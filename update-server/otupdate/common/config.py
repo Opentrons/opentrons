@@ -5,7 +5,7 @@ otupdate.common.config: Handlers for reading update server configuration
 import os
 import logging
 import json
-from typing import Any, Dict, Mapping, NamedTuple, Optional, Tuple
+from typing import Any, Dict, Mapping, NamedTuple, Optional, Tuple, cast
 
 from aiohttp.web import Request
 
@@ -38,7 +38,7 @@ class Config(NamedTuple):
 
 
 def config_from_request(req: Request) -> Config:
-    return req.app[CONFIG_VARNAME]
+    return cast(Config, req.app[CONFIG_VARNAME])
 
 
 def _ensure_load(path: str) -> Optional[Mapping[str, Any]]:
@@ -116,7 +116,7 @@ def _get_path(args_path: Optional[str]) -> str:
     return DEFAULT_PATH
 
 
-def load(args_path: str = None) -> Config:
+def load(args_path: Optional[str] = None) -> Config:
     """
     Load the config file, selecting the appropriate path from many sources
     """

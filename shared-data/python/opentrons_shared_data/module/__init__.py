@@ -8,15 +8,15 @@ from .dev_types import (
     SchemaVersions,
     ModuleSchema,
     SchemaV1,
-    SchemaV2,
     SchemaV3,
     ModuleDefinitionV1,
-    ModuleDefinitionV2,
     ModuleDefinitionV3,
     ModuleModel,
 )
 
 
+# TODO (spp, 2022-05-12): Python has a built-in error called `ModuleNotFoundError` so,
+#                         maybe rename this one?
 class ModuleNotFoundError(KeyError):
     def __init__(self, version: str, model_or_loadname: str):
         super().__init__(model_or_loadname)
@@ -48,13 +48,6 @@ def load_definition(version: SchemaV1, model_or_loadname: str) -> ModuleDefiniti
 
 @overload
 def load_definition(
-    version: SchemaV2, model_or_loadname: ModuleModel
-) -> ModuleDefinitionV2:
-    ...
-
-
-@overload
-def load_definition(
     version: SchemaV3, model_or_loadname: ModuleModel
 ) -> ModuleDefinitionV3:
     ...
@@ -63,7 +56,7 @@ def load_definition(
 def load_definition(
     version: SchemaVersions,
     model_or_loadname: Union[str, ModuleModel],
-) -> Union[ModuleDefinitionV1, ModuleDefinitionV2, ModuleDefinitionV3]:
+) -> Union[ModuleDefinitionV1, ModuleDefinitionV3]:
     if version == "1":
         path = Path("module") / "definitions" / "1.json"
         data = json.loads(load_shared_data(path))
@@ -76,5 +69,5 @@ def load_definition(
         try:
             data = load_shared_data(path)
         except FileNotFoundError:
-            raise ModuleNotFoundError("2", model_or_loadname)
-        return cast(ModuleDefinitionV2, json.loads(data))
+            raise ModuleNotFoundError(version, model_or_loadname)
+        return cast(ModuleDefinitionV3, json.loads(data))

@@ -4,7 +4,7 @@
   "offline_pipettes_and_modules": "Robot must be on the network to see pipettes and modules",
   "offline_recent_protocol_runs": "Robot must be on the network to see protocol runs",
   "pipettes_and_modules": "Pipettes and Modules",
-  "run_a_protocol": "Run a Protocol",
+  "run_a_protocol": "Run a protocol",
   "usb_port": "usb port {{port}}",
   "usb_hub": "usb port {{port}} via hub",
   "magdeck_gen1_height": "Height: {{height}}",
@@ -103,5 +103,9 @@
   "rerun_now": "Rerun protocol now",
   "delete_run": "Delete protocol run record",
   "no_protocol_runs": "No protocol runs yet!",
-  "download_run_log": "Download run log"
+  "download_run_log": "Download run log",
+  "plunger_positions": "Plunger Positions",
+  "tip_pickup_drop": "Tip Pickup / Drop",
+  "for_dev_use_only": "For Dev Use only",
+  "power_force": "Power / Force"
 }

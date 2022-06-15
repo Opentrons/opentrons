@@ -14,7 +14,7 @@ export interface StoredProtocolData {
   modified: number
   srcFileNames: string[]
   srcFiles: Buffer[]
-  mostRecentAnalysis: ProtocolAnalysisOutput
+  mostRecentAnalysis: ProtocolAnalysisOutput | null
 }
 
 // state types

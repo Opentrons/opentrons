@@ -71,6 +71,7 @@ export function RecentProtocolRuns({
               >
                 {t('run')}
               </StyledText>
+
               <StyledText
                 as="label"
                 width="35%"
@@ -79,6 +80,7 @@ export function RecentProtocolRuns({
               >
                 {t('protocol')}
               </StyledText>
+
               <StyledText
                 as="label"
                 width="20%"
@@ -117,6 +119,7 @@ export function RecentProtocolRuns({
                   <HistoricalProtocolRun
                     run={run}
                     protocolName={protocolName}
+                    protocolKey={protocol?.key}
                     robotName={robotName}
                     robotIsBusy={robotIsBusy}
                     key={index}
@@ -135,7 +138,7 @@ export function RecentProtocolRuns({
             {t('offline_recent_protocol_runs')}
           </StyledText>
         )}
-        {(runs == null || runs.length === 0) && (
+        {isRobotViewable && (runs == null || runs.length === 0) && (
           <StyledText
             as="p"
             id="RecentProtocolRuns_no_runs"

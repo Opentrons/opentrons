@@ -10,10 +10,12 @@ import { TestShakeSlideout } from '../TestShakeSlideout'
 import { HeaterShakerModuleCard } from '../../Devices/HeaterShakerWizard/HeaterShakerModuleCard'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
 import { useLatchControls } from '../hooks'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../Devices/HeaterShakerWizard/HeaterShakerModuleCard')
 jest.mock('../hooks')
+jest.mock('../useModuleIdFromRun')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
@@ -26,6 +28,9 @@ const mockHeaterShakerModuleCard = HeaterShakerModuleCard as jest.MockedFunction
 >
 const mockUseLatchControls = useLatchControls as jest.MockedFunction<
   typeof useLatchControls
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const render = (props: React.ComponentProps<typeof TestShakeSlideout>) => {
@@ -128,6 +133,9 @@ describe('TestShakeSlideout', () => {
     mockHeaterShakerModuleCard.mockReturnValue(
       <div>Mock Heater Shaker Module Card</div>
     )
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'heatershaker_id',
+    })
   })
 
   afterEach(() => {
@@ -162,7 +170,7 @@ describe('TestShakeSlideout', () => {
     getByText('Shake speed')
 
     const button = getByRole('button', { name: /Start/i })
-    expect(button).toBeEnabled()
+    expect(button).toBeDisabled()
   })
 
   it('renders a troubleshoot accordion and contents when it is clicked', () => {
@@ -233,7 +241,7 @@ describe('TestShakeSlideout', () => {
 
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'heaterShakerModule/setTargetShakeSpeed',
+        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
         params: {
           moduleId: 'heatershaker_id',
           rpm: 300,
@@ -273,7 +281,7 @@ describe('TestShakeSlideout', () => {
     expect(mockCreateCommand).toHaveBeenCalledWith({
       runId: props.runId,
       command: {
-        commandType: 'heaterShakerModule/setTargetShakeSpeed',
+        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
         params: {
           moduleId: 'heatershaker_id',
           rpm: 300,

@@ -70,7 +70,6 @@ async def test_runner_with_python(
         id=matchers.IsA(str),
         model=ModuleModel.TEMPERATURE_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-        definition=tempdeck_v1_def,
         serialNumber=matchers.IsA(str),
     )
 

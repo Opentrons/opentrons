@@ -39,8 +39,11 @@ def get_shared_data_files() -> List[Path]:
 
 
 def _minimize_and_write_json(data_file: Path, target_file: Path) -> None:
-    contents = json.dumps(json.loads(data_file.read_text()), separators=(",", ":"))
-    target_file.write_text(contents)
+    contents = json.dumps(
+        json.loads(data_file.read_text(encoding="utf-8")),
+        separators=(",", ":"),
+    )
+    target_file.write_text(contents, encoding="utf-8")
 
 
 class SDistWithData(sdist.sdist):

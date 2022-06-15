@@ -23,9 +23,11 @@ type ModalType = 'info' | 'warning' | 'error'
 export interface ModalProps extends BaseModalProps {
   type?: ModalType
   onClose?: React.MouseEventHandler
+  closeOnOutsideClick?: boolean
   title?: React.ReactNode
   children?: React.ReactNode
   icon?: IconProps
+  contentBackgroundColor?: string
 }
 
 const closeIconStyles = css`
@@ -45,7 +47,15 @@ const closeIconStyles = css`
 `
 
 export const Modal = (props: ModalProps): JSX.Element => {
-  const { type = 'info', onClose, title, children } = props
+  const {
+    type = 'info',
+    onClose,
+    closeOnOutsideClick,
+    title,
+    contentBackgroundColor,
+    children,
+    maxHeight,
+  } = props
   const header =
     title != null ? (
       <>
@@ -90,13 +100,16 @@ export const Modal = (props: ModalProps): JSX.Element => {
 
   return (
     <BaseModal
-      width={'31.25rem'}
+      width="31.25rem"
       noHeaderStyles
       header={header}
       css={css`
         border-radius: ${BORDERS.radiusSoftCorners};
         box-shadow: ${BORDERS.smallDropShadow};
+        max-height: ${maxHeight};
       `}
+      onOutsideClick={closeOnOutsideClick ? onClose : undefined}
+      contentBackgroundColor={contentBackgroundColor}
     >
       {children}
     </BaseModal>

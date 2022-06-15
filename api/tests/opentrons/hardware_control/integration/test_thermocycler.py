@@ -5,6 +5,7 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.modules import Thermocycler
+from opentrons.hardware_control.modules.types import TemperatureStatus
 
 
 @pytest.fixture
@@ -113,3 +114,13 @@ async def test_cycle_temperatures(thermocycler: Thermocycler):
     assert thermocycler.current_step_index is None
     assert thermocycler.total_cycle_count is None
     assert thermocycler.total_step_count is None
+
+
+async def test_wait_for_temperatures(thermocycler: Thermocycler):
+    """It should wait for temperature and be at holding status"""
+    await thermocycler.set_target_block_temperature(40.0)
+    await thermocycler.set_target_lid_temperature(50.0)
+    await thermocycler.wait_for_block_temperature(temperature=40.0)
+    await thermocycler.wait_for_lid_temperature(temperature=50.0)
+    assert thermocycler.status == TemperatureStatus.HOLDING
+    assert thermocycler.lid_temp_status == TemperatureStatus.HOLDING

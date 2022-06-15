@@ -4,6 +4,10 @@ import {
   thermocyclerPipetteCollision,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
 } from '../../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { DispenseParams } from '@opentrons/shared-data/protocol/types/schemaV3'
@@ -18,6 +22,16 @@ export const dispense: CommandCreator<DispenseParams> = (
   const { pipette, volume, labware, well, offsetFromBottomMm, flowRate } = args
   const actionName = 'dispense'
   const errors: CommandCreatorError[] = []
+  const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
+
+  if (!pipetteSpec) {
+    errors.push(
+      errorCreators.pipetteDoesNotExist({
+        actionName,
+        pipette,
+      })
+    )
+  }
 
   if (
     modulePipetteCollision({
@@ -78,6 +92,46 @@ export const dispense: CommandCreator<DispenseParams> = (
     )
   ) {
     errors.push(errorCreators.heaterShakerIsShaking())
+  }
+
+  if (
+    pipetteAdjacentHeaterShakerWhileShaking(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]?.slot
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
+  }
+
+  if (
+    getIsHeaterShakerEastWestWithLatchOpen(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]?.slot
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerEastWestWithLatchOpen())
+  }
+
+  if (
+    getIsHeaterShakerEastWestMultiChannelPipette(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]?.slot,
+      pipetteSpec
+    )
+  ) {
+    errors.push(errorCreators.heaterShakerEastWestOfMultiChannelPipette())
+  }
+  if (
+    getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]?.slot,
+      pipetteSpec,
+      invariantContext.labwareEntities[labware]
+    )
+  ) {
+    errors.push(
+      errorCreators.heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette()
+    )
   }
 
   if (errors.length > 0) {

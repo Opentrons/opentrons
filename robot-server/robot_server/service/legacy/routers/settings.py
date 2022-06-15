@@ -33,6 +33,7 @@ from robot_server.service.legacy.models.settings import (
     Links,
     AdvancedSetting,
 )
+from robot_server.persistence import PersistenceResetter, get_persistence_resetter
 
 log = logging.getLogger(__name__)
 
@@ -193,11 +194,17 @@ async def get_settings_reset_options() -> FactoryResetOptions:
     "/settings/reset", description="Perform a factory reset of some robot data"
 )
 async def post_settings_reset_options(
-    factory_reset_commands: Dict[reset_util.ResetOptionId, bool]
+    factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
+    persistence_resetter: PersistenceResetter = Depends(get_persistence_resetter),
 ) -> V1BasicResponse:
     options = set(k for k, v in factory_reset_commands.items() if v)
     reset_util.reset(options)
 
+    if factory_reset_commands.get(reset_util.ResetOptionId.runs_history, False):
+        await persistence_resetter.mark_directory_reset()
+
+    # TODO (tz, 5-24-22): The order of a set is undefined because set's aren't ordered.
+    # The message returned to the client will be printed in the wrong order.
     message = (
         "Options '{}' were reset".format(", ".join(o.name for o in options))
         if options

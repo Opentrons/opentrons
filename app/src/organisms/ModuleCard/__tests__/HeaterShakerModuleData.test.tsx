@@ -18,13 +18,17 @@ describe('HeaterShakerModuleData', () => {
   let props: React.ComponentProps<typeof HeaterShakerModuleData>
   beforeEach(() => {
     props = {
-      heaterStatus: 'idle',
-      shakerStatus: 'idle',
-      latchStatus: 'idle_unknown',
-      targetTemp: null,
-      currentTemp: null,
-      targetSpeed: null,
-      currentSpeed: null,
+      moduleData: {
+        labwareLatchStatus: 'idle_unknown',
+        speedStatus: 'idle',
+        temperatureStatus: 'idle',
+        currentSpeed: null,
+        currentTemperature: null,
+        targetSpeed: null,
+        targetTemperature: null,
+        errorDetails: null,
+        status: 'idle',
+      },
     }
     mockStatusLabel.mockReturnValue(<div>Mock StatusLabel</div>)
   })
@@ -41,13 +45,17 @@ describe('HeaterShakerModuleData', () => {
 
   it('renders a holding at target status', () => {
     props = {
-      heaterStatus: 'holding at target',
-      shakerStatus: 'idle',
-      latchStatus: 'idle_unknown',
-      targetTemp: null,
-      currentTemp: null,
-      targetSpeed: 200,
-      currentSpeed: 200,
+      moduleData: {
+        labwareLatchStatus: 'idle_unknown',
+        speedStatus: 'idle',
+        temperatureStatus: 'holding at target',
+        currentSpeed: 200,
+        currentTemperature: null,
+        targetSpeed: 200,
+        targetTemperature: null,
+        errorDetails: null,
+        status: 'idle',
+      },
     }
     const { getByText } = render(props)
     expect(getByText('Mock StatusLabel')).toHaveStyle(
@@ -57,13 +65,17 @@ describe('HeaterShakerModuleData', () => {
 
   it('renders a heating status', () => {
     props = {
-      heaterStatus: 'heating',
-      shakerStatus: 'idle',
-      latchStatus: 'idle_unknown',
-      targetTemp: 42,
-      currentTemp: 39,
-      targetSpeed: null,
-      currentSpeed: null,
+      moduleData: {
+        labwareLatchStatus: 'idle_unknown',
+        speedStatus: 'idle',
+        temperatureStatus: 'heating',
+        currentSpeed: null,
+        currentTemperature: 39,
+        targetSpeed: null,
+        targetTemperature: 42,
+        errorDetails: null,
+        status: 'idle',
+      },
     }
     const { getByText } = render(props)
     expect(getByText('Mock StatusLabel')).toHaveStyle(
@@ -73,13 +85,17 @@ describe('HeaterShakerModuleData', () => {
 
   it('renders a shaking status', () => {
     props = {
-      heaterStatus: 'idle',
-      shakerStatus: 'speeding up',
-      latchStatus: 'idle_unknown',
-      targetTemp: null,
-      currentTemp: null,
-      targetSpeed: 200,
-      currentSpeed: 200,
+      moduleData: {
+        labwareLatchStatus: 'idle_unknown',
+        speedStatus: 'speeding up',
+        temperatureStatus: 'idle',
+        currentSpeed: 200,
+        currentTemperature: null,
+        targetSpeed: 200,
+        targetTemperature: null,
+        errorDetails: null,
+        status: 'idle',
+      },
     }
     const { getByText } = render(props)
     getByText('Target: 200 RPM')
@@ -91,13 +107,17 @@ describe('HeaterShakerModuleData', () => {
 
   it('renders an idle shaking status', () => {
     props = {
-      heaterStatus: 'idle',
-      shakerStatus: 'idle',
-      latchStatus: 'idle_unknown',
-      targetTemp: null,
-      currentTemp: null,
-      targetSpeed: null,
-      currentSpeed: 0,
+      moduleData: {
+        labwareLatchStatus: 'idle_unknown',
+        speedStatus: 'idle',
+        temperatureStatus: 'idle',
+        currentSpeed: 0,
+        currentTemperature: null,
+        targetSpeed: null,
+        targetTemperature: null,
+        errorDetails: null,
+        status: 'idle',
+      },
     }
     const { getByText } = render(props)
     getByText('Target: N/A')
@@ -109,13 +129,17 @@ describe('HeaterShakerModuleData', () => {
 
   it('renders an error shaking status', () => {
     props = {
-      heaterStatus: 'idle',
-      shakerStatus: 'error',
-      latchStatus: 'idle_unknown',
-      targetTemp: null,
-      currentTemp: null,
-      targetSpeed: 200,
-      currentSpeed: 200,
+      moduleData: {
+        labwareLatchStatus: 'idle_unknown',
+        speedStatus: 'error',
+        temperatureStatus: 'idle',
+        currentSpeed: 200,
+        currentTemperature: null,
+        targetSpeed: 200,
+        targetTemperature: null,
+        errorDetails: null,
+        status: 'idle',
+      },
     }
     const { getByText } = render(props)
     getByText('Target: 200 RPM')
@@ -127,13 +151,17 @@ describe('HeaterShakerModuleData', () => {
 
   it('renders an idle temp status', () => {
     props = {
-      heaterStatus: 'idle',
-      shakerStatus: 'idle',
-      latchStatus: 'idle_unknown',
-      targetTemp: null,
-      currentTemp: null,
-      targetSpeed: null,
-      currentSpeed: 0,
+      moduleData: {
+        labwareLatchStatus: 'idle_unknown',
+        speedStatus: 'idle',
+        temperatureStatus: 'idle',
+        currentSpeed: 0,
+        currentTemperature: null,
+        targetSpeed: null,
+        targetTemperature: null,
+        errorDetails: null,
+        status: 'idle',
+      },
     }
     const { getByText } = render(props)
     getByText('Target: N/A')
@@ -145,13 +173,17 @@ describe('HeaterShakerModuleData', () => {
 
   it('renders a cooling temp status', () => {
     props = {
-      heaterStatus: 'cooling',
-      shakerStatus: 'idle',
-      latchStatus: 'idle_unknown',
-      targetTemp: 42,
-      currentTemp: 60,
-      targetSpeed: null,
-      currentSpeed: null,
+      moduleData: {
+        labwareLatchStatus: 'idle_unknown',
+        speedStatus: 'idle',
+        temperatureStatus: 'cooling',
+        currentSpeed: null,
+        currentTemperature: 60,
+        targetSpeed: null,
+        targetTemperature: 42,
+        errorDetails: null,
+        status: 'idle',
+      },
     }
     const { getByText } = render(props)
     expect(getByText('Mock StatusLabel')).toHaveStyle(
@@ -161,13 +193,17 @@ describe('HeaterShakerModuleData', () => {
 
   it('renders a correct text when latch is opened', () => {
     props = {
-      heaterStatus: 'cooling',
-      shakerStatus: 'idle',
-      latchStatus: 'idle_open',
-      targetTemp: 42,
-      currentTemp: 60,
-      targetSpeed: null,
-      currentSpeed: null,
+      moduleData: {
+        labwareLatchStatus: 'idle_open',
+        speedStatus: 'idle',
+        temperatureStatus: 'cooling',
+        currentSpeed: null,
+        currentTemperature: 60,
+        targetSpeed: null,
+        targetTemperature: 42,
+        errorDetails: null,
+        status: 'idle',
+      },
     }
     const { getByText } = render(props)
     getByText('open')
@@ -175,13 +211,17 @@ describe('HeaterShakerModuleData', () => {
 
   it('renders a correct text when latch is opening', () => {
     props = {
-      heaterStatus: 'cooling',
-      shakerStatus: 'idle',
-      latchStatus: 'opening',
-      targetTemp: 42,
-      currentTemp: 60,
-      targetSpeed: null,
-      currentSpeed: null,
+      moduleData: {
+        labwareLatchStatus: 'opening',
+        speedStatus: 'idle',
+        temperatureStatus: 'cooling',
+        currentSpeed: null,
+        currentTemperature: 60,
+        targetSpeed: null,
+        targetTemperature: 42,
+        errorDetails: null,
+        status: 'idle',
+      },
     }
     const { getByText } = render(props)
     getByText('open')
@@ -189,13 +229,17 @@ describe('HeaterShakerModuleData', () => {
 
   it('renders a correct text when latch is unknown', () => {
     props = {
-      heaterStatus: 'cooling',
-      shakerStatus: 'idle',
-      latchStatus: 'idle_unknown',
-      targetTemp: 42,
-      currentTemp: 60,
-      targetSpeed: null,
-      currentSpeed: null,
+      moduleData: {
+        labwareLatchStatus: 'idle_unknown',
+        speedStatus: 'idle',
+        temperatureStatus: 'cooling',
+        currentSpeed: null,
+        currentTemperature: 60,
+        targetSpeed: null,
+        targetTemperature: 42,
+        errorDetails: null,
+        status: 'idle',
+      },
     }
     const { getByText } = render(props)
     getByText('open')
@@ -203,13 +247,17 @@ describe('HeaterShakerModuleData', () => {
 
   it('renders a correct text when latch is closing and is not shaking', () => {
     props = {
-      heaterStatus: 'cooling',
-      shakerStatus: 'idle',
-      latchStatus: 'closing',
-      targetTemp: 42,
-      currentTemp: 60,
-      targetSpeed: null,
-      currentSpeed: null,
+      moduleData: {
+        labwareLatchStatus: 'closing',
+        speedStatus: 'idle',
+        temperatureStatus: 'cooling',
+        currentSpeed: null,
+        currentTemperature: 60,
+        targetSpeed: null,
+        targetTemperature: 42,
+        errorDetails: null,
+        status: 'idle',
+      },
     }
     const { getByText } = render(props)
     getByText('Closed')
@@ -217,13 +265,17 @@ describe('HeaterShakerModuleData', () => {
 
   it('renders a correct text when latch is closing and is shaking', () => {
     props = {
-      heaterStatus: 'cooling',
-      shakerStatus: 'speeding up',
-      latchStatus: 'closing',
-      targetTemp: 42,
-      currentTemp: 60,
-      targetSpeed: 500,
-      currentSpeed: 200,
+      moduleData: {
+        labwareLatchStatus: 'closing',
+        speedStatus: 'speeding up',
+        temperatureStatus: 'cooling',
+        currentSpeed: 200,
+        currentTemperature: 60,
+        targetSpeed: 500,
+        targetTemperature: 42,
+        errorDetails: null,
+        status: 'idle',
+      },
     }
     const { getByText, getByTestId } = render(props)
     getByText('Closed and Locked')

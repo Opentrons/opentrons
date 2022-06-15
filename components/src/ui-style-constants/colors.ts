@@ -16,23 +16,24 @@ export const medBlue = '#d9e9fe'
 export const disabled = '#a0a0a0'
 export const medGreyHover = '#b8b8b8'
 export const darkBlack = '#16212D'
-export const darkBlackHover = '#283d52'
+export const darkBlackHover = '#24313f'
 export const darkBlackPressed = '#16212D'
 export const darkBlackSelected = '#39495B'
 // note: darkBlackDisabled = greyDisabled
 
 export const darkGrey = '#4a4a4a'
-export const darkGreyHover = '#787a7d'
+export const darkGreyHover = '#283d52'
 export const darkGreyPressed = '#646668'
 export const darkGreyEnabled = '#707075'
 // note: darkGreyDisabled = greyDisabled
+// note: darkGraySelected = darkBlackSelected
 
 export const greyHover = '#acacaf'
 export const greyPressed = '#8d8d91'
 export const greyDisabled = '#eaeaeb'
 
 export const lightGrey = '#f8f8f8'
-export const lightGreyHover = '#3314202c'
+export const lightGreyHover = '#16212d26'
 
 export const yellow = '#f2b53c'
 export const yellowHover = '#eca20f'

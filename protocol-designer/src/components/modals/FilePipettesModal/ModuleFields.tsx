@@ -79,8 +79,10 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
 
     onFieldChange(e)
 
-    // only clear model dropdown if not TC
-    if (targetToClear !== 'modulesByType.thermocyclerModuleType.model') {
+    if (
+      targetToClear !== 'modulesByType.thermocyclerModuleType.model' &&
+      targetToClear !== 'modulesByType.heaterShakerModuleType.model'
+    ) {
       onSetFieldValue(targetToClear, null)
     }
     onSetFieldTouched(targetToClear, false)

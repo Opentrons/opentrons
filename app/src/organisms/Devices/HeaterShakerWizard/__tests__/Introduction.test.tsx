@@ -8,7 +8,7 @@ import {
   RobotWorkSpace,
 } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { mockDefinition } from '../../../../redux/custom-labware/__fixtures__'
 import { Introduction } from '../Introduction'
 import type { ThermalAdapterName } from '@opentrons/shared-data'
@@ -46,6 +46,7 @@ describe('Introduction', () => {
     props = {
       labwareDefinition: null,
       thermalAdapterName: null,
+      moduleModel: 'heaterShakerModuleV1',
     }
   })
   afterEach(() => {
@@ -62,7 +63,7 @@ describe('Introduction', () => {
     getByText('Thermal Adapter + Screw')
     getByText('Screw may already be in the center of the module.')
     getByText('Labware')
-    getByText('Heater-Shaker Module')
+    getByText('Heater-Shaker Module GEN1')
     getByText('T10 Torx Screwdriver')
     getByText(
       'Provided with module. Note: using another screwdriver size can strip the module’s screws.'
@@ -74,6 +75,7 @@ describe('Introduction', () => {
     props = {
       labwareDefinition: mockDefinition,
       thermalAdapterName: 'PCR Adapter' as ThermalAdapterName,
+      moduleModel: 'heaterShakerModuleV1',
     }
     when(mockRobotWorkSpace)
       .mockReturnValue(<div></div>)
@@ -110,6 +112,7 @@ describe('Introduction', () => {
     props = {
       labwareDefinition: null,
       thermalAdapterName: 'Universal Flat Adapter',
+      moduleModel: 'heaterShakerModuleV1',
     }
 
     const { getByText, getByAltText } = render(props)
@@ -120,6 +123,7 @@ describe('Introduction', () => {
     props = {
       labwareDefinition: null,
       thermalAdapterName: 'Deep Well Adapter',
+      moduleModel: 'heaterShakerModuleV1',
     }
 
     const { getByText, getByAltText } = render(props)
@@ -130,6 +134,7 @@ describe('Introduction', () => {
     props = {
       labwareDefinition: null,
       thermalAdapterName: '96 Flat Bottom Adapter',
+      moduleModel: 'heaterShakerModuleV1',
     }
 
     const { getByText, getByAltText } = render(props)

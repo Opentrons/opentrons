@@ -1,6 +1,7 @@
 """Public protocol run data models."""
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
+from datetime import datetime
 
 from ..errors import ErrorOccurrence
 from ..types import (
@@ -21,3 +22,5 @@ class StateSummary(BaseModel):
     pipettes: List[LoadedPipette]
     modules: List[LoadedModule]
     labwareOffsets: List[LabwareOffset]
+    startedAt: Optional[datetime]
+    completedAt: Optional[datetime]

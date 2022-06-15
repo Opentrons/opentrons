@@ -463,11 +463,6 @@ class SensorDiagnosticResponse:  # noqa: D101
 
 
 @dataclass
-class PipetteInfoRequest(EmptyPayloadMessage):  # noqa: D101
-    message_id: Literal[MessageId.pipette_info_request] = MessageId.pipette_info_request
-
-
-@dataclass
 class PipetteInfoResponse:  # noqa: D101
     payload: payloads.PipetteInfoResponsePayload
     payload_type: Type[
@@ -541,11 +536,6 @@ class BindSensorOutputResponse:  # noqa: D101
 
 
 @dataclass
-class GripperInfoRequest(EmptyPayloadMessage):  # noqa: D101
-    message_id: Literal[MessageId.gripper_info_request] = MessageId.gripper_info_request
-
-
-@dataclass
 class GripperInfoResponse:  # noqa: D101
     payload: payloads.GripperInfoResponsePayload
     payload_type: Type[
@@ -605,3 +595,16 @@ class SetSerialNumber:  # noqa: D101
     payload: payloads.SerialNumberPayload
     payload_type: Type[payloads.SerialNumberPayload] = payloads.SerialNumberPayload
     message_id: Literal[MessageId.set_serial_number] = MessageId.set_serial_number
+
+
+@dataclass
+class InstrumentInfoRequest(EmptyPayloadMessage):
+    """Prompt pipettes and grippers to respond.
+
+    Pipette should respond with PipetteInfoResponse.
+    Gripper should respond with GripperInfoResponse.
+    """
+
+    message_id: Literal[
+        MessageId.instrument_info_request
+    ] = MessageId.instrument_info_request

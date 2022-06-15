@@ -13,7 +13,7 @@ import {
 export interface ExternalLinkProps extends LinkProps {
   href: string
   id?: string
-  children: JSX.Element
+  children: React.ReactNode
 }
 
 export const ExternalLink = (props: ExternalLinkProps): JSX.Element => (

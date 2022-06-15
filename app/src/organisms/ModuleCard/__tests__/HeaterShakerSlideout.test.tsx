@@ -8,12 +8,14 @@ import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
+import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { HeaterShakerSlideout } from '../HeaterShakerSlideout'
 import { ConfirmAttachmentModal } from '../ConfirmAttachmentModal'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../ConfirmAttachmentModal')
 jest.mock('../../../redux/config')
+jest.mock('../useModuleIdFromRun')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -26,6 +28,9 @@ const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
 >
 const mockConfirmAttachmentModal = ConfirmAttachmentModal as jest.MockedFunction<
   typeof ConfirmAttachmentModal
+>
+const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
+  typeof useModuleIdFromRun
 >
 
 const render = (props: React.ComponentProps<typeof HeaterShakerSlideout>) => {
@@ -56,6 +61,9 @@ describe('HeaterShakerSlideout', () => {
     mockConfirmAttachmentModal.mockReturnValue(
       <div>mock confirm attachment modal</div>
     )
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'heatershaker_id',
+    })
   })
 
   afterEach(() => {
@@ -125,10 +133,10 @@ describe('HeaterShakerSlideout', () => {
 
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'heaterShakerModule/startSetTargetTemperature',
+        commandType: 'heaterShaker/setTargetTemperature',
         params: {
           moduleId: 'heatershaker_id',
-          temperature: 40,
+          celsius: 40,
         },
       },
     })
@@ -188,10 +196,10 @@ describe('HeaterShakerSlideout', () => {
     expect(mockCreateCommand).toHaveBeenCalledWith({
       runId: props.runId,
       command: {
-        commandType: 'heaterShakerModule/startSetTargetTemperature',
+        commandType: 'heaterShaker/setTargetTemperature',
         params: {
           moduleId: 'heatershaker_id',
-          temperature: 40,
+          celsius: 40,
         },
       },
     })

@@ -199,7 +199,7 @@ class ProtocolContextImplementation(AbstractProtocol):
 
         attached = {
             att_mount: instr.get("name", None)
-            for att_mount, instr in self._sync_hardware.attached_instruments.items()  # noqa: E501
+            for att_mount, instr in self._sync_hardware.attached_instruments.items()
             if instr
         }
         attached[mount] = instrument_name

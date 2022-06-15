@@ -247,6 +247,35 @@ def test_dispense(
     assert result == response
 
 
+def test_touch_tip(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a touch tip command."""
+    request = commands.TouchTipCreate(
+        params=commands.TouchTipParams(
+            pipetteId="123",
+            labwareId="456",
+            wellName="A2",
+            wellLocation=WellLocation(),
+        )
+    )
+
+    response = commands.TouchTipResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.touch_tip(
+        pipette_id="123",
+        labware_id="456",
+        well_name="A2",
+        well_location=WellLocation(),
+    )
+
+    assert result == response
+
+
 def test_pause(
     decoy: Decoy,
     transport: AbstractSyncTransport,
@@ -325,5 +354,34 @@ def test_thermocycler_deactivate_lid(
     response = commands.thermocycler.DeactivateLidResult()
     decoy.when(transport.execute_command(request=request)).then_return(response)
     result = subject.thermocycler_deactivate_lid(module_id="module-id")
+
+    assert result == response
+
+
+def test_blow_out(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a blow_out command."""
+    request = commands.BlowOutCreate(
+        params=commands.BlowOutParams(
+            pipetteId="123",
+            labwareId="456",
+            wellName="A2",
+            wellLocation=WellLocation(),
+        )
+    )
+
+    response = commands.BlowOutResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.blow_out(
+        pipette_id="123",
+        labware_id="456",
+        well_name="A2",
+        well_location=WellLocation(),
+    )
 
     assert result == response

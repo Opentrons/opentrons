@@ -72,7 +72,7 @@ def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
 
     """
     # mypy wants type annotation for v.
-    return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]  # type: ignore[var-annotated]  # noqa: E501
+    return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]  # type: ignore[var-annotated]
 
 
 PromptedEnum = TypeVar("PromptedEnum", bound=Enum, covariant=True)

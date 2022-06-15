@@ -62,7 +62,7 @@ export const TemperatureModuleData = (
         data-testid={`temp_module_data`}
       >
         <Text marginBottom={SPACING.spacing1}>
-          {t(targetTemp === null ? 'na_temp' : 'target_temp', {
+          {t(targetTemp == null ? 'na_temp' : 'target_temp', {
             temp: targetTemp,
           })}
         </Text>

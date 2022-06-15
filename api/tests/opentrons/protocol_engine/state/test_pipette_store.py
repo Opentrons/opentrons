@@ -19,6 +19,7 @@ from .command_fixtures import (
     create_pick_up_tip_command,
     create_drop_tip_command,
     create_move_to_well_command,
+    create_blow_out_command,
 )
 
 
@@ -80,6 +81,27 @@ def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
     subject.handle_action(UpdateCommandAction(command=aspirate_command))
 
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 84
+
+
+def test_handles_blow_out(subject: PipetteStore) -> None:
+    """It should set volume to 0 and set current well."""
+    command = create_blow_out_command(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="well-name",
+    )
+
+    subject.handle_action(UpdateCommandAction(command=command))
+
+    result = subject.state
+
+    assert result.aspirated_volume_by_id["pipette-id"] == 0
+
+    assert result.current_well == CurrentWell(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="well-name",
+    )
 
 
 def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
@@ -168,6 +190,18 @@ def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
         ),
         (
             create_move_to_well_command(
+                pipette_id="move-to-well-pipette-id",
+                labware_id="move-to-well-labware-id",
+                well_name="move-to-well-well-name",
+            ),
+            CurrentWell(
+                pipette_id="move-to-well-pipette-id",
+                labware_id="move-to-well-labware-id",
+                well_name="move-to-well-well-name",
+            ),
+        ),
+        (
+            create_blow_out_command(
                 pipette_id="move-to-well-pipette-id",
                 labware_id="move-to-well-labware-id",
                 well_name="move-to-well-well-name",

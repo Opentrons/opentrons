@@ -3,6 +3,56 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2022-06-09)
+
+
+### Features
+
+* **protocol-designer:** disable placing module next to heater shaker ([#10660](https://github.com/Opentrons/opentrons/issues/10660)) ([b96b410](https://github.com/Opentrons/opentrons/commit/b96b410599c823bd6efbb02d8b749e4a89db0fa6)), closes [#10449](https://github.com/Opentrons/opentrons/issues/10449) [#10450](https://github.com/Opentrons/opentrons/issues/10450)
+* **step-generation:** raise timeline error when pipetting E/W of H-S with multi channel pipette ([#10681](https://github.com/Opentrons/opentrons/issues/10681)) ([3ea88a2](https://github.com/Opentrons/opentrons/commit/3ea88a260ebbfedc7c7fcda194ab5d37e1b22774)), closes [#10442](https://github.com/Opentrons/opentrons/issues/10442)
+
+
+
+
+
+# [6.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.0...v6.0.0-alpha.1) (2022-06-07)
+
+
+### Bug Fixes
+
+* **protocol-designer:** change PD help link ([#10440](https://github.com/Opentrons/opentrons/issues/10440)) ([9152d25](https://github.com/Opentrons/opentrons/commit/9152d2571f4c821387b4b3249b895a6278c17b77)), closes [#10325](https://github.com/Opentrons/opentrons/issues/10325)
+
+
+### Features
+
+* **protocol-designer:** add module placement restriction when editing position of H-S ([#10457](https://github.com/Opentrons/opentrons/issues/10457)) ([9f16650](https://github.com/Opentrons/opentrons/commit/9f16650d3efdb008329751941308264d9324cc56)), closes [#10454](https://github.com/Opentrons/opentrons/issues/10454)
+* **protocol-designer:** add timeline error for tall labware east west of a heater shaker ([#10551](https://github.com/Opentrons/opentrons/issues/10551)) ([1e799d3](https://github.com/Opentrons/opentrons/commit/1e799d3d65a40080f346f8ac2f1e6e3e7196b564)), closes [#10444](https://github.com/Opentrons/opentrons/issues/10444)
+* **step-generation, protocol-designer:** add H-S timeline error when pipetting E-W with latch open ([#10566](https://github.com/Opentrons/opentrons/issues/10566)) ([3abafbd](https://github.com/Opentrons/opentrons/commit/3abafbd8f5b6463c67b47d14ecf6a371b8ce7bfa)), closes [#10510](https://github.com/Opentrons/opentrons/issues/10510)
+* **step-generation, protocol-designer:** generate error when pipetting NSEW of HS while shaking ([#10589](https://github.com/Opentrons/opentrons/issues/10589)) ([17c1b27](https://github.com/Opentrons/opentrons/commit/17c1b27dbdf30f6e42fac0e3e657d813d7eff57e)), closes [#10509](https://github.com/Opentrons/opentrons/issues/10509)
+
+
+
+
+
+# [6.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.1.0-beta.0...v6.0.0-alpha.0) (2022-05-26)
+
+
+### Bug Fixes
+
+* **protocol-designer:** delay when offset length is falsey ([#10016](https://github.com/Opentrons/opentrons/issues/10016)) ([1c13967](https://github.com/Opentrons/opentrons/commit/1c139676fcc3fea28f29c1b49bff6452514475b0)), closes [#815](https://github.com/Opentrons/opentrons/issues/815)
+
+
+### Features
+
+* **protocol-designer:** add labware placement restrictions east west of heater-shaker ([#10410](https://github.com/Opentrons/opentrons/issues/10410)) ([e1a8887](https://github.com/Opentrons/opentrons/commit/e1a88879941ae3e9da025f10aaac191452e3f938)), closes [#10255](https://github.com/Opentrons/opentrons/issues/10255)
+* **protocol-designer, step-generation, shared-data:** rename trash labware id to match protocol engine usage ([#10132](https://github.com/Opentrons/opentrons/issues/10132)) ([2136030](https://github.com/Opentrons/opentrons/commit/21360302a0a67a544ebde9f114d5eb31d61af659)), closes [#10017](https://github.com/Opentrons/opentrons/issues/10017)
+* **shared-data:** add heater-shaker labware w/ adapter definitions ([#9917](https://github.com/Opentrons/opentrons/issues/9917)) ([859fe69](https://github.com/Opentrons/opentrons/commit/859fe69789fbf1d065420fce07dcd7a940e2c09c))
+* **shared-data, protocol-designer:** add liquid color to schema v6 ([#10294](https://github.com/Opentrons/opentrons/issues/10294)) ([c8ee567](https://github.com/Opentrons/opentrons/commit/c8ee5675f725e36578d0aca024e4bcd838030bf8))
+
+
+
+
+
 # [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
 
 

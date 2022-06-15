@@ -1,13 +1,18 @@
 """Router for /runs commands endpoints."""
-from anyio import move_on_after
+import textwrap
 from datetime import datetime
 from typing import Optional, Union
 from typing_extensions import Final, Literal
 
+from anyio import move_on_after
 from fastapi import APIRouter, Depends, Query, status
 from pydantic import BaseModel, Field
 
-from opentrons.protocol_engine import ProtocolEngine, commands as pe_commands
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    commands as pe_commands,
+    errors as pe_errors,
+)
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
@@ -37,6 +42,13 @@ class CommandNotFound(ErrorDetails):
 
     id: Literal["CommandNotFound"] = "CommandNotFound"
     title: str = "Run Command Not Found"
+
+
+class CommandNotAllowed(ErrorDetails):
+    """An error if a given run command is not allowed."""
+
+    id: Literal["CommandNotAllowed"] = "CommandNotAllowed"
+    title: str = "Setup Command Not Allowed"
 
 
 class CommandLinkMeta(BaseModel):
@@ -102,16 +114,41 @@ async def get_current_run_engine_from_url(
 
 @commands_router.post(
     path="/runs/{runId}/commands",
-    summary="Enqueue a protocol command",
-    description=(
-        "Add a single protocol command to the run. "
-        "The command is placed at the back of the queue."
+    summary="Enqueue a command",
+    description=textwrap.dedent(
+        """
+        Add a single command to the run. You can add commands to a run
+        for two reasons:
+
+        - Setup commands (`data.source == "setup"`)
+        - Protocol commands (`data.source == "protocol"`)
+
+        Setup commands may be enqueued before the run has been started.
+        You could use setup commands to prepare a module or
+        run labware calibration procedures.
+
+        Protocol commands may be enqueued anytime using this endpoint.
+        You can create a protocol purely over HTTP using protocol commands.
+        If you are running a protocol from a file(s), then you will likely
+        not need to enqueue protocol commands using this endpoint.
+
+        Once enqueued, setup commands will execute immediately with priority,
+        while protocol commands will wait until a `play` action is issued.
+        A play action may be issued while setup commands are still queued,
+        in which case all setup commands will finish executing before
+        the run moves on to protocol commands.
+
+        If you are running a protocol file(s), use caution with this endpoint,
+        as added commands may interfere with commands added by the protocol
+        """
     ),
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[pe_commands.Command]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
-        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorBody[Union[RunStopped, CommandNotAllowed]]
+        },
     },
 )
 async def create_run_command(
@@ -131,8 +168,7 @@ async def create_run_command(
         description=(
             "If `waitUntilComplete` is `true`,"
             " the maximum number of milliseconds to wait before returning."
-            "\n\n"
-            "Ignored if `waitUntilComplete` is `false`."
+            " Ignored if `waitUntilComplete` is `false`."
             "\n\n"
             "The timer starts when the new command is enqueued,"
             " *not* when it starts running."
@@ -156,10 +192,19 @@ async def create_run_command(
             Else, return immediately. Comes from a query parameter in the URL.
         timeout: The maximum time, in seconds, to wait before returning.
             Comes from a query parameter in the URL.
-        protocol_engine: Used to retrieve the `ProtocolEngine` on which the new
+        protocol_engine: The run's `ProtocolEngine` on which the new
             command will be enqueued.
     """
-    command = protocol_engine.add_command(request_body.data)
+    # TODO(mc, 2022-05-26): increment the HTTP API version so that default
+    # behavior is to pass through `command_intent` without overriding it
+    command_intent = request_body.data.intent or pe_commands.CommandIntent.SETUP
+    command_create = request_body.data.copy(update={"intent": command_intent})
+
+    try:
+        command = protocol_engine.add_command(command_create)
+
+    except pe_errors.SetupCommandNotAllowedError as e:
+        raise CommandNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
     if waitUntilComplete:
         with move_on_after(timeout / 1000.0):
@@ -229,6 +274,7 @@ async def get_run_commands(
             id=c.id,
             key=c.key,
             commandType=c.commandType,
+            intent=c.intent,
             status=c.status,
             createdAt=c.createdAt,
             startedAt=c.startedAt,

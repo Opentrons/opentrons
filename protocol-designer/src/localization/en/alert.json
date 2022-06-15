@@ -121,6 +121,24 @@
       "HEATER_SHAKER_IS_SHAKING": {
         "title": "Heater-Shaker is shaking",
         "body": "A pipette cannot interact with labware on the Heater-Shaker Module while it is shaking."
+      },
+      "TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER": {
+        "body": "The Heater-Shaker labware latch will collide with labware over 53 mm. Move labware to a different slot."
+      },
+      "HEATER_SHAKER_EAST_WEST_LATCH_OPEN": {
+        "body": "Pipettes cannot access labware on, or to the left or right of, the Heater-Shaker while the labware latch is open. Create a step before this one that closes the latch."
+      },
+      "HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING": {
+        "title": "The Heater-Shaker is shaking",
+        "body": "Pipettes cannot access labware on or adjacent to the Heater-Shaker while it is shaking. Create a step before this one that deactivates the shaker."
+      },
+      "HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL": {
+        "title": "8-Channel pipette cannot access labware",
+        "body": "8-Channel pipettes cannot access labware or tip racks to the left or right of a Heater-Shaker GEN1 module. Move labware to a different slot to access it with an 8-Channel pipette."
+      },
+      "HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL": {
+        "title": "8-Channel pipette cannot access labware",
+        "body": "8-Channel pipettes cannot access labware in front of or behind a Heater-Shaker. They can access Opentrons Tip Racks in this slot. Move labware to a different slot."
       }
     },
     "warning": {
@@ -144,6 +162,18 @@
     "SLOT_OCCUPIED": {
       "title": "Cannot place module",
       "body": "Slot {{selectedSlot}} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue."
+    },
+    "HEATER_SHAKER_ADJACENT_LABWARE_TOO_TALL": {
+      "title": "Cannot place module",
+      "body": "Slot {{selectedSlot}} is occupied by labware over 53mm tall. The Heater-Shaker's labware latch risks collision with this labware."
+    },
+    "HEATER_SHAKER_ADJACENT_TO_ANOTHER_MODULE": {
+      "title": "Cannot place module",
+      "body": "Slot {{selectedSlot}} is occupied by a module. The Heater-Shaker cannot be placed in front of or behind another module."
+    },
+    "HEATER_SHAKER_ADJACENT_TO_MODULE": {
+      "title": "Cannot place module",
+      "body": "Slot {{selectedSlot}} is occupied by a Heater-Shaker. Other modules cannot be placed in front of or behind a Heater-Shaker."
     }
   },
   "export_warnings": {

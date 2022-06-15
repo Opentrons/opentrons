@@ -4,6 +4,7 @@ import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 import {
   Flex,
   Text,
@@ -80,6 +81,10 @@ export const MagneticModuleSlideout = (
   const [engageHeightValue, setEngageHeightValue] = React.useState<
     string | null
   >(null)
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    module,
+    runId != null ? runId : null
+  )
 
   const moduleName = getModuleDisplayName(module.moduleModel)
   const info = getInfoByModel(module.moduleModel)
@@ -114,7 +119,7 @@ export const MagneticModuleSlideout = (
       const setEngageCommand: MagneticModuleEngageMagnetCreateCommand = {
         commandType: 'magneticModule/engage',
         params: {
-          moduleId: module.id,
+          moduleId: runId != null ? moduleIdFromRun : module.id,
           height: parseInt(engageHeightValue),
         },
       }

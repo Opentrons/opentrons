@@ -1,0 +1,120 @@
+test_name: Upload and run a PAPI v2 protocol that should fail.
+
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload a protocol
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/runtime_error.py'
+    response:
+      status_code: 201
+      save:
+        json:
+          protocol_id: data.id
+
+  - name: Create run from protocol
+    request:
+      url: '{host:s}:{port:d}/runs'
+      method: POST
+      json:
+        data:
+          protocolId: '{protocol_id}'
+    response:
+      status_code: 201
+      save:
+        json:
+          run_id: data.id
+
+  - name: Play the run
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: play
+    response:
+      status_code: 201
+      strict:
+        - json:off
+
+  - name: Wait for the protocol to complete
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          status: failed
+          errors:
+            - id: !anystr
+              errorType: ExceptionInProtocolError
+              createdAt: !anystr
+              detail: 'NoTipAttachedError [line 9]: Cannot perform DROPTIP without a tip attached'
+
+  - name: Verify commands contain the expected results
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        links:
+          current: !anydict
+        meta:
+          cursor: 0
+          totalLength: 3
+        data:
+          - id: !anystr
+            key: !anystr
+            commandType: loadLabware
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              location:
+                slotName: '1'
+              loadName: opentrons_96_tiprack_300ul
+              namespace: opentrons
+              version: 1
+          - id: !anystr
+            key: !anystr
+            commandType: loadPipette
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              pipetteName: p300_single
+              mount: right
+          - id: !anystr
+            key: !anystr
+            commandType: dropTip
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: failed
+            error:
+              id: !anystr
+              errorType: LegacyContextCommandError
+              createdAt: !anystr
+              detail: 'Cannot perform DROPTIP without a tip attached'
+            params:
+              pipetteId: !anystr
+              labwareId: !anystr
+              wellName: A1
+              wellLocation:
+                origin: top
+                offset:
+                  x: 0
+                  y: 0
+                  z: 0

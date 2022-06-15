@@ -68,17 +68,18 @@ export function RenameRobotSlideout({
     },
   })
 
-  // TODO: when a user lost connection while the user is renaming a robot,
-  // the app needs to show a message to inform that.
   const { updateRobotName } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
       // remove the previous robot name from the list
       dispatch(removeRobot(previousRobotName))
-      data.name != null && history.push(`/devices/${data.name}/robot-settings`)
+      // data.name != null && history.push(`/devices/${data.name}/robot-settings`)
+      // TODO 6/9/2022 kj this is a temporary fix to avoid the issue
+      // https://github.com/Opentrons/opentrons/issues/10709
+      data.name != null && history.push(`/devices`)
     },
-    onError: error => {
-      // TODO: handle error
-      // When #9960 is solved, need to update.
+    onError: (error: Error) => {
+      // TODO kj 5/25/2022: when a user lost connection while the user is renaming a robot,
+      // the app needs to show a message to inform that.
       console.error('error', error.message)
     },
   })

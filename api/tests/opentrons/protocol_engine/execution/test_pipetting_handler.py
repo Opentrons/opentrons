@@ -3,8 +3,9 @@ import pytest
 from decoy import Decoy
 from typing import Tuple
 
-from opentrons.types import Mount
+from opentrons.types import Mount, MountType, Point
 from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
 
 from opentrons.protocols.models import LabwareDefinition
@@ -14,6 +15,7 @@ from opentrons.protocol_engine.state import (
     TipGeometry,
     HardwarePipette,
     CurrentWell,
+    PipetteLocationData,
 )
 from opentrons.protocol_engine.execution.movement import MovementHandler
 from opentrons.protocol_engine.execution.pipetting import PipettingHandler
@@ -540,4 +542,63 @@ async def test_handle_add_tip_length_fallback(
         await hardware_api.add_tip(mount=Mount.LEFT, tip_length=50),
         hardware_api.set_current_tiprack_diameter(mount=Mount.LEFT, tiprack_diameter=5),
         hardware_api.set_working_volume(mount=Mount.LEFT, tip_volume=300),
+    )
+
+
+async def test_touch_tip(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    movement_handler: MovementHandler,
+    subject: PipettingHandler,
+) -> None:
+    """It should be able to touch tip to the edges of a well."""
+    decoy.when(
+        state_store.motion.get_pipette_location(
+            pipette_id="pipette-id",
+            current_well=CurrentWell(
+                pipette_id="pipette-id",
+                labware_id="labware-id",
+                well_name="A3",
+            ),
+        )
+    ).then_return(
+        PipetteLocationData(
+            mount=MountType.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+        )
+    )
+
+    decoy.when(
+        state_store.geometry.get_well_edges(
+            labware_id="labware-id",
+            well_name="A3",
+            well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        )
+    ).then_return([Point(x=0, y=1, z=2), Point(x=3, y=4, z=5)])
+
+    await subject.touch_tip(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="A3",
+        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+    )
+
+    decoy.verify(
+        await movement_handler.move_to_well(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="A3",
+            well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        ),
+        await hardware_api.move_to(
+            mount=Mount.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+            abs_position=Point(x=0, y=1, z=2),
+        ),
+        await hardware_api.move_to(
+            mount=Mount.LEFT,
+            critical_point=CriticalPoint.XY_CENTER,
+            abs_position=Point(x=3, y=4, z=5),
+        ),
     )

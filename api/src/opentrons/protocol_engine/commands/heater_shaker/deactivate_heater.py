@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler
 
 
-DeactivateHeaterCommandType = Literal["heaterShakerModule/deactivateHeater"]
+DeactivateHeaterCommandType = Literal["heaterShaker/deactivateHeater"]
 
 
 class DeactivateHeaterParams(BaseModel):
@@ -51,7 +51,7 @@ class DeactivateHeaterImpl(
         )
 
         if hs_hardware_module is not None:
-            await hs_hardware_module.start_set_temperature(celsius=0)
+            await hs_hardware_module.deactivate_heater()
 
         return DeactivateHeaterResult()
 
@@ -59,7 +59,7 @@ class DeactivateHeaterImpl(
 class DeactivateHeater(BaseCommand[DeactivateHeaterParams, DeactivateHeaterResult]):
     """A command to unset a Heater-Shaker's target temperature."""
 
-    commandType: DeactivateHeaterCommandType = "heaterShakerModule/deactivateHeater"
+    commandType: DeactivateHeaterCommandType = "heaterShaker/deactivateHeater"
     params: DeactivateHeaterParams
     result: Optional[DeactivateHeaterResult]
 

@@ -73,7 +73,7 @@ describe('RobotConfigurationDetails', () => {
     getByText('left mount')
     getByText('P10 Single-Channel GEN1')
     getByText('right mount')
-    getByText('empty')
+    getByText('Not Used')
   })
 
   it('renders right mount pipette when there is a pipette only in the right mount', () => {
@@ -86,7 +86,7 @@ describe('RobotConfigurationDetails', () => {
     getByText('left mount')
     getByText('P10 Single-Channel GEN1')
     getByText('right mount')
-    getByText('empty')
+    getByText('Not Used')
   })
 
   it('renders the magnetic module when the protocol contains a magnetic module', () => {

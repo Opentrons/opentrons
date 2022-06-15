@@ -122,7 +122,7 @@ def test_save_labware_calibration(monkeypatch, clear_calibration):
     # Test the save calibration file
     assert not os.path.exists(path(MOCK_HASH))
 
-    impl = LabwareImplementation(minimalLabwareDef, Location(Point(0, 0, 0), "deck"))  # type: ignore[arg-type]  # noqa: E501
+    impl = LabwareImplementation(minimalLabwareDef, Location(Point(0, 0, 0), "deck"))  # type: ignore[arg-type]
     impl.set_calibration = Mock()  # type: ignore[assignment]
 
     monkeypatch.setattr(helpers, "hash_labware_def", mock_hash_labware)
@@ -163,7 +163,7 @@ def test_create_tip_length_calibration_data(monkeypatch, clear_custom_tiprack_di
         }
     }
     assert not os.path.exists(custom_tiprack_path(URI))
-    result = modify.create_tip_length_data(minimalLabwareDef, tip_length)  # type: ignore[arg-type]  # noqa: E501
+    result = modify.create_tip_length_data(minimalLabwareDef, tip_length)  # type: ignore[arg-type]
     assert result == expected_data
     assert os.path.exists(custom_tiprack_path(URI))
 
@@ -201,7 +201,7 @@ def test_load_nonexistent_tip_length_calibration_data(
 
     # file does not exist (FileNotFoundError)
     with pytest.raises(cs_types.TipLengthCalNotFound):
-        get.load_tip_length_calibration(PIPETTE_ID, minimalLabwareDef)  # type: ignore[arg-type]  # noqa: E501
+        get.load_tip_length_calibration(PIPETTE_ID, minimalLabwareDef)  # type: ignore[arg-type]
 
     # labware hash not in calibration file (KeyError)
     calpath = config.get_tip_length_cal_path()
@@ -209,7 +209,7 @@ def test_load_nonexistent_tip_length_calibration_data(
         test_offset = {"FAKE_HASH": {"tipLength": 22.0, "lastModified": 1}}
         json.dump(test_offset, offset_file)
     with pytest.raises(cs_types.TipLengthCalNotFound):
-        get.load_tip_length_calibration(PIPETTE_ID, minimalLabwareDef)  # type: ignore[arg-type]  # noqa: E501
+        get.load_tip_length_calibration(PIPETTE_ID, minimalLabwareDef)  # type: ignore[arg-type]
 
 
 def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
@@ -218,9 +218,9 @@ def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
     monkeypatch.setattr(helpers, "hash_labware_def", mock_hash_labware)
 
     tip_length = 22.0
-    test_data = modify.create_tip_length_data(minimalLabwareDef, tip_length)  # type: ignore[arg-type]  # noqa: E501
+    test_data = modify.create_tip_length_data(minimalLabwareDef, tip_length)  # type: ignore[arg-type]
     modify.save_tip_length_calibration(PIPETTE_ID, test_data)
-    result = get.load_tip_length_calibration(PIPETTE_ID, minimalLabwareDef)  # type: ignore[arg-type]  # noqa: E501
+    result = get.load_tip_length_calibration(PIPETTE_ID, minimalLabwareDef)  # type: ignore[arg-type]
     expected = cs_types.TipLengthCalibration(
         tip_length=tip_length,
         pipette=PIPETTE_ID,
@@ -262,7 +262,7 @@ def test_schema_shape(monkeypatch, clear_calibration):
     mock.__class__ = datetime.datetime  # type: ignore[assignment]
 
     test_labware = labware.Labware(
-        LabwareImplementation(minimalLabwareDef, Location(Point(0, 0, 0), "deck"))  # type: ignore[arg-type]  # noqa: E501
+        LabwareImplementation(minimalLabwareDef, Location(Point(0, 0, 0), "deck"))  # type: ignore[arg-type]
     )
 
     monkeypatch.setattr(helpers, "hash_labware_def", mock_hash_labware)
@@ -285,7 +285,7 @@ def test_load_calibration(monkeypatch, clear_calibration):
     monkeypatch.setattr(helpers, "hash_labware_def", mock_hash_labware)
 
     test_labware = labware.Labware(
-        LabwareImplementation(minimalLabwareDef, Location(Point(0, 0, 0), "deck"))  # type: ignore[arg-type]  # noqa: E501
+        LabwareImplementation(minimalLabwareDef, Location(Point(0, 0, 0), "deck"))  # type: ignore[arg-type]
     )
 
     test_offset = Point(1, 1, 1)
@@ -306,7 +306,7 @@ def test_load_calibration(monkeypatch, clear_calibration):
 def test_wells_rebuilt_with_offset():
     test_labware = labware.Labware(
         implementation=LabwareImplementation(
-            minimalLabwareDef, Location(Point(0, 0, 0), "deck")  # type: ignore[arg-type]  # noqa: E501
+            minimalLabwareDef, Location(Point(0, 0, 0), "deck")  # type: ignore[arg-type]
         )
     )
     old_wells = test_labware.wells()
@@ -340,12 +340,12 @@ def testhash_labware_def():
     def2 = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.000033, 1 / 3]}
 
     # identity preserved across json serialization+deserialization
-    assert helpers.hash_labware_def(def1a) == helpers.hash_labware_def(  # type: ignore[arg-type]  # noqa: E501
+    assert helpers.hash_labware_def(def1a) == helpers.hash_labware_def(  # type: ignore[arg-type]
         json.loads(json.dumps(def1a, separators=(",", ":")))
     )
     # 2 instances of same def should match
-    assert helpers.hash_labware_def(def1a) == helpers.hash_labware_def(def1aa)  # type: ignore[arg-type]  # noqa: E501
+    assert helpers.hash_labware_def(def1a) == helpers.hash_labware_def(def1aa)  # type: ignore[arg-type]
     # metadata ignored
-    assert helpers.hash_labware_def(def1a) == helpers.hash_labware_def(def1b)  # type: ignore[arg-type]  # noqa: E501
+    assert helpers.hash_labware_def(def1a) == helpers.hash_labware_def(def1b)  # type: ignore[arg-type]
     # different data should not match
-    assert helpers.hash_labware_def(def1a) != helpers.hash_labware_def(def2)  # type: ignore[arg-type]  # noqa: E501
+    assert helpers.hash_labware_def(def1a) != helpers.hash_labware_def(def2)  # type: ignore[arg-type]

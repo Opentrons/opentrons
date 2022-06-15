@@ -6,6 +6,8 @@ import type {
   ConfigV4,
   ConfigV5,
   ConfigV6,
+  ConfigV7,
+  ConfigV8,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -116,5 +118,26 @@ export const MOCK_CONFIG_V6: ConfigV6 = {
     heaterShaker: {
       isAttached: false,
     },
+  },
+}
+
+export const MOCK_CONFIG_V7: ConfigV7 = {
+  ...MOCK_CONFIG_V6,
+  version: 7,
+  ui: {
+    ...MOCK_CONFIG_V6.ui,
+    width: 800,
+    minWidth: 600,
+    height: 760,
+  },
+}
+
+export const MOCK_CONFIG_V8: ConfigV8 = {
+  ...MOCK_CONFIG_V7,
+  version: 8,
+  ui: {
+    ...MOCK_CONFIG_V7.ui,
+    width: 1024,
+    height: 768,
   },
 }

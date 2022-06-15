@@ -43,7 +43,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
     <RobotWorkSpace
       deckLayerBlocklist={deckSetupLayerBlocklist}
       deckDef={deckDef}
-      viewBox="-80 -20 550 480"
+      viewBox="-90 -40 560 500"
     >
       {({ deckSlotsById }) =>
         map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {

@@ -120,3 +120,14 @@ export const linkPSemiBold = css`
     opacity: 70%;
   }
 `
+
+export const darkLinkPSemiBold = css`
+  font-size: ${fontSizeP};
+  font-weight: ${fontWeightSemiBold};
+  line-height: ${lineHeight20};
+  color: ${COLORS.darkBlack};
+
+  &:hover {
+    opacity: 1;
+  }
+`

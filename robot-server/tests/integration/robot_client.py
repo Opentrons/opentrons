@@ -10,8 +10,8 @@ import httpx
 from httpx import Response
 
 
-STARTUP_WAIT = 15
-SHUTDOWN_WAIT = 15
+STARTUP_WAIT = 20
+SHUTDOWN_WAIT = 20
 
 
 class RobotClient:
@@ -239,5 +239,17 @@ class RobotClient:
     async def delete_run(self, run_id: str) -> Response:
         """DELETE /runs/{run_id}."""
         response = await self.httpx_client.delete(f"{self.base_url}/runs/{run_id}")
+        response.raise_for_status()
+        return response
+
+    async def post_setting_reset_options(
+        self,
+        req_body: Dict[str, bool],
+    ) -> Response:
+        """POST /settings/reset."""
+        response = await self.httpx_client.post(
+            url=f"{self.base_url}/settings/reset",
+            json=req_body,
+        )
         response.raise_for_status()
         return response

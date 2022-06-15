@@ -18,6 +18,7 @@ from ..commands import (
     PickUpTipResult,
     DropTipResult,
     HomeResult,
+    BlowOutResult,
 )
 from ..actions import Action, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
@@ -78,6 +79,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 DropTipResult,
                 AspirateResult,
                 DispenseResult,
+                BlowOutResult,
             ),
         ):
             self._state.current_well = CurrentWell(
@@ -123,6 +125,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             # That should never happen outside of tests. But if it somehow does,
             # it won't harm the state.
             self._state.attached_tip_labware_by_id.pop(pipette_id, None)
+
+        elif isinstance(command.result, BlowOutResult):
+            pipette_id = command.params.pipetteId
+            self._state.aspirated_volume_by_id[pipette_id] = 0
 
 
 class PipetteView(HasState[PipetteState]):

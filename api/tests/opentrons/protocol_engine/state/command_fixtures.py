@@ -62,6 +62,7 @@ def create_failed_command(
     completed_at: datetime = datetime(year=2022, month=2, day=2),
     params: Optional[BaseModel] = None,
     error: Optional[ErrorOccurrence] = None,
+    intent: Optional[cmd.CommandIntent] = None,
 ) -> cmd.Command:
     """Given command data, build a failed command model."""
     return cast(
@@ -75,6 +76,7 @@ def create_failed_command(
             status=cmd.CommandStatus.FAILED,
             params=params or BaseModel(),
             error=error,
+            intent=intent,
         ),
     )
 
@@ -271,6 +273,31 @@ def create_move_to_well_command(
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
         createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_blow_out_command(
+    pipette_id: str,
+    labware_id: str = "labware-id",
+    well_name: str = "A1",
+    well_location: Optional[WellLocation] = None,
+) -> cmd.BlowOut:
+    """Get a completed BlowOut command."""
+    params = cmd.BlowOutParams(
+        pipetteId=pipette_id,
+        labwareId=labware_id,
+        wellName=well_name,
+        wellLocation=well_location or WellLocation(),
+    )
+    result = cmd.BlowOutResult()
+
+    return cmd.BlowOut(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime(year=2022, month=1, day=1),
         params=params,
         result=result,
     )

@@ -21,9 +21,9 @@ import {
 
 import logoSvg from '../assets/images/logo_nav.svg'
 import { NAV_BAR_WIDTH } from './constants'
+import { StyledText } from '../atoms/text'
 
 import type { RouteProps } from './types'
-import { StyledText } from '../atoms/text'
 
 const SALESFORCE_HELP_LINK = 'https://support.opentrons.com/s/'
 
@@ -32,9 +32,14 @@ const NavbarLink = styled(NavLink)`
   align-self: ${ALIGN_STRETCH};
   background-color: ${COLORS.darkBlack};
 
-  &:hover,
-  &:focus {
-    background-color: ${COLORS.darkBlackHover};
+  &:hover {
+    background-color: ${COLORS.darkGreyHover};
+  }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 3px ${COLORS.warning};
+    outline: none;
+    background-color: ${COLORS.darkGreyHover};
   }
 
   &:active {
@@ -50,13 +55,13 @@ const NavbarLink = styled(NavLink)`
 `
 const NavIconLink = styled(NavLink)`
   &.active > svg {
-    color: ${COLORS.white};
+    color: ${COLORS.medGrey};
     background-color: ${COLORS.darkBlackSelected};
   }
 `
 const IconLink = styled(Link)`
   &.active > svg {
-    color: ${COLORS.white};
+    color: ${COLORS.medGrey};
     background-color: ${COLORS.darkBlackSelected};
   }
 `
@@ -66,22 +71,26 @@ const NavbarIcon = styled(Icon)`
   height: ${SIZE_2};
   padding: 0.375rem;
   border-radius: 50%;
-  color: #d0d3d5;
+  color: ${COLORS.medGrey};
   background-color: ${COLORS.transparent};
 
-  &:hover,
-  &:focus {
-    color: ${COLORS.white};
-    background-color: ${COLORS.darkBlackHover};
+  &:hover {
+    background-color: ${COLORS.darkGreyHover};
+  }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 3px ${COLORS.warning};
+    outline: none;
+    background-color: ${COLORS.darkGreyHover};
   }
 
   &:active {
-    color: ${COLORS.white};
+    color: ${COLORS.medGrey};
     background-color: ${COLORS.darkBlackPressed};
   }
 
   &.active {
-    color: ${COLORS.white};
+    color: ${COLORS.medGrey};
     background-color: ${COLORS.darkBlackSelected};
   }
 `

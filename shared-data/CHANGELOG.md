@@ -3,6 +3,53 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2022-06-09)
+
+**Note:** Version bump only for package @opentrons/shared-data
+
+
+
+
+
+# [6.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.0...v6.0.0-alpha.1) (2022-06-07)
+
+
+### Features
+
+* **api:** add Thermocycler Gen2 driver ([#9854](https://github.com/Opentrons/opentrons/issues/9854)) ([b12641d](https://github.com/Opentrons/opentrons/commit/b12641dd93c0c8fd24924d1f4d56dcccf055a8dc))
+* **app:** add liquid setup list view static list ([#10608](https://github.com/Opentrons/opentrons/issues/10608)) ([4158875](https://github.com/Opentrons/opentrons/commit/415887527fcd161cc8fcffcc6536e746a4f7d7df)), closes [#10517](https://github.com/Opentrons/opentrons/issues/10517)
+* **app:** add liquid setup step to run setup page ([#10591](https://github.com/Opentrons/opentrons/issues/10591)) ([9f54480](https://github.com/Opentrons/opentrons/commit/9f54480213cf033d32e0531a0b397b7626a2e86d)), closes [#8909](https://github.com/Opentrons/opentrons/issues/8909)
+* **app:** Add robot side protocol analysis error states ([#10595](https://github.com/Opentrons/opentrons/issues/10595)) ([44cc077](https://github.com/Opentrons/opentrons/commit/44cc077c8c0457fdf76f3abdc00f9a5b95ed6864)), closes [#10357](https://github.com/Opentrons/opentrons/issues/10357)
+* **step-generation, protocol-designer:** generate error when pipetting NSEW of HS while shaking ([#10589](https://github.com/Opentrons/opentrons/issues/10589)) ([17c1b27](https://github.com/Opentrons/opentrons/commit/17c1b27dbdf30f6e42fac0e3e657d813d7eff57e)), closes [#10509](https://github.com/Opentrons/opentrons/issues/10509)
+
+
+
+
+
+# [6.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.1.0-beta.0...v6.0.0-alpha.0) (2022-05-26)
+
+
+### Bug Fixes
+
+* **app-shell:** ensure Windows build can analyze protocols ([#10347](https://github.com/Opentrons/opentrons/issues/10347)) ([66a96bc](https://github.com/Opentrons/opentrons/commit/66a96bc9e76911a3a63b9dae5730607c5ee4cebc)), closes [#10378](https://github.com/Opentrons/opentrons/issues/10378)
+
+
+### Features
+
+* **api:** use V3 module definitions as default in PAPI ([#10245](https://github.com/Opentrons/opentrons/issues/10245)) ([85daa65](https://github.com/Opentrons/opentrons/commit/85daa655eac994aa53a0bcbebe4f398f6734499b))
+* **app:** add protocol overview section ([#10212](https://github.com/Opentrons/opentrons/issues/10212)) ([1066ff0](https://github.com/Opentrons/opentrons/commit/1066ff0238e091c9bcfeac23e729a4b74a063211)), closes [#8821](https://github.com/Opentrons/opentrons/issues/8821)
+* **app:** module slideout QA feedback touchups  ([#10110](https://github.com/Opentrons/opentrons/issues/10110)) ([a9b0738](https://github.com/Opentrons/opentrons/commit/a9b073854bd9d51ba79bfc25a24b07b3b30b3a07)), closes [#9869](https://github.com/Opentrons/opentrons/issues/9869)
+* **app:** show live labware offset while jogging during Labware Position Check ([#10264](https://github.com/Opentrons/opentrons/issues/10264)) ([a5df9e0](https://github.com/Opentrons/opentrons/commit/a5df9e0bbaa7b2429b1e06d0243a8886693c45a4)), closes [#9796](https://github.com/Opentrons/opentrons/issues/9796) [#9797](https://github.com/Opentrons/opentrons/issues/9797)
+* **protocol-designer:** add labware placement restrictions east west of heater-shaker ([#10410](https://github.com/Opentrons/opentrons/issues/10410)) ([e1a8887](https://github.com/Opentrons/opentrons/commit/e1a88879941ae3e9da025f10aaac191452e3f938)), closes [#10255](https://github.com/Opentrons/opentrons/issues/10255)
+* **protocol-designer, step-generation, shared-data:** rename trash labware id to match protocol engine usage ([#10132](https://github.com/Opentrons/opentrons/issues/10132)) ([2136030](https://github.com/Opentrons/opentrons/commit/21360302a0a67a544ebde9f114d5eb31d61af659)), closes [#10017](https://github.com/Opentrons/opentrons/issues/10017)
+* **shared-data:** add H/S to deck definition, bump deck definition schema ([#10417](https://github.com/Opentrons/opentrons/issues/10417)) ([183a1ac](https://github.com/Opentrons/opentrons/commit/183a1acd2db56750148d59a6058345aa32618311))
+* **shared-data:** add heater-shaker labware w/ adapter definitions ([#9917](https://github.com/Opentrons/opentrons/issues/9917)) ([859fe69](https://github.com/Opentrons/opentrons/commit/859fe69789fbf1d065420fce07dcd7a940e2c09c))
+* **shared-data, protocol-designer:** add liquid color to schema v6 ([#10294](https://github.com/Opentrons/opentrons/issues/10294)) ([c8ee567](https://github.com/Opentrons/opentrons/commit/c8ee5675f725e36578d0aca024e4bcd838030bf8))
+
+
+
+
+
 # [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
 
 
