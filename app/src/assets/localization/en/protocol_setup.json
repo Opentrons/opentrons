@@ -127,5 +127,6 @@
   "location": "Location",
   "labware_name": "Labware Name",
   "volume": "Volume",
-  "slot_location": "Slot {{slotName}}"
+  "slot_location": "Slot {{slotName}}",
+  "slot_number": "Slot Number"
 }

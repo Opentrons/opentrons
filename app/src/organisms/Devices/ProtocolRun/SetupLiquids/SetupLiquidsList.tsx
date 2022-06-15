@@ -19,6 +19,7 @@ import {
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { StyledText } from '../../../../atoms/text'
+import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 
 import type { Liquid } from './getMockLiquidData'
 
@@ -45,6 +46,7 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
       {liquids?.map(liquid => (
         <LiquidsListItem
           key={liquid.liquidId}
+          liquidId={liquid.liquidId}
           description={liquid.description}
           displayColor={liquid.displayColor}
           displayName={liquid.displayName}
@@ -56,6 +58,7 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
 }
 
 interface LiquidsListItemProps {
+  liquidId: string
   description: string | null
   displayColor: string
   displayName: string
@@ -67,14 +70,26 @@ interface LiquidsListItemProps {
 }
 
 export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
-  const { description, displayColor, displayName, locations } = props
+  const { liquidId, description, displayColor, displayName, locations } = props
   const [openItem, setOpenItem] = React.useState(false)
+  const [
+    showLiquidLabwareDetails,
+    setShowLiquidLabwareDetails,
+  ] = React.useState(false)
   const { t } = useTranslation('protocol_setup')
   const LIQUID_CARD_STYLE = css`
     ${BORDERS.cardOutlineBorder}
 
     &:hover {
       background-color: ${COLORS.background};
+      border: 1px solid ${COLORS.medGreyHover};
+    }
+  `
+  const LIQUID_CARD_ITEM_STYLE = css`
+    ${BORDERS.cardOutlineBorder}
+
+    &:hover {
+      cursor: pointer;
       border: 1px solid ${COLORS.medGreyHover};
     }
   `
@@ -130,6 +145,12 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
           </StyledText>
         </Flex>
       </Flex>
+      {showLiquidLabwareDetails && (
+        <LiquidsLabwareDetailsModal
+          liquidId={liquidId}
+          closeModal={() => setShowLiquidLabwareDetails(false)}
+        />
+      )}
       {openItem && (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex
@@ -162,12 +183,14 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
           {locations.map((location, index) => {
             return (
               <Box
+                css={LIQUID_CARD_ITEM_STYLE}
                 key={index}
                 borderRadius={'4px'}
                 marginY={SPACING.spacing3}
                 padding={SPACING.spacing4}
                 backgroundColor={COLORS.white}
                 data-testid={`LiquidsListItem_slotRow_${index}`}
+                onClick={() => setShowLiquidLabwareDetails(true)}
               >
                 <Flex
                   flexDirection={DIRECTION_ROW}
