@@ -347,7 +347,7 @@ class HeaterShakerGeometry(ModuleGeometry):
         parent: Location,
         api_level: APIVersion,
     ) -> None:
-        """Heater-Shaker geomtry constructor. Inherits from ModuleGeometry."""
+        """Heater-Shaker geometry constructor. Inherits from ModuleGeometry."""
         super().__init__(
             display_name,
             model,

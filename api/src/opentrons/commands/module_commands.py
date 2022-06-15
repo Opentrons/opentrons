@@ -184,7 +184,7 @@ def heater_shaker_set_and_wait_for_shake_speed(
 
 
 def heater_shaker_open_labware_latch() -> command_types.HeaterShakerOpenLabwareLatchCommand:
-    text = "Unlatching Labware on Heater-Shaker"
+    text = "Unlatching labware on Heater-Shaker"
     return {
         "name": command_types.HEATER_SHAKER_OPEN_LABWARE_LATCH,
         "payload": {"text": text},
@@ -192,7 +192,7 @@ def heater_shaker_open_labware_latch() -> command_types.HeaterShakerOpenLabwareL
 
 
 def heater_shaker_close_labware_latch() -> command_types.HeaterShakerCloseLabwareLatchCommand:
-    text = "Latching Labware on Heater-Shaker"
+    text = "Latching labware on Heater-Shaker"
     return {
         "name": command_types.HEATER_SHAKER_CLOSE_LABWARE_LATCH,
         "payload": {"text": text},

@@ -180,7 +180,7 @@ settings = [
         _id="enableHeaterShakerPAPI",
         title="Enable Heater-Shaker Python API support",
         description=(
-            "Do not enable. This is an Opentrons internal setting to test new module."
+            "Do not enable. This is an Opentrons internal setting to test a new module."
         ),
         restart_required=False,
     ),

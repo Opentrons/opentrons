@@ -879,12 +879,9 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
 
     # TODO: add API version requirement
     def set_and_wait_for_temperature(self, celsius: float) -> None:
-        """Set and wait for target temperature.
+        """Set the target temperature and wait for it to be reached.
 
-        Sets the heater-shaker target temperature and delays protocol execution
-        until target temperature has reached.
-
-        Note: The H/S truncates the temperature param to 2 decimal places
+        Note: The Heater-Shaker truncates the ``temperature`` parameter to 2 decimal places.
 
         :param celsius: The target temperature, in °C in range 37°C to 95°C.
         """
@@ -909,10 +906,10 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     # TODO: add API version requirement
     @publish(command=cmds.heater_shaker_wait_for_temperature)
     def wait_for_temperature(self) -> None:
-        """Wait for target temperature.
+        """Wait for the Heater-Shaker to reach its target temperature.
 
-        Delays protocol execution until heater-shaker has reached its target
-        temperature. The module should have a target temperature set previously.
+        Delays protocol execution until the Heater-Shaker has reached its target
+        temperature. The module must have a target temperature set previously.
         """
         if self.target_temperature is None:
             raise NoTargetTemperatureSetError(
@@ -943,13 +940,15 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     # TODO: add API version requirement
     @publish(command=cmds.heater_shaker_open_labware_latch)
     def open_labware_latch(self) -> None:
-        """Open heater-shaker's labware latch.
+        """Open the Heater-Shaker's labware latch.
 
-        Note that the labware latch needs to be closed before sending a shake command
-        and before pipetting to/from the H/S labware or labware on east and west of the
-        heater-shaker.
+        Note that the labware latch needs to be closed before:
+        
+        * Shaking
+        * Pipetting to or from the labware on the Heater-Shaker
+        * Pipetting to or from labware to the left or right of the Heater-Shaker
 
-        Raises an error when attempting to open latch while heater-shaker is shaking.
+        Raises an error when attempting to open the latch while the Heater-Shaker is shaking.
         """
         if self._module.speed_status != module_types.SpeedStatus.IDLE:
             # TODO: What to do when speed status is ERROR?
