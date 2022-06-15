@@ -176,7 +176,7 @@ async def test_deactivated_updated_live_data(simulating_module):
 @pytest.fixture
 def mock_hs_driver():
     with unittest.mock.patch(
-        'simulator.SimulatingDriver',
+        "simulator.SimulatingDriver",
         mock.AsyncMock(spec=simulator.SimulatingDriver),
     ) as mock_driver:
         yield mock_driver
