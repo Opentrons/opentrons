@@ -113,7 +113,7 @@ describe('AdvancedSettings', () => {
     getByText('Update Channel')
     getByText('Additional Custom Labware Source Folder')
     getByText('Tip Length Calibration Method')
-    getByText('Display Unavailable Robots')
+    getByText('Disable Robot Caching')
     getByText('Clear Unavailable Robots')
     getByText('Enable Developer Tools')
   })
@@ -150,8 +150,9 @@ describe('AdvancedSettings', () => {
   })
   it('renders the display unavailable robots section', () => {
     const [{ getByText, getByRole }] = render()
+    getByText('NOTE: This will clear cached robots when switched ON.')
     getByText(
-      'Disabling this may improve overall networking performance in environments with many robots, but it may be slower to find robots when opening the app.'
+      'Disable caching of previously seen robots. Enabling this setting may improve overall networking performance in environments with many OT-2s, but may cause initial OT-2 discovery on app launch to be slower and more susceptible to failures.'
     )
     getByRole('switch', { name: 'display_unavailable_robots' })
   })
