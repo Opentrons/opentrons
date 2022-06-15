@@ -40,7 +40,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
-          target: 'setup lint'
+          target: 'lint'
   test:
     name: 'opentrons package tests'
     needs: [lint]
