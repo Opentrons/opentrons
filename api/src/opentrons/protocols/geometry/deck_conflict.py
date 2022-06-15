@@ -1,6 +1,6 @@
 """Check a deck layout for conflicts."""
 # TODO(mc, 2022-06-15): decouple this interface from DeckItem
-# (and ModuleGeometry) so it can be used in ProtocolEngine
+# (and subclasses) so it can be used in ProtocolEngine
 from typing import Dict, List, Mapping, NamedTuple, Optional, Union
 from typing_extensions import Final
 
@@ -56,7 +56,7 @@ class _NoModule(NamedTuple):
         return not isinstance(item, ModuleGeometry)
 
 
-class _OnlyTrash(NamedTuple):
+class _FixedTrash(NamedTuple):
     """Only fixed-trash labware is allowed in this slot."""
 
     source_location: int = FIXED_TRASH_SLOT
@@ -70,7 +70,7 @@ class _OnlyTrash(NamedTuple):
         return False
 
 
-_DeckRestriction = Union[_NotAllowed, _MaxHeight, _NoModule, _OnlyTrash]
+_DeckRestriction = Union[_NotAllowed, _MaxHeight, _NoModule, _FixedTrash]
 """A restriction on what is allowed in a given slot."""
 
 
@@ -102,16 +102,18 @@ def check(
     """Check a deck layout for conflicts.
 
     Args:
-        items: A list of location, item tuples to check.
+        existing_items: Existing items on the deck, assumed to be valid.
+        new_item: New item to add to the deck.
+        new_location: Location where the new item will be added.
 
     Raises:
-        DeckConflictError: The given layout has at least one conflict.
+        DeckConflictError: Adding this item should not be allowed.
     """
-    restrictions: Dict[int, _DeckRestriction] = {FIXED_TRASH_SLOT: _OnlyTrash()}
+    restrictions: Dict[int, _DeckRestriction] = {FIXED_TRASH_SLOT: _FixedTrash()}
 
     # build restrictions driven by existing items
     for location, item in existing_items.items():
-        restrictions = _create_restrictions(
+        restrictions = _add_restrictions(
             item=item,
             location=location,
             existing_restrictions=restrictions,
@@ -126,7 +128,7 @@ def check(
 
     # check new restrictions required by new item
     # do not interfere with existing items
-    _create_restrictions(
+    _add_restrictions(
         item=new_item,
         location=new_location,
         existing_items=existing_items,
@@ -134,7 +136,7 @@ def check(
     )
 
 
-def _create_restrictions(
+def _add_restrictions(
     item: DeckItem,
     location: int,
     existing_restrictions: Mapping[int, _DeckRestriction],
@@ -190,7 +192,7 @@ def _check_restrictions(
     restriction = restrictions.get(new_location, None)
 
     if restriction is not None and not restriction.is_allowed(new_item):
-        if isinstance(restriction, _OnlyTrash):
+        if isinstance(restriction, _FixedTrash):
             raise DeckConflictError(
                 f"Only fixed-trash is allowed in slot {restriction.source_location}"
             )
