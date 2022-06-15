@@ -4,6 +4,8 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
+  COLORS,
+  SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 
@@ -18,8 +20,11 @@ export function LabeledValue(props: LabeledValueProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
+      paddingY={SPACING.spacing3}
     >
-      <StyledText as="h6">{props.label}</StyledText>
+      <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+        {props.label}
+      </StyledText>
       <StyledText as="p">{props.value}</StyledText>
     </Flex>
   )
