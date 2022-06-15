@@ -943,7 +943,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """Open the Heater-Shaker's labware latch.
 
         Note that the labware latch needs to be closed before:
-        
+
         * Shaking
         * Pipetting to or from the labware on the Heater-Shaker
         * Pipetting to or from labware to the left or right of the Heater-Shaker
