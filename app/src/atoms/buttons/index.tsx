@@ -101,6 +101,10 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
     box-shadow: 0 0 0 3px ${COLORS.warning};
   }
 
+  &:enabled {
+    background-color: ${COLORS.transparent};
+  }
+  
   &:disabled {
     opacity: 50%;
   }

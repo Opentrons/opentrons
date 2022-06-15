@@ -23,6 +23,7 @@ import {
   ModuleIcon,
   POSITION_ABSOLUTE,
   TEXT_ALIGN_RIGHT,
+  TYPOGRAPHY
 } from '@opentrons/components'
 import { useHistory } from 'react-router-dom'
 import {
@@ -175,10 +176,10 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_leftMount_${protocolDisplayName}`}
               >
-                <StyledText as="h6" marginBottom={SPACING.spacing3}>
+                <StyledText as="h6" marginBottom={SPACING.spacing3} css={COLORS.darkGreyEnabled}>
                   {t('left_mount')}
                 </StyledText>
-                <StyledText as="p">
+                <StyledText as="p" marginTop={SPACING.spacing2}>
                   {
                     {
                       missing: t('no_data'),
@@ -196,13 +197,13 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               <Flex
                 flex="1"
                 flexDirection={DIRECTION_COLUMN}
-                marginRight={SPACING.spacing4}
+                marginRight={SPACING.spacing1}
                 data-testid={`ProtocolCard_rightMount_${protocolDisplayName}`}
               >
                 <StyledText as="h6" marginBottom={SPACING.spacing3}>
                   {t('right_mount')}
                 </StyledText>
-                <StyledText as="p">
+                <StyledText as="p" min-width="10.625rem">
                   {
                     {
                       missing: t('no_data'),
@@ -249,7 +250,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             data-testid={`ProtocolCard_date_${protocolDisplayName}`}
           >
             <StyledText
-              as="h6"
+              as="h7"
               marginBottom={SPACING.spacing3}
               color={COLORS.darkGreyEnabled}
               textAlign={TEXT_ALIGN_RIGHT}

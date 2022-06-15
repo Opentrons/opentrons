@@ -79,6 +79,12 @@ export const h6Default = css`
   line-height: ${lineHeight12};
   text-transform: ${textTransformUppercase};
 `
+export const h7Default = css`
+  font-size: ${fontSizeH6};
+  font-weight: ${fontWeightRegular};
+  line-height: ${lineHeight12};
+  text-transform: ${textTransformCapitalize};
+`
 
 export const h6SemiBold = css`
   font-size: ${fontSizeH6};
@@ -122,10 +128,11 @@ export const linkPSemiBold = css`
 `
 
 export const darkLinkPSemiBold = css`
-  font-size: ${fontSizeP};
+  font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
   color: ${COLORS.darkBlack};
+  opacity: 0.7;
 
   &:hover {
     opacity: 1;
