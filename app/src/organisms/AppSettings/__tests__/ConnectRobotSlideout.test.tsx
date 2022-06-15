@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, queryByText } from '@testing-library/react'
 import { act } from 'react-dom/test-utils'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
@@ -103,31 +103,18 @@ describe('ConnectRobotSlideout', () => {
   })
 
   it('Clicking Add button with an IP address/hostname should display the IP address/hostname', async () => {
-    // mockGetConfig.mockReturnValue({
-    //   discovery: {
-    //     candidates: ['localhost'],
-    //   },
-    // } as any)
-    // mockGetViewableRobots.mockReturnValue([
-    //   {
-    //     name: 'test-robot-name',
-    //     host: 'localhost',
-    //     port: 31950,
-    //     local: true,
-    //     ok: true,
-    //     serverOk: true,
-    //   },
-    // ] as any[])
-    // const { getByRole, getByText, getByTestId, findByText } = render(props)
-    // const newIpAddress = 'localhost'
-    // const inputBox = getByTestId('manual-ip-hostname-input')
-    // const addButton = getByRole('button', { name: 'Add' })
-    // await act(async () => {
-    //   await fireEvent.change(inputBox, { target: { value: newIpAddress } })
-    //   await fireEvent.click(addButton)
-    // })
-    // expect(getByText(newIpAddress)).toBeInTheDocument()
-    // expect(findByText('Available')).toBeInTheDocument()
+    const { getByRole, getByText, queryByText } = render(props)
+    const newIpAddress = 'localhost'
+    const inputBox = getByRole('textbox')
+    const addButton = getByRole('button', { name: 'Add' })
+    await act(async () => {
+      await fireEvent.change(inputBox, { target: { value: newIpAddress } })
+      await fireEvent.click(addButton)
+    })
+
+    getByText(newIpAddress)
+    getByText('Searching for 30s')
+    expect(queryByText('Available')).toBeInTheDocument()
   })
 
   it('Clicking Add button with an IP address/hostname should display the IP address/hostname and Available label', async () => {
