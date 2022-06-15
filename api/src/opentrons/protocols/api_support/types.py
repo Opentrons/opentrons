@@ -1,10 +1,22 @@
 from __future__ import annotations
-from typing import NamedTuple
+from typing import NamedTuple, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .definitions import MAX_SUPPORTED_VERSION
 
 
 class APIVersion(NamedTuple):
     major: int
     minor: int
+
+    @classmethod
+    def validate_api_version(cls, api_version: str):
+        if api_version > MAX_SUPPORTED_VERSION:
+            raise RuntimeError(
+                f"API version {api_version} is not supported by this "
+                f"robot software. Please either reduce your requested API "
+                f"version or update your robot."
+            )
 
     @classmethod
     def from_string(cls, inp: str) -> APIVersion:

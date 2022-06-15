@@ -117,7 +117,10 @@ class ProtocolRunner:
             if api_version >= LEGACY_PYTHON_API_VERSION_CUTOFF:
                 self._load_python(protocol_source)
             else:
-                self._load_legacy(protocol_source)
+                try:
+                    self._load_legacy(protocol_source)
+                except RuntimeError:
+                    raise "tamar test"
 
     def play(self) -> None:
         """Start or resume the run."""
