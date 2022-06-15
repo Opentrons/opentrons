@@ -34,9 +34,12 @@ class OT3GPIO:
         other programs trying to find out who holds a line) then it will be used;
         otherwise, the default is opentrons.
         """
+        self._consumer_name = consumer_name or CONSUMER_NAME_DEFAULT
         self._gpiod = self._get_gpiod()
         self._estop_out_line = self._gpiod.find_line(ESTOP_OUT_GPIO_NAME)
-        self._estop_out_line.request("opentrons", type=self._gpiod.LINE_REQ_DIR_OUT)
+        self._estop_out_line.request(
+            self._consumer_name, type=self._gpiod.LINE_REQ_DIR_OUT
+        )
         self.release_estop()
 
     def assert_estop(self) -> None:
