@@ -29,7 +29,6 @@ export function ConfirmCancelModal(
       trackEvent({ name: 'runCancel', properties: {} })
       stopRun(runId)
     }
-    runId != null && stopRun(runId)
     onClose()
   }
 
