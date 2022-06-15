@@ -200,7 +200,10 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           />
         ))}
       </Flex>
-      <EmptyStateLinks title={t('create_or_download')} css={TYPOGRAPHY.pSemiBold}/>
+      <EmptyStateLinks
+        title={t('create_or_download')}
+        css={TYPOGRAPHY.pSemiBold}
+      />
       <Slideout
         title={t('import_new_protocol')}
         isExpanded={showSlideout}

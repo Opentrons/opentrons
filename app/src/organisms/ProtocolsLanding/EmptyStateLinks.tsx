@@ -34,7 +34,12 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
       paddingBottom={SPACING.spacing3}
       width="96.5%"
     >
-      <StyledText role="complementary" as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold} marginBottom={SPACING.spacing3}>
+      <StyledText
+        role="complementary"
+        as="label"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        marginBottom={SPACING.spacing3}
+      >
         {props.title}
       </StyledText>
       <Flex justifyContent={JUSTIFY_START} flexDirection={DIRECTION_ROW}>

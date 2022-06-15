@@ -23,7 +23,7 @@ import {
   ModuleIcon,
   POSITION_ABSOLUTE,
   TEXT_ALIGN_RIGHT,
-  TYPOGRAPHY
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useHistory } from 'react-router-dom'
 import {
@@ -176,7 +176,11 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_leftMount_${protocolDisplayName}`}
               >
-                <StyledText as="h6" marginBottom={SPACING.spacing3} css={COLORS.darkGreyEnabled}>
+                <StyledText
+                  as="h6"
+                  marginBottom={SPACING.spacing3}
+                  css={COLORS.darkGreyEnabled}
+                >
                   {t('left_mount')}
                 </StyledText>
                 <StyledText as="p" marginTop={SPACING.spacing2}>
