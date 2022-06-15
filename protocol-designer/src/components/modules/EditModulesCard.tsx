@@ -41,6 +41,9 @@ export function EditModulesCard(props: Props): JSX.Element {
   const temperatureModuleOnDeck = modules[TEMPERATURE_MODULE_TYPE]
   const heaterShakerOnDeck = modules[HEATERSHAKER_MODULE_TYPE]
 
+  const crashablePipetteSelected = getIsCrashablePipetteSelected(
+    pipettesByMount
+  )
   const hasCrashableMagneticModule =
     magneticModuleOnDeck &&
     isModuleWithCollisionIssue(magneticModuleOnDeck.model)
@@ -49,11 +52,13 @@ export function EditModulesCard(props: Props): JSX.Element {
     isModuleWithCollisionIssue(temperatureModuleOnDeck.model)
   const isHeaterShakerOnDeck = Boolean(heaterShakerOnDeck)
 
+  const showTempPipetteCollisons =
+    crashablePipetteSelected && hasCrashableTempModule
+  const showMagPipetteCollisons =
+    crashablePipetteSelected && hasCrashableMagneticModule
+
   const moduleRestrictionsDisabled = Boolean(
     useSelector(featureFlagSelectors.getDisableModuleRestrictions)
-  )
-  const crashablePipettesSelected = getIsCrashablePipetteSelected(
-    pipettesByMount
   )
 
   const showHeaterShakerPipetteCollisions =
@@ -64,11 +69,6 @@ export function EditModulesCard(props: Props): JSX.Element {
     ].some(pipetteSpecs => pipetteSpecs?.channels !== 1)
 
   const warningsEnabled = !moduleRestrictionsDisabled
-  const showCrashInfoBox =
-    warningsEnabled &&
-    ((crashablePipettesSelected && hasCrashableMagneticModule) ||
-      (crashablePipettesSelected && hasCrashableTempModule) ||
-      isHeaterShakerOnDeck)
 
   const SUPPORTED_MODULE_TYPES_FILTERED = enableHeaterShaker
     ? SUPPORTED_MODULE_TYPES
@@ -79,11 +79,12 @@ export function EditModulesCard(props: Props): JSX.Element {
   return (
     <Card title="Modules">
       <div className={styles.modules_card_content}>
-        {showCrashInfoBox && (
+        {warningsEnabled && (
           <CrashInfoBox
-            magnetOnDeck={hasCrashableMagneticModule}
-            temperatureOnDeck={hasCrashableTempModule}
-            heaterShakerOnDeck={isHeaterShakerOnDeck}
+            showMagPipetteCollisons={showMagPipetteCollisons}
+            showTempPipetteCollisons={showTempPipetteCollisons}
+            showHeaterShakerLabwareCollisions={isHeaterShakerOnDeck}
+            showHeaterShakerModuleCollisions={isHeaterShakerOnDeck}
             showHeaterShakerPipetteCollisions={
               showHeaterShakerPipetteCollisions
             }

@@ -324,11 +324,16 @@ export class FilePipettesModal extends React.Component<Props, State> {
                         pipetteSpecs && pipetteSpecs.channels !== 1
                     )
 
-                  const showCrashInfoBox =
-                    (getIsCrashablePipetteSelected(values.pipettesByMount) &&
-                      (hasCrashableMagnetModuleSelected ||
-                        hasCrashableTemperatureModuleSelected)) ||
-                    hasHeaterShakerSelected
+                  const crashablePipetteSelected = getIsCrashablePipetteSelected(
+                    values.pipettesByMount
+                  )
+
+                  const showTempPipetteCollisons =
+                    crashablePipetteSelected &&
+                    hasCrashableTemperatureModuleSelected
+                  const showMagPipetteCollisons =
+                    crashablePipetteSelected && hasCrashableMagnetModuleSelected
+
                   return (
                     <>
                       <form onSubmit={handleSubmit}>
@@ -397,14 +402,17 @@ export class FilePipettesModal extends React.Component<Props, State> {
                             />
                           </div>
                         )}
-                        {showCrashInfoBox && !moduleRestrictionsDisabled && (
+                        {!moduleRestrictionsDisabled && (
                           <CrashInfoBox
                             showDiagram
-                            magnetOnDeck={hasCrashableMagnetModuleSelected}
-                            temperatureOnDeck={
-                              hasCrashableTemperatureModuleSelected
+                            showMagPipetteCollisons={showMagPipetteCollisons}
+                            showTempPipetteCollisons={showTempPipetteCollisons}
+                            showHeaterShakerLabwareCollisions={
+                              hasHeaterShakerSelected
                             }
-                            heaterShakerOnDeck={hasHeaterShakerSelected}
+                            showHeaterShakerModuleCollisions={
+                              hasHeaterShakerSelected
+                            }
                             showHeaterShakerPipetteCollisions={
                               showHeaterShakerPipetteCollisions
                             }

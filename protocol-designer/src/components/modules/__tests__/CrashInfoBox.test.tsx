@@ -10,8 +10,11 @@ describe('CrashInfoBox', () => {
   it('should render PipetteModuleCollisions, ModuleLabwareCollisions, and ModuleModuleCollisions when a heater shaker is on deck', () => {
     props = {
       ...props,
-      heaterShakerOnDeck: true,
+      showHeaterShakerLabwareCollisions: true,
+      showHeaterShakerModuleCollisions: true,
       showHeaterShakerPipetteCollisions: true,
+      showMagPipetteCollisons: true,
+      showTempPipetteCollisons: true,
     }
     const { getByText } = render(<CrashInfoBox {...props} />)
     getByText('Potential pipette-module collisions')
@@ -21,7 +24,7 @@ describe('CrashInfoBox', () => {
   it('should only render PipetteModuleCollisions when a mag mod is on deck', () => {
     props = {
       ...props,
-      magnetOnDeck: true,
+      showMagPipetteCollisons: true,
     }
     const { getByText, queryByText } = render(<CrashInfoBox {...props} />)
     getByText('Potential pipette-module collisions')
@@ -31,7 +34,7 @@ describe('CrashInfoBox', () => {
   it('should only render PipetteModuleCollisions when a temp mod is on deck', () => {
     props = {
       ...props,
-      temperatureOnDeck: true,
+      showTempPipetteCollisons: true,
     }
     const { getByText, queryByText } = render(<CrashInfoBox {...props} />)
     getByText('Potential pipette-module collisions')

@@ -6,14 +6,18 @@ import styles from './styles.css'
 
 interface Props {
   showDiagram?: boolean
-  magnetOnDeck?: boolean | null
-  temperatureOnDeck?: boolean | null
-  heaterShakerOnDeck?: boolean
+  showMagPipetteCollisons?: boolean | null
+  showTempPipetteCollisons?: boolean | null
   showHeaterShakerPipetteCollisions?: boolean
+  showHeaterShakerModuleCollisions?: boolean
+  showHeaterShakerLabwareCollisions?: boolean
 }
 
-type TempMagCollisonProps = Pick<Props, 'magnetOnDeck' | 'temperatureOnDeck'>
-type HeaterShakerCollisonProps = Pick<Props, 'heaterShakerOnDeck'>
+type TempMagCollisonProps = Pick<
+  Props,
+  'showMagPipetteCollisons' | 'showTempPipetteCollisons'
+>
+// type HeaterShakerCollisonProps = Pick<Props, 'heaterShakerOnDeck'>
 
 const HeaterShakerPipetteCollisions = (): JSX.Element | null => {
   return (
@@ -31,8 +35,7 @@ const HeaterShakerPipetteCollisions = (): JSX.Element | null => {
   )
 }
 
-const TempMagCollisions = (props: TempMagCollisonProps): JSX.Element | null => {
-  if (!props.magnetOnDeck && !props.temperatureOnDeck) return null
+const TempMagCollisions = (props: TempMagCollisonProps): JSX.Element => {
   const moduleMessage = getCrashableModulesCopy(props) || ''
   return (
     <li style={{ marginTop: SPACING_3 }}>
@@ -47,19 +50,24 @@ const TempMagCollisions = (props: TempMagCollisonProps): JSX.Element | null => {
 
 const PipetteModuleCollisions = (props: Props): JSX.Element | null => {
   if (
-    !props.magnetOnDeck &&
-    !props.temperatureOnDeck &&
+    !props.showMagPipetteCollisons &&
+    !props.showTempPipetteCollisons &&
     !props.showHeaterShakerPipetteCollisions
   )
     return null
 
   const body = (
     <React.Fragment>
-      <HeaterShakerPipetteCollisions />
-      <TempMagCollisions
-        magnetOnDeck={props.magnetOnDeck}
-        temperatureOnDeck={props.temperatureOnDeck}
-      />
+      {props.showHeaterShakerPipetteCollisions && (
+        <HeaterShakerPipetteCollisions />
+      )}
+
+      {(props.showMagPipetteCollisons || props.showTempPipetteCollisons) && (
+        <TempMagCollisions
+          showMagPipetteCollisons={props.showMagPipetteCollisons}
+          showTempPipetteCollisons={props.showTempPipetteCollisons}
+        />
+      )}
     </React.Fragment>
   )
   const title = 'Potential pipette-module collisions'
@@ -67,9 +75,9 @@ const PipetteModuleCollisions = (props: Props): JSX.Element | null => {
   return <CollisionCard body={body} title={title} showDiagram />
 }
 const ModuleLabwareCollisions = (
-  props: HeaterShakerCollisonProps
+  props: Pick<Props, 'showHeaterShakerLabwareCollisions'>
 ): JSX.Element | null => {
-  if (!props.heaterShakerOnDeck) return null
+  if (!props.showHeaterShakerLabwareCollisions) return null
   const title = 'Potential module-labware collisions'
   const body = (
     <li>
@@ -81,9 +89,9 @@ const ModuleLabwareCollisions = (
   return <CollisionCard title={title} body={body} />
 }
 const ModuleModuleCollisions = (
-  props: HeaterShakerCollisonProps
+  props: Pick<Props, 'showHeaterShakerModuleCollisions'>
 ): JSX.Element | null => {
-  if (!props.heaterShakerOnDeck) return null
+  if (!props.showHeaterShakerModuleCollisions) return null
   const title = 'Potential module-module collisions'
   const body = (
     <li>
@@ -120,8 +128,16 @@ export function CrashInfoBox(props: Props): JSX.Element {
     <React.Fragment>
       <PipetteModuleCollisions {...props} />
       {/* the remaining collision warnings below are only relevant to a heater shaker */}
-      <ModuleLabwareCollisions heaterShakerOnDeck={props.heaterShakerOnDeck} />
-      <ModuleModuleCollisions heaterShakerOnDeck={props.heaterShakerOnDeck} />
+      <ModuleLabwareCollisions
+        showHeaterShakerLabwareCollisions={
+          props.showHeaterShakerLabwareCollisions
+        }
+      />
+      <ModuleModuleCollisions
+        showHeaterShakerModuleCollisions={
+          props.showHeaterShakerModuleCollisions
+        }
+      />
     </React.Fragment>
   )
 }
@@ -129,17 +145,17 @@ export function CrashInfoBox(props: Props): JSX.Element {
 function getCrashableModulesCopy(
   props: TempMagCollisonProps
 ): JSX.Element | null {
-  const { magnetOnDeck, temperatureOnDeck } = props
-  if (magnetOnDeck && temperatureOnDeck) {
+  const { showMagPipetteCollisons, showTempPipetteCollisons } = props
+  if (showMagPipetteCollisons && showTempPipetteCollisons) {
     return (
       <span>
         <strong>Temperature Module GEN1</strong> or a{' '}
         <strong>Magnetic Module GEN1</strong>
       </span>
     )
-  } else if (magnetOnDeck) {
+  } else if (showMagPipetteCollisons) {
     return <strong>Magnetic Module GEN1</strong>
-  } else if (temperatureOnDeck) {
+  } else if (showTempPipetteCollisons) {
     return <strong>Temperature Module GEN1</strong>
   }
   return null
