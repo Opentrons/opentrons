@@ -5,7 +5,6 @@ import {
   TYPOGRAPHY,
   Icon,
   Flex,
-  FONT_SIZE_CAPTION,
   SPACING,
   Link,
   JUSTIFY_START,
