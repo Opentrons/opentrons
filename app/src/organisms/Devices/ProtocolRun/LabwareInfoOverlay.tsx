@@ -80,7 +80,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
         )}
       </>
       {props.labwareHasLiquid && (
-        <Icon name="water" color={COLORS.white} width={SPACING.spacing6} />
+        <Icon name="water" color={COLORS.white} width={'0'} minWidth={'1rem'} />
       )}
     </Flex>
   )
