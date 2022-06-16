@@ -140,7 +140,7 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
           flexDirection={DIRECTION_COLUMN}
           data-testid={`ProtocolDetails_description`}
         >
-          <StyledText>{description}</StyledText>
+          <StyledText as="p">{description}</StyledText>
           {filteredMetaData.map((item, index) => {
             return (
               <React.Fragment key={index}>
