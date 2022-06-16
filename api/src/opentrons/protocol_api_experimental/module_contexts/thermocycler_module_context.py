@@ -25,6 +25,14 @@ class ThermocyclerModuleContext:  # noqa: D101
         """Turn off the well block heater."""
         self._engine_client.thermocycler_deactivate_block(self._module_id)
 
+    def open_lid(self) -> None:
+        """Opens a thermocycler's lid."""
+        self._engine_client.thermocycler_open_lid(self._module_id)
+
+    def close_lid(self) -> None:
+        """Closes a thermocycler's lid."""
+        self._engine_client.thermocycler_close_lid(self._module_id)
+
     # TODO(mc, 2022-04-29): if you go down to the driver level, there is a
     # separate "deactivate all" g-code. Is this functionally different than
     # deactivating the lid and block in sequence like this?
