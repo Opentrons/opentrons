@@ -2,6 +2,8 @@
 import pytest
 from decoy import Decoy
 
+from opentrons_shared_data.labware.dev_types import LabwareUri
+
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.module_geometry import (
@@ -131,80 +133,49 @@ def test_labware_when_heater_shaker(
 ) -> None:
     """It should allow short labware east and west if a heater-shaker is placed."""
     heater_shaker = decoy.mock(cls=HeaterShakerGeometry)
-    labware = decoy.mock(cls=DeckItem)
+    cool_labware = decoy.mock(cls=DeckItem)
+    lame_labware = decoy.mock(cls=DeckItem)
 
     decoy.when(heater_shaker.load_name).then_return("some_heater_shaker")
-    decoy.when(heater_shaker.MAX_ADJACENT_ITEM_HEIGHT).then_return(10)
-    decoy.when(labware.load_name).then_return("some_labware")
-    decoy.when(labware.highest_z).then_return(9.9)
+    decoy.when(heater_shaker.MAX_X_ADJACENT_ITEM_HEIGHT).then_return(10)
+    decoy.when(cool_labware.load_name).then_return("cool_labware")
+    decoy.when(cool_labware.highest_z).then_return(9.9)
+    decoy.when(lame_labware.load_name).then_return("lame_labware")
+    decoy.when(lame_labware.highest_z).then_return(10.1)
 
     check(
         existing_items={heater_shaker_location: heater_shaker},
         new_location=labware_location,
-        new_item=labware,
+        new_item=cool_labware,
     )
     check(
-        existing_items={labware_location: labware},
+        existing_items={labware_location: cool_labware},
         new_location=heater_shaker_location,
         new_item=heater_shaker,
     )
-
-
-@pytest.mark.parametrize(
-    ("heater_shaker_location", "labware_location"),
-    [
-        (1, 2),
-        (2, 1),
-        (2, 3),
-        (3, 2),
-        (4, 5),
-        (5, 4),
-        (5, 6),
-        (6, 5),
-        (7, 8),
-        (8, 7),
-        (8, 9),
-        (9, 8),
-        (10, 11),
-        (11, 10),
-    ],
-)
-def test_no_labware_when_heater_shaker(
-    decoy: Decoy,
-    heater_shaker_location: int,
-    labware_location: int,
-) -> None:
-    """It should not allow tall labware east and west if a heater-shaker is placed."""
-    heater_shaker = decoy.mock(cls=HeaterShakerGeometry)
-    labware = decoy.mock(cls=DeckItem)
-
-    decoy.when(heater_shaker.load_name).then_return("some_heater_shaker")
-    decoy.when(heater_shaker.MAX_ADJACENT_ITEM_HEIGHT).then_return(10)
-    decoy.when(labware.load_name).then_return("some_labware")
-    decoy.when(labware.highest_z).then_return(10.1)
 
     with pytest.raises(
         DeckConflictError,
         match=(
             f"some_heater_shaker in slot {heater_shaker_location}"
-            f" prevents some_labware from using slot {labware_location}"
+            f" prevents lame_labware from using slot {labware_location}"
         ),
     ):
         check(
             existing_items={heater_shaker_location: heater_shaker},
             new_location=labware_location,
-            new_item=labware,
+            new_item=lame_labware,
         )
 
     with pytest.raises(
         DeckConflictError,
         match=(
-            f"some_labware in slot {labware_location}"
+            f"lame_labware in slot {labware_location}"
             f" prevents some_heater_shaker from using slot {heater_shaker_location}"
         ),
     ):
         check(
-            existing_items={labware_location: labware},
+            existing_items={labware_location: lame_labware},
             new_location=heater_shaker_location,
             new_item=heater_shaker,
         )
@@ -298,84 +269,54 @@ def test_tip_rack_when_heater_shaker(
 ) -> None:
     """It should allow short tip racks east and west if a heater-shaker is placed."""
     heater_shaker = decoy.mock(cls=HeaterShakerGeometry)
-    tip_rack = decoy.mock(cls=AbstractLabware)
+    cool_tip_rack = decoy.mock(cls=AbstractLabware)
+    lame_tip_rack = decoy.mock(cls=AbstractLabware)
 
     decoy.when(heater_shaker.load_name).then_return("some_heater_shaker")
-    decoy.when(heater_shaker.MAX_ADJACENT_ITEM_HEIGHT).then_return(10)
-    decoy.when(heater_shaker.MAX_ADJACENT_TIP_RACK_HEIGHT).then_return(12)
-    decoy.when(tip_rack.load_name).then_return("some_tip_rack")
-    decoy.when(tip_rack.highest_z).then_return(11)
-    decoy.when(tip_rack.is_tiprack()).then_return(True)
+    decoy.when(heater_shaker.MAX_X_ADJACENT_ITEM_HEIGHT).then_return(10)
+    decoy.when(heater_shaker.ALLOWED_ADJACENT_TALL_LABWARE).then_return(
+        [LabwareUri("test/cool_tip_rack/1")]
+    )
+    decoy.when(cool_tip_rack.load_name).then_return("cool_tip_rack")
+    decoy.when(cool_tip_rack.highest_z).then_return(11)
+    decoy.when(cool_tip_rack.get_uri()).then_return("test/cool_tip_rack/1")
+    decoy.when(lame_tip_rack.load_name).then_return("lame_tip_rack")
+    decoy.when(lame_tip_rack.highest_z).then_return(11)
+    decoy.when(lame_tip_rack.get_uri()).then_return("test/lame_tip_rack/1")
 
     check(
         existing_items={heater_shaker_location: heater_shaker},
         new_location=tip_rack_location,
-        new_item=tip_rack,
+        new_item=cool_tip_rack,
     )
     check(
-        existing_items={tip_rack_location: tip_rack},
+        existing_items={tip_rack_location: cool_tip_rack},
         new_location=heater_shaker_location,
         new_item=heater_shaker,
     )
-
-
-@pytest.mark.parametrize(
-    ("heater_shaker_location", "tip_rack_location"),
-    [
-        (1, 2),
-        (2, 1),
-        (2, 3),
-        (3, 2),
-        (4, 5),
-        (5, 4),
-        (5, 6),
-        (6, 5),
-        (7, 8),
-        (8, 7),
-        (8, 9),
-        (9, 8),
-        (10, 11),
-        (11, 10),
-    ],
-)
-def test_no_tip_rack_when_heater_shaker(
-    decoy: Decoy,
-    heater_shaker_location: int,
-    tip_rack_location: int,
-) -> None:
-    """It should not allow tall tip racks east and west if a heater-shaker is placed."""
-    heater_shaker = decoy.mock(cls=HeaterShakerGeometry)
-    tip_rack = decoy.mock(cls=AbstractLabware)
-
-    decoy.when(heater_shaker.load_name).then_return("some_heater_shaker")
-    decoy.when(heater_shaker.MAX_ADJACENT_ITEM_HEIGHT).then_return(10)
-    decoy.when(heater_shaker.MAX_ADJACENT_TIP_RACK_HEIGHT).then_return(12)
-    decoy.when(tip_rack.load_name).then_return("some_tip_rack")
-    decoy.when(tip_rack.highest_z).then_return(13)
-    decoy.when(tip_rack.is_tiprack()).then_return(True)
 
     with pytest.raises(
         DeckConflictError,
         match=(
             f"some_heater_shaker in slot {heater_shaker_location}"
-            f" prevents some_tip_rack from using slot {tip_rack_location}"
+            f" prevents lame_tip_rack from using slot {tip_rack_location}"
         ),
     ):
         check(
             existing_items={heater_shaker_location: heater_shaker},
             new_location=tip_rack_location,
-            new_item=tip_rack,
+            new_item=lame_tip_rack,
         )
 
     with pytest.raises(
         DeckConflictError,
         match=(
-            f"some_tip_rack in slot {tip_rack_location}"
+            f"lame_tip_rack in slot {tip_rack_location}"
             f" prevents some_heater_shaker from using slot {heater_shaker_location}"
         ),
     ):
         check(
-            existing_items={tip_rack_location: tip_rack},
+            existing_items={tip_rack_location: lame_tip_rack},
             new_location=heater_shaker_location,
             new_item=heater_shaker,
         )

@@ -17,6 +17,7 @@ from opentrons import types
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 
 from opentrons_shared_data import module
+from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 
@@ -336,8 +337,31 @@ class ThermocyclerGeometry(ModuleGeometry):
 class HeaterShakerGeometry(ModuleGeometry):
     """Class holding the state of a heater-shaker's physical geometry."""
 
-    MAX_ADJACENT_ITEM_HEIGHT = 53.0
-    MAX_ADJACENT_TIP_RACK_HEIGHT = 70.0
+    # TODO(mc, 2022-06-16): move these constants to the module definition
+    MAX_X_ADJACENT_ITEM_HEIGHT = 53.0
+    """Maximum height of an adjacent item in the x-direction.
+
+    This value selected to avoid interference
+    with the heater-shaker's labware latch.
+
+    For background, see: https://github.com/Opentrons/opentrons/issues/10316
+    """
+
+    ALLOWED_ADJACENT_TALL_LABWARE = [
+        LabwareUri("opentrons/opentrons_96_filtertiprack_10ul/1"),
+        LabwareUri("opentrons/opentrons_96_filtertiprack_200ul/1"),
+        LabwareUri("opentrons/opentrons_96_filtertiprack_20ul/1"),
+        LabwareUri("opentrons/opentrons_96_tiprack_10ul/1"),
+        LabwareUri("opentrons/opentrons_96_tiprack_20ul/1"),
+        LabwareUri("opentrons/opentrons_96_tiprack_300ul/1"),
+    ]
+    """URI's of labware that are allowed to exceed the height limit above.
+
+    These labware do not take up the full with of the slot
+    in the area that would interfere with the labware latch.
+
+    For background, see: https://github.com/Opentrons/opentrons/issues/10316
+    """
 
     def __init__(
         self,

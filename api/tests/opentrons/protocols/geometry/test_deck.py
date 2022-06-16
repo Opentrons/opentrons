@@ -117,3 +117,5 @@ def test_item_collisions(
 
     with pytest.raises(deck_conflict.DeckConflictError, match="oh no"):
         subject[7] = module_item
+
+    assert subject[7] is None

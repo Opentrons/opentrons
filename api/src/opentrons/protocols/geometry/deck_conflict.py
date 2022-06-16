@@ -4,6 +4,8 @@
 from typing import List, Mapping, NamedTuple, Optional, Union
 from typing_extensions import Final
 
+from opentrons_shared_data.labware.dev_types import LabwareUri
+
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.geometry.module_geometry import (
@@ -36,16 +38,13 @@ class _MaxHeight(NamedTuple):
     source_item: DeckItem
     source_location: int
     max_height: float
-    max_tip_rack_height: float
+    allowed_labware: List[LabwareUri]
 
     def is_allowed(self, item: DeckItem) -> bool:
-        height_limit = (
-            self.max_tip_rack_height
-            if (isinstance(item, AbstractLabware) and item.is_tiprack())
-            else self.max_height
-        )
+        if isinstance(item, AbstractLabware) and item.get_uri() in self.allowed_labware:
+            return True
 
-        return item.highest_z < height_limit
+        return item.highest_z < self.max_height
 
 
 class _NoModule(NamedTuple):
@@ -153,8 +152,8 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
                     location=covered_location,
                     source_item=item,
                     source_location=location,
-                    max_height=item.MAX_ADJACENT_ITEM_HEIGHT,
-                    max_tip_rack_height=item.MAX_ADJACENT_TIP_RACK_HEIGHT,
+                    max_height=item.MAX_X_ADJACENT_ITEM_HEIGHT,
+                    allowed_labware=item.ALLOWED_ADJACENT_TALL_LABWARE,
                 )
             )
 
