@@ -63,7 +63,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_ROW}
       marginBottom={SPACING.spacing3}
-      padding={`${SPACING.spacing3} ${SPACING.spacing2} ${SPACING.spacing3} ${SPACING.spacing3}`}
+      padding={`${SPACING.spacing2} ${SPACING.spacing2} ${SPACING.spacing3} ${SPACING.spacing3}`}
       width="100%"
       onClick={() => history.push(`/devices/${robotName}`)}
       cursor="pointer"
