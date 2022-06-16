@@ -22,7 +22,7 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { StyledText } from '../../atoms/text'
-import { TertiaryButton, SecondaryTertiaryButton } from '../../atoms/buttons'
+import { SecondaryTertiaryButton } from '../../atoms/buttons'
 import { CONNECTABLE, UNREACHABLE } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'

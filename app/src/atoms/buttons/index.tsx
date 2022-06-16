@@ -52,9 +52,19 @@ export const SecondaryTertiaryButton = styled(NewSecondaryBtn)`
   overflow: no-wrap;
   padding: 0.375rem 0.75rem;
   text-transform: ${TYPOGRAPHY.textTransformNone};
+  white-space: nowrap;
+  ${TYPOGRAPHY.labelSemiBold}
 
   &:hover {
     opacity: 0.7;
+    box-shadow: 0 0 0;
+  }
+  &:focus-visible {
+    box-shadow: 0 0 0 3px ${COLORS.warning};
+  }
+
+  &:disabled {
+    opacity: 50%;
   }
 `
 
