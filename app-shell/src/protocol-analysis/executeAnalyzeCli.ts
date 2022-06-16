@@ -5,9 +5,8 @@ const log = createLogger('protocol-analysis/executeAnalyzeCli')
 
 export function executeAnalyzeCli(
   pythonPath: string,
-  sourcePath: string,
   outputPath: string,
-  ...auxSourcePaths: string[]
+  sourcePaths: string[]
 ): Promise<void> {
   return execa(pythonPath, [
     '-m',
