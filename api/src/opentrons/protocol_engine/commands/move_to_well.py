@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import BasePipettingParams
+from .pipetting_common import PipetteIdMixin, WellLocationMixin
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 MoveToWellCommandType = Literal["moveToWell"]
 
 
-class MoveToWellParams(BasePipettingParams):
+class MoveToWellParams(PipetteIdMixin, WellLocationMixin):
     """Payload required to move a pipette to a specific well."""
 
     pass

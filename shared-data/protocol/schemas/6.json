@@ -392,8 +392,9 @@
                     "minimum": 0
                   },
                   "forceDirect": {
-                    "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
-                    "type": "boolean"
+                    "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
+                    "type": "boolean",
+                    "default": false
                   }
                 }
               }
@@ -422,8 +423,9 @@
                     "minimum": 0
                   },
                   "forceDirect": {
-                    "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
-                    "type": "boolean"
+                    "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
+                    "type": "boolean",
+                    "default": false
                   }
                 }
               }
@@ -968,8 +970,9 @@
                     "minimum": 0
                   },
                   "forceDirect": {
-                    "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
-                    "type": "boolean"
+                    "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
+                    "type": "boolean",
+                    "default": false
                   }
                 }
               }

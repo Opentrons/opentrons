@@ -105,6 +105,14 @@ from .move_relative import (
     MoveRelativeCommandType,
 )
 
+from .move_to_coordinates import (
+    MoveToCoordinates,
+    MoveToCoordinatesParams,
+    MoveToCoordinatesCreate,
+    MoveToCoordinatesResult,
+    MoveToCoordinatesCommandType,
+)
+
 from .move_to_well import (
     MoveToWell,
     MoveToWellParams,
@@ -227,6 +235,12 @@ __all__ = [
     "MoveRelativeCreate",
     "MoveRelativeResult",
     "MoveRelativeCommandType",
+    # move to coordinates command models
+    "MoveToCoordinates",
+    "MoveToCoordinatesParams",
+    "MoveToCoordinatesCreate",
+    "MoveToCoordinatesResult",
+    "MoveToCoordinatesCommandType",
     # move to well command models
     "MoveToWell",
     "MoveToWellCreate",
