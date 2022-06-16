@@ -114,7 +114,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
           ) : null}
         </Flex>
         {robot.status === CONNECTABLE ? (
-          <Flex>
+          <Flex css={{ flex: '2 1' }}>
             <AttachedPipettes robotName={robotName} />
             <AttachedModules robotName={robotName} />
           </Flex>
@@ -130,7 +130,11 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
   const { t } = useTranslation('devices_landing')
   const attachedModules = useAttachedModules()
   return attachedModules.length > 0 ? (
-    <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing4}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      paddingRight={SPACING.spacing4}
+      width="100%"
+    >
       <StyledText
         as="h6"
         textTransform={TEXT_TRANSFORM_UPPERCASE}
@@ -152,15 +156,21 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
         ))}
       </Flex>
     </Flex>
-  ) : null
+  ) : (
+    <Flex width="100%"></Flex>
+  )
 }
 function AttachedPipettes(props: { robotName: string }): JSX.Element {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
   const attachedPipettes = useAttachedPipettes()
   return (
-    <>
-      <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing4}>
+    <Flex flexDirection={DIRECTION_ROW} width="100%">
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        paddingRight={SPACING.spacing4}
+        width="100%"
+      >
         <StyledText
           as="h6"
           textTransform={TEXT_TRANSFORM_UPPERCASE}
@@ -173,7 +183,11 @@ function AttachedPipettes(props: { robotName: string }): JSX.Element {
           {attachedPipettes?.left?.modelSpecs.displayName ?? t('empty')}
         </StyledText>
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing4}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        paddingRight={SPACING.spacing4}
+        width="100%"
+      >
         <StyledText
           as="h6"
           textTransform={TEXT_TRANSFORM_UPPERCASE}
@@ -186,7 +200,7 @@ function AttachedPipettes(props: { robotName: string }): JSX.Element {
           {attachedPipettes?.right?.modelSpecs.displayName ?? t('empty')}
         </StyledText>
       </Flex>
-    </>
+    </Flex>
   )
 }
 
