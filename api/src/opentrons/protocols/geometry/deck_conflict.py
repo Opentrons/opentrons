@@ -17,7 +17,7 @@ from opentrons.protocols.geometry.module_geometry import (
 from .deck_item import DeckItem
 
 
-FIXED_TRASH_SLOT: Final = 12
+_FIXED_TRASH_SLOT: Final = 12
 
 
 class _NotAllowed(NamedTuple):
@@ -61,7 +61,7 @@ class _NoModule(NamedTuple):
 class _FixedTrash(NamedTuple):
     """Only fixed-trash labware is allowed in this slot."""
 
-    location: int = FIXED_TRASH_SLOT
+    location: int = _FIXED_TRASH_SLOT
 
     def is_allowed(self, item: DeckItem) -> bool:
         if isinstance(item, AbstractLabware):
@@ -126,7 +126,7 @@ def check(
 def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction]:
     restrictions: List[_DeckRestriction] = []
 
-    if location != FIXED_TRASH_SLOT:
+    if location != _FIXED_TRASH_SLOT:
         restrictions.append(
             _NotAllowed(
                 location=location,

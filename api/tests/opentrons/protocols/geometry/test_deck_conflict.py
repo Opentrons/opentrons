@@ -41,10 +41,13 @@ def test_only_trash_in_12(decoy: Decoy) -> None:
     """It should only allow trash labware in slot 12."""
     trash_labware = decoy.mock(cls=Labware)
     trash_labware_impl = decoy.mock(cls=AbstractLabware)
-    not_trash = decoy.mock(cls=DeckItem)
+    not_trash = decoy.mock(cls=Labware)
+    not_trash_impl = decoy.mock(cls=AbstractLabware)
 
     decoy.when(trash_labware.quirks).then_return(["fixedTrash"])
     decoy.when(trash_labware_impl.get_quirks()).then_return(["fixedTrash"])
+    decoy.when(not_trash.quirks).then_return(["notTrash"])
+    decoy.when(not_trash_impl.get_quirks()).then_return(["notTrash"])
 
     check(existing_items={}, new_item=trash_labware, new_location=12)
     check(existing_items={}, new_item=trash_labware_impl, new_location=12)
@@ -53,6 +56,11 @@ def test_only_trash_in_12(decoy: Decoy) -> None:
         DeckConflictError, match="Only fixed-trash is allowed in slot 12"
     ):
         check(existing_items={}, new_item=not_trash, new_location=12)
+
+    with pytest.raises(
+        DeckConflictError, match="Only fixed-trash is allowed in slot 12"
+    ):
+        check(existing_items={}, new_item=not_trash_impl, new_location=12)
 
 
 def test_trash_override(decoy: Decoy) -> None:
@@ -320,3 +328,25 @@ def test_tip_rack_when_heater_shaker(
             new_location=heater_shaker_location,
             new_item=heater_shaker,
         )
+
+
+def test_no_heater_shaker_trash(decoy: Decoy) -> None:
+    """It should check that fixed trash does not conflict with heater-shaker."""
+    heater_shaker = decoy.mock(cls=HeaterShakerGeometry)
+    trash = decoy.mock(cls=Labware)
+
+    decoy.when(trash.load_name).then_return("some_fixed_trash")
+    decoy.when(trash.quirks).then_return(["fixedTrash"])
+    decoy.when(trash.highest_z).then_return(11)
+
+    decoy.when(heater_shaker.load_name).then_return("some_heater_shaker")
+    decoy.when(heater_shaker.MAX_X_ADJACENT_ITEM_HEIGHT).then_return(10)
+
+    with pytest.raises(
+        DeckConflictError,
+        match=(
+            "some_fixed_trash in slot 12"
+            " prevents some_heater_shaker from using slot 11"
+        ),
+    ):
+        check(existing_items={12: trash}, new_item=heater_shaker, new_location=11)
