@@ -272,7 +272,7 @@ CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
                 """
             ).encode(),
         ),
-        expected_message='API version 123.456 is not supported by this robot software. Please either reduce your requested API version or update your robot.',
+        expected_message="API version 123.456 is not supported by this robot software. Please either reduce your requested API version or update your robot.",
     ),
 ]
 

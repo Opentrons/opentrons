@@ -13,8 +13,6 @@ from .protocol_source import Metadata, PythonProtocolConfig, JsonProtocolConfig
 from .role_analyzer import RoleAnalysisFile
 
 
-
-
 @dataclass(frozen=True)
 class ConfigAnalysis:
     """Protocol config analyzed from main file."""

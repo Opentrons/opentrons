@@ -11,7 +11,7 @@ class APIVersion(NamedTuple):
 
     @classmethod
     def validate_api_version(cls, api_version: str):
-        if api_version > MAX_SUPPORTED_VERSION:
+        if cls.from_string(api_version) > MAX_SUPPORTED_VERSION:
             raise RuntimeError(
                 f"API version {api_version} is not supported by this "
                 f"robot software. Please either reduce your requested API "
