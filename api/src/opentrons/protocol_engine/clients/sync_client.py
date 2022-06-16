@@ -127,6 +127,8 @@ class SyncClient:
                 wellName=well_name,
                 wellLocation=well_location,
                 volume=volume,
+                # TODO need to figure out how to transform rate into flowRate when called from pipette context
+                flowRate=6.789,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -149,6 +151,8 @@ class SyncClient:
                 wellName=well_name,
                 wellLocation=well_location,
                 volume=volume,
+                # TODO need to figure out how to transform rate into flowRate when called from pipette context
+                flowRate=6.789,
             )
         )
         result = self._transport.execute_command(request=request)
