@@ -295,9 +295,9 @@ class PipettingHandler:
                 abs_position=position,
             )
 
-    @staticmethod
     @contextmanager
     def set_flow_rate(
+        self,
         pipette: HardwarePipette,
         aspirate_flow_rate: Optional[float] = None,
         dispense_flow_rate: Optional[float] = None,
@@ -305,19 +305,20 @@ class PipettingHandler:
     ) -> Iterator[None]:
         """Context manager for setting flow rate before calling aspirate, dispense, or blowout."""
         original_aspirate_rate = pipette.config["aspirate_flow_rate"]
-        if aspirate_flow_rate is not None:
-            pipette.config["aspirate_flow_rate"] = aspirate_flow_rate
-
         original_dispense_rate = pipette.config["dispense_flow_rate"]
-        if dispense_flow_rate is not None:
-            pipette.config["dispense_flow_rate"] = dispense_flow_rate
-
         original_blow_out_rate = pipette.config["blow_out_flow_rate"]
-        if blow_out_flow_rate is not None:
-            pipette.config["blow_out_flow_rate"] = blow_out_flow_rate
+        self._hardware_api.set_flow_rate(
+            pipette.mount,
+            aspirate=aspirate_flow_rate,
+            dispense=dispense_flow_rate,
+            blow_out=blow_out_flow_rate,
+        )
         try:
             yield
         finally:
-            pipette.config["aspirate_flow_rate"] = original_aspirate_rate
-            pipette.config["dispense_flow_rate"] = original_dispense_rate
-            pipette.config["blow_out_flow_rate"] = original_blow_out_rate
+            self._hardware_api.set_flow_rate(
+                pipette.mount,
+                aspirate=original_aspirate_rate,
+                dispense=original_dispense_rate,
+                blow_out=original_blow_out_rate,
+            )
