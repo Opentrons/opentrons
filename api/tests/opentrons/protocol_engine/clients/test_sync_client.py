@@ -188,6 +188,7 @@ def test_aspirate(
                 offset=WellOffset(x=0, y=0, z=1),
             ),
             volume=123.45,
+            flowRate=6.789,
         )
     )
 
@@ -227,6 +228,7 @@ def test_dispense(
                 offset=WellOffset(x=0, y=0, z=1),
             ),
             volume=10,
+            flowRate=6.789,
         )
     )
 

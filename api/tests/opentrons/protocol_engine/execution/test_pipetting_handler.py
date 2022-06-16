@@ -307,6 +307,7 @@ async def test_handle_aspirate_request_without_prep(
         well_name="C6",
         well_location=well_location,
         volume=25,
+        flow_rate=2.3,  # TODO try and make sure this (and value in other tests) is asserted for
     )
 
     assert volume == 25
@@ -365,6 +366,7 @@ async def test_handle_aspirate_request_with_prep(
         well_name="C6",
         well_location=well_location,
         volume=25,
+        flow_rate=2.3,
     )
 
     assert volume == 25
@@ -424,6 +426,7 @@ async def test_handle_dispense_request(
         well_name="C6",
         well_location=well_location,
         volume=25,
+        flow_rate=2.3,
     )
 
     assert volume == 25
