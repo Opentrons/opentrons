@@ -36,7 +36,9 @@ class BaseLiquidHandlingParams(BasePipettingParams):
     )
 
     # todo blow out also needs this, but uses BasePipettingParams. Need to probably make another subclass
-    flowRate: float = Field(..., description="Speed in uL/s configured for the pipette", gt=0)
+    flowRate: float = Field(
+        ..., description="Speed in uL/s configured for the pipette", gt=0
+    )
 
 
 class BaseLiquidHandlingResult(BaseModel):
