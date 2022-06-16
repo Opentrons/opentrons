@@ -1,7 +1,6 @@
 import asyncio
 import pytest
-import unittest
-import mock
+from unittest import mock
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.modules.types import (
     TemperatureStatus,
@@ -10,7 +9,7 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
-from opentrons.drivers.heater_shaker import simulator
+from opentrons.drivers import heater_shaker
 
 
 @pytest.fixture
@@ -38,6 +37,19 @@ async def simulating_module(usb_port):
         yield module
     finally:
         await module.cleanup()
+
+
+@pytest.fixture
+async def simulating_module_driver_patched(simulating_module):
+    driver_mock = mock.MagicMock()
+    with mock.patch.object(simulating_module, "_driver", driver_mock), mock.patch.object(simulating_module._poller._reader, "_driver", driver_mock):
+        yield simulating_module
+
+
+@pytest.fixture
+async def simulating_module_poller_patched(simulating_module):
+    with mock.patch.object(simulating_module, "_poller"):
+        yield simulating_module
 
 
 async def test_sim_state(simulating_module):
@@ -173,44 +185,19 @@ async def test_deactivated_updated_live_data(simulating_module):
     }
 
 
-@pytest.fixture
-def mock_hs_driver():
-    with unittest.mock.patch(
-        "simulator.SimulatingDriver",
-        mock.AsyncMock(spec=simulator.SimulatingDriver),
-    ) as mock_driver:
-        yield mock_driver
-
-
-@pytest.fixture
-async def simulating_patched_module(usb_port, mock_hs_driver):
-    module = await modules.build(
-        port=usb_port.device_path,
-        usb_port=usb_port,
-        which="heatershaker",
-        simulating=True,
-        loop=asyncio.get_running_loop(),
-        execution_manager=ExecutionManager(),
-    )
-    assert isinstance(module, modules.AbstractModule)
-    try:
-        yield module
-    finally:
-        await module.cleanup()
-
-
-async def test_error_response(simulating_patched_module):
-    # now you can tell get_temperature to return something weird. you can use side_effect
-    # to run an arbitrary function or raise an exception; you can use return_value to change the
-    # return value
-    simulating_patched_module._driver.get_temperature.side_effect = RuntimeError()
+async def test_error_response(simulating_module_driver_patched):
+    simulating_module_driver_patched._driver.set_rpm.side_effect = RuntimeError()
     with pytest.raises(RuntimeError):
-        simulating_patched_module.get_temperature()
+        await simulating_module_driver_patched.set_speed(rpm=500)
     assert (
-        simulating_patched_module.live_data["data"]["errorDetails"] == "RuntimeError"
-    )  # or whatever
+        simulating_module_driver_patched.live_data["data"]["errorDetails"] == "RuntimeError()"
+    )
 
-    # simulating_module._error_status = "motor unable to move"
-    # await
 
-    # And for the async error injection?
+async def test_async_error_response(simulating_module_driver_patched):
+    simulating_module_driver_patched._driver.get_temperature.side_effect = RuntimeError()
+    with pytest.raises(RuntimeError):
+        await simulating_module_driver_patched.wait_next_poll()
+    assert (
+        simulating_module_driver_patched.live_data["data"]["errorDetails"] == "RuntimeError()"
+    )

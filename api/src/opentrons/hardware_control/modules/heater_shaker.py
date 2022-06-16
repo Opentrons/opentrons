@@ -543,3 +543,5 @@ class HeaterShakerListener(WaitableListener[PollResult]):
         """On error."""
         if self._callback:
             self._callback(exc)
+        super().on_error(exc)
+        
