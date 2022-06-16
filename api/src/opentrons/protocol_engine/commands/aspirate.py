@@ -39,6 +39,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, AspirateResult]
             well_name=params.wellName,
             well_location=params.wellLocation,
             volume=params.volume,
+            flow_rate=params.flowRate,
         )
 
         return AspirateResult(volume=volume)

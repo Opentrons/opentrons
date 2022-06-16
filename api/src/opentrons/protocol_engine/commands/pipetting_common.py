@@ -35,9 +35,8 @@ class BaseLiquidHandlingParams(BasePipettingParams):
         gt=0,
     )
 
-    # todo(mm, 2021-03-26): This class or one of its subclasses should have a
-    # field for liquid flow rate in microliters per second.
-    # See Opentrons/opentrons#4837 for terminology concerns.
+    # todo blow out also needs this, but uses BasePipettingParams. Need to probably make another subclass
+    flowRate: float = Field(..., description="Speed in uL/s configured for the pipette", gt=0)
 
 
 class BaseLiquidHandlingResult(BaseModel):
