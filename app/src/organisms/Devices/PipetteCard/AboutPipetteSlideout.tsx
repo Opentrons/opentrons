@@ -1,6 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
+import {
+  Flex,
+  DIRECTION_COLUMN,
+  SPACING,
+  TYPOGRAPHY,
+  COLORS,
+  TEXT_TRANSFORM_UPPERCASE,
+} from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import { Slideout } from '../../../atoms/Slideout'
 
@@ -29,12 +36,15 @@ export const AboutPipetteSlideout = (
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText
           as="h6"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          color={COLORS.darkGreyEnabled}
           data-testid={`AboutPipetteSlideout_serial_number_text_${pipetteId}`}
+          textTransform={TEXT_TRANSFORM_UPPERCASE}
         >
           {t('serial_number')}
         </StyledText>
         <StyledText
-          as="h6"
+          as="p"
           paddingTop={SPACING.spacing2}
           data-testid={`AboutPipetteSlideout_serial_${pipetteId}`}
         >
