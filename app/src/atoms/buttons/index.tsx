@@ -44,6 +44,20 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   }
 `
 
+export const SecondaryTertiaryButton = styled(NewSecondaryBtn)`
+  background-color: ${COLORS.white};
+  border-radius: ${BORDERS.radiusRoundEdge};
+  box-shadow: none;
+  color: ${COLORS.blue};
+  overflow: no-wrap;
+  padding: 0.375rem 0.75rem;
+  text-transform: ${TYPOGRAPHY.textTransformNone};
+
+  &:hover {
+    opacity: 0.7;
+  }
+`
+
 export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
   background-color: ${COLORS.error};
   border-radius: ${BORDERS.radiusSoftCorners};

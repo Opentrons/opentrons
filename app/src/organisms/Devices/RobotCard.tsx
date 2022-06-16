@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useHistory } from 'react-router-dom'
+import { css } from 'styled-components'
 
 import {
   Box,
@@ -21,7 +22,7 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { StyledText } from '../../atoms/text'
-import { TertiaryButton } from '../../atoms/buttons'
+import { TertiaryButton, SecondaryTertiaryButton } from '../../atoms/buttons'
 import { CONNECTABLE, UNREACHABLE } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
@@ -38,6 +39,13 @@ import { RobotOverflowMenu } from './RobotOverflowMenu'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 
+const ROBOT_CARD_STYLE = css`
+  border: 1px solid ${COLORS.medGrey};
+  &:hover {
+    border: 1px solid ${COLORS.medGreyHover};
+  }
+`
+
 interface RobotCardProps {
   robot: DiscoveredRobot
 }
@@ -51,7 +59,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.white}
-      border={`1px solid ${COLORS.medGrey}`}
+      css={ROBOT_CARD_STYLE}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_ROW}
       marginBottom={SPACING.spacing3}
@@ -202,7 +210,7 @@ function RunningProtocolBanner(props: {
         to={`/devices/${robotName}/protocol-runs/${currentRunId}/run-log`}
         id={`RobotStatusBanner_${robotName}_goToRun`}
       >
-        <TertiaryButton>{t('go_to_run')}</TertiaryButton>
+        <SecondaryTertiaryButton>{t('go_to_run')}</SecondaryTertiaryButton>
       </Link>
     </Flex>
   ) : null
