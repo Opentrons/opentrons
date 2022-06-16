@@ -102,49 +102,12 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       backgroundColor={openItem ? COLORS.lightGrey : COLORS.white}
       data-testid={'LiquidsListItem_Row'}
     >
-      <Flex flexDirection={DIRECTION_ROW}>
-        <Flex
-          css={BORDERS.cardOutlineBorder}
-          padding={'0.75rem'}
-          height={'max-content'}
-          backgroundColor={COLORS.white}
-        >
-          <Icon name="circle" color={displayColor} size={SIZE_1} />
-        </Flex>
-        <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
-          <StyledText
-            as="p"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            marginX={SPACING.spacing4}
-          >
-            {displayName}
-          </StyledText>
-          <StyledText
-            as="p"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            color={COLORS.darkGreyEnabled}
-            marginX={SPACING.spacing4}
-          >
-            {description != null ? description : null}
-          </StyledText>
-        </Flex>
-        <Flex
-          backgroundColor={COLORS.darkBlack + '1A'}
-          borderRadius={BORDERS.radiusSoftCorners}
-          height={'max-content'}
-          paddingY={SPACING.spacing2}
-          paddingX={SPACING.spacing3}
-          alignSelf={ALIGN_CENTER}
-          marginLeft={SIZE_AUTO}
-        >
-          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-            {locations
-              .flatMap(obj => Object.values(obj.volumeByWell))
-              .reduce((prev, curr) => prev + curr, 0)}{' '}
-            {MICRO_LITERS}
-          </StyledText>
-        </Flex>
-      </Flex>
+      <LiquidsListItemDetails
+        displayColor={displayColor}
+        displayName={displayName}
+        description={description}
+        locations={locations}
+      />
       {showLiquidLabwareDetails && (
         <LiquidsLabwareDetailsModal
           liquidId={liquidId}
@@ -216,5 +179,67 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
         </Flex>
       )}
     </Box>
+  )
+}
+
+interface LiquidsListItemDetailsProps {
+  displayColor: string
+  displayName: string
+  description: string | null
+  locations: Array<{
+    slotName: string
+    labwareName: string
+    volumeByWell: { [well: string]: number }
+  }>
+}
+
+export const LiquidsListItemDetails = (
+  props: LiquidsListItemDetailsProps
+): JSX.Element => {
+  const { displayColor, displayName, description, locations } = props
+  return (
+    <Flex flexDirection={DIRECTION_ROW}>
+      <Flex
+        css={BORDERS.cardOutlineBorder}
+        padding={'0.75rem'}
+        height={'max-content'}
+        backgroundColor={COLORS.white}
+      >
+        <Icon name="circle" color={displayColor} size={SIZE_1} />
+      </Flex>
+      <Flex flexDirection={DIRECTION_COLUMN} justifyContent={JUSTIFY_CENTER}>
+        <StyledText
+          as="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          marginX={SPACING.spacing4}
+        >
+          {displayName}
+        </StyledText>
+        <StyledText
+          as="p"
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          color={COLORS.darkGreyEnabled}
+          marginX={SPACING.spacing4}
+        >
+          {description != null ? description : null}
+        </StyledText>
+      </Flex>
+      <Flex
+        backgroundColor={COLORS.darkBlack + '1A'}
+        borderRadius={BORDERS.radiusSoftCorners}
+        height={'max-content'}
+        paddingY={SPACING.spacing2}
+        paddingX={SPACING.spacing3}
+        alignSelf={ALIGN_CENTER}
+        marginLeft={SIZE_AUTO}
+      >
+        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          {locations
+            .flatMap(obj => Object.values(obj.volumeByWell))
+            .reduce((prev, curr) => prev + curr, 0)}{' '}
+          {MICRO_LITERS}
+        </StyledText>
+      </Flex>
+    </Flex>
   )
 }
