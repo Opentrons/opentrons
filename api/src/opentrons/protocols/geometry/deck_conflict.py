@@ -1,7 +1,7 @@
 """Check a deck layout for conflicts."""
 # TODO(mc, 2022-06-15): decouple this interface from DeckItem
 # (and subclasses) so it can be used in ProtocolEngine
-from typing import Dict, List, Mapping, NamedTuple, Optional, Union
+from typing import List, Mapping, NamedTuple, Optional, Union
 from typing_extensions import Final
 
 from opentrons.protocol_api.labware import Labware
@@ -21,6 +21,7 @@ FIXED_TRASH_SLOT: Final = 12
 class _NotAllowed(NamedTuple):
     """Nothing is allowed in this slot."""
 
+    location: int
     source_item: DeckItem
     source_location: int
 
@@ -31,6 +32,7 @@ class _NotAllowed(NamedTuple):
 class _MaxHeight(NamedTuple):
     """Nothing over a certain height is allowed in this slot."""
 
+    location: int
     source_item: DeckItem
     source_location: int
     max_height: float
@@ -49,6 +51,7 @@ class _MaxHeight(NamedTuple):
 class _NoModule(NamedTuple):
     """A module is not allowed in this slot."""
 
+    location: int
     source_item: DeckItem
     source_location: int
 
@@ -59,7 +62,7 @@ class _NoModule(NamedTuple):
 class _FixedTrash(NamedTuple):
     """Only fixed-trash labware is allowed in this slot."""
 
-    source_location: int = FIXED_TRASH_SLOT
+    location: int = FIXED_TRASH_SLOT
 
     def is_allowed(self, item: DeckItem) -> bool:
         if isinstance(item, AbstractLabware):
@@ -78,22 +81,6 @@ class DeckConflictError(ValueError):
     """Adding an item to the deck would cause a conflict."""
 
 
-class DeckItemConflictError(DeckConflictError):
-    """Adding an item to the deck would conflict with an existing item."""
-
-    def __init__(
-        self,
-        new_item: DeckItem,
-        new_location: int,
-        existing_item: DeckItem,
-        existing_location: int,
-    ) -> None:
-        super().__init__(
-            f"{existing_item.load_name} in slot {existing_location}"
-            f" prevents {new_item.load_name} from using slot {new_location}."
-        )
-
-
 def check(
     existing_items: Mapping[int, DeckItem],
     new_item: DeckItem,
@@ -109,167 +96,108 @@ def check(
     Raises:
         DeckConflictError: Adding this item should not be allowed.
     """
-    restrictions: Dict[int, _DeckRestriction] = {FIXED_TRASH_SLOT: _FixedTrash()}
+    restrictions: List[_DeckRestriction] = [_FixedTrash()]
 
     # build restrictions driven by existing items
     for location, item in existing_items.items():
-        restrictions = _add_restrictions(
-            item=item,
-            location=location,
-            existing_restrictions=restrictions,
-        )
+        restrictions += _create_restrictions(item=item, location=location)
 
     # check new item against existing restrictions
-    _check_restrictions(
-        new_item=new_item,
-        new_location=new_location,
-        restrictions=restrictions,
-    )
+    for r in restrictions:
+        if r.location == new_location and not r.is_allowed(new_item):
+            raise DeckConflictError(
+                _create_deck_conflict_error_message(restriction=r, new_item=new_item)
+            )
 
     # check new restrictions required by new item
     # do not interfere with existing items
-    _add_restrictions(
-        item=new_item,
-        location=new_location,
-        existing_items=existing_items,
-        existing_restrictions=restrictions,
-    )
+    new_restrictions = _create_restrictions(item=new_item, location=new_location)
+
+    for r in new_restrictions:
+        existing_item = existing_items.get(r.location)
+        if existing_item is not None and not r.is_allowed(existing_item):
+            raise DeckConflictError(
+                _create_deck_conflict_error_message(
+                    restriction=r,
+                    existing_item=existing_item,
+                )
+            )
 
 
-def _add_restrictions(
-    item: DeckItem,
-    location: int,
-    existing_restrictions: Mapping[int, _DeckRestriction],
-    existing_items: Optional[Mapping[int, DeckItem]] = None,
-) -> Dict[int, _DeckRestriction]:
-    restrictions = dict(existing_restrictions)
-    existing_items = existing_items or {}
+def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction]:
+    restrictions: List[_DeckRestriction] = []
 
     if location != FIXED_TRASH_SLOT:
-        restrictions[location] = _create_not_allowed_restriction(
-            existing_items=existing_items,
-            restriction_location=location,
-            source_item=item,
-            source_location=location,
+        restrictions.append(
+            _NotAllowed(
+                location=location,
+                source_item=item,
+                source_location=location,
+            )
         )
 
     if isinstance(item, ThermocyclerGeometry):
         for covered_location in item.covered_slots:
-            restrictions[covered_location] = _create_not_allowed_restriction(
-                existing_items=existing_items,
-                restriction_location=covered_location,
-                source_item=item,
-                source_location=location,
+            restrictions.append(
+                _NotAllowed(
+                    location=covered_location,
+                    source_item=item,
+                    source_location=location,
+                )
             )
 
     if isinstance(item, HeaterShakerGeometry):
         for covered_location in _get_east_west_locations(location):
-            restrictions[covered_location] = _create_max_height_restriction(
-                existing_items=existing_items,
-                restriction_location=covered_location,
-                source_item=item,
-                source_location=location,
-                max_height=item.MAX_ADJACENT_ITEM_HEIGHT,
-                max_tip_rack_height=item.MAX_ADJACENT_TIP_RACK_HEIGHT,
+            restrictions.append(
+                _MaxHeight(
+                    location=covered_location,
+                    source_item=item,
+                    source_location=location,
+                    max_height=item.MAX_ADJACENT_ITEM_HEIGHT,
+                    max_tip_rack_height=item.MAX_ADJACENT_TIP_RACK_HEIGHT,
+                )
             )
 
         for covered_location in _get_north_south_locations(location):
-            restrictions[covered_location] = _create_no_module_restriction(
-                existing_items=existing_items,
-                restriction_location=covered_location,
-                source_item=item,
-                source_location=location,
+            restrictions.append(
+                _NoModule(
+                    location=covered_location,
+                    source_item=item,
+                    source_location=location,
+                )
             )
 
     return restrictions
 
 
-def _check_restrictions(
-    new_item: DeckItem,
-    new_location: int,
-    restrictions: Dict[int, _DeckRestriction],
-) -> None:
-    restriction = restrictions.get(new_location, None)
+def _create_deck_conflict_error_message(
+    restriction: _DeckRestriction,
+    new_item: Optional[DeckItem] = None,
+    existing_item: Optional[DeckItem] = None,
+) -> str:
+    assert (
+        new_item is not None or existing_item is not None
+    ), "Conflict error expects either new_item or existing_item"
 
-    if restriction is not None and not restriction.is_allowed(new_item):
-        if isinstance(restriction, _FixedTrash):
-            raise DeckConflictError(
-                f"Only fixed-trash is allowed in slot {restriction.source_location}"
-            )
-        else:
-            raise DeckItemConflictError(
-                new_item,
-                new_location,
-                restriction.source_item,
-                restriction.source_location,
-            )
+    if isinstance(restriction, _FixedTrash):
+        message = f"Only fixed-trash is allowed in slot {restriction.location}"
 
-
-def _create_not_allowed_restriction(
-    existing_items: Mapping[int, DeckItem],
-    restriction_location: int,
-    source_item: DeckItem,
-    source_location: int,
-) -> _NotAllowed:
-    restriction = _NotAllowed(source_item=source_item, source_location=source_location)
-    existing_item = existing_items.get(restriction_location)
-
-    if existing_item is not None and not restriction.is_allowed(existing_item):
-        raise DeckItemConflictError(
-            new_item=source_item,
-            new_location=source_location,
-            existing_item=existing_items[restriction_location],
-            existing_location=restriction_location,
+    elif new_item is not None:
+        message = (
+            f"{restriction.source_item.load_name}"
+            f" in slot {restriction.source_location}"
+            f" prevents {new_item.load_name}"
+            f" from using slot {restriction.location}."
         )
 
-    return restriction
-
-
-def _create_max_height_restriction(
-    existing_items: Mapping[int, DeckItem],
-    restriction_location: int,
-    source_item: DeckItem,
-    source_location: int,
-    max_height: float,
-    max_tip_rack_height: float,
-) -> _MaxHeight:
-    restriction = _MaxHeight(
-        source_item=source_item,
-        source_location=source_location,
-        max_height=max_height,
-        max_tip_rack_height=max_tip_rack_height,
-    )
-    existing_item = existing_items.get(restriction_location)
-
-    if existing_item is not None and not restriction.is_allowed(existing_item):
-        raise DeckItemConflictError(
-            new_item=source_item,
-            new_location=source_location,
-            existing_item=existing_items[restriction_location],
-            existing_location=restriction_location,
+    elif existing_item is not None:
+        message = (
+            f"{existing_item.load_name} in slot {restriction.location}"
+            f" prevents {restriction.source_item.load_name}"
+            f" from using slot {restriction.source_location}."
         )
 
-    return restriction
-
-
-def _create_no_module_restriction(
-    existing_items: Mapping[int, DeckItem],
-    restriction_location: int,
-    source_item: DeckItem,
-    source_location: int,
-) -> _NoModule:
-    restriction = _NoModule(source_item=source_item, source_location=source_location)
-    existing_item = existing_items.get(restriction_location)
-
-    if existing_item is not None and not restriction.is_allowed(existing_item):
-        raise DeckItemConflictError(
-            new_item=source_item,
-            new_location=source_location,
-            existing_item=existing_items[restriction_location],
-            existing_location=restriction_location,
-        )
-
-    return restriction
+    return message
 
 
 def _get_east_west_locations(location: int) -> List[int]:
