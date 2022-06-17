@@ -36,7 +36,6 @@ jobs:
     name: 'opentrons package linting'
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: 'actions/checkout@v2'
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
