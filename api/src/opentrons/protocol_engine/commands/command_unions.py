@@ -86,6 +86,14 @@ from .move_relative import (
     MoveRelativeCommandType,
 )
 
+from .move_to_coordinates import (
+    MoveToCoordinates,
+    MoveToCoordinatesParams,
+    MoveToCoordinatesCreate,
+    MoveToCoordinatesResult,
+    MoveToCoordinatesCommandType,
+)
+
 from .move_to_well import (
     MoveToWell,
     MoveToWellParams,
@@ -145,6 +153,7 @@ Command = Union[
     LoadModule,
     LoadPipette,
     MoveRelative,
+    MoveToCoordinates,
     MoveToWell,
     Pause,
     PickUpTip,
@@ -169,6 +178,8 @@ Command = Union[
     thermocycler.WaitForLidTemperature,
     thermocycler.DeactivateBlock,
     thermocycler.DeactivateLid,
+    thermocycler.OpenLid,
+    thermocycler.CloseLid,
 ]
 
 CommandParams = Union[
@@ -182,6 +193,7 @@ CommandParams = Union[
     LoadModuleParams,
     LoadPipetteParams,
     MoveRelativeParams,
+    MoveToCoordinatesParams,
     MoveToWellParams,
     PauseParams,
     PickUpTipParams,
@@ -206,6 +218,8 @@ CommandParams = Union[
     thermocycler.WaitForLidTemperatureParams,
     thermocycler.DeactivateBlockParams,
     thermocycler.DeactivateLidParams,
+    thermocycler.OpenLidParams,
+    thermocycler.CloseLidParams,
 ]
 
 CommandType = Union[
@@ -219,6 +233,7 @@ CommandType = Union[
     LoadModuleCommandType,
     LoadPipetteCommandType,
     MoveRelativeCommandType,
+    MoveToCoordinatesCommandType,
     MoveToWellCommandType,
     PauseCommandType,
     PickUpTipCommandType,
@@ -243,6 +258,8 @@ CommandType = Union[
     thermocycler.WaitForLidTemperatureCommandType,
     thermocycler.DeactivateBlockCommandType,
     thermocycler.DeactivateLidCommandType,
+    thermocycler.OpenLidCommandType,
+    thermocycler.CloseLidCommandType,
 ]
 
 CommandCreate = Union[
@@ -255,6 +272,7 @@ CommandCreate = Union[
     LoadModuleCreate,
     LoadPipetteCreate,
     MoveRelativeCreate,
+    MoveToCoordinatesCreate,
     MoveToWellCreate,
     PauseCreate,
     PickUpTipCreate,
@@ -279,6 +297,8 @@ CommandCreate = Union[
     thermocycler.WaitForLidTemperatureCreate,
     thermocycler.DeactivateBlockCreate,
     thermocycler.DeactivateLidCreate,
+    thermocycler.OpenLidCreate,
+    thermocycler.CloseLidCreate,
 ]
 
 CommandResult = Union[
@@ -292,6 +312,7 @@ CommandResult = Union[
     LoadModuleResult,
     LoadPipetteResult,
     MoveRelativeResult,
+    MoveToCoordinatesResult,
     MoveToWellResult,
     PauseResult,
     PickUpTipResult,
@@ -316,4 +337,6 @@ CommandResult = Union[
     thermocycler.WaitForLidTemperatureResult,
     thermocycler.DeactivateBlockResult,
     thermocycler.DeactivateLidResult,
+    thermocycler.OpenLidResult,
+    thermocycler.CloseLidResult,
 ]

@@ -37,7 +37,11 @@ export function SetupLiquids(props: SetupLiquidsProps): JSX.Element {
       {selectedValue === t('list_view') ? (
         <SetupLiquidsList liquids={liquidsData} />
       ) : (
-        <SetupLiquidsMap />
+        <SetupLiquidsMap
+          runId={props.runId}
+          robotName={props.robotName}
+          liquids={liquidsData}
+        />
       )}
       <Flex alignSelf={ALIGN_CENTER}>
         <ProceedToRunButton

@@ -241,3 +241,23 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.thermocycler.DeactivateLidResult, result)
+
+    def thermocycler_open_lid(
+        self, module_id: str
+    ) -> commands.thermocycler.OpenLidResult:
+        """Execute a `thermocycler/openLid` command and return the result."""
+        request = commands.thermocycler.OpenLidCreate(
+            params=commands.thermocycler.OpenLidParams(moduleId=module_id)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.thermocycler.OpenLidResult, result)
+
+    def thermocycler_close_lid(
+        self, module_id: str
+    ) -> commands.thermocycler.CloseLidResult:
+        """Execute a `thermocycler/closeLid` command and return the result."""
+        request = commands.thermocycler.CloseLidCreate(
+            params=commands.thermocycler.CloseLidParams(moduleId=module_id)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.thermocycler.CloseLidResult, result)

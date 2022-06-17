@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 from pydantic import BaseModel
 
-from .pipetting_common import BasePipettingParams
+from .pipetting_common import PipetteIdMixin, WellLocationMixin
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 from opentrons.hardware_control import HardwareControlAPI
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 BlowOutCommandType = Literal["blowout"]
 
 
-class BlowOutParams(BasePipettingParams):
+class BlowOutParams(PipetteIdMixin, WellLocationMixin):
     """Payload required to blow-out a specific well."""
 
     pass

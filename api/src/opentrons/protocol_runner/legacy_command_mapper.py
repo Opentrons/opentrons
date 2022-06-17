@@ -27,6 +27,7 @@ from .legacy_wrappers import (
     LegacyMagneticModuleModel,
     LegacyTemperatureModuleModel,
     LegacyThermocyclerModuleModel,
+    LegacyHeaterShakerModuleModel,
 )
 
 
@@ -48,6 +49,7 @@ _LEGACY_TO_PE_MODULE: Dict[LegacyModuleModel, pe_types.ModuleModel] = {
     LegacyTemperatureModuleModel.TEMPERATURE_V2: pe_types.ModuleModel.TEMPERATURE_MODULE_V2,
     LegacyThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModel.THERMOCYCLER_MODULE_V1,
     LegacyThermocyclerModuleModel.THERMOCYCLER_V2: pe_types.ModuleModel.THERMOCYCLER_MODULE_V2,
+    LegacyHeaterShakerModuleModel.HEATER_SHAKER_V1: pe_types.ModuleModel.HEATER_SHAKER_MODULE_V1,
 }
 
 _HIGHER_ORDER_COMMAND_TYPES = {
