@@ -1,0 +1,17 @@
+name: 'Python Container Run'
+description: 'Invoke a make target in a pre-populated container'
+inputs:
+  project:
+    description: 'Which project (by subdirectory) to set up'
+    required: true
+  target:
+    description: 'Which makefile operation to preform'
+    required: false
+    default: 'setup'
+  python-version:
+    description: 'Which version of Python to use'
+    required: false
+    default: '3.7'
+runs:
+  using: 'docker'
+  image: 'docker://otsam/otbuildy:${inputs.python-version}-0.0.5'
