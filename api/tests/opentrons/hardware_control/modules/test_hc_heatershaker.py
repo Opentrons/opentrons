@@ -46,12 +46,6 @@ async def simulating_module_driver_patched(simulating_module):
         yield simulating_module
 
 
-@pytest.fixture
-async def simulating_module_poller_patched(simulating_module):
-    with mock.patch.object(simulating_module, "_poller"):
-        yield simulating_module
-
-
 async def test_sim_state(simulating_module):
     await simulating_module.wait_next_poll()
     assert simulating_module.temperature == 23
