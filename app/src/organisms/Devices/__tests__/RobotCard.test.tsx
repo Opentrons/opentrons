@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
@@ -17,7 +16,6 @@ import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import {
   useAttachedModules,
   useAttachedPipettes,
-  useRobotBusyAndUpdateAlertEnabled,
   useProtocolDetailsForRun,
 } from '../hooks'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
@@ -58,9 +56,6 @@ const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction
 const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
   typeof UpdateRobotBanner
 >
-const mockRobotBusyAndUpdateAlertEnabled = useRobotBusyAndUpdateAlertEnabled as jest.MockedFunction<
-  typeof useRobotBusyAndUpdateAlertEnabled
->
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
 const PROTOCOL_DETAILS = {
@@ -82,10 +77,6 @@ const render = () => {
 
 describe('RobotCard', () => {
   beforeEach(() => {
-    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
-      isRobotBusy: false,
-      isUpdateAlertEnabled: true,
-    })
     mockUseAttachedModules.mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
@@ -124,22 +115,6 @@ describe('RobotCard', () => {
   it('renders a UpdateRobotBanner component', () => {
     const [{ getByText }] = render()
     getByText('Mock UpdateRobotBanner')
-  })
-
-  it('does not render a UpdateRobotBanner component when robot is busy', () => {
-    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
-      isRobotBusy: true,
-      isUpdateAlertEnabled: true,
-    })
-    expect(screen.queryByText('Mock UpdateRobotBanner')).toBeNull()
-  })
-
-  it('does not render a UpdateRobotBanner component when isUpdateAlertEnabled is false', () => {
-    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
-      isRobotBusy: false,
-      isUpdateAlertEnabled: false,
-    })
-    expect(screen.queryByText('Mock UpdateRobotBanner')).toBeNull()
   })
 
   it('renders the type of pipettes attached to left and right mounts', () => {

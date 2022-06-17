@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -10,11 +10,7 @@ import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useDispatchApiRequest } from '../../../redux/robot-api'
 import { fetchLights } from '../../../redux/robot-controls'
-import {
-  useLights,
-  useRobot,
-  useRobotBusyAndUpdateAlertEnabled,
-} from '../hooks'
+import { useLights, useRobot } from '../hooks'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotOverview } from '../RobotOverview'
@@ -33,9 +29,6 @@ jest.mock('../RobotOverviewOverflowMenu')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
 
-const mockRobotBusyAndUpdateAlertEnabled = useRobotBusyAndUpdateAlertEnabled as jest.MockedFunction<
-  typeof useRobotBusyAndUpdateAlertEnabled
->
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
@@ -76,10 +69,6 @@ describe('RobotOverview', () => {
 
   beforeEach(() => {
     dispatchApiRequest = jest.fn()
-    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
-      isRobotBusy: false,
-      isUpdateAlertEnabled: true,
-    })
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
     mockUseLights.mockReturnValue({
       lightsOn: false,
@@ -116,22 +105,6 @@ describe('RobotOverview', () => {
   it('renders a UpdateRobotBanner component', () => {
     const [{ getByText }] = render()
     getByText('Mock UpdateRobotBanner')
-  })
-
-  it('does not render a UpdateRobotBanner component when robot is busy', () => {
-    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
-      isRobotBusy: true,
-      isUpdateAlertEnabled: true,
-    })
-    expect(screen.queryByText('Mock UpdateRobotBanner')).toBeNull()
-  })
-
-  it('does not render a UpdateRobotBanner component when update alert is not enabled', () => {
-    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
-      isRobotBusy: false,
-      isUpdateAlertEnabled: false,
-    })
-    expect(screen.queryByText('Mock UpdateRobotBanner')).toBeNull()
   })
 
   it('fetches lights status', () => {

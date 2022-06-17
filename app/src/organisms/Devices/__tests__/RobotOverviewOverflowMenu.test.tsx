@@ -14,8 +14,8 @@ import {
 } from '../../../redux/discovery/__fixtures__'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
-import { useRobotBusyAndUpdateAlertEnabled } from '../hooks'
 import { UpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
+import { useIsRobotBusy } from '../hooks'
 
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../../redux/robot-controls')
@@ -37,8 +37,8 @@ const mockRestartRobot = restartRobot as jest.MockedFunction<
 const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
   typeof UpdateBuildroot
 >
-const mockRobotBusyAndUpdateAlertEnabled = useRobotBusyAndUpdateAlertEnabled as jest.MockedFunction<
-  typeof useRobotBusyAndUpdateAlertEnabled
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 
 const render = (
@@ -64,10 +64,7 @@ describe('RobotOverviewOverflowMenu', () => {
       updateFromFileDisabledReason: null,
     })
     when(mockUseCurrentRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
-    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
-      isRobotBusy: false,
-      isUpdateAlertEnabled: true,
-    })
+    mockUseIsRobotBusy.mockReturnValue(false)
     when(mockUpdateBuildroot).mockReturnValue(<div>mock update buildroot</div>)
   })
   afterEach(() => {
@@ -96,10 +93,7 @@ describe('RobotOverviewOverflowMenu', () => {
   })
 
   it('should render disabled buttons in the menu when the robot is busy', () => {
-    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
-      isRobotBusy: true,
-      isUpdateAlertEnabled: true,
-    })
+    mockUseIsRobotBusy.mockReturnValue(true)
     when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_RUNNING)
@@ -116,10 +110,7 @@ describe('RobotOverviewOverflowMenu', () => {
   })
 
   it('should render disabled buttons in the menu when the robot is not connectable', () => {
-    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
-      isRobotBusy: true,
-      isUpdateAlertEnabled: true,
-    })
+    mockUseIsRobotBusy.mockReturnValue(true)
     when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_RUNNING)
@@ -133,18 +124,6 @@ describe('RobotOverviewOverflowMenu', () => {
     expect(screen.queryByText('Restart robot')).toBeNull()
     expect(screen.queryByText('Home gantry')).toBeNull()
     getByRole('button', { name: 'Robot settings' })
-  })
-
-  it('does not render the update available button when the update alert is not enabled', () => {
-    mockRobotBusyAndUpdateAlertEnabled.mockReturnValue({
-      isRobotBusy: false,
-      isUpdateAlertEnabled: false,
-    })
-    const { getByRole } = render({ robot: mockReachableRobot })
-
-    const btn = getByRole('button')
-    fireEvent.click(btn)
-    expect(screen.queryByText('Update robot software')).toBeNull()
   })
 
   it('clicking home gantry should home the gantry', () => {

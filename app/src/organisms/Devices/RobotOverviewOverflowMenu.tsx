@@ -21,8 +21,8 @@ import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { useRobotBusyAndUpdateAlertEnabled } from './hooks'
 import { UpdateBuildroot } from './RobotSettings/UpdateBuildroot'
+import { useIsRobotBusy } from './hooks'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { Dispatch, State } from '../../redux/types'
@@ -43,10 +43,7 @@ export const RobotOverviewOverflowMenu = (
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const history = useHistory()
-  const {
-    isRobotBusy,
-    isUpdateAlertEnabled,
-  } = useRobotBusyAndUpdateAlertEnabled()
+  const isRobotBusy = useIsRobotBusy()
 
   const dispatch = useDispatch<Dispatch>()
 
@@ -117,9 +114,7 @@ export const RobotOverviewOverflowMenu = (
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          {autoUpdateAction === 'upgrade' &&
-          !isRobotInUse &&
-          isUpdateAlertEnabled ? (
+          {autoUpdateAction === 'upgrade' && !isRobotInUse ? (
             <MenuItem
               onClick={handleClickUpdateBuildroot}
               data-testid={`RobotOverviewOverflowMenu_updateSoftware_${robot.name}`}

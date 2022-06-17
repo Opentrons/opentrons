@@ -19,7 +19,7 @@ import { TertiaryButton } from '../../../../atoms/buttons'
 import { getRobotApiVersion, UNREACHABLE } from '../../../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
-import { useRobot, useRobotBusyAndUpdateAlertEnabled } from '../../hooks'
+import { useRobot } from '../../hooks'
 import { UpdateBuildroot } from '../UpdateBuildroot'
 
 import type { State } from '../../../../redux/types'
@@ -37,10 +37,6 @@ export function RobotServerVersion({
   const { t } = useTranslation(['device_settings', 'shared'])
   const robot = useRobot(robotName)
   const [showVersionInfoModal, setShowVersionInfoModal] = React.useState(false)
-  const {
-    isRobotBusy,
-    isUpdateAlertEnabled,
-  } = useRobotBusyAndUpdateAlertEnabled()
   const { autoUpdateAction } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robotName)
   })
@@ -58,10 +54,7 @@ export function RobotServerVersion({
           />
         </Portal>
       ) : null}
-      {autoUpdateAction !== 'reinstall' &&
-      robot != null &&
-      !isRobotBusy &&
-      isUpdateAlertEnabled ? (
+      {autoUpdateAction !== 'reinstall' && robot != null ? (
         <Box marginBottom={SPACING.spacing4} width="100%">
           <UpdateRobotBanner robot={robot} />
         </Box>
@@ -91,10 +84,7 @@ export function RobotServerVersion({
             >{` ${t('shared:github')}`}</Link>
           </StyledText>
         </Box>
-        {autoUpdateAction !== 'reinstall' &&
-        robot != null &&
-        !isRobotBusy &&
-        isUpdateAlertEnabled ? null : (
+        {autoUpdateAction !== 'reinstall' && robot != null ? null : (
           <Flex justifyContent={JUSTIFY_FLEX_END} alignItems="center">
             <StyledText
               as="label"

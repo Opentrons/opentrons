@@ -17,6 +17,8 @@ import type {
   BuildrootUpdateType,
   RobotSystemType,
 } from '../../../../redux/buildroot/types'
+import { useIsRobotBusy } from '../../hooks'
+import { RobotIsBusyModal } from './RobotIsBusyModal'
 
 export interface ViewUpdateModalProps {
   robotName: string
@@ -33,6 +35,7 @@ export function ViewUpdateModal(
   const updateInfo = useSelector(getBuildrootUpdateInfo)
   const downloadProgress = useSelector(getBuildrootDownloadProgress)
   const downloadError = useSelector(getBuildrootDownloadError)
+  const isRobotBusy = useIsRobotBusy()
 
   const [
     showMigrationWarning,
@@ -50,6 +53,10 @@ export function ViewUpdateModal(
       proceed()
     }
   }, [updateInfo, showReleaseNotes, showMigrationWarning, proceed])
+
+  if (isRobotBusy) {
+    return <RobotIsBusyModal closeModal={close} proceed={proceed} />
+  }
 
   if (showMigrationWarning) {
     return (

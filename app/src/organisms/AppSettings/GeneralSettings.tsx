@@ -71,15 +71,15 @@ export function GeneralSettings(): JSX.Element {
   ] = React.useState(false)
 
   // may be enabled, disabled, or unknown (because config is loading)
-  const enabled = useSelector((s: State) => {
+  const updateAlertEnabled = useSelector((s: State) => {
     const ignored = getAlertIsPermanentlyIgnored(s, ALERT_APP_UPDATE_AVAILABLE)
     return ignored !== null ? !ignored : null
   })
 
   const handleToggle = (): void => {
-    if (enabled !== null) {
+    if (updateAlertEnabled !== null) {
       dispatch(
-        enabled
+        updateAlertEnabled
           ? alertPermanentlyIgnored(ALERT_APP_UPDATE_AVAILABLE)
           : alertUnignored(ALERT_APP_UPDATE_AVAILABLE)
       )
@@ -89,7 +89,7 @@ export function GeneralSettings(): JSX.Element {
         // this looks weird, but the control is a toggle, which makes the next
         // "enabled" setting `!enabled`. Therefore the next "ignored" setting is
         // `!!enabled`, or just `enabled`
-        properties: { updatesIgnored: enabled },
+        properties: { updatesIgnored: updateAlertEnabled },
       })
     }
   }
@@ -104,7 +104,7 @@ export function GeneralSettings(): JSX.Element {
         paddingX={SPACING.spacing4}
         paddingY={SPACING.spacing5}
       >
-        {showUpdateBanner && enabled && (
+        {showUpdateBanner && (
           <Box
             marginBottom={SPACING.spacing4}
             id="GeneralSettings_updatebanner"
@@ -218,8 +218,8 @@ export function GeneralSettings(): JSX.Element {
           <ToggleButton
             label={ENABLE_APP_UPDATE_NOTIFICATIONS}
             marginRight={SPACING.spacing4}
-            disabled={enabled === null}
-            toggledOn={enabled === true}
+            disabled={updateAlertEnabled === null}
+            toggledOn={updateAlertEnabled === true}
             onClick={handleToggle}
             id="GeneralSettings_softwareUpdateAlerts"
           />
@@ -244,7 +244,7 @@ export function GeneralSettings(): JSX.Element {
           </TertiaryButton>
         </Flex>
       </Box>
-      {showUpdateModal && enabled ? (
+      {showUpdateModal && updateAlertEnabled ? (
         <Portal level="top">
           <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />
         </Portal>
