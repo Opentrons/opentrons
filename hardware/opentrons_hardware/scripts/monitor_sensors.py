@@ -68,7 +68,10 @@ async def do_run(
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    target = constants.NodeId["pipette_" + args.mount]
+    if args.mount == "gripper":
+        target = constants.NodeId["gripper"]
+    else:
+        target = constants.NodeId["pipette_" + args.mount]
     sensor = constants.SensorType[args.sensor]
 
     async with build.can_messenger(build_settings(args)) as messenger:
@@ -84,7 +87,7 @@ def main() -> None:
         "-m",
         "--mount",
         type=str,
-        choices=["left", "right"],
+        choices=["left", "right", "gripper"],
         help="which mount",
         default="right",
     )
