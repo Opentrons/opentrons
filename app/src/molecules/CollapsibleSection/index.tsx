@@ -36,7 +36,13 @@ export function CollapsibleSection(
   const [isExpanded, setIsExpanded] = React.useState(isExpandedInitially)
   return (
     <Flex flexDirection={DIRECTION_COLUMN} {...styleProps}>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <Flex
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        onClick={() => setIsExpanded(!isExpanded)}
+        css={{
+          cursor: 'pointer',
+        }}
+      >
         <StyledText as="p" marginBottom={SPACING.spacing4}>
           {title}
         </StyledText>
