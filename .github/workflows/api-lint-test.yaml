@@ -46,6 +46,7 @@ jobs:
     strategy:
       matrix:
         os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+      fail-fast: true
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/setup-python@v2'
