@@ -3,6 +3,10 @@
 
 name: 'API test/lint'
 
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   pull_request:
