@@ -34,11 +34,11 @@ const mockHome = home as jest.MockedFunction<typeof home>
 const mockRestartRobot = restartRobot as jest.MockedFunction<
   typeof restartRobot
 >
-const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
-  typeof UpdateBuildroot
->
 const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
   typeof useIsRobotBusy
+>
+const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
+  typeof UpdateBuildroot
 >
 
 const render = (
@@ -64,7 +64,7 @@ describe('RobotOverviewOverflowMenu', () => {
       updateFromFileDisabledReason: null,
     })
     when(mockUseCurrentRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
-    mockUseIsRobotBusy.mockReturnValue(false)
+    when(mockUseIsRobotBusy).calledWith().mockReturnValue(false)
     when(mockUpdateBuildroot).mockReturnValue(<div>mock update buildroot</div>)
   })
   afterEach(() => {
@@ -92,8 +92,8 @@ describe('RobotOverviewOverflowMenu', () => {
     getByText('mock update buildroot')
   })
 
-  it('should render disabled buttons in the menu when the robot is busy', () => {
-    mockUseIsRobotBusy.mockReturnValue(true)
+  it('should not render the menu items when robot is busy', () => {
+    when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
     when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_RUNNING)
@@ -109,8 +109,8 @@ describe('RobotOverviewOverflowMenu', () => {
     getByRole('button', { name: 'Robot settings' })
   })
 
-  it('should render disabled buttons in the menu when the robot is not connectable', () => {
-    mockUseIsRobotBusy.mockReturnValue(true)
+  it('should not render menu items when the robot is not connectable', () => {
+    when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
     when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_RUNNING)
