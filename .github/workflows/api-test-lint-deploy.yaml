@@ -3,6 +3,10 @@
 
 name: 'API test/lint/deploy'
 
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   pull_request:
@@ -44,19 +48,11 @@ jobs:
     timeout-minutes: 10
     runs-on: 'ubuntu-18.04'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
-        with:
-          node-version: '14'
-      - uses: 'actions/setup-python@v2'
-        with:
-          python-version: '3.7'
-
-      - uses: './.github/actions/python/setup'
+        - uses: 'actions/checkout@v2' 
+        - uses: './.github/actions/python/setup'
         with:
           project: 'api'
-      - name: Lint with opentrons_hardware
-        run: make -C api lint
+          target: 'setup lint'
   test:
     name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
     timeout-minutes: 30
@@ -77,6 +73,7 @@ jobs:
             python: '3.10'
           - python: '3.10'
             with-ot-hardware: 'true'
+      fail-fast: true
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v2'
