@@ -98,8 +98,8 @@ describe('HeaterShakerModuleData', () => {
       },
     }
     const { getByText } = render(props)
-    getByText('Target: 200 RPM')
-    getByText('Current: 200 RPM')
+    getByText('Target: 200 rpm')
+    getByText('Current: 200 rpm')
     expect(getByText('Mock StatusLabel')).toHaveStyle(
       'backgroundColor: COLORS.blue'
     )
@@ -121,7 +121,7 @@ describe('HeaterShakerModuleData', () => {
     }
     const { getByText } = render(props)
     getByText('Target: N/A')
-    getByText('Current: 0 RPM')
+    getByText('Current: 0 rpm')
     expect(getByText('Mock StatusLabel')).toHaveStyle(
       'backgroundColor: COLORS.medGrey'
     )
@@ -142,8 +142,8 @@ describe('HeaterShakerModuleData', () => {
       },
     }
     const { getByText } = render(props)
-    getByText('Target: 200 RPM')
-    getByText('Current: 200 RPM')
+    getByText('Target: 200 rpm')
+    getByText('Current: 200 rpm')
     expect(getByText('Mock StatusLabel')).toHaveStyle(
       'backgroundColor: COLORS.warningBg'
     )
@@ -165,7 +165,7 @@ describe('HeaterShakerModuleData', () => {
     }
     const { getByText } = render(props)
     getByText('Target: N/A')
-    getByText('Current: 0 RPM')
+    getByText('Current: 0 rpm')
     expect(getByText('Mock StatusLabel')).toHaveStyle(
       'backgroundColor: COLORS.medGrey'
     )
