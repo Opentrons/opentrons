@@ -55,21 +55,19 @@ setup-js:
 
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
 
+pipenv-install:
+	$(OT_PYTHON) -m pip install pipenv==2021.5.29 && touch pipenv-install
+
 .PHONY: setup-py
-setup-py:
-	$(OT_PYTHON) -m pip install pipenv==2021.5.29
-	$(MAKE) $(PYTHON_SETUP_TARGETS)
+setup-py: pipenv-install $(PYTHON_SETUP_TARGETS)
 
-
-%-py-setup:
+%-py-setup: pipenv-install
 	$(MAKE) -C $* setup
 
 # uninstall all project dependencies
 # tear down JS after Python, because Python cleanup depends on JS dep shx
 .PHONY: teardown
-teardown:
-	$(MAKE) teardown-py
-	$(MAKE) teardown-js
+teardown: teardown-py teardown-js
 
 .PHONY: teardown-js
 teardown-js: clean-js
