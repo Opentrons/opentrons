@@ -76,6 +76,7 @@ import {
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
+  useIsRobotViewable,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
 
@@ -134,7 +135,8 @@ export function ProtocolRunHeader({
   const { protocolData, displayName, protocolKey } = useProtocolDetailsForRun(
     runId
   )
-  const isProtocolAnalyzing = protocolData == null
+  const isRobotViewable = useIsRobotViewable(robotName)
+  const isProtocolAnalyzing = protocolData == null && isRobotViewable
   const runStatus = useRunStatus(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
@@ -143,8 +145,14 @@ export function ProtocolRunHeader({
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   // NOTE: we are polling pipettes, though not using their value directly here
   usePipettesQuery({ refetchInterval: EQUIPMENT_POLL_MS })
-
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
+
+  React.useEffect(() => {
+    if (protocolData != null && !isRobotViewable) {
+      history.push(`/devices`)
+    }
+  }, [protocolData, isRobotViewable, history])
+
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent) {
       runId != null && dismissCurrentRun(runId)
