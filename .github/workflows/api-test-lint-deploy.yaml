@@ -49,7 +49,7 @@ jobs:
     runs-on: 'ubuntu-18.04'
     steps:
         - uses: 'actions/checkout@v2' 
-        - uses: './.github/actions/python/setup'
+        - uses: './.github/actions/python/container-run'
           with:
             project: 'api'
             target: 'setup lint'
