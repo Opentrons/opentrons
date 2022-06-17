@@ -137,7 +137,7 @@ export const announcements: Announcement[] = [
           The Opentrons Protocol Designer now supports our Heater-Shaker Module!
         </p>
         <p>
-          Protocols using a Heater-Shaker Module require Opentrons App version
+          All protocols now require Opentrons App version
           <strong> 6.1+ </strong> to run.
         </p>
       </>
