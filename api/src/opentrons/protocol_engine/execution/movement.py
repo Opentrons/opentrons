@@ -98,7 +98,7 @@ class MovementHandler:
         max_travel_z = self._hardware_api.get_instrument_max_height(mount=hw_mount)
 
         # calculate the movement's waypoints
-        waypoints = self._state_store.motion.get_movement_waypoints(
+        waypoints = self._state_store.motion.get_movement_waypoints_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,

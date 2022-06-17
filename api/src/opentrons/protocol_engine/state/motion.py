@@ -68,7 +68,7 @@ class MotionView:
             critical_point = CriticalPoint.XY_CENTER
         return PipetteLocationData(mount=mount, critical_point=critical_point)
 
-    def get_movement_waypoints(
+    def get_movement_waypoints_to_well(
         self,
         pipette_id: str,
         labware_id: str,
@@ -79,7 +79,7 @@ class MotionView:
         max_travel_z: float,
         current_well: Optional[CurrentWell] = None,
     ) -> List[Waypoint]:
-        """Get the movement waypoints from an origin to a given location."""
+        """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_well()
         center_dest = self._labware.get_has_quirk(
             labware_id,

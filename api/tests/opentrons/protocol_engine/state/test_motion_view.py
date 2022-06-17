@@ -180,7 +180,7 @@ def test_get_pipette_location_override_current_location(
 
 @dataclass(frozen=True)
 class WaypointSpec:
-    """Spec data for testing the get_movement_waypoints selector."""
+    """Spec data for testing the get_movement_waypoints_to_well selector."""
 
     name: str
     expected_move_type: MoveType
@@ -282,7 +282,7 @@ class WaypointSpec:
         # TODO(mc, 2021-01-08): add test for override current location
     ],
 )
-def test_get_movement_waypoints(
+def test_get_movement_waypoints_to_well(
     decoy: Decoy,
     labware_view: LabwareView,
     pipette_view: PipetteView,
@@ -346,7 +346,7 @@ def test_get_movement_waypoints(
             Point(x=spec.extra_waypoints[0][0], y=spec.extra_waypoints[0][1], z=123)
         )
 
-    result = subject.get_movement_waypoints(
+    result = subject.get_movement_waypoints_to_well(
         pipette_id=spec.pipette_id,
         labware_id=spec.labware_id,
         well_name=spec.well_name,
@@ -373,7 +373,7 @@ def test_get_movement_waypoints(
     assert result == expected
 
 
-def test_get_movement_waypoints_raises(
+def test_get_movement_waypoints_to_well_raises(
     decoy: Decoy,
     pipette_view: PipetteView,
     geometry_view: GeometryView,
@@ -386,7 +386,7 @@ def test_get_movement_waypoints_raises(
     )
 
     with pytest.raises(errors.FailedToPlanMoveError, match="out of bounds"):
-        subject.get_movement_waypoints(
+        subject.get_movement_waypoints_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
             well_name="A1",
