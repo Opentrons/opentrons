@@ -50,7 +50,7 @@ jobs:
     steps:
         - uses: 'actions/checkout@v2' 
         - uses: './.github/actions/python/setup'
-        with:
+          with:
           project: 'api'
           target: 'setup lint'
   test:
