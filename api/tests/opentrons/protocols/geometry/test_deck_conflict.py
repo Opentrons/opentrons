@@ -64,7 +64,7 @@ def test_only_trash_in_12(decoy: Decoy) -> None:
 
 
 def test_trash_override(decoy: Decoy) -> None:
-    """It should only the trash labware to be replaced"""
+    """It should allow the trash labware to be replaced with another trash labware"""
     trash_labware = decoy.mock(cls=Labware)
     trash_labware_impl = decoy.mock(cls=AbstractLabware)
 

@@ -49,7 +49,7 @@ def test_slot_names(decoy: Decoy, slot_number: int, subject: Deck) -> None:
     assert subject[slot_name] is None
 
 
-@pytest.mark.parametrize("bad_slot", [0, 13, "0", "13", "hello world"])
+@pytest.mark.parametrize("bad_slot", [0, 13, 1.0, "0", "13", "1.0", "hello world"])
 def test_invalid_slot_names(decoy: Decoy, bad_slot: Any, subject: Deck) -> None:
     with pytest.raises(ValueError, match="Unknown slot"):
         subject[bad_slot]
