@@ -41,6 +41,7 @@ def get_waypoints(
 
     :returns: A list of :py:class:`.Waypoint` locations to move through.
     """
+    # TODO: Update this note.
     # NOTE(mc, 2020-10-28): This function is currently experimental. Flipping
     # `use_experimental_waypoint_planning` to True in
     # `opentrons.protocols.geometry.plan_moves` causes three test failures at

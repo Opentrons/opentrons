@@ -123,7 +123,6 @@ class MotionView:
             #  could crash onto the thermocycler if current well is not known.
 
         try:
-            # TODO(mc, 2021-01-08): inject `get_waypoints` via constructor
             return get_waypoints(
                 move_type=move_type,
                 origin=origin,
@@ -133,6 +132,50 @@ class MotionView:
                 min_travel_z=min_travel_z,
                 max_travel_z=max_travel_z,
                 xy_waypoints=extra_waypoints,
+            )
+        except MotionPlanningError as error:
+            raise errors.FailedToPlanMoveError(str(error))
+
+    def get_movement_waypoints_to_coords(
+        self,
+        origin: Point,
+        dest: Point,
+        direct: bool,
+        max_travel_z: float,
+    ) -> List[Waypoint]:
+        """
+        Args:
+            origin: The start point of the movement.
+                This is the bottom of the pipette's back-most tip if a tip is attached,
+                or the bottom of the pipette's back-most nozzle if not.
+            dest: The end point of the movement.
+                See `origin` for where this point is on the pipette.
+            direct: If True, move directly.  If False, move in an arc.
+            max_travel_z: How high, in deck coords, the pipette can go with whatever
+                tip it currently has attached.
+            min_travel_z: Ignored if `direct` is False.
+        """
+        all_labware_highest_z = self._geometry.get_all_labware_highest_z()
+
+        move_type = MoveType.DIRECT if direct else MoveType.GENERAL_ARC
+
+        try:
+            return get_waypoints(
+                origin=origin,
+                dest=dest,
+                min_travel_z=all_labware_highest_z,
+                max_travel_z=max_travel_z,
+                move_type=move_type,
+                # Planning waypoints with a None origin and destination critical point means
+                # each output waypoint will have None as its critical point.
+                # When those waypoints get passed to the hardware API to move, the hardware
+                # API will treat None as "use the pipette's current critical point",
+                # which will be the backmost tip or nozzle.
+                #
+                # Rely on the hardware API having the same idea of the pipette's current tip
+                # as the caller of this function.
+                origin_cp=None,
+                dest_cp=None,
             )
         except MotionPlanningError as error:
             raise errors.FailedToPlanMoveError(str(error))

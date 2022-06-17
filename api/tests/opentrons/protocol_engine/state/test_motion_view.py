@@ -356,6 +356,9 @@ def test_get_movement_waypoints(
         max_travel_z=spec.max_travel_z,
     )
 
+    # To do: Mock this out instead of getting its actual result.
+    # |
+    # V
     expected = get_waypoints(
         move_type=spec.expected_move_type,
         origin=spec.origin,

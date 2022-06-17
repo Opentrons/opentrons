@@ -108,7 +108,8 @@ class JsonCommandTranslator:
             "loadLiquid",
             "delay",
             "moveToSlot",
-            "moveToCoordinates",
+            # TODO: Add tests
+            # "moveToCoordinates",
         ]
         commands_to_parse = [
             command
