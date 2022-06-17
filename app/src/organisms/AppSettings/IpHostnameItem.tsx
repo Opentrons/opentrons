@@ -18,7 +18,6 @@ import { StyledText } from '../../atoms/text'
 
 const IpItem = styled.div`
   flex: 1 1 auto;
-  padding: 0 1rem;
   border: 0;
   border-radius: 0;
   outline: 0;
