@@ -17,7 +17,7 @@ stages:
         json:
           protocol_id: data.id
           analysis_id: data.analysisSummaries[0].id
-      status_code: 201
+      status_code: 422
       json:
         data:
           id: !anystr
