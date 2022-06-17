@@ -146,6 +146,15 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
             )
 
     if isinstance(item, HeaterShakerGeometry):
+        for covered_location in _get_adjacent_locations(location):
+            restrictions.append(
+                _NoModule(
+                    location=covered_location,
+                    source_item=item,
+                    source_location=location,
+                )
+            )
+
         for covered_location in _get_east_west_locations(location):
             restrictions.append(
                 _MaxHeight(
@@ -154,15 +163,6 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
                     source_location=location,
                     max_height=item.MAX_X_ADJACENT_ITEM_HEIGHT,
                     allowed_labware=item.ALLOWED_ADJACENT_TALL_LABWARE,
-                )
-            )
-
-        for covered_location in _get_north_south_locations(location):
-            restrictions.append(
-                _NoModule(
-                    location=covered_location,
-                    source_item=item,
-                    source_location=location,
                 )
             )
 
@@ -208,10 +208,12 @@ def _get_east_west_locations(location: int) -> List[int]:
         return [location - 1]
 
 
-def _get_north_south_locations(location: int) -> List[int]:
+def _get_adjacent_locations(location: int) -> List[int]:
     if location in [1, 2, 3]:
-        return [location + 3]
+        north_south = [location + 3]
     elif location in [4, 5, 6, 7, 8, 9]:
-        return [location - 3, location + 3]
+        north_south = [location - 3, location + 3]
     else:
-        return [location - 3]
+        north_south = [location - 3]
+
+    return north_south + _get_east_west_locations(location)

@@ -67,15 +67,31 @@ def test_trash_override(decoy: Decoy) -> None:
     """It should allow the trash labware to be replaced with another trash labware"""
     trash_labware = decoy.mock(cls=Labware)
     trash_labware_impl = decoy.mock(cls=AbstractLabware)
+    not_trash = decoy.mock(cls=Labware)
+    not_trash_impl = decoy.mock(cls=AbstractLabware)
 
     decoy.when(trash_labware.quirks).then_return(["fixedTrash"])
     decoy.when(trash_labware_impl.get_quirks()).then_return(["fixedTrash"])
+    decoy.when(not_trash.quirks).then_return(["notTrash"])
+    decoy.when(not_trash_impl.get_quirks()).then_return(["notTrash"])
 
     check(
         existing_items={12: trash_labware},
         new_item=trash_labware_impl,
         new_location=12,
     )
+
+    with pytest.raises(
+        DeckConflictError, match="Only fixed-trash is allowed in slot 12"
+    ):
+        check(existing_items={12: trash_labware}, new_item=not_trash, new_location=12)
+
+    with pytest.raises(
+        DeckConflictError, match="Only fixed-trash is allowed in slot 12"
+    ):
+        check(
+            existing_items={12: trash_labware}, new_item=not_trash_impl, new_location=12
+        )
 
 
 @pytest.mark.parametrize("labware_location", [8, 10, 11])
@@ -192,20 +208,36 @@ def test_labware_when_heater_shaker(
 @pytest.mark.parametrize(
     ("heater_shaker_location", "other_module_location"),
     [
+        (1, 2),
         (1, 4),
+        (2, 1),
+        (2, 3),
         (2, 5),
+        (3, 2),
         (3, 6),
         (4, 1),
+        (4, 5),
         (4, 7),
         (5, 2),
+        (5, 4),
+        (5, 6),
         (5, 8),
         (6, 3),
+        (6, 5),
         (6, 9),
         (7, 4),
+        (7, 8),
         (7, 10),
         (8, 5),
+        (8, 7),
+        (8, 9),
         (8, 11),
         (9, 6),
+        (9, 8),
+        (10, 7),
+        (10, 11),
+        (11, 8),
+        (11, 10),
     ],
 )
 def test_no_modules_when_heater_shaker(

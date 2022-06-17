@@ -53,6 +53,9 @@ class Deck(UserDict):
             for idx in range(12)
         }
         self._highest_z = 0.0
+        # TODO(mc, 2022-06-17): move deck type selection
+        # (and maybe deck definition loading) out of this constructor
+        # to decouple from config (and environment) reading / loading
         self._definition = load_deck(deck_type(), DEFAULT_DECK_DEFINITION_VERSION)
         self._load_fixtures()
         self._thermocycler_present = False
