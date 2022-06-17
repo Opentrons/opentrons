@@ -79,8 +79,8 @@ describe('HeaterShakerSlideout', () => {
     }
     const { getByText } = render(props)
 
-    getByText('Set Shake Speed for Heater-Shaker Module GEN1')
-    getByText('Set RPM for this module.')
+    getByText('Set shake speed for Heater-Shaker Module GEN1')
+    getByText('Set rpm for this module.')
     getByText('Confirm')
   })
 
