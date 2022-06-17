@@ -52,6 +52,9 @@ def get_waypoints(
 
     # a direct move can ignore all arc and waypoint planning
     if move_type == MoveType.DIRECT:
+        # TODO(mm, 2022-06-17): This will not raise an out-of-bounds error
+        # even if the destination is far out of bounds. A protocol can run into this by
+        # doing a direct move to bad coordinates. Should we raise in that case?
         return [dest_waypoint]
 
     # ensure destination is not out of bounds
