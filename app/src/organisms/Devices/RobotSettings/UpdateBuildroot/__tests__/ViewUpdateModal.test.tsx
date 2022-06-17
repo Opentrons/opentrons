@@ -2,15 +2,17 @@ import * as React from 'react'
 
 import { mountWithStore } from '@opentrons/components'
 import * as Buildroot from '../../../../../redux/buildroot'
-
+import { useIsRobotBusy } from '../../../hooks'
 import { DownloadUpdateModal } from '../DownloadUpdateModal'
 import { ReleaseNotesModal } from '../ReleaseNotesModal'
 import { MigrationWarningModal } from '../MigrationWarningModal'
 import { ViewUpdateModal } from '../ViewUpdateModal'
+import { RobotIsBusyModal } from '../RobotIsBusyModal'
 
 import type { State } from '../../../../../redux/types'
 
 jest.mock('../../../../../redux/buildroot')
+jest.mock('../../../hooks')
 
 const getBuildrootUpdateInfo = Buildroot.getBuildrootUpdateInfo as jest.MockedFunction<
   typeof Buildroot.getBuildrootUpdateInfo
@@ -20,6 +22,9 @@ const getBuildrootDownloadProgress = Buildroot.getBuildrootDownloadProgress as j
 >
 const getBuildrootDownloadError = Buildroot.getBuildrootDownloadError as jest.MockedFunction<
   typeof Buildroot.getBuildrootDownloadError
+>
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
 >
 
 const MOCK_STATE: State = { mockState: true } as any
@@ -50,6 +55,7 @@ describe('ViewUpdateModal', () => {
   }
 
   beforeEach(() => {
+    mockUseIsRobotBusy.mockReturnValue(false)
     getBuildrootUpdateInfo.mockReturnValue(null)
     getBuildrootDownloadProgress.mockReturnValue(50)
     getBuildrootDownloadError.mockReturnValue(null)
@@ -170,5 +176,14 @@ describe('ViewUpdateModal', () => {
 
     migrationWarning.invoke('proceed')?.()
     expect(wrapper.exists(DownloadUpdateModal)).toBe(true)
+  })
+
+  it('should show RobotIsBusyModal when the robot is busy', () => {
+    mockUseIsRobotBusy.mockReturnValue(true)
+    const { wrapper } = render()
+    const migrationWarning = wrapper.find(RobotIsBusyModal)
+
+    migrationWarning.invoke('proceed')?.()
+    expect(wrapper.exists(RobotIsBusyModal)).toBe(true)
   })
 })
