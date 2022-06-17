@@ -62,6 +62,7 @@ pipenv-install:
 setup-py: pipenv-install $(PYTHON_SETUP_TARGETS)
 
 %-py-setup: pipenv-install
+	export pipenv_opts
 	$(MAKE) -C $* setup
 
 # uninstall all project dependencies
