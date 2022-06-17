@@ -14,8 +14,8 @@ import {
 } from '../../../redux/discovery/__fixtures__'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
-import { UpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
 import { useIsRobotBusy } from '../hooks'
+import { UpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
 
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../../redux/robot-controls')
