@@ -182,6 +182,7 @@ class SensorId(int, Enum):
     S0 = 0x0
     S1 = 0x1
 
+
 @unique
 class PipetteName(int, Enum):
     """High-level type of pipette."""

@@ -296,6 +296,7 @@ class SensorPayload(utils.BinarySerializable):
     sensor: SensorTypeField
     sensor_id: SensorIdField
 
+
 @dataclass
 class ReadFromSensorRequestPayload(SensorPayload):
     """Take a single reading from a sensor request payload."""

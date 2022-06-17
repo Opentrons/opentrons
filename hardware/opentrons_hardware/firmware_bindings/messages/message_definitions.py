@@ -571,9 +571,7 @@ class TipActionResponse:  # noqa: D101
 @dataclass
 class PeripheralStatusRequest:  # noqa: D101
     payload: payloads.SensorPayload
-    payload_type: Type[
-        payloads.SensorPayload
-    ] = payloads.SensorPayload
+    payload_type: Type[payloads.SensorPayload] = payloads.SensorPayload
     message_id: Literal[
         MessageId.peripheral_status_request
     ] = MessageId.peripheral_status_request
