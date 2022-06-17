@@ -26,6 +26,7 @@ on:
       - '.github/actions/python/**/*'
       - '.github/workflows/utils.js'
     branches:
+      - 'dockerize-actions'
       - 'edge'
       - 'release'
       - '*hotfix*'
