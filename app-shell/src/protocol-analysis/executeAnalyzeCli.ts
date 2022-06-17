@@ -13,8 +13,7 @@ export function executeAnalyzeCli(
     'opentrons.cli',
     'analyze',
     `--json-output=${outputPath}`,
-    sourcePath,
-    ...auxSourcePaths,
+    ...sourcePaths,
   ])
     .then(output => {
       log.debug('Output from opentrons.cli', { output })
