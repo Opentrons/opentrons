@@ -15,6 +15,8 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
+import { useDispatchApiRequest } from '../../redux/robot-api'
+import { fetchProtocols } from '../../redux/protocol-storage'
 import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { HistoricalProtocolRun } from './HistoricalProtocolRun'
@@ -29,11 +31,16 @@ export function RecentProtocolRuns({
 }: RecentProtocolRunsProps): JSX.Element | null {
   const { t } = useTranslation('device_details')
   const isRobotViewable = useIsRobotViewable(robotName)
+  const [dispatchRequest] = useDispatchApiRequest()
   const runsQueryResponse = useAllRunsQuery()
   const runs = runsQueryResponse?.data?.data
   const protocols = useAllProtocolsQuery()
   const currentRunId = useCurrentRunId()
   const robotIsBusy = currentRunId != null
+
+  React.useEffect(() => {
+    dispatchRequest(fetchProtocols())
+  }, [dispatchRequest, robotName])
 
   return (
     <Flex

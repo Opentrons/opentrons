@@ -20,13 +20,17 @@ import {
   Btn,
   TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
-import { LEFT } from '../../../redux/pipettes'
+import { fetchPipettes, LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { Portal } from '../../../App/portal'
 import { StyledText } from '../../../atoms/text'
 import { getHasCalibrationBlock } from '../../../redux/config'
+import { useDispatchApiRequest } from '../../../redux/robot-api'
 import { Banner } from '../../../atoms/Banner'
-import { fetchPipetteOffsetCalibrations } from '../../../redux/calibration'
+import {
+  fetchCalibrationStatus,
+  fetchPipetteOffsetCalibrations,
+} from '../../../redux/calibration'
 import { ChangePipette } from '../../ChangePipette'
 import { useCalibratePipetteOffset } from '../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import {
@@ -57,6 +61,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
   const { pipetteInfo, mount, robotName, pipetteId } = props
   const dispatch = useDispatch<Dispatch>()
+  const [dispatchRequest] = useDispatchApiRequest()
   const pipetteName = pipetteInfo?.displayName
   const pipetteOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
@@ -86,6 +91,16 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteOffsetCalibration === null ? 1000 : FETCH_PIPETTE_CAL_MS,
     true
   )
+
+  
+  React.useEffect(() => {
+    dispatchRequest(fetchPipettes(robotName, true))
+    dispatchRequest(fetchCalibrationStatus(robotName))
+    dispatchRequest(fetchPipetteOffsetCalibrations(robotName))
+  }, [dispatchRequest, robotName])
+
+  console.log(pipetteOffsetCalibration)
+  console.log(isDeckCalibrated)
 
   const badCalibration = pipetteOffsetCalibration?.status.markedBad
 
