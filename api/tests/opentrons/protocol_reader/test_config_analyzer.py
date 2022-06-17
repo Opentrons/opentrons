@@ -267,7 +267,7 @@ CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
             role=ProtocolFileRole.MAIN,
             contents=textwrap.dedent(
                 """
-                # apiLevel provided, but not as a well formatted string.
+                # apiLevel provided, but not a valid version.
                 metadata = {"apiLevel": "123.456"}
                 """
             ).encode(),
