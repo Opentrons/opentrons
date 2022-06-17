@@ -4,10 +4,21 @@ inputs:
   project:
     description: 'Which project (by subdirectory) to set up'
     required: true
-  target:
-    description: 'Which makefile operation to preform'
+  python-version:
+    description: "What Python version to use to create the project's virtual environment"
     required: false
-    default: 'setup'
 runs:
-  using: 'docker'
-  image: 'docker://otsam/otbuildy:0.0.3'
+  using: 'composite'
+  steps:
+    - shell: bash
+      run: |
+        if [[ "${OSTYPE}" =~ "linux" ]]; then
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libsystemd-dev
+        fi
+    - shell: bash
+      run: |
+        npm install --global shx@0.3.3
+        pip install pipenv==2021.5.29
+    - shell: bash
+      run: 'make -C ${{ inputs.project }} setup OT_VIRTUALENV_VERSION=${{ inputs.python-version }}'
