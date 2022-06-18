@@ -8,6 +8,8 @@ disk into the runner, and the protocols are run to completion. From
 there, the ProtocolEngine state is inspected to everything was loaded
 and ran as expected.
 """
+import pytest
+
 from datetime import datetime
 from decoy import matchers
 from pathlib import Path
@@ -28,9 +30,12 @@ from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
 
 
+# TODO (tz, 6-17-22): API version 3.x in-development.
+# Currently parsing protocol versions less then MAX_SUPPORTED_VERSION
+@pytest.mark.xfail
 async def test_runner_with_python(
-    python_protocol_file: Path,
-    tempdeck_v1_def: ModuleDefinition,
+        python_protocol_file: Path,
+        tempdeck_v1_def: ModuleDefinition,
 ) -> None:
     """It should run a Python protocol on the ProtocolRunner."""
     protocol_reader = ProtocolReader()
