@@ -1,12 +1,7 @@
 // jog controls component
 import * as React from 'react'
 
-import {
-  SPACING,
-  Flex,
-  JUSTIFY_CENTER,
-  ALIGN_STRETCH,
-} from '@opentrons/components'
+import { Flex, JUSTIFY_CENTER, ALIGN_STRETCH } from '@opentrons/components'
 
 import { DirectionControl } from './DirectionControl'
 import { StepSizeControl } from './StepSizeControl'
@@ -49,7 +44,6 @@ export function JogControls(props: JogControlsProps): JSX.Element {
     <Flex
       justifyContent={JUSTIFY_CENTER}
       alignSelf={ALIGN_STRETCH}
-      marginBottom={SPACING.spacing5}
       {...styleProps}
     >
       <StepSizeControl
