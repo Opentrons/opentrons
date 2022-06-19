@@ -98,6 +98,7 @@ interface LoadModuleResult {
 }
 
 interface LoadLiquidParams {
+  displayColor: string
   liquidId: string
   labwareId: string
   volumeByWell: { [wellName: string]: number }

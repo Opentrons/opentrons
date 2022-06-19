@@ -63,13 +63,28 @@ export function constructInvariantContextFromRunCommands(
             },
           },
         }
+      } else if (command.commandType === 'loadLiquid') {
+        const { displayColor } = command.params
+        return {
+          ...acc,
+          liquidEntities: {
+            ...acc.liquidEntities,
+            [command.result.liquidId]: {
+              description: 'stub liquid description',
+              displayName: command.result.liquidId,
+              displayColor,
+            },
+          },
+        }
       }
+
       return acc
     },
     {
       labwareEntities: {},
       moduleEntities: {},
       pipetteEntities: {},
+      liquidEntities: {},
       config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: true },
     }
   )
