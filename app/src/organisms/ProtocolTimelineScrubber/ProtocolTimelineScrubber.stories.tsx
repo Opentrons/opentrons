@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { ProtocolTimelineScrubber } from './index'
 import analysisOutputFixture from './analysisOutputFixture.json'
+import longerAnalysisOutputFixture from './longerAnalysisOutputFixture.json'
 
 import type { Story, Meta } from '@storybook/react'
 
@@ -13,7 +14,12 @@ const Template: Story<React.ComponentProps<typeof ProtocolTimelineScrubber>> = a
   <ProtocolTimelineScrubber {...args} />
 )
 
-export const Primary = Template.bind({})
-Primary.args = {
+export const Basic = Template.bind({})
+Basic.args = {
   commands:  analysisOutputFixture.commands
+}
+
+export const Larger = Template.bind({})
+Larger.args = {
+  commands:  longerAnalysisOutputFixture.commands
 }

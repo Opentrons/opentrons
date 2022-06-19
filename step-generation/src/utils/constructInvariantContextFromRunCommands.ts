@@ -3,7 +3,9 @@ import {
   getLabwareDefURI,
   RunTimeCommand,
   getPipetteNameSpecs,
+  FIXED_TRASH_ID,
 } from '@opentrons/shared-data'
+import fixedTrash from '@opentrons/shared-data/labware/definitions/2/opentrons_1_trash_3200ml_fixed/1.json'
 import { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import { InvariantContext } from '../types'
@@ -81,7 +83,13 @@ export function constructInvariantContextFromRunCommands(
       return acc
     },
     {
-      labwareEntities: {},
+      labwareEntities: {
+        [FIXED_TRASH_ID]: {
+          id: FIXED_TRASH_ID,
+          labwareDefURI: getLabwareDefURI(fixedTrash),
+          def: fixedTrash,
+        },
+      },
       moduleEntities: {},
       pipetteEntities: {},
       liquidEntities: {},
