@@ -57,6 +57,7 @@ export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
 export const PrimaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blue};
   border-radius: ${BORDERS.radiusSoftCorners};
+  box-shadow: none;
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   line-height: ${TYPOGRAPHY.lineHeight20};
   text-transform: ${TYPOGRAPHY.textTransformNone};
@@ -64,13 +65,9 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
 
   ${styleProps}
 
-  &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
-  }
-
-  &:hover {
+  &:hover, &:focus {
     background-color: ${COLORS.blueHover};
-    box-shadow: 0 0 0;
+    box-shadow: none;
   }
 
   &:active {
@@ -107,6 +104,6 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
 `
 
 export const ToggleButton = (props: ToggleBtnProps): JSX.Element => {
-  const color = props.toggledOn ? COLORS.blue : COLORS.darkGrey
+  const color = props.toggledOn ? COLORS.blue : COLORS.darkGreyEnabled
   return <ToggleBtn size={SIZE_2} color={color} {...props} />
 }

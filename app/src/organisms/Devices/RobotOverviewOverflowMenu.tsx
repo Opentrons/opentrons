@@ -110,7 +110,7 @@ export const RobotOverviewOverflowMenu = (
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
-          top={SPACING.spacing7}
+          top={'2.25rem'}
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >

@@ -5,7 +5,6 @@ import {
   Box,
   Flex,
   ALIGN_CENTER,
-  C_MED_LIGHT_GRAY,
   C_WHITE,
   DIRECTION_COLUMN,
   OVERFLOW_SCROLL,
@@ -34,14 +33,17 @@ export function DeviceDetails(): JSX.Element | null {
         overflow={OVERFLOW_SCROLL}
         padding={SPACING_3}
       >
+        {/* TODO(va, 2022-06-17) update border color to 
+            COLORS.medGreyEnabled when PR #10664 is merged */}
         <Flex
           alignItems={ALIGN_CENTER}
           backgroundColor={C_WHITE}
-          border={`1px solid ${C_MED_LIGHT_GRAY}`}
+          border={`1px solid #e3e3e3`}
           borderRadius="3px"
           flexDirection={DIRECTION_COLUMN}
           marginBottom={SPACING_3}
-          padding={SPACING_3}
+          paddingX={SPACING_3}
+          paddingBottom={SPACING_3}
           width="100%"
         >
           <RobotOverview robotName={robotName} />

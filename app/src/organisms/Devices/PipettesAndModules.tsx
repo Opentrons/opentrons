@@ -59,7 +59,6 @@ export function PipettesAndModules({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         minHeight={SIZE_3}
-        paddingX={SPACING.spacing3}
         paddingBottom={SPACING.spacing3}
         width="100%"
         flexDirection={DIRECTION_COLUMN}
@@ -77,7 +76,7 @@ export function PipettesAndModules({
         {/* TODO(jr, 4/15/22): This needs to be refactored to get a combined array of pipettes and modules so it can display with widths matching each column as the design shows */}
         {isRobotViewable ? (
           <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-            <Flex flexDirection={DIRECTION_ROW}>
+            <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
               <PipetteCard
                 pipetteId={attachedPipettes.left?.id}
                 pipetteInfo={

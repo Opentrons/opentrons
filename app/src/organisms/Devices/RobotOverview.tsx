@@ -8,14 +8,16 @@ import {
   ALIGN_CENTER,
   ALIGN_START,
   C_MED_LIGHT_GRAY,
+  COLORS,
   C_WHITE,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
-  SIZE_2,
   SPACING,
   TEXT_TRANSFORM_NONE,
   TEXT_TRANSFORM_UPPERCASE,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
 } from '@opentrons/components'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
@@ -64,17 +66,18 @@ export function RobotOverview({
 
   return robot != null ? (
     <Flex
-      alignItems={ALIGN_CENTER}
+      alignItems={ALIGN_START}
       backgroundColor={C_WHITE}
       borderBottom={`1px solid ${C_MED_LIGHT_GRAY}`}
       flexDirection={DIRECTION_ROW}
       marginBottom={SPACING.spacing4}
       padding={SPACING.spacing3}
+      position={POSITION_RELATIVE}
       width="100%"
     >
       <img
         src={OT2_PNG}
-        style={{ width: '6rem' }}
+        style={{ paddingTop: SPACING.spacing3, width: '6rem' }}
         id="RobotOverview_robotImage"
       />
       <Box padding={SPACING.spacing3} width="100%">
@@ -90,7 +93,12 @@ export function RobotOverview({
             flexDirection={DIRECTION_COLUMN}
             paddingRight={SPACING.spacing4}
           >
-            <StyledText as="h6" textTransform={TEXT_TRANSFORM_UPPERCASE}>
+            <StyledText
+              as="h6"
+              color={COLORS.darkGreyEnabled}
+              paddingBottom=".125rem"
+              textTransform={TEXT_TRANSFORM_UPPERCASE}
+            >
               {t('controls')}
             </StyledText>
             <Flex alignItems={ALIGN_CENTER}>
@@ -99,7 +107,8 @@ export function RobotOverview({
                 toggledOn={lightsOn != null ? lightsOn : false}
                 disabled={lightsOn === null || robot.status !== CONNECTABLE}
                 onClick={toggleLights}
-                size={SIZE_2}
+                height=".875rem"
+                width="1.375rem"
                 marginRight={SPACING.spacing3}
                 id={`RobotOverview_lightsToggle`}
               />
@@ -126,7 +135,7 @@ export function RobotOverview({
           ) : null}
         </Flex>
       </Box>
-      <Box alignSelf={ALIGN_START}>
+      <Box position={POSITION_ABSOLUTE} top={SPACING.spacing2} right='-.75rem'>
         <RobotOverviewOverflowMenu robot={robot} />
       </Box>
     </Flex>
