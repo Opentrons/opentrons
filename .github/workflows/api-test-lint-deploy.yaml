@@ -49,11 +49,10 @@ jobs:
     runs-on: 'ubuntu-18.04'
     steps:
         - uses: 'actions/checkout@v2' 
-        - uses: './.github/actions/python/container-run'
+        - uses: './.github/actions/python/run-37-container'
           with:
             project: 'api'
             target: 'setup lint'
-            pythonVersion: '3.7'
   test:
     name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
     timeout-minutes: 30

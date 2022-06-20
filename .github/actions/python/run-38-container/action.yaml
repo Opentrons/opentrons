@@ -1,4 +1,4 @@
-name: 'Python Container Run'
+name: 'Python 3.8 Container Run'
 description: 'Invoke a make target in a pre-populated container'
 inputs:
   project:
@@ -8,10 +8,6 @@ inputs:
     description: 'Which makefile operation to preform'
     required: false
     default: 'setup'
-  pythonVersion:
-    description: 'Which version of Python to use'
-    required: true
-    default: '3.7'
 runs:
   using: 'docker'
-  image: "docker://otsam/otbuildy:${{ inputs.pythonVersion }}-0.0.5"
+  image: "docker://otsam/otbuildy:3.8-0.0.5"
