@@ -13,6 +13,11 @@ import {
   SPACING,
   ALIGN_CENTER,
   TEXT_TRANSFORM_UPPERCASE,
+  FONT_WEIGHT_BOLD,
+  ALIGN_FLEX_END,
+  COLORS,
+  JUSTIFY_SPACE_BETWEEN,
+  ALIGN_STRETCH,
 } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { getResultingTimelineFrameFromRunCommands } from '@opentrons/step-generation'
@@ -28,6 +33,9 @@ import type {
   PipetteEntity,
   TimelineFrame,
 } from '@opentrons/step-generation'
+import { StyledText } from '../../atoms/text'
+
+const COMMAND_WIDTH_PX = 160
 
 interface ProtocolTimelineScrubberProps {
   commands: RunTimeCommand[]
@@ -52,6 +60,8 @@ export function ProtocolTimelineScrubber(
 ): JSX.Element {
   const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
   const { commands } = props
+  const wrapperRef = React.useRef<HTMLDivElement>(null)
+  const commandListRef = React.useRef<HTMLDivElement>(null)
   const [currentCommandIndex, setCurrentCommandIndex] = React.useState<number>(
     0
   )
@@ -78,20 +88,9 @@ export function ProtocolTimelineScrubber(
       : null
 
   return (
-    <Flex size="41rem" flexDirection={DIRECTION_COLUMN}>
-      <input
-        type="range"
-        min={0}
-        max={commands.length - 1}
-        value={currentCommandIndex}
-        onChange={e => setCurrentCommandIndex(Number(e.target.value))}
-      />
-
-      <Text as="h3">Current Command</Text>
-      <Text marginLeft={SPACING.spacing3}>index: {currentCommandIndex}</Text>
-      <Text marginLeft={SPACING.spacing3}>type: {command.commandType}</Text>
+    <Flex ref={wrapperRef} width="100%" flexDirection={DIRECTION_COLUMN}>
       <Flex>
-        <Flex size="25rem">
+        <Flex size="25rem" marginRight={SPACING.spacing3}>
           <RobotWorkSpace
             deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
             deckDef={deckDef}
@@ -209,6 +208,120 @@ export function ProtocolTimelineScrubber(
           invariantContext={invariantContext}
         />
       </Flex>
+      <Flex width="100%" overflowX="scroll" ref={commandListRef}>
+        {commands.map((command, index) => (
+          <Flex
+            key={index}
+            backgroundColor={
+              index === currentCommandIndex
+                ? COLORS.blueFocus
+                : index < currentCommandIndex
+                ? '#00002222'
+                : '#fff'
+            }
+            border={
+              index === currentCommandIndex
+                ? `3px solid ${COLORS.blue}`
+                : '1px solid #000'
+            }
+            padding={SPACING.spacing1}
+            flexDirection={DIRECTION_COLUMN}
+            minWidth={`${COMMAND_WIDTH_PX}px`}
+            width={`${COMMAND_WIDTH_PX}px`}
+            height="10rem"
+            overflowX="hidden"
+            overflowY="scroll"
+            cursor="pointer"
+            onClick={() => setCurrentCommandIndex(index)}
+          >
+            <Text as="p" fontSize="0.5rem" alignSelf={ALIGN_FLEX_END}>
+              {index + 1}
+            </Text>
+            <StyledText
+              as="p"
+              fontSize="0.6rem"
+              marginBottom={SPACING.spacing2}
+              fontWeight={FONT_WEIGHT_BOLD}
+            >
+              {command.commandType}
+            </StyledText>
+            {Object.entries(command.params ?? {}).map(([key, value]) => (
+              <Flex
+                key={key}
+                flexDirection={DIRECTION_COLUMN}
+                marginBottom={SPACING.spacing1}
+                paddingLeft={SPACING.spacing1}
+              >
+                <Text
+                  as="label"
+                  fontSize="0.6rem"
+                  marginRight={SPACING.spacing1}
+                >
+                  {key}:
+                </Text>
+                {value != null && typeof value === 'object' ? (
+                  Object.entries(value).map(([innerKey, innerValue]) => (
+                    <Flex key={innerKey}>
+                      <Text
+                        as="label"
+                        fontSize="0.6rem"
+                        marginRight={SPACING.spacing1}
+                      >
+                        {key}:
+                      </Text>
+                      <Text as="p" fontSize="0.6rem" title={String(innerValue)}>
+                        {String(innerValue)}
+                      </Text>
+                    </Flex>
+                  ))
+                ) : (
+                  <Text as="p" fontSize="0.6rem" title={String(value)}>
+                    {String(value)}
+                  </Text>
+                )}
+              </Flex>
+            ))}
+          </Flex>
+        ))}
+      </Flex>
+      <StyledText as="label" marginY={SPACING.spacing2}>
+        Jump to command
+      </StyledText>
+      <input
+        type="range"
+        min={1}
+        max={commands.length}
+        value={currentCommandIndex + 1}
+        onChange={e => {
+          const nextIndex = Number(e.target.value) - 1
+          setCurrentCommandIndex(nextIndex)
+          const progressOffset = window.innerWidth / 2
+          commandListRef.current?.scrollTo({
+            left: nextIndex * COMMAND_WIDTH_PX - progressOffset,
+          })
+        }}
+      />
+      <Flex alignSelf={ALIGN_STRETCH} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Text as="p" fontSize="0.5rem">
+          1
+        </Text>
+        <Text as="p" fontSize="0.5rem">
+          {commands.length}
+        </Text>
+      </Flex>
+      {currentCommandIndex !== 0 &&
+      currentCommandIndex !== commands.length - 1 ? (
+        <Text
+          as="p"
+          fontSize="0.5rem"
+          marginLeft={
+            (currentCommandIndex / (commands.length - 1)) *
+            ((wrapperRef.current?.getBoundingClientRect()?.width - 6) ?? 0)
+          }
+        >
+          {currentCommandIndex + 1}
+        </Text>
+      ) : null}
     </Flex>
   )
 }
@@ -230,12 +343,12 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
   const { robotState } = timelineFrame
   return (
     <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
-      <Text as="h3" textTransform={TEXT_TRANSFORM_UPPERCASE}>
+      <StyledText as="h1" textTransform={TEXT_TRANSFORM_UPPERCASE}>
         {mount}
-      </Text>
-      <Text as="p" fontSize="0.5rem" marginY={SPACING.spacing2}>
-        {pipetteEntity?.spec?.displayName ?? 'empty'}
-      </Text>
+      </StyledText>
+      <StyledText as="p" fontSize="0.5rem" marginY={SPACING.spacing2}>
+        {pipetteEntity?.spec?.displayName ?? 'none'}
+      </StyledText>
       {pipetteEntity != null && pipetteId != null ? (
         <PipetteSideView
           allNozzlesHaveTips={robotState.tipState.pipettes[pipetteId]}
