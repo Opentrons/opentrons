@@ -4,6 +4,7 @@ import {
   RunTimeCommand,
   getPipetteNameSpecs,
   FIXED_TRASH_ID,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import fixedTrash from '@opentrons/shared-data/labware/definitions/2/opentrons_1_trash_3200ml_fixed/1.json'
 import { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
@@ -86,8 +87,8 @@ export function constructInvariantContextFromRunCommands(
       labwareEntities: {
         [FIXED_TRASH_ID]: {
           id: FIXED_TRASH_ID,
-          labwareDefURI: getLabwareDefURI(fixedTrash),
-          def: fixedTrash,
+          labwareDefURI: getLabwareDefURI(fixedTrash as LabwareDefinition2),
+          def: fixedTrash as LabwareDefinition2,
         },
       },
       moduleEntities: {},

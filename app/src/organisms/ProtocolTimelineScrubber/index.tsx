@@ -7,10 +7,12 @@ import {
   Module,
   LabwareRender,
   Flex,
+  Box,
   Text,
   DIRECTION_COLUMN,
   SPACING,
   ALIGN_CENTER,
+  TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { getResultingTimelineFrameFromRunCommands } from '@opentrons/step-generation'
@@ -23,6 +25,8 @@ import type { RunTimeCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   LocationLiquidState,
+  PipetteEntity,
+  TimelineFrame,
 } from '@opentrons/step-generation'
 
 interface ProtocolTimelineScrubberProps {
@@ -190,49 +194,63 @@ export function ProtocolTimelineScrubber(
             )}
           </RobotWorkSpace>
         </Flex>
-        {leftPipetteEntity != null ? (
-          <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
-            <Text as="h3">LEFT</Text>
-            <PipetteSideView
-              allNozzlesHaveTips={robotState.tipState.pipettes[leftPipetteId]}
-              allNozzleTipContents={
-                robotState.liquidState.pipettes[leftPipetteId]
-              }
-              liquidEntities={invariantContext.liquidEntities}
-              maxVolume={
-                (Object.entries(
-                  invariantContext.pipetteEntities[leftPipetteId]
-                    ?.tiprackLabwareDef?.wells ?? {}
-                ).find(
-                  ([_wellName, { totalLiquidVolume }]) =>
-                    totalLiquidVolume != null
-                ) ?? [null, { totalLiquidVolume: 0 }])[1].totalLiquidVolume
-              }
-            />
-          </Flex>
-        ) : null}
-        {rightPipetteEntity != null ? (
-          <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
-            <Text as="h3">RIGHT</Text>
-            <PipetteSideView
-              allNozzlesHaveTips={robotState.tipState.pipettes[rightPipetteId]}
-              allNozzleTipContents={
-                robotState.liquidState.pipettes[rightPipetteId]
-              }
-              liquidEntities={invariantContext.liquidEntities}
-              maxVolume={
-                (Object.entries(
-                  invariantContext.pipetteEntities[rightPipetteId]
-                    ?.tiprackLabwareDef?.wells ?? {}
-                ).find(
-                  ([_wellName, { totalLiquidVolume }]) =>
-                    totalLiquidVolume != null
-                ) ?? [null, { totalLiquidVolume: 0 }])[1].totalLiquidVolume
-              }
-            />
-          </Flex>
-        ) : null}
+        <PipetteMountViz
+          mount="left"
+          pipetteId={leftPipetteId}
+          pipetteEntity={leftPipetteEntity}
+          timelineFrame={frame}
+          invariantContext={invariantContext}
+        />
+        <PipetteMountViz
+          mount="right"
+          pipetteId={rightPipetteId}
+          pipetteEntity={rightPipetteEntity}
+          timelineFrame={frame}
+          invariantContext={invariantContext}
+        />
       </Flex>
+    </Flex>
+  )
+}
+interface PipetteMountVizProps {
+  pipetteId: string | null
+  pipetteEntity: PipetteEntity | null
+  mount: string
+  timelineFrame: TimelineFrame
+  invariantContext: InvariantContext
+}
+function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
+  const {
+    mount,
+    pipetteEntity,
+    pipetteId,
+    timelineFrame,
+    invariantContext,
+  } = props
+  const { robotState } = timelineFrame
+  return (
+    <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
+      <Text as="h3" textTransform={TEXT_TRANSFORM_UPPERCASE}>
+        {mount}
+      </Text>
+      <Text as="p" fontSize="0.5rem" marginY={SPACING.spacing2}>
+        {pipetteEntity?.spec?.displayName ?? 'empty'}
+      </Text>
+      {pipetteEntity != null && pipetteId != null ? (
+        <PipetteSideView
+          allNozzlesHaveTips={robotState.tipState.pipettes[pipetteId]}
+          allNozzleTipContents={robotState.liquidState.pipettes[pipetteId]}
+          liquidEntities={invariantContext.liquidEntities}
+          maxVolume={
+            (Object.entries(
+              invariantContext.pipetteEntities[pipetteId]?.tiprackLabwareDef
+                ?.wells ?? {}
+            ).find(
+              ([_wellName, { totalLiquidVolume }]) => totalLiquidVolume != null
+            ) ?? [null, { totalLiquidVolume: 0 }])[1].totalLiquidVolume
+          }
+        />
+      ) : <Box size="8rem" />}
     </Flex>
   )
 }
