@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
 import {
   Flex,
@@ -38,6 +39,7 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const dispatch = useDispatch<Dispatch>()
+  const history = useHistory()
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -47,6 +49,11 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
   const handleClickReanalyze: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     dispatch(analyzeProtocol(protocolKey))
+    setShowOverflowMenu(!showOverflowMenu)
+  }
+  const handleClickTimeline: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    history.push(`/protocols/${protocolKey}/timeline`)
     setShowOverflowMenu(!showOverflowMenu)
   }
   return (
@@ -66,6 +73,9 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
         >
           <MenuItem onClick={handleClickShowInFolder}>
             {t('show_in_folder')}
+          </MenuItem>
+          <MenuItem onClick={handleClickTimeline}>
+            {t('go_to_timeline')}
           </MenuItem>
           <MenuItem onClick={handleClickReanalyze}>{t('reanalyze')}</MenuItem>
           {protocolType === 'json' ? (

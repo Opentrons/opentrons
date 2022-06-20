@@ -22,6 +22,7 @@ import { ProtocolRunDetails } from '../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../pages/Devices/RobotSettings'
 import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
 import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
+import { ProtocolTimeline} from '../pages/Protocols/ProtocolDetails/ProtocolTimeline'
 import { AppSettings } from '../organisms/AppSettings'
 import { Labware } from '../organisms/Labware'
 import { Navbar } from './Navbar'
@@ -44,6 +45,12 @@ export const routes: RouteProps[] = [
     exact: true,
     name: 'Protocol Details',
     path: '/protocols/:protocolKey',
+  },
+  {
+    Component: ProtocolTimeline,
+    exact: true,
+    name: 'Protocol Timeline',
+    path: '/protocols/:protocolKey/timeline',
   },
   {
     Component: () => <div>deck setup</div>,

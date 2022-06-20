@@ -31,5 +31,6 @@
   "quantity": "Quantity",
   "go_to_labware_definition": "Go to labware definition",
   "protocol_designer_version": "Protocol Designer {{version}}",
-  "python_api_version": "Python API {{version}}"
+  "python_api_version": "Python API {{version}}",
+  "go_to_timeline": "Go to timeline"
 }
