@@ -250,7 +250,9 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
             ) ?? [null, { totalLiquidVolume: 0 }])[1].totalLiquidVolume
           }
         />
-      ) : <Box size="8rem" />}
+      ) : (
+        <Box size="8rem" />
+      )}
     </Flex>
   )
 }
@@ -267,18 +269,56 @@ function PipetteSideView({
   maxVolume,
   allNozzlesHaveTips,
 }: SideViewProps): JSX.Element {
+  const channelCount = Object.keys(allNozzleTipContents).length
   return (
     <svg width="8rem" height="16rem" viewBox="0 0 100 200">
-      <rect x="30" y="0" height="80" width="40" fill="#000" stroke="#000" />
-      <rect x="45" y="80" height="50" width="10" fill="#000" stroke="#000" />
-      {allNozzlesHaveTips ? (
-        <TipSideView
-          tipContents={allNozzleTipContents[0]}
-          liquidEntities={liquidEntities}
-          maxVolume={maxVolume}
-        />
+      {channelCount <= 1 ? (
+        <>
+          <rect x="30" y="0" height="80" width="40" stroke="#000" />
+          <rect x="45" y="80" height="50" width="10" stroke="#000" />
+          {allNozzlesHaveTips ? (
+            <TipSideView
+              x={45}
+              y={130}
+              tipContents={allNozzleTipContents[0]}
+              liquidEntities={liquidEntities}
+              maxVolume={maxVolume}
+            />
+          ) : (
+            <path
+              d="M47,130 L49,140 H51 L53,130 H47z"
+              stroke="#000"
+              fill="#000"
+            />
+          )}
+        </>
       ) : (
-        <path d="M47,130 L49,140 H51 L53,130 H47z" stroke="#000" fill="#000" />
+        <>
+          <rect x="30" y="0" height="40" width="40" stroke="#000" />
+          <path d="M30,40 L10,85 H90 L70,40 H30z" stroke="#000" />
+          <rect x="10" y="85" height="45" width="80" stroke="#000" />
+          {Object.values(allNozzleTipContents).map((tipContents, index) => {
+            const x = index * 10 + 10
+            return allNozzlesHaveTips ? (
+              <TipSideView
+                x={x}
+                y={130}
+                key={index}
+                tipContents={tipContents}
+                liquidEntities={liquidEntities}
+                maxVolume={maxVolume}
+              />
+            ) : (
+              <path
+                d={`M${x + 2},130 L${x + 4},140 H${x + 6} L${x + 8},130 H${
+                  x + 2
+                }z`}
+                stroke="#000"
+                fill="#000"
+              />
+            )
+          })}
+        </>
       )}
     </svg>
   )
@@ -288,11 +328,15 @@ interface TipSideViewProps {
   tipContents: LocationLiquidState
   liquidEntities: InvariantContext['liquidEntities']
   maxVolume: number
+  x: number
+  y: number
 }
 function TipSideView({
   tipContents,
   liquidEntities,
   maxVolume,
+  x,
+  y,
 }: TipSideViewProps): JSX.Element {
   const emptyVolumeLeft =
     maxVolume -
@@ -302,13 +346,14 @@ function TipSideView({
   const yOfFirstLiquid = (emptyVolumeLeft / maxVolume) * 50
   return (
     <>
-      <rect x="45" y="130" height={yOfFirstLiquid} width="10" fill="#FFF" />
+      <rect x={x} y={y} height={yOfFirstLiquid} width="10" fill="#FFF" />
       {Object.entries(tipContents).map(([liquidId, { volume }]) => {
         console.table({ liquidId, volume, emptyVolumeLeft, yOfFirstLiquid })
         return (
           <rect
-            x="45"
-            y={130 + yOfFirstLiquid}
+            key={liquidId}
+            x={x}
+            y={y + yOfFirstLiquid}
             height={(volume / maxVolume) * 50}
             width="10"
             fill={liquidEntities[liquidId]?.displayColor ?? 'rebeccapurple'}
@@ -316,12 +361,16 @@ function TipSideView({
         )
       })}
       <path
-        d="M45,130 V150 L47,170 L49,180 H51 L53,170 L55,150 V130 H45z"
+        d={`M${x},130 V150 L${x + 2},170 L${x + 4},180 H${x + 6} L${
+          x + 8
+        },170 L${x + 10},150 V130 H${x}z`}
         stroke="#000"
         fill="none"
       />
       <path
-        d="M44,129 V150 L47,170 L49,180 H51 L53,170 L55,150 V130 H56 V181 H44 V129z"
+        d={`M${x - 1},129 V150 L${x + 2},170 L${x + 4},180 H${x + 6} L${
+          x + 8
+        },170 L${x + 10},150 V130 H${x + 11} V181 H${x - 1} V129z`}
         fill="#FFF"
         stroke="none"
       />
