@@ -53,7 +53,7 @@ jobs:
           with:
             project: 'api'
             target: 'setup lint'
-            python-version: '3.7'
+            pythonVersion: '3.7'
   test:
     name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
     timeout-minutes: 30
