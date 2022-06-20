@@ -14,4 +14,4 @@ inputs:
     default: '3.7'
 runs:
   using: 'docker'
-  image: 'docker://otsam/otbuildy:${{ github.event.inputs.python-version }}-0.0.5'
+  image: 'docker://otsam/otbuildy:${{ event.inputs.python-version }}-0.0.5'
