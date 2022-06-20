@@ -10,6 +10,10 @@
 
 name: 'API docs build'
 
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     tags:
@@ -48,6 +52,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
+          target: 'docs'
       - name: 'set complex environment variables'
         uses: actions/github-script@v3.1
         with:
