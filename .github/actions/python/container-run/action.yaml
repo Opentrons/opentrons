@@ -10,8 +10,8 @@ inputs:
     default: 'setup'
   python-version:
     description: 'Which version of Python to use'
-    required: false
+    required: true
     default: '3.7'
 runs:
   using: 'docker'
-  image: 'docker://otsam/otbuildy:${{ python-version }}-0.0.5'
+  image: 'docker://otsam/otbuildy:${{ inputs.python-version }}-0.0.5'
