@@ -11,6 +11,5 @@ inputs:
 runs:
   using: 'docker'
   image: 'docker://otsam/otbuildy:3.7-0.0.5'
-  entrypoint: '/bin/bash -c'
   args:
     - ". /root/.bashrc && cd /opentrons && git fetch && git checkout ${GITHUB_SHA} && make -C ${INPUT_PROJECT} ${INPUT_TARGET}"
