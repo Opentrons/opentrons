@@ -4,7 +4,10 @@ import { Card } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
   ModuleType,
+  PipetteName,
+  getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
@@ -36,25 +39,36 @@ export function EditModulesCard(props: Props): JSX.Element {
 
   const magneticModuleOnDeck = modules[MAGNETIC_MODULE_TYPE]
   const temperatureModuleOnDeck = modules[TEMPERATURE_MODULE_TYPE]
+  const heaterShakerOnDeck = modules[HEATERSHAKER_MODULE_TYPE]
 
+  const crashablePipetteSelected = getIsCrashablePipetteSelected(
+    pipettesByMount
+  )
   const hasCrashableMagneticModule =
     magneticModuleOnDeck &&
     isModuleWithCollisionIssue(magneticModuleOnDeck.model)
   const hasCrashableTempModule =
     temperatureModuleOnDeck &&
     isModuleWithCollisionIssue(temperatureModuleOnDeck.model)
+  const isHeaterShakerOnDeck = Boolean(heaterShakerOnDeck)
+
+  const showTempPipetteCollisons =
+    crashablePipetteSelected && hasCrashableTempModule
+  const showMagPipetteCollisons =
+    crashablePipetteSelected && hasCrashableMagneticModule
 
   const moduleRestrictionsDisabled = Boolean(
     useSelector(featureFlagSelectors.getDisableModuleRestrictions)
   )
-  const crashablePipettesSelected = getIsCrashablePipetteSelected(
-    pipettesByMount
-  )
 
-  const warningsEnabled =
-    !moduleRestrictionsDisabled && crashablePipettesSelected
-  const showCrashInfoBox =
-    warningsEnabled && (hasCrashableMagneticModule || hasCrashableTempModule)
+  const showHeaterShakerPipetteCollisions =
+    isHeaterShakerOnDeck &&
+    [
+      getPipetteNameSpecs(pipettesByMount.left.pipetteName as PipetteName),
+      getPipetteNameSpecs(pipettesByMount.right.pipetteName as PipetteName),
+    ].some(pipetteSpecs => pipetteSpecs?.channels !== 1)
+
+  const warningsEnabled = !moduleRestrictionsDisabled
 
   const SUPPORTED_MODULE_TYPES_FILTERED = enableHeaterShaker
     ? SUPPORTED_MODULE_TYPES
@@ -65,10 +79,15 @@ export function EditModulesCard(props: Props): JSX.Element {
   return (
     <Card title="Modules">
       <div className={styles.modules_card_content}>
-        {showCrashInfoBox && (
+        {warningsEnabled && (
           <CrashInfoBox
-            magnetOnDeck={hasCrashableMagneticModule}
-            temperatureOnDeck={hasCrashableTempModule}
+            showMagPipetteCollisons={showMagPipetteCollisons}
+            showTempPipetteCollisons={showTempPipetteCollisons}
+            showHeaterShakerLabwareCollisions={isHeaterShakerOnDeck}
+            showHeaterShakerModuleCollisions={isHeaterShakerOnDeck}
+            showHeaterShakerPipetteCollisions={
+              showHeaterShakerPipetteCollisions
+            }
           />
         )}
         {SUPPORTED_MODULE_TYPES_FILTERED.map((moduleType, i) => {
