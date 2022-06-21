@@ -19,54 +19,49 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedExportFixture:
         '../../fixtures/protocol/6/preFlexGrandfatheredProtocolMigratedFromV1_0_0.json',
       unusedPipettes: false,
-      exportModalCopy:
-        'This protocol uses settings that can only run on app and robot server version 5.1 or higher',
       migrationModal: 'newLabwareDefs',
     },
-    // {
-    //   title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 5.2.x, schema 3',
-    //   importFixture: '../../fixtures/protocol/1/example_1_1_0.json',
-    //   expectedExportFixture:
-    //     '../../fixtures/protocol/5/example_1_1_0MigratedFromV1_0_0.json',
-    //   unusedPipettes: true,
-    //   exportModalCopy: null,
-    //   migrationModal: 'newLabwareDefs',
-    // },
+    {
+      title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 6.0.x, schema 6',
+      importFixture: '../../fixtures/protocol/1/example_1_1_0.json',
+      expectedExportFixture:
+        '../../fixtures/protocol/6/example_1_1_0MigratedFromV1_0_0.json',
+      unusedPipettes: true,
+      migrationModal: 'newLabwareDefs',
+    },
     {
       title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 6.0.x, schema 6',
       importFixture: '../../fixtures/protocol/4/doItAllV3.json',
-      expectedExportFixture: '../../fixtures/protocol/6/doItAllV3MigratedToV6.json',
+      expectedExportFixture:
+        '../../fixtures/protocol/6/doItAllV3MigratedToV6.json',
       unusedPipettes: false,
-      exportModalCopy: 'This protocol uses settings that can only run on app and robot server version 5.1 or higher',
       migrationModal: 'noBehaviorChange',
     },
-    // {
-    //   title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 5.2.x, schema 4',
-    //   importFixture: '../../fixtures/protocol/4/doItAllV4.json',
-    //   expectedExportFixture: '../../fixtures/protocol/5/doItAllV4.json',
-    //   unusedPipettes: false,
-    //   exportModalCopy:
-    //     'Robot requirements for running module inclusive JSON protocols',
-    //   migrationModal: 'noBehaviorChange',
-    // },
-    // {
-    //   title:
-    //     'doItAllV5 (schema 5, PD version 5.2.0) -> import and re-export should preserve data',
-    //   importFixture: '../../fixtures/protocol/5/doItAllV5.json',
-    //   expectedExportFixture: '../../fixtures/protocol/5/doItAllV5.json',
-    //   unusedPipettes: false,
-    //   exportModalCopy: 'server version 3.20 or higher',
-    //   migrationModal: null,
-    // },
-    // {
-    //   title:
-    //     'mix 5.0.x (schema 3, PD version 5.0.0) -> should migrate to 5.2.x',
-    //   importFixture: '../../fixtures/protocol/5/mix_5_0_x.json',
-    //   expectedExportFixture: '../../fixtures/protocol/5/mix_5_2_0.json',
-    //   unusedPipettes: false,
-    //   exportModalCopy: null,
-    //   migrationModal: 'noBehaviorChange',
-    // },
+    {
+      title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 6.0.x, schema 6',
+      importFixture: '../../fixtures/protocol/4/doItAllV4.json',
+      expectedExportFixture:
+        '../../fixtures/protocol/6/doItAllV4MigratedToV6.json',
+      unusedPipettes: false,
+      migrationModal: 'noBehaviorChange',
+    },
+    {
+      title:
+        'doItAllV6 (schema 6, PD version 6.0.0) -> import and re-export should preserve data',
+      importFixture: '../../fixtures/protocol/6/doItAllV4MigratedToV6.json',
+      expectedExportFixture:
+        '../../fixtures/protocol/6/doItAllV4MigratedToV6.json',
+      unusedPipettes: false,
+      migrationModal: null,
+    },
+    {
+      title:
+        'mix 5.0.x (schema 3, PD version 5.0.0) -> should migrate to 6.0.x, schema v6',
+      importFixture: '../../fixtures/protocol/5/mix_5_0_x.json',
+      expectedExportFixture: '../../fixtures/protocol/6/mix_6_0_0.json',
+      migrationModal: 'noBehaviorChange',
+      unusedPipettes: false,
+    },
   ]
 
   testCases.forEach(
@@ -75,7 +70,6 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       importFixture,
       expectedExportFixture,
       unusedPipettes,
-      exportModalCopy,
       migrationModal,
     }) => {
       it(title, () => {
@@ -133,10 +127,12 @@ describe('Protocol fixtures migrate and match snapshots', () => {
               .click()
           }
 
-          if (exportModalCopy) {
-            cy.get('div').contains(exportModalCopy).should('exist')
-            cy.get('button').contains('continue', { matchCase: false }).click()
-          }
+          cy.get('div')
+            .contains(
+              'This protocol uses settings that can only run on app and robot server version 5.1 or higher'
+            )
+            .should('exist')
+          cy.get('button').contains('continue', { matchCase: false }).click()
 
           cy.window()
             .its('__lastSavedFileBlob__')
