@@ -135,7 +135,7 @@ export function RobotOverview({
           ) : null}
         </Flex>
       </Box>
-      <Box position={POSITION_ABSOLUTE} top={SPACING.spacing2} right='-.75rem'>
+      <Box position={POSITION_ABSOLUTE} top={SPACING.spacing2} right="-.75rem">
         <RobotOverviewOverflowMenu robot={robot} />
       </Box>
     </Flex>
