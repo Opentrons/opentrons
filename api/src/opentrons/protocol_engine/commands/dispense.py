@@ -6,6 +6,7 @@ from typing_extensions import Literal
 from .pipetting_common import (
     PipetteIdMixin,
     VolumeMixin,
+    FlowRateMixin,
     WellLocationMixin,
     BaseLiquidHandlingResult,
 )
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
 DispenseCommandType = Literal["dispense"]
 
 
-class DispenseParams(PipetteIdMixin, VolumeMixin, WellLocationMixin):
+class DispenseParams(PipetteIdMixin, VolumeMixin, FlowRateMixin, WellLocationMixin):
     """Payload required to dispense to a specific well."""
 
     pass

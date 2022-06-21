@@ -6,6 +6,7 @@ from typing_extensions import Literal
 from .pipetting_common import (
     PipetteIdMixin,
     VolumeMixin,
+    FlowRateMixin,
     WellLocationMixin,
     BaseLiquidHandlingResult,
 )
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
 AspirateCommandType = Literal["aspirate"]
 
 
-class AspirateParams(PipetteIdMixin, VolumeMixin, WellLocationMixin):
+class AspirateParams(PipetteIdMixin, VolumeMixin, FlowRateMixin, WellLocationMixin):
     """Parameters required to aspirate from a specific well."""
 
     pass
