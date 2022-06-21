@@ -10,6 +10,7 @@ import {
   OVERFLOW_SCROLL,
   SIZE_6,
   SPACING_3,
+  COLORS,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
@@ -38,7 +39,7 @@ export function DeviceDetails(): JSX.Element | null {
         <Flex
           alignItems={ALIGN_CENTER}
           backgroundColor={C_WHITE}
-          border={`1px solid #e3e3e3`}
+          border={`1px solid ${COLORS.medGrey}`}
           borderRadius="3px"
           flexDirection={DIRECTION_COLUMN}
           marginBottom={SPACING_3}
