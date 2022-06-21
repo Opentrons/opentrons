@@ -144,7 +144,7 @@ describe('Desktop Navigation', () => {
         cy.get('button').contains('CONTINUE WITH EXPORT').click()
         // check that the robot stack version modal starts
         cy.contains(
-          'This protocol uses settings that can only run on app and robot server version 6.1 or higher'
+          'This protocol can only run on app and robot server version 6.1 or higher'
         ).should('exist')
       })
 
