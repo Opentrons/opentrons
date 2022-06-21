@@ -28,8 +28,6 @@ const SECONDARY_LINK_STYLE = css`
   }
 `
 
-// const ACCORDION_STYLE = css``
-
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
   'https://support.opentrons.com/s/ot2-get-started'
 

@@ -139,7 +139,6 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
         as="h6"
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         color={COLORS.darkGreyEnabled}
-        // marginBottom={SPACING.spacing1}
         marginBottom={SPACING.spacing2}
       >
         {t('modules')}
