@@ -140,22 +140,27 @@ class MotionView:
         self,
         origin: Point,
         dest: Point,
-        direct: bool,
         max_travel_z: float,
+        direct: bool,
+        additional_min_travel_z: Optional[float],
     ) -> List[Waypoint]:
-        """
+        """Calculate waypoints to a destination that's specified as deck coordinates.
+
         Args:
             origin: The start point of the movement.
-                This is the bottom of the pipette's back-most tip if a tip is attached,
-                or the bottom of the pipette's back-most nozzle if not.
             dest: The end point of the movement.
-                See `origin` for where this point is on the pipette.
-            direct: If True, move directly.  If False, move in an arc.
-            max_travel_z: How high, in deck coords, the pipette can go with whatever
-                tip it currently has attached.
-            min_travel_z: Ignored if `direct` is False.
+            max_travel_z: How high, in deck coordinates, the pipette can go.
+                This should be measured at the bottom of whatever tip is currently
+                attached (if any).
+            direct: If True, move directly. If False, move in an arc.
+            additional_min_travel_z: The minimum height to clear, if moving in an arc.
+                Ignored if `direct` is True. If lower than the default height,
+                the default is used; this can only increase the height, not decrease it.
         """
         all_labware_highest_z = self._geometry.get_all_labware_highest_z()
+        if additional_min_travel_z is None:
+            additional_min_travel_z = float("-inf")
+        min_travel_z = max(all_labware_highest_z, additional_min_travel_z)
 
         move_type = MoveType.DIRECT if direct else MoveType.GENERAL_ARC
 
@@ -163,17 +168,9 @@ class MotionView:
             return get_waypoints(
                 origin=origin,
                 dest=dest,
-                min_travel_z=all_labware_highest_z,
+                min_travel_z=min_travel_z,
                 max_travel_z=max_travel_z,
                 move_type=move_type,
-                # Planning waypoints with a None origin and destination critical point means
-                # each output waypoint will have None as its critical point.
-                # When those waypoints get passed to the hardware API to move, the hardware
-                # API will treat None as "use the pipette's current critical point",
-                # which will be the backmost tip or nozzle.
-                #
-                # Rely on the hardware API having the same idea of the pipette's current tip
-                # as the caller of this function.
                 origin_cp=None,
                 dest_cp=None,
             )

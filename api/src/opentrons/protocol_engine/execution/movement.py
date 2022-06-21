@@ -117,41 +117,6 @@ class MovementHandler:
                 critical_point=waypoint.critical_point,
             )
 
-    async def move_to_coordinates(
-        self,
-        pipette_id: str,
-        deck_coordinates: DeckPoint,
-        # TODO: Allow overriding minimum Z height
-        direct: bool,
-    ) -> None:
-        hw_mount = self._state_store.pipettes.get(
-            pipette_id=pipette_id
-        ).mount.to_hw_mount()
-
-        origin = await self._hardware_api.gantry_position(
-            mount=hw_mount,
-            # To match contract of get_movement_waypoints_to_coords().
-            critical_point=None,
-        )
-
-        max_travel_z = self._hardware_api.get_instrument_max_height(mount=hw_mount)
-
-        waypoints = self._state_store.motion.get_movement_waypoints_to_coords(
-            origin=origin,
-            dest=Point(
-                x=deck_coordinates.x, y=deck_coordinates.y, z=deck_coordinates.z
-            ),
-            direct=direct,
-            max_travel_z=max_travel_z,
-        )
-
-        for waypoint in waypoints:
-            await self._hardware_api.move_to(
-                mount=hw_mount,
-                abs_position=waypoint.position,
-                critical_point=waypoint.critical_point,
-            )
-
     async def move_relative(
         self,
         pipette_id: str,
