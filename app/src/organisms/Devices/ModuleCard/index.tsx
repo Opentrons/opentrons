@@ -218,8 +218,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         backgroundColor={COLORS.background}
         borderRadius={SPACING.spacing2}
         marginBottom={SPACING.spacing3}
-        marginLeft={SPACING.spacing2}
-        marginRight={SPACING.spacing2}
         width={'100%'}
         data-testid={`ModuleCard_${module.serialNumber}`}
       >

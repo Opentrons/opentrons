@@ -109,8 +109,9 @@ export function PipettesAndModules({
                 return (
                   <Flex
                     flex="1"
-                    maxWidth="50%"
+                    marginRight={SPACING.spacing3}
                     key={`moduleCard_${module.moduleType}_${index}`}
+                    width={`calc(50% - ${SPACING.spacing2})`}
                   >
                     <ModuleCard module={module} robotName={robotName} />
                   </Flex>

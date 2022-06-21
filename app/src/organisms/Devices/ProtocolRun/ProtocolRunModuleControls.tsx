@@ -80,6 +80,7 @@ export const ProtocolRunModuleControls = ({
         return (
           <Flex
             marginTop={SPACING.spacing3}
+            marginX={SPACING.spacing2}
             key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
           >
             {module.attachedModuleMatch != null ? (
