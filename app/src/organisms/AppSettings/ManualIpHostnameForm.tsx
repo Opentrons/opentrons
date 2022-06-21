@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useFormik } from 'formik'
 import styled from 'styled-components'
+
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -11,6 +12,7 @@ import {
   Text,
   COLORS,
 } from '@opentrons/components'
+
 import { TertiaryButton } from '../../atoms/buttons'
 import { addManualIp } from '../../redux/config'
 import { startDiscovery } from '../../redux/discovery'
@@ -21,7 +23,7 @@ interface FormikErrors {
   ip?: string
 }
 
-interface Props {
+interface ManualIpHostnameFormProps {
   setMostRecentAddition: (ip: string) => void
 }
 
@@ -40,7 +42,9 @@ const StyledInput = styled.input`
   border: 1px solid ${COLORS.medGrey};
 `
 
-export function ManualIpHostnameForm(props: Props): JSX.Element {
+export function ManualIpHostnameForm({
+  setMostRecentAddition,
+}: ManualIpHostnameFormProps): JSX.Element {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const addManualIpAndHostname = (ip: string): void => {
@@ -56,7 +60,7 @@ export function ManualIpHostnameForm(props: Props): JSX.Element {
       const inputForm = document.getElementById('ip')
       if (inputForm) inputForm.style.border = `1px solid ${COLORS.medGrey}`
       addManualIpAndHostname(ip)
-      props.setMostRecentAddition(ip)
+      setMostRecentAddition(ip)
       resetForm({ values: undefined })
     },
     validate: values => {

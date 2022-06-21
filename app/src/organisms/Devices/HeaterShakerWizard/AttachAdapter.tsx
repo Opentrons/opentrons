@@ -17,7 +17,7 @@ import screwInAdapter from '@opentrons/app/src/assets/images/heater_shaker_adapt
 import heaterShakerAdapterAlignment from '@opentrons/app/src/assets/images/heater_shaker_adapter_alignment.png'
 import { TertiaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
-import { useLatchControls } from '../ModuleCard/hooks'
+import { useLatchControls } from '../../ModuleCard/hooks'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 
