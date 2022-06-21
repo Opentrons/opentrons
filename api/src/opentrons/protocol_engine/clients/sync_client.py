@@ -127,8 +127,8 @@ class SyncClient:
                 wellName=well_name,
                 wellLocation=well_location,
                 volume=volume,
-                # TODO need to figure out how to transform rate into flowRate when called from pipette context
-                flowRate=6.789,
+                # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
+                flowRate=2.0,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -151,8 +151,8 @@ class SyncClient:
                 wellName=well_name,
                 wellLocation=well_location,
                 volume=volume,
-                # TODO need to figure out how to transform rate into flowRate when called from pipette context
-                flowRate=6.789,
+                # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
+                flowRate=2.0,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -172,6 +172,8 @@ class SyncClient:
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
+                # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
+                flowRate=2.0,
             )
         )
         result = self._transport.execute_command(request=request)
