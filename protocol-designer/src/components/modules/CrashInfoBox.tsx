@@ -18,7 +18,6 @@ type TempMagCollisonProps = Pick<
   Props,
   'showMagPipetteCollisons' | 'showTempPipetteCollisons'
 >
-// type HeaterShakerCollisonProps = Pick<Props, 'heaterShakerOnDeck'>
 
 const HeaterShakerPipetteCollisions = (): JSX.Element | null => {
   return (
