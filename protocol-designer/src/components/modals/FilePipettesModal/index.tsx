@@ -16,7 +16,6 @@ import {
   FormGroup,
   InputField,
   OutlineButton,
-  Flex,
 } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_V1,
@@ -267,6 +266,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     const { showProtocolFields, moduleRestrictionsDisabled } = this.props
 
     return (
+      <React.Fragment>
         <Modal
           contentsClassName={cx(
             styles.new_file_modal_contents,
@@ -423,6 +423,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
             </div>
           </div>
         </Modal>
+      </React.Fragment>
     )
   }
 }
