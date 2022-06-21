@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { mountWithStore, renderWithProviders } from '@opentrons/components'
+import { mountWithStore } from '@opentrons/components'
 import * as Buildroot from '../../../../../redux/buildroot'
 
 import { DownloadUpdateModal } from '../DownloadUpdateModal'
@@ -51,7 +51,6 @@ describe('ViewUpdateModal', () => {
       { initialState: MOCK_STATE }
     )
   }
-  renderWithProviders
   beforeEach(() => {
     getBuildrootUpdateInfo.mockReturnValue(null)
     getBuildrootDownloadProgress.mockReturnValue(50)

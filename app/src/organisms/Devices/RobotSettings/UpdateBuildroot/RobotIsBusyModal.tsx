@@ -7,13 +7,13 @@ import {
   JUSTIFY_FLEX_END,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
-  Text,
   TYPOGRAPHY,
   ALIGN_CENTER,
   Btn,
 } from '@opentrons/components'
 import { Modal } from '../../../../atoms/Modal'
 import { PrimaryButton } from '../../../../atoms/buttons'
+import { StyledText } from '../../../../atoms/text'
 
 interface RobotIsBusyModalProps {
   closeModal: () => void
@@ -33,12 +33,7 @@ export function RobotIsBusyModal({
           t={t}
           i18nKey="this_robot_will_restart_with_update"
           components={{
-            block: (
-              <Text
-                fontSize={TYPOGRAPHY.fontSizeP}
-                marginBottom={SPACING.spacing2}
-              />
-            ),
+            block: <StyledText as="p" marginBottom={SPACING.spacing2} />,
           }}
         />
         <Flex
