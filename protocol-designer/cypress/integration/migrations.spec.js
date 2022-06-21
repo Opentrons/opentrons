@@ -129,7 +129,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
 
           cy.get('div')
             .contains(
-              'This protocol uses settings that can only run on app and robot server version 5.1 or higher'
+              'This protocol can only run on app and robot server version 6.1 or higher'
             )
             .should('exist')
           cy.get('button').contains('continue', { matchCase: false }).click()
