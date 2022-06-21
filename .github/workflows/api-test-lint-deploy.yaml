@@ -52,7 +52,7 @@ jobs:
         - uses: './.github/actions/python/run-37-container'
           with:
             project: 'api'
-            target: 'setup lint'
+            target: 'lint'
   test:
     name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
     timeout-minutes: 30
