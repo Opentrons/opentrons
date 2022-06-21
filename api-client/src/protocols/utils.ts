@@ -103,7 +103,7 @@ export function parseAllRequiredModuleModelsById(
   )
 }
 
-export interface LoadedLabwareBySlot {
+interface LoadedLabwareBySlot {
   [slotName: string]: LoadLabwareRunTimeCommand
 }
 export function parseInitialLoadedLabwareBySlot(
