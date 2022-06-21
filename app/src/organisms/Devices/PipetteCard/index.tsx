@@ -141,183 +141,168 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   }
 
   return (
-    <>
-      {isFetching ? null : (
-        <Flex
-          backgroundColor={COLORS.background}
-          borderRadius={BORDERS.radiusSoftCorners}
-          marginBottom={SPACING.spacing3}
-          marginX={SPACING.spacing2}
-          width={'100%'}
-          data-testid={`PipetteCard_${pipetteName}`}
-        >
-          {showChangePipette && (
-            <ChangePipette
-              robotName={robotName}
-              mount={mount}
-              closeModal={() => setChangePipette(false)}
-            />
-          )}
-          {showSlideout && pipetteInfo != null && pipetteId != null && (
-            <PipetteSettingsSlideout
-              robotName={robotName}
-              pipetteName={pipetteInfo.displayName}
-              onCloseClick={() => setShowSlideout(false)}
-              isExpanded={true}
-              pipetteId={pipetteId}
-            />
-          )}
-          {PipetteOffsetCalibrationWizard}
-          {showAboutSlideout && pipetteInfo != null && pipetteId != null && (
-            <AboutPipetteSlideout
-              pipetteId={pipetteId}
-              pipetteName={pipetteInfo.displayName}
-              onCloseClick={() => setShowAboutSlideout(false)}
-              isExpanded={true}
-            />
-          )}
-          {showCalBlockModal && (
-            <Portal level="top">
-              <AskForCalibrationBlockModal
-                onResponse={hasBlockModalResponse => {
-                  startPipetteOffsetCalibrationBlockModal(hasBlockModalResponse)
-                }}
-                titleBarTitle={t('protocol_setup:pipette_offset_cal')}
-                closePrompt={() => setShowCalBlockModal(false)}
-              />
-            </Portal>
-          )}
-          <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">
-            <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
-              <Flex alignItems={ALIGN_START}>
-                {pipetteInfo === null ? null : (
-                  <InstrumentDiagram
-                    pipetteSpecs={pipetteInfo}
-                    mount={mount}
-                    transform="scale(0.3)"
-                    size="3.125rem"
-                    transformOrigin="20% -10%"
-                  />
-                )}
-              </Flex>
-              <Flex
-                flexDirection={DIRECTION_COLUMN}
-                paddingLeft={SPACING.spacing3}
-              >
-                {!isDeckCalibrated &&
-                pipetteOffsetCalibration == null &&
-                pipetteInfo != null &&
-                showBanner &&
-                !isFetching ? (
-                  <Flex paddingBottom={SPACING.spacing2}>
-                    <Banner
-                      type="error"
-                      onCloseClick={() => setShowBanner(false)}
-                    >
-                      {t('deck_cal_missing')}
-                    </Banner>
-                  </Flex>
-                ) : null}
-                {isDeckCalibrated &&
-                pipetteOffsetCalibration == null &&
-                pipetteInfo != null &&
-                showBanner &&
-                !isFetching ? (
-                  <Flex paddingBottom={SPACING.spacing2}>
-                    <Banner
-                      type="error"
-                      onCloseClick={() => setShowBanner(false)}
-                    >
-                      <Flex flexDirection={DIRECTION_COLUMN}>
-                        {t('pipette_offset_calibration_needed')}
-                        <Btn
-                          textAlign={ALIGN_START}
-                          fontSize={TYPOGRAPHY.fontSizeP}
-                          textDecoration={TEXT_DECORATION_UNDERLINE}
-                          onClick={handleCalibrate}
-                        >
-                          {t('calibrate_now')}
-                        </Btn>
-                      </Flex>
-                    </Banner>
-                  </Flex>
-                ) : null}
-                {isDeckCalibrated && badCalibration && showBanner ? (
-                  <Flex paddingBottom={SPACING.spacing2}>
-                    <Banner
-                      type="warning"
-                      onCloseClick={() => setShowBanner(false)}
-                    >
-                      <Flex flexDirection={DIRECTION_COLUMN}>
-                        {t('pipette_cal_recommended')}
-                        <Btn
-                          textAlign={ALIGN_START}
-                          fontSize={TYPOGRAPHY.fontSizeP}
-                          textDecoration={TEXT_DECORATION_UNDERLINE}
-                          onClick={handleCalibrate}
-                        >
-                          {t('recalibrate_now')}
-                        </Btn>
-                      </Flex>
-                    </Banner>
-                  </Flex>
-                ) : null}
-                <StyledText
-                  textTransform={TEXT_TRANSFORM_UPPERCASE}
-                  color={COLORS.darkGrey}
-                  fontWeight={FONT_WEIGHT_REGULAR}
-                  fontSize={FONT_SIZE_CAPTION}
-                  paddingBottom={SPACING.spacing2}
-                  data-testid={`PipetteCard_mount_${pipetteName}`}
-                >
-                  {t('mount', {
-                    side: mount === LEFT ? t('left') : t('right'),
-                  })}
-                </StyledText>
-                <Flex
-                  paddingBottom={SPACING.spacing2}
-                  data-testid={`PipetteCard_display_name_${pipetteName}`}
-                >
-                  <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
-                    {pipetteName ?? t('empty')}
-                  </StyledText>
-                </Flex>
-              </Flex>
-            </Flex>
-          </Box>
-          <Box
-            alignSelf={ALIGN_START}
-            padding={SPACING.spacing2}
-            data-testid={`PipetteCard_overflow_btn_${pipetteName}`}
-          >
-            <OverflowBtn
-              aria-label="overflow"
-              onClick={() => {
-                setShowOverflowMenu(
-                  prevShowOverflowMenu => !prevShowOverflowMenu
-                )
-              }}
-            />
-          </Box>
-          {showOverflowMenu && (
-            <Box
-              ref={pipetteOverflowWrapperRef}
-              data-testid={`PipetteCard_overflow_menu_${pipetteName}`}
-              onClick={() => setShowOverflowMenu(false)}
-            >
-              <PipetteOverflowMenu
-                pipetteName={pipetteName ?? t('empty')}
-                mount={mount}
-                handleChangePipette={handleChangePipette}
-                handleCalibrate={handleCalibrate}
-                handleSettingsSlideout={handleSettingsSlideout}
-                handleAboutSlideout={handleAboutSlideout}
-                isPipetteCalibrated={pipetteOffsetCalibration != null}
-              />
-            </Box>
-          )}
-        </Flex>
+    <Flex
+      backgroundColor={COLORS.background}
+      borderRadius={BORDERS.radiusSoftCorners}
+      marginBottom={SPACING.spacing3}
+      marginX={SPACING.spacing2}
+      width={'100%'}
+      data-testid={`PipetteCard_${pipetteName}`}
+    >
+      {showChangePipette && (
+        <ChangePipette
+          robotName={robotName}
+          mount={mount}
+          closeModal={() => setChangePipette(false)}
+        />
       )}
-    </>
+      {showSlideout && pipetteInfo != null && pipetteId != null && (
+        <PipetteSettingsSlideout
+          robotName={robotName}
+          pipetteName={pipetteInfo.displayName}
+          onCloseClick={() => setShowSlideout(false)}
+          isExpanded={true}
+          pipetteId={pipetteId}
+        />
+      )}
+      {PipetteOffsetCalibrationWizard}
+      {showAboutSlideout && pipetteInfo != null && pipetteId != null && (
+        <AboutPipetteSlideout
+          pipetteId={pipetteId}
+          pipetteName={pipetteInfo.displayName}
+          onCloseClick={() => setShowAboutSlideout(false)}
+          isExpanded={true}
+        />
+      )}
+      {showCalBlockModal && (
+        <Portal level="top">
+          <AskForCalibrationBlockModal
+            onResponse={hasBlockModalResponse => {
+              startPipetteOffsetCalibrationBlockModal(hasBlockModalResponse)
+            }}
+            titleBarTitle={t('protocol_setup:pipette_offset_cal')}
+            closePrompt={() => setShowCalBlockModal(false)}
+          />
+        </Portal>
+      )}
+      <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">
+        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
+          <Flex alignItems={ALIGN_START}>
+            {pipetteInfo === null ? null : (
+              <InstrumentDiagram
+                pipetteSpecs={pipetteInfo}
+                mount={mount}
+                transform="scale(0.3)"
+                size="3.125rem"
+                transformOrigin="20% -10%"
+              />
+            )}
+          </Flex>
+          <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
+            {!isDeckCalibrated &&
+            pipetteOffsetCalibration == null &&
+            pipetteInfo != null &&
+            showBanner &&
+            !isFetching ? (
+              <Flex paddingBottom={SPACING.spacing2}>
+                <Banner type="error" onCloseClick={() => setShowBanner(false)}>
+                  {t('deck_cal_missing')}
+                </Banner>
+              </Flex>
+            ) : null}
+            {isDeckCalibrated &&
+            pipetteOffsetCalibration == null &&
+            pipetteInfo != null &&
+            showBanner &&
+            !isFetching ? (
+              <Flex paddingBottom={SPACING.spacing2}>
+                <Banner type="error" onCloseClick={() => setShowBanner(false)}>
+                  <Flex flexDirection={DIRECTION_COLUMN}>
+                    {t('pipette_offset_calibration_needed')}
+                    <Btn
+                      textAlign={ALIGN_START}
+                      fontSize={TYPOGRAPHY.fontSizeP}
+                      textDecoration={TEXT_DECORATION_UNDERLINE}
+                      onClick={handleCalibrate}
+                    >
+                      {t('calibrate_now')}
+                    </Btn>
+                  </Flex>
+                </Banner>
+              </Flex>
+            ) : null}
+            {isDeckCalibrated && badCalibration && showBanner ? (
+              <Flex paddingBottom={SPACING.spacing2}>
+                <Banner
+                  type="warning"
+                  onCloseClick={() => setShowBanner(false)}
+                >
+                  <Flex flexDirection={DIRECTION_COLUMN}>
+                    {t('pipette_cal_recommended')}
+                    <Btn
+                      textAlign={ALIGN_START}
+                      fontSize={TYPOGRAPHY.fontSizeP}
+                      textDecoration={TEXT_DECORATION_UNDERLINE}
+                      onClick={handleCalibrate}
+                    >
+                      {t('recalibrate_now')}
+                    </Btn>
+                  </Flex>
+                </Banner>
+              </Flex>
+            ) : null}
+            <StyledText
+              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              color={COLORS.darkGrey}
+              fontWeight={FONT_WEIGHT_REGULAR}
+              fontSize={FONT_SIZE_CAPTION}
+              paddingBottom={SPACING.spacing2}
+              data-testid={`PipetteCard_mount_${pipetteName}`}
+            >
+              {t('mount', {
+                side: mount === LEFT ? t('left') : t('right'),
+              })}
+            </StyledText>
+            <Flex
+              paddingBottom={SPACING.spacing2}
+              data-testid={`PipetteCard_display_name_${pipetteName}`}
+            >
+              <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
+                {pipetteName ?? t('empty')}
+              </StyledText>
+            </Flex>
+          </Flex>
+        </Flex>
+      </Box>
+      <Box
+        alignSelf={ALIGN_START}
+        padding={SPACING.spacing2}
+        data-testid={`PipetteCard_overflow_btn_${pipetteName}`}
+      >
+        <OverflowBtn
+          aria-label="overflow"
+          onClick={() => {
+            setShowOverflowMenu(prevShowOverflowMenu => !prevShowOverflowMenu)
+          }}
+        />
+      </Box>
+      {showOverflowMenu && (
+        <Box
+          ref={pipetteOverflowWrapperRef}
+          data-testid={`PipetteCard_overflow_menu_${pipetteName}`}
+          onClick={() => setShowOverflowMenu(false)}
+        >
+          <PipetteOverflowMenu
+            pipetteName={pipetteName ?? t('empty')}
+            mount={mount}
+            handleChangePipette={handleChangePipette}
+            handleCalibrate={handleCalibrate}
+            handleSettingsSlideout={handleSettingsSlideout}
+            handleAboutSlideout={handleAboutSlideout}
+            isPipetteCalibrated={pipetteOffsetCalibration != null}
+          />
+        </Box>
+      )}
+    </Flex>
   )
 }
