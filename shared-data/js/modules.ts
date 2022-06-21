@@ -46,7 +46,7 @@ export const getModuleDef2 = (moduleModel: ModuleModel): ModuleDefinition => {
       return thermocyclerModuleV1 as ModuleDefinition
 
     case THERMOCYCLER_MODULE_V2:
-        return (thermocyclerModuleV2 as unknown) as ModuleDefinition
+      return (thermocyclerModuleV2 as unknown) as ModuleDefinition
 
     case HEATERSHAKER_MODULE_V1:
       return (heaterShakerModuleV1 as unknown) as ModuleDefinition
