@@ -53,7 +53,7 @@ export function RenameRobotSlideout({
   const dispatch = useDispatch<Dispatch>()
 
   const currentRobotName = useRobotName()
-  console.log('currentRobotName', currentRobotName)
+  console.log('currentRobotName', currentRobotName.data)
 
   const formik = useFormik({
     initialValues: {
@@ -82,7 +82,8 @@ export function RenameRobotSlideout({
       // data.name != null && history.push(`/devices/${data.name}/robot-settings`)
       // TODO kj: this is a temporary fix to avoid Download logs button disabled issue
       // Once fix react tree rendering issue, the push direction will be switched to robot-settings
-      data.name != null && history.push(`/devices/${data.name}`)
+      console.log('renamed robot', currentRobotName.data)
+      data.name != null && history.push(`/devices`)
     },
     onError: (error: Error) => {
       // TODO kj 5/25/2022: when a user lost connection while the user is renaming a robot,
