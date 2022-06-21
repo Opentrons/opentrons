@@ -19,6 +19,9 @@ from numpy import array, dot
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
 )
+from opentrons.hardware_control.modules.types import SpeedStatus
+from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
+
 from opentrons.types import DeckSlotName
 
 from ..types import (
@@ -182,6 +185,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         elif ModuleModel.is_heater_shaker_module_model(model):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
+                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
+                speed_status=SpeedStatus.IDLE,
                 plate_target_temperature=None,
             )
         elif ModuleModel.is_temperature_module_model(model):
@@ -203,18 +208,27 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         ],
     ) -> None:
         module_id = command.params.moduleId
+        hs_substate = self._state.substate_by_module_id[module_id]
         assert isinstance(
             self._state.substate_by_module_id[module_id], HeaterShakerModuleSubState
         ), f"{module_id} is not heater-shaker."
 
+        # Get current values to preserve target temperature not being set/deactivated
+        latch_status = hs_substate.labware_latch_status
+        speed_status = hs_substate.speed_status
+
         if isinstance(command.result, heater_shaker.SetTargetTemperatureResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
+                labware_latch_status=latch_status,
+                speed_status=speed_status,
                 plate_target_temperature=command.params.celsius,
             )
         elif isinstance(command.result, heater_shaker.DeactivateHeaterResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
+                labware_latch_status=latch_status,
+                speed_status=speed_status,
                 plate_target_temperature=None,
             )
 

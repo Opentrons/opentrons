@@ -153,6 +153,10 @@ class InvalidTargetSpeedError(ProtocolEngineError):
     """An error raised when attempting to set an invalid target speed."""
 
 
+class CannotPerformModuleAction(ProtocolEngineError):
+    """An error raised when trying to perform an illegal hardware module action."""
+
+
 class ProtocolCommandFailedError(ProtocolEngineError):
     """An error raised if a fatal command execution error has occurred.
 

@@ -33,6 +33,9 @@ from opentrons.protocol_engine.state.module_substates import (
     ModuleSubStateType,
 )
 
+from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
+from opentrons.hardware_control.modules.types import SpeedStatus
+
 
 def test_initial_state() -> None:
     """It should initialize the module state."""
@@ -61,6 +64,8 @@ def test_initial_state() -> None:
             ModuleModel.HEATER_SHAKER_MODULE_V1,
             HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
+                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
+                speed_status=SpeedStatus.IDLE,
                 plate_target_temperature=None,
             ),
         ),
@@ -133,6 +138,8 @@ def test_load_module(
             lazy_fixture("heater_shaker_v1_def"),
             HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
+                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
+                speed_status=SpeedStatus.IDLE,
                 plate_target_temperature=None,
             ),
         ),
@@ -207,13 +214,19 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
     subject.handle_action(actions.UpdateCommandAction(command=set_temp_cmd))
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
-            module_id=HeaterShakerModuleId("module-id"), plate_target_temperature=42
+            module_id=HeaterShakerModuleId("module-id"),
+            labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
+            speed_status=SpeedStatus.IDLE,
+            plate_target_temperature=42
         )
     }
     subject.handle_action(actions.UpdateCommandAction(command=deactivate_cmd))
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
-            module_id=HeaterShakerModuleId("module-id"), plate_target_temperature=None
+            module_id=HeaterShakerModuleId("module-id"),
+            labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
+            speed_status=SpeedStatus.IDLE,
+            plate_target_temperature=None
         )
     }
 

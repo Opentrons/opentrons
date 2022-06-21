@@ -7,7 +7,11 @@ from opentrons.protocol_engine.errors import (
     InvalidTargetTemperatureError,
     InvalidTargetSpeedError,
     NoTargetTemperatureSetError,
+    CannotPerformModuleAction
 )
+
+from opentrons.hardware_control.modules.types import SpeedStatus
+from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 
 HeaterShakerModuleId = NewType("HeaterShakerModuleId", str)
 
@@ -26,6 +30,8 @@ class HeaterShakerModuleSubState:
     """
 
     module_id: HeaterShakerModuleId
+    labware_latch_status: HeaterShakerLabwareLatchStatus
+    speed_status: SpeedStatus
     plate_target_temperature: Optional[float]
 
     def get_plate_target_temperature(self) -> float:
@@ -63,4 +69,19 @@ class HeaterShakerModuleSubState:
             raise InvalidTargetSpeedError(
                 f"Heater-Shaker got invalid speed of {rpm}RPM. Valid range is "
                 f"{HEATER_SHAKER_SPEED_RANGE}."
+            )
+
+    def raise_if_labware_latch_not_closed(self) -> None:
+        """Raise an error if labware is not latched on the heater-shaker."""
+        if self.labware_latch_status != HeaterShakerLabwareLatchStatus.IDLE_CLOSED:
+            raise CannotPerformModuleAction(
+                f"Cannot perform the module action when labware latch open or in error."
+                f" Current latch status is: {self.labware_latch_status.value}")
+
+    def raise_if_shaking(self) -> None:
+        """Raise an error if the heater-shaker is currently shaking."""
+        if self.speed_status != SpeedStatus.IDLE:
+            raise CannotPerformModuleAction(
+                f"Cannot perform the module action when module is shaking or in error."
+                f" Current latch status is: {self.speed_status.value}"
             )

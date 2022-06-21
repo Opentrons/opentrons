@@ -49,5 +49,6 @@ async def test_set_and_wait_for_shake_speed(
     ).then_return(hs_hardware)
 
     result = await subject.execute(data)
+    decoy.verify(hs_module_substate.raise_if_labware_latch_not_closed(), times=1)
     decoy.verify(await hs_hardware.set_speed(rpm=1234), times=1)
     assert result == heater_shaker.SetAndWaitForShakeSpeedResult()
