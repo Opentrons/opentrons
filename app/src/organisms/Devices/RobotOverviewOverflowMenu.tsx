@@ -8,7 +8,6 @@ import {
   Flex,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  SPACING,
   useMountEffect,
 } from '@opentrons/components'
 import { checkShellUpdate } from '../../redux/shell'
