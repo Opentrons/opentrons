@@ -204,6 +204,7 @@ stages:
                   'y': 0
                   z: 2
               volume: 5
+              flowRate: 3
           - id: !anystr
             key: !anystr
             commandType: dispense
@@ -220,6 +221,7 @@ stages:
                   'y': 0
                   z: 1
               volume: 4.5
+              flowRate: 2.5
           - id: !anystr
             key: !anystr
             commandType: moveToWell
@@ -447,6 +449,7 @@ stages:
                   'y': 0
                   z: 2
               volume: 5
+              flowRate: 3
           - id: !anystr
             key: !anystr
             commandType: dispense
@@ -465,6 +468,7 @@ stages:
                   'y': 0
                   z: 1
               volume: 4.5
+              flowRate: 2.5
           - id: !anystr
             key: !anystr
             commandType: moveToWell
