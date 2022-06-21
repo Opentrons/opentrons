@@ -13,8 +13,9 @@ stages:
     response:
       strict:
         - json:off
-      save:
-        json:
-          protocol_id: data.id
-          analysis_id: data.analysisSummaries[0].id
       status_code: 422
+      json:
+        errors:
+          - id: ProtocolFilesInvalid
+            title: Protocol File(s) Invalid
+            detail: "API version 2.1000 is not supported by this robot software. Please either reduce your requested API version or update your robot."
