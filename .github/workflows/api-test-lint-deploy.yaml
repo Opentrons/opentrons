@@ -93,11 +93,7 @@ jobs:
         with:
           project: 'api'
           python-version: ${{ matrix.python }}
-      - if: ${{ matrix.with-ot-hardware == 'false' }}
-        name: Remove OT-3 hardware package
-        run: make -C api setup-ot2
-        env:
-          OT_VIRTUALENV_VERSION: ${{ matrix.python }}
+          make-setup-recipe: ${{ matrix.with-ot-hardware && 'setup' || 'setup-ot2'}}
       - if: ${{ matrix.with-ot-hardware == 'false' }}
         name: Test without opentrons_hardware
         run: make -C api test-ot2

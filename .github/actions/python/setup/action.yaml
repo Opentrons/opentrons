@@ -7,6 +7,10 @@ inputs:
   python-version:
     description: "What Python version to use to create the project's virtual environment"
     required: false
+  make-setup-recipe:
+    description: "For overriding the default `make setup` command with a custom setup recipe"
+    required: false
+    default: "setup"
 runs:
   using: 'composite'
   steps:
@@ -21,4 +25,4 @@ runs:
         npm install --global shx@0.3.3
         pip install pipenv==2021.5.29
     - shell: bash
-      run: 'make -C ${{ inputs.project }} setup OT_VIRTUALENV_VERSION=${{ inputs.python-version }}'
+      run: 'make -C ${{ inputs.project }} ${{ inputs.make-setup-recipe }} OT_VIRTUALENV_VERSION=${{ inputs.python-version }}'
