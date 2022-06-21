@@ -7,6 +7,8 @@ from enum import Enum
 from typing_extensions import Literal
 
 
+GripperName = Literal["gripper"]
+
 ConfigUnit = Literal[
     "amps",
     "percentage",  # Duty cycle
