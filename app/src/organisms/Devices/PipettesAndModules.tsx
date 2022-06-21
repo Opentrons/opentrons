@@ -102,7 +102,7 @@ export function PipettesAndModules({
               justifyContent={JUSTIFY_START}
               flexDirection={DIRECTION_COLUMN}
               flexWrap={WRAP}
-              maxHeight="27rem"
+              maxHeight={attachedModules.length <= 3 ? '27rem ' : '34rem'}
             >
               {attachedModules.map((module, index) => {
                 return (
