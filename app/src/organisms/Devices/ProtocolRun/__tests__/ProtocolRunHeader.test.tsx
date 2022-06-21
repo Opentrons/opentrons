@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import '@testing-library/jest-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import {
   RUN_STATUS_IDLE,
@@ -54,6 +54,7 @@ import {
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
+  useIsRobotViewable,
 } from '../../hooks'
 import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
@@ -150,6 +151,9 @@ const mockConfirmAttachmentModal = ConfirmAttachmentModal as jest.MockedFunction
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
+const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
+  typeof useIsRobotViewable
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -225,6 +229,7 @@ describe('ProtocolRunHeader', () => {
       },
     } as any)
     mockGetIsHeaterShakerAttached.mockReturnValue(false)
+    mockUseIsRobotViewable.mockReturnValue(true)
     mockConfirmAttachmentModal.mockReturnValue(
       <div>mock confirm attachment modal</div>
     )
@@ -660,5 +665,11 @@ describe('ProtocolRunHeader', () => {
       })
     const [{ getByText }] = render()
     getByText('Protocol analysis failed.')
+  })
+  it('renders the devices page when robot is not viewable but protocol is loaded', async () => {
+    mockUseIsRobotViewable.mockReturnValue(false)
+    waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/devices')
+    })
   })
 })
