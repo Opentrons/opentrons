@@ -50,6 +50,7 @@ export function useProtocolDetails(): ProtocolDetails {
   return { displayName, protocolData }
 }
 
+// TODO(mc, 2022-06-21): this hook is not unit tested
 export function useTimeElapsedSincePause(): string | null {
   const runRecord = useCurrentRun()
   const now = useNow()
@@ -58,7 +59,7 @@ export function useTimeElapsedSincePause(): string | null {
     runRecord?.data &&
     ['paused', 'pause-requested'].includes(runRecord?.data.status) &&
     mostRecentAction != null &&
-    mostRecentAction?.actionType === 'pause'
+    ['pause', 'waitForResume'].includes(mostRecentAction?.actionType)
   ) {
     return formatInterval(mostRecentAction.createdAt, now)
   }

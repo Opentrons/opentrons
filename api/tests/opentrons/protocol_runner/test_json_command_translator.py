@@ -222,9 +222,48 @@ VALID_TEST_PARAMS = [
             )
         ),
     ),
-    # TODO(mc, 2021-06-21): add translation tests for
-    # `delay`, `waitForResume`, and `waitForDuration`
-    # https://github.com/Opentrons/opentrons/issues/9472
+    (
+        protocol_schema_v6.Command(
+            commandType="delay",
+            params=protocol_schema_v6.Params(waitForResume=True, message="hello world"),
+        ),
+        pe_commands.WaitForResumeCreate(
+            params=pe_commands.WaitForResumeParams(message="hello world")
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="delay",
+            params=protocol_schema_v6.Params(seconds=12.34, message="hello world"),
+        ),
+        pe_commands.WaitForDurationCreate(
+            params=pe_commands.WaitForDurationParams(
+                seconds=12.34,
+                message="hello world",
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="waitForResume",
+            params=protocol_schema_v6.Params(message="hello world"),
+        ),
+        pe_commands.WaitForResumeCreate(
+            params=pe_commands.WaitForResumeParams(message="hello world")
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="waitForDuration",
+            params=protocol_schema_v6.Params(seconds=12.34, message="hello world"),
+        ),
+        pe_commands.WaitForDurationCreate(
+            params=pe_commands.WaitForDurationParams(
+                seconds=12.34,
+                message="hello world",
+            )
+        ),
+    ),
 ]
 
 
