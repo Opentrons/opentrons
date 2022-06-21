@@ -151,16 +151,6 @@ VALID_TEST_PARAMS = [
     ),
     (
         protocol_schema_v6.Command(
-            commandType="pause",
-            params=protocol_schema_v6.Params(
-                wait=True,
-                message="hello world",
-            ),
-        ),
-        pe_commands.PauseCreate(params=pe_commands.PauseParams(message="hello world")),
-    ),
-    (
-        protocol_schema_v6.Command(
             commandType="loadPipette",
             params=protocol_schema_v6.Params(pipetteId="pipetteId", mount="left"),
         ),
@@ -232,6 +222,9 @@ VALID_TEST_PARAMS = [
             )
         ),
     ),
+    # TODO(mc, 2021-06-21): add translation tests for
+    # `delay`, `waitForResume`, and `waitForDuration`
+    # https://github.com/Opentrons/opentrons/issues/9472
 ]
 
 

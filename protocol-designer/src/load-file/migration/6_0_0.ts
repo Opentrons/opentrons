@@ -128,11 +128,25 @@ const migrateCommands = (
       delete v5Command.params.labware
     }
 
+    // map v5 delay to v6 delay
+    if ('wait' in v5Command.params) {
+      const { wait } = v5Command.params
+      if (wait === true) {
+        // @ts-expect-error: we are modifying a v5 command (no waitForResume exists on a v5 command)
+        v5Command.params.waitForResume = true
+      } else {
+        // @ts-expect-error: we are modifying a v5 command (no seconds exists on a v5 command)
+        v5Command.params.seconds = wait
+      }
+      // @ts-expect-error: we are modifying a v5 command (wait is required in v5)
+      delete v5Command.params.wait
+    }
+
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const v6Command = {
       commandType,
       key: uuid(),
-      params: v5Command.params,
+      params: v5Command.params as any,
     } as CreateCommand
     return v6Command
   })

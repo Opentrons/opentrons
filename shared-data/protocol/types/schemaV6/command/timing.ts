@@ -9,10 +9,17 @@ export interface TimingRunTimeCommand
   result: {}
 }
 
-interface DelayParams {
-  wait: number | true
+interface DelayUntilResumeParams {
+  waitForResume: true
   message?: string
 }
+
+interface DelayForDurationParams {
+  seconds: number
+  message?: string
+}
+
+type DelayParams = DelayUntilResumeParams | DelayForDurationParams
 
 export interface PauseCreateCommand extends CommonCommandCreateInfo {
   commandType: 'pause'

@@ -106,7 +106,12 @@ class JsonCommandTranslator:
         commands_list: List[pe_commands.CommandCreate] = []
         exclude_commands = [
             "loadLiquid",
+            # TODO(mc, 2021-06-21): add translation for
+            # `delay`, `waitForResume` and `waitForDuration`
+            # https://github.com/Opentrons/opentrons/issues/9472
             "delay",
+            "waitForResume",
+            "waitForDuration",
             "moveToSlot",
             "moveToCoordinates",
         ]
