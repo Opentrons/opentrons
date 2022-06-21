@@ -54,7 +54,7 @@ jobs:
             project: 'api'
             target: 'lint'
   test:
-    name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
+    name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }} (${{matrix.with-ot-hardware =='true' && 'With' || 'Without'}} Hardware)'
     timeout-minutes: 30
     needs: [lint]
     strategy:
@@ -93,7 +93,7 @@ jobs:
         with:
           project: 'api'
           python-version: ${{ matrix.python }}
-          make-setup-recipe: ${{ matrix.with-ot-hardware && 'setup' || 'setup-ot2'}}
+          make-setup-recipe: ${{ matrix.with-ot-hardware == 'true' && 'setup' || 'setup-ot2'}}
       - if: ${{ matrix.with-ot-hardware == 'false' }}
         name: Test without opentrons_hardware
         run: make -C api test-ot2
