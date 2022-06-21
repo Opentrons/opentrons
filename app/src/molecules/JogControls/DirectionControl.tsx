@@ -134,7 +134,6 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
           gridGap={SPACING.spacing1}
           gridTemplateRows="repeat(2, [row] 2rem)"
           gridTemplateColumns="repeat(3, [col] 2rem)"
-          marginBottom={SPACING.spacing5}
         >
           {controls.map(
             ({ bearing, gridRow, gridColumn, iconName, axis, sign }) => (

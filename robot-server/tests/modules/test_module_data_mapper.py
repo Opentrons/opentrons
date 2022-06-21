@@ -29,17 +29,51 @@ from robot_server.modules.module_models import (
 
 
 @pytest.mark.parametrize(
-    "input_model",
-    ["magneticModuleV1", "magneticModuleV2"],
-)
-@pytest.mark.parametrize(
-    "input_data",
+    ("input_model", "input_data", "expected_output_data"),
     [
-        {"status": "engaged", "data": {"engaged": True, "height": 42}},
-        {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
+        (
+            "magneticModuleV1",
+            {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
+            MagneticModuleData(
+                status=MagneticStatus.DISENGAGED,
+                engaged=False,
+                height=-2.5,
+            ),
+        ),
+        (
+            "magneticModuleV1",
+            {"status": "engaged", "data": {"engaged": True, "height": 42}},
+            MagneticModuleData(
+                status=MagneticStatus.ENGAGED,
+                engaged=True,
+                height=18.5,
+            ),
+        ),
+        (
+            "magneticModuleV2",
+            {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
+            MagneticModuleData(
+                status=MagneticStatus.DISENGAGED,
+                engaged=False,
+                height=-2.5,
+            ),
+        ),
+        (
+            "magneticModuleV2",
+            {"status": "engaged", "data": {"engaged": True, "height": 42}},
+            MagneticModuleData(
+                status=MagneticStatus.ENGAGED,
+                engaged=True,
+                height=39.5,
+            ),
+        ),
     ],
 )
-def test_maps_magnetic_module_data(input_model: str, input_data: LiveData) -> None:
+def test_maps_magnetic_module_data(
+    input_model: str,
+    input_data: LiveData,
+    expected_output_data: MagneticModuleData,
+) -> None:
     """It should map hardware data to a magnetic module."""
     module_identity = ModuleIdentity(
         module_id="module-id",
@@ -73,11 +107,7 @@ def test_maps_magnetic_module_data(input_model: str, input_data: LiveData) -> No
         moduleType=ModuleType.MAGNETIC,
         moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
         usbPort=UsbPort(port=101, hub=202, path="/dev/null"),
-        data=MagneticModuleData(
-            status=MagneticStatus(input_data["status"]),
-            engaged=input_data["data"]["engaged"],  # type: ignore[arg-type]
-            height=input_data["data"]["height"],  # type: ignore[arg-type]
-        ),
+        data=expected_output_data,
     )
 
 

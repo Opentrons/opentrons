@@ -83,6 +83,8 @@ export function RenameRobotSlideout({
       // TODO kj: this is a temporary fix to avoid Download logs button disabled issue
       // Once fix react tree rendering issue, the push direction will be switched to robot-settings
       console.log('renamed robot', currentRobotName.data)
+      // TODO 6/9/2022 kj this is a temporary fix to avoid the issue
+      // https://github.com/Opentrons/opentrons/issues/10709
       data.name != null && history.push(`/devices`)
     },
     onError: (error: Error) => {

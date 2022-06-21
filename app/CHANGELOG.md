@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.2...v6.0.0-beta.0) (2022-06-10)
+
+
+### Bug Fixes
+
+* **app:** temporary redirect to devices page ([#10712](https://github.com/Opentrons/opentrons/issues/10712)) ([4eaedbe](https://github.com/Opentrons/opentrons/commit/4eaedbea2fa7d08a614c2633d7cb6a74955d4095)), closes [#10709](https://github.com/Opentrons/opentrons/issues/10709)
+* **app:** update robot banner no longer accessible when robot is busy ([#10717](https://github.com/Opentrons/opentrons/issues/10717)) ([bb700df](https://github.com/Opentrons/opentrons/commit/bb700df918ee8ebfcb34f80add01f18fe4de1562)), closes [#10311](https://github.com/Opentrons/opentrons/issues/10311)
+
+
+
+
+
 # [6.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2022-06-09)
 
 
