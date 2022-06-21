@@ -215,4 +215,66 @@ describe('v6 migration', () => {
       ].dispense_delay_checkbox
     ).toBe(false)
   })
+
+  it('maps v5 delays to v6 delays', () => {
+    const migratedFile = migrateFile(oldDoItAllProtocol)
+    const expectedConvertedDelayCommands = [
+      {
+        key: expect.any(String), // no key used to exist in v5 commands
+        commandType: 'delay',
+        params: { message: '', seconds: 62 },
+      },
+      {
+        key: expect.any(String),
+        commandType: 'delay',
+        params: { seconds: 2 },
+      },
+      {
+        key: expect.any(String),
+        commandType: 'delay',
+        params: { seconds: 2 },
+      },
+      {
+        key: expect.any(String),
+        commandType: 'delay',
+        params: { seconds: 1 },
+      },
+      {
+        key: expect.any(String),
+        commandType: 'delay',
+        params: { seconds: 1 },
+      },
+      {
+        key: expect.any(String),
+        commandType: 'delay',
+        params: { seconds: 2 },
+      },
+      {
+        key: expect.any(String),
+        commandType: 'delay',
+        params: { seconds: 2 },
+      },
+      {
+        key: expect.any(String),
+        commandType: 'delay',
+        params: { seconds: 1 },
+      },
+      {
+        key: expect.any(String),
+        commandType: 'delay',
+        params: { seconds: 1 },
+      },
+      {
+        key: expect.any(String),
+        commandType: 'delay',
+        params: {
+          message: 'Wait until user intervention',
+          waitForResume: true,
+        },
+      },
+    ]
+    expect(migratedFile.commands).toEqual(
+      expect.arrayContaining(expectedConvertedDelayCommands)
+    )
+  })
 })
