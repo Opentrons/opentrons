@@ -188,7 +188,7 @@ def test_aspirate(
                 offset=WellOffset(x=0, y=0, z=1),
             ),
             volume=123.45,
-            flowRate=6.789,
+            flowRate=2.0,
         )
     )
 
@@ -228,7 +228,7 @@ def test_dispense(
                 offset=WellOffset(x=0, y=0, z=1),
             ),
             volume=10,
-            flowRate=6.789,
+            flowRate=2.0,
         )
     )
 
@@ -404,6 +404,7 @@ def test_blow_out(
             labwareId="456",
             wellName="A2",
             wellLocation=WellLocation(),
+            flowRate=2.0,
         )
     )
 

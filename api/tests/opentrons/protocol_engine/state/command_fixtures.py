@@ -284,6 +284,7 @@ def create_move_to_well_command(
 
 def create_blow_out_command(
     pipette_id: str,
+    flow_rate: float,
     labware_id: str = "labware-id",
     well_name: str = "A1",
     well_location: Optional[WellLocation] = None,
@@ -294,6 +295,7 @@ def create_blow_out_command(
         labwareId=labware_id,
         wellName=well_name,
         wellLocation=well_location or WellLocation(),
+        flowRate=flow_rate,
     )
     result = cmd.BlowOutResult()
 

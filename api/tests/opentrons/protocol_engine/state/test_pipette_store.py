@@ -90,6 +90,7 @@ def test_handles_blow_out(subject: PipetteStore) -> None:
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_name="well-name",
+        flow_rate=1.23,
     )
 
     subject.handle_action(UpdateCommandAction(command=command))
@@ -210,6 +211,7 @@ def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
                 pipette_id="move-to-well-pipette-id",
                 labware_id="move-to-well-labware-id",
                 well_name="move-to-well-well-name",
+                flow_rate=1.23,
             ),
             CurrentWell(
                 pipette_id="move-to-well-pipette-id",

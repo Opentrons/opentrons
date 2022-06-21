@@ -220,6 +220,7 @@ VALID_TEST_PARAMS = [
                     origin="bottom",
                     offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=7.89),
                 ),
+                flowRate=1.23,
             ),
         ),
         pe_commands.BlowOutCreate(
@@ -231,6 +232,7 @@ VALID_TEST_PARAMS = [
                     origin=WellOrigin.BOTTOM,
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),
+                flowRate=1.23,
             )
         ),
     ),
