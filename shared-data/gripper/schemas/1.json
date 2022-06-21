@@ -77,7 +77,10 @@
       "type": "array",
       "items": {
         "type": "array",
-        "items": { "type": "number" },
+        "items": [
+          {"type": "number"},
+          {"$ref": "#/definitions/percentage"}
+        ],
         "minItems": 2,
         "maxItems": 2
       }
