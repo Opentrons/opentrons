@@ -32,7 +32,7 @@ from opentrons.protocol_runner import create_simulating_runner
 
 # TODO (tz, 6-17-22): API version 3.x in-development.
 # Currently parsing protocol versions less then MAX_SUPPORTED_VERSION
-@pytest.mark.xfail
+@pytest.mark.xfail(strict=True)
 async def test_runner_with_python(
     python_protocol_file: Path,
     tempdeck_v1_def: ModuleDefinition,
