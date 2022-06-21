@@ -217,7 +217,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
             module_id=HeaterShakerModuleId("module-id"),
             labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
             speed_status=SpeedStatus.IDLE,
-            plate_target_temperature=42
+            plate_target_temperature=42,
         )
     }
     subject.handle_action(actions.UpdateCommandAction(command=deactivate_cmd))
@@ -226,7 +226,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
             module_id=HeaterShakerModuleId("module-id"),
             labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
             speed_status=SpeedStatus.IDLE,
-            plate_target_temperature=None
+            plate_target_temperature=None,
         )
     }
 

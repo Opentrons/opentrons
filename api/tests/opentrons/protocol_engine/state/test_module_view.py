@@ -996,22 +996,34 @@ def test_validate_heater_shaker_target_speed_raises_error(
 
 @pytest.mark.parametrize(
     ["latch_status", "expected_raise"],
-    [(HeaterShakerLabwareLatchStatus.IDLE_OPEN,
-      pytest.raises(errors.CannotPerformModuleAction)),
-     (HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
-      pytest.raises(errors.CannotPerformModuleAction)),
-     (HeaterShakerLabwareLatchStatus.OPENING,
-      pytest.raises(errors.CannotPerformModuleAction)),
-     (HeaterShakerLabwareLatchStatus.CLOSING,
-      pytest.raises(errors.CannotPerformModuleAction)),
-     (HeaterShakerLabwareLatchStatus.UNKNOWN,
-      pytest.raises(errors.CannotPerformModuleAction)),
-     (HeaterShakerLabwareLatchStatus.IDLE_CLOSED, does_not_raise())]
+    [
+        (
+            HeaterShakerLabwareLatchStatus.IDLE_OPEN,
+            pytest.raises(errors.CannotPerformModuleAction),
+        ),
+        (
+            HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
+            pytest.raises(errors.CannotPerformModuleAction),
+        ),
+        (
+            HeaterShakerLabwareLatchStatus.OPENING,
+            pytest.raises(errors.CannotPerformModuleAction),
+        ),
+        (
+            HeaterShakerLabwareLatchStatus.CLOSING,
+            pytest.raises(errors.CannotPerformModuleAction),
+        ),
+        (
+            HeaterShakerLabwareLatchStatus.UNKNOWN,
+            pytest.raises(errors.CannotPerformModuleAction),
+        ),
+        (HeaterShakerLabwareLatchStatus.IDLE_CLOSED, does_not_raise()),
+    ],
 )
 def test_raise_if_labware_latch_not_closed(
-        heater_shaker_v1_def: ModuleDefinition,
-        latch_status: HeaterShakerLabwareLatchStatus,
-        expected_raise: ContextManager[Any]
+    heater_shaker_v1_def: ModuleDefinition,
+    latch_status: HeaterShakerLabwareLatchStatus,
+    expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise an error if labware latch is not closed."""
     module_view = make_module_view(
@@ -1038,11 +1050,13 @@ def test_raise_if_labware_latch_not_closed(
 
 @pytest.mark.parametrize(
     ["speed_status", "expected_raise"],
-    [(SpeedStatus.IDLE, does_not_raise()),
-     (SpeedStatus.ACCELERATING, pytest.raises(errors.CannotPerformModuleAction)),
-     (SpeedStatus.DECELERATING, pytest.raises(errors.CannotPerformModuleAction)),
-     (SpeedStatus.HOLDING, pytest.raises(errors.CannotPerformModuleAction)),
-     (SpeedStatus.ERROR, pytest.raises(errors.CannotPerformModuleAction))]
+    [
+        (SpeedStatus.IDLE, does_not_raise()),
+        (SpeedStatus.ACCELERATING, pytest.raises(errors.CannotPerformModuleAction)),
+        (SpeedStatus.DECELERATING, pytest.raises(errors.CannotPerformModuleAction)),
+        (SpeedStatus.HOLDING, pytest.raises(errors.CannotPerformModuleAction)),
+        (SpeedStatus.ERROR, pytest.raises(errors.CannotPerformModuleAction)),
+    ],
 )
 def test_heater_shaker_raise_if_shaking(
     heater_shaker_v1_def: ModuleDefinition,

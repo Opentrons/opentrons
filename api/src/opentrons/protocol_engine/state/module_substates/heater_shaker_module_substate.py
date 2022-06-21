@@ -7,7 +7,7 @@ from opentrons.protocol_engine.errors import (
     InvalidTargetTemperatureError,
     InvalidTargetSpeedError,
     NoTargetTemperatureSetError,
-    CannotPerformModuleAction
+    CannotPerformModuleAction,
 )
 
 from opentrons.hardware_control.modules.types import SpeedStatus
@@ -76,7 +76,8 @@ class HeaterShakerModuleSubState:
         if self.labware_latch_status != HeaterShakerLabwareLatchStatus.IDLE_CLOSED:
             raise CannotPerformModuleAction(
                 f"Cannot perform the module action when labware latch open or in error."
-                f" Current latch status is: {self.labware_latch_status.value}")
+                f" Current latch status is: {self.labware_latch_status.value}"
+            )
 
     def raise_if_shaking(self) -> None:
         """Raise an error if the heater-shaker is currently shaking."""

@@ -210,7 +210,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         module_id = command.params.moduleId
         hs_substate = self._state.substate_by_module_id[module_id]
         assert isinstance(
-            self._state.substate_by_module_id[module_id], HeaterShakerModuleSubState
+            hs_substate, HeaterShakerModuleSubState
         ), f"{module_id} is not heater-shaker."
 
         # Get current values to preserve target temperature not being set/deactivated
