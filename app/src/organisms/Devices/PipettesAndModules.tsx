@@ -73,7 +73,6 @@ export function PipettesAndModules({
             <Banner type="warning">{t('robot_control_not_available')}</Banner>
           </Flex>
         )}
-        {/* TODO(jr, 4/15/22): This needs to be refactored to get a combined array of pipettes and modules so it can display with widths matching each column as the design shows */}
         {isRobotViewable ? (
           <Flex flexDirection={DIRECTION_COLUMN} width="100%">
             <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>

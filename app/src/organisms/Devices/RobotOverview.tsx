@@ -96,7 +96,7 @@ export function RobotOverview({
             <StyledText
               as="h6"
               color={COLORS.darkGreyEnabled}
-              paddingBottom=".125rem"
+              paddingBottom={SPACING.spacing1}
               textTransform={TEXT_TRANSFORM_UPPERCASE}
             >
               {t('controls')}

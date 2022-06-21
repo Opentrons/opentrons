@@ -70,6 +70,10 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
     box-shadow: none;
   }
 
+  &:focus-visible {
+    box-shadow: 0 0 0 3px ${COLORS.warning};
+  }
+
   &:active {
     background-color: ${COLORS.bluePressed};
   }
