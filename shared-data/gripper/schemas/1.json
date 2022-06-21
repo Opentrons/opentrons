@@ -2,25 +2,20 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
 
   "definitions": {
-    "idleCurrentRange": {
+    "idleZCurrentRange": {
       "type": "number",
       "minimum": 0.01,
       "maximum": 1.0
     },
-    "activeCurrentRange": {
+    "activeZCurrentRange": {
       "type": "number",
       "minimum": 0.02,
       "maximum": 2.0
     },
-    "referenceVoltageRange": {
+    "jawReferenceVoltageRange": {
       "type": "number",
       "minimum": 0.01,
       "maximum": 3.3
-    },
-    "pwmFrequencyRange": {
-      "type": "number",
-      "minimum": 0,
-      "maximum": 32000
     },
     "percentage": {
       "type": "number",
@@ -45,11 +40,10 @@
     "$otSharedSchema",
     "displayName",
     "model",
-    "idleCurrent",
-    "activeCurrent",
-    "referenceVoltage",
-    "pwmFrequency",
-    "dutyCycle",
+    "idleZCurrent",
+    "activeZCurrent",
+    "jawReferenceVoltage",
+    "jawForcePerDutyCycle",
     "baseOffsetFromMount",
     "jawCenterOffsetFromBase",
     "pinOneOffsetFromBase",
@@ -67,25 +61,26 @@
       "type": "string",
       "pattern": "^gripperV[0-9]$"
     },
-    "idleCurrent": {
+    "idleZCurrent": {
       "type": "object",
-      "value": { "$ref": "#/definitions/idleCurrentRange" }
+      "value": { "$ref": "#/definitions/idleZCurrentRange" }
     },
-    "activeCurrent": {
+    "activeZCurrent": {
       "type": "object",
-      "value": { "$ref": "#/definitions/activeCurrentRange" }
+      "value": { "$ref": "#/definitions/activeZCurrentRange" }
     },
-    "referenceVoltage": {
+    "jawReferenceVoltage": {
       "type": "object",
-      "value": { "$ref": "#/definitions/referenceVoltageRange" }
+      "value": { "$ref": "#/definitions/jawReferenceVoltageRange" }
     },
-    "pwmFrequency": {
-      "type": "object",
-      "value": { "$ref": "#/definitions/pwmFrequencyRange" }
-    },
-    "dutyCycle": {
-      "type": "object",
-      "value": { "$ref": "#/definitions/percentage" }
+    "jawForcePerDutyCycle": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": { "type": "number" },
+        "minItems": 2,
+        "maxItems": 2
+      }
     },
     "baseOffsetFromMount": { "$ref": "#/definitions/coordinates" },
     "jawCenterOffsetFromBase": { "$ref": "#/definitions/coordinates" },

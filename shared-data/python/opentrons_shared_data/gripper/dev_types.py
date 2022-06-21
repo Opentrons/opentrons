@@ -1,6 +1,6 @@
 """opentrons_shared_data.gripper.dev_types: gripper types."""
 
-from typing import Any, Dict, List, NamedTuple
+from typing import Any, Dict, List, NamedTuple, Tuple
 from dataclasses import dataclass
 from enum import Enum
 
@@ -9,7 +9,6 @@ from typing_extensions import Literal
 
 ConfigUnit = Literal[
     "amps",
-    "hertz",  # PWM frequency
     "percentage",  # Duty cycle
     "volts",  # Reference voltage
 ]
@@ -82,11 +81,10 @@ class GripperDefinitionV1:
 
     display_name: str
     model: GripperModel
-    idle_current: GripperCustomizableFloat
-    active_current: GripperCustomizableFloat
-    reference_voltage: GripperCustomizableFloat
-    pwm_frequency: GripperCustomizableInt
-    duty_cycle: GripperCustomizableInt
+    z_idle_current: GripperCustomizableFloat
+    z_active_current: GripperCustomizableFloat
+    jaw_reference_voltage: GripperCustomizableFloat
+    jaw_force_per_duty_cycle: List[Tuple[float, int]]
     base_offset_from_mount: GripperOffset
     jaw_center_offset_from_base: GripperOffset
     pin_one_offset_from_base: GripperOffset
@@ -100,13 +98,16 @@ class GripperDefinitionV1:
             return cls(
                 display_name=data["displayName"],
                 model=GripperModel(data["model"]),
-                idle_current=GripperCustomizableFloat.build(**data["idleCurrent"]),
-                active_current=GripperCustomizableFloat.build(**data["activeCurrent"]),
-                reference_voltage=GripperCustomizableFloat.build(
-                    **data["referenceVoltage"]
+                z_idle_current=GripperCustomizableFloat.build(**data["idleZCurrent"]),
+                z_active_current=GripperCustomizableFloat.build(
+                    **data["activeZCurrent"]
                 ),
-                pwm_frequency=GripperCustomizableInt.build(**data["pwmFrequency"]),
-                duty_cycle=GripperCustomizableInt.build(**data["dutyCycle"]),
+                jaw_reference_voltage=GripperCustomizableFloat.build(
+                    **data["jawReferenceVoltage"]
+                ),
+                jaw_force_per_duty_cycle=[
+                    (element[0], element[1]) for element in data["jawForcePerDutyCycle"]
+                ],
                 base_offset_from_mount=GripperOffset(**data["baseOffsetFromMount"]),
                 jaw_center_offset_from_base=GripperOffset(
                     **data["jawCenterOffsetFromBase"]

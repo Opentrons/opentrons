@@ -7,41 +7,41 @@ GRIPPER_DEF = {
     "$otSharedSchema": "gripper/schemas/1",
     "model": "gripperV1",
     "displayName": "Gripper GEN1",
-    "idleCurrent": {
+    "idleZCurrent": {
         "defaultValue": 0.1,
         "min": 0.02,
         "max": 1.0,
         "units": "amps",
         "type": "float",
     },
-    "activeCurrent": {
+    "activeZCurrent": {
         "defaultValue": 0.8,
         "min": 0.02,
         "max": 2.0,
         "units": "amps",
         "type": "float",
     },
-    "referenceVoltage": {
+    "jawReferenceVoltage": {
         "defaultValue": 2.6,
         "min": 0.5,
         "max": 3.3,
         "units": "volts",
         "type": "float",
     },
-    "pwmFrequency": {
-        "defaultValue": 32000,
-        "min": 1000,
-        "max": 32000,
-        "units": "hertz",
-        "type": "int",
-    },
-    "dutyCycle": {
-        "defaultValue": 50,
-        "min": 10,
-        "max": 90,
-        "units": "percentage",
-        "type": "int",
-    },
+    "jawForcePerDutyCycle": [
+        [0.92, 4],
+        [1.48, 5],
+        [2.86, 7],
+        [3.72, 9],
+        [5.64, 12],
+        [7.66, 17],
+        [8.76, 20],
+        [10.06, 23],
+        [12.42, 34],
+        [16.2, 54],
+        [23, 80],
+        [25.7, 90],
+    ],
     "baseOffsetFromMount": {"x": 6.775, "y": 87.325, "z": 32.05},
     "jawCenterOffsetFromBase": {"x": 8.5, "y": 2.5, "z": 86},
     "pinOneOffsetFromBase": {"x": 23, "y": 73.37920159, "z": 95},
@@ -61,12 +61,12 @@ def test_gripper_definition_type() -> None:
     assert dev_types.GripperDefinitionV1.from_dict(GRIPPER_DEF)
 
     # missing key
-    del GRIPPER_DEF["idleCurrent"]
+    del GRIPPER_DEF["idleZCurrent"]
     with pytest.raises(dev_types.InvalidGripperDefinition):
         assert dev_types.GripperDefinitionV1.from_dict(GRIPPER_DEF)
 
     # add back in missing values
-    GRIPPER_DEF["idleCurrent"] = {
+    GRIPPER_DEF["idleZCurrent"] = {
         "defaultValue": 0.01,
         "min": 0.02,
         "max": 1.0,
