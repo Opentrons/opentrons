@@ -86,7 +86,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   )
   const latestRequestId = last(requestIds)
   const isFetching = useSelector<State, boolean>(state =>
-    latestRequestId
+    latestRequestId != null
       ? getRequestById(state, latestRequestId)?.status === 'pending'
       : false
   )

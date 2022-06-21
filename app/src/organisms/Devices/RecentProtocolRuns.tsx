@@ -43,7 +43,7 @@ export function RecentProtocolRuns({
   const robotIsBusy = currentRunId != null
   const latestRequestId = last(requestIds)
   const isFetching = useSelector<State, boolean>(state =>
-    latestRequestId
+    latestRequestId != null
       ? getRequestById(state, latestRequestId)?.status === 'pending'
       : false
   )
