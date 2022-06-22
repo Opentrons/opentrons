@@ -25,7 +25,7 @@ from opentrons.protocol_engine.state.modules import ModuleView
 
 
 @pytest.fixture
-def module_view(decoy: Decoy) -> ModuleView:
+def mock_module_view(decoy: Decoy) -> ModuleView:
     """Get a mock in the shape of a ModuleView."""
     return decoy.mock(cls=ModuleView)
 
@@ -35,14 +35,14 @@ def subject(
     labware_view: LabwareView,
     pipette_view: PipetteView,
     geometry_view: GeometryView,
-    module_view: ModuleView,
+    mock_module_view: ModuleView,
 ) -> MotionView:
     """Get a MotionView with its dependencies mocked out."""
     return MotionView(
         labware_view=labware_view,
         pipette_view=pipette_view,
         geometry_view=geometry_view,
-        module_view=module_view,
+        module_view=mock_module_view,
     )
 
 
@@ -287,7 +287,7 @@ def test_get_movement_waypoints_to_well(
     labware_view: LabwareView,
     pipette_view: PipetteView,
     geometry_view: GeometryView,
-    module_view: ModuleView,
+    mock_module_view: ModuleView,
     subject: MotionView,
     spec: WaypointSpec,
 ) -> None:
@@ -334,7 +334,7 @@ def test_get_movement_waypoints_to_well(
             geometry_view.get_ancestor_slot_name(spec.location.labware_id)
         ).then_return(DeckSlotName.SLOT_1)
         decoy.when(
-            module_view.should_dodge_thermocycler(
+            mock_module_view.should_dodge_thermocycler(
                 from_slot=DeckSlotName.SLOT_1, to_slot=DeckSlotName.SLOT_1
             )
         ).then_return(spec.should_dodge_thermocycler)
