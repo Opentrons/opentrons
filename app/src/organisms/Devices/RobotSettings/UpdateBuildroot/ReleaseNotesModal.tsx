@@ -49,20 +49,16 @@ export function ReleaseNotesModal(props: ReleaseNotesModalProps): JSX.Element {
     },
   ]
 
-  return (
-    <>
-      {showRobotIsBusyModal ? (
-        <RobotIsBusyModal closeModal={cancelExit} proceed={confirmProceed} />
-      ) : (
-        <ScrollableAlertModal
-          heading={heading}
-          buttons={buttons}
-          restrictOuterScroll={false}
-          alertOverlay
-        >
-          <ReleaseNotes source={releaseNotes} />
-        </ScrollableAlertModal>
-      )}
-    </>
+  return showRobotIsBusyModal ? (
+    <RobotIsBusyModal closeModal={cancelExit} proceed={confirmProceed} />
+  ) : (
+    <ScrollableAlertModal
+      heading={heading}
+      buttons={buttons}
+      restrictOuterScroll={false}
+      alertOverlay
+    >
+      <ReleaseNotes source={releaseNotes} />
+    </ScrollableAlertModal>
   )
 }

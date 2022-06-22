@@ -31,6 +31,12 @@ describe('RobotIsBusyModal', () => {
       'This robot has to restart to update its software. Restarting will immediately stop the current run or calibration.'
     )
     getByText('Do you want to update now anyway?')
+    getByRole('button', { name: 'cancel' })
+    getByRole('button', { name: 'Yes, update now' })
+  })
+
+  it('should render buttons and they should be clickable', () => {
+    const { getByRole } = render(props)
     const cancelBtn = getByRole('button', { name: 'cancel' })
     const proceedBtn = getByRole('button', { name: 'Yes, update now' })
     fireEvent.click(cancelBtn)

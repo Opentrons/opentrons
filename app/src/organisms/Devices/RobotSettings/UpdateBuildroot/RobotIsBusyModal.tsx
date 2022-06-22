@@ -46,7 +46,6 @@ export function RobotIsBusyModal({
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
             marginRight={SPACING.spacing5}
             css={TYPOGRAPHY.linkPSemiBold}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('shared:cancel')}
           </Btn>
