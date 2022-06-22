@@ -41,13 +41,14 @@ def get_waypoints(
 
     :returns: A list of :py:class:`.Waypoint` locations to move through.
     """
-    # TODO: Update this note.
-    # NOTE(mc, 2020-10-28): This function is currently experimental. Flipping
-    # `use_experimental_waypoint_planning` to True in
-    # `opentrons.protocols.geometry.plan_moves` causes three test failures at
-    # the time of this writing.
+    # NOTE(mm, 2022-06-22):
+    # This function is used by v6+ JSON protocols and v3+
+    # Python API protocols, but not v2 Python API protocols.
     #
-    # Eventually, it may take over for opentrons.hardware_control.util.plan_arc
+    # Flipping `use_experimental_waypoint_planning` to True to make PAPIv2 use this too
+    # causes three test failures at the time of this writing.
+    # Eventually, those may be resolved and this may take over for
+    # opentrons.hardware_control.util.plan_arc, which PAPIv2 currently uses.
     dest_waypoint = Waypoint(dest, dest_cp)
     waypoints: List[Waypoint] = []
 
