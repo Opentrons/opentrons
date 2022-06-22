@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { pick } from 'lodash'
+import pick from 'lodash/pick'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { parseAllRequiredModuleModels } from '@opentrons/api-client'
