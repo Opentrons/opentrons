@@ -57,7 +57,6 @@ class HeaterShakerMovementFlagger:
         )
 
         if heater_shaker_module is not None:
-            # TODthiO check with max (or someone else) if theres a better/more correct way of doing s
             heater_shaker_hardware = await self._find_heater_shaker_by_serial(
                 heater_shaker_module.serialNumber
             )
@@ -66,6 +65,7 @@ class HeaterShakerMovementFlagger:
                     f'No Heater Shaker found with serial number "{heater_shaker_module.serialNumber}".'
                 )
 
+            # TODO will this work in simulation?
             hw_pipette = self._state_store.pipettes.get_hardware_pipette(
                 pipette_id=pipette_id,
                 attached_pipettes=self._hardware_api.attached_instruments,
