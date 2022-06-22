@@ -59,7 +59,7 @@ export function useTimeElapsedSincePause(): string | null {
     runRecord?.data &&
     ['paused', 'pause-requested'].includes(runRecord?.data.status) &&
     mostRecentAction != null &&
-    ['pause', 'waitForResume'].includes(mostRecentAction?.actionType)
+    mostRecentAction?.actionType === 'pause'
   ) {
     return formatInterval(mostRecentAction.createdAt, now)
   }
