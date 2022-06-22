@@ -253,7 +253,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             data-testid={`ProtocolCard_date_${protocolDisplayName}`}
           >
             <StyledText
-              as="h7"
+              as="label"
               marginBottom={SPACING.spacing3}
               color={COLORS.darkGreyEnabled}
               textAlign={TEXT_ALIGN_RIGHT}
