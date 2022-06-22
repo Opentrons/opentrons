@@ -4,12 +4,7 @@ from typing import List, Optional
 
 from opentrons.types import MountType, Point, DeckSlotName
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.motion_planning import (
-    MoveType,
-    Waypoint,
-    MotionPlanningError,
-    get_waypoints,
-)
+from opentrons import motion_planning
 
 from .. import errors
 from ..types import WellLocation
@@ -78,7 +73,7 @@ class MotionView:
         origin_cp: Optional[CriticalPoint],
         max_travel_z: float,
         current_well: Optional[CurrentWell] = None,
-    ) -> List[Waypoint]:
+    ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_well()
         center_dest = self._labware.get_has_quirk(
@@ -92,7 +87,7 @@ class MotionView:
             well_location,
         )
         dest_cp = CriticalPoint.XY_CENTER if center_dest else None
-        extra_waypoints = []
+        extra_waypoints = ()
 
         if (
             location is not None
@@ -100,13 +95,13 @@ class MotionView:
             and labware_id == location.labware_id
         ):
             move_type = (
-                MoveType.IN_LABWARE_ARC
+                motion_planning.MoveType.IN_LABWARE_ARC
                 if well_name != location.well_name
-                else MoveType.DIRECT
+                else motion_planning.MoveType.DIRECT
             )
             min_travel_z = self._geometry.get_labware_highest_z(labware_id)
         else:
-            move_type = MoveType.GENERAL_ARC
+            move_type = motion_planning.MoveType.GENERAL_ARC
             min_travel_z = self._geometry.get_all_labware_highest_z()
             if location is not None:
                 if self._module.should_dodge_thermocycler(
@@ -123,7 +118,7 @@ class MotionView:
             #  could crash onto the thermocycler if current well is not known.
 
         try:
-            return get_waypoints(
+            return motion_planning.get_waypoints(
                 move_type=move_type,
                 origin=origin,
                 origin_cp=origin_cp,
@@ -133,7 +128,7 @@ class MotionView:
                 max_travel_z=max_travel_z,
                 xy_waypoints=extra_waypoints,
             )
-        except MotionPlanningError as error:
+        except motion_planning.MotionPlanningError as error:
             raise errors.FailedToPlanMoveError(str(error))
 
     def get_movement_waypoints_to_coords(
@@ -143,7 +138,7 @@ class MotionView:
         max_travel_z: float,
         direct: bool,
         additional_min_travel_z: Optional[float],
-    ) -> List[Waypoint]:
+    ) -> List[motion_planning.Waypoint]:
         """Calculate waypoints to a destination that's specified as deck coordinates.
 
         Args:
@@ -162,10 +157,10 @@ class MotionView:
             additional_min_travel_z = float("-inf")
         min_travel_z = max(all_labware_highest_z, additional_min_travel_z)
 
-        move_type = MoveType.DIRECT if direct else MoveType.GENERAL_ARC
+        move_type = motion_planning.MoveType.DIRECT if direct else motion_planning.MoveType.GENERAL_ARC
 
         try:
-            return get_waypoints(
+            return motion_planning.get_waypoints(
                 origin=origin,
                 dest=dest,
                 min_travel_z=min_travel_z,
@@ -174,5 +169,5 @@ class MotionView:
                 origin_cp=None,
                 dest_cp=None,
             )
-        except MotionPlanningError as error:
+        except motion_planning.MotionPlanningError as error:
             raise errors.FailedToPlanMoveError(str(error))

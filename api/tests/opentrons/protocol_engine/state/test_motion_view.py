@@ -2,11 +2,11 @@
 import pytest
 from decoy import Decoy
 from dataclasses import dataclass, field
-from typing import Optional, Sequence, Tuple
+from typing import Callable, List, Optional, Sequence, Tuple
 
 from opentrons.types import Point, MountType, DeckSlotName
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.motion_planning import MoveType, get_waypoints
+from opentrons import motion_planning
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -28,6 +28,26 @@ from opentrons.protocol_engine.state.modules import ModuleView
 def mock_module_view(decoy: Decoy) -> ModuleView:
     """Get a mock in the shape of a ModuleView."""
     return decoy.mock(cls=ModuleView)
+
+
+# The signature of the motion_planning.get_waypoints() function.
+_GET_WAYPOINTS_SIGNATURE = Callable[
+    ...,  # Parameter types not included, for simplicity.
+    List[motion_planning.Waypoint]
+]
+
+
+@pytest.fixture
+def mock_get_waypoints(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> _GET_WAYPOINTS_SIGNATURE:
+    """Return a mock in the shape of the motion_planning.get_waypoints() function.
+
+    When used by a test, the real get_waypoints() will be patched by this mock.
+    """
+    mock_get_waypoints = decoy.mock(func=motion_planning.get_waypoints)
+    monkeypatch.setattr(motion_planning, "get_waypoints", mock_get_waypoints)
+    return mock_get_waypoints
 
 
 @pytest.fixture
@@ -183,7 +203,7 @@ class WaypointSpec:
     """Spec data for testing the get_movement_waypoints_to_well selector."""
 
     name: str
-    expected_move_type: MoveType
+    expected_move_type: motion_planning.MoveType
     pipette_id: str = "pipette-id"
     labware_id: str = "labware-id"
     well_name: str = "A1"
@@ -201,16 +221,13 @@ class WaypointSpec:
     extra_waypoints: Sequence[Tuple[float, float]] = ()
 
 
-# TODO(mc, 2021-01-14): these tests probably need to be rethought; this fixture
-# is impossible to reason with. The test is really just trying to be a collaborator
-# test for the `get_waypoints` function, so we should rewrite it as such.
 @pytest.mark.parametrize(
     "spec",
     [
         WaypointSpec(
             name="General arc if moving from unknown location",
             all_labware_z=20,
-            expected_move_type=MoveType.GENERAL_ARC,
+            expected_move_type=motion_planning.MoveType.GENERAL_ARC,
         ),
         WaypointSpec(
             name="General arc if moving from other labware",
@@ -220,7 +237,7 @@ class WaypointSpec:
                 well_name="A1",
             ),
             all_labware_z=20,
-            expected_move_type=MoveType.GENERAL_ARC,
+            expected_move_type=motion_planning.MoveType.GENERAL_ARC,
         ),
         WaypointSpec(
             name="In-labware arc if moving to same labware",
@@ -230,7 +247,7 @@ class WaypointSpec:
                 well_name="B2",
             ),
             labware_z=10,
-            expected_move_type=MoveType.IN_LABWARE_ARC,
+            expected_move_type=motion_planning.MoveType.IN_LABWARE_ARC,
         ),
         WaypointSpec(
             name="General arc if moving to same labware with different pipette",
@@ -240,7 +257,7 @@ class WaypointSpec:
                 well_name="A1",
             ),
             all_labware_z=20,
-            expected_move_type=MoveType.GENERAL_ARC,
+            expected_move_type=motion_planning.MoveType.GENERAL_ARC,
         ),
         WaypointSpec(
             name="Direct movement from well to same well",
@@ -250,13 +267,13 @@ class WaypointSpec:
                 well_name="A1",
             ),
             labware_z=10,
-            expected_move_type=MoveType.DIRECT,
+            expected_move_type=motion_planning.MoveType.DIRECT,
         ),
         WaypointSpec(
             name="General arc with XY_CENTER destination CP",
             has_center_multichannel_quirk=True,
             all_labware_z=20,
-            expected_move_type=MoveType.GENERAL_ARC,
+            expected_move_type=motion_planning.MoveType.GENERAL_ARC,
             expected_dest_cp=CriticalPoint.XY_CENTER,
         ),
         WaypointSpec(
@@ -265,7 +282,7 @@ class WaypointSpec:
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=1)
             ),
-            expected_move_type=MoveType.GENERAL_ARC,
+            expected_move_type=motion_planning.MoveType.GENERAL_ARC,
         ),
         WaypointSpec(
             name="General arc with extra waypoints to dodge thermocycler",
@@ -276,7 +293,7 @@ class WaypointSpec:
             ),
             all_labware_z=20,
             should_dodge_thermocycler=True,
-            expected_move_type=MoveType.GENERAL_ARC,
+            expected_move_type=motion_planning.MoveType.GENERAL_ARC,
             extra_waypoints=[(123, 456)],
         )
         # TODO(mc, 2021-01-08): add test for override current location
@@ -288,10 +305,11 @@ def test_get_movement_waypoints_to_well(
     pipette_view: PipetteView,
     geometry_view: GeometryView,
     mock_module_view: ModuleView,
+    mock_get_waypoints: _GET_WAYPOINTS_SIGNATURE,
     subject: MotionView,
     spec: WaypointSpec,
 ) -> None:
-    """It should calculate the correct set of waypoints for a move."""
+    """It should call get_waypoints() with the correct args to move to a well."""
     decoy.when(
         labware_view.get_has_quirk(
             spec.labware_id,
@@ -346,6 +364,26 @@ def test_get_movement_waypoints_to_well(
             Point(x=spec.extra_waypoints[0][0], y=spec.extra_waypoints[0][1], z=123)
         )
 
+    waypoints = [
+        motion_planning.Waypoint(
+            position=Point(1, 2, 3), critical_point=CriticalPoint.XY_CENTER
+        ),
+        motion_planning.Waypoint(
+            position=Point(4, 5, 6), critical_point=CriticalPoint.MOUNT
+        )
+    ]
+
+    decoy.when(mock_get_waypoints(
+        move_type=spec.expected_move_type,
+        origin=spec.origin,
+        origin_cp=spec.origin_cp,
+        max_travel_z=spec.max_travel_z,
+        min_travel_z=min_travel_z,
+        dest=spec.dest,
+        dest_cp=spec.expected_dest_cp,
+        xy_waypoints=spec.extra_waypoints,
+    )).then_return(waypoints)
+
     result = subject.get_movement_waypoints_to_well(
         pipette_id=spec.pipette_id,
         labware_id=spec.labware_id,
@@ -356,21 +394,7 @@ def test_get_movement_waypoints_to_well(
         max_travel_z=spec.max_travel_z,
     )
 
-    # To do: Mock this out instead of getting its actual result.
-    # |
-    # V
-    expected = get_waypoints(
-        move_type=spec.expected_move_type,
-        origin=spec.origin,
-        origin_cp=spec.origin_cp,
-        max_travel_z=spec.max_travel_z,
-        min_travel_z=min_travel_z,
-        dest=spec.dest,
-        dest_cp=spec.expected_dest_cp,
-        xy_waypoints=spec.extra_waypoints,
-    )
-
-    assert result == expected
+    assert result == waypoints
 
 
 def test_get_movement_waypoints_to_well_raises(
@@ -379,7 +403,7 @@ def test_get_movement_waypoints_to_well_raises(
     geometry_view: GeometryView,
     subject: MotionView,
 ) -> None:
-    """It should raise FailedToPlanMoveError if get_waypoints raises."""
+    """It should raise FailedToPlanMoveError if motion_planning.get_waypoints raises."""
     decoy.when(pipette_view.get_current_well()).then_return(None)
     decoy.when(geometry_view.get_well_position("labware-id", "A1", None)).then_return(
         Point(4, 5, 6)
