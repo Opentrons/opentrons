@@ -6,6 +6,7 @@ import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react-hooks'
 import { i18n } from '../../../i18n'
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   useCreateLiveCommandMutation,
   useCreateCommandMutation,
@@ -14,7 +15,8 @@ import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useProtocolDetailsForRun } from '../../Devices/hooks'
+import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useIsRobotBusy, useProtocolDetailsForRun } from '../../Devices/hooks'
 import {
   useLatchControls,
   useModuleOverflowMenu,
@@ -37,6 +39,7 @@ jest.mock('../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../Devices/hooks')
 jest.mock('../useModuleIdFromRun')
+jest.mock('../../RunTimeControl/hooks')
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
@@ -56,6 +59,12 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
 >
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
+>
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
+>
+const mockUseRunStatus = useRunStatus as jest.MockedFunction<
+  typeof useRunStatus
 >
 
 const mockCloseLatchHeaterShaker = {
@@ -218,7 +227,8 @@ describe('useLatchControls', () => {
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
-
+    mockUseIsRobotBusy.mockReturnValue(false)
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     mockCreateCommand = jest.fn()
     mockCreateCommand.mockResolvedValue(null)
     mockUseCreateCommandMutation.mockReturnValue({
