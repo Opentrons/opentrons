@@ -88,7 +88,9 @@ async def test_wait_for_duration(
     await subject.wait_for_duration(seconds=0.1)
     end = datetime.now()
 
-    assert (end - start).total_seconds() == pytest.approx(0.1, abs=0.01)
+    # NOTE: margin of error selected empirically
+    # this is flakey test risk in CI
+    assert (end - start).total_seconds() == pytest.approx(0.1, abs=0.05)
 
 
 async def test_wait_for_duration_ignore_pause(
@@ -109,4 +111,6 @@ async def test_wait_for_duration_ignore_pause(
     await subject.wait_for_duration(seconds=0.1)
     end = datetime.now()
 
-    assert (end - start).total_seconds() == pytest.approx(0, abs=0.01)
+    # NOTE: margin of error selected empirically
+    # this is flakey test risk in CI
+    assert (end - start).total_seconds() == pytest.approx(0, abs=0.05)
