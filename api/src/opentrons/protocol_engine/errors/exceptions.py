@@ -133,6 +133,10 @@ class RobotDoorOpenError(ProtocolEngineError):
     """An error raised when executing a protocol command when a robot door is open."""
 
 
+class HeaterShakerMovementRestrictionError(ProtocolEngineError):
+    """An error raised when trying to move to labware that's restricted by H/S prescence"""
+
+
 class EngageHeightOutOfRangeError(ProtocolEngineError):
     """An error raised when a Magnetic Module engage height is out of bounds."""
 

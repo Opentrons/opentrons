@@ -17,6 +17,7 @@ from ..state import StateStore, CurrentWell
 from ..errors import MustHomeError
 from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
+from .heater_shaker_restriction_flagger import HeaterShakerMovementFlagger
 
 
 MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
@@ -57,6 +58,7 @@ class MovementHandler:
         hardware_api: HardwareControlAPI,
         model_utils: Optional[ModelUtils] = None,
         thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
+        heater_shaker_movement_flagger: Optional[HeaterShakerMovementFlagger] = None,
     ) -> None:
         """Initialize a MovementHandler instance."""
         self._state_store = state_store
@@ -65,6 +67,12 @@ class MovementHandler:
         self._tc_movement_flagger = (
             thermocycler_movement_flagger
             or ThermocyclerMovementFlagger(
+                state_store=self._state_store, hardware_api=self._hardware_api
+            )
+        )
+        self._hs_movement_flagger = (
+            heater_shaker_movement_flagger
+            or HeaterShakerMovementFlagger(
                 state_store=self._state_store, hardware_api=self._hardware_api
             )
         )
@@ -80,6 +88,10 @@ class MovementHandler:
         """Move to a specific well."""
         await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
             labware_id=labware_id
+        )
+
+        await self._hs_movement_flagger.raise_if_movement_restricted(
+            labware_id=labware_id, pipette_id=pipette_id
         )
 
         # get the pipette's mount and current critical point, if applicable
