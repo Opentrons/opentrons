@@ -84,6 +84,7 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   line-height: ${TYPOGRAPHY.lineHeight20};
   text-transform: ${TYPOGRAPHY.textTransformNone};
+  box-shadow: none;
   ${TYPOGRAPHY.pSemiBold}
 
   ${styleProps}

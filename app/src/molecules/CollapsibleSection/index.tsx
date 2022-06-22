@@ -7,7 +7,6 @@ import {
   Btn,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   StyleProps,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
@@ -43,9 +42,7 @@ export function CollapsibleSection(
           cursor: 'pointer',
         }}
       >
-        <StyledText as="p" marginBottom={SPACING.spacing4}>
-          {title}
-        </StyledText>
+        <StyledText as="p">{title}</StyledText>
         <Btn
           onClick={() => setIsExpanded(!isExpanded)}
           data-testid={

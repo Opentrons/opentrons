@@ -16,7 +16,8 @@ import {
   COLORS,
   Link,
   TYPOGRAPHY,
-  // ALIGN_FLEX_END,
+  POSITION_ABSOLUTE,
+  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
@@ -90,41 +91,50 @@ export function DevicesLanding(): JSX.Element {
       {!isScanning && noRobots ? (
         <DevicesEmptyState />
       ) : (
-        <>
-          <CollapsibleSection
-            marginY={SPACING.spacing4}
-            title={t('available', {
-              count: [...healthyReachableRobots, ...unhealthyReachableRobots]
-                .length,
-            })}
-          >
-            {healthyReachableRobots.map(robot => (
-              <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
-                <RobotCard robot={robot} />
-              </ApiHostProvider>
-            ))}
-            {unhealthyReachableRobots.map(robot => (
-              <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
-                <RobotCard robot={robot} />
-              </ApiHostProvider>
-            ))}
-          </CollapsibleSection>
-          <Divider />
-          <CollapsibleSection
-            marginY={SPACING.spacing4}
-            title={t('unavailable', {
-              count: [...recentlySeenRobots, ...unreachableRobots].length,
-            })}
-            isExpandedInitially={healthyReachableRobots.length === 0}
-          >
-            {recentlySeenRobots.map(robot => (
-              <RobotCard key={robot.name} robot={{ ...robot, local: null }} />
-            ))}
-            {unreachableRobots.map(robot => (
-              <RobotCard key={robot.name} robot={robot} />
-            ))}
-          </CollapsibleSection>
-        </>
+        [
+          !noRobots ? (
+            <>
+              <CollapsibleSection
+                marginY={SPACING.spacing4}
+                title={t('available', {
+                  count: [
+                    ...healthyReachableRobots,
+                    ...unhealthyReachableRobots,
+                  ].length,
+                })}
+              >
+                {healthyReachableRobots.map(robot => (
+                  <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
+                    <RobotCard robot={robot} />
+                  </ApiHostProvider>
+                ))}
+                {unhealthyReachableRobots.map(robot => (
+                  <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
+                    <RobotCard robot={robot} />
+                  </ApiHostProvider>
+                ))}
+              </CollapsibleSection>
+              <Divider />
+              <CollapsibleSection
+                marginY={SPACING.spacing4}
+                title={t('unavailable', {
+                  count: [...recentlySeenRobots, ...unreachableRobots].length,
+                })}
+                isExpandedInitially={healthyReachableRobots.length === 0}
+              >
+                {recentlySeenRobots.map(robot => (
+                  <RobotCard
+                    key={robot.name}
+                    robot={{ ...robot, local: null }}
+                  />
+                ))}
+                {unreachableRobots.map(robot => (
+                  <RobotCard key={robot.name} robot={robot} />
+                ))}
+              </CollapsibleSection>
+            </>
+          ) : null,
+        ]
       )}
     </Box>
   )
@@ -149,20 +159,36 @@ function DevicesLoadingState(): JSX.Element {
         marginBottom={SPACING.spacing4}
         color={COLORS.darkGreyEnabled}
       />
-      <Link
-        css={LINK_STYLES}
-        external
-        href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
-        display="flex"
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
-        color={COLORS.darkBlack}
-        fontSize={TYPOGRAPHY.fontSizeLabel}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        id="DevicesEmptyState_troubleshootingConnectionProblems"
+        position={POSITION_ABSOLUTE}
+        bottom="2.5rem"
+        left="0"
+        right="0"
+        marginLeft="auto"
+        marginRight="auto"
+        textAlign={TEXT_ALIGN_CENTER}
       >
-        {t('troubleshooting_connection_problems')}
-        <Icon name="open-in-new" size="0.5rem" marginLeft={SPACING.spacing2} />
-      </Link>
+        <Link
+          css={LINK_STYLES}
+          external
+          href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
+          display="flex"
+          alignItems={ALIGN_CENTER}
+          color={COLORS.darkBlack}
+          fontSize={TYPOGRAPHY.fontSizeLabel}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          id="DevicesEmptyState_troubleshootingConnectionProblems"
+        >
+          {t('troubleshooting_connection_problems')}
+          <Icon
+            name="open-in-new"
+            size="0.5rem"
+            marginLeft={SPACING.spacing2}
+          />
+        </Link>
+      </Flex>
     </Flex>
   )
 }
