@@ -22,6 +22,7 @@ import { useRunControls } from '../RunTimeControl/hooks'
 import { RUN_LOG_WINDOW_SIZE } from './constants'
 import { DownloadRunLogToast } from './DownloadRunLogToast'
 import { useTrackEvent } from '../../redux/analytics'
+import { useProtocolRunAnalyticsData } from './hooks'
 import type { Run } from '@opentrons/api-client'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
@@ -93,7 +94,6 @@ interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
 function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const history = useHistory()
-
   const {
     runId,
     robotName,
@@ -101,6 +101,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     closeOverflowMenu,
     setShowDownloadRunLogToast,
   } = props
+  const { getProtocolRunAnalyticsData } = useProtocolRunAnalyticsData(runId)
 
   const onResetSuccess = (createRunResponse: Run): void =>
     history.push(
@@ -117,7 +118,18 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { deleteRun } = useDeleteRunMutation()
 
   const handleResetClick = (): void => {
-    trackEvent({ name: 'runAgain', properties: {} })
+    getProtocolRunAnalyticsData()
+      .then(({ protocolRunAnalyticsData }) => {
+        trackEvent({
+          name: 'runAgain',
+          properties: { ...protocolRunAnalyticsData },
+        })
+      })
+      .catch((e: Error) =>
+        console.error(
+          `error formatting runAgain protocol analytics data: ${e.message}`
+        )
+      )
     reset()
   }
 
