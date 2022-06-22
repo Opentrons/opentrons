@@ -26,7 +26,11 @@ export function ConfirmCancelModal(
   const { t } = useTranslation('run_details')
   const trackEvent = useTrackEvent()
 
-  const cancel = async (): Promise<void> => {
+  const cancel: React.MouseEventHandler<HTMLButtonElement> = async (
+    e
+  ): Promise<void> => {
+    e.preventDefault()
+    e.stopPropagation()
     if (runId != null) {
       stopRun(runId)
 
@@ -43,6 +47,7 @@ export function ConfirmCancelModal(
         },
       })
     }
+
     onClose()
   }
 

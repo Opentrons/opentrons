@@ -14,8 +14,8 @@ type GetProtocolRunAnalyticsData = () => Promise<{
  *
  * @param   {string | null} runId
  * @returns {{ getProtocolRunAnalyticsData: GetProtocolRunAnalyticsData }}
- *          Returns a promise that resolves to protocol analytics data properties
- *          for use in event trackEvent
+ *          Function returned returns a promise that resolves to protocol analytics
+ *          data properties for use in event trackEvent
  */
 export function useProtocolRunAnalyticsData(
   runId: string | null
