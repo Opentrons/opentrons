@@ -77,6 +77,8 @@ import {
   useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
   useIsRobotViewable,
+  useProtocolRunAnalyticsData,
+  useRobotAnalyticsData,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
 
@@ -135,6 +137,8 @@ export function ProtocolRunHeader({
   const { protocolData, displayName, protocolKey } = useProtocolDetailsForRun(
     runId
   )
+  const { getProtocolRunAnalyticsData } = useProtocolRunAnalyticsData(runId)
+  const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
   const isProtocolAnalyzing = protocolData == null && isRobotViewable
   const runStatus = useRunStatus(runId)
@@ -154,8 +158,28 @@ export function ProtocolRunHeader({
   }, [protocolData, isRobotViewable, history])
 
   React.useEffect(() => {
+    const dismissRun = (): void => {
+      getProtocolRunAnalyticsData()
+        .then(({ protocolRunAnalyticsData, runTime }) => {
+          trackEvent({
+            name: 'runFinish',
+            properties: {
+              ...robotAnalyticsData,
+              ...protocolRunAnalyticsData,
+              runTime,
+            },
+          })
+        })
+        .catch((e: Error) =>
+          console.error(
+            `error formatting runFinish protocol analytics data: ${e.message}`
+          )
+        )
+      dismissCurrentRun(runId)
+    }
+
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent) {
-      runId != null && dismissCurrentRun(runId)
+      runId != null && dismissRun()
     }
   }, [runStatus, isRunCurrent, runId, dismissCurrentRun])
 
@@ -238,17 +262,41 @@ export function ProtocolRunHeader({
     } else if (isHeaterShakerInProtocol && !isShaking) {
       confirmAttachment()
     } else {
-      if (runStatus === RUN_STATUS_IDLE) {
-        trackEvent({ name: 'runStart', properties: {} })
-      } else {
-        trackEvent({ name: 'runResume', properties: {} })
-      }
+      getProtocolRunAnalyticsData()
+        .then(({ protocolRunAnalyticsData, runTime }) => {
+          const isIdle = runStatus === RUN_STATUS_IDLE
+          const properties = isIdle
+            ? { ...robotAnalyticsData, ...protocolRunAnalyticsData }
+            : { ...protocolRunAnalyticsData, runTime }
+          trackEvent({
+            name: isIdle ? 'runStart' : 'runResume',
+            properties,
+          })
+        })
+        .catch((e: Error) =>
+          console.error(
+            `error formatting ${
+              runStatus === RUN_STATUS_IDLE ? 'runStart' : 'runResume'
+            }  protocol analytics data: ${e.message}`
+          )
+        )
       play()
     }
   }
 
   const handlePauseButtonClick = (): void => {
-    trackEvent({ name: 'runPause', properties: {} })
+    getProtocolRunAnalyticsData()
+      .then(({ protocolRunAnalyticsData, runTime }) => {
+        trackEvent({
+          name: 'runPause',
+          properties: { ...protocolRunAnalyticsData, runTime },
+        })
+      })
+      .catch((e: Error) =>
+        console.error(
+          `error formatting runPause protocol analytics data: ${e.message}`
+        )
+      )
     pause()
   }
 
