@@ -67,7 +67,7 @@ export function DevicesLanding(): JSX.Element {
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        marginTop={SPACING.spacing3}
+        marginY={SPACING.spacing3}
       >
         <StyledText as="h1" id="DevicesLanding_title">
           {t('devices')}
