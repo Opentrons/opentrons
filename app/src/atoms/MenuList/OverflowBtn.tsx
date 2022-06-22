@@ -25,12 +25,12 @@ const overflowButtonStyles = css`
 
   &:focus-visible {
     box-shadow: 0 0 0 3px ${COLORS.warning};
+    // focus-visible takes over focus background-color tried focus-only but didn't work
+    background-color: transparent;
   }
 
   &:focus-visible circle {
     fill: ${COLORS.darkGreyHover};
-    // focus-visible takes over focus background-color tried focus-only but didn't work
-    background-color: transparent;
   }
 
   &:disabled circle {
