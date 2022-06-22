@@ -159,6 +159,8 @@ export function ProtocolRunHeader({
 
   React.useEffect(() => {
     const dismissRun = async (): Promise<void> => {
+      dismissCurrentRun(runId)
+
       const {
         protocolRunAnalyticsData,
         runTime,
@@ -172,8 +174,6 @@ export function ProtocolRunHeader({
           runTime,
         },
       })
-
-      dismissCurrentRun(runId)
     }
 
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent) {
@@ -268,6 +268,8 @@ export function ProtocolRunHeader({
     } else if (isHeaterShakerInProtocol && !isShaking) {
       confirmAttachment()
     } else {
+      play()
+
       const {
         protocolRunAnalyticsData,
         runTime,
@@ -281,12 +283,12 @@ export function ProtocolRunHeader({
         name: isIdle ? 'runStart' : 'runResume',
         properties,
       })
-
-      play()
     }
   }
 
   const handlePauseButtonClick = async (): Promise<void> => {
+    pause()
+
     const {
       protocolRunAnalyticsData,
       runTime,
@@ -296,8 +298,6 @@ export function ProtocolRunHeader({
       name: 'runPause',
       properties: { ...protocolRunAnalyticsData, runTime },
     })
-
-    pause()
   }
 
   const handleResetButtonClick = async (): Promise<void> => {

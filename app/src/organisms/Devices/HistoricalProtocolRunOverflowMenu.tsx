@@ -123,14 +123,14 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   ): Promise<void> => {
     e.preventDefault()
     e.stopPropagation()
+    reset()
+
     const { protocolRunAnalyticsData } = await getProtocolRunAnalyticsData()
 
     trackEvent({
       name: 'runAgain',
       properties: { ...protocolRunAnalyticsData },
     })
-
-    reset()
   }
 
   const handleDeleteClick: React.MouseEventHandler<HTMLButtonElement> = e => {

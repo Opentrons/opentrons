@@ -77,15 +77,15 @@ export function LastRun(): JSX.Element | null {
   const labwareOffsetCount = getLatestLabwareOffsetCount(labwareOffsets ?? [])
 
   const handleCloneRun = async (): Promise<void> => {
+    cloneRun()
+    history.push('/run')
+
     const { protocolRunAnalyticsData } = await getProtocolRunAnalyticsData()
 
     trackEvent({
       name: 'runAgain',
       properties: { ...protocolRunAnalyticsData },
     })
-
-    cloneRun()
-    history.push('/run')
   }
 
   if (mostRecentRun == null && !isFetchingMostRecentRun) return null

@@ -26,24 +26,22 @@ export function ConfirmCancelModal(
   const { t } = useTranslation('run_details')
   const trackEvent = useTrackEvent()
 
-  const cancel = (): void => {
+  const cancel = async (): Promise<void> => {
     if (runId != null) {
-      getProtocolRunAnalyticsData()
-        .then(({ protocolRunAnalyticsData, runTime }) => {
-          trackEvent({
-            name: 'runCancel',
-            properties: {
-              ...protocolRunAnalyticsData,
-              runTime,
-            },
-          })
-        })
-        .catch((e: Error) =>
-          console.error(
-            `error getting runCancel protocol analytics data: ${e.message}`
-          )
-        )
       stopRun(runId)
+
+      const {
+        protocolRunAnalyticsData,
+        runTime,
+      } = await getProtocolRunAnalyticsData()
+
+      trackEvent({
+        name: 'runCancel',
+        properties: {
+          ...protocolRunAnalyticsData,
+          runTime,
+        },
+      })
     }
     onClose()
   }
