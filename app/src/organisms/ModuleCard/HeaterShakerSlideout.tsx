@@ -25,11 +25,12 @@ import {
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import { InputField } from '../../atoms/InputField'
-import { useModuleIdFromRun } from './useModuleIdFromRun'
+import { Portal } from '../../App/portal'
+import { SubmitPrimaryButton } from '../../atoms/buttons'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type { HeaterShakerModule } from '../../redux/modules/types'
 import type {
@@ -126,19 +127,24 @@ export const HeaterShakerSlideout = (
       }
     }
     isSetShake ? confirmAttachment() : setHsValue(null)
+    onCloseClick()
   }
 
   let errorMessage
   if (isSetShake) {
     errorMessage =
       hsValue != null &&
-      (parseInt(hsValue) < HS_RPM_MIN || parseInt(hsValue) > HS_RPM_MAX)
+      (parseInt(hsValue) < HS_RPM_MIN ||
+        parseInt(hsValue) > HS_RPM_MAX ||
+        hsValue.includes('.'))
         ? t('input_out_of_range')
         : null
   } else {
     errorMessage =
       hsValue != null &&
-      (parseInt(hsValue) < HS_TEMP_MIN || parseInt(hsValue) > HS_TEMP_MAX)
+      (parseInt(hsValue) < HS_TEMP_MIN ||
+        parseInt(hsValue) > HS_TEMP_MAX ||
+        hsValue.includes('.'))
         ? t('input_out_of_range')
         : null
   }
@@ -150,11 +156,13 @@ export const HeaterShakerSlideout = (
   return (
     <>
       {showConfirmationModal && (
-        <ConfirmAttachmentModal
-          onCloseClick={cancelExit}
-          isProceedToRunModal={false}
-          onConfirmClick={sendShakeSpeedCommand}
-        />
+        <Portal level="top">
+          <ConfirmAttachmentModal
+            onCloseClick={cancelExit}
+            isProceedToRunModal={false}
+            onConfirmClick={sendShakeSpeedCommand}
+          />
+        </Portal>
       )}
       <Slideout
         title={t('set_status_heater_shaker', {
@@ -164,14 +172,13 @@ export const HeaterShakerSlideout = (
         onCloseClick={onCloseClick}
         isExpanded={isExpanded}
         footer={
-          <PrimaryButton
+          <SubmitPrimaryButton
+            form={'HeaterShakerSlideout_submitValue'}
+            value={t('confirm')}
             onClick={sendSetTemperatureOrShakeCommand}
             disabled={hsValue === null || errorMessage !== null}
-            width="100%"
             data-testid={`HeaterShakerSlideout_btn_${module.serialNumber}`}
-          >
-            {t('confirm')}
-          </PrimaryButton>
+          />
         }
       >
         <Text
@@ -195,21 +202,23 @@ export const HeaterShakerSlideout = (
           >
             {isSetShake ? t('set_shake_speed') : t('set_block_temp')}
           </Text>
-          <InputField
-            data-testid={`${module.moduleModel}_${isSetShake}`}
-            id={`${module.moduleModel}_${isSetShake}`}
-            autoFocus
-            units={unit}
-            value={hsValue}
-            onChange={e => setHsValue(e.target.value)}
-            type="number"
-            caption={t('module_status_range', {
-              min: inputMin,
-              max: inputMax,
-              unit: unit,
-            })}
-            error={errorMessage}
-          />
+          <form id="HeaterShakerSlideout_submitValue">
+            <InputField
+              data-testid={`${module.moduleModel}_${isSetShake}`}
+              id={`${module.moduleModel}_${isSetShake}`}
+              units={unit}
+              autoFocus
+              value={hsValue}
+              onChange={e => setHsValue(e.target.value)}
+              type="number"
+              caption={t('module_status_range', {
+                min: inputMin,
+                max: inputMax,
+                unit: unit,
+              })}
+              error={errorMessage}
+            />
+          </form>
         </Flex>
       </Slideout>
     </>

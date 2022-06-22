@@ -148,7 +148,13 @@ export const HeaterShakerModuleData = (
             {t('heater')}
           </Text>
           <StatusLabel
-            status={moduleData.temperatureStatus}
+            status={
+              // when module is first turned on, target Temp is set to 0 which a user can never set
+              //  since it is out of range
+              moduleData.targetTemperature === 0
+                ? 'idle'
+                : moduleData.temperatureStatus
+            }
             {...getStatusLabelProps(moduleData.temperatureStatus)}
           />
           <Text
@@ -157,7 +163,10 @@ export const HeaterShakerModuleData = (
             marginBottom={SPACING.spacing1}
           >
             {t(
-              moduleData.targetTemperature != null ? 'target_temp' : 'na_temp',
+              moduleData.targetTemperature != null &&
+                moduleData.targetTemperature !== 0
+                ? 'target_temp'
+                : 'na_temp',
               {
                 temp: moduleData.targetTemperature,
               }

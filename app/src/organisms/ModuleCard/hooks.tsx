@@ -16,6 +16,7 @@ import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocol
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { useRunStatus } from '../RunTimeControl/hooks'
 import { useIsRobotBusy, useProtocolDetailsForRun } from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
@@ -128,10 +129,11 @@ export function useModuleOverflowMenu(
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
+  const runStatus = runId != null ? useRunStatus(runId) : null
+  const isBusy = runStatus != null ? useIsRobotBusy() && runId == null : false
   const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
-  const isBusy = useIsRobotBusy() && runId == null
 
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&

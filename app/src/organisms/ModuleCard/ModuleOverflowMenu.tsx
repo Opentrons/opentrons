@@ -4,11 +4,12 @@ import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
+import { useIsRobotBusy } from '../Devices/hooks'
+import { useRunStatus } from '../RunTimeControl/hooks'
 import { MenuItemsByModuleType, useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '../../redux/modules/types'
 import type { ModuleType } from '@opentrons/shared-data'
-import { useIsRobotBusy } from '../Devices/hooks'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
@@ -31,7 +32,8 @@ export const ModuleOverflowMenu = (
     handleTestShakeClick,
     handleWizardClick,
   } = props
-
+  const runStatus = runId != null ? useRunStatus(runId) : null
+  const isBusy = runStatus != null ? useIsRobotBusy() && runId == null : false
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
     module,
@@ -41,7 +43,7 @@ export const ModuleOverflowMenu = (
     handleWizardClick,
     handleSlideoutClick
   )
-  const isBusy = useIsRobotBusy() && runId == null
+
   return (
     <>
       <Flex position={POSITION_RELATIVE}>

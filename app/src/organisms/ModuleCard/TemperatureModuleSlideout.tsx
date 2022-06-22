@@ -20,7 +20,7 @@ import {
   TEMP_MIN,
 } from '@opentrons/shared-data'
 import { Slideout } from '../../atoms/Slideout'
-import { PrimaryButton } from '../../atoms/buttons'
+import { SubmitPrimaryButton } from '../../atoms/buttons'
 import { InputField } from '../../atoms/InputField'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
@@ -79,12 +79,14 @@ export const TemperatureModuleSlideout = (
       }
     }
     setTemperatureValue(null)
+    onCloseClick()
   }
 
   const valueOutOfRange =
     temperatureValue != null &&
     (parseInt(temperatureValue) < TEMP_MIN ||
-      parseInt(temperatureValue) > TEMP_MAX)
+      parseInt(temperatureValue) > TEMP_MAX ||
+      temperatureValue?.includes('.'))
 
   return (
     <Slideout
@@ -92,14 +94,13 @@ export const TemperatureModuleSlideout = (
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
-        <PrimaryButton
-          width="100%"
+        <SubmitPrimaryButton
+          form="TemperatureModuleSlideout_submitValue"
+          value={t('confirm')}
           onClick={handleSubmitTemperature}
           disabled={temperatureValue === null || valueOutOfRange}
           data-testid={`TemperatureSlideout_btn_${module.serialNumber}`}
-        >
-          {t('confirm')}
-        </PrimaryButton>
+        />
       }
     >
       <Text
@@ -125,21 +126,23 @@ export const TemperatureModuleSlideout = (
         >
           {t('set_temperature')}
         </Text>
-        <InputField
-          id={`${module.moduleModel}`}
-          data-testid={`${module.moduleModel}`}
-          autoFocus
-          units={CELSIUS}
-          value={temperatureValue}
-          onChange={e => setTemperatureValue(e.target.value)}
-          type="number"
-          caption={t('module_status_range', {
-            min: TEMP_MIN,
-            max: TEMP_MAX,
-            unit: CELSIUS,
-          })}
-          error={valueOutOfRange ? t('input_out_of_range') : null}
-        />
+        <form id="TemperatureModuleSlideout_submitValue">
+          <InputField
+            id={`${module.moduleModel}`}
+            data-testid={`${module.moduleModel}`}
+            units={CELSIUS}
+            value={temperatureValue}
+            autoFocus
+            onChange={e => setTemperatureValue(e.target.value)}
+            type="number"
+            caption={t('module_status_range', {
+              min: TEMP_MIN,
+              max: TEMP_MAX,
+              unit: CELSIUS,
+            })}
+            error={valueOutOfRange ? t('input_out_of_range') : null}
+          />
+        </form>
       </Flex>
     </Slideout>
   )

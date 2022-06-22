@@ -23,7 +23,7 @@ import {
   Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
+import { SubmitPrimaryButton } from '../../atoms/buttons'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type { ThermocyclerModule } from '../../redux/modules/types'
@@ -60,13 +60,17 @@ export const ThermocyclerModuleSlideout = (
   if (isSecondaryTemp) {
     errorMessage =
       tempValue != null &&
-      (parseInt(tempValue) < TEMP_LID_MIN || parseInt(tempValue) > TEMP_LID_MAX)
+      (parseInt(tempValue) < TEMP_LID_MIN ||
+        parseInt(tempValue) > TEMP_LID_MAX ||
+        tempValue.includes('.'))
         ? t('input_out_of_range')
         : null
   } else {
     errorMessage =
       tempValue != null &&
-      (parseInt(tempValue) < TEMP_MIN || parseInt(tempValue) > TEMP_BLOCK_MAX)
+      (parseInt(tempValue) < TEMP_MIN ||
+        parseInt(tempValue) > TEMP_BLOCK_MAX ||
+        tempValue.includes('.'))
         ? t('input_out_of_range')
         : null
   }
@@ -112,6 +116,7 @@ export const ThermocyclerModuleSlideout = (
       }
     }
     setTempValue(null)
+    onCloseClick()
   }
 
   return (
@@ -120,14 +125,13 @@ export const ThermocyclerModuleSlideout = (
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
-        <PrimaryButton
+        <SubmitPrimaryButton
+          form="ThermocyclerModuleSlideout_submitValue"
+          value={t('confirm')}
           onClick={handleSubmitTemp}
           disabled={tempValue === null || errorMessage !== null}
-          width="100%"
           data-testid={`ThermocyclerSlideout_btn_${module.serialNumber}`}
-        >
-          {t('confirm')}
-        </PrimaryButton>
+        />
       }
     >
       <Text
@@ -155,21 +159,23 @@ export const ThermocyclerModuleSlideout = (
         >
           {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}
         </Text>
-        <InputField
-          data-testid={`${module.moduleModel}_${isSecondaryTemp}`}
-          id={`${module.moduleModel}_${isSecondaryTemp}`}
-          autoFocus
-          units={CELSIUS}
-          value={tempValue}
-          onChange={e => setTempValue(e.target.value)}
-          type="number"
-          caption={t('module_status_range', {
-            min: tempRanges.min,
-            max: tempRanges.max,
-            unit: CELSIUS,
-          })}
-          error={errorMessage}
-        />
+        <form id="ThermocyclerModuleSlideout_submitValue">
+          <InputField
+            data-testid={`${module.moduleModel}_${isSecondaryTemp}`}
+            id={`${module.moduleModel}_${isSecondaryTemp}`}
+            units={CELSIUS}
+            value={tempValue}
+            autoFocus
+            onChange={e => setTempValue(e.target.value)}
+            type="number"
+            caption={t('module_status_range', {
+              min: tempRanges.min,
+              max: tempRanges.max,
+              unit: CELSIUS,
+            })}
+            error={errorMessage}
+          />
+        </form>
       </Flex>
     </Slideout>
   )
