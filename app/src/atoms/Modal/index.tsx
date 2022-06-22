@@ -53,12 +53,12 @@ export const Modal = (props: ModalProps): JSX.Element => {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           paddingX={SPACING.spacing5}
-          paddingY={SPACING.spacing4}
+          paddingY={SPACING.spacing5}
         >
           <Flex>
             {['error', 'warning'].includes(type) ? (
               <Icon
-                name="alert-circle"
+                name="ot-alert"
                 color={type === 'error' ? COLORS.error : COLORS.warning}
                 size={SPACING.spacingM}
                 marginRight={SPACING.spacing3}
