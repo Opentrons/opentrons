@@ -4,6 +4,8 @@ import {
   useAllRunsQuery,
   useAllProtocolsQuery,
 } from '@opentrons/react-api-client'
+import last from 'lodash/last'
+
 import {
   Flex,
   Box,
@@ -15,10 +17,14 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
+import { getRequestById, useDispatchApiRequest } from '../../redux/robot-api'
+import { fetchProtocols } from '../../redux/protocol-storage'
 import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { HistoricalProtocolRun } from './HistoricalProtocolRun'
 import { useIsRobotViewable } from './hooks'
+import { useSelector } from 'react-redux'
+import type { State } from '../../redux/types'
 
 interface RecentProtocolRunsProps {
   robotName: string
@@ -29,11 +35,22 @@ export function RecentProtocolRuns({
 }: RecentProtocolRunsProps): JSX.Element | null {
   const { t } = useTranslation('device_details')
   const isRobotViewable = useIsRobotViewable(robotName)
+  const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const runsQueryResponse = useAllRunsQuery()
   const runs = runsQueryResponse?.data?.data
   const protocols = useAllProtocolsQuery()
   const currentRunId = useCurrentRunId()
   const robotIsBusy = currentRunId != null
+  const latestRequestId = last(requestIds)
+  const isFetching = useSelector<State, boolean>(state =>
+    latestRequestId != null
+      ? getRequestById(state, latestRequestId)?.status === 'pending'
+      : false
+  )
+
+  React.useEffect(() => {
+    dispatchRequest(fetchProtocols())
+  }, [dispatchRequest, robotName])
 
   return (
     <Flex
@@ -109,11 +126,12 @@ export function RecentProtocolRuns({
                 const protocol = protocols?.data?.data.find(
                   protocol => protocol.id === run.protocolId
                 )
-                const protocolName =
-                  protocol?.metadata.protocolName ??
-                  protocol?.files[0].name ??
-                  run.protocolId ??
-                  ''
+                const protocolName = isFetching
+                  ? protocol?.metadata.protocolName ??
+                    protocol?.files[0].name ??
+                    run.protocolId ??
+                    ''
+                  : ''
 
                 return (
                   <HistoricalProtocolRun

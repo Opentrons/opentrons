@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
+import last from 'lodash/last'
 import {
   Box,
   Flex,
@@ -20,13 +21,17 @@ import {
   Btn,
   TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
-import { LEFT } from '../../../redux/pipettes'
+import { fetchPipettes, LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { Portal } from '../../../App/portal'
 import { StyledText } from '../../../atoms/text'
 import { getHasCalibrationBlock } from '../../../redux/config'
+import { getRequestById, useDispatchApiRequest } from '../../../redux/robot-api'
 import { Banner } from '../../../atoms/Banner'
-import { fetchPipetteOffsetCalibrations } from '../../../redux/calibration'
+import {
+  fetchCalibrationStatus,
+  fetchPipetteOffsetCalibrations,
+} from '../../../redux/calibration'
 import { ChangePipette } from '../../ChangePipette'
 import { useCalibratePipetteOffset } from '../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import {
@@ -41,7 +46,7 @@ import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
 import type { AttachedPipette, Mount } from '../../../redux/pipettes/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
-import type { Dispatch } from '../../../redux/types'
+import type { Dispatch, State } from '../../../redux/types'
 
 interface PipetteCardProps {
   pipetteInfo: PipetteModelSpecs | null
@@ -57,6 +62,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
   const { pipetteInfo, mount, robotName, pipetteId } = props
   const dispatch = useDispatch<Dispatch>()
+  const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const pipetteName = pipetteInfo?.displayName
   const pipetteOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
@@ -78,6 +84,12 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteId,
     mount
   )
+  const latestRequestId = last(requestIds)
+  const isFetching = useSelector<State, boolean>(state =>
+    latestRequestId != null
+      ? getRequestById(state, latestRequestId)?.status === 'pending'
+      : false
+  )
 
   useInterval(
     () => {
@@ -86,6 +98,11 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     pipetteOffsetCalibration === null ? 1000 : FETCH_PIPETTE_CAL_MS,
     true
   )
+
+  React.useEffect(() => {
+    dispatchRequest(fetchPipettes(robotName, true))
+    dispatchRequest(fetchCalibrationStatus(robotName))
+  }, [dispatchRequest, robotName])
 
   const badCalibration = pipetteOffsetCalibration?.status.markedBad
 
@@ -122,6 +139,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const handleSettingsSlideout = (): void => {
     setShowSlideout(true)
   }
+
   return (
     <Flex
       backgroundColor={COLORS.background}
@@ -184,7 +202,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             {!isDeckCalibrated &&
             pipetteOffsetCalibration == null &&
             pipetteInfo != null &&
-            showBanner ? (
+            showBanner &&
+            !isFetching ? (
               <Flex paddingBottom={SPACING.spacing2}>
                 <Banner type="error" onCloseClick={() => setShowBanner(false)}>
                   {t('deck_cal_missing')}
@@ -194,7 +213,8 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             {isDeckCalibrated &&
             pipetteOffsetCalibration == null &&
             pipetteInfo != null &&
-            showBanner ? (
+            showBanner &&
+            !isFetching ? (
               <Flex paddingBottom={SPACING.spacing2}>
                 <Banner type="error" onCloseClick={() => setShowBanner(false)}>
                   <Flex flexDirection={DIRECTION_COLUMN}>
@@ -239,7 +259,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               paddingBottom={SPACING.spacing2}
               data-testid={`PipetteCard_mount_${pipetteName}`}
             >
-              {t('mount', { side: mount === LEFT ? t('left') : t('right') })}
+              {t('mount', {
+                side: mount === LEFT ? t('left') : t('right'),
+              })}
             </StyledText>
             <Flex
               paddingBottom={SPACING.spacing2}
