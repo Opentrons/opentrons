@@ -21,7 +21,6 @@ class OT3GPIO:
         """
         try:
             import gpiod  # type: ignore[import]
-
             return gpiod
         except ImportError:
             LOG.warning("could not import gpiod")
@@ -40,13 +39,13 @@ class OT3GPIO:
         self._estop_out_line.request(
             self._consumer_name, type=self._gpiod.LINE_REQ_DIR_OUT
         )
-        self.release_estop()
+        self.deactivate_estop()
 
-    def assert_estop(self) -> None:
+    def activate_estop(self) -> None:
         """Assert the emergency stop, which will disable all motors."""
         self._estop_out_line.set_value(0)
 
-    def release_estop(self) -> None:
+    def deactivate_estop(self) -> None:
         """Stop asserting the emergency stop.
 
         If no other node is asserting estop, then motors can be enabled

@@ -101,7 +101,7 @@ async def run(args: argparse.Namespace) -> None:
     async with build.can_messenger(build_settings(args)) as messenger:
         # build a GPIO handler, which will automatically release estop
         gpio = OT3GPIO(__name__)
-        gpio.release_estop()
+        gpio.deactivate_estop()
         await run_move(messenger)
 
 

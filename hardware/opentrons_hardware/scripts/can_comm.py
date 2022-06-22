@@ -232,7 +232,7 @@ async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     # build a gpio handler which will automatically release estop
     gpio = OT3GPIO()
-    gpio.release_estop()
+    gpio.deactivate_estop()
     async with build.driver(build_settings(args)) as driver:
         await (run_ui(driver))
 
