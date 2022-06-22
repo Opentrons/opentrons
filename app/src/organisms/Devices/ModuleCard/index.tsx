@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { last } from 'lodash'
+import last from 'lodash/last'
 import {
   Box,
   Flex,
