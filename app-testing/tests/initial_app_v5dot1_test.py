@@ -30,8 +30,6 @@ def test_initial_load_robot_available_v5dot1(
     os.environ["OT_APP_ANALYTICS__SEEN_OPT_IN"] = "true"
     # app should look on localhost for robots
     os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"
-    # app should use the __DEV__ Hierarchy Reorganization
-    os.environ["OT_APP_DEV_INTERNAL__hierarchyReorganization"] = "false"
     # Start chromedriver with our options and use the
     # context manager to ensure it quits.
     with webdriver.Chrome(options=chrome_options) as driver:

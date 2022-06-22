@@ -17,6 +17,7 @@ from collections import OrderedDict
 
 from opentrons import types
 from opentrons.broker import Broker
+from opentrons.config import feature_flags as ff
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleType
@@ -27,6 +28,7 @@ from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
     requires_version,
     APIVersionError,
+    UnsupportedAPIError,
 )
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.context.protocol import AbstractProtocol
@@ -43,6 +45,7 @@ from .module_contexts import (
     MagneticModuleContext,
     TemperatureModuleContext,
     ThermocyclerContext,
+    HeaterShakerContext,
 )
 from .labware_offset_provider import (
     AbstractLabwareOffsetProvider,
@@ -57,7 +60,10 @@ logger = logging.getLogger(__name__)
 
 
 ModuleTypes = Union[
-    TemperatureModuleContext, MagneticModuleContext, ThermocyclerContext
+    TemperatureModuleContext,
+    MagneticModuleContext,
+    ThermocyclerContext,
+    HeaterShakerContext,
 ]
 
 
@@ -460,11 +466,13 @@ class ProtocolContext(CommandPublisher):
                               pass in the key word value `semi`
         :type location: str or int or None
         :returns: The loaded and initialized module---a
-                  :py:class:`TemperatureModuleContext`,
+                  :py:class:`TemperatureModuleContext`, or
                   :py:class:`ThermocyclerContext`, or
-                  :py:class:`MagneticModuleContext`,
+                  :py:class:`MagneticModuleContext`
                   depending on what you requested with ``module_name``.
         """
+        # TODO: add heater-shaker to the returns values in above docstring
+
         if self._api_version < APIVersion(2, 4) and configuration:
             raise APIVersionError(
                 f"You have specified API {self._api_version}, but you are"
@@ -472,7 +480,6 @@ class ProtocolContext(CommandPublisher):
             )
 
         requested_model = resolve_module_model(module_name)
-
         load_result = self._implementation.load_module(
             model=requested_model, location=location, configuration=configuration
         )
@@ -480,10 +487,18 @@ class ProtocolContext(CommandPublisher):
         if not load_result:
             raise RuntimeError(f"Could not find specified module: {module_name}")
 
+        # TODO(mc, 2022-06-14): remove guard for heater-shaker production release
+        if (
+            load_result.type == ModuleType.HEATER_SHAKER
+            and not ff.enable_heater_shaker_python_api()
+        ):
+            raise UnsupportedAPIError("Heater-Shaker module is not yet supported")
+
         mod_class = {
             ModuleType.MAGNETIC: MagneticModuleContext,
             ModuleType.TEMPERATURE: TemperatureModuleContext,
             ModuleType.THERMOCYCLER: ThermocyclerContext,
+            ModuleType.HEATER_SHAKER: HeaterShakerContext,
         }[load_result.type]
 
         module_context: ModuleTypes = mod_class(

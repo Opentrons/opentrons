@@ -6,13 +6,13 @@ import { Banner } from '../../../atoms/Banner'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useIsRobotViewable } from '../hooks'
-import { ModuleCard } from '../ModuleCard'
+import { ModuleCard } from '../../ModuleCard'
 import { PipettesAndModules } from '../PipettesAndModules'
 import { PipetteCard } from '../PipetteCard'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../hooks')
-jest.mock('../ModuleCard')
+jest.mock('../../ModuleCard')
 jest.mock('../PipetteCard')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../../atoms/Banner')

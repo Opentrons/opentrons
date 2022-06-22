@@ -2,27 +2,23 @@ import functools
 import logging
 from collections import UserDict
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional, List, Dict, Set
+from typing import Optional, List
 
-from opentrons import types
-from opentrons.protocol_api.labware import load as load_lw, Labware
-from opentrons.protocols.api_support.constants import deck_type
-from opentrons.protocols.api_support.labware_like import LabwareLike
-from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.hardware_control.modules.types import ModuleType
-from opentrons.protocols.geometry.module_geometry import (
-    ModuleGeometry,
-    ThermocyclerGeometry,
-)
 from opentrons_shared_data.deck import (
     DEFAULT_DECK_DEFINITION_VERSION,
     load as load_deck,
 )
+from opentrons_shared_data.deck.dev_types import SlotDefV3
 
-if TYPE_CHECKING:
-    from opentrons_shared_data.deck.dev_types import (
-        SlotDefV3,
-    )
+from opentrons import types
+from opentrons.hardware_control.modules.types import ModuleType
+from opentrons.protocol_api.labware import load as load_lw, Labware
+from opentrons.protocols.api_support.constants import deck_type
+from opentrons.protocols.api_support.labware_like import LabwareLike
+
+from . import deck_conflict
+from .deck_item import DeckItem
+from .module_geometry import ModuleGeometry, ThermocyclerGeometry
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -46,7 +42,7 @@ class CalibrationPosition:
 
 
 class Deck(UserDict):
-    def __init__(self, load_name: Optional[str] = None) -> None:
+    def __init__(self) -> None:
         super().__init__()
         row_offset = 90.5
         col_offset = 132.5
@@ -57,15 +53,26 @@ class Deck(UserDict):
             for idx in range(12)
         }
         self._highest_z = 0.0
-        if not load_name:
-            load_name = deck_type()
-        self._definition = load_deck(load_name, DEFAULT_DECK_DEFINITION_VERSION)
+        # TODO(mc, 2022-06-17): move deck type selection
+        # (and maybe deck definition loading) out of this constructor
+        # to decouple from config (and environment) reading / loading
+        self._definition = load_deck(deck_type(), DEFAULT_DECK_DEFINITION_VERSION)
         self._load_fixtures()
         self._thermocycler_present = False
 
     def _load_fixtures(self):
         for f in self._definition["locations"]["fixtures"]:
             slot_name = self._check_name(f["slot"])  # type: ignore
+            # TODO(mc, 2022-06-15): this loads the fixed trash as an instance of
+            # `opentrons.protocol_api.labware.Labware`
+            # However, all other labware will be added to the `Deck` as instances of
+            # `opentrons.protocols.context.labware.AbstractLabware`
+            # And modules will be added as instances of
+            # `opentrons.protocols.geometry.module_geometry.ModuleGeometry`
+            # This mix of public and private interfaces as members of a public
+            # `Deck` interface is confusing and should be resolved.
+            # If `Deck` is public, all items in a `Deck` should be
+            # instances of other public APIs.
             loaded_f = load_lw(
                 f["labware"], self.position_for(slot_name)  # type: ignore
             )
@@ -110,30 +117,17 @@ class Deck(UserDict):
 
     def __setitem__(self, key: types.DeckLocation, val: DeckItem) -> None:
         slot_key_int = self._check_name(key)
-        item = self.data.get(slot_key_int)
+        existing_items = {
+            slot: item for slot, item in self.data.items() if item is not None
+        }
 
-        overlapping_items = self._get_collisions_for_item(slot_key_int, val)
-        if item is not None:
-            if slot_key_int == 12:
-                if FIXED_TRASH_ID in item.parameters.get("quirks", []):
-                    pass
-                else:
-                    raise ValueError(f"Deck slot {key} is for fixed trash only")
-            else:
-                raise ValueError(
-                    f"Deck slot {key} already"
-                    f" has an item: {self.data[slot_key_int].load_name}"
-                )
-        elif overlapping_items:
-            flattened_overlappers = [
-                f"{item.load_name} in slot {slot}"
-                for slot, sublist in overlapping_items.items()
-                for item in sublist
-            ]
-            raise ValueError(
-                f"Could not load {val} because it would"
-                f" interfere with {', '.join(flattened_overlappers)}"
-            )
+        # will raise DeckConflictError if items conflict
+        deck_conflict.check(
+            existing_items=existing_items,
+            new_location=slot_key_int,
+            new_item=val,
+        )
+
         self.data[slot_key_int] = val
         self._highest_z = max(val.highest_z, self._highest_z)
         self._thermocycler_present = any(
@@ -286,32 +280,6 @@ class Deck(UserDict):
             self._check_name(f.get("slot")) for f in fixtures if f.get("slot")
         }
         return [s for s in self.data.keys() if s not in fixture_slots]
-
-    def _get_collisions_for_item(
-        self, slot_key: types.DeckLocation, item: DeckItem
-    ) -> Dict[types.DeckLocation, List[DeckItem]]:
-        """Return the loaded deck items that collide with the given item."""
-
-        def get_item_covered_slot_keys(sk, i) -> Set[str]:
-            if isinstance(i, ThermocyclerGeometry):
-                return i.covered_slots
-            elif i is not None:
-                return set([sk])
-            else:
-                return set()
-
-        item_slot_keys = get_item_covered_slot_keys(slot_key, item)
-        colliding_items: Dict[types.DeckLocation, List[DeckItem]] = {}
-
-        for slot_key, existing_item in self.data.items():
-            occupied_slot_keys = get_item_covered_slot_keys(slot_key, existing_item)
-            conflicting_slot_keys = occupied_slot_keys & item_slot_keys
-
-            if len(conflicting_slot_keys) > 0:
-                for conflict in conflicting_slot_keys:
-                    colliding_items.setdefault(conflict, []).append(existing_item)
-
-        return colliding_items
 
     @property
     def thermocycler_present(self) -> bool:
