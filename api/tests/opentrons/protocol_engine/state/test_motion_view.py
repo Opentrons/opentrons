@@ -471,3 +471,115 @@ def test_get_movement_waypoints_to_well_raises(
             origin_cp=None,
             max_travel_z=123,
         )
+
+
+@pytest.mark.parametrize(
+    ("direct", "expected_move_type"),
+    [
+        (False, motion_planning.MoveType.GENERAL_ARC),
+        (True, motion_planning.MoveType.DIRECT),
+    ],
+)
+@pytest.mark.parametrize(
+    ("additional_min_travel_z", "all_labware_highest_z", "expected_min_travel_z"),
+    [
+        (None, 100, 100),
+        (200, 100, 200),
+        (100, 200, 200),
+        (None, -100, -100),
+        (-200, -100, -100),
+        (-100, -200, -100),
+    ],
+)
+def test_get_movement_waypoints_to_coords(
+    decoy: Decoy,
+    geometry_view: GeometryView,
+    mock_get_waypoints: _GET_WAYPOINTS_SIGNATURE,
+    subject: MotionView,
+    direct: bool,
+    expected_move_type: motion_planning.MoveType,
+    additional_min_travel_z: float,
+    all_labware_highest_z: float,
+    expected_min_travel_z: float,
+) -> None:
+    origin = Point(1, 2, 3)
+    dest = Point(4, 5, 6)
+    max_travel_z = 789
+
+    decoy.when(geometry_view.get_all_labware_highest_z()).then_return(
+        all_labware_highest_z
+    )
+
+    waypoints = [
+        motion_planning.Waypoint(
+            position=Point(1, 2, 3), critical_point=CriticalPoint.XY_CENTER
+        ),
+        motion_planning.Waypoint(
+            position=Point(4, 5, 6), critical_point=CriticalPoint.MOUNT
+        ),
+    ]
+
+    decoy.when(
+        mock_get_waypoints(
+            origin=origin,
+            origin_cp=None,
+            dest=dest,
+            dest_cp=None,
+            min_travel_z=expected_min_travel_z,
+            max_travel_z=max_travel_z,
+            move_type=expected_move_type,
+        )
+    ).then_return(waypoints)
+
+    result = subject.get_movement_waypoints_to_coords(
+        origin=origin,
+        dest=dest,
+        max_travel_z=max_travel_z,
+        direct=direct,
+        additional_min_travel_z=additional_min_travel_z,
+    )
+
+    assert result == waypoints
+
+
+def test_get_movement_waypoints_to_coords_raises(
+    decoy: Decoy,
+    geometry_view: GeometryView,
+    mock_get_waypoints: _GET_WAYPOINTS_SIGNATURE,
+    subject: MotionView,
+) -> None:
+    """It should raise FailedToPlanMoveError if motion_planning.get_waypoints raises."""
+    decoy.when(geometry_view.get_all_labware_highest_z()).then_return(123)
+    decoy.when(
+        # TODO(mm, 2022-06-22): We should use decoy.matchers.Anything() for all
+        # arguments. For some reason, Decoy does not match the call unless we
+        # specify concrete values for all (?) arguments?
+        mock_get_waypoints(
+            Point(x=1, y=2, z=3),
+            Point(x=1, y=2, z=3),
+            max_travel_z=123,
+            min_travel_z=123,
+            move_type=motion_planning.MoveType.GENERAL_ARC,
+            origin_cp=None,
+            dest_cp=None,
+        ),
+    ).then_raise(
+        motion_planning.MotionPlanningError(
+            origin=Point(1, 2, 3),
+            dest=Point(1, 2, 3),
+            clearance=123,
+            min_travel_z=123,
+            max_travel_z=123,
+            message="oh the humanity",
+        )
+    )
+
+    with pytest.raises(errors.FailedToPlanMoveError, match="oh the humanity"):
+        subject.get_movement_waypoints_to_coords(
+            origin=Point(1, 2, 3),
+            dest=Point(1, 2, 3),
+            max_travel_z=123,
+            direct=False,
+            additional_min_travel_z=None,
+        )
+
