@@ -94,6 +94,7 @@ interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
 function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const history = useHistory()
+
   const {
     runId,
     robotName,
