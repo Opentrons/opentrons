@@ -220,6 +220,8 @@ class WaypointSpec:
     extra_waypoints: Sequence[Tuple[float, float]] = ()
 
 
+# TODO(mm, 2022-06-22): Break this test apart into the parts that are orthogonal
+# (see this test's docstring) or refactor the subject to do less at once.
 @pytest.mark.parametrize(
     "spec",
     [
@@ -295,7 +297,7 @@ class WaypointSpec:
             expected_move_type=motion_planning.MoveType.GENERAL_ARC,
             extra_waypoints=[(123, 456)],
         )
-        # TODO(mc, 2021-01-08): add test for override current location
+        # TODO(mc, 2021-01-08): add test for override current location (current_well)
     ],
 )
 def test_get_movement_waypoints_to_well(
@@ -308,7 +310,35 @@ def test_get_movement_waypoints_to_well(
     subject: MotionView,
     spec: WaypointSpec,
 ) -> None:
-    """It should call get_waypoints() with the correct args to move to a well."""
+    """It should call get_waypoints() with the correct args to move to a well.
+
+    The arguments to get_waypoints() should be as follows:
+
+    * move_type:
+        * DIRECT if moving within a single well.
+        * IN_LABWARE_ARC if going well-to-well in a single labware.
+        * GENERAL_ARC otherwise.
+    * origin:
+        Always passed through as-is from subject's arguments.
+    * origin_cp:
+        Always passed through as-is from subject's arguments.
+    * max_travel_z:
+        Always passed through as-is from subject's arguments.
+    * min_travel_z:
+        * Labware's highest Z if going well-to-well in a single labware.
+        * Doesn't matter if moving within a single well (because it'll be DIRECT).
+        * get_all_labware_highest_z() deck-wide safe height otherwise.
+    * dest:
+        Point calculated from subject's labware_id, well_name, and well_location
+        arguments.
+    * dest_cp:
+        None or XY_CENTER depending on the labware's centerMultichannelOnWells quirk.
+    * max_travel_z:
+        Always passed through as-is from subject's arguments.
+    * xy_waypoints:
+        * Center of slot 5 if source is known and path warrants a Thermocycler dodge.
+        * [] otherwise.
+    """
     decoy.when(
         labware_view.get_has_quirk(
             spec.labware_id,
