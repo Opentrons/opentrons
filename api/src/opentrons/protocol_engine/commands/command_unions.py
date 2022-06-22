@@ -102,12 +102,20 @@ from .move_to_well import (
     MoveToWellCommandType,
 )
 
-from .pause import (
-    Pause,
-    PauseParams,
-    PauseCreate,
-    PauseResult,
-    PauseCommandType,
+from .wait_for_resume import (
+    WaitForResume,
+    WaitForResumeParams,
+    WaitForResumeCreate,
+    WaitForResumeResult,
+    WaitForResumeCommandType,
+)
+
+from .wait_for_duration import (
+    WaitForDuration,
+    WaitForDurationParams,
+    WaitForDurationCreate,
+    WaitForDurationResult,
+    WaitForDurationCommandType,
 )
 
 from .pick_up_tip import (
@@ -155,7 +163,8 @@ Command = Union[
     MoveRelative,
     MoveToCoordinates,
     MoveToWell,
-    Pause,
+    WaitForResume,
+    WaitForDuration,
     PickUpTip,
     SavePosition,
     SetRailLights,
@@ -195,7 +204,8 @@ CommandParams = Union[
     MoveRelativeParams,
     MoveToCoordinatesParams,
     MoveToWellParams,
-    PauseParams,
+    WaitForResumeParams,
+    WaitForDurationParams,
     PickUpTipParams,
     SavePositionParams,
     SetRailLightsParams,
@@ -235,7 +245,8 @@ CommandType = Union[
     MoveRelativeCommandType,
     MoveToCoordinatesCommandType,
     MoveToWellCommandType,
-    PauseCommandType,
+    WaitForResumeCommandType,
+    WaitForDurationCommandType,
     PickUpTipCommandType,
     SavePositionCommandType,
     SetRailLightsCommandType,
@@ -274,7 +285,8 @@ CommandCreate = Union[
     MoveRelativeCreate,
     MoveToCoordinatesCreate,
     MoveToWellCreate,
-    PauseCreate,
+    WaitForResumeCreate,
+    WaitForDurationCreate,
     PickUpTipCreate,
     SavePositionCreate,
     SetRailLightsCreate,
@@ -314,7 +326,8 @@ CommandResult = Union[
     MoveRelativeResult,
     MoveToCoordinatesResult,
     MoveToWellResult,
-    PauseResult,
+    WaitForResumeResult,
+    WaitForDurationResult,
     PickUpTipResult,
     SavePositionResult,
     SetRailLightsResult,

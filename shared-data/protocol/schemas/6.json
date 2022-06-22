@@ -559,7 +559,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["waitForResume"]
+                "enum": ["waitForResume", "pause"]
               },
               "params": {
                 "type": "object",
@@ -1187,25 +1187,6 @@
                         "type": "number"
                       }
                     }
-                  }
-                }
-              }
-            }
-          },
-          {
-            "description": "Pause: This command pauses the run.",
-            "type": "object",
-            "required": ["commandType"],
-            "properties": {
-              "key": { "type": "string" },
-              "commandType": {
-                "enum": ["pause"]
-              },
-              "params": {
-                "properties": {
-                  "message": {
-                    "type": "string",
-                    "description": "Optional message the user can set for their pause command"
                   }
                 }
               }
