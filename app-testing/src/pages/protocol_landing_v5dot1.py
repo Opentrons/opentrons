@@ -87,25 +87,23 @@ class ProtocolLanding:
         )
         return self.base.present_wrapper(header, 4)
 
-    def get_deckMap_protocol_landing(self, protocol_name: str) -> Optional[WebElement]:
+    def get_deckMap_protocol_landing(self) -> Optional[WebElement]:
         """Get the deckmap on Protocol Landing Page."""
         header: Element = Element(
             (
                 By.XPATH,
-                '//div[@data-testid="ProtocolCard_deckLayout_{protocol_name}"]',
+                '//div[@data-testid="ProtocolCard_deckLayout_script_pur_sample_1"]',
             ),
             "the deckmap on Protocol Landing Page.",
         )
         return self.base.present_wrapper(header, 7)
 
-    def get_protocol_name_text_protocol_landing(
-        self, protocol_name: str
-    ) -> Optional[WebElement]:
+    def get_protocol_name_text_protocol_landing(self) -> Optional[WebElement]:
         """Get the protocol name on Protocol Landing Page."""
         header: Element = Element(
             (
                 By.XPATH,
-                '//h3[@data-testid="ProtocolCard_{protocol_name}"]',
+                '//h3[@data-testid="ProtocolCard_script_pur_sample_1"]',
             ),
             "the protocol name on Protocol Landing Page.",
         )
@@ -427,7 +425,7 @@ class ProtocolLanding:
             ),
             "the close button on success banner.",
         )
-        return self.base.present_wrapper(header, 1)
+        return self.base.present_wrapper(header, 4)
 
     def get_thermocycler_mod_protocol_detail(self) -> Optional[WebElement]:
         """Get the thermocycler module on Protocol Detail Page."""

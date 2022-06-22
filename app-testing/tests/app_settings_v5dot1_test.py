@@ -71,7 +71,6 @@ def test_app_settings_v5dot1(
         assert app_settings.get_link_app_robot_sync().is_displayed()
         assert app_settings.get_software_update_alert_header().is_displayed()
         assert app_settings.get_software_update_alert_toggle().is_displayed()
-        app_settings.click_software_update_alert_toggle()
 
         assert app_settings.get_connect_robot_via_IP_header().is_displayed()
         assert app_settings.get_connect_to_robot_via_IP_address_button().is_displayed()
@@ -101,7 +100,6 @@ def test_app_settings_v5dot1(
         app_settings.click_advanced_tab()
         assert app_settings.get_advanced_tab().is_displayed()
         assert app_settings.get_update_channel().is_displayed()
-        assert app_settings.get_update_channel_latest_stable().is_displayed()
         assert app_settings.get_additional_custom_labware_source_folder().is_displayed()
         assert app_settings.get_change_labware_source_folder_button().is_displayed()
         assert app_settings.get_additional_source_folder().is_displayed()
@@ -120,7 +118,6 @@ def test_app_settings_v5dot1(
 
         assert app_settings.get_clear_unavailable_robots_header().is_displayed()
         assert app_settings.get_clear_unavailable_robots_list_button().is_displayed()
-        app_settings.click_clear_unavailable_robot_button()
 
         assert app_settings.get_enable_developer_tool_header().is_displayed()
         assert app_settings.get_enable_developer_tools_toggle().is_displayed()

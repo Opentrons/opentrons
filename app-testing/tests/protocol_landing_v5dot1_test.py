@@ -170,6 +170,7 @@ def test_protocol_detail_v5dot1(
             driver, console, request.node.nodeid
         )
         # Verify the componenets on run page
+        assert device_landing.get_run_button().is_displayed()
         device_landing.click_start_run_button()
         assert device_landing.get_run_button().is_displayed()
         assert device_landing.get_success_banner_run_page().is_displayed()
@@ -177,6 +178,7 @@ def test_protocol_detail_v5dot1(
         # Uncurrent the run from the robot
         assert protocol_landing.get_close_button_uncurrent_run().is_displayed()
         protocol_landing.click_close_button_uncurrent_run()
+        assert device_landing.get_run_button().is_displayed()
 
 
 @pytest.mark.v5dot1
@@ -221,13 +223,9 @@ def test_protocol_landing_v5dot1(
 
         # Verifying elements on Protocol Landing Page
         assert protocol_landing.get_import_button_protocol_landing().is_displayed()
-        assert protocol_landing.get_deckMap_protocol_landing(
-            protocol_name="script_pur_sample_1"
-        ).is_displayed()
+        assert protocol_landing.get_deckMap_protocol_landing().is_displayed()
         assert (
-            protocol_landing.get_protocol_name_text_protocol_landing(
-                protocol_name="script_pur_sample_1"
-            )
+            protocol_landing.get_protocol_name_text_protocol_landing()
             == "script_pur_sample_1"
         )
         protocol_landing.click_overflow_menu()

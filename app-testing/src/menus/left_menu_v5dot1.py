@@ -26,7 +26,7 @@ class LeftMenu:
         (By.XPATH, '//a[contains(@href,"#/devices")]'), "Left menu Devices"
     )
     gear: Element = Element(
-        (By.XPATH, '//a[contains(@href,"#/app-settings/general")]'),
+        (By.XPATH, '//a[contains(@href,"#/app-settings")]'),
         "Left menu bottom gear to go to App Settings",
     )
 

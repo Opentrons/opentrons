@@ -367,6 +367,27 @@ class DeviceLanding:
         )
         return self.base.clickable_wrapper(banner, 5)
 
+    def get_rerun_protocol_now(self) -> Optional[WebElement]:
+        """Get the rerun protocol now button from overflow menu."""
+        banner: Element = Element(
+            (
+                By.XPATH,
+                "//*[@data-testid='RecentProtocolRun_OverflowMenu_rerunNow']",
+            ),
+            "the rerun protocol now button from overflow menu.",
+        )
+        return self.base.clickable_wrapper(banner, 5)
+
+    def click_rerun_recent_protocol_now_button(self) -> None:
+        button: Element = Element(
+            (
+                By.XPATH,
+                f"//button[@data-testid='RecentProtocolRun_OverflowMenu_rerunNow']",
+            ),
+            f"Button to rerun the recent run.",
+        )
+        self.base.click(button)
+
     def get_run_duration_value(self) -> Optional[WebElement]:
         """Get the run duration value on recent run page."""
         banner: Element = Element(
@@ -405,6 +426,16 @@ class DeviceLanding:
         )
         self.base.click(button)
 
+    def click_on_overflow_button_recent_run(self) -> None:
+        button: Element = Element(
+            (
+                By.XPATH,
+                '//div[@data-testid="HistoricalProtocolRunOverflowMenu_OverflowMenu"]//button',
+            ),
+            "Clicking on run protocol option in device landing page from recent runs.'",
+        )
+        self.base.click(button)
+
     def click_on_close_run_banner(self) -> None:
         button: Element = Element(
             (
@@ -429,7 +460,7 @@ class DeviceLanding:
         button: Element = Element(
             (
                 By.XPATH,
-                "//button[text()='Run a Protocol']",
+                "//button[text()='Run a protocol']",
             ),
             "Button to go to setup for run page.'",
         )
@@ -462,6 +493,16 @@ class DeviceLanding:
                 "RobotStatusBanner_opentrons-dev_goToRun",
             ),
             "Button to select run protocol from robot landing overflow menu.'",
+        )
+        self.base.click(button)
+
+    def click_opentrons_dev_robot(self) -> None:
+        button: Element = Element(
+            (
+                By.ID,
+                "RobotStatusBanner_opentrons-dev_robotName",
+            ),
+            "Button to opentrons dev robot.'",
         )
         self.base.click(button)
 
