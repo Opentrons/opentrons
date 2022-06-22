@@ -10,7 +10,8 @@ if TYPE_CHECKING:
     from ..execution import RunControlHandler
 
 
-# pause accepted for backwards compatibility
+# NOTE: multiple values accepted for backwards compatibility
+# with the 6.0.0-beta.0 release, which used `pause`
 WaitForResumeCommandType = Literal["waitForResume", "pause"]
 
 
