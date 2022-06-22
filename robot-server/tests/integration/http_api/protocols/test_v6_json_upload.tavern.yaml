@@ -394,7 +394,7 @@ stages:
                 completedAt: !anystr
               - id: !anystr
                 createdAt: !anystr
-                commandType: pause
+                commandType: waitForResume
                 key: !anystr
                 status: succeeded
                 params:

@@ -1436,7 +1436,7 @@
       }
     },
     {
-      "commandType": "pause",
+      "commandType": "waitForResume",
       "id": "18abc123",
       "params": {
         "message": "pause command"
