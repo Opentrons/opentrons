@@ -34,7 +34,7 @@ describe('ConnectionTroubleshootingModal', () => {
     getByText('Restart the robot')
     getByText('Restart the app')
     getByText(
-      'If none of these work, contact Opentrons Support for help (via the question mark link in this app, or by emailing support@opentrons.com)'
+      'If none of these work, contact Opentrons Support for help (via the question mark link in this app, or by emailing support@opentrons.com.)'
     )
     getByRole('link', {
       name: 'Learn more about troubleshooting connection problems',
