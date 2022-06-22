@@ -19,6 +19,7 @@ export function selectPythonPath(pythonOverride: string | null): void {
       pythonOverride,
       path.join(pythonOverride, 'bin/python3'),
       path.join(pythonOverride, 'python.exe'),
+      path.join(pythonOverride, 'scripts/python.exe'),
       ...candidates,
     ]
   }
