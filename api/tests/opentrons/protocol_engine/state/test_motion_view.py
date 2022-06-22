@@ -402,15 +402,36 @@ def test_get_movement_waypoints_to_well_raises(
     decoy: Decoy,
     pipette_view: PipetteView,
     geometry_view: GeometryView,
+    mock_get_waypoints: _GET_WAYPOINTS_SIGNATURE,
     subject: MotionView,
 ) -> None:
     """It should raise FailedToPlanMoveError if motion_planning.get_waypoints raises."""
-    decoy.when(pipette_view.get_current_well()).then_return(None)
-    decoy.when(geometry_view.get_well_position("labware-id", "A1", None)).then_return(
-        Point(4, 5, 6)
+    decoy.when(
+        # TODO(mm, 2022-06-22): We should use decoy.matchers.Anything() for all
+        # arguments. For some reason, Decoy does not match the call unless we
+        # specify concrete values for all (?) arguments?
+        mock_get_waypoints(
+            Point(x=1, y=2, z=3),
+            None,
+            max_travel_z=123,
+            min_travel_z=None,
+            move_type=motion_planning.MoveType.GENERAL_ARC,
+            xy_waypoints=(),
+            origin_cp=None,
+            dest_cp=None,
+        ),
+    ).then_raise(
+        motion_planning.MotionPlanningError(
+            origin=Point(1, 2, 3),
+            dest=Point(1, 2, 3),
+            clearance=123,
+            min_travel_z=123,
+            max_travel_z=123,
+            message="oh the humanity",
+        )
     )
 
-    with pytest.raises(errors.FailedToPlanMoveError, match="out of bounds"):
+    with pytest.raises(errors.FailedToPlanMoveError, match="oh the humanity"):
         subject.get_movement_waypoints_to_well(
             pipette_id="pipette-id",
             labware_id="labware-id",
@@ -418,6 +439,5 @@ def test_get_movement_waypoints_to_well_raises(
             well_location=None,
             origin=Point(1, 2, 3),
             origin_cp=None,
-            # this max_travel_z is too low and will induce failure
-            max_travel_z=1,
+            max_travel_z=123,
         )
