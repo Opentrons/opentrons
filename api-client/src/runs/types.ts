@@ -29,7 +29,7 @@ export type RunStatus =
 export interface RunData {
   id: string
   createdAt: string
-  startedAt?: string;
+  startedAt?: string
   completedAt?: string
   current: boolean
   status: RunStatus
