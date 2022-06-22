@@ -18,7 +18,7 @@ def get_waypoints(
     dest: Point,
     *,
     max_travel_z: float,
-    min_travel_z: float = 0.0,
+    min_travel_z: float,
     move_type: MoveType = MoveType.GENERAL_ARC,
     xy_waypoints: Sequence[Tuple[float, float]] = (),
     origin_cp: Optional[CriticalPoint] = None,
