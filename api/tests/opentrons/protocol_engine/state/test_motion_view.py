@@ -32,8 +32,7 @@ def mock_module_view(decoy: Decoy) -> ModuleView:
 
 # The signature of the motion_planning.get_waypoints() function.
 _GET_WAYPOINTS_SIGNATURE = Callable[
-    ...,  # Parameter types not included, for simplicity.
-    List[motion_planning.Waypoint]
+    ..., List[motion_planning.Waypoint]  # Parameter types not included, for simplicity.
 ]
 
 
@@ -370,19 +369,21 @@ def test_get_movement_waypoints_to_well(
         ),
         motion_planning.Waypoint(
             position=Point(4, 5, 6), critical_point=CriticalPoint.MOUNT
-        )
+        ),
     ]
 
-    decoy.when(mock_get_waypoints(
-        move_type=spec.expected_move_type,
-        origin=spec.origin,
-        origin_cp=spec.origin_cp,
-        max_travel_z=spec.max_travel_z,
-        min_travel_z=min_travel_z,
-        dest=spec.dest,
-        dest_cp=spec.expected_dest_cp,
-        xy_waypoints=spec.extra_waypoints,
-    )).then_return(waypoints)
+    decoy.when(
+        mock_get_waypoints(
+            move_type=spec.expected_move_type,
+            origin=spec.origin,
+            origin_cp=spec.origin_cp,
+            max_travel_z=spec.max_travel_z,
+            min_travel_z=min_travel_z,
+            dest=spec.dest,
+            dest_cp=spec.expected_dest_cp,
+            xy_waypoints=spec.extra_waypoints,
+        )
+    ).then_return(waypoints)
 
     result = subject.get_movement_waypoints_to_well(
         pipette_id=spec.pipette_id,

@@ -157,7 +157,11 @@ class MotionView:
             additional_min_travel_z = float("-inf")
         min_travel_z = max(all_labware_highest_z, additional_min_travel_z)
 
-        move_type = motion_planning.MoveType.DIRECT if direct else motion_planning.MoveType.GENERAL_ARC
+        move_type = (
+            motion_planning.MoveType.DIRECT
+            if direct
+            else motion_planning.MoveType.GENERAL_ARC
+        )
 
         try:
             return motion_planning.get_waypoints(
