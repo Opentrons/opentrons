@@ -36,9 +36,9 @@ class HeaterShakerMovementFlagger:
 
         Args:
             state_store: The Protocol Engine state store interface. Used to figure out
-                         which Thermocycler a labware is in, if any.
+                         modules on deck, deck location, and getting pipette data
             hardware_api: The underlying hardware interface. Used to query
-                          Thermocyclers' current lid states.
+                          Heater Shaker's current states.
         """
         self._state_store = state_store
         self._hardware_api = hardware_api
@@ -125,10 +125,10 @@ class HeaterShakerMovementFlagger:
     async def _find_heater_shaker_by_serial(
         self, serial_number: str
     ) -> Optional[HardwareHeaterShaker]:
-        """Find the hardware Thermocycler with the given serial number.
+        """Find the hardware Heater Shaker with the given serial number.
 
         Returns:
-            The matching hardware Thermocycler, or None if none was found.
+            The matching hardware Heater Shaker, or None if none was found.
         """
         available_modules, simulating_module = await self._hardware_api.find_modules(
             by_model=OpentronsHeaterShakerModuleModel.HEATER_SHAKER_V1,

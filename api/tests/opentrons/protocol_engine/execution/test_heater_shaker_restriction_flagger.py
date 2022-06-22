@@ -1,4 +1,4 @@
-"""Tests for thermocycler_movement_flagger."""
+"""Tests for heater_shaker_movement_flagger."""
 
 
 from contextlib import nullcontext as does_not_raise
@@ -85,12 +85,9 @@ def subject(
 class LocationAndHeaterShakerStatus(NamedTuple):
     """Test parametrization data.
 
-    A Thermocycler lid status, and what we expect the subject to raise when it finds
-    that the Thermocycler has that lid status.
+    Destination slot name, heater-shaker and latch status, and what
+    we expect the subject to raise when it finds
     """
-
-    # Optional to match current signature of Thermocycler.lid_status.
-    # Should change to non-Optional if/when that becomes non-optional.
     slot_name: DeckSlotName
     heater_shaker_status: HeaterShakerStatus
     latch_status: HeaterShakerLabwareLatchStatus
