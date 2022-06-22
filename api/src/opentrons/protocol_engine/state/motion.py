@@ -1,6 +1,6 @@
 """Motion state store and getters."""
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Sequence, Tuple
 
 from opentrons.types import MountType, Point, DeckSlotName
 from opentrons.hardware_control.types import CriticalPoint
@@ -87,7 +87,7 @@ class MotionView:
             well_location,
         )
         dest_cp = CriticalPoint.XY_CENTER if center_dest else None
-        extra_waypoints = ()
+        extra_waypoints: Sequence[Tuple[float, float]] = ()
 
         if (
             location is not None
