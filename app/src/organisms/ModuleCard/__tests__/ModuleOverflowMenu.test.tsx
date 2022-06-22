@@ -8,19 +8,24 @@ import {
   mockThermocycler,
   mockHeaterShaker,
 } from '../../../redux/modules/__fixtures__'
+import { useIsRobotBusy } from '../../Devices/hooks'
+import { useRunStatus } from '../../RunTimeControl/hooks'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
-import { useIsRobotBusy } from '../../Devices/hooks'
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 jest.mock('../useModuleIdFromRun')
 jest.mock('../../Devices/hooks')
+jest.mock('../../RunTimeControl/hooks')
 
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
 >
-
 const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
   typeof useIsRobotBusy
+>
+const mokcUseRunStatus = useRunStatus as jest.MockedFunction<
+  typeof useRunStatus
 >
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
@@ -455,9 +460,9 @@ describe('ModuleOverflowMenu', () => {
     fireEvent.click(btn)
   })
 
-  it('should disable module control buttons when the robot is busy', () => {
+  it('should disable module control buttons when the robot is busy and run status is not null', () => {
     mockUseIsRobotBusy.mockReturnValue(true)
-
+    mokcUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     props = {
       module: mockTCBlockHeating,
       handleSlideoutClick: jest.fn(),
