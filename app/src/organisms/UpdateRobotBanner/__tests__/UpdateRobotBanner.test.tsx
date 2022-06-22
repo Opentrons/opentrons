@@ -70,8 +70,15 @@ describe('UpdateRobotBanner', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    const { getByText } = render(props)
+    const { getByText, getByTestId } = render(props)
     getByText('A software update is available for this robot.')
+
+    const closeButton = getByTestId('Banner_close-button')
+    fireEvent.click(closeButton)
+    const bannerText = screen.queryByText(
+      'A software update is available for this robot.'
+    )
+    expect(bannerText).toBeNull()
   })
 
   it('should render nothing if robot health status is not ok', () => {
