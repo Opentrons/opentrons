@@ -52,10 +52,10 @@ export function HistoricalProtocolRun(
   const runDisplayName = formatTimestamp(run.createdAt)
   let duration = EMPTY_TIMESTAMP
   if (runStatus !== 'idle') {
-    if (run.completedAt != null) {
-      duration = formatInterval(run.createdAt, run.completedAt)
-    } else {
-      duration = formatInterval(run.createdAt, new Date().toString())
+    if (run.completedAt != null && run.startedAt != null) {
+      duration = formatInterval(run.startedAt, run.completedAt)
+    } else if (run.startedAt != null) {
+      duration = formatInterval(run.startedAt, new Date().toString())
     }
   }
   const protocolKeyInStoredKeys = storedProtocols.find(
