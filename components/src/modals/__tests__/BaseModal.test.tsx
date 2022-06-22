@@ -108,8 +108,9 @@ describe('BaseModal', () => {
     const contentWrapper = text.closest(Box)
 
     expect({ ...contentWrapper.props() }).toMatchObject({
-      paddingY: '1rem',
-      paddingX: '2rem',
+      paddingTop: '1rem',
+      paddingX: '1.5rem',
+      paddingBottom: '1.5rem',
     })
   })
 })
