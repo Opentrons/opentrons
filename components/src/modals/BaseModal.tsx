@@ -42,8 +42,9 @@ const FOOTER_STYLE = {
 } as const
 
 const CONTENT_STYLE = {
-  paddingX: SPACING.spacing6,
-  paddingY: SPACING.spacing4,
+  paddingTop: SPACING.spacing4,
+  paddingX: SPACING.spacing5,
+  paddingBottom: SPACING.spacing5,
 } as const
 
 export interface BaseModalProps extends StyleProps {

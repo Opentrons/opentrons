@@ -53,6 +53,10 @@ export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
   ${TYPOGRAPHY.pSemiBold}
 
   ${styleProps}
+
+  &:hover {
+    box-shadow: 0 0 0;
+  }
 `
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
