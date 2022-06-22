@@ -27,7 +27,6 @@ import {
 } from '@opentrons/components'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
-import { useTrackEvent } from '../../redux/analytics'
 import { Divider } from '../../atoms/structure'
 import { getLatestLabwareOffsetCount } from '../LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import { useProtocolDetails } from '../RunDetails/hooks'
@@ -35,13 +34,11 @@ import { useMostRecentRunId } from './hooks/useMostRecentRunId'
 import { getRunDisplayStatus } from './getRunDisplayStatus'
 import { RerunningProtocolModal } from './RerunningProtocolModal'
 import { useCloneRun } from './hooks'
-import { useProtocolRunAnalyticsData } from '../Devices/hooks'
 import type { State } from '../../redux/types'
 
 export function LastRun(): JSX.Element | null {
   const { t } = useTranslation('protocol_info')
   const history = useHistory()
-  const trackEvent = useTrackEvent()
   const mostRecentRunId = useMostRecentRunId()
   const { data: runRecord, isFetching: isFetchingMostRecentRun } = useRunQuery(
     mostRecentRunId
@@ -55,9 +52,6 @@ export function LastRun(): JSX.Element | null {
   //  If mostRecentRun is null, the CTA that uses cloneRun won't appear so this will never be reached
   const { cloneRun } = useCloneRun(
     mostRecentRunId != null ? mostRecentRunId : null
-  )
-  const { getProtocolRunAnalyticsData } = useProtocolRunAnalyticsData(
-    mostRecentRunId
   )
   const [rerunningProtocolModal, showRerunningProtocolModal] = React.useState(
     false
@@ -79,13 +73,6 @@ export function LastRun(): JSX.Element | null {
   const handleCloneRun = async (): Promise<void> => {
     cloneRun()
     history.push('/run')
-
-    const { protocolRunAnalyticsData } = await getProtocolRunAnalyticsData()
-
-    trackEvent({
-      name: 'runAgain',
-      properties: { ...protocolRunAnalyticsData },
-    })
   }
 
   if (mostRecentRun == null && !isFetchingMostRecentRun) return null
