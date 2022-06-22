@@ -60,7 +60,7 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
         )
 
         with self._pipetting.set_flow_rate(
-            hw_pipette, blow_out_flow_rate=params.flowRate
+            pipette=hw_pipette, blow_out_flow_rate=params.flowRate
         ):
             await self._hardware_api.blow_out(mount=hw_pipette.mount)
 

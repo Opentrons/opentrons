@@ -58,13 +58,13 @@ async def test_blow_out_implementation(
         flowRate=1.234,
     )
 
-    mock_flow_rate = decoy.mock(name="mock flow rate")
+    mock_flow_rate_context = decoy.mock(name="mock flow rate context")
     decoy.when(
         pipetting.set_flow_rate(
             pipette=HardwarePipette(mount=Mount.LEFT, config=left_config),
             blow_out_flow_rate=1.234,
         )
-    ).then_return(mock_flow_rate)
+    ).then_return(mock_flow_rate_context)
 
     result = await subject.execute(data)
 
@@ -77,7 +77,7 @@ async def test_blow_out_implementation(
             well_name="C6",
             well_location=location,
         ),
-        mock_flow_rate.__enter__(),
+        mock_flow_rate_context.__enter__(),
         await hardware_api.blow_out(mount=left_pipette.mount),
-        mock_flow_rate.__exit__(None, None, None),
+        mock_flow_rate_context.__exit__(None, None, None),
     )

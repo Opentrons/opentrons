@@ -128,6 +128,7 @@ class SyncClient:
                 wellLocation=well_location,
                 volume=volume,
                 # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
+                # https://github.com/Opentrons/opentrons/issues/10810
                 flowRate=2.0,
             )
         )
@@ -152,6 +153,7 @@ class SyncClient:
                 wellLocation=well_location,
                 volume=volume,
                 # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
+                # https://github.com/Opentrons/opentrons/issues/10810
                 flowRate=2.0,
             )
         )
@@ -173,6 +175,7 @@ class SyncClient:
                 wellName=well_name,
                 wellLocation=well_location,
                 # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
+                # https://github.com/Opentrons/opentrons/issues/10810
                 flowRate=2.0,
             )
         )

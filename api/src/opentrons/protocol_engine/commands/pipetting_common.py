@@ -32,7 +32,7 @@ class FlowRateMixin(BaseModel):
     """Mixin for command requests that take a flow rate."""
 
     flowRate: float = Field(
-        ..., description="Speed in uL/s configured for the pipette", gt=0
+        ..., description="Speed in µL/s configured for the pipette", gt=0
     )
 
 

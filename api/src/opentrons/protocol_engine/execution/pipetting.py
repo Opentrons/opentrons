@@ -221,7 +221,7 @@ class PipettingHandler:
             current_well=current_well,
         )
 
-        with self.set_flow_rate(hw_pipette, aspirate_flow_rate=flow_rate):
+        with self.set_flow_rate(pipette=hw_pipette, aspirate_flow_rate=flow_rate):
             await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
 
         return volume
@@ -248,7 +248,7 @@ class PipettingHandler:
             well_location=well_location,
         )
 
-        with self.set_flow_rate(hw_pipette, dispense_flow_rate=flow_rate):
+        with self.set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):
             await self._hardware_api.dispense(mount=hw_pipette.mount, volume=volume)
 
         return volume
