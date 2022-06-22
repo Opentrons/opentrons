@@ -109,8 +109,7 @@ export const MagneticModuleSlideout = (
   const errorMessage =
     engageHeightValue != null &&
     (parseInt(engageHeightValue) < info.disengagedHeight ||
-      parseInt(engageHeightValue) > info.maxHeight ||
-      engageHeightValue.includes('.'))
+      parseInt(engageHeightValue) > info.maxHeight)
       ? t('input_out_of_range')
       : null
 

@@ -32,8 +32,9 @@ export const ModuleOverflowMenu = (
     handleTestShakeClick,
     handleWizardClick,
   } = props
-  const runStatus = runId != null ? useRunStatus(runId) : null
-  const isBusy = runStatus != null ? useIsRobotBusy() && runId == null : false
+  const runStatus = useRunStatus(runId != null ? runId : null)
+  const isRobotBusy = useIsRobotBusy()
+  const isBusy = runStatus != null && isRobotBusy
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
     module,
