@@ -35,6 +35,7 @@ import { useMostRecentRunId } from './hooks/useMostRecentRunId'
 import { getRunDisplayStatus } from './getRunDisplayStatus'
 import { RerunningProtocolModal } from './RerunningProtocolModal'
 import { useCloneRun } from './hooks'
+import { useProtocolRunAnalyticsData } from '../Devices/hooks'
 import type { State } from '../../redux/types'
 
 export function LastRun(): JSX.Element | null {
@@ -55,6 +56,9 @@ export function LastRun(): JSX.Element | null {
   const { cloneRun } = useCloneRun(
     mostRecentRunId != null ? mostRecentRunId : null
   )
+  const { getProtocolRunAnalyticsData } = useProtocolRunAnalyticsData(
+    mostRecentRunId
+  )
   const [rerunningProtocolModal, showRerunningProtocolModal] = React.useState(
     false
   )
@@ -73,7 +77,18 @@ export function LastRun(): JSX.Element | null {
   const labwareOffsetCount = getLatestLabwareOffsetCount(labwareOffsets ?? [])
 
   const handleCloneRun = (): void => {
-    trackEvent({ name: 'runAgain', properties: {} })
+    getProtocolRunAnalyticsData()
+      .then(({ protocolRunAnalyticsData }) => {
+        trackEvent({
+          name: 'runAgain',
+          properties: { ...protocolRunAnalyticsData },
+        })
+      })
+      .catch((e: Error) =>
+        console.error(
+          `error formatting runAgain protocol analytics data: ${e.message}`
+        )
+      )
     cloneRun()
     history.push('/run')
   }

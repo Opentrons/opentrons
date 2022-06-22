@@ -14,6 +14,7 @@ import {
   RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+  getProtocol,
 } from '@opentrons/api-client'
 import {
   useDismissCurrentRunMutation,
@@ -301,7 +302,18 @@ export function ProtocolRunHeader({
   }
 
   const handleResetButtonClick = (): void => {
-    trackEvent({ name: 'runAgain', properties: {} })
+    getProtocolRunAnalyticsData()
+      .then(({ protocolRunAnalyticsData }) => {
+        trackEvent({
+          name: 'runAgain',
+          properties: { ...protocolRunAnalyticsData },
+        })
+      })
+      .catch((e: Error) =>
+        console.error(
+          `error formatting runAgain protocol analytics data: ${e.message}`
+        )
+      )
     reset()
   }
 
