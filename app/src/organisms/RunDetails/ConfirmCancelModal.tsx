@@ -10,6 +10,7 @@ import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
 import { useTrackEvent } from '../../redux/analytics'
+import { useProtocolRunAnalyticsData } from '../Devices/hooks'
 
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
@@ -21,12 +22,27 @@ export function ConfirmCancelModal(
 ): JSX.Element {
   const { onClose, runId } = props
   const { stopRun } = useStopRunMutation()
+  const { getProtocolRunAnalyticsData } = useProtocolRunAnalyticsData(runId)
   const { t } = useTranslation('run_details')
   const trackEvent = useTrackEvent()
 
   const cancel = (): void => {
     if (runId != null) {
-      trackEvent({ name: 'runCancel', properties: {} })
+      getProtocolRunAnalyticsData()
+        .then(({ protocolRunAnalyticsData, runTime }) => {
+          trackEvent({
+            name: 'runCancel',
+            properties: {
+              ...protocolRunAnalyticsData,
+              runTime,
+            },
+          })
+        })
+        .catch((e: Error) =>
+          console.error(
+            `error getting runCancel protocol analytics data: ${e.message}`
+          )
+        )
       stopRun(runId)
     }
     onClose()

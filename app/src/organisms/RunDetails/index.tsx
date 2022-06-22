@@ -38,13 +38,11 @@ import {
   useCurrentRunId,
   useIsProtocolRunLoaded,
 } from '../ProtocolUpload/hooks'
-import { useTrackEvent } from '../../redux/analytics'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
 import type { State } from '../../redux/types'
 
 export function RunDetails(): JSX.Element | null {
   const { t } = useTranslation(['run_details', 'shared'])
-  const trackEvent = useTrackEvent()
   const robotName = useSelector<State>(getConnectedRobotName)
   const runId = useCurrentRunId()
   const { displayName } = useProtocolDetails()
@@ -73,7 +71,6 @@ export function RunDetails(): JSX.Element | null {
   ] = React.useState<boolean>(false)
 
   const handleCancelClick = (): void => {
-    trackEvent({ name: 'runPause', properties: {} })
     pause()
     setShowConfirmCancelModal(true)
   }
