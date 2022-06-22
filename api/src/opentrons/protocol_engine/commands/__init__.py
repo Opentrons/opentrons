@@ -121,12 +121,20 @@ from .move_to_well import (
     MoveToWellCommandType,
 )
 
-from .pause import (
-    Pause,
-    PauseParams,
-    PauseCreate,
-    PauseResult,
-    PauseCommandType,
+from .wait_for_resume import (
+    WaitForResume,
+    WaitForResumeParams,
+    WaitForResumeCreate,
+    WaitForResumeResult,
+    WaitForResumeCommandType,
+)
+
+from .wait_for_duration import (
+    WaitForDuration,
+    WaitForDurationParams,
+    WaitForDurationCreate,
+    WaitForDurationResult,
+    WaitForDurationCommandType,
 )
 
 from .pick_up_tip import (
@@ -247,12 +255,18 @@ __all__ = [
     "MoveToWellParams",
     "MoveToWellResult",
     "MoveToWellCommandType",
-    # pause command models
-    "Pause",
-    "PauseParams",
-    "PauseCreate",
-    "PauseResult",
-    "PauseCommandType",
+    # wait for resume command models
+    "WaitForResume",
+    "WaitForResumeParams",
+    "WaitForResumeCreate",
+    "WaitForResumeResult",
+    "WaitForResumeCommandType",
+    # wait for duration command models
+    "WaitForDuration",
+    "WaitForDurationParams",
+    "WaitForDurationCreate",
+    "WaitForDurationResult",
+    "WaitForDurationCommandType",
     # pick up tip command models
     "PickUpTip",
     "PickUpTipCreate",

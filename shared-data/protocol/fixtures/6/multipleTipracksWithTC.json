@@ -7003,7 +7003,7 @@
       "id": "58",
       "commandType": "delay",
       "params": {
-        "wait": 1
+        "seconds": 1
       }
     },
     {

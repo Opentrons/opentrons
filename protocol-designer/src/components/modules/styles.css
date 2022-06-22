@@ -57,6 +57,8 @@
 }
 
 .crash_info_container {
+  display: flex;
+  flex-direction: row;
   margin: 1rem 0;
   background-color: var(--c-light-gray);
   border: 0.25rem solid var(--c-light-gray);
@@ -90,6 +92,10 @@
   & p {
     margin: 0.5rem 0;
   }
+}
+
+.crash_info_list {
+  margin-left: 2rem;
 }
 
 .alert_icon {
