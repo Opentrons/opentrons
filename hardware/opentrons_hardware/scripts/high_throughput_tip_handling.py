@@ -123,7 +123,6 @@ async def run(args: argparse.Namespace) -> None:
                     )
                 }
             ],
-
         ]
     )
     home_z = MoveGroupRunner(
@@ -148,8 +147,7 @@ async def run(args: argparse.Namespace) -> None:
                     NodeId.head_l: MoveGroupSingleAxisStep(
                         distance_mm=float64(0),
                         velocity_mm_sec=float64(10.5),
-                        duration_sec=float64(11.24),
-                        stop_condition=MoveStopCondition.limit_switch,
+                        duration_sec=float64(10.86),
                     )
                 }
             ]
@@ -157,8 +155,8 @@ async def run(args: argparse.Namespace) -> None:
     )
     try:
         # Home the gear motors and Z before performing the test
-        await home_z.run(can_messenger=messenger)
         await drop_tip_runner.run(can_messenger=messenger)
+        await home_z.run(can_messenger=messenger)
         await asyncio.sleep(1)
         # Move to the tiprack
         await initial_z.run(can_messenger=messenger)
