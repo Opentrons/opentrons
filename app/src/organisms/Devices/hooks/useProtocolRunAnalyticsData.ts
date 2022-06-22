@@ -13,7 +13,7 @@ type GetProtocolRunAnalyticsData = () => Promise<{
 /**
  *
  * @param   {string | null} runId
- * @returns {GetProtocolRunAnalyticsData}
+ * @returns {{ getProtocolRunAnalyticsData: GetProtocolRunAnalyticsData }}
  *          Returns a promise that resolves to protocol analytics data properties
  *          for use in event trackEvent
  */

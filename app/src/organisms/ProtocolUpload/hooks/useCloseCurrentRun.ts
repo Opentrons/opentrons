@@ -35,6 +35,11 @@ export function useCloseCurrentRun(): {
     options?: UseDismissCurrentRunMutationOptions
   ): Promise<void> => {
     if (currentRunId != null) {
+      dismissCurrentRun(currentRunId, {
+        ...options,
+        onError: () => console.warn('failed to dismiss current'),
+      })
+
       const {
         protocolRunAnalyticsData,
         runTime,
@@ -47,11 +52,6 @@ export function useCloseCurrentRun(): {
           ...protocolRunAnalyticsData,
           runTime,
         },
-      })
-
-      dismissCurrentRun(currentRunId, {
-        ...options,
-        onError: () => console.warn('failed to dismiss current'),
       })
     }
   }
