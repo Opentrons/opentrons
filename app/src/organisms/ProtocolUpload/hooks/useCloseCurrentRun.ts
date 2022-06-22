@@ -31,26 +31,24 @@ export function useCloseCurrentRun(): {
     isLoading: isDismissing,
   } = useDismissCurrentRunMutation()
 
-  const closeCurrentRun = (
+  const closeCurrentRun = async (
     options?: UseDismissCurrentRunMutationOptions
-  ): void => {
+  ): Promise<void> => {
     if (currentRunId != null) {
-      getProtocolRunAnalyticsData()
-        .then(({ protocolRunAnalyticsData, runTime }) => {
-          trackEvent({
-            name: 'runFinish',
-            properties: {
-              ...robotAnalyticsData,
-              ...protocolRunAnalyticsData,
-              runTime,
-            },
-          })
-        })
-        .catch((e: Error) =>
-          console.error(
-            `error formatting runFinish protocol analytics data: ${e.message}`
-          )
-        )
+      const {
+        protocolRunAnalyticsData,
+        runTime,
+      } = await getProtocolRunAnalyticsData()
+
+      trackEvent({
+        name: 'runFinish',
+        properties: {
+          ...robotAnalyticsData,
+          ...protocolRunAnalyticsData,
+          runTime,
+        },
+      })
+
       dismissCurrentRun(currentRunId, {
         ...options,
         onError: () => console.warn('failed to dismiss current'),
@@ -60,6 +58,9 @@ export function useCloseCurrentRun(): {
   const closeCurrentRunCallback = React.useCallback(closeCurrentRun, [
     dismissCurrentRun,
     currentRunId,
+    getProtocolRunAnalyticsData,
+    robotAnalyticsData,
+    trackEvent,
   ])
 
   return {

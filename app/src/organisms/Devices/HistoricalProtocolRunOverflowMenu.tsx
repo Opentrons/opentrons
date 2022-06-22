@@ -118,19 +118,18 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { reset } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
 
-  const handleResetClick = (): void => {
-    getProtocolRunAnalyticsData()
-      .then(({ protocolRunAnalyticsData }) => {
-        trackEvent({
-          name: 'runAgain',
-          properties: { ...protocolRunAnalyticsData },
-        })
-      })
-      .catch((e: Error) =>
-        console.error(
-          `error formatting runAgain protocol analytics data: ${e.message}`
-        )
-      )
+  const handleResetClick: React.MouseEventHandler<HTMLButtonElement> = async (
+    e
+  ): Promise<void> => {
+    e.preventDefault()
+    e.stopPropagation()
+    const { protocolRunAnalyticsData } = await getProtocolRunAnalyticsData()
+
+    trackEvent({
+      name: 'runAgain',
+      properties: { ...protocolRunAnalyticsData },
+    })
+
     reset()
   }
 

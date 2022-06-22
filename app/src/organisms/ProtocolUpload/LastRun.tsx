@@ -76,19 +76,14 @@ export function LastRun(): JSX.Element | null {
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const labwareOffsetCount = getLatestLabwareOffsetCount(labwareOffsets ?? [])
 
-  const handleCloneRun = (): void => {
-    getProtocolRunAnalyticsData()
-      .then(({ protocolRunAnalyticsData }) => {
-        trackEvent({
-          name: 'runAgain',
-          properties: { ...protocolRunAnalyticsData },
-        })
-      })
-      .catch((e: Error) =>
-        console.error(
-          `error formatting runAgain protocol analytics data: ${e.message}`
-        )
-      )
+  const handleCloneRun = async (): Promise<void> => {
+    const { protocolRunAnalyticsData } = await getProtocolRunAnalyticsData()
+
+    trackEvent({
+      name: 'runAgain',
+      properties: { ...protocolRunAnalyticsData },
+    })
+
     cloneRun()
     history.push('/run')
   }

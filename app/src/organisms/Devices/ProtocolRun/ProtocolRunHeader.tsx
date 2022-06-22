@@ -14,7 +14,6 @@ import {
   RUN_STATUS_FINISHING,
   RUN_STATUS_SUCCEEDED,
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  getProtocol,
 } from '@opentrons/api-client'
 import {
   useDismissCurrentRunMutation,
@@ -159,30 +158,36 @@ export function ProtocolRunHeader({
   }, [protocolData, isRobotViewable, history])
 
   React.useEffect(() => {
-    const dismissRun = (): void => {
-      getProtocolRunAnalyticsData()
-        .then(({ protocolRunAnalyticsData, runTime }) => {
-          trackEvent({
-            name: 'runFinish',
-            properties: {
-              ...robotAnalyticsData,
-              ...protocolRunAnalyticsData,
-              runTime,
-            },
-          })
-        })
-        .catch((e: Error) =>
-          console.error(
-            `error formatting runFinish protocol analytics data: ${e.message}`
-          )
-        )
+    const dismissRun = async (): Promise<void> => {
+      const {
+        protocolRunAnalyticsData,
+        runTime,
+      } = await getProtocolRunAnalyticsData()
+
+      trackEvent({
+        name: 'runFinish',
+        properties: {
+          ...robotAnalyticsData,
+          ...protocolRunAnalyticsData,
+          runTime,
+        },
+      })
+
       dismissCurrentRun(runId)
     }
 
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent) {
       runId != null && dismissRun()
     }
-  }, [runStatus, isRunCurrent, runId, dismissCurrentRun])
+  }, [
+    runStatus,
+    isRunCurrent,
+    runId,
+    dismissCurrentRun,
+    getProtocolRunAnalyticsData,
+    robotAnalyticsData,
+    trackEvent,
+  ])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : '--:--:--'
@@ -257,63 +262,52 @@ export function ProtocolRunHeader({
     }
   }, [analysisErrors])
 
-  const handlePlayButtonClick = (): void => {
+  const handlePlayButtonClick = async (): Promise<void> => {
     if (isShaking) {
       setShowIsShakingModal(true)
     } else if (isHeaterShakerInProtocol && !isShaking) {
       confirmAttachment()
     } else {
-      getProtocolRunAnalyticsData()
-        .then(({ protocolRunAnalyticsData, runTime }) => {
-          const isIdle = runStatus === RUN_STATUS_IDLE
-          const properties = isIdle
-            ? { ...robotAnalyticsData, ...protocolRunAnalyticsData }
-            : { ...protocolRunAnalyticsData, runTime }
-          trackEvent({
-            name: isIdle ? 'runStart' : 'runResume',
-            properties,
-          })
-        })
-        .catch((e: Error) =>
-          console.error(
-            `error formatting ${
-              runStatus === RUN_STATUS_IDLE ? 'runStart' : 'runResume'
-            }  protocol analytics data: ${e.message}`
-          )
-        )
+      const {
+        protocolRunAnalyticsData,
+        runTime,
+      } = await getProtocolRunAnalyticsData()
+      const isIdle = runStatus === RUN_STATUS_IDLE
+      const properties = isIdle
+        ? { ...robotAnalyticsData, ...protocolRunAnalyticsData }
+        : { ...protocolRunAnalyticsData, runTime }
+
+      trackEvent({
+        name: isIdle ? 'runStart' : 'runResume',
+        properties,
+      })
+
       play()
     }
   }
 
-  const handlePauseButtonClick = (): void => {
-    getProtocolRunAnalyticsData()
-      .then(({ protocolRunAnalyticsData, runTime }) => {
-        trackEvent({
-          name: 'runPause',
-          properties: { ...protocolRunAnalyticsData, runTime },
-        })
-      })
-      .catch((e: Error) =>
-        console.error(
-          `error formatting runPause protocol analytics data: ${e.message}`
-        )
-      )
+  const handlePauseButtonClick = async (): Promise<void> => {
+    const {
+      protocolRunAnalyticsData,
+      runTime,
+    } = await getProtocolRunAnalyticsData()
+
+    trackEvent({
+      name: 'runPause',
+      properties: { ...protocolRunAnalyticsData, runTime },
+    })
+
     pause()
   }
 
-  const handleResetButtonClick = (): void => {
-    getProtocolRunAnalyticsData()
-      .then(({ protocolRunAnalyticsData }) => {
-        trackEvent({
-          name: 'runAgain',
-          properties: { ...protocolRunAnalyticsData },
-        })
-      })
-      .catch((e: Error) =>
-        console.error(
-          `error formatting runAgain protocol analytics data: ${e.message}`
-        )
-      )
+  const handleResetButtonClick = async (): Promise<void> => {
+    const { protocolRunAnalyticsData } = await getProtocolRunAnalyticsData()
+
+    trackEvent({
+      name: 'runAgain',
+      properties: { ...protocolRunAnalyticsData },
+    })
+
     reset()
   }
 
