@@ -11,7 +11,6 @@ import type {
   Response,
   CurrentRobotName,
 } from '@opentrons/api-client'
-import { act } from 'react-test-renderer'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
