@@ -12,12 +12,12 @@ class MockPipettes:
 
     left_config: PipetteDict = field(
         default_factory=lambda: cast(
-            PipetteDict, {"name": "p300_single", "pipette_id": "123"}
+            PipetteDict, {"name": "p300_single", "pipette_id": "123", "channels": 1}
         )
     )
     right_config: PipetteDict = field(
         default_factory=lambda: cast(
-            PipetteDict, {"name": "p300_multi", "pipette_id": "abc"}
+            PipetteDict, {"name": "p300_multi", "pipette_id": "abc", "channels": 8}
         )
     )
 

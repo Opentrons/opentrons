@@ -36,6 +36,10 @@ from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
     ThermocyclerMovementFlagger,
 )
 
+from opentrons.protocol_engine.execution.heater_shaker_restriction_flagger import (
+    HeaterShakerMovementFlagger,
+)
+
 from .mock_defs import MockPipettes
 
 
@@ -66,16 +70,24 @@ def thermocycler_movement_flagger(decoy: Decoy) -> ThermocyclerMovementFlagger:
 
 
 @pytest.fixture
+def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
+    """Get a mock in the shape of a ThermocyclerMovementFlagger."""
+    return decoy.mock(cls=HeaterShakerMovementFlagger)
+
+
+@pytest.fixture
 def subject(
     state_store: StateStore,
     hardware_api: HardwareAPI,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
+    heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
 ) -> MovementHandler:
     """Create a PipettingHandler with its dependencies mocked out."""
     return MovementHandler(
         state_store=state_store,
         hardware_api=hardware_api,
         thermocycler_movement_flagger=thermocycler_movement_flagger,
+        heater_shaker_movement_flagger=heater_shaker_movement_flagger,
     )
 
 
