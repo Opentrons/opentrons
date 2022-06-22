@@ -55,12 +55,11 @@ export function useCloseCurrentRun(): {
       })
     }
   }
+
   const closeCurrentRunCallback = React.useCallback(closeCurrentRun, [
     dismissCurrentRun,
     currentRunId,
-    getProtocolRunAnalyticsData,
     robotAnalyticsData,
-    trackEvent,
   ])
 
   return {

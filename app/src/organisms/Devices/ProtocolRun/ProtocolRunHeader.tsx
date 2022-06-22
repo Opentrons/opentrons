@@ -16,7 +16,6 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import {
-  useDismissCurrentRunMutation,
   useRunQuery,
   useModulesQuery,
   usePipettesQuery,
@@ -144,7 +143,7 @@ export function ProtocolRunHeader({
   const runStatus = useRunStatus(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
-  const { dismissCurrentRun } = useDismissCurrentRunMutation()
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   // NOTE: we are polling pipettes, though not using their value directly here
@@ -158,36 +157,10 @@ export function ProtocolRunHeader({
   }, [protocolData, isRobotViewable, history])
 
   React.useEffect(() => {
-    const dismissRun = async (): Promise<void> => {
-      dismissCurrentRun(runId)
-
-      const {
-        protocolRunAnalyticsData,
-        runTime,
-      } = await getProtocolRunAnalyticsData()
-
-      trackEvent({
-        name: 'runFinish',
-        properties: {
-          ...robotAnalyticsData,
-          ...protocolRunAnalyticsData,
-          runTime,
-        },
-      })
-    }
-
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent) {
-      runId != null && dismissRun()
+      runId != null && closeCurrentRun()
     }
-  }, [
-    runStatus,
-    isRunCurrent,
-    runId,
-    dismissCurrentRun,
-    getProtocolRunAnalyticsData,
-    robotAnalyticsData,
-    trackEvent,
-  ])
+  }, [runStatus, isRunCurrent, runId, closeCurrentRun])
 
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : '--:--:--'
@@ -393,8 +366,6 @@ export function ProtocolRunHeader({
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
     runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
     runStatus === RUN_STATUS_IDLE
-
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
 
   const handleClearClick = (): void => {
     closeCurrentRun()
