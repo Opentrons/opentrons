@@ -8,6 +8,7 @@ import {
   Text,
   FONT_SIZE_BODY_2,
   DIRECTION_ROW,
+  SPACING,
   SPACING_3,
   SPACING_5,
   BORDER_SOLID_LIGHT,
@@ -308,6 +309,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element {
             : [HORIZONTAL_PLANE]
         }
         auxiliaryControl={allowVertical ? null : <AllowVerticalPrompt />}
+        marginBottom={SPACING.spacing5}
       />
       <Flex
         width="100%"

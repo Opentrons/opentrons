@@ -6,6 +6,7 @@ import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { i18n } from '../../../../i18n'
 import { getHasCalibrationBlock } from '../../../../redux/config'
 import { Banner } from '../../../../atoms/Banner'
+import { useDispatchApiRequest } from '../../../../redux/robot-api'
 import { AskForCalibrationBlockModal } from '../../../CalibrateTipLength'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import {
@@ -23,6 +24,7 @@ import {
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 
 import type { DeckCalibrationInfo } from '../../../../redux/calibration/api-types'
+import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 
 jest.mock('../PipetteOverflowMenu')
 jest.mock('../../../../redux/config')
@@ -31,6 +33,7 @@ jest.mock('../../../CalibrateTipLength')
 jest.mock('../../hooks')
 jest.mock('../../../../atoms/Banner')
 jest.mock('../AboutPipetteSlideout')
+jest.mock('../../../../redux/robot-api')
 
 const mockPipetteOverflowMenu = PipetteOverflowMenu as jest.MockedFunction<
   typeof PipetteOverflowMenu
@@ -52,6 +55,9 @@ const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction
 >
 const mockAboutPipettesSlideout = AboutPipetteSlideout as jest.MockedFunction<
   typeof AboutPipetteSlideout
+>
+const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
+  typeof useDispatchApiRequest
 >
 const mockBanner = Banner as jest.MockedFunction<typeof Banner>
 
@@ -82,9 +88,11 @@ const mockBadDeckCal: DeckCalibrationInfo = {
 const mockRobotName = 'mockRobotName'
 describe('PipetteCard', () => {
   let startWizard: any
+  let dispatchApiRequest: DispatchApiRequestType
 
   beforeEach(() => {
     startWizard = jest.fn()
+    dispatchApiRequest = jest.fn()
     when(mockAboutPipettesSlideout).mockReturnValue(
       <div>mock about slideout</div>
     )
@@ -102,6 +110,10 @@ describe('PipetteCard', () => {
     when(mockAskForCalibrationBlockModal).mockReturnValue(
       <div>Mock AskForCalibrationBlockModal</div>
     )
+    when(mockUseDispatchApiRequest).mockReturnValue([
+      dispatchApiRequest,
+      ['id'],
+    ])
   })
   afterEach(() => {
     jest.resetAllMocks()

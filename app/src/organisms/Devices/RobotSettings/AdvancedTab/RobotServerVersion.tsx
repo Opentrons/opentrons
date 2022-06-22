@@ -11,13 +11,17 @@ import {
   COLORS,
   Link,
   JUSTIFY_FLEX_END,
+  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
-import { getRobotApiVersion } from '../../../../redux/discovery'
+import { Portal } from '../../../../App/portal'
+import { TertiaryButton } from '../../../../atoms/buttons'
+import { getRobotApiVersion, UNREACHABLE } from '../../../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
 import { useIsRobotBusy } from '../../hooks/useIsRobotBusy'
 import { useRobot } from '../../hooks'
+import { UpdateBuildroot } from '../UpdateBuildroot'
 
 import type { State } from '../../../../redux/types'
 
@@ -34,6 +38,7 @@ export function RobotServerVersion({
   const { t } = useTranslation(['device_settings', 'shared'])
   const robot = useRobot(robotName)
   const isBusy = useIsRobotBusy()
+  const [showVersionInfoModal, setShowVersionInfoModal] = React.useState(false)
   const { autoUpdateAction } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robotName)
   })
@@ -42,18 +47,19 @@ export function RobotServerVersion({
 
   return (
     <>
+      {showVersionInfoModal && robot != null && robot.status !== UNREACHABLE ? (
+        <Portal level="top">
+          <UpdateBuildroot
+            robot={robot}
+            close={() => setShowVersionInfoModal(false)}
+          />
+        </Portal>
+      ) : null}
       {autoUpdateAction !== 'reinstall' && robot != null && !isBusy ? (
         <Box marginBottom={SPACING.spacing4} width="100%">
           <UpdateRobotBanner robot={robot} />
         </Box>
-      ) : (
-        // TODO: add reinstall option
-        <Flex justifyContent={JUSTIFY_FLEX_END}>
-          <StyledText as="label" color={COLORS.darkGreyEnabled}>
-            {t('robot_server_versions_status')}
-          </StyledText>
-        </Flex>
-      )}
+      ) : null}
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Box width="70%">
           <StyledText
@@ -79,6 +85,23 @@ export function RobotServerVersion({
             >{` ${t('shared:github')}`}</Link>
           </StyledText>
         </Box>
+        {autoUpdateAction !== 'reinstall' && robot != null && !isBusy ? null : (
+          <Flex justifyContent={JUSTIFY_FLEX_END} alignItems="center">
+            <StyledText
+              as="label"
+              color={COLORS.darkGreyEnabled}
+              paddingRight={SPACING.spacing4}
+            >
+              {t('robot_server_versions_status')}
+            </StyledText>
+            <TertiaryButton
+              onClick={() => setShowVersionInfoModal(true)}
+              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            >
+              {t('reinstall')}
+            </TertiaryButton>
+          </Flex>
+        )}
       </Flex>
     </>
   )

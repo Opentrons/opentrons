@@ -64,15 +64,15 @@ describe('MagneticModuleSlideout', () => {
 
     getByText('Set Engage Height for Magnetic Module GEN1')
     getByText(
-      'Set the engage height for this Magnetic Module. Enter an integer between -5 and 40.'
+      'Set the engage height for this Magnetic Module. Enter an integer between -2.5 and 20.'
     )
     getByText('GEN 1 Height Ranges')
     getByText('Max Engage Height')
     getByText('Labware Bottom')
     getByText('Disengaged')
-    getByText('40')
-    getByText('0')
-    getByText('-5')
+    getByText('20 mm')
+    getByText('0 mm')
+    getByText('-2.5 mm')
     getByText('Set Engage Height')
     getByText('Confirm')
   })
@@ -87,15 +87,15 @@ describe('MagneticModuleSlideout', () => {
 
     getByText('Set Engage Height for Magnetic Module GEN2')
     getByText(
-      'Set the engage height for this Magnetic Module. Enter an integer between -4 and 16.'
+      'Set the engage height for this Magnetic Module. Enter an integer between -2.5 and 20.'
     )
     getByText('GEN 2 Height Ranges')
     getByText('Max Engage Height')
     getByText('Labware Bottom')
     getByText('Disengaged')
-    getByText('16 mm')
+    getByText('20 mm')
     getByText('0 mm')
-    getByText('-4 mm')
+    getByText('-2.5 mm') // TODO(jr, 6/14/22): change this to -4 when ticket #9585 merges
     getByText('Set Engage Height')
     getByText('Confirm')
   })
