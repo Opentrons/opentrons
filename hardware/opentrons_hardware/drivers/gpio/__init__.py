@@ -21,6 +21,7 @@ class OT3GPIO:
         """
         try:
             import gpiod  # type: ignore[import]
+
             return gpiod
         except ImportError:
             LOG.warning("could not import gpiod")
