@@ -2,6 +2,11 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
+  parseLabwareInfoByLiquidId,
+  parseLiquidsInLoadOrder,
+} from '@opentrons/api-client'
+
+import {
   Flex,
   SPACING,
   Icon,
@@ -18,13 +23,17 @@ import {
   Box,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
+import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { StyledText } from '../../../../atoms/text'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
-
-import type { Liquid } from './getMockLiquidData'
+import {
+  getTotalVolumePerLiquidId,
+  getTotalVolumePerLiquidLabwarePair,
+  getSlotLabwareName,
+} from './utils'
 
 interface SetupLiquidsListProps {
-  liquids: Liquid[] | null
+  runId: string
 }
 
 const HIDE_SCROLLBAR = css`
@@ -34,7 +43,8 @@ const HIDE_SCROLLBAR = css`
 `
 
 export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
-  const { liquids } = props
+  const liquidsInLoadOrder = parseLiquidsInLoadOrder()
+
   return (
     <Flex
       css={HIDE_SCROLLBAR}
@@ -43,14 +53,14 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
       overflowY={'auto'}
       data-testid={'SetupLiquidsList_ListView'}
     >
-      {liquids?.map(liquid => (
+      {liquidsInLoadOrder?.map(liquid => (
         <LiquidsListItem
           key={liquid.liquidId}
           liquidId={liquid.liquidId}
           description={liquid.description}
           displayColor={liquid.displayColor}
           displayName={liquid.displayName}
-          locations={liquid.locations}
+          runId={props.runId}
         />
       ))}
     </Flex>
@@ -62,21 +72,19 @@ interface LiquidsListItemProps {
   description: string | null
   displayColor: string
   displayName: string
-  locations: Array<{
-    slotName: string
-    labwareName: string
-    volumeByWell: { [well: string]: number }
-  }>
+  runId: string
 }
 
 export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
-  const { liquidId, description, displayColor, displayName, locations } = props
-  const [openItem, setOpenItem] = React.useState(false)
-  const [
-    showLiquidLabwareDetails,
-    setShowLiquidLabwareDetails,
-  ] = React.useState(false)
+  const { liquidId, description, displayColor, displayName, runId } = props
   const { t } = useTranslation('protocol_setup')
+  const [openItem, setOpenItem] = React.useState(false)
+  const [liquidDetailsLabwareId, setLiquidDetailsLabwareId] = React.useState<
+    string | null
+  >(null)
+  const commands = useProtocolDetailsForRun(runId).protocolData?.commands
+  const labwareByLiquidId = parseLabwareInfoByLiquidId()
+
   const LIQUID_CARD_STYLE = css`
     ${BORDERS.cardOutlineBorder}
 
@@ -93,6 +101,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       border: 1px solid ${COLORS.medGreyHover};
     }
   `
+
   return (
     <Box
       css={LIQUID_CARD_STYLE}
@@ -138,17 +147,17 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
           marginLeft={SIZE_AUTO}
         >
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-            {locations
-              .flatMap(obj => Object.values(obj.volumeByWell))
-              .reduce((prev, curr) => prev + curr, 0)}{' '}
+            {getTotalVolumePerLiquidId(liquidId, labwareByLiquidId)}{' '}
             {MICRO_LITERS}
           </StyledText>
         </Flex>
       </Flex>
-      {showLiquidLabwareDetails && (
+      {liquidDetailsLabwareId != null && (
         <LiquidsLabwareDetailsModal
+          labwareId={liquidDetailsLabwareId}
           liquidId={liquidId}
-          closeModal={() => setShowLiquidLabwareDetails(false)}
+          runId={runId}
+          closeModal={() => setLiquidDetailsLabwareId(null)}
         />
       )}
       {openItem && (
@@ -180,7 +189,11 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
               {t('volume')}
             </StyledText>
           </Flex>
-          {locations.map((location, index) => {
+          {labwareByLiquidId[liquidId].map((labware, index) => {
+            const { slotName, labwareName } = getSlotLabwareName(
+              labware.labwareId,
+              commands
+            )
             return (
               <Box
                 css={LIQUID_CARD_ITEM_STYLE}
@@ -190,22 +203,25 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                 padding={SPACING.spacing4}
                 backgroundColor={COLORS.white}
                 data-testid={`LiquidsListItem_slotRow_${index}`}
-                onClick={() => setShowLiquidLabwareDetails(true)}
+                onClick={() => setLiquidDetailsLabwareId(labware.labwareId)}
               >
                 <Flex
                   flexDirection={DIRECTION_ROW}
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                 >
                   <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-                    {t('slot_location', { slotName: location.slotName })}
+                    {t('slot_location', {
+                      slotName: slotName,
+                    })}
                   </StyledText>
                   <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-                    {location.labwareName}
+                    {labwareName}
                   </StyledText>
                   <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-                    {Object.values(location.volumeByWell).reduce(
-                      (prev, curr) => prev + curr,
-                      0
+                    {getTotalVolumePerLiquidLabwarePair(
+                      liquidId,
+                      labware.labwareId,
+                      labwareByLiquidId
                     )}{' '}
                     {MICRO_LITERS}
                   </StyledText>
