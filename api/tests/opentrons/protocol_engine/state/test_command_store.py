@@ -80,6 +80,7 @@ class QueueCommandSpec(NamedTuple):
                     labwareId="labware-id",
                     wellName="well-name",
                     volume=42,
+                    flowRate=1.23,
                     wellLocation=WellLocation(),
                 ),
             ),
@@ -92,6 +93,7 @@ class QueueCommandSpec(NamedTuple):
                     labwareId="labware-id",
                     wellName="well-name",
                     volume=42,
+                    flowRate=1.23,
                     wellLocation=WellLocation(),
                 )
             ),

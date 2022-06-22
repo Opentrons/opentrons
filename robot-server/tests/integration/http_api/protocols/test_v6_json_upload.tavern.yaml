@@ -268,6 +268,7 @@ stages:
                       y: 0
                       z: 2
                   volume: 5
+                  flowRate: 3
                 result:
                   volume: 5
                 startedAt: !anystr
@@ -298,6 +299,7 @@ stages:
                       y: 0
                       z: 1
                   volume: 4.5
+                  flowRate: 2.5
                 result:
                   volume: 4.5
                 startedAt: !anystr
@@ -335,6 +337,7 @@ stages:
                       x: 0
                       y: 0
                       z: 12
+                  flowRate: 2
                 result: {}
                 startedAt: !anystr
                 completedAt: !anystr
