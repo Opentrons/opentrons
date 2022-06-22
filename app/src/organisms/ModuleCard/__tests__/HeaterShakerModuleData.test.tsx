@@ -171,28 +171,6 @@ describe('HeaterShakerModuleData', () => {
     )
   })
 
-  it('renders an idle temp status when target temp is 0 when H-S is first turned on', () => {
-    props = {
-      moduleData: {
-        labwareLatchStatus: 'idle_unknown',
-        speedStatus: 'idle',
-        temperatureStatus: 'idle',
-        currentSpeed: 0,
-        currentTemperature: null,
-        targetSpeed: null,
-        targetTemperature: 0,
-        errorDetails: null,
-        status: 'idle',
-      },
-    }
-    const { getByText } = render(props)
-    getByText('Target: N/A')
-    getByText('Current: 0 rpm')
-    expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.medGrey'
-    )
-  })
-
   it('renders a cooling temp status', () => {
     props = {
       moduleData: {
