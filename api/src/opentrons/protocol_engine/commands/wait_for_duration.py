@@ -36,7 +36,7 @@ class WaitForDurationImplementation(
         self._run_control = run_control
 
     async def execute(self, params: WaitForDurationParams) -> WaitForDurationResult:
-        """Wait for a duration of time using."""
+        """Wait for a duration of time."""
         await self._run_control.wait_for_duration(params.seconds)
         return WaitForDurationResult()
 

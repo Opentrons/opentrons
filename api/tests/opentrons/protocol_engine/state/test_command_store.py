@@ -154,6 +154,8 @@ class QueueCommandSpec(NamedTuple):
             expected_cls=commands.WaitForResume,
         ),
         QueueCommandSpec(
+            # a WaitForResumeCreate with `pause` should be mapped to
+            # a WaitForResume with `commandType="waitForResume"`
             command_request=commands.WaitForResumeCreate(
                 commandType="pause",
                 params=commands.WaitForResumeParams(message="hello world"),
@@ -181,7 +183,6 @@ def test_command_store_queues_commands(
         key=command_key,
         createdAt=created_at,
         status=commands.CommandStatus.QUEUED,
-        commandType=command_request.commandType,  # type: ignore[arg-type]
         params=command_request.params,  # type: ignore[arg-type]
     )
 

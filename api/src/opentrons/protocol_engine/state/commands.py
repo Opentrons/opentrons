@@ -183,7 +183,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 id=action.command_id,
                 key=action.command_key,
                 createdAt=action.created_at,
-                commandType=action.request.commandType,  # type: ignore[arg-type]
                 params=action.request.params,  # type: ignore[arg-type]
                 intent=action.request.intent,
                 status=CommandStatus.QUEUED,
