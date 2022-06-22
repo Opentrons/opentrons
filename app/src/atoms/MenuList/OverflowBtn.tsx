@@ -25,6 +25,7 @@ const overflowButtonStyles = css`
 
   &:focus-visible {
     box-shadow: 0 0 0 3px ${COLORS.warning};
+    background-color: ${COLORS.white};
   }
 
   &:focus-visible circle {
