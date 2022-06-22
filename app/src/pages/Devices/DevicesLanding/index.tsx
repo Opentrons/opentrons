@@ -10,9 +10,9 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
-  SIZE_2,
   SIZE_6,
   SPACING,
+  COLORS,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
@@ -133,9 +133,10 @@ function DevicesLoadingState(): JSX.Element {
         name="ot-spinner"
         aria-label="ot-spinner"
         spin
-        size={SIZE_2}
+        size="3.25rem"
         marginTop={SPACING.spacing4}
         marginBottom={SPACING.spacing4}
+        color={COLORS.darkGreyEnabled}
       />
       <ExternalLink
         href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
