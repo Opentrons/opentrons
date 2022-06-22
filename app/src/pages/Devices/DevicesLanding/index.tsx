@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import partition from 'lodash/partition'
+import { css } from 'styled-components'
 
 import {
   Box,
@@ -13,6 +14,9 @@ import {
   SIZE_6,
   SPACING,
   COLORS,
+  Link,
+  TYPOGRAPHY,
+  // ALIGN_FLEX_END,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
@@ -27,13 +31,20 @@ import { CollapsibleSection } from '../../../molecules/CollapsibleSection'
 
 import { Divider } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
-import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'
 
 import type { State } from '../../../redux/types'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/en/articles/2687601-troubleshooting-connection-problems'
+
+const LINK_STYLES = css`
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+  }
+`
 
 export function DevicesLanding(): JSX.Element {
   const { t } = useTranslation('devices_landing')
@@ -138,12 +149,20 @@ function DevicesLoadingState(): JSX.Element {
         marginBottom={SPACING.spacing4}
         color={COLORS.darkGreyEnabled}
       />
-      <ExternalLink
+      <Link
+        css={LINK_STYLES}
+        external
         href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
+        display="flex"
+        alignItems={ALIGN_CENTER}
+        color={COLORS.darkBlack}
+        fontSize={TYPOGRAPHY.fontSizeLabel}
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         id="DevicesEmptyState_troubleshootingConnectionProblems"
       >
         {t('troubleshooting_connection_problems')}
-      </ExternalLink>
+        <Icon name="open-in-new" size="0.5rem" marginLeft={SPACING.spacing2} />
+      </Link>
     </Flex>
   )
 }
