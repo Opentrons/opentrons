@@ -20,6 +20,7 @@ import type { CommandsData } from '@opentrons/api-client'
 
 const mockPush = jest.fn()
 
+jest.mock('../../Devices/hooks')
 jest.mock('../DownloadRunLogToast')
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../../redux/analytics')

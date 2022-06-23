@@ -8,6 +8,7 @@ import { useProtocolRunAnalyticsData } from '../../../organisms/Devices/hooks'
 import { useTrackEvent } from '../../../redux/analytics'
 import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
 
+jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/config')
 
@@ -28,16 +29,20 @@ const RUN_ID = 'mockRunId'
 let mockGetProtocolRunAnalyticsData: jest.Mock
 let mockTrackEvent: jest.Mock
 
-describe.skip('ConfirmCancelModal', () => {
+describe('ConfirmCancelModal', () => {
   let props: React.ComponentProps<typeof ConfirmCancelModal>
   beforeEach(() => {
     mockTrackEvent = jest.fn()
     mockGetProtocolRunAnalyticsData = jest.fn()
 
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
+    mockGetProtocolRunAnalyticsData.mockReturnValue(
+      new Promise(resolve => resolve({}))
+    )
     when(mockUseProtocolRunAnalyticsData).calledWith(RUN_ID).mockReturnValue({
       getProtocolRunAnalyticsData: mockGetProtocolRunAnalyticsData,
     })
+
     props = { onClose: jest.fn(), runId: RUN_ID }
   })
 

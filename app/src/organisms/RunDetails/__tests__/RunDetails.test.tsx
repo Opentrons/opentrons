@@ -36,9 +36,8 @@ import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 const mockPush = jest.fn()
 
-jest.mock('@opentrons/react-api-client')
-
 jest.mock('../hooks')
+jest.mock('../../Devices/hooks')
 jest.mock('../CommandList')
 jest.mock('../../../redux/robot/selectors')
 jest.mock('../../../redux/analytics')
@@ -51,7 +50,7 @@ jest.mock('react-router-dom', () => {
   }
 })
 jest.mock('../../RunTimeControl/hooks')
-jest.mock('../../ProtocolUpload/hooks/')
+jest.mock('../../ProtocolUpload/hooks')
 
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
@@ -97,7 +96,6 @@ const render = () => {
   )[0]
 }
 
-const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
 let mockGetProtocolRunAnalyticsData: jest.Mock
 
 describe('RunDetails', () => {
@@ -109,15 +107,17 @@ describe('RunDetails', () => {
       displayName: 'mock display name',
     })
     when(mockCommandList).mockReturnValue(<div>Mock Command List</div>)
+    when(mockUseProtocolRunAnalyticsData)
+      .calledWith('mockRunId')
+      .mockReturnValue({
+        getProtocolRunAnalyticsData: mockGetProtocolRunAnalyticsData,
+      })
     when(mockUseCloseCurrentRun)
       .calledWith()
       .mockReturnValue({
         isClosingCurrentRun: false,
         closeCurrentRun: jest.fn(),
       } as any)
-    when(mockUseProtocolRunAnalyticsData).calledWith(RUN_ID).mockReturnValue({
-      getProtocolRunAnalyticsData: mockGetProtocolRunAnalyticsData,
-    })
     when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(true)
     when(mockUseCurrentRunControls).calledWith().mockReturnValue({
       play: jest.fn(),

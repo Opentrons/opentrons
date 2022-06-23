@@ -31,6 +31,8 @@ export function ConfirmCancelModal(
   ): Promise<void> => {
     e.preventDefault()
     e.stopPropagation()
+    onClose()
+
     if (runId != null) {
       stopRun(runId)
 
@@ -47,8 +49,6 @@ export function ConfirmCancelModal(
         },
       })
     }
-
-    onClose()
   }
 
   return (
