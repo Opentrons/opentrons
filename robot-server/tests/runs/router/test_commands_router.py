@@ -226,8 +226,8 @@ async def test_add_command_to_stopped_engine(
     mock_protocol_engine: ProtocolEngine,
 ) -> None:
     """It should raise an error if the setup command cannot be added."""
-    command_request = pe_commands.WaitForResumeCreate(
-        params=pe_commands.WaitForResumeParams(message="Hello"),
+    command_request = pe_commands.HomeCreate(
+        params=pe_commands.HomeParams(),
         intent=pe_commands.CommandIntent.SETUP,
     )
 
