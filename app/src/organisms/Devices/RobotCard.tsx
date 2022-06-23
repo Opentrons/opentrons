@@ -116,7 +116,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
         </Flex>
         {robot.status === CONNECTABLE ? (
           <Flex flexDirection={DIRECTION_ROW}>
-            <Flex flex="2">
+            <Flex flex="4">
               <AttachedPipettes robotName={robotName} />
             </Flex>
             <Flex flex="1">
