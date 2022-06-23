@@ -12,6 +12,7 @@ import {
   ALIGN_FLEX_END,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
+
 import { CONNECTABLE, removeRobot } from '../../redux/discovery'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
@@ -53,6 +54,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
+    setShowOverflowMenu(false)
     setShowChooseProtocolSlideout(true)
   }
   const handleClickConnectionTroubleshooting: React.MouseEventHandler<HTMLButtonElement> = e => {

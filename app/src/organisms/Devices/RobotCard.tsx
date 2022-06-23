@@ -115,9 +115,13 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
           ) : null}
         </Flex>
         {robot.status === CONNECTABLE ? (
-          <Flex css={{ flex: '2 1' }}>
-            <AttachedPipettes robotName={robotName} />
-            <AttachedModules robotName={robotName} />
+          <Flex flexDirection={DIRECTION_ROW}>
+            <Flex flex="2">
+              <AttachedPipettes robotName={robotName} />
+            </Flex>
+            <Flex flex="1">
+              <AttachedModules robotName={robotName} />
+            </Flex>
           </Flex>
         ) : null}
       </Box>
@@ -167,6 +171,7 @@ function AttachedPipettes(props: { robotName: string }): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_ROW} width="100%">
       <Flex
+        flex="1"
         flexDirection={DIRECTION_COLUMN}
         paddingRight={SPACING.spacing4}
         width="100%"
@@ -184,6 +189,7 @@ function AttachedPipettes(props: { robotName: string }): JSX.Element {
         </StyledText>
       </Flex>
       <Flex
+        flex="1"
         flexDirection={DIRECTION_COLUMN}
         paddingRight={SPACING.spacing4}
         width="100%"
