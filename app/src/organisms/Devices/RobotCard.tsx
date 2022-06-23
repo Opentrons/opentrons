@@ -184,7 +184,11 @@ function AttachedPipettes(props: { robotName: string }): JSX.Element {
         >
           {t('left_mount')}
         </StyledText>
-        <StyledText as="p" id={`RobotCard_${robotName}_leftMountPipette`}>
+        <StyledText
+          as="p"
+          id={`RobotCard_${robotName}_leftMountPipette`}
+          css={{ 'white-space': 'nowrap' }}
+        >
           {attachedPipettes?.left?.modelSpecs.displayName ?? t('empty')}
         </StyledText>
       </Flex>
@@ -202,7 +206,11 @@ function AttachedPipettes(props: { robotName: string }): JSX.Element {
         >
           {t('right_mount')}
         </StyledText>
-        <StyledText as="p" id={`RobotCard_${robotName}_rightMountPipette`}>
+        <StyledText
+          as="p"
+          id={`RobotCard_${robotName}_rightMountPipette`}
+          css={{ 'white-space': 'nowrap' }}
+        >
           {attachedPipettes?.right?.modelSpecs.displayName ?? t('empty')}
         </StyledText>
       </Flex>
