@@ -105,6 +105,14 @@ from .move_relative import (
     MoveRelativeCommandType,
 )
 
+from .move_to_coordinates import (
+    MoveToCoordinates,
+    MoveToCoordinatesParams,
+    MoveToCoordinatesCreate,
+    MoveToCoordinatesResult,
+    MoveToCoordinatesCommandType,
+)
+
 from .move_to_well import (
     MoveToWell,
     MoveToWellParams,
@@ -113,12 +121,20 @@ from .move_to_well import (
     MoveToWellCommandType,
 )
 
-from .pause import (
-    Pause,
-    PauseParams,
-    PauseCreate,
-    PauseResult,
-    PauseCommandType,
+from .wait_for_resume import (
+    WaitForResume,
+    WaitForResumeParams,
+    WaitForResumeCreate,
+    WaitForResumeResult,
+    WaitForResumeCommandType,
+)
+
+from .wait_for_duration import (
+    WaitForDuration,
+    WaitForDurationParams,
+    WaitForDurationCreate,
+    WaitForDurationResult,
+    WaitForDurationCommandType,
 )
 
 from .pick_up_tip import (
@@ -145,6 +161,21 @@ from .set_rail_lights import (
     SetRailLightsCommandType,
 )
 
+from .touch_tip import (
+    TouchTip,
+    TouchTipParams,
+    TouchTipCreate,
+    TouchTipResult,
+    TouchTipCommandType,
+)
+
+from .blow_out import (
+    BlowOutParams,
+    BlowOutResult,
+    BlowOutCreate,
+    BlowOutImplementation,
+    BlowOut,
+)
 
 __all__ = [
     # command type unions
@@ -212,18 +243,30 @@ __all__ = [
     "MoveRelativeCreate",
     "MoveRelativeResult",
     "MoveRelativeCommandType",
+    # move to coordinates command models
+    "MoveToCoordinates",
+    "MoveToCoordinatesParams",
+    "MoveToCoordinatesCreate",
+    "MoveToCoordinatesResult",
+    "MoveToCoordinatesCommandType",
     # move to well command models
     "MoveToWell",
     "MoveToWellCreate",
     "MoveToWellParams",
     "MoveToWellResult",
     "MoveToWellCommandType",
-    # pause command models
-    "Pause",
-    "PauseParams",
-    "PauseCreate",
-    "PauseResult",
-    "PauseCommandType",
+    # wait for resume command models
+    "WaitForResume",
+    "WaitForResumeParams",
+    "WaitForResumeCreate",
+    "WaitForResumeResult",
+    "WaitForResumeCommandType",
+    # wait for duration command models
+    "WaitForDuration",
+    "WaitForDurationParams",
+    "WaitForDurationCreate",
+    "WaitForDurationResult",
+    "WaitForDurationCommandType",
     # pick up tip command models
     "PickUpTip",
     "PickUpTipCreate",
@@ -242,6 +285,18 @@ __all__ = [
     "SetRailLightsCreate",
     "SetRailLightsResult",
     "SetRailLightsCommandType",
+    # touch tip command models
+    "TouchTip",
+    "TouchTipParams",
+    "TouchTipCreate",
+    "TouchTipResult",
+    "TouchTipCommandType",
+    # blow out command models
+    "BlowOutResult",
+    "BlowOutCreate",
+    "BlowOutImplementation",
+    "BlowOutParams",
+    "BlowOut",
     # module command bundles
     "heater_shaker",
     "magnetic_module",

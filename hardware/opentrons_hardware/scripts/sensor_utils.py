@@ -20,17 +20,17 @@ class SensorRun:
     """User input for the sensor script."""
 
     sensor_type: SensorType
-    pipette_serial_number: str
+    serial_number: str
     auto_zero: bool
     minutes: int
-    pipette_mount: str
+    mount: str
 
 
 @dataclass
 class CSVMetaData:
     """Sensor metadata."""
 
-    pipette_serial: str
+    serial: str
     sensor: str
     repeats: int
     auto_zero: bool
@@ -79,7 +79,7 @@ class CSVFormatter:
 async def handle_pressure_sensor(
     command: SensorRun,
     driver: AbstractCanDriver,
-    pipette_mount: NodeId,
+    node_id: NodeId,
     include_csv: bool,
     log: logging.Logger,
 ) -> None:
@@ -89,7 +89,7 @@ async def handle_pressure_sensor(
     pressure = mmr920C04.PressureSensor()
     if include_csv:
         metadata = CSVMetaData(
-            command.pipette_serial_number,
+            command.serial_number,
             command.sensor_type.name,
             command.minutes,
             command.auto_zero,
@@ -100,7 +100,7 @@ async def handle_pressure_sensor(
     while datetime.now() < end_time:
         messenger = CanMessenger(driver=driver)
         messenger.start()
-        data = await pressure.read(messenger, pipette_mount, offset=False, timeout=10)
+        data = await pressure.read(messenger, node_id, offset=False, timeout=10)
         curr_time = datetime.now().strftime(hms)
         if isinstance(data, SensorDataType):
             log.info(f"Pressure data: {data.to_float()} at: {curr_time}")
@@ -119,7 +119,7 @@ async def handle_pressure_sensor(
 async def handle_capacitive_sensor(
     command: SensorRun,
     driver: AbstractCanDriver,
-    pipette_mount: NodeId,
+    node_id: NodeId,
     include_csv: bool,
     log: logging.Logger,
 ) -> None:
@@ -131,7 +131,7 @@ async def handle_capacitive_sensor(
     messenger.start()
     if include_csv:
         metadata = CSVMetaData(
-            command.pipette_serial_number,
+            command.serial_number,
             command.sensor_type.name,
             command.minutes,
             command.auto_zero,
@@ -139,10 +139,10 @@ async def handle_capacitive_sensor(
         )
         csv = CSVFormatter.build(metadata, list(metadata.to_dict().keys()))
     # autozero
-    await capacitive.get_baseline(messenger, pipette_mount, 10, 10, timeout=10)
+    await capacitive.get_baseline(messenger, node_id, 10, 10, timeout=10)
     end_time = start_time + timedelta(minutes=command.minutes)
     while datetime.now() < end_time:
-        data = await capacitive.read(messenger, pipette_mount, offset=False, timeout=10)
+        data = await capacitive.read(messenger, node_id, offset=False, timeout=10)
         curr_time = datetime.now().strftime(hms)
 
         log.info(
@@ -165,7 +165,7 @@ async def handle_capacitive_sensor(
 async def read_temp_from_pressure_sensor(
     command: SensorRun,
     driver: AbstractCanDriver,
-    pipette_mount: NodeId,
+    node_id: NodeId,
     include_csv: bool,
     log: logging.Logger,
 ) -> None:
@@ -175,7 +175,7 @@ async def read_temp_from_pressure_sensor(
     pressure = mmr920C04.PressureSensor()
     if include_csv:
         metadata = CSVMetaData(
-            command.pipette_serial_number,
+            command.serial_number,
             command.sensor_type.name,
             command.minutes,
             command.auto_zero,
@@ -188,7 +188,7 @@ async def read_temp_from_pressure_sensor(
         messenger.start()
         data = await pressure.read_temperature(
             messenger,
-            pipette_mount,
+            node_id,
             offset=False,
             timeout=10,
         )
@@ -210,7 +210,7 @@ async def read_temp_from_pressure_sensor(
 async def handle_environment_sensor(
     command: SensorRun,
     driver: AbstractCanDriver,
-    pipette_mount: NodeId,
+    node_id: NodeId,
     include_csv: bool,
     log: logging.Logger,
 ) -> None:
@@ -222,7 +222,7 @@ async def handle_environment_sensor(
     messenger.start()
     if include_csv:
         metadata = CSVMetaData(
-            command.pipette_serial_number,
+            command.serial_number,
             command.sensor_type.name,
             command.minutes,
             command.auto_zero,
@@ -231,7 +231,7 @@ async def handle_environment_sensor(
         csv = CSVFormatter.build(metadata, list(metadata.to_dict().keys()))
     end_time = start_time + timedelta(minutes=command.minutes)
     while datetime.now() < end_time:
-        data = await environment.read(messenger, pipette_mount, timeout=10)
+        data = await environment.read(messenger, node_id, timeout=10)
         curr_time = datetime.now().strftime(hms)
         if isinstance(data, SensorDataType):
             log.info(f"Capacitive data: {data.to_float()} at: {curr_time}")

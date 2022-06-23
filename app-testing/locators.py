@@ -88,8 +88,6 @@ if find_dotenv():
 os.environ["OT_APP_ANALYTICS__SEEN_OPT_IN"] = "true"
 # app should look on localhost for robots
 os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"
-# app should use the __DEV__ Hierarchy Reorganization
-os.environ["OT_APP_DEV_INTERNAL__hierarchyReorganization"] = "false"
 # dev tools open at start
 os.environ["OT_APP_DEVTOOLS"] = "true"
 driver: WebDriver = WebDriver(options=_chrome_options())

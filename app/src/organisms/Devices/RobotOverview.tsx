@@ -31,7 +31,7 @@ import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { RobotStatusBanner } from './RobotStatusBanner'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
-import { useLights, useRobot } from './hooks'
+import { useIsRobotBusy, useLights, useRobot } from './hooks'
 
 const EQUIPMENT_POLL_MS = 5000
 
@@ -52,6 +52,7 @@ export function RobotOverview({
   ] = React.useState<boolean>(false)
   const { lightsOn, toggleLights } = useLights(robotName)
   const currentRunId = useCurrentRunId()
+  const isRobotBusy = useIsRobotBusy()
 
   useInterval(
     () => {
@@ -78,7 +79,7 @@ export function RobotOverview({
       />
       <Box padding={SPACING.spacing3} width="100%">
         <ReachableBanner robot={robot} />
-        {robot != null ? (
+        {robot != null && !isRobotBusy ? (
           <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
         ) : null}
         {robot?.status === CONNECTABLE ? (

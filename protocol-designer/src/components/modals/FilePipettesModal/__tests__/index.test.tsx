@@ -205,14 +205,14 @@ describe('FilePipettesModal', () => {
       expect(props.onSave).toHaveBeenCalledWith({
         modules: [
           {
-            type: MAGNETIC_MODULE_TYPE,
-            model: MAGNETIC_MODULE_V1,
-            slot: '9',
-          },
-          {
             type: HEATERSHAKER_MODULE_TYPE,
             model: HEATERSHAKER_MODULE_V1,
             slot: '1',
+          },
+          {
+            type: MAGNETIC_MODULE_TYPE,
+            model: MAGNETIC_MODULE_V1,
+            slot: '9',
           },
         ],
         newProtocolFields: { name: '' },
@@ -293,8 +293,14 @@ describe('FilePipettesModal', () => {
       props.initialModuleValues = initialModuleValues
 
       const wrapper = renderFormComponent(props)
-
-      expect(wrapper.find(CrashInfoBox)).toHaveLength(0)
+      expect(wrapper.find(CrashInfoBox).props()).toEqual({
+        showDiagram: true,
+        showHeaterShakerLabwareCollisions: false,
+        showHeaterShakerModuleCollisions: false,
+        showHeaterShakerPipetteCollisions: false,
+        showMagPipetteCollisons: false,
+        showTempPipetteCollisons: false,
+      })
     })
 
     it('does not display crash info when noncrashable pipettes', () => {
@@ -306,7 +312,14 @@ describe('FilePipettesModal', () => {
 
       const wrapper = renderFormComponent(props)
 
-      expect(wrapper.find(CrashInfoBox)).toHaveLength(0)
+      expect(wrapper.find(CrashInfoBox).props()).toEqual({
+        showDiagram: true,
+        showHeaterShakerLabwareCollisions: false,
+        showHeaterShakerModuleCollisions: false,
+        showHeaterShakerPipetteCollisions: false,
+        showMagPipetteCollisons: false,
+        showTempPipetteCollisons: false,
+      })
     })
 
     it('does not display crash info when module restrictions disabled', () => {

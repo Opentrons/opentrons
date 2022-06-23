@@ -3,8 +3,8 @@ import * as React from 'react'
 import * as Styles from '../styles'
 import { Box, Flex } from '../primitives'
 import { COLORS, SPACING } from '../ui-style-constants'
-
 import type { StyleProps } from '../primitives'
+import { POSITION_FIXED } from '../styles'
 
 const BASE_STYLE = {
   position: Styles.POSITION_ABSOLUTE,
@@ -47,8 +47,12 @@ const CONTENT_STYLE = {
 } as const
 
 export interface BaseModalProps extends StyleProps {
+  /** Content background color, defaults to white **/
+  contentBackgroundColor?: string
   /** Overlay color, defaults to `OVERLAY_GRAY_90` */
   overlayColor?: string
+  /** Optional close on outside click **/
+  onOutsideClick?: React.MouseEventHandler
   /** Optional sticky header */
   header?: React.ReactNode
   /** Option to turn off headerStyles */
@@ -70,7 +74,9 @@ export interface BaseModalProps extends StyleProps {
  */
 export function BaseModal(props: BaseModalProps): JSX.Element {
   const {
+    contentBackgroundColor = COLORS.white,
     overlayColor = COLORS.backgroundOverlay,
+    onOutsideClick,
     zIndex = 10,
     header,
     footer,
@@ -83,18 +89,33 @@ export function BaseModal(props: BaseModalProps): JSX.Element {
 
   return (
     <Flex
-      {...BASE_STYLE}
+      position={POSITION_FIXED}
+      left="0"
+      right="0"
+      top="0"
+      bottom="0"
+      zIndex="1"
       backgroundColor={overlayColor}
-      zIndex={zIndex}
       onClick={e => {
         e.stopPropagation()
+        if (onOutsideClick) onOutsideClick(e)
       }}
     >
-      <Box {...MODAL_STYLE} {...styleProps}>
-        {header != null ? <Box {...headerStyle}>{header}</Box> : null}
-        <Box {...CONTENT_STYLE}>{children}</Box>
-        {footer != null ? <Box {...FOOTER_STYLE}>{footer}</Box> : null}
-      </Box>
+      <Flex {...BASE_STYLE} zIndex={zIndex}>
+        <Box
+          {...MODAL_STYLE}
+          {...styleProps}
+          onClick={e => {
+            e.stopPropagation()
+          }}
+        >
+          {header != null ? <Box {...headerStyle}>{header}</Box> : null}
+          <Box {...CONTENT_STYLE} backgroundColor={contentBackgroundColor}>
+            {children}
+          </Box>
+          {footer != null ? <Box {...FOOTER_STYLE}>{footer}</Box> : null}
+        </Box>
+      </Flex>
     </Flex>
   )
 }

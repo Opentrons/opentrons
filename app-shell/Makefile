@@ -28,7 +28,7 @@ publish_dir := dist/publish
 # if branch exists -> b$(BUILD_NUMBER)-$(BRANCH_NAME)
 # only copy update files publish directory on tagged builds
 publish_update := $(filter v%,$(OT_TAG))
-branch_suffix := $(if $(publish_update),,-$(OT_BRANCH))
+branch_suffix := $(if $(publish_update),,-$(subst /,-,$(OT_BRANCH)))
 build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
 
 builder := electron-builder \
@@ -45,6 +45,10 @@ electron := electron . \
 
 # standard targets
 #####################################################################
+
+.PHONY: branch-suffix
+branch-suffix:
+	echo $(branch_suffix)
 
 .PHONY: all
 all: package

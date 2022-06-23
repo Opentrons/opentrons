@@ -6,7 +6,7 @@ import {
   renderWithProviders,
 } from '@opentrons/components'
 import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
-import { ModuleCard } from '../../ModuleCard'
+import { ModuleCard } from '../../../ModuleCard'
 import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
@@ -24,7 +24,7 @@ import {
   ProtocolAnalysisFile,
 } from '@opentrons/shared-data'
 
-jest.mock('../../ModuleCard')
+jest.mock('../../../ModuleCard')
 jest.mock('../../hooks')
 
 const mockModuleCard = ModuleCard as jest.MockedFunction<typeof ModuleCard>
