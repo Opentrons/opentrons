@@ -34,7 +34,7 @@ export function useProtocolRunAnalyticsData(
       ? {
           ...robotProtocolAnalysis,
           metadata: protocolMetadata,
-          config: null,
+          config: storedProtocolAnalysis?.config,
         }
       : storedProtocolAnalysis
   const { startedAt } = useRunTimestamps(runId)
