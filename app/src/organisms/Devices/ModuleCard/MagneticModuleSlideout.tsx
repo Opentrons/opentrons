@@ -7,28 +7,27 @@ import {
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 import {
   Flex,
-  Text,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   TEXT_TRANSFORM_UPPERCASE,
-  JUSTIFY_FLEX_END,
   COLORS,
   TYPOGRAPHY,
   SPACING,
+  JUSTIFY_END,
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
   MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V1_DISNEGAGED_HEIGHT,
-  MAGNETIC_MODULE_V1_MAX_ENGAGE_HEIGHT,
+  MAGNETIC_MODULES_MAX_ENGAGE_HEIGHT,
   MAGNETIC_MODULE_V2_DISNEGAGED_HEIGHT,
-  MAGNETIC_MODULE_V2_MAX_ENGAGE_HEIGHT,
   MM,
 } from '@opentrons/shared-data'
 import { Slideout } from '../../../atoms/Slideout'
 import { InputField } from '../../../atoms/InputField'
+import { StyledText } from '../../../atoms/text'
 import { PrimaryButton } from '../../../atoms/buttons'
 
 import type { TFunctionResult } from 'i18next'
@@ -38,7 +37,7 @@ import type { MagneticModuleEngageMagnetCreateCommand } from '@opentrons/shared-
 
 interface ModelContents {
   version: string
-  units: string | null
+  units: string
   maxHeight: number
   labwareBottomHeight: number
   disengagedHeight: number
@@ -48,8 +47,8 @@ const getInfoByModel = (model: MagneticModuleModel): ModelContents => {
   if (model === MAGNETIC_MODULE_V1) {
     return {
       version: 'GEN 1',
-      units: null,
-      maxHeight: MAGNETIC_MODULE_V1_MAX_ENGAGE_HEIGHT,
+      units: MM,
+      maxHeight: MAGNETIC_MODULES_MAX_ENGAGE_HEIGHT,
       labwareBottomHeight: MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT,
       disengagedHeight: MAGNETIC_MODULE_V1_DISNEGAGED_HEIGHT,
     }
@@ -57,7 +56,7 @@ const getInfoByModel = (model: MagneticModuleModel): ModelContents => {
     return {
       version: 'GEN 2',
       units: MM,
-      maxHeight: MAGNETIC_MODULE_V2_MAX_ENGAGE_HEIGHT,
+      maxHeight: MAGNETIC_MODULES_MAX_ENGAGE_HEIGHT,
       labwareBottomHeight: MAGNETIC_MODULE_TYPE_LABWARE_BOTTOM_HEIGHT,
       disengagedHeight: MAGNETIC_MODULE_V2_DISNEGAGED_HEIGHT,
     }
@@ -95,15 +94,15 @@ export const MagneticModuleSlideout = (
 
   switch (info.version) {
     case 'GEN 1': {
-      max = info.maxHeight
-      labwareBottom = info.labwareBottomHeight
-      disengageHeight = info.disengagedHeight
+      max = t('num_units', { num: info.maxHeight })
+      labwareBottom = t('num_units', { num: info.labwareBottomHeight })
+      disengageHeight = t('num_units', { num: info.disengagedHeight })
       break
     }
     case 'GEN 2': {
-      max = t('gen_2_num', { num: info.maxHeight })
-      labwareBottom = t('gen_2_num', { num: info.labwareBottomHeight })
-      disengageHeight = t('gen_2_num', { num: info.disengagedHeight })
+      max = t('num_units', { num: info.maxHeight })
+      labwareBottom = t('num_units', { num: info.labwareBottomHeight })
+      disengageHeight = t('num_units', { num: info.disengagedHeight })
     }
   }
 
@@ -158,10 +157,9 @@ export const MagneticModuleSlideout = (
         </PrimaryButton>
       }
     >
-      <Text
+      <StyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
-        color={COLORS.darkBlack}
         paddingTop={SPACING.spacing2}
         data-testid={`MagneticModuleSlideout_body_text_${module.serialNumber}`}
       >
@@ -170,13 +168,10 @@ export const MagneticModuleSlideout = (
             module.moduleModel === MAGNETIC_MODULE_V1
               ? MAGNETIC_MODULE_V1_DISNEGAGED_HEIGHT
               : MAGNETIC_MODULE_V2_DISNEGAGED_HEIGHT,
-          higher:
-            module.moduleModel === MAGNETIC_MODULE_V1
-              ? MAGNETIC_MODULE_V1_MAX_ENGAGE_HEIGHT
-              : MAGNETIC_MODULE_V2_MAX_ENGAGE_HEIGHT,
+          higher: MAGNETIC_MODULES_MAX_ENGAGE_HEIGHT,
         })}
-      </Text>
-      <Text
+      </StyledText>
+      <StyledText
         fontSize={TYPOGRAPHY.fontSizeH6}
         color={COLORS.darkGreyEnabled}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -186,7 +181,7 @@ export const MagneticModuleSlideout = (
         data-testid={`MagneticModuleSlideout_body_subtitle_${module.serialNumber}`}
       >
         {t('height_ranges', { gen: info.version })}
-      </Text>
+      </StyledText>
       <Flex
         backgroundColor={COLORS.background}
         flexDirection={DIRECTION_ROW}
@@ -199,20 +194,32 @@ export const MagneticModuleSlideout = (
           flexDirection={DIRECTION_COLUMN}
           data-testid={`MagneticModuleSlideout_body_data_text_${module.serialNumber}`}
         >
-          <Text paddingBottom={SPACING.spacing3}>{t('max_engage_height')}</Text>
-          <Text paddingBottom={SPACING.spacing3}>{t('labware_bottom')}</Text>
-          <Text>{t('disengaged')}</Text>
+          <StyledText paddingBottom={SPACING.spacing3}>
+            {t('max_engage_height')}
+          </StyledText>
+          <StyledText paddingBottom={SPACING.spacing3}>
+            {t('labware_bottom')}
+          </StyledText>
+          <StyledText>{t('disengaged')}</StyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_FLEX_END}
+          justifyContent={JUSTIFY_END}
           data-testid={`MagneticModuleSlideout_body_data_num_${module.serialNumber}`}
         >
-          <Text paddingBottom={SPACING.spacing3}>{max}</Text>
-          <Text paddingBottom={SPACING.spacing3} paddingLeft={SPACING.spacing2}>
+          <StyledText
+            paddingLeft={SPACING.spacing3}
+            paddingBottom={SPACING.spacing3}
+          >
+            {max}
+          </StyledText>
+          <StyledText
+            paddingLeft={SPACING.spacing4}
+            paddingBottom={SPACING.spacing3}
+          >
             {labwareBottom}
-          </Text>
-          <Text>{disengageHeight}</Text>
+          </StyledText>
+          <StyledText>{disengageHeight}</StyledText>
         </Flex>
       </Flex>
       <Flex
@@ -220,14 +227,14 @@ export const MagneticModuleSlideout = (
         flexDirection={DIRECTION_COLUMN}
         data-testid={`MagneticModuleSlideout_input_field_${module.serialNumber}`}
       >
-        <Text
+        <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.darkGrey}
           paddingBottom={SPACING.spacing3}
         >
           {t('set_engage_height')}
-        </Text>
+        </StyledText>
         <InputField
           data-testid={`${module.moduleModel}`}
           id={`${module.moduleModel}`}

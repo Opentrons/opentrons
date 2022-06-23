@@ -34,7 +34,7 @@
   "pause_protocol": "Pause protocol",
   "current_step_pause": "Current Step - Paused by User",
   "current_step_pause_timer": "Timer",
-  "user_paused_protocol_for": "User paused protocol for",
+  "protocol_paused_for": "Protocol paused for",
   "step_failed": "Step failed",
   "failed_step": "Failed step",
   "cancel_run_modal_heading": "Are you sure you want to cancel this run?",

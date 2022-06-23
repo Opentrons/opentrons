@@ -16,7 +16,7 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../../../../atoms/text'
-import { PrimaryButton } from '../../../../../atoms/buttons'
+import { AlertPrimaryButton, PrimaryButton } from '../../../../../atoms/buttons'
 import { Modal } from '../../../../../atoms/Modal'
 import {
   useDispatchApiRequest,
@@ -77,7 +77,7 @@ export function FactoryResetModal({
           onClose={closeModal}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p" marginBottom={SPACING.spacing5}>
+            <StyledText as="p" paddingBottom={SPACING.spacing5}>
               {t('factory_reset_modal_description')}
             </StyledText>
             <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
@@ -85,19 +85,18 @@ export function FactoryResetModal({
                 role="button"
                 onClick={closeModal}
                 textTransform={TEXT_TRANSFORM_CAPITALIZE}
-                marginRight={SPACING.spacing3}
+                marginRight={SPACING.spacing5}
                 css={TYPOGRAPHY.linkPSemiBold}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {t('shared:cancel')}
               </Link>
-              <PrimaryButton
-                backgroundColor={COLORS.error}
+              <AlertPrimaryButton
                 onClick={triggerReset}
                 disabled={PENDING_STATUS}
               >
                 {t('factory_reset_modal_confirm_button')}
-              </PrimaryButton>
+              </AlertPrimaryButton>
             </Flex>
           </Flex>
         </Modal>
@@ -107,7 +106,11 @@ export function FactoryResetModal({
           icon={reconnectModalIcon}
           onClose={closeModal}
         >
-          <StyledText as="p" marginBottom={SPACING.spacing5}>
+          <StyledText
+            as="p"
+            marginBottom={SPACING.spacing5}
+            paddingBottom={SPACING.spacing5}
+          >
             {t('factory_reset_modal_connection_lost_description')}
           </StyledText>
           <Flex justifyContent={JUSTIFY_FLEX_END}>

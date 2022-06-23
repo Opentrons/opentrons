@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { NavLink, Redirect, useParams } from 'react-router-dom'
