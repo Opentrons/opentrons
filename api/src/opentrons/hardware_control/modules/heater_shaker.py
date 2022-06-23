@@ -346,7 +346,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         """
         with self._guard_exc_to_error_state():
             await self.wait_for_is_running()
-      
+
             # TODO(mc, 2022-06-14); this common "set and wait for the next poll" pattern
             # exists so `self.target_...`  immediately after a `_driver.set_...` works.
             # This is fraught, and probably still open to race conditions.
@@ -362,7 +362,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         """
         if self.is_simulated:
             return
-          
+
         # TODO(mc, 2022-06-14): wait logic disagrees with `self.set_temperature`.
         # Resolve discrepency whichever way is most correct
         async def _await_temperature() -> None:
