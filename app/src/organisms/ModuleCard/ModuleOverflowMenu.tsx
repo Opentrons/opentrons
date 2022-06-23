@@ -1,5 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
 import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
@@ -42,6 +48,15 @@ export const ModuleOverflowMenu = (
     handleSlideoutClick
   )
   const isIncompleteOrBusy = useRunIncompleteOrLegacySessionInProgress()
+  const runStatus = useRunStatus(runId != null ? runId : null)
+  const isRunStill =
+    runStatus === RUN_STATUS_SUCCEEDED ||
+    runStatus === RUN_STATUS_STOPPED ||
+    runStatus === RUN_STATUS_FAILED ||
+    runStatus === RUN_STATUS_IDLE
+
+  const isDisabled = runId != null ? !isRunStill : isIncompleteOrBusy
+
   return (
     <>
       <Flex position={POSITION_RELATIVE}>
@@ -58,7 +73,7 @@ export const ModuleOverflowMenu = (
                       key={`${index}_${module.moduleModel}`}
                       onClick={() => item.onClick(item.isSecondary)}
                       data-testid={`module_setting_${module.moduleModel}`}
-                      disabled={item.disabledReason || isIncompleteOrBusy}
+                      disabled={item.disabledReason || isDisabled}
                       {...targetProps}
                     >
                       {item.setSetting}

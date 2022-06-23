@@ -8,6 +8,7 @@ import {
   mockThermocycler,
   mockHeaterShaker,
 } from '../../../redux/modules/__fixtures__'
+import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useRunIncompleteOrLegacySessionInProgress } from '../../Devices/hooks'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
@@ -16,12 +17,16 @@ jest.mock('../useModuleIdFromRun')
 jest.mock('../../Devices/hooks')
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../Devices/hooks')
+jest.mock('../../hooks')
 
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
 >
 const mockUseRunIncompleteOrLegacySessionInProgress = useRunIncompleteOrLegacySessionInProgress as jest.MockedFunction<
   typeof useRunIncompleteOrLegacySessionInProgress
+>
+const mockUseRunStatus = useRunStatus as jest.MockedFunction<
+  typeof useRunStatus
 >
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
@@ -202,6 +207,7 @@ describe('ModuleOverflowMenu', () => {
   beforeEach(() => {
     mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
     mockUseRunIncompleteOrLegacySessionInProgress.mockReturnValue(false)
+    mockUseRunStatus.mockReturnValue(null)
     props = {
       module: mockMagneticModule,
       handleSlideoutClick: jest.fn(),
