@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   ALIGN_FLEX_END,
@@ -13,8 +14,9 @@ import {
   Link,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
+
 import { ManualIpHostnameForm } from './ManualIpHostnameForm'
-import { IpHostnameList } from './IpHostnameList'
+import { ManualIpHostnameList } from './ManualIpHostnameList'
 import { Slideout } from '../../atoms/Slideout'
 import { PrimaryButton } from '../../atoms/buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'

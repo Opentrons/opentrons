@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import BasePipettingParams
+from .pipetting_common import PipetteIdMixin, WellLocationMixin
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 from ..errors import TouchTipDisabledError, LabwareIsTipRackError
 
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 TouchTipCommandType = Literal["touchTip"]
 
 
-class TouchTipParams(BasePipettingParams):
+class TouchTipParams(PipetteIdMixin, WellLocationMixin):
     """Payload needed to touch a pipette tip the sides of a specific well."""
 
     pass

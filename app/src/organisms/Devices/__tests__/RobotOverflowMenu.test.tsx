@@ -61,7 +61,7 @@ describe('RobotOverflowMenu', () => {
     const { getByText, getByLabelText } = render(props)
     const btn = getByLabelText('RobotOverflowMenu_button')
     fireEvent.click(btn)
-    getByText('robot settings')
+    getByText('Robot settings')
     const run = getByText('Run a protocol')
     fireEvent.click(run)
     getByText('choose protocol slideout')
@@ -71,7 +71,7 @@ describe('RobotOverflowMenu', () => {
     const { getByLabelText, getByRole } = render(props)
     const btn = getByLabelText('RobotOverflowMenu_button')
     fireEvent.click(btn)
-    getByRole('link', { name: 'robot settings' })
+    getByRole('link', { name: 'Robot settings' })
   })
 
   it('renders overflow menu items when the robot is not reachable', () => {

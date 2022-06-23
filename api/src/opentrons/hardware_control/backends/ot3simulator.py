@@ -18,7 +18,6 @@ from typing import (
 )
 
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.config import pipette_config, gripper_config
 from opentrons_shared_data.pipette import dummy_model_for_name
 from .ot3utils import (
@@ -56,7 +55,7 @@ from opentrons.hardware_control.dev_types import (
     AttachedGripper,
     OT3AttachedInstruments,
 )
-from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
+from opentrons_hardware.drivers.gpio import OT3GPIO
 
 log = logging.getLogger(__name__)
 
@@ -88,14 +87,11 @@ class OT3Simulator:
         Returns:
             Instance.
         """
-        gpio = SimulatingGPIOCharDev("gpiochip0")
-        await gpio.setup()
         return cls(
             attached_instruments,
             attached_modules,
             config,
             loop,
-            gpio,
             strict_attached_instruments,
         )
 
@@ -105,7 +101,6 @@ class OT3Simulator:
         attached_modules: List[str],
         config: OT3Config,
         loop: asyncio.AbstractEventLoop,
-        gpio_chardev: GPIODriverLike,
         strict_attached_instruments: bool = True,
     ) -> None:
         """Construct.
@@ -116,7 +111,7 @@ class OT3Simulator:
         """
         self._configuration = config
         self._loop = loop
-        self._gpio_dev = SimulatingGPIOCharDev("simulated")
+        self._gpio_dev = OT3GPIO()
         self._strict_attached = bool(strict_attached_instruments)
         self._stubbed_attached_modules = attached_modules
 
@@ -157,7 +152,7 @@ class OT3Simulator:
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
 
     @property
-    def gpio_chardev(self) -> GPIODriverLike:
+    def gpio_chardev(self) -> OT3GPIO:
         """Get the GPIO device."""
         return self._gpio_dev
 

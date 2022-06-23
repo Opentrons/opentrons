@@ -86,6 +86,14 @@ from .move_relative import (
     MoveRelativeCommandType,
 )
 
+from .move_to_coordinates import (
+    MoveToCoordinates,
+    MoveToCoordinatesParams,
+    MoveToCoordinatesCreate,
+    MoveToCoordinatesResult,
+    MoveToCoordinatesCommandType,
+)
+
 from .move_to_well import (
     MoveToWell,
     MoveToWellParams,
@@ -94,12 +102,20 @@ from .move_to_well import (
     MoveToWellCommandType,
 )
 
-from .pause import (
-    Pause,
-    PauseParams,
-    PauseCreate,
-    PauseResult,
-    PauseCommandType,
+from .wait_for_resume import (
+    WaitForResume,
+    WaitForResumeParams,
+    WaitForResumeCreate,
+    WaitForResumeResult,
+    WaitForResumeCommandType,
+)
+
+from .wait_for_duration import (
+    WaitForDuration,
+    WaitForDurationParams,
+    WaitForDurationCreate,
+    WaitForDurationResult,
+    WaitForDurationCommandType,
 )
 
 from .pick_up_tip import (
@@ -145,8 +161,10 @@ Command = Union[
     LoadModule,
     LoadPipette,
     MoveRelative,
+    MoveToCoordinates,
     MoveToWell,
-    Pause,
+    WaitForResume,
+    WaitForDuration,
     PickUpTip,
     SavePosition,
     SetRailLights,
@@ -169,6 +187,8 @@ Command = Union[
     thermocycler.WaitForLidTemperature,
     thermocycler.DeactivateBlock,
     thermocycler.DeactivateLid,
+    thermocycler.OpenLid,
+    thermocycler.CloseLid,
 ]
 
 CommandParams = Union[
@@ -182,8 +202,10 @@ CommandParams = Union[
     LoadModuleParams,
     LoadPipetteParams,
     MoveRelativeParams,
+    MoveToCoordinatesParams,
     MoveToWellParams,
-    PauseParams,
+    WaitForResumeParams,
+    WaitForDurationParams,
     PickUpTipParams,
     SavePositionParams,
     SetRailLightsParams,
@@ -206,6 +228,8 @@ CommandParams = Union[
     thermocycler.WaitForLidTemperatureParams,
     thermocycler.DeactivateBlockParams,
     thermocycler.DeactivateLidParams,
+    thermocycler.OpenLidParams,
+    thermocycler.CloseLidParams,
 ]
 
 CommandType = Union[
@@ -219,8 +243,10 @@ CommandType = Union[
     LoadModuleCommandType,
     LoadPipetteCommandType,
     MoveRelativeCommandType,
+    MoveToCoordinatesCommandType,
     MoveToWellCommandType,
-    PauseCommandType,
+    WaitForResumeCommandType,
+    WaitForDurationCommandType,
     PickUpTipCommandType,
     SavePositionCommandType,
     SetRailLightsCommandType,
@@ -243,6 +269,8 @@ CommandType = Union[
     thermocycler.WaitForLidTemperatureCommandType,
     thermocycler.DeactivateBlockCommandType,
     thermocycler.DeactivateLidCommandType,
+    thermocycler.OpenLidCommandType,
+    thermocycler.CloseLidCommandType,
 ]
 
 CommandCreate = Union[
@@ -255,8 +283,10 @@ CommandCreate = Union[
     LoadModuleCreate,
     LoadPipetteCreate,
     MoveRelativeCreate,
+    MoveToCoordinatesCreate,
     MoveToWellCreate,
-    PauseCreate,
+    WaitForResumeCreate,
+    WaitForDurationCreate,
     PickUpTipCreate,
     SavePositionCreate,
     SetRailLightsCreate,
@@ -279,6 +309,8 @@ CommandCreate = Union[
     thermocycler.WaitForLidTemperatureCreate,
     thermocycler.DeactivateBlockCreate,
     thermocycler.DeactivateLidCreate,
+    thermocycler.OpenLidCreate,
+    thermocycler.CloseLidCreate,
 ]
 
 CommandResult = Union[
@@ -292,8 +324,10 @@ CommandResult = Union[
     LoadModuleResult,
     LoadPipetteResult,
     MoveRelativeResult,
+    MoveToCoordinatesResult,
     MoveToWellResult,
-    PauseResult,
+    WaitForResumeResult,
+    WaitForDurationResult,
     PickUpTipResult,
     SavePositionResult,
     SetRailLightsResult,
@@ -316,4 +350,6 @@ CommandResult = Union[
     thermocycler.WaitForLidTemperatureResult,
     thermocycler.DeactivateBlockResult,
     thermocycler.DeactivateLidResult,
+    thermocycler.OpenLidResult,
+    thermocycler.CloseLidResult,
 ]

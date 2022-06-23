@@ -307,6 +307,7 @@ async def test_handle_aspirate_request_without_prep(
         well_name="C6",
         well_location=well_location,
         volume=25,
+        flow_rate=2.5,
     )
 
     assert volume == 25
@@ -319,9 +320,15 @@ async def test_handle_aspirate_request_without_prep(
             well_location=well_location,
             current_well=None,
         ),
+        hardware_api.set_flow_rate(
+            mount=Mount.LEFT, aspirate=2.5, dispense=None, blow_out=None
+        ),
         await hardware_api.aspirate(
             mount=Mount.LEFT,
             volume=25,
+        ),
+        hardware_api.set_flow_rate(
+            mount=Mount.LEFT, aspirate=1.23, dispense=1.23, blow_out=1.23
         ),
     )
 
@@ -365,6 +372,7 @@ async def test_handle_aspirate_request_with_prep(
         well_name="C6",
         well_location=well_location,
         volume=25,
+        flow_rate=2.5,
     )
 
     assert volume == 25
@@ -388,7 +396,13 @@ async def test_handle_aspirate_request_with_prep(
                 well_name="C6",
             ),
         ),
+        hardware_api.set_flow_rate(
+            mount=Mount.LEFT, aspirate=2.5, dispense=None, blow_out=None
+        ),
         await hardware_api.aspirate(mount=Mount.LEFT, volume=25),
+        hardware_api.set_flow_rate(
+            mount=Mount.LEFT, aspirate=1.23, dispense=1.23, blow_out=1.23
+        ),
     )
 
 
@@ -424,6 +438,7 @@ async def test_handle_dispense_request(
         well_name="C6",
         well_location=well_location,
         volume=25,
+        flow_rate=2.5,
     )
 
     assert volume == 25
@@ -435,7 +450,13 @@ async def test_handle_dispense_request(
             well_name="C6",
             well_location=well_location,
         ),
+        hardware_api.set_flow_rate(
+            mount=Mount.RIGHT, aspirate=None, dispense=2.5, blow_out=None
+        ),
         await hardware_api.dispense(mount=Mount.RIGHT, volume=25),
+        hardware_api.set_flow_rate(
+            mount=Mount.RIGHT, aspirate=1.23, dispense=1.23, blow_out=1.23
+        ),
     )
 
 

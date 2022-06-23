@@ -3,16 +3,19 @@ import { UseQueryResult } from 'react-query'
 import { renderWithProviders } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
+import { useDispatchApiRequest } from '../../../redux/robot-api'
 import { useIsRobotViewable } from '../hooks'
 import { RecentProtocolRuns } from '../RecentProtocolRuns'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 
 import type { Runs } from '@opentrons/api-client'
+import type { DispatchApiRequestType } from '../../../redux/robot-api'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../hooks')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../HistoricalProtocolRun')
+jest.mock('../../../redux/robot-api')
 
 const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
   typeof useIsRobotViewable
@@ -23,7 +26,9 @@ const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
 const mockHistoricalProtocolRun = HistoricalProtocolRun as jest.MockedFunction<
   typeof HistoricalProtocolRun
 >
-
+const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
+  typeof useDispatchApiRequest
+>
 const render = () => {
   return renderWithProviders(<RecentProtocolRuns robotName="otie" />, {
     i18nInstance: i18n,
@@ -31,10 +36,14 @@ const render = () => {
 }
 
 describe('RecentProtocolRuns', () => {
+  let dispatchApiRequest: DispatchApiRequestType
+
   beforeEach(() => {
+    dispatchApiRequest = jest.fn()
     mockHistoricalProtocolRun.mockReturnValue(
       <div>mock HistoricalProtocolRun</div>
     )
+    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, ['id']])
   })
   afterEach(() => {
     jest.resetAllMocks()

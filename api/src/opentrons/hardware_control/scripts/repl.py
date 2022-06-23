@@ -35,6 +35,8 @@ from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     calibrate_mount,
     find_edge,
     find_deck_position,
+    CalibrationMethod,
+    find_axis_center,
 )
 from opentrons.hardware_control.protocols import HardwareControlAPI  # noqa: E402
 from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
@@ -101,6 +103,8 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "find_edge": wrap_async_util_fn(find_edge, api),
             "find_deck_position": wrap_async_util_fn(find_deck_position, api),
             "do_calibration": partial(do_calibration, api),
+            "CalibrationMethod": CalibrationMethod,
+            "find_axis_center": wrap_async_util_fn(find_axis_center, api),
         },
     )
 

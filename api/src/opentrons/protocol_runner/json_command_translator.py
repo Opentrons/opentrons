@@ -84,6 +84,14 @@ def _translate_simple_command(
     command: protocol_schema_v6.Command,
 ) -> pe_commands.CommandCreate:
     dict_command = command.dict(exclude_none=True)
+
+    # map deprecated `delay` commands to `waitForResume` / `waitForDuration`
+    if dict_command["commandType"] == "delay":
+        if "waitForResume" in dict_command["params"]:
+            dict_command["commandType"] = "waitForResume"
+        else:
+            dict_command["commandType"] = "waitForDuration"
+
     translated_obj = cast(
         pe_commands.CommandCreate,
         parse_obj_as(
@@ -106,7 +114,6 @@ class JsonCommandTranslator:
         commands_list: List[pe_commands.CommandCreate] = []
         exclude_commands = [
             "loadLiquid",
-            "delay",
             "moveToSlot",
             "moveToCoordinates",
         ]

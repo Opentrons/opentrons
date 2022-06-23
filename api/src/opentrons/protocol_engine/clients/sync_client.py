@@ -127,6 +127,9 @@ class SyncClient:
                 wellName=well_name,
                 wellLocation=well_location,
                 volume=volume,
+                # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
+                # https://github.com/Opentrons/opentrons/issues/10810
+                flowRate=2.0,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -149,6 +152,9 @@ class SyncClient:
                 wellName=well_name,
                 wellLocation=well_location,
                 volume=volume,
+                # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
+                # https://github.com/Opentrons/opentrons/issues/10810
+                flowRate=2.0,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -168,6 +174,9 @@ class SyncClient:
                 labwareId=labware_id,
                 wellName=well_name,
                 wellLocation=well_location,
+                # TODO(jbl 2022-06-17) replace default with parameter from pipette_context
+                # https://github.com/Opentrons/opentrons/issues/10810
+                flowRate=2.0,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -192,11 +201,13 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.TouchTipResult, result)
 
-    def pause(self, message: Optional[str]) -> commands.PauseResult:
-        """Execute a ``Pause`` command and return the result."""
-        request = commands.PauseCreate(params=commands.PauseParams(message=message))
+    def wait_for_resume(self, message: Optional[str]) -> commands.WaitForResumeResult:
+        """Execute a `WaitForResume` command and return the result."""
+        request = commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(message=message)
+        )
         result = self._transport.execute_command(request=request)
-        return cast(commands.PauseResult, result)
+        return cast(commands.WaitForResumeResult, result)
 
     def set_rail_lights(self, on: bool) -> commands.SetRailLightsResult:
         """Execute a ``setRailLights`` command and return the result."""
@@ -237,3 +248,23 @@ class SyncClient:
         )
         result = self._transport.execute_command(request=request)
         return cast(commands.thermocycler.DeactivateLidResult, result)
+
+    def thermocycler_open_lid(
+        self, module_id: str
+    ) -> commands.thermocycler.OpenLidResult:
+        """Execute a `thermocycler/openLid` command and return the result."""
+        request = commands.thermocycler.OpenLidCreate(
+            params=commands.thermocycler.OpenLidParams(moduleId=module_id)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.thermocycler.OpenLidResult, result)
+
+    def thermocycler_close_lid(
+        self, module_id: str
+    ) -> commands.thermocycler.CloseLidResult:
+        """Execute a `thermocycler/closeLid` command and return the result."""
+        request = commands.thermocycler.CloseLidCreate(
+            params=commands.thermocycler.CloseLidParams(moduleId=module_id)
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.thermocycler.CloseLidResult, result)

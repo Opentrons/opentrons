@@ -10,95 +10,12 @@ from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import module_geometry
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.hardware_control.modules.types import ThermocyclerModuleModel
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 tall_lw_name = "opentrons_96_tiprack_1000ul"
 labware_name = "corning_96_wellplate_360ul_flat"
 trough_name = "usascientific_12_reservoir_22ml"
 P300M_GEN2_MAX_HEIGHT = 155.75
-
-
-def test_slot_names():
-    slots_by_int = list(range(1, 13))
-    slots_by_str = [str(idx) for idx in slots_by_int]
-    for method in (slots_by_int, slots_by_str):
-        d = Deck()
-        for idx, slot in enumerate(method):
-            lw = labware.load(labware_name, d.position_for(slot))
-            assert slot in d
-            d[slot] = lw
-            with pytest.raises(ValueError):
-                d[slot] = "not this time boyo"
-            del d[slot]
-            assert slot in d
-            assert d[slot] is None
-            mod = module_geometry.load_module(
-                module_geometry.TemperatureModuleModel.TEMPERATURE_V1,
-                d.position_for(slot),
-            )
-            d[slot] = mod
-            assert mod == d[slot]
-
-    assert "hasasdaia" not in d
-    with pytest.raises(ValueError):
-        d["ahgoasia"] = "nope"
-
-
-def test_slot_collisions_module_first():
-    d = Deck()
-    mod_slot = "7"
-    mod = module_geometry.load_module(
-        module_geometry.ThermocyclerModuleModel.THERMOCYCLER_V1,
-        d.position_for(mod_slot),
-    )
-    d[mod_slot] = mod
-    with pytest.raises(ValueError):
-        d["7"] = "not this time boyo"
-    with pytest.raises(ValueError):
-        d["8"] = "nor this time boyo"
-    with pytest.raises(ValueError):
-        d["10"] = "or even this time boyo"
-    with pytest.raises(ValueError):
-        d["11"] = "def not this time though"
-
-    lw_slot = "4"
-    lw = labware.load(labware_name, d.position_for(lw_slot))
-    d[lw_slot] = lw
-
-    assert lw_slot in d
-
-
-@pytest.mark.parametrize("labware_slot", ["7", "8", "10", "11"])
-def test_slot_collisions_labware_first(labware_slot: str):
-    deck = Deck()
-    deck[labware_slot] = labware.load(labware_name, deck.position_for(labware_slot))
-
-    with pytest.raises(ValueError):
-        deck["7"] = module_geometry.load_module(
-            ThermocyclerModuleModel.THERMOCYCLER_V1,
-            deck.position_for("7"),
-        )
-
-
-def test_highest_z():
-    deck = Deck()
-    fixed_trash = deck.get_fixed_trash()
-    assert deck.highest_z == fixed_trash.highest_z
-    tall_lw = labware.load(tall_lw_name, deck.position_for(1))
-    deck[1] = tall_lw
-    assert deck.highest_z == pytest.approx(tall_lw.wells()[0].top().point.z)
-    del deck[1]
-    assert deck.highest_z == fixed_trash.highest_z
-    mod = module_geometry.load_module(
-        module_geometry.TemperatureModuleModel.TEMPERATURE_V1, deck.position_for(8)
-    )
-    deck[8] = mod
-    assert deck.highest_z == mod.highest_z
-    lw = labware.load(labware_name, mod.location)
-    mod.add_labware(lw)
-    deck.recalculate_high_z()
-    assert deck.highest_z == mod.highest_z
 
 
 def check_arc_basic(arc, from_loc, to_loc):

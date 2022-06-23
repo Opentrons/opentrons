@@ -14,7 +14,7 @@ const Template: Story<React.ComponentProps<typeof InputField>> = args => (
 export const Primary = Template.bind({})
 Primary.args = {
   value: 200,
-  units: 'RPM',
+  units: 'rpm',
   type: 'number',
   caption: 'example caption',
   max: 200,

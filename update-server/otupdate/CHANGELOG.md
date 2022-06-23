@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.2...v6.0.0-beta.0) (2022-06-10)
+
+
+### Bug Fixes
+
+* **update-server:** Keep name deconflicted with other devices on the network ([#10559](https://github.com/Opentrons/opentrons/issues/10559)) ([d40e435](https://github.com/Opentrons/opentrons/commit/d40e435eea5d135057176dfbec848732e8d24d9c)), closes [#10126](https://github.com/Opentrons/opentrons/issues/10126)
+
+
+
+
+
 # [6.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2022-06-09)
 
 **Note:** Version bump only for package @opentrons/update-server

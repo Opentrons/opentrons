@@ -158,3 +158,12 @@ async def test_get_default_engine_conflict(subject: EngineStore) -> None:
 
     with pytest.raises(EngineConflictError):
         await subject.get_default_engine()
+
+
+async def test_get_default_engine_run_stopped(subject: EngineStore) -> None:
+    """It allow a default engine if another engine is terminal."""
+    await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
+    await subject.engine.finish()
+
+    result = await subject.get_default_engine()
+    assert isinstance(result, ProtocolEngine)
