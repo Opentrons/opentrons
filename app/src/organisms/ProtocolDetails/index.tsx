@@ -49,7 +49,6 @@ import {
   getAnalysisStatus,
   getProtocolDisplayName,
 } from '../ProtocolsLanding/utils'
-import { getMockLiquidData } from '../Devices/ProtocolRun/SetupLiquids/getMockLiquidData'
 
 import type { State } from '../../redux/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -265,8 +264,6 @@ export function ProtocolDetails(
       ? format(new Date(mostRecentAnalysis.createdAt), 'MMMM dd, yyyy HH:mm')
       : t('shared:no_data')
 
-  const liquidsData = getMockLiquidData()
-
   const getTabContents = (): JSX.Element => {
     switch (currentTab) {
       case 'labware':
@@ -286,7 +283,7 @@ export function ProtocolDetails(
         )
 
       case 'liquids':
-        return <ProtocolLiquidsDetails liquids={liquidsData} />
+        return <ProtocolLiquidsDetails />
     }
   }
 

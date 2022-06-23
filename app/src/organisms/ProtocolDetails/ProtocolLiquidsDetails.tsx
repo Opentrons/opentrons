@@ -1,19 +1,16 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import {
+  parseLabwareInfoByLiquidId,
+  parseLiquidsInLoadOrder,
+} from '@opentrons/api-client'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
 import { LiquidsListItemDetails } from '../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList'
 
-import type { Liquid } from '../Devices/ProtocolRun/SetupLiquids/getMockLiquidData'
-
-interface ProtocolLiquidsDetailsProps {
-  liquids: Liquid[] | null
-}
-
-export const ProtocolLiquidsDetails = (
-  props: ProtocolLiquidsDetailsProps
-): JSX.Element => {
-  const { liquids } = props
+export const ProtocolLiquidsDetails = (): JSX.Element => {
+  const liquidsInLoadOrder = parseLiquidsInLoadOrder()
+  const labwareByLiquidId = parseLabwareInfoByLiquidId()
   const HIDE_SCROLLBAR = css`
     ::-webkit-scrollbar {
       display: none;
@@ -27,7 +24,7 @@ export const ProtocolLiquidsDetails = (
       overflowY={'auto'}
       data-testid={'LiquidsDetailsTab'}
     >
-      {liquids?.map(liquid => {
+      {liquidsInLoadOrder?.map(liquid => {
         return (
           <>
             <Flex
@@ -36,10 +33,11 @@ export const ProtocolLiquidsDetails = (
               marginY={SPACING.spacing4}
             >
               <LiquidsListItemDetails
+                liquidId={liquid.liquidId}
                 displayColor={liquid.displayColor}
                 displayName={liquid.displayName}
                 description={liquid.description}
-                locations={liquid.locations}
+                labwareByLiquidId={labwareByLiquidId}
               />
             </Flex>
             <Divider />
