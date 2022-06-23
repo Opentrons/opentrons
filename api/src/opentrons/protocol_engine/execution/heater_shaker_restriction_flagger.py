@@ -82,7 +82,7 @@ class HeaterShakerMovementFlagger:
 
             if any([dest_east_west, dest_north_south, dest_heater_shaker]):
                 # If heater shaker is running, can't move in any cardinal direction of it
-                if heater_shaker_hardware.status == HeaterShakerStatus.RUNNING and (
+                if heater_shaker_hardware.status != HeaterShakerStatus.IDLE and (
                     dest_east_west or dest_north_south
                 ):
                     raise HeaterShakerMovementRestrictionError(
@@ -96,7 +96,7 @@ class HeaterShakerMovementFlagger:
                     and (dest_east_west or dest_heater_shaker)
                 ):
                     raise HeaterShakerMovementRestrictionError(
-                        "Cannot move pipette east or west of Heater Shaker while latch is open"
+                        "Cannot move pipette east or west of or to Heater Shaker while latch is open"
                     )
 
                 # TODO will this work in simulation?
@@ -123,7 +123,7 @@ class HeaterShakerMovementFlagger:
         if module.location is not None:
             return module.location.slotName
         else:
-            return self._state_store.geometry.get_ancestor_slot_name(module.id)
+            return self._state_store.modules.get_location(module.id)
 
     async def _find_heater_shaker_by_serial(
         self, serial_number: str
@@ -137,7 +137,7 @@ class HeaterShakerMovementFlagger:
             by_model=OpentronsHeaterShakerModuleModel.HEATER_SHAKER_V1,
             # Hard-coding instead of using
             # opentrons.protocols.geometry.module_geometry.resolve_module_type(),
-            # to avoid parsing a JSON definition every time a protocol when a
+            # to avoid parsing a JSON definition every time a protocol runs when a
             # heater shaker is on the deck
             resolved_type=OpentronsModuleType.HEATER_SHAKER,
         )
