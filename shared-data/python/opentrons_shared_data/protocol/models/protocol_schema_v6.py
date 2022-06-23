@@ -43,7 +43,7 @@ class Params(BaseModel):
     flowRate: Optional[float]
     wellLocation: Optional[WellLocation]
     wait: Optional[int]
-    minimumZHeight: Optional[int]
+    minimumZHeight: Optional[float]
     forceDirect: Optional[bool]
     message: Optional[str]
     coordinates: Optional[OffsetVector]
