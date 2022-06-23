@@ -791,6 +791,12 @@ class InstrumentHandlerProvider(Generic[MountType]):
                         target_position=bottom_pos, current=plunger_currents, speed=None
                     )
                 )
+            # always move to a known position after a drop-tip
+            base.append(
+                DropTipMove(
+                    target_position=bottom_pos, current=plunger_currents, speed=None
+                )
+            )
             return base
 
         return build
