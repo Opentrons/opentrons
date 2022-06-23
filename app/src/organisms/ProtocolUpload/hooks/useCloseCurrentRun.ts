@@ -40,19 +40,32 @@ export function useCloseCurrentRun(): {
         onError: () => console.warn('failed to dismiss current'),
       })
 
-      const {
-        protocolRunAnalyticsData,
-        runTime,
-      } = await getProtocolRunAnalyticsData()
-
-      trackEvent({
-        name: 'runFinish',
-        properties: {
-          ...robotAnalyticsData,
-          ...protocolRunAnalyticsData,
+      try {
+        const {
+          protocolRunAnalyticsData,
           runTime,
-        },
-      })
+        } = await getProtocolRunAnalyticsData()
+
+        trackEvent({
+          name: 'runFinish',
+          properties: {
+            ...robotAnalyticsData,
+            ...protocolRunAnalyticsData,
+            runTime,
+          },
+        })
+      } catch (e) {
+        console.error(
+          `getProtocolRunAnalyticsData error during runFinish: ${
+            (e as Error).message
+          }; sending event without protocol properties`
+        )
+
+        trackEvent({
+          name: 'runAgain',
+          properties: { ...robotAnalyticsData },
+        })
+      }
     }
   }
 
