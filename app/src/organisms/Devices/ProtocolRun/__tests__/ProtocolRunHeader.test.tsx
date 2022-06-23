@@ -52,7 +52,6 @@ import {
   useProtocolDetailsForRun,
   useProtocolAnalysisErrors,
   useProtocolRunAnalyticsData,
-  // useRobotAnalyticsData,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
@@ -219,7 +218,7 @@ describe('ProtocolRunHeader', () => {
     mockCloseCurrentRun = jest.fn()
     mockGetProtocolRunAnalyticsData = jest.fn()
 
-    when(mockUseTrackEvent).mockReturnValue(mockTrackEvent)
+    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
     mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
     mockMockHeaterShakerIsRunningModal.mockReturnValue(
       <div>Mock HeaterShakerIsRunningModal</div>
