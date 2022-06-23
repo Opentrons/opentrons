@@ -87,7 +87,7 @@ class MotionView:
             well_location,
         )
         dest_cp = CriticalPoint.XY_CENTER if center_dest else None
-        extra_waypoints: Sequence[Tuple[float, float]] = ()
+        extra_waypoints = []
 
         if (
             location is not None

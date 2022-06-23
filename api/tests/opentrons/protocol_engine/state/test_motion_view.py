@@ -217,7 +217,7 @@ class WaypointSpec:
     all_labware_z: Optional[float] = None
     max_travel_z: float = 50
     should_dodge_thermocycler: bool = False
-    extra_waypoints: Sequence[Tuple[float, float]] = ()
+    extra_waypoints: Sequence[Tuple[float, float]] = field(default_factory=list)
 
 
 # TODO(mm, 2022-06-22): Break this test apart into the parts that are orthogonal
@@ -446,7 +446,7 @@ def test_get_movement_waypoints_to_well_raises(
             max_travel_z=123,
             min_travel_z=None,
             move_type=motion_planning.MoveType.GENERAL_ARC,
-            xy_waypoints=(),
+            xy_waypoints=[],
             origin_cp=None,
             dest_cp=None,
         ),
