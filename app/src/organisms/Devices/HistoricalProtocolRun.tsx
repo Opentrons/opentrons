@@ -17,12 +17,11 @@ import { StyledText } from '../../atoms/text'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { formatInterval } from '../RunTimeControl/utils'
 import { formatTimestamp } from './utils'
+import { EMPTY_TIMESTAMP } from './constants'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
 import { HistoricalProtocolRunOffsetDrawer as OffsetDrawer } from './HistoricalProtocolRunOffsetDrawer'
 import type { RunData } from '@opentrons/api-client'
 import type { State } from '../../redux/types'
-
-const EMPTY_TIMESTAMP = '--:--:--'
 
 const CLICK_STYLE = css`
   cursor: pointer;

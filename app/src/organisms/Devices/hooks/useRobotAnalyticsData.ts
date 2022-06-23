@@ -41,7 +41,7 @@ export function useRobotAnalyticsData(
       return settings.reduce<RobotAnalyticsData>(
         (result, setting) => ({
           ...result,
-          [`${FF_PREFIX}${setting.id}`]: !!setting.value,
+          [`${FF_PREFIX}${setting.id}`]: !!(setting?.value ?? false),
         }),
         // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
         {

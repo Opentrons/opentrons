@@ -78,6 +78,7 @@ import {
   useRobotAnalyticsData,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
+import { EMPTY_TIMESTAMP } from '../constants'
 import { useIsHeaterShakerInProtocol } from '../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../ModuleCard/ConfirmAttachmentModal'
 
@@ -112,7 +113,7 @@ function RunTimer({
       : completedAt ?? now
 
   const runTime =
-    startedAt != null ? formatInterval(startedAt, endTime) : '--:--:--'
+    startedAt != null ? formatInterval(startedAt, endTime) : EMPTY_TIMESTAMP
 
   return (
     <StyledText css={TYPOGRAPHY.pRegular} color={COLORS.darkBlack}>
@@ -163,10 +164,10 @@ export function ProtocolRunHeader({
   }, [runStatus, isRunCurrent, runId, closeCurrentRun])
 
   const startedAtTimestamp =
-    startedAt != null ? formatTimestamp(startedAt) : '--:--:--'
+    startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
 
   const completedAtTimestamp =
-    completedAt != null ? formatTimestamp(completedAt) : '--:--:--'
+    completedAt != null ? formatTimestamp(completedAt) : EMPTY_TIMESTAMP
 
   // redirect to new run after successful reset
   const onResetSuccess = (createRunResponse: Run): void =>
