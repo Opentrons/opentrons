@@ -55,10 +55,10 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   background-color={COLORS.transparent}
   font-weight: ${TYPOGRAPHY.pSemiBold};
    &:enabled {
-    align-items={TYPOGRAPHY.textAlignCenter}
+    alignItems={ALIGN_CENTER}
    }
    &:hover {
-    align-items={TYPOGRAPHY.textAlignCenter}
+    alignItems={ALIGN_CENTER}
     }
   `
 

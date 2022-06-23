@@ -169,12 +169,6 @@ export const NewSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
     box-shadow: none;
   }
 
-  &:enabled {
-    border-width: '2px';
-    color: ${Styles.C_BLUE};
-    box-shadow: none;
-  }
-
   &:disabled,
   &.disabled {
     border-width: '2px';

@@ -111,6 +111,12 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
   &:disabled {
     opacity: 50%;
   }
+
+  &:enabled {
+    border-width: '2px';
+    color: ${COLORS.blueFocus};
+    box-shadow: none;
+  }
 `
 
 export const ToggleButton = (props: ToggleBtnProps): JSX.Element => {
