@@ -47,17 +47,12 @@ class HeaterShakerMovementFlagger:
         self, labware_id: str, pipette_id: str
     ) -> None:
         """Flag restricted movement around/to a Heater Shaker."""
-        all_modules = self._state_store.modules.get_all()
-        heater_shaker_module = next(
-            (
-                module
-                for module in all_modules
-                if module.model == ModuleModel.HEATER_SHAKER_MODULE_V1
-            ),
-            None,
-        )
-
-        if heater_shaker_module is not None:
+        heater_shaker_modules = [
+            module
+            for module in self._state_store.modules.get_all()
+            if module.model == ModuleModel.HEATER_SHAKER_MODULE_V1
+        ]
+        for heater_shaker_module in heater_shaker_modules:
             heater_shaker_hardware = await self._find_heater_shaker_by_serial(
                 heater_shaker_module.serialNumber
             )
