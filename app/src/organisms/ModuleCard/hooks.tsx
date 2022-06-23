@@ -16,8 +16,11 @@ import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocol
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { useRunStatus } from '../RunTimeControl/hooks'
-import { useIsRobotBusy, useProtocolDetailsForRun } from '../Devices/hooks'
+import {
+  useProtocolDetailsForRun,
+  useRunIncompleteOrLegacySessionInProgress,
+} from '../Devices/hooks'
+
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
@@ -132,9 +135,7 @@ export function useModuleOverflowMenu(
   const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
-  const runStatus = useRunStatus(runId != null ? runId : null)
-  const isRobotBusy = useIsRobotBusy()
-  const isBusy = runStatus != null && isRobotBusy
+  const isIncompleteOrBusy = useRunIncompleteOrLegacySessionInProgress()
 
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
@@ -147,7 +148,7 @@ export function useModuleOverflowMenu(
         key={`hs_labware_latch_${module.moduleModel}`}
         data-testid={`hs_labware_latch_${module.moduleModel}`}
         onClick={toggleLatch}
-        disabled={isLatchDisabled || isBusy}
+        disabled={isLatchDisabled || isIncompleteOrBusy}
         {...targetProps}
       >
         {t(isLatchClosed ? 'open_labware_latch' : 'close_labware_latch', {
@@ -189,7 +190,7 @@ export function useModuleOverflowMenu(
       minWidth="10.6rem"
       onClick={() => handleTestShakeClick()}
       key={`hs_test_shake_btn_${module.moduleModel}`}
-      disabled={isBusy}
+      disabled={isIncompleteOrBusy}
     >
       {t('test_shake', { ns: 'heater_shaker' })}
     </MenuItem>

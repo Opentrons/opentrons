@@ -4,8 +4,7 @@ import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
-import { useIsRobotBusy } from '../Devices/hooks'
-import { useRunStatus } from '../RunTimeControl/hooks'
+import { useRunIncompleteOrLegacySessionInProgress } from '../Devices/hooks'
 import { useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '../../redux/modules/types'
@@ -42,9 +41,7 @@ export const ModuleOverflowMenu = (
     handleWizardClick,
     handleSlideoutClick
   )
-  const runStatus = useRunStatus(runId != null ? runId : null)
-  const isRobotBusy = useIsRobotBusy()
-  const isBusy = runStatus != null && isRobotBusy
+  const isIncompleteOrBusy = useRunIncompleteOrLegacySessionInProgress()
   return (
     <>
       <Flex position={POSITION_RELATIVE}>
@@ -61,7 +58,7 @@ export const ModuleOverflowMenu = (
                       key={`${index}_${module.moduleModel}`}
                       onClick={() => item.onClick(item.isSecondary)}
                       data-testid={`module_setting_${module.moduleModel}`}
-                      disabled={item.disabledReason || isBusy}
+                      disabled={item.disabledReason || isIncompleteOrBusy}
                       {...targetProps}
                     >
                       {item.setSetting}

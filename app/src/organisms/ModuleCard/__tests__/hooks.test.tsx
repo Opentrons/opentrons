@@ -6,7 +6,6 @@ import { createStore } from 'redux'
 import { I18nextProvider } from 'react-i18next'
 import { renderHook } from '@testing-library/react-hooks'
 import { i18n } from '../../../i18n'
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   useCreateLiveCommandMutation,
   useCreateCommandMutation,
@@ -15,7 +14,6 @@ import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useIsRobotBusy, useProtocolDetailsForRun } from '../../Devices/hooks'
 import {
   useLatchControls,
@@ -39,7 +37,6 @@ jest.mock('../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../Devices/hooks')
 jest.mock('../useModuleIdFromRun')
-jest.mock('../../RunTimeControl/hooks')
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
@@ -63,8 +60,8 @@ const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
 const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
   typeof useIsRobotBusy
 >
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseRunIncompleteOrLegacySessionInProgress = useRunIncompleteOrLegacySessionInProgress as jest.MockedFunction<
+  typeof useRunIncompleteOrLegacySessionInProgress
 >
 
 const mockCloseLatchHeaterShaker = {
@@ -300,7 +297,7 @@ describe('useModuleOverflowMenu', () => {
     store.dispatch = jest.fn()
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
+    mockUseRunIncompleteOrLegacySessionInProgress.mockReturnValue(true)
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
