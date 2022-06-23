@@ -88,9 +88,21 @@ class LocationAndHeaterShakerStatus(NamedTuple):
     Destination slot name, heater-shaker and latch status, and what
     we expect the subject to raise when it finds
     """
+
     slot_name: DeckSlotName
     heater_shaker_status: HeaterShakerStatus
     latch_status: HeaterShakerLabwareLatchStatus
+    expected_raise_cm: ContextManager[Any]
+
+
+class MultiChannelLocationAndLabwareStatus(NamedTuple):
+    """Test parametrization data.
+
+    Destination slot name, if labware is tiprack, and what
+    we expect the subject to raise when it finds
+    """
+    slot_name: DeckSlotName
+    is_tiprack: bool
     expected_raise_cm: ContextManager[Any]
 
 
@@ -141,7 +153,7 @@ class LocationAndHeaterShakerStatus(NamedTuple):
         ),
     ],
 )
-async def test_raises_single_channel_on_restricted_movement(
+async def test_raises_any_channel_on_restricted_movement(
     slot_name: DeckSlotName,
     heater_shaker_status: HeaterShakerStatus,
     latch_status: HeaterShakerLabwareLatchStatus,
@@ -185,6 +197,80 @@ async def test_raises_single_channel_on_restricted_movement(
         )
     ).then_return(
         HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
+    )
+
+    with expected_raise_cm:
+        await subject.raise_if_movement_restricted(
+            labware_id="labware-id", pipette_id="pipette-id"
+        )
+
+
+@pytest.mark.parametrize(
+    MultiChannelLocationAndLabwareStatus._fields,
+    [
+        MultiChannelLocationAndLabwareStatus(
+            slot_name=DeckSlotName.SLOT_4,
+            is_tiprack=False,
+            expected_raise_cm=pytest.raises(HeaterShakerMovementRestrictionError),
+        ),
+        MultiChannelLocationAndLabwareStatus(
+            slot_name=DeckSlotName.SLOT_8,
+            is_tiprack=False,
+            expected_raise_cm=pytest.raises(HeaterShakerMovementRestrictionError),
+        ),
+        MultiChannelLocationAndLabwareStatus(
+            slot_name=DeckSlotName.SLOT_2,
+            is_tiprack=True,
+            expected_raise_cm=does_not_raise(),
+        ),
+    ],
+)
+async def test_raises_multi_channel_on_restricted_movement(
+    slot_name: DeckSlotName,
+    is_tiprack: bool,
+    expected_raise_cm: ContextManager[Any],
+    subject: HeaterShakerMovementFlagger,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    mock_hw_pipettes: MockPipettes,
+    decoy: Decoy,
+) -> None:
+    decoy.when(state_store.modules.get_all()).then_return(
+        [
+            LoadedModule(
+                id="module-id",
+                model=PEModuleModel.HEATER_SHAKER_MODULE_V1,
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+                serialNumber="serial-number",
+            )
+        ]
+    )
+
+    heater_shaker = decoy.mock(cls=HardwareHeaterShaker)
+    decoy.when(heater_shaker.device_info).then_return({"serial": "serial-number"})
+    decoy.when(heater_shaker.status).then_return(HeaterShakerStatus.IDLE)
+    decoy.when(heater_shaker.labware_latch_status).then_return(
+        HeaterShakerLabwareLatchStatus.IDLE_CLOSED
+    )
+    decoy.when(
+        await hardware_api.find_modules(
+            by_model=OpentronsHeaterShakerModuleModel.HEATER_SHAKER_V1,
+            resolved_type=OpentronsModuleType.HEATER_SHAKER,
+        )
+    ).then_return(([heater_shaker], None))
+
+    decoy.when(state_store.geometry.get_ancestor_slot_name("labware-id")).then_return(
+        slot_name
+    )
+    decoy.when(state_store.labware.is_tiprack("labware-id")).then_return(is_tiprack)
+
+    decoy.when(
+        state_store.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes=mock_hw_pipettes.by_mount,
+        )
+    ).then_return(
+        HardwarePipette(mount=Mount.RIGHT, config=mock_hw_pipettes.right_config)
     )
 
     with expected_raise_cm:
