@@ -75,6 +75,13 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
             "Use setup commands for activities like pre-run calibration checks"
             " and module setup, like pre-heating."
         ),
+    ),
+    key: Optional[str] = Field(
+        None,
+        description=(
+            "UI command key. This field will help"
+            " protocol analysis for JSON v6."
+        ),
     )
 
 
