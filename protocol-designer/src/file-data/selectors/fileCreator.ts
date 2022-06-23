@@ -9,6 +9,7 @@ import {
   FIXED_TRASH_ID,
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getFileMetadata } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
@@ -247,6 +248,10 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         module: typeof initialRobotState.modules[keyof typeof initialRobotState.modules],
         moduleId: string
       ): LoadModuleCreateCommand => {
+        // translate the magic TC location string to 7 so PE can read it
+        if (module.moduleState.type === THERMOCYCLER_MODULE_TYPE) {
+          module.slot = '7'
+        }
         const loadModuleCommand = {
           key: uuid(),
           commandType: 'loadModule' as const,

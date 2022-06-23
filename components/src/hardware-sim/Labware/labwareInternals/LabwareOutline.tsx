@@ -10,6 +10,7 @@ export interface LabwareOutlineProps {
   width?: number
   height?: number
   isTiprack?: boolean
+  hover?: boolean
   stroke?: CSSProperties['stroke']
 }
 
@@ -22,6 +23,7 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
     height = SLOT_RENDER_HEIGHT,
     isTiprack,
     stroke,
+    hover,
   } = props
   const {
     parameters = { isTiprack },
@@ -29,17 +31,20 @@ export function LabwareOutline(props: LabwareOutlineProps): JSX.Element {
   } = definition || {}
 
   return (
-    <rect
-      x={OUTLINE_THICKNESS_MM}
-      y={OUTLINE_THICKNESS_MM}
-      strokeWidth={OUTLINE_THICKNESS_MM}
-      width={dimensions.xDimension - 2 * OUTLINE_THICKNESS_MM}
-      height={dimensions.yDimension - 2 * OUTLINE_THICKNESS_MM}
-      rx={6 * OUTLINE_THICKNESS_MM}
-      className={cx(styles.labware_outline, {
-        [styles.tiprack_outline]: parameters && parameters.isTiprack,
-      })}
-      style={{ stroke }}
-    />
+    <>
+      <rect
+        x={OUTLINE_THICKNESS_MM}
+        y={OUTLINE_THICKNESS_MM}
+        strokeWidth={OUTLINE_THICKNESS_MM}
+        width={dimensions.xDimension - 2 * OUTLINE_THICKNESS_MM}
+        height={dimensions.yDimension - 2 * OUTLINE_THICKNESS_MM}
+        rx={6 * OUTLINE_THICKNESS_MM}
+        className={cx(styles.labware_outline, {
+          [styles.tiprack_outline]: parameters && parameters.isTiprack,
+          [styles.hover_outline]: hover,
+        })}
+        style={{ stroke }}
+      />
+    </>
   )
 }

@@ -1009,7 +1009,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1031,7 +1031,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (asp)
@@ -1054,7 +1054,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1076,7 +1076,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate
@@ -1115,7 +1115,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
@@ -1153,7 +1153,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // dispense the aspirate > air gap
@@ -1176,7 +1176,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
@@ -1214,7 +1214,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
@@ -1237,7 +1237,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1259,7 +1259,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
@@ -1316,7 +1316,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1338,7 +1338,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate 81 (= total vol 350 - prev transfer's 269)
@@ -1377,7 +1377,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
@@ -1415,7 +1415,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // dispense aspirate > air gap then liquid
@@ -1438,7 +1438,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
@@ -1476,7 +1476,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
@@ -1499,7 +1499,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1521,7 +1521,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
@@ -1574,7 +1574,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // since we used dispense > air gap, drop the tip
@@ -1619,7 +1619,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1641,7 +1641,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (asp)
@@ -1664,7 +1664,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1686,7 +1686,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate
@@ -1725,7 +1725,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
@@ -1763,7 +1763,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // dispense the aspirate > air gap
@@ -1786,7 +1786,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
@@ -1824,7 +1824,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
@@ -1847,7 +1847,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1869,7 +1869,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
@@ -1927,7 +1927,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1949,7 +1949,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate 81 (= total vol 350 - prev transfer's 269)
@@ -1988,7 +1988,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
@@ -2026,7 +2026,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2048,7 +2048,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
@@ -2086,7 +2086,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
@@ -2109,7 +2109,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2131,7 +2131,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
@@ -2185,7 +2185,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // this step is over, and we used dispense > air gap, so
@@ -2248,7 +2248,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2270,7 +2270,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (asp)
@@ -2293,7 +2293,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2315,7 +2315,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate
@@ -2354,7 +2354,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
@@ -2392,7 +2392,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // dispense
@@ -2415,7 +2415,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
@@ -2453,7 +2453,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
@@ -2476,7 +2476,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2498,7 +2498,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
@@ -2556,7 +2556,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2578,7 +2578,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate 81 (= total vol 350 - prev transfer's 269)
@@ -2617,7 +2617,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
@@ -2655,7 +2655,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // dispense "aspirate > air gap" then dispense liquid
@@ -2678,7 +2678,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
@@ -2716,7 +2716,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
@@ -2739,7 +2739,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2761,7 +2761,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
@@ -2815,7 +2815,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // we used dispense > air gap, so we will dispose of the tip
@@ -2877,7 +2877,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2899,7 +2899,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (asp)
@@ -2922,7 +2922,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2944,7 +2944,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate
@@ -2983,7 +2983,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
@@ -3021,7 +3021,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // dispense
@@ -3044,7 +3044,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
@@ -3082,7 +3082,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
@@ -3105,7 +3105,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -3127,7 +3127,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
@@ -3180,7 +3180,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
-          params: { wait: 11 },
+          params: { seconds: 11 },
         },
         // we're not re-using the tip, so instead of dispenseAirGap we'll change the tip
         {
@@ -3221,7 +3221,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -3243,7 +3243,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate 81 (= total vol 350 - prev transfer's 269)
@@ -3282,7 +3282,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
@@ -3320,7 +3320,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // dispense "aspirate > air gap" then dispense liquid
@@ -3343,7 +3343,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
@@ -3381,7 +3381,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
@@ -3404,7 +3404,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -3426,7 +3426,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
@@ -3480,7 +3480,7 @@ describe('advanced options', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // we used dispense > air gap, so we will dispose of the tip

@@ -16,7 +16,7 @@ import {
 import { StyledText } from '../../../../atoms/text'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated } from './utils'
-import { getDisplayNameForTipRack } from '../../../../pages/Robots/InstrumentSettings/utils'
+import { getDisplayNameForTipRack } from '../utils'
 import { getCustomLabwareDefinitions } from '../../../../redux/custom-labware'
 import { useAttachedPipettes } from '../../hooks'
 

@@ -11,6 +11,7 @@ from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorType,
+    SensorId,
     SensorThresholdMode,
 )
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
@@ -135,6 +136,7 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
 
     threshold_payload = payloads.SetSensorThresholdRequestPayload(
         sensor=fields.SensorTypeField(SensorType.capacitive),
+        sensor_id=fields.SensorIdField(SensorId.S0),
         threshold=Int32Field(
             int(args.threshold * sensor_utils.sensor_fixed_point_conversion)
         ),
@@ -149,11 +151,13 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
         binding = 1
     stim_payload = payloads.BindSensorOutputRequestPayload(
         sensor=fields.SensorTypeField(SensorType.capacitive),
+        sensor_id=fields.SensorIdField(SensorId.S0),
         binding=fields.SensorOutputBindingField(binding),
     )
     stim_message = message_definitions.BindSensorOutputRequest(payload=stim_payload)
     reset_payload = payloads.BindSensorOutputRequestPayload(
         sensor=fields.SensorTypeField(SensorType.capacitive),
+        sensor_id=fields.SensorIdField(SensorId.S0),
         binding=fields.SensorOutputBindingField(0),
     )
     reset_message = message_definitions.BindSensorOutputRequest(payload=reset_payload)

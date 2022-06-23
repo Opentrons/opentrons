@@ -5,6 +5,7 @@ from typing import Optional, AsyncIterator
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
+    SensorId,
     SensorType,
 )
 from opentrons_hardware.sensors.utils import SensorDataType
@@ -16,8 +17,10 @@ from contextlib import asynccontextmanager
 class AbstractBasicSensor(ABC):
     """Abstract base class for basic sensors."""
 
-    def __init__(self) -> None:
+    def __init__(self, sensor_type: SensorType, sensor_id: SensorId) -> None:
         """Constructor."""
+        self._sensor_type = sensor_type
+        self._sensor_id = sensor_id
         self._scheduler = SensorScheduler()
 
     @abstractmethod
@@ -58,13 +61,13 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
         stop_threshold: float,
         offset: float,
         sensor_type: SensorType,
+        sensor_id: SensorId,
     ) -> None:
         """Constructor."""
-        super().__init__()
+        super().__init__(sensor_type, sensor_id)
         self._zero_threshold: float = zero_threshold
         self._stop_threshold: float = stop_threshold
         self._offset: float = offset
-        self._sensor_type: SensorType = sensor_type
 
     @property
     def zero_threshold(self) -> float:

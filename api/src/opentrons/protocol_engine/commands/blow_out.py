@@ -4,20 +4,20 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 from pydantic import BaseModel
 
-from .pipetting_common import BasePipettingParams
+from .pipetting_common import PipetteIdMixin, FlowRateMixin, WellLocationMixin
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 from opentrons.hardware_control import HardwareControlAPI
 
 
 if TYPE_CHECKING:
-    from ..execution import MovementHandler
+    from ..execution import MovementHandler, PipettingHandler
     from ..state import StateView
 
 BlowOutCommandType = Literal["blowout"]
 
 
-class BlowOutParams(BasePipettingParams):
+class BlowOutParams(PipetteIdMixin, FlowRateMixin, WellLocationMixin):
     """Payload required to blow-out a specific well."""
 
     pass
@@ -35,11 +35,13 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
     def __init__(
         self,
         movement: MovementHandler,
+        pipetting: PipettingHandler,
         state_view: StateView,
         hardware_api: HardwareControlAPI,
         **kwargs: object,
     ) -> None:
         self._movement = movement
+        self._pipetting = pipetting
         self._state_view = state_view
         self._hardware_api = hardware_api
 
@@ -57,7 +59,10 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, BlowOutResult]):
             well_location=params.wellLocation,
         )
 
-        await self._hardware_api.blow_out(mount=hw_pipette.mount)
+        with self._pipetting.set_flow_rate(
+            pipette=hw_pipette, blow_out_flow_rate=params.flowRate
+        ):
+            await self._hardware_api.blow_out(mount=hw_pipette.mount)
 
         return BlowOutResult()
 

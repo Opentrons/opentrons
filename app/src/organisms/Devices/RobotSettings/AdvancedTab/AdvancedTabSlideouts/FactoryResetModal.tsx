@@ -77,7 +77,7 @@ export function FactoryResetModal({
           onClose={closeModal}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p">
+            <StyledText as="p" paddingBottom={SPACING.spacing5}>
               {t('factory_reset_modal_description')}
             </StyledText>
             <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
@@ -106,7 +106,11 @@ export function FactoryResetModal({
           icon={reconnectModalIcon}
           onClose={closeModal}
         >
-          <StyledText as="p" marginBottom={SPACING.spacing5}>
+          <StyledText
+            as="p"
+            marginBottom={SPACING.spacing5}
+            paddingBottom={SPACING.spacing5}
+          >
             {t('factory_reset_modal_connection_lost_description')}
           </StyledText>
           <Flex justifyContent={JUSTIFY_FLEX_END}>

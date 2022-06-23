@@ -7,6 +7,7 @@ from math import copysign
 from typing_extensions import Literal
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
+    SensorId,
     SensorType,
     SensorThresholdMode,
 )
@@ -60,6 +61,7 @@ async def capacitive_probe(
     threshold = await sensor_scheduler.send_threshold(
         SensorThresholdInformation(
             sensor_type=SensorType.capacitive,
+            sensor_id=SensorId.S0,
             node_id=tool,
             data=SensorDataType.build(relative_threshold_pf),
             mode=SensorThresholdMode.auto_baseline,
@@ -72,7 +74,9 @@ async def capacitive_probe(
     pass_group = _build_pass_step(mover, distance, speed)
     runner = MoveGroupRunner(move_groups=[[pass_group]])
     async with sensor_scheduler.bind_sync(
-        SensorInformation(sensor_type=SensorType.capacitive, node_id=tool),
+        SensorInformation(
+            sensor_type=SensorType.capacitive, sensor_id=SensorId.S0, node_id=tool
+        ),
         messenger,
         log=log_sensor_values,
     ):
@@ -89,7 +93,9 @@ async def capacitive_pass(
 ) -> List[float]:
     """Move the specified axis while capturing capacitive sensor readings."""
     sensor_scheduler = SensorScheduler()
-    sensor = SensorInformation(sensor_type=SensorType.capacitive, node_id=tool)
+    sensor = SensorInformation(
+        sensor_type=SensorType.capacitive, sensor_id=SensorId.S0, node_id=tool
+    )
     pass_group = _build_pass_step(mover, distance, speed)
     runner = MoveGroupRunner(move_groups=[[pass_group]])
     await runner.prep(messenger)

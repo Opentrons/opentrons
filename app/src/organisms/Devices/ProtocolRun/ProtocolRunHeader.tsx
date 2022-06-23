@@ -66,7 +66,6 @@ import {
   useRunTimestamps,
 } from '../../../organisms/RunTimeControl/hooks'
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
-
 import {
   useProtocolDetailsForRun,
   useProtocolAnalysisErrors,
