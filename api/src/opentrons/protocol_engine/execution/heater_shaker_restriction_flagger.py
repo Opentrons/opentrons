@@ -72,8 +72,12 @@ class HeaterShakerMovementFlagger:
                 self._state_store.geometry.get_ancestor_slot_name(labware_id)
             )
 
-            dest_east_west = self._is_east_or_west(heater_shaker_slot_int, dest_slot_int)
-            dest_north_south = self._is_north_south(heater_shaker_slot_int, dest_slot_int)
+            dest_east_west = self._is_east_or_west(
+                heater_shaker_slot_int, dest_slot_int
+            )
+            dest_north_south = self._is_north_south(
+                heater_shaker_slot_int, dest_slot_int
+            )
             dest_heater_shaker = dest_slot_int == heater_shaker_slot_int
 
             if any([dest_east_west, dest_north_south, dest_heater_shaker]):
@@ -119,7 +123,7 @@ class HeaterShakerMovementFlagger:
         if module.location is not None:
             return module.location.slotName
         else:
-            return self._state_store.modules.get_location(module.id)
+            return self._state_store.modules.get_location(module.id).slotName
 
     async def _find_heater_shaker_by_serial(
         self, serial_number: str
