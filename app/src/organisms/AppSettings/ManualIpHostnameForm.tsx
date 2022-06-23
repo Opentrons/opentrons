@@ -82,7 +82,6 @@ export function ManualIpHostnameForm({
       if (inputForm != null)
         inputForm.style.border = `1px solid ${COLORS.medGrey}`
       addManualIpAndHostname(ip)
-      // setMostRecentAddition(ip)
       resetForm()
       setMostRecentAddition(ip)
     },
