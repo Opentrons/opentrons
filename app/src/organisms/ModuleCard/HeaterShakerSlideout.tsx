@@ -51,7 +51,7 @@ export const HeaterShakerSlideout = (
 ): JSX.Element | null => {
   const { module, onCloseClick, isExpanded, isSetShake, runId } = props
   const { t } = useTranslation('device_details')
-  const [hsValue, setHsValue] = React.useState<string | null>(null)
+  const [hsValue, setHsValue] = React.useState<number | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
@@ -68,7 +68,7 @@ export const HeaterShakerSlideout = (
         commandType: 'heaterShaker/setAndWaitForShakeSpeed',
         params: {
           moduleId: runId != null ? moduleIdFromRun : module.id,
-          rpm: parseInt(hsValue),
+          rpm: hsValue,
         },
       }
       if (runId != null) {
@@ -105,7 +105,7 @@ export const HeaterShakerSlideout = (
         commandType: 'heaterShaker/setTargetTemperature',
         params: {
           moduleId: runId != null ? moduleIdFromRun : module.id,
-          celsius: parseInt(hsValue),
+          celsius: hsValue,
         },
       }
       if (runId != null) {
@@ -133,18 +133,12 @@ export const HeaterShakerSlideout = (
   let errorMessage
   if (isSetShake) {
     errorMessage =
-      hsValue != null &&
-      (parseInt(hsValue) < HS_RPM_MIN ||
-        parseInt(hsValue) > HS_RPM_MAX ||
-        hsValue.includes('.'))
+      hsValue != null && (hsValue < HS_RPM_MIN || hsValue > HS_RPM_MAX)
         ? t('input_out_of_range')
         : null
   } else {
     errorMessage =
-      hsValue != null &&
-      (parseInt(hsValue) < HS_TEMP_MIN ||
-        parseInt(hsValue) > HS_TEMP_MAX ||
-        hsValue.includes('.'))
+      hsValue != null && (hsValue < HS_TEMP_MIN || hsValue > HS_TEMP_MAX)
         ? t('input_out_of_range')
         : null
   }
@@ -208,8 +202,8 @@ export const HeaterShakerSlideout = (
               id={`${module.moduleModel}_${isSetShake}`}
               units={unit}
               autoFocus
-              value={hsValue}
-              onChange={e => setHsValue(e.target.value)}
+              value={hsValue != null ? Math.round(hsValue) : null}
+              onChange={e => setHsValue(e.target.valueAsNumber)}
               type="number"
               caption={t('module_status_range', {
                 min: inputMin,

@@ -6,10 +6,11 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useIsRobotBusy } from '../Devices/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
-import { MenuItemsByModuleType, useModuleOverflowMenu } from './hooks'
+import { useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '../../redux/modules/types'
 import type { ModuleType } from '@opentrons/shared-data'
+import type { MenuItemsByModuleType } from './hooks'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
@@ -32,9 +33,6 @@ export const ModuleOverflowMenu = (
     handleTestShakeClick,
     handleWizardClick,
   } = props
-  const runStatus = useRunStatus(runId != null ? runId : null)
-  const isRobotBusy = useIsRobotBusy()
-  const isBusy = runStatus != null && isRobotBusy
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
     module,
@@ -44,7 +42,7 @@ export const ModuleOverflowMenu = (
     handleWizardClick,
     handleSlideoutClick
   )
-
+  const isBusy = useIsRobotBusy() && runId == null
   return (
     <>
       <Flex position={POSITION_RELATIVE}>
@@ -55,7 +53,7 @@ export const ModuleOverflowMenu = (
             ] as MenuItemsByModuleType[ModuleType]).map(
               (item: any, index: number) => {
                 return (
-                  <>
+                  <React.Fragment key={`${index}_${module.moduleType}`}>
                     <MenuItem
                       minWidth="10.6rem"
                       key={`${index}_${module.moduleModel}`}
@@ -72,7 +70,7 @@ export const ModuleOverflowMenu = (
                       </Tooltip>
                     )}
                     {item.menuButtons}
-                  </>
+                  </React.Fragment>
                 )
               }
             ),

@@ -45,7 +45,7 @@ export const ThermocyclerModuleSlideout = (
 ): JSX.Element | null => {
   const { module, onCloseClick, isExpanded, isSecondaryTemp, runId } = props
   const { t } = useTranslation('device_details')
-  const [tempValue, setTempValue] = React.useState<string | null>(null)
+  const [tempValue, setTempValue] = React.useState<number | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
   const { moduleIdFromRun } = useModuleIdFromRun(
@@ -60,17 +60,12 @@ export const ThermocyclerModuleSlideout = (
   if (isSecondaryTemp) {
     errorMessage =
       tempValue != null &&
-      (parseInt(tempValue) < TEMP_LID_MIN ||
-        parseInt(tempValue) > TEMP_LID_MAX ||
-        tempValue.includes('.'))
+      (tempValue < TEMP_LID_MIN || tempValue > TEMP_LID_MAX)
         ? t('input_out_of_range')
         : null
   } else {
     errorMessage =
-      tempValue != null &&
-      (parseInt(tempValue) < TEMP_MIN ||
-        parseInt(tempValue) > TEMP_BLOCK_MAX ||
-        tempValue.includes('.'))
+      tempValue != null && (tempValue < TEMP_MIN || tempValue > TEMP_BLOCK_MAX)
         ? t('input_out_of_range')
         : null
   }
@@ -81,14 +76,14 @@ export const ThermocyclerModuleSlideout = (
         commandType: 'thermocycler/setTargetLidTemperature',
         params: {
           moduleId: runId != null ? moduleIdFromRun : module.id,
-          celsius: parseInt(tempValue),
+          celsius: tempValue,
         },
       }
       const saveBlockCommand: TCSetTargetBlockTemperatureCreateCommand = {
         commandType: 'thermocycler/setTargetBlockTemperature',
         params: {
           moduleId: runId != null ? moduleIdFromRun : module.id,
-          celsius: parseInt(tempValue),
+          celsius: tempValue,
           //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
         },
       }
@@ -164,9 +159,9 @@ export const ThermocyclerModuleSlideout = (
             data-testid={`${module.moduleModel}_${isSecondaryTemp}`}
             id={`${module.moduleModel}_${isSecondaryTemp}`}
             units={CELSIUS}
-            value={tempValue}
+            value={tempValue != null ? Math.round(tempValue) : null}
             autoFocus
-            onChange={e => setTempValue(e.target.value)}
+            onChange={e => setTempValue(e.target.valueAsNumber)}
             type="number"
             caption={t('module_status_range', {
               min: tempRanges.min,

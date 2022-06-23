@@ -46,7 +46,7 @@ export const TemperatureModuleSlideout = (
     runId != null ? runId : null
   )
   const name = getModuleDisplayName(module.moduleModel)
-  const [temperatureValue, setTemperatureValue] = React.useState<string | null>(
+  const [temperatureValue, setTemperatureValue] = React.useState<number | null>(
     null
   )
 
@@ -56,7 +56,7 @@ export const TemperatureModuleSlideout = (
         commandType: 'temperatureModule/setTargetTemperature',
         params: {
           moduleId: runId != null ? moduleIdFromRun : module.id,
-          celsius: parseInt(temperatureValue),
+          celsius: temperatureValue,
         },
       }
       if (runId != null) {
@@ -84,9 +84,7 @@ export const TemperatureModuleSlideout = (
 
   const valueOutOfRange =
     temperatureValue != null &&
-    (parseInt(temperatureValue) < TEMP_MIN ||
-      parseInt(temperatureValue) > TEMP_MAX ||
-      temperatureValue?.includes('.'))
+    (temperatureValue < TEMP_MIN || temperatureValue > TEMP_MAX)
 
   return (
     <Slideout
@@ -131,9 +129,11 @@ export const TemperatureModuleSlideout = (
             id={`${module.moduleModel}`}
             data-testid={`${module.moduleModel}`}
             units={CELSIUS}
-            value={temperatureValue}
+            value={
+              temperatureValue != null ? Math.round(temperatureValue) : null
+            }
             autoFocus
-            onChange={e => setTemperatureValue(e.target.value)}
+            onChange={e => setTemperatureValue(e.target.valueAsNumber)}
             type="number"
             caption={t('module_status_range', {
               min: TEMP_MIN,

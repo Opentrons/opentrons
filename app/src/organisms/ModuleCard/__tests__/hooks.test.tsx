@@ -63,9 +63,6 @@ const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
 const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
   typeof useIsRobotBusy
 >
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
->
 
 const mockCloseLatchHeaterShaker = {
   id: 'heatershaker_id',
@@ -228,7 +225,6 @@ describe('useLatchControls', () => {
       createLiveCommand: mockCreateLiveCommand,
     } as any)
     mockUseIsRobotBusy.mockReturnValue(false)
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     mockCreateCommand = jest.fn()
     mockCreateCommand.mockResolvedValue(null)
     mockUseCreateCommandMutation.mockReturnValue({

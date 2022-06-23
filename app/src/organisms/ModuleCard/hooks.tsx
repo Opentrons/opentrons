@@ -129,12 +129,10 @@ export function useModuleOverflowMenu(
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
-  const runStatus = useRunStatus(runId != null ? runId : null)
-  const isRobotBusy = useIsRobotBusy()
-  const isBusy = runStatus != null && isRobotBusy
   const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
+  const isBusy = useIsRobotBusy() && runId == null
 
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&

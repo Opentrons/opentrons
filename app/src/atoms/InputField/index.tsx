@@ -31,7 +31,7 @@ export interface InputFieldProps {
   /** optional suffix component, appears to the right of input text */
   units?: React.ReactNode
   /** current value of text in box, defaults to '' */
-  value?: string | null | undefined
+  value?: string | number | null | undefined
   /** if included, InputField will use error style and display error instead of caption */
   error?: string | null | undefined
   /** optional caption. hidden when `error` is given */

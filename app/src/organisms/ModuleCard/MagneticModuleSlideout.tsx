@@ -78,7 +78,7 @@ export const MagneticModuleSlideout = (
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
   const [engageHeightValue, setEngageHeightValue] = React.useState<
-    string | null
+    number | null
   >(null)
   const { moduleIdFromRun } = useModuleIdFromRun(
     module,
@@ -108,8 +108,8 @@ export const MagneticModuleSlideout = (
 
   const errorMessage =
     engageHeightValue != null &&
-    (parseInt(engageHeightValue) < info.disengagedHeight ||
-      parseInt(engageHeightValue) > info.maxHeight)
+    (engageHeightValue < info.disengagedHeight ||
+      engageHeightValue > info.maxHeight)
       ? t('input_out_of_range')
       : null
 
@@ -119,7 +119,7 @@ export const MagneticModuleSlideout = (
         commandType: 'magneticModule/engage',
         params: {
           moduleId: runId != null ? moduleIdFromRun : module.id,
-          height: parseInt(engageHeightValue),
+          height: engageHeightValue,
         },
       }
       if (runId != null) {
@@ -240,9 +240,13 @@ export const MagneticModuleSlideout = (
             data-testid={`${module.moduleModel}`}
             id={`${module.moduleModel}`}
             units={info.units}
-            value={engageHeightValue}
+            value={
+              engageHeightValue != null
+                ? Math.round(engageHeightValue * 10) / 10
+                : null
+            }
             autoFocus
-            onChange={e => setEngageHeightValue(e.target.value)}
+            onChange={e => setEngageHeightValue(e.target.valueAsNumber)}
             type="number"
             caption={t('module_status_range', {
               min: info.disengagedHeight,
