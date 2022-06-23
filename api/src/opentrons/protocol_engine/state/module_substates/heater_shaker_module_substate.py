@@ -75,7 +75,7 @@ class HeaterShakerModuleSubState:
         """Raise an error if labware is not latched on the heater-shaker."""
         if self.labware_latch_status != HeaterShakerLabwareLatchStatus.IDLE_CLOSED:
             raise CannotPerformModuleAction(
-                f"Cannot perform the module action when labware latch open or in error."
+                f"The Heater-Shaker can't start shaking while the labware latch is open."
                 f" Current latch status is: {self.labware_latch_status.value}"
             )
 
@@ -83,6 +83,6 @@ class HeaterShakerModuleSubState:
         """Raise an error if the heater-shaker is currently shaking."""
         if self.speed_status != SpeedStatus.IDLE:
             raise CannotPerformModuleAction(
-                f"Cannot perform the module action when module is shaking or in error."
+                f"The Heater-Shaker can't open its labware latch while it is shaking."
                 f" Current shaking status is: {self.speed_status.value}"
             )
