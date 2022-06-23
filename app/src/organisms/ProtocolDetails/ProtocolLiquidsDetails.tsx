@@ -24,7 +24,7 @@ export const ProtocolLiquidsDetails = (): JSX.Element => {
       overflowY={'auto'}
       data-testid={'LiquidsDetailsTab'}
     >
-      {liquidsInLoadOrder?.map(liquid => {
+      {liquidsInLoadOrder?.map((liquid, index) => {
         return (
           <>
             <Flex
@@ -40,7 +40,7 @@ export const ProtocolLiquidsDetails = (): JSX.Element => {
                 labwareByLiquidId={labwareByLiquidId}
               />
             </Flex>
-            <Divider />
+            {index < liquidsInLoadOrder.length - 1 && <Divider />}
           </>
         )
       })}
