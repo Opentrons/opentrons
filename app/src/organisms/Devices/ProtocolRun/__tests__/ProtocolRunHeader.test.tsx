@@ -116,7 +116,7 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
 >
-const mockUseProtocolRunDataAnalytics = useProtocolRunAnalyticsData as jest.MockedFunction<
+const mockUseProtocolRunAnalyticsData = useProtocolRunAnalyticsData as jest.MockedFunction<
   typeof useProtocolRunAnalyticsData
 >
 const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFunction<
@@ -219,7 +219,7 @@ describe('ProtocolRunHeader', () => {
     mockCloseCurrentRun = jest.fn()
     mockGetProtocolRunAnalyticsData = jest.fn()
 
-    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
+    when(mockUseTrackEvent).mockReturnValue(mockTrackEvent)
     mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
     mockMockHeaterShakerIsRunningModal.mockReturnValue(
       <div>Mock HeaterShakerIsRunningModal</div>
@@ -284,7 +284,7 @@ describe('ProtocolRunHeader', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue(PROTOCOL_DETAILS)
-    when(mockUseProtocolRunDataAnalytics).calledWith(RUN_ID).mockReturnValue({
+    when(mockUseProtocolRunAnalyticsData).calledWith(RUN_ID).mockReturnValue({
       getProtocolRunAnalyticsData: mockGetProtocolRunAnalyticsData,
     })
     when(mockUseUnmatchedModulesForProtocol)

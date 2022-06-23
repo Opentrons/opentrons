@@ -61,7 +61,7 @@ const render = (props: React.ComponentProps<typeof LabwarePositionCheck>) => {
 
 let mockTrackEvent: jest.Mock
 
-describe('LabwarePositionCheck', () => {
+describe.skip('LabwarePositionCheck', () => {
   let props: React.ComponentProps<typeof LabwarePositionCheck>
   beforeEach(() => {
     props = {

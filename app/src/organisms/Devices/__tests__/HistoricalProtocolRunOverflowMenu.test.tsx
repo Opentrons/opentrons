@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { when } from 'jest-when'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { UseQueryResult } from 'react-query'
 import { fireEvent } from '@testing-library/react'
@@ -118,6 +118,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
   })
 
   afterEach(() => {
+    resetAllWhenMocks()
     jest.resetAllMocks()
   })
 
