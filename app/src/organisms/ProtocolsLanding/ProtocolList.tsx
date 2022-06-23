@@ -52,11 +52,10 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   }
 
   const SortByText = styled(StyledText)`
-
+  background-color={COLORS.transparent}
   font-weight: ${TYPOGRAPHY.pSemiBold};
    &:enabled {
     align-items={TYPOGRAPHY.textAlignCenter}
-    background-color={COLORS.transparent}
    }
    &:hover {
     align-items={TYPOGRAPHY.textAlignCenter}

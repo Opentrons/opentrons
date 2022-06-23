@@ -121,7 +121,7 @@ export const linkPSemiBold = css`
   }
 `
 
-export const darkLinkPSemiBold = css`
+export const darkLinkLabelSemiBold = css`
   font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};

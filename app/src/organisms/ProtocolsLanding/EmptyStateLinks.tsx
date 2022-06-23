@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  COLORS,
   TYPOGRAPHY,
   Icon,
   Flex,
@@ -35,7 +34,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
     >
       <StyledText
         role="complementary"
-        as="label"
+        as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginBottom={SPACING.spacing3}
       >
@@ -43,13 +42,10 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
       </StyledText>
       <Flex justifyContent={JUSTIFY_START} flexDirection={DIRECTION_ROW}>
         <Link
-          fontSize={TYPOGRAPHY.fontSizeLabel}
-          css={TYPOGRAPHY.labelSemiBold}
-          color={COLORS.darkBlack}
+          css={TYPOGRAPHY.darkLinkLabelSemiBold}
           href={PROTOCOL_LIBRARY_URL}
           id={'EmptyStateLinks_protocolLibraryButton'}
           marginRight={SPACING.spacing3}
-          opacity="0.7"
           external
         >
           {t('browse_protocol_library')}
@@ -57,38 +53,33 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
             name={'open-in-new'}
             marginLeft={SPACING.spacing2}
             size="0.5rem"
-            opacity="0.7"
           />
         </Link>
         <Link
-          fontSize={TYPOGRAPHY.fontSizeLabel}
-          css={TYPOGRAPHY.labelSemiBold}
-          color={COLORS.darkBlack}
+          css={TYPOGRAPHY.darkLinkLabelSemiBold}
           marginRight={SPACING.spacing3}
           href={PROTOCOL_DESIGNER_URL}
           id={'EmptyStateLinks_protocolDesignerButton'}
-          opacity="0.7"
           external
         >
-          <Flex alignItems={ALIGN_CENTER} css={TYPOGRAPHY.labelSemiBold}>
+          <Flex
+            alignItems={ALIGN_CENTER}
+            css={TYPOGRAPHY.darkLinkLabelSemiBold}
+          >
             {t('launch_protocol_designer')}
 
             <Icon
               name={'open-in-new'}
               marginLeft={SPACING.spacing2}
               size="0.5rem"
-              opacity="0.7"
             />
           </Flex>
         </Link>
 
         <Link
-          fontSize={TYPOGRAPHY.fontSizeLabel}
-          css={TYPOGRAPHY.labelSemiBold}
-          color={COLORS.darkBlack}
+          css={TYPOGRAPHY.darkLinkLabelSemiBold}
           href={API_DOCS_URL}
           id={'EmptyStateLinks_apiDocsButton'}
-          opacity="0.7"
           external
         >
           {t('open_api_docs')}
@@ -96,7 +87,6 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
             name={'open-in-new'}
             marginLeft={SPACING.spacing2}
             size="0.5rem"
-            opacity="0.7"
           />
         </Link>
       </Flex>

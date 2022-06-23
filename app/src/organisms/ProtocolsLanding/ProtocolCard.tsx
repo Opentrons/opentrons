@@ -178,7 +178,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 <StyledText
                   as="h6"
                   marginBottom={SPACING.spacing3}
-                  css={COLORS.darkGreyEnabled}
+                  color={COLORS.darkGreyEnabled}
                 >
                   {t('left_mount')}
                 </StyledText>
@@ -200,7 +200,8 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               <Flex
                 flex="1"
                 flexDirection={DIRECTION_COLUMN}
-                marginRight={SPACING.spacing1}
+                marginRight={SPACING.spacing4}
+                color={COLORS.darkGreyEnabled}
                 data-testid={`ProtocolCard_rightMount_${protocolDisplayName}`}
               >
                 <StyledText as="h6" marginBottom={SPACING.spacing3}>
@@ -261,7 +262,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               {t('updated')}
             </StyledText>
             <StyledText
-              as="p"
+              as="label"
               color={COLORS.darkGreyEnabled}
               textAlign={TEXT_ALIGN_RIGHT}
             >
