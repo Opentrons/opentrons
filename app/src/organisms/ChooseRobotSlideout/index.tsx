@@ -25,11 +25,16 @@ import {
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import {
+  getConnectableRobots,
+  getReachableRobots,
+  getUnreachableRobots,
+  getScanning,
+  startDiscovery,
+} from '../../redux/discovery'
 import { PrimaryButton } from '../../atoms/buttons'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
-import { useAvailableAndUnavailableDevices } from '../../pages/Devices/DevicesLanding/hooks'
-import { getScanning, startDiscovery } from '../../redux/discovery'
 import { StoredProtocolData } from '../../redux/protocol-storage'
 import { AvailableRobotOption } from './AvailableRobotOption'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
@@ -52,12 +57,17 @@ export function ChooseRobotSlideout(
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
 
-  const {
-    unavailableDevices,
-    availableDevices,
-  } = useAvailableAndUnavailableDevices()
+  const unhealthyReachableRobots = useSelector((state: State) =>
+    getReachableRobots(state)
+  )
+  const unreachableRobots = useSelector((state: State) =>
+    getUnreachableRobots(state)
+  )
+  const healthyReachableRobots = useSelector((state: State) =>
+    getConnectableRobots(state)
+  )
 
-  const availableRobots = availableDevices.filter(robot => {
+  const availableRobots = healthyReachableRobots.filter(robot => {
     // TODO: filter out robots who have a current run that is in thie paused or running status
     return true
   })
@@ -85,7 +95,10 @@ export function ChooseRobotSlideout(
     first(srcFileNames) ??
     protocolKey
   const unavailableOrBusyCount =
-    unavailableDevices.length + availableDevices.length - availableRobots.length
+    unhealthyReachableRobots.length +
+    unreachableRobots.length +
+    healthyReachableRobots.length -
+    availableRobots.length
 
   return (
     <Slideout

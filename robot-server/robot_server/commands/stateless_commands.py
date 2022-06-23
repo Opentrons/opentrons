@@ -13,9 +13,8 @@ StatelessCommandCreate = Union[
     commands.thermocycler.SetTargetLidTemperatureCreate,
     commands.thermocycler.DeactivateBlockCreate,
     commands.thermocycler.DeactivateLidCreate,
-    # TODO(mc, 2022-03-18): implement these commands
-    # commands.thermocycler.OpenLidCreate,
-    # commands.thermocycler.CloseLidCreate,
+    commands.thermocycler.OpenLidCreate,
+    commands.thermocycler.CloseLidCreate,
     commands.heater_shaker.SetTargetTemperatureCreate,
     commands.heater_shaker.SetAndWaitForShakeSpeedCreate,
     commands.heater_shaker.DeactivateHeaterCreate,
@@ -35,9 +34,8 @@ StatelessCommand = Union[
     commands.thermocycler.SetTargetLidTemperature,
     commands.thermocycler.DeactivateBlock,
     commands.thermocycler.DeactivateLid,
-    # TODO(mc, 2022-03-18): implement these commands
-    # commands.thermocycler.OpenLid,
-    # commands.thermocycler.CloseLid,
+    commands.thermocycler.OpenLid,
+    commands.thermocycler.CloseLid,
     commands.heater_shaker.SetTargetTemperature,
     commands.heater_shaker.SetAndWaitForShakeSpeed,
     commands.heater_shaker.DeactivateHeater,

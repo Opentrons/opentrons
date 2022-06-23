@@ -62,7 +62,7 @@ describe('RobotOverflowMenu', () => {
     const btn = getByLabelText('RobotOverflowMenu_button')
     fireEvent.click(btn)
     getByText('robot settings')
-    const run = getByText('Run protocol')
+    const run = getByText('Run a protocol')
     fireEvent.click(run)
     getByText('choose protocol slideout')
   })

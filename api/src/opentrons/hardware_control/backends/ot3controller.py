@@ -19,8 +19,7 @@ from typing import (
     Iterator,
 )
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
-from opentrons.config import pipette_config
+from opentrons.config import pipette_config, gripper_config
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -79,15 +78,20 @@ from opentrons_hardware.hardware_control.motion import (
 from opentrons_hardware.hardware_control.types import NodeMap
 from opentrons_hardware.hardware_control.tools import detector, types as ohc_tool_types
 
-from opentrons_hardware.hardware_control.tool_sensors import capacitive_probe
+from opentrons_hardware.hardware_control.tool_sensors import (
+    capacitive_probe,
+    capacitive_pass,
+)
+from opentrons_hardware.drivers.gpio import OT3GPIO
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
     from ..dev_types import (
         AttachedPipette,
+        AttachedGripper,
+        OT3AttachedInstruments,
         InstrumentHardwareConfigs,
     )
-    from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 
 log = logging.getLogger(__name__)
 
@@ -122,7 +126,7 @@ class OT3Controller:
             driver: The Can Driver
         """
         self._configuration = config
-        self._gpio_dev = SimulatingGPIOCharDev("simulated")
+        self._gpio_dev = OT3GPIO("hardware_control")
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
@@ -172,7 +176,7 @@ class OT3Controller:
         )
 
     @property
-    def gpio_chardev(self) -> GPIODriverLike:
+    def gpio_chardev(self) -> OT3GPIO:
         """Get the GPIO device."""
         return self._gpio_dev
 
@@ -328,14 +332,14 @@ class OT3Controller:
 
     async def get_attached_instruments(
         self, expected: Dict[OT3Mount, PipetteName]
-    ) -> Dict[OT3Mount, AttachedPipette]:
+    ) -> Dict[OT3Mount, OT3AttachedInstruments]:
         """Get attached instruments.
 
         Args:
             expected: Which mounts are expected.
 
         Returns:
-            A map of mount to pipette name.
+            A map of mount to instrument name.
         """
         await self._probe_core()
         attached = await self._tool_detector.detect()
@@ -345,7 +349,7 @@ class OT3Controller:
         ) -> "PipetteModel":
             return cast("PipetteModel", name.name + "_v3." + str(model))
 
-        def _build_attached_instr(
+        def _build_attached_pip(
             attached: ohc_tool_types.PipetteInformation,
         ) -> AttachedPipette:
             return {
@@ -355,18 +359,27 @@ class OT3Controller:
                 "id": attached.serial,
             }
 
+        def _build_attached_gripper(
+            attached: ohc_tool_types.GripperInformation,
+        ) -> AttachedGripper:
+            return {
+                "config": gripper_config.load(attached.model),
+                "id": attached.serial,
+            }
+
         def _generate_attached_instrs(
             attached: ohc_tool_types.ToolSummary,
-        ) -> Iterator[Tuple[OT3Mount, AttachedPipette]]:
+        ) -> Iterator[Tuple[OT3Mount, OT3AttachedInstruments]]:
             if attached.left:
-                yield (OT3Mount.LEFT, _build_attached_instr(attached.left))
+                yield (OT3Mount.LEFT, _build_attached_pip(attached.left))
             if attached.right:
-                yield (OT3Mount.RIGHT, _build_attached_instr(attached.right))
+                yield (OT3Mount.RIGHT, _build_attached_pip(attached.right))
+            if attached.gripper:
+                yield (OT3Mount.GRIPPER, _build_attached_gripper(attached.gripper))
 
         current_tools = dict(_generate_attached_instrs(attached))
         self._present_nodes -= set(
-            axis_to_node(OT3Axis.of_main_tool_actuator(mount))
-            for mount in (OT3Mount.RIGHT, OT3Mount.LEFT)
+            axis_to_node(OT3Axis.of_main_tool_actuator(mount)) for mount in OT3Mount
         )
         for mount in current_tools.keys():
             self._present_nodes.add(axis_to_node(OT3Axis.of_main_tool_actuator(mount)))
@@ -622,6 +635,10 @@ class OT3Controller:
             expected.add(NodeId.pipette_left)
         if instrs.get(OT3Mount.RIGHT, cast("AttachedPipette", {})).get("config", None):
             expected.add(NodeId.pipette_right)
+        if instrs.get(OT3Mount.GRIPPER, cast("AttachedGripper", {})).get(
+            "config", None
+        ):
+            expected.add(NodeId.gripper)
         present = await probe(self._messenger, expected, timeout)
         self._present_nodes = self._replace_head_node(present)
 
@@ -655,3 +672,20 @@ class OT3Controller:
         )
 
         self._position[axis_to_node(moving)] = pos
+
+    async def capacitive_pass(
+        self,
+        mount: OT3Mount,
+        moving: OT3Axis,
+        distance_mm: float,
+        speed_mm_per_s: float,
+    ) -> List[float]:
+        data = await capacitive_pass(
+            self._messenger,
+            sensor_node_for_mount(mount),
+            axis_to_node(moving),
+            distance_mm,
+            speed_mm_per_s,
+        )
+        self._position[axis_to_node(moving)] += distance_mm
+        return data

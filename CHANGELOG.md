@@ -3,6 +3,100 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2022-06-09)
+
+
+### Bug Fixes
+
+* **api:** delete legacy deck calibration file ([#10656](https://github.com/Opentrons/opentrons/issues/10656)) ([787c3a5](https://github.com/Opentrons/opentrons/commit/787c3a5a5586678fc0d74b497b80687ae7ec58f4))
+* **api:** mark JSONv6 run as failed if queued protocol command fails ([#10629](https://github.com/Opentrons/opentrons/issues/10629)) ([a521e16](https://github.com/Opentrons/opentrons/commit/a521e16c0b8c47006198a2479d0c71954db11016)), closes [#9888](https://github.com/Opentrons/opentrons/issues/9888)
+* **app:** App fix deck cal button disabled issue ([#10650](https://github.com/Opentrons/opentrons/issues/10650)) ([5819011](https://github.com/Opentrons/opentrons/commit/5819011c5e4ddec6afeb1d7e5527d5f9754ba47c)), closes [#10638](https://github.com/Opentrons/opentrons/issues/10638)
+* **app:** App fix one attached pipette cal display issue ([#10657](https://github.com/Opentrons/opentrons/issues/10657)) ([c5df074](https://github.com/Opentrons/opentrons/commit/c5df074471a041548f84e84369429791a50ed21c)), closes [#10574](https://github.com/Opentrons/opentrons/issues/10574)
+* **app:** check for sw updates with regular top level poll ([#10659](https://github.com/Opentrons/opentrons/issues/10659)) ([62f4476](https://github.com/Opentrons/opentrons/commit/62f4476febd45adbf4dcc39feac8084af2360833))
+* **app:** close labware slideout when labware deleted ([#10663](https://github.com/Opentrons/opentrons/issues/10663)) ([4ce9d70](https://github.com/Opentrons/opentrons/commit/4ce9d70872a6138bf72063efbf18e176722ca427)), closes [#10482](https://github.com/Opentrons/opentrons/issues/10482)
+* **app:** close pipette and module overflow menus on click ([#10662](https://github.com/Opentrons/opentrons/issues/10662)) ([edb5482](https://github.com/Opentrons/opentrons/commit/edb548282052d35f875ba0129d90f8676ed17b37)), closes [#10639](https://github.com/Opentrons/opentrons/issues/10639)
+* **app:** disallow run level module control while the run is paused ([#10685](https://github.com/Opentrons/opentrons/issues/10685)) ([212a0f4](https://github.com/Opentrons/opentrons/commit/212a0f4798e5937cba0a4a2c25be379fd5c25722)), closes [#10647](https://github.com/Opentrons/opentrons/issues/10647)
+* **app:** fix pipette offset cal data fetch issue on RobotSettings ([#10680](https://github.com/Opentrons/opentrons/issues/10680)) ([c11da0c](https://github.com/Opentrons/opentrons/commit/c11da0ca04fe4d78a8f80668e0ae58df9c6d5942)), closes [#10676](https://github.com/Opentrons/opentrons/issues/10676)
+* **app:** fix refresh robots spinner spacing and double icon ([#10646](https://github.com/Opentrons/opentrons/issues/10646)) ([33df1aa](https://github.com/Opentrons/opentrons/commit/33df1aa4f5a540d7b0409cdc1577324ca8ce1460)), closes [#10483](https://github.com/Opentrons/opentrons/issues/10483)
+* **app:** robot Update banner renders when bot is unavailable fix ([#10673](https://github.com/Opentrons/opentrons/issues/10673)) ([f8f8425](https://github.com/Opentrons/opentrons/commit/f8f84256f7d51783f05d40e3b0624c8cfffac4ee)), closes [#10670](https://github.com/Opentrons/opentrons/issues/10670)
+* **app:** this will fix overflow menu overlapping issue on RobotSettings Calibration Tab ([#10661](https://github.com/Opentrons/opentrons/issues/10661)) ([44f9e81](https://github.com/Opentrons/opentrons/commit/44f9e8126006b0406139418af46607f3f7770646)), closes [#10640](https://github.com/Opentrons/opentrons/issues/10640)
+* **engine:** disallow setup commands while run is paused ([#10675](https://github.com/Opentrons/opentrons/issues/10675)) ([bd3a4e1](https://github.com/Opentrons/opentrons/commit/bd3a4e146ace8157687cf6913ec3794bae0f4411))
+
+
+### Features
+
+* **api, ot3:** add gripper to get_attached_instruments  ([#10619](https://github.com/Opentrons/opentrons/issues/10619)) ([212dfc5](https://github.com/Opentrons/opentrons/commit/212dfc540f29fe05cc56335560fb22a70e7bf9b5))
+* **app:** wire up Modal warning for Clear unavailable robots list button ([#10648](https://github.com/Opentrons/opentrons/issues/10648)) ([a701e09](https://github.com/Opentrons/opentrons/commit/a701e097bd0d7b2730a8dc5dced94bdaf6dfc79a)), closes [#10511](https://github.com/Opentrons/opentrons/issues/10511)
+* **protocol-designer:** disable placing module next to heater shaker ([#10660](https://github.com/Opentrons/opentrons/issues/10660)) ([b96b410](https://github.com/Opentrons/opentrons/commit/b96b410599c823bd6efbb02d8b749e4a89db0fa6)), closes [#10449](https://github.com/Opentrons/opentrons/issues/10449) [#10450](https://github.com/Opentrons/opentrons/issues/10450)
+* **step-generation:** raise timeline error when pipetting E/W of H-S with multi channel pipette ([#10681](https://github.com/Opentrons/opentrons/issues/10681)) ([3ea88a2](https://github.com/Opentrons/opentrons/commit/3ea88a260ebbfedc7c7fcda194ab5d37e1b22774)), closes [#10442](https://github.com/Opentrons/opentrons/issues/10442)
+
+
+
+
+
+# [6.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.0...v6.0.0-alpha.1) (2022-06-07)
+
+
+### Bug Fixes
+
+* **add:** Dispay sortBy labels to labware and protocols ([#10475](https://github.com/Opentrons/opentrons/issues/10475)) ([c58c51c](https://github.com/Opentrons/opentrons/commit/c58c51c188cd1940e2c4bf77393a5256bb7daf63))
+* **api:** disallow thermocycler if item in conflicting slot ([#10516](https://github.com/Opentrons/opentrons/issues/10516)) ([b3735c2](https://github.com/Opentrons/opentrons/commit/b3735c29eb21a2f76e6d663dd4bdd439d18ad1cf)), closes [#9419](https://github.com/Opentrons/opentrons/issues/9419)
+* **app:** 6.0 feedback design QA T1 protocols landing page ([#10488](https://github.com/Opentrons/opentrons/issues/10488)) ([18149cc](https://github.com/Opentrons/opentrons/commit/18149cc99ef91cfd4ecc6ed04eed3324afc4892f))
+* **app:** Add looking for robots state ([#10615](https://github.com/Opentrons/opentrons/issues/10615)) ([00df52d](https://github.com/Opentrons/opentrons/commit/00df52d1ee54d2f6e6dc711ec394b8891d7f5eee)), closes [#10483](https://github.com/Opentrons/opentrons/issues/10483)
+* **app:** Add null check to avoid white screen ([#10518](https://github.com/Opentrons/opentrons/issues/10518)) ([7981096](https://github.com/Opentrons/opentrons/commit/798109663751b0f0e1fda5340ec293b1536beb77))
+* **app:** add overflow prop for long name ([#10524](https://github.com/Opentrons/opentrons/issues/10524)) ([1c051fe](https://github.com/Opentrons/opentrons/commit/1c051febd37aa87fd986b99c5fa486f983c1b0d3)), closes [#10505](https://github.com/Opentrons/opentrons/issues/10505) [#10481](https://github.com/Opentrons/opentrons/issues/10481)
+* **app:** App fix design feedback navbar ([#10439](https://github.com/Opentrons/opentrons/issues/10439)) ([a2c2f3a](https://github.com/Opentrons/opentrons/commit/a2c2f3a6a6c997cb5d0f8f283ea301608b166c24))
+* **app:** Appettings general tab remove duplicated text ([#10526](https://github.com/Opentrons/opentrons/issues/10526)) ([929abce](https://github.com/Opentrons/opentrons/commit/929abcef437c7861d60876906406ced663a4d9fe))
+* **app:** disable device details module controls when robot is busy ([#10614](https://github.com/Opentrons/opentrons/issues/10614)) ([79c70cd](https://github.com/Opentrons/opentrons/commit/79c70cdfb0c3638f751bd375c867b66deec66995)), closes [#10609](https://github.com/Opentrons/opentrons/issues/10609)
+* **app:** fix historical protocol run overflow menu bugs ([#10587](https://github.com/Opentrons/opentrons/issues/10587)) ([5f5c20d](https://github.com/Opentrons/opentrons/commit/5f5c20d2ea9d1c3699f7a4d2368cb7e630b4c76a)), closes [#10404](https://github.com/Opentrons/opentrons/issues/10404) [#10545](https://github.com/Opentrons/opentrons/issues/10545) [#10548](https://github.com/Opentrons/opentrons/issues/10548)
+* **app:** fix robot update banner ([#10567](https://github.com/Opentrons/opentrons/issues/10567)) ([a7713c4](https://github.com/Opentrons/opentrons/commit/a7713c45216a0ad22e62bbf24605fd902224b8b8)), closes [#10041](https://github.com/Opentrons/opentrons/issues/10041)
+* **app:** fix RobotSettings pipette offset cals banner issue ([#10599](https://github.com/Opentrons/opentrons/issues/10599)) ([e6ac78a](https://github.com/Opentrons/opentrons/commit/e6ac78a811eabe69730cb408f439fa58f72f769c))
+* **app:** Fix RobotSettings sync issue ([#10581](https://github.com/Opentrons/opentrons/issues/10581)) ([349f35f](https://github.com/Opentrons/opentrons/commit/349f35f4c409858854dc1a3accdcc88cee52b9fc)), closes [#10577](https://github.com/Opentrons/opentrons/issues/10577)
+* **app:** Fix tip length cal fetch on device details ([#10598](https://github.com/Opentrons/opentrons/issues/10598)) ([c73f4cd](https://github.com/Opentrons/opentrons/commit/c73f4cd4be5ffbd06a00f821451df1cdca1be953)), closes [#10531](https://github.com/Opentrons/opentrons/issues/10531)
+* **app:** fix toast display issue on RobotSettings Advanced tab ([#10625](https://github.com/Opentrons/opentrons/issues/10625)) ([dae7ee5](https://github.com/Opentrons/opentrons/commit/dae7ee5f2087dce9c7d9c122cae61c0f40588481)), closes [#10624](https://github.com/Opentrons/opentrons/issues/10624)
+* **app:** fix white screen issue after renaming clicking advanced tab ([#10463](https://github.com/Opentrons/opentrons/issues/10463)) ([e272382](https://github.com/Opentrons/opentrons/commit/e272382d0b3a2318fdf1b8271521bbfc8d164d32))
+* **app:** pipette card calibrate banner bug fix ([#10400](https://github.com/Opentrons/opentrons/issues/10400)) ([66b3a70](https://github.com/Opentrons/opentrons/commit/66b3a705764e04e8fc88db55860e18e381795467)), closes [#10324](https://github.com/Opentrons/opentrons/issues/10324)
+* **app:** protocol sort order changing when clicking sort menu ([#10556](https://github.com/Opentrons/opentrons/issues/10556)) ([6083fb0](https://github.com/Opentrons/opentrons/commit/6083fb08eb859c10b306fab71efa98a5db351163)), closes [#10398](https://github.com/Opentrons/opentrons/issues/10398)
+* **app:** remove unused intercom snippet ([#10620](https://github.com/Opentrons/opentrons/issues/10620)) ([8607bc0](https://github.com/Opentrons/opentrons/commit/8607bc0451cee5acc20b9e2a18608dc98f861679)), closes [#10547](https://github.com/Opentrons/opentrons/issues/10547)
+* **app:** reorder overeflow menu on protocol card ([#10522](https://github.com/Opentrons/opentrons/issues/10522)) ([5d737ce](https://github.com/Opentrons/opentrons/commit/5d737cef27ec114ba9021e710e256f17e9d98315)), closes [#10499](https://github.com/Opentrons/opentrons/issues/10499)
+* **app:** robot configuration unused pipette mount copy ([#10467](https://github.com/Opentrons/opentrons/issues/10467)) ([07d2dd0](https://github.com/Opentrons/opentrons/commit/07d2dd047cde571386801ac4eea354ae68b61c0f)), closes [#10466](https://github.com/Opentrons/opentrons/issues/10466)
+* **app:** robot settings cal health check wizard issue ([#10525](https://github.com/Opentrons/opentrons/issues/10525)) ([b1a28e3](https://github.com/Opentrons/opentrons/commit/b1a28e3a14a44397a9ae12fa5bd2ff840edecf91))
+* **app:** robot update Modal CTA fix ([#10592](https://github.com/Opentrons/opentrons/issues/10592)) ([33fd4ab](https://github.com/Opentrons/opentrons/commit/33fd4abdfbcf6aa2bf6c2aeb843a1d5914f50558)), closes [#10431](https://github.com/Opentrons/opentrons/issues/10431)
+* **app:** RobotSettings deck calibration banner issue display issue ([#10515](https://github.com/Opentrons/opentrons/issues/10515)) ([4e975d3](https://github.com/Opentrons/opentrons/commit/4e975d383e788efb069144f5cc1a4d20e555c43f)), closes [#10484](https://github.com/Opentrons/opentrons/issues/10484)
+* **app:** See How Robot Calibration Works Modal ([#10415](https://github.com/Opentrons/opentrons/issues/10415)) ([b28a6be](https://github.com/Opentrons/opentrons/commit/b28a6be983b444a1b647f5d89d31a4ed03f1941b))
+* **can:** ensure that the pcan parameters match new values for 500KHz bit timing ([#10572](https://github.com/Opentrons/opentrons/issues/10572)) ([d5a319b](https://github.com/Opentrons/opentrons/commit/d5a319bc0a508aed418070dceb9a0ad10ae670fe))
+* **docs:** link fix, upcoming issues ([c385668](https://github.com/Opentrons/opentrons/commit/c385668f6d1384b7ca42a97d2f5b4ced581f4037))
+* **protocol-designer:** change PD help link ([#10440](https://github.com/Opentrons/opentrons/issues/10440)) ([9152d25](https://github.com/Opentrons/opentrons/commit/9152d2571f4c821387b4b3249b895a6278c17b77)), closes [#10325](https://github.com/Opentrons/opentrons/issues/10325)
+* **robot-server:** disallow pause action for non-active run ([#10550](https://github.com/Opentrons/opentrons/issues/10550)) ([5d17c93](https://github.com/Opentrons/opentrons/commit/5d17c937de3e10f71b7665c3796d2dfb9d6bdb55))
+
+
+### Features
+
+* **api:** add Thermocycler Gen2 driver ([#9854](https://github.com/Opentrons/opentrons/issues/9854)) ([b12641d](https://github.com/Opentrons/opentrons/commit/b12641dd93c0c8fd24924d1f4d56dcccf055a8dc))
+* **app:** add feature flag for liquid setup ([#10554](https://github.com/Opentrons/opentrons/issues/10554)) ([d4d3666](https://github.com/Opentrons/opentrons/commit/d4d3666300faa78e802aba5c34cf3f4944a59039)), closes [#10520](https://github.com/Opentrons/opentrons/issues/10520)
+* **app:** add liquid setup list view static list ([#10608](https://github.com/Opentrons/opentrons/issues/10608)) ([4158875](https://github.com/Opentrons/opentrons/commit/415887527fcd161cc8fcffcc6536e746a4f7d7df)), closes [#10517](https://github.com/Opentrons/opentrons/issues/10517)
+* **app:** add liquid setup step to run setup page ([#10591](https://github.com/Opentrons/opentrons/issues/10591)) ([9f54480](https://github.com/Opentrons/opentrons/commit/9f54480213cf033d32e0531a0b397b7626a2e86d)), closes [#8909](https://github.com/Opentrons/opentrons/issues/8909)
+* **app:** Add robot side protocol analysis error states ([#10595](https://github.com/Opentrons/opentrons/issues/10595)) ([44cc077](https://github.com/Opentrons/opentrons/commit/44cc077c8c0457fdf76f3abdc00f9a5b95ed6864)), closes [#10357](https://github.com/Opentrons/opentrons/issues/10357)
+* **app:** add useToggleGroup for toggle component ([#10558](https://github.com/Opentrons/opentrons/issues/10558)) ([ab66052](https://github.com/Opentrons/opentrons/commit/ab660524e7207dfbc33ec2f29f70b4479ff2793a)), closes [#10552](https://github.com/Opentrons/opentrons/issues/10552)
+* **app:** App add reset option for run history ([#10461](https://github.com/Opentrons/opentrons/issues/10461)) ([73503a3](https://github.com/Opentrons/opentrons/commit/73503a392b1f208180b9e9796375d4391fc56d6f))
+* **app:** App robot settings advanced tab robot is busy ([#10368](https://github.com/Opentrons/opentrons/issues/10368)) ([4cfaadc](https://github.com/Opentrons/opentrons/commit/4cfaadc1d4847976781cae50e6e954f90b873157))
+* **app:** App robot settings other tabs robot is busy ([#10369](https://github.com/Opentrons/opentrons/issues/10369)) ([c9500e0](https://github.com/Opentrons/opentrons/commit/c9500e0aabcf9634352993566b84509168791fe2))
+* **app:** change H-S set shake speed button disabled reason ([#10421](https://github.com/Opentrons/opentrons/issues/10421)) ([0b1b15f](https://github.com/Opentrons/opentrons/commit/0b1b15f3d555c961a1c77c54d765406c454c3a41)), closes [#10418](https://github.com/Opentrons/opentrons/issues/10418)
+* **app:** make protocol runs from history clickable ([#10537](https://github.com/Opentrons/opentrons/issues/10537)) ([b98abee](https://github.com/Opentrons/opentrons/commit/b98abee7ce9922b656ed4f2caf3baedc49fa0609)), closes [#10502](https://github.com/Opentrons/opentrons/issues/10502)
+* **hardware:** add InstrumentInfoRequest to get info from Pipettes & Gripper ([#10557](https://github.com/Opentrons/opentrons/issues/10557)) ([2485b5b](https://github.com/Opentrons/opentrons/commit/2485b5b98092f12c54517d8ab2c918cd584d0224))
+* **ot3-hardware:** support tip action requests in the move group runner ([#10445](https://github.com/Opentrons/opentrons/issues/10445)) ([9403981](https://github.com/Opentrons/opentrons/commit/9403981003cd6d40842bb2c374c16f384c64fa56))
+* **protocol-designer:** add module placement restriction when editing position of H-S ([#10457](https://github.com/Opentrons/opentrons/issues/10457)) ([9f16650](https://github.com/Opentrons/opentrons/commit/9f16650d3efdb008329751941308264d9324cc56)), closes [#10454](https://github.com/Opentrons/opentrons/issues/10454)
+* **protocol-designer:** add timeline error for tall labware east west of a heater shaker ([#10551](https://github.com/Opentrons/opentrons/issues/10551)) ([1e799d3](https://github.com/Opentrons/opentrons/commit/1e799d3d65a40080f346f8ac2f1e6e3e7196b564)), closes [#10444](https://github.com/Opentrons/opentrons/issues/10444)
+* **robot-server:** add modules field to /runs responses ([#10462](https://github.com/Opentrons/opentrons/issues/10462)) ([b4389fb](https://github.com/Opentrons/opentrons/commit/b4389fbe9934193a963671fbce344e50a827db85)), closes [#10432](https://github.com/Opentrons/opentrons/issues/10432)
+* **robot-server:** add run completedAt and startedAt timestamps ([#10327](https://github.com/Opentrons/opentrons/issues/10327)) ([93a195d](https://github.com/Opentrons/opentrons/commit/93a195d26a1128a68a91f71514fb122b48f253b4))
+* **robot-server, api:** support running JSONv6 protocols ([#10170](https://github.com/Opentrons/opentrons/issues/10170)) ([9c30653](https://github.com/Opentrons/opentrons/commit/9c306534576847bd7bd6ea0b8454afd4e74ae476)), closes [#9584](https://github.com/Opentrons/opentrons/issues/9584)
+* **step-generation, protocol-designer:** add H-S timeline error when pipetting E-W with latch open ([#10566](https://github.com/Opentrons/opentrons/issues/10566)) ([3abafbd](https://github.com/Opentrons/opentrons/commit/3abafbd8f5b6463c67b47d14ecf6a371b8ce7bfa)), closes [#10510](https://github.com/Opentrons/opentrons/issues/10510)
+* **step-generation, protocol-designer:** generate error when pipetting NSEW of HS while shaking ([#10589](https://github.com/Opentrons/opentrons/issues/10589)) ([17c1b27](https://github.com/Opentrons/opentrons/commit/17c1b27dbdf30f6e42fac0e3e657d813d7eff57e)), closes [#10509](https://github.com/Opentrons/opentrons/issues/10509)
+
+
+
+
+
 # [6.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.1.0-beta.0...v6.0.0-alpha.0) (2022-05-26)
 
 

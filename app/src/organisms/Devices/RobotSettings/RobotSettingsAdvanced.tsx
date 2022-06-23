@@ -20,11 +20,11 @@ import { UseOlderProtocol } from './AdvancedTab/UseOlderProtocol'
 import { LegacySettings } from './AdvancedTab/LegacySettings'
 import { ShortTrashBin } from './AdvancedTab/ShortTrashBin'
 import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior'
-import { UpdateBuildroot } from '../../../pages/Robots/RobotSettings/UpdateBuildroot'
 import { getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
 import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
+import { UpdateBuildroot } from './UpdateBuildroot'
 
 import type { State, Dispatch } from '../../../redux/types'
 import type {
@@ -129,7 +129,7 @@ export function RobotSettingsAdvanced({
           icon={toastIcon}
           closeButton={false}
           onClose={() => setShowDownloadToast(false)}
-          requiredTimeout={false}
+          disableTimeout={true}
         />
       )}
       <Box>

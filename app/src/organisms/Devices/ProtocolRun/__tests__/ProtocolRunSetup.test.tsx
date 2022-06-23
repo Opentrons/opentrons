@@ -2,6 +2,7 @@ import * as React from 'react'
 import { pick } from 'lodash'
 import { when, resetAllWhenMocks } from 'jest-when'
 
+import { parseAllRequiredModuleModels } from '@opentrons/api-client'
 import {
   partialComponentPropsMatcher,
   renderWithProviders,
@@ -19,6 +20,8 @@ import {
   useRobot,
   useRunCalibrationStatus,
   useRunHasStarted,
+  useProtocolAnalysisErrors,
+  useStoredProtocolAnalysis,
 } from '../../hooks'
 import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
@@ -27,7 +30,9 @@ import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import { SetupModules } from '../SetupModules'
 
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { StoredProtocolAnalysis } from '../../hooks'
 
+jest.mock('@opentrons/api-client')
 jest.mock('../../hooks')
 jest.mock('../SetupLabware')
 jest.mock('../SetupRobotCalibration')
@@ -41,12 +46,21 @@ const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
 >
+const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFunction<
+  typeof useProtocolAnalysisErrors
+>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
 >
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted
+>
+const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
+  typeof useStoredProtocolAnalysis
+>
+const mockParseAllRequiredModuleModels = parseAllRequiredModuleModels as jest.MockedFunction<
+  typeof parseAllRequiredModuleModels
 >
 const mockSetupLabware = SetupLabware as jest.MockedFunction<
   typeof SetupLabware
@@ -95,6 +109,13 @@ describe('ProtocolRunSetup', () => {
         displayName: 'mock display name',
         protocolKey: 'fakeProtocolKey',
       })
+    when(mockUseProtocolAnalysisErrors).calledWith(RUN_ID).mockReturnValue({
+      analysisErrors: null,
+    })
+    when(mockUseStoredProtocolAnalysis)
+      .calledWith(RUN_ID)
+      .mockReturnValue((noModulesProtocol as unknown) as StoredProtocolAnalysis)
+    when(mockParseAllRequiredModuleModels).mockReturnValue([])
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)
       .mockReturnValue(mockConnectedRobot)
@@ -132,12 +153,13 @@ describe('ProtocolRunSetup', () => {
     expect(container.firstChild).toBeNull()
   })
 
-  it('renders loading data message if robot-analyzed protocol data is null', () => {
+  it('renders loading data message if robot-analyzed and app-analyzed protocol data is null', () => {
     when(mockUseProtocolDetailsForRun).calledWith(RUN_ID).mockReturnValue({
       protocolData: null,
       displayName: null,
       protocolKey: null,
     })
+    when(mockUseStoredProtocolAnalysis).calledWith(RUN_ID).mockReturnValue(null)
     const { getByText } = render()
     getByText('Loading data...')
   })
@@ -220,6 +242,10 @@ describe('ProtocolRunSetup', () => {
 
   describe('when modules are in the protocol', () => {
     beforeEach(() => {
+      when(mockParseAllRequiredModuleModels).mockReturnValue([
+        'magneticModuleV1',
+        'temperatureModuleV1',
+      ])
       when(mockUseProtocolDetailsForRun)
         .calledWith(RUN_ID)
         .mockReturnValue({
@@ -276,6 +302,9 @@ describe('ProtocolRunSetup', () => {
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
         })
+      when(mockParseAllRequiredModuleModels).mockReturnValue([
+        'magneticModuleV1',
+      ])
       const { getByText } = render()
 
       getByText('STEP 1')
@@ -304,6 +333,23 @@ describe('ProtocolRunSetup', () => {
       expect(getByText('Mock SetupModules')).not.toBeVisible()
       expect(getByText('Mock SetupLabware')).not.toBeVisible()
       getByText('Setup is view-only once run has started')
+    })
+
+    it('renders analysis error message if there is an analysis error', async () => {
+      when(mockUseProtocolAnalysisErrors)
+        .calledWith(RUN_ID)
+        .mockReturnValue({
+          analysisErrors: [
+            {
+              id: 'error_id',
+              detail: 'protocol analysis error',
+              errorType: 'analysis',
+              createdAt: '100000',
+            },
+          ],
+        })
+      const { getByText } = render()
+      getByText('Protocol analysis failed')
     })
   })
 })

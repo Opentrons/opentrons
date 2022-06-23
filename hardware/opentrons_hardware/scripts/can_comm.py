@@ -8,6 +8,7 @@ from logging.config import dictConfig
 from typing import Type, Sequence, Callable, TypeVar
 
 from opentrons_hardware.drivers.can_bus import build
+from opentrons_hardware.drivers.gpio import OT3GPIO
 from opentrons_hardware.firmware_bindings.constants import (
     MessageId,
     NodeId,
@@ -72,7 +73,7 @@ def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
 
     """
     # mypy wants type annotation for v.
-    return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]  # type: ignore[var-annotated]  # noqa: E501
+    return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]  # type: ignore[var-annotated]
 
 
 PromptedEnum = TypeVar("PromptedEnum", bound=Enum, covariant=True)
@@ -229,6 +230,9 @@ async def run_ui(driver: AbstractCanDriver) -> None:
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
+    # build a gpio handler which will automatically release estop
+    gpio = OT3GPIO()
+    gpio.deactivate_estop()
     async with build.driver(build_settings(args)) as driver:
         await (run_ui(driver))
 

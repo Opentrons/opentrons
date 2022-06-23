@@ -193,7 +193,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
             definition=heater_shaker_v1_def,
         ),
     )
-    set_temp_cmd = hs_commands.SetTargetTemperature.construct(  # type: ignore[call-arg]  # noqa: E501
+    set_temp_cmd = hs_commands.SetTargetTemperature.construct(  # type: ignore[call-arg]
         params=hs_commands.SetTargetTemperatureParams(moduleId="module-id", celsius=42),
         result=hs_commands.SetTargetTemperatureResult(),
     )
@@ -234,13 +234,13 @@ def test_handle_tempdeck_temperature_commands(
             definition=tempdeck_v2_def,
         ),
     )
-    set_temp_cmd = temp_commands.SetTargetTemperature.construct(  # type: ignore[call-arg]  # noqa: E501
+    set_temp_cmd = temp_commands.SetTargetTemperature.construct(  # type: ignore[call-arg]
         params=temp_commands.SetTargetTemperatureParams(
             moduleId="module-id", celsius=42.4
         ),
         result=temp_commands.SetTargetTemperatureResult(targetTemperature=42),
     )
-    deactivate_cmd = temp_commands.DeactivateTemperature.construct(  # type: ignore[call-arg]  # noqa: E501
+    deactivate_cmd = temp_commands.DeactivateTemperature.construct(  # type: ignore[call-arg]
         params=temp_commands.DeactivateTemperatureParams(moduleId="module-id"),
         result=temp_commands.DeactivateTemperatureResult(),
     )
@@ -277,23 +277,23 @@ def test_handle_thermocycler_block_temperature_commands(
             definition=thermocycler_v1_def,
         ),
     )
-    set_block_temp_cmd = tc_commands.SetTargetBlockTemperature.construct(  # type: ignore[call-arg]  # noqa: E501
+    set_block_temp_cmd = tc_commands.SetTargetBlockTemperature.construct(  # type: ignore[call-arg]
         params=tc_commands.SetTargetBlockTemperatureParams(
             moduleId="module-id", celsius=42.4
         ),
         result=tc_commands.SetTargetBlockTemperatureResult(targetBlockTemperature=42.4),
     )
-    deactivate_block_cmd = tc_commands.DeactivateBlock.construct(  # type: ignore[call-arg]  # noqa: E501
+    deactivate_block_cmd = tc_commands.DeactivateBlock.construct(  # type: ignore[call-arg]
         params=tc_commands.DeactivateBlockParams(moduleId="module-id"),
         result=tc_commands.DeactivateBlockResult(),
     )
-    set_lid_temp_cmd = tc_commands.SetTargetLidTemperature.construct(  # type: ignore[call-arg]  # noqa: E501
+    set_lid_temp_cmd = tc_commands.SetTargetLidTemperature.construct(  # type: ignore[call-arg]
         params=tc_commands.SetTargetLidTemperatureParams(
             moduleId="module-id", celsius=35.3
         ),
         result=tc_commands.SetTargetLidTemperatureResult(targetLidTemperature=35.3),
     )
-    deactivate_lid_cmd = tc_commands.DeactivateLid.construct(  # type: ignore[call-arg]  # noqa: E501
+    deactivate_lid_cmd = tc_commands.DeactivateLid.construct(  # type: ignore[call-arg]
         params=tc_commands.DeactivateLidParams(moduleId="module-id"),
         result=tc_commands.DeactivateLidResult(),
     )

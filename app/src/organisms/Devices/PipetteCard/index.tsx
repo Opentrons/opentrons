@@ -53,7 +53,7 @@ interface PipetteCardProps {
 const FETCH_PIPETTE_CAL_MS = 30000
 
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
-  const { t } = useTranslation('device_details')
+  const { t } = useTranslation(['device_details', 'protocol_setup'])
   const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
   const { pipetteInfo, mount, robotName, pipetteId } = props
   const dispatch = useDispatch<Dispatch>()
@@ -138,13 +138,13 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
           closeModal={() => setChangePipette(false)}
         />
       )}
-      {showSlideout && pipetteInfo != null && (
+      {showSlideout && pipetteInfo != null && pipetteId != null && (
         <PipetteSettingsSlideout
-          mount={mount}
           robotName={robotName}
           pipetteName={pipetteInfo.displayName}
           onCloseClick={() => setShowSlideout(false)}
           isExpanded={true}
+          pipetteId={pipetteId}
         />
       )}
       {PipetteOffsetCalibrationWizard}
@@ -162,7 +162,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             onResponse={hasBlockModalResponse => {
               startPipetteOffsetCalibrationBlockModal(hasBlockModalResponse)
             }}
-            titleBarTitle={t('pipette_offset_cal')}
+            titleBarTitle={t('protocol_setup:pipette_offset_cal')}
             closePrompt={() => setShowCalBlockModal(false)}
           />
         </Portal>
@@ -265,9 +265,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         />
       </Box>
       {showOverflowMenu && (
-        <div
+        <Box
           ref={pipetteOverflowWrapperRef}
           data-testid={`PipetteCard_overflow_menu_${pipetteName}`}
+          onClick={() => setShowOverflowMenu(false)}
         >
           <PipetteOverflowMenu
             pipetteName={pipetteName ?? t('empty')}
@@ -278,7 +279,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             handleAboutSlideout={handleAboutSlideout}
             isPipetteCalibrated={pipetteOffsetCalibration != null}
           />
-        </div>
+        </Box>
       )}
     </Flex>
   )

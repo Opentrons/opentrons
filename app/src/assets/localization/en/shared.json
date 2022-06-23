@@ -29,5 +29,7 @@
   "view_latest_release_notes": "View latest release notes on",
   "github": "GitHub",
   "confirm": "Confirm",
-  "reset_all": "Reset all"
+  "reset_all": "Reset all",
+  "robot_is_reachable_but_not_responding": "This robot's API server is not responding correctly to requests at IP address {{hostname}}",
+  "robot_was_seen_but_is_unreachable": "This robot has been seen recently, but is currently not reachable at IP address {{hostname}}"
 }

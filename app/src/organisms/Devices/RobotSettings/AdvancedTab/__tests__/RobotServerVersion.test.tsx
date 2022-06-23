@@ -1,16 +1,19 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
-import { useRobot } from '../../../hooks'
 import { getRobotApiVersion } from '../../../../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../../../../redux/buildroot'
 import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
+import { useIsRobotBusy, useRobot } from '../../../hooks'
+import { UpdateBuildroot } from '../../UpdateBuildroot'
 import { RobotServerVersion } from '../RobotServerVersion'
 
 jest.mock('../../../hooks')
 jest.mock('../../../../../redux/buildroot/selectors')
 jest.mock('../../../../../redux/discovery/selectors')
+jest.mock('../../UpdateBuildroot')
 
 const mockGetRobotApiVersion = getRobotApiVersion as jest.MockedFunction<
   typeof getRobotApiVersion
@@ -20,6 +23,13 @@ const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.
 >
 
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
+
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
+>
+const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
+  typeof UpdateBuildroot
+>
 
 const MOCK_ROBOT_VERSION = '7.7.7'
 const render = () => {
@@ -33,6 +43,8 @@ const render = () => {
 
 describe('RobotSettings RobotServerVersion', () => {
   beforeEach(() => {
+    mockUpdateBuildroot.mockReturnValue(<div>mock update buildroot</div>)
+    mockUseIsRobotBusy.mockReturnValue(false)
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: 'reinstall',
@@ -67,7 +79,9 @@ describe('RobotSettings RobotServerVersion', () => {
     })
     const [{ getByText }] = render()
     getByText('A software update is available for this robot.')
-    getByText('View update')
+    const btn = getByText('View update')
+    fireEvent.click(btn)
+    getByText('mock update buildroot')
   })
 
   it('should render the warning message if the robot server version needs to downgrade', () => {
@@ -78,7 +92,9 @@ describe('RobotSettings RobotServerVersion', () => {
     })
     const [{ getByText }] = render()
     getByText('A software update is available for this robot.')
-    getByText('View update')
+    const btn = getByText('View update')
+    fireEvent.click(btn)
+    getByText('mock update buildroot')
   })
 
   it('the link should have the correct href', () => {

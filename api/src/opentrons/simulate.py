@@ -585,7 +585,7 @@ def main() -> int:
     args = parser.parse_args()
     # Try to migrate api v1 containers if needed
 
-    duration_estimator = DurationEstimator() if args.estimate_duration else None  # type: ignore[no-untyped-call]  # noqa: E501
+    duration_estimator = DurationEstimator() if args.estimate_duration else None  # type: ignore[no-untyped-call]
 
     runlog, maybe_bundle = simulate(
         args.protocol,

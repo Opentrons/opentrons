@@ -19,6 +19,7 @@ from .command_fixtures import (
     create_pick_up_tip_command,
     create_drop_tip_command,
     create_move_to_well_command,
+    create_blow_out_command,
 )
 
 
@@ -70,6 +71,7 @@ def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
     aspirate_command = create_aspirate_command(
         pipette_id="pipette-id",
         volume=42,
+        flow_rate=1.23,
     )
 
     subject.handle_action(UpdateCommandAction(command=load_command))
@@ -82,6 +84,28 @@ def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
     assert subject.state.aspirated_volume_by_id["pipette-id"] == 84
 
 
+def test_handles_blow_out(subject: PipetteStore) -> None:
+    """It should set volume to 0 and set current well."""
+    command = create_blow_out_command(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="well-name",
+        flow_rate=1.23,
+    )
+
+    subject.handle_action(UpdateCommandAction(command=command))
+
+    result = subject.state
+
+    assert result.aspirated_volume_by_id["pipette-id"] == 0
+
+    assert result.current_well == CurrentWell(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="well-name",
+    )
+
+
 def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
     """It should subtract volume from pipette after a dispense."""
     load_command = create_load_pipette_command(
@@ -92,10 +116,12 @@ def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
     aspirate_command = create_aspirate_command(
         pipette_id="pipette-id",
         volume=42,
+        flow_rate=1.23,
     )
     dispense_command = create_dispense_command(
         pipette_id="pipette-id",
         volume=21,
+        flow_rate=1.23,
     )
 
     subject.handle_action(UpdateCommandAction(command=load_command))
@@ -122,6 +148,7 @@ def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
                 labware_id="aspirate-labware-id",
                 well_name="aspirate-well-name",
                 volume=1337,
+                flow_rate=1.23,
             ),
             CurrentWell(
                 pipette_id="aspirate-pipette-id",
@@ -135,6 +162,7 @@ def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
                 labware_id="dispense-labware-id",
                 well_name="dispense-well-name",
                 volume=1337,
+                flow_rate=1.23,
             ),
             CurrentWell(
                 pipette_id="dispense-pipette-id",
@@ -171,6 +199,19 @@ def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
                 pipette_id="move-to-well-pipette-id",
                 labware_id="move-to-well-labware-id",
                 well_name="move-to-well-well-name",
+            ),
+            CurrentWell(
+                pipette_id="move-to-well-pipette-id",
+                labware_id="move-to-well-labware-id",
+                well_name="move-to-well-well-name",
+            ),
+        ),
+        (
+            create_blow_out_command(
+                pipette_id="move-to-well-pipette-id",
+                labware_id="move-to-well-labware-id",
+                well_name="move-to-well-well-name",
+                flow_rate=1.23,
             ),
             CurrentWell(
                 pipette_id="move-to-well-pipette-id",

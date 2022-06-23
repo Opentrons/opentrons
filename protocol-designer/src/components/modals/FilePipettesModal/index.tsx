@@ -26,6 +26,8 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   ModuleType,
   ModuleModel,
+  getPipetteNameSpecs,
+  PipetteName,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
@@ -82,6 +84,11 @@ const initialFormState: FormState = {
     right: { pipetteName: '', tiprackDefURI: null },
   },
   modulesByType: {
+    [HEATERSHAKER_MODULE_TYPE]: {
+      onDeck: false,
+      model: HEATERSHAKER_MODULE_V1,
+      slot: '1',
+    },
     [MAGNETIC_MODULE_TYPE]: {
       onDeck: false,
       model: null,
@@ -96,11 +103,6 @@ const initialFormState: FormState = {
       onDeck: false,
       model: THERMOCYCLER_MODULE_V1, // Default to GEN1 for TC only
       slot: SPAN7_8_10_11_SLOT,
-    },
-    [HEATERSHAKER_MODULE_TYPE]: {
-      onDeck: false,
-      model: HEATERSHAKER_MODULE_V1,
-      slot: '1',
     },
   },
 }
@@ -308,10 +310,29 @@ export class FilePipettesModal extends React.Component<Props, State> {
                     values.modulesByType,
                     TEMPERATURE_MODULE_TYPE
                   )
-                  const showCrashInfoBox =
-                    getIsCrashablePipetteSelected(values.pipettesByMount) &&
-                    (hasCrashableMagnetModuleSelected ||
-                      hasCrashableTemperatureModuleSelected)
+                  const hasHeaterShakerSelected = Boolean(
+                    values.modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck
+                  )
+
+                  const showHeaterShakerPipetteCollisions =
+                    hasHeaterShakerSelected &&
+                    [
+                      getPipetteNameSpecs(left.pipetteName as PipetteName),
+                      getPipetteNameSpecs(right.pipetteName as PipetteName),
+                    ].some(
+                      pipetteSpecs =>
+                        pipetteSpecs && pipetteSpecs.channels !== 1
+                    )
+
+                  const crashablePipetteSelected = getIsCrashablePipetteSelected(
+                    values.pipettesByMount
+                  )
+
+                  const showTempPipetteCollisons =
+                    crashablePipetteSelected &&
+                    hasCrashableTemperatureModuleSelected
+                  const showMagPipetteCollisons =
+                    crashablePipetteSelected && hasCrashableMagnetModuleSelected
 
                   return (
                     <>
@@ -381,12 +402,19 @@ export class FilePipettesModal extends React.Component<Props, State> {
                             />
                           </div>
                         )}
-                        {showCrashInfoBox && !moduleRestrictionsDisabled && (
+                        {!moduleRestrictionsDisabled && (
                           <CrashInfoBox
                             showDiagram
-                            magnetOnDeck={hasCrashableMagnetModuleSelected}
-                            temperatureOnDeck={
-                              hasCrashableTemperatureModuleSelected
+                            showMagPipetteCollisons={showMagPipetteCollisons}
+                            showTempPipetteCollisons={showTempPipetteCollisons}
+                            showHeaterShakerLabwareCollisions={
+                              hasHeaterShakerSelected
+                            }
+                            showHeaterShakerModuleCollisions={
+                              hasHeaterShakerSelected
+                            }
+                            showHeaterShakerPipetteCollisions={
+                              showHeaterShakerPipetteCollisions
                             }
                           />
                         )}

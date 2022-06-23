@@ -10,6 +10,8 @@ from .exceptions import (
     LabwareDefinitionDoesNotExistError,
     LabwareOffsetDoesNotExistError,
     LabwareIsNotTipRackError,
+    LabwareIsTipRackError,
+    TouchTipDisabledError,
     WellDoesNotExistError,
     PipetteNotLoadedError,
     PipetteTipInfoNotFoundError,
@@ -32,6 +34,7 @@ from .exceptions import (
     InvalidTargetTemperatureError,
     InvalidBlockVolumeError,
     PauseNotAllowedError,
+    ProtocolCommandFailedError,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -47,6 +50,8 @@ __all__ = [
     "LabwareDefinitionDoesNotExistError",
     "LabwareOffsetDoesNotExistError",
     "LabwareIsNotTipRackError",
+    "LabwareIsTipRackError",
+    "TouchTipDisabledError",
     "WellDoesNotExistError",
     "PipetteNotLoadedError",
     "PipetteTipInfoNotFoundError",
@@ -69,6 +74,7 @@ __all__ = [
     "InvalidTargetSpeedError",
     "InvalidBlockVolumeError",
     "PauseNotAllowedError",
+    "ProtocolCommandFailedError",
     # error occurrence models
     "ErrorOccurrence",
 ]

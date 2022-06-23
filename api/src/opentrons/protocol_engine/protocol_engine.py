@@ -185,7 +185,8 @@ class ProtocolEngine:
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
 
-        This will happen if all commands are executed or if one command fails.
+        Raises:
+            CommandExecutionFailedError: if any protocol command failed.
         """
         await self._state_store.wait_for(
             condition=self._state_store.commands.get_all_complete

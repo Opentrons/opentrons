@@ -38,7 +38,7 @@ def solve_attitude(expected: SolvePoints, actual: SolvePoints) -> AttitudeMatrix
     mask_transform = np.array(
         [[True, True, False], [True, True, False], [False, False, False]]
     )
-    masked_array = np.ma.masked_array(t, ~mask_transform)  # type: ignore[var-annotated, no-untyped-call]  # noqa: E501
+    masked_array = np.ma.masked_array(t, ~mask_transform)  # type: ignore[var-annotated, no-untyped-call]
 
     no_z_component = np.zeros((3, 3))
     np.put(no_z_component, [8, 8], 1)
