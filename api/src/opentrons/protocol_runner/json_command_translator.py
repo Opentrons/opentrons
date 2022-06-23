@@ -39,7 +39,8 @@ def _translate_labware_command(
                 LabwareLocation,  # type: ignore[arg-type]
                 command.params.location,
             ),
-        )
+        ),
+        key=command.key
     )
     return labware_command
 
@@ -58,7 +59,8 @@ def _translate_module_command(
             model=ModuleModel(modules[module_id].model),
             location=DeckSlotLocation.parse_obj(command.params.location),
             moduleId=command.params.moduleId,
-        )
+        ),
+        key=command.key
     )
     return translated_obj
 
@@ -75,7 +77,8 @@ def _translate_pipette_command(
             pipetteName=PipetteName(protocol.pipettes[pipette_id].name),
             mount=MountType(command.params.mount),
             pipetteId=command.params.pipetteId,
-        )
+        ),
+        key=command.key
     )
     return translated_obj
 
@@ -83,7 +86,8 @@ def _translate_pipette_command(
 def _translate_simple_command(
     command: protocol_schema_v6.Command,
 ) -> pe_commands.CommandCreate:
-    dict_command = command.dict(exclude_none=True)
+    # TODO (tz, 6-23-22): removed exclude_none=True
+    dict_command = command.dict()
 
     # map deprecated `delay` commands to `waitForResume` / `waitForDuration`
     if dict_command["commandType"] == "delay":
