@@ -55,8 +55,8 @@ import {
   useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
-import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
-import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
+import { useIsHeaterShakerInProtocol } from '../../../ModuleCard/hooks'
+import { ConfirmAttachmentModal } from '../../../ModuleCard/ConfirmAttachmentModal'
 import { formatTimestamp } from '../../utils'
 import { ProtocolRunHeader } from '../ProtocolRunHeader'
 import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
@@ -87,8 +87,8 @@ jest.mock('../../../../organisms/RunDetails/ConfirmCancelModal')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../hooks')
 jest.mock('../../HeaterShakerIsRunningModal')
-jest.mock('../../ModuleCard/ConfirmAttachmentModal')
-jest.mock('../../ModuleCard/hooks')
+jest.mock('../../../ModuleCard/ConfirmAttachmentModal')
+jest.mock('../../../ModuleCard/hooks')
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
 

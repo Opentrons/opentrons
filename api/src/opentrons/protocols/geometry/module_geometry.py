@@ -17,6 +17,10 @@ from opentrons import types
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 
 from opentrons_shared_data import module
+from opentrons_shared_data.labware.dev_types import LabwareUri
+
+from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
+
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
@@ -127,6 +131,8 @@ class ModuleGeometry(DeckItem):
         self._api_version = api_level
         self._parent = parent
         self._module_type = module_type
+
+        # Note (spp, 2022-05-23): I think this should say '{display_name} on {slot}'
         self._display_name = "{} on {}".format(display_name, str(parent.labware))
         self._model = model
         self._offset = offset
@@ -328,6 +334,68 @@ class ThermocyclerGeometry(ModuleGeometry):
             )
 
 
+class HeaterShakerGeometry(ModuleGeometry):
+    """Class holding the state of a heater-shaker's physical geometry."""
+
+    # TODO(mc, 2022-06-16): move these constants to the module definition
+    MAX_X_ADJACENT_ITEM_HEIGHT = 53.0
+    """Maximum height of an adjacent item in the x-direction.
+
+    This value selected to avoid interference
+    with the heater-shaker's labware latch.
+
+    For background, see: https://github.com/Opentrons/opentrons/issues/10316
+    """
+
+    ALLOWED_ADJACENT_TALL_LABWARE = [
+        LabwareUri("opentrons/opentrons_96_filtertiprack_10ul/1"),
+        LabwareUri("opentrons/opentrons_96_filtertiprack_200ul/1"),
+        LabwareUri("opentrons/opentrons_96_filtertiprack_20ul/1"),
+        LabwareUri("opentrons/opentrons_96_tiprack_10ul/1"),
+        LabwareUri("opentrons/opentrons_96_tiprack_20ul/1"),
+        LabwareUri("opentrons/opentrons_96_tiprack_300ul/1"),
+    ]
+    """URI's of labware that are allowed to exceed the height limit above.
+
+    These labware do not take up the full with of the slot
+    in the area that would interfere with the labware latch.
+
+    For background, see: https://github.com/Opentrons/opentrons/issues/10316
+    """
+
+    def __init__(
+        self,
+        display_name: str,
+        model: ModuleModel,
+        module_type: ModuleType,
+        offset: Point,
+        overall_height: float,
+        height_over_labware: float,
+        parent: Location,
+        api_level: APIVersion,
+    ) -> None:
+        """Heater-Shaker geometry constructor. Inherits from ModuleGeometry."""
+        super().__init__(
+            display_name,
+            model,
+            module_type,
+            offset,
+            overall_height,
+            height_over_labware,
+            parent,
+            api_level,
+        )
+        self._latch_status = HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN
+
+    @property
+    def latch_status(self) -> HeaterShakerLabwareLatchStatus:
+        return self._latch_status
+
+    @latch_status.setter
+    def latch_status(self, status: HeaterShakerLabwareLatchStatus) -> None:
+        self._latch_status = status
+
+
 def _load_from_v1(
     definition: "ModuleDefinitionV1", parent: Location, api_level: APIVersion
 ) -> ModuleGeometry:
@@ -444,6 +512,17 @@ def _load_from_v3(
             display_name=definition["displayName"],
             lid_height=definition["dimensions"]["lidHeight"],
             configuration=configuration,
+        )
+    elif definition["moduleType"] == ModuleType.HEATER_SHAKER.value:
+        return HeaterShakerGeometry(
+            parent=parent,
+            api_level=api_level,
+            offset=Point(xformed[0], xformed[1], definition["labwareOffset"]["z"]),
+            overall_height=definition["dimensions"]["bareOverallHeight"],
+            height_over_labware=definition["dimensions"]["overLabwareHeight"],
+            model=module_model_from_string(definition["model"]),
+            module_type=ModuleType(definition["moduleType"]),
+            display_name=definition["displayName"],
         )
     else:
         raise RuntimeError(f'Unknown module type {definition["moduleType"]}')
@@ -609,6 +688,7 @@ def resolve_module_model(module_model_or_load_name: str) -> ModuleModel:
         "temperatureModuleV2": TemperatureModuleModel.TEMPERATURE_V2,
         "thermocyclerModuleV1": ThermocyclerModuleModel.THERMOCYCLER_V1,
         "thermocyclerModuleV2": ThermocyclerModuleModel.THERMOCYCLER_V2,
+        "heaterShakerModuleV1": HeaterShakerModuleModel.HEATER_SHAKER_V1,
     }
 
     alias_map: Mapping[str, ModuleModel] = {
@@ -621,6 +701,7 @@ def resolve_module_model(module_model_or_load_name: str) -> ModuleModel:
         "thermocycler": ThermocyclerModuleModel.THERMOCYCLER_V1,
         "thermocycler module": ThermocyclerModuleModel.THERMOCYCLER_V1,
         "thermocycler module gen2": ThermocyclerModuleModel.THERMOCYCLER_V2,
+        # No alias for heater-shaker. Use heater-shaker model name for loading.
     }
 
     lower_name = module_model_or_load_name.lower()

@@ -108,17 +108,15 @@ def prompt_message(
 ) -> Tuple[SensorRun, bool]:
     """A list of all the information required to perform an initial sensor test."""
     sensor_type = prompt_sensor_type(get_user_input, output_func)
-    pipette_serial_number = prompt_str_input("pipette serial number", get_user_input)
-    pipette_mount = prompt_str_input(
-        'pipette_mount if on robot, "left" or "right"', get_user_input
+    mount = prompt_str_input(
+        'pipette mounts:"left" or "right", gripper mount: "gripper"', get_user_input
     )
+    serial_number = prompt_str_input("instrument serial number", get_user_input)
     auto_zero = prompt_int_input("auto zero", get_user_input)
     minutes = prompt_int_input("script run time in minutes", get_user_input)
     output_to_csv = bool(prompt_int_input("output to csv?", get_user_input))
 
-    sensor_run = SensorRun(
-        sensor_type, pipette_serial_number, bool(auto_zero), minutes, pipette_mount
-    )
+    sensor_run = SensorRun(sensor_type, serial_number, bool(auto_zero), minutes, mount)
     return sensor_run, output_to_csv
 
 
@@ -126,12 +124,14 @@ async def send_sensor_command(
     driver: AbstractCanDriver, command: SensorRun, csv: bool
 ) -> None:
     """Perform the specified sensor test located in utils.py."""
-    if command.pipette_mount == "left":
+    if command.mount == "left":
         node = NodeId.pipette_left
-    elif command.pipette_mount == "right":
+    elif command.mount == "right":
         node = NodeId.pipette_right
+    elif command.mount == "gripper":
+        node = NodeId.gripper
     else:
-        node = NodeId.pipette_right
+        node = NodeId.broadcast
     if command.sensor_type == SensorType.pressure:
         await handle_pressure_sensor(command, driver, node, csv, log)
     elif command.sensor_type == SensorType.capacitive:

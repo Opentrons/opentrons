@@ -49,10 +49,10 @@
       "title": "Missing labware",
       "body": "Your module has no labware on it. We recommend you add labware before proceeding."
     },
-    "export_v6_protocol_5_10": {
+    "export_v6_protocol_6_10": {
       "title": "Robot and app update may be required",
-      "body1": "This protocol uses settings that can only run on app and robot server version",
-      "body2": "5.1 or higher",
+      "body1": "This protocol can only run on app and robot server version",
+      "body2": "6.1 or higher",
       "body3": ". Please ensure your OT-2 is updated to the correct version."
     },
     "change_magnet_module_model": {
@@ -135,6 +135,10 @@
       "HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL": {
         "title": "8-Channel pipette cannot access labware",
         "body": "8-Channel pipettes cannot access labware or tip racks to the left or right of a Heater-Shaker GEN1 module. Move labware to a different slot to access it with an 8-Channel pipette."
+      },
+      "HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL": {
+        "title": "8-Channel pipette cannot access labware",
+        "body": "8-Channel pipettes cannot access labware in front of or behind a Heater-Shaker. They can access Opentrons Tip Racks in this slot. Move labware to a different slot."
       }
     },
     "warning": {
@@ -198,5 +202,17 @@
       "body1": "The {{modulesDetails}} specified in your protocol are not currently used in any step. In order to run this protocol you will need to power up and connect the modules to your robot.",
       "body2": "If you don't intend to use these modules, please consider removing them from your protocol."
     }
+  },
+  "crash": {
+    "eight_channel": "8-Channel",
+    "pipettes_east_west": "pipettes cannot access slots to the left or right of a",
+    "labware_east_west": "can be placed to the left or right of a",
+    "pipettes_can_access_north_south": "pipettes can only access slots in front of or behind a",
+    "pipettes_cannot_access_north_south": "pipettes cannot access slots in front of or behind a",
+    "modules_north_south": "No modules can be placed in front of or behind a",
+    "slot_has_tiprack": "if that slot contains a tip rack.",
+    "read_more_here": "Read more here",
+    "no_labware_over": "No labware over",
+    "latch_collision": "due to risk of collision with the labware latch."
   }
 }

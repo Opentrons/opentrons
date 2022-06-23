@@ -37,8 +37,9 @@ labware_sources = $(wildcard ../labware/definitions/*/*.json) $(wildcard ../labw
 module_sources = $(wildcard ../module/definitions/*.json) $(wildcard ../module/definitions/*/*.json) $(wildcard ../module/schemas/*.json)
 pipette_sources = $(wildcard ../pipette/definitions/*.json) $(wildcard ../pipette/schemas/*.json)
 protocol_sources = $(wildcard ../protocol/schemas/*.json)
+gripper_sources = $(wildcard ../gripper/definitions/*.json) $(wildcard ../gripper/schemas/*.json)
 
-json_sources = $(deck_sources) $(labware_sources) $(module_sources) $(pipette_sources) $(protocol_sources)
+json_sources = $(deck_sources) $(labware_sources) $(module_sources) $(pipette_sources) $(protocol_sources) $(gripper_sources)
 
 
 

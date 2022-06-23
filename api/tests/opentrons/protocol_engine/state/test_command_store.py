@@ -80,6 +80,7 @@ class QueueCommandSpec(NamedTuple):
                     labwareId="labware-id",
                     wellName="well-name",
                     volume=42,
+                    flowRate=1.23,
                     wellLocation=WellLocation(),
                 ),
             ),
@@ -92,6 +93,7 @@ class QueueCommandSpec(NamedTuple):
                     labwareId="labware-id",
                     wellName="well-name",
                     volume=42,
+                    flowRate=1.23,
                     wellLocation=WellLocation(),
                 )
             ),
@@ -148,10 +150,19 @@ class QueueCommandSpec(NamedTuple):
             expected_cls=commands.MoveToWell,
         ),
         QueueCommandSpec(
-            command_request=commands.PauseCreate(
-                params=commands.PauseParams(message="hello world"),
+            command_request=commands.WaitForResumeCreate(
+                params=commands.WaitForResumeParams(message="hello world"),
             ),
-            expected_cls=commands.Pause,
+            expected_cls=commands.WaitForResume,
+        ),
+        QueueCommandSpec(
+            # a WaitForResumeCreate with `pause` should be mapped to
+            # a WaitForResume with `commandType="waitForResume"`
+            command_request=commands.WaitForResumeCreate(
+                commandType="pause",
+                params=commands.WaitForResumeParams(message="hello world"),
+            ),
+            expected_cls=commands.WaitForResume,
         ),
     ],
 )
@@ -190,13 +201,13 @@ def test_command_store_queues_commands(
 def test_command_queue_and_unqueue() -> None:
     """It should queue on QueueCommandAction and dequeue on UpdateCommandAction."""
     queue_1 = QueueCommandAction(
-        request=commands.PauseCreate(params=commands.PauseParams()),
+        request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
         command_key="command-key-1",
     )
     queue_2 = QueueCommandAction(
-        request=commands.PauseCreate(params=commands.PauseParams()),
+        request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
         created_at=datetime(year=2022, month=2, day=2),
         command_id="command-id-2",
         command_key="command-key-2",
@@ -228,8 +239,8 @@ def test_command_queue_and_unqueue() -> None:
 def test_setup_command_queue_and_unqueue() -> None:
     """It should queue and dequeue on setup commands."""
     queue_1 = QueueCommandAction(
-        request=commands.PauseCreate(
-            params=commands.PauseParams(),
+        request=commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
         ),
         created_at=datetime(year=2021, month=1, day=1),
@@ -237,8 +248,8 @@ def test_setup_command_queue_and_unqueue() -> None:
         command_key="command-key-1",
     )
     queue_2 = QueueCommandAction(
-        request=commands.PauseCreate(
-            params=commands.PauseParams(),
+        request=commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
         ),
         created_at=datetime(year=2022, month=2, day=2),
@@ -272,8 +283,8 @@ def test_setup_command_queue_and_unqueue() -> None:
 def test_setup_queue_action_updates_command_intent() -> None:
     """It should update command source correctly."""
     queue_cmd = QueueCommandAction(
-        request=commands.PauseCreate(
-            params=commands.PauseParams(),
+        request=commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
         ),
         created_at=datetime(year=2021, month=1, day=1),
@@ -281,11 +292,11 @@ def test_setup_queue_action_updates_command_intent() -> None:
         command_key="command-key-1",
     )
 
-    expected_pause_cmd = commands.Pause(
+    expected_pause_cmd = commands.WaitForResume(
         id="command-id-1",
         key="command-key-1",
         createdAt=datetime(year=2021, month=1, day=1),
-        params=commands.PauseParams(),
+        params=commands.WaitForResumeParams(),
         status=commands.CommandStatus.QUEUED,
         intent=commands.CommandIntent.SETUP,
     )
@@ -301,7 +312,7 @@ def test_setup_queue_action_updates_command_intent() -> None:
 def test_running_command_id() -> None:
     """It should update the running command ID through a command's lifecycle."""
     queue = QueueCommandAction(
-        request=commands.PauseCreate(params=commands.PauseParams()),
+        request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
         command_key="command-key-1",
@@ -348,24 +359,24 @@ def test_running_command_no_queue() -> None:
 def test_command_failure_clears_queues() -> None:
     """It should clear the command queue on command failure."""
     queue_1 = QueueCommandAction(
-        request=commands.PauseCreate(params=commands.PauseParams()),
+        request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
         command_key="command-key-1",
     )
     queue_2 = QueueCommandAction(
-        request=commands.PauseCreate(params=commands.PauseParams()),
+        request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-2",
         command_key="command-key-2",
     )
     running_1 = UpdateCommandAction(
-        command=commands.Pause(
+        command=commands.WaitForResume(
             id="command-id-1",
             key="command-key-1",
             createdAt=datetime(year=2021, month=1, day=1),
             startedAt=datetime(year=2022, month=2, day=2),
-            params=commands.PauseParams(),
+            params=commands.WaitForResumeParams(),
             status=commands.CommandStatus.RUNNING,
         )
     )
@@ -376,7 +387,7 @@ def test_command_failure_clears_queues() -> None:
         error=errors.ProtocolEngineError("oh no"),
     )
 
-    expected_failed_1 = commands.Pause(
+    expected_failed_1 = commands.WaitForResume(
         id="command-id-1",
         key="command-key-1",
         error=errors.ErrorOccurrence(
@@ -388,16 +399,16 @@ def test_command_failure_clears_queues() -> None:
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
         completedAt=datetime(year=2023, month=3, day=3),
-        params=commands.PauseParams(),
+        params=commands.WaitForResumeParams(),
         status=commands.CommandStatus.FAILED,
     )
-    expected_failed_2 = commands.Pause(
+    expected_failed_2 = commands.WaitForResume(
         id="command-id-2",
         key="command-key-2",
         error=None,
         createdAt=datetime(year=2021, month=1, day=1),
         completedAt=datetime(year=2023, month=3, day=3),
-        params=commands.PauseParams(),
+        params=commands.WaitForResumeParams(),
         status=commands.CommandStatus.FAILED,
     )
 
@@ -423,22 +434,22 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
     This test queues up a non-setup command followed by two setup commands,
     then attempts to run and fail the first setup command and
     """
-    cmd_1_non_setup = commands.Pause(
+    cmd_1_non_setup = commands.WaitForResume(
         id="command-id-1",
         key="command-key-1",
         createdAt=datetime(year=2021, month=1, day=1),
-        params=commands.PauseParams(),
+        params=commands.WaitForResumeParams(),
         status=commands.CommandStatus.QUEUED,
     )
     queue_action_1_non_setup = QueueCommandAction(
-        request=commands.PauseCreate(params=cmd_1_non_setup.params),
+        request=commands.WaitForResumeCreate(params=cmd_1_non_setup.params),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
         command_key="command-key-1",
     )
     queue_action_2_setup = QueueCommandAction(
-        request=commands.PauseCreate(
-            params=commands.PauseParams(),
+        request=commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
         ),
         created_at=datetime(year=2021, month=1, day=1),
@@ -446,8 +457,8 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         command_key="command-key-2",
     )
     queue_action_3_setup = QueueCommandAction(
-        request=commands.PauseCreate(
-            params=commands.PauseParams(),
+        request=commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
         ),
         created_at=datetime(year=2021, month=1, day=1),
@@ -456,12 +467,12 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
     )
 
     running_cmd_2 = UpdateCommandAction(
-        command=commands.Pause(
+        command=commands.WaitForResume(
             id="command-id-2",
             key="command-key-2",
             createdAt=datetime(year=2021, month=1, day=1),
             startedAt=datetime(year=2022, month=2, day=2),
-            params=commands.PauseParams(),
+            params=commands.WaitForResumeParams(),
             status=commands.CommandStatus.RUNNING,
             intent=commands.CommandIntent.SETUP,
         )
@@ -472,7 +483,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         failed_at=datetime(year=2023, month=3, day=3),
         error=errors.ProtocolEngineError("oh no"),
     )
-    expected_failed_cmd_2 = commands.Pause(
+    expected_failed_cmd_2 = commands.WaitForResume(
         id="command-id-2",
         key="command-key-2",
         error=errors.ErrorOccurrence(
@@ -484,17 +495,17 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
         completedAt=datetime(year=2023, month=3, day=3),
-        params=commands.PauseParams(),
+        params=commands.WaitForResumeParams(),
         status=commands.CommandStatus.FAILED,
         intent=commands.CommandIntent.SETUP,
     )
-    expected_failed_cmd_3 = commands.Pause(
+    expected_failed_cmd_3 = commands.WaitForResume(
         id="command-id-3",
         key="command-key-3",
         error=None,
         createdAt=datetime(year=2021, month=1, day=1),
         completedAt=datetime(year=2023, month=3, day=3),
-        params=commands.PauseParams(),
+        params=commands.WaitForResumeParams(),
         status=commands.CommandStatus.FAILED,
         intent=commands.CommandIntent.SETUP,
     )

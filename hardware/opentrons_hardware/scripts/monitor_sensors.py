@@ -28,11 +28,13 @@ async def do_run(
     callback: WaitableCallback,
     target_node: constants.NodeId,
     target_sensor: constants.SensorType,
+    sensor_id: constants.SensorId,
     threshold: float,
 ) -> None:
     """Configure and start the monitoring."""
     threshold_payload = payloads.SetSensorThresholdRequestPayload(
         sensor=fields.SensorTypeField(constants.SensorType.capacitive),
+        sensor_id=fields.SensorIdField(sensor_id),
         threshold=Int32Field(int(threshold * sensor_fixed_point_conversion)),
         mode=fields.SensorThresholdModeField(constants.SensorThresholdMode.absolute),
     )
@@ -42,11 +44,13 @@ async def do_run(
     await messenger.send(target_node, threshold_message)
     stim_payload = payloads.BindSensorOutputRequestPayload(
         sensor=fields.SensorTypeField(target_sensor.value),
+        sensor_id=fields.SensorIdField(sensor_id),
         binding=fields.SensorOutputBindingField(3),
     )
     stim_message = message_definitions.BindSensorOutputRequest(payload=stim_payload)
     reset_payload = payloads.BindSensorOutputRequestPayload(
         sensor=fields.SensorTypeField(target_sensor.value),
+        sensor_id=fields.SensorIdField(sensor_id),
         binding=fields.SensorOutputBindingField(0),
     )
     reset_message = message_definitions.BindSensorOutputRequest(payload=reset_payload)
@@ -68,12 +72,18 @@ async def do_run(
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    target = constants.NodeId["pipette_" + args.mount]
+    if args.mount == "gripper":
+        target = constants.NodeId["gripper"]
+    else:
+        target = constants.NodeId["pipette_" + args.mount]
     sensor = constants.SensorType[args.sensor]
+    sensor_id = constants.SensorId[args.id]
 
     async with build.can_messenger(build_settings(args)) as messenger:
         with WaitableCallback(messenger) as reader:
-            return await do_run(messenger, reader, target, sensor, args.threshold)
+            return await do_run(
+                messenger, reader, target, sensor, sensor_id, args.threshold
+            )
 
 
 def main() -> None:
@@ -84,7 +94,7 @@ def main() -> None:
         "-m",
         "--mount",
         type=str,
-        choices=["left", "right"],
+        choices=["left", "right", "gripper"],
         help="which mount",
         default="right",
     )
@@ -95,6 +105,14 @@ def main() -> None:
         choices=["capacitive"],
         help="which sensor",
         default="capacitive",
+    )
+    parser.add_argument(
+        "-i",
+        "--id",
+        type=str,
+        choices=["S0", "S1"],
+        help="sensor id",
+        default="S0",
     )
     parser.add_argument(
         "-t", "--threshold", type=float, help="sensor threshold", default=50
