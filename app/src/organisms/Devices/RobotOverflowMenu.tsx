@@ -10,9 +10,9 @@ import {
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
-  SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
+
 import { CONNECTABLE, removeRobot } from '../../redux/discovery'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
@@ -137,8 +137,8 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
               boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
               position={POSITION_ABSOLUTE}
               backgroundColor={COLORS.white}
-              top="2.6rem"
-              right={`calc(50% + ${SPACING.spacing2})`}
+              top="2.25rem"
+              right="0"
               flexDirection={DIRECTION_COLUMN}
               id={`RobotOverflowMenu_${robot.name}_buttons`}
             >
