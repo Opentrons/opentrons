@@ -20,12 +20,12 @@ import { RunDetails } from '..'
 import { i18n } from '../../../i18n'
 import { CommandList } from '../CommandList'
 import { useProtocolDetails } from '../hooks'
+import { useProtocolRunAnalyticsData } from '../../Devices/hooks'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import {
   useCurrentRunStatus,
   useCurrentRunControls,
   useRunControls,
-  useRunTimestamps,
 } from '../../RunTimeControl/hooks'
 import {
   useCloseCurrentRun,
@@ -35,6 +35,8 @@ import {
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 const mockPush = jest.fn()
+
+jest.mock('@opentrons/react-api-client')
 
 jest.mock('../hooks')
 jest.mock('../CommandList')
@@ -65,8 +67,8 @@ const mockUseCurrentRunControls = useCurrentRunControls as jest.MockedFunction<
 const mockUseRunControls = useRunControls as jest.MockedFunction<
   typeof useRunControls
 >
-const mockUseRunTimestamps = useRunTimestamps as jest.MockedFunction<
-  typeof useRunTimestamps
+const mockUseProtocolRunAnalyticsData = useProtocolRunAnalyticsData as jest.MockedFunction<
+  typeof useProtocolRunAnalyticsData
 >
 const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
   typeof useCloseCurrentRun
@@ -96,10 +98,12 @@ const render = () => {
 }
 
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
-const STARTED_AT = '2022-03-03T19:09:40.620530+00:00'
+let mockGetProtocolRunAnalyticsData: jest.Mock
 
 describe('RunDetails', () => {
   beforeEach(() => {
+    mockGetProtocolRunAnalyticsData = jest.fn()
+
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
       protocolData: simpleV6Protocol,
       displayName: 'mock display name',
@@ -111,11 +115,8 @@ describe('RunDetails', () => {
         isClosingCurrentRun: false,
         closeCurrentRun: jest.fn(),
       } as any)
-    when(mockUseRunTimestamps).calledWith(RUN_ID).mockReturnValue({
-      startedAt: STARTED_AT,
-      pausedAt: null,
-      stoppedAt: null,
-      completedAt: null,
+    when(mockUseProtocolRunAnalyticsData).calledWith(RUN_ID).mockReturnValue({
+      getProtocolRunAnalyticsData: mockGetProtocolRunAnalyticsData,
     })
     when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(true)
     when(mockUseCurrentRunControls).calledWith().mockReturnValue({
@@ -144,6 +145,7 @@ describe('RunDetails', () => {
 
   afterEach(() => {
     resetAllWhenMocks()
+    jest.restoreAllMocks()
   })
 
   it('pushes the /robots route if we somehow land on this page without a connected robot', () => {
