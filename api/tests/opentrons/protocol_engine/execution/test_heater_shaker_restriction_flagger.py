@@ -280,3 +280,34 @@ async def test_raises_multi_channel_on_restricted_movement(
         await subject.raise_if_movement_restricted(
             labware_id="labware-id", pipette_id="pipette-id"
         )
+
+
+async def test_raises_if_hardware_module_has_gone_missing(
+    subject: HeaterShakerMovementFlagger,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    decoy: Decoy,
+) -> None:
+    """It should raise if the hardware module can't be found by its serial no."""
+    decoy.when(state_store.modules.get_all()).then_return(
+        [
+            LoadedModule(
+                id="module-id",
+                model=PEModuleModel.HEATER_SHAKER_MODULE_V1,
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+                serialNumber="serial-number",
+            )
+        ]
+    )
+
+    decoy.when(
+        await hardware_api.find_modules(
+            by_model=OpentronsHeaterShakerModuleModel.HEATER_SHAKER_V1,
+            resolved_type=OpentronsModuleType.HEATER_SHAKER,
+        )
+    ).then_return(([], None))
+
+    with pytest.raises(HeaterShakerMovementRestrictionError):
+        await subject.raise_if_movement_restricted(
+            labware_id="labware-id", pipette_id="pipette-id"
+        )

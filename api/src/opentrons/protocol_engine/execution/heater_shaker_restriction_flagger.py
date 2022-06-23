@@ -62,8 +62,9 @@ class HeaterShakerMovementFlagger:
                 heater_shaker_module.serialNumber
             )
             if heater_shaker_hardware is None:
-                raise self._HardwareHeaterShakerMissingError(
-                    f'No Heater Shaker found with serial number "{heater_shaker_module.serialNumber}".'
+                raise HeaterShakerMovementRestrictionError(
+                    f"Cannot resolve heater-shaker movement restrictions."
+                    f' No Heater Shaker found with serial number "{heater_shaker_module.serialNumber}".'
                 )
 
             heater_shaker_slot_int = int(self._resolve_location(heater_shaker_module))
@@ -172,6 +173,3 @@ class HeaterShakerMovementFlagger:
             return [location - 3, location + 3]
         else:
             return [location - 3]
-
-    class _HardwareHeaterShakerMissingError(Exception):
-        pass
