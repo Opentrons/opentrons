@@ -76,7 +76,7 @@ export const LiquidsLabwareDetailsModal = (
             css={HIDE_SCROLLBAR}
             maxHeight={'27.125rem'}
             overflowY={'auto'}
-            minWidth="165px"
+            minWidth={'10.313rem'}
           >
             {Object.entries(labwareInfo).map((entry, index) => {
               const liquidInfo = liquids.find(
@@ -130,7 +130,7 @@ export const LiquidsLabwareDetailsModal = (
                 </StyledText>
               </Flex>
             </Flex>
-            <Box width="490px">
+            <Box width={'30.625rem'}>
               <svg viewBox="0 -10 130 100" transform="scale(1, -1)">
                 <LabwareRender
                   definition={labwareRenderInfo.labwareDef}
