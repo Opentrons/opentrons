@@ -1,6 +1,7 @@
 import { hash } from '../../../redux/analytics/hash'
 import { useStoredProtocolAnalysis } from './useStoredProtocolAnalysis'
 import { useProtocolDetailsForRun } from './useProtocolDetailsForRun'
+import { useProtocolMetadata } from '../../ProtocolSetup/hooks'
 import { useRunTimestamps } from '../../RunTimeControl/hooks'
 import { formatInterval } from '../../RunTimeControl/utils'
 import { EMPTY_TIMESTAMP } from '../constants'
@@ -24,16 +25,16 @@ export function useProtocolRunAnalyticsData(
 ): {
   getProtocolRunAnalyticsData: GetProtocolRunAnalyticsData
 } {
-  const {
-    protocolData: robotProtocolAnalysis,
-    protocolMetadata,
-  } = useProtocolDetailsForRun(runId)
+  const robotProtocolMetadata = useProtocolMetadata()
+  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
+    runId
+  )
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis =
     robotProtocolAnalysis != null
       ? {
           ...robotProtocolAnalysis,
-          metadata: protocolMetadata,
+          metadata: robotProtocolMetadata,
           config: storedProtocolAnalysis?.config,
         }
       : storedProtocolAnalysis
