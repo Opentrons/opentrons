@@ -101,6 +101,7 @@ class MultiChannelLocationAndLabwareStatus(NamedTuple):
     Destination slot name, if labware is tiprack, and what
     we expect the subject to raise when it finds
     """
+
     slot_name: DeckSlotName
     is_tiprack: bool
     expected_raise_cm: ContextManager[Any]
