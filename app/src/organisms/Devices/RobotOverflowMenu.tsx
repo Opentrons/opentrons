@@ -54,7 +54,6 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    setShowOverflowMenu(false)
     setShowChooseProtocolSlideout(true)
   }
   const handleClickConnectionTroubleshooting: React.MouseEventHandler<HTMLButtonElement> = e => {
