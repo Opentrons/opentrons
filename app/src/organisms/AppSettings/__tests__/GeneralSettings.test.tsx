@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
+import { getAlertIsPermanentlyIgnored } from '../../../redux/alerts'
 import * as Shell from '../../../redux/shell'
 import { GeneralSettings } from '../GeneralSettings'
 
@@ -16,6 +18,9 @@ jest.mock('../../UpdateAppModal', () => ({
 
 const getAvailableShellUpdate = Shell.getAvailableShellUpdate as jest.MockedFunction<
   typeof Shell.getAvailableShellUpdate
+>
+const mockGetAlertIsPermanentlyIgnored = getAlertIsPermanentlyIgnored as jest.MockedFunction<
+  typeof getAlertIsPermanentlyIgnored
 >
 
 const render = () => {
@@ -32,6 +37,7 @@ const render = () => {
 describe('GeneralSettings', () => {
   beforeEach(() => {
     getAvailableShellUpdate.mockReturnValue(null)
+    mockGetAlertIsPermanentlyIgnored.mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -65,6 +71,16 @@ describe('GeneralSettings', () => {
     getAvailableShellUpdate.mockReturnValue('5.0.0-beta.8')
     const [{ getByRole }] = render()
     getByRole('button', { name: 'View software update' })
+  })
+
+  it('renders correct info if there is no update available', () => {
+    expect(screen.queryByText('View software update')).toBeNull()
+  })
+
+  it('renders correct info if there is update available but alert ignored enabled', () => {
+    getAvailableShellUpdate.mockReturnValue('5.0.0-beta.8')
+    mockGetAlertIsPermanentlyIgnored.mockReturnValue(true)
+    expect(screen.queryByText('View software update')).toBeNull()
   })
 
   it('renders the text and toggle for update alert section', () => {

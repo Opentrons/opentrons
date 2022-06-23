@@ -49,6 +49,7 @@ export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
+  box-shadow: 0 0 0;
   ${TYPOGRAPHY.pSemiBold}
 
   ${styleProps}
@@ -60,6 +61,7 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   line-height: ${TYPOGRAPHY.lineHeight20};
   text-transform: ${TYPOGRAPHY.textTransformNone};
+  box-shadow: 0 0 0;
   ${TYPOGRAPHY.pSemiBold}
 
   ${styleProps}

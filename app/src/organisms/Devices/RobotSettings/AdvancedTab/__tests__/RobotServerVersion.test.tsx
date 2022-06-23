@@ -6,7 +6,7 @@ import { i18n } from '../../../../../i18n'
 import { getRobotApiVersion } from '../../../../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../../../../redux/buildroot'
 import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
-import { useIsRobotBusy, useRobot } from '../../../hooks'
+import { useRobot } from '../../../hooks'
 import { UpdateBuildroot } from '../../UpdateBuildroot'
 import { RobotServerVersion } from '../RobotServerVersion'
 
@@ -24,9 +24,6 @@ const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.
 
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
->
 const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
   typeof UpdateBuildroot
 >
@@ -44,7 +41,6 @@ const render = () => {
 describe('RobotSettings RobotServerVersion', () => {
   beforeEach(() => {
     mockUpdateBuildroot.mockReturnValue(<div>mock update buildroot</div>)
-    mockUseIsRobotBusy.mockReturnValue(false)
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: 'reinstall',
