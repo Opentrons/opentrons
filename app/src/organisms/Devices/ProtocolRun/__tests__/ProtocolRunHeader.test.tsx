@@ -51,7 +51,7 @@ import { getIsHeaterShakerAttached } from '../../../../redux/config'
 import {
   useProtocolDetailsForRun,
   useProtocolAnalysisErrors,
-  useProtocolRunAnalyticsData,
+  useTrackProtocolRunEvent,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
@@ -115,8 +115,8 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
 >
-const mockUseProtocolRunAnalyticsData = useProtocolRunAnalyticsData as jest.MockedFunction<
-  typeof useProtocolRunAnalyticsData
+const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
+  typeof useTrackProtocolRunEvent
 >
 const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFunction<
   typeof useProtocolAnalysisErrors
@@ -210,13 +210,13 @@ const render = () => {
 }
 let mockTrackEvent: jest.Mock
 let mockCloseCurrentRun: jest.Mock
-let mockGetProtocolRunAnalyticsData: jest.Mock
+let mockTrackProtocolRunEvent: jest.Mock
 
 describe('ProtocolRunHeader', () => {
   beforeEach(() => {
     mockTrackEvent = jest.fn()
+    mockTrackProtocolRunEvent = jest.fn()
     mockCloseCurrentRun = jest.fn()
-    mockGetProtocolRunAnalyticsData = jest.fn()
 
     when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
     mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
@@ -283,8 +283,8 @@ describe('ProtocolRunHeader', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue(PROTOCOL_DETAILS)
-    when(mockUseProtocolRunAnalyticsData).calledWith(RUN_ID).mockReturnValue({
-      getProtocolRunAnalyticsData: mockGetProtocolRunAnalyticsData,
+    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
+      trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)

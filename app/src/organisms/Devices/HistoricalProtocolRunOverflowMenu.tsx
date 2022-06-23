@@ -123,8 +123,11 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
     reset()
 
-    // eslint-disable-next-line no-void
-    void trackProtocolRunEvent({ name: 'runAgain', properties: {} })
+    trackProtocolRunEvent({ name: 'runAgain', properties: {} }).catch(e =>
+      console.log(
+        `Error tracking protocol run runAgain event: ${(e as Error).message}`
+      )
+    )
   }
 
   const handleDeleteClick: React.MouseEventHandler<HTMLButtonElement> = e => {
