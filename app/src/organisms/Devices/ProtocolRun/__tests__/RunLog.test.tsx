@@ -25,7 +25,7 @@ import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 import type { RunTimestamps } from '../../../../organisms/RunTimeControl/hooks'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../organisms/Labware/helpers/getAllDefs')
+jest.mock('../../../../pages/Labware/helpers/getAllDefs')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../DownloadRunLogToast')
 jest.mock('../../hooks')

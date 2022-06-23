@@ -19,8 +19,8 @@ beforeEach(() => {
     wait: true,
   }
 })
-describe('delay indefinitely', () => {
-  it('...', () => {
+describe('delay', () => {
+  it('should delay until the user clicks resume', () => {
     const robotInitialState = getRobotInitialState()
     const message = 'delay indefinitely message'
     const result = delay(
@@ -33,15 +33,14 @@ describe('delay indefinitely', () => {
       {
         commandType: 'delay',
         params: {
-          wait: true,
+          waitForResume: true,
           message,
         },
       },
     ])
   })
-})
-describe('delay for a given time', () => {
-  it('...', () => {
+
+  it('should delay for a given duration', () => {
     const robotInitialState = getRobotInitialState()
     const message = 'delay 95.5 secs message'
     const result = delay(
@@ -54,7 +53,7 @@ describe('delay for a given time', () => {
       {
         commandType: 'delay',
         params: {
-          wait: 95.5,
+          seconds: 95.5,
           message,
         },
       },

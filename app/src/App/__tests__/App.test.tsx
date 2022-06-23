@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import '@testing-library/jest-dom'
-import { resetAllWhenMocks, when } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -12,10 +11,8 @@ import { DevicesLanding } from '../../pages/Devices/DevicesLanding'
 import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
 import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
-import { GeneralSettings } from '../../organisms/AppSettings/GeneralSettings'
+import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
 import { Alerts } from '../../organisms/Alerts'
-import { useFeatureFlag } from '../../redux/config'
-import { LegacyApp } from '../LegacyApp'
 import { App } from '../'
 
 jest.mock('../../organisms/Breadcrumbs')
@@ -26,17 +23,11 @@ jest.mock('../../pages/Protocols/ProtocolsLanding')
 jest.mock('../../pages/Devices/ProtocolRunDetails')
 jest.mock('../../pages/Devices/RobotSettings')
 jest.mock('../../organisms/Alerts')
-jest.mock('../../organisms/Labware/helpers/getAllDefs')
-jest.mock('../../organisms/AppSettings/GeneralSettings')
+jest.mock('../../pages/Labware/helpers/getAllDefs')
+jest.mock('../../pages/AppSettings/GeneralSettings')
 jest.mock('../../redux/config')
-jest.mock('../LegacyApp')
 jest.mock('../hooks')
 
-const mockLegacyApp = LegacyApp as jest.MockedFunction<typeof LegacyApp>
-mockLegacyApp.mockReturnValue(<div>Mock LegacyApp</div>)
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
->
 const mockDeviceDetails = DeviceDetails as jest.MockedFunction<
   typeof DeviceDetails
 >
@@ -76,15 +67,6 @@ const render = (path = '/') => {
 }
 
 describe('App', () => {
-  beforeEach(() => {
-    when(mockUseFeatureFlag)
-      .calledWith('hierarchyReorganization')
-      .mockReturnValue(false)
-  })
-  afterEach(() => {
-    resetAllWhenMocks()
-  })
-
   it('renders a Breadcrumbs component', () => {
     const [{ getByText }] = render('/devices')
     getByText('Mock Breadcrumbs')
@@ -125,18 +107,5 @@ describe('App', () => {
   it('should render app-wide Alerts', () => {
     const [{ getByText }] = render()
     getByText('Mock Alerts')
-  })
-
-  it('should render not render the Legacy App when the Hierarchy Reorganization feature flag is false', () => {
-    const [{ queryByText }] = render()
-    expect(queryByText('Mock LegacyApp')).toBeNull()
-  })
-
-  it('should only render the legacy app when hierarchyReorg feature flag is true', () => {
-    when(mockUseFeatureFlag)
-      .calledWith('hierarchyReorganization')
-      .mockReturnValue(true)
-    const [{ getByText }] = render()
-    getByText('Mock LegacyApp')
   })
 })
