@@ -6,6 +6,7 @@ import {
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
+import { useRunStatus } from '../../RunTimeControl/hooks'
 import { TestShakeSlideout } from '../TestShakeSlideout'
 import { HeaterShakerModuleCard } from '../../Devices/HeaterShakerWizard/HeaterShakerModuleCard'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
@@ -16,6 +17,7 @@ jest.mock('@opentrons/react-api-client')
 jest.mock('../../Devices/HeaterShakerWizard/HeaterShakerModuleCard')
 jest.mock('../hooks')
 jest.mock('../useModuleIdFromRun')
+jest.mock('../../RunTimeControl/hooks')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
@@ -31,6 +33,9 @@ const mockUseLatchControls = useLatchControls as jest.MockedFunction<
 >
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
+>
+const mockUseRunStatus = useRunStatus as jest.MockedFunction<
+  typeof useRunStatus
 >
 
 const render = (props: React.ComponentProps<typeof TestShakeSlideout>) => {
@@ -136,6 +141,7 @@ describe('TestShakeSlideout', () => {
     mockUseModuleIdFromRun.mockReturnValue({
       moduleIdFromRun: 'heatershaker_id',
     })
+    mockUseRunStatus.mockReturnValue(null)
   })
 
   afterEach(() => {

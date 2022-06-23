@@ -11,6 +11,11 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
@@ -20,7 +25,7 @@ import {
   useProtocolDetailsForRun,
   useRunIncompleteOrLegacySessionInProgress,
 } from '../Devices/hooks'
-
+import { useRunStatus } from '../RunTimeControl/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
@@ -63,6 +68,12 @@ export function useLatchControls(
     module,
     runId != null ? runId : null
   )
+  //  TODO(jr, 6/23/22): delete this boolean + logic when you can send commands with runId known re: https://opentrons.slack.com/archives/C033PPVEC76/p1656000780091279
+  const runStatus = useRunStatus(runId != null ? runId : null)
+  const isRunTerminal =
+    runStatus === RUN_STATUS_SUCCEEDED ||
+    runStatus === RUN_STATUS_STOPPED ||
+    runStatus === RUN_STATUS_FAILED
 
   const isLatchClosed =
     module.moduleType === 'heaterShakerModuleType' &&
@@ -75,11 +86,13 @@ export function useLatchControls(
     commandType: isLatchClosed
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',
-    params: { moduleId: runId != null ? moduleIdFromRun : module.id },
+    params: {
+      moduleId: runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
+    },
   }
 
   const toggleLatch = (): void => {
-    if (runId != null) {
+    if (runId != null && !isRunTerminal) {
       createCommand({
         runId: runId,
         command: latchCommand,
@@ -136,6 +149,13 @@ export function useModuleOverflowMenu(
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
   const isIncompleteOrBusy = useRunIncompleteOrLegacySessionInProgress()
+
+  //  TODO(jr, 6/23/22): delete this boolean + logic when you can send commands with runId known re: https://opentrons.slack.com/archives/C033PPVEC76/p1656000780091279
+  const runStatus = useRunStatus(runId)
+  const isRunTerminal =
+    runStatus === RUN_STATUS_SUCCEEDED ||
+    runStatus === RUN_STATUS_STOPPED ||
+    runStatus === RUN_STATUS_FAILED
 
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
@@ -207,9 +227,11 @@ export function useModuleOverflowMenu(
       | TCDeactivateBlockCreateCommand
       | HeaterShakerDeactivateShakerCreateCommand = {
       commandType: deactivateModuleCommandType,
-      params: { moduleId: runId != null ? moduleIdFromRun : module.id },
+      params: {
+        moduleId: runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
+      },
     }
-    if (runId != null) {
+    if (runId != null && !isRunTerminal) {
       createCommand({
         runId: runId,
         command: deactivateCommand,

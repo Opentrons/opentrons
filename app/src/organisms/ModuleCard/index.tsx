@@ -31,7 +31,13 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
 import { useHistory } from 'react-router-dom'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { updateModule } from '../../redux/modules'
@@ -212,6 +218,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     setShowWizard(true)
   }
 
+  //  TODO(jr, 6/23/22): delete this boolean + logic when you can send commands with runId known re: https://opentrons.slack.com/archives/C033PPVEC76/p1656000780091279
+  const isRunTerminal =
+    runStatus === RUN_STATUS_SUCCEEDED ||
+    runStatus === RUN_STATUS_STOPPED ||
+    runStatus === RUN_STATUS_FAILED
+
   return (
     <React.Fragment>
       <Flex
@@ -230,7 +242,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           ) : (
             <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
           ))}
-        {showSlideout && runId != null ? (
+        {showSlideout && runId != null && !isRunTerminal ? (
           <ModuleSlideout
             module={module}
             runId={runId}

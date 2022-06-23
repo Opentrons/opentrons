@@ -22,7 +22,12 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
 
 import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
@@ -260,10 +265,15 @@ const ModuleControlsTab = (
     robotName,
     runId
   )
+  const isRunStill =
+    runStatus === RUN_STATUS_SUCCEEDED ||
+    runStatus === RUN_STATUS_STOPPED ||
+    runStatus === RUN_STATUS_FAILED ||
+    runStatus === RUN_STATUS_IDLE
 
-  const disabled = currentRunId !== runId || runStatus !== RUN_STATUS_IDLE
+  const disabled = currentRunId !== runId || !isRunStill
   const tabDisabledReason = `${t('module_controls')} ${t(
-    'not_available_for_a_completed_run'
+    'not_available_for_a_run_in_progress'
   )}`
 
   return isEmpty(moduleRenderInfoForProtocolById) ? null : (

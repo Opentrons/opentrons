@@ -14,7 +14,13 @@ import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useIsRobotBusy, useProtocolDetailsForRun } from '../../Devices/hooks'
+import { useRunStatus } from '../../RunTimeControl/hooks'
+import {
+  useIsRobotBusy,
+  useProtocolDetailsForRun,
+  useRunIncompleteOrLegacySessionInProgress,
+} from '../../Devices/hooks'
+
 import {
   useLatchControls,
   useModuleOverflowMenu,
@@ -37,6 +43,7 @@ jest.mock('../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../Devices/hooks')
 jest.mock('../useModuleIdFromRun')
+jest.mock('../../RunTimeControl/hooks')
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
@@ -62,6 +69,9 @@ const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
 >
 const mockUseRunIncompleteOrLegacySessionInProgress = useRunIncompleteOrLegacySessionInProgress as jest.MockedFunction<
   typeof useRunIncompleteOrLegacySessionInProgress
+>
+const mockUseRunStatus = useRunStatus as jest.MockedFunction<
+  typeof useRunStatus
 >
 
 const mockCloseLatchHeaterShaker = {
@@ -221,6 +231,7 @@ describe('useLatchControls', () => {
     store.dispatch = jest.fn()
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseRunStatus.mockReturnValue(null)
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
@@ -297,6 +308,7 @@ describe('useModuleOverflowMenu', () => {
     store.dispatch = jest.fn()
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseRunStatus.mockReturnValue(null)
     mockUseRunIncompleteOrLegacySessionInProgress.mockReturnValue(true)
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
