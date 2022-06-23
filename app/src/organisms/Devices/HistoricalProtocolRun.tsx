@@ -17,6 +17,7 @@ import { StyledText } from '../../atoms/text'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { formatInterval } from '../RunTimeControl/utils'
 import { formatTimestamp } from './utils'
+import { useRunTimestamps } from '../RunTimeControl/hooks'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
 import { HistoricalProtocolRunOffsetDrawer as OffsetDrawer } from './HistoricalProtocolRunOffsetDrawer'
 import type { RunData } from '@opentrons/api-client'
@@ -45,6 +46,7 @@ export function HistoricalProtocolRun(
   const { run, protocolName, robotIsBusy, robotName, protocolKey, key } = props
   const history = useHistory()
   const [offsetDrawerOpen, setOffsetDrawerOpen] = React.useState(false)
+  const { startedAt, completedAt } = useRunTimestamps(run.id)
   const storedProtocols = useSelector((state: State) =>
     getStoredProtocols(state)
   )
@@ -52,10 +54,10 @@ export function HistoricalProtocolRun(
   const runDisplayName = formatTimestamp(run.createdAt)
   let duration = EMPTY_TIMESTAMP
   if (runStatus !== 'idle') {
-    if (run.completedAt != null && run.startedAt != null) {
-      duration = formatInterval(run.startedAt, run.completedAt)
-    } else if (run.startedAt != null) {
-      duration = formatInterval(run.startedAt, new Date().toString())
+    if (completedAt != null && startedAt != null) {
+      duration = formatInterval(startedAt, completedAt)
+    } else if (startedAt != null) {
+      duration = formatInterval(startedAt, new Date().toString())
     }
   }
   const protocolKeyInStoredKeys = storedProtocols.find(
