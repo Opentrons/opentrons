@@ -17,7 +17,6 @@ import {
   COLORS,
   TEXT_TRANSFORM_UPPERCASE,
   BORDERS,
-  WRAP,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
