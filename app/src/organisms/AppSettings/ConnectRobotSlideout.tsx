@@ -133,7 +133,7 @@ export function ConnectRobotSlideout({
             ]
           )}
         </Flex>
-        <IpHostnameList
+        <ManualIpHostnameList
           mostRecentAddition={mostRecentAddition}
           setMostRecentDiscovered={setMostRecentDiscovered}
           setMostRecentAddition={setMostRecentAddition}

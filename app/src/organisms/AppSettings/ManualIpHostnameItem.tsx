@@ -44,7 +44,7 @@ interface IpHostnameItemProps {
   setMostRecentDiscovered: (discovered: boolean) => void
 }
 
-export function IpHostnameItem({
+export function ManualIpHostnameItem({
   candidate,
   discovered,
   removeIp,
