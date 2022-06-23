@@ -1,3 +1,4 @@
+import { uuid } from '../../utils'
 import type { TCProfileParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { CommandCreator } from '../../types'
 export const thermocyclerRunProfile: CommandCreator<TCProfileParams> = (
@@ -10,6 +11,7 @@ export const thermocyclerRunProfile: CommandCreator<TCProfileParams> = (
     commands: [
       {
         commandType: 'thermocycler/runProfile',
+        key: uuid(),
         params: {
           moduleId: module,
           profile,

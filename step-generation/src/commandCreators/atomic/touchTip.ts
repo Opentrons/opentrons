@@ -1,3 +1,4 @@
+import { uuid } from '../../utils'
 import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 import type { CreateCommand } from '@opentrons/shared-data'
@@ -43,6 +44,7 @@ export const touchTip: CommandCreator<TouchTipParams> = (
   const commands: CreateCommand[] = [
     {
       commandType: 'touchTip',
+      key: uuid(),
       params: {
         pipetteId: pipette,
         labwareId: labware,
