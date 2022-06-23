@@ -10,9 +10,8 @@ import {
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import runRecord from '../../../organisms/RunDetails/__fixtures__/runRecord.json'
-import { useProtocolRunAnalyticsData } from '../hooks'
+import { useTrackProtocolRunEvent } from '../hooks'
 import { useRunControls } from '../../RunTimeControl/hooks'
-import { useTrackEvent } from '../../../redux/analytics'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 import { DownloadRunLogToast } from '../DownloadRunLogToast'
 
@@ -46,11 +45,8 @@ const mockUseDeleteRunMutation = useDeleteRunMutation as jest.MockedFunction<
 const mockDownloadRunLogToast = DownloadRunLogToast as jest.MockedFunction<
   typeof DownloadRunLogToast
 >
-const mockUseProtocolRunAnalyticsData = useProtocolRunAnalyticsData as jest.MockedFunction<
-  typeof useProtocolRunAnalyticsData
->
-const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
-  typeof useTrackEvent
+const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
+  typeof useTrackProtocolRunEvent
 >
 
 const render = (
@@ -67,14 +63,12 @@ const render = (
 }
 const PAGE_LENGTH = 101
 const RUN_ID = 'id'
-let mockGetProtocolRunAnalyticsData: jest.Mock
-let mockTrackEvent: jest.Mock
+let mockTrackProtocolRunEvent: jest.Mock
 
 describe('HistoricalProtocolRunOverflowMenu', () => {
   let props: React.ComponentProps<typeof HistoricalProtocolRunOverflowMenu>
   beforeEach(() => {
-    mockTrackEvent = jest.fn()
-    mockGetProtocolRunAnalyticsData = jest.fn()
+    mockTrackProtocolRunEvent = jest.fn()
     when(mockDownloadRunLogToast).mockReturnValue(
       <div>mock downlaod run log toast</div>
     )
@@ -83,7 +77,9 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
         deleteRun: jest.fn(),
       } as any)
     )
-    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
+    mockUseTrackProtocolRunEvent.mockReturnValue({
+      trackProtocolRunEvent: mockTrackProtocolRunEvent,
+    })
     when(mockUseRunControls)
       .calledWith(RUN_ID, expect.anything())
       .mockReturnValue({
@@ -108,9 +104,6 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       .mockReturnValue(({
         data: { data: runRecord.data.commands, meta: { totalLength: 14 } },
       } as unknown) as UseQueryResult<CommandsData>)
-    when(mockUseProtocolRunAnalyticsData).calledWith(RUN_ID).mockReturnValue({
-      getProtocolRunAnalyticsData: mockGetProtocolRunAnalyticsData,
-    })
     props = {
       runId: RUN_ID,
       robotName: 'otie',

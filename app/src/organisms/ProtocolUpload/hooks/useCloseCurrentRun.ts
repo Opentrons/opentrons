@@ -3,10 +3,8 @@ import { useParams } from 'react-router-dom'
 
 import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 import { useCurrentRunId } from './useCurrentRunId'
-
-import { useTrackEvent } from '../../../redux/analytics'
 import {
-  useProtocolRunAnalyticsData,
+  useTrackProtocolRunEvent,
   useRobotAnalyticsData,
 } from '../../Devices/hooks'
 
@@ -20,10 +18,7 @@ export function useCloseCurrentRun(): {
   isClosingCurrentRun: boolean
 } {
   const currentRunId = useCurrentRunId()
-  const trackEvent = useTrackEvent()
-  const { getProtocolRunAnalyticsData } = useProtocolRunAnalyticsData(
-    currentRunId
-  )
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(currentRunId)
   const { robotName } = useParams<NavRouteParams>()
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const {
@@ -40,32 +35,16 @@ export function useCloseCurrentRun(): {
         onError: () => console.warn('failed to dismiss current'),
       })
 
-      try {
-        const {
-          protocolRunAnalyticsData,
-          runTime,
-        } = await getProtocolRunAnalyticsData()
-
-        trackEvent({
-          name: 'runFinish',
-          properties: {
-            ...robotAnalyticsData,
-            ...protocolRunAnalyticsData,
-            runTime,
-          },
-        })
-      } catch (e) {
-        console.error(
-          `getProtocolRunAnalyticsData error during runFinish: ${
-            (e as Error).message
-          }; sending event without protocol properties`
+      trackProtocolRunEvent({
+        name: 'runFinish',
+        properties: {
+          ...robotAnalyticsData,
+        },
+      }).catch(e =>
+        console.log(
+          `Error tracking protocol run runFinish event: ${(e as Error).message}`
         )
-
-        trackEvent({
-          name: 'runAgain',
-          properties: { ...robotAnalyticsData },
-        })
-      }
+      )
     }
   }
 

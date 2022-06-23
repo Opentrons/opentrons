@@ -76,7 +76,7 @@ import {
   useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
   useIsRobotViewable,
-  useProtocolRunAnalyticsData,
+  useTrackProtocolRunEvent,
   useRobotAnalyticsData,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
@@ -137,7 +137,7 @@ export function ProtocolRunHeader({
   const { protocolData, displayName, protocolKey } = useProtocolDetailsForRun(
     runId
   )
-  const { getProtocolRunAnalyticsData } = useProtocolRunAnalyticsData(runId)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
   const isProtocolAnalyzing = protocolData == null && isRobotViewable
@@ -245,84 +245,46 @@ export function ProtocolRunHeader({
       play()
 
       const isIdle = runStatus === RUN_STATUS_IDLE
-      try {
-        const {
-          protocolRunAnalyticsData,
-          runTime,
-        } = await getProtocolRunAnalyticsData()
-        const properties = isIdle
-          ? { ...robotAnalyticsData, ...protocolRunAnalyticsData }
-          : { ...protocolRunAnalyticsData, runTime }
+      const eventProperties = isIdle ? { ...robotAnalyticsData } : {}
+      const eventName = isIdle ? 'runStart' : 'runResume'
 
-        trackEvent({
-          name: isIdle ? 'runStart' : 'runResume',
-          properties,
-        })
-      } catch (e) {
-        console.error(
-          `getProtocolRunAnalyticsData error during ${
-            isIdle ? 'runStart' : 'runResume'
-          }: ${(e as Error).message}; sending event without protocol properties`
+      trackProtocolRunEvent({
+        name: eventName,
+        properties: eventProperties,
+      }).catch(e =>
+        console.log(
+          `Error tracking protocol run ${eventName} event: ${
+            (e as Error).message
+          }`
         )
-        const properties = isIdle ? { ...robotAnalyticsData } : {}
-
-        trackEvent({
-          name: isIdle ? 'runStart' : 'runResume',
-          properties,
-        })
-      }
+      )
     }
   }
 
   const handlePauseButtonClick = async (): Promise<void> => {
     pause()
 
-    try {
-      const {
-        protocolRunAnalyticsData,
-        runTime,
-      } = await getProtocolRunAnalyticsData()
-
-      trackEvent({
-        name: 'runPause',
-        properties: { ...protocolRunAnalyticsData, runTime },
-      })
-    } catch (e) {
-      console.error(
-        `getProtocolRunAnalyticsData error during runPause: ${
-          (e as Error).message
-        }; sending event without protocol properties`
+    trackProtocolRunEvent({
+      name: 'runPause',
+      properties: {},
+    }).catch(e =>
+      console.log(
+        `Error tracking protocol run runPause event: ${(e as Error).message}`
       )
-
-      trackEvent({
-        name: 'runPause',
-        properties: {},
-      })
-    }
+    )
   }
 
   const handleResetButtonClick = async (): Promise<void> => {
     reset()
 
-    try {
-      const { protocolRunAnalyticsData } = await getProtocolRunAnalyticsData()
-
-      trackEvent({
-        name: 'runAgain',
-        properties: { ...protocolRunAnalyticsData },
-      })
-    } catch (e) {
-      console.error(
-        `getProtocolRunAnalyticsData error during runAgain: ${
-          (e as Error).message
-        }; sending event without protocol properties`
+    trackProtocolRunEvent({
+      name: 'runPause',
+      properties: {},
+    }).catch(e =>
+      console.log(
+        `Error tracking protocol run runPause event: ${(e as Error).message}`
       )
-
-      trackEvent({
-        name: 'runAgain',
-        properties: {},
-      })
-    }
+    )
   }
 
   const isRunControlButtonDisabled =

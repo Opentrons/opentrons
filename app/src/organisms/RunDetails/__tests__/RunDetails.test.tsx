@@ -20,7 +20,7 @@ import { RunDetails } from '..'
 import { i18n } from '../../../i18n'
 import { CommandList } from '../CommandList'
 import { useProtocolDetails } from '../hooks'
-import { useProtocolRunAnalyticsData } from '../../Devices/hooks'
+import { useTrackProtocolRunEvent } from '../../Devices/hooks'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import {
   useCurrentRunStatus,
@@ -66,8 +66,8 @@ const mockUseCurrentRunControls = useCurrentRunControls as jest.MockedFunction<
 const mockUseRunControls = useRunControls as jest.MockedFunction<
   typeof useRunControls
 >
-const mockUseProtocolRunAnalyticsData = useProtocolRunAnalyticsData as jest.MockedFunction<
-  typeof useProtocolRunAnalyticsData
+const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
+  typeof useTrackProtocolRunEvent
 >
 const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
   typeof useCloseCurrentRun
@@ -96,22 +96,20 @@ const render = () => {
   )[0]
 }
 
-let mockGetProtocolRunAnalyticsData: jest.Mock
+let mockTrackProtocolRunEvent: jest.Mock
 
 describe('RunDetails', () => {
   beforeEach(() => {
-    mockGetProtocolRunAnalyticsData = jest.fn()
+    mockTrackProtocolRunEvent = jest.fn()
 
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
       protocolData: simpleV6Protocol,
       displayName: 'mock display name',
     })
     when(mockCommandList).mockReturnValue(<div>Mock Command List</div>)
-    when(mockUseProtocolRunAnalyticsData)
-      .calledWith('mockRunId')
-      .mockReturnValue({
-        getProtocolRunAnalyticsData: mockGetProtocolRunAnalyticsData,
-      })
+    when(mockUseTrackProtocolRunEvent).calledWith('mockRunId').mockReturnValue({
+      trackProtocolRunEvent: mockTrackProtocolRunEvent,
+    })
     when(mockUseCloseCurrentRun)
       .calledWith()
       .mockReturnValue({

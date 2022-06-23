@@ -9,8 +9,7 @@ import {
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
-import { useTrackEvent } from '../../redux/analytics'
-import { useProtocolRunAnalyticsData } from '../Devices/hooks'
+import { useTrackProtocolRunEvent } from '../Devices/hooks'
 
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
@@ -22,9 +21,8 @@ export function ConfirmCancelModal(
 ): JSX.Element {
   const { onClose, runId } = props
   const { stopRun } = useStopRunMutation()
-  const { getProtocolRunAnalyticsData } = useProtocolRunAnalyticsData(runId)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const { t } = useTranslation('run_details')
-  const trackEvent = useTrackEvent()
 
   const cancel: React.MouseEventHandler<HTMLButtonElement> = async (
     e
@@ -36,31 +34,14 @@ export function ConfirmCancelModal(
     if (runId != null) {
       stopRun(runId)
 
-      try {
-        const {
-          protocolRunAnalyticsData,
-          runTime,
-        } = await getProtocolRunAnalyticsData()
-
-        trackEvent({
-          name: 'runCancel',
-          properties: {
-            ...protocolRunAnalyticsData,
-            runTime,
-          },
-        })
-      } catch (e) {
-        console.error(
-          `getProtocolRunAnalyticsData error during runCancel: ${
-            (e as Error).message
-          }; sending event without protocol properties`
+      trackProtocolRunEvent({
+        name: 'runCancel',
+        properties: {},
+      }).catch(e =>
+        console.log(
+          `Error tracking protocol run runCancel event: ${(e as Error).message}`
         )
-
-        trackEvent({
-          name: 'runCancel',
-          properties: {},
-        })
-      }
+      )
     }
   }
 
