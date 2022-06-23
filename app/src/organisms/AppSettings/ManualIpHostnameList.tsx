@@ -13,7 +13,7 @@ interface IpHostnameListProps {
   setMostRecentDiscovered: (discovered: boolean) => void
 }
 
-export function IpHostnameList({
+export function ManualIpHostnameList({
   mostRecentAddition,
   setMostRecentAddition,
   setMostRecentDiscovered,
