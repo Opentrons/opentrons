@@ -115,17 +115,14 @@ class LegacyContextPlugin(AbstractPlugin):
 
     def handle_action(self, action: pe_actions.Action) -> None:
         """React to a ProtocolEngine action."""
+        # NOTE: the ProtocolEngine will accept the first `PlayAction` issued,
+        # even if the door is open, in order to start the run in a paused state.
+        # For PAPIv2 protocols, we must manually pause the Hardware API
+        # so that the protocol does not start running.
         if isinstance(action, pe_actions.PlayAction):
             if self.state.commands.get_is_door_blocking():
-                # This should happen only on first PlayAction of the protocol run
                 self._hardware_api.pause(HardwarePauseType.PAUSE)
-            else:
-                self._hardware_api.resume(HardwarePauseType.PAUSE)
-        elif (
-            isinstance(action, pe_actions.PauseAction)
-            and action.source == pe_actions.PauseSource.CLIENT
-        ):
-            self._hardware_api.pause(HardwarePauseType.PAUSE)
+
         elif (
             isinstance(action, pe_actions.HardwareEventAction)
             and not self.state.commands.get_is_implicitly_active()

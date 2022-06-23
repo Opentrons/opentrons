@@ -8,6 +8,7 @@ from typing import Any
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
+from opentrons.hardware_control.types import PauseType as HardwarePauseType
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands
@@ -279,6 +280,7 @@ def test_play(
     action_dispatcher: ActionDispatcher,
     model_utils: ModelUtils,
     queue_worker: QueueWorker,
+    hardware_api: HardwareControlAPI,
     subject: ProtocolEngine,
 ) -> None:
     """It should be able to start executing queued commands."""
@@ -298,6 +300,7 @@ def test_play(
             PlayAction(requested_at=datetime(year=2022, month=2, day=2))
         ),
         queue_worker.start(),
+        hardware_api.resume(HardwarePauseType.PAUSE),
     )
 
 
@@ -305,6 +308,7 @@ def test_pause(
     decoy: Decoy,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
+    hardware_api: HardwareControlAPI,
     subject: ProtocolEngine,
 ) -> None:
     """It should be able to pause executing queued commands."""
@@ -318,6 +322,7 @@ def test_pause(
 
     decoy.verify(
         action_dispatcher.dispatch(expected_action),
+        hardware_api.pause(HardwarePauseType.PAUSE),
     )
 
 

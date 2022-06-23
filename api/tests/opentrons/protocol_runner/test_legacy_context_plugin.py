@@ -80,46 +80,24 @@ def subject(
     return plugin
 
 
-def test_play_action(
-    decoy: Decoy,
-    hardware_api: HardwareAPI,
-    subject: LegacyContextPlugin,
-) -> None:
-    """It should resume the hardware controller upon a play action."""
-    action = pe_actions.PlayAction(requested_at=datetime(year=2021, month=1, day=1))
-    subject.handle_action(action)
-
-    decoy.verify(hardware_api.resume(PauseType.PAUSE))
-
-
+@pytest.mark.parametrize(
+    ("is_door_blocking", "expected_pause_call_count"), [(True, 1), (False, 0)]
+)
 def test_play_pauses_when_door_is_open(
     decoy: Decoy,
     hardware_api: HardwareAPI,
     state_view: StateView,
+    is_door_blocking: bool,
+    expected_pause_call_count: int,
     subject: LegacyContextPlugin,
 ) -> None:
     """It should not play the hardware controller when door is blocking."""
     action = pe_actions.PlayAction(requested_at=datetime(year=2021, month=1, day=1))
 
-    decoy.when(state_view.commands.get_is_door_blocking()).then_return(True)
+    decoy.when(state_view.commands.get_is_door_blocking()).then_return(is_door_blocking)
     subject.handle_action(action)
 
-    decoy.verify(hardware_api.pause(PauseType.PAUSE))
-
-
-def test_pause_action(
-    decoy: Decoy,
-    hardware_api: HardwareAPI,
-    subject: LegacyContextPlugin,
-) -> None:
-    """It should pause the hardware controller upon a pause action."""
-    subject.handle_action(
-        pe_actions.PauseAction(source=pe_actions.PauseSource.PROTOCOL)
-    )
-    decoy.verify(hardware_api.pause(PauseType.PAUSE), times=0)
-
-    subject.handle_action(pe_actions.PauseAction(source=pe_actions.PauseSource.CLIENT))
-    decoy.verify(hardware_api.pause(PauseType.PAUSE), times=1)
+    decoy.verify(hardware_api.pause(PauseType.PAUSE), times=expected_pause_call_count)
 
 
 def test_hardware_event_action(
