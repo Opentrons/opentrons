@@ -52,6 +52,7 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
                 volume=1.23,
+                flowRate=4.56,
                 wellName="A1",
                 wellLocation=WellLocation(
                     origin=WellOrigin.BOTTOM,
@@ -80,6 +81,7 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
                 volume=1.23,
+                flowRate=4.56,
                 wellName="A1",
                 wellLocation=WellLocation(
                     origin=WellOrigin.BOTTOM,
@@ -151,16 +153,6 @@ VALID_TEST_PARAMS = [
     ),
     (
         protocol_schema_v6.Command(
-            commandType="pause",
-            params=protocol_schema_v6.Params(
-                wait=True,
-                message="hello world",
-            ),
-        ),
-        pe_commands.PauseCreate(params=pe_commands.PauseParams(message="hello world")),
-    ),
-    (
-        protocol_schema_v6.Command(
             commandType="loadPipette",
             params=protocol_schema_v6.Params(pipetteId="pipetteId", mount="left"),
         ),
@@ -218,6 +210,7 @@ VALID_TEST_PARAMS = [
                     origin="bottom",
                     offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=7.89),
                 ),
+                flowRate=1.23,
             ),
         ),
         pe_commands.BlowOutCreate(
@@ -229,6 +222,49 @@ VALID_TEST_PARAMS = [
                     origin=WellOrigin.BOTTOM,
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),
+                flowRate=1.23,
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="delay",
+            params=protocol_schema_v6.Params(waitForResume=True, message="hello world"),
+        ),
+        pe_commands.WaitForResumeCreate(
+            params=pe_commands.WaitForResumeParams(message="hello world")
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="delay",
+            params=protocol_schema_v6.Params(seconds=12.34, message="hello world"),
+        ),
+        pe_commands.WaitForDurationCreate(
+            params=pe_commands.WaitForDurationParams(
+                seconds=12.34,
+                message="hello world",
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="waitForResume",
+            params=protocol_schema_v6.Params(message="hello world"),
+        ),
+        pe_commands.WaitForResumeCreate(
+            params=pe_commands.WaitForResumeParams(message="hello world")
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="waitForDuration",
+            params=protocol_schema_v6.Params(seconds=12.34, message="hello world"),
+        ),
+        pe_commands.WaitForDurationCreate(
+            params=pe_commands.WaitForDurationParams(
+                seconds=12.34,
+                message="hello world",
             )
         ),
     ),

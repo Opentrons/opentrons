@@ -10,7 +10,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorOutputBinding,
     SensorThresholdMode,
 )
-from opentrons_hardware.firmware_bindings.constants import SensorType, NodeId
+from opentrons_hardware.firmware_bindings.constants import SensorId, SensorType, NodeId
 from opentrons_hardware.sensors.utils import (
     ReadSensorInformation,
     PollSensorInformation,
@@ -24,6 +24,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorOutputBindingField,
     SensorTypeField,
+    SensorIdField,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BindSensorOutputRequest,
@@ -39,9 +40,12 @@ class CapacitiveSensor(AbstractAdvancedSensor):
         zero_threshold: float = 0.0,
         stop_threshold: float = 0.0,
         offset: float = 0.0,
+        sensor_id: SensorId = SensorId.S0,
     ) -> None:
         """Constructor."""
-        super().__init__(zero_threshold, stop_threshold, offset, SensorType.capacitive)
+        super().__init__(
+            zero_threshold, stop_threshold, offset, SensorType.capacitive, sensor_id
+        )
 
     async def get_report(
         self,
@@ -65,7 +69,9 @@ class CapacitiveSensor(AbstractAdvancedSensor):
         timeout: int = 1,
     ) -> Optional[SensorDataType]:
         """Poll the capacitive sensor."""
-        poll = PollSensorInformation(self._sensor_type, node_id, poll_for_ms)
+        poll = PollSensorInformation(
+            self._sensor_type, self._sensor_id, node_id, poll_for_ms
+        )
         return await self._scheduler.run_poll(poll, can_messenger, timeout)
 
     async def read(
@@ -76,14 +82,18 @@ class CapacitiveSensor(AbstractAdvancedSensor):
         timeout: int = 1,
     ) -> Optional[SensorDataType]:
         """Single read of the capacitive sensor."""
-        read = ReadSensorInformation(self._sensor_type, node_id, offset)
+        read = ReadSensorInformation(
+            self._sensor_type, self._sensor_id, node_id, offset
+        )
         return await self._scheduler.send_read(read, can_messenger, timeout)
 
     async def write(
         self, can_messenger: CanMessenger, node_id: NodeId, data: SensorDataType
     ) -> None:
         """Write to a register of the capacitive sensor."""
-        write = WriteSensorInformation(self._sensor_type, node_id, data)
+        write = WriteSensorInformation(
+            self._sensor_type, self._sensor_id, node_id, data
+        )
         await self._scheduler.send_write(write, can_messenger)
 
     async def send_zero_threshold(
@@ -95,7 +105,11 @@ class CapacitiveSensor(AbstractAdvancedSensor):
     ) -> Optional[SensorDataType]:
         """Send the zero threshold which the offset value is compared to."""
         write = SensorThresholdInformation(
-            self._sensor_type, node_id, threshold, SensorThresholdMode.absolute
+            self._sensor_type,
+            self._sensor_id,
+            node_id,
+            threshold,
+            SensorThresholdMode.absolute,
         )
         threshold_data = await self._scheduler.send_threshold(
             write, can_messenger, timeout
@@ -118,6 +132,7 @@ class CapacitiveSensor(AbstractAdvancedSensor):
                 message=BindSensorOutputRequest(
                     payload=BindSensorOutputRequestPayload(
                         sensor=SensorTypeField(self._sensor_type),
+                        sensor_id=SensorIdField(self._sensor_id),
                         binding=SensorOutputBindingField(binding),
                     )
                 ),
@@ -129,6 +144,7 @@ class CapacitiveSensor(AbstractAdvancedSensor):
                 message=BindSensorOutputRequest(
                     payload=BindSensorOutputRequestPayload(
                         sensor=SensorTypeField(self._sensor_type),
+                        sensor_id=SensorIdField(self._sensor_id),
                         binding=SensorOutputBindingField(SensorOutputBinding.none),
                     )
                 ),
@@ -142,5 +158,5 @@ class CapacitiveSensor(AbstractAdvancedSensor):
     ) -> bool:
         """Send a PeripheralStatusRequest and read the response message."""
         return await self._scheduler.request_peripheral_status(
-            self._sensor_type, node_id, can_messenger, timeout
+            self._sensor_type, self._sensor_id, node_id, can_messenger, timeout
         )
