@@ -70,10 +70,14 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
             moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
               ? initialLoadedLabwareByModuleId[moduleInSlot.result.moduleId]
               : null
+          let labwareId = labwareInSlot ? labwareInSlot.result.labwareId : null
+          labwareId = labwareInModule
+            ? labwareInModule.result.labwareId
+            : labwareId
           const wellFill =
-            labwareInSlot && showLiquids && liquidSetupEnabled
+            labwareId && showLiquids && liquidSetupEnabled
               ? getWellFillFromLabwareId(
-                  labwareInSlot.result.labwareId,
+                  labwareId,
                   liquidsInLoadOrder,
                   labwareByLiquidId
                 )
@@ -97,6 +101,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                   {labwareInModule != null ? (
                     <LabwareRender
                       definition={labwareInModule.result.definition}
+                      wellFill={wellFill ?? undefined}
                     />
                   ) : null}
                 </Module>
