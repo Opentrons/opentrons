@@ -1,7 +1,9 @@
 import { hash } from '../../../redux/analytics/hash'
 import { useStoredProtocolAnalysis } from './useStoredProtocolAnalysis'
+import { useProtocolDetailsForRun } from './useProtocolDetailsForRun'
 import { useRunTimestamps } from '../../RunTimeControl/hooks'
 import { formatInterval } from '../../RunTimeControl/utils'
+import { EMPTY_TIMESTAMP } from '../constants'
 
 import type { ProtocolAnalyticsData } from '../../../redux/analytics/types'
 
@@ -22,7 +24,19 @@ export function useProtocolRunAnalyticsData(
 ): {
   getProtocolRunAnalyticsData: GetProtocolRunAnalyticsData
 } {
-  const protocolAnalysis = useStoredProtocolAnalysis(runId)
+  const {
+    protocolData: robotProtocolAnalysis,
+    protocolMetadata,
+  } = useProtocolDetailsForRun(runId)
+  const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
+  const protocolAnalysis =
+    robotProtocolAnalysis != null
+      ? {
+          ...robotProtocolAnalysis,
+          metadata: protocolMetadata,
+          config: null,
+        }
+      : storedProtocolAnalysis
   const { startedAt } = useRunTimestamps(runId)
 
   const getProtocolRunAnalyticsData: GetProtocolRunAnalyticsData = () => {
@@ -40,7 +54,7 @@ export function useProtocolRunAnalyticsData(
             : 'Python API',
         protocolAppVersion:
           protocolAnalysis?.config?.protocolType === 'json'
-            ? protocolAnalysis.config.schemaVersion.toFixed(1)
+            ? protocolAnalysis?.config?.schemaVersion.toFixed(1)
             : protocolAnalysis?.metadata?.apiLevel,
         protocolApiVersion: protocolAnalysis?.metadata?.apiLevel ?? '',
         protocolSource: protocolAnalysis?.metadata?.source ?? '',
@@ -55,7 +69,7 @@ export function useProtocolRunAnalyticsData(
         protocolText: protocolText !== '' ? protocolText : '',
       },
       runTime:
-        startedAt != null ? formatInterval(startedAt, Date()) : '--:--:--',
+        startedAt != null ? formatInterval(startedAt, Date()) : EMPTY_TIMESTAMP,
     }))
   }
 

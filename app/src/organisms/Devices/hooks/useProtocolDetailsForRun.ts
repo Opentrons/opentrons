@@ -13,6 +13,7 @@ export interface ProtocolDetails {
   displayName: string | null
   protocolData: ProtocolAnalysisFile<{}> | null
   protocolKey: string | null
+  protocolMetadata: { [key: string]: any } | null
 }
 
 export function useProtocolDetailsForRun(
@@ -56,5 +57,6 @@ export function useProtocolDetailsForRun(
     protocolData:
       mostRecentAnalysis != null ? schemaV6Adapter(mostRecentAnalysis) : null,
     protocolKey: protocolRecord?.data.key ?? null,
+    protocolMetadata: protocolRecord?.data.metadata ?? null,
   }
 }
