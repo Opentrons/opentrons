@@ -21,8 +21,7 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../RunTimeControl/hooks'
 import { RUN_LOG_WINDOW_SIZE } from './constants'
 import { DownloadRunLogToast } from './DownloadRunLogToast'
-import { useTrackEvent } from '../../redux/analytics'
-import { useProtocolRunAnalyticsData } from './hooks'
+import { useTrackProtocolRunEvent } from './hooks'
 import type { Run } from '@opentrons/api-client'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
@@ -102,8 +101,6 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     closeOverflowMenu,
     setShowDownloadRunLogToast,
   } = props
-  const { getProtocolRunAnalyticsData } = useProtocolRunAnalyticsData(runId)
-
   const onResetSuccess = (createRunResponse: Run): void =>
     history.push(
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-log`
@@ -114,7 +111,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     setShowDownloadRunLogToast(true)
     closeOverflowMenu(e)
   }
-  const trackEvent = useTrackEvent()
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const { reset } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
 
@@ -123,27 +120,11 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   ): Promise<void> => {
     e.preventDefault()
     e.stopPropagation()
+
     reset()
 
-    try {
-      const { protocolRunAnalyticsData } = await getProtocolRunAnalyticsData()
-
-      trackEvent({
-        name: 'runAgain',
-        properties: { ...protocolRunAnalyticsData },
-      })
-    } catch (e) {
-      console.error(
-        `getProtocolRunAnalyticsData error during runAgain: ${
-          (e as Error).message
-        }; sending event without protocol properties`
-      )
-
-      trackEvent({
-        name: 'runAgain',
-        properties: {},
-      })
-    }
+    // eslint-disable-next-line no-void
+    void trackProtocolRunEvent({ name: 'runAgain', properties: {} })
   }
 
   const handleDeleteClick: React.MouseEventHandler<HTMLButtonElement> = e => {
