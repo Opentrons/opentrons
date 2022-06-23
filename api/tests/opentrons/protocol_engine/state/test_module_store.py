@@ -138,24 +138,24 @@ def test_load_module(
             lazy_fixture("heater_shaker_v1_def"),
             HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
-                speed_status=SpeedStatus.IDLE,
-                plate_target_temperature=None,
+                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
+                speed_status=SpeedStatus.HOLDING,
+                plate_target_temperature=123,
             ),
         ),
         (
             lazy_fixture("tempdeck_v2_def"),
             TemperatureModuleSubState(
                 module_id=TemperatureModuleId("module-id"),
-                plate_target_temperature=None,
+                plate_target_temperature=123,
             ),
         ),
         (
             lazy_fixture("thermocycler_v1_def"),
             ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
-                target_block_temperature=None,
-                target_lid_temperature=None,
+                target_block_temperature=123,
+                target_lid_temperature=321,
             ),
         ),
     ],
@@ -169,6 +169,7 @@ def test_add_module_action(
         module_id="module-id",
         serial_number="serial-number",
         definition=module_definition,
+        substate=expected_substate,
     )
 
     subject = ModuleStore()

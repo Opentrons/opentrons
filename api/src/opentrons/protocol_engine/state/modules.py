@@ -122,6 +122,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 module_id=action.module_id,
                 serial_number=action.serial_number,
                 definition=action.definition,
+                substate=action.substate,
             )
 
     def _handle_command(self, command: Command) -> None:
@@ -167,6 +168,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         module_id: str,
         serial_number: str,
         definition: ModuleDefinition,
+        substate: Optional[ModuleSubStateType] = None,
         slot_name: Optional[DeckSlotName] = None,
     ) -> None:
         model = definition.model
@@ -178,24 +180,32 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         )
 
         if ModuleModel.is_magnetic_module_model(model):
-            self._state.substate_by_module_id[module_id] = MagneticModuleSubState(
+            self._state.substate_by_module_id[
+                module_id
+            ] = substate or MagneticModuleSubState(
                 module_id=MagneticModuleId(module_id),
                 model=model,
             )
         elif ModuleModel.is_heater_shaker_module_model(model):
-            self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+            self._state.substate_by_module_id[
+                module_id
+            ] = substate or HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
                 labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
                 speed_status=SpeedStatus.IDLE,
                 plate_target_temperature=None,
             )
         elif ModuleModel.is_temperature_module_model(model):
-            self._state.substate_by_module_id[module_id] = TemperatureModuleSubState(
+            self._state.substate_by_module_id[
+                module_id
+            ] = substate or TemperatureModuleSubState(
                 module_id=TemperatureModuleId(module_id),
                 plate_target_temperature=None,
             )
         elif ModuleModel.is_thermocycler_module_model(model):
-            self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
+            self._state.substate_by_module_id[
+                module_id
+            ] = substate or ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
                 target_block_temperature=None,
                 target_lid_temperature=None,

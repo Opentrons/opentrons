@@ -26,7 +26,13 @@ from opentrons.protocol_engine.execution import (
     HardwareEventForwarder,
 )
 from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state import (
+    StateStore,
+    TemperatureModuleSubState,
+    TemperatureModuleId,
+    MagneticModuleSubState,
+    MagneticModuleId,
+)
 from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
 
 from opentrons.protocol_engine.actions import (
@@ -585,6 +591,7 @@ async def test_use_attached_modules(
     decoy.when(mod_2.device_info).then_return({"serial": "serial-2"})
     decoy.when(mod_1.model()).then_return("temperatureModuleV1")
     decoy.when(mod_2.model()).then_return("magneticModuleV1")
+    decoy.when(mod_1.target).then_return(11.22)
 
     decoy.when(
         module_data_provider.get_definition(ModuleModel.TEMPERATURE_MODULE_V1)
@@ -607,6 +614,10 @@ async def test_use_attached_modules(
                 module_id="module-1",
                 serial_number="serial-1",
                 definition=tempdeck_v1_def,
+                substate=TemperatureModuleSubState(
+                    module_id=TemperatureModuleId("module-1"),
+                    plate_target_temperature=11.22,
+                ),
             )
         ),
         action_dispatcher.dispatch(
@@ -614,6 +625,10 @@ async def test_use_attached_modules(
                 module_id="module-2",
                 serial_number="serial-2",
                 definition=magdeck_v1_def,
+                substate=MagneticModuleSubState(
+                    module_id=MagneticModuleId("module-2"),
+                    model=ModuleModel.MAGNETIC_MODULE_V1,
+                ),
             ),
         ),
     )

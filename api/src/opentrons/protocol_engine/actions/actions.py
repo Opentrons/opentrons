@@ -14,6 +14,7 @@ from opentrons.hardware_control.types import HardwareEvent
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
 from ..types import LabwareOffsetCreate, ModuleDefinition
+from ..state.module_substates import ModuleSubStateType
 
 
 @dataclass(frozen=True)
@@ -141,6 +142,7 @@ class AddModuleAction:
     module_id: str
     serial_number: str
     definition: ModuleDefinition
+    substate: Optional[ModuleSubStateType]
 
 
 Action = Union[
