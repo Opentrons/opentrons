@@ -103,4 +103,4 @@ export const makeTimerText = (
     ? null
     : `${targetMinutes}  ${i18n.t(
         'application.units.minutes'
-      )} + ${targetSeconds}  ${i18n.t('application.units.seconds')} timer`
+      )} ${targetSeconds}  ${i18n.t('application.units.seconds')} timer`

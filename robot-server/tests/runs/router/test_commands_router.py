@@ -100,16 +100,16 @@ async def test_create_run_command(
     mock_protocol_engine: ProtocolEngine,
 ) -> None:
     """It should add the requested command to the ProtocolEngine and return it."""
-    command_request = pe_commands.PauseCreate(
-        params=pe_commands.PauseParams(message="Hello")
+    command_request = pe_commands.WaitForResumeCreate(
+        params=pe_commands.WaitForResumeParams(message="Hello")
     )
 
-    command_once_added = pe_commands.Pause(
+    command_once_added = pe_commands.WaitForResume(
         id="command-id",
         key="command-key",
         createdAt=datetime(year=2021, month=1, day=1),
         status=pe_commands.CommandStatus.QUEUED,
-        params=pe_commands.PauseParams(message="Hello"),
+        params=pe_commands.WaitForResumeParams(message="Hello"),
     )
 
     def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
@@ -120,8 +120,8 @@ async def test_create_run_command(
 
     decoy.when(
         mock_protocol_engine.add_command(
-            pe_commands.PauseCreate(
-                params=pe_commands.PauseParams(message="Hello"),
+            pe_commands.WaitForResumeCreate(
+                params=pe_commands.WaitForResumeParams(message="Hello"),
                 intent=pe_commands.CommandIntent.SETUP,
             )
         )
@@ -143,26 +143,26 @@ async def test_create_run_command_blocking_completion(
     mock_protocol_engine: ProtocolEngine,
 ) -> None:
     """It should be able to create a command and wait for it to execute."""
-    command_request = pe_commands.PauseCreate(
-        params=pe_commands.PauseParams(message="Hello"),
+    command_request = pe_commands.WaitForResumeCreate(
+        params=pe_commands.WaitForResumeParams(message="Hello"),
         intent=pe_commands.CommandIntent.PROTOCOL,
     )
 
-    command_once_added = pe_commands.Pause(
+    command_once_added = pe_commands.WaitForResume(
         id="command-id",
         key="command-key",
         createdAt=datetime(year=2021, month=1, day=1),
         status=pe_commands.CommandStatus.QUEUED,
-        params=pe_commands.PauseParams(message="Hello"),
+        params=pe_commands.WaitForResumeParams(message="Hello"),
     )
 
-    command_once_completed = pe_commands.Pause(
+    command_once_completed = pe_commands.WaitForResume(
         id="command-id",
         key="command-key",
         createdAt=datetime(year=2021, month=1, day=1),
         status=pe_commands.CommandStatus.SUCCEEDED,
-        params=pe_commands.PauseParams(message="Hello"),
-        result=pe_commands.PauseResult(),
+        params=pe_commands.WaitForResumeParams(message="Hello"),
+        result=pe_commands.WaitForResumeResult(),
     )
 
     def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
@@ -201,8 +201,8 @@ async def test_add_conflicting_setup_command(
     mock_protocol_engine: ProtocolEngine,
 ) -> None:
     """It should raise an error if the setup command cannot be added."""
-    command_request = pe_commands.PauseCreate(
-        params=pe_commands.PauseParams(message="Hello"),
+    command_request = pe_commands.WaitForResumeCreate(
+        params=pe_commands.WaitForResumeParams(message="Hello"),
         intent=pe_commands.CommandIntent.SETUP,
     )
 
@@ -225,7 +225,7 @@ async def test_get_run_commands(
     decoy: Decoy, mock_run_data_manager: RunDataManager
 ) -> None:
     """It should return a list of all commands in a run."""
-    command = pe_commands.Pause(
+    command = pe_commands.WaitForResume(
         id="command-id",
         key="command-key",
         intent=pe_commands.CommandIntent.PROTOCOL,
@@ -233,7 +233,7 @@ async def test_get_run_commands(
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
         completedAt=datetime(year=2023, month=3, day=3),
-        params=pe_commands.PauseParams(message="hello world"),
+        params=pe_commands.WaitForResumeParams(message="hello world"),
         error=pe_errors.ErrorOccurrence(
             id="error-id",
             errorType="PrettyBadError",
@@ -269,13 +269,13 @@ async def test_get_run_commands(
         RunCommandSummary(
             id="command-id",
             key="command-key",
-            commandType="pause",
+            commandType="waitForResume",
             intent=pe_commands.CommandIntent.PROTOCOL,
             createdAt=datetime(year=2021, month=1, day=1),
             startedAt=datetime(year=2022, month=2, day=2),
             completedAt=datetime(year=2023, month=3, day=3),
             status=pe_commands.CommandStatus.FAILED,
-            params=pe_commands.PauseParams(message="hello world"),
+            params=pe_commands.WaitForResumeParams(message="hello world"),
             error=pe_errors.ErrorOccurrence(
                 id="error-id",
                 errorType="PrettyBadError",
