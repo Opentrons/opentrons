@@ -15,11 +15,17 @@ import {
   DIRECTION_ROW,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
 
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
+import { useRunStatus } from '../RunTimeControl/hooks'
 import { useIsRobotViewable } from './hooks'
 import { PipetteCard } from './PipetteCard'
 
@@ -40,6 +46,11 @@ export function PipettesAndModules({
   })?.data ?? { left: undefined, right: undefined }
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
+  const runStatus = useRunStatus(currentRunId)
+  const isRunTerminal =
+    runStatus === RUN_STATUS_SUCCEEDED ||
+    runStatus === RUN_STATUS_STOPPED ||
+    runStatus === RUN_STATUS_FAILED
 
   return (
     <Flex
@@ -63,7 +74,7 @@ export function PipettesAndModules({
         width="100%"
         flexDirection={DIRECTION_COLUMN}
       >
-        {currentRunId != null && (
+        {currentRunId != null && !isRunTerminal && (
           <Flex
             paddingBottom={SPACING.spacing4}
             flexDirection={DIRECTION_COLUMN}

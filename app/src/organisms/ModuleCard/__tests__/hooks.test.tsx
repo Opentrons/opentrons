@@ -63,6 +63,9 @@ const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
 const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
   typeof useIsRobotBusy
 >
+const mockUseRunStatus = useRunStatus as jest.MockedFunction<
+  typeof useRunStatus
+>
 
 const mockCloseLatchHeaterShaker = {
   id: 'heatershaker_id',
@@ -297,6 +300,7 @@ describe('useModuleOverflowMenu', () => {
     store.dispatch = jest.fn()
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)

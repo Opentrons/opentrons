@@ -42,7 +42,9 @@ export const ModuleOverflowMenu = (
     handleWizardClick,
     handleSlideoutClick
   )
-  const isBusy = useIsRobotBusy() && runId == null
+  const runStatus = useRunStatus(runId != null ? runId : null)
+  const isRobotBusy = useIsRobotBusy()
+  const isBusy = runStatus != null && isRobotBusy
   return (
     <>
       <Flex position={POSITION_RELATIVE}>

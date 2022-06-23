@@ -2,6 +2,7 @@ import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   mockMagneticModule,
   mockTemperatureModuleGen2,
@@ -23,6 +24,9 @@ const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
 >
 const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
   typeof useIsRobotBusy
+>
+const mockUseRunStatus = useRunStatus as jest.MockedFunction<
+  typeof useRunStatus
 >
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
@@ -202,6 +206,7 @@ describe('ModuleOverflowMenu', () => {
   let props: React.ComponentProps<typeof ModuleOverflowMenu>
   beforeEach(() => {
     mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
+    mockUseRunStatus.mockReturnValue(null)
     props = {
       module: mockMagneticModule,
       handleSlideoutClick: jest.fn(),
@@ -457,8 +462,9 @@ describe('ModuleOverflowMenu', () => {
     fireEvent.click(btn)
   })
 
-  it('should disable module control buttons when the robot is busy', () => {
+  it('should disable module control buttons when the robot is busy and run status not null', () => {
     mockUseIsRobotBusy.mockReturnValue(true)
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     props = {
       module: mockTCBlockHeating,
       handleSlideoutClick: jest.fn(),
