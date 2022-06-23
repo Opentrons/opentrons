@@ -1,5 +1,5 @@
 import * as errorCreators from '../../errorCreators'
-import { isValidSlot } from '../../utils/isValidSlot'
+import { isValidSlot, uuid } from '../../utils'
 import type { MoveToSlotParams } from '@opentrons/shared-data/protocol/types/schemaV3'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
@@ -35,6 +35,7 @@ export const moveToSlot: CommandCreator<MoveToSlotParams> = (
   const commands: CreateCommand[] = [
     {
       commandType: 'moveToSlot',
+      key: uuid(),
       params: {
         pipetteId: pipette,
         slotName: slot,
