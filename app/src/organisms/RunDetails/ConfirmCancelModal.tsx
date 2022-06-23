@@ -36,18 +36,31 @@ export function ConfirmCancelModal(
     if (runId != null) {
       stopRun(runId)
 
-      const {
-        protocolRunAnalyticsData,
-        runTime,
-      } = await getProtocolRunAnalyticsData()
-
-      trackEvent({
-        name: 'runCancel',
-        properties: {
-          ...protocolRunAnalyticsData,
+      try {
+        const {
+          protocolRunAnalyticsData,
           runTime,
-        },
-      })
+        } = await getProtocolRunAnalyticsData()
+
+        trackEvent({
+          name: 'runCancel',
+          properties: {
+            ...protocolRunAnalyticsData,
+            runTime,
+          },
+        })
+      } catch (e) {
+        console.error(
+          `getProtocolRunAnalyticsData error during runCancel: ${
+            (e as Error).message
+          }; sending event without protocol properties`
+        )
+
+        trackEvent({
+          name: 'runCancel',
+          properties: {},
+        })
+      }
     }
   }
 

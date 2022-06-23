@@ -125,12 +125,25 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     e.stopPropagation()
     reset()
 
-    const { protocolRunAnalyticsData } = await getProtocolRunAnalyticsData()
+    try {
+      const { protocolRunAnalyticsData } = await getProtocolRunAnalyticsData()
 
-    trackEvent({
-      name: 'runAgain',
-      properties: { ...protocolRunAnalyticsData },
-    })
+      trackEvent({
+        name: 'runAgain',
+        properties: { ...protocolRunAnalyticsData },
+      })
+    } catch (e) {
+      console.error(
+        `getProtocolRunAnalyticsData error during runAgain: ${
+          (e as Error).message
+        }; sending event without protocol properties`
+      )
+
+      trackEvent({
+        name: 'runAgain',
+        properties: {},
+      })
+    }
   }
 
   const handleDeleteClick: React.MouseEventHandler<HTMLButtonElement> = e => {

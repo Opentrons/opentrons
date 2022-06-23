@@ -244,45 +244,85 @@ export function ProtocolRunHeader({
     } else {
       play()
 
-      const {
-        protocolRunAnalyticsData,
-        runTime,
-      } = await getProtocolRunAnalyticsData()
       const isIdle = runStatus === RUN_STATUS_IDLE
-      const properties = isIdle
-        ? { ...robotAnalyticsData, ...protocolRunAnalyticsData }
-        : { ...protocolRunAnalyticsData, runTime }
+      try {
+        const {
+          protocolRunAnalyticsData,
+          runTime,
+        } = await getProtocolRunAnalyticsData()
+        const properties = isIdle
+          ? { ...robotAnalyticsData, ...protocolRunAnalyticsData }
+          : { ...protocolRunAnalyticsData, runTime }
 
-      trackEvent({
-        name: isIdle ? 'runStart' : 'runResume',
-        properties,
-      })
+        trackEvent({
+          name: isIdle ? 'runStart' : 'runResume',
+          properties,
+        })
+      } catch (e) {
+        console.error(
+          `getProtocolRunAnalyticsData error during ${
+            isIdle ? 'runStart' : 'runResume'
+          }: ${(e as Error).message}; sending event without protocol properties`
+        )
+        const properties = isIdle ? { ...robotAnalyticsData } : {}
+
+        trackEvent({
+          name: isIdle ? 'runStart' : 'runResume',
+          properties,
+        })
+      }
     }
   }
 
   const handlePauseButtonClick = async (): Promise<void> => {
     pause()
 
-    const {
-      protocolRunAnalyticsData,
-      runTime,
-    } = await getProtocolRunAnalyticsData()
+    try {
+      const {
+        protocolRunAnalyticsData,
+        runTime,
+      } = await getProtocolRunAnalyticsData()
 
-    trackEvent({
-      name: 'runPause',
-      properties: { ...protocolRunAnalyticsData, runTime },
-    })
+      trackEvent({
+        name: 'runPause',
+        properties: { ...protocolRunAnalyticsData, runTime },
+      })
+    } catch (e) {
+      console.error(
+        `getProtocolRunAnalyticsData error during runPause: ${
+          (e as Error).message
+        }; sending event without protocol properties`
+      )
+
+      trackEvent({
+        name: 'runPause',
+        properties: {},
+      })
+    }
   }
 
   const handleResetButtonClick = async (): Promise<void> => {
-    const { protocolRunAnalyticsData } = await getProtocolRunAnalyticsData()
-
-    trackEvent({
-      name: 'runAgain',
-      properties: { ...protocolRunAnalyticsData },
-    })
-
     reset()
+
+    try {
+      const { protocolRunAnalyticsData } = await getProtocolRunAnalyticsData()
+
+      trackEvent({
+        name: 'runAgain',
+        properties: { ...protocolRunAnalyticsData },
+      })
+    } catch (e) {
+      console.error(
+        `getProtocolRunAnalyticsData error during runAgain: ${
+          (e as Error).message
+        }; sending event without protocol properties`
+      )
+
+      trackEvent({
+        name: 'runAgain',
+        properties: {},
+      })
+    }
   }
 
   const isRunControlButtonDisabled =
