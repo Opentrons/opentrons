@@ -134,7 +134,7 @@ class RobotDoorOpenError(ProtocolEngineError):
 
 
 class HeaterShakerMovementRestrictionError(ProtocolEngineError):
-    """An error raised when trying to move to labware that's restricted by H/S prescence"""
+    """An error raised when trying to move to labware that's restricted by H/S presence."""
 
 
 class EngageHeightOutOfRangeError(ProtocolEngineError):

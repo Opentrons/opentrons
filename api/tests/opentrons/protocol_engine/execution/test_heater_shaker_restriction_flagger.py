@@ -165,6 +165,7 @@ async def test_raises_any_channel_on_restricted_movement(
     mock_hw_pipettes: MockPipettes,
     decoy: Decoy,
 ) -> None:
+    """It should raise if restricted movement around a heater-shaker is attempted."""
     decoy.when(state_store.modules.get_all()).then_return(
         [
             LoadedModule(
@@ -236,6 +237,7 @@ async def test_raises_multi_channel_on_restricted_movement(
     mock_hw_pipettes: MockPipettes,
     decoy: Decoy,
 ) -> None:
+    """It should raise if restricted movement around a heater-shaker is attempted with a multi-channel pipette."""
     decoy.when(state_store.modules.get_all()).then_return(
         [
             LoadedModule(

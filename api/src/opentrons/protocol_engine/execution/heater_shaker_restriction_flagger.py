@@ -46,6 +46,7 @@ class HeaterShakerMovementFlagger:
     async def raise_if_movement_restricted(
         self, labware_id: str, pipette_id: str
     ) -> None:
+        """Flag restricted movement around/to a Heater Shaker."""
         all_modules = self._state_store.modules.get_all()
         heater_shaker_module = next(
             (
