@@ -25,6 +25,7 @@ import {
   useCurrentRunStatus,
   useCurrentRunControls,
   useRunControls,
+  useRunTimestamps,
 } from '../../RunTimeControl/hooks'
 import {
   useCloseCurrentRun,
@@ -38,6 +39,8 @@ const mockPush = jest.fn()
 jest.mock('../hooks')
 jest.mock('../CommandList')
 jest.mock('../../../redux/robot/selectors')
+jest.mock('../../../redux/analytics')
+jest.mock('../../../redux/config')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -61,6 +64,9 @@ const mockUseCurrentRunControls = useCurrentRunControls as jest.MockedFunction<
 >
 const mockUseRunControls = useRunControls as jest.MockedFunction<
   typeof useRunControls
+>
+const mockUseRunTimestamps = useRunTimestamps as jest.MockedFunction<
+  typeof useRunTimestamps
 >
 const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
   typeof useCloseCurrentRun
@@ -89,6 +95,9 @@ const render = () => {
   )[0]
 }
 
+const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
+const STARTED_AT = '2022-03-03T19:09:40.620530+00:00'
+
 describe('RunDetails', () => {
   beforeEach(() => {
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
@@ -102,6 +111,12 @@ describe('RunDetails', () => {
         isClosingCurrentRun: false,
         closeCurrentRun: jest.fn(),
       } as any)
+    when(mockUseRunTimestamps).calledWith(RUN_ID).mockReturnValue({
+      startedAt: STARTED_AT,
+      pausedAt: null,
+      stoppedAt: null,
+      completedAt: null,
+    })
     when(mockUseIsProtocolRunLoaded).calledWith().mockReturnValue(true)
     when(mockUseCurrentRunControls).calledWith().mockReturnValue({
       play: jest.fn(),

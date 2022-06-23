@@ -1,8 +1,22 @@
 import * as React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
+
 import { i18n } from '../../../i18n'
+import { useProtocolRunAnalyticsData } from '../../../organisms/Devices/hooks'
+import { useTrackEvent } from '../../../redux/analytics'
 import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
+
+jest.mock('../../../redux/analytics')
+jest.mock('../../../redux/config')
+
+const mockUseProtocolRunDataAnalytics = useProtocolRunAnalyticsData as jest.MockedFunction<
+  typeof useProtocolRunAnalyticsData
+>
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
 
 const render = (props: React.ComponentProps<typeof ConfirmCancelModal>) => {
   return renderWithProviders(<ConfirmCancelModal {...props} />, {
@@ -10,10 +24,25 @@ const render = (props: React.ComponentProps<typeof ConfirmCancelModal>) => {
   })[0]
 }
 
+const RUN_ID = 'mockRunId'
+let mockGetProtocolRunAnalyticsData: jest.Mock
+let mockTrackEvent: jest.Mock
+
 describe('ConfirmCancelModal', () => {
   let props: React.ComponentProps<typeof ConfirmCancelModal>
   beforeEach(() => {
-    props = { onClose: jest.fn(), runId: 'mockRunId' }
+    mockTrackEvent = jest.fn()
+    mockGetProtocolRunAnalyticsData = jest.fn()
+
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
+    when(mockUseProtocolRunDataAnalytics).calledWith(RUN_ID).mockReturnValue({
+      getProtocolRunAnalyticsData: mockGetProtocolRunAnalyticsData,
+    })
+    props = { onClose: jest.fn(), runId: RUN_ID }
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+    jest.restoreAllMocks()
   })
 
   it('should render the correct title', () => {
