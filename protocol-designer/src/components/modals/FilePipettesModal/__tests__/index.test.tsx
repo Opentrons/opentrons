@@ -293,8 +293,14 @@ describe('FilePipettesModal', () => {
       props.initialModuleValues = initialModuleValues
 
       const wrapper = renderFormComponent(props)
-
-      expect(wrapper.find(CrashInfoBox)).toHaveLength(0)
+      expect(wrapper.find(CrashInfoBox).props()).toEqual({
+        showDiagram: true,
+        showHeaterShakerLabwareCollisions: false,
+        showHeaterShakerModuleCollisions: false,
+        showHeaterShakerPipetteCollisions: false,
+        showMagPipetteCollisons: false,
+        showTempPipetteCollisons: false,
+      })
     })
 
     it('does not display crash info when noncrashable pipettes', () => {
@@ -306,7 +312,14 @@ describe('FilePipettesModal', () => {
 
       const wrapper = renderFormComponent(props)
 
-      expect(wrapper.find(CrashInfoBox)).toHaveLength(0)
+      expect(wrapper.find(CrashInfoBox).props()).toEqual({
+        showDiagram: true,
+        showHeaterShakerLabwareCollisions: false,
+        showHeaterShakerModuleCollisions: false,
+        showHeaterShakerPipetteCollisions: false,
+        showMagPipetteCollisons: false,
+        showTempPipetteCollisons: false,
+      })
     })
 
     it('does not display crash info when module restrictions disabled', () => {

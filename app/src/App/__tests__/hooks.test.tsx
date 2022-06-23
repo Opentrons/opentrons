@@ -27,7 +27,7 @@ jest.mock('../../redux/nav')
 jest.mock('../../redux/config')
 jest.mock('../../redux/discovery')
 jest.mock('../../organisms/ProtocolUpload/hooks')
-jest.mock('../../organisms/Labware/helpers/getAllDefs')
+jest.mock('../../pages/Labware/helpers/getAllDefs')
 
 const mockGetConnectedRobot = getConnectedRobot as jest.MockedFunction<
   typeof getConnectedRobot

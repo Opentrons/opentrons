@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import heaterShakerModule from '../../../assets/images/heatershaker_module_transparent.svg'
-import { HeaterShakerModuleData } from '../ModuleCard/HeaterShakerModuleData'
+import { HeaterShakerModuleData } from '../../ModuleCard/HeaterShakerModuleData'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 

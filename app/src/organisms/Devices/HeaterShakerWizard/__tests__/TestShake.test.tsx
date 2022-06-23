@@ -6,19 +6,19 @@ import {
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
-import { useLatchControls } from '../../ModuleCard/hooks'
+import { useLatchControls } from '../../../ModuleCard/hooks'
 import { TestShake } from '../TestShake'
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
-import { useModuleIdFromRun } from '../../ModuleCard/useModuleIdFromRun'
+import { useModuleIdFromRun } from '../../../ModuleCard/useModuleIdFromRun'
 
 import type { ProtocolModuleInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../HeaterShakerModuleCard')
-jest.mock('../../ModuleCard/hooks')
-jest.mock('../../ModuleCard/useModuleIdFromRun')
+jest.mock('../../../ModuleCard/hooks')
+jest.mock('../../../ModuleCard/useModuleIdFromRun')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation

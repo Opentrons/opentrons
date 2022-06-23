@@ -28,6 +28,14 @@ class VolumeMixin(BaseModel):
     # See Opentrons/opentrons#4837 for terminology concerns.
 
 
+class FlowRateMixin(BaseModel):
+    """Mixin for command requests that take a flow rate."""
+
+    flowRate: float = Field(
+        ..., description="Speed in µL/s configured for the pipette", gt=0
+    )
+
+
 class WellLocationMixin(BaseModel):
     """Mixin for command requests that take a location that's somewhere in a well."""
 
