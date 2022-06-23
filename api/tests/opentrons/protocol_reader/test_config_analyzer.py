@@ -48,14 +48,14 @@ CONFIG_ANALYZER_SPECS: List[ConfigAnalyzerSpec] = [
                 """
                 metadata = {
                     "author": "Dr. Sy. N. Tist",
-                    "apiLevel": "123.456",
+                    "apiLevel": "2.11",
                 }
                 """
             ).encode(),
         ),
         expected=ConfigAnalysis(
-            metadata={"author": "Dr. Sy. N. Tist", "apiLevel": "123.456"},
-            config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
+            metadata={"author": "Dr. Sy. N. Tist", "apiLevel": "2.11"},
+            config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
         ),
     ),
     ConfigAnalyzerSpec(
@@ -131,14 +131,14 @@ CONFIG_ANALYZER_SPECS: List[ConfigAnalyzerSpec] = [
                 """
                 metadata = {
                     "author": "Dr. Sy. N. Tist",
-                    "apiLevel": "123.456",
+                    "apiLevel": "2.11",
                 }
                 """
             ).encode(),
         ),
         expected=ConfigAnalysis(
-            metadata={"author": "Dr. Sy. N. Tist", "apiLevel": "123.456"},
-            config=PythonProtocolConfig(api_version=APIVersion(123, 456)),
+            metadata={"author": "Dr. Sy. N. Tist", "apiLevel": "2.11"},
+            config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
         ),
     ),
 ]
@@ -258,6 +258,21 @@ CONFIG_ANALYZER_ERROR_SPECS: List[ConfigAnalyzerErrorSpec] = [
             ).encode(),
         ),
         expected_message="is not of the format X.Y",
+    ),
+    ConfigAnalyzerErrorSpec(
+        main_file=RoleAnalysisFile(
+            name="protocol.py",
+            data=None,
+            path=None,
+            role=ProtocolFileRole.MAIN,
+            contents=textwrap.dedent(
+                """
+                # apiLevel provided, but not a valid version.
+                metadata = {"apiLevel": "123.456"}
+                """
+            ).encode(),
+        ),
+        expected_message="API version 123.456 is not supported by this robot software. Please either reduce your requested API version or update your robot.",
     ),
 ]
 

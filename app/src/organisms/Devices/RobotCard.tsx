@@ -31,7 +31,6 @@ import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import {
   useAttachedModules,
   useAttachedPipettes,
-  useIsRobotBusy,
   useProtocolDetailsForRun,
 } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
@@ -54,7 +53,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const { robot } = props
   const { name: robotName = null, local } = robot
   const history = useHistory()
-  const isRobotBusy = useIsRobotBusy()
+
   return robotName != null ? (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -73,10 +72,8 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
         style={{ width: '6rem' }}
         id={`RobotCard_${robotName}_robotImage`}
       />
-      <Box padding={SPACING.spacing4} width="100%">
-        {!isRobotBusy ? (
-          <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
-        ) : null}
+      <Box padding={SPACING.spacing3} width="100%">
+        <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
         <ReachableBanner robot={robot} />
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_START}>
           <Flex flexDirection={DIRECTION_COLUMN}>

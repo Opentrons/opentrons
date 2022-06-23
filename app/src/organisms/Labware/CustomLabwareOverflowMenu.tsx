@@ -5,7 +5,6 @@ import {
   Flex,
   Icon,
   useConditionalConfirm,
-  AlertModal,
   SPACING,
   COLORS,
   POSITION_ABSOLUTE,
@@ -13,12 +12,17 @@ import {
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
   TEXT_TRANSFORM_CAPITALIZE,
+  JUSTIFY_FLEX_END,
+  ALIGN_CENTER,
+  TYPOGRAPHY,
+  Btn,
 } from '@opentrons/components'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
+import { AlertPrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
+import { Modal } from '../../atoms/Modal'
 import { Portal } from '../../App/portal'
 import { useCloseOnOutsideClick } from './hooks'
 import {
@@ -38,7 +42,7 @@ export function CustomLabwareOverflowMenu(
   props: CustomLabwareOverflowMenuProps
 ): JSX.Element {
   const { filename, onDelete } = props
-  const { t } = useTranslation(['labware_landing'])
+  const { t } = useTranslation(['labware_landing', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
   const overflowMenuRef = React.useRef(null)
@@ -76,9 +80,19 @@ export function CustomLabwareOverflowMenu(
     window.open(LABWARE_CREATOR_HREF, '_blank')
   }
 
+  const handleCancelModal: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    cancelDeleteLabware()
+  }
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
-      <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
+      <OverflowBtn
+        aria-label="CustomLabwareOverflowMenu_button"
+        alignSelf={ALIGN_FLEX_END}
+        onClick={handleOverflowClick}
+      />
       {showOverflowMenu && (
         <Flex
           ref={overflowMenuRef}
@@ -107,41 +121,35 @@ export function CustomLabwareOverflowMenu(
       )}
       {showDeleteConfirmation && (
         <Portal level="top">
-          <AlertModal
-            heading={t('delete_this_labware')}
-            buttons={[
-              {
-                Component: () => (
-                  <SecondaryButton
-                    onClick={(e: React.MouseEvent) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      cancelDeleteLabware()
-                    }}
-                    textTransform={TEXT_TRANSFORM_CAPITALIZE}
-                  >
-                    {t('cancel')}
-                  </SecondaryButton>
-                ),
-              },
-              {
-                Component: () => (
-                  <AlertPrimaryButton
-                    onClick={handleClickDelete}
-                    marginLeft={SPACING.spacing3}
-                  >
-                    {t('yes_delete_def')}
-                  </AlertPrimaryButton>
-                ),
-              },
-            ]}
-            alertOverlay
+          <Modal
+            type="warning"
+            title={t('delete_this_labware')}
+            onClose={handleCancelModal}
           >
-            <StyledText as="p">{t('def_moved_to_trash')}</StyledText>
-            <StyledText as="p">
-              {t('cannot-run-python-missing-labware')}
-            </StyledText>
-          </AlertModal>
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <StyledText as="p">{t('def_moved_to_trash')}</StyledText>
+              <StyledText as="p" paddingTop={SPACING.spacing3}>
+                {t('cannot-run-python-missing-labware')}
+              </StyledText>
+              <Flex
+                justifyContent={JUSTIFY_FLEX_END}
+                alignItems={ALIGN_CENTER}
+                marginTop={SPACING.spacing5}
+              >
+                <Btn
+                  onClick={handleCancelModal}
+                  textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                  marginRight={SPACING.spacing5}
+                  css={TYPOGRAPHY.linkPSemiBold}
+                >
+                  {t('shared:cancel')}
+                </Btn>
+                <AlertPrimaryButton onClick={handleClickDelete}>
+                  {t('yes_delete_def')}
+                </AlertPrimaryButton>
+              </Flex>
+            </Flex>
+          </Modal>
         </Portal>
       )}
     </Flex>
