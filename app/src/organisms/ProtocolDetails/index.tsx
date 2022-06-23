@@ -436,6 +436,7 @@ export function ProtocolDetails(
                 complete: (
                   <DeckThumbnail
                     commands={mostRecentAnalysis?.commands ?? []}
+                    showLiquids
                   />
                 ),
               }[analysisStatus]
