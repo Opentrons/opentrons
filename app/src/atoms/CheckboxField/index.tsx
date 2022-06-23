@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { Icon, COLORS, Box, SPACING } from '@opentrons/components'
+import { Icon, COLORS, Box, SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 export interface CheckboxFieldProps {
   /** change handler */
@@ -40,8 +40,8 @@ const OUTER_STYLE = css`
 `
 
 const INNER_STYLE_VALUE = css`
-  width: 1.25rem;
-  min-width: 1.25rem;
+  width: ${SPACING.spacingM};
+  min-width: ${SPACING.spacingM};
   color: ${COLORS.blue};
   display: flex;
   border-radius: ${SPACING.spacingXXS};
@@ -66,8 +66,8 @@ const INNER_STYLE_VALUE = css`
 `
 
 const INNER_STYLE_NO_VALUE = css`
-  width: 1.25rem;
-  min-width: 1.25rem;
+  width: ${SPACING.spacingM};
+  min-width: ${SPACING.spacingM};
   color: ${COLORS.darkGreyEnabled};
   display: flex;
   border-radius: ${SPACING.spacingXXS};
@@ -90,6 +90,19 @@ const INNER_STYLE_NO_VALUE = css`
     color: ${COLORS.disabled};
   }
 `
+
+const LABEL_TEXT_STYLE = css`
+  font-size: ${TYPOGRAPHY.fontSizeP};
+  font-weight: ${TYPOGRAPHY.fontWeightRegular};
+  color: ${COLORS.darkBlack};
+  flex: 0 0 auto;
+  padding: 0 0.5rem;
+
+  &:empty {
+    padding: 0;
+  }
+`
+
 export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
   const indeterminate = props.isIndeterminate ? 'true' : undefined
 
@@ -115,7 +128,7 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
         /* @ts-expect-error */
         indeterminate={indeterminate}
       />
-      <Box>{props.label}</Box>
+      <Box css={LABEL_TEXT_STYLE}>{props.label}</Box>
     </label>
   )
 }
