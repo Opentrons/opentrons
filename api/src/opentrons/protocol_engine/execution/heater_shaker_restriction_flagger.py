@@ -72,12 +72,8 @@ class HeaterShakerMovementFlagger:
                 self._state_store.geometry.get_ancestor_slot_name(labware_id)
             )
 
-            dest_east_west = dest_slot_int in self._get_east_west_locations(
-                heater_shaker_slot_int
-            )
-            dest_north_south = dest_slot_int in self._get_north_south_locations(
-                heater_shaker_slot_int
-            )
+            dest_east_west = self._is_east_or_west(heater_shaker_slot_int, dest_slot_int)
+            dest_north_south = self._is_north_south(heater_shaker_slot_int, dest_slot_int)
             dest_heater_shaker = dest_slot_int == heater_shaker_slot_int
 
             if any([dest_east_west, dest_north_south, dest_heater_shaker]):
@@ -157,19 +153,19 @@ class HeaterShakerMovementFlagger:
         return None
 
     @staticmethod
-    def _get_east_west_locations(location: int) -> List[int]:
-        if location in [1, 4, 7, 10]:
-            return [location + 1]
-        elif location in [2, 5, 8, 11]:
-            return [location - 1, location + 1]
+    def _is_east_or_west(hs_location: int, dest_location: int) -> bool:
+        if hs_location in {1, 4, 7, 10}:
+            return dest_location == hs_location + 1
+        elif hs_location in {2, 5, 8, 11}:
+            return dest_location == hs_location - 1 or dest_location == hs_location + 1
         else:
-            return [location - 1]
+            return dest_location == hs_location - 1
 
     @staticmethod
-    def _get_north_south_locations(location: int) -> List[int]:
-        if location in [1, 2, 3]:
-            return [location + 3]
-        elif location in [4, 5, 6, 7, 8, 9]:
-            return [location - 3, location + 3]
+    def _is_north_south(hs_location: int, dest_location: int) -> bool:
+        if hs_location in {1, 2, 3}:
+            return dest_location == hs_location + 3
+        elif hs_location in {4, 5, 6, 7, 8, 9}:
+            return dest_location == hs_location - 3 or dest_location == hs_location + 3
         else:
-            return [location - 3]
+            return dest_location == hs_location - 3
