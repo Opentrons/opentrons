@@ -17,7 +17,6 @@ jest.mock('../useModuleIdFromRun')
 jest.mock('../../Devices/hooks')
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../Devices/hooks')
-jest.mock('../../hooks')
 
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun

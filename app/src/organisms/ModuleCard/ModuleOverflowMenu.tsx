@@ -10,6 +10,7 @@ import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
+import { useRunStatus } from '../RunTimeControl/hooks'
 import { useRunIncompleteOrLegacySessionInProgress } from '../Devices/hooks'
 import { useModuleOverflowMenu } from './hooks'
 
