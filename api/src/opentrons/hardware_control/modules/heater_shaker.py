@@ -144,6 +144,8 @@ class HeaterShaker(mod_abc.AbstractModule):
                 self._error_status = self._exc_to_errorstr(exc)
             elif ignorelist and not isinstance(exc, ignorelist):
                 self._error_status = self._exc_to_errorstr(exc)
+            elif (catchlist == None) and (ignorelist == None):
+                self._error_status = self._exc_to_errorstr(exc)
             raise
 
     async def cleanup(self) -> None:
@@ -544,4 +546,3 @@ class HeaterShakerListener(WaitableListener[PollResult]):
         if self._callback:
             self._callback(exc)
         super().on_error(exc)
-        

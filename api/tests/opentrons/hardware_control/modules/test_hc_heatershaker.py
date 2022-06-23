@@ -179,7 +179,8 @@ async def test_deactivated_updated_live_data(simulating_module):
     }
 
 
-async def test_sync_error_responses(simulating_module_driver_patched):
+async def test_sync_rpm_error_response(simulating_module_driver_patched):
+    """Test that synchronous rpm response with error updates module live data and status."""
     simulating_module_driver_patched._driver.set_rpm.side_effect = RuntimeError()
     with pytest.raises(RuntimeError):
         await simulating_module_driver_patched.set_speed(rpm=500)
@@ -187,6 +188,10 @@ async def test_sync_error_responses(simulating_module_driver_patched):
         simulating_module_driver_patched.live_data["data"]["errorDetails"] == "RuntimeError()"
     )
     assert simulating_module_driver_patched.status == HeaterShakerStatus.ERROR
+
+
+async def test_sync_temp_error_response(simulating_module_driver_patched):
+    """Test that synchronous temperature response with error updates module live data and status."""
     simulating_module_driver_patched._driver.set_temperature.side_effect = RuntimeError()
     with pytest.raises(RuntimeError):
         await simulating_module_driver_patched.set_temperature(celsius=50)
@@ -194,6 +199,10 @@ async def test_sync_error_responses(simulating_module_driver_patched):
         simulating_module_driver_patched.live_data["data"]["errorDetails"] == "RuntimeError()"
     )
     assert simulating_module_driver_patched.status == HeaterShakerStatus.ERROR
+
+
+async def test_sync_deactivate_error_response(simulating_module_driver_patched):
+    """Test that synchronous deactivate response with error updates module live data and status."""
     simulating_module_driver_patched._driver.deactivate_heater.side_effect = RuntimeError()
     with pytest.raises(RuntimeError):
         await simulating_module_driver_patched.deactivate()
@@ -201,6 +210,10 @@ async def test_sync_error_responses(simulating_module_driver_patched):
         simulating_module_driver_patched.live_data["data"]["errorDetails"] == "RuntimeError()"
     )
     assert simulating_module_driver_patched.status == HeaterShakerStatus.ERROR
+
+
+async def test_sync_latch_error_response(simulating_module_driver_patched):
+    """Test that synchronous latch response with error updates module live data and status."""
     simulating_module_driver_patched._driver.open_labware_latch.side_effect = RuntimeError()
     with pytest.raises(RuntimeError):
         await simulating_module_driver_patched.open_labware_latch()
@@ -211,6 +224,7 @@ async def test_sync_error_responses(simulating_module_driver_patched):
 
 
 async def test_async_error_response(simulating_module_driver_patched):
+    """Test that asynchronous error is detected by poller and module live data and status are updated."""
     simulating_module_driver_patched._driver.get_temperature.side_effect = RuntimeError()
     with pytest.raises(RuntimeError):
         await simulating_module_driver_patched.wait_next_poll()
