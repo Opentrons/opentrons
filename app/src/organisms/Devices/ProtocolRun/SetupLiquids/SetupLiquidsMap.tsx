@@ -22,6 +22,7 @@ import {
   useModuleRenderInfoForProtocolById,
 } from '../../hooks'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
+import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 import { getWellFillFromLabwareId } from './utils'
 import type { DeckDefinition } from '@opentrons/shared-data'
 
@@ -52,6 +53,9 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
   const liquids = parseLiquidsInLoadOrder()
   const labwareByLiquidId = parseLabwareInfoByLiquidId()
+  const [liquidDetailsLabwareId, setLiquidDetailsLabwareId] = React.useState<
+    string | null
+  >(null)
 
   return (
     <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
@@ -118,6 +122,12 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                       transform={`translate(${x},${y})`}
                       onMouseEnter={() => setHoverLabwareId(labwareId)}
                       onMouseLeave={() => setHoverLabwareId('')}
+                      onClick={() =>
+                        labwareHasLiquid
+                          ? setLiquidDetailsLabwareId(labwareId)
+                          : null
+                      }
+                      cursor={labwareHasLiquid ? 'pointer' : ''}
                     >
                       <LabwareRender
                         definition={labwareDef}
@@ -140,6 +150,13 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
           </>
         )}
       </RobotWorkSpace>
+      {liquidDetailsLabwareId != null && (
+        <LiquidsLabwareDetailsModal
+          labwareId={liquidDetailsLabwareId}
+          runId={runId}
+          closeModal={() => setLiquidDetailsLabwareId(null)}
+        />
+      )}
     </Flex>
   )
 }
