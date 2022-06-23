@@ -84,5 +84,5 @@ class HeaterShakerModuleSubState:
         if self.speed_status != SpeedStatus.IDLE:
             raise CannotPerformModuleAction(
                 f"Cannot perform the module action when module is shaking or in error."
-                f" Current latch status is: {self.speed_status.value}"
+                f" Current shaking status is: {self.speed_status.value}"
             )
