@@ -502,6 +502,7 @@ def test_get_movement_waypoints_to_coords(
     all_labware_highest_z: float,
     expected_min_travel_z: float,
 ) -> None:
+    """It should call get_waypoints() with the correct args to move to coordinates."""
     origin = Point(1, 2, 3)
     dest = Point(4, 5, 6)
     max_travel_z = 789
@@ -582,4 +583,3 @@ def test_get_movement_waypoints_to_coords_raises(
             direct=False,
             additional_min_travel_z=None,
         )
-
