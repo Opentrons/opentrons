@@ -11,10 +11,7 @@ import {
   COLORS,
 } from '@opentrons/components'
 
-import {
-  useUpdateRobotNameMutation,
-  useRobotName,
-} from '@opentrons/react-api-client'
+import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import { removeRobot } from '../../../../../redux/discovery'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
@@ -52,9 +49,6 @@ export function RenameRobotSlideout({
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
 
-  const currentRobotName = useRobotName()
-  console.log('currentRobotName', currentRobotName.data)
-
   const formik = useFormik({
     initialValues: {
       newRobotName: '',
@@ -82,7 +76,7 @@ export function RenameRobotSlideout({
       // data.name != null && history.push(`/devices/${data.name}/robot-settings`)
       // TODO kj: this is a temporary fix to avoid Download logs button disabled issue
       // Once fix react tree rendering issue, the push direction will be switched to robot-settings
-      console.log('renamed robot', currentRobotName.data)
+      // TODO: useRobotName for redirect
       // TODO 6/9/2022 kj this is a temporary fix to avoid the issue
       // https://github.com/Opentrons/opentrons/issues/10709
       data.name != null && history.push(`/devices`)
