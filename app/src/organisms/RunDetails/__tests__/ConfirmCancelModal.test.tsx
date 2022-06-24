@@ -75,6 +75,7 @@ describe('ConfirmCancelModal', () => {
     const closeButton = getByRole('button', { name: 'yes, cancel run' })
     fireEvent.click(closeButton)
     expect(props.onClose).toHaveBeenCalled()
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
   })
   it('should call No go back button', () => {
     const { getByRole } = render(props)
