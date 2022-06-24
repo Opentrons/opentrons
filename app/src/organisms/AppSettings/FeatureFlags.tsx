@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import {
   Flex,
   Box,
-  Text,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
@@ -14,6 +13,7 @@ import * as Config from '../../redux/config'
 
 import type { DevInternalFlag } from '../../redux/config/types'
 import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
 import { ToggleButton } from '../../atoms/buttons'
 import { useTranslation } from 'react-i18next'
 
@@ -37,9 +37,13 @@ export function FeatureFlags(): JSX.Element {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             key={flag}
           >
-            <Text css={TYPOGRAPHY.h3SemiBold} id={`FeatureFlags_${flag}_text`}>
+            <StyledText
+              as="h3"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              id={`FeatureFlags_${flag}_text`}
+            >
               {t(`__dev_internal__${flag}`)}
-            </Text>
+            </StyledText>
             <ToggleButton
               label={`${flag}-toggle`}
               toggledOn={Boolean(devInternalFlags?.[flag])}

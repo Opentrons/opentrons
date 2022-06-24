@@ -1,10 +1,11 @@
 """Pipetting command handling."""
-from typing import NamedTuple, Optional
+from typing import NamedTuple, Optional, Iterator
+from contextlib import contextmanager
 
 from opentrons.types import Mount as HardwareMount
 from opentrons.hardware_control import HardwareControlAPI
 
-from ..state import StateStore, CurrentWell
+from ..state import StateStore, CurrentWell, HardwarePipette
 from ..resources import LabwareDataProvider
 from ..types import WellLocation, WellOrigin
 from .movement import MovementHandler
@@ -178,6 +179,7 @@ class PipettingHandler:
         well_name: str,
         well_location: WellLocation,
         volume: float,
+        flow_rate: float,
     ) -> float:
         """Aspirate liquid from a well."""
         # get mount and config data from state and hardware controller
@@ -219,7 +221,8 @@ class PipettingHandler:
             current_well=current_well,
         )
 
-        await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
+        with self.set_flow_rate(pipette=hw_pipette, aspirate_flow_rate=flow_rate):
+            await self._hardware_api.aspirate(mount=hw_pipette.mount, volume=volume)
 
         return volume
 
@@ -230,6 +233,7 @@ class PipettingHandler:
         well_name: str,
         well_location: WellLocation,
         volume: float,
+        flow_rate: float,
     ) -> float:
         """Dispense liquid to a well."""
         hw_pipette = self._state_store.pipettes.get_hardware_pipette(
@@ -244,6 +248,77 @@ class PipettingHandler:
             well_location=well_location,
         )
 
-        await self._hardware_api.dispense(mount=hw_pipette.mount, volume=volume)
+        with self.set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):
+            await self._hardware_api.dispense(mount=hw_pipette.mount, volume=volume)
 
         return volume
+
+    async def touch_tip(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+    ) -> None:
+        """Touch the pipette tip to the sides of a well."""
+        target_well = CurrentWell(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+        )
+
+        # get pipette mount and critical point for our touch tip moves
+        pipette_location = self._state_store.motion.get_pipette_location(
+            pipette_id=pipette_id,
+            current_well=target_well,
+        )
+
+        touch_points = self._state_store.geometry.get_well_edges(
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+        )
+
+        # this will handle raising if the thermocycler lid is in a bad state
+        # so we don't need to put that logic elsewhere
+        await self._movement_handler.move_to_well(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
+            well_location=well_location,
+        )
+
+        for position in touch_points:
+            await self._hardware_api.move_to(
+                mount=pipette_location.mount.to_hw_mount(),
+                critical_point=pipette_location.critical_point,
+                abs_position=position,
+            )
+
+    @contextmanager
+    def set_flow_rate(
+        self,
+        pipette: HardwarePipette,
+        aspirate_flow_rate: Optional[float] = None,
+        dispense_flow_rate: Optional[float] = None,
+        blow_out_flow_rate: Optional[float] = None,
+    ) -> Iterator[None]:
+        """Context manager for setting flow rate before calling aspirate, dispense, or blowout."""
+        original_aspirate_rate = pipette.config["aspirate_flow_rate"]
+        original_dispense_rate = pipette.config["dispense_flow_rate"]
+        original_blow_out_rate = pipette.config["blow_out_flow_rate"]
+        self._hardware_api.set_flow_rate(
+            pipette.mount,
+            aspirate=aspirate_flow_rate,
+            dispense=dispense_flow_rate,
+            blow_out=blow_out_flow_rate,
+        )
+        try:
+            yield
+        finally:
+            self._hardware_api.set_flow_rate(
+                pipette.mount,
+                aspirate=original_aspirate_rate,
+                dispense=original_dispense_rate,
+                blow_out=original_blow_out_rate,
+            )

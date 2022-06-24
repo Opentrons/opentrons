@@ -1044,7 +1044,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1066,7 +1066,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // First aspirate: source well A1
@@ -1105,7 +1105,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1142,7 +1142,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Second aspirate: source well A2
@@ -1181,7 +1181,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1218,7 +1218,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Dispense full air + liquid volume all together to dest well (100+31+100+31 = 262uL)
@@ -1257,7 +1257,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Mix (disp)
@@ -1280,7 +1280,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1302,7 +1302,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Touch tip (disp)
@@ -1362,7 +1362,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1384,7 +1384,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // actual aspirate A3
@@ -1423,7 +1423,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1460,7 +1460,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Dispense full air + liquid volume all together to dest well (100+31 = 131uL)
@@ -1499,7 +1499,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Mix (disp)
@@ -1522,7 +1522,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1544,7 +1544,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Touch tip (disp)
@@ -1600,7 +1600,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
 
@@ -1674,7 +1674,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1696,7 +1696,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // First aspirate: source well A1
@@ -1735,7 +1735,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1772,7 +1772,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Second aspirate: source well A2
@@ -1811,7 +1811,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1848,7 +1848,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Dispense full air + liquid volume all together to dest well (100+31+100+31 = 262uL)
@@ -1887,7 +1887,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Mix (disp)
@@ -1910,7 +1910,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -1932,7 +1932,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Touch tip (disp)
@@ -1992,7 +1992,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2014,7 +2014,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // actual aspirate A3
@@ -2053,7 +2053,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2090,7 +2090,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Dispense full air + liquid volume all together to dest well (100+31 = 131uL)
@@ -2129,7 +2129,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Mix (disp)
@@ -2152,7 +2152,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2174,7 +2174,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Touch tip (disp)
@@ -2228,7 +2228,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
 
@@ -2302,7 +2302,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2324,7 +2324,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // First aspirate: source well A1
@@ -2363,7 +2363,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2400,7 +2400,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Second aspirate: source well A2
@@ -2439,7 +2439,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2476,7 +2476,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Dispense full air + liquid volume all together to dest well (100+31+100+31 = 262uL)
@@ -2515,7 +2515,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Mix (disp)
@@ -2538,7 +2538,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2560,7 +2560,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Touch tip (disp)
@@ -2616,7 +2616,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // replace tip
@@ -2658,7 +2658,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2680,7 +2680,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // actual aspirate A3
@@ -2719,7 +2719,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2756,7 +2756,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Dispense full air + liquid volume all together to dest well (100+31 = 131uL)
@@ -2795,7 +2795,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Mix (disp)
@@ -2818,7 +2818,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
@@ -2840,7 +2840,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Touch tip (disp)
@@ -2894,7 +2894,7 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'delay',
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
 

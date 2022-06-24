@@ -114,7 +114,8 @@ export function CommandText(props: Props): JSX.Element | null {
       )
       break
     }
-    case 'pause': {
+    case 'pause':
+    case 'waitForResume': {
       messageNode = displayCommand.params?.message ?? displayCommand.commandType
       break
     }

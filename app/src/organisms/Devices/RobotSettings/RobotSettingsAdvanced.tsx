@@ -33,6 +33,7 @@ import type {
 } from '../../../redux/robot-settings/types'
 import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
 import { UNREACHABLE } from '../../../redux/discovery'
+import { Portal } from '../../../App/portal'
 
 interface RobotSettingsAdvancedProps {
   robotName: string
@@ -149,12 +150,14 @@ export function RobotSettingsAdvanced({
           />
         )}
         {showFactoryResetModal && (
-          <FactoryResetModal
-            closeModal={() => setShowFactoryResetModal(false)}
-            isRobotConnected={isRobotConnected}
-            robotName={robotName}
-            resetOptions={resetOptions}
-          />
+          <Portal level="top">
+            <FactoryResetModal
+              closeModal={() => setShowFactoryResetModal(false)}
+              isRobotConnected={isRobotConnected}
+              robotName={robotName}
+              resetOptions={resetOptions}
+            />
+          </Portal>
         )}
         <DisplayRobotName
           robotName={robotName}

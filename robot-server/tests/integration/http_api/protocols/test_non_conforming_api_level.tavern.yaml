@@ -1,0 +1,21 @@
+test_name: Upload, analyze, and validate protocol analysis failure for api level.
+
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Upload a python protocol with non-conforming api level 
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/non_conforming_api_level.py'
+    response:
+      strict:
+        - json:off
+      status_code: 422
+      json:
+        errors:
+          - id: ProtocolFilesInvalid
+            title: Protocol File(s) Invalid
+            detail: "API version 2.1000 is not supported by this robot software. Please either reduce your requested API version or update your robot."

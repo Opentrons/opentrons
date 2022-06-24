@@ -1,7 +1,8 @@
 import * as React from 'react'
 import map from 'lodash/map'
 import omit from 'lodash/omit'
-import { isEmpty, startCase } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
+import startCase from 'lodash/startCase'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
@@ -140,7 +141,7 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
           flexDirection={DIRECTION_COLUMN}
           data-testid={`ProtocolDetails_description`}
         >
-          {description}
+          <StyledText as="p">{description}</StyledText>
           {filteredMetaData.map((item, index) => {
             return (
               <React.Fragment key={index}>
