@@ -5,11 +5,6 @@ import {
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
 import {
-  RUN_STATUS_FAILED,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
-} from '@opentrons/api-client'
-import {
   Flex,
   Text,
   TYPOGRAPHY,
@@ -39,7 +34,6 @@ import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { Tooltip } from '../../atoms/Tooltip'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
-import { useRunStatus } from '../RunTimeControl/hooks'
 import { useLatchControls } from './hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 import { Collapsible } from './Collapsible'
@@ -71,12 +65,6 @@ export const TestShakeSlideout = (
     module,
     runId != null ? runId : null
   )
-  //  TODO(jr, 6/23/22): delete this boolean + logic when you can send commands with runId known re: https://opentrons.slack.com/archives/C033PPVEC76/p1656000780091279
-  const runStatus = useRunStatus(runId != null ? runId : null)
-  const isRunTerminal =
-    runStatus === RUN_STATUS_SUCCEEDED ||
-    runStatus === RUN_STATUS_STOPPED ||
-    runStatus === RUN_STATUS_FAILED
 
   const [showCollapsed, setShowCollapsed] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
@@ -99,7 +87,7 @@ export const TestShakeSlideout = (
   }
 
   const handleShakeCommand = (): void => {
-    if (runId != null && !isRunTerminal) {
+    if (runId != null) {
       createCommand({
         runId: runId,
         command: isShaking ? stopShakeCommand : setShakeCommand,
