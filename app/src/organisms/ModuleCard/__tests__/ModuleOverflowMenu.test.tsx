@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 import {
   mockMagneticModule,
@@ -9,15 +10,16 @@ import {
   mockHeaterShaker,
 } from '../../../redux/modules/__fixtures__'
 import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useRunIncompleteOrLegacySessionInProgress } from '../../Devices/hooks'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 jest.mock('../useModuleIdFromRun')
 jest.mock('../../Devices/hooks')
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../Devices/hooks')
+jest.mock('../../ProtocolUpload/hooks')
 
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
@@ -27,6 +29,9 @@ const mockUseRunIncompleteOrLegacySessionInProgress = useRunIncompleteOrLegacySe
 >
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
+>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
@@ -208,6 +213,7 @@ describe('ModuleOverflowMenu', () => {
     mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
     mockUseRunIncompleteOrLegacySessionInProgress.mockReturnValue(false)
     mockUseRunStatus.mockReturnValue(null)
+    mockUseCurrentRunId.mockReturnValue(null)
     props = {
       module: mockMagneticModule,
       handleSlideoutClick: jest.fn(),

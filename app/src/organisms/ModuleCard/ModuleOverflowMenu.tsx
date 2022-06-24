@@ -10,6 +10,7 @@ import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { useRunIncompleteOrLegacySessionInProgress } from '../Devices/hooks'
 import { useModuleOverflowMenu } from './hooks'
@@ -50,8 +51,10 @@ export const ModuleOverflowMenu = (
     handleWizardClick,
     handleSlideoutClick
   )
-  const isIncompleteOrBusy = useRunIncompleteOrLegacySessionInProgress()
   const runStatus = useRunStatus(runId != null ? runId : null)
+  const currentRunId = useCurrentRunId()
+
+  const isIncompleteOrBusy = useRunIncompleteOrLegacySessionInProgress()
   const isRunStill =
     runStatus === RUN_STATUS_SUCCEEDED ||
     runStatus === RUN_STATUS_STOPPED ||
@@ -61,7 +64,7 @@ export const ModuleOverflowMenu = (
   let isDisabled: boolean = false
   if (runId != null && isModuleControl) {
     isDisabled = !isRunStill
-  } else if (runId != null && !isModuleControl) {
+  } else if ((runId != null || currentRunId != null) && !isModuleControl) {
     isDisabled = isIncompleteOrBusy
   }
 
