@@ -28,7 +28,7 @@ export function useTrackProtocolRunEvent(
           runTime,
         },
       })
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(
         `getProtocolRunAnalyticsData error during ${event.name}: ${
           (e as Error).message

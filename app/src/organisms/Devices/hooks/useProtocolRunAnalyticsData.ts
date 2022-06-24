@@ -1,4 +1,7 @@
+import { useSelector } from 'react-redux'
+
 import { hash } from '../../../redux/analytics/hash'
+import { getStoredProtocol } from '../../../redux/protocol-storage'
 import { useStoredProtocolAnalysis } from './useStoredProtocolAnalysis'
 import { useProtocolDetailsForRun } from './useProtocolDetailsForRun'
 import { useProtocolMetadata } from '../../ProtocolSetup/hooks'
@@ -7,6 +10,7 @@ import { formatInterval } from '../../RunTimeControl/utils'
 import { EMPTY_TIMESTAMP } from '../constants'
 
 import type { ProtocolAnalyticsData } from '../../../redux/analytics/types'
+import type { State } from '../../../redux/types'
 
 type GetProtocolRunAnalyticsData = () => Promise<{
   protocolRunAnalyticsData: ProtocolAnalyticsData
@@ -30,8 +34,11 @@ export function useProtocolRunAnalyticsData(
     runId
   )
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
+  const storedProtocol = useSelector((state: State) =>
+    getStoredProtocol(storedProtocolAnalysis?.metadata?.protocolKey)
+  )
   const protocolAnalysis =
-    robotProtocolAnalysis != null
+    robotProtocolAnalysis != null && robotProtocolMetadata != null
       ? {
           ...robotProtocolAnalysis,
           metadata: robotProtocolMetadata,
@@ -43,7 +50,7 @@ export function useProtocolRunAnalyticsData(
   const getProtocolRunAnalyticsData: GetProtocolRunAnalyticsData = () => {
     const hashTasks = [
       hash(protocolAnalysis?.metadata?.author) ?? '',
-      hash(protocolAnalysis?.metadata?.description) ?? '',
+      hash(storedProtocol?.srcFiles?.toString() ?? '') ?? '',
     ]
 
     return Promise.all(hashTasks).then(([protocolAuthor, protocolText]) => ({
