@@ -165,7 +165,7 @@ export function ProtocolRunHeader({
             ...robotAnalyticsData,
           },
         }).catch((e: Error) =>
-          console.log(
+          console.error(
             `Error tracking protocol run runFinish event: ${e.message}`
           )
         )
@@ -264,7 +264,7 @@ export function ProtocolRunHeader({
         name: eventName,
         properties: eventProperties,
       }).catch((e: Error) =>
-        console.log(
+        console.error(
           `Error tracking protocol run ${eventName} event: ${e.message}`
         )
       )
@@ -278,7 +278,7 @@ export function ProtocolRunHeader({
       name: 'runPause',
       properties: {},
     }).catch((e: Error) =>
-      console.log(`Error tracking protocol run runPause event: ${e.message}`)
+      console.error(`Error tracking protocol run runPause event: ${e.message}`)
     )
   }
 
@@ -289,7 +289,7 @@ export function ProtocolRunHeader({
       name: 'runAgain',
       properties: {},
     }).catch((e: Error) =>
-      console.log(`Error tracking protocol run runAgain event: ${e.message}`)
+      console.error(`Error tracking protocol run runAgain event: ${e.message}`)
     )
   }
 
@@ -383,7 +383,7 @@ export function ProtocolRunHeader({
         ...robotAnalyticsData,
       },
     }).catch((e: Error) =>
-      console.log(`Error tracking protocol run runFinish event: ${e.message}`)
+      console.error(`Error tracking protocol run runFinish event: ${e.message}`)
     )
 
     closeCurrentRun()

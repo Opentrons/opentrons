@@ -36,7 +36,9 @@ export function ConfirmCancelModal(
         name: 'runCancel',
         properties: {},
       }).catch((e: Error) =>
-        console.log(`Error tracking protocol run runCancel event: ${e.message}`)
+        console.error(
+          `Error tracking protocol run runCancel event: ${e.message}`
+        )
       )
     }
   }

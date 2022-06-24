@@ -4,7 +4,6 @@
 const ALGORITHM = 'SHA-256'
 
 export function hash(source: string): Promise<string> {
-  console.log('hashSource:', source)
   const encoder = new TextEncoder()
   const data = encoder.encode(source)
 
