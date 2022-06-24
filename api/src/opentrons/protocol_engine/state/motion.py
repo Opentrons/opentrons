@@ -1,6 +1,6 @@
 """Motion state store and getters."""
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Tuple
+from typing import List, Optional
 
 from opentrons.types import MountType, Point, DeckSlotName
 from opentrons.hardware_control.types import CriticalPoint
