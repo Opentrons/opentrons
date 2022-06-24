@@ -11,6 +11,7 @@ from opentrons.protocol_engine.commands import (
 )
 from opentrons.protocol_engine.execution import (
     MovementHandler,
+    PipettingHandler,
 )
 from opentrons.types import Mount
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -22,10 +23,14 @@ async def test_blow_out_implementation(
     state_view: StateView,
     hardware_api: HardwareControlAPI,
     movement: MovementHandler,
+    pipetting: PipettingHandler,
 ) -> None:
     """Test BlowOut command execution."""
     subject = BlowOutImplementation(
-        state_view=state_view, movement=movement, hardware_api=hardware_api
+        state_view=state_view,
+        movement=movement,
+        hardware_api=hardware_api,
+        pipetting=pipetting,
     )
 
     left_config = cast(PipetteDict, {"name": "p300_single", "pipette_id": "123"})
@@ -50,7 +55,16 @@ async def test_blow_out_implementation(
         labwareId="labware-id",
         wellName="C6",
         wellLocation=location,
+        flowRate=1.234,
     )
+
+    mock_flow_rate_context = decoy.mock(name="mock flow rate context")
+    decoy.when(
+        pipetting.set_flow_rate(
+            pipette=HardwarePipette(mount=Mount.LEFT, config=left_config),
+            blow_out_flow_rate=1.234,
+        )
+    ).then_return(mock_flow_rate_context)
 
     result = await subject.execute(data)
 
@@ -63,5 +77,7 @@ async def test_blow_out_implementation(
             well_name="C6",
             well_location=location,
         ),
+        mock_flow_rate_context.__enter__(),
         await hardware_api.blow_out(mount=left_pipette.mount),
+        mock_flow_rate_context.__exit__(None, None, None),
     )

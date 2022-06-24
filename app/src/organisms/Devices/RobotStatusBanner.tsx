@@ -14,7 +14,7 @@ import {
   COLORS,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../atoms/buttons'
+import { SecondaryTertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
@@ -48,7 +48,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
           }`}
           id={`RobotStatusBanner_${name}_goToRun`}
         >
-          <TertiaryButton>{t('go_to_run')}</TertiaryButton>
+          <SecondaryTertiaryButton>{t('go_to_run')}</SecondaryTertiaryButton>
         </Link>
       </Flex>
     ) : null

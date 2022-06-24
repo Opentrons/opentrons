@@ -4982,7 +4982,7 @@
       "id": "51",
       "commandType": "delay",
       "params": {
-        "wait": 1
+        "seconds": 1
       }
     },
     {

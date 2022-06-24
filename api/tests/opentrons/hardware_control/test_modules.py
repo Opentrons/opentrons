@@ -1,15 +1,27 @@
 import asyncio
+import pytest
+
 from pathlib import Path
 from unittest import mock
-import pytest
+
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import ModuleAtPort
 from opentrons.hardware_control.modules.types import (
     BundledFirmware,
+    ModuleModel,
     MagneticModuleModel,
+    TemperatureModuleModel,
+    HeaterShakerModuleModel,
+    ThermocyclerModuleModel,
     ModuleType,
 )
-from opentrons.hardware_control.modules import tempdeck, magdeck
+from opentrons.hardware_control.modules import (
+    TempDeck,
+    MagDeck,
+    Thermocycler,
+    HeaterShaker,
+    AbstractModule,
+)
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 
@@ -66,7 +78,37 @@ async def test_module_caching():
     assert two_magdecks[1] is not two_magdecks[0]
 
 
-async def test_filtering_modules():
+@pytest.mark.parametrize(
+    argnames=[
+        "module_model",
+        "module_type",
+        "expected_found_type",
+        "expected_found_number",
+    ],
+    argvalues=[
+        (MagneticModuleModel.MAGNETIC_V1, ModuleType.MAGNETIC, MagDeck, 2),
+        (TemperatureModuleModel.TEMPERATURE_V2, ModuleType.TEMPERATURE, TempDeck, 2),
+        (
+            ThermocyclerModuleModel.THERMOCYCLER_V1,
+            ModuleType.THERMOCYCLER,
+            Thermocycler,
+            1,
+        ),
+        (
+            HeaterShakerModuleModel.HEATER_SHAKER_V1,
+            ModuleType.HEATER_SHAKER,
+            HeaterShaker,
+            1,
+        ),
+    ],
+)
+async def test_filtering_modules(
+    module_model: ModuleModel,
+    module_type: ModuleType,
+    expected_found_type: AbstractModule,
+    expected_found_number: int,
+) -> None:
+    """It should parse available modules and filter out the specified ones."""
     import opentrons.hardware_control as hardware_control
 
     mods = [
@@ -80,14 +122,49 @@ async def test_filtering_modules():
     api = await hardware_control.API.build_hardware_simulator(attached_modules=mods)
     await asyncio.sleep(0.05)
 
-    filtered_modules, _ = await api.find_modules(
-        MagneticModuleModel.MAGNETIC_V1, ModuleType.MAGNETIC
-    )
-    assert len(filtered_modules) == 2
-    assert filtered_modules == api.attached_modules[2:4]
+    filtered_modules, _ = await api.find_modules(module_model, module_type)
 
+    assert len(filtered_modules) == expected_found_number
+    for mod in filtered_modules:
+        assert isinstance(mod, expected_found_type)
+
+    await _.cleanup()
     for m in api.attached_modules:
         await m.cleanup()
+
+
+@pytest.mark.parametrize(
+    argnames=["module_model", "module_type", "expected_sim_type"],
+    argvalues=[
+        (MagneticModuleModel.MAGNETIC_V1, ModuleType.MAGNETIC, MagDeck),
+        (TemperatureModuleModel.TEMPERATURE_V1, ModuleType.TEMPERATURE, TempDeck),
+        (
+            ThermocyclerModuleModel.THERMOCYCLER_V1,
+            ModuleType.THERMOCYCLER,
+            Thermocycler,
+        ),
+        (
+            HeaterShakerModuleModel.HEATER_SHAKER_V1,
+            ModuleType.HEATER_SHAKER,
+            HeaterShaker,
+        ),
+    ],
+)
+async def test_get_simulating_module(
+    module_model: ModuleModel,
+    module_type: ModuleType,
+    expected_sim_type: AbstractModule,
+) -> None:
+    """It should create simulating module instance for specified module."""
+    import opentrons.hardware_control as hardware_control
+
+    api = await hardware_control.API.build_hardware_simulator(attached_modules=[])
+    await asyncio.sleep(0.05)
+
+    _, simulating_module = await api.find_modules(module_model, module_type)
+    assert isinstance(simulating_module, expected_sim_type)
+
+    await simulating_module.cleanup()
 
 
 @pytest.fixture
@@ -276,7 +353,7 @@ async def test_get_bundled_fw(monkeypatch, tmpdir):
     ],
 )
 def test_magnetic_module_revision_parsing(revision, model):
-    assert magdeck.MagDeck._model_from_revision(revision) == model
+    assert MagDeck._model_from_revision(revision) == model
 
 
 @pytest.mark.parametrize(
@@ -293,4 +370,4 @@ def test_magnetic_module_revision_parsing(revision, model):
     ],
 )
 def test_temperature_module_revision_parsing(revision, model):
-    assert tempdeck.TempDeck._model_from_revision(revision) == model
+    assert TempDeck._model_from_revision(revision) == model

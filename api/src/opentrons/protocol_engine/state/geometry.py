@@ -1,6 +1,6 @@
 """Geometry state getters."""
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 
 from opentrons.types import Point, DeckSlotName
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -135,6 +135,39 @@ class GeometryView:
             y=labware_pos.y + offset.y + well_def.y,
             z=labware_pos.z + offset.z + well_def.z,
         )
+
+    def get_well_edges(
+        self,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+    ) -> List[Point]:
+        """Get list of absolute positions of four cardinal edges and center of well."""
+        well_def = self._labware.get_well_definition(labware_id, well_name)
+        if well_def.shape == "rectangular":
+            x_size = well_def.xDimension
+            y_size = well_def.yDimension
+            if x_size is None or y_size is None:
+                raise ValueError(
+                    f"Rectangular well {well_name} does not have x and y dimensions"
+                )
+        elif well_def.shape == "circular":
+            x_size = y_size = well_def.diameter
+            if x_size is None or y_size is None:
+                raise ValueError(f"Circular well {well_name} does not have diamater")
+        else:
+            raise ValueError(f'Shape "{well_def.shape}" is not a supported well shape')
+
+        x_offset = x_size / 2.0
+        y_offset = y_size / 2.0
+        center = self.get_well_position(labware_id, well_name, well_location)
+        return [
+            center + Point(x=x_offset, y=0, z=0),  # right
+            center + Point(x=-x_offset, y=0, z=0),  # left
+            center,  # center
+            center + Point(x=0, y=y_offset, z=0),  # up
+            center + Point(x=0, y=-y_offset, z=0),  # down
+        ]
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
         labware_pos = self.get_labware_position(lw_data.id)

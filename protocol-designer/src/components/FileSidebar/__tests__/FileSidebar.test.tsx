@@ -46,7 +46,6 @@ describe('FileSidebar', () => {
       pipettesOnDeck: {},
       modulesOnDeck: {},
       savedStepForms: {},
-      schemaVersion: 3,
     }
 
     commands = [
@@ -119,16 +118,6 @@ describe('FileSidebar', () => {
     expect(downloadButton.prop('disabled')).toEqual(true)
   })
 
-  it('export button exports protocol when no errors', () => {
-    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
-    props.fileData.commands = commands
-    const wrapper = shallow(<FileSidebar {...props} />)
-    const downloadButton = wrapper.find(PrimaryButton).at(0)
-    downloadButton.simulate('click')
-
-    expect(props.onDownload).toHaveBeenCalled()
-  })
-
   it('warning modal is shown when export is clicked with no command', () => {
     const wrapper = shallow(<FileSidebar {...props} />)
     const downloadButton = wrapper.find(PrimaryButton).at(0)
@@ -137,10 +126,6 @@ describe('FileSidebar', () => {
 
     expect(alertModal).toHaveLength(1)
     expect(alertModal.prop('heading')).toEqual('Your protocol has no steps')
-
-    const continueButton = alertModal.dive().find(OutlineButton).at(1)
-    continueButton.simulate('click')
-    expect(props.onDownload).toHaveBeenCalled()
   })
 
   it('warning modal is shown when export is clicked with unused pipette', () => {
@@ -163,10 +148,6 @@ describe('FileSidebar', () => {
     expect(alertModal.html()).not.toContain(
       pipettesOnDeck.pipetteLeftId.spec.displayName
     )
-
-    const continueButton = alertModal.dive().find(OutlineButton).at(1)
-    continueButton.simulate('click')
-    expect(props.onDownload).toHaveBeenCalled()
   })
 
   it('warning modal is shown when export is clicked with unused module', () => {
@@ -183,10 +164,6 @@ describe('FileSidebar', () => {
     expect(alertModal).toHaveLength(1)
     expect(alertModal.prop('heading')).toEqual('Unused module')
     expect(alertModal.html()).toContain('Magnetic module')
-
-    const continueButton = alertModal.dive().find(OutlineButton).at(1)
-    continueButton.simulate('click')
-    expect(props.onDownload).toHaveBeenCalled()
   })
 
   it('warning modal is shown when export is clicked with unused module and pipette', () => {
@@ -211,10 +188,6 @@ describe('FileSidebar', () => {
     expect(alertModal.html()).not.toContain(
       pipettesOnDeck.pipetteLeftId.spec.displayName
     )
-
-    const continueButton = alertModal.dive().find(OutlineButton).at(1)
-    continueButton.simulate('click')
-    expect(props.onDownload).toHaveBeenCalled()
   })
 
   it('blocking hint is shown', () => {
@@ -228,13 +201,13 @@ describe('FileSidebar', () => {
 
     mockUseBlockingHint.mockReturnValue(<MockHintComponent />)
 
-    const wrapper = mount(<FileSidebar {...props} schemaVersion={5} />)
+    const wrapper = mount(<FileSidebar {...props} />)
 
     expect(wrapper.exists(MockHintComponent)).toEqual(true)
     // Before save button is clicked, enabled should be false
     expect(mockUseBlockingHint).toHaveBeenNthCalledWith(1, {
       enabled: false,
-      hintKey: 'export_v6_protocol_5_10',
+      hintKey: 'export_v6_protocol_6_10',
       content: v6WarningContent,
       handleCancel: expect.any(Function),
       handleContinue: expect.any(Function),
@@ -246,7 +219,7 @@ describe('FileSidebar', () => {
     // After save button is clicked, enabled should be true
     expect(mockUseBlockingHint).toHaveBeenLastCalledWith({
       enabled: true,
-      hintKey: 'export_v6_protocol_5_10',
+      hintKey: 'export_v6_protocol_6_10',
       content: v6WarningContent,
       handleCancel: expect.any(Function),
       handleContinue: expect.any(Function),

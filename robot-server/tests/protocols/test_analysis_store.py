@@ -209,13 +209,13 @@ class AnalysisResultSpec(NamedTuple):
 analysis_result_specs: List[AnalysisResultSpec] = [
     AnalysisResultSpec(
         commands=[
-            pe_commands.Pause(
+            pe_commands.WaitForResume(
                 id="pause-1",
                 key="command-key",
                 status=pe_commands.CommandStatus.SUCCEEDED,
                 createdAt=datetime(year=2021, month=1, day=1),
-                params=pe_commands.PauseParams(message="hello world"),
-                result=pe_commands.PauseResult(),
+                params=pe_commands.WaitForResumeParams(message="hello world"),
+                result=pe_commands.WaitForResumeResult(),
             )
         ],
         errors=[],

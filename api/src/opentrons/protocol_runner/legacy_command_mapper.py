@@ -27,6 +27,7 @@ from .legacy_wrappers import (
     LegacyMagneticModuleModel,
     LegacyTemperatureModuleModel,
     LegacyThermocyclerModuleModel,
+    LegacyHeaterShakerModuleModel,
 )
 
 
@@ -48,6 +49,7 @@ _LEGACY_TO_PE_MODULE: Dict[LegacyModuleModel, pe_types.ModuleModel] = {
     LegacyTemperatureModuleModel.TEMPERATURE_V2: pe_types.ModuleModel.TEMPERATURE_MODULE_V2,
     LegacyThermocyclerModuleModel.THERMOCYCLER_V1: pe_types.ModuleModel.THERMOCYCLER_MODULE_V1,
     LegacyThermocyclerModuleModel.THERMOCYCLER_V2: pe_types.ModuleModel.THERMOCYCLER_MODULE_V2,
+    LegacyHeaterShakerModuleModel.HEATER_SHAKER_V1: pe_types.ModuleModel.HEATER_SHAKER_MODULE_V1,
 }
 
 _HIGHER_ORDER_COMMAND_TYPES = {
@@ -156,7 +158,7 @@ class LegacyCommandMapper:
                     )
                 results.append(pe_actions.UpdateCommandAction(completed_command))
 
-                if isinstance(completed_command, pe_commands.Pause):
+                if isinstance(completed_command, pe_commands.WaitForResume):
                     results.append(
                         pe_actions.PauseAction(source=pe_actions.PauseSource.PROTOCOL)
                     )
@@ -249,13 +251,13 @@ class LegacyCommandMapper:
                 ),
             )
         elif command["name"] == legacy_command_types.PAUSE:
-            engine_command = pe_commands.Pause.construct(
+            engine_command = pe_commands.WaitForResume.construct(
                 id=command_id,
                 key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=now,
                 startedAt=now,
-                params=pe_commands.PauseParams.construct(
+                params=pe_commands.WaitForResumeParams.construct(
                     message=command["payload"]["userMessage"],
                 ),
             )

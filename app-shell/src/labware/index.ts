@@ -13,6 +13,7 @@ import * as ConfigActions from '@opentrons/app/src/redux/config'
 import type {
   UncheckedLabwareFile,
   DuplicateLabwareFile,
+  CheckedLabwareFile,
   CustomLabwareListActionSource as ListSource,
 } from '@opentrons/app/src/redux/custom-labware/types'
 
@@ -29,13 +30,16 @@ const fetchCustomLabware = (): Promise<UncheckedLabwareFile[]> => {
     .then(Definitions.parseLabwareFiles)
 }
 
+const fetchValidatedCustomLabware = (): Promise<CheckedLabwareFile[]> => {
+  return fetchCustomLabware().then(validateLabwareFiles)
+}
+
 const fetchAndValidateCustomLabware = (
   dispatch: Dispatch,
   source: ListSource
 ): Promise<void> => {
-  return fetchCustomLabware()
-    .then(files => {
-      const payload = validateLabwareFiles(files)
+  return fetchValidatedCustomLabware()
+    .then(payload => {
       dispatch(CustomLabware.customLabwareList(payload, source))
     })
     .catch((error: Error) => {
@@ -93,6 +97,14 @@ const deleteLabware = (dispatch: Dispatch, filePath: string): Promise<void> => {
   return Definitions.removeLabwareFile(filePath).then(() =>
     fetchAndValidateCustomLabware(dispatch, CustomLabware.DELETE_LABWARE)
   )
+}
+
+export function getValidLabwareFilePaths(): Promise<string[]> {
+  return fetchValidatedCustomLabware().then(validatedLabware => {
+    return validatedLabware
+      .filter(labware => labware.type === CustomLabware.VALID_LABWARE_FILE)
+      .map(labware => labware.filename)
+  })
 }
 
 export function registerLabware(
