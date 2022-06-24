@@ -136,6 +136,7 @@ describe('thermocycler atomic commands', () => {
       expect(res.commands).toEqual([
         {
           commandType: expectedType,
+          key: expect.any(String),
           params: v6Params,
         },
       ])

@@ -35,6 +35,7 @@ describe('deactivateTemperature', () => {
         commands: [
           {
             commandType: 'temperatureModule/deactivate',
+            key: expect.any(String),
             params: {
               moduleId: temperatureModuleId,
             },
