@@ -59,7 +59,6 @@ export function PipettesAndModules({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         minHeight={SIZE_3}
-        paddingX={SPACING.spacing3}
         paddingBottom={SPACING.spacing3}
         width="100%"
         flexDirection={DIRECTION_COLUMN}
@@ -74,10 +73,9 @@ export function PipettesAndModules({
             <Banner type="warning">{t('robot_control_not_available')}</Banner>
           </Flex>
         )}
-        {/* TODO(jr, 4/15/22): This needs to be refactored to get a combined array of pipettes and modules so it can display with widths matching each column as the design shows */}
         {isRobotViewable ? (
           <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-            <Flex flexDirection={DIRECTION_ROW}>
+            <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
               <PipetteCard
                 pipetteId={attachedPipettes.left?.id}
                 pipetteInfo={
@@ -104,14 +102,15 @@ export function PipettesAndModules({
               justifyContent={JUSTIFY_START}
               flexDirection={DIRECTION_COLUMN}
               flexWrap={WRAP}
-              maxHeight="27rem"
+              maxHeight={attachedModules.length <= 3 ? '27rem ' : '34rem'}
             >
               {attachedModules.map((module, index) => {
                 return (
                   <Flex
                     flex="1"
-                    maxWidth="50%"
+                    marginRight={SPACING.spacing3}
                     key={`moduleCard_${module.moduleType}_${index}`}
+                    width={`calc(50% - ${SPACING.spacing2})`}
                   >
                     <ModuleCard module={module} robotName={robotName} />
                   </Flex>

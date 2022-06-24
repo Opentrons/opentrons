@@ -8,7 +8,6 @@ import {
   Icon,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
-  SIZE_1,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   COLORS,
@@ -79,7 +78,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
             <Icon
               // local boolean corresponds to a wired usb connection
               name={local ? 'usb' : 'wifi'}
-              size={SIZE_1}
+              size="1.25rem"
               marginRight={SPACING.spacing3}
             />
           </Flex>
