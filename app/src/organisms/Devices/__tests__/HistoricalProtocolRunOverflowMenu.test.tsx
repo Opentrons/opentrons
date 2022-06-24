@@ -133,6 +133,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
     })
     fireEvent.click(rerunBtn)
     expect(mockUseRunControls).toHaveBeenCalled()
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
     fireEvent.click(deleteBtn)
     expect(mockUseDeleteRunMutation).toHaveBeenCalled()
   })

@@ -353,7 +353,7 @@ describe('ProtocolRunHeader', () => {
     getByText('Mock ConfirmCancelModal')
   })
 
-  it('dismisses a current but canceled run', () => {
+  it('dismisses a current but canceled run and calls trackProtocolRunEvent', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_STOPPED)
@@ -364,6 +364,7 @@ describe('ProtocolRunHeader', () => {
       } as UseQueryResult<Run>)
     render()
     expect(mockCloseCurrentRun).toBeCalled()
+    expect(mockTrackProtocolRunEvent).toBeCalled()
   })
 
   it('disables the Start Run button with tooltip if calibration is incomplete', () => {
