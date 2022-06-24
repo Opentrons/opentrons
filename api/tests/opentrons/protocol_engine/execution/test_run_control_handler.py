@@ -108,6 +108,9 @@ async def test_wait_for_duration_ignore_pause(
         EngineConfigs(ignore_pause=True)
     )
     start = time_monotonic()
+    # This wait time would be disruptively long for the test suite,
+    # but it only matters when the subject has a bug and this test fails,
+    # which should be rare.
     await subject.wait_for_duration(seconds=1.0)
     end = time_monotonic()
 
