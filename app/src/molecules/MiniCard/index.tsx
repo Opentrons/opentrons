@@ -1,11 +1,13 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-
 import { SPACING, Flex, COLORS, BORDERS } from '@opentrons/components'
 
-interface MiniCardProps {
+import type { StyleProps } from '@opentrons/components'
+
+interface MiniCardProps extends StyleProps {
   onClick: () => void
   isSelected: boolean
+  isNonviable: boolean
   children: React.ReactNode
 }
 const unselectedOptionStyles = css`
@@ -33,12 +35,29 @@ const selectedOptionStyles = css`
   }
 `
 
+const nonviableOptionStyles = css`
+  ${selectedOptionStyles}
+  border: 1px solid ${COLORS.warning};
+  background-color: ${COLORS.warningBg};
+
+  &:hover {
+    border: 1px solid ${COLORS.warning};
+    background-color: ${COLORS.warningBg};
+  }
+`
+
 export function MiniCard(props: MiniCardProps): JSX.Element {
-  const { children, onClick, isSelected } = props
+  const { children, onClick, isSelected, isNonviable } = props
   return (
     <Flex
       onClick={onClick}
-      css={isSelected ? selectedOptionStyles : unselectedOptionStyles}
+      css={
+        isSelected
+          ? isNonviable
+            ? nonviableOptionStyles
+            : selectedOptionStyles
+          : unselectedOptionStyles
+      }
     >
       {children}
     </Flex>
