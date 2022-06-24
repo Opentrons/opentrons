@@ -142,9 +142,6 @@ export function FactoryResetSlideout({
             {t('factory_reset_slideout_warning_message')}
           </StyledText>
         </Flex>
-        {/* <Banner type="warning">
-          {t('factory_reset_slideout_warning_message')}
-        </Banner> */}
         <Divider marginY={SPACING.spacing4} />
         <Box>
           <Flex
