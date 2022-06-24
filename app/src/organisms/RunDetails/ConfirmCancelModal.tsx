@@ -24,9 +24,7 @@ export function ConfirmCancelModal(
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const { t } = useTranslation('run_details')
 
-  const cancel: React.MouseEventHandler<HTMLButtonElement> = async (
-    e
-  ): Promise<void> => {
+  const cancel: React.MouseEventHandler<HTMLButtonElement> = (e): void => {
     e.preventDefault()
     e.stopPropagation()
     onClose()

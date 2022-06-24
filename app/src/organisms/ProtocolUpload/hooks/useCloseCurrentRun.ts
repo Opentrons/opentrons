@@ -26,9 +26,9 @@ export function useCloseCurrentRun(): {
     isLoading: isDismissing,
   } = useDismissCurrentRunMutation()
 
-  const closeCurrentRun = async (
+  const closeCurrentRun = (
     options?: UseDismissCurrentRunMutationOptions
-  ): Promise<void> => {
+  ): void => {
     if (currentRunId != null) {
       dismissCurrentRun(currentRunId, {
         ...options,

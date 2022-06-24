@@ -235,7 +235,7 @@ export function ProtocolRunHeader({
     }
   }, [analysisErrors])
 
-  const handlePlayButtonClick = async (): Promise<void> => {
+  const handlePlayButtonClick = (): void => {
     if (isShaking) {
       setShowIsShakingModal(true)
     } else if (isHeaterShakerInProtocol && !isShaking) {
@@ -260,7 +260,7 @@ export function ProtocolRunHeader({
     }
   }
 
-  const handlePauseButtonClick = async (): Promise<void> => {
+  const handlePauseButtonClick = (): void => {
     pause()
 
     trackProtocolRunEvent({
@@ -273,7 +273,7 @@ export function ProtocolRunHeader({
     )
   }
 
-  const handleResetButtonClick = async (): Promise<void> => {
+  const handleResetButtonClick = (): void => {
     reset()
 
     trackProtocolRunEvent({
