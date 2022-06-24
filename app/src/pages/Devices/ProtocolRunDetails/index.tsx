@@ -271,9 +271,11 @@ const ModuleControlsTab = (
     runStatus === RUN_STATUS_FAILED ||
     runStatus === RUN_STATUS_IDLE
 
-  const disabled = !isRunStill
+  const disabled = currentRunId !== runId || !isRunStill
   const tabDisabledReason = `${t('module_controls')} ${t(
-    'not_available_for_a_run_in_progress'
+    currentRunId !== runId
+      ? 'not_available_for_a_completed_run'
+      : 'not_available_for_a_run_in_progress'
   )}`
 
   return isEmpty(moduleRenderInfoForProtocolById) ? null : (
@@ -285,7 +287,7 @@ const ModuleControlsTab = (
         to={`/devices/${robotName}/protocol-runs/${runId}/module-controls`}
         tabName={t('module_controls')}
       />
-      {currentRunId !== runId ? (
+      {disabled ? (
         // redirect to run log if not current run
         <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/run-log`} />
       ) : null}
