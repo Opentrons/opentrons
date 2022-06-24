@@ -422,7 +422,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             }}
           />
           {isOverflowBtnDisabled && (
-            <Tooltip {...tooltipProps}>
+            <Tooltip tooltipProps={tooltipProps}>
               {t('module_actions_unavailable')}
             </Tooltip>
           )}
