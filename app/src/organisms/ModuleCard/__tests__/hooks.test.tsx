@@ -14,11 +14,10 @@ import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useRunStatus } from '../../RunTimeControl/hooks'
 import {
   useIsRobotBusy,
   useProtocolDetailsForRun,
-  useRunIncompleteOrLegacySessionInProgress,
+  useRunStatuses,
 } from '../../Devices/hooks'
 
 import {
@@ -43,7 +42,6 @@ jest.mock('../../Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../Devices/hooks')
 jest.mock('../useModuleIdFromRun')
-jest.mock('../../RunTimeControl/hooks')
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
@@ -67,11 +65,8 @@ const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
 const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
   typeof useIsRobotBusy
 >
-const mockUseRunIncompleteOrLegacySessionInProgress = useRunIncompleteOrLegacySessionInProgress as jest.MockedFunction<
-  typeof useRunIncompleteOrLegacySessionInProgress
->
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
 >
 
 const mockCloseLatchHeaterShaker = {
@@ -231,7 +226,11 @@ describe('useLatchControls', () => {
     store.dispatch = jest.fn()
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
-    mockUseRunStatus.mockReturnValue(null)
+    mockUseRunStatuses.mockReturnValue({
+      isRunIncomplete: true,
+      isRunStill: true,
+      isRunTerminal: false,
+    })
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
@@ -308,8 +307,11 @@ describe('useModuleOverflowMenu', () => {
     store.dispatch = jest.fn()
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
-    mockUseRunStatus.mockReturnValue(null)
-    mockUseRunIncompleteOrLegacySessionInProgress.mockReturnValue(true)
+    mockUseRunStatuses.mockReturnValue({
+      isRunIncomplete: true,
+      isRunStill: true,
+      isRunTerminal: false,
+    })
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
@@ -338,7 +340,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          jest.fn()
+          jest.fn(),
+          false
         ),
       {
         wrapper,
@@ -372,7 +375,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          jest.fn()
+          jest.fn(),
+          false
         ),
       {
         wrapper,
@@ -409,7 +413,8 @@ describe('useModuleOverflowMenu', () => {
           mockAboutClick,
           mockTestShakeClick,
           mockHandleWizard,
-          mockHandleSlideoutClick
+          mockHandleSlideoutClick,
+          false
         ),
       {
         wrapper,
@@ -438,7 +443,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          mockHandleClick
+          mockHandleClick,
+          false
         ),
       {
         wrapper,
@@ -465,7 +471,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          jest.fn()
+          jest.fn(),
+          false
         ),
       {
         wrapper,
@@ -500,7 +507,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          mockHandleClick
+          mockHandleClick,
+          false
         ),
       {
         wrapper,
@@ -526,7 +534,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          jest.fn()
+          jest.fn(),
+          false
         ),
       {
         wrapper,
@@ -560,7 +569,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          mockHandleClick
+          mockHandleClick,
+          false
         ),
       {
         wrapper,
@@ -586,7 +596,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          jest.fn()
+          jest.fn(),
+          false
         ),
       {
         wrapper,
@@ -620,7 +631,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          jest.fn()
+          jest.fn(),
+          false
         ),
       {
         wrapper,

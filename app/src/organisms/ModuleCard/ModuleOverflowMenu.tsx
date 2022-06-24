@@ -1,18 +1,11 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  RUN_STATUS_FAILED,
-  RUN_STATUS_IDLE,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
-} from '@opentrons/api-client'
 import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { useRunStatus } from '../RunTimeControl/hooks'
-import { useRunIncompleteOrLegacySessionInProgress } from '../Devices/hooks'
+import { useRunStatuses } from '../Devices/hooks'
 import { useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '../../redux/modules/types'
@@ -49,23 +42,17 @@ export const ModuleOverflowMenu = (
     handleAboutClick,
     handleTestShakeClick,
     handleWizardClick,
-    handleSlideoutClick
+    handleSlideoutClick,
+    isModuleControl
   )
-  const runStatus = useRunStatus(runId != null ? runId : null)
   const currentRunId = useCurrentRunId()
-
-  const isIncompleteOrBusy = useRunIncompleteOrLegacySessionInProgress()
-  const isRunStill =
-    runStatus === RUN_STATUS_SUCCEEDED ||
-    runStatus === RUN_STATUS_STOPPED ||
-    runStatus === RUN_STATUS_FAILED ||
-    runStatus === RUN_STATUS_IDLE
+  const { isRunIncomplete, isRunStill } = useRunStatuses()
 
   let isDisabled: boolean = false
   if (runId != null && isModuleControl) {
     isDisabled = !isRunStill
   } else if ((runId != null || currentRunId != null) && !isModuleControl) {
-    isDisabled = isIncompleteOrBusy
+    isDisabled = isRunIncomplete
   }
 
   return (

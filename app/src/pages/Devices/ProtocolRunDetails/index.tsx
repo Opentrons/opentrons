@@ -22,26 +22,19 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import {
-  RUN_STATUS_FAILED,
-  RUN_STATUS_IDLE,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
-} from '@opentrons/api-client'
-
 import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
   useRobot,
+  useRunStatuses,
 } from '../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { RunLog } from '../../../organisms/Devices/ProtocolRun/RunLog'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
-import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { fetchProtocols } from '../../../redux/protocol-storage'
 
 import type { NavRouteParams, ProtocolRunDetailsTab } from '../../../App/types'
@@ -260,16 +253,11 @@ const ModuleControlsTab = (
   const { robotName, runId } = props
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
-  const runStatus = useRunStatus(runId)
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
     robotName,
     runId
   )
-  const isRunStill =
-    runStatus === RUN_STATUS_SUCCEEDED ||
-    runStatus === RUN_STATUS_STOPPED ||
-    runStatus === RUN_STATUS_FAILED ||
-    runStatus === RUN_STATUS_IDLE
+  const { isRunStill } = useRunStatuses()
 
   const disabled = currentRunId !== runId || !isRunStill
   const tabDisabledReason = `${t('module_controls')} ${t(

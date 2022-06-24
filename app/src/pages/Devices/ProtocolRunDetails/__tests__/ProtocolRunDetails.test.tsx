@@ -10,18 +10,17 @@ import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
   useRobot,
+  useRunStatuses,
 } from '../../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunModuleControls } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunSetup } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { RunLog } from '../../../../organisms/Devices/ProtocolRun/RunLog'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
-import { useRunStatus } from '../../../../organisms/RunTimeControl/hooks'
 import { ProtocolRunDetails } from '..'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
-import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader')
@@ -29,7 +28,6 @@ jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup')
 jest.mock('../../../../organisms/Devices/ProtocolRun/RunLog')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls')
 jest.mock('../../../../organisms/ProtocolUpload/hooks')
-jest.mock('../../../../organisms/RunTimeControl/hooks')
 
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockProtocolRunHeader = ProtocolRunHeader as jest.MockedFunction<
@@ -48,8 +46,8 @@ const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolByI
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
 >
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
@@ -92,7 +90,11 @@ const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
 describe('ProtocolRunDetails', () => {
   beforeEach(() => {
     mockUseRobot.mockReturnValue(mockConnectableRobot)
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
+    mockUseRunStatuses.mockReturnValue({
+      isRunIncomplete: false,
+      isRunStill: true,
+      isRunTerminal: false,
+    })
     mockProtocolRunHeader.mockReturnValue(<div>Mock ProtocolRunHeader</div>)
     mockRunLog.mockReturnValue(<div>Mock RunLog</div>)
     mockProtocolRunSetup.mockReturnValue(<div>Mock ProtocolRunSetup</div>)
@@ -206,7 +208,11 @@ describe('ProtocolRunDetails', () => {
 
   it('disables module controls tab when the run current but not idle', () => {
     mockUseCurrentRunId.mockReturnValue(RUN_ID)
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
+    mockUseRunStatuses.mockReturnValue({
+      isRunIncomplete: false,
+      isRunStill: false,
+      isRunTerminal: false,
+    })
     const [{ getByText, queryByText }] = render(
       `/devices/otie/protocol-runs/${RUN_ID}`
     )

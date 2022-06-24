@@ -2,6 +2,7 @@ import { UseQueryResult } from 'react-query'
 import { useAllSessionsQuery } from '@opentrons/react-api-client'
 import {
   RUN_STATUS_FAILED,
+  RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
@@ -9,7 +10,7 @@ import {
 
 import { useCurrentRunId } from '../../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../../RunTimeControl/hooks'
-import { useRunIncompleteOrLegacySessionInProgress } from '..'
+import { useRunStatuses } from '..'
 
 import type { Sessions } from '@opentrons/api-client'
 
@@ -27,7 +28,7 @@ const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
   typeof useAllSessionsQuery
 >
 
-describe('useRunIncompleteOrLegacySessionInProgress', () => {
+describe(' useRunStatuses ', () => {
   beforeEach(() => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     mockUseCurrentRunId.mockReturnValue('123')
@@ -40,12 +41,16 @@ describe('useRunIncompleteOrLegacySessionInProgress', () => {
     jest.resetAllMocks()
   })
 
-  it('returns true when current run status is not terminal or sessions are empty', () => {
-    const result = useRunIncompleteOrLegacySessionInProgress()
-    expect(result).toBe(true)
+  it('returns true isRunIncomplete when current run status is not terminal or sessions are empty', () => {
+    const result = useRunStatuses()
+    expect(result).toStrictEqual({
+      isRunIncomplete: true,
+      isRunStill: false,
+      isRunTerminal: false,
+    })
   })
 
-  it('returns false when run status is suceeded or sessions are not empty', () => {
+  it('returns false isRunIncomplete and true isRunStill and Terminal when run status is suceeded or sessions are not empty', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_SUCCEEDED)
     mockUseAllSessionsQuery.mockReturnValue(({
       data: [
@@ -59,11 +64,15 @@ describe('useRunIncompleteOrLegacySessionInProgress', () => {
       ],
       links: {},
     } as unknown) as UseQueryResult<Sessions, Error>)
-    const result = useRunIncompleteOrLegacySessionInProgress()
-    expect(result).toBe(false)
+    const result = useRunStatuses()
+    expect(result).toStrictEqual({
+      isRunIncomplete: false,
+      isRunStill: true,
+      isRunTerminal: true,
+    })
   })
 
-  it('returns false when run status is stopped or sessions are not empty', () => {
+  it('returns false  isRunIncomplete and true isRunStill and Terminal when run status is stopped or sessions are not empty', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_STOPPED)
     mockUseAllSessionsQuery.mockReturnValue(({
       data: [
@@ -77,11 +86,15 @@ describe('useRunIncompleteOrLegacySessionInProgress', () => {
       ],
       links: {},
     } as unknown) as UseQueryResult<Sessions, Error>)
-    const result = useRunIncompleteOrLegacySessionInProgress()
-    expect(result).toBe(false)
+    const result = useRunStatuses()
+    expect(result).toStrictEqual({
+      isRunIncomplete: false,
+      isRunStill: true,
+      isRunTerminal: true,
+    })
   })
 
-  it('returns false when run status is failed or sessions are not empty', () => {
+  it('returns false  isRunIncomplete and true isRunStill and Terminal when run status is failed or sessions are not empty', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_FAILED)
     mockUseAllSessionsQuery.mockReturnValue(({
       data: [
@@ -95,7 +108,21 @@ describe('useRunIncompleteOrLegacySessionInProgress', () => {
       ],
       links: {},
     } as unknown) as UseQueryResult<Sessions, Error>)
-    const result = useRunIncompleteOrLegacySessionInProgress()
-    expect(result).toBe(false)
+    const result = useRunStatuses()
+    expect(result).toStrictEqual({
+      isRunIncomplete: false,
+      isRunStill: true,
+      isRunTerminal: true,
+    })
+  })
+
+  it('returns false isRunIncomplete and true isRunStill when run status is idle', () => {
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
+    const result = useRunStatuses()
+    expect(result).toStrictEqual({
+      isRunIncomplete: true,
+      isRunStill: true,
+      isRunTerminal: false,
+    })
   })
 })

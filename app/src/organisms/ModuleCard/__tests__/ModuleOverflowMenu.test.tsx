@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 import {
   mockMagneticModule,
@@ -9,26 +8,21 @@ import {
   mockThermocycler,
   mockHeaterShaker,
 } from '../../../redux/modules/__fixtures__'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useRunStatuses } from '../../Devices/hooks'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useRunIncompleteOrLegacySessionInProgress } from '../../Devices/hooks'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
 
 jest.mock('../useModuleIdFromRun')
 jest.mock('../../Devices/hooks')
 jest.mock('../../RunTimeControl/hooks')
-jest.mock('../../Devices/hooks')
 jest.mock('../../ProtocolUpload/hooks')
 
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
 >
-const mockUseRunIncompleteOrLegacySessionInProgress = useRunIncompleteOrLegacySessionInProgress as jest.MockedFunction<
-  typeof useRunIncompleteOrLegacySessionInProgress
->
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
 >
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
@@ -211,8 +205,11 @@ describe('ModuleOverflowMenu', () => {
   let props: React.ComponentProps<typeof ModuleOverflowMenu>
   beforeEach(() => {
     mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
-    mockUseRunIncompleteOrLegacySessionInProgress.mockReturnValue(false)
-    mockUseRunStatus.mockReturnValue(null)
+    mockUseRunStatuses.mockReturnValue({
+      isRunIncomplete: false,
+      isRunStill: true,
+      isRunTerminal: false,
+    })
     mockUseCurrentRunId.mockReturnValue(null)
     props = {
       module: mockMagneticModule,
@@ -484,8 +481,11 @@ describe('ModuleOverflowMenu', () => {
   })
 
   it('should disable module control buttons when the robot is busy and run status not null', () => {
-    mockUseRunIncompleteOrLegacySessionInProgress.mockReturnValue(true)
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
+    mockUseRunStatuses.mockReturnValue({
+      isRunIncomplete: true,
+      isRunStill: false,
+      isRunTerminal: false,
+    })
     props = {
       module: mockTCBlockHeating,
       handleSlideoutClick: jest.fn(),

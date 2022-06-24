@@ -11,21 +11,12 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import {
-  RUN_STATUS_FAILED,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
-} from '@opentrons/api-client'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import {
-  useProtocolDetailsForRun,
-  useRunIncompleteOrLegacySessionInProgress,
-} from '../Devices/hooks'
-import { useRunStatus } from '../RunTimeControl/hooks'
+import { useProtocolDetailsForRun, useRunStatuses } from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
@@ -64,16 +55,11 @@ export function useLatchControls(
 ): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
+  const { isRunTerminal } = useRunStatuses()
   const { moduleIdFromRun } = useModuleIdFromRun(
     module,
     runId != null ? runId : null
   )
-  //  TODO(jr, 6/23/22): delete this boolean + logic when you can send commands with runId known re: https://opentrons.slack.com/archives/C033PPVEC76/p1656000780091279
-  const runStatus = useRunStatus(runId != null ? runId : null)
-  const isRunTerminal =
-    runStatus === RUN_STATUS_SUCCEEDED ||
-    runStatus === RUN_STATUS_STOPPED ||
-    runStatus === RUN_STATUS_FAILED
 
   const isLatchClosed =
     module.moduleType === 'heaterShakerModuleType' &&
@@ -140,7 +126,8 @@ export function useModuleOverflowMenu(
   handleAboutClick: () => void,
   handleTestShakeClick: () => void,
   handleWizardClick: () => void,
-  handleSlideoutClick: (isSecondary: boolean) => void
+  handleSlideoutClick: (isSecondary: boolean) => void,
+  isModuleControl: boolean
 ): ModuleOverflowMenu {
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
@@ -148,15 +135,14 @@ export function useModuleOverflowMenu(
   const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
-  const isIncompleteOrBusy = useRunIncompleteOrLegacySessionInProgress()
-
-  //  TODO(jr, 6/23/22): delete this boolean + logic when you can send commands with runId known re: https://opentrons.slack.com/archives/C033PPVEC76/p1656000780091279
-  const runStatus = useRunStatus(runId)
-  const isRunTerminal =
-    runStatus === RUN_STATUS_SUCCEEDED ||
-    runStatus === RUN_STATUS_STOPPED ||
-    runStatus === RUN_STATUS_FAILED
-
+  const { isRunIncomplete, isRunTerminal, isRunStill } = useRunStatuses()
+  const currentRunId = useCurrentRunId()
+  let isDisabled: boolean = false
+  if (runId != null && isModuleControl) {
+    isDisabled = !isRunStill
+  } else if ((runId != null || currentRunId != null) && !isModuleControl) {
+    isDisabled = isRunIncomplete
+  }
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
     module.data.speedStatus !== 'idle'
@@ -168,7 +154,7 @@ export function useModuleOverflowMenu(
         key={`hs_labware_latch_${module.moduleModel}`}
         data-testid={`hs_labware_latch_${module.moduleModel}`}
         onClick={toggleLatch}
-        disabled={isLatchDisabled || isIncompleteOrBusy}
+        disabled={isLatchDisabled || isDisabled}
         {...targetProps}
       >
         {t(isLatchClosed ? 'open_labware_latch' : 'close_labware_latch', {
@@ -210,7 +196,7 @@ export function useModuleOverflowMenu(
       minWidth="10.6rem"
       onClick={() => handleTestShakeClick()}
       key={`hs_test_shake_btn_${module.moduleModel}`}
-      disabled={isIncompleteOrBusy}
+      disabled={isDisabled}
     >
       {t('test_shake', { ns: 'heater_shaker' })}
     </MenuItem>

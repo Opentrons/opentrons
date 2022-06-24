@@ -219,7 +219,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     setShowWizard(true)
   }
 
-  //  TODO(jr, 6/23/22): delete this boolean + logic when you can send commands with runId known re: https://opentrons.slack.com/archives/C033PPVEC76/p1656000780091279
   const isRunTerminal =
     runStatus === RUN_STATUS_SUCCEEDED ||
     runStatus === RUN_STATUS_STOPPED ||
