@@ -10,7 +10,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   Link,
-  CheckboxField,
+  // CheckboxField,
   Box,
 } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
@@ -20,6 +20,7 @@ import { PrimaryButton } from '../../../../../atoms/buttons'
 import { StyledText } from '../../../../../atoms/text'
 import { Divider } from '../../../../../atoms/structure'
 import { Banner } from '../../../../../atoms/Banner'
+import { CheckboxField } from '../../../../../atoms/CheckboxField'
 import {
   getResetConfigOptions,
   fetchResetConfigOptions,
@@ -162,6 +163,10 @@ export function FactoryResetSlideout({
               }
               value={resetOptions[opt.id]}
               label={`Clear ${opt.name}`}
+              css={{
+                paddingTop: SPACING.spacing2,
+                paddingBottom: SPACING.spacing2,
+              }}
             />
           ))}
         </Box>

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
   Box,
@@ -15,8 +16,9 @@ import {
   COLORS,
   TYPOGRAPHY,
   SPACING,
+  POSITION_ABSOLUTE,
+  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
-import { css } from 'styled-components'
 
 import { startDiscovery } from '../../redux/discovery'
 import { PrimaryButton } from '../../atoms/buttons'
@@ -26,10 +28,10 @@ export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'
 
 const LINK_STYLES = css`
-  opacity: 70%;
+  opacity: 0.7;
 
   &:hover {
-    opacity: 100%;
+    opacity: 1;
   }
 `
 export function DevicesEmptyState(): JSX.Element {
@@ -68,7 +70,13 @@ export function DevicesEmptyState(): JSX.Element {
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
-        marginBottom={SPACING.spacing6}
+        position={POSITION_ABSOLUTE}
+        bottom="2.5rem"
+        left="0"
+        right="0"
+        marginLeft="auto"
+        marginRight="auto"
+        textAlign={TEXT_ALIGN_CENTER}
       >
         <Link
           css={LINK_STYLES}

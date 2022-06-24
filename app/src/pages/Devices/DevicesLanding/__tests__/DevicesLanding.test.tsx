@@ -86,7 +86,7 @@ describe('DevicesLanding', () => {
     mockGetUnreachableRobots.mockReturnValue([])
     const [{ getByText }] = render()
 
-    getByText('Looking for robots...')
+    getByText('Looking for robots')
   })
 
   it('renders the Icon when scanning is true and there are no devices', () => {
