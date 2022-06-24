@@ -100,7 +100,9 @@ let mockTrackProtocolRunEvent: jest.Mock
 
 describe('RunDetails', () => {
   beforeEach(() => {
-    mockTrackProtocolRunEvent = jest.fn()
+    mockTrackProtocolRunEvent = jest.fn(
+      () => new Promise(resolve => resolve({}))
+    )
 
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
       protocolData: simpleV6Protocol,

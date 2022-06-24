@@ -63,10 +63,14 @@ const render = (
 }
 const PAGE_LENGTH = 101
 const RUN_ID = 'id'
+let mockTrackProtocolRunEvent: jest.Mock
 
 describe('HistoricalProtocolRunOverflowMenu', () => {
   let props: React.ComponentProps<typeof HistoricalProtocolRunOverflowMenu>
   beforeEach(() => {
+    mockTrackProtocolRunEvent = jest.fn(
+      () => new Promise(resolve => resolve({}))
+    )
     when(mockDownloadRunLogToast).mockReturnValue(
       <div>mock downlaod run log toast</div>
     )
@@ -75,14 +79,9 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
         deleteRun: jest.fn(),
       } as any)
     )
-    when(mockUseTrackProtocolRunEvent)
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        trackProtocolRunEvent: () =>
-          new Promise(resolve => {
-            resolve({})
-          }),
-      })
+    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
+      trackProtocolRunEvent: mockTrackProtocolRunEvent,
+    })
     when(mockUseRunControls)
       .calledWith(RUN_ID, expect.anything())
       .mockReturnValue({
