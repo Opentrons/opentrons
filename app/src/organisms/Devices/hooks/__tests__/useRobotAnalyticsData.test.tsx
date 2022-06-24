@@ -9,16 +9,13 @@ import { useRobot } from '../'
 import { useRobotAnalyticsData } from '../useRobotAnalyticsData'
 import { getAttachedPipettes } from '../../../../redux/pipettes'
 import { getRobotSettings } from '../../../../redux/robot-settings'
-import { FF_PREFIX } from '../../../../redux/analytics'
 import {
   getRobotApiVersion,
   getRobotFirmwareVersion,
 } from '../../../../redux/discovery'
 
 import type { DiscoveredRobot } from '../../../../redux/discovery/types'
-import type { RobotAnalyticsData } from '../../../../redux/analytics/types'
-import { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
-import { useDeckCalibrationStatus } from '../useDeckCalibrationStatus'
+import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../hooks')
@@ -41,10 +38,11 @@ const mockGetAttachedPipettes = getAttachedPipettes as jest.MockedFunction<
 >
 
 const ROBOT_SETTINGS = [
-  { id: `${FF_PREFIX}_setting1`, value: true, title: '', description: '' },
-  { id: `${FF_PREFIX}_setting2`, value: false, title: '', description: '' },
+  { id: `setting1`, value: true, title: '', description: '' },
+  { id: `setting2`, value: false, title: '', description: '' },
 ]
 const ROBOT_VERSION = 'version1'
+const ROBOT_FIRMWARE_VERSION = 'firmwareVersion1'
 const ATTACHED_PIPETTES = {
   left: { id: '1', model: 'testModelLeft' },
   right: { id: '2', model: 'testModelLeft' },
@@ -64,10 +62,10 @@ describe('useProtocolAnalysisErrors hook', () => {
         </QueryClientProvider>
       </Provider>
     )
-    when(mockUseRobot).calledWith(null).mockReturnValue(null)
+    when(mockUseRobot).calledWith('noRobot').mockReturnValue(null)
     mockGetRobotApiVersion.mockReturnValue(ROBOT_VERSION)
     mockGetRobotSettings.mockReturnValue(ROBOT_SETTINGS)
-    mockGetRobotFirmwareVersion.mockReturnValue('firmwareVersion1')
+    mockGetRobotFirmwareVersion.mockReturnValue(ROBOT_FIRMWARE_VERSION)
     mockGetAttachedPipettes.mockReturnValue(
       ATTACHED_PIPETTES as AttachedPipettesByMount
     )
@@ -79,9 +77,27 @@ describe('useProtocolAnalysisErrors hook', () => {
   })
 
   it('returns null when robot is null or undefined', () => {
-    const { result } = renderHook(() => useRobotAnalyticsData('otie'), {
+    const { result } = renderHook(() => useRobotAnalyticsData('noRobot'), {
       wrapper,
     })
     expect(result.current).toStrictEqual(null)
+  })
+
+  it('returns robot analytics data when robot exists', () => {
+    when(mockUseRobot)
+      .calledWith('otie')
+      .mockReturnValue({} as DiscoveredRobot)
+
+    const { result } = renderHook(() => useRobotAnalyticsData('otie'), {
+      wrapper,
+    })
+    expect(result.current).toStrictEqual({
+      robotApiServerVersion: ROBOT_VERSION,
+      robotFF_setting1: true,
+      robotFF_setting2: false,
+      robotLeftPipette: 'testModelLeft',
+      robotRightPipette: 'testModelLeft',
+      robotSmoothieVersion: ROBOT_FIRMWARE_VERSION,
+    })
   })
 })
