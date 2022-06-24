@@ -209,11 +209,15 @@ const render = () => {
   )
 }
 let mockTrackEvent: jest.Mock
+let mockTrackProtocolRunEvent: jest.Mock
 let mockCloseCurrentRun: jest.Mock
 
 describe('ProtocolRunHeader', () => {
   beforeEach(() => {
     mockTrackEvent = jest.fn()
+    mockTrackProtocolRunEvent = jest.fn(
+      () => new Promise(resolve => resolve({}))
+    )
     mockCloseCurrentRun = jest.fn()
 
     when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
@@ -281,14 +285,9 @@ describe('ProtocolRunHeader', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue(PROTOCOL_DETAILS)
-    when(mockUseTrackProtocolRunEvent)
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        trackProtocolRunEvent: () =>
-          new Promise(resolve => {
-            resolve({})
-          }),
-      })
+    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
+      trackProtocolRunEvent: mockTrackProtocolRunEvent,
+    })
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })

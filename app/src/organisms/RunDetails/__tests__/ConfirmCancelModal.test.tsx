@@ -27,21 +27,20 @@ const render = (props: React.ComponentProps<typeof ConfirmCancelModal>) => {
 
 const RUN_ID = 'mockRunId'
 let mockTrackEvent: jest.Mock
+let mockTrackProtocolRunEvent: jest.Mock
 
 describe('ConfirmCancelModal', () => {
   let props: React.ComponentProps<typeof ConfirmCancelModal>
   beforeEach(() => {
     mockTrackEvent = jest.fn()
+    mockTrackProtocolRunEvent = jest.fn(
+      () => new Promise(resolve => resolve({}))
+    )
 
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
-    when(mockUseTrackProtocolRunEvent)
-      .calledWith(RUN_ID)
-      .mockReturnValue({
-        trackProtocolRunEvent: () =>
-          new Promise(resolve => {
-            resolve({})
-          }),
-      })
+    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
+      trackProtocolRunEvent: mockTrackProtocolRunEvent,
+    })
 
     props = { onClose: jest.fn(), runId: RUN_ID }
   })
