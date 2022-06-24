@@ -24,6 +24,7 @@ interface ModuleOverflowMenuProps {
   handleAboutClick: () => void
   handleTestShakeClick: () => void
   handleWizardClick: () => void
+  isModuleControl: boolean
   runId?: string
 }
 
@@ -38,6 +39,7 @@ export const ModuleOverflowMenu = (
     handleAboutClick,
     handleTestShakeClick,
     handleWizardClick,
+    isModuleControl,
   } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
@@ -56,7 +58,12 @@ export const ModuleOverflowMenu = (
     runStatus === RUN_STATUS_FAILED ||
     runStatus === RUN_STATUS_IDLE
 
-  const isDisabled = runId != null ? !isRunStill : isIncompleteOrBusy
+  let isDisabled: boolean = false
+  if (runId != null && isModuleControl) {
+    isDisabled = !isRunStill
+  } else if (runId != null && !isModuleControl) {
+    isDisabled = isIncompleteOrBusy
+  }
 
   return (
     <>

@@ -123,7 +123,11 @@ export function PipettesAndModules({
                     key={`moduleCard_${module.moduleType}_${index}`}
                     width={`calc(50% - ${SPACING.spacing2})`}
                   >
-                    <ModuleCard module={module} robotName={robotName} />
+                    <ModuleCard
+                      module={module}
+                      robotName={robotName}
+                      isModuleControl={false}
+                    />
                   </Flex>
                 )
               })}

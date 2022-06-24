@@ -18,7 +18,6 @@ import {
   Btn,
   TEXT_DECORATION_UNDERLINE,
   IconProps,
-  Tooltip,
   useHoverTooltip,
   COLORS,
   Icon,
@@ -52,6 +51,7 @@ import {
 } from '../../redux/robot-api'
 import { Banner } from '../../atoms/Banner'
 import { Toast } from '../../atoms/Toast'
+import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
 import { MagneticModuleData } from './MagneticModuleData'
@@ -82,13 +82,14 @@ import type { RequestState } from '../../redux/robot-api/types'
 interface ModuleCardProps {
   module: AttachedModule
   robotName: string
+  isModuleControl: boolean
   runId?: string
   slotName?: string
 }
 
 export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
-  const { module, robotName, runId, slotName } = props
+  const { module, robotName, runId, slotName, isModuleControl } = props
   const dispatch = useDispatch<Dispatch>()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
   const [showSlideout, setShowSlideout] = React.useState(false)
@@ -439,6 +440,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
               handleWizardClick={handleWizardClick}
+              isModuleControl={isModuleControl}
             />
           </Box>
         )}
