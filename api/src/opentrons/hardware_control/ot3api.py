@@ -37,7 +37,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
 
 
 from .util import use_or_initialize_loop, check_motion_bounds
-from .pipette import (
+from .instruments.pipette import (
     generate_hardware_configs_ot3,
     load_from_config_and_check_skip,
 )
@@ -73,7 +73,7 @@ from .robot_calibration import (
 
 
 from .protocols import HardwareControlAPI
-from .instrument_handler import OT3InstrumentHandler, InstrumentsByMount
+from .instruments.pipette_handler import OT3PipetteHandler, InstrumentsByMount
 from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
@@ -160,7 +160,7 @@ class OT3API(
             )
         )
 
-        self._instrument_handler = OT3InstrumentHandler({m: None for m in OT3Mount})
+        self._instrument_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
 
     def set_robot_calibration(self, robot_calibration: RobotCalibration) -> None:
