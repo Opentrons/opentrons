@@ -229,7 +229,7 @@ const SetupTab = (props: SetupTabProps): JSX.Element | null => {
 
   const disabled = currentRunId !== runId
   const tabDisabledReason = `${t('setup')} ${t(
-    'not_available_for_a_run_in_progress'
+    'not_available_for_a_completed_run'
   )}`
 
   return (
