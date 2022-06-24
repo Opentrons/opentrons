@@ -68,7 +68,6 @@ import {
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
-
 import {
   useProtocolDetailsForRun,
   useProtocolAnalysisErrors,
