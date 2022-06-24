@@ -158,7 +158,20 @@ export function ProtocolRunHeader({
 
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent) {
-      runId != null && closeCurrentRun()
+      if (runId != null) {
+        trackProtocolRunEvent({
+          name: 'runFinish',
+          properties: {
+            ...robotAnalyticsData,
+          },
+        }).catch((e: Error) =>
+          console.log(
+            `Error tracking protocol run runFinish event: ${e.message}`
+          )
+        )
+
+        closeCurrentRun()
+      }
     }
   }, [runStatus, isRunCurrent, runId, closeCurrentRun])
 
@@ -250,11 +263,9 @@ export function ProtocolRunHeader({
       trackProtocolRunEvent({
         name: eventName,
         properties: eventProperties,
-      }).catch(e =>
+      }).catch((e: Error) =>
         console.log(
-          `Error tracking protocol run ${eventName} event: ${
-            (e as Error).message
-          }`
+          `Error tracking protocol run ${eventName} event: ${e.message}`
         )
       )
     }
@@ -266,10 +277,8 @@ export function ProtocolRunHeader({
     trackProtocolRunEvent({
       name: 'runPause',
       properties: {},
-    }).catch(e =>
-      console.log(
-        `Error tracking protocol run runPause event: ${(e as Error).message}`
-      )
+    }).catch((e: Error) =>
+      console.log(`Error tracking protocol run runPause event: ${e.message}`)
     )
   }
 
@@ -277,12 +286,10 @@ export function ProtocolRunHeader({
     reset()
 
     trackProtocolRunEvent({
-      name: 'runPause',
+      name: 'runAgain',
       properties: {},
-    }).catch(e =>
-      console.log(
-        `Error tracking protocol run runPause event: ${(e as Error).message}`
-      )
+    }).catch((e: Error) =>
+      console.log(`Error tracking protocol run runAgain event: ${e.message}`)
     )
   }
 
@@ -370,6 +377,15 @@ export function ProtocolRunHeader({
     runStatus === RUN_STATUS_IDLE
 
   const handleClearClick = (): void => {
+    trackProtocolRunEvent({
+      name: 'runFinish',
+      properties: {
+        ...robotAnalyticsData,
+      },
+    }).catch((e: Error) =>
+      console.log(`Error tracking protocol run runFinish event: ${e.message}`)
+    )
+
     closeCurrentRun()
   }
 

@@ -124,10 +124,11 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
     reset()
 
-    trackProtocolRunEvent({ name: 'runAgain', properties: {} }).catch(e =>
-      console.log(
-        `Error tracking protocol run runAgain event: ${(e as Error).message}`
-      )
+    trackProtocolRunEvent({
+      name: 'runAgain',
+      properties: {},
+    }).catch((e: Error) =>
+      console.log(`Error tracking protocol run runAgain event: ${e.message}`)
     )
   }
 
