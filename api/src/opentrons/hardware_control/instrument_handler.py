@@ -784,19 +784,10 @@ class InstrumentHandlerProvider(Generic[MountType]):
                     home_after_safety_margin=abs(bottom_pos - droptip_pos),
                     home_axes=home_axes,
                 ),
-            ]
-            if home_after:
-                base.append(
-                    DropTipMove(
-                        target_position=bottom_pos, current=plunger_currents, speed=None
-                    )
-                )
-            # always move to a known position after a drop-tip
-            base.append(
-                DropTipMove(
+                DropTipMove(  # always finish drop-tip at a known safe plunger position
                     target_position=bottom_pos, current=plunger_currents, speed=None
-                )
-            )
+                ),
+            ]
             return base
 
         return build
