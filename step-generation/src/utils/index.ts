@@ -18,5 +18,4 @@ export {
 export * from './commandCreatorArgsGetters'
 export * from './misc'
 export * from './heaterShakerCollision'
-
 export const uuid: () => string = uuidv1
