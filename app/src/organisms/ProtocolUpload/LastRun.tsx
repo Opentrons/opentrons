@@ -70,7 +70,7 @@ export function LastRun(): JSX.Element | null {
   const robotName = useSelector((state: State) => getConnectedRobotName(state))
   const labwareOffsetCount = getLatestLabwareOffsetCount(labwareOffsets ?? [])
 
-  const handleCloneRun = async (): Promise<void> => {
+  const handleCloneRun = (): void => {
     cloneRun()
     history.push('/run')
   }
