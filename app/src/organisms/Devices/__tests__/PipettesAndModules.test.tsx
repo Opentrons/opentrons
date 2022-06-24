@@ -6,8 +6,7 @@ import { i18n } from '../../../i18n'
 import { Banner } from '../../../atoms/Banner'
 import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useRunStatus } from '../../RunTimeControl/hooks'
-import { useIsRobotViewable } from '../hooks'
+import { useIsRobotViewable, useRunStatuses } from '../hooks'
 import { ModuleCard } from '../../ModuleCard'
 import { PipettesAndModules } from '../PipettesAndModules'
 import { PipetteCard } from '../PipetteCard'
@@ -35,8 +34,8 @@ const mockBanner = Banner as jest.MockedFunction<typeof Banner>
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
 >
 
 const render = () => {
@@ -48,6 +47,11 @@ const render = () => {
 describe('PipettesAndModules', () => {
   beforeEach(() => {
     mockUseCurrentRunId.mockReturnValue(null)
+    mockUseRunStatuses.mockReturnValue({
+      isRunIncomplete: false,
+      isRunStill: true,
+      isRunTerminal: false,
+    })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -95,7 +99,6 @@ describe('PipettesAndModules', () => {
   })
   it('renders the protocol loaded banner when protocol is loaded and not terminal state', () => {
     mockUseCurrentRunId.mockReturnValue('RUNID')
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     mockBanner.mockReturnValue(<div>mock Banner</div>)
     const [{ getByText }] = render()
 
