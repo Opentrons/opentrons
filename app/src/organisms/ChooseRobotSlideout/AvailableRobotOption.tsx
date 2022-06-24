@@ -76,7 +76,10 @@ export function AvailableRobotOption(
           </Box>
         </Flex>
         {isOnDifferentSoftwareVersion ? (
-          <Icon name="ot-alert" size="1.25rem" color={COLORS.warning} />
+          <>
+            <Box flex="1 1 auto" />
+            <Icon name="ot-alert" size="1.25rem" color={COLORS.warning} />
+          </>
         ) : null}
       </MiniCard>
 
@@ -84,7 +87,7 @@ export function AvailableRobotOption(
         <StyledText as="label" color={COLORS.warningText}>
           <Trans
             t={t}
-            i18nkey="a_software_update_is_available_please_update"
+            i18nKey="a_software_update_is_available_please_update"
             components={{
               robotLink: <NavLink to={`/devices/${robotName}`} />,
             }}

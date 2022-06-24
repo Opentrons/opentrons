@@ -7,8 +7,8 @@ import type { StyleProps } from '@opentrons/components'
 interface MiniCardProps extends StyleProps {
   onClick: () => void
   isSelected: boolean
-  isNonviable: boolean
   children: React.ReactNode
+  isNonviable?: boolean
 }
 const unselectedOptionStyles = css`
   background-color: ${COLORS.white};
@@ -47,7 +47,7 @@ const nonviableOptionStyles = css`
 `
 
 export function MiniCard(props: MiniCardProps): JSX.Element {
-  const { children, onClick, isSelected, isNonviable } = props
+  const { children, onClick, isSelected, isNonviable = false } = props
   return (
     <Flex
       onClick={onClick}

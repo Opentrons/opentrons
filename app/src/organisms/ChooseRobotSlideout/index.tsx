@@ -1,7 +1,7 @@
 import * as React from 'react'
 import path from 'path'
 import first from 'lodash/first'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { NavLink, useHistory } from 'react-router-dom'
 
@@ -74,11 +74,13 @@ export function ChooseRobotSlideout(
     'upgrade',
     'downgrade',
   ].includes(
-    useSelector((state: State) =>
-      selectedRobot != null
-        ? getBuildrootUpdateDisplayInfo(state, selectedRobot.name)
-        : { autoUpdateAction: '' }
-    )?.autoUpdateAction
+    useSelector((state: State) => {
+      const value =
+        selectedRobot != null
+          ? getBuildrootUpdateDisplayInfo(state, selectedRobot.name)
+          : { autoUpdateAction: '' }
+      return value
+    })?.autoUpdateAction
   )
 
   const {
@@ -104,7 +106,7 @@ export function ChooseRobotSlideout(
     mostRecentAnalysis?.metadata?.protocolName ??
     first(srcFileNames) ??
     protocolKey
-  const unavailableOrBusyCount =
+  const unavailableCount =
     unhealthyReachableRobots.length + unreachableRobots.length
 
   return (
@@ -186,21 +188,25 @@ export function ChooseRobotSlideout(
             />
           ))
         )}
-        {!isScanning && unavailableOrBusyCount > 0 ? (
+        {!isScanning && unavailableCount > 0 ? (
           <Flex
             flexDirection={DIRECTION_COLUMN}
             alignItems={ALIGN_CENTER}
             textAlign={TEXT_ALIGN_CENTER}
-            marginTop={SPACING.spacing4}
+            marginTop={SPACING.spacing5}
           >
             <StyledText as="p">
-              {t('unavailable_or_busy_robot_not_listed', {
-                count: unavailableOrBusyCount,
-              })}
+              {t('unavailable_robot_not_listed', { count: unavailableCount })}
             </StyledText>
-            <NavLink to="/devices">
-              <StyledText as="p">{t('view_all_robots')}</StyledText>
-            </NavLink>
+            <StyledText as="p">
+              <Trans
+                t={t}
+                i18nKey="view_unavailable_robots"
+                components={{
+                  devicesLink: <NavLink to="/devices" />,
+                }}
+              />
+            </StyledText>
           </Flex>
         ) : null}
       </Flex>
