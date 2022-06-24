@@ -10,6 +10,7 @@ import {
   COLORS,
   TYPOGRAPHY,
   SIZE_1,
+  TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
 import { Trans, useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
@@ -84,7 +85,16 @@ export function AvailableRobotOption(
       </MiniCard>
 
       {isOnDifferentSoftwareVersion ? (
-        <StyledText as="label" color={COLORS.errorText}>
+        <StyledText
+          as="label"
+          color={COLORS.errorText}
+          css={css`
+            & > a {
+              color: ${COLORS.errorText};
+              text-decoration: ${TEXT_DECORATION_UNDERLINE};
+            }
+          `}
+        >
           <Trans
             t={t}
             i18nKey="a_software_update_is_available_please_update"
