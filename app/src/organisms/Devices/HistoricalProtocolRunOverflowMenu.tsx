@@ -101,6 +101,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     closeOverflowMenu,
     setShowDownloadRunLogToast,
   } = props
+
   const onResetSuccess = (createRunResponse: Run): void =>
     history.push(
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-log`
@@ -115,9 +116,9 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { reset } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
 
-  const handleResetClick: React.MouseEventHandler<HTMLButtonElement> = async (
+  const handleResetClick: React.MouseEventHandler<HTMLButtonElement> = (
     e
-  ): Promise<void> => {
+  ): void => {
     e.preventDefault()
     e.stopPropagation()
 
