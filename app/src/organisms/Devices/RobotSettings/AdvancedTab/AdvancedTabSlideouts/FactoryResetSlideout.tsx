@@ -156,6 +156,8 @@ export function FactoryResetSlideout({
               {t('reset_option_calibration')}
             </StyledText>
             <Link
+              role="button"
+              tabIndex={0}
               css={TYPOGRAPHY.linkPSemiBold}
               onClick={downloadCalibrationLogs}
             >
@@ -189,7 +191,8 @@ export function FactoryResetSlideout({
               {t('reset_option_protocol_run_history')}
             </StyledText>
             <Link
-              external
+              role="button"
+              tabIndex={0}
               css={TYPOGRAPHY.linkPSemiBold}
               onClick={downloadRunHistoryLogs}
             >

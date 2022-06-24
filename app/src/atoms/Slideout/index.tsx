@@ -77,6 +77,23 @@ const CLOSE_ICON_STYLE = css`
 
 export const Slideout = (props: Props): JSX.Element | null => {
   const { isExpanded, title, onCloseClick, children, footer } = props
+  const slideOutRef = React.useRef<HTMLDivElement>(null)
+  const [isReachedBottom, setIsReachedBottom] = React.useState<boolean>(false)
+
+  const onScroll = (): void => {
+    if (slideOutRef.current != null) {
+      const { scrollTop, scrollHeight, clientHeight } = slideOutRef.current
+      console.log('val', scrollTop, scrollHeight, clientHeight)
+      if (scrollTop + clientHeight === scrollHeight) {
+        setIsReachedBottom(true)
+      }
+    }
+  }
+
+  React.useEffect(() => {
+    onScroll()
+  }, [])
+
   return (
     <>
       {isExpanded ? (
@@ -101,6 +118,8 @@ export const Slideout = (props: Props): JSX.Element | null => {
           flex="0 1 auto"
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
+          ref={slideOutRef}
+          onScroll={onScroll}
         >
           {typeof title === 'string' ? (
             <Flex
@@ -152,8 +171,9 @@ export const Slideout = (props: Props): JSX.Element | null => {
               paddingTop={SPACING.spacing4}
               paddingX={SPACING.spacing4}
               flex="0 0 auto"
-              //  TODO(jr, 6/6/22): add logic to hide this boxShadow if the children box is already scrolled to the max
-              boxShadow={'0px -4px 12px rgba(0, 0, 0, 0.15)'}
+              boxShadow={
+                isReachedBottom ? 'none' : '0px -4px 12px rgba(0, 0, 0, 0.15)'
+              }
             >
               {footer}
             </Box>
