@@ -31,13 +31,13 @@ export interface InputFieldProps {
   /** optional suffix component, appears to the right of input text */
   units?: React.ReactNode
   /** current value of text in box, defaults to '' */
-  value?: string | number | null | undefined
+  value?: string | number | null
   /** if included, InputField will use error style and display error instead of caption */
-  error?: string | null | undefined
+  error?: string | null
   /** optional caption. hidden when `error` is given */
-  caption?: string | null | undefined
+  caption?: string | null
   /** appears to the right of the caption. Used for character limits, eg '0/45' */
-  secondaryCaption?: string | null | undefined
+  secondaryCaption?: string | null
   /** optional input type (default "text") */
   type?:
     | typeof INPUT_TYPE_TEXT

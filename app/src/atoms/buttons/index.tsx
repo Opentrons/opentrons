@@ -157,7 +157,6 @@ export const SubmitPrimaryButton = (
     padding: ${SPACING.spacing3} ${SPACING.spacing4};
     color: ${COLORS.white};
     line-height: ${TYPOGRAPHY.lineHeight20};
-    text-transform: ${TYPOGRAPHY.textTransformNone};
     ${TYPOGRAPHY.pSemiBold}
     width: 100%;
     border: none;

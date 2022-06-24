@@ -204,25 +204,6 @@ describe('ProtocolRunDetails', () => {
     expect(queryByText('Module Controls')).toBeNull()
   })
 
-  it('disables protocol run setup and module controls tabs when the run is not current', () => {
-    mockUseCurrentRunId.mockReturnValue(null)
-    const [{ getByText, queryByText }] = render(
-      `/devices/otie/protocol-runs/${RUN_ID}`
-    )
-
-    const setupTab = getByText('Setup')
-    const moduleTab = getByText('Module Controls')
-    const runTab = getByText('Run Log')
-    runTab.click()
-    getByText('Mock RunLog')
-    expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
-    expect(queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
-    setupTab.click()
-    expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
-    moduleTab.click()
-    expect(queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
-  })
-
   it('disables module controls tab when the run current but not idle', () => {
     mockUseCurrentRunId.mockReturnValue(RUN_ID)
     mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
