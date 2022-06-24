@@ -136,7 +136,6 @@ class ProtocolEngine:
             QueueCommandAction(
                 request=request,
                 command_id=command_id,
-                command_key=request.key,
                 created_at=self._model_utils.get_timestamp(),
             )
         )

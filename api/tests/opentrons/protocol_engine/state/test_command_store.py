@@ -178,7 +178,6 @@ def test_command_store_queues_commands(
         request=command_request,
         created_at=created_at,
         command_id=command_id,
-        command_key=command_key,
     )
     expected_command = expected_cls(
         id=command_id,
@@ -204,13 +203,11 @@ def test_command_queue_and_unqueue() -> None:
         request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
-        command_key="command-key-1",
     )
     queue_2 = QueueCommandAction(
         request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
         created_at=datetime(year=2022, month=2, day=2),
         command_id="command-id-2",
-        command_key="command-key-2",
     )
     update_1 = UpdateCommandAction(
         command=create_running_command(command_id="command-id-1"),
@@ -245,7 +242,6 @@ def test_setup_command_queue_and_unqueue() -> None:
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
-        command_key="command-key-1",
     )
     queue_2 = QueueCommandAction(
         request=commands.WaitForResumeCreate(
@@ -254,7 +250,6 @@ def test_setup_command_queue_and_unqueue() -> None:
         ),
         created_at=datetime(year=2022, month=2, day=2),
         command_id="command-id-2",
-        command_key="command-key-2",
     )
     update_1 = UpdateCommandAction(
         command=create_running_command(command_id="command-id-1"),
@@ -289,7 +284,6 @@ def test_setup_queue_action_updates_command_intent() -> None:
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
-        command_key="command-key-1",
     )
 
     expected_pause_cmd = commands.WaitForResume(
@@ -315,7 +309,6 @@ def test_running_command_id() -> None:
         request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
-        command_key="command-key-1",
     )
     running_update = UpdateCommandAction(
         command=create_running_command(command_id="command-id-1"),
@@ -362,13 +355,11 @@ def test_command_failure_clears_queues() -> None:
         request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
-        command_key="command-key-1",
     )
     queue_2 = QueueCommandAction(
         request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-2",
-        command_key="command-key-2",
     )
     running_1 = UpdateCommandAction(
         command=commands.WaitForResume(
@@ -445,7 +436,6 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         request=commands.WaitForResumeCreate(params=cmd_1_non_setup.params),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
-        command_key="command-key-1",
     )
     queue_action_2_setup = QueueCommandAction(
         request=commands.WaitForResumeCreate(
@@ -454,7 +444,6 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-2",
-        command_key="command-key-2",
     )
     queue_action_3_setup = QueueCommandAction(
         request=commands.WaitForResumeCreate(
@@ -463,7 +452,6 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-3",
-        command_key="command-key-3",
     )
 
     running_cmd_2 = UpdateCommandAction(

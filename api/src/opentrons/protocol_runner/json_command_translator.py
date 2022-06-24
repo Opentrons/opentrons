@@ -87,7 +87,7 @@ def _translate_simple_command(
     command: protocol_schema_v6.Command,
 ) -> pe_commands.CommandCreate:
     # TODO (tz, 6-23-22): removed exclude_none=True
-    dict_command = command.dict()
+    dict_command = command.dict(exclude_none=True)
 
     # map deprecated `delay` commands to `waitForResume` / `waitForDuration`
     if dict_command["commandType"] == "delay":
@@ -96,6 +96,9 @@ def _translate_simple_command(
         else:
             dict_command["commandType"] = "waitForDuration"
 
+    # dict_command["key"] = command.key
+    print("command.key ")
+    print(command.key)
     translated_obj = cast(
         pe_commands.CommandCreate,
         parse_obj_as(

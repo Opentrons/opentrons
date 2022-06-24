@@ -165,7 +165,6 @@ def test_add_command(
         state_store.commands.validate_action_allowed(
             QueueCommandAction(
                 command_id="command-id",
-                command_key="command-id",
                 created_at=created_at,
                 request=request,
             )
@@ -173,7 +172,6 @@ def test_add_command(
     ).then_return(
         QueueCommandAction(
             command_id="command-id-validated",
-            command_key="command-id-validated",
             created_at=created_at,
             request=request,
         )
@@ -236,7 +234,6 @@ async def test_add_and_execute_command(
         state_store.commands.validate_action_allowed(
             QueueCommandAction(
                 command_id="command-id",
-                command_key="command-id",
                 created_at=created_at,
                 request=request,
             )
@@ -244,7 +241,6 @@ async def test_add_and_execute_command(
     ).then_return(
         QueueCommandAction(
             command_id="command-id-validated",
-            command_key="command-id-validated",
             created_at=created_at,
             request=request,
         )

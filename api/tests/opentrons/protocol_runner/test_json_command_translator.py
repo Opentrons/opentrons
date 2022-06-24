@@ -32,6 +32,7 @@ VALID_TEST_PARAMS = [
     (
         protocol_schema_v6.Command(
             commandType="aspirate",
+            key=None,
             params=protocol_schema_v6.Params(
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
@@ -47,6 +48,7 @@ VALID_TEST_PARAMS = [
             ),
         ),
         pe_commands.AspirateCreate(
+            key=None,
             params=pe_commands.AspirateParams(
                 # todo: id
                 pipetteId="pipette-id-abc123",
@@ -64,6 +66,7 @@ VALID_TEST_PARAMS = [
     (
         protocol_schema_v6.Command(
             commandType="dispense",
+            key="dispense-key",
             params=protocol_schema_v6.Params(
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
@@ -77,6 +80,7 @@ VALID_TEST_PARAMS = [
             ),
         ),
         pe_commands.DispenseCreate(
+            key="dispense-key",
             params=pe_commands.DispenseParams(
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
