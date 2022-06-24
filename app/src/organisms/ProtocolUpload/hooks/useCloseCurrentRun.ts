@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useParams } from 'react-router-dom'
 
 import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 import { useCurrentRunId } from './useCurrentRunId'
