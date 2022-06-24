@@ -78,13 +78,13 @@ export function AvailableRobotOption(
         {isOnDifferentSoftwareVersion ? (
           <>
             <Box flex="1 1 auto" />
-            <Icon name="ot-alert" size="1.25rem" color={COLORS.warning} />
+            <Icon name="ot-alert" size="1.25rem" color={COLORS.error} />
           </>
         ) : null}
       </MiniCard>
 
       {isOnDifferentSoftwareVersion ? (
-        <StyledText as="label" color={COLORS.warningText}>
+        <StyledText as="label" color={COLORS.errorText}>
           <Trans
             t={t}
             i18nKey="a_software_update_is_available_please_update"

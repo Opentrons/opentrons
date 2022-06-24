@@ -37,12 +37,12 @@ const selectedOptionStyles = css`
 
 const nonviableOptionStyles = css`
   ${selectedOptionStyles}
-  border: 1px solid ${COLORS.warning};
-  background-color: ${COLORS.warningBg};
+  border: 1px solid ${COLORS.error};
+  background-color: ${COLORS.errorBg};
 
   &:hover {
-    border: 1px solid ${COLORS.warning};
-    background-color: ${COLORS.warningBg};
+    border: 1px solid ${COLORS.error};
+    background-color: ${COLORS.errorBg};
   }
 `
 
