@@ -293,6 +293,7 @@ def test_setup_queue_action_updates_command_intent() -> None:
         request=commands.WaitForResumeCreate(
             params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
+            key="command-key-1"
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
@@ -364,12 +365,12 @@ def test_running_command_no_queue() -> None:
 def test_command_failure_clears_queues() -> None:
     """It should clear the command queue on command failure."""
     queue_1 = QueueCommandAction(
-        request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
+        request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams(), key="command-key-1"),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
     )
     queue_2 = QueueCommandAction(
-        request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
+        request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams(), key="command-key-2"),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-2",
     )
@@ -445,7 +446,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         status=commands.CommandStatus.QUEUED,
     )
     queue_action_1_non_setup = QueueCommandAction(
-        request=commands.WaitForResumeCreate(params=cmd_1_non_setup.params),
+        request=commands.WaitForResumeCreate(params=cmd_1_non_setup.params, key="command-key-1"),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
     )
@@ -453,6 +454,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         request=commands.WaitForResumeCreate(
             params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
+            key="command-key-2"
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-2",
@@ -461,6 +463,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         request=commands.WaitForResumeCreate(
             params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
+            key="command-key-3"
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-3",
