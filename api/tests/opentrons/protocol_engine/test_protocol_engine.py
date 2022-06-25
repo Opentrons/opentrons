@@ -181,7 +181,6 @@ def test_add_command(
         action_dispatcher.dispatch(
             QueueCommandAction(
                 command_id="command-id-validated",
-                command_key="command-id-validated",
                 created_at=created_at,
                 request=request,
             )
@@ -250,7 +249,6 @@ async def test_add_and_execute_command(
         action_dispatcher.dispatch(
             QueueCommandAction(
                 command_id="command-id-validated",
-                command_key="command-id-validated",
                 created_at=created_at,
                 request=request,
             )
