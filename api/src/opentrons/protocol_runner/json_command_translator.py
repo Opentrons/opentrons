@@ -40,7 +40,7 @@ def _translate_labware_command(
                 command.params.location,
             ),
         ),
-        key=command.key
+        key=command.key,
     )
     return labware_command
 
@@ -60,7 +60,7 @@ def _translate_module_command(
             location=DeckSlotLocation.parse_obj(command.params.location),
             moduleId=command.params.moduleId,
         ),
-        key=command.key
+        key=command.key,
     )
     return translated_obj
 
@@ -78,7 +78,7 @@ def _translate_pipette_command(
             mount=MountType(command.params.mount),
             pipetteId=command.params.pipetteId,
         ),
-        key=command.key
+        key=command.key,
     )
     return translated_obj
 

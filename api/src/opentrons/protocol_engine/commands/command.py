@@ -79,8 +79,7 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
     key: Optional[str] = Field(
         None,
         description=(
-            "UI command key. This field will help"
-            " protocol analysis for JSON v6."
+            "UI command key. This field will help" " protocol analysis for JSON v6."
         ),
     )
 

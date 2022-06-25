@@ -83,7 +83,7 @@ class QueueCommandSpec(NamedTuple):
                     flowRate=1.23,
                     wellLocation=WellLocation(),
                 ),
-                key="command-key"
+                key="command-aspirate-key",
             ),
             expected_cls=commands.Aspirate,
         ),
@@ -97,7 +97,7 @@ class QueueCommandSpec(NamedTuple):
                     flowRate=1.23,
                     wellLocation=WellLocation(),
                 ),
-                key="command-key"
+                key="command-dispense-key",
             ),
             expected_cls=commands.Dispense,
         ),
@@ -108,7 +108,7 @@ class QueueCommandSpec(NamedTuple):
                     labwareId="labware-id",
                     wellName="well-name",
                 ),
-                key="command-key"
+                key="command-drop-tip-key",
             ),
             expected_cls=commands.DropTip,
         ),
@@ -120,7 +120,7 @@ class QueueCommandSpec(NamedTuple):
                     namespace="namespace",
                     version=42,
                 ),
-                key="command-key"
+                key="command-load-labware-key",
             ),
             expected_cls=commands.LoadLabware,
         ),
@@ -130,7 +130,7 @@ class QueueCommandSpec(NamedTuple):
                     mount=MountType.LEFT,
                     pipetteName=PipetteName.P300_SINGLE,
                 ),
-                key="command-key"
+                key="command-pipette-key",
             ),
             expected_cls=commands.LoadPipette,
         ),
@@ -141,7 +141,7 @@ class QueueCommandSpec(NamedTuple):
                     labwareId="labware-id",
                     wellName="well-name",
                 ),
-                key="command-key"
+                key="command-pick-up-key",
             ),
             expected_cls=commands.PickUpTip,
         ),
@@ -152,14 +152,14 @@ class QueueCommandSpec(NamedTuple):
                     labwareId="labware-id",
                     wellName="well-name",
                 ),
-                key="command-key"
+                key="command-move-to-well-key",
             ),
             expected_cls=commands.MoveToWell,
         ),
         QueueCommandSpec(
             command_request=commands.WaitForResumeCreate(
                 params=commands.WaitForResumeParams(message="hello world"),
-                key="command-key"
+                key="command-wait-resume-key",
             ),
             expected_cls=commands.WaitForResume,
         ),
@@ -169,7 +169,7 @@ class QueueCommandSpec(NamedTuple):
             command_request=commands.WaitForResumeCreate(
                 commandType="pause",
                 params=commands.WaitForResumeParams(message="hello world"),
-                key="command-key"
+                key="command-wait-resume-key",
             ),
             expected_cls=commands.WaitForResume,
         ),
@@ -198,12 +198,10 @@ def test_command_store_queues_commands(
 
     subject = CommandStore()
     subject.handle_action(action)
-    print('\n')
-    print(subject.state.commands_by_id["command-id"])
-    print('\n')
-    print(expected_command)
 
-    assert subject.state.commands_by_id["command-id"] == CommandEntry(index=0, command=expected_command)
+    assert subject.state.commands_by_id["command-id"] == CommandEntry(
+        index=0, command=expected_command
+    )
 
     assert subject.state.all_command_ids == ["command-id"]
     assert subject.state.queued_command_ids == OrderedSet(["command-id"])
@@ -293,7 +291,7 @@ def test_setup_queue_action_updates_command_intent() -> None:
         request=commands.WaitForResumeCreate(
             params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
-            key="command-key-1"
+            key="command-key-1",
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
@@ -365,12 +363,16 @@ def test_running_command_no_queue() -> None:
 def test_command_failure_clears_queues() -> None:
     """It should clear the command queue on command failure."""
     queue_1 = QueueCommandAction(
-        request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams(), key="command-key-1"),
+        request=commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(), key="command-key-1"
+        ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
     )
     queue_2 = QueueCommandAction(
-        request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams(), key="command-key-2"),
+        request=commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(), key="command-key-2"
+        ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-2",
     )
@@ -446,7 +448,9 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         status=commands.CommandStatus.QUEUED,
     )
     queue_action_1_non_setup = QueueCommandAction(
-        request=commands.WaitForResumeCreate(params=cmd_1_non_setup.params, key="command-key-1"),
+        request=commands.WaitForResumeCreate(
+            params=cmd_1_non_setup.params, key="command-key-1"
+        ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
     )
@@ -454,7 +458,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         request=commands.WaitForResumeCreate(
             params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
-            key="command-key-2"
+            key="command-key-2",
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-2",
@@ -463,7 +467,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         request=commands.WaitForResumeCreate(
             params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
-            key="command-key-3"
+            key="command-key-3",
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-3",

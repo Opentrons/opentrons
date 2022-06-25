@@ -60,7 +60,7 @@ VALID_TEST_PARAMS = [
                     origin=WellOrigin.BOTTOM,
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),
-            )
+            ),
         ),
     ),
     (
@@ -91,7 +91,7 @@ VALID_TEST_PARAMS = [
                     origin=WellOrigin.BOTTOM,
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),
-            )
+            ),
         ),
     ),
     (
