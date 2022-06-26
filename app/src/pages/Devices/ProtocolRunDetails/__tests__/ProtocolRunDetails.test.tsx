@@ -91,7 +91,7 @@ describe('ProtocolRunDetails', () => {
   beforeEach(() => {
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     mockUseRunStatuses.mockReturnValue({
-      isRunIncomplete: false,
+      isLegacySessionInProgress: false,
       isRunStill: true,
       isRunTerminal: false,
     })
@@ -209,7 +209,7 @@ describe('ProtocolRunDetails', () => {
   it('disables module controls tab when the run current but not idle', () => {
     mockUseCurrentRunId.mockReturnValue(RUN_ID)
     mockUseRunStatuses.mockReturnValue({
-      isRunIncomplete: false,
+      isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: false,
     })

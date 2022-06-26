@@ -135,13 +135,17 @@ export function useModuleOverflowMenu(
   const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
-  const { isRunIncomplete, isRunTerminal, isRunStill } = useRunStatuses()
+  const {
+    isLegacySessionInProgress,
+    isRunTerminal,
+    isRunStill,
+  } = useRunStatuses()
   const currentRunId = useCurrentRunId()
   let isDisabled: boolean = false
   if (runId != null && isModuleControl) {
     isDisabled = !isRunStill
   } else if ((runId != null || currentRunId != null) && !isModuleControl) {
-    isDisabled = isRunIncomplete
+    isDisabled = !isLegacySessionInProgress && !isRunTerminal
   }
   const isLatchDisabled =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&

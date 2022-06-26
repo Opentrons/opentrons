@@ -227,7 +227,7 @@ describe('useLatchControls', () => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     mockUseRunStatuses.mockReturnValue({
-      isRunIncomplete: true,
+      isLegacySessionInProgress: true,
       isRunStill: true,
       isRunTerminal: false,
     })
@@ -308,7 +308,7 @@ describe('useModuleOverflowMenu', () => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     mockUseRunStatuses.mockReturnValue({
-      isRunIncomplete: true,
+      isLegacySessionInProgress: true,
       isRunStill: true,
       isRunTerminal: false,
     })

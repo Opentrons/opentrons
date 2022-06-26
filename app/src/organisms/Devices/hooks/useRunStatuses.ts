@@ -9,7 +9,7 @@ import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 
 interface RunStatusesInfo {
-  isRunIncomplete: boolean
+  isLegacySessionInProgress: boolean
   isRunStill: boolean
   isRunTerminal: boolean
 }
@@ -24,10 +24,9 @@ export function useRunStatuses(): RunStatusesInfo {
 
   const allSessionsQueryResponse = useAllSessionsQuery()
 
-  const isRunIncomplete =
-    !isRunTerminal ||
-    (allSessionsQueryResponse?.data?.data != null &&
-      allSessionsQueryResponse?.data?.data?.length !== 0)
+  const isLegacySessionInProgress =
+    allSessionsQueryResponse?.data?.data != null &&
+    allSessionsQueryResponse?.data?.data?.length !== 0
 
   const isRunStill =
     runStatus === RUN_STATUS_SUCCEEDED ||
@@ -35,5 +34,5 @@ export function useRunStatuses(): RunStatusesInfo {
     runStatus === RUN_STATUS_FAILED ||
     runStatus === RUN_STATUS_IDLE
 
-  return { isRunIncomplete, isRunStill, isRunTerminal }
+  return { isLegacySessionInProgress, isRunStill, isRunTerminal }
 }

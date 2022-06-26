@@ -46,13 +46,17 @@ export const ModuleOverflowMenu = (
     isModuleControl
   )
   const currentRunId = useCurrentRunId()
-  const { isRunIncomplete, isRunStill } = useRunStatuses()
+  const {
+    isRunTerminal,
+    isLegacySessionInProgress,
+    isRunStill,
+  } = useRunStatuses()
 
   let isDisabled: boolean = false
   if (runId != null && isModuleControl) {
     isDisabled = !isRunStill
   } else if ((runId != null || currentRunId != null) && !isModuleControl) {
-    isDisabled = isRunIncomplete
+    isDisabled = !isRunTerminal && !isLegacySessionInProgress
   }
 
   return (

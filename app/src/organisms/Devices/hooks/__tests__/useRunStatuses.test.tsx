@@ -41,86 +41,81 @@ describe(' useRunStatuses ', () => {
     jest.resetAllMocks()
   })
 
-  it('returns true isRunIncomplete when current run status is not terminal or sessions are empty', () => {
+  it('returns everything as false when run status is null and sessions are empty', () => {
     const result = useRunStatuses()
     expect(result).toStrictEqual({
-      isRunIncomplete: true,
+      isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: false,
     })
   })
 
-  it('returns false isRunIncomplete and true isRunStill and Terminal when run status is suceeded or sessions are not empty', () => {
+  it('returns  true isLegacySessionInProgress and true isRunStill and Terminal when run status is suceeded and sessions are not empty', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_SUCCEEDED)
     mockUseAllSessionsQuery.mockReturnValue(({
-      data: [
-        {
-          id: 'test',
-          createdAt: '2019-08-24T14:15:22Z',
-          details: {},
+      data: {
+        data: {
+          id: 'id',
           sessionType: 'calibrationCheck',
-          createParams: {},
+          createParams: 'params',
         },
-      ],
+      },
       links: {},
     } as unknown) as UseQueryResult<Sessions, Error>)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
-      isRunIncomplete: false,
+      isLegacySessionInProgress: true,
       isRunStill: true,
       isRunTerminal: true,
     })
   })
 
-  it('returns false  isRunIncomplete and true isRunStill and Terminal when run status is stopped or sessions are not empty', () => {
+  it('returns true isLegacySessionInProgress and true isRunStill and Terminal when run status is stopped and sessions are not empty', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_STOPPED)
     mockUseAllSessionsQuery.mockReturnValue(({
-      data: [
-        {
-          id: 'test',
-          createdAt: '2019-08-24T14:15:22Z',
-          details: {},
+      data: {
+        data: {
+          id: 'id',
           sessionType: 'calibrationCheck',
-          createParams: {},
+          createParams: 'params',
         },
-      ],
+      },
       links: {},
     } as unknown) as UseQueryResult<Sessions, Error>)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
-      isRunIncomplete: false,
+      isLegacySessionInProgress: true,
       isRunStill: true,
       isRunTerminal: true,
     })
   })
 
-  it('returns false  isRunIncomplete and true isRunStill and Terminal when run status is failed or sessions are not empty', () => {
+  it('returns true  isLegacySesionInprogress and true isRunStill and Terminal when run status is failed and sessions are not empty', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_FAILED)
     mockUseAllSessionsQuery.mockReturnValue(({
-      data: [
-        {
-          id: 'test',
-          createdAt: '2019-08-24T14:15:22Z',
-          details: {},
+      data: {
+        data: {
+          id: 'id',
           sessionType: 'calibrationCheck',
-          createParams: {},
+          createParams: 'params',
         },
-      ],
+      },
       links: {},
     } as unknown) as UseQueryResult<Sessions, Error>)
+
     const result = useRunStatuses()
     expect(result).toStrictEqual({
-      isRunIncomplete: false,
+      isLegacySessionInProgress: true,
       isRunStill: true,
       isRunTerminal: true,
     })
   })
 
-  it('returns false isRunIncomplete and true isRunStill when run status is idle', () => {
+  it('returns false isLegacySessionInprogress and true isRunStill when run status is idle and sessions are empty', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
-      isRunIncomplete: true,
+      isLegacySessionInProgress: false,
       isRunStill: true,
       isRunTerminal: false,
     })

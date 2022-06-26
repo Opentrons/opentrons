@@ -30,13 +30,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import {
-  RUN_STATUS_FAILED,
-  RUN_STATUS_FINISHING,
-  RUN_STATUS_RUNNING,
-  RUN_STATUS_STOPPED,
-  RUN_STATUS_SUCCEEDED,
-} from '@opentrons/api-client'
+import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { useHistory } from 'react-router-dom'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { updateModule } from '../../redux/modules'
@@ -54,6 +48,7 @@ import { Toast } from '../../atoms/Toast'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
+import { useRunStatuses } from '../Devices/hooks'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
@@ -100,6 +95,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showBanner, setShowBanner] = React.useState<boolean>(true)
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
+  const { isRunTerminal } = useRunStatuses()
   const history = useHistory()
   const [dispatchApiRequest, requestIds] = useDispatchApiRequest()
   const runStatus = useCurrentRunStatus({
@@ -218,11 +214,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const handleWizardClick = (): void => {
     setShowWizard(true)
   }
-
-  const isRunTerminal =
-    runStatus === RUN_STATUS_SUCCEEDED ||
-    runStatus === RUN_STATUS_STOPPED ||
-    runStatus === RUN_STATUS_FAILED
 
   return (
     <React.Fragment>
