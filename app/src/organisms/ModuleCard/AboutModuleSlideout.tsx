@@ -8,7 +8,6 @@ import {
   TYPOGRAPHY,
   SPACING,
   JUSTIFY_SPACE_BETWEEN,
-  TEXT_DECORATION_UNDERLINE,
   Btn,
   ALIGN_START,
   COLORS,
@@ -83,7 +82,7 @@ export const AboutModuleSlideout = (
               textAlign={ALIGN_START}
               paddingLeft={SPACING.spacing2}
               fontSize={TYPOGRAPHY.fontSizeP}
-              textDecoration={TEXT_DECORATION_UNDERLINE}
+              textDecoration={TYPOGRAPHY.textDecorationUnderline}
               onClick={handleFirmwareUpdateClick}
             >
               {t('update_now')}

@@ -12,7 +12,6 @@ import {
   DIRECTION_ROW,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  TEXT_DECORATION_UNDERLINE,
   SPACING,
   TYPOGRAPHY,
   COLORS,
@@ -116,7 +115,7 @@ export function GeneralSettings(): JSX.Element {
             >
               {t('update_available')}
               <Link
-                textDecoration={TEXT_DECORATION_UNDERLINE}
+                textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 onClick={() => setShowUpdateModal(true)}
               >
                 {t('view_update')}

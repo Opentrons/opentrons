@@ -15,7 +15,6 @@ import {
   TYPOGRAPHY,
   useOnClickOutside,
   Btn,
-  TEXT_DECORATION_UNDERLINE,
   IconProps,
   Tooltip,
   useHoverTooltip,
@@ -305,7 +304,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                       <Btn
                         textAlign={ALIGN_START}
                         fontSize={TYPOGRAPHY.fontSizeP}
-                        textDecoration={TEXT_DECORATION_UNDERLINE}
+                        textDecoration={TYPOGRAPHY.textDecorationUnderline}
                         onClick={() => handleUpdateClick()}
                       >
                         {t('update_now')}

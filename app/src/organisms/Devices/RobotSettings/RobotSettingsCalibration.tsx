@@ -12,7 +12,6 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
-  TEXT_DECORATION_UNDERLINE,
   useHoverTooltip,
   TOOLTIP_LEFT,
   Mount,
@@ -572,7 +571,7 @@ export function RobotSettingsCalibration({
               role="button"
               color={COLORS.darkBlack}
               css={TYPOGRAPHY.pRegular}
-              textDecoration={TEXT_DECORATION_UNDERLINE}
+              textDecoration={TYPOGRAPHY.textDecorationUnderline}
               onClick={() => handleClickDeckCalibration()}
             >
               {checkDeckCalibrationStatus() === 'error'
