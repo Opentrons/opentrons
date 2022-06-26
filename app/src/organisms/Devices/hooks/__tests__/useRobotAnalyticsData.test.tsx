@@ -45,7 +45,7 @@ const ROBOT_VERSION = 'version1'
 const ROBOT_FIRMWARE_VERSION = 'firmwareVersion1'
 const ATTACHED_PIPETTES = {
   left: { id: '1', model: 'testModelLeft' },
-  right: { id: '2', model: 'testModelLeft' },
+  right: { id: '2', model: 'testModelRight' },
 }
 
 let wrapper: React.FunctionComponent<{}>
@@ -97,7 +97,7 @@ describe('useProtocolAnalysisErrors hook', () => {
       robotFF_setting1: true,
       robotFF_setting2: false,
       robotLeftPipette: 'testModelLeft',
-      robotRightPipette: 'testModelLeft',
+      robotRightPipette: 'testModelRight',
       robotSmoothieVersion: ROBOT_FIRMWARE_VERSION,
     })
   })

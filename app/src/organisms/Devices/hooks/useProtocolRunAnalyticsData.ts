@@ -2,8 +2,7 @@ import { useSelector } from 'react-redux'
 
 import { hash } from '../../../redux/analytics/hash'
 import { getStoredProtocol } from '../../../redux/protocol-storage'
-import { useStoredProtocolAnalysis } from './useStoredProtocolAnalysis'
-import { useProtocolDetailsForRun } from './useProtocolDetailsForRun'
+import { useStoredProtocolAnalysis, useProtocolDetailsForRun } from './'
 import { useProtocolMetadata } from '../../ProtocolSetup/hooks'
 import { useRunTimestamps } from '../../RunTimeControl/hooks'
 import { formatInterval } from '../../RunTimeControl/utils'
@@ -63,8 +62,9 @@ export function useProtocolRunAnalyticsData(
         protocolAppVersion:
           protocolAnalysis?.config?.protocolType === 'json'
             ? protocolAnalysis?.config?.schemaVersion.toFixed(1)
-            : protocolAnalysis?.metadata?.apiLevel,
-        protocolApiVersion: protocolAnalysis?.metadata?.apiLevel ?? '',
+            : protocolAnalysis?.metadata?.apiLevel.toFixed(1),
+        protocolApiVersion:
+          protocolAnalysis?.metadata?.apiLevel.toString() ?? '',
         protocolSource: protocolAnalysis?.metadata?.source ?? '',
         protocolName: protocolAnalysis?.metadata?.protocolName ?? '',
         pipettes: Object.values(protocolAnalysis?.pipettes ?? {})

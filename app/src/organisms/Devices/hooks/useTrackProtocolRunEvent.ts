@@ -3,7 +3,7 @@ import { useProtocolRunAnalyticsData } from './useProtocolRunAnalyticsData'
 
 import type { AnalyticsEvent } from '../../../redux/analytics/types'
 
-type TrackProtocolRunEvent = (event: AnalyticsEvent) => Promise<void>
+type TrackProtocolRunEvent = (protocolRunEvent: AnalyticsEvent) => Promise<void>
 
 export function useTrackProtocolRunEvent(
   runId: string | null
@@ -11,9 +11,7 @@ export function useTrackProtocolRunEvent(
   const trackEvent = useTrackEvent()
   const { getProtocolRunAnalyticsData } = useProtocolRunAnalyticsData(runId)
 
-  const trackProtocolRunEvent = async (
-    event: AnalyticsEvent
-  ): Promise<void> => {
+  const trackProtocolRunEvent: TrackProtocolRunEvent = async protocolRunEvent => {
     try {
       const {
         protocolRunAnalyticsData,
@@ -21,23 +19,23 @@ export function useTrackProtocolRunEvent(
       } = await getProtocolRunAnalyticsData()
 
       trackEvent({
-        name: event.name,
+        name: protocolRunEvent.name,
         properties: {
-          ...event.properties,
+          ...protocolRunEvent.properties,
           ...protocolRunAnalyticsData,
           runTime,
         },
       })
     } catch (e: unknown) {
       console.error(
-        `getProtocolRunAnalyticsData error during ${event.name}: ${
+        `getProtocolRunAnalyticsData error during ${protocolRunEvent.name}: ${
           (e as Error).message
-        }; sending event without protocol properties`
+        }; sending protocolRunEvent without protocol properties`
       )
 
       trackEvent({
-        name: event.name,
-        properties: { ...event.properties },
+        name: protocolRunEvent.name,
+        properties: { ...protocolRunEvent.properties },
       })
     }
   }
