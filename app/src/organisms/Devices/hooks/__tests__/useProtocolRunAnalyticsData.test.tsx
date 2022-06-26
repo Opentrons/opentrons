@@ -19,7 +19,7 @@ jest.mock('../../../../redux/protocol-storage')
 jest.mock('../../hooks')
 jest.mock('../../../ProtocolSetup/hooks')
 jest.mock('../../../RunTimeControl/hooks')
-jest.mock('../../../RuntimeControl/utils')
+jest.mock('../../../RunTimeControl/utils')
 
 const mockHash = hash as jest.MockedFunction<typeof hash>
 const mockGetStoredProtocol = getStoredProtocol as jest.MockedFunction<
