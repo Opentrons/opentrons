@@ -9,7 +9,7 @@ import {
   SPACING_2,
   SPACING_3,
   SPACING_4,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_SPACE_EVENLY,
 } from '@opentrons/components'
@@ -30,7 +30,7 @@ export const ExitPreventionModal = (
       <Text
         as={'h3'}
         marginBottom={SPACING_3}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        textTransform={TYPOGRAPHY.textTransformUppercase}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginLeft={SPACING_3}
       >

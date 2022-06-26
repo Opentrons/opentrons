@@ -20,7 +20,6 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
-  TEXT_TRANSFORM_CAPITALIZE,
   TOOLTIP_LEFT,
   COLORS,
   SPACING,
@@ -342,7 +341,7 @@ export function SetupLabware({
                 </Link>
                 <Flex justifyContent={JUSTIFY_CENTER}>
                   <SecondaryButton
-                    textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                    textTransform={TYPOGRAPHY.textTransformCapitalize}
                     title={t('run_labware_position_check')}
                     onClick={() => {
                       setShowLabwarePositionCheckModal(true)

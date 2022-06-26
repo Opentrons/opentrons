@@ -40,7 +40,6 @@ import {
   SIZE_3,
   SIZE_4,
   SIZE_5,
-  TEXT_TRANSFORM_UPPERCASE,
   BORDERS,
   COLORS,
   SPACING,
@@ -363,7 +362,7 @@ export function ProtocolRunHeader({
         <Flex gridGap={SPACING.spacing6}>
           <Box>
             <StyledText
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.darkGreyEnabled}
               css={TYPOGRAPHY.h6Default}
               paddingBottom={SPACING.spacing2}
@@ -380,7 +379,7 @@ export function ProtocolRunHeader({
           </Box>
           <Box>
             <StyledText
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.darkGreyEnabled}
               css={TYPOGRAPHY.h6Default}
               paddingBottom={SPACING.spacing2}
@@ -473,7 +472,7 @@ export function ProtocolRunHeader({
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Box minWidth={SIZE_4}>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6Default}
             paddingBottom={SPACING.spacing2}
@@ -491,7 +490,7 @@ export function ProtocolRunHeader({
         </Box>
         <Box minWidth={SIZE_3}>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6Default}
             paddingBottom={SPACING.spacing2}
@@ -528,7 +527,7 @@ export function ProtocolRunHeader({
         </Box>
         <Box minWidth={SIZE_3}>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6Default}
             paddingBottom={SPACING.spacing2}

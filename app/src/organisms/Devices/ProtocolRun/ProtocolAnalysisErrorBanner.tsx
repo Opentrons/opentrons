@@ -7,9 +7,8 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
-  TEXT_TRANSFORM_CAPITALIZE,
-  TEXT_DECORATION_UNDERLINE,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
@@ -55,7 +54,7 @@ export function ProtocolAnalysisErrorBanner(
                   as="a"
                   role="button"
                   aria-label="error_link"
-                  textDecoration={TEXT_DECORATION_UNDERLINE}
+                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={handleToggleDetails}
                 />
               ),
@@ -80,7 +79,7 @@ export function ProtocolAnalysisErrorBanner(
                 role="button"
                 aria-label="close_modal_button"
                 onClick={handleToggleDetails}
-                textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                textTransform={TYPOGRAPHY.textTransformCapitalize}
                 marginTop={SPACING.spacing4}
               >
                 {t('shared:close')}

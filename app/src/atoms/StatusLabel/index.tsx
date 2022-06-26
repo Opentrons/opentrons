@@ -5,10 +5,10 @@ import {
   Text,
   JUSTIFY_SPACE_BETWEEN,
   SPACING_1,
-  TEXT_TRANSFORM_CAPITALIZE,
   ALIGN_CENTER,
   C_BLUE_PRESSED,
   FONT_SIZE_CAPTION,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 interface StatusLabelProps {
   status: string
@@ -53,7 +53,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
         <Text
           fontSize={FONT_SIZE_CAPTION}
           color={textColor ?? C_BLUE_PRESSED}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
           marginRight={SPACING_1}
         >
           {status}

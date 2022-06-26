@@ -4,14 +4,12 @@ import { css } from 'styled-components'
 import {
   Flex,
   Text,
-  TEXT_TRANSFORM_UPPERCASE,
   COLORS,
   DIRECTION_COLUMN,
   SPACING,
   Icon,
   DIRECTION_ROW,
   TYPOGRAPHY,
-  TEXT_TRANSFORM_CAPITALIZE,
   SIZE_1,
 } from '@opentrons/components'
 import { StatusLabel } from '../../atoms/StatusLabel'
@@ -102,7 +100,7 @@ export const HeaterShakerModuleData = (
       case 'idle_open':
       case 'idle_unknown': {
         return (
-          <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+          <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
             {t('open', { ns: 'shared' })}
           </Text>
         )
@@ -111,13 +109,13 @@ export const HeaterShakerModuleData = (
       case 'idle_closed': {
         if (isShaking) {
           return (
-            <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+            <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
               {t('closed_and_locked', { ns: 'heater_shaker' })}
             </Text>
           )
         } else {
           return (
-            <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+            <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
               {t('closed', { ns: 'heater_shaker' })}
             </Text>
           )
@@ -139,7 +137,7 @@ export const HeaterShakerModuleData = (
           data-testid={`heater_shaker_module_data_temp`}
         >
           <Text
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
@@ -173,7 +171,7 @@ export const HeaterShakerModuleData = (
         data-testid={`heater_shaker_module_data_shaker`}
       >
         <Text
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           fontSize={TYPOGRAPHY.fontSizeH6}
@@ -206,7 +204,7 @@ export const HeaterShakerModuleData = (
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Text
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}

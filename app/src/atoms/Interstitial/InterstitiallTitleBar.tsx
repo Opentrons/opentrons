@@ -7,7 +7,6 @@ import {
   POSITION_ABSOLUTE,
   SPACING,
   Text,
-  TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
   Flex,
   COLORS,
@@ -70,7 +69,7 @@ export function InterstitialTitleBar(
             paddingTop={SPACING.spacingXS}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH3}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {exit.title}
           </Text>

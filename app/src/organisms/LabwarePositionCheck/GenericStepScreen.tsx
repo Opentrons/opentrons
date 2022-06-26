@@ -6,7 +6,6 @@ import {
   Flex,
   JUSTIFY_CENTER,
   NewPrimaryBtn,
-  TEXT_TRANSFORM_UPPERCASE,
   ALIGN_FLEX_START,
   SPACING,
   TYPOGRAPHY,
@@ -56,7 +55,7 @@ export const GenericStepScreen = (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <StyledText
         as="h3"
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        textTransform={TYPOGRAPHY.textTransformUppercase}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {props.title}

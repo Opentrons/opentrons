@@ -14,8 +14,7 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  TEXT_TRANSFORM_NONE,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
 } from '@opentrons/components'
@@ -96,7 +95,7 @@ export function RobotOverview({
               as="h6"
               color={COLORS.darkGreyEnabled}
               paddingBottom={SPACING.spacing1}
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              textTransform={TYPOGRAPHY.textTransformUppercase}
             >
               {t('controls')}
             </StyledText>
@@ -115,7 +114,7 @@ export function RobotOverview({
             </Flex>
           </Flex>
           <PrimaryButton
-            textTransform={TEXT_TRANSFORM_NONE}
+            textTransform={TYPOGRAPHY.textTransformNone}
             disabled={currentRunId != null || robot.status !== CONNECTABLE}
             onClick={() => {
               setShowChooseProtocolSlideout(true)

@@ -8,7 +8,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
-  TEXT_TRANSFORM_UPPERCASE,
   SIZE_1,
   BORDERS,
   COLORS,
@@ -77,7 +76,7 @@ export function SetupCalibrationItem({
               <StyledText
                 color={COLORS.darkGreyEnabled}
                 css={TYPOGRAPHY.h6SemiBold}
-                textTransform={TEXT_TRANSFORM_UPPERCASE}
+                textTransform={TYPOGRAPHY.textTransformUppercase}
                 id={id}
               >
                 {label}

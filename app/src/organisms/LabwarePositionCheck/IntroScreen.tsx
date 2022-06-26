@@ -6,7 +6,7 @@ import {
   Flex,
   Box,
   useInterval,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
@@ -53,7 +53,7 @@ export const IntroScreen = (props: {
     <Box margin={SPACING_3}>
       <Text
         as={'h3'}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        textTransform={TYPOGRAPHY.textTransformUppercase}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         id={`IntroScreen_labware_position_check_overview`}
       >

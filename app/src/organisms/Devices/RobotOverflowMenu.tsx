@@ -10,7 +10,7 @@ import {
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
-  TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { CONNECTABLE, removeRobot } from '../../redux/discovery'
@@ -76,7 +76,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
         <MenuItem
           to={`/devices/${robot.name}/robot-settings`}
           as={Link}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
           id={`RobotOverflowMenu_${robot.name}_robotSettings`}
         >
           {t('robot_settings')}
@@ -88,7 +88,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
       <MenuItem
         to={`/devices/${robot.name}/robot-settings`}
         as={Link}
-        textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        textTransform={TYPOGRAPHY.textTransformCapitalize}
         id={`RobotOverflowMenu_${robot.name}_robotSettings_${runId}`}
       >
         {t('robot_settings')}

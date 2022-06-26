@@ -7,7 +7,6 @@ import {
   Flex,
   Link,
   TYPOGRAPHY,
-  TEXT_TRANSFORM_CAPITALIZE,
   SPACING,
   COLORS,
 } from '@opentrons/components'
@@ -61,7 +60,7 @@ export function NewRobotSetupHelp(): JSX.Element {
               <PrimaryButton
                 onClick={() => setShowNewRobotHelpModal(false)}
                 alignSelf={ALIGN_FLEX_END}
-                textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                textTransform={TYPOGRAPHY.textTransformCapitalize}
               >
                 {t('shared:close')}
               </PrimaryButton>

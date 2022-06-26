@@ -22,7 +22,7 @@ import {
   POSITION_STICKY,
   SIZE_2,
   SPACING_3,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { CountPerStepType, StepType } from '../../form-types'
@@ -109,7 +109,7 @@ export const StepSelectionBannerComponent = (
                 width="10rem"
                 marginLeft="0.5rem"
                 fontWeight={FONT_WEIGHT_SEMIBOLD}
-                textTransform={TEXT_TRANSFORM_UPPERCASE}
+                textTransform={TYPOGRAPHY.textTransformUppercase}
                 id="StepSelectionBannerComponent_numberStepsSelected"
               >
                 {i18n.t('application.n_steps_selected', { n: numSteps })}

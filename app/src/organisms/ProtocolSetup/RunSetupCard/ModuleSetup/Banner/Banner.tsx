@@ -10,7 +10,6 @@ import {
   SPACING,
   Icon,
   NewPrimaryBtn,
-  TEXT_TRANSFORM_NONE,
   SIZE_6,
 } from '@opentrons/components'
 
@@ -93,7 +92,7 @@ export const BannerItem = (props: BannerItemProps): JSX.Element => {
         <NewPrimaryBtn
           backgroundColor={COLORS.blue}
           borderRadius={SPACING.spacingM}
-          textTransform={TEXT_TRANSFORM_NONE}
+          textTransform={TYPOGRAPHY.textTransformNone}
           css={TYPOGRAPHY.labelRegular}
           marginBottom={SPACING.spacingXL}
           data-testid={`banner_open_wizard_btn`}

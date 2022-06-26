@@ -21,7 +21,7 @@ import {
   SPACING_4,
   SPACING_5,
   Text,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
   C_DARK_GRAY,
@@ -53,7 +53,7 @@ export const LabwarePositionCheckStepDetailModal = (
             <Text
               as={'h3'}
               marginBottom={SPACING_3}
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              textTransform={TYPOGRAPHY.textTransformUppercase}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
             >
               {t('labware_step_detail_modal_heading')}

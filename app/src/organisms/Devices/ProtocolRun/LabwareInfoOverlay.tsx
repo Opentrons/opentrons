@@ -71,7 +71,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
             <StyledText
               as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              textTransform={'uppercase'}
+              textTransform={TYPOGRAPHY.textTransformUppercase}
             >
               {t('offset_data')}
             </StyledText>

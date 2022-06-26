@@ -12,6 +12,7 @@ import {
   JUSTIFY_SPACE_AROUND,
   ALIGN_CENTER,
   BORDERS,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { getStoredProtocols } from '../../redux/protocol-storage'
@@ -123,7 +124,7 @@ export function HistoricalProtocolRun(
         <StyledText
           as="p"
           width="20%"
-          textTransform="capitalize"
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
           data-testid={`RecentProtocolRuns_Status_${props.key}`}
         >
           {runStatus === 'running' && (

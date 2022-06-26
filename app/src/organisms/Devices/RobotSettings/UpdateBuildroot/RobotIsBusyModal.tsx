@@ -6,7 +6,6 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
   SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
   ALIGN_CENTER,
   Btn,
@@ -43,7 +42,7 @@ export function RobotIsBusyModal({
         >
           <Btn
             onClick={closeModal}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
             marginRight={SPACING.spacing5}
             css={TYPOGRAPHY.linkPSemiBold}
           >

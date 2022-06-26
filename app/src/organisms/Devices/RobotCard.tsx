@@ -15,8 +15,8 @@ import {
   DIRECTION_ROW,
   SPACING,
   COLORS,
-  TEXT_TRANSFORM_UPPERCASE,
   BORDERS,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
@@ -139,7 +139,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
     >
       <StyledText
         as="h6"
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        textTransform={TYPOGRAPHY.textTransformUppercase}
         color={COLORS.darkGreyEnabled}
         marginBottom={SPACING.spacing2}
       >
@@ -175,7 +175,7 @@ function AttachedPipettes(props: { robotName: string }): JSX.Element {
       >
         <StyledText
           as="h6"
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
           marginBottom={SPACING.spacing2}
         >
@@ -193,7 +193,7 @@ function AttachedPipettes(props: { robotName: string }): JSX.Element {
       >
         <StyledText
           as="h6"
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
           marginBottom={SPACING.spacing2}
         >

@@ -12,7 +12,6 @@ import {
   SIZE_4,
   useConditionalConfirm,
   SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
   JUSTIFY_FLEX_END,
   ALIGN_CENTER,
   TYPOGRAPHY,
@@ -142,7 +141,7 @@ export function ProtocolOverflowMenu(
                     e.stopPropagation()
                     cancelDeleteProtocol()
                   }}
-                  textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
                   marginRight={SPACING.spacing5}
                   css={TYPOGRAPHY.linkPSemiBold}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}

@@ -12,7 +12,7 @@ import {
   SPACING_2,
   SPACING_4,
   Text,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
@@ -76,7 +76,7 @@ export const SummaryScreen = (props: {
     <Flex margin={SPACING_3} flexDirection={DIRECTION_COLUMN}>
       <Text
         as={'h3'}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        textTransform={TYPOGRAPHY.textTransformUppercase}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginBottom={SPACING_3}
         marginLeft={SPACING_3}

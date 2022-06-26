@@ -6,7 +6,6 @@ import {
   SPACING,
   TYPOGRAPHY,
   COLORS,
-  TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import { Slideout } from '../../../atoms/Slideout'
@@ -49,7 +48,7 @@ export const AboutPipetteSlideout = (
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.darkGreyEnabled}
           data-testid={`AboutPipetteSlideout_serial_number_text_${pipetteId}`}
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          textTransform={TYPOGRAPHY.textTransformUppercase}
         >
           {t('serial_number')}
         </StyledText>

@@ -13,7 +13,7 @@ import {
   SPACING_3,
   SPACING_5,
   Text,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 interface Props {
@@ -29,7 +29,7 @@ export const ConfirmPickUpTipModal = (props: Props): JSX.Element => {
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Text
         as={'h4'}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        textTransform={TYPOGRAPHY.textTransformUppercase}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginBottom={SPACING_3}
         marginLeft={SPACING_1}

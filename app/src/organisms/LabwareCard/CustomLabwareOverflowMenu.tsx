@@ -11,7 +11,6 @@ import {
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
-  TEXT_TRANSFORM_CAPITALIZE,
   JUSTIFY_FLEX_END,
   ALIGN_CENTER,
   TYPOGRAPHY,
@@ -138,7 +137,7 @@ export function CustomLabwareOverflowMenu(
               >
                 <Btn
                   onClick={handleCancelModal}
-                  textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                  textTransform={TYPOGRAPHY.textTransformCapitalize}
                   marginRight={SPACING.spacing5}
                   css={TYPOGRAPHY.linkPSemiBold}
                 >

@@ -5,7 +5,7 @@ import { StatusLabel } from '../../atoms/StatusLabel'
 import {
   Flex,
   Text,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
   SPACING_2,
   FONT_SIZE_CAPTION,
   FONT_WEIGHT_REGULAR,
@@ -83,7 +83,7 @@ export const ThermocyclerModuleData = (
         data-testid={`thermocycler_module_data_lid`}
       >
         <Text
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
           fontWeight={FONT_WEIGHT_REGULAR}
           fontSize={FONT_SIZE_CAPTION}
@@ -110,7 +110,7 @@ export const ThermocyclerModuleData = (
         data-testid={`thermocycler_module_data_block`}
       >
         <Text
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
           fontWeight={FONT_WEIGHT_REGULAR}
           fontSize={FONT_SIZE_CAPTION}

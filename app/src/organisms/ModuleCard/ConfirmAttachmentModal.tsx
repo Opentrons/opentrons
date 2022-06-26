@@ -10,7 +10,6 @@ import {
   TEXT_ALIGN_CENTER,
   SPACING,
   TYPOGRAPHY,
-  TEXT_TRANSFORM_CAPITALIZE,
   DIRECTION_COLUMN,
   Btn,
   COLORS,
@@ -106,7 +105,7 @@ export const ConfirmAttachmentModal = (
         >
           <Btn
             onClick={onCloseClick}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
             color={COLORS.blue}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginRight={SPACING.spacing6}

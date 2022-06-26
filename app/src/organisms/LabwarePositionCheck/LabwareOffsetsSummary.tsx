@@ -19,7 +19,7 @@ import {
   SPACING_3,
   SPACING_4,
   SPACING_5,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
   Text,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
@@ -43,7 +43,7 @@ const OffsetDataLoader = (): JSX.Element | null => {
         marginTop={SPACING_4}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         fontSize={FONT_SIZE_BODY_2}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        textTransform={TYPOGRAPHY.textTransformUppercase}
       >
         {t('loading_labware_offsets')}
       </Text>
@@ -71,7 +71,7 @@ const SummaryData = (props: LabwareOffsetSummary): JSX.Element => {
         justifyContent={JUSTIFY_CENTER}
       >
         <Text
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          textTransform={TYPOGRAPHY.textTransformUppercase}
           marginBottom={SPACING_3}
           color={C_MED_GRAY}
           fontSize={FONT_SIZE_CAPTION}
@@ -96,7 +96,7 @@ const SummaryData = (props: LabwareOffsetSummary): JSX.Element => {
         justifyContent={JUSTIFY_CENTER}
       >
         <Text
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          textTransform={TYPOGRAPHY.textTransformUppercase}
           marginBottom={SPACING_3}
           color={C_MED_GRAY}
           fontSize={FONT_SIZE_CAPTION}
@@ -121,7 +121,7 @@ const SummaryData = (props: LabwareOffsetSummary): JSX.Element => {
         justifyContent={JUSTIFY_CENTER}
       >
         <Text
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          textTransform={TYPOGRAPHY.textTransformUppercase}
           marginBottom={SPACING_3}
           color={C_MED_GRAY}
           fontSize={FONT_SIZE_CAPTION}

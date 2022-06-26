@@ -10,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
   SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
   Link,
   TYPOGRAPHY,
   ALIGN_CENTER,
@@ -84,7 +83,7 @@ export function FactoryResetModal({
               <Link
                 role="button"
                 onClick={closeModal}
-                textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                textTransform={TYPOGRAPHY.textTransformCapitalize}
                 marginRight={SPACING.spacing5}
                 css={TYPOGRAPHY.linkPSemiBold}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}

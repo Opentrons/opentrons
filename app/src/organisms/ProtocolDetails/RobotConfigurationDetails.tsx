@@ -10,8 +10,6 @@ import {
   POSITION_ABSOLUTE,
   SIZE_1,
   SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
-  TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -75,7 +73,7 @@ export const RobotConfigurationDetails = (
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     marginRight={SPACING.spacing4}
                     color={COLORS.darkGreyPressed}
-                    textTransform={TEXT_TRANSFORM_UPPERCASE}
+                    textTransform={TYPOGRAPHY.textTransformUppercase}
                   >
                     {t('run_details:module_slot_number', {
                       slot_number:
@@ -126,14 +124,14 @@ export const RobotConfigurationDetailsItem = (
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginRight={SPACING.spacing4}
         color={COLORS.darkGreyPressed}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        textTransform={TYPOGRAPHY.textTransformUppercase}
       >
         {label}
       </StyledText>
       <Flex marginX={'6rem'} position={POSITION_ABSOLUTE}>
         <StyledText
           as="p"
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
           data-testid={`RobotConfigurationDetails_${label}`}
         >
           {item}

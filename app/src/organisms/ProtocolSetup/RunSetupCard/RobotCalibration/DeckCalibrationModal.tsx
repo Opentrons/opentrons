@@ -10,7 +10,6 @@ import {
   TYPOGRAPHY,
   SPACING,
   ALIGN_FLEX_END,
-  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 
 import RobotCalHelpImage from '../../../../assets/images/robot_calibration_help.png'
@@ -100,7 +99,7 @@ export function DeckCalibrationModal({
           <PrimaryButton
             onClick={onCloseClick}
             alignSelf={ALIGN_FLEX_END}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {t('shared:close')}
           </PrimaryButton>

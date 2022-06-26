@@ -7,7 +7,7 @@ import {
   FONT_WEIGHT_REGULAR,
   SPACING_1,
   SPACING_2,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { formatInterval } from '../RunTimeControl/utils'
 
@@ -24,7 +24,7 @@ export function CommandTimer(props: TimerProps): JSX.Element | null {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      textTransform={TEXT_TRANSFORM_UPPERCASE}
+      textTransform={TYPOGRAPHY.textTransformUppercase}
       fontSize={FONT_SIZE_CAPTION}
       fontWeight={FONT_WEIGHT_REGULAR}
       marginRight={SPACING_2}

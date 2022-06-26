@@ -13,7 +13,6 @@ import {
   DIRECTION_COLUMN,
   Icon,
   DIRECTION_ROW,
-  TEXT_TRANSFORM_CAPITALIZE,
   SIZE_AUTO,
   ALIGN_FLEX_START,
   Link,
@@ -125,7 +124,7 @@ export const TestShakeSlideout = (
       isExpanded={isExpanded}
       footer={
         <PrimaryButton
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
           width="100%"
           onClick={onCloseClick}
           data-testid={`Temp_Slideout_set_temp_btn_${name}`}
@@ -193,7 +192,7 @@ export const TestShakeSlideout = (
           </Flex>
           <TertiaryButton
             marginTop={SPACING.spacing2}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
             paddingX={SPACING.spacing4}
@@ -245,7 +244,7 @@ export const TestShakeSlideout = (
             ></Text>
           </Flex>
           <TertiaryButton
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
             marginLeft={SIZE_AUTO}
             marginTop={SPACING.spacing3}
             paddingX={SPACING.spacing4}
@@ -276,7 +275,7 @@ export const TestShakeSlideout = (
           expanded={showCollapsed}
           title={
             <StyledText
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
               as="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >

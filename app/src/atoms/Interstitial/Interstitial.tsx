@@ -7,7 +7,6 @@ import {
   JUSTIFY_FLEX_START,
   POSITION_RELATIVE,
   COLORS,
-  TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
   SPACING,
   Overlay,
@@ -62,7 +61,7 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
           <Flex
             marginTop="0"
             marginBottom={TYPOGRAPHY.lineHeight16}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
             fontWeight={TYPOGRAPHY.fontWeightBold}
           >
             <h3>{heading}</h3>

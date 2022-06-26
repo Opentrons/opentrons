@@ -9,7 +9,6 @@ import {
   DIRECTION_ROW,
   ALIGN_START,
   DIRECTION_COLUMN,
-  TEXT_TRANSFORM_UPPERCASE,
   SPACING,
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_CAPTION,
@@ -354,7 +353,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               ) : (
                 <>
                   <Text
-                    textTransform={TEXT_TRANSFORM_UPPERCASE}
+                    textTransform={TYPOGRAPHY.textTransformUppercase}
                     color={COLORS.darkGrey}
                     fontWeight={FONT_WEIGHT_REGULAR}
                     fontSize={FONT_SIZE_CAPTION}
