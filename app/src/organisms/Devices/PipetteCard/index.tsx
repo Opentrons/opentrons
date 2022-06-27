@@ -145,7 +145,6 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       backgroundColor={COLORS.background}
       borderRadius={BORDERS.radiusSoftCorners}
       marginBottom={SPACING.spacing3}
-      marginX={SPACING.spacing2}
       width={'100%'}
       data-testid={`PipetteCard_${pipetteName}`}
     >

@@ -6,8 +6,6 @@ import {
   Icon,
   TYPOGRAPHY,
   SPACING,
-  Flex,
-  ALIGN_CENTER,
 } from '@opentrons/components'
 
 export interface ExternalLinkProps extends LinkProps {
@@ -17,10 +15,8 @@ export interface ExternalLinkProps extends LinkProps {
 }
 
 export const ExternalLink = (props: ExternalLinkProps): JSX.Element => (
-  <Link external {...props}>
-    <Flex alignItems={ALIGN_CENTER} css={TYPOGRAPHY.linkPSemiBold}>
-      {props.children}
-      <Icon size={SPACING.spacing3} marginLeft=".4375rem" name="open-in-new" />
-    </Flex>
+  <Link external {...props} css={TYPOGRAPHY.linkPSemiBold}>
+    {props.children}
+    <Icon size={SPACING.spacing3} marginLeft=".4375rem" name="open-in-new" />
   </Link>
 )

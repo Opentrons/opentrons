@@ -1,14 +1,24 @@
 """Functions and utilites for OT3 calibration."""
 from typing_extensions import Final, Literal
-from math import copysign
+from typing import Union, Tuple, List, Dict, Any, Optional
+import datetime
+import numpy as np
+from enum import Enum
+from math import copysign, floor
 from logging import getLogger
 from .ot3api import OT3API
 from .types import OT3Mount, OT3Axis
 from opentrons.types import Point
+import json
 
 LOG = getLogger(__name__)
 
 CAL_TRANSIT_HEIGHT: Final[float] = 10
+
+
+class CalibrationMethod(Enum):
+    BINARY_SEARCH = "binary search"
+    NONCONTACT_PASS = "noncontact pass"
 
 
 class EarlyCapacitiveSenseTrigger(RuntimeError):
@@ -16,6 +26,14 @@ class EarlyCapacitiveSenseTrigger(RuntimeError):
         super().__init__(
             f"Calibration triggered early at z={triggered_at}mm, "
             f"expected {nominal_point}"
+        )
+
+
+class InaccurateNonContactSweepError(RuntimeError):
+    def __init__(self, nominal_width: float, detected_width: float) -> None:
+        super().__init__(
+            f"Calibration detected a slot width of {detected_width:.3f}mm "
+            f"which is too far from the design width of {nominal_width:.3f}mm"
         )
 
 
@@ -31,12 +49,9 @@ async def find_deck_position(hcapi: OT3API, mount: OT3Mount) -> float:
     z_offset_settings = hcapi.config.calibration.z_offset
     await hcapi.home_z()
     here = await hcapi.gantry_position(mount)
-    LOG.info(f"my gantry position after home is {here}")
     z_prep_point = Point(*z_offset_settings.point)
     above_point = z_prep_point._replace(z=here.z)
-    LOG.info(f"moving to {above_point}")
     await hcapi.move_to(mount, above_point)
-    LOG.info("probing")
     deck_z = await hcapi.capacitive_probe(
         mount, OT3Axis.by_mount(mount), z_prep_point.z, z_offset_settings.pass_settings
     )
@@ -65,7 +80,7 @@ async def find_edge(
     hcapi: OT3API,
     mount: OT3Mount,
     slot_edge_nominal: Point,
-    search_axis: OT3Axis,
+    search_axis: Union[Literal[OT3Axis.X, OT3Axis.Y]],
     search_direction: Literal[1, -1],
 ) -> float:
     """
@@ -160,7 +175,216 @@ async def find_edge(
     return _element_of_axis(checking_pos, search_axis)
 
 
-async def calibrate_mount(hcapi: OT3API, mount: OT3Mount) -> Point:
+async def find_slot_center_binary(
+    hcapi: OT3API, mount: OT3Mount, deck_height: float
+) -> Tuple[float, float]:
+    """Find the center of the calibration slot by binary-searching its edges.
+
+    Returns the XY-center of the slot.
+    """
+    # Find all four edges of the calibration slot
+    plus_x_edge = await find_edge(
+        hcapi,
+        mount,
+        Point(*hcapi.config.calibration.edge_sense.plus_x_pos)._replace(z=deck_height),
+        OT3Axis.X,
+        -1,
+    )
+    LOG.info(f"Found +x edge at {plus_x_edge}mm")
+    minus_x_edge = await find_edge(
+        hcapi,
+        mount,
+        Point(*hcapi.config.calibration.edge_sense.minus_x_pos)._replace(z=deck_height),
+        OT3Axis.X,
+        1,
+    )
+    LOG.info(f"Found -x edge at {minus_x_edge}mm")
+    plus_y_edge = await find_edge(
+        hcapi,
+        mount,
+        Point(*hcapi.config.calibration.edge_sense.plus_y_pos)._replace(z=deck_height),
+        OT3Axis.Y,
+        -1,
+    )
+    LOG.info(f"Found +y edge at {plus_y_edge}mm")
+    minus_y_edge = await find_edge(
+        hcapi,
+        mount,
+        Point(*hcapi.config.calibration.edge_sense.minus_y_pos)._replace(z=deck_height),
+        OT3Axis.Y,
+        1,
+    )
+    LOG.info(f"Found -y edge at {minus_y_edge}mm")
+    return (plus_x_edge + minus_x_edge) / 2, (plus_y_edge + minus_y_edge) / 2
+
+
+async def find_axis_center(
+    hcapi: OT3API,
+    mount: OT3Mount,
+    minus_edge_nominal: Point,
+    plus_edge_nominal: Point,
+    axis: Union[Literal[OT3Axis.X, OT3Axis.Y]],
+) -> float:
+    """Find the center of the calibration slot on the specified axis.
+
+    Sweep from the specified left edge to the specified right edge while taking
+    capacitive sense data. When the probe is over the deck, the capacitance will
+    be higher than when the probe is over the slot. By postprocessing the data,
+    we determine where the slot edges are, and return those positions.
+    """
+    WIDTH_TOLERANCE_MM: float = 0.5
+    here = await hcapi.gantry_position(mount)
+    await hcapi.move_to(mount, here._replace(z=CAL_TRANSIT_HEIGHT))
+    edge_settings = hcapi.config.calibration.edge_sense
+
+    start = axis.set_in_point(
+        minus_edge_nominal,
+        axis.of_point(minus_edge_nominal) - edge_settings.search_initial_tolerance_mm,
+    )
+    end = axis.set_in_point(
+        plus_edge_nominal,
+        axis.of_point(plus_edge_nominal) + edge_settings.search_initial_tolerance_mm,
+    )
+
+    await hcapi.move_to(mount, start._replace(z=CAL_TRANSIT_HEIGHT))
+
+    data = await hcapi.capacitive_sweep(
+        mount, axis, start, end, edge_settings.pass_settings.speed_mm_per_s
+    )
+
+    left_edge, right_edge = _edges_from_data(
+        data,
+        axis.of_point(end) - axis.of_point(start),
+        {
+            "axis": axis.name,
+            "speed": edge_settings.pass_settings.speed_mm_per_s,
+            "start_absolute": axis.of_point(start),
+            "end_absolute": axis.of_point(end),
+        },
+    )
+    nominal_width = axis.of_point(plus_edge_nominal) - axis.of_point(minus_edge_nominal)
+    detected_width = right_edge - left_edge
+    left_edge_absolute = axis.of_point(start) + left_edge
+    right_edge_absolute = axis.of_point(start) + right_edge
+    if abs(detected_width - nominal_width) > WIDTH_TOLERANCE_MM:
+        raise InaccurateNonContactSweepError(nominal_width, detected_width)
+    return (left_edge_absolute + right_edge_absolute) / 2
+
+
+def _edges_from_data(
+    data: List[float], distance: float, log_metadata: Optional[Dict[str, Any]] = None
+) -> Tuple[float, float]:
+    """
+    Postprocess the capacitance data taken from a sweep to find the calibration slot.
+
+    The sweep should have covered both edges, going off the deck into the slot,
+    all the way across the slot, and back onto the deck on the other side.
+
+    Capacitance is proportional to the area of the "plates" involved in the sensing. To
+    a first approximation, these are the flat circular face of the bottom of the probe,
+    and the deck. When the probe begins to cross the edge of the deck, the area of the
+    second "plate" - the deck - ends abruptly, in a straight line transverse to motion.
+    As the probe crosses, less and less of that circular face is over the deck.
+
+    That means that the rate of change with respect to the overlap distance (or time, at
+    constant velocity) is maximized as the center of the probe passes the edge of the
+    deck.
+
+    We can therefore apply a combined smoothing and differencing convolution kernel to
+    the timeseries data and set the locations of the edges as the locations of the
+    extrema of the difference of the series.
+    """
+    now_str = datetime.datetime.now().strftime("%d-%m-%y-%H:%M:%S")
+
+    # The width of the averaging kernel defines how strong the averaging is - a wider
+    # kernel, or filter, has a lower rolloff frequency and will smooth more. This
+    # calculation sets the width at 5% of the length of the data, and then makes that
+    # value an even number
+    average_width_samples = (int(floor(0.05 * len(data))) // 2) * 2
+    # an averaging kernel would be an array of length N with elements each set to 1/N;
+    # when convolved with a data stream, this will (ignoring edge effects) produce
+    # an N-sample rolling average. by inverting the sign of half the kernel, which is
+    # why we need it to be even, we do the same thing but while also taking a finite
+    # difference.
+    average_difference_kernel = np.concatenate(  # type: ignore
+        (
+            np.full(average_width_samples // 2, 1 / average_width_samples),
+            np.full(average_width_samples // 2, -1 / average_width_samples),
+        )
+    )
+    differenced = np.convolve(np.array(data), average_difference_kernel, mode="valid")
+    # These are the indices of the minimum difference (which should be the left edge,
+    # where the probe is halfway through moving off the deck, and the slope of the
+    # data is most negative) and the maximum difference (which should be the right
+    # edge, where the probe is halfway through moving back onto the deck, and the slope
+    # of the data is most positive)
+    left_edge_sample = np.argmin(differenced)
+    right_edge_sample = np.argmax(differenced)
+    mm_per_elem = distance / len(data)
+    # The differenced data is shorter than the input data because we used valid outputs
+    # of the convolution only to avoid edge effects; that means we need to account for
+    # the distance in the cut-off data
+    distance_prefix = ((len(data) - len(differenced)) / 2) * mm_per_elem
+    left_edge_offset = left_edge_sample * mm_per_elem
+    left_edge = left_edge_offset + distance_prefix
+    right_edge_offset = right_edge_sample * mm_per_elem
+    right_edge = right_edge_offset + distance_prefix
+    json.dump(
+        {
+            "metadata": log_metadata,
+            "inputs": {
+                "raw_data": data,
+                "distance": distance,
+                "kernel_width": len(average_difference_kernel),
+            },
+            "outputs": {
+                "differenced_data": [d for d in differenced],
+                "mm_per_elem": mm_per_elem,
+                "distance_prefix": distance_prefix,
+                "right_edge_offset": right_edge_offset,
+                "left_edge_offset": left_edge_offset,
+                "left_edge": left_edge,
+                "right_edge": right_edge,
+            },
+        },
+        open(f"/data/sweep_{now_str}.json", "w"),
+    )
+    LOG.info(
+        f"Found edges ({left_edge:.3f}, {right_edge:.3f}) "
+        f"from offsets ({left_edge_offset:.3f}, {right_edge_offset:.3f}) "
+        f"with {len(data)} cap samples over {distance}mm "
+        f"using a kernel width of {len(average_difference_kernel)}"
+    )
+    return float(left_edge), float(right_edge)
+
+
+async def find_slot_center_noncontact(
+    hcapi: OT3API, mount: OT3Mount, deck_height: float
+) -> Tuple[float, float]:
+    NONCONTACT_INTERVAL_MM: float = 0.1
+    target_z = deck_height + NONCONTACT_INTERVAL_MM
+    x_center = await find_axis_center(
+        hcapi,
+        mount,
+        Point(*hcapi.config.calibration.edge_sense.minus_x_pos)._replace(z=target_z),
+        Point(*hcapi.config.calibration.edge_sense.plus_x_pos)._replace(z=target_z),
+        OT3Axis.X,
+    )
+    y_center = await find_axis_center(
+        hcapi,
+        mount,
+        Point(*hcapi.config.calibration.edge_sense.minus_y_pos)._replace(z=target_z),
+        Point(*hcapi.config.calibration.edge_sense.plus_y_pos)._replace(z=target_z),
+        OT3Axis.Y,
+    )
+    return x_center, y_center
+
+
+async def calibrate_mount(
+    hcapi: OT3API,
+    mount: OT3Mount,
+    method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
+) -> Point:
     """
     Run automatic calibration for the tool attached to the specified mount.
 
@@ -184,44 +408,16 @@ async def calibrate_mount(hcapi: OT3API, mount: OT3Mount) -> Point:
     # also be used to baseline the edge detection points.
     z_pos = await find_deck_position(hcapi, mount)
     LOG.info(f"Found deck at {z_pos}mm")
-    # Next, find all four edges of the calibration slot
-    plus_x_edge = await find_edge(
-        hcapi,
-        mount,
-        Point(*hcapi.config.calibration.edge_sense.plus_x_pos)._replace(z=z_pos),
-        OT3Axis.X,
-        -1,
-    )
-    LOG.info(f"Found +x edge at {plus_x_edge}mm")
-    minus_x_edge = await find_edge(
-        hcapi,
-        mount,
-        Point(*hcapi.config.calibration.edge_sense.minus_x_pos)._replace(z=z_pos),
-        OT3Axis.X,
-        1,
-    )
-    LOG.info(f"Found -x edge at {minus_x_edge}mm")
-    plus_y_edge = await find_edge(
-        hcapi,
-        mount,
-        Point(*hcapi.config.calibration.edge_sense.plus_y_pos)._replace(z=z_pos),
-        OT3Axis.Y,
-        -1,
-    )
-    LOG.info(f"Found +y edge at {plus_y_edge}mm")
-    minus_y_edge = await find_edge(
-        hcapi,
-        mount,
-        Point(*hcapi.config.calibration.edge_sense.minus_y_pos)._replace(z=z_pos),
-        OT3Axis.Y,
-        1,
-    )
-    LOG.info(f"Found -y edge at {minus_y_edge}mm")
 
-    # The center of the calibration slot is the average of the edge positions
-    # in-plane, and the absolute sense value out-of-plane
-    center = Point(
-        (plus_x_edge + minus_x_edge) / 2, (plus_y_edge + minus_y_edge) / 2, z_pos
-    )
+    if method == CalibrationMethod.BINARY_SEARCH:
+        x_center, y_center = await find_slot_center_binary(hcapi, mount, z_pos)
+    elif method == CalibrationMethod.NONCONTACT_PASS:
+        x_center, y_center = await find_slot_center_noncontact(hcapi, mount, z_pos)
+    else:
+        raise RuntimeError("Unknown calibration method")
+
+    # The center of the calibration slot is the xy-center in-plane, and
+    # the absolute sense value out-of-plane
+    center = Point(x_center, y_center, z_pos)
     LOG.info(f"Found calibration value {center} for mount {mount.name}")
     return center

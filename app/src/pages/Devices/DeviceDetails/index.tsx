@@ -5,12 +5,11 @@ import {
   Box,
   Flex,
   ALIGN_CENTER,
-  C_MED_LIGHT_GRAY,
-  C_WHITE,
   DIRECTION_COLUMN,
   OVERFLOW_SCROLL,
   SIZE_6,
-  SPACING_3,
+  SPACING,
+  COLORS,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
@@ -32,16 +31,19 @@ export function DeviceDetails(): JSX.Element | null {
         minWidth={SIZE_6}
         height="100%"
         overflow={OVERFLOW_SCROLL}
-        padding={SPACING_3}
+        padding={SPACING.spacing4}
       >
+        {/* TODO(va, 2022-06-17) update border color to 
+            COLORS.medGreyEnabled when PR #10664 is merged */}
         <Flex
           alignItems={ALIGN_CENTER}
-          backgroundColor={C_WHITE}
-          border={`1px solid ${C_MED_LIGHT_GRAY}`}
+          backgroundColor={COLORS.white}
+          border={`1px solid ${COLORS.medGrey}`}
           borderRadius="3px"
           flexDirection={DIRECTION_COLUMN}
-          marginBottom={SPACING_3}
-          padding={SPACING_3}
+          marginBottom={SPACING.spacing4}
+          paddingX={SPACING.spacing4}
+          paddingBottom={SPACING.spacing4}
           width="100%"
         >
           <RobotOverview robotName={robotName} />

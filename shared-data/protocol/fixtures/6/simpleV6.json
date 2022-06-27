@@ -1345,7 +1345,7 @@
       "commandType": "delay",
       "id": "10abc123",
       "params": {
-        "wait": 42
+        "seconds": 42
       }
     },
     {
@@ -1436,7 +1436,7 @@
       }
     },
     {
-      "commandType": "pause",
+      "commandType": "waitForResume",
       "id": "18abc123",
       "params": {
         "message": "pause command"

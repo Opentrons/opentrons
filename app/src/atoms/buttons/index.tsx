@@ -44,6 +44,30 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   }
 `
 
+export const SecondaryTertiaryButton = styled(NewSecondaryBtn)`
+  background-color: ${COLORS.white};
+  border-radius: ${BORDERS.radiusRoundEdge};
+  box-shadow: none;
+  color: ${COLORS.blue};
+  overflow: no-wrap;
+  padding: 0.375rem 0.75rem;
+  text-transform: ${TYPOGRAPHY.textTransformNone};
+  white-space: nowrap;
+  ${TYPOGRAPHY.labelSemiBold}
+
+  &:hover {
+    opacity: 0.7;
+    box-shadow: 0 0 0;
+  }
+  &:focus-visible {
+    box-shadow: 0 0 0 3px ${COLORS.warning};
+  }
+
+  &:disabled {
+    opacity: 50%;
+  }
+`
+
 export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
   background-color: ${COLORS.error};
   border-radius: ${BORDERS.radiusSoftCorners};
@@ -62,6 +86,7 @@ export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
 export const PrimaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blue};
   border-radius: ${BORDERS.radiusSoftCorners};
+  box-shadow: none;
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   line-height: ${TYPOGRAPHY.lineHeight20};
   text-transform: ${TYPOGRAPHY.textTransformNone};
@@ -70,13 +95,13 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
 
   ${styleProps}
 
-  &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+  &:hover, &:focus {
+    background-color: ${COLORS.blueHover};
+    box-shadow: none;
   }
 
-  &:hover {
-    background-color: ${COLORS.blueHover};
-    box-shadow: 0 0 0;
+  &:focus-visible {
+    box-shadow: 0 0 0 3px ${COLORS.warning};
   }
 
   &:active {
@@ -114,6 +139,6 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
 `
 
 export const ToggleButton = (props: ToggleBtnProps): JSX.Element => {
-  const color = props.toggledOn ? COLORS.blue : COLORS.darkGrey
+  const color = props.toggledOn ? COLORS.blue : COLORS.darkGreyEnabled
   return <ToggleBtn size={SIZE_2} color={color} {...props} />
 }

@@ -15,6 +15,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
     LoadedLabware,
+    LoadedModule,
     WellLocation,
     WellOrigin,
     WellOffset,
@@ -213,6 +214,7 @@ def test_get_all_labware_highest_z(
     well_plate_def: LabwareDefinition,
     reservoir_def: LabwareDefinition,
     labware_view: LabwareView,
+    module_view: ModuleView,
     subject: GeometryView,
 ) -> None:
     """It should get the highest Z amongst all labware."""
@@ -233,6 +235,8 @@ def test_get_all_labware_highest_z(
 
     plate_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     reservoir_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+
+    decoy.when(module_view.get_all()).then_return([])
 
     decoy.when(labware_view.get_all()).then_return([plate, reservoir])
     decoy.when(labware_view.get("plate-id")).then_return(plate)
@@ -260,6 +264,26 @@ def test_get_all_labware_highest_z(
     all_z = subject.get_all_labware_highest_z()
 
     assert all_z == max(plate_z, reservoir_z)
+
+
+def test_get_all_labware_highest_z_with_modules(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """It should get the highest Z including modules."""
+    module_1 = LoadedModule.construct(id="module-id-1")  # type: ignore[call-arg]
+    module_2 = LoadedModule.construct(id="module-id-2")  # type: ignore[call-arg]
+
+    decoy.when(labware_view.get_all()).then_return([])
+    decoy.when(module_view.get_all()).then_return([module_1, module_2])
+    decoy.when(module_view.get_overall_height("module-id-1")).then_return(42.0)
+    decoy.when(module_view.get_overall_height("module-id-2")).then_return(1337.0)
+
+    result = subject.get_all_labware_highest_z()
+
+    assert result == 1337.0
 
 
 def test_get_labware_position(
@@ -336,6 +360,57 @@ def test_get_well_position(
         y=slot_pos[1] - 2 + well_def.y,
         z=slot_pos[2] + 3 + well_def.z + well_def.depth,
     )
+
+
+def test_get_well_edges(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    standard_deck_def: DeckDefinitionV3,
+    labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """It should be able to get the position of a well top in a labware."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="load-name",
+        definitionUri="definition-uri",
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        offsetId="offset-id",
+    )
+    calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+    slot_pos = Point(4, 5, 6)
+    well_def = well_plate_def.wells["B2"]
+    well_location = WellLocation(offset=WellOffset(x=7, y=8, z=-9))
+
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(labware_view.get_definition("labware-id")).then_return(well_plate_def)
+    decoy.when(labware_view.get_labware_offset_vector("labware-id")).then_return(
+        calibration_offset
+    )
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_4)).then_return(
+        slot_pos
+    )
+    decoy.when(labware_view.get_well_definition("labware-id", "B2")).then_return(
+        well_def
+    )
+
+    result = subject.get_well_edges("labware-id", "B2", well_location)
+
+    expected_center = Point(
+        x=slot_pos[0] + 1 + well_def.x + 7,
+        y=slot_pos[1] - 2 + well_def.y + 8,
+        z=slot_pos[2] + 3 + well_def.z - 9 + well_def.depth,
+    )
+    assert well_def.diameter is not None
+    offset = well_def.diameter / 2.0
+
+    assert result == [
+        expected_center + Point(x=offset, y=0, z=0),
+        expected_center + Point(x=-offset, y=0, z=0),
+        expected_center,
+        expected_center + Point(x=0, y=offset, z=0),
+        expected_center + Point(x=0, y=-offset, z=0),
+    ]
 
 
 def test_get_module_labware_well_position(
