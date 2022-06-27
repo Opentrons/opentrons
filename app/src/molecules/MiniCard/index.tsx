@@ -48,17 +48,16 @@ const nonviableOptionStyles = css`
 
 export function MiniCard(props: MiniCardProps): JSX.Element {
   const { children, onClick, isSelected, isNonviable = false } = props
+
+  const selectedWrapperStyles = isNonviable
+    ? nonviableOptionStyles
+    : selectedOptionStyles
+  const wrapperStyles = isSelected
+    ? selectedWrapperStyles
+    : unselectedOptionStyles
+
   return (
-    <Flex
-      onClick={onClick}
-      css={
-        isSelected
-          ? isNonviable
-            ? nonviableOptionStyles
-            : selectedOptionStyles
-          : unselectedOptionStyles
-      }
-    >
+    <Flex onClick={onClick} css={wrapperStyles}>
       {children}
     </Flex>
   )

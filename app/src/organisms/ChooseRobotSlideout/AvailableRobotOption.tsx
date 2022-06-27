@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import { Trans, useTranslation } from 'react-i18next'
+import { NavLink } from 'react-router-dom'
 
 import {
   SPACING,
@@ -12,11 +14,9 @@ import {
   SIZE_1,
   TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
-import { Trans, useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import { NavLink } from 'react-router-dom'
 
 interface AvailableRobotOptionProps {
   robotName: string
@@ -44,7 +44,7 @@ export function AvailableRobotOption(
       <MiniCard
         onClick={onClick}
         isSelected={isSelected}
-        isNonviable={isOnDifferentSoftwareVersion}
+        isNonviable={isOnDifferentSoftwareVersion && isSelected}
       >
         <img
           src={OT2_PNG}
@@ -76,7 +76,7 @@ export function AvailableRobotOption(
             </StyledText>
           </Box>
         </Flex>
-        {isOnDifferentSoftwareVersion ? (
+        {isOnDifferentSoftwareVersion && isSelected ? (
           <>
             <Box flex="1 1 auto" />
             <Icon name="ot-alert" size="1.25rem" color={COLORS.error} />
@@ -84,7 +84,7 @@ export function AvailableRobotOption(
         ) : null}
       </MiniCard>
 
-      {isOnDifferentSoftwareVersion ? (
+      {isOnDifferentSoftwareVersion && isSelected ? (
         <StyledText
           as="label"
           color={COLORS.errorText}
