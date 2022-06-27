@@ -109,8 +109,11 @@ class ProtocolEngine:
             PlayAction(requested_at=requested_at)
         )
         self._action_dispatcher.dispatch(action)
-        self._queue_worker.start()
-        self._hardware_api.resume(HardwarePauseType.PAUSE)
+
+        if self._state_store.commands.get_is_door_blocking():
+            self._hardware_api.pause(HardwarePauseType.PAUSE)
+        else:
+            self._hardware_api.resume(HardwarePauseType.PAUSE)
 
     def pause(self) -> None:
         """Pause executing commands in the queue."""

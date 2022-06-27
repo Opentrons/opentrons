@@ -299,8 +299,38 @@ def test_play(
         action_dispatcher.dispatch(
             PlayAction(requested_at=datetime(year=2022, month=2, day=2))
         ),
-        queue_worker.start(),
         hardware_api.resume(HardwarePauseType.PAUSE),
+    )
+
+
+def test_play_blocked_by_door(
+    decoy: Decoy,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    model_utils: ModelUtils,
+    queue_worker: QueueWorker,
+    hardware_api: HardwareControlAPI,
+    subject: ProtocolEngine,
+) -> None:
+    """It should not pause instead of resuming the hardware if blocked by door."""
+    decoy.when(model_utils.get_timestamp()).then_return(
+        datetime(year=2021, month=1, day=1)
+    )
+    decoy.when(
+        state_store.commands.validate_action_allowed(
+            PlayAction(requested_at=datetime(year=2021, month=1, day=1))
+        ),
+    ).then_return(PlayAction(requested_at=datetime(year=2022, month=2, day=2)))
+    decoy.when(state_store.commands.get_is_door_blocking()).then_return(True)
+
+    subject.play()
+
+    decoy.verify(hardware_api.resume(HardwarePauseType.PAUSE), times=0)
+    decoy.verify(
+        action_dispatcher.dispatch(
+            PlayAction(requested_at=datetime(year=2022, month=2, day=2))
+        ),
+        hardware_api.pause(HardwarePauseType.PAUSE),
     )
 
 

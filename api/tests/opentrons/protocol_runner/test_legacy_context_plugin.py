@@ -80,26 +80,6 @@ def subject(
     return plugin
 
 
-@pytest.mark.parametrize(
-    ("is_door_blocking", "expected_pause_call_count"), [(True, 1), (False, 0)]
-)
-def test_play_pauses_when_door_is_open(
-    decoy: Decoy,
-    hardware_api: HardwareAPI,
-    state_view: StateView,
-    is_door_blocking: bool,
-    expected_pause_call_count: int,
-    subject: LegacyContextPlugin,
-) -> None:
-    """It should not play the hardware controller when door is blocking."""
-    action = pe_actions.PlayAction(requested_at=datetime(year=2021, month=1, day=1))
-
-    decoy.when(state_view.commands.get_is_door_blocking()).then_return(is_door_blocking)
-    subject.handle_action(action)
-
-    decoy.verify(hardware_api.pause(PauseType.PAUSE), times=expected_pause_call_count)
-
-
 def test_hardware_event_action(
     decoy: Decoy,
     hardware_api: HardwareAPI,
@@ -107,7 +87,7 @@ def test_hardware_event_action(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should pause the hardware controller upon a blocking HardwareEventAction."""
-    door_open_event = DoorStateNotification(new_state=DoorState.OPEN, blocking=True)
+    door_open_event = DoorStateNotification(new_state=DoorState.OPEN)
     decoy.when(state_view.commands.get_is_implicitly_active()).then_return(True)
     subject.handle_action(pe_actions.HardwareEventAction(event=door_open_event))
     # Should not pause when engine queue is implicitly active
