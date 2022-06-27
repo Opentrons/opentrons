@@ -199,9 +199,9 @@ def test_command_store_queues_commands(
     subject = CommandStore()
     subject.handle_action(action)
 
-    assert subject.state.commands_by_id["command-id"] == CommandEntry(
-        index=0, command=expected_command
-    )
+    assert subject.state.commands_by_id == {
+        "command-id": CommandEntry(index=0, command=expected_command),
+    }
 
     assert subject.state.all_command_ids == ["command-id"]
     assert subject.state.queued_command_ids == OrderedSet(["command-id"])
