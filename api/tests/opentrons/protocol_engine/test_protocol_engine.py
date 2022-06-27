@@ -7,7 +7,14 @@ from typing import Any
 
 from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import MagDeck, TempDeck
+from opentrons.hardware_control.modules import (
+    MagDeck,
+    TempDeck,
+    Thermocycler,
+    HeaterShaker,
+)
+from opentrons.hardware_control.modules.types import SpeedStatus
+from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands
@@ -29,9 +36,13 @@ from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
 from opentrons.protocol_engine.state import (
     StateStore,
     TemperatureModuleSubState,
-    TemperatureModuleId,
     MagneticModuleSubState,
+    ThermocyclerModuleSubState,
+    HeaterShakerModuleSubState,
+    TemperatureModuleId,
     MagneticModuleId,
+    ThermocyclerModuleId,
+    HeaterShakerModuleId,
 )
 from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
 
@@ -575,13 +586,13 @@ def test_add_labware_definition(
     assert result == "some/definition/uri"
 
 
-async def test_use_attached_modules(
+async def test_use_attached_temp_and_mag_modules(
     decoy: Decoy,
     module_data_provider: ModuleDataProvider,
     action_dispatcher: ActionDispatcher,
     subject: ProtocolEngine,
     tempdeck_v1_def: ModuleDefinition,
-    magdeck_v1_def: ModuleDefinition,
+    magdeck_v2_def: ModuleDefinition,
 ) -> None:
     """It should be able to load attached hardware modules directly into state."""
     mod_1 = decoy.mock(cls=TempDeck)
@@ -590,7 +601,7 @@ async def test_use_attached_modules(
     decoy.when(mod_1.device_info).then_return({"serial": "serial-1"})
     decoy.when(mod_2.device_info).then_return({"serial": "serial-2"})
     decoy.when(mod_1.model()).then_return("temperatureModuleV1")
-    decoy.when(mod_2.model()).then_return("magneticModuleV1")
+    decoy.when(mod_2.model()).then_return("magneticModuleV2")
     decoy.when(mod_1.target).then_return(11.22)
 
     decoy.when(
@@ -598,8 +609,8 @@ async def test_use_attached_modules(
     ).then_return(tempdeck_v1_def)
 
     decoy.when(
-        module_data_provider.get_definition(ModuleModel.MAGNETIC_MODULE_V1)
-    ).then_return(magdeck_v1_def)
+        module_data_provider.get_definition(ModuleModel.MAGNETIC_MODULE_V2)
+    ).then_return(magdeck_v2_def)
 
     await subject.use_attached_modules(
         {
@@ -624,10 +635,79 @@ async def test_use_attached_modules(
             AddModuleAction(
                 module_id="module-2",
                 serial_number="serial-2",
-                definition=magdeck_v1_def,
+                definition=magdeck_v2_def,
                 substate=MagneticModuleSubState(
                     module_id=MagneticModuleId("module-2"),
-                    model=ModuleModel.MAGNETIC_MODULE_V1,
+                    model=ModuleModel.MAGNETIC_MODULE_V2,
+                ),
+            ),
+        ),
+    )
+
+
+async def test_use_attached_tc_and_hs_modules(
+    decoy: Decoy,
+    module_data_provider: ModuleDataProvider,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+    thermocycler_v1_def: ModuleDefinition,
+    heater_shaker_v1_def: ModuleDefinition,
+) -> None:
+    """It should be able to load attached hardware modules directly into state."""
+    mod_1 = decoy.mock(cls=Thermocycler)
+    mod_2 = decoy.mock(cls=HeaterShaker)
+
+    decoy.when(mod_1.device_info).then_return({"serial": "serial-1"})
+    decoy.when(mod_2.device_info).then_return({"serial": "serial-2"})
+    decoy.when(mod_1.model()).then_return("thermocyclerModuleV1")
+    decoy.when(mod_2.model()).then_return("heaterShakerModuleV1")
+
+    decoy.when(mod_1.target).then_return(11.22)
+    decoy.when(mod_1.lid_target).then_return(33.44)
+    decoy.when(mod_2.labware_latch_status).then_return(
+        HeaterShakerLabwareLatchStatus.IDLE_CLOSED
+    )
+    decoy.when(mod_2.speed_status).then_return(SpeedStatus.HOLDING)
+    decoy.when(mod_2.target_temperature).then_return(111)
+
+    decoy.when(
+        module_data_provider.get_definition(ModuleModel.THERMOCYCLER_MODULE_V1)
+    ).then_return(thermocycler_v1_def)
+
+    decoy.when(
+        module_data_provider.get_definition(ModuleModel.HEATER_SHAKER_MODULE_V1)
+    ).then_return(heater_shaker_v1_def)
+
+    await subject.use_attached_modules(
+        {
+            "module-1": mod_1,
+            "module-2": mod_2,
+        }
+    )
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            AddModuleAction(
+                module_id="module-1",
+                serial_number="serial-1",
+                definition=thermocycler_v1_def,
+                substate=ThermocyclerModuleSubState(
+                    module_id=ThermocyclerModuleId("module-1"),
+                    target_block_temperature=11.22,
+                    target_lid_temperature=33.44,
+                ),
+            )
+        ),
+        action_dispatcher.dispatch(
+            AddModuleAction(
+                module_id="module-2",
+                serial_number="serial-2",
+                definition=heater_shaker_v1_def,
+                substate=HeaterShakerModuleSubState(
+                    module_id=HeaterShakerModuleId("module-2"),
+                    labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
+                    speed_status=SpeedStatus.HOLDING,
+                    plate_target_temperature=111,
                 ),
             ),
         ),
