@@ -30,6 +30,7 @@ import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 import { InputField } from '../../atoms/InputField'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { useRunStatuses } from '../Devices/hooks'
 
 import type { TFunctionResult } from 'i18next'
 import type { MagneticModule } from '../../redux/modules/types'
@@ -77,6 +78,7 @@ export const MagneticModuleSlideout = (
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
+  const { isRunTerminal } = useRunStatuses()
   const [engageHeightValue, setEngageHeightValue] = React.useState<
     string | null
   >(null)
@@ -118,11 +120,12 @@ export const MagneticModuleSlideout = (
       const setEngageCommand: MagneticModuleEngageMagnetCreateCommand = {
         commandType: 'magneticModule/engage',
         params: {
-          moduleId: runId != null ? moduleIdFromRun : module.id,
+          moduleId:
+            runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
           height: parseInt(engageHeightValue),
         },
       }
-      if (runId != null) {
+      if (runId != null && !isRunTerminal) {
         createCommand({ runId: runId, command: setEngageCommand }).catch(
           (e: Error) => {
             console.error(

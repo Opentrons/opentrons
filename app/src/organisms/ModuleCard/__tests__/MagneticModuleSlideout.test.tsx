@@ -6,6 +6,7 @@ import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
+import { useRunStatuses } from '../../Devices/hooks'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
 
@@ -16,6 +17,7 @@ import {
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../useModuleIdFromRun')
+jest.mock('../../Devices/hooks')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
@@ -25,6 +27,9 @@ const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
 >
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
+>
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
 >
 
 const render = (props: React.ComponentProps<typeof MagneticModuleSlideout>) => {
@@ -39,6 +44,11 @@ describe('MagneticModuleSlideout', () => {
   beforeEach(() => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: true,
+    })
     props = {
       module: mockMagneticModule,
       isExpanded: true,
@@ -120,6 +130,11 @@ describe('MagneticModuleSlideout', () => {
   })
 
   it('renders the button and it is not clickable until there is something in form field when there is a runId', () => {
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: false,
+    })
     props = {
       module: mockMagneticModule,
       isExpanded: true,

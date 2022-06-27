@@ -8,6 +8,7 @@ import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
+import { useRunStatuses } from '../../Devices/hooks'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { HeaterShakerSlideout } from '../HeaterShakerSlideout'
 import { ConfirmAttachmentModal } from '../ConfirmAttachmentModal'
@@ -16,6 +17,7 @@ jest.mock('@opentrons/react-api-client')
 jest.mock('../ConfirmAttachmentModal')
 jest.mock('../../../redux/config')
 jest.mock('../useModuleIdFromRun')
+jest.mock('../../Devices/hooks')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -32,6 +34,9 @@ const mockConfirmAttachmentModal = ConfirmAttachmentModal as jest.MockedFunction
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
 >
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
+>
 
 const render = (props: React.ComponentProps<typeof HeaterShakerSlideout>) => {
   return renderWithProviders(<HeaterShakerSlideout {...props} />, {
@@ -47,6 +52,11 @@ describe('HeaterShakerSlideout', () => {
   beforeEach(() => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: true,
+    })
     mockGetIsHeaterShakerAttached.mockReturnValue(false)
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
@@ -161,6 +171,11 @@ describe('HeaterShakerSlideout', () => {
   })
 
   it('renders the button and it is not clickable until there is something in form field for set shake when there is a runId', () => {
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: false,
+    })
     props = {
       module: mockHeaterShaker,
       isSetShake: true,
@@ -179,6 +194,11 @@ describe('HeaterShakerSlideout', () => {
   })
 
   it('renders the button and it is not clickable until there is something in form field for set temp when there is a runId', () => {
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: false,
+    })
     props = {
       module: mockHeaterShaker,
       isSetShake: false,

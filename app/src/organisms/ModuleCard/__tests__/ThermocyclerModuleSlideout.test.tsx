@@ -6,6 +6,7 @@ import {
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
+import { useRunStatuses } from '../../Devices/hooks'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { ThermocyclerModuleSlideout } from '../ThermocyclerModuleSlideout'
 
@@ -13,6 +14,7 @@ import { mockThermocycler } from '../../../redux/modules/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../useModuleIdFromRun')
+jest.mock('../../Devices/hooks')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
@@ -22,6 +24,9 @@ const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
 >
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
+>
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
 >
 
 const render = (
@@ -39,6 +44,11 @@ describe('ThermocyclerModuleSlideout', () => {
   beforeEach(() => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: true,
+    })
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
@@ -143,6 +153,11 @@ describe('ThermocyclerModuleSlideout', () => {
   })
 
   it('renders the button and it is not clickable until there is something in form field for the TC Block when there is a runId', () => {
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: false,
+    })
     props = {
       module: mockThermocycler,
       isSecondaryTemp: false,
@@ -171,6 +186,11 @@ describe('ThermocyclerModuleSlideout', () => {
   })
 
   it('renders the button and it is not clickable until there is something in form field for the TC Lid when there is a runId', () => {
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: false,
+    })
     props = {
       module: mockThermocycler,
       isSecondaryTemp: true,

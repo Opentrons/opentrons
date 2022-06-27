@@ -31,6 +31,7 @@ import type {
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import { useRunStatuses } from '../Devices/hooks'
 
 interface ThermocyclerModuleSlideoutProps {
   module: ThermocyclerModule
@@ -48,6 +49,7 @@ export const ThermocyclerModuleSlideout = (
   const [tempValue, setTempValue] = React.useState<number | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
+  const { isRunTerminal } = useRunStatuses()
   const { moduleIdFromRun } = useModuleIdFromRun(
     module,
     runId != null ? runId : null
@@ -75,19 +77,21 @@ export const ThermocyclerModuleSlideout = (
       const saveLidCommand: TCSetTargetLidTemperatureCreateCommand = {
         commandType: 'thermocycler/setTargetLidTemperature',
         params: {
-          moduleId: runId != null ? moduleIdFromRun : module.id,
+          moduleId:
+            runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
           celsius: tempValue,
         },
       }
       const saveBlockCommand: TCSetTargetBlockTemperatureCreateCommand = {
         commandType: 'thermocycler/setTargetBlockTemperature',
         params: {
-          moduleId: runId != null ? moduleIdFromRun : module.id,
+          moduleId:
+            runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
           celsius: tempValue,
           //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
         },
       }
-      if (runId != null) {
+      if (runId != null && !isRunTerminal) {
         createCommand({
           runId: runId,
           command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,

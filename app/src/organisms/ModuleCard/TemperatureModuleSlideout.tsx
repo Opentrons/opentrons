@@ -22,6 +22,7 @@ import {
 import { Slideout } from '../../atoms/Slideout'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 import { InputField } from '../../atoms/InputField'
+import { useRunStatuses } from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
@@ -49,17 +50,19 @@ export const TemperatureModuleSlideout = (
   const [temperatureValue, setTemperatureValue] = React.useState<number | null>(
     null
   )
+  const { isRunTerminal } = useRunStatuses()
 
   const handleSubmitTemperature = (): void => {
     if (temperatureValue != null) {
       const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {
         commandType: 'temperatureModule/setTargetTemperature',
         params: {
-          moduleId: runId != null ? moduleIdFromRun : module.id,
+          moduleId:
+            runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
           celsius: temperatureValue,
         },
       }
-      if (runId != null) {
+      if (runId != null && !isRunTerminal) {
         createCommand({
           runId: runId,
           command: saveTempCommand,

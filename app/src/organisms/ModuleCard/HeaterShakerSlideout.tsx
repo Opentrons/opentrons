@@ -29,6 +29,7 @@ import { getIsHeaterShakerAttached } from '../../redux/config'
 import { InputField } from '../../atoms/InputField'
 import { Portal } from '../../App/portal'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { useRunStatuses } from '../Devices/hooks'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
@@ -53,6 +54,7 @@ export const HeaterShakerSlideout = (
   const { t } = useTranslation('device_details')
   const [hsValue, setHsValue] = React.useState<number | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { isRunTerminal } = useRunStatuses()
   const { createCommand } = useCreateCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
@@ -67,11 +69,12 @@ export const HeaterShakerSlideout = (
       const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
         commandType: 'heaterShaker/setAndWaitForShakeSpeed',
         params: {
-          moduleId: runId != null ? moduleIdFromRun : module.id,
+          moduleId:
+            runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
           rpm: hsValue,
         },
       }
-      if (runId != null) {
+      if (runId != null && !isRunTerminal) {
         createCommand({ runId: runId, command: setShakeCommand }).catch(
           (e: Error) => {
             console.error(
@@ -104,11 +107,12 @@ export const HeaterShakerSlideout = (
       const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
         commandType: 'heaterShaker/setTargetTemperature',
         params: {
-          moduleId: runId != null ? moduleIdFromRun : module.id,
+          moduleId:
+            runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
           celsius: hsValue,
         },
       }
-      if (runId != null) {
+      if (runId != null && !isRunTerminal) {
         createCommand({ runId: runId, command: setTempCommand }).catch(
           (e: Error) => {
             console.error(
