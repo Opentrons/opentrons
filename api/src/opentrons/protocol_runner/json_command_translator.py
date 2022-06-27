@@ -86,7 +86,6 @@ def _translate_pipette_command(
 def _translate_simple_command(
     command: protocol_schema_v6.Command,
 ) -> pe_commands.CommandCreate:
-    # TODO (tz, 6-23-22): removed exclude_none=True
     dict_command = command.dict(exclude_none=True)
 
     # map deprecated `delay` commands to `waitForResume` / `waitForDuration`
