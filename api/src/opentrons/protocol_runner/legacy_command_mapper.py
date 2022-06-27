@@ -158,7 +158,7 @@ class LegacyCommandMapper:
                     )
                 results.append(pe_actions.UpdateCommandAction(completed_command))
 
-                if isinstance(completed_command, pe_commands.Pause):
+                if isinstance(completed_command, pe_commands.WaitForResume):
                     results.append(
                         pe_actions.PauseAction(source=pe_actions.PauseSource.PROTOCOL)
                     )
@@ -251,13 +251,13 @@ class LegacyCommandMapper:
                 ),
             )
         elif command["name"] == legacy_command_types.PAUSE:
-            engine_command = pe_commands.Pause.construct(
+            engine_command = pe_commands.WaitForResume.construct(
                 id=command_id,
                 key=command_id,
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=now,
                 startedAt=now,
-                params=pe_commands.PauseParams.construct(
+                params=pe_commands.WaitForResumeParams.construct(
                     message=command["payload"]["userMessage"],
                 ),
             )

@@ -19,7 +19,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { ModuleCard } from './ModuleCard'
+import { ModuleCard } from '../ModuleCard'
 import { useIsRobotViewable } from './hooks'
 import { PipetteCard } from './PipetteCard'
 

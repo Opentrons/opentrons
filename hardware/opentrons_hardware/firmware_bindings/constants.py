@@ -176,6 +176,18 @@ class SensorType(int, Enum):
 
 
 @unique
+class SensorId(int, Enum):
+    """Sensor IDs available.
+
+    Not to be confused with SensorType. This is the ID value that separate
+    two or more of the same type of sensor within a system.
+    """
+
+    S0 = 0x0
+    S1 = 0x1
+
+
+@unique
 class PipetteName(int, Enum):
     """High-level type of pipette."""
 

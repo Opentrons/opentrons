@@ -5,12 +5,7 @@ import type {
 import type { GantryRunTimeCommand, GantryCreateCommand } from './gantry'
 import type { ModuleRunTimeCommand, ModuleCreateCommand } from './module'
 import type { SetupRunTimeCommand, SetupCreateCommand } from './setup'
-import type {
-  TimingRunTimeCommand,
-  TimingCreateCommand,
-  PauseRunTimeCommand,
-  PauseCreateCommand,
-} from './timing'
+import type { TimingRunTimeCommand, TimingCreateCommand } from './timing'
 
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to
@@ -36,7 +31,6 @@ export type CreateCommand =
   | ModuleCreateCommand // directed at a hardware module
   | SetupCreateCommand // only effecting robot's equipment setup (pipettes, labware, modules, liquid), no hardware side-effects
   | TimingCreateCommand // effecting the timing of command execution
-  | PauseCreateCommand // effecting the timing of command execution
   | ({
       commandType: 'custom'
       params: { [key: string]: any }
@@ -49,7 +43,6 @@ export type RunTimeCommand =
   | ModuleRunTimeCommand // directed at a hardware module
   | SetupRunTimeCommand // only effecting robot's equipment setup (pipettes, labware, modules, liquid), no hardware side-effects
   | TimingRunTimeCommand // effecting the timing of command execution
-  | PauseRunTimeCommand // effecting the timing of command execution
   | ({
       commandType: 'custom'
       params: { [key: string]: any }

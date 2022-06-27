@@ -73,6 +73,16 @@ const MOCK_PAUSE_COMMAND: RunTimeCommand = {
   completedAt: 'end timestamp',
 } as any
 
+const MOCK_WAIT_FOR_RESUME_COMMAND: RunTimeCommand = {
+  id: '1234',
+  commandType: 'waitForResume',
+  params: { message: 'THIS IS THE PAUSE MESSAGE' },
+  status: 'running',
+  result: {},
+  startedAt: 'start timestamp',
+  completedAt: 'end timestamp',
+} as any
+
 const MOCK_LOAD_COMMAND = {
   id: '1234',
   commandType: 'loadModule',
@@ -117,6 +127,16 @@ describe('StepText', () => {
       runId: RUN_ID,
       analysisCommand: null,
       runCommand: MOCK_PAUSE_COMMAND as RunCommandSummary,
+    })
+    getByText('THIS IS THE PAUSE MESSAGE')
+  })
+
+  it('renders correct command text for wait for resume commands', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: MOCK_WAIT_FOR_RESUME_COMMAND as RunCommandSummary,
     })
     getByText('THIS IS THE PAUSE MESSAGE')
   })

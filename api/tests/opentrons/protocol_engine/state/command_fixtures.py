@@ -155,6 +155,7 @@ def create_load_pipette_command(
 def create_aspirate_command(
     pipette_id: str,
     volume: float,
+    flow_rate: float,
     labware_id: str = "labware-id",
     well_name: str = "A1",
     well_location: Optional[WellLocation] = None,
@@ -166,6 +167,7 @@ def create_aspirate_command(
         wellName=well_name,
         wellLocation=well_location or WellLocation(),
         volume=volume,
+        flowRate=flow_rate,
     )
     result = cmd.AspirateResult(volume=volume)
 
@@ -182,6 +184,7 @@ def create_aspirate_command(
 def create_dispense_command(
     pipette_id: str,
     volume: float,
+    flow_rate: float,
     labware_id: str = "labware-id",
     well_name: str = "A1",
     well_location: Optional[WellLocation] = None,
@@ -193,6 +196,7 @@ def create_dispense_command(
         wellName=well_name,
         wellLocation=well_location or WellLocation(),
         volume=volume,
+        flowRate=flow_rate,
     )
     result = cmd.DispenseResult(volume=volume)
 
@@ -280,6 +284,7 @@ def create_move_to_well_command(
 
 def create_blow_out_command(
     pipette_id: str,
+    flow_rate: float,
     labware_id: str = "labware-id",
     well_name: str = "A1",
     well_location: Optional[WellLocation] = None,
@@ -290,6 +295,7 @@ def create_blow_out_command(
         labwareId=labware_id,
         wellName=well_name,
         wellLocation=well_location or WellLocation(),
+        flowRate=flow_rate,
     )
     result = cmd.BlowOutResult()
 

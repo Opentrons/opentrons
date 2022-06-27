@@ -19,7 +19,6 @@ from typing import (
     Iterator,
 )
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.config import pipette_config, gripper_config
 from .ot3utils import (
     axis_convert,
@@ -83,6 +82,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     capacitive_pass,
 )
+from opentrons_hardware.drivers.gpio import OT3GPIO
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
@@ -92,7 +92,6 @@ if TYPE_CHECKING:
         OT3AttachedInstruments,
         InstrumentHardwareConfigs,
     )
-    from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 
 log = logging.getLogger(__name__)
 
@@ -127,7 +126,7 @@ class OT3Controller:
             driver: The Can Driver
         """
         self._configuration = config
-        self._gpio_dev = SimulatingGPIOCharDev("simulated")
+        self._gpio_dev = OT3GPIO("hardware_control")
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
@@ -177,7 +176,7 @@ class OT3Controller:
         )
 
     @property
-    def gpio_chardev(self) -> GPIODriverLike:
+    def gpio_chardev(self) -> OT3GPIO:
         """Get the GPIO device."""
         return self._gpio_dev
 

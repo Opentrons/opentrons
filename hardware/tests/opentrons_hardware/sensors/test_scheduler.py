@@ -6,6 +6,7 @@ from typing import Iterator
 from opentrons_hardware.sensors import scheduler, utils
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
+    SensorId,
     SensorType,
     SensorOutputBinding,
 )
@@ -17,6 +18,7 @@ from opentrons_hardware.firmware_bindings.arbitration_id import (
 from opentrons_hardware.firmware_bindings.utils import Int32Field
 
 from opentrons_hardware.firmware_bindings.messages.fields import (
+    SensorIdField,
     SensorTypeField,
     SensorOutputBindingField,
 )
@@ -42,18 +44,22 @@ async def test_capture_output(
     stim_message = BindSensorOutputRequest(
         payload=BindSensorOutputRequestPayload(
             sensor=SensorTypeField(SensorType.capacitive),
+            sensor_id=SensorIdField(SensorId.S0),
             binding=SensorOutputBindingField(SensorOutputBinding.report.value),
         )
     )
     reset_message = BindSensorOutputRequest(
         payload=BindSensorOutputRequestPayload(
             sensor=SensorTypeField(SensorType.capacitive),
+            sensor_id=SensorIdField(SensorId.S0),
             binding=SensorOutputBindingField(SensorOutputBinding.none.value),
         )
     )
     async with subject.capture_output(
         utils.SensorInformation(
-            sensor_type=SensorType.capacitive, node_id=NodeId.pipette_left
+            sensor_type=SensorType.capacitive,
+            sensor_id=SensorId.S0,
+            node_id=NodeId.pipette_left,
         ),
         mock_messenger,
     ) as output_queue:
@@ -65,6 +71,7 @@ async def test_capture_output(
                 ReadFromSensorResponse(
                     payload=ReadFromSensorResponsePayload(
                         sensor=SensorTypeField(SensorType.capacitive.value),
+                        sensor_id=SensorIdField(SensorId.S0),
                         sensor_data=Int32Field(i << 16),
                     )
                 ),
