@@ -1,5 +1,6 @@
 import { getLabwareDisplayName, RunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareByLiquidId, Liquid } from '@opentrons/api-client'
+import { WellGroup } from '@opentrons/components'
 
 export function getWellFillFromLabwareId(
   labwareId: string,
@@ -115,4 +116,23 @@ export function getLiquidsByIdForLabware(
     },
     {}
   )
+}
+
+export function getWellGroupForLiquidId(
+  labwareByLiquidId: LabwareByLiquidId,
+  liquidId: string
+): WellGroup {
+  const labwareInfo = labwareByLiquidId[liquidId]
+  return labwareInfo.reduce((allWells, { volumeByWell }) => {
+    const someWells = Object.entries(volumeByWell).reduce(
+      (someWells, [wellName]) => {
+        return {
+          ...someWells,
+          [wellName]: null,
+        }
+      },
+      {}
+    )
+    return { ...allWells, ...someWells }
+  }, {})
 }

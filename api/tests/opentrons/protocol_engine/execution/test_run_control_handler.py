@@ -1,5 +1,5 @@
 """Run control side-effect handler."""
-from datetime import datetime
+from time import monotonic as time_monotonic
 
 import pytest
 from decoy import Decoy, matchers
@@ -84,13 +84,13 @@ async def test_wait_for_duration(
     decoy.when(mock_state_store.get_configs()).then_return(
         EngineConfigs(ignore_pause=False)
     )
-    start = datetime.now()
-    await subject.wait_for_duration(seconds=0.1)
-    end = datetime.now()
+    start = time_monotonic()
+    await subject.wait_for_duration(seconds=0.2)
+    end = time_monotonic()
 
     # NOTE: margin of error selected empirically
     # this is flakey test risk in CI
-    assert (end - start).total_seconds() == pytest.approx(0.1, abs=0.05)
+    assert end - start == pytest.approx(0.2, abs=0.1)
 
 
 async def test_wait_for_duration_ignore_pause(
@@ -107,10 +107,13 @@ async def test_wait_for_duration_ignore_pause(
     decoy.when(mock_state_store.get_configs()).then_return(
         EngineConfigs(ignore_pause=True)
     )
-    start = datetime.now()
-    await subject.wait_for_duration(seconds=0.1)
-    end = datetime.now()
+    start = time_monotonic()
+    # This wait time would be disruptively long for the test suite,
+    # but it only matters when the subject has a bug and this test fails,
+    # which should be rare.
+    await subject.wait_for_duration(seconds=1.0)
+    end = time_monotonic()
 
     # NOTE: margin of error selected empirically
     # this is flakey test risk in CI
-    assert (end - start).total_seconds() == pytest.approx(0, abs=0.05)
+    assert end - start == pytest.approx(0, abs=0.1)

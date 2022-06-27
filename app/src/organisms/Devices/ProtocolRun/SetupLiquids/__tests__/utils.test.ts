@@ -4,6 +4,7 @@ import {
   getTotalVolumePerLiquidLabwarePair,
   getSlotLabwareName,
   getLiquidsByIdForLabware,
+  getWellGroupForLiquidId,
 } from '../utils'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import type { LabwareByLiquidId, Liquid } from '@opentrons/api-client'
@@ -149,6 +150,57 @@ const MOCK_COMMANDS = [
   },
 ]
 
+const MOCK_LABWARE_BY_LIQUID_ID_FOR_LABWARE = {
+  '4': [
+    {
+      labwareId:
+        '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
+      volumeByWell: {
+        A3: 100,
+        A4: 100,
+        B3: 100,
+        B4: 100,
+        C3: 100,
+        C4: 100,
+        D3: 100,
+        D4: 100,
+      },
+    },
+  ],
+  '7': [
+    {
+      labwareId:
+        '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
+      volumeByWell: {
+        A1: 100,
+        A2: 100,
+        B1: 100,
+        B2: 100,
+        C1: 100,
+        C2: 100,
+        D1: 100,
+        D2: 100,
+      },
+    },
+  ],
+  '19': [
+    {
+      labwareId:
+        '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
+      volumeByWell: {
+        A5: 100,
+        A6: 100,
+        B5: 100,
+        B6: 100,
+        C5: 100,
+        C6: 100,
+        D5: 100,
+        D6: 100,
+      },
+    },
+  ],
+}
+
 jest.mock('@opentrons/shared-data')
 const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
   typeof getLabwareDisplayName
@@ -242,58 +294,26 @@ describe('getSlotLabwareName', () => {
 
 describe('getLiquidsByIdForLabware', () => {
   it('returns liquid info by labware id', () => {
-    const expected = {
-      '4': [
-        {
-          labwareId:
-            '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
-          volumeByWell: {
-            A3: 100,
-            A4: 100,
-            B3: 100,
-            B4: 100,
-            C3: 100,
-            C4: 100,
-            D3: 100,
-            D4: 100,
-          },
-        },
-      ],
-      '7': [
-        {
-          labwareId:
-            '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
-          volumeByWell: {
-            A1: 100,
-            A2: 100,
-            B1: 100,
-            B2: 100,
-            C1: 100,
-            C2: 100,
-            D1: 100,
-            D2: 100,
-          },
-        },
-      ],
-      '19': [
-        {
-          labwareId:
-            '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
-          volumeByWell: {
-            A5: 100,
-            A6: 100,
-            B5: 100,
-            B6: 100,
-            C5: 100,
-            C6: 100,
-            D5: 100,
-            D6: 100,
-          },
-        },
-      ],
-    }
     expect(
       getLiquidsByIdForLabware(LABWARE_ID, MOCK_LABWARE_BY_LIQUID_ID as any)
+    ).toEqual(MOCK_LABWARE_BY_LIQUID_ID_FOR_LABWARE)
+  })
+})
+
+describe('getWellGroupForLiquidId', () => {
+  it('returns wellgroup object for the specified liquidId', () => {
+    const expected = {
+      A1: null,
+      A2: null,
+      B1: null,
+      B2: null,
+      C1: null,
+      C2: null,
+      D1: null,
+      D2: null,
+    }
+    expect(
+      getWellGroupForLiquidId(MOCK_LABWARE_BY_LIQUID_ID_FOR_LABWARE, '7')
     ).toEqual(expected)
   })
 })

@@ -19,6 +19,7 @@ jest.mock('@opentrons/components', () => {
     )),
   }
 })
+jest.mock('../../../redux/config')
 
 const commands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
 

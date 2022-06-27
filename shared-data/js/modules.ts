@@ -3,6 +3,7 @@ import magneticModuleV2 from '../module/definitions/3/magneticModuleV2.json'
 import temperatureModuleV1 from '../module/definitions/3/temperatureModuleV1.json'
 import temperatureModuleV2 from '../module/definitions/3/temperatureModuleV2.json'
 import thermocyclerModuleV1 from '../module/definitions/3/thermocyclerModuleV1.json'
+import thermocyclerModuleV2 from '../module/definitions/3/thermocyclerModuleV2.json'
 import heaterShakerModuleV1 from '../module/definitions/3/heaterShakerModuleV1.json'
 
 import {
@@ -14,6 +15,7 @@ import {
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER,
   THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
   HEATERSHAKER_MODULE_V1,
 } from './constants'
 
@@ -42,6 +44,9 @@ export const getModuleDef2 = (moduleModel: ModuleModel): ModuleDefinition => {
 
     case THERMOCYCLER_MODULE_V1:
       return thermocyclerModuleV1 as ModuleDefinition
+
+    case THERMOCYCLER_MODULE_V2:
+      return (thermocyclerModuleV2 as unknown) as ModuleDefinition
 
     case HEATERSHAKER_MODULE_V1:
       return (heaterShakerModuleV1 as unknown) as ModuleDefinition
