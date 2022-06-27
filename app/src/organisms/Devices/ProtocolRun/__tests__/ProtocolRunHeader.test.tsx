@@ -353,6 +353,18 @@ describe('ProtocolRunHeader', () => {
     getByText('Mock ConfirmCancelModal')
   })
 
+  it('calls trackProtocolRunEvent when start run button clicked', () => {
+    const [{ getByRole }] = render()
+
+    const button = getByRole('button', { name: 'Start run' })
+    fireEvent.click(button)
+    expect(mockTrackProtocolRunEvent).toBeCalledTimes(1)
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: 'runStart',
+      properties: {},
+    })
+  })
+
   it('dismisses a current but canceled run and calls trackProtocolRunEvent', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
@@ -365,6 +377,10 @@ describe('ProtocolRunHeader', () => {
     render()
     expect(mockCloseCurrentRun).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalled()
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: 'runFinish',
+      properties: {},
+    })
   })
 
   it('disables the Start Run button with tooltip if calibration is incomplete', () => {
@@ -393,7 +409,7 @@ describe('ProtocolRunHeader', () => {
     getByText('Complete required steps in Setup tab')
   })
 
-  it('renders a pause run button, start time, and end time when run is running', () => {
+  it('renders a pause run button, start time, and end time when run is running, and calls trackProtocolRunEvent when button clicked', () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -404,10 +420,15 @@ describe('ProtocolRunHeader', () => {
       .mockReturnValue(RUN_STATUS_RUNNING)
     const [{ getByRole, getByText }] = render()
 
-    getByRole('button', { name: 'Pause run' })
+    const button = getByRole('button', { name: 'Pause run' })
     getByText(formatTimestamp(STARTED_AT))
     getByText('Protocol start')
     getByText('Protocol end')
+    fireEvent.click(button)
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: 'runPause',
+      properties: {},
+    })
   })
 
   it('renders a cancel run button when running and shows a confirm cancel modal when clicked', () => {
@@ -427,7 +448,7 @@ describe('ProtocolRunHeader', () => {
     getByText('Mock ConfirmCancelModal')
   })
 
-  it('renders a Resume Run button and Cancel Run button when paused', () => {
+  it('renders a Resume Run button and Cancel Run button when paused and call trackProtocolRunEvent when resume button clicked', () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -437,9 +458,14 @@ describe('ProtocolRunHeader', () => {
 
     const [{ getByRole, getByText }] = render()
 
-    getByRole('button', { name: 'Resume run' })
+    const button = getByRole('button', { name: 'Resume run' })
     getByRole('button', { name: 'Cancel run' })
     getByText('Paused')
+    fireEvent.click(button)
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: 'runResume',
+      properties: {},
+    })
   })
 
   it('renders a disabled Resume Run button and when pause requested', () => {
@@ -477,7 +503,7 @@ describe('ProtocolRunHeader', () => {
     getByText('Stop requested')
   })
 
-  it('renders a Run Again button and end time when run has stopped', () => {
+  it('renders a Run Again button and end time when run has stopped and calls trackProtocolRunEvent when run again button clicked', () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -495,12 +521,17 @@ describe('ProtocolRunHeader', () => {
 
     const [{ getByText }] = render()
 
-    getByText('Run again')
+    const button = getByText('Run again')
     getByText('Canceled')
     getByText(formatTimestamp(COMPLETED_AT))
+    fireEvent.click(button)
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: 'runAgain',
+      properties: {},
+    })
   })
 
-  it('renders a Run Again button and end time when run has failed', () => {
+  it('renders a Run Again button and end time when run has failed and calls trackProtocolRunEvent when run again button clicked', () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -516,12 +547,17 @@ describe('ProtocolRunHeader', () => {
 
     const [{ getByText }] = render()
 
-    getByText('Run again')
+    const button = getByText('Run again')
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
+    fireEvent.click(button)
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: 'runAgain',
+      properties: {},
+    })
   })
 
-  it('renders a Run Again button and end time when run has succeeded', () => {
+  it('renders a Run Again button and end time when run has succeeded and calls trackProtocolRunEvent when run again button clicked', () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -539,9 +575,14 @@ describe('ProtocolRunHeader', () => {
 
     const [{ getByText }] = render()
 
-    getByText('Run again')
+    const button = getByText('Run again')
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
+    fireEvent.click(button)
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: 'runAgain',
+      properties: {},
+    })
   })
 
   it('disables the Run Again button with tooltip for a completed run if the robot is busy', () => {
@@ -627,6 +668,7 @@ describe('ProtocolRunHeader', () => {
     const button = getByRole('button', { name: 'Start run' })
     fireEvent.click(button)
     getByText('mock confirm attachment modal')
+    expect(mockTrackProtocolRunEvent).toBeCalledTimes(0)
   })
 
   it('does NOT render confirm attachment modal when the user already confirmed the heater shaker is attached', () => {
