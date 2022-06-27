@@ -3,12 +3,12 @@ import { useProtocolRunAnalyticsData } from './useProtocolRunAnalyticsData'
 
 interface ProtocolRunAnalyticsEvent {
   name: string
-  properties: { [key: string]: unknown }
+  properties?: { [key: string]: unknown }
 }
 
 type TrackProtocolRunEvent = (
   protocolRunEvent: ProtocolRunAnalyticsEvent
-) => Promise<void>
+) => void
 
 export function useTrackProtocolRunEvent(
   runId: string | null
@@ -16,33 +16,27 @@ export function useTrackProtocolRunEvent(
   const trackEvent = useTrackEvent()
   const { getProtocolRunAnalyticsData } = useProtocolRunAnalyticsData(runId)
 
-  const trackProtocolRunEvent: TrackProtocolRunEvent = async protocolRunEvent => {
-    try {
-      const {
-        protocolRunAnalyticsData,
-        runTime,
-      } = await getProtocolRunAnalyticsData()
-
-      trackEvent({
-        name: protocolRunEvent.name,
-        properties: {
-          ...protocolRunEvent.properties,
-          ...protocolRunAnalyticsData,
-          runTime,
-        },
+  const trackProtocolRunEvent: TrackProtocolRunEvent = ({
+    name,
+    properties = {},
+  }) => {
+    getProtocolRunAnalyticsData()
+      .then(({ protocolRunAnalyticsData, runTime }) => {
+        trackEvent({
+          name,
+          properties: {
+            ...properties,
+            ...protocolRunAnalyticsData,
+            runTime,
+          },
+        })
       })
-    } catch (e: unknown) {
-      console.error(
-        `getProtocolRunAnalyticsData error during ${protocolRunEvent.name}: ${
-          (e as Error).message
-        }; sending protocolRunEvent without protocol properties`
-      )
-
-      trackEvent({
-        name: protocolRunEvent.name,
-        properties: { ...protocolRunEvent.properties },
+      .catch((e: Error) => {
+        console.error(
+          `getProtocolRunAnalyticsData error during ${name}: ${e.message}; sending protocolRunEvent without protocol properties`
+        )
+        trackEvent({ name, properties: {} })
       })
-    }
   }
 
   return { trackProtocolRunEvent }

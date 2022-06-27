@@ -82,7 +82,7 @@ describe('useTrackProtocolRunEvent hook', () => {
     })
   })
 
-  it('trackProtocolRunEvent invokes trackEvent without props when error is thrown in getProtocolRunAnalyticsData', async () => {
+  it('trackProtocolRunEvent calls trackEvent without props when error is thrown in getProtocolRunAnalyticsData', async () => {
     when(mockUseProtocolRunAnalyticsData)
       .calledWith('errorId')
       .mockReturnValue({

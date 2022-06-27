@@ -164,11 +164,7 @@ export function ProtocolRunHeader({
           properties: {
             ...robotAnalyticsData,
           },
-        }).catch((e: Error) =>
-          console.error(
-            `Error tracking protocol run runFinish event: ${e.message}`
-          )
-        )
+        })
 
         closeCurrentRun()
       }
@@ -257,40 +253,27 @@ export function ProtocolRunHeader({
       play()
 
       const isIdle = runStatus === RUN_STATUS_IDLE
-      const eventProperties = isIdle ? { ...robotAnalyticsData } : {}
+      const eventProperties =
+        isIdle && robotAnalyticsData != null ? robotAnalyticsData : {}
       const eventName = isIdle ? 'runStart' : 'runResume'
 
       trackProtocolRunEvent({
         name: eventName,
         properties: eventProperties,
-      }).catch((e: Error) =>
-        console.error(
-          `Error tracking protocol run ${eventName} event: ${e.message}`
-        )
-      )
+      })
     }
   }
 
   const handlePauseButtonClick = (): void => {
     pause()
 
-    trackProtocolRunEvent({
-      name: 'runPause',
-      properties: {},
-    }).catch((e: Error) =>
-      console.error(`Error tracking protocol run runPause event: ${e.message}`)
-    )
+    trackProtocolRunEvent({ name: 'runPause' })
   }
 
   const handleResetButtonClick = (): void => {
     reset()
 
-    trackProtocolRunEvent({
-      name: 'runAgain',
-      properties: {},
-    }).catch((e: Error) =>
-      console.error(`Error tracking protocol run runAgain event: ${e.message}`)
-    )
+    trackProtocolRunEvent({ name: 'runAgain' })
   }
 
   const isRunControlButtonDisabled =
@@ -382,9 +365,7 @@ export function ProtocolRunHeader({
       properties: {
         ...robotAnalyticsData,
       },
-    }).catch((e: Error) =>
-      console.error(`Error tracking protocol run runFinish event: ${e.message}`)
-    )
+    })
 
     closeCurrentRun()
   }

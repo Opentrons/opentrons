@@ -189,7 +189,6 @@ export function GeneralSettings(): JSX.Element {
           <Box>
             <Link
               role="button"
-              tabIndex={0}
               css={TYPOGRAPHY.linkPSemiBold}
               onClick={() => setShowPreviousVersionModal(true)}
               id="GeneralSettings_previousVersionLink"

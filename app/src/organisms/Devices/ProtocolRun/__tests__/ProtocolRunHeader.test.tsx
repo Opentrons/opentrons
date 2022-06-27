@@ -425,10 +425,7 @@ describe('ProtocolRunHeader', () => {
     getByText('Protocol start')
     getByText('Protocol end')
     fireEvent.click(button)
-    expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: 'runPause',
-      properties: {},
-    })
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runPause' })
   })
 
   it('renders a cancel run button when running and shows a confirm cancel modal when clicked', () => {
@@ -525,10 +522,7 @@ describe('ProtocolRunHeader', () => {
     getByText('Canceled')
     getByText(formatTimestamp(COMPLETED_AT))
     fireEvent.click(button)
-    expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: 'runAgain',
-      properties: {},
-    })
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
   })
 
   it('renders a Run Again button and end time when run has failed and calls trackProtocolRunEvent when run again button clicked', () => {
@@ -551,10 +545,7 @@ describe('ProtocolRunHeader', () => {
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
     fireEvent.click(button)
-    expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: 'runAgain',
-      properties: {},
-    })
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
   })
 
   it('renders a Run Again button and end time when run has succeeded and calls trackProtocolRunEvent when run again button clicked', () => {
@@ -579,10 +570,7 @@ describe('ProtocolRunHeader', () => {
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
     fireEvent.click(button)
-    expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: 'runAgain',
-      properties: {},
-    })
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
   })
 
   it('disables the Run Again button with tooltip for a completed run if the robot is busy', () => {

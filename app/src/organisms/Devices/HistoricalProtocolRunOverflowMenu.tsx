@@ -124,12 +124,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
     reset()
 
-    trackProtocolRunEvent({
-      name: 'runAgain',
-      properties: {},
-    }).catch((e: Error) =>
-      console.error(`Error tracking protocol run runAgain event: ${e.message}`)
-    )
+    trackProtocolRunEvent({ name: 'runAgain' })
   }
 
   const handleDeleteClick: React.MouseEventHandler<HTMLButtonElement> = e => {

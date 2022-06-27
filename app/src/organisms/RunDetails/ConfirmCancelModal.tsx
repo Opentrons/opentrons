@@ -32,14 +32,7 @@ export function ConfirmCancelModal(
     if (runId != null) {
       stopRun(runId)
 
-      trackProtocolRunEvent({
-        name: 'runCancel',
-        properties: {},
-      }).catch((e: Error) =>
-        console.error(
-          `Error tracking protocol run runCancel event: ${e.message}`
-        )
-      )
+      trackProtocolRunEvent({ name: 'runCancel' })
     }
   }
 
