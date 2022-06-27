@@ -84,7 +84,7 @@ interface ModuleCardProps {
 
 export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
-  const { module, robotName, runId, slotName, isModuleControl } = props
+  const { module, robotName, isModuleControl, runId, slotName } = props
   const dispatch = useDispatch<Dispatch>()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
   const [showSlideout, setShowSlideout] = React.useState(false)
@@ -233,22 +233,23 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           ) : (
             <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
           ))}
-        {showSlideout && runId != null && !isRunTerminal ? (
-          <ModuleSlideout
-            module={module}
-            runId={runId}
-            isSecondary={hasSecondary}
-            showSlideout={showSlideout}
-            onCloseClick={() => setShowSlideout(false)}
-          />
-        ) : (
-          <ModuleSlideout
-            module={module}
-            isSecondary={hasSecondary}
-            showSlideout={showSlideout}
-            onCloseClick={() => setShowSlideout(false)}
-          />
-        )}
+        {showSlideout &&
+          (runId != null && !isRunTerminal ? (
+            <ModuleSlideout
+              module={module}
+              runId={runId}
+              isSecondary={hasSecondary}
+              showSlideout={showSlideout}
+              onCloseClick={() => setShowSlideout(false)}
+            />
+          ) : (
+            <ModuleSlideout
+              module={module}
+              isSecondary={hasSecondary}
+              showSlideout={showSlideout}
+              onCloseClick={() => setShowSlideout(false)}
+            />
+          ))}
         {showAboutModule && (
           <AboutModuleSlideout
             module={module}

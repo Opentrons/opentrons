@@ -171,7 +171,7 @@ export const HeaterShakerSlideout = (
         isExpanded={isExpanded}
         footer={
           <SubmitPrimaryButton
-            form={'HeaterShakerSlideout_submitValue'}
+            form="HeaterShakerSlideout_submitValue"
             value={t('confirm')}
             onClick={sendSetTemperatureOrShakeCommand}
             disabled={hsValue === null || errorMessage !== null}

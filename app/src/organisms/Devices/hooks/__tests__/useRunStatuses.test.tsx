@@ -27,7 +27,6 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
 const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
   typeof useAllSessionsQuery
 >
-
 describe(' useRunStatuses ', () => {
   beforeEach(() => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)

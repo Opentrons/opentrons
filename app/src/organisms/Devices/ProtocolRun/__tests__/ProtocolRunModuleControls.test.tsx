@@ -111,7 +111,7 @@ describe('ProtocolRunModuleControls', () => {
           robotName: 'otie',
           module: mockMagneticModuleGen2,
           runId: 'test123',
-          isModuleControl: true,
+          isModuleControl: true, // this can never be false in this component since isModuleControl true is hardcoded in
         })
       )
       .mockReturnValue(<div>mock Magnetic Module Card</div>)

@@ -57,8 +57,7 @@ export const TemperatureModuleSlideout = (
       const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {
         commandType: 'temperatureModule/setTargetTemperature',
         params: {
-          moduleId:
-            runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
+          moduleId: module.id,
           celsius: temperatureValue,
         },
       }
