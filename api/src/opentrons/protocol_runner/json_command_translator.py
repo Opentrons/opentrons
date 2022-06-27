@@ -96,9 +96,6 @@ def _translate_simple_command(
         else:
             dict_command["commandType"] = "waitForDuration"
 
-    # dict_command["key"] = command.key
-    print("command.key ")
-    print(command.key)
     translated_obj = cast(
         pe_commands.CommandCreate,
         parse_obj_as(
