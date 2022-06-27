@@ -1,9 +1,14 @@
 import { useTrackEvent } from '../../../redux/analytics'
 import { useProtocolRunAnalyticsData } from './useProtocolRunAnalyticsData'
 
-import type { AnalyticsEvent } from '../../../redux/analytics/types'
+interface ProtocolRunAnalyticsEvent {
+  name: string
+  properties: { [key: string]: unknown }
+}
 
-type TrackProtocolRunEvent = (protocolRunEvent: AnalyticsEvent) => Promise<void>
+type TrackProtocolRunEvent = (
+  protocolRunEvent: ProtocolRunAnalyticsEvent
+) => Promise<void>
 
 export function useTrackProtocolRunEvent(
   runId: string | null
