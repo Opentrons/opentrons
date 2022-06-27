@@ -174,6 +174,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
               boxShadow={
                 isReachedBottom ? 'none' : '0px -4px 12px rgba(0, 0, 0, 0.1)'
               }
+              zIndex="3"
             >
               {footer}
             </Box>
