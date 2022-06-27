@@ -90,7 +90,7 @@ module.exports = function beforeBuild(context) {
         `--target=${path.join(PYTHON_DESTINATION, sitePackages)}`,
         path.join(__dirname, '../../shared-data/python'),
         path.join(__dirname, '../../api'),
-        'pandas==0.25.3',
+        'pandas==1.4.3',
       ])
     })
     .then(({ stdout }) => {
