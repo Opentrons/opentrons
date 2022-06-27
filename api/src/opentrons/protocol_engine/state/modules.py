@@ -463,8 +463,6 @@ class ModuleView(HasState[ModuleState]):
             z=definition.labwareOffset.z,
         )
 
-    # TODO(mc, 2022-01-19): this method is missing unit test coverage and
-    # is also unused. Remove or add tests.
     def get_overall_height(self, module_id: str) -> float:
         """Get the height of the module."""
         return self.get_dimensions(module_id).bareOverallHeight
