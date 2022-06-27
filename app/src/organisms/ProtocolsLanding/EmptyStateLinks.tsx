@@ -78,6 +78,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
 
         <Link
           css={TYPOGRAPHY.darkLinkLabelSemiBold}
+          marginRight={SPACING.spacing3}
           href={API_DOCS_URL}
           id={'EmptyStateLinks_apiDocsButton'}
           external
