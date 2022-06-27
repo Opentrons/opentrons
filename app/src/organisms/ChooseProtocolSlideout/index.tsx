@@ -14,6 +14,7 @@ import {
   Flex,
   BORDERS,
   DIRECTION_COLUMN,
+  DISPLAY_BLOCK,
   Icon,
   COLORS,
   TEXT_ALIGN_CENTER,
@@ -49,6 +50,10 @@ export function ChooseProtocolSlideout(
     selectedProtocol,
     setSelectedProtocol,
   ] = React.useState<StoredProtocolData | null>(first(storedProtocols) ?? null)
+  const [
+    createProtocolCreationError,
+    setCreateProtocolCreationError,
+  ] = React.useState<string | null>(null)
 
   const srcFileObjects =
     selectedProtocol != null
@@ -70,43 +75,63 @@ export function ChooseProtocolSlideout(
               selectedProtocol != null ? selectedProtocol.protocolKey : ''
             }
             srcFileObjects={srcFileObjects}
+            setError={setCreateProtocolCreationError}
             robotName={name}
           />
         </ApiHostProvider>
       }
     >
       {storedProtocols.length > 0 ? (
-        storedProtocols.map(storedProtocol => (
-          <MiniCard
-            key={storedProtocol.protocolKey}
-            isSelected={
-              selectedProtocol != null &&
-              storedProtocol.protocolKey === selectedProtocol.protocolKey
-            }
-            onClick={() => setSelectedProtocol(storedProtocol)}
-          >
-            <Flex
-              marginRight={SPACING.spacing4}
-              height="6rem"
-              width="6rem"
-              justifyContent={JUSTIFY_CENTER}
-              alignItems={ALIGN_CENTER}
-            >
-              <DeckThumbnail
-                commands={storedProtocol.mostRecentAnalysis?.commands ?? []}
-              />
-            </Flex>
-            <StyledText
-              as="p"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              css={{ 'overflow-wrap': 'anywhere' }}
-            >
-              {storedProtocol.mostRecentAnalysis?.metadata?.protocolName ??
-                first(storedProtocol.srcFileNames) ??
-                storedProtocol.protocolKey}
-            </StyledText>
-          </MiniCard>
-        ))
+        storedProtocols.map(storedProtocol => {
+          const isSelected =
+            selectedProtocol != null &&
+            storedProtocol.protocolKey === selectedProtocol.protocolKey
+          return (
+            <>
+              <MiniCard
+                key={storedProtocol.protocolKey}
+                isSelected={isSelected}
+                error={createProtocolCreationError}
+                onClick={() => {
+                  setCreateProtocolCreationError(null)
+                  setSelectedProtocol(storedProtocol)
+                }}
+              >
+                <Flex
+                  marginRight={SPACING.spacing4}
+                  height="6rem"
+                  width="6rem"
+                  justifyContent={JUSTIFY_CENTER}
+                  alignItems={ALIGN_CENTER}
+                >
+                  <DeckThumbnail
+                    commands={storedProtocol.mostRecentAnalysis?.commands ?? []}
+                  />
+                </Flex>
+                <StyledText
+                  as="p"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  css={{ 'overflow-wrap': 'anywhere' }}
+                >
+                  {storedProtocol.mostRecentAnalysis?.metadata?.protocolName ??
+                    first(storedProtocol.srcFileNames) ??
+                    storedProtocol.protocolKey}
+                </StyledText>
+              </MiniCard>
+              {createProtocolCreationError != null && isSelected && (
+                <StyledText
+                  as="label"
+                  color={COLORS.error}
+                  display={DISPLAY_BLOCK}
+                  marginTop={`-${SPACING.spacing2}`}
+                  marginBottom={SPACING.spacing3}
+                >
+                  {createProtocolCreationError}
+                </StyledText>
+              )}
+            </>
+          )
+        })
       ) : (
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -148,16 +173,32 @@ interface CreateRunButtonProps
   srcFileObjects: File[]
   protocolKey: string
   robotName: string
+  setError: (error: string | null) => void
 }
 function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
   const { t } = useTranslation('protocol_details')
   const history = useHistory()
-  const { protocolKey, srcFileObjects, robotName, ...buttonProps } = props
-  const { createRunFromProtocolSource } = useCreateRunFromProtocol({
+  const {
+    protocolKey,
+    srcFileObjects,
+    robotName,
+    setError,
+    ...buttonProps
+  } = props
+  const {
+    createRunFromProtocolSource,
+    runCreationError,
+  } = useCreateRunFromProtocol({
     onSuccess: ({ data: runData }) => {
       history.push(`/devices/${robotName}/protocol-runs/${runData.id}`)
     },
   })
+
+  React.useEffect(() => {
+    if (runCreationError != null) {
+      setError(runCreationError)
+    }
+  }, [runCreationError, setError])
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
     createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
