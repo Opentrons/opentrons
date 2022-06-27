@@ -1,4 +1,5 @@
 import * as React from 'react'
+import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   Box,
@@ -49,6 +50,17 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
     e.preventDefault()
     setShowSortByMenu(false)
   }
+
+  const SortByText = styled(StyledText)`
+  background-color={COLORS.transparent}
+  font-weight: ${TYPOGRAPHY.pSemiBold};
+   &:enabled {
+    align-items={TYPOGRAPHY.textAlignCenter}
+   }
+   &:hover {
+    align-items={TYPOGRAPHY.textAlignCenter}
+    }
+  `
 
   const sortByLabelType: {
     [key in ProtocolSort]: {
@@ -108,6 +120,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
                 paddingY={SPACING.spacing2}
                 data-testid="sortBy-label"
               >
+                {SortByText[sortBy]}
                 {sortByLabelType[sortBy].label}
               </StyledText>
               <Icon
@@ -186,7 +199,10 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           />
         ))}
       </Flex>
-      <EmptyStateLinks title={t('create_or_download')} />
+      <EmptyStateLinks
+        title={t('create_or_download')}
+        css={TYPOGRAPHY.pSemiBold}
+      />
       <Slideout
         title={t('import_new_protocol')}
         isExpanded={showSlideout}
