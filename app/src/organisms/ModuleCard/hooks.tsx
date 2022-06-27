@@ -60,7 +60,6 @@ export function useLatchControls(
     module,
     runId != null ? runId : null
   )
-
   const isLatchClosed =
     module.moduleType === 'heaterShakerModuleType' &&
     (module.data.labwareLatchStatus === 'idle_closed' ||
@@ -127,7 +126,7 @@ export function useModuleOverflowMenu(
   handleTestShakeClick: () => void,
   handleWizardClick: () => void,
   handleSlideoutClick: (isSecondary: boolean) => void,
-  isModuleControl: boolean
+  isLoadedInRun: boolean
 ): ModuleOverflowMenu {
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
@@ -139,12 +138,13 @@ export function useModuleOverflowMenu(
     isLegacySessionInProgress,
     isRunTerminal,
     isRunStill,
+    isRunIdle,
   } = useRunStatuses()
   const currentRunId = useCurrentRunId()
   let isDisabled: boolean = false
-  if (runId != null && isModuleControl) {
+  if (runId != null && isLoadedInRun) {
     isDisabled = !isRunStill
-  } else if ((runId != null || currentRunId != null) && !isModuleControl) {
+  } else if ((runId != null || currentRunId != null) && !isLoadedInRun) {
     isDisabled = !isLegacySessionInProgress && !isRunTerminal
   }
   const isLatchDisabled =
@@ -206,6 +206,13 @@ export function useModuleOverflowMenu(
     </MenuItem>
   )
 
+  let moduleId: string
+  if (isRunIdle && currentRunId != null && isLoadedInRun) {
+    moduleId = moduleIdFromRun
+  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
+    moduleId = module.id
+  }
+
   const handleDeactivationCommand = (
     deactivateModuleCommandType: deactivateCommandTypes
   ): void => {
@@ -218,19 +225,22 @@ export function useModuleOverflowMenu(
       | HeaterShakerDeactivateShakerCreateCommand = {
       commandType: deactivateModuleCommandType,
       params: {
-        moduleId: runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
+        moduleId,
       },
     }
-    if (runId != null && !isRunTerminal) {
+    if (isRunIdle && currentRunId != null && isLoadedInRun) {
       createCommand({
-        runId: runId,
+        runId: currentRunId,
         command: deactivateCommand,
       }).catch((e: Error) => {
         console.error(
           `error setting module status with command type ${deactivateCommand.commandType} and run id ${runId}: ${e.message}`
         )
       })
-    } else {
+    } else if (
+      (currentRunId != null && isRunTerminal) ||
+      currentRunId == null
+    ) {
       createLiveCommand({
         command: deactivateCommand,
       }).catch((e: Error) => {

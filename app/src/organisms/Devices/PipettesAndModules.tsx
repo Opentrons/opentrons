@@ -116,7 +116,7 @@ export function PipettesAndModules({
                     <ModuleCard
                       module={module}
                       robotName={robotName}
-                      isModuleControl={false}
+                      isLoadedInRun={false}
                     />
                   </Flex>
                 )

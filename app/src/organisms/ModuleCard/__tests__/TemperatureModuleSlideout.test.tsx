@@ -53,6 +53,7 @@ describe('TemperatureModuleSlideout', () => {
     props = {
       module: mockTemperatureModule,
       isExpanded: true,
+      isLoadedInRun: false,
       onCloseClick: jest.fn(),
     }
     mockUseLiveCommandMutation.mockReturnValue({
@@ -63,8 +64,9 @@ describe('TemperatureModuleSlideout', () => {
     } as any)
     mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'tempdeck_id' })
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: false,
       isRunStill: false,
+      isLegacySessionInProgress: false,
+      isRunIdle: false,
       isRunTerminal: true,
     })
   })
@@ -87,6 +89,7 @@ describe('TemperatureModuleSlideout', () => {
       module: mockTemperatureModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByText } = render(props)
 
@@ -102,6 +105,7 @@ describe('TemperatureModuleSlideout', () => {
       module: mockTemperatureModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Confirm' })
@@ -125,14 +129,16 @@ describe('TemperatureModuleSlideout', () => {
   it('renders the button and it is not clickable until there is something in form field and a run id is present', () => {
     mockUseRunStatuses.mockReturnValue({
       isLegacySessionInProgress: false,
-      isRunStill: false,
+      isRunStill: true,
       isRunTerminal: false,
+      isRunIdle: true,
     })
     props = {
       module: mockTemperatureModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
-      runId: 'test123',
+      currentRunId: 'tempdeck_id',
+      isLoadedInRun: true,
     }
     const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Confirm' })
@@ -142,7 +148,7 @@ describe('TemperatureModuleSlideout', () => {
     fireEvent.click(button)
 
     expect(mockCreateCommand).toHaveBeenCalledWith({
-      runId: props.runId,
+      runId: props.currentRunId,
       command: {
         commandType: 'temperatureModule/setTargetTemperature',
         params: {

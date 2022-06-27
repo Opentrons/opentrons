@@ -94,6 +94,7 @@ describe('ProtocolRunDetails', () => {
       isLegacySessionInProgress: false,
       isRunStill: true,
       isRunTerminal: false,
+      isRunIdle: true,
     })
     mockProtocolRunHeader.mockReturnValue(<div>Mock ProtocolRunHeader</div>)
     mockRunLog.mockReturnValue(<div>Mock RunLog</div>)
@@ -212,6 +213,7 @@ describe('ProtocolRunDetails', () => {
       isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: false,
+      isRunIdle: false,
     })
     const [{ getByText, queryByText }] = render(
       `/devices/otie/protocol-runs/${RUN_ID}`

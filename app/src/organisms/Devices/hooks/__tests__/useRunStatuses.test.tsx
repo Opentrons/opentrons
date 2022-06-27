@@ -46,6 +46,7 @@ describe(' useRunStatuses ', () => {
       isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: false,
+      isRunIdle: false,
     })
   })
 
@@ -66,6 +67,7 @@ describe(' useRunStatuses ', () => {
       isLegacySessionInProgress: true,
       isRunStill: true,
       isRunTerminal: true,
+      isRunIdle: false,
     })
   })
 
@@ -86,6 +88,7 @@ describe(' useRunStatuses ', () => {
       isLegacySessionInProgress: true,
       isRunStill: true,
       isRunTerminal: true,
+      isRunIdle: false,
     })
   })
 
@@ -107,16 +110,18 @@ describe(' useRunStatuses ', () => {
       isLegacySessionInProgress: true,
       isRunStill: true,
       isRunTerminal: true,
+      isRunIdle: false,
     })
   })
 
-  it('returns false isLegacySessionInprogress and true isRunStill when run status is idle and sessions are empty', () => {
+  it('returns false isLegacySessionInprogress and true isRunStill and isRunIdle when run status is idle and sessions are empty', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
       isLegacySessionInProgress: false,
       isRunStill: true,
       isRunTerminal: false,
+      isRunIdle: true,
     })
   })
 })

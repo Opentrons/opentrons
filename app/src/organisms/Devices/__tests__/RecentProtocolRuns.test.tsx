@@ -47,6 +47,7 @@ describe('RecentProtocolRuns', () => {
       isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: true,
+      isRunIdle: false,
     })
     mockHistoricalProtocolRun.mockReturnValue(
       <div>mock HistoricalProtocolRun</div>

@@ -89,7 +89,7 @@ export const ProtocolRunModuleControls = ({
                 runId={runId}
                 module={module.attachedModuleMatch}
                 slotName={module.slotName}
-                isModuleControl={true}
+                isLoadedInRun={true}
               />
             ) : null}
           </Flex>

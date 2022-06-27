@@ -48,11 +48,13 @@ describe('MagneticModuleSlideout', () => {
       isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: true,
+      isRunIdle: false,
     })
     props = {
       module: mockMagneticModule,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
@@ -92,6 +94,7 @@ describe('MagneticModuleSlideout', () => {
       module: mockMagneticModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByText } = render(props)
 
@@ -134,12 +137,14 @@ describe('MagneticModuleSlideout', () => {
       isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: false,
+      isRunIdle: true,
     })
     props = {
       module: mockMagneticModule,
       isExpanded: true,
       onCloseClick: jest.fn(),
-      runId: 'test123',
+      isLoadedInRun: true,
+      currentRunId: 'test123',
     }
 
     const { getByRole, getByTestId } = render(props)
@@ -149,7 +154,7 @@ describe('MagneticModuleSlideout', () => {
     expect(button).toBeEnabled()
     fireEvent.click(button)
     expect(mockCreateCommand).toHaveBeenCalledWith({
-      runId: props.runId,
+      runId: props.currentRunId,
       command: {
         commandType: 'magneticModule/engage',
         params: {

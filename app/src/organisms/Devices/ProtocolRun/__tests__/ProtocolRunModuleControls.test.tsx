@@ -111,7 +111,7 @@ describe('ProtocolRunModuleControls', () => {
           robotName: 'otie',
           module: mockMagneticModuleGen2,
           runId: 'test123',
-          isModuleControl: true, // this can never be false in this component since isModuleControl true is hardcoded in
+          isLoadedInRun: true, // this can never be false in this component since isModuleControl true is hardcoded in
         })
       )
       .mockReturnValue(<div>mock Magnetic Module Card</div>)
@@ -145,7 +145,7 @@ describe('ProtocolRunModuleControls', () => {
           robotName: 'otie',
           module: mockTemperatureModuleGen2,
           runId: 'test123',
-          isModuleControl: true,
+          isLoadedInRun: true,
         })
       )
       .mockReturnValue(<div>mock Temperature Module Card</div>)
@@ -180,7 +180,7 @@ describe('ProtocolRunModuleControls', () => {
           robotName: 'otie',
           module: mockThermocycler,
           runId: 'test123',
-          isModuleControl: true,
+          isLoadedInRun: true,
         })
       )
       .mockReturnValue(<div>mock Thermocycler Module Card</div>)
@@ -215,7 +215,7 @@ describe('ProtocolRunModuleControls', () => {
           robotName: 'otie',
           module: mockHeaterShaker,
           runId: 'test123',
-          isModuleControl: true,
+          isLoadedInRun: true,
         })
       )
       .mockReturnValue(<div>mock Heater-Shaker Module Card</div>)

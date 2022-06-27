@@ -32,45 +32,63 @@ interface TemperatureModuleSlideoutProps {
   module: TemperatureModule
   onCloseClick: () => unknown
   isExpanded: boolean
-  runId?: string
+  isLoadedInRun: boolean
+  currentRunId?: string
 }
 
 export const TemperatureModuleSlideout = (
   props: TemperatureModuleSlideoutProps
 ): JSX.Element | null => {
-  const { module, onCloseClick, isExpanded, runId } = props
+  const {
+    module,
+    onCloseClick,
+    isLoadedInRun,
+    isExpanded,
+    currentRunId,
+  } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
+
   const { moduleIdFromRun } = useModuleIdFromRun(
     module,
-    runId != null ? runId : null
+    currentRunId != null ? currentRunId : null
   )
   const name = getModuleDisplayName(module.moduleModel)
   const [temperatureValue, setTemperatureValue] = React.useState<number | null>(
     null
   )
-  const { isRunTerminal } = useRunStatuses()
+  const { isRunIdle, isRunTerminal } = useRunStatuses()
+
+  let moduleId: string | null = null
+  if (isRunIdle && currentRunId != null && isLoadedInRun) {
+    moduleId = moduleIdFromRun
+  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
+    moduleId = module.id
+  }
 
   const handleSubmitTemperature = (): void => {
     if (temperatureValue != null) {
       const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {
         commandType: 'temperatureModule/setTargetTemperature',
         params: {
-          moduleId: module.id,
+          moduleId: moduleId != null ? moduleId : '',
           celsius: temperatureValue,
         },
       }
-      if (runId != null && !isRunTerminal) {
+      if (isRunIdle && currentRunId != null && isLoadedInRun) {
         createCommand({
-          runId: runId,
+          runId: currentRunId,
           command: saveTempCommand,
         }).catch((e: Error) => {
           console.error(
-            `error setting module status with command type ${saveTempCommand.commandType} and run id ${runId}: ${e.message}`
+            `error setting module status with command type ${saveTempCommand.commandType} and run id ${currentRunId}: ${e.message}`
           )
         })
-      } else {
+      } else if (
+        (currentRunId != null && isRunTerminal) ||
+        currentRunId == null
+      ) {
         createLiveCommand({
           command: saveTempCommand,
         }).catch((e: Error) => {

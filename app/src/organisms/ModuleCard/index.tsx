@@ -48,7 +48,7 @@ import { Toast } from '../../atoms/Toast'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
-import { useRunStatuses } from '../Devices/hooks'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
@@ -77,14 +77,14 @@ import type { RequestState } from '../../redux/robot-api/types'
 interface ModuleCardProps {
   module: AttachedModule
   robotName: string
-  isModuleControl: boolean
+  isLoadedInRun: boolean
   runId?: string
   slotName?: string
 }
 
 export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
-  const { module, robotName, isModuleControl, runId, slotName } = props
+  const { module, robotName, isLoadedInRun, runId, slotName } = props
   const dispatch = useDispatch<Dispatch>()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
   const [showSlideout, setShowSlideout] = React.useState(false)
@@ -95,8 +95,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showBanner, setShowBanner] = React.useState<boolean>(true)
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { isRunTerminal } = useRunStatuses()
   const history = useHistory()
+  const currentRunId = useCurrentRunId()
   const [dispatchApiRequest, requestIds] = useDispatchApiRequest()
   const runStatus = useCurrentRunStatus({
     onSettled: data => {
@@ -233,23 +233,16 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           ) : (
             <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
           ))}
-        {showSlideout &&
-          (runId != null && !isRunTerminal ? (
-            <ModuleSlideout
-              module={module}
-              runId={runId}
-              isSecondary={hasSecondary}
-              showSlideout={showSlideout}
-              onCloseClick={() => setShowSlideout(false)}
-            />
-          ) : (
-            <ModuleSlideout
-              module={module}
-              isSecondary={hasSecondary}
-              showSlideout={showSlideout}
-              onCloseClick={() => setShowSlideout(false)}
-            />
-          ))}
+        {showSlideout && (
+          <ModuleSlideout
+            module={module}
+            runId={currentRunId != null ? currentRunId : undefined}
+            isSecondary={hasSecondary}
+            showSlideout={showSlideout}
+            onCloseClick={() => setShowSlideout(false)}
+            isLoadedInRun={isLoadedInRun}
+          />
+        )}
         {showAboutModule && (
           <AboutModuleSlideout
             module={module}
@@ -431,7 +424,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
               handleWizardClick={handleWizardClick}
-              isModuleControl={isModuleControl}
+              isLoadedInRun={isLoadedInRun}
             />
           </Box>
         )}
@@ -445,48 +438,60 @@ interface ModuleSlideoutProps {
   runId?: string
   isSecondary: boolean
   showSlideout: boolean
+  isLoadedInRun: boolean
   onCloseClick: () => unknown
 }
 
 const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
-  const { module, runId, isSecondary, showSlideout, onCloseClick } = props
+  const {
+    module,
+    runId,
+    isSecondary,
+    showSlideout,
+    onCloseClick,
+    isLoadedInRun,
+  } = props
 
   if (module.moduleType === THERMOCYCLER_MODULE_TYPE) {
     return (
       <ThermocyclerModuleSlideout
         module={module}
-        runId={runId}
+        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
         isSecondaryTemp={isSecondary}
+        isLoadedInRun={isLoadedInRun}
       />
     )
   } else if (module.moduleType === MAGNETIC_MODULE_TYPE) {
     return (
       <MagneticModuleSlideout
         module={module}
-        runId={runId}
+        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
+        isLoadedInRun={isLoadedInRun}
       />
     )
   } else if (module.moduleType === TEMPERATURE_MODULE_TYPE) {
     return (
       <TemperatureModuleSlideout
         module={module}
-        runId={runId}
+        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
+        isLoadedInRun={isLoadedInRun}
       />
     )
   } else {
     return (
       <HeaterShakerSlideout
         module={module}
-        runId={runId}
+        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
         isSetShake={isSecondary}
+        isLoadedInRun={isLoadedInRun}
       />
     )
   }

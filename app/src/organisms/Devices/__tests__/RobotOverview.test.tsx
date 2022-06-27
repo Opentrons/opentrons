@@ -76,6 +76,7 @@ describe('RobotOverview', () => {
       isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: true,
+      isRunIdle: false,
     })
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
     mockUseLights.mockReturnValue({
@@ -157,6 +158,7 @@ describe('RobotOverview', () => {
       isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: false,
+      isRunIdle: false,
     })
     const [{ getByRole }] = render()
     const runButton = getByRole('button', { name: 'Run a protocol' })
@@ -169,6 +171,7 @@ describe('RobotOverview', () => {
       isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: true,
+      isRunIdle: false,
     })
     const [{ getByText, getByRole }] = render()
     const runButton = getByRole('button', { name: 'Run a protocol' })

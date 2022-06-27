@@ -44,45 +44,62 @@ interface HeaterShakerSlideoutProps {
   onCloseClick: () => unknown
   isExpanded: boolean
   isSetShake: boolean
-  runId?: string
+  isLoadedInRun: boolean
+  currentRunId?: string
 }
 
 export const HeaterShakerSlideout = (
   props: HeaterShakerSlideoutProps
 ): JSX.Element | null => {
-  const { module, onCloseClick, isExpanded, isSetShake, runId } = props
+  const {
+    module,
+    onCloseClick,
+    isExpanded,
+    isSetShake,
+    isLoadedInRun,
+    currentRunId,
+  } = props
   const { t } = useTranslation('device_details')
   const [hsValue, setHsValue] = React.useState<number | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { isRunTerminal } = useRunStatuses()
+  const { isRunIdle, isRunTerminal } = useRunStatuses()
   const { createCommand } = useCreateCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const { moduleIdFromRun } = useModuleIdFromRun(
     module,
-    runId != null ? runId : null
+    currentRunId != null ? currentRunId : null
   )
   const modulePart = isSetShake ? t('shake_speed') : t('temperature')
+
+  let moduleId: string
+  if (isRunIdle && currentRunId != null && isLoadedInRun) {
+    moduleId = moduleIdFromRun
+  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
+    moduleId = module.id
+  }
 
   const sendShakeSpeedCommand = (): void => {
     if (hsValue != null && isSetShake) {
       const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
         commandType: 'heaterShaker/setAndWaitForShakeSpeed',
         params: {
-          moduleId:
-            runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
+          moduleId: moduleId,
           rpm: hsValue,
         },
       }
-      if (runId != null && !isRunTerminal) {
-        createCommand({ runId: runId, command: setShakeCommand }).catch(
+      if (isRunIdle && currentRunId != null && isLoadedInRun) {
+        createCommand({ runId: currentRunId, command: setShakeCommand }).catch(
           (e: Error) => {
             console.error(
-              `error setting heater shaker shake speed: ${e.message} with run id ${runId}`
+              `error setting heater shaker shake speed: ${e.message} with run id ${currentRunId}`
             )
           }
         )
-      } else {
+      } else if (
+        (currentRunId != null && isRunTerminal) ||
+        currentRunId == null
+      ) {
         createLiveCommand({
           command: setShakeCommand,
         }).catch((e: Error) => {
@@ -107,20 +124,22 @@ export const HeaterShakerSlideout = (
       const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
         commandType: 'heaterShaker/setTargetTemperature',
         params: {
-          moduleId:
-            runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
+          moduleId: moduleId,
           celsius: hsValue,
         },
       }
-      if (runId != null && !isRunTerminal) {
-        createCommand({ runId: runId, command: setTempCommand }).catch(
+      if (isRunIdle && currentRunId != null && isLoadedInRun) {
+        createCommand({ runId: currentRunId, command: setTempCommand }).catch(
           (e: Error) => {
             console.error(
-              `error setting module status with command type ${setTempCommand.commandType} with run id ${runId}: ${e.message}`
+              `error setting module status with command type ${setTempCommand.commandType} with run id ${currentRunId}: ${e.message}`
             )
           }
         )
-      } else {
+      } else if (
+        (currentRunId != null && isRunTerminal) ||
+        currentRunId == null
+      ) {
         createLiveCommand({
           command: setTempCommand,
         }).catch((e: Error) => {

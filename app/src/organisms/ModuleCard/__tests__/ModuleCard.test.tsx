@@ -11,7 +11,7 @@ import {
 import { Toast } from '../../../atoms/Toast'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import * as RobotApi from '../../../redux/robot-api'
-import { useRunStatuses } from '../../Devices/hooks'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { MagneticModuleData } from '../MagneticModuleData'
 import { TemperatureModuleData } from '../TemperatureModuleData'
@@ -34,7 +34,7 @@ import type {
   MagneticModule,
 } from '../../../redux/modules/types'
 
-jest.mock('../../Devices/hooks')
+jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../MagneticModuleData')
 jest.mock('../TemperatureModuleData')
 jest.mock('../ThermocyclerModuleData')
@@ -87,8 +87,8 @@ const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
 const mockFirmwareUpdateFailedModal = FirmwareUpdateFailedModal as jest.MockedFunction<
   typeof FirmwareUpdateFailedModal
 >
-const mockUseRunStatues = useRunStatuses as jest.MockedFunction<
-  typeof useRunStatuses
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
 const mockToast = Toast as jest.MockedFunction<typeof Toast>
 const mockMagneticModuleHub = {
@@ -140,11 +140,7 @@ describe('ModuleCard', () => {
 
   beforeEach(() => {
     dispatchApiRequest = jest.fn()
-    mockUseRunStatues.mockReturnValue({
-      isLegacySessionInProgress: false,
-      isRunStill: false,
-      isRunTerminal: false,
-    })
+    mockUseCurrentRunId.mockReturnValue(null)
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, ['id']])
     mockMagneticModuleData.mockReturnValue(<div>Mock Magnetic Module Data</div>)
     mockThermocyclerModuleData.mockReturnValue(
@@ -175,7 +171,7 @@ describe('ModuleCard', () => {
     const { getByText, getByAltText } = render({
       module: mockMagneticModule,
       robotName: mockRobot.name,
-      isModuleControl: false,
+      isLoadedInRun: false,
     })
     getByText('Magnetic Module GEN1')
     getByText('Mock Magnetic Module Data')
@@ -187,7 +183,7 @@ describe('ModuleCard', () => {
     const { getByText, getByAltText } = render({
       module: mockMagneticModuleHub,
       robotName: mockRobot.name,
-      isModuleControl: false,
+      isLoadedInRun: false,
     })
     getByText('Magnetic Module GEN1')
     getByText('Mock Magnetic Module Data')
@@ -203,7 +199,7 @@ describe('ModuleCard', () => {
     const { getByText, getByAltText } = render({
       module: mockTemperatureModuleGen2,
       robotName: mockRobot.name,
-      isModuleControl: false,
+      isLoadedInRun: false,
     })
     getByText('Temperature Module GEN2')
     getByText('Mock Temperature Module Data')
@@ -218,7 +214,7 @@ describe('ModuleCard', () => {
     const { getByText, getByAltText } = render({
       module: mockThermocycler,
       robotName: mockRobot.name,
-      isModuleControl: false,
+      isLoadedInRun: false,
     })
 
     getByText('Thermocycler Module')
@@ -235,7 +231,7 @@ describe('ModuleCard', () => {
     const { getByText, getByAltText } = render({
       module: mockHeaterShaker,
       robotName: mockRobot.name,
-      isModuleControl: false,
+      isLoadedInRun: false,
     })
 
     getByText('Heater-Shaker Module GEN1')
@@ -249,7 +245,7 @@ describe('ModuleCard', () => {
     const { getByRole, getByText, queryByText } = render({
       module: mockMagneticModule,
       robotName: mockRobot.name,
-      isModuleControl: false,
+      isLoadedInRun: false,
     })
     const overflowButton = getByRole('button', {
       name: /overflow/i,
@@ -270,7 +266,7 @@ describe('ModuleCard', () => {
     const { getByRole, getByText } = render({
       module: mockMagneticModule,
       robotName: mockRobot.name,
-      isModuleControl: false,
+      isLoadedInRun: false,
     })
     const overflowButton = getByRole('button', {
       name: /overflow/i,
@@ -286,7 +282,7 @@ describe('ModuleCard', () => {
     const { getByText } = render({
       module: mockHotHeaterShaker,
       robotName: mockRobot.name,
-      isModuleControl: false,
+      isLoadedInRun: false,
     })
     getByText(nestedTextMatcher('Module is hot to the touch'))
   })
@@ -306,7 +302,7 @@ describe('ModuleCard', () => {
     const { getByText } = render({
       module: mockHotHeaterShaker,
       robotName: mockRobot.name,
-      isModuleControl: false,
+      isLoadedInRun: false,
     })
     getByText('mock toast')
   })
@@ -315,7 +311,7 @@ describe('ModuleCard', () => {
     const { getByText } = render({
       module: mockMagneticModuleHub,
       robotName: mockRobot.name,
-      isModuleControl: false,
+      isLoadedInRun: false,
     })
     getByText('Firmware update available.')
     const button = getByText('Update now')
@@ -338,7 +334,7 @@ describe('ModuleCard', () => {
     const { getByText } = render({
       module: mockMagneticModuleHub,
       robotName: mockRobot.name,
-      isModuleControl: false,
+      isLoadedInRun: false,
     })
     getByText('Firmware update available.')
     const button = getByText('Update now')
@@ -354,7 +350,7 @@ describe('ModuleCard', () => {
     const { getByText, getByLabelText } = render({
       module: mockMagneticModuleHub,
       robotName: mockRobot.name,
-      isModuleControl: false,
+      isLoadedInRun: false,
     })
     expect(getByText('Updating firmware...')).toBeVisible()
     expect(getByLabelText('ot-spinner')).toBeVisible()

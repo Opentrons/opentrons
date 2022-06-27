@@ -12,11 +12,14 @@ interface RunStatusesInfo {
   isLegacySessionInProgress: boolean
   isRunStill: boolean
   isRunTerminal: boolean
+  isRunIdle: boolean
 }
 
+//  TODO:(jr, 6/27/22): rename this hook or turn it into a utility, rename to something that includes sessions
 export function useRunStatuses(): RunStatusesInfo {
   const currentRunId = useCurrentRunId()
   const runStatus = useRunStatus(currentRunId)
+  const isRunIdle = runStatus === RUN_STATUS_IDLE
   const isRunTerminal =
     runStatus === RUN_STATUS_SUCCEEDED ||
     runStatus === RUN_STATUS_STOPPED ||
@@ -34,5 +37,5 @@ export function useRunStatuses(): RunStatusesInfo {
     runStatus === RUN_STATUS_FAILED ||
     runStatus === RUN_STATUS_IDLE
 
-  return { isLegacySessionInProgress, isRunStill, isRunTerminal }
+  return { isLegacySessionInProgress, isRunStill, isRunTerminal, isRunIdle }
 }

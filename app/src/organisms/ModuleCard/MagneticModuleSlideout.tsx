@@ -68,23 +68,30 @@ interface MagneticModuleSlideoutProps {
   module: MagneticModule
   onCloseClick: () => unknown
   isExpanded: boolean
-  runId?: string
+  isLoadedInRun: boolean
+  currentRunId?: string
 }
 
 export const MagneticModuleSlideout = (
   props: MagneticModuleSlideoutProps
 ): JSX.Element | null => {
-  const { module, isExpanded, onCloseClick, runId } = props
+  const {
+    module,
+    isExpanded,
+    onCloseClick,
+    isLoadedInRun,
+    currentRunId,
+  } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
-  const { isRunTerminal } = useRunStatuses()
+  const { isRunTerminal, isRunIdle } = useRunStatuses()
   const [engageHeightValue, setEngageHeightValue] = React.useState<
     string | null
   >(null)
   const { moduleIdFromRun } = useModuleIdFromRun(
     module,
-    runId != null ? runId : null
+    currentRunId != null ? currentRunId : null
   )
 
   const moduleName = getModuleDisplayName(module.moduleModel)
@@ -108,6 +115,12 @@ export const MagneticModuleSlideout = (
     }
   }
 
+  let moduleId: string
+  if (isRunIdle && currentRunId != null && isLoadedInRun) {
+    moduleId = moduleIdFromRun
+  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
+    moduleId = module.id
+  }
   const errorMessage =
     engageHeightValue != null &&
     (parseInt(engageHeightValue) < info.disengagedHeight ||
@@ -120,20 +133,22 @@ export const MagneticModuleSlideout = (
       const setEngageCommand: MagneticModuleEngageMagnetCreateCommand = {
         commandType: 'magneticModule/engage',
         params: {
-          moduleId:
-            runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
+          moduleId: moduleId,
           height: parseInt(engageHeightValue),
         },
       }
-      if (runId != null && !isRunTerminal) {
-        createCommand({ runId: runId, command: setEngageCommand }).catch(
+      if (isRunIdle && currentRunId != null && isLoadedInRun) {
+        createCommand({ runId: currentRunId, command: setEngageCommand }).catch(
           (e: Error) => {
             console.error(
-              `error setting module status with command type ${setEngageCommand.commandType} and run id ${runId}: ${e.message}`
+              `error setting module status with command type ${setEngageCommand.commandType} and run id ${currentRunId}: ${e.message}`
             )
           }
         )
-      } else {
+      } else if (
+        (currentRunId != null && isRunTerminal) ||
+        currentRunId == null
+      ) {
         createLiveCommand({ command: setEngageCommand }).catch((e: Error) => {
           console.error(
             `error setting module status with command type ${setEngageCommand.commandType}: ${e.message}`

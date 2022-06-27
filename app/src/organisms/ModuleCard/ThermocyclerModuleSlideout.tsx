@@ -24,6 +24,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { useRunStatuses } from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type { ThermocyclerModule } from '../../redux/modules/types'
@@ -31,32 +32,46 @@ import type {
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
-import { useRunStatuses } from '../Devices/hooks'
 
 interface ThermocyclerModuleSlideoutProps {
   module: ThermocyclerModule
   onCloseClick: () => unknown
   isExpanded: boolean
+  isLoadedInRun: boolean
   isSecondaryTemp?: boolean
-  runId?: string
+  currentRunId?: string
 }
 
 export const ThermocyclerModuleSlideout = (
   props: ThermocyclerModuleSlideoutProps
 ): JSX.Element | null => {
-  const { module, onCloseClick, isExpanded, isSecondaryTemp, runId } = props
+  const {
+    module,
+    onCloseClick,
+    isExpanded,
+    isLoadedInRun,
+    isSecondaryTemp,
+    currentRunId,
+  } = props
   const { t } = useTranslation('device_details')
   const [tempValue, setTempValue] = React.useState<number | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
-  const { isRunTerminal } = useRunStatuses()
+  const { isRunIdle, isRunTerminal } = useRunStatuses()
   const { moduleIdFromRun } = useModuleIdFromRun(
     module,
-    runId != null ? runId : null
+    currentRunId != null ? currentRunId : null
   )
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
+
+  let moduleId: string
+  if (isRunIdle && currentRunId != null && isLoadedInRun) {
+    moduleId = moduleIdFromRun
+  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
+    moduleId = module.id
+  }
 
   let errorMessage
   if (isSecondaryTemp) {
@@ -77,32 +92,33 @@ export const ThermocyclerModuleSlideout = (
       const saveLidCommand: TCSetTargetLidTemperatureCreateCommand = {
         commandType: 'thermocycler/setTargetLidTemperature',
         params: {
-          moduleId:
-            runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
+          moduleId: moduleId,
           celsius: tempValue,
         },
       }
       const saveBlockCommand: TCSetTargetBlockTemperatureCreateCommand = {
         commandType: 'thermocycler/setTargetBlockTemperature',
         params: {
-          moduleId:
-            runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
+          moduleId: moduleId,
           celsius: tempValue,
           //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
         },
       }
-      if (runId != null && !isRunTerminal) {
+      if (isRunIdle && currentRunId != null && isLoadedInRun) {
         createCommand({
-          runId: runId,
+          runId: currentRunId,
           command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
         }).catch((e: Error) => {
           console.error(
             `error setting module status with command type ${
               saveLidCommand.commandType ?? saveBlockCommand.commandType
-            } and run id ${runId}: ${e.message}`
+            } and run id ${currentRunId}: ${e.message}`
           )
         })
-      } else {
+      } else if (
+        (currentRunId != null && isRunTerminal) ||
+        currentRunId == null
+      ) {
         createLiveCommand({
           command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
         }).catch((e: Error) => {

@@ -229,6 +229,7 @@ describe('useLatchControls', () => {
     mockUseRunStatuses.mockReturnValue({
       isLegacySessionInProgress: true,
       isRunStill: true,
+      isRunIdle: false,
       isRunTerminal: false,
     })
     mockUseLiveCommandMutation.mockReturnValue({
@@ -311,6 +312,7 @@ describe('useModuleOverflowMenu', () => {
       isLegacySessionInProgress: true,
       isRunStill: true,
       isRunTerminal: false,
+      isRunIdle: false,
     })
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,

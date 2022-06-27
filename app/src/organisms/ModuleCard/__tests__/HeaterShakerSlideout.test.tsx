@@ -56,6 +56,7 @@ describe('HeaterShakerSlideout', () => {
       isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: true,
+      isRunIdle: false,
     })
     mockGetIsHeaterShakerAttached.mockReturnValue(false)
     mockUseLiveCommandMutation.mockReturnValue({
@@ -86,6 +87,7 @@ describe('HeaterShakerSlideout', () => {
       isSetShake: true,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByText } = render(props)
 
@@ -100,6 +102,7 @@ describe('HeaterShakerSlideout', () => {
       isSetShake: false,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByText } = render(props)
 
@@ -116,6 +119,7 @@ describe('HeaterShakerSlideout', () => {
       isSetShake: true,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
 
     const { getByRole, getByTestId, getByText } = render(props)
@@ -133,6 +137,7 @@ describe('HeaterShakerSlideout', () => {
       isSetShake: false,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Confirm' })
@@ -159,6 +164,7 @@ describe('HeaterShakerSlideout', () => {
       isSetShake: true,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
 
     const { getByRole, getByTestId } = render(props)
@@ -175,13 +181,15 @@ describe('HeaterShakerSlideout', () => {
       isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: false,
+      isRunIdle: true,
     })
     props = {
       module: mockHeaterShaker,
       isSetShake: true,
       isExpanded: true,
       onCloseClick: jest.fn(),
-      runId: 'test123',
+      isLoadedInRun: true,
+      currentRunId: 'test123',
     }
 
     const { getByRole, getByTestId, getByText } = render(props)
@@ -198,13 +206,15 @@ describe('HeaterShakerSlideout', () => {
       isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: false,
+      isRunIdle: true,
     })
     props = {
       module: mockHeaterShaker,
       isSetShake: false,
       isExpanded: true,
       onCloseClick: jest.fn(),
-      runId: 'test123',
+      isLoadedInRun: true,
+      currentRunId: 'test123',
     }
     const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Confirm' })
@@ -214,7 +224,7 @@ describe('HeaterShakerSlideout', () => {
     fireEvent.click(button)
 
     expect(mockCreateCommand).toHaveBeenCalledWith({
-      runId: props.runId,
+      runId: props.currentRunId,
       command: {
         commandType: 'heaterShaker/setTargetTemperature',
         params: {
