@@ -724,7 +724,6 @@ class InstrumentContext(CommandPublisher):
                 increment=increment,
             )
             # Note that the hardware API pick_up_tip action includes homing z after
-            self._implementation.prepare_for_aspirate()
 
         tiprack.use_tips(target, self.channels)
         self._last_tip_picked_up_from = target

@@ -1006,6 +1006,7 @@ class API(
             await self.move_rel(mount, rel_point, speed=speed)
 
         await self.retract(mount, spec.retract_target)
+        await self.prepare_for_aspirate(mount)
 
     async def drop_tip(self, mount: top_types.Mount, home_after: bool = True) -> None:
         """Drop tip at the current location."""

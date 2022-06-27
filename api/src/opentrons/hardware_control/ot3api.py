@@ -1047,6 +1047,7 @@ class OT3API(
         # Here we add in the debounce distance for the switch as
         # a safety precaution
         await self.retract(realmount, spec.retract_target)
+        await self.prepare_for_aspirate(realmount)
 
     def set_current_tiprack_diameter(
         self, mount: Union[top_types.Mount, OT3Mount], tiprack_diameter: float

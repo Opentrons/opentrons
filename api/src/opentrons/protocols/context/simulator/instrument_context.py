@@ -53,7 +53,6 @@ class InstrumentContextSimulation(AbstractInstrument):
         assert (
             new_volume <= self._pipette_dict["working_volume"]
         ), "Cannot aspirate more than pipette max volume"
-        self._pipette_dict["ready_to_aspirate"] = True
         self._update_volume(new_volume)
 
     def dispense(self, volume: float, rate: float) -> None:
@@ -92,6 +91,7 @@ class InstrumentContextSimulation(AbstractInstrument):
             geometry.max_volume, self.get_max_volume()
         )
         self._pipette_dict["available_volume"] = self._pipette_dict["working_volume"]
+        self._pipette_dict["ready_to_aspirate"] = True
 
     def drop_tip(self, home_after: bool) -> None:
         self._raise_if_no_tip(HardwareAction.DROPTIP.name)
