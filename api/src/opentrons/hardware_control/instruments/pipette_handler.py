@@ -137,7 +137,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         Also available as :py:meth:`get_attached_instruments`.
 
         This returns a dictified version of the
-        :py:class:`hardware_control.pipette.Pipette` as a dict keyed by
+        :py:class:`hardware_control.instruments.pipette.Pipette` as a dict keyed by
         the :py:class:`top_types.Mount` to which the pipette is attached.
         If no pipette is attached on a given mount, the mount key will
         still be present but will have the value ``None``.

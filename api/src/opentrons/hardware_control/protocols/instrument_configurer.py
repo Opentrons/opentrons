@@ -53,7 +53,7 @@ class InstrumentConfigurer(Protocol):
         Also available as :py:meth:`get_attached_instruments`.
 
         This returns a dictified version of the
-        hardware_control.pipette.Pipette as a dict keyed by
+        hardware_control.instruments.pipette.Pipette as a dict keyed by
         the Mount to which the pipette is attached.
         If no pipette is attached on a given mount, the mount key will
         still be present but will have the value ``None``.
