@@ -19,7 +19,7 @@ from typing import (
 from opentrons_shared_data.pipette.dev_types import UlPerMmAction
 
 from opentrons import types as top_types
-from .types import (
+from opentrons.hardware_control.types import (
     CriticalPoint,
     HardwareAction,
     TipAttachedError,
@@ -28,15 +28,15 @@ from .types import (
     OT3Axis,
     OT3Mount,
 )
-from .constants import (
+from opentrons.hardware_control.constants import (
     SHAKE_OFF_TIPS_SPEED,
     SHAKE_OFF_TIPS_PICKUP_DISTANCE,
     DROP_TIP_RELEASE_DISTANCE,
     SHAKE_OFF_TIPS_DROP_DISTANCE,
 )
 
-from .robot_calibration import load_pipette_offset
-from .dev_types import PipetteDict
+from opentrons.hardware_control.robot_calibration import load_pipette_offset
+from opentrons.hardware_control.dev_types import PipetteDict
 from .pipette import Pipette
 
 
@@ -94,13 +94,13 @@ class DropTipSpec(Generic[AxisType]):
     ending_current: Dict[AxisType, float]
 
 
-class InstrumentHandlerProvider(Generic[MountType]):
+class PipetteHandlerProvider(Generic[MountType]):
     IHP_LOG = MOD_LOG.getChild("InstrumentHandler")
 
     def __init__(self, attached_instruments: InstrumentsByMount[MountType]):
         assert attached_instruments
         self._attached_instruments: InstrumentsByMount[MountType] = attached_instruments
-        self._ihp_log = InstrumentHandlerProvider.IHP_LOG.getChild(str(id(self)))
+        self._ihp_log = PipetteHandlerProvider.IHP_LOG.getChild(str(id(self)))
 
     def reset_instrument(self, mount: Optional[MountType] = None) -> None:
         """
@@ -137,7 +137,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
         Also available as :py:meth:`get_attached_instruments`.
 
         This returns a dictified version of the
-        :py:class:`hardware_control.pipette.Pipette` as a dict keyed by
+        :py:class:`hardware_control.instruments.pipette.Pipette` as a dict keyed by
         the :py:class:`top_types.Mount` to which the pipette is attached.
         If no pipette is attached on a given mount, the mount key will
         still be present but will have the value ``None``.
@@ -892,7 +892,7 @@ class InstrumentHandlerProvider(Generic[MountType]):
         return pip
 
 
-class OT3InstrumentHandler(InstrumentHandlerProvider[OT3Mount]):
+class OT3PipetteHandler(PipetteHandlerProvider[OT3Mount]):
     """Override for correct plunger_position."""
 
     def plunger_position(
