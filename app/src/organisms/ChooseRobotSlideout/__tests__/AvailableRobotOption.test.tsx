@@ -64,10 +64,34 @@ describe('AvailableRobotOption', () => {
     fireEvent.click(container)
     expect(handleClick).toHaveBeenCalled()
   })
-  it('renders link to device details if software version is out of sync with app', () => {
+  it('renders link to device details if software version is out of sync with app and is selected', () => {
     const handleClick = jest.fn()
 
     const { getByText } = renderWithProviders(
+      <StaticRouter>
+        <AvailableRobotOption
+          robotName={robotName}
+          robotModel={robotModel}
+          local={false}
+          onClick={handleClick()}
+          isSelected={true}
+          isOnDifferentSoftwareVersion={true}
+        />
+      </StaticRouter>,
+      {
+        i18nInstance: i18n,
+      }
+    )[0]
+    expect(
+      getByText(
+        'A software update is available for this robot. Update to run protocols.'
+      )
+    ).toBeInTheDocument()
+  })
+  it('does not render link to device details if software version is out of sync with app and is not selected', () => {
+    const handleClick = jest.fn()
+
+    const { queryByText } = renderWithProviders(
       <StaticRouter>
         <AvailableRobotOption
           robotName={robotName}
@@ -83,9 +107,9 @@ describe('AvailableRobotOption', () => {
       }
     )[0]
     expect(
-      getByText(
+      queryByText(
         'A software update is available for this robot. Update to run protocols.'
       )
-    ).toBeInTheDocument()
+    ).toBeNull()
   })
 })
