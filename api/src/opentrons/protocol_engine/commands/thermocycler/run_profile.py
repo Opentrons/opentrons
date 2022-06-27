@@ -63,14 +63,27 @@ class RunProfileImpl(AbstractCommandImpl[RunProfileParams, RunProfileResult]):
             thermocycler_state.module_id
         )
 
-        steps = [
-            {"temperature": step.celsius, "hold_time_seconds": step.holdSeconds}
-            for step in params.profile
-        ]
+        steps = []
+        for profile_step in params.profile:
+            target_temperature = thermocycler_state.validate_target_block_temperature(
+                profile_step.celsius
+            )
+            steps.append(
+                {
+                    "temperature": target_temperature,
+                    "hold_time_seconds": profile_step.holdSeconds,
+                }
+            )
+
+        target_volume = thermocycler_state.validate_max_block_volume(
+            params.blockMaxVolumeUl
+        )
 
         if thermocycler_hardware is not None:
+            # TODO(jbl 2022-06-27) hardcoded constant 1 for `repetitions` should be
+            #  moved from HardwareControlAPI to the Python ProtocolContext
             await thermocycler_hardware.cycle_temperatures(
-                steps=steps, repetitions=1, volume=params.blockMaxVolumeUl
+                steps=steps, repetitions=1, volume=target_volume
             )
 
         return RunProfileResult()

@@ -45,13 +45,16 @@ async def test_run_profile(
         ThermocyclerModuleId("thermocycler-id")
     )
 
-    # # Stub temperature validation from hs module view
-    # decoy.when(tc_module_substate.validate_target_block_temperature(12.3)).then_return(
-    #     45.6
-    # )
-    #
-    # # Stub volume validation from hs module view
-    # decoy.when(tc_module_substate.validate_max_block_volume(50.2)).then_return(77.6)
+    # Stub temperature validation from hs module view
+    decoy.when(tc_module_substate.validate_target_block_temperature(12.3)).then_return(
+        32.1
+    )
+    decoy.when(tc_module_substate.validate_target_block_temperature(45.6)).then_return(
+        65.4
+    )
+
+    # Stub volume validation from hs module view
+    decoy.when(tc_module_substate.validate_max_block_volume(56.7)).then_return(76.5)
 
     # Get attached hardware modules
     decoy.when(
@@ -63,11 +66,11 @@ async def test_run_profile(
     decoy.verify(
         await tc_hardware.cycle_temperatures(
             steps=[
-                {"temperature": 12.3, "hold_time_seconds": 45},
-                {"temperature": 45.6, "hold_time_seconds": 78},
+                {"temperature": 32.1, "hold_time_seconds": 45},
+                {"temperature": 65.4, "hold_time_seconds": 78},
             ],
             repetitions=1,
-            volume=56.7,
+            volume=76.5,
         ),
         times=1,
     )
