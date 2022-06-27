@@ -88,7 +88,10 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
     )
   }
 
-  if (args.timerMinutes != null || args.timerSeconds != null) {
+  if (
+    (args.timerMinutes != null && args.timerMinutes !== 0) ||
+    (args.timerSeconds != null && args.timerSeconds !== 0)
+  ) {
     const totalSeconds =
       (args.timerSeconds ?? 0) + (args.timerMinutes ?? 0) * 60
     commandCreators.push(

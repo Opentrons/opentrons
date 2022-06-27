@@ -115,4 +115,43 @@ describe('heaterShaker compound command creator', () => {
       },
     ])
   })
+  it('should NOT delay and deactivate the heater shaker when a user specificies a timer tthat is 0 seconds', () => {
+    heaterShakerArgs = {
+      ...heaterShakerArgs,
+      rpm: 444,
+      targetTemperature: 80,
+      timerSeconds: 0,
+      timerMinutes: 0,
+    }
+    const result = heaterShaker(heaterShakerArgs, invariantContext, robotState)
+
+    expect(getSuccessResult(result).commands).toEqual([
+      {
+        commandType: 'heaterShaker/closeLabwareLatch',
+        params: {
+          moduleId: 'heaterShakerId',
+        },
+      },
+      {
+        commandType: 'heaterShaker/setTargetTemperature',
+        params: {
+          celsius: 80,
+          moduleId: 'heaterShakerId',
+        },
+      },
+      {
+        commandType: 'heaterShaker/waitForTemperature',
+        params: {
+          moduleId: 'heaterShakerId',
+        },
+      },
+      {
+        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
+        params: {
+          moduleId: 'heaterShakerId',
+          rpm: 444,
+        },
+      },
+    ])
+  })
 })
