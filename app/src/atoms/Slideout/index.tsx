@@ -80,30 +80,30 @@ export const Slideout = (props: Props): JSX.Element | null => {
   const slideOutRef = React.useRef<HTMLDivElement>(null)
   const [isReachedBottom, setIsReachedBottom] = React.useState<boolean>(false)
 
-  const onScroll = (): void => {
-    if (slideOutRef.current != null) {
-      const { scrollTop, scrollHeight, clientHeight } = slideOutRef.current
-      console.log('val', scrollTop, scrollHeight, clientHeight)
-      if (scrollTop + clientHeight === scrollHeight) {
-        setIsReachedBottom(true)
-      }
+  const handleScroll = (): void => {
+    if (slideOutRef.current == null) return
+    const { scrollTop, scrollHeight, clientHeight } = slideOutRef.current
+    if (scrollTop + clientHeight === scrollHeight) {
+      setIsReachedBottom(true)
+    } else {
+      setIsReachedBottom(false)
     }
   }
 
   React.useEffect(() => {
-    onScroll()
-  }, [])
+    handleScroll()
+  }, [slideOutRef])
 
   return (
     <>
-      {isExpanded ? (
+      {isExpanded ?? false ? (
         <Overlay
           onClick={onCloseClick}
           backgroundColor={COLORS.backgroundOverlay}
         />
       ) : null}
       <Box
-        css={isExpanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
+        css={isExpanded ?? false ? EXPANDED_STYLE : COLLAPSED_STYLE}
         position={POSITION_FIXED}
         right="0"
         top="0"
@@ -118,8 +118,6 @@ export const Slideout = (props: Props): JSX.Element | null => {
           flex="0 1 auto"
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          ref={slideOutRef}
-          onScroll={onScroll}
         >
           {typeof title === 'string' ? (
             <Flex
@@ -163,6 +161,8 @@ export const Slideout = (props: Props): JSX.Element | null => {
             data-testid={`Slideout_body_${
               typeof title === 'string' ? title : ''
             }`}
+            ref={slideOutRef}
+            onScroll={handleScroll}
           >
             {children}
           </Box>
