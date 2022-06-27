@@ -62,9 +62,8 @@ export function useProtocolRunAnalyticsData(
         protocolAppVersion:
           protocolAnalysis?.config?.protocolType === 'json'
             ? protocolAnalysis?.config?.schemaVersion.toFixed(1)
-            : protocolAnalysis?.metadata?.apiLevel.toFixed(1),
-        protocolApiVersion:
-          protocolAnalysis?.metadata?.apiLevel.toString() ?? '',
+            : protocolAnalysis?.metadata?.apiLevel,
+        protocolApiVersion: protocolAnalysis?.metadata?.apiLevel ?? '',
         protocolSource: protocolAnalysis?.metadata?.source ?? '',
         protocolName: protocolAnalysis?.metadata?.protocolName ?? '',
         pipettes: Object.values(protocolAnalysis?.pipettes ?? {})

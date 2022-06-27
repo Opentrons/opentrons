@@ -132,9 +132,9 @@ describe('useProtocolAnalysisErrors hook', () => {
       protocolRunAnalyticsData: {
         pipettes: FORMATTED_PIPETTES,
         modules: FORMATTED_MODULES,
-        protocolApiVersion: '2.3',
+        protocolApiVersion: 2.3,
         protocolAppName: 'Python API',
-        protocolAppVersion: '2.3',
+        protocolAppVersion: 2.3,
         protocolAuthor: 'hashedString',
         protocolName: 'robot protocol',
         protocolSource: 'robot protocol source',
@@ -156,7 +156,7 @@ describe('useProtocolAnalysisErrors hook', () => {
       protocolRunAnalyticsData: {
         pipettes: FORMATTED_PIPETTES,
         modules: FORMATTED_MODULES,
-        protocolApiVersion: '2.2',
+        protocolApiVersion: 2.2,
         protocolAppName: 'Protocol Designer',
         protocolAppVersion: '1.1',
         protocolAuthor: 'hashedString',
