@@ -97,9 +97,10 @@ class QueueCommandSpec(NamedTuple):
                     flowRate=1.23,
                     wellLocation=WellLocation(),
                 ),
-                key="command-key",
             ),
             expected_cls=commands.Dispense,
+            # test when key prop is missing
+            command_key="command-id",
         ),
         QueueCommandSpec(
             command_request=commands.DropTipCreate(
@@ -981,31 +982,3 @@ def test_handles_door_event_during_idle_run() -> None:
         errors_by_id={},
         run_started_at=None,
     )
-
-
-def test_handle_action_key_none() -> None:
-    """It should use command id for the command key."""
-    command_request = commands.WaitForResumeCreate(
-        params=commands.WaitForResumeParams(message="hello world"),
-    )
-
-    action = QueueCommandAction(
-        request=command_request,
-        created_at=datetime(year=2022, month=1, day=1),
-        command_id="command-id",
-    )
-
-    expected_command = commands.WaitForResume(
-        id="command-id",
-        key="command-id",
-        createdAt=datetime(year=2022, month=1, day=1),
-        status=commands.CommandStatus.QUEUED,
-        params=command_request.params,
-    )
-
-    subject = CommandStore()
-    subject.handle_action(action)
-
-    assert subject.state.commands_by_id == {
-        "command-id": CommandEntry(index=0, command=expected_command),
-    }
