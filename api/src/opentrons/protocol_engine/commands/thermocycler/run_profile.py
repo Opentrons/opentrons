@@ -16,7 +16,7 @@ RunProfileCommandType = Literal["thermocycler/runProfile"]
 
 
 class RunProfileStepParams(BaseModel):
-    """Input parameters for an individual Thermocycler profile step"""
+    """Input parameters for an individual Thermocycler profile step."""
 
     celsius: float = Field(..., description="Target temperature in °C.")
     holdSeconds: int = Field(
