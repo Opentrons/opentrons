@@ -22,7 +22,6 @@ import {
   POSITION_RELATIVE,
   DISPLAY_BLOCK,
   Link,
-  Card,
   JUSTIFY_SPACE_BETWEEN,
   TEXT_TRANSFORM_CAPITALIZE,
   Text,
@@ -59,12 +58,22 @@ const defaultTabStyle = css`
   border-top: ${BORDERS.transparentLineBorder};
   border-left: ${BORDERS.transparentLineBorder};
   border-right: ${BORDERS.transparentLineBorder};
-  color: ${COLORS.darkGreyEnabled};
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   position: ${POSITION_RELATIVE};
 `
 
+const inactiveTabStyle = css`
+  color: ${COLORS.darkGreyEnabled};
+
+  &:hover {
+    color: ${COLORS.darkGreyEnabled};
+    background-color: #eeeeee;
+    border-radius: 4px 4px 0px 0px;
+  }
+`
+
 const currentTabStyle = css`
+  ${TYPOGRAPHY.pSemiBold}
   background-color: ${COLORS.white};
   border-top: ${BORDERS.lineBorder};
   border-left: ${BORDERS.lineBorder};
@@ -100,7 +109,10 @@ function RoundTab({
               ${defaultTabStyle}
               ${currentTabStyle}
             `
-          : defaultTabStyle
+          : css`
+              ${defaultTabStyle}
+              ${inactiveTabStyle}
+            `
       }
     >
       {children}
@@ -284,10 +296,12 @@ export function ProtocolDetails(
         showSlideout={showSlideout}
         storedProtocolData={props}
       />
-      <Card
+      <Box
         marginBottom={SPACING.spacing4}
         padding={SPACING.spacing4}
         backgroundColor={COLORS.white}
+        border={`1px solid ${COLORS.medGrey}`}
+        borderRadius={BORDERS.radiusSoftCorners}
       >
         {analysisStatus !== 'loading' &&
         mostRecentAnalysis != null &&
@@ -302,9 +316,8 @@ export function ProtocolDetails(
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <StyledText
-            as="h3"
+            css={TYPOGRAPHY.h2SemiBold}
             marginBottom={SPACING.spacing4}
-            height="2.75rem"
             data-testid={`ProtocolDetails_${protocolDisplayName}`}
           >
             {protocolDisplayName}
@@ -324,7 +337,9 @@ export function ProtocolDetails(
             marginRight={SPACING.spacing4}
             data-testid={`ProtocolDetails_creationMethod`}
           >
-            <StyledText as="h6">{t('creation_method')}</StyledText>
+            <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+              {t('creation_method')}
+            </StyledText>
             <StyledText as="p">
               {analysisStatus === 'loading'
                 ? t('shared:loading')
@@ -336,7 +351,9 @@ export function ProtocolDetails(
             marginRight={SPACING.spacing4}
             data-testid={`ProtocolDetails_lastUpdated`}
           >
-            <StyledText as="h6">{t('last_updated')}</StyledText>
+            <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+              {t('last_updated')}
+            </StyledText>
             <StyledText as="p">
               {analysisStatus === 'loading'
                 ? t('shared:loading')
@@ -348,7 +365,9 @@ export function ProtocolDetails(
             marginRight={SPACING.spacing4}
             data-testid={`ProtocolDetails_lastAnalyzed`}
           >
-            <StyledText as="h6">{t('last_analyzed')}</StyledText>
+            <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+              {t('last_analyzed')}
+            </StyledText>
             <StyledText as="p">
               {analysisStatus === 'loading'
                 ? t('shared:loading')
@@ -365,12 +384,14 @@ export function ProtocolDetails(
         <Divider marginY={SPACING.spacing4} />
         <Flex flexDirection={DIRECTION_ROW}>
           <Flex
-            flex="1"
+            flex="0.34"
             flexDirection={DIRECTION_COLUMN}
             marginRight={SPACING.spacing4}
             data-testid={`ProtocolDetails_author`}
           >
-            <StyledText as="h6">{t('org_or_author')}</StyledText>
+            <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+              {t('org_or_author')}
+            </StyledText>
             <StyledText as="p">
               {analysisStatus === 'loading' ? t('shared:loading') : author}
             </StyledText>
@@ -381,7 +402,9 @@ export function ProtocolDetails(
             marginRight={SPACING.spacing4}
             data-testid={`ProtocolDetails_description`}
           >
-            <StyledText as="h6">{t('description')}</StyledText>
+            <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+              {t('description')}
+            </StyledText>
             {analysisStatus === 'loading' ? (
               <StyledText as="p">{t('shared:loading')}</StyledText>
             ) : null}
@@ -393,16 +416,18 @@ export function ProtocolDetails(
             ) : null}
           </Flex>
         </Flex>
-      </Card>
+      </Box>
 
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Card
+        <Box
           flex="0 0 20rem"
           backgroundColor={COLORS.white}
           data-testid={`ProtocolDetails_deckMap`}
+          border={`1px solid ${COLORS.medGrey}`}
+          borderRadius={BORDERS.radiusSoftCorners}
         >
           <StyledText
             as="h3"
@@ -427,7 +452,7 @@ export function ProtocolDetails(
               }[analysisStatus]
             }
           </Box>
-        </Card>
+        </Box>
 
         <Flex
           width="100%"
