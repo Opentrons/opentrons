@@ -8,7 +8,7 @@ from opentrons.hardware_control.modules.types import (
     HeaterShakerStatus,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
+from opentrons.drivers.types import HeaterShakerLabwareLatchStatus, Temperature, RPM
 
 
 @pytest.fixture
@@ -181,11 +181,11 @@ async def test_deactivated_updated_live_data(simulating_module):
 
 
 async def fake_get_rpm(*args, **kwargs):
-    return 500
+    return RPM(current=500, target=500)
 
 
 async def fake_get_temperature(*args, **kwargs):
-    return 50
+    return Temperature(current=50, target=50)
 
 
 async def fake_get_latch_status(*args, **kwargs):
@@ -235,3 +235,13 @@ async def test_async_error_response(simulating_module_driver_patched):
         == "RuntimeError()"
     )
     assert simulating_module_driver_patched.status == HeaterShakerStatus.ERROR
+    simulating_module_driver_patched._driver.get_temperature.side_effect = (
+        fake_get_temperature
+    )
+    simulating_module_driver_patched._driver.get_rpm.side_effect = fake_get_rpm
+    simulating_module_driver_patched._driver.get_labware_latch_status.side_effect = (
+        fake_get_latch_status
+    )
+    await simulating_module_driver_patched.wait_next_poll()
+    assert simulating_module_driver_patched.live_data["data"]["errorDetails"] is None
+    assert simulating_module_driver_patched.status == HeaterShakerStatus.RUNNING
