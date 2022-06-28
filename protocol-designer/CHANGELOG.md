@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.0...v6.0.0-alpha.3) (2022-06-28)
+
+
+### Features
+
+* **protocol-designer:** add collision warnings for heater shaker ([#10759](https://github.com/Opentrons/opentrons/issues/10759)) ([039d597](https://github.com/Opentrons/opentrons/commit/039d597ddbbf615e5acd8c41795cb5a825e2174f)), closes [#10514](https://github.com/Opentrons/opentrons/issues/10514)
+* **protocol-designer:** add HS announcement modal ([#10795](https://github.com/Opentrons/opentrons/issues/10795)) ([b9f0d9f](https://github.com/Opentrons/opentrons/commit/b9f0d9fdae0dbd6565f9bbc794318cf290de7acc)), closes [#9973](https://github.com/Opentrons/opentrons/issues/9973)
+* **protocol-designer:** bump PD version to 6.0 ([#10796](https://github.com/Opentrons/opentrons/issues/10796)) ([5419409](https://github.com/Opentrons/opentrons/commit/5419409ee353e9454deba149cc27bc0f239996be)), closes [#9853](https://github.com/Opentrons/opentrons/issues/9853)
+* **protocol-designer:** export TC load module commands with slot 7 ([#10829](https://github.com/Opentrons/opentrons/issues/10829)) ([540dae2](https://github.com/Opentrons/opentrons/commit/540dae239b17a844db8d51d6ca5642c6be91f60e)), closes [#10808](https://github.com/Opentrons/opentrons/issues/10808)
+* **protocol-designer:** update export modal ([#10807](https://github.com/Opentrons/opentrons/issues/10807)) ([431a535](https://github.com/Opentrons/opentrons/commit/431a53528a3536afce386cfb3f8614fd182824f6)), closes [#9987](https://github.com/Opentrons/opentrons/issues/9987)
+
+
+
+
+
 # [6.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.2...v6.0.0-beta.0) (2022-06-10)
 
 

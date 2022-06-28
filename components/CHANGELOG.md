@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.0...v6.0.0-alpha.3) (2022-06-28)
+
+
+### Features
+
+* **app:** liquid setup labware detail modal ([#10742](https://github.com/Opentrons/opentrons/issues/10742)) ([bda60f1](https://github.com/Opentrons/opentrons/commit/bda60f115ab929367c01e7b931622c28163b7960)), closes [#10669](https://github.com/Opentrons/opentrons/issues/10669)
+* **app:** map view of liquid setup  ([#10743](https://github.com/Opentrons/opentrons/issues/10743)) ([e8eab25](https://github.com/Opentrons/opentrons/commit/e8eab253444c546d0cefcfb116957a1666779b22)), closes [#10519](https://github.com/Opentrons/opentrons/issues/10519)
+* **app:** modal design qa feedback round 2 ([#10868](https://github.com/Opentrons/opentrons/issues/10868)) ([aba9664](https://github.com/Opentrons/opentrons/commit/aba9664450a668d3295c47908a2e6a5f1c12521c)), closes [#10866](https://github.com/Opentrons/opentrons/issues/10866)
+
+
+
+
+
 # [6.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.2...v6.0.0-beta.0) (2022-06-10)
 
 **Note:** Version bump only for package @opentrons/components
