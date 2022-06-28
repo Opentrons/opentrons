@@ -5,6 +5,7 @@ from opentrons.hardware_control.backends.ot3utils import (
     node_to_axis,
 )
 from opentrons_hardware.drivers.can_bus import CanMessenger
+from opentrons.config import gripper_config
 from opentrons.config.types import OT3Config
 from opentrons.config.robot_configs import build_config_ot3
 from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName
@@ -250,7 +251,7 @@ async def test_get_attached_instruments(
     mock_tool_detector.return_value = ToolSummary(
         left=PipetteInformation(name=PipetteName.p1000_single, model=0, serial="hello"),
         right=None,
-        gripper=GripperInformation(model=1, serial="fake_serial"),
+        gripper=GripperInformation(model=0, serial="fake_serial"),
     )
 
     with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
