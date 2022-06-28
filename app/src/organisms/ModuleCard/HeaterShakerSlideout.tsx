@@ -170,6 +170,11 @@ export const HeaterShakerSlideout = (
   const inputMin = isSetShake ? HS_RPM_MIN : HS_TEMP_MIN
   const unit = isSetShake ? RPM : CELSIUS
 
+  const handleCloseSlideout = (): void => {
+    setHsValue(null)
+    onCloseClick()
+  }
+
   return (
     <>
       {showConfirmationModal && (
@@ -186,7 +191,7 @@ export const HeaterShakerSlideout = (
           part: modulePart,
           name: moduleName,
         })}
-        onCloseClick={onCloseClick}
+        onCloseClick={handleCloseSlideout}
         isExpanded={isExpanded}
         footer={
           <SubmitPrimaryButton

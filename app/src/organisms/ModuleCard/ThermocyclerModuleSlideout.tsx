@@ -134,10 +134,15 @@ export const ThermocyclerModuleSlideout = (
     onCloseClick()
   }
 
+  const handleCloseSlideout = (): void => {
+    setTempValue(null)
+    onCloseClick()
+  }
+
   return (
     <Slideout
       title={t('tc_set_temperature', { part: modulePart, name: moduleName })}
-      onCloseClick={onCloseClick}
+      onCloseClick={handleCloseSlideout}
       isExpanded={isExpanded}
       footer={
         <SubmitPrimaryButton
