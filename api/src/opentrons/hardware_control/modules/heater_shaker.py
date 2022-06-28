@@ -2,8 +2,7 @@ import asyncio
 import logging
 from anyio import create_task_group
 from dataclasses import dataclass
-from contextlib import contextmanager
-from typing import Optional, Mapping, Callable, Tuple, Iterator, Type
+from typing import Optional, Mapping, Callable
 from typing_extensions import Final
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.heater_shaker.driver import HeaterShakerDriver
