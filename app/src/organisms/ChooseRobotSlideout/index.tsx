@@ -55,10 +55,9 @@ export function ChooseRobotSlideout(
   const { t } = useTranslation(['protocol_details', 'shared'])
   const { storedProtocolData, showSlideout, onCloseClick, ...restProps } = props
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
-  const [
-    createProtocolCreationError,
-    setCreateProtocolCreationError,
-  ] = React.useState<string | null>(null)
+  const [createRunError, setCreateRunError] = React.useState<string | null>(
+    null
+  )
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
 
@@ -120,7 +119,7 @@ export function ChooseRobotSlideout(
             disabled={selectedRobot == null}
             protocolKey={protocolKey}
             srcFileObjects={srcFileObjects}
-            setError={setCreateProtocolCreationError}
+            setError={setCreateRunError}
             robotName={selectedRobot != null ? selectedRobot.name : ''}
           />
         </ApiHostProvider>
@@ -165,26 +164,25 @@ export function ChooseRobotSlideout(
             const isSelected =
               selectedRobot != null && selectedRobot.ip === robot.ip
             return (
-              <>
+              <Flex flexDirection={DIRECTION_COLUMN} key={robot.ip}>
                 <AvailableRobotOption
-                  key={robot.ip}
                   robotName={robot.name}
                   robotModel="OT-2"
                   local={robot.local}
                   onClick={() => {
-                    setCreateProtocolCreationError(null)
+                    setCreateRunError(null)
                     setSelectedRobot(
                       selectedRobot != null && robot.ip === selectedRobot.ip
                         ? null
                         : robot
                     )
                   }}
-                  error={createProtocolCreationError}
+                  isError={createRunError != null}
                   isSelected={
                     selectedRobot != null && selectedRobot.ip === robot.ip
                   }
                 />
-                {createProtocolCreationError != null && isSelected && (
+                {createRunError != null && isSelected && (
                   <StyledText
                     as="label"
                     color={COLORS.error}
@@ -192,10 +190,10 @@ export function ChooseRobotSlideout(
                     marginTop={`-${SPACING.spacing2}`}
                     marginBottom={SPACING.spacing3}
                   >
-                    {createProtocolCreationError}
+                    {createRunError}
                   </StyledText>
                 )}
-              </>
+              </Flex>
             )
           })
         )}
@@ -236,11 +234,13 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
     srcFileObjects,
     robotName,
     setError,
+    disabled,
     ...buttonProps
   } = props
   const {
     createRunFromProtocolSource,
     runCreationError,
+    isCreatingRun,
   } = useCreateRunFromProtocol({
     onSuccess: ({ data: runData }) => {
       history.push(`/devices/${robotName}/protocol-runs/${runData.id}`)
@@ -258,7 +258,12 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
   }
 
   return (
-    <PrimaryButton onClick={handleClick} width="100%" {...buttonProps}>
+    <PrimaryButton
+      onClick={handleClick}
+      width="100%"
+      disabled={isCreatingRun || disabled}
+      {...buttonProps}
+    >
       {t('proceed_to_setup')}
     </PrimaryButton>
   )

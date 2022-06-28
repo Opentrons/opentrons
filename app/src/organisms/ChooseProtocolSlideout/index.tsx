@@ -50,10 +50,9 @@ export function ChooseProtocolSlideout(
     selectedProtocol,
     setSelectedProtocol,
   ] = React.useState<StoredProtocolData | null>(first(storedProtocols) ?? null)
-  const [
-    createProtocolCreationError,
-    setCreateProtocolCreationError,
-  ] = React.useState<string | null>(null)
+  const [createRunError, setCreateRunError] = React.useState<string | null>(
+    null
+  )
 
   const srcFileObjects =
     selectedProtocol != null
@@ -75,7 +74,7 @@ export function ChooseProtocolSlideout(
               selectedProtocol != null ? selectedProtocol.protocolKey : ''
             }
             srcFileObjects={srcFileObjects}
-            setError={setCreateProtocolCreationError}
+            setError={setCreateRunError}
             robotName={name}
           />
         </ApiHostProvider>
@@ -87,13 +86,15 @@ export function ChooseProtocolSlideout(
             selectedProtocol != null &&
             storedProtocol.protocolKey === selectedProtocol.protocolKey
           return (
-            <>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              key={storedProtocol.protocolKey}
+            >
               <MiniCard
-                key={storedProtocol.protocolKey}
                 isSelected={isSelected}
-                error={createProtocolCreationError}
+                isError={createRunError != null}
                 onClick={() => {
-                  setCreateProtocolCreationError(null)
+                  setCreateRunError(null)
                   setSelectedProtocol(storedProtocol)
                 }}
               >
@@ -118,7 +119,7 @@ export function ChooseProtocolSlideout(
                     storedProtocol.protocolKey}
                 </StyledText>
               </MiniCard>
-              {createProtocolCreationError != null && isSelected && (
+              {createRunError != null && isSelected && (
                 <StyledText
                   as="label"
                   color={COLORS.error}
@@ -126,10 +127,10 @@ export function ChooseProtocolSlideout(
                   marginTop={`-${SPACING.spacing2}`}
                   marginBottom={SPACING.spacing3}
                 >
-                  {createProtocolCreationError}
+                  {createRunError}
                 </StyledText>
               )}
-            </>
+            </Flex>
           )
         })
       ) : (
@@ -183,11 +184,13 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
     srcFileObjects,
     robotName,
     setError,
+    disabled,
     ...buttonProps
   } = props
   const {
     createRunFromProtocolSource,
     runCreationError,
+    isCreatingRun,
   } = useCreateRunFromProtocol({
     onSuccess: ({ data: runData }) => {
       history.push(`/devices/${robotName}/protocol-runs/${runData.id}`)
@@ -205,7 +208,12 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
   }
 
   return (
-    <PrimaryButton onClick={handleClick} width="100%" {...buttonProps}>
+    <PrimaryButton
+      onClick={handleClick}
+      disabled={isCreatingRun || disabled}
+      width="100%"
+      {...buttonProps}
+    >
       {t('proceed_to_setup')}
     </PrimaryButton>
   )

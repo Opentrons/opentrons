@@ -20,15 +20,15 @@ interface AvailableRobotOptionProps {
   local: boolean | null
   onClick: () => void
   isSelected: boolean
-  error?: string | null
+  isError: boolean
 }
 
 export function AvailableRobotOption(
   props: AvailableRobotOptionProps
 ): JSX.Element {
-  const { robotName, robotModel, local, onClick, isSelected, error } = props
+  const { robotName, robotModel, local, onClick, isSelected, isError } = props
   return (
-    <MiniCard onClick={onClick} isSelected={isSelected} error={error}>
+    <MiniCard onClick={onClick} isSelected={isSelected} isError={isError}>
       <img
         src={OT2_PNG}
         css={css`
