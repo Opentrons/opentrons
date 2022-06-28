@@ -440,11 +440,8 @@ def test_get_movement_waypoints_to_well_raises(
             Point(x=4, y=5, z=6),
             max_travel_z=123,
             min_travel_z=456,
-            move_type=motion_planning.MoveType.GENERAL_ARC,
-            xy_waypoints=[],
-            origin_cp=None,
-            dest_cp=None,
         ),
+        ignore_extra_args=True,
     ).then_raise(
         motion_planning.MotionPlanningError(
             origin=Point(1, 2, 3),
@@ -553,10 +550,8 @@ def test_get_movement_waypoints_to_coords_raises(
             Point(x=1, y=2, z=3),
             max_travel_z=123,
             min_travel_z=123,
-            move_type=motion_planning.MoveType.GENERAL_ARC,
-            origin_cp=None,
-            dest_cp=None,
         ),
+        ignore_extra_args=True,
     ).then_raise(
         motion_planning.MotionPlanningError(
             origin=Point(1, 2, 3),
