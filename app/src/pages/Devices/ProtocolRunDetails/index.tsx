@@ -121,7 +121,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
   const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
 
   const robot = useRobot(robotName)
-
+  useSyncRobotClock(robotName)
   interface ProtocolRunDetailsTabProps {
     protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
     robotName: string

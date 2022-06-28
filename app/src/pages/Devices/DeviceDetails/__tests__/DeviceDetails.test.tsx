@@ -8,6 +8,7 @@ import { mockFetchModulesSuccessActionPayloadModules } from '../../../../redux/m
 import {
   useAttachedModules,
   useRobot,
+  useSyncRobotClock,
 } from '../../../../organisms/Devices/hooks'
 import { PipettesAndModules } from '../../../../organisms/Devices/PipettesAndModules'
 import { RecentProtocolRuns } from '../../../../organisms/Devices/RecentProtocolRuns'
@@ -19,6 +20,9 @@ jest.mock('../../../../organisms/Devices/PipettesAndModules')
 jest.mock('../../../../organisms/Devices/RecentProtocolRuns')
 jest.mock('../../../../organisms/Devices/RobotOverview')
 
+const mockUseSyncRobotClock = useSyncRobotClock as jest.MockedFunction<
+  typeof useSyncRobotClock
+>
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
 >
@@ -69,6 +73,12 @@ describe('DeviceDetails', () => {
     const [{ getByText }] = render('/devices/otie')
 
     getByText('Mock RobotOverview')
+  })
+
+  it('syncs robot system clock on mount', () => {
+    render(`/devices/otie/protocol-runs/${RUN_ID}/setup`)
+
+    expect(mockUseSyncRobotClock).toHaveBeenCalledWith('otie')
   })
 
   it('renders PipettesAndModules when a robot is found', () => {
