@@ -96,7 +96,7 @@ const LABEL_TEXT_STYLE = css`
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   color: ${COLORS.darkBlack};
   flex: 0 0 auto;
-  padding: 0 0.5rem;
+  padding: ${SPACING.spacing3} ${SPACING.spacing3};
 
   &:empty {
     padding: 0;
@@ -124,11 +124,13 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
         checked={props.value || false}
         disabled={props.disabled}
         onChange={props.onChange}
-        tabIndex={props.tabIndex}
+        tabIndex={0}
         /* @ts-expect-error */
         indeterminate={indeterminate}
       />
-      <Box css={LABEL_TEXT_STYLE}>{props.label}</Box>
+      <Box css={LABEL_TEXT_STYLE} tabIndex={0}>
+        {props.label}
+      </Box>
     </label>
   )
 }
