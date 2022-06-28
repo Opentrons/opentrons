@@ -185,11 +185,6 @@ async def test_sync_rpm_error_response(simulating_module_driver_patched):
     simulating_module_driver_patched._driver.set_rpm.side_effect = RuntimeError()
     with pytest.raises(RuntimeError):
         await simulating_module_driver_patched.set_speed(rpm=500)
-    assert (
-        simulating_module_driver_patched.live_data["data"]["errorDetails"]
-        == "RuntimeError()"
-    )
-    assert simulating_module_driver_patched.status == HeaterShakerStatus.ERROR
 
 
 async def test_sync_temp_error_response(simulating_module_driver_patched):
@@ -199,11 +194,6 @@ async def test_sync_temp_error_response(simulating_module_driver_patched):
     )
     with pytest.raises(RuntimeError):
         await simulating_module_driver_patched.set_temperature(celsius=50)
-    assert (
-        simulating_module_driver_patched.live_data["data"]["errorDetails"]
-        == "RuntimeError()"
-    )
-    assert simulating_module_driver_patched.status == HeaterShakerStatus.ERROR
 
 
 async def test_sync_deactivate_error_response(simulating_module_driver_patched):
@@ -213,11 +203,6 @@ async def test_sync_deactivate_error_response(simulating_module_driver_patched):
     )
     with pytest.raises(RuntimeError):
         await simulating_module_driver_patched.deactivate()
-    assert (
-        simulating_module_driver_patched.live_data["data"]["errorDetails"]
-        == "RuntimeError()"
-    )
-    assert simulating_module_driver_patched.status == HeaterShakerStatus.ERROR
 
 
 async def test_sync_latch_error_response(simulating_module_driver_patched):
@@ -227,11 +212,6 @@ async def test_sync_latch_error_response(simulating_module_driver_patched):
     )
     with pytest.raises(RuntimeError):
         await simulating_module_driver_patched.open_labware_latch()
-    assert (
-        simulating_module_driver_patched.live_data["data"]["errorDetails"]
-        == "RuntimeError()"
-    )
-    assert simulating_module_driver_patched.status == HeaterShakerStatus.ERROR
 
 
 async def test_async_error_response(simulating_module_driver_patched):
