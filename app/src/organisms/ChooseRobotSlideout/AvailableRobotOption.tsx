@@ -88,6 +88,7 @@ export function AvailableRobotOption(
         <StyledText
           as="label"
           color={COLORS.errorText}
+          marginBottom={SPACING.spacing3}
           css={css`
             & > a {
               color: ${COLORS.errorText};
