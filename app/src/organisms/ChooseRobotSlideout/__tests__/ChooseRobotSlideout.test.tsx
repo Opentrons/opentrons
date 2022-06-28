@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
+
 import { i18n } from '../../../i18n'
 import { useProtocolDetailsForRun } from '../../../organisms/Devices/hooks'
 import {
@@ -23,7 +25,6 @@ import {
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { ChooseRobotSlideout } from '../'
-import { fireEvent } from '@testing-library/react'
 
 import type { ProtocolDetails } from '../../../organisms/Devices/hooks'
 

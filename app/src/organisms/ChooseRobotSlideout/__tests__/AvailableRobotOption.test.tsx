@@ -45,7 +45,7 @@ describe('AvailableRobotOption', () => {
     )
     expect(queryByLabelText('wifi')).toBeInTheDocument()
   })
-  it('calls onClick prop when clickecd', () => {
+  it('calls onClick prop when clicked', () => {
     const handleClick = jest.fn()
 
     const { container } = render(
@@ -60,5 +60,18 @@ describe('AvailableRobotOption', () => {
     )
     fireEvent.click(container)
     expect(handleClick).toHaveBeenCalled()
+  })
+  it('renders error state when error present on selected robot', () => {
+    const { getByLabelText } = render(
+      <AvailableRobotOption
+        robotName={robotName}
+        robotModel={robotModel}
+        local={false}
+        onClick={jest.fn()}
+        isSelected={true}
+        isError={true}
+      />
+    )
+    expect(getByLabelText('icon_error')).toBeInTheDocument()
   })
 })
