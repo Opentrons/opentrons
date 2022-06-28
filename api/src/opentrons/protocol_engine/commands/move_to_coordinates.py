@@ -1,9 +1,11 @@
 """Move to coordinates command request, result, and implementation models."""
 from __future__ import annotations
+
 from pydantic import BaseModel, Field
 from typing import Optional, Type, TYPE_CHECKING
 from typing_extensions import Literal
 
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.types import Point
 
 from ..types import DeckPoint
@@ -11,7 +13,6 @@ from .pipetting_common import PipetteIdMixin
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
-    from opentrons.hardware_control import HardwareControlAPI
     from ..execution import MovementHandler
     from ..state import StateView
 
