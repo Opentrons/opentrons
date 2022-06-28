@@ -1,4 +1,4 @@
-"""Helpers for flagging unsafe movements around a heater shaker Module."""
+"""Helpers for flagging unsafe movements around a heater-shaker Module."""
 
 
 from typing import List, Optional
@@ -23,7 +23,7 @@ from ..errors import HeaterShakerMovementRestrictionError
 
 
 class HeaterShakerMovementFlagger:
-    """A helper for flagging unsafe movements around a Heater Shaker Module.
+    """A helper for flagging unsafe movements around a Heater-Shaker Module.
 
     This is only intended for use by MovementHandler.
     It's a separate class for independent testability.
@@ -38,7 +38,7 @@ class HeaterShakerMovementFlagger:
             state_store: The Protocol Engine state store interface. Used to figure out
                          modules on deck, deck location, and getting pipette data
             hardware_api: The underlying hardware interface. Used to query
-                          Heater Shaker's current states.
+                          Heater-Shaker's current states.
         """
         self._state_store = state_store
         self._hardware_api = hardware_api
@@ -46,7 +46,7 @@ class HeaterShakerMovementFlagger:
     async def raise_if_movement_restricted(
         self, labware_id: str, pipette_id: str
     ) -> None:
-        """Flag restricted movement around/to a Heater Shaker."""
+        """Flag restricted movement around/to a Heater-Shaker."""
         heater_shaker_modules = [
             module
             for module in self._state_store.modules.get_all()
@@ -59,7 +59,7 @@ class HeaterShakerMovementFlagger:
             if heater_shaker_hardware is None:
                 raise HeaterShakerMovementRestrictionError(
                     f"Cannot resolve heater-shaker movement restrictions."
-                    f' No Heater Shaker found with serial number "{heater_shaker_module.serialNumber}".'
+                    f' No Heater-Shaker found with serial number "{heater_shaker_module.serialNumber}".'
                 )
 
             heater_shaker_slot_int = int(self._resolve_location(heater_shaker_module))
@@ -76,22 +76,22 @@ class HeaterShakerMovementFlagger:
             dest_heater_shaker = dest_slot_int == heater_shaker_slot_int
 
             if any([dest_east_west, dest_north_south, dest_heater_shaker]):
-                # If heater shaker is running, can't move in any cardinal direction of it
+                # If heater-shaker is running, can't move in any cardinal direction of it
                 if heater_shaker_hardware.status != HeaterShakerStatus.IDLE and (
                     dest_east_west or dest_north_south
                 ):
                     raise HeaterShakerMovementRestrictionError(
-                        "Cannot move pipette to adjacent slot while Heater Shaker is shaking"
+                        "Cannot move pipette to adjacent slot while Heater-Shaker is shaking"
                     )
 
-                # If heater shaker's latch is open, can't move to it or east and west of it
+                # If heater-shaker's latch is open, can't move to it or east and west of it
                 elif (
                     heater_shaker_hardware.labware_latch_status
                     != HeaterShakerLabwareLatchStatus.IDLE_CLOSED
                     and (dest_east_west or dest_heater_shaker)
                 ):
                     raise HeaterShakerMovementRestrictionError(
-                        "Cannot move pipette east or west of or to Heater Shaker while latch is open"
+                        "Cannot move pipette east or west of or to Heater-Shaker while latch is open"
                     )
 
                 # TODO will this work in simulation?
@@ -104,14 +104,14 @@ class HeaterShakerMovementFlagger:
                     # Can't go to east/west slot under any circumstances if pipette is multi-channel
                     if dest_east_west:
                         raise HeaterShakerMovementRestrictionError(
-                            "Cannot move multi-channel pipette east or west of Heater Shaker"
+                            "Cannot move multi-channel pipette east or west of Heater-Shaker"
                         )
                     # Can only go north/west if the labware is a tiprack
                     elif dest_north_south and not self._state_store.labware.is_tiprack(
                         labware_id
                     ):
                         raise HeaterShakerMovementRestrictionError(
-                            "Cannot move multi-channel pipette north or south of Heater Shaker to non-tiprack labware"
+                            "Cannot move multi-channel pipette north or south of Heater-Shaker to non-tiprack labware"
                         )
 
     def _resolve_location(self, module: LoadedModule) -> DeckSlotName:
@@ -123,17 +123,17 @@ class HeaterShakerMovementFlagger:
     async def _find_heater_shaker_by_serial(
         self, serial_number: str
     ) -> Optional[HardwareHeaterShaker]:
-        """Find the hardware Heater Shaker with the given serial number.
+        """Find the hardware Heater-Shaker with the given serial number.
 
         Returns:
-            The matching hardware Heater Shaker, or None if none was found.
+            The matching hardware Heater-Shaker, or None if none was found.
         """
         available_modules, simulating_module = await self._hardware_api.find_modules(
             by_model=OpentronsHeaterShakerModuleModel.HEATER_SHAKER_V1,
             # Hard-coding instead of using
             # opentrons.protocols.geometry.module_geometry.resolve_module_type(),
             # to avoid parsing a JSON definition every time a protocol runs when a
-            # heater shaker is on the deck
+            # heater-shaker is on the deck
             resolved_type=OpentronsModuleType.HEATER_SHAKER,
         )
 
@@ -143,7 +143,7 @@ class HeaterShakerMovementFlagger:
 
         for module in modules_to_check:
             # Different module types have different keys under .device_info.
-            # Heater shakers should always have .device_info["serial"].
+            # Heater-shakers should always have .device_info["serial"].
             if (
                 isinstance(module, HardwareHeaterShaker)
                 and module.device_info["serial"] == serial_number
