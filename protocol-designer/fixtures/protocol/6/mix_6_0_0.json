@@ -2199,7 +2199,7 @@
         "location": { "slotName": "7" }
       }
     },
-    { "commandType": "delay", "params": { "message": "", "wait": 3723 } },
+    { "commandType": "delay", "params": { "message": "", "seconds": 3723 } },
     {
       "commandType": "pickUpTip",
       "params": {
