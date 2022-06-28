@@ -377,6 +377,7 @@ export function ProtocolDetails(
           <PrimaryButton
             onClick={() => setShowSlideout(true)}
             data-testid={`ProtocolDetails_runProtocol`}
+            disabled={analysisStatus === 'loading'}
           >
             {t('run_protocol')}
           </PrimaryButton>
