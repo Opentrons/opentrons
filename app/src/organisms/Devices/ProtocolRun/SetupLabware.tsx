@@ -290,7 +290,7 @@ export function SetupLabware({
                   marginRight={SPACING.spacing2}
                 />
                 <StyledText css={TYPOGRAPHY.labelRegular}>
-                  {t('optional')}
+                  {t('recommended')}
                 </StyledText>
               </Flex>
             </Flex>
