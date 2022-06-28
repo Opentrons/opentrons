@@ -502,7 +502,7 @@ class CommandView(HasState[CommandState]):
             CommandExecutionFailedError: if any added command failed.
         """
         no_command_running = self._state.running_command_id is None
-        no_command_queued = len(self._state.queued_command_ids) == 0
+        no_command_queued = self.get_next_queued() is None
 
         if no_command_running and no_command_queued:
             for command_id in self._state.all_command_ids:
