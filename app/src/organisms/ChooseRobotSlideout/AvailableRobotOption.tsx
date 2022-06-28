@@ -23,7 +23,7 @@ interface AvailableRobotOptionProps {
   local: boolean | null
   onClick: () => void
   isSelected: boolean
-  isError: boolean
+  isError?: boolean
   isOnDifferentSoftwareVersion: boolean
 }
 
@@ -36,7 +36,7 @@ export function AvailableRobotOption(
     local,
     onClick,
     isSelected,
-    isError,
+    isError = false,
     isOnDifferentSoftwareVersion,
   } = props
   const { t } = useTranslation('protocol_list')
