@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.0...v6.0.0-alpha.3) (2022-06-28)
+
+
+### Features
+
+* **papi-v2:** restrict placement of heater-shaker modules ([#10785](https://github.com/Opentrons/opentrons/issues/10785)) ([3c74e30](https://github.com/Opentrons/opentrons/commit/3c74e30e1183844e456c5e9bef7779141a2fa115)), closes [#10316](https://github.com/Opentrons/opentrons/issues/10316)
+* **shared-data:** add gripper specs ([#10722](https://github.com/Opentrons/opentrons/issues/10722)) ([9dc6a28](https://github.com/Opentrons/opentrons/commit/9dc6a28a5cc94c0794f394d877836a634c44afce))
+
+
+
+
+
 # [6.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.2...v6.0.0-beta.0) (2022-06-10)
 
 **Note:** Version bump only for package @opentrons/shared-data

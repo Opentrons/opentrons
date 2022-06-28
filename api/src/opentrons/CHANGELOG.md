@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.0...v6.0.0-alpha.3) (2022-06-28)
+
+
+### Bug Fixes
+
+* **api:** fix multiple h/s bugs ([#10727](https://github.com/Opentrons/opentrons/issues/10727)) ([b8c7c88](https://github.com/Opentrons/opentrons/commit/b8c7c8878a8c99ad2f2c5d6bc150faecb0b7f7d4)), closes [#10605](https://github.com/Opentrons/opentrons/issues/10605) [#10258](https://github.com/Opentrons/opentrons/issues/10258)
+* **engine:** include modules w/o labware in motion planning ([#10902](https://github.com/Opentrons/opentrons/issues/10902)) ([0b0dfae](https://github.com/Opentrons/opentrons/commit/0b0dfae27211607ace9465b63e1fe0024a855fee))
+* **robot-server:** allow live commands if current run is terminal ([#10879](https://github.com/Opentrons/opentrons/issues/10879)) ([0ee0c72](https://github.com/Opentrons/opentrons/commit/0ee0c728a1517009336c2c6e2135eaaf0dab2150))
+* **robot-server:** calculate magnetic module gen 1 height  ([#10724](https://github.com/Opentrons/opentrons/issues/10724)) ([c231d1b](https://github.com/Opentrons/opentrons/commit/c231d1b841b40018ad891aeb5a3cb707d34e0ea8)), closes [#9515](https://github.com/Opentrons/opentrons/issues/9515)
+* **robot-server, api:** Disallow python protocol upload with unsupported version ([#10780](https://github.com/Opentrons/opentrons/issues/10780)) ([da8d9af](https://github.com/Opentrons/opentrons/commit/da8d9af65d47207251131d413aca284e08612132))
+
+
+### Features
+
+* **api:** add heaterShakerModuleContext and methods to PAPIv2 ([#10426](https://github.com/Opentrons/opentrons/issues/10426)) ([6461ec8](https://github.com/Opentrons/opentrons/commit/6461ec84846151ccc68640cc6a0bbdfb7cf35590))
+* **engine:** open and close thermocycler lid ([#10760](https://github.com/Opentrons/opentrons/issues/10760)) ([1e82c26](https://github.com/Opentrons/opentrons/commit/1e82c26a8f8aa6d0f4821390109661216a095732))
+* **engine:** set flow rate in aspirate, dispense, and blowout ([#10800](https://github.com/Opentrons/opentrons/issues/10800)) ([0e66677](https://github.com/Opentrons/opentrons/commit/0e666777f96dd832b08efba255ef0e28a31641d6))
+* **engine:** touch tip PAPIv3 ([#10678](https://github.com/Opentrons/opentrons/issues/10678)) ([25c99df](https://github.com/Opentrons/opentrons/commit/25c99df9e4ac89107af51bfa720e2d3242946f83))
+* **hardware:** add ot3 gpio driver, set estop ([#10776](https://github.com/Opentrons/opentrons/issues/10776)) ([b1ad8d2](https://github.com/Opentrons/opentrons/commit/b1ad8d20f4de8c3e39b928c848e34f7466f305ae))
+* **papi-v2:** restrict placement of heater-shaker modules ([#10785](https://github.com/Opentrons/opentrons/issues/10785)) ([3c74e30](https://github.com/Opentrons/opentrons/commit/3c74e30e1183844e456c5e9bef7779141a2fa115)), closes [#10316](https://github.com/Opentrons/opentrons/issues/10316)
+
+
+
+
+
 # [6.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.2...v6.0.0-beta.0) (2022-06-10)
 
 
