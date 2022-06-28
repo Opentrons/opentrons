@@ -2,7 +2,7 @@ import * as React from 'react'
 import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, getByText } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import {
   getConnectableRobots,
@@ -84,7 +84,7 @@ describe('ProtocolDetails', () => {
 
   it('renders protocol title as display name if present in metadata', () => {
     const protocolName = 'fakeProtocolDisplayName'
-    const { getByRole } = render({
+    const { getByText } = render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -99,10 +99,10 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    getByRole('heading', { name: 'fakeProtocolDisplayName' })
+    getByText('fakeProtocolDisplayName')
   })
   it('renders protocol title as file name if not in metadata', () => {
-    const { getByRole } = render({
+    const { getByText } = render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -117,9 +117,7 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    expect(
-      getByRole('heading', { name: 'fakeSrcFileName' })
-    ).toBeInTheDocument()
+    expect(getByText('fakeSrcFileName')).toBeInTheDocument()
   })
   it('renders deck setup section', () => {
     const { getByRole, getByText } = render({

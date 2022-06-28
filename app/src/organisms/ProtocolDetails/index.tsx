@@ -67,7 +67,7 @@ const inactiveTabStyle = css`
 
   &:hover {
     color: ${COLORS.darkGreyEnabled};
-    background-color: #eeeeee;
+    background-color: ${COLORS.fundamentalsBackgroundShade};
     border-radius: 4px 4px 0px 0px;
   }
 `
