@@ -245,7 +245,10 @@ class OT3Simulator:
     def _attached_gripper_to_mount(self, init_instr: GripperSpec) -> AttachedGripper:
         found_model = init_instr["model"]
         if found_model:
-            return {"config": gripper_config.load(), "id": init_instr["id"]}
+            return {
+                "config": gripper_config.load(GripperModel.V1),
+                "id": init_instr["id"],
+            }
         else:
             return {"config": None, "id": None}
 

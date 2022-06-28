@@ -26,7 +26,9 @@ def test_config_update():
     for k, v in config_to_update.items():
         gripr.update_config_item(k, v)
     assert gripr.config.z_idle_current == config_to_update["z_idle_current"]
-    assert gripr.config.jaw_reference_voltage == config_to_update["jaw_reference_voltage"]
+    assert (
+        gripr.config.jaw_reference_voltage == config_to_update["jaw_reference_voltage"]
+    )
 
 
 def test_id_get_added_to_dict():

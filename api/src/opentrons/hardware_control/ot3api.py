@@ -18,7 +18,6 @@ from typing import (
     Any,
 )
 
-
 from opentrons_shared_data.pipette import name_config
 from opentrons import types as top_types
 from opentrons.config import robot_configs
@@ -66,11 +65,12 @@ from .types import (
 from . import modules
 from .robot_calibration import (
     load_pipette_offset,
+    load_gripper_calibration_offset,
     OT3Transforms,
     RobotCalibration,
     build_ot3_transforms,
 )
-
+from . import gripper
 
 from .protocols import HardwareControlAPI
 from .instruments.pipette_handler import OT3PipetteHandler, InstrumentsByMount
@@ -88,7 +88,13 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
 
-from .dev_types import AttachedPipette, PipetteDict, InstrumentDict, GripperDict
+from .dev_types import (
+    AttachedGripper,
+    AttachedPipette,
+    PipetteDict,
+    InstrumentDict,
+    GripperDict,
+)
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     MoveConditionNotMet,
 )
@@ -395,6 +401,42 @@ class OT3API(
             return GantryLoad.GRIPPER
         return GantryLoad.NONE
 
+    async def cache_pipette(
+        self, mount: OT3Mount, instrument_data: AttachedPipette, req_instr: PipetteName
+    ) -> None:
+        """Set up pipette based on scanned information."""
+        config = instrument_data.get("config")
+        pip_id = instrument_data.get("id")
+        pip_offset_cal = load_pipette_offset(pip_id, mount.to_mount())
+        p, may_skip = load_from_config_and_check_skip(
+            config,
+            self._instrument_handler.hardware_instruments[mount],
+            req_instr,
+            pip_id,
+            pip_offset_cal,
+        )
+        self._instrument_handler.hardware_instruments[mount] = p
+        if req_instr and p:
+            p.act_as(req_instr)
+        if not may_skip:
+            self._log.info(f"Doing full configuration on {mount.name}")
+            hw_config = generate_hardware_configs_ot3(
+                p, self._config, self._backend.board_revision
+            )
+            await self._backend.configure_mount(mount, hw_config)
+        else:
+            self._log.info(f"Skipping configuration on {mount.name}")
+
+    async def cache_gripper(self, instrument_data: AttachedGripper) -> None:
+        """Set up gripper based on scanned information."""
+        grip_cal = load_gripper_calibration_offset(instrument_data.get("id"))
+        g = gripper.compare_gripper_config_and_check_skip(
+            instrument_data,
+            self._instrument_handler.hardware_instruments[OT3Mount.GRIPPER],
+            grip_cal,
+        )
+        self._instrument_handler.hardware_instruments[OT3Mount.GRIPPER] = g
+
     async def cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
     ) -> None:
@@ -413,33 +455,16 @@ class OT3API(
             found = await self._backend.get_attached_instruments(checked_require)
 
         for mount, instrument_data in found.items():
+            req_instr_name = checked_require.get(mount, None)
             if mount == OT3Mount.GRIPPER:
-                continue
-            instrument_data = cast(AttachedPipette, instrument_data)
-            config = instrument_data.get("config")
-            req_instr = checked_require.get(mount, None)
-            pip_id = instrument_data.get("id")
-            pip_offset_cal = load_pipette_offset(pip_id, mount.to_mount())
-            p, may_skip = load_from_config_and_check_skip(
-                config,
-                self._pipette_handler.hardware_instruments[mount],
-                req_instr,
-                pip_id,
-                pip_offset_cal,
-            )
-            self._pipette_handler.hardware_instruments[mount] = p
-            if req_instr and p:
-                p.act_as(req_instr)
+                self.cache_gripper(cast(instrument_data, AttachedGripper))
+            else:
+                self.cache_pipette(
+                    mount,
+                    cast(instrument_data, AttachedPipette),
+                    cast(req_instr_name, PipetteName),
+                )
 
-            if may_skip:
-                self._log.info(f"Skipping configuration on {mount.name}")
-                continue
-
-            self._log.info(f"Doing full configuration on {mount.name}")
-            hw_config = generate_hardware_configs_ot3(
-                p, self._config, self._backend.board_revision
-            )
-            await self._backend.configure_mount(mount, hw_config)
         await self._backend.probe_network()
         await self.set_gantry_load(
             self._gantry_load_from_instruments(

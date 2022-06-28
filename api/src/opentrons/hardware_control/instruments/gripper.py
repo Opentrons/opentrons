@@ -4,13 +4,17 @@ from __future__ import annotations
 """
 from dataclasses import asdict, replace
 import logging
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Set, Tuple, Union
 
 from opentrons.types import Point
 from opentrons.calibration_storage.types import GripperCalibrationOffset
 from opentrons.config import gripper_config
 from opentrons.hardware_control.types import CriticalPoint
 from .instrument_abc import AbstractInstrument
+from .types import CriticalPoint
+from .dev_types import AttachedGripper
+
+from opentrons_shared_data.gripper.dev_types import GripperName, GripperModel
 
 RECONFIG_KEYS = {"quirks"}
 
@@ -100,3 +104,66 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             }
         )
         return self._config_as_dict
+
+
+def _reload_gripper(
+    new_config: gripper_config.GripperConfig,
+    attached_instr: Gripper,
+    cal_offset: GripperCalibrationOffset,
+) -> Gripper:
+    # Once we have determined that the new and attached grippers
+    # are similar enough that we might skip, see if the configs
+    # match closely enough.
+    # Returns a gripper object
+    if (
+        new_config == attached_instr.config
+        and cal_offset == attached_instr._calibration_offset
+    ):
+        # Same config, good enough
+        return attached_instr
+    else:
+        newdict = asdict(new_config)
+        olddict = asdict(attached_instr.config)
+        changed: Set[str] = set()
+        for k in newdict.keys():
+            if newdict[k] != olddict[k]:
+                changed.add(k)
+        if changed.intersection(RECONFIG_KEYS):
+            # Something has changed that requires reconfig
+            return Gripper(new_config, cal_offset, attached_instr._gripper_id)
+    return attached_instr
+
+
+def compare_gripper_config_and_check_skip(
+    freshly_detected: AttachedGripper,
+    attached: Optional[Gripper],
+    cal_offset: GripperCalibrationOffset,
+) -> Optional[Gripper]:
+    """
+    Given the gripper config for an attached gripper (if any) freshly read
+    from disk, and any attached instruments,
+
+    - Compare the new and configured gripper configs
+    - Load the new configs if they differ
+    - Return a bool indicating whether hardware reconfiguration may be
+      skipped
+    """
+    config = freshly_detected.get("config")
+    serial = freshly_detected.get("id")
+
+    if config and not attached:
+        # nothing attached now, nothing used to be attached, nothing
+        # to reconfigure
+        return attached
+
+    if config and attached:
+        # something was attached and something is attached. are they
+        # the same? we can tell by comparing serials
+        if serial == attached.gripper_id:
+            # similar enough to check
+            return _reload_gripper(config, attached, cal_offset)
+
+    if config:
+        return Gripper(config, cal_offset, serial)
+    else:
+        return None
