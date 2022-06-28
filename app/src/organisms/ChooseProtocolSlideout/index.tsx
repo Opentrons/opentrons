@@ -11,6 +11,7 @@ import {
   TYPOGRAPHY,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
+  Box,
   Flex,
   BORDERS,
   DIRECTION_COLUMN,
@@ -118,8 +119,18 @@ export function ChooseProtocolSlideout(
                     first(storedProtocol.srcFileNames) ??
                     storedProtocol.protocolKey}
                 </StyledText>
+                {createRunError != null && isSelected ? (
+                  <>
+                    <Box flex="1 1 auto" />
+                    <Icon
+                      name="alert-circle"
+                      size="1.25rem"
+                      color={COLORS.error}
+                    />
+                  </>
+                ) : null}
               </MiniCard>
-              {createRunError != null && isSelected && (
+              {createRunError != null && isSelected ? (
                 <StyledText
                   as="label"
                   color={COLORS.errorText}
@@ -129,7 +140,7 @@ export function ChooseProtocolSlideout(
                 >
                   {createRunError}
                 </StyledText>
-              )}
+              ) : null}
             </Flex>
           )
         })

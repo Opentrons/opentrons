@@ -181,7 +181,10 @@ export function ChooseRobotSlideout(
                   robotName={robot.name}
                   robotModel="OT-2"
                   local={robot.local}
-                  onClick={() => setSelectedRobot(isSelected ? null : robot)}
+                  onClick={() => {
+                    setCreateRunError(null)
+                    setSelectedRobot(isSelected ? null : robot)
+                  }}
                   isError={createRunError != null}
                   isSelected={isSelected}
                   isOnDifferentSoftwareVersion={
