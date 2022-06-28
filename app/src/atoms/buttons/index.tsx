@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import {
   TYPOGRAPHY,
   COLORS,
@@ -140,4 +140,46 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
 export const ToggleButton = (props: ToggleBtnProps): JSX.Element => {
   const color = props.toggledOn ? COLORS.blue : COLORS.darkGreyEnabled
   return <ToggleBtn size={SIZE_2} color={color} {...props} />
+}
+
+interface SubmitPrimaryButtonProps {
+  form: string
+  value: string
+  onClick?: (event: React.MouseEvent<HTMLInputElement>) => unknown
+  disabled?: boolean
+}
+export const SubmitPrimaryButton = (
+  props: SubmitPrimaryButtonProps
+): JSX.Element => {
+  const SUBMIT_INPUT_STYLE = css`
+    background-color: ${COLORS.blue};
+    border-radius: ${BORDERS.radiusSoftCorners};
+    padding: ${SPACING.spacing3} ${SPACING.spacing4};
+    color: ${COLORS.white};
+    line-height: ${TYPOGRAPHY.lineHeight20};
+    ${TYPOGRAPHY.pSemiBold}
+    width: 100%;
+    border: none;
+
+    ${styleProps}
+
+    &:focus-visible {
+      box-shadow: 0 0 0 3px ${COLORS.warning};
+    }
+
+    &:hover {
+      background-color: ${COLORS.blueHover};
+      box-shadow: 0 0 0;
+    }
+
+    &:active {
+      background-color: ${COLORS.bluePressed};
+    }
+
+    &:disabled {
+      background-color: ${COLORS.greyDisabled};
+      color: ${COLORS.disabled};
+    }
+  `
+  return <input {...props} css={SUBMIT_INPUT_STYLE} type="submit" />
 }

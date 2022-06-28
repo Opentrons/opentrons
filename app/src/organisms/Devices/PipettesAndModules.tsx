@@ -20,7 +20,7 @@ import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
-import { useIsRobotViewable } from './hooks'
+import { useIsRobotViewable, useRunStatuses } from './hooks'
 import { PipetteCard } from './PipetteCard'
 
 const EQUIPMENT_POLL_MS = 5000
@@ -40,6 +40,7 @@ export function PipettesAndModules({
   })?.data ?? { left: undefined, right: undefined }
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
+  const { isRunTerminal } = useRunStatuses()
 
   return (
     <Flex
@@ -63,7 +64,7 @@ export function PipettesAndModules({
         width="100%"
         flexDirection={DIRECTION_COLUMN}
       >
-        {currentRunId != null && (
+        {currentRunId != null && !isRunTerminal && (
           <Flex
             paddingBottom={SPACING.spacing4}
             flexDirection={DIRECTION_COLUMN}
@@ -112,7 +113,11 @@ export function PipettesAndModules({
                     key={`moduleCard_${module.moduleType}_${index}`}
                     width={`calc(50% - ${SPACING.spacing2})`}
                   >
-                    <ModuleCard module={module} robotName={robotName} />
+                    <ModuleCard
+                      module={module}
+                      robotName={robotName}
+                      isLoadedInRun={false}
+                    />
                   </Flex>
                 )
               })}

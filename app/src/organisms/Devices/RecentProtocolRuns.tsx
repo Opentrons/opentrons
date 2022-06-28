@@ -22,7 +22,7 @@ import { fetchProtocols } from '../../redux/protocol-storage'
 import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { HistoricalProtocolRun } from './HistoricalProtocolRun'
-import { useIsRobotViewable } from './hooks'
+import { useIsRobotViewable, useRunStatuses } from './hooks'
 import { useSelector } from 'react-redux'
 import type { State } from '../../redux/types'
 
@@ -40,7 +40,8 @@ export function RecentProtocolRuns({
   const runs = runsQueryResponse?.data?.data
   const protocols = useAllProtocolsQuery()
   const currentRunId = useCurrentRunId()
-  const robotIsBusy = currentRunId != null
+  const { isRunTerminal } = useRunStatuses()
+  const robotIsBusy = currentRunId != null ? !isRunTerminal : false
   const latestRequestId = last(requestIds)
   const isFetching = useSelector<State, boolean>(state =>
     latestRequestId != null

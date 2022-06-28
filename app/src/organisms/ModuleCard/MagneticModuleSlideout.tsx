@@ -29,7 +29,8 @@ import {
 import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
 import { InputField } from '../../atoms/InputField'
-import { PrimaryButton } from '../../atoms/buttons'
+import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { useRunStatuses } from '../Devices/hooks'
 
 import type { TFunctionResult } from 'i18next'
 import type { MagneticModule } from '../../redux/modules/types'
@@ -63,27 +64,34 @@ const getInfoByModel = (model: MagneticModuleModel): ModelContents => {
     }
   }
 }
-
 interface MagneticModuleSlideoutProps {
   module: MagneticModule
   onCloseClick: () => unknown
   isExpanded: boolean
-  runId?: string
+  isLoadedInRun: boolean
+  currentRunId?: string
 }
 
 export const MagneticModuleSlideout = (
   props: MagneticModuleSlideoutProps
 ): JSX.Element | null => {
-  const { module, isExpanded, onCloseClick, runId } = props
+  const {
+    module,
+    isExpanded,
+    onCloseClick,
+    isLoadedInRun,
+    currentRunId,
+  } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
+  const { isRunTerminal, isRunIdle } = useRunStatuses()
   const [engageHeightValue, setEngageHeightValue] = React.useState<
     string | null
   >(null)
   const { moduleIdFromRun } = useModuleIdFromRun(
     module,
-    runId != null ? runId : null
+    currentRunId != null ? currentRunId : null
   )
 
   const moduleName = getModuleDisplayName(module.moduleModel)
@@ -107,6 +115,12 @@ export const MagneticModuleSlideout = (
     }
   }
 
+  let moduleId: string
+  if (isRunIdle && currentRunId != null && isLoadedInRun) {
+    moduleId = moduleIdFromRun
+  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
+    moduleId = module.id
+  }
   const errorMessage =
     engageHeightValue != null &&
     (parseInt(engageHeightValue) < info.disengagedHeight ||
@@ -119,19 +133,22 @@ export const MagneticModuleSlideout = (
       const setEngageCommand: MagneticModuleEngageMagnetCreateCommand = {
         commandType: 'magneticModule/engage',
         params: {
-          moduleId: runId != null ? moduleIdFromRun : module.id,
+          moduleId: moduleId,
           height: parseInt(engageHeightValue),
         },
       }
-      if (runId != null) {
-        createCommand({ runId: runId, command: setEngageCommand }).catch(
+      if (isRunIdle && currentRunId != null && isLoadedInRun) {
+        createCommand({ runId: currentRunId, command: setEngageCommand }).catch(
           (e: Error) => {
             console.error(
-              `error setting module status with command type ${setEngageCommand.commandType} and run id ${runId}: ${e.message}`
+              `error setting module status with command type ${setEngageCommand.commandType} and run id ${currentRunId}: ${e.message}`
             )
           }
         )
-      } else {
+      } else if (
+        (currentRunId != null && isRunTerminal) ||
+        currentRunId == null
+      ) {
         createLiveCommand({ command: setEngageCommand }).catch((e: Error) => {
           console.error(
             `error setting module status with command type ${setEngageCommand.commandType}: ${e.message}`
@@ -140,6 +157,7 @@ export const MagneticModuleSlideout = (
       }
     }
     setEngageHeightValue(null)
+    onCloseClick()
   }
 
   return (
@@ -148,14 +166,13 @@ export const MagneticModuleSlideout = (
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
-        <PrimaryButton
-          width="100%"
+        <SubmitPrimaryButton
+          form="MagneticModuleSlideout_submitValue"
+          value={t('confirm')}
           onClick={handleSubmitHeight}
           disabled={engageHeightValue == null || errorMessage !== null}
           data-testid={`MagneticModuleSlideout_btn_${module.serialNumber}`}
-        >
-          {t('confirm')}
-        </PrimaryButton>
+        />
       }
     >
       <StyledText
@@ -236,21 +253,23 @@ export const MagneticModuleSlideout = (
         >
           {t('set_engage_height')}
         </StyledText>
-        <InputField
-          data-testid={`${module.moduleModel}`}
-          id={`${module.moduleModel}`}
-          autoFocus
-          units={info.units}
-          value={engageHeightValue}
-          onChange={e => setEngageHeightValue(e.target.value)}
-          type="number"
-          caption={t('module_status_range', {
-            min: info.disengagedHeight,
-            max: info.maxHeight,
-            unit: info.units,
-          })}
-          error={errorMessage}
-        />
+        <form id="MagneticModuleSlideout_submitValue">
+          <InputField
+            data-testid={`${module.moduleModel}`}
+            id={`${module.moduleModel}`}
+            units={info.units}
+            value={engageHeightValue}
+            autoFocus
+            onChange={e => setEngageHeightValue(e.target.value)}
+            type="number"
+            caption={t('module_status_range', {
+              min: info.disengagedHeight,
+              max: info.maxHeight,
+              unit: info.units,
+            })}
+            error={errorMessage}
+          />
+        </form>
       </Flex>
     </Slideout>
   )
