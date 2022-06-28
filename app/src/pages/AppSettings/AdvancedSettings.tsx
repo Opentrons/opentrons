@@ -285,8 +285,8 @@ export function AdvancedSettings(): JSX.Element {
             </StyledText>
             {labwarePath !== '' ? (
               <Link
+                role="button"
                 css={TYPOGRAPHY.pRegular}
-                external
                 color={COLORS.darkBlack}
                 onClick={() =>
                   dispatch(CustomLabware.openCustomLabwareDirectory())
