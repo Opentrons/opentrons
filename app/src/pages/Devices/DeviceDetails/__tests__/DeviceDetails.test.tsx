@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
@@ -40,7 +40,9 @@ const mockRecentProtocolRuns = RecentProtocolRuns as jest.MockedFunction<
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <DeviceDetails />
+      <Route path="/devices/:robotName">
+        <DeviceDetails />
+      </Route>
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -68,16 +70,11 @@ describe('DeviceDetails', () => {
     expect(queryByText('Mock RobotOverview')).toBeFalsy()
   })
 
-  it('renders a RobotOverview when a robot is found', () => {
+  it('renders a RobotOverview when a robot is found and syncs clock', () => {
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     const [{ getByText }] = render('/devices/otie')
 
     getByText('Mock RobotOverview')
-  })
-
-  it('syncs robot system clock on mount', () => {
-    render(`/devices/otie/protocol-runs/${RUN_ID}/setup`)
-
     expect(mockUseSyncRobotClock).toHaveBeenCalledWith('otie')
   })
 

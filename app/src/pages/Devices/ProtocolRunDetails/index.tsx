@@ -29,6 +29,7 @@ import {
   useProtocolDetailsForRun,
   useRobot,
   useRunStatuses,
+  useSyncRobotClock,
 } from '../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { RunLog } from '../../../organisms/Devices/ProtocolRun/RunLog'
