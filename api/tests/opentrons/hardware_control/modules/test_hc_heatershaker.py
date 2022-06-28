@@ -1,6 +1,6 @@
 import asyncio
 import pytest
-from unittest import mock
+import mock
 from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.modules.types import (
     TemperatureStatus,
@@ -180,38 +180,47 @@ async def test_deactivated_updated_live_data(simulating_module):
     }
 
 
-async def test_sync_rpm_error_response(simulating_module_driver_patched):
+async def fake_get_rpm(*args, **kwargs):
+    return 500
+
+
+async def fake_get_temperature(*args, **kwargs):
+    return 50
+
+
+async def fake_get_latch_status(*args, **kwargs):
+    return HeaterShakerLabwareLatchStatus.IDLE_OPEN
+
+
+@pytest.mark.parametrize(
+    "mock_get_rpm,mock_get_temperature,mock_get_latch_status",
+    [
+        (fake_get_rpm, RuntimeError(), fake_get_latch_status),
+        (RuntimeError(), fake_get_temperature, fake_get_latch_status),
+        (fake_get_rpm, fake_get_temperature, RuntimeError()),
+    ],
+)
+async def test_sync_rpm_error_response(
+    simulating_module_driver_patched,
+    mock_get_rpm,
+    mock_get_temperature,
+    mock_get_latch_status,
+):
     """Test that synchronous rpm response with error updates module live data and status."""
-    simulating_module_driver_patched._driver.set_rpm.side_effect = RuntimeError()
+    simulating_module_driver_patched._driver.get_rpm.side_effect = mock_get_rpm
+    simulating_module_driver_patched._driver.get_temperature.side_effect = (
+        mock_get_temperature
+    )
+    simulating_module_driver_patched._driver.get_labware_latch_status.side_effect = (
+        mock_get_latch_status
+    )
+
+    async def fake_rpm_setter(*args, **kwargs):
+        pass
+
+    simulating_module_driver_patched._driver.set_rpm.side_effect = fake_rpm_setter
     with pytest.raises(RuntimeError):
         await simulating_module_driver_patched.set_speed(rpm=500)
-
-
-async def test_sync_temp_error_response(simulating_module_driver_patched):
-    """Test that synchronous temperature response with error updates module live data and status."""
-    simulating_module_driver_patched._driver.set_temperature.side_effect = (
-        RuntimeError()
-    )
-    with pytest.raises(RuntimeError):
-        await simulating_module_driver_patched.set_temperature(celsius=50)
-
-
-async def test_sync_deactivate_error_response(simulating_module_driver_patched):
-    """Test that synchronous deactivate response with error updates module live data and status."""
-    simulating_module_driver_patched._driver.deactivate_heater.side_effect = (
-        RuntimeError()
-    )
-    with pytest.raises(RuntimeError):
-        await simulating_module_driver_patched.deactivate()
-
-
-async def test_sync_latch_error_response(simulating_module_driver_patched):
-    """Test that synchronous latch response with error updates module live data and status."""
-    simulating_module_driver_patched._driver.open_labware_latch.side_effect = (
-        RuntimeError()
-    )
-    with pytest.raises(RuntimeError):
-        await simulating_module_driver_patched.open_labware_latch()
 
 
 async def test_async_error_response(simulating_module_driver_patched):
