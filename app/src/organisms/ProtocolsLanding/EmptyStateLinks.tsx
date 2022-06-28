@@ -65,13 +65,12 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
             marginRight={SPACING.spacing3}
             external
           >
-             {t('launch_protocol_designer')}
-              <Icon
-                name={'open-in-new'}
-                marginLeft={SPACING.spacing2}
-                size="0.5rem"
-              />
-            
+            {t('launch_protocol_designer')}
+            <Icon
+              name={'open-in-new'}
+              marginLeft={SPACING.spacing2}
+              size="0.5rem"
+            />
           </Link>
         </StyledText>
         <StyledText>
