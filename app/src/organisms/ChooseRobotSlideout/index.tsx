@@ -13,6 +13,7 @@ import {
   COLORS,
   BORDERS,
   DIRECTION_COLUMN,
+  DISPLAY_INLINE_BLOCK,
   TYPOGRAPHY,
   SIZE_1,
   SIZE_2,
@@ -54,6 +55,9 @@ export function ChooseRobotSlideout(
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_details', 'shared'])
   const { storedProtocolData, showSlideout, onCloseClick, ...restProps } = props
+  const [createRunError, setCreateRunError] = React.useState<string | null>(
+    null
+  )
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
 
@@ -126,6 +130,7 @@ export function ChooseRobotSlideout(
             }
             protocolKey={protocolKey}
             srcFileObjects={srcFileObjects}
+            setError={setCreateRunError}
             robotName={selectedRobot != null ? selectedRobot.name : ''}
           />
         </ApiHostProvider>
@@ -166,27 +171,40 @@ export function ChooseRobotSlideout(
             </StyledText>
           </Flex>
         ) : (
-          healthyReachableRobots.map(robot => (
-            <AvailableRobotOption
-              key={robot.ip}
-              robotName={robot.name}
-              robotModel="OT-2"
-              local={robot.local}
-              onClick={() =>
-                setSelectedRobot(
-                  selectedRobot != null && robot.ip === selectedRobot.ip
-                    ? null
-                    : robot
-                )
-              }
-              isSelected={
-                selectedRobot != null && selectedRobot.ip === robot.ip
-              }
-              isOnDifferentSoftwareVersion={
-                isSelectedRobotOnWrongVersionOfSoftware
-              }
-            />
-          ))
+          healthyReachableRobots.map(robot => {
+            const isSelected =
+              selectedRobot != null && selectedRobot.ip === robot.ip
+            return (
+              <Flex key={robot.ip} flexDirection={DIRECTION_COLUMN}>
+                <AvailableRobotOption
+                  key={robot.ip}
+                  robotName={robot.name}
+                  robotModel="OT-2"
+                  local={robot.local}
+                  onClick={() => {
+                    setCreateRunError(null)
+                    setSelectedRobot(isSelected ? null : robot)
+                  }}
+                  isError={createRunError != null}
+                  isSelected={isSelected}
+                  isOnDifferentSoftwareVersion={
+                    isSelectedRobotOnWrongVersionOfSoftware
+                  }
+                />
+                {createRunError != null && isSelected && (
+                  <StyledText
+                    as="label"
+                    color={COLORS.errorText}
+                    display={DISPLAY_INLINE_BLOCK}
+                    marginTop={`-${SPACING.spacing2}`}
+                    marginBottom={SPACING.spacing3}
+                  >
+                    {createRunError}
+                  </StyledText>
+                )}
+              </Flex>
+            )
+          })
         )}
         {!isScanning && unavailableCount > 0 ? (
           <Flex
@@ -219,23 +237,46 @@ interface CreateRunButtonProps
   srcFileObjects: File[]
   protocolKey: string
   robotName: string
+  setError: (error: string | null) => void
 }
 function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
   const { t } = useTranslation('protocol_details')
   const history = useHistory()
-  const { protocolKey, srcFileObjects, robotName, ...buttonProps } = props
-  const { createRunFromProtocolSource } = useCreateRunFromProtocol({
+  const {
+    protocolKey,
+    srcFileObjects,
+    robotName,
+    setError,
+    disabled,
+    ...buttonProps
+  } = props
+  const {
+    createRunFromProtocolSource,
+    runCreationError,
+    isCreatingRun,
+  } = useCreateRunFromProtocol({
     onSuccess: ({ data: runData }) => {
       history.push(`/devices/${robotName}/protocol-runs/${runData.id}`)
     },
   })
+
+  React.useEffect(() => {
+    if (runCreationError != null) {
+      setError(runCreationError)
+    }
+  }, [runCreationError, setError])
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
     createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
   }
 
   return (
-    <PrimaryButton onClick={handleClick} width="100%" {...buttonProps}>
+    <PrimaryButton
+      onClick={handleClick}
+      width="100%"
+      disabled={isCreatingRun || disabled}
+      {...buttonProps}
+    >
       {t('proceed_to_setup')}
     </PrimaryButton>
   )

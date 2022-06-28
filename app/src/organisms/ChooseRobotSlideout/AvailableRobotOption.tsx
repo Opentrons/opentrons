@@ -23,6 +23,7 @@ interface AvailableRobotOptionProps {
   local: boolean | null
   onClick: () => void
   isSelected: boolean
+  isError?: boolean
   isOnDifferentSoftwareVersion: boolean
 }
 
@@ -35,6 +36,7 @@ export function AvailableRobotOption(
     local,
     onClick,
     isSelected,
+    isError = false,
     isOnDifferentSoftwareVersion,
   } = props
   const { t } = useTranslation('protocol_list')
@@ -43,7 +45,7 @@ export function AvailableRobotOption(
       <MiniCard
         onClick={onClick}
         isSelected={isSelected}
-        isError={isOnDifferentSoftwareVersion && isSelected}
+        isError={(isError || isOnDifferentSoftwareVersion) && isSelected}
       >
         <img
           src={OT2_PNG}
@@ -66,19 +68,19 @@ export function AvailableRobotOption(
               {robotName}
               <Icon
                 // local boolean corresponds to a wired usb connection
-                aria-label={local ? 'usb' : 'wifi'}
+                aria-label={local ?? false ? 'usb' : 'wifi'}
                 marginBottom={`-${SPACING.spacing2}`}
                 marginLeft={SPACING.spacing3}
-                name={local ? 'usb' : 'wifi'}
+                name={local ?? false ? 'usb' : 'wifi'}
                 size={SIZE_1}
               />
             </StyledText>
           </Box>
         </Flex>
-        {isOnDifferentSoftwareVersion && isSelected ? (
+        {(isError || isOnDifferentSoftwareVersion) && isSelected ? (
           <>
             <Box flex="1 1 auto" />
-            <Icon name="ot-alert" size="1.25rem" color={COLORS.error} />
+            <Icon name="alert-circle" size="1.25rem" color={COLORS.error} />
           </>
         ) : null}
       </MiniCard>

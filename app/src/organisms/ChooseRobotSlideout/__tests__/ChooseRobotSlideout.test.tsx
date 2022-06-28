@@ -1,7 +1,9 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
 import { when } from 'jest-when'
+
 import { i18n } from '../../../i18n'
 import { useProtocolDetailsForRun } from '../../../organisms/Devices/hooks'
 import {
@@ -25,7 +27,6 @@ import {
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { ChooseRobotSlideout } from '../'
-import { fireEvent } from '@testing-library/react'
 
 import type { ProtocolDetails } from '../../../organisms/Devices/hooks'
 import type { State } from '../../../redux/types'
@@ -193,7 +194,6 @@ describe('ChooseRobotSlideout', () => {
       protocolKey: storedProtocolDataFixture.protocolKey,
     })
   })
-
   it('if selected robot is on a different version of the software than the app, disable CTA and show link to device details in options', () => {
     when(mockGetBuildrootUpdateDisplayInfo)
       .calledWith((undefined as any) as State, 'opentrons-robot-name')
@@ -216,5 +216,25 @@ describe('ChooseRobotSlideout', () => {
     ).toBeInTheDocument()
     const linkToRobotDetails = getByText('Go to Robot')
     linkToRobotDetails.click()
+  })
+
+  it('renders error state when there is a run creation error', () => {
+    mockUseCreateRunFromProtocol.mockReturnValue({
+      runCreationError: 'run creation error',
+      createRunFromProtocolSource: mockCreateRunFromProtocolSource,
+      isCreatingRun: false,
+    })
+    const [{ getByRole, getByText }] = render({
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: jest.fn(),
+      showSlideout: true,
+    })
+    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    proceedButton.click()
+    expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
+      files: [expect.any(File)],
+      protocolKey: storedProtocolDataFixture.protocolKey,
+    })
+    expect(getByText('run creation error')).toBeInTheDocument()
   })
 })

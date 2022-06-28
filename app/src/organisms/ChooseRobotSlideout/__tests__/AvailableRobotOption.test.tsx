@@ -16,6 +16,7 @@ describe('AvailableRobotOption', () => {
         local={false}
         onClick={jest.fn()}
         isSelected={false}
+        isError={false}
         isOnDifferentSoftwareVersion={false}
       />
     )
@@ -30,6 +31,7 @@ describe('AvailableRobotOption', () => {
         local={true}
         onClick={jest.fn()}
         isSelected={false}
+        isError={false}
         isOnDifferentSoftwareVersion={false}
       />
     )
@@ -43,12 +45,13 @@ describe('AvailableRobotOption', () => {
         local={false}
         onClick={jest.fn()}
         isSelected={false}
+        isError={false}
         isOnDifferentSoftwareVersion={false}
       />
     )
     expect(queryByLabelText('wifi')).toBeInTheDocument()
   })
-  it('calls onClick prop when clickecd', () => {
+  it('calls onClick prop when clicked', () => {
     const handleClick = jest.fn()
 
     const { container } = render(
@@ -58,6 +61,7 @@ describe('AvailableRobotOption', () => {
         local={false}
         onClick={handleClick()}
         isSelected={false}
+        isError={false}
         isOnDifferentSoftwareVersion={false}
       />
     )
@@ -75,6 +79,7 @@ describe('AvailableRobotOption', () => {
           local={false}
           onClick={handleClick()}
           isSelected={true}
+          isError={false}
           isOnDifferentSoftwareVersion={true}
         />
       </StaticRouter>,
