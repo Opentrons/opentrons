@@ -49,10 +49,10 @@ async def test_move_to_coordinates_implementation(
     current_position = Point(4.44, 5.55, 6.66)
     max_height = 5678
 
-    planned_waypoints = [
-        Waypoint(position=Point(3, 1, 4), critical_point=None),
-        Waypoint(position=Point(1, 5, 9), critical_point=CriticalPoint.XY_CENTER),
-    ]
+    planned_waypoint_1 = Waypoint(position=Point(3, 1, 4), critical_point=None)
+    planned_waypoint_2 = Waypoint(
+        position=Point(1, 5, 9), critical_point=CriticalPoint.XY_CENTER
+    )
 
     decoy.when(state_view.pipettes.get(params.pipetteId)).then_return(
         LoadedPipette(
@@ -80,19 +80,21 @@ async def test_move_to_coordinates_implementation(
             direct=params.forceDirect,
             additional_min_travel_z=params.minimumZHeight,
         )
-    ).then_return(planned_waypoints)
+    ).then_return([planned_waypoint_1, planned_waypoint_2])
 
     result = await subject.execute(params=params)
 
     decoy.verify(
-        *[
-            await hardware_api.move_to(
-                mount=mount,
-                abs_position=waypoint.position,
-                critical_point=waypoint.critical_point,
-            )
-            for waypoint in planned_waypoints
-        ]
+        await hardware_api.move_to(
+            mount=mount,
+            abs_position=planned_waypoint_1.position,
+            critical_point=planned_waypoint_1.critical_point,
+        ),
+        await hardware_api.move_to(
+            mount=mount,
+            abs_position=planned_waypoint_2.position,
+            critical_point=planned_waypoint_2.critical_point,
+        ),
     )
 
     assert result == MoveToCoordinatesResult()
