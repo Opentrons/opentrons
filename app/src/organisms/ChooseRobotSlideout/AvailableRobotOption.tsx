@@ -91,7 +91,7 @@ export function AvailableRobotOption(
           css={css`
             & > a {
               color: ${COLORS.errorText};
-              text-decoration: ${TEXT_DECORATION_UNDERLINE};
+              text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
             }
           `}
         >
