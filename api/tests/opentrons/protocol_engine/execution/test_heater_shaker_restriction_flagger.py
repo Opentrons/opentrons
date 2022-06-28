@@ -15,7 +15,7 @@ from opentrons.protocol_engine.types import (
     LoadedModule,
 )
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
-from opentrons.protocol_engine.errors import HeaterShakerMovementRestrictionError
+from opentrons.protocol_engine.errors import RestrictedPipetteMovementError
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.modules import HeaterShaker as HardwareHeaterShaker
 from opentrons.hardware_control.modules.types import (
@@ -114,19 +114,19 @@ class MultiChannelLocationAndLabwareStatus(NamedTuple):
             slot_name=DeckSlotName.SLOT_4,
             heater_shaker_status=HeaterShakerStatus.RUNNING,
             latch_status=HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
-            expected_raise_cm=pytest.raises(HeaterShakerMovementRestrictionError),
+            expected_raise_cm=pytest.raises(RestrictedPipetteMovementError),
         ),
         LocationAndHeaterShakerStatus(
             slot_name=DeckSlotName.SLOT_2,
             heater_shaker_status=HeaterShakerStatus.RUNNING,
             latch_status=HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
-            expected_raise_cm=pytest.raises(HeaterShakerMovementRestrictionError),
+            expected_raise_cm=pytest.raises(RestrictedPipetteMovementError),
         ),
         LocationAndHeaterShakerStatus(
             slot_name=DeckSlotName.SLOT_5,
             heater_shaker_status=HeaterShakerStatus.RUNNING,
             latch_status=HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
-            expected_raise_cm=pytest.raises(HeaterShakerMovementRestrictionError),
+            expected_raise_cm=pytest.raises(RestrictedPipetteMovementError),
         ),
         LocationAndHeaterShakerStatus(
             slot_name=DeckSlotName.SLOT_3,
@@ -138,13 +138,13 @@ class MultiChannelLocationAndLabwareStatus(NamedTuple):
             slot_name=DeckSlotName.SLOT_5,
             heater_shaker_status=HeaterShakerStatus.IDLE,
             latch_status=HeaterShakerLabwareLatchStatus.IDLE_OPEN,
-            expected_raise_cm=pytest.raises(HeaterShakerMovementRestrictionError),
+            expected_raise_cm=pytest.raises(RestrictedPipetteMovementError),
         ),
         LocationAndHeaterShakerStatus(
             slot_name=DeckSlotName.SLOT_6,
             heater_shaker_status=HeaterShakerStatus.IDLE,
             latch_status=HeaterShakerLabwareLatchStatus.IDLE_OPEN,
-            expected_raise_cm=pytest.raises(HeaterShakerMovementRestrictionError),
+            expected_raise_cm=pytest.raises(RestrictedPipetteMovementError),
         ),
         LocationAndHeaterShakerStatus(
             slot_name=DeckSlotName.SLOT_8,
@@ -219,12 +219,12 @@ async def test_raises_any_channel_on_restricted_movement(
         MultiChannelLocationAndLabwareStatus(
             slot_name=DeckSlotName.SLOT_4,
             is_tiprack=False,
-            expected_raise_cm=pytest.raises(HeaterShakerMovementRestrictionError),
+            expected_raise_cm=pytest.raises(RestrictedPipetteMovementError),
         ),
         MultiChannelLocationAndLabwareStatus(
             slot_name=DeckSlotName.SLOT_8,
             is_tiprack=False,
-            expected_raise_cm=pytest.raises(HeaterShakerMovementRestrictionError),
+            expected_raise_cm=pytest.raises(RestrictedPipetteMovementError),
         ),
         MultiChannelLocationAndLabwareStatus(
             slot_name=DeckSlotName.SLOT_2,
@@ -313,7 +313,7 @@ async def test_raises_if_hardware_module_has_gone_missing(
         )
     ).then_return(([], None))
 
-    with pytest.raises(HeaterShakerMovementRestrictionError):
+    with pytest.raises(RestrictedPipetteMovementError):
         await subject.raise_if_movement_restricted(
             labware_id="labware-id", pipette_id="pipette-id"
         )

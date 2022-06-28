@@ -19,7 +19,7 @@ from opentrons.hardware_control.modules.types import HeaterShakerStatus
 
 from ..types import ModuleModel, LoadedModule
 from ..state import StateStore
-from ..errors import HeaterShakerMovementRestrictionError
+from ..errors import RestrictedPipetteMovementError
 
 
 class HeaterShakerMovementFlagger:
@@ -57,7 +57,7 @@ class HeaterShakerMovementFlagger:
                 heater_shaker_module.serialNumber
             )
             if heater_shaker_hardware is None:
-                raise HeaterShakerMovementRestrictionError(
+                raise RestrictedPipetteMovementError(
                     f"Cannot resolve heater-shaker movement restrictions."
                     f' No Heater-Shaker found with serial number "{heater_shaker_module.serialNumber}".'
                 )
@@ -78,7 +78,7 @@ class HeaterShakerMovementFlagger:
             if any([dest_east_west, dest_north_south, dest_heater_shaker]):
                 # If heater-shaker is running, can't move to or around it
                 if heater_shaker_hardware.status != HeaterShakerStatus.IDLE:
-                    raise HeaterShakerMovementRestrictionError(
+                    raise RestrictedPipetteMovementError(
                         "Cannot move pipette to adjacent slot while Heater-Shaker is shaking"
                     )
 
@@ -88,7 +88,7 @@ class HeaterShakerMovementFlagger:
                     != HeaterShakerLabwareLatchStatus.IDLE_CLOSED
                     and (dest_east_west or dest_heater_shaker)
                 ):
-                    raise HeaterShakerMovementRestrictionError(
+                    raise RestrictedPipetteMovementError(
                         "Cannot move pipette east or west of or to Heater-Shaker while latch is open"
                     )
 
@@ -101,14 +101,14 @@ class HeaterShakerMovementFlagger:
                 if hw_pipette.config["channels"] > 1:
                     # Can't go to east/west slot under any circumstances if pipette is multi-channel
                     if dest_east_west:
-                        raise HeaterShakerMovementRestrictionError(
+                        raise RestrictedPipetteMovementError(
                             "Cannot move multi-channel pipette east or west of Heater-Shaker"
                         )
                     # Can only go north/west if the labware is a tiprack
                     elif dest_north_south and not self._state_store.labware.is_tiprack(
                         labware_id
                     ):
-                        raise HeaterShakerMovementRestrictionError(
+                        raise RestrictedPipetteMovementError(
                             "Cannot move multi-channel pipette north or south of Heater-Shaker to non-tiprack labware"
                         )
 
