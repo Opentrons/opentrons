@@ -6,6 +6,7 @@ import { format } from 'date-fns'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { useFeatureFlag } from '../../redux/config'
 import {
   Box,
   Btn,
@@ -43,6 +44,7 @@ import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { OverflowMenu } from './OverflowMenu'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
+import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import {
   getAnalysisStatus,
   getProtocolDisplayName,
@@ -186,13 +188,14 @@ export function ProtocolDetails(
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
   const [currentTab, setCurrentTab] = React.useState<
-    'robot_config' | 'labware'
+    'robot_config' | 'labware' | 'liquids'
   >('robot_config')
   const [showSlideout, setShowSlideout] = React.useState(false)
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
+  const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   if (analysisStatus === 'missing') return null
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
@@ -261,16 +264,28 @@ export function ProtocolDetails(
       ? format(new Date(mostRecentAnalysis.createdAt), 'MMMM dd, yyyy HH:mm')
       : t('shared:no_data')
 
-  const getTabContents = (): JSX.Element =>
-    currentTab === 'labware' ? (
-      <ProtocolLabwareDetails requiredLabwareDetails={requiredLabwareDetails} />
-    ) : (
-      <RobotConfigurationDetails
-        leftMountPipetteName={leftMountPipetteName}
-        rightMountPipetteName={rightMountPipetteName}
-        requiredModuleDetails={requiredModuleDetails}
-      />
-    )
+  const getTabContents = (): JSX.Element => {
+    switch (currentTab) {
+      case 'labware':
+        return (
+          <ProtocolLabwareDetails
+            requiredLabwareDetails={requiredLabwareDetails}
+          />
+        )
+
+      case 'robot_config':
+        return (
+          <RobotConfigurationDetails
+            leftMountPipetteName={leftMountPipetteName}
+            rightMountPipetteName={rightMountPipetteName}
+            requiredModuleDetails={requiredModuleDetails}
+          />
+        )
+
+      case 'liquids':
+        return <ProtocolLiquidsDetails />
+    }
+  }
 
   return (
     <Flex
@@ -421,6 +436,7 @@ export function ProtocolDetails(
                 complete: (
                   <DeckThumbnail
                     commands={mostRecentAnalysis?.commands ?? []}
+                    showLiquids
                   />
                 ),
               }[analysisStatus]
@@ -453,6 +469,17 @@ export function ProtocolDetails(
                 {t('labware')}
               </Text>
             </RoundTab>
+            {liquidSetupEnabled && (
+              <RoundTab
+                data-testid={`ProtocolDetails_liquids`}
+                isCurrent={currentTab === 'liquids'}
+                onClick={() => setCurrentTab('liquids')}
+              >
+                <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+                  {t('liquids')}
+                </Text>
+              </RoundTab>
+            )}
           </Flex>
           <Box
             backgroundColor={COLORS.white}
@@ -463,7 +490,7 @@ export function ProtocolDetails(
             } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
               BORDERS.radiusSoftCorners
             }`}
-            padding={`${SPACING.spacing5} ${SPACING.spacing4}`}
+            padding={`${SPACING.spacing4} ${SPACING.spacing4}`}
           >
             {getTabContents()}
           </Box>

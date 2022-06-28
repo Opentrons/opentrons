@@ -9,8 +9,8 @@ from typing import Any, Dict, Optional, Union
 from opentrons.types import Point
 from opentrons.calibration_storage.types import GripperCalibrationOffset
 from opentrons.config import gripper_config
+from opentrons.hardware_control.types import CriticalPoint
 from .instrument_abc import AbstractInstrument
-from .types import CriticalPoint
 
 RECONFIG_KEYS = {"quirks"}
 

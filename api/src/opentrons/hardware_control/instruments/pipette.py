@@ -16,7 +16,7 @@ from opentrons.config import pipette_config, robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
 from opentrons.drivers.types import MoveSplit
 from .instrument_abc import AbstractInstrument
-from .types import CriticalPoint, BoardRevision, OT3AxisKind
+from opentrons.hardware_control.types import CriticalPoint, BoardRevision, OT3AxisKind
 
 
 if TYPE_CHECKING:
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
         PipetteName,
         PipetteModel,
     )
-    from .dev_types import InstrumentHardwareConfigs
+    from opentrons.hardware_control.dev_types import InstrumentHardwareConfigs
 
 
 RECONFIG_KEYS = {"quirks"}
