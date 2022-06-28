@@ -55,18 +55,15 @@ const errorOptionStyles = css`
 
 export function MiniCard(props: MiniCardProps): JSX.Element {
   const { children, onClick, isSelected, isError } = props
+  const selectedWrapperStyles = isError
+    ? errorOptionStyles
+    : selectedOptionStyles
+  const wrapperStyles = isSelected
+    ? selectedWrapperStyles
+    : unselectedOptionStyles
+
   return (
-    <Flex
-      position={POSITION_RELATIVE}
-      onClick={onClick}
-      css={
-        isError && isSelected
-          ? errorOptionStyles
-          : isSelected
-          ? selectedOptionStyles
-          : unselectedOptionStyles
-      }
-    >
+    <Flex position={POSITION_RELATIVE} onClick={onClick} css={wrapperStyles}>
       {isError && isSelected && (
         <Icon
           name="alert-circle"

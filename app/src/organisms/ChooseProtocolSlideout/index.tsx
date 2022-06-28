@@ -122,7 +122,7 @@ export function ChooseProtocolSlideout(
               {createRunError != null && isSelected && (
                 <StyledText
                   as="label"
-                  color={COLORS.error}
+                  color={COLORS.errorText}
                   display={DISPLAY_BLOCK}
                   marginTop={`-${SPACING.spacing2}`}
                   marginBottom={SPACING.spacing3}

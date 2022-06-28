@@ -185,7 +185,7 @@ export function ChooseRobotSlideout(
                 {createRunError != null && isSelected && (
                   <StyledText
                     as="label"
-                    color={COLORS.error}
+                    color={COLORS.errorText}
                     display={DISPLAY_INLINE_BLOCK}
                     marginTop={`-${SPACING.spacing2}`}
                     marginBottom={SPACING.spacing3}
