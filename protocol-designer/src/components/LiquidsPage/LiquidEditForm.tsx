@@ -15,6 +15,7 @@ import formStyles from '../forms/forms.css'
 
 import { LiquidGroup } from '../../labware-ingred/types'
 import { ColorPicker } from '../ColorPicker'
+import { ColorResult } from 'react-color'
 
 type Props = LiquidGroup & {
   canDelete: boolean
@@ -25,6 +26,7 @@ type Props = LiquidGroup & {
 
 interface LiquidEditFormValues {
   name: string
+  displayColor: string
   description?: string | null
   serialize?: boolean
   [key: string]: unknown
@@ -38,6 +40,7 @@ export const liquidEditFormSchema: Yup.Schema<
       name: i18n.t('form.liquid_edit.name'),
     })
   ),
+  displayColor: Yup.string(),
   description: Yup.string(),
   serialize: Yup.boolean(),
 })
@@ -47,9 +50,14 @@ export function LiquidEditForm(props: Props): JSX.Element {
 
   const initialValues: LiquidEditFormValues = {
     name: props.name || '',
+    displayColor: props.displayColor || '',
     description: props.description || '',
     serialize: props.serialize || false,
   }
+
+  const [currentColor, setCurrentColor] = React.useState<ColorResult['hex']>(
+    props.displayColor || '#000'
+  )
 
   return (
     <Formik
@@ -58,6 +66,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
       onSubmit={(values: LiquidEditFormValues) => {
         saveForm({
           name: values.name,
+          displayColor: currentColor,
           description: values.description || null,
           serialize: values.serialize || false,
         })
@@ -103,7 +112,10 @@ export function LiquidEditForm(props: Props): JSX.Element {
                   />
                 </FormGroup>
                 <FormGroup label={'Liquid'} className={formStyles.column_1_3}>
-                  <ColorPicker liquidId={'1'} />
+                  <ColorPicker
+                    value={currentColor}
+                    onChange={setCurrentColor}
+                  />
                 </FormGroup>
               </div>
             </section>

@@ -5,14 +5,17 @@ import { colors } from '../swatchColors'
 import styles from './ColorPicker.css'
 
 interface ColorPickerProps {
-  liquidId: string
+  value: string
+  onChange: (hex: ColorResult['hex']) => void
 }
 
 export function ColorPicker(props: ColorPickerProps): JSX.Element {
   const [showColorPicker, setShowColorPicker] = React.useState<boolean>(false)
-  const [currentColor, setCurrentColor] = React.useState<ColorResult['hex']>(
-    '#000'
-  )
+
+  React.useEffect(() => {
+    console.log(props.value)
+  }, [props.value])
+
   return (
     <div>
       <div
@@ -22,7 +25,7 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
         <div
           className={styles.color}
           style={{
-            backgroundColor: currentColor,
+            backgroundColor: props.value,
           }}
         />
       </div>
@@ -34,9 +37,9 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
           />
           <TwitterPicker
             colors={colors}
-            color={currentColor}
-            onChange={color => {
-              setCurrentColor(color.hex)
+            color={props.value}
+            onChange={(color, event) => {
+              props.onChange(color.hex)
               setShowColorPicker(showColorPicker => !showColorPicker)
             }}
             triangle="top-left"
