@@ -2,7 +2,7 @@
 import pytest
 from decoy import Decoy
 from dataclasses import dataclass, field
-from typing import Callable, List, Optional, Sequence, Tuple
+from typing import Optional, Sequence, Tuple
 
 from opentrons.types import Point, MountType, DeckSlotName
 from opentrons.hardware_control.types import CriticalPoint
@@ -30,23 +30,11 @@ def mock_module_view(decoy: Decoy) -> ModuleView:
     return decoy.mock(cls=ModuleView)
 
 
-# The signature of the motion_planning.get_waypoints() function.
-_GET_WAYPOINTS_SIGNATURE = Callable[
-    ..., List[motion_planning.Waypoint]  # Parameter types not included, for simplicity.
-]
-
-
-@pytest.fixture
-def mock_get_waypoints(
-    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
-) -> _GET_WAYPOINTS_SIGNATURE:
-    """Return a mock in the shape of the motion_planning.get_waypoints() function.
-
-    When used by a test, the real get_waypoints() will be patched by this mock.
-    """
+@pytest.fixture(autouse=True)
+def patch_mock_get_waypoints(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Replace motion_planning.get_waypoints() with a mock."""
     mock_get_waypoints = decoy.mock(func=motion_planning.get_waypoints)
     monkeypatch.setattr(motion_planning, "get_waypoints", mock_get_waypoints)
-    return mock_get_waypoints
 
 
 @pytest.fixture
@@ -306,7 +294,6 @@ def test_get_movement_waypoints_to_well(
     pipette_view: PipetteView,
     geometry_view: GeometryView,
     mock_module_view: ModuleView,
-    mock_get_waypoints: _GET_WAYPOINTS_SIGNATURE,
     subject: MotionView,
     spec: WaypointSpec,
 ) -> None:
@@ -403,7 +390,7 @@ def test_get_movement_waypoints_to_well(
     ]
 
     decoy.when(
-        mock_get_waypoints(
+        motion_planning.get_waypoints(
             move_type=spec.expected_move_type,
             origin=spec.origin,
             origin_cp=spec.origin_cp,
@@ -432,19 +419,27 @@ def test_get_movement_waypoints_to_well_raises(
     decoy: Decoy,
     pipette_view: PipetteView,
     geometry_view: GeometryView,
-    mock_get_waypoints: _GET_WAYPOINTS_SIGNATURE,
     subject: MotionView,
 ) -> None:
     """It should raise FailedToPlanMoveError if motion_planning.get_waypoints raises."""
     decoy.when(
+        geometry_view.get_well_position(
+            labware_id="labware-id",
+            well_name="A1",
+            well_location=None,
+        )
+    ).then_return(Point(x=4, y=5, z=6))
+    decoy.when(pipette_view.get_current_well()).then_return(None)
+    decoy.when(geometry_view.get_all_labware_highest_z()).then_return(456)
+    decoy.when(
         # TODO(mm, 2022-06-22): We should use decoy.matchers.Anything() for all
         # arguments. For some reason, Decoy does not match the call unless we
         # specify concrete values for all (?) arguments?
-        mock_get_waypoints(
+        motion_planning.get_waypoints(
             Point(x=1, y=2, z=3),
-            None,
+            Point(x=4, y=5, z=6),
             max_travel_z=123,
-            min_travel_z=None,
+            min_travel_z=456,
             move_type=motion_planning.MoveType.GENERAL_ARC,
             xy_waypoints=[],
             origin_cp=None,
@@ -494,7 +489,6 @@ def test_get_movement_waypoints_to_well_raises(
 def test_get_movement_waypoints_to_coords(
     decoy: Decoy,
     geometry_view: GeometryView,
-    mock_get_waypoints: _GET_WAYPOINTS_SIGNATURE,
     subject: MotionView,
     direct: bool,
     expected_move_type: motion_planning.MoveType,
@@ -521,7 +515,7 @@ def test_get_movement_waypoints_to_coords(
     ]
 
     decoy.when(
-        mock_get_waypoints(
+        motion_planning.get_waypoints(
             origin=origin,
             origin_cp=None,
             dest=dest,
@@ -546,7 +540,6 @@ def test_get_movement_waypoints_to_coords(
 def test_get_movement_waypoints_to_coords_raises(
     decoy: Decoy,
     geometry_view: GeometryView,
-    mock_get_waypoints: _GET_WAYPOINTS_SIGNATURE,
     subject: MotionView,
 ) -> None:
     """It should raise FailedToPlanMoveError if motion_planning.get_waypoints raises."""
@@ -555,7 +548,7 @@ def test_get_movement_waypoints_to_coords_raises(
         # TODO(mm, 2022-06-22): We should use decoy.matchers.Anything() for all
         # arguments. For some reason, Decoy does not match the call unless we
         # specify concrete values for all (?) arguments?
-        mock_get_waypoints(
+        motion_planning.get_waypoints(
             Point(x=1, y=2, z=3),
             Point(x=1, y=2, z=3),
             max_travel_z=123,

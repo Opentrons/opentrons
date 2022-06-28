@@ -266,7 +266,7 @@ def test_movement_commands_update_current_well(
 def test_movement_commands_without_well_clear_current_well(
     subject: PipetteStore, command: cmd.Command
 ) -> None:
-    """Commands that leave the current well unknown should clear the current well."""
+    """Commands that make the current well unknown should clear the current well."""
     load_pipette_command = create_load_pipette_command(
         pipette_id="pipette-id",
         pipette_name=PipetteName.P300_SINGLE,
