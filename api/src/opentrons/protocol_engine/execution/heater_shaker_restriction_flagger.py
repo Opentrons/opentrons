@@ -76,10 +76,8 @@ class HeaterShakerMovementFlagger:
             dest_heater_shaker = dest_slot_int == heater_shaker_slot_int
 
             if any([dest_east_west, dest_north_south, dest_heater_shaker]):
-                # If heater-shaker is running, can't move in any cardinal direction of it
-                if heater_shaker_hardware.status != HeaterShakerStatus.IDLE and (
-                    dest_east_west or dest_north_south
-                ):
+                # If heater-shaker is running, can't move to or around it
+                if heater_shaker_hardware.status != HeaterShakerStatus.IDLE:
                     raise HeaterShakerMovementRestrictionError(
                         "Cannot move pipette to adjacent slot while Heater-Shaker is shaking"
                     )

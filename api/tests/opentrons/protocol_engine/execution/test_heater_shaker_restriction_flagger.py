@@ -123,6 +123,12 @@ class MultiChannelLocationAndLabwareStatus(NamedTuple):
             expected_raise_cm=pytest.raises(HeaterShakerMovementRestrictionError),
         ),
         LocationAndHeaterShakerStatus(
+            slot_name=DeckSlotName.SLOT_5,
+            heater_shaker_status=HeaterShakerStatus.RUNNING,
+            latch_status=HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
+            expected_raise_cm=pytest.raises(HeaterShakerMovementRestrictionError),
+        ),
+        LocationAndHeaterShakerStatus(
             slot_name=DeckSlotName.SLOT_3,
             heater_shaker_status=HeaterShakerStatus.RUNNING,
             latch_status=HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
