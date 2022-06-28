@@ -2,7 +2,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 import logging
 from typing import List, Tuple, Optional
-from typing_extensions import Literal
 
 from opentrons_hardware.hardware_control.tools.types import GripperInformation
 from opentrons_shared_data.gripper import load_definition
@@ -15,7 +14,7 @@ from opentrons_shared_data.gripper.dev_types import (
 )
 from .types import Offset
 
-log = logging.getLogger(__name__) 
+log = logging.getLogger(__name__)
 
 DEFAULT_GRIPPER_CALIBRATION_OFFSET = [0.0, 0.0, 0.0]
 

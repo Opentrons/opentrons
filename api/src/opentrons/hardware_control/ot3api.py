@@ -73,8 +73,8 @@ from .robot_calibration import (
 )
 
 from .protocols import HardwareControlAPI
-from .instruments.gripper import Gripper
 from .instruments.pipette_handler import OT3PipetteHandler, InstrumentsByMount
+from .instruments.gripper_handler import GripperHandler
 from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
@@ -168,6 +168,7 @@ class OT3API(
         )
 
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
+        self._gripper_handler = GripperHandler(gripper=None)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
 
     def set_robot_calibration(self, robot_calibration: RobotCalibration) -> None:
@@ -403,7 +404,10 @@ class OT3API(
         return GantryLoad.NONE
 
     async def cache_pipette(
-        self, mount: OT3Mount, instrument_data: AttachedPipette, req_instr: PipetteName
+        self,
+        mount: OT3Mount,
+        instrument_data: AttachedPipette,
+        req_instr: Optional[PipetteName]
     ) -> None:
         """Set up pipette based on scanned information."""
         config = instrument_data.get("config")
@@ -433,10 +437,10 @@ class OT3API(
         grip_cal = load_gripper_calibration_offset(instrument_data.get("id"))
         g = compare_gripper_config_and_check_skip(
             instrument_data,
-            self._pipette_handler.hardware_instruments[OT3Mount.GRIPPER],
+            self._gripper_handler._gripper,
             grip_cal,
         )
-        self._pipette_handler.hardware_instruments[OT3Mount.GRIPPER] = g
+        self._gripper_handler._gripper = g
 
     async def cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
@@ -456,12 +460,12 @@ class OT3API(
             found = await self._backend.get_attached_instruments(checked_require)
 
         for mount, instrument_data in found.items():
-            req_instr_name = checked_require.get(mount, None)
             if mount == OT3Mount.GRIPPER:
-                self.cache_gripper(instrument_data)
+                await self.cache_gripper(cast(AttachedGripper, instrument_data))
             else:
-                self.cache_pipette(
-                    mount, instrument_data, req_instr_name
+                req_instr_name = checked_require.get(mount, None)
+                await self.cache_pipette(
+                    mount, cast(AttachedPipette, instrument_data), req_instr_name
                 )
 
         await self._backend.probe_network()

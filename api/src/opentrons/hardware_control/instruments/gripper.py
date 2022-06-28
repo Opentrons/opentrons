@@ -4,14 +4,13 @@ from __future__ import annotations
 """
 from dataclasses import asdict, replace
 import logging
-from typing import Any, Dict, Optional, Set, Tuple, Union
+from typing import Any, Dict, Optional, Set, Union
 
 from opentrons.types import Point
 from opentrons.calibration_storage.types import GripperCalibrationOffset
 from opentrons.config import gripper_config
 from opentrons.hardware_control.types import CriticalPoint
 from .instrument_abc import AbstractInstrument
-from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.dev_types import AttachedGripper
 
 from opentrons_shared_data.gripper.dev_types import GripperName, GripperModel

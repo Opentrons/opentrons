@@ -5,7 +5,6 @@ from opentrons.hardware_control.backends.ot3utils import (
     node_to_axis,
 )
 from opentrons_hardware.drivers.can_bus import CanMessenger
-from opentrons.config import gripper_config
 from opentrons.config.types import OT3Config
 from opentrons.config.robot_configs import build_config_ot3
 from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName

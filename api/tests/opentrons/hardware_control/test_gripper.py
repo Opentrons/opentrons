@@ -1,21 +1,11 @@
 from opentrons.types import Point
 from opentrons.hardware_control.robot_calibration import load_gripper_calibration_offset
 from opentrons.hardware_control.instruments import gripper
-from opentrons.config import gripper_config
 from opentrons.calibration_storage.delete import clear_gripper_calibration_offsets
+from opentrons.config import gripper_config
+from opentrons_shared_data.gripper.dev_types import GripperModel
 
-
-fake_gripper_conf = gripper_config.GripperConfig(
-    gripper_offset=(0, 0, 0),
-    gripper_current=1.0,
-    display_name="Display Name of This Gripper",
-    name="gripper",
-    model="gripper_v1",
-    max_travel=10.0,
-    home_position=0.0,
-    steps_per_mm=0.0,
-    idle_current=0.0,
-)
+fake_gripper_conf = gripper_config.load(GripperModel.V1)
 
 FAKE_OFFSET = load_gripper_calibration_offset("fakeid123")
 
