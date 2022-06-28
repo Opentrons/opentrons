@@ -14,6 +14,7 @@ import styles from './LiquidEditForm.css'
 import formStyles from '../forms/forms.css'
 
 import { LiquidGroup } from '../../labware-ingred/types'
+import { ColorPicker } from '../ColorPicker'
 
 type Props = LiquidGroup & {
   canDelete: boolean
@@ -81,7 +82,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
               <div className={formStyles.row_wrapper}>
                 <FormGroup
                   label={i18n.t('form.liquid_edit.name')}
-                  className={formStyles.column_1_2}
+                  className={formStyles.column_1_3}
                 >
                   <InputField
                     name="name"
@@ -93,13 +94,16 @@ export function LiquidEditForm(props: Props): JSX.Element {
                 </FormGroup>
                 <FormGroup
                   label={i18n.t('form.liquid_edit.description')}
-                  className={formStyles.column_1_2}
+                  className={formStyles.column_1_3}
                 >
                   <InputField
                     name="description"
                     value={values.description}
                     onChange={handleChange}
                   />
+                </FormGroup>
+                <FormGroup label={'Liquid'} className={formStyles.column_1_3}>
+                  <ColorPicker liquidId={'1'} />
                 </FormGroup>
               </div>
             </section>
