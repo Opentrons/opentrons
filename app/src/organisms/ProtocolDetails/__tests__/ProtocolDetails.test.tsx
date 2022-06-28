@@ -2,7 +2,7 @@ import * as React from 'react'
 import '@testing-library/jest-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
-import { fireEvent, getByText } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import {
   getConnectableRobots,
