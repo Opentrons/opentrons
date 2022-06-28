@@ -8,7 +8,7 @@ interface MiniCardProps extends StyleProps {
   onClick: () => void
   isSelected: boolean
   children: React.ReactNode
-  isNonviable?: boolean
+  isError?: boolean
 }
 const unselectedOptionStyles = css`
   background-color: ${COLORS.white};
@@ -35,7 +35,7 @@ const selectedOptionStyles = css`
   }
 `
 
-const nonviableOptionStyles = css`
+const errorOptionStyles = css`
   ${selectedOptionStyles}
   border: 1px solid ${COLORS.error};
   background-color: ${COLORS.errorBg};
@@ -47,10 +47,10 @@ const nonviableOptionStyles = css`
 `
 
 export function MiniCard(props: MiniCardProps): JSX.Element {
-  const { children, onClick, isSelected, isNonviable = false } = props
+  const { children, onClick, isSelected, isError = false } = props
 
-  const selectedWrapperStyles = isNonviable
-    ? nonviableOptionStyles
+  const selectedWrapperStyles = isError
+    ? errorOptionStyles
     : selectedOptionStyles
   const wrapperStyles = isSelected
     ? selectedWrapperStyles

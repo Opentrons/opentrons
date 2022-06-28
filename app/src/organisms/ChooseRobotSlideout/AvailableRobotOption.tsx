@@ -44,7 +44,7 @@ export function AvailableRobotOption(
       <MiniCard
         onClick={onClick}
         isSelected={isSelected}
-        isNonviable={isOnDifferentSoftwareVersion && isSelected}
+        isError={isOnDifferentSoftwareVersion && isSelected}
       >
         <img
           src={OT2_PNG}
