@@ -41,55 +41,55 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
         {props.title}
       </StyledText>
       <Flex justifyContent={JUSTIFY_START} flexDirection={DIRECTION_ROW}>
-        <Link
-          css={TYPOGRAPHY.darkLinkLabelSemiBold}
-          href={PROTOCOL_LIBRARY_URL}
-          id={'EmptyStateLinks_protocolLibraryButton'}
-          marginRight={SPACING.spacing3}
-          external
-        >
-          {t('browse_protocol_library')}
-          <Icon
-            name={'open-in-new'}
-            marginLeft={SPACING.spacing2}
-            size="0.5rem"
-          />
-        </Link>
-        <Link
-          css={TYPOGRAPHY.darkLinkLabelSemiBold}
-          marginRight={SPACING.spacing3}
-          href={PROTOCOL_DESIGNER_URL}
-          id={'EmptyStateLinks_protocolDesignerButton'}
-          external
-        >
-          <Flex
-            alignItems={ALIGN_CENTER}
+        <StyledText>
+          <Link
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
+            href={PROTOCOL_LIBRARY_URL}
+            id={'EmptyStateLinks_protocolLibraryButton'}
+            marginRight={SPACING.spacing3}
+            external
           >
-            {t('launch_protocol_designer')}
-
+            {t('browse_protocol_library')}
             <Icon
               name={'open-in-new'}
               marginLeft={SPACING.spacing2}
               size="0.5rem"
             />
-          </Flex>
-        </Link>
-
-        <Link
-          css={TYPOGRAPHY.darkLinkLabelSemiBold}
-          marginRight={SPACING.spacing3}
-          href={API_DOCS_URL}
-          id={'EmptyStateLinks_apiDocsButton'}
-          external
-        >
-          {t('open_api_docs')}
-          <Icon
-            name={'open-in-new'}
-            marginLeft={SPACING.spacing2}
-            size="0.5rem"
-          />
-        </Link>
+          </Link>
+        </StyledText>
+        <StyledText>
+          <Link
+            css={TYPOGRAPHY.darkLinkLabelSemiBold}
+            href={PROTOCOL_DESIGNER_URL}
+            id={'EmptyStateLinks_protocolDesignerButton'}
+            marginRight={SPACING.spacing3}
+            external
+          >
+             {t('launch_protocol_designer')}
+              <Icon
+                name={'open-in-new'}
+                marginLeft={SPACING.spacing2}
+                size="0.5rem"
+              />
+            
+          </Link>
+        </StyledText>
+        <StyledText>
+          <Link
+            css={TYPOGRAPHY.darkLinkLabelSemiBold}
+            href={API_DOCS_URL}
+            id={'EmptyStateLinks_apiDocsButton'}
+            marginRight={SPACING.spacing2}
+            external
+          >
+            {t('open_api_docs')}
+            <Icon
+              name={'open-in-new'}
+              marginLeft={SPACING.spacing2}
+              size="0.5rem"
+            />
+          </Link>
+        </StyledText>
       </Flex>
     </Flex>
   )
