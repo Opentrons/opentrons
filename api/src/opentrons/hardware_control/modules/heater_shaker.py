@@ -153,7 +153,7 @@ class HeaterShaker(mod_abc.AbstractModule):
                 self._error_status = self._exc_to_errorstr(exc)
             elif ignorelist and not isinstance(exc, ignorelist):
                 self._error_status = self._exc_to_errorstr(exc)
-            elif (catchlist == None) and (ignorelist == None):
+            elif (catchlist is None) and (ignorelist is None):
                 self._error_status = self._exc_to_errorstr(exc)
             raise
 

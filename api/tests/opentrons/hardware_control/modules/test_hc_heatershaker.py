@@ -9,7 +9,6 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
-from opentrons.drivers import heater_shaker
 
 
 @pytest.fixture
