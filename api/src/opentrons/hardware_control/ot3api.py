@@ -40,6 +40,7 @@ from .instruments.pipette import (
     generate_hardware_configs_ot3,
     load_from_config_and_check_skip,
 )
+from .instruments.gripper import compare_gripper_config_and_check_skip
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
 from .execution_manager import ExecutionManagerProvider
@@ -70,9 +71,9 @@ from .robot_calibration import (
     RobotCalibration,
     build_ot3_transforms,
 )
-from . import gripper
 
 from .protocols import HardwareControlAPI
+from .instruments.gripper import Gripper
 from .instruments.pipette_handler import OT3PipetteHandler, InstrumentsByMount
 from .motion_utilities import (
     target_position_from_absolute,
@@ -410,12 +411,12 @@ class OT3API(
         pip_offset_cal = load_pipette_offset(pip_id, mount.to_mount())
         p, may_skip = load_from_config_and_check_skip(
             config,
-            self._instrument_handler.hardware_instruments[mount],
+            self._pipette_handler.hardware_instruments[mount],
             req_instr,
             pip_id,
             pip_offset_cal,
         )
-        self._instrument_handler.hardware_instruments[mount] = p
+        self._pipette_handler.hardware_instruments[mount] = p
         if req_instr and p:
             p.act_as(req_instr)
         if not may_skip:
@@ -430,12 +431,12 @@ class OT3API(
     async def cache_gripper(self, instrument_data: AttachedGripper) -> None:
         """Set up gripper based on scanned information."""
         grip_cal = load_gripper_calibration_offset(instrument_data.get("id"))
-        g = gripper.compare_gripper_config_and_check_skip(
+        g = compare_gripper_config_and_check_skip(
             instrument_data,
-            self._instrument_handler.hardware_instruments[OT3Mount.GRIPPER],
+            self._pipette_handler.hardware_instruments[OT3Mount.GRIPPER],
             grip_cal,
         )
-        self._instrument_handler.hardware_instruments[OT3Mount.GRIPPER] = g
+        self._pipette_handler.hardware_instruments[OT3Mount.GRIPPER] = g
 
     async def cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
@@ -457,12 +458,10 @@ class OT3API(
         for mount, instrument_data in found.items():
             req_instr_name = checked_require.get(mount, None)
             if mount == OT3Mount.GRIPPER:
-                self.cache_gripper(cast(instrument_data, AttachedGripper))
+                self.cache_gripper(instrument_data)
             else:
                 self.cache_pipette(
-                    mount,
-                    cast(instrument_data, AttachedPipette),
-                    cast(req_instr_name, PipetteName),
+                    mount, instrument_data, req_instr_name
                 )
 
         await self._backend.probe_network()

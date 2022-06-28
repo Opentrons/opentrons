@@ -1,27 +1,29 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import logging
-from typing import Tuple, Optional
+from typing import List, Tuple, Optional
 from typing_extensions import Literal
 
-log = logging.getLogger(__name__)
+from opentrons_hardware.hardware_control.tools.types import GripperInformation
+from opentrons_shared_data.gripper import load_definition
+from opentrons_shared_data.gripper.dev_types import (
+    GripperCustomizableFloat,
+    GripperOffset,
+    GripperSchemaVersion,
+    GripperModel,
+    GripperName,
+)
+from .types import Offset
 
-GripperName = Literal["gripper"]
-GripperModel = Literal["gripper_v1"]
+log = logging.getLogger(__name__) 
 
 DEFAULT_GRIPPER_CALIBRATION_OFFSET = [0.0, 0.0, 0.0]
 
 
 @dataclass(frozen=True)
 class GripperConfig:
-    gripper_offset: Tuple[float, float, float]
-    gripper_current: float
     display_name: str
     name: GripperName
-    max_travel: float
-    home_position: float
-    steps_per_mm: float
-    idle_current: float
     model: GripperModel
     z_idle_current: float
     z_active_current: float

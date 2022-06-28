@@ -11,8 +11,8 @@ from opentrons.calibration_storage.types import GripperCalibrationOffset
 from opentrons.config import gripper_config
 from opentrons.hardware_control.types import CriticalPoint
 from .instrument_abc import AbstractInstrument
-from .types import CriticalPoint
-from .dev_types import AttachedGripper
+from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.dev_types import AttachedGripper
 
 from opentrons_shared_data.gripper.dev_types import GripperName, GripperModel
 
@@ -64,11 +64,11 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         self._config_as_dict = asdict(self._config)
 
     @property
-    def name(self) -> gripper_config.GripperName:
+    def name(self) -> GripperName:
         return self._name
 
     @property
-    def model(self) -> gripper_config.GripperModel:
+    def model(self) -> GripperModel:
         return self._model
 
     @property
