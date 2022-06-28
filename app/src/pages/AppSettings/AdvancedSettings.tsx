@@ -544,8 +544,8 @@ export function AdvancedSettings(): JSX.Element {
             </StyledText>
             {pathToPythonInterpreter !== null ? (
               <Link
+                role="button"
                 css={TYPOGRAPHY.pRegular}
-                external
                 color={COLORS.darkBlack}
                 onClick={() =>
                   dispatch(Config.openPythonInterpreterDirectory())

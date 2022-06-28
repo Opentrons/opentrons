@@ -116,6 +116,7 @@ export function GeneralSettings(): JSX.Element {
             >
               {t('update_available')}
               <Link
+                role="button"
                 textDecoration={TEXT_DECORATION_UNDERLINE}
                 onClick={() => setShowUpdateModal(true)}
               >
