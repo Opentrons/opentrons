@@ -12,7 +12,6 @@ import {
   COLORS,
   TYPOGRAPHY,
   SIZE_1,
-  TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
