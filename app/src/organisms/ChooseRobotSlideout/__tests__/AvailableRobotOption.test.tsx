@@ -13,6 +13,7 @@ describe('AvailableRobotOption', () => {
         local={false}
         onClick={jest.fn()}
         isSelected={false}
+        isError={false}
       />
     )
     expect(queryByText(robotModel)).toBeInTheDocument()
@@ -26,6 +27,7 @@ describe('AvailableRobotOption', () => {
         local={true}
         onClick={jest.fn()}
         isSelected={false}
+        isError={false}
       />
     )
     expect(queryByLabelText('usb')).toBeInTheDocument()
@@ -38,6 +40,7 @@ describe('AvailableRobotOption', () => {
         local={false}
         onClick={jest.fn()}
         isSelected={false}
+        isError={false}
       />
     )
     expect(queryByLabelText('wifi')).toBeInTheDocument()
@@ -52,6 +55,7 @@ describe('AvailableRobotOption', () => {
         local={false}
         onClick={handleClick()}
         isSelected={false}
+        isError={false}
       />
     )
     fireEvent.click(container)
