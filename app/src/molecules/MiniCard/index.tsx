@@ -1,7 +1,15 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
-import { SPACING, Flex, COLORS, BORDERS } from '@opentrons/components'
+import {
+  Icon,
+  SPACING,
+  Flex,
+  COLORS,
+  BORDERS,
+  POSITION_RELATIVE,
+  POSITION_ABSOLUTE,
+} from '@opentrons/components'
 
 interface MiniCardProps {
   onClick: () => void
@@ -49,6 +57,7 @@ export function MiniCard(props: MiniCardProps): JSX.Element {
   const { children, onClick, isSelected, isError } = props
   return (
     <Flex
+      position={POSITION_RELATIVE}
       onClick={onClick}
       css={
         isError && isSelected
@@ -58,6 +67,17 @@ export function MiniCard(props: MiniCardProps): JSX.Element {
           : unselectedOptionStyles
       }
     >
+      {isError && isSelected && (
+        <Icon
+          name="alert-circle"
+          color={COLORS.error}
+          position={POSITION_ABSOLUTE}
+          width={SPACING.spacing4}
+          top={SPACING.spacing3}
+          right={SPACING.spacing3}
+          aria-label={`icon_error`}
+        />
+      )}
       {children}
     </Flex>
   )
