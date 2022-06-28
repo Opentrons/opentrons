@@ -1278,14 +1278,13 @@ class SmoothieDriver:
             for axis, value in target.items()
             if axis in "BC" and self.position[axis] < value
         ]
-        backlash_target = {
-            ax: moving_target[ax]
-            for ax in plunger_backlash_axes
-        }
-        moving_target.update({
-            ax: moving_target[ax] + PLUNGER_BACKLASH_MM
-            for ax in plunger_backlash_axes
-        })
+        backlash_target = {ax: moving_target[ax] for ax in plunger_backlash_axes}
+        moving_target.update(
+            {
+                ax: moving_target[ax] + PLUNGER_BACKLASH_MM
+                for ax in plunger_backlash_axes
+            }
+        )
 
         # whatever else we do to our motion target, if nothing moves in the
         # input we will not command it to move
