@@ -20,7 +20,7 @@ export function ProtocolsEmptyState(): JSX.Element | null {
       padding={SPACING.spacing4}
       paddingTop={SPACING.spacing6}
     >
-      <Text role="complementary" as="h4">
+      <Text role="complementary" as="h1">
         {t('import_a_file')}
       </Text>
       <UploadInput />
