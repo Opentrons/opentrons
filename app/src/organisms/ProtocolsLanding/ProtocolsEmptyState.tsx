@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { StyledText } from '../../atoms/text'
 import {
   Flex,
-  Text,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
   SPACING,
@@ -20,9 +20,9 @@ export function ProtocolsEmptyState(): JSX.Element | null {
       padding={SPACING.spacing4}
       paddingTop={SPACING.spacing6}
     >
-      <Text role="complementary" as="h1">
+      <StyledText role="complementary" as="h1">
         {t('import_a_file')}
-      </Text>
+      </StyledText>
       <UploadInput />
       <EmptyStateLinks title={t('no_protocol_yet')} />
     </Flex>

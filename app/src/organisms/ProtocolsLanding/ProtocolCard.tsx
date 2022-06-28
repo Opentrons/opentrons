@@ -207,7 +207,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 <StyledText as="h6" marginBottom={SPACING.spacing3}>
                   {t('right_mount')}
                 </StyledText>
-                <StyledText as="p" min-width="10.625rem">
+                <StyledText as="p" minwidth="10.625rem">
                   {
                     {
                       missing: t('no_data'),
