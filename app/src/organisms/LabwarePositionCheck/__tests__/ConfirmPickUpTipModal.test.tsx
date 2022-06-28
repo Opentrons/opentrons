@@ -45,7 +45,6 @@ describe('ConfirmPickUpTipModal', () => {
     jest.restoreAllMocks()
   })
   it('should render an alert modal with the correct props', () => {
-    // mockAlertModal.mockImplementation(args => console.log(args))
     const { getByText } = render(props)
     getByText('mock alert item')
   })

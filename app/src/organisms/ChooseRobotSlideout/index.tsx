@@ -1,7 +1,7 @@
 import * as React from 'react'
 import path from 'path'
 import first from 'lodash/first'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { NavLink, useHistory } from 'react-router-dom'
 
@@ -33,6 +33,7 @@ import {
   getScanning,
   startDiscovery,
 } from '../../redux/discovery'
+import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
 import { PrimaryButton } from '../../atoms/buttons'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
@@ -54,7 +55,6 @@ export function ChooseRobotSlideout(
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_details', 'shared'])
   const { storedProtocolData, showSlideout, onCloseClick, ...restProps } = props
-  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(null)
   const [createRunError, setCreateRunError] = React.useState<string | null>(
     null
   )
@@ -70,11 +70,23 @@ export function ChooseRobotSlideout(
   const healthyReachableRobots = useSelector((state: State) =>
     getConnectableRobots(state)
   )
+  const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(
+    healthyReachableRobots[0] ?? null
+  )
 
-  const availableRobots = healthyReachableRobots.filter(robot => {
-    // TODO: filter out robots who have a current run that is in thie paused or running status
-    return true
-  })
+  const isSelectedRobotOnWrongVersionOfSoftware = [
+    'upgrade',
+    'downgrade',
+  ].includes(
+    useSelector((state: State) => {
+      const value =
+        selectedRobot != null
+          ? getBuildrootUpdateDisplayInfo(state, selectedRobot.name)
+          : { autoUpdateAction: '' }
+      return value
+    })?.autoUpdateAction
+  )
+
   const {
     protocolKey,
     srcFileNames,
@@ -98,11 +110,8 @@ export function ChooseRobotSlideout(
     mostRecentAnalysis?.metadata?.protocolName ??
     first(srcFileNames) ??
     protocolKey
-  const unavailableOrBusyCount =
-    unhealthyReachableRobots.length +
-    unreachableRobots.length +
-    healthyReachableRobots.length -
-    availableRobots.length
+  const unavailableCount =
+    unhealthyReachableRobots.length + unreachableRobots.length
 
   return (
     <Slideout
@@ -116,7 +125,9 @@ export function ChooseRobotSlideout(
           hostname={selectedRobot != null ? selectedRobot.ip : null}
         >
           <CreateRunButton
-            disabled={selectedRobot == null}
+            disabled={
+              selectedRobot == null || isSelectedRobotOnWrongVersionOfSoftware
+            }
             protocolKey={protocolKey}
             srcFileObjects={srcFileObjects}
             setError={setCreateRunError}
@@ -146,7 +157,7 @@ export function ChooseRobotSlideout(
             </Link>
           )}
         </Flex>
-        {!isScanning && availableRobots.length === 0 ? (
+        {!isScanning && healthyReachableRobots.length === 0 ? (
           <Flex
             css={BORDERS.cardOutlineBorder}
             flexDirection={DIRECTION_COLUMN}
@@ -160,26 +171,21 @@ export function ChooseRobotSlideout(
             </StyledText>
           </Flex>
         ) : (
-          availableRobots.map(robot => {
+          healthyReachableRobots.map(robot => {
             const isSelected =
               selectedRobot != null && selectedRobot.ip === robot.ip
             return (
-              <Flex flexDirection={DIRECTION_COLUMN} key={robot.ip}>
+              <Flex key={robot.ip} flexDirection={DIRECTION_COLUMN}>
                 <AvailableRobotOption
+                  key={robot.ip}
                   robotName={robot.name}
                   robotModel="OT-2"
                   local={robot.local}
-                  onClick={() => {
-                    setCreateRunError(null)
-                    setSelectedRobot(
-                      selectedRobot != null && robot.ip === selectedRobot.ip
-                        ? null
-                        : robot
-                    )
-                  }}
+                  onClick={() => setSelectedRobot(isSelected ? null : robot)}
                   isError={createRunError != null}
-                  isSelected={
-                    selectedRobot != null && selectedRobot.ip === robot.ip
+                  isSelected={isSelected}
+                  isOnDifferentSoftwareVersion={
+                    isSelectedRobotOnWrongVersionOfSoftware
                   }
                 />
                 {createRunError != null && isSelected && (
@@ -197,21 +203,25 @@ export function ChooseRobotSlideout(
             )
           })
         )}
-        {!isScanning && unavailableOrBusyCount > 0 ? (
+        {!isScanning && unavailableCount > 0 ? (
           <Flex
             flexDirection={DIRECTION_COLUMN}
             alignItems={ALIGN_CENTER}
             textAlign={TEXT_ALIGN_CENTER}
-            marginTop={SPACING.spacing4}
+            marginTop={SPACING.spacing5}
           >
             <StyledText as="p">
-              {t('unavailable_or_busy_robot_not_listed', {
-                count: unavailableOrBusyCount,
-              })}
+              {t('unavailable_robot_not_listed', { count: unavailableCount })}
             </StyledText>
-            <NavLink to="/devices">
-              <StyledText as="p">{t('view_all_robots')}</StyledText>
-            </NavLink>
+            <StyledText as="p">
+              <Trans
+                t={t}
+                i18nKey="view_unavailable_robots"
+                components={{
+                  devicesLink: <NavLink to="/devices" />,
+                }}
+              />
+            </StyledText>
           </Flex>
         ) : null}
       </Flex>

@@ -1,8 +1,23 @@
 import * as React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
+
 import { i18n } from '../../../i18n'
-import { ConfirmCancelModal } from '../ConfirmCancelModal'
+import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
+import { useTrackEvent } from '../../../redux/analytics'
+import { ConfirmCancelModal } from '../../../organisms/RunDetails/ConfirmCancelModal'
+
+jest.mock('../../../organisms/Devices/hooks')
+jest.mock('../../../redux/analytics')
+jest.mock('../../../redux/config')
+
+const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
+  typeof useTrackProtocolRunEvent
+>
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
 
 const render = (props: React.ComponentProps<typeof ConfirmCancelModal>) => {
   return renderWithProviders(<ConfirmCancelModal {...props} />, {
@@ -10,10 +25,29 @@ const render = (props: React.ComponentProps<typeof ConfirmCancelModal>) => {
   })[0]
 }
 
+const RUN_ID = 'mockRunId'
+let mockTrackEvent: jest.Mock
+let mockTrackProtocolRunEvent: jest.Mock
+
 describe('ConfirmCancelModal', () => {
   let props: React.ComponentProps<typeof ConfirmCancelModal>
   beforeEach(() => {
-    props = { onClose: jest.fn(), runId: 'mockRunId' }
+    mockTrackEvent = jest.fn()
+    mockTrackProtocolRunEvent = jest.fn(
+      () => new Promise(resolve => resolve({}))
+    )
+
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
+    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
+      trackProtocolRunEvent: mockTrackProtocolRunEvent,
+    })
+
+    props = { onClose: jest.fn(), runId: RUN_ID }
+  })
+
+  afterEach(() => {
+    resetAllWhenMocks()
+    jest.restoreAllMocks()
   })
 
   it('should render the correct title', () => {
@@ -41,6 +75,7 @@ describe('ConfirmCancelModal', () => {
     const closeButton = getByRole('button', { name: 'yes, cancel run' })
     fireEvent.click(closeButton)
     expect(props.onClose).toHaveBeenCalled()
+    expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
   })
   it('should call No go back button', () => {
     const { getByRole } = render(props)

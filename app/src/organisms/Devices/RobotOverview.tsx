@@ -25,15 +25,15 @@ import { ToggleButton, PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { useDispatchApiRequest } from '../../redux/robot-api'
 import { fetchLights } from '../../redux/robot-controls'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
 import { Portal } from '../../App/portal'
 import { CONNECTABLE } from '../../redux/discovery'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { RobotStatusBanner } from './RobotStatusBanner'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
-import { useLights, useRobot } from './hooks'
+import { useLights, useRobot, useRunStatuses } from './hooks'
 
 const EQUIPMENT_POLL_MS = 5000
 
@@ -53,6 +53,7 @@ export function RobotOverview({
     setShowChooseProtocolSlideout,
   ] = React.useState<boolean>(false)
   const { lightsOn, toggleLights } = useLights(robotName)
+  const { isRunTerminal } = useRunStatuses()
   const currentRunId = useCurrentRunId()
 
   useInterval(
@@ -116,7 +117,10 @@ export function RobotOverview({
           </Flex>
           <PrimaryButton
             textTransform={TEXT_TRANSFORM_NONE}
-            disabled={currentRunId != null || robot.status !== CONNECTABLE}
+            disabled={
+              (currentRunId != null ? !isRunTerminal : false) ||
+              robot.status !== CONNECTABLE
+            }
             onClick={() => {
               setShowChooseProtocolSlideout(true)
             }}

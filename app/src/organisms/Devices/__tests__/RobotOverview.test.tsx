@@ -10,7 +10,7 @@ import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useDispatchApiRequest } from '../../../redux/robot-api'
 import { fetchLights } from '../../../redux/robot-controls'
-import { useLights, useRobot } from '../hooks'
+import { useLights, useRobot, useRunStatuses } from '../hooks'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotOverview } from '../RobotOverview'
@@ -49,6 +49,9 @@ const mockRobotOverviewOverflowMenu = RobotOverviewOverflowMenu as jest.MockedFu
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
 >
+const mockUseRunStatues = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
+>
 const mockFetchLights = fetchLights as jest.MockedFunction<typeof fetchLights>
 
 const mockToggleLights = jest.fn()
@@ -69,6 +72,12 @@ describe('RobotOverview', () => {
 
   beforeEach(() => {
     dispatchApiRequest = jest.fn()
+    mockUseRunStatues.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: true,
+      isRunIdle: false,
+    })
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
     mockUseLights.mockReturnValue({
       lightsOn: false,
@@ -141,5 +150,32 @@ describe('RobotOverview', () => {
     const [{ getByText }] = render()
 
     getByText('mock RobotOverviewOverflowMenu')
+  })
+
+  it('renders run a protocol button as disabled when run is not terminal and run id is not null', () => {
+    mockUseCurrentRunId.mockReturnValue('id')
+    mockUseRunStatues.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: false,
+      isRunIdle: false,
+    })
+    const [{ getByRole }] = render()
+    const runButton = getByRole('button', { name: 'Run a protocol' })
+    expect(runButton).toBeDisabled()
+  })
+
+  it('renders run a protocol button as not disabled when run id is null but run status is not terminal', () => {
+    mockUseCurrentRunId.mockReturnValue(null)
+    mockUseRunStatues.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: true,
+      isRunIdle: false,
+    })
+    const [{ getByText, getByRole }] = render()
+    const runButton = getByRole('button', { name: 'Run a protocol' })
+    fireEvent.click(runButton)
+    getByText('Mock Choose Protocol Slideout showing')
   })
 })

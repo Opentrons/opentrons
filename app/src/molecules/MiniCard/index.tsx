@@ -1,21 +1,14 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import { SPACING, Flex, COLORS, BORDERS } from '@opentrons/components'
 
-import {
-  Icon,
-  SPACING,
-  Flex,
-  COLORS,
-  BORDERS,
-  POSITION_RELATIVE,
-  POSITION_ABSOLUTE,
-} from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
 
-interface MiniCardProps {
+interface MiniCardProps extends StyleProps {
   onClick: () => void
   isSelected: boolean
-  isError: boolean
   children: React.ReactNode
+  isError?: boolean
 }
 const unselectedOptionStyles = css`
   background-color: ${COLORS.white};
@@ -43,7 +36,7 @@ const selectedOptionStyles = css`
 `
 
 const errorOptionStyles = css`
-  ${unselectedOptionStyles}
+  ${selectedOptionStyles}
   border: 1px solid ${COLORS.error};
   background-color: ${COLORS.errorBg};
 
@@ -54,7 +47,8 @@ const errorOptionStyles = css`
 `
 
 export function MiniCard(props: MiniCardProps): JSX.Element {
-  const { children, onClick, isSelected, isError } = props
+  const { children, onClick, isSelected, isError = false } = props
+
   const selectedWrapperStyles = isError
     ? errorOptionStyles
     : selectedOptionStyles
@@ -63,18 +57,7 @@ export function MiniCard(props: MiniCardProps): JSX.Element {
     : unselectedOptionStyles
 
   return (
-    <Flex position={POSITION_RELATIVE} onClick={onClick} css={wrapperStyles}>
-      {isError && isSelected && (
-        <Icon
-          name="alert-circle"
-          color={COLORS.error}
-          position={POSITION_ABSOLUTE}
-          width={SPACING.spacing4}
-          top={SPACING.spacing3}
-          right={SPACING.spacing3}
-          aria-label={`icon_error`}
-        />
-      )}
+    <Flex onClick={onClick} css={wrapperStyles}>
       {children}
     </Flex>
   )

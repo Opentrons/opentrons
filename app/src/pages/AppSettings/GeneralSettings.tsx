@@ -17,6 +17,7 @@ import {
   TYPOGRAPHY,
   COLORS,
   ALIGN_START,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
@@ -187,20 +188,23 @@ export function GeneralSettings(): JSX.Element {
             </StyledText>
           </Box>
           <Box>
-            <Link
-              role="button"
-              css={TYPOGRAPHY.linkPSemiBold}
-              onClick={() => setShowPreviousVersionModal(true)}
-              id="GeneralSettings_previousVersionLink"
-            >
-              {t('restore_previous')}
-            </Link>
-            <ExternalLink
-              href={SOFTWARE_SYNC_URL}
-              id="GeneralSettings_appAndRobotSync"
-            >
-              {t('versions_sync')}
-            </ExternalLink>
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <Link
+                role="button"
+                css={TYPOGRAPHY.linkPSemiBold}
+                href={''}
+                onClick={() => setShowPreviousVersionModal(true)}
+                id="GeneralSettings_previousVersionLink"
+              >
+                {t('restore_previous')}
+              </Link>
+              <ExternalLink
+                href={SOFTWARE_SYNC_URL}
+                id="GeneralSettings_appAndRobotSync"
+              >
+                {t('versions_sync')}
+              </ExternalLink>
+            </Flex>
           </Box>
         </Box>
         <Divider marginY={SPACING.spacing5} />

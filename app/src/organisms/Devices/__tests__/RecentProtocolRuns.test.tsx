@@ -4,7 +4,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { useDispatchApiRequest } from '../../../redux/robot-api'
-import { useIsRobotViewable } from '../hooks'
+import { useIsRobotViewable, useRunStatuses } from '../hooks'
 import { RecentProtocolRuns } from '../RecentProtocolRuns'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 
@@ -29,6 +29,9 @@ const mockHistoricalProtocolRun = HistoricalProtocolRun as jest.MockedFunction<
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
 >
+const mockUseRunStatues = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
+>
 const render = () => {
   return renderWithProviders(<RecentProtocolRuns robotName="otie" />, {
     i18nInstance: i18n,
@@ -40,6 +43,12 @@ describe('RecentProtocolRuns', () => {
 
   beforeEach(() => {
     dispatchApiRequest = jest.fn()
+    mockUseRunStatues.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: true,
+      isRunIdle: false,
+    })
     mockHistoricalProtocolRun.mockReturnValue(
       <div>mock HistoricalProtocolRun</div>
     )
