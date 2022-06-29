@@ -125,10 +125,9 @@ export const darkLinkLabelSemiBold = css`
   font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${COLORS.darkBlack};
-  opacity: 0.7;
+  color: ${COLORS.darkGreyEnabled};
 
   &:hover {
-    opacity: 1;
+    color: ${COLORS.darkBlack};
   }
 `

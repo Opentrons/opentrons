@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import {
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
@@ -9,7 +8,6 @@ import {
   TYPOGRAPHY,
   TEXT_TRANSFORM_CAPITALIZE,
   SPACING,
-  COLORS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -17,16 +15,6 @@ import { Portal } from '../../../App/portal'
 import { Modal } from '../../../atoms/Modal'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { PrimaryButton } from '../../../atoms/buttons'
-
-const SECONDARY_LINK_STYLE = css`
-  color: ${COLORS.darkBlack};
-  opacity: 0.7;
-  font-size: ${TYPOGRAPHY.fontSizeLabel};
-  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  &:hover {
-    opacity: 1;
-  }
-`
 
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
   'https://support.opentrons.com/s/ot2-get-started'
@@ -40,7 +28,7 @@ export function NewRobotSetupHelp(): JSX.Element {
   return (
     <>
       <Link
-        css={SECONDARY_LINK_STYLE}
+        css={TYPOGRAPHY.darkLinkLabelSemiBold}
         onClick={() => setShowNewRobotHelpModal(true)}
       >
         {t('see_how_to_setup_new_robot')}

@@ -28,10 +28,10 @@ export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'
 
 const LINK_STYLES = css`
-  opacity: 0.7;
+  color: ${COLORS.darkGreyEnabled};
 
   &:hover {
-    opacity: 1;
+    color: ${COLORS.darkBlack};
   }
 `
 export function DevicesEmptyState(): JSX.Element {
@@ -79,14 +79,11 @@ export function DevicesEmptyState(): JSX.Element {
         textAlign={TEXT_ALIGN_CENTER}
       >
         <Link
-          css={LINK_STYLES}
+          css={TYPOGRAPHY.darkLinkLabelSemiBold}
           external
           href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
           display="flex"
           alignItems={ALIGN_CENTER}
-          color={COLORS.darkBlack}
-          fontSize={TYPOGRAPHY.fontSizeLabel}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           id="DevicesEmptyState_troubleshootingConnectionProblems"
         >
           {t('troubleshooting_connection_problems')}

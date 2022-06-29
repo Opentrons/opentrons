@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
-import { css } from 'styled-components'
 
 import {
   Box,
@@ -52,13 +51,6 @@ const FILTER_OPTIONS: DropdownOption[] = []
 labwareDisplayCategoryFilters.forEach(category =>
   FILTER_OPTIONS.push({ name: startCase(category), value: category })
 )
-
-const LINK_STYLES = css`
-  opacity: 70%;
-  &:hover {
-    opacity: 100%;
-  }
-`
 
 export function Labware(): JSX.Element {
   const { t } = useTranslation('labware_landing')
@@ -222,10 +214,7 @@ export function Labware(): JSX.Element {
           <Link
             external
             href={LABWARE_CREATOR_HREF}
-            color={COLORS.darkBlack}
-            css={LINK_STYLES}
-            fontSize={TYPOGRAPHY.fontSizeLabel}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            css={TYPOGRAPHY.darkLinkLabelSemiBold}
           >
             {t('open_labware_creator')}
             <Icon
