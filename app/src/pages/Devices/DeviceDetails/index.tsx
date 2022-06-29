@@ -23,9 +23,8 @@ import type { NavRouteParams } from '../../../App/types'
 export function DeviceDetails(): JSX.Element | null {
   const { robotName } = useParams<NavRouteParams>()
   const robot = useRobot(robotName)
-  console.log('RENDERED DEV')
+
   useSyncRobotClock(robotName)
-  console.log('RENDERED n', robotName)
 
   return robot != null ? (
     <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
