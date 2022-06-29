@@ -195,9 +195,9 @@ async def fake_get_latch_status(*args, **kwargs):
 @pytest.mark.parametrize(
     "mock_get_rpm,mock_get_temperature,mock_get_latch_status",
     [
-        (fake_get_rpm, RuntimeError(), fake_get_latch_status),
-        (RuntimeError(), fake_get_temperature, fake_get_latch_status),
-        (fake_get_rpm, fake_get_temperature, RuntimeError()),
+        (fake_get_rpm, Exception(), fake_get_latch_status),
+        (Exception(), fake_get_temperature, fake_get_latch_status),
+        (fake_get_rpm, fake_get_temperature, Exception()),
     ],
 )
 async def test_sync_rpm_error_response(
@@ -219,8 +219,13 @@ async def test_sync_rpm_error_response(
         pass
 
     simulating_module_driver_patched._driver.set_rpm.side_effect = fake_rpm_setter
-    with pytest.raises(RuntimeError):
+    with pytest.raises(Exception):
         await simulating_module_driver_patched.set_speed(rpm=500)
+    assert (
+        simulating_module_driver_patched.live_data["data"]["errorDetails"]
+        == "Exception()"
+    )
+    assert simulating_module_driver_patched.status == HeaterShakerStatus.ERROR
 
 
 async def test_async_error_response(simulating_module_driver_patched):

@@ -99,9 +99,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         )
         self._device_info = device_info
         self._driver = driver
-
         self._listener = HeaterShakerListener(loop=loop)
-
         self._poller = Poller(
             reader=PollerReader(driver=self._driver),
             interval_seconds=polling_period,
