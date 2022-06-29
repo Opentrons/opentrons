@@ -1,6 +1,6 @@
 from opentrons.types import Point
 from opentrons.hardware_control.robot_calibration import load_gripper_calibration_offset
-from opentrons.hardware_control import gripper
+from opentrons.hardware_control.instruments import gripper
 from opentrons.config import gripper_config
 from opentrons.calibration_storage.delete import clear_gripper_calibration_offsets
 

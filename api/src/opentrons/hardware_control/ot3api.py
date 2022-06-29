@@ -37,7 +37,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
 
 
 from .util import use_or_initialize_loop, check_motion_bounds
-from .pipette import (
+from .instruments.pipette import (
     generate_hardware_configs_ot3,
     load_from_config_and_check_skip,
 )
@@ -73,7 +73,7 @@ from .robot_calibration import (
 
 
 from .protocols import HardwareControlAPI
-from .instrument_handler import OT3InstrumentHandler, InstrumentsByMount
+from .instruments.pipette_handler import OT3PipetteHandler, InstrumentsByMount
 from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
@@ -160,7 +160,7 @@ class OT3API(
             )
         )
 
-        self._instrument_handler = OT3InstrumentHandler({m: None for m in OT3Mount})
+        self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
 
     def set_robot_calibration(self, robot_calibration: RobotCalibration) -> None:
@@ -422,12 +422,12 @@ class OT3API(
             pip_offset_cal = load_pipette_offset(pip_id, mount.to_mount())
             p, may_skip = load_from_config_and_check_skip(
                 config,
-                self._instrument_handler.hardware_instruments[mount],
+                self._pipette_handler.hardware_instruments[mount],
                 req_instr,
                 pip_id,
                 pip_offset_cal,
             )
-            self._instrument_handler.hardware_instruments[mount] = p
+            self._pipette_handler.hardware_instruments[mount] = p
             if req_instr and p:
                 p.act_as(req_instr)
 
@@ -443,7 +443,7 @@ class OT3API(
         await self._backend.probe_network()
         await self.set_gantry_load(
             self._gantry_load_from_instruments(
-                self._instrument_handler.attached_instruments
+                self._pipette_handler.attached_instruments
             )
         )
 
@@ -504,7 +504,7 @@ class OT3API(
         """Reset the stored state of the system."""
         self._pause_manager.reset()
         await self._execution_manager.reset()
-        await self._instrument_handler.reset()
+        await self._pipette_handler.reset()
         await self.cache_instruments()
 
     # Gantry/frame (i.e. not pipette) action API
@@ -527,7 +527,7 @@ class OT3API(
 
         checked_mount = OT3Mount.from_mount(mount)
         await self.home([OT3Axis.of_main_tool_actuator(checked_mount)])
-        instr = self._instrument_handler.hardware_instruments[checked_mount]
+        instr = self._pipette_handler.hardware_instruments[checked_mount]
         if instr:
             target_pos = target_position_from_plunger(
                 checked_mount, instr.config.bottom, self._current_position
@@ -877,14 +877,14 @@ class OT3API(
     ) -> None:
         """Prepare the pipette for aspiration."""
         checked_mount = OT3Mount.from_mount(mount)
-        instrument = self._instrument_handler.get_pipette(checked_mount)
+        instrument = self._pipette_handler.get_pipette(checked_mount)
 
-        self._instrument_handler.ready_for_tip_action(
+        self._pipette_handler.ready_for_tip_action(
             instrument, HardwareAction.PREPARE_ASPIRATE
         )
 
         if instrument.current_volume == 0:
-            speed = self._instrument_handler.plunger_speed(
+            speed = self._pipette_handler.plunger_speed(
                 instrument, instrument.blow_out_flow_rate, "aspirate"
             )
             bottom = instrument.config.bottom
@@ -907,7 +907,7 @@ class OT3API(
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette."""
         realmount = OT3Mount.from_mount(mount)
-        aspirate_spec = self._instrument_handler.plan_check_aspirate(
+        aspirate_spec = self._pipette_handler.plan_check_aspirate(
             realmount, volume, rate
         )
         if not aspirate_spec:
@@ -944,7 +944,7 @@ class OT3API(
         """
         Dispense a volume of liquid in microliters(uL) using this pipette."""
         realmount = OT3Mount.from_mount(mount)
-        dispense_spec = self._instrument_handler.plan_check_dispense(
+        dispense_spec = self._pipette_handler.plan_check_dispense(
             realmount, volume, rate
         )
         if not dispense_spec:
@@ -977,7 +977,7 @@ class OT3API(
         the current location of pipette
         """
         realmount = OT3Mount.from_mount(mount)
-        blowout_spec = self._instrument_handler.plan_check_blow_out(realmount)
+        blowout_spec = self._pipette_handler.plan_check_blow_out(realmount)
         await self._backend.set_active_current(
             {blowout_spec.axis: blowout_spec.current}
         )
@@ -1009,7 +1009,7 @@ class OT3API(
     ) -> None:
         """Pick up tip from current location."""
         realmount = OT3Mount.from_mount(mount)
-        spec, _add_tip_to_instrs = self._instrument_handler.plan_check_pick_up_tip(
+        spec, _add_tip_to_instrs = self._pipette_handler.plan_check_pick_up_tip(
             realmount, tip_length, presses, increment
         )
         await self._backend.set_active_current(
@@ -1051,7 +1051,7 @@ class OT3API(
     def set_current_tiprack_diameter(
         self, mount: Union[top_types.Mount, OT3Mount], tiprack_diameter: float
     ) -> None:
-        instrument = self._instrument_handler.get_pipette(OT3Mount.from_mount(mount))
+        instrument = self._pipette_handler.get_pipette(OT3Mount.from_mount(mount))
         self._log.info(
             "Updating tip rack diameter on pipette mount: "
             f"{mount.name}, tip diameter: {tiprack_diameter} mm"
@@ -1061,7 +1061,7 @@ class OT3API(
     def set_working_volume(
         self, mount: Union[top_types.Mount, OT3Mount], tip_volume: int
     ) -> None:
-        instrument = self._instrument_handler.get_pipette(OT3Mount.from_mount(mount))
+        instrument = self._pipette_handler.get_pipette(OT3Mount.from_mount(mount))
         self._log.info(
             "Updating working volume on pipette mount:"
             f"{mount.name}, tip volume: {tip_volume} ul"
@@ -1073,9 +1073,7 @@ class OT3API(
     ) -> None:
         """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
-        spec, _remove = self._instrument_handler.plan_check_drop_tip(
-            realmount, home_after
-        )
+        spec, _remove = self._pipette_handler.plan_check_drop_tip(realmount, home_after)
         for move in spec.drop_moves:
             await self._backend.set_active_current(
                 {
@@ -1133,7 +1131,7 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         cp_override: Optional[CriticalPoint] = None,
     ) -> top_types.Point:
-        return self._instrument_handler.critical_point_for(
+        return self._pipette_handler.critical_point_for(
             OT3Mount.from_mount(mount), cp_override
         )
 
@@ -1142,14 +1140,14 @@ class OT3API(
         # override required for type matching
         return {
             m.to_mount(): i
-            for m, i in self._instrument_handler.hardware_instruments.items()
+            for m, i in self._pipette_handler.hardware_instruments.items()
             if m != OT3Mount.GRIPPER
         }
 
     def get_attached_instruments(self) -> Dict[top_types.Mount, PipetteDict]:
         return {
             m.to_mount(): pd
-            for m, pd in self._instrument_handler.get_attached_instruments().items()
+            for m, pd in self._pipette_handler.get_attached_instruments().items()
             if m != OT3Mount.GRIPPER
         }
 
@@ -1160,20 +1158,18 @@ class OT3API(
             checked_mount: Optional[OT3Mount] = OT3Mount.from_mount(mount)
         else:
             checked_mount = None
-        self._instrument_handler.reset_instrument(checked_mount)
+        self._pipette_handler.reset_instrument(checked_mount)
 
     def get_attached_instrument(
         self, mount: Union[top_types.Mount, OT3Mount]
     ) -> PipetteDict:
-        return self._instrument_handler.get_attached_instrument(
-            OT3Mount.from_mount(mount)
-        )
+        return self._pipette_handler.get_attached_instrument(OT3Mount.from_mount(mount))
 
     @property
     def attached_instruments(self) -> Dict[top_types.Mount, PipetteDict]:
         return {
             m.to_mount(): d
-            for m, d in self._instrument_handler.attached_instruments.items()
+            for m, d in self._pipette_handler.attached_instruments.items()
             if m != OT3Mount.GRIPPER
         }
 
@@ -1185,7 +1181,7 @@ class OT3API(
         blow_out: Optional[float] = None,
         drop_tip: Optional[float] = None,
     ) -> None:
-        self._instrument_handler.calibrate_plunger(
+        self._pipette_handler.calibrate_plunger(
             OT3Mount.from_mount(mount), top, bottom, blow_out, drop_tip
         )
 
@@ -1196,7 +1192,7 @@ class OT3API(
         dispense: Optional[float] = None,
         blow_out: Optional[float] = None,
     ) -> None:
-        return self._instrument_handler.set_flow_rate(
+        return self._pipette_handler.set_flow_rate(
             OT3Mount.from_mount(mount), aspirate, dispense, blow_out
         )
 
@@ -1207,7 +1203,7 @@ class OT3API(
         dispense: Optional[float] = None,
         blow_out: Optional[float] = None,
     ) -> None:
-        self._instrument_handler.set_pipette_speed(
+        self._pipette_handler.set_pipette_speed(
             OT3Mount.from_mount(mount), aspirate, dispense, blow_out
         )
 
@@ -1231,10 +1227,10 @@ class OT3API(
     async def add_tip(
         self, mount: Union[top_types.Mount, OT3Mount], tip_length: float
     ) -> None:
-        await self._instrument_handler.add_tip(OT3Mount.from_mount(mount), tip_length)
+        await self._pipette_handler.add_tip(OT3Mount.from_mount(mount), tip_length)
 
     async def remove_tip(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
-        await self._instrument_handler.remove_tip(OT3Mount.from_mount(mount))
+        await self._pipette_handler.remove_tip(OT3Mount.from_mount(mount))
 
     async def capacitive_probe(
         self,

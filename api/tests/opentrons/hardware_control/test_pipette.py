@@ -1,7 +1,8 @@
 import pytest
 from opentrons.calibration_storage import types as cal_types
 from opentrons.types import Point
-from opentrons.hardware_control import pipette, types
+from opentrons.hardware_control.instruments import pipette
+from opentrons.hardware_control import types
 from opentrons.config import pipette_config
 
 PIP_CAL = cal_types.PipetteOffsetByPipetteMount(
