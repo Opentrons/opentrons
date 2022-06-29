@@ -309,7 +309,7 @@ export function ProtocolDetails(
       >
         <Box
           padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing4}`}
-          width="115%"
+          width="100%"
         >
           {analysisStatus !== 'loading' &&
           mostRecentAnalysis != null &&

@@ -9,7 +9,6 @@ import {
   Icon,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  SIZE_5,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -61,6 +60,7 @@ export const ProtocolLabwareDetails = (
           color={COLORS.darkBlack}
           marginBottom={SPACING.spacing3}
           data-testid={'ProtocolLabwareDetails_labware_name'}
+          width="66%"
         >
           {t('labware_name')}
         </StyledText>
@@ -68,7 +68,6 @@ export const ProtocolLabwareDetails = (
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.darkBlack}
-          marginLeft={SIZE_5}
           data-testid={'ProtocolLabwareDetails_quantity'}
         >
           {t('quantity')}
@@ -110,22 +109,29 @@ export const ProtocolLabwareDetailItem = (
         marginY={SPACING.spacing3}
         alignItems={ALIGN_CENTER}
       >
-        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_CENTER}
+          width="66%"
+          marginRight="1.25rem"
+        >
           {namespace === 'opentrons' ? (
             <Icon
               color={COLORS.blue}
               name="check-decagram"
-              height=".75rem"
+              height="0.75rem"
+              minHeight="0.75rem"
+              minWidth="0.75rem"
               marginRight={SPACING.spacing3}
             />
           ) : (
             <Flex marginLeft={SPACING.spacingM} />
           )}
-          <StyledText as="p" color={COLORS.darkBlack} width={SIZE_5}>
+          <StyledText as="p" color={COLORS.darkBlack} paddingRight="2rem">
             {displayName}
           </StyledText>
         </Flex>
-        <StyledText as="p" color={COLORS.darkBlack} marginLeft={'5rem'}>
+        <StyledText as="p" color={COLORS.darkBlack}>
           {quantity}
         </StyledText>
         <LabwareDetailOverflowMenu labware={labware} />
