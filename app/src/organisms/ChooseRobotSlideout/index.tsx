@@ -127,7 +127,7 @@ export function ChooseRobotSlideout(
         >
           <CreateRunButton
             disabled={
-              selectedRobot == null // || isSelectedRobotOnWrongVersionOfSoftware
+              selectedRobot == null || isSelectedRobotOnWrongVersionOfSoftware
             }
             protocolKey={protocolKey}
             srcFileObjects={srcFileObjects}

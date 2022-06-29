@@ -20,6 +20,7 @@ import {
   Icon,
   COLORS,
   TEXT_ALIGN_CENTER,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 
 import { getStoredProtocols } from '../../redux/protocol-storage'
@@ -84,7 +85,17 @@ export function ChooseProtocolSlideout(
         </ApiHostProvider>
       }
     >
-      {isCreatingRun ? <Icon name="ot-spinner" spin size={SIZE_1} /> : null}
+      <Flex justifyContent={ALIGN_FLEX_END}>
+        {isCreatingRun ? (
+          <Icon
+            name="ot-spinner"
+            marginBottom={SPACING.spacing3}
+            spin
+            size={SIZE_1}
+          />
+        ) : null}
+      </Flex>
+
       {storedProtocols.length > 0 ? (
         storedProtocols.map(storedProtocol => {
           const isSelected =
