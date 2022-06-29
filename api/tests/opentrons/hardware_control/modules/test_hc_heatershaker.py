@@ -225,14 +225,12 @@ async def test_sync_rpm_error_response(
 
 async def test_async_error_response(simulating_module_driver_patched):
     """Test that asynchronous error is detected by poller and module live data and status are updated."""
-    simulating_module_driver_patched._driver.get_temperature.side_effect = (
-        RuntimeError()
-    )
-    with pytest.raises(RuntimeError):
+    simulating_module_driver_patched._driver.get_temperature.side_effect = Exception()
+    with pytest.raises(Exception):
         await simulating_module_driver_patched.wait_next_poll()
     assert (
         simulating_module_driver_patched.live_data["data"]["errorDetails"]
-        == "RuntimeError()"
+        == "Exception()"
     )
     assert simulating_module_driver_patched.status == HeaterShakerStatus.ERROR
     simulating_module_driver_patched._driver.get_temperature.side_effect = (
