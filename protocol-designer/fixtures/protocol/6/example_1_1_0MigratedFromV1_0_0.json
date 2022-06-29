@@ -5140,7 +5140,7 @@
     },
     {
       "commandType": "delay",
-      "params": { "message": "Delay plz", "wait": 3723 }
+      "params": { "message": "Delay plz", "seconds": 3723 }
     }
   ]
 }
