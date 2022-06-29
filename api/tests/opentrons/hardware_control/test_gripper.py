@@ -11,7 +11,7 @@ FAKE_OFFSET = load_gripper_calibration_offset("fakeid123")
 
 
 def test_config_update():
-    gripr = gripper.Gripper(fake_gripper_conf, "fakeid123")
+    gripr = gripper.Gripper(fake_gripper_conf, FAKE_OFFSET, "fakeid123")
     config_to_update = {"z_idle_current": 1.0, "jaw_reference_voltage": 0.5}
     for k, v in config_to_update.items():
         gripr.update_config_item(k, v)

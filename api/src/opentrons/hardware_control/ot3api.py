@@ -407,7 +407,7 @@ class OT3API(
         self,
         mount: OT3Mount,
         instrument_data: AttachedPipette,
-        req_instr: Optional[PipetteName]
+        req_instr: Optional[PipetteName],
     ) -> None:
         """Set up pipette based on scanned information."""
         config = instrument_data.get("config")
@@ -533,6 +533,7 @@ class OT3API(
         self._pause_manager.reset()
         await self._execution_manager.reset()
         await self._pipette_handler.reset()
+        await self._gripper_handler.reset()
         await self.cache_instruments()
 
     # Gantry/frame (i.e. not pipette) action API
@@ -1159,12 +1160,15 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         cp_override: Optional[CriticalPoint] = None,
     ) -> top_types.Point:
-        return self._pipette_handler.critical_point_for(
-            OT3Mount.from_mount(mount), cp_override
-        )
+        if mount == OT3Mount.GRIPPER:
+            return self._gripper_handler.get_critical_point(cp_override)
+        else:
+            return self._pipette_handler.critical_point_for(
+                OT3Mount.from_mount(mount), cp_override
+            )
 
     @property
-    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:
+    def hardware_pipettes(self) -> InstrumentsByMount[top_types.Mount]:
         # override required for type matching
         return {
             m.to_mount(): i
@@ -1172,12 +1176,20 @@ class OT3API(
             if m != OT3Mount.GRIPPER
         }
 
-    def get_attached_instruments(self) -> Dict[top_types.Mount, PipetteDict]:
+    @property
+    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:
+        # override required for type matching
+        return self.hardware_pipettes
+
+    def get_attached_pipettes(self) -> Dict[top_types.Mount, PipetteDict]:
         return {
             m.to_mount(): pd
             for m, pd in self._pipette_handler.get_attached_instruments().items()
             if m != OT3Mount.GRIPPER
         }
+
+    def get_attached_instruments(self) -> Dict[top_types.Mount, PipetteDict]:
+        return self.get_attached_pipettes()
 
     def reset_instrument(
         self, mount: Union[top_types.Mount, OT3Mount, None] = None
@@ -1186,15 +1198,28 @@ class OT3API(
             checked_mount: Optional[OT3Mount] = OT3Mount.from_mount(mount)
         else:
             checked_mount = None
-        self._pipette_handler.reset_instrument(checked_mount)
+        if checked_mount == OT3Mount.GRIPPER:
+            self._gripper_handler.reset_gripper()
+        else:
+            self._pipette_handler.reset_instrument(checked_mount)
 
-    def get_attached_instrument(
+    def get_attached_pipette(
         self, mount: Union[top_types.Mount, OT3Mount]
     ) -> PipetteDict:
         return self._pipette_handler.get_attached_instrument(OT3Mount.from_mount(mount))
 
+    def get_attached_instrument(
+        self, mount: Union[top_types.Mount, OT3Mount]
+    ) -> PipetteDict:
+        return self.get_attached_pipette(mount)
+
+
     @property
-    def attached_instruments(self) -> Dict[top_types.Mount, PipetteDict]:
+    def attached_instruments(self) -> Any:
+        return self.attached_pipettes
+
+    @property
+    def attached_pipettes(self) -> Dict[top_types.Mount, PipetteDict]:
         return {
             m.to_mount(): d
             for m, d in self._pipette_handler.attached_instruments.items()

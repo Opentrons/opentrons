@@ -90,6 +90,9 @@ class PipetteDict(InstrumentDict):
 class GripperDict(InstrumentDict):
     name: GripperName
     model: GripperModel
+    gripper_id: str
+    has_gripped: bool
+    ready_to_grip: bool
 
 
 class InstrumentHardwareConfigs(TypedDict):
