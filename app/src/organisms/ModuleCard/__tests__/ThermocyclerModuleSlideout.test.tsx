@@ -157,6 +157,24 @@ describe('ThermocyclerModuleSlideout', () => {
     expect(button).not.toBeEnabled()
   })
 
+  it('renders the exit button and when clicked, deletes the value input', () => {
+    props = {
+      module: mockThermocycler,
+      isSecondaryTemp: true,
+      isExpanded: true,
+      onCloseClick: jest.fn(),
+      isLoadedInRun: false,
+    }
+    const { getByLabelText, getByTestId } = render(props)
+    const button = getByLabelText('exit')
+    const input = getByTestId('thermocyclerModuleV1_true')
+    fireEvent.change(input, { target: { value: '45' } })
+    fireEvent.click(button)
+
+    expect(props.onCloseClick).toHaveBeenCalled()
+    expect(input).not.toHaveValue()
+  })
+
   it('renders the button and it is not clickable until there is something in form field for the TC Block when there is a runId', () => {
     mockUseRunStatuses.mockReturnValue({
       isLegacySessionInProgress: false,
