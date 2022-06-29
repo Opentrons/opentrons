@@ -15,7 +15,6 @@ import {
   DIRECTION_COLUMN,
   Overlay,
 } from '@opentrons/components'
-
 import { useSortedProtocols } from './hooks'
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/buttons'
