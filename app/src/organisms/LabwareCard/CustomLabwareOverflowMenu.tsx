@@ -16,7 +16,9 @@ import {
   ALIGN_CENTER,
   TYPOGRAPHY,
   Btn,
+  useOnClickOutside,
 } from '@opentrons/components'
+
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { AlertPrimaryButton } from '../../atoms/buttons'
@@ -24,16 +26,17 @@ import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { Modal } from '../../atoms/Modal'
 import { Portal } from '../../App/portal'
-import { useCloseOnOutsideClick } from './hooks'
 import {
   deleteCustomLabwareFile,
   openCustomLabwareDirectory,
 } from '../../redux/custom-labware'
+
+import type { StyleProps } from '@opentrons/components'
 import type { Dispatch } from '../../redux/types'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 
-interface CustomLabwareOverflowMenuProps {
+interface CustomLabwareOverflowMenuProps extends StyleProps {
   filename: string
   onDelete?: () => void
 }
@@ -41,12 +44,13 @@ interface CustomLabwareOverflowMenuProps {
 export function CustomLabwareOverflowMenu(
   props: CustomLabwareOverflowMenuProps
 ): JSX.Element {
-  const { filename, onDelete } = props
+  const { filename, onDelete, ...styleProps } = props
   const { t } = useTranslation(['labware_landing', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
-  const overflowMenuRef = React.useRef(null)
-  useCloseOnOutsideClick(overflowMenuRef, () => setShowOverflowMenu(false))
+  const overflowMenuRef = useOnClickOutside({
+    onClickOutside: () => setShowOverflowMenu(false),
+  }) as React.RefObject<HTMLDivElement>
 
   const {
     confirm: confirmDeleteLabware,
@@ -87,7 +91,11 @@ export function CustomLabwareOverflowMenu(
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      position={POSITION_RELATIVE}
+      {...styleProps}
+    >
       <OverflowBtn
         aria-label="CustomLabwareOverflowMenu_button"
         alignSelf={ALIGN_FLEX_END}
@@ -96,7 +104,7 @@ export function CustomLabwareOverflowMenu(
       {showOverflowMenu && (
         <Flex
           ref={overflowMenuRef}
-          width="10rem"
+          width="11rem"
           zIndex={10}
           borderRadius={'4px 4px 0px 0px'}
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}

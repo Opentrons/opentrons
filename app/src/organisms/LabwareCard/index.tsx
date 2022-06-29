@@ -2,6 +2,8 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
 import { format } from 'date-fns'
+import { css } from 'styled-components'
+
 import {
   Box,
   Flex,
@@ -20,9 +22,19 @@ import {
   ALIGN_CENTER,
   SIZE_1,
 } from '@opentrons/components'
+
 import { StyledText } from '../../atoms/text'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
+
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
+
+const COPY_ICON_STYLE = css`
+  color: ${COLORS.darkGreyEnabled};
+
+  &:hover {
+    color: ${COLORS.black};
+  }
+`
 
 export interface LabwareCardProps {
   labware: LabwareDefAndDate
@@ -42,14 +54,19 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     await navigator.clipboard.writeText(apiName)
   }
 
+  console.log(
+    `${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`
+  )
+
   return (
     <Box
       role="link"
       backgroundColor={COLORS.white}
       color={COLORS.black}
       css={BORDERS.cardOutlineBorder}
-      padding={SPACING.spacing4}
-      height="7.375rem"
+      paddingLeft={SPACING.spacing4}
+      paddingY={SPACING.spacing4}
+      height="auto"
       onClick={props.onClick}
       cursor="pointer"
     >
@@ -75,23 +92,27 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               </StyledText>
               {isCustomDefinition ? (
                 <StyledText
-                  as="h6"
+                  as="label"
                   color={COLORS.darkGreyEnabled}
                   id="LabwareCard_customDef"
                 >
                   {t('custom_def')}
                 </StyledText>
               ) : (
-                <>
-                  <StyledText as="h6" id="LabwareCard_opentronsDef">
-                    <Icon
-                      color={COLORS.blue}
-                      name="check-decagram"
-                      height=".7rem"
-                    />{' '}
+                <Flex alignItems={ALIGN_CENTER} marginTop={SPACING.spacing2}>
+                  <Icon
+                    color={COLORS.blue}
+                    name="check-decagram"
+                    height=".7rem"
+                  />
+                  <StyledText
+                    as="label"
+                    id="LabwareCard_opentronsDef"
+                    marginLeft={SPACING.spacing2}
+                  >
                     {t('opentrons_def')}
                   </StyledText>
-                </>
+                </Flex>
               )}
             </Box>
             <Box paddingTop={SPACING.spacing4}>
@@ -108,12 +129,16 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 onClick={handleCopyClick}
                 role="button"
               >
-                <Flex alignItems={ALIGN_CENTER}>
+                <Flex
+                  alignItems={ALIGN_CENTER}
+                  css={{ 'overflow-wrap': 'anywhere' }}
+                >
                   {apiName}{' '}
                   <Icon
                     height={SIZE_1}
                     name="copy-text"
                     aria-label="copy-text"
+                    css={COPY_ICON_STYLE}
                   />
                 </Flex>
               </Link>
@@ -128,9 +153,10 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           >
             <CustomLabwareOverflowMenu filename={filename} />
             <StyledText
-              as="h6"
+              as="label"
               color={COLORS.darkGreyEnabled}
               id="LabwareCard_dateAdded"
+              textAlign={TYPOGRAPHY.textAlignRight}
             >
               {t('date_added')} {format(new Date(modified), 'MM/dd/yyyy')}
             </StyledText>

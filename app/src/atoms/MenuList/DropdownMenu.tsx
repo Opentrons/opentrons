@@ -41,11 +41,12 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        width="8rem"
+        width="9.125rem"
         onClick={toggleSetShowDropdownMenu}
         border={BORDERS.lineBorder}
         borderRadius={BORDERS.radiusRoundEdge}
-        padding={SPACING.spacing3}
+        padding={`
+          ${SPACING.spacing3} ${SPACING.spacing3} ${SPACING.spacing3} 0.75rem`} // temp
         backgroundColor={COLORS.white}
         css={css`
           cursor: pointer;

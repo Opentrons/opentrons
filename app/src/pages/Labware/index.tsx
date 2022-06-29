@@ -18,6 +18,7 @@ import {
   ALIGN_CENTER,
   Icon,
   ALIGN_FLEX_END,
+  useOnClickOutside,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -59,6 +60,18 @@ const LINK_STYLES = css`
     opacity: 100%;
   }
 `
+const SORT_BY_STYLE = css`
+  background-color: ${COLORS.transparent};
+
+  &:hover {
+    background-color: ${COLORS.medGreyHover};
+  }
+
+  &:active,
+  &:focus {
+    background-color: ${COLORS.medGrey};
+  }
+`
 
 export function Labware(): JSX.Element {
   const { t } = useTranslation('labware_landing')
@@ -81,6 +94,9 @@ export function Labware(): JSX.Element {
     currentLabwareDef,
     setCurrentLabwareDef,
   ] = React.useState<null | LabwareDefAndDate>(null)
+  const sortOverflowWrapperRef = useOnClickOutside({
+    onClickOutside: () => setShowSortByMenu(false),
+  }) as React.RefObject<HTMLDivElement>
 
   React.useEffect(() => {
     if (labwareFailureMessage != null) {
@@ -143,9 +159,9 @@ export function Labware(): JSX.Element {
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
-              backgroundColor={COLORS.medGrey}
               borderRadius={BORDERS.radiusSoftCorners}
               marginLeft={SPACING.spacing3}
+              css={SORT_BY_STYLE}
             >
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
@@ -165,13 +181,14 @@ export function Labware(): JSX.Element {
           </Flex>
           {showSortByMenu && (
             <Flex
+              ref={sortOverflowWrapperRef}
               width="9.375rem"
               zIndex={2}
               borderRadius={BORDERS.radiusSoftCorners}
               boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
               position={POSITION_ABSOLUTE}
               backgroundColor={COLORS.white}
-              top="8.5rem"
+              top="8.25rem"
               right={0}
               flexDirection={DIRECTION_COLUMN}
             >
