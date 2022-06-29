@@ -6,6 +6,8 @@ import {
   useCreateRunMutation,
 } from '@opentrons/react-api-client'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
+
 import { getValidCustomLabwareFiles } from '../../redux/custom-labware/selectors'
 
 import type { UseMutateFunction } from 'react-query'
@@ -30,6 +32,7 @@ export function useCreateRunFromProtocol(
 ): UseCreateRun {
   const host = useHost()
   const queryClient = useQueryClient()
+  const { t } = useTranslation('shared')
   const [runCreationError, setRunCreationError] = React.useState<string | null>(
     null
   )
@@ -49,7 +52,10 @@ export function useCreateRunFromProtocol(
       options.onSuccess?.(...args)
     },
     onError: error => {
-      setRunCreationError(error.response?.data.errors[0].detail ?? null)
+      setRunCreationError(
+        error.response?.data.errors[0].detail ??
+          t('protocol_run_general_error_msg')
+      )
     },
   })
   const {
@@ -60,7 +66,10 @@ export function useCreateRunFromProtocol(
       createRun({ protocolId: data.data.id })
     },
     onError: error => {
-      setRunCreationError(error.response?.data.errors[0].detail ?? null)
+      setRunCreationError(
+        error.response?.data.errors[0].detail ??
+          t('protocol_run_general_error_msg')
+      )
     },
   })
 
