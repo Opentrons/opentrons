@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next'
 import { getValidCustomLabwareFiles } from '../../redux/custom-labware/selectors'
 
 import type { UseMutateFunction } from 'react-query'
-import type { Protocol } from '@opentrons/api-client'
+import type { HostConfig, Protocol } from '@opentrons/api-client'
 import type { UseCreateRunMutationOptions } from '@opentrons/react-api-client/src/runs/useCreateRunMutation'
 import type { CreateProtocolVariables } from '@opentrons/react-api-client/src/protocols/useCreateProtocolMutation'
 import type { State } from '../../redux/types'
@@ -25,66 +25,80 @@ export interface UseCreateRun {
   >
   isCreatingRun: boolean
   runCreationError: string | null
+  reset: () => void
 }
 
 export function useCreateRunFromProtocol(
-  options: UseCreateRunMutationOptions
+  options: UseCreateRunMutationOptions,
+  hostOverride?: HostConfig | null
 ): UseCreateRun {
-  const host = useHost()
+  const contextHost = useHost()
+  const host = hostOverride ?? contextHost
   const queryClient = useQueryClient()
   const { t } = useTranslation('shared')
-  const [runCreationError, setRunCreationError] = React.useState<string | null>(
-    null
-  )
 
   const customLabwareFiles = useSelector((state: State) =>
     getValidCustomLabwareFiles(state)
   )
 
-  const { createRun, isLoading: isCreatingRun } = useCreateRunMutation({
-    ...options,
-    onSuccess: (...args) => {
-      queryClient
-        .invalidateQueries([host, 'runs'])
-        .catch((e: Error) =>
-          console.error(`error invalidating runs query: ${e.message}`)
-        )
-      options.onSuccess?.(...args)
+  const {
+    createRun,
+    isLoading: isCreatingRun,
+    reset: resetRunMutation,
+    error: runError,
+  } = useCreateRunMutation(
+    {
+      ...options,
+      onSuccess: (...args) => {
+        queryClient
+          .invalidateQueries([host, 'runs'])
+          .catch((e: Error) =>
+            console.error(`error invalidating runs query: ${e.message}`)
+          )
+        options.onSuccess?.(...args)
+      },
     },
-    onError: error => {
-      setRunCreationError(
-        error.response?.data.errors[0].detail ??
-          t('protocol_run_general_error_msg')
-      )
-    },
-  })
+    host
+  )
   const {
     createProtocol: createProtocolRun,
     isLoading: isCreatingProtocol,
-  } = useCreateProtocolMutation({
-    onSuccess: data => {
-      createRun({ protocolId: data.data.id })
+    error: protocolError,
+    reset: resetProtocolMutation,
+  } = useCreateProtocolMutation(
+    {
+      onSuccess: data => {
+        createRun({ protocolId: data.data.id })
+      },
     },
-    onError: error => {
-      setRunCreationError(
-        error.response?.data.errors[0].detail ??
-          t('protocol_run_general_error_msg')
-      )
-    },
-  })
+    host
+  )
+
+  const error =
+    protocolError != null || runError != null
+      ? protocolError?.response?.data?.errors?.[0]?.detail ??
+        protocolError?.response?.data ??
+        runError?.response?.data?.errors?.[0]?.detail ??
+        runError?.response?.data ??
+        t('protocol_run_general_error_msg')
+      : null
 
   return {
     createRunFromProtocolSource: (
       { files: srcFiles, protocolKey },
       ...args
     ) => {
-      setRunCreationError(null)
+      resetRunMutation()
       createProtocolRun(
         { files: [...srcFiles, ...customLabwareFiles], protocolKey },
         ...args
       )
     },
     isCreatingRun: isCreatingProtocol || isCreatingRun,
-    runCreationError,
+    runCreationError: error,
+    reset: () => {
+      resetProtocolMutation()
+      resetRunMutation()
+    },
   }
 }

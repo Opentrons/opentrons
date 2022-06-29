@@ -24,7 +24,6 @@ import {
   SIZE_4,
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import {
   getConnectableRobots,
@@ -55,11 +54,8 @@ export function ChooseRobotSlideout(
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_details', 'shared'])
   const { storedProtocolData, showSlideout, onCloseClick, ...restProps } = props
-  const [createRunError, setCreateRunError] = React.useState<string | null>(
-    null
-  )
-  const [isCreatingRun, setIsCreatingRun] = React.useState<boolean>(false)
   const dispatch = useDispatch<Dispatch>()
+  const history = useHistory()
   const isScanning = useSelector((state: State) => getScanning(state))
 
   const unhealthyReachableRobots = useSelector((state: State) =>
@@ -74,6 +70,26 @@ export function ChooseRobotSlideout(
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(
     healthyReachableRobots[0] ?? null
   )
+  const {
+    createRunFromProtocolSource,
+    runCreationError,
+    reset: resetCreateRun,
+    isCreatingRun,
+  } = useCreateRunFromProtocol(
+    {
+      onSuccess: ({ data: runData }) => {
+        if (selectedRobot != null) {
+          history.push(
+            `/devices/${selectedRobot.name}/protocol-runs/${runData.id}`
+          )
+        }
+      },
+    },
+    selectedRobot != null ? { hostname: selectedRobot.ip } : null
+  )
+  const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
+    createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
+  }
 
   const isSelectedRobotOnWrongVersionOfSoftware = [
     'upgrade',
@@ -122,20 +138,21 @@ export function ChooseRobotSlideout(
         protocol_name: protocolDisplayName,
       })}
       footer={
-        <ApiHostProvider
-          hostname={selectedRobot != null ? selectedRobot.ip : null}
+        <PrimaryButton
+          onClick={handleProceed}
+          width="100%"
+          disabled={
+            isCreatingRun ||
+            selectedRobot == null ||
+            isSelectedRobotOnWrongVersionOfSoftware
+          }
         >
-          <CreateRunButton
-            disabled={
-              selectedRobot == null || isSelectedRobotOnWrongVersionOfSoftware
-            }
-            protocolKey={protocolKey}
-            srcFileObjects={srcFileObjects}
-            setError={setCreateRunError}
-            setIsCreatingRun={setIsCreatingRun}
-            robotName={selectedRobot != null ? selectedRobot.name : ''}
-          />
-        </ApiHostProvider>
+          {isCreatingRun ? (
+            <Icon name="ot-spinner" spin size={SIZE_1} />
+          ) : (
+            t('proceed_to_setup')
+          )}
+        </PrimaryButton>
       }
       {...restProps}
     >
@@ -185,17 +202,17 @@ export function ChooseRobotSlideout(
                   local={robot.local}
                   onClick={() => {
                     if (!isCreatingRun) {
-                      setCreateRunError(null)
+                      resetCreateRun()
                       setSelectedRobot(isSelected ? null : robot)
                     }
                   }}
-                  isError={createRunError != null}
+                  isError={runCreationError != null}
                   isSelected={isSelected}
                   isOnDifferentSoftwareVersion={
                     isSelectedRobotOnWrongVersionOfSoftware
                   }
                 />
-                {createRunError != null && isSelected && (
+                {runCreationError != null && isSelected && (
                   <StyledText
                     as="label"
                     color={COLORS.errorText}
@@ -203,7 +220,7 @@ export function ChooseRobotSlideout(
                     marginTop={`-${SPACING.spacing2}`}
                     marginBottom={SPACING.spacing3}
                   >
-                    {createRunError}
+                    {runCreationError}
                   </StyledText>
                 )}
               </Flex>
@@ -233,65 +250,5 @@ export function ChooseRobotSlideout(
         ) : null}
       </Flex>
     </Slideout>
-  )
-}
-
-interface CreateRunButtonProps
-  extends React.ComponentProps<typeof PrimaryButton> {
-  srcFileObjects: File[]
-  protocolKey: string
-  robotName: string
-  setError: (error: string | null) => void
-  setIsCreatingRun: (value: boolean) => void
-}
-function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
-  const { t } = useTranslation('protocol_details')
-  const history = useHistory()
-  const {
-    protocolKey,
-    srcFileObjects,
-    robotName,
-    setError,
-    setIsCreatingRun,
-    disabled,
-    ...buttonProps
-  } = props
-  const {
-    createRunFromProtocolSource,
-    runCreationError,
-    isCreatingRun,
-  } = useCreateRunFromProtocol({
-    onSuccess: ({ data: runData }) => {
-      setIsCreatingRun(false)
-      setError(null)
-      history.push(`/devices/${robotName}/protocol-runs/${runData.id}`)
-    },
-  })
-
-  React.useEffect(() => {
-    if (runCreationError != null) {
-      setIsCreatingRun(false)
-      setError(runCreationError)
-    }
-  }, [runCreationError, setError, setIsCreatingRun])
-
-  const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-    setIsCreatingRun(true)
-    createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
-  }
-
-  return (
-    <PrimaryButton
-      onClick={handleClick}
-      width="100%"
-      disabled={isCreatingRun || disabled}
-      {...buttonProps}
-    >
-      {isCreatingRun ? (
-        <Icon name="ot-spinner" spin size={SIZE_1} />
-      ) : (
-        t('proceed_to_setup')
-      )}
-    </PrimaryButton>
   )
 }

@@ -223,6 +223,7 @@ describe('ChooseRobotSlideout', () => {
       runCreationError: 'run creation error',
       createRunFromProtocolSource: mockCreateRunFromProtocolSource,
       isCreatingRun: false,
+      reset: jest.fn(),
     })
     const [{ getByRole, getByText }] = render({
       storedProtocolData: storedProtocolDataFixture,
