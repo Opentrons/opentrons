@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { css } from 'styled-components'
 
 import {
   Box,
@@ -13,7 +12,6 @@ import {
   FONT_WEIGHT_REGULAR,
   SPACING_5,
   JUSTIFY_SPACE_BETWEEN,
-  COLORS,
   TYPOGRAPHY,
   SPACING,
   POSITION_ABSOLUTE,
@@ -27,13 +25,6 @@ import { StyledText } from '../../atoms/text'
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'
 
-const LINK_STYLES = css`
-  color: ${COLORS.darkGreyEnabled};
-
-  &:hover {
-    color: ${COLORS.darkBlack};
-  }
-`
 export function DevicesEmptyState(): JSX.Element {
   const { t } = useTranslation('devices_landing')
   const dispatch = useDispatch()
