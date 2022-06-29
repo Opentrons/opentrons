@@ -50,20 +50,20 @@ stages:
     response:
       status_code: 201
 
-  - name: Wait for the delay to complete
-    max_retries: 10
-    delay_after: 0.2
-    request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
-      method: GET
-    response:
-      status_code: 200
-      strict:
-        - json:off
-      json:
-        data:
-          - status: succeeded
-          - status: queued
+#  - name: Wait for the delay to complete
+#    max_retries: 10
+#    delay_after: 0.2
+#    request:
+#      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+#      method: GET
+#    response:
+#      status_code: 200
+#      strict:
+#        - json:off
+#      json:
+#        data:
+#          - status: succeeded
+#          - status: queued
 
   - name: Stop the run
     request:
