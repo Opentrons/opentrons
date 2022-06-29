@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { Banner } from '../Banner'
 
@@ -26,5 +27,17 @@ describe('HeaterShakerBanner', () => {
     }
     const { getByText } = render(props)
     getByText('TITLE')
+  })
+
+  it('should render exit button and it is clickable', () => {
+    props = {
+      title: 'TITLE',
+      onClose: jest.fn(),
+    }
+    const { getByText, getByLabelText } = render(props)
+    getByText('TITLE')
+    const btn = getByLabelText('close')
+    fireEvent.click(btn)
+    expect(props.onClose).toHaveBeenCalled()
   })
 })
