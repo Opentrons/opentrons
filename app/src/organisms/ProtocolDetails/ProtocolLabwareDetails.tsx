@@ -7,7 +7,6 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SIZE_5,
@@ -54,7 +53,7 @@ export const ProtocolLabwareDetails = (
       : []
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       <Flex flexDirection={DIRECTION_ROW}>
         <StyledText
           as="label"
@@ -110,7 +109,6 @@ export const ProtocolLabwareDetailItem = (
         flexDirection={DIRECTION_ROW}
         marginY={SPACING.spacing3}
         alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           {namespace === 'opentrons' ? (

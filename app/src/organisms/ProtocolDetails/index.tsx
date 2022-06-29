@@ -282,6 +282,7 @@ export function ProtocolDetails(
         leftMountPipetteName={leftMountPipetteName}
         rightMountPipetteName={rightMountPipetteName}
         requiredModuleDetails={requiredModuleDetails}
+        isLoading={analysisStatus === 'loading'}
       />
     )
 
@@ -296,25 +297,28 @@ export function ProtocolDetails(
         showSlideout={showSlideout}
         storedProtocolData={props}
       />
-      <Box
-        marginBottom={SPACING.spacing4}
-        padding={SPACING.spacing4}
+
+      <Flex
         backgroundColor={COLORS.white}
         border={`1px solid ${COLORS.medGrey}`}
         borderRadius={BORDERS.radiusSoftCorners}
+        position={POSITION_RELATIVE}
+        flexDirection={DIRECTION_ROW}
+        width="100%"
+        marginBottom={SPACING.spacing4}
       >
-        {analysisStatus !== 'loading' &&
-        mostRecentAnalysis != null &&
-        mostRecentAnalysis.errors.length > 0 ? (
-          <ProtocolAnalysisFailure
-            protocolKey={protocolKey}
-            errors={mostRecentAnalysis.errors.map(e => e.detail)}
-          />
-        ) : null}
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
+        <Box
+          padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing4}`}
+          width="115%"
         >
+          {analysisStatus !== 'loading' &&
+          mostRecentAnalysis != null &&
+          mostRecentAnalysis.errors.length > 0 ? (
+            <ProtocolAnalysisFailure
+              protocolKey={protocolKey}
+              errors={mostRecentAnalysis.errors.map(e => e.detail)}
+            />
+          ) : null}
           <StyledText
             css={TYPOGRAPHY.h2SemiBold}
             marginBottom={SPACING.spacing4}
@@ -322,102 +326,108 @@ export function ProtocolDetails(
           >
             {protocolDisplayName}
           </StyledText>
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+          >
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              marginRight={SPACING.spacing4}
+              data-testid={`ProtocolDetails_creationMethod`}
+            >
+              <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                {t('creation_method')}
+              </StyledText>
+              <StyledText as="p">
+                {analysisStatus === 'loading'
+                  ? t('shared:loading')
+                  : creationMethod}
+              </StyledText>
+            </Flex>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              marginRight={SPACING.spacing4}
+              data-testid={`ProtocolDetails_lastUpdated`}
+            >
+              <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                {t('last_updated')}
+              </StyledText>
+              <StyledText as="p">
+                {analysisStatus === 'loading'
+                  ? t('shared:loading')
+                  : format(new Date(modified), 'MMMM dd, yyyy HH:mm')}
+              </StyledText>
+            </Flex>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              marginRight={SPACING.spacing4}
+              data-testid={`ProtocolDetails_lastAnalyzed`}
+            >
+              <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                {t('last_analyzed')}
+              </StyledText>
+              <StyledText as="p">
+                {analysisStatus === 'loading'
+                  ? t('shared:loading')
+                  : lastAnalyzed}
+              </StyledText>
+            </Flex>
+            <PrimaryButton
+              onClick={() => setShowSlideout(true)}
+              data-testid={`ProtocolDetails_runProtocol`}
+              disabled={analysisStatus === 'loading'}
+            >
+              {t('run_protocol')}
+            </PrimaryButton>
+          </Flex>
+          <Divider marginY={SPACING.spacing4} />
+          <Flex flexDirection={DIRECTION_ROW}>
+            <Flex
+              flex="0.34"
+              flexDirection={DIRECTION_COLUMN}
+              marginRight={SPACING.spacing4}
+              data-testid={`ProtocolDetails_author`}
+            >
+              <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                {t('org_or_author')}
+              </StyledText>
+              <StyledText as="p">
+                {analysisStatus === 'loading' ? t('shared:loading') : author}
+              </StyledText>
+            </Flex>
+            <Flex
+              flex="1"
+              flexDirection={DIRECTION_COLUMN}
+              marginRight={SPACING.spacing4}
+              data-testid={`ProtocolDetails_description`}
+            >
+              <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                {t('description')}
+              </StyledText>
+              {analysisStatus === 'loading' ? (
+                <StyledText as="p">{t('shared:loading')}</StyledText>
+              ) : null}
+              {mostRecentAnalysis != null ? (
+                <ReadMoreContent
+                  metadata={mostRecentAnalysis.metadata}
+                  protocolType={mostRecentAnalysis.config.protocolType}
+                />
+              ) : null}
+            </Flex>
+          </Flex>
+        </Box>
+        <Box
+          position={POSITION_RELATIVE}
+          top={SPACING.spacing1}
+          right={SPACING.spacing1}
+        >
           <OverflowMenu
             protocolKey={protocolKey}
             protocolType={mostRecentAnalysis?.config?.protocolType ?? 'python'}
             data-testid={`ProtocolDetails_overFlowMenu`}
           />
-        </Flex>
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-        >
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            marginRight={SPACING.spacing4}
-            data-testid={`ProtocolDetails_creationMethod`}
-          >
-            <StyledText as="h6" color={COLORS.darkGreyEnabled}>
-              {t('creation_method')}
-            </StyledText>
-            <StyledText as="p">
-              {analysisStatus === 'loading'
-                ? t('shared:loading')
-                : creationMethod}
-            </StyledText>
-          </Flex>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            marginRight={SPACING.spacing4}
-            data-testid={`ProtocolDetails_lastUpdated`}
-          >
-            <StyledText as="h6" color={COLORS.darkGreyEnabled}>
-              {t('last_updated')}
-            </StyledText>
-            <StyledText as="p">
-              {analysisStatus === 'loading'
-                ? t('shared:loading')
-                : format(new Date(modified), 'MMMM dd, yyyy HH:mm')}
-            </StyledText>
-          </Flex>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            marginRight={SPACING.spacing4}
-            data-testid={`ProtocolDetails_lastAnalyzed`}
-          >
-            <StyledText as="h6" color={COLORS.darkGreyEnabled}>
-              {t('last_analyzed')}
-            </StyledText>
-            <StyledText as="p">
-              {analysisStatus === 'loading'
-                ? t('shared:loading')
-                : lastAnalyzed}
-            </StyledText>
-          </Flex>
-          <PrimaryButton
-            onClick={() => setShowSlideout(true)}
-            data-testid={`ProtocolDetails_runProtocol`}
-            disabled={analysisStatus === 'loading'}
-          >
-            {t('run_protocol')}
-          </PrimaryButton>
-        </Flex>
-        <Divider marginY={SPACING.spacing4} />
-        <Flex flexDirection={DIRECTION_ROW}>
-          <Flex
-            flex="0.34"
-            flexDirection={DIRECTION_COLUMN}
-            marginRight={SPACING.spacing4}
-            data-testid={`ProtocolDetails_author`}
-          >
-            <StyledText as="h6" color={COLORS.darkGreyEnabled}>
-              {t('org_or_author')}
-            </StyledText>
-            <StyledText as="p">
-              {analysisStatus === 'loading' ? t('shared:loading') : author}
-            </StyledText>
-          </Flex>
-          <Flex
-            flex="1"
-            flexDirection={DIRECTION_COLUMN}
-            marginRight={SPACING.spacing4}
-            data-testid={`ProtocolDetails_description`}
-          >
-            <StyledText as="h6" color={COLORS.darkGreyEnabled}>
-              {t('description')}
-            </StyledText>
-            {analysisStatus === 'loading' ? (
-              <StyledText as="p">{t('shared:loading')}</StyledText>
-            ) : null}
-            {mostRecentAnalysis != null ? (
-              <ReadMoreContent
-                metadata={mostRecentAnalysis.metadata}
-                protocolType={mostRecentAnalysis.config.protocolType}
-              />
-            ) : null}
-          </Flex>
-        </Flex>
-      </Box>
+        </Box>
+      </Flex>
 
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -490,7 +500,11 @@ export function ProtocolDetails(
             } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
               BORDERS.radiusSoftCorners
             }`}
-            padding={`${SPACING.spacing5} ${SPACING.spacing4}`}
+            padding={
+              currentTab === 'robot_config'
+                ? `${SPACING.spacing5} ${SPACING.spacing4}`
+                : `${SPACING.spacing4} ${SPACING.spacing4} 0 ${SPACING.spacing4}`
+            }
           >
             {getTabContents()}
           </Box>
