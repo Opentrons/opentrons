@@ -439,7 +439,11 @@ export function ProtocolRunHeader({
         </Flex>
         {showCancelButton ? (
           <SecondaryButton
-            color={COLORS.errorText}
+            style={{
+              color: `${COLORS.errorText}`,
+              backgroundColor: 'none',
+              borderColor: `${COLORS.error}`,
+            }}
             padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
             onClick={handleCancelClick}
             id="ProtocolRunHeader_cancelRunButton"
@@ -519,7 +523,7 @@ export function ProtocolRunHeader({
             css={TYPOGRAPHY.h6Default}
             paddingBottom={SPACING.spacing2}
           >
-            {t('run_id')}
+            {t('run')}
           </StyledText>
           {/* this is the createdAt timestamp, not the run id */}
           <StyledText
