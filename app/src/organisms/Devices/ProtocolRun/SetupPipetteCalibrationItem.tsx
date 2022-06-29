@@ -147,31 +147,33 @@ export function SetupPipetteCalibrationItem({
             </Tooltip>
           ) : null}
         </Flex>
-        {PipetteOffsetCalibrationWizard}
-        {showCalBlockModal && (
-          <Portal level="top">
-            <AskForCalibrationBlockModal
-              onResponse={hasBlockModalResponse => {
-                startPipetteOffsetCalibrationBlockModal(hasBlockModalResponse)
-              }}
-              titleBarTitle={t('pipette_offset_cal')}
-              closePrompt={() => setShowCalBlockModal(false)}
-            />
-          </Portal>
-        )}
       </>
     )
   }
 
   return (
-    <SetupCalibrationItem
-      button={button}
-      calibratedDate={attached ? pipetteInfo.pipetteCalDate : null}
-      subText={subText}
-      label={t(`devices_landing:${mount}_mount`)}
-      title={pipetteInfo.pipetteSpecs?.displayName}
-      id={`PipetteCalibration_${mount}MountTitle`}
-      runId={runId}
-    />
+    <>
+      <SetupCalibrationItem
+        button={button}
+        calibratedDate={attached ? pipetteInfo.pipetteCalDate : null}
+        subText={subText}
+        label={t(`devices_landing:${mount}_mount`)}
+        title={pipetteInfo.pipetteSpecs?.displayName}
+        id={`PipetteCalibration_${mount}MountTitle`}
+        runId={runId}
+      />
+      {PipetteOffsetCalibrationWizard}
+      {showCalBlockModal && (
+        <Portal level="top">
+          <AskForCalibrationBlockModal
+            onResponse={hasBlockModalResponse => {
+              startPipetteOffsetCalibrationBlockModal(hasBlockModalResponse)
+            }}
+            titleBarTitle={t('pipette_offset_cal')}
+            closePrompt={() => setShowCalBlockModal(false)}
+          />
+        </Portal>
+      )}
+    </>
   )
 }
