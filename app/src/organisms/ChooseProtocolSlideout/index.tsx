@@ -85,17 +85,18 @@ export function ChooseProtocolSlideout(
         </ApiHostProvider>
       }
     >
-      <Flex justifyContent={ALIGN_FLEX_END}>
-        {isCreatingRun ? (
+      {isCreatingRun ? (
+        <Flex justifyContent={ALIGN_FLEX_END}>
+          (
           <Icon
             name="ot-spinner"
             marginBottom={SPACING.spacing3}
             spin
             size={SIZE_1}
           />
-        ) : null}
-      </Flex>
-
+          )
+        </Flex>
+      ) : null}
       {storedProtocols.length > 0 ? (
         storedProtocols.map(storedProtocol => {
           const isSelected =
