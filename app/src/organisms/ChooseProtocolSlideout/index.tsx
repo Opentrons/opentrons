@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux'
 
 import {
   SPACING,
+  SIZE_1,
   TYPOGRAPHY,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
@@ -54,6 +55,7 @@ export function ChooseProtocolSlideout(
   const [createRunError, setCreateRunError] = React.useState<string | null>(
     null
   )
+  const [isCreatingRun, setIsCreatingRun] = React.useState<boolean>(false)
 
   const srcFileObjects =
     selectedProtocol != null
@@ -76,11 +78,13 @@ export function ChooseProtocolSlideout(
             }
             srcFileObjects={srcFileObjects}
             setError={setCreateRunError}
+            setIsCreatingRun={setIsCreatingRun}
             robotName={name}
           />
         </ApiHostProvider>
       }
     >
+      {isCreatingRun ? <Icon name="ot-spinner" spin size={SIZE_1} /> : null}
       {storedProtocols.length > 0 ? (
         storedProtocols.map(storedProtocol => {
           const isSelected =
@@ -186,6 +190,7 @@ interface CreateRunButtonProps
   protocolKey: string
   robotName: string
   setError: (error: string | null) => void
+  setIsCreatingRun: (value: boolean) => void
 }
 function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
   const { t } = useTranslation('protocol_details')
@@ -195,6 +200,7 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
     srcFileObjects,
     robotName,
     setError,
+    setIsCreatingRun,
     disabled,
     ...buttonProps
   } = props
@@ -213,6 +219,10 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
       setError(runCreationError)
     }
   }, [runCreationError, setError])
+
+  React.useEffect(() => {
+    setIsCreatingRun(isCreatingRun)
+  }, [isCreatingRun, setIsCreatingRun])
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
     createRunFromProtocolSource({ files: srcFileObjects, protocolKey })

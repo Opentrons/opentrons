@@ -58,6 +58,7 @@ export function ChooseRobotSlideout(
   const [createRunError, setCreateRunError] = React.useState<string | null>(
     null
   )
+  const [isCreatingRun, setIsCreatingRun] = React.useState<boolean>(false)
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
 
@@ -126,11 +127,12 @@ export function ChooseRobotSlideout(
         >
           <CreateRunButton
             disabled={
-              selectedRobot == null || isSelectedRobotOnWrongVersionOfSoftware
+              selectedRobot == null // || isSelectedRobotOnWrongVersionOfSoftware
             }
             protocolKey={protocolKey}
             srcFileObjects={srcFileObjects}
             setError={setCreateRunError}
+            setIsCreatingRun={setIsCreatingRun}
             robotName={selectedRobot != null ? selectedRobot.name : ''}
           />
         </ApiHostProvider>
@@ -143,7 +145,7 @@ export function ChooseRobotSlideout(
           marginY={SPACING.spacing3}
           height={SIZE_2}
         >
-          {isScanning ? (
+          {isScanning || isCreatingRun ? (
             <Icon name="ot-spinner" spin size={SIZE_1} />
           ) : (
             <Link
@@ -238,6 +240,7 @@ interface CreateRunButtonProps
   protocolKey: string
   robotName: string
   setError: (error: string | null) => void
+  setIsCreatingRun: (value: boolean) => void
 }
 function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
   const { t } = useTranslation('protocol_details')
@@ -247,6 +250,7 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
     srcFileObjects,
     robotName,
     setError,
+    setIsCreatingRun,
     disabled,
     ...buttonProps
   } = props
@@ -265,6 +269,10 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
       setError(runCreationError)
     }
   }, [runCreationError, setError])
+
+  React.useEffect(() => {
+    setIsCreatingRun(isCreatingRun)
+  }, [isCreatingRun, setIsCreatingRun])
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
     createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
