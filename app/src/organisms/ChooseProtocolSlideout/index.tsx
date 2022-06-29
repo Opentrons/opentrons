@@ -87,14 +87,12 @@ export function ChooseProtocolSlideout(
     >
       {isCreatingRun ? (
         <Flex justifyContent={ALIGN_FLEX_END}>
-          (
           <Icon
             name="ot-spinner"
             marginBottom={SPACING.spacing3}
             spin
             size={SIZE_1}
           />
-          )
         </Flex>
       ) : null}
       {storedProtocols.length > 0 ? (
