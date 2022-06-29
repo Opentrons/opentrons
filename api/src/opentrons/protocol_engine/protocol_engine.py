@@ -3,13 +3,7 @@ from typing import Dict, Optional
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import (
-    TempDeck,
-    MagDeck,
-    Thermocycler,
-    HeaterShaker,
-    AbstractModule as HardwareModuleAPI,
-)
+from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 
 from .resources import ModelUtils, ModuleDataProvider
 from .commands import Command, CommandCreate
@@ -21,17 +15,6 @@ from .execution import (
     HardwareStopper,
 )
 from .state import StateStore, StateView
-from .state.module_substates import (
-    ModuleSubStateType,
-    TemperatureModuleSubState,
-    MagneticModuleSubState,
-    HeaterShakerModuleSubState,
-    ThermocyclerModuleSubState,
-    TemperatureModuleId,
-    MagneticModuleId,
-    HeaterShakerModuleId,
-    ThermocyclerModuleId,
-)
 from .plugins import AbstractPlugin, PluginStarter
 from .actions import (
     ActionDispatcher,
@@ -303,44 +286,10 @@ class ProtocolEngine:
                 definition=self._module_data_provider.get_definition(
                     ModuleModel(mod.model())
                 ),
-                substate=self._get_module_substate_data(
-                    module_id=module_id, module=mod
-                ),
+                module_live_data=mod.live_data,
             )
             for module_id, mod in modules_by_id.items()
         ]
 
         for a in actions:
             self._action_dispatcher.dispatch(a)
-
-    @staticmethod
-    def _get_module_substate_data(
-        module_id: str, module: HardwareModuleAPI
-    ) -> ModuleSubStateType:
-        """Extract the given module's engine-specific substate data."""
-        if isinstance(module, TempDeck):
-            return TemperatureModuleSubState(
-                module_id=TemperatureModuleId(module_id),
-                plate_target_temperature=module.target,
-            )
-        elif isinstance(module, MagDeck):
-            return MagneticModuleSubState(
-                module_id=MagneticModuleId(module_id),
-                model=ModuleModel(module.model()),  # type: ignore[arg-type]
-            )
-        elif isinstance(module, Thermocycler):
-            return ThermocyclerModuleSubState(
-                module_id=ThermocyclerModuleId(module_id),
-                target_block_temperature=module.target,
-                target_lid_temperature=module.lid_target,
-            )
-        elif isinstance(module, HeaterShaker):
-            return HeaterShakerModuleSubState(
-                module_id=HeaterShakerModuleId(module_id),
-                labware_latch_status=module.labware_latch_status,
-                speed_status=module.speed_status,
-                plate_target_temperature=module.target_temperature,
-            )
-
-        # This shouldn't happen
-        assert False, "Cannot fetch substate of an invalid module."

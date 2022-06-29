@@ -19,7 +19,7 @@ from numpy import array, dot
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
 )
-from opentrons.hardware_control.modules.types import SpeedStatus
+from opentrons.hardware_control.modules.types import SpeedStatus, LiveData
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 
 from opentrons.types import DeckSlotName
@@ -122,7 +122,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 module_id=action.module_id,
                 serial_number=action.serial_number,
                 definition=action.definition,
-                substate=action.substate,
+                module_live_data=action.module_live_data,
             )
 
     def _handle_command(self, command: Command) -> None:
@@ -168,10 +168,11 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         module_id: str,
         serial_number: str,
         definition: ModuleDefinition,
-        substate: Optional[ModuleSubStateType] = None,
         slot_name: Optional[DeckSlotName] = None,
+        module_live_data: Optional[LiveData] = None,
     ) -> None:
         model = definition.model
+        live_data = module_live_data["data"] if module_live_data else None
 
         self._state.slot_by_module_id[module_id] = slot_name
         self._state.hardware_by_module_id[module_id] = HardwareModule(
@@ -180,35 +181,33 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         )
 
         if ModuleModel.is_magnetic_module_model(model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = substate or MagneticModuleSubState(
+            self._state.substate_by_module_id[module_id] = MagneticModuleSubState(
                 module_id=MagneticModuleId(module_id),
                 model=model,
             )
         elif ModuleModel.is_heater_shaker_module_model(model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = substate or HeaterShakerModuleSubState(
+            self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
-                speed_status=SpeedStatus.IDLE,
-                plate_target_temperature=None,
+                labware_latch_status=HeaterShakerLabwareLatchStatus(
+                    live_data["labwareLatchStatus"]
+                )
+                if live_data
+                else HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
+                speed_status=SpeedStatus(live_data["speedStatus"])
+                if live_data
+                else SpeedStatus.IDLE,
+                plate_target_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
             )
         elif ModuleModel.is_temperature_module_model(model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = substate or TemperatureModuleSubState(
+            self._state.substate_by_module_id[module_id] = TemperatureModuleSubState(
                 module_id=TemperatureModuleId(module_id),
-                plate_target_temperature=None,
+                plate_target_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
             )
         elif ModuleModel.is_thermocycler_module_model(model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = substate or ThermocyclerModuleSubState(
+            self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
-                target_block_temperature=None,
-                target_lid_temperature=None,
+                target_block_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
+                target_lid_temperature=live_data["lidTarget"] if live_data else None,  # type: ignore[arg-type]
             )
 
     def _handle_heater_shaker_commands(

@@ -34,7 +34,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
-from opentrons.hardware_control.modules.types import SpeedStatus
+from opentrons.hardware_control.modules.types import SpeedStatus, LiveData
 
 
 def test_initial_state() -> None:
@@ -125,10 +125,11 @@ def test_load_module(
 
 
 @pytest.mark.parametrize(
-    argnames=["module_definition", "expected_substate"],
+    argnames=["module_definition", "live_data", "expected_substate"],
     argvalues=[
         (
             lazy_fixture("magdeck_v2_def"),
+            {},
             MagneticModuleSubState(
                 module_id=MagneticModuleId("module-id"),
                 model=ModuleModel.MAGNETIC_MODULE_V2,
@@ -136,6 +137,14 @@ def test_load_module(
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
+            {
+                "status": "abc",
+                "data": {
+                    "labwareLatchStatus": "idle_closed",
+                    "speedStatus": "holding at target",
+                    "targetTemp": 123,
+                },
+            },
             HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
                 labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
@@ -145,6 +154,7 @@ def test_load_module(
         ),
         (
             lazy_fixture("tempdeck_v2_def"),
+            {"status": "abc", "data": {"targetTemp": 123}},
             TemperatureModuleSubState(
                 module_id=TemperatureModuleId("module-id"),
                 plate_target_temperature=123,
@@ -152,6 +162,13 @@ def test_load_module(
         ),
         (
             lazy_fixture("thermocycler_v1_def"),
+            {
+                "status": "abc",
+                "data": {
+                    "targetTemp": 123,
+                    "lidTarget": 321,
+                },
+            },
             ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
                 target_block_temperature=123,
@@ -162,6 +179,7 @@ def test_load_module(
 )
 def test_add_module_action(
     module_definition: ModuleDefinition,
+    live_data: LiveData,
     expected_substate: ModuleSubStateType,
 ) -> None:
     """It should be able to add attached modules directly into state."""
@@ -169,7 +187,7 @@ def test_add_module_action(
         module_id="module-id",
         serial_number="serial-number",
         definition=module_definition,
-        substate=expected_substate,
+        module_live_data=live_data,
     )
 
     subject = ModuleStore()
