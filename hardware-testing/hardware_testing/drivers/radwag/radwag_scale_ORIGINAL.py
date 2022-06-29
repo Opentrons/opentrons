@@ -19,7 +19,7 @@ from serial.serialutil import SerialException  # type: ignore[import]
 import random
 from abc import ABC
 
-from hardware_testing.drivers.limit_sensor import LimitSensorBase, SimLimitSensor
+from .limit_sensor import LimitSensorBase, SimLimitSensor
 
 log = logging.getLogger(__name__)
 
