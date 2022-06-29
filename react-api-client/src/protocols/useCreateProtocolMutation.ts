@@ -61,7 +61,9 @@ export function useCreateProtocolMutation(
             })
           return response.data
         }
-      ),
+      ).catch(e => {
+        throw e
+      }),
     options
   )
   return {

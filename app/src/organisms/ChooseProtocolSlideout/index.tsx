@@ -109,8 +109,10 @@ export function ChooseProtocolSlideout(
                 isSelected={isSelected}
                 isError={createRunError != null}
                 onClick={() => {
-                  setCreateRunError(null)
-                  setSelectedProtocol(storedProtocol)
+                  if (!isCreatingRun) {
+                    setCreateRunError(null)
+                    setSelectedProtocol(storedProtocol)
+                  }
                 }}
               >
                 <Flex
