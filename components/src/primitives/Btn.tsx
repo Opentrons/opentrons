@@ -151,6 +151,7 @@ export const NewPrimaryBtn: BtnComponent = styled(PrimaryBtn)`
  * @component
  */
 export const NewSecondaryBtn: BtnComponent = styled(SecondaryBtn)`
+  background-color: ${Styles.C_WHITE};
   color: ${Styles.C_BLUE};
 
   &:hover,
