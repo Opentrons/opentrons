@@ -1,6 +1,4 @@
-from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
 
 RADWAG_COMMAND_TERMINATOR = '\r\n'
 
@@ -77,89 +75,5 @@ class RadwagCommand(str, Enum):
     COOPERATION_WITH_PUE_7_1_PUE_10_TERMINAL = 'NT'  # Cooperation with PUE 7.1 PUE 10 terminal
 
 
-class RadwagResponseCodes(str, Enum):
-    NONE = ''
-    IN_PROGRESS = 'A'
-    CARRIED_OUT_AFTER_IN_PROGRESS = 'D'
-    CARRIED_OUT = 'OK'
-    UNABLE_TO_EXECUTE = 'I'
-    MAX_THRESHOLD_EXCEEDED = '^'
-    MIN_THRESHOLD_EXCEEDED = 'v'
-    COMMAND_NOT_RECOGNIZED = 'ES'
-    STABLE_TIME_LIMIT_EXCEEDED = 'E'
-
-    @classmethod
-    def parse(cls, response: str) -> "RadwagResponseCodes":
-        if response == cls.IN_PROGRESS:
-            return cls.IN_PROGRESS
-        elif response == cls.CARRIED_OUT_AFTER_IN_PROGRESS:
-            return cls.CARRIED_OUT_AFTER_IN_PROGRESS
-        elif response == cls.CARRIED_OUT:
-            return cls.CARRIED_OUT
-        elif response == cls.UNABLE_TO_EXECUTE:
-            return cls.UNABLE_TO_EXECUTE
-        elif response == cls.MAX_THRESHOLD_EXCEEDED:
-            return cls.MAX_THRESHOLD_EXCEEDED
-        elif response == cls.MIN_THRESHOLD_EXCEEDED:
-            return cls.MIN_THRESHOLD_EXCEEDED
-        elif response == cls.COMMAND_NOT_RECOGNIZED:
-            return cls.COMMAND_NOT_RECOGNIZED
-        elif response == cls.STABLE_TIME_LIMIT_EXCEEDED:
-            return cls.STABLE_TIME_LIMIT_EXCEEDED
-        else:
-            return cls.NONE
-
-
-@dataclass
-class RadwagDataPacket:
-    code: RadwagResponseCodes
-    command: RadwagCommand
-    stable: bool
-    measurement: Optional[float] = None
-    message: Optional[str] = None
-
-    @classmethod
-    def build(cls, command: RadwagCommand):
-        return RadwagDataPacket(code=RadwagResponseCodes.NONE,
-                                command=command,
-                                stable=False,
-                                measurement=None,
-                                message=None)
-
-
 def radwag_command_format(command: str) -> str:
     return f'{command}{RADWAG_COMMAND_TERMINATOR}'
-
-
-def radwag_response_parse(response: str, command: RadwagCommand) -> RadwagDataPacket:
-    assert RADWAG_COMMAND_TERMINATOR in response, f'CR LF not found ' \
-                                                  f'in response: {response}'
-    assert ' ' in response, f'No space (\" \") found in response: {response}'
-    cmd_not_rec = RadwagResponseCodes.COMMAND_NOT_RECOGNIZED
-    if cmd_not_rec in response and response.index(cmd_not_rec) == 0:
-        raise RuntimeError(
-            'Command not recognized: {command} (response={response})')
-    res_list = [d for d in response.strip().split(' ') if d]
-    assert res_list[0] == command, f'Unexpected response from scale: {response}'
-    data = RadwagDataPacket.build(command)
-    if len(res_list) == 2:
-        data.code = RadwagResponseCodes.parse(res_list[1])
-    # TODO: (andy s) create custom handler for each command type
-    elif (command == RadwagCommand.GET_MEASUREMENT_BASIC_UNIT) or \
-            (command == RadwagCommand.GET_MEASUREMENT_BASIC_UNIT_STABLE) or \
-            (command == RadwagCommand.GET_MEASUREMENT_CURRENT_UNIT) or \
-            (command == RadwagCommand.GET_MEASUREMENT_CURRENT_UNIT_STABLE):
-        # SI ? -  0.00020 g
-        # TODO: we could accept more unit types if we wanted...
-        assert res_list[-1] == 'g', \
-            f'Expected units to be grams (\"g\"), ' \
-            f'instead got \"{res_list[-1]}\"'
-        data.stable = ('?' not in res_list)
-        data.measurement = float(res_list[-2])
-        if '-' in res_list:
-            data.measurement *= -1
-    elif command == RadwagCommand.GET_SERIAL_NUMBER:
-        data.code = RadwagResponseCodes.parse(res_list[1])
-        assert len(res_list) == 3
-        data.message = res_list[-1].replace('\"', '')
-    return data

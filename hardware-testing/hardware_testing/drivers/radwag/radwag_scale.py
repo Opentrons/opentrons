@@ -1,7 +1,8 @@
 import serial
 
-from .radwag_commands import RadwagCommand, RadwagDataPacket, RadwagResponseCodes
-from .radwag_commands import radwag_response_parse, radwag_command_format
+from .radwag_commands import RadwagCommand, radwag_command_format
+from .radwag_response_handlers import \
+    (RadwageResponse, RadwagResponseCodes, radwag_response_parse)
 
 
 class RadwagScale:
@@ -18,12 +19,12 @@ class RadwagScale:
 
     def _write_command(self, cmd: RadwagCommand) -> None:
         cmd_str = radwag_command_format(cmd)
-        cmd_bytes = cmd_str.encode("utf-8")
-        send_len = self._connection.write(cmd_str.encode('utf-8'))
+        cmd_bytes = cmd_str.encode('utf-8')
+        send_len = self._connection.write(cmd_bytes)
         assert send_len == len(cmd_bytes), f'Radwag command \"{cmd}\" ({cmd_bytes} ' \
                                            f'bytes) only sent {send_len} bytes'
 
-    def _read_response_packet(self, command: RadwagCommand) -> RadwagDataPacket:
+    def _read_response_packet(self, command: RadwagCommand) -> RadwageResponse:
         response = self._connection.readline().decode('utf-8')
         data = radwag_response_parse(response, command)
         return data
