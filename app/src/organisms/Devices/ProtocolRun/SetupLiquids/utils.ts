@@ -136,3 +136,59 @@ export function getWellGroupForLiquidId(
     return { ...allWells, ...someWells }
   }, {})
 }
+
+// labware ordering
+// liquids by id for labware
+// start at top [0][0]
+// check if this is in volumeByWell
+// if yes, store volume and check [0][1]
+// if yes through [0][end], store index [0] and the volume
+// if no, check [1][0]
+// once you reach the end, look see if adjacent indeces have same volume
+// then range them based on [0][0] to [last][last]
+
+export function getWellRangeForLiquidLabwarePair(): any {
+  const volumeByWell = {
+    A3: 100,
+    A4: 100,
+    B3: 100,
+    B4: 100,
+    C3: 100,
+    C4: 100,
+    D3: 100,
+    D4: 100,
+  }
+  const ordering = [
+    ['A1', 'B1', 'C1', 'D1'],
+    ['A2', 'B2', 'C2', 'D2'],
+    ['A3', 'B3', 'C3', 'D3'],
+    ['A4', 'B4', 'C4', 'D4'],
+    ['A5', 'B5', 'C5', 'D5'],
+    ['A6', 'B6', 'C6', 'D6'],
+  ]
+
+  const myArray = ordering.reduce((totalAcc, row, index) => {
+    const rowValues = row.reduce((rowAcc, well, index) => {
+      if (index === 0 && volumeByWell[well] != null) {
+        return [{ wellName: well, volume: volumeByWell[well] }]
+      } else if (
+        rowAcc[0] != null &&
+        volumeByWell[well] != null &&
+        volumeByWell[well] === rowAcc[0].volume
+      ) {
+        return [rowAcc[0], { wellName: well, volume: volumeByWell[well] }]
+      } else {
+        return []
+      }
+    }, [])
+    // in outer reduce -- if no rowValues, add every volume by well for that row
+    // or if rowValues is greater than 2 ??
+    if (rowValues.length === 2) {
+      const rangeString = `${rowValues[0].wellName}: ${rowValues[1].wellName}`
+      totalAcc.push({ range: rangeString, volume: rowValues[0].volume })
+    }
+    return totalAcc
+  }, [])
+
+  console.log(myArray)
+}
