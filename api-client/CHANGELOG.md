@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.0...v6.0.0-alpha.3) (2022-06-28)
+
+
+### Bug Fixes
+
+* **app:** fix historical protocol run timestamps ([#10934](https://github.com/Opentrons/opentrons/issues/10934)) ([1ade355](https://github.com/Opentrons/opentrons/commit/1ade355b019b3f8d3988938f21047dc70b5a5cb0))
+
+
+
+
+
 # [6.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.2...v6.0.0-beta.0) (2022-06-10)
 
 **Note:** Version bump only for package @opentrons/api-client

@@ -6,9 +6,10 @@ import {
   NewSecondaryBtn,
   SPACING_3,
 } from '@opentrons/components'
+import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
-import { useStopRunMutation } from '@opentrons/react-api-client'
+import { useTrackProtocolRunEvent } from '../Devices/hooks'
 
 export interface ConfirmCancelModalProps {
   onClose: () => unknown
@@ -20,11 +21,19 @@ export function ConfirmCancelModal(
 ): JSX.Element {
   const { onClose, runId } = props
   const { stopRun } = useStopRunMutation()
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const { t } = useTranslation('run_details')
 
-  const cancel = (): void => {
-    runId != null && stopRun(runId)
+  const cancel: React.MouseEventHandler<HTMLButtonElement> = (e): void => {
+    e.preventDefault()
+    e.stopPropagation()
     onClose()
+
+    if (runId != null) {
+      stopRun(runId)
+
+      trackProtocolRunEvent({ name: 'runCancel' })
+    }
   }
 
   return (

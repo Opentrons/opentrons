@@ -21,6 +21,7 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../RunTimeControl/hooks'
 import { RUN_LOG_WINDOW_SIZE } from './constants'
 import { DownloadRunLogToast } from './DownloadRunLogToast'
+import { useTrackProtocolRunEvent } from './hooks'
 import type { Run } from '@opentrons/api-client'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
@@ -111,10 +112,22 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     setShowDownloadRunLogToast(true)
     closeOverflowMenu(e)
   }
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const { reset } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
 
-  const handleDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
+  const handleResetClick: React.MouseEventHandler<HTMLButtonElement> = (
+    e
+  ): void => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    reset()
+
+    trackProtocolRunEvent({ name: 'runAgain' })
+  }
+
+  const handleDeleteClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
     deleteRun(runId)
@@ -140,7 +153,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         </MenuItem>
       </NavLink>
       <MenuItem
-        onClick={reset}
+        onClick={handleResetClick}
         disabled={robotIsBusy}
         data-testid={`RecentProtocolRun_OverflowMenu_rerunNow`}
       >
@@ -154,7 +167,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       </MenuItem>
       <Divider />
       <MenuItem
-        onClick={handleDelete}
+        onClick={handleDeleteClick}
         data-testid={`RecentProtocolRun_OverflowMenu_deleteRun`}
       >
         {t('delete_run')}

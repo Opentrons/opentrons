@@ -93,3 +93,11 @@ export const restartStatusChanged = (
   type: Constants.RESTART_STATUS_CHANGED,
   payload: { robotName, restartStatus, bootId, startTime },
 })
+
+export const syncSystemTime = (
+  robotName: string
+): Types.SyncSystemTimeAction => ({
+  type: Constants.SYNC_SYSTEM_TIME,
+  payload: { robotName },
+  meta: {},
+})

@@ -68,7 +68,6 @@ export function RenameRobotSlideout({
     },
     onSubmit: (values, { resetForm }) => {
       const newName = values.newRobotName
-      console.log('form robotName', robotName)
       setPreviousRobotName(robotName)
       const sameNameRobotInUnavailable = unreachableRobots.find(
         robot => robot.name === newName
