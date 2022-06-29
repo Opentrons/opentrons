@@ -5,6 +5,7 @@ import max from 'lodash/max'
 import reduce from 'lodash/reduce'
 import { Options } from '@opentrons/components'
 import { LabwareLiquidState } from '@opentrons/step-generation'
+// import { swatchColors } from '../components/swatchColors'
 import {
   RootState,
   ContainersState,
@@ -105,12 +106,13 @@ const allIngredientGroupFields: Selector<
 const allIngredientNamesIds: Selector<
   RootSlice,
   OrderedLiquids
-> = createSelector(getLiquidGroupsById, ingreds =>
-  Object.keys(ingreds).map(ingredId => ({
+> = createSelector(getLiquidGroupsById, ingreds => {
+  return Object.keys(ingreds).map(ingredId => ({
     ingredientId: ingredId,
     name: ingreds[ingredId].name,
+    displayColor: ingreds[ingredId].displayColor,
   }))
-)
+})
 const getLabwareSelectionMode: Selector<RootSlice, boolean> = createSelector(
   rootSelector,
   rootState => {

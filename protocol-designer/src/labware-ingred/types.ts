@@ -28,7 +28,7 @@ export interface WellContentsByLabware {
 export type OrderedLiquids = Array<{
   ingredientId: string
   name: string | null | undefined
-  displayColor: string
+  displayColor: string | null | undefined
 }>
 // TODO: Ian 2018-10-15 audit & rename these confusing types
 export interface LiquidGroup {

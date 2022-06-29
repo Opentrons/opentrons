@@ -1,7 +1,9 @@
 import * as React from 'react'
-import { Formik, FormikProps } from 'formik'
+import { useSelector } from 'react-redux'
+import { Field, Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
 import { i18n } from '../../localization'
+import { swatchColors } from '../swatchColors'
 import {
   Card,
   CheckboxField,
@@ -10,6 +12,7 @@ import {
   OutlineButton,
   PrimaryButton,
 } from '@opentrons/components'
+import { selectors } from '../../labware-ingred/selectors'
 import styles from './LiquidEditForm.css'
 import formStyles from '../forms/forms.css'
 
@@ -47,17 +50,16 @@ export const liquidEditFormSchema: Yup.Schema<
 
 export function LiquidEditForm(props: Props): JSX.Element {
   const { deleteLiquidGroup, cancelForm, canDelete, saveForm } = props
+  const selectedLiquid = useSelector(selectors.getSelectedLiquidGroupState)
+  const nextGroupId = useSelector(selectors.getNextLiquidGroupId)
+  const liquidId = selectedLiquid.liquidGroupId ?? nextGroupId
 
   const initialValues: LiquidEditFormValues = {
     name: props.name || '',
-    displayColor: props.displayColor || '',
+    displayColor: props.displayColor ?? swatchColors(liquidId),
     description: props.description || '',
     serialize: props.serialize || false,
   }
-
-  const [currentColor, setCurrentColor] = React.useState<ColorResult['hex']>(
-    props.displayColor || '#000'
-  )
 
   return (
     <Formik
@@ -66,7 +68,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
       onSubmit={(values: LiquidEditFormValues) => {
         saveForm({
           name: values.name,
-          displayColor: currentColor,
+          displayColor: values.displayColor,
           description: values.description || null,
           serialize: values.serialize || false,
         })
@@ -76,6 +78,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
         handleChange,
         handleBlur,
         handleSubmit,
+        setFieldValue,
         dirty,
         errors,
         isValid,
@@ -112,9 +115,13 @@ export function LiquidEditForm(props: Props): JSX.Element {
                   />
                 </FormGroup>
                 <FormGroup label={'Liquid'} className={formStyles.column_1_3}>
-                  <ColorPicker
-                    value={currentColor}
-                    onChange={setCurrentColor}
+                  <Field
+                    name="displayColor"
+                    component={ColorPicker}
+                    value={values.displayColor}
+                    onChange={(color: ColorResult['hex']) => {
+                      setFieldValue('displayColor', color)
+                    }}
                   />
                 </FormGroup>
               </div>

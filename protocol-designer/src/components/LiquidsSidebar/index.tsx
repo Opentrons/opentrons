@@ -27,13 +27,15 @@ function LiquidsSidebarComponent(props: Props): JSX.Element {
   const { liquids, selectedLiquid, createNewLiquid, selectLiquid } = props
   return (
     <SidePanel title="Liquids">
-      {liquids.map(({ ingredientId, name }) => (
+      {liquids.map(({ ingredientId, name, displayColor }) => (
         <PDTitledList
           key={ingredientId}
           selected={selectedLiquid === ingredientId}
           onClick={() => selectLiquid(ingredientId)}
           iconName="circle"
-          iconProps={{ style: { fill: swatchColors(ingredientId) } }}
+          iconProps={{
+            style: { fill: displayColor ?? swatchColors(ingredientId) },
+          }}
           title={name || `Unnamed Ingredient ${ingredientId}`} // fallback, should not happen
         />
       ))}

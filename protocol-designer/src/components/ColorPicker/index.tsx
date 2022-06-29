@@ -12,10 +12,6 @@ interface ColorPickerProps {
 export function ColorPicker(props: ColorPickerProps): JSX.Element {
   const [showColorPicker, setShowColorPicker] = React.useState<boolean>(false)
 
-  React.useEffect(() => {
-    console.log(props.value)
-  }, [props.value])
-
   return (
     <div>
       <div
