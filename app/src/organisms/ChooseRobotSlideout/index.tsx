@@ -145,7 +145,7 @@ export function ChooseRobotSlideout(
           marginY={SPACING.spacing3}
           height={SIZE_2}
         >
-          {isScanning || isCreatingRun ? (
+          {isScanning ? (
             <Icon name="ot-spinner" spin size={SIZE_1} />
           ) : (
             <Link
@@ -262,21 +262,21 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
     isCreatingRun,
   } = useCreateRunFromProtocol({
     onSuccess: ({ data: runData }) => {
+      setIsCreatingRun(false)
+      setError(null)
       history.push(`/devices/${robotName}/protocol-runs/${runData.id}`)
     },
   })
 
   React.useEffect(() => {
     if (runCreationError != null) {
+      setIsCreatingRun(false)
       setError(runCreationError)
     }
-  }, [runCreationError, setError])
-
-  React.useEffect(() => {
-    setIsCreatingRun(isCreatingRun)
-  }, [isCreatingRun, setIsCreatingRun])
+  }, [runCreationError, setError, setIsCreatingRun])
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
+    setIsCreatingRun(true)
     createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
   }
 
@@ -287,7 +287,11 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
       disabled={isCreatingRun || disabled}
       {...buttonProps}
     >
-      {t('proceed_to_setup')}
+      {isCreatingRun ? (
+        <Icon name="ot-spinner" spin size={SIZE_1} />
+      ) : (
+        t('proceed_to_setup')
+      )}
     </PrimaryButton>
   )
 }

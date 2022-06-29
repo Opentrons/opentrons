@@ -20,7 +20,6 @@ import {
   Icon,
   COLORS,
   TEXT_ALIGN_CENTER,
-  ALIGN_FLEX_END,
 } from '@opentrons/components'
 
 import { getStoredProtocols } from '../../redux/protocol-storage'
@@ -85,16 +84,6 @@ export function ChooseProtocolSlideout(
         </ApiHostProvider>
       }
     >
-      {isCreatingRun ? (
-        <Flex justifyContent={ALIGN_FLEX_END}>
-          <Icon
-            name="ot-spinner"
-            marginBottom={SPACING.spacing3}
-            spin
-            size={SIZE_1}
-          />
-        </Flex>
-      ) : null}
       {storedProtocols.length > 0 ? (
         storedProtocols.map(storedProtocol => {
           const isSelected =
@@ -222,21 +211,21 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
     isCreatingRun,
   } = useCreateRunFromProtocol({
     onSuccess: ({ data: runData }) => {
+      setIsCreatingRun(false)
+      setError(null)
       history.push(`/devices/${robotName}/protocol-runs/${runData.id}`)
-    },
+    }
   })
 
   React.useEffect(() => {
     if (runCreationError != null) {
+      setIsCreatingRun(false)
       setError(runCreationError)
     }
-  }, [runCreationError, setError])
-
-  React.useEffect(() => {
-    setIsCreatingRun(isCreatingRun)
-  }, [isCreatingRun, setIsCreatingRun])
+  }, [runCreationError, setError, setIsCreatingRun])
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
+    setIsCreatingRun(true)
     createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
   }
 
@@ -247,7 +236,11 @@ function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
       width="100%"
       {...buttonProps}
     >
-      {t('proceed_to_setup')}
+      {isCreatingRun ? (
+        <Icon name="ot-spinner" spin size={SIZE_1} />
+      ) : (
+        t('proceed_to_setup')
+      )}
     </PrimaryButton>
   )
 }
