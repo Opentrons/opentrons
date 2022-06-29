@@ -100,9 +100,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         self._device_info = device_info
         self._driver = driver
 
-        self._listener = HeaterShakerListener(
-            loop=loop,
-        )
+        self._listener = HeaterShakerListener(loop=loop)
 
         self._poller = Poller(
             reader=PollerReader(driver=self._driver),
@@ -264,15 +262,14 @@ class HeaterShaker(mod_abc.AbstractModule):
         the requested temperature or an error occurs. To start heating
         but not wait until heating is complete, see start_set_temperature.
         """
+        await self.wait_for_is_running()
+        await self._driver.set_temperature(temperature=celsius)
+        await self.wait_next_poll()
 
         async def _wait() -> None:
             # Wait until we reach the target temperature.
             while self.temperature_status != TemperatureStatus.HOLDING:
                 await self.wait_next_poll()
-
-        await self.wait_for_is_running()
-        await self._driver.set_temperature(temperature=celsius)
-        await self.wait_next_poll()
 
         task = self._loop.create_task(_wait())
         self.make_cancellable(task)
@@ -314,6 +311,9 @@ class HeaterShaker(mod_abc.AbstractModule):
         if self.is_simulated:
             return
 
+        await self.wait_for_is_running()
+        await self.wait_next_poll()
+
         # TODO(mc, 2022-06-14): wait logic disagrees with `self.set_temperature`.
         # Resolve discrepency whichever way is most correct
         async def _await_temperature() -> None:
@@ -323,9 +323,6 @@ class HeaterShaker(mod_abc.AbstractModule):
             elif self.temperature_status == TemperatureStatus.COOLING:
                 while self.temperature > awaiting_temperature:
                     await self.wait_next_poll()
-
-        await self.wait_for_is_running()
-        await self.wait_next_poll()
 
         t = self._loop.create_task(_await_temperature())
         self.make_cancellable(t)
@@ -342,15 +339,14 @@ class HeaterShaker(mod_abc.AbstractModule):
         the speed or an error occurs. To start spinning but not wait
         until the final speed is reached, see start_set_speed.
         """
+        await self.wait_for_is_running()
+        await self._driver.set_rpm(rpm)
+        await self.wait_next_poll()
 
         async def _wait() -> None:
             # Wait until we reach the target speed.
             while self.speed_status != SpeedStatus.HOLDING:
                 await self.wait_next_poll()
-
-        await self.wait_for_is_running()
-        await self._driver.set_rpm(rpm)
-        await self.wait_next_poll()
 
         task = self._loop.create_task(_wait())
         self.make_cancellable(task)
@@ -382,6 +378,9 @@ class HeaterShaker(mod_abc.AbstractModule):
         if self.is_simulated:
             return
 
+        await self.wait_for_is_running()
+        await self.wait_next_poll()
+
         async def _await_speed() -> None:
             if self.speed_status == SpeedStatus.ACCELERATING:
                 while self.speed < awaiting_speed:
@@ -389,9 +388,6 @@ class HeaterShaker(mod_abc.AbstractModule):
             elif self.speed_status == SpeedStatus.DECELERATING:
                 while self.speed > awaiting_speed:
                     await self.wait_next_poll()
-
-        await self.wait_for_is_running()
-        await self.wait_next_poll()
 
         t = self._loop.create_task(_await_speed())
         self.make_cancellable(t)
