@@ -1,8 +1,5 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-
-import { Flex, POSITION_RELATIVE } from '@opentrons/components'
-
 import {
   fetchProtocols,
   getStoredProtocols,
@@ -24,8 +21,6 @@ export function ProtocolsLanding(): JSX.Element {
   return storedProtocols.length > 0 ? (
     <ProtocolList storedProtocols={storedProtocols} />
   ) : (
-    <Flex position={POSITION_RELATIVE}>
-      <ProtocolsEmptyState />
-    </Flex>
+    <ProtocolsEmptyState />
   )
 }

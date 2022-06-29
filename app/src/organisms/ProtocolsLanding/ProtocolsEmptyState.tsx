@@ -6,7 +6,6 @@ import {
   DIRECTION_COLUMN,
   ALIGN_CENTER,
   SPACING,
-  POSITION_ABSOLUTE,
 } from '@opentrons/components'
 
 import { UploadInput } from './UploadInput'
@@ -20,10 +19,7 @@ export function ProtocolsEmptyState(): JSX.Element | null {
       width="100%"
       padding={SPACING.spacing4}
       paddingTop={SPACING.spacing6}
-      position={POSITION_ABSOLUTE}
-      top="50%"
-      left="50%"
-      transform="translateY(25%) translateX(-50%)"
+      transform="translateY(25%)"
     >
       <StyledText role="complementary" as="h1">
         {t('import_a_file')}
