@@ -1,4 +1,4 @@
-"""Forward events from a `HardwareControlAPI` into a `ProtocolEngine`."""
+"""Forward door events from a `HardwareControlAPI` into a `ProtocolEngine`."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ _UnsubscribeCallback = Callable[[], None]
 
 
 class DoorWatcher:
-    """Forward events from a `HardwareControlAPI` into a `ProtocolEngine`."""
+    """Forward door events from a `HardwareControlAPI` into a `ProtocolEngine`."""
 
     def __init__(
         self,
@@ -29,14 +29,15 @@ class DoorWatcher:
         hardware_api: HardwareControlAPI,
         action_dispatcher: ActionDispatcher,
     ) -> None:
-        """Initialize the HardwareEventForwarder.
+        """Initialize the DoorWatcher.
 
         Args:
+            state_store: The StateStore to check if the protocol queue is running.
             hardware_api: The HardwareControlAPI whose events we will listen for.
                 Assumed to be running in a separate thread from action_dispatcher.
             action_dispatcher: The ActionDispatcher to dispatch actions into.
                 Assumed to be owned by the same event loop that this
-                HardwareEventForwarder was constructed in.
+                DoorWatcher was constructed in.
         """
         self._state_store = state_store
         self._hardware_api = hardware_api
@@ -69,7 +70,7 @@ class DoorWatcher:
             self._unsubscribe_callback = None
 
     def _handle_hardware_event(self, event: HardwareEvent) -> None:
-        """Handle a hardware event, ensuring thread-safety.
+        """Handle a door state hardware event, ensuring thread-safety.
 
         This is used as a callback for HardwareControlAPI.register_callback(),
         and it's run inside the hardware thread.
@@ -79,7 +80,7 @@ class DoorWatcher:
         is running in, that may take a moment, and the hardware thread may be blocked.
 
         This method will deadlock if it's ever run from the same thread that
-        owns the event loop that this HardwareEventForwarder was constructed in.
+        owns the event loop that this DoorWatcher was constructed in.
         """
         if isinstance(event, DoorStateNotification):
             action = DoorChangeAction(event=event)
@@ -94,7 +95,7 @@ class DoorWatcher:
 
         This must run in the event loop that owns self._action_dispatcher, for safety.
 
-        Defined as an async function so we can use this with
+        Defined as an async function, so we can use this with
         run_coroutine_threadsafe(), which lets us block until
         the dispatch completes.
         """
