@@ -38,7 +38,7 @@ describe('LabwareOffsetModal', () => {
     })
 
     getByText(
-      'Labware Position Check is a guided workflow that helps you verify the position of every labware on the deck for an added degree of precision in your protocol. When you check a labware, the OT-2’s pipette nozzle or attached tip will stop at the center of the A1 well. If the pipette nozzle or tip is not centered, you can reveal the OT-2’s jog controls to make an adjustment. This Labware Offset will be applied to the entire labware. Offset data is measured to the nearest 1/10th mm and can be made in the X, Y and/or Z directions.'
+      'Labware Position Check is a recommended workflow that helps you verify the position of every labware on the deck for an added degree of precision in your protocol. When you check a labware, the OT-2’s pipette nozzle or attached tip will stop at the center of the A1 well. If the pipette nozzle or tip is not centered, you can reveal the OT-2’s jog controls to make an adjustment. This Labware Offset will be applied to the entire labware. Offset data is measured to the nearest 1/10th mm and can be made in the X, Y and/or Z directions.'
     )
     getByRole('heading', { name: 'Rerunning a Protocol' })
 

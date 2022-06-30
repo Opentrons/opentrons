@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
+import { when } from 'jest-when'
+
 import { i18n } from '../../../i18n'
 import { useProtocolDetailsForRun } from '../../../organisms/Devices/hooks'
 import {
@@ -15,6 +18,7 @@ import {
   getUnreachableRobots,
   startDiscovery,
 } from '../../../redux/discovery'
+import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import {
   mockConnectableRobot,
   mockReachableRobot,
@@ -23,16 +27,20 @@ import {
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 import { ChooseRobotSlideout } from '../'
-import { fireEvent } from '@testing-library/react'
 
 import type { ProtocolDetails } from '../../../organisms/Devices/hooks'
+import type { State } from '../../../redux/types'
 
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../redux/discovery')
+jest.mock('../../../redux/buildroot')
 jest.mock('../useCreateRunFromProtocol')
 
+const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
+  typeof getBuildrootUpdateDisplayInfo
+>
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
 >
@@ -83,6 +91,11 @@ describe('ChooseRobotSlideout', () => {
   beforeEach(() => {
     mockCloseCurrentRun = jest.fn()
     mockCreateRunFromProtocolSource = jest.fn()
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: '',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
@@ -131,7 +144,7 @@ describe('ChooseRobotSlideout', () => {
     })
     expect(queryByText('opentrons-robot-name')).toBeInTheDocument()
     expect(
-      queryByText('2 unavailable or busy robots are not listed')
+      queryByText('2 unavailable robots are not listed')
     ).toBeInTheDocument()
   })
   it('if scanning, show robots, but do not show link to other devices', () => {
@@ -143,7 +156,7 @@ describe('ChooseRobotSlideout', () => {
     })
     expect(queryByText('opentrons-robot-name')).toBeInTheDocument()
     expect(
-      queryByText('2 unavailable or busy robots are not listed')
+      queryByText('2 unavailable robots are not listed')
     ).not.toBeInTheDocument()
   })
   it('if not scanning, show refresh button, start discovery if clicked', () => {
@@ -157,13 +170,20 @@ describe('ChooseRobotSlideout', () => {
     expect(mockStartDiscovery).toHaveBeenCalled()
     expect(dispatch).toHaveBeenCalledWith({ type: 'mockStartDiscovery' })
   })
-  it('allows an available robot to be selected', () => {
+  it('defaults to first available robot and allows an available robot to be selected', () => {
+    mockGetConnectableRobots.mockReturnValue([
+      { ...mockConnectableRobot, name: 'otherRobot', ip: 'otherIp' },
+      mockConnectableRobot,
+    ])
     const [{ getByRole, getByText }] = render({
       storedProtocolData: storedProtocolDataFixture,
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
     const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    expect(proceedButton).not.toBeDisabled()
+    const otherRobot = getByText('otherRobot')
+    otherRobot.click() // unselect default robot
     expect(proceedButton).toBeDisabled()
     const mockRobot = getByText('opentrons-robot-name')
     mockRobot.click()
@@ -173,5 +193,48 @@ describe('ChooseRobotSlideout', () => {
       files: [expect.any(File)],
       protocolKey: storedProtocolDataFixture.protocolKey,
     })
+  })
+  it('if selected robot is on a different version of the software than the app, disable CTA and show link to device details in options', () => {
+    when(mockGetBuildrootUpdateDisplayInfo)
+      .calledWith((undefined as any) as State, 'opentrons-robot-name')
+      .mockReturnValue({
+        autoUpdateAction: 'upgrade',
+        autoUpdateDisabledReason: null,
+        updateFromFileDisabledReason: null,
+      })
+    const [{ getByRole, getByText }] = render({
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: jest.fn(),
+      showSlideout: true,
+    })
+    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    expect(proceedButton).toBeDisabled()
+    expect(
+      getByText(
+        'A software update is available for this robot. Update to run protocols.'
+      )
+    ).toBeInTheDocument()
+    const linkToRobotDetails = getByText('Go to Robot')
+    linkToRobotDetails.click()
+  })
+
+  it('renders error state when there is a run creation error', () => {
+    mockUseCreateRunFromProtocol.mockReturnValue({
+      runCreationError: 'run creation error',
+      createRunFromProtocolSource: mockCreateRunFromProtocolSource,
+      isCreatingRun: false,
+    })
+    const [{ getByRole, getByText }] = render({
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: jest.fn(),
+      showSlideout: true,
+    })
+    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    proceedButton.click()
+    expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
+      files: [expect.any(File)],
+      protocolKey: storedProtocolDataFixture.protocolKey,
+    })
+    expect(getByText('run creation error')).toBeInTheDocument()
   })
 })

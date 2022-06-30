@@ -29,6 +29,7 @@ export function NewRobotSetupHelp(): JSX.Element {
     <>
       <Link
         css={TYPOGRAPHY.darkLinkLabelSemiBold}
+        role="button"
         onClick={() => setShowNewRobotHelpModal(true)}
       >
         {t('see_how_to_setup_new_robot')}

@@ -16,7 +16,6 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import {
-  useDismissCurrentRunMutation,
   useRunQuery,
   useModulesQuery,
   usePipettesQuery,
@@ -69,7 +68,6 @@ import {
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
-
 import {
   useProtocolDetailsForRun,
   useProtocolAnalysisErrors,
@@ -77,8 +75,11 @@ import {
   useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
   useIsRobotViewable,
+  useTrackProtocolRunEvent,
+  useRobotAnalyticsData,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
+import { EMPTY_TIMESTAMP } from '../constants'
 
 import type { Run } from '@opentrons/api-client'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
@@ -111,7 +112,7 @@ function RunTimer({
       : completedAt ?? now
 
   const runTime =
-    startedAt != null ? formatInterval(startedAt, endTime) : '--:--:--'
+    startedAt != null ? formatInterval(startedAt, endTime) : EMPTY_TIMESTAMP
 
   return (
     <StyledText css={TYPOGRAPHY.pRegular} color={COLORS.darkBlack}>
@@ -135,12 +136,14 @@ export function ProtocolRunHeader({
   const { protocolData, displayName, protocolKey } = useProtocolDetailsForRun(
     runId
   )
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
   const isProtocolAnalyzing = protocolData == null && isRobotViewable
   const runStatus = useRunStatus(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
-  const { dismissCurrentRun } = useDismissCurrentRunMutation()
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   // NOTE: we are polling pipettes, though not using their value directly here
@@ -155,15 +158,24 @@ export function ProtocolRunHeader({
 
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent) {
-      runId != null && dismissCurrentRun(runId)
+      if (runId != null) {
+        trackProtocolRunEvent({
+          name: 'runFinish',
+          properties: {
+            ...robotAnalyticsData,
+          },
+        })
+
+        closeCurrentRun()
+      }
     }
-  }, [runStatus, isRunCurrent, runId, dismissCurrentRun])
+  }, [runStatus, isRunCurrent, runId, closeCurrentRun])
 
   const startedAtTimestamp =
-    startedAt != null ? formatTimestamp(startedAt) : '--:--:--'
+    startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
 
   const completedAtTimestamp =
-    completedAt != null ? formatTimestamp(completedAt) : '--:--:--'
+    completedAt != null ? formatTimestamp(completedAt) : EMPTY_TIMESTAMP
 
   // redirect to new run after successful reset
   const onResetSuccess = (createRunResponse: Run): void =>
@@ -237,7 +249,31 @@ export function ProtocolRunHeader({
       setShowIsShakingModal(true)
     } else if (isHeaterShakerInProtocol && !isShaking) {
       confirmAttachment()
-    } else play()
+    } else {
+      play()
+
+      const isIdle = runStatus === RUN_STATUS_IDLE
+      const eventProperties =
+        isIdle && robotAnalyticsData != null ? robotAnalyticsData : {}
+      const eventName = isIdle ? 'runStart' : 'runResume'
+
+      trackProtocolRunEvent({
+        name: eventName,
+        properties: eventProperties,
+      })
+    }
+  }
+
+  const handlePauseButtonClick = (): void => {
+    pause()
+
+    trackProtocolRunEvent({ name: 'runPause' })
+  }
+
+  const handleResetButtonClick = (): void => {
+    reset()
+
+    trackProtocolRunEvent({ name: 'runAgain' })
   }
 
   const isRunControlButtonDisabled =
@@ -267,12 +303,12 @@ export function ProtocolRunHeader({
     case RUN_STATUS_RUNNING:
       buttonIconName = 'pause'
       buttonText = t('pause_run')
-      handleButtonClick = pause
+      handleButtonClick = handlePauseButtonClick
       break
     case RUN_STATUS_STOP_REQUESTED:
       buttonIconName = null
       buttonText = t('canceling_run')
-      handleButtonClick = reset
+      handleButtonClick = handleResetButtonClick
       break
     case RUN_STATUS_STOPPED:
     case RUN_STATUS_FINISHING:
@@ -280,7 +316,7 @@ export function ProtocolRunHeader({
     case RUN_STATUS_SUCCEEDED:
       buttonIconName = 'play'
       buttonText = t('run_again')
-      handleButtonClick = reset
+      handleButtonClick = handleResetButtonClick
       break
   }
 
@@ -323,9 +359,14 @@ export function ProtocolRunHeader({
     runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
     runStatus === RUN_STATUS_IDLE
 
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
-
   const handleClearClick = (): void => {
+    trackProtocolRunEvent({
+      name: 'runFinish',
+      properties: {
+        ...robotAnalyticsData,
+      },
+    })
+
     closeCurrentRun()
   }
 

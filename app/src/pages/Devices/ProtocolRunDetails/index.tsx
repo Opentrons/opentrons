@@ -22,21 +22,20 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
-
 import { StyledText } from '../../../atoms/text'
 import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
   useRobot,
+  useRunStatuses,
+  useSyncRobotClock,
 } from '../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { RunLog } from '../../../organisms/Devices/ProtocolRun/RunLog'
 import { ProtocolRunSetup } from '../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
 import { ProtocolRunModuleControls } from '../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
-import { useRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { fetchProtocols } from '../../../redux/protocol-storage'
 
 import type { NavRouteParams, ProtocolRunDetailsTab } from '../../../App/types'
@@ -123,7 +122,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
   const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
 
   const robot = useRobot(robotName)
-
+  useSyncRobotClock(robotName)
   interface ProtocolRunDetailsTabProps {
     protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
     robotName: string
@@ -255,15 +254,17 @@ const ModuleControlsTab = (
   const { robotName, runId } = props
   const { t } = useTranslation('run_details')
   const currentRunId = useCurrentRunId()
-  const runStatus = useRunStatus(runId)
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
     robotName,
     runId
   )
+  const { isRunStill } = useRunStatuses()
 
-  const disabled = currentRunId !== runId || runStatus !== RUN_STATUS_IDLE
+  const disabled = currentRunId !== runId || !isRunStill
   const tabDisabledReason = `${t('module_controls')} ${t(
-    'not_available_for_a_completed_run'
+    currentRunId !== runId
+      ? 'not_available_for_a_completed_run'
+      : 'not_available_for_a_run_in_progress'
   )}`
 
   return isEmpty(moduleRenderInfoForProtocolById) ? null : (

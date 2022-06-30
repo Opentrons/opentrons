@@ -34,9 +34,9 @@ import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { Tooltip } from '../../atoms/Tooltip'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
+import { useLatchControls } from './hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 import { Collapsible } from './Collapsible'
-import { useLatchControls } from './hooks'
 
 import type { HeaterShakerModule } from '../../redux/modules/types'
 import type {
@@ -298,6 +298,7 @@ export const TestShakeSlideout = (
             <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
           )}
           <Link
+            role="button"
             marginTop={SPACING.spacing2}
             fontSize={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}

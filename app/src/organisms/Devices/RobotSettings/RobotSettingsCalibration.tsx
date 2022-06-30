@@ -544,6 +544,7 @@ export function RobotSettingsCalibration({
               />
             ) : null}
             <Link
+              role="button"
               css={TYPOGRAPHY.linkPSemiBold}
               onClick={() => setShowDeckCalibrationModal(true)}
             >

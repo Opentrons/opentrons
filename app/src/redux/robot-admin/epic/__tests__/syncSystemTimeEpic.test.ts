@@ -3,17 +3,12 @@ import { subSeconds, differenceInSeconds, parseISO } from 'date-fns'
 
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import { GET, PUT } from '../../../robot-api'
-import * as Robot from '../../../robot'
+import { syncSystemTime } from '../../actions'
 import {
   mockFetchSystemTimeSuccess,
   mockFetchSystemTimeFailure,
 } from '../../__fixtures__'
-import { syncTimeOnConnectEpic } from '../syncTimeOnConnectEpic'
-
-import type { Action } from '../../../types'
-
-const createConnectAction = (robotName: string): Action =>
-  Robot.connect(robotName)
+import { syncSystemTimeEpic } from '../syncSystemTimeEpic'
 
 const createTimeSuccessResponse = (
   time: Date
@@ -26,22 +21,22 @@ const createTimeSuccessResponse = (
 const createEpicOutput = (
   mocks: any,
   createHotObservable: any
-): ReturnType<typeof syncTimeOnConnectEpic> => {
+): ReturnType<typeof syncSystemTimeEpic> => {
   const action$ = createHotObservable('--a', { a: mocks.action })
   const state$ = createHotObservable('s-s', { s: mocks.state })
-  const output$ = syncTimeOnConnectEpic(action$, state$)
+  const output$ = syncSystemTimeEpic(action$, state$)
 
   return output$
 }
 
-describe('syncTimeOnConnectEpic', () => {
+describe('syncSystemTimeEpic', () => {
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  it("should fetch the robot's time on connect request", () => {
+  it("should fetch the robot's time on sync system time request", () => {
     const mocks = setupEpicTestMocks(
-      createConnectAction,
+      syncSystemTime,
       createTimeSuccessResponse(new Date())
     )
 
@@ -59,7 +54,7 @@ describe('syncTimeOnConnectEpic', () => {
   })
 
   it('should update time if off by more than a minute', () => {
-    const mocks = setupEpicTestMocks(createConnectAction)
+    const mocks = setupEpicTestMocks(syncSystemTime)
 
     runEpicTest(mocks, ({ hot, cold, expectObservable, flush }) => {
       mocks.fetchRobotApi.mockImplementation((robot, request) => {
@@ -102,10 +97,7 @@ describe('syncTimeOnConnectEpic', () => {
   })
 
   it('should not try to update time if fetch fails', () => {
-    const mocks = setupEpicTestMocks(
-      createConnectAction,
-      mockFetchSystemTimeFailure
-    )
+    const mocks = setupEpicTestMocks(syncSystemTime, mockFetchSystemTimeFailure)
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const output$ = createEpicOutput(mocks, hot)
@@ -118,7 +110,7 @@ describe('syncTimeOnConnectEpic', () => {
 
   it('should not try to update time if off by less than a minute', () => {
     const mocks = setupEpicTestMocks(
-      createConnectAction,
+      syncSystemTime,
       createTimeSuccessResponse(subSeconds(new Date(), 55))
     )
 

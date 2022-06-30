@@ -20,8 +20,9 @@ import {
   TEMP_MIN,
 } from '@opentrons/shared-data'
 import { Slideout } from '../../atoms/Slideout'
-import { PrimaryButton } from '../../atoms/buttons'
+import { SubmitPrimaryButton } from '../../atoms/buttons'
 import { InputField } from '../../atoms/InputField'
+import { useRunStatuses } from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
@@ -31,44 +32,63 @@ interface TemperatureModuleSlideoutProps {
   module: TemperatureModule
   onCloseClick: () => unknown
   isExpanded: boolean
-  runId?: string
+  isLoadedInRun: boolean
+  currentRunId?: string
 }
 
 export const TemperatureModuleSlideout = (
   props: TemperatureModuleSlideoutProps
 ): JSX.Element | null => {
-  const { module, onCloseClick, isExpanded, runId } = props
+  const {
+    module,
+    onCloseClick,
+    isLoadedInRun,
+    isExpanded,
+    currentRunId,
+  } = props
   const { t } = useTranslation('device_details')
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
+
   const { moduleIdFromRun } = useModuleIdFromRun(
     module,
-    runId != null ? runId : null
+    currentRunId != null ? currentRunId : null
   )
   const name = getModuleDisplayName(module.moduleModel)
-  const [temperatureValue, setTemperatureValue] = React.useState<string | null>(
+  const [temperatureValue, setTemperatureValue] = React.useState<number | null>(
     null
   )
+  const { isRunIdle, isRunTerminal } = useRunStatuses()
+
+  let moduleId: string | null = null
+  if (isRunIdle && currentRunId != null && isLoadedInRun) {
+    moduleId = moduleIdFromRun
+  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
+    moduleId = module.id
+  }
 
   const handleSubmitTemperature = (): void => {
     if (temperatureValue != null) {
       const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {
         commandType: 'temperatureModule/setTargetTemperature',
         params: {
-          moduleId: runId != null ? moduleIdFromRun : module.id,
-          celsius: parseInt(temperatureValue),
+          moduleId: moduleId != null ? moduleId : '',
+          celsius: temperatureValue,
         },
       }
-      if (runId != null) {
+      if (isRunIdle && currentRunId != null && isLoadedInRun) {
         createCommand({
-          runId: runId,
+          runId: currentRunId,
           command: saveTempCommand,
         }).catch((e: Error) => {
           console.error(
-            `error setting module status with command type ${saveTempCommand.commandType} and run id ${runId}: ${e.message}`
+            `error setting module status with command type ${saveTempCommand.commandType} and run id ${currentRunId}: ${e.message}`
           )
         })
-      } else {
+      } else if (
+        (currentRunId != null && isRunTerminal) ||
+        currentRunId == null
+      ) {
         createLiveCommand({
           command: saveTempCommand,
         }).catch((e: Error) => {
@@ -79,12 +99,12 @@ export const TemperatureModuleSlideout = (
       }
     }
     setTemperatureValue(null)
+    onCloseClick()
   }
 
   const valueOutOfRange =
     temperatureValue != null &&
-    (parseInt(temperatureValue) < TEMP_MIN ||
-      parseInt(temperatureValue) > TEMP_MAX)
+    (temperatureValue < TEMP_MIN || temperatureValue > TEMP_MAX)
 
   return (
     <Slideout
@@ -92,14 +112,13 @@ export const TemperatureModuleSlideout = (
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
-        <PrimaryButton
-          width="100%"
+        <SubmitPrimaryButton
+          form="TemperatureModuleSlideout_submitValue"
+          value={t('confirm')}
           onClick={handleSubmitTemperature}
           disabled={temperatureValue === null || valueOutOfRange}
           data-testid={`TemperatureSlideout_btn_${module.serialNumber}`}
-        >
-          {t('confirm')}
-        </PrimaryButton>
+        />
       }
     >
       <Text
@@ -125,21 +144,25 @@ export const TemperatureModuleSlideout = (
         >
           {t('set_temperature')}
         </Text>
-        <InputField
-          id={`${module.moduleModel}`}
-          data-testid={`${module.moduleModel}`}
-          autoFocus
-          units={CELSIUS}
-          value={temperatureValue}
-          onChange={e => setTemperatureValue(e.target.value)}
-          type="number"
-          caption={t('module_status_range', {
-            min: TEMP_MIN,
-            max: TEMP_MAX,
-            unit: CELSIUS,
-          })}
-          error={valueOutOfRange ? t('input_out_of_range') : null}
-        />
+        <form id="TemperatureModuleSlideout_submitValue">
+          <InputField
+            id={`${module.moduleModel}`}
+            data-testid={`${module.moduleModel}`}
+            units={CELSIUS}
+            value={
+              temperatureValue != null ? Math.round(temperatureValue) : null
+            }
+            autoFocus
+            onChange={e => setTemperatureValue(e.target.valueAsNumber)}
+            type="number"
+            caption={t('module_status_range', {
+              min: TEMP_MIN,
+              max: TEMP_MAX,
+              unit: CELSIUS,
+            })}
+            error={valueOutOfRange ? t('input_out_of_range') : null}
+          />
+        </form>
       </Flex>
     </Slideout>
   )
