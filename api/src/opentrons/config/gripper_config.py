@@ -3,7 +3,6 @@ from dataclasses import dataclass
 import logging
 from typing import List, Tuple, Optional
 
-from opentrons_hardware.hardware_control.tools.types import GripperInformation
 from opentrons_shared_data.gripper import load_definition
 from opentrons_shared_data.gripper.dev_types import (
     GripperCustomizableFloat,
@@ -50,10 +49,6 @@ def _get_offset(def_offset: GripperOffset) -> Offset:
 def info_num_to_model(num: int) -> GripperModel:
     model_map = {0: GripperModel.V1}
     return model_map[num]
-
-
-def extract_gripper_info(info: "GripperInformation") -> Tuple[GripperModel, str]:
-    return info_num_to_model(info.model), info.serial
 
 
 def load(

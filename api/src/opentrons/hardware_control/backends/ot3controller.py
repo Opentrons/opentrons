@@ -362,7 +362,8 @@ class OT3Controller:
         def _build_attached_gripper(
             attached: ohc_tool_types.GripperInformation,
         ) -> AttachedGripper:
-            model, serial = gripper_config.extract_gripper_info(attached)
+            model = gripper_config.info_num_to_model(attached.model)
+            serial = attached.serial
             return {
                 "config": gripper_config.load(model, serial),
                 "id": serial,
