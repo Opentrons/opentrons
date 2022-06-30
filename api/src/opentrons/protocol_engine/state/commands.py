@@ -295,12 +295,10 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.queue_status = QueueStatus.PAUSED
 
         elif isinstance(action, StopAction):
-            # TODO (tz, 6-30-22): Clear queued commands on stop.
-            #  Commands should not get processed after stop command.
-            self._state.queued_command_ids = None
             if not self._state.run_result:
                 self._state.queue_status = QueueStatus.PAUSED
                 self._state.run_result = RunResult.STOPPED
+                self._state.queued_command_ids.clear()
 
         elif isinstance(action, FinishAction):
             if not self._state.run_result:
