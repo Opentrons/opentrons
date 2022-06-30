@@ -40,6 +40,7 @@ export function NewRobotSetupHelp(): JSX.Element {
   return (
     <>
       <Link
+        role="button"
         css={SECONDARY_LINK_STYLE}
         onClick={() => setShowNewRobotHelpModal(true)}
       >

@@ -331,14 +331,14 @@ describe('LabwarePositionCheckStepDetail', () => {
     it('renders correct text when jog controls are hidden', () => {
       const { getByText, getByRole } = render(props)
       getByText('Need to make an adjustment?')
-      getByRole('link', { name: 'Reveal jog controls' })
+      getByRole('button', { name: 'Reveal jog controls' })
       expect(screen.queryByText('Mock Jog Controls')).toBeNull()
     })
     it('renders correct text when jog controls are revealed', () => {
       mockJogControls.mockReturnValue(<div>Mock Jog Controls</div>)
       const { getByText, getByRole } = render(props)
       getByText('Need to make an adjustment?')
-      const revealJogControls = getByRole('link', {
+      const revealJogControls = getByRole('button', {
         name: 'Reveal jog controls',
       })
       fireEvent.click(revealJogControls)
@@ -349,7 +349,7 @@ describe('LabwarePositionCheckStepDetail', () => {
         <button onClick={() => props.jog('x', 1, 1)}>MOCK JOG BUTTON</button>
       ))
       const { getByText, getByRole } = render(props)
-      const revealJogControls = getByRole('link', {
+      const revealJogControls = getByRole('button', {
         name: 'Reveal jog controls',
       })
       getByText('x0,y0,z0')
@@ -374,7 +374,7 @@ describe('LabwarePositionCheckStepDetail', () => {
           definitionUri: 'fakeUri',
         })
       const { getByText, getByRole } = render(props)
-      const revealJogControls = getByRole('link', {
+      const revealJogControls = getByRole('button', {
         name: 'Reveal jog controls',
       })
       getByText('x4,y5,z6')

@@ -154,7 +154,6 @@ export function FactoryResetSlideout({
             </StyledText>
             <Link
               role="button"
-              tabIndex={0}
               css={TYPOGRAPHY.linkPSemiBold}
               onClick={downloadCalibrationLogs}
             >
@@ -189,7 +188,6 @@ export function FactoryResetSlideout({
             </StyledText>
             <Link
               role="button"
-              tabIndex={0}
               css={TYPOGRAPHY.linkPSemiBold}
               onClick={downloadRunHistoryLogs}
             >

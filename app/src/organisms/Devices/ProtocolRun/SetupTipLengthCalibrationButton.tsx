@@ -224,6 +224,7 @@ export function SetupTipLengthCalibrationButton({
     </>
   ) : (
     <Link
+      role="link"
       onClick={() => confirm(true)}
       css={TYPOGRAPHY.labelSemiBold}
       id={'TipRackCalibration_recalibrateTipRackLink'}
