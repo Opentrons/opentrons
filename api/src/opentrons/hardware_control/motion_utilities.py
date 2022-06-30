@@ -1,6 +1,6 @@
 """Utilities for calculating motion correctly."""
 
-from typing import Callable, Dict, Union, overload, Type
+from typing import Callable, Dict, Union, overload, TypeVar
 from collections import OrderedDict
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage.types import AttitudeMatrix
@@ -281,34 +281,21 @@ def machine_point_from_deck_point(
     return Point(*linal.apply_transform(attitude, deck_point)) + offset
 
 
-@overload
+AxisType = TypeVar("AxisType", Axis, OT3Axis)
+
+
 def machine_from_deck(
-    deck_pos: Dict[Axis, float], attitude: AttitudeMatrix, offset: Point
-) -> Dict[str, float]:
-    ...
-
-
-@overload
-def machine_from_deck(
-    deck_pos: Dict[OT3Axis, float], attitude: AttitudeMatrix, offset: Point
-) -> Dict[OT3Axis, float]:
-    ...
-
-
-def machine_from_deck(  # type: ignore[no-untyped-def]
-    deck_pos,
-    attitude,
-    offset,
-):
+    deck_pos: Dict[AxisType, float],
+    attitude: AttitudeMatrix,
+    offset: Point,
+) -> Dict[AxisType, float]:
     """Build a machine-axis position from a deck position"""
     to_transform = Point(*(tp for ax, tp in deck_pos.items() if ax in ax.gantry_axes()))
 
     # Pre-fill the dict we’ll send to the backend with the axes we don’t
     # need to transform
     machine_pos = {
-        _axis_name(ax): pos
-        for ax, pos in deck_pos.items()
-        if ax not in ax.gantry_axes()
+        ax: pos for ax, pos in deck_pos.items() if ax not in ax.gantry_axes()
     }
     if len(to_transform) != 3:
         raise ValueError(
@@ -323,7 +310,7 @@ def machine_from_deck(  # type: ignore[no-untyped-def]
     transformed = machine_point_from_deck_point(to_transform, attitude, offset)
 
     to_check = {
-        _axis_name(ax): transformed[idx]
+        ax: transformed[idx]
         for idx, ax in enumerate(deck_pos.keys())
         if ax in ax.gantry_axes()
     }
@@ -331,54 +318,31 @@ def machine_from_deck(  # type: ignore[no-untyped-def]
     return machine_pos
 
 
-@overload
 def deck_from_machine(
-    machine_pos: Dict[str, float],
+    machine_pos: Dict[AxisType, float],
     attitude: AttitudeMatrix,
     offset: Point,
-    axis_enum: Type[Axis],
-) -> Dict[Axis, float]:
-    ...
-
-
-@overload
-def deck_from_machine(
-    machine_pos: Dict[OT3Axis, float],
-    attitude: AttitudeMatrix,
-    offset: Point,
-    axis_enum: Type[OT3Axis],
-) -> Dict[OT3Axis, float]:
-    ...
-
-
-def deck_from_machine(  # type: ignore[no-untyped-def]
-    machine_pos,
-    attitude,
-    offset,
-    axis_enum,
-):
+) -> Dict[AxisType, float]:
     """Build a deck-abs position store from the machine's position"""
-    with_enum = {_axis_enum(k): v for k, v in machine_pos.items()}
-    plunger_axes = {k: v for k, v in with_enum.items() if k not in k.gantry_axes()}
-    right = Point(
-        with_enum[axis_enum.X],
-        with_enum[axis_enum.Y],
-        with_enum[axis_enum.by_mount(Mount.RIGHT)],
-    )
-    left = Point(
-        with_enum[axis_enum.X],
-        with_enum[axis_enum.Y],
-        with_enum[axis_enum.by_mount(Mount.LEFT)],
-    )
-
-    right_deck = deck_point_from_machine_point(right, attitude, offset)
-    left_deck = deck_point_from_machine_point(left, attitude, offset)
-    deck_pos = {
-        axis_enum.X: right_deck[0],
-        axis_enum.Y: right_deck[1],
-        axis_enum.by_mount(Mount.RIGHT): right_deck[2],
-        axis_enum.by_mount(Mount.LEFT): left_deck[2],
+    axis_enum = type(next(iter(machine_pos.keys())))
+    plunger_axes = {k: v for k, v in machine_pos.items() if k not in k.gantry_axes()}
+    mount_axes = {k: v for k, v in machine_pos.items() if k in k.mount_axes()}
+    deck_positions_by_mount = {
+        axis_enum.to_mount(axis): deck_point_from_machine_point(
+            Point(machine_pos[axis_enum.X], machine_pos[axis_enum.Y], value),
+            attitude,
+            offset,
+        )
+        for axis, value in mount_axes.items()
     }
+    position_for_gantry = next(iter(deck_positions_by_mount.values()))
+    deck_pos = {
+        axis_enum.X: position_for_gantry[0],
+        axis_enum.Y: position_for_gantry[1],
+    }
+    for mount, pos in deck_positions_by_mount.items():
+        deck_pos[axis_enum.by_mount(mount)] = pos[2]
+
     deck_pos.update(plunger_axes)
     return deck_pos
 

@@ -83,7 +83,6 @@ async def test_home(ot3_hardware, mock_home):
             mock_home.return_value,
             ot3_hardware._transforms.deck_calibration.attitude,
             ot3_hardware._transforms.carriage_offset,
-            OT3Axis,
         )
     assert ot3_hardware._current_position[OT3Axis.X] == 20
 

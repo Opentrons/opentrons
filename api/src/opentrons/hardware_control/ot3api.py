@@ -602,7 +602,6 @@ class OT3API(
                     await self._backend.update_position(),
                     self._transforms.deck_calibration.attitude,
                     self._transforms.carriage_offset,
-                    OT3Axis,
                 )
             ot3pos = self._effector_pos_from_carriage_pos(
                 OT3Mount.from_mount(mount), self._current_position, critical_point
@@ -805,6 +804,7 @@ class OT3API(
         Worker function to home the robot by axis or list of
         desired axes.
         """
+
         self._reset_last_mount()
         if axes:
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
@@ -823,7 +823,6 @@ class OT3API(
                     machine_pos,
                     self._transforms.deck_calibration.attitude,
                     self._transforms.carriage_offset,
-                    OT3Axis,
                 )
                 self._current_position.update(position)
 
@@ -860,7 +859,6 @@ class OT3API(
                 machine_pos,
                 self._transforms.deck_calibration.attitude,
                 self._transforms.carriage_offset,
-                OT3Axis,
             )
 
     # Gantry/frame (i.e. not pipette) config API
@@ -1129,7 +1127,6 @@ class OT3API(
                     machine_pos,
                     self._transforms.deck_calibration.attitude,
                     self._transforms.carriage_offset,
-                    OT3Axis,
                 )
 
         for shake in spec.shake_moves:
@@ -1277,7 +1274,6 @@ class OT3API(
             self._backend.home_position(),
             self._transforms.deck_calibration.attitude,
             self._transforms.carriage_offset,
-            OT3Axis,
         )
         pos_at_home = self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount), carriage_pos, critical_point
@@ -1359,14 +1355,7 @@ class OT3API(
             machine_pass_distance,
             pass_settings.speed_mm_per_s,
         )
-        machine_pos = await self._backend.update_position()
-        self._current_position = deck_from_machine(
-            machine_pos,
-            self._transforms.deck_calibration.attitude,
-            self._transforms.carriage_offset,
-            OT3Axis,
-        )
-        end_pos = await self.gantry_position(mount)
+        end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)
 
