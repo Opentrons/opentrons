@@ -4,7 +4,7 @@ from datetime import datetime
 
 from opentrons.types import MountType
 from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.types import PipetteName, LoadedPipette
+from opentrons.protocol_engine.types import DeckPoint, LoadedPipette, PipetteName
 from opentrons.protocol_engine.actions import UpdateCommandAction
 from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
@@ -239,8 +239,34 @@ def test_movement_commands_update_current_well(
     assert subject.state.current_well == expected_location
 
 
-def test_home_clears_current_well(subject: PipetteStore) -> None:
-    """It clear the last accessed well with a home command."""
+@pytest.mark.parametrize(
+    "command",
+    [
+        cmd.Home(
+            id="command-id-2",
+            key="command-key-2",
+            status=cmd.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=cmd.HomeParams(),
+            result=cmd.HomeResult(),
+        ),
+        cmd.MoveToCoordinates(
+            id="command-id-2",
+            key="command-key-2",
+            status=cmd.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=cmd.MoveToCoordinatesParams(
+                pipetteId="pipette-id",
+                coordinates=DeckPoint(x=1.1, y=2.2, z=3.3),
+            ),
+            result=cmd.MoveToCoordinatesResult(),
+        ),
+    ],
+)
+def test_movement_commands_without_well_clear_current_well(
+    subject: PipetteStore, command: cmd.Command
+) -> None:
+    """Commands that make the current well unknown should clear the current well."""
     load_pipette_command = create_load_pipette_command(
         pipette_id="pipette-id",
         pipette_name=PipetteName.P300_SINGLE,
@@ -251,18 +277,10 @@ def test_home_clears_current_well(subject: PipetteStore) -> None:
         labware_id="labware-id",
         well_name="well-name",
     )
-    home_command = cmd.Home(
-        id="command-id-2",
-        key="command-key-2",
-        status=cmd.CommandStatus.SUCCEEDED,
-        createdAt=datetime(year=2021, month=1, day=1),
-        params=cmd.HomeParams(),
-        result=cmd.HomeResult(),
-    )
 
     subject.handle_action(UpdateCommandAction(command=load_pipette_command))
     subject.handle_action(UpdateCommandAction(command=move_command))
-    subject.handle_action(UpdateCommandAction(command=home_command))
+    subject.handle_action(UpdateCommandAction(command=command))
 
     assert subject.state.current_well is None
 
