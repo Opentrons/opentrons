@@ -16,14 +16,7 @@ from .commands import (
     CommandType,
     CommandIntent,
 )
-from .state import (
-    State,
-    StateView,
-    CommandSlice,
-    CurrentCommand,
-    EngineConfigs,
-    StateSummary,
-)
+from .state import State, StateView, StateSummary, CommandSlice, CurrentCommand, Config
 from .plugins import AbstractPlugin
 
 from .types import (
@@ -52,8 +45,8 @@ __all__ = [
     # main factory and interface exports
     "create_protocol_engine",
     "ProtocolEngine",
-    "EngineConfigs",
     "StateSummary",
+    "Config",
     # error types
     "ProtocolEngineError",
     "ErrorOccurrence",
