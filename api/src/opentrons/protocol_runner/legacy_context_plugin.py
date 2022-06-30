@@ -116,7 +116,7 @@ class LegacyContextPlugin(AbstractPlugin):
     def handle_action(self, action: pe_actions.Action) -> None:
         """React to a ProtocolEngine action."""
         if (
-            isinstance(action, pe_actions.HardwareEventAction)
+            isinstance(action, pe_actions.DoorChangeAction)
             and not self.state.commands.get_is_implicitly_active()
             and isinstance(action.event, DoorStateNotification)
         ):

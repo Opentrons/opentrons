@@ -14,7 +14,7 @@ from opentrons.hardware_control.types import (
     HardwareEventHandler,
 )
 
-from opentrons.protocol_engine.actions import ActionDispatcher, HardwareEventAction
+from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
 from opentrons.protocol_engine.execution.door_watcher import (
     DoorWatcher,
 )
@@ -65,7 +65,7 @@ async def test_event_forwarding(
     captured_handler = cast(HardwareEventHandler, handler_captor.value)
 
     input_event = DoorStateNotification(new_state=DoorState.OPEN)
-    expected_action_to_forward = HardwareEventAction(input_event)
+    expected_action_to_forward = DoorChangeAction(input_event)
 
     await to_thread.run_sync(captured_handler, input_event)
     decoy.verify(action_dispatcher.dispatch(expected_action_to_forward))
