@@ -1,7 +1,8 @@
 import serial
+from typing import Tuple
 
-from .radwag_commands import RadwagCommand, radwag_command_format
-from .radwag_response_handlers import \
+from .commands import RadwagCommand, radwag_command_format
+from .responses import \
     (RadwageResponse, RadwagResponseCodes, radwag_response_parse)
 
 
@@ -24,7 +25,7 @@ class RadwagScale:
         assert send_len == len(cmd_bytes), f'Radwag command \"{cmd}\" ({cmd_bytes} ' \
                                            f'bytes) only sent {send_len} bytes'
 
-    def _read_response_packet(self, command: RadwagCommand) -> RadwageResponse:
+    def _read_response(self, command: RadwagCommand) -> RadwageResponse:
         response = self._connection.readline().decode('utf-8')
         data = radwag_response_parse(response, command)
         return data
@@ -38,7 +39,7 @@ class RadwagScale:
     def read_serial_number(self) -> str:
         cmd = RadwagCommand.GET_SERIAL_NUMBER
         self._write_command(cmd)
-        res = self._read_response_packet(cmd)
+        res = self._read_response(cmd)
         assert res.code == RadwagResponseCodes.IN_PROGRESS
         return res.message
 
@@ -48,7 +49,7 @@ class RadwagScale:
         else:
             cmd = RadwagCommand.DISABLE_CONTINUOUS_TRANS_BASIC_UNIT
         self._write_command(cmd)
-        res = self._read_response_packet(cmd)
+        res = self._read_response(cmd)
         assert res.code == RadwagResponseCodes.IN_PROGRESS
 
     def automatic_internal_adjustment(self, enable: bool) -> None:
@@ -57,12 +58,16 @@ class RadwagScale:
         else:
             cmd = RadwagCommand.DISABLE_AUTO_INTERNAL_ADJUST
         self._write_command(cmd)
-        res = self._read_response_packet(cmd)
+        res = self._read_response(cmd)
         assert res.code == RadwagResponseCodes.CARRIED_OUT
 
-    def read_mass(self) -> [float, bool]:
+    def set_working_mode(self) -> None:
+        # TODO: set working mode (Precision)
+        return
+
+    def read_mass(self) -> Tuple[float, bool]:
         cmd = RadwagCommand.GET_MEASUREMENT_BASIC_UNIT
         self._write_command(cmd)
-        res = self._read_response_packet(cmd)
+        res = self._read_response(cmd)
         assert res.measurement is not None
         return res.measurement, res.stable

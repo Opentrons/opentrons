@@ -1,4 +1,4 @@
-from .radwag_commands import RadwagCommand, RADWAG_COMMAND_TERMINATOR
+from .commands import RadwagCommand, RADWAG_COMMAND_TERMINATOR
 
 from enum import Enum
 from dataclasses import dataclass

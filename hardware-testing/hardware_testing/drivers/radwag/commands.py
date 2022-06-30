@@ -57,7 +57,7 @@ class RadwagCommand(str, Enum):
     SET_AMBIENT_CONDITIONS_STATE = 'EV'  # Set ambient conditions state
     GET_CURRENT_AMBIENT_CONDITIONS = 'EVG'  # Give currently set ambient conditions
 
-    # filter
+    # filter ???
     SET_FILTER = 'FIS'  # Set filter
     GET_FILTER = 'FIG'  # Give current filter
 

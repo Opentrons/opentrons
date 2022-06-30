@@ -1,6 +1,6 @@
 import time
 
-from hardware_testing.drivers.radwag.radwag_scale import RadwagScale
+from hardware_testing.drivers.radwag.driver import RadwagScale
 
 
 if __name__ == '__main__':
