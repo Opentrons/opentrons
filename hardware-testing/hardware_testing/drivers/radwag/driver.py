@@ -5,6 +5,10 @@ from .commands import RadwagCommand, radwag_command_format
 from .responses import \
     (RadwageResponse, RadwagResponseCodes, radwag_response_parse)
 
+# vid:pid for Radwag's "AS 82/220.X2 PLUS" USB2 (usb-b) port
+USB_VID = 1155
+USB_PID = 41389
+
 
 class RadwagScale:
     def __init__(self, connection: serial.Serial) -> None:
