@@ -7,6 +7,7 @@ import {
   ALIGN_CENTER,
   Link,
   COLORS,
+  SPACING,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { UploadInput as FileImporter } from '../../molecules/UploadInput'
@@ -33,7 +34,11 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      alignItems={ALIGN_CENTER}
+      marginY={SPACING.spacingM}
+    >
       <FileImporter
         onUpload={(file: File) => handleUpload(file)}
         uploadText={t('valid_file_types')}
@@ -43,7 +48,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
               t={t}
               i18nKey="shared:drag_and_drop"
               components={{
-                a: <Link color={COLORS.blue} role="button" />,
+                a: <Link color={COLORS.blueHover} role="button" />,
               }}
             />
           </StyledText>

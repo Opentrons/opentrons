@@ -175,7 +175,11 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_leftMount_${protocolDisplayName}`}
               >
-                <StyledText as="h6" marginBottom={SPACING.spacing3}>
+                <StyledText
+                  as="h6"
+                  marginBottom={SPACING.spacing3}
+                  color={COLORS.darkGreyEnabled}
+                >
                   {t('left_mount')}
                 </StyledText>
                 <StyledText as="p">
@@ -199,7 +203,11 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_rightMount_${protocolDisplayName}`}
               >
-                <StyledText as="h6" marginBottom={SPACING.spacing3}>
+                <StyledText
+                  as="h6"
+                  marginBottom={SPACING.spacing3}
+                  color={COLORS.darkGreyEnabled}
+                >
                   {t('right_mount')}
                 </StyledText>
                 <StyledText as="p">
@@ -249,7 +257,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             data-testid={`ProtocolCard_date_${protocolDisplayName}`}
           >
             <StyledText
-              as="h6"
+              as="label"
               marginBottom={SPACING.spacing3}
               color={COLORS.darkGreyEnabled}
               textAlign={TEXT_ALIGN_RIGHT}
@@ -257,7 +265,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               {t('updated')}
             </StyledText>
             <StyledText
-              as="p"
+              as="label"
               color={COLORS.darkGreyEnabled}
               textAlign={TEXT_ALIGN_RIGHT}
             >

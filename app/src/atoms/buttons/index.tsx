@@ -120,6 +120,7 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   ${TYPOGRAPHY.pSemiBold}
+  background-color: ${COLORS.transparent};
 
   ${styleProps}
 
