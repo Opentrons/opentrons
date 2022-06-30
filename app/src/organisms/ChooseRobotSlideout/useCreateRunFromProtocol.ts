@@ -81,6 +81,7 @@ export function useCreateRunFromProtocol(
         runError?.response?.data ??
         t('protocol_run_general_error_msg')
       : null
+  console.error(error)
   error = error?.length > 255 ? t('protocol_run_general_error_msg') : error
 
   return {
