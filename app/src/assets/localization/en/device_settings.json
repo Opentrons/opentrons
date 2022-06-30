@@ -37,7 +37,7 @@
   "last_calibrated": "Last calibrated: {{date}}",
   "not_calibrated": "Not calibrated yet",
   "deck_calibration_missing": "Deck calibration missing",
-  "deck_calibration_missing_no_pipette": "Deck calibration missing. Attach a pipette to perform Deck calibration.",
+  "deck_calibration_missing_no_pipette": "Deck calibration missing. Attach a pipette to perform deck calibration.",
   "deck_calibration_recommended": "Deck calibration recommended",
   "calibrate_now": "Calibrate now",
   "recalibrate_now": "Recalibrate now",
