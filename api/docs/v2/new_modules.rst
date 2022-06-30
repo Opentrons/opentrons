@@ -747,10 +747,6 @@ Provided that the parallel pipetting actions don’t take more than one minute, 
 
 You’ll also notice that the timing ``while`` loop has been embedded in an ``if`` statement. Without this, the protocol will wait the entire duration, even in simulation and when loading the protocol onto a robot. This is because the Python API’s :py:meth:`.ProtocolContext.delay` method is designed to run instantaneously in simulation, but the methods from the ``time`` module (or any other module) run as they ordinarily would. Skipping these steps when simulating — yet performing them when ``not protocol.is_simulating()`` — saves considerable time.
 
-Command aliases
----------------
-
-TK (or not)
 
 Deactivation
 ============
