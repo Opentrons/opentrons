@@ -118,6 +118,7 @@ export function GeneralSettings(): JSX.Element {
               <Link
                 textDecoration={TEXT_DECORATION_UNDERLINE}
                 onClick={() => setShowUpdateModal(true)}
+                marginLeft={SPACING.spacing2}
               >
                 {t('view_update')}
               </Link>
