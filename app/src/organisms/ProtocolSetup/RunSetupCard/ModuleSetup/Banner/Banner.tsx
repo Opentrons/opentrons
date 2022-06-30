@@ -12,18 +12,16 @@ import {
   NewPrimaryBtn,
   TEXT_TRANSFORM_NONE,
   SIZE_6,
-  Btn,
 } from '@opentrons/components'
 import { StyledText } from '../../../../../atoms/text'
 
 interface BannerProps {
   title: string
   children?: React.ReactNode
-  onClose?: () => void
 }
 
 export function Banner(props: BannerProps): JSX.Element | null {
-  const { title, children, onClose } = props
+  const { title, children } = props
 
   return (
     <React.Fragment>
@@ -59,11 +57,6 @@ export function Banner(props: BannerProps): JSX.Element | null {
                 {title}
               </StyledText>
             </Flex>
-            {onClose != null ? (
-              <Btn size="1.5rem" onClick={onClose} aria-label="close">
-                <Icon name={'close'} color={COLORS.darkGrey} />
-              </Btn>
-            ) : null}
           </Flex>
         </Flex>
         {children}

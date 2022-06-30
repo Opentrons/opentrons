@@ -1,7 +1,16 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import {
+  COLORS,
+  Flex,
+  DIRECTION_COLUMN,
+  JUSTIFY_SPACE_BETWEEN,
+  DIRECTION_ROW,
+  TYPOGRAPHY,
+  SPACING,
+  Icon,
+} from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
-import { Banner } from './Banner/Banner'
 
 interface UnMatchedModuleWarningProps {
   isAnyModuleUnnecessary: boolean
@@ -11,19 +20,50 @@ export const UnMatchedModuleWarning = (
   props: UnMatchedModuleWarningProps
 ): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')
-  const [showModulesMismatch, setShowModulesMismatch] = React.useState<boolean>(
-    true
-  )
-  const isVisible = showModulesMismatch && props.isAnyModuleUnnecessary
+  const isVisible = props.isAnyModuleUnnecessary
   if (!isVisible) return null
 
   return (
-    <Banner
-      title={t('module_mismatch_title')}
-      onClose={() => setShowModulesMismatch(false)}
-      data-testid={`UnMatchedModuleWarning_banner`}
+    <Flex
+      marginTop={SPACING.spacing4}
+      flexDirection={DIRECTION_COLUMN}
+      backgroundColor={COLORS.background}
+      padding={SPACING.spacing5}
     >
-      <StyledText as="p">{t('module_mismatch_body')}</StyledText>
-    </Banner>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
+        <Flex>
+          <Icon
+            size={SPACING.spacing6}
+            color={COLORS.darkGreyEnabled}
+            name="information"
+            paddingRight={SPACING.spacing3}
+            paddingBottom={'0.625rem'}
+            aria-label="information_icon"
+          />
+          <StyledText
+            fontSize={TYPOGRAPHY.fontSizeP}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            data-testid={`UnMatchedModuleWarning_title`}
+            color={COLORS.darkBlack}
+          >
+            {t('module_mismatch_title')}
+          </StyledText>
+        </Flex>
+      </Flex>
+
+      <StyledText
+        as="p"
+        marginLeft={SPACING.spacing6}
+        marginRight={SPACING.spacing4}
+        color={COLORS.darkGrey}
+        width="100%"
+        data-testid={`UnMatchedModuleWarning_body`}
+      >
+        {t('module_mismatch_body')}
+      </StyledText>
+    </Flex>
   )
 }
