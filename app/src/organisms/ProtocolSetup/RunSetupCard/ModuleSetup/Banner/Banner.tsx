@@ -12,6 +12,7 @@ import {
   NewPrimaryBtn,
   TEXT_TRANSFORM_NONE,
   SIZE_6,
+  SIZE_2,
 } from '@opentrons/components'
 import { StyledText } from '../../../../../atoms/text'
 
@@ -42,18 +43,14 @@ export function Banner(props: BannerProps): JSX.Element | null {
           >
             <Flex>
               <Icon
-                size={SPACING.spacing6}
+                size={SIZE_2}
                 color={COLORS.darkGreyEnabled}
                 name="information"
                 paddingRight={SPACING.spacing3}
-                paddingBottom={TYPOGRAPHY.fontSizeCaption}
+                paddingBottom={SPACING.spacingSM}
                 aria-label="information_icon"
               />
-              <StyledText
-                as="h3"
-                data-testid={`banner_title_${title}`}
-                color={COLORS.darkBlack}
-              >
+              <StyledText as="h3" data-testid={`banner_title_${title}`}>
                 {title}
               </StyledText>
             </Flex>

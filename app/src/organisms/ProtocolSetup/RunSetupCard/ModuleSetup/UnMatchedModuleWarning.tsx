@@ -6,9 +6,9 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_ROW,
-  TYPOGRAPHY,
   SPACING,
   Icon,
+  SIZE_2,
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 
@@ -36,16 +36,15 @@ export const UnMatchedModuleWarning = (
       >
         <Flex>
           <Icon
-            size={SPACING.spacing6}
+            size={SIZE_2}
             color={COLORS.darkGreyEnabled}
             name="information"
             paddingRight={SPACING.spacing3}
-            paddingBottom={'0.625rem'}
+            paddingBottom={SPACING.spacingSM}
             aria-label="information_icon"
           />
           <StyledText
-            fontSize={TYPOGRAPHY.fontSizeP}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            as="p"
             data-testid={`UnMatchedModuleWarning_title`}
             color={COLORS.darkBlack}
           >
