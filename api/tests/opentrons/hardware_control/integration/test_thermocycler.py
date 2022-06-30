@@ -173,9 +173,6 @@ async def test_cycle_cannot_be_interrupted_by_pause(
     # Make sure we're actually in the middle of the steps.
     assert thermocycler.temperature != final_temp
 
-    # 10 poll/sec
-    # 1 deg / poll  (10 deg/sec)
-    #
     await execution_manager.pause()
 
     # All of the steps should complete, despite the pause.
