@@ -571,6 +571,8 @@ class OT3Controller:
             NodeId.gantry_y: 0,
             NodeId.pipette_left: 0,
             NodeId.pipette_right: 0,
+            NodeId.gripper_z: 0,
+            NodeId.gripper_g: 0,
         }
 
     @staticmethod

@@ -80,6 +80,7 @@ def mock_home(ot3_hardware):
             OT3Axis.P_L: 0,
             OT3Axis.P_R: 0,
             OT3Axis.Z_G: 0,
+            OT3Axis.G: 0,
         }
         yield mock_home
 
@@ -530,6 +531,7 @@ async def test_gripper_move_to(ot3_hardware, mock_backend_move):
         OT3Axis.P_L: 0,
         OT3Axis.P_R: 0,
         OT3Axis.Z_G: 0,
+        OT3Axis.G: 0,
     }
     for move in moves:
         assert list(sorted(move.unit_vector.keys(), key=lambda elem: elem.value)) == [
