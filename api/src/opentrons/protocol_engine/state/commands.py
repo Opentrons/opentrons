@@ -181,9 +181,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
             # For now, unit tests cover mapping every request type
             queued_command = action.request._CommandCls.construct(
                 id=action.command_id,
-                key=action.request.key
-                if action.request.key is not None
-                else action.command_id,
+                key=(
+                    action.request.key
+                    if action.request.key is not None
+                    # TODO(mc, 2021-12-13): generate a command key from params and state
+                    # https://github.com/Opentrons/opentrons/issues/8986
+                    else action.command_id
+                ),
                 createdAt=action.created_at,
                 params=action.request.params,  # type: ignore[arg-type]
                 intent=action.request.intent,
