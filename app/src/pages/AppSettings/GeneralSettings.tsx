@@ -193,7 +193,6 @@ export function GeneralSettings(): JSX.Element {
               <Link
                 role="button"
                 css={TYPOGRAPHY.linkPSemiBold}
-                href={''}
                 onClick={() => setShowPreviousVersionModal(true)}
                 id="GeneralSettings_previousVersionLink"
               >
