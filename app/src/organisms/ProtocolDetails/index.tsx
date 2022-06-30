@@ -396,7 +396,11 @@ export function ProtocolDetails(
               <StyledText as="h6" color={COLORS.darkGreyEnabled}>
                 {t('org_or_author')}
               </StyledText>
-              <StyledText as="p">
+              <StyledText
+                as="p"
+                marginRight={SPACING.spacingM}
+                css={{ 'overflow-wrap': 'anywhere' }}
+              >
                 {analysisStatus === 'loading' ? t('shared:loading') : author}
               </StyledText>
             </Flex>
