@@ -1009,4 +1009,3 @@ def test_command_store_handles_stop_action_with_queued_commands() -> None:
     assert subject.state.queue_status == QueueStatus.PAUSED
 
     assert subject.state.run_result == RunResult.STOPPED
-
