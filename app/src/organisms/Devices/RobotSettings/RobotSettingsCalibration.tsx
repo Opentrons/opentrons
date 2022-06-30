@@ -557,6 +557,11 @@ export function RobotSettingsCalibration({
       </Box>
       <Line />
       {/* DeckCalibration Section */}
+      {!pipettePresent && checkDeckCalibrationStatus() === 'error' && (
+        <Banner marginTop={SPACING.spacing5} type="error">
+          <StyledText>{t('deck_calibration_missing_no_pipette')}</StyledText>
+        </Banner>
+      )}
       {checkDeckCalibrationStatus() !== null && (
         <Banner
           marginTop={SPACING.spacing5}
