@@ -1,22 +1,25 @@
-import serial
 from typing import Tuple
+
+from serial import Serial
 
 from .commands import RadwagCommand, radwag_command_format
 from .responses import \
     (RadwageResponse, RadwagResponseCodes, radwag_response_parse)
 
-# vid:pid for Radwag's "AS 82/220.X2 PLUS" USB2 (usb-b) port
-USB_VID = 1155
-USB_PID = 41389
-
 
 class RadwagScale:
-    def __init__(self, connection: serial.Serial) -> None:
+    def __init__(self, connection: Serial) -> None:
         self._connection = connection
 
     @classmethod
+    def vid_pid(cls) -> Tuple[int, int]:
+        # TODO: check and handle the vid:pid of other scales
+        # vid:pid for Radwag's "AS 82/220.X2 PLUS" USB2 (usb-b) port
+        return 1155, 41389
+
+    @classmethod
     def create(cls, port: str, baudrate: int = 9600, timeout: float = 1) -> "RadwagScale":
-        conn = serial.Serial()
+        conn = Serial()
         conn.port = port
         conn.baudrate = baudrate
         conn.timeout = timeout
