@@ -167,3 +167,20 @@ def create_tip_action_step(
             action=action,
         )
     return step
+
+
+def create_gripper_step(
+    duration: np.float64,
+    dut
+) -> MoveGroupStep:
+    step: MoveGroupStep = {}
+    step[NodeId.gripper_g] = MoveGroupSingleGripperStep(
+        
+    )
+    DEFAULT_PWM_FREQ = 320000
+
+    duration_sec: np.float64
+    pwm_frequency: np.float32
+    pwm_duty_cycle: np.float32
+    stop_condition: MoveStopCondition = MoveStopCondition.none
+    move_type: MoveType = MoveType.linear

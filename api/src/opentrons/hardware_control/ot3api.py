@@ -915,6 +915,24 @@ class OT3API(
     async def update_deck_calibration(self, new_transform: RobotCalibration) -> None:
         pass
 
+    async def _gripper_move(self, duty_cycle: float) -> None:
+        try:
+            await self._backend.(origin, moves[0])
+        except Exception:
+            self._log.exception("Gripper motion failed")
+            raise
+        
+
+    async def prepare_for_grip(self) -> None:
+        try:
+            await self._gripper_handler.ready_for_grip()
+            dc = self._gripper_handler.get_duty_cycle_by_grip_force()
+            await self._gripper_move()
+        except Exception:
+            self._log.exception("Failed to prepare for grip")
+            raise
+        self._gripper_handler.set_ready_to_grip(True)
+
     # Pipette action API
     async def prepare_for_aspirate(
         self, mount: Union[top_types.Mount, OT3Mount], rate: float = 1.0

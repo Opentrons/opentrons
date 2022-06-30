@@ -51,6 +51,7 @@ from opentrons_hardware.hardware_control.current_settings import (
     set_hold_current,
     set_currents,
 )
+from opentrons_hardware.hardware_control import gripper_settings as gripper_hc
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
@@ -314,6 +315,13 @@ class OT3Controller:
             New position.
         """
         return await self.home(axes)
+
+    async def move_gripper(self, moves) -> bool:
+        runner = MoveGroupRunner(move_groups=[move_group])
+        await runner.run(can_messenger=self._messenger)
+        # TODO: should return encoder value once implemented
+        return True
+
 
     async def get_attached_instruments(
         self, expected: Dict[OT3Mount, PipetteName]

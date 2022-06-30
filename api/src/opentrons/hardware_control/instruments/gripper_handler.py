@@ -13,6 +13,16 @@ class GripperNotAttachedError(Exception):
     pass
 
 
+class GripError(Exception):
+    """An error raised if a gripper is accessed that is not attached"""
+
+    pass
+
+
+# TODO: verify value with HW and put this value in gripper config
+DEFAULT_GRIP_FORCE_IN_NEWTON = 3
+
+
 class GripperHandler:
     def __init__(self, gripper: Optional[Gripper] = None):
         self._gripper = gripper
@@ -57,3 +67,20 @@ class GripperHandler:
             return None
         else:
             return self._gripper.as_dict()
+
+    def ready_for_grip(self) -> None:
+        gripper = self._verify_gripper()
+        if gripper._has_gripped:
+            raise GripError("Gripper is already gripping")
+
+    def set_ready_to_grip(self, val: bool) -> None:
+        gripper = self._verify_gripper()
+        gripper._ready_to_grip = val
+
+    def get_duty_cycle_by_grip_force(self, newton: Optional[float] = 0) -> float:
+        gripper = self._verify_gripper()
+        if not newton:
+            newton = DEFAULT_GRIP_FORCE_IN_NEWTON
+        duty_cycle = newton / gripper.force_per_duty_cycle(newton)
+        return duty_cycle
+

@@ -80,6 +80,9 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         # TODO: add critical point implementation
         return Point(0, 0, 0)
 
+    def force_per_duty_cycle(self, newton: float):
+        return gripper_config.piecewise_force_conversion(newton, self.config.jaw_force_per_duty_cycle)
+
     def __str__(self) -> str:
         return f"{self._config.display_name}"
 

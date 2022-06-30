@@ -71,3 +71,28 @@ def load(
         pin_two_offset_from_base=_get_offset(gripper_def.pin_two_offset_from_base),
         quirks=gripper_def.quirks,
     )
+
+
+def piecewise_force_conversion(newton: float, sequence: List[List[float]]) -> float:
+    """
+    Takes a force in newton and a sequence representing a piecewise
+    function for the slope and y-intercept of a force/duty-cycle function, where each
+    sub-list in the sequence contains:
+
+      - the max volume for the piece of the function (minimum implied from the
+        max of the previous item or 0
+      - the slope of the segment
+      - the y-intercept of the segment
+
+    :return: the force/duty-cycle value for the specified volume
+    """
+    # pick the first item from the seq for which the target is less than
+    # the bracketing element
+    for x in sequence:
+        if newton <= x[0]:
+            # use that element to calculate the movement distance in mm
+            return x[1] * newton + x[2]
+
+    # Compatibility with previous implementation of search.
+    #  list(filter(lambda x: ul <= x[0], sequence))[0]
+    raise IndexError()
