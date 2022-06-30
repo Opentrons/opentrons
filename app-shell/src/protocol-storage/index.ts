@@ -7,9 +7,16 @@ import * as ProtocolStorageActions from '@opentrons/app/src/redux/protocol-stora
 
 import * as FileSystem from './file-system'
 
-import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
+import type {
+  ProtocolListActionSource as ListSource,
+  StoredProtocolData,
+} from '@opentrons/app/src/redux/protocol-storage/types'
 
 import type { Action, Dispatch } from '../types'
+import {
+  createFailedAnalysis,
+  writeFailedAnalysis,
+} from '../protocol-analysis/writeFailedAnalysis'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
@@ -29,34 +36,49 @@ const fetchProtocols = (
     .then(FileSystem.parseProtocolDirs)
     .then(storedProtocols => {
       const storedProtocolsData = storedProtocols.map(storedProtocolDir => {
-        const mostRecentAnalysisFilePath = storedProtocolDir.analysisFilePaths.reduce<
-          string | null
-        >((acc, analysisFilePath) => {
-          if (acc !== null) {
-            if (
-              getUnixTimeFromAnalysisPath(analysisFilePath) >
-              getUnixTimeFromAnalysisPath(acc)
-            ) {
-              return analysisFilePath
+        try {
+          const mostRecentAnalysisFilePath = storedProtocolDir.analysisFilePaths.reduce<
+            string | null
+          >((acc, analysisFilePath) => {
+            if (acc !== null) {
+              if (
+                getUnixTimeFromAnalysisPath(analysisFilePath) >
+                getUnixTimeFromAnalysisPath(acc)
+              ) {
+                return analysisFilePath
+              }
+              return acc
             }
-            return acc
+            return analysisFilePath
+          }, null)
+          return {
+            protocolKey: path.parse(storedProtocolDir.dirPath).base,
+            modified: storedProtocolDir.modified,
+            srcFileNames: storedProtocolDir.srcFilePaths.map(
+              filePath => path.parse(filePath).base
+            ),
+            srcFiles: storedProtocolDir.srcFilePaths.map(srcFilePath => {
+              const buffer = fse.readFileSync(srcFilePath)
+              return Buffer.from(buffer, buffer.byteOffset, buffer.byteLength)
+            }),
+            mostRecentAnalysis:
+              mostRecentAnalysisFilePath != null
+                ? fse.readJsonSync(mostRecentAnalysisFilePath)
+                : null,
           }
-          return analysisFilePath
-        }, null)
-        return {
-          protocolKey: path.parse(storedProtocolDir.dirPath).base,
-          modified: storedProtocolDir.modified,
-          srcFileNames: storedProtocolDir.srcFilePaths.map(
-            filePath => path.parse(filePath).base
-          ),
-          srcFiles: storedProtocolDir.srcFilePaths.map(srcFilePath => {
-            const buffer = fse.readFileSync(srcFilePath)
-            return Buffer.from(buffer, buffer.byteOffset, buffer.byteLength)
-          }),
-          mostRecentAnalysis:
-            mostRecentAnalysisFilePath != null
-              ? fse.readJsonSync(mostRecentAnalysisFilePath)
-              : null,
+        } catch (error: Error) {
+          return {
+            protocolKey: path.parse(storedProtocolDir.dirPath).base,
+            modified: storedProtocolDir.modified,
+            srcFileNames: storedProtocolDir.srcFilePaths.map(
+              filePath => path.parse(filePath).base
+            ),
+            srcFiles: storedProtocolDir.srcFilePaths.map(srcFilePath => {
+              const buffer = fse.readFileSync(srcFilePath)
+              return Buffer.from(buffer, buffer.byteOffset, buffer.byteLength)
+            }),
+            mostRecentAnalysis: createFailedAnalysis(error.message),
+          }
         }
       })
       dispatch(
