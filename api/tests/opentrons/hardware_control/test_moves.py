@@ -16,7 +16,7 @@ from opentrons.hardware_control.types import (
     MustHomeError,
 )
 from opentrons.hardware_control.robot_calibration import RobotCalibration
-from opentrons.hardware_control.types import OT3Axis
+from opentrons.hardware_control.types import OT3Axis, OT3Mount
 
 
 async def test_controller_must_home(hardware_api):
@@ -57,6 +57,16 @@ async def test_retract(hardware_api):
         Axis.B: 19,
         Axis.C: 19,
     }
+
+
+@pytest.fixture
+async def mock_backend_move(ot3_hardware):
+    with mock.patch.object(
+        ot3_hardware.managed_obj._backend,
+        "move",
+        mock.AsyncMock(spec=ot3_hardware.managed_obj._backend.move),
+    ) as mock_move:
+        yield mock_move
 
 
 @pytest.fixture
@@ -504,4 +514,34 @@ async def test_current_position_homing_failures(hardware_api):
     await hardware_api.gantry_position(
         mount=types.Mount.RIGHT,
         fail_on_not_homed=True,
+    )
+
+
+async def test_gripper_move_to(ot3_hardware, mock_backend_move):
+    # Moving the gripper should, well, work
+    await ot3_hardware.move_to(OT3Mount.GRIPPER, types.Point(0, 0, 0))
+    origin, moves = mock_backend_move.call_args_list[0][0]
+    # The moves that it emits should move only x, y, and the gripper z
+    assert origin == {
+        OT3Axis.X: 0,
+        OT3Axis.Y: 0,
+        OT3Axis.Z_L: 0,
+        OT3Axis.Z_R: 0,
+        OT3Axis.P_L: 0,
+        OT3Axis.P_R: 0,
+        OT3Axis.Z_G: 0,
+    }
+    for move in moves:
+        assert list(sorted(move.unit_vector.keys(), key=lambda elem: elem.value)) == [
+            OT3Axis.X,
+            OT3Axis.Y,
+            OT3Axis.Z_G,
+        ]
+
+
+async def test_gripper_position(ot3_hardware):
+    await ot3_hardware.home()
+    position = await ot3_hardware.gantry_position(OT3Mount.GRIPPER)
+    assert position == types.Point(*ot3_hardware.config.carriage_offset) + types.Point(
+        *ot3_hardware.config.gripper_mount_offset
     )

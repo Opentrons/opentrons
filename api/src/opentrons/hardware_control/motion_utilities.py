@@ -1,6 +1,6 @@
 """Utilities for calculating motion correctly."""
 
-from typing import Callable, Dict, Union, overload, TypeVar
+from typing import Callable, Dict, Union, overload, TypeVar, Optional, cast
 from collections import OrderedDict
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage.types import AttitudeMatrix
@@ -9,17 +9,44 @@ from .types import Axis, OT3Axis, OT3Mount
 from functools import lru_cache
 
 
+# TODO: The offset_for_mount function should be defined with an overload
+# set, as with other functions in this module. Unfortunately, mypy < 0.920
+# has an internal crash when you mix overloads and particular kinds of decorators
+# ( https://github.com/python/mypy/pull/11630 fixes it ) so instead it's defined
+# with unions and therefore requires a bit of casting.
+# @overload
+# def offset_for_mount(
+#     primary_mount: Mount,
+#     left_mount_offset: Point,
+#     right_mount_offset: Point,
+#     gripper_mount_offset: None,
+# ) -> Point:
+#     ...
+
+
+# @overload
+# def offset_for_mount(
+#     primary_mount: OT3Mount,
+#     left_mount_offset: Point,
+#     right_mount_offset: Point,
+#     gripper_mount_offset: Point,
+# ) -> Point:
+#     ...
+
+
 @lru_cache(4)
 def offset_for_mount(
-    primary_mount: Union[Mount, OT3Mount],
+    primary_mount: Union[OT3Mount, Mount],
     left_mount_offset: Point,
     right_mount_offset: Point,
+    gripper_mount_offset: Optional[Point] = None,
 ) -> Point:
     offsets = {
         Mount.LEFT: left_mount_offset,
         Mount.RIGHT: right_mount_offset,
         OT3Mount.LEFT: left_mount_offset,
         OT3Mount.RIGHT: right_mount_offset,
+        OT3Mount.GRIPPER: cast(Point, gripper_mount_offset),
     }
     return offsets[primary_mount]
 
@@ -133,6 +160,7 @@ def target_position_from_absolute(
     get_critical_point: Callable[[Mount], Point],
     left_mount_offset: Point,
     right_mount_offset: Point,
+    gripper_mount_offset: None = None,
 ) -> "OrderedDict[Axis, float]":
     ...
 
@@ -144,6 +172,7 @@ def target_position_from_absolute(
     get_critical_point: Callable[[OT3Mount], Point],
     left_mount_offset: Point,
     right_mount_offset: Point,
+    gripper_mount_offset: Point,
 ) -> "OrderedDict[OT3Axis, float]":
     ...
 
@@ -176,8 +205,11 @@ def target_position_from_absolute(  # type: ignore[no-untyped-def]
     get_critical_point,
     left_mount_offset,
     right_mount_offset,
+    gripper_mount_offset=None,
 ):
-    offset = offset_for_mount(mount, left_mount_offset, right_mount_offset)
+    offset = offset_for_mount(
+        mount, left_mount_offset, right_mount_offset, gripper_mount_offset
+    )
     primary_cp = get_critical_point(mount)
     primary_z = _z_for_mount(mount)
     target_position = OrderedDict(
