@@ -370,31 +370,33 @@ export function ProtocolRunHeader({
     closeCurrentRun()
   }
 
-  const ClearProtocolBanner = (): JSX.Element | null => {
-    switch (runStatus) {
-      case RUN_STATUS_FAILED: {
-        return (
-          <Banner type="error" onCloseClick={handleClearClick}>
-            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-              {`${t('run_failed')}.`}
-            </Flex>
-          </Banner>
-        )
-      }
-      case RUN_STATUS_SUCCEEDED: {
-        return (
-          <Banner type="success" onCloseClick={handleClearClick}>
-            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-              {`${t('run_completed')}.`}
-            </Flex>
-          </Banner>
-        )
-      }
+  let ClearProtocolBanner: React.ReactNode
+  switch (runStatus) {
+    case RUN_STATUS_FAILED: {
+      ClearProtocolBanner = (
+        <Banner type="error" onCloseClick={handleClearClick}>
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+            {`${t('run_failed')}.`}
+          </Flex>
+        </Banner>
+      )
+      break
     }
-    return null
+    case RUN_STATUS_SUCCEEDED: {
+      ClearProtocolBanner = (
+        <Banner type="success" onCloseClick={handleClearClick}>
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+            {`${t('run_completed')}.`}
+          </Flex>
+        </Banner>
+      )
+      break
+    }
+    default:
+      ClearProtocolBanner = null
   }
 
-  const ProtocolRunningContent = (): JSX.Element | null =>
+  const ProtocolRunningContent: React.ReactNode =
     runStatus != null ? (
       <Flex
         backgroundColor={COLORS.lightGrey}
@@ -501,7 +503,7 @@ export function ProtocolRunHeader({
           </StyledText>
         )}
       </Flex>
-      {analysisErrors && analysisErrors?.length > 0 && (
+      {analysisErrors != null && analysisErrors?.length > 0 && (
         <ProtocolAnalysisErrorBanner errors={analysisErrors} />
       )}
       {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
@@ -510,7 +512,7 @@ export function ProtocolRunHeader({
       {runStatus === RUN_STATUS_STOPPED ? (
         <Banner type="warning">{`${t('run_canceled')}.`}</Banner>
       ) : null}
-      {isCurrentRun ? <ClearProtocolBanner /> : null}
+      {isCurrentRun ? ClearProtocolBanner : null}
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Box minWidth={SIZE_4}>
           <StyledText
@@ -615,7 +617,7 @@ export function ProtocolRunHeader({
           )}
         </Flex>
       </Flex>
-      <ProtocolRunningContent />
+      {ProtocolRunningContent}
       {showConfirmCancelModal ? (
         <ConfirmCancelModal
           onClose={() => setShowConfirmCancelModal(false)}
