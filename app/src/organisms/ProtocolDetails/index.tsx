@@ -92,6 +92,12 @@ const currentTabStyle = css`
     width: 100%;
   }
 `
+
+const GRID_STYLE = css`
+  display: grid;
+  width: 100%;
+  grid-template-columns: 26.6% 26.6% 26.6% 20%;
+`
 interface RoundTabProps extends React.ComponentProps<typeof Btn> {
   isCurrent: boolean
 }
@@ -326,13 +332,9 @@ export function ProtocolDetails(
           >
             {protocolDisplayName}
           </StyledText>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-          >
+          <Flex css={GRID_STYLE}>
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              marginRight={SPACING.spacing4}
               data-testid={`ProtocolDetails_creationMethod`}
             >
               <StyledText as="h6" color={COLORS.darkGreyEnabled}>
@@ -346,7 +348,6 @@ export function ProtocolDetails(
             </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              marginRight={SPACING.spacing4}
               data-testid={`ProtocolDetails_lastUpdated`}
             >
               <StyledText as="h6" color={COLORS.darkGreyEnabled}>
@@ -360,7 +361,6 @@ export function ProtocolDetails(
             </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              marginRight={SPACING.spacing4}
               data-testid={`ProtocolDetails_lastAnalyzed`}
             >
               <StyledText as="h6" color={COLORS.darkGreyEnabled}>
@@ -372,20 +372,25 @@ export function ProtocolDetails(
                   : lastAnalyzed}
               </StyledText>
             </Flex>
-            <PrimaryButton
-              onClick={() => setShowSlideout(true)}
-              data-testid={`ProtocolDetails_runProtocol`}
-              disabled={analysisStatus === 'loading'}
+            <Flex
+              css={css`
+                display: grid;
+                justify-self: end;
+              `}
             >
-              {t('run_protocol')}
-            </PrimaryButton>
+              <PrimaryButton
+                onClick={() => setShowSlideout(true)}
+                data-testid={`ProtocolDetails_runProtocol`}
+                disabled={analysisStatus === 'loading'}
+              >
+                {t('run_protocol')}
+              </PrimaryButton>
+            </Flex>
           </Flex>
           <Divider marginY={SPACING.spacing4} />
-          <Flex flexDirection={DIRECTION_ROW}>
+          <Flex css={GRID_STYLE}>
             <Flex
-              flex="0.34"
               flexDirection={DIRECTION_COLUMN}
-              marginRight={SPACING.spacing4}
               data-testid={`ProtocolDetails_author`}
             >
               <StyledText as="h6" color={COLORS.darkGreyEnabled}>
@@ -396,9 +401,7 @@ export function ProtocolDetails(
               </StyledText>
             </Flex>
             <Flex
-              flex="1"
               flexDirection={DIRECTION_COLUMN}
-              marginRight={SPACING.spacing4}
               data-testid={`ProtocolDetails_description`}
             >
               <StyledText as="h6" color={COLORS.darkGreyEnabled}>

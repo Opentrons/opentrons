@@ -90,7 +90,7 @@ export const RobotConfigurationDetails = (
                           : module.params.location.slotName,
                     })}
                   </StyledText>
-                  <Flex>
+                  <Flex paddingLeft={SPACING.spacing4}>
                     <ModuleIcon
                       key={index}
                       moduleType={getModuleType(module.params.model)}

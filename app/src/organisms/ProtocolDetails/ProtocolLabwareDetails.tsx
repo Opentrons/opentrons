@@ -52,7 +52,11 @@ export const ProtocolLabwareDetails = (
       : []
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} width="100%">
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      width="100%"
+      marginBottom={SPACING.spacing3}
+    >
       <Flex flexDirection={DIRECTION_ROW}>
         <StyledText
           as="label"
@@ -113,7 +117,7 @@ export const ProtocolLabwareDetailItem = (
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
           width="66%"
-          marginRight="1.25rem"
+          marginRight={SPACING.spacingM}
         >
           {namespace === 'opentrons' ? (
             <Icon
@@ -127,7 +131,11 @@ export const ProtocolLabwareDetailItem = (
           ) : (
             <Flex marginLeft={SPACING.spacingM} />
           )}
-          <StyledText as="p" color={COLORS.darkBlack} paddingRight="2rem">
+          <StyledText
+            as="p"
+            color={COLORS.darkBlack}
+            paddingRight={SPACING.spacing6}
+          >
             {displayName}
           </StyledText>
         </Flex>
@@ -170,7 +178,7 @@ export const LabwareDetailOverflowMenu = (
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
       marginRight={SPACING.spacing3}
-      marginLeft={'auto'}
+      marginLeft="auto"
     >
       <Flex>
         <OverflowBtn onClick={handleOverflowClick} />
