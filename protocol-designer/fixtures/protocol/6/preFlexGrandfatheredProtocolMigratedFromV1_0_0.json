@@ -8030,10 +8030,13 @@
         "wellName": "A1"
       }
     },
-    { "commandType": "delay", "params": { "message": "", "wait": 3 } },
+    { "commandType": "delay", "params": { "message": "", "seconds": 3 } },
     {
       "commandType": "delay",
-      "params": { "message": "OK HOPEFULLY YOU ARE DONE", "wait": true }
+      "params": {
+        "message": "OK HOPEFULLY YOU ARE DONE",
+        "waitForResume": true
+      }
     }
   ]
 }

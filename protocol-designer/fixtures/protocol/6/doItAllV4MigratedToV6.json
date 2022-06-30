@@ -2704,7 +2704,7 @@
         "celsius": 25
       }
     },
-    { "commandType": "delay", "params": { "message": "", "wait": 62 } },
+    { "commandType": "delay", "params": { "message": "", "seconds": 62 } },
     {
       "commandType": "pickUpTip",
       "params": {
@@ -2796,7 +2796,10 @@
     },
     {
       "commandType": "delay",
-      "params": { "message": "Wait until user intervention", "wait": true }
+      "params": {
+        "message": "Wait until user intervention",
+        "waitForResume": true
+      }
     },
     {
       "commandType": "temperatureModule/deactivate",
