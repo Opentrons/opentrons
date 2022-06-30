@@ -1,6 +1,7 @@
 .swatch {
   display: inline-block;
   cursor: pointer;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.41);
 }
 
 .color {
@@ -10,14 +11,14 @@
 }
 
 .popover {
-  margin-top: 10px;
-  padding-right: 100px;
+  margin-top: 15px;
   position: absolute;
+  right: 24px;
 }
 
 .cover {
   position: fixed;
-  top: 0px;
+  top: 10px;
   right: 0px;
   bottom: 0px;
   left: 0px;

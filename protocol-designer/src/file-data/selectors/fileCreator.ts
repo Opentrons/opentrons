@@ -29,7 +29,6 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
-import { swatchColors } from '../../components/swatchColors'
 import type {
   ModuleEntity,
   PipetteEntity,
@@ -186,7 +185,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           [liquidId]: {
             displayName: liquidData.name,
             description: liquidData.description ?? '',
-            displayColor: swatchColors(liquidId),
+            displayColor: liquidData.displayColor,
           },
         }
       },

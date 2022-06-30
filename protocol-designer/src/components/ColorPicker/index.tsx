@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ColorResult, TwitterPicker } from 'react-color'
-import { colors } from '../swatchColors'
+import { COLORS } from '@opentrons/components'
 
 import styles from './ColorPicker.css'
 
@@ -32,13 +32,13 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
             onClick={() => setShowColorPicker(false)}
           />
           <TwitterPicker
-            colors={colors}
+            colors={COLORS.liquidColors}
             color={props.value}
             onChange={(color, event) => {
               props.onChange(color.hex)
               setShowColorPicker(showColorPicker => !showColorPicker)
             }}
-            triangle="top-left"
+            triangle="top-right"
           />
         </div>
       ) : null}

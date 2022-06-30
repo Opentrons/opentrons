@@ -91,10 +91,10 @@ export function LiquidEditForm(props: Props): JSX.Element {
               <div className={formStyles.header}>
                 {i18n.t('form.liquid_edit.details')}
               </div>
-              <div className={formStyles.row_wrapper}>
+              <div className={formStyles.row_container}>
                 <FormGroup
                   label={i18n.t('form.liquid_edit.name')}
-                  className={formStyles.column_1_3}
+                  className={formStyles.column}
                 >
                   <InputField
                     name="name"
@@ -106,7 +106,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
                 </FormGroup>
                 <FormGroup
                   label={i18n.t('form.liquid_edit.description')}
-                  className={formStyles.column_1_3}
+                  className={formStyles.column}
                 >
                   <InputField
                     name="description"
@@ -114,7 +114,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
                     onChange={handleChange}
                   />
                 </FormGroup>
-                <FormGroup label={'Liquid'} className={formStyles.column_1_3}>
+                <FormGroup label={i18n.t('form.liquid_edit.displayColor')}>
                   <Field
                     name="displayColor"
                     component={ColorPicker}

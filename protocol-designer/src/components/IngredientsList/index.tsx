@@ -1,12 +1,12 @@
 // TODO: Ian 2018-10-09 figure out what belongs in LiquidsSidebar vs IngredientsList after #2427
 import * as React from 'react'
-
+import { useSelector } from 'react-redux'
+import { selectors } from '../../labware-ingred/selectors'
 import { IconButton, SidePanel } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { PDTitledList, PDListItem } from '../lists'
 import { TitledListNotes } from '../TitledListNotes'
-import { swatchColors } from '../swatchColors'
 import { LabwareDetailsCard } from './LabwareDetailsCard'
 import styles from './IngredientsList.css'
 import { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
@@ -48,6 +48,8 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
     .sort(sortWells)
     .filter(well => labwareWellContents[well][groupId])
 
+  const liquidGroups = useSelector(selectors.getLiquidGroupsById)
+
   if (wellsWithIngred.length < 1) {
     // do not show liquid card if it has no instances for this labware
     return null
@@ -56,7 +58,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
   return (
     <PDTitledList
       title={ingredGroup.name || i18n.t('card.unnamedLiquid')}
-      iconProps={{ style: { fill: swatchColors(groupId) } }}
+      iconProps={{ style: { fill: liquidGroups[groupId].displayColor } }}
       iconName="circle"
       onCollapseToggle={toggleAccordion}
       collapsed={!expanded}
