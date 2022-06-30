@@ -61,9 +61,6 @@ export function GeneralSettings(): JSX.Element {
     setShowPreviousVersionModal,
   ] = React.useState<boolean>(false)
   const updateAvailable = Boolean(useSelector(getAvailableShellUpdate))
-  const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(
-    updateAvailable
-  )
   const [showUpdateBanner, setShowUpdateBanner] = React.useState<boolean>(
     updateAvailable
   )
@@ -77,7 +74,9 @@ export function GeneralSettings(): JSX.Element {
     const ignored = getAlertIsPermanentlyIgnored(s, ALERT_APP_UPDATE_AVAILABLE)
     return ignored !== null ? !ignored : null
   })
-
+  const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(
+    updateAlertEnabled ? updateAvailable : false
+  )
   const handleToggle = (): void => {
     if (updateAlertEnabled !== null) {
       dispatch(
@@ -120,6 +119,7 @@ export function GeneralSettings(): JSX.Element {
                 role="button"
                 textDecoration={TEXT_DECORATION_UNDERLINE}
                 onClick={() => setShowUpdateModal(true)}
+                marginLeft={SPACING.spacing2}
               >
                 {t('view_update')}
               </Link>
@@ -250,7 +250,7 @@ export function GeneralSettings(): JSX.Element {
           </TertiaryButton>
         </Flex>
       </Box>
-      {showUpdateModal && updateAlertEnabled ? (
+      {showUpdateModal ? (
         <Portal level="top">
           <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />
         </Portal>
