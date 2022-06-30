@@ -12,7 +12,9 @@ import {
   NewPrimaryBtn,
   TEXT_TRANSFORM_NONE,
   SIZE_6,
+  SIZE_2,
 } from '@opentrons/components'
+import { StyledText } from '../../../../../atoms/text'
 
 interface BannerProps {
   title: string
@@ -35,22 +37,23 @@ export function Banner(props: BannerProps): JSX.Element | null {
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <Flex flexDirection={DIRECTION_ROW}>
-            <Icon
-              size={SPACING.spacing6}
-              color={COLORS.darkGreyEnabled}
-              name="information"
-              paddingRight={SPACING.spacing3}
-              paddingBottom={TYPOGRAPHY.fontSizeCaption}
-              aria-label="information_icon"
-            />
-            <Text
-              fontSize={TYPOGRAPHY.fontSizeH3}
-              data-testid={`banner_title_${title}`}
-              color={COLORS.darkBlack}
-            >
-              {title}
-            </Text>
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+          >
+            <Flex>
+              <Icon
+                size={SIZE_2}
+                color={COLORS.darkGreyEnabled}
+                name="information"
+                paddingRight={SPACING.spacing3}
+                paddingBottom={SPACING.spacingSM}
+                aria-label="information_icon"
+              />
+              <StyledText as="h3" data-testid={`banner_title_${title}`}>
+                {title}
+              </StyledText>
+            </Flex>
           </Flex>
         </Flex>
         {children}
