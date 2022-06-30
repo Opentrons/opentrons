@@ -698,7 +698,7 @@ def test_command_store_handles_stop_action() -> None:
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
-        queued_command_ids=None,
+        queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -806,7 +806,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
-        queued_command_ids=None,
+        queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -829,7 +829,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         is_door_blocking=False,
         running_command_id=None,
         all_command_ids=[],
-        queued_command_ids=None,
+        queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
         errors_by_id={},
@@ -982,3 +982,31 @@ def test_handles_door_event_during_idle_run() -> None:
         errors_by_id={},
         run_started_at=None,
     )
+
+
+def test_command_store_handles_stop_action_with_queued_commands() -> None:
+    """It should clear queued commands."""
+    subject = CommandStore()
+
+    action = QueueCommandAction(
+        request=commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(message="hello world"),
+        ),
+        created_at=datetime(year=2022, month=1, day=1),
+        command_id="command_id",
+    )
+
+    subject.handle_action(action)
+
+    assert len(subject.state.queued_command_ids) > 0
+
+    assert subject.state.run_result is None
+
+    subject.handle_action(StopAction())
+
+    assert len(subject.state.queued_command_ids) == 0
+
+    assert subject.state.queue_status == QueueStatus.PAUSED
+
+    assert subject.state.run_result == RunResult.STOPPED
+
