@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useQueryClient } from 'react-query'
 import {
   useHost,
