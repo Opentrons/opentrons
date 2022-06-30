@@ -1,5 +1,7 @@
+from abc import ABC, abstractmethod
 from typing import Tuple
 
+from random import uniform
 from serial import Serial
 
 from .commands import RadwagCommand, radwag_command_format
@@ -7,7 +9,35 @@ from .responses import \
     (RadwageResponse, RadwagResponseCodes, radwag_response_parse)
 
 
-class RadwagScale:
+class RadwagScaleBase(ABC):
+    """Base class if Radwag scale driver."""
+
+    @abstractmethod
+    def connect(self) -> None:
+        ...
+
+    @abstractmethod
+    def disconnect(self) -> None:
+        ...
+
+    @abstractmethod
+    def read_serial_number(self) -> str:
+        ...
+
+    @abstractmethod
+    def continuous_transmission(self, enable: bool) -> None:
+        ...
+
+    @abstractmethod
+    def automatic_internal_adjustment(self, enable: bool) -> None:
+        ...
+
+    @abstractmethod
+    def read_mass(self) -> Tuple[float, bool]:
+        ...
+
+
+class RadwagScale(RadwagScaleBase):
     def __init__(self, connection: Serial) -> None:
         self._connection = connection
 
@@ -68,13 +98,30 @@ class RadwagScale:
         res = self._read_response(cmd)
         assert res.code == RadwagResponseCodes.CARRIED_OUT
 
-    def set_working_mode(self) -> None:
-        # TODO: set working mode (Precision)
-        return
-
     def read_mass(self) -> Tuple[float, bool]:
         cmd = RadwagCommand.GET_MEASUREMENT_BASIC_UNIT
         self._write_command(cmd)
         res = self._read_response(cmd)
         assert res.measurement is not None
         return res.measurement, res.stable
+
+
+class SimRadwagScale(RadwagScaleBase):
+
+    def connect(self) -> None:
+        return
+
+    def disconnect(self) -> None:
+        return
+
+    def read_serial_number(self) -> str:
+        return 'radwag-sim-serial-num'
+
+    def continuous_transmission(self, enable: bool) -> None:
+        return
+
+    def automatic_internal_adjustment(self, enable: bool) -> None:
+        return
+
+    def read_mass(self) -> Tuple[float, bool]:
+        return uniform(2.5, 2), True

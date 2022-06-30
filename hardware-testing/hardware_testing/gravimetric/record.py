@@ -3,7 +3,7 @@ from statistics import stdev
 from time import time
 from typing import List, Optional
 
-from hardware_testing.drivers.radwag.driver import RadwagScale
+from hardware_testing.drivers.radwag.driver import RadwagScaleBase
 
 
 @dataclass
@@ -15,8 +15,8 @@ class GravimetricSample:
 
 @dataclass
 class GravimetricRecording:
-    def __init__(self, samples: Optional[List[GravimetricSample]] = []) -> None:
-        self._samples = samples
+    def __init__(self, samples: Optional[List[GravimetricSample]] = None) -> None:
+        self._samples = samples if samples else []
 
     def __len__(self) -> int:
         return len(self._samples)
@@ -63,12 +63,12 @@ class GravimetricRecording:
         return (self.average - target) / target
 
 
-def read_sample_from_scale(scale: RadwagScale) -> GravimetricSample:
+def read_sample_from_scale(scale: RadwagScaleBase) -> GravimetricSample:
     g, s = scale.read_mass()
     return GravimetricSample(grams=g, stable=s, time=time())
 
 
-def record_samples(scale: RadwagScale,
+def record_samples(scale: RadwagScaleBase,
                    length: Optional[int] = None,
                    duration: Optional[float] = None,
                    interval: Optional[float] = None,
