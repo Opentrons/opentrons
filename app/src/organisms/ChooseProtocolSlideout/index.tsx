@@ -101,7 +101,7 @@ export function ChooseProtocolSlideout(
             {isCreatingRun ? (
               <Icon name="ot-spinner" spin size={SIZE_1} />
             ) : (
-              t('proceed_to_setup')
+              t('shared:proceed_to_setup')
             )}
           </PrimaryButton>
         </ApiHostProvider>
@@ -162,6 +162,7 @@ export function ChooseProtocolSlideout(
                 <StyledText
                   as="label"
                   color={COLORS.errorText}
+                  css={{ 'overflow-wrap': 'anywhere' }}
                   display={DISPLAY_BLOCK}
                   marginTop={`-${SPACING.spacing2}`}
                   marginBottom={SPACING.spacing3}
