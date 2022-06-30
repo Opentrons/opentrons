@@ -77,7 +77,7 @@
   "robot_rename_button": "Rename robot",
   "robot_server_versions": "Robot Server Versions",
   "robot_server_versions_status": "up to date",
-  "robot_server_versions_banner_title": "A software update is available for this robot.",
+  "robot_software_update_required": "A robot software update is required to run protocols with this version of the Opentrons App.",
   "robot_server_versions_view_update": "View update",
   "robot_serial_number": "Robot Serial Number",
   "firmware_version": "Firmware Version",

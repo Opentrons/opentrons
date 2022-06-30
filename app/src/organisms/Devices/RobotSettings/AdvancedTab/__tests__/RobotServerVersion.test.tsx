@@ -76,7 +76,9 @@ describe('RobotSettings RobotServerVersion', () => {
       updateFromFileDisabledReason: null,
     })
     const [{ getByText }] = render()
-    getByText('A software update is available for this robot.')
+    getByText(
+      'A robot software update is required to run protocols with this version of the Opentrons App.'
+    )
     const btn = getByText('View update')
     fireEvent.click(btn)
     getByText('mock update buildroot')
@@ -89,7 +91,9 @@ describe('RobotSettings RobotServerVersion', () => {
       updateFromFileDisabledReason: null,
     })
     const [{ getByText }] = render()
-    getByText('A software update is available for this robot.')
+    getByText(
+      'A robot software update is required to run protocols with this version of the Opentrons App.'
+    )
     const btn = getByText('View update')
     fireEvent.click(btn)
     getByText('mock update buildroot')
