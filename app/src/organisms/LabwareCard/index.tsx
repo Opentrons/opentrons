@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
 import { format } from 'date-fns'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   Box,
@@ -15,12 +15,12 @@ import {
   TYPOGRAPHY,
   BORDERS,
   COLORS,
-  DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
   ALIGN_FLEX_END,
   ALIGN_CENTER,
   SIZE_1,
+  POSITION_RELATIVE,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -31,9 +31,21 @@ import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
 const COPY_ICON_STYLE = css`
   color: ${COLORS.darkGreyEnabled};
 
+  position: ${POSITION_RELATIVE};
+  top: ${SPACING.spacing1};
+  left: ${SPACING.spacing2};
+
   &:hover {
     color: ${COLORS.black};
   }
+`
+
+const LabwareInfoWrapper = styled.div`
+  display: grid;
+  grid-template-columns: minmax(5rem, 1fr) minmax(7.5rem, 1fr) 4fr minmax(
+      3rem,
+      1fr
+    );
 `
 
 export interface LabwareCardProps {
@@ -70,18 +82,22 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
       onClick={props.onClick}
       cursor="pointer"
     >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} height="100%">
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
-          <Box width="5rem" id="LabwareCard_labwareImage">
-            <RobotWorkSpace
-              viewBox={`0 0 ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
-            >
-              {() => <LabwareRender definition={definition} />}
-            </RobotWorkSpace>
-          </Box>
-          <StyledText css={TYPOGRAPHY.pSemiBold} width="5.75rem">
+      <LabwareInfoWrapper>
+        <Box id="LabwareCard_labwareImage" marginRight={SPACING.spacing5}>
+          <RobotWorkSpace
+            viewBox={`0 0 ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
+          >
+            {() => <LabwareRender definition={definition} />}
+          </RobotWorkSpace>
+        </Box>
+        {/* labware category name min:7.5 rem for the longest, Aluminum Block  */}
+        <Box marginRight={SPACING.spacing4}>
+          <StyledText css={TYPOGRAPHY.pSemiBold} id="displayCategory">
             {displayCategory}
           </StyledText>
+        </Box>
+        {/* labware info */}
+        <Box>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -129,40 +145,54 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 onClick={handleCopyClick}
                 role="button"
               >
-                <Flex
-                  alignItems={ALIGN_CENTER}
-                  css={{ 'overflow-wrap': 'anywhere' }}
-                >
-                  {apiName}{' '}
+                <Box css={{ 'overflow-wrap': 'anywhere' }}>
+                  {apiName}
                   <Icon
                     height={SIZE_1}
                     name="copy-text"
                     aria-label="copy-text"
                     css={COPY_ICON_STYLE}
                   />
-                </Flex>
+                </Box>
               </Link>
             </Box>
           </Flex>
-        </Flex>
-        {modified != null && filename != null && (
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            alignItems={ALIGN_FLEX_END}
-          >
-            <CustomLabwareOverflowMenu filename={filename} />
-            <StyledText
-              as="label"
-              color={COLORS.darkGreyEnabled}
-              id="LabwareCard_dateAdded"
-              textAlign={TYPOGRAPHY.textAlignRight}
+        </Box>
+        {/* space for custom labware min: 3rem for date */}
+        {/* Note kj 06/30/2022 currently this section would not be ideal implementation
+        Once the team have an agreement for grid system, we could refactor */}
+        <Box
+          marginTop={`-${SPACING.spacingSM}`}
+          paddingRight={SPACING.spacing3}
+        >
+          {modified != null && filename != null && (
+            <Flex
+              height="100%"
+              flexDirection={DIRECTION_COLUMN}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+              alignItems={ALIGN_FLEX_END}
             >
-              {t('date_added')} {format(new Date(modified), 'MM/dd/yyyy')}
-            </StyledText>
-          </Flex>
-        )}
-      </Flex>
+              <CustomLabwareOverflowMenu filename={filename} />
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                <StyledText
+                  as="label"
+                  color={COLORS.darkGreyEnabled}
+                  textAlign={TYPOGRAPHY.textAlignRight}
+                >
+                  {t('date_added')}
+                </StyledText>
+                <StyledText
+                  as="label"
+                  color={COLORS.darkGreyEnabled}
+                  id="LabwareCard_dateAdded"
+                >
+                  {format(new Date(modified), 'MM/dd/yyyy')}
+                </StyledText>
+              </Flex>
+            </Flex>
+          )}
+        </Box>
+      </LabwareInfoWrapper>
     </Box>
   )
 }
