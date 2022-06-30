@@ -466,6 +466,8 @@ export function RobotSettingsCalibration({
     true
   )
 
+  console.log('checkDeckCalibrationStatus', checkDeckCalibrationStatus())
+
   return (
     <>
       <Portal level="top">
@@ -557,7 +559,7 @@ export function RobotSettingsCalibration({
       </Box>
       <Line />
       {/* DeckCalibration Section */}
-      {!pipettePresent && (
+      {!pipettePresent && checkDeckCalibrationStatus() === 'error' && (
         <Banner marginTop={SPACING.spacing5} type="error">
           <StyledText>{t('deck_calibration_missing_no_pipette')}</StyledText>
         </Banner>

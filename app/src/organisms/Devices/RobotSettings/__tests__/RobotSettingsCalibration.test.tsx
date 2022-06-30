@@ -228,6 +228,9 @@ describe('RobotSettingsCalibration', () => {
   })
 
   it('renders the error banner when a user has no pipette', () => {
+    mockUseDeckCalibrationStatus.mockReturnValue(
+      Calibration.DECK_CAL_STATUS_IDENTITY
+    )
     const mockEmptyAttachedPipettes: AttachedPipettesByMount = {
       left: null,
       right: null,
