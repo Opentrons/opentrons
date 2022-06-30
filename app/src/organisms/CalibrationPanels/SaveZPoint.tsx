@@ -146,7 +146,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
     ...props,
   })
 
-  const AllowHorizontalPrompt = (): JSX.Element => (
+  const allowHorizontalPrompt: JSX.Element = (
     <Flex
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
@@ -217,7 +217,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
             ? [VERTICAL_PLANE, HORIZONTAL_PLANE]
             : [VERTICAL_PLANE]
         }
-        auxiliaryControl={allowHorizontal ? null : <AllowHorizontalPrompt />}
+        auxiliaryControl={allowHorizontal ? null : allowHorizontalPrompt}
         width="100%"
         marginBottom={SPACING.spacing5}
       />

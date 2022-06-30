@@ -35,7 +35,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   const { robot, ...styleProps } = props
   const { t } = useTranslation(['devices_landing', 'shared'])
   const {
-    MenuOverlay,
+    menuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
@@ -146,7 +146,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
             </Flex>
           ) : null}
           <Portal level="top">
-            <MenuOverlay />
+            {menuOverlay}
             {robot.status === CONNECTABLE ? (
               <ChooseProtocolSlideout
                 robot={robot}

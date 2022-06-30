@@ -45,7 +45,7 @@ export function ProtocolOverflowMenu(
   const { protocolKey, handleRunProtocol } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
   const {
-    MenuOverlay,
+    menuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
@@ -160,7 +160,7 @@ export function ProtocolOverflowMenu(
           </Modal>
         </Portal>
       ) : null}
-      <MenuOverlay />
+      {menuOverlay}
     </Flex>
   )
 }
