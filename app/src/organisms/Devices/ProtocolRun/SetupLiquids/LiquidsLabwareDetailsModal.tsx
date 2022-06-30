@@ -27,7 +27,6 @@ import {
   getLiquidsByIdForLabware,
   getWellFillFromLabwareId,
   getWellGroupForLiquidId,
-  getWellRangeForLiquidLabwarePair,
 } from './utils'
 
 interface LiquidsLabwareDetailsModalProps {
@@ -56,7 +55,11 @@ export const LiquidsLabwareDetailsModal = (
   )
   const labwareInfo = getLiquidsByIdForLabware(labwareId, labwareByLiquidId)
   const { slotName, labwareName } = getSlotLabwareName(labwareId, commands)
-  getWellRangeForLiquidLabwarePair()
+  const loadLabwareCommand = commands
+    ?.filter(command => command.commandType === 'loadLabware')
+    ?.find(command => command.result.labwareId === labwareId)
+  const labwareWellOrdering = loadLabwareCommand?.result.definition.ordering
+
   const HIDE_SCROLLBAR = css`
     ::-webkit-scrollbar {
       display: none;
@@ -89,6 +92,7 @@ export const LiquidsLabwareDetailsModal = (
                     key={index}
                     {...liquidInfo}
                     volumeByWell={entry[1][0].volumeByWell}
+                    labwareWellOrdering={labwareWellOrdering}
                     setSelectedValue={setSelectedValue}
                     selectedValue={selectedValue}
                   />
