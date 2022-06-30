@@ -18,9 +18,7 @@ import {
   COLORS,
   ALIGN_START,
   DIRECTION_COLUMN,
-  Btn,
 } from '@opentrons/components'
-import { css } from 'styled-components'
 
 import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
@@ -53,15 +51,6 @@ const GITHUB_LINK =
 
 const ENABLE_APP_UPDATE_NOTIFICATIONS = 'Enable app update notifications'
 const EVENT_APP_UPDATE_NOTIFICATIONS_TOGGLED = 'appUpdateNotificationsToggled'
-
-const PREVIOUS_VERSION_LINK_STYLE = css`
-  ${TYPOGRAPHY.linkPSemiBold}
-
-  &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
-    background-color: transparent;
-  }
-`
 
 export function GeneralSettings(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared'])
@@ -201,14 +190,14 @@ export function GeneralSettings(): JSX.Element {
           </Box>
           <Box>
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <Btn
-                textAlign={ALIGN_START}
-                css={PREVIOUS_VERSION_LINK_STYLE}
+              <Link
+                role="button"
+                css={TYPOGRAPHY.linkPSemiBold}
                 onClick={() => setShowPreviousVersionModal(true)}
                 id="GeneralSettings_previousVersionLink"
               >
                 {t('restore_previous')}
-              </Btn>
+              </Link>
               <ExternalLink
                 href={SOFTWARE_SYNC_URL}
                 id="GeneralSettings_appAndRobotSync"
