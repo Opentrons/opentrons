@@ -1,4 +1,4 @@
-"""Tests for hardware_event_forwarder."""
+"""Tests for door_watcher."""
 
 
 from typing import cast
@@ -15,8 +15,8 @@ from opentrons.hardware_control.types import (
 )
 
 from opentrons.protocol_engine.actions import ActionDispatcher, HardwareEventAction
-from opentrons.protocol_engine.execution.hardware_event_forwarder import (
-    HardwareEventForwarder,
+from opentrons.protocol_engine.execution.door_watcher import (
+    DoorWatcher,
 )
 
 
@@ -37,19 +37,19 @@ def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
 @pytest.fixture
 async def subject(
     hardware_control_api: HardwareControlAPI, action_dispatcher: ActionDispatcher
-) -> HardwareEventForwarder:
-    """Return a HardwareEventForwarder with mocked dependencies.
+) -> DoorWatcher:
+    """Return a DoorWatcher with mocked dependencies.
 
-    Async because HardwareEventForwarder's initializer requires a running event loop.
+    Async because DoorWatcher's initializer requires a running event loop.
     """
-    return HardwareEventForwarder(
+    return DoorWatcher(
         hardware_api=hardware_control_api, action_dispatcher=action_dispatcher
     )
 
 
 async def test_event_forwarding(
     decoy: Decoy,
-    subject: HardwareEventForwarder,
+    subject: DoorWatcher,
     hardware_control_api: HardwareControlAPI,
     action_dispatcher: ActionDispatcher,
 ) -> None:
@@ -74,7 +74,7 @@ async def test_event_forwarding(
 async def test_one_subscribe_one_unsubscribe(
     decoy: Decoy,
     hardware_control_api: HardwareControlAPI,
-    subject: HardwareEventForwarder,
+    subject: DoorWatcher,
 ) -> None:
     """Multiple start()s and stop()s should be collapsed."""
     unsubscribe = decoy.mock()

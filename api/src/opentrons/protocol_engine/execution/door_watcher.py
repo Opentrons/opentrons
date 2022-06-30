@@ -14,7 +14,7 @@ from opentrons.protocol_engine.actions import ActionDispatcher, HardwareEventAct
 _UnsubscribeCallback = Callable[[], None]
 
 
-class HardwareEventForwarder:
+class DoorWatcher:
     """Forward events from a `HardwareControlAPI` into a `ProtocolEngine`."""
 
     def __init__(
