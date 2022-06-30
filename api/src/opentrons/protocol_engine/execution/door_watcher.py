@@ -6,9 +6,15 @@ from asyncio import get_running_loop, run_coroutine_threadsafe
 from typing import Callable, Optional
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import HardwareEvent, DoorStateNotification
+from opentrons.hardware_control.types import (
+    HardwareEvent,
+    DoorStateNotification,
+    PauseType,
+)
 
 from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
+
+from ..state import StateStore
 
 
 _UnsubscribeCallback = Callable[[], None]
@@ -19,6 +25,7 @@ class DoorWatcher:
 
     def __init__(
         self,
+        state_store: StateStore,
         hardware_api: HardwareControlAPI,
         action_dispatcher: ActionDispatcher,
     ) -> None:
@@ -31,6 +38,7 @@ class DoorWatcher:
                 Assumed to be owned by the same event loop that this
                 HardwareEventForwarder was constructed in.
         """
+        self._state_store = state_store
         self._hardware_api = hardware_api
         self._action_dispatcher = action_dispatcher
         self._loop = get_running_loop()
@@ -90,4 +98,7 @@ class DoorWatcher:
         run_coroutine_threadsafe(), which lets us block until
         the dispatch completes.
         """
+        if self._state_store.commands.get_is_running():
+            self._hardware_api.pause(PauseType.PAUSE)
+
         self._action_dispatcher.dispatch(action)

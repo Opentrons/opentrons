@@ -15,9 +15,16 @@ from opentrons.hardware_control.types import (
 )
 
 from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
+from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.execution.door_watcher import (
     DoorWatcher,
 )
+
+
+@pytest.fixture
+def state_store(decoy: Decoy) -> StateStore:
+    """Get a mock in the shape of a StateStore."""
+    return decoy.mock(cls=StateStore)
 
 
 @pytest.fixture
@@ -36,14 +43,18 @@ def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
 
 @pytest.fixture
 async def subject(
-    hardware_control_api: HardwareControlAPI, action_dispatcher: ActionDispatcher
+    state_store: StateStore,
+    hardware_control_api: HardwareControlAPI,
+    action_dispatcher: ActionDispatcher,
 ) -> DoorWatcher:
     """Return a DoorWatcher with mocked dependencies.
 
     Async because DoorWatcher's initializer requires a running event loop.
     """
     return DoorWatcher(
-        hardware_api=hardware_control_api, action_dispatcher=action_dispatcher
+        state_store=state_store,
+        hardware_api=hardware_control_api,
+        action_dispatcher=action_dispatcher,
     )
 
 

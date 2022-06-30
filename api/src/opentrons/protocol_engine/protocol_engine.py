@@ -80,6 +80,7 @@ class ProtocolEngine:
             hardware_api=hardware_api, state_store=state_store
         )
         self._door_watcher = door_watcher or DoorWatcher(
+            state_store=state_store,
             hardware_api=hardware_api,
             action_dispatcher=self._action_dispatcher,
         )
