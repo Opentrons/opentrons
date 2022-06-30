@@ -225,7 +225,7 @@ export function SetupTipLengthCalibrationButton({
   ) : (
     <Link
       role="link"
-      onClick={() => confirm(true)}
+      onClick={() => confirm(null)}
       css={TYPOGRAPHY.labelSemiBold}
       id={'TipRackCalibration_recalibrateTipRackLink'}
     >
@@ -242,7 +242,7 @@ export function SetupTipLengthCalibrationButton({
           <>
             <TertiaryButton
               padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
-              onClick={() => handleStart()}
+              onClick={() => handleStart(null)}
               id={'TipRackCalibration_calibrateTipRackButton'}
               disabled={disabled || !isDeckCalibrated}
               {...targetProps}
