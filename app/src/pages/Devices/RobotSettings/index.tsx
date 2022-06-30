@@ -43,21 +43,21 @@ export function RobotSettings(): JSX.Element | null {
   }
 
   const robotSettingsContentByTab: {
-    [K in RobotSettingsTab]: () => JSX.Element
+    [K in RobotSettingsTab]: JSX.Element
   } = {
-    calibration: () => (
+    calibration: (
       <RobotSettingsCalibration
         robotName={robotName}
         updateRobotStatus={updateRobotStatus}
       />
     ),
-    networking: () => (
+    networking: (
       <RobotSettingsNetworking
         robotName={robotName}
         updateRobotStatus={updateRobotStatus}
       />
     ),
-    advanced: () => (
+    advanced: (
       <RobotSettingsAdvanced
         robotName={robotName}
         updateRobotStatus={updateRobotStatus}
@@ -76,7 +76,7 @@ export function RobotSettings(): JSX.Element | null {
     return <Redirect to={`/devices/${robotName}/robot-settings/networking`} />
   }
 
-  const RobotSettingsContent =
+  const robotSettingsContent =
     robotSettingsContentByTab[robotSettingsTab] ??
     // default to the calibration tab if no tab or nonexistent tab is passed as a param
     (() => <Redirect to={`/devices/${robotName}/robot-settings/calibration`} />)
@@ -135,7 +135,7 @@ export function RobotSettings(): JSX.Element | null {
             hostname={robot?.ip ?? null}
             port={robot?.port ?? null}
           >
-            <RobotSettingsContent />
+            {robotSettingsContent}
           </ApiHostProvider>
         </Box>
       </Flex>
