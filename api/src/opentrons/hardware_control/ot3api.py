@@ -378,7 +378,7 @@ class OT3API(
 
     @staticmethod
     def _gantry_load_from_instruments(
-        instruments: Mapping[OT3Mount, InstrumentDict]
+        instruments: Mapping[OT3Mount, Optional[InstrumentDict]]
     ) -> GantryLoad:
         """Compute the gantry load based on attached instruments."""
         left = cast(PipetteDict, instruments.get(OT3Mount.LEFT))
@@ -440,7 +440,14 @@ class OT3API(
             self._gripper_handler._gripper,
             grip_cal,
         )
-        self._gripper_handler._gripper = g
+        self._gripper_handler.gripper = g
+
+    def get_all_attached_instr(self) -> Dict[OT3Mount, Optional[InstrumentDict]]:
+        return {
+            OT3Mount.LEFT: self.attached_pipettes[top_types.Mount.LEFT],
+            OT3Mount.RIGHT: self.attached_pipettes[top_types.Mount.RIGHT],
+            OT3Mount.GRIPPER: self.attached_gripper,
+        }
 
     async def cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
@@ -470,9 +477,7 @@ class OT3API(
 
         await self._backend.probe_network()
         await self.set_gantry_load(
-            self._gantry_load_from_instruments(
-                self._pipette_handler.attached_instruments
-            )
+            self._gantry_load_from_instruments(self.get_all_attached_instr())
         )
 
     # Global actions API
@@ -1178,7 +1183,7 @@ class OT3API(
 
     @property
     def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:
-        # override required for type matching
+        # Warning: don't use this in new code, used `hardware_pipettes` instead
         return self.hardware_pipettes
 
     def get_attached_pipettes(self) -> Dict[top_types.Mount, PipetteDict]:
@@ -1189,6 +1194,7 @@ class OT3API(
         }
 
     def get_attached_instruments(self) -> Dict[top_types.Mount, PipetteDict]:
+        # Warning: don't use this in new code, used `get_attached_pipettes` instead
         return self.get_attached_pipettes()
 
     def reset_instrument(
@@ -1211,11 +1217,12 @@ class OT3API(
     def get_attached_instrument(
         self, mount: Union[top_types.Mount, OT3Mount]
     ) -> PipetteDict:
+        # Warning: don't use this in new code, used `get_attached_pipette` instead
         return self.get_attached_pipette(mount)
-
 
     @property
     def attached_instruments(self) -> Any:
+        # Warning: don't use this in new code, used `attached_pipettes` instead
         return self.attached_pipettes
 
     @property
@@ -1225,6 +1232,10 @@ class OT3API(
             for m, d in self._pipette_handler.attached_instruments.items()
             if m != OT3Mount.GRIPPER
         }
+
+    @property
+    def attached_gripper(self) -> Optional[GripperDict]:
+        return self._gripper_handler.get_gripper_dict()
 
     def calibrate_plunger(
         self,

@@ -6,12 +6,18 @@ from math import copysign
 import pytest
 from mock import AsyncMock, patch
 from opentrons.config.types import GantryLoad, CapacitivePassSettings
-from opentrons.hardware_control.dev_types import InstrumentDict
+from opentrons.hardware_control.dev_types import (
+    InstrumentDict,
+    AttachedGripper,
+)
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.backends.ot3utils import axis_to_node
 from opentrons.types import Point
+
+from opentrons.config import gripper_config as gc
+from opentrons_shared_data.gripper.dev_types import GripperModel
 
 
 @pytest.fixture
@@ -296,3 +302,15 @@ async def test_capacitive_sweep_invalid_axes(
         )
     mock_move_to.assert_not_called()
     mock_backend_capacitive_probe.assert_not_called()
+
+
+async def test_cache_gripper(ot3_hardware: ThreadManager[OT3API]) -> None:
+    assert not ot3_hardware._gripper_handler.gripper
+    gripper_config = gc.load(GripperModel.V1, "g12345")
+    instr_data = AttachedGripper(config=gripper_config, id="g12345")
+    await ot3_hardware.cache_gripper(instr_data)
+    assert ot3_hardware._gripper_handler.gripper
+    assert ot3_hardware._gripper_handler.gripper.gripper_id == "g12345"
+    # make sure the property attached_gripper returns GripperDict
+    assert ot3_hardware.attached_gripper is not None
+    assert ot3_hardware.attached_gripper["gripper_id"] == "g12345"

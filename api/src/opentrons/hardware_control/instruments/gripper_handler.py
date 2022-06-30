@@ -42,12 +42,18 @@ class GripperHandler:
     def gripper(self) -> Optional[Gripper]:
         return self._gripper
 
+    @gripper.setter
+    def gripper(self, gripper: Optional[Gripper] = None) -> None:
+        self._gripper = gripper
+
     def get_critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         if not self._gripper:
             return Point(0, 0, 0)
         else:
             return self._gripper.critical_point(cp_override)
 
-    def get_gripper_dict(self) -> GripperDict:
-        gripper = self._verify_gripper()
-        return gripper.as_dict()
+    def get_gripper_dict(self) -> Optional[GripperDict]:
+        if not self._gripper:
+            return None
+        else:
+            return self._gripper.as_dict()

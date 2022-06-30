@@ -143,7 +143,7 @@ def compare_gripper_config_and_check_skip(
     config = freshly_detected.get("config")
     serial = freshly_detected.get("id") or ""
 
-    if config and not attached:
+    if not config and not attached:
         # nothing attached now, nothing used to be attached, nothing
         # to reconfigure
         return attached
