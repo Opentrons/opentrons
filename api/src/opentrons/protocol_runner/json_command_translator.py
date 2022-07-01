@@ -118,7 +118,6 @@ class JsonCommandTranslator:
         exclude_commands = [
             "loadLiquid",
             "moveToSlot",
-            "moveToCoordinates",
         ]
         commands_to_parse = [
             command

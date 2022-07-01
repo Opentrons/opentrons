@@ -291,7 +291,7 @@ class ModuleView(HasState[ModuleState]):
 
     _state: ModuleState
 
-    def __init__(self, state: ModuleState, virtualize_modules: bool) -> None:
+    def __init__(self, state: ModuleState) -> None:
         """Initialize the view with its backing state value."""
         self._state = state
 

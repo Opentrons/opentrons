@@ -115,22 +115,10 @@ class LegacyContextPlugin(AbstractPlugin):
 
     def handle_action(self, action: pe_actions.Action) -> None:
         """React to a ProtocolEngine action."""
-        if isinstance(action, pe_actions.PlayAction):
-            if self.state.commands.get_is_door_blocking():
-                # This should happen only on first PlayAction of the protocol run
-                self._hardware_api.pause(HardwarePauseType.PAUSE)
-            else:
-                self._hardware_api.resume(HardwarePauseType.PAUSE)
-        elif (
-            isinstance(action, pe_actions.PauseAction)
-            and action.source == pe_actions.PauseSource.CLIENT
-        ):
-            self._hardware_api.pause(HardwarePauseType.PAUSE)
-        elif (
+        if (
             isinstance(action, pe_actions.HardwareEventAction)
             and not self.state.commands.get_is_implicitly_active()
             and isinstance(action.event, DoorStateNotification)
-            and action.event.blocking
         ):
             self._hardware_api.pause(HardwarePauseType.PAUSE)
 

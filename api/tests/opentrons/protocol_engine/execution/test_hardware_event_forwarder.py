@@ -64,7 +64,7 @@ async def test_event_forwarding(
 
     captured_handler = cast(HardwareEventHandler, handler_captor.value)
 
-    input_event = DoorStateNotification(new_state=DoorState.OPEN, blocking=True)
+    input_event = DoorStateNotification(new_state=DoorState.OPEN)
     expected_action_to_forward = HardwareEventAction(input_event)
 
     await to_thread.run_sync(captured_handler, input_event)

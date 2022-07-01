@@ -121,7 +121,7 @@ class API(
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock()
         self._door_state = DoorState.CLOSED
-        self._pause_manager = PauseManager(self._door_state)
+        self._pause_manager = PauseManager()
         ExecutionManagerProvider.__init__(self, isinstance(backend, Simulator))
         RobotCalibrationProvider.__init__(self)
         PipetteHandlerProvider.__init__(
@@ -139,11 +139,8 @@ class API(
     def _update_door_state(self, door_state: DoorState) -> None:
         mod_log.info(f"Updating the window switch status: {door_state}")
         self.door_state = door_state
-        self._pause_manager.set_door(self.door_state)
         for cb in self._callbacks:
-            hw_event = DoorStateNotification(
-                new_state=door_state, blocking=self._pause_manager.blocked_by_door
-            )
+            hw_event = DoorStateNotification(new_state=door_state)
             try:
                 cb(hw_event)
             except Exception:

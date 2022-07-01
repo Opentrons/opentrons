@@ -10,7 +10,7 @@ from opentrons.hardware_control.types import DoorStateNotification, DoorState
 
 from opentrons.protocol_engine import commands, errors
 from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, WellLocation
-
+from opentrons.protocol_engine.state import Config
 from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandStore,
@@ -41,15 +41,28 @@ from .command_fixtures import (
 )
 
 
-def test_initial_state() -> None:
+@pytest.mark.parametrize(
+    ("is_door_open", "config", "expected_is_door_blocking"),
+    [
+        (False, Config(), False),
+        (True, Config(), False),
+        (False, Config(block_on_door_open=True), False),
+        (True, Config(block_on_door_open=True), True),
+    ],
+)
+def test_initial_state(
+    is_door_open: bool,
+    config: Config,
+    expected_is_door_blocking: bool,
+) -> None:
     """It should set the initial state."""
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=is_door_open, config=config)
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.SETUP,
         run_completed_at=None,
         run_started_at=None,
-        is_door_blocking=False,
+        is_door_blocking=expected_is_door_blocking,
         run_result=None,
         running_command_id=None,
         queued_command_ids=OrderedSet(),
@@ -197,7 +210,7 @@ def test_command_store_queues_commands(
         params=command_request.params,  # type: ignore[arg-type]
     )
 
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
     subject.handle_action(action)
 
     assert subject.state.commands_by_id == {
@@ -227,7 +240,7 @@ def test_command_queue_and_unqueue() -> None:
         command=create_running_command(command_id="command-id-2"),
     )
 
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
 
     subject.handle_action(queue_1)
     assert subject.state.queued_command_ids == OrderedSet(["command-id-1"])
@@ -269,7 +282,7 @@ def test_setup_command_queue_and_unqueue() -> None:
         command=create_running_command(command_id="command-id-2"),
     )
 
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
 
     subject.handle_action(queue_1)
     assert subject.state.queued_setup_command_ids == OrderedSet(["command-id-1"])
@@ -307,7 +320,7 @@ def test_setup_queue_action_updates_command_intent() -> None:
         intent=commands.CommandIntent.SETUP,
     )
 
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
 
     subject.handle_action(queue_cmd)
     assert subject.state.commands_by_id["command-id-1"] == CommandEntry(
@@ -329,7 +342,7 @@ def test_running_command_id() -> None:
         command=create_succeeded_command(command_id="command-id-1"),
     )
 
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
 
     subject.handle_action(queue)
     assert subject.state.running_command_id is None
@@ -350,7 +363,7 @@ def test_running_command_no_queue() -> None:
         command=create_succeeded_command(command_id="command-id-1"),
     )
 
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
 
     subject.handle_action(running_update)
     assert subject.state.all_command_ids == ["command-id-1"]
@@ -419,7 +432,7 @@ def test_command_failure_clears_queues() -> None:
         status=commands.CommandStatus.FAILED,
     )
 
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
 
     subject.handle_action(queue_1)
     subject.handle_action(queue_2)
@@ -518,7 +531,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         intent=commands.CommandIntent.SETUP,
     )
 
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
 
     subject.handle_action(queue_action_1_non_setup)
     subject.handle_action(queue_action_2_setup)
@@ -548,7 +561,7 @@ def test_command_store_preserves_handle_order() -> None:
     command_b = create_running_command(command_id="command-id-2")
     command_c = create_succeeded_command(command_id="command-id-1")
 
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
 
     subject.handle_action(UpdateCommandAction(command=command_a))
     assert subject.state.all_command_ids == ["command-id-1"]
@@ -574,7 +587,7 @@ def test_command_store_preserves_handle_order() -> None:
 @pytest.mark.parametrize("pause_source", PauseSource)
 def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
     """It should clear the running flag on pause."""
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
     subject.handle_action(PauseAction(source=pause_source))
 
     assert subject.state == CommandState(
@@ -595,7 +608,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
 @pytest.mark.parametrize("pause_source", PauseSource)
 def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
     """It should set the running flag on play."""
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
     assert subject.state == CommandState(
@@ -613,48 +626,9 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
     )
 
 
-def test_command_store_handles_play_according_to_door_state() -> None:
-    """It should inactivate/activate command queue according to door state."""
-    subject = CommandStore(is_door_blocking=True)
-    start_time = datetime(year=2021, month=1, day=1)
-    subject.handle_action(PlayAction(requested_at=start_time))
-    assert subject.state == CommandState(
-        queue_status=QueueStatus.PAUSED,
-        run_result=None,
-        run_completed_at=None,
-        is_door_blocking=True,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
-        errors_by_id={},
-        run_started_at=start_time,
-    )
-
-    door_close_event = DoorStateNotification(new_state=DoorState.CLOSED, blocking=False)
-    subject.handle_action(HardwareEventAction(event=door_close_event))
-    resume_start_time = datetime(year=2021, month=1, day=2)
-    subject.handle_action(PlayAction(requested_at=resume_start_time))
-
-    assert subject.state == CommandState(
-        queue_status=QueueStatus.RUNNING,
-        run_result=None,
-        run_completed_at=None,
-        run_started_at=start_time,
-        is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
-        errors_by_id={},
-    )
-
-
 def test_command_store_handles_finish_action() -> None:
     """It should change to a succeeded state with FinishAction."""
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction())
@@ -676,7 +650,7 @@ def test_command_store_handles_finish_action() -> None:
 
 def test_command_store_handles_finish_action_with_stopped() -> None:
     """It should change to a stopped state if FinishAction has set_run_status=False."""
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction(set_run_status=False))
@@ -686,7 +660,7 @@ def test_command_store_handles_finish_action_with_stopped() -> None:
 
 def test_command_store_handles_stop_action() -> None:
     """It should mark the engine as non-gracefully stopped on StopAction."""
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(StopAction())
@@ -708,7 +682,7 @@ def test_command_store_handles_stop_action() -> None:
 
 def test_command_store_cannot_restart_after_should_stop() -> None:
     """It should reject a play action after finish."""
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
     subject.handle_action(FinishAction())
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
 
@@ -729,7 +703,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
 
 def test_command_store_save_started_completed_run_timestamp() -> None:
     """Should return a none empty run_completed_at and run_started_at."""
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
     start_time = datetime(year=2021, month=1, day=1)
     hardware_stopped_time = datetime(year=2021, month=1, day=2)
     resume_time = datetime(year=2021, month=1, day=3)
@@ -760,7 +734,7 @@ def test_command_store_save_started_completed_run_timestamp() -> None:
 
 def test_command_store_saves_unknown_finish_error() -> None:
     """It not store a ProtocolEngineError that comes in with the stop action."""
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
 
     error_details = FinishErrorDetails(
         error=RuntimeError("oh no"),
@@ -793,7 +767,7 @@ def test_command_store_saves_unknown_finish_error() -> None:
 
 def test_command_store_ignores_stop_after_graceful_finish() -> None:
     """It should no-op on stop if already gracefully finished."""
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(FinishAction())
@@ -816,7 +790,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
 
 def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
     """It should no-op on finish if already ungracefully stopped."""
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(StopAction())
@@ -854,7 +828,7 @@ def test_command_store_handles_command_failed() -> None:
         completed_at=datetime(year=2022, month=2, day=2),
     )
 
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
     subject.handle_action(UpdateCommandAction(command=command))
     subject.handle_action(
         FailCommandAction(
@@ -884,7 +858,7 @@ def test_command_store_handles_command_failed() -> None:
 
 def test_handles_hardware_stopped() -> None:
     """It should mark the hardware as stopped on HardwareStoppedAction."""
-    subject = CommandStore()
+    subject = CommandStore(is_door_open=False, config=Config())
     completed_at = datetime(year=2021, day=1, month=1)
     subject.handle_action(HardwareStoppedAction(completed_at=completed_at))
 
@@ -903,85 +877,82 @@ def test_handles_hardware_stopped() -> None:
     )
 
 
-def test_handles_door_open_and_close_event() -> None:
+@pytest.mark.parametrize(
+    ("is_door_open", "config", "expected_queue_status"),
+    [
+        (False, Config(), QueueStatus.RUNNING),
+        (True, Config(), QueueStatus.RUNNING),
+        (False, Config(block_on_door_open=True), QueueStatus.RUNNING),
+        (True, Config(block_on_door_open=True), QueueStatus.PAUSED),
+    ],
+)
+def test_command_store_handles_play_according_to_initial_door_state(
+    is_door_open: bool,
+    config: Config,
+    expected_queue_status: QueueStatus,
+) -> None:
+    """It should set command queue state on play action according to door state."""
+    subject = CommandStore(is_door_open=is_door_open, config=config)
+    start_time = datetime(year=2021, month=1, day=1)
+    subject.handle_action(PlayAction(requested_at=start_time))
+
+    assert subject.state.queue_status == expected_queue_status
+    assert subject.state.run_started_at == start_time
+
+
+@pytest.mark.parametrize(
+    ("config", "expected_is_door_blocking"),
+    [
+        (Config(block_on_door_open=True), True),
+        (Config(block_on_door_open=False), False),
+    ],
+)
+def test_handles_door_open_and_close_event_before_play(
+    config: Config, expected_is_door_blocking: bool
+) -> None:
+    """It should update state but not pause on door open whenis setup."""
+    subject = CommandStore(is_door_open=False, config=config)
+
+    door_open_event = DoorStateNotification(new_state=DoorState.OPEN)
+    door_close_event = DoorStateNotification(new_state=DoorState.CLOSED)
+
+    subject.handle_action(HardwareEventAction(event=door_open_event))
+
+    assert subject.state.queue_status == QueueStatus.SETUP
+    assert subject.state.is_door_blocking is expected_is_door_blocking
+
+    subject.handle_action(HardwareEventAction(event=door_close_event))
+
+    assert subject.state.queue_status == QueueStatus.SETUP
+    assert subject.state.is_door_blocking is False
+
+
+@pytest.mark.parametrize(
+    ("config", "expected_queue_status", "expected_is_door_blocking"),
+    [
+        (Config(block_on_door_open=True), QueueStatus.PAUSED, True),
+        (Config(block_on_door_open=False), QueueStatus.RUNNING, False),
+    ],
+)
+def test_handles_door_open_and_close_event_after_play(
+    config: Config, expected_queue_status: QueueStatus, expected_is_door_blocking: bool
+) -> None:
     """It should update state when door opened and closed after run is played."""
-    subject = CommandStore()
-    door_open_event = DoorStateNotification(new_state=DoorState.OPEN, blocking=True)
-    door_close_event = DoorStateNotification(new_state=DoorState.CLOSED, blocking=False)
+    subject = CommandStore(is_door_open=False, config=config)
+
+    door_open_event = DoorStateNotification(new_state=DoorState.OPEN)
+    door_close_event = DoorStateNotification(new_state=DoorState.CLOSED)
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
     subject.handle_action(HardwareEventAction(event=door_open_event))
 
-    # Pause queue and update state
-    assert subject.state == CommandState(
-        queue_status=QueueStatus.PAUSED,
-        run_result=None,
-        run_completed_at=None,
-        is_door_blocking=True,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
-        errors_by_id={},
-        run_started_at=datetime(year=2021, month=1, day=1),
-    )
+    assert subject.state.queue_status == expected_queue_status
+    assert subject.state.is_door_blocking is expected_is_door_blocking
 
     subject.handle_action(HardwareEventAction(event=door_close_event))
-
-    # Don't unpause but update state
-    assert subject.state == CommandState(
-        queue_status=QueueStatus.PAUSED,
-        run_result=None,
-        run_completed_at=None,
-        is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
-        errors_by_id={},
-        run_started_at=datetime(year=2021, month=1, day=1),
-    )
-
-
-def test_handles_door_event_during_idle_run() -> None:
-    """It should update state but not pause on door open when implicitly active."""
-    subject = CommandStore()
-    door_open_event = DoorStateNotification(new_state=DoorState.OPEN, blocking=True)
-    door_close_event = DoorStateNotification(new_state=DoorState.CLOSED, blocking=False)
-
-    subject.handle_action(HardwareEventAction(event=door_open_event))
-
-    assert subject.state == CommandState(
-        queue_status=QueueStatus.SETUP,
-        run_result=None,
-        run_completed_at=None,
-        is_door_blocking=True,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
-        errors_by_id={},
-        run_started_at=None,
-    )
-
-    subject.handle_action(HardwareEventAction(event=door_close_event))
-
-    assert subject.state == CommandState(
-        queue_status=QueueStatus.SETUP,
-        run_result=None,
-        run_completed_at=None,
-        is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
-        errors_by_id={},
-        run_started_at=None,
-    )
+    
+    assert subject.state.queue_status == expected_queue_status
+    assert subject.state.is_door_blocking is False
 
 
 def test_command_store_handles_stop_action_with_queued_commands() -> None:

@@ -21,7 +21,7 @@ class RunControlHandler:
 
     async def wait_for_resume(self) -> None:
         """Issue a PauseAction to the store, pausing the run."""
-        if not self._state_store.get_configs().ignore_pause:
+        if not self._state_store.config.ignore_pause:
             self._action_dispatcher.dispatch(PauseAction(source=PauseSource.PROTOCOL))
             await self._state_store.wait_for(
                 condition=self._state_store.commands.get_is_running
@@ -29,5 +29,5 @@ class RunControlHandler:
 
     async def wait_for_duration(self, seconds: float) -> None:
         """Delay protocol execution for a duration."""
-        if not self._state_store.get_configs().ignore_pause:
+        if not self._state_store.config.ignore_pause:
             await asyncio.sleep(seconds)
