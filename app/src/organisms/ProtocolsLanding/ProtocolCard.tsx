@@ -169,7 +169,6 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             </StyledText>
           ) : (
             <>
-              {/* TODO: kj 07/01/2022 for 6.1 we need to user flex-wrap */}
               <Flex
                 flex="1"
                 flexDirection={DIRECTION_COLUMN}
