@@ -67,8 +67,8 @@ class MoveGroupSingleGripperStep:
     """A single gripper move in a move group."""
 
     duration_sec: np.float64
-    pwm_frequency: np.float32
     pwm_duty_cycle: np.float32
+    pwm_frequency: np.float32 = np.float32(320000)
     stop_condition: MoveStopCondition = MoveStopCondition.none
     move_type: MoveType = MoveType.linear
 
@@ -171,16 +171,15 @@ def create_tip_action_step(
 
 def create_gripper_step(
     duration: np.float64,
-    dut
+    duty_cycle: np.float32,
+    frequency: np.float32 = np.float32(320000),
+    stop_condition: MoveStopCondition = MoveStopCondition.none
 ) -> MoveGroupStep:
     step: MoveGroupStep = {}
     step[NodeId.gripper_g] = MoveGroupSingleGripperStep(
-        
+        duration_sec=duration,
+        pwm_frequency=frequency,
+        pwm_duty_cycle=duty_cycle,
+        stop_condition=stop_condition,
     )
-    DEFAULT_PWM_FREQ = 320000
-
-    duration_sec: np.float64
-    pwm_frequency: np.float32
-    pwm_duty_cycle: np.float32
-    stop_condition: MoveStopCondition = MoveStopCondition.none
-    move_type: MoveType = MoveType.linear
+    return step

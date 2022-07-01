@@ -20,7 +20,7 @@ class GripError(Exception):
 
 
 # TODO: verify value with HW and put this value in gripper config
-DEFAULT_GRIP_FORCE_IN_NEWTON = 3
+DEFAULT_GRIP_FORCE_IN_NEWTON = 3.0
 
 
 class GripperHandler:
@@ -70,12 +70,16 @@ class GripperHandler:
 
     def ready_for_grip(self) -> None:
         gripper = self._verify_gripper()
-        if gripper._has_gripped:
+        if gripper.has_gripped:
             raise GripError("Gripper is already gripping")
 
     def set_ready_to_grip(self, val: bool) -> None:
         gripper = self._verify_gripper()
-        gripper._ready_to_grip = val
+        gripper.ready_to_grip = val
+
+    def set_has_gripped(self, val: bool) -> None:
+        gripper = self._verify_gripper()
+        gripper.has_gripped = val
 
     def get_duty_cycle_by_grip_force(self, newton: Optional[float] = 0) -> float:
         gripper = self._verify_gripper()
@@ -83,4 +87,3 @@ class GripperHandler:
             newton = DEFAULT_GRIP_FORCE_IN_NEWTON
         duty_cycle = newton / gripper.force_per_duty_cycle(newton)
         return duty_cycle
-

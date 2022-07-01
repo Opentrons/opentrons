@@ -39,8 +39,8 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         self._model = self._config.model
         self._calibration_offset = gripper_cal_offset
         self._gripper_id = gripper_id
-        self._has_gripped = False
-        self._ready_to_grip = False
+        self.has_gripped = False
+        self.ready_to_grip = False
         self._log = mod_log.getChild(self._gripper_id)
         self._log.info(
             f"loaded: {self._model}, gripper offset: {self._calibration_offset}"
@@ -80,8 +80,10 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         # TODO: add critical point implementation
         return Point(0, 0, 0)
 
-    def force_per_duty_cycle(self, newton: float):
-        return gripper_config.piecewise_force_conversion(newton, self.config.jaw_force_per_duty_cycle)
+    def force_per_duty_cycle(self, newton: float) -> float:
+        return gripper_config.piecewise_force_conversion(
+            newton, self.config.jaw_force_per_duty_cycle
+        )
 
     def __str__(self) -> str:
         return f"{self._config.display_name}"
@@ -95,8 +97,8 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             "model": self._config.model,
             "gripper_id": self._gripper_id,
             "display_name": self._config.display_name,
-            "has_gripped": self._has_gripped,
-            "ready_to_grip": self._ready_to_grip,
+            "has_gripped": self.has_gripped,
+            "ready_to_grip": self.ready_to_grip,
         }
         return d
 

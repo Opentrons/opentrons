@@ -29,6 +29,8 @@ from .ot3utils import (
     node_to_axis,
     sub_system_to_node_id,
     sensor_node_for_mount,
+    create_gripper_move_group,
+    create_gripper_home_group,
 )
 
 try:
@@ -51,7 +53,6 @@ from opentrons_hardware.hardware_control.current_settings import (
     set_hold_current,
     set_currents,
 )
-from opentrons_hardware.hardware_control import gripper_settings as gripper_hc
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
@@ -316,12 +317,27 @@ class OT3Controller:
         """
         return await self.home(axes)
 
-    async def move_gripper(self, moves) -> bool:
+    async def gripper_move(
+        self,
+        duration: float,
+        duty_cycle: float,
+        frequency: float = 320000,
+        stop_condition: MoveStopCondition = MoveStopCondition.none,
+    ) -> bool:
+        move_group = create_gripper_move_group(
+            duration, duty_cycle, frequency, stop_condition
+        )
         runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
-        # TODO: should return encoder value once implemented
         return True
 
+    async def gripper_home(
+        self, duration: float, duty_cycle: float, frequency: float = 320000
+    ) -> bool:
+        move_group = create_gripper_home_group(duration, duty_cycle, frequency)
+        runner = MoveGroupRunner(move_groups=[move_group])
+        await runner.run(can_messenger=self._messenger)
+        return True
 
     async def get_attached_instruments(
         self, expected: Dict[OT3Mount, PipetteName]

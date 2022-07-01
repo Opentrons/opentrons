@@ -73,25 +73,27 @@ def load(
     )
 
 
-def piecewise_force_conversion(newton: float, sequence: List[List[float]]) -> float:
+def piecewise_force_conversion(
+    newton: float, sequence: List[Tuple[float, int]]
+) -> float:
     """
     Takes a force in newton and a sequence representing a piecewise
     function for the slope and y-intercept of a force/duty-cycle function, where each
     sub-list in the sequence contains:
 
-      - the max volume for the piece of the function (minimum implied from the
-        max of the previous item or 0
-      - the slope of the segment
-      - the y-intercept of the segment
-
     :return: the force/duty-cycle value for the specified volume
     """
     # pick the first item from the seq for which the target is less than
     # the bracketing element
-    for x in sequence:
+    for i, x in enumerate(sequence):
         if newton <= x[0]:
-            # use that element to calculate the movement distance in mm
-            return x[1] * newton + x[2]
+            if i > 0:
+                # get slope m
+                prev_x = sequence[i - 1]
+                m = (x[0] - prev_x[0]) / (x[1] - prev_x[1])
+                return (x[0] - newton) / m + x[1]
+            else:
+                return newton * x[1] / x[0]
 
     # Compatibility with previous implementation of search.
     #  list(filter(lambda x: ul <= x[0], sequence))[0]

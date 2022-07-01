@@ -915,23 +915,44 @@ class OT3API(
     async def update_deck_calibration(self, new_transform: RobotCalibration) -> None:
         pass
 
-    async def _gripper_move(self, duty_cycle: float) -> None:
+    @ExecutionManagerProvider.wait_for_running
+    async def _grip(self, duration: float, duty_cycle: float) -> None:
+        """Move the gripper jaw inward to close."""
         try:
-            await self._backend.(origin, moves[0])
+            await self._backend.gripper_move(duration=duration, duty_cycle=duty_cycle)
         except Exception:
-            self._log.exception("Gripper motion failed")
+            self._log.exception("Gripper grip failed")
             raise
-        
+
+    @ExecutionManagerProvider.wait_for_running
+    async def _release(self, duration: float, duty_cycle: float) -> None:
+        """Move the gripper jaw outward to reach the homing switch."""
+        try:
+            await self._backend.gripper_home(duration=duration, duty_cycle=duty_cycle)
+        except Exception:
+            self._log.exception("Gripper home failed")
+            raise
 
     async def prepare_for_grip(self) -> None:
         try:
-            await self._gripper_handler.ready_for_grip()
-            dc = self._gripper_handler.get_duty_cycle_by_grip_force()
-            await self._gripper_move()
+            self._gripper_handler.ready_for_grip()
+            await self.release(duration=2.0)
         except Exception:
             self._log.exception("Failed to prepare for grip")
             raise
         self._gripper_handler.set_ready_to_grip(True)
+
+    async def grip(self, duration: float, newton: float) -> None:
+        dc = self._gripper_handler.get_duty_cycle_by_grip_force(newton)
+        await self._grip(duty_cycle=dc, duration=duration)
+        self._gripper_handler.set_has_gripped(True)
+        self._gripper_handler.set_ready_to_grip(False)
+
+    async def release(self, duration: float, newton: Optional[float] = None) -> None:
+        # get default grip force for release if not provided
+        dc = self._gripper_handler.get_duty_cycle_by_grip_force(newton)
+        await self._release(duty_cycle=dc, duration=duration)
+        self._gripper_handler.set_has_gripped(False)
 
     # Pipette action API
     async def prepare_for_aspirate(

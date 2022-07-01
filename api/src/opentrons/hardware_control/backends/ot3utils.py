@@ -29,6 +29,7 @@ from opentrons_hardware.hardware_control.motion import (
     create_home_step,
     MoveGroup,
     MoveStopCondition,
+    create_gripper_step,
 )
 
 # TODO: These methods exist to defer uses of NodeId to inside
@@ -214,6 +215,37 @@ def create_home_group(
     step = create_home_step(
         distance=node_id_distances,
         velocity=node_id_velocities,
+    )
+    move_group: MoveGroup = [step]
+    return move_group
+
+
+def create_gripper_move_group(
+    duration: float,
+    duty_cycle: float,
+    frequency: float,
+    stop_condition: MoveStopCondition = MoveStopCondition.none,
+) -> MoveGroup:
+    step = create_gripper_step(
+        duration=np.float64(duration),
+        frequency=np.float32(frequency),
+        duty_cycle=np.float32(duty_cycle),
+        stop_condition=stop_condition,
+    )
+    move_group: MoveGroup = [step]
+    return move_group
+
+
+def create_gripper_home_group(
+    duration: float,
+    duty_cycle: float,
+    frequency: float,
+) -> MoveGroup:
+    step = create_gripper_step(
+        duration=np.float64(duration),
+        frequency=np.float32(frequency),
+        duty_cycle=np.float32(duty_cycle),
+        stop_condition=MoveStopCondition.limit_switch,
     )
     move_group: MoveGroup = [step]
     return move_group
