@@ -37,7 +37,7 @@
   "displayName": "Thermocycler Module",
   "quirks": [],
   "slotTransforms": {},
-  "compatibleWith": [],
+  "compatibleWith": ["thermocyclerModuleV1"],
   "twoDimensionalRendering": {
     "name": "svg",
     "type": "element",

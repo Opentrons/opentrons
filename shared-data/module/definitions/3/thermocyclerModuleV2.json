@@ -4,15 +4,15 @@
   "model": "thermocyclerModuleV2",
   "labwareOffset": {
     "x": 0,
-    "y": 82.56,
-    "z": 97.8
+    "y": 68.06,
+    "z": 98.26
   },
   "dimensions": {
     "bareOverallHeight": 98.0,
     "overLabwareHeight": 0.0,
-    "lidHeight": 37.7,
+    "lidHeight": 61.7,
     "xDimension": 172,
-    "yDimension": 259.7,
+    "yDimension": 245.2,
     "labwareInterfaceXDimension": 128,
     "labwareInterfaceYDimension": 86
   },
