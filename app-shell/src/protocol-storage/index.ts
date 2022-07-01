@@ -6,17 +6,30 @@ import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import * as ProtocolStorageActions from '@opentrons/app/src/redux/protocol-storage/actions'
 
 import * as FileSystem from './file-system'
+import { createFailedAnalysis } from '../protocol-analysis/writeFailedAnalysis'
 
 import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
-
 import type { Action, Dispatch } from '../types'
+import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
-const getUnixTimeFromAnalysisPath = (analysisPath: string): number =>
+export const getUnixTimeFromAnalysisPath = (analysisPath: string): number =>
   Number(path.basename(analysisPath, path.extname(analysisPath)))
 
-const fetchProtocols = (
+export const getParsedAnalysisFromPath = (
+  analysisPath: string
+): ProtocolAnalysisOutput => {
+  try {
+    return fse.readJsonSync(analysisPath)
+  } catch (error) {
+    return createFailedAnalysis(
+      error?.message ?? 'protocol analysis file cannot be parsed'
+    )
+  }
+}
+
+export const fetchProtocols = (
   dispatch: Dispatch,
   source: ListSource
 ): Promise<void> => {
@@ -43,6 +56,11 @@ const fetchProtocols = (
           }
           return analysisFilePath
         }, null)
+        const mostRecentAnalysis =
+          mostRecentAnalysisFilePath != null
+            ? getParsedAnalysisFromPath(mostRecentAnalysisFilePath)
+            : null
+
         return {
           protocolKey: path.parse(storedProtocolDir.dirPath).base,
           modified: storedProtocolDir.modified,
@@ -53,10 +71,7 @@ const fetchProtocols = (
             const buffer = fse.readFileSync(srcFilePath)
             return Buffer.from(buffer, buffer.byteOffset, buffer.byteLength)
           }),
-          mostRecentAnalysis:
-            mostRecentAnalysisFilePath != null
-              ? fse.readJsonSync(mostRecentAnalysisFilePath)
-              : null,
+          mostRecentAnalysis,
         }
       })
       dispatch(
