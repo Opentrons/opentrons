@@ -135,6 +135,8 @@ async def test_wait_for_temperatures(thermocycler: Thermocycler) -> None:
     assert thermocycler.lid_temp_status == TemperatureStatus.HOLDING
 
 
+# TODO(mm, 2022-07-01): This test is a flakiness hazard because it's sensitive to
+# timing and async task scheduling.
 async def test_cycle_cannot_be_interrupted_by_pause(
     thermocycler: Thermocycler,
     execution_manager: ExecutionManager,
@@ -152,30 +154,44 @@ async def test_cycle_cannot_be_interrupted_by_pause(
 
     # Oscillate between two temperatures for a while
     # and then end on a third temperature.
+    #
+    # This list must be long enough that we can reliably target a pause somewhere
+    # in the middle of it, but not so long that makes the test take a disruptively
+    # long time.
     steps = [
         *[
             {"temperature": temp_1},
             {"temperature": temp_2},
         ]
-        * 10,
+        * 5,
         {"temperature": final_temp},
     ]
 
+    # 1-based index, arbitrarily chosen somewhere in the middle.
+    step_to_pause_after = 2
+
+    # Start cycling through the steps.
     cycle_temperatures_task = asyncio.create_task(
         thermocycler.cycle_temperatures(steps=steps, repetitions=1)
     )
 
-    # Sleep until we're somewhere in the middle of the steps, probably mid-ramp.
-    # The overall time to complete all steps depends on the temperature change required,
-    # the emulator's poll frequency, and the emulator's temperature change per poll.
-    # We rely on this sleep time being less than whatever that is.
-    await asyncio.sleep(0.1)
-    # Make sure we're actually in the middle of the steps.
+    # Wait until we reach step_to_pause_after or any of the steps that follow it.
+    while (
+        thermocycler.current_step_index is None
+        or thermocycler.current_step_index < step_to_pause_after
+    ):
+        await asyncio.sleep(0)
+
+    # For this test to be meaningful, this task needs to have woken up before the steps
+    # have completed. Double-check that this is actually the case.
+    # Note that current_step_index is 1-based.
+    assert thermocycler.current_step_index <= thermocycler.total_step_count
     assert thermocycler.temperature != final_temp
 
+    # Issue a pause now that we're in the middle of the steps.
     await execution_manager.pause()
 
-    # All of the steps should complete, despite the pause.
+    # All of the steps should complete, despite the pause. The pause should be ignored.
     #
     # If the subject has a bug where the pause actually takes effect,
     # this would stall forever. The anyio.fail_after() turns that into a TimeoutError
@@ -193,19 +209,24 @@ async def test_cycle_can_be_blocked_by_preexisting_pause(
 
     Not to be confused with a pause that happens in the middle of a cycle.
     """
-    temp_1 = 40.0
-    temp_2 = 50.0
+    temp_1 = 20.0
+    temp_2 = 30.0
 
+    # Start at a known temperature.
     await thermocycler.set_temperature(temperature=temp_1)
 
+    # Pause before we begin a cycle.
     await execution_manager.pause()
 
+    # Assert that starting a cycle blocks for at least 0.5 seconds,
+    # as an approximation of asserting that it blocks forever.
     with pytest.raises(TimeoutError):
-        with anyio.fail_after(1.0):
-            # Should block forever, if not for the anyio.fail_after().
+        with anyio.fail_after(0.5):
             steps = [{"temperature": temp_2}]
             await thermocycler.cycle_temperatures(steps=steps, repetitions=1)
 
+    # Assert that the cycle didn't have any effect.
+    assert thermocycler.current_step_index is None
     assert thermocycler.temperature == temp_1
 
 
@@ -214,37 +235,22 @@ async def test_cycle_can_be_cancelled(
     execution_manager: ExecutionManager,
 ) -> None:
     """A cycle should be cancellable (even though it isn't pausable)."""
-    temp_1 = 40.0
-    temp_2 = 50.0
-    final_temp = 60.0
-
-    # Start at a known temperature.
-    await thermocycler.set_temperature(temperature=temp_1)
-
-    # Oscillate between two temperatures for a while
-    # and then end on a third temperature.
     steps = [
-        *[
-            {"temperature": temp_1},
-            {"temperature": temp_2},
-        ]
-        * 10,
-        {"temperature": final_temp},
+        {"temperature": 20.0, "hold_time_minutes": 99999},
     ]
 
     cycle_temperatures_task = asyncio.create_task(
         thermocycler.cycle_temperatures(steps=steps, repetitions=1)
     )
 
-    # Sleep until we're somewhere in the middle of the steps, probably mid-ramp.
-    # The overall time to complete all steps depends on the temperature change required,
-    # the emulator's poll frequency, and the emulator's temperature change per poll.
-    # We rely on this sleep time being less than whatever that is.
-    await asyncio.sleep(0.1)
-    # Make sure we're actually in the middle of the steps.
-    assert thermocycler.temperature != final_temp
+    # Wait until we're somewhere in the middle of the steps.
+    while thermocycler.current_step_index is None:
+        await asyncio.sleep(0)
 
+    # Issue a cancellation now that we're in the middle of the steps.
     await execution_manager.cancel()
 
-    with pytest.raises(asyncio.CancelledError):
-        await cycle_temperatures_task
+    # Assert that the cancellation takes effect promptly, within 0.5 seconds.
+    with anyio.fail_after(0.5):
+        with pytest.raises(asyncio.CancelledError):
+            await cycle_temperatures_task
