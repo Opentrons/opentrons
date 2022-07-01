@@ -144,7 +144,10 @@ export function OverflowMenu({
           confirmStart()
         }
       } else {
-        startPipetteOffsetPossibleTLC({ keepTipLength: false })
+        startPipetteOffsetPossibleTLC({
+          keepTipLength: false,
+          hasBlockModalResponse: null,
+        })
       }
     }
     setShowOverflowMenu(!showOverflowMenu)
