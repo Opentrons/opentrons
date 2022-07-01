@@ -173,8 +173,9 @@ def create_gripper_step(
     duration: np.float64,
     duty_cycle: np.float32,
     frequency: np.float32 = np.float32(320000),
-    stop_condition: MoveStopCondition = MoveStopCondition.none
+    stop_condition: MoveStopCondition = MoveStopCondition.none,
 ) -> MoveGroupStep:
+    """Creates a step for gripper jaw action."""
     step: MoveGroupStep = {}
     step[NodeId.gripper_g] = MoveGroupSingleGripperStep(
         duration_sec=duration,
