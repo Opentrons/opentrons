@@ -16,6 +16,7 @@ from typing import (
     Sequence,
     Set,
     Any,
+    TypeVar,
 )
 
 from opentrons_shared_data.pipette import name_config
@@ -565,7 +566,7 @@ class OT3API(
             )
             await self._move(target_pos, acquire_lock=False, home_flagged_axes=False)
 
-            await self.current_position(mount=checked_mount, refresh=True)
+            await self.current_position_ot3(mount=checked_mount, refresh=True)
 
     @lru_cache(1)
     def _carriage_offset(self) -> top_types.Point:
@@ -576,10 +577,23 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         critical_point: Optional[CriticalPoint] = None,
         refresh: bool = False,
-        # TODO(mc, 2021-11-15): combine with `refresh` for more reliable
-        # position reporting when motors are not homed
         fail_on_not_homed: bool = False,
     ) -> Dict[Axis, float]:
+        realmount = OT3Mount.from_mount(mount)
+        ot3_pos = await self.current_position_ot3(
+            realmount, critical_point, refresh, fail_on_not_homed
+        )
+        return self._axis_map_from_ot3axis_map(ot3_pos)
+
+    async def current_position_ot3(
+        self,
+        mount: OT3Mount,
+        critical_point: Optional[CriticalPoint] = None,
+        # TODO(mc, 2021-11-15): combine with `refresh` for more reliable
+        # position reporting when motors are not homed
+        refresh: bool = False,
+        fail_on_not_homed: bool = False,
+    ) -> Dict[OT3Axis, float]:
         """Return the postion (in deck coords) of the critical point of the
         specified mount.
         """
@@ -602,12 +616,10 @@ class OT3API(
                     await self._backend.update_position(),
                     self._transforms.deck_calibration.attitude,
                     self._transforms.carriage_offset,
-                    OT3Axis,
                 )
-            ot3pos = self._effector_pos_from_carriage_pos(
+            return self._effector_pos_from_carriage_pos(
                 OT3Mount.from_mount(mount), self._current_position, critical_point
             )
-            return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
 
     def _effector_pos_from_carriage_pos(
         self,
@@ -616,7 +628,10 @@ class OT3API(
         critical_point: Optional[CriticalPoint],
     ) -> OT3AxisMap[float]:
         offset = offset_for_mount(
-            mount, self._config.left_mount_offset, self._config.right_mount_offset
+            mount,
+            top_types.Point(*self._config.left_mount_offset),
+            top_types.Point(*self._config.right_mount_offset),
+            top_types.Point(*self._config.gripper_mount_offset),
         )
         cp = self.critical_point_for(mount, critical_point)
         z_ax = OT3Axis.by_mount(mount)
@@ -639,18 +654,17 @@ class OT3API(
         fail_on_not_homed: bool = False,
     ) -> top_types.Point:
         """Return the position of the critical point as pertains to the gantry."""
-        cur_pos = await self.current_position(
-            mount,
+        realmount = OT3Mount.from_mount(mount)
+        cur_pos = await self.current_position_ot3(
+            realmount,
             critical_point,
             refresh,
             fail_on_not_homed,
         )
-        if isinstance(mount, OT3Mount):
-            old_mount = mount.to_mount()
-        else:
-            old_mount = mount
         return top_types.Point(
-            x=cur_pos[Axis.X], y=cur_pos[Axis.Y], z=cur_pos[Axis.by_mount(old_mount)]
+            x=cur_pos[OT3Axis.X],
+            y=cur_pos[OT3Axis.Y],
+            z=cur_pos[OT3Axis.by_mount(realmount)],
         )
 
     async def move_to(
@@ -673,6 +687,7 @@ class OT3API(
             partial(self.critical_point_for, cp_override=critical_point),
             top_types.Point(*self._config.left_mount_offset),
             top_types.Point(*self._config.right_mount_offset),
+            top_types.Point(*self._config.gripper_mount_offset),
         )
         if max_speeds:
             checked_max: Optional[OT3AxisMap[float]] = {
@@ -805,6 +820,7 @@ class OT3API(
         Worker function to home the robot by axis or list of
         desired axes.
         """
+
         self._reset_last_mount()
         if axes:
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
@@ -823,13 +839,12 @@ class OT3API(
                     machine_pos,
                     self._transforms.deck_calibration.attitude,
                     self._transforms.carriage_offset,
-                    OT3Axis,
                 )
                 self._current_position.update(position)
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
-        return {ax.to_axis(): eng for ax, eng in self._backend.engaged_axes().items()}
+        return self._axis_map_from_ot3axis_map(self._backend.engaged_axes())
 
     @property
     def engaged_axes(self) -> Dict[Axis, bool]:
@@ -860,7 +875,6 @@ class OT3API(
                 machine_pos,
                 self._transforms.deck_calibration.attitude,
                 self._transforms.carriage_offset,
-                OT3Axis,
             )
 
     # Gantry/frame (i.e. not pipette) config API
@@ -1129,7 +1143,6 @@ class OT3API(
                     machine_pos,
                     self._transforms.deck_calibration.attitude,
                     self._transforms.carriage_offset,
-                    OT3Axis,
                 )
 
         for shake in spec.shake_moves:
@@ -1277,7 +1290,6 @@ class OT3API(
             self._backend.home_position(),
             self._transforms.deck_calibration.attitude,
             self._transforms.carriage_offset,
-            OT3Axis,
         )
         pos_at_home = self._effector_pos_from_carriage_pos(
             OT3Mount.from_mount(mount), carriage_pos, critical_point
@@ -1359,14 +1371,7 @@ class OT3API(
             machine_pass_distance,
             pass_settings.speed_mm_per_s,
         )
-        machine_pos = await self._backend.update_position()
-        self._current_position = deck_from_machine(
-            machine_pos,
-            self._transforms.deck_calibration.attitude,
-            self._transforms.carriage_offset,
-            OT3Axis,
-        )
-        end_pos = await self.gantry_position(mount)
+        end_pos = await self.gantry_position(mount, refresh=True)
         await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)
 
@@ -1398,3 +1403,17 @@ class OT3API(
         )
         await self.move_to(mount, begin)
         return values
+
+    AMKey = TypeVar("AMKey")
+
+    @staticmethod
+    def _axis_map_from_ot3axis_map(
+        inval: Dict[OT3Axis, "OT3API.AMKey"]
+    ) -> Dict[Axis, "OT3API.AMKey"]:
+        ret: Dict[Axis, OT3API.AMKey] = {}
+        for ax in Axis:
+            try:
+                ret[ax] = inval[OT3Axis.from_axis(ax)]
+            except KeyError:
+                pass
+        return ret

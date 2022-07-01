@@ -358,6 +358,7 @@ class OT3Simulator:
             OT3Axis.Y: phony_bounds,
             OT3Axis.X: phony_bounds,
             OT3Axis.Z_G: phony_bounds,
+            OT3Axis.G: phony_bounds,
         }
 
     def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
@@ -428,6 +429,7 @@ class OT3Simulator:
             NodeId.pipette_left: 0,
             NodeId.pipette_right: 0,
             NodeId.gripper_z: 0,
+            NodeId.gripper_g: 0,
         }
 
     @staticmethod
