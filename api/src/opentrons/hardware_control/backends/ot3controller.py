@@ -597,6 +597,20 @@ class OT3Controller:
         return nodes
 
     @staticmethod
+    def _replace_gripper_node(nodes: Set[NodeId]) -> Set[NodeId]:
+        """Replace the gripper core node with its two axes.
+
+        The node ID for the gripper controller is what shows up in a network probe,
+        but what we actually send most commands to is the gripper_z and gripper_g
+        synthetic nodes, so we should have them in the network map instead.
+        """
+        if NodeId.gripper in nodes:
+            nodes.remove(NodeId.gripper)
+            nodes.add(NodeId.gripper_z)
+            nodes.add(NodeId.gripper_g)
+        return nodes
+
+    @staticmethod
     def _filter_probed_core_nodes(
         current_set: Set[NodeId], probed_set: Set[NodeId]
     ) -> Set[NodeId]:
@@ -644,7 +658,9 @@ class OT3Controller:
         ):
             expected.add(NodeId.gripper)
         present = await probe(self._messenger, expected, timeout)
-        self._present_nodes = self._replace_head_node(present)
+        self._present_nodes = self._replace_gripper_node(
+            self._replace_head_node(present)
+        )
 
     def _axis_is_present(self, axis: OT3Axis) -> bool:
         try:
