@@ -9,10 +9,10 @@
   },
   "head_l": {
     "hold_current": 0,
-    "run_current": 1.0
+    "run_current": 0.9
   },
   "head_r": {
     "hold_current": 0,
-    "run_current": 1.0
+    "run_current": 0.9
   }
 }

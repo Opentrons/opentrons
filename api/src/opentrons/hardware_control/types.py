@@ -295,16 +295,15 @@ class HardwareEventType(enum.Enum):
     ERROR_MESSAGE = enum.auto()
 
 
-@dataclass
+@dataclass(frozen=True)
 class DoorStateNotification:
     event: Literal[
         HardwareEventType.DOOR_SWITCH_CHANGE
     ] = HardwareEventType.DOOR_SWITCH_CHANGE
     new_state: DoorState = DoorState.CLOSED
-    blocking: bool = False
 
 
-@dataclass
+@dataclass(frozen=True)
 class ErrorMessageNotification:
     message: str
     event: Literal[HardwareEventType.ERROR_MESSAGE] = HardwareEventType.ERROR_MESSAGE
@@ -429,10 +428,6 @@ class AionotifyEvent:
         flag_list = [f.name for f in flags]
         Flag = enum.Enum("Flag", flag_list)  # type: ignore
         return cls(flags=Flag, name=name)
-
-
-class PauseResumeError(RuntimeError):
-    pass
 
 
 class ExecutionCancelledError(RuntimeError):

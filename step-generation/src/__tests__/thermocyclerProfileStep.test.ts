@@ -62,7 +62,7 @@ describe('thermocyclerProfileStep', () => {
           params: {
             moduleId: 'thermocyclerId',
             profile: [],
-            volume: 42,
+            blockMaxVolumeUl: 42,
           },
         },
         {
@@ -128,8 +128,8 @@ describe('thermocyclerProfileStep', () => {
           key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
-            profile: [{ temperature: 61, holdTime: 99 }],
-            volume: 42,
+            profile: [{ celsius: 61, holdSeconds: 99 }],
+            blockMaxVolumeUl: 42,
           },
         },
         {
@@ -202,8 +202,8 @@ describe('thermocyclerProfileStep', () => {
           key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
-            profile: [{ temperature: 61, holdTime: 99 }],
-            volume: 42,
+            profile: [{ celsius: 61, holdSeconds: 99 }],
+            blockMaxVolumeUl: 42,
           },
         },
         {
@@ -269,8 +269,8 @@ describe('thermocyclerProfileStep', () => {
           key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
-            profile: [{ temperature: 61, holdTime: 99 }],
-            volume: 42,
+            profile: [{ celsius: 61, holdSeconds: 99 }],
+            blockMaxVolumeUl: 42,
           },
         },
         {
