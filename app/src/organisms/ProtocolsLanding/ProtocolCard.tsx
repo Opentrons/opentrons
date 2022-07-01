@@ -2,12 +2,13 @@ import * as React from 'react'
 import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
+
 import {
   getModuleType,
   getPipetteNameSpecs,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-
 import {
   Box,
   Flex,
@@ -22,9 +23,10 @@ import {
   SIZE_4,
   ModuleIcon,
   POSITION_ABSOLUTE,
-  TEXT_ALIGN_RIGHT,
+  BORDERS,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { useHistory } from 'react-router-dom'
+
 import {
   parseInitialPipetteNamesByMount,
   parseAllRequiredModuleModels,
@@ -75,6 +77,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       position="relative"
       cursor="pointer"
       onClick={() => history.push(`/protocols/${protocolKey}`)}
+      css={BORDERS.cardOutlineBorder}
     >
       <AnalysisInfo
         protocolKey={protocolKey}
@@ -164,7 +167,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         </StyledText>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           {analysisStatus === 'loading' ? (
-            <StyledText as="p" flex="1" css={COLORS.darkGreyEnabled}>
+            <StyledText as="p" flex="1" color={COLORS.darkGreyEnabled}>
               {t('loading_data')}
             </StyledText>
           ) : (
@@ -177,7 +180,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               >
                 <StyledText
                   as="h6"
-                  marginBottom={SPACING.spacing3}
+                  marginBottom={SPACING.spacing2}
                   color={COLORS.darkGreyEnabled}
                 >
                   {t('left_mount')}
@@ -205,7 +208,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               >
                 <StyledText
                   as="h6"
-                  marginBottom={SPACING.spacing3}
+                  marginBottom={SPACING.spacing2}
                   color={COLORS.darkGreyEnabled}
                 >
                   {t('right_mount')}
@@ -232,7 +235,11 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               >
                 {requiredModuleTypes.length > 0 ? (
                   <>
-                    <StyledText as="h6" marginBottom={SPACING.spacing3}>
+                    <StyledText
+                      as="h6"
+                      color={COLORS.darkGreyEnabled}
+                      marginBottom={SPACING.spacing2}
+                    >
                       {t('modules')}
                     </StyledText>
                     <Flex>
@@ -260,14 +267,14 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               as="label"
               marginBottom={SPACING.spacing3}
               color={COLORS.darkGreyEnabled}
-              textAlign={TEXT_ALIGN_RIGHT}
+              textAlign={TYPOGRAPHY.textAlignRight}
             >
               {t('updated')}
             </StyledText>
             <StyledText
               as="label"
               color={COLORS.darkGreyEnabled}
-              textAlign={TEXT_ALIGN_RIGHT}
+              textAlign={TYPOGRAPHY.textAlignRight}
             >
               {format(new Date(modified), 'MM/dd/yy HH:mm:ss')}
             </StyledText>
