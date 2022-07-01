@@ -132,6 +132,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
       <Flex
         marginRight={SPACING.spacing4}
         size="6rem"
+        height="auto"
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
         data-testid={`ProtocolCard_deckLayout_${protocolDisplayName}`}

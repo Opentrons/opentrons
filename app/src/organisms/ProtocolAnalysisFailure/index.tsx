@@ -54,6 +54,7 @@ export function ProtocolAnalysisFailure(
       type="error"
       marginBottom={SPACING.spacing4}
       paddingRight={SPACING.spacing4}
+      marginRight={SPACING.spacing5}
     >
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
