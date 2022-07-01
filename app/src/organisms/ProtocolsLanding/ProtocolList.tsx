@@ -1,7 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-
 import {
   Box,
   Flex,
@@ -17,7 +15,6 @@ import {
   DIRECTION_COLUMN,
   Overlay,
 } from '@opentrons/components'
-
 import { useSortedProtocols } from './hooks'
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/buttons'
@@ -31,16 +28,6 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { ProtocolSort } from './hooks'
 
-const SORT_BY_STYLE = css`
-  background-color: ${COLORS.transparent};
-  &:hover {
-    background-color: ${COLORS.medGreyHover};
-  }
-  &:active,
-  &:focus {
-    background-color: ${COLORS.medGrey};
-  }
-`
 interface ProtocolListProps {
   storedProtocols: StoredProtocolData[]
 }
@@ -104,10 +91,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             marginRight={SPACING.spacing4}
             onClick={toggleSetShowSortByMenu}
           >
-            <StyledText
-              css={TYPOGRAPHY.pSemiBold}
-              color={COLORS.darkGreyEnabled}
-            >
+            <StyledText css={TYPOGRAPHY.pSemiBold}>
               {t('labware_landing:sort_by')}
             </StyledText>
             <Flex
@@ -116,7 +100,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               backgroundColor={COLORS.medGrey}
               borderRadius={BORDERS.radiusSoftCorners}
               marginLeft={SPACING.spacing3}
-              css={SORT_BY_STYLE}
             >
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
