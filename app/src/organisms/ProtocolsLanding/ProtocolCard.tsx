@@ -169,11 +169,13 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             </StyledText>
           ) : (
             <>
+              {/* TODO: kj 07/01/2022 for 6.1 we need to user flex-wrap */}
               <Flex
                 flex="1"
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_leftMount_${protocolDisplayName}`}
+                minWidth="10.625rem"
               >
                 <StyledText
                   as="h6"
@@ -202,6 +204,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_rightMount_${protocolDisplayName}`}
+                minWidth="10.625rem"
               >
                 <StyledText
                   as="h6"
