@@ -19,8 +19,7 @@ from numpy import array, dot
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
 )
-from opentrons.hardware_control.modules.types import SpeedStatus, LiveData
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
+from opentrons.hardware_control.modules.types import LiveData
 
 from opentrons.types import DeckSlotName
 
@@ -139,6 +138,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             (
                 heater_shaker.SetTargetTemperatureResult,
                 heater_shaker.DeactivateHeaterResult,
+                heater_shaker.SetAndWaitForShakeSpeedResult,
+                heater_shaker.DeactivateShakerResult,
+                heater_shaker.OpenLabwareLatchResult,
+                heater_shaker.CloseLabwareLatchResult,
             ),
         ):
             self._handle_heater_shaker_commands(command)
@@ -188,14 +191,12 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         elif ModuleModel.is_heater_shaker_module_model(model):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                labware_latch_status=HeaterShakerLabwareLatchStatus(
-                    live_data["labwareLatchStatus"]
-                )
-                if live_data
-                else HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
-                speed_status=SpeedStatus(live_data["speedStatus"])
-                if live_data
-                else SpeedStatus.IDLE,
+                is_labware_latch_closed=True
+                if (live_data and live_data["labwareLatchStatus"] == "idle_closed")
+                else False,
+                is_plate_shaking=True
+                if (live_data and live_data["targetSpeed"])
+                else False,
                 plate_target_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
             )
         elif ModuleModel.is_temperature_module_model(model):
@@ -213,7 +214,12 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def _handle_heater_shaker_commands(
         self,
         command: Union[
-            heater_shaker.SetTargetTemperature, heater_shaker.DeactivateHeater
+            heater_shaker.SetTargetTemperature,
+            heater_shaker.DeactivateHeater,
+            heater_shaker.SetAndWaitForShakeSpeed,
+            heater_shaker.DeactivateShaker,
+            heater_shaker.OpenLabwareLatch,
+            heater_shaker.CloseLabwareLatch,
         ],
     ) -> None:
         module_id = command.params.moduleId
@@ -223,22 +229,49 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         ), f"{module_id} is not heater-shaker."
 
         # Get current values to preserve target temperature not being set/deactivated
-        latch_status = hs_substate.labware_latch_status
-        speed_status = hs_substate.speed_status
+        prev_state: HeaterShakerModuleSubState = hs_substate
 
         if isinstance(command.result, heater_shaker.SetTargetTemperatureResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                labware_latch_status=latch_status,
-                speed_status=speed_status,
+                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                is_plate_shaking=prev_state.is_plate_shaking,
                 plate_target_temperature=command.params.celsius,
             )
         elif isinstance(command.result, heater_shaker.DeactivateHeaterResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                labware_latch_status=latch_status,
-                speed_status=speed_status,
+                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                is_plate_shaking=prev_state.is_plate_shaking,
                 plate_target_temperature=None,
+            )
+        elif isinstance(command.result, heater_shaker.SetAndWaitForShakeSpeedResult):
+            self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId(module_id),
+                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                is_plate_shaking=True,
+                plate_target_temperature=prev_state.plate_target_temperature,
+            )
+        elif isinstance(command.result, heater_shaker.DeactivateShakerResult):
+            self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId(module_id),
+                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                is_plate_shaking=False,
+                plate_target_temperature=prev_state.plate_target_temperature,
+            )
+        elif isinstance(command.result, heater_shaker.OpenLabwareLatchResult):
+            self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId(module_id),
+                is_labware_latch_closed=False,
+                is_plate_shaking=prev_state.is_plate_shaking,
+                plate_target_temperature=prev_state.plate_target_temperature,
+            )
+        elif isinstance(command.result, heater_shaker.CloseLabwareLatchResult):
+            self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId(module_id),
+                is_labware_latch_closed=True,
+                is_plate_shaking=prev_state.is_plate_shaking,
+                plate_target_temperature=prev_state.plate_target_temperature,
             )
 
     def _handle_temperature_module_commands(

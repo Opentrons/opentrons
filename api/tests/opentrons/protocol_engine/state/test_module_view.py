@@ -3,7 +3,7 @@ import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 from contextlib import nullcontext as does_not_raise
-from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union, Any
+from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union
 
 from opentrons_shared_data import load_shared_data
 from opentrons.types import DeckSlotName
@@ -31,9 +31,6 @@ from opentrons.protocol_engine.state.module_substates import (
     ThermocyclerModuleId,
     ModuleSubStateType,
 )
-
-from opentrons.hardware_control.modules.types import SpeedStatus
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 
 
 def make_module_view(
@@ -221,8 +218,8 @@ def test_get_magnetic_module_substate(
             ),
             "heatshake-module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("heatshake-module-id"),
-                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_OPEN,
-                speed_status=SpeedStatus.IDLE,
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             ),
         },
@@ -275,8 +272,8 @@ def test_get_heater_shaker_module_substate(
             "heatshake-module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("heatshake-module-id"),
                 plate_target_temperature=432,
-                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_OPEN,
-                speed_status=SpeedStatus.ACCELERATING,
+                is_labware_latch_closed=True,
+                is_plate_shaking=True,
             ),
         },
     )
@@ -286,8 +283,8 @@ def test_get_heater_shaker_module_substate(
     )
     assert hs_substate.module_id == "heatshake-module-id"
     assert hs_substate.plate_target_temperature == 432
-    assert hs_substate.speed_status == SpeedStatus.ACCELERATING
-    assert hs_substate.labware_latch_status == HeaterShakerLabwareLatchStatus.IDLE_OPEN
+    assert hs_substate.is_plate_shaking is True
+    assert hs_substate.is_labware_latch_closed is True
 
     with pytest.raises(errors.WrongModuleTypeError):
         subject.get_heater_shaker_module_substate(module_id="magnetic-module-gen2-id")
@@ -333,8 +330,8 @@ def test_get_temperature_module_substate(
             ),
             "heatshake-module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("heatshake-module-id"),
-                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_OPEN,
-                speed_status=SpeedStatus.IDLE,
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             ),
         },
@@ -414,8 +411,8 @@ def test_get_plate_target_temperature(heater_shaker_v1_def: ModuleDefinition) ->
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_OPEN,
-                speed_status=SpeedStatus.IDLE,
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=12.3,
             )
         },
@@ -439,8 +436,8 @@ def test_get_plate_target_temperature_no_target(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_OPEN,
-                speed_status=SpeedStatus.IDLE,
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             )
         },
@@ -844,8 +841,8 @@ def test_validate_heater_shaker_target_temperature_raises(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_OPEN,
-                speed_status=SpeedStatus.IDLE,
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             )
         },
@@ -872,8 +869,8 @@ def test_validate_heater_shaker_target_temperature(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_OPEN,
-                speed_status=SpeedStatus.IDLE,
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             )
         },
@@ -953,8 +950,8 @@ def test_validate_heater_shaker_target_speed_converts_to_int(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_OPEN,
-                speed_status=SpeedStatus.IDLE,
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             )
         },
@@ -982,8 +979,8 @@ def test_validate_heater_shaker_target_speed_raises_error(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_OPEN,
-                speed_status=SpeedStatus.IDLE,
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             )
         },
@@ -994,36 +991,8 @@ def test_validate_heater_shaker_target_speed_raises_error(
             subject.validate_target_speed(rpm_param)
 
 
-@pytest.mark.parametrize(
-    ["latch_status", "expected_raise"],
-    [
-        (
-            HeaterShakerLabwareLatchStatus.IDLE_OPEN,
-            pytest.raises(errors.CannotPerformModuleAction),
-        ),
-        (
-            HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
-            pytest.raises(errors.CannotPerformModuleAction),
-        ),
-        (
-            HeaterShakerLabwareLatchStatus.OPENING,
-            pytest.raises(errors.CannotPerformModuleAction),
-        ),
-        (
-            HeaterShakerLabwareLatchStatus.CLOSING,
-            pytest.raises(errors.CannotPerformModuleAction),
-        ),
-        (
-            HeaterShakerLabwareLatchStatus.UNKNOWN,
-            pytest.raises(errors.CannotPerformModuleAction),
-        ),
-        (HeaterShakerLabwareLatchStatus.IDLE_CLOSED, does_not_raise()),
-    ],
-)
 def test_raise_if_labware_latch_not_closed(
     heater_shaker_v1_def: ModuleDefinition,
-    latch_status: HeaterShakerLabwareLatchStatus,
-    expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise an error if labware latch is not closed."""
     module_view = make_module_view(
@@ -1037,31 +1006,19 @@ def test_raise_if_labware_latch_not_closed(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                labware_latch_status=latch_status,
-                speed_status=SpeedStatus.IDLE,
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             )
         },
     )
     subject = module_view.get_heater_shaker_module_substate("module-id")
-    with expected_raise:
+    with pytest.raises(errors.CannotPerformModuleAction):
         subject.raise_if_labware_latch_not_closed()
 
 
-@pytest.mark.parametrize(
-    ["speed_status", "expected_raise"],
-    [
-        (SpeedStatus.IDLE, does_not_raise()),
-        (SpeedStatus.ACCELERATING, pytest.raises(errors.CannotPerformModuleAction)),
-        (SpeedStatus.DECELERATING, pytest.raises(errors.CannotPerformModuleAction)),
-        (SpeedStatus.HOLDING, pytest.raises(errors.CannotPerformModuleAction)),
-        (SpeedStatus.ERROR, pytest.raises(errors.CannotPerformModuleAction)),
-    ],
-)
 def test_heater_shaker_raise_if_shaking(
     heater_shaker_v1_def: ModuleDefinition,
-    speed_status: SpeedStatus,
-    expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise when heater-shaker is shaking."""
     module_view = make_module_view(
@@ -1075,14 +1032,14 @@ def test_heater_shaker_raise_if_shaking(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                labware_latch_status=HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
-                speed_status=speed_status,
+                is_labware_latch_closed=False,
+                is_plate_shaking=True,
                 plate_target_temperature=None,
             )
         },
     )
     subject = module_view.get_heater_shaker_module_substate("module-id")
-    with expected_raise:
+    with pytest.raises(errors.CannotPerformModuleAction):
         subject.raise_if_shaking()
 
 
