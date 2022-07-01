@@ -950,14 +950,14 @@ def test_handles_door_open_and_close_event_after_play(
     assert subject.state.is_door_blocking is expected_is_door_blocking
 
     subject.handle_action(HardwareEventAction(event=door_close_event))
-    
+
     assert subject.state.queue_status == expected_queue_status
     assert subject.state.is_door_blocking is False
 
 
 def test_command_store_handles_stop_action_with_queued_commands() -> None:
     """It should clear queued commands."""
-    subject = CommandStore()
+    subject = CommandStore(config=Config(block_on_door_open=False), is_door_open=False)
 
     action = QueueCommandAction(
         request=commands.WaitForResumeCreate(
