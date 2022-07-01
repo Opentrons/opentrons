@@ -174,6 +174,7 @@ def create_gripper_step(
     duty_cycle: np.float32,
     frequency: np.float32 = np.float32(320000),
     stop_condition: MoveStopCondition = MoveStopCondition.none,
+    move_type: MoveType = MoveType.linear,
 ) -> MoveGroupStep:
     """Creates a step for gripper jaw action."""
     step: MoveGroupStep = {}
@@ -182,5 +183,6 @@ def create_gripper_step(
         pwm_frequency=frequency,
         pwm_duty_cycle=duty_cycle,
         stop_condition=stop_condition,
+        move_type=move_type,
     )
     return step

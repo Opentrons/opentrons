@@ -305,3 +305,31 @@ def test_nodeid_filter_probed_core():
     assert OT3Controller._filter_probed_core_nodes(
         set([NodeId.gantry_x, NodeId.pipette_left]), set([NodeId.gantry_y])
     ) == set([NodeId.gantry_y, NodeId.pipette_left])
+
+
+async def test_gripper_home(controller: OT3Controller, mock_move_group_run):
+    await controller.gripper_home(duration=2.0, duty_cycle=50)
+    for call in mock_move_group_run.call_args_list:
+        move_group_runner = call[0][0]
+        for move_group in move_group_runner._move_groups:
+            assert move_group  # don't pass in empty groups
+            assert len(move_group) == 1
+        # onlly homing the gripper jaw
+        assert list(move_group[0].keys()) == [NodeId.gripper_g]
+        step = move_group[0][NodeId.gripper_g]
+        assert step.stop_condition == MoveStopCondition.limit_switch
+        assert step.move_type == MoveType.home
+
+
+async def test_gripper_grip(controller: OT3Controller, mock_move_group_run):
+    await controller.gripper_move(duration=2.0, duty_cycle=50)
+    for call in mock_move_group_run.call_args_list:
+        move_group_runner = call[0][0]
+        for move_group in move_group_runner._move_groups:
+            assert move_group  # don't pass in empty groups
+            assert len(move_group) == 1
+        # onlly homing the gripper jaw
+        assert list(move_group[0].keys()) == [NodeId.gripper_g]
+        step = move_group[0][NodeId.gripper_g]
+        assert step.stop_condition == MoveStopCondition.none
+        assert step.move_type == MoveType.linear

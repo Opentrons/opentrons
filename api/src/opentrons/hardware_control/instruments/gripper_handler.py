@@ -14,7 +14,7 @@ class GripperNotAttachedError(Exception):
 
 
 class GripError(Exception):
-    """An error raised if a gripper is accessed that is not attached"""
+    """An error raised if a gripper action is blocked"""
 
     pass
 
@@ -30,7 +30,9 @@ class GripperHandler:
     def _verify_gripper(self) -> Gripper:
         gripper = self._gripper
         if not gripper:
-            raise GripperNotAttachedError
+            raise GripperNotAttachedError(
+                "Cannot perform action without gripper attached"
+            )
         return gripper
 
     def reset_gripper(self) -> None:
@@ -85,5 +87,4 @@ class GripperHandler:
         gripper = self._verify_gripper()
         if not newton:
             newton = DEFAULT_GRIP_FORCE_IN_NEWTON
-        duty_cycle = newton / gripper.force_per_duty_cycle(newton)
-        return duty_cycle
+        return gripper.duty_cycle_by_force(newton)

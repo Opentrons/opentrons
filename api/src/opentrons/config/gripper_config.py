@@ -81,7 +81,7 @@ def piecewise_force_conversion(
     function for the slope and y-intercept of a force/duty-cycle function, where each
     sub-list in the sequence contains:
 
-    :return: the force/duty-cycle value for the specified volume
+    :return: the duty-cycle value for the specified force
     """
     # pick the first item from the seq for which the target is less than
     # the bracketing element
@@ -94,7 +94,5 @@ def piecewise_force_conversion(
                 return (x[0] - newton) / m + x[1]
             else:
                 return newton * x[1] / x[0]
-
-    # Compatibility with previous implementation of search.
-    #  list(filter(lambda x: ul <= x[0], sequence))[0]
-    raise IndexError()
+    # return max duty cycle in config
+    return sequence[-1][1]

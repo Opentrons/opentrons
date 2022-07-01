@@ -28,6 +28,7 @@ from opentrons_hardware.hardware_control.motion import (
     NodeIdMotionValues,
     create_home_step,
     MoveGroup,
+    MoveType,
     MoveStopCondition,
     create_gripper_step,
 )
@@ -246,6 +247,7 @@ def create_gripper_home_group(
         frequency=np.float32(frequency),
         duty_cycle=np.float32(duty_cycle),
         stop_condition=MoveStopCondition.limit_switch,
+        move_type=MoveType.home,
     )
     move_group: MoveGroup = [step]
     return move_group

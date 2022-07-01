@@ -944,7 +944,7 @@ class OT3API(
 
     async def grip(self, duration: float, newton: float) -> None:
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(newton)
-        await self._grip(duty_cycle=dc, duration=duration)
+        await self._grip(duration=duration, duty_cycle=dc)
         self._gripper_handler.set_has_gripped(True)
         self._gripper_handler.set_ready_to_grip(False)
 
