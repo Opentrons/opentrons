@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.3...v6.0.0-alpha.4) (2022-07-01)
+
+
+### Bug Fixes
+
+* **app:** add default message for waitForResume commands ([#10965](https://github.com/Opentrons/opentrons/issues/10965)) ([b04a1eb](https://github.com/Opentrons/opentrons/commit/b04a1eba23e13f5ba3f6b606c08bafda4500a1e4)), closes [#10948](https://github.com/Opentrons/opentrons/issues/10948)
+* **app:** address design feedback initial protocols landing page  ([#10950](https://github.com/Opentrons/opentrons/issues/10950)) ([9346a8a](https://github.com/Opentrons/opentrons/commit/9346a8af2830a1d191558d2215e9feb7a696a1e5)), closes [#10907](https://github.com/Opentrons/opentrons/issues/10907)
+* **app:** fix pipette calibration modal auto closing ([#10955](https://github.com/Opentrons/opentrons/issues/10955)) ([5d775be](https://github.com/Opentrons/opentrons/commit/5d775be54088f9afbfdd300a39aeccf693a77550)), closes [#10941](https://github.com/Opentrons/opentrons/issues/10941)
+* **app:** fix ProtocolRunningContent remounting issue ([#10977](https://github.com/Opentrons/opentrons/issues/10977)) ([be8b3b5](https://github.com/Opentrons/opentrons/commit/be8b3b5a4f2121772156f0e4f0173abc8b0a9ff4)), closes [#10956](https://github.com/Opentrons/opentrons/issues/10956)
+* **app:** fix tip length calibration method selection ([#10976](https://github.com/Opentrons/opentrons/issues/10976)) ([9d4bec0](https://github.com/Opentrons/opentrons/commit/9d4bec019e449efc8d160005e198fd0e567009da)), closes [#10939](https://github.com/Opentrons/opentrons/issues/10939)
+* **app:** protocol Run Record protocolName no longer renders runId ([#10961](https://github.com/Opentrons/opentrons/issues/10961)) ([322c71c](https://github.com/Opentrons/opentrons/commit/322c71c69139c7b7acfa5f7e58a4d9840d24d278)), closes [#10899](https://github.com/Opentrons/opentrons/issues/10899) [#10658](https://github.com/Opentrons/opentrons/issues/10658)
+* **app:** see how to restore a previous sw version btn fix ([#10978](https://github.com/Opentrons/opentrons/issues/10978)) ([c20ad24](https://github.com/Opentrons/opentrons/commit/c20ad24feb1cfc54e07d633f3a3c4a9d8ef9933d)), closes [#10972](https://github.com/Opentrons/opentrons/issues/10972)
+* **app:** software update toggle logic refactor ([#10968](https://github.com/Opentrons/opentrons/issues/10968)) ([df3ab80](https://github.com/Opentrons/opentrons/commit/df3ab804f628299b728db56cd0cf5a11e2db524d)), closes [#10962](https://github.com/Opentrons/opentrons/issues/10962)
+* **app:** this PR makes <Link> from opentrons componets tabbable ([#10930](https://github.com/Opentrons/opentrons/issues/10930)) ([c7fc0f0](https://github.com/Opentrons/opentrons/commit/c7fc0f0969b8c29325a153b61ac2796dda042703))
+* **app, react-api-client:** add run creation spinner and handle errors in slideouts during run creation ([#10944](https://github.com/Opentrons/opentrons/issues/10944)) ([3002093](https://github.com/Opentrons/opentrons/commit/300209338efcd77071632d88a677ab2a68636a71))
+
+
+
+
+
 # [6.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.0...v6.0.0-alpha.3) (2022-06-28)
 
 

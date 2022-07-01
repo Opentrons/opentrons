@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.3...v6.0.0-alpha.4) (2022-07-01)
+
+
+### Bug Fixes
+
+* **app, react-api-client:** add run creation spinner and handle errors in slideouts during run creation ([#10944](https://github.com/Opentrons/opentrons/issues/10944)) ([3002093](https://github.com/Opentrons/opentrons/commit/300209338efcd77071632d88a677ab2a68636a71))
+
+
+
+
+
 # [6.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.0...v6.0.0-alpha.3) (2022-06-28)
 
 **Note:** Version bump only for package @opentrons/react-api-client
