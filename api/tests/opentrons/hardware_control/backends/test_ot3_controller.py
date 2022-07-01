@@ -250,7 +250,7 @@ async def test_get_attached_instruments(
     mock_tool_detector.return_value = ToolSummary(
         left=PipetteInformation(name=PipetteName.p1000_single, model=0, serial="hello"),
         right=None,
-        gripper=GripperInformation(model=1, serial="fake_serial"),
+        gripper=GripperInformation(model=0, serial="fake_serial"),
     )
 
     with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):

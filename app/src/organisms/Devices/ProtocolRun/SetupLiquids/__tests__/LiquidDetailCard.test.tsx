@@ -15,22 +15,25 @@ describe('LiquidDetailCard', () => {
       displayName: 'Mock Liquid',
       description: 'Mock Description',
       displayColor: '#FFF',
-      volumeByWell: { A1: 50 },
+      volumeByWell: { A1: 50, B1: 50 },
       setSelectedValue: jest.fn(),
-      selectedValue: '0',
+      selectedValue: '2',
     }
   })
 
-  it('renders liquid name, description, and volume', () => {
+  it('renders liquid name, description, total volume', () => {
     const [{ getByText, getAllByText }] = render(props)
     getByText('Mock Liquid')
     getByText('Mock Description')
-    getAllByText(nestedTextMatcher('50 µL'))
+    getAllByText(nestedTextMatcher('100 µL'))
   })
-
-  it('renders well volume information', () => {
-    const [{ getByText, getAllByText }] = render(props)
+  it('renders well volume information if selected', () => {
+    const [{ getByText, getAllByText }] = render({
+      ...props,
+      selectedValue: '0',
+    })
     getByText('A1')
+    getByText('B1')
     getAllByText(nestedTextMatcher('50 µL'))
   })
 })

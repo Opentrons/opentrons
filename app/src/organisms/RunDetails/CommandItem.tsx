@@ -110,7 +110,9 @@ export function CommandItemComponent(
 
   const isPause =
     analysisCommand?.commandType === 'pause' ||
-    runCommandSummary?.commandType === 'pause'
+    analysisCommand?.commandType === 'waitForResume' ||
+    runCommandSummary?.commandType === 'pause' ||
+    runCommandSummary?.commandType === 'waitForResume'
 
   const WRAPPER_STYLE = css`
     font-size: ${FONT_SIZE_BODY_1};

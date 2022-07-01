@@ -20,6 +20,7 @@ import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
 } from '../../../hooks'
+import { getWellFillFromLabwareId } from '../utils'
 import { SetupLiquidsMap } from '../SetupLiquidsMap'
 import { LabwareInfoOverlay } from '../../LabwareInfoOverlay'
 
@@ -41,6 +42,7 @@ jest.mock('@opentrons/shared-data', () => {
 })
 jest.mock('../../LabwareInfoOverlay')
 jest.mock('../../../hooks')
+jest.mock('../utils')
 
 const mockLabwareInfoOverlay = LabwareInfoOverlay as jest.MockedFunction<
   typeof LabwareInfoOverlay
@@ -61,26 +63,11 @@ const mockUseLabwareRenderInfoForRunById = useLabwareRenderInfoForRunById as jes
 const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById as jest.MockedFunction<
   typeof useModuleRenderInfoForProtocolById
 >
+const mockGetWellFillFromLabwareId = getWellFillFromLabwareId as jest.MockedFunction<
+  typeof getWellFillFromLabwareId
+>
 
-const MOCK_LIQUID = [
-  {
-    liquidId: '0',
-    displayName: 'mock liquid 1',
-    description: 'mock sample',
-    displayColor: '#ff4888',
-    locations: [
-      {
-        labwareName: 'Mock Labware',
-        slotName: '5',
-        volumeByWell: {
-          C1: 50,
-          C2: 50,
-        },
-        labwareId: '300_ul_tiprack_id',
-      },
-    ],
-  },
-]
+const MOCK_WELL_FILL = { C1: '#ff4888', C2: '#ff4888' }
 
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
@@ -131,7 +118,7 @@ const render = (props: React.ComponentProps<typeof SetupLiquidsMap>) => {
 describe('SetupLiquidsMap', () => {
   let props: React.ComponentProps<typeof SetupLiquidsMap>
   beforeEach(() => {
-    props = { liquids: [], runId: RUN_ID, robotName: ROBOT_NAME }
+    props = { runId: RUN_ID, robotName: ROBOT_NAME }
     when(mockInferModuleOrientationFromXCoordinate)
       .calledWith(expect.anything())
       .mockReturnValue(STUBBED_ORIENTATION_VALUE)
@@ -308,8 +295,8 @@ describe('SetupLiquidsMap', () => {
           z: MOCK_300_UL_TIPRACK_COORDS[2],
         },
       })
-
-    const [{ getByText }] = render({ ...props, liquids: MOCK_LIQUID })
+    mockGetWellFillFromLabwareId.mockReturnValue(MOCK_WELL_FILL)
+    const [{ getByText }] = render({ ...props })
     getByText('mock labware overlay with liquid')
     getByText('mock labware render with well fill')
   })

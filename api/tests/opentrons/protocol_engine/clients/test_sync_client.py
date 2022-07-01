@@ -188,6 +188,7 @@ def test_aspirate(
                 offset=WellOffset(x=0, y=0, z=1),
             ),
             volume=123.45,
+            flowRate=2.0,
         )
     )
 
@@ -227,6 +228,7 @@ def test_dispense(
                 offset=WellOffset(x=0, y=0, z=1),
             ),
             volume=10,
+            flowRate=2.0,
         )
     )
 
@@ -276,18 +278,20 @@ def test_touch_tip(
     assert result == response
 
 
-def test_pause(
+def test_wait_for_resume(
     decoy: Decoy,
     transport: AbstractSyncTransport,
     subject: SyncClient,
 ) -> None:
-    """It should execute a pause command."""
-    request = commands.PauseCreate(params=commands.PauseParams(message="hello world"))
-    response = commands.PauseResult()
+    """It should execute a wait for resume command."""
+    request = commands.WaitForResumeCreate(
+        params=commands.WaitForResumeParams(message="hello world")
+    )
+    response = commands.WaitForResumeResult()
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
-    result = subject.pause(message="hello world")
+    result = subject.wait_for_resume(message="hello world")
 
     assert result == response
 
@@ -402,6 +406,7 @@ def test_blow_out(
             labwareId="456",
             wellName="A2",
             wellLocation=WellLocation(),
+            flowRate=2.0,
         )
     )
 

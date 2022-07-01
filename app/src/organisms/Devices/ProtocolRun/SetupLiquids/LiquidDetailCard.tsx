@@ -23,8 +23,8 @@ interface LiquidDetailCardProps {
   description: string | null
   displayColor: string
   volumeByWell: { [well: string]: number }
-  setSelectedValue: React.Dispatch<React.SetStateAction<string | null>>
-  selectedValue: string | null
+  setSelectedValue: React.Dispatch<React.SetStateAction<string | undefined>>
+  selectedValue: string | undefined
 }
 
 export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
@@ -57,7 +57,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       padding={SPACING.spacing4}
       backgroundColor={COLORS.white}
       onClick={() => setSelectedValue(liquidId)}
-      maxWidth={'10.3rem'}
+      width={'10.3rem'}
       minHeight={'max-content'}
     >
       <Flex
@@ -116,6 +116,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   marginTop={SPACING.spacing3}
+                  marginRight={SPACING.spacing2}
                 >
                   {well[0]}
                 </StyledText>

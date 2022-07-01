@@ -279,14 +279,14 @@ export interface ShakeSpeedParams {
 }
 
 export interface AtomicProfileStep {
-  holdTime: number
-  temperature: number
+  holdSeconds: number
+  celsius: number
 }
 
 export interface TCProfileParams {
   moduleId: string
   profile: AtomicProfileStep[]
-  volume: number
+  blockMaxVolumeUl?: number
 }
 
 export interface ModuleOnlyParams {

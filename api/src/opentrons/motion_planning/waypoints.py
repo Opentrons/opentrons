@@ -18,7 +18,7 @@ def get_waypoints(
     dest: Point,
     *,
     max_travel_z: float,
-    min_travel_z: float = 0.0,
+    min_travel_z: float,
     move_type: MoveType = MoveType.GENERAL_ARC,
     xy_waypoints: Sequence[Tuple[float, float]] = (),
     origin_cp: Optional[CriticalPoint] = None,
@@ -41,17 +41,22 @@ def get_waypoints(
 
     :returns: A list of :py:class:`.Waypoint` locations to move through.
     """
-    # NOTE(mc, 2020-10-28): This function is currently experimental. Flipping
-    # `use_experimental_waypoint_planning` to True in
-    # `opentrons.protocols.geometry.plan_moves` causes three test failures at
-    # the time of this writing.
+    # NOTE(mm, 2022-06-22):
+    # This function is used by v6+ JSON protocols and v3+
+    # Python API protocols, but not v2 Python API protocols.
     #
-    # Eventually, it may take over for opentrons.hardware_control.util.plan_arc
+    # Flipping `use_experimental_waypoint_planning` to True to make PAPIv2 use this too
+    # causes three test failures at the time of this writing.
+    # Eventually, those may be resolved and this may take over for
+    # opentrons.hardware_control.util.plan_arc, which PAPIv2 currently uses.
     dest_waypoint = Waypoint(dest, dest_cp)
     waypoints: List[Waypoint] = []
 
     # a direct move can ignore all arc and waypoint planning
     if move_type == MoveType.DIRECT:
+        # TODO(mm, 2022-06-17): This will not raise an out-of-bounds error
+        # even if the destination is far out of bounds. A protocol can run into this by
+        # doing a direct move to bad coordinates. Should we raise in that case?
         return [dest_waypoint]
 
     # ensure destination is not out of bounds

@@ -19,6 +19,7 @@ from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_runner.json_command_translator import JsonCommandTranslator
 from opentrons.protocol_engine import (
     commands as pe_commands,
+    DeckPoint,
     DeckSlotLocation,
     PipetteName,
     WellLocation,
@@ -52,6 +53,7 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
                 volume=1.23,
+                flowRate=4.56,
                 wellName="A1",
                 wellLocation=WellLocation(
                     origin=WellOrigin.BOTTOM,
@@ -80,6 +82,7 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
                 volume=1.23,
+                flowRate=4.56,
                 wellName="A1",
                 wellLocation=WellLocation(
                     origin=WellOrigin.BOTTOM,
@@ -208,6 +211,7 @@ VALID_TEST_PARAMS = [
                     origin="bottom",
                     offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=7.89),
                 ),
+                flowRate=1.23,
             ),
         ),
         pe_commands.BlowOutCreate(
@@ -219,12 +223,71 @@ VALID_TEST_PARAMS = [
                     origin=WellOrigin.BOTTOM,
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),
+                flowRate=1.23,
             )
         ),
     ),
-    # TODO(mc, 2021-06-21): add translation tests for
-    # `delay`, `waitForResume`, and `waitForDuration`
-    # https://github.com/Opentrons/opentrons/issues/9472
+    (
+        protocol_schema_v6.Command(
+            commandType="delay",
+            params=protocol_schema_v6.Params(waitForResume=True, message="hello world"),
+        ),
+        pe_commands.WaitForResumeCreate(
+            params=pe_commands.WaitForResumeParams(message="hello world")
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="delay",
+            params=protocol_schema_v6.Params(seconds=12.34, message="hello world"),
+        ),
+        pe_commands.WaitForDurationCreate(
+            params=pe_commands.WaitForDurationParams(
+                seconds=12.34,
+                message="hello world",
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="waitForResume",
+            params=protocol_schema_v6.Params(message="hello world"),
+        ),
+        pe_commands.WaitForResumeCreate(
+            params=pe_commands.WaitForResumeParams(message="hello world")
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="waitForDuration",
+            params=protocol_schema_v6.Params(seconds=12.34, message="hello world"),
+        ),
+        pe_commands.WaitForDurationCreate(
+            params=pe_commands.WaitForDurationParams(
+                seconds=12.34,
+                message="hello world",
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="moveToCoordinates",
+            params=protocol_schema_v6.Params(
+                pipetteId="pipette-id-abc123",
+                coordinates=protocol_schema_v6.OffsetVector(x=1.1, y=2.2, z=3.3),
+                minimumZHeight=123.4,
+                forceDirect=True,
+            ),
+        ),
+        pe_commands.MoveToCoordinatesCreate(
+            params=pe_commands.MoveToCoordinatesParams(
+                pipetteId="pipette-id-abc123",
+                coordinates=DeckPoint(x=1.1, y=2.2, z=3.3),
+                minimumZHeight=123.4,
+                forceDirect=True,
+            )
+        ),
+    ),
 ]
 
 

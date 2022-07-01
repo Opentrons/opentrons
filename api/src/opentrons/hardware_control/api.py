@@ -24,7 +24,10 @@ from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
 
 from .util import use_or_initialize_loop, check_motion_bounds
-from .pipette import generate_hardware_configs, load_from_config_and_check_skip
+from .instruments.pipette import (
+    generate_hardware_configs,
+    load_from_config_and_check_skip,
+)
 from .backends import Controller, Simulator
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
@@ -48,7 +51,7 @@ from .robot_calibration import (
     RobotCalibration,
 )
 from .protocols import HardwareControlAPI
-from .instrument_handler import InstrumentHandlerProvider
+from .instruments.pipette_handler import PipetteHandlerProvider
 from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
@@ -64,7 +67,7 @@ mod_log = logging.getLogger(__name__)
 class API(
     ExecutionManagerProvider,
     RobotCalibrationProvider,
-    InstrumentHandlerProvider[top_types.Mount],
+    PipetteHandlerProvider[top_types.Mount],
     # This MUST be kept last in the inheritance list so that it is
     # deprioritized in the method resolution order; otherwise, invocations
     # of methods that are present in the protocol will call the (empty,
@@ -118,10 +121,10 @@ class API(
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock()
         self._door_state = DoorState.CLOSED
-        self._pause_manager = PauseManager(self._door_state)
+        self._pause_manager = PauseManager()
         ExecutionManagerProvider.__init__(self, isinstance(backend, Simulator))
         RobotCalibrationProvider.__init__(self)
-        InstrumentHandlerProvider.__init__(
+        PipetteHandlerProvider.__init__(
             self, {top_types.Mount.LEFT: None, top_types.Mount.RIGHT: None}
         )
 
@@ -136,11 +139,8 @@ class API(
     def _update_door_state(self, door_state: DoorState) -> None:
         mod_log.info(f"Updating the window switch status: {door_state}")
         self.door_state = door_state
-        self._pause_manager.set_door(self.door_state)
         for cb in self._callbacks:
-            hw_event = DoorStateNotification(
-                new_state=door_state, blocking=self._pause_manager.blocked_by_door
-            )
+            hw_event = DoorStateNotification(new_state=door_state)
             try:
                 cb(hw_event)
             except Exception:
@@ -488,7 +488,7 @@ class API(
         """Reset the stored state of the system."""
         self._pause_manager.reset()
         await self._execution_manager.reset()
-        await InstrumentHandlerProvider.reset(self)
+        await PipetteHandlerProvider.reset(self)
 
     # Gantry/frame (i.e. not pipette) action API
     async def home_z(self, mount: Optional[top_types.Mount] = None) -> None:
@@ -1053,7 +1053,7 @@ class API(
     def get_instrument_max_height(
         self, mount: top_types.Mount, critical_point: Optional[CriticalPoint] = None
     ) -> float:
-        return InstrumentHandlerProvider.instrument_max_height(
+        return PipetteHandlerProvider.instrument_max_height(
             self, mount, self._config.z_retract_distance, critical_point
         )
 
