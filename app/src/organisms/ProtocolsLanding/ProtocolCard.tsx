@@ -147,11 +147,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           }[analysisStatus]
         }
       </Flex>
-      <Flex
-        flex="1"
-        flexDirection={DIRECTION_COLUMN}
-        marginRight={SPACING.spacing4}
-      >
+      <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
         {analysisStatus === 'error' ? (
           <ProtocolAnalysisFailure
             protocolKey={protocolKey}
@@ -260,8 +256,8 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           <Flex
             flex="0 0 8rem"
             flexDirection={DIRECTION_COLUMN}
-            marginRight={SPACING.spacing4}
             data-testid={`ProtocolCard_date_${protocolDisplayName}`}
+            marginTop={SPACING.spacing3}
           >
             <StyledText
               as="label"
