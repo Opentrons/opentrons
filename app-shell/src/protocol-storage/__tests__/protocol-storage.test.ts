@@ -100,8 +100,7 @@ describe('protocol storage directory utilities', () => {
         errors: [
           {
             createdAt: expect.any(String),
-            detail:
-              "__mock-app-path__/protocols/fake_timestamp1.json: ENOENT: no such file or directory, open '__mock-app-path__/protocols/fake_timestamp1.json'",
+            detail: expect.any(String),
             errorType: 'UnexpectedAnalysisError',
             id: expect.any(String),
           },
