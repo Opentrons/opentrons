@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.3...v6.0.0-alpha.4) (2022-07-01)
+
+
+### Bug Fixes
+
+* **app:** address design feedback initial protocols landing page  ([#10950](https://github.com/Opentrons/opentrons/issues/10950)) ([9346a8a](https://github.com/Opentrons/opentrons/commit/9346a8af2830a1d191558d2215e9feb7a696a1e5)), closes [#10907](https://github.com/Opentrons/opentrons/issues/10907)
+* **app:** this PR makes <Link> from opentrons componets tabbable ([#10930](https://github.com/Opentrons/opentrons/issues/10930)) ([c7fc0f0](https://github.com/Opentrons/opentrons/commit/c7fc0f0969b8c29325a153b61ac2796dda042703))
+
+
+
+
+
 # [6.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.0...v6.0.0-alpha.3) (2022-06-28)
 
 
