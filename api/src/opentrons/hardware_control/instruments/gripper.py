@@ -37,6 +37,16 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         self._config = config
         self._name = self._config.name
         self._model = self._config.model
+        base_offset = Point(*self._config.base_offset_from_mount)
+        self._jaw_center_offset = (
+            Point(*self._config.jaw_center_offset_from_base) + base_offset
+        )
+        self._front_pin_offset = (
+            Point(*self._config.pin_one_offset_from_base) + base_offset
+        )
+        self._back_pin_offset = (
+            Point(*self._config.pin_two_offset_from_base) + base_offset
+        )
         self._calibration_offset = gripper_cal_offset
         self._gripper_id = gripper_id
         self._state = GripperJawState.UNHOMED
@@ -80,12 +90,15 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
 
     def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         """
-        The vector from the gripper's origin to its critical point. The
-        critical point for a pipette is the end of the nozzle if no tip is
-        attached, or the end of the tip if a tip is attached.
+        The vector from the gripper mount to the critical point, which is selectable
+        between the center of the gripper engagement volume and the calibration pins.
         """
-        # TODO: add critical point implementation
-        return Point(0, 0, 0)
+        if cp_override == CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN:
+            return self._front_pin_offset + Point(*self._calibration_offset.offset)
+        elif cp_override == CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN:
+            return self._back_pin_offset + Point(*self._calibration_offset.offset)
+        else:
+            return self._jaw_center_offset + Point(*self._calibration_offset.offset)
 
     def duty_cycle_by_force(self, newton: float) -> float:
         return gripper_config.piecewise_force_conversion(

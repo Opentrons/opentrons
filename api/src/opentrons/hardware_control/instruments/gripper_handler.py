@@ -62,10 +62,10 @@ class GripperHandler:
         self._gripper = gripper
 
     def get_critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
-        if not self._gripper:
-            return Point(0, 0, 0)
-        else:
+        if self._gripper and cp_override != CriticalPoint.MOUNT:
             return self._gripper.critical_point(cp_override)
+        else:
+            return Point(0, 0, 0)
 
     def get_gripper_dict(self) -> Optional[GripperDict]:
         if not self._gripper:
