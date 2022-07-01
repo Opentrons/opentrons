@@ -12,7 +12,6 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
-  TEXT_DECORATION_UNDERLINE,
   useHoverTooltip,
   TOOLTIP_LEFT,
   Mount,
@@ -447,6 +446,47 @@ export function RobotSettingsCalibration({
     }
   }
 
+  const DeckCalibrationBanner = (): JSX.Element | null => {
+    const currentDeckStatus = checkDeckCalibrationStatus()
+    return (
+      <>
+        {!pipettePresent
+          ? currentDeckStatus === 'error' && (
+              <Banner marginTop={SPACING.spacing5} type="error">
+                <StyledText>
+                  {t('deck_calibration_missing_no_pipette')}
+                </StyledText>
+              </Banner>
+            )
+          : currentDeckStatus != null && (
+              <Banner
+                marginTop={SPACING.spacing5}
+                type={currentDeckStatus === 'error' ? 'error' : 'warning'}
+              >
+                <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+                  <StyledText as="p">
+                    {currentDeckStatus === 'error'
+                      ? t('deck_calibration_missing')
+                      : t('deck_calibration_recommended')}
+                  </StyledText>
+                  <Link
+                    role="button"
+                    color={COLORS.darkBlack}
+                    css={TYPOGRAPHY.pRegular}
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                    onClick={() => handleClickDeckCalibration()}
+                  >
+                    {currentDeckStatus === 'error'
+                      ? t('calibrate_now')
+                      : t('recalibrate_now')}
+                  </Link>
+                </Flex>
+              </Banner>
+            )}
+      </>
+    )
+  }
+
   React.useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
@@ -557,36 +597,7 @@ export function RobotSettingsCalibration({
       </Box>
       <Line />
       {/* DeckCalibration Section */}
-      {!pipettePresent && checkDeckCalibrationStatus() === 'error' && (
-        <Banner marginTop={SPACING.spacing5} type="error">
-          <StyledText>{t('deck_calibration_missing_no_pipette')}</StyledText>
-        </Banner>
-      )}
-      {pipettePresent && checkDeckCalibrationStatus() !== null && (
-        <Banner
-          marginTop={SPACING.spacing5}
-          type={checkDeckCalibrationStatus() === 'error' ? 'error' : 'warning'}
-        >
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-            <StyledText as="p">
-              {checkDeckCalibrationStatus() === 'error'
-                ? t('deck_calibration_missing')
-                : t('deck_calibration_recommended')}
-            </StyledText>
-            <Link
-              role="button"
-              color={COLORS.darkBlack}
-              css={TYPOGRAPHY.pRegular}
-              textDecoration={TEXT_DECORATION_UNDERLINE}
-              onClick={() => handleClickDeckCalibration()}
-            >
-              {checkDeckCalibrationStatus() === 'error'
-                ? t('calibrate_now')
-                : t('recalibrate_now')}
-            </Link>
-          </Flex>
-        </Banner>
-      )}
+      <DeckCalibrationBanner />
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>

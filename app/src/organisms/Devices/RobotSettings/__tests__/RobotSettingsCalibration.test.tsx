@@ -238,7 +238,7 @@ describe('RobotSettingsCalibration', () => {
     mockUseAttachedPipettes.mockReturnValue(mockEmptyAttachedPipettes)
     const [{ getByText }] = render()
     getByText(
-      'Deck calibration missing. Attach a pipette to perform Deck calibration.'
+      'Deck calibration missing. Attach a pipette to perform deck calibration.'
     )
   })
 
