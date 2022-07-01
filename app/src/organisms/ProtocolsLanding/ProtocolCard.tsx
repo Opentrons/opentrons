@@ -176,6 +176,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               >
                 <StyledText
                   as="h6"
+                  marginTop={SPACING.spacing3}
                   marginBottom={SPACING.spacing2}
                   color={COLORS.darkGreyEnabled}
                 >
@@ -204,6 +205,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               >
                 <StyledText
                   as="h6"
+                  marginTop={SPACING.spacing3}
                   marginBottom={SPACING.spacing2}
                   color={COLORS.darkGreyEnabled}
                 >
@@ -233,8 +235,9 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                   <>
                     <StyledText
                       as="h6"
-                      color={COLORS.darkGreyEnabled}
+                      marginTop={SPACING.spacing3}
                       marginBottom={SPACING.spacing2}
+                      color={COLORS.darkGreyEnabled}
                     >
                       {t('modules')}
                     </StyledText>
