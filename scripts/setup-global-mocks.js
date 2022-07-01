@@ -10,7 +10,7 @@ jest.mock('electron-store')
 jest.mock('../components/src/hardware-sim/Deck/getDeckDefinitions')
 
 jest.mock('../app/src/assets/labware/getLabware')
-jest.mock('../app/src/organisms/Labware/helpers/getAllDefs')
+jest.mock('../app/src/pages/Labware/helpers/getAllDefs')
 jest.mock('../app/src/logger')
 jest.mock('../app/src/App/portal')
 jest.mock('../app/src/redux/shell/remote')

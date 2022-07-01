@@ -4,10 +4,10 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { AttachAdapter } from '../AttachAdapter'
-import { useLatchControls } from '../../ModuleCard/hooks'
+import { useLatchControls } from '../../../ModuleCard/hooks'
 import type { HeaterShakerModule } from '../../../../redux/modules/types'
 
-jest.mock('../../ModuleCard/hooks')
+jest.mock('../../../ModuleCard/hooks')
 
 const mockUseLatchControls = useLatchControls as jest.MockedFunction<
   typeof useLatchControls

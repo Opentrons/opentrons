@@ -102,7 +102,13 @@ describe('EditModulesCard', () => {
 
     const wrapper = render(props)
 
-    expect(wrapper.find(CrashInfoBox)).toHaveLength(0)
+    expect(wrapper.find(CrashInfoBox).props()).toEqual({
+      showHeaterShakerLabwareCollisions: false,
+      showHeaterShakerModuleCollisions: false,
+      showHeaterShakerPipetteCollisions: false,
+      showMagPipetteCollisons: false,
+      showTempPipetteCollisons: undefined,
+    })
   })
 
   it('displays crash warning info box when crashable pipette is used with module with collision issue and restrictions are not disabled', () => {
@@ -129,7 +135,13 @@ describe('EditModulesCard', () => {
 
     const wrapper = render(props)
 
-    expect(wrapper.find(CrashInfoBox)).toHaveLength(0)
+    expect(wrapper.find(CrashInfoBox).props()).toEqual({
+      showHeaterShakerLabwareCollisions: false,
+      showHeaterShakerModuleCollisions: false,
+      showHeaterShakerPipetteCollisions: false,
+      showMagPipetteCollisons: false,
+      showTempPipetteCollisons: false,
+    })
   })
 
   it('displays crash info text only for the module with issue', () => {
@@ -152,8 +164,11 @@ describe('EditModulesCard', () => {
     const wrapper = render(props)
 
     expect(wrapper.find(CrashInfoBox).props()).toEqual({
-      magnetOnDeck: false,
-      temperatureOnDeck: true,
+      showTempPipetteCollisons: true,
+      showHeaterShakerLabwareCollisions: false,
+      showHeaterShakerModuleCollisions: false,
+      showHeaterShakerPipetteCollisions: false,
+      showMagPipetteCollisons: false,
     })
   })
 

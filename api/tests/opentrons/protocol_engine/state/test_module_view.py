@@ -37,7 +37,6 @@ def make_module_view(
     slot_by_module_id: Optional[Dict[str, Optional[DeckSlotName]]] = None,
     hardware_by_module_id: Optional[Dict[str, HardwareModule]] = None,
     substate_by_module_id: Optional[Dict[str, ModuleSubStateType]] = None,
-    virtualize_modules: bool = False,
 ) -> ModuleView:
     """Get a module view test subject with the specified state."""
     state = ModuleState(
@@ -46,7 +45,7 @@ def make_module_view(
         substate_by_module_id=substate_by_module_id or {},
     )
 
-    return ModuleView(state=state, virtualize_modules=virtualize_modules)
+    return ModuleView(state=state)
 
 
 def get_sample_parent_module_view(

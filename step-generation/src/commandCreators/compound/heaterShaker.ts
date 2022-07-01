@@ -7,6 +7,7 @@ import {
   HeaterShakerModuleState,
 } from '../../types'
 import { getModuleState } from '../../robotStateSelectors'
+import { delay } from '../atomic/delay'
 import { heaterShakerOpenLatch } from '../atomic/heaterShakerOpenLatch'
 import { heaterShakerCloseLatch } from '../atomic/heaterShakerCloseLatch'
 import { heaterShakerDeactivateHeater } from '../atomic/heaterShakerDeactivateHeater'
@@ -83,6 +84,33 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
         moduleId: args.module,
         commandCreatorFnName: 'setShakeSpeed',
         rpm: args.rpm,
+      })
+    )
+  }
+
+  if (
+    (args.timerMinutes != null && args.timerMinutes !== 0) ||
+    (args.timerSeconds != null && args.timerSeconds !== 0)
+  ) {
+    const totalSeconds =
+      (args.timerSeconds ?? 0) + (args.timerMinutes ?? 0) * 60
+    commandCreators.push(
+      curryCommandCreator(delay, {
+        commandCreatorFnName: 'delay',
+        description: null,
+        name: null,
+        meta: null,
+        wait: totalSeconds,
+      })
+    )
+    commandCreators.push(
+      curryCommandCreator(heaterShakerStopShake, {
+        moduleId: args.module,
+      })
+    )
+    commandCreators.push(
+      curryCommandCreator(heaterShakerDeactivateHeater, {
+        moduleId: args.module,
       })
     )
   }

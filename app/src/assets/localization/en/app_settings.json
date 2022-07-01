@@ -77,7 +77,6 @@
   "clear_robots_button": "Clear unavailable robots list",
   "enable_dev_tools": "Enable Developer Tools",
   "enable_dev_tools_description": "Open Developer Tools on app launch, enable additional logging, and allow access to feature flags.",
-  "__dev_internal__hierarchyReorganization": "revert to legacy hierarchy organization",
   "__dev_internal__allPipetteConfig": "All Pipette Config",
   "__dev_internal__enableBundleUpload": "Enable Bundle Upload",
   "__dev_internal__enableLiquidSetup": "Enable Liquid Setup",

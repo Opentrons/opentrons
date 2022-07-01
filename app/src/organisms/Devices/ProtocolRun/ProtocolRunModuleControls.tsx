@@ -6,12 +6,12 @@ import {
   SPACING,
   WRAP,
 } from '@opentrons/components'
-import { useCreateCommandMutation } from '@opentrons/react-api-client'
+import { ModuleCard } from '../../ModuleCard'
 import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
 } from '../hooks'
-import { ModuleCard } from '../ModuleCard'
+import { useCreateCommandMutation } from '@opentrons/react-api-client'
 
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { RunTimeCommand } from '@opentrons/shared-data'

@@ -2,6 +2,10 @@ import * as React from 'react'
 import map from 'lodash/map'
 import isEmpty from 'lodash/isEmpty'
 import {
+  parseLiquidsInLoadOrder,
+  parseLabwareInfoByLiquidId,
+} from '@opentrons/api-client'
+import {
   DIRECTION_COLUMN,
   Flex,
   RobotWorkSpace,
@@ -18,8 +22,9 @@ import {
   useModuleRenderInfoForProtocolById,
 } from '../../hooks'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
+import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
+import { getWellFillFromLabwareId } from './utils'
 import type { DeckDefinition } from '@opentrons/shared-data'
-import type { Liquid } from './getMockLiquidData'
 
 const DECK_MAP_VIEWBOX = '-80 -40 550 500'
 const DECK_LAYER_BLOCKLIST = [
@@ -35,18 +40,22 @@ const DECK_LAYER_BLOCKLIST = [
 interface SetupLiquidsMapProps {
   runId: string
   robotName: string
-  liquids: Liquid[]
 }
 
 export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
-  const { runId, robotName, liquids } = props
+  const { runId, robotName } = props
+  const [hoverLabwareId, setHoverLabwareId] = React.useState('')
+
   const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
     robotName,
     runId
   )
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
-
-  const [hoverLabwareId, setHoverLabwareId] = React.useState('')
+  const liquids = parseLiquidsInLoadOrder()
+  const labwareByLiquidId = parseLabwareInfoByLiquidId()
+  const [liquidDetailsLabwareId, setLiquidDetailsLabwareId] = React.useState<
+    string | null
+  >(null)
 
   return (
     <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
@@ -99,20 +108,11 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
             {map(
               labwareRenderInfoById,
               ({ x, y, labwareDef, displayName }, labwareId) => {
-                let wellFill = {}
-                liquids.forEach(liquid => {
-                  liquid.locations.forEach(location => {
-                    if (location.labwareId === labwareId) {
-                      const liquidWellFill: {
-                        [well: string]: number | string
-                      } = { ...location.volumeByWell }
-                      Object.keys(liquidWellFill).forEach(key => {
-                        liquidWellFill[key] = liquid?.displayColor
-                      })
-                      wellFill = { ...wellFill, ...liquidWellFill }
-                    }
-                  })
-                })
+                const wellFill = getWellFillFromLabwareId(
+                  labwareId,
+                  liquids,
+                  labwareByLiquidId
+                )
                 const labwareHasLiquid = !isEmpty(wellFill)
                 return (
                   <React.Fragment
@@ -122,6 +122,12 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                       transform={`translate(${x},${y})`}
                       onMouseEnter={() => setHoverLabwareId(labwareId)}
                       onMouseLeave={() => setHoverLabwareId('')}
+                      onClick={() =>
+                        labwareHasLiquid
+                          ? setLiquidDetailsLabwareId(labwareId)
+                          : null
+                      }
+                      cursor={labwareHasLiquid ? 'pointer' : ''}
                     >
                       <LabwareRender
                         definition={labwareDef}
@@ -144,6 +150,13 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
           </>
         )}
       </RobotWorkSpace>
+      {liquidDetailsLabwareId != null && (
+        <LiquidsLabwareDetailsModal
+          labwareId={liquidDetailsLabwareId}
+          runId={runId}
+          closeModal={() => setLiquidDetailsLabwareId(null)}
+        />
+      )}
     </Flex>
   )
 }

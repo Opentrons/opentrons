@@ -4,6 +4,7 @@ from typing import Optional, AsyncIterator
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from contextlib import asynccontextmanager
 from opentrons_hardware.firmware_bindings.constants import (
+    SensorId,
     SensorType,
     NodeId,
     SensorThresholdMode,
@@ -22,6 +23,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorOutputBindingField,
     SensorTypeField,
+    SensorIdField,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BindSensorOutputRequest,
@@ -35,12 +37,15 @@ class PressureSensor(AbstractAdvancedSensor):
 
     def __init__(
         self,
+        sensor_id: SensorId = SensorId.S0,
         zero_threshold: float = 0.0,
         stop_threshold: float = 0.0,
         offset: float = 0.0,
     ) -> None:
         """Constructor."""
-        super().__init__(zero_threshold, stop_threshold, offset, SensorType.pressure)
+        super().__init__(
+            zero_threshold, stop_threshold, offset, SensorType.pressure, sensor_id
+        )
 
     async def get_report(
         self,
@@ -64,7 +69,9 @@ class PressureSensor(AbstractAdvancedSensor):
         timeout: int = 1,
     ) -> Optional[SensorDataType]:
         """Poll the pressure sensor."""
-        poll = PollSensorInformation(self._sensor_type, node_id, poll_for_ms)
+        poll = PollSensorInformation(
+            self._sensor_type, self._sensor_id, node_id, poll_for_ms
+        )
         return await self._scheduler.run_poll(poll, can_messenger, timeout)
 
     async def poll_temperature(
@@ -76,7 +83,7 @@ class PressureSensor(AbstractAdvancedSensor):
     ) -> Optional[SensorDataType]:
         """Poll the pressure sensor."""
         poll = PollSensorInformation(
-            SensorType.pressure_temperature, node_id, poll_for_ms
+            SensorType.pressure_temperature, self._sensor_id, node_id, poll_for_ms
         )
         return await self._scheduler.run_poll(poll, can_messenger, timeout)
 
@@ -88,7 +95,9 @@ class PressureSensor(AbstractAdvancedSensor):
         timeout: int = 1,
     ) -> Optional[SensorDataType]:
         """Poll the read sensor."""
-        read = ReadSensorInformation(self._sensor_type, node_id, offset)
+        read = ReadSensorInformation(
+            self._sensor_type, self._sensor_id, node_id, offset
+        )
         return await self._scheduler.send_read(read, can_messenger, timeout)
 
     async def read_temperature(
@@ -99,7 +108,9 @@ class PressureSensor(AbstractAdvancedSensor):
         timeout: int = 1,
     ) -> Optional[SensorDataType]:
         """Poll the read sensor."""
-        read = ReadSensorInformation(SensorType.pressure_temperature, node_id, offset)
+        read = ReadSensorInformation(
+            SensorType.pressure_temperature, self._sensor_id, node_id, offset
+        )
         return await self._scheduler.send_read(read, can_messenger, timeout)
 
     async def write(
@@ -109,7 +120,9 @@ class PressureSensor(AbstractAdvancedSensor):
         data: SensorDataType,
     ) -> None:
         """Write to a register of the pressure sensor."""
-        write = WriteSensorInformation(self._sensor_type, node_id, data)
+        write = WriteSensorInformation(
+            self._sensor_type, self._sensor_id, node_id, data
+        )
         await self._scheduler.send_write(write, can_messenger)
 
     async def send_zero_threshold(
@@ -121,7 +134,11 @@ class PressureSensor(AbstractAdvancedSensor):
     ) -> Optional[SensorDataType]:
         """Send the zero threshold which the offset value is compared to."""
         write = SensorThresholdInformation(
-            self._sensor_type, node_id, threshold, SensorThresholdMode.absolute
+            self._sensor_type,
+            self._sensor_id,
+            node_id,
+            threshold,
+            SensorThresholdMode.absolute,
         )
         threshold_data = await self._scheduler.send_threshold(
             write, can_messenger, timeout
@@ -144,6 +161,7 @@ class PressureSensor(AbstractAdvancedSensor):
                 message=BindSensorOutputRequest(
                     payload=BindSensorOutputRequestPayload(
                         sensor=SensorTypeField(self._sensor_type),
+                        sensor_id=SensorIdField(self._sensor_id),
                         binding=SensorOutputBindingField(binding),
                     )
                 ),
@@ -155,6 +173,7 @@ class PressureSensor(AbstractAdvancedSensor):
                 message=BindSensorOutputRequest(
                     payload=BindSensorOutputRequestPayload(
                         sensor=SensorTypeField(self._sensor_type),
+                        sensor_id=SensorIdField(self._sensor_id),
                         binding=SensorOutputBindingField(SensorOutputBinding.none),
                     )
                 ),
@@ -168,5 +187,5 @@ class PressureSensor(AbstractAdvancedSensor):
     ) -> bool:
         """Send a PeripheralStatusRequest and read the response message."""
         return await self._scheduler.request_peripheral_status(
-            self._sensor_type, node_id, can_messenger, timeout
+            self._sensor_type, self._sensor_id, node_id, can_messenger, timeout
         )
