@@ -86,7 +86,7 @@ $(wheel_file): setup.py $(py_sources) $(json_sources)
 	$(SHX) ls $(BUILD_DIR)
 
 
-$(sdist_file): setup.py $(py_sources)
+$(sdist_file): setup.py $(py_sources) $(json_sources)
 	$(SHX) mkdir -p build
 	$(python) setup.py sdist
 	$(SHX) ls $(BUILD_DIR)
