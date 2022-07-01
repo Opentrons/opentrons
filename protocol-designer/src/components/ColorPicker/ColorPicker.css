@@ -1,7 +1,7 @@
 .swatch {
   display: inline-block;
   cursor: pointer;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.41);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.41);
 }
 
 .color {
@@ -19,7 +19,7 @@
 .cover {
   position: fixed;
   top: 10px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
