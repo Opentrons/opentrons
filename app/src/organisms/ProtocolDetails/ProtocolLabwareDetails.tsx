@@ -61,7 +61,6 @@ export const ProtocolLabwareDetails = (
         <StyledText
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkBlack}
           marginBottom={SPACING.spacing3}
           data-testid={'ProtocolLabwareDetails_labware_name'}
           width="66%"
@@ -71,7 +70,6 @@ export const ProtocolLabwareDetails = (
         <StyledText
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkBlack}
           data-testid={'ProtocolLabwareDetails_quantity'}
         >
           {t('quantity')}
@@ -131,17 +129,11 @@ export const ProtocolLabwareDetailItem = (
           ) : (
             <Flex marginLeft={SPACING.spacingM} />
           )}
-          <StyledText
-            as="p"
-            color={COLORS.darkBlack}
-            paddingRight={SPACING.spacing6}
-          >
+          <StyledText as="p" paddingRight={SPACING.spacing6}>
             {displayName}
           </StyledText>
         </Flex>
-        <StyledText as="p" color={COLORS.darkBlack}>
-          {quantity}
-        </StyledText>
+        <StyledText as="p">{quantity}</StyledText>
         <LabwareDetailOverflowMenu labware={labware} />
       </Flex>
     </>

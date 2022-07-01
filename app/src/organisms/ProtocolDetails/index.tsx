@@ -96,7 +96,7 @@ const currentTabStyle = css`
 const GRID_STYLE = css`
   display: grid;
   width: 100%;
-  grid-template-columns: 26.6% 26.6% 26.6% 20%;
+  grid-template-columns: 26.6% 26.6% 26.6% 20.2%;
 `
 interface RoundTabProps extends React.ComponentProps<typeof Btn> {
   isCurrent: boolean
