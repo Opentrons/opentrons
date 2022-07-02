@@ -18,14 +18,16 @@ import { StyledText } from '../../atoms/text'
 import { UploadInput } from '../../molecules/UploadInput'
 import type { Dispatch } from '../../redux/types'
 
-export interface AddCustomLabwareProps {
+export interface AddCustomLabwareSlideoutProps {
   isExpanded: boolean
   onCloseClick: () => void
   onSuccess: () => void
   onFailure: () => void
 }
 
-export function AddCustomLabware(props: AddCustomLabwareProps): JSX.Element {
+export function AddCustomLabwareSlideout(
+  props: AddCustomLabwareSlideoutProps
+): JSX.Element {
   const { t } = useTranslation(['labware_landing', 'shared'])
   const dispatch = useDispatch<Dispatch>()
 
