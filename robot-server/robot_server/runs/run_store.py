@@ -12,7 +12,7 @@ from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import StateSummary, CommandSlice
 from opentrons.protocol_engine.commands import Command
 
-from robot_server.persistence import run_table, action_table, ensure_utc_datetime
+from robot_server.persistence import run_table, action_table
 from robot_server.protocols import ProtocolNotFoundError
 
 from .action_models import RunAction, RunActionType
@@ -385,7 +385,7 @@ def _convert_row_to_run(
 ) -> RunResource:
     run_id = row.id
     protocol_id = row.protocol_id
-    created_at = ensure_utc_datetime(row.created_at)
+    created_at = row.created_at
 
     assert isinstance(run_id, str), f"Run ID {run_id} is not a string"
     assert protocol_id is None or isinstance(
@@ -399,7 +399,7 @@ def _convert_row_to_run(
         actions=[
             RunAction(
                 id=action_row.id,
-                createdAt=ensure_utc_datetime(action_row.created_at),
+                createdAt=action_row.created_at,
                 actionType=RunActionType(action_row.action_type),
             )
             for action_row in action_rows
@@ -410,7 +410,7 @@ def _convert_row_to_run(
 def _convert_run_to_sql_values(run: RunResource) -> Dict[str, object]:
     return {
         "id": run.run_id,
-        "created_at": ensure_utc_datetime(run.created_at),
+        "created_at": run.created_at,
         "protocol_id": run.protocol_id,
     }
 
@@ -418,7 +418,7 @@ def _convert_run_to_sql_values(run: RunResource) -> Dict[str, object]:
 def _convert_action_to_sql_values(action: RunAction, run_id: str) -> Dict[str, object]:
     return {
         "id": action.id,
-        "created_at": ensure_utc_datetime(action.createdAt),
+        "created_at": action.createdAt,
         "action_type": action.actionType.value,
         "run_id": run_id,
     }
