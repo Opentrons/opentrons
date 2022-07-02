@@ -2,6 +2,7 @@
 
 import path from 'path'
 import fs from 'fs-extra'
+import tempy from 'tempy'
 
 import { PROTOCOLS_DIRECTORY_NAME } from '../file-system'
 import {
@@ -12,14 +13,20 @@ import {
 
 describe('protocol storage directory utilities', () => {
   let protocolsDir: string
+  let mockAnalysisFilePath: string
   let mockDispatch: () => void
+
   beforeEach(() => {
+    mockAnalysisFilePath = tempy.file({ extension: 'json' })
     protocolsDir = path.join('__mock-app-path__', PROTOCOLS_DIRECTORY_NAME)
     mockDispatch = jest.fn()
   })
 
   afterEach(() => {
-    fs.remove(protocolsDir)
+    return Promise.all([
+      fs.rmdir(protocolsDir, { recursive: true }),
+      fs.rm(mockAnalysisFilePath, { force: true }),
+    ])
   })
   afterAll(() => {
     jest.resetAllMocks()
@@ -77,23 +84,17 @@ describe('protocol storage directory utilities', () => {
   describe('getParsedAnalysis', () => {
     it('parses json if available', () => {
       return fs
-        .writeJson(path.join(protocolsDir, 'fake_timestamp0.json'), {
+        .writeJson(mockAnalysisFilePath, {
           someKey: 1,
         })
         .then(() => {
-          expect(
-            getParsedAnalysisFromPath(
-              path.join(protocolsDir, 'fake_timestamp0.json')
-            )
-          ).toEqual({ someKey: 1 })
+          expect(getParsedAnalysisFromPath(mockAnalysisFilePath)).toEqual({
+            someKey: 1,
+          })
         })
     })
     it('returns failed analysis if parsing error', () => {
-      expect(
-        getParsedAnalysisFromPath(
-          path.join(protocolsDir, 'fake_timestamp1.json')
-        )
-      ).toEqual({
+      expect(getParsedAnalysisFromPath('non-existent-path.json')).toEqual({
         commands: [],
         config: {},
         createdAt: expect.any(String),
@@ -113,21 +114,15 @@ describe('protocol storage directory utilities', () => {
 
   describe('getUnixTimeFromAnalysisPath', () => {
     it('parses unix time from analysis file path is parsable', () => {
-      return fs
-        .writeJson(path.join(protocolsDir, '12345.json'), {
-          someKey: 1,
-        })
-        .then(() => {
-          expect(
-            getUnixTimeFromAnalysisPath(path.join(protocolsDir, '12345.json'))
-          ).toEqual(12345)
-        })
+      return fs.createFile(path.join(protocolsDir, '12345.json')).then(() => {
+        expect(
+          getUnixTimeFromAnalysisPath(path.join(protocolsDir, '12345.json'))
+        ).toEqual(12345)
+      })
     })
     it('returns Nan if from analysis file path is not parsable', () => {
       return fs
-        .writeJson(path.join(protocolsDir, 'not_a_number.json'), {
-          someKey: 1,
-        })
+        .createFile(path.join(protocolsDir, 'not_a_number.json'))
         .then(() => {
           expect(
             getUnixTimeFromAnalysisPath(
