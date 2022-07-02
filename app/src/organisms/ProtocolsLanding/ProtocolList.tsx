@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
   Box,
@@ -29,6 +30,17 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { ProtocolSort } from './hooks'
+
+const SORT_BY_STYLE = css`
+  background-color: ${COLORS.transparent};
+  &:hover {
+    background-color: ${COLORS.medGreyHover};
+  }
+  &:active,
+  &:focus {
+    background-color: ${COLORS.medGrey};
+  }
+`
 
 interface ProtocolListProps {
   storedProtocols: StoredProtocolData[]
@@ -103,13 +115,12 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
-              backgroundColor={COLORS.medGrey}
               borderRadius={BORDERS.radiusSoftCorners}
               marginLeft={SPACING.spacing3}
+              css={SORT_BY_STYLE}
             >
               <StyledText
                 as="p"
-                // color={COLORS.darkGreyEnabled}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 paddingLeft={SPACING.spacing3}
                 paddingRight={SPACING.spacing2}
