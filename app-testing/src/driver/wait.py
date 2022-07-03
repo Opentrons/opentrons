@@ -12,7 +12,7 @@ def wait_until(
     somepredicate: Func,
     timeout_sec: float,
     period_sec: float = 0.25,
-    **kwargs: Optional[int]
+    **kwargs: Optional[int],
 ) -> bool:
     """Wait until some function returns True or timeout."""
     mustend = time.time() + timeout_sec

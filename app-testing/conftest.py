@@ -1,15 +1,14 @@
-"""For pytest."""
-import logging
+"""Pytest setup."""
 import os
 from pathlib import Path
 from typing import Dict, List
+
 import pytest
-from _pytest.config.argparsing import Parser
-from dotenv import load_dotenv, find_dotenv
-from rich.console import Console
+from dotenv import find_dotenv, load_dotenv
 from rich import pretty, traceback
+from rich.console import Console
 from selenium.webdriver.chrome.options import Options
-from src.resources.ot_robot5dot1 import OtRobot
+
 from src.resources.robot_data import ROBOT_MAPPING, RobotDataType
 
 collect_ignore_glob = ["files/**/*.py"]
@@ -25,7 +24,7 @@ if find_dotenv():
 
 
 def _chrome_options() -> Options:
-    """Standard Chrome options."""
+    """Chrome options for setup."""
     options = Options()
     executable_path = os.getenv("EXECUTABLE_PATH")
     assert (
@@ -93,13 +92,15 @@ def test_labwares() -> Dict[str, Path]:
 
 @pytest.fixture(scope="session")
 def console() -> Console:
+    """Rich console for output."""
     return _console
 
 
 @pytest.fixture(scope="session")
 def robots() -> List[RobotDataType]:
+    """Robot data."""
     # read from .env for what robots to load for a test
-    robots = os.getenv("ROBOTS").lower().split(",")
+    robots = os.getenv("ROBOTS", "dev").lower().split(",")
     result = []
     for robot in robots:
         robot_type = ROBOT_MAPPING[robot]

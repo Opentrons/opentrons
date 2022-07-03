@@ -1,688 +1,689 @@
 """Model for the screen of Labware Position Check."""
-import logging
-from typing import Optional, Tuple
+
+from typing import Optional
+
+from rich.console import Console
 from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
 
-from src.driver.highlight import highlight
-
-logger = logging.getLogger(__name__)
+from src.driver.base import Base, Element
 
 
 class LabwarePositionCheck:
     """Class for Labware Position Check."""
 
-    def __init__(self, driver: WebDriver) -> None:
+    def __init__(self, driver: WebDriver, console: Console, execution_id: str) -> None:
         """Initialize with driver."""
-        self.driver: WebDriver = driver
+        self.base: Base = Base(driver, console, execution_id)
+        self.console: Console = console
 
-    labware_setup_position_check_button: Tuple[str, str] = (
-        By.ID,
-        "LabwareSetup_checkLabwarePositionsButton",
-    )
-
-    introScreen_labware_position_check_overview: Tuple[str, str] = (
-        By.ID,
-        "IntroScreen_labware_position_check_overview",
-    )
-
-    begin_labware_position_text_locator: Tuple[str, str] = (
-        By.XPATH,
-        "//button[text()='begin labware position check, move to Slot 4']",
+    labware_setup_position_check_button: Element = Element(
+        (
+            By.ID,
+            "LabwareSetup_checkLabwarePositionsButton",
+        ),
+        "",
     )
 
-    how_to_tell_pipette_is_centered_link: Tuple[str, str] = (
-        By.ID,
-        "StepDetailText_link",
+    introScreen_labware_position_check_overview: Element = Element(
+        (
+            By.ID,
+            "IntroScreen_labware_position_check_overview",
+        ),
+        "",
     )
 
-    reveal_all_jog_controls: Tuple[str, str] = (
-        By.ID,
-        "LabwarePositionCheckStepDetail_reveal_jog_controls",
+    begin_labware_position_text_locator: Element = Element(
+        (
+            By.XPATH,
+            "//button[text()='begin labware position check, move to Slot 2']",
+        ),
+        "",
     )
 
-    back_jog_button: Tuple[str, str] = (
-        By.XPATH,
-        "//button[@title='back']",
-    )
-    left_jog_button: Tuple[str, str] = (
-        By.XPATH,
-        "//button[@title='left']",
-    )
-    right_jog_button: Tuple[str, str] = (
-        By.XPATH,
-        "//button[@title='right']",
-    )
-    forward_jog_button: Tuple[str, str] = (
-        By.XPATH,
-        "//button[@title='forward']",
-    )
-    up_jog_button: Tuple[str, str] = (
-        By.XPATH,
-        "//button[@title='up']",
-    )
-    down_jog_button: Tuple[str, str] = (
-        By.XPATH,
-        "//button[@title='down']",
+    how_to_tell_pipette_is_centered_link: Element = Element(
+        (
+            By.ID,
+            "StepDetailText_link",
+        ),
+        "",
     )
 
-    confirm_position_button_pickup_tip: Tuple[str, str] = (
-        By.XPATH,
-        "//button[text()='Confirm position, pick up tip']",
+    reveal_all_jog_controls: Element = Element(
+        (
+            By.ID,
+            "LabwarePositionCheckStepDetail_reveal_jog_controls",
+        ),
+        "",
     )
 
-    confirm_position_moveto_slot_2: Tuple[str, str] = (
-        By.XPATH,
-        "//button[text()='Confirm position, move to slot 2']",
+    back_jog_button: Element = Element(
+        (
+            By.XPATH,
+            "//button[@title='back']",
+        ),
+        "",
+    )
+    left_jog_button: Element = Element(
+        (
+            By.XPATH,
+            "//button[@title='left']",
+        ),
+        "",
+    )
+    right_jog_button: Element = Element(
+        (
+            By.XPATH,
+            "//button[@title='right']",
+        ),
+        "",
+    )
+    forward_jog_button: Element = Element(
+        (
+            By.XPATH,
+            "//button[@title='forward']",
+        ),
+        "",
+    )
+    up_jog_button: Element = Element(
+        (
+            By.XPATH,
+            "//button[@title='up']",
+        ),
+        "",
+    )
+    down_jog_button: Element = Element(
+        (
+            By.XPATH,
+            "//button[@title='down']",
+        ),
+        "",
     )
 
-    confirm_position_moveto_slot_5: Tuple[str, str] = (
-        By.XPATH,
-        "//button[text()='Confirm position, move to slot 5']",
+    confirm_position_button_pickup_tip: Element = Element(
+        (
+            By.XPATH,
+            "//button[text()='Confirm position, pick up tip']",
+        ),
+        "",
     )
 
-    confirm_position_moveto_slot_6: Tuple[str, str] = (
-        By.XPATH,
-        "//button[text()='Confirm position, move to slot 6']",
+    confirm_position_moveto_slot_2: Element = Element(
+        (
+            By.XPATH,
+            "//button[text()='Confirm position, move to slot 2']",
+        ),
+        "",
     )
 
-    confirm_position_returntip_slot_home: Tuple[str, str] = (
-        By.XPATH,
-        "//button[text()='Confirm position, return tip to Slot  and home']",
+    confirm_position_moveto_slot_5: Element = Element(
+        (
+            By.XPATH,
+            "//button[text()='Confirm position, move to slot 5']",
+        ),
+        "",
     )
 
-    labware_position_check_complete: Tuple[str, str] = (
-        By.XPATH,
-        "//h3[text()='Labware Position Check Complete']",
+    confirm_position_moveto_slot_6: Element = Element(
+        (
+            By.XPATH,
+            "//button[text()='Confirm position, move to slot 6']",
+        ),
+        "",
     )
 
-    deckmap_labware_check_complete: Tuple[str, str] = (
-        By.ID,
-        "LabwarePositionCheck_deckMap",
+    confirm_position_returntip_slot_home: Element = Element(
+        (
+            By.XPATH,
+            "//button[text()='Confirm position, return tip to Slot 2 and home']",
+        ),
+        "",
     )
 
-    section_list_step0: Tuple[str, str] = (
-        By.ID,
-        "sectionList_step_0",
+    labware_position_check_complete: Element = Element(
+        (
+            By.XPATH,
+            "//h3[text()='Labware Position Check Complete']",
+        ),
+        "",
     )
 
-    section_list_step1: Tuple[str, str] = (
-        By.ID,
-        "sectionList_step_1",
+    deckmap_labware_check_complete: Element = Element(
+        (
+            By.ID,
+            "LabwarePositionCheck_deckMap",
+        ),
+        "",
     )
 
-    section_list_step2: Tuple[str, str] = (
-        By.ID,
-        "sectionList_step_2",
+    section_list_step0: Element = Element(
+        (
+            By.ID,
+            "sectionList_step_0",
+        ),
+        "",
     )
 
-    close_and_apply_labware_offset_data_button: Tuple[str, str] = (
-        By.ID,
-        "Lpc_summaryScreen_applyOffsetButton",
+    section_list_step1: Element = Element(
+        (
+            By.ID,
+            "sectionList_step_1",
+        ),
+        "",
     )
 
-    labware_success_toast: Tuple[str, str] = (
-        By.XPATH,
-        "//span[text()='Labware Position Check complete. 3 Labware Offsets created.']",
+    section_list_step2: Element = Element(
+        (
+            By.ID,
+            "sectionList_step_2",
+        ),
+        "",
     )
 
-    labware_offsetbox_slot_4: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_slot_4_offsetBox",
+    close_and_apply_labware_offset_data_button: Element = Element(
+        (
+            By.ID,
+            "Lpc_summaryScreen_applyOffsetButton",
+        ),
+        "",
     )
 
-    labware_display_name_slot_4: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_slot_4_displayName",
+    labware_success_toast: Element = Element(
+        (
+            By.XPATH,
+            "//span[text()='Labware Position Check complete. 3 Labware Offsets created.']",
+        ),
+        "",
     )
 
-    labware_slot_4_offset_x_text: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_4_x",
+    labware_offsetbox_slot_4: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_slot_4_offsetBox",
+        ),
+        "",
     )
 
-    labware_slot_4_offset_x_value: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_4_xValue",
+    labware_display_name_slot_4: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_slot_4_displayName",
+        ),
+        "",
     )
 
-    labware_slot_4_offset_y_text: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_4_y",
+    labware_slot_4_offset_x_text: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_4_x",
+        ),
+        "",
     )
 
-    labware_slot_4_offset_y_value: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_4_yValue",
-    )
-    labware_slot_4_offset_z_text: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_4_z",
-    )
-
-    labware_slot_4_offset_z_value: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_4_zValue",
-    )
-    labware_display_name_slot_5: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_slot_5_displayName",
+    labware_slot_4_offset_x_value: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_4_xValue",
+        ),
+        "",
     )
 
-    labware_slot_5_offset_x_text: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_5_x",
+    labware_slot_4_offset_y_text: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_4_y",
+        ),
+        "",
     )
 
-    labware_slot_5_offset_x_value: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_5_xValue",
+    labware_slot_4_offset_y_value: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_4_yValue",
+        ),
+        "",
+    )
+    labware_slot_4_offset_z_text: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_4_z",
+        ),
+        "",
     )
 
-    labware_slot_5_offset_y_text: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_5_y",
+    labware_slot_4_offset_z_value: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_4_zValue",
+        ),
+        "",
+    )
+    labware_display_name_slot_5: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_slot_5_displayName",
+        ),
+        "",
     )
 
-    labware_slot_5_offset_y_value: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_5_yValue",
-    )
-    labware_slot_5_offset_z_text: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_5_z",
-    )
-
-    labware_slot_5_offset_z_value: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_5_zValue",
-    )
-    labware_display_name_slot_2: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_slot_2_displayName",
+    labware_slot_5_offset_x_text: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_5_x",
+        ),
+        "",
     )
 
-    labware_slot_2_offset_x_text: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_2_x",
+    labware_slot_5_offset_x_value: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_5_xValue",
+        ),
+        "",
     )
 
-    labware_slot_2_offset_x_value: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_2_xValue",
+    labware_slot_5_offset_y_text: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_5_y",
+        ),
+        "",
     )
 
-    labware_slot_2_offset_y_text: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_2_y",
+    labware_slot_5_offset_y_value: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_5_yValue",
+        ),
+        "",
+    )
+    labware_slot_5_offset_z_text: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_5_z",
+        ),
+        "",
     )
 
-    labware_slot_2_offset_y_value: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_2_yValue",
+    labware_slot_5_offset_z_value: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_5_zValue",
+        ),
+        "",
     )
-    labware_slot_2_offset_z_text: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_2_z",
+    labware_display_name_slot_2: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_slot_2_displayName",
+        ),
+        "",
     )
 
-    labware_slot_2_offset_z_value: Tuple[str, str] = (
-        By.ID,
-        "LabwareInfoOverlay_2_zValue",
+    labware_slot_2_offset_x_text: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_2_x",
+        ),
+        "",
     )
 
-    @highlight
+    labware_slot_2_offset_x_value: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_2_xValue",
+        ),
+        "",
+    )
+
+    labware_slot_2_offset_y_text: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_2_y",
+        ),
+        "",
+    )
+
+    labware_slot_2_offset_y_value: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_2_yValue",
+        ),
+        "",
+    )
+    labware_slot_2_offset_z_text: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_2_z",
+        ),
+        "",
+    )
+
+    labware_slot_2_offset_z_value: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_2_zValue",
+        ),
+        "",
+    )
+
+    labware_offsetbox_slot_2: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_slot_2_offsetBox",
+        ),
+        "",
+    )
+
+    labware_offsetbox_slot_5: Element = Element(
+        (
+            By.ID,
+            "LabwareInfoOverlay_slot_5_offsetBox",
+        ),
+        "",
+    )
+
     def get_labware_position_check_button(self) -> WebElement:
         """Button to locate LPC button."""
-        toggle: WebElement = WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_setup_position_check_button
-            )
+        button = self.base.clickable_wrapper(
+            self.labware_setup_position_check_button, 2
         )
-        actions = ActionChains(self.driver)
-        actions.move_to_element(toggle).perform()
-        return toggle
+        actions = ActionChains(self.base.driver)  # type: ignore
+        actions.move_to_element(button).perform()  # type: ignore
+        return button
 
-    @highlight
     def get_labware_success_toast(self) -> WebElement:
-        """Element to locate the success toast of LPC"""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.labware_success_toast)
-        )
+        """Element to locate the success toast of LPC."""
+        return self.base.clickable_wrapper(self.labware_success_toast, 2)
 
-    @highlight
     def get_close_and_apply_labware_offset_data_button(self) -> WebElement:
         """Button to close and apply labware oddset data on LPC flow."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.close_and_apply_labware_offset_data_button
-            )
+        return self.base.clickable_wrapper(
+            self.close_and_apply_labware_offset_data_button, 2
         )
 
-    @highlight
     def get_section_list_step2(self) -> WebElement:
-        """Element to locate the section list step2"""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.section_list_step2)
-        )
+        """Element to locate the section list step2."""
+        return self.base.clickable_wrapper(self.section_list_step2, 2)
 
-    @highlight
     def get_section_list_step1(self) -> WebElement:
-        """Element to locate the section list step1"""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.section_list_step1)
-        )
+        """Element to locate the section list step1."""
+        return self.base.clickable_wrapper(self.section_list_step1, 2)
 
-    @highlight
     def get_section_list_step0(self) -> WebElement:
-        """Element to locate the section list step0"""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.section_list_step0)
-        )
+        """Element to locate the section list step0."""
+        return self.base.clickable_wrapper(self.section_list_step0, 2)
 
-    @highlight
     def get_deckmap_labware_check_complete(self) -> WebElement:
-        """Element to locate the deckmap"""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.deckmap_labware_check_complete
-            )
-        )
+        """Element to locate the deckmap."""
+        return self.base.clickable_wrapper(self.deckmap_labware_check_complete, 2)
 
-    @highlight
     def get_labware_position_check_complete(self) -> WebElement:
-        """Element to locate the LPC complete text"""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_position_check_complete
-            )
-        )
+        """Element to locate the LPC complete text."""
+        return self.base.clickable_wrapper(self.labware_position_check_complete, 2)
 
     def click_labware_position_button(self) -> None:
-        self.get_labware_position_check_button().click()
+        """Click labware position button."""
+        button = self.base.clickable_wrapper(
+            self.labware_setup_position_check_button, 2
+        )
+        actions = ActionChains(self.base.driver)  # type: ignore
+        actions.move_to_element(button).perform()  # type: ignore
+        self.base.click(self.labware_setup_position_check_button)
 
-    @highlight
     def get_introScreen_labware_position_check_overview(self) -> WebElement:
-        """Element to locate into screen of LPC overview"""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.introScreen_labware_position_check_overview
-            )
+        """Element to locate into screen of LPC overview."""
+        return self.base.clickable_wrapper(
+            self.introScreen_labware_position_check_overview, 2
         )
 
-    @highlight
     def get_begin_labware_position_check_button(self) -> WebElement:
-        """Element to locate begin LPC button"""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.begin_labware_position_text_locator
-            )
-        )
+        """Element to locate begin LPC button."""
+        return self.base.clickable_wrapper(self.begin_labware_position_text_locator, 2)
 
     def click_begin_labware_position_check_button(self) -> None:
-        self.get_begin_labware_position_check_button().click()
+        """Click begin_labware_position_text."""
+        self.base.click(self.begin_labware_position_text_locator)
 
-    @highlight
     def get_how_to_tell_pipette_is_centered_link(self) -> WebElement:
         """Locator for how to tell pipette is centered link."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.how_to_tell_pipette_is_centered_link
-            )
-        )
+        return self.base.clickable_wrapper(self.how_to_tell_pipette_is_centered_link, 2)
 
     def click_how_to_tell_pipette_is_centered_link(self) -> None:
-        self.get_how_to_tell_pipette_is_centered_link().click()
+        """Click is centered."""
+        self.base.click(self.how_to_tell_pipette_is_centered_link)
 
-    @highlight
     def get_reveal_all_jog_controls(self) -> WebElement:
         """Locator for reveal all jog controls."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.reveal_all_jog_controls)
-        )
+        return self.base.clickable_wrapper(self.reveal_all_jog_controls, 2)
 
     def click_reveal_all_jog_controls(self) -> None:
-        self.get_reveal_all_jog_controls().click()
+        """Click reveal all."""
+        self.base.click(self.reveal_all_jog_controls)
 
-    @highlight
     def get_back_jog_button(self) -> WebElement:
         """Locator for back jog button."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.back_jog_button)
-        )
+        return self.base.clickable_wrapper(self.back_jog_button, 2)
 
     def click_back_jog_button(self) -> None:
-        self.get_back_jog_button().click()
+        """Click back jog."""
+        self.base.click(self.back_jog_button)
 
-    @highlight
     def get_left_jog_button(self) -> WebElement:
         """Locator for left jog button."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.left_jog_button)
-        )
+        return self.base.clickable_wrapper(self.left_jog_button, 2)
 
     def click_left_jog_button(self) -> None:
-        self.get_left_jog_button().click()
+        """Click left jog."""
+        self.base.click(self.left_jog_button)
 
-    @highlight
     def get_right_jog_button(self) -> WebElement:
         """Locator for right jog button."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.right_jog_button)
-        )
+        return self.base.clickable_wrapper(self.right_jog_button, 2)
 
     def click_right_jog_button(self) -> None:
-        self.get_right_jog_button().click()
+        """Click right jog."""
+        self.base.click(self.right_jog_button)
 
-    @highlight
     def get_forward_jog_button(self) -> WebElement:
         """Locator for forward jog button."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.forward_jog_button)
-        )
+        return self.base.clickable_wrapper(self.forward_jog_button)
 
     def click_forward_jog_button(self) -> None:
-        self.get_forward_jog_button().click()
+        """Click forward jog."""
+        self.base.click(self.forward_jog_button)
 
-    @highlight
     def get_up_jog_button(self) -> WebElement:
         """Locator for up jog button."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.up_jog_button)
-        )
+        return self.base.clickable_wrapper(self.up_jog_button, 2)
 
     def click_up_jog_button(self) -> None:
-        self.get_up_jog_button().click()
+        """Click up jog."""
+        self.base.click(self.up_jog_button)
 
-    @highlight
     def get_down_jog_button(self) -> WebElement:
         """Locator for down jog button."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.down_jog_button)
-        )
+        return self.base.clickable_wrapper(self.down_jog_button, 2)
 
     def click_down_jog_button(self) -> None:
-        self.get_down_jog_button().click()
+        """Click down jog."""
+        self.base.click(self.down_jog_button)
 
-    @highlight
     def get_confirm_position_button_pickup_tip(self) -> WebElement:
         """Locator for confirm position button pickup."""
-        toggle: WebElement = WebDriverWait(self.driver, 5).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.confirm_position_button_pickup_tip
-            )
+        toggle: WebElement = self.base.clickable_wrapper(
+            self.confirm_position_button_pickup_tip, 5
         )
-        actions = ActionChains(self.driver)
-        actions.move_to_element(toggle).perform()
+        actions = ActionChains(self.base.driver)  # type: ignore
+        actions.move_to_element(toggle).perform()  # type: ignore
         return toggle
 
     def click_confirm_position_button_pickup_tip(self) -> None:
-        self.get_confirm_position_button_pickup_tip().click()
+        """Click confirm and pick up tip."""
+        self.get_confirm_position_button_pickup_tip()
+        self.base.click(self.confirm_position_button_pickup_tip)
 
-    @highlight
     def get_confirm_position_moveto_slot_2(self) -> WebElement:
-        """Locator for confirm positin moveto slot."""
-        toggle: WebElement = WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.confirm_position_moveto_slot_2
-            )
+        """Locator for confirm position moveto slot."""
+        toggle: WebElement = self.base.clickable_wrapper(
+            self.confirm_position_moveto_slot_2, 5
         )
-        actions = ActionChains(self.driver)
-        actions.move_to_element(toggle).perform()
+        actions = ActionChains(self.base.driver)  # type: ignore
+        actions.move_to_element(toggle).perform()  # type: ignore
         return toggle
 
     def click_confirm_position_moveto_slot_2(self) -> None:
-        self.get_confirm_position_moveto_slot_2().click()
+        """Click confirm position move to slot 2."""
+        self.get_confirm_position_moveto_slot_2()
+        self.base.click(self.confirm_position_moveto_slot_2)
 
-    @highlight
     def get_confirm_position_moveto_slot_5(self) -> WebElement:
-        """Locator for confirm positin moveto slot."""
-        toggle: WebElement = WebDriverWait(self.driver, 5).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.confirm_position_moveto_slot_5
-            )
+        """Locator for confirm position move to slot."""
+        toggle: WebElement = self.base.clickable_wrapper(
+            self.confirm_position_moveto_slot_5, 5
         )
-        actions = ActionChains(self.driver)
-        actions.move_to_element(toggle).perform()
+        actions = ActionChains(self.base.driver)  # type: ignore
+        actions.move_to_element(toggle).perform()  # type: ignore
         return toggle
 
     def click_confirm_position_moveto_slot_5(self) -> None:
-        self.get_confirm_position_moveto_slot_5().click()
+        """Click confirm position move to slot 5."""
+        self.get_confirm_position_moveto_slot_5()
+        self.base.click(self.confirm_position_moveto_slot_5)
 
-    @highlight
     def get_confirm_position_moveto_slot_6(self) -> WebElement:
-        """Locator for confirm positin moveto slot."""
-        toggle: WebElement = WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.confirm_position_moveto_slot_6
-            )
+        """Locator for confirm position moveto slot."""
+        toggle: WebElement = self.base.clickable_wrapper(
+            self.confirm_position_moveto_slot_6, 5
         )
-        actions = ActionChains(self.driver)
-        actions.move_to_element(toggle).perform()
+        actions = ActionChains(self.base.driver)  # type: ignore
+        actions.move_to_element(toggle).perform()  # type: ignore
         return toggle
 
     def click_confirm_position_moveto_slot_6(self) -> None:
-        self.get_confirm_position_moveto_slot_6().click()
+        """Click confirm position move to slot 6."""
+        self.get_confirm_position_moveto_slot_6()
+        self.base.click(self.confirm_position_moveto_slot_6)
 
-    @highlight
     def get_confirm_position_returntip_slot_home(self) -> WebElement:
-        """Locator for confirm positin return tip ."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.confirm_position_returntip_slot_home
-            )
-        )
+        """Locator for confirm position return tip ."""
+        return self.base.clickable_wrapper(self.confirm_position_returntip_slot_home, 2)
 
     def click_confirm_position_returntip_slot_home(self) -> None:
-        self.get_confirm_position_returntip_slot_home().click()
+        """Click confirm position return tip slot home."""
+        self.base.click(self.confirm_position_returntip_slot_home)
 
     def click_get_close_and_apply_labware_offset_data_button(self) -> None:
-        self.get_close_and_apply_labware_offset_data_button().click()
+        """Click get close and apply."""
+        self.base.click(self.close_and_apply_labware_offset_data_button)
 
-    @highlight
-    def get_labware_display_name_slot_4(self) -> Optional[WebElement]:
-        """locator for Labware name on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.labware_display_name_slot_4)
-        )
+    def get_labware_display_name_slot_4(self) -> WebElement:
+        """Labware name on deckmap."""
+        return self.base.clickable_wrapper(self.labware_display_name_slot_4, 2)
 
-    @highlight
-    def get_labware_offsetbox_slot_4(self) -> Optional[WebElement]:
-        """locator for Labware offset box on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.labware_offsetbox_slot_4)
-        )
+    def get_labware_offsetbox_slot_4(self) -> WebElement:
+        """Labware offset box on deckmap."""
+        return self.base.clickable_wrapper(self.labware_offsetbox_slot_4, 2)
 
-    @highlight
-    def get_labware_slot_4_offset_x_text(self) -> Optional[WebElement]:
-        """locator for Labware x text on slot 4 on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_4_offset_x_text
-            )
-        )
+    def get_labware_slot_4_offset_x_text(self) -> WebElement:
+        """Labware x text on slot 4 on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_4_offset_x_text, 2)
 
-    @highlight
-    def get_labware_slot_4_offset_x_value(self) -> Optional[WebElement]:
-        """locator for Labware x offset value on slot 4 on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_4_offset_x_value
-            )
-        )
+    def get_labware_slot_4_offset_x_value(self) -> WebElement:
+        """Labware x offset value on slot 4 on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_4_offset_x_value, 2)
 
-    @highlight
-    def get_labware_slot_4_offset_y_text(self) -> Optional[WebElement]:
-        """locator for Labware y osset value on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_4_offset_y_text
-            )
-        )
+    def get_labware_slot_4_offset_y_text(self) -> WebElement:
+        """Labware y osset value on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_4_offset_y_text, 2)
 
-    @highlight
-    def get_labware_slot_4_offset_y_value(self) -> Optional[WebElement]:
-        """locator for Labware y offset value on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_4_offset_y_value
-            )
-        )
+    def get_labware_slot_4_offset_y_value(self) -> WebElement:
+        """Labware y offset value on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_4_offset_y_value, 2)
 
-    @highlight
-    def get_labware_slot_4_offset_z_text(self) -> Optional[WebElement]:
-        """locator for Labware y osset value on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_4_offset_z_text
-            )
-        )
+    def get_labware_slot_4_offset_z_text(self) -> WebElement:
+        """Labware y osset value on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_4_offset_z_text, 2)
 
-    @highlight
-    def get_labware_slot_4_offset_z_value(self) -> Optional[WebElement]:
-        """locator for Labware y offset value on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_4_offset_z_value
-            )
-        )
+    def get_labware_slot_4_offset_z_value(self) -> WebElement:
+        """Labware y offset value on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_4_offset_z_value, 2)
 
-    @highlight
-    def get_labware_display_name_slot_5(self) -> Optional[WebElement]:
-        """locator for Labware name on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.labware_display_name_slot_5)
-        )
+    def get_labware_display_name_slot_5(self) -> WebElement:
+        """Labware name on deckmap."""
+        return self.base.clickable_wrapper(self.labware_display_name_slot_5, 2)
 
-    @highlight
-    def get_labware_offsetbox_slot_5(self) -> Optional[WebElement]:
-        """locator for Labware offset box on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.labware_offsetbox_slot_5)
-        )
+    def get_labware_offsetbox_slot_5(self) -> WebElement:
+        """Labware offset box on deckmap."""
+        return self.base.clickable_wrapper(self.labware_offsetbox_slot_5, 2)
 
-    @highlight
-    def get_labware_slot_5_offset_x_text(self) -> Optional[WebElement]:
-        """locator for Labware x text on slot 4 on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_5_offset_x_text
-            )
-        )
+    def get_labware_slot_5_offset_x_text(self) -> WebElement:
+        """Labware x text on slot 4 on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_5_offset_x_text, 2)
 
-    @highlight
-    def get_labware_slot_5_offset_x_value(self) -> Optional[WebElement]:
-        """locator for Labware x offset value on slot 4 on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_5_offset_x_value
-            )
-        )
+    def get_labware_slot_5_offset_x_value(self) -> WebElement:
+        """Labware x offset value on slot 4 on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_5_offset_x_value, 2)
 
-    @highlight
-    def get_labware_slot_5_offset_y_text(self) -> Optional[WebElement]:
-        """locator for Labware y osset value on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_5_offset_y_text
-            )
-        )
+    def get_labware_slot_5_offset_y_text(self) -> WebElement:
+        """Labware y offset value on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_5_offset_y_text, 2)
 
-    @highlight
-    def get_labware_slot_5_offset_y_value(self) -> Optional[WebElement]:
-        """locator for Labware y offset value on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_5_offset_y_value
-            )
-        )
+    def get_labware_slot_5_offset_y_value(self) -> WebElement:
+        """Labware y offset value on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_5_offset_y_value, 2)
 
-    @highlight
-    def get_labware_slot_5_offset_z_text(self) -> Optional[WebElement]:
-        """locator for Labware y osset value on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_5_offset_z_text
-            )
-        )
+    def get_labware_slot_5_offset_z_text(self) -> WebElement:
+        """Labware y osset value on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_5_offset_z_text, 2)
 
-    @highlight
-    def get_labware_slot_5_offset_z_value(self) -> Optional[WebElement]:
-        """locator for Labware y offset value on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_5_offset_z_value
-            )
-        )
+    def get_labware_slot_5_offset_z_value(self) -> WebElement:
+        """Labware y offset value on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_5_offset_z_value, 2)
 
-    @highlight
-    def get_labware_display_name_slot_2(self) -> Optional[WebElement]:
-        """locator for Labware name on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.labware_display_name_slot_2)
-        )
+    def get_labware_display_name_slot_2(self) -> WebElement:
+        """Labware name on deckmap."""
+        return self.base.clickable_wrapper(self.labware_display_name_slot_2, 2)
 
-    @highlight
-    def get_labware_offsetbox_slot_2(self) -> Optional[WebElement]:
-        """locator for Labware offset box on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(LabwarePositionCheck.labware_offsetbox_slot_2)
-        )
+    def get_labware_offsetbox_slot_2(self) -> WebElement:
+        """Labware offset box on deckmap."""
+        return self.base.clickable_wrapper(self.labware_offsetbox_slot_2, 2)
 
-    @highlight
-    def get_labware_slot_2_offset_x_text(self) -> Optional[WebElement]:
-        """locator for Labware x text on slot 4 on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_2_offset_x_text
-            )
-        )
+    def get_labware_slot_2_offset_x_text(self) -> WebElement:
+        """Labware x text on slot 4 on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_2_offset_x_text, 2)
 
-    @highlight
-    def get_labware_slot_2_offset_x_value(self) -> Optional[WebElement]:
-        """locator for Labware x offset value on slot 4 on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_2_offset_x_value
-            )
-        )
+    def get_labware_slot_2_offset_x_value(self) -> WebElement:
+        """Labware x offset value on slot 4 on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_2_offset_x_value, 2)
 
-    @highlight
-    def get_labware_slot_2_offset_y_text(self) -> Optional[WebElement]:
-        """locator for Labware y osset value on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_2_offset_y_text
-            )
-        )
+    def get_labware_slot_2_offset_y_text(self) -> WebElement:
+        """Labware y osset value on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_2_offset_y_text, 2)
 
-    @highlight
-    def get_labware_slot_2_offset_y_value(self) -> Optional[WebElement]:
-        """locator for Labware y offset value on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_2_offset_y_value
-            )
-        )
+    def get_labware_slot_2_offset_y_value(self) -> WebElement:
+        """Labware y offset value on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_2_offset_y_value, 2)
 
-    @highlight
-    def get_labware_slot_2_offset_z_text(self) -> Optional[WebElement]:
-        """locator for Labware y osset value on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_2_offset_z_text
-            )
-        )
+    def get_labware_slot_2_offset_z_text(self) -> WebElement:
+        """Labware y osset value on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_2_offset_z_text, 2)
 
-    @highlight
-    def get_labware_slot_2_offset_z_value(self) -> Optional[WebElement]:
-        """locator for Labware y offset value on deckmap."""
-        return WebDriverWait(self.driver, 2).until(
-            EC.element_to_be_clickable(
-                LabwarePositionCheck.labware_slot_2_offset_z_value
-            )
-        )
+    def get_labware_slot_2_offset_z_value(self) -> WebElement:
+        """Labware y offset value on deckmap."""
+        return self.base.clickable_wrapper(self.labware_slot_2_offset_z_value, 2)
+
+    ignore_stored_data_button: Element = Element(
+        (By.XPATH, "//button[text()='Ignore stored data']"),
+        "ignore stored data button on modal for LPC enhancement",
+    )
+
+    def get_ignored_stored_data(self) -> Optional[WebElement]:
+        """Safely get the ignore stored data button."""
+        return self.base.clickable_wrapper_safe(self.ignore_stored_data_button, 4)
+
+    def click_ignored_stored_data(self) -> None:
+        """Click the ignore stored data button."""
+        self.base.click(self.ignore_stored_data_button)

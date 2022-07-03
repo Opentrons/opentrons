@@ -1,0 +1,67 @@
+# This workflow runs lint on pull requests that touch anything in the app-testing directory
+
+name: 'app-testing lint'
+
+on:
+  pull_request:
+    paths:
+      - 'app-testing/**'
+
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-a-fallback-value
+# At first implementation only running this on pull requests so this workflow
+# should always have the github.head_ref
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    env:
+      PIPENV_VENV_IN_PROJECT: 1
+    name: 'app-testing lint'
+    timeout-minutes: 5
+    runs-on: 'ubuntu-22.04'
+    steps:
+      - name: Checkout opentrons repo
+        uses: 'actions/checkout@v3'
+
+      - name: Setup Python
+        uses: 'actions/setup-python@v4'
+        with:
+          python-version: '3.10'
+
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        id: cache-dependencies
+        with:
+          path: ./app-testing/.venv
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('./app-testing/Pipfile.lock') }}
+      - name: Pipenv Install
+        id: install
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        working-directory: ./app-testing
+        run: make setup
+      - name: black-check
+        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        working-directory: ./app-testing
+        run: make black-check
+      - name: isort-check
+        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        working-directory: ./app-testing
+        run: make isort-check
+      - name: flake8
+        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        working-directory: ./app-testing
+        run: make flake8
+      - name: mypy
+        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        working-directory: ./app-testing
+        run: make mypy

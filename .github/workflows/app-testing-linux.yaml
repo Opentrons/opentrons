@@ -1,0 +1,106 @@
+name: 'app-testing linux smoke test'
+
+on:
+  workflow_run:
+    workflows:
+      - 'App test, build, and deploy'
+    types:
+      - 'completed'
+    branches:
+      - 'edge'
+      - 'release**'
+
+# We only ever want one of this workflow running per branch.
+# If a new build completes and this workflow is running;
+# Cancel the in-progress run of this workflow in preference to the new build.
+# Success and failures grouped so a subsequent failure does not cancel a running test against a successful build
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.workflow_run.branch }}-${{ github.event.workflow_run.conclusion }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    env:
+      PIPENV_VENV_IN_PROJECT: enabled
+    timeout-minutes: 10
+    runs-on: 'ubuntu-22.04'
+    steps:
+      - name: print
+        run: |
+          echo ${{github.event.workflow_run}}
+          echo ${{github.event}}
+      - uses: 'actions/setup-python@v2'
+        with:
+          python-version: '3.10'
+
+      - name: Install pipenv
+        run: |
+          pip install pipenv==2022.3.24
+
+      - name: Check out repository code.
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.workflow_run.ref }}
+          path: opentrons
+
+      - name: Setup robot-server
+        id: install
+        working-directory: ./opentrons/robot-server
+        run: make setup
+
+      - name: Bring up dev robot from robot-server
+        working-directory: ./opentrons/robot-server
+        run: make dev > /dev/null 2>&1 &
+
+      - name: Cache Testing Dependencies
+        uses: actions/cache@v3
+        id: cache-test-dependencies
+        with:
+          path: ./opentrons/app-testing/.venv
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('./opentrons/app-testing/Pipfile.lock') }}
+
+      - name: Setup app-testing
+        id: install
+        if: steps.cache-test-dependencies.outputs.cache-hit != 'true'
+        working-directory: ./opentrons/app-testing
+        run: make setup
+
+      - name: Download the AppImage from the build workflow
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          # Required, workflow file name or ID
+          workflow: app-test-build-deploy.yaml
+          run_id: ${{ github.event.workflow_run.id }}
+          name: opentrons-ubuntu-18.04
+
+      - name: Find AppImage file allow execution and set env.EXECUTABLE_PATH
+        run: |
+          file = find . -type f -name "*.AppImage"
+          filename="${file[0]}"
+          chmod +x $filename
+          filepath=$(pwd)/$filename
+          echo "EXECUTABLE_PATH=$filepath" >> $GITHUB_ENV
+
+      - name: Install Chromedriver on the path.
+        run: |
+          chmod +x ./opentrons/app-testing/ci-tools/linux_get_chromedriver.sh
+          ./opentrons/app-testing/ci-tools/linux_get_chromedriver.sh 13.1.8
+          chromedriver --version
+
+      - name: Run Tests.
+        working-directory: ./opentrons/app-testing
+        run: |
+          export DISPLAY=:99
+          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          export EXECUTABLE_PATH=${{ env.EXECUTABLE_PATH }}
+          export ROBOT_BASE_URL="http://127.0.0.1:31950"
+          expert ROBOTS=dev
+          make test
+
+      - name: Upload results.
+        uses: actions/upload-artifact@v2
+        with:
+          name: results
+          path: app-testing/results/
+        if: always()

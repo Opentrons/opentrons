@@ -1,0 +1,15 @@
+[tool.isort]
+profile = "black"
+[tool.black]
+target-version = ['py310']
+[tool.mypy]
+strict = true
+follow_imports = "silent"
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_reexport = true
+exclude = "__init__.py|protocol_upload_todo.py|test_drive.py"
+[mypy-selenium]
+ignore_missing_imports = true

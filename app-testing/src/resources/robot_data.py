@@ -1,11 +1,12 @@
+"""Robot data."""
 from dataclasses import dataclass
-import enum
-from re import M
-from typing import List, Literal, Union
+from typing import Literal
 
 
 @dataclass
 class Module:
+    """Module types."""
+
     type: Literal[
         "magneticModuleV1",
         "magneticModuleV2",
@@ -20,7 +21,7 @@ class Module:
 
 @dataclass
 class Dev:
-    """Info about the robot brought up with 'make -C robot-server dev'"""
+    """Info about the robot brought up with 'make -C robot-server dev'."""
 
     display_name: str = "opentrons-dev"
     host: str = "localhost"
@@ -29,7 +30,7 @@ class Dev:
 
 @dataclass
 class EmulatedAlpha:
-    """Info about the robot brought up with emulation samples/ot2/ot2_with_all_modules.yaml
+    """Info about the robot brought up with emulation samples/ot2/ot2_with_all_modules.yaml.
 
     temperatureModuleV2, thermocyclerModuleV1, magneticModuleV2
     """
@@ -43,7 +44,7 @@ class EmulatedAlpha:
 class Kansas:
     """A robot in Kansas used for testing."""
 
-    display_name: str = "OT2CEP20210323B11"
+    display_name: str = "kansas"
     host: str = "192.168.50.89"
     port: str = "31950"
 

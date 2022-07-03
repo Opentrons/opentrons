@@ -1,39 +1,35 @@
 """Test the initial state the application with various setups."""
 import os
 from pathlib import Path
-import time
-from typing import Generic, List, Union
-import pytest
+from typing import List
 
+import pytest
 from rich.console import Console
 from rich.style import Style
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-
-from src.resources.ot_robot5dot1 import OtRobot
-from src.resources.ot_application import OtApplication
+from src.menus.left_menu import LeftMenu
 from src.pages.app_settings import AppSettings
-from src.menus.left_menu_v5dot1 import LeftMenu
-from src.resources.robot_data import Dev, Kansas, RobotDataType
+from src.resources.ot_application import OtApplication
+from src.resources.robot_data import RobotDataType
 
 style = Style(color="#ac0505", bgcolor="yellow", bold=True)
 
 
-@pytest.mark.v5dot1
-def test_app_settings_v5dot1(
+def test_app_settings(
     chrome_options: Options,
     console: Console,
     robots: List[RobotDataType],
     request: pytest.FixtureRequest,
 ) -> None:
-    """Test the initial load of the app with a docker or dev mode emulated robot."""
+    """Validate most of the app settings are present and that some may be toggled or selected."""
     os.environ["OT_APP_ANALYTICS__SEEN_OPT_IN"] = "true"
     # app should look on localhost for robots
     # os.environ["OT_APP_DISCOVERY__CANDIDATES"] = "localhost"
     # Start chromedriver with our options and use the
     # context manager to ensure it quits.
-    with webdriver.Chrome(options=chrome_options) as driver:
+    with webdriver.Chrome(options=chrome_options) as driver:  # type: ignore
         console.print("Driver Capabilities.")
         console.print(driver.capabilities)
         # Each chromedriver instance will have its own user data store.
@@ -44,17 +40,22 @@ def test_app_settings_v5dot1(
         )
         # Add the value to the config to ignore app updates.
         ot_application.config["alerts"]["ignored"] = ["appUpdateAvailable"]
+        ot_application.config["update"]["channel"] = "latest"
         ot_application.write_config()
 
         # Instantiate the page object for the App settings.
         app_settings: AppSettings = AppSettings(driver, console, request.node.nodeid)
         left_menu: LeftMenu = LeftMenu(driver, console, request.node.nodeid)
 
-        ## General tab verification
+        # General tab verification
         left_menu.click_gear_button()
         assert app_settings.get_app_settings_header().text == "App Settings"
         assert (
             app_settings.get_app_software_version_text().text == "App Software Version"
+        )
+        assert (
+            app_settings.get_release_notes_link().get_attribute("href")
+            == "https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md"
         )
         assert app_settings.get_app_software_version_value().is_displayed()
 
@@ -64,14 +65,29 @@ def test_app_settings_v5dot1(
         assert (
             app_settings.get_learn_more_about_uninstalling_opentrons_app().is_displayed()
         )
+        assert (
+            app_settings.get_learn_more_about_uninstalling_opentrons_app().get_attribute(
+                "href"
+            )
+            == "https://support.opentrons.com/s/article/Uninstall-the-Opentrons-App"
+        )
         assert app_settings.get_link_to_previous_releases().is_displayed()
-        app_settings.get_close_previous_software_modal()
+        assert (
+            app_settings.get_link_to_previous_releases().get_attribute("href")
+            == "https://github.com/Opentrons/opentrons/releases"
+        )
         app_settings.click_close_previous_software_modal()
 
         assert app_settings.get_link_app_robot_sync().is_displayed()
+        assert (
+            app_settings.get_link_app_robot_sync().get_attribute("href")
+            == "https://support.opentrons.com/s/article/Get-started-Update-your-OT-2"
+        )
         assert app_settings.get_software_update_alert_header().is_displayed()
         assert app_settings.get_software_update_alert_toggle().is_displayed()
-        app_settings.click_software_update_alert_toggle()
+
+        # can't do this, it makes the alert appear
+        # app_settings.click_software_update_alert_toggle()
 
         assert app_settings.get_connect_robot_via_IP_header().is_displayed()
         assert app_settings.get_connect_to_robot_via_IP_address_button().is_displayed()
@@ -82,22 +98,28 @@ def test_app_settings_v5dot1(
         assert (
             app_settings.get_link_learn_more_about_connecting_a_robot_manually().is_displayed()
         )
+        assert (
+            app_settings.get_link_learn_more_about_connecting_a_robot_manually().get_attribute(
+                "href"
+            )
+            == "https://support.opentrons.com/s/article/Manually-adding-a-robot-s-IP-address"
+        )
         assert app_settings.get_textbox_to_enter_the_ip().is_displayed()
         app_settings.click_add_ip_or_hostname()
         assert app_settings.get_try_again_link().is_displayed()
-        app_settings.enter_hostname(["AKNA"])
+        app_settings.enter_hostname("garbage")
         assert app_settings.get_add_button().is_displayed()
         app_settings.click_add_button()
         assert app_settings.get_done_button().is_displayed()
         app_settings.click_done_button()
 
-        ## Privacy Tab verification
+        # Privacy Tab verification
         app_settings.click_privacy_tab()
         assert app_settings.get_robot_app_analytics().is_displayed()
         assert app_settings.get_robot_app_analytics_toggle().is_displayed()
-        app_settings.click_robot_app_analytics()
+        # app_settings.click_robot_app_analytics()
 
-        ## Advanced Tab Verification
+        # Advanced Tab Verification
         app_settings.click_advanced_tab()
         assert app_settings.get_advanced_tab().is_displayed()
         assert app_settings.get_update_channel().is_displayed()
@@ -109,8 +131,8 @@ def test_app_settings_v5dot1(
         assert app_settings.get_tip_length_calibration_method().is_displayed()
         assert app_settings.get_tip_calibration_block_to_calibrate().is_displayed()
         app_settings.click_tip_calibration_block_to_calibrate()
-        assert app_settings.get_tip_calaibration_trash_bin().is_displayed()
-        app_settings.click_tip_calaibration_trash_bin()
+        assert app_settings.get_tip_calibration_trash_bin().is_displayed()
+        app_settings.click_tip_calibration_trash_bin()
         assert app_settings.get_tip_calibration_prompt_choose().is_displayed()
         app_settings.click_tip_calibration_prompt_choose()
 
@@ -124,7 +146,7 @@ def test_app_settings_v5dot1(
 
         assert app_settings.get_enable_developer_tool_header().is_displayed()
         assert app_settings.get_enable_developer_tools_toggle().is_displayed()
-        app_settings.click_enable_developer_tools_toggle()
-
-        app_settings.click_feature_flag_tab()
-        assert app_settings.get_feature_flag_tab().is_displayed()
+        # not available when we run the app through chromedriver like this
+        # app_settings.click_enable_developer_tools_toggle()
+        # app_settings.click_feature_flag_tab()
+        # assert app_settings.get_feature_flag_tab().is_displayed()

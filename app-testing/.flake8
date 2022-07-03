@@ -1,5 +1,8 @@
 [flake8]
 
+# set line-length for compatibility with black
+# https://github.com/psf/black/blob/master/docs/compatible_configs.md
+max-line-length = 120
 # max cyclomatic complexity
 max-complexity = 9
 
@@ -8,7 +11,8 @@ extend-ignore =
     E203,
     # do not require type annotations for self nor cls
     ANN101,
-    ANN102
+    ANN102,
+    E722
 
 noqa-require-code = true
 
