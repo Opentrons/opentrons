@@ -89,11 +89,9 @@ class RunStore:
                 )
             )
         )
-        select_run_resource = sqlalchemy.select(
-            run_table.c.id,
-            run_table.c.protocol_id,
-            run_table.c.created_at,
-        ).where(run_table.c.id == run_id)
+        select_run_resource = sqlalchemy.select(_run_columns).where(
+            run_table.c.id == run_id
+        )
 
         select_actions = sqlalchemy.select(action_table).where(
             action_table.c.run_id == run_id
@@ -196,11 +194,9 @@ class RunStore:
         Raises:
             RunNotFoundError: The given run ID was not found.
         """
-        select_run_resource = sqlalchemy.select(
-            run_table.c.id,
-            run_table.c.protocol_id,
-            run_table.c.created_at,
-        ).where(run_table.c.id == run_id)
+        select_run_resource = sqlalchemy.select(_run_columns).where(
+            run_table.c.id == run_id
+        )
 
         select_actions = sqlalchemy.select(action_table).where(
             action_table.c.run_id == run_id
@@ -222,7 +218,7 @@ class RunStore:
         Returns:
             All stored run entries.
         """
-        select_runs = sqlalchemy.select(run_table)
+        select_runs = sqlalchemy.select(_run_columns)
         select_actions = sqlalchemy.select(action_table)
         actions_by_run_id = defaultdict(list)
 
@@ -377,6 +373,10 @@ class RunStore:
         self.get_state_summary.cache_clear()
         self.get_command.cache_clear()
         self._get_all_unparsed_commands.cache_clear()
+
+
+# The columns that must be present in a row passed to _convert_row_to_run().
+_run_columns = [run_table.c.id, run_table.c.protocol_id, run_table.c.created_at]
 
 
 def _convert_row_to_run(
