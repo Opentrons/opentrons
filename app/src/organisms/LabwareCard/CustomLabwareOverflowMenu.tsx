@@ -111,7 +111,7 @@ export function CustomLabwareOverflowMenu(
           top={SPACING.spacing6}
           right={0}
           flexDirection={DIRECTION_COLUMN}
-          css={{ 'white-space': 'nowrap' }}
+          whiteSpace="nowrap"
         >
           <MenuItem onClick={handleOpenInFolder}>
             {t('show_in_folder')}

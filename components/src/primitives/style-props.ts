@@ -80,6 +80,7 @@ const LAYOUT_PROPS = [
   'whiteSpace',
   'wordSpacing',
   'cursor',
+  'overflowWrap',
 ] as const
 
 const POSITION_PROPS = [

@@ -141,7 +141,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 onClick={handleCopyClick}
                 role="button"
               >
-                <Box css={{ 'overflow-wrap': 'anywhere' }}>
+                <Box overflowWrap="anywhere">
                   {apiName}
                   <Icon
                     height={SIZE_1}
