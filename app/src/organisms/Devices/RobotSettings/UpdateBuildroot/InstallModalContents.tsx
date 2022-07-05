@@ -80,7 +80,7 @@ export function InstallModalContents(
       <ProgressSpinner />
     )
 
-  return step === 'finished' ? null : (
+  return (
     <>
       <div className={styles.system_update_modal}>
         <p className={styles.update_title}>{title}</p>

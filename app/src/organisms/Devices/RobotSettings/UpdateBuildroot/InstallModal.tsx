@@ -16,7 +16,7 @@ export interface InstallModalProps {
   close: () => unknown
 }
 
-export function InstallModal(props: InstallModalProps): JSX.Element {
+export function InstallModal(props: InstallModalProps): JSX.Element | null {
   const { session, close, robotSystemType } = props
   const buttons = []
 
@@ -39,7 +39,7 @@ export function InstallModal(props: InstallModalProps): JSX.Element {
     heading = 'Robot Update'
   }
 
-  return (
+  return session.step === 'finished' ? null : (
     <AlertModal
       // @ts-expect-error use commented code above
       heading={heading}
