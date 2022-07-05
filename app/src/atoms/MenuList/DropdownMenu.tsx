@@ -12,6 +12,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   Icon,
+  useOnClickOutside,
 } from '@opentrons/components'
 import { StyledText } from '../text'
 import { MenuItem } from './MenuItem'
@@ -34,6 +35,9 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   const [showDropdownMenu, setShowDropdownMenu] = React.useState<boolean>(false)
   const toggleSetShowDropdownMenu = (): void =>
     setShowDropdownMenu(!showDropdownMenu)
+  const dropDownMenuWrapperRef = useOnClickOutside<HTMLDivElement>({
+    onClickOutside: () => setShowDropdownMenu(false),
+  })
 
   return (
     <>
@@ -45,8 +49,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         onClick={toggleSetShowDropdownMenu}
         border={BORDERS.lineBorder}
         borderRadius={BORDERS.radiusRoundEdge}
-        padding={`
-          ${SPACING.spacing3} ${SPACING.spacing3} ${SPACING.spacing3} 0.75rem`} // temp
+        padding={SPACING.spacing3}
         backgroundColor={COLORS.white}
         css={css`
           cursor: pointer;
@@ -60,7 +63,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
       </Flex>
       {showDropdownMenu && (
         <Flex
-          width="8rem"
+          ref={dropDownMenuWrapperRef}
           zIndex={2}
           borderRadius={BORDERS.radiusSoftCorners}
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}

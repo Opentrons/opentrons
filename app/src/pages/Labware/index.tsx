@@ -54,12 +54,6 @@ labwareDisplayCategoryFilters.forEach(category =>
   FILTER_OPTIONS.push({ name: startCase(category), value: category })
 )
 
-const LINK_STYLES = css`
-  opacity: 70%;
-  &:hover {
-    opacity: 100%;
-  }
-`
 const SORT_BY_STYLE = css`
   background-color: ${COLORS.transparent};
 
@@ -94,10 +88,10 @@ export function Labware(): JSX.Element {
     currentLabwareDef,
     setCurrentLabwareDef,
   ] = React.useState<null | LabwareDefAndDate>(null)
-  const sortOverflowWrapperRef = useOnClickOutside({
-    onClickOutside: () => setShowSortByMenu(false),
-  }) as React.RefObject<HTMLDivElement>
 
+  const sortOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
+    onClickOutside: () => setShowSortByMenu(false),
+  })
   React.useEffect(() => {
     if (labwareFailureMessage != null) {
       setShowAddLabwareSlideout(false)
@@ -159,6 +153,7 @@ export function Labware(): JSX.Element {
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
+              // backgroundColor={COLORS.medGrey}
               borderRadius={BORDERS.radiusSoftCorners}
               marginLeft={SPACING.spacing3}
               css={SORT_BY_STYLE}
@@ -181,16 +176,16 @@ export function Labware(): JSX.Element {
           </Flex>
           {showSortByMenu && (
             <Flex
-              ref={sortOverflowWrapperRef}
               width="9.375rem"
               zIndex={2}
               borderRadius={BORDERS.radiusSoftCorners}
               boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
               position={POSITION_ABSOLUTE}
               backgroundColor={COLORS.white}
-              top="8.25rem"
+              top="8.5rem"
               right={0}
               flexDirection={DIRECTION_COLUMN}
+              ref={sortOverflowWrapperRef}
             >
               <MenuItem
                 onClick={() => {
@@ -239,10 +234,7 @@ export function Labware(): JSX.Element {
           <Link
             external
             href={LABWARE_CREATOR_HREF}
-            color={COLORS.darkBlack}
-            css={LINK_STYLES}
-            fontSize={TYPOGRAPHY.fontSizeLabel}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            css={TYPOGRAPHY.linkPSemiBold}
           >
             {t('open_labware_creator')}
             <Icon

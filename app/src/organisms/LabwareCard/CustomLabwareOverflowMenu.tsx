@@ -31,12 +31,11 @@ import {
   openCustomLabwareDirectory,
 } from '../../redux/custom-labware'
 
-import type { StyleProps } from '@opentrons/components'
 import type { Dispatch } from '../../redux/types'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
 
-interface CustomLabwareOverflowMenuProps extends StyleProps {
+interface CustomLabwareOverflowMenuProps {
   filename: string
   onDelete?: () => void
 }
@@ -48,9 +47,9 @@ export function CustomLabwareOverflowMenu(
   const { t } = useTranslation(['labware_landing', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
-  const overflowMenuRef = useOnClickOutside({
+  const overflowMenuRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
-  }) as React.RefObject<HTMLDivElement>
+  })
 
   const {
     confirm: confirmDeleteLabware,
@@ -104,7 +103,6 @@ export function CustomLabwareOverflowMenu(
       {showOverflowMenu && (
         <Flex
           ref={overflowMenuRef}
-          width="11rem"
           zIndex={10}
           borderRadius={'4px 4px 0px 0px'}
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
@@ -113,6 +111,7 @@ export function CustomLabwareOverflowMenu(
           top={SPACING.spacing6}
           right={0}
           flexDirection={DIRECTION_COLUMN}
+          css={{ 'white-space': 'nowrap' }}
         >
           <MenuItem onClick={handleOpenInFolder}>
             {t('show_in_folder')}
@@ -120,9 +119,13 @@ export function CustomLabwareOverflowMenu(
           <MenuItem onClick={handleClickDelete}>{t('delete')}</MenuItem>
           <Divider />
           <MenuItem onClick={handleClickLabwareCreator}>
-            <StyledText color={COLORS.blue}>
+            <StyledText css={TYPOGRAPHY.linkPSemiBold}>
               {t('open_labware_creator')}
-              <Icon name="open-in-new" height={SPACING.spacingSM}></Icon>
+              <Icon
+                name="open-in-new"
+                height={SPACING.spacingSM}
+                marginLeft="0.375rem"
+              ></Icon>
             </StyledText>
           </MenuItem>
         </Flex>

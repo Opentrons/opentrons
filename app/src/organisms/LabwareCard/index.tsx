@@ -66,10 +66,6 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     await navigator.clipboard.writeText(apiName)
   }
 
-  console.log(
-    `${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`
-  )
-
   return (
     <Box
       role="link"
