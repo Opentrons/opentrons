@@ -227,6 +227,21 @@ describe('RobotSettingsCalibration', () => {
     getByText('Pipette Offset calibration missing')
   })
 
+  it('renders the error banner when a user has no pipette', () => {
+    mockUseDeckCalibrationStatus.mockReturnValue(
+      Calibration.DECK_CAL_STATUS_IDENTITY
+    )
+    const mockEmptyAttachedPipettes: AttachedPipettesByMount = {
+      left: null,
+      right: null,
+    } as any
+    mockUseAttachedPipettes.mockReturnValue(mockEmptyAttachedPipettes)
+    const [{ getByText }] = render()
+    getByText(
+      'Deck calibration missing. Attach a pipette to perform deck calibration.'
+    )
+  })
+
   // it('renders the warning banner when calibration is marked bad', () => {
   //   mockUsePipetteOffsetCalibrations.mockReturnValue([
   //     mockPipetteOffsetCalibration4,

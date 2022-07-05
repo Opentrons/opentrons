@@ -93,7 +93,7 @@ describe('ProtocolDetails', () => {
 
   it('renders protocol title as display name if present in metadata', () => {
     const protocolName = 'fakeProtocolDisplayName'
-    const { getByRole } = render({
+    const { getByText } = render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -108,10 +108,10 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    getByRole('heading', { name: 'fakeProtocolDisplayName' })
+    getByText('fakeProtocolDisplayName')
   })
   it('renders protocol title as file name if not in metadata', () => {
-    const { getByRole } = render({
+    const { getByText } = render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -126,9 +126,7 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    expect(
-      getByRole('heading', { name: 'fakeSrcFileName' })
-    ).toBeInTheDocument()
+    expect(getByText('fakeSrcFileName')).toBeInTheDocument()
   })
   it('renders deck setup section', () => {
     const { getByRole, getByText } = render({

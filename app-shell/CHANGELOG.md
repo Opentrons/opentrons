@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.3...v6.0.0-alpha.4) (2022-07-01)
+
+
+### Bug Fixes
+
+* **app-shell:** allow corrupt protocol analysis files to error gracefully ([#10969](https://github.com/Opentrons/opentrons/issues/10969)) ([ed72dc3](https://github.com/Opentrons/opentrons/commit/ed72dc3003f2de4bbfb931526ebaddd506f9b7cd)), closes [#10828](https://github.com/Opentrons/opentrons/issues/10828)
+
+
+
+
+
+# [6.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.0...v6.0.0-alpha.3) (2022-06-28)
+
+
+### Bug Fixes
+
+* **app-shell:** use existing logic to feed custom labware to analysis ([#10827](https://github.com/Opentrons/opentrons/issues/10827)) ([d210ac5](https://github.com/Opentrons/opentrons/commit/d210ac54ba9d962cd40970e41327aa9785fd373b))
+
+
+
+
+
 # [6.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.2...v6.0.0-beta.0) (2022-06-10)
 
 **Note:** Version bump only for package @opentrons/app-shell

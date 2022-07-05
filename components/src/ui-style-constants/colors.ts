@@ -5,6 +5,7 @@ export const lightBlue = '#f1f8ff'
 export const medGrey = '#e3e3e3'
 export const black = '#000000'
 export const transparent = 'transparent'
+export const fundamentalsBackgroundShade = '#eeeeee'
 
 // colors with states
 export const blueFocus = '#deecff'

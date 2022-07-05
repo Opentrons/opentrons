@@ -29,6 +29,7 @@ import {
   useProtocolDetailsForRun,
   useRobot,
   useRunStatuses,
+  useSyncRobotClock,
 } from '../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { RunLog } from '../../../organisms/Devices/ProtocolRun/RunLog'
@@ -121,7 +122,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
   const protocolRunHeaderRef = React.useRef<HTMLDivElement>(null)
 
   const robot = useRobot(robotName)
-
+  useSyncRobotClock(robotName)
   interface ProtocolRunDetailsTabProps {
     protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
     robotName: string

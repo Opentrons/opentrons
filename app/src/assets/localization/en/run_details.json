@@ -53,6 +53,7 @@
   "drop_tip": "Dropping tip in {{well_name}} of {{labware}} in {{labware_location}}",
   "end_of_protocol": "End of protocol",
   "comment": "Comment",
+  "wait_for_resume": "Pausing protocol",
   "anticipated": "Anticipated steps",
   "protocol_steps": "Protocol steps",
   "protocol_run_failed": "Protocol run failed",

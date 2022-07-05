@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux'
 
 import {
   SPACING,
+  SIZE_1,
   TYPOGRAPHY,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
@@ -21,6 +22,7 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
+import { useLogger } from '../../logger'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { Slideout } from '../../atoms/Slideout'
 import { PrimaryButton } from '../../atoms/buttons'
@@ -42,6 +44,8 @@ export function ChooseProtocolSlideout(
   props: ChooseProtocolSlideoutProps
 ): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
+  const history = useHistory()
+  const logger = useLogger(__filename)
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
   const storedProtocols = useSelector((state: State) =>
@@ -51,9 +55,6 @@ export function ChooseProtocolSlideout(
     selectedProtocol,
     setSelectedProtocol,
   ] = React.useState<StoredProtocolData | null>(first(storedProtocols) ?? null)
-  const [createRunError, setCreateRunError] = React.useState<string | null>(
-    null
-  )
 
   const srcFileObjects =
     selectedProtocol != null
@@ -62,6 +63,29 @@ export function ChooseProtocolSlideout(
           return new File([srcFileBuffer], path.basename(srcFilePath))
         })
       : []
+
+  const {
+    createRunFromProtocolSource,
+    runCreationError,
+    isCreatingRun,
+    reset: resetCreateRun,
+  } = useCreateRunFromProtocol({
+    onSuccess: ({ data: runData }) => {
+      history.push(`/devices/${name}/protocol-runs/${runData.id}`)
+    },
+  })
+
+  const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
+    if (selectedProtocol != null) {
+      createRunFromProtocolSource({
+        files: srcFileObjects,
+        protocolKey: selectedProtocol.protocolKey,
+      })
+    } else {
+      logger.warn('failed to create protocol, no protocol selected')
+    }
+  }
+
   return (
     <Slideout
       isExpanded={showSlideout}
@@ -69,15 +93,17 @@ export function ChooseProtocolSlideout(
       title={t('choose_protocol_to_run', { name })}
       footer={
         <ApiHostProvider hostname={robot.ip}>
-          <CreateRunButton
-            disabled={selectedProtocol == null}
-            protocolKey={
-              selectedProtocol != null ? selectedProtocol.protocolKey : ''
-            }
-            srcFileObjects={srcFileObjects}
-            setError={setCreateRunError}
-            robotName={name}
-          />
+          <PrimaryButton
+            onClick={handleProceed}
+            disabled={isCreatingRun || selectedProtocol == null}
+            width="100%"
+          >
+            {isCreatingRun ? (
+              <Icon name="ot-spinner" spin size={SIZE_1} />
+            ) : (
+              t('shared:proceed_to_setup')
+            )}
+          </PrimaryButton>
         </ApiHostProvider>
       }
     >
@@ -93,10 +119,12 @@ export function ChooseProtocolSlideout(
             >
               <MiniCard
                 isSelected={isSelected}
-                isError={createRunError != null}
+                isError={runCreationError != null}
                 onClick={() => {
-                  setCreateRunError(null)
-                  setSelectedProtocol(storedProtocol)
+                  if (!isCreatingRun) {
+                    resetCreateRun()
+                    setSelectedProtocol(storedProtocol)
+                  }
                 }}
               >
                 <Flex
@@ -119,7 +147,7 @@ export function ChooseProtocolSlideout(
                     first(storedProtocol.srcFileNames) ??
                     storedProtocol.protocolKey}
                 </StyledText>
-                {createRunError != null && isSelected ? (
+                {runCreationError != null && isSelected ? (
                   <>
                     <Box flex="1 1 auto" />
                     <Icon
@@ -130,15 +158,16 @@ export function ChooseProtocolSlideout(
                   </>
                 ) : null}
               </MiniCard>
-              {createRunError != null && isSelected ? (
+              {runCreationError != null && isSelected ? (
                 <StyledText
                   as="label"
                   color={COLORS.errorText}
+                  css={{ 'overflow-wrap': 'anywhere' }}
                   display={DISPLAY_BLOCK}
                   marginTop={`-${SPACING.spacing2}`}
                   marginBottom={SPACING.spacing3}
                 >
-                  {createRunError}
+                  {runCreationError}
                 </StyledText>
               ) : null}
             </Flex>
@@ -177,55 +206,5 @@ export function ChooseProtocolSlideout(
         </Flex>
       )}
     </Slideout>
-  )
-}
-
-interface CreateRunButtonProps
-  extends React.ComponentProps<typeof PrimaryButton> {
-  srcFileObjects: File[]
-  protocolKey: string
-  robotName: string
-  setError: (error: string | null) => void
-}
-function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
-  const { t } = useTranslation('protocol_details')
-  const history = useHistory()
-  const {
-    protocolKey,
-    srcFileObjects,
-    robotName,
-    setError,
-    disabled,
-    ...buttonProps
-  } = props
-  const {
-    createRunFromProtocolSource,
-    runCreationError,
-    isCreatingRun,
-  } = useCreateRunFromProtocol({
-    onSuccess: ({ data: runData }) => {
-      history.push(`/devices/${robotName}/protocol-runs/${runData.id}`)
-    },
-  })
-
-  React.useEffect(() => {
-    if (runCreationError != null) {
-      setError(runCreationError)
-    }
-  }, [runCreationError, setError])
-
-  const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-    createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
-  }
-
-  return (
-    <PrimaryButton
-      onClick={handleClick}
-      disabled={isCreatingRun || disabled}
-      width="100%"
-      {...buttonProps}
-    >
-      {t('proceed_to_setup')}
-    </PrimaryButton>
   )
 }

@@ -85,11 +85,13 @@ const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
 }
 
 let mockCloseCurrentRun: jest.Mock
+let mockResetCreateRun: jest.Mock
 let mockCreateRunFromProtocolSource: jest.Mock
 
 describe('ChooseRobotSlideout', () => {
   beforeEach(() => {
     mockCloseCurrentRun = jest.fn()
+    mockResetCreateRun = jest.fn()
     mockCreateRunFromProtocolSource = jest.fn()
     mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: '',
@@ -112,6 +114,7 @@ describe('ChooseRobotSlideout', () => {
     } as ProtocolDetails)
     mockUseCreateRunFromProtocol.mockReturnValue({
       createRunFromProtocolSource: mockCreateRunFromProtocolSource,
+      reset: mockResetCreateRun,
     } as any)
   })
   afterEach(() => {
@@ -223,6 +226,7 @@ describe('ChooseRobotSlideout', () => {
       runCreationError: 'run creation error',
       createRunFromProtocolSource: mockCreateRunFromProtocolSource,
       isCreatingRun: false,
+      reset: jest.fn(),
     })
     const [{ getByRole, getByText }] = render({
       storedProtocolData: storedProtocolDataFixture,
