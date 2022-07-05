@@ -152,7 +152,12 @@ export const HeaterShakerSlideout = (
         })
       }
     }
-    isSetShake ? confirmAttachment() : setHsValue(null)
+    if (isSetShake) {
+      confirmAttachment()
+    } else {
+      setHsValue(null)
+      onCloseClick()
+    }
   }
 
   let errorMessage
