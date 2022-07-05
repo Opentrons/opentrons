@@ -27,21 +27,6 @@ export interface ToastProps {
   duration?: number
 }
 
-// const EXPANDED_STYLE = css`
-//   animation-duration: 300ms;
-//   animation-name: slidein;
-//   overflow: hidden;
-
-//   @keyframes slidein {
-//     from {
-//       bottom: 0;
-//     }
-//     to {
-//       bottom: ${SPACING.spacing4};
-//     }
-//   }
-// `
-
 const EXPANDED_STYLE = css`
   animation-duration: 300ms;
   animation-name: slideup;
