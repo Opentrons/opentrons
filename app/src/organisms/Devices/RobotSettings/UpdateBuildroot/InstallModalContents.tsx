@@ -82,10 +82,16 @@ export function InstallModalContents(
 
   return (
     <div className={styles.system_update_modal}>
-      <p className={styles.update_title}>{title}</p>
-      {progressComponent}
-      <p className={styles.update_message}>{updateMessage}</p>
-      <p>{restartMessage}</p>
+      {step === 'finished' ? (
+        <p>Your robot is now successfully updated.</p>
+      ) : (
+        <>
+          <p className={styles.update_title}>{title}</p>
+          {progressComponent}
+          <p className={styles.update_message}>{updateMessage}</p>
+          <p>{restartMessage}</p>
+        </>
+      )}
     </div>
   )
 }

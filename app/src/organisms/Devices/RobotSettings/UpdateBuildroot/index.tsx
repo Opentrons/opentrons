@@ -38,6 +38,15 @@ export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {
     dispatch(setBuildrootUpdateSeen(robotName))
   }, [dispatch, robotName])
 
+  // TODO(bc, 2022-07-05): We are currently ignoring the 'finished' session state, but
+  // when new SW Update flow is made, delete this implicit dismissal that
+  // clears buildroot state if session finished when initially mounted
+  React.useEffect(() => {
+    if (step === 'finished') {
+      dispatch(clearBuildrootSession())
+    }
+  }, [dispatch, step])
+
   // clear buildroot state on component dismount if done
   React.useEffect(() => {
     if (step === 'finished' || error !== null) {
