@@ -321,20 +321,15 @@ class OT3Controller:
         self,
         duration: float,
         duty_cycle: float,
-        frequency: float = 320000,
         stop_condition: MoveStopCondition = MoveStopCondition.none,
     ) -> bool:
-        move_group = create_gripper_jaw_move_group(
-            duration, duty_cycle, frequency, stop_condition
-        )
+        move_group = create_gripper_jaw_move_group(duration, duty_cycle, stop_condition)
         runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
         return True
 
-    async def gripper_home_jaw(
-        self, duration: float, duty_cycle: float, frequency: float = 320000
-    ) -> bool:
-        move_group = create_gripper_jaw_home_group(duration, duty_cycle, frequency)
+    async def gripper_home_jaw(self) -> bool:
+        move_group = create_gripper_jaw_home_group()
         runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
         return True

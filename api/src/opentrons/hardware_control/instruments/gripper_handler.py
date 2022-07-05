@@ -3,7 +3,7 @@ from typing import Optional
 from opentrons.types import Point
 from opentrons.hardware_control.robot_calibration import load_gripper_calibration_offset
 from opentrons.hardware_control.dev_types import GripperDict
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.types import CriticalPoint, GripperJawState
 from .gripper import Gripper
 
 
@@ -27,7 +27,10 @@ class GripperHandler:
     def __init__(self, gripper: Optional[Gripper] = None):
         self._gripper = gripper
 
-    def _verify_gripper(self) -> Gripper:
+    def has_gripper(self) -> bool:
+        return bool(self._gripper)
+
+    def verify_gripper(self) -> Gripper:
         gripper = self._gripper
         if not gripper:
             raise GripperNotAttachedError(
@@ -70,21 +73,26 @@ class GripperHandler:
         else:
             return self._gripper.as_dict()
 
-    def ready_for_grip(self) -> None:
-        gripper = self._verify_gripper()
-        if gripper.has_gripped:
+    def check_ready_for_grip(self) -> None:
+        """Raise an exception if it is not currently valid to grip."""
+        gripper = self.verify_gripper()
+        self.check_ready_for_jaw_move()
+        if gripper.state == GripperJawState.GRIPPING:
             raise GripError("Gripper is already gripping")
+        elif not gripper.state.ready_for_grip:
+            raise GripError("Gripper cannot currently grip")
 
-    def set_ready_to_grip(self, val: bool) -> None:
-        gripper = self._verify_gripper()
-        gripper.ready_to_grip = val
+    def check_ready_for_jaw_move(self) -> None:
+        """Raise an exception if it is not currently valid to move the jaw."""
+        gripper = self.verify_gripper()
+        if gripper.state == GripperJawState.UNHOMED:
+            raise GripError("Gripper jaw must be homed before moving")
 
-    def set_has_gripped(self, val: bool) -> None:
-        gripper = self._verify_gripper()
-        gripper.has_gripped = val
+    def set_jaw_state(self, state: GripperJawState) -> None:
+        self.verify_gripper().state = state
 
     def get_duty_cycle_by_grip_force(self, newton: Optional[float] = 0) -> float:
-        gripper = self._verify_gripper()
+        gripper = self.verify_gripper()
         if not newton:
             newton = DEFAULT_GRIP_FORCE_IN_NEWTON
         return gripper.duty_cycle_by_force(newton)

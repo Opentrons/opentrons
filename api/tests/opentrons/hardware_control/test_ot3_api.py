@@ -12,6 +12,7 @@ from opentrons.hardware_control.dev_types import (
 )
 from opentrons.hardware_control.instruments.gripper_handler import (
     GripperNotAttachedError,
+    GripError,
 )
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.hardware_control.ot3api import OT3API
@@ -367,6 +368,14 @@ async def test_gripper_action(
     instr_data = AttachedGripper(config=gripper_config, id="g12345")
     await ot3_hardware.cache_gripper(instr_data)
 
+    with pytest.raises(GripError, match="Gripper jaw must be homed before moving"):
+        await ot3_hardware.grip(2.0, 5.0)
+    await ot3_hardware.home_gripper_jaw()
+    mock_release.assert_called_once()
+    mock_release.reset_mock()
+    await ot3_hardware.home([OT3Axis.G])
+    mock_release.assert_called_once()
+    mock_release.reset_mock()
     await ot3_hardware.grip(2.0, 5.0)
     mock_grip.assert_called_once_with(
         2.0,
@@ -374,7 +383,4 @@ async def test_gripper_action(
     )
 
     await ot3_hardware.release(2.0, 10.0)
-    mock_release.assert_called_once_with(
-        2.0,
-        gc.piecewise_force_conversion(10.0, gripper_config.jaw_force_per_duty_cycle),
-    )
+    mock_release.assert_called_once()

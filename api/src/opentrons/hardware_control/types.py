@@ -444,3 +444,21 @@ class NoTipAttachedError(RuntimeError):
 
 class TipAttachedError(RuntimeError):
     pass
+
+
+class GripperJawState(enum.Enum):
+    UNHOMED = enum.auto()
+    #: the gripper must be homed before it can do anything
+    HOMED_READY = enum.auto()
+    #: the gripper has been homed and is at its fully-open homed position
+    GRIPPING = enum.auto()
+    #: the gripper is actively force-control gripping something
+    HOLDING_CLOSED = enum.auto()
+    #: the gripper is in position-control mode somewhere other than its
+    #: open position and probably should be opened before gripping something
+    HOLDING_OPENED = enum.auto()
+    #: the gripper is holding itself open but not quite at its homed position
+
+    @property
+    def ready_for_grip(self) -> bool:
+        return self in [GripperJawState.HOMED_READY, GripperJawState.HOLDING_OPENED]

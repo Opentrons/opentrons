@@ -63,6 +63,7 @@ from .types import (
     OT3Mount,
     OT3AxisMap,
     OT3SubSystem,
+    GripperJawState,
 )
 from . import modules
 from .robot_calibration import (
@@ -550,6 +551,14 @@ class OT3API(
             axes = [OT3Axis.Z_R, OT3Axis.Z_L]
         await self.home(axes)
 
+    async def home_gripper_jaw(self) -> None:
+        """
+        Home the jaw of the gripper.
+        """
+        gripper = self._gripper_handler.verify_gripper()
+        await self._release()
+        gripper.state = GripperJawState.HOMED_READY
+
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
@@ -827,6 +836,8 @@ class OT3API(
             checked_axes = [ax for ax in OT3Axis]
         async with self._motion_lock:
             try:
+                if OT3Axis.G in checked_axes and self._gripper_handler.has_gripper():
+                    await self.home_gripper_jaw()
                 await self._backend.home(checked_axes)
             except MoveConditionNotMet:
                 self._log.exception("Homing failed")
@@ -927,36 +938,24 @@ class OT3API(
             raise
 
     @ExecutionManagerProvider.wait_for_running
-    async def _release(self, duration: float, duty_cycle: float) -> None:
+    async def _release(self) -> None:
         """Move the gripper jaw outward to reach the homing switch."""
         try:
-            await self._backend.gripper_home_jaw(
-                duration=duration, duty_cycle=duty_cycle
-            )
+            await self._backend.gripper_home_jaw()
         except Exception:
             self._log.exception("Gripper home failed")
             raise
 
-    async def prepare_for_grip(self) -> None:
-        try:
-            self._gripper_handler.ready_for_grip()
-            await self.release(duration=2.0)
-        except Exception:
-            self._log.exception("Failed to prepare for grip")
-            raise
-        self._gripper_handler.set_ready_to_grip(True)
-
     async def grip(self, duration: float, newton: float) -> None:
+        self._gripper_handler.check_ready_for_grip()
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(newton)
         await self._grip(duration=duration, duty_cycle=dc)
-        self._gripper_handler.set_has_gripped(True)
-        self._gripper_handler.set_ready_to_grip(False)
 
     async def release(self, duration: float, newton: Optional[float] = None) -> None:
         # get default grip force for release if not provided
-        dc = self._gripper_handler.get_duty_cycle_by_grip_force(newton)
-        await self._release(duty_cycle=dc, duration=duration)
-        self._gripper_handler.set_has_gripped(False)
+        self._gripper_handler.check_ready_for_jaw_move()
+        await self._release()
+        self._gripper_handler.set_jaw_state(GripperJawState.HOMED_READY)
 
     # Pipette action API
     async def prepare_for_aspirate(

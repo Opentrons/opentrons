@@ -33,6 +33,9 @@ from opentrons_hardware.hardware_control.motion import (
     create_gripper_jaw_step,
 )
 
+GRIPPER_JAW_HOME_TIME: float = 120
+GRIPPER_JAW_FREQUENCY: float = 320000
+
 # TODO: These methods exist to defer uses of NodeId to inside
 # method bodies, which won't be evaluated until called. This is needed
 # because the robot server doesn't have opentrons_ot3_firmware as a dep
@@ -224,12 +227,11 @@ def create_home_group(
 def create_gripper_jaw_move_group(
     duration: float,
     duty_cycle: float,
-    frequency: float,
     stop_condition: MoveStopCondition = MoveStopCondition.none,
 ) -> MoveGroup:
     step = create_gripper_jaw_step(
         duration=np.float64(duration),
-        frequency=np.float32(frequency),
+        frequency=np.float32(GRIPPER_JAW_FREQUENCY),
         duty_cycle=np.float32(duty_cycle),
         stop_condition=stop_condition,
     )
@@ -237,15 +239,11 @@ def create_gripper_jaw_move_group(
     return move_group
 
 
-def create_gripper_jaw_home_group(
-    duration: float,
-    duty_cycle: float,
-    frequency: float,
-) -> MoveGroup:
+def create_gripper_jaw_home_group() -> MoveGroup:
     step = create_gripper_jaw_step(
-        duration=np.float64(duration),
-        frequency=np.float32(frequency),
-        duty_cycle=np.float32(duty_cycle),
+        duration=np.float64(GRIPPER_JAW_HOME_TIME),
+        frequency=np.float32(GRIPPER_JAW_FREQUENCY),
+        duty_cycle=np.float32(1),
         stop_condition=MoveStopCondition.limit_switch,
         move_type=MoveType.home,
     )

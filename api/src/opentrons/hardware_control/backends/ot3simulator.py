@@ -237,23 +237,15 @@ class OT3Simulator:
         self,
         duration: float,
         duty_cycle: float,
-        frequency: float = 320000,
         stop_condition: MoveStopCondition = MoveStopCondition.none,
     ) -> bool:
         """Move gripper inward."""
-        _ = create_gripper_jaw_move_group(
-            duration, duty_cycle, frequency, stop_condition
-        )
+        _ = create_gripper_jaw_move_group(duration, duty_cycle, stop_condition)
         return True
 
-    async def gripper_home_jaw(
-        self,
-        duration: float,
-        duty_cycle: float,
-        frequency: float = 320000,
-    ) -> bool:
+    async def gripper_home_jaw(self) -> bool:
         """Move gripper outward."""
-        _ = create_gripper_jaw_home_group(duration, duty_cycle, frequency)
+        _ = create_gripper_jaw_home_group()
         return True
 
     def _attached_to_mount(
