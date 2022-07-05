@@ -119,7 +119,10 @@ export const HeaterShakerSlideout = (
     !configHasHeaterShakerAttached
   )
 
-  const sendSetTemperatureOrShakeCommand = (): void => {
+  const sendSetTemperatureOrShakeCommand: React.MouseEventHandler<HTMLInputElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+
     if (hsValue != null && !isSetShake) {
       const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
         commandType: 'heaterShaker/setTargetTemperature',
@@ -150,7 +153,6 @@ export const HeaterShakerSlideout = (
       }
     }
     isSetShake ? confirmAttachment() : setHsValue(null)
-    onCloseClick()
   }
 
   let errorMessage
