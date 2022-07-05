@@ -82,16 +82,17 @@ export function InstallModalContents(
 
   return (
     <div className={styles.system_update_modal}>
+      {/* TODO(jr, 7/5/22): temporarily removing this until we redo Update Robot Software flow in 6.1-6.2 
       {step === 'finished' ? (
         <p>Your robot is now successfully updated.</p>
       ) : (
-        <>
-          <p className={styles.update_title}>{title}</p>
-          {progressComponent}
-          <p className={styles.update_message}>{updateMessage}</p>
-          <p>{restartMessage}</p>
-        </>
-      )}
+        <> */}
+      <p className={styles.update_title}>{title}</p>
+      {progressComponent}
+      <p className={styles.update_message}>{updateMessage}</p>
+      <p>{restartMessage}</p>
+      {/* </>
+      )} */}
     </div>
   )
 }
