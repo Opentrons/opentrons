@@ -38,9 +38,8 @@ from opentrons.hardware_control.constants import (
 from opentrons.hardware_control.robot_calibration import load_pipette_offset
 from opentrons.hardware_control.dev_types import PipetteDict
 from .pipette import Pipette
+from .instrument_abc import MountType
 
-
-MountType = TypeVar("MountType", top_types.Mount, OT3Mount)
 
 InstrumentsByMount = Dict[MountType, Optional[Pipette]]
 PipetteHandlingData = Tuple[Pipette, MountType]

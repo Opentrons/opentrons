@@ -212,7 +212,7 @@ class EquipmentHandler:
                 assigned to the requested location.
         """
         # TODO(mc, 2022-02-09): validate module location given deck definition
-        use_virtual_modules = self._state_store.get_configs().use_virtual_modules
+        use_virtual_modules = self._state_store.config.use_virtual_modules
 
         if not use_virtual_modules:
             attached_modules = [
@@ -275,7 +275,7 @@ class EquipmentHandler:
 
     def get_module_hardware_api(self, module_id: str) -> Optional[AbstractModule]:
         """Get the hardware API for a given module."""
-        use_virtual_modules = self._state_store.get_configs().use_virtual_modules
+        use_virtual_modules = self._state_store.config.use_virtual_modules
         if use_virtual_modules:
             return None
 

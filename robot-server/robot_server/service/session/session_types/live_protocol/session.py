@@ -1,4 +1,9 @@
-from opentrons.protocol_engine import ProtocolEngine, create_protocol_engine
+# TODO(mc, 2022-06-27): delete the `live_protocol` session type
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    Config as ProtocolEngineConfig,
+    create_protocol_engine,
+)
 
 from robot_server.service.session.models import session as models
 from robot_server.service.session.command_execution import CommandQueue, CommandExecutor
@@ -29,7 +34,9 @@ class LiveProtocolSession(BaseSession):
         return LiveProtocolSession(
             configuration=configuration,
             instance_meta=instance_meta,
-            protocol_engine=await create_protocol_engine(configuration.hardware),
+            protocol_engine=await create_protocol_engine(
+                hardware_api=configuration.hardware, config=ProtocolEngineConfig()
+            ),
         )
 
     @property

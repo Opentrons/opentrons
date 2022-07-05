@@ -362,9 +362,11 @@ class OT3Controller:
         def _build_attached_gripper(
             attached: ohc_tool_types.GripperInformation,
         ) -> AttachedGripper:
+            model = gripper_config.info_num_to_model(attached.model)
+            serial = attached.serial
             return {
-                "config": gripper_config.load(attached.model),
-                "id": attached.serial,
+                "config": gripper_config.load(model, serial),
+                "id": serial,
             }
 
         def _generate_attached_instrs(
@@ -569,6 +571,8 @@ class OT3Controller:
             NodeId.gantry_y: 0,
             NodeId.pipette_left: 0,
             NodeId.pipette_right: 0,
+            NodeId.gripper_z: 0,
+            NodeId.gripper_g: 0,
         }
 
     @staticmethod
@@ -590,6 +594,20 @@ class OT3Controller:
             nodes.remove(NodeId.head)
             nodes.add(NodeId.head_r)
             nodes.add(NodeId.head_l)
+        return nodes
+
+    @staticmethod
+    def _replace_gripper_node(nodes: Set[NodeId]) -> Set[NodeId]:
+        """Replace the gripper core node with its two axes.
+
+        The node ID for the gripper controller is what shows up in a network probe,
+        but what we actually send most commands to is the gripper_z and gripper_g
+        synthetic nodes, so we should have them in the network map instead.
+        """
+        if NodeId.gripper in nodes:
+            nodes.remove(NodeId.gripper)
+            nodes.add(NodeId.gripper_z)
+            nodes.add(NodeId.gripper_g)
         return nodes
 
     @staticmethod
@@ -640,7 +658,9 @@ class OT3Controller:
         ):
             expected.add(NodeId.gripper)
         present = await probe(self._messenger, expected, timeout)
-        self._present_nodes = self._replace_head_node(present)
+        self._present_nodes = self._replace_gripper_node(
+            self._replace_head_node(present)
+        )
 
     def _axis_is_present(self, axis: OT3Axis) -> bool:
         try:

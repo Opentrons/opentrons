@@ -49,6 +49,7 @@ def axis_nodes() -> List["NodeId"]:
         NodeId.pipette_left,
         NodeId.pipette_right,
         NodeId.gripper_z,
+        NodeId.gripper_g,
     ]
 
 
@@ -61,6 +62,7 @@ def node_axes() -> List[OT3Axis]:
         OT3Axis.P_L,
         OT3Axis.P_R,
         OT3Axis.Z_G,
+        OT3Axis.G,
     ]
 
 
@@ -68,6 +70,7 @@ def home_axes() -> List[OT3Axis]:
     return [
         OT3Axis.P_L,
         OT3Axis.P_R,
+        OT3Axis.G,
         OT3Axis.Z_L,
         OT3Axis.Z_R,
         OT3Axis.Z_G,
