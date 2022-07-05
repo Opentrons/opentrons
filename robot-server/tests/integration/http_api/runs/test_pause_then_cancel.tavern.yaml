@@ -62,6 +62,7 @@ stages:
         - json:off
       json:
         data:
+          # Assert that there's a succeeded command followed by a queued command.
           - status: succeeded
           - status: queued
 
