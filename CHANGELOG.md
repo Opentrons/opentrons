@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.4...v6.0.0-alpha.5) (2022-07-05)
+
+
+### Bug Fixes
+
+* **app:** App fix deck cal banner misleading issue ([#10979](https://github.com/Opentrons/opentrons/issues/10979)) ([4b732bf](https://github.com/Opentrons/opentrons/commit/4b732bf506af0327a8bae6e4ef87a9ce160fafbf)), closes [#10952](https://github.com/Opentrons/opentrons/issues/10952)
+* **app:** fix robot settings tip length calibration method selection ([#10991](https://github.com/Opentrons/opentrons/issues/10991)) ([84aa5bf](https://github.com/Opentrons/opentrons/commit/84aa5bf2969f4b41e53108327f6fc5aa07d0b18c)), closes [#10939](https://github.com/Opentrons/opentrons/issues/10939)
+* **app:** H-S confirm attachment modal form stopPropagation addition ([#10996](https://github.com/Opentrons/opentrons/issues/10996)) ([e196f4d](https://github.com/Opentrons/opentrons/commit/e196f4d0fd500423ffea7b3ae0fd0dab111aa68a)), closes [#10881](https://github.com/Opentrons/opentrons/issues/10881)
+* **app:** remove array brackets in devices landing page jsx ([#11004](https://github.com/Opentrons/opentrons/issues/11004)) ([65e6f0d](https://github.com/Opentrons/opentrons/commit/65e6f0dc94a767422a9477eac5652ab047be88aa))
+* **app:** remove legacy modal content background color override prop ([#10992](https://github.com/Opentrons/opentrons/issues/10992)) ([346fafc](https://github.com/Opentrons/opentrons/commit/346fafce067bfd805e073309d0660feb7603b0d9)), closes [#10742](https://github.com/Opentrons/opentrons/issues/10742)
+* **app:** remove Robot is now successful modal from update flow ([#11001](https://github.com/Opentrons/opentrons/issues/11001)) ([81373cb](https://github.com/Opentrons/opentrons/commit/81373cbff82a0f41f80a44d89525b8303b05d825))
+* **app:** remove slideout and modal from robot overflow menu conditional render ([#10990](https://github.com/Opentrons/opentrons/issues/10990)) ([884396d](https://github.com/Opentrons/opentrons/commit/884396d9cb04753fd21e802ae1e9d9ecb5a51e6a)), closes [#10782](https://github.com/Opentrons/opentrons/issues/10782) [#10536](https://github.com/Opentrons/opentrons/issues/10536)
+* **components:** fix link tabIndex ([#10986](https://github.com/Opentrons/opentrons/issues/10986)) ([867e6b7](https://github.com/Opentrons/opentrons/commit/867e6b74d93bdf56b984d71522492fec31528929))
+
+
+### Features
+
+* **app:** add delete protocol option to overflow menu and create modal ([#10984](https://github.com/Opentrons/opentrons/issues/10984)) ([2e4ad60](https://github.com/Opentrons/opentrons/commit/2e4ad6065a310c12f2fdbe8f3a8b576df9395374)), closes [#10402](https://github.com/Opentrons/opentrons/issues/10402)
+
+
+
+
+
 # [6.0.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.3...v6.0.0-alpha.4) (2022-07-01)
 
 
