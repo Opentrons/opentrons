@@ -218,11 +218,7 @@ class RunStore:
         Returns:
             All stored run entries.
         """
-        select_runs = sqlalchemy.select(
-            run_table.c.id,
-            run_table.c.protocol_id,
-            run_table.c.created_at,
-        )
+        select_runs = sqlalchemy.select(_run_columns)
         select_actions = sqlalchemy.select(action_table)
         actions_by_run_id = defaultdict(list)
 
