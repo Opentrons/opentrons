@@ -20,7 +20,7 @@ export function InstallModal(props: InstallModalProps): JSX.Element | null {
   const { session, close, robotSystemType } = props
   const buttons = []
 
-  if (session.step === 'finished' || session.error !== null) {
+  if (session.error !== null) {
     buttons.push({ children: 'close', onClick: close })
   }
 
