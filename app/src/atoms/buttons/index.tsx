@@ -121,6 +121,7 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
   text-transform: ${TYPOGRAPHY.textTransformNone};
   background-color: ${COLORS.transparent};
   ${TYPOGRAPHY.pSemiBold}
+  background-color: ${COLORS.transparent};
 
   ${styleProps}
 

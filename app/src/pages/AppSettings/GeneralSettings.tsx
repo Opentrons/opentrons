@@ -17,6 +17,7 @@ import {
   TYPOGRAPHY,
   COLORS,
   ALIGN_START,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
@@ -60,9 +61,6 @@ export function GeneralSettings(): JSX.Element {
     setShowPreviousVersionModal,
   ] = React.useState<boolean>(false)
   const updateAvailable = Boolean(useSelector(getAvailableShellUpdate))
-  const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(
-    updateAvailable
-  )
   const [showUpdateBanner, setShowUpdateBanner] = React.useState<boolean>(
     updateAvailable
   )
@@ -76,7 +74,9 @@ export function GeneralSettings(): JSX.Element {
     const ignored = getAlertIsPermanentlyIgnored(s, ALERT_APP_UPDATE_AVAILABLE)
     return ignored !== null ? !ignored : null
   })
-
+  const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(
+    updateAlertEnabled ? updateAvailable : false
+  )
   const handleToggle = (): void => {
     if (updateAlertEnabled !== null) {
       dispatch(
@@ -116,8 +116,10 @@ export function GeneralSettings(): JSX.Element {
             >
               {t('update_available')}
               <Link
+                role="button"
                 textDecoration={TEXT_DECORATION_UNDERLINE}
                 onClick={() => setShowUpdateModal(true)}
+                marginLeft={SPACING.spacing2}
               >
                 {t('view_update')}
               </Link>
@@ -187,20 +189,22 @@ export function GeneralSettings(): JSX.Element {
             </StyledText>
           </Box>
           <Box>
-            <Link
-              role="button"
-              css={TYPOGRAPHY.linkPSemiBold}
-              onClick={() => setShowPreviousVersionModal(true)}
-              id="GeneralSettings_previousVersionLink"
-            >
-              {t('restore_previous')}
-            </Link>
-            <ExternalLink
-              href={SOFTWARE_SYNC_URL}
-              id="GeneralSettings_appAndRobotSync"
-            >
-              {t('versions_sync')}
-            </ExternalLink>
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <Link
+                role="button"
+                css={TYPOGRAPHY.linkPSemiBold}
+                onClick={() => setShowPreviousVersionModal(true)}
+                id="GeneralSettings_previousVersionLink"
+              >
+                {t('restore_previous')}
+              </Link>
+              <ExternalLink
+                href={SOFTWARE_SYNC_URL}
+                id="GeneralSettings_appAndRobotSync"
+              >
+                {t('versions_sync')}
+              </ExternalLink>
+            </Flex>
           </Box>
         </Box>
         <Divider marginY={SPACING.spacing5} />
@@ -245,7 +249,7 @@ export function GeneralSettings(): JSX.Element {
           </TertiaryButton>
         </Flex>
       </Box>
-      {showUpdateModal && updateAlertEnabled ? (
+      {showUpdateModal ? (
         <Portal level="top">
           <UpdateAppModal closeModal={() => setShowUpdateModal(false)} />
         </Portal>

@@ -11,6 +11,7 @@ import {
   useProtocolDetailsForRun,
   useRobot,
   useRunStatuses,
+  useSyncRobotClock,
 } from '../../../../organisms/Devices/hooks'
 import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunModuleControls } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
@@ -30,6 +31,9 @@ jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls')
 jest.mock('../../../../organisms/ProtocolUpload/hooks')
 
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
+const mockUseSyncRobotClock = useSyncRobotClock as jest.MockedFunction<
+  typeof useSyncRobotClock
+>
 const mockProtocolRunHeader = ProtocolRunHeader as jest.MockedFunction<
   typeof ProtocolRunHeader
 >
@@ -141,6 +145,12 @@ describe('ProtocolRunDetails', () => {
     )
 
     getByText('Mock ProtocolRunHeader')
+  })
+
+  it('syncs robot system clock on mount', () => {
+    render(`/devices/otie/protocol-runs/${RUN_ID}/setup`)
+
+    expect(mockUseSyncRobotClock).toHaveBeenCalledWith('otie')
   })
 
   it('renders navigation tabs', () => {

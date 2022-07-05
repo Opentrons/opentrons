@@ -52,7 +52,6 @@ export const LiquidsLabwareDetailsModal = (
     <Modal
       onClose={closeModal}
       title={labwareName}
-      contentBackgroundColor={COLORS.background}
       closeOnOutsideClick
       width="46.875rem"
     >

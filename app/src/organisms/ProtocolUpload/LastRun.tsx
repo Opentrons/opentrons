@@ -86,7 +86,7 @@ export function LastRun(): JSX.Element | null {
           values={{ robot_name: robotName }}
         />
         <Link
-          role={'link'}
+          role="button"
           fontSize={FONT_SIZE_BODY_1}
           color={C_BLUE}
           onClick={() => showRerunningProtocolModal(true)}

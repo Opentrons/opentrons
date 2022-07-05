@@ -157,6 +157,25 @@ describe('HeaterShakerSlideout', () => {
     })
     expect(button).not.toBeEnabled()
   })
+
+  it('renders the exit button and when clicked, deletes the value input', () => {
+    props = {
+      module: mockHeaterShaker,
+      isSetShake: false,
+      isExpanded: true,
+      onCloseClick: jest.fn(),
+      isLoadedInRun: false,
+    }
+    const { getByLabelText, getByTestId } = render(props)
+    const button = getByLabelText('exit')
+    const input = getByTestId('heaterShakerModuleV1_false')
+    fireEvent.change(input, { target: { value: '40' } })
+    fireEvent.click(button)
+
+    expect(props.onCloseClick).toHaveBeenCalled()
+    expect(input).not.toHaveValue()
+  })
+
   it('renders heater shaker form field and when button is clicked, confirm attachment modal is not rendered', () => {
     mockGetIsHeaterShakerAttached.mockReturnValue(true)
     props = {
@@ -222,6 +241,7 @@ describe('HeaterShakerSlideout', () => {
     fireEvent.change(input, { target: { value: '40' } })
     expect(button).toBeEnabled()
     fireEvent.click(button)
+    expect(props.onCloseClick).toHaveBeenCalled()
 
     expect(mockCreateCommand).toHaveBeenCalledWith({
       runId: props.currentRunId,

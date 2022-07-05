@@ -3,6 +3,100 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.4...v6.0.0-alpha.5) (2022-07-05)
+
+
+### Bug Fixes
+
+* **app:** App fix deck cal banner misleading issue ([#10979](https://github.com/Opentrons/opentrons/issues/10979)) ([4b732bf](https://github.com/Opentrons/opentrons/commit/4b732bf506af0327a8bae6e4ef87a9ce160fafbf)), closes [#10952](https://github.com/Opentrons/opentrons/issues/10952)
+* **app:** fix robot settings tip length calibration method selection ([#10991](https://github.com/Opentrons/opentrons/issues/10991)) ([84aa5bf](https://github.com/Opentrons/opentrons/commit/84aa5bf2969f4b41e53108327f6fc5aa07d0b18c)), closes [#10939](https://github.com/Opentrons/opentrons/issues/10939)
+* **app:** H-S confirm attachment modal form stopPropagation addition ([#10996](https://github.com/Opentrons/opentrons/issues/10996)) ([e196f4d](https://github.com/Opentrons/opentrons/commit/e196f4d0fd500423ffea7b3ae0fd0dab111aa68a)), closes [#10881](https://github.com/Opentrons/opentrons/issues/10881)
+* **app:** remove array brackets in devices landing page jsx ([#11004](https://github.com/Opentrons/opentrons/issues/11004)) ([65e6f0d](https://github.com/Opentrons/opentrons/commit/65e6f0dc94a767422a9477eac5652ab047be88aa))
+* **app:** remove legacy modal content background color override prop ([#10992](https://github.com/Opentrons/opentrons/issues/10992)) ([346fafc](https://github.com/Opentrons/opentrons/commit/346fafce067bfd805e073309d0660feb7603b0d9)), closes [#10742](https://github.com/Opentrons/opentrons/issues/10742)
+* **app:** remove Robot is now successful modal from update flow ([#11001](https://github.com/Opentrons/opentrons/issues/11001)) ([81373cb](https://github.com/Opentrons/opentrons/commit/81373cbff82a0f41f80a44d89525b8303b05d825))
+* **app:** remove slideout and modal from robot overflow menu conditional render ([#10990](https://github.com/Opentrons/opentrons/issues/10990)) ([884396d](https://github.com/Opentrons/opentrons/commit/884396d9cb04753fd21e802ae1e9d9ecb5a51e6a)), closes [#10782](https://github.com/Opentrons/opentrons/issues/10782) [#10536](https://github.com/Opentrons/opentrons/issues/10536)
+* **components:** fix link tabIndex ([#10986](https://github.com/Opentrons/opentrons/issues/10986)) ([867e6b7](https://github.com/Opentrons/opentrons/commit/867e6b74d93bdf56b984d71522492fec31528929))
+
+
+### Features
+
+* **app:** add delete protocol option to overflow menu and create modal ([#10984](https://github.com/Opentrons/opentrons/issues/10984)) ([2e4ad60](https://github.com/Opentrons/opentrons/commit/2e4ad6065a310c12f2fdbe8f3a8b576df9395374)), closes [#10402](https://github.com/Opentrons/opentrons/issues/10402)
+
+
+
+
+
+# [6.0.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.3...v6.0.0-alpha.4) (2022-07-01)
+
+
+### Bug Fixes
+
+* **app:** add default message for waitForResume commands ([#10965](https://github.com/Opentrons/opentrons/issues/10965)) ([b04a1eb](https://github.com/Opentrons/opentrons/commit/b04a1eba23e13f5ba3f6b606c08bafda4500a1e4)), closes [#10948](https://github.com/Opentrons/opentrons/issues/10948)
+* **app:** address design feedback initial protocols landing page  ([#10950](https://github.com/Opentrons/opentrons/issues/10950)) ([9346a8a](https://github.com/Opentrons/opentrons/commit/9346a8af2830a1d191558d2215e9feb7a696a1e5)), closes [#10907](https://github.com/Opentrons/opentrons/issues/10907)
+* **app:** fix pipette calibration modal auto closing ([#10955](https://github.com/Opentrons/opentrons/issues/10955)) ([5d775be](https://github.com/Opentrons/opentrons/commit/5d775be54088f9afbfdd300a39aeccf693a77550)), closes [#10941](https://github.com/Opentrons/opentrons/issues/10941)
+* **app:** fix ProtocolRunningContent remounting issue ([#10977](https://github.com/Opentrons/opentrons/issues/10977)) ([be8b3b5](https://github.com/Opentrons/opentrons/commit/be8b3b5a4f2121772156f0e4f0173abc8b0a9ff4)), closes [#10956](https://github.com/Opentrons/opentrons/issues/10956)
+* **app:** fix tip length calibration method selection ([#10976](https://github.com/Opentrons/opentrons/issues/10976)) ([9d4bec0](https://github.com/Opentrons/opentrons/commit/9d4bec019e449efc8d160005e198fd0e567009da)), closes [#10939](https://github.com/Opentrons/opentrons/issues/10939)
+* **app:** protocol Run Record protocolName no longer renders runId ([#10961](https://github.com/Opentrons/opentrons/issues/10961)) ([322c71c](https://github.com/Opentrons/opentrons/commit/322c71c69139c7b7acfa5f7e58a4d9840d24d278)), closes [#10899](https://github.com/Opentrons/opentrons/issues/10899) [#10658](https://github.com/Opentrons/opentrons/issues/10658)
+* **app:** see how to restore a previous sw version btn fix ([#10978](https://github.com/Opentrons/opentrons/issues/10978)) ([c20ad24](https://github.com/Opentrons/opentrons/commit/c20ad24feb1cfc54e07d633f3a3c4a9d8ef9933d)), closes [#10972](https://github.com/Opentrons/opentrons/issues/10972)
+* **app:** software update toggle logic refactor ([#10968](https://github.com/Opentrons/opentrons/issues/10968)) ([df3ab80](https://github.com/Opentrons/opentrons/commit/df3ab804f628299b728db56cd0cf5a11e2db524d)), closes [#10962](https://github.com/Opentrons/opentrons/issues/10962)
+* **app:** this PR makes <Link> from opentrons componets tabbable ([#10930](https://github.com/Opentrons/opentrons/issues/10930)) ([c7fc0f0](https://github.com/Opentrons/opentrons/commit/c7fc0f0969b8c29325a153b61ac2796dda042703))
+* **app-shell:** allow corrupt protocol analysis files to error gracefully ([#10969](https://github.com/Opentrons/opentrons/issues/10969)) ([ed72dc3](https://github.com/Opentrons/opentrons/commit/ed72dc3003f2de4bbfb931526ebaddd506f9b7cd)), closes [#10828](https://github.com/Opentrons/opentrons/issues/10828)
+* **app, react-api-client:** add run creation spinner and handle errors in slideouts during run creation ([#10944](https://github.com/Opentrons/opentrons/issues/10944)) ([3002093](https://github.com/Opentrons/opentrons/commit/300209338efcd77071632d88a677ab2a68636a71))
+
+
+
+
+
+# [6.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.0...v6.0.0-alpha.3) (2022-06-28)
+
+
+### Bug Fixes
+
+* **api:** fix multiple h/s bugs ([#10727](https://github.com/Opentrons/opentrons/issues/10727)) ([b8c7c88](https://github.com/Opentrons/opentrons/commit/b8c7c8878a8c99ad2f2c5d6bc150faecb0b7f7d4)), closes [#10605](https://github.com/Opentrons/opentrons/issues/10605) [#10258](https://github.com/Opentrons/opentrons/issues/10258)
+* **app:** avoid the name conflict issue in the same network ([#10723](https://github.com/Opentrons/opentrons/issues/10723)) ([9ba3c37](https://github.com/Opentrons/opentrons/commit/9ba3c37cddcd8210f65a01cd5e980ec88db70b6c))
+* **app:** edit paused step item copy ([#10735](https://github.com/Opentrons/opentrons/issues/10735)) ([1a245a8](https://github.com/Opentrons/opentrons/commit/1a245a83a981ac2647e69de95b7a3a2b50a2ff21)), closes [#10338](https://github.com/Opentrons/opentrons/issues/10338)
+* **app:** fix connect robot via ip address functionality and style ([#10784](https://github.com/Opentrons/opentrons/issues/10784)) ([e3025b7](https://github.com/Opentrons/opentrons/commit/e3025b75f0c5db7eeb499de2df122e31c33c05ed)), closes [#10618](https://github.com/Opentrons/opentrons/issues/10618) [#10593](https://github.com/Opentrons/opentrons/issues/10593) [#10594](https://github.com/Opentrons/opentrons/issues/10594)
+* **app:** fix historical protocol run timestamps ([#10934](https://github.com/Opentrons/opentrons/issues/10934)) ([1ade355](https://github.com/Opentrons/opentrons/commit/1ade355b019b3f8d3988938f21047dc70b5a5cb0))
+* **app:** fix long labware name display issue on slideout ([#10745](https://github.com/Opentrons/opentrons/issues/10745)) ([f88a416](https://github.com/Opentrons/opentrons/commit/f88a4167cfcd90664e0c93d23a4f816910b9fc29)), closes [#10641](https://github.com/Opentrons/opentrons/issues/10641)
+* **app:** fix run log run duration ([#10860](https://github.com/Opentrons/opentrons/issues/10860)) ([6413cfb](https://github.com/Opentrons/opentrons/commit/6413cfbd5d62b38d107a0ac0fb7f49160df607bf))
+* **app:** fix wrong event name for Mixpanel ([#10748](https://github.com/Opentrons/opentrons/issues/10748)) ([601e3e6](https://github.com/Opentrons/opentrons/commit/601e3e68d7ba1918751d56a732ee9c28de2bdb6d)), closes [#10744](https://github.com/Opentrons/opentrons/issues/10744)
+* **app:** handle protocol creation failure in slideouts ([#10925](https://github.com/Opentrons/opentrons/issues/10925)) ([91c28a9](https://github.com/Opentrons/opentrons/commit/91c28a939396955deac52a84f00e8546fcecb91e)), closes [#10569](https://github.com/Opentrons/opentrons/issues/10569)
+* **app:** if robot is not connectable during run, navigate to devices ([#10769](https://github.com/Opentrons/opentrons/issues/10769)) ([a4123d3](https://github.com/Opentrons/opentrons/commit/a4123d338c81b83479109d62d568122ed1c8152f)), closes [#10584](https://github.com/Opentrons/opentrons/issues/10584)
+* **app:** module cards and slideouts various bug fixes ([#10864](https://github.com/Opentrons/opentrons/issues/10864)) ([7b90a79](https://github.com/Opentrons/opentrons/commit/7b90a79c88c743c36f4291f41baf7db6e821873e)), closes [#10839](https://github.com/Opentrons/opentrons/issues/10839) [#10854](https://github.com/Opentrons/opentrons/issues/10854) [#10856](https://github.com/Opentrons/opentrons/issues/10856)
+* **app:** pipette card banners and historical protocol run protocolNames render fix ([#10848](https://github.com/Opentrons/opentrons/issues/10848)) ([3bec913](https://github.com/Opentrons/opentrons/commit/3bec9135fc54014db49ada51150826cc81832c02)), closes [#10658](https://github.com/Opentrons/opentrons/issues/10658)
+* **app:** sync robot clock on device and run detail page ([#10933](https://github.com/Opentrons/opentrons/issues/10933)) ([06a73a8](https://github.com/Opentrons/opentrons/commit/06a73a8c9571a1950d3055de8b971d77d3d6015b)), closes [#10804](https://github.com/Opentrons/opentrons/issues/10804)
+* **app:** wire up Software Update Alerts toggle logic ([#10732](https://github.com/Opentrons/opentrons/issues/10732)) ([6c8c5c0](https://github.com/Opentrons/opentrons/commit/6c8c5c0b0980e5c33a836cf46c94a6597dd55046)), closes [#10576](https://github.com/Opentrons/opentrons/issues/10576)
+* **app-shell:** use existing logic to feed custom labware to analysis ([#10827](https://github.com/Opentrons/opentrons/issues/10827)) ([d210ac5](https://github.com/Opentrons/opentrons/commit/d210ac54ba9d962cd40970e41327aa9785fd373b))
+* **engine:** include modules w/o labware in motion planning ([#10902](https://github.com/Opentrons/opentrons/issues/10902)) ([0b0dfae](https://github.com/Opentrons/opentrons/commit/0b0dfae27211607ace9465b63e1fe0024a855fee))
+* **robot-server:** allow live commands if current run is terminal ([#10879](https://github.com/Opentrons/opentrons/issues/10879)) ([0ee0c72](https://github.com/Opentrons/opentrons/commit/0ee0c728a1517009336c2c6e2135eaaf0dab2150))
+* **robot-server:** calculate magnetic module gen 1 height  ([#10724](https://github.com/Opentrons/opentrons/issues/10724)) ([c231d1b](https://github.com/Opentrons/opentrons/commit/c231d1b841b40018ad891aeb5a3cb707d34e0ea8)), closes [#9515](https://github.com/Opentrons/opentrons/issues/9515)
+* **robot-server, api:** Disallow python protocol upload with unsupported version ([#10780](https://github.com/Opentrons/opentrons/issues/10780)) ([da8d9af](https://github.com/Opentrons/opentrons/commit/da8d9af65d47207251131d413aca284e08612132))
+
+
+### Features
+
+* **api:** add heaterShakerModuleContext and methods to PAPIv2 ([#10426](https://github.com/Opentrons/opentrons/issues/10426)) ([6461ec8](https://github.com/Opentrons/opentrons/commit/6461ec84846151ccc68640cc6a0bbdfb7cf35590))
+* **app:** add reinstall button to robot advanced settings ([#10773](https://github.com/Opentrons/opentrons/issues/10773)) ([ace769c](https://github.com/Opentrons/opentrons/commit/ace769c678703d1d96d5e5e40eb70ba567cc23af)), closes [#10435](https://github.com/Opentrons/opentrons/issues/10435)
+* **app:** interactive liquid list view items ([#10696](https://github.com/Opentrons/opentrons/issues/10696)) ([9116db1](https://github.com/Opentrons/opentrons/commit/9116db1c565f73799983cbbebe7245cc6098aa6d)), closes [#10571](https://github.com/Opentrons/opentrons/issues/10571)
+* **app:** liquid setup labware detail modal ([#10742](https://github.com/Opentrons/opentrons/issues/10742)) ([bda60f1](https://github.com/Opentrons/opentrons/commit/bda60f115ab929367c01e7b931622c28163b7960)), closes [#10669](https://github.com/Opentrons/opentrons/issues/10669)
+* **app:** map view of liquid setup  ([#10743](https://github.com/Opentrons/opentrons/issues/10743)) ([e8eab25](https://github.com/Opentrons/opentrons/commit/e8eab253444c546d0cefcfb116957a1666779b22)), closes [#10519](https://github.com/Opentrons/opentrons/issues/10519)
+* **app:** modal design qa feedback round 2 ([#10868](https://github.com/Opentrons/opentrons/issues/10868)) ([aba9664](https://github.com/Opentrons/opentrons/commit/aba9664450a668d3295c47908a2e6a5f1c12521c)), closes [#10866](https://github.com/Opentrons/opentrons/issues/10866)
+* **engine:** open and close thermocycler lid ([#10760](https://github.com/Opentrons/opentrons/issues/10760)) ([1e82c26](https://github.com/Opentrons/opentrons/commit/1e82c26a8f8aa6d0f4821390109661216a095732))
+* **engine:** set flow rate in aspirate, dispense, and blowout ([#10800](https://github.com/Opentrons/opentrons/issues/10800)) ([0e66677](https://github.com/Opentrons/opentrons/commit/0e666777f96dd832b08efba255ef0e28a31641d6))
+* **engine:** touch tip PAPIv3 ([#10678](https://github.com/Opentrons/opentrons/issues/10678)) ([25c99df](https://github.com/Opentrons/opentrons/commit/25c99df9e4ac89107af51bfa720e2d3242946f83))
+* **hardware:** add ot3 gpio driver, set estop ([#10776](https://github.com/Opentrons/opentrons/issues/10776)) ([b1ad8d2](https://github.com/Opentrons/opentrons/commit/b1ad8d20f4de8c3e39b928c848e34f7466f305ae))
+* **papi-v2:** restrict placement of heater-shaker modules ([#10785](https://github.com/Opentrons/opentrons/issues/10785)) ([3c74e30](https://github.com/Opentrons/opentrons/commit/3c74e30e1183844e456c5e9bef7779141a2fa115)), closes [#10316](https://github.com/Opentrons/opentrons/issues/10316)
+* **protocol-designer:** add collision warnings for heater shaker ([#10759](https://github.com/Opentrons/opentrons/issues/10759)) ([039d597](https://github.com/Opentrons/opentrons/commit/039d597ddbbf615e5acd8c41795cb5a825e2174f)), closes [#10514](https://github.com/Opentrons/opentrons/issues/10514)
+* **protocol-designer:** add HS announcement modal ([#10795](https://github.com/Opentrons/opentrons/issues/10795)) ([b9f0d9f](https://github.com/Opentrons/opentrons/commit/b9f0d9fdae0dbd6565f9bbc794318cf290de7acc)), closes [#9973](https://github.com/Opentrons/opentrons/issues/9973)
+* **protocol-designer:** bump PD version to 6.0 ([#10796](https://github.com/Opentrons/opentrons/issues/10796)) ([5419409](https://github.com/Opentrons/opentrons/commit/5419409ee353e9454deba149cc27bc0f239996be)), closes [#9853](https://github.com/Opentrons/opentrons/issues/9853)
+* **protocol-designer:** export TC load module commands with slot 7 ([#10829](https://github.com/Opentrons/opentrons/issues/10829)) ([540dae2](https://github.com/Opentrons/opentrons/commit/540dae239b17a844db8d51d6ca5642c6be91f60e)), closes [#10808](https://github.com/Opentrons/opentrons/issues/10808)
+* **protocol-designer:** update export modal ([#10807](https://github.com/Opentrons/opentrons/issues/10807)) ([431a535](https://github.com/Opentrons/opentrons/commit/431a53528a3536afce386cfb3f8614fd182824f6)), closes [#9987](https://github.com/Opentrons/opentrons/issues/9987)
+* **shared-data:** add gripper specs ([#10722](https://github.com/Opentrons/opentrons/issues/10722)) ([9dc6a28](https://github.com/Opentrons/opentrons/commit/9dc6a28a5cc94c0794f394d877836a634c44afce))
+
+
+
+
+
 # [6.0.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.2...v6.0.0-beta.0) (2022-06-10)
 
 

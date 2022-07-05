@@ -8,17 +8,21 @@ import { useSelector } from 'react-redux'
 
 import {
   SPACING,
+  SIZE_1,
   TYPOGRAPHY,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
+  Box,
   Flex,
   BORDERS,
   DIRECTION_COLUMN,
+  DISPLAY_BLOCK,
   Icon,
   COLORS,
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
+import { useLogger } from '../../logger'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { Slideout } from '../../atoms/Slideout'
 import { PrimaryButton } from '../../atoms/buttons'
@@ -40,6 +44,8 @@ export function ChooseProtocolSlideout(
   props: ChooseProtocolSlideoutProps
 ): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
+  const history = useHistory()
+  const logger = useLogger(__filename)
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
   const storedProtocols = useSelector((state: State) =>
@@ -57,6 +63,29 @@ export function ChooseProtocolSlideout(
           return new File([srcFileBuffer], path.basename(srcFilePath))
         })
       : []
+
+  const {
+    createRunFromProtocolSource,
+    runCreationError,
+    isCreatingRun,
+    reset: resetCreateRun,
+  } = useCreateRunFromProtocol({
+    onSuccess: ({ data: runData }) => {
+      history.push(`/devices/${name}/protocol-runs/${runData.id}`)
+    },
+  })
+
+  const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
+    if (selectedProtocol != null) {
+      createRunFromProtocolSource({
+        files: srcFileObjects,
+        protocolKey: selectedProtocol.protocolKey,
+      })
+    } else {
+      logger.warn('failed to create protocol, no protocol selected')
+    }
+  }
+
   return (
     <Slideout
       isExpanded={showSlideout}
@@ -64,49 +93,86 @@ export function ChooseProtocolSlideout(
       title={t('choose_protocol_to_run', { name })}
       footer={
         <ApiHostProvider hostname={robot.ip}>
-          <CreateRunButton
-            disabled={selectedProtocol == null}
-            protocolKey={
-              selectedProtocol != null ? selectedProtocol.protocolKey : ''
-            }
-            srcFileObjects={srcFileObjects}
-            robotName={name}
-          />
+          <PrimaryButton
+            onClick={handleProceed}
+            disabled={isCreatingRun || selectedProtocol == null}
+            width="100%"
+          >
+            {isCreatingRun ? (
+              <Icon name="ot-spinner" spin size={SIZE_1} />
+            ) : (
+              t('shared:proceed_to_setup')
+            )}
+          </PrimaryButton>
         </ApiHostProvider>
       }
     >
       {storedProtocols.length > 0 ? (
-        storedProtocols.map(storedProtocol => (
-          <MiniCard
-            key={storedProtocol.protocolKey}
-            isSelected={
-              selectedProtocol != null &&
-              storedProtocol.protocolKey === selectedProtocol.protocolKey
-            }
-            onClick={() => setSelectedProtocol(storedProtocol)}
-          >
+        storedProtocols.map(storedProtocol => {
+          const isSelected =
+            selectedProtocol != null &&
+            storedProtocol.protocolKey === selectedProtocol.protocolKey
+          return (
             <Flex
-              marginRight={SPACING.spacing4}
-              height="6rem"
-              width="6rem"
-              justifyContent={JUSTIFY_CENTER}
-              alignItems={ALIGN_CENTER}
+              flexDirection={DIRECTION_COLUMN}
+              key={storedProtocol.protocolKey}
             >
-              <DeckThumbnail
-                commands={storedProtocol.mostRecentAnalysis?.commands ?? []}
-              />
+              <MiniCard
+                isSelected={isSelected}
+                isError={runCreationError != null}
+                onClick={() => {
+                  if (!isCreatingRun) {
+                    resetCreateRun()
+                    setSelectedProtocol(storedProtocol)
+                  }
+                }}
+              >
+                <Flex
+                  marginRight={SPACING.spacing4}
+                  height="6rem"
+                  width="6rem"
+                  justifyContent={JUSTIFY_CENTER}
+                  alignItems={ALIGN_CENTER}
+                >
+                  <DeckThumbnail
+                    commands={storedProtocol.mostRecentAnalysis?.commands ?? []}
+                  />
+                </Flex>
+                <StyledText
+                  as="p"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  css={{ 'overflow-wrap': 'anywhere' }}
+                >
+                  {storedProtocol.mostRecentAnalysis?.metadata?.protocolName ??
+                    first(storedProtocol.srcFileNames) ??
+                    storedProtocol.protocolKey}
+                </StyledText>
+                {runCreationError != null && isSelected ? (
+                  <>
+                    <Box flex="1 1 auto" />
+                    <Icon
+                      name="alert-circle"
+                      size="1.25rem"
+                      color={COLORS.error}
+                    />
+                  </>
+                ) : null}
+              </MiniCard>
+              {runCreationError != null && isSelected ? (
+                <StyledText
+                  as="label"
+                  color={COLORS.errorText}
+                  css={{ 'overflow-wrap': 'anywhere' }}
+                  display={DISPLAY_BLOCK}
+                  marginTop={`-${SPACING.spacing2}`}
+                  marginBottom={SPACING.spacing3}
+                >
+                  {runCreationError}
+                </StyledText>
+              ) : null}
             </Flex>
-            <StyledText
-              as="p"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              css={{ 'overflow-wrap': 'anywhere' }}
-            >
-              {storedProtocol.mostRecentAnalysis?.metadata?.protocolName ??
-                first(storedProtocol.srcFileNames) ??
-                storedProtocol.protocolKey}
-            </StyledText>
-          </MiniCard>
-        ))
+          )
+        })
       ) : (
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -140,32 +206,5 @@ export function ChooseProtocolSlideout(
         </Flex>
       )}
     </Slideout>
-  )
-}
-
-interface CreateRunButtonProps
-  extends React.ComponentProps<typeof PrimaryButton> {
-  srcFileObjects: File[]
-  protocolKey: string
-  robotName: string
-}
-function CreateRunButton(props: CreateRunButtonProps): JSX.Element {
-  const { t } = useTranslation('protocol_details')
-  const history = useHistory()
-  const { protocolKey, srcFileObjects, robotName, ...buttonProps } = props
-  const { createRunFromProtocolSource } = useCreateRunFromProtocol({
-    onSuccess: ({ data: runData }) => {
-      history.push(`/devices/${robotName}/protocol-runs/${runData.id}`)
-    },
-  })
-
-  const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-    createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
-  }
-
-  return (
-    <PrimaryButton onClick={handleClick} width="100%" {...buttonProps}>
-      {t('proceed_to_setup')}
-    </PrimaryButton>
   )
 }

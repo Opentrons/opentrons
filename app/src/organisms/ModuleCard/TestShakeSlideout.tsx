@@ -298,6 +298,7 @@ export const TestShakeSlideout = (
             <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
           )}
           <Link
+            role="button"
             marginTop={SPACING.spacing2}
             fontSize={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}

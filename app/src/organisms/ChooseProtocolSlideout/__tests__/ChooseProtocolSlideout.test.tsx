@@ -103,4 +103,24 @@ describe('ChooseProtocolSlideout', () => {
       protocolKey: storedProtocolDataFixture.protocolKey,
     })
   })
+  it('renders error state when there is a run creation error', () => {
+    mockUseCreateRunFromProtocol.mockReturnValue({
+      runCreationError: 'run creation error',
+      createRunFromProtocolSource: mockCreateRunFromProtocol,
+      isCreatingRun: false,
+      reset: jest.fn(),
+    })
+    const [{ getByRole, getByText }] = render({
+      robot: mockConnectableRobot,
+      onCloseClick: jest.fn(),
+      showSlideout: true,
+    })
+    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    proceedButton.click()
+    expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
+      files: [expect.any(File)],
+      protocolKey: storedProtocolDataFixture.protocolKey,
+    })
+    expect(getByText('run creation error')).toBeInTheDocument()
+  })
 })

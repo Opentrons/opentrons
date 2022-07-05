@@ -119,7 +119,10 @@ export const HeaterShakerSlideout = (
     !configHasHeaterShakerAttached
   )
 
-  const sendSetTemperatureOrShakeCommand = (): void => {
+  const sendSetTemperatureOrShakeCommand: React.MouseEventHandler<HTMLInputElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+
     if (hsValue != null && !isSetShake) {
       const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
         commandType: 'heaterShaker/setTargetTemperature',
@@ -149,8 +152,12 @@ export const HeaterShakerSlideout = (
         })
       }
     }
-    isSetShake ? confirmAttachment() : setHsValue(null)
-    onCloseClick()
+    if (isSetShake) {
+      confirmAttachment()
+    } else {
+      setHsValue(null)
+      onCloseClick()
+    }
   }
 
   let errorMessage
@@ -170,6 +177,11 @@ export const HeaterShakerSlideout = (
   const inputMin = isSetShake ? HS_RPM_MIN : HS_TEMP_MIN
   const unit = isSetShake ? RPM : CELSIUS
 
+  const handleCloseSlideout = (): void => {
+    setHsValue(null)
+    onCloseClick()
+  }
+
   return (
     <>
       {showConfirmationModal && (
@@ -186,7 +198,7 @@ export const HeaterShakerSlideout = (
           part: modulePart,
           name: moduleName,
         })}
-        onCloseClick={onCloseClick}
+        onCloseClick={handleCloseSlideout}
         isExpanded={isExpanded}
         footer={
           <SubmitPrimaryButton

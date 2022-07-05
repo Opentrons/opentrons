@@ -6,13 +6,13 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 6.0.0-beta.0
+# OT-2 Software Changes in 6.0.0-alpha.5
 
-Welcome to the v6.0.0 beta release of the OT-2 software!
+Welcome to the v6.0.0 alpha release of the OT-2 software!
 
 In conjunction with changes on the app side, the 6.0.0 release reshapes the way your OT-2 stores runs and protocols.
 
-This is beta software! You may experience unexpected crashes or missing features not detailed here. Please see the [issue tracker][] for more details and to leave feedback.
+This is alpha software! You may experience unexpected crashes or missing features not detailed here. Please see the [issue tracker][] for more details and to leave feedback.
 
 [issue tracker]: https://github.com/Opentrons/opentrons/issues/new?assignees=y3rsh%2Cnusrat813&labels=6.0-feedback&template=testing_feedback.yml&title=6.0+Feedback%3A++%3Ctitle%3E
 
