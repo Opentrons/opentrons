@@ -30,6 +30,7 @@ interface SP {
   wellContents: ContentsByWell
   labwareDef?: LabwareDefinition2 | null
   liquidNamesById: WellIngredientNames
+  liquidDisplayColors: string[]
 }
 
 interface DP {
@@ -55,7 +56,7 @@ class LiquidPlacementModalComponent extends React.Component<Props, State> {
   }
 
   render(): JSX.Element {
-    const { labwareDef, selectedWells } = this.props
+    const { labwareDef, selectedWells, liquidDisplayColors } = this.props
 
     return (
       <div
@@ -72,7 +73,10 @@ class LiquidPlacementModalComponent extends React.Component<Props, State> {
                 wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
                 definition: labwareDef,
                 highlightedWells: this.state.highlightedWells,
-                wellFill: wellFillFromWellContents(this.props.wellContents),
+                wellFill: wellFillFromWellContents(
+                  this.props.wellContents,
+                  liquidDisplayColors
+                ),
               }}
               selectedPrimaryWells={selectedWells}
               selectWells={this.props.selectWells}
@@ -103,6 +107,7 @@ const mapStateToProps = (state: BaseState): SP => {
       wellContents: null,
       labwareDef: null,
       liquidNamesById: {},
+      liquidDisplayColors: [],
     }
   }
 
@@ -119,6 +124,7 @@ const mapStateToProps = (state: BaseState): SP => {
     wellContents,
     labwareDef,
     liquidNamesById: selectors.getLiquidNamesById(state),
+    liquidDisplayColors: selectors.getLiquidDisplayColors(state),
   }
 }
 

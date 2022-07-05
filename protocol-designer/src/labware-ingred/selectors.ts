@@ -149,6 +149,14 @@ const getDeckHasLiquid: Selector<RootSlice, boolean> = createSelector(
   getLiquidGroupsOnDeck,
   liquidGroups => liquidGroups.length > 0
 )
+const getLiquidDisplayColors: Selector<RootSlice, string[]> = createSelector(
+  getLiquidGroupsById,
+  liquids =>
+    Object.values(liquids).reduce<string[]>((acc, curr) => {
+      acc.push(curr.displayColor)
+      return acc
+    }, [])
+)
 // TODO: prune selectors
 export const selectors = {
   rootSelector,
@@ -168,4 +176,5 @@ export const selectors = {
   allIngredientNamesIds,
   selectedAddLabwareSlot,
   getDeckHasLiquid,
+  getLiquidDisplayColors,
 }

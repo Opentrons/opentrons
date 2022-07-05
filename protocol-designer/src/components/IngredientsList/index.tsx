@@ -48,7 +48,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
     .sort(sortWells)
     .filter(well => labwareWellContents[well][groupId])
 
-  const liquidGroups = useSelector(selectors.getLiquidGroupsById)
+  const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 
   if (wellsWithIngred.length < 1) {
     // do not show liquid card if it has no instances for this labware
@@ -58,7 +58,7 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
   return (
     <PDTitledList
       title={ingredGroup.name || i18n.t('card.unnamedLiquid')}
-      iconProps={{ style: { fill: liquidGroups[groupId].displayColor } }}
+      iconProps={{ style: { fill: liquidDisplayColors[Number(groupId)] } }}
       iconName="circle"
       onCollapseToggle={toggleAccordion}
       collapsed={!expanded}
