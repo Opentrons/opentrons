@@ -16,7 +16,7 @@ export interface InstallModalContentsProps {
 
 export function InstallModalContents(
   props: InstallModalContentsProps
-): JSX.Element | null {
+): JSX.Element {
   const { robotSystemType, session } = props
   const { step: updateStep, progress, error } = session
   const prevStep = usePrevious(updateStep)
@@ -81,13 +81,11 @@ export function InstallModalContents(
     )
 
   return (
-    <>
-      <div className={styles.system_update_modal}>
-        <p className={styles.update_title}>{title}</p>
-        {progressComponent}
-        <p className={styles.update_message}>{updateMessage}</p>
-        <p>{restartMessage}</p>
-      </div>
-    </>
+    <div className={styles.system_update_modal}>
+      <p className={styles.update_title}>{title}</p>
+      {progressComponent}
+      <p className={styles.update_message}>{updateMessage}</p>
+      <p>{restartMessage}</p>
+    </div>
   )
 }
