@@ -18,6 +18,7 @@ import {
   SpinnerModalPage,
   AlertModal,
   useInterval,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
@@ -601,7 +602,9 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing3}>
               {t('deck_calibration_description')}
             </StyledText>
-            <StyledText as="label">{deckLastModified()}</StyledText>
+            <StyledText as="label" color={COLORS.darkGreyEnabled}>
+              {deckLastModified()}
+            </StyledText>
           </Box>
           <TertiaryButton
             onClick={() => handleClickDeckCalibration()}
@@ -611,7 +614,11 @@ export function RobotSettingsCalibration({
           </TertiaryButton>
         </Flex>
       </Box>
-      <Line />
+      <Line
+        marginBottom={
+          showPipetteOffsetCalibrationBanner ? SPACING.spacing4 : null
+        }
+      />
       {/* Pipette Offset Calibration Section */}
       {showPipetteOffsetCalibrationBanner && (
         <Banner
@@ -623,7 +630,7 @@ export function RobotSettingsCalibration({
         </Banner>
       )}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER}>
+        <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
           <Box marginRight={SPACING.spacing6}>
             <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
               {t('pipette_offset_calibrations_title')}
@@ -631,16 +638,16 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing4}>
               {t('pipette_offset_calibrations_description')}
             </StyledText>
-            {pipetteOffsetCalibrations != null ? (
-              <PipetteOffsetCalibrationItems
-                robotName={robotName}
-                formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
-                updateRobotStatus={updateRobotStatus}
-              />
-            ) : (
-              <StyledText as="label">{t('not_calibrated')}</StyledText>
-            )}
           </Box>
+          {pipetteOffsetCalibrations != null ? (
+            <PipetteOffsetCalibrationItems
+              robotName={robotName}
+              formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
+              updateRobotStatus={updateRobotStatus}
+            />
+          ) : (
+            <StyledText as="label">{t('not_calibrated')}</StyledText>
+          )}
         </Flex>
       </Box>
       <Line />
