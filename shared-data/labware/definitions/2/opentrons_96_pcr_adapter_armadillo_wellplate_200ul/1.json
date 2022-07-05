@@ -1010,10 +1010,10 @@
     }
   ],
   "parameters": {
-    "loadName": "armadillo_96_wellplate_200ul_pcr_full_skirt",
+    "loadName": "opentrons_96_pcr_adapter_armadillo_wellplate_200ul",
     "format": "96Standard",
     "isTiprack": false,
-    "isMagneticModuleCompatible": true
+    "isMagneticModuleCompatible": false
   },
   "namespace": "opentrons",
   "version": 1,
