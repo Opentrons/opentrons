@@ -55,6 +55,7 @@ const FLEXBOX_PROPS = [
   'flexDirection',
   'flexWrap',
   'alignSelf',
+  'whiteSpace',
 ] as const
 
 const GRID_PROPS = [
