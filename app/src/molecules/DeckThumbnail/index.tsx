@@ -42,11 +42,11 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   return (
     // PR #10488 changed size
     // revert the height
-    // TODO: kj 07/01/2022 x, y will be modified by 1on1 with Mel
+    // Note add offset 18px to right and left
     <RobotWorkSpace
       deckLayerBlocklist={deckSetupLayerBlocklist}
       deckDef={deckDef}
-      viewBox="-65 -20 550 480"
+      viewBox="-68 -20 586 480"
     >
       {({ deckSlotsById }) =>
         map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {
