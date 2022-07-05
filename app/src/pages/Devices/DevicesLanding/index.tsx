@@ -88,54 +88,44 @@ export function DevicesLanding(): JSX.Element {
         <NewRobotSetupHelp />
       </Flex>
       {isScanning && noRobots ? <DevicesLoadingState /> : null}
-      {!isScanning && noRobots ? (
-        <DevicesEmptyState />
-      ) : (
-        [
-          !noRobots ? (
-            <>
-              <CollapsibleSection
-                marginY={SPACING.spacing3}
-                title={t('available', {
-                  count: [
-                    ...healthyReachableRobots,
-                    ...unhealthyReachableRobots,
-                  ].length,
-                })}
-              >
-                {healthyReachableRobots.map(robot => (
-                  <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
-                    <RobotCard robot={robot} />
-                  </ApiHostProvider>
-                ))}
-                {unhealthyReachableRobots.map(robot => (
-                  <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
-                    <RobotCard robot={robot} />
-                  </ApiHostProvider>
-                ))}
-              </CollapsibleSection>
-              <Divider />
-              <CollapsibleSection
-                marginY={SPACING.spacing3}
-                title={t('unavailable', {
-                  count: [...recentlySeenRobots, ...unreachableRobots].length,
-                })}
-                isExpandedInitially={healthyReachableRobots.length === 0}
-              >
-                {recentlySeenRobots.map(robot => (
-                  <RobotCard
-                    key={robot.name}
-                    robot={{ ...robot, local: null }}
-                  />
-                ))}
-                {unreachableRobots.map(robot => (
-                  <RobotCard key={robot.name} robot={robot} />
-                ))}
-              </CollapsibleSection>
-            </>
-          ) : null,
-        ]
-      )}
+      {!isScanning && noRobots ? <DevicesEmptyState /> : null}
+      {!noRobots ? (
+        <>
+          <CollapsibleSection
+            marginY={SPACING.spacing3}
+            title={t('available', {
+              count: [...healthyReachableRobots, ...unhealthyReachableRobots]
+                .length,
+            })}
+          >
+            {healthyReachableRobots.map(robot => (
+              <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
+                <RobotCard robot={robot} />
+              </ApiHostProvider>
+            ))}
+            {unhealthyReachableRobots.map(robot => (
+              <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
+                <RobotCard robot={robot} />
+              </ApiHostProvider>
+            ))}
+          </CollapsibleSection>
+          <Divider />
+          <CollapsibleSection
+            marginY={SPACING.spacing3}
+            title={t('unavailable', {
+              count: [...recentlySeenRobots, ...unreachableRobots].length,
+            })}
+            isExpandedInitially={healthyReachableRobots.length === 0}
+          >
+            {recentlySeenRobots.map(robot => (
+              <RobotCard key={robot.name} robot={{ ...robot, local: null }} />
+            ))}
+            {unreachableRobots.map(robot => (
+              <RobotCard key={robot.name} robot={robot} />
+            ))}
+          </CollapsibleSection>
+        </>
+      ) : null}
     </Box>
   )
 }
