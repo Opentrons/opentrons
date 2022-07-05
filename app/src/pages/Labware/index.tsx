@@ -234,7 +234,7 @@ export function Labware(): JSX.Element {
           <Link
             external
             href={LABWARE_CREATOR_HREF}
-            css={TYPOGRAPHY.linkPSemiBold}
+            css={TYPOGRAPHY.darkLinkLabelSemiBold}
           >
             {t('open_labware_creator')}
             <Icon
