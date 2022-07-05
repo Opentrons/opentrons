@@ -29,8 +29,8 @@ from .ot3utils import (
     node_to_axis,
     sub_system_to_node_id,
     sensor_node_for_mount,
-    create_gripper_move_group,
-    create_gripper_home_group,
+    create_gripper_jaw_move_group,
+    create_gripper_jaw_home_group,
 )
 
 try:
@@ -317,24 +317,24 @@ class OT3Controller:
         """
         return await self.home(axes)
 
-    async def gripper_move(
+    async def gripper_move_jaw(
         self,
         duration: float,
         duty_cycle: float,
         frequency: float = 320000,
         stop_condition: MoveStopCondition = MoveStopCondition.none,
     ) -> bool:
-        move_group = create_gripper_move_group(
+        move_group = create_gripper_jaw_move_group(
             duration, duty_cycle, frequency, stop_condition
         )
         runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
         return True
 
-    async def gripper_home(
+    async def gripper_home_jaw(
         self, duration: float, duty_cycle: float, frequency: float = 320000
     ) -> bool:
-        move_group = create_gripper_home_group(duration, duty_cycle, frequency)
+        move_group = create_gripper_jaw_home_group(duration, duty_cycle, frequency)
         runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
         return True

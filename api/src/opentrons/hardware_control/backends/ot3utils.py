@@ -30,7 +30,7 @@ from opentrons_hardware.hardware_control.motion import (
     MoveGroup,
     MoveType,
     MoveStopCondition,
-    create_gripper_step,
+    create_gripper_jaw_step,
 )
 
 # TODO: These methods exist to defer uses of NodeId to inside
@@ -221,13 +221,13 @@ def create_home_group(
     return move_group
 
 
-def create_gripper_move_group(
+def create_gripper_jaw_move_group(
     duration: float,
     duty_cycle: float,
     frequency: float,
     stop_condition: MoveStopCondition = MoveStopCondition.none,
 ) -> MoveGroup:
-    step = create_gripper_step(
+    step = create_gripper_jaw_step(
         duration=np.float64(duration),
         frequency=np.float32(frequency),
         duty_cycle=np.float32(duty_cycle),
@@ -237,12 +237,12 @@ def create_gripper_move_group(
     return move_group
 
 
-def create_gripper_home_group(
+def create_gripper_jaw_home_group(
     duration: float,
     duty_cycle: float,
     frequency: float,
 ) -> MoveGroup:
-    step = create_gripper_step(
+    step = create_gripper_jaw_step(
         duration=np.float64(duration),
         frequency=np.float32(frequency),
         duty_cycle=np.float32(duty_cycle),

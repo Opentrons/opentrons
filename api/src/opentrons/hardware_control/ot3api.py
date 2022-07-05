@@ -919,7 +919,9 @@ class OT3API(
     async def _grip(self, duration: float, duty_cycle: float) -> None:
         """Move the gripper jaw inward to close."""
         try:
-            await self._backend.gripper_move(duration=duration, duty_cycle=duty_cycle)
+            await self._backend.gripper_move_jaw(
+                duration=duration, duty_cycle=duty_cycle
+            )
         except Exception:
             self._log.exception("Gripper grip failed")
             raise
@@ -928,7 +930,9 @@ class OT3API(
     async def _release(self, duration: float, duty_cycle: float) -> None:
         """Move the gripper jaw outward to reach the homing switch."""
         try:
-            await self._backend.gripper_home(duration=duration, duty_cycle=duty_cycle)
+            await self._backend.gripper_home_jaw(
+                duration=duration, duty_cycle=duty_cycle
+            )
         except Exception:
             self._log.exception("Gripper home failed")
             raise

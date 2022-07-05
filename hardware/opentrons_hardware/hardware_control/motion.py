@@ -169,7 +169,7 @@ def create_tip_action_step(
     return step
 
 
-def create_gripper_step(
+def create_gripper_jaw_step(
     duration: np.float64,
     duty_cycle: np.float32,
     frequency: np.float32 = np.float32(320000),

@@ -26,8 +26,8 @@ from .ot3utils import (
     get_current_settings,
     node_to_axis,
     axis_to_node,
-    create_gripper_move_group,
-    create_gripper_home_group,
+    create_gripper_jaw_move_group,
+    create_gripper_jaw_home_group,
 )
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -233,7 +233,7 @@ class OT3Simulator:
         """
         return axis_convert(self._position, 0.0)
 
-    async def gripper_move(
+    async def gripper_move_jaw(
         self,
         duration: float,
         duty_cycle: float,
@@ -241,17 +241,19 @@ class OT3Simulator:
         stop_condition: MoveStopCondition = MoveStopCondition.none,
     ) -> bool:
         """Move gripper inward."""
-        _ = create_gripper_move_group(duration, duty_cycle, frequency, stop_condition)
+        _ = create_gripper_jaw_move_group(
+            duration, duty_cycle, frequency, stop_condition
+        )
         return True
 
-    async def gripper_home(
+    async def gripper_home_jaw(
         self,
         duration: float,
         duty_cycle: float,
         frequency: float = 320000,
     ) -> bool:
         """Move gripper outward."""
-        _ = create_gripper_home_group(duration, duty_cycle, frequency)
+        _ = create_gripper_jaw_home_group(duration, duty_cycle, frequency)
         return True
 
     def _attached_to_mount(

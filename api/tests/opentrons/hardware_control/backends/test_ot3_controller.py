@@ -307,8 +307,8 @@ def test_nodeid_filter_probed_core():
     ) == set([NodeId.gantry_y, NodeId.pipette_left])
 
 
-async def test_gripper_home(controller: OT3Controller, mock_move_group_run):
-    await controller.gripper_home(duration=2.0, duty_cycle=50)
+async def test_gripper_home_jaw(controller: OT3Controller, mock_move_group_run):
+    await controller.gripper_home_jaw(duration=2.0, duty_cycle=50)
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
@@ -322,7 +322,7 @@ async def test_gripper_home(controller: OT3Controller, mock_move_group_run):
 
 
 async def test_gripper_grip(controller: OT3Controller, mock_move_group_run):
-    await controller.gripper_move(duration=2.0, duty_cycle=50)
+    await controller.gripper_move_jaw(duration=2.0, duty_cycle=50)
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
