@@ -8,34 +8,36 @@ from hardware_testing.drivers.radwag.driver import RadwagScaleBase
 
 @dataclass
 class GravimetricSample:
+    time: float
     grams: float
     stable: bool
-    time: float
+
+    @classmethod
+    def csv_header(cls) -> str:
+        return 'time,grams,stable'
+
+    def as_csv(self) -> str:
+        return f'{self.time},{self.grams},{int(self.stable)}'
 
 
 @dataclass
-class GravimetricRecording:
-    def __init__(self, samples: Optional[List[GravimetricSample]] = None) -> None:
-        self._samples = samples if samples else []
+class GravimetricRecording(List):
 
-    def __len__(self) -> int:
-        return len(self._samples)
-
-    def append(self, sample: GravimetricSample) -> None:
-        self._samples.append(sample)
-
-    def clear(self) -> None:
-        self._samples = []
+    def __str__(self):
+        return f'GravimetricRecording(' \
+               f'length={len(self)}, ' \
+               f'duration={round(self.duration, 2)}, ' \
+               f'start_time={self.start_time})'
 
     @property
     def start_time(self) -> float:
-        assert len(self._samples), 'No samples recorded'
-        return self._samples[0].time
+        assert len(self), 'No samples recorded'
+        return self[0].time
 
     @property
     def end_time(self) -> float:
-        assert len(self._samples), 'No samples recorded'
-        return self._samples[-1].time
+        assert len(self), 'No samples recorded'
+        return self[-1].time
 
     @property
     def duration(self) -> float:
@@ -43,17 +45,17 @@ class GravimetricRecording:
 
     @property
     def grams_as_list(self) -> List[float]:
-        return [s.grams for s in self._samples]
+        return [s.grams for s in self]
 
     @property
     def average(self) -> float:
-        assert len(self._samples), 'No samples recorded'
+        assert len(self), 'No samples recorded'
         _grams_list = self.grams_as_list
         return sum(_grams_list) / len(_grams_list)
 
     @property
     def stdev(self) -> float:
-        assert len(self._samples), 'No samples recorded'
+        assert len(self), 'No samples recorded'
         return stdev(self.grams_as_list)
 
     def calculate_cv(self) -> float:
@@ -61,6 +63,12 @@ class GravimetricRecording:
 
     def calculate_d(self, target: float) -> float:
         return (self.average - target) / target
+
+    def as_csv(self) -> str:
+        csv_file_str = GravimetricSample.csv_header() + '\r\n'
+        for s in self:
+            csv_file_str += s.as_csv() + '\r\n'
+        return csv_file_str + '\r\n'
 
 
 def read_sample_from_scale(scale: RadwagScaleBase) -> GravimetricSample:

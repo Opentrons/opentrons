@@ -1,13 +1,16 @@
 from serial.tools.list_ports import comports
 
-from opentrons import protocol_api, execute, simulate
-from opentrons.hardware_control.thread_manager import ThreadManagerException
+from opentrons.protocol_api import ProtocolContext
 
+from hardware_testing import get_api_context
+from hardware_testing.data import dump_data_to_file, create_file_name
 from hardware_testing.drivers import RadwagScale, SimRadwagScale
-from hardware_testing.drivers.radwag.driver import RadwagScaleBase
 from hardware_testing.gravimetric import record_samples
 
-metadata = {'apiLevel': '2.12'}
+metadata = {
+    'protocolName': 'example-test',
+    'apiLevel': '2.12'
+}
 
 
 def find_scale_port() -> str:
@@ -19,42 +22,30 @@ def find_scale_port() -> str:
         f'No scale found from available serial ports: {comports()}')
 
 
-def initialize_scale(scale: RadwagScaleBase) -> None:
-    print(f'Scale serial number: {scale.read_serial_number()}')
+def initialize_scale(scale) -> str:
     scale.continuous_transmission(enable=False)
     scale.automatic_internal_adjustment(enable=False)
+    return scale.read_serial_number()
 
 
-def run(protocol: protocol_api.ProtocolContext) -> None:
+def run(protocol: ProtocolContext) -> None:
     if protocol.is_simulating():
         scale = SimRadwagScale()
     else:
         scale = RadwagScale.create(find_scale_port())
     scale.connect()
-    initialize_scale(scale)
-    print('Recording samples...')
-    samples = record_samples(scale, duration=3, length=30)
-    print(len(samples), samples.average)
+    scale_sn = initialize_scale(scale)
+    recording = record_samples(scale, duration=3, length=30)
     scale.disconnect()
+    test_data_name = create_file_name(metadata['protocolName'], scale_sn)
+    dump_data_to_file(metadata['protocolName'], test_data_name, recording.as_csv())
 
 
 if __name__ == '__main__':
     import argparse
-    import types
-    parser = argparse.ArgumentParser('Grav Protocol')
-    parser.add_argument("--simulate", action='store_true',
-                        help='If set, the protocol will be simulated')
+    parser = argparse.ArgumentParser(metadata['protocolName'])
+    parser.add_argument("--simulate", action='store_true')
     args = parser.parse_args()
-    if args.simulate:
-        ctx = simulate.get_protocol_api(metadata['apiLevel'])
-    else:
-        # NOTE: protocol context cannot be built outside of
-        try:
-            ctx = execute.get_protocol_api(metadata['apiLevel'])
-        except ThreadManagerException:
-            print('\nUnable to build non-simulated Protocol Context')
-            print('Creating simulated Protocol Context, with .is_simulated() overridden')
-            ctx = simulate.get_protocol_api(metadata['apiLevel'])
-            ctx.is_simulating = types.MethodType(lambda _: False, ctx)
+    ctx = get_api_context(api_level=metadata['apiLevel'], is_simulating=args.simulate)
     ctx.home()
     run(ctx)
