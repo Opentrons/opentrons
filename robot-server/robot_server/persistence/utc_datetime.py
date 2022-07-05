@@ -26,17 +26,20 @@ class UTCDateTime(sqlalchemy.types.TypeDecorator[datetime]):
     the timezone gets stripped upon insertion, and subsequent reads return a naive
     (timezone-less) datetime.
 
-    Using this type instead preserves the UTC-ness of the timestamp.
+    Using this class instead preserves datetimes' UTC-ness.
 
     * When a Python datetime object gets inserted into SQL:
 
-      This asserts that the Python object has its timezone set to UTC.
-      Then stores the timestamp into SQL without any explicit timezone.
-      This matches how we were storing them before.
+      This first asserts that the Python object has its timezone set to UTC,
+      because we don't currently have any good reason try to store non-UTC datetimes.
+
+      Then, it inserts the timestamp into the database without any explicit timezone.
+      This matches how sqlalchemy.DateTime would store it.
 
     * When a datetime is extracted from SQL:
 
-      This returns it as a Python datetime object that's marked with the UTC timezone.
+      The raw timestamp from the database will be naive (timezone-less).
+      This marks it with the UTC timezone before returning it.
     """
 
     impl = sqlalchemy.types.DateTime
@@ -48,6 +51,9 @@ class UTCDateTime(sqlalchemy.types.TypeDecorator[datetime]):
         """Prepare a Python datetime object to inserted into SQL via SQLAlchemy."""
         if value is not None:
             assert value.tzinfo == timezone.utc, f"Expected '{value}' to be UTC"
+
+        # Pass the value to sqlalchemy.DateTime,
+        # which will strip .tzinfo and store the timestamp as-is.
         return value
 
     def process_result_value(
