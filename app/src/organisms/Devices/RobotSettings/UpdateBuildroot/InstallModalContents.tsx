@@ -16,7 +16,7 @@ export interface InstallModalContentsProps {
 
 export function InstallModalContents(
   props: InstallModalContentsProps
-): JSX.Element {
+): JSX.Element | null {
   const { robotSystemType, session } = props
   const { step: updateStep, progress, error } = session
   const prevStep = usePrevious(updateStep)
@@ -80,19 +80,14 @@ export function InstallModalContents(
       <ProgressSpinner />
     )
 
-  return (
-    <div className={styles.system_update_modal}>
-      {/* TODO(jr, 7/5/22): temporarily removing this until we redo Update Robot Software flow in 6.1-6.2 
-      {step === 'finished' ? (
-        <p>Your robot is now successfully updated.</p>
-      ) : (
-        <> */}
-      <p className={styles.update_title}>{title}</p>
-      {progressComponent}
-      <p className={styles.update_message}>{updateMessage}</p>
-      <p>{restartMessage}</p>
-      {/* </>
-      )} */}
-    </div>
+  return step === 'finished' ? null : (
+    <>
+      <div className={styles.system_update_modal}>
+        <p className={styles.update_title}>{title}</p>
+        {progressComponent}
+        <p className={styles.update_message}>{updateMessage}</p>
+        <p>{restartMessage}</p>
+      </div>
+    </>
   )
 }
