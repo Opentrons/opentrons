@@ -268,13 +268,13 @@ def _get_west_location(location: int) -> Optional[int]:
 def _get_east_west_locations(location: int) -> List[int]:
     east = _get_east_location(location)
     west = _get_west_location(location)
-    return [l for l in [east, west] if l is not None]
+    return [maybe_loc for maybe_loc in [east, west] if maybe_loc is not None]
 
 
 def _get_north_south_locations(location: int) -> List[int]:
     north = _get_north_location(location)
     south = _get_south_location(location)
-    return [l for l in [north, south] if l is not None]
+    return [maybe_loc for maybe_loc in [north, south] if maybe_loc is not None]
 
 
 def _get_adjacent_locations(location: int) -> List[int]:
