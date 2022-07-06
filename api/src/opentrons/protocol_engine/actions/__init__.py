@@ -20,7 +20,7 @@ from .actions import (
     AddLabwareDefinitionAction,
     AddModuleAction,
     FinishErrorDetails,
-    DoorChangeAction,
+    HardwareEventAction,
 )
 
 __all__ = [
@@ -41,7 +41,7 @@ __all__ = [
     "AddLabwareOffsetAction",
     "AddLabwareDefinitionAction",
     "AddModuleAction",
-    "DoorChangeAction",
+    "HardwareEventAction",
     # action payload values
     "PauseSource",
     "FinishErrorDetails",

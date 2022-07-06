@@ -9,7 +9,7 @@ from enum import Enum
 from typing import Optional, Union
 
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.hardware_control.types import DoorStateNotification
+from opentrons.hardware_control.types import HardwareEvent
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
@@ -79,10 +79,10 @@ class HardwareStoppedAction:
 
 
 @dataclass(frozen=True)
-class DoorChangeAction:
+class HardwareEventAction:
     """Handle events coming in from hardware control."""
 
-    event: DoorStateNotification
+    event: HardwareEvent
 
 
 @dataclass(frozen=True)
@@ -149,7 +149,7 @@ Action = Union[
     StopAction,
     FinishAction,
     HardwareStoppedAction,
-    DoorChangeAction,
+    HardwareEventAction,
     QueueCommandAction,
     UpdateCommandAction,
     FailCommandAction,

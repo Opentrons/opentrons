@@ -30,7 +30,7 @@ from opentrons.protocol_engine.actions import (
     FinishErrorDetails,
     StopAction,
     HardwareStoppedAction,
-    DoorChangeAction,
+    HardwareEventAction,
 )
 
 from .command_fixtures import (
@@ -908,12 +908,12 @@ def test_handles_door_open_and_close_event_before_play(
     door_open_event = DoorStateNotification(new_state=DoorState.OPEN)
     door_close_event = DoorStateNotification(new_state=DoorState.CLOSED)
 
-    subject.handle_action(DoorChangeAction(event=door_open_event))
+    subject.handle_action(HardwareEventAction(event=door_open_event))
 
     assert subject.state.queue_status == QueueStatus.SETUP
     assert subject.state.is_door_blocking is expected_is_door_blocking
 
-    subject.handle_action(DoorChangeAction(event=door_close_event))
+    subject.handle_action(HardwareEventAction(event=door_close_event))
 
     assert subject.state.queue_status == QueueStatus.SETUP
     assert subject.state.is_door_blocking is False
@@ -936,12 +936,12 @@ def test_handles_door_open_and_close_event_after_play(
     door_close_event = DoorStateNotification(new_state=DoorState.CLOSED)
 
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
-    subject.handle_action(DoorChangeAction(event=door_open_event))
+    subject.handle_action(HardwareEventAction(event=door_open_event))
 
     assert subject.state.queue_status == expected_queue_status
     assert subject.state.is_door_blocking is expected_is_door_blocking
 
-    subject.handle_action(DoorChangeAction(event=door_close_event))
+    subject.handle_action(HardwareEventAction(event=door_close_event))
 
     assert subject.state.queue_status == expected_queue_status
     assert subject.state.is_door_blocking is False

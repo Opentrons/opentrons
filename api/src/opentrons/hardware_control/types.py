@@ -290,14 +290,23 @@ class DoorState(enum.Enum):
         return self.name.lower()
 
 
+class HardwareEventType(enum.Enum):
+    DOOR_SWITCH_CHANGE = enum.auto()
+    ERROR_MESSAGE = enum.auto()
+
+
 @dataclass(frozen=True)
 class DoorStateNotification:
+    event: Literal[
+        HardwareEventType.DOOR_SWITCH_CHANGE
+    ] = HardwareEventType.DOOR_SWITCH_CHANGE
     new_state: DoorState = DoorState.CLOSED
 
 
 @dataclass(frozen=True)
 class ErrorMessageNotification:
     message: str
+    event: Literal[HardwareEventType.ERROR_MESSAGE] = HardwareEventType.ERROR_MESSAGE
 
 
 # new event types get new dataclasses

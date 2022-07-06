@@ -6,13 +6,9 @@ from asyncio import get_running_loop, run_coroutine_threadsafe
 from typing import Callable, Optional
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import (
-    HardwareEvent,
-    DoorStateNotification,
-    PauseType,
-)
+from opentrons.hardware_control.types import HardwareEvent, PauseType
 
-from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
+from opentrons.protocol_engine.actions import ActionDispatcher, HardwareEventAction
 
 from ..state import StateStore
 
@@ -82,15 +78,14 @@ class DoorWatcher:
         This method will deadlock if it's ever run from the same thread that
         owns the event loop that this DoorWatcher was constructed in.
         """
-        if isinstance(event, DoorStateNotification):
-            action = DoorChangeAction(event=event)
-            coroutine = self._dispatch_action(action)
-            future = run_coroutine_threadsafe(coroutine, self._loop)
-            # Wait for the dispatch to complete before returning,
-            # which is important for ordering guarantees.
-            future.result()
+        action = HardwareEventAction(event=event)
+        coroutine = self._dispatch_action(action)
+        future = run_coroutine_threadsafe(coroutine, self._loop)
+        # Wait for the dispatch to complete before returning,
+        # which is important for ordering guarantees.
+        future.result()
 
-    async def _dispatch_action(self, action: DoorChangeAction) -> None:
+    async def _dispatch_action(self, action: HardwareEventAction) -> None:
         """Dispatch an action into self._action_dispatcher.
 
         This must run in the event loop that owns self._action_dispatcher, for safety.
