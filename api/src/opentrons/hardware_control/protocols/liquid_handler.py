@@ -94,6 +94,7 @@ class LiquidHandler(
         tip_length: float,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
+        prep_after: bool = True,
     ) -> None:
         """
         Pick up tip from current location.

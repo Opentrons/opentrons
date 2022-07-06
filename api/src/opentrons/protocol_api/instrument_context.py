@@ -644,6 +644,7 @@ class InstrumentContext(CommandPublisher):
         location: Optional[Union[types.Location, Well]] = None,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
+        prep_after: Optional[bool] = None,
     ) -> InstrumentContext:
         """
         Pick up a tip for the pipette to run liquid-handling commands with
@@ -682,6 +683,12 @@ class InstrumentContext(CommandPublisher):
                           the first press will travel down into the tip by
                           3.5mm, the second by 4.5mm, and the third by 5.5mm).
         :type increment: float
+        :param prep_after: If the pipette's plunger should be prepared to make
+                           an aspiration immediately after picking up a tip.
+                           Setting this to `True` will cause the pipette to
+                           move its plunger position to `bottom`, in preparation
+                           for any following calls to `.aspirate()`
+        :type prep_after: bool
 
         :returns: This instance
         """
@@ -712,6 +719,9 @@ class InstrumentContext(CommandPublisher):
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
         validate_tiprack(self.name, tiprack, logger)
 
+        if prep_after is None:
+            prep_after = (self.api_version > APIVersion(2, 12))
+
         with publish_context(
             broker=self.broker,
             command=cmds.pick_up_tip(instrument=self, location=target),
@@ -722,6 +732,7 @@ class InstrumentContext(CommandPublisher):
                 tip_length=self._tip_length_for(tiprack),
                 presses=presses,
                 increment=increment,
+                prep_after=prep_after,
             )
             # Note that the hardware API pick_up_tip action includes homing z after
 

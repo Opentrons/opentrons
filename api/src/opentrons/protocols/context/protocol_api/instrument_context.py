@@ -103,6 +103,7 @@ class InstrumentContextImplementation(AbstractInstrument):
         tip_length: float,
         presses: Optional[int],
         increment: Optional[float],
+        prep_after: bool,
     ) -> None:
         """Pick up a tip for the pipette to run liquid-handling commands."""
         hw = self._protocol_interface.get_hardware()

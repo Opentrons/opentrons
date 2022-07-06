@@ -81,6 +81,7 @@ class InstrumentContextSimulation(AbstractInstrument):
         tip_length: float,
         presses: typing.Optional[int],
         increment: typing.Optional[float],
+        prep_after: bool,
     ) -> None:
         geometry = well.get_geometry()
         self._raise_if_tip("pick up tip")
