@@ -12,11 +12,11 @@ from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.api_support.instrument import (
     validate_blowout_location,
     tip_length_for,
-    validate_tiprack,
     determine_drop_target,
     validate_can_aspirate,
     validate_can_dispense,
 )
+from opentrons.protocols.api_support import instrument
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocols.api_support.util import (
@@ -80,7 +80,7 @@ class InstrumentContext(CommandPublisher):
         self._tip_racks = tip_racks or list()
         for tip_rack in self.tip_racks:
             assert tip_rack.is_tiprack
-            validate_tiprack(self.name, tip_rack, logger)
+            instrument.validate_tiprack(self.name, tip_rack, logger)
         if trash is None:
             self.trash_container = self._ctx.fixed_trash
         else:
@@ -710,7 +710,7 @@ class InstrumentContext(CommandPublisher):
             )
 
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
-        validate_tiprack(self.name, tiprack, logger)
+        instrument.validate_tiprack(self.name, tiprack, logger)
 
         with publish_context(
             broker=self.broker,

@@ -23,7 +23,6 @@ def patch_mock_validate_tiprack(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -
         mock_validate_tiprack,
     )
 
-
 @pytest.fixture
 def mock_protocol_context(decoy: Decoy) -> ProtocolContext:
     return decoy.mock(cls=ProtocolContext)
