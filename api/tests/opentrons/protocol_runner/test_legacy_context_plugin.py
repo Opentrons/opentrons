@@ -80,25 +80,6 @@ def subject(
     return plugin
 
 
-def test_hardware_event_action(
-    decoy: Decoy,
-    hardware_api: HardwareAPI,
-    state_view: StateView,
-    subject: LegacyContextPlugin,
-) -> None:
-    """It should pause the hardware controller upon a blocking HardwareEventAction."""
-    door_open_event = DoorStateNotification(new_state=DoorState.OPEN)
-    decoy.when(state_view.commands.get_is_implicitly_active()).then_return(True)
-    subject.handle_action(pe_actions.DoorChangeAction(event=door_open_event))
-    # Should not pause when engine queue is implicitly active
-    decoy.verify(hardware_api.pause(PauseType.PAUSE), times=0)
-
-    decoy.when(state_view.commands.get_is_implicitly_active()).then_return(False)
-    subject.handle_action(pe_actions.DoorChangeAction(event=door_open_event))
-    # Should pause
-    decoy.verify(hardware_api.pause(PauseType.PAUSE), times=1)
-
-
 async def test_broker_subscribe_unsubscribe(
     decoy: Decoy,
     legacy_context: LegacyProtocolContext,
