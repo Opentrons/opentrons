@@ -1,14 +1,15 @@
 """Store and retrieve information about uploaded protocols."""
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
 from logging import getLogger
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Union, cast
 
-from anyio import Path as AsyncPath, create_task_group
+from anyio import Path as AsyncPath
 import sqlalchemy
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
@@ -88,7 +89,7 @@ class ProtocolStore:
         self,
         *,
         _sql_engine: sqlalchemy.engine.Engine,
-        _sources_by_id: Dict[str, ProtocolSource],
+        _sources_by_id: Dict[str, Union[ProtocolSource, Exception]],
     ) -> None:
         """Do not call directly.
 
@@ -179,11 +180,16 @@ class ProtocolStore:
             ProtocolNotFoundError
         """
         sql_resource = self._sql_get(protocol_id=protocol_id)
+        source_or_exception = self._sources_by_id[protocol_id]
+
+        if isinstance(source_or_exception, Exception):
+            raise source_or_exception
+
         return ProtocolResource(
             protocol_id=sql_resource.protocol_id,
             created_at=sql_resource.created_at,
             protocol_key=sql_resource.protocol_key,
-            source=self._sources_by_id[sql_resource.protocol_id],
+            source=source_or_exception,
         )
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
@@ -195,9 +201,10 @@ class ProtocolStore:
                 protocol_id=r.protocol_id,
                 created_at=r.created_at,
                 protocol_key=r.protocol_key,
-                source=self._sources_by_id[r.protocol_id],
+                source=cast(ProtocolSource, self._sources_by_id[r.protocol_id]),
             )
             for r in all_sql_resources
+            if not isinstance(self._sources_by_id[r.protocol_id], Exception)
         ]
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
@@ -340,18 +347,11 @@ class ProtocolStore:
         self.has.cache_clear()
 
 
-# TODO(mm, 2022-04-18):
-# Restructure to degrade gracefully in the face of ProtocolReader failures.
-#
-# * ProtocolStore.get_all() should omit protocols for which it failed to compute
-#   a ProtocolSource.
-# * ProtocolStore.get(id) should continue to raise an exception if it failed to compute
-#   that protocol's ProtocolSource.
 async def _compute_protocol_sources(
     expected_protocol_ids: Set[str],
     protocols_directory: AsyncPath,
     protocol_reader: ProtocolReader,
-) -> Dict[str, ProtocolSource]:
+) -> Dict[str, Union[ProtocolSource, Exception]]:
     """Compute `ProtocolSource` objects from protocol source files.
 
     We don't store these `ProtocolSource` objects in the SQL database because
@@ -397,7 +397,7 @@ async def _compute_protocol_sources(
 
     async def compute_source(
         protocol_id: str, protocol_subdirectory: AsyncPath
-    ) -> None:
+    ) -> ProtocolSource:
         # Given that the expected protocol subdirectory exists,
         # we trust that the files in it are correct.
         # No extra files, and no files missing.
@@ -410,18 +410,31 @@ async def _compute_protocol_sources(
         protocol_source = await protocol_reader.read_saved(
             files=protocol_files, directory=Path(protocol_subdirectory)
         )
-        sources_by_id[protocol_id] = protocol_source
+        return protocol_source
 
-    async with create_task_group() as task_group:
-        # Use a TaskGroup instead of asyncio.gather() so,
-        # if any task raises an unexpected exception,
-        # it cancels every other task and raises an exception to signal the bug.
-        for protocol_id in expected_protocol_ids:
-            protocol_subdirectory = protocols_directory / protocol_id
-            task_group.start_soon(compute_source, protocol_id, protocol_subdirectory)
+    all_protocol_ids = list(expected_protocol_ids)
 
-    for id in expected_protocol_ids:
-        assert id in sources_by_id
+    # TODO(mc, 2022-07-06): this is... not great.
+    # Keeping the database in sync with the filesystem is presenting obstacles.
+    # Restructure how this store works to remove these pitfalls.
+    # See also: https://github.com/Opentrons/opentrons/issues/11015
+    source_results = await asyncio.gather(
+        *(
+            compute_source(protocol_id, protocols_directory / protocol_id)
+            for protocol_id in all_protocol_ids
+        ),
+        return_exceptions=True,
+    )
+
+    sources_by_id = {}
+
+    for protocol_id, result in zip(all_protocol_ids, source_results):
+        sources_by_id[protocol_id] = result
+        if isinstance(result, Exception):
+            _log.warning(
+                f"Exception while rehydrating protocol {protocol_id}",
+                exc_info=result,
+            )
 
     return sources_by_id
 

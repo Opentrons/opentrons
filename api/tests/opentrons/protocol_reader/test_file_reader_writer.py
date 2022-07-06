@@ -123,6 +123,27 @@ async def test_read_opentrons_json_bad_validate() -> None:
         await subject.read([in_file])
 
 
+async def test_read_os_error(tmp_path: Path) -> None:
+    """It should raise an error if multiple file cannot be read."""
+    path_1 = tmp_path / "i_do_not_exist.txt"
+
+    subject = FileReaderWriter()
+
+    with pytest.raises(FileReadError, match='Could not find "i_do_not_exist.txt"'):
+        await subject.read([path_1])
+
+
+async def test_read_multiple_os_error(tmp_path: Path) -> None:
+    """It should raise an error if multiple file cannot be read."""
+    path_1 = tmp_path / "i_do_not_exist.txt"
+    path_2 = tmp_path / "neither_do_i.txt"
+
+    subject = FileReaderWriter()
+
+    with pytest.raises(FileReadError, match="Could not read files"):
+        await subject.read([path_1, path_2])
+
+
 async def test_write(tmp_path: Path) -> None:
     """It should write buffered files to disk."""
     directory = tmp_path / "target"

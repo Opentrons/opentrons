@@ -1,10 +1,10 @@
 """Input file reading."""
 from json import JSONDecodeError
-from anyio import Path as AsyncPath, create_task_group, wrap_file
+from anyio import ExceptionGroup, Path as AsyncPath, create_task_group, wrap_file
 from dataclasses import dataclass
 from pathlib import Path
 from pydantic import ValidationError, parse_raw_as
-from typing import List, Optional, Sequence, Union
+from typing import IO, List, Optional, Sequence, Union
 
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6
 
@@ -34,6 +34,10 @@ class FileReadError(Exception):
     """An error raised if input files cannot be read."""
 
 
+class FileWriteError(Exception):
+    """An error raised if input files cannot be written."""
+
+
 class FileReaderWriter:
     """Input file reader/writer interface."""
 
@@ -50,14 +54,13 @@ class FileReaderWriter:
             if isinstance(input_file, Path):
                 path: Optional[Path] = input_file
                 filename = input_file.name
-                contents = await AsyncPath(input_file).read_bytes()
+                contents = await _read_path(input_file)
             elif not input_file.filename:
                 raise FileReadError("File was missing a name")
             else:
                 path = None
                 filename = input_file.filename
-                async with wrap_file(input_file.file) as f:
-                    contents = await f.read()
+                contents = await _read_io(input_file.file, filename)
 
             data: Optional[BufferedJsonFileData] = None
 
@@ -83,9 +86,15 @@ class FileReaderWriter:
                 path=path,
             )
 
-        async with create_task_group() as tg:
-            for index, input_file in enumerate(files):
-                tg.start_soon(_read_file, input_file, index)
+        try:
+            async with create_task_group() as tg:
+                for index, input_file in enumerate(files):
+                    tg.start_soon(_read_file, input_file, index)
+
+        except ExceptionGroup as eg:
+            raise FileReadError(
+                f"Could not read files: {'; '.join(str(e) for e in eg.exceptions)}"
+            ) from eg
 
         assert all(results), "Expected all files to be read"
         return [f for f in results if f]
@@ -95,7 +104,36 @@ class FileReaderWriter:
         """Write a set of previously buffered files to disk."""
         await AsyncPath(directory).mkdir(parents=True, exist_ok=True)
 
-        async with create_task_group() as tg:
-            for f in files:
-                path = AsyncPath(directory / f.name)
-                tg.start_soon(path.write_bytes, f.contents)
+        try:
+            async with create_task_group() as tg:
+                for f in files:
+                    tg.start_soon(_write_path, directory, f.name, f.contents)
+        except ExceptionGroup as eg:
+            raise FileWriteError(
+                f"Could not write files: {'; '.join(str(e) for e in eg.exceptions)}"
+            ) from eg
+
+
+async def _read_path(path: Path) -> bytes:
+    try:
+        return await AsyncPath(path).read_bytes()
+    except FileNotFoundError as e:
+        raise FileReadError(f'Could not find "{path.name}".') from e
+    except OSError as e:
+        raise FileReadError(f'Could not read "{path.name}".') from e
+
+
+async def _read_io(file_io: IO[bytes], name: str) -> bytes:
+    async with wrap_file(file_io) as f:
+        try:
+            return await f.read()
+        except OSError as e:
+            raise FileReadError(f'Could not read "{name}".') from e
+
+
+async def _write_path(directory: Path, filename: str, contents: bytes) -> None:
+    async_path = AsyncPath(directory / filename)
+    try:
+        await async_path.write_bytes(contents)
+    except OSError as e:
+        raise FileWriteError(f'Could not write "{filename}".') from e

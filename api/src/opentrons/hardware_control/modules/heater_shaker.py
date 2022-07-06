@@ -401,6 +401,9 @@ class HeaterShaker(mod_abc.AbstractModule):
         To set speed, use start_set_speed. To set temperature,
         use start_set_temperature.
         """
+        # TODO(mc, 2022-07-06): may raise an `ExceptionGroup`
+        # which is an instance of BaseException, not Exception,
+        # and may evade our normal try/except blocks
         async with create_task_group() as tg:  # Does task cleanup
             tg.start_soon(self.await_speed, speed)
             tg.start_soon(self.await_temperature, temperature)
