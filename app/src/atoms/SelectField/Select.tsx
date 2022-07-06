@@ -18,7 +18,6 @@ import type {
   MenuProps,
   IndicatorProps,
 } from 'react-select'
-import { MenuItem } from '../MenuList/MenuItem'
 
 export { reactSelectComponents }
 
@@ -145,15 +144,15 @@ const Menu = (props: MenuProps<SelectOption, false>): JSX.Element => (
         boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
         flexDirection={DIRECTION_COLUMN}
       >
-        {/* {props.options
+        {props.options
           //  @ts-expect-error: options is not in SelectOption
           .flatMap(og => og.options || [og])
           .map((option, index) => (
             <Box key={index} css={MENU_ITEM_STYLING}>
               {option.label != null ? option.label : option.value}
             </Box>
-          ))} */}
-        <Box css={MENU_ITEM_STYLING}>{props.children}</Box>
+          ))}
+        {/* <Box css={MENU_ITEM_STYLING}>{props.children}</Box> */}
       </Flex>
     </>
   </reactSelectComponents.Menu>
