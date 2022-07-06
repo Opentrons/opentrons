@@ -163,13 +163,6 @@ class OT3Controller:
             hold_currents[axis] = settings.hold_current
         return hold_currents
 
-    async def setup_motors(self) -> None:
-        """Set up the motors."""
-        await self._messenger.send(
-            node_id=NodeId.broadcast,
-            message=EnableMotorRequest(),
-        )
-
     @property
     def gpio_chardev(self) -> OT3GPIO:
         """Get the GPIO device."""
