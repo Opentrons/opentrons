@@ -25,6 +25,7 @@ import {
   POSITION_ABSOLUTE,
   BORDERS,
   TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
 
 import {
@@ -162,7 +163,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         >
           {protocolDisplayName}
         </StyledText>
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} flexWrap={WRAP}>
           {analysisStatus === 'loading' ? (
             <StyledText as="p" flex="1" color={COLORS.darkGreyEnabled}>
               {t('loading_data')}
