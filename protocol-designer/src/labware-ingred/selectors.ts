@@ -5,7 +5,6 @@ import max from 'lodash/max'
 import reduce from 'lodash/reduce'
 import { Options } from '@opentrons/components'
 import { LabwareLiquidState } from '@opentrons/step-generation'
-// import { swatchColors } from '../components/swatchColors'
 import {
   RootState,
   ContainersState,
