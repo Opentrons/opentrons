@@ -333,8 +333,7 @@ export function SetupLabware({
               >
                 <Link
                   role="link"
-                  css={TYPOGRAPHY.labelSemiBold}
-                  color={COLORS.darkBlack}
+                  css={TYPOGRAPHY.darkLinkLabelSemiBold}
                   onClick={() => setShowLabwareHelpModal(true)}
                   data-test={'LabwareSetup_helpLink'}
                 >
