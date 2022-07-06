@@ -354,13 +354,13 @@ async def test_gripper_action(
     with pytest.raises(
         GripperNotAttachedError, match="Cannot perform action without gripper attached"
     ):
-        await ot3_hardware.grip(2.0, 5.0)
+        await ot3_hardware.grip(5.0)
     mock_grip.assert_not_called()
 
     with pytest.raises(
         GripperNotAttachedError, match="Cannot perform action without gripper attached"
     ):
-        await ot3_hardware.release(2.0, 5.0)
+        await ot3_hardware.release()
     mock_release.assert_not_called()
 
     # cache gripper
@@ -369,18 +369,17 @@ async def test_gripper_action(
     await ot3_hardware.cache_gripper(instr_data)
 
     with pytest.raises(GripError, match="Gripper jaw must be homed before moving"):
-        await ot3_hardware.grip(2.0, 5.0)
+        await ot3_hardware.grip(5.0)
     await ot3_hardware.home_gripper_jaw()
     mock_release.assert_called_once()
     mock_release.reset_mock()
     await ot3_hardware.home([OT3Axis.G])
     mock_release.assert_called_once()
     mock_release.reset_mock()
-    await ot3_hardware.grip(2.0, 5.0)
+    await ot3_hardware.grip(5.0)
     mock_grip.assert_called_once_with(
-        2.0,
         gc.piecewise_force_conversion(5.0, gripper_config.jaw_force_per_duty_cycle),
     )
 
-    await ot3_hardware.release(2.0, 10.0)
+    await ot3_hardware.release()
     mock_release.assert_called_once()

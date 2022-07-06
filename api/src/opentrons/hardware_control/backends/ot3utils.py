@@ -34,6 +34,7 @@ from opentrons_hardware.hardware_control.motion import (
 )
 
 GRIPPER_JAW_HOME_TIME: float = 120
+GRIPPER_JAW_GRIP_TIME: float = 2
 GRIPPER_JAW_FREQUENCY: float = 320000
 GRIPPER_JAW_HOME_DC: float = 100
 
@@ -226,12 +227,11 @@ def create_home_group(
 
 
 def create_gripper_jaw_move_group(
-    duration: float,
     duty_cycle: float,
     stop_condition: MoveStopCondition = MoveStopCondition.none,
 ) -> MoveGroup:
     step = create_gripper_jaw_step(
-        duration=np.float64(duration),
+        duration=np.float64(GRIPPER_JAW_GRIP_TIME),
         frequency=np.float32(GRIPPER_JAW_FREQUENCY),
         duty_cycle=np.float32(duty_cycle),
         stop_condition=stop_condition,

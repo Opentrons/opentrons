@@ -927,12 +927,10 @@ class OT3API(
         pass
 
     @ExecutionManagerProvider.wait_for_running
-    async def _grip(self, duration: float, duty_cycle: float) -> None:
+    async def _grip(self, duty_cycle: float) -> None:
         """Move the gripper jaw inward to close."""
         try:
-            await self._backend.gripper_move_jaw(
-                duration=duration, duty_cycle=duty_cycle
-            )
+            await self._backend.gripper_move_jaw(duty_cycle=duty_cycle)
         except Exception:
             self._log.exception("Gripper grip failed")
             raise
@@ -946,12 +944,12 @@ class OT3API(
             self._log.exception("Gripper home failed")
             raise
 
-    async def grip(self, duration: float, newton: float) -> None:
+    async def grip(self, force_newtons: float) -> None:
         self._gripper_handler.check_ready_for_grip()
-        dc = self._gripper_handler.get_duty_cycle_by_grip_force(newton)
-        await self._grip(duration=duration, duty_cycle=dc)
+        dc = self._gripper_handler.get_duty_cycle_by_grip_force(force_newtons)
+        await self._grip(duty_cycle=dc)
 
-    async def release(self, duration: float, newton: Optional[float] = None) -> None:
+    async def release(self) -> None:
         # get default grip force for release if not provided
         self._gripper_handler.check_ready_for_jaw_move()
         await self._release()

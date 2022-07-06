@@ -319,11 +319,10 @@ class OT3Controller:
 
     async def gripper_move_jaw(
         self,
-        duration: float,
         duty_cycle: float,
         stop_condition: MoveStopCondition = MoveStopCondition.none,
     ) -> bool:
-        move_group = create_gripper_jaw_move_group(duration, duty_cycle, stop_condition)
+        move_group = create_gripper_jaw_move_group(duty_cycle, stop_condition)
         runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
         return True
