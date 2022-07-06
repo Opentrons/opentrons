@@ -7,7 +7,8 @@ from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types, hardware_control as hc
 from opentrons.commands import commands as cmds
-from opentrons.commands.publisher import CommandPublisher, publish, publish_context
+from opentrons.commands.publisher import CommandPublisher, publish
+from opentrons.commands import publisher
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.api_support.instrument import (
     validate_blowout_location,
@@ -223,7 +224,7 @@ class InstrumentContext(CommandPublisher):
 
         c_vol = self._implementation.get_available_volume() if not volume else volume
 
-        with publish_context(
+        with publisher.publish_context(
             broker=self.broker,
             command=cmds.aspirate(
                 instrument=self,
@@ -317,7 +318,7 @@ class InstrumentContext(CommandPublisher):
 
         c_vol = self.current_volume if not volume else volume
 
-        with publish_context(
+        with publisher.publish_context(
             broker=self.broker,
             command=cmds.dispense(
                 instrument=self,
@@ -384,7 +385,7 @@ class InstrumentContext(CommandPublisher):
 
         c_vol = self._implementation.get_available_volume() if not volume else volume
 
-        with publish_context(
+        with publisher.publish_context(
             broker=self.broker,
             command=cmds.mix(
                 instrument=self,
@@ -455,7 +456,7 @@ class InstrumentContext(CommandPublisher):
                 "knows where it is."
             )
 
-        with publish_context(
+        with publisher.publish_context(
             broker=self.broker,
             command=cmds.blow_out(
                 instrument=self,
@@ -711,11 +712,11 @@ class InstrumentContext(CommandPublisher):
 
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
         instrument.validate_tiprack(self.name, tiprack, logger)
-
-        with publish_context(
+        with publisher.publish_context(
             broker=self.broker,
             command=cmds.pick_up_tip(instrument=self, location=target),
         ):
+            print("in publisher")
             self.move_to(target.top(), publish=False)
             self._implementation.pick_up_tip(
                 well=target._impl,
@@ -834,7 +835,7 @@ class InstrumentContext(CommandPublisher):
                 " However, it is a {}".format(location)
             )
 
-        with publish_context(
+        with publisher.publish_context(
             broker=self.broker,
             command=cmds.drop_tip(instrument=self, location=target),
         ):
@@ -869,7 +870,7 @@ class InstrumentContext(CommandPublisher):
 
         mount_name = self._implementation.get_mount().name.lower()
 
-        with publish_context(broker=self.broker, command=cmds.home(mount_name)):
+        with publisher.publish_context(broker=self.broker, command=cmds.home(mount_name)):
             self._implementation.home()
 
         return self
@@ -1206,7 +1207,7 @@ class InstrumentContext(CommandPublisher):
         publish_ctx = nullcontext()
 
         if publish:
-            publish_ctx = publish_context(
+            publish_ctx = publisher.publish_context(
                 broker=self.broker,
                 command=cmds.move_to(
                     instrument=self,

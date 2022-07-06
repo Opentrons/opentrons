@@ -12,6 +12,8 @@ from opentrons.broker import Broker
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api.labware import Well
 from opentrons.protocols.api_support.instrument import validate_tiprack
+from opentrons.commands import publisher
+
 
 
 @pytest.fixture(autouse=True)
@@ -21,6 +23,15 @@ def patch_mock_validate_tiprack(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -
     monkeypatch.setattr(
         "opentrons.protocols.api_support.instrument.validate_tiprack",
         mock_validate_tiprack,
+    )
+
+@pytest.fixture(autouse=True)
+def patch_mock_publish_context(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Replace motion_planning.get_waypoints() with a mock."""
+    mock_publish_context = decoy.mock(func=publisher.publish_context)
+    monkeypatch.setattr(
+        "opentrons.commands.publisher.publish_context",
+        mock_publish_context,
     )
 
 @pytest.fixture
