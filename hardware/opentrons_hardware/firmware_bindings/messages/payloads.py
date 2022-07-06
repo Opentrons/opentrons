@@ -391,7 +391,6 @@ class BrushedMotorVrefPayload(utils.BinarySerializable):
 class BrushedMotorPwmPayload(utils.BinarySerializable):
     """A request to set the pwm of a brushed motor."""
 
-    freq: utils.UInt32Field
     duty_cycle: utils.UInt32Field
 
 
@@ -407,7 +406,6 @@ class GripperInfoResponsePayload(utils.BinarySerializable):
 class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
     """A request to move gripper."""
 
-    freq: utils.UInt32Field
     duty_cycle: utils.UInt32Field
 
 
