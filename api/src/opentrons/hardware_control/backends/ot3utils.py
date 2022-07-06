@@ -34,8 +34,8 @@ from opentrons_hardware.hardware_control.motion import (
 )
 
 GRIPPER_JAW_HOME_TIME: float = 120
-GRIPPER_JAW_GRIP_TIME: float = 2
-GRIPPER_JAW_FREQUENCY: float = 320000
+GRIPPER_JAW_GRIP_TIME: float = 1
+GRIPPER_JAW_FREQUENCY: float = 32000
 GRIPPER_JAW_HOME_DC: float = 100
 
 # TODO: These methods exist to defer uses of NodeId to inside
