@@ -870,7 +870,9 @@ class InstrumentContext(CommandPublisher):
 
         mount_name = self._implementation.get_mount().name.lower()
 
-        with publisher.publish_context(broker=self.broker, command=cmds.home(mount_name)):
+        with publisher.publish_context(
+            broker=self.broker, command=cmds.home(mount_name)
+        ):
             self._implementation.home()
 
         return self
