@@ -149,7 +149,7 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
         )
 
     if _is_fixed_trash(item):
-        # A Heater-Shaker can't safely be placed just south of the fixed trash
+        # A Heater-Shaker can't safely be placed just south of the fixed trash,
         # because the fixed trash blocks access to the screw that locks the
         # Heater-Shaker onto the deck.
         location_south_of_fixed_trash = _get_south_location(location)
