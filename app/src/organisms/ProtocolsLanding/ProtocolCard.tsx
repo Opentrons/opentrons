@@ -136,7 +136,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     targetRef
   )
 
-  // TODO kj 07/06/2022: Currently, using hardcoded number 880 to align svg and updated position
+  // TODO kj 07/06/2022: Currently, using hardcoded number to align elements
   // This should be removed in the future
 
   return (
@@ -189,7 +189,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_leftMount_${protocolDisplayName}`}
-                whiteSpace="nowrap"
+                minWidth="10.625rem"
               >
                 <StyledText
                   as="h6"
@@ -219,7 +219,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_rightMount_${protocolDisplayName}`}
-                whiteSpace="nowrap"
+                minWidth="10.625rem"
               >
                 <StyledText
                   as="h6"
