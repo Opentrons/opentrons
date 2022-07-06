@@ -236,7 +236,6 @@ class OT3API(
         else:
             checked_config = config
         backend = await OT3Controller.build(checked_config)
-        await backend.setup_motors()
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance.cache_instruments()
         module_controls = await AttachedModulesControl.build(

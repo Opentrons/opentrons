@@ -55,9 +55,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
 )
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    EnableMotorRequest,
-)
 from opentrons_hardware import firmware_update
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
@@ -162,13 +159,6 @@ class OT3Controller:
         for axis, settings in self._current_settings.items():
             hold_currents[axis] = settings.hold_current
         return hold_currents
-
-    async def setup_motors(self) -> None:
-        """Set up the motors."""
-        await self._messenger.send(
-            node_id=NodeId.broadcast,
-            message=EnableMotorRequest(),
-        )
 
     @property
     def gpio_chardev(self) -> OT3GPIO:
