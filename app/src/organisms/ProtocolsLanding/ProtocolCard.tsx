@@ -175,7 +175,6 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_leftMount_${protocolDisplayName}`}
-                // minWidth="10.625rem"
               >
                 <StyledText
                   as="h6"
@@ -205,7 +204,6 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_rightMount_${protocolDisplayName}`}
-                // minWidth="10.625rem"
               >
                 <StyledText
                   as="h6"
@@ -234,7 +232,6 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flex="1"
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
-                // minWidth="6.25rem"
               >
                 {requiredModuleTypes.length > 0 ? (
                   <>
