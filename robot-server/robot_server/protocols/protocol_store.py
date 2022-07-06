@@ -17,7 +17,6 @@ from robot_server.persistence import (
     protocol_table,
     run_table,
     sqlite_rowid,
-    ensure_utc_datetime,
 )
 
 
@@ -440,7 +439,7 @@ def _convert_sql_row_to_dataclass(
 ) -> _DBProtocolResource:
     protocol_id = sql_row.id
     protocol_key = sql_row.protocol_key
-    created_at = ensure_utc_datetime(sql_row.created_at)
+    created_at = sql_row.created_at
 
     assert isinstance(protocol_id, str), f"Protocol ID {protocol_id} not a string"
     assert protocol_key is None or isinstance(
@@ -459,6 +458,6 @@ def _convert_dataclass_to_sql_values(
 ) -> Dict[str, object]:
     return {
         "id": resource.protocol_id,
-        "created_at": ensure_utc_datetime(resource.created_at),
+        "created_at": resource.created_at,
         "protocol_key": resource.protocol_key,
     }
