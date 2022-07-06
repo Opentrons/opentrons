@@ -54,9 +54,9 @@ labwareDisplayCategoryFilters.forEach(category =>
   FILTER_OPTIONS.push({ name: startCase(category), value: category })
 )
 
-const SORT_BY_STYLE = css`
+const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
-
+  cursor: pointer;
   &:hover {
     background-color: ${COLORS.medGreyHover};
   }
@@ -139,11 +139,7 @@ export function Labware(): JSX.Element {
               }}
             />
           </Flex>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            alignItems={ALIGN_CENTER}
-            onClick={toggleSetShowSortByMenu}
-          >
+          <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <StyledText
               css={TYPOGRAPHY.pSemiBold}
               color={COLORS.darkGreyEnabled}
@@ -153,10 +149,10 @@ export function Labware(): JSX.Element {
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
-              // backgroundColor={COLORS.medGrey}
               borderRadius={BORDERS.radiusSoftCorners}
               marginLeft={SPACING.spacing3}
-              css={SORT_BY_STYLE}
+              css={SORT_BY_BUTTON_STYLE}
+              onClick={toggleSetShowSortByMenu}
             >
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
