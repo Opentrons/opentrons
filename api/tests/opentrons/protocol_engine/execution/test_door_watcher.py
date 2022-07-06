@@ -12,6 +12,7 @@ from opentrons.hardware_control.types import (
     DoorStateNotification,
     DoorState,
     HardwareEventHandler,
+    PauseType,
 )
 
 from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
@@ -61,6 +62,7 @@ async def subject(
 async def test_event_forwarding(
     decoy: Decoy,
     subject: DoorWatcher,
+    state_store: StateStore,
     hardware_control_api: HardwareControlAPI,
     action_dispatcher: ActionDispatcher,
 ) -> None:
@@ -71,6 +73,8 @@ async def test_event_forwarding(
         unsubscribe_callback
     )
 
+    decoy.when(state_store.commands.get_is_running()).then_return(True)
+
     subject.start()
 
     captured_handler = cast(HardwareEventHandler, handler_captor.value)
@@ -79,7 +83,11 @@ async def test_event_forwarding(
     expected_action_to_forward = DoorChangeAction(DoorState.OPEN)
 
     await to_thread.run_sync(captured_handler, input_event)
-    decoy.verify(action_dispatcher.dispatch(expected_action_to_forward))
+    decoy.verify(
+        hardware_control_api.pause(PauseType.PAUSE),
+        action_dispatcher.dispatch(expected_action_to_forward),
+        times=1,
+    )
 
 
 async def test_one_subscribe_one_unsubscribe(
