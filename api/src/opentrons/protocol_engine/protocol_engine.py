@@ -293,6 +293,7 @@ class ProtocolEngine:
                 definition=self._module_data_provider.get_definition(
                     ModuleModel(mod.model())
                 ),
+                module_live_data=mod.live_data,
             )
             for module_id, mod in modules_by_id.items()
         ]
