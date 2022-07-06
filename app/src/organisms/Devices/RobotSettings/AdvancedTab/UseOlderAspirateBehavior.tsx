@@ -6,8 +6,8 @@ import {
   Flex,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  Box,
   SPACING,
+  DIRECTION_COLUMN,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -46,17 +46,16 @@ export function UseOlderAspirateBehavior({
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-      <Box width="70%">
+      <Flex width="70%" flexDirection={DIRECTION_COLUMN}>
         <StyledText
-          as="h2"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          paddingBottom={SPACING.spacing4}
+          css={TYPOGRAPHY.pSemiBold}
+          paddingBottom={SPACING.spacing2}
           id="AdvancedSettings_devTools"
         >
           {t('use_older_aspirate')}
         </StyledText>
         <StyledText as="p">{t('use_older_aspirate_description')}</StyledText>
-      </Box>
+      </Flex>
       <ToggleButton
         label="use_older_aspirate_behavior"
         toggledOn={settings?.value === true}

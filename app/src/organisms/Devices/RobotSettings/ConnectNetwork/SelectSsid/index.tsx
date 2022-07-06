@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { SelectField, CONTEXT_MENU } from '@opentrons/components'
+import { CONTEXT_MENU } from '@opentrons/components'
 import * as Copy from '../i18n'
 import { NetworkOptionLabel, NetworkActionLabel } from './NetworkOptionLabel'
 
@@ -11,6 +11,7 @@ import type {
 } from '@opentrons/components'
 
 import type { WifiNetwork } from '../types'
+import { SelectField } from '../../../../../atoms/SelectField/SelectField'
 
 export interface SelectSsidProps {
   list: WifiNetwork[]

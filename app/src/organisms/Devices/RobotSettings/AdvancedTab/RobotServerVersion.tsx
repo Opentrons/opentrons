@@ -12,6 +12,7 @@ import {
   Link,
   JUSTIFY_FLEX_END,
   TEXT_TRANSFORM_CAPITALIZE,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 import { Portal } from '../../../../App/portal'
@@ -60,11 +61,10 @@ export function RobotServerVersion({
         </Box>
       ) : null}
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Box width="70%">
+        <Flex width="70%" flexDirection={DIRECTION_COLUMN}>
           <StyledText
-            as="h2"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            paddingBottom={SPACING.spacing4}
+            css={TYPOGRAPHY.pSemiBold}
+            paddingBottom={SPACING.spacing2}
             id="AdvancedSettings_RobotServerVersion"
           >
             {t('robot_server_versions')}
@@ -83,7 +83,7 @@ export function RobotServerVersion({
               css={TYPOGRAPHY.linkPSemiBold}
             >{` ${t('shared:github')}`}</Link>
           </StyledText>
-        </Box>
+        </Flex>
         {autoUpdateAction !== 'reinstall' && robot != null ? null : (
           <Flex justifyContent={JUSTIFY_FLEX_END} alignItems="center">
             <StyledText

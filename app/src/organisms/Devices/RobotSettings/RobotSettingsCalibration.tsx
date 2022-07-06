@@ -653,7 +653,7 @@ export function RobotSettingsCalibration({
       <Line />
       {/* Tip Length Calibration Section */}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER}>
+        <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
           <Box marginRight={SPACING.spacing6}>
             <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
               {t('tip_length_calibrations_title')}
@@ -661,18 +661,18 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing4}>
               {t('tip_length_calibrations_description')}
             </StyledText>
-            {tipLengthCalibrations != null &&
-            tipLengthCalibrations.length !== 0 ? (
-              <TipLengthCalibrationItems
-                robotName={robotName}
-                formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
-                formattedTipLengthCalibrations={formatTipLengthCalibrations()}
-                updateRobotStatus={updateRobotStatus}
-              />
-            ) : (
-              <StyledText as="label">{t('not_calibrated')}</StyledText>
-            )}
           </Box>
+          {tipLengthCalibrations != null &&
+          tipLengthCalibrations.length !== 0 ? (
+            <TipLengthCalibrationItems
+              robotName={robotName}
+              formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
+              formattedTipLengthCalibrations={formatTipLengthCalibrations()}
+              updateRobotStatus={updateRobotStatus}
+            />
+          ) : (
+            <StyledText as="label">{t('not_calibrated')}</StyledText>
+          )}
         </Flex>
       </Box>
       <Line />

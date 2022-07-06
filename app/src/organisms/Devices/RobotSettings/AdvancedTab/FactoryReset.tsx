@@ -5,9 +5,9 @@ import {
   Flex,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  Box,
   SPACING,
   SPACING_AUTO,
+  DIRECTION_COLUMN,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -40,17 +40,16 @@ export function FactoryReset({
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-      <Box width="70%">
+      <Flex width="70%" flexDirection={DIRECTION_COLUMN}>
         <StyledText
-          as="h2"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing4}
+          css={TYPOGRAPHY.pSemiBold}
+          marginBottom={SPACING.spacing2}
           id="AdvancedSettings_factoryReset"
         >
           {t('factory_reset')}
         </StyledText>
         <StyledText as="p">{t('factory_reset_description')}</StyledText>
-      </Box>
+      </Flex>
       <TertiaryButton
         marginLeft={SPACING_AUTO}
         onClick={handleClick}

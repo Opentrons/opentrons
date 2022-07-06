@@ -35,6 +35,7 @@ const StyledTableHeader = styled.th`
 `
 const StyledTableRow = styled.tr`
   padding: ${SPACING.spacing3};
+  border-bottom: ${BORDERS.lineBorder};
 `
 const StyledTableCell = styled.td`
   padding: ${SPACING.spacing3};

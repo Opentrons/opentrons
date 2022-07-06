@@ -6,9 +6,9 @@ import {
   Flex,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  Box,
   SPACING,
   TYPOGRAPHY,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../../atoms/text'
@@ -46,11 +46,10 @@ export function UsageSettings({
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-      <Box width="70%">
+      <Flex width="70%" flexDirection={DIRECTION_COLUMN}>
         <StyledText
-          as="h2"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          paddingBottom={SPACING.spacing4}
+          css={TYPOGRAPHY.h2SemiBold}
+          marginBottom={SPACING.spacing4}
           id="AdvancedSettings_UsageSettings"
         >
           {t('usage_settings')}
@@ -59,7 +58,7 @@ export function UsageSettings({
           {t('pause_protocol')}
         </StyledText>
         <StyledText as="p">{t('pause_protocol_description')}</StyledText>
-      </Box>
+      </Flex>
       <ToggleButton
         label="usage_settings_pause_protocol"
         toggledOn={settings?.value === true}

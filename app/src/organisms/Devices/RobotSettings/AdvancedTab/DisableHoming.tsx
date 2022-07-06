@@ -6,9 +6,9 @@ import {
   Flex,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  Box,
-  SPACING,
   TYPOGRAPHY,
+  SPACING,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../../atoms/text'
@@ -46,17 +46,16 @@ export function DisableHoming({
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-      <Box width="70%">
+      <Flex width="70%" flexDirection={DIRECTION_COLUMN}>
         <StyledText
-          as="h2"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          paddingBottom={SPACING.spacing4}
+          css={TYPOGRAPHY.pSemiBold}
+          paddingBottom={SPACING.spacing2}
           id="AdvancedSettings_disableHoming"
         >
           {t('disable_homing')}
         </StyledText>
         <StyledText as="p">{t('disable_homing_description')}</StyledText>
-      </Box>
+      </Flex>
       <ToggleButton
         label="disable_homing"
         toggledOn={value}

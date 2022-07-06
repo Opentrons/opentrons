@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
-import { SelectField, CONTEXT_VALUE, CONTEXT_MENU } from '@opentrons/components'
+import { CONTEXT_VALUE, CONTEXT_MENU } from '@opentrons/components'
 
 import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
+import { SelectField } from '../../../../../../atoms/SelectField/SelectField'
 import { LABEL_JOIN_OTHER_NETWORK, DISCONNECT_FROM_SSID } from '../../i18n'
 
 import { SelectSsid } from '..'
