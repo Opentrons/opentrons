@@ -1,4 +1,4 @@
-import uuidv1 from 'uuid/v1'
+import uuidv1 from 'uuid/v4'
 import { commandCreatorsTimeline } from './commandCreatorsTimeline'
 import { curryCommandCreator } from './curryCommandCreator'
 import { reduceCommandCreators } from './reduceCommandCreators'
