@@ -20,7 +20,7 @@ from .deck_item import DeckItem
 _FIXED_TRASH_SLOT: Final = 12
 
 
-class _NotAllowed(NamedTuple):
+class _NothingAllowed(NamedTuple):
     """Nothing is allowed in this slot."""
 
     location: int
@@ -48,7 +48,7 @@ class _MaxHeight(NamedTuple):
 
 
 class _NoModule(NamedTuple):
-    """A module is not allowed in this slot."""
+    """No module of any kind is allowed in this slot."""
 
     location: int
     source_item: DeckItem
@@ -58,21 +58,33 @@ class _NoModule(NamedTuple):
         return not isinstance(item, ModuleGeometry)
 
 
-class _FixedTrash(NamedTuple):
+class _NoHeaterShakerModule(NamedTuple):
+    """No Heater-Shaker module is allowed in this slot."""
+
+    location: int
+    source_item: DeckItem
+    source_location: int
+
+    def is_allowed(self, item: DeckItem) -> bool:
+        return not isinstance(item, HeaterShakerGeometry)
+
+
+class _FixedTrashOnly(NamedTuple):
     """Only fixed-trash labware is allowed in this slot."""
 
     location: int = _FIXED_TRASH_SLOT
 
     def is_allowed(self, item: DeckItem) -> bool:
-        if isinstance(item, AbstractLabware):
-            return "fixedTrash" in item.get_quirks()
-        if isinstance(item, Labware):
-            return "fixedTrash" in item.quirks
-
-        return False
+        return _is_fixed_trash(item)
 
 
-_DeckRestriction = Union[_NotAllowed, _MaxHeight, _NoModule, _FixedTrash]
+_DeckRestriction = Union[
+    _NothingAllowed,
+    _MaxHeight,
+    _NoModule,
+    _NoHeaterShakerModule,
+    _FixedTrashOnly,
+]
 """A restriction on what is allowed in a given slot."""
 
 
@@ -95,7 +107,7 @@ def check(
     Raises:
         DeckConflictError: Adding this item should not be allowed.
     """
-    restrictions: List[_DeckRestriction] = [_FixedTrash()]
+    restrictions: List[_DeckRestriction] = [_FixedTrashOnly()]
 
     # build restrictions driven by existing items
     for location, item in existing_items.items():
@@ -127,18 +139,33 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
     restrictions: List[_DeckRestriction] = []
 
     if location != _FIXED_TRASH_SLOT:
+        # Disallow a different item from overlapping this item in this deck slot.
         restrictions.append(
-            _NotAllowed(
+            _NothingAllowed(
                 location=location,
                 source_item=item,
                 source_location=location,
             )
         )
 
+    if _is_fixed_trash(item):
+        # A Heater-Shaker can't safely be placed just south of the fixed trash,
+        # because the fixed trash blocks access to the screw that locks the
+        # Heater-Shaker onto the deck.
+        location_south_of_fixed_trash = _get_south_location(location)
+        if location_south_of_fixed_trash is not None:
+            restrictions.append(
+                _NoHeaterShakerModule(
+                    location=location_south_of_fixed_trash,
+                    source_item=item,
+                    source_location=location,
+                )
+            )
+
     if isinstance(item, ThermocyclerGeometry):
         for covered_location in item.covered_slots:
             restrictions.append(
-                _NotAllowed(
+                _NothingAllowed(
                     location=covered_location,
                     source_item=item,
                     source_location=location,
@@ -178,7 +205,7 @@ def _create_deck_conflict_error_message(
         new_item is not None or existing_item is not None
     ), "Conflict error expects either new_item or existing_item"
 
-    if isinstance(restriction, _FixedTrash):
+    if isinstance(restriction, _FixedTrashOnly):
         message = f"Only fixed-trash is allowed in slot {restriction.location}"
 
     elif new_item is not None:
@@ -199,21 +226,56 @@ def _create_deck_conflict_error_message(
     return message
 
 
-def _get_east_west_locations(location: int) -> List[int]:
-    if location in [1, 4, 7, 10]:
-        return [location + 1]
-    elif location in [2, 5, 8, 11]:
-        return [location - 1, location + 1]
+def _is_fixed_trash(item: DeckItem) -> bool:
+    # `item` is inconsistently provided to us as an AbstractLabware or Labware.
+    # See TODO comments in opentrons.protocols.geometry.deck,
+    # the module that calls into this module.
+    if isinstance(item, AbstractLabware):
+        return "fixedTrash" in item.get_quirks()
+    if isinstance(item, Labware):
+        return "fixedTrash" in item.quirks
+    return False
+
+
+def _get_north_location(location: int) -> Optional[int]:
+    if location in [10, 11, 12]:
+        return None
     else:
-        return [location - 1]
+        return location + 3
+
+
+def _get_south_location(location: int) -> Optional[int]:
+    if location in [1, 2, 3]:
+        return None
+    else:
+        return location - 3
+
+
+def _get_east_location(location: int) -> Optional[int]:
+    if location in [3, 6, 9, 12]:
+        return None
+    else:
+        return location + 1
+
+
+def _get_west_location(location: int) -> Optional[int]:
+    if location in [1, 4, 7, 10]:
+        return None
+    else:
+        return location - 1
+
+
+def _get_east_west_locations(location: int) -> List[int]:
+    east = _get_east_location(location)
+    west = _get_west_location(location)
+    return [maybe_loc for maybe_loc in [east, west] if maybe_loc is not None]
+
+
+def _get_north_south_locations(location: int) -> List[int]:
+    north = _get_north_location(location)
+    south = _get_south_location(location)
+    return [maybe_loc for maybe_loc in [north, south] if maybe_loc is not None]
 
 
 def _get_adjacent_locations(location: int) -> List[int]:
-    if location in [1, 2, 3]:
-        north_south = [location + 3]
-    elif location in [4, 5, 6, 7, 8, 9]:
-        north_south = [location - 3, location + 3]
-    else:
-        north_south = [location - 3]
-
-    return north_south + _get_east_west_locations(location)
+    return _get_east_west_locations(location) + _get_north_south_locations(location)
