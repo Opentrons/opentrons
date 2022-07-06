@@ -14,10 +14,20 @@ class GravimetricSample:
 
     @classmethod
     def csv_header(cls) -> str:
-        return 'time,grams,stable'
+        return 'time,relative-time,grams,unstable-grams,stable-grams,stable'
 
-    def as_csv(self) -> str:
-        return f'{self.time},{self.grams},{int(self.stable)}'
+    def as_csv(self, parent: Optional["GravimetricRecording"] = None) -> str:
+        rel_time = self.relative_time(parent.start_time)
+        unstable_grams = str(self.grams) if not self.stable else ''
+        stable_grams = str(self.grams) if self.stable else ''
+        return f'{self.time},{rel_time},{self.grams},' \
+               f'{unstable_grams},{stable_grams},{int(self.stable)}'
+
+    def relative_time(self, start_time: float) -> float:
+        return self.time - start_time
+
+    def relative_grams(self, start_grams: float) -> float:
+        return self.grams - start_grams
 
 
 @dataclass
@@ -38,6 +48,16 @@ class GravimetricRecording(List):
     def end_time(self) -> float:
         assert len(self), 'No samples recorded'
         return self[-1].time
+
+    @property
+    def start_grams(self) -> float:
+        assert len(self), 'No samples recorded'
+        return self[0].grams
+
+    @property
+    def end_grams(self) -> float:
+        assert len(self), 'No samples recorded'
+        return self[-1].grams
 
     @property
     def duration(self) -> float:
@@ -65,10 +85,10 @@ class GravimetricRecording(List):
         return (self.average - target) / target
 
     def as_csv(self) -> str:
-        csv_file_str = GravimetricSample.csv_header() + '\r\n'
+        csv_file_str = GravimetricSample.csv_header() + '\n'
         for s in self:
-            csv_file_str += s.as_csv() + '\r\n'
-        return csv_file_str + '\r\n'
+            csv_file_str += s.as_csv(self) + '\n'
+        return csv_file_str + '\n'
 
 
 def read_sample_from_scale(scale: RadwagScaleBase) -> GravimetricSample:

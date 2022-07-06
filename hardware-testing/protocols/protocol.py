@@ -1,3 +1,5 @@
+import atexit
+
 from serial.tools.list_ports import comports
 
 from opentrons.protocol_api import ProtocolContext
@@ -18,6 +20,10 @@ def find_scale_port() -> str:
     for p in comports():
         if p.vid == vid and p.pid == pid:
             return p.device
+    # also try looking for the RS232 USB adapter cable
+    for p in comports():
+        if p.vid == 1659 and p.pid == 8963:
+            return p.device
     raise RuntimeError(
         f'No scale found from available serial ports: {comports()}')
 
@@ -34,11 +40,23 @@ def run(protocol: ProtocolContext) -> None:
     else:
         scale = RadwagScale.create(find_scale_port())
     scale.connect()
-    scale_sn = initialize_scale(scale)
-    recording = record_samples(scale, duration=3, length=30)
-    scale.disconnect()
-    test_data_name = create_file_name(metadata['protocolName'], scale_sn)
-    dump_data_to_file(metadata['protocolName'], test_data_name, recording.as_csv())
+    initialize_scale(scale)
+    atexit.register(scale.disconnect)
+
+    while 'y' not in input('Quit? (y/n): ').lower():
+        try:
+            recording_name = input('Name of recording: ')
+            recording_duration = float(input('\tDuration (sec): '))
+            recording_interval = float(input('\tInterval (sec): '))
+        except Exception:
+            continue
+        input('\tPress ENTER when ready...')
+        print('\trecording...')
+        recording = record_samples(
+            scale, duration=recording_duration, interval=recording_interval, stable=False)
+        test_data_name = create_file_name(metadata['protocolName'], recording_name)
+        print(f'\tDone, saving {len(recording)} samples as \"{test_data_name}\"\n')
+        dump_data_to_file(metadata['protocolName'], test_data_name, recording.as_csv())
 
 
 if __name__ == '__main__':
