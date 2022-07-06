@@ -277,11 +277,11 @@ export const getAdapterName = (labwareLoadname: string): ThermalAdapterName => {
 
   if (
     labwareLoadname ===
-    'opentrons_96_pcr_plate_adapter_nest_wellplate_100ul_pcr_full_skirt'
+    'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt'
   ) {
     adapterName = 'PCR Adapter'
   } else if (
-    labwareLoadname === 'opentrons_96_deepwell_adapter_nest_wellplate_2ml_deep'
+    labwareLoadname === 'opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep'
   ) {
     adapterName = 'Deep Well Adapter'
   } else if (

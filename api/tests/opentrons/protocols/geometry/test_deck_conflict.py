@@ -320,9 +320,11 @@ def test_tip_rack_when_heater_shaker(
     decoy.when(cool_tip_rack.load_name).then_return("cool_tip_rack")
     decoy.when(cool_tip_rack.highest_z).then_return(11)
     decoy.when(cool_tip_rack.get_uri()).then_return("test/cool_tip_rack/1")
+    decoy.when(cool_tip_rack.get_quirks()).then_return([])
     decoy.when(lame_tip_rack.load_name).then_return("lame_tip_rack")
     decoy.when(lame_tip_rack.highest_z).then_return(11)
     decoy.when(lame_tip_rack.get_uri()).then_return("test/lame_tip_rack/1")
+    decoy.when(lame_tip_rack.get_quirks()).then_return([])
 
     check(
         existing_items={heater_shaker_location: heater_shaker},
@@ -362,7 +364,7 @@ def test_tip_rack_when_heater_shaker(
         )
 
 
-def test_no_heater_shaker_trash(decoy: Decoy) -> None:
+def test_no_heater_shaker_west_of_trash(decoy: Decoy) -> None:
     """It should check that fixed trash does not conflict with heater-shaker."""
     heater_shaker = decoy.mock(cls=HeaterShakerGeometry)
     trash = decoy.mock(cls=Labware)
@@ -382,3 +384,23 @@ def test_no_heater_shaker_trash(decoy: Decoy) -> None:
         ),
     ):
         check(existing_items={12: trash}, new_item=heater_shaker, new_location=11)
+
+
+def test_no_heater_shaker_south_of_trash_(decoy: Decoy) -> None:
+    """It should check that fixed trash does not conflict with heater-shaker."""
+    heater_shaker = decoy.mock(cls=HeaterShakerGeometry)
+    trash = decoy.mock(cls=Labware)
+
+    decoy.when(trash.load_name).then_return("some_fixed_trash")
+    decoy.when(trash.quirks).then_return(["fixedTrash"])
+
+    decoy.when(heater_shaker.load_name).then_return("some_heater_shaker")
+
+    with pytest.raises(
+        DeckConflictError,
+        match=(
+            "some_fixed_trash in slot 12"
+            " prevents some_heater_shaker from using slot 9"
+        ),
+    ):
+        check(existing_items={12: trash}, new_item=heater_shaker, new_location=9)

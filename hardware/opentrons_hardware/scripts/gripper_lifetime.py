@@ -9,7 +9,6 @@ from typing import Callable
 from logging.config import dictConfig
 
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    SetupRequest,
     EnableMotorRequest,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
@@ -92,7 +91,6 @@ async def run(args: argparse.Namespace) -> None:
     messenger = CanMessenger(driver=driver)
     messenger.start()
     await set_reference_voltage(messenger, vref)
-    await messenger.send(node_id=NodeId.gripper_g, message=SetupRequest())
     await messenger.send(node_id=NodeId.gripper_g, message=EnableMotorRequest())
 
     move_groups: MoveGroups = []

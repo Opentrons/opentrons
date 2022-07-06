@@ -10,6 +10,7 @@ from typing import Optional, Union
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.types import DoorState
+from opentrons.hardware_control.modules import LiveData
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
@@ -141,6 +142,7 @@ class AddModuleAction:
     module_id: str
     serial_number: str
     definition: ModuleDefinition
+    module_live_data: LiveData
 
 
 Action = Union[

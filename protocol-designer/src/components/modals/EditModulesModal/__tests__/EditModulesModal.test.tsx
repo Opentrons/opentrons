@@ -185,6 +185,14 @@ describe('Edit Modules Modal', () => {
         'The Heater-Shaker cannot be placed in front of or behind another module'
       )
     })
+    it('should NOT error when moving a heater shaker adjacent to a slot it is in', () => {
+      // initial deck setup has HS in slot 1
+      getInitialDeckSetupMock.mockReturnValue(getMockDeckSetup())
+      // move heater shaker to slot 2
+      props.moduleOnDeck = { ...getMockHeaterShakerModule(), slot: '2' }
+      const wrapper = render(props)
+      expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toBeFalsy()
+    })
     it('should error when selecting a module when there is a heater shaker adjacent', () => {
       const initialDeckSetup = getMockDeckSetup()
       getInitialDeckSetupMock.mockReturnValue({

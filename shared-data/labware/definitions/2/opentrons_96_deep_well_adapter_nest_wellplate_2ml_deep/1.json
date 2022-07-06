@@ -19,7 +19,7 @@
     "links": []
   },
   "metadata": {
-    "displayName": "Opentrons 96 Deep Well Adapter with Nest Deep Well Plate 2ml",
+    "displayName": "Opentrons 96 Deep Well Adapter with NEST Deep Well Plate 2 mL",
     "displayCategory": "aluminumBlock",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -1108,7 +1108,7 @@
     "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_96_deepwell_adapter_nest_wellplate_2ml_deep"
+    "loadName": "opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep"
   },
   "namespace": "opentrons",
   "version": 1,
