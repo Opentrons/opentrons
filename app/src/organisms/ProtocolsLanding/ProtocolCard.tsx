@@ -26,6 +26,9 @@ import {
   BORDERS,
   TYPOGRAPHY,
   WRAP,
+  ALIGN_START,
+  JUSTIFY_FLEX_END,
+  FLEX_NONE,
 } from '@opentrons/components'
 
 import {
@@ -39,6 +42,7 @@ import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { getAnalysisStatus, getProtocolDisplayName } from './utils'
+import { useGetElementProperty } from './useGetElementProperty'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
@@ -127,15 +131,21 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   const requiredModuleTypes = parseAllRequiredModuleModels(
     mostRecentAnalysis != null ? mostRecentAnalysis.commands : []
   ).map(getModuleType)
+  const targetRef = React.useRef(null)
+  const { getElementProperty } = useGetElementProperty<HTMLDivElement>(
+    targetRef
+  )
 
   return (
-    <Flex flex="1">
+    <Flex flex="1" ref={targetRef}>
       <Flex
         marginRight={SPACING.spacing4}
         size="6rem"
         height="auto"
         justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
+        alignItems={
+          getElementProperty('height') <= 880 ? ALIGN_START : ALIGN_CENTER
+        }
         data-testid={`ProtocolCard_deckLayout_${protocolDisplayName}`}
       >
         {
@@ -163,19 +173,20 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         >
           {protocolDisplayName}
         </StyledText>
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} flexWrap={WRAP}>
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           {analysisStatus === 'loading' ? (
             <StyledText as="p" flex="1" color={COLORS.darkGreyEnabled}>
               {t('loading_data')}
             </StyledText>
           ) : (
-            <>
+            <Flex flexWrap={WRAP}>
               {/* TODO: kj 07/01/2022 for 6.1 we need to user flex-wrap */}
               <Flex
                 flex="1"
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_leftMount_${protocolDisplayName}`}
+                minWidth="10.625rem"
               >
                 <StyledText
                   as="h6"
@@ -205,6 +216,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_rightMount_${protocolDisplayName}`}
+                minWidth="10.625rem"
               >
                 <StyledText
                   as="h6"
@@ -257,13 +269,16 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                   </>
                 ) : null}
               </Flex>
-            </>
+            </Flex>
           )}
           <Flex
             flex="0 0 8rem"
             flexDirection={DIRECTION_COLUMN}
             data-testid={`ProtocolCard_date_${protocolDisplayName}`}
             marginTop={SPACING.spacing3}
+            justifyContent={
+              getElementProperty('height') <= 880 ? JUSTIFY_FLEX_END : FLEX_NONE
+            }
           >
             <StyledText
               as="label"

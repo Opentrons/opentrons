@@ -6,10 +6,11 @@ import {
   Flex,
   SPACING,
   Link,
-  JUSTIFY_START,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  WRAP,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
@@ -40,7 +41,11 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
       >
         {props.title}
       </StyledText>
-      <Flex justifyContent={JUSTIFY_START} flexDirection={DIRECTION_ROW}>
+      <Flex
+        justifyContent={JUSTIFY_CENTER}
+        flexDirection={DIRECTION_ROW}
+        flexWrap={WRAP}
+      >
         <StyledText>
           <Link
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
