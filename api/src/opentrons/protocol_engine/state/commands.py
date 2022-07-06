@@ -35,6 +35,7 @@ from ..errors import (
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
+from .config import Config
 
 
 class QueueStatus(str, Enum):
@@ -152,11 +153,17 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
     _state: CommandState
 
-    def __init__(self, is_door_blocking: bool = False) -> None:
+    def __init__(
+        self,
+        *,
+        config: Config,
+        is_door_open: bool,
+    ) -> None:
         """Initialize a CommandStore and its state."""
+        self._config = config
         self._state = CommandState(
             queue_status=QueueStatus.SETUP,
-            is_door_blocking=is_door_blocking,
+            is_door_blocking=is_door_open and config.block_on_door_open,
             run_result=None,
             running_command_id=None,
             all_command_ids=[],
@@ -327,8 +334,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.run_completed_at = action.completed_at
 
         elif isinstance(action, HardwareEventAction):
-            if isinstance(action.event, DoorStateNotification):
-                if action.event.blocking:
+            if (
+                isinstance(action.event, DoorStateNotification)
+                and self._config.block_on_door_open
+            ):
+                if action.event.new_state == DoorState.OPEN:
                     self._state.is_door_blocking = True
                     if self._state.queue_status != QueueStatus.SETUP:
                         self._state.queue_status = QueueStatus.PAUSED

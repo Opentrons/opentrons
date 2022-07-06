@@ -12,8 +12,11 @@ export const thermocyclerRunProfile: CommandCreator<TCProfileParams> = (
         commandType: 'thermocycler/runProfile',
         params: {
           moduleId: module,
-          profile,
-          volume,
+          profile: profile.map(profileItem => ({
+            holdSeconds: profileItem.holdTime,
+            celsius: profileItem.temperature,
+          })),
+          blockMaxVolumeUl: volume,
         },
       },
     ],
