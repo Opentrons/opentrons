@@ -35,7 +35,6 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
-  TEXT_TRANSFORM_UPPERCASE,
   BORDERS,
   COLORS,
   SPACING,
@@ -111,11 +110,7 @@ function RunTimer({
   const runTime =
     startedAt != null ? formatInterval(startedAt, endTime) : EMPTY_TIMESTAMP
 
-  return (
-    <StyledText css={TYPOGRAPHY.pRegular} color={COLORS.darkBlack}>
-      {runTime}
-    </StyledText>
-  )
+  return <StyledText css={TYPOGRAPHY.pRegular}>{runTime}</StyledText>
 }
 
 export function ProtocolRunHeader({
@@ -403,7 +398,7 @@ export function ProtocolRunHeader({
       >
         <Box>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6Default}
             paddingBottom={SPACING.spacing2}
@@ -412,7 +407,6 @@ export function ProtocolRunHeader({
           </StyledText>
           <StyledText
             css={TYPOGRAPHY.pRegular}
-            color={COLORS.darkBlack}
             id="ProtocolRunHeader_protocolStart"
           >
             {startedAtTimestamp}
@@ -420,7 +414,7 @@ export function ProtocolRunHeader({
         </Box>
         <Box>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6Default}
             paddingBottom={SPACING.spacing2}
@@ -429,7 +423,6 @@ export function ProtocolRunHeader({
           </StyledText>
           <StyledText
             css={TYPOGRAPHY.pRegular}
-            color={COLORS.darkBlack}
             id="ProtocolRunHeader_protocolEnd"
           >
             {completedAtTimestamp}
@@ -518,7 +511,7 @@ export function ProtocolRunHeader({
       <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
         <Box>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6Default}
             paddingBottom={SPACING.spacing2}
@@ -528,7 +521,6 @@ export function ProtocolRunHeader({
           {/* this is the createdAt timestamp, not the run id */}
           <StyledText
             css={TYPOGRAPHY.pRegular}
-            color={COLORS.darkBlack}
             id="ProtocolRunHeader_runRecordId"
           >
             {createdAtTimestamp}
@@ -536,7 +528,7 @@ export function ProtocolRunHeader({
         </Box>
         <Box>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6Default}
             paddingBottom={SPACING.spacing2}
@@ -564,7 +556,6 @@ export function ProtocolRunHeader({
             ) : null}
             <StyledText
               css={TYPOGRAPHY.pRegular}
-              color={COLORS.darkBlack}
               id="ProtocolRunHeader_runStatus"
             >
               {runStatus != null ? t(`status_${runStatus}`) : ''}
@@ -573,7 +564,7 @@ export function ProtocolRunHeader({
         </Box>
         <Box>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6Default}
             paddingBottom={SPACING.spacing2}

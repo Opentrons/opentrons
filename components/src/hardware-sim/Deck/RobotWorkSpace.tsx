@@ -64,7 +64,6 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
       className={cx(styles.robot_work_space, props.className)}
       viewBox={viewBox || wholeDeckViewBox}
       ref={wrapperRef}
-      style={{ margin: '0 auto', maxWidth: '740px' }}
       id={id}
     >
       {deckDef && (
