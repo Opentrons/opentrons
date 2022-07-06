@@ -6,7 +6,7 @@ from typing import NamedTuple, Type
 
 from opentrons.ordered_set import OrderedSet
 from opentrons.types import MountType, DeckSlotName
-from opentrons.hardware_control.types import DoorStateNotification, DoorState
+from opentrons.hardware_control.types import DoorState
 
 from opentrons.protocol_engine import commands, errors
 from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, WellLocation

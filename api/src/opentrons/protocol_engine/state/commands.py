@@ -8,7 +8,7 @@ from typing import Dict, List, Mapping, Optional, Union
 
 from opentrons.ordered_set import OrderedSet
 
-from opentrons.hardware_control.types import DoorStateNotification, DoorState
+from opentrons.hardware_control.types import DoorState
 
 from ..actions import (
     Action,

@@ -7,11 +7,6 @@ from typing import Callable
 
 from opentrons.commands.types import CommandMessage as LegacyCommand, PauseMessage
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.types import (
-    PauseType,
-    DoorStateNotification,
-    DoorState,
-)
 from opentrons.protocol_engine import (
     StateView,
     actions as pe_actions,

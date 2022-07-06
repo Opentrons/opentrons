@@ -6,7 +6,11 @@ from asyncio import get_running_loop, run_coroutine_threadsafe
 from typing import Callable, Optional
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import HardwareEvent, DoorStateNotification, PauseType
+from opentrons.hardware_control.types import (
+    HardwareEvent,
+    DoorStateNotification,
+    PauseType,
+)
 
 from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
 
