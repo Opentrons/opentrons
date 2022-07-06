@@ -74,6 +74,26 @@ def test_pick_up_tip_no_tip(
         )
 
 
+def test_pick_up_tip_prep_after(
+    subject: AbstractInstrument, labware: AbstractLabware
+) -> None:
+    """It should not raise an error, regardless of prep_after value."""
+    subject.home()
+    subject.pick_up_tip(
+        well=labware.get_wells()[0], tip_length=1, presses=None, increment=None, prep_after=True
+    )
+    subject.aspirate(1, rate=1)
+    subject.dispense(1, rate=1)
+    subject.drop_tip(home_after=True)
+    # and again, without preparing for aspirate
+    subject.pick_up_tip(
+        well=labware.get_wells()[0], tip_length=1, presses=None, increment=None, prep_after=False
+    )
+    subject.aspirate(1, rate=1)
+    subject.dispense(1, rate=1)
+    subject.drop_tip(home_after=True)
+
+
 def test_aspirate_too_much(
     subject: AbstractInstrument, labware: AbstractLabware
 ) -> None:
