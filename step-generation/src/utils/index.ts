@@ -1,4 +1,4 @@
-import uuidv1 from 'uuid/v4'
+import uuidv4 from 'uuid/v4'
 import { commandCreatorsTimeline } from './commandCreatorsTimeline'
 import { curryCommandCreator } from './curryCommandCreator'
 import { reduceCommandCreators } from './reduceCommandCreators'
@@ -18,4 +18,4 @@ export {
 export * from './commandCreatorArgsGetters'
 export * from './misc'
 export * from './heaterShakerCollision'
-export const uuid: () => string = uuidv1
+export const uuid: () => string = uuidv4
