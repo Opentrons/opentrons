@@ -55,9 +55,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
 )
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    EnableMotorRequest,
-)
 from opentrons_hardware import firmware_update
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
