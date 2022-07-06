@@ -49,6 +49,10 @@ const baseRoundTabStyling = css`
   border-right: ${BORDERS.transparentLineBorder};
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   position: ${POSITION_RELATIVE};
+
+  &:hover {
+    background-color: ${COLORS.fundamentalsBackgroundShade};
+  }
 `
 
 const RoundNavLink = styled(NavLink)`
@@ -61,6 +65,10 @@ const RoundNavLink = styled(NavLink)`
     border-left: ${BORDERS.lineBorder};
     border-right: ${BORDERS.lineBorder};
     color: ${COLORS.blue};
+
+    &:hover {
+      color: ${COLORS.blueHover};
+    }
 
     /* extend below the tab when active to flow into the content */
     &:after {
