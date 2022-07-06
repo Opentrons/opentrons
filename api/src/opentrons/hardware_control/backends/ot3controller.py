@@ -56,7 +56,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteName as FirmwarePipetteName,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    SetupRequest,
     EnableMotorRequest,
 )
 from opentrons_hardware import firmware_update
@@ -166,10 +165,6 @@ class OT3Controller:
 
     async def setup_motors(self) -> None:
         """Set up the motors."""
-        await self._messenger.send(
-            node_id=NodeId.broadcast,
-            message=SetupRequest(),
-        )
         await self._messenger.send(
             node_id=NodeId.broadcast,
             message=EnableMotorRequest(),
