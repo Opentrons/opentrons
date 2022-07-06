@@ -49,7 +49,7 @@ class DoorWatcher:
         """Subscribe to hardware events and start forwarding them as PE actions."""
         if self._unsubscribe_callback is None:
             self._unsubscribe_callback = self._hardware_api.register_callback(
-                self._handle_hardware_event
+                self._handle_hardware_door_event
             )
 
     # todo(mm, 2022-02-01):
@@ -69,7 +69,7 @@ class DoorWatcher:
             self._unsubscribe_callback()
             self._unsubscribe_callback = None
 
-    def _handle_hardware_event(self, event: HardwareEvent) -> None:
+    def _handle_hardware_door_event(self, event: HardwareEvent) -> None:
         """Handle a door state hardware event, ensuring thread-safety.
 
         This is used as a callback for HardwareControlAPI.register_callback(),
