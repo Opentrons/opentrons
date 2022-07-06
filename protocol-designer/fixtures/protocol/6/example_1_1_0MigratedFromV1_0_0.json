@@ -4,7 +4,7 @@
     "author": "Author name",
     "description": "Description here",
     "created": 1560957631666,
-    "lastModified": 1655834013312,
+    "lastModified": 1657087289027,
     "category": null,
     "subcategory": null,
     "tags": []
@@ -13,7 +13,7 @@
     "name": "opentrons/protocol-designer",
     "version": "6.0.0",
     "data": {
-      "_internalAppBuildDate": "Fri, 17 Jun 2022 19:27:17 GMT",
+      "_internalAppBuildDate": "Fri, 01 Jul 2022 16:41:32 GMT",
       "defaultValues": {
         "aspirate_mmFromBottom": 1,
         "dispense_mmFromBottom": 0.5,
@@ -198,9 +198,9 @@
     "0": {
       "displayName": "samples",
       "description": "",
-      "displayColor": "#00d781"
+      "displayColor": "#b925ff"
     },
-    "1": { "displayName": "dna", "description": "", "displayColor": "#0076ff" }
+    "1": { "displayName": "dna", "description": "", "displayColor": "#ffd600" }
   },
   "labwareDefinitions": {
     "opentrons/opentrons_96_tiprack_10ul/1": {
@@ -3390,7 +3390,7 @@
   "modules": {},
   "commands": [
     {
-      "key": "1135cf10-f18b-11ec-8c85-d1e531238b7c",
+      "key": "13bf6130-fcf1-11ec-9196-697464e70343",
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
@@ -3398,7 +3398,7 @@
       }
     },
     {
-      "key": "1135cf11-f18b-11ec-8c85-d1e531238b7c",
+      "key": "13bf6131-fcf1-11ec-9196-697464e70343",
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "c6f47740-92a5-11e9-ac62-1b173f839d9e",
@@ -3406,7 +3406,7 @@
       }
     },
     {
-      "key": "1135cf12-f18b-11ec-8c85-d1e531238b7c",
+      "key": "13bf6132-fcf1-11ec-9196-697464e70343",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul",
@@ -3414,7 +3414,7 @@
       }
     },
     {
-      "key": "1135cf13-f18b-11ec-8c85-d1e531238b7c",
+      "key": "13bf6133-fcf1-11ec-9196-697464e70343",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "c6f51380-92a5-11e9-ac62-1b173f839d9e:tiprack-200ul",
@@ -3422,7 +3422,7 @@
       }
     },
     {
-      "key": "1135cf14-f18b-11ec-8c85-d1e531238b7c",
+      "key": "13bf6134-fcf1-11ec-9196-697464e70343",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
@@ -3431,7 +3431,7 @@
     },
     {
       "commandType": "loadLiquid",
-      "key": "1135cf16-f18b-11ec-8c85-d1e531238b7c",
+      "key": "13bf8840-fcf1-11ec-9196-697464e70343",
       "params": {
         "liquidId": "1",
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",
@@ -3440,7 +3440,7 @@
     },
     {
       "commandType": "loadLiquid",
-      "key": "1135cf15-f18b-11ec-8c85-d1e531238b7c",
+      "key": "13bf6135-fcf1-11ec-9196-697464e70343",
       "params": {
         "liquidId": "0",
         "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well",

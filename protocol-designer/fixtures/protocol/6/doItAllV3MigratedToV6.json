@@ -4,7 +4,7 @@
     "author": "Fixture",
     "description": "Test all v3 commands",
     "created": 1585930833548,
-    "lastModified": 1655820379385,
+    "lastModified": 1657087816127,
     "category": null,
     "subcategory": null,
     "tags": []
@@ -13,7 +13,7 @@
     "name": "opentrons/protocol-designer",
     "version": "6.0.0",
     "data": {
-      "_internalAppBuildDate": "Fri, 17 Jun 2022 19:27:17 GMT",
+      "_internalAppBuildDate": "Fri, 01 Jul 2022 16:41:32 GMT",
       "defaultValues": {
         "aspirate_mmFromBottom": 1,
         "dispense_mmFromBottom": 0.5,
@@ -201,7 +201,7 @@
     "0": {
       "displayName": "Water",
       "description": "",
-      "displayColor": "#00d781"
+      "displayColor": "#b925ff"
     }
   },
   "labwareDefinitions": {
@@ -2575,7 +2575,7 @@
   "modules": {},
   "commands": [
     {
-      "key": "52c17e90-f16b-11ec-b2e1-61739b3f8d1d",
+      "key": "4dec74f0-fcf2-11ec-bdbe-d1c437dcce8c",
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5",
@@ -2583,7 +2583,7 @@
       }
     },
     {
-      "key": "52c1a5a0-f16b-11ec-b2e1-61739b3f8d1d",
+      "key": "4dec74f1-fcf2-11ec-bdbe-d1c437dcce8c",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "0b44c760-75c7-11ea-b42f-4b64e50f43e5:opentrons/opentrons_96_tiprack_300ul/1",
@@ -2591,7 +2591,7 @@
       }
     },
     {
-      "key": "52c1a5a1-f16b-11ec-b2e1-61739b3f8d1d",
+      "key": "4dec74f2-fcf2-11ec-bdbe-d1c437dcce8c",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "1e610d40-75c7-11ea-b42f-4b64e50f43e5:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
@@ -2599,7 +2599,7 @@
       }
     },
     {
-      "key": "52c1a5a2-f16b-11ec-b2e1-61739b3f8d1d",
+      "key": "4dec74f3-fcf2-11ec-bdbe-d1c437dcce8c",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "21ed8f60-75c7-11ea-b42f-4b64e50f43e5:opentrons/opentrons_24_aluminumblock_generic_2ml_screwcap/1",
@@ -2608,7 +2608,7 @@
     },
     {
       "commandType": "loadLiquid",
-      "key": "52c1a5a3-f16b-11ec-b2e1-61739b3f8d1d",
+      "key": "4dec74f4-fcf2-11ec-bdbe-d1c437dcce8c",
       "params": {
         "liquidId": "0",
         "labwareId": "1e610d40-75c7-11ea-b42f-4b64e50f43e5:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",

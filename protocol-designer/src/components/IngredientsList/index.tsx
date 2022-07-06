@@ -7,6 +7,7 @@ import { sortWells } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { PDTitledList, PDListItem } from '../lists'
 import { TitledListNotes } from '../TitledListNotes'
+import { swatchColors } from '../swatchColors'
 import { LabwareDetailsCard } from './LabwareDetailsCard'
 import styles from './IngredientsList.css'
 import { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
@@ -58,7 +59,11 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
   return (
     <PDTitledList
       title={ingredGroup.name || i18n.t('card.unnamedLiquid')}
-      iconProps={{ style: { fill: liquidDisplayColors[Number(groupId)] } }}
+      iconProps={{
+        style: {
+          fill: liquidDisplayColors[Number(groupId)] ?? swatchColors(groupId),
+        },
+      }}
       iconName="circle"
       onCollapseToggle={toggleAccordion}
       collapsed={!expanded}

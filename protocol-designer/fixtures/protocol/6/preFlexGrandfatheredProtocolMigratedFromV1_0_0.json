@@ -4,7 +4,7 @@
     "author": "",
     "description": "",
     "created": 1547476685921,
-    "lastModified": 1655819704279,
+    "lastModified": 1657085442366,
     "category": null,
     "subcategory": null,
     "tags": []
@@ -13,7 +13,7 @@
     "name": "opentrons/protocol-designer",
     "version": "6.0.0",
     "data": {
-      "_internalAppBuildDate": "Fri, 17 Jun 2022 19:27:17 GMT",
+      "_internalAppBuildDate": "Fri, 01 Jul 2022 16:41:32 GMT",
       "defaultValues": {
         "aspirate_mmFromBottom": 1,
         "dispense_mmFromBottom": 0.5,
@@ -1826,7 +1826,7 @@
     "0": {
       "displayName": "Liquid",
       "description": "",
-      "displayColor": "#00d781"
+      "displayColor": "#b925ff"
     }
   },
   "labwareDefinitions": {
@@ -4123,7 +4123,7 @@
   "modules": {},
   "commands": [
     {
-      "key": "c05c7e70-f169-11ec-b2e1-61739b3f8d1d",
+      "key": "c70d6cf0-fcec-11ec-bd0d-5dfbc21e644d",
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
@@ -4131,7 +4131,7 @@
       }
     },
     {
-      "key": "c05c7e71-f169-11ec-b2e1-61739b3f8d1d",
+      "key": "c70d6cf1-fcec-11ec-bd0d-5dfbc21e644d",
       "commandType": "loadPipette",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
@@ -4139,7 +4139,7 @@
       }
     },
     {
-      "key": "c05c7e72-f169-11ec-b2e1-61739b3f8d1d",
+      "key": "c70d6cf2-fcec-11ec-bd0d-5dfbc21e644d",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -4147,7 +4147,7 @@
       }
     },
     {
-      "key": "c05c7e73-f169-11ec-b2e1-61739b3f8d1d",
+      "key": "c70d6cf3-fcec-11ec-bd0d-5dfbc21e644d",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -4155,7 +4155,7 @@
       }
     },
     {
-      "key": "c05c7e74-f169-11ec-b2e1-61739b3f8d1d",
+      "key": "c70d6cf4-fcec-11ec-bd0d-5dfbc21e644d",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -4163,7 +4163,7 @@
       }
     },
     {
-      "key": "c05c7e75-f169-11ec-b2e1-61739b3f8d1d",
+      "key": "c70d6cf5-fcec-11ec-bd0d-5dfbc21e644d",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "cea1c650-1811-11e9-9608-8bed9be8868f",
@@ -4172,7 +4172,7 @@
     },
     {
       "commandType": "loadLiquid",
-      "key": "c05ca580-f169-11ec-b2e1-61739b3f8d1d",
+      "key": "c70d9400-fcec-11ec-bd0d-5dfbc21e644d",
       "params": {
         "liquidId": "0",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
