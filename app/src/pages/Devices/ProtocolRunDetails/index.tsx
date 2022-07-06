@@ -49,15 +49,15 @@ const baseRoundTabStyling = css`
   border-right: ${BORDERS.transparentLineBorder};
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   position: ${POSITION_RELATIVE};
-
-  &:hover {
-    background-color: ${COLORS.fundamentalsBackgroundShade};
-  }
 `
 
 const RoundNavLink = styled(NavLink)`
   ${baseRoundTabStyling}
   color: ${COLORS.darkGreyEnabled};
+
+  &:hover {
+    background-color: ${COLORS.fundamentalsBackgroundShade};
+  }
 
   &.active {
     background-color: ${COLORS.white};
