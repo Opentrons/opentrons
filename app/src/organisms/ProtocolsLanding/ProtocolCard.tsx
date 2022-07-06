@@ -70,7 +70,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       border={`1px solid ${COLORS.medGrey}`}
       borderRadius="4px"
       flexDirection={DIRECTION_ROW}
-      marginBottom={SPACING.spacing3}
+      marginBottom={SPACING.spacing2}
       padding={SPACING.spacing4}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       width="100%"
@@ -175,7 +175,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_leftMount_${protocolDisplayName}`}
-                minWidth="10.625rem"
+                // minWidth="10.625rem"
               >
                 <StyledText
                   as="h6"
@@ -205,7 +205,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_rightMount_${protocolDisplayName}`}
-                minWidth="10.625rem"
+                // minWidth="10.625rem"
               >
                 <StyledText
                   as="h6"
@@ -234,7 +234,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flex="1"
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
-                minWidth="6.25rem"
+                // minWidth="6.25rem"
               >
                 {requiredModuleTypes.length > 0 ? (
                   <>

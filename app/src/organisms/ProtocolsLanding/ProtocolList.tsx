@@ -33,6 +33,7 @@ import type { ProtocolSort } from './hooks'
 
 const SORT_BY_STYLE = css`
   background-color: ${COLORS.transparent};
+  cursor: pointer;
   &:hover {
     background-color: ${COLORS.medGreyHover};
   }
@@ -103,7 +104,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             flexDirection={DIRECTION_ROW}
             alignItems={ALIGN_CENTER}
             marginRight={SPACING.spacing4}
-            onClick={toggleSetShowSortByMenu}
           >
             <StyledText
               as="p"
@@ -118,6 +118,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               borderRadius={BORDERS.radiusSoftCorners}
               marginLeft={SPACING.spacing3}
               css={SORT_BY_STYLE}
+              onClick={toggleSetShowSortByMenu}
             >
               <StyledText
                 as="p"
