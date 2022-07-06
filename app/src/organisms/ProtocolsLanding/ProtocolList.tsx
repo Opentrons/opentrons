@@ -31,7 +31,7 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { ProtocolSort } from './hooks'
 
-const SORT_BY_STYLE = css`
+const SORT_BY_BUTTON_STYLE = css`
   background-color: ${COLORS.transparent};
   cursor: pointer;
   &:hover {
@@ -117,7 +117,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               alignItems={ALIGN_CENTER}
               borderRadius={BORDERS.radiusSoftCorners}
               marginLeft={SPACING.spacing3}
-              css={SORT_BY_STYLE}
+              css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
             >
               <StyledText
