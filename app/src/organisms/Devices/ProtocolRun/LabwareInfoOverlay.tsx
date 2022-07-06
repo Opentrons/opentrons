@@ -9,7 +9,7 @@ import {
   SPACING,
   COLORS,
   TYPOGRAPHY,
-  OVERLAY_BLACK_70,
+  OVERLAY_BLACK_80,
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
@@ -37,7 +37,7 @@ const labwareDisplayNameStyle = css`
   white-space: initial;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 `
 const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
@@ -47,7 +47,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
 
   return (
     <Box
-      backgroundColor={hover ? COLORS.blue : OVERLAY_BLACK_70}
+      backgroundColor={hover ? COLORS.blue : OVERLAY_BLACK_80}
       borderRadius={`0 0 0.4rem 0.4rem`}
       fontSize={FONT_SIZE_CAPTION}
       padding={SPACING.spacing2}
