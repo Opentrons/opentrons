@@ -93,11 +93,6 @@ class MoveRequest:  # noqa: D101
 
 
 @dataclass
-class SetupRequest(EmptyPayloadMessage):  # noqa: D101
-    message_id: Literal[MessageId.setup_request] = MessageId.setup_request
-
-
-@dataclass
 class WriteToEEPromRequest:  # noqa: D101
     payload: payloads.EEPromDataPayload
     payload_type: Type[payloads.EEPromDataPayload] = payloads.EEPromDataPayload

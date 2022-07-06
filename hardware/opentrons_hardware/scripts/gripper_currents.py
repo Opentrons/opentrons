@@ -9,7 +9,6 @@ from logging.config import dictConfig
 
 from opentrons_hardware.drivers.can_bus import build
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    SetupRequest,
     DisableMotorRequest,
     ExecuteMoveGroupRequest,
 )
@@ -84,7 +83,6 @@ async def run_test(messenger: CanMessenger) -> None:
     pwm_freq = prompt_int_input("Set PWM frequency in Hz (int, \033[96m32000Hz\033[0m)")
 
     try:
-        await messenger.send(node_id=NodeId.gripper, message=SetupRequest())
         await set_reference_voltage(messenger, v_ref)
 
         while True:

@@ -102,9 +102,6 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
         raise RuntimeError(f"could not find targets for {args.mount} in {found}")
 
     await messenger.send(
-        node_id=NodeId.broadcast, message=message_definitions.SetupRequest()
-    )
-    await messenger.send(
         node_id=NodeId.broadcast, message=message_definitions.EnableMotorRequest()
     )
 

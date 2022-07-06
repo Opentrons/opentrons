@@ -20,7 +20,6 @@ MessageDefinition = Union[
     defs.EnableMotorRequest,
     defs.DisableMotorRequest,
     defs.MoveRequest,
-    defs.SetupRequest,
     defs.WriteToEEPromRequest,
     defs.ReadFromEEPromRequest,
     defs.ReadFromEEPromResponse,

@@ -10,7 +10,6 @@ from logging.config import dictConfig
 from opentrons_hardware.drivers.can_bus import build
 from opentrons_hardware.firmware_bindings.messages import payloads
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    SetupRequest,
     DisableMotorRequest,
     ExecuteMoveGroupRequest,
 )
@@ -91,7 +90,6 @@ async def run_test(messenger: CanMessenger) -> None:
 
     """Setup gripper"""
     try:
-        await messenger.send(node_id=NodeId.gripper, message=SetupRequest())
         await set_pwm_param(messenger, pwm_freq, pwm_duty)
 
         for i, v in enumerate(vref_list):
