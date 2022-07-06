@@ -115,12 +115,8 @@ class LegacyContextPlugin(AbstractPlugin):
 
     def handle_action(self, action: pe_actions.Action) -> None:
         """React to a ProtocolEngine action."""
-        if (
-            isinstance(action, pe_actions.DoorChangeAction)
-            and not self.state.commands.get_is_implicitly_active()
-            and isinstance(action.event, DoorStateNotification)
-        ):
-            self._hardware_api.pause(HardwarePauseType.PAUSE)
+        # TODO(jbl 2022-07-06) handle_action stub should be completely removed
+        pass
 
     def _handle_legacy_command(self, command: LegacyCommand) -> None:
         """Handle a command reported by the APIv2 protocol.
