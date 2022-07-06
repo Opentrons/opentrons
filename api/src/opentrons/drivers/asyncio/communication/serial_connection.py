@@ -166,6 +166,11 @@ class SerialConnection:
                 str_response = self.process_raw_response(
                     command=data, response=response.decode()
                 )
+                return str_response
+            elif self._error_keyword.encode() in response.lower():
+                str_response = self.process_raw_response(
+                    command=data, response=response.decode()
+                )
                 self.raise_on_error(response=str_response)
                 return str_response
 
