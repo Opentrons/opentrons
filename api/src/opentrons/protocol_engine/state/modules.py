@@ -191,12 +191,13 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         elif ModuleModel.is_heater_shaker_module_model(model):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=True
-                if (live_data and live_data["labwareLatchStatus"] == "idle_closed")
-                else False,
-                is_plate_shaking=True
-                if (live_data and live_data["targetSpeed"])
-                else False,
+                is_labware_latch_closed=(
+                    live_data is not None
+                    and live_data["labwareLatchStatus"] == "idle_closed"
+                ),
+                is_plate_shaking=(
+                    live_data is not None and live_data["targetSpeed"] is not None
+                ),
                 plate_target_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
             )
         elif ModuleModel.is_temperature_module_model(model):
