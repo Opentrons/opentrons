@@ -42,7 +42,7 @@ import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { getAnalysisStatus, getProtocolDisplayName } from './utils'
-import { useGetElementProperty } from './useGetElementProperty'
+import { useGetElementDOMRectProperty } from './useGetElementDOMRectProperty'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
@@ -132,7 +132,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     mostRecentAnalysis != null ? mostRecentAnalysis.commands : []
   ).map(getModuleType)
   const targetRef = React.useRef(null)
-  const { getElementProperty } = useGetElementProperty<HTMLDivElement>(
+  const { getElementProperty } = useGetElementDOMRectProperty<HTMLDivElement>(
     targetRef
   )
 

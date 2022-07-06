@@ -5,7 +5,7 @@ interface props {
     getElementProperty: (property: DOMRectProperty) => number;
 }
 
-export const useGetElementProperty = <T extends HTMLElement>(
+export const useGetElementDOMRectProperty = <T extends HTMLElement>(
 elementRef: React.RefObject<T>): props  => {
     const getElementProperty = React.useCallback(
       (targetProperty: DOMRectProperty): number => {
@@ -18,7 +18,7 @@ elementRef: React.RefObject<T>): props  => {
       },
       [elementRef]
     );
-  
+
     return {
       getElementProperty,
     };
