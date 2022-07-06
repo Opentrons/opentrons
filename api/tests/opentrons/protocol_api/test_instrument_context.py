@@ -1,7 +1,7 @@
 """Tests for the InstrumentContext class."""
 import pytest
 
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from opentrons.protocol_api import ProtocolContext
 
@@ -33,6 +33,13 @@ def patch_mock_publish_context(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) ->
         "opentrons.commands.publisher.publish_context",
         mock_publish_context,
     )
+
+    decoy.when(
+        mock_publish_context(
+            broker=matchers.Anything(),
+            command=matchers.Anything(),
+        )
+    ).then_return(decoy.mock(name="publish-context"))
 
 
 @pytest.fixture
