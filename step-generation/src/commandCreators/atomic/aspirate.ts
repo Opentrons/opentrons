@@ -9,6 +9,7 @@ import {
   pipetteAdjacentHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  uuid,
 } from '../../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/types/schemaV3'
@@ -165,6 +166,7 @@ export const aspirate: CommandCreator<AspirateParams> = (
   const commands: CreateCommand[] = [
     {
       commandType: 'aspirate',
+      key: uuid(),
       params: {
         pipetteId: pipette,
         volume,

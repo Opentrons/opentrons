@@ -4,7 +4,7 @@
     "author": "",
     "description": "A test for 5.0.0 -> 5.1.0 migration",
     "created": 1600714068238,
-    "lastModified": 1655834652170,
+    "lastModified": 1657134994803,
     "category": null,
     "subcategory": null,
     "tags": []
@@ -13,7 +13,7 @@
     "name": "opentrons/protocol-designer",
     "version": "6.0.0",
     "data": {
-      "_internalAppBuildDate": "Fri, 17 Jun 2022 19:27:17 GMT",
+      "_internalAppBuildDate": "Wed, 06 Jul 2022 19:10:55 GMT",
       "defaultValues": {
         "aspirate_mmFromBottom": 1,
         "dispense_mmFromBottom": 0.5,
@@ -2179,12 +2179,12 @@
   "modules": {},
   "commands": [
     {
-      "key": "8dffa6a0-f18c-11ec-8c85-d1e531238b7c",
+      "key": "c67db43e-fafe-489e-9a26-19e89476e59d",
       "commandType": "loadPipette",
       "params": { "pipetteId": "pipetteId", "mount": "left" }
     },
     {
-      "key": "8dffa6a1-f18c-11ec-8c85-d1e531238b7c",
+      "key": "10681bc0-87f4-465f-b5d4-906a13cefe56",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "f1c677c0-fc3a-11ea-8809-e959e7d61d96:opentrons/opentrons_96_tiprack_10ul/1",
@@ -2192,16 +2192,21 @@
       }
     },
     {
-      "key": "8dffa6a2-f18c-11ec-8c85-d1e531238b7c",
+      "key": "4c7c55aa-c422-46a7-9b51-ed4089df1c90",
       "commandType": "loadLabware",
       "params": {
         "labwareId": "fe572c50-fc3a-11ea-8809-e959e7d61d96:opentrons/biorad_96_wellplate_200ul_pcr/1",
         "location": { "slotName": "7" }
       }
     },
-    { "commandType": "delay", "params": { "message": "", "seconds": 3723 } },
+    {
+      "commandType": "delay",
+      "key": "ecf2299c-d292-489b-b75d-90a4ca5ed385",
+      "params": { "message": "", "seconds": 3723 }
+    },
     {
       "commandType": "pickUpTip",
+      "key": "61daf6cc-6833-473c-92d6-89e1c07b3817",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "f1c677c0-fc3a-11ea-8809-e959e7d61d96:opentrons/opentrons_96_tiprack_10ul/1",
@@ -2210,6 +2215,7 @@
     },
     {
       "commandType": "aspirate",
+      "key": "51e1f9ca-70b2-4a9e-976f-d105cfb4a7cd",
       "params": {
         "pipetteId": "pipetteId",
         "volume": 5,
@@ -2221,6 +2227,7 @@
     },
     {
       "commandType": "dispense",
+      "key": "aee68b0a-f115-4e19-8140-a97043bb7291",
       "params": {
         "pipetteId": "pipetteId",
         "volume": 5,
@@ -2232,6 +2239,7 @@
     },
     {
       "commandType": "aspirate",
+      "key": "9462383d-95d9-4e06-a5f7-afd2007183e0",
       "params": {
         "pipetteId": "pipetteId",
         "volume": 5,
@@ -2243,6 +2251,7 @@
     },
     {
       "commandType": "dispense",
+      "key": "48c8919a-c7d4-46e4-ada2-aa1e1df3cbb4",
       "params": {
         "pipetteId": "pipetteId",
         "volume": 5,
@@ -2254,6 +2263,7 @@
     },
     {
       "commandType": "dropTip",
+      "key": "9c8bf913-9467-407c-807a-cd1f2cabaef9",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "fixedTrash",

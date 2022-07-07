@@ -143,9 +143,6 @@ class ProtocolEngine:
             QueueCommandAction(
                 request=request,
                 command_id=command_id,
-                # TODO(mc, 2021-12-13): generate a command key from params and state
-                # https://github.com/Opentrons/opentrons/issues/8986
-                command_key=command_id,
                 created_at=self._model_utils.get_timestamp(),
             )
         )
