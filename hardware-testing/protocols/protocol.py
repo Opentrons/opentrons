@@ -9,7 +9,9 @@ from hardware_testing import get_api_context
 from hardware_testing.data import dump_data_to_file, append_data_to_file, create_file_name
 from hardware_testing.drivers import RadwagScaleBase, RadwagScale, SimRadwagScale
 from hardware_testing.drivers.radwag.commands import RadwagWorkingMode, RadwagFilter, RadwagValueRelease
-from hardware_testing.gravimetric import record_samples, GravimetricRecording, GravimetricSample, RecordingConfig
+from hardware_testing.gravimetric import (
+    record_samples_to_disk, GravimetricRecording, GravimetricSample, RecordConfig, RecordToDiskConfig
+)
 
 metadata = {
     'protocolName': 'example-test',
@@ -58,33 +60,15 @@ def run(protocol: ProtocolContext) -> None:
         except ValueError:
             continue
         input('\tPress ENTER when ready...')
-
-        test_data_name = create_file_name(metadata['protocolName'], recording_name)
-        print(f'\trecording to file {test_data_name}...')
-
-        def _on_new_sample(recording: GravimetricRecording) -> None:
-            append_data_to_file(metadata['protocolName'],
-                                test_data_name,
-                                recording[-1].as_csv(recording) + '\n')
-
-        def _record_the_samples() -> GravimetricRecording:
-            st = time()
-            rec_cfg = RecordingConfig(length=None,
-                                      duration=recording_duration,
-                                      interval=recording_interval,
-                                      stable=False)
-            r = record_samples(scale, rec_cfg, on_new_sample=_on_new_sample)
-            t = round(time() - st, 2)
-            print(f'\tDone (time={t}), saving {len(r)} samples\n')
-            return r
-
-        # add the header to the CSV file
-        dump_data_to_file(metadata['protocolName'],
-                          test_data_name,
-                          GravimetricSample.csv_header() + '\n')
-        _recording = _record_the_samples()
-        # add a final newline character to the CSV file
-        append_data_to_file(metadata['protocolName'], test_data_name, '\n')
+        rec_cfg = RecordConfig(length=None,
+                               duration=recording_duration,
+                               interval=recording_interval,
+                               stable=False)
+        cfg = RecordToDiskConfig(record_config=rec_cfg,
+                                 test_name=metadata['protocolName'],
+                                 tag=recording_name)
+        record_samples_to_disk(scale, cfg)
+        print('\tdone')
 
 
 if __name__ == '__main__':

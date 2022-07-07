@@ -4,6 +4,7 @@ from time import time
 from typing import List, Optional, Callable
 
 from hardware_testing.drivers.radwag.driver import RadwagScaleBase
+from hardware_testing.data import dump_data_to_file, append_data_to_file, create_file_name
 
 
 @dataclass
@@ -97,7 +98,7 @@ def read_sample_from_scale(scale: RadwagScaleBase) -> GravimetricSample:
 
 
 @dataclass
-class RecordingConfig:
+class RecordConfig:
     length: Optional[int]
     duration: Optional[float]
     interval: Optional[float]
@@ -105,7 +106,7 @@ class RecordingConfig:
 
 
 def record_samples(scale: RadwagScaleBase,
-                   config: RecordingConfig,
+                   config: RecordConfig,
                    timeout: Optional[float] = None,
                    on_new_sample: Optional[Callable] = None) -> GravimetricRecording:
 
@@ -154,3 +155,29 @@ def record_samples(scale: RadwagScaleBase,
         f'Scale recording timed out before accumulating ' \
         f'{config.length} samples (recorded {len(_samples)} samples)'
     return _samples
+
+
+@dataclass
+class RecordToDiskConfig:
+    record_config: RecordConfig
+    test_name: str
+    tag: str
+
+
+def record_samples_to_disk(scale: RadwagScaleBase,
+                           config: RecordToDiskConfig,
+                           timeout: Optional[float] = None) -> GravimetricRecording:
+    _file_name = create_file_name(config.test_name, config.tag)
+
+    def _on_new_sample(recording: GravimetricRecording) -> None:
+        append_data_to_file(config.test_name, _file_name,
+                            recording[-1].as_csv(recording) + '\n')
+
+    # add the header to the CSV file
+    dump_data_to_file(config.test_name, _file_name,
+                      GravimetricSample.csv_header() + '\n')
+    _recording = record_samples(scale, config.record_config,
+                                timeout=timeout, on_new_sample=_on_new_sample)
+    # add a final newline character to the CSV file
+    append_data_to_file(config.test_name, _file_name, '\n')
+    return _recording
