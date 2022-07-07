@@ -14,8 +14,8 @@ class RadwagCommand(str, Enum):
     ZERO = 'Z'  # Zero balance
     TARE = 'T'  # Tare balance
     GET_TARE = 'OT'  # Give tare value
-    SET_TARE = 'UT'  # Set tare
-    SET_AUTOZERO_FUNCTION = 'A'  # Set autozero function
+    SET_TARE = 'UT'  # Set tare  # TODO: add to driver
+    SET_AUTOZERO_FUNCTION = 'A'  # Set autozero function  # TODO: add to driver
 
     # reading a measurement
     GET_MEASUREMENT_BASIC_UNIT_STABLE = 'S'  # Send stable measurement result in basic measuring unit
@@ -39,7 +39,7 @@ class RadwagCommand(str, Enum):
     SET_REFERENCE_MASS_VALUE = 'RM'  # Set reference mass value
 
     # internal adjustment
-    INTERNAL_ADJUST_PERFORMANCE = 'IC'  # Internal adjustment performance
+    INTERNAL_ADJUST_PERFORMANCE = 'IC'  # Internal adjustment performance # TODO: add to driver
     DISABLE_AUTO_INTERNAL_ADJUST = 'IC1'  # Disable automatic internal adjustment of the balance
     ENABLE_AUTO_INTERNAL_ADJUST = 'IC0'  # Enable automatic internal adjustment of the balance
 
@@ -50,30 +50,61 @@ class RadwagCommand(str, Enum):
 
     # units
     GET_ACCESSIBLE_UNITS = 'UI'  # Give accessible units
-    SET_UNIT = 'US'  # Set unit
+    SET_UNIT = 'US'  # Set unit  # TODO: add to driver
     GET_CURRENT_UNIT = 'UG'  # Give current unit
 
     # ambient conditions
     SET_AMBIENT_CONDITIONS_STATE = 'EV'  # Set ambient conditions state
     GET_CURRENT_AMBIENT_CONDITIONS = 'EVG'  # Give currently set ambient conditions
 
-    # filter ???
+    # filter
     SET_FILTER = 'FIS'  # Set filter
     GET_FILTER = 'FIG'  # Give current filter
 
-    # value release ???
+    # value release
     VALUE_RELEASE = 'SS'  # Value release
     SET_VALUE_RELEASE = 'ARS'  # Set value release
     GET_CURRENT_VALUE_RELEASE = 'ARG'  # Give current value release
 
     # other
-    ACTIVATE_SOUND_SIGNAL = 'BP'  # Activate sound signal
-    LOCK_KEYPAD = 'K1'  # Lock balance keypad
-    UNLOCK_KEYPAD = 'K0'  # Unlock balance keypad
+    ACTIVATE_SOUND_SIGNAL = 'BP'  # Activate sound signal  # TODO: add to driver
+    LOCK_KEYPAD = 'K1'  # Lock balance keypad # TODO: add to driver
+    UNLOCK_KEYPAD = 'K0'  # Unlock balance keypad  # TODO: add to driver
     SEND_ALL_IMPLEMENTED_COMMANDS = 'PC'  # Send all implemented commands
     SET_LAST_DIGIT = 'LDS'  # Set last digit
     COOPERATION_WITH_PUE_7_1_PUE_10_TERMINAL = 'NT'  # Cooperation with PUE 7.1 PUE 10 terminal
+    LOGIN = 'LOGIN'
+    LOGOUT = 'LOGOUT'
 
 
 def radwag_command_format(command: str) -> str:
     return f'{command}{RADWAG_COMMAND_TERMINATOR}'
+
+
+class RadwagWorkingMode(Enum):
+    weighing = 1
+    parts_counting = 2
+    percent_weighing = 3
+    dosing = 4
+    formulas = 5
+    animal_weighing = 6
+    density_of_solid_bodies = 8
+    density_of_liquids = 9
+    peak_hold = 10
+    totalizing = 11
+    checkweighing = 12
+    statistics = 13
+
+
+class RadwagFilter(Enum):
+    very_fast = 1
+    fast = 2
+    average = 3
+    slow = 4
+    very_slow = 5
+
+
+class RadwagValueRelease(Enum):
+    fast = 1
+    fast_reliable = 2
+    reliable = 3

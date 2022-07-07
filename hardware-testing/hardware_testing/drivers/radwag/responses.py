@@ -39,34 +39,26 @@ class RadwagResponseCodes(str, Enum):
 
 
 @dataclass
-class RadwageResponse:
+class RadwagResponse:
     code: RadwagResponseCodes
     command: RadwagCommand
     stable: bool
+    response_list: List[str]
     measurement: Optional[float] = None
     message: Optional[str] = None
 
     @classmethod
-    def build(cls, command: RadwagCommand):
-        return RadwageResponse(code=RadwagResponseCodes.NONE,
-                               command=command,
-                               stable=False,
-                               measurement=None,
-                               message=None)
+    def build(cls, command: RadwagCommand, response_list: List[str]):
+        return RadwagResponse(code=RadwagResponseCodes.parse(response_list[1]),
+                              command=command,
+                              stable=False,
+                              response_list=response_list,
+                              measurement=None,
+                              message=None)
 
 
-def _default_handler(command: RadwagCommand, response_list: List[str]) -> RadwageResponse:
-    data = RadwageResponse.build(command)
-    if len(response_list) == 2:
-        data.code = RadwagResponseCodes.parse(response_list[1])
-    else:
-        raise ValueError(f'Unexpected response or no handler for '
-                         f'command \"{command}\": response={response_list}')
-    return data
-
-
-def _on_unstable_measurement(command: RadwagCommand, response_list: List[str]) -> RadwageResponse:
-    data = RadwageResponse.build(command)
+def _on_unstable_measurement(command: RadwagCommand, response_list: List[str]) -> RadwagResponse:
+    data = RadwagResponse.build(command, response_list)
     # SI ? -  0.00020 g
     # TODO: we could accept more unit types if we wanted...
     assert response_list[-1] == 'g', \
@@ -79,9 +71,8 @@ def _on_unstable_measurement(command: RadwagCommand, response_list: List[str]) -
     return data
 
 
-def _on_serial_number(command: RadwagCommand, response_list: List[str]) -> RadwageResponse:
-    data = RadwageResponse.build(command)
-    data.code = RadwagResponseCodes.parse(response_list[1])
+def _on_serial_number(command: RadwagCommand, response_list: List[str]) -> RadwagResponse:
+    data = RadwagResponse.build(command, response_list)
     assert len(response_list) == 3
     data.message = response_list[-1].replace('\"', '')
     return data
@@ -94,7 +85,7 @@ HANDLERS = {
 }
 
 
-def radwag_response_parse(response: str, command: RadwagCommand) -> RadwageResponse:
+def radwag_response_parse(response: str, command: RadwagCommand) -> RadwagResponse:
     assert RADWAG_COMMAND_TERMINATOR in response, f'CR LF not found ' \
                                                   f'in response: {response}'
     assert ' ' in response, f'No space (\" \") found in response: {response}'
@@ -107,4 +98,4 @@ def radwag_response_parse(response: str, command: RadwagCommand) -> RadwageRespo
     if command in HANDLERS.keys():
         return HANDLERS[command](command, res_list)
     else:
-        return _default_handler(command, res_list)
+        return RadwagResponse.build(command, res_list)

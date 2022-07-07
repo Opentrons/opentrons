@@ -6,7 +6,8 @@ from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing import get_api_context
 from hardware_testing.data import dump_data_to_file, create_file_name
-from hardware_testing.drivers import RadwagScale, SimRadwagScale
+from hardware_testing.drivers import RadwagScaleBase, RadwagScale, SimRadwagScale
+from hardware_testing.drivers.radwag.commands import RadwagWorkingMode, RadwagFilter, RadwagValueRelease
 from hardware_testing.gravimetric import record_samples
 
 metadata = {
@@ -28,9 +29,14 @@ def find_scale_port() -> str:
         f'No scale found from available serial ports: {comports()}')
 
 
-def initialize_scale(scale) -> str:
+def initialize_scale(scale: RadwagScaleBase) -> str:
     scale.continuous_transmission(enable=False)
     scale.automatic_internal_adjustment(enable=False)
+    scale.working_mode(mode=RadwagWorkingMode.weighing)
+    scale.filter(RadwagFilter.very_fast)
+    scale.value_release(RadwagValueRelease.fast)
+    # scale.internal_adjustment()
+    scale.set_tare(0)
     return scale.read_serial_number()
 
 
@@ -40,15 +46,15 @@ def run(protocol: ProtocolContext) -> None:
     else:
         scale = RadwagScale.create(find_scale_port())
     scale.connect()
-    initialize_scale(scale)
     atexit.register(scale.disconnect)
+    initialize_scale(scale)
 
     while 'y' not in input('Quit? (y/n): ').lower():
         try:
             recording_name = input('Name of recording: ')
             recording_duration = float(input('\tDuration (sec): '))
             recording_interval = float(input('\tInterval (sec): '))
-        except Exception:
+        except ValueError:
             continue
         input('\tPress ENTER when ready...')
         print('\trecording...')
