@@ -677,7 +677,7 @@ export function RobotSettingsCalibration({
       </Box>
       <Line />
       {/* Calibration Health Check Section */}
-      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
+      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing2}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
             <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>

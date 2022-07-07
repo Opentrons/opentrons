@@ -45,7 +45,11 @@ export function LegacySettings({
   }
 
   return (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      marginTop={SPACING.spacing5}
+    >
       <Box width="70%">
         <StyledText
           as="h2"

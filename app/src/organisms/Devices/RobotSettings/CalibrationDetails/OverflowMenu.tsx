@@ -65,7 +65,12 @@ export function OverflowMenu({
 }: OverflowMenuProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
-  const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const {
+    MenuOverlay,
+    handleOverflowClick,
+    showOverflowMenu,
+    setShowOverflowMenu,
+  } = useMenuHandleClickOutside()
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
 
   const calsOverflowWrapperRef = useOnClickOutside({
@@ -178,12 +183,6 @@ export function OverflowMenu({
     setShowOverflowMenu(!showOverflowMenu)
   }
 
-  const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    setShowOverflowMenu(!showOverflowMenu)
-  }
-
   // TODO 5/6/2021 kj: This is scoped out from 6.0
   // const handleDeleteCalibrationData = (
   //   calType: 'pipetteOffset' | 'tipLength'
@@ -258,6 +257,7 @@ export function OverflowMenu({
           />
         </Portal>
       ) : null}
+      <MenuOverlay />
     </Flex>
   )
 }

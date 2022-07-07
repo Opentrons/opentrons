@@ -45,7 +45,11 @@ export function UsageSettings({
   }
 
   return (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      marginTop={SPACING.spacing5}
+    >
       <Flex width="70%" flexDirection={DIRECTION_COLUMN}>
         <StyledText
           css={TYPOGRAPHY.h2SemiBold}
