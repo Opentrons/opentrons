@@ -78,8 +78,11 @@ def piecewise_force_conversion(
 ) -> float:
     """
     Takes a force in newton and a sequence representing a piecewise
-    function for the slope and y-intercept of a force/duty-cycle function, where each
-    sub-list in the sequence contains:
+    function for the slope for a force/duty-cycle function, where each
+    sub-list in the sequence contains the slope and valid domain for
+    the specific linear segment.
+
+    The values come from shared-data/gripper/definitions/gripperVx.json.
 
     :return: the duty-cycle value for the specified force
     """
