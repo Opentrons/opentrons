@@ -67,6 +67,7 @@ const render = (
 describe('LiquidsLabwareDetailsModal', () => {
   let props: React.ComponentProps<typeof LiquidsLabwareDetailsModal>
   beforeEach(() => {
+    window.HTMLElement.prototype.scrollIntoView = function () {}
     props = {
       liquidId: '4',
       labwareId: '123',
