@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import {
@@ -11,9 +11,12 @@ import {
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
   TEXT_TRANSFORM_CAPITALIZE,
+  useHoverTooltip,
+  Tooltip,
 } from '@opentrons/components'
 
 import { CONNECTABLE, removeRobot } from '../../redux/discovery'
+import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { Divider } from '../../atoms/structure'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
@@ -25,7 +28,7 @@ import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 
 import type { StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { Dispatch } from '../../redux/types'
+import type { Dispatch, State } from '../../redux/types'
 
 interface RobotOverflowMenuProps extends StyleProps {
   robot: DiscoveredRobot
@@ -40,6 +43,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch<Dispatch>()
   const runId = useCurrentRunId()
   const [
@@ -50,6 +54,11 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
     showConnectionTroubleshootingModal,
     setShowConnectionTroubleshootingModal,
   ] = React.useState<boolean>(false)
+  const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
+    useSelector((state: State) => {
+      return getBuildrootUpdateDisplayInfo(state, robot.name)
+    })?.autoUpdateAction
+  )
 
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -69,11 +78,18 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
     menuItems = (
       <>
         <MenuItem
+          {...targetProps}
           onClick={handleClickRun}
+          disabled={isRobotOnWrongVersionOfSoftware}
           data-testid={`RobotOverflowMenu_${robot.name}_runProtocol`}
         >
           {t('run_a_protocol')}
         </MenuItem>
+        {isRobotOnWrongVersionOfSoftware && (
+          <Tooltip {...tooltipProps}>
+            {t('shared:a_software_update_is_available')}
+          </Tooltip>
+        )}
         <Divider marginY={'0'} />
         <MenuItem
           to={`/devices/${robot.name}/robot-settings`}
