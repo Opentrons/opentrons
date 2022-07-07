@@ -96,11 +96,16 @@ def read_sample_from_scale(scale: RadwagScaleBase) -> GravimetricSample:
     return GravimetricSample(grams=g, stable=s, time=time())
 
 
+@dataclass
+class RecordingConfig:
+    length: Optional[int]
+    duration: Optional[float]
+    interval: Optional[float]
+    stable: Optional[bool]
+
+
 def record_samples(scale: RadwagScaleBase,
-                   length: Optional[int] = None,
-                   duration: Optional[float] = None,
-                   interval: Optional[float] = None,
-                   stable: Optional[bool] = True,
+                   config: RecordingConfig,
                    timeout: Optional[float] = None,
                    on_new_sample: Optional[Callable] = None) -> GravimetricRecording:
 
@@ -121,31 +126,31 @@ def record_samples(scale: RadwagScaleBase,
         ideal_time = (len(samples) - 1) * period
         return real_time - ideal_time
 
-    if length and interval and duration:
+    if config.length and config.interval and config.duration:
         raise ValueError(
             'Cannot have all three (length, interval, duration) '
             'arguments set, only use 2 at a time')
-    if duration and length:
-        interval = duration / (length - 1)
-    elif duration and interval:
-        length = int(duration / interval) + 1
-    if not length or not interval:
+    if config.duration and config.length:
+        config.interval = config.duration / (config.length - 1)
+    elif config.duration and config.interval:
+        config.length = int(config.duration / config.interval) + 1
+    if not config.length or not config.interval:
         raise ValueError('Cannot record with 2 of the following arguments: '
                          '1) length, 2) interval, or 3) duration')
 
     _samples = GravimetricRecording()
     _start_time = time()
-    while len(_samples) < length and not _did_exceed_time(_start_time, timeout):
+    while len(_samples) < config.length and not _did_exceed_time(_start_time, timeout):
         _s = read_sample_from_scale(scale)
-        if stable and not _s.stable:
+        if config.stable and not _s.stable:
             _samples.clear()  # delete all previously recorded samples
             continue
-        iwo = interval - _get_interval_overlap(_samples, interval)
+        iwo = config.interval - _get_interval_overlap(_samples, config.interval)
         if not len(_samples) or _did_exceed_time(_samples.end_time, iwo):
             _samples.append(_s)
             if callable(on_new_sample):
                 on_new_sample(_samples)
-    assert len(_samples) == length, \
+    assert len(_samples) == config.length, \
         f'Scale recording timed out before accumulating ' \
-        f'{length} samples (recorded {len(_samples)} samples)'
+        f'{config.length} samples (recorded {len(_samples)} samples)'
     return _samples

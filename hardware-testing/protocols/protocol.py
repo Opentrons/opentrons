@@ -9,7 +9,7 @@ from hardware_testing import get_api_context
 from hardware_testing.data import dump_data_to_file, append_data_to_file, create_file_name
 from hardware_testing.drivers import RadwagScaleBase, RadwagScale, SimRadwagScale
 from hardware_testing.drivers.radwag.commands import RadwagWorkingMode, RadwagFilter, RadwagValueRelease
-from hardware_testing.gravimetric import record_samples, GravimetricRecording, GravimetricSample
+from hardware_testing.gravimetric import record_samples, GravimetricRecording, GravimetricSample, RecordingConfig
 
 metadata = {
     'protocolName': 'example-test',
@@ -69,11 +69,11 @@ def run(protocol: ProtocolContext) -> None:
 
         def _record_the_samples() -> GravimetricRecording:
             st = time()
-            r = record_samples(scale,
-                               duration=recording_duration,
-                               interval=recording_interval,
-                               stable=False,
-                               on_new_sample=_on_new_sample)
+            rec_cfg = RecordingConfig(length=None,
+                                      duration=recording_duration,
+                                      interval=recording_interval,
+                                      stable=False)
+            r = record_samples(scale, rec_cfg, on_new_sample=_on_new_sample)
             t = round(time() - st, 2)
             print(f'\tDone (time={t}), saving {len(r)} samples\n')
             return r
