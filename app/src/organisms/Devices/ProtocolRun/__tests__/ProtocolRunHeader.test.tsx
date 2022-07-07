@@ -429,7 +429,9 @@ describe('ProtocolRunHeader', () => {
     const [{ getByRole, getByText }] = render()
     const button = getByRole('button', { name: 'Start run' })
     expect(button).toBeDisabled()
-    getByText('A software update is available for this robot. Update to run protocols.')
+    getByText(
+      'A software update is available for this robot. Update to run protocols.'
+    )
   })
 
   it('renders a pause run button, start time, and end time when run is running, and calls trackProtocolRunEvent when button clicked', () => {
