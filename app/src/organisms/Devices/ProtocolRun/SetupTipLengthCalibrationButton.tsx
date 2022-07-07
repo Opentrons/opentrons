@@ -15,7 +15,6 @@ import {
   TEXT_ALIGN_CENTER,
   TOOLTIP_LEFT,
   COLORS,
-  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getLabwareDefURI } from '@opentrons/shared-data'
