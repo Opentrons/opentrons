@@ -91,7 +91,7 @@ class GripperHandler:
     def set_jaw_state(self, state: GripperJawState) -> None:
         self.verify_gripper().state = state
 
-    def get_duty_cycle_by_grip_force(self, newton: Optional[float] = 0) -> float:
+    def get_duty_cycle_by_grip_force(self, newton: Optional[float] = None) -> float:
         gripper = self.verify_gripper()
         if not newton:
             newton = DEFAULT_GRIP_FORCE_IN_NEWTON
