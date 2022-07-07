@@ -47,7 +47,7 @@ export function UseOlderProtocol({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginBottom="2.5rem"
+      marginBottom={SPACING.spacing4}
     >
       <Flex width="70%" flexDirection={DIRECTION_COLUMN}>
         <StyledText

@@ -189,7 +189,6 @@ export function RobotSettingsAdvanced({
           onUpdateStart={() => setShowSoftwareUpdateModal(true)}
         />
         <Divider marginY={SPACING.spacing4} />
-
         <Troubleshooting
           robotName={robotName}
           updateDownloadLogsStatus={updateDownloadLogsStatus}
@@ -205,6 +204,7 @@ export function RobotSettingsAdvanced({
           robotName={robotName}
           updateIsRobotBusy={updateIsRobotBusy}
         />
+        <Divider marginY={SPACING.spacing4} />
         <LegacySettings
           settings={findSettings('deckCalibrationDots')}
           robotName={robotName}
