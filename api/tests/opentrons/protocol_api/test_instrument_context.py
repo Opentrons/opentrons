@@ -14,6 +14,7 @@ from opentrons.protocol_api.labware import Well
 from opentrons.protocols.api_support.instrument import validate_tiprack, tip_length_for
 from opentrons.commands import publisher
 
+
 @pytest.fixture(autouse=True)
 def patch_mock_validate_tiprack(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     """Replace validate_tiprack() with a mock."""
@@ -22,6 +23,7 @@ def patch_mock_validate_tiprack(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -
         "opentrons.protocols.api_support.instrument.validate_tiprack",
         mock_validate_tiprack,
     )
+
 
 @pytest.fixture(autouse=True)
 def patch_mock_tip_length_for(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -75,15 +77,24 @@ def subject(
     )
 
 
-def test_pick_up_from_location(decoy: Decoy, subject: InstrumentContext, mock_instrument_implementation: AbstractInstrument) -> None:
+def test_pick_up_from_location(
+    decoy: Decoy,
+    subject: InstrumentContext,
+    mock_instrument_implementation: AbstractInstrument,
+) -> None:
     """Should pick up tip from supplied location."""
     mock_well = decoy.mock(cls=Well)
 
     point = Point(-100, -100, 0)
     location = Location(point=point, labware=mock_well)
-
+    target = location.labware.as_well()
     decoy.when(subject._ctx._modules).then_return([])
 
     subject.pick_up_tip(location=location)
 
-    decoy.verify(mock_instrument_implementation.move_to(location=location, force_direct=False, minimum_z_height=0, speed=0), times=1)
+    decoy.verify(
+        mock_instrument_implementation.move_to(
+            location=target, force_direct=False, minimum_z_height=None, speed=None
+        ),
+        times=1,
+    )

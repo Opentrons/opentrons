@@ -715,7 +715,7 @@ class InstrumentContext(CommandPublisher):
             broker=self.broker,
             command=cmds.pick_up_tip(instrument=self, location=target),
         ):
-            self.move_to(target.top(), publish=False)
+            self.move_to(target, publish=False)
             self._implementation.pick_up_tip(
                 well=target._impl,
                 tip_length=self._tip_length_for(tiprack),
@@ -1214,7 +1214,6 @@ class InstrumentContext(CommandPublisher):
                     location=location or self._ctx.location_cache,  # type: ignore[arg-type]
                 ),
             )
-
         with publish_ctx:
             self._implementation.move_to(
                 location=location,
