@@ -87,14 +87,14 @@ def test_pick_up_from_location(
 
     point = Point(-100, -100, 0)
     location = Location(point=point, labware=mock_well)
-    target = location.labware.as_well()
+
     decoy.when(subject._ctx._modules).then_return([])
 
     subject.pick_up_tip(location=location)
 
     decoy.verify(
         mock_instrument_implementation.move_to(
-            location=target, force_direct=False, minimum_z_height=None, speed=None
+            location=location, force_direct=False, minimum_z_height=None, speed=None
         ),
         times=1,
     )

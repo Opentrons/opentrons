@@ -689,18 +689,22 @@ class InstrumentContext(CommandPublisher):
             if location.labware.is_labware:
                 tiprack = location.labware.as_labware()
                 target: Well = tiprack.next_tip(self.channels)  # type: ignore
+                move_to_location = target.top()
                 if not target:
                     raise OutOfTipsError
             elif location.labware.is_well:
                 target = location.labware.as_well()
                 tiprack = target.parent
+                move_to_location = location
         elif location and isinstance(location, Well):
             tiprack = location.parent
             target = location
+            move_to_location = target.top()
         elif not location:
             tiprack, target = next_available_tip(
                 self.starting_tip, self.tip_racks, self.channels
             )
+            move_to_location = target.top()
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
@@ -715,7 +719,7 @@ class InstrumentContext(CommandPublisher):
             broker=self.broker,
             command=cmds.pick_up_tip(instrument=self, location=target),
         ):
-            self.move_to(target, publish=False)
+            self.move_to(move_to_location, publish=False)
             self._implementation.pick_up_tip(
                 well=target._impl,
                 tip_length=self._tip_length_for(tiprack),
