@@ -114,7 +114,7 @@ export function SetupStep({
                     marginRight={SPACING.spacing3}
                     name={
                       calibrationStatusComplete
-                        ? 'check-circle'
+                        ? 'ot-check'
                         : 'alert-circle'
                     }
                     id={'RunSetupCard_calibrationIcon'}
