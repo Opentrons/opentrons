@@ -47,6 +47,7 @@ from opentrons.hardware_control.types import (
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+from opentrons_shared_data.gripper.dev_types import GripperModel
 from opentrons.hardware_control.dev_types import (
     InstrumentHardwareConfigs,
     PipetteSpec,
@@ -121,7 +122,7 @@ class OT3Simulator:
             if mount is OT3Mount.GRIPPER:
                 gripper_spec: GripperSpec = {"model": None, "id": None}
                 if passed_ai and passed_ai.get("model"):
-                    gripper_spec["model"] = "gripper_v1"
+                    gripper_spec["model"] = GripperModel.V1
                     gripper_spec["id"] = passed_ai.get("id")
                 return gripper_spec
 
@@ -245,7 +246,10 @@ class OT3Simulator:
     def _attached_gripper_to_mount(self, init_instr: GripperSpec) -> AttachedGripper:
         found_model = init_instr["model"]
         if found_model:
-            return {"config": gripper_config.load(), "id": init_instr["id"]}
+            return {
+                "config": gripper_config.load(GripperModel.V1),
+                "id": init_instr["id"],
+            }
         else:
             return {"config": None, "id": None}
 
@@ -354,6 +358,7 @@ class OT3Simulator:
             OT3Axis.Y: phony_bounds,
             OT3Axis.X: phony_bounds,
             OT3Axis.Z_G: phony_bounds,
+            OT3Axis.G: phony_bounds,
         }
 
     def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
@@ -424,6 +429,7 @@ class OT3Simulator:
             NodeId.pipette_left: 0,
             NodeId.pipette_right: 0,
             NodeId.gripper_z: 0,
+            NodeId.gripper_g: 0,
         }
 
     @staticmethod

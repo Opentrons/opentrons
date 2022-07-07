@@ -8,7 +8,6 @@ from typing import Callable
 from logging.config import dictConfig
 
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    SetupRequest,
     EnableMotorRequest,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
@@ -16,6 +15,7 @@ from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteTipAct
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 from opentrons_hardware.hardware_control.motion import (
     MoveGroupTipActionStep,
+    MoveGroupSingleAxisStep,
     MoveStopCondition,
 )
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
@@ -61,23 +61,22 @@ async def run(args: argparse.Namespace) -> None:
     print("Test tip pick up for the 96 channel\n")
     reps = prompt_int_input("Number of repetitions for pick up and drop tip")
     delay = prompt_int_input("Delay in seconds between pick up and drop tip")
-    # 96 channel can only be mounted to the right
-    pipette_node = NodeId.pipette_right
+    # 96 channel can only be mounted to the left
+    pipette_node = NodeId.pipette_left
 
     driver = await build_driver(build_settings(args))
 
     messenger = CanMessenger(driver=driver)
     messenger.start()
-    await messenger.send(node_id=pipette_node, message=SetupRequest())
-    await messenger.send(node_id=pipette_node, message=EnableMotorRequest())
+    await messenger.send(node_id=NodeId.broadcast, message=EnableMotorRequest())
 
     pick_up_tip_runner = MoveGroupRunner(
         move_groups=[
             [
                 {
                     pipette_node: MoveGroupTipActionStep(
-                        velocity_mm_sec=float64(20.5),
-                        duration_sec=float64(3),
+                        velocity_mm_sec=float64(5.5),
+                        duration_sec=float64(2.5),
                         stop_condition=MoveStopCondition.none,
                         action=PipetteTipActionType.pick_up,
                     )
@@ -90,8 +89,8 @@ async def run(args: argparse.Namespace) -> None:
             [
                 {
                     pipette_node: MoveGroupTipActionStep(
-                        velocity_mm_sec=float64(-20.5),
-                        duration_sec=float64(3),
+                        velocity_mm_sec=float64(-5.5),
+                        duration_sec=float64(6),
                         stop_condition=MoveStopCondition.limit_switch,
                         action=PipetteTipActionType.drop,
                     )
@@ -99,12 +98,76 @@ async def run(args: argparse.Namespace) -> None:
             ]
         ]
     )
+
+    move_tip_runner = MoveGroupRunner(
+        move_groups=[
+            # Group 0
+            [
+                {
+                    NodeId.head_l: MoveGroupSingleAxisStep(
+                        distance_mm=float64(0),
+                        velocity_mm_sec=float64(-10.5),
+                        duration_sec=float64(6),
+                    )
+                }
+            ],
+            # Group 1
+            [
+                {
+                    NodeId.head_l: MoveGroupSingleAxisStep(
+                        distance_mm=float64(0),
+                        velocity_mm_sec=float64(10.5),
+                        duration_sec=float64(6),
+                    )
+                }
+            ],
+        ]
+    )
+    home_z = MoveGroupRunner(
+        move_groups=[
+            [
+                {
+                    NodeId.head_l: MoveGroupSingleAxisStep(
+                        distance_mm=float64(0),
+                        velocity_mm_sec=float64(-10.5),
+                        duration_sec=float64(100),
+                        stop_condition=MoveStopCondition.limit_switch,
+                    )
+                }
+            ]
+        ]
+    )
+
+    initial_z = MoveGroupRunner(
+        move_groups=[
+            [
+                {
+                    NodeId.head_l: MoveGroupSingleAxisStep(
+                        distance_mm=float64(0),
+                        velocity_mm_sec=float64(10.5),
+                        duration_sec=float64(10.86),
+                    )
+                }
+            ]
+        ]
+    )
     try:
+        # Home the gear motors and Z before performing the test
+        await drop_tip_runner.run(can_messenger=messenger)
+        await home_z.run(can_messenger=messenger)
+        await asyncio.sleep(1)
+        # Move to the tiprack
+        await initial_z.run(can_messenger=messenger)
         for i in range(reps):
             output_details(i, reps)
             log.info(f"*********** Now executing round {i} / {reps}")
+            # Pick up tips
             await pick_up_tip_runner.run(can_messenger=messenger)
             await asyncio.sleep(delay)
+            # Move the tips up and down to test seal
+            await move_tip_runner.run(can_messenger=messenger)
+            await asyncio.sleep(delay)
+            # Drop the tips
             await drop_tip_runner.run(can_messenger=messenger)
             await asyncio.sleep(delay)
     except asyncio.CancelledError:
@@ -127,7 +190,7 @@ LOG_CONFIG = {
         "file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "basic",
-            "filename": "96channel.log",
+            "filename": "HT_tip_handling.log",
             "maxBytes": 5000000,
             "level": logging.INFO,
             "backupCount": 3,

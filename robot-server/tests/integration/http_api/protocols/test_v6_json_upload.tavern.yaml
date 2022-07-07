@@ -407,6 +407,22 @@ stages:
                 completedAt: !anystr
               - id: !anystr
                 createdAt: !anystr
+                commandType: moveToCoordinates
+                key: !anystr
+                status: succeeded
+                params:
+                  pipetteId: pipetteId
+                  coordinates:
+                    x: 0
+                    y: 0
+                    z: 0
+                  minimumZHeight: 35
+                  forceDirect: true
+                result: {}
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
                 commandType: moveRelative
                 key: !anystr
                 status: succeeded

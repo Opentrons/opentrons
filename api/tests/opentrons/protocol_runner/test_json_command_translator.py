@@ -19,6 +19,7 @@ from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_runner.json_command_translator import JsonCommandTranslator
 from opentrons.protocol_engine import (
     commands as pe_commands,
+    DeckPoint,
     DeckSlotLocation,
     PipetteName,
     WellLocation,
@@ -265,6 +266,25 @@ VALID_TEST_PARAMS = [
             params=pe_commands.WaitForDurationParams(
                 seconds=12.34,
                 message="hello world",
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="moveToCoordinates",
+            params=protocol_schema_v6.Params(
+                pipetteId="pipette-id-abc123",
+                coordinates=protocol_schema_v6.OffsetVector(x=1.1, y=2.2, z=3.3),
+                minimumZHeight=123.4,
+                forceDirect=True,
+            ),
+        ),
+        pe_commands.MoveToCoordinatesCreate(
+            params=pe_commands.MoveToCoordinatesParams(
+                pipetteId="pipette-id-abc123",
+                coordinates=DeckPoint(x=1.1, y=2.2, z=3.3),
+                minimumZHeight=123.4,
+                forceDirect=True,
             )
         ),
     ),

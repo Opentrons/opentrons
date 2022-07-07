@@ -4,6 +4,7 @@ from typing import Dict, Optional
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
+from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
 from .resources import ModelUtils, ModuleDataProvider
 from .commands import Command, CommandCreate
@@ -59,6 +60,7 @@ class ProtocolEngine:
         This constructor does not inject provider implementations.
         Prefer the `create_protocol_engine()` factory function.
         """
+        self._hardware_api = hardware_api
         self._state_store = state_store
         self._model_utils = model_utils or ModelUtils()
 
@@ -107,7 +109,11 @@ class ProtocolEngine:
             PlayAction(requested_at=requested_at)
         )
         self._action_dispatcher.dispatch(action)
-        self._queue_worker.start()
+
+        if self._state_store.commands.get_is_door_blocking():
+            self._hardware_api.pause(HardwarePauseType.PAUSE)
+        else:
+            self._hardware_api.resume(HardwarePauseType.PAUSE)
 
     def pause(self) -> None:
         """Pause executing commands in the queue."""
@@ -115,6 +121,7 @@ class ProtocolEngine:
             PauseAction(source=PauseSource.CLIENT)
         )
         self._action_dispatcher.dispatch(action)
+        self._hardware_api.pause(HardwarePauseType.PAUSE)
 
     def add_command(self, request: CommandCreate) -> Command:
         """Add a command to the `ProtocolEngine`'s queue.
@@ -286,6 +293,7 @@ class ProtocolEngine:
                 definition=self._module_data_provider.get_definition(
                     ModuleModel(mod.model())
                 ),
+                module_live_data=mod.live_data,
             )
             for module_id, mod in modules_by_id.items()
         ]

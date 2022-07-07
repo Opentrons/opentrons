@@ -402,7 +402,7 @@
           },
 
           {
-            "description": "Move To Coordinates",
+            "description": "Move To Coordinates: Move the pipette's critical point to the specified coordinates. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-Channel pipette with no tip: end of nozzle. (2) 8-Channel pipette with no tip: end of backmost nozzle. (3) Single-Channel pipette with a tip: end of tip. (4) 8-Channel pipette with tip: end of tip on backmost nozzle.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
@@ -843,7 +843,7 @@
               "commandType": { "enum": ["thermocycler/runProfile"] },
               "params": {
                 "type": "object",
-                "required": ["moduleId", "profile", "volume"],
+                "required": ["moduleId", "profile"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
@@ -853,20 +853,20 @@
                     "type": "array",
                     "items": {
                       "type": "object",
-                      "required": ["temperature", "holdTime"],
+                      "required": ["celsius", "holdSeconds"],
                       "properties": {
-                        "temperature": {
-                          "description": "Target temperature of profile step",
+                        "celsius": {
+                          "description": "Target temperature (in celsius) of profile step",
                           "type": "number"
                         },
-                        "holdTime": {
+                        "holdSeconds": {
                           "description": "Time (in seconds) to hold once temperature is reached",
                           "type": "number"
                         }
                       }
                     }
                   },
-                  "volume": {
+                  "blockMaxVolumeUl": {
                     "type": "number"
                   }
                 }
@@ -1013,7 +1013,7 @@
           },
 
           {
-            "description": "Move To Well: Move the pipette's critical point to the specified well in a labware, with an optional offset. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-channel pipette with no tip: end of nozzle. (2) Multi-channel pipette with no tip: end of backmost nozzle. (3) Single-channel pipette with a tip: end of tip. (4) Multi-channel pipette with tip: end of tip on backmost nozzle.",
+            "description": "Move To Well: Move the pipette's critical point to the specified well in a labware, with an optional offset. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-Channel pipette with no tip: end of nozzle. (2) 8-Channel pipette with no tip: end of backmost nozzle. (3) Single-Channel pipette with a tip: end of tip. (4) 8-Channel pipette with tip: end of tip on backmost nozzle.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {

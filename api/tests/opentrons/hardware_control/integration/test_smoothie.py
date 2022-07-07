@@ -147,8 +147,8 @@ async def test_plunger_commands(subject: SmoothieDriver, spy: MagicMock):
     )
     expected = [
         # Set active axes high
-        "M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005 G0 B4.55 G0 A3.5"
-        " B4.25 C5.55 X10.988 Y2.123 Z2.5",
+        "M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005"
+        " G0 A3.5 B4.55 C5.55 X10.988 Y2.123 Z2.5 G0 B4.25",
         "M400",
         # Set plunger current low
         "M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4 P0.005",

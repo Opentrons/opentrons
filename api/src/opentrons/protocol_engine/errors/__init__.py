@@ -34,6 +34,7 @@ from .exceptions import (
     InvalidTargetSpeedError,
     InvalidTargetTemperatureError,
     InvalidBlockVolumeError,
+    CannotPerformModuleAction,
     PauseNotAllowedError,
     ProtocolCommandFailedError,
 )
@@ -75,6 +76,7 @@ __all__ = [
     "InvalidTargetTemperatureError",
     "InvalidTargetSpeedError",
     "InvalidBlockVolumeError",
+    "CannotPerformModuleAction",
     "PauseNotAllowedError",
     "ProtocolCommandFailedError",
     # error occurrence models
