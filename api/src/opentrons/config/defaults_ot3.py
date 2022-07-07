@@ -225,6 +225,7 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
     two_low_throughput={
         OT3AxisKind.X: 1.0,
         OT3AxisKind.Y: 1.0,
+        OT3AxisKind.Z: 1.4,
     },
     gripper={
         OT3AxisKind.Z: 1.4,
