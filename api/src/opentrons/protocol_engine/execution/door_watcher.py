@@ -9,6 +9,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     HardwareEvent,
     DoorStateNotification,
+    DoorState,
     PauseType,
 )
 
@@ -99,7 +100,10 @@ class DoorWatcher:
         run_coroutine_threadsafe(), which lets us block until
         the dispatch completes.
         """
-        if self._state_store.commands.get_is_running():
+        if (
+            self._state_store.commands.get_is_running()
+            and action.door_state == DoorState.OPEN
+        ):
             self._hardware_api.pause(PauseType.PAUSE)
 
         self._action_dispatcher.dispatch(action)
