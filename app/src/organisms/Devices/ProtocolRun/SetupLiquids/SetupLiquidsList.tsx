@@ -19,7 +19,6 @@ import {
   BORDERS,
   ALIGN_CENTER,
   SIZE_AUTO,
-  JUSTIFY_SPACE_BETWEEN,
   Box,
   JUSTIFY_FLEX_START,
 } from '@opentrons/components'
