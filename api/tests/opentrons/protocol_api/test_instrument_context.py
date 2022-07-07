@@ -1,12 +1,13 @@
 """Tests for the InstrumentContext class."""
 import pytest
+from pytest_lazyfixture import lazy_fixture
 
 from decoy import Decoy, matchers
 
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api.instrument_context import InstrumentContext
 from opentrons.protocols.context.instrument import AbstractInstrument
-from opentrons.types import Location, Point
+from opentrons.types import Location, Point, LocationLabware
 from opentrons.broker import Broker
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api.labware import Well
@@ -76,24 +77,42 @@ def subject(
     )
 
 
+@pytest.fixture
+def mock_well(decoy: Decoy) -> Well:
+    return decoy.mock(cls=Well)
+
+
+@pytest.mark.parametrize(
+    "input_point, labware, expected_point_call",
+    [
+        (
+            Point(-100, -100, 0),
+            lazy_fixture("mock_well"),
+            Point(-100, -100, 0),
+        )
+    ],
+)
 def test_pick_up_from_location(
     decoy: Decoy,
     subject: InstrumentContext,
     mock_instrument_implementation: AbstractInstrument,
+    mock_well: Well,
+    input_point: Point,
+    labware: LocationLabware,
+    expected_point_call: Point,
 ) -> None:
     """Should pick up tip from supplied location."""
-    mock_well = decoy.mock(cls=Well)
-
-    point = Point(-100, -100, 0)
-    location = Location(point=point, labware=mock_well)
 
     decoy.when(subject._ctx._modules).then_return([])
-
-    subject.pick_up_tip(location=location)
-
+    input_location = Location(point=input_point, labware=labware)
+    subject.pick_up_tip(location=input_location)
+    expected_location = Location(point=expected_point_call, labware=labware)
     decoy.verify(
         mock_instrument_implementation.move_to(
-            location=location, force_direct=False, minimum_z_height=None, speed=None
+            location=expected_location,
+            force_direct=False,
+            minimum_z_height=None,
+            speed=None,
         ),
         times=1,
     )
