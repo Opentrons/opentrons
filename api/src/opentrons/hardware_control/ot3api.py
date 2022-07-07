@@ -76,7 +76,7 @@ from .robot_calibration import (
 
 from .protocols import HardwareControlAPI
 from .instruments.pipette_handler import OT3PipetteHandler, InstrumentsByMount
-from .instruments.gripper_handler import GripperHandler
+from .instruments.gripper_handler import GripperHandler, GripperNotAttachedError
 from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
@@ -836,8 +836,6 @@ class OT3API(
             checked_axes = [ax for ax in OT3Axis]
         async with self._motion_lock:
             try:
-                if OT3Axis.G in checked_axes and self._gripper_handler.has_gripper():
-                    await self.home_gripper_jaw()
                 await self._backend.home(checked_axes)
             except MoveConditionNotMet:
                 self._log.exception("Homing failed")
@@ -851,6 +849,12 @@ class OT3API(
                     self._transforms.carriage_offset,
                 )
                 self._current_position.update(position)
+                if OT3Axis.G in checked_axes:
+                    try:
+                        gripper = self._gripper_handler.verify_gripper()
+                        gripper.state = GripperJawState.HOMED_READY
+                    except GripperNotAttachedError:
+                        pass
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""

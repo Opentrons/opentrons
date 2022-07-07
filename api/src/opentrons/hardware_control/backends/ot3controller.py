@@ -286,6 +286,8 @@ class OT3Controller:
         if move_group_pipette:
             coros.append(runner_pipette.run(can_messenger=self._messenger))
         positions = await asyncio.gather(*coros)
+        if OT3Axis.G in checked_axes:
+            await self.gripper_home_jaw()
         for position in positions:
             self._position.update(position)
 
