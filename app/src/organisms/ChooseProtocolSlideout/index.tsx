@@ -127,26 +127,31 @@ export function ChooseProtocolSlideout(
                   }
                 }}
               >
-                <Flex
-                  marginRight={SPACING.spacing4}
-                  height="6rem"
-                  width="6rem"
-                  justifyContent={JUSTIFY_CENTER}
-                  alignItems={ALIGN_CENTER}
-                >
-                  <DeckThumbnail
-                    commands={storedProtocol.mostRecentAnalysis?.commands ?? []}
-                  />
-                </Flex>
-                <StyledText
-                  as="p"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                  css={{ 'overflow-wrap': 'anywhere' }}
-                >
-                  {storedProtocol.mostRecentAnalysis?.metadata?.protocolName ??
-                    first(storedProtocol.srcFileNames) ??
-                    storedProtocol.protocolKey}
-                </StyledText>
+                <Box display="grid" gridTemplateColumns="1fr 3fr">
+                  <Box
+                    marginY="auto"
+                    backgroundColor={isSelected ? COLORS.white : 'inherit'}
+                    marginRight={SPACING.spacing4}
+                    height="4.25rem"
+                    width="4.75rem"
+                  >
+                    <DeckThumbnail
+                      commands={
+                        storedProtocol.mostRecentAnalysis?.commands ?? []
+                      }
+                    />
+                  </Box>
+                  <StyledText
+                    as="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    css={{ 'overflow-wrap': 'anywhere' }}
+                  >
+                    {storedProtocol.mostRecentAnalysis?.metadata
+                      ?.protocolName ??
+                      first(storedProtocol.srcFileNames) ??
+                      storedProtocol.protocolKey}
+                  </StyledText>
+                </Box>
                 {runCreationError != null && isSelected ? (
                   <>
                     <Box flex="1 1 auto" />
@@ -200,7 +205,11 @@ export function ChooseProtocolSlideout(
             <Trans
               t={t}
               i18nKey="to_run_protocol_go_to_protocols_page"
-              components={{ navlink: <Link to="/protocols" /> }}
+              components={{
+                navlink: (
+                  <Link to="/protocols" css={TYPOGRAPHY.linkPSemiBold} />
+                ),
+              }}
             />
           </StyledText>
         </Flex>
