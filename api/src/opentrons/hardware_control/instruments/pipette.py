@@ -16,7 +16,12 @@ from opentrons.config import pipette_config, robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
 from opentrons.drivers.types import MoveSplit
 from .instrument_abc import AbstractInstrument
-from opentrons.hardware_control.types import CriticalPoint, BoardRevision, OT3AxisKind
+from opentrons.hardware_control.types import (
+    CriticalPoint,
+    BoardRevision,
+    OT3AxisKind,
+    InvalidMoveError,
+)
 
 
 if TYPE_CHECKING:
@@ -145,6 +150,15 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
         """
         instr = Point(*self._pipette_offset.offset)
         offsets = self.nozzle_offset
+
+        if cp_override in [
+            CriticalPoint.GRIPPER_JAW_CENTER,
+            CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN,
+            CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN,
+        ]:
+            raise InvalidMoveError(
+                f"Critical point {cp_override.name} is not valid for a pipette"
+            )
 
         if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
             cp_type = CriticalPoint.NOZZLE

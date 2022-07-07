@@ -9,7 +9,7 @@ from typing import Any, Optional, Set
 from opentrons.types import Point
 from opentrons.calibration_storage.types import GripperCalibrationOffset
 from opentrons.config import gripper_config
-from opentrons.hardware_control.types import CriticalPoint, GripperJawState
+from opentrons.hardware_control.types import CriticalPoint, GripperJawState, InvalidMoveError
 from .instrument_abc import AbstractInstrument
 from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
 
@@ -97,8 +97,12 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             return self._front_pin_offset + Point(*self._calibration_offset.offset)
         elif cp_override == CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN:
             return self._back_pin_offset + Point(*self._calibration_offset.offset)
-        else:
+        elif cp_override == CriticalPoint.GRIPPER_JAW_CENTER or not cp_override:
             return self._jaw_center_offset + Point(*self._calibration_offset.offset)
+        else:
+            raise InvalidMoveError(
+                f"Critical point {cp_override.name} is not valid for a gripper"
+            )
 
     def duty_cycle_by_force(self, newton: float) -> float:
         return gripper_config.piecewise_force_conversion(

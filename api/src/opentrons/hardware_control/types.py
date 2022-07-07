@@ -481,3 +481,13 @@ class GripperJawState(enum.Enum):
     @property
     def ready_for_grip(self) -> bool:
         return self in [GripperJawState.HOMED_READY, GripperJawState.HOLDING_OPENED]
+
+
+class InvalidMoveError(ValueError):
+    pass
+
+
+class GripperNotAttachedError(Exception):
+    """An error raised if a gripper is accessed that is not attached"""
+
+    pass
