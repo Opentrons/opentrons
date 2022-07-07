@@ -46,8 +46,12 @@ def update_graph_scatter(n):
     test_dir_path = create_folder_for_test_data(TEST_NAME)
     file_path = _find_newest_file_in_directory(str(test_dir_path))
     recording = GravimetricRecording.load(file_path)
+    if recording[-1].stable:
+        g_list = [s.grams for s in recording if s.stable]
+    else:
+        g_list = recording.grams_as_list
     x_min_max = [0, recording.duration]
-    y_min_max = [min(recording.grams_as_list), max(recording.grams_as_list)]
+    y_min_max = [min(g_list), max(g_list)]
     graph_x = [s.relative_time(recording.start_time) for s in recording]
     graph_y_stable = [s.grams if s.stable else None for s in recording]
     graph_y_unstable = [s.grams if not s.stable else None for s in recording]
