@@ -28,8 +28,14 @@ from opentrons_hardware.hardware_control.motion import (
     NodeIdMotionValues,
     create_home_step,
     MoveGroup,
+    MoveType,
     MoveStopCondition,
+    create_gripper_jaw_step,
 )
+
+GRIPPER_JAW_HOME_TIME: float = 120
+GRIPPER_JAW_GRIP_TIME: float = 1
+GRIPPER_JAW_HOME_DC: float = 100
 
 # TODO: These methods exist to defer uses of NodeId to inside
 # method bodies, which won't be evaluated until called. This is needed
@@ -214,6 +220,30 @@ def create_home_group(
     step = create_home_step(
         distance=node_id_distances,
         velocity=node_id_velocities,
+    )
+    move_group: MoveGroup = [step]
+    return move_group
+
+
+def create_gripper_jaw_move_group(
+    duty_cycle: float,
+    stop_condition: MoveStopCondition = MoveStopCondition.none,
+) -> MoveGroup:
+    step = create_gripper_jaw_step(
+        duration=np.float64(GRIPPER_JAW_GRIP_TIME),
+        duty_cycle=np.float32(duty_cycle),
+        stop_condition=stop_condition,
+    )
+    move_group: MoveGroup = [step]
+    return move_group
+
+
+def create_gripper_jaw_home_group() -> MoveGroup:
+    step = create_gripper_jaw_step(
+        duration=np.float64(GRIPPER_JAW_HOME_TIME),
+        duty_cycle=np.float32(GRIPPER_JAW_HOME_DC),
+        stop_condition=MoveStopCondition.limit_switch,
+        move_type=MoveType.home,
     )
     move_group: MoveGroup = [step]
     return move_group

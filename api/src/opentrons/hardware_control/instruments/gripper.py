@@ -9,7 +9,7 @@ from typing import Any, Optional, Set
 from opentrons.types import Point
 from opentrons.calibration_storage.types import GripperCalibrationOffset
 from opentrons.config import gripper_config
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.types import CriticalPoint, GripperJawState
 from .instrument_abc import AbstractInstrument
 from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
 
@@ -39,12 +39,19 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         self._model = self._config.model
         self._calibration_offset = gripper_cal_offset
         self._gripper_id = gripper_id
-        self._has_gripped = False
-        self._ready_to_grip = False
+        self._state = GripperJawState.UNHOMED
         self._log = mod_log.getChild(self._gripper_id)
         self._log.info(
             f"loaded: {self._model}, gripper offset: {self._calibration_offset}"
         )
+
+    @property
+    def state(self) -> GripperJawState:
+        return self._state
+
+    @state.setter
+    def state(self, s: GripperJawState) -> None:
+        self._state = s
 
     @property
     def config(self) -> gripper_config.GripperConfig:
@@ -80,6 +87,11 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         # TODO: add critical point implementation
         return Point(0, 0, 0)
 
+    def duty_cycle_by_force(self, newton: float) -> float:
+        return gripper_config.piecewise_force_conversion(
+            newton, self.config.jaw_force_per_duty_cycle
+        )
+
     def __str__(self) -> str:
         return f"{self._config.display_name}"
 
@@ -92,8 +104,7 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             "model": self._config.model,
             "gripper_id": self._gripper_id,
             "display_name": self._config.display_name,
-            "has_gripped": self._has_gripped,
-            "ready_to_grip": self._ready_to_grip,
+            "state": self._state,
         }
         return d
 
