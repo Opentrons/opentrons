@@ -8,24 +8,20 @@ import pytest
 from decoy import Decoy
 
 from opentrons.types import DeckSlotName, Mount
-from opentrons.protocol_engine.state import StateStore, HardwarePipette
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.protocol_engine.state import (
+    StateStore,
+    HardwarePipette,
+    HeaterShakerModuleSubState,
+    HeaterShakerModuleId,
+)
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleModel as PEModuleModel,
     LoadedModule,
 )
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.protocol_engine.errors import RestrictedPipetteMovementError
-from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.modules import HeaterShaker as HardwareHeaterShaker
-from opentrons.hardware_control.modules.types import (
-    # Renamed to avoid conflicting with ..types.ModuleModel.
-    ModuleType as OpentronsModuleType,
-    HeaterShakerModuleModel as OpentronsHeaterShakerModuleModel,
-    HeaterShakerStatus,
-)
-from opentrons.hardware_control.dev_types import PipetteDict
-
 from opentrons.protocol_engine.execution.heater_shaker_restriction_flagger import (
     HeaterShakerMovementFlagger,
 )
@@ -90,8 +86,8 @@ class LocationAndHeaterShakerStatus(NamedTuple):
     """
 
     slot_name: DeckSlotName
-    heater_shaker_status: HeaterShakerStatus
-    latch_status: HeaterShakerLabwareLatchStatus
+    plate_shaking: bool
+    labware_latch_closed: bool
     expected_raise_cm: ContextManager[Any]
 
 
@@ -112,58 +108,58 @@ class MultiChannelLocationAndLabwareStatus(NamedTuple):
     [
         LocationAndHeaterShakerStatus(
             slot_name=DeckSlotName.SLOT_4,
-            heater_shaker_status=HeaterShakerStatus.RUNNING,
-            latch_status=HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
+            plate_shaking=True,
+            labware_latch_closed=True,
             expected_raise_cm=pytest.raises(RestrictedPipetteMovementError),
         ),
         LocationAndHeaterShakerStatus(
             slot_name=DeckSlotName.SLOT_2,
-            heater_shaker_status=HeaterShakerStatus.RUNNING,
-            latch_status=HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
+            plate_shaking=True,
+            labware_latch_closed=True,
             expected_raise_cm=pytest.raises(RestrictedPipetteMovementError),
         ),
         LocationAndHeaterShakerStatus(
             slot_name=DeckSlotName.SLOT_5,
-            heater_shaker_status=HeaterShakerStatus.RUNNING,
-            latch_status=HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
+            plate_shaking=True,
+            labware_latch_closed=True,
             expected_raise_cm=pytest.raises(RestrictedPipetteMovementError),
         ),
         LocationAndHeaterShakerStatus(
             slot_name=DeckSlotName.SLOT_3,
-            heater_shaker_status=HeaterShakerStatus.RUNNING,
-            latch_status=HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
+            plate_shaking=True,
+            labware_latch_closed=True,
             expected_raise_cm=does_not_raise(),
         ),
         LocationAndHeaterShakerStatus(
             slot_name=DeckSlotName.SLOT_5,
-            heater_shaker_status=HeaterShakerStatus.IDLE,
-            latch_status=HeaterShakerLabwareLatchStatus.IDLE_OPEN,
+            plate_shaking=False,
+            labware_latch_closed=False,
             expected_raise_cm=pytest.raises(RestrictedPipetteMovementError),
         ),
         LocationAndHeaterShakerStatus(
             slot_name=DeckSlotName.SLOT_6,
-            heater_shaker_status=HeaterShakerStatus.IDLE,
-            latch_status=HeaterShakerLabwareLatchStatus.IDLE_OPEN,
+            plate_shaking=False,
+            labware_latch_closed=False,
             expected_raise_cm=pytest.raises(RestrictedPipetteMovementError),
         ),
         LocationAndHeaterShakerStatus(
             slot_name=DeckSlotName.SLOT_8,
-            heater_shaker_status=HeaterShakerStatus.IDLE,
-            latch_status=HeaterShakerLabwareLatchStatus.IDLE_OPEN,
+            plate_shaking=False,
+            labware_latch_closed=False,
             expected_raise_cm=does_not_raise(),
         ),
         LocationAndHeaterShakerStatus(
             slot_name=DeckSlotName.SLOT_4,
-            heater_shaker_status=HeaterShakerStatus.IDLE,
-            latch_status=HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
+            plate_shaking=False,
+            labware_latch_closed=True,
             expected_raise_cm=does_not_raise(),
         ),
     ],
 )
 async def test_raises_any_channel_on_restricted_movement(
     slot_name: DeckSlotName,
-    heater_shaker_status: HeaterShakerStatus,
-    latch_status: HeaterShakerLabwareLatchStatus,
+    plate_shaking: bool,
+    labware_latch_closed: bool,
     expected_raise_cm: ContextManager[Any],
     subject: HeaterShakerMovementFlagger,
     state_store: StateStore,
@@ -183,16 +179,16 @@ async def test_raises_any_channel_on_restricted_movement(
         ]
     )
 
-    heater_shaker = decoy.mock(cls=HardwareHeaterShaker)
-    decoy.when(heater_shaker.device_info).then_return({"serial": "serial-number"})
-    decoy.when(heater_shaker.status).then_return(heater_shaker_status)
-    decoy.when(heater_shaker.labware_latch_status).then_return(latch_status)
     decoy.when(
-        await hardware_api.find_modules(
-            by_model=OpentronsHeaterShakerModuleModel.HEATER_SHAKER_V1,
-            resolved_type=OpentronsModuleType.HEATER_SHAKER,
+        state_store.modules.get_heater_shaker_module_substate("module-id")
+    ).then_return(
+        HeaterShakerModuleSubState(
+            module_id=HeaterShakerModuleId("module-id"),
+            is_labware_latch_closed=labware_latch_closed,
+            is_plate_shaking=plate_shaking,
+            plate_target_temperature=None,
         )
-    ).then_return(([heater_shaker], None))
+    )
 
     decoy.when(state_store.geometry.get_ancestor_slot_name("labware-id")).then_return(
         slot_name
@@ -255,18 +251,16 @@ async def test_raises_multi_channel_on_restricted_movement(
         ]
     )
 
-    heater_shaker = decoy.mock(cls=HardwareHeaterShaker)
-    decoy.when(heater_shaker.device_info).then_return({"serial": "serial-number"})
-    decoy.when(heater_shaker.status).then_return(HeaterShakerStatus.IDLE)
-    decoy.when(heater_shaker.labware_latch_status).then_return(
-        HeaterShakerLabwareLatchStatus.IDLE_CLOSED
-    )
     decoy.when(
-        await hardware_api.find_modules(
-            by_model=OpentronsHeaterShakerModuleModel.HEATER_SHAKER_V1,
-            resolved_type=OpentronsModuleType.HEATER_SHAKER,
+        state_store.modules.get_heater_shaker_module_substate("module-id")
+    ).then_return(
+        HeaterShakerModuleSubState(
+            module_id=HeaterShakerModuleId("module-id"),
+            is_labware_latch_closed=True,
+            is_plate_shaking=False,
+            plate_target_temperature=None,
         )
-    ).then_return(([heater_shaker], None))
+    )
 
     decoy.when(state_store.geometry.get_ancestor_slot_name("labware-id")).then_return(
         slot_name
@@ -283,37 +277,6 @@ async def test_raises_multi_channel_on_restricted_movement(
     )
 
     with expected_raise_cm:
-        await subject.raise_if_movement_restricted(
-            labware_id="labware-id", pipette_id="pipette-id"
-        )
-
-
-async def test_raises_if_hardware_module_has_gone_missing(
-    subject: HeaterShakerMovementFlagger,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    decoy: Decoy,
-) -> None:
-    """It should raise if the hardware module can't be found by its serial no."""
-    decoy.when(state_store.modules.get_all()).then_return(
-        [
-            LoadedModule(
-                id="module-id",
-                model=PEModuleModel.HEATER_SHAKER_MODULE_V1,
-                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
-                serialNumber="serial-number",
-            )
-        ]
-    )
-
-    decoy.when(
-        await hardware_api.find_modules(
-            by_model=OpentronsHeaterShakerModuleModel.HEATER_SHAKER_V1,
-            resolved_type=OpentronsModuleType.HEATER_SHAKER,
-        )
-    ).then_return(([], None))
-
-    with pytest.raises(RestrictedPipetteMovementError):
         await subject.raise_if_movement_restricted(
             labware_id="labware-id", pipette_id="pipette-id"
         )
