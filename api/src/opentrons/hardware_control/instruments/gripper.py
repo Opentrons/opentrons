@@ -41,13 +41,20 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         self._jaw_center_offset = (
             Point(*self._config.jaw_center_offset_from_base) + base_offset
         )
-        self._front_pin_offset = (
+        #: the distance between the gripper mount and the jaw center at home
+        self._front_calibration_pin_offset = (
             Point(*self._config.pin_one_offset_from_base) + base_offset
         )
-        self._back_pin_offset = (
+        #: the distance between the gripper mount and the front calibration pin
+        #: at home
+        self._back_calibration_pin_offset = (
             Point(*self._config.pin_two_offset_from_base) + base_offset
         )
+        #: the distance between the gripper mount and the back calibration pin
+        #: at home
         self._calibration_offset = gripper_cal_offset
+        #: The output value of calibration - the additional vector added into
+        #: the critical point geometry based on gripper mount calibration
         self._gripper_id = gripper_id
         self._state = GripperJawState.UNHOMED
         self._log = mod_log.getChild(self._gripper_id)
@@ -94,9 +101,13 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         between the center of the gripper engagement volume and the calibration pins.
         """
         if cp_override == CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN:
-            return self._front_pin_offset + Point(*self._calibration_offset.offset)
+            return self._front_calibration_pin_offset + Point(
+                *self._calibration_offset.offset
+            )
         elif cp_override == CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN:
-            return self._back_pin_offset + Point(*self._calibration_offset.offset)
+            return self._back_calibration_pin_offset + Point(
+                *self._calibration_offset.offset
+            )
         elif cp_override == CriticalPoint.GRIPPER_JAW_CENTER or not cp_override:
             return self._jaw_center_offset + Point(*self._calibration_offset.offset)
         else:

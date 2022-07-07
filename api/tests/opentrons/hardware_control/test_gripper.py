@@ -35,8 +35,14 @@ def test_id_get_added_to_dict():
     [
         (None, lambda g: g._jaw_center_offset),
         (CriticalPoint.GRIPPER_JAW_CENTER, lambda g: g._jaw_center_offset),
-        (CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN, lambda g: g._front_pin_offset),
-        (CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN, lambda g: g._back_pin_offset),
+        (
+            CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN,
+            lambda g: g._front_calibration_pin_offset,
+        ),
+        (
+            CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN,
+            lambda g: g._back_calibration_pin_offset,
+        ),
     ],
 )
 def test_critical_point(
