@@ -323,17 +323,15 @@ class OT3Controller:
         self,
         duty_cycle: float,
         stop_condition: MoveStopCondition = MoveStopCondition.none,
-    ) -> bool:
+    ) -> None:
         move_group = create_gripper_jaw_move_group(duty_cycle, stop_condition)
         runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
-        return True
 
-    async def gripper_home_jaw(self) -> bool:
+    async def gripper_home_jaw(self) -> None:
         move_group = create_gripper_jaw_home_group()
         runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
-        return True
 
     async def get_attached_instruments(
         self, expected: Dict[OT3Mount, PipetteName]

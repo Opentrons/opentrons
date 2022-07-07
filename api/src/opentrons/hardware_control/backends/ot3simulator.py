@@ -237,15 +237,13 @@ class OT3Simulator:
         self,
         duty_cycle: float,
         stop_condition: MoveStopCondition = MoveStopCondition.none,
-    ) -> bool:
+    ) -> None:
         """Move gripper inward."""
         _ = create_gripper_jaw_move_group(duty_cycle, stop_condition)
-        return True
 
-    async def gripper_home_jaw(self) -> bool:
+    async def gripper_home_jaw(self) -> None:
         """Move gripper outward."""
         _ = create_gripper_jaw_home_group()
-        return True
 
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]
