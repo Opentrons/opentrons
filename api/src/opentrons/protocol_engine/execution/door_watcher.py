@@ -103,6 +103,7 @@ class DoorWatcher:
         if (
             self._state_store.commands.get_is_running()
             and action.door_state == DoorState.OPEN
+            and self._state_store.config.block_on_door_open
         ):
             self._hardware_api.pause(PauseType.PAUSE)
 
