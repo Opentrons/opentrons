@@ -6,10 +6,10 @@ from serial.tools.list_ports import comports
 from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing import get_api_context
-from hardware_testing.data import dump_data_to_file, create_file_name
+from hardware_testing.data import dump_data_to_file, append_data_to_file, create_file_name
 from hardware_testing.drivers import RadwagScaleBase, RadwagScale, SimRadwagScale
 from hardware_testing.drivers.radwag.commands import RadwagWorkingMode, RadwagFilter, RadwagValueRelease
-from hardware_testing.gravimetric import record_samples
+from hardware_testing.gravimetric import record_samples, GravimetricRecording, GravimetricSample
 
 metadata = {
     'protocolName': 'example-test',
@@ -58,14 +58,33 @@ def run(protocol: ProtocolContext) -> None:
         except ValueError:
             continue
         input('\tPress ENTER when ready...')
-        print('\trecording...')
-        start_time = time()
-        recording = record_samples(
-            scale, duration=recording_duration, interval=recording_interval, stable=False)
-        end_time = time()
+
         test_data_name = create_file_name(metadata['protocolName'], recording_name)
-        print(f'\tDone (time={round(end_time - start_time, 2)}), saving {len(recording)} samples as \"{test_data_name}\"\n')
-        dump_data_to_file(metadata['protocolName'], test_data_name, recording.as_csv())
+        print(f'\trecording to file {test_data_name}...')
+
+        def _on_new_sample(recording: GravimetricRecording) -> None:
+            append_data_to_file(metadata['protocolName'],
+                                test_data_name,
+                                recording[-1].as_csv(recording) + '\n')
+
+        def _record_the_samples() -> GravimetricRecording:
+            st = time()
+            r = record_samples(scale,
+                               duration=recording_duration,
+                               interval=recording_interval,
+                               stable=False,
+                               on_new_sample=_on_new_sample)
+            t = round(time() - st, 2)
+            print(f'\tDone (time={t}), saving {len(r)} samples\n')
+            return r
+
+        # add the header to the CSV file
+        dump_data_to_file(metadata['protocolName'],
+                          test_data_name,
+                          GravimetricSample.csv_header() + '\n')
+        _recording = _record_the_samples()
+        # add a final newline character to the CSV file
+        append_data_to_file(metadata['protocolName'], test_data_name, '\n')
 
 
 if __name__ == '__main__':

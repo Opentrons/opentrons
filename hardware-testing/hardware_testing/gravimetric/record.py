@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from statistics import stdev
 from time import time
-from typing import List, Optional
+from typing import List, Optional, Callable
 
 from hardware_testing.drivers.radwag.driver import RadwagScaleBase
 
@@ -101,7 +101,8 @@ def record_samples(scale: RadwagScaleBase,
                    duration: Optional[float] = None,
                    interval: Optional[float] = None,
                    stable: Optional[bool] = True,
-                   timeout: Optional[float] = None) -> GravimetricRecording:
+                   timeout: Optional[float] = None,
+                   on_new_sample: Optional[Callable] = None) -> GravimetricRecording:
 
     def _get_remaining_time(stamp: float, period: float) -> float:
         return (stamp + period) - time()
@@ -142,6 +143,8 @@ def record_samples(scale: RadwagScaleBase,
         iwo = interval - _get_interval_overlap(_samples, interval)
         if not len(_samples) or _did_exceed_time(_samples.end_time, iwo):
             _samples.append(_s)
+            if callable(on_new_sample):
+                on_new_sample(_samples)
     assert len(_samples) == length, \
         f'Scale recording timed out before accumulating ' \
         f'{length} samples (recorded {len(_samples)} samples)'

@@ -81,7 +81,6 @@ class RadwagScale(RadwagScaleBase):
     def _write_command(self, cmd: str) -> None:
         cmd_str = radwag_command_format(cmd)
         cmd_bytes = cmd_str.encode('utf-8')
-        print(f'-> {cmd_bytes}')
         send_len = self._connection.write(cmd_bytes)
         assert send_len == len(cmd_bytes), f'Radwag command \"{cmd}\" ({cmd_bytes} ' \
                                            f'bytes) only sent {send_len} bytes'
@@ -94,7 +93,6 @@ class RadwagScale(RadwagScaleBase):
             self._connection.timeout = prev_timeout
         else:
             response = self._connection.readline()
-        print(f'<- {response}')
         data = radwag_response_parse(response.decode('utf-8'), command)
         return data
 
