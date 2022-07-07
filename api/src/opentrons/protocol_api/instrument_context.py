@@ -7,15 +7,17 @@ from opentrons.broker import Broker
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types, hardware_control as hc
 from opentrons.commands import commands as cmds
-from opentrons.commands.publisher import CommandPublisher, publish
+
+# from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.commands import publisher
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
-from opentrons.protocols.api_support.instrument import (
-    validate_blowout_location,
-    determine_drop_target,
-    validate_can_aspirate,
-    validate_can_dispense,
-)
+
+# from opentrons.protocols.api_support.instrument import (
+#     validate_blowout_location,
+#     determine_drop_target,
+#     validate_can_aspirate,
+#     validate_can_dispense,
+# )
 from opentrons.protocols.api_support import instrument
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocol_api.module_contexts import ThermocyclerContext
@@ -44,7 +46,7 @@ AdvancedLiquidHandling = Union[
 logger = logging.getLogger(__name__)
 
 
-class InstrumentContext(CommandPublisher):
+class InstrumentContext(publisher.CommandPublisher):
     """A context for a specific pipette or instrument.
 
     This can be used to call methods related to pipettes - moves or
@@ -194,7 +196,7 @@ class InstrumentContext(CommandPublisher):
                 "knows where it is."
             )
         if self.api_version >= APIVersion(2, 11):
-            validate_can_aspirate(dest)
+            instrument.validate_can_aspirate(dest)
 
         if self.current_volume == 0:
             # Make sure we're at the top of the labware and clear of any
@@ -313,7 +315,7 @@ class InstrumentContext(CommandPublisher):
                 "knows where it is."
             )
         if self.api_version >= APIVersion(2, 11):
-            validate_can_dispense(loc)
+            instrument.validate_can_dispense(loc)
 
         c_vol = self.current_volume if not volume else volume
 
@@ -472,7 +474,7 @@ class InstrumentContext(CommandPublisher):
         else:
             return clamp_value(speed, 80, 1, "touch_tip:")
 
-    @publish(command=cmds.touch_tip)
+    @publisher.publish(command=cmds.touch_tip)
     @requires_version(2, 0)
     def touch_tip(
         self,
@@ -560,7 +562,7 @@ class InstrumentContext(CommandPublisher):
         )
         return self
 
-    @publish(command=cmds.air_gap)
+    @publisher.publish(command=cmds.air_gap)
     @requires_version(2, 0)
     def air_gap(
         self, volume: Optional[float] = None, height: Optional[float] = None
@@ -609,7 +611,7 @@ class InstrumentContext(CommandPublisher):
         self.aspirate(volume)
         return self
 
-    @publish(command=cmds.return_tip)
+    @publisher.publish(command=cmds.return_tip)
     @requires_version(2, 0)
     def return_tip(self, home_after: bool = True) -> InstrumentContext:
         """
@@ -631,7 +633,7 @@ class InstrumentContext(CommandPublisher):
                 "Last tip location should be a Well but it is: " "{}".format(loc)
             )
         return_height = self._implementation.get_return_height()
-        drop_loc = determine_drop_target(
+        drop_loc = instrument.determine_drop_target(
             self.api_version, loc, return_height, APIVersion(2, 3)
         )
         self.drop_tip(drop_loc, home_after=home_after)
@@ -824,7 +826,7 @@ class InstrumentContext(CommandPublisher):
                 target = location.top()
             else:
                 return_height = self._implementation.get_return_height()
-                target = determine_drop_target(
+                target = instrument.determine_drop_target(
                     self.api_version, location, return_height
                 )
         elif not location:
@@ -888,7 +890,7 @@ class InstrumentContext(CommandPublisher):
         self._implementation.home_plunger()
         return self
 
-    @publish(command=cmds.distribute)
+    @publisher.publish(command=cmds.distribute)
     @requires_version(2, 0)
     def distribute(
         self,
@@ -916,11 +918,13 @@ class InstrumentContext(CommandPublisher):
         kwargs["disposal_volume"] = kwargs.get("disposal_volume", self.min_volume)
         kwargs["mix_after"] = (0, 0)
         blowout_location = kwargs.get("blowout_location")
-        validate_blowout_location(self.api_version, "distribute", blowout_location)
+        instrument.validate_blowout_location(
+            self.api_version, "distribute", blowout_location
+        )
 
         return self.transfer(volume, source, dest, **kwargs)
 
-    @publish(command=cmds.consolidate)
+    @publisher.publish(command=cmds.consolidate)
     @requires_version(2, 0)
     def consolidate(
         self,
@@ -947,11 +951,13 @@ class InstrumentContext(CommandPublisher):
         kwargs["mix_before"] = (0, 0)
         kwargs["disposal_volume"] = 0
         blowout_location = kwargs.get("blowout_location")
-        validate_blowout_location(self.api_version, "consolidate", blowout_location)
+        instrument.validate_blowout_location(
+            self.api_version, "consolidate", blowout_location
+        )
 
         return self.transfer(volume, source, dest, **kwargs)
 
-    @publish(command=cmds.transfer)  # noqa: C901
+    @publisher.publish(command=cmds.transfer)  # noqa: C901
     @requires_version(2, 0)
     def transfer(
         self,
@@ -1061,7 +1067,9 @@ class InstrumentContext(CommandPublisher):
         logger.debug("Transfer {} from {} to {}".format(volume, source, dest))
 
         blowout_location = kwargs.get("blowout_location")
-        validate_blowout_location(self.api_version, "transfer", blowout_location)
+        instrument.validate_blowout_location(
+            self.api_version, "transfer", blowout_location
+        )
 
         kwargs["mode"] = kwargs.get("mode", "transfer")
 
