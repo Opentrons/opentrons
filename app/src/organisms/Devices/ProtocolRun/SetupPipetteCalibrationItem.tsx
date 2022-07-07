@@ -14,7 +14,6 @@ import {
   JUSTIFY_CENTER,
   SIZE_4,
   TOOLTIP_LEFT,
-  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
