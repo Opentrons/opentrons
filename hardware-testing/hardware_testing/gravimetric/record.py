@@ -103,21 +103,31 @@ def record_samples(scale: RadwagScaleBase,
                    stable: Optional[bool] = True,
                    timeout: Optional[float] = None) -> GravimetricRecording:
 
-    def _did_exceed_time(stamp, period) -> bool:
+    def _get_remaining_time(stamp: float, period: float) -> float:
+        return (stamp + period) - time()
+
+    def _did_exceed_time(stamp: float, period: float) -> bool:
         if not stamp:
             return True
         if not period:
             return False
-        return time() > (stamp + period)
+        return _get_remaining_time(stamp, period) <= 0
+
+    def _get_interval_overlap(samples: GravimetricRecording, period: float):
+        if len(samples) < 2:
+            return 0
+        real_time = samples.duration
+        ideal_time = (len(samples) - 1) * period
+        return real_time - ideal_time
 
     if length and interval and duration:
         raise ValueError(
             'Cannot have all three (length, interval, duration) '
             'arguments set, only use 2 at a time')
     if duration and length:
-        interval = duration / length
+        interval = duration / (length - 1)
     elif duration and interval:
-        length = int(duration / interval)
+        length = int(duration / interval) + 1
     if not length or not interval:
         raise ValueError('Cannot record with 2 of the following arguments: '
                          '1) length, 2) interval, or 3) duration')
@@ -129,7 +139,8 @@ def record_samples(scale: RadwagScaleBase,
         if stable and not _s.stable:
             _samples.clear()  # delete all previously recorded samples
             continue
-        if not len(_samples) or _did_exceed_time(_samples.end_time, interval):
+        iwo = interval - _get_interval_overlap(_samples, interval)
+        if not len(_samples) or _did_exceed_time(_samples.end_time, iwo):
             _samples.append(_s)
     assert len(_samples) == length, \
         f'Scale recording timed out before accumulating ' \

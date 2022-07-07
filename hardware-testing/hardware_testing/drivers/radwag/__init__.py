@@ -1,6 +1,7 @@
-from .driver import RadwagScale, SimRadwagScale
+from .driver import RadwagScaleBase, RadwagScale, SimRadwagScale
 
 __all__ = [
+    "RadwagScaleBase",
     "RadwagScale",
     "SimRadwagScale"
 ]

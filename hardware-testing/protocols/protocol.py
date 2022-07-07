@@ -1,4 +1,5 @@
 import atexit
+from time import time
 
 from serial.tools.list_ports import comports
 
@@ -58,10 +59,12 @@ def run(protocol: ProtocolContext) -> None:
             continue
         input('\tPress ENTER when ready...')
         print('\trecording...')
+        start_time = time()
         recording = record_samples(
             scale, duration=recording_duration, interval=recording_interval, stable=False)
+        end_time = time()
         test_data_name = create_file_name(metadata['protocolName'], recording_name)
-        print(f'\tDone, saving {len(recording)} samples as \"{test_data_name}\"\n')
+        print(f'\tDone (time={round(end_time - start_time, 2)}), saving {len(recording)} samples as \"{test_data_name}\"\n')
         dump_data_to_file(metadata['protocolName'], test_data_name, recording.as_csv())
 
 
