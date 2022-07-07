@@ -89,11 +89,12 @@ async def test_event_forwarding(
         times=1,
     )
 
+    decoy.reset()
     input_event = DoorStateNotification(new_state=DoorState.CLOSED)
     await to_thread.run_sync(captured_handler, input_event)
     decoy.verify(
         hardware_control_api.pause(PauseType.PAUSE),
-        times=1,
+        times=0,
     )
 
 
