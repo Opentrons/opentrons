@@ -42,9 +42,7 @@ const makeSelectDisconnectGroup = (
 
 const StyledSelectField: React.ComponentType<SelectFieldProps> = styled(
   SelectField
-)`
-  max-width: 16.875rem;
-`
+)``
 
 const formatOptions = (
   list: WifiNetwork[],

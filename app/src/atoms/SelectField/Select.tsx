@@ -1,5 +1,5 @@
 import * as React from 'react'
-import ReactSelect, { components as reactSelectComponents } from 'react-select'
+import ReactSelect, { components, DropdownIndicatorProps } from 'react-select'
 import { css, CSSObject } from 'styled-components'
 import {
   Icon,
@@ -8,20 +8,12 @@ import {
   COLORS,
   Box,
   SPACING,
-  Flex,
-  TEXT_ALIGN_LEFT,
-  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  POSITION_RELATIVE,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
 
-import type {
-  Props as ReactSelectProps,
-  MenuProps,
-  IndicatorProps,
-} from 'react-select'
-
-export { reactSelectComponents }
-
-export const SELECT_CX_PREFIX = 'ot_select'
+import type { Props as ReactSelectProps } from 'react-select'
 
 export type ChangeAction =
   | 'select-option'
@@ -45,58 +37,85 @@ const NO_STYLE_FN = (): CSSObject => VOID_STYLE as CSSObject
 
 const CLEAR_STYLES = {
   clearIndicator: NO_STYLE_FN,
+  control: (styles: any) => ({
+    ...styles,
+    borderRadius: BORDERS.radiusRoundEdge,
+    border: BORDERS.lineBorder,
+    width: '14rem',
+    borderColor: COLORS.medGrey,
+    boxShadow: 'none',
+    padding: '0.375rem',
+    margin: '0rem',
+    flexDirection: DIRECTION_ROW,
+    '&:hover': {
+      borderColor: COLORS.medGreyHover,
+    },
+    '&:active': {
+      borderColor: COLORS.medGreyHover,
+    },
+  }),
   container: NO_STYLE_FN,
-  control: NO_STYLE_FN,
   dropdownIndicator: NO_STYLE_FN,
   group: NO_STYLE_FN,
   groupHeading: NO_STYLE_FN,
   indicatorsContainer: NO_STYLE_FN,
   indicatorSeparator: NO_STYLE_FN,
-  input: NO_STYLE_FN,
+  input: (styles: any) => ({
+    ...styles,
+    zIndex: 5,
+    position: 'absolute',
+    top: SPACING.spacingXS,
+    paddingLeft: '0.375rem',
+  }),
   loadingIndicator: NO_STYLE_FN,
   loadingMessage: NO_STYLE_FN,
-  menu: NO_STYLE_FN,
+  menu: (styles: any) => ({
+    ...styles,
+    backgroundColor: COLORS.white,
+    width: 'auto',
+    minWidth: '14rem',
+    boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.2)',
+    borderRadius: '4px 4px 0px 0px',
+  }),
   menuList: NO_STYLE_FN,
+  menuPortal: NO_STYLE_FN,
   multiValue: NO_STYLE_FN,
   multiValueLabel: NO_STYLE_FN,
   multiValueRemove: NO_STYLE_FN,
-  option: NO_STYLE_FN,
+  noOptionsMessage: (styles: any) => ({
+    ...styles,
+    padding: '0.375rem',
+    color: COLORS.darkBlack,
+  }),
+  option: (styles: any) => ({
+    ...styles,
+    backgroundColor: COLORS.white,
+    '&:hover': {
+      backgroundColor: COLORS.lightBlue,
+    },
+    '&:active': {
+      backgroundColor: COLORS.lightBlue,
+    },
+  }),
+  placeholder: (styles: any) => ({
+    ...styles,
+    marginLeft: SPACING.spacingSS,
+    color: COLORS.darkBlack,
+  }),
+  singleValue: (styles: any) => ({
+    ...styles,
+    marginRight: '0.75rem',
+  }),
+  valueContainer: NO_STYLE_FN,
 }
 
-const SELECT_STYLING = css`
-  position: relative;
-  background-color: white;
-  border: ${BORDERS.lineBorder};
-  padding: ${SPACING.spacing3} 0.4rem 1.8rem 0;
-  outline: none;
-  border-radius: ${BORDERS.radiusRoundEdge};
-  height: 1.75rem;
-  box-shadow: none;
-  width: 16rem;
+const SELECT_STYLES = css`
+  position: ${POSITION_RELATIVE};
   font-size: ${TYPOGRAPHY.fontSizeP};
 `
 
-const MENU_ITEM_STYLING = css`
-  background-color: white;
-  width: 16rem;
-  min-width: 12rem;
-  color: ${COLORS.darkBlack};
-  padding: ${SPACING.spacing3} 0 ${SPACING.spacing3} 0.75rem;
-  text-align: ${TEXT_ALIGN_LEFT};
-  font-size: ${TYPOGRAPHY.fontSizeP};
-
-  &:hover {
-    background-color: ${COLORS.lightBlue};
-  }
-
-  &:disabled,
-  &.disabled {
-    color: ${COLORS.greyDisabled};
-  }
-`
-
-const INDICATOR_STYLE = css`
-  position: absolute;
+const INDICATOR_STYLES = css`
+  position: ${POSITION_ABSOLUTE};
   top: 0.75rem;
   right: ${SPACING.spacing2};
   width: ${SPACING.spacingM};
@@ -106,54 +125,23 @@ export function Select(props: SelectProps): JSX.Element {
     <ReactSelect
       {...props}
       styles={CLEAR_STYLES}
-      classNamePrefix={SELECT_CX_PREFIX}
-      components={{ DropdownIndicator, Menu }}
-      css={SELECT_STYLING}
-      theme={theme => ({
-        ...theme,
-        colors: {
-          ...theme.colors,
-          neutral50: COLORS.darkBlack, // Placeholder text color
-        },
-      })}
+      components={{ DropdownIndicator }}
+      css={SELECT_STYLES}
     />
   )
 }
 
 function DropdownIndicator(
-  props: IndicatorProps<SelectOption, false>
+  props: DropdownIndicatorProps<SelectOption>
 ): JSX.Element {
   return (
-    <reactSelectComponents.DropdownIndicator {...props}>
-      <Box css={INDICATOR_STYLE}>
+    <components.DropdownIndicator {...props}>
+      <Box css={INDICATOR_STYLES}>
         <Icon
           name={props.selectProps.menuIsOpen ? 'chevron-up' : 'chevron-down'}
           height={TYPOGRAPHY.lineHeight16}
         />
       </Box>
-    </reactSelectComponents.DropdownIndicator>
+    </components.DropdownIndicator>
   )
 }
-
-const Menu = (props: MenuProps<SelectOption, false>): JSX.Element => (
-  <reactSelectComponents.Menu {...props}>
-    <>
-      <Box color={COLORS.transparent} height={SPACING.spacing3} />
-      <Flex
-        borderRadius="4px 4px 0px 0px"
-        boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
-        flexDirection={DIRECTION_COLUMN}
-      >
-        {props.options
-          //  @ts-expect-error: options is not in SelectOption
-          .flatMap(og => og.options || [og])
-          .map((option, index) => (
-            <Box key={index} css={MENU_ITEM_STYLING}>
-              {option.label != null ? option.label : option.value}
-            </Box>
-          ))}
-        {/* <Box css={MENU_ITEM_STYLING}>{props.children}</Box> */}
-      </Flex>
-    </>
-  </reactSelectComponents.Menu>
-)

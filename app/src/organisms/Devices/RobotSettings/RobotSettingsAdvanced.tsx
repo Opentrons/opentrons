@@ -188,6 +188,8 @@ export function RobotSettingsAdvanced({
           updateIsRobotBusy={updateIsRobotBusy}
           onUpdateStart={() => setShowSoftwareUpdateModal(true)}
         />
+        <Divider marginY={SPACING.spacing4} />
+
         <Troubleshooting
           robotName={robotName}
           updateDownloadLogsStatus={updateDownloadLogsStatus}
