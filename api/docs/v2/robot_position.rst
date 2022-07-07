@@ -113,6 +113,25 @@ Changing these attributes will affect all subsequent aspirate and dispense actio
 .. versionadded:: 2.0
 
 
+.. _using_lpc:
+
+Using Labware Position Check
+============================
+
+TKTKTK
+
+All of the above positions are calculated after the effects of Labware Position Check, which is run in the Opentrons App. 
+
+- behavior: offsets are stored for a particular labware type in a particular position
+- Jupyter protocols don't have access to LPC, so:
+	- construct a matching protocol to run in the app
+	- get the labware offsets
+	- apply them with ``set_offset``
+- don't use ``set_offset`` in non-Jupyter protocols; it will override LPC and you might get undesired results or even crash.
+
+KTKTKT
+
+
 .. _protocol-api-deck-coords:
 
 *****************************
