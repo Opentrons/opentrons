@@ -8,16 +8,8 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons import types, hardware_control as hc
 from opentrons.commands import commands as cmds
 
-# from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.commands import publisher
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
-
-# from opentrons.protocols.api_support.instrument import (
-#     validate_blowout_location,
-#     determine_drop_target,
-#     validate_can_aspirate,
-#     validate_can_dispense,
-# )
 from opentrons.protocols.api_support import instrument
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocol_api.module_contexts import ThermocyclerContext

@@ -4,7 +4,6 @@ import pytest
 from decoy import Decoy, matchers
 
 from opentrons.protocol_api import ProtocolContext
-
 from opentrons.protocol_api.instrument_context import InstrumentContext
 from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.types import Location, Point
