@@ -12,7 +12,6 @@ from opentrons.commands import publisher
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.api_support.instrument import (
     validate_blowout_location,
-    tip_length_for,
     determine_drop_target,
     validate_can_aspirate,
     validate_can_dispense,
@@ -716,7 +715,6 @@ class InstrumentContext(CommandPublisher):
             broker=self.broker,
             command=cmds.pick_up_tip(instrument=self, location=target),
         ):
-            print("in publisher")
             self.move_to(target.top(), publish=False)
             self._implementation.pick_up_tip(
                 well=target._impl,
@@ -1443,4 +1441,4 @@ class InstrumentContext(CommandPublisher):
 
     def _tip_length_for(self, tiprack: Labware) -> float:
         """Get the tip length, including overlap, for a tip from this rack"""
-        return tip_length_for(self.hw_pipette, tiprack)
+        return instrument.tip_length_for(self.hw_pipette, tiprack)
