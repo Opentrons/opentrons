@@ -35,7 +35,7 @@ export function SetupDeckCalibration({
 
   const calibrateNowButton = (
     <Link to={`/devices/${robotName}/robot-settings/calibration`}>
-      <TertiaryButton padding={`${SPACING.spacing3} ${SPACING.spacing4}`}>
+      <TertiaryButton>
         {t('calibrate_now_cta')}
       </TertiaryButton>
     </Link>

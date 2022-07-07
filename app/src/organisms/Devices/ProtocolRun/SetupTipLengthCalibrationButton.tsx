@@ -241,7 +241,6 @@ export function SetupTipLengthCalibrationButton({
         ) : (
           <>
             <TertiaryButton
-              padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
               onClick={() => handleStart(null)}
               id={'TipRackCalibration_calibrateTipRackButton'}
               disabled={disabled || !isDeckCalibrated}

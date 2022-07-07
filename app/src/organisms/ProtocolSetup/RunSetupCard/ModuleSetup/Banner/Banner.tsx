@@ -99,8 +99,6 @@ export const BannerItem = (props: BannerItemProps): JSX.Element => {
         </Text>
         <TertiaryButton
           alignSelf={ALIGN_FLEX_START}
-          paddingY={SPACING.spacing3}
-          paddingX={SPACING.spacing4}
           data-testid={`banner_open_wizard_btn`}
           onClick={() => props.onClick()}
         >
