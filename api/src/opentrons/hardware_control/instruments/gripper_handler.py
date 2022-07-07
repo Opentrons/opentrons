@@ -30,7 +30,7 @@ class GripperHandler:
     def has_gripper(self) -> bool:
         return bool(self._gripper)
 
-    def verify_gripper(self) -> Gripper:
+    def get_gripper(self) -> Gripper:
         gripper = self._gripper
         if not gripper:
             raise GripperNotAttachedError(
@@ -75,7 +75,7 @@ class GripperHandler:
 
     def check_ready_for_grip(self) -> None:
         """Raise an exception if it is not currently valid to grip."""
-        gripper = self.verify_gripper()
+        gripper = self.get_gripper()
         self.check_ready_for_jaw_move()
         if gripper.state == GripperJawState.GRIPPING:
             raise GripError("Gripper is already gripping")
@@ -84,15 +84,15 @@ class GripperHandler:
 
     def check_ready_for_jaw_move(self) -> None:
         """Raise an exception if it is not currently valid to move the jaw."""
-        gripper = self.verify_gripper()
+        gripper = self.get_gripper()
         if gripper.state == GripperJawState.UNHOMED:
             raise GripError("Gripper jaw must be homed before moving")
 
     def set_jaw_state(self, state: GripperJawState) -> None:
-        self.verify_gripper().state = state
+        self.get_gripper().state = state
 
     def get_duty_cycle_by_grip_force(self, newton: Optional[float] = None) -> float:
-        gripper = self.verify_gripper()
+        gripper = self.get_gripper()
         if not newton:
             newton = DEFAULT_GRIP_FORCE_IN_NEWTON
         return gripper.duty_cycle_by_force(newton)

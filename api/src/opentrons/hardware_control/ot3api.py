@@ -555,7 +555,7 @@ class OT3API(
         """
         Home the jaw of the gripper.
         """
-        gripper = self._gripper_handler.verify_gripper()
+        gripper = self._gripper_handler.get_gripper()
         await self._ungrip()
         gripper.state = GripperJawState.HOMED_READY
 
@@ -851,7 +851,7 @@ class OT3API(
                 self._current_position.update(position)
                 if OT3Axis.G in checked_axes:
                     try:
-                        gripper = self._gripper_handler.verify_gripper()
+                        gripper = self._gripper_handler.get_gripper()
                         gripper.state = GripperJawState.HOMED_READY
                     except GripperNotAttachedError:
                         pass
