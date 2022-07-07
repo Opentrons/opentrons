@@ -1,0 +1,4 @@
+{
+	"$otSharedSchema": "pipette/schemas/2/pipetteLiquidPropertiesSchema",
+	"model": "singleChannel"
+}

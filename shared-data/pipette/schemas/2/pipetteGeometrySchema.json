@@ -1,0 +1,122 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "opentronsPipetteGeometrySchemaV2",
+	"definitions": {
+	  "positiveNumber": {
+		"type": "number",
+		"minimum": 0
+	  },
+	  "idleCurrentRange": {
+		"type": "number",
+		"minimum": 0.01,
+		"maximum": 1.0
+	  },
+	  "xyzArray": {
+		"type": "array",
+		"description": "Array of 3 numbers, [x, y, z]",
+		"items": { "type": "number" },
+		"minItems": 3,
+		"maxItems": 3
+	  },
+	  "linearEquations": {
+		"description": "Array containing any number of 3-arrays. Each inner 3-array describes a line segment: [boundary, slope, intercept]. So [1, 2, 3] would mean 'where (next_boundary > x >= 1), y = 2x + 3'",
+		"type": "array",
+		"items": {
+		  "type": "array",
+		  "items": { "type": "number" },
+		  "minItems": 3,
+		  "maxItems": 3
+		}
+	  },
+	  "liquidHandlingSpecs": {
+		"description": "Object containing linear equations for translating between uL of liquid and mm of plunger travel. There is one linear equation for aspiration and one for dispense",
+		"type": "object",
+		"required": ["aspirate", "dispense"],
+		"additionalProperties": false,
+		"properties": {
+		  "aspirate": { "$ref": "#/definitions/linearEquations" },
+		  "dispense": { "$ref": "#/definitions/linearEquations" }
+		}
+	  },
+	  "editConfigurations": {
+		"type": "object",
+		"description": "Object allowing you to modify a config",
+		"required": ["value"],
+		"properties": {
+		  "value": { "type": ["number", "array"] },
+		  "min": { "type": "number" },
+		  "max": { "type": "number" },
+		  "units": { "type": "string" },
+		  "type": { "type": "string" },
+		  "displayName": { "type": "string" }
+		}
+	  },
+	  "tipConfigurations": {
+		"required": ["current"],
+		"properties": {
+			"current": {"$ref": "#/definitions/current"},
+			"distance": {},
+			"presses": {},
+			"increment": {}
+		}
+	  }
+	},
+  
+	"type": "object",
+	"additionalProperties": false,
+	"required": ["config", "mutableConfigs"],
+	"properties": {
+		"description": "Version-level pipette specifications, which may vary across different versions of the same pipette",
+		"type": "object",
+		"$comment": "Example key: 'p10_single_v1.3'",
+		"patternProperties": {
+		  ".*": {
+			"required": [
+			  "name",
+			  "top",
+			  "bottom",
+			  "blowout",
+			  "modelOffset",
+			  "plungerCurrent",
+			  "dropTipCurrent",
+			  "dropTipSpeed",
+			  "ulPerMm",
+			  "tipLength",
+			  "nozzleOffset"
+			],
+			"additionalProperties": false,
+			"properties": {
+			  "top": { "$ref": "#/definitions/editConfigurations" },
+			  "bottom": { "$ref": "#/definitions/editConfigurations" },
+			  "blowout": { "$ref": "#/definitions/editConfigurations" },
+			  "dropTip": { "$ref": "#/definitions/editConfigurations" },
+			  "pickUpCurrent": { "$ref": "#/definitions/editConfigurations" },
+			  "pickUpDistance": { "$ref": "#/definitions/editConfigurations" },
+			  "pickUpPresses": { "$ref": "#/definitions/editConfigurations" },
+			  "pickUpIncrement": { "$ref": "#/definitions/editConfigurations" },
+			  "pickUpSpeed": { "$ref": "#/definitions/editConfigurations" },
+			  "modelOffset": { "$ref": "#/definitions/xyzArray" },
+			  "nozzleOffset": { "$ref": "#/definitions/xyzArray" },
+			  "plungerCurrent": { "$ref": "#/definitions/editConfigurations" },
+			  "dropTipCurrent": { "$ref": "#/definitions/editConfigurations" },
+			  "dropTipSpeed": { "$ref": "#/definitions/editConfigurations" },
+			  "motorConfigurations": {
+				"$ref": "#/definitions/motorConfigurations"
+			  },
+			  "pickUpTipConfigurations" : {
+				"$ref": "#/definitions/tipConfigurations"
+			  },
+			  "dropTipConfigurations" : {
+				"$ref": "#/definitions/tipConfigurations"
+			  },
+			  "ulPerMm": {
+				"type": "array",
+				"items": { "$ref": "#/definitions/liquidHandlingSpecs" }
+			  },
+			  "idleCurrent": { "$ref": "#/definitions/idleCurrentRange" },
+			  "volumeRange": {}
+		  }
+		}
+	  }
+  }
+  
