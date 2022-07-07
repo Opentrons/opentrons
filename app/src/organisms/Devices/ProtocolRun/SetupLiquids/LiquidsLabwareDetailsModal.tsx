@@ -7,10 +7,10 @@ import {
 } from '@opentrons/api-client'
 import {
   Box,
+  Flex,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  Flex,
   SPACING,
   TYPOGRAPHY,
   LabwareRender,
@@ -44,6 +44,7 @@ export const LiquidsLabwareDetailsModal = (
   const [selectedValue, setSelectedValue] = React.useState<typeof liquidId>(
     liquidId
   )
+  const currentLiquidRef = React.useRef<HTMLDivElement>(null)
   const labwareRenderInfo = useLabwareRenderInfoForRunById(runId)[labwareId]
   const commands = useProtocolDetailsForRun(runId).protocolData?.commands
   const liquids = parseLiquidsInLoadOrder()
@@ -60,6 +61,12 @@ export const LiquidsLabwareDetailsModal = (
     ?.find(command => command.result.labwareId === labwareId)
   const labwareWellOrdering = loadLabwareCommand?.result.definition.ordering
 
+  const scrollToCurrentItem = (): void => {
+    currentLiquidRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+  React.useEffect(() => {
+    scrollToCurrentItem()
+  }, [])
   const HIDE_SCROLLBAR = css`
     ::-webkit-scrollbar {
       display: none;
@@ -88,14 +95,22 @@ export const LiquidsLabwareDetailsModal = (
               )
               return (
                 liquidInfo != null && (
-                  <LiquidDetailCard
+                  <Flex
                     key={index}
-                    {...liquidInfo}
-                    volumeByWell={entry[1][0].volumeByWell}
-                    labwareWellOrdering={labwareWellOrdering}
-                    setSelectedValue={setSelectedValue}
-                    selectedValue={selectedValue}
-                  />
+                    ref={
+                      selectedValue === liquidInfo.liquidId
+                        ? currentLiquidRef
+                        : undefined
+                    }
+                  >
+                    <LiquidDetailCard
+                      {...liquidInfo}
+                      volumeByWell={entry[1][0].volumeByWell}
+                      labwareWellOrdering={labwareWellOrdering}
+                      setSelectedValue={setSelectedValue}
+                      selectedValue={selectedValue}
+                    />
+                  </Flex>
                 )
               )
             })}

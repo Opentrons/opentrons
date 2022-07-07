@@ -21,6 +21,7 @@ import {
   SIZE_AUTO,
   JUSTIFY_SPACE_BETWEEN,
   Box,
+  JUSTIFY_FLEX_START,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
@@ -132,13 +133,15 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex
             flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            justifyContent={JUSTIFY_FLEX_START}
+            gridGap={SPACING.spacing4}
             marginTop={SPACING.spacing4}
           >
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing4}
+              width="8.125rem"
             >
               {t('location')}
             </StyledText>
@@ -152,6 +155,9 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              width="4.25rem"
+              flexShrink="0"
+              marginLeft="auto"
               marginRight={SPACING.spacing4}
             >
               {t('volume')}
@@ -175,9 +181,14 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
               >
                 <Flex
                   flexDirection={DIRECTION_ROW}
-                  justifyContent={JUSTIFY_SPACE_BETWEEN}
+                  justifyContent={JUSTIFY_FLEX_START}
+                  gridGap={SPACING.spacing4}
                 >
-                  <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+                  <StyledText
+                    as="p"
+                    fontWeight={TYPOGRAPHY.fontWeightRegular}
+                    width="8.125rem"
+                  >
                     {t('slot_location', {
                       slotName: slotName,
                     })}
@@ -185,7 +196,13 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                   <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
                     {labwareName}
                   </StyledText>
-                  <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+                  <StyledText
+                    as="p"
+                    fontWeight={TYPOGRAPHY.fontWeightRegular}
+                    width="4.25rem"
+                    flexShrink="0"
+                    marginLeft="auto"
+                  >
                     {getTotalVolumePerLiquidLabwarePair(
                       liquidId,
                       labware.labwareId,
