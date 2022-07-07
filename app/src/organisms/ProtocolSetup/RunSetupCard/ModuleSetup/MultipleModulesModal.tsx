@@ -28,7 +28,7 @@ import multipleModuleHelp from '../../../../assets/images/MoaM_modal_Image.svg'
 import styles from '../../styles.css'
 
 const HOW_TO_MULTIPLE_MODULES_HREF =
-  'https://support.opentrons.com/en/articles/5167312-using-modules-of-the-same-type-on-the-ot-2'
+  'https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2'
 
 interface MultipleModulesModalProps {
   onCloseClick: () => unknown

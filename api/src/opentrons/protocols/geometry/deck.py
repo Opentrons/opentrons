@@ -2,24 +2,23 @@ import functools
 import logging
 from collections import UserDict
 from dataclasses import dataclass
-from typing import Optional, List, Dict, TYPE_CHECKING
+from typing import Optional, List
+
+from opentrons_shared_data.deck import (
+    DEFAULT_DECK_DEFINITION_VERSION,
+    load as load_deck,
+)
+from opentrons_shared_data.deck.dev_types import SlotDefV3
 
 from opentrons import types
+from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.protocol_api.labware import load as load_lw, Labware
 from opentrons.protocols.api_support.constants import deck_type
 from opentrons.protocols.api_support.labware_like import LabwareLike
-from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.hardware_control.modules.types import ModuleType
-from opentrons.protocols.geometry.module_geometry import (
-    ModuleGeometry,
-    ThermocyclerGeometry,
-)
-from opentrons_shared_data.deck import load as load_deck
 
-if TYPE_CHECKING:
-    from opentrons_shared_data.deck.dev_types import (
-        SlotDefV2,
-    )
+from . import deck_conflict
+from .deck_item import DeckItem
+from .module_geometry import ModuleGeometry, ThermocyclerGeometry
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -43,7 +42,7 @@ class CalibrationPosition:
 
 
 class Deck(UserDict):
-    def __init__(self, load_name: Optional[str] = None) -> None:
+    def __init__(self) -> None:
         super().__init__()
         row_offset = 90.5
         col_offset = 132.5
@@ -54,15 +53,26 @@ class Deck(UserDict):
             for idx in range(12)
         }
         self._highest_z = 0.0
-        if not load_name:
-            load_name = deck_type()
-        self._definition = load_deck(load_name, 2)
+        # TODO(mc, 2022-06-17): move deck type selection
+        # (and maybe deck definition loading) out of this constructor
+        # to decouple from config (and environment) reading / loading
+        self._definition = load_deck(deck_type(), DEFAULT_DECK_DEFINITION_VERSION)
         self._load_fixtures()
         self._thermocycler_present = False
 
     def _load_fixtures(self):
         for f in self._definition["locations"]["fixtures"]:
             slot_name = self._check_name(f["slot"])  # type: ignore
+            # TODO(mc, 2022-06-15): this loads the fixed trash as an instance of
+            # `opentrons.protocol_api.labware.Labware`
+            # However, all other labware will be added to the `Deck` as instances of
+            # `opentrons.protocols.context.labware.AbstractLabware`
+            # And modules will be added as instances of
+            # `opentrons.protocols.geometry.module_geometry.ModuleGeometry`
+            # This mix of public and private interfaces as members of a public
+            # `Deck` interface is confusing and should be resolved.
+            # If `Deck` is public, all items in a `Deck` should be
+            # instances of other public APIs.
             loaded_f = load_lw(
                 f["labware"], self.position_for(slot_name)  # type: ignore
             )
@@ -107,29 +117,17 @@ class Deck(UserDict):
 
     def __setitem__(self, key: types.DeckLocation, val: DeckItem) -> None:
         slot_key_int = self._check_name(key)
-        item = self.data.get(slot_key_int)
+        existing_items = {
+            slot: item for slot, item in self.data.items() if item is not None
+        }
 
-        overlapping_items = self.get_collisions_for_item(slot_key_int, val)
-        if item is not None:
-            if slot_key_int == 12:
-                if FIXED_TRASH_ID in item.parameters.get("quirks", []):
-                    pass
-                else:
-                    raise ValueError(f"Deck location {key} " "is for fixed trash only")
-            else:
-                raise ValueError(
-                    f"Deck location {key} already"
-                    f"  has an item: {self.data[slot_key_int]}"
-                )
-        elif overlapping_items:
-            flattened_overlappers = [
-                repr(item) for sublist in overlapping_items.values() for item in sublist
-            ]
-            raise ValueError(
-                f"Could not load {val} as deck location {key} "
-                "is obscured by "
-                f'{", ".join(flattened_overlappers)}'
-            )
+        # will raise DeckConflictError if items conflict
+        deck_conflict.check(
+            existing_items=existing_items,
+            new_location=slot_key_int,
+            new_item=val,
+        )
+
         self.data[slot_key_int] = val
         self._highest_z = max(val.highest_z, self._highest_z)
         self._thermocycler_present = any(
@@ -187,7 +185,7 @@ class Deck(UserDict):
         for item in [lw for lw in self.data.values() if lw]:
             self._highest_z = max(item.highest_z, self._highest_z)
 
-    def get_slot_definition(self, slot_name) -> "SlotDefV2":
+    def get_slot_definition(self, slot_name) -> "SlotDefV3":
         slots = self._definition["locations"]["orderedSlots"]
         slot_def = next((slot for slot in slots if slot["id"] == slot_name), None)
         if not slot_def:
@@ -213,6 +211,7 @@ class Deck(UserDict):
             ModuleType.MAGNETIC: "Magnetic Module",
             ModuleType.THERMOCYCLER: "Thermocycler",
             ModuleType.TEMPERATURE: "Temperature Module",
+            ModuleType.HEATER_SHAKER: "Heater-Shaker",
         }
         if isinstance(location, str) or isinstance(location, int):
             slot_def = self.get_slot_definition(str(location))
@@ -234,7 +233,7 @@ class Deck(UserDict):
                 return valid_slots[0]
             elif not valid_slots:
                 raise ValueError(
-                    "A {dn_from_type[module_type]} cannot be used with this " "deck"
+                    "A {dn_from_type[module_type]} cannot be used with this deck"
                 )
             else:
                 raise AssertionError(
@@ -248,7 +247,7 @@ class Deck(UserDict):
         return self._highest_z
 
     @property
-    def slots(self) -> List["SlotDefV2"]:
+    def slots(self) -> List["SlotDefV3"]:
         """Return the definition of the loaded robot deck."""
         return self._definition["locations"]["orderedSlots"]
 
@@ -281,30 +280,6 @@ class Deck(UserDict):
             self._check_name(f.get("slot")) for f in fixtures if f.get("slot")
         }
         return [s for s in self.data.keys() if s not in fixture_slots]
-
-    def get_collisions_for_item(
-        self, slot_key: types.DeckLocation, item: DeckItem
-    ) -> Dict[types.DeckLocation, List[DeckItem]]:
-        """Return the loaded deck items that collide
-        with the given item.
-        """
-
-        def get_item_covered_slot_keys(sk, i):
-            if isinstance(i, ThermocyclerGeometry):
-                return i.covered_slots
-            elif i is not None:
-                return set([sk])
-            else:
-                return set([])
-
-        item_slot_keys = get_item_covered_slot_keys(slot_key, item)
-
-        colliding_items: Dict[types.DeckLocation, List[DeckItem]] = {}
-        for sk, i in self.data.items():
-            covered_sks = get_item_covered_slot_keys(sk, i)
-            if item_slot_keys.issubset(covered_sks):
-                colliding_items.setdefault(sk, []).append(i)
-        return colliding_items
 
     @property
     def thermocycler_present(self) -> bool:

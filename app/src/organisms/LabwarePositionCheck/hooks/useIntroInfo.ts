@@ -1,5 +1,5 @@
-import { getPipetteMount } from '../../ProtocolSetup/utils/getPipetteMount'
-import { getLabwareLocation } from '../../ProtocolSetup/utils/getLabwareLocation'
+import { getPipetteMount } from '../../Devices/ProtocolRun/utils/getPipetteMount'
+import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
 import { useProtocolDetailsForRun } from '../../Devices/hooks/useProtocolDetailsForRun'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useSteps } from './useSteps'

@@ -4,7 +4,7 @@ import { i18n } from '../../../../i18n'
 import { AttachModule } from '../AttachModule'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
-import { ProtocolModuleInfo } from '../../../ProtocolSetup/utils/getProtocolModulesInfo'
+import { ProtocolModuleInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 const HEATER_SHAKER_PROTOCOL_MODULE_INFO = {
   moduleId: 'heater_shaker_id',
@@ -51,12 +51,12 @@ describe('AttachModule', () => {
     )
     getByText(
       nestedTextMatcher(
-        'Turn screws  counter clockwise to retract the anchors. The screws should not come out of the module.'
+        'Turn screws  counterclockwise to retract the anchors. The screws should not come out of the module.'
       )
     )
     getByText(
       nestedTextMatcher(
-        'Orient your module such that the plugs for power and USB connection are outward.'
+        'Orient your module such that the power and USB ports are facing outward.'
       )
     )
     getByText(

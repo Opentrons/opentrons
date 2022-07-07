@@ -3,6 +3,69 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2022-06-09)
+
+
+### Bug Fixes
+
+* **api:** delete legacy deck calibration file ([#10656](https://github.com/Opentrons/opentrons/issues/10656)) ([787c3a5](https://github.com/Opentrons/opentrons/commit/787c3a5a5586678fc0d74b497b80687ae7ec58f4))
+* **api:** mark JSONv6 run as failed if queued protocol command fails ([#10629](https://github.com/Opentrons/opentrons/issues/10629)) ([a521e16](https://github.com/Opentrons/opentrons/commit/a521e16c0b8c47006198a2479d0c71954db11016)), closes [#9888](https://github.com/Opentrons/opentrons/issues/9888)
+* **engine:** disallow setup commands while run is paused ([#10675](https://github.com/Opentrons/opentrons/issues/10675)) ([bd3a4e1](https://github.com/Opentrons/opentrons/commit/bd3a4e146ace8157687cf6913ec3794bae0f4411))
+
+
+### Features
+
+* **api, ot3:** add gripper to get_attached_instruments  ([#10619](https://github.com/Opentrons/opentrons/issues/10619)) ([212dfc5](https://github.com/Opentrons/opentrons/commit/212dfc540f29fe05cc56335560fb22a70e7bf9b5))
+
+
+
+
+
+# [6.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.0...v6.0.0-alpha.1) (2022-06-07)
+
+
+### Bug Fixes
+
+* **api:** disallow thermocycler if item in conflicting slot ([#10516](https://github.com/Opentrons/opentrons/issues/10516)) ([b3735c2](https://github.com/Opentrons/opentrons/commit/b3735c29eb21a2f76e6d663dd4bdd439d18ad1cf)), closes [#9419](https://github.com/Opentrons/opentrons/issues/9419)
+* **robot-server:** disallow pause action for non-active run ([#10550](https://github.com/Opentrons/opentrons/issues/10550)) ([5d17c93](https://github.com/Opentrons/opentrons/commit/5d17c937de3e10f71b7665c3796d2dfb9d6bdb55))
+
+
+### Features
+
+* **api:** add Thermocycler Gen2 driver ([#9854](https://github.com/Opentrons/opentrons/issues/9854)) ([b12641d](https://github.com/Opentrons/opentrons/commit/b12641dd93c0c8fd24924d1f4d56dcccf055a8dc))
+* **robot-server:** add modules field to /runs responses ([#10462](https://github.com/Opentrons/opentrons/issues/10462)) ([b4389fb](https://github.com/Opentrons/opentrons/commit/b4389fbe9934193a963671fbce344e50a827db85)), closes [#10432](https://github.com/Opentrons/opentrons/issues/10432)
+* **robot-server:** add run completedAt and startedAt timestamps ([#10327](https://github.com/Opentrons/opentrons/issues/10327)) ([93a195d](https://github.com/Opentrons/opentrons/commit/93a195d26a1128a68a91f71514fb122b48f253b4))
+* **robot-server, api:** support running JSONv6 protocols ([#10170](https://github.com/Opentrons/opentrons/issues/10170)) ([9c30653](https://github.com/Opentrons/opentrons/commit/9c306534576847bd7bd6ea0b8454afd4e74ae476)), closes [#9584](https://github.com/Opentrons/opentrons/issues/9584)
+
+
+
+
+
+# [6.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.1.0-beta.0...v6.0.0-alpha.0) (2022-05-26)
+
+
+### Bug Fixes
+
+* **api:** Fix delays returning immediately ([#10334](https://github.com/Opentrons/opentrons/issues/10334)) ([fa72078](https://github.com/Opentrons/opentrons/commit/fa72078d746a63319d12e9e4638d6299d287d49b))
+* **api:** ot3: fix saving config to json ([#10377](https://github.com/Opentrons/opentrons/issues/10377)) ([2da4911](https://github.com/Opentrons/opentrons/commit/2da4911b971214fb273f71845abae1ac0e2e2bd7))
+* **app-shell:** ensure Windows build can analyze protocols ([#10347](https://github.com/Opentrons/opentrons/issues/10347)) ([66a96bc](https://github.com/Opentrons/opentrons/commit/66a96bc9e76911a3a63b9dae5730607c5ee4cebc)), closes [#10378](https://github.com/Opentrons/opentrons/issues/10378)
+
+
+### Features
+
+* **api:** add gripper offset calibration data handling ([#10411](https://github.com/Opentrons/opentrons/issues/10411)) ([4b89491](https://github.com/Opentrons/opentrons/commit/4b894917c5d1d764b14a588bea390c91b86afbf9))
+* **api:** use V3 module definitions as default in PAPI ([#10245](https://github.com/Opentrons/opentrons/issues/10245)) ([85daa65](https://github.com/Opentrons/opentrons/commit/85daa655eac994aa53a0bcbebe4f398f6734499b))
+* **app:** show live labware offset while jogging during Labware Position Check ([#10264](https://github.com/Opentrons/opentrons/issues/10264)) ([a5df9e0](https://github.com/Opentrons/opentrons/commit/a5df9e0bbaa7b2429b1e06d0243a8886693c45a4)), closes [#9796](https://github.com/Opentrons/opentrons/issues/9796) [#9797](https://github.com/Opentrons/opentrons/issues/9797)
+* **heater-shaker:** add deactivate_heater method ([#9955](https://github.com/Opentrons/opentrons/issues/9955)) ([003727f](https://github.com/Opentrons/opentrons/commit/003727f804569cfccef35f3f541706451a9d7347))
+* **ot3, api:** Add gripper class  ([#10278](https://github.com/Opentrons/opentrons/issues/10278)) ([0eeba15](https://github.com/Opentrons/opentrons/commit/0eeba1558876a8ae6e44bd81cb4c9ba689aec3e9))
+* **robot-server:** add runs history removal to reset options ([#10395](https://github.com/Opentrons/opentrons/issues/10395)) ([e9294c3](https://github.com/Opentrons/opentrons/commit/e9294c3592783dcfdbcbc5ed91dcb60d37afe90e))
+* **robot-server:** persist previous run results and commands ([#10187](https://github.com/Opentrons/opentrons/issues/10187)) ([87677c6](https://github.com/Opentrons/opentrons/commit/87677c6919cb6257e8ad063b58b3faccea96d7fe)), closes [#8474](https://github.com/Opentrons/opentrons/issues/8474)
+* **shared-data:** add H/S to deck definition, bump deck definition schema ([#10417](https://github.com/Opentrons/opentrons/issues/10417)) ([183a1ac](https://github.com/Opentrons/opentrons/commit/183a1acd2db56750148d59a6058345aa32618311))
+
+
+
+
+
 # [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
 
 

@@ -44,14 +44,13 @@ describe('thermocyclerProfileStep', () => {
           commandType: 'thermocycler/setTargetLidTemperature',
           params: {
             moduleId: 'thermocyclerId',
-            temperature: 55,
+            celsius: 55,
           },
         },
         {
-          commandType: 'thermocycler/awaitLidTemperature',
+          commandType: 'thermocycler/waitForLidTemperature',
           params: {
             moduleId: 'thermocyclerId',
-            temperature: 55,
           },
         },
         {
@@ -59,7 +58,7 @@ describe('thermocyclerProfileStep', () => {
           params: {
             moduleId: 'thermocyclerId',
             profile: [],
-            volume: 42,
+            blockMaxVolumeUl: 42,
           },
         },
         {
@@ -78,14 +77,13 @@ describe('thermocyclerProfileStep', () => {
           commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
-            temperature: 4,
+            celsius: 4,
           },
         },
         {
-          commandType: 'thermocycler/awaitBlockTemperature',
+          commandType: 'thermocycler/waitForBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
-            temperature: 4,
           },
         },
         {
@@ -120,8 +118,8 @@ describe('thermocyclerProfileStep', () => {
           commandType: 'thermocycler/runProfile',
           params: {
             moduleId: 'thermocyclerId',
-            profile: [{ temperature: 61, holdTime: 99 }],
-            volume: 42,
+            profile: [{ celsius: 61, holdSeconds: 99 }],
+            blockMaxVolumeUl: 42,
           },
         },
         {
@@ -140,14 +138,13 @@ describe('thermocyclerProfileStep', () => {
           commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
-            temperature: 4,
+            celsius: 4,
           },
         },
         {
-          commandType: 'thermocycler/awaitBlockTemperature',
+          commandType: 'thermocycler/waitForBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
-            temperature: 4,
           },
         },
         {
@@ -188,8 +185,8 @@ describe('thermocyclerProfileStep', () => {
           commandType: 'thermocycler/runProfile',
           params: {
             moduleId: 'thermocyclerId',
-            profile: [{ temperature: 61, holdTime: 99 }],
-            volume: 42,
+            profile: [{ celsius: 61, holdSeconds: 99 }],
+            blockMaxVolumeUl: 42,
           },
         },
         {
@@ -208,14 +205,13 @@ describe('thermocyclerProfileStep', () => {
           commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
-            temperature: 4,
+            celsius: 4,
           },
         },
         {
-          commandType: 'thermocycler/awaitBlockTemperature',
+          commandType: 'thermocycler/waitForBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
-            temperature: 4,
           },
         },
         {
@@ -250,8 +246,8 @@ describe('thermocyclerProfileStep', () => {
           commandType: 'thermocycler/runProfile',
           params: {
             moduleId: 'thermocyclerId',
-            profile: [{ temperature: 61, holdTime: 99 }],
-            volume: 42,
+            profile: [{ celsius: 61, holdSeconds: 99 }],
+            blockMaxVolumeUl: 42,
           },
         },
         {
@@ -270,14 +266,13 @@ describe('thermocyclerProfileStep', () => {
           commandType: 'thermocycler/setTargetBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
-            temperature: 4,
+            celsius: 4,
           },
         },
         {
-          commandType: 'thermocycler/awaitBlockTemperature',
+          commandType: 'thermocycler/waitForBlockTemperature',
           params: {
             moduleId: 'thermocyclerId',
-            temperature: 4,
           },
         },
         {

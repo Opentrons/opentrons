@@ -9,6 +9,7 @@ import {
   FIXED_TRASH_ID,
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getFileMetadata } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
@@ -28,6 +29,7 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
+import { swatchColors } from '../../components/swatchColors'
 import type {
   ModuleEntity,
   PipetteEntity,
@@ -184,6 +186,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           [liquidId]: {
             displayName: liquidData.name,
             description: liquidData.description ?? '',
+            displayColor: swatchColors(liquidId),
           },
         }
       },
@@ -245,6 +248,10 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         module: typeof initialRobotState.modules[keyof typeof initialRobotState.modules],
         moduleId: string
       ): LoadModuleCreateCommand => {
+        // translate the magic TC location string to 7 so PE can read it
+        if (module.moduleState.type === THERMOCYCLER_MODULE_TYPE) {
+          module.slot = '7'
+        }
         const loadModuleCommand = {
           key: uuid(),
           commandType: 'loadModule' as const,

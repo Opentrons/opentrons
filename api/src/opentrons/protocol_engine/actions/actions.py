@@ -10,6 +10,7 @@ from typing import Optional, Union
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.types import HardwareEvent
+from opentrons.hardware_control.modules import LiveData
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
@@ -19,6 +20,8 @@ from ..types import LabwareOffsetCreate, ModuleDefinition
 @dataclass(frozen=True)
 class PlayAction:
     """Start or resume processing commands in the engine."""
+
+    requested_at: datetime
 
 
 class PauseSource(str, Enum):
@@ -72,6 +75,8 @@ class FinishAction:
 @dataclass(frozen=True)
 class HardwareStoppedAction:
     """An action dispatched after hardware has successfully been stopped."""
+
+    completed_at: datetime
 
 
 @dataclass(frozen=True)
@@ -137,6 +142,7 @@ class AddModuleAction:
     module_id: str
     serial_number: str
     definition: ModuleDefinition
+    module_live_data: LiveData
 
 
 Action = Union[

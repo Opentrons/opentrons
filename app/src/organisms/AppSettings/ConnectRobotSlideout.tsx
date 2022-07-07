@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   ALIGN_FLEX_END,
@@ -13,10 +14,11 @@ import {
   SIZE_2,
   Link,
 } from '@opentrons/components'
+
 import { ManualIpHostnameForm } from './ManualIpHostnameForm'
-import { IpHostnameList } from './IpHostnameList'
+import { ManualIpHostnameList } from './ManualIpHostnameList'
 import { Slideout } from '../../atoms/Slideout'
-import { PrimaryButton } from '../../atoms/Buttons'
+import { PrimaryButton } from '../../atoms/buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
@@ -25,9 +27,9 @@ import { getScanning, startDiscovery } from '../../redux/discovery'
 import type { Dispatch, State } from '../../redux/types'
 
 const SUPPORT_PAGE_LINK =
-  'https://support.opentrons.com/en/articles/2934336-manually-adding-a-robot-s-ip-address'
+  'https://support.opentrons.com/s/article/Manually-adding-a-robot-s-IP-address'
 
-export interface ConnectRobotSlideoutProps {
+interface ConnectRobotSlideoutProps {
   isExpanded: boolean
   onCloseClick: () => void
 }
@@ -120,7 +122,7 @@ export function ConnectRobotSlideout(
             ]
           )}
         </Flex>
-        <IpHostnameList mostRecentAddition={mostRecentAddition} />
+        <ManualIpHostnameList mostRecentAddition={mostRecentAddition} />
       </Flex>
     </Slideout>
   )

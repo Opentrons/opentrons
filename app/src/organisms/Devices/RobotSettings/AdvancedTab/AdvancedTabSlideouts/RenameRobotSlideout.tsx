@@ -14,7 +14,7 @@ import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import { removeRobot } from '../../../../../redux/discovery'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
-import { PrimaryButton } from '../../../../../atoms/Buttons'
+import { PrimaryButton } from '../../../../../atoms/buttons'
 import { InputField } from '../../../../../atoms/InputField'
 
 import type { UpdatedRobotName } from '@opentrons/api-client'
@@ -30,10 +30,10 @@ interface FormikErrors {
 }
 
 /* max length is 35 and min length is 1
-   allow users to use alphabets, numbers, space, ', !, ?, $, _, .(dot), and -
-   not allow users to use space at the beginning of a new name
+   allow users to use alphabets(a-z & A-Z) and numbers
+   https://github.com/Opentrons/opentrons/issues/10214
 */
-const REGEX_RENAME_ROBOT_PATTERN = /^\S([a-zA-Z0-9\s-_.!$?*]{0,35})$/
+const REGEX_RENAME_ROBOT_PATTERN = /^([a-zA-Z0-9]{0,35})$/
 const regexPattern = new RegExp(REGEX_RENAME_ROBOT_PATTERN)
 
 export function RenameRobotSlideout({
@@ -62,23 +62,24 @@ export function RenameRobotSlideout({
       const errors: FormikErrors = {}
       const newName = values.newRobotName
       if (!regexPattern.test(newName)) {
-        errors.newRobotName = t('rename_robot_input_error_message')
+        errors.newRobotName = t('rename_robot_input_limitation_detail')
       }
       return errors
     },
   })
 
-  // TODO: when a user lost connection while the user is renaming a robot,
-  // the app needs to show a message to inform that.
   const { updateRobotName } = useUpdateRobotNameMutation({
     onSuccess: (data: UpdatedRobotName) => {
       // remove the previous robot name from the list
       dispatch(removeRobot(previousRobotName))
-      data.name != null && history.push(`/devices/${data.name}/robot-settings`)
+      // data.name != null && history.push(`/devices/${data.name}/robot-settings`)
+      // TODO 6/9/2022 kj this is a temporary fix to avoid the issue
+      // https://github.com/Opentrons/opentrons/issues/10709
+      data.name != null && history.push(`/devices`)
     },
-    onError: error => {
-      // TODO: handle error
-      // When #9960 is solved, need to update.
+    onError: (error: Error) => {
+      // TODO kj 5/25/2022: when a user lost connection while the user is renaming a robot,
+      // the app needs to show a message to inform that.
       console.error('error', error.message)
     },
   })
@@ -100,7 +101,7 @@ export function RenameRobotSlideout({
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText as="p" marginBottom={SPACING.spacing4}>
-          {t('rename_robot_slideout_description')}
+          {t('rename_robot_input_limitation_detail')}
         </StyledText>
         <StyledText
           as="label"

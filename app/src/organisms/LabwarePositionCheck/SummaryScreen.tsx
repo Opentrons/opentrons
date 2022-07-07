@@ -1,5 +1,4 @@
 import * as React from 'react'
-import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_START,
@@ -15,7 +14,6 @@ import {
   Text,
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
-import { IDENTITY_VECTOR } from '@opentrons/shared-data'
 import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { useLPCSuccessToast } from '../ProtocolSetup/hooks'
@@ -58,18 +56,16 @@ export const SummaryScreen = (props: {
   const applyLabwareOffsets = (): void => {
     if (labwareOffsets.length > 0) {
       labwareOffsets.forEach(labwareOffset => {
-        if (!isEqual(labwareOffset.vector, IDENTITY_VECTOR)) {
-          createLabwareOffset({
-            runId: runId,
-            data: {
-              definitionUri: labwareOffset.labwareDefinitionUri,
-              location: labwareOffset.labwareOffsetLocation,
-              vector: labwareOffset.vector,
-            },
-          }).catch((e: Error) => {
-            console.error(`error applying labware offsets: ${e.message}`)
-          })
-        }
+        createLabwareOffset({
+          runId: runId,
+          data: {
+            definitionUri: labwareOffset.labwareDefinitionUri,
+            location: labwareOffset.labwareOffsetLocation,
+            vector: labwareOffset.vector,
+          },
+        }).catch((e: Error) => {
+          console.error(`error applying labware offsets: ${e.message}`)
+        })
       })
     } else {
       console.error('no labware offset data found')

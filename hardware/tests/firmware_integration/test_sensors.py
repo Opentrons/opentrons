@@ -2,7 +2,12 @@
 import asyncio
 
 import pytest
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorId,
+    SensorType,
+    SensorThresholdMode,
+)
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BaselineSensorRequest,
     ReadFromSensorRequest,
@@ -17,7 +22,11 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     SetSensorThresholdRequestPayload,
     WriteToSensorRequestPayload,
 )
-from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    SensorTypeField,
+    SensorIdField,
+    SensorThresholdModeField,
+)
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
     UInt16Field,
@@ -51,6 +60,7 @@ async def test_write_to_sensors(
     write_message = WriteToSensorRequest(
         payload=WriteToSensorRequestPayload(
             sensor=SensorTypeField(sensor_type),
+            sensor_id=SensorIdField(SensorId.S0),
             data=data_to_write,
             reg_address=register_address,
         )
@@ -78,6 +88,7 @@ async def test_read_from_sensors(
     read_message = ReadFromSensorRequest(
         payload=ReadFromSensorRequestPayload(
             sensor=SensorTypeField(sensor_type),
+            sensor_id=SensorIdField(SensorId.S0),
             offset_reading=UInt8Field(0),
         )
     )
@@ -110,6 +121,7 @@ async def test_baseline_poll_sensors(
     poll_sensor = BaselineSensorRequest(
         payload=BaselineSensorRequestPayload(
             sensor=SensorTypeField(sensor_type),
+            sensor_id=SensorIdField(SensorId.S0),
             sample_rate=UInt16Field(5),
         )
     )
@@ -120,6 +132,7 @@ async def test_baseline_poll_sensors(
         message=ReadFromSensorRequest(
             payload=ReadFromSensorRequestPayload(
                 sensor=SensorTypeField(sensor_type),
+                sensor_id=SensorIdField(SensorId.S0),
                 offset_reading=UInt8Field(0),
             )
         ),
@@ -146,7 +159,10 @@ async def test_set_threshold_sensors(
     """We should be able to set thresholds for the pressure and capacitive sensor."""
     set_threshold = SetSensorThresholdRequest(
         payload=SetSensorThresholdRequestPayload(
-            sensor=SensorTypeField(sensor_type), threshold=Int32Field(0x1)
+            sensor=SensorTypeField(sensor_type),
+            sensor_id=SensorIdField(SensorId.S0),
+            threshold=Int32Field(0x1),
+            mode=SensorThresholdModeField(SensorThresholdMode.absolute.value),
         )
     )
     await can_messenger.send(node_id=NodeId.pipette_left, message=set_threshold)

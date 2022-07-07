@@ -24,7 +24,7 @@ import {
 import { UseQueryOptions } from 'react-query'
 import type { RunAction, RunStatus, Run, RunData } from '@opentrons/api-client'
 
-interface RunControls {
+export interface RunControls {
   play: () => void
   pause: () => void
   stop: () => void

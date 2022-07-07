@@ -32,7 +32,10 @@ async def test_protocols_and_analyses_persist(
                 await robot_client.wait_until_alive()
             ), "Dev Robot never became available."
 
-            protocols_to_create = 13
+            # Must not be so high that the server runs out of room and starts
+            # auto-deleting old protocols.
+            protocols_to_create = 5
+
             for _ in range(protocols_to_create):
                 with protocol(secrets.token_urlsafe(16)) as file:
                     await robot_client.post_protocol([Path(file.name)])
@@ -129,10 +132,10 @@ async def test_protocol_labware_files_persist() -> None:
             assert restarted_protocol_detail == protocol_detail
 
             four_tuberack = Path(
-                f"{server.persistence_directory}/protocols/{protocol_id}/cpx_4_tuberack_100ul.json"  # noqa: E501
+                f"{server.persistence_directory}/protocols/{protocol_id}/cpx_4_tuberack_100ul.json"
             )
             six_tuberack = Path(
-                f"{server.persistence_directory}/protocols/{protocol_id}/cpx_6_tuberack_100ul.json"  # noqa: E501
+                f"{server.persistence_directory}/protocols/{protocol_id}/cpx_6_tuberack_100ul.json"
             )
             assert four_tuberack.is_file()
             assert six_tuberack.is_file()
@@ -181,4 +184,4 @@ async def _wait_for_all_analyses_to_complete(robot_client: RobotClient) -> None:
         return True
 
     while not await _all_analyses_are_complete():
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)

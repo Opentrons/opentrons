@@ -80,48 +80,6 @@ def subject(
     return plugin
 
 
-def test_play_action(
-    decoy: Decoy,
-    hardware_api: HardwareAPI,
-    subject: LegacyContextPlugin,
-) -> None:
-    """It should resume the hardware controller upon a play action."""
-    action = pe_actions.PlayAction()
-    subject.handle_action(action)
-
-    decoy.verify(hardware_api.resume(PauseType.PAUSE))
-
-
-def test_play_pauses_when_door_is_open(
-    decoy: Decoy,
-    hardware_api: HardwareAPI,
-    state_view: StateView,
-    subject: LegacyContextPlugin,
-) -> None:
-    """It should not play the hardware controller when door is blocking."""
-    action = pe_actions.PlayAction()
-
-    decoy.when(state_view.commands.get_is_door_blocking()).then_return(True)
-    subject.handle_action(action)
-
-    decoy.verify(hardware_api.pause(PauseType.PAUSE))
-
-
-def test_pause_action(
-    decoy: Decoy,
-    hardware_api: HardwareAPI,
-    subject: LegacyContextPlugin,
-) -> None:
-    """It should pause the hardware controller upon a pause action."""
-    subject.handle_action(
-        pe_actions.PauseAction(source=pe_actions.PauseSource.PROTOCOL)
-    )
-    decoy.verify(hardware_api.pause(PauseType.PAUSE), times=0)
-
-    subject.handle_action(pe_actions.PauseAction(source=pe_actions.PauseSource.CLIENT))
-    decoy.verify(hardware_api.pause(PauseType.PAUSE), times=1)
-
-
 def test_hardware_event_action(
     decoy: Decoy,
     hardware_api: HardwareAPI,
@@ -129,7 +87,7 @@ def test_hardware_event_action(
     subject: LegacyContextPlugin,
 ) -> None:
     """It should pause the hardware controller upon a blocking HardwareEventAction."""
-    door_open_event = DoorStateNotification(new_state=DoorState.OPEN, blocking=True)
+    door_open_event = DoorStateNotification(new_state=DoorState.OPEN)
     decoy.when(state_view.commands.get_is_implicitly_active()).then_return(True)
     subject.handle_action(pe_actions.HardwareEventAction(event=door_open_event))
     # Should not pause when engine queue is implicitly active

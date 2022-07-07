@@ -9,7 +9,7 @@ type HintKey =  // normal hints
   | 'protocol_can_enter_batch_edit'
   // blocking hints
   | 'custom_labware_with_modules'
-  | 'export_v6_protocol_5_10'
+  | 'export_v6_protocol_6_10'
   | 'change_magnet_module_model'
 // DEPRECATED HINTS (keep a record to avoid name collisions with old persisted dismissal states)
 // 'export_v4_protocol'

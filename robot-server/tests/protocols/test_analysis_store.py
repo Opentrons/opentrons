@@ -1,9 +1,9 @@
 """Tests for the AnalysisStore interface."""
 import pytest
 
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Generator, List, NamedTuple
+from typing import List, NamedTuple
 
 from sqlalchemy.engine import Engine as SQLEngine
 
@@ -18,7 +18,6 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
 )
 
-from robot_server.persistence import open_db_no_cleanup, add_tables_to_db
 from robot_server.protocols.analysis_models import (
     AnalysisResult,
     AnalysisStatus,
@@ -34,18 +33,6 @@ from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,
 )
-
-
-@pytest.fixture
-def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
-    """Return a set-up database to back the store."""
-    db_file_path = tmp_path / "test.db"
-    sql_engine = open_db_no_cleanup(db_file_path=db_file_path)
-    try:
-        add_tables_to_db(sql_engine)
-        yield sql_engine
-    finally:
-        sql_engine.dispose()
 
 
 @pytest.fixture
@@ -73,7 +60,7 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
     """
     return ProtocolResource(
         protocol_id=protocol_id,
-        created_at=datetime(year=2021, month=1, day=1),
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         source=ProtocolSource(
             directory=Path("/dev/null"),
             main_file=Path("/dev/null"),
@@ -212,7 +199,7 @@ async def test_add_analysis_equipment(
 
 
 class AnalysisResultSpec(NamedTuple):
-    """Spec data for analyis result tests."""
+    """Spec data for analysis result tests."""
 
     commands: List[pe_commands.Command]
     errors: List[pe_errors.ErrorOccurrence]
@@ -222,13 +209,13 @@ class AnalysisResultSpec(NamedTuple):
 analysis_result_specs: List[AnalysisResultSpec] = [
     AnalysisResultSpec(
         commands=[
-            pe_commands.Pause(
+            pe_commands.WaitForResume(
                 id="pause-1",
                 key="command-key",
                 status=pe_commands.CommandStatus.SUCCEEDED,
-                createdAt=datetime(year=2021, month=1, day=1),
-                params=pe_commands.PauseParams(message="hello world"),
-                result=pe_commands.PauseResult(),
+                createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+                params=pe_commands.WaitForResumeParams(message="hello world"),
+                result=pe_commands.WaitForResumeResult(),
             )
         ],
         errors=[],
@@ -239,7 +226,7 @@ analysis_result_specs: List[AnalysisResultSpec] = [
         errors=[
             pe_errors.ErrorOccurrence(
                 id="error-id",
-                createdAt=datetime(year=2021, month=1, day=1),
+                createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
                 errorType="BadError",
                 detail="oh no",
             )

@@ -170,6 +170,7 @@ class AttachedModulesControl:
             modules.types.ModuleType.MAGNETIC: "magdeck",
             modules.types.ModuleType.TEMPERATURE: "tempdeck",
             modules.types.ModuleType.THERMOCYCLER: "thermocycler",
+            modules.types.ModuleType.HEATER_SHAKER: "heatershaker",
         }[resolved_type]
         for module in self.available_modules:
             if mod_type == module.name():
@@ -179,6 +180,7 @@ class AttachedModulesControl:
                 "magdeck": modules.MagDeck.build,
                 "tempdeck": modules.TempDeck.build,
                 "thermocycler": modules.Thermocycler.build,
+                "heatershaker": modules.HeaterShaker.build,
             }[mod_type]
             if module_builder:
                 # The dict stuff above somehow erases specifically the return type

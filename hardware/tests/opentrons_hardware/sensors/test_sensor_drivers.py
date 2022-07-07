@@ -3,13 +3,17 @@ import pytest
 import mock
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
+from unittest.mock import patch
+from mock.mock import AsyncMock
 
 from tests.conftest import MockCanMessageNotifier
 
 from opentrons_hardware.sensors import fdc1004, hdc2080, mmr920C04, sensor_abc
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
-from opentrons_hardware.firmware_bindings.constants import SensorType, NodeId
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+from opentrons_hardware.firmware_bindings.constants import SensorType, SensorId, NodeId
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    CanMessenger,
+)
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
     UInt16Field,
@@ -24,6 +28,9 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     WriteToSensorRequest,
     ReadFromSensorResponse,
     SensorThresholdResponse,
+    BindSensorOutputRequest,
+    PeripheralStatusRequest,
+    PeripheralStatusResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
@@ -32,9 +39,16 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     WriteToSensorRequestPayload,
     ReadFromSensorResponsePayload,
     SensorThresholdResponsePayload,
+    BindSensorOutputRequestPayload,
+    PeripheralStatusResponsePayload,
 )
-from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    SensorTypeField,
+    SensorIdField,
+    SensorOutputBindingField,
+)
 from opentrons_hardware.sensors.utils import SensorDataType
+from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
 
 
 @pytest.fixture
@@ -70,6 +84,7 @@ def humidity_sensor() -> hdc2080.EnvironmentSensor:
             BaselineSensorRequest(
                 payload=BaselineSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.pressure),
+                    sensor_id=SensorIdField(SensorId.S0),
                     sample_rate=UInt16Field(10),
                 )
             ),
@@ -80,6 +95,7 @@ def humidity_sensor() -> hdc2080.EnvironmentSensor:
             BaselineSensorRequest(
                 payload=BaselineSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.capacitive),
+                    sensor_id=SensorIdField(SensorId.S0),
                     sample_rate=UInt16Field(10),
                 )
             ),
@@ -91,7 +107,7 @@ async def test_polling(
 ) -> None:
     """Test that a polling function sends the expected message."""
     messenger = mock.AsyncMock(spec=CanMessenger)
-    await sensor.poll(messenger, node, 10)
+    await sensor.get_baseline(messenger, node, 10, 10)
     messenger.send.assert_called_once_with(node_id=node, message=message)
 
 
@@ -115,6 +131,7 @@ async def test_receive_data_polling(
             ReadFromSensorResponse(
                 payload=ReadFromSensorResponsePayload(
                     sensor_data=Int32Field(256),
+                    sensor_id=SensorIdField(SensorId.S0),
                     sensor=SensorTypeField(sensor._sensor_type),
                 )
             ),
@@ -129,7 +146,7 @@ async def test_receive_data_polling(
         )
 
     mock_messenger.send.side_effect = responder
-    return_data = await sensor.poll(mock_messenger, NodeId.pipette_left, 10)
+    return_data = await sensor.get_baseline(mock_messenger, NodeId.pipette_left, 10, 10)
     assert return_data == SensorDataType.build([0x0, 0x1, 0x0])
 
 
@@ -142,6 +159,7 @@ async def test_receive_data_polling(
             WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.pressure),
+                    sensor_id=SensorIdField(SensorId.S0),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
                     reg_address=UInt8Field(0x0),
                 )
@@ -153,6 +171,7 @@ async def test_receive_data_polling(
             WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.capacitive),
+                    sensor_id=SensorIdField(SensorId.S0),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
                     reg_address=UInt8Field(0x0),
                 )
@@ -164,6 +183,7 @@ async def test_receive_data_polling(
             WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.temperature),
+                    sensor_id=SensorIdField(SensorId.S0),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
                     reg_address=UInt8Field(0x0),
                 )
@@ -175,6 +195,7 @@ async def test_receive_data_polling(
             WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.humidity),
+                    sensor_id=SensorIdField(SensorId.S0),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
                     reg_address=UInt8Field(0x0),
                 )
@@ -201,6 +222,7 @@ async def test_write(
             ReadFromSensorRequest(
                 payload=ReadFromSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.pressure),
+                    sensor_id=SensorIdField(SensorId.S0),
                     offset_reading=UInt8Field(False),
                 )
             ),
@@ -211,6 +233,7 @@ async def test_write(
             ReadFromSensorRequest(
                 payload=ReadFromSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.capacitive),
+                    sensor_id=SensorIdField(SensorId.S0),
                     offset_reading=UInt8Field(False),
                 )
             ),
@@ -221,6 +244,7 @@ async def test_write(
             ReadFromSensorRequest(
                 payload=ReadFromSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.temperature),
+                    sensor_id=SensorIdField(SensorId.S0),
                     offset_reading=UInt8Field(False),
                 )
             ),
@@ -231,6 +255,7 @@ async def test_write(
             ReadFromSensorRequest(
                 payload=ReadFromSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.humidity),
+                    sensor_id=SensorIdField(SensorId.S0),
                     offset_reading=UInt8Field(False),
                 )
             ),
@@ -268,6 +293,7 @@ async def test_receive_data_read(
             ReadFromSensorResponse(
                 payload=ReadFromSensorResponsePayload(
                     sensor_data=Int32Field(256),
+                    sensor_id=SensorIdField(SensorId.S0),
                     sensor=SensorTypeField(sensor._sensor_type),
                 )
             ),
@@ -305,6 +331,8 @@ async def test_threshold(
                     payload=SensorThresholdResponsePayload(
                         threshold=message.payload.threshold,
                         sensor=SensorTypeField(sensor._sensor_type),
+                        sensor_id=SensorIdField(SensorId.S0),
+                        mode=message.payload.mode,
                     )
                 ),
                 ArbitrationId(
@@ -323,3 +351,176 @@ async def test_threshold(
         mock_messenger, NodeId.pipette_left, threshold, 10
     )
     assert return_data == threshold
+
+
+@pytest.mark.parametrize(
+    argnames=["node_id", "timeout", "sensor"],
+    argvalues=[
+        [NodeId.pipette_left, 1, lazy_fixture("pressure_sensor")],
+        [NodeId.pipette_left, 5, lazy_fixture("capacitive_sensor")],
+    ],
+)
+async def test_bind_to_sync(
+    mock_messenger: mock.AsyncMock,
+    can_message_notifier: MockCanMessageNotifier,
+    sensor: sensor_abc.AbstractAdvancedSensor,
+    node_id: NodeId,
+    timeout: int,
+) -> None:
+    """Test for bind_to_sync.
+
+    Tests that bind_to_sync does in fact
+    send out a BindSensorOutputRequest.
+    """
+    async with sensor.bind_output(
+        mock_messenger,
+        node_id,
+        SensorOutputBinding.sync,
+    ):
+        mock_messenger.send.assert_called_with(
+            node_id=node_id,
+            message=BindSensorOutputRequest(
+                payload=BindSensorOutputRequestPayload(
+                    sensor=SensorTypeField(sensor._sensor_type),
+                    sensor_id=SensorIdField(SensorId.S0),
+                    binding=SensorOutputBindingField(SensorOutputBinding.sync),
+                )
+            ),
+        )
+    mock_messenger.send.assert_called_with(
+        node_id=node_id,
+        message=BindSensorOutputRequest(
+            payload=BindSensorOutputRequestPayload(
+                sensor=SensorTypeField(sensor._sensor_type),
+                sensor_id=SensorIdField(SensorId.S0),
+                binding=SensorOutputBindingField(SensorOutputBinding.none),
+            )
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["sensor", "node_id", "timeout"],
+    argvalues=[
+        [lazy_fixture("capacitive_sensor"), NodeId.pipette_right, 10],
+        [lazy_fixture("pressure_sensor"), NodeId.pipette_left, 2],
+    ],
+)
+async def test_get_baseline(
+    mock_messenger: mock.AsyncMock,
+    can_message_notifier: MockCanMessageNotifier,
+    sensor: sensor_abc.AbstractAdvancedSensor,
+    node_id: NodeId,
+    timeout: int,
+) -> None:
+    """Test for get_baseline.
+
+    Tests that a BaselineSensorRequest gets sent,
+    and reads ReadFromSensorResponse message containing the
+    correct information.
+    """
+
+    def responder(node_id: NodeId, message: MessageDefinition) -> None:
+        """Message responder."""
+        if isinstance(message, BaselineSensorRequest):
+            can_message_notifier.notify(
+                ReadFromSensorResponse(
+                    payload=ReadFromSensorResponsePayload(
+                        sensor=SensorTypeField(sensor._sensor_type),
+                        sensor_id=SensorIdField(SensorId.S0),
+                        sensor_data=Int32Field(50),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=ReadFromSensorResponse.message_id,
+                        node_id=node_id,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
+
+    mock_messenger.send.side_effect = responder
+    baseline = await sensor.get_baseline(mock_messenger, node_id, 100, timeout)
+    assert baseline == SensorDataType.build(Int32Field(50))
+
+
+@pytest.mark.parametrize(
+    argnames=["sensor", "node_id", "timeout"],
+    argvalues=[
+        [lazy_fixture("capacitive_sensor"), NodeId.pipette_left, 2],
+        [lazy_fixture("pressure_sensor"), NodeId.pipette_right, 3],
+    ],
+)
+async def test_debug_poll(
+    mock_messenger: mock.AsyncMock,
+    sensor: sensor_abc.AbstractAdvancedSensor,
+    node_id: NodeId,
+    timeout: int,
+) -> None:
+    """Test for debug poll."""
+    async with sensor.bind_output(mock_messenger, node_id, SensorOutputBinding.report):
+        for i in range(2):
+            with patch.object(
+                sensor._scheduler,
+                "_wait_for_response",
+                new=AsyncMock(return_value=SensorDataType.build(50)),
+            ):
+
+                data = await sensor.get_report(node_id, mock_messenger, timeout)
+                assert data == SensorDataType.build(Int32Field(50))
+    mock_messenger.send.assert_called_with(
+        node_id=node_id,
+        message=BindSensorOutputRequest(
+            payload=BindSensorOutputRequestPayload(
+                sensor=SensorTypeField(sensor._sensor_type),
+                sensor_id=SensorIdField(SensorId.S0),
+                binding=SensorOutputBindingField(SensorOutputBinding.none),
+            )
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["sensor", "node_id", "timeout"],
+    argvalues=[
+        [lazy_fixture("capacitive_sensor"), NodeId.pipette_left, 2],
+        [lazy_fixture("pressure_sensor"), NodeId.pipette_right, 3],
+        [lazy_fixture("temperature_sensor"), NodeId.pipette_left, 2],
+        [lazy_fixture("humidity_sensor"), NodeId.pipette_right, 2],
+    ],
+)
+async def test_peripheral_status(
+    mock_messenger: mock.AsyncMock,
+    can_message_notifier: MockCanMessageNotifier,
+    sensor: sensor_abc.AbstractAdvancedSensor,
+    node_id: NodeId,
+    timeout: int,
+) -> None:
+    """Test for getting peripheral device status."""
+
+    def responder(node_id: NodeId, message: MessageDefinition) -> None:
+        """Message responder."""
+        if isinstance(message, PeripheralStatusRequest):
+            can_message_notifier.notify(
+                PeripheralStatusResponse(
+                    payload=PeripheralStatusResponsePayload(
+                        sensor=SensorTypeField(sensor._sensor_type),
+                        sensor_id=SensorIdField(SensorId.S0),
+                        status=UInt8Field(0x1),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=ReadFromSensorResponse.message_id,
+                        node_id=node_id,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
+
+    mock_messenger.send.side_effect = responder
+    status = await sensor.get_device_status(mock_messenger, node_id, timeout)
+    assert status

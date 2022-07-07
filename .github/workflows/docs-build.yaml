@@ -54,8 +54,6 @@ jobs:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - name: 'Setup Docs'
-        run: sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended libsystemd-dev latexmk texlive-lang-greek
       - name: 'Build docs'
         run: |
           make -C api docs
@@ -63,6 +61,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
         uses: './.github/actions/webstack/deploy-to-sandbox'
         with:
           domain: 'docs.opentrons.com'

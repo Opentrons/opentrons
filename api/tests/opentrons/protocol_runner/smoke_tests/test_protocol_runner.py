@@ -42,9 +42,9 @@ async def test_runner_with_python(
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)
     commands_result = result.commands
-    pipettes_result = result.pipettes
-    labware_result = result.labware
-    modules_result = result.modules
+    pipettes_result = result.state_summary.pipettes
+    labware_result = result.state_summary.labware
+    modules_result = result.state_summary.modules
 
     pipette_id_captor = matchers.Captor()
     labware_id_captor = matchers.Captor()
@@ -70,7 +70,6 @@ async def test_runner_with_python(
         id=matchers.IsA(str),
         model=ModuleModel.TEMPERATURE_MODULE_V1,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-        definition=tempdeck_v1_def,
         serialNumber=matchers.IsA(str),
     )
 
@@ -107,8 +106,8 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)
     commands_result = result.commands
-    pipettes_result = result.pipettes
-    labware_result = result.labware
+    pipettes_result = result.state_summary.pipettes
+    labware_result = result.state_summary.labware
 
     expected_pipette = LoadedPipette(
         id="pipette-id",
@@ -160,8 +159,8 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
     result = await subject.run(protocol_source)
 
     commands_result = result.commands
-    pipettes_result = result.pipettes
-    labware_result = result.labware
+    pipettes_result = result.state_summary.pipettes
+    labware_result = result.state_summary.labware
 
     pipette_id_captor = matchers.Captor()
     labware_id_captor = matchers.Captor()
@@ -215,8 +214,8 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
     result = await subject.run(protocol_source)
 
     commands_result = result.commands
-    pipettes_result = result.pipettes
-    labware_result = result.labware
+    pipettes_result = result.state_summary.pipettes
+    labware_result = result.state_summary.labware
 
     pipette_id_captor = matchers.Captor()
     labware_id_captor = matchers.Captor()

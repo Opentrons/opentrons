@@ -6,7 +6,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { i18n } from '../../../../i18n'
-import { getLabwareLocation } from '../../../../organisms/ProtocolSetup/utils/getLabwareLocation'
+import { getLabwareLocation } from '../../ProtocolRun/utils/getLabwareLocation'
 import {
   useLabwareRenderInfoForRunById,
   useProtocolDetailsForRun,
@@ -17,7 +17,7 @@ import { StepText } from '../StepText'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command'
 
 jest.mock('@opentrons/shared-data/js/helpers')
-jest.mock('../../../../organisms/ProtocolSetup/utils/getLabwareLocation')
+jest.mock('../../ProtocolRun/utils/getLabwareLocation')
 jest.mock('../../hooks')
 jest.mock('./../RunLogProtocolSetupInfo')
 
@@ -73,6 +73,16 @@ const MOCK_PAUSE_COMMAND: RunTimeCommand = {
   completedAt: 'end timestamp',
 } as any
 
+const MOCK_WAIT_FOR_RESUME_COMMAND: RunTimeCommand = {
+  id: '1234',
+  commandType: 'waitForResume',
+  params: { message: 'THIS IS THE PAUSE MESSAGE' },
+  status: 'running',
+  result: {},
+  startedAt: 'start timestamp',
+  completedAt: 'end timestamp',
+} as any
+
 const MOCK_LOAD_COMMAND = {
   id: '1234',
   commandType: 'loadModule',
@@ -117,6 +127,16 @@ describe('StepText', () => {
       runId: RUN_ID,
       analysisCommand: null,
       runCommand: MOCK_PAUSE_COMMAND as RunCommandSummary,
+    })
+    getByText('THIS IS THE PAUSE MESSAGE')
+  })
+
+  it('renders correct command text for wait for resume commands', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: MOCK_WAIT_FOR_RESUME_COMMAND as RunCommandSummary,
     })
     getByText('THIS IS THE PAUSE MESSAGE')
   })

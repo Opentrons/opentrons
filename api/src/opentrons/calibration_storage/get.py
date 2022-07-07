@@ -355,3 +355,27 @@ def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinitio
             "pipette offset with this tiprack before performing calibration "
             "health check."
         )
+
+
+def get_gripper_calibration_offset(
+    gripper_id: str,
+) -> typing.Optional[local_types.GripperCalibrationOffset]:
+    gripper_dir = config.get_opentrons_path("gripper_calibration_dir")
+    offset_path = gripper_dir / f"{gripper_id}.json"
+    if offset_path.exists():
+        try:
+            data = io.read_cal_file(offset_path)
+        except json.JSONDecodeError:
+            log.error(
+                f"Skipping corrupt calibration file (bad json): {str(offset_path)}"
+            )
+            return None
+        assert "offset" in data.keys(), "Not valid gripper calibration data"
+        return local_types.GripperCalibrationOffset(
+            offset=data["offset"],
+            source=_get_calibration_source(data),
+            last_modified=data["last_modified"],
+            status=_get_calibration_status(data),
+        )
+    else:
+        return None

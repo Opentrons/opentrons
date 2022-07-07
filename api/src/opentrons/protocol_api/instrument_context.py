@@ -167,7 +167,7 @@ class InstrumentContext(CommandPublisher):
             a location, specify it as a keyword argument:
             ``instr.aspirate(location=wellplate['A1'])``
 
-        """  # noqa: E501
+        """
         logger.debug(
             "aspirate {} from {} at {}".format(
                 volume, location if location else "current position", rate
@@ -282,7 +282,7 @@ class InstrumentContext(CommandPublisher):
             a location, specify it as a keyword argument:
             ``instr.dispense(location=wellplate['A1'])``
 
-        """  # noqa: E501
+        """
         logger.debug(
             "dispense {} from {} at {}".format(
                 volume, location if location else "current position", rate
@@ -1210,7 +1210,7 @@ class InstrumentContext(CommandPublisher):
                 broker=self.broker,
                 command=cmds.move_to(
                     instrument=self,
-                    location=location or self._ctx.location_cache,  # type: ignore[arg-type]  # noqa: E501
+                    location=location or self._ctx.location_cache,  # type: ignore[arg-type]
                 ),
             )
 

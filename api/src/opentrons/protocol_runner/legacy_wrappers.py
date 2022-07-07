@@ -8,12 +8,13 @@ from opentrons_shared_data.labware.dev_types import (
 
 from opentrons.calibration_storage.helpers import uri_from_details
 
-from opentrons.hardware_control import SyncHardwareAPI, HardwareControlAPI
+from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import (
     ModuleModel as LegacyModuleModel,
     TemperatureModuleModel as LegacyTemperatureModuleModel,
     MagneticModuleModel as LegacyMagneticModuleModel,
     ThermocyclerModuleModel as LegacyThermocyclerModuleModel,
+    HeaterShakerModuleModel as LegacyHeaterShakerModuleModel,
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.context.protocol_api.protocol_context import (
@@ -70,7 +71,7 @@ class LegacyFileReader:
     def read(protocol_source: ProtocolSource) -> LegacyProtocol:
         """Read a PAPIv2 protocol into a datastructure."""
         protocol_file_path = protocol_source.main_file
-        protocol_contents = protocol_file_path.read_text()
+        protocol_contents = protocol_file_path.read_text(encoding="utf-8")
 
         return parse(
             protocol_file=protocol_contents,
@@ -129,7 +130,7 @@ class LegacyContextCreator:
 
 
 class LegacySimulatingContextCreator(LegacyContextCreator):
-    """Interface to construct PAPIv2 contexts using simlulating implementations.
+    """Interface to construct PAPIv2 contexts using simulating implementations.
 
     Avoids some calls to the hardware API for performance.
     See `opentrons.protocols.context.simulator`.
@@ -141,18 +142,9 @@ class LegacySimulatingContextCreator(LegacyContextCreator):
 class LegacyExecutor:
     """Interface to execute Protocol API v2 protocols in a child thread."""
 
-    def __init__(self, hardware_api: HardwareControlAPI) -> None:
-        self._hardware_api = hardware_api
-
-    async def execute(
-        self,
-        protocol: LegacyProtocol,
-        context: LegacyProtocolContext,
-    ) -> None:
+    @staticmethod
+    async def execute(protocol: LegacyProtocol, context: LegacyProtocolContext) -> None:
         """Execute a PAPIv2 protocol with a given ProtocolContext in a child thread."""
-        # NOTE: this initial home is to match the previous behavior of the
-        # RPC session, which called `ctx.home` before calling `run_protocol`
-        await self._hardware_api.home()
         await to_thread.run_sync(run_protocol, protocol, context)
 
 
@@ -175,6 +167,7 @@ __all__ = [
     "LegacyMagneticModuleModel",
     "LegacyTemperatureModuleModel",
     "LegacyThermocyclerModuleModel",
+    "LegacyHeaterShakerModuleModel",
     # legacy typed dicts
     "LegacyLabwareDefinition",
 ]

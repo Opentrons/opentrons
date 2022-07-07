@@ -15,6 +15,7 @@ import {
   BORDERS,
   RobotWorkSpace,
 } from '@opentrons/components'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import heaterShaker from '@opentrons/app/src/assets/images/heater_shaker_empty.png'
 import flatBottom from '@opentrons/app/src/assets/images/flatbottom_thermal_adapter.png'
@@ -25,6 +26,7 @@ import screwdriver from '@opentrons/app/src/assets/images/t10_torx_screwdriver.p
 
 import type {
   LabwareDefinition2,
+  ModuleModel,
   ThermalAdapterName,
 } from '@opentrons/shared-data'
 
@@ -97,6 +99,7 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
 interface IntroductionProps {
   labwareDefinition: LabwareDefinition2 | null
   thermalAdapterName: ThermalAdapterName | null
+  moduleModel: ModuleModel
 }
 
 const THERMAL_ADAPTER_TRANSFORM = css`
@@ -207,7 +210,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
         >
           <IntroItem
             image={<img src={heaterShaker} alt={'heater_shaker_image'} />}
-            text={t('heater_shaker_mod')}
+            text={getModuleDisplayName(props.moduleModel)}
           />
         </Flex>
         <Flex

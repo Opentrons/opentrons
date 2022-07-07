@@ -12,11 +12,13 @@ from .fields import (
     FirmwareUpdateDataField,
     ErrorCodeField,
     SensorTypeField,
+    SensorIdField,
     PipetteNameField,
-    PipetteSerialField,
-    GripperSerialField,
     SensorOutputBindingField,
     EepromDataField,
+    SerialField,
+    SensorThresholdModeField,
+    PipetteTipActionTypeField,
 )
 from .. import utils
 
@@ -74,7 +76,7 @@ class GetSpeedResponsePayload(utils.BinarySerializable):
 class EEPromReadPayload(utils.BinarySerializable):
     """Eeprom read request payload ."""
 
-    address: utils.UInt8Field
+    address: utils.UInt16Field
     data_length: utils.UInt8Field
 
 
@@ -288,84 +290,84 @@ class GetLimitSwitchResponse(utils.BinarySerializable):
 
 
 @dataclass
-class ReadFromSensorRequestPayload(utils.BinarySerializable):
+class SensorPayload(utils.BinarySerializable):
     """Take a single reading from a sensor request payload."""
 
     sensor: SensorTypeField
+    sensor_id: SensorIdField
+
+
+@dataclass
+class ReadFromSensorRequestPayload(SensorPayload):
+    """Take a single reading from a sensor request payload."""
+
     offset_reading: utils.UInt8Field
 
 
 @dataclass
-class WriteToSensorRequestPayload(utils.BinarySerializable):
+class WriteToSensorRequestPayload(SensorPayload):
     """Write a piece of data to a sensor request payload."""
 
-    sensor: SensorTypeField
     data: utils.UInt32Field
     reg_address: utils.UInt8Field
 
 
 @dataclass
-class BaselineSensorRequestPayload(utils.BinarySerializable):
+class BaselineSensorRequestPayload(SensorPayload):
     """Take a specified amount of readings from a sensor request payload."""
 
-    sensor: SensorTypeField
     sample_rate: utils.UInt16Field
 
 
 @dataclass
-class ReadFromSensorResponsePayload(utils.BinarySerializable):
+class ReadFromSensorResponsePayload(SensorPayload):
     """A response for either a single reading or an averaged reading of a sensor."""
 
-    sensor: SensorTypeField
     sensor_data: utils.Int32Field
 
 
 @dataclass
-class SetSensorThresholdRequestPayload(utils.BinarySerializable):
+class SetSensorThresholdRequestPayload(SensorPayload):
     """A request to set the threshold value of a sensor."""
 
-    sensor: SensorTypeField
     threshold: utils.Int32Field
+    mode: SensorThresholdModeField
 
 
 @dataclass
-class SensorThresholdResponsePayload(utils.BinarySerializable):
+class SensorThresholdResponsePayload(SensorPayload):
     """A response that sends back the current threshold value of the sensor."""
 
-    sensor: SensorTypeField
     threshold: utils.Int32Field
+    mode: SensorThresholdModeField
 
 
 @dataclass
-class SensorDiagnosticRequestPayload(utils.BinarySerializable):
+class SensorDiagnosticRequestPayload(SensorPayload):
     """A response that sends back the current threshold value of the sensor."""
 
-    sensor: SensorTypeField
     reg_address: utils.UInt8Field
 
 
 @dataclass
-class SensorDiagnosticResponsePayload(utils.BinarySerializable):
+class SensorDiagnosticResponsePayload(SensorPayload):
     """A response that sends back the current threshold value of the sensor."""
 
-    sensor: SensorTypeField
     reg_address: utils.UInt8Field
     data: utils.UInt32Field
 
 
 @dataclass
-class BindSensorOutputRequestPayload(utils.BinarySerializable):
+class BindSensorOutputRequestPayload(SensorPayload):
     """A request to link a GPIO pin output to a sensor threshold."""
 
-    sensor: SensorTypeField
     binding: SensorOutputBindingField
 
 
 @dataclass
-class BindSensorOutputResponsePayload(utils.BinarySerializable):
+class BindSensorOutputResponsePayload(SensorPayload):
     """A response that sends back the current binding for a sensor."""
 
-    sensor: SensorTypeField
     binding: SensorOutputBindingField
 
 
@@ -373,9 +375,9 @@ class BindSensorOutputResponsePayload(utils.BinarySerializable):
 class PipetteInfoResponsePayload(utils.BinarySerializable):
     """A response carrying data about an attached pipette."""
 
-    pipette_name: PipetteNameField
-    pipette_model: utils.UInt16Field
-    pipette_serial: PipetteSerialField
+    name: PipetteNameField
+    model: utils.UInt16Field
+    serial: SerialField
 
 
 @dataclass
@@ -397,8 +399,8 @@ class BrushedMotorPwmPayload(utils.BinarySerializable):
 class GripperInfoResponsePayload(utils.BinarySerializable):
     """A response carrying data about an attached gripper."""
 
-    gripper_model: utils.UInt16Field
-    gripper_serial: GripperSerialField
+    model: utils.UInt16Field
+    serial: SerialField
 
 
 @dataclass
@@ -414,10 +416,27 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     """A request to perform a tip action."""
 
     velocity: utils.Int32Field
+    action: PipetteTipActionTypeField
+    request_stop_condition: utils.UInt8Field
 
 
 @dataclass
-class TipActionResponsePayload(MoveGroupResponsePayload):
+class TipActionResponsePayload(MoveCompletedPayload):
     """A response that sends back whether tip action was successful."""
 
+    action: PipetteTipActionTypeField
     success: utils.UInt8Field
+
+
+@dataclass
+class PeripheralStatusResponsePayload(SensorPayload):
+    """A response that sends back the initialization status of a peripheral device."""
+
+    status: utils.UInt8Field
+
+
+@dataclass
+class SerialNumberPayload(utils.BinarySerializable):
+    """A payload with a serial number."""
+
+    serial: SerialField

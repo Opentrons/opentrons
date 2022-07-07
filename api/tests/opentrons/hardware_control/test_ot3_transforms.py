@@ -2,7 +2,7 @@ import pytest
 from unittest import mock
 from opentrons import types
 from opentrons.hardware_control import ot3api
-from opentrons.hardware_control.types import OT3Axis
+from opentrons.hardware_control.types import OT3Axis, OT3Mount
 from opentrons_shared_data.pipette import name_for_model
 
 
@@ -21,6 +21,7 @@ async def test_transforms_roundtrip(pipette_model):
             "id": pipette_model + "_idididid_right",
             "name": name_for_model(pipette_model),
         },
+        OT3Mount.GRIPPER: None,
     }
     sim = await ot3api.OT3API.build_hardware_simulator(attached_instruments=attached)
     target = types.Point(20, 30, 40)

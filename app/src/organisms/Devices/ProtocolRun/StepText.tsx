@@ -8,7 +8,7 @@ import {
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
-import { getLabwareLocation } from '../../../organisms/ProtocolSetup/utils/getLabwareLocation'
+import { getLabwareLocation } from '../ProtocolRun/utils/getLabwareLocation'
 import {
   useLabwareRenderInfoForRunById,
   useProtocolDetailsForRun,
@@ -120,7 +120,8 @@ export function StepText(props: Props): JSX.Element | null {
       )
       break
     }
-    case 'pause': {
+    case 'pause':
+    case 'waitForResume': {
       messageNode = displayCommand.params?.message ?? displayCommand.commandType
       break
     }

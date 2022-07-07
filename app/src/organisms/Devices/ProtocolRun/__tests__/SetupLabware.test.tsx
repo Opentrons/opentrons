@@ -3,7 +3,6 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   renderWithProviders,
   componentPropsMatcher,
@@ -19,24 +18,25 @@ import {
   ModuleType,
 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 
 import { i18n } from '../../../../i18n'
 import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'
 import { LabwarePositionCheck } from '../../../LabwarePositionCheck'
 import { ModuleExtraAttention } from '../ModuleExtraAttention'
-import { LabwareInfoOverlay } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay'
+import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
-import { useRunStatus } from '../../../RunTimeControl/hooks'
 import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
   useRunCalibrationStatus,
+  useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
+import { ProceedToRunButton } from '../ProceedToRunButton'
 import { SetupLabware } from '../SetupLabware'
 
 jest.mock('@opentrons/components', () => {
@@ -59,7 +59,7 @@ jest.mock('../../../ProtocolSetup/hooks')
 jest.mock('../../../ProtocolSetup/LabwareOffsetSuccessToast')
 jest.mock('../../../LabwarePositionCheck')
 jest.mock('../ModuleExtraAttention')
-jest.mock('../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareInfoOverlay')
+jest.mock('../LabwareInfoOverlay')
 jest.mock('../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal')
 jest.mock(
   '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
@@ -67,6 +67,7 @@ jest.mock(
 jest.mock('../../../RunTimeControl/hooks')
 jest.mock('../../../../redux/config')
 jest.mock('../../hooks')
+jest.mock('../ProceedToRunButton')
 
 const mockLabwareInfoOverlay = LabwareInfoOverlay as jest.MockedFunction<
   typeof LabwareInfoOverlay
@@ -101,8 +102,8 @@ const mockUseModuleRenderInfoForProtocolById = useModuleRenderInfoForProtocolByI
 const mockLabwarePostionCheck = LabwarePositionCheck as jest.MockedFunction<
   typeof LabwarePositionCheck
 >
-const mockUseRunStatus = useRunStatus as jest.MockedFunction<
-  typeof useRunStatus
+const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
+  typeof useRunHasStarted
 >
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
@@ -118,6 +119,9 @@ const mockGetIsLabwareOffsetCodeSnippetsOn = getIsLabwareOffsetCodeSnippetsOn as
 >
 const mockUseLPCSuccessToast = useLPCSuccessToast as jest.MockedFunction<
   typeof useLPCSuccessToast
+>
+const mockProceedToRunButton = ProceedToRunButton as jest.MockedFunction<
+  typeof ProceedToRunButton
 >
 const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
@@ -189,6 +193,8 @@ const render = () => {
         protocolRunHeaderRef={null}
         robotName={ROBOT_NAME}
         runId={RUN_ID}
+        nextStep={null}
+        expandStep={() => null}
       />
     </StaticRouter>,
     {
@@ -279,7 +285,7 @@ describe('LabwareSetup', () => {
       .mockReturnValue({
         complete: true,
       })
-    when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -309,6 +315,9 @@ describe('LabwareSetup', () => {
         },
       } as any)
     when(mockGetIsLabwareOffsetCodeSnippetsOn).mockReturnValue(false)
+    when(mockProceedToRunButton).mockReturnValue(
+      <button>Mock ProceedToRunButton</button>
+    )
   })
 
   afterEach(() => {
@@ -455,10 +464,8 @@ describe('LabwareSetup', () => {
     fireEvent.click(button)
     getByText('mock Labware Position Check')
   })
-  it('should render a disabled button when a run has been started', () => {
-    when(mockUseRunStatus)
-      .calledWith(RUN_ID)
-      .mockReturnValue(RUN_STATUS_RUNNING)
+  it('should render a disabled LPC button when a run has started', () => {
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
     const { getByRole, queryByText } = render()
     const button = getByRole('button', {
       name: 'run labware position check',
@@ -532,7 +539,19 @@ describe('LabwareSetup', () => {
     fireEvent.click(button)
     expect(mockSetIsShowingLPCSuccessToast).toHaveBeenCalledWith(false)
   })
-  it('should render a disabled button when a protocol without a pipette AND without a labware is uploaded', () => {
+  it('should render a disabled LPC button when a robot-side protocol analysis is not complete', () => {
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        protocolData: null,
+      } as any)
+    const { getByRole } = render()
+    const button = getByRole('button', {
+      name: 'run labware position check',
+    })
+    expect(button).toBeDisabled()
+  })
+  it('should render a disabled LPC button when a protocol without a pipette AND without a labware is uploaded', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -544,7 +563,7 @@ describe('LabwareSetup', () => {
     })
     expect(button).toBeDisabled()
   })
-  it('should render a disabled button when robot calibration is incomplete', () => {
+  it('should render a disabled LPC button when robot calibration is incomplete', () => {
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({
@@ -556,7 +575,7 @@ describe('LabwareSetup', () => {
     })
     expect(button).toBeDisabled()
   })
-  it('should render a disabled button when modules are not connected', () => {
+  it('should render a disabled LPC button when modules are not connected', () => {
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({
@@ -569,7 +588,7 @@ describe('LabwareSetup', () => {
     })
     expect(button).toBeDisabled()
   })
-  it('should render a disabled button when modules are not connected and robot calibration is incomplete', () => {
+  it('should render a disabled LPC button when modules are not connected and robot calibration is incomplete', () => {
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({
@@ -587,7 +606,7 @@ describe('LabwareSetup', () => {
     })
     expect(button).toBeDisabled()
   })
-  it('should render a disabled button when a protocol does not load a tip rack', () => {
+  it('should render a disabled LPC button when a protocol does not load a tip rack', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -616,7 +635,7 @@ describe('LabwareSetup', () => {
     })
     expect(button).toBeDisabled()
   })
-  it('should render a disabled button when a protocol does not include a pickUpTip', () => {
+  it('should render a disabled LPC button when a protocol does not include a pickUpTip', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -655,6 +674,12 @@ describe('LabwareSetup', () => {
     fireEvent.click(getOffsetDataLink)
     getByRole('button', {
       name: 'Jupyter Notebook',
+    })
+  })
+  it('should render a proceed to run button', () => {
+    const { getByRole } = render()
+    getByRole('button', {
+      name: 'Mock ProceedToRunButton',
     })
   })
 })

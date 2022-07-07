@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { act } from 'react-dom/test-utils'
+
 import { renderWithProviders } from '@opentrons/components'
+
 import { i18n } from '../../../i18n'
 import { getScanning, getViewableRobots } from '../../../redux/discovery'
 import { getConfig } from '../../../redux/config'
 import { ConnectRobotSlideout } from '../ConnectRobotSlideout'
-
-import type { ConnectRobotSlideoutProps } from '../ConnectRobotSlideout'
 
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/config')
@@ -61,7 +61,7 @@ describe('ConnectRobotSlideout', () => {
       checkIpAndHostname: jest.fn(),
       isExpanded: true,
       onCloseClick: jest.fn(),
-    } as ConnectRobotSlideoutProps
+    } as React.ComponentProps<typeof ConnectRobotSlideout>
   })
 
   afterEach(() => {
@@ -95,7 +95,7 @@ describe('ConnectRobotSlideout', () => {
   it('renders the link and it has the correct href attribute', () => {
     const { getByText } = render(props)
     const targetLink =
-      'https://support.opentrons.com/en/articles/2934336-manually-adding-a-robot-s-ip-address'
+      'https://support.opentrons.com/s/article/Manually-adding-a-robot-s-IP-address'
     const link = getByText('Learn more about connecting a robot manually')
     expect(link.closest('a')).toHaveAttribute('href', targetLink)
   })

@@ -4,12 +4,10 @@ from typing import Dict, Optional
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
+from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
 from .resources import ModelUtils, ModuleDataProvider
-from .commands import (
-    Command,
-    CommandCreate,
-)
+from .commands import Command, CommandCreate
 from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel
 from .execution import (
     QueueWorker,
@@ -62,6 +60,7 @@ class ProtocolEngine:
         This constructor does not inject provider implementations.
         Prefer the `create_protocol_engine()` factory function.
         """
+        self._hardware_api = hardware_api
         self._state_store = state_store
         self._model_utils = model_utils or ModelUtils()
 
@@ -103,19 +102,26 @@ class ProtocolEngine:
 
     def play(self) -> None:
         """Start or resume executing commands in the queue."""
+        requested_at = self._model_utils.get_timestamp()
         # TODO(mc, 2021-08-05): if starting, ensure plungers motors are
         # homed if necessary
-        action = PlayAction()
-        self._state_store.commands.raise_if_paused_by_blocking_door()
-        self._state_store.commands.raise_if_stop_requested()
+        action = self._state_store.commands.validate_action_allowed(
+            PlayAction(requested_at=requested_at)
+        )
         self._action_dispatcher.dispatch(action)
-        self._queue_worker.start()
+
+        if self._state_store.commands.get_is_door_blocking():
+            self._hardware_api.pause(HardwarePauseType.PAUSE)
+        else:
+            self._hardware_api.resume(HardwarePauseType.PAUSE)
 
     def pause(self) -> None:
         """Pause executing commands in the queue."""
-        action = PauseAction(source=PauseSource.CLIENT)
-        self._state_store.commands.raise_if_stop_requested()
+        action = self._state_store.commands.validate_action_allowed(
+            PauseAction(source=PauseSource.CLIENT)
+        )
         self._action_dispatcher.dispatch(action)
+        self._hardware_api.pause(HardwarePauseType.PAUSE)
 
     def add_command(self, request: CommandCreate) -> Command:
         """Add a command to the `ProtocolEngine`'s queue.
@@ -126,15 +132,22 @@ class ProtocolEngine:
 
         Returns:
             The full, newly queued command.
+
+        Raises:
+            SetupCommandNotAllowed: the request specified a setup command,
+                but the engine was not idle or paused.
         """
         command_id = self._model_utils.generate_id()
-        action = QueueCommandAction(
-            request=request,
-            command_id=command_id,
-            # TODO(mc, 2021-12-13): generate a command key from params and state
-            # https://github.com/Opentrons/opentrons/issues/8986
-            command_key=command_id,
-            created_at=self._model_utils.get_timestamp(),
+
+        action = self.state_view.commands.validate_action_allowed(
+            QueueCommandAction(
+                request=request,
+                command_id=command_id,
+                # TODO(mc, 2021-12-13): generate a command key from params and state
+                # https://github.com/Opentrons/opentrons/issues/8986
+                command_key=command_id,
+                created_at=self._model_utils.get_timestamp(),
+            )
         )
         self._action_dispatcher.dispatch(action)
         return self._state_store.commands.get(command_id)
@@ -171,15 +184,16 @@ class ProtocolEngine:
         After a `stop`, you must still call `finish` to give the engine a chance
         to clean up resources and propagate errors.
         """
-        self._state_store.commands.raise_if_stop_requested()
-        self._action_dispatcher.dispatch(StopAction())
+        action = self._state_store.commands.validate_action_allowed(StopAction())
+        self._action_dispatcher.dispatch(action)
         self._queue_worker.cancel()
         await self._hardware_stopper.do_halt()
 
     async def wait_until_complete(self) -> None:
         """Wait until there are no more commands to execute.
 
-        This will happen if all commands are executed or if one command fails.
+        Raises:
+            CommandExecutionFailedError: if any protocol command failed.
         """
         await self._state_store.wait_for(
             condition=self._state_store.commands.get_all_complete
@@ -234,7 +248,10 @@ class ProtocolEngine:
 
             await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
 
-            self._action_dispatcher.dispatch(HardwareStoppedAction())
+            completed_at = self._model_utils.get_timestamp()
+            self._action_dispatcher.dispatch(
+                HardwareStoppedAction(completed_at=completed_at)
+            )
             await self._plugin_starter.stop()
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
@@ -276,6 +293,7 @@ class ProtocolEngine:
                 definition=self._module_data_provider.get_definition(
                     ModuleModel(mod.model())
                 ),
+                module_live_data=mod.live_data,
             )
             for module_id, mod in modules_by_id.items()
         ]

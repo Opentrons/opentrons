@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
+from functools import lru_cache
 from logging import getLogger
 from pathlib import Path
 from typing import Dict, List, Optional, Set
@@ -11,7 +12,15 @@ from anyio import Path as AsyncPath, create_task_group
 import sqlalchemy
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
-from robot_server.persistence import analysis_table, protocol_table, ensure_utc_datetime
+from robot_server.persistence import (
+    analysis_table,
+    protocol_table,
+    run_table,
+    sqlite_rowid,
+)
+
+
+_CACHE_ENTRIES = 32
 
 
 _log = getLogger(__name__)
@@ -27,12 +36,37 @@ class ProtocolResource:
     protocol_key: Optional[str]
 
 
+@dataclass(frozen=True)
+class ProtocolUsageInfo:
+    """Information about whether a particular protocol is being used by any runs.
+
+    See `ProtocolStore.get_usage_info()`.
+    """
+
+    protocol_id: str
+    """This protocol's ID."""
+
+    is_used_by_run: bool
+    """Whether any currently existing run uses this protocol.
+
+    A protocol counts as "used" even if the run that uses it is no longer active.
+    """
+
+
 class ProtocolNotFoundError(KeyError):
     """Error raised when a protocol ID was not found in the store."""
 
     def __init__(self, protocol_id: str) -> None:
-        """Initialize the error message from the missing ID."""
         super().__init__(f"Protocol {protocol_id} was not found.")
+
+
+class ProtocolUsedByRunError(ValueError):
+    """Error raised if a protocol can't be deleted because it's used by a run."""
+
+    def __init__(self, protocol_id: str) -> None:
+        super().__init__(
+            f"Protocol {protocol_id} is used by a run and cannot be deleted."
+        )
 
 
 class SubdirectoryMissingError(Exception):
@@ -134,7 +168,9 @@ class ProtocolStore:
             )
         )
         self._sources_by_id[resource.protocol_id] = resource.source
+        self._clear_caches()
 
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get(self, protocol_id: str) -> ProtocolResource:
         """Get a single protocol by ID.
 
@@ -149,6 +185,7 @@ class ProtocolStore:
             source=self._sources_by_id[sql_resource.protocol_id],
         )
 
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def get_all(self) -> List[ProtocolResource]:
         """Get all protocols currently saved in this store."""
         all_sql_resources = self._sql_get_all()
@@ -162,6 +199,7 @@ class ProtocolStore:
             for r in all_sql_resources
         ]
 
+    @lru_cache(maxsize=_CACHE_ENTRIES)
     def has(self, protocol_id: str) -> bool:
         """Check for the presence of a protocol ID in the store."""
         statement = sqlalchemy.select(protocol_table).where(
@@ -173,7 +211,7 @@ class ProtocolStore:
 
         return result is not None
 
-    def remove(self, protocol_id: str) -> ProtocolResource:
+    def remove(self, protocol_id: str) -> None:
         """Remove a `ProtocolResource` from the store.
 
         After removing it from the store, attempt to delete all files that it
@@ -184,11 +222,13 @@ class ProtocolStore:
             Note that the files it refers to will no longer exist.
 
         Raises:
-            ProtocolNotFoundError
+            ProtocolNotFoundError: the given protocol ID was not in the store
+            ProtocolUsedByRunError: the protocol could not be deleted because
+                there is a run currently referencing the protocol.
         """
-        deleted_sql_resource = self._sql_remove(protocol_id=protocol_id)
-        deleted_source = self._sources_by_id.pop(protocol_id)
+        self._sql_remove(protocol_id=protocol_id)
 
+        deleted_source = self._sources_by_id.pop(protocol_id)
         protocol_dir = deleted_source.directory
 
         for source_file in deleted_source.files:
@@ -196,12 +236,45 @@ class ProtocolStore:
         if protocol_dir:
             protocol_dir.rmdir()
 
-        return ProtocolResource(
-            protocol_id=protocol_id,
-            created_at=deleted_sql_resource.created_at,
-            protocol_key=deleted_sql_resource.protocol_key,
-            source=deleted_source,
+        self._clear_caches()
+
+    # Note that this is NOT cached like the other getters because we would need
+    # to invalidate the cache whenever the runs table changes, which is not something
+    # that this class can easily monitor.
+    def get_usage_info(self) -> List[ProtocolUsageInfo]:
+        """Return information about which protocols are currently being used by runs.
+
+        See the `runs` module for information about runs.
+
+        Results are ordered with the oldest-added protocol first.
+        """
+        select_all_protocol_ids = sqlalchemy.select(protocol_table.c.id).order_by(
+            sqlite_rowid
         )
+        select_used_protocol_ids = sqlalchemy.select(run_table.c.protocol_id).where(
+            run_table.c.protocol_id.is_not(None)
+        )
+
+        with self._sql_engine.begin() as transaction:
+            all_protocol_ids: List[str] = (
+                transaction.execute(select_all_protocol_ids).scalars().all()
+            )
+            used_protocol_ids: Set[str] = set(
+                transaction.execute(select_used_protocol_ids).scalars().all()
+            )
+
+        # It's probably inefficient to do this processing in Python
+        # instead of as part of the SQL query.
+        # But the number of runs and protocols is on the order of 20, so it's fine.
+        usage_info = [
+            ProtocolUsageInfo(
+                protocol_id=protocol_id,
+                is_used_by_run=(protocol_id in used_protocol_ids),
+            )
+            for protocol_id in all_protocol_ids
+        ]
+
+        return usage_info
 
     def _sql_insert(self, resource: _DBProtocolResource) -> None:
         statement = sqlalchemy.insert(protocol_table).values(
@@ -233,24 +306,15 @@ class ProtocolStore:
             all_rows = transaction.execute(statement).all()
         return [_convert_sql_row_to_dataclass(sql_row=row) for row in all_rows]
 
-    def _sql_remove(self, protocol_id: str) -> _DBProtocolResource:
-        select_statement = sqlalchemy.select(protocol_table).where(
-            protocol_table.c.id == protocol_id
-        )
+    def _sql_remove(self, protocol_id: str) -> None:
         delete_analyses_statement = sqlalchemy.delete(analysis_table).where(
             analysis_table.c.protocol_id == protocol_id
         )
         delete_protocol_statement = sqlalchemy.delete(protocol_table).where(
             protocol_table.c.id == protocol_id
         )
-        with self._sql_engine.begin() as transaction:
-            try:
-                # SQLite <3.35.0 doesn't support the RETURNING clause,
-                # so we do it ourselves with a separate SELECT.
-                row_to_delete = transaction.execute(select_statement).one()
-            except sqlalchemy.exc.NoResultFound as e:
-                raise ProtocolNotFoundError(protocol_id=protocol_id) from e
 
+        with self._sql_engine.begin() as transaction:
             # TODO(mm, 2022-04-28): Deleting analyses from the table is enough to
             # avoid a SQL foreign key conflict. But, if this protocol had any *pending*
             # analyses, they'll be left behind in the AnalysisStore, orphaned,
@@ -260,12 +324,19 @@ class ProtocolStore:
             #
             # * Merge the Store classes or otherwise give them access to each other.
             # * Switch from SQLAlchemy Core to ORM and use cascade deletes.
-            transaction.execute(delete_analyses_statement)
+            try:
+                transaction.execute(delete_analyses_statement)
+                result = transaction.execute(delete_protocol_statement)
+            except sqlalchemy.exc.IntegrityError as e:
+                raise ProtocolUsedByRunError(protocol_id=protocol_id) from e
 
-            transaction.execute(delete_protocol_statement)
+        if result.rowcount < 1:
+            raise ProtocolNotFoundError(protocol_id=protocol_id)
 
-        deleted_resource = _convert_sql_row_to_dataclass(sql_row=row_to_delete)
-        return deleted_resource
+    def _clear_caches(self) -> None:
+        self.get.cache_clear()
+        self.get_all.cache_clear()
+        self.has.cache_clear()
 
 
 # TODO(mm, 2022-04-18):
@@ -368,7 +439,7 @@ def _convert_sql_row_to_dataclass(
 ) -> _DBProtocolResource:
     protocol_id = sql_row.id
     protocol_key = sql_row.protocol_key
-    created_at = ensure_utc_datetime(sql_row.created_at)
+    created_at = sql_row.created_at
 
     assert isinstance(protocol_id, str), f"Protocol ID {protocol_id} not a string"
     assert protocol_key is None or isinstance(
@@ -387,6 +458,6 @@ def _convert_dataclass_to_sql_values(
 ) -> Dict[str, object]:
     return {
         "id": resource.protocol_id,
-        "created_at": ensure_utc_datetime(resource.created_at),
+        "created_at": resource.created_at,
         "protocol_key": resource.protocol_key,
     }

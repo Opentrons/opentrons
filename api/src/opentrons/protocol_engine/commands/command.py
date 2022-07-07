@@ -35,6 +35,18 @@ class CommandStatus(str, Enum):
     FAILED = "failed"
 
 
+class CommandIntent(str, Enum):
+    """Run intent for a given command.
+
+    Props:
+        PROTOCOL: the command is part of the protocol run itself.
+        SETUP: the command is part of the setup phase of a run.
+    """
+
+    PROTOCOL = "protocol"
+    SETUP = "setup"
+
+
 class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
     """Base class for command creation requests.
 
@@ -50,6 +62,20 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
         ),
     )
     params: CommandParamsT = Field(..., description="Command execution data payload")
+    intent: Optional[CommandIntent] = Field(
+        None,
+        description=(
+            "The reason the command was added. If not specified or `protocol`,"
+            " the command will be treated as part of the protocol run itself,"
+            " and added to the end of the existing command queue."
+            "\n\n"
+            "If `setup`, the command will be treated as part of run setup."
+            " A setup command may only be enqueued if the run has not started."
+            "\n\n"
+            "Use setup commands for activities like pre-run calibration checks"
+            " and module setup, like pre-heating."
+        ),
+    )
 
 
 class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
@@ -98,6 +124,15 @@ class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):
     completedAt: Optional[datetime] = Field(
         None,
         description="Command execution completed timestamp, if completed",
+    )
+    intent: Optional[CommandIntent] = Field(
+        None,
+        description=(
+            "The reason the command was added to the run."
+            " If not specified or `protocol`, it is part of the protocol itself."
+            " If `setup`, it was added as part of setup; for example,"
+            " a command that is part of a calibration procedure."
+        ),
     )
 
 

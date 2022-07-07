@@ -17,7 +17,7 @@ fake_bus_og = [
     "/sys/bus/usb/devices/usb1/1-1/1-1.1/dev",
     "/sys/bus/usb/devices/usb1/1-1/dev",
     "/sys/bus/usb/devices/usb1/1-1/1-1.5/dev",
-    "/sys/bus/usb/devices/usb1/1-1/1-1.5/1-1.5:1.2/0003:046D:C52B.0017/hidraw/hidraw0/dev",  # noqa: E501
+    "/sys/bus/usb/devices/usb1/1-1/1-1.5/1-1.5:1.2/0003:046D:C52B.0017/hidraw/hidraw0/dev",
     "/sys/bus/usb/devices/usb1/1-1/1-1.5/1-1.5:1.2/usbmisc/hiddev0/dev",
 ]
 
@@ -57,7 +57,7 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
     # TODO(mc, 2022-03-01): partial patching the class under test creates
     # a contaminated test subject that reduces the value of these tests
     # https://github.com/testdouble/contributing-tests/wiki/Partial-Mock
-    usb_bus._read_symlink = MagicMock(return_value="ttyACM1")  # type: ignore[assignment]  # noqa: E501
+    usb_bus._read_symlink = MagicMock(return_value="ttyACM1")  # type: ignore[assignment]
     mod_at_port_list = [
         ModuleAtPort(name="temperature module", port="dev/ot_module_temperature_module")
     ]
@@ -73,7 +73,7 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
     # TODO(mc, 2022-03-01): figure out why this section of the test doesn't
     # work on using the OT-2R mocked port values
     if revision == BoardRevision.OG:
-        usb_bus._read_symlink = MagicMock(return_value="ttyACM2")  # type: ignore[assignment]  # noqa: E501
+        usb_bus._read_symlink = MagicMock(return_value="ttyACM2")  # type: ignore[assignment]
         mod_at_port_list = [
             ModuleAtPort(name="magnetic module", port="dev/ot_module_magnetic_module")
         ]

@@ -35,9 +35,7 @@ export function useRunActionMutations(runId: string): UseRunActionMutations {
     onSuccess,
   })
 
-  const { stopRun, isLoading: isStopRunActionLoading } = useStopRunMutation({
-    onSuccess,
-  })
+  const { stopRun, isLoading: isStopRunActionLoading } = useStopRunMutation()
 
   return {
     playRun: () => playRun(runId),

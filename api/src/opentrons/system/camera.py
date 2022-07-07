@@ -25,7 +25,7 @@ async def take_picture(filename: Path) -> None:
 
     if IS_OSX:
         # Purely for development on macos
-        cmd = 'ffmpeg -f avfoundation -framerate 1  -s 640x480  -i "0" -ss 0:0:1 -frames 1'  # noqa: E501
+        cmd = 'ffmpeg -f avfoundation -framerate 1  -s 640x480  -i "0" -ss 0:0:1 -frames 1'
 
     proc = await asyncio.create_subprocess_shell(
         f"{cmd} {filename}",

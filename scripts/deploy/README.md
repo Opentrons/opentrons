@@ -20,17 +20,17 @@ Before running any of these scripts, the release in question must be tagged and 
 This process is still manual. Check out the commit you would like to release, and:
 
 ```shell
-git tag -a ${name}@${version} -m 'chore(release): ${name} ${version}
+git tag -a ${name}@${version} -m "chore(release): ${name} ${version}"
 git push --tags
 ```
 
-- `name` - The name of the project in the monorepo
+- `name` - The name of the project in the monorepo. Make sure this matches the directory name exactly, as it determines what actions are triggered when the tag is pushed.
 - `version` - The version to bump to
 
 For example, to bump Protocol Designer to version 3.0.0:
 
 ```shell
-git tag -a protocol-designer@3.0.0 -m 'chore(release): protocol-designer 3.0.0'
+git tag -a protocol-designer@3.0.0 -m "chore(release): protocol-designer 3.0.0"
 git push --tags
 ```
 

@@ -48,7 +48,7 @@ describe('useModuleMatchResults', () => {
       .mockReturnValue({})
 
     when(mockUseAttachedModules)
-      .calledWith(mockConnectedRobot.name)
+      .calledWith()
       .mockReturnValue([mockTemperatureModule])
   })
 
@@ -57,9 +57,7 @@ describe('useModuleMatchResults', () => {
   })
 
   it('should return no missing Module Ids if all modules present', () => {
-    when(mockUseAttachedModules)
-      .calledWith(mockConnectedRobot.name)
-      .mockReturnValue([])
+    when(mockUseAttachedModules).calledWith().mockReturnValue([])
 
     const { result } = renderHook(() =>
       useUnmatchedModulesForProtocol(mockConnectedRobot.name, '1')
@@ -87,9 +85,7 @@ describe('useModuleMatchResults', () => {
           slotName: '1',
         },
       })
-    when(mockUseAttachedModules)
-      .calledWith(mockConnectedRobot.name)
-      .mockReturnValue([])
+    when(mockUseAttachedModules).calledWith().mockReturnValue([])
 
     const { result } = renderHook(() =>
       useUnmatchedModulesForProtocol(mockConnectedRobot.name, '1')

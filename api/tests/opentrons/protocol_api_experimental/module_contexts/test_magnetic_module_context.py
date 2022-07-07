@@ -128,7 +128,7 @@ def test_engage_only_one_height_allowed(subject: MagneticModuleContext) -> None:
     # itself when there is no type-checker.
 
     with pytest.raises(InvalidMagnetEngageHeightError):
-        subject.engage(height=1, height_from_base=2, offset=3)  # type: ignore[call-overload]  # noqa: E501
+        subject.engage(height=1, height_from_base=2, offset=3)  # type: ignore[call-overload]
     with pytest.raises(InvalidMagnetEngageHeightError):
         subject.engage(height=1, height_from_base=2)  # type: ignore[call-overload]
     with pytest.raises(InvalidMagnetEngageHeightError):

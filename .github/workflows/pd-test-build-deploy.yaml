@@ -75,7 +75,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        os: ['ubuntu-18.04', 'macos-latest']
+        os: ['ubuntu-18.04']
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v2'
@@ -166,6 +166,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
         uses: './.github/actions/webstack/deploy-to-sandbox'
         with:
           domain: 'designer.opentrons.com'

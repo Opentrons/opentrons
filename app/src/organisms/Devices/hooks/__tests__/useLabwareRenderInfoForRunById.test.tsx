@@ -1,17 +1,22 @@
 import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 
-import { getLabwareRenderInfo } from '../../../../organisms/ProtocolSetup/utils/getLabwareRenderInfo'
-import { useLabwareRenderInfoForRunById, useProtocolDetailsForRun } from '..'
+import { getLabwareRenderInfo } from '../../ProtocolRun/utils/getLabwareRenderInfo'
+import {
+  useLabwareRenderInfoForRunById,
+  useProtocolDetailsForRun,
+  useStoredProtocolAnalysis,
+} from '..'
 
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
-import type { ProtocolDetails } from '..'
+import type { ProtocolDetails, StoredProtocolAnalysis } from '..'
 
-jest.mock('../../../../organisms/ProtocolSetup/utils/getLabwareRenderInfo')
+jest.mock('../../ProtocolRun/utils/getLabwareRenderInfo')
 jest.mock('../useProtocolDetailsForRun')
+jest.mock('../useStoredProtocolAnalysis')
 
 const mockGetLabwareRenderInfo = getLabwareRenderInfo as jest.MockedFunction<
   typeof getLabwareRenderInfo
@@ -19,12 +24,16 @@ const mockGetLabwareRenderInfo = getLabwareRenderInfo as jest.MockedFunction<
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
 >
+const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
+  typeof useStoredProtocolAnalysis
+>
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
   protocolData: simpleV6Protocol,
+  protocolKey: 'fakeProtocolKey',
 }
 
 // these are just taken from the ot-2 deck def for readability
@@ -106,6 +115,9 @@ describe('useLabwareRenderInfoForRunById hook', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith('1')
       .mockReturnValue(PROTOCOL_DETAILS)
+    when(mockUseStoredProtocolAnalysis)
+      .calledWith('1')
+      .mockReturnValue((PROTOCOL_DETAILS as unknown) as StoredProtocolAnalysis)
     when(mockGetLabwareRenderInfo)
       .calledWith(simpleV6Protocol, standardDeckDef as any)
       .mockReturnValue(LABWARE_RENDER_INFO)
@@ -118,6 +130,7 @@ describe('useLabwareRenderInfoForRunById hook', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith('1')
       .mockReturnValue({} as ProtocolDetails)
+    when(mockUseStoredProtocolAnalysis).calledWith('1').mockReturnValue(null)
     const { result } = renderHook(() => useLabwareRenderInfoForRunById('1'))
     expect(result.current).toStrictEqual({})
   })

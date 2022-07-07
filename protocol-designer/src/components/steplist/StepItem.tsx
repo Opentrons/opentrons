@@ -364,13 +364,19 @@ export const StepItemContents = (
           label={i18n.t(`modules.shaker_label`)}
           value={shakerValue}
         />
-        {timer == null ? null : (
-          <ModuleStepItemRow
-            label={
-              timer == null ? null : i18n.t(`modules.actions.deactivate_after`)
-            }
-            value={timer}
-          />
+        {substeps.heaterShakerTimerMinutes === 0 &&
+        substeps.heaterShakerTimerSeconds === 0 ? null : (
+          <PDListItem
+            className={cx(
+              styles.step_subitem_column_header,
+              styles.substep_content
+            )}
+          >
+            <span className={styles.labware_display_name}>
+              {i18n.t(`modules.actions.deactivate_after`)}
+            </span>
+            <span className={styles.align_right}>{timer}</span>
+          </PDListItem>
         )}
       </ModuleStepItems>
     )
@@ -461,7 +467,7 @@ export const StepItemContents = (
     )
   }
 
-  if (substeps && substeps.substepType === 'awaitTemperature') {
+  if (substeps && substeps.substepType === 'waitForTemperature') {
     const temperature = makeTemperatureText(substeps.temperature)
 
     return (

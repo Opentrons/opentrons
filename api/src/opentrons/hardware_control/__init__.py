@@ -14,7 +14,6 @@ from .adapters import SynchronousAdapter
 from .api import API
 from .pause_manager import PauseManager
 from .backends import Controller, Simulator
-from .pipette import Pipette
 from .types import (
     CriticalPoint,
     NoTipAttachedError,
@@ -27,15 +26,18 @@ from .thread_manager import ThreadManager
 from .execution_manager import ExecutionManager
 from .threaded_async_lock import ThreadedAsyncLock, ThreadedAsyncForbidden
 from .protocols import HardwareControlAPI
+from .instruments import AbstractInstrument, Pipette, Gripper
 
 ThreadManagedHardware = ThreadManager[HardwareControlAPI]
 SyncHardwareAPI = SynchronousAdapter[HardwareControlAPI]
 
 __all__ = [
     "API",
+    "AbstractInstrument",
     "Controller",
     "Simulator",
     "Pipette",
+    "Gripper",
     "PauseManager",
     "SynchronousAdapter",
     "HardwareControlAPI",

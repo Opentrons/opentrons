@@ -176,6 +176,14 @@ settings = [
         ),
         restart_required=True,
     ),
+    SettingDefinition(
+        _id="enableHeaterShakerPAPI",
+        title="Enable Heater-Shaker Python API support",
+        description=(
+            "Do not enable. This is an Opentrons internal setting to test a new module."
+        ),
+        restart_required=False,
+    ),
 ]
 
 if ARCHITECTURE == SystemArchitecture.BUILDROOT:
@@ -442,6 +450,16 @@ def _migrate13to14(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate14to15(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 15 of the feature flags file.
+
+    - adds enableHeaterShakerPAPI option
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableHeaterShakerPAPI"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -457,6 +475,7 @@ _MIGRATIONS = [
     _migrate11to12,
     _migrate12to13,
     _migrate13to14,
+    _migrate14to15,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

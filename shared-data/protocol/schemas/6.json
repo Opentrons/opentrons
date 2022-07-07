@@ -185,7 +185,7 @@
           "enum": ["OT-2 Standard", "OT-3 Standard"]
         },
         "deckId": {
-          "description": "Identifier of physical deck this protocol is written for. This should match a top-level key in shared-data/deck/definitions/2.json",
+          "description": "Identifier of physical deck this protocol is written for. This should match a top-level key in shared-data/deck/definitions/3.json",
           "type": "string"
         }
       }
@@ -254,6 +254,10 @@
             },
             "description": {
               "description": "A description of this liquid.",
+              "type": "string"
+            },
+            "displayColor": {
+              "description": "Hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.",
               "type": "string"
             }
           }
@@ -388,8 +392,9 @@
                     "minimum": 0
                   },
                   "forceDirect": {
-                    "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
-                    "type": "boolean"
+                    "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
+                    "type": "boolean",
+                    "default": false
                   }
                 }
               }
@@ -397,7 +402,7 @@
           },
 
           {
-            "description": "Move To Coordinates",
+            "description": "Move To Coordinates: Move the pipette's critical point to the specified coordinates. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-Channel pipette with no tip: end of nozzle. (2) 8-Channel pipette with no tip: end of backmost nozzle. (3) Single-Channel pipette with a tip: end of tip. (4) 8-Channel pipette with tip: end of tip on backmost nozzle.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
@@ -418,8 +423,9 @@
                     "minimum": 0
                   },
                   "forceDirect": {
-                    "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
-                    "type": "boolean"
+                    "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
+                    "type": "boolean",
+                    "default": false
                   }
                 }
               }
@@ -502,7 +508,8 @@
           },
 
           {
-            "description": "Delay Protocol Execution",
+            "title": "Delay (deprecated)",
+            "description": "Delay protocol execution for a time duration or until the user resumes the protocol. Deprecated; use `waitForResume` or `waitForDuration` commands instead.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
@@ -511,15 +518,77 @@
                 "enum": ["delay"]
               },
               "params": {
-                "type": "object",
-                "required": ["wait"],
-                "properties": {
-                  "wait": {
-                    "description": "either a number of seconds to wait (fractional values OK), or `true` to wait indefinitely until the user manually resumes the protocol",
-                    "anyOf": [{ "type": "number" }, { "enum": [true] }]
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "required": ["seconds"],
+                    "properties": {
+                      "seconds": {
+                        "description": "A number of seconds to wait, with fractional values allowed.",
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "message": {
+                        "description": "An optional message describing the delay."
+                      }
+                    }
                   },
+                  {
+                    "type": "object",
+                    "required": ["waitForResume"],
+                    "properties": {
+                      "waitForResume": {
+                        "description": "A number of seconds to wait, with fractional values allowed.",
+                        "enum": [true]
+                      },
+                      "message": {
+                        "description": "An optional message describing the delay."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+
+          {
+            "title": "Wait For Resume",
+            "description": "Pause protocol execution until the user manually resumes the protocol.",
+            "type": "object",
+            "required": ["commandType", "params"],
+            "properties": {
+              "key": { "type": "string" },
+              "commandType": {
+                "enum": ["waitForResume", "pause"]
+              },
+              "params": {
+                "type": "object",
+                "required": [],
+                "properties": {
                   "message": {
-                    "description": "optional message describing the delay"
+                    "description": "An optional message describing the pause."
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "title": "Wait For Duration",
+            "description": "Pause protocol execution for a given duration.",
+            "type": "object",
+            "required": ["commandType", "params"],
+            "properties": {
+              "key": { "type": "string" },
+              "commandType": {
+                "enum": ["waitForDuration"]
+              },
+              "params": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "message": {
+                    "description": "An optional message describing the pause."
                   }
                 }
               }
@@ -533,12 +602,12 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["magneticModule/engageMagnet"]
+                "enum": ["magneticModule/engage"]
               },
               "params": {
-                "required": ["moduleId", "engageHeight"],
+                "required": ["moduleId", "height"],
                 "properties": {
-                  "engageHeight": {
+                  "height": {
                     "description": "How high, in millimeters, to raise the magnets.\n\nZero means the tops of the magnets are level with the ledge that the labware rests on. This will be slightly above the magnets' minimum height, the hardware home position. Negative values are allowed, to put the magnets below the ledge.\n\nUnits are always true millimeters. This is unlike certain labware definitions, engage commands in the Python Protocol API, and engage commands in older versions of the JSON protocol schema. Take care to convert properly.",
                     "type": "number"
                   },
@@ -558,7 +627,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["magneticModule/disengageMagnet"]
+                "enum": ["magneticModule/disengage"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -576,33 +645,34 @@
                 "enum": ["temperatureModule/setTargetTemperature"]
               },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Temperature Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" }
+                  "celsius": { "type": "number" }
                 }
               }
             }
           },
 
           {
-            "description": "Temperature Module Await Temperature: Delay protocol execution until the specified temperature is reached.",
+            "description": "Temperature Module Wait For Temperature: Delay protocol execution until the specified temperature is reached.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
-              "commandType": { "enum": ["temperatureModule/awaitTemperature"] },
+              "commandType": {
+                "enum": ["temperatureModule/waitForTemperature"]
+              },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Temperature Module to target. Must be a key from the top level 'modules' object"
-                  },
-                  "temperature": { "type": "number" }
+                  }
                 }
               }
             }
@@ -622,7 +692,7 @@
           },
 
           {
-            "description": "Thermocycler Set Target Block Temperature: Well block will begin moving to the target temperature. This command is blocking, it delays protocol execution while approaching the target temperature.",
+            "description": "Thermocycler Set Target Block Temperature: Well block will begin moving to the target temperature. This command is non-blocking, it does not delay protocol execution while approaching the target temperature.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
@@ -631,15 +701,19 @@
                 "enum": ["thermocycler/setTargetBlockTemperature"]
               },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" },
-                  "volume": {
-                    "type": "number"
+                  "celsius": {
+                    "type": "number",
+                    "description": "Target temperature in °C."
+                  },
+                  "blockMaxVolumeUl": {
+                    "type": "number",
+                    "description": "Amount of liquid in uL of the most-full well in labware loaded onto the thermocycler."
                   }
                 }
               }
@@ -656,53 +730,53 @@
                 "enum": ["thermocycler/setTargetLidTemperature"]
               },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": { "type": "number" }
+                  "celsius": { "type": "number" }
                 }
               }
             }
           },
 
           {
-            "description": "Thermocycler Await Block Temperature: Delay protocol execution until the specified well block target temperature is reached.",
+            "description": "Thermocycler Wait For Block Temperature: Delay protocol execution until the specified well block target temperature is reached.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
-              "commandType": { "enum": ["thermocycler/awaitBlockTemperature"] },
+              "commandType": {
+                "enum": ["thermocycler/waitForBlockTemperature"]
+              },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
-                  },
-                  "temperature": { "type": "number" }
+                  }
                 }
               }
             }
           },
 
           {
-            "description": "Thermocycler Await Lid Temperature: Delay protocol execution until the specified lid target temperature is reached.",
+            "description": "Thermocycler Wait For Lid Temperature: Delay protocol execution until the specified lid target temperature is reached.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
-              "commandType": { "enum": ["thermocycler/awaitLidTemperature"] },
+              "commandType": { "enum": ["thermocycler/waitForLidTemperature"] },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Thermocycler Module to target. Must be a key from the top level 'modules' object"
-                  },
-                  "temperature": { "type": "number" }
+                  }
                 }
               }
             }
@@ -769,7 +843,7 @@
               "commandType": { "enum": ["thermocycler/runProfile"] },
               "params": {
                 "type": "object",
-                "required": ["moduleId", "profile", "volume"],
+                "required": ["moduleId", "profile"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
@@ -779,20 +853,20 @@
                     "type": "array",
                     "items": {
                       "type": "object",
-                      "required": ["temperature", "holdTime"],
+                      "required": ["celsius", "holdSeconds"],
                       "properties": {
-                        "temperature": {
-                          "description": "Target temperature of profile step",
+                        "celsius": {
+                          "description": "Target temperature (in celsius) of profile step",
                           "type": "number"
                         },
-                        "holdTime": {
+                        "holdSeconds": {
                           "description": "Time (in seconds) to hold once temperature is reached",
                           "type": "number"
                         }
                       }
                     }
                   },
-                  "volume": {
+                  "blockMaxVolumeUl": {
                     "type": "number"
                   }
                 }
@@ -820,16 +894,16 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/startSetTargetTemperature"]
+                "enum": ["heaterShaker/setTargetTemperature"]
               },
               "params": {
-                "required": ["moduleId", "temperature"],
+                "required": ["moduleId", "celsius"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
                     "description": "Unique identifier of Heater Shaker Module to target. Must be a key from the top level 'modules' object"
                   },
-                  "temperature": {
+                  "celsius": {
                     "type": "number",
                     "description": "target temperature to heat to in °C"
                   }
@@ -845,7 +919,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/setTargetShakeSpeed"]
+                "enum": ["heaterShaker/setAndWaitForShakeSpeed"]
               },
               "params": {
                 "required": ["moduleId", "rpm"],
@@ -864,13 +938,13 @@
           },
 
           {
-            "description": "Heater Shaker Module Await Temperature: Delay protocol execution until the previously supplied startSetTargetTemperature command's temperature parameter has been reached. Errors if no target temperature was set previously.",
+            "description": "Heater Shaker Module Wait For Temperature: Delay protocol execution until the previously supplied startSetTargetTemperature command's temperature parameter has been reached. Errors if no target temperature was set previously.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/awaitTemperature"]
+                "enum": ["heaterShaker/waitForTemperature"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -885,7 +959,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/deactivateHeater"]
+                "enum": ["heaterShaker/deactivateHeater"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -894,13 +968,13 @@
           },
 
           {
-            "description": "Heater Shaker Module Stop Shake: Module will stop actively shaking and ramp down to a still state",
+            "description": "Heater Shaker Module Deactivate Shaker: Module will stop actively shaking and ramp down to a still state",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/stopShake"]
+                "enum": ["heaterShaker/deactivateShaker"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -915,7 +989,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/openLatch"]
+                "enum": ["heaterShaker/openLabwareLatch"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -930,7 +1004,7 @@
             "properties": {
               "key": { "type": "string" },
               "commandType": {
-                "enum": ["heaterShakerModule/closeLatch"]
+                "enum": ["heaterShaker/closeLabwareLatch"]
               },
               "params": {
                 "$ref": "#/definitions/moduleOnlyParams"
@@ -939,7 +1013,7 @@
           },
 
           {
-            "description": "Move To Well: Move the pipette's critical point to the specified well in a labware, with an optional offset. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-channel pipette with no tip: end of nozzle. (2) Multi-channel pipette with no tip: end of backmost nozzle. (3) Single-channel pipette with a tip: end of tip. (4) Multi-channel pipette with tip: end of tip on backmost nozzle.",
+            "description": "Move To Well: Move the pipette's critical point to the specified well in a labware, with an optional offset. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-Channel pipette with no tip: end of nozzle. (2) 8-Channel pipette with no tip: end of backmost nozzle. (3) Single-Channel pipette with a tip: end of tip. (4) 8-Channel pipette with tip: end of tip on backmost nozzle.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
@@ -959,8 +1033,9 @@
                     "minimum": 0
                   },
                   "forceDirect": {
-                    "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
-                    "type": "boolean"
+                    "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
+                    "type": "boolean",
+                    "default": false
                   }
                 }
               }
@@ -1112,25 +1187,6 @@
                         "type": "number"
                       }
                     }
-                  }
-                }
-              }
-            }
-          },
-          {
-            "description": "Pause: This command pauses the run.",
-            "type": "object",
-            "required": ["commandType"],
-            "properties": {
-              "key": { "type": "string" },
-              "commandType": {
-                "enum": ["pause"]
-              },
-              "params": {
-                "properties": {
-                  "message": {
-                    "type": "string",
-                    "description": "Optional message the user can set for their pause command"
                   }
                 }
               }

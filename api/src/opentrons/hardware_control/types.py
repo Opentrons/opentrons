@@ -67,6 +67,10 @@ class Axis(enum.Enum):
             cls.C: top_types.Mount.RIGHT,
         }[inst]
 
+    @classmethod
+    def pipette_axes(cls) -> Tuple["Axis", "Axis"]:
+        return cls.B, cls.C
+
     def __str__(self) -> str:
         return self.name
 
@@ -162,18 +166,18 @@ class OT3Axis(enum.Enum):
         return cls.P_L, cls.P_R
 
     @classmethod
-    def mount_axes(cls) -> Tuple["OT3Axis", "OT3Axis"]:
-        """The axes which are used for moving pipettes up and down."""
-        return cls.Z_L, cls.Z_R
+    def mount_axes(cls) -> Tuple["OT3Axis", "OT3Axis", "OT3Axis"]:
+        """The axes which are used for moving instruments up and down."""
+        return cls.Z_L, cls.Z_R, cls.Z_G
 
     @classmethod
     def gantry_axes(
         cls,
-    ) -> Tuple["OT3Axis", "OT3Axis", "OT3Axis", "OT3Axis"]:
+    ) -> Tuple["OT3Axis", "OT3Axis", "OT3Axis", "OT3Axis", "OT3Axis"]:
         """The axes which are tied to the gantry and require the deck
         calibration transform
         """
-        return cls.X, cls.Y, cls.Z_L, cls.Z_R
+        return cls.X, cls.Y, cls.Z_L, cls.Z_R, cls.Z_G
 
     @classmethod
     def of_main_tool_actuator(
@@ -226,6 +230,26 @@ class OT3Axis(enum.Enum):
     def __str__(self) -> str:
         return self.name
 
+    def of_point(self, point: top_types.Point) -> float:
+        if OT3Axis.to_kind(self) == OT3AxisKind.Z:
+            return point.z
+        elif self == OT3Axis.X:
+            return point.x
+        elif self == OT3Axis.Y:
+            return point.y
+        else:
+            raise KeyError(self)
+
+    def set_in_point(self, point: top_types.Point, position: float) -> top_types.Point:
+        if OT3Axis.to_kind(self) == OT3AxisKind.Z:
+            return point._replace(z=position)
+        elif self == OT3Axis.X:
+            return point._replace(x=position)
+        elif self == OT3Axis.Y:
+            return point._replace(y=position)
+        else:
+            raise KeyError(self)
+
 
 class OT3SubSystem(enum.Enum):
     """An enumeration of ot3 components.
@@ -271,16 +295,15 @@ class HardwareEventType(enum.Enum):
     ERROR_MESSAGE = enum.auto()
 
 
-@dataclass
+@dataclass(frozen=True)
 class DoorStateNotification:
     event: Literal[
         HardwareEventType.DOOR_SWITCH_CHANGE
     ] = HardwareEventType.DOOR_SWITCH_CHANGE
     new_state: DoorState = DoorState.CLOSED
-    blocking: bool = False
 
 
-@dataclass
+@dataclass(frozen=True)
 class ErrorMessageNotification:
     message: str
     event: Literal[HardwareEventType.ERROR_MESSAGE] = HardwareEventType.ERROR_MESSAGE
@@ -405,10 +428,6 @@ class AionotifyEvent:
         flag_list = [f.name for f in flags]
         Flag = enum.Enum("Flag", flag_list)  # type: ignore
         return cls(flags=Flag, name=name)
-
-
-class PauseResumeError(RuntimeError):
-    pass
 
 
 class ExecutionCancelledError(RuntimeError):

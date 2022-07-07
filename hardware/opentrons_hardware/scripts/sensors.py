@@ -5,10 +5,11 @@ import argparse
 from enum import Enum
 from typing import Type, Sequence, Callable, Tuple
 from logging.config import dictConfig
+
+from opentrons_hardware.drivers.can_bus import build
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-from opentrons_hardware.drivers.can_bus.build import build_driver
 
 from .sensor_utils import (
     SensorRun,
@@ -39,7 +40,7 @@ def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
 
     """
     # mypy wants type annotation for v.
-    return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]  # type: ignore[var-annotated]  # noqa: E501
+    return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]  # type: ignore[var-annotated]
 
 
 def prompt_sensor_type(
@@ -107,17 +108,15 @@ def prompt_message(
 ) -> Tuple[SensorRun, bool]:
     """A list of all the information required to perform an initial sensor test."""
     sensor_type = prompt_sensor_type(get_user_input, output_func)
-    pipette_serial_number = prompt_str_input("pipette serial number", get_user_input)
-    pipette_mount = prompt_str_input(
-        'pipette_mount if on robot, "left" or "right"', get_user_input
+    mount = prompt_str_input(
+        'pipette mounts:"left" or "right", gripper mount: "gripper"', get_user_input
     )
+    serial_number = prompt_str_input("instrument serial number", get_user_input)
     auto_zero = prompt_int_input("auto zero", get_user_input)
     minutes = prompt_int_input("script run time in minutes", get_user_input)
     output_to_csv = bool(prompt_int_input("output to csv?", get_user_input))
 
-    sensor_run = SensorRun(
-        sensor_type, pipette_serial_number, bool(auto_zero), minutes, pipette_mount
-    )
+    sensor_run = SensorRun(sensor_type, serial_number, bool(auto_zero), minutes, mount)
     return sensor_run, output_to_csv
 
 
@@ -125,12 +124,14 @@ async def send_sensor_command(
     driver: AbstractCanDriver, command: SensorRun, csv: bool
 ) -> None:
     """Perform the specified sensor test located in utils.py."""
-    if command.pipette_mount == "left":
+    if command.mount == "left":
         node = NodeId.pipette_left
-    elif command.pipette_mount == "right":
+    elif command.mount == "right":
         node = NodeId.pipette_right
+    elif command.mount == "gripper":
+        node = NodeId.gripper
     else:
-        node = NodeId.pipette_right
+        node = NodeId.broadcast
     if command.sensor_type == SensorType.pressure:
         await handle_pressure_sensor(command, driver, node, csv, log)
     elif command.sensor_type == SensorType.capacitive:
@@ -162,18 +163,15 @@ async def ui_task(can_driver: AbstractCanDriver) -> None:
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    driver = await build_driver(build_settings(args))
-
-    loop = asyncio.get_event_loop()
-    task = loop.create_task(ui_task(driver))
-    try:
-        await task
-    except KeyboardInterrupt:
-        task.cancel()
-    except asyncio.CancelledError:
-        pass
-    finally:
-        driver.shutdown()
+    async with build.driver(build_settings(args)) as driver:
+        loop = asyncio.get_event_loop()
+        task = loop.create_task(ui_task(driver))
+        try:
+            await task
+        except KeyboardInterrupt:
+            task.cancel()
+        except asyncio.CancelledError:
+            pass
 
 
 log = logging.getLogger(__name__)

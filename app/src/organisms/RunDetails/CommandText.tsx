@@ -9,7 +9,7 @@ import {
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
 import { useProtocolDetails } from './hooks'
-import { getLabwareLocation } from '../ProtocolSetup/utils/getLabwareLocation'
+import { getLabwareLocation } from '../Devices/ProtocolRun/utils/getLabwareLocation'
 import { useLabwareRenderInfoById } from '../ProtocolSetup/hooks'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { RunCommandSummary } from '@opentrons/api-client'
@@ -114,7 +114,8 @@ export function CommandText(props: Props): JSX.Element | null {
       )
       break
     }
-    case 'pause': {
+    case 'pause':
+    case 'waitForResume': {
       messageNode = displayCommand.params?.message ?? displayCommand.commandType
       break
     }

@@ -1,9 +1,12 @@
 import * as React from 'react'
 import map from 'lodash/map'
+import omit from 'lodash/omit'
+import { isEmpty, startCase } from 'lodash'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { useFeatureFlag } from '../../redux/config'
 import {
   Box,
   Btn,
@@ -35,12 +38,13 @@ import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/Buttons'
+import { PrimaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { OverflowMenu } from './OverflowMenu'
 import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 import { ProtocolLabwareDetails } from './ProtocolLabwareDetails'
+import { ProtocolLiquidsDetails } from './ProtocolLiquidsDetails'
 import {
   getAnalysisStatus,
   getProtocolDisplayName,
@@ -48,6 +52,7 @@ import {
 
 import type { State } from '../../redux/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
+import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -104,6 +109,77 @@ function RoundTab({
   )
 }
 
+interface ReadMoreContentProps {
+  metadata: {
+    [key: string]: any
+  }
+  protocolType: 'json' | 'python'
+}
+
+const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
+  const { metadata, protocolType } = props
+  const { t } = useTranslation('protocol_details')
+  const [isReadMore, setIsReadMore] = React.useState(true)
+
+  const description = isEmpty(metadata.description)
+    ? t('shared:no_data')
+    : metadata.description
+
+  const getMetadataDetails = (
+    description: string,
+    protocolType: string
+  ): string | JSX.Element => {
+    if (protocolType === 'json') {
+      return <StyledText as="p">{description}</StyledText>
+    } else {
+      const filteredMetaData = Object.entries(
+        omit(metadata, ['description', 'protocolName', 'author', 'apiLevel'])
+      ).map(item => ({ label: item[0], value: item[1] }))
+
+      return (
+        <Flex
+          flex="1"
+          flexDirection={DIRECTION_COLUMN}
+          data-testid={`ProtocolDetails_description`}
+        >
+          {description}
+          {filteredMetaData.map((item, index) => {
+            return (
+              <React.Fragment key={index}>
+                <StyledText as="h6" marginTop={SPACING.spacing3}>
+                  {startCase(item.label)}
+                </StyledText>
+                <StyledText as="p">{item.value}</StyledText>
+              </React.Fragment>
+            )
+          })}
+        </Flex>
+      )
+    }
+  }
+
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      {isReadMore ? (
+        <StyledText as="p">{description.slice(0, 160)}</StyledText>
+      ) : (
+        getMetadataDetails(description, protocolType)
+      )}
+      {(description.length > 160 || protocolType === 'python') && (
+        <Link
+          role="button"
+          css={TYPOGRAPHY.linkPSemiBold}
+          marginTop={SPACING.spacing3}
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          onClick={() => setIsReadMore(!isReadMore)}
+        >
+          {isReadMore ? t('read_more') : t('read_less')}
+        </Link>
+      )}
+    </Flex>
+  )
+}
+
 interface ProtocolDetailsProps extends StoredProtocolData {}
 
 export function ProtocolDetails(
@@ -112,13 +188,14 @@ export function ProtocolDetails(
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
   const [currentTab, setCurrentTab] = React.useState<
-    'robot_config' | 'labware'
+    'robot_config' | 'labware' | 'liquids'
   >('robot_config')
   const [showSlideout, setShowSlideout] = React.useState(false)
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
+  const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   if (analysisStatus === 'missing') return null
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
@@ -126,20 +203,34 @@ export function ProtocolDetails(
       ? parseInitialPipetteNamesByMount(mostRecentAnalysis.commands)
       : { left: null, right: null }
 
-  const requiredModuleDetails = map(
-    parseInitialLoadedModulesBySlot(
-      mostRecentAnalysis.commands != null ? mostRecentAnalysis.commands : []
-    )
-  )
+  const requiredModuleDetails =
+    mostRecentAnalysis != null
+      ? map(
+          parseInitialLoadedModulesBySlot(
+            mostRecentAnalysis.commands != null
+              ? mostRecentAnalysis.commands
+              : []
+          )
+        )
+      : []
 
-  const requiredLabwareDetails = map({
-    ...parseInitialLoadedLabwareByModuleId(
-      mostRecentAnalysis.commands != null ? mostRecentAnalysis.commands : []
-    ),
-    ...parseInitialLoadedLabwareBySlot(
-      mostRecentAnalysis.commands != null ? mostRecentAnalysis.commands : []
-    ),
-  }).filter(labware => labware.result.definition.parameters.format !== 'trash')
+  const requiredLabwareDetails =
+    mostRecentAnalysis != null
+      ? map({
+          ...parseInitialLoadedLabwareByModuleId(
+            mostRecentAnalysis.commands != null
+              ? mostRecentAnalysis.commands
+              : []
+          ),
+          ...parseInitialLoadedLabwareBySlot(
+            mostRecentAnalysis.commands != null
+              ? mostRecentAnalysis.commands
+              : []
+          ),
+        }).filter(
+          labware => labware.result.definition.parameters.format !== 'trash'
+        )
+      : []
 
   const protocolDisplayName = getProtocolDisplayName(
     protocolKey,
@@ -147,22 +238,54 @@ export function ProtocolDetails(
     mostRecentAnalysis
   )
 
-  // TODO: IMMEDIATELY parse real values out of analysis file for these with fallback to no data
-  const creationMethod = t('shared:no_data')
-  const author = t('shared:no_data')
-  const description = t('shared:no_data')
-  const lastAnalyzed = t('shared:no_data')
+  const getCreationMethod = (config: JsonConfig | PythonConfig): string => {
+    if (config.protocolType === 'json') {
+      return t('protocol_designer_version', {
+        version: config.schemaVersion.toFixed(1),
+      })
+    } else {
+      return t('python_api_version', {
+        version:
+          config.apiVersion != null ? config.apiVersion?.join('.') : null,
+      })
+    }
+  }
 
-  const getTabContents = (): JSX.Element =>
-    currentTab === 'labware' ? (
-      <ProtocolLabwareDetails requiredLabwareDetails={requiredLabwareDetails} />
-    ) : (
-      <RobotConfigurationDetails
-        leftMountPipetteName={leftMountPipetteName}
-        rightMountPipetteName={rightMountPipetteName}
-        requiredModuleDetails={requiredModuleDetails}
-      />
-    )
+  const creationMethod =
+    mostRecentAnalysis != null
+      ? getCreationMethod(mostRecentAnalysis.config) ?? t('shared:no_data')
+      : t('shared:no_data')
+  const author =
+    mostRecentAnalysis != null
+      ? mostRecentAnalysis?.metadata?.author ?? t('shared:no_data')
+      : t('shared:no_data')
+  const lastAnalyzed =
+    mostRecentAnalysis?.createdAt != null
+      ? format(new Date(mostRecentAnalysis.createdAt), 'MMMM dd, yyyy HH:mm')
+      : t('shared:no_data')
+
+  const getTabContents = (): JSX.Element => {
+    switch (currentTab) {
+      case 'labware':
+        return (
+          <ProtocolLabwareDetails
+            requiredLabwareDetails={requiredLabwareDetails}
+          />
+        )
+
+      case 'robot_config':
+        return (
+          <RobotConfigurationDetails
+            leftMountPipetteName={leftMountPipetteName}
+            rightMountPipetteName={rightMountPipetteName}
+            requiredModuleDetails={requiredModuleDetails}
+          />
+        )
+
+      case 'liquids':
+        return <ProtocolLiquidsDetails />
+    }
+  }
 
   return (
     <Flex
@@ -175,7 +298,11 @@ export function ProtocolDetails(
         showSlideout={showSlideout}
         storedProtocolData={props}
       />
-      <Card marginBottom={SPACING.spacing4} padding={SPACING.spacing4}>
+      <Card
+        marginBottom={SPACING.spacing4}
+        padding={SPACING.spacing4}
+        backgroundColor={COLORS.white}
+      >
         {analysisStatus !== 'loading' &&
         mostRecentAnalysis != null &&
         mostRecentAnalysis.errors.length > 0 ? (
@@ -198,6 +325,7 @@ export function ProtocolDetails(
           </StyledText>
           <OverflowMenu
             protocolKey={protocolKey}
+            protocolType={mostRecentAnalysis?.config?.protocolType ?? 'python'}
             data-testid={`ProtocolDetails_overFlowMenu`}
           />
         </Flex>
@@ -268,18 +396,15 @@ export function ProtocolDetails(
             data-testid={`ProtocolDetails_description`}
           >
             <StyledText as="h6">{t('description')}</StyledText>
-            <StyledText as="p">
-              {analysisStatus === 'loading' ? t('shared:loading') : description}
-            </StyledText>
-            <Link
-              onClick={() =>
-                console.log(
-                  'TODO: truncate description if more than three lines'
-                )
-              }
-            >
-              {t('read_more')}
-            </Link>
+            {analysisStatus === 'loading' ? (
+              <StyledText as="p">{t('shared:loading')}</StyledText>
+            ) : null}
+            {mostRecentAnalysis != null ? (
+              <ReadMoreContent
+                metadata={mostRecentAnalysis.metadata}
+                protocolType={mostRecentAnalysis.config.protocolType}
+              />
+            ) : null}
           </Flex>
         </Flex>
       </Card>
@@ -311,6 +436,7 @@ export function ProtocolDetails(
                 complete: (
                   <DeckThumbnail
                     commands={mostRecentAnalysis?.commands ?? []}
+                    showLiquids
                   />
                 ),
               }[analysisStatus]
@@ -343,6 +469,17 @@ export function ProtocolDetails(
                 {t('labware')}
               </Text>
             </RoundTab>
+            {liquidSetupEnabled && (
+              <RoundTab
+                data-testid={`ProtocolDetails_liquids`}
+                isCurrent={currentTab === 'liquids'}
+                onClick={() => setCurrentTab('liquids')}
+              >
+                <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+                  {t('liquids')}
+                </Text>
+              </RoundTab>
+            )}
           </Flex>
           <Box
             backgroundColor={COLORS.white}
@@ -353,7 +490,7 @@ export function ProtocolDetails(
             } ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} ${
               BORDERS.radiusSoftCorners
             }`}
-            padding={`${SPACING.spacing5} ${SPACING.spacing4}`}
+            padding={`${SPACING.spacing4} ${SPACING.spacing4}`}
           >
             {getTabContents()}
           </Box>

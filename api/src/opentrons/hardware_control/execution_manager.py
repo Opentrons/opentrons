@@ -56,12 +56,9 @@ class ExecutionManager:
         async with self._condition:
             return self._state
 
-    async def register_cancellable_task(
-        self, task: "asyncio.Task[TaskContents]"
-    ) -> "asyncio.Task[TaskContents]":
+    def register_cancellable_task(self, task: "asyncio.Task[TaskContents]") -> None:
         self._cancellable_tasks.add(task)
         task.add_done_callback(lambda t: self._cancellable_tasks.discard(t))
-        return task
 
     async def wait_for_is_running(self) -> None:
         async with self._condition:
@@ -139,4 +136,5 @@ class ExecutionManagerProvider:
                 await asyncio.sleep(seconds)
 
             delay_task = asyncio.create_task(sleep_for_seconds(duration_s))
-            await self._execution_manager.register_cancellable_task(delay_task)
+            self._execution_manager.register_cancellable_task(delay_task)
+            await delay_task

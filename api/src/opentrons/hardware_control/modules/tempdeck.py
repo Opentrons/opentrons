@@ -111,8 +111,7 @@ class TempDeck(mod_abc.AbstractModule):
     def model(self) -> str:
         return self._model_from_revision(self._device_info.get("model"))
 
-    @classmethod
-    def bootloader(cls) -> types.UploadFunction:
+    def bootloader(self) -> types.UploadFunction:
         return update.upload_via_avrdude
 
     async def wait_next_poll(self) -> None:
@@ -137,7 +136,7 @@ class TempDeck(mod_abc.AbstractModule):
                 await self.wait_next_poll()
 
         task = self._loop.create_task(_wait())
-        await self.make_cancellable(task)
+        self.make_cancellable(task)
         await task
 
     async def start_set_temperature(self, celsius: float) -> None:
@@ -172,7 +171,7 @@ class TempDeck(mod_abc.AbstractModule):
                     await self.wait_next_poll()
 
         t = self._loop.create_task(_await_temperature())
-        await self.make_cancellable(t)
+        self.make_cancellable(t)
         await t
 
     async def deactivate(self) -> None:

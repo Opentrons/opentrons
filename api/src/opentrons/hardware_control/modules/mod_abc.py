@@ -101,8 +101,8 @@ class AbstractModule(abc.ABC):
         if not self.is_simulated:
             await self._execution_manager.wait_for_is_running()
 
-    async def make_cancellable(self, task: "asyncio.Task[TaskPayload]") -> None:
-        await self._execution_manager.register_cancellable_task(task)
+    def make_cancellable(self, task: "asyncio.Task[TaskPayload]") -> None:
+        self._execution_manager.register_cancellable_task(task)
 
     @abc.abstractmethod
     async def deactivate(self) -> None:
@@ -171,9 +171,8 @@ class AbstractModule(abc.ABC):
         """A shortname used for looking up firmware, among other things"""
         pass
 
-    @classmethod
     @abc.abstractmethod
-    def bootloader(cls) -> UploadFunction:
+    def bootloader(self) -> UploadFunction:
         """Method used to upload file to this module's bootloader."""
         pass
 

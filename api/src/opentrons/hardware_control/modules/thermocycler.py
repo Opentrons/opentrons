@@ -14,7 +14,8 @@ from . import types, update, mod_abc
 from opentrons.drivers.thermocycler import (
     AbstractThermocyclerDriver,
     SimulatingDriver,
-    ThermocyclerDriver,
+    ThermocyclerDriverV2,
+    ThermocyclerDriverFactory,
 )
 
 
@@ -66,10 +67,10 @@ class Thermocycler(mod_abc.AbstractModule):
         polling_frequency = kwargs.get("polling_frequency")
         driver: AbstractThermocyclerDriver
         if not simulating:
-            driver = await ThermocyclerDriver.create(port=port, loop=loop)
+            driver = await ThermocyclerDriverFactory.create(port=port, loop=loop)
             polling_frequency = polling_frequency or POLLING_FREQUENCY_SEC
         else:
-            driver = SimulatingDriver()
+            driver = SimulatingDriver(model=sim_model)
             polling_frequency = polling_frequency or SIM_POLLING_FREQUENCY_SEC
 
         mod = cls(
@@ -136,11 +137,19 @@ class Thermocycler(mod_abc.AbstractModule):
         return "thermocycler"
 
     def model(self) -> str:
-        return "thermocyclerModuleV1"
+        if isinstance(self._driver, SimulatingDriver):
+            return self._driver.model()
+        elif isinstance(self._driver, ThermocyclerDriverV2):
+            return "thermocyclerModuleV2"
+        else:
+            # Real module that is not a V2
+            return "thermocyclerModuleV1"
 
-    @classmethod
-    def bootloader(cls) -> types.UploadFunction:
-        return update.upload_via_bossa
+    def bootloader(self) -> types.UploadFunction:
+        if isinstance(self._driver, ThermocyclerDriverV2):
+            return update.upload_via_dfu
+        else:
+            return update.upload_via_bossa
 
     def _clear_cycle_counters(self) -> None:
         """Clear the cycle counters."""
@@ -223,6 +232,22 @@ class Thermocycler(mod_abc.AbstractModule):
         Returns: None
         """
         await self.wait_for_is_running()
+        await self._set_temperature_no_pause(
+            temperature=temperature,
+            hold_time_seconds=hold_time_seconds,
+            hold_time_minutes=hold_time_minutes,
+            ramp_rate=ramp_rate,
+            volume=volume,
+        )
+
+    async def _set_temperature_no_pause(
+        self,
+        temperature: float,
+        hold_time_seconds: Optional[float],
+        hold_time_minutes: Optional[float],
+        ramp_rate: Optional[float],
+        volume: Optional[float],
+    ) -> None:
         seconds = hold_time_seconds if hold_time_seconds is not None else 0
         minutes = hold_time_minutes if hold_time_minutes is not None else 0
         total_seconds = seconds + (minutes * 60)
@@ -236,7 +261,6 @@ class Thermocycler(mod_abc.AbstractModule):
         # Wait for target temperature to be set.
         retries = 0
         while self.target != temperature or not self.hold_time_probably_set(hold_time):
-            await self.wait_for_is_running()
             # Wait for the poller to update
             await self.wait_next_poll()
             retries += 1
@@ -251,7 +275,40 @@ class Thermocycler(mod_abc.AbstractModule):
             task = self._loop.create_task(self._wait_for_hold(hold_time))
         else:
             task = self._loop.create_task(self._wait_for_temp())
-        await self.make_cancellable(task)
+        self.make_cancellable(task)
+        await task
+
+    async def wait_for_block_temperature(
+        self,
+        temperature: float,
+    ) -> None:
+        """
+        Wait for thermocycler to reach given temperature.
+
+        Will return when the target temperature is reached.
+
+        Args:
+            temperature: The target temperature.
+
+        Returns: None
+        """
+        await self.wait_for_is_running()
+
+        # Wait for target temperature to be set.
+        retries = 0
+        while self.target != temperature:
+            # Wait for the poller to update
+            await self.wait_next_poll()
+            retries += 1
+            if retries > TEMP_UPDATE_RETRIES:
+                raise ThermocyclerError(
+                    f"Thermocycler driver waiting for block temp "
+                    f"T={temperature} but status reads "
+                    f"T={self.target}"
+                )
+
+        task = self._loop.create_task(self._wait_for_temp())
+        self.make_cancellable(task)
         await task
 
     async def cycle_temperatures(
@@ -275,7 +332,7 @@ class Thermocycler(mod_abc.AbstractModule):
         self._total_step_count = len(steps)
 
         task = self._loop.create_task(self._execute_cycles(steps, repetitions, volume))
-        await self.make_cancellable(task)
+        self.make_cancellable(task)
         await task
 
     async def set_lid_temperature(self, temperature: float) -> None:
@@ -285,17 +342,35 @@ class Thermocycler(mod_abc.AbstractModule):
         # Wait for target to be set
         retries = 0
         while self.lid_target != temperature:
-            await self.wait_for_is_running()
             # Wait for the poller to update
             await self.wait_next_poll()
             retries += 1
             if retries > TEMP_UPDATE_RETRIES:
                 raise ThermocyclerError(
-                    f"Thermocycler driver set the lid temp to T={temperature}"
+                    f"Thermocycler driver set the lid temp to T={temperature} "
                     f"but status reads T={self.lid_target}"
                 )
         task = self._loop.create_task(self._wait_for_lid_temp())
-        await self.make_cancellable(task)
+        self.make_cancellable(task)
+        await task
+
+    async def wait_for_lid_temperature(self, temperature: float) -> None:
+        """Set the lid temperature in deg Celsius"""
+        await self.wait_for_is_running()
+
+        # Wait for target to be set
+        retries = 0
+        while self.lid_target != temperature:
+            # Wait for the poller to update
+            await self.wait_next_poll()
+            retries += 1
+            if retries > TEMP_UPDATE_RETRIES:
+                raise ThermocyclerError(
+                    f"Thermocycler driver set the lid temp to T={temperature} "
+                    f"but status reads T={self.lid_target}"
+                )
+        task = self._loop.create_task(self._wait_for_lid_temp())
+        self.make_cancellable(task)
         await task
 
     # TODO(mc, 2022-04-25): de-duplicate with `set_temperature`
@@ -507,13 +582,11 @@ class Thermocycler(mod_abc.AbstractModule):
 
         Returns: None
         """
-        await self.wait_for_is_running()
-
         temperature = step.get("temperature")
         hold_time_minutes = step.get("hold_time_minutes", None)
         hold_time_seconds = step.get("hold_time_seconds", None)
         ramp_rate = step.get("ramp_rate", None)
-        await self.set_temperature(
+        await self._set_temperature_no_pause(
             temperature=temperature,  # type: ignore
             hold_time_minutes=hold_time_minutes,
             hold_time_seconds=hold_time_seconds,

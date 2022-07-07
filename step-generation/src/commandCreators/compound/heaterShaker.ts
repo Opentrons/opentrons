@@ -7,11 +7,12 @@ import {
   HeaterShakerModuleState,
 } from '../../types'
 import { getModuleState } from '../../robotStateSelectors'
+import { delay } from '../atomic/delay'
 import { heaterShakerOpenLatch } from '../atomic/heaterShakerOpenLatch'
 import { heaterShakerCloseLatch } from '../atomic/heaterShakerCloseLatch'
 import { heaterShakerDeactivateHeater } from '../atomic/heaterShakerDeactivateHeater'
-import { setTemperature as heaterShakerSetTemperature } from '../atomic/setTemperature'
-import { awaitTemperature as heaterShakerAwaitTemperature } from '../atomic'
+import { setTemperature } from '../atomic/setTemperature'
+import { waitForTemperature } from '../atomic'
 import { heaterShakerStopShake } from '../atomic/heaterShakerStopShake'
 import { heaterShakerSetTargetShakeSpeed } from '../atomic/heaterShakerSetTargetShakeSpeed'
 
@@ -55,7 +56,7 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
     )
   } else {
     commandCreators.push(
-      curryCommandCreator(heaterShakerSetTemperature, {
+      curryCommandCreator(setTemperature, {
         module: args.module,
         targetTemperature: args.targetTemperature,
         commandCreatorFnName: 'setTemperature',
@@ -63,10 +64,10 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
     )
 
     commandCreators.push(
-      curryCommandCreator(heaterShakerAwaitTemperature, {
+      curryCommandCreator(waitForTemperature, {
         module: args.module,
         temperature: args.targetTemperature,
-        commandCreatorFnName: 'awaitTemperature',
+        commandCreatorFnName: 'waitForTemperature',
       })
     )
   }
@@ -83,6 +84,33 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
         moduleId: args.module,
         commandCreatorFnName: 'setShakeSpeed',
         rpm: args.rpm,
+      })
+    )
+  }
+
+  if (
+    (args.timerMinutes != null && args.timerMinutes !== 0) ||
+    (args.timerSeconds != null && args.timerSeconds !== 0)
+  ) {
+    const totalSeconds =
+      (args.timerSeconds ?? 0) + (args.timerMinutes ?? 0) * 60
+    commandCreators.push(
+      curryCommandCreator(delay, {
+        commandCreatorFnName: 'delay',
+        description: null,
+        name: null,
+        meta: null,
+        wait: totalSeconds,
+      })
+    )
+    commandCreators.push(
+      curryCommandCreator(heaterShakerStopShake, {
+        moduleId: args.module,
+      })
+    )
+    commandCreators.push(
+      curryCommandCreator(heaterShakerDeactivateHeater, {
+        moduleId: args.module,
       })
     )
   }

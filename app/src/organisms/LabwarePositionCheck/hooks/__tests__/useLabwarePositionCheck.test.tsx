@@ -6,7 +6,6 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderHook } from '@testing-library/react-hooks'
 import {
   useCreateCommandMutation,
-  useCreateLabwareOffsetMutation,
   useCreateLabwareDefinitionMutation,
   useHost,
 } from '@opentrons/react-api-client'
@@ -19,7 +18,7 @@ import {
   useAttachedModules,
   useProtocolDetailsForRun,
 } from '../../../Devices/hooks'
-import { getLabwareLocation } from '../../../ProtocolSetup/utils/getLabwareLocation'
+import { getLabwareLocation } from '../../../Devices/ProtocolRun/utils/getLabwareLocation'
 import { useSteps } from '../useSteps'
 import { useLabwarePositionCheck } from '../useLabwarePositionCheck'
 
@@ -31,7 +30,7 @@ jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/modules')
 jest.mock('../../../Devices/hooks')
 jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../../../ProtocolSetup/utils/getLabwareLocation')
+jest.mock('../../../Devices/ProtocolRun/utils/getLabwareLocation')
 jest.mock('../useSteps')
 
 const queryClient = new QueryClient()
@@ -55,9 +54,6 @@ const mockUseCreateCommandMutation = useCreateCommandMutation as jest.MockedFunc
 >
 const mockUseCreateLabwareDefinitionMutation = useCreateLabwareDefinitionMutation as jest.MockedFunction<
   typeof useCreateLabwareDefinitionMutation
->
-const mockUseCreateLabwareOffsetMutation = useCreateLabwareOffsetMutation as jest.MockedFunction<
-  typeof useCreateLabwareOffsetMutation
 >
 const mockUseCurrentRunCommands = useCurrentRunCommands as jest.MockedFunction<
   typeof useCurrentRunCommands
@@ -84,11 +80,10 @@ describe('useLabwarePositionCheck', () => {
   const MOCK_COMMAND_ID = 'MOCK_COMMAND_ID'
   const MOCK_SLOT = '1'
   let mockCreateCommand: jest.Mock
-  let mockCreateLabwareOffset: jest.Mock
   let mockCreateLabwareDefinition: jest.Mock
   beforeEach(() => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockUseAttachedModules).calledWith(MOCK_ROBOT_NAME).mockReturnValue([])
+    when(mockUseAttachedModules).calledWith().mockReturnValue([])
     when(mockUseCurrentRunId).calledWith().mockReturnValue(MOCK_RUN_ID)
     when(mockUseProtocolDetailsForRun)
       .calledWith(MOCK_RUN_ID)
@@ -117,10 +112,6 @@ describe('useLabwarePositionCheck', () => {
     when(mockUseCreateCommandMutation)
       .calledWith()
       .mockReturnValue({ createCommand: mockCreateCommand } as any)
-    mockCreateLabwareOffset = jest.fn()
-    when(mockUseCreateLabwareOffsetMutation)
-      .calledWith()
-      .mockReturnValue({ createLabwareOffset: mockCreateLabwareOffset } as any)
     mockCreateLabwareDefinition = jest.fn()
     when(mockUseCreateLabwareDefinitionMutation)
       .calledWith()

@@ -1,15 +1,27 @@
 """Abstract base classes for the sensor drivers."""
 from abc import ABC, abstractmethod
 
-from typing import Optional
-
+from typing import Optional, AsyncIterator
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    SensorId,
+    SensorType,
+)
 from opentrons_hardware.sensors.utils import SensorDataType
+from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
+from .scheduler import SensorScheduler
+from contextlib import asynccontextmanager
 
 
 class AbstractBasicSensor(ABC):
     """Abstract base class for basic sensors."""
+
+    def __init__(self, sensor_type: SensorType, sensor_id: SensorId) -> None:
+        """Constructor."""
+        self._sensor_type = sensor_type
+        self._sensor_id = sensor_id
+        self._scheduler = SensorScheduler()
 
     @abstractmethod
     async def read(
@@ -29,6 +41,16 @@ class AbstractBasicSensor(ABC):
         """Write a message to a given sensor."""
         ...
 
+    @abstractmethod
+    async def get_device_status(
+        self,
+        can_messenger: CanMessenger,
+        node_id: NodeId,
+        timeout: int = 1,
+    ) -> bool:
+        """Send a PeripheralStatusRequest and read the response message."""
+        ...
+
 
 class AbstractAdvancedSensor(AbstractBasicSensor):
     """Abstract base class for advanced sensors."""
@@ -39,12 +61,13 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
         stop_threshold: float,
         offset: float,
         sensor_type: SensorType,
+        sensor_id: SensorId,
     ) -> None:
         """Constructor."""
+        super().__init__(sensor_type, sensor_id)
         self._zero_threshold: float = zero_threshold
         self._stop_threshold: float = stop_threshold
         self._offset: float = offset
-        self._sensor_type: SensorType = sensor_type
 
     @property
     def zero_threshold(self) -> float:
@@ -77,11 +100,12 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
         self._offset = offset
 
     @abstractmethod
-    async def poll(
+    async def get_baseline(
         self,
         can_messenger: CanMessenger,
         node_id: NodeId,
         poll_for_ms: int,
+        sample_rate: int,
         timeout: int = 1,
     ) -> Optional[SensorDataType]:
         """Poll the sensor for data."""
@@ -97,3 +121,27 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
     ) -> Optional[SensorDataType]:
         """Send the zero threshold to the sensor."""
         ...
+
+    async def get_report(
+        self,
+        node_id: NodeId,
+        can_messenger: CanMessenger,
+        timeout: int = 1,
+    ) -> Optional[SensorDataType]:
+        """This function retrieves ReadFromResponse messages.
+
+        This is meant to be called after a bind_to_sync call,
+        with the sensor being bound to "report".
+        """
+        ...
+
+    @abstractmethod
+    @asynccontextmanager
+    async def bind_output(
+        self,
+        can_messenger: CanMessenger,
+        node_id: NodeId,
+        binding: SensorOutputBinding = SensorOutputBinding.sync,
+    ) -> AsyncIterator[None]:
+        """Send a BindSensorOutputRequest."""
+        yield

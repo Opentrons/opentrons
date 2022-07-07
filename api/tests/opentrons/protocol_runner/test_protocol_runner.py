@@ -167,6 +167,8 @@ async def test_stop(
     subject: ProtocolRunner,
 ) -> None:
     """It should halt a protocol run with stop."""
+    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(True)
+
     subject.play()
     await subject.stop()
 
@@ -180,6 +182,8 @@ async def test_stop_never_started(
     subject: ProtocolRunner,
 ) -> None:
     """It should clean up rather than halt if the runner was never started."""
+    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(False)
+
     await subject.stop()
 
     decoy.verify(
@@ -190,16 +194,22 @@ async def test_stop_never_started(
 
 async def test_run(
     decoy: Decoy,
+    hardware_api: HardwareAPI,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
     subject: ProtocolRunner,
 ) -> None:
     """It should run a protocol to completion."""
+    decoy.when(protocol_engine.state_view.commands.has_been_played()).then_return(
+        False, True
+    )
+
     assert subject.was_started() is False
     await subject.run()
     assert subject.was_started() is True
 
     decoy.verify(
+        await hardware_api.home(),
         protocol_engine.play(),
         task_queue.start(),
         await task_queue.join(),
@@ -227,8 +237,12 @@ def test_load_json(
     json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
 
     commands: List[pe_commands.CommandCreate] = [
-        pe_commands.PauseCreate(params=pe_commands.PauseParams(message="hello")),
-        pe_commands.PauseCreate(params=pe_commands.PauseParams(message="goodbye")),
+        pe_commands.WaitForResumeCreate(
+            params=pe_commands.WaitForResumeParams(message="hello")
+        ),
+        pe_commands.WaitForResumeCreate(
+            params=pe_commands.WaitForResumeParams(message="goodbye")
+        ),
     ]
 
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
@@ -238,13 +252,13 @@ def test_load_json(
 
     decoy.verify(
         protocol_engine.add_command(
-            request=pe_commands.PauseCreate(
-                params=pe_commands.PauseParams(message="hello")
+            request=pe_commands.WaitForResumeCreate(
+                params=pe_commands.WaitForResumeParams(message="hello")
             )
         ),
         protocol_engine.add_command(
-            request=pe_commands.PauseCreate(
-                params=pe_commands.PauseParams(message="goodbye")
+            request=pe_commands.WaitForResumeCreate(
+                params=pe_commands.WaitForResumeParams(message="goodbye")
             )
         ),
         task_queue.set_run_func(func=protocol_engine.wait_until_complete),

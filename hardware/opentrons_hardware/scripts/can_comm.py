@@ -7,6 +7,8 @@ from enum import Enum
 from logging.config import dictConfig
 from typing import Type, Sequence, Callable, TypeVar
 
+from opentrons_hardware.drivers.can_bus import build
+from opentrons_hardware.drivers.gpio import OT3GPIO
 from opentrons_hardware.firmware_bindings.constants import (
     MessageId,
     NodeId,
@@ -20,7 +22,6 @@ from opentrons_hardware.firmware_bindings.arbitration_id import (
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.firmware_bindings.messages.messages import get_definition
 
-from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 from opentrons_hardware.firmware_bindings.utils import (
     BinarySerializable,
@@ -72,7 +73,7 @@ def create_choices(enum_type: Type[Enum]) -> Sequence[str]:
 
     """
     # mypy wants type annotation for v.
-    return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]  # type: ignore[var-annotated]  # noqa: E501
+    return [f"{i}: {v.name}" for (i, v) in enumerate(enum_type)]  # type: ignore[var-annotated]
 
 
 PromptedEnum = TypeVar("PromptedEnum", bound=Enum, covariant=True)
@@ -213,10 +214,8 @@ async def ui_task(can_driver: AbstractCanDriver) -> None:
             print(in_red(str(e)))
 
 
-async def run(args: argparse.Namespace) -> None:
-    """Entry point for script."""
-    driver = await build_driver(build_settings(args))
-
+async def run_ui(driver: AbstractCanDriver) -> None:
+    """Run the UI."""
     loop = asyncio.get_event_loop()
     fut = asyncio.gather(
         loop.create_task(listen_task(driver)), loop.create_task(ui_task(driver))
@@ -227,8 +226,15 @@ async def run(args: argparse.Namespace) -> None:
         fut.cancel()
     except asyncio.CancelledError:
         pass
-    finally:
-        driver.shutdown()
+
+
+async def run(args: argparse.Namespace) -> None:
+    """Entry point for script."""
+    # build a gpio handler which will automatically release estop
+    gpio = OT3GPIO()
+    gpio.deactivate_estop()
+    async with build.driver(build_settings(args)) as driver:
+        await (run_ui(driver))
 
 
 def in_red(s: str) -> str:

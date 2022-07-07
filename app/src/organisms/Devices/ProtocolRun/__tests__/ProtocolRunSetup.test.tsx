@@ -2,6 +2,7 @@ import * as React from 'react'
 import { pick } from 'lodash'
 import { when, resetAllWhenMocks } from 'jest-when'
 
+import { parseAllRequiredModuleModels } from '@opentrons/api-client'
 import {
   partialComponentPropsMatcher,
   renderWithProviders,
@@ -12,23 +13,32 @@ import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/test
 import { i18n } from '../../../../i18n'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
+import { useFeatureFlag } from '../../../../redux/config'
 import {
   useDeckCalibrationData,
   useProtocolDetailsForRun,
   useRobot,
   useRunCalibrationStatus,
+  useRunHasStarted,
+  useProtocolAnalysisErrors,
+  useStoredProtocolAnalysis,
 } from '../../hooks'
 import { SetupLabware } from '../SetupLabware'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
+import { SetupLiquids } from '../SetupLiquids'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import { SetupModules } from '../SetupModules'
 
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { StoredProtocolAnalysis } from '../../hooks'
 
+jest.mock('@opentrons/api-client')
 jest.mock('../../hooks')
 jest.mock('../SetupLabware')
 jest.mock('../SetupRobotCalibration')
 jest.mock('../SetupModules')
+jest.mock('../SetupLiquids')
+jest.mock('../../../../redux/config')
 
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
@@ -36,9 +46,21 @@ const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
 >
+const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFunction<
+  typeof useProtocolAnalysisErrors
+>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseRunCalibrationStatus = useRunCalibrationStatus as jest.MockedFunction<
   typeof useRunCalibrationStatus
+>
+const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
+  typeof useRunHasStarted
+>
+const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
+  typeof useStoredProtocolAnalysis
+>
+const mockParseAllRequiredModuleModels = parseAllRequiredModuleModels as jest.MockedFunction<
+  typeof parseAllRequiredModuleModels
 >
 const mockSetupLabware = SetupLabware as jest.MockedFunction<
   typeof SetupLabware
@@ -48,6 +70,14 @@ const mockSetupRobotCalibration = SetupRobotCalibration as jest.MockedFunction<
 >
 const mockSetupModules = SetupModules as jest.MockedFunction<
   typeof SetupModules
+>
+
+const mockSetupLiquids = SetupLiquids as jest.MockedFunction<
+  typeof SetupLiquids
+>
+
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
 >
 
 const ROBOT_NAME = 'otie'
@@ -77,13 +107,22 @@ describe('ProtocolRunSetup', () => {
       .mockReturnValue({
         protocolData: (noModulesProtocol as unknown) as ProtocolAnalysisFile,
         displayName: 'mock display name',
+        protocolKey: 'fakeProtocolKey',
       })
+    when(mockUseProtocolAnalysisErrors).calledWith(RUN_ID).mockReturnValue({
+      analysisErrors: null,
+    })
+    when(mockUseStoredProtocolAnalysis)
+      .calledWith(RUN_ID)
+      .mockReturnValue((noModulesProtocol as unknown) as StoredProtocolAnalysis)
+    when(mockParseAllRequiredModuleModels).mockReturnValue([])
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)
       .mockReturnValue(mockConnectedRobot)
     when(mockUseRunCalibrationStatus)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ complete: true })
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     when(mockSetupRobotCalibration)
       .calledWith(
         partialComponentPropsMatcher({
@@ -101,7 +140,8 @@ describe('ProtocolRunSetup', () => {
         })
       )
       .mockReturnValue(<span>Mock SetupLabware</span>)
-    when(mockSetupModules).mockReturnValue(<div>mock SetupModules</div>)
+    when(mockSetupModules).mockReturnValue(<div>Mock SetupModules</div>)
+    when(mockSetupLiquids).mockReturnValue(<div>Mock SetupLiquids</div>)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -111,6 +151,17 @@ describe('ProtocolRunSetup', () => {
     when(mockUseRobot).calledWith(ROBOT_NAME).mockReturnValue(null)
     const { container } = render()
     expect(container.firstChild).toBeNull()
+  })
+
+  it('renders loading data message if robot-analyzed and app-analyzed protocol data is null', () => {
+    when(mockUseProtocolDetailsForRun).calledWith(RUN_ID).mockReturnValue({
+      protocolData: null,
+      displayName: null,
+      protocolKey: null,
+    })
+    when(mockUseStoredProtocolAnalysis).calledWith(RUN_ID).mockReturnValue(null)
+    const { getByText } = render()
+    getByText('Loading data...')
   })
 
   it('renders calibration ready when robot calibration complete', () => {
@@ -124,6 +175,13 @@ describe('ProtocolRunSetup', () => {
       .mockReturnValue({ complete: false })
     const { getByText } = render()
     getByText('Calibration needed')
+  })
+
+  it('does not render calibration status when run has started', () => {
+    when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
+    const { queryByText } = render()
+    expect(queryByText('Calibration needed')).toBeNull()
+    expect(queryByText('Calibration ready')).toBeNull()
   })
 
   describe('when no modules are in the protocol', () => {
@@ -156,16 +214,46 @@ describe('ProtocolRunSetup', () => {
       const { getByText } = render()
       expect(getByText('Mock SetupLabware')).not.toBeVisible()
     })
+
+    it('renders view-only info message if run has started', async () => {
+      when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
+
+      const { getByText } = render()
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      expect(getByText('Mock SetupRobotCalibration')).not.toBeVisible()
+      expect(getByText('Mock SetupLabware')).not.toBeVisible()
+      getByText('Setup is view-only once run has started')
+    })
+  })
+
+  describe('when liquids are in the protocol', () => {
+    it('renders correct text for liquids when FF is on', () => {
+      when(mockUseFeatureFlag)
+        .calledWith('enableLiquidSetup')
+        .mockReturnValue(true)
+
+      const { getByText } = render()
+      getByText('STEP 3')
+      getByText('Initial Liquid Setup')
+      getByText('View liquid starting locations and volumes')
+      getByText('Mock SetupLiquids')
+    })
   })
 
   describe('when modules are in the protocol', () => {
     beforeEach(() => {
+      when(mockParseAllRequiredModuleModels).mockReturnValue([
+        'magneticModuleV1',
+        'temperatureModuleV1',
+      ])
       when(mockUseProtocolDetailsForRun)
         .calledWith(RUN_ID)
         .mockReturnValue({
           protocolData: (withModulesProtocol as unknown) as ProtocolAnalysisFile,
           displayName: 'mock display name',
+          protocolKey: 'fakeProtocolKey',
         })
+      when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     })
     afterEach(() => {
       resetAllWhenMocks()
@@ -175,7 +263,7 @@ describe('ProtocolRunSetup', () => {
       const { getByText } = render()
       const moduleSetup = getByText('Module Setup')
       moduleSetup.click()
-      getByText('mock SetupModules')
+      getByText('Mock SetupModules')
     })
 
     it('renders correct text contents for multiple modules', () => {
@@ -212,7 +300,11 @@ describe('ProtocolRunSetup', () => {
             ),
           } as unknown) as ProtocolAnalysisFile,
           displayName: 'mock display name',
+          protocolKey: 'fakeProtocolKey',
         })
+      when(mockParseAllRequiredModuleModels).mockReturnValue([
+        'magneticModuleV1',
+      ])
       const { getByText } = render()
 
       getByText('STEP 1')
@@ -231,6 +323,33 @@ describe('ProtocolRunSetup', () => {
       getByText(
         'Position full tip racks and labware in the deck slots as shown in the deck map.'
       )
+    })
+    it('renders view-only info message if run has started', async () => {
+      when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
+
+      const { getByText } = render()
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      expect(getByText('Mock SetupRobotCalibration')).not.toBeVisible()
+      expect(getByText('Mock SetupModules')).not.toBeVisible()
+      expect(getByText('Mock SetupLabware')).not.toBeVisible()
+      getByText('Setup is view-only once run has started')
+    })
+
+    it('renders analysis error message if there is an analysis error', async () => {
+      when(mockUseProtocolAnalysisErrors)
+        .calledWith(RUN_ID)
+        .mockReturnValue({
+          analysisErrors: [
+            {
+              id: 'error_id',
+              detail: 'protocol analysis error',
+              errorType: 'analysis',
+              createdAt: '100000',
+            },
+          ],
+        })
+      const { getByText } = render()
+      getByText('Protocol analysis failed')
     })
   })
 })

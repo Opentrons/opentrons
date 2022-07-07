@@ -17,6 +17,10 @@ from opentrons import types
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 
 from opentrons_shared_data import module
+from opentrons_shared_data.labware.dev_types import LabwareUri
+
+from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
+
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
@@ -29,7 +33,7 @@ from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import (
     MAX_SUPPORTED_VERSION,
-    V2_MODULE_DEF_VERSION,
+    POST_V1_MODULE_DEF_VERSION,
 )
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocol_api.labware import Labware
@@ -39,7 +43,7 @@ from .types import GenericConfiguration, ThermocyclerConfiguration
 if TYPE_CHECKING:
     from opentrons_shared_data.module.dev_types import (
         ModuleDefinitionV1,
-        ModuleDefinitionV2,
+        ModuleDefinitionV3,
     )
 
 
@@ -70,6 +74,7 @@ class NoSuchModuleError(Exception):
         return self.message
 
 
+# TODO (spp, 2022-05-09): add tests
 class ModuleGeometry(DeckItem):
     """
     This class represents an active peripheral, such as an Opentrons Magnetic
@@ -126,6 +131,8 @@ class ModuleGeometry(DeckItem):
         self._api_version = api_level
         self._parent = parent
         self._module_type = module_type
+
+        # Note (spp, 2022-05-23): I think this should say '{display_name} on {slot}'
         self._display_name = "{} on {}".format(display_name, str(parent.labware))
         self._model = model
         self._offset = offset
@@ -327,6 +334,68 @@ class ThermocyclerGeometry(ModuleGeometry):
             )
 
 
+class HeaterShakerGeometry(ModuleGeometry):
+    """Class holding the state of a heater-shaker's physical geometry."""
+
+    # TODO(mc, 2022-06-16): move these constants to the module definition
+    MAX_X_ADJACENT_ITEM_HEIGHT = 53.0
+    """Maximum height of an adjacent item in the x-direction.
+
+    This value selected to avoid interference
+    with the heater-shaker's labware latch.
+
+    For background, see: https://github.com/Opentrons/opentrons/issues/10316
+    """
+
+    ALLOWED_ADJACENT_TALL_LABWARE = [
+        LabwareUri("opentrons/opentrons_96_filtertiprack_10ul/1"),
+        LabwareUri("opentrons/opentrons_96_filtertiprack_200ul/1"),
+        LabwareUri("opentrons/opentrons_96_filtertiprack_20ul/1"),
+        LabwareUri("opentrons/opentrons_96_tiprack_10ul/1"),
+        LabwareUri("opentrons/opentrons_96_tiprack_20ul/1"),
+        LabwareUri("opentrons/opentrons_96_tiprack_300ul/1"),
+    ]
+    """URI's of labware that are allowed to exceed the height limit above.
+
+    These labware do not take up the full with of the slot
+    in the area that would interfere with the labware latch.
+
+    For background, see: https://github.com/Opentrons/opentrons/issues/10316
+    """
+
+    def __init__(
+        self,
+        display_name: str,
+        model: ModuleModel,
+        module_type: ModuleType,
+        offset: Point,
+        overall_height: float,
+        height_over_labware: float,
+        parent: Location,
+        api_level: APIVersion,
+    ) -> None:
+        """Heater-Shaker geometry constructor. Inherits from ModuleGeometry."""
+        super().__init__(
+            display_name,
+            model,
+            module_type,
+            offset,
+            overall_height,
+            height_over_labware,
+            parent,
+            api_level,
+        )
+        self._latch_status = HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN
+
+    @property
+    def latch_status(self) -> HeaterShakerLabwareLatchStatus:
+        return self._latch_status
+
+    @latch_status.setter
+    def latch_status(self, status: HeaterShakerLabwareLatchStatus) -> None:
+        self._latch_status = status
+
+
 def _load_from_v1(
     definition: "ModuleDefinitionV1", parent: Location, api_level: APIVersion
 ) -> ModuleGeometry:
@@ -382,13 +451,13 @@ def _load_from_v1(
     return mod
 
 
-def _load_from_v2(
-    definition: "ModuleDefinitionV2",
+def _load_from_v3(
+    definition: "ModuleDefinitionV3",
     parent: Location,
     api_level: APIVersion,
     configuration: GenericConfiguration,
 ) -> ModuleGeometry:
-    """Load a module geometry from a v2 definition.
+    """Load a module geometry from a v3 definition.
 
     The definition should be schema checked before being passed to this
      function; all definitions passed here are assumed to be valid.
@@ -444,12 +513,23 @@ def _load_from_v2(
             lid_height=definition["dimensions"]["lidHeight"],
             configuration=configuration,
         )
+    elif definition["moduleType"] == ModuleType.HEATER_SHAKER.value:
+        return HeaterShakerGeometry(
+            parent=parent,
+            api_level=api_level,
+            offset=Point(xformed[0], xformed[1], definition["labwareOffset"]["z"]),
+            overall_height=definition["dimensions"]["bareOverallHeight"],
+            height_over_labware=definition["dimensions"]["overLabwareHeight"],
+            model=module_model_from_string(definition["model"]),
+            module_type=ModuleType(definition["moduleType"]),
+            display_name=definition["displayName"],
+        )
     else:
         raise RuntimeError(f'Unknown module type {definition["moduleType"]}')
 
 
 def load_module_from_definition(
-    definition: Union["ModuleDefinitionV1", "ModuleDefinitionV2"],
+    definition: Union["ModuleDefinitionV1", "ModuleDefinitionV3"],
     parent: Location,
     api_level: APIVersion = None,
     configuration: GenericConfiguration = ThermocyclerConfiguration.FULL,
@@ -479,8 +559,9 @@ def load_module_from_definition(
         # presence or absence of keys
         v1def: "ModuleDefinitionV1" = definition  # type: ignore
         return _load_from_v1(v1def, parent, api_level)
-    if schema == "module/schemas/2":
-        schema_doc = module.load_schema("2")
+
+    if schema == "module/schemas/3":
+        schema_doc = module.load_schema("3")
         try:
             jsonschema.validate(definition, schema_doc)
         except jsonschema.ValidationError:
@@ -488,8 +569,9 @@ def load_module_from_definition(
             raise RuntimeError("The specified module definition is not valid.")
         # mypy can't tell these apart, but we've schema validated it - this is
         # the right type
-        v2def: "ModuleDefinitionV2" = definition  # type: ignore
-        return _load_from_v2(v2def, parent, api_level, configuration)
+        v3def: "ModuleDefinitionV3" = definition  # type: ignore[assignment]
+        return _load_from_v3(v3def, parent, api_level, configuration)
+
     elif isinstance(schema, str):
         maybe_schema = re.match("^module/schemas/([0-9]+)$", schema)
         if maybe_schema:
@@ -516,39 +598,41 @@ def _load_v1_module_def(module_model: ModuleModel) -> "ModuleDefinitionV1":
     return module.load_definition("1", name)
 
 
-def _load_v2_module_def(module_model: ModuleModel) -> "ModuleDefinitionV2":
+def _load_v3_module_def(module_model: ModuleModel) -> "ModuleDefinitionV3":
     try:
-        return module.load_definition("2", module_model.value)
+        return module.load_definition("3", module_model.value)
     except module.ModuleNotFoundError:
         raise NoSuchModuleError(
-            f"Could not find the module {module_model.value}.", module_model
+            f"Could not find the module {module_model.value} in the "
+            f"specified API version.",
+            module_model,
         )
 
 
 @functools.lru_cache(maxsize=128)
 def _load_module_definition(
     api_level: APIVersion, module_model: ModuleModel
-) -> Union["ModuleDefinitionV2", "ModuleDefinitionV1"]:
+) -> Union["ModuleDefinitionV3", "ModuleDefinitionV1"]:
     """
     Load the appropriate module definition for this api version
     """
 
-    if api_level < V2_MODULE_DEF_VERSION:
+    if api_level < POST_V1_MODULE_DEF_VERSION:
         try:
             return _load_v1_module_def(module_model)
         except NoSuchModuleError:
             try:
-                dname = _load_v2_module_def(module_model)["displayName"]
+                dname = _load_v3_module_def(module_model)["displayName"]
             except NoSuchModuleError:
                 dname = module_model.value
             raise NoSuchModuleError(
                 f"API version {api_level} does not support the module "
                 f"{dname}. Please use at least version "
-                f"{V2_MODULE_DEF_VERSION} to use this module.",
+                f"{POST_V1_MODULE_DEF_VERSION} to use this module.",
                 module_model,
             )
     else:
-        return _load_v2_module_def(module_model)
+        return _load_v3_module_def(module_model)
 
 
 def load_module(
@@ -603,6 +687,8 @@ def resolve_module_model(module_model_or_load_name: str) -> ModuleModel:
         "temperatureModuleV1": TemperatureModuleModel.TEMPERATURE_V1,
         "temperatureModuleV2": TemperatureModuleModel.TEMPERATURE_V2,
         "thermocyclerModuleV1": ThermocyclerModuleModel.THERMOCYCLER_V1,
+        "thermocyclerModuleV2": ThermocyclerModuleModel.THERMOCYCLER_V2,
+        "heaterShakerModuleV1": HeaterShakerModuleModel.HEATER_SHAKER_V1,
     }
 
     alias_map: Mapping[str, ModuleModel] = {
@@ -614,6 +700,8 @@ def resolve_module_model(module_model_or_load_name: str) -> ModuleModel:
         "temperature module gen2": TemperatureModuleModel.TEMPERATURE_V2,
         "thermocycler": ThermocyclerModuleModel.THERMOCYCLER_V1,
         "thermocycler module": ThermocyclerModuleModel.THERMOCYCLER_V1,
+        "thermocycler module gen2": ThermocyclerModuleModel.THERMOCYCLER_V2,
+        # No alias for heater-shaker. Use heater-shaker model name for loading.
     }
 
     lower_name = module_model_or_load_name.lower()
@@ -635,11 +723,11 @@ def resolve_module_model(module_model_or_load_name: str) -> ModuleModel:
 
 
 def resolve_module_type(module_model: ModuleModel) -> ModuleType:
-    return ModuleType(_load_v2_module_def(module_model)["moduleType"])
+    return ModuleType(_load_v3_module_def(module_model)["moduleType"])
 
 
 def models_compatible(model_a: ModuleModel, model_b: ModuleModel) -> bool:
     """Check if two module models may be considered the same"""
     if model_a == model_b:
         return True
-    return model_b.value in _load_v2_module_def(model_a)["compatibleWith"]
+    return model_b.value in _load_v3_module_def(model_a)["compatibleWith"]

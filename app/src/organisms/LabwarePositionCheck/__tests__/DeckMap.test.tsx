@@ -17,7 +17,7 @@ import {
 } from '@opentrons/shared-data'
 import { mockMagneticModule as mockMagneticModuleFixture } from '@opentrons/app/src/redux/modules/__fixtures__'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/2/ot2_standard.json'
+import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,

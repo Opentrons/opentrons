@@ -203,14 +203,16 @@ class ThermocyclerModuleData(BaseModel):
 class ThermocyclerModule(
     GenericModule[
         Literal[ModuleType.THERMOCYCLER],
-        Literal[ModuleModel.THERMOCYCLER_MODULE_V1],
+        Literal[ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2],
         ThermocyclerModuleData,
     ]
 ):
     """An attached Thermocycler Module."""
 
     moduleType: Literal[ModuleType.THERMOCYCLER]
-    moduleModel: Literal[ModuleModel.THERMOCYCLER_MODULE_V1]
+    moduleModel: Literal[
+        ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2
+    ]
     data: ThermocyclerModuleData
 
 

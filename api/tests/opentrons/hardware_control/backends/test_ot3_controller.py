@@ -1,4 +1,5 @@
 import pytest
+from itertools import chain
 from mock import AsyncMock, patch
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import (
@@ -7,7 +8,7 @@ from opentrons.hardware_control.backends.ot3utils import (
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons.config.types import OT3Config
 from opentrons.config.robot_configs import build_config_ot3
-from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName, ToolType
+from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons.hardware_control.types import OT3Axis, OT3Mount
 
@@ -19,6 +20,7 @@ from opentrons_hardware.hardware_control.tools.detector import OneshotToolDetect
 from opentrons_hardware.hardware_control.tools.types import (
     ToolSummary,
     PipetteInformation,
+    GripperInformation,
 )
 
 
@@ -68,6 +70,7 @@ def mock_present_nodes(controller: OT3Controller):
             NodeId.head_l,
             NodeId.head_r,
             NodeId.pipette_right,
+            NodeId.gripper_z,
         )
     )
     try:
@@ -83,7 +86,9 @@ def mock_tool_detector(controller: OT3Controller):
     ) as md:
 
         md.return_value = ToolSummary(
-            right=None, left=None, gripper=ToolType.nothing_attached
+            right=None,
+            left=None,
+            gripper=None,
         )
 
         yield md
@@ -98,6 +103,8 @@ home_test_params = [
     [OT3Axis.X, OT3Axis.Z_R, OT3Axis.P_R, OT3Axis.Y, OT3Axis.Z_L],
     [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.P_L, OT3Axis.P_R],
     [OT3Axis.P_R],
+    [OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G],
+    [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_G],
 ]
 
 
@@ -105,12 +112,17 @@ home_test_params = [
 async def test_home_execute(
     controller: OT3Controller, mock_move_group_run, axes, mock_present_nodes
 ):
+    commanded_homes = set(axes)
     await controller.home(axes)
-    for group in mock_move_group_run.call_args_list:
-        for step in group[0][0]._move_groups[0][0].values():
-            assert step.acceleration_mm_sec_sq == 0
-            assert step.move_type == MoveType.home
-            assert step.stop_condition == MoveStopCondition.limit_switch
+    all_calls = list(chain([args[0][0] for args in mock_move_group_run.call_args_list]))
+    for command in all_calls:
+        for group in command._move_groups:
+            for node, step in group[0].items():
+                commanded_homes.remove(node_to_axis(node))
+                assert step.acceleration_mm_sec_sq == 0
+                assert step.move_type == MoveType.home
+                assert step.stop_condition == MoveStopCondition.limit_switch
+    assert not commanded_homes
 
 
 @pytest.mark.parametrize("axes", home_test_params)
@@ -198,7 +210,9 @@ async def test_probing(
     assert controller._present_nodes == set()
 
     call_count = 0
-    fake_nodes = set((NodeId.gantry_x, NodeId.head, NodeId.pipette_left))
+    fake_nodes = set(
+        (NodeId.gantry_x, NodeId.head, NodeId.pipette_left, NodeId.gripper)
+    )
     passed_expected = None
 
     async def fake_probe(can_messenger, expected, timeout):
@@ -210,7 +224,10 @@ async def test_probing(
         return fake_nodes
 
     async def fake_gai(expected):
-        return {OT3Mount.RIGHT: {"config": "whatever"}}
+        return {
+            OT3Mount.RIGHT: {"config": "whatever"},
+            OT3Mount.GRIPPER: {"config": "whateverelse"},
+        }
 
     with patch(
         "opentrons.hardware_control.backends.ot3controller.probe", fake_probe
@@ -223,6 +240,7 @@ async def test_probing(
                 NodeId.gantry_y,
                 NodeId.head,
                 NodeId.pipette_right,
+                NodeId.gripper,
             )
         )
     assert controller._present_nodes == set(
@@ -231,6 +249,8 @@ async def test_probing(
             NodeId.head_l,
             NodeId.head_r,
             NodeId.pipette_left,
+            NodeId.gripper_g,
+            NodeId.gripper_z,
         )
     )
 
@@ -239,7 +259,7 @@ async def test_get_attached_instruments(
     controller: OT3Controller, mock_tool_detector: OneshotToolDetector
 ):
     async def fake_probe(can_messenger, expected, timeout):
-        return set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head))
+        return set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head, NodeId.gripper))
 
     with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
         assert await controller.get_attached_instruments({}) == {}
@@ -247,14 +267,16 @@ async def test_get_attached_instruments(
     mock_tool_detector.return_value = ToolSummary(
         left=PipetteInformation(name=PipetteName.p1000_single, model=0, serial="hello"),
         right=None,
-        gripper=ToolType.nothing_attached,
+        gripper=GripperInformation(model=0, serial="fake_serial"),
     )
 
     with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
         detected = await controller.get_attached_instruments({})
-    assert list(detected.keys()) == [OT3Mount.LEFT]
+    assert list(detected.keys()) == [OT3Mount.LEFT, OT3Mount.GRIPPER]
     assert detected[OT3Mount.LEFT]["id"] == "hello"
     assert detected[OT3Mount.LEFT]["config"].name == "p1000_single_gen3"
+    assert detected[OT3Mount.GRIPPER]["id"] == "fake_serial"
+    assert detected[OT3Mount.GRIPPER]["config"].name == "gripper"
 
 
 def test_nodeid_replace_head():
@@ -266,6 +288,16 @@ def test_nodeid_replace_head():
     )
     assert OT3Controller._replace_head_node(set([NodeId.head_l])) == set(
         [NodeId.head_l]
+    )
+
+
+def test_nodeid_replace_gripper():
+    assert OT3Controller._replace_gripper_node(
+        set([NodeId.gripper, NodeId.head])
+    ) == set([NodeId.gripper_g, NodeId.gripper_z, NodeId.head])
+    assert OT3Controller._replace_gripper_node(set([NodeId.head])) == set([NodeId.head])
+    assert OT3Controller._replace_gripper_node(set([NodeId.gripper_g])) == set(
+        [NodeId.gripper_g]
     )
 
 

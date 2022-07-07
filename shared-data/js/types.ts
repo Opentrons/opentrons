@@ -7,6 +7,7 @@ import {
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -180,7 +181,9 @@ export type TemperatureModuleModel =
   | typeof TEMPERATURE_MODULE_V1
   | typeof TEMPERATURE_MODULE_V2
 
-export type ThermocyclerModuleModel = typeof THERMOCYCLER_MODULE_V1
+export type ThermocyclerModuleModel =
+  | typeof THERMOCYCLER_MODULE_V1
+  | typeof THERMOCYCLER_MODULE_V2
 
 export type HeaterShakerModuleModel = typeof HEATERSHAKER_MODULE_V1
 
@@ -394,7 +397,7 @@ export interface LoadedLabware {
     slotName: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
   }
 }
-interface AnalysisError {
+export interface AnalysisError {
   id: string
   detail: string
   errorType: string
@@ -422,6 +425,7 @@ export interface ProtocolResource {
   metadata: ProtocolMetadata
   analysisSummaries: ProtocolAnalysisSummary[]
   files: ResourceFile[]
+  key?: string
 }
 
 export interface ProtocolAnalysesResource {
