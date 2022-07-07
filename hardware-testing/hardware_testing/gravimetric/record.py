@@ -31,7 +31,6 @@ class GravimetricSample:
         return self.grams - start_grams
 
 
-@dataclass
 class GravimetricRecording(List):
 
     def __str__(self):
@@ -39,6 +38,33 @@ class GravimetricRecording(List):
                f'length={len(self)}, ' \
                f'duration={round(self.duration, 2)}, ' \
                f'start_time={self.start_time})'
+
+    @classmethod
+    def load(cls, file_path: str) -> "GravimetricRecording":
+        with open(file_path, 'r') as f:
+            lines = f.readlines()
+
+        if len(lines) <= 1:
+            raise FileNotFoundError(f'File has no data saved yet: \"{file_path}\"')
+        expected_header = GravimetricSample.csv_header()
+        assert expected_header.strip() == lines[0].strip()
+        header_list = expected_header.split(',')
+        time_idx = header_list.index('time')
+        grams_idx = header_list.index('grams')
+        stable_idx = header_list.index('stable')
+        recording = GravimetricRecording()
+        for line in lines[1:]:  # skip the header
+            if not line:
+                continue
+            line_list = line.strip().split(',')
+            if len(line) <= 1:
+                continue
+            recording.append(GravimetricSample(
+                time=float(line_list[time_idx]),
+                grams=float(line_list[grams_idx]),
+                stable=bool(int(line_list[stable_idx]))
+            ))
+        return recording
 
     @property
     def start_time(self) -> float:
