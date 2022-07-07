@@ -9,7 +9,11 @@ from typing import Any, Optional, Set
 from opentrons.types import Point
 from opentrons.calibration_storage.types import GripperCalibrationOffset
 from opentrons.config import gripper_config
-from opentrons.hardware_control.types import CriticalPoint, GripperJawState, InvalidMoveError
+from opentrons.hardware_control.types import (
+    CriticalPoint,
+    GripperJawState,
+    InvalidMoveError,
+)
 from .instrument_abc import AbstractInstrument
 from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
 

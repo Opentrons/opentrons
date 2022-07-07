@@ -64,6 +64,7 @@ from .types import (
     OT3AxisMap,
     OT3SubSystem,
     GripperJawState,
+    GripperNotAttachedError,
 )
 from . import modules
 from .robot_calibration import (
@@ -76,7 +77,7 @@ from .robot_calibration import (
 
 from .protocols import HardwareControlAPI
 from .instruments.pipette_handler import OT3PipetteHandler, InstrumentsByMount
-from .instruments.gripper_handler import GripperHandler, GripperNotAttachedError
+from .instruments.gripper_handler import GripperHandler
 from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,

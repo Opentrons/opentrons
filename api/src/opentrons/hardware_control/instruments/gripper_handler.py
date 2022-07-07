@@ -7,10 +7,9 @@ from opentrons.hardware_control.types import (
     CriticalPoint,
     GripperJawState,
     InvalidMoveError,
-    GripperNotAttachedError
-    )
+    GripperNotAttachedError,
+)
 from .gripper import Gripper
-
 
 
 class GripError(Exception):

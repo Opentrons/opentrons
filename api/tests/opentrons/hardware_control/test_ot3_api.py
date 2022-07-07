@@ -66,7 +66,6 @@ def mock_gantry_position(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncM
 
 
 @pytest.fixture
-
 def mock_grip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
     with patch.object(
         ot3_hardware.managed_obj,
@@ -88,8 +87,9 @@ def mock_ungrip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
             spec=ot3_hardware.managed_obj._ungrip,
             wraps=ot3_hardware.managed_obj._ungrip,
         ),
-            ) as mock_move:
+    ) as mock_move:
         yield mock_move
+
 
 @pytest.fixture
 async def mock_backend_move(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
@@ -97,7 +97,6 @@ async def mock_backend_move(ot3_hardware: ThreadManager[OT3API]) -> Iterator[Asy
         ot3_hardware.managed_obj._backend,
         "move",
         AsyncMock(spec=ot3_hardware.managed_obj._backend.move),
-
     ) as mock_move:
         yield mock_move
 
@@ -399,7 +398,6 @@ async def test_gripper_action(
     mock_ungrip.assert_called_once()
 
 
-
 async def test_gripper_move_fails_with_no_gripper(
     ot3_hardware: ThreadManager[OT3API],
 ) -> None:
@@ -455,8 +453,6 @@ async def test_gripper_position(ot3_hardware: ThreadManager[OT3API]):
         + Point(*ot3_hardware.config.gripper_mount_offset)
         + ot3_hardware._gripper_handler.gripper._jaw_center_offset
     )
-
-n
 
 
 async def test_gripper_move_to(
