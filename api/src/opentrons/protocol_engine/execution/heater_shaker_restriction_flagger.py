@@ -1,21 +1,7 @@
 """Helpers for flagging unsafe movements around a heater-shaker Module."""
 
-
-from typing import List, Optional
-
 from opentrons.types import DeckSlotName
-from opentrons.hardware_control.modules.types import (
-    # Renamed to avoid conflicting with ..types.ModuleModel.
-    ModuleType as OpentronsModuleType,
-    HeaterShakerModuleModel as OpentronsHeaterShakerModuleModel,
-)
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import (
-    AbstractModule as AbstractHardwareModule,
-    HeaterShaker as HardwareHeaterShaker,
-)
-from opentrons.hardware_control.modules.types import HeaterShakerStatus
 
 from ..types import ModuleModel, LoadedModule
 from ..state import StateStore
@@ -36,9 +22,10 @@ class HeaterShakerMovementFlagger:
 
         Args:
             state_store: The Protocol Engine state store interface. Used to figure out
-                         modules on deck, deck location, and getting pipette data
-            hardware_api: The underlying hardware interface. Used to query
-                          Heater-Shaker's current states.
+                         modules on deck, deck location, module substate, and
+                         getting pipette data
+            hardware_api: The underlying hardware interface. Used for getting
+                          hardware pipette object.
         """
         self._state_store = state_store
         self._hardware_api = hardware_api
@@ -53,15 +40,11 @@ class HeaterShakerMovementFlagger:
             if module.model == ModuleModel.HEATER_SHAKER_MODULE_V1
         ]
         for heater_shaker_module in heater_shaker_modules:
-            heater_shaker_hardware = await self._find_heater_shaker_by_serial(
-                heater_shaker_module.serialNumber
-            )
-            if heater_shaker_hardware is None:
-                raise RestrictedPipetteMovementError(
-                    f"Cannot resolve heater-shaker movement restrictions."
-                    f' No Heater-Shaker found with serial number "{heater_shaker_module.serialNumber}".'
+            hs_module_substate = (
+                self._state_store.modules.get_heater_shaker_module_substate(
+                    module_id=heater_shaker_module.id
                 )
-
+            )
             heater_shaker_slot_int = int(self._resolve_location(heater_shaker_module))
             dest_slot_int = int(
                 self._state_store.geometry.get_ancestor_slot_name(labware_id)
@@ -77,22 +60,19 @@ class HeaterShakerMovementFlagger:
 
             if any([dest_east_west, dest_north_south, dest_heater_shaker]):
                 # If heater-shaker is running, can't move to or around it
-                if heater_shaker_hardware.status != HeaterShakerStatus.IDLE:
+                if hs_module_substate.is_plate_shaking:
                     raise RestrictedPipetteMovementError(
                         "Cannot move pipette to adjacent slot while Heater-Shaker is shaking"
                     )
 
                 # If heater-shaker's latch is open, can't move to it or east and west of it
-                elif (
-                    heater_shaker_hardware.labware_latch_status
-                    != HeaterShakerLabwareLatchStatus.IDLE_CLOSED
-                    and (dest_east_west or dest_heater_shaker)
+                elif not hs_module_substate.is_labware_latch_closed and (
+                    dest_east_west or dest_heater_shaker
                 ):
                     raise RestrictedPipetteMovementError(
                         "Cannot move pipette east or west of or to Heater-Shaker while latch is open"
                     )
 
-                # TODO will this work in simulation?
                 hw_pipette = self._state_store.pipettes.get_hardware_pipette(
                     pipette_id=pipette_id,
                     attached_pipettes=self._hardware_api.attached_instruments,
@@ -104,7 +84,7 @@ class HeaterShakerMovementFlagger:
                         raise RestrictedPipetteMovementError(
                             "Cannot move multi-channel pipette east or west of Heater-Shaker"
                         )
-                    # Can only go north/west if the labware is a tiprack
+                    # Can only go north/south if the labware is a tiprack
                     elif dest_north_south and not self._state_store.labware.is_tiprack(
                         labware_id
                     ):
@@ -117,37 +97,6 @@ class HeaterShakerMovementFlagger:
             return module.location.slotName
         else:
             return self._state_store.modules.get_location(module.id).slotName
-
-    async def _find_heater_shaker_by_serial(
-        self, serial_number: str
-    ) -> Optional[HardwareHeaterShaker]:
-        """Find the hardware Heater-Shaker with the given serial number.
-
-        Returns:
-            The matching hardware Heater-Shaker, or None if none was found.
-        """
-        available_modules, simulating_module = await self._hardware_api.find_modules(
-            by_model=OpentronsHeaterShakerModuleModel.HEATER_SHAKER_V1,
-            # Hard-coding instead of using
-            # opentrons.protocols.geometry.module_geometry.resolve_module_type(),
-            # to avoid parsing a JSON definition every time a protocol runs when a
-            # heater-shaker is on the deck
-            resolved_type=OpentronsModuleType.HEATER_SHAKER,
-        )
-
-        modules_to_check: List[AbstractHardwareModule] = (
-            available_modules if simulating_module is None else [simulating_module]
-        )
-
-        for module in modules_to_check:
-            # Different module types have different keys under .device_info.
-            # Heater-shakers should always have .device_info["serial"].
-            if (
-                isinstance(module, HardwareHeaterShaker)
-                and module.device_info["serial"] == serial_number
-            ):
-                return module
-        return None
 
     @staticmethod
     def _is_east_or_west(hs_location: int, dest_location: int) -> bool:
