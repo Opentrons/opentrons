@@ -556,7 +556,7 @@ class OT3API(
         Home the jaw of the gripper.
         """
         gripper = self._gripper_handler.verify_gripper()
-        await self._release()
+        await self._ungrip()
         gripper.state = GripperJawState.HOMED_READY
 
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
@@ -940,7 +940,7 @@ class OT3API(
             raise
 
     @ExecutionManagerProvider.wait_for_running
-    async def _release(self) -> None:
+    async def _ungrip(self) -> None:
         """Move the gripper jaw outward to reach the homing switch."""
         try:
             await self._backend.gripper_home_jaw()
@@ -953,10 +953,10 @@ class OT3API(
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(force_newtons)
         await self._grip(duty_cycle=dc)
 
-    async def release(self) -> None:
+    async def ungrip(self) -> None:
         # get default grip force for release if not provided
         self._gripper_handler.check_ready_for_jaw_move()
-        await self._release()
+        await self._ungrip()
         self._gripper_handler.set_jaw_state(GripperJawState.HOMED_READY)
 
     # Pipette action API

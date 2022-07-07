@@ -74,13 +74,13 @@ def mock_grip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
 
 
 @pytest.fixture
-def mock_release(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+def mock_ungrip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
     with patch.object(
         ot3_hardware.managed_obj,
-        "_release",
+        "_ungrip",
         AsyncMock(
-            spec=ot3_hardware.managed_obj._release,
-            wraps=ot3_hardware.managed_obj._release,
+            spec=ot3_hardware.managed_obj._ungrip,
+            wraps=ot3_hardware.managed_obj._ungrip,
         ),
     ) as mock_move:
         yield mock_move
@@ -349,7 +349,7 @@ async def test_cache_gripper(ot3_hardware: ThreadManager[OT3API]) -> None:
 async def test_gripper_action(
     ot3_hardware: ThreadManager[OT3API],
     mock_grip: AsyncMock,
-    mock_release: AsyncMock,
+    mock_ungrip: AsyncMock,
 ) -> None:
     with pytest.raises(
         GripperNotAttachedError, match="Cannot perform action without gripper attached"
@@ -360,8 +360,8 @@ async def test_gripper_action(
     with pytest.raises(
         GripperNotAttachedError, match="Cannot perform action without gripper attached"
     ):
-        await ot3_hardware.release()
-    mock_release.assert_not_called()
+        await ot3_hardware.ungrip()
+    mock_ungrip.assert_not_called()
 
     # cache gripper
     gripper_config = gc.load(GripperModel.V1, "g12345")
@@ -371,13 +371,13 @@ async def test_gripper_action(
     with pytest.raises(GripError, match="Gripper jaw must be homed before moving"):
         await ot3_hardware.grip(5.0)
     await ot3_hardware.home_gripper_jaw()
-    mock_release.assert_called_once()
-    mock_release.reset_mock()
+    mock_ungrip.assert_called_once()
+    mock_ungrip.reset_mock()
     await ot3_hardware.home([OT3Axis.G])
     await ot3_hardware.grip(5.0)
     mock_grip.assert_called_once_with(
         gc.piecewise_force_conversion(5.0, gripper_config.jaw_force_per_duty_cycle),
     )
 
-    await ot3_hardware.release()
-    mock_release.assert_called_once()
+    await ot3_hardware.ungrip()
+    mock_ungrip.assert_called_once()
