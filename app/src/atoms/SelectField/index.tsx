@@ -14,7 +14,7 @@ export interface SelectFieldProps {
   /** react-Select option, usually label, value */
   options: NonNullable<SelectProps['options']>
   /** currently selected value */
-  value: string | null | undefined
+  value?: string | null
   /** disable the select */
   disabled?: SelectProps['isDisabled']
   /** optional placeholder  */
@@ -26,7 +26,7 @@ export interface SelectFieldProps {
   /** optional caption. hidden when `error` is given */
   caption?: React.ReactNode
   /** if included, use error style and display error instead of caption */
-  error?: string | null | undefined
+  error?: string | null
   /** change handler called with (name, value) */
   onValueChange?: (name: string, value: string) => unknown
   /** blur handler called with (name) */
@@ -72,8 +72,8 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
         menuPosition={menuPosition}
         formatOptionLabel={formatOptionLabel}
         //  @ts-expect-error(jr, 7/6/22): value will never be multi value select option
-        onChange={opt => onValueChange && onValueChange(name, opt?.value || '')}
-        onBlur={() => onLoseFocus && onLoseFocus(name)}
+        onChange={opt => onValueChange?.(name, opt?.value || '')}
+        onBlur={() => onLoseFocus?.(name)}
       />
       {caption && <Flex css={CAPTION_STYLE}>{caption}</Flex>}
     </>

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import ReactSelect, { components, DropdownIndicatorProps } from 'react-select'
+import ReactSelect, { components } from 'react-select'
 import { css, CSSObject } from 'styled-components'
 import {
   Icon,
@@ -11,18 +11,13 @@ import {
   DIRECTION_ROW,
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
+  SIZE_1,
 } from '@opentrons/components'
 
-import type { Props as ReactSelectProps } from 'react-select'
-
-export type ChangeAction =
-  | 'select-option'
-  | 'deselect-option'
-  | 'remove-value'
-  | 'pop-value'
-  | 'set-value'
-  | 'clear'
-  | 'create-option'
+import type {
+  Props as ReactSelectProps,
+  DropdownIndicatorProps,
+} from 'react-select'
 
 export interface SelectOption {
   value: string
@@ -139,7 +134,7 @@ function DropdownIndicator(
       <Box css={INDICATOR_STYLES}>
         <Icon
           name={props.selectProps.menuIsOpen ? 'chevron-up' : 'chevron-down'}
-          height={TYPOGRAPHY.lineHeight16}
+          height={SIZE_1}
         />
       </Box>
     </components.DropdownIndicator>
