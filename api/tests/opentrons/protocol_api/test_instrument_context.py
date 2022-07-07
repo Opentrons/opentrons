@@ -86,4 +86,4 @@ def test_pick_up_from_location(decoy: Decoy, subject: InstrumentContext, mock_in
 
     subject.pick_up_tip(location=location)
 
-    decoy.verify(subject.move_to(location), times=1)
+    decoy.verify(mock_instrument_implementation.move_to(location=location, force_direct=False, minimum_z_height=0, speed=0), times=1)
