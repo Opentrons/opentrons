@@ -9,7 +9,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field, UInt32Field
 from opentrons_hardware.firmware_bindings.constants import NodeId
-from .constants import gripper_interrupts_per_sec
+from .constants import brushed_motor_interrupts_per_sec
 
 
 async def set_reference_voltage(
@@ -54,7 +54,9 @@ async def grip(
             payload=payloads.GripperMoveRequestPayload(
                 group_id=UInt8Field(group_id),
                 seq_id=UInt8Field(seq_id),
-                duration=UInt32Field(int(duration_sec * gripper_interrupts_per_sec)),
+                duration=UInt32Field(
+                    int(duration_sec * brushed_motor_interrupts_per_sec)
+                ),
                 duty_cycle=UInt32Field(duty_cycle),
             )
         ),

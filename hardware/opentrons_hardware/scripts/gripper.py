@@ -23,7 +23,9 @@ from opentrons_hardware.hardware_control.gripper_settings import (
     home,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
-from opentrons_hardware.hardware_control.constants import gripper_interrupts_per_sec
+from opentrons_hardware.hardware_control.constants import (
+    brushed_motor_interrupts_per_sec,
+)
 
 GetInputFunc = Callable[[str], str]
 OutputFunc = Callable[[str], None]
@@ -79,7 +81,7 @@ def output_details(i: int, duty_cycle: int, v_ref: float) -> None:
     print(f"\n\033[95mRound {i}:\033[0m")
     print("--------")
     print(f"V_ref: {v_ref * 100} mA")
-    print(f"PWM: {gripper_interrupts_per_sec}Hz {duty_cycle}%\n")
+    print(f"PWM: {brushed_motor_interrupts_per_sec}Hz {duty_cycle}%\n")
 
 
 async def run_test(messenger: CanMessenger) -> None:

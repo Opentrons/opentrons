@@ -27,7 +27,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     GripperMoveRequestPayload,
     TipActionRequestPayload,
 )
-from .constants import interrupts_per_sec, gripper_interrupts_per_sec
+from .constants import interrupts_per_sec, brushed_motor_interrupts_per_sec
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
@@ -200,7 +200,7 @@ class MoveGroupRunner:
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
                 duration=UInt32Field(
-                    int(step.duration_sec * gripper_interrupts_per_sec)
+                    int(step.duration_sec * brushed_motor_interrupts_per_sec)
                 ),
                 duty_cycle=UInt32Field(int(step.pwm_duty_cycle)),
             )
@@ -211,7 +211,7 @@ class MoveGroupRunner:
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
                 duration=UInt32Field(
-                    int(step.duration_sec * gripper_interrupts_per_sec)
+                    int(step.duration_sec * brushed_motor_interrupts_per_sec)
                 ),
                 duty_cycle=UInt32Field(int(step.pwm_duty_cycle)),
             )
