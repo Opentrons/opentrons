@@ -1,16 +1,19 @@
 import atexit
-from time import time
 
 from serial.tools.list_ports import comports
 
 from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing import get_api_context
-from hardware_testing.data import dump_data_to_file, append_data_to_file, create_file_name
-from hardware_testing.drivers import RadwagScaleBase, RadwagScale, SimRadwagScale
-from hardware_testing.drivers.radwag.commands import RadwagWorkingMode, RadwagFilter, RadwagValueRelease
+
+from hardware_testing.drivers import (
+    RadwagScaleBase, RadwagScale, SimRadwagScale
+)
+from hardware_testing.drivers.radwag.commands import (
+    RadwagWorkingMode, RadwagFilter, RadwagValueRelease
+)
 from hardware_testing.gravimetric import (
-    record_samples_to_disk, GravimetricRecording, GravimetricSample, RecordConfig, RecordToDiskConfig
+    record_samples_to_disk, RecordConfig, RecordToDiskConfig
 )
 
 metadata = {
@@ -38,7 +41,8 @@ def initialize_scale(scale: RadwagScaleBase) -> str:
     scale.working_mode(mode=RadwagWorkingMode.weighing)
     scale.filter(RadwagFilter.very_fast)
     scale.value_release(RadwagValueRelease.fast)
-    # scale.internal_adjustment()
+    if 'y' in input('Run \"INTERNAL ADJUSTMENT" ? (y/n) ').lower():
+        scale.internal_adjustment()  # this takes quite a few seconds...
     scale.set_tare(0)
     return scale.read_serial_number()
 
