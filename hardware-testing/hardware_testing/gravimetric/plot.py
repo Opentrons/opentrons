@@ -8,6 +8,7 @@ from dash_html_components import Div
 from plotly.graph_objs import Layout, Scatter
 
 from hardware_testing.gravimetric import GravimetricRecording
+from hardware_testing.data import create_folder_for_test_data
 
 
 app = Dash(__name__)
@@ -15,7 +16,7 @@ GRAPH_ID = 'live-graph'
 UPDATE_ID = 'graph-update'
 UPDATE_INTERVAL_MS = 500
 
-USER_PATH = 'C:/Users/andy/.opentrons/testing_data/example-test'
+TEST_NAME = 'example-test'
 
 
 def _find_newest_file_in_directory(directory: str) -> str:
@@ -42,10 +43,8 @@ def _find_newest_file_in_directory(directory: str) -> str:
     [Input(UPDATE_ID, 'n_intervals')]
 )
 def update_graph_scatter(n):
-    if os.path.isdir(USER_PATH):
-        file_path = _find_newest_file_in_directory(USER_PATH)
-    else:
-        file_path = str(USER_PATH)
+    test_dir_path = create_folder_for_test_data(TEST_NAME)
+    file_path = _find_newest_file_in_directory(str(test_dir_path))
     recording = GravimetricRecording.load(file_path)
     x_min_max = [0, recording.duration]
     y_min_max = [min(recording.grams_as_list), max(recording.grams_as_list)]
@@ -64,6 +63,11 @@ def update_graph_scatter(n):
 
 
 if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser('Plot Gravimetric')
+    parser.add_argument("--test-name", type=str, default=TEST_NAME)
+    args = parser.parse_args()
+    TEST_NAME = args.test_name
     app.layout = Div(
         [
             Graph(id=GRAPH_ID),

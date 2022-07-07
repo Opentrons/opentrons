@@ -40,7 +40,7 @@ def initialize_scale(scale: RadwagScaleBase) -> str:
     scale.automatic_internal_adjustment(enable=False)
     scale.working_mode(mode=RadwagWorkingMode.weighing)
     scale.filter(RadwagFilter.very_fast)
-    scale.value_release(RadwagValueRelease.fast)
+    scale.value_release(RadwagValueRelease.reliable)
     if 'y' in input('Run \"INTERNAL ADJUSTMENT" ? (y/n) ').lower():
         scale.internal_adjustment()  # this takes quite a few seconds...
     scale.set_tare(0)
