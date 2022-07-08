@@ -387,6 +387,25 @@ class CriticalPoint(enum.Enum):
     Only relevant when a multichannel pipette is present.
     """
 
+    GRIPPER_JAW_CENTER = enum.auto()
+    """
+    The center of the gripper jaw engagement zone, such that if this critical
+    point is moved to the center of a labware the gripper will be ready to
+    grip it.
+    """
+
+    GRIPPER_FRONT_CALIBRATION_PIN = enum.auto()
+    """
+    The center of the bottom face of a calibration pin inserted in the gripper's
+    front calibration pin slot.
+    """
+
+    GRIPPER_BACK_CALIBRATION_PIN = enum.auto()
+    """
+    The center of the bottom face of a calibration pin inserted in the gripper's
+    back calibration pin slot.
+    """
+
 
 class ExecutionState(enum.Enum):
     RUNNING = enum.auto()
@@ -462,3 +481,13 @@ class GripperJawState(enum.Enum):
     @property
     def ready_for_grip(self) -> bool:
         return self in [GripperJawState.HOMED_READY, GripperJawState.HOLDING_OPENED]
+
+
+class InvalidMoveError(ValueError):
+    pass
+
+
+class GripperNotAttachedError(Exception):
+    """An error raised if a gripper is accessed that is not attached"""
+
+    pass

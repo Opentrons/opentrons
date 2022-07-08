@@ -39,23 +39,23 @@
   ],
   "baseOffsetFromMount": {
     "x": 6.775,
-    "y": 87.325,
-    "z": 32.05
+    "y": -87.325,
+    "z": -32.05
   },
   "jawCenterOffsetFromBase": {
-    "x": 8.5,
+    "x": -8.5,
     "y": 2.5,
-    "z": 86
+    "z": -86
   },
   "pinOneOffsetFromBase": {
     "x": 23,
-    "y": 73.37920159,
-    "z": 95
+    "y": -73.37920159,
+    "z": -95
   },
   "pinTwoOffsetFromBase": {
     "x": 23,
     "y": 78.37920159,
-    "z": 95
+    "z": -95
   },
   "quirks": []
 }

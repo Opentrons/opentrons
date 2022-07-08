@@ -3,14 +3,13 @@ from typing import Optional
 from opentrons.types import Point
 from opentrons.hardware_control.robot_calibration import load_gripper_calibration_offset
 from opentrons.hardware_control.dev_types import GripperDict
-from opentrons.hardware_control.types import CriticalPoint, GripperJawState
+from opentrons.hardware_control.types import (
+    CriticalPoint,
+    GripperJawState,
+    InvalidMoveError,
+    GripperNotAttachedError,
+)
 from .gripper import Gripper
-
-
-class GripperNotAttachedError(Exception):
-    """An error raised if a gripper is accessed that is not attached"""
-
-    pass
 
 
 class GripError(Exception):
@@ -63,9 +62,10 @@ class GripperHandler:
 
     def get_critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         if not self._gripper:
-            return Point(0, 0, 0)
-        else:
-            return self._gripper.critical_point(cp_override)
+            raise GripperNotAttachedError()
+        if cp_override == CriticalPoint.MOUNT:
+            raise InvalidMoveError("The gripper mount may not be moved directly.")
+        return self._gripper.critical_point(cp_override)
 
     def get_gripper_dict(self) -> Optional[GripperDict]:
         if not self._gripper:
