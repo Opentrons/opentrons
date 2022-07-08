@@ -25,6 +25,10 @@ const PYTHON_BY_PLATFORM = {
       sha256:
         'b9989411bed71ba4867538c991f20b55f549dd9131905733f0df9f3fde81ad1d',
     },
+    arm64: {
+      url: 'https://github.com/indygreg/python-build-standalone/releases/download/20220630/cpython-3.10.5+20220630-aarch64-unknown-linux-gnu-install_only.tar.gz',
+      sha256: '012fa37c12d2647d76d004dc003302563864d2f1cd0731b71eeafad63d28b3f0'
+    },
   },
   win32: {
     x64: {
