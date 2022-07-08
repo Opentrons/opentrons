@@ -14,11 +14,13 @@ import { useTrackProtocolRunEvent } from '../hooks'
 import { useRunControls } from '../../RunTimeControl/hooks'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 import { DownloadRunLogToast } from '../DownloadRunLogToast'
+import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 
 import type { CommandsData } from '@opentrons/api-client'
 
 const mockPush = jest.fn()
 
+jest.mock('../../../redux/buildroot/selectors')
 jest.mock('../../Devices/hooks')
 jest.mock('../DownloadRunLogToast')
 jest.mock('../../RunTimeControl/hooks')
@@ -48,6 +50,9 @@ const mockDownloadRunLogToast = DownloadRunLogToast as jest.MockedFunction<
 const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
   typeof useTrackProtocolRunEvent
 >
+const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
+  typeof getBuildrootUpdateDisplayInfo
+>
 
 const render = (
   props: React.ComponentProps<typeof HistoricalProtocolRunOverflowMenu>
@@ -71,6 +76,11 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
     mockTrackProtocolRunEvent = jest.fn(
       () => new Promise(resolve => resolve({}))
     )
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'reinstall',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
     when(mockDownloadRunLogToast).mockReturnValue(
       <div>mock downlaod run log toast</div>
     )
@@ -136,5 +146,21 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
     fireEvent.click(deleteBtn)
     expect(mockUseDeleteRunMutation).toHaveBeenCalled()
+  })
+
+  it('disables the rerun protocol menu item if robot software update is available', () => {
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+    const { getByRole } = render(props)
+    const btn = getByRole('button')
+    fireEvent.click(btn)
+    getByRole('button', {
+      name: 'View protocol run record',
+    })
+    const rerunBtn = getByRole('button', { name: 'Rerun protocol now' })
+    expect(rerunBtn).toBeDisabled()
   })
 })

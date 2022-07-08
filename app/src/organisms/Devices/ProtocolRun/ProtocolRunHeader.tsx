@@ -26,7 +26,6 @@ import {
   Flex,
   Icon,
   IconName,
-  Tooltip,
   useHoverTooltip,
   useInterval,
   ALIGN_CENTER,
@@ -47,6 +46,7 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 
+import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
 import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
 import { Banner } from '../../../atoms/Banner'
@@ -54,6 +54,7 @@ import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { useTrackEvent } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { StyledText } from '../../../atoms/text'
+import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useCloseCurrentRun,
   useCurrentRunId,
@@ -82,6 +83,7 @@ import { formatTimestamp } from '../utils'
 import { EMPTY_TIMESTAMP } from '../constants'
 
 import type { Run } from '@opentrons/api-client'
+import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 const EQUIPMENT_POLL_MS = 5000
@@ -276,6 +278,11 @@ export function ProtocolRunHeader({
     trackProtocolRunEvent({ name: 'runAgain' })
   }
 
+  const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
+    useSelector((state: State) => {
+      return getBuildrootUpdateDisplayInfo(state, robotName)
+    })?.autoUpdateAction
+  )
   const isRunControlButtonDisabled =
     (isCurrentRun && !isSetupComplete) ||
     isMutationLoading ||
@@ -284,7 +291,8 @@ export function ProtocolRunHeader({
     runStatus === RUN_STATUS_FINISHING ||
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
     runStatus === RUN_STATUS_STOP_REQUESTED ||
-    runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR
+    runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
+    isRobotOnWrongVersionOfSoftware
 
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
@@ -330,6 +338,8 @@ export function ProtocolRunHeader({
     disableReason = t('setup_incomplete')
   } else if (isRobotBusy) {
     disableReason = t('robot_is_busy')
+  } else if (isRobotOnWrongVersionOfSoftware) {
+    disableReason = t('shared:a_software_update_is_available')
   }
 
   const buttonIcon =
@@ -613,7 +623,7 @@ export function ProtocolRunHeader({
             <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>
           </PrimaryButton>
           {disableReason != null && (
-            <Tooltip {...tooltipProps}>{disableReason}</Tooltip>
+            <Tooltip tooltipProps={tooltipProps}>{disableReason}</Tooltip>
           )}
         </Flex>
       </Flex>
