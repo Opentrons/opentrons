@@ -12,12 +12,12 @@ import {
   ALIGN_FLEX_END,
   TEXT_TRANSFORM_CAPITALIZE,
   useHoverTooltip,
-  Tooltip,
 } from '@opentrons/components'
 
 import { CONNECTABLE, removeRobot } from '../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
+import { Tooltip } from '../../atoms/Tooltip'
 import { Divider } from '../../atoms/structure'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Portal } from '../../App/portal'
@@ -86,7 +86,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           {t('run_a_protocol')}
         </MenuItem>
         {isRobotOnWrongVersionOfSoftware && (
-          <Tooltip {...tooltipProps}>
+          <Tooltip tooltipProps={tooltipProps}>
             {t('shared:a_software_update_is_available')}
           </Tooltip>
         )}

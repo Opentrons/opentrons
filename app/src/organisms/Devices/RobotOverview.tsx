@@ -20,11 +20,11 @@ import {
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   useHoverTooltip,
-  Tooltip,
 } from '@opentrons/components'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { ToggleButton, PrimaryButton } from '../../atoms/buttons'
+import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
 import { useDispatchApiRequest } from '../../redux/robot-api'
 import { fetchLights } from '../../redux/robot-controls'
@@ -142,7 +142,7 @@ export function RobotOverview({
             {t('run_a_protocol')}
           </PrimaryButton>
           {isRobotOnWrongVersionOfSoftware && (
-            <Tooltip {...tooltipProps}>
+            <Tooltip tooltipProps={tooltipProps}>
               {t('shared:a_software_update_is_available')}
             </Tooltip>
           )}

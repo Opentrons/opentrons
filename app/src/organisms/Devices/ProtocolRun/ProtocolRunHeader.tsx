@@ -26,7 +26,6 @@ import {
   Flex,
   Icon,
   IconName,
-  Tooltip,
   useHoverTooltip,
   useInterval,
   ALIGN_CENTER,
@@ -55,6 +54,7 @@ import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { useTrackEvent } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { StyledText } from '../../../atoms/text'
+import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useCloseCurrentRun,
   useCurrentRunId,
@@ -623,7 +623,7 @@ export function ProtocolRunHeader({
             <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>
           </PrimaryButton>
           {disableReason != null && (
-            <Tooltip {...tooltipProps}>{disableReason}</Tooltip>
+            <Tooltip tooltipProps={tooltipProps}>{disableReason}</Tooltip>
           )}
         </Flex>
       </Flex>

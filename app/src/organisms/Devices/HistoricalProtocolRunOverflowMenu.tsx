@@ -12,13 +12,13 @@ import {
   COLORS,
   useOnClickOutside,
   useHoverTooltip,
-  Tooltip,
 } from '@opentrons/components'
 import {
   useDeleteRunMutation,
   useAllCommandsQuery,
 } from '@opentrons/react-api-client'
 import { Divider } from '../../atoms/structure'
+import { Tooltip } from '../../atoms/Tooltip'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../RunTimeControl/hooks'
@@ -172,7 +172,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         {t('rerun_now')}
       </MenuItem>
       {isRobotOnWrongVersionOfSoftware && (
-        <Tooltip {...tooltipProps}>
+        <Tooltip tooltipProps={tooltipProps}>
           {t('shared:a_software_update_is_available')}
         </Tooltip>
       )}
