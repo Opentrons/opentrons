@@ -20,7 +20,7 @@ export const cardOutlineBorder = css`
   border-color: ${medGrey};
   border-radius: ${radiusSoftCorners};
   &:hover {
-    border: 1px solid ${medGreyHover};
+    border-color: ${medGreyHover};
   }
 `
 

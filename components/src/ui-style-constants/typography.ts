@@ -126,7 +126,6 @@ export const darkLinkLabelSemiBold = css`
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
   color: ${COLORS.darkGreyEnabled};
-
   &:hover {
     color: ${COLORS.darkBlack};
   }

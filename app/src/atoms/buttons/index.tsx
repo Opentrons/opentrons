@@ -120,6 +120,7 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
+  background-color: ${COLORS.transparent};
   ${TYPOGRAPHY.pSemiBold}
   background-color: ${COLORS.transparent};
 

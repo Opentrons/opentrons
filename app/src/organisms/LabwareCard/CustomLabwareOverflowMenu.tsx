@@ -16,7 +16,9 @@ import {
   ALIGN_CENTER,
   TYPOGRAPHY,
   Btn,
+  useOnClickOutside,
 } from '@opentrons/components'
+
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { AlertPrimaryButton } from '../../atoms/buttons'
@@ -24,11 +26,11 @@ import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { Modal } from '../../atoms/Modal'
 import { Portal } from '../../App/portal'
-import { useCloseOnOutsideClick } from './hooks'
 import {
   deleteCustomLabwareFile,
   openCustomLabwareDirectory,
 } from '../../redux/custom-labware'
+
 import type { Dispatch } from '../../redux/types'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
@@ -45,8 +47,9 @@ export function CustomLabwareOverflowMenu(
   const { t } = useTranslation(['labware_landing', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
-  const overflowMenuRef = React.useRef(null)
-  useCloseOnOutsideClick(overflowMenuRef, () => setShowOverflowMenu(false))
+  const overflowMenuRef = useOnClickOutside<HTMLDivElement>({
+    onClickOutside: () => setShowOverflowMenu(false),
+  })
 
   const {
     confirm: confirmDeleteLabware,
@@ -96,7 +99,6 @@ export function CustomLabwareOverflowMenu(
       {showOverflowMenu && (
         <Flex
           ref={overflowMenuRef}
-          width="10rem"
           zIndex={10}
           borderRadius={'4px 4px 0px 0px'}
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
@@ -105,6 +107,7 @@ export function CustomLabwareOverflowMenu(
           top={SPACING.spacing6}
           right={0}
           flexDirection={DIRECTION_COLUMN}
+          whiteSpace="nowrap"
         >
           <MenuItem onClick={handleOpenInFolder}>
             {t('show_in_folder')}
@@ -112,9 +115,13 @@ export function CustomLabwareOverflowMenu(
           <MenuItem onClick={handleClickDelete}>{t('delete')}</MenuItem>
           <Divider />
           <MenuItem onClick={handleClickLabwareCreator}>
-            <StyledText color={COLORS.blue}>
+            <StyledText css={TYPOGRAPHY.linkPSemiBold}>
               {t('open_labware_creator')}
-              <Icon name="open-in-new" height={SPACING.spacingSM}></Icon>
+              <Icon
+                name="open-in-new"
+                height={SPACING.spacingSM}
+                marginLeft="0.375rem"
+              ></Icon>
             </StyledText>
           </MenuItem>
         </Flex>

@@ -82,12 +82,16 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         </Link>
       </Flex>
       {!isCustomDefinition && (
-        <>
-          <StyledText as="label" id="LabwareDetails_opentronsDef">
-            <Icon color={COLORS.blue} name="check-decagram" height=".7rem" />{' '}
+        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+          <Icon color={COLORS.blue} name="check-decagram" height=".7rem" />{' '}
+          <StyledText
+            as="label"
+            id="LabwareDetails_opentronsDef"
+            marginLeft={SPACING.spacing2}
+          >
             {t('opentrons_def')}
           </StyledText>
-        </>
+        </Flex>
       )}
       {modified != null && filename != null && (
         <Flex
