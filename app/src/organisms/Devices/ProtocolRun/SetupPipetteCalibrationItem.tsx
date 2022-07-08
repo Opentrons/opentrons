@@ -14,7 +14,6 @@ import {
   JUSTIFY_CENTER,
   SIZE_4,
   TOOLTIP_LEFT,
-  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -118,7 +117,6 @@ export function SetupPipetteCalibrationItem({
         <TertiaryButton
           as={RRDLink}
           to={deviceDetailsUrl}
-          padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
           id={'PipetteCalibration_attachPipetteButton'}
         >
           {t('attach_pipette_cta')}
@@ -131,7 +129,6 @@ export function SetupPipetteCalibrationItem({
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           {pipetteMismatchInfo}
           <TertiaryButton
-            padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
             onClick={() => startPipetteOffsetCalibrationBlockModal(null)}
             disabled={!isDeckCalibrated}
             id={'PipetteCalibration_calibratePipetteButton'}

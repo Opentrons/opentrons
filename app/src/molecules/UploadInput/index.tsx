@@ -104,7 +104,11 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       alignItems={ALIGN_CENTER}
       gridGap={SPACING.spacing5}
     >
-      <StyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
+      <StyledText
+        as="p"
+        textAlign={TYPOGRAPHY.textAlignCenter}
+        marginTop={SPACING.spacing4}
+      >
         {props.uploadText}
       </StyledText>
       <PrimaryButton

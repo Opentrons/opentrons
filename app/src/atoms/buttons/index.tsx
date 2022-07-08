@@ -19,7 +19,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   box-shadow: none;
   color: ${COLORS.background};
   overflow: no-wrap;
-  padding: 0.375rem 0.75rem;
+  padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   white-space: nowrap;
   ${TYPOGRAPHY.labelSemiBold}
@@ -28,6 +28,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
 
   &:hover {
     background-color: ${COLORS.blueHover};
+    box-shadow: none;
   }
 
   &:active {

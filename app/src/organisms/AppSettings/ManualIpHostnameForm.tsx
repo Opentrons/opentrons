@@ -119,7 +119,6 @@ export function ManualIpHostnameForm({
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight12}
           marginLeft={SPACING.spacing3}
-          padding="0.375rem 0.75rem"
           type="submit"
         >
           {t('add_ip_button')}

@@ -46,6 +46,7 @@ import {
 } from '../../../../organisms/RunTimeControl/__fixtures__'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { useTrackEvent } from '../../../../redux/analytics'
+import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
 
 import {
@@ -93,6 +94,7 @@ jest.mock('../../../ModuleCard/ConfirmAttachmentModal')
 jest.mock('../../../ModuleCard/hooks')
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
+jest.mock('../../../../redux/buildroot/selectors')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -157,6 +159,9 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 >
 const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
   typeof useIsRobotViewable
+>
+const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
+  typeof getBuildrootUpdateDisplayInfo
 >
 
 const ROBOT_NAME = 'otie'
@@ -245,6 +250,11 @@ describe('ProtocolRunHeader', () => {
       analysisErrors: null,
     })
     mockUseIsHeaterShakerInProtocol.mockReturnValue(false)
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'reinstall',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID)
     when(mockUseCloseCurrentRun).calledWith().mockReturnValue({
       isClosingCurrentRun: false,
@@ -304,7 +314,7 @@ describe('ProtocolRunHeader', () => {
     const [{ getByText }] = render()
 
     getByText('A Protocol for Otie')
-    getByText('Run ID')
+    getByText('Run')
     getByText('03/03/2022 19:08:49')
     getByText('Status')
     getByText('Not started')
@@ -407,6 +417,21 @@ describe('ProtocolRunHeader', () => {
     const button = getByRole('button', { name: 'Start run' })
     expect(button).toBeDisabled()
     getByText('Complete required steps in Setup tab')
+  })
+
+  it('disables the Start Run button with tooltip if robot software update is available', () => {
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+
+    const [{ getByRole, getByText }] = render()
+    const button = getByRole('button', { name: 'Start run' })
+    expect(button).toBeDisabled()
+    getByText(
+      'A software update is available for this robot. Update to run protocols.'
+    )
   })
 
   it('renders a pause run button, start time, and end time when run is running, and calls trackProtocolRunEvent when button clicked', () => {
