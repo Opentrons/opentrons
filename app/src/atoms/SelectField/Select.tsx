@@ -14,10 +14,7 @@ import {
   SIZE_1,
 } from '@opentrons/components'
 
-import type {
-  Props as ReactSelectProps,
-  DropdownIndicatorProps,
-} from 'react-select'
+import type { Props as ReactSelectProps } from 'react-select'
 
 export interface SelectOption {
   value: string
@@ -127,7 +124,7 @@ export function Select(props: SelectProps): JSX.Element {
 }
 
 function DropdownIndicator(
-  props: DropdownIndicatorProps<SelectOption>
+  props: ReactSelect.DropdownIndicatorProps<SelectOption>
 ): JSX.Element {
   return (
     <components.DropdownIndicator {...props}>
