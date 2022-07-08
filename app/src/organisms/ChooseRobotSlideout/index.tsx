@@ -217,7 +217,7 @@ export function ChooseRobotSlideout(
                   onClick={() => {
                     if (!isCreatingRun) {
                       resetCreateRun()
-                      setSelectedRobot(isSelected ? null : robot)
+                      setSelectedRobot(robot)
                     }
                   }}
                   isError={runCreationError != null}
