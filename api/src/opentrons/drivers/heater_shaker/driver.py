@@ -176,7 +176,7 @@ class HeaterShakerDriver(AbstractHeaterShakerDriver):
         c = CommandBuilder(terminator=HS_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.ENTER_BOOTLOADER
         )
-        await self._connection.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
+        await self._connection.send_dfu_command(command=c)
         await self._connection.close()
 
     async def deactivate_heater(self) -> None:

@@ -76,6 +76,7 @@ class AbstractModule(abc.ABC):
         name_to_fw_file_prefix = {
             "tempdeck": "temperature-module",
             "magdeck": "magnetic-module",
+            "heatershaker": "heater-shaker",
         }
         name = self.name()
         file_prefix = name_to_fw_file_prefix.get(name, name)

@@ -19,13 +19,15 @@ async def update_firmware(
 
     raises an UpdateError with the reason for the failure.
     """
-    flash_port = await module.prep_for_update()
+    flash_port_or_dfu_serial = await module.prep_for_update()
     kwargs: Dict[str, Any] = {
         "stdout": asyncio.subprocess.PIPE,
         "stderr": asyncio.subprocess.PIPE,
         "loop": loop,
     }
-    successful, res = await module.bootloader()(flash_port, str(firmware_file), kwargs)
+    successful, res = await module.bootloader()(flash_port_or_dfu_serial,
+                                                str(firmware_file),
+                                                kwargs)
     if not successful:
         log.info(f"Bootloader reponse: {res}")
         raise UpdateError(res)
@@ -48,6 +50,39 @@ async def find_bootloader_port() -> str:
                 raise OSError("Multiple new bootloader ports" "found on mode switch")
         await asyncio.sleep(2)
     raise Exception("No ot_module bootloaders found in /dev. Try again")
+
+
+async def find_dfu_device(pid: str) -> str:
+    """Find the dfu device and return its serial number (separate from module serial)"""
+    retries = 5
+    log.info(f"Searching for a dfu device with PID {pid}")
+    while retries != 0:
+        retries -= 1
+        await asyncio.sleep(1)
+        proc = await asyncio.create_subprocess_exec("dfu-util", "-l",
+                                                    stdout=asyncio.subprocess.PIPE,
+                                                    stderr=asyncio.subprocess.PIPE)
+        await proc.wait()
+        stdout, stderr = await proc.communicate()
+
+        if stdout is None and stderr is None:
+            # This probably needs to be refactored into just a check for empty stdout
+            continue
+        if stderr:
+            raise RuntimeError(f"Error finding dfu device: {stderr}")
+
+        result = stdout.decode()
+        if pid not in result:
+            # It could take a few seconds for the device to show up
+            continue
+        for line in result.splitlines():
+            if pid in line:
+                log.info(f"Found device with PID {pid}")
+                # TODO: Make this return just the serial and not the entire string
+                return line[line.find("serial"):]
+
+    raise RuntimeError("Could not update firmware via dfu. Possible issues- dfu-util"
+                       " not working or specified dfu device not found")
 
 
 async def upload_via_avrdude(
@@ -141,19 +176,28 @@ async def upload_via_bossa(
 
 
 async def upload_via_dfu(
-    port: str, firmware_file_path: str, kwargs: Dict[str, Any]
+    dfu_serial: str, firmware_file_path: str, kwargs: Dict[str, Any]
 ) -> Tuple[bool, str]:
     """Run firmware upload command for DFU.
 
     Returns tuple of success boolean and message from bootloader
     """
+    log.info("Starting firmware upload via dfu util")
 
+    # We don't specify a port since the dfu device doesn't get one &
+    # dfu-util doesn't need it either so I've replaced the 'port' arg with an arg to
+    # fetch dfu device serial. I haven't used it in the below command though.
+
+    # The below command works but if we want to be super-specific about
+    # which dfu device to upload firmware to, then we can specify the device serial
+    # (or the vid:pid) in the command. This will take care of the super rare case where
+    # a robot has two stm32 devices plugged in and a user initiates firmware upload for
+    # both of them in quick succession. It's a rare case but has happened before.
     dfu_args = [
         "dfu-util",
         "-a 0",
         "-s 0x08000000:leave",
-        "--dfuse-address 0x08000000",
-        f"-D {firmware_file_path}",
+        f"-D{firmware_file_path}",
         "-R",
     ]
 
@@ -163,10 +207,11 @@ async def upload_via_dfu(
     res = stdout.decode()
     if return_code == 0:
         log.debug(res)
+        log.info("UPLOAD SUCCESSFUL")
         return True, res
     else:
         log.error(
-            f"Failed to update module firmware for {port}: {res}. "
+            f"Failed to update module firmware for Heater-Shaker dfu: {res}. "
             f"Error given: {stderr.decode()}"
         )
         return False, res
