@@ -44,7 +44,7 @@ marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Create a calibration check session
+  - name: Create a pipette offset calibration session
     request:
       url: '{host:s}:{port:d}/sessions'
       method: POST
