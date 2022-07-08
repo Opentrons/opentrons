@@ -36,6 +36,10 @@ def find_scale_port() -> str:
 
 
 def initialize_scale(scale: RadwagScaleBase) -> str:
+    # Some Radwag settings cannot be controlled remotely.
+    # Listed below are the things the must be done using the touchscreen:
+    #   1) Set profile to USER
+    #   2) Set screensaver to NONE
     scale.continuous_transmission(enable=False)
     scale.automatic_internal_adjustment(enable=False)
     scale.working_mode(mode=RadwagWorkingMode.weighing)
@@ -56,7 +60,7 @@ def run(protocol: ProtocolContext) -> None:
     atexit.register(scale.disconnect)
     initialize_scale(scale)
 
-    while 'y' not in input('Quit? (y/n): ').lower():
+    while True:
         try:
             recording_name = input('Name of recording: ')
             recording_duration = float(input('\tDuration (sec): '))

@@ -172,8 +172,8 @@ def record_samples(scale: RadwagScaleBase,
         if config.stable and not _s.stable:
             _samples.clear()  # delete all previously recorded samples
             continue
-        iwo = config.interval - _get_interval_overlap(_samples, config.interval)
-        if not len(_samples) or _did_exceed_time(_samples.end_time, iwo):
+        interval_w_overlap = config.interval - _get_interval_overlap(_samples, config.interval)
+        if not len(_samples) or _did_exceed_time(_samples.end_time, interval_w_overlap):
             _samples.append(_s)
             if callable(on_new_sample):
                 on_new_sample(_samples)
