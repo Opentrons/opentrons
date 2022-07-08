@@ -196,7 +196,6 @@ export const TestShakeSlideout = (
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
-            paddingX={SPACING.spacing4}
             onClick={toggleLatch}
             disabled={isShaking}
             {...targetProps}
@@ -248,7 +247,6 @@ export const TestShakeSlideout = (
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
             marginLeft={SIZE_AUTO}
             marginTop={SPACING.spacing3}
-            paddingX={SPACING.spacing4}
             onClick={handleShakeCommand}
             disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
             {...targetProps}

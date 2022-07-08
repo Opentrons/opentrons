@@ -75,7 +75,7 @@
   "protocol_end": "Protocol end",
   "total_elapsed_time": "Total elapsed time",
   "run_log": "Run Log",
-  "run_id": "Run ID",
+  "run": "Run",
   "setup": "Setup",
   "status": "Status",
   "setup_incomplete": "Complete required steps in Setup tab",
