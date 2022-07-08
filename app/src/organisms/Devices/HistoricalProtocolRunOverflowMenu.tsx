@@ -18,6 +18,7 @@ import {
 } from '@opentrons/react-api-client'
 import { Divider } from '../../atoms/structure'
 import { Tooltip } from '../../atoms/Tooltip'
+import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../RunTimeControl/hooks'
@@ -39,7 +40,12 @@ export function HistoricalProtocolRunOverflowMenu(
   props: HistoricalProtocolRunOverflowMenuProps
 ): JSX.Element {
   const { runId, robotName } = props
-  const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const {
+    MenuOverlay,
+    handleOverflowClick,
+    showOverflowMenu,
+    setShowOverflowMenu,
+  } = useMenuHandleClickOutside()
   const protocolRunOverflowWrapperRef = useOnClickOutside({
     onClickOutside: () => setShowOverflowMenu(false),
   }) as React.RefObject<HTMLDivElement>
@@ -47,11 +53,6 @@ export function HistoricalProtocolRunOverflowMenu(
     showDownloadRunLogToast,
     setShowDownloadRunLogToast,
   ] = React.useState<boolean>(false)
-  const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    setShowOverflowMenu(!showOverflowMenu)
-  }
 
   const commands = useAllCommandsQuery(
     runId,
@@ -68,16 +69,19 @@ export function HistoricalProtocolRunOverflowMenu(
     >
       <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
       {showOverflowMenu && (
-        <div
-          ref={protocolRunOverflowWrapperRef}
-          data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
-        >
-          <MenuDropdown
-            {...props}
-            closeOverflowMenu={handleOverflowClick}
-            setShowDownloadRunLogToast={setShowDownloadRunLogToast}
-          />
-        </div>
+        <>
+          <div
+            ref={protocolRunOverflowWrapperRef}
+            data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
+          >
+            <MenuDropdown
+              {...props}
+              closeOverflowMenu={handleOverflowClick}
+              setShowDownloadRunLogToast={setShowDownloadRunLogToast}
+            />
+          </div>
+          <MenuOverlay />
+        </>
       )}
       {runTotalCommandCount != null && showDownloadRunLogToast ? (
         <DownloadRunLogToast
