@@ -10,7 +10,6 @@ from logging.config import dictConfig
 from opentrons_hardware.drivers.can_bus import build
 from opentrons_hardware.firmware_bindings.messages import payloads
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    SetupRequest,
     DisableMotorRequest,
     ExecuteMoveGroupRequest,
 )
@@ -24,7 +23,9 @@ from opentrons_hardware.hardware_control.gripper_settings import (
     home,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
-
+from opentrons_hardware.hardware_control.constants import (
+    brushed_motor_interrupts_per_sec,
+)
 
 GetInputFunc = Callable[[str], str]
 OutputFunc = Callable[[str], None]
@@ -75,37 +76,35 @@ async def execute_move(messenger: CanMessenger) -> None:
     )
 
 
-def output_details(i: int, freq: int, duty_cycle: int, v_ref: float) -> None:
+def output_details(i: int, duty_cycle: int, v_ref: float) -> None:
     """Print out test details."""
     print(f"\n\033[95mRound {i}:\033[0m")
     print("--------")
     print(f"V_ref: {v_ref * 100} mA")
-    print(f"PWM: {freq}Hz {duty_cycle}%\n")
+    print(f"PWM: {brushed_motor_interrupts_per_sec}Hz {duty_cycle}%\n")
 
 
 async def run_test(messenger: CanMessenger) -> None:
     """Run the for test."""
     print("Gripper testing begins... \n")
-    pwm_freq = prompt_int_input("PWM frequency in Hz (int)")
     pwm_duty = prompt_int_input("PWM duty cycle in % (int)")
 
     """Setup gripper"""
     try:
-        await messenger.send(node_id=NodeId.gripper, message=SetupRequest())
-        await set_pwm_param(messenger, pwm_freq, pwm_duty)
+        await set_pwm_param(messenger, pwm_duty)
 
         for i, v in enumerate(vref_list):
             await set_reference_voltage(messenger, v)
-            output_details(i, pwm_freq, pwm_duty, v)
+            output_details(i, pwm_duty, v)
 
             input(in_green("Press Enter to grip...\n"))
 
-            await grip(messenger, 0, 0, 0, 0, 0)
+            await grip(messenger, 0, 0, 0, 0)
             await execute_move(messenger)
 
             input(in_green("Press Enter to release...\n"))
 
-            await home(messenger, 0, 0, 0, 0)
+            await home(messenger, 0, 0, 0)
             await execute_move(messenger)
 
     except asyncio.CancelledError:

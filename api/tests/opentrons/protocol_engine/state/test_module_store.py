@@ -33,6 +33,8 @@ from opentrons.protocol_engine.state.module_substates import (
     ModuleSubStateType,
 )
 
+from opentrons.hardware_control.modules.types import LiveData
+
 
 def test_initial_state() -> None:
     """It should initialize the module state."""
@@ -61,6 +63,8 @@ def test_initial_state() -> None:
             ModuleModel.HEATER_SHAKER_MODULE_V1,
             HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             ),
         ),
@@ -120,10 +124,11 @@ def test_load_module(
 
 
 @pytest.mark.parametrize(
-    argnames=["module_definition", "expected_substate"],
+    argnames=["module_definition", "live_data", "expected_substate"],
     argvalues=[
         (
             lazy_fixture("magdeck_v2_def"),
+            {},
             MagneticModuleSubState(
                 module_id=MagneticModuleId("module-id"),
                 model=ModuleModel.MAGNETIC_MODULE_V2,
@@ -131,30 +136,50 @@ def test_load_module(
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
+            {
+                "status": "abc",
+                "data": {
+                    "labwareLatchStatus": "idle_closed",
+                    "speedStatus": "holding at target",
+                    "targetSpeed": 123,
+                    "targetTemp": 123,
+                },
+            },
             HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                plate_target_temperature=None,
+                is_labware_latch_closed=True,
+                is_plate_shaking=True,
+                plate_target_temperature=123,
             ),
         ),
         (
             lazy_fixture("tempdeck_v2_def"),
+            {"status": "abc", "data": {"targetTemp": 123}},
             TemperatureModuleSubState(
                 module_id=TemperatureModuleId("module-id"),
-                plate_target_temperature=None,
+                plate_target_temperature=123,
             ),
         ),
         (
             lazy_fixture("thermocycler_v1_def"),
+            {
+                "status": "abc",
+                "data": {
+                    "targetTemp": 123,
+                    "lidTarget": 321,
+                },
+            },
             ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
-                target_block_temperature=None,
-                target_lid_temperature=None,
+                target_block_temperature=123,
+                target_lid_temperature=321,
             ),
         ),
     ],
 )
 def test_add_module_action(
     module_definition: ModuleDefinition,
+    live_data: LiveData,
     expected_substate: ModuleSubStateType,
 ) -> None:
     """It should be able to add attached modules directly into state."""
@@ -162,6 +187,7 @@ def test_add_module_action(
         module_id="module-id",
         serial_number="serial-number",
         definition=module_definition,
+        module_live_data=live_data,
     )
 
     subject = ModuleStore()
@@ -207,13 +233,111 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
     subject.handle_action(actions.UpdateCommandAction(command=set_temp_cmd))
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
-            module_id=HeaterShakerModuleId("module-id"), plate_target_temperature=42
+            module_id=HeaterShakerModuleId("module-id"),
+            is_labware_latch_closed=False,
+            is_plate_shaking=False,
+            plate_target_temperature=42,
         )
     }
     subject.handle_action(actions.UpdateCommandAction(command=deactivate_cmd))
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
-            module_id=HeaterShakerModuleId("module-id"), plate_target_temperature=None
+            module_id=HeaterShakerModuleId("module-id"),
+            is_labware_latch_closed=False,
+            is_plate_shaking=False,
+            plate_target_temperature=None,
+        )
+    }
+
+
+def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> None:
+    """It should update heater-shaker's `is_plate_shaking` correctly."""
+    load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
+        params=commands.LoadModuleParams(
+            model=ModuleModel.HEATER_SHAKER_MODULE_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        ),
+        result=commands.LoadModuleResult(
+            moduleId="module-id",
+            model=ModuleModel.HEATER_SHAKER_MODULE_V1,
+            serialNumber="serial-number",
+            definition=heater_shaker_v1_def,
+        ),
+    )
+    set_shake_cmd = hs_commands.SetAndWaitForShakeSpeed.construct(  # type: ignore[call-arg]
+        params=hs_commands.SetAndWaitForShakeSpeedParams(moduleId="module-id", rpm=111),
+        result=hs_commands.SetAndWaitForShakeSpeedResult(),
+    )
+    deactivate_cmd = hs_commands.DeactivateShaker.construct(  # type: ignore[call-arg]
+        params=hs_commands.DeactivateShakerParams(moduleId="module-id"),
+        result=hs_commands.DeactivateShakerResult(),
+    )
+    subject = ModuleStore()
+
+    subject.handle_action(actions.UpdateCommandAction(command=load_module_cmd))
+    subject.handle_action(actions.UpdateCommandAction(command=set_shake_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": HeaterShakerModuleSubState(
+            module_id=HeaterShakerModuleId("module-id"),
+            is_labware_latch_closed=False,
+            is_plate_shaking=True,
+            plate_target_temperature=None,
+        )
+    }
+    subject.handle_action(actions.UpdateCommandAction(command=deactivate_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": HeaterShakerModuleSubState(
+            module_id=HeaterShakerModuleId("module-id"),
+            is_labware_latch_closed=False,
+            is_plate_shaking=False,
+            plate_target_temperature=None,
+        )
+    }
+
+
+def test_handle_hs_labware_latch_commands(
+    heater_shaker_v1_def: ModuleDefinition,
+) -> None:
+    """It should update heater-shaker's `is_labware_latch_closed` correctly."""
+    load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
+        params=commands.LoadModuleParams(
+            model=ModuleModel.HEATER_SHAKER_MODULE_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        ),
+        result=commands.LoadModuleResult(
+            moduleId="module-id",
+            model=ModuleModel.HEATER_SHAKER_MODULE_V1,
+            serialNumber="serial-number",
+            definition=heater_shaker_v1_def,
+        ),
+    )
+    close_latch_cmd = hs_commands.CloseLabwareLatch.construct(  # type: ignore[call-arg]
+        params=hs_commands.CloseLabwareLatchParams(moduleId="module-id"),
+        result=hs_commands.CloseLabwareLatchResult(),
+    )
+    open_latch_cmd = hs_commands.OpenLabwareLatch.construct(  # type: ignore[call-arg]
+        params=hs_commands.OpenLabwareLatchParams(moduleId="module-id"),
+        result=hs_commands.OpenLabwareLatchResult(),
+    )
+    subject = ModuleStore()
+
+    subject.handle_action(actions.UpdateCommandAction(command=load_module_cmd))
+    subject.handle_action(actions.UpdateCommandAction(command=close_latch_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": HeaterShakerModuleSubState(
+            module_id=HeaterShakerModuleId("module-id"),
+            is_labware_latch_closed=True,
+            is_plate_shaking=False,
+            plate_target_temperature=None,
+        )
+    }
+    subject.handle_action(actions.UpdateCommandAction(command=open_latch_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": HeaterShakerModuleSubState(
+            module_id=HeaterShakerModuleId("module-id"),
+            is_labware_latch_closed=False,
+            is_plate_shaking=False,
+            plate_target_temperature=None,
         )
     }
 

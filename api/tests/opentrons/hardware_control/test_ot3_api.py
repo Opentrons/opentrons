@@ -10,6 +10,10 @@ from opentrons.hardware_control.dev_types import (
     InstrumentDict,
     AttachedGripper,
 )
+from opentrons.hardware_control.instruments.gripper_handler import (
+    GripperNotAttachedError,
+    GripError,
+)
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
@@ -54,6 +58,32 @@ def mock_gantry_position(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncM
         ),
     ) as mock_gantry_pos:
         yield mock_gantry_pos
+
+
+@pytest.fixture
+def mock_grip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "_grip",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj._grip,
+            wraps=ot3_hardware.managed_obj._grip,
+        ),
+    ) as mock_move:
+        yield mock_move
+
+
+@pytest.fixture
+def mock_ungrip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "_ungrip",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj._ungrip,
+            wraps=ot3_hardware.managed_obj._ungrip,
+        ),
+    ) as mock_move:
+        yield mock_move
 
 
 @pytest.mark.parametrize(
@@ -314,3 +344,40 @@ async def test_cache_gripper(ot3_hardware: ThreadManager[OT3API]) -> None:
     # make sure the property attached_gripper returns GripperDict
     assert ot3_hardware.attached_gripper is not None
     assert ot3_hardware.attached_gripper["gripper_id"] == "g12345"
+
+
+async def test_gripper_action(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_grip: AsyncMock,
+    mock_ungrip: AsyncMock,
+) -> None:
+    with pytest.raises(
+        GripperNotAttachedError, match="Cannot perform action without gripper attached"
+    ):
+        await ot3_hardware.grip(5.0)
+    mock_grip.assert_not_called()
+
+    with pytest.raises(
+        GripperNotAttachedError, match="Cannot perform action without gripper attached"
+    ):
+        await ot3_hardware.ungrip()
+    mock_ungrip.assert_not_called()
+
+    # cache gripper
+    gripper_config = gc.load(GripperModel.V1, "g12345")
+    instr_data = AttachedGripper(config=gripper_config, id="g12345")
+    await ot3_hardware.cache_gripper(instr_data)
+
+    with pytest.raises(GripError, match="Gripper jaw must be homed before moving"):
+        await ot3_hardware.grip(5.0)
+    await ot3_hardware.home_gripper_jaw()
+    mock_ungrip.assert_called_once()
+    mock_ungrip.reset_mock()
+    await ot3_hardware.home([OT3Axis.G])
+    await ot3_hardware.grip(5.0)
+    mock_grip.assert_called_once_with(
+        gc.piecewise_force_conversion(5.0, gripper_config.jaw_force_per_duty_cycle),
+    )
+
+    await ot3_hardware.ungrip()
+    mock_ungrip.assert_called_once()

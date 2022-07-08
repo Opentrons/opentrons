@@ -63,6 +63,7 @@ from .types import (
     OT3Mount,
     OT3AxisMap,
     OT3SubSystem,
+    GripperJawState,
 )
 from . import modules
 from .robot_calibration import (
@@ -75,7 +76,7 @@ from .robot_calibration import (
 
 from .protocols import HardwareControlAPI
 from .instruments.pipette_handler import OT3PipetteHandler, InstrumentsByMount
-from .instruments.gripper_handler import GripperHandler
+from .instruments.gripper_handler import GripperHandler, GripperNotAttachedError
 from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
@@ -236,7 +237,6 @@ class OT3API(
         else:
             checked_config = config
         backend = await OT3Controller.build(checked_config)
-        await backend.setup_motors()
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
         await api_instance.cache_instruments()
         module_controls = await AttachedModulesControl.build(
@@ -551,6 +551,14 @@ class OT3API(
             axes = [OT3Axis.Z_R, OT3Axis.Z_L]
         await self.home(axes)
 
+    async def home_gripper_jaw(self) -> None:
+        """
+        Home the jaw of the gripper.
+        """
+        gripper = self._gripper_handler.get_gripper()
+        await self._ungrip()
+        gripper.state = GripperJawState.HOMED_READY
+
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
@@ -841,6 +849,12 @@ class OT3API(
                     self._transforms.carriage_offset,
                 )
                 self._current_position.update(position)
+                if OT3Axis.G in checked_axes:
+                    try:
+                        gripper = self._gripper_handler.get_gripper()
+                        gripper.state = GripperJawState.HOMED_READY
+                    except GripperNotAttachedError:
+                        pass
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
@@ -915,6 +929,35 @@ class OT3API(
 
     async def update_deck_calibration(self, new_transform: RobotCalibration) -> None:
         pass
+
+    @ExecutionManagerProvider.wait_for_running
+    async def _grip(self, duty_cycle: float) -> None:
+        """Move the gripper jaw inward to close."""
+        try:
+            await self._backend.gripper_move_jaw(duty_cycle=duty_cycle)
+        except Exception:
+            self._log.exception("Gripper grip failed")
+            raise
+
+    @ExecutionManagerProvider.wait_for_running
+    async def _ungrip(self) -> None:
+        """Move the gripper jaw outward to reach the homing switch."""
+        try:
+            await self._backend.gripper_home_jaw()
+        except Exception:
+            self._log.exception("Gripper home failed")
+            raise
+
+    async def grip(self, force_newtons: float) -> None:
+        self._gripper_handler.check_ready_for_grip()
+        dc = self._gripper_handler.get_duty_cycle_by_grip_force(force_newtons)
+        await self._grip(duty_cycle=dc)
+
+    async def ungrip(self) -> None:
+        # get default grip force for release if not provided
+        self._gripper_handler.check_ready_for_jaw_move()
+        await self._ungrip()
+        self._gripper_handler.set_jaw_state(GripperJawState.HOMED_READY)
 
     # Pipette action API
     async def prepare_for_aspirate(

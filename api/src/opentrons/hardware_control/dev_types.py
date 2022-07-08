@@ -21,6 +21,7 @@ from opentrons.drivers.types import MoveSplit
 from opentrons.types import Mount
 from opentrons.config.pipette_config import PipetteConfig
 from opentrons.config.gripper_config import GripperConfig
+from opentrons.hardware_control.types import GripperJawState
 
 
 class InstrumentSpec(TypedDict):
@@ -91,8 +92,7 @@ class GripperDict(InstrumentDict):
     name: GripperName
     model: GripperModel
     gripper_id: str
-    has_gripped: bool
-    ready_to_grip: bool
+    state: GripperJawState
 
 
 class InstrumentHardwareConfigs(TypedDict):

@@ -12,7 +12,7 @@ from typing_extensions import Final
 from robot_server.app_state import AppState, AppStateAccessor, get_app_state
 from robot_server.settings import get_settings
 
-from .database import create_sql_engine, sqlite_rowid, ensure_utc_datetime
+from .database import create_sql_engine, sqlite_rowid
 from .tables import protocol_table, analysis_table, run_table, action_table
 
 _sql_engine_accessor = AppStateAccessor[sqlalchemy.engine.Engine]("sql_engine")
@@ -119,5 +119,4 @@ __all__ = [
     "action_table",
     # database utilities and helpers
     "sqlite_rowid",
-    "ensure_utc_datetime",
 ]

@@ -29,6 +29,8 @@ from .ot3utils import (
     node_to_axis,
     sub_system_to_node_id,
     sensor_node_for_mount,
+    create_gripper_jaw_move_group,
+    create_gripper_jaw_home_group,
 )
 
 try:
@@ -54,10 +56,6 @@ from opentrons_hardware.hardware_control.current_settings import (
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
-)
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    SetupRequest,
-    EnableMotorRequest,
 )
 from opentrons_hardware import firmware_update
 
@@ -163,17 +161,6 @@ class OT3Controller:
         for axis, settings in self._current_settings.items():
             hold_currents[axis] = settings.hold_current
         return hold_currents
-
-    async def setup_motors(self) -> None:
-        """Set up the motors."""
-        await self._messenger.send(
-            node_id=NodeId.broadcast,
-            message=SetupRequest(),
-        )
-        await self._messenger.send(
-            node_id=NodeId.broadcast,
-            message=EnableMotorRequest(),
-        )
 
     @property
     def gpio_chardev(self) -> OT3GPIO:
@@ -299,6 +286,8 @@ class OT3Controller:
         if move_group_pipette:
             coros.append(runner_pipette.run(can_messenger=self._messenger))
         positions = await asyncio.gather(*coros)
+        if OT3Axis.G in checked_axes:
+            await self.gripper_home_jaw()
         for position in positions:
             self._position.update(position)
 
@@ -329,6 +318,20 @@ class OT3Controller:
             New position.
         """
         return await self.home(axes)
+
+    async def gripper_move_jaw(
+        self,
+        duty_cycle: float,
+        stop_condition: MoveStopCondition = MoveStopCondition.none,
+    ) -> None:
+        move_group = create_gripper_jaw_move_group(duty_cycle, stop_condition)
+        runner = MoveGroupRunner(move_groups=[move_group])
+        await runner.run(can_messenger=self._messenger)
+
+    async def gripper_home_jaw(self) -> None:
+        move_group = create_gripper_jaw_home_group()
+        runner = MoveGroupRunner(move_groups=[move_group])
+        await runner.run(can_messenger=self._messenger)
 
     async def get_attached_instruments(
         self, expected: Dict[OT3Mount, PipetteName]

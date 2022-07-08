@@ -32,6 +32,7 @@ describe('setTemperature', () => {
         commands: [
           {
             commandType: 'temperatureModule/setTargetTemperature',
+            key: expect.any(String),
             params: {
               moduleId: temperatureModuleId,
               celsius: targetTemperature,

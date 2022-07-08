@@ -438,7 +438,7 @@
     "brandId": []
   },
   "metadata": {
-    "displayName": "Opentrons Flat Plate Adapter with Corning 384 Well Plate 112uL",
+    "displayName": "Opentrons Universal Flat Adapter with Corning 384 Well Plate 112 µl Flat",
     "displayCategory": "aluminumBlock",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -4696,7 +4696,7 @@
     "format": "384Standard",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_flat_plate_adapter_corning_384_wellplate_112ul_flat"
+    "loadName": "opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat"
   },
   "namespace": "opentrons",
   "version": 1,
