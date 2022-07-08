@@ -43,7 +43,7 @@ interface CustomLabwareOverflowMenuProps {
 export function CustomLabwareOverflowMenu(
   props: CustomLabwareOverflowMenuProps
 ): JSX.Element {
-  const { filename, onDelete, ...styleProps } = props
+  const { filename, onDelete } = props
   const { t } = useTranslation(['labware_landing', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
@@ -90,11 +90,7 @@ export function CustomLabwareOverflowMenu(
   }
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      position={POSITION_RELATIVE}
-      {...styleProps}
-    >
+    <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
       <OverflowBtn
         aria-label="CustomLabwareOverflowMenu_button"
         alignSelf={ALIGN_FLEX_END}
