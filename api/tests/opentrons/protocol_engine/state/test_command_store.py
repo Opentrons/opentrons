@@ -720,7 +720,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
 
 
 def test_command_store_save_started_completed_run_timestamp() -> None:
-    """It should return save started and completed timestamps."""
+    """It should save started and completed timestamps."""
     subject = CommandStore()
     start_time = datetime(year=2021, month=1, day=1)
     hardware_stopped_time = datetime(year=2022, month=2, day=2)
