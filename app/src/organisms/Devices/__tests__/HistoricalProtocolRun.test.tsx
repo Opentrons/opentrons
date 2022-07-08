@@ -58,7 +58,6 @@ describe('RecentProtocolRuns', () => {
       protocolKey: 'protocolKeyStub',
       robotIsBusy: false,
       run: run,
-      key: 1,
     }
     mockHistoricalProtocolRunOverflowMenu.mockReturnValue(
       <div>mock HistoricalProtocolRunOverflowMenu</div>
@@ -91,7 +90,6 @@ describe('RecentProtocolRuns', () => {
       protocolKey: '12345',
       robotIsBusy: false,
       run: run,
-      key: 1,
     }
     const { getByText } = render(props)
     const protocolBtn = getByText('my protocol')
