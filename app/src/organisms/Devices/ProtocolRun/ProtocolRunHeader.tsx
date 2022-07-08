@@ -31,19 +31,15 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
-  DIRECTION_ROW,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
-  SIZE_3,
-  SIZE_4,
-  SIZE_5,
-  TEXT_TRANSFORM_UPPERCASE,
   BORDERS,
   COLORS,
   SPACING,
   TYPOGRAPHY,
   useConditionalConfirm,
+  SPACING_AUTO,
 } from '@opentrons/components'
 
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
@@ -116,11 +112,7 @@ function RunTimer({
   const runTime =
     startedAt != null ? formatInterval(startedAt, endTime) : EMPTY_TIMESTAMP
 
-  return (
-    <StyledText css={TYPOGRAPHY.pRegular} color={COLORS.darkBlack}>
-      {runTime}
-    </StyledText>
-  )
+  return <StyledText css={TYPOGRAPHY.pRegular}>{runTime}</StyledText>
 }
 
 export function ProtocolRunHeader({
@@ -408,59 +400,62 @@ export function ProtocolRunHeader({
 
   const protocolRunningContent: JSX.Element | null =
     runStatus != null ? (
-      <Flex
+      <Box
         backgroundColor={COLORS.lightGrey}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        display="grid"
+        gridTemplateColumns="4fr 6fr 4fr"
         padding={SPACING.spacing3}
       >
-        <Flex gridGap={SPACING.spacing6}>
-          <Box>
-            <StyledText
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
-              color={COLORS.darkGreyEnabled}
-              css={TYPOGRAPHY.h6Default}
-              paddingBottom={SPACING.spacing2}
-            >
-              {t('protocol_start')}
-            </StyledText>
-            <StyledText
-              css={TYPOGRAPHY.pRegular}
-              color={COLORS.darkBlack}
-              id="ProtocolRunHeader_protocolStart"
-            >
-              {startedAtTimestamp}
-            </StyledText>
-          </Box>
-          <Box>
-            <StyledText
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
-              color={COLORS.darkGreyEnabled}
-              css={TYPOGRAPHY.h6Default}
-              paddingBottom={SPACING.spacing2}
-            >
-              {t('protocol_end')}
-            </StyledText>
-            <StyledText
-              css={TYPOGRAPHY.pRegular}
-              color={COLORS.darkBlack}
-              id="ProtocolRunHeader_protocolEnd"
-            >
-              {completedAtTimestamp}
-            </StyledText>
-          </Box>
-        </Flex>
-        {showCancelButton ? (
-          <SecondaryButton
-            color={COLORS.errorText}
-            padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
-            onClick={handleCancelClick}
-            id="ProtocolRunHeader_cancelRunButton"
-            disabled={isClosingCurrentRun}
+        <Box>
+          <StyledText
+            textTransform={TYPOGRAPHY.textTransformUppercase}
+            color={COLORS.darkGreyEnabled}
+            css={TYPOGRAPHY.h6Default}
+            paddingBottom={SPACING.spacing2}
           >
-            {t('cancel_run')}
-          </SecondaryButton>
-        ) : null}
-      </Flex>
+            {t('protocol_start')}
+          </StyledText>
+          <StyledText
+            css={TYPOGRAPHY.pRegular}
+            id="ProtocolRunHeader_protocolStart"
+          >
+            {startedAtTimestamp}
+          </StyledText>
+        </Box>
+        <Box>
+          <StyledText
+            textTransform={TYPOGRAPHY.textTransformUppercase}
+            color={COLORS.darkGreyEnabled}
+            css={TYPOGRAPHY.h6Default}
+            paddingBottom={SPACING.spacing2}
+          >
+            {t('protocol_end')}
+          </StyledText>
+          <StyledText
+            css={TYPOGRAPHY.pRegular}
+            id="ProtocolRunHeader_protocolEnd"
+          >
+            {completedAtTimestamp}
+          </StyledText>
+        </Box>
+        <Box marginLeft={SPACING_AUTO}>
+          {showCancelButton != null && (
+            <SecondaryButton
+              style={{
+                color: `${COLORS.errorText}`,
+                backgroundColor: 'none',
+                borderColor: `${COLORS.error}`,
+              }}
+              padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
+              onClick={handleCancelClick}
+              id="ProtocolRunHeader_cancelRunButton"
+              disabled={isClosingCurrentRun}
+            >
+              {t('cancel_run')}
+            </SecondaryButton>
+          )}
+        </Box>
+      </Box>
     ) : null
 
   return (
@@ -523,28 +518,27 @@ export function ProtocolRunHeader({
         <Banner type="warning">{`${t('run_canceled')}.`}</Banner>
       ) : null}
       {isCurrentRun ? clearProtocolBanner : null}
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Box minWidth={SIZE_4}>
+      <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
+        <Box>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6Default}
             paddingBottom={SPACING.spacing2}
           >
-            {t('run_id')}
+            {t('run')}
           </StyledText>
           {/* this is the createdAt timestamp, not the run id */}
           <StyledText
             css={TYPOGRAPHY.pRegular}
-            color={COLORS.darkBlack}
             id="ProtocolRunHeader_runRecordId"
           >
             {createdAtTimestamp}
           </StyledText>
         </Box>
-        <Box minWidth={SIZE_3}>
+        <Box>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6Default}
             paddingBottom={SPACING.spacing2}
@@ -572,16 +566,15 @@ export function ProtocolRunHeader({
             ) : null}
             <StyledText
               css={TYPOGRAPHY.pRegular}
-              color={COLORS.darkBlack}
               id="ProtocolRunHeader_runStatus"
             >
               {runStatus != null ? t(`status_${runStatus}`) : ''}
             </StyledText>
           </Flex>
         </Box>
-        <Box minWidth={SIZE_3}>
+        <Box>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6Default}
             paddingBottom={SPACING.spacing2}
@@ -602,12 +595,7 @@ export function ProtocolRunHeader({
             startRun={play}
           />
         )}
-        <Flex
-          justifyContent={'flex-end'}
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacingSM}
-          width={SIZE_5}
-        >
+        <Box marginLeft={SPACING_AUTO}>
           <PrimaryButton
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
@@ -625,8 +613,8 @@ export function ProtocolRunHeader({
           {disableReason != null && (
             <Tooltip tooltipProps={tooltipProps}>{disableReason}</Tooltip>
           )}
-        </Flex>
-      </Flex>
+        </Box>
+      </Box>
       {protocolRunningContent}
       {showConfirmCancelModal ? (
         <ConfirmCancelModal

@@ -314,7 +314,7 @@ describe('ProtocolRunHeader', () => {
     const [{ getByText }] = render()
 
     getByText('A Protocol for Otie')
-    getByText('Run ID')
+    getByText('Run')
     getByText('03/03/2022 19:08:49')
     getByText('Status')
     getByText('Not started')
