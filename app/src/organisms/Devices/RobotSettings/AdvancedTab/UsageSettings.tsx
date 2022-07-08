@@ -48,7 +48,7 @@ export function UsageSettings({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginTop={SPACING.spacing5}
+      marginTop="2.5rem"
     >
       <Flex width="70%" flexDirection={DIRECTION_COLUMN}>
         <StyledText

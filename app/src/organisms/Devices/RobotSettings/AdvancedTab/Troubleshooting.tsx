@@ -51,7 +51,7 @@ export function Troubleshooting({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginTop={SPACING.spacing5}
+      marginTop="2.5rem"
     >
       <Box width="70%">
         <StyledText
