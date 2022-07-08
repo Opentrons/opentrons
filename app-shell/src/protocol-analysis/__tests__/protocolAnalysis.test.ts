@@ -1,6 +1,6 @@
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import { Config, getConfig } from '../../config'
+import { Config, getConfig, handleConfigChange } from '../../config'
 import { getValidLabwareFilePaths } from '../../labware'
 import { selectPythonPath, getPythonPath } from '../getPythonPath'
 import { executeAnalyzeCli } from '../executeAnalyzeCli'
@@ -29,6 +29,9 @@ const mockWriteFailedAnalysis = writeFailedAnalysis as jest.MockedFunction<
 const mockGetValidLabwareFilePaths = getValidLabwareFilePaths as jest.MockedFunction<
   typeof getValidLabwareFilePaths
 >
+const mockHandleConfigChange = handleConfigChange as jest.MockedFunction<
+  typeof handleConfigChange
+>
 
 describe('analyzeProtocolSource', () => {
   afterEach(() => {
@@ -45,6 +48,13 @@ describe('analyzeProtocolSource', () => {
     initializePython()
 
     expect(mockSelectPythonPath).toHaveBeenCalledWith('/some/override/python')
+
+    // the 'python.pathToPythonOverride' change handler
+    const changeHandler = mockHandleConfigChange.mock.calls[0][1]
+    const otherOverridePath = '/some/other/path/to/python'
+    changeHandler(otherOverridePath, '/some/override/python')
+
+    expect(mockSelectPythonPath).toHaveBeenCalledWith(otherOverridePath)
   })
 
   it('should get the Python path and execute the analyze CLI with custom labware', () => {
