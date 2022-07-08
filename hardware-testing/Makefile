@@ -97,3 +97,11 @@ push-no-restart-ot3: sdist Pipfile.lock
 .PHONY: push
 push-ot3: push-no-restart
 	$(call restart-server,$(host),,$(ssh_opts),"opentrons-robot-server")
+
+.PHONE: push-protocols
+push-protocols:
+	scp -r protocols root@$(host):/data/user_storage/opentrons_data
+
+.PHONY: term
+term:
+	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
