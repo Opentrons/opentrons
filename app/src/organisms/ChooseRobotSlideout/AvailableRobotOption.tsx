@@ -50,19 +50,23 @@ export function AvailableRobotOption(
         <img
           src={OT2_PNG}
           css={css`
-            width: 6rem;
+            width: 4rem;
+            height: 3.5625rem;
           `}
         />
         <Flex
           flexDirection={DIRECTION_COLUMN}
           marginLeft={SPACING.spacing4}
           marginTop={SPACING.spacing3}
+          marginBottom={SPACING.spacing4}
         >
           <StyledText as="h6">{robotModel}</StyledText>
           <Box maxWidth="9.5rem">
             <StyledText
               as="p"
-              css={{ 'overflow-wrap': 'break-word' }}
+              css={css`
+                overflow-wrap: break-word;
+              `}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {robotName}
