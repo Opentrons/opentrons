@@ -95,7 +95,8 @@ describe('Toast', () => {
     background-color: #eaeaeb`)
     getByLabelText('icon_info')
   })
-  it('after 3 seconds the toast should be closed automatically', async () => {
+
+  it('after 5 seconds the toast should be closed automatically', async () => {
     jest.useFakeTimers()
     props = {
       message: 'test message',
@@ -110,12 +111,33 @@ describe('Toast', () => {
     })
     expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
-      jest.advanceTimersByTime(3000)
+      jest.advanceTimersByTime(5000)
     })
     expect(props.onClose).toHaveBeenCalled()
   })
 
-  it('should stay more than 3 seconds when requiredTimeout is true', async () => {
+  it('after 8 seconds the toast should be closed automatically', async () => {
+    jest.useFakeTimers()
+    props = {
+      message: 'test message',
+      type: 'info',
+      duration: 8000,
+      closeButton: false,
+      onClose: jest.fn(),
+    }
+    const { getByText } = render(props)
+    getByText('test message')
+    act(() => {
+      jest.advanceTimersByTime(100)
+    })
+    expect(props.onClose).not.toHaveBeenCalled()
+    act(() => {
+      jest.advanceTimersByTime(8000)
+    })
+    expect(props.onClose).toHaveBeenCalled()
+  })
+
+  it('should stay more than 5 seconds when requiredTimeout is true', async () => {
     jest.useFakeTimers()
     props = {
       message: 'test message',
@@ -131,12 +153,12 @@ describe('Toast', () => {
     })
     expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
-      jest.advanceTimersByTime(3000)
+      jest.advanceTimersByTime(5000)
     })
     expect(props.onClose).not.toHaveBeenCalled()
   })
 
-  it('should not stay more than 3 seconds when requiredTimeout is false', async () => {
+  it('should not stay more than 5 seconds when requiredTimeout is false', async () => {
     jest.useFakeTimers()
     props = {
       message: 'test message',
@@ -152,7 +174,7 @@ describe('Toast', () => {
     })
     expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
-      jest.advanceTimersByTime(3000)
+      jest.advanceTimersByTime(5000)
     })
     expect(props.onClose).toHaveBeenCalled()
   })
