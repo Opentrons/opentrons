@@ -104,7 +104,7 @@ export function HistoricalProtocolRun(
             data-testid={`RecentProtocolRuns_Protocol_${props.key}`}
             onClick={() => history.push(`/protocols/${protocolKey}`)}
             css={CLICK_STYLE}
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing4}
           >
             {protocolName}
           </StyledText>
