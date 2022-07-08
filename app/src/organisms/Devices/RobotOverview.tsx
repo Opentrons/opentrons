@@ -129,6 +129,7 @@ export function RobotOverview({
           </Flex>
           <PrimaryButton
             {...targetProps}
+            marginBottom={SPACING.spacing4}
             textTransform={TEXT_TRANSFORM_NONE}
             disabled={
               (currentRunId != null ? !isRunTerminal : false) ||

@@ -25,6 +25,7 @@ import { fetchPipettes, LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
 import { Portal } from '../../../App/portal'
 import { StyledText } from '../../../atoms/text'
+import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 import { getHasCalibrationBlock } from '../../../redux/config'
 import { getRequestById, useDispatchApiRequest } from '../../../redux/robot-api'
 import { Banner } from '../../../atoms/Banner'
@@ -59,8 +60,13 @@ const FETCH_PIPETTE_CAL_MS = 30000
 
 export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t } = useTranslation(['device_details', 'protocol_setup'])
-  const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
   const { pipetteInfo, mount, robotName, pipetteId } = props
+  const {
+    MenuOverlay,
+    handleOverflowClick,
+    showOverflowMenu,
+    setShowOverflowMenu,
+  } = useMenuHandleClickOutside()
   const dispatch = useDispatch<Dispatch>()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const pipetteName = pipetteInfo?.displayName
@@ -278,29 +284,27 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         padding={SPACING.spacing2}
         data-testid={`PipetteCard_overflow_btn_${pipetteName}`}
       >
-        <OverflowBtn
-          aria-label="overflow"
-          onClick={() => {
-            setShowOverflowMenu(prevShowOverflowMenu => !prevShowOverflowMenu)
-          }}
-        />
+        <OverflowBtn aria-label="overflow" onClick={handleOverflowClick} />
       </Box>
       {showOverflowMenu && (
-        <Box
-          ref={pipetteOverflowWrapperRef}
-          data-testid={`PipetteCard_overflow_menu_${pipetteName}`}
-          onClick={() => setShowOverflowMenu(false)}
-        >
-          <PipetteOverflowMenu
-            pipetteName={pipetteName ?? t('empty')}
-            mount={mount}
-            handleChangePipette={handleChangePipette}
-            handleCalibrate={handleCalibrate}
-            handleSettingsSlideout={handleSettingsSlideout}
-            handleAboutSlideout={handleAboutSlideout}
-            isPipetteCalibrated={pipetteOffsetCalibration != null}
-          />
-        </Box>
+        <>
+          <Box
+            ref={pipetteOverflowWrapperRef}
+            data-testid={`PipetteCard_overflow_menu_${pipetteName}`}
+            onClick={() => setShowOverflowMenu(false)}
+          >
+            <PipetteOverflowMenu
+              pipetteName={pipetteName ?? t('empty')}
+              mount={mount}
+              handleChangePipette={handleChangePipette}
+              handleCalibrate={handleCalibrate}
+              handleSettingsSlideout={handleSettingsSlideout}
+              handleAboutSlideout={handleAboutSlideout}
+              isPipetteCalibrated={pipetteOffsetCalibration != null}
+            />
+          </Box>
+          <MenuOverlay />
+        </>
       )}
     </Flex>
   )

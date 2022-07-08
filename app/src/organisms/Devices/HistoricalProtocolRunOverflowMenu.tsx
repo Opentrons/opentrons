@@ -156,7 +156,6 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       top={SPACING.spacing6}
       right={0}
       flexDirection={DIRECTION_COLUMN}
-      height="10.5rem"
     >
       <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}>
         <MenuItem data-testid={`RecentProtocolRun_OverflowMenu_viewRunRecord`}>
@@ -182,7 +181,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       >
         {t('download_run_log')}
       </MenuItem>
-      <Divider />
+      <Divider marginY="0" />
       <MenuItem
         onClick={handleDeleteClick}
         data-testid={`RecentProtocolRun_OverflowMenu_deleteRun`}
