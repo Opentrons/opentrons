@@ -11,6 +11,7 @@ import {
   COLORS,
   useOnClickOutside,
   useHoverTooltip,
+  Box,
 } from '@opentrons/components'
 import {
   useDeleteRunMutation,
@@ -46,9 +47,9 @@ export function HistoricalProtocolRunOverflowMenu(
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
-  const protocolRunOverflowWrapperRef = useOnClickOutside({
+  const protocolRunOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
-  }) as React.RefObject<HTMLDivElement>
+  })
   const [
     showDownloadRunLogToast,
     setShowDownloadRunLogToast,
@@ -70,7 +71,7 @@ export function HistoricalProtocolRunOverflowMenu(
       <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
       {showOverflowMenu && (
         <>
-          <div
+          <Box
             ref={protocolRunOverflowWrapperRef}
             data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
           >
@@ -79,7 +80,7 @@ export function HistoricalProtocolRunOverflowMenu(
               closeOverflowMenu={handleOverflowClick}
               setShowDownloadRunLogToast={setShowDownloadRunLogToast}
             />
-          </div>
+          </Box>
           <MenuOverlay />
         </>
       )}
