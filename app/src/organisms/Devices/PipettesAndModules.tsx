@@ -25,7 +25,7 @@ import { ModuleCard } from '../ModuleCard'
 import { useIsRobotViewable, useRunStatuses } from './hooks'
 import { PipetteCard } from './PipetteCard'
 
-const MIN_HEIGHT_STYLING = css`
+const MIN_HEIGHT_OVER_3_STYLING = css`
   max-height: 37rem;
 
   @media (min-width: 700px) {
@@ -34,6 +34,22 @@ const MIN_HEIGHT_STYLING = css`
 
   @media (min-width: 800px) {
     max-height: 30rem;
+  }
+
+  @media (min-width: 900px) {
+    max-height: 22rem;
+  }
+`
+
+const MIN_HEIGHT_UNDER_3_STYLING = css`
+  max-height: 29rem;
+
+  @media (min-width: 700px) {
+    max-height: 27rem;
+  }
+
+  @media (min-width: 800px) {
+    max-height: 25rem;
   }
 
   @media (min-width: 900px) {
@@ -120,7 +136,11 @@ export function PipettesAndModules({
               justifyContent={JUSTIFY_START}
               flexDirection={DIRECTION_COLUMN}
               flexWrap={WRAP}
-              css={MIN_HEIGHT_STYLING}
+              css={
+                attachedModules.length > 3
+                  ? MIN_HEIGHT_OVER_3_STYLING
+                  : MIN_HEIGHT_UNDER_3_STYLING
+              }
             >
               {attachedModules.map((module, index) => {
                 return (
