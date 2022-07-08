@@ -38,6 +38,89 @@ stages:
     response:
       status_code: 404
 
+---
+test_name: Multiple Session Lifecycle
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Create a calibration check session
+    request:
+      url: '{host:s}:{port:d}/sessions'
+      method: POST
+      json:
+        data:
+          sessionType: 'pipetteOffsetCalibration'
+          createParams:
+            mount: 'right'
+    response:
+      status_code: 201
+      save:
+        json:
+          session_id_1: data.id
+
+  - name: Create a deck cal session
+    request:
+      url: '{host:s}:{port:d}/sessions'
+      method: POST
+      json:
+        data:
+          sessionType: deckCalibration
+    response:
+      status_code: 201
+      save:
+        json:
+          session_id_2: data.id
+
+  - name: Get all the sessions
+    request:
+      url: '{host:s}:{port:d}/sessions'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        links: null
+        data:
+          - id: '{session_id_1}'
+            sessionType: 'pipetteOffsetCalibration'
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            details: !anydict
+            createParams: !anydict
+          - id: '{session_id_2}'
+            sessionType: 'deckCalibration'
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            details: !anydict
+            createParams: null
+
+  - name: Get just the deck cal sessions
+    request:
+      url: '{host:s}:{port:d}/sessions?session_type=deckCalibration'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        links: null
+        data:
+          - id: '{session_id_2}'
+            sessionType: 'deckCalibration'
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            details: !anydict
+            createParams: null
+
+  - name: Delete session 1
+    request:
+      url: '{host:s}:{port:d}/sessions/{session_id_1}'
+      method: DELETE
+    response:
+      status_code: 200
+
+  - name: Delete session 2
+    request:
+      url: '{host:s}:{port:d}/sessions/{session_id_2}'
+      method: DELETE
+    response:
+      status_code: 200
+
   - name: Get all the sessions and there are none
     request:
       url: '{host:s}:{port:d}/sessions'
