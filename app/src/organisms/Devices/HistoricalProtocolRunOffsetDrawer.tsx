@@ -166,9 +166,12 @@ export function HistoricalProtocolRunOffsetDrawer(
             >
               {labwareName}
             </StyledText>
-            <StyledText as="label" width="40%">
-              <OffsetVector {...offset.vector} />
-            </StyledText>
+            <OffsetVector
+              {...offset.vector}
+              width="40%"
+              fontSize={TYPOGRAPHY.fontSizeLabel}
+              as="label"
+            />
           </Flex>
         )
       })}
