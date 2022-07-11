@@ -201,34 +201,36 @@ def test_pick_up_from_manipulated_location(
     )
 
 
-# def test_pick_up_from_well(
-#     decoy: Decoy,
-#     subject: InstrumentContext,
-#     mock_instrument_implementation: AbstractInstrument,
-#     mock_well_implementation: WellImplementation,
-#     mock_well: Well,
-#     mock_labware: Labware
-# ) -> None:
-#     """Should pick up tip from supplied location of types.Location."""
-#     expected_location = Location(Point(0, 0, 0), mock_well)
-#     input_location = Well(mock_well_implementation)
-#
-#     decoy.when(subject._ctx._modules).then_return([])
-#     decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=None)).then_return(False)
-#
-#     decoy.when(mock_well.parent).then_return(mock_labware)
-#
-#     subject.pick_up_tip(location=input_location)
-#
-#     decoy.verify(
-#         mock_instrument_implementation.move_to(
-#             location=expected_location,
-#             force_direct=False,
-#             minimum_z_height=None,
-#             speed=None,
-#         ),
-#         times=1,
-#     )
+def test_pick_up_from_well(
+    decoy: Decoy,
+    subject: InstrumentContext,
+    mock_instrument_implementation: AbstractInstrument,
+    mock_well_implementation: WellImplementation,
+    mock_well: Well,
+    mock_labware: Labware,
+) -> None:
+    """Should pick up tip from supplied well location top."""
+    expected_location = Location(Point(0, 0, 0), mock_well)
+    input_location = Well(mock_well_implementation)
+
+    decoy.when(subject._ctx._modules).then_return([])
+    decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=0)).then_return(
+        False
+    )
+
+    decoy.when(input_location.parent).then_return(mock_labware)
+
+    subject.pick_up_tip(location=input_location)
+
+    decoy.verify(
+        mock_instrument_implementation.move_to(
+            location=expected_location,
+            force_direct=False,
+            minimum_z_height=None,
+            speed=None,
+        ),
+        times=1,
+    )
 
 
 def test_pick_up_from_no_location(
