@@ -8,6 +8,7 @@ import {
   pipetteAdjacentHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  uuid,
 } from '../../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { DispenseParams } from '@opentrons/shared-data/protocol/types/schemaV3'
@@ -143,6 +144,7 @@ export const dispense: CommandCreator<DispenseParams> = (
   const commands: CreateCommand[] = [
     {
       commandType: 'dispense',
+      key: uuid(),
       params: {
         pipetteId: pipette,
         volume,

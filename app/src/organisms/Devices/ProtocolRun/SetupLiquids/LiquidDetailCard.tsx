@@ -16,6 +16,7 @@ import * as React from 'react'
 import { css } from 'styled-components'
 import { Divider } from '../../../../atoms/structure'
 import { StyledText } from '../../../../atoms/text'
+import { getWellRangeForLiquidLabwarePair } from './utils'
 
 interface LiquidDetailCardProps {
   liquidId: string
@@ -25,6 +26,7 @@ interface LiquidDetailCardProps {
   volumeByWell: { [well: string]: number }
   setSelectedValue: React.Dispatch<React.SetStateAction<string | undefined>>
   selectedValue: string | undefined
+  labwareWellOrdering: string[][]
 }
 
 export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
@@ -36,6 +38,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     volumeByWell,
     setSelectedValue,
     selectedValue,
+    labwareWellOrdering,
   } = props
   const LIQUID_CARD_STYLE = css`
     ${BORDERS.cardOutlineBorder}
@@ -49,6 +52,10 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     background-color: ${COLORS.lightBlue};
     border: 1px solid ${COLORS.blue};
   `
+  const volumePerWellRange = getWellRangeForLiquidLabwarePair(
+    volumeByWell,
+    labwareWellOrdering
+  )
   return (
     <Box
       css={selectedValue === liquidId ? ACTIVE_STYLE : LIQUID_CARD_STYLE}
@@ -105,7 +112,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       {selectedValue === liquidId ? (
         <>
           <Divider marginX={'-1rem'} marginY={SPACING.spacing4} />
-          {Object.entries(volumeByWell).map((well, index) => {
+          {volumePerWellRange.map((well, index) => {
             return (
               <Flex
                 key={index}
@@ -118,14 +125,14 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                   marginTop={SPACING.spacing3}
                   marginRight={SPACING.spacing2}
                 >
-                  {well[0]}
+                  {well.wellName}
                 </StyledText>
                 <StyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   marginTop={SPACING.spacing3}
                 >
-                  {well[1]} {MICRO_LITERS}
+                  {well.volume} {MICRO_LITERS}
                 </StyledText>
               </Flex>
             )

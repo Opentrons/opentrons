@@ -45,6 +45,8 @@ class OpenLabwareLatchImpl(
             module_id=params.moduleId
         )
 
+        hs_module_substate.raise_if_shaking()
+
         # Allow propagation of ModuleNotAttachedError.
         hs_hardware_module = self._equipment.get_module_hardware_api(
             hs_module_substate.module_id

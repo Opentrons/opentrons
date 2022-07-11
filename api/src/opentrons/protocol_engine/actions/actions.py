@@ -10,6 +10,7 @@ from typing import Optional, Union
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.types import HardwareEvent
+from opentrons.hardware_control.modules import LiveData
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
@@ -90,7 +91,6 @@ class QueueCommandAction:
     """Add a command request to the queue."""
 
     command_id: str
-    command_key: str
     created_at: datetime
     request: CommandCreate
 
@@ -141,6 +141,7 @@ class AddModuleAction:
     module_id: str
     serial_number: str
     definition: ModuleDefinition
+    module_live_data: LiveData
 
 
 Action = Union[

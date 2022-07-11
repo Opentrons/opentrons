@@ -71,8 +71,6 @@ class MessageId(int, Enum):
 
     move_request = 0x10
 
-    setup_request = 0x02
-
     write_eeprom = 0x201
     read_eeprom_request = 0x202
     read_eeprom_response = 0x203

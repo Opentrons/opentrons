@@ -14,6 +14,7 @@ from opentrons.hardware_control.types import (
     OutOfBoundsMove,
     MotionChecks,
     MustHomeError,
+    InvalidMoveError,
 )
 from opentrons.hardware_control.robot_calibration import RobotCalibration
 from opentrons.hardware_control.types import OT3Axis
@@ -70,6 +71,7 @@ def mock_home(ot3_hardware):
             OT3Axis.P_L: 0,
             OT3Axis.P_R: 0,
             OT3Axis.Z_G: 0,
+            OT3Axis.G: 0,
         }
         yield mock_home
 
@@ -83,7 +85,6 @@ async def test_home(ot3_hardware, mock_home):
             mock_home.return_value,
             ot3_hardware._transforms.deck_calibration.attitude,
             ot3_hardware._transforms.carriage_offset,
-            OT3Axis,
         )
     assert ot3_hardware._current_position[OT3Axis.X] == 20
 
@@ -167,6 +168,29 @@ async def test_mount_offset_applied(hardware_api, is_robot):
     }
     await hardware_api.move_to(mount, abs_position)
     assert hardware_api._current_position == target_position
+
+
+@pytest.mark.parametrize(
+    "critical_point",
+    [
+        CriticalPoint.GRIPPER_JAW_CENTER,
+        CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN,
+        CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN,
+    ],
+)
+async def test_gripper_critical_points_fail_on_pipettes(
+    hardware_api, is_robot, critical_point
+):
+    await hardware_api.home()
+    hardware_api._backend._attached_instruments = {
+        types.Mount.LEFT: {"model": None, "id": None},
+        types.Mount.RIGHT: {"model": "p10_single_v1", "id": "testyness"},
+    }
+    await hardware_api.cache_instruments()
+    with pytest.raises(InvalidMoveError):
+        await hardware_api.move_to(
+            types.Mount.RIGHT, types.Point(0, 0, 0), critical_point=critical_point
+        )
 
 
 async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):

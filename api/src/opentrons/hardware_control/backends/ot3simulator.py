@@ -26,6 +26,8 @@ from .ot3utils import (
     get_current_settings,
     node_to_axis,
     axis_to_node,
+    create_gripper_jaw_move_group,
+    create_gripper_jaw_home_group,
 )
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -231,6 +233,18 @@ class OT3Simulator:
         """
         return axis_convert(self._position, 0.0)
 
+    async def gripper_move_jaw(
+        self,
+        duty_cycle: float,
+        stop_condition: MoveStopCondition = MoveStopCondition.none,
+    ) -> None:
+        """Move gripper inward."""
+        _ = create_gripper_jaw_move_group(duty_cycle, stop_condition)
+
+    async def gripper_home_jaw(self) -> None:
+        """Move gripper outward."""
+        _ = create_gripper_jaw_home_group()
+
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]
     ) -> OT3AttachedInstruments:
@@ -358,6 +372,7 @@ class OT3Simulator:
             OT3Axis.Y: phony_bounds,
             OT3Axis.X: phony_bounds,
             OT3Axis.Z_G: phony_bounds,
+            OT3Axis.G: phony_bounds,
         }
 
     def single_boundary(self, boundary: int) -> OT3AxisMap[float]:
@@ -428,6 +443,7 @@ class OT3Simulator:
             NodeId.pipette_left: 0,
             NodeId.pipette_right: 0,
             NodeId.gripper_z: 0,
+            NodeId.gripper_g: 0,
         }
 
     @staticmethod
