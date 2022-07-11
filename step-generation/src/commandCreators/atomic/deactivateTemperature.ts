@@ -3,6 +3,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { uuid } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import type { CommandCreator, DeactivateTemperatureArgs } from '../../types'
 
@@ -30,6 +31,7 @@ export const deactivateTemperature: CommandCreator<DeactivateTemperatureArgs> = 
       commands: [
         {
           commandType: 'temperatureModule/deactivate',
+          key: uuid(),
           params,
         },
       ],
@@ -39,10 +41,12 @@ export const deactivateTemperature: CommandCreator<DeactivateTemperatureArgs> = 
       commands: [
         {
           commandType: 'thermocycler/deactivateLid',
+          key: uuid(),
           params,
         },
         {
           commandType: 'thermocycler/deactivateBlock',
+          key: uuid(),
           params,
         },
       ],
@@ -52,6 +56,7 @@ export const deactivateTemperature: CommandCreator<DeactivateTemperatureArgs> = 
       commands: [
         {
           commandType: 'heaterShaker/deactivateHeater',
+          key: uuid(),
           params,
         },
       ],

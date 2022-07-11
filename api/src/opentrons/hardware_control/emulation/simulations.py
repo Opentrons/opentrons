@@ -7,7 +7,7 @@ class Simulation:
 
 
 class Temperature(Simulation):
-    """A model with a current and target temperature. The current temperate is
+    """A model with a current and target temperature. The current temperature is
     always moving towards the target.
     """
 
@@ -53,8 +53,8 @@ class Temperature(Simulation):
 
 
 class TemperatureWithHold(Temperature):
-    """A model with a current, target temperature and hold time. The current
-    temperate is always moving towards the target.
+    """A model with a current temperature, target temperature, and hold time.
+    The current temperature is always moving towards the target.
 
     When the current temperature is within close enough from target the hold time
     decrements once per tick.

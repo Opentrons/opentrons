@@ -7,6 +7,8 @@ import {
   pipetteIntoHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestWithLatchOpen,
   pipetteAdjacentHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
 } from '../utils'
 import {
   getRobotStateWithTipStandard,
@@ -19,10 +21,7 @@ import {
 import type { InvariantContext, RobotState } from '../types'
 
 jest.mock('../utils/thermocyclerPipetteCollision')
-jest.mock('../utils/pipetteIntoHeaterShakerLatchOpen')
-jest.mock('../utils/pipetteIntoHeaterShakerWhileShaking')
-jest.mock('../utils/getIsHeaterShakerEastWestWithLatchOpen')
-jest.mock('../utils/pipetteAdjacentHeaterShakerWhileShaking')
+jest.mock('../utils/heaterShakerCollision')
 
 const mockThermocyclerPipetteCollision = thermocyclerPipetteCollision as jest.MockedFunction<
   typeof thermocyclerPipetteCollision
@@ -36,8 +35,14 @@ const mockPipetteIntoHeaterShakerWhileShaking = pipetteIntoHeaterShakerWhileShak
 const mockGetIsHeaterShakerEastWestWithLatchOpen = getIsHeaterShakerEastWestWithLatchOpen as jest.MockedFunction<
   typeof getIsHeaterShakerEastWestWithLatchOpen
 >
+const mockGetIsHeaterShakerEastWestMultiChannelPipette = getIsHeaterShakerEastWestMultiChannelPipette as jest.MockedFunction<
+  typeof getIsHeaterShakerEastWestMultiChannelPipette
+>
 const mockPipetteAdjacentHeaterShakerWhileShaking = pipetteAdjacentHeaterShakerWhileShaking as jest.MockedFunction<
   typeof pipetteAdjacentHeaterShakerWhileShaking
+>
+const mockGetIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette as jest.MockedFunction<
+  typeof getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette
 >
 
 describe('moveToWell', () => {
@@ -60,6 +65,7 @@ describe('moveToWell', () => {
     expect(getSuccessResult(result).commands).toEqual([
       {
         commandType: 'moveToWell',
+        key: expect.any(String),
         params: {
           pipetteId: DEFAULT_PIPETTE,
           labwareId: SOURCE_LABWARE,
@@ -85,6 +91,7 @@ describe('moveToWell', () => {
     expect(getSuccessResult(result).commands).toEqual([
       {
         commandType: 'moveToWell',
+        key: expect.any(String),
         params: {
           pipetteId: DEFAULT_PIPETTE,
           labwareId: SOURCE_LABWARE,
@@ -316,7 +323,7 @@ describe('moveToWell', () => {
     when(mockGetIsHeaterShakerEastWestWithLatchOpen)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE]
+        robotStateWithTip.labware[SOURCE_LABWARE].slot
       )
       .mockReturnValue(true)
 
@@ -334,11 +341,34 @@ describe('moveToWell', () => {
       type: 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN',
     })
   })
+  it('should return an error when moving to a well east/west of a heater shaker with a multi channel pipette', () => {
+    when(mockGetIsHeaterShakerEastWestMultiChannelPipette)
+      .calledWith(
+        robotStateWithTip.modules,
+        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        expect.anything()
+      )
+      .mockReturnValue(true)
+
+    const result = moveToWell(
+      {
+        pipette: DEFAULT_PIPETTE,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL',
+    })
+  })
   it('should return an error when moving to a well north/south/east/west of a heater shaker while it is shaking', () => {
     when(mockPipetteAdjacentHeaterShakerWhileShaking)
       .calledWith(
         robotStateWithTip.modules,
-        robotStateWithTip.labware[SOURCE_LABWARE]
+        robotStateWithTip.labware[SOURCE_LABWARE].slot
       )
       .mockReturnValue(true)
 
@@ -354,6 +384,30 @@ describe('moveToWell', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING',
+    })
+  })
+  it('should return an error when moving to labware north/south of a heater shaker into a non tiprack using a multi channel pipette', () => {
+    when(mockGetIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
+      .calledWith(
+        robotStateWithTip.modules,
+        robotStateWithTip.labware[SOURCE_LABWARE].slot,
+        expect.anything(),
+        expect.anything()
+      )
+      .mockReturnValue(true)
+
+    const result = moveToWell(
+      {
+        pipette: DEFAULT_PIPETTE,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL',
     })
   })
 })

@@ -28,8 +28,14 @@ from opentrons_hardware.hardware_control.motion import (
     NodeIdMotionValues,
     create_home_step,
     MoveGroup,
+    MoveType,
     MoveStopCondition,
+    create_gripper_jaw_step,
 )
+
+GRIPPER_JAW_HOME_TIME: float = 120
+GRIPPER_JAW_GRIP_TIME: float = 1
+GRIPPER_JAW_HOME_DC: float = 100
 
 # TODO: These methods exist to defer uses of NodeId to inside
 # method bodies, which won't be evaluated until called. This is needed
@@ -48,17 +54,29 @@ def axis_nodes() -> List["NodeId"]:
         NodeId.head_r,
         NodeId.pipette_left,
         NodeId.pipette_right,
+        NodeId.gripper_z,
+        NodeId.gripper_g,
     ]
 
 
 def node_axes() -> List[OT3Axis]:
-    return [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.P_L, OT3Axis.P_R]
+    return [
+        OT3Axis.X,
+        OT3Axis.Y,
+        OT3Axis.Z_L,
+        OT3Axis.Z_R,
+        OT3Axis.P_L,
+        OT3Axis.P_R,
+        OT3Axis.Z_G,
+        OT3Axis.G,
+    ]
 
 
 def home_axes() -> List[OT3Axis]:
     return [
         OT3Axis.P_L,
         OT3Axis.P_R,
+        OT3Axis.G,
         OT3Axis.Z_L,
         OT3Axis.Z_R,
         OT3Axis.Z_G,
@@ -75,7 +93,8 @@ def axis_to_node(axis: OT3Axis) -> "NodeId":
         OT3Axis.Z_R: NodeId.head_r,
         OT3Axis.P_L: NodeId.pipette_left,
         OT3Axis.P_R: NodeId.pipette_right,
-        OT3Axis.Z_G: NodeId.gripper,
+        OT3Axis.Z_G: NodeId.gripper_z,
+        OT3Axis.G: NodeId.gripper_g,
     }
     return anm[axis]
 
@@ -88,7 +107,8 @@ def node_to_axis(node: "NodeId") -> OT3Axis:
         NodeId.head_r: OT3Axis.Z_R,
         NodeId.pipette_left: OT3Axis.P_L,
         NodeId.pipette_right: OT3Axis.P_R,
-        NodeId.gripper: OT3Axis.Z_G,
+        NodeId.gripper_z: OT3Axis.Z_G,
+        NodeId.gripper_g: OT3Axis.G,
     }
     return nam[node]
 
@@ -200,6 +220,30 @@ def create_home_group(
     step = create_home_step(
         distance=node_id_distances,
         velocity=node_id_velocities,
+    )
+    move_group: MoveGroup = [step]
+    return move_group
+
+
+def create_gripper_jaw_move_group(
+    duty_cycle: float,
+    stop_condition: MoveStopCondition = MoveStopCondition.none,
+) -> MoveGroup:
+    step = create_gripper_jaw_step(
+        duration=np.float64(GRIPPER_JAW_GRIP_TIME),
+        duty_cycle=np.float32(duty_cycle),
+        stop_condition=stop_condition,
+    )
+    move_group: MoveGroup = [step]
+    return move_group
+
+
+def create_gripper_jaw_home_group() -> MoveGroup:
+    step = create_gripper_jaw_step(
+        duration=np.float64(GRIPPER_JAW_HOME_TIME),
+        duty_cycle=np.float32(GRIPPER_JAW_HOME_DC),
+        stop_condition=MoveStopCondition.limit_switch,
+        move_type=MoveType.home,
     )
     move_group: MoveGroup = [step]
     return move_group

@@ -187,8 +187,8 @@ describe('PipetteCard', () => {
     getByText('left Mount')
     getByText('Empty')
   })
-  it('renders kebab icon and is clickable', () => {
-    const { getByRole, getByText } = render({
+  it('renders kebab icon, opens and closes overflow menu on click', () => {
+    const { getByRole, getByText, queryByText } = render({
       pipetteInfo: mockRightSpecs,
       mount: RIGHT,
       robotName: mockRobotName,
@@ -200,6 +200,8 @@ describe('PipetteCard', () => {
 
     fireEvent.click(overflowButton)
     expect(overflowButton).not.toBeDisabled()
-    getByText('mock pipette overflow menu')
+    const overflowMenu = getByText('mock pipette overflow menu')
+    overflowMenu.click()
+    expect(queryByText('mock pipette overflow menu')).toBeNull()
   })
 })

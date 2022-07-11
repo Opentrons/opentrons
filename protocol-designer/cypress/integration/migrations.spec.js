@@ -4,7 +4,7 @@ import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
 
 // TODO: (sa 2022-03-31: change these migration fixtures to v6 protocols once the liquids key is added to PD protocols
 // https://github.com/Opentrons/opentrons/issues/9852
-describe.skip('Protocol fixtures migrate and match snapshots', () => {
+describe('Protocol fixtures migrate and match snapshots', () => {
   beforeEach(() => {
     cy.visit('/')
     cy.closeAnnouncementModal()
@@ -13,58 +13,54 @@ describe.skip('Protocol fixtures migrate and match snapshots', () => {
   const testCases = [
     {
       title:
-        'preFlexGrandfatheredProtocol 1.0.0 (schema 1, PD version pre-1) -> PD 5.2.x, schema 3',
+        'preFlexGrandfatheredProtocol 1.0.0 (schema 1, PD version pre-1) -> PD 6.0.x, schema 6',
       importFixture:
         '../../fixtures/protocol/1/preFlexGrandfatheredProtocol.json',
       expectedExportFixture:
-        '../../fixtures/protocol/5/preFlexGrandfatheredProtocolMigratedFromV1_0_0.json',
+        '../../fixtures/protocol/6/preFlexGrandfatheredProtocolMigratedFromV1_0_0.json',
       unusedPipettes: false,
-      exportModalCopy: null,
       migrationModal: 'newLabwareDefs',
     },
     {
-      title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 5.2.x, schema 3',
+      title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 6.0.x, schema 6',
       importFixture: '../../fixtures/protocol/1/example_1_1_0.json',
       expectedExportFixture:
-        '../../fixtures/protocol/5/example_1_1_0MigratedFromV1_0_0.json',
+        '../../fixtures/protocol/6/example_1_1_0MigratedFromV1_0_0.json',
       unusedPipettes: true,
-      exportModalCopy: null,
       migrationModal: 'newLabwareDefs',
     },
     {
-      title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 5.2.x, schema 3',
+      title: 'doItAllV3 (schema 3, PD version 4.0.0) -> PD 6.0.x, schema 6',
       importFixture: '../../fixtures/protocol/4/doItAllV3.json',
-      expectedExportFixture: '../../fixtures/protocol/5/doItAllV3.json',
+      expectedExportFixture:
+        '../../fixtures/protocol/6/doItAllV3MigratedToV6.json',
       unusedPipettes: false,
-      exportModalCopy: null,
       migrationModal: 'noBehaviorChange',
     },
     {
-      title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 5.2.x, schema 4',
+      title: 'doItAllV4 (schema 4, PD version 4.0.0) -> PD 6.0.x, schema 6',
       importFixture: '../../fixtures/protocol/4/doItAllV4.json',
-      expectedExportFixture: '../../fixtures/protocol/5/doItAllV4.json',
+      expectedExportFixture:
+        '../../fixtures/protocol/6/doItAllV4MigratedToV6.json',
       unusedPipettes: false,
-      exportModalCopy:
-        'Robot requirements for running module inclusive JSON protocols',
       migrationModal: 'noBehaviorChange',
     },
     {
       title:
-        'doItAllV5 (schema 5, PD version 5.2.0) -> import and re-export should preserve data',
-      importFixture: '../../fixtures/protocol/5/doItAllV5.json',
-      expectedExportFixture: '../../fixtures/protocol/5/doItAllV5.json',
+        'doItAllV6 (schema 6, PD version 6.0.0) -> import and re-export should preserve data',
+      importFixture: '../../fixtures/protocol/6/doItAllV4MigratedToV6.json',
+      expectedExportFixture:
+        '../../fixtures/protocol/6/doItAllV4MigratedToV6.json',
       unusedPipettes: false,
-      exportModalCopy: 'server version 3.20 or higher',
       migrationModal: null,
     },
     {
       title:
-        'mix 5.0.x (schema 3, PD version 5.0.0) -> should migrate to 5.2.x',
+        'mix 5.0.x (schema 3, PD version 5.0.0) -> should migrate to 6.0.x, schema v6',
       importFixture: '../../fixtures/protocol/5/mix_5_0_x.json',
-      expectedExportFixture: '../../fixtures/protocol/5/mix_5_2_0.json',
-      unusedPipettes: false,
-      exportModalCopy: null,
+      expectedExportFixture: '../../fixtures/protocol/6/mix_6_0_0.json',
       migrationModal: 'noBehaviorChange',
+      unusedPipettes: false,
     },
   ]
 
@@ -74,7 +70,6 @@ describe.skip('Protocol fixtures migrate and match snapshots', () => {
       importFixture,
       expectedExportFixture,
       unusedPipettes,
-      exportModalCopy,
       migrationModal,
     }) => {
       it(title, () => {
@@ -132,10 +127,12 @@ describe.skip('Protocol fixtures migrate and match snapshots', () => {
               .click()
           }
 
-          if (exportModalCopy) {
-            cy.get('div').contains(exportModalCopy).should('exist')
-            cy.get('button').contains('continue', { matchCase: false }).click()
-          }
+          cy.get('div')
+            .contains(
+              'This protocol can only run on app and robot server version 6.1 or higher'
+            )
+            .should('exist')
+          cy.get('button').contains('continue', { matchCase: false }).click()
 
           cy.window()
             .its('__lastSavedFileBlob__')
@@ -147,14 +144,19 @@ describe.skip('Protocol fixtures migrate and match snapshots', () => {
 
               assert.match(
                 savedFile.designerApplication.version,
-                /^5\.2\.\d+$/,
-                'designerApplication.version is 5.2.x'
+                /^6\.0\.\d+$/,
+                'designerApplication.version is 6.0.x'
               )
               ;[savedFile, expectedFile].forEach(f => {
                 // Homogenize fields we don't want to compare
                 f.metadata.lastModified = 123
                 f.designerApplication.data._internalAppBuildDate = 'Foo Date'
                 f.designerApplication.version = 'x.x.x'
+                f.commands.forEach(command => {
+                  if ('key' in command) {
+                    command.key = '123'
+                  }
+                })
               })
 
               expectDeepEqual(assert, savedFile, expectedFile)

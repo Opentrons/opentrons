@@ -1,14 +1,11 @@
+import uuidv4 from 'uuid/v4'
 import { commandCreatorsTimeline } from './commandCreatorsTimeline'
 import { curryCommandCreator } from './curryCommandCreator'
 import { reduceCommandCreators } from './reduceCommandCreators'
 import { modulePipetteCollision } from './modulePipetteCollision'
 import { thermocyclerPipetteCollision } from './thermocyclerPipetteCollision'
-import { pipetteIntoHeaterShakerLatchOpen } from './pipetteIntoHeaterShakerLatchOpen'
-import { pipetteIntoHeaterShakerWhileShaking } from './pipetteIntoHeaterShakerWhileShaking'
 import { orderWells } from './orderWells'
-import { getIsTallLabwareEastWestOfHeaterShaker } from './getIsTallLabwareEastWestOfHeaterShaker'
-import { getIsHeaterShakerEastWestWithLatchOpen } from './getIsHeaterShakerEastWestWithLatchOpen'
-import { pipetteAdjacentHeaterShakerWhileShaking } from './pipetteAdjacentHeaterShakerWhileShaking'
+import { isValidSlot } from './isValidSlot'
 export {
   commandCreatorsTimeline,
   curryCommandCreator,
@@ -16,11 +13,9 @@ export {
   reduceCommandCreators,
   modulePipetteCollision,
   thermocyclerPipetteCollision,
-  pipetteIntoHeaterShakerLatchOpen,
-  pipetteIntoHeaterShakerWhileShaking,
-  pipetteAdjacentHeaterShakerWhileShaking,
-  getIsTallLabwareEastWestOfHeaterShaker,
-  getIsHeaterShakerEastWestWithLatchOpen,
+  isValidSlot,
 }
 export * from './commandCreatorArgsGetters'
 export * from './misc'
+export * from './heaterShakerCollision'
+export const uuid: () => string = uuidv4

@@ -20,7 +20,9 @@ class MockCanMessageNotifier:
 
     def __init__(self) -> None:
         """Constructor."""
-        self._listeners: List[MessageListenerCallback] = []
+        self._listeners: List[
+            Tuple[MessageListenerCallback, Optional[MessageListenerCallbackFilter]]
+        ] = []
 
     def add_listener(
         self,
@@ -28,11 +30,13 @@ class MockCanMessageNotifier:
         filter: Optional[MessageListenerCallbackFilter] = None,
     ) -> None:
         """Add listener."""
-        self._listeners.append(listener)
+        self._listeners.append((listener, filter))
 
     def notify(self, message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
         """Notify."""
-        for listener in self._listeners:
+        for listener, filter in self._listeners:
+            if filter and not filter(arbitration_id):
+                continue
             listener(message, arbitration_id)
 
 

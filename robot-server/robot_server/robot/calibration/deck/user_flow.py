@@ -17,7 +17,7 @@ from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.calibration_storage import helpers
 from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint
-from opentrons.hardware_control.pipette import Pipette
+from opentrons.hardware_control.instruments.pipette import Pipette
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.types import Mount, Point, Location
@@ -105,9 +105,9 @@ class DeckCalibrationUserFlow:
             CalibrationCommand.move_to_deck: self.move_to_deck,
             CalibrationCommand.move_to_point_one: self.move_to_point_one,
             DeckCalibrationCommand.move_to_point_two: self.move_to_point_two,
-            DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,  # noqa: E501
+            DeckCalibrationCommand.move_to_point_three: self.move_to_point_three,
             CalibrationCommand.exit: self.exit_session,
-            CalibrationCommand.invalidate_last_action: self.invalidate_last_action,  # noqa: E501
+            CalibrationCommand.invalidate_last_action: self.invalidate_last_action,
         }
         self.hardware.set_robot_calibration(
             robot_cal.build_temporary_identity_calibration()

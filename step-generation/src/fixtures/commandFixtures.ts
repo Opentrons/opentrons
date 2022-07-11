@@ -120,6 +120,7 @@ export const makeAspirateHelper: MakeAspDispHelper<AspDispAirgapParams> = bakedP
   params
 ) => ({
   commandType: 'aspirate',
+  key: expect.any(String),
   params: {
     ..._defaultAspirateParams,
     ...bakedParams,
@@ -141,6 +142,7 @@ export const makeAirGapHelper: MakeAirGapHelper<AspDispAirgapParams> = bakedPara
   params
 ) => ({
   commandType: 'aspirate',
+  key: expect.any(String),
   params: {
     ..._defaultAspirateParams,
     ...bakedParams,
@@ -155,6 +157,7 @@ export const blowoutHelper = (
   params?: Partial<BlowoutParams>
 ): CreateCommand => ({
   commandType: 'blowout',
+  key: expect.any(String),
   params: {
     pipetteId: DEFAULT_PIPETTE,
     labwareId: labware || FIXED_TRASH_ID,
@@ -187,6 +190,7 @@ export const makeDispenseHelper: MakeAspDispHelper<AspDispAirgapParams> = bakedP
   params
 ) => ({
   commandType: 'dispense',
+  key: expect.any(String),
   params: {
     ..._defaultDispenseParams,
     ...bakedParams,
@@ -201,6 +205,7 @@ export const makeDispenseAirGapHelper: MakeDispenseAirGapHelper<AspDispAirgapPar
   params
 ) => ({
   commandType: 'dispense',
+  key: expect.any(String),
   params: {
     ..._defaultDispenseParams,
     ...bakedParams,
@@ -227,12 +232,14 @@ export const makeTouchTipHelper: MakeTouchTipHelper = bakedParams => (
   params
 ) => ({
   commandType: 'touchTip',
+  key: expect.any(String),
   params: { ..._defaultTouchTipParams, ...bakedParams, wellName, ...params },
 })
 export const delayCommand = (seconds: number): CreateCommand => ({
   commandType: 'delay',
+  key: expect.any(String),
   params: {
-    wait: seconds,
+    seconds: seconds,
   },
 })
 export const delayWithOffset = (
@@ -243,6 +250,7 @@ export const delayWithOffset = (
 ): CreateCommand[] => [
   {
     commandType: 'moveToWell',
+    key: expect.any(String),
     params: {
       pipetteId: DEFAULT_PIPETTE,
       labwareId,
@@ -259,8 +267,9 @@ export const delayWithOffset = (
   },
   {
     commandType: 'delay',
+    key: expect.any(String),
     params: {
-      wait: seconds || 12,
+      seconds: seconds ?? 12,
     },
   },
 ]
@@ -273,6 +282,7 @@ export const dropTipHelper = (
   }
 ): CreateCommand => ({
   commandType: 'dropTip',
+  key: expect.any(String),
   params: {
     pipetteId: DEFAULT_PIPETTE,
     labwareId: FIXED_TRASH_ID,
@@ -289,6 +299,7 @@ export const pickUpTipHelper = (
   }
 ): CreateCommand => ({
   commandType: 'pickUpTip',
+  key: expect.any(String),
   params: {
     pipetteId: DEFAULT_PIPETTE,
     labwareId: 'tiprack1Id',

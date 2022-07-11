@@ -12,7 +12,7 @@ import typeguard
 
 from opentrons import types
 from opentrons.hardware_control import API
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.types import Axis, OT3Mount
 from opentrons.hardware_control.dev_types import PipetteDict
 
 
@@ -49,6 +49,7 @@ def dummy_instruments_attached_ot3():
             "name": "p1000_single_gen3",
         },
         types.Mount.RIGHT: {"model": None, "id": None, "name": None},
+        OT3Mount.GRIPPER: None,
     }
 
 
@@ -119,7 +120,7 @@ def get_plunger_speed(api):
     if isinstance(api, API):
         return api.plunger_speed
     else:
-        return api._instrument_handler.plunger_speed
+        return api._pipette_handler.plunger_speed
 
 
 async def test_cache_instruments(sim_and_instr):

@@ -27,7 +27,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     GripperMoveRequestPayload,
     TipActionRequestPayload,
 )
-from .constants import interrupts_per_sec
+from .constants import interrupts_per_sec, brushed_motor_interrupts_per_sec
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
@@ -69,6 +69,7 @@ class MoveGroupRunner:
         """
         self._move_groups = move_groups
         self._start_at_index = start_at_index
+        self._is_prepped: bool = False
 
     @staticmethod
     def _has_moves(move_groups: MoveGroups) -> bool:
@@ -77,6 +78,37 @@ class MoveGroupRunner:
                 for node, step in move.items():
                     return True
         return False
+
+    async def prep(self, can_messenger: CanMessenger) -> None:
+        """Prepare the move group. The first thing that happens during run().
+
+        prep() and execute() can be used to replace a single call to run() to
+        ensure tighter timing, if you want something else to start as soon as
+        possible to the actual execution of the move.
+        """
+        if not self._has_moves(self._move_groups):
+            log.debug("No moves. Nothing to do.")
+            return
+        await self._clear_groups(can_messenger)
+        await self._send_groups(can_messenger)
+        self._is_prepped = True
+
+    async def execute(
+        self, can_messenger: CanMessenger
+    ) -> NodeDict[Tuple[float, float]]:
+        """Execute a pre-prepared move group. The second thing that run() does.
+
+        prep() and execute() can be used to replace a single call to run() to
+        ensure tighter timing, if you want something else to start as soon as
+        possible to the actual execution of the move.
+        """
+        if not self._has_moves(self._move_groups):
+            log.debug("No moves. Nothing to do.")
+            return {}
+        if not self._is_prepped:
+            raise RuntimeError("A group must be prepped before it can be executed.")
+        move_completion_data = await self._move(can_messenger)
+        return self._accumulate_move_completions(move_completion_data)
 
     async def run(self, can_messenger: CanMessenger) -> NodeDict[Tuple[float, float]]:
         """Run the move group.
@@ -87,15 +119,17 @@ class MoveGroupRunner:
         Returns:
             The current position after the move for all the axes that
             acknowledged completing moves.
-        """
-        if not self._has_moves(self._move_groups):
-            log.debug("No moves. Nothing to do.")
-            return {}
 
-        await self._clear_groups(can_messenger)
-        await self._send_groups(can_messenger)
-        move_completion_data = await self._move(can_messenger)
-        return self._accumulate_move_completions(move_completion_data)
+        This function first prepares all connected devices to move (by sending
+        all the data for the moves over) and then executes the move with a
+        single call.
+
+        prep() and execute() can be used to replace a single call to run() to
+        ensure tighter timing, if you want something else to start as soon as
+        possible to the actual execution of the move.
+        """
+        await self.prep(can_messenger)
+        return await self.execute(can_messenger)
 
     @staticmethod
     def _accumulate_move_completions(
@@ -172,8 +206,9 @@ class MoveGroupRunner:
             home_payload = GripperMoveRequestPayload(
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
-                duration=UInt32Field(int(step.duration_sec * step.pwm_frequency)),
-                freq=UInt32Field(int(step.pwm_frequency)),
+                duration=UInt32Field(
+                    int(step.duration_sec * brushed_motor_interrupts_per_sec)
+                ),
                 duty_cycle=UInt32Field(int(step.pwm_duty_cycle)),
             )
             return GripperHomeRequest(payload=home_payload)
@@ -182,8 +217,9 @@ class MoveGroupRunner:
             linear_payload = GripperMoveRequestPayload(
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
-                duration=UInt32Field(int(step.duration_sec * step.pwm_frequency)),
-                freq=UInt32Field(int(step.pwm_frequency)),
+                duration=UInt32Field(
+                    int(step.duration_sec * brushed_motor_interrupts_per_sec)
+                ),
                 duty_cycle=UInt32Field(int(step.pwm_duty_cycle)),
             )
             return GripperGripRequest(payload=linear_payload)
@@ -283,8 +319,15 @@ class MoveScheduler:
             f"{'is' if (node_id, seq_id) in self._moves[group_id] else 'isn''t'}"
             " in group"
         )
-        self._moves[group_id].remove((node_id, seq_id))
-        self._completion_queue.put_nowait((arbitration_id, message))
+        try:
+            self._moves[group_id].remove((node_id, seq_id))
+            self._completion_queue.put_nowait((arbitration_id, message))
+        except KeyError:
+            log.warning(
+                f"Got a move ack for ({node_id}, {seq_id}) which is not in this "
+                "group; may have leaked from an earlier timed-out group"
+            )
+
         if not self._moves[group_id]:
             log.info(f"Move group {group_id} has completed.")
             self._event.set()
@@ -348,8 +391,13 @@ class MoveScheduler:
             )
 
             try:
+                # TODO: The max here can be removed once can_driver.send() no longer
+                # returns before the message actually hits the bus. Right now it
+                # returns when the message is enqueued in the kernel, meaning that
+                # for short move durations we can see the timeout expiring before
+                # the execute even gets sent.
                 await asyncio.wait_for(
-                    self._event.wait(), self._durations[group_id] * 1.1
+                    self._event.wait(), max(1.0, self._durations[group_id] * 1.1)
                 )
             except asyncio.TimeoutError:
                 log.warning("Move set timed out")

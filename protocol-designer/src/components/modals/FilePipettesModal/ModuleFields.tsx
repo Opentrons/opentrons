@@ -79,7 +79,6 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
 
     onFieldChange(e)
 
-    // only clear model dropdown if not TC
     if (
       targetToClear !== 'modulesByType.thermocyclerModuleType.model' &&
       targetToClear !== 'modulesByType.heaterShakerModuleType.model'

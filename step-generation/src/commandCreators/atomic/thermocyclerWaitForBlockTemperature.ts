@@ -1,3 +1,4 @@
+import { uuid } from '../../utils'
 import type { ModuleOnlyParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { CommandCreator } from '../../types'
 export const thermocyclerWaitForBlockTemperature: CommandCreator<ModuleOnlyParams> = (
@@ -9,6 +10,7 @@ export const thermocyclerWaitForBlockTemperature: CommandCreator<ModuleOnlyParam
     commands: [
       {
         commandType: 'thermocycler/waitForBlockTemperature',
+        key: uuid(),
         params: {
           moduleId: args.module,
         },

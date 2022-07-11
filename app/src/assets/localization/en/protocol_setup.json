@@ -123,5 +123,10 @@
   "liquid_setup_step_title": "Initial Liquid Setup",
   "liquid_setup_step_description": "View liquid starting locations and volumes",
   "list_view": "List View",
-  "map_view": "Map View"
+  "map_view": "Map View",
+  "location": "Location",
+  "labware_name": "Labware Name",
+  "volume": "Volume",
+  "slot_location": "Slot {{slotName}}",
+  "slot_number": "Slot Number"
 }

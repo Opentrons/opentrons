@@ -71,8 +71,6 @@ class MessageId(int, Enum):
 
     move_request = 0x10
 
-    setup_request = 0x02
-
     write_eeprom = 0x201
     read_eeprom_request = 0x202
     read_eeprom_response = 0x203
@@ -176,6 +174,18 @@ class SensorType(int, Enum):
     temperature = 0x03
     pressure = 0x04
     pressure_temperature = 0x05
+
+
+@unique
+class SensorId(int, Enum):
+    """Sensor IDs available.
+
+    Not to be confused with SensorType. This is the ID value that separate
+    two or more of the same type of sensor within a system.
+    """
+
+    S0 = 0x0
+    S1 = 0x1
 
 
 @unique

@@ -10,7 +10,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
-from opentrons.protocol_engine.commands.heater_shaker.set_and_wait_for_shake_speed import (  # noqa: E501
+from opentrons.protocol_engine.commands.heater_shaker.set_and_wait_for_shake_speed import (
     SetAndWaitForShakeSpeedImpl,
 )
 
@@ -49,5 +49,8 @@ async def test_set_and_wait_for_shake_speed(
     ).then_return(hs_hardware)
 
     result = await subject.execute(data)
-    decoy.verify(await hs_hardware.set_speed(rpm=1234), times=1)
+    decoy.verify(
+        hs_module_substate.raise_if_labware_latch_not_closed(),
+        await hs_hardware.set_speed(rpm=1234),
+    )
     assert result == heater_shaker.SetAndWaitForShakeSpeedResult()

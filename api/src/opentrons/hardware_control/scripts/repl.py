@@ -28,13 +28,15 @@ from typing import Union, Type, Any, cast  # noqa: E402
 import logging  # noqa: E402
 
 from opentrons.types import Mount, Point  # noqa: E402
-from opentrons.hardware_control.types import Axis  # noqa: E402
+from opentrons.hardware_control.types import Axis, CriticalPoint  # noqa: E402
 from opentrons.config.feature_flags import enable_ot3_hardware_controller  # noqa: E402
 from opentrons.hardware_control.types import OT3Axis, OT3Mount  # noqa: E402
 from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     calibrate_mount,
     find_edge,
     find_deck_position,
+    CalibrationMethod,
+    find_axis_center,
 )
 from opentrons.hardware_control.protocols import HardwareControlAPI  # noqa: E402
 from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
@@ -101,6 +103,9 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "find_edge": wrap_async_util_fn(find_edge, api),
             "find_deck_position": wrap_async_util_fn(find_deck_position, api),
             "do_calibration": partial(do_calibration, api),
+            "CalibrationMethod": CalibrationMethod,
+            "find_axis_center": wrap_async_util_fn(find_axis_center, api),
+            "CriticalPoint": CriticalPoint,
         },
     )
 

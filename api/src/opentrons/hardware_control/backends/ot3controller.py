@@ -19,8 +19,7 @@ from typing import (
     Iterator,
 )
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
-from opentrons.config import pipette_config
+from opentrons.config import pipette_config, gripper_config
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -30,6 +29,8 @@ from .ot3utils import (
     node_to_axis,
     sub_system_to_node_id,
     sensor_node_for_mount,
+    create_gripper_jaw_move_group,
+    create_gripper_jaw_home_group,
 )
 
 try:
@@ -56,10 +57,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
 )
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    SetupRequest,
-    EnableMotorRequest,
-)
 from opentrons_hardware import firmware_update
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
@@ -79,15 +76,20 @@ from opentrons_hardware.hardware_control.motion import (
 from opentrons_hardware.hardware_control.types import NodeMap
 from opentrons_hardware.hardware_control.tools import detector, types as ohc_tool_types
 
-from opentrons_hardware.hardware_control.tool_sensors import capacitive_probe
+from opentrons_hardware.hardware_control.tool_sensors import (
+    capacitive_probe,
+    capacitive_pass,
+)
+from opentrons_hardware.drivers.gpio import OT3GPIO
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
     from ..dev_types import (
         AttachedPipette,
+        AttachedGripper,
+        OT3AttachedInstruments,
         InstrumentHardwareConfigs,
     )
-    from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 
 log = logging.getLogger(__name__)
 
@@ -123,7 +125,7 @@ class OT3Controller:
             driver: The Can Driver
         """
         self._configuration = config
-        self._gpio_dev = SimulatingGPIOCharDev("simulated")
+        self._gpio_dev = OT3GPIO("hardware_control")
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
@@ -162,19 +164,8 @@ class OT3Controller:
             hold_currents[axis] = settings.hold_current
         return hold_currents
 
-    async def setup_motors(self) -> None:
-        """Set up the motors."""
-        await self._messenger.send(
-            node_id=NodeId.broadcast,
-            message=SetupRequest(),
-        )
-        await self._messenger.send(
-            node_id=NodeId.broadcast,
-            message=EnableMotorRequest(),
-        )
-
     @property
-    def gpio_chardev(self) -> GPIODriverLike:
+    def gpio_chardev(self) -> OT3GPIO:
         """Get the GPIO device."""
         return self._gpio_dev
 
@@ -230,6 +221,77 @@ class OT3Controller:
             self._position.update({axis: point[0]})
             self._encoder_position.update({axis: point[1]})
 
+    def _build_home_pipettes_runner(
+        self, axes: Sequence[OT3Axis]
+    ) -> Optional[MoveGroupRunner]:
+        speed_settings = (
+            self._configuration.motion_settings.max_speed_discontinuity.none
+        )
+
+        distances_pipette = {
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
+            for ax in axes
+            if ax in OT3Axis.pipette_axes()
+        }
+        velocities_pipette = {
+            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            for ax in axes
+            if ax in OT3Axis.pipette_axes()
+        }
+
+        move_group_pipette = []
+        if distances_pipette and velocities_pipette:
+            pipette_move = self._filter_move_group(
+                create_home_group(distances_pipette, velocities_pipette)
+            )
+            move_group_pipette.append(pipette_move)
+
+        if move_group_pipette:
+            return MoveGroupRunner(move_groups=move_group_pipette, start_at_index=2)
+        return None
+
+    def _build_home_gantry_z_runner(
+        self, axes: Sequence[OT3Axis]
+    ) -> Optional[MoveGroupRunner]:
+        speed_settings = (
+            self._configuration.motion_settings.max_speed_discontinuity.none
+        )
+
+        distances_gantry = {
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
+            for ax in axes
+            if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
+        }
+        velocities_gantry = {
+            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            for ax in axes
+            if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
+        }
+        distances_z = {
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
+            for ax in axes
+            if ax in OT3Axis.mount_axes()
+        }
+        velocities_z = {
+            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            for ax in axes
+            if ax in OT3Axis.mount_axes()
+        }
+        move_group_gantry_z = []
+        if distances_z and velocities_z:
+            z_move = self._filter_move_group(
+                create_home_group(distances_z, velocities_z)
+            )
+            move_group_gantry_z.append(z_move)
+        if distances_gantry and velocities_gantry:
+            gantry_move = self._filter_move_group(
+                create_home_group(distances_gantry, velocities_gantry)
+            )
+            move_group_gantry_z.append(gantry_move)
+        if move_group_gantry_z:
+            return MoveGroupRunner(move_groups=move_group_gantry_z)
+        return None
+
     async def home(self, axes: Sequence[OT3Axis]) -> OT3AxisMap[float]:
         """Home each axis passed in, and reset the positions to 0.
 
@@ -242,67 +304,19 @@ class OT3Controller:
         checked_axes = [axis for axis in axes if self._axis_is_present(axis)]
         if not checked_axes:
             return {}
-        speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.none
-        )
 
-        distances_gantry = {
-            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
-            for ax in checked_axes
-            if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
-        }
-        velocities_gantry = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
-            for ax in checked_axes
-            if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
-        }
-        distances_z = {
-            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
-            for ax in checked_axes
-            if ax in OT3Axis.mount_axes()
-        }
-        velocities_z = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
-            for ax in checked_axes
-            if ax in OT3Axis.mount_axes()
-        }
-        distances_pipette = {
-            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
-            for ax in checked_axes
-            if ax in OT3Axis.pipette_axes()
-        }
-        velocities_pipette = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
-            for ax in checked_axes
-            if ax in OT3Axis.pipette_axes()
-        }
-        move_group_gantry_z = []
-        move_group_pipette = []
-        if distances_z and velocities_z:
-            z_move = self._filter_move_group(
-                create_home_group(distances_z, velocities_z)
-            )
-            move_group_gantry_z.append(z_move)
-        if distances_gantry and velocities_gantry:
-            gantry_move = self._filter_move_group(
-                create_home_group(distances_gantry, velocities_gantry)
-            )
-            move_group_gantry_z.append(gantry_move)
-        if distances_pipette and velocities_pipette:
-            pipette_move = self._filter_move_group(
-                create_home_group(distances_pipette, velocities_pipette)
-            )
-            move_group_pipette.append(pipette_move)
-        runner_gantry_z = MoveGroupRunner(move_groups=move_group_gantry_z)
-        runner_pipette = MoveGroupRunner(
-            move_groups=move_group_pipette, start_at_index=2
+        maybe_runners = (
+            self._build_home_gantry_z_runner(checked_axes),
+            self._build_home_pipettes_runner(checked_axes),
         )
-        coros = []
-        if move_group_gantry_z:
-            coros.append(runner_gantry_z.run(can_messenger=self._messenger))
-        if move_group_pipette:
-            coros.append(runner_pipette.run(can_messenger=self._messenger))
+        coros = [
+            runner.run(can_messenger=self._messenger)
+            for runner in maybe_runners
+            if runner
+        ]
         positions = await asyncio.gather(*coros)
+        if OT3Axis.G in checked_axes:
+            await self.gripper_home_jaw()
         for position in positions:
             for p in position.items():
                 self._position.update({p[0]: p[1][0]})
@@ -335,16 +349,30 @@ class OT3Controller:
         """
         return await self.home(axes)
 
+    async def gripper_move_jaw(
+        self,
+        duty_cycle: float,
+        stop_condition: MoveStopCondition = MoveStopCondition.none,
+    ) -> None:
+        move_group = create_gripper_jaw_move_group(duty_cycle, stop_condition)
+        runner = MoveGroupRunner(move_groups=[move_group])
+        await runner.run(can_messenger=self._messenger)
+
+    async def gripper_home_jaw(self) -> None:
+        move_group = create_gripper_jaw_home_group()
+        runner = MoveGroupRunner(move_groups=[move_group])
+        await runner.run(can_messenger=self._messenger)
+
     async def get_attached_instruments(
         self, expected: Dict[OT3Mount, PipetteName]
-    ) -> Dict[OT3Mount, AttachedPipette]:
+    ) -> Dict[OT3Mount, OT3AttachedInstruments]:
         """Get attached instruments.
 
         Args:
             expected: Which mounts are expected.
 
         Returns:
-            A map of mount to pipette name.
+            A map of mount to instrument name.
         """
         await self._probe_core()
         attached = await self._tool_detector.detect()
@@ -354,7 +382,7 @@ class OT3Controller:
         ) -> "PipetteModel":
             return cast("PipetteModel", name.name + "_v3." + str(model))
 
-        def _build_attached_instr(
+        def _build_attached_pip(
             attached: ohc_tool_types.PipetteInformation,
         ) -> AttachedPipette:
             return {
@@ -364,18 +392,29 @@ class OT3Controller:
                 "id": attached.serial,
             }
 
+        def _build_attached_gripper(
+            attached: ohc_tool_types.GripperInformation,
+        ) -> AttachedGripper:
+            model = gripper_config.info_num_to_model(attached.model)
+            serial = attached.serial
+            return {
+                "config": gripper_config.load(model, serial),
+                "id": serial,
+            }
+
         def _generate_attached_instrs(
             attached: ohc_tool_types.ToolSummary,
-        ) -> Iterator[Tuple[OT3Mount, AttachedPipette]]:
+        ) -> Iterator[Tuple[OT3Mount, OT3AttachedInstruments]]:
             if attached.left:
-                yield (OT3Mount.LEFT, _build_attached_instr(attached.left))
+                yield (OT3Mount.LEFT, _build_attached_pip(attached.left))
             if attached.right:
-                yield (OT3Mount.RIGHT, _build_attached_instr(attached.right))
+                yield (OT3Mount.RIGHT, _build_attached_pip(attached.right))
+            if attached.gripper:
+                yield (OT3Mount.GRIPPER, _build_attached_gripper(attached.gripper))
 
         current_tools = dict(_generate_attached_instrs(attached))
         self._present_nodes -= set(
-            axis_to_node(OT3Axis.of_main_tool_actuator(mount))
-            for mount in (OT3Mount.RIGHT, OT3Mount.LEFT)
+            axis_to_node(OT3Axis.of_main_tool_actuator(mount)) for mount in OT3Mount
         )
         for mount in current_tools.keys():
             self._present_nodes.add(axis_to_node(OT3Axis.of_main_tool_actuator(mount)))
@@ -565,6 +604,8 @@ class OT3Controller:
             NodeId.gantry_y: 0,
             NodeId.pipette_left: 0,
             NodeId.pipette_right: 0,
+            NodeId.gripper_z: 0,
+            NodeId.gripper_g: 0,
         }
 
     @staticmethod
@@ -586,6 +627,20 @@ class OT3Controller:
             nodes.remove(NodeId.head)
             nodes.add(NodeId.head_r)
             nodes.add(NodeId.head_l)
+        return nodes
+
+    @staticmethod
+    def _replace_gripper_node(nodes: Set[NodeId]) -> Set[NodeId]:
+        """Replace the gripper core node with its two axes.
+
+        The node ID for the gripper controller is what shows up in a network probe,
+        but what we actually send most commands to is the gripper_z and gripper_g
+        synthetic nodes, so we should have them in the network map instead.
+        """
+        if NodeId.gripper in nodes:
+            nodes.remove(NodeId.gripper)
+            nodes.add(NodeId.gripper_z)
+            nodes.add(NodeId.gripper_g)
         return nodes
 
     @staticmethod
@@ -631,8 +686,14 @@ class OT3Controller:
             expected.add(NodeId.pipette_left)
         if instrs.get(OT3Mount.RIGHT, cast("AttachedPipette", {})).get("config", None):
             expected.add(NodeId.pipette_right)
+        if instrs.get(OT3Mount.GRIPPER, cast("AttachedGripper", {})).get(
+            "config", None
+        ):
+            expected.add(NodeId.gripper)
         present = await probe(self._messenger, expected, timeout)
-        self._present_nodes = self._replace_head_node(present)
+        self._present_nodes = self._replace_gripper_node(
+            self._replace_head_node(present)
+        )
 
     def _axis_is_present(self, axis: OT3Axis) -> bool:
         try:
@@ -654,7 +715,7 @@ class OT3Controller:
         distance_mm: float,
         speed_mm_per_s: float,
     ) -> None:
-        pos = await capacitive_probe(
+        pos, _ = await capacitive_probe(
             self._messenger,
             sensor_node_for_mount(mount),
             axis_to_node(moving),
@@ -664,3 +725,20 @@ class OT3Controller:
         )
 
         self._position[axis_to_node(moving)] = pos
+
+    async def capacitive_pass(
+        self,
+        mount: OT3Mount,
+        moving: OT3Axis,
+        distance_mm: float,
+        speed_mm_per_s: float,
+    ) -> List[float]:
+        data = await capacitive_pass(
+            self._messenger,
+            sensor_node_for_mount(mount),
+            axis_to_node(moving),
+            distance_mm,
+            speed_mm_per_s,
+        )
+        self._position[axis_to_node(moving)] += distance_mm
+        return data

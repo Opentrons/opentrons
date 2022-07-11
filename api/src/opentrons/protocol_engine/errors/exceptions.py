@@ -59,6 +59,14 @@ class LabwareIsNotTipRackError(ProtocolEngineError):
     """An error raised when trying to use a regular labware as a tip rack."""
 
 
+class LabwareIsTipRackError(ProtocolEngineError):
+    """An error raised when trying to use a command not allowed on tip rack."""
+
+
+class TouchTipDisabledError(ProtocolEngineError):
+    """An error raised when touch tip is used on well with touchTipDisabled quirk."""
+
+
 class WellDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a well that does not exist."""
 
@@ -143,3 +151,19 @@ class InvalidBlockVolumeError(ProtocolEngineError):
 
 class InvalidTargetSpeedError(ProtocolEngineError):
     """An error raised when attempting to set an invalid target speed."""
+
+
+class CannotPerformModuleAction(ProtocolEngineError):
+    """An error raised when trying to perform an illegal hardware module action."""
+
+
+class ProtocolCommandFailedError(ProtocolEngineError):
+    """An error raised if a fatal command execution error has occurred.
+
+    Args:
+        command_id: The ID of the command that failed.
+    """
+
+    def __init__(self, command_id: str) -> None:
+        super().__init__(f"Command {command_id} failed to execute")
+        self.command_id = command_id

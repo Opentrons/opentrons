@@ -59,11 +59,11 @@ def engine_state_summary() -> StateSummary:
     """Get a StateSummary value object."""
     return StateSummary(
         status=EngineStatus.IDLE,
-        errors=[ErrorOccurrence.construct(id="some-error-id")],  # type: ignore[call-arg]  # noqa: E501
-        labware=[LoadedLabware.construct(id="some-labware-id")],  # type: ignore[call-arg]  # noqa: E501
-        labwareOffsets=[LabwareOffset.construct(id="some-labware-offset-id")],  # type: ignore[call-arg]  # noqa: E501
-        pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]  # noqa: E501
-        modules=[LoadedModule.construct(id="some-module-id")],  # type: ignore[call-arg]  # noqa: E501
+        errors=[ErrorOccurrence.construct(id="some-error-id")],  # type: ignore[call-arg]
+        labware=[LoadedLabware.construct(id="some-labware-id")],  # type: ignore[call-arg]
+        labwareOffsets=[LabwareOffset.construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
+        pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]
+        modules=[LoadedModule.construct(id="some-module-id")],  # type: ignore[call-arg]
     )
 
 
@@ -81,12 +81,12 @@ def run_resource() -> RunResource:
 @pytest.fixture
 def run_command() -> commands.Command:
     """Get a ProtocolEngine Command value object."""
-    return commands.Pause(
+    return commands.WaitForResume(
         id="command-id",
         key="command-key",
         createdAt=datetime(year=2021, month=1, day=1),
         status=commands.CommandStatus.SUCCEEDED,
-        params=commands.PauseParams(message="Hello"),
+        params=commands.WaitForResumeParams(message="Hello"),
     )
 
 
@@ -353,20 +353,20 @@ async def test_get_all_runs(
     """It should get all runs, including current and historical."""
     current_run_data = StateSummary(
         status=EngineStatus.IDLE,
-        errors=[ErrorOccurrence.construct(id="current-error-id")],  # type: ignore[call-arg]  # noqa: E501
-        labware=[LoadedLabware.construct(id="current-labware-id")],  # type: ignore[call-arg]  # noqa: E501
-        labwareOffsets=[LabwareOffset.construct(id="current-labware-offset-id")],  # type: ignore[call-arg]  # noqa: E501
-        pipettes=[LoadedPipette.construct(id="current-pipette-id")],  # type: ignore[call-arg]  # noqa: E501
-        modules=[LoadedModule.construct(id="current-module-id")],  # type: ignore[call-arg]  # noqa: E501
+        errors=[ErrorOccurrence.construct(id="current-error-id")],  # type: ignore[call-arg]
+        labware=[LoadedLabware.construct(id="current-labware-id")],  # type: ignore[call-arg]
+        labwareOffsets=[LabwareOffset.construct(id="current-labware-offset-id")],  # type: ignore[call-arg]
+        pipettes=[LoadedPipette.construct(id="current-pipette-id")],  # type: ignore[call-arg]
+        modules=[LoadedModule.construct(id="current-module-id")],  # type: ignore[call-arg]
     )
 
     historical_run_data = StateSummary(
         status=EngineStatus.STOPPED,
-        errors=[ErrorOccurrence.construct(id="old-error-id")],  # type: ignore[call-arg]  # noqa: E501
-        labware=[LoadedLabware.construct(id="old-labware-id")],  # type: ignore[call-arg]  # noqa: E501
-        labwareOffsets=[LabwareOffset.construct(id="old-labware-offset-id")],  # type: ignore[call-arg]  # noqa: E501
-        pipettes=[LoadedPipette.construct(id="old-pipette-id")],  # type: ignore[call-arg]  # noqa: E501
-        modules=[LoadedModule.construct(id="old-module-id")],  # type: ignore[call-arg]  # noqa: E501
+        errors=[ErrorOccurrence.construct(id="old-error-id")],  # type: ignore[call-arg]
+        labware=[LoadedLabware.construct(id="old-labware-id")],  # type: ignore[call-arg]
+        labwareOffsets=[LabwareOffset.construct(id="old-labware-offset-id")],  # type: ignore[call-arg]
+        pipettes=[LoadedPipette.construct(id="old-pipette-id")],  # type: ignore[call-arg]
+        modules=[LoadedModule.construct(id="old-module-id")],  # type: ignore[call-arg]
     )
 
     current_run_resource = RunResource(
@@ -620,12 +620,12 @@ def test_get_commands_slice_from_db(
 ) -> None:
     """Should get a sliced command list from run store."""
     expected_commands_result = [
-        commands.Pause(
+        commands.WaitForResume(
             id="command-id-2",
             key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
             status=commands.CommandStatus.SUCCEEDED,
-            params=commands.PauseParams(message="Hello"),
+            params=commands.WaitForResumeParams(message="Hello"),
         ),
         run_command,
     ]
@@ -650,12 +650,12 @@ def test_get_commands_slice_current_run(
 ) -> None:
     """Should get a sliced command list from engine store."""
     expected_commands_result = [
-        commands.Pause(
+        commands.WaitForResume(
             id="command-id-2",
             key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
             status=commands.CommandStatus.SUCCEEDED,
-            params=commands.PauseParams(message="Hello"),
+            params=commands.WaitForResumeParams(message="Hello"),
         ),
         run_command,
     ]

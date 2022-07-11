@@ -6,11 +6,7 @@ import { renderHook } from '@testing-library/react-hooks'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { useDispatchApiRequest } from '../../../../redux/robot-api'
-import {
-  fetchLights,
-  updateLights,
-  getLightsOn,
-} from '../../../../redux/robot-controls'
+import { updateLights, getLightsOn } from '../../../../redux/robot-controls'
 import { useLights } from '..'
 
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
@@ -18,7 +14,6 @@ import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 jest.mock('../../../../redux/robot-api')
 jest.mock('../../../../redux/robot-controls')
 
-const mockFetchLights = fetchLights as jest.MockedFunction<typeof fetchLights>
 const mockGetLightsOn = getLightsOn as jest.MockedFunction<typeof getLightsOn>
 const mockUpdateLights = updateLights as jest.MockedFunction<
   typeof updateLights
@@ -57,7 +52,6 @@ describe('useLights hook', () => {
 
     const { result } = renderHook(() => useLights('otie'), { wrapper })
 
-    expect(dispatchApiRequest).toBeCalledWith(mockFetchLights('otie'))
     expect(result.current.lightsOn).toEqual(true)
     result.current.toggleLights()
     expect(dispatchApiRequest).toBeCalledWith(mockUpdateLights('otie', false))
@@ -72,7 +66,6 @@ describe('useLights hook', () => {
       wrapper,
     })
 
-    expect(dispatchApiRequest).toBeCalledWith(mockFetchLights('otie'))
     expect(result.current.lightsOn).toEqual(false)
     result.current.toggleLights()
     expect(dispatchApiRequest).toBeCalledWith(mockUpdateLights('otie', true))

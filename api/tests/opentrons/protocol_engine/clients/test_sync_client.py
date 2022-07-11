@@ -188,6 +188,7 @@ def test_aspirate(
                 offset=WellOffset(x=0, y=0, z=1),
             ),
             volume=123.45,
+            flowRate=2.0,
         )
     )
 
@@ -227,6 +228,7 @@ def test_dispense(
                 offset=WellOffset(x=0, y=0, z=1),
             ),
             volume=10,
+            flowRate=2.0,
         )
     )
 
@@ -247,18 +249,49 @@ def test_dispense(
     assert result == response
 
 
-def test_pause(
+def test_touch_tip(
     decoy: Decoy,
     transport: AbstractSyncTransport,
     subject: SyncClient,
 ) -> None:
-    """It should execute a pause command."""
-    request = commands.PauseCreate(params=commands.PauseParams(message="hello world"))
-    response = commands.PauseResult()
+    """It should execute a touch tip command."""
+    request = commands.TouchTipCreate(
+        params=commands.TouchTipParams(
+            pipetteId="123",
+            labwareId="456",
+            wellName="A2",
+            wellLocation=WellLocation(),
+        )
+    )
+
+    response = commands.TouchTipResult()
 
     decoy.when(transport.execute_command(request=request)).then_return(response)
 
-    result = subject.pause(message="hello world")
+    result = subject.touch_tip(
+        pipette_id="123",
+        labware_id="456",
+        well_name="A2",
+        well_location=WellLocation(),
+    )
+
+    assert result == response
+
+
+def test_wait_for_resume(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a wait for resume command."""
+    request = commands.WaitForResumeCreate(
+        params=commands.WaitForResumeParams(message="hello world")
+    )
+    response = commands.WaitForResumeResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.wait_for_resume(message="hello world")
 
     assert result == response
 
@@ -325,5 +358,67 @@ def test_thermocycler_deactivate_lid(
     response = commands.thermocycler.DeactivateLidResult()
     decoy.when(transport.execute_command(request=request)).then_return(response)
     result = subject.thermocycler_deactivate_lid(module_id="module-id")
+
+    assert result == response
+
+
+def test_thermocycler_open_lid(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Thermocycler's open lid command."""
+    request = commands.thermocycler.OpenLidCreate(
+        params=commands.thermocycler.OpenLidParams(moduleId="module-id")
+    )
+    response = commands.thermocycler.OpenLidResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_open_lid(module_id="module-id")
+
+    assert result == response
+
+
+def test_thermocycler_close_lid(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a Thermocycler's close lid command."""
+    request = commands.thermocycler.CloseLidCreate(
+        params=commands.thermocycler.CloseLidParams(moduleId="module-id")
+    )
+    response = commands.thermocycler.CloseLidResult()
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+    result = subject.thermocycler_close_lid(module_id="module-id")
+
+    assert result == response
+
+
+def test_blow_out(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a blow_out command."""
+    request = commands.BlowOutCreate(
+        params=commands.BlowOutParams(
+            pipetteId="123",
+            labwareId="456",
+            wellName="A2",
+            wellLocation=WellLocation(),
+            flowRate=2.0,
+        )
+    )
+
+    response = commands.BlowOutResult()
+
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.blow_out(
+        pipette_id="123",
+        labware_id="456",
+        well_name="A2",
+        well_location=WellLocation(),
+    )
 
     assert result == response

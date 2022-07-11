@@ -93,11 +93,6 @@ class MoveRequest:  # noqa: D101
 
 
 @dataclass
-class SetupRequest(EmptyPayloadMessage):  # noqa: D101
-    message_id: Literal[MessageId.setup_request] = MessageId.setup_request
-
-
-@dataclass
 class WriteToEEPromRequest:  # noqa: D101
     payload: payloads.EEPromDataPayload
     payload_type: Type[payloads.EEPromDataPayload] = payloads.EEPromDataPayload
@@ -588,10 +583,8 @@ class TipActionResponse:  # noqa: D101
 
 @dataclass
 class PeripheralStatusRequest:  # noqa: D101
-    payload: payloads.PeripheralStatusRequestPayload
-    payload_type: Type[
-        payloads.PeripheralStatusRequestPayload
-    ] = payloads.PeripheralStatusRequestPayload
+    payload: payloads.SensorPayload
+    payload_type: Type[payloads.SensorPayload] = payloads.SensorPayload
     message_id: Literal[
         MessageId.peripheral_status_request
     ] = MessageId.peripheral_status_request

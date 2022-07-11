@@ -14,10 +14,12 @@ from ..commands import (
     LoadPipetteResult,
     AspirateResult,
     DispenseResult,
+    MoveToCoordinatesResult,
     MoveToWellResult,
     PickUpTipResult,
     DropTipResult,
     HomeResult,
+    BlowOutResult,
 )
 from ..actions import Action, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
@@ -78,6 +80,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 DropTipResult,
                 AspirateResult,
                 DispenseResult,
+                BlowOutResult,
             ),
         ):
             self._state.current_well = CurrentWell(
@@ -85,8 +88,12 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 labware_id=command.params.labwareId,
                 well_name=command.params.wellName,
             )
+
         # TODO(mc, 2021-11-12): wipe out current_well on movement failures, too
-        elif isinstance(command.result, HomeResult):
+        elif isinstance(command.result, (HomeResult, MoveToCoordinatesResult)):
+            # A command left the pipette in a place that we can't associate
+            # with a logical well location. Set the current well to None
+            # to reflect the fact that it's now unknown.
             self._state.current_well = None
 
         if isinstance(command.result, LoadPipetteResult):
@@ -123,6 +130,10 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             # That should never happen outside of tests. But if it somehow does,
             # it won't harm the state.
             self._state.attached_tip_labware_by_id.pop(pipette_id, None)
+
+        elif isinstance(command.result, BlowOutResult):
+            pipette_id = command.params.pipetteId
+            self._state.aspirated_volume_by_id[pipette_id] = 0
 
 
 class PipetteView(HasState[PipetteState]):

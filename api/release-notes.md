@@ -5,7 +5,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 ---
-# OT-2 Software Changes in 6.0.0-alpha.0
+# OT-2 Software Changes in 6.0.0-alpha.2
 
 Welcome to the alpha release of v6.0.0 of the OT-2 software!
 

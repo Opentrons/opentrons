@@ -1,9 +1,11 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
+import { resetAllWhenMocks, when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
+import { useFeatureFlag } from '../../../redux/config'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -20,11 +22,13 @@ import { storedProtocolData } from '../../../redux/protocol-storage/__fixtures__
 import { ProtocolDetails } from '..'
 import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
 import { getValidCustomLabwareFiles } from '../../../redux/custom-labware/selectors'
+import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 jest.mock('../../../redux/custom-labware/selectors')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/protocol-storage/selectors')
 jest.mock('../../../molecules/DeckThumbnail')
+jest.mock('../../../redux/config')
 
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
@@ -44,6 +48,9 @@ const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as j
 >
 const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.MockedFunction<
   typeof getValidCustomLabwareFiles
+>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
 >
 
 const render = (
@@ -65,6 +72,8 @@ const author = 'Otie'
 const createdAt = '2022-05-04T18:33:48.916159+00:00'
 const description = 'fake protocol description'
 
+const mockMostRecentAnalysis: ProtocolAnalysisOutput = storedProtocolData.mostRecentAnalysis as ProtocolAnalysisOutput
+
 describe('ProtocolDetails', () => {
   beforeEach(() => {
     mockGetValidCustomLabwareFiles.mockReturnValue([])
@@ -74,23 +83,27 @@ describe('ProtocolDetails', () => {
     mockGetScanning.mockReturnValue(false)
     mockDeckThumbnail.mockReturnValue(<div>mock Deck Thumbnail</div>)
     mockGetIsProtocolAnalysisInProgress.mockReturnValue(false)
+    when(mockUseFeatureFlag)
+      .calledWith('enableLiquidSetup')
+      .mockReturnValue(true)
   })
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('renders protocol title as display name if present in metadata', () => {
     const protocolName = 'fakeProtocolDisplayName'
     const { getByRole } = render({
       mostRecentAnalysis: {
-        ...storedProtocolData.mostRecentAnalysis,
+        ...mockMostRecentAnalysis,
         createdAt,
         metadata: {
-          ...storedProtocolData.mostRecentAnalysis.metadata,
+          ...mockMostRecentAnalysis.metadata,
           protocolName,
         },
         config: {
-          ...storedProtocolData.mostRecentAnalysis.config,
+          ...mockMostRecentAnalysis.config,
           protocolType,
           schemaVersion,
         },
@@ -101,14 +114,14 @@ describe('ProtocolDetails', () => {
   it('renders protocol title as file name if not in metadata', () => {
     const { getByRole } = render({
       mostRecentAnalysis: {
-        ...storedProtocolData.mostRecentAnalysis,
+        ...mockMostRecentAnalysis,
         createdAt,
         metadata: {
-          ...storedProtocolData.mostRecentAnalysis.metadata,
+          ...mockMostRecentAnalysis.metadata,
           author,
         },
         config: {
-          ...storedProtocolData.mostRecentAnalysis.config,
+          ...mockMostRecentAnalysis.config,
           protocolType,
           schemaVersion,
         },
@@ -121,13 +134,13 @@ describe('ProtocolDetails', () => {
   it('renders deck setup section', () => {
     const { getByRole, getByText } = render({
       mostRecentAnalysis: {
-        ...storedProtocolData.mostRecentAnalysis,
+        ...mockMostRecentAnalysis,
         createdAt,
         metadata: {
-          ...storedProtocolData.mostRecentAnalysis.metadata,
+          ...mockMostRecentAnalysis.metadata,
         },
         config: {
-          ...storedProtocolData.mostRecentAnalysis.config,
+          ...mockMostRecentAnalysis.config,
           protocolType,
           schemaVersion,
         },
@@ -139,13 +152,13 @@ describe('ProtocolDetails', () => {
   it('opens choose robot slideout when run protocol button is clicked', () => {
     const { getByRole, queryByRole } = render({
       mostRecentAnalysis: {
-        ...storedProtocolData.mostRecentAnalysis,
+        ...mockMostRecentAnalysis,
         createdAt,
         metadata: {
-          ...storedProtocolData.mostRecentAnalysis.metadata,
+          ...mockMostRecentAnalysis.metadata,
         },
         config: {
-          ...storedProtocolData.mostRecentAnalysis.config,
+          ...mockMostRecentAnalysis.config,
           protocolType,
           schemaVersion,
         },
@@ -163,13 +176,13 @@ describe('ProtocolDetails', () => {
   it('renders the protocol creation method', () => {
     const { getByRole, getByText } = render({
       mostRecentAnalysis: {
-        ...storedProtocolData.mostRecentAnalysis,
+        ...mockMostRecentAnalysis,
         createdAt,
         metadata: {
-          ...storedProtocolData.mostRecentAnalysis.metadata,
+          ...mockMostRecentAnalysis.metadata,
         },
         config: {
-          ...storedProtocolData.mostRecentAnalysis.config,
+          ...mockMostRecentAnalysis.config,
           protocolType,
           schemaVersion,
         },
@@ -181,13 +194,13 @@ describe('ProtocolDetails', () => {
   it('renders the last analyzed date', () => {
     const { getByRole } = render({
       mostRecentAnalysis: {
-        ...storedProtocolData.mostRecentAnalysis,
+        ...mockMostRecentAnalysis,
         createdAt,
         metadata: {
-          ...storedProtocolData.mostRecentAnalysis.metadata,
+          ...mockMostRecentAnalysis.metadata,
         },
         config: {
-          ...storedProtocolData.mostRecentAnalysis.config,
+          ...mockMostRecentAnalysis.config,
           protocolType,
           schemaVersion,
         },
@@ -198,14 +211,14 @@ describe('ProtocolDetails', () => {
   it('renders the protocol description', () => {
     const { getByRole, getByText } = render({
       mostRecentAnalysis: {
-        ...storedProtocolData.mostRecentAnalysis,
+        ...mockMostRecentAnalysis,
         createdAt,
         metadata: {
-          ...storedProtocolData.mostRecentAnalysis.metadata,
+          ...mockMostRecentAnalysis.metadata,
           description,
         },
         config: {
-          ...storedProtocolData.mostRecentAnalysis.config,
+          ...mockMostRecentAnalysis.config,
           protocolType,
           schemaVersion,
         },

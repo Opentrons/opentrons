@@ -392,8 +392,9 @@
                     "minimum": 0
                   },
                   "forceDirect": {
-                    "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
-                    "type": "boolean"
+                    "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
+                    "type": "boolean",
+                    "default": false
                   }
                 }
               }
@@ -401,7 +402,7 @@
           },
 
           {
-            "description": "Move To Coordinates",
+            "description": "Move To Coordinates: Move the pipette's critical point to the specified coordinates. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-Channel pipette with no tip: end of nozzle. (2) 8-Channel pipette with no tip: end of backmost nozzle. (3) Single-Channel pipette with a tip: end of tip. (4) 8-Channel pipette with tip: end of tip on backmost nozzle.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
@@ -422,8 +423,9 @@
                     "minimum": 0
                   },
                   "forceDirect": {
-                    "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
-                    "type": "boolean"
+                    "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
+                    "type": "boolean",
+                    "default": false
                   }
                 }
               }
@@ -506,7 +508,8 @@
           },
 
           {
-            "description": "Delay Protocol Execution",
+            "title": "Delay (deprecated)",
+            "description": "Delay protocol execution for a time duration or until the user resumes the protocol. Deprecated; use `waitForResume` or `waitForDuration` commands instead.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
@@ -515,15 +518,77 @@
                 "enum": ["delay"]
               },
               "params": {
-                "type": "object",
-                "required": ["wait"],
-                "properties": {
-                  "wait": {
-                    "description": "either a number of seconds to wait (fractional values OK), or `true` to wait indefinitely until the user manually resumes the protocol",
-                    "anyOf": [{ "type": "number" }, { "enum": [true] }]
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "required": ["seconds"],
+                    "properties": {
+                      "seconds": {
+                        "description": "A number of seconds to wait, with fractional values allowed.",
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "message": {
+                        "description": "An optional message describing the delay."
+                      }
+                    }
                   },
+                  {
+                    "type": "object",
+                    "required": ["waitForResume"],
+                    "properties": {
+                      "waitForResume": {
+                        "description": "A number of seconds to wait, with fractional values allowed.",
+                        "enum": [true]
+                      },
+                      "message": {
+                        "description": "An optional message describing the delay."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+
+          {
+            "title": "Wait For Resume",
+            "description": "Pause protocol execution until the user manually resumes the protocol.",
+            "type": "object",
+            "required": ["commandType", "params"],
+            "properties": {
+              "key": { "type": "string" },
+              "commandType": {
+                "enum": ["waitForResume", "pause"]
+              },
+              "params": {
+                "type": "object",
+                "required": [],
+                "properties": {
                   "message": {
-                    "description": "optional message describing the delay"
+                    "description": "An optional message describing the pause."
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "title": "Wait For Duration",
+            "description": "Pause protocol execution for a given duration.",
+            "type": "object",
+            "required": ["commandType", "params"],
+            "properties": {
+              "key": { "type": "string" },
+              "commandType": {
+                "enum": ["waitForDuration"]
+              },
+              "params": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "message": {
+                    "description": "An optional message describing the pause."
                   }
                 }
               }
@@ -778,7 +843,7 @@
               "commandType": { "enum": ["thermocycler/runProfile"] },
               "params": {
                 "type": "object",
-                "required": ["moduleId", "profile", "volume"],
+                "required": ["moduleId", "profile"],
                 "properties": {
                   "moduleId": {
                     "type": "string",
@@ -788,20 +853,20 @@
                     "type": "array",
                     "items": {
                       "type": "object",
-                      "required": ["temperature", "holdTime"],
+                      "required": ["celsius", "holdSeconds"],
                       "properties": {
-                        "temperature": {
-                          "description": "Target temperature of profile step",
+                        "celsius": {
+                          "description": "Target temperature (in celsius) of profile step",
                           "type": "number"
                         },
-                        "holdTime": {
+                        "holdSeconds": {
                           "description": "Time (in seconds) to hold once temperature is reached",
                           "type": "number"
                         }
                       }
                     }
                   },
-                  "volume": {
+                  "blockMaxVolumeUl": {
                     "type": "number"
                   }
                 }
@@ -948,7 +1013,7 @@
           },
 
           {
-            "description": "Move To Well: Move the pipette's critical point to the specified well in a labware, with an optional offset. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-channel pipette with no tip: end of nozzle. (2) Multi-channel pipette with no tip: end of backmost nozzle. (3) Single-channel pipette with a tip: end of tip. (4) Multi-channel pipette with tip: end of tip on backmost nozzle.",
+            "description": "Move To Well: Move the pipette's critical point to the specified well in a labware, with an optional offset. The pipette's critical point is a reference point on the pipette. The critical point can be one of the following: (1) Single-Channel pipette with no tip: end of nozzle. (2) 8-Channel pipette with no tip: end of backmost nozzle. (3) Single-Channel pipette with a tip: end of tip. (4) 8-Channel pipette with tip: end of tip on backmost nozzle.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
@@ -968,8 +1033,9 @@
                     "minimum": 0
                   },
                   "forceDirect": {
-                    "description": "Default is false. If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the 'minimumZHeight' param to be ignored. A 'direct' movement is in X/Y/Z simultaneously",
-                    "type": "boolean"
+                    "description": "If true, moving from one labware/well to another will not arc to the default safe z, but instead will move directly to the specified location. This will also force the `minimumZHeight` param to be ignored. A 'direct' movement is in X/Y/Z simultaneously.",
+                    "type": "boolean",
+                    "default": false
                   }
                 }
               }
@@ -1121,25 +1187,6 @@
                         "type": "number"
                       }
                     }
-                  }
-                }
-              }
-            }
-          },
-          {
-            "description": "Pause: This command pauses the run.",
-            "type": "object",
-            "required": ["commandType"],
-            "properties": {
-              "key": { "type": "string" },
-              "commandType": {
-                "enum": ["pause"]
-              },
-              "params": {
-                "properties": {
-                  "message": {
-                    "type": "string",
-                    "description": "Optional message the user can set for their pause command"
                   }
                 }
               }

@@ -8,6 +8,10 @@ import zipfile
 from typing import Dict
 
 import pytest
+from decoy import Decoy
+
+from otupdate.common.name_management import NameSynchronizer
+
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -143,3 +147,9 @@ def otupdate_config(request, tmpdir, testing_cert):
             conf.update({"update_cert_path": testing_cert})
     json.dump(conf, open(path, "w"))
     return path
+
+
+@pytest.fixture
+def mock_name_synchronizer(decoy: Decoy) -> NameSynchronizer:
+    """Return a mock in the shape of a NameSynchronizer."""
+    return decoy.mock(cls=NameSynchronizer)

@@ -86,6 +86,14 @@ from .move_relative import (
     MoveRelativeCommandType,
 )
 
+from .move_to_coordinates import (
+    MoveToCoordinates,
+    MoveToCoordinatesParams,
+    MoveToCoordinatesCreate,
+    MoveToCoordinatesResult,
+    MoveToCoordinatesCommandType,
+)
+
 from .move_to_well import (
     MoveToWell,
     MoveToWellParams,
@@ -94,12 +102,20 @@ from .move_to_well import (
     MoveToWellCommandType,
 )
 
-from .pause import (
-    Pause,
-    PauseParams,
-    PauseCreate,
-    PauseResult,
-    PauseCommandType,
+from .wait_for_resume import (
+    WaitForResume,
+    WaitForResumeParams,
+    WaitForResumeCreate,
+    WaitForResumeResult,
+    WaitForResumeCommandType,
+)
+
+from .wait_for_duration import (
+    WaitForDuration,
+    WaitForDurationParams,
+    WaitForDurationCreate,
+    WaitForDurationResult,
+    WaitForDurationCommandType,
 )
 
 from .pick_up_tip import (
@@ -110,6 +126,14 @@ from .pick_up_tip import (
     PickUpTipCommandType,
 )
 
+from .touch_tip import (
+    TouchTip,
+    TouchTipParams,
+    TouchTipCreate,
+    TouchTipResult,
+    TouchTipCommandType,
+)
+
 from .save_position import (
     SavePosition,
     SavePositionParams,
@@ -118,21 +142,33 @@ from .save_position import (
     SavePositionCommandType,
 )
 
+from .blow_out import (
+    BlowOutParams,
+    BlowOut,
+    BlowOutCreate,
+    BlowOutCommandType,
+    BlowOutResult,
+)
+
 Command = Union[
     Aspirate,
     Custom,
     Dispense,
+    BlowOut,
     DropTip,
     Home,
     LoadLabware,
     LoadModule,
     LoadPipette,
     MoveRelative,
+    MoveToCoordinates,
     MoveToWell,
-    Pause,
+    WaitForResume,
+    WaitForDuration,
     PickUpTip,
     SavePosition,
     SetRailLights,
+    TouchTip,
     heater_shaker.WaitForTemperature,
     heater_shaker.SetTargetTemperature,
     heater_shaker.DeactivateHeater,
@@ -151,23 +187,30 @@ Command = Union[
     thermocycler.WaitForLidTemperature,
     thermocycler.DeactivateBlock,
     thermocycler.DeactivateLid,
+    thermocycler.OpenLid,
+    thermocycler.CloseLid,
+    thermocycler.RunProfile,
 ]
 
 CommandParams = Union[
     AspirateParams,
     CustomParams,
     DispenseParams,
+    BlowOutParams,
     DropTipParams,
     HomeParams,
     LoadLabwareParams,
     LoadModuleParams,
     LoadPipetteParams,
     MoveRelativeParams,
+    MoveToCoordinatesParams,
     MoveToWellParams,
-    PauseParams,
+    WaitForResumeParams,
+    WaitForDurationParams,
     PickUpTipParams,
     SavePositionParams,
     SetRailLightsParams,
+    TouchTipParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -186,23 +229,31 @@ CommandParams = Union[
     thermocycler.WaitForLidTemperatureParams,
     thermocycler.DeactivateBlockParams,
     thermocycler.DeactivateLidParams,
+    thermocycler.OpenLidParams,
+    thermocycler.CloseLidParams,
+    thermocycler.RunProfileParams,
+    thermocycler.RunProfileStepParams,
 ]
 
 CommandType = Union[
     AspirateCommandType,
     CustomCommandType,
     DispenseCommandType,
+    BlowOutCommandType,
     DropTipCommandType,
     HomeCommandType,
     LoadLabwareCommandType,
     LoadModuleCommandType,
     LoadPipetteCommandType,
     MoveRelativeCommandType,
+    MoveToCoordinatesCommandType,
     MoveToWellCommandType,
-    PauseCommandType,
+    WaitForResumeCommandType,
+    WaitForDurationCommandType,
     PickUpTipCommandType,
     SavePositionCommandType,
     SetRailLightsCommandType,
+    TouchTipCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -221,22 +272,29 @@ CommandType = Union[
     thermocycler.WaitForLidTemperatureCommandType,
     thermocycler.DeactivateBlockCommandType,
     thermocycler.DeactivateLidCommandType,
+    thermocycler.OpenLidCommandType,
+    thermocycler.CloseLidCommandType,
+    thermocycler.RunProfileCommandType,
 ]
 
 CommandCreate = Union[
     AspirateCreate,
     DispenseCreate,
+    BlowOutCreate,
     DropTipCreate,
     HomeCreate,
     LoadLabwareCreate,
     LoadModuleCreate,
     LoadPipetteCreate,
     MoveRelativeCreate,
+    MoveToCoordinatesCreate,
     MoveToWellCreate,
-    PauseCreate,
+    WaitForResumeCreate,
+    WaitForDurationCreate,
     PickUpTipCreate,
     SavePositionCreate,
     SetRailLightsCreate,
+    TouchTipCreate,
     heater_shaker.WaitForTemperatureCreate,
     heater_shaker.SetTargetTemperatureCreate,
     heater_shaker.DeactivateHeaterCreate,
@@ -255,23 +313,30 @@ CommandCreate = Union[
     thermocycler.WaitForLidTemperatureCreate,
     thermocycler.DeactivateBlockCreate,
     thermocycler.DeactivateLidCreate,
+    thermocycler.OpenLidCreate,
+    thermocycler.CloseLidCreate,
+    thermocycler.RunProfileCreate,
 ]
 
 CommandResult = Union[
     AspirateResult,
     CustomResult,
     DispenseResult,
+    BlowOutResult,
     DropTipResult,
     HomeResult,
     LoadLabwareResult,
     LoadModuleResult,
     LoadPipetteResult,
     MoveRelativeResult,
+    MoveToCoordinatesResult,
     MoveToWellResult,
-    PauseResult,
+    WaitForResumeResult,
+    WaitForDurationResult,
     PickUpTipResult,
     SavePositionResult,
     SetRailLightsResult,
+    TouchTipResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,
@@ -290,4 +355,7 @@ CommandResult = Union[
     thermocycler.WaitForLidTemperatureResult,
     thermocycler.DeactivateBlockResult,
     thermocycler.DeactivateLidResult,
+    thermocycler.OpenLidResult,
+    thermocycler.CloseLidResult,
+    thermocycler.RunProfileResult,
 ]

@@ -15,7 +15,6 @@ import {
   TEXT_DECORATION_UNDERLINE,
   useHoverTooltip,
   TOOLTIP_LEFT,
-  useConditionalConfirm,
   Mount,
   SpinnerModalPage,
   AlertModal,
@@ -50,8 +49,10 @@ import {
   useTipLengthCalibrations,
   useDeckCalibrationStatus,
   useIsRobotBusy,
+  useAttachedPipettes,
+  useAttachedPipetteCalibrations,
+  useRunStartedOrLegacySessionInProgress,
 } from '../hooks'
-import { DeckCalibrationConfirmModal } from './DeckCalibrationConfirmModal'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 
@@ -136,15 +137,13 @@ export function RobotSettingsCalibration({
     setPipetteOffsetCalBannerType,
   ] = React.useState<string>('')
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
+  const isRunStartedOrLegacySessionInProgress = useRunStartedOrLegacySessionInProgress()
   const isBusy = useIsRobotBusy()
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
   const deckCalStatus = useSelector((state: State) => {
     return Calibration.getDeckCalibrationStatus(state, robotName)
-  })
-  const attachedPipetteCalibrations = useSelector((state: State) => {
-    return Pipettes.getAttachedPipetteCalibrations(state, robotName)
   })
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
   const dispatch = useDispatch<Dispatch>()
@@ -183,9 +182,8 @@ export function RobotSettingsCalibration({
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
   const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
-  const attachedPipettes = useSelector((state: State) => {
-    return Pipettes.getAttachedPipettes(state, robotName)
-  })
+  const attachedPipettes = useAttachedPipettes()
+  const attachedPipetteCalibrations = useAttachedPipetteCalibrations(robotName)
 
   const isRunning = useSelector(robotSelectors.getIsRunning)
 
@@ -195,7 +193,7 @@ export function RobotSettingsCalibration({
   )
 
   const pipettePresent =
-    !(attachedPipettes?.left == null) || !(attachedPipettes?.right == null)
+    !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
 
   const isPending =
     useSelector<State, RequestState | null>(state =>
@@ -209,6 +207,7 @@ export function RobotSettingsCalibration({
       ? RobotApi.getRequestById(state, createRequestId.current)
       : null
   )
+
   const createStatus = createRequest?.status
 
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
@@ -226,22 +225,11 @@ export function RobotSettingsCalibration({
     )
   }
 
-  const pipOffsetDataPresent =
-    pipetteOffsetCalibrations != null
-      ? pipetteOffsetCalibrations.length > 0
-      : false
-
   const deckCalibrationSession: DeckCalibrationSession | null = useSelector(
     (state: State) => {
       return getDeckCalibrationSession(state, robotName)
     }
   )
-
-  const {
-    showConfirmation: showConfirmStart,
-    confirm: confirmStart,
-    cancel: cancelStart,
-  } = useConditionalConfirm(handleStartDeckCalSession, !!pipOffsetDataPresent)
 
   let buttonDisabledReason: string | null = null
   if (notConnectable) {
@@ -262,7 +250,7 @@ export function RobotSettingsCalibration({
     pipettePresent
 
   const calCheckButtonDisabled = healthCheckIsPossible
-    ? Boolean(buttonDisabledReason)
+    ? Boolean(buttonDisabledReason) || isPending
     : true
 
   const onClickSaveAs: React.MouseEventHandler = e => {
@@ -283,9 +271,10 @@ export function RobotSettingsCalibration({
     )
   }
 
-  const deckCalibrationButtonText = deckCalibrationData.isDeckCalibrated
-    ? t('deck_calibration_recalibrate_button')
-    : t('deck_calibration_calibrate_button')
+  const deckCalibrationButtonText =
+    deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
+      ? t('deck_calibration_recalibrate_button')
+      : t('deck_calibration_calibrate_button')
 
   const disabledOrBusyReason = isPending
     ? t('robot_calibration:deck_calibration_spinner', {
@@ -434,10 +423,10 @@ export function RobotSettingsCalibration({
   }
 
   const handleClickDeckCalibration = (): void => {
-    if (isBusy) {
+    if (isRunStartedOrLegacySessionInProgress) {
       updateRobotStatus(true)
     } else {
-      confirmStart()
+      handleStartDeckCalSession()
     }
   }
 
@@ -464,6 +453,8 @@ export function RobotSettingsCalibration({
     }
   }, [createStatus])
 
+  // Note: following fetch need to reflect the latest state of calibrations
+  // when a user does calibration or rename a robot.
   useInterval(
     () => {
       dispatch(Calibration.fetchCalibrationStatus(robotName))
@@ -492,16 +483,11 @@ export function RobotSettingsCalibration({
             closePrompt={() => setShowCalBlockModal(false)}
           />
         ) : null}
-        {showConfirmStart && pipOffsetDataPresent && (
-          <DeckCalibrationConfirmModal
-            confirm={confirmStart}
-            cancel={cancelStart}
-          />
-        )}
+
         {createStatus === RobotApi.PENDING ? (
           <SpinnerModalPage
             titleBar={{
-              title: t('health_check_title'),
+              title: t('robot_calibration:health_check_title'),
               back: {
                 disabled: true,
                 title: t('shared:exit'),
@@ -520,7 +506,7 @@ export function RobotSettingsCalibration({
         {createStatus === RobotApi.FAILURE && (
           <AlertModal
             alertOverlay
-            heading={t('deck_calibration_failure')}
+            heading={t('robot_calibration:deck_calibration_failure')}
             buttons={[
               {
                 children: t('shared:ok'),
@@ -609,7 +595,7 @@ export function RobotSettingsCalibration({
           </Box>
           <TertiaryButton
             onClick={() => handleClickDeckCalibration()}
-            disabled={disabledOrBusyReason !== null}
+            disabled={disabledOrBusyReason != null}
           >
             {deckCalibrationButtonText}
           </TertiaryButton>

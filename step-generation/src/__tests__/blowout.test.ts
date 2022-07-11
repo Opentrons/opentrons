@@ -34,6 +34,7 @@ describe('blowout', () => {
     expect(res.commands).toEqual([
       {
         commandType: 'blowout',
+        key: expect.any(String),
         params: {
           pipetteId: DEFAULT_PIPETTE,
           labwareId: SOURCE_LABWARE,
