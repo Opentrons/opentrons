@@ -85,7 +85,7 @@ export function useCreateRunFromProtocol(
   error != null && console.error(error)
   error = error?.length > 255 ? t('protocol_run_general_error_msg') : error
 
-  const errorCode = protocolError?.code ?? runError?.code ?? ''
+  const errorCode = protocolError?.code ?? runError?.code ?? null
 
   return {
     createRunFromProtocolSource: (
