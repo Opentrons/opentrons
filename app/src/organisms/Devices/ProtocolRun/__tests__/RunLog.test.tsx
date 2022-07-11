@@ -4,7 +4,7 @@ import { UseQueryResult } from 'react-query'
 import { fireEvent } from '@testing-library/dom'
 
 import { renderWithProviders } from '@opentrons/components'
-import { useAllCommandsQuery } from '@opentrons/react-api-client'
+import { useAllCommandsQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
 import fixtureAnalysis from '../../../../organisms/RunDetails/__fixtures__/analysis.json'
@@ -20,7 +20,7 @@ import { RunLogProtocolSetupInfo } from '../RunLogProtocolSetupInfo'
 import { StepItemComponent as StepItem } from '../StepItem'
 import { RunLog } from '../RunLog'
 
-import type { CommandsData } from '@opentrons/api-client'
+import type { CommandsData, Run } from '@opentrons/api-client'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 import type { RunTimestamps } from '../../../../organisms/RunTimeControl/hooks'
 
@@ -38,6 +38,7 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
 const mockUseAllCommandsQuery = useAllCommandsQuery as jest.MockedFunction<
   typeof useAllCommandsQuery
 >
+const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
@@ -73,6 +74,9 @@ describe('RunLog', () => {
       displayName: 'mock display name',
       protocolKey: 'fakeProtocolKey',
     })
+    when(mockUseRunQuery).mockReturnValue(({
+      data: { data: { current: true } },
+    } as unknown) as UseQueryResult<Run>)
     when(mockUseAllCommandsQuery).mockReturnValue(({
       data: { data: runRecord.data.commands, meta: { totalLength: 14 } },
     } as unknown) as UseQueryResult<CommandsData>)
