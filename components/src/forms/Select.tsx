@@ -71,7 +71,11 @@ const CLEAR_STYLES = {
   groupHeading: NO_STYLE_FN,
   indicatorsContainer: NO_STYLE_FN,
   indicatorSeparator: NO_STYLE_FN,
-  input: NO_STYLE_FN,
+  input: (styles: any) => ({
+    ...styles,
+    zIndex: 2,
+    position: 'absolute',
+  }),
   loadingIndicator: NO_STYLE_FN,
   loadingMessage: NO_STYLE_FN,
   menu: NO_STYLE_FN,
