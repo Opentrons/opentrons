@@ -493,13 +493,19 @@ class API(
 
     # Gantry/frame (i.e. not pipette) action API
     async def home_z(self, mount: Optional[top_types.Mount] = None) -> None:
-        """Home the two z-axes"""
-        self._reset_last_mount()
-        if not mount:
+        """Home the Z-stage(s) of the instrument mounts.
+
+        If given a mount, will try to only home that mount.
+        However, if the other mount is currently extended,
+        both mounts will be homed.
+        """
+        if not mount or self._last_moved_mount is not None:
             axes = [Axis.Z, Axis.A]
         else:
             axes = [Axis.by_mount(mount)]
+
         await self.home(axes)
+        self._reset_last_mount()
 
     async def _do_plunger_home(
         self,
