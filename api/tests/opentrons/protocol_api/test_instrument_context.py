@@ -19,21 +19,22 @@ from opentrons.protocol_api.labware import next_available_tip
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_next_available_tip(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+def patch_mock_next_available_tip(decoy: Decoy, monkeypatch: pytest.MonkeyPatch, mock_labware: Labware, mock_well: Well) -> None:
     """Replace next_available_tip() with a mock."""
     mock_next_available_tip = decoy.mock(func=next_available_tip)
     monkeypatch.setattr(
         "opentrons.protocol_api.labware.next_available_tip",
         mock_next_available_tip,
     )
-    print("mocking mock_next_available_tip")
+
     decoy.when(
         mock_next_available_tip(
             starting_tip=matchers.Anything(),
             tip_racks=matchers.Anything(),
             channels=matchers.Anything()
         )
-    ).then_return(decoy.mock(name="next_available_tip"))
+    ).then_return([mock_labware, mock_well])
+
 
 @pytest.fixture(autouse=True)
 def patch_mock_validate_tiprack(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -161,18 +162,25 @@ def test_pick_up_from_location(
     )
 
 
-def test_pick_up_from_well(
+def test_pick_up_from_manipulated_location(
     decoy: Decoy,
     subject: InstrumentContext,
     mock_instrument_implementation: AbstractInstrument,
     mock_well_implementation: WellImplementation,
+    mock_well_geometry: WellGeometry,
     mock_well: Well,
+    mock_labware: Labware,
 ) -> None:
-    """Should pick up tip from supplied location of types.Location."""
-    expected_location = Location(Point(0, 0, 0), mock_well)
-    input_location = Well(mock_well_implementation)
+    """Should pick up tip from move result of types.Location."""
 
-    subject.pick_up_tip(location=input_location)
+    initial_location = Location(Point(0, 0, 0), labware=mock_well)
+    expected_location = Location(Point(x=-100, y=-100, z=0), labware=mock_well)
+    move_to_location = initial_location.move(point=Point(x=-100, y=-100, z=0))
+
+    decoy.when(subject._ctx._modules).then_return([])
+
+    subject.pick_up_tip(location=move_to_location)
+
     decoy.verify(
         mock_instrument_implementation.move_to(
             location=expected_location,
@@ -182,3 +190,59 @@ def test_pick_up_from_well(
         ),
         times=1,
     )
+
+# def test_pick_up_from_well(
+#     decoy: Decoy,
+#     subject: InstrumentContext,
+#     mock_instrument_implementation: AbstractInstrument,
+#     mock_well_implementation: WellImplementation,
+#     mock_well: Well,
+#     mock_labware: Labware
+# ) -> None:
+#     """Should pick up tip from supplied location of types.Location."""
+#     expected_location = Location(Point(0, 0, 0), mock_well)
+#     input_location = Well(mock_well_implementation)
+#
+#     decoy.when(subject._ctx._modules).then_return([])
+#     decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=None)).then_return(False)
+#
+#     decoy.when(mock_well.parent).then_return(mock_labware)
+#
+#     subject.pick_up_tip(location=input_location)
+#
+#     decoy.verify(
+#         mock_instrument_implementation.move_to(
+#             location=expected_location,
+#             force_direct=False,
+#             minimum_z_height=None,
+#             speed=None,
+#         ),
+#         times=1,
+#     )
+
+# def test_pick_up_from_no_location(
+#     decoy: Decoy,
+#     subject: InstrumentContext,
+#     mock_instrument_implementation: AbstractInstrument,
+#     mock_well_implementation: WellImplementation,
+#     mock_well: Well,
+#     mock_labware: Labware
+# ) -> None:
+#     """Should pick up tip from supplied location of types.Location."""
+#     expected_location = Location(Point(0, 0, 0), mock_well)
+#     input_location = Well(mock_well_implementation)
+#
+#     decoy.when(subject._ctx._modules).then_return([])
+#     decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=None)).then_return(False)
+#
+#     subject.pick_up_tip(location=None)
+#
+#     decoy.verify(
+#         mock_instrument_implementation.move_to(
+#             location=expected_location,
+#             force_direct=False,
+#             minimum_z_height=None,
+#             speed=None,
+#         ),
+#         times=1,
+#     )
