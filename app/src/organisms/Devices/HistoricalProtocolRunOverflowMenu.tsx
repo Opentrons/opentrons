@@ -42,7 +42,7 @@ export function HistoricalProtocolRunOverflowMenu(
 ): JSX.Element {
   const { runId, robotName } = props
   const {
-    MenuOverlay,
+    menuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
@@ -81,7 +81,7 @@ export function HistoricalProtocolRunOverflowMenu(
               setShowDownloadRunLogToast={setShowDownloadRunLogToast}
             />
           </Box>
-          <MenuOverlay />
+          {menuOverlay}
         </>
       )}
       {runTotalCommandCount != null && showDownloadRunLogToast ? (
