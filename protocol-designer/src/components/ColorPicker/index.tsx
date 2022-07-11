@@ -1,4 +1,5 @@
 import * as React from 'react'
+import cx from 'classnames'
 import { ColorResult, TwitterPicker } from 'react-color'
 import { COLORS } from '@opentrons/components'
 
@@ -15,10 +16,9 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
   return (
     <div>
       <div
-        className={styles.swatch}
-        style={
-          showColorPicker ? { boxShadow: '0 2px 4px rgba(0, 0, 0, 0.41)' } : {}
-        }
+        className={cx(styles.swatch, {
+          [styles.swatch_enabled]: showColorPicker,
+        })}
         onClick={() => setShowColorPicker(showColorPicker => !showColorPicker)}
       >
         <div

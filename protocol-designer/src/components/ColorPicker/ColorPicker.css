@@ -3,7 +3,8 @@
   cursor: pointer;
 }
 
-.swatch:hover {
+.swatch:hover,
+.swatch_enabled {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.41);
 }
 
