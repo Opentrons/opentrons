@@ -92,12 +92,12 @@ def mock_labware(decoy: Decoy) -> Labware:
 
 
 @pytest.fixture
-def mock_well_implementation(mock_well_geometry) -> WellImplementation:
+def mock_well_implementation(mock_well_geometry: WellGeometry) -> WellImplementation:
     return WellImplementation(
         well_geometry=mock_well_geometry,
         display_name="test",
         has_tip=True,
-        name="test"
+        name="A1"
     )
 
 
@@ -122,18 +122,13 @@ def opentrons_96_tiprack_300ul(opentrons_96_tiprack_300ul_def):
 
 
 @pytest.mark.parametrize(
-    "input_point, labware, expected_point_call, is_type_location",
+    "input_point, labware, expected_point_call",
     [
-        (Point(-100, -100, 0), lazy_fixture("mock_well"), Point(-100, -100, 0), True),
+        (Point(-100, -100, 0), lazy_fixture("mock_well"), Point(-100, -100, 0)),
         (
             Point(-100, -100, 0),
             lazy_fixture("mock_labware"),
-            Point(-100, -100, 0),
-            True,
-        ),
-        (
-            Well(well_implementation=lazy_fixture("mock_well_implementation")),
-            False,
+            Point(-100, -100, 0)
         ),
     ],
 )
@@ -149,18 +144,13 @@ def test_pick_up_from_location(
     labware: Optional[LocationLabware],
     expected_point_call: Optional[Point],
     opentrons_96_tiprack_300ul,
-    is_type_location: bool,
 ) -> None:
-    """Should pick up tip from supplied location."""
-    if is_type_location:
-        input_location = Location(point=input_point, labware=labware)
-        expected_location = Location(point=expected_point_call, labware=mock_well)
-    else:
-        input_location = Well(mock_instrument_implementation)
-        expected_location = Location(point=expected_point_call, labware=mock_well)
+    """Should pick up tip from supplied location of types.Location."""
+
+    input_location = Location(point=input_point, labware=labware)
+    expected_location = Location(point=expected_point_call, labware=mock_well)
 
     decoy.when(subject._ctx._modules).then_return([])
-    decoy.when(mock_well_implementation.get_geometry()).then_return(mock_well_geometry)
     tiprack = opentrons_96_tiprack_300ul
     print("tiprack")
     print(tiprack)
@@ -168,6 +158,32 @@ def test_pick_up_from_location(
     print(tiprack._implementation.is_tiprack())
     decoy.when(mock_labware.next_tip(None)).then_return(mock_well)
     # decoy.when(Well(mock_labware.next_tip(None)).top()).then_return(tiprack)
+
+    subject.pick_up_tip(location=input_location)
+    decoy.verify(
+        mock_instrument_implementation.move_to(
+            location=expected_location,
+            force_direct=False,
+            minimum_z_height=None,
+            speed=None,
+        ),
+        times=1,
+    )
+
+def test_pick_up_from_location(
+    decoy: Decoy,
+    subject: InstrumentContext,
+    mock_instrument_implementation: AbstractInstrument,
+    mock_well_implementation: WellImplementation,
+    mock_well_geometry: WellGeometry,
+    mock_well: Well,
+    mock_labware: Labware,
+) -> None:
+    """Should pick up tip from supplied location of types.Location."""
+
+    input_location = Well(mock_instrument_implementation)
+    print("after Well")
+    expected_location = Location(point=input_location, labware=mock_well)
 
     subject.pick_up_tip(location=input_location)
     decoy.verify(
