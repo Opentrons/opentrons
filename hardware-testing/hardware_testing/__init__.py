@@ -1,5 +1,6 @@
 """Hardware Testing support package."""
 from types import MethodType
+from typing import Any
 
 from opentrons import protocol_api, execute, simulate
 from opentrons.hardware_control.thread_manager import ThreadManagerException
@@ -20,7 +21,7 @@ def get_api_context(
             # Creating simulated Protocol Context, with .is_simulated() overridden
             ctx = simulate.get_protocol_api(api_level)
 
-            def _fake_context_is_simulating() -> bool:
+            def _fake_context_is_simulating(_: Any) -> bool:
                 return False
 
             setattr(ctx, "is_simulating", MethodType(_fake_context_is_simulating, ctx))
