@@ -53,7 +53,7 @@ describe('Export', () => {
         'The protocol requires a Single Channel pipette on the right mount of your robot.'
     )
 
-    screen.getByRole('textbox', { name: /test pipette/i })
+    screen.getByText(/test pipette/i)
     screen.getByRole('button', { name: /export/i })
   })
 
