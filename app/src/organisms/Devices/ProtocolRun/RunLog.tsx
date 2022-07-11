@@ -336,6 +336,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
 
   const isCurrentStepBelow =
     (currentItemRef.current?.getBoundingClientRect().top != null &&
+      listInnerRef.current?.getBoundingClientRect().bottom != null &&
       currentItemRef.current?.getBoundingClientRect().top >
         listInnerRef.current?.getBoundingClientRect().bottom) ||
     windowIndex < indexOfFirstWindowContainingCurrentCommand
