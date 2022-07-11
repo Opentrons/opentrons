@@ -16,5 +16,9 @@ def get_api_context(api_level: str, is_simulating: bool = False) -> protocol_api
             # Probably be running on a non-Linux machine
             # Creating simulated Protocol Context, with .is_simulated() overridden
             ctx = simulate.get_protocol_api(api_level)
-            ctx.is_simulating = MethodType(lambda _: False, ctx)
+
+            def _fake_context_is_simulating() -> bool:
+                return False
+
+            setattr(ctx, 'is_simulating', MethodType(_fake_context_is_simulating, ctx))
     return ctx

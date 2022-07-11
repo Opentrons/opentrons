@@ -18,7 +18,8 @@ class GravimetricSample:
         return 'time,relative-time,grams,unstable-grams,stable-grams,stable'
 
     def as_csv(self, parent: Optional["GravimetricRecording"] = None) -> str:
-        rel_time = self.relative_time(parent.start_time)
+        start_time = parent.start_time if parent else self.time
+        rel_time = self.relative_time(start_time)
         unstable_grams = str(self.grams) if not self.stable else ''
         stable_grams = str(self.grams) if self.stable else ''
         return f'{self.time},{rel_time},{self.grams},' \
@@ -139,7 +140,7 @@ def record_samples(scale: RadwagScaleBase,
     def _get_remaining_time(stamp: float, period: float) -> float:
         return (stamp + period) - time()
 
-    def _did_exceed_time(stamp: float, period: float) -> bool:
+    def _did_exceed_time(stamp: float, period: Optional[float] = None) -> bool:
         if not stamp:
             return True
         if not period:

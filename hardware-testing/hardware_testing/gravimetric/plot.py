@@ -1,11 +1,11 @@
 import os
 
-from dash import Dash
-from dash.dependencies import Output, Input
-from dash_core_components import Graph, Interval
-from dash_html_components import Div
+from dash import Dash  # type: ignore[import]
+from dash.dependencies import Output, Input  # type: ignore[import]
+from dash_core_components import Graph, Interval  # type: ignore[import]
+from dash_html_components import Div  # type: ignore[import]
 
-from plotly.graph_objs import Layout, Scatter
+from plotly.graph_objs import Layout, Scatter  # type: ignore[import]
 
 from hardware_testing.gravimetric import GravimetricRecording
 from hardware_testing.data import create_folder_for_test_data

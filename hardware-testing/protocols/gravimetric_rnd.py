@@ -1,6 +1,6 @@
 import atexit
 
-from serial.tools.list_ports import comports
+from serial.tools.list_ports import comports  # type: ignore[import]
 
 from opentrons.protocol_api import ProtocolContext
 
@@ -55,7 +55,7 @@ def run(protocol: ProtocolContext) -> None:
     if protocol.is_simulating():
         scale = SimRadwagScale()
     else:
-        scale = RadwagScale.create(find_scale_port())
+        scale = RadwagScale.create(find_scale_port())   # type: ignore[assignment]
     scale.connect()
     atexit.register(scale.disconnect)
     initialize_scale(scale)

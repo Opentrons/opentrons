@@ -18,9 +18,7 @@ def scale_connection() -> MagicMock:
 @pytest.fixture
 def subject(scale_connection: MagicMock) -> RadwagScale:
     """Test subject."""
-    r = RadwagScale(
-        connection=scale_connection, time_delay=0, limit_sensor=SimLimitSensor()
-    )
+    r = RadwagScale(connection=scale_connection)
     return r
 
 
@@ -64,33 +62,10 @@ def test_read_mass(
         create_radwag_result_line("SI", v) for v in masses
     ]
 
-    mass = subject.read_mass(samples=len(masses))
-
-    assert mass == expected
-    assert scale_connection.readline.call_count == len(masses)
-
-
-@pytest.mark.parametrize(
-    argnames="masses,expected",
-    argvalues=[
-        # drop all but last three
-        [[5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5.5, 5.5, 5.5], 5.5],
-        # All the same
-        [[5.5, 5.5, 5.5, 5.5], 5.5],
-        # Remove outlier
-        [[1.0, 12.0, 1.0], 1.0],
-    ],
-)
-def test_stable_read(
-    subject: RadwagScale,
-    scale_connection: MagicMock,
-    masses: List[float],
-    expected: float,
-) -> None:
-    """It should read samples."""
-    scale_connection.readline.side_effect = [
-        create_radwag_result_line("SU", v) for v in masses
+    mass = [
+        subject.read_mass()
+        for _ in range(len(masses))
     ]
-    mass = subject.stable_read(len(masses))
+
     assert mass == expected
     assert scale_connection.readline.call_count == len(masses)

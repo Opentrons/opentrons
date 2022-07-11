@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Tuple, Optional
 
 from random import uniform
-from serial import Serial
+from serial import Serial  # type: ignore[import]
 
 from .commands import (
     RadwagCommand, RadwagWorkingMode, RadwagFilter, RadwagValueRelease, radwag_command_format
@@ -82,7 +82,7 @@ class RadwagScale(RadwagScaleBase):
         cmd_str = radwag_command_format(cmd)
         cmd_bytes = cmd_str.encode('utf-8')
         send_len = self._connection.write(cmd_bytes)
-        assert send_len == len(cmd_bytes), f'Radwag command \"{cmd}\" ({cmd_bytes} ' \
+        assert send_len == len(cmd_bytes), f'Radwag command \"{cmd}\" ({str(cmd_bytes)} ' \
                                            f'bytes) only sent {send_len} bytes'
 
     def _read_response(self, command: RadwagCommand, timeout: Optional[float] = None) -> RadwagResponse:
@@ -108,6 +108,8 @@ class RadwagScale(RadwagScaleBase):
         res = self._read_response(cmd)
         assert res.code == RadwagResponseCodes.IN_PROGRESS, \
             f'Unexpected response code: {res.code}'
+        assert res.message, \
+            'No serial number returned from scale'
         return res.message
 
     def working_mode(self, mode: RadwagWorkingMode) -> None:
