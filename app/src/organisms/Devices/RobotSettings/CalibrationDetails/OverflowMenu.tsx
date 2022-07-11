@@ -66,7 +66,7 @@ export function OverflowMenu({
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
   const {
-    MenuOverlay,
+    menuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
@@ -257,7 +257,7 @@ export function OverflowMenu({
           />
         </Portal>
       ) : null}
-      <MenuOverlay />
+      {menuOverlay}
     </Flex>
   )
 }

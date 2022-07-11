@@ -1,5 +1,5 @@
 import * as React from 'react'
-import ReactSelect, { components } from 'react-select'
+import ReactSelect, { components, DropdownIndicatorProps } from 'react-select'
 import { css, CSSObject } from 'styled-components'
 import {
   Icon,
@@ -124,7 +124,7 @@ export function Select(props: SelectProps): JSX.Element {
 }
 
 function DropdownIndicator(
-  props: ReactSelect.DropdownIndicatorProps<SelectOption>
+  props: DropdownIndicatorProps<SelectOption>
 ): JSX.Element {
   return (
     <components.DropdownIndicator {...props}>

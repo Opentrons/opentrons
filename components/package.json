@@ -15,9 +15,13 @@
     "url": "https://github.com/Opentrons/opentrons/issues"
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
+  "workspaces": {
+    "nohoist": [
+      "**/react-select/**"
+    ]
+  },
   "peerDependencies": {
     "react": "17.0.1",
-    "react-select": "3.0.8",
     "react-router-dom": "5.1.1"
   },
   "dependencies": {
@@ -35,6 +39,7 @@
     "lodash": "4.17.15",
     "react-popper": "1.0.0",
     "react-remove-scroll": "2.4.3",
+    "react-select": "3.0.8",
     "styled-components": "5.1.1"
   },
   "browser": {
