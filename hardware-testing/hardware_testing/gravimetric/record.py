@@ -4,7 +4,11 @@ from time import time
 from typing import List, Optional, Callable
 
 from hardware_testing.drivers.radwag.driver import RadwagScaleBase
-from hardware_testing.data import dump_data_to_file, append_data_to_file, create_file_name
+from hardware_testing.data import (
+    dump_data_to_file,
+    append_data_to_file,
+    create_file_name,
+)
 
 
 @dataclass
@@ -15,15 +19,17 @@ class GravimetricSample:
 
     @classmethod
     def csv_header(cls) -> str:
-        return 'time,relative-time,grams,unstable-grams,stable-grams,stable'
+        return "time,relative-time,grams,unstable-grams,stable-grams,stable"
 
     def as_csv(self, parent: Optional["GravimetricRecording"] = None) -> str:
         start_time = parent.start_time if parent else self.time
         rel_time = self.relative_time(start_time)
-        unstable_grams = str(self.grams) if not self.stable else ''
-        stable_grams = str(self.grams) if self.stable else ''
-        return f'{self.time},{rel_time},{self.grams},' \
-               f'{unstable_grams},{stable_grams},{int(self.stable)}'
+        unstable_grams = str(self.grams) if not self.stable else ""
+        stable_grams = str(self.grams) if self.stable else ""
+        return (
+            f"{self.time},{rel_time},{self.grams},"
+            f"{unstable_grams},{stable_grams},{int(self.stable)}"
+        )
 
     def relative_time(self, start_time: float) -> float:
         return self.time - start_time
@@ -33,58 +39,61 @@ class GravimetricSample:
 
 
 class GravimetricRecording(List):
-
     def __str__(self):
-        return f'GravimetricRecording(' \
-               f'length={len(self)}, ' \
-               f'duration={round(self.duration, 2)}, ' \
-               f'start_time={self.start_time})'
+        return (
+            f"GravimetricRecording("
+            f"length={len(self)}, "
+            f"duration={round(self.duration, 2)}, "
+            f"start_time={self.start_time})"
+        )
 
     @classmethod
     def load(cls, file_path: str) -> "GravimetricRecording":
-        with open(file_path, 'r') as f:
+        with open(file_path, "r") as f:
             lines = f.readlines()
 
         if len(lines) <= 1:
-            raise FileNotFoundError(f'File has no data saved yet: \"{file_path}\"')
+            raise FileNotFoundError(f'File has no data saved yet: "{file_path}"')
         expected_header = GravimetricSample.csv_header()
         assert expected_header.strip() == lines[0].strip()
-        header_list = expected_header.split(',')
-        time_idx = header_list.index('time')
-        grams_idx = header_list.index('grams')
-        stable_idx = header_list.index('stable')
+        header_list = expected_header.split(",")
+        time_idx = header_list.index("time")
+        grams_idx = header_list.index("grams")
+        stable_idx = header_list.index("stable")
         recording = GravimetricRecording()
         for line in lines[1:]:  # skip the header
             if not line:
                 continue
-            line_list = line.strip().split(',')
+            line_list = line.strip().split(",")
             if len(line) <= 1:
                 continue
-            recording.append(GravimetricSample(
-                time=float(line_list[time_idx]),
-                grams=float(line_list[grams_idx]),
-                stable=bool(int(line_list[stable_idx]))
-            ))
+            recording.append(
+                GravimetricSample(
+                    time=float(line_list[time_idx]),
+                    grams=float(line_list[grams_idx]),
+                    stable=bool(int(line_list[stable_idx])),
+                )
+            )
         return recording
 
     @property
     def start_time(self) -> float:
-        assert len(self), 'No samples recorded'
+        assert len(self), "No samples recorded"
         return self[0].time
 
     @property
     def end_time(self) -> float:
-        assert len(self), 'No samples recorded'
+        assert len(self), "No samples recorded"
         return self[-1].time
 
     @property
     def start_grams(self) -> float:
-        assert len(self), 'No samples recorded'
+        assert len(self), "No samples recorded"
         return self[0].grams
 
     @property
     def end_grams(self) -> float:
-        assert len(self), 'No samples recorded'
+        assert len(self), "No samples recorded"
         return self[-1].grams
 
     @property
@@ -97,13 +106,13 @@ class GravimetricRecording(List):
 
     @property
     def average(self) -> float:
-        assert len(self), 'No samples recorded'
+        assert len(self), "No samples recorded"
         _grams_list = self.grams_as_list
         return sum(_grams_list) / len(_grams_list)
 
     @property
     def stdev(self) -> float:
-        assert len(self), 'No samples recorded'
+        assert len(self), "No samples recorded"
         return stdev(self.grams_as_list)
 
     def calculate_cv(self) -> float:
@@ -113,10 +122,10 @@ class GravimetricRecording(List):
         return (self.average - target) / target
 
     def as_csv(self) -> str:
-        csv_file_str = GravimetricSample.csv_header() + '\n'
+        csv_file_str = GravimetricSample.csv_header() + "\n"
         for s in self:
-            csv_file_str += s.as_csv(self) + '\n'
-        return csv_file_str + '\n'
+            csv_file_str += s.as_csv(self) + "\n"
+        return csv_file_str + "\n"
 
 
 def read_sample_from_scale(scale: RadwagScaleBase) -> GravimetricSample:
@@ -132,11 +141,12 @@ class RecordConfig:
     stable: Optional[bool]
 
 
-def record_samples(scale: RadwagScaleBase,
-                   config: RecordConfig,
-                   timeout: Optional[float] = None,
-                   on_new_sample: Optional[Callable] = None) -> GravimetricRecording:
-
+def record_samples(
+    scale: RadwagScaleBase,
+    config: RecordConfig,
+    timeout: Optional[float] = None,
+    on_new_sample: Optional[Callable] = None,
+) -> GravimetricRecording:
     def _get_remaining_time(stamp: float, period: float) -> float:
         return (stamp + period) - time()
 
@@ -156,15 +166,18 @@ def record_samples(scale: RadwagScaleBase,
 
     if config.length and config.interval and config.duration:
         raise ValueError(
-            'Cannot have all three (length, interval, duration) '
-            'arguments set, only use 2 at a time')
+            "Cannot have all three (length, interval, duration) "
+            "arguments set, only use 2 at a time"
+        )
     if config.duration and config.length:
         config.interval = config.duration / (config.length - 1)
     elif config.duration and config.interval:
         config.length = int(config.duration / config.interval) + 1
     if not config.length or not config.interval:
-        raise ValueError('Cannot record with 2 of the following arguments: '
-                         '1) length, 2) interval, or 3) duration')
+        raise ValueError(
+            "Cannot record with 2 of the following arguments: "
+            "1) length, 2) interval, or 3) duration"
+        )
 
     _samples = GravimetricRecording()
     _start_time = time()
@@ -173,14 +186,17 @@ def record_samples(scale: RadwagScaleBase,
         if config.stable and not _s.stable:
             _samples.clear()  # delete all previously recorded samples
             continue
-        interval_w_overlap = config.interval - _get_interval_overlap(_samples, config.interval)
+        interval_w_overlap = config.interval - _get_interval_overlap(
+            _samples, config.interval
+        )
         if not len(_samples) or _did_exceed_time(_samples.end_time, interval_w_overlap):
             _samples.append(_s)
             if callable(on_new_sample):
                 on_new_sample(_samples)
-    assert len(_samples) == config.length, \
-        f'Scale recording timed out before accumulating ' \
-        f'{config.length} samples (recorded {len(_samples)} samples)'
+    assert len(_samples) == config.length, (
+        f"Scale recording timed out before accumulating "
+        f"{config.length} samples (recorded {len(_samples)} samples)"
+    )
     return _samples
 
 
@@ -191,20 +207,23 @@ class RecordToDiskConfig:
     tag: str
 
 
-def record_samples_to_disk(scale: RadwagScaleBase,
-                           config: RecordToDiskConfig,
-                           timeout: Optional[float] = None) -> GravimetricRecording:
+def record_samples_to_disk(
+    scale: RadwagScaleBase, config: RecordToDiskConfig, timeout: Optional[float] = None
+) -> GravimetricRecording:
     _file_name = create_file_name(config.test_name, config.tag)
 
     def _on_new_sample(recording: GravimetricRecording) -> None:
-        append_data_to_file(config.test_name, _file_name,
-                            recording[-1].as_csv(recording) + '\n')
+        append_data_to_file(
+            config.test_name, _file_name, recording[-1].as_csv(recording) + "\n"
+        )
 
     # add the header to the CSV file
-    dump_data_to_file(config.test_name, _file_name,
-                      GravimetricSample.csv_header() + '\n')
-    _recording = record_samples(scale, config.record_config,
-                                timeout=timeout, on_new_sample=_on_new_sample)
+    dump_data_to_file(
+        config.test_name, _file_name, GravimetricSample.csv_header() + "\n"
+    )
+    _recording = record_samples(
+        scale, config.record_config, timeout=timeout, on_new_sample=_on_new_sample
+    )
     # add a final newline character to the CSV file
-    append_data_to_file(config.test_name, _file_name, '\n')
+    append_data_to_file(config.test_name, _file_name, "\n")
     return _recording

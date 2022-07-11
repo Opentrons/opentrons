@@ -5,11 +5,13 @@ from random import uniform
 from serial import Serial  # type: ignore[import]
 
 from .commands import (
-    RadwagCommand, RadwagWorkingMode, RadwagFilter, RadwagValueRelease, radwag_command_format
+    RadwagCommand,
+    RadwagWorkingMode,
+    RadwagFilter,
+    RadwagValueRelease,
+    radwag_command_format,
 )
-from .responses import (
-    RadwagResponse, RadwagResponseCodes, radwag_response_parse
-)
+from .responses import RadwagResponse, RadwagResponseCodes, radwag_response_parse
 
 
 class RadwagScaleBase(ABC):
@@ -71,7 +73,9 @@ class RadwagScale(RadwagScaleBase):
         return 1155, 41389
 
     @classmethod
-    def create(cls, port: str, baudrate: int = 9600, timeout: float = 1) -> "RadwagScale":
+    def create(
+        cls, port: str, baudrate: int = 9600, timeout: float = 1
+    ) -> "RadwagScale":
         conn = Serial()
         conn.port = port
         conn.baudrate = baudrate
@@ -80,12 +84,16 @@ class RadwagScale(RadwagScaleBase):
 
     def _write_command(self, cmd: str) -> None:
         cmd_str = radwag_command_format(cmd)
-        cmd_bytes = cmd_str.encode('utf-8')
+        cmd_bytes = cmd_str.encode("utf-8")
         send_len = self._connection.write(cmd_bytes)
-        assert send_len == len(cmd_bytes), f'Radwag command \"{cmd}\" ({str(cmd_bytes)} ' \
-                                           f'bytes) only sent {send_len} bytes'
+        assert send_len == len(cmd_bytes), (
+            f'Radwag command "{cmd}" ({str(cmd_bytes)} '
+            f"bytes) only sent {send_len} bytes"
+        )
 
-    def _read_response(self, command: RadwagCommand, timeout: Optional[float] = None) -> RadwagResponse:
+    def _read_response(
+        self, command: RadwagCommand, timeout: Optional[float] = None
+    ) -> RadwagResponse:
         if timeout is not None:
             prev_timeout = float(self._connection.timeout)
             self._connection.timeout = timeout
@@ -93,7 +101,7 @@ class RadwagScale(RadwagScaleBase):
             self._connection.timeout = prev_timeout
         else:
             response = self._connection.readline()
-        data = radwag_response_parse(response.decode('utf-8'), command)
+        data = radwag_response_parse(response.decode("utf-8"), command)
         return data
 
     def connect(self) -> None:
@@ -106,32 +114,35 @@ class RadwagScale(RadwagScaleBase):
         cmd = RadwagCommand.GET_SERIAL_NUMBER
         self._write_command(cmd)
         res = self._read_response(cmd)
-        assert res.code == RadwagResponseCodes.IN_PROGRESS, \
-            f'Unexpected response code: {res.code}'
-        assert res.message, \
-            'No serial number returned from scale'
+        assert (
+            res.code == RadwagResponseCodes.IN_PROGRESS
+        ), f"Unexpected response code: {res.code}"
+        assert res.message, "No serial number returned from scale"
         return res.message
 
     def working_mode(self, mode: RadwagWorkingMode) -> None:
         cmd = RadwagCommand.SET_WORKING_MODE
-        self._write_command(f'{cmd} {mode.value}')
+        self._write_command(f"{cmd} {mode.value}")
         res = self._read_response(cmd)
-        assert res.code == RadwagResponseCodes.CARRIED_OUT, \
-            f'Unexpected response code: {res.code}'
+        assert (
+            res.code == RadwagResponseCodes.CARRIED_OUT
+        ), f"Unexpected response code: {res.code}"
 
     def filter(self, f: RadwagFilter) -> None:
         cmd = RadwagCommand.SET_FILTER
-        self._write_command(f'{cmd} {f.value}')
+        self._write_command(f"{cmd} {f.value}")
         res = self._read_response(cmd)
-        assert res.code == RadwagResponseCodes.CARRIED_OUT, \
-            f'Unexpected response code: {res.code}'
+        assert (
+            res.code == RadwagResponseCodes.CARRIED_OUT
+        ), f"Unexpected response code: {res.code}"
 
     def value_release(self, val_rel: RadwagValueRelease) -> None:
         cmd = RadwagCommand.SET_VALUE_RELEASE
-        self._write_command(f'{cmd} {val_rel.value}')
+        self._write_command(f"{cmd} {val_rel.value}")
         res = self._read_response(cmd)
-        assert res.code == RadwagResponseCodes.CARRIED_OUT, \
-            f'Unexpected response code: {res.code}'
+        assert (
+            res.code == RadwagResponseCodes.CARRIED_OUT
+        ), f"Unexpected response code: {res.code}"
 
     def continuous_transmission(self, enable: bool) -> None:
         if enable:
@@ -140,8 +151,9 @@ class RadwagScale(RadwagScaleBase):
             cmd = RadwagCommand.DISABLE_CONTINUOUS_TRANS_BASIC_UNIT
         self._write_command(cmd)
         res = self._read_response(cmd)
-        assert res.code == RadwagResponseCodes.IN_PROGRESS, \
-            f'Unexpected response code: {res.code}'
+        assert (
+            res.code == RadwagResponseCodes.IN_PROGRESS
+        ), f"Unexpected response code: {res.code}"
 
     def automatic_internal_adjustment(self, enable: bool) -> None:
         if enable:
@@ -150,26 +162,30 @@ class RadwagScale(RadwagScaleBase):
             cmd = RadwagCommand.DISABLE_AUTO_INTERNAL_ADJUST
         self._write_command(cmd)
         res = self._read_response(cmd)
-        assert res.code == RadwagResponseCodes.CARRIED_OUT, \
-            f'Unexpected response code: {res.code}'
+        assert (
+            res.code == RadwagResponseCodes.CARRIED_OUT
+        ), f"Unexpected response code: {res.code}"
 
     def internal_adjustment(self) -> None:
         cmd = RadwagCommand.INTERNAL_ADJUST_PERFORMANCE
         self._write_command(cmd)
         res = self._read_response(cmd)
-        assert res.code == RadwagResponseCodes.IN_PROGRESS, \
-            f'Unexpected response code: {res.code}'
+        assert (
+            res.code == RadwagResponseCodes.IN_PROGRESS
+        ), f"Unexpected response code: {res.code}"
         res = self._read_response(cmd, timeout=60 * 2)
-        assert res.code == RadwagResponseCodes.CARRIED_OUT_AFTER_IN_PROGRESS, \
-            f'Unexpected response code: {res.code}'
+        assert (
+            res.code == RadwagResponseCodes.CARRIED_OUT_AFTER_IN_PROGRESS
+        ), f"Unexpected response code: {res.code}"
 
     def set_tare(self, tare: float) -> None:
-        assert tare >= 0, f'Radwag tare values cannot be negative (got {tare})'
+        assert tare >= 0, f"Radwag tare values cannot be negative (got {tare})"
         cmd = RadwagCommand.SET_TARE
-        self._write_command(f'{cmd} {round(tare, 5)}')
+        self._write_command(f"{cmd} {round(tare, 5)}")
         res = self._read_response(cmd)
-        assert res.code == RadwagResponseCodes.CARRIED_OUT, \
-            f'Unexpected response code: {res.code}'
+        assert (
+            res.code == RadwagResponseCodes.CARRIED_OUT
+        ), f"Unexpected response code: {res.code}"
 
     def read_mass(self) -> Tuple[float, bool]:
         cmd = RadwagCommand.GET_MEASUREMENT_BASIC_UNIT
@@ -180,7 +196,6 @@ class RadwagScale(RadwagScaleBase):
 
 
 class SimRadwagScale(RadwagScaleBase):
-
     def connect(self) -> None:
         return
 
@@ -188,7 +203,7 @@ class SimRadwagScale(RadwagScaleBase):
         return
 
     def read_serial_number(self) -> str:
-        return 'radwag-sim-serial-num'
+        return "radwag-sim-serial-num"
 
     def working_mode(self, mode: RadwagWorkingMode) -> None:
         return

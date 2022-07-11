@@ -6,15 +6,15 @@ from typing import Optional, List
 
 
 class RadwagResponseCodes(str, Enum):
-    NONE = ''
-    IN_PROGRESS = 'A'
-    CARRIED_OUT_AFTER_IN_PROGRESS = 'D'
-    CARRIED_OUT = 'OK'
-    UNABLE_TO_EXECUTE = 'I'
-    MAX_THRESHOLD_EXCEEDED = '^'
-    MIN_THRESHOLD_EXCEEDED = 'v'
-    COMMAND_NOT_RECOGNIZED = 'ES'
-    STABLE_TIME_LIMIT_EXCEEDED = 'E'
+    NONE = ""
+    IN_PROGRESS = "A"
+    CARRIED_OUT_AFTER_IN_PROGRESS = "D"
+    CARRIED_OUT = "OK"
+    UNABLE_TO_EXECUTE = "I"
+    MAX_THRESHOLD_EXCEEDED = "^"
+    MIN_THRESHOLD_EXCEEDED = "v"
+    COMMAND_NOT_RECOGNIZED = "ES"
+    STABLE_TIME_LIMIT_EXCEEDED = "E"
 
     @classmethod
     def parse(cls, response: str) -> "RadwagResponseCodes":
@@ -49,32 +49,38 @@ class RadwagResponse:
 
     @classmethod
     def build(cls, command: RadwagCommand, response_list: List[str]):
-        return RadwagResponse(code=RadwagResponseCodes.parse(response_list[1]),
-                              command=command,
-                              stable=False,
-                              response_list=response_list,
-                              measurement=None,
-                              message=None)
+        return RadwagResponse(
+            code=RadwagResponseCodes.parse(response_list[1]),
+            command=command,
+            stable=False,
+            response_list=response_list,
+            measurement=None,
+            message=None,
+        )
 
 
-def _on_unstable_measurement(command: RadwagCommand, response_list: List[str]) -> RadwagResponse:
+def _on_unstable_measurement(
+    command: RadwagCommand, response_list: List[str]
+) -> RadwagResponse:
     data = RadwagResponse.build(command, response_list)
     # SI ? -  0.00020 g
     # TODO: we could accept more unit types if we wanted...
-    assert response_list[-1] == 'g', \
-        f'Expected units to be grams (\"g\"), ' \
-        f'instead got \"{response_list[-1]}\"'
-    data.stable = ('?' not in response_list)
+    assert response_list[-1] == "g", (
+        f'Expected units to be grams ("g"), ' f'instead got "{response_list[-1]}"'
+    )
+    data.stable = "?" not in response_list
     data.measurement = float(response_list[-2])
-    if '-' in response_list:
+    if "-" in response_list:
         data.measurement *= -1
     return data
 
 
-def _on_serial_number(command: RadwagCommand, response_list: List[str]) -> RadwagResponse:
+def _on_serial_number(
+    command: RadwagCommand, response_list: List[str]
+) -> RadwagResponse:
     data = RadwagResponse.build(command, response_list)
     assert len(response_list) == 3
-    data.message = response_list[-1].replace('\"', '')
+    data.message = response_list[-1].replace('"', "")
     return data
 
 
@@ -86,15 +92,15 @@ HANDLERS = {
 
 
 def radwag_response_parse(response: str, command: RadwagCommand) -> RadwagResponse:
-    assert RADWAG_COMMAND_TERMINATOR in response, f'CR LF not found ' \
-                                                  f'in response: {response}'
-    assert ' ' in response, f'No space (\" \") found in response: {response}'
+    assert RADWAG_COMMAND_TERMINATOR in response, (
+        f"CR LF not found " f"in response: {response}"
+    )
+    assert " " in response, f'No space (" ") found in response: {response}'
     cmd_not_rec = RadwagResponseCodes.COMMAND_NOT_RECOGNIZED
     if cmd_not_rec in response and response.index(cmd_not_rec) == 0:
-        raise RuntimeError(
-            'Command not recognized: {command} (response={response})')
-    res_list = [d for d in response.strip().split(' ') if d]
-    assert res_list[0] == command, f'Unexpected response from scale: {response}'
+        raise RuntimeError("Command not recognized: {command} (response={response})")
+    res_list = [d for d in response.strip().split(" ") if d]
+    assert res_list[0] == command, f"Unexpected response from scale: {response}"
     if command in HANDLERS.keys():
         return HANDLERS[command](command, res_list)
     else:

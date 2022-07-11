@@ -62,10 +62,7 @@ def test_read_mass(
         create_radwag_result_line("SI", v) for v in masses
     ]
 
-    mass = [
-        subject.read_mass()
-        for _ in range(len(masses))
-    ]
+    mass = [subject.read_mass() for _ in range(len(masses))]
 
     assert mass == expected
     assert scale_connection.readline.call_count == len(masses)

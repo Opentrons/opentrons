@@ -12,36 +12,28 @@ from hardware_testing.data import create_folder_for_test_data
 
 
 app = Dash(__name__)
-GRAPH_ID = 'live-graph'
-UPDATE_ID = 'graph-update'
+GRAPH_ID = "live-graph"
+UPDATE_ID = "graph-update"
 UPDATE_INTERVAL_MS = 500
 
-TEST_NAME = 'example-test'
+TEST_NAME = "example-test"
 
 
 def _find_newest_file_in_directory(directory: str) -> str:
     file_paths = [
-        os.path.join(directory, f)
-        for f in os.listdir(directory)
-        if f.endswith('.csv')
+        os.path.join(directory, f) for f in os.listdir(directory) if f.endswith(".csv")
     ]
-    assert len(file_paths) > 0, \
-        f'No CSV files found in directory: \"{directory}\"'
-    files_with_mod_time = [
-        (f, os.path.getmtime(f))
-        for f in file_paths
-    ]
+    assert len(file_paths) > 0, f'No CSV files found in directory: "{directory}"'
+    files_with_mod_time = [(f, os.path.getmtime(f)) for f in file_paths]
     files_with_mod_time.sort(key=lambda f: f[-1])
     latest_file = files_with_mod_time[-1][0]
-    assert os.path.isfile(latest_file), \
-        f'The latest file found is not a file: \"{latest_file}\"'
+    assert os.path.isfile(
+        latest_file
+    ), f'The latest file found is not a file: "{latest_file}"'
     return latest_file
 
 
-@app.callback(
-    Output(GRAPH_ID, 'figure'),
-    [Input(UPDATE_ID, 'n_intervals')]
-)
+@app.callback(Output(GRAPH_ID, "figure"), [Input(UPDATE_ID, "n_intervals")])
 def update_graph_scatter(n):
     test_dir_path = create_folder_for_test_data(TEST_NAME)
     file_path = _find_newest_file_in_directory(str(test_dir_path))
@@ -56,19 +48,35 @@ def update_graph_scatter(n):
     graph_y_stable = [s.grams if s.stable else None for s in recording]
     graph_y_unstable = [s.grams if not s.stable else None for s in recording]
     return {
-        'data': [
-            Scatter(x=graph_x, y=graph_y_stable, mode='lines+markers',
-                    line={'color': 'blue'}, name='stable'),
-            Scatter(x=graph_x, y=graph_y_unstable, mode='lines+markers',
-                    line={'color': 'red'}, name='unstable'),
+        "data": [
+            Scatter(
+                x=graph_x,
+                y=graph_y_stable,
+                mode="lines+markers",
+                line={"color": "blue"},
+                name="stable",
+            ),
+            Scatter(
+                x=graph_x,
+                y=graph_y_unstable,
+                mode="lines+markers",
+                line={"color": "red"},
+                name="unstable",
+            ),
         ],
-        'layout': Layout(width=1700, height=800, xaxis={'range': x_min_max}, yaxis={'range': y_min_max})
+        "layout": Layout(
+            width=1700,
+            height=800,
+            xaxis={"range": x_min_max},
+            yaxis={"range": y_min_max},
+        ),
     }
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser('Plot Gravimetric')
+
+    parser = argparse.ArgumentParser("Plot Gravimetric")
     parser.add_argument("--test-name", type=str, default=TEST_NAME)
     args = parser.parse_args()
     TEST_NAME = args.test_name

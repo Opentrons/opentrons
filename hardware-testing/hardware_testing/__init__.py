@@ -5,7 +5,9 @@ from opentrons import protocol_api, execute, simulate
 from opentrons.hardware_control.thread_manager import ThreadManagerException
 
 
-def get_api_context(api_level: str, is_simulating: bool = False) -> protocol_api.ProtocolContext:
+def get_api_context(
+    api_level: str, is_simulating: bool = False
+) -> protocol_api.ProtocolContext:
     if is_simulating:
         ctx = simulate.get_protocol_api(api_level)
     else:
@@ -20,5 +22,5 @@ def get_api_context(api_level: str, is_simulating: bool = False) -> protocol_api
             def _fake_context_is_simulating() -> bool:
                 return False
 
-            setattr(ctx, 'is_simulating', MethodType(_fake_context_is_simulating, ctx))
+            setattr(ctx, "is_simulating", MethodType(_fake_context_is_simulating, ctx))
     return ctx
