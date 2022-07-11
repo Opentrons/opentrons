@@ -1,9 +1,12 @@
+"""Radwag Commands."""
 from enum import Enum
 
 RADWAG_COMMAND_TERMINATOR = "\r\n"
 
 
 class RadwagCommand(str, Enum):
+    """Radwag commands."""
+
     # info
     GET_SERIAL_NUMBER = "NB"  # Give balance serial number
     GET_BALANCE_TYPE = "BN"  # Give balance type
@@ -102,10 +105,13 @@ class RadwagCommand(str, Enum):
 
 
 def radwag_command_format(command: str) -> str:
+    """Radwag command format."""
     return f"{command}{RADWAG_COMMAND_TERMINATOR}"
 
 
 class RadwagWorkingMode(Enum):
+    """Radwag Working Modes."""
+
     weighing = 1
     parts_counting = 2
     percent_weighing = 3
@@ -121,6 +127,8 @@ class RadwagWorkingMode(Enum):
 
 
 class RadwagFilter(Enum):
+    """Radwag filter types."""
+
     very_fast = 1
     fast = 2
     average = 3
@@ -129,6 +137,8 @@ class RadwagFilter(Enum):
 
 
 class RadwagValueRelease(Enum):
+    """Radwag value release states."""
+
     fast = 1
     fast_reliable = 2
     reliable = 3

@@ -1,4 +1,6 @@
+"""Gravimetric plot server."""
 import os
+from typing import Any
 
 from dash import Dash  # type: ignore[import]
 from dash.dependencies import Output, Input  # type: ignore[import]
@@ -34,7 +36,7 @@ def _find_newest_file_in_directory(directory: str) -> str:
 
 
 @app.callback(Output(GRAPH_ID, "figure"), [Input(UPDATE_ID, "n_intervals")])
-def update_graph_scatter(n):
+def _update_graph_scatter(_: Any) -> dict:
     test_dir_path = create_folder_for_test_data(TEST_NAME)
     file_path = _find_newest_file_in_directory(str(test_dir_path))
     recording = GravimetricRecording.load(file_path)

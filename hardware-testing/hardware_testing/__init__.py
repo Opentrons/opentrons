@@ -8,6 +8,7 @@ from opentrons.hardware_control.thread_manager import ThreadManagerException
 def get_api_context(
     api_level: str, is_simulating: bool = False
 ) -> protocol_api.ProtocolContext:
+    """Create an Opentrons API ProtocolContext instance."""
     if is_simulating:
         ctx = simulate.get_protocol_api(api_level)
     else:

@@ -1,3 +1,4 @@
+"""Gravimetric RnD."""
 import atexit
 
 from serial.tools.list_ports import comports  # type: ignore[import]
@@ -21,7 +22,7 @@ from hardware_testing.gravimetric import (
 metadata = {"protocolName": "example-test", "apiLevel": "2.12"}
 
 
-def find_scale_port() -> str:
+def _find_scale_port() -> str:
     vid, pid = RadwagScale.vid_pid()
     for p in comports():
         if p.vid == vid and p.pid == pid:
@@ -33,7 +34,7 @@ def find_scale_port() -> str:
     raise RuntimeError(f"No scale found from available serial ports: {comports()}")
 
 
-def initialize_scale(scale: RadwagScaleBase) -> str:
+def _initialize_scale(scale: RadwagScaleBase) -> str:
     # Some Radwag settings cannot be controlled remotely.
     # Listed below are the things the must be done using the touchscreen:
     #   1) Set profile to USER
@@ -49,14 +50,14 @@ def initialize_scale(scale: RadwagScaleBase) -> str:
     return scale.read_serial_number()
 
 
-def run(protocol: ProtocolContext) -> None:
+def _run(protocol: ProtocolContext) -> None:
     if protocol.is_simulating():
         scale = SimRadwagScale()
     else:
-        scale = RadwagScale.create(find_scale_port())  # type: ignore[assignment]
+        scale = RadwagScale.create(_find_scale_port())  # type: ignore[assignment]
     scale.connect()
     atexit.register(scale.disconnect)
-    initialize_scale(scale)
+    _initialize_scale(scale)
 
     while True:
         try:
@@ -89,4 +90,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     ctx = get_api_context(api_level=metadata["apiLevel"], is_simulating=args.simulate)
     ctx.home()
-    run(ctx)
+    _run(ctx)

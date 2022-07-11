@@ -1,3 +1,4 @@
+"""Data for hardware-testing."""
 from datetime import datetime
 import os
 from pathlib import Path
@@ -18,6 +19,7 @@ def _initialize_testing_data_base_dir() -> Path:
 
 
 def create_folder_for_test_data(test_name: str) -> Path:
+    """Create a folder for test data."""
     base = _initialize_testing_data_base_dir()
     test_path = base / test_name
     test_path.mkdir(parents=False, exist_ok=True)
@@ -25,10 +27,12 @@ def create_folder_for_test_data(test_name: str) -> Path:
 
 
 def create_datetime_string() -> str:
+    """Create a datetime string."""
     return datetime.now().strftime("%y%m%d%H%M%S")
 
 
 def create_file_name(test_name: str, unique_id: str, extension: str = "csv") -> str:
+    """Create a file name, given a test name."""
     return f"{test_name}_{unique_id}_{create_datetime_string()}.{extension}"
 
 
@@ -40,8 +44,10 @@ def _save_data(test_name: str, file_name: str, data: str, perm: str = "w+") -> N
 
 
 def dump_data_to_file(test_name: str, file_name: str, data: str) -> None:
+    """Save entire file contents to a file on disk."""
     return _save_data(test_name, file_name, data, perm="w+")
 
 
 def append_data_to_file(test_name: str, file_name: str, data: str) -> None:
+    """Append new content to an already existing file on disk."""
     return _save_data(test_name, file_name, data, perm="a+")

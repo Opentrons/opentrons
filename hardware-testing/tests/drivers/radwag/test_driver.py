@@ -6,7 +6,6 @@ from unittest.mock import MagicMock
 import pytest
 
 from hardware_testing.drivers import RadwagScale
-from hardware_testing.drivers.limit_sensor import SimLimitSensor
 
 
 @pytest.fixture

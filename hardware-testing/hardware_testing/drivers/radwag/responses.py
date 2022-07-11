@@ -1,3 +1,4 @@
+"""Radwag Responses."""
 from .commands import RadwagCommand, RADWAG_COMMAND_TERMINATOR
 
 from enum import Enum
@@ -6,6 +7,8 @@ from typing import Optional, List
 
 
 class RadwagResponseCodes(str, Enum):
+    """Radwag response codes."""
+
     NONE = ""
     IN_PROGRESS = "A"
     CARRIED_OUT_AFTER_IN_PROGRESS = "D"
@@ -18,6 +21,7 @@ class RadwagResponseCodes(str, Enum):
 
     @classmethod
     def parse(cls, response: str) -> "RadwagResponseCodes":
+        """Parse a str response into a RadwagResponseCode."""
         if response == cls.IN_PROGRESS:
             return cls.IN_PROGRESS
         elif response == cls.CARRIED_OUT_AFTER_IN_PROGRESS:
@@ -40,6 +44,8 @@ class RadwagResponseCodes(str, Enum):
 
 @dataclass
 class RadwagResponse:
+    """Radwag response."""
+
     code: RadwagResponseCodes
     command: RadwagCommand
     stable: bool
@@ -48,7 +54,10 @@ class RadwagResponse:
     message: Optional[str] = None
 
     @classmethod
-    def build(cls, command: RadwagCommand, response_list: List[str]):
+    def build(
+        cls, command: RadwagCommand, response_list: List[str]
+    ) -> "RadwagResponse":
+        """Build a RadwagResponse."""
         return RadwagResponse(
             code=RadwagResponseCodes.parse(response_list[1]),
             command=command,
@@ -92,6 +101,7 @@ HANDLERS = {
 
 
 def radwag_response_parse(response: str, command: RadwagCommand) -> RadwagResponse:
+    """Radwag response parse."""
     assert RADWAG_COMMAND_TERMINATOR in response, (
         f"CR LF not found " f"in response: {response}"
     )
