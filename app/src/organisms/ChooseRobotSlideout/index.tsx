@@ -213,7 +213,7 @@ export function ChooseRobotSlideout(
                     isSelectedRobotOnWrongVersionOfSoftware
                   }
                 />
-                {isSelected && (
+                {runCreationError != null && isSelected && (
                   <StyledText
                     as="label"
                     color={COLORS.errorText}
