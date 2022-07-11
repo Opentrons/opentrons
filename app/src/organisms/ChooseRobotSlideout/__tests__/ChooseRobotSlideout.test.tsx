@@ -260,10 +260,9 @@ describe('ChooseRobotSlideout', () => {
       files: [expect.any(File)],
       protocolKey: storedProtocolDataFixture.protocolKey,
     })
-    expect(
-      getByText(
-        'This robot is busy and can’t run this protocol right now. Go to robot.'
-      )
-    ).toBeInTheDocument()
+    getByText('This robot is busy and can’t run this protocol right now.')
+    const link = getByRole('link', { name: 'Go to Robot' })
+    fireEvent.click(link)
+    expect(link.getAttribute('href')).toEqual('/devices/opentrons-robot-name')
   })
 })
