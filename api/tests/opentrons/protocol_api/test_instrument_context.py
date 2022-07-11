@@ -34,9 +34,7 @@ def patch_mock_next_available_tip(
 
     decoy.when(
         mock_next_available_tip(
-            starting_tip=matchers.Anything(),
-            tip_racks=matchers.Anything(),
-            channels=matchers.Anything(),
+            None, [], 0
         )
     ).then_return((mock_labware, mock_well))
 
@@ -94,14 +92,20 @@ def subject(
     decoy: Decoy,
     mock_instrument_implementation: AbstractInstrument,
     mock_protocol_context: ProtocolContext,
+    mock_labware: Labware,
 ) -> InstrumentContext:
+
     subject = InstrumentContext(
         implementation=mock_instrument_implementation,
         ctx=mock_protocol_context,
         broker=Broker(),
         at_version=APIVersion(2, 0),
     )
+
     decoy.when(subject.channels).then_return(0)
+    # decoy.when(subject.starting_tip).then_return(None)
+    # decoy.when(subject.tip_racks).then_return([mock_labware])
+
     return subject
 
 
@@ -228,29 +232,29 @@ def test_pick_up_from_manipulated_location(
 #         times=1,
 #     )
 
-# def test_pick_up_from_no_location(
-#     decoy: Decoy,
-#     subject: InstrumentContext,
-#     mock_instrument_implementation: AbstractInstrument,
-#     mock_well_implementation: WellImplementation,
-#     mock_well: Well,
-#     mock_labware: Labware
-# ) -> None:
-#     """Should pick up tip from supplied location of types.Location."""
-#     expected_location = Location(Point(0, 0, 0), mock_well)
-#     input_location = Well(mock_well_implementation)
-#
-#     decoy.when(subject._ctx._modules).then_return([])
-#     decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=None)).then_return(False)
-#
-#     subject.pick_up_tip(location=None)
-#
-#     decoy.verify(
-#         mock_instrument_implementation.move_to(
-#             location=expected_location,
-#             force_direct=False,
-#             minimum_z_height=None,
-#             speed=None,
-#         ),
-#         times=1,
-#     )
+def test_pick_up_from_no_location(
+    decoy: Decoy,
+    subject: InstrumentContext,
+    mock_instrument_implementation: AbstractInstrument,
+    mock_well_implementation: WellImplementation,
+    mock_well: Well,
+    mock_labware: Labware
+) -> None:
+    """Should pick up tip from next_available_tip.top()."""
+    expected_location = Location(Point(0, 0, 0), mock_well)
+
+    decoy.when(subject._ctx._modules).then_return([])
+    decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=0)).then_return(False)
+    decoy.when(mock_well.top()).then_return(expected_location)
+
+    subject.pick_up_tip(location=None)
+
+    decoy.verify(
+        mock_instrument_implementation.move_to(
+            location=expected_location,
+            force_direct=False,
+            minimum_z_height=None,
+            speed=None,
+        ),
+        times=1,
+    )
