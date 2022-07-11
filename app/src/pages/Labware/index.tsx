@@ -18,6 +18,7 @@ import {
   ALIGN_CENTER,
   Icon,
   ALIGN_FLEX_END,
+  useOnClickOutside,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -26,7 +27,7 @@ import { Toast } from '../../atoms/Toast'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { LabwareCard } from '../../organisms/LabwareCard'
-import { AddCustomLabware } from '../../organisms/AddCustomLabware'
+import { AddCustomLabwareSlideout } from '../../organisms/AddCustomLabwareSlideout'
 import { LabwareDetails } from '../../organisms/LabwareDetails'
 import {
   LabwareDefAndDate,
@@ -53,10 +54,16 @@ labwareDisplayCategoryFilters.forEach(category =>
   FILTER_OPTIONS.push({ name: startCase(category), value: category })
 )
 
-const LINK_STYLES = css`
-  opacity: 70%;
+const SORT_BY_BUTTON_STYLE = css`
+  background-color: ${COLORS.transparent};
+  cursor: pointer;
   &:hover {
-    opacity: 100%;
+    background-color: ${COLORS.medGreyHover};
+  }
+
+  &:active,
+  &:focus {
+    background-color: ${COLORS.medGrey};
   }
 `
 
@@ -82,6 +89,9 @@ export function Labware(): JSX.Element {
     setCurrentLabwareDef,
   ] = React.useState<null | LabwareDefAndDate>(null)
 
+  const sortOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
+    onClickOutside: () => setShowSortByMenu(false),
+  })
   React.useEffect(() => {
     if (labwareFailureMessage != null) {
       setShowAddLabwareSlideout(false)
@@ -129,11 +139,7 @@ export function Labware(): JSX.Element {
               }}
             />
           </Flex>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            alignItems={ALIGN_CENTER}
-            onClick={toggleSetShowSortByMenu}
-          >
+          <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <StyledText
               css={TYPOGRAPHY.pSemiBold}
               color={COLORS.darkGreyEnabled}
@@ -143,9 +149,10 @@ export function Labware(): JSX.Element {
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
-              backgroundColor={COLORS.medGrey}
               borderRadius={BORDERS.radiusSoftCorners}
               marginLeft={SPACING.spacing3}
+              css={SORT_BY_BUTTON_STYLE}
+              onClick={toggleSetShowSortByMenu}
             >
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
@@ -174,6 +181,7 @@ export function Labware(): JSX.Element {
               top="8.5rem"
               right={0}
               flexDirection={DIRECTION_COLUMN}
+              ref={sortOverflowWrapperRef}
             >
               <MenuItem
                 onClick={() => {
@@ -222,10 +230,7 @@ export function Labware(): JSX.Element {
           <Link
             external
             href={LABWARE_CREATOR_HREF}
-            color={COLORS.darkBlack}
-            css={LINK_STYLES}
-            fontSize={TYPOGRAPHY.fontSizeLabel}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            css={TYPOGRAPHY.darkLinkLabelSemiBold}
           >
             {t('open_labware_creator')}
             <Icon
@@ -237,7 +242,7 @@ export function Labware(): JSX.Element {
         </Flex>
       </Box>
       {showAddLabwareSlideout && (
-        <AddCustomLabware
+        <AddCustomLabwareSlideout
           isExpanded={showAddLabwareSlideout}
           onCloseClick={() => setShowAddLabwareSlideout(false)}
           onSuccess={() => setShowSuccessToast(true)}

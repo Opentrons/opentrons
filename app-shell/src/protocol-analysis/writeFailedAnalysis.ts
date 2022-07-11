@@ -5,13 +5,12 @@ import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 const UNEXPECTED_ERROR_TYPE = 'UnexpectedAnalysisError'
 
-export function writeFailedAnalysis(
-  outputPath: string,
+export function createFailedAnalysis(
   errorMessage: string
-): Promise<void> {
+): ProtocolAnalysisOutput {
   const createdAt = new Date().toISOString()
 
-  const analysis: ProtocolAnalysisOutput = {
+  return {
     createdAt,
     errors: [
       {
@@ -29,6 +28,13 @@ export function writeFailedAnalysis(
     // ProtocolAnalysisOutput
     config: {} as any,
   }
+}
+
+export function writeFailedAnalysis(
+  outputPath: string,
+  errorMessage: string
+): Promise<void> {
+  const analysis = createFailedAnalysis(errorMessage)
 
   return writeFile(outputPath, JSON.stringify(analysis))
 }

@@ -15,7 +15,6 @@ import {
   TEXT_ALIGN_CENTER,
   TOOLTIP_LEFT,
   COLORS,
-  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getLabwareDefURI } from '@opentrons/shared-data'
@@ -241,7 +240,6 @@ export function SetupTipLengthCalibrationButton({
         ) : (
           <>
             <TertiaryButton
-              padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
               onClick={() => handleStart(null)}
               id={'TipRackCalibration_calibrateTipRackButton'}
               disabled={disabled || !isDeckCalibrated}

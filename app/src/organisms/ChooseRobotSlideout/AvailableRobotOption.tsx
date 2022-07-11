@@ -23,8 +23,8 @@ interface AvailableRobotOptionProps {
   local: boolean | null
   onClick: () => void
   isSelected: boolean
-  isError?: boolean
   isOnDifferentSoftwareVersion: boolean
+  isError?: boolean
 }
 
 export function AvailableRobotOption(

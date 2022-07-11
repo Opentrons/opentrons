@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.5...v6.0.0-beta.1) (2022-07-06)
+
+**Note:** Version bump only for package @opentrons/components
+
+
+
+
+
+# [6.0.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.4...v6.0.0-alpha.5) (2022-07-05)
+
+
+### Bug Fixes
+
+* **app:** remove legacy modal content background color override prop ([#10992](https://github.com/Opentrons/opentrons/issues/10992)) ([346fafc](https://github.com/Opentrons/opentrons/commit/346fafce067bfd805e073309d0660feb7603b0d9)), closes [#10742](https://github.com/Opentrons/opentrons/issues/10742)
+* **app:** remove slideout and modal from robot overflow menu conditional render ([#10990](https://github.com/Opentrons/opentrons/issues/10990)) ([884396d](https://github.com/Opentrons/opentrons/commit/884396d9cb04753fd21e802ae1e9d9ecb5a51e6a)), closes [#10782](https://github.com/Opentrons/opentrons/issues/10782) [#10536](https://github.com/Opentrons/opentrons/issues/10536)
+* **components:** fix link tabIndex ([#10986](https://github.com/Opentrons/opentrons/issues/10986)) ([867e6b7](https://github.com/Opentrons/opentrons/commit/867e6b74d93bdf56b984d71522492fec31528929))
+
+
+
+
+
+# [6.0.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.3...v6.0.0-alpha.4) (2022-07-01)
+
+
+### Bug Fixes
+
+* **app:** address design feedback initial protocols landing page  ([#10950](https://github.com/Opentrons/opentrons/issues/10950)) ([9346a8a](https://github.com/Opentrons/opentrons/commit/9346a8af2830a1d191558d2215e9feb7a696a1e5)), closes [#10907](https://github.com/Opentrons/opentrons/issues/10907)
+* **app:** this PR makes <Link> from opentrons componets tabbable ([#10930](https://github.com/Opentrons/opentrons/issues/10930)) ([c7fc0f0](https://github.com/Opentrons/opentrons/commit/c7fc0f0969b8c29325a153b61ac2796dda042703))
+
+
+
+
+
 # [6.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.0...v6.0.0-alpha.3) (2022-06-28)
 
 

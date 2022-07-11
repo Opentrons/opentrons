@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.5...v6.0.0-beta.1) (2022-07-06)
+
+**Note:** Version bump only for package @opentrons/step-generation
+
+
+
+
+
+# [6.0.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.4...v6.0.0-alpha.5) (2022-07-05)
+
+**Note:** Version bump only for package @opentrons/step-generation
+
+
+
+
+
+# [6.0.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.3...v6.0.0-alpha.4) (2022-07-01)
+
+**Note:** Version bump only for package @opentrons/step-generation
+
+
+
+
+
 # [6.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.0...v6.0.0-alpha.3) (2022-06-28)
 
 **Note:** Version bump only for package @opentrons/step-generation

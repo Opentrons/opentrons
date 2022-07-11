@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.5...v6.0.0-beta.1) (2022-07-06)
+
+**Note:** Version bump only for package @opentrons/app-shell
+
+
+
+
+
+# [6.0.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.4...v6.0.0-alpha.5) (2022-07-05)
+
+
+### Bug Fixes
+
+* **app:** remove legacy modal content background color override prop ([#10992](https://github.com/Opentrons/opentrons/issues/10992)) ([346fafc](https://github.com/Opentrons/opentrons/commit/346fafce067bfd805e073309d0660feb7603b0d9)), closes [#10742](https://github.com/Opentrons/opentrons/issues/10742)
+
+
+
+
+
+# [6.0.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.3...v6.0.0-alpha.4) (2022-07-01)
+
+
+### Bug Fixes
+
+* **app-shell:** allow corrupt protocol analysis files to error gracefully ([#10969](https://github.com/Opentrons/opentrons/issues/10969)) ([ed72dc3](https://github.com/Opentrons/opentrons/commit/ed72dc3003f2de4bbfb931526ebaddd506f9b7cd)), closes [#10828](https://github.com/Opentrons/opentrons/issues/10828)
+
+
+
+
+
 # [6.0.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.0...v6.0.0-alpha.3) (2022-06-28)
 
 

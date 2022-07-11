@@ -53,6 +53,6 @@ describe('LabwareCard', () => {
     props.labware.definition.namespace = 'custom'
     const [{ getByText }] = render(props)
     getByText('Custom Definition')
-    getByText(nestedTextMatcher('Date added'))
+    getByText(nestedTextMatcher('Added'))
   })
 })

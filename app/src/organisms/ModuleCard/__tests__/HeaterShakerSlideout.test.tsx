@@ -241,6 +241,7 @@ describe('HeaterShakerSlideout', () => {
     fireEvent.change(input, { target: { value: '40' } })
     expect(button).toBeEnabled()
     fireEvent.click(button)
+    expect(props.onCloseClick).toHaveBeenCalled()
 
     expect(mockCreateCommand).toHaveBeenCalledWith({
       runId: props.currentRunId,

@@ -9,6 +9,7 @@ import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useDispatchApiRequest } from '../../../redux/robot-api'
+import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import { fetchLights } from '../../../redux/robot-controls'
 import { useLights, useRobot, useRunStatuses } from '../hooks'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
@@ -20,6 +21,7 @@ import type { DispatchApiRequestType } from '../../../redux/robot-api'
 
 jest.mock('../../../redux/robot-api')
 jest.mock('../../../redux/robot-controls')
+jest.mock('../../../redux/buildroot/selectors')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 jest.mock('../RobotStatusBanner')
@@ -52,6 +54,9 @@ const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
 const mockUseRunStatues = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
+const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
+  typeof getBuildrootUpdateDisplayInfo
+>
 const mockFetchLights = fetchLights as jest.MockedFunction<typeof fetchLights>
 
 const mockToggleLights = jest.fn()
@@ -77,6 +82,11 @@ describe('RobotOverview', () => {
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,
+    })
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'reinstall',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
     })
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
     mockUseLights.mockReturnValue({
@@ -163,6 +173,18 @@ describe('RobotOverview', () => {
     const [{ getByRole }] = render()
     const runButton = getByRole('button', { name: 'Run a protocol' })
     expect(runButton).toBeDisabled()
+  })
+
+  it('disables the run a protocol button if robot software update is available', () => {
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Run a protocol' })
+    expect(button).toBeDisabled()
   })
 
   it('renders run a protocol button as not disabled when run id is null but run status is not terminal', () => {

@@ -6,13 +6,13 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 6.0.0-alpha.3
+# Opentrons App Changes in 6.0.0-beta.1
 
-Welcome to the v6.0.0 alpha release of the Opentrons App! This release focuses on a visual redesign of the app that offers more ways to manage protocols even when you're not connected to a robot.
+Welcome to the v6.0.0 beta release of the Opentrons App! This release focuses on a visual redesign of the app that offers more ways to manage protocols even when you're not connected to a robot.
 
 This release includes updates to the robot operating system, so be sure to update any OT-2s before running protocols with this version of the app.
 
-This is alpha software! You may experience unexpected crashes or missing features not detailed here. Please see the [issue tracker][] for more details and to leave feedback.
+This is beta software! You may experience unexpected crashes or missing features not detailed here. Please see the [issue tracker][] for more details and to leave feedback.
 
 [issue tracker]: https://github.com/Opentrons/opentrons/issues/new?assignees=y3rsh%2Cnusrat813&labels=6.0-feedback&template=testing_feedback.yml&title=6.0+Feedback%3A++%3Ctitle%3E
 

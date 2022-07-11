@@ -55,12 +55,20 @@ const RoundNavLink = styled(NavLink)`
   ${baseRoundTabStyling}
   color: ${COLORS.darkGreyEnabled};
 
+  &:hover {
+    background-color: ${COLORS.fundamentalsBackgroundShade};
+  }
+
   &.active {
     background-color: ${COLORS.white};
     border-top: ${BORDERS.lineBorder};
     border-left: ${BORDERS.lineBorder};
     border-right: ${BORDERS.lineBorder};
     color: ${COLORS.blue};
+
+    &:hover {
+      color: ${COLORS.blueHover};
+    }
 
     /* extend below the tab when active to flow into the content */
     &:after {

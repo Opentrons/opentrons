@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useHistory } from 'react-router-dom'
 import {
@@ -10,19 +11,24 @@ import {
   POSITION_RELATIVE,
   COLORS,
   useOnClickOutside,
+  useHoverTooltip,
 } from '@opentrons/components'
 import {
   useDeleteRunMutation,
   useAllCommandsQuery,
 } from '@opentrons/react-api-client'
 import { Divider } from '../../atoms/structure'
+import { Tooltip } from '../../atoms/Tooltip'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../RunTimeControl/hooks'
 import { RUN_LOG_WINDOW_SIZE } from './constants'
 import { DownloadRunLogToast } from './DownloadRunLogToast'
 import { useTrackProtocolRunEvent } from './hooks'
+import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+
 import type { Run } from '@opentrons/api-client'
+import type { State } from '../../redux/types'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
   runId: string
@@ -101,7 +107,12 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     closeOverflowMenu,
     setShowDownloadRunLogToast,
   } = props
-
+  const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
+    useSelector((state: State) => {
+      return getBuildrootUpdateDisplayInfo(state, robotName)
+    })?.autoUpdateAction
+  )
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const onResetSuccess = (createRunResponse: Run): void =>
     history.push(
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-log`
@@ -153,12 +164,18 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         </MenuItem>
       </NavLink>
       <MenuItem
+        {...targetProps}
         onClick={handleResetClick}
-        disabled={robotIsBusy}
+        disabled={robotIsBusy || isRobotOnWrongVersionOfSoftware}
         data-testid={`RecentProtocolRun_OverflowMenu_rerunNow`}
       >
         {t('rerun_now')}
       </MenuItem>
+      {isRobotOnWrongVersionOfSoftware && (
+        <Tooltip tooltipProps={tooltipProps}>
+          {t('shared:a_software_update_is_available')}
+        </Tooltip>
+      )}
       <MenuItem
         data-testid={`RecentProtocolRun_OverflowMenu_downloadRunLog`}
         onClick={onDownloadClick}
