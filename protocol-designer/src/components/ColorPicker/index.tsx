@@ -16,6 +16,9 @@ export function ColorPicker(props: ColorPickerProps): JSX.Element {
     <div>
       <div
         className={styles.swatch}
+        style={
+          showColorPicker ? { boxShadow: '0 2px 4px rgba(0, 0, 0, 0.41)' } : {}
+        }
         onClick={() => setShowColorPicker(showColorPicker => !showColorPicker)}
       >
         <div
