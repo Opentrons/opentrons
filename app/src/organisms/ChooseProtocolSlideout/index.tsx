@@ -2,9 +2,10 @@ import * as React from 'react'
 import path from 'path'
 import first from 'lodash/first'
 import { Trans, useTranslation } from 'react-i18next'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, NavLink, useHistory } from 'react-router-dom'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import { useSelector } from 'react-redux'
+import { css } from 'styled-components'
 
 import {
   SPACING,
@@ -69,6 +70,7 @@ export function ChooseProtocolSlideout(
     runCreationError,
     isCreatingRun,
     reset: resetCreateRun,
+    runCreationErrorCode,
   } = useCreateRunFromProtocol({
     onSuccess: ({ data: runData }) => {
       history.push(`/devices/${name}/protocol-runs/${runData.id}`)
@@ -172,7 +174,25 @@ export function ChooseProtocolSlideout(
                   marginTop={`-${SPACING.spacing2}`}
                   marginBottom={SPACING.spacing3}
                 >
-                  {runCreationError}
+                  {runCreationErrorCode === '409' ? (
+                    <Trans
+                      t={t}
+                      i18nKey="shared:robot_is_busy_no_protocol_run_allowed"
+                      components={{
+                        robotLink: (
+                          <NavLink
+                            css={css`
+                              color: ${COLORS.errorText};
+                              text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+                            `}
+                            to={`/devices/${robot.name}`}
+                          />
+                        ),
+                      }}
+                    />
+                  ) : (
+                    runCreationError
+                  )}
                 </StyledText>
               ) : null}
             </Flex>

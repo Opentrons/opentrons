@@ -227,6 +227,7 @@ describe('ChooseRobotSlideout', () => {
       createRunFromProtocolSource: mockCreateRunFromProtocolSource,
       isCreatingRun: false,
       reset: jest.fn(),
+      runCreationErrorCode: 'error code',
     })
     const [{ getByRole, getByText }] = render({
       storedProtocolData: storedProtocolDataFixture,
@@ -240,5 +241,30 @@ describe('ChooseRobotSlideout', () => {
       protocolKey: storedProtocolDataFixture.protocolKey,
     })
     expect(getByText('run creation error')).toBeInTheDocument()
+  })
+
+  it('renders error state when run creation error code is 409', () => {
+    mockUseCreateRunFromProtocol.mockReturnValue({
+      runCreationError: 'Current run is not idle or stopped.',
+      createRunFromProtocolSource: mockCreateRunFromProtocolSource,
+      isCreatingRun: false,
+      reset: jest.fn(),
+      runCreationErrorCode: '409',
+    })
+    const [{ getByRole, getByText }] = render({
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick: jest.fn(),
+      showSlideout: true,
+    })
+    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    proceedButton.click()
+    expect(mockCreateRunFromProtocolSource).toHaveBeenCalledWith({
+      files: [expect.any(File)],
+      protocolKey: storedProtocolDataFixture.protocolKey,
+    })
+    getByText('This robot is busy and can’t run this protocol right now.')
+    const link = getByRole('link', { name: 'Go to Robot' })
+    fireEvent.click(link)
+    expect(link.getAttribute('href')).toEqual('/devices/opentrons-robot-name')
   })
 })

@@ -4,6 +4,7 @@ import first from 'lodash/first'
 import { useTranslation, Trans } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import { NavLink, useHistory } from 'react-router-dom'
+import { css } from 'styled-components'
 
 import {
   SPACING,
@@ -75,6 +76,7 @@ export function ChooseRobotSlideout(
     runCreationError,
     reset: resetCreateRun,
     isCreatingRun,
+    runCreationErrorCode,
   } = useCreateRunFromProtocol(
     {
       onSuccess: ({ data: runData }) => {
@@ -221,7 +223,25 @@ export function ChooseRobotSlideout(
                     marginTop={`-${SPACING.spacing2}`}
                     marginBottom={SPACING.spacing3}
                   >
-                    {runCreationError}
+                    {runCreationErrorCode === '409' ? (
+                      <Trans
+                        t={t}
+                        i18nKey="shared:robot_is_busy_no_protocol_run_allowed"
+                        components={{
+                          robotLink: (
+                            <NavLink
+                              css={css`
+                                color: ${COLORS.errorText};
+                                text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+                              `}
+                              to={`/devices/${robot.name}`}
+                            />
+                          ),
+                        }}
+                      />
+                    ) : (
+                      runCreationError
+                    )}
                   </StyledText>
                 )}
               </Flex>
