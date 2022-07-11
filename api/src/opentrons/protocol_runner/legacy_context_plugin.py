@@ -7,10 +7,6 @@ from typing import Optional
 
 from opentrons.commands.types import CommandMessage as LegacyCommand
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import (
-    DoorStateNotification,
-    PauseType as HardwarePauseType,
-)
 
 from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
 
@@ -115,12 +111,8 @@ class LegacyContextPlugin(AbstractPlugin):
 
     def handle_action(self, action: pe_actions.Action) -> None:
         """React to a ProtocolEngine action."""
-        if (
-            isinstance(action, pe_actions.HardwareEventAction)
-            and not self.state.commands.get_is_implicitly_active()
-            and isinstance(action.event, DoorStateNotification)
-        ):
-            self._hardware_api.pause(HardwarePauseType.PAUSE)
+        # TODO(jbl 2022-07-06) handle_action stub should be completely removed
+        pass
 
     def _handle_legacy_command(self, command: LegacyCommand) -> None:
         """Handle a command reported by the APIv2 protocol.

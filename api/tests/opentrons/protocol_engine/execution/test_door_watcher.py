@@ -1,4 +1,4 @@
-"""Tests for hardware_event_forwarder."""
+"""Tests for door_watcher."""
 
 
 from typing import cast
@@ -12,12 +12,20 @@ from opentrons.hardware_control.types import (
     DoorStateNotification,
     DoorState,
     HardwareEventHandler,
+    PauseType,
 )
 
-from opentrons.protocol_engine.actions import ActionDispatcher, HardwareEventAction
-from opentrons.protocol_engine.execution.hardware_event_forwarder import (
-    HardwareEventForwarder,
+from opentrons.protocol_engine.actions import ActionDispatcher, DoorChangeAction
+from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.execution.door_watcher import (
+    DoorWatcher,
 )
+
+
+@pytest.fixture
+def state_store(decoy: Decoy) -> StateStore:
+    """Get a mock in the shape of a StateStore."""
+    return decoy.mock(cls=StateStore)
 
 
 @pytest.fixture
@@ -36,20 +44,25 @@ def action_dispatcher(decoy: Decoy) -> ActionDispatcher:
 
 @pytest.fixture
 async def subject(
-    hardware_control_api: HardwareControlAPI, action_dispatcher: ActionDispatcher
-) -> HardwareEventForwarder:
-    """Return a HardwareEventForwarder with mocked dependencies.
+    state_store: StateStore,
+    hardware_control_api: HardwareControlAPI,
+    action_dispatcher: ActionDispatcher,
+) -> DoorWatcher:
+    """Return a DoorWatcher with mocked dependencies.
 
-    Async because HardwareEventForwarder's initializer requires a running event loop.
+    Async because DoorWatcher's initializer requires a running event loop.
     """
-    return HardwareEventForwarder(
-        hardware_api=hardware_control_api, action_dispatcher=action_dispatcher
+    return DoorWatcher(
+        state_store=state_store,
+        hardware_api=hardware_control_api,
+        action_dispatcher=action_dispatcher,
     )
 
 
 async def test_event_forwarding(
     decoy: Decoy,
-    subject: HardwareEventForwarder,
+    subject: DoorWatcher,
+    state_store: StateStore,
     hardware_control_api: HardwareControlAPI,
     action_dispatcher: ActionDispatcher,
 ) -> None:
@@ -60,21 +73,35 @@ async def test_event_forwarding(
         unsubscribe_callback
     )
 
+    decoy.when(state_store.commands.get_is_running()).then_return(True)
+
     subject.start()
 
     captured_handler = cast(HardwareEventHandler, handler_captor.value)
 
     input_event = DoorStateNotification(new_state=DoorState.OPEN)
-    expected_action_to_forward = HardwareEventAction(input_event)
+    expected_action_to_forward = DoorChangeAction(DoorState.OPEN)
 
     await to_thread.run_sync(captured_handler, input_event)
-    decoy.verify(action_dispatcher.dispatch(expected_action_to_forward))
+    decoy.verify(
+        hardware_control_api.pause(PauseType.PAUSE),
+        action_dispatcher.dispatch(expected_action_to_forward),
+        times=1,
+    )
+
+    decoy.reset()
+    input_event = DoorStateNotification(new_state=DoorState.CLOSED)
+    await to_thread.run_sync(captured_handler, input_event)
+    decoy.verify(
+        hardware_control_api.pause(PauseType.PAUSE),
+        times=0,
+    )
 
 
 async def test_one_subscribe_one_unsubscribe(
     decoy: Decoy,
     hardware_control_api: HardwareControlAPI,
-    subject: HardwareEventForwarder,
+    subject: DoorWatcher,
 ) -> None:
     """Multiple start()s and stop()s should be collapsed."""
     unsubscribe = decoy.mock()

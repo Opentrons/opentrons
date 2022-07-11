@@ -6,7 +6,7 @@ from typing import NamedTuple, Type
 
 from opentrons.ordered_set import OrderedSet
 from opentrons.types import MountType, DeckSlotName
-from opentrons.hardware_control.types import DoorStateNotification, DoorState
+from opentrons.hardware_control.types import DoorState
 
 from opentrons.protocol_engine import commands, errors
 from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, WellLocation
@@ -30,7 +30,7 @@ from opentrons.protocol_engine.actions import (
     FinishErrorDetails,
     StopAction,
     HardwareStoppedAction,
-    HardwareEventAction,
+    DoorChangeAction,
 )
 
 from .command_fixtures import (
@@ -913,15 +913,12 @@ def test_handles_door_open_and_close_event_before_play(
     """It should update state but not pause on door open whenis setup."""
     subject = CommandStore(is_door_open=False, config=config)
 
-    door_open_event = DoorStateNotification(new_state=DoorState.OPEN)
-    door_close_event = DoorStateNotification(new_state=DoorState.CLOSED)
-
-    subject.handle_action(HardwareEventAction(event=door_open_event))
+    subject.handle_action(DoorChangeAction(door_state=DoorState.OPEN))
 
     assert subject.state.queue_status == QueueStatus.SETUP
     assert subject.state.is_door_blocking is expected_is_door_blocking
 
-    subject.handle_action(HardwareEventAction(event=door_close_event))
+    subject.handle_action(DoorChangeAction(door_state=DoorState.CLOSED))
 
     assert subject.state.queue_status == QueueStatus.SETUP
     assert subject.state.is_door_blocking is False
@@ -940,16 +937,13 @@ def test_handles_door_open_and_close_event_after_play(
     """It should update state when door opened and closed after run is played."""
     subject = CommandStore(is_door_open=False, config=config)
 
-    door_open_event = DoorStateNotification(new_state=DoorState.OPEN)
-    door_close_event = DoorStateNotification(new_state=DoorState.CLOSED)
-
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
-    subject.handle_action(HardwareEventAction(event=door_open_event))
+    subject.handle_action(DoorChangeAction(door_state=DoorState.OPEN))
 
     assert subject.state.queue_status == expected_queue_status
     assert subject.state.is_door_blocking is expected_is_door_blocking
 
-    subject.handle_action(HardwareEventAction(event=door_close_event))
+    subject.handle_action(DoorChangeAction(door_state=DoorState.CLOSED))
 
     assert subject.state.queue_status == expected_queue_status
     assert subject.state.is_door_blocking is False

@@ -25,7 +25,7 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.execution import (
     QueueWorker,
     HardwareStopper,
-    HardwareEventForwarder,
+    DoorWatcher,
 )
 from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
 from opentrons.protocol_engine.state import StateStore
@@ -90,9 +90,9 @@ def hardware_stopper(decoy: Decoy) -> HardwareStopper:
 
 
 @pytest.fixture
-def hardware_event_forwarder(decoy: Decoy) -> HardwareEventForwarder:
-    """Get a mock HardwareListener."""
-    return decoy.mock(cls=HardwareEventForwarder)
+def door_watcher(decoy: Decoy) -> DoorWatcher:
+    """Get a mock DoorWatcher."""
+    return decoy.mock(cls=DoorWatcher)
 
 
 @pytest.fixture
@@ -110,7 +110,7 @@ def subject(
     queue_worker: QueueWorker,
     model_utils: ModelUtils,
     hardware_stopper: HardwareStopper,
-    hardware_event_forwarder: HardwareEventForwarder,
+    door_watcher: DoorWatcher,
     module_data_provider: ModuleDataProvider,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
@@ -122,7 +122,7 @@ def subject(
         queue_worker=queue_worker,
         model_utils=model_utils,
         hardware_stopper=hardware_stopper,
-        hardware_event_forwarder=hardware_event_forwarder,
+        door_watcher=door_watcher,
         module_data_provider=module_data_provider,
     )
 
@@ -130,11 +130,11 @@ def subject(
 def test_create_starts_background_tasks(
     decoy: Decoy,
     queue_worker: QueueWorker,
-    hardware_event_forwarder: HardwareEventForwarder,
+    door_watcher: DoorWatcher,
     subject: ProtocolEngine,
 ) -> None:
     """It should start the queue worker upon creation."""
-    decoy.verify(queue_worker.start(), hardware_event_forwarder.start())
+    decoy.verify(queue_worker.start(), door_watcher.start())
 
 
 def test_add_command(
@@ -445,7 +445,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     queue_worker: QueueWorker,
     hardware_api: HardwareControlAPI,
     hardware_stopper: HardwareStopper,
-    hardware_event_forwarder: HardwareEventForwarder,
+    door_watcher: DoorWatcher,
     action_dispatcher: ActionDispatcher,
     plugin_starter: PluginStarter,
     subject: ProtocolEngine,
@@ -464,7 +464,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         await subject.finish()
 
     decoy.verify(
-        hardware_event_forwarder.stop_soon(),
+        door_watcher.stop_soon(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
         action_dispatcher.dispatch(HardwareStoppedAction(completed_at=completed_at)),
         await plugin_starter.stop(),
