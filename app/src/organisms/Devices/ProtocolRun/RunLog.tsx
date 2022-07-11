@@ -29,7 +29,7 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
-import { useAllCommandsQuery } from '@opentrons/react-api-client'
+import { useAllCommandsQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { NAV_BAR_WIDTH } from '../../../App/constants'
 import { PrimaryButton } from '../../../atoms/buttons'
@@ -49,11 +49,12 @@ import type { RunCommandSummary } from '@opentrons/api-client'
 import type { RunTimeCommand, CommandStatus } from '@opentrons/shared-data'
 
 const AVERAGE_ITEM_HEIGHT_PX = 56 // average px height of a command item
-const WINDOW_OVERLAP = 42 // number of command items that fall within two adjacent windows
+const WINDOW_OVERLAP = 40 // number of command items that fall within two adjacent windows
 const NUM_EAGER_ITEMS = 5 // number of command items away from the end of the current window that will trigger a window transition if scrolled into view
 const COMMANDS_REFETCH_INTERVAL = 3000
 const AVERAGE_WINDOW_HEIGHT_PX =
   (RUN_LOG_WINDOW_SIZE - WINDOW_OVERLAP) * AVERAGE_ITEM_HEIGHT_PX
+const NON_COMMAND_BUFFER_PX = 118 // px height of a the area below and above the windowed command items, but within the scrolled div
 interface CommandRuntimeInfo {
   analysisCommand: RunTimeCommand | null // analysisCommand will only be null if protocol is nondeterministic
   runCommandSummary: RunCommandSummary | null
@@ -90,6 +91,8 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
     firstPostInitialPlayRunCommandIndex.current != null
       ? firstPostInitialPlayRunCommandIndex.current
       : 0
+  const isCurrentRun =
+    useRunQuery(runId, { staleTime: Infinity }).data?.data.current ?? false
   const { data: commandsData } = useAllCommandsQuery(
     runId,
     {
@@ -255,6 +258,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
       const targetWindow = isCurrentCommandInFinalWindow
         ? indexOfFirstWindowContainingCurrentCommand
         : indexOfLastWindowContainingCurrentCommand
+
       setWindowIndex(Math.max(targetWindow, 0))
     }
     setIsJumpingToCurrent(true)
@@ -333,12 +337,12 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   const isCurrentStepBelow =
     (currentItemRef.current?.getBoundingClientRect().top != null &&
       currentItemRef.current?.getBoundingClientRect().top >
-        window.innerHeight) ||
+        listInnerRef.current?.getBoundingClientRect().bottom) ||
     windowIndex < indexOfFirstWindowContainingCurrentCommand
   const isCurrentStepAbove =
     (currentItemRef.current?.getBoundingClientRect().bottom != null &&
-      // 168 is additional containing element height
-      currentItemRef.current?.getBoundingClientRect().bottom < 168) ||
+      currentItemRef.current?.getBoundingClientRect().bottom <
+        NON_COMMAND_BUFFER_PX) ||
     windowIndex > indexOfLastWindowContainingCurrentCommand
 
   const jumpToCurrentStepButton = (
@@ -349,7 +353,9 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
       transform="translate(-50%)"
       borderRadius={SPACING.spacing6}
       display={
-        isCurrentStepBelow || isCurrentStepAbove ? DISPLAY_FLEX : DISPLAY_NONE
+        isCurrentRun && (isCurrentStepBelow || isCurrentStepAbove)
+          ? DISPLAY_FLEX
+          : DISPLAY_NONE
       }
       onClick={jumpToCurrentCommandWindow}
       id="RunLog_jumpToCurrentStep"
