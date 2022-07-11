@@ -115,11 +115,11 @@ Changing these attributes will affect all subsequent aspirate and dispense actio
 Using Labware Position Check
 ============================
 
-All positions relative to labware are automatically adjusted based on the labware's offset, an x, y, z vector added to any movement targeting the labware. The best way to calculate and apply these offsets is by using Labware Position Check when you run your protocol in the Opentrons App. As of version 6.0 of the app, you can apply previously calculated offsets — even across different protocols — as long as they are for the same type of labware in the same deck slot on the same robot.
+All positions relative to labware are automatically adjusted based on the labware's offset, an x, y, z vector. The best way to calculate and apply these offsets is by using Labware Position Check when you run your protocol in the Opentrons App. As of version 6.0 of the app, you can apply previously calculated offsets — even across different protocols — as long as they are for the same type of labware in the same deck slot on the same robot.
 
 You shouldn't adjust labware offsets in your Python code if you plan to run your protocol in the app. However, if you are running your protocol in Jupyter notebook or with ``opentrons_execute``, Labware Position Check is not directly available. For these applications, you can calculate and apply labware offsets by:
 	
-	1. Creating a "dummy" protocol that loads your labware, tip racks, and pipettes
+	1. Creating a "dummy" protocol that loads your labware and has each used pipette pick up a tip from a tip rack
 	2. Importing the dummy protocol to the Opentrons App
 	3. Running Labware Position Check
 	4. Adding the offsets to your protocol
@@ -127,9 +127,8 @@ You shouldn't adjust labware offsets in your Python code if you plan to run your
 To prepare code written for Jupyter notebook so it can be run in the app, you need to include a metadata block and a ``run()`` function. And to enable Labware Position Check, you need to add a :py:meth:`.pick_up_tip` action for each pipette the protocol uses. For example, a dummy protocol using a P300 Single-Channel pipette, a reservoir, and a well plate would look like this:
 
 .. code-block:: python
-    :substitutions:
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': 2.12}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
@@ -139,7 +138,7 @@ To prepare code written for Jupyter notebook so it can be run in the app, you ne
         p300.pick_up_tip()
         p300.return_tip()
 		
-After importing this protocol to the Opentrons App, you can run Labware Position Check to get the x, y, and z offsets for the two pieces of labware. When complete, you can click **Get Labware Offset Data** to get automatically generated code that uses :py:meth:`.set_offset` to apply the offsets to each piece of labware:
+After importing this protocol to the Opentrons App, run Labware Position Check to get the x, y, and z offsets for the tip rack and labware. When complete, you can click **Get Labware Offset Data** to view automatically generated code that uses :py:meth:`.set_offset` to apply the offsets to each piece of labware:
 
 .. code-block:: python
 	
@@ -158,6 +157,8 @@ You'll notice that this code uses generic names for the loaded labware. If you w
 
     reservoir = protocol.load_labware('nest_12_reservoir_15ml', 2)
     reservoir.set_offset(x=0.10, y=0.20, z=0.30)
+    
+.. versionadded:: 2.12
 
 Once you've executed this code in Jupyter notebook, all subsequent positional calculations for this reservoir in slot 2 will be adjusted 0.1 mm to the right, 0.2 mm to the back, and 0.3 mm up.
 
