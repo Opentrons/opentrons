@@ -11,6 +11,11 @@ import {
   JUSTIFY_FLEX_START,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
+import {
+  getLabwareDefURI,
+  getLabwareDisplayName,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useProtocolDetailsForRun, useDeckCalibrationData } from './hooks'
@@ -27,7 +32,6 @@ export function HistoricalProtocolRunOffsetDrawer(
 ): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const { run, robotName } = props
-  const [showOutOfDateBanner, setShowOutOfDateBanner] = React.useState(false)
   const allLabwareOffsets = run.labwareOffsets?.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
@@ -50,7 +54,6 @@ export function HistoricalProtocolRunOffsetDrawer(
       ? deckCalibrationData.lastModified
       : null
   const protocolDetails = useProtocolDetailsForRun(run.id)
-  const labwareDetails = protocolDetails.protocolData?.labware
 
   if (uniqueLabwareOffsets == null || uniqueLabwareOffsets.length === 0) {
     return (
@@ -70,15 +73,12 @@ export function HistoricalProtocolRunOffsetDrawer(
       </Box>
     )
   }
-  if (
+  const isOutOfDate =
     typeof lastModifiedDeckCal === 'string' &&
     new Date(lastModifiedDeckCal).getTime() >
       new Date(
         uniqueLabwareOffsets[uniqueLabwareOffsets?.length - 1].createdAt
       ).getTime()
-  ) {
-    setShowOutOfDateBanner(true)
-  }
 
   return (
     <Box
@@ -86,7 +86,7 @@ export function HistoricalProtocolRunOffsetDrawer(
       width="100%"
       padding={SPACING.spacing3}
     >
-      {showOutOfDateBanner && (
+      {isOutOfDate ? (
         <Banner
           type="warning"
           marginLeft={SPACING.spacing5}
@@ -99,7 +99,7 @@ export function HistoricalProtocolRunOffsetDrawer(
             <StyledText as="p">{t('robot_was_recalibrated')}</StyledText>
           </Flex>
         </Banner>
-      )}
+      ) : null}
       <Flex
         justifyContent={JUSTIFY_FLEX_START}
         borderBottom={BORDERS.lineBorder}
@@ -111,7 +111,7 @@ export function HistoricalProtocolRunOffsetDrawer(
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
-          dataTest-id={`RecentProtocolRun_OffsetDrawer_locationTitle`}
+          datatest-id={`RecentProtocolRun_OffsetDrawer_locationTitle`}
         >
           {t('location')}
         </StyledText>
@@ -120,7 +120,7 @@ export function HistoricalProtocolRunOffsetDrawer(
           width="33%"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
-          dataTest-id={`RecentProtocolRun_OffsetDrawer_labwareTitle`}
+          datatest-id={`RecentProtocolRun_OffsetDrawer_labwareTitle`}
         >
           {t('labware')}
         </StyledText>
@@ -129,19 +129,19 @@ export function HistoricalProtocolRunOffsetDrawer(
           width="40%"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
-          dataTest-id={`RecentProtocolRun_OffsetDrawer_labwareOffsetDataTitle`}
+          datatest-id={`RecentProtocolRun_OffsetDrawer_labwareOffsetDataTitle`}
         >
           {t('labware_offset_data')}
         </StyledText>
       </Flex>
       {uniqueLabwareOffsets.map((offset, index) => {
-        let labwareName = offset.definitionUri
-        if (labwareDetails != null) {
-          labwareName =
-            Object.values(labwareDetails)?.find(labware =>
-              labware.definitionId.includes(offset.definitionUri)
-            )?.displayName ?? offset.definitionUri
-        }
+        const definition = Object.values(
+          protocolDetails.protocolData?.labwareDefinitions ?? {}
+        ).find(def => getLabwareDefURI(def) === offset.definitionUri)
+        const labwareName =
+          definition != null
+            ? getLabwareDisplayName(definition)
+            : offset.definitionUri
 
         return (
           <Flex
@@ -155,18 +155,23 @@ export function HistoricalProtocolRunOffsetDrawer(
             <StyledText width="25%" as="label">
               {t('slot', { slotName: offset.location.slotName })}
               {offset.location.moduleModel != null &&
-                ` - ${offset.location.moduleModel}`}
+                ` - ${getModuleDisplayName(offset.location.moduleModel)}`}
             </StyledText>
-            <StyledText as="label" width="33%">
+            <StyledText
+              as="label"
+              width="33%"
+              overflow="hidden"
+              textOverflow="ellipsis"
+              title={labwareName}
+            >
               {labwareName}
             </StyledText>
-            <StyledText as="label" width="40%">
-              <OffsetVector
-                x={offset.vector.x}
-                y={offset.vector.y}
-                z={offset.vector.z}
-              />
-            </StyledText>
+            <OffsetVector
+              {...offset.vector}
+              width="40%"
+              fontSize={TYPOGRAPHY.fontSizeLabel}
+              as="label"
+            />
           </Flex>
         )
       })}

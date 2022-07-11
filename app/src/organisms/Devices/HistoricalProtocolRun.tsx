@@ -33,7 +33,6 @@ interface HistoricalProtocolRunProps {
   protocolName: string
   robotName: string
   robotIsBusy: boolean
-  key: number
   protocolKey?: string
 }
 
@@ -41,7 +40,7 @@ export function HistoricalProtocolRun(
   props: HistoricalProtocolRunProps
 ): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const { run, protocolName, robotIsBusy, robotName, protocolKey, key } = props
+  const { run, protocolName, robotIsBusy, robotName, protocolKey } = props
   const history = useHistory()
   const [offsetDrawerOpen, setOffsetDrawerOpen] = React.useState(false)
   const storedProtocols = useSelector((state: State) =>
@@ -85,7 +84,7 @@ export function HistoricalProtocolRun(
         <StyledText
           as="p"
           width="25%"
-          data-testid={`RecentProtocolRuns_Run_${key}`}
+          data-testid={`RecentProtocolRuns_Run_${protocolKey}`}
           onClick={() =>
             history.push(
               `${robotName}/protocol-runs/${run.id}/protocolRunDetailsTab?`
@@ -101,7 +100,7 @@ export function HistoricalProtocolRun(
           <StyledText
             as="p"
             width="35%"
-            data-testid={`RecentProtocolRuns_Protocol_${props.key}`}
+            data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
             onClick={() => history.push(`/protocols/${protocolKey}`)}
             css={CLICK_STYLE}
             marginRight={SPACING.spacing4}
@@ -112,7 +111,7 @@ export function HistoricalProtocolRun(
           <StyledText
             as="p"
             width="35%"
-            data-testid={`RecentProtocolRuns_Protocol_${props.key}`}
+            data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
             css={{ 'overflow-wrap': 'anywhere' }}
           >
             {protocolName}
@@ -122,7 +121,7 @@ export function HistoricalProtocolRun(
           as="p"
           width="20%"
           textTransform="capitalize"
-          data-testid={`RecentProtocolRuns_Status_${props.key}`}
+          data-testid={`RecentProtocolRuns_Status_${protocolKey}`}
         >
           {runStatus === 'running' && (
             <Icon
