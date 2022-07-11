@@ -438,8 +438,10 @@ async def test_delete_current_run(
 
     await subject.delete(run_id=run_id)
 
-    decoy.verify(await mock_engine_store.clear(), times=1)
-    decoy.verify(mock_run_store.remove(run_id=run_id), times=0)
+    decoy.verify(
+        await mock_engine_store.clear(),
+        mock_run_store.remove(run_id=run_id),
+    )
 
 
 async def test_delete_historical_run(
