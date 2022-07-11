@@ -263,7 +263,7 @@ export function ChooseRobotSlideout(
                 t={t}
                 i18nKey="view_unavailable_robots"
                 components={{
-                  robotLink: <NavLink to="/devices" />,
+                  devicesLink: <NavLink to="/devices" />,
                 }}
               />
             </StyledText>
