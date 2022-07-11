@@ -24,6 +24,7 @@ export interface UseCreateRun {
   >
   isCreatingRun: boolean
   runCreationError: string | null
+  runCreationErrorCode: string | null
   reset: () => void
 }
 
@@ -84,6 +85,8 @@ export function useCreateRunFromProtocol(
   error != null && console.error(error)
   error = error?.length > 255 ? t('protocol_run_general_error_msg') : error
 
+  const errorCode = protocolError?.code ?? runError?.code ?? ''
+
   return {
     createRunFromProtocolSource: (
       { files: srcFiles, protocolKey },
@@ -97,6 +100,7 @@ export function useCreateRunFromProtocol(
     },
     isCreatingRun: isCreatingProtocol || isCreatingRun,
     runCreationError: error,
+    runCreationErrorCode: errorCode,
     reset: () => {
       resetProtocolMutation()
       resetRunMutation()

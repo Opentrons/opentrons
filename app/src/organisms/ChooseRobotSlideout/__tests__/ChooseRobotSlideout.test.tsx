@@ -227,6 +227,7 @@ describe('ChooseRobotSlideout', () => {
       createRunFromProtocolSource: mockCreateRunFromProtocolSource,
       isCreatingRun: false,
       reset: jest.fn(),
+      runCreationErrorCode: 'error code',
     })
     const [{ getByRole, getByText }] = render({
       storedProtocolData: storedProtocolDataFixture,
@@ -242,12 +243,13 @@ describe('ChooseRobotSlideout', () => {
     expect(getByText('run creation error')).toBeInTheDocument()
   })
 
-  it('renders error state when run creation error is busy', () => {
+  it('renders error state when run creation error code is 409', () => {
     mockUseCreateRunFromProtocol.mockReturnValue({
       runCreationError: 'Current run is not idle or stopped.',
       createRunFromProtocolSource: mockCreateRunFromProtocolSource,
       isCreatingRun: false,
       reset: jest.fn(),
+      runCreationErrorCode: '409',
     })
     const [{ getByRole, getByText }] = render({
       storedProtocolData: storedProtocolDataFixture,
