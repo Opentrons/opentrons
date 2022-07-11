@@ -32,11 +32,9 @@ def patch_mock_next_available_tip(
         mock_next_available_tip,
     )
 
-    decoy.when(
-        mock_next_available_tip(
-            None, [], 0
-        )
-    ).then_return((mock_labware, mock_well))
+    decoy.when(mock_next_available_tip(None, [], 0)).then_return(
+        (mock_labware, mock_well)
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -232,19 +230,22 @@ def test_pick_up_from_manipulated_location(
 #         times=1,
 #     )
 
+
 def test_pick_up_from_no_location(
     decoy: Decoy,
     subject: InstrumentContext,
     mock_instrument_implementation: AbstractInstrument,
     mock_well_implementation: WellImplementation,
     mock_well: Well,
-    mock_labware: Labware
+    mock_labware: Labware,
 ) -> None:
     """Should pick up tip from next_available_tip.top()."""
     expected_location = Location(Point(0, 0, 0), mock_well)
 
     decoy.when(subject._ctx._modules).then_return([])
-    decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=0)).then_return(False)
+    decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=0)).then_return(
+        False
+    )
     decoy.when(mock_well.top()).then_return(expected_location)
 
     subject.pick_up_tip(location=None)
