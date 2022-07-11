@@ -12,6 +12,7 @@ from opentrons.broker import Broker
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocols.context.well import WellImplementation
+from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.api_support.instrument import validate_tiprack, tip_length_for
 from opentrons.commands import publisher
@@ -113,9 +114,17 @@ def mock_well(decoy: Decoy) -> Well:
 
 
 @pytest.fixture
-def mock_labware(decoy: Decoy) -> Labware:
-    return decoy.mock(cls=Labware)
+def mock_abstract_labware(decoy: Decoy) -> AbstractLabware:
+    return decoy.mock(cls=AbstractLabware)
 
+# @pytest.fixture
+# def mock_labware(decoy: Decoy, mock_abstract_labware: AbstractLabware) -> Labware:
+#     return Labware(implementation=mock_abstract_labware)
+
+
+@pytest.fixture
+def mock_labware(decoy: Decoy, mock_abstract_labware: AbstractLabware) -> Labware:
+    return decoy.mock(cls=Labware)
 
 @pytest.fixture
 def mock_well_implementation(mock_well_geometry: WellGeometry) -> WellImplementation:
@@ -206,6 +215,7 @@ def test_pick_up_from_well(
     subject: InstrumentContext,
     mock_instrument_implementation: AbstractInstrument,
     mock_well_implementation: WellImplementation,
+    mock_abstract_labware: AbstractLabware,
     mock_well: Well,
     mock_labware: Labware,
 ) -> None:
@@ -219,6 +229,11 @@ def test_pick_up_from_well(
     )
 
     decoy.when(input_location.parent).then_return(mock_labware)
+
+    # TODO (tz, 7-11-22): Do I need this? failing on tiprack printing as str
+    decoy.when(mock_labware.is_tiprack()).then_return(True)
+    decoy.when(mock_labware._is_tiprack).then_return(True)
+    decoy.when(mock_abstract_labware.is_tiprack()).then_return(True)
 
     subject.pick_up_tip(location=input_location)
 
