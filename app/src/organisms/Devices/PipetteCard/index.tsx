@@ -62,7 +62,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const { t } = useTranslation(['device_details', 'protocol_setup'])
   const { pipetteInfo, mount, robotName, pipetteId } = props
   const {
-    MenuOverlay,
+    menuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
@@ -303,7 +303,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               isPipetteCalibrated={pipetteOffsetCalibration != null}
             />
           </Box>
-          <MenuOverlay />
+          {menuOverlay}
         </>
       )}
     </Flex>

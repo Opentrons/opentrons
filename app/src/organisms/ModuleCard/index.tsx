@@ -88,7 +88,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { module, robotName, isLoadedInRun, runId, slotName } = props
   const dispatch = useDispatch<Dispatch>()
   const {
-    MenuOverlay,
+    menuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
@@ -427,7 +427,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               isLoadedInRun={isLoadedInRun}
             />
           </Box>
-          <MenuOverlay />
+          {menuOverlay}
         </>
       )}
     </Flex>
