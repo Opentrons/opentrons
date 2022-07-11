@@ -19,7 +19,12 @@ from opentrons.protocol_api.labware import next_available_tip
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_next_available_tip(decoy: Decoy, monkeypatch: pytest.MonkeyPatch, mock_labware: Labware, mock_well: Well) -> None:
+def patch_mock_next_available_tip(
+    decoy: Decoy,
+    monkeypatch: pytest.MonkeyPatch,
+    mock_labware: Labware,
+    mock_well: Well,
+) -> None:
     """Replace next_available_tip() with a mock."""
     mock_next_available_tip = decoy.mock(func=next_available_tip)
     monkeypatch.setattr(
@@ -31,9 +36,9 @@ def patch_mock_next_available_tip(decoy: Decoy, monkeypatch: pytest.MonkeyPatch,
         mock_next_available_tip(
             starting_tip=matchers.Anything(),
             tip_racks=matchers.Anything(),
-            channels=matchers.Anything()
+            channels=matchers.Anything(),
         )
-    ).then_return([mock_labware, mock_well])
+    ).then_return((mock_labware, mock_well))
 
 
 @pytest.fixture(autouse=True)
@@ -90,12 +95,14 @@ def subject(
     mock_instrument_implementation: AbstractInstrument,
     mock_protocol_context: ProtocolContext,
 ) -> InstrumentContext:
-    return InstrumentContext(
+    subject = InstrumentContext(
         implementation=mock_instrument_implementation,
         ctx=mock_protocol_context,
         broker=Broker(),
         at_version=APIVersion(2, 0),
     )
+    decoy.when(subject.channels).then_return(0)
+    return subject
 
 
 @pytest.fixture
@@ -145,7 +152,7 @@ def test_pick_up_from_location(
     expected_location = Location(point=expected_point_call, labware=mock_well)
 
     decoy.when(subject._ctx._modules).then_return([])
-    decoy.when(mock_labware.next_tip(None)).then_return(mock_well)
+    decoy.when(mock_labware.next_tip(0)).then_return(mock_well)
 
     decoy.when(mock_well.top()).then_return(expected_location)
 
@@ -190,6 +197,7 @@ def test_pick_up_from_manipulated_location(
         ),
         times=1,
     )
+
 
 # def test_pick_up_from_well(
 #     decoy: Decoy,
