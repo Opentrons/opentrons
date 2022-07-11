@@ -16,6 +16,7 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
   return (
     <Box
       borderRadius={'4px 4px 0px 0px'}
+      zIndex={10}
       boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}

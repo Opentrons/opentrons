@@ -54,6 +54,7 @@ export interface FlexboxProps {
   justifyContent?: string
   flexDirection?: string
   flexWrap?: string
+  whiteSpace?: string
 }
 
 export interface GridProps {
@@ -78,6 +79,7 @@ export interface LayoutProps {
   overflowY?: CSSProperties['overflowY']
   wordSpacing?: string | number
   cursor?: CSSProperties['cursor']
+  overflowWrap?: string
 }
 
 export interface PositionProps {

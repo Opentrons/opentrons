@@ -42,6 +42,11 @@ const NavbarLink = styled(NavLink)`
     background-color: ${COLORS.darkGreyHover};
   }
 
+  &:focus-visible.active {
+    box-shadow: none;
+    outline: none;
+  }
+
   &:active {
     background-color: ${COLORS.darkBlackPressed};
   }

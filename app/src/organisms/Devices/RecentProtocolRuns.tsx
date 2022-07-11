@@ -40,7 +40,8 @@ export function RecentProtocolRuns({
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.white}
-      css={BORDERS.cardOutlineBorder}
+      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid}  ${COLORS.medGrey}`}
+      borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_COLUMN}
       width="100%"
       marginBottom="6rem"

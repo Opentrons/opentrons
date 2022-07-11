@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -18,10 +19,12 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { ToggleButton, PrimaryButton } from '../../atoms/buttons'
+import { Tooltip } from '../../atoms/Tooltip'
 import { StyledText } from '../../atoms/text'
 import { useDispatchApiRequest } from '../../redux/robot-api'
 import { fetchLights } from '../../redux/robot-controls'
@@ -34,6 +37,9 @@ import { RobotStatusBanner } from './RobotStatusBanner'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
 import { useLights, useRobot, useRunStatuses } from './hooks'
+import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+
+import type { State } from '../../redux/types'
 
 const EQUIPMENT_POLL_MS = 5000
 
@@ -45,7 +51,13 @@ export function RobotOverview({
   robotName,
 }: RobotOverviewProps): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const [dispatchRequest] = useDispatchApiRequest()
+  const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
+    useSelector((state: State) => {
+      return getBuildrootUpdateDisplayInfo(state, robotName)
+    })?.autoUpdateAction
+  )
 
   const robot = useRobot(robotName)
   const [
@@ -116,10 +128,13 @@ export function RobotOverview({
             </Flex>
           </Flex>
           <PrimaryButton
+            {...targetProps}
+            marginBottom={SPACING.spacing4}
             textTransform={TEXT_TRANSFORM_NONE}
             disabled={
               (currentRunId != null ? !isRunTerminal : false) ||
-              robot.status !== CONNECTABLE
+              robot.status !== CONNECTABLE ||
+              isRobotOnWrongVersionOfSoftware
             }
             onClick={() => {
               setShowChooseProtocolSlideout(true)
@@ -127,6 +142,11 @@ export function RobotOverview({
           >
             {t('run_a_protocol')}
           </PrimaryButton>
+          {isRobotOnWrongVersionOfSoftware && (
+            <Tooltip tooltipProps={tooltipProps}>
+              {t('shared:a_software_update_is_available')}
+            </Tooltip>
+          )}
           {robot.status === CONNECTABLE ? (
             <Portal level="top">
               <ChooseProtocolSlideout

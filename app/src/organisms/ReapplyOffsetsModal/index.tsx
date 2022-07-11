@@ -84,7 +84,7 @@ export function ReapplyOffsetsModal(
       <OffsetTable>
         <tr>
           <OffsetTableHeader>{t('location')}</OffsetTableHeader>
-          <OffsetTableHeader>{t('run_id')}</OffsetTableHeader>
+          <OffsetTableHeader>{t('run')}</OffsetTableHeader>
           <OffsetTableHeader>{t('labware')}</OffsetTableHeader>
           <OffsetTableHeader>{t('labware_offset_data')}</OffsetTableHeader>
         </tr>

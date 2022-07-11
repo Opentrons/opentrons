@@ -2,15 +2,17 @@ import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { AddCustomLabware } from '../../AddCustomLabware'
+import { AddCustomLabwareSlideout } from '..'
 
 jest.mock('../../../redux/custom-labware')
 jest.mock('../../../pages/Labware/helpers/getAllDefs')
 
-const render = (props: React.ComponentProps<typeof AddCustomLabware>) => {
+const render = (
+  props: React.ComponentProps<typeof AddCustomLabwareSlideout>
+) => {
   return renderWithProviders(
     <MemoryRouter>
-      <AddCustomLabware {...props} />
+      <AddCustomLabwareSlideout {...props} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -18,8 +20,8 @@ const render = (props: React.ComponentProps<typeof AddCustomLabware>) => {
   )
 }
 
-describe('AddCustomLabware', () => {
-  const props: React.ComponentProps<typeof AddCustomLabware> = {
+describe('AddCustomLabwareSlideout', () => {
+  const props: React.ComponentProps<typeof AddCustomLabwareSlideout> = {
     isExpanded: true,
     onCloseClick: jest.fn(() => null),
     onSuccess: jest.fn(() => null),

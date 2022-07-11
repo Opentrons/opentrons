@@ -324,7 +324,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
         elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.PAUSED
             self._state.run_result = self._state.run_result or RunResult.STOPPED
-            self._state.run_completed_at = action.completed_at
+            self._state.run_completed_at = (
+                self._state.run_completed_at or action.completed_at
+            )
 
         elif isinstance(action, HardwareEventAction):
             if isinstance(action.event, DoorStateNotification):
