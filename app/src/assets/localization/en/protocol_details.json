@@ -30,5 +30,6 @@
   "quantity": "Quantity",
   "go_to_labware_definition": "Go to labware definition",
   "protocol_designer_version": "Protocol Designer {{version}}",
-  "python_api_version": "Python API {{version}}"
+  "python_api_version": "Python API {{version}}",
+  "robot_is_busy_no_protocol_run_allowed": "This robot is busy and can’t run this protocol right now. Go to robot."
 }
