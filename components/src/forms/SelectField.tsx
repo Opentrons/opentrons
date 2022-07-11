@@ -71,7 +71,8 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
         placeholder={placeholder}
         menuPosition={menuPosition}
         formatOptionLabel={formatOptionLabel}
-        onChange={opt => onValueChange && onValueChange(name, opt?.value || '')}
+        //  @ts-expect-error(jr 7/11/22): multi select will not happen, resolve this error
+        onChange={og => onValueChange && onValueChange(name, og?.value ?? [])}
         onBlur={() => onLoseFocus && onLoseFocus(name)}
       />
       {caption && <p className={captionCx}>{caption}</p>}
