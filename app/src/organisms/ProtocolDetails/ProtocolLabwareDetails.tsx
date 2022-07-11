@@ -150,7 +150,7 @@ export const LabwareDetailOverflowMenu = (
   const { labware } = props
   const { t } = useTranslation('protocol_details')
   const {
-    MenuOverlay,
+    menuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
@@ -193,7 +193,7 @@ export const LabwareDetailOverflowMenu = (
         </Flex>
       ) : null}
       <Portal level="top">
-        <MenuOverlay />
+        {menuOverlay}
         {showLabwareDetailSlideout ? (
           <LabwareDetails
             labware={labware}

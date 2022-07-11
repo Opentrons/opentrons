@@ -31,7 +31,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
   const currentRunStatus = useCurrentRunStatus()
   const { displayName } = useProtocolDetailsForRun(currentRunId)
 
-  const RunningProtocolBanner = (): JSX.Element | null =>
+  const runningProtocolBanner: JSX.Element | null =
     currentRunId != null ? (
       <Flex alignItems={ALIGN_CENTER}>
         <StyledText
@@ -84,7 +84,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
           </Flex>
         </Flex>
       </Flex>
-      <RunningProtocolBanner />
+      {runningProtocolBanner}
     </Flex>
   )
 }
