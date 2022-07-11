@@ -32,7 +32,9 @@ export function DeviceDetails(): JSX.Element | null {
         minWidth={SIZE_6}
         height="100%"
         overflow={OVERFLOW_SCROLL}
-        padding={SPACING.spacing4}
+        paddingX={SPACING.spacing4}
+        paddingTop={SPACING.spacing4}
+        paddingBottom={SPACING.spacing7}
       >
         {/* TODO(va, 2022-06-17) update border color to
             COLORS.medGreyEnabled when PR #10664 is merged */}
@@ -44,7 +46,7 @@ export function DeviceDetails(): JSX.Element | null {
           flexDirection={DIRECTION_COLUMN}
           marginBottom={SPACING.spacing4}
           paddingX={SPACING.spacing4}
-          paddingBottom={SPACING.spacing4}
+          paddingBottom={SPACING.spacing2}
           width="100%"
         >
           <RobotOverview robotName={robotName} />

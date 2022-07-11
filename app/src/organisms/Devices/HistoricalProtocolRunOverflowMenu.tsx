@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { NavLink, useHistory } from 'react-router-dom'
 import {
   Flex,
-  SPACING,
   POSITION_ABSOLUTE,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
@@ -12,6 +11,7 @@ import {
   COLORS,
   useOnClickOutside,
   useHoverTooltip,
+  Box,
 } from '@opentrons/components'
 import {
   useDeleteRunMutation,
@@ -19,6 +19,7 @@ import {
 } from '@opentrons/react-api-client'
 import { Divider } from '../../atoms/structure'
 import { Tooltip } from '../../atoms/Tooltip'
+import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../RunTimeControl/hooks'
@@ -40,19 +41,19 @@ export function HistoricalProtocolRunOverflowMenu(
   props: HistoricalProtocolRunOverflowMenuProps
 ): JSX.Element {
   const { runId, robotName } = props
-  const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
-  const protocolRunOverflowWrapperRef = useOnClickOutside({
+  const {
+    MenuOverlay,
+    handleOverflowClick,
+    showOverflowMenu,
+    setShowOverflowMenu,
+  } = useMenuHandleClickOutside()
+  const protocolRunOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
-  }) as React.RefObject<HTMLDivElement>
+  })
   const [
     showDownloadRunLogToast,
     setShowDownloadRunLogToast,
   ] = React.useState<boolean>(false)
-  const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    setShowOverflowMenu(!showOverflowMenu)
-  }
 
   const commands = useAllCommandsQuery(
     runId,
@@ -69,16 +70,19 @@ export function HistoricalProtocolRunOverflowMenu(
     >
       <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
       {showOverflowMenu && (
-        <div
-          ref={protocolRunOverflowWrapperRef}
-          data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
-        >
-          <MenuDropdown
-            {...props}
-            closeOverflowMenu={handleOverflowClick}
-            setShowDownloadRunLogToast={setShowDownloadRunLogToast}
-          />
-        </div>
+        <>
+          <Box
+            ref={protocolRunOverflowWrapperRef}
+            data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
+          >
+            <MenuDropdown
+              {...props}
+              closeOverflowMenu={handleOverflowClick}
+              setShowDownloadRunLogToast={setShowDownloadRunLogToast}
+            />
+          </Box>
+          <MenuOverlay />
+        </>
       )}
       {runTotalCommandCount != null && showDownloadRunLogToast ? (
         <DownloadRunLogToast
@@ -153,10 +157,9 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}
-      top={SPACING.spacing6}
+      top={'2.3rem'}
       right={0}
       flexDirection={DIRECTION_COLUMN}
-      height="10.5rem"
     >
       <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}>
         <MenuItem data-testid={`RecentProtocolRun_OverflowMenu_viewRunRecord`}>
@@ -182,7 +185,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       >
         {t('download_run_log')}
       </MenuItem>
-      <Divider />
+      <Divider marginY="0" />
       <MenuItem
         onClick={handleDeleteClick}
         data-testid={`RecentProtocolRun_OverflowMenu_deleteRun`}

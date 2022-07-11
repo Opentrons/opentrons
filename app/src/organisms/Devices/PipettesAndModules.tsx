@@ -2,6 +2,8 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 import { useModulesQuery, usePipettesQuery } from '@opentrons/react-api-client'
+import { css } from 'styled-components'
+
 import {
   Flex,
   ALIGN_CENTER,
@@ -23,6 +25,37 @@ import { ModuleCard } from '../ModuleCard'
 import { useIsRobotViewable, useRunStatuses } from './hooks'
 import { PipetteCard } from './PipetteCard'
 
+const MIN_HEIGHT_OVER_3_STYLING = css`
+  max-height: 37rem;
+
+  @media (min-width: 700px) {
+    max-height: 32rem;
+  }
+
+  @media (min-width: 800px) {
+    max-height: 30rem;
+  }
+
+  @media (min-width: 900px) {
+    max-height: 22rem;
+  }
+`
+
+const MIN_HEIGHT_UNDER_3_STYLING = css`
+  max-height: 29rem;
+
+  @media (min-width: 700px) {
+    max-height: 27rem;
+  }
+
+  @media (min-width: 800px) {
+    max-height: 25rem;
+  }
+
+  @media (min-width: 900px) {
+    max-height: 22rem;
+  }
+`
 const EQUIPMENT_POLL_MS = 5000
 interface PipettesAndModulesProps {
   robotName: string
@@ -103,7 +136,11 @@ export function PipettesAndModules({
               justifyContent={JUSTIFY_START}
               flexDirection={DIRECTION_COLUMN}
               flexWrap={WRAP}
-              maxHeight={attachedModules.length <= 3 ? '27rem ' : '34rem'}
+              css={
+                attachedModules.length > 3
+                  ? MIN_HEIGHT_OVER_3_STYLING
+                  : MIN_HEIGHT_UNDER_3_STYLING
+              }
             >
               {attachedModules.map((module, index) => {
                 return (
