@@ -135,6 +135,8 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   const { getElementProperty } = useGetElementDOMRectProperty<HTMLDivElement>(
     targetRef
   )
+  const width = getElementProperty('width')
+  const height = getElementProperty('height')
 
   // TODO kj 07/06/2022: Currently, using hardcoded number to align elements
   // This should be removed in the future
@@ -146,9 +148,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         size="6rem"
         height="auto"
         justifyContent={JUSTIFY_CENTER}
-        alignItems={
-          getElementProperty('width') <= 800 ? ALIGN_START : ALIGN_CENTER
-        }
+        alignItems={width == null || width <= 800 ? ALIGN_START : ALIGN_CENTER}
         data-testid={`ProtocolCard_deckLayout_${protocolDisplayName}`}
       >
         {
@@ -280,7 +280,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             data-testid={`ProtocolCard_date_${protocolDisplayName}`}
             marginTop={SPACING.spacing3}
             justifyContent={
-              getElementProperty('height') <= 880 ? JUSTIFY_FLEX_END : FLEX_NONE
+              height == null || height <= 880 ? JUSTIFY_FLEX_END : FLEX_NONE
             }
           >
             <StyledText

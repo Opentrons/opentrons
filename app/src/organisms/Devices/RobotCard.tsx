@@ -61,16 +61,20 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const { getElementProperty } = useGetElementDOMRectProperty<HTMLDivElement>(
     robotCardRef
   )
-  const [robotCardWidth, setRobotCardWidth] = React.useState<number>(
+  const [robotCardWidth, setRobotCardWidth] = React.useState<number | null>(
     getElementProperty('width')
   )
 
+  const handleResize = React.useCallback((): void => {
+    setRobotCardWidth(getElementProperty('width'))
+  }, [getElementProperty])
+
   React.useEffect(() => {
-    const handleResize = (): void => {
-      setRobotCardWidth(getElementProperty('width'))
-    }
     window.addEventListener('resize', handleResize)
-  })
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [handleResize])
 
   return robotName != null ? (
     <Flex
@@ -134,7 +138,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
           <Box
             display="grid"
             css={
-              robotCardWidth >= ROBOT_CARD_WRAP_SIZE
+              robotCardWidth == null || robotCardWidth >= ROBOT_CARD_WRAP_SIZE
                 ? { 'grid-template-columns': '4fr 1fr' }
                 : { 'grid-template-rows': '2fr 1fr' }
             }
@@ -188,7 +192,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
 }
 function AttachedPipettes(props: {
   robotName: string
-  robotCardWidth: number
+  robotCardWidth: number | null
 }): JSX.Element {
   const { robotName, robotCardWidth } = props
   const { t } = useTranslation('devices_landing')
@@ -198,7 +202,7 @@ function AttachedPipettes(props: {
     <Box
       display="grid"
       css={
-        robotCardWidth >= ROBOT_CARD_WRAP_SIZE
+        robotCardWidth == null || robotCardWidth >= ROBOT_CARD_WRAP_SIZE
           ? { 'grid-template-columns': '1fr 1fr' }
           : { 'grid-template-rows': '1fr' }
       }
