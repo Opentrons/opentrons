@@ -18,6 +18,7 @@ from opentrons.protocols.api_support.instrument import (
     validate_can_dispense,
 )
 from opentrons.protocols.api_support.labware_like import LabwareLike
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocols.api_support.util import (
     FlowRates,
@@ -675,7 +676,7 @@ class InstrumentContext(CommandPublisher):
         :param presses: The number of times to lower and then raise the pipette
                         when picking up a tip, to ensure a good seal (0 [zero]
                         will result in the pipette hovering over the tip but
-                        not picking it up--generally not desireable, but could
+                        not picking it up--generally not desirable, but could
                         be used for dry-run).
         :type presses: int
         :param increment: The additional distance to travel on each successive
@@ -683,12 +684,34 @@ class InstrumentContext(CommandPublisher):
                           the first press will travel down into the tip by
                           3.5mm, the second by 4.5mm, and the third by 5.5mm).
         :type increment: float
-        :param prep_after: If the pipette's plunger should be prepared to make
-                           an aspiration immediately after picking up a tip.
-                           Setting this to `True` will cause the pipette to
-                           move its plunger position to `bottom`, in preparation
-                           for any following calls to `.aspirate()`
+        :param prep_after: Whether the pipette plunger should prepare itself
+                           to aspirate immediately after picking up a tip.
+
+                           .. warning::
+                               This is provided for compatibility with older
+                               Python Protocol API behavior. You should normally
+                               leave this unset.
+
+                           If ``True``, the pipette will move its plunger position to
+                           bottom in preparation for any following calls to
+                           :py:meth:.aspirate.
+
+                           If ``False``, the pipette will prepare its plunger later,
+                           during the next call to :py:meth:.aspirate. This is
+                           accomplished by moving the tip to the top of the well,
+                           and positioning the plunger outside any potential liquids.
+
+                           .. warning::
+                               Setting ``prep_after=False`` may create an unintended
+                               pipette movement, when the pipette automatically moves
+                               the tip to the top of the well to prepare the plunger.
         :type prep_after: bool
+
+        .. versionchanged:: 2.13
+            ``prep_after=`` argument is added. API versions <2.13 can not prepare the
+            plunger for aspiration during :py:meth:.pick_up_tip, and will instead always
+            prepare during :py:meth:.aspirate. API versions <2.13 will raise an
+            ``APIVersionError`` if ``prep_after=`` is included as an argument.
 
         :returns: This instance
         """
@@ -719,8 +742,14 @@ class InstrumentContext(CommandPublisher):
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
         validate_tiprack(self.name, tiprack, logger)
 
+        prep_after_added_in = APIVersion(2, 13)
         if prep_after is None:
-            prep_after = (self.api_version > APIVersion(2, 12))
+            prep_after = self.api_version >= prep_after_added_in
+        elif self._api_version < prep_after_added_in:
+            raise APIVersionError(
+                f"prep_after is only available in API {prep_after_added_in} and newer,"
+                f" but you are using API {self._api_version}."
+            )
 
         with publish_context(
             broker=self.broker,
