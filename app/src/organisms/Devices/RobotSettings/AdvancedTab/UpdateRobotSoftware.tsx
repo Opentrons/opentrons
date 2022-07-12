@@ -7,12 +7,12 @@ import {
   Flex,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  Box,
   SPACING,
   SPACING_AUTO,
-  TYPOGRAPHY,
+  Box,
   Tooltip,
   useHoverTooltip,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../../atoms/text'
@@ -68,13 +68,12 @@ export function UpdateRobotSoftware({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginBottom={SPACING.spacing5}
+      marginBottom={SPACING.spacing4}
     >
       <Box width="70%">
         <StyledText
-          as="h2"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing4}
+          css={TYPOGRAPHY.pSemiBold}
+          marginBottom={SPACING.spacing2}
           id="AdvancedSettings_updateRobotSoftware"
         >
           {t('update_robot_software')}

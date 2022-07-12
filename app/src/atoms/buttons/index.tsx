@@ -140,9 +140,46 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
   }
 `
 
+const TOGGLE_DISABLED_STYLES = css`
+  color: ${COLORS.darkGreyEnabled};
+
+  &:hover {
+    color: ${COLORS.darkGreyHover};
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px ${COLORS.warning};
+  }
+
+  &:disabled {
+    colors: ${COLORS.greyDisabled};
+  }
+`
+
+const TOGGLE_ENABLED_STYLES = css`
+  color: ${COLORS.blue};
+
+  &:hover {
+    color: ${COLORS.blueHover};
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px ${COLORS.warning};
+  }
+
+  &:disabled {
+    colors: ${COLORS.greyDisabled};
+  }
+`
+
 export const ToggleButton = (props: ToggleBtnProps): JSX.Element => {
-  const color = props.toggledOn ? COLORS.blue : COLORS.darkGreyEnabled
-  return <ToggleBtn size={SIZE_2} color={color} {...props} />
+  return (
+    <ToggleBtn
+      size={SIZE_2}
+      css={props.toggledOn ? TOGGLE_ENABLED_STYLES : TOGGLE_DISABLED_STYLES}
+      {...props}
+    />
+  )
 }
 
 interface SubmitPrimaryButtonProps {

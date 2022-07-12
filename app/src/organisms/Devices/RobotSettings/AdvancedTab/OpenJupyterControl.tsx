@@ -34,9 +34,8 @@ export function OpenJupyterControl({
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
         <StyledText
-          as="h2"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing4}
+          css={TYPOGRAPHY.pSemiBold}
+          marginBottom={SPACING.spacing2}
           id="AdvancedSettings_About"
         >
           {t('jupyter_notebook')}
