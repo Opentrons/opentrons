@@ -80,7 +80,7 @@ const NavbarIcon = styled(Icon)`
   background-color: ${COLORS.transparent};
 
   &:hover {
-    background-color: ${COLORS.darkGreyHover};
+    background-color: ${COLORS.darkBlackHover};
   }
 
   &:focus-visible {
