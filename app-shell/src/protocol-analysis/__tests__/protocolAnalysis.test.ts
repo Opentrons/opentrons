@@ -48,13 +48,15 @@ describe('analyzeProtocolSource', () => {
     initializePython()
 
     expect(mockSelectPythonPath).toHaveBeenCalledWith('/some/override/python')
+    expect(mockHandleConfigChange).toHaveBeenCalledWith(
+      'python.pathToPythonOverride',
+      expect.any(Function)
+    )
 
     // the 'python.pathToPythonOverride' change handler
     const changeHandler = mockHandleConfigChange.mock.calls[0][1]
-    const otherOverridePath = '/some/other/path/to/python'
-    changeHandler(otherOverridePath, '/some/override/python')
-
-    expect(mockSelectPythonPath).toHaveBeenCalledWith(otherOverridePath)
+    changeHandler('/new/override/python', '/old/path/does/not/matter')
+    expect(mockSelectPythonPath).toHaveBeenCalledWith('/new/override/python')
   })
 
   it('should get the Python path and execute the analyze CLI with custom labware', () => {
