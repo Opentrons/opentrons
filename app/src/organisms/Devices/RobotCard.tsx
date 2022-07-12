@@ -66,7 +66,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   React.useEffect(() => {
     const handleResize = (): void => {
       setRobotCardWidth(getElementProperty('width'))
-      console.log('robotCard', robotCardWidth)
     }
     window.addEventListener('resize', handleResize)
   })
@@ -192,21 +191,6 @@ function AttachedPipettes(props: {
   const { robotName, robotCardWidth } = props
   const { t } = useTranslation('devices_landing')
   const attachedPipettes = useAttachedPipettes()
-  // const pipetteRef = React.useRef(null)
-  // const { getElementProperty } = useGetElementDOMRectProperty<HTMLDivElement>(
-  //   pipetteRef
-  // )
-  // const [pipetteWidth, setPipetteWidth] = React.useState<number>(
-  //   getElementProperty('width')
-  // )
-
-  // React.useEffect(() => {
-  //   const handleResize = (): void => {
-  //     setPipetteWidth(getElementProperty('width'))
-  //     console.log(pipetteWidth)
-  //   }
-  //   window.addEventListener('resize', handleResize)
-  // })
 
   return (
     <Box
