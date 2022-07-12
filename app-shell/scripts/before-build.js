@@ -8,7 +8,6 @@ const crypto = require('crypto')
 const execa = require('execa')
 const USE_PYTHON = process.env.NO_PYTHON !== 'true'
 
-
 const HOST_PYTHON = process.env.HOST_PYTHON ?? 'python3.10'
 
 const PYTHON_BY_PLATFORM = {
