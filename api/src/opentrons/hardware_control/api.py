@@ -499,12 +499,10 @@ class API(
         However, if the other mount is currently extended,
         both mounts will be homed.
         """
-        if mount is None or (
-            self._last_moved_mount is not None and self._last_moved_mount != mount
-        ):
-            axes = [Axis.Z, Axis.A]
-        else:
+        if mount is not None and self._last_moved_mount in [mount, None]:
             axes = [Axis.by_mount(mount)]
+        else:
+            axes = [Axis.Z, Axis.A]
 
         await self.home(axes)
         self._reset_last_mount()
