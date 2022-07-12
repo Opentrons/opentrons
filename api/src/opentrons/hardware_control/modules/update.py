@@ -200,18 +200,19 @@ async def upload_via_dfu(
         f"-D{firmware_file_path}",
         "-R",
     ]
-
     proc = await asyncio.create_subprocess_exec(*dfu_args, **kwargs)
-    return_code = proc.returncode
     stdout, stderr = await proc.communicate()
     res = stdout.decode()
-    if return_code == 0:
+
+    if "File downloaded successfully" in res:
         log.debug(res)
-        log.info("UPLOAD SUCCESSFUL")
+        log.info("Firmware upload successful")
         return True, res
     else:
         log.error(
-            f"Failed to update module firmware for Heater-Shaker dfu: {res}. "
-            f"Error given: {stderr.decode()}"
+            f"Failed to update module firmware for {dfu_serial}. "
+            # It isn't easy to decipher the issue from stderror alone
+            f"stdout: {res} \n"     
+            f"stderr: {stderr.decode()}"
         )
         return False, res
