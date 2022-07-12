@@ -76,7 +76,7 @@ export function ChooseRobotSlideout(
     runCreationError,
     reset: resetCreateRun,
     isCreatingRun,
-    isErrorCode409,
+    runCreationErrorCode,
   } = useCreateRunFromProtocol(
     {
       onSuccess: ({ data: runData }) => {
@@ -223,7 +223,7 @@ export function ChooseRobotSlideout(
                     marginTop={`-${SPACING.spacing2}`}
                     marginBottom={SPACING.spacing3}
                   >
-                    {isErrorCode409 ? (
+                    {runCreationErrorCode === 409 ? (
                       <Trans
                         t={t}
                         i18nKey="shared:robot_is_busy_no_protocol_run_allowed"

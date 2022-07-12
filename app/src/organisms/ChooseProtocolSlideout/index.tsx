@@ -70,7 +70,7 @@ export function ChooseProtocolSlideout(
     runCreationError,
     isCreatingRun,
     reset: resetCreateRun,
-    isErrorCode409,
+    runCreationErrorCode,
   } = useCreateRunFromProtocol({
     onSuccess: ({ data: runData }) => {
       history.push(`/devices/${name}/protocol-runs/${runData.id}`)
@@ -174,7 +174,7 @@ export function ChooseProtocolSlideout(
                   marginTop={`-${SPACING.spacing2}`}
                   marginBottom={SPACING.spacing3}
                 >
-                  {isErrorCode409 ? (
+                  {runCreationErrorCode === 409 ? (
                     <Trans
                       t={t}
                       i18nKey="shared:robot_is_busy_no_protocol_run_allowed"
