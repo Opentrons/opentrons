@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import isEqual from 'lodash/isEqual'
 import { getCommand } from '@opentrons/api-client'
@@ -20,10 +19,7 @@ import {
   useCurrentRunCommands,
   useCurrentProtocol,
 } from '../../ProtocolUpload/hooks'
-import {
-  useAttachedModules,
-  useProtocolDetailsForRun,
-} from '../../Devices/hooks'
+import { useProtocolDetailsForRun } from '../../Devices/hooks'
 import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
 import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
 import { useSteps } from './useSteps'
