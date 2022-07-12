@@ -17,7 +17,7 @@ Framework supporting the following:
 
 ### Acceptance Tests
 
-To run `g-code-testing` framework acceptance tests run 
+To run `g-code-testing` framework acceptance tests run
 
 ```bash
 make test
@@ -32,7 +32,7 @@ comparison files in `g_code_test_data/comparison_files`
 
 All G-Code program test cases that take under a minute are grouped together in one execution `test-g-code-fast`
 
-To run these run 
+To run these run
 
 ```bash
 make test-g-code-fast
@@ -43,9 +43,9 @@ make test-g-code-fast
 All G-Code program tests that take over a minute are pulled out into their own Makefile target so they can be called
 in parallel inside a Github Action.
 
-To run these run the specific make target related to the test. 
+To run these run the specific make target related to the test.
 
-For instance, to run the `swift-turbo` test run 
+For instance, to run the `swift-turbo` test run
 
 ```bash
 make test-g-code-swift-turbo
@@ -67,6 +67,7 @@ make get-g-code-configurations
 ```
 
 **Sample Output:**
+
 ```
 Runnable Configurations:
 http/robot_home_robot
@@ -128,7 +129,7 @@ make load-g-code-configuration-comparison name=protocol/swift_turbo
 
 ### Print Diff Between Comparison and Local Code
 
-To run the G-Code Program locally and print the diff between the result and the stored comparison use 
+To run the G-Code Program locally and print the diff between the result and the stored comparison use
 `diff-g-code-configuration-comparison`
 
 **Command:**
