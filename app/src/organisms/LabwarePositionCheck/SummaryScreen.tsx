@@ -4,15 +4,14 @@ import {
   ALIGN_START,
   DIRECTION_COLUMN,
   Flex,
+  Box,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
-  JUSTIFY_START,
   NewPrimaryBtn,
-  SPACING_3,
-  SPACING_2,
-  SPACING_4,
+  SPACING,
   Text,
   TEXT_TRANSFORM_UPPERCASE,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
@@ -73,35 +72,34 @@ export const SummaryScreen = (props: {
   }
 
   return (
-    <Flex margin={SPACING_3} flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+    >
       <Text
         as={'h3'}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
-        marginBottom={SPACING_3}
-        marginLeft={SPACING_3}
+        marginBottom={SPACING.spacing4}
+        marginLeft={SPACING.spacing4}
       >
         {t('lpc_complete_summary_screen_heading')}
       </Text>
-      <Flex justifyContent={JUSTIFY_START} alignItems={ALIGN_START}>
-        <Flex flex={'1 1 10%'} flexDirection={DIRECTION_COLUMN}>
-          <Flex paddingLeft={SPACING_4}>
-            <SectionList
-              primaryPipetteMount={primaryPipetteMount}
-              secondaryPipetteMount={secondaryPipetteMount}
-              sections={sections}
-              completedSections={sections}
-            />
-          </Flex>
-          <Flex paddingTop={SPACING_2}>
-            <DeckMap completedLabwareIds={labwareIds} />
-          </Flex>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_START}>
+        <Flex flex={'1 1 22%'} flexDirection={DIRECTION_COLUMN}>
+          <SectionList
+            primaryPipetteMount={primaryPipetteMount}
+            secondaryPipetteMount={secondaryPipetteMount}
+            sections={sections}
+            completedSections={sections}
+          />
+          <Box size={SPACING.spacing3} />
+          <DeckMap completedLabwareIds={labwareIds} />
         </Flex>
-        <Flex flex={'1 1 45%'}>
-          <LabwareOffsetsSummary offsetData={labwareOffsets} />
-        </Flex>
+        <Box size={SPACING.spacing3} />
+        <LabwareOffsetsSummary offsetData={labwareOffsets} />
       </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER} marginBottom={SPACING_4}>
+      <Flex justifyContent={JUSTIFY_CENTER} marginY={SPACING.spacing4}>
         <NewPrimaryBtn
           title={t('close_and_apply_offset_data')}
           id={'Lpc_summaryScreen_applyOffsetButton'}
