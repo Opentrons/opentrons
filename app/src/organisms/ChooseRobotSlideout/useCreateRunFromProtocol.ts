@@ -24,7 +24,7 @@ export interface UseCreateRun {
   >
   isCreatingRun: boolean
   runCreationError: string | null
-  runCreationErrorCode: string | null
+  runCreationErrorCode: number | null
   reset: () => void
 }
 
@@ -85,7 +85,8 @@ export function useCreateRunFromProtocol(
   error != null && console.error(error)
   error = error?.length > 255 ? t('protocol_run_general_error_msg') : error
 
-  const errorCode = protocolError?.code ?? runError?.code ?? null
+  const errorCode =
+    protocolError?.response?.status ?? runError?.response?.status ?? null
 
   return {
     createRunFromProtocolSource: (

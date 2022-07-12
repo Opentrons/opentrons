@@ -109,7 +109,7 @@ describe('ChooseProtocolSlideout', () => {
       createRunFromProtocolSource: mockCreateRunFromProtocol,
       isCreatingRun: false,
       reset: jest.fn(),
-      runCreationErrorCode: 'error code',
+      runCreationErrorCode: 500,
     })
     const [{ getByRole, getByText }] = render({
       robot: mockConnectableRobot,
@@ -131,7 +131,7 @@ describe('ChooseProtocolSlideout', () => {
       createRunFromProtocolSource: mockCreateRunFromProtocol,
       isCreatingRun: false,
       reset: jest.fn(),
-      runCreationErrorCode: '409',
+      runCreationErrorCode: 409,
     })
     const [{ getByRole, getByText }] = render({
       robot: mockConnectableRobot,
