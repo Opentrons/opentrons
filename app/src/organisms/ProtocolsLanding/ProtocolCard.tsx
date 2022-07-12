@@ -147,7 +147,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         height="auto"
         justifyContent={JUSTIFY_CENTER}
         alignItems={
-          getElementProperty('height') <= 880 ? ALIGN_START : ALIGN_CENTER
+          getElementProperty('width') <= 800 ? ALIGN_START : ALIGN_CENTER
         }
         data-testid={`ProtocolCard_deckLayout_${protocolDisplayName}`}
       >
