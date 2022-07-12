@@ -505,7 +505,6 @@ class API(
             axes = [Axis.Z, Axis.A]
 
         await self.home(axes)
-        self._reset_last_mount()
 
     async def _do_plunger_home(
         self,
