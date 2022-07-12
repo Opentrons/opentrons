@@ -9,7 +9,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   SPACING_AUTO,
-  DIRECTION_COLUMN,
+  Box,
   Tooltip,
   useHoverTooltip,
   TYPOGRAPHY,
@@ -70,7 +70,7 @@ export function UpdateRobotSoftware({
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       marginBottom={SPACING.spacing4}
     >
-      <Flex width="70%" flexDirection={DIRECTION_COLUMN}>
+      <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.pSemiBold}
           marginBottom={SPACING.spacing2}
@@ -82,7 +82,7 @@ export function UpdateRobotSoftware({
         <ExternalLink href={OT_APP_UPDATE_PAGE_LINK}>
           {t('update_robot_software_link')}
         </ExternalLink>
-      </Flex>
+      </Box>
       <TertiaryButton
         as="label"
         marginLeft={SPACING_AUTO}

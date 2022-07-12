@@ -6,7 +6,7 @@ import {
   Flex,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_COLUMN,
+  Box,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -46,7 +46,7 @@ export function ShortTrashBin({
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-      <Flex width="70%" flexDirection={DIRECTION_COLUMN}>
+      <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.pSemiBold}
           paddingBottom={SPACING.spacing2}
@@ -57,7 +57,7 @@ export function ShortTrashBin({
         <StyledText css={TYPOGRAPHY.pRegular}>
           {t('short_trash_bin_description')}
         </StyledText>
-      </Flex>
+      </Box>
       <ToggleButton
         label="short_trash_bin"
         toggledOn={settings?.value === true}

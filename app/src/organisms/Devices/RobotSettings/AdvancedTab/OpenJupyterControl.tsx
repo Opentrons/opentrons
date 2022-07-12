@@ -6,7 +6,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  DIRECTION_COLUMN,
+  Box,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useTrackEvent } from '../../../../redux/analytics'
@@ -32,7 +32,7 @@ export function OpenJupyterControl({
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-      <Flex width="70%" flexDirection={DIRECTION_COLUMN}>
+      <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.pSemiBold}
           marginBottom={SPACING.spacing2}
@@ -44,7 +44,7 @@ export function OpenJupyterControl({
         <ExternalLink href={JUPYTER_NOTEBOOK_LINK}>
           {t('jupyter_notebook_link')}
         </ExternalLink>
-      </Flex>
+      </Box>
       <TertiaryButton
         onClick={() => trackEvent(EVENT_JUPYTER_OPEN)}
         as={Link}

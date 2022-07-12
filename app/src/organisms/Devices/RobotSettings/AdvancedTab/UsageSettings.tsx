@@ -8,7 +8,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
-  DIRECTION_COLUMN,
+  Box,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../../atoms/text'
@@ -50,7 +50,7 @@ export function UsageSettings({
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       marginTop="2.5rem"
     >
-      <Flex width="70%" flexDirection={DIRECTION_COLUMN}>
+      <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.h2SemiBold}
           marginBottom={SPACING.spacing4}
@@ -62,7 +62,7 @@ export function UsageSettings({
           {t('pause_protocol')}
         </StyledText>
         <StyledText as="p">{t('pause_protocol_description')}</StyledText>
-      </Flex>
+      </Box>
       <ToggleButton
         label="usage_settings_pause_protocol"
         toggledOn={settings?.value === true}

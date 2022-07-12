@@ -28,9 +28,9 @@ export interface SelectFieldProps {
   /** if included, use error style and display error instead of caption */
   error?: string | null
   /** change handler called with (name, value) */
-  onValueChange?: (name: string, value: string) => unknown
+  onValueChange: (name: string, value: string) => void
   /** blur handler called with (name) */
-  onLoseFocus?: (name: string) => unknown
+  onLoseFocus?: (name: string) => void
 }
 
 const CAPTION_STYLE = css`

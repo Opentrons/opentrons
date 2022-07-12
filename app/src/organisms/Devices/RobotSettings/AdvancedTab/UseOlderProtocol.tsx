@@ -7,7 +7,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  DIRECTION_COLUMN,
+  Box,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -49,7 +49,7 @@ export function UseOlderProtocol({
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       marginBottom={SPACING.spacing4}
     >
-      <Flex width="70%" flexDirection={DIRECTION_COLUMN}>
+      <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.pSemiBold}
           paddingBottom={SPACING.spacing2}
@@ -60,7 +60,7 @@ export function UseOlderProtocol({
         <StyledText as="p">
           {t('use_older_protocol_analysis_method_description')}
         </StyledText>
-      </Flex>
+      </Box>
       <ToggleButton
         label="use_older_protocol_analysis_method"
         toggledOn={settings?.value === true}
