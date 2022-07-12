@@ -22,7 +22,8 @@ from opentrons.protocols.api_support.util import (
 )
 from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.api_support.types import APIVersion
-from .labware import Labware, OutOfTipsError, Well, next_available_tip
+from .labware import Labware, OutOfTipsError, Well
+from opentrons.protocol_api import labware
 from opentrons.protocols.advanced_control import transfers
 
 if TYPE_CHECKING:
@@ -694,8 +695,9 @@ class InstrumentContext(publisher.CommandPublisher):
             tiprack = location.parent
             target = location
             move_to_location = target.top()
+            print(target)
         elif not location:
-            tiprack, target = next_available_tip(
+            tiprack, target = labware.next_available_tip(
                 self.starting_tip, self.tip_racks, self.channels
             )
             move_to_location = target.top()
@@ -1093,7 +1095,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 blow_out_strategy = transfers.BlowOutStrategy.TRASH
 
         if new_tip != types.TransferTipPolicy.NEVER:
-            tr, next_tip = next_available_tip(
+            tr, next_tip = labware.next_available_tip(
                 self.starting_tip, self.tip_racks, self.channels
             )
             max_volume = min(next_tip.max_volume, self.max_volume)
