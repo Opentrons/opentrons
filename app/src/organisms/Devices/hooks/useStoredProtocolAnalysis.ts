@@ -25,22 +25,9 @@ export interface StoredProtocolAnalysis extends ProtocolAnalysisOutput {
   labwareDefinitions: LoadedLabwareDefinitionsById
 }
 
-export function useStoredProtocolAnalysis(
-  runId: string | null
-): StoredProtocolAnalysis | null {
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
-  const protocolId = runRecord?.data?.protocolId ?? null
-
-  const { data: protocolRecord } = useProtocolQuery(protocolId, {
-    staleTime: Infinity,
-  })
-
-  const protocolKey = protocolRecord?.data?.key
-
-  const storedProtocolAnalysis =
-    useSelector((state: State) => getStoredProtocol(state, protocolKey))
-      ?.mostRecentAnalysis ?? null
-
+export const parseProtocolAnalysisOutput = (
+  storedProtocolAnalysis: ProtocolAnalysisOutput | null
+): StoredProtocolAnalysis | null => {
   const pipettesNamesById = parseInitialPipetteNamesById(
     storedProtocolAnalysis?.commands ?? []
   )
@@ -63,4 +50,23 @@ export function useStoredProtocolAnalysis(
         labwareDefinitions: labwareDefinitionsById,
       }
     : null
+}
+
+export function useStoredProtocolAnalysis(
+  runId: string | null
+): StoredProtocolAnalysis | null {
+  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const protocolId = runRecord?.data?.protocolId ?? null
+
+  const { data: protocolRecord } = useProtocolQuery(protocolId, {
+    staleTime: Infinity,
+  })
+
+  const protocolKey = protocolRecord?.data?.key
+
+  const storedProtocolAnalysis =
+    useSelector((state: State) => getStoredProtocol(state, protocolKey))
+      ?.mostRecentAnalysis ?? null
+
+  return parseProtocolAnalysisOutput(storedProtocolAnalysis)
 }

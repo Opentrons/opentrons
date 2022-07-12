@@ -686,7 +686,7 @@ const HEATER_SHAKER_MODULE_INFO = {
   slotName: '1',
 }
 
-describe('useProtocolMetadata', () => {
+describe('useIsHeaterShakerInProtocol', () => {
   const store: Store<State> = createStore(jest.fn(), {})
 
   beforeEach(() => {

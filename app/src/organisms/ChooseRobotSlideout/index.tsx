@@ -38,6 +38,7 @@ import { PrimaryButton } from '../../atoms/buttons'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
 import { StoredProtocolData } from '../../redux/protocol-storage'
+import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { AvailableRobotOption } from './AvailableRobotOption'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 
@@ -58,6 +59,10 @@ export function ChooseRobotSlideout(
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
   const isScanning = useSelector((state: State) => getScanning(state))
+
+  const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
+    storedProtocolData
+  )
 
   const unhealthyReachableRobots = useSelector((state: State) =>
     getReachableRobots(state)
@@ -81,15 +86,26 @@ export function ChooseRobotSlideout(
     {
       onSuccess: ({ data: runData }) => {
         if (selectedRobot != null) {
+          trackCreateProtocolRunEvent({
+            name: 'createProtocolRecordResponse',
+            properties: { success: true },
+          })
           history.push(
             `/devices/${selectedRobot.name}/protocol-runs/${runData.id}`
           )
         }
       },
+      onError: (error: Error) => {
+        trackCreateProtocolRunEvent({
+          name: 'createProtocolRecordResponse',
+          properties: { success: false, error: error.message },
+        })
+      },
     },
     selectedRobot != null ? { hostname: selectedRobot.ip } : null
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
+    trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
     createRunFromProtocolSource({ files: srcFileObjects, protocolKey })
   }
 

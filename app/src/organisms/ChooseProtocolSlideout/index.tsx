@@ -30,6 +30,7 @@ import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
+import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { useCreateRunFromProtocol } from '../ChooseRobotSlideout/useCreateRunFromProtocol'
 
 import type { Robot } from '../../redux/discovery/types'
@@ -57,6 +58,10 @@ export function ChooseProtocolSlideout(
     setSelectedProtocol,
   ] = React.useState<StoredProtocolData | null>(first(storedProtocols) ?? null)
 
+  const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
+    selectedProtocol
+  )
+
   const srcFileObjects =
     selectedProtocol != null
       ? selectedProtocol.srcFiles.map((srcFileBuffer, index) => {
@@ -73,12 +78,23 @@ export function ChooseProtocolSlideout(
     runCreationErrorCode,
   } = useCreateRunFromProtocol({
     onSuccess: ({ data: runData }) => {
+      trackCreateProtocolRunEvent({
+        name: 'createProtocolRecordResponse',
+        properties: { success: true },
+      })
       history.push(`/devices/${name}/protocol-runs/${runData.id}`)
+    },
+    onError: (error: Error) => {
+      trackCreateProtocolRunEvent({
+        name: 'createProtocolRecordResponse',
+        properties: { success: false, error: error.message },
+      })
     },
   })
 
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     if (selectedProtocol != null) {
+      trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
       createRunFromProtocolSource({
         files: srcFileObjects,
         protocolKey: selectedProtocol.protocolKey,
