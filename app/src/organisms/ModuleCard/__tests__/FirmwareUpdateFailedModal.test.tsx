@@ -26,6 +26,9 @@ describe('FirmwareUpdateFailedModal', () => {
   it('should render the correct header and body', () => {
     const { getByText } = render(props)
     getByText('Failed to update module firmware')
+    getByText(
+      'An error occurred while updating your Temperature Module GEN1. Please try again.'
+    )
     getByText('error message')
   })
   it('should call onCloseClick when the close button is pressed', () => {
