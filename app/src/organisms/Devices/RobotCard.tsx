@@ -46,6 +46,8 @@ const ROBOT_CARD_STYLE = css`
   }
 `
 
+const ROBOT_CARD_WRAP_SIZE = 650
+
 interface RobotCardProps {
   robot: DiscoveredRobot
 }
@@ -132,7 +134,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
           <Box
             display="grid"
             css={
-              robotCardWidth >= 650
+              robotCardWidth >= ROBOT_CARD_WRAP_SIZE
                 ? { 'grid-template-columns': '4fr 1fr' }
                 : { 'grid-template-rows': '2fr 1fr' }
             }
@@ -197,7 +199,7 @@ function AttachedPipettes(props: {
       // ref={pipetteRef}
       display="grid"
       css={
-        robotCardWidth >= 650
+        robotCardWidth >= ROBOT_CARD_WRAP_SIZE
           ? { 'grid-template-columns': '1fr 1fr' }
           : { 'grid-template-rows': '1fr' }
       }
