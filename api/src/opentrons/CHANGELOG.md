@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.1...v6.0.0-beta.2) (2022-07-12)
+
+
+### Bug Fixes
+
+* **engine:** do not allow completed timestamp to change once set ([#11055](https://github.com/Opentrons/opentrons/issues/11055)) ([b413d40](https://github.com/Opentrons/opentrons/commit/b413d40312715fceeabe6b873640d6c892a65501))
+
+
+
+
+
 # [6.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.5...v6.0.0-beta.1) (2022-07-06)
 
 **Note:** Version bump only for package @opentrons/api-server

@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.1...v6.0.0-beta.2) (2022-07-12)
+
+
+### Bug Fixes
+
+* **app:** Address Labware import slideout design feedback ([#10994](https://github.com/Opentrons/opentrons/issues/10994)) ([6943c37](https://github.com/Opentrons/opentrons/commit/6943c37e5fadab983b10366b69ea7706a5c587f8)), closes [#10926](https://github.com/Opentrons/opentrons/issues/10926)
+* **app:** Address labware landing page design feedback ([#10957](https://github.com/Opentrons/opentrons/issues/10957)) ([6baaa46](https://github.com/Opentrons/opentrons/commit/6baaa46169d6f6e7907a1bf75b88719cbccf729c)), closes [#10905](https://github.com/Opentrons/opentrons/issues/10905)
+* **app:** Address protocols landing design feedback ([#10993](https://github.com/Opentrons/opentrons/issues/10993)) ([1e83a0f](https://github.com/Opentrons/opentrons/commit/1e83a0f0a0ab0977d2accca9db0f67485e29de49)), closes [#10767](https://github.com/Opentrons/opentrons/issues/10767) [#10208](https://github.com/Opentrons/opentrons/issues/10208) [#10208](https://github.com/Opentrons/opentrons/issues/10208)
+* **app:** change error text when creation error is run is busy ([#11069](https://github.com/Opentrons/opentrons/issues/11069)) ([b9f2ba4](https://github.com/Opentrons/opentrons/commit/b9f2ba4436a20758f7dcb3356b54ba3f0a0060c9)), closes [#11060](https://github.com/Opentrons/opentrons/issues/11060)
+* **app:** disable protocol runs when robot update available ([#11050](https://github.com/Opentrons/opentrons/issues/11050)) ([3618c9a](https://github.com/Opentrons/opentrons/commit/3618c9a73c7bb751413f435925ff9b53e52765ad)), closes [#10935](https://github.com/Opentrons/opentrons/issues/10935)
+* **app:** fix jump to current step when outside current window ([#11052](https://github.com/Opentrons/opentrons/issues/11052)) ([eb8cf4c](https://github.com/Opentrons/opentrons/commit/eb8cf4c3c31442822fd01bf487a066719ba4f73c)), closes [#10898](https://github.com/Opentrons/opentrons/issues/10898)
+* **app:** fix labware info overlay styling with vector ([#11008](https://github.com/Opentrons/opentrons/issues/11008)) ([ebe2ed5](https://github.com/Opentrons/opentrons/commit/ebe2ed559d0e5180a14f57250a7c1be5bc4acbc3)), closes [#10942](https://github.com/Opentrons/opentrons/issues/10942)
+* **app:** historical runs labware offset should list display names ([#11064](https://github.com/Opentrons/opentrons/issues/11064)) ([09fbb1f](https://github.com/Opentrons/opentrons/commit/09fbb1fb76e103af6378693f043f7db8ac1fc465)), closes [#11062](https://github.com/Opentrons/opentrons/issues/11062)
+* **app:** protocol run page design qa ([#11013](https://github.com/Opentrons/opentrons/issues/11013)) ([529a0d4](https://github.com/Opentrons/opentrons/commit/529a0d40f4a78b2237dc85b76bc75b730d291d15))
+* **app:** remove focus state in nav on app load ([#11068](https://github.com/Opentrons/opentrons/issues/11068)) ([ace77fd](https://github.com/Opentrons/opentrons/commit/ace77fd5417e4b21602eb1fa155b84b4924d2b01))
+* **app:** render LPC summary data as a table to prevent misalignment ([#11084](https://github.com/Opentrons/opentrons/issues/11084)) ([331c52e](https://github.com/Opentrons/opentrons/commit/331c52ec6bc926e06ecb4536dfb6a6f4732185f9)), closes [#11077](https://github.com/Opentrons/opentrons/issues/11077)
+* **app:** this will fix [#11028](https://github.com/Opentrons/opentrons/issues/11028) ([#11053](https://github.com/Opentrons/opentrons/issues/11053)) ([7497d68](https://github.com/Opentrons/opentrons/commit/7497d683e143f00d20d90bb4c912ff74c46b4926))
+* **engine:** do not allow completed timestamp to change once set ([#11055](https://github.com/Opentrons/opentrons/issues/11055)) ([b413d40](https://github.com/Opentrons/opentrons/commit/b413d40312715fceeabe6b873640d6c892a65501))
+
+
+### Features
+
+* **app:** device Details design qa round 2 and fix card overflow btn bugs ([#11054](https://github.com/Opentrons/opentrons/issues/11054)) ([2804048](https://github.com/Opentrons/opentrons/commit/280404814882be82f12ea0b2d9b2ca8c9ea405b1)), closes [#10892](https://github.com/Opentrons/opentrons/issues/10892)
+
+
+
+
+
 # [6.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.5...v6.0.0-beta.1) (2022-07-06)
 
 **Note:** Version bump only for package opentrons

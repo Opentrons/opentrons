@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.1...v6.0.0-beta.2) (2022-07-12)
+
+
+### Bug Fixes
+
+* **app:** Address labware landing page design feedback ([#10957](https://github.com/Opentrons/opentrons/issues/10957)) ([6baaa46](https://github.com/Opentrons/opentrons/commit/6baaa46169d6f6e7907a1bf75b88719cbccf729c)), closes [#10905](https://github.com/Opentrons/opentrons/issues/10905)
+* **app:** Address protocols landing design feedback ([#10993](https://github.com/Opentrons/opentrons/issues/10993)) ([1e83a0f](https://github.com/Opentrons/opentrons/commit/1e83a0f0a0ab0977d2accca9db0f67485e29de49)), closes [#10767](https://github.com/Opentrons/opentrons/issues/10767) [#10208](https://github.com/Opentrons/opentrons/issues/10208) [#10208](https://github.com/Opentrons/opentrons/issues/10208)
+* **app:** fix labware info overlay styling with vector ([#11008](https://github.com/Opentrons/opentrons/issues/11008)) ([ebe2ed5](https://github.com/Opentrons/opentrons/commit/ebe2ed559d0e5180a14f57250a7c1be5bc4acbc3)), closes [#10942](https://github.com/Opentrons/opentrons/issues/10942)
+* **app:** historical runs labware offset should list display names ([#11064](https://github.com/Opentrons/opentrons/issues/11064)) ([09fbb1f](https://github.com/Opentrons/opentrons/commit/09fbb1fb76e103af6378693f043f7db8ac1fc465)), closes [#11062](https://github.com/Opentrons/opentrons/issues/11062)
+
+
+
+
+
 # [6.0.0-beta.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.5...v6.0.0-beta.1) (2022-07-06)
 
 **Note:** Version bump only for package @opentrons/components
