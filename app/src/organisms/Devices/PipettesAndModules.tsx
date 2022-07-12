@@ -25,7 +25,7 @@ import { ModuleCard } from '../ModuleCard'
 import { useIsRobotViewable, useRunStatuses } from './hooks'
 import { PipetteCard } from './PipetteCard'
 
-const MIN_HEIGHT_OVER_3_STYLING = css`
+export const MIN_HEIGHT_OVER_3_STYLING = css`
   max-height: 37rem;
 
   @media (min-width: 700px) {
@@ -41,7 +41,7 @@ const MIN_HEIGHT_OVER_3_STYLING = css`
   }
 `
 
-const MIN_HEIGHT_UNDER_3_STYLING = css`
+export const MIN_HEIGHT_UNDER_3_STYLING = css`
   max-height: 29rem;
 
   @media (min-width: 700px) {

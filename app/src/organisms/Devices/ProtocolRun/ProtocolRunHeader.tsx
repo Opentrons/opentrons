@@ -439,7 +439,7 @@ export function ProtocolRunHeader({
           </StyledText>
         </Box>
         <Box marginLeft={SPACING_AUTO}>
-          {showCancelButton != null && (
+          {showCancelButton && (
             <SecondaryButton
               style={{
                 color: `${COLORS.errorText}`,
