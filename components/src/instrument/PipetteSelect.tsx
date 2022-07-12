@@ -12,12 +12,16 @@ import styles from './PipetteSelect.css'
 
 import type { SelectOption } from '../forms'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
+import type { ActionMeta, SingleValue, MultiValue } from 'react-select'
 
 export interface PipetteSelectProps {
   /** currently selected value, optional in case selecting triggers immediate action */
   pipetteName?: string | null
   /** react-select change handler */
-  onPipetteChange: (pipetteName: string | null) => unknown
+  onPipetteChange: (
+    pipetteName: string | null,
+    e: ActionMeta<SelectOption>
+  ) => unknown
   /** list of pipette names to omit */
   nameBlocklist?: string[]
   /** whether or not "None" shows up as the default option */
@@ -86,12 +90,16 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
       options={groupedOptions}
       value={value}
       defaultValue={defaultValue}
-      tabIndex={tabIndex as string}
+      tabIndex={tabIndex as number}
       id={id}
-      onChange={option => {
-        // TODO(mc, 2021-03-19): use optional chaining
-        const value = option && option.value ? option.value : null
-        props.onPipetteChange(value)
+      onChange={(
+        option: SingleValue<SelectOption> | MultiValue<SelectOption>,
+        e: ActionMeta<SelectOption>
+      ) => {
+        const value = (option as SelectOption).value
+          ? (option as SelectOption).value
+          : null
+        props.onPipetteChange(value, e)
       }}
       formatOptionLabel={(option, { context }) => {
         const { value } = option

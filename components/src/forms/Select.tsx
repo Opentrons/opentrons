@@ -10,7 +10,7 @@ import type { CSSObject } from 'styled-components'
 import type {
   Props as ReactSelectProps,
   MenuProps,
-  IndicatorProps,
+  DropdownIndicatorProps,
 } from 'react-select'
 
 export { reactSelectComponents }
@@ -71,7 +71,11 @@ const CLEAR_STYLES = {
   groupHeading: NO_STYLE_FN,
   indicatorsContainer: NO_STYLE_FN,
   indicatorSeparator: NO_STYLE_FN,
-  input: NO_STYLE_FN,
+  input: (styles: any) => ({
+    ...styles,
+    zIndex: 2,
+    position: 'absolute',
+  }),
   loadingIndicator: NO_STYLE_FN,
   loadingMessage: NO_STYLE_FN,
   menu: NO_STYLE_FN,
@@ -102,7 +106,7 @@ export function Select(props: SelectProps): JSX.Element {
 }
 
 function DropdownIndicator(
-  props: IndicatorProps<SelectOption, false>
+  props: DropdownIndicatorProps<SelectOption>
 ): JSX.Element {
   return (
     <reactSelectComponents.DropdownIndicator {...props}>
@@ -117,10 +121,7 @@ function DropdownIndicator(
   )
 }
 
-// TODO(bc, 2021-03-09): reactSelectComponents.Menu children type expects single element
-// add do nothing <> fragment around contents to satisfy react select type
-const Menu = (props: MenuProps<SelectOption, false>): JSX.Element => (
-  /* @ts-expect-error(mc, 2021-03-19): investigate this error, as Menu might require a single child */
+const Menu = (props: MenuProps<SelectOption>): JSX.Element => (
   <reactSelectComponents.Menu {...props}>
     <div className={styles.menu}>{props.children}</div>
     <div className={styles.menu_control_bridge} />
