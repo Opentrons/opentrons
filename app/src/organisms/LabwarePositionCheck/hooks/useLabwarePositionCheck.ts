@@ -8,7 +8,6 @@ import {
   getLabwareDefIsStandard,
   getLabwareDisplayName,
   IDENTITY_VECTOR,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   useHost,
@@ -16,7 +15,6 @@ import {
   useCreateCommandMutation,
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../redux/analytics'
-import { sendModuleCommand } from '../../../redux/modules'
 import {
   useCurrentRunId,
   useCurrentRunCommands,
@@ -558,27 +556,13 @@ export function useLabwarePositionCheck(
 
     // execute prep commands
     prepCommands.forEach(prepCommand => {
-      // 11/18/21 intercept TCOpenLidCommand and use legacy modules endpoint
-      // delete this once PE supports themocycler open lid command
-      if (prepCommand.commandType === 'thermocycler/openLid') {
-        const serial = attachedModules.find(
-          module => module.moduleType === THERMOCYCLER_MODULE_TYPE
-        )?.serialNumber
-        if (serial == null) {
-          throw new Error(
-            'Expected to be able to find thermocycler serial number, but could not.'
-          )
-        }
-        dispatch(sendModuleCommand(robotName, serial, 'open'))
-      } else {
-        createCommand({
-          runId: currentRunId,
-          command: createCommandData(prepCommand),
-        }).catch((e: Error) => {
-          console.error(`error issuing command to robot: ${e.message}`)
-          setError(e)
-        })
-      }
+      createCommand({
+        runId: currentRunId,
+        command: createCommandData(prepCommand),
+      }).catch((e: Error) => {
+        console.error(`error issuing command to robot: ${e.message}`)
+        setError(e)
+      })
     })
     // issue first movement command
     createCommand({
