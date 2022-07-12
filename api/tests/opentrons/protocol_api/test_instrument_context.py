@@ -221,7 +221,6 @@ def test_pick_up_from_well(
 ) -> None:
     """Should pick up tip from supplied well location top."""
     expected_location = Location(Point(0, 0, 0), mock_well)
-    # input_location = Well(mock_well_implementation)
 
     decoy.when(subject._ctx._modules).then_return([])
     decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=0)).then_return(
@@ -229,10 +228,7 @@ def test_pick_up_from_well(
     )
 
     decoy.when(mock_well.parent).then_return(mock_labware)
-    # TODO (tz, 7-11-22): Do I need this? failing on tiprack printing as str
-    decoy.when(mock_labware.is_tiprack()).then_return(True)
-    decoy.when(mock_labware._is_tiprack).then_return(True)
-    decoy.when(mock_abstract_labware.is_tiprack()).then_return(True)
+    decoy.when(mock_well.top()).then_return(expected_location)
 
     subject.pick_up_tip(location=mock_well)
 
