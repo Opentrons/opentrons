@@ -15,11 +15,6 @@
     "url": "https://github.com/Opentrons/opentrons/issues"
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
-  "workspaces": {
-    "nohoist": [
-      "**/react-select/**"
-    ]
-  },
   "peerDependencies": {
     "react": "17.0.1",
     "react-router-dom": "5.1.1"
