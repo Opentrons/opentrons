@@ -1,1 +1,0 @@
-"""Gravimetric Test support package."""

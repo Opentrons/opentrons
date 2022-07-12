@@ -9,7 +9,11 @@ from typing import Any, Optional, Set
 from opentrons.types import Point
 from opentrons.calibration_storage.types import GripperCalibrationOffset
 from opentrons.config import gripper_config
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.types import (
+    CriticalPoint,
+    GripperJawState,
+    InvalidMoveError,
+)
 from .instrument_abc import AbstractInstrument
 from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
 
@@ -37,14 +41,38 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
         self._config = config
         self._name = self._config.name
         self._model = self._config.model
+        base_offset = Point(*self._config.base_offset_from_mount)
+        self._jaw_center_offset = (
+            Point(*self._config.jaw_center_offset_from_base) + base_offset
+        )
+        #: the distance between the gripper mount and the jaw center at home
+        self._front_calibration_pin_offset = (
+            Point(*self._config.pin_one_offset_from_base) + base_offset
+        )
+        #: the distance between the gripper mount and the front calibration pin
+        #: at home
+        self._back_calibration_pin_offset = (
+            Point(*self._config.pin_two_offset_from_base) + base_offset
+        )
+        #: the distance between the gripper mount and the back calibration pin
+        #: at home
         self._calibration_offset = gripper_cal_offset
+        #: The output value of calibration - the additional vector added into
+        #: the critical point geometry based on gripper mount calibration
         self._gripper_id = gripper_id
-        self._has_gripped = False
-        self._ready_to_grip = False
+        self._state = GripperJawState.UNHOMED
         self._log = mod_log.getChild(self._gripper_id)
         self._log.info(
             f"loaded: {self._model}, gripper offset: {self._calibration_offset}"
         )
+
+    @property
+    def state(self) -> GripperJawState:
+        return self._state
+
+    @state.setter
+    def state(self, s: GripperJawState) -> None:
+        self._state = s
 
     @property
     def config(self) -> gripper_config.GripperConfig:
@@ -73,12 +101,28 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
 
     def critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
         """
-        The vector from the gripper's origin to its critical point. The
-        critical point for a pipette is the end of the nozzle if no tip is
-        attached, or the end of the tip if a tip is attached.
+        The vector from the gripper mount to the critical point, which is selectable
+        between the center of the gripper engagement volume and the calibration pins.
         """
-        # TODO: add critical point implementation
-        return Point(0, 0, 0)
+        if cp_override == CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN:
+            return self._front_calibration_pin_offset + Point(
+                *self._calibration_offset.offset
+            )
+        elif cp_override == CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN:
+            return self._back_calibration_pin_offset + Point(
+                *self._calibration_offset.offset
+            )
+        elif cp_override == CriticalPoint.GRIPPER_JAW_CENTER or not cp_override:
+            return self._jaw_center_offset + Point(*self._calibration_offset.offset)
+        else:
+            raise InvalidMoveError(
+                f"Critical point {cp_override.name} is not valid for a gripper"
+            )
+
+    def duty_cycle_by_force(self, newton: float) -> float:
+        return gripper_config.piecewise_force_conversion(
+            newton, self.config.jaw_force_per_duty_cycle
+        )
 
     def __str__(self) -> str:
         return f"{self._config.display_name}"
@@ -92,8 +136,7 @@ class Gripper(AbstractInstrument[gripper_config.GripperConfig]):
             "model": self._config.model,
             "gripper_id": self._gripper_id,
             "display_name": self._config.display_name,
-            "has_gripped": self._has_gripped,
-            "ready_to_grip": self._ready_to_grip,
+            "state": self._state,
         }
         return d
 

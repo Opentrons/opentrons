@@ -63,6 +63,8 @@ function mapStateToProps(state: BaseState): SP {
     name: selectedIngredFields.name,
     // @ts-expect-error(sa, 2021-6-22): description might not exist
     description: selectedIngredFields.description,
+    // @ts-expect-error(sh, 2022-6-28): displayColor might not exist
+    displayColor: selectedIngredFields.displayColor,
     // @ts-expect-error(sa, 2021-6-22): serialize might not exist
     serialize: selectedIngredFields.serialize,
   }
