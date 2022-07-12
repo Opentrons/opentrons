@@ -196,7 +196,6 @@ function AttachedPipettes(props: {
 
   return (
     <Box
-      // ref={pipetteRef}
       display="grid"
       css={
         robotCardWidth >= ROBOT_CARD_WRAP_SIZE
