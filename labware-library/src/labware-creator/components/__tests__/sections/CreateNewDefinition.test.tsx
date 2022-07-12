@@ -30,7 +30,7 @@ describe('CreateNewDefinition', () => {
 
     getByTestId('fakeChildField')
 
-    const labwareTypeDropdown = getByRole('combobox', {
+    const labwareTypeDropdown = getByRole('textbox', {
       name: /what type of labware are you creating\?.*/i,
     })
     expect(labwareTypeDropdown).toHaveValue('')
@@ -64,6 +64,6 @@ describe('CreateNewDefinition', () => {
       wrapInFormik(<CreateNewDefinition {...props} />, formikConfig)
     )
 
-    expect(queryByRole('combobox')).toBe(null)
+    expect(queryByRole('textbox')).toBe(null)
   })
 })

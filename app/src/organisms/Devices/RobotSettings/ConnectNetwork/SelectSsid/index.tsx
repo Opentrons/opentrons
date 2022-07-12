@@ -1,11 +1,14 @@
 import * as React from 'react'
+import styled from 'styled-components'
 
-import { CONTEXT_MENU } from '@opentrons/components'
-import { SelectField } from '../../../../../atoms/SelectField'
+import { SelectField, CONTEXT_MENU } from '@opentrons/components'
 import * as Copy from '../i18n'
 import { NetworkOptionLabel, NetworkActionLabel } from './NetworkOptionLabel'
 
-import type { SelectOptionOrGroup } from '@opentrons/components'
+import type {
+  SelectFieldProps,
+  SelectOptionOrGroup,
+} from '@opentrons/components'
 
 import type { WifiNetwork } from '../types'
 
@@ -35,6 +38,12 @@ const makeSelectDisconnectGroup = (
     { value: DISCONNECT_WIFI_VALUE, label: Copy.DISCONNECT_FROM_SSID(ssid) },
   ],
 })
+
+const StyledSelectField: React.ComponentType<SelectFieldProps> = styled(
+  SelectField
+)`
+  max-width: 16.875rem;
+`
 
 const formatOptions = (
   list: WifiNetwork[],
@@ -74,7 +83,7 @@ export function SelectSsid(props: SelectSsidProps): JSX.Element {
   }
 
   const formatOptionLabel: React.ComponentProps<
-    typeof SelectField
+    typeof StyledSelectField
   >['formatOptionLabel'] = (option, { context }): JSX.Element | null => {
     const { value, label } = option
 
@@ -94,7 +103,7 @@ export function SelectSsid(props: SelectSsidProps): JSX.Element {
   }
 
   return (
-    <SelectField
+    <StyledSelectField
       name={FIELD_NAME}
       value={value}
       options={formatOptions(list, showWifiDisconnect)}

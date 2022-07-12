@@ -86,11 +86,10 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
       options={groupedOptions}
       value={value}
       defaultValue={defaultValue}
-      tabIndex={tabIndex as number}
+      tabIndex={tabIndex as string}
       id={id}
       onChange={option => {
         // TODO(mc, 2021-03-19): use optional chaining
-        //  @ts-expect-error(jr 7/11/22): multi select will not happen, resolve this error
         const value = option && option.value ? option.value : null
         props.onPipetteChange(value)
       }}

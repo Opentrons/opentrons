@@ -259,7 +259,6 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
             <Select
               className={styles.select_tiprack_menu}
               options={groupOptions}
-              //  @ts-expect-error(jr 7/11/22): multi select will not happen, resolve this error
               onChange={handleValueChange}
               value={selectedValue}
             />
