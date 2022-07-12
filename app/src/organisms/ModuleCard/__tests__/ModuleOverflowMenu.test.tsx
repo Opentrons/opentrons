@@ -395,7 +395,7 @@ describe('ModuleOverflowMenu', () => {
     const { getByRole } = render(props)
 
     const btn = getByRole('button', {
-      name: 'Deactivate',
+      name: 'Deactivate heater',
     })
     expect(btn).not.toBeDisabled()
     fireEvent.click(btn)
