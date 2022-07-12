@@ -102,8 +102,6 @@ def subject(
     )
 
     decoy.when(subject.channels).then_return(0)
-    # decoy.when(subject.starting_tip).then_return(None)
-    # decoy.when(subject.tip_racks).then_return([mock_labware])
 
     return subject
 
@@ -117,14 +115,11 @@ def mock_well(decoy: Decoy) -> Well:
 def mock_abstract_labware(decoy: Decoy) -> AbstractLabware:
     return decoy.mock(cls=AbstractLabware)
 
-# @pytest.fixture
-# def mock_labware(decoy: Decoy, mock_abstract_labware: AbstractLabware) -> Labware:
-#     return Labware(implementation=mock_abstract_labware)
-
 
 @pytest.fixture
 def mock_labware(decoy: Decoy, mock_abstract_labware: AbstractLabware) -> Labware:
     return decoy.mock(cls=Labware)
+
 
 @pytest.fixture
 def mock_well_implementation(mock_well_geometry: WellGeometry) -> WellImplementation:

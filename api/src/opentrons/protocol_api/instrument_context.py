@@ -695,7 +695,6 @@ class InstrumentContext(publisher.CommandPublisher):
             tiprack = location.parent
             target = location
             move_to_location = target.top()
-            print(target)
         elif not location:
             tiprack, target = labware.next_available_tip(
                 self.starting_tip, self.tip_racks, self.channels
