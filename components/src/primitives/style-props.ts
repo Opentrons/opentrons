@@ -17,6 +17,7 @@ const TYPOGRAPHY_PROPS = [
   'textAlign',
   'textTransform',
   'textDecoration',
+  'textOverflow',
 ] as const
 
 const SPACING_PROPS = [

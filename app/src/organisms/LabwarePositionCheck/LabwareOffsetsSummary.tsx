@@ -1,30 +1,52 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   C_DARK_GRAY,
   C_MED_GRAY,
   C_NEAR_WHITE,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   Flex,
-  FONT_BODY_1_DARK,
   FONT_SIZE_BODY_2,
-  FONT_SIZE_CAPTION,
   FONT_WEIGHT_SEMIBOLD,
   Icon,
   JUSTIFY_CENTER,
-  SPACING_1,
-  SPACING_2,
-  SPACING_3,
-  SPACING_4,
-  SPACING_5,
+  SPACING,
+  TYPOGRAPHY,
+  COLORS,
   TEXT_TRANSFORM_UPPERCASE,
   Text,
-  JUSTIFY_SPACE_BETWEEN,
+  SIZE_3,
 } from '@opentrons/components'
+import { OffsetVector } from '../../molecules/OffsetVector'
+import { StyledText } from '../../atoms/text'
 import type { LabwareOffsets } from './hooks/useLabwareOffsets'
 
+const OffsetTable = styled('table')`
+  ${TYPOGRAPHY.labelRegular}
+  table-layout: auto;
+  width: 100%;
+  border-spacing: 0 ${SPACING.spacing1};
+  margin: ${SPACING.spacing4} 0;
+  text-align: left;
+`
+const OffsetTableHeader = styled('th')`
+  text-transform: ${TYPOGRAPHY.textTransformUppercase};
+  color: ${COLORS.disabled};
+  font-weight: ${TYPOGRAPHY.fontWeightRegular};
+  font-size: ${TYPOGRAPHY.fontSizeCaption};
+  padding: ${SPACING.spacing2};
+`
+const OffsetTableRow = styled('tr')`
+  background-color: ${COLORS.background};
+`
+
+const OffsetTableDatum = styled('td')`
+  padding: ${SPACING.spacing2};
+  white-space: break-spaces;
+  text-overflow: wrap;
+`
 interface LabwareOffsetSummary {
   offsetData: LabwareOffsets
 }
@@ -40,7 +62,7 @@ const OffsetDataLoader = (): JSX.Element | null => {
       <Text
         as={'h3'}
         color={C_DARK_GRAY}
-        marginTop={SPACING_4}
+        marginTop={SPACING.spacing6}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         fontSize={FONT_SIZE_BODY_2}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
@@ -50,9 +72,9 @@ const OffsetDataLoader = (): JSX.Element | null => {
       <Icon
         name="ot-spinner"
         id={`LabwareOffsetsSummary_loadingSpinner`}
-        width={SPACING_5}
-        marginTop={SPACING_4}
-        marginBottom={SPACING_4}
+        width={SIZE_3}
+        marginTop={SPACING.spacing6}
+        marginBottom={SPACING.spacing6}
         color={C_MED_GRAY}
         spin
       />
@@ -64,102 +86,39 @@ const SummaryData = (props: LabwareOffsetSummary): JSX.Element => {
   const { offsetData } = props
   const { t } = useTranslation('labware_position_check')
   return (
-    <Flex flexDirection={DIRECTION_ROW}>
-      <Flex
-        flex={'auto'}
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_CENTER}
-      >
-        <Text
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-          marginBottom={SPACING_3}
-          color={C_MED_GRAY}
-          fontSize={FONT_SIZE_CAPTION}
-        >
-          {t('labware_offsets_summary_location')}
-        </Text>
-        {offsetData.map(({ displayLocation: location }) => {
-          return (
-            <Flex
-              key={location}
-              marginBottom={SPACING_3}
-              css={FONT_BODY_1_DARK}
-            >
-              {location}
-            </Flex>
+    <OffsetTable>
+      <thead>
+        <tr>
+          <OffsetTableHeader>
+            {t('labware_offsets_summary_location')}
+          </OffsetTableHeader>
+          <OffsetTableHeader>
+            {t('labware_offsets_summary_labware')}
+          </OffsetTableHeader>
+          <OffsetTableHeader>
+            {t('labware_offsets_summary_offset')}
+          </OffsetTableHeader>
+        </tr>
+      </thead>
+
+      <tbody>
+        {offsetData.map(
+          ({ displayLocation, displayName, labwareId, vector }) => (
+            <OffsetTableRow key={labwareId}>
+              <OffsetTableDatum>{displayLocation}</OffsetTableDatum>
+              <OffsetTableDatum>{displayName}</OffsetTableDatum>
+              <OffsetTableDatum>
+                {vector.x === 0 && vector.y === 0 && vector.z === 0 ? (
+                  <StyledText>{t('no_labware_offsets')}</StyledText>
+                ) : (
+                  <OffsetVector {...vector} />
+                )}
+              </OffsetTableDatum>
+            </OffsetTableRow>
           )
-        })}
-      </Flex>
-      <Flex
-        flex={'auto'}
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_CENTER}
-      >
-        <Text
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-          marginBottom={SPACING_3}
-          color={C_MED_GRAY}
-          fontSize={FONT_SIZE_CAPTION}
-        >
-          {t('labware_offsets_summary_labware')}
-        </Text>
-        {offsetData.map(({ displayName: labware }, index) => {
-          return (
-            <Flex
-              key={`${labware}_${index}`}
-              marginBottom={SPACING_3}
-              css={FONT_BODY_1_DARK}
-            >
-              {labware}
-            </Flex>
-          )
-        })}
-      </Flex>
-      <Flex
-        flex={'auto'}
-        flexDirection={DIRECTION_COLUMN}
-        justifyContent={JUSTIFY_CENTER}
-      >
-        <Text
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-          marginBottom={SPACING_3}
-          color={C_MED_GRAY}
-          fontSize={FONT_SIZE_CAPTION}
-        >
-          {t('labware_offsets_summary_offset')}
-        </Text>
-        {offsetData
-          .map(({ vector }) => vector)
-          .map(({ x, y, z }, index) => {
-            return x === 0 && y === 0 && z === 0 ? (
-              <Flex key={index} marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
-                {t('no_labware_offsets')}
-              </Flex>
-            ) : (
-              <Flex key={index} marginBottom={SPACING_3} css={FONT_BODY_1_DARK}>
-                <Text as={'strong'} marginRight={SPACING_1}>
-                  X
-                </Text>
-                <Text as={'span'} marginRight={SPACING_2}>
-                  {x.toFixed(2)}
-                </Text>
-                <Text as={'strong'} marginRight={SPACING_1}>
-                  Y
-                </Text>
-                <Text as={'span'} marginRight={SPACING_2}>
-                  {y.toFixed(2)}
-                </Text>
-                <Text as={'strong'} marginRight={SPACING_1}>
-                  Z
-                </Text>
-                <Text as={'span'} marginRight={SPACING_2}>
-                  {z.toFixed(2)}
-                </Text>
-              </Flex>
-            )
-          })}
-      </Flex>
-    </Flex>
+        )}
+      </tbody>
+    </OffsetTable>
   )
 }
 
@@ -169,33 +128,22 @@ export const LabwareOffsetsSummary = (
   const { offsetData } = props
   const { t } = useTranslation('labware_position_check')
   return (
-    <React.Fragment>
-      <Flex
-        flex={'auto'}
-        padding={SPACING_4}
-        boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
-        borderRadius="4px"
-        backgroundColor={C_NEAR_WHITE}
-        flexDirection={DIRECTION_COLUMN}
-      >
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-        >
-          <Text
-            as={'h5'}
-            fontWeight={FONT_WEIGHT_SEMIBOLD}
-            marginBottom={SPACING_3}
-          >
-            {t('labware_offsets_summary_title')}
-          </Text>
-        </Flex>
-        {offsetData.length === 0 ? (
-          <OffsetDataLoader />
-        ) : (
-          <SummaryData offsetData={offsetData} />
-        )}
-      </Flex>
-    </React.Fragment>
+    <Flex
+      flex={'auto'}
+      padding={SPACING.spacing4}
+      boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
+      borderRadius="4px"
+      backgroundColor={C_NEAR_WHITE}
+      flexDirection={DIRECTION_COLUMN}
+    >
+      <StyledText as={'h5'} marginBottom={SPACING.spacing3}>
+        {t('labware_offsets_summary_title')}
+      </StyledText>
+      {offsetData.length === 0 ? (
+        <OffsetDataLoader />
+      ) : (
+        <SummaryData offsetData={offsetData} />
+      )}
+    </Flex>
   )
 }
