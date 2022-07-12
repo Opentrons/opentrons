@@ -85,7 +85,7 @@ export interface ProtocolAnalysisOutput {
   errors: AnalysisError[]
 }
 
-interface AnalysisSourceFile {
+export interface AnalysisSourceFile {
   name: string
   role: 'main' | 'labware'
 }
@@ -98,7 +98,7 @@ export interface PythonConfig {
   apiVersion: [major: number, minor: number]
 }
 
-interface AnalysisError {
+export interface AnalysisError {
   id: string
   errorType: string
   createdAt: string

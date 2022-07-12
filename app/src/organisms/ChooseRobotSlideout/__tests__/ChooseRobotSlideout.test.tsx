@@ -5,7 +5,10 @@ import { fireEvent } from '@testing-library/react'
 import { when } from 'jest-when'
 
 import { i18n } from '../../../i18n'
-import { useProtocolDetailsForRun } from '../../../organisms/Devices/hooks'
+import {
+  useProtocolDetailsForRun,
+  useTrackCreateProtocolRunEvent,
+} from '../../../organisms/Devices/hooks'
 import {
   useCloseCurrentRun,
   useCurrentRunId,
@@ -72,6 +75,9 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
 const mockUseCreateRunFromProtocol = useCreateRunFromProtocol as jest.MockedFunction<
   typeof useCreateRunFromProtocol
 >
+const mockUseTrackCreateProtocolRunEvent = useTrackCreateProtocolRunEvent as jest.MockedFunction<
+  typeof useTrackCreateProtocolRunEvent
+>
 
 const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
   return renderWithProviders(
@@ -87,12 +93,16 @@ const render = (props: React.ComponentProps<typeof ChooseRobotSlideout>) => {
 let mockCloseCurrentRun: jest.Mock
 let mockResetCreateRun: jest.Mock
 let mockCreateRunFromProtocolSource: jest.Mock
+let mockTrackCreateProtocolRunEvent: jest.Mock
 
 describe('ChooseRobotSlideout', () => {
   beforeEach(() => {
     mockCloseCurrentRun = jest.fn()
     mockResetCreateRun = jest.fn()
     mockCreateRunFromProtocolSource = jest.fn()
+    mockTrackCreateProtocolRunEvent = jest.fn(
+      () => new Promise(resolve => resolve({}))
+    )
     mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: '',
       autoUpdateDisabledReason: null,
@@ -116,6 +126,9 @@ describe('ChooseRobotSlideout', () => {
       createRunFromProtocolSource: mockCreateRunFromProtocolSource,
       reset: mockResetCreateRun,
     } as any)
+    mockUseTrackCreateProtocolRunEvent.mockReturnValue({
+      trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
+    })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -196,6 +209,7 @@ describe('ChooseRobotSlideout', () => {
       files: [expect.any(File)],
       protocolKey: storedProtocolDataFixture.protocolKey,
     })
+    expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
   })
   it('if selected robot is on a different version of the software than the app, disable CTA and show link to device details in options', () => {
     when(mockGetBuildrootUpdateDisplayInfo)
@@ -240,6 +254,7 @@ describe('ChooseRobotSlideout', () => {
       files: [expect.any(File)],
       protocolKey: storedProtocolDataFixture.protocolKey,
     })
+    expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
     expect(getByText('run creation error')).toBeInTheDocument()
   })
 
@@ -262,6 +277,7 @@ describe('ChooseRobotSlideout', () => {
       files: [expect.any(File)],
       protocolKey: storedProtocolDataFixture.protocolKey,
     })
+    expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
     getByText('This robot is busy and can’t run this protocol right now.')
     const link = getByRole('link', { name: 'Go to Robot' })
     fireEvent.click(link)

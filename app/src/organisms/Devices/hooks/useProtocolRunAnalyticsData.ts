@@ -9,7 +9,47 @@ import { formatInterval } from '../../RunTimeControl/utils'
 import { EMPTY_TIMESTAMP } from '../constants'
 
 import type { ProtocolAnalyticsData } from '../../../redux/analytics/types'
+import type { StoredProtocolData } from '../../../redux/protocol-storage/types'
 import type { State } from '../../../redux/types'
+import type { StoredProtocolAnalysis } from './'
+
+export const parseProtocolRunAnalyticsData = (
+  protocolAnalysis: StoredProtocolAnalysis | null,
+  storedProtocol: StoredProtocolData | null,
+  startedAt: string | null
+) => () => {
+  const hashTasks = [
+    hash(protocolAnalysis?.metadata?.author) ?? '',
+    hash(storedProtocol?.srcFiles?.toString() ?? '') ?? '',
+  ]
+
+  return Promise.all(hashTasks).then(([protocolAuthor, protocolText]) => ({
+    protocolRunAnalyticsData: {
+      protocolType: protocolAnalysis?.config?.protocolType ?? '',
+      protocolAppName:
+        protocolAnalysis?.config?.protocolType === 'json'
+          ? 'Protocol Designer'
+          : 'Python API',
+      protocolAppVersion:
+        protocolAnalysis?.config?.protocolType === 'json'
+          ? protocolAnalysis?.config?.schemaVersion.toFixed(1)
+          : protocolAnalysis?.metadata?.apiLevel,
+      protocolApiVersion: protocolAnalysis?.metadata?.apiLevel ?? '',
+      protocolSource: protocolAnalysis?.metadata?.source ?? '',
+      protocolName: protocolAnalysis?.metadata?.protocolName ?? '',
+      pipettes: Object.values(protocolAnalysis?.pipettes ?? {})
+        .map(pipette => pipette.name)
+        .join(','),
+      modules: Object.values(protocolAnalysis?.modules ?? {})
+        .map(module => module.model)
+        .join(','),
+      protocolAuthor: protocolAuthor !== '' ? protocolAuthor : '',
+      protocolText: protocolText !== '' ? protocolText : '',
+    },
+    runTime:
+      startedAt != null ? formatInterval(startedAt, Date()) : EMPTY_TIMESTAMP,
+  }))
+}
 
 type GetProtocolRunAnalyticsData = () => Promise<{
   protocolRunAnalyticsData: ProtocolAnalyticsData
@@ -34,7 +74,7 @@ export function useProtocolRunAnalyticsData(
   )
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const storedProtocol = useSelector((state: State) =>
-    getStoredProtocol(storedProtocolAnalysis?.metadata?.protocolKey)
+    getStoredProtocol(state, storedProtocolAnalysis?.metadata?.protocolKey)
   )
   const protocolAnalysis =
     robotProtocolAnalysis != null && robotProtocolMetadata != null
@@ -42,43 +82,18 @@ export function useProtocolRunAnalyticsData(
           ...robotProtocolAnalysis,
           metadata: robotProtocolMetadata,
           config: storedProtocolAnalysis?.config,
+          createdAt: storedProtocolAnalysis?.createdAt ?? '',
+          errors: storedProtocolAnalysis?.errors,
+          files: storedProtocolAnalysis?.files ?? [],
         }
       : storedProtocolAnalysis
   const { startedAt } = useRunTimestamps(runId)
 
-  const getProtocolRunAnalyticsData: GetProtocolRunAnalyticsData = () => {
-    const hashTasks = [
-      hash(protocolAnalysis?.metadata?.author) ?? '',
-      hash(storedProtocol?.srcFiles?.toString() ?? '') ?? '',
-    ]
-
-    return Promise.all(hashTasks).then(([protocolAuthor, protocolText]) => ({
-      protocolRunAnalyticsData: {
-        protocolType: protocolAnalysis?.config?.protocolType ?? '',
-        protocolAppName:
-          protocolAnalysis?.config?.protocolType === 'json'
-            ? 'Protocol Designer'
-            : 'Python API',
-        protocolAppVersion:
-          protocolAnalysis?.config?.protocolType === 'json'
-            ? protocolAnalysis?.config?.schemaVersion.toFixed(1)
-            : protocolAnalysis?.metadata?.apiLevel,
-        protocolApiVersion: protocolAnalysis?.metadata?.apiLevel ?? '',
-        protocolSource: protocolAnalysis?.metadata?.source ?? '',
-        protocolName: protocolAnalysis?.metadata?.protocolName ?? '',
-        pipettes: Object.values(protocolAnalysis?.pipettes ?? {})
-          .map(pipette => pipette.name)
-          .join(','),
-        modules: Object.values(protocolAnalysis?.modules ?? {})
-          .map(module => module.model)
-          .join(','),
-        protocolAuthor: protocolAuthor !== '' ? protocolAuthor : '',
-        protocolText: protocolText !== '' ? protocolText : '',
-      },
-      runTime:
-        startedAt != null ? formatInterval(startedAt, Date()) : EMPTY_TIMESTAMP,
-    }))
-  }
+  const getProtocolRunAnalyticsData = parseProtocolRunAnalyticsData(
+    protocolAnalysis as StoredProtocolAnalysis | null,
+    storedProtocol,
+    startedAt
+  )
 
   return { getProtocolRunAnalyticsData }
 }
