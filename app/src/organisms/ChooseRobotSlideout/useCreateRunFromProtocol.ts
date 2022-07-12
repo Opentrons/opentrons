@@ -24,7 +24,7 @@ export interface UseCreateRun {
   >
   isCreatingRun: boolean
   runCreationError: string | null
-  runCreationErrorCode: string | null
+  isErrorCode409: boolean
   reset: () => void
 }
 
@@ -85,7 +85,10 @@ export function useCreateRunFromProtocol(
   error != null && console.error(error)
   error = error?.length > 255 ? t('protocol_run_general_error_msg') : error
 
-  const errorCode = protocolError?.code ?? runError?.code ?? null
+  const isErrorCode409 =
+    protocolError?.message.includes('409') ??
+    runError?.message.includes('409') ??
+    false
 
   return {
     createRunFromProtocolSource: (
@@ -100,7 +103,7 @@ export function useCreateRunFromProtocol(
     },
     isCreatingRun: isCreatingProtocol || isCreatingRun,
     runCreationError: error,
-    runCreationErrorCode: errorCode,
+    isErrorCode409: isErrorCode409,
     reset: () => {
       resetProtocolMutation()
       resetRunMutation()
