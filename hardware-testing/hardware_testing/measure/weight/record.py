@@ -154,18 +154,20 @@ class GravimetricRecording(List):
         return csv_file_str + "\n"
 
 
-def read_sample_from_scale(scale: RadwagScaleBase) -> GravimetricSample:
-    """Read a single sample from a scale."""
-    g, s = scale.read_mass()
-    return GravimetricSample(grams=g, stable=s, time=time())
-
-
-@dataclass
 class RecordConfig:
     """Recording config."""
-    duration: Optional[float]
-    frequency: Optional[float]
-    stable: Optional[bool]
+
+    def __init__(self, duration: float, frequency: float, stable: bool = False,
+                 test_name: Optional[str] = None, tag: Optional[str] = None):
+        self.duration = duration
+        self.frequency = frequency
+        self.stable = stable
+        self.test_name = test_name
+        self.tag = tag
+
+    @property
+    def save_to_disk(self) -> bool:
+        return bool(self.test_name and self.tag)
 
 
 def _record_get_remaining_time(stamp: float, period: float) -> float:
@@ -189,7 +191,7 @@ def _record_get_interval_overlap(samples: GravimetricRecording, period: float) -
 
 
 def record_samples(
-    protocol: ProtocolContext,
+    scale: RadwagScaleBase,
     config: RecordConfig,
     timeout: Optional[float] = None,
     on_new_sample: Optional[Callable] = None,
@@ -199,48 +201,38 @@ def record_samples(
     assert config.frequency
     length = int(config.duration * config.frequency) + 1
     interval = 1.0 / config.frequency
-    _samples = GravimetricRecording()
-    scale = scale_connect_and_initialize(protocol)
-    try:
-        _start_time = time()
-        while len(_samples) < length and not _record_did_exceed_time(
-            _start_time, timeout
-        ):
-            _s = read_sample_from_scale(scale)
-            if config.stable and not _s.stable:
-                _samples.clear()  # delete all previously recorded samples
-                continue
-            interval_w_overlap = interval - _record_get_interval_overlap(
-                _samples, interval
-            )
-            if not len(_samples) or _record_did_exceed_time(
-                _samples.end_time, interval_w_overlap
-            ):
-                _samples.append(_s)
-                if callable(on_new_sample):
-                    on_new_sample(_samples)
-        assert len(_samples) == length, (
-            f"Scale recording timed out before accumulating "
-            f"{length} samples (recorded {len(_samples)} samples)"
+    _recording = GravimetricRecording()
+    _start_time = time()
+    while len(_recording) < length and not _record_did_exceed_time(
+        _start_time, timeout
+    ):
+        g, s = scale.read_mass()
+        _s = GravimetricSample(grams=g, stable=s, time=time())
+        if config.stable and not _s.stable:
+            _recording.clear()  # delete all previously recorded samples
+            continue
+        interval_w_overlap = interval - _record_get_interval_overlap(
+            _recording, interval
         )
-        return _samples
-    finally:
-        scale.disconnect()
-
-
-@dataclass
-class RecordToDiskConfig:
-    """Record to disk config."""
-
-    record_config: RecordConfig
-    test_name: str
-    tag: str
+        if not len(_recording) or _record_did_exceed_time(
+            _recording.end_time, interval_w_overlap
+        ):
+            _recording.append(_s)
+            if callable(on_new_sample):
+                on_new_sample(_recording)
+    assert len(_recording) == length, (
+        f"Scale recording timed out before accumulating "
+        f"{length} samples (recorded {len(_recording)} samples)"
+    )
+    return _recording
 
 
 def record_samples_to_disk(
-    protocol: ProtocolContext, config: RecordToDiskConfig, timeout: Optional[float] = None
+    scale: RadwagScaleBase, config: RecordConfig, timeout: Optional[float] = None
 ) -> GravimetricRecording:
     """Record samples to disk."""
+    assert config.test_name
+    assert config.tag
     _file_name = create_file_name(config.test_name, config.tag)
 
     def _on_new_sample(recording: GravimetricRecording) -> None:
@@ -253,8 +245,47 @@ def record_samples_to_disk(
         config.test_name, _file_name, GravimetricSample.csv_header() + "\n"
     )
     _recording = record_samples(
-        protocol, config.record_config, timeout=timeout, on_new_sample=_on_new_sample
+        scale, config, timeout=timeout, on_new_sample=_on_new_sample
     )
     # add a final newline character to the CSV file
     append_data_to_file(config.test_name, _file_name, "\n")
     return _recording
+
+
+class GravimetricRecorder:
+    """Gravimetric Recorder."""
+
+    def __init__(self, ctx: ProtocolContext, test_name: str) -> None:
+        self._ctx = ctx
+        self._cfg = RecordConfig(test_name=test_name, duration=1.0, frequency=10)
+        self._scale = None
+
+    @property
+    def config(self):
+        """Config."""
+        return self._cfg
+
+    def activate(self) -> None:
+        """Activate."""
+        self._scale = scale_connect_and_initialize(self._ctx)
+
+    def deactivate(self) -> None:
+        """Deactivate."""
+        self._scale.disconnect()
+
+    def set_tag(self, tag: str) -> None:
+        """Set tag."""
+        self._cfg.tag = tag
+
+    def set_frequency(self, frequency: float) -> None:
+        """Set frequency."""
+        self._cfg.frequency = frequency
+
+    def record(self, duration: Optional[float] = None) -> GravimetricRecording:
+        """Record."""
+        if duration is not None:
+            self._cfg.duration = duration
+        if self._cfg.save_to_disk:
+            return record_samples_to_disk(self._scale, self._cfg)
+        else:
+            return record_samples(self._scale, self._cfg)

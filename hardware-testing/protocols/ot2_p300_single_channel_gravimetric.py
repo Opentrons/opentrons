@@ -8,7 +8,7 @@ from hardware_testing import config, data
 from hardware_testing.drivers import find_port, RadwagScaleBase, AsairSensorBase
 from hardware_testing.labware.definitions import load_radwag_vial_definition
 from hardware_testing.labware.liquid_level.liquid_level import LiquidTracker
-from hardware_testing.pipetting import motions
+from hardware_testing.pipette import motions
 from hardware_testing.protocol import metadata, load_labware_and_pipettes, apply_calibrated_labware_offsets
 
 CFG = config.default_config()

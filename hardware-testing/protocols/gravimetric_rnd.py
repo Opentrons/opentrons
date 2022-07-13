@@ -4,9 +4,7 @@ from opentrons.protocol_api import ProtocolContext
 from hardware_testing import get_api_context
 from hardware_testing.measure.weight import (
     scale_calibrate,
-    record_samples_to_disk,
-    RecordConfig,
-    RecordToDiskConfig,
+    GravimetricRecorder,
 )
 
 metadata = {"protocolName": "example-test", "apiLevel": "2.12"}
@@ -15,24 +13,17 @@ metadata = {"protocolName": "example-test", "apiLevel": "2.12"}
 def _run(protocol: ProtocolContext) -> None:
     if 'y' in input('Calibrate the scale? (y/n): ').lower():
         scale_calibrate(protocol)
+    recorder = GravimetricRecorder(protocol, test_name=metadata['protocolName'])
+    recorder.activate()
     while True:
         try:
             recording_name = input("Name of recording: ")
             recording_duration = float(input("\tDuration (sec): "))
-            recording_frequency = float(input("\tFrequency (hz): "))
         except ValueError:
             continue
         input("\tPress ENTER when ready...")
-        cfg = RecordToDiskConfig(
-            test_name=metadata["protocolName"],
-            tag=recording_name,
-            record_config=RecordConfig(
-                duration=recording_duration,
-                frequency=recording_frequency,
-                stable=False,
-            )
-        )
-        record_samples_to_disk(protocol, cfg)
+        recorder.set_tag(recording_name)
+        recorder.record(duration=recording_duration)
         print("\tdone")
 
 
