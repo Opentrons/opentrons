@@ -85,7 +85,7 @@ describe('RobotSettings RenameRobotSlideout', () => {
       fireEvent.click(renameButton)
       expect(mockTrackEvent).toHaveBeenCalledWith({
         name: 'renameRobot',
-        properties: {newRobotName: 'mockInput', previousRobotName: 'otie'},
+        properties: { newRobotName: 'mockInput', previousRobotName: 'otie' },
       })
     })
   })

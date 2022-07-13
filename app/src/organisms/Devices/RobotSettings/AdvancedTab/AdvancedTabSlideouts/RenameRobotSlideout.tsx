@@ -116,7 +116,13 @@ export function RenameRobotSlideout({
   })
 
   const handleSubmitRobotRename = (): void => {
-    trackEvent({ name: 'renameRobot', properties: {previousRobotName, newRobotName: formik.values.newRobotName} })
+    trackEvent({
+      name: 'renameRobot',
+      properties: {
+        previousRobotName,
+        newRobotName: formik.values.newRobotName,
+      },
+    })
     formik.handleSubmit()
   }
 
