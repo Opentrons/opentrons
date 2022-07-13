@@ -17,9 +17,9 @@ CFG.scale.safe_z_offset = 10
 PRELOADED_SCALE_DEF = None
 
 
-def init_liquid_tracking(plate, trough, vial):
+def init_liquid_tracking(plate, vial):
     # LIQUID TRACKING
-    for c in [plate, trough, vial]:
+    for c in [plate, vial]:
         for w in c.wells():
             # NOTE: For Corning 3631, assuming a perfect cylinder creates
             #       an error of -0.78mm when Corning 3631 plate is full (~360uL)
@@ -27,27 +27,9 @@ def init_liquid_tracking(plate, trough, vial):
             #       0.78mm lower than it is in reality. To make it more
             #       accurate, give .init_liquid_height() a lookup table
             liquid_level.init_liquid_height(w)
-    if CFG.photo:
-        for col in CFG.trough_cols:
-            dye_well = trough[f'A{col}']
-            if not liquid_level.get_volume(dye_well):
-                liquid_level.add_start_volume(dye_well, 3000)
-            liquid_level.add_start_volume(
-                dye_well, CFG.volume * CFG.num_samples, name='Dye')
-    # always assume baseline is in the final x2 troughs
-    if CFG.baseline or CFG.plate_on_scale:
-        vol_per_transfer = CFG.volume * 8
-        dead_vol = 3000
-        vol_needed = vol_per_transfer * 6  # 6 columns (half the plate)
-        for col in ['11', '12']:
-            baseline_well = trough[f'A{col}']
-            if not liquid_level.get_volume(baseline_well):
-                liquid_level.add_start_volume(baseline_well, dead_vol)
-            liquid_level.add_start_volume(baseline_well, vol_needed, name='Baseline')
-    if CFG.grav:
-        # add 10mm of clearance from calibrated liquid-level in vial
-        liquid_level.set_start_volume_from_liquid_height(
-            vial['A1'], vial['A1'].depth - CFG.scale.safe_z_offset, name='Water')
+    # add 10mm of clearance from calibrated liquid-level in vial
+    liquid_level.set_start_volume_from_liquid_height(
+        vial['A1'], vial['A1'].depth - CFG.scale.safe_z_offset, name='Water')
 
 
 def test_drop_tip(pipette):
@@ -84,26 +66,7 @@ def test_aspirate_dispense(
             w, after_aspirate=liq_lvl_asp, after_dispense=liq_lvl_disp)
 
 
-def test_evaporation(scale, temp_sensor, test_data):
-    print('Measuring evaporation (ENTER when ready)')
-    print('DATA:\n-----\n')
-    print('seconds,milligrams,celsius,humidity')
-    start_time = time.time()
-
-    def _take_reading():
-        _t = time.time()
-        _mg = scale.read_continuous() * 1000
-        _c, _h = temp_sensor.get_reading()
-        return _t, _mg, _c, _h
-
-    start_t, start_mg, _, _ = _take_reading()
-    while True:
-        t, mg, c, h = _take_reading()
-        print(f'{t - start_t},{start_mg - mg},{c},{h}')
-        time.sleep(0.1)
-
-
-def test_gravimetric(protocol, pipette, vial, scale, temp_sensor, test_data):
+def test_gravimetric(protocol, pipette, vial, scale, temp_sensor):
     def _take_reading():
         g = scale.read_continuous()
         c, h = temp_sensor.get_reading()
@@ -176,108 +139,6 @@ def test_gravimetric(protocol, pipette, vial, scale, temp_sensor, test_data):
     test_data.print_summary()
 
 
-def test_photometric(protocol, pipette, trough, plate):
-    total_samples = CFG.num_samples * len(CFG.plate_rows)
-    corning_3631_wells = [
-        well
-        for row in CFG.plate_rows
-        for well in plate.rows_by_name()[row][:CFG.num_samples]
-    ]
-    dye_wells = [
-        trough[f'A{col}']
-        for col in CFG.trough_cols
-        for _ in range(CFG.num_samples)
-    ]
-    for i, (src_well, target_well) in enumerate(zip(dye_wells, corning_3631_wells)):
-        print(f'PHOTO ({i + 1}/{total_samples})')
-        print(f'\t({CFG.volume}uL) trough[{src_well.well_name}] '
-              f'--> plate[{target_well.well_name}]')
-        if not pipette.has_tip:
-            pipette.pick_up_tip()
-        test_aspirate_dispense(
-            protocol, pipette, src_well, aspirate=CFG.volume)
-        test_aspirate_dispense(
-            protocol, pipette, target_well, dispense=CFG.volume)
-        if CFG.pipette.change_tip:
-            test_drop_tip(pipette)
-    if pipette.has_tip:
-        test_drop_tip(pipette)
-
-
-def fill_plate_with_baseline(protocol, multi, trough, plate):
-    # hard-coded wells for baseline in trough
-    source_wells = [
-        trough['A11'], trough['A11'], trough['A11'], trough['A11'], trough['A11'], trough['A11'],
-        trough['A12'], trough['A12'], trough['A12'], trough['A12'], trough['A12'], trough['A12'],
-    ]
-    target_cols = [w for w in plate.rows_by_name()['A']]  # every column on the plate
-    fill_plate_with_multi(protocol, multi, volume=200,
-                          source_wells=source_wells, target_wells=target_cols)
-
-
-def fill_plate_with_dye(protocol, multi, trough, plate, scale, temp_sensor):
-    # hard-coded wells for baseline in trough
-    source_wells = [
-        trough['A11'], trough['A11'], trough['A11'], trough['A11'], trough['A11'], trough['A11'],
-        trough['A12'], trough['A12'], trough['A12'], trough['A12'], trough['A12'], trough['A12'],
-    ]
-    target_wells = [w for w in plate.rows_by_name()['A']]  # every column on the plate
-    dispense_count = 0
-    start_sample = (0, 0, 0, 0)
-    end_sample = (0, 0, 0, 0)
-
-    def _take_reading():
-        g = scale.read_continuous()
-        c, h = temp_sensor.get_reading()
-        return time.time(), g, c, h
-
-    def _on_pre_dispense():
-        nonlocal dispense_count, start_sample
-        dispense_count += 1  # counter starts at well A1
-        if dispense_count == 1:
-            start_sample = _take_reading()
-
-    def _on_post_dispense():
-        nonlocal end_sample
-        if dispense_count == 12:
-            end_sample = _take_reading()
-
-    fill_plate_with_multi(protocol, multi, volume=200,
-                          source_wells=source_wells, target_wells=target_wells,
-                          on_pre_dispense=_on_pre_dispense, on_post_dispense=_on_post_dispense)
-    print('Plate-on-Scale Results:')
-    print(f'\tTotal Grams Dispensed: {end_sample[1] - start_sample[1]}')
-    print(f'\tTotal Seconds Elapsed: {end_sample[0] - start_sample[0]}')
-
-
-def fill_plate_with_multi(protocol, multi, volume, source_wells, target_wells,
-                          on_pre_aspirate=None, on_post_aspirate=None,
-                          on_pre_dispense=None, on_post_dispense=None):
-    assert len(source_wells) == len(target_wells), \
-        f'{source_wells} not same length as {target_wells}' \
-        f' ({len(source_wells)} != {len(target_wells)})'
-    for i, (src_well, target_well) in enumerate(zip(source_wells, target_wells)):
-        print(f'FILL ({i + 1}/{len(target_wells)})')
-        print(f'\t(200uL) trough[{src_well.well_name}] '
-              f'--> plate[{target_well.well_name}]')
-        if not multi.has_tip:
-            multi.pick_up_tip()
-        test_aspirate_dispense(
-            protocol, multi, src_well,
-            aspirate=volume,
-            on_pre_submerge=on_pre_aspirate,
-            on_post_emerge=on_post_aspirate)
-        test_aspirate_dispense(
-            protocol, multi, target_well,
-            dispense=volume,
-            on_pre_submerge=on_pre_dispense,
-            on_post_emerge=on_post_dispense)
-        if CFG.pipette.change_tip:
-            test_drop_tip(multi)
-    if multi.has_tip:
-        test_drop_tip(multi)
-
-
 def run(protocol: protocol_api.ProtocolContext):
     assert CFG.volume > 0
     assert len(CFG.plate_rows) == len(CFG.trough_cols)
@@ -305,39 +166,11 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # EQUIPMENT
     scale, temp_sensor = connect_to_scale_and_temp_sensor(protocol.is_simulating())
-    test_data_filename = f'{items.pipette.hw_pipette["pipette_id"]}'
-    test_data = data.GravimetricTestData(
-        directory=CFG.data.directory, filename=test_data_filename)
 
     # RUN
     liquid_level.print_setup_instructions(
         user_confirm=not protocol.is_simulating())
-    if CFG.baseline:
-        fill_plate_with_baseline(
-            protocol, items.multi, items.trough, items.plate)
-    if CFG.plate_on_scale:
-        fill_plate_with_dye(
-            protocol, items.multi, items.trough,
-            items.plate, scale, temp_sensor)
-    if CFG.photo:
-        test_photometric(protocol, items.pipette, items.trough, items.plate)
-        print(f'Time: {datetime.now().strftime("%m/%d/%Y, %H:%M:%S")}')
-        if not protocol.is_simulating():
-            input('Done transferring dye:'
-                  '\n\t1) Add SEAL to top of plate'
-                  '\n\t2) Remove plate from OT2'
-                  '\n\t3) Press ENTER to continue test')
-        print(f'Time: {datetime.now().strftime("%m/%d/%Y, %H:%M:%S")}')
-    if CFG.grav:
-        print(f'Time: {datetime.now().strftime("%m/%d/%Y, %H:%M:%S")}')
-        test_gravimetric(protocol, items.pipette, items.vial, scale, temp_sensor, test_data)
-        print(f'Time: {datetime.now().strftime("%m/%d/%Y, %H:%M:%S")}')
-        print('\n\n\nFULL CSV DATA:\n\n')
-        test_data.print_full_data()
-    print(f'Duration: {round((time.time() - start_timestamp) / 60, 1)} minutes')
-    if CFG.measure_evaporation:
-        test_evaporation(scale, temp_sensor, test_data)
-    print('\ndone')
+    test_gravimetric(protocol, items.pipette, items.vial, scale, temp_sensor)
 
 
 if __name__ == '__main__':

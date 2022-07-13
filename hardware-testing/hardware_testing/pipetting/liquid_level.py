@@ -1,12 +1,91 @@
+from abc import ABC, abstractmethod
 from collections import namedtuple
+from dataclasses import dataclass
 import math
+from typing import List
 
 
-CalcTypeCube = namedtuple('CalcTypeCube', 'w l h')
-CalcTypeCylinder = namedtuple('CalcTypeCylinder', 'd h')
-CalcTypeLookup = namedtuple('CalcTypeLookup', 'lookup')  # [(ul, mm), (ul, mm)]
+@dataclass
+class CalcType(ABC):
 
-LIQUID_HEIGHT_TRACKER = {}
+    @abstractmethod
+    def max_volume(self) -> float:
+        ...
+
+    @abstractmethod
+    def height_from_volume(self, volume: float) -> float:
+        ...
+
+    @abstractmethod
+    def volume_from_height(self, height: float) -> float:
+        ...
+
+
+@dataclass
+class CalcTypeCube(CalcType):
+    width: float
+    length: float
+    depth: float
+
+    def max_volume(self) -> float:
+        return self.width * self.length * self.depth
+
+    def height_from_volume(self, volume: float) -> float:
+        assert 0 <= volume <= self.max_volume(), f'Volume {volume} is out of range'
+        return (volume / self.max_volume()) * self.depth
+
+    def volume_from_height(self, height: float) -> float:
+        assert 0 <= height <= self.depth, f'Height {height} is out of range'
+        return (height / self.depth) * self.max_volume()
+
+
+@dataclass
+class CalcTypeCylinder(CalcType):
+    diameter: float
+    depth: float
+
+    def max_volume(self) -> float:
+        return math.pi * pow(self.diameter / 2, 2) * self.depth
+
+    def height_from_volume(self, volume: float) -> float:
+        assert 0 <= volume <= self.max_volume(), f'Volume {volume} is out of range'
+        return (volume / self.max_volume()) * self.depth
+
+    def volume_from_height(self, height: float) -> float:
+        assert 0 <= height <= self.depth, f'Height {height} is out of range'
+        return (height / self.depth) * self.max_volume()
+
+
+@dataclass
+class CalcTypeLookup(CalcType):
+    lookup: List[tuple]  # [(ul, mm), (ul, mm)]
+
+    @property
+    def depth(self) -> float:
+        return self.lookup[-1][1]
+
+    def max_volume(self) -> float:
+        return self.lookup[-1][0]
+
+    def height_from_volume(self, volume: float) -> float:
+        assert 0 <= volume <= self.max_volume(), f'Volume {volume} is out of range'
+        for i, (lv, lh) in enumerate(self.lookup[1:]):
+            plv, plh = self.lookup[i - 1]
+            if plv <= volume <= lv:
+                v_perc = (volume - plv) / (lv - plv)
+                return plh + ((lh - plh) * v_perc)
+        raise ValueError(
+            f'Unable to find volume ({volume}) in lookup table')
+
+    def volume_from_height(self, height: float) -> float:
+        assert 0 <= height <= self.depth, f'Height {height} is out of range'
+        for i, (lv, lh) in enumerate(self.lookup[1:]):
+            plv, plh = self.lookup[i - 1]
+            if plh < height < lh:
+                h_perc = (height - plh) / (lh - plv)
+                return plv + ((lv - plv) * h_perc)
+        raise ValueError(
+            f'Unable to find height ({height}) in lookup table')
 
 
 class LiquidHeight:
@@ -36,26 +115,8 @@ class LiquidHeight:
             self.set_volume(self.get_volume() + after_dispense)
 
     def set_volume_from_height(self, liquid_height):
-        c_type = type(self._calc_type).__name__.lower()
-        vol = None
-        if 'cube' in c_type:
-            max_vol = self._calc_type.w * self._calc_type.l * self._calc_type.h
-            vol = (liquid_height / self._calc_type.h) * max_vol
-        elif 'cylinder' in c_type:
-            max_vol = math.pi * pow(self._calc_type.d / 2, 2) * self._calc_type.h
-            vol = (liquid_height / self._calc_type.h) * max_vol
-        elif 'lookup' in c_type:
-            max_vol = self._calc_type.lookup[-1][0]
-            for i, (lv, lh) in enumerate(self._calc_type.lookup[1:]):
-                plv, plh = self._calc_type.lookup[i - 1]
-                if plh < liquid_height < lh:
-                    h_perc = (liquid_height - plh) / (lh - plv)
-                    vol = plv + ((lv - plv) * h_perc)
-            if vol is None:
-                raise ValueError(
-                    f'Unable to find height ({liquid_height}) in lookup table')
-        else:
-            raise ValueError(f'Unexpected c_type: {self._calc_type}')
+        max_vol = self._calc_type.max_volume
+        vol = self._calc_type.volume_from_height(liquid_height)
         assert vol >= 0, f'{vol} uL is less than 0 uL'
         assert vol <= max_vol, f'{vol} uL is greater than {max_vol} uL'
         self.set_volume(vol)
@@ -66,94 +127,69 @@ class LiquidHeight:
             vol -= after_aspirate
         if after_dispense is not None:
             vol += after_dispense
-        c_type = type(self._calc_type).__name__.lower()
-        if 'cube' in c_type:
-            cube_max_vol = self._calc_type.w * self._calc_type.l * self._calc_type.h
-            assert vol >= 0, f'{vol} uL is less than 0 uL'
-            assert vol <= cube_max_vol,\
-                f'{vol} uL is greater than {cube_max_vol} uL'
-            return (vol / cube_max_vol) * self._calc_type.h
-        elif 'cylinder' in c_type:
-            cylinder_max_vol = math.pi * pow(self._calc_type.d / 2, 2) * self._calc_type.h
-            assert vol >= 0, f'{vol} uL is less than 0 uL'
-            assert vol <= cylinder_max_vol,\
-                f'{vol} uL is greater than {cylinder_max_vol} uL'
-            return (vol / cylinder_max_vol) * self._calc_type.h
-        elif 'lookup' in c_type:
-            assert vol >= 0, f'{vol} uL is less than 0 uL'
-            for i, (lv, lh) in enumerate(self._calc_type.lookup[1:]):
-                plv, plh = self._calc_type.lookup[i - 1]
-                if plv <= vol <= lv:
-                    v_perc = (vol - plv) / (lv - plv)
-                    return plh + ((lh - plh) * v_perc)
-            raise ValueError(f'Unable to find updated volume ({vol}) in lookup table')
-        else:
-            raise ValueError(f'Unexpected c_type: {self._calc_type}')
+        return self._calc_type.height_from_volume(vol)
 
 
-def reset():
-    for key in LIQUID_HEIGHT_TRACKER:
-        del LIQUID_HEIGHT_TRACKER[key]
+class LiquidTracker:
 
-
-def print_setup_instructions(user_confirm=False):
-    found = [(well, tracker)
-             for well, tracker in LIQUID_HEIGHT_TRACKER.items()
-             if tracker.get_volume() > 0]
-    if not len(found):
+    def __init__(self) -> None:
+        self._items = {}
         return
-    print('Add the following volumes (uL) to the specified wells:')
-    for well, tracker in found:
-        print(f'\t{tracker.name}   -> {int(tracker.get_volume())} uL -> {well.display_name}')
-    if user_confirm:
-        input('\npress ENTER when ready...')
 
+    def reset(self):
+        for key in self._items:
+            del self._items[key]
 
-def init_liquid_height(well, lookup_table=None):
-    if lookup_table:
-        calc_type = CalcTypeLookup(lookup_table)
-    elif well.diameter:
-        calc_type = CalcTypeCylinder(well.diameter, well.depth)
-    else:
-        calc_type = CalcTypeCube(well.width, well.length, well.depth)
-    if well in LIQUID_HEIGHT_TRACKER:
-        del LIQUID_HEIGHT_TRACKER[well]
-    LIQUID_HEIGHT_TRACKER[well] = LiquidHeight(calc_type)
+    def print_setup_instructions(self, user_confirm=False):
+        found = [(well, tracker)
+                 for well, tracker in self._items.items()
+                 if tracker.get_volume() > 0]
+        if not len(found):
+            return
+        print('Add the following volumes (uL) to the specified wells:')
+        for well, tracker in found:
+            print(f'\t{tracker.name}   -> {int(tracker.get_volume())} uL -> {well.display_name}')
+        if user_confirm:
+            input('\npress ENTER when ready...')
 
+    def init_liquid_height(self, well, lookup_table=None):
+        if lookup_table:
+            calc_type = CalcTypeLookup(lookup=lookup_table)
+        elif well.diameter:
+            calc_type = CalcTypeCylinder(diameter=well.diameter, depth=well.depth)
+        else:
+            calc_type = CalcTypeCube(width=well.width, length=well.length, depth=well.depth)
+        if well in self._items:
+            del self._items[well]
+        self._items[well] = LiquidHeight(calc_type)
 
-def set_start_volume(well, volume):
-    LIQUID_HEIGHT_TRACKER[well].set_volume(volume)
+    def set_start_volume(self, well, volume):
+        self._items[well].set_volume(volume)
 
+    def add_start_volume(self, well, volume, name=None):
+        self.update_well_volume(well, after_dispense=volume)
+        self._items[well].set_name(name)
 
-def add_start_volume(well, volume, name=None):
-    update_well_volume(well, after_dispense=volume)
-    LIQUID_HEIGHT_TRACKER[well].set_name(name)
+    def set_start_volume_from_liquid_height(self, well, liquid_height, name=None):
+        self._items[well].set_volume_from_height(liquid_height)
+        self._items[well].set_name(name)
 
+    def get_liquid_height(self, well, after_aspirate=None, after_dispense=None):
+        return self._items[well].get_height(
+            after_aspirate=after_aspirate, after_dispense=after_dispense)
 
-def set_start_volume_from_liquid_height(well, liquid_height, name=None):
-    LIQUID_HEIGHT_TRACKER[well].set_volume_from_height(liquid_height)
-    LIQUID_HEIGHT_TRACKER[well].set_name(name)
+    def get_volume(self, well):
+        return self._items[well].get_volume()
 
+    def get_height_change(self, well, after_aspirate=None, after_dispense=None):
+        start = self.get_liquid_height(well)
+        end = self.get_liquid_height(
+            well, after_aspirate=after_aspirate, after_dispense=after_dispense)
+        return end - start
 
-def get_liquid_height(well, after_aspirate=None, after_dispense=None):
-    return LIQUID_HEIGHT_TRACKER[well].get_height(
-        after_aspirate=after_aspirate, after_dispense=after_dispense)
-
-
-def get_volume(well):
-    return LIQUID_HEIGHT_TRACKER[well].get_volume()
-
-
-def get_height_change(well, after_aspirate=None, after_dispense=None):
-    start = get_liquid_height(well)
-    end = get_liquid_height(
-        well, after_aspirate=after_aspirate, after_dispense=after_dispense)
-    return end - start
-
-
-def update_well_volume(well, after_aspirate=None, after_dispense=None):
-    LIQUID_HEIGHT_TRACKER[well].update_volume(
-        after_aspirate=after_aspirate, after_dispense=after_dispense)
+    def update_well_volume(self, well, after_aspirate=None, after_dispense=None):
+        self._items[well].update_volume(
+            after_aspirate=after_aspirate, after_dispense=after_dispense)
 
 
 if __name__ == '__main__':
@@ -163,11 +199,12 @@ if __name__ == '__main__':
     from lookup_tables import LIQUID_LEVEL_LOOKUP_NEXT_TROUGH_12_ROW as TROUGH_LOOKUP
     FakeWell = namedtuple('FakeWell', 'display_name depth diameter width length')
     fake_well = FakeWell('fake', TROUGH_LOOKUP[-1][1], None, None, None)
-    init_liquid_height(fake_well, TROUGH_LOOKUP)
-    set_start_volume(fake_well, 14500)
-    while get_volume(fake_well) > 0:
-        ul = get_volume(fake_well)
-        mm = get_liquid_height(fake_well)
-        update_well_volume(fake_well, after_aspirate=100)
+    tracker = LiquidTracker()
+    tracker.init_liquid_height(fake_well, TROUGH_LOOKUP)
+    tracker.set_start_volume(fake_well, 14500)
+    while tracker.get_volume(fake_well) > 0:
+        ul = tracker.get_volume(fake_well)
+        mm = tracker.get_liquid_height(fake_well)
+        tracker.update_well_volume(fake_well, after_aspirate=100)
         print(f'{int(ul)} ul  \t({round(mm, 1)} mm)')
 
