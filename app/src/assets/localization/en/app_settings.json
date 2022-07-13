@@ -54,7 +54,7 @@
   "add_folder_button": "Add labware source folder",
   "change_folder_button": "Change labware source folder",
   "tip_length_cal_method": "Tip Length Calibration Method",
-  "heater_shaker_attach_visible": "Confirm Heater-Shaker Module Attachment",
+  "heater_shaker_attach_visible": "Confirm Heater-Shaker is attached before using it",
   "heater_shaker_attach_description": "Display a reminder to attach the Heater-Shaker properly before running a test shake or using it in a protocol.",
   "cal_block": "Always use calibration block to calibrate",
   "trash_bin": "Always use trash bin to calibrate",

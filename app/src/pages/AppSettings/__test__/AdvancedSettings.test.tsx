@@ -241,7 +241,7 @@ describe('AdvancedSettings', () => {
   it('renders the toggle button on when showing heater shaker modal as false', () => {
     mockGetIsHeaterShakerAttached.mockReturnValue(true)
     const [{ getByRole, getByText }] = render()
-    getByText('Confirm Heater-Shaker Module Attachment')
+    getByText('Confirm Heater-Shaker is attached before using it')
     getByText(
       'Display a reminder to attach the Heater-Shaker properly before running a test shake or using it in a protocol.'
     )
