@@ -501,6 +501,14 @@ export function RobotSettingsCalibration({
     true
   )
 
+  const handleHealthCheckClick = (): void => {
+    handleHealthCheck(null)
+    doTrackEvent({
+      name: 'calibrationHealthCheckButtonClicked',
+      properties: {},
+    })
+  }
+
   return (
     <>
       <Portal level="top">
@@ -690,7 +698,7 @@ export function RobotSettingsCalibration({
           </Box>
           <TertiaryButton
             {...targetProps}
-            onClick={() => handleHealthCheck(null)}
+            onClick={handleHealthCheckClick}
             disabled={calCheckButtonDisabled}
           >
             {t('health_check_button')}
