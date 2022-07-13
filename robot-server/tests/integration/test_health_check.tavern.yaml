@@ -1,0 +1,14 @@
+---
+test_name: GET Health
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Health GET request returns correct info
+    request:
+      url: "{host:s}:{port:d}/health"
+      method: GET
+    response:
+      status_code: 200
+      verify_response_with:
+        function: 'tests.integration.fixtures:check_health_response'
