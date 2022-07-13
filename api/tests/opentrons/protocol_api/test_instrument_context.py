@@ -108,11 +108,6 @@ def subject(
 
 
 @pytest.fixture
-def mock_well(decoy: Decoy) -> Well:
-    return decoy.mock(cls=Well)
-
-
-@pytest.fixture
 def mock_abstract_labware(decoy: Decoy) -> AbstractLabware:
     return decoy.mock(cls=AbstractLabware)
 
@@ -134,29 +129,55 @@ def mock_well_geometry(decoy: Decoy) -> WellGeometry:
     return decoy.mock(cls=WellGeometry)
 
 
-@pytest.mark.parametrize(
-    "input_point, labware, expected_point_call",
-    [
-        (Point(-100, -100, 0), lazy_fixture("mock_well"), Point(-100, -100, 0)),
-        (Point(-100, -100, 0), lazy_fixture("mock_labware"), Point(-100, -100, 0)),
-    ],
-)
-def test_pick_up_from_location(
+# @pytest.mark.parametrize(
+#     "input_point, labware, expected_point_call",
+#     [
+#         (Point(-100, -100, 0), lazy_fixture("mock_well"), Point(-100, -100, 0)),
+#         (Point(-100, -100, 0), lazy_fixture("mock_labware"), Point(-100, -100, 0)),
+#     ],
+# )
+def test_pick_up_from_exact_well_location(
     decoy: Decoy,
     subject: InstrumentContext,
     mock_instrument_implementation: AbstractInstrument,
     mock_well_implementation: WellImplementation,
     mock_well_geometry: WellGeometry,
     mock_labware: Labware,
-    mock_well: Well,
-    input_point: Point,
-    labware: LocationLabware,
-    expected_point_call: Point,
 ) -> None:
     """Should pick up tip from supplied location of types.Location."""
-    # mock_well = decoy.mock(cls=Well)
-    input_location = Location(point=input_point, labware=labware)
-    expected_location = Location(point=expected_point_call, labware=mock_well)
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(-100, -100, 0), labware=mock_well)
+    expected_location = Location(point=Point(-100, -100, 0), labware=mock_well)
+
+    decoy.when(mock_labware.next_tip(0)).then_return(mock_well)
+
+    decoy.when(mock_well.top()).then_return(expected_location)
+
+    subject.pick_up_tip(location=input_location)
+
+    decoy.verify(
+        mock_instrument_implementation.move_to(
+            location=expected_location,
+            force_direct=False,
+            minimum_z_height=None,
+            speed=None,
+        ),
+        times=1,
+    )
+
+
+def test_pick_up_from_exact_labware_location(
+    decoy: Decoy,
+    subject: InstrumentContext,
+    mock_instrument_implementation: AbstractInstrument,
+    mock_well_implementation: WellImplementation,
+    mock_well_geometry: WellGeometry,
+    mock_labware: Labware,
+) -> None:
+    """Should pick up tip from supplied location of types.Location."""
+    mock_well = decoy.mock(cls=Well)
+    input_location = Location(point=Point(-100, -100, 0), labware=mock_labware)
+    expected_location = Location(point=Point(-100, -100, 0), labware=mock_well)
 
     decoy.when(mock_labware.next_tip(0)).then_return(mock_well)
 
