@@ -24,9 +24,9 @@ def patch_mock_next_available_tip(
     decoy: Decoy,
     monkeypatch: pytest.MonkeyPatch,
     mock_labware: Labware,
-    mock_well: Well,
 ) -> None:
     """Replace next_available_tip() with a mock."""
+    mock_well = decoy.mock(cls=Well)
     mock_next_available_tip = decoy.mock(func=next_available_tip)
     monkeypatch.setattr(
         "opentrons.protocol_api.labware.next_available_tip",
@@ -146,14 +146,14 @@ def test_pick_up_from_location(
     mock_instrument_implementation: AbstractInstrument,
     mock_well_implementation: WellImplementation,
     mock_well_geometry: WellGeometry,
-    mock_well: Well,
     mock_labware: Labware,
+    mock_well: Well,
     input_point: Point,
     labware: LocationLabware,
     expected_point_call: Point,
 ) -> None:
     """Should pick up tip from supplied location of types.Location."""
-
+    # mock_well = decoy.mock(cls=Well)
     input_location = Location(point=input_point, labware=labware)
     expected_location = Location(point=expected_point_call, labware=mock_well)
 
@@ -181,11 +181,11 @@ def test_pick_up_from_manipulated_location(
     mock_instrument_implementation: AbstractInstrument,
     mock_well_implementation: WellImplementation,
     mock_well_geometry: WellGeometry,
-    mock_well: Well,
     mock_labware: Labware,
 ) -> None:
     """Should pick up tip from move result of types.Location."""
 
+    mock_well = decoy.mock(cls=Well)
     initial_location = Location(Point(0, 0, 0), labware=mock_well)
     expected_location = Location(Point(x=-100, y=-100, z=0), labware=mock_well)
     move_to_location = initial_location.move(point=Point(x=-100, y=-100, z=0))
@@ -211,10 +211,10 @@ def test_pick_up_from_well(
     mock_instrument_implementation: AbstractInstrument,
     mock_well_implementation: WellImplementation,
     mock_abstract_labware: AbstractLabware,
-    mock_well: Well,
     mock_labware: Labware,
 ) -> None:
     """Should pick up tip from supplied well location top."""
+    mock_well = decoy.mock(cls=Well)
     expected_location = Location(Point(0, 0, 0), mock_well)
 
     decoy.when(subject._ctx._modules).then_return([])
@@ -243,10 +243,11 @@ def test_pick_up_from_no_location(
     subject: InstrumentContext,
     mock_instrument_implementation: AbstractInstrument,
     mock_well_implementation: WellImplementation,
-    mock_well: Well,
     mock_labware: Labware,
 ) -> None:
     """Should pick up tip from next_available_tip.top()."""
+    mock_well = decoy.mock(cls=Well)
+
     expected_location = Location(Point(0, 0, 0), mock_well)
 
     decoy.when(subject._ctx._modules).then_return([])
