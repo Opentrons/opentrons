@@ -78,6 +78,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   const listInnerRef = React.useRef<HTMLDivElement>(null)
   const currentItemRef = React.useRef<HTMLDivElement>(null)
   const firstPostInitialPlayRunCommandIndex = React.useRef<number | null>(null)
+  const lastKnownPrePlayRunCommandIndex = React.useRef<number>(-1)
   const [isDeterministic, setIsDeterministic] = React.useState<boolean>(true)
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
   const [
@@ -90,7 +91,8 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   const prePlayCommandCount =
     firstPostInitialPlayRunCommandIndex.current != null
       ? firstPostInitialPlayRunCommandIndex.current
-      : 0
+      : lastKnownPrePlayRunCommandIndex.current + 1
+
   const isCurrentRun =
     useRunQuery(runId, { staleTime: Infinity }).data?.data.current ?? false
   const { data: commandsData } = useAllCommandsQuery(
@@ -141,6 +143,32 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   )
 
   const runStartDateTime = runStartTime != null ? new Date(runStartTime) : null
+  React.useEffect(() => {
+    // if viewing an historical run log, because there is no current command
+    // we may get stuck with no  run commands as the default first window may
+    // contain only "pre-play" commands (e.g. more LPC commands than the window size)
+    // in this case, we'll walk the pointer to the first "post-play" command
+    if (
+      (runStatus === RUN_STATUS_FAILED ||
+        runStatus === RUN_STATUS_STOPPED ||
+        runStatus === RUN_STATUS_SUCCEEDED) &&
+      runStartDateTime != null &&
+      firstPostInitialPlayRunCommandIndex.current === null
+    ) {
+      const foundPostPlayRunCommandIndex = runCommands.findIndex(
+        command => new Date(command?.createdAt) > runStartDateTime
+      )
+      if (foundPostPlayRunCommandIndex >= 0) {
+        firstPostInitialPlayRunCommandIndex.current =
+          lastKnownPrePlayRunCommandIndex.current +
+          foundPostPlayRunCommandIndex +
+          2
+      } else {
+        lastKnownPrePlayRunCommandIndex.current =
+          lastKnownPrePlayRunCommandIndex.current + runCommands.length
+      }
+    }
+  }, [runId, runStatus, runCommands, runStartDateTime])
   const postInitialPlayRunCommands =
     runStartDateTime != null
       ? dropWhile(
