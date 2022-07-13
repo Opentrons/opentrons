@@ -147,7 +147,7 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 
     seq_id: utils.UInt8Field
     current_position_um: utils.UInt32Field
-    encoder_position: utils.UInt32Field
+    encoder_position: utils.Int32Field
     ack_id: utils.UInt8Field
 
 
@@ -155,7 +155,7 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 class EncoderPositionResponse(utils.BinarySerializable):
     """Read Encoder Position."""
 
-    encoder_position: utils.UInt32Field
+    encoder_position: utils.Int32Field
 
 
 @dataclass
