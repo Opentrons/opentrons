@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
-import { ModuleType } from '@opentrons/shared-data'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useIsRobotBusy } from '../Devices/hooks'
 import { MenuItemsByModuleType, useModuleOverflowMenu } from './hooks'
 
+import type { ModuleType } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../redux/modules/types'
 
 interface ModuleOverflowMenuProps {
