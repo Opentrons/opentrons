@@ -1,13 +1,12 @@
 """Tests for the InstrumentContext class."""
 import pytest
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 from decoy import Decoy, matchers
 
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api.instrument_context import InstrumentContext
 from opentrons.protocols.context.instrument import AbstractInstrument
-from opentrons.types import Location, Point, LocationLabware
+from opentrons.types import Location, Point
 from opentrons.broker import Broker
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api.labware import Well, Labware
@@ -129,29 +128,17 @@ def mock_well_geometry(decoy: Decoy) -> WellGeometry:
     return decoy.mock(cls=WellGeometry)
 
 
-# @pytest.mark.parametrize(
-#     "input_point, labware, expected_point_call",
-#     [
-#         (Point(-100, -100, 0), lazy_fixture("mock_well"), Point(-100, -100, 0)),
-#         (Point(-100, -100, 0), lazy_fixture("mock_labware"), Point(-100, -100, 0)),
-#     ],
-# )
 def test_pick_up_from_exact_well_location(
     decoy: Decoy,
     subject: InstrumentContext,
     mock_instrument_implementation: AbstractInstrument,
     mock_well_implementation: WellImplementation,
     mock_well_geometry: WellGeometry,
-    mock_labware: Labware,
 ) -> None:
-    """Should pick up tip from supplied location of types.Location."""
+    """Should pick up tip from supplied exact Well Location."""
     mock_well = decoy.mock(cls=Well)
     input_location = Location(point=Point(-100, -100, 0), labware=mock_well)
     expected_location = Location(point=Point(-100, -100, 0), labware=mock_well)
-
-    decoy.when(mock_labware.next_tip(0)).then_return(mock_well)
-
-    decoy.when(mock_well.top()).then_return(expected_location)
 
     subject.pick_up_tip(location=input_location)
 
@@ -174,7 +161,7 @@ def test_pick_up_from_exact_labware_location(
     mock_well_geometry: WellGeometry,
     mock_labware: Labware,
 ) -> None:
-    """Should pick up tip from supplied location of types.Location."""
+    """Should pick up tip from supplied exact labware Location."""
     mock_well = decoy.mock(cls=Well)
     input_location = Location(point=Point(-100, -100, 0), labware=mock_labware)
     expected_location = Location(point=Point(-100, -100, 0), labware=mock_well)
