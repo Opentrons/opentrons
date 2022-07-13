@@ -136,7 +136,6 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     targetRef
   )
   const width = getElementProperty('width')
-  const height = getElementProperty('height')
 
   // TODO kj 07/06/2022: Currently, using hardcoded number to align elements
   // This should be removed in the future
@@ -280,7 +279,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             data-testid={`ProtocolCard_date_${protocolDisplayName}`}
             marginTop={SPACING.spacing3}
             justifyContent={
-              height == null || height <= 880 ? JUSTIFY_FLEX_END : FLEX_NONE
+              width == null || width <= 880 ? JUSTIFY_FLEX_END : FLEX_NONE
             }
           >
             <StyledText
