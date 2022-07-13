@@ -57,7 +57,7 @@ describe('RecentProtocolRuns', () => {
     mockUseIsRobotViewable.mockReturnValue(true)
     mockUseAllRunsQuery.mockReturnValue({
       data: {},
-    } as UseQueryResult<Runs>)
+    } as UseQueryResult<Runs, Error>)
     const [{ getByText }] = render()
 
     getByText('No protocol runs yet!')
@@ -76,7 +76,7 @@ describe('RecentProtocolRuns', () => {
           },
         ],
       },
-    } as UseQueryResult<Runs>)
+    } as UseQueryResult<Runs, Error>)
     const [{ getByText }] = render()
     getByText(`otie's Protocol Runs`)
     getByText('Run')

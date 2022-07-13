@@ -3,7 +3,7 @@ import {
   useAllRunsQuery,
 } from '@opentrons/react-api-client'
 
-const ROBOT_STATUS_POLL_MS = 3000
+const ROBOT_STATUS_POLL_MS = 30000
 
 interface UseIsRobotBusyOptions {
   poll: boolean

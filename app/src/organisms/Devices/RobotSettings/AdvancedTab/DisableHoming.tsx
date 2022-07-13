@@ -9,12 +9,10 @@ import {
   TYPOGRAPHY,
   SPACING,
   Box,
-  useHoverTooltip,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../../atoms/text'
 import { ToggleButton } from '../../../../atoms/buttons'
-import { Tooltip } from '../../../../atoms/Tooltip'
 import { useIsRobotBusy } from '../../hooks'
 import { updateSetting } from '../../../../redux/robot-settings'
 
@@ -63,14 +61,7 @@ export function DisableHoming({
         toggledOn={value}
         onClick={handleClick}
         id="RobotSettings_disableHomingToggleButton"
-        disabled={isBusy}
-        // {...disableHomingToggleButtonProps}
       />
-      {/* {isBusy && (
-        <Tooltip tooltipProps={disableHomingToggleButtonTooltipProps}>
-          {t('robot_busy')}
-        </Tooltip>
-      )} */}
     </Flex>
   )
 }

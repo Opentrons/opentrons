@@ -63,7 +63,6 @@ export function ShortTrashBin({
         toggledOn={settings?.value === true}
         onClick={handleClick}
         id="AdvancedSettings_shortTrashBin"
-        disabled={isBusy}
       />
     </Flex>
   )

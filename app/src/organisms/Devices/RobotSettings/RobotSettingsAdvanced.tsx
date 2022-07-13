@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import { Box, SPACING, IconProps } from '@opentrons/components'
-import { useIsRobotBusyQuery } from '@opentrons/react-api-client'
 
 import { Divider } from '../../../atoms/structure'
 import { Toast } from '../../../atoms/Toast'
@@ -66,7 +65,7 @@ export function RobotSettingsAdvanced({
     false
   )
 
-  const isRobotBusy = useIsRobotBusy({ poll: true})
+  const isRobotBusy = useIsRobotBusy({ poll: true })
 
   const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
   const robot = useRobot(robotName)
@@ -106,6 +105,7 @@ export function RobotSettingsAdvanced({
   const updateDownloadLogsStatus = (isDownloading: boolean): void =>
     setShowDownloadToast(isDownloading)
 
+  // TODO: kj 07/1 this function and all props will be removed by another PR
   const updateIsRobotBusy = (isRobotBusy: boolean): void => {
     updateRobotStatus(isRobotBusy)
   }
@@ -169,7 +169,7 @@ export function RobotSettingsAdvanced({
         <DisplayRobotName
           robotName={robotName}
           updateIsExpanded={updateIsExpanded}
-          isRobotBusy={isRobotBusy}
+          updateIsRobotBusy={updateIsRobotBusy}
         />
         <Divider marginY={SPACING.spacing4} />
         <RobotServerVersion robotName={robotName} />
@@ -192,7 +192,6 @@ export function RobotSettingsAdvanced({
         <Divider marginY={SPACING.spacing5} />
         <UpdateRobotSoftware
           robotName={robotName}
-          // updateIsRobotBusy={updateIsRobotBusy}
           isRobotBusy={isRobotBusy}
           onUpdateStart={() => setShowSoftwareUpdateModal(true)}
         />

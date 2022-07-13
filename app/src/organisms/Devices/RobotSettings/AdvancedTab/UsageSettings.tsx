@@ -68,7 +68,6 @@ export function UsageSettings({
         toggledOn={settings?.value === true}
         onClick={handleClick}
         id="RobotSettings_usageSettingsToggleButton"
-        disabled={isBusy}
       />
     </Flex>
   )

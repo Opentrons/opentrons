@@ -13,25 +13,30 @@ import {
 
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
-
+import { useIsRobotBusy } from '../../hooks'
 interface DisplayRobotNameProps {
   robotName: string
   updateIsExpanded: (
     isExpanded: boolean,
     type: 'factoryReset' | 'renameRobot'
   ) => void
-  isRobotBusy: boolean
+  updateIsRobotBusy: (isRobotBusy: boolean) => void
 }
 
 export function DisplayRobotName({
   robotName,
   updateIsExpanded,
-  isRobotBusy,
+  updateIsRobotBusy,
 }: DisplayRobotNameProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const isBusy = useIsRobotBusy()
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-    updateIsExpanded(true, 'renameRobot')
+    if (isBusy) {
+      updateIsRobotBusy(true)
+    } else {
+      updateIsExpanded(true, 'renameRobot')
+    }
   }
 
   return (
@@ -58,7 +63,6 @@ export function DisplayRobotName({
         marginLeft={SPACING_AUTO}
         onClick={handleClick}
         id="RobotSettings_RenameRobot"
-        disabled={isRobotBusy}
       >
         {t('robot_rename_button')}
       </TertiaryButton>

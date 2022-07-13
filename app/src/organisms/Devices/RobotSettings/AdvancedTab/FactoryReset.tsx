@@ -54,7 +54,6 @@ export function FactoryReset({
         marginLeft={SPACING_AUTO}
         onClick={handleClick}
         id="RobotSettings_FactoryResetChooseButton"
-        disabled={isBusy}
       >
         {t('factory_reset_settings_button')}
       </TertiaryButton>
