@@ -7,7 +7,7 @@ import { useIsRobotBusyQuery } from '@opentrons/react-api-client'
 
 import { Divider } from '../../../atoms/structure'
 import { Toast } from '../../../atoms/Toast'
-import { useRobot } from '../hooks'
+import { useIsRobotBusy, useRobot } from '../hooks'
 import { DisplayRobotName } from './AdvancedTab/DisplayRobotName'
 import { RobotInformation } from './AdvancedTab/RobotInformation'
 import { RobotServerVersion } from './AdvancedTab/RobotServerVersion'
@@ -36,7 +36,6 @@ import type {
 } from '../../../redux/robot-settings/types'
 import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
 
-const ROBOT_STATUS_POLL_MS = 3000
 interface RobotSettingsAdvancedProps {
   robotName: string
   updateRobotStatus: (isRobotBusy: boolean) => void
@@ -67,10 +66,7 @@ export function RobotSettingsAdvanced({
     false
   )
 
-  const isRobotBusy =
-    useIsRobotBusyQuery({ refetchInterval: ROBOT_STATUS_POLL_MS }).data ?? false
-
-  console.log('isRobotBusy', isRobotBusy)
+  const isRobotBusy = useIsRobotBusy({ poll: true})
 
   const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
   const robot = useRobot(robotName)
