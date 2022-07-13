@@ -1,6 +1,6 @@
 """Asair sensor driver.
 
-This libray is for the temperature and humidity sensor used with the
+This library is for the temperature and humidity sensor used with the
 pipette gravimetric fixture. The sensor outputs temperature and
 relative humidity that is recorded onto the pipette results.
 """
