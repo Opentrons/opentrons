@@ -382,7 +382,7 @@ export function ProtocolRunHeader({
         <Banner
           type="error"
           onCloseClick={handleClearClick}
-          isLoading={isClosingCurrentRun}
+          isCloseActionLoading={isClosingCurrentRun}
         >
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
             {`${t('run_failed')}.`}
@@ -396,7 +396,7 @@ export function ProtocolRunHeader({
         <Banner
           type="success"
           onCloseClick={handleClearClick}
-          isLoading={isClosingCurrentRun}
+          isCloseActionLoading={isClosingCurrentRun}
         >
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
             {`${t('run_completed')}.`}
