@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { LabwareCard } from '..'
 import { useAllLabware } from '../../../pages/Labware/hooks'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
+import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
+import { LabwareCard } from '..'
 
 jest.mock('../../../pages/Labware/hooks')
-jest.mock('../../../pages/Labware/helpers/getAllDefs')
+jest.mock('../CustomLabwareOverflowMenu')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -15,6 +16,9 @@ jest.mock('@opentrons/components', () => {
   }
 })
 
+const mockCustomLabwareOverflowMenu = CustomLabwareOverflowMenu as jest.MockedFunction<
+  typeof CustomLabwareOverflowMenu
+>
 const mockUseAllLabware = useAllLabware as jest.MockedFunction<
   typeof useAllLabware
 >
@@ -27,6 +31,9 @@ const render = (props: React.ComponentProps<typeof LabwareCard>) => {
 describe('LabwareCard', () => {
   let props: React.ComponentProps<typeof LabwareCard>
   beforeEach(() => {
+    mockCustomLabwareOverflowMenu.mockReturnValue(
+      <div>Mock CustomLabwareOverflowMenu</div>
+    )
     mockUseAllLabware.mockReturnValue([{ definition: mockDefinition }])
     props = {
       labware: {

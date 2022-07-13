@@ -305,6 +305,7 @@ export function RobotSettingsCalibration({
       session &&
       session.sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
     ) {
+      // TODO: add this analytics event when we deprecate this event firing in redux/analytics makeEvent
       return session
     }
     return null
@@ -500,6 +501,14 @@ export function RobotSettingsCalibration({
     true
   )
 
+  const handleHealthCheckClick = (): void => {
+    handleHealthCheck(null)
+    doTrackEvent({
+      name: 'calibrationHealthCheckButtonClicked',
+      properties: {},
+    })
+  }
+
   return (
     <>
       <Portal level="top">
@@ -689,7 +698,7 @@ export function RobotSettingsCalibration({
           </Box>
           <TertiaryButton
             {...targetProps}
-            onClick={() => handleHealthCheck(null)}
+            onClick={handleHealthCheckClick}
             disabled={calCheckButtonDisabled}
           >
             {t('health_check_button')}

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
+import { useTrackEvent } from '../../../redux/analytics'
 import {
   renderWithProviders,
   useConditionalConfirm,
@@ -7,6 +8,7 @@ import {
 import { i18n } from '../../../i18n'
 import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
 
+jest.mock('../../../redux/analytics')
 jest.mock('@opentrons/components/src/hooks')
 
 const render = (
@@ -20,8 +22,13 @@ const render = (
 const mockUseConditionalConfirm = useConditionalConfirm as jest.MockedFunction<
   typeof useConditionalConfirm
 >
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
+
 const mockConfirm = jest.fn()
 const mockCancel = jest.fn()
+let mockTrackEvent: jest.Mock
 
 describe('CustomLabwareOverflowMenu', () => {
   let props: React.ComponentProps<typeof CustomLabwareOverflowMenu>
@@ -36,6 +43,8 @@ describe('CustomLabwareOverflowMenu', () => {
       showConfirmation: true,
       cancel: mockCancel,
     })
+    mockTrackEvent = jest.fn()
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
   })
 
   afterEach(() => {

@@ -393,6 +393,11 @@ describe('RobotSettingsCalibration', () => {
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Check health' })
     expect(button).not.toBeDisabled()
+    fireEvent.click(button)
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'calibrationHealthCheckButtonClicked',
+      properties: {},
+    })
   })
 
   it('Health check button is disabled when a robot is unreachable', () => {

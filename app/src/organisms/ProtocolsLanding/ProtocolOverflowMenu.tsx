@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-
+import { useTrackEvent } from '../../redux/analytics'
 import {
   Flex,
   COLORS,
@@ -43,11 +43,15 @@ export function ProtocolOverflowMenu(
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const dispatch = useDispatch<Dispatch>()
+  const trackEvent = useTrackEvent()
   const {
     confirm: confirmDeleteProtocol,
     showConfirmation: showDeleteConfirmation,
     cancel: cancelDeleteProtocol,
-  } = useConditionalConfirm(() => dispatch(removeProtocol(protocolKey)), true)
+  } = useConditionalConfirm(() => {
+    dispatch(removeProtocol(protocolKey))
+    trackEvent({ name: 'deleteProtocolFromApp', properties: {} })
+  }, true)
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()

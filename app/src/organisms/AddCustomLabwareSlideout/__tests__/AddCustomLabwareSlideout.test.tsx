@@ -1,11 +1,20 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
+import { useTrackEvent } from '../../../redux/analytics'
 import { AddCustomLabwareSlideout } from '..'
 
 jest.mock('../../../redux/custom-labware')
 jest.mock('../../../pages/Labware/helpers/getAllDefs')
+jest.mock('../../../redux/analytics')
+
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
+
+let mockTrackEvent: jest.Mock
 
 const render = (
   props: React.ComponentProps<typeof AddCustomLabwareSlideout>
@@ -27,12 +36,21 @@ describe('AddCustomLabwareSlideout', () => {
     onSuccess: jest.fn(() => null),
     onFailure: jest.fn(() => null),
   }
+  beforeEach(() => {
+    mockTrackEvent = jest.fn()
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
+  })
 
-  it('renders correct title and labware cards', () => {
+  it('renders correct title and labware cards and clicking on button triggers analytics event', () => {
     const [{ getByText, getByRole }] = render(props)
     getByText('Import a Custom Labware Definition')
     getByText('Or choose a file from your computer to upload.')
-    getByRole('button', { name: 'Choose File' })
+    const btn = getByRole('button', { name: 'Choose File' })
+    fireEvent.click(btn)
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'addCustomLabware',
+      properties: {},
+    })
   })
 
   it('renders drag and drop section', () => {
