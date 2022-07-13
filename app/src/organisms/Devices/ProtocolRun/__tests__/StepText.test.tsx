@@ -202,4 +202,21 @@ describe('StepText', () => {
       'Picking up tip from wellName of fake_display_name in fake_labware_location'
     )
   })
+
+  it('renders correct command text for for legacy command with non-string text', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'custom',
+        params: {
+          legacyCommandType: 'anyLegacyCommand',
+          legacyCommandText: { someKey: ['someValue', 'someOtherValue'] },
+        },
+      },
+    })
+    getByText('{"someKey":["someValue","someOtherValue"]}')
+  })
 })
