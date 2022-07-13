@@ -22,7 +22,8 @@ from opentrons.protocols.api_support.util import (
 )
 from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.api_support.types import APIVersion
-from .labware import Labware, OutOfTipsError, Well
+
+# from .labware import Labware, OutOfTipsError, Well
 from opentrons.protocol_api import labware
 from opentrons.protocols.advanced_control import transfers
 
@@ -30,10 +31,10 @@ if TYPE_CHECKING:
     from opentrons.protocol_api import ProtocolContext
 
 AdvancedLiquidHandling = Union[
-    Well,
+    labware.Well,
     types.Location,
-    Sequence[Union[Well, types.Location]],
-    Sequence[Sequence[Well]],
+    Sequence[Union[labware.Well, types.Location]],
+    Sequence[Sequence[labware.Well]],
 ]
 
 logger = logging.getLogger(__name__)
@@ -63,8 +64,8 @@ class InstrumentContext(publisher.CommandPublisher):
         ctx: ProtocolContext,
         broker: Broker,
         at_version: APIVersion,
-        tip_racks: Optional[List[Labware]] = None,
-        trash: Optional[Labware] = None,
+        tip_racks: Optional[List[labware.Labware]] = None,
+        trash: Optional[labware.Labware] = None,
     ) -> None:
 
         super().__init__(broker)
@@ -81,8 +82,8 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             self.trash_container = trash
 
-        self._last_tip_picked_up_from: Union[Well, None] = None
-        self._starting_tip: Union[Well, None] = None
+        self._last_tip_picked_up_from: Union[labware.Well, None] = None
+        self._starting_tip: Union[labware.Well, None] = None
         self.requested_as = self._implementation.get_instrument_name()
 
     @property  # type: ignore
@@ -92,12 +93,12 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def starting_tip(self) -> Union[Well, None]:
+    def starting_tip(self) -> Union[labware.Well, None]:
         """The starting tip from which the pipette pick up"""
         return self._starting_tip
 
     @starting_tip.setter
-    def starting_tip(self, location: Union[Well, None]) -> None:
+    def starting_tip(self, location: Union[labware.Well, None]) -> None:
         self._starting_tip = location
 
     @requires_version(2, 0)
@@ -127,7 +128,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def aspirate(
         self,
         volume: Optional[float] = None,
-        location: Optional[Union[types.Location, Well]] = None,
+        location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
     ) -> InstrumentContext:
         """
@@ -169,7 +170,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         )
 
-        if isinstance(location, Well):
+        if isinstance(location, labware.Well):
             dest = location.bottom().move(
                 types.Point(0, 0, self.well_bottom_clearance.aspirate)
             )
@@ -235,7 +236,7 @@ class InstrumentContext(publisher.CommandPublisher):
     def dispense(
         self,
         volume: Optional[float] = None,
-        location: Optional[Union[types.Location, Well]] = None,
+        location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
     ) -> InstrumentContext:
         """
@@ -283,7 +284,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 volume, location if location else "current position", rate
             )
         )
-        if isinstance(location, Well):
+        if isinstance(location, labware.Well):
             if LabwareLike(location).is_fixed_trash():
                 loc = location.top()
             else:
@@ -330,7 +331,7 @@ class InstrumentContext(publisher.CommandPublisher):
         self,
         repetitions: int = 1,
         volume: Optional[float] = None,
-        location: Optional[Union[types.Location, Well]] = None,
+        location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
     ) -> InstrumentContext:
         """
@@ -399,7 +400,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @requires_version(2, 0)
     def blow_out(
-        self, location: Optional[Union[types.Location, Well]] = None
+        self, location: Optional[Union[types.Location, labware.Well]] = None
     ) -> InstrumentContext:
         """
         Blow liquid out of the tip.
@@ -423,7 +424,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :returns: This instance
         """
 
-        if isinstance(location, Well):
+        if isinstance(location, labware.Well):
             if location.parent.is_tiprack:
                 logger.warning(
                     "Blow_out being performed on a tiprack. "
@@ -471,7 +472,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def touch_tip(
         self,
-        location: Optional[Well] = None,
+        location: Optional[labware.Well] = None,
         radius: float = 1.0,
         v_offset: float = -1.0,
         speed: float = 60.0,
@@ -621,7 +622,7 @@ class InstrumentContext(publisher.CommandPublisher):
         if not self._implementation.has_tip():
             logger.warning("Pipette has no tip to return")
         loc = self._last_tip_picked_up_from
-        if not isinstance(loc, Well):
+        if not isinstance(loc, labware.Well):
             raise TypeError(
                 "Last tip location should be a Well but it is: " "{}".format(loc)
             )
@@ -636,7 +637,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def pick_up_tip(
         self,
-        location: Optional[Union[types.Location, Well]] = None,
+        location: Optional[Union[types.Location, labware.Well]] = None,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
     ) -> InstrumentContext:
@@ -683,15 +684,15 @@ class InstrumentContext(publisher.CommandPublisher):
         if location and isinstance(location, types.Location):
             if location.labware.is_labware:
                 tiprack = location.labware.as_labware()
-                target: Well = tiprack.next_tip(self.channels)  # type: ignore
+                target: labware.Well = tiprack.next_tip(self.channels)  # type: ignore
                 move_to_location = target.top()
                 if not target:
-                    raise OutOfTipsError
+                    raise labware.OutOfTipsError
             elif location.labware.is_well:
                 target = location.labware.as_well()
                 tiprack = target.parent
                 move_to_location = location
-        elif location and isinstance(location, Well):
+        elif location and isinstance(location, labware.Well):
             tiprack = location.parent
             target = location
             move_to_location = target.top()
@@ -731,7 +732,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def drop_tip(
         self,
-        location: Optional[Union[types.Location, Well]] = None,
+        location: Optional[Union[types.Location, labware.Well]] = None,
         home_after: bool = True,
     ) -> InstrumentContext:
         """
@@ -814,7 +815,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     "dropped. The passed location, however, is in "
                     "reference to {}".format(location.labware)
                 )
-        elif location and isinstance(location, Well):
+        elif location and isinstance(location, labware.Well):
             if LabwareLike(location).is_fixed_trash():
                 target = location.top()
             else:
@@ -888,8 +889,8 @@ class InstrumentContext(publisher.CommandPublisher):
     def distribute(
         self,
         volume: Union[float, Sequence[float]],
-        source: Well,
-        dest: List[Well],
+        source: labware.Well,
+        dest: List[labware.Well],
         *args: Any,
         **kwargs: Any,
     ) -> InstrumentContext:
@@ -922,8 +923,8 @@ class InstrumentContext(publisher.CommandPublisher):
     def consolidate(
         self,
         volume: Union[float, Sequence[float]],
-        source: List[Well],
-        dest: Well,
+        source: List[labware.Well],
+        dest: labware.Well,
         *args: Any,
         **kwargs: Any,
     ) -> InstrumentContext:
@@ -1303,7 +1304,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def tip_racks(self) -> List[Labware]:
+    def tip_racks(self) -> List[labware.Labware]:
         """
         The tip racks that have been linked to this pipette.
 
@@ -1313,12 +1314,12 @@ class InstrumentContext(publisher.CommandPublisher):
         return self._tip_racks
 
     @tip_racks.setter
-    def tip_racks(self, racks: List[Labware]) -> None:
+    def tip_racks(self, racks: List[labware.Labware]) -> None:
         self._tip_racks = racks
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def trash_container(self) -> Labware:
+    def trash_container(self) -> labware.Labware:
         """The trash container associated with this pipette.
 
         This is the property used to determine where to drop tips and blow out
@@ -1328,7 +1329,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return self._trash
 
     @trash_container.setter
-    def trash_container(self, trash: Labware) -> None:
+    def trash_container(self, trash: labware.Labware) -> None:
         self._trash = trash
 
     @property  # type: ignore
@@ -1443,6 +1444,6 @@ class InstrumentContext(publisher.CommandPublisher):
     def __str__(self) -> str:
         return "{} on {} mount".format(self.hw_pipette["display_name"], self.mount)
 
-    def _tip_length_for(self, tiprack: Labware) -> float:
+    def _tip_length_for(self, tiprack: labware.Labware) -> float:
         """Get the tip length, including overlap, for a tip from this rack"""
         return instrument.tip_length_for(self.hw_pipette, tiprack)
