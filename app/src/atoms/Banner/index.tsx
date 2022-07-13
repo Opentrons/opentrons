@@ -11,6 +11,7 @@ import {
   TYPOGRAPHY,
   BORDERS,
   Btn,
+  SIZE_1,
 } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'
@@ -31,6 +32,8 @@ export interface BannerProps extends StyleProps {
   onCloseClick?: (() => unknown) | React.MouseEventHandler<HTMLButtonElement>
   /** Override the default Alert Icon */
   icon?: IconProps
+  /** some banner onCloseClicks fire events, this allows a spinner after click but before event finishes */
+  isLoading?: boolean
 }
 
 const BANNER_PROPS_BY_TYPE: Record<
@@ -65,7 +68,7 @@ const BANNER_PROPS_BY_TYPE: Record<
 }
 
 export function Banner(props: BannerProps): JSX.Element {
-  const { type, onCloseClick, icon, children, ...styleProps } = props
+  const { type, onCloseClick, icon, children, isLoading, ...styleProps } = props
   const bannerProps = BANNER_PROPS_BY_TYPE[type]
 
   const iconProps = {
@@ -98,7 +101,7 @@ export function Banner(props: BannerProps): JSX.Element {
       <Flex flex="1" alignItems={ALIGN_CENTER}>
         {props.children}
       </Flex>
-      {props.onCloseClick && (
+      {props.onCloseClick && !isLoading && (
         <Btn
           data-testid="Banner_close-button"
           onClick={props.onCloseClick}
@@ -107,6 +110,14 @@ export function Banner(props: BannerProps): JSX.Element {
         >
           <Icon name="close" aria-label="close_icon" />
         </Btn>
+      )}
+      {isLoading && (
+        <Icon
+          name="ot-spinner"
+          size={SIZE_1}
+          aria-label={`ot-spinner`}
+          spin
+        />
       )}
     </Flex>
   )

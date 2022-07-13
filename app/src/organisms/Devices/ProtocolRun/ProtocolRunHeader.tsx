@@ -127,13 +127,15 @@ export function ProtocolRunHeader({
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
-  const { protocolData, displayName, protocolKey } = useProtocolDetailsForRun(
-    runId
-  )
+  const {
+    protocolData,
+    displayName,
+    protocolKey,
+    isProtocolAnalyzing,
+  } = useProtocolDetailsForRun(runId)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isRobotViewable = useIsRobotViewable(robotName)
-  const isProtocolAnalyzing = protocolData == null && isRobotViewable
   const runStatus = useRunStatus(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
@@ -280,6 +282,7 @@ export function ProtocolRunHeader({
     isMutationLoading ||
     isRobotBusy ||
     isProtocolAnalyzing ||
+    protocolData == null ||
     runStatus === RUN_STATUS_FINISHING ||
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
     runStatus === RUN_STATUS_STOP_REQUESTED ||
@@ -376,7 +379,11 @@ export function ProtocolRunHeader({
   switch (runStatus) {
     case RUN_STATUS_FAILED: {
       clearProtocolBanner = (
-        <Banner type="error" onCloseClick={handleClearClick}>
+        <Banner
+          type="error"
+          onCloseClick={handleClearClick}
+          isLoading={isClosingCurrentRun}
+        >
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
             {`${t('run_failed')}.`}
           </Flex>
@@ -386,7 +393,11 @@ export function ProtocolRunHeader({
     }
     case RUN_STATUS_SUCCEEDED: {
       clearProtocolBanner = (
-        <Banner type="success" onCloseClick={handleClearClick}>
+        <Banner
+          type="success"
+          onCloseClick={handleClearClick}
+          isLoading={isClosingCurrentRun}
+        >
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
             {`${t('run_completed')}.`}
           </Flex>
