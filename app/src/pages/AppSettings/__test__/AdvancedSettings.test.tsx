@@ -289,6 +289,10 @@ describe('AdvancedSettings', () => {
     input.click = jest.fn()
     fireEvent.click(button)
     expect(input.click).toHaveBeenCalled()
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'changePathToPythonDirectory',
+      properties: {},
+    })
   })
 
   it('renders the path to python override text and button with a selected path', () => {

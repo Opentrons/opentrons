@@ -167,6 +167,10 @@ export function AdvancedSettings(): JSX.Element {
 
   const handleClickPythonDirectoryChange: React.MouseEventHandler<HTMLButtonElement> = _event => {
     pythonDirectoryFileInput.current?.click()
+    trackEvent({
+      name: 'changePathToPythonDirectory',
+      properties: {},
+    })
   }
 
   const setPythonInterpreterDirectory: React.ChangeEventHandler<HTMLInputElement> = event => {
