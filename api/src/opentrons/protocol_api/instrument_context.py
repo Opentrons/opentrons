@@ -23,8 +23,7 @@ from opentrons.protocols.api_support.util import (
 from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.api_support.types import APIVersion
 
-# from .labware import Labware, OutOfTipsError, Well
-from opentrons.protocol_api import labware
+from . import labware
 from opentrons.protocols.advanced_control import transfers
 
 if TYPE_CHECKING:
