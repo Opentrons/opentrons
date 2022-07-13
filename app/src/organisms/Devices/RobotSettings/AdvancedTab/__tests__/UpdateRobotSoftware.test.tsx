@@ -41,7 +41,7 @@ const render = () => {
 describe('RobotSettings UpdateRobotSoftware', () => {
   beforeEach(() => {
     mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
-      autoUpdateAction: 'reinstall',
+      autoUpdateAction: 'update',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
@@ -53,12 +53,12 @@ describe('RobotSettings UpdateRobotSoftware', () => {
   })
 
   it('should render title, description and toggle button', () => {
-    const [{ getByText, getByLabelText }] = render()
+    const [{ getByText }] = render()
     getByText('Update robot software manually with a local file (.zip)')
     getByText(
       'Bypass the Opentrons App auto-update process and update the robot software manually.'
     )
-    getByLabelText('Browse file system')
+    getByText('Browse file system')
     getByText('Launch Opentrons software update page')
   })
 
@@ -69,11 +69,30 @@ describe('RobotSettings UpdateRobotSoftware', () => {
     expect(link.closest('a')).toHaveAttribute('href', targetLink)
   })
 
-  it('should call update robot status if a robot is busy', () => {
-    mockUseIsRobotBusy.mockReturnValue(true)
-    const [{ getByLabelText }] = render()
-    const button = getByLabelText('Browse file system')
+  it('should be disabled if updateFromFileDisabledReason is not null', () => {
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'update',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: 'mock reason',
+    })
+    const [{ getByText }] = render()
+    const button = getByText('Browse file system')
+    expect(button).toBeDisabled()
+  })
+
+  it('should not call update robot status if a robot is busy', () => {
+    mockUseIsRobotBusy.mockReturnValue(false)
+    const [{ getByText }] = render()
+    const button = getByText('Browse file system')
     fireEvent.change(button)
+    expect(mockUpdateRobotStatus).not.toHaveBeenCalled()
+  })
+
+  it('should call update robot status if a robot is busy', async () => {
+    mockUseIsRobotBusy.mockReturnValue(true)
+    const [{ getByText }] = render()
+    const button = getByText('Browse file system')
+    fireEvent.click(button)
     expect(mockUpdateRobotStatus).toHaveBeenCalled()
   })
 })

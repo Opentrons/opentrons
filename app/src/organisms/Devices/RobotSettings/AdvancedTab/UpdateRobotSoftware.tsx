@@ -51,16 +51,23 @@ export function UpdateRobotSoftware({
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
   const isBusy = useIsRobotBusy()
+  const inputRef = React.useRef<HTMLInputElement>(null)
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
+    const { files } = event.target
+    if (files?.length === 1 && !updateDisabled) {
+      dispatch(startBuildrootUpdate(robotName, files[0].path))
+      onUpdateStart()
+    }
+  }
+
+  const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
+    console.log('handleClick')
     if (isBusy) {
+      console.log('isBusy')
       updateIsRobotBusy(true)
     } else {
-      const { files } = event.target
-      if (files?.length === 1 && !updateDisabled) {
-        dispatch(startBuildrootUpdate(robotName, files[0].path))
-        onUpdateStart()
-      }
+      inputRef.current?.click()
     }
   }
 
@@ -84,13 +91,15 @@ export function UpdateRobotSoftware({
         </ExternalLink>
       </Box>
       <TertiaryButton
-        as="label"
         marginLeft={SPACING_AUTO}
         id="AdvancedSettings_softwareUpdateButton"
         {...updateButtonProps}
+        disabled={updateDisabled}
+        onClick={handleClick}
       >
-        {t('update_robot_software_browse_button')}
+        {t('browse_file_system')}
         <input
+          ref={inputRef}
           type="file"
           onChange={handleChange}
           disabled={updateDisabled}
