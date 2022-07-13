@@ -6,7 +6,7 @@ import { Box, SPACING, IconProps } from '@opentrons/components'
 
 import { Divider } from '../../../atoms/structure'
 import { Toast } from '../../../atoms/Toast'
-import { useRobot } from '../hooks'
+import { useIsRobotBusy, useRobot } from '../hooks'
 import { DisplayRobotName } from './AdvancedTab/DisplayRobotName'
 import { RobotInformation } from './AdvancedTab/RobotInformation'
 import { RobotServerVersion } from './AdvancedTab/RobotServerVersion'
@@ -25,6 +25,8 @@ import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRo
 import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
 import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
 import { UpdateBuildroot } from './UpdateBuildroot'
+import { UNREACHABLE } from '../../../redux/discovery'
+import { Portal } from '../../../App/portal'
 
 import type { State, Dispatch } from '../../../redux/types'
 import type {
@@ -32,8 +34,6 @@ import type {
   RobotSettingsField,
 } from '../../../redux/robot-settings/types'
 import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
-import { UNREACHABLE } from '../../../redux/discovery'
-import { Portal } from '../../../App/portal'
 
 interface RobotSettingsAdvancedProps {
   robotName: string
@@ -64,6 +64,8 @@ export function RobotSettingsAdvanced({
   const [showDownloadToast, setShowDownloadToast] = React.useState<boolean>(
     false
   )
+
+  const isRobotBusy = useIsRobotBusy({ poll: true })
 
   const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
   const robot = useRobot(robotName)
@@ -103,6 +105,7 @@ export function RobotSettingsAdvanced({
   const updateDownloadLogsStatus = (isDownloading: boolean): void =>
     setShowDownloadToast(isDownloading)
 
+  // TODO: kj 07/1 this function and all props will be removed by another PR
   const updateIsRobotBusy = (isRobotBusy: boolean): void => {
     updateRobotStatus(isRobotBusy)
   }
@@ -112,6 +115,10 @@ export function RobotSettingsAdvanced({
   React.useEffect(() => {
     dispatch(fetchSettings(robotName))
   }, [dispatch, robotName])
+
+  React.useEffect(() => {
+    updateRobotStatus(isRobotBusy)
+  }, [isRobotBusy, updateRobotStatus])
 
   return (
     <>
@@ -185,7 +192,7 @@ export function RobotSettingsAdvanced({
         <Divider marginY={SPACING.spacing5} />
         <UpdateRobotSoftware
           robotName={robotName}
-          updateIsRobotBusy={updateIsRobotBusy}
+          isRobotBusy={isRobotBusy}
           onUpdateStart={() => setShowSoftwareUpdateModal(true)}
         />
         <Divider marginY={SPACING.spacing4} />

@@ -94,7 +94,7 @@
   "jupyter_notebook_link": "Learn more about using Jupyter notebook with the OT-2",
   "update_robot_software": "Update robot software manually with a local file (.zip)",
   "update_robot_software_description": "Bypass the Opentrons App auto-update process and update the robot software manually.",
-  "update_robot_software_browse_button": "Browse file system",
+  "browse_file_system": "Browse file system",
   "update_robot_software_link": "Launch Opentrons software update page",
   "update_robot_software_troubleshooting": "Troubleshooting",
   "update_robot_software_download_logs": "Download logs",

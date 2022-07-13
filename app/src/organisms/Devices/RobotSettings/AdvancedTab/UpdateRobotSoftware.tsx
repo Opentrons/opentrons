@@ -10,7 +10,6 @@ import {
   SPACING,
   SPACING_AUTO,
   Box,
-  Tooltip,
   useHoverTooltip,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -18,7 +17,7 @@ import {
 import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { TertiaryButton } from '../../../../atoms/buttons'
-import { useIsRobotBusy } from '../../hooks'
+import { Tooltip } from '../../../../atoms/Tooltip'
 import {
   getBuildrootUpdateDisplayInfo,
   startBuildrootUpdate,
@@ -34,14 +33,14 @@ const HIDDEN_CSS = css`
 
 interface UpdateRobotSoftwareProps {
   robotName: string
-  updateIsRobotBusy: (isRobotBusy: boolean) => void
   onUpdateStart: () => void
+  isRobotBusy: boolean
 }
 
 export function UpdateRobotSoftware({
   robotName,
-  updateIsRobotBusy,
   onUpdateStart,
+  isRobotBusy,
 }: UpdateRobotSoftwareProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
@@ -50,18 +49,18 @@ export function UpdateRobotSoftware({
   })
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
-  const isBusy = useIsRobotBusy()
+  const inputRef = React.useRef<HTMLInputElement>(null)
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
-    if (isBusy) {
-      updateIsRobotBusy(true)
-    } else {
-      const { files } = event.target
-      if (files?.length === 1 && !updateDisabled) {
-        dispatch(startBuildrootUpdate(robotName, files[0].path))
-        onUpdateStart()
-      }
+    const { files } = event.target
+    if (files?.length === 1 && !updateDisabled) {
+      dispatch(startBuildrootUpdate(robotName, files[0].path))
+      onUpdateStart()
     }
+  }
+
+  const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
+    inputRef.current?.click()
   }
 
   return (
@@ -84,13 +83,15 @@ export function UpdateRobotSoftware({
         </ExternalLink>
       </Box>
       <TertiaryButton
-        as="label"
         marginLeft={SPACING_AUTO}
         id="AdvancedSettings_softwareUpdateButton"
         {...updateButtonProps}
+        disabled={updateDisabled || isRobotBusy}
+        onClick={handleClick}
       >
-        {t('update_robot_software_browse_button')}
+        {t('browse_file_system')}
         <input
+          ref={inputRef}
           type="file"
           onChange={handleChange}
           disabled={updateDisabled}
@@ -98,7 +99,7 @@ export function UpdateRobotSoftware({
         />
       </TertiaryButton>
       {updateFromFileDisabledReason != null && (
-        <Tooltip {...updateButtonTooltipProps}>
+        <Tooltip tooltipProps={updateButtonTooltipProps}>
           {updateFromFileDisabledReason}
         </Tooltip>
       )}
