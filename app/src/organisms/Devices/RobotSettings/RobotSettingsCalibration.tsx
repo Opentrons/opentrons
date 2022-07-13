@@ -305,6 +305,7 @@ export function RobotSettingsCalibration({
       session &&
       session.sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
     ) {
+      // TODO: add analytics event
       return session
     }
     return null

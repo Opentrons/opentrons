@@ -102,6 +102,8 @@ export function RenameRobotSlideout({
       // TODO 6/9/2022 kj this is a temporary fix to avoid the issue
       // https://github.com/Opentrons/opentrons/issues/10709
       data.name != null && history.push(`/devices`)
+
+      // TODO: add analytics event
       dispatch(removeRobot(previousRobotName))
     },
     onError: (error: Error) => {

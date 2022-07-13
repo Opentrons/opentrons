@@ -53,6 +53,7 @@ export const SummaryScreen = (props: {
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
 
   const applyLabwareOffsets = (): void => {
+    // TODO: add analytics event
     if (labwareOffsets.length > 0) {
       labwareOffsets.forEach(labwareOffset => {
         createLabwareOffset({
