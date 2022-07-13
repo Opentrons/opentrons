@@ -78,6 +78,7 @@ def patch_mock_publish_context(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) ->
 @pytest.fixture
 def mock_protocol_context(decoy: Decoy) -> ProtocolContext:
     mock_protocol_context = decoy.mock(cls=ProtocolContext)
+    decoy.when(mock_protocol_context._modules).then_return([])
     return mock_protocol_context
 
 
@@ -157,7 +158,6 @@ def test_pick_up_from_location(
     input_location = Location(point=input_point, labware=labware)
     expected_location = Location(point=expected_point_call, labware=mock_well)
 
-    decoy.when(subject._ctx._modules).then_return([])
     decoy.when(mock_labware.next_tip(0)).then_return(mock_well)
 
     decoy.when(mock_well.top()).then_return(expected_location)
@@ -190,8 +190,6 @@ def test_pick_up_from_manipulated_location(
     expected_location = Location(Point(x=-100, y=-100, z=0), labware=mock_well)
     move_to_location = initial_location.move(point=Point(x=-100, y=-100, z=0))
 
-    decoy.when(subject._ctx._modules).then_return([])
-
     subject.pick_up_tip(location=move_to_location)
 
     decoy.verify(
@@ -217,7 +215,6 @@ def test_pick_up_from_well(
     mock_well = decoy.mock(cls=Well)
     expected_location = Location(Point(0, 0, 0), mock_well)
 
-    decoy.when(subject._ctx._modules).then_return([])
     decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=0)).then_return(
         False
     )
@@ -250,7 +247,6 @@ def test_pick_up_from_no_location(
 
     expected_location = Location(Point(0, 0, 0), mock_well)
 
-    decoy.when(subject._ctx._modules).then_return([])
     decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=0)).then_return(
         False
     )
