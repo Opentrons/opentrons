@@ -13,9 +13,9 @@ from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocols.context.well import WellImplementation
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.api_support.instrument import validate_tiprack, tip_length_for
+from opentrons.protocols.api_support import instrument
 from opentrons.commands import publisher
-from opentrons.protocol_api.labware import next_available_tip
+from opentrons.protocol_api import labware
 
 
 @pytest.fixture(autouse=True)
@@ -26,7 +26,7 @@ def patch_mock_next_available_tip(
 ) -> None:
     """Replace next_available_tip() with a mock."""
     mock_well = decoy.mock(cls=Well)
-    mock_next_available_tip = decoy.mock(func=next_available_tip)
+    mock_next_available_tip = decoy.mock(func=labware.next_available_tip)
     monkeypatch.setattr(
         "opentrons.protocol_api.labware.next_available_tip",
         mock_next_available_tip,
@@ -40,7 +40,7 @@ def patch_mock_next_available_tip(
 @pytest.fixture(autouse=True)
 def patch_mock_validate_tiprack(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     """Replace validate_tiprack() with a mock."""
-    mock_validate_tiprack = decoy.mock(func=validate_tiprack)
+    mock_validate_tiprack = decoy.mock(func=instrument.validate_tiprack)
     monkeypatch.setattr(
         "opentrons.protocols.api_support.instrument.validate_tiprack",
         mock_validate_tiprack,
@@ -50,7 +50,7 @@ def patch_mock_validate_tiprack(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -
 @pytest.fixture(autouse=True)
 def patch_mock_tip_length_for(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     """Replace tip_length_for() with a mock."""
-    mock_validate_tiprack = decoy.mock(func=tip_length_for)
+    mock_validate_tiprack = decoy.mock(func=instrument.tip_length_for)
     monkeypatch.setattr(
         "opentrons.protocols.api_support.instrument.tip_length_for",
         mock_validate_tiprack,
@@ -195,14 +195,13 @@ def test_pick_up_from_manipulated_location(
 
     mock_well = decoy.mock(cls=Well)
     initial_location = Location(Point(0, 0, 0), labware=mock_well)
-    expected_location = Location(Point(x=-100, y=-100, z=0), labware=mock_well)
     move_to_location = initial_location.move(point=Point(x=-100, y=-100, z=0))
 
     subject.pick_up_tip(location=move_to_location)
 
     decoy.verify(
         mock_instrument_implementation.move_to(
-            location=expected_location,
+            location=move_to_location,
             force_direct=False,
             minimum_z_height=None,
             speed=None,
