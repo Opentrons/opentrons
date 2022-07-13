@@ -20,7 +20,6 @@ const unselectedOptionStyles = css`
   cursor: pointer;
 
   &:hover {
-    background-color: ${COLORS.background};
     border: 1px solid ${COLORS.medGreyHover};
   }
 `

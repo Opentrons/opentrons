@@ -181,7 +181,7 @@ describe('ChooseRobotSlideout', () => {
       onCloseClick: jest.fn(),
       showSlideout: true,
     })
-    const refreshButton = getByRole('button', { name: 'Refresh list' })
+    const refreshButton = getByRole('button', { name: 'refresh' })
     fireEvent.click(refreshButton)
     expect(mockStartDiscovery).toHaveBeenCalled()
     expect(dispatch).toHaveBeenCalledWith({ type: 'mockStartDiscovery' })
@@ -200,7 +200,7 @@ describe('ChooseRobotSlideout', () => {
     expect(proceedButton).not.toBeDisabled()
     const otherRobot = getByText('otherRobot')
     otherRobot.click() // unselect default robot
-    expect(proceedButton).toBeDisabled()
+    expect(proceedButton).not.toBeDisabled()
     const mockRobot = getByText('opentrons-robot-name')
     mockRobot.click()
     expect(proceedButton).not.toBeDisabled()

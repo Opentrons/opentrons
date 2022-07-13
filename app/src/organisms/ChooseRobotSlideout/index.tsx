@@ -24,6 +24,7 @@ import {
   JUSTIFY_CENTER,
   SIZE_4,
   TEXT_ALIGN_CENTER,
+  DIRECTION_ROW,
 } from '@opentrons/components'
 
 import {
@@ -54,7 +55,7 @@ interface ChooseRobotSlideoutProps extends StyleProps {
 export function ChooseRobotSlideout(
   props: ChooseRobotSlideoutProps
 ): JSX.Element | null {
-  const { t } = useTranslation(['protocol_details', 'shared'])
+  const { t } = useTranslation(['protocol_details', 'shared', 'app_settings'])
   const { storedProtocolData, showSlideout, onCloseClick, ...restProps } = props
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
@@ -177,20 +178,33 @@ export function ChooseRobotSlideout(
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex
           alignSelf={ALIGN_FLEX_END}
-          marginY={SPACING.spacing3}
+          marginBottom={SPACING.spacing3}
           height={SIZE_2}
         >
           {isScanning ? (
-            <Icon name="ot-spinner" spin size={SIZE_1} />
+            <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+              <StyledText
+                as="p"
+                color={COLORS.darkGreyEnabled}
+                marginRight={SPACING.spacingSM}
+              >
+                {t('app_settings:searching')}
+              </StyledText>
+              <Icon
+                name="ot-spinner"
+                spin
+                size="1.25rem"
+                color={COLORS.darkGreyEnabled}
+              />
+            </Flex>
           ) : (
             <Link
-              color={COLORS.blue}
               onClick={() => dispatch(startDiscovery())}
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
               role="button"
-              css={TYPOGRAPHY.pSemiBold}
+              css={TYPOGRAPHY.linkPSemiBold}
             >
-              {t('shared:refresh_list')}
+              {t('shared:refresh')}
             </Link>
           )}
         </Flex>
@@ -221,7 +235,7 @@ export function ChooseRobotSlideout(
                   onClick={() => {
                     if (!isCreatingRun) {
                       resetCreateRun()
-                      setSelectedRobot(isSelected ? null : robot)
+                      setSelectedRobot(robot)
                     }
                   }}
                   isError={runCreationError != null}
@@ -279,7 +293,9 @@ export function ChooseRobotSlideout(
                 t={t}
                 i18nKey="view_unavailable_robots"
                 components={{
-                  devicesLink: <NavLink to="/devices" />,
+                  devicesLink: (
+                    <NavLink to="/devices" css={TYPOGRAPHY.linkPSemiBold} />
+                  ),
                 }}
               />
             </StyledText>
