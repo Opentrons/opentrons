@@ -14,6 +14,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
+import { useTrackEvent } from '../../redux/analytics'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { useLPCSuccessToast } from '../ProtocolSetup/hooks'
 import { DeckMap } from './DeckMap'
@@ -35,6 +36,7 @@ export const SummaryScreen = (props: {
   const { t } = useTranslation('labware_position_check')
   const introInfo = useIntroInfo()
   const { protocolData } = useProtocolDetailsForRun(runId)
+  const trackEvent = useTrackEvent()
   useLabwareOffsets(
     savePositionCommandData,
     protocolData as ProtocolAnalysisFile
@@ -53,7 +55,7 @@ export const SummaryScreen = (props: {
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
 
   const applyLabwareOffsets = (): void => {
-    // TODO: add analytics event
+    trackEvent({ name: 'applyLabwareOffsetData', properties: {} })
     if (labwareOffsets.length > 0) {
       labwareOffsets.forEach(labwareOffset => {
         createLabwareOffset({
