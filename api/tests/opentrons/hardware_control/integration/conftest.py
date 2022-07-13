@@ -29,7 +29,12 @@ def emulator_settings() -> Settings:
 @pytest.fixture(scope="session")
 def emulation_app(emulator_settings: Settings) -> Iterator[None]:
     """Run the emulators"""
-    modules = [ModuleType.Magnetic, ModuleType.Temperature, ModuleType.Thermocycler]
+    modules = [
+        ModuleType.Magnetic,
+        ModuleType.Temperature,
+        ModuleType.Thermocycler,
+        ModuleType.Heatershaker,
+    ]
 
     def _run_app() -> None:
         async def _async_run() -> None:
