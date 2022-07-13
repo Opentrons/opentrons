@@ -51,7 +51,7 @@ class RobotClient:
                 )
 
     async def alive(self) -> bool:
-        """Is /health  reachable?"""
+        """Is /health reachable?"""
         try:
             await self.get_health()
             return True
