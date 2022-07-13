@@ -128,9 +128,9 @@ To prepare code written for Jupyter notebook so it can be run in the app, you ne
 
 .. code-block:: python
 
-    metadata = {'apiLevel': 2.12}
+    metadata = {'apiLevel': '2.12'}
 
-    def run(protocol: protocol_api.ProtocolContext):
+    def run(protocol):
         tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
         reservoir = protocol.load_labware('nest_12_reservoir_15ml', 2)
         plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 3)
