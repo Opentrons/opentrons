@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-beta.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.2...v6.0.0-beta.3) (2022-07-13)
+
+
+### Bug Fixes
+
+* **app:** 6.0 overall design QA ([#11081](https://github.com/Opentrons/opentrons/issues/11081)) ([bec8e23](https://github.com/Opentrons/opentrons/commit/bec8e23b9dfc4d29c88d5b5de73dd315a0c00885))
+* **app:** Address Choose a robot to run slideout design feedback ([#11065](https://github.com/Opentrons/opentrons/issues/11065)) ([1b1f84e](https://github.com/Opentrons/opentrons/commit/1b1f84e195ebd4daf709ce2736defcd6d55c37a2)), closes [#11029](https://github.com/Opentrons/opentrons/issues/11029) [#11057](https://github.com/Opentrons/opentrons/issues/11057)
+* **app:** firmware update modal copy update ([#11088](https://github.com/Opentrons/opentrons/issues/11088)) ([27bed72](https://github.com/Opentrons/opentrons/commit/27bed7252268881abe1163ddbe8c96483da46b47)), closes [#11075](https://github.com/Opentrons/opentrons/issues/11075)
+* **app:** fix Browse file system button issues ([#11113](https://github.com/Opentrons/opentrons/issues/11113)) ([ec1a4bb](https://github.com/Opentrons/opentrons/commit/ec1a4bbeab8af136cd4162d156b7916a1c95f65d)), closes [#11105](https://github.com/Opentrons/opentrons/issues/11105)
+* **app:** fix devices landing page text wrapping ([#11110](https://github.com/Opentrons/opentrons/issues/11110)) ([9de3dca](https://github.com/Opentrons/opentrons/commit/9de3dca436a96c8c975ca23e2d230016fe17a892)), closes [#10886](https://github.com/Opentrons/opentrons/issues/10886)
+* **app:** fix labware offset text alignment, fix historical run log missing timestamps ([#11114](https://github.com/Opentrons/opentrons/issues/11114)) ([94c32a7](https://github.com/Opentrons/opentrons/commit/94c32a70da46201af28481703df775296c600199)), closes [#11109](https://github.com/Opentrons/opentrons/issues/11109) [#11108](https://github.com/Opentrons/opentrons/issues/11108)
+* **app:** open tc lid in LPC via protocol engine command ([#11111](https://github.com/Opentrons/opentrons/issues/11111)) ([f74853b](https://github.com/Opentrons/opentrons/commit/f74853b072ff31d3a383ce639d35d0ff5d4db033)), closes [#11096](https://github.com/Opentrons/opentrons/issues/11096)
+* **app:** rm analyzing state in run header for historical runs ([#11122](https://github.com/Opentrons/opentrons/issues/11122)) ([efa83d4](https://github.com/Opentrons/opentrons/commit/efa83d4da31d27bb2d16dd35ddd91757dace02fb))
+* **app:** sanitize legacy command text in new run log to protect for non string values ([#11129](https://github.com/Opentrons/opentrons/issues/11129)) ([06edad6](https://github.com/Opentrons/opentrons/commit/06edad69dae9c8827c9083562304f59bc399c016))
+* **app:** sanitize legacy command text in run log to protect for non string values ([#11127](https://github.com/Opentrons/opentrons/issues/11127)) ([e586bfe](https://github.com/Opentrons/opentrons/commit/e586bfefd904587673fa7ca4cd71ffee524aa484))
+
+
+### Features
+
+* **app:** fix choose protocol/robot slideout robot busy error logic ([#11106](https://github.com/Opentrons/opentrons/issues/11106)) ([d7ae58b](https://github.com/Opentrons/opentrons/commit/d7ae58bba1bcdf5b2c9bc0197881a65e4488e4c2)), closes [#11060](https://github.com/Opentrons/opentrons/issues/11060)
+* **app:** Robot Settings Design QA 2 ([#11020](https://github.com/Opentrons/opentrons/issues/11020)) ([8b43995](https://github.com/Opentrons/opentrons/commit/8b439959d97cc077e3795cfdfb82398ea6e62d9b)), closes [#10893](https://github.com/Opentrons/opentrons/issues/10893)
+
+
+
+
+
 # [6.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.1...v6.0.0-beta.2) (2022-07-12)
 
 
