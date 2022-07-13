@@ -2,13 +2,11 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import startCase from 'lodash/startCase'
 import { format } from 'date-fns'
-import { css } from 'styled-components'
 
 import {
   Box,
   Flex,
   Icon,
-  Link,
   LabwareRender,
   RobotWorkSpace,
   SPACING,
@@ -19,26 +17,12 @@ import {
   DIRECTION_COLUMN,
   ALIGN_FLEX_END,
   ALIGN_CENTER,
-  SIZE_1,
-  POSITION_RELATIVE,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
 
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
-
-const COPY_ICON_STYLE = css`
-  color: ${COLORS.darkGreyEnabled};
-
-  position: ${POSITION_RELATIVE};
-  top: ${SPACING.spacing1};
-  left: ${SPACING.spacing2};
-
-  &:hover {
-    color: ${COLORS.black};
-  }
-`
 
 export interface LabwareCardProps {
   labware: LabwareDefAndDate
@@ -52,11 +36,6 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const displayName = definition?.metadata.displayName
   const displayCategory = startCase(definition.metadata.displayCategory)
   const isCustomDefinition = definition.namespace !== 'opentrons'
-
-  const handleCopyClick = async (e: React.MouseEvent): Promise<void> => {
-    e.stopPropagation()
-    await navigator.clipboard.writeText(apiName)
-  }
 
   return (
     <Box
@@ -132,21 +111,9 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             >
               {t('api_name')}
             </StyledText>
-            <Link
-              css={TYPOGRAPHY.pRegular}
-              onClick={handleCopyClick}
-              role="button"
-            >
-              <Box overflowWrap="anywhere">
-                {apiName}
-                <Icon
-                  height={SIZE_1}
-                  name="copy-text"
-                  aria-label="copy-text"
-                  css={COPY_ICON_STYLE}
-                />
-              </Box>
-            </Link>
+            <StyledText as="p">
+              <Box overflowWrap="anywhere">{apiName}</Box>
+            </StyledText>
           </Box>
         </Flex>
       </Box>

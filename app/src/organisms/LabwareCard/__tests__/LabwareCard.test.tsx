@@ -38,13 +38,12 @@ describe('LabwareCard', () => {
 
   it('renders correct info for opentrons labware card', () => {
     props.labware.definition.namespace = 'opentrons'
-    const [{ getByText, getByRole }] = render(props)
+    const [{ getByText }] = render(props)
     getByText('mock RobotWorkSpace')
     getByText('Well Plate')
     getByText('Mock Definition')
     getByText(`Opentrons Definition`)
     getByText('API Name')
-    getByRole('button', { name: 'mock_definition' })
   })
 
   it('renders additional info for custom labware card', () => {
