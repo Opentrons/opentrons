@@ -1,6 +1,9 @@
 import { UseQueryResult } from 'react-query'
 import { act } from '@testing-library/react'
-import { useAllSessionsQuery, useAllRunsQuery } from '@opentrons/react-api-client'
+import {
+  useAllSessionsQuery,
+  useAllRunsQuery,
+} from '@opentrons/react-api-client'
 
 import { useIsRobotBusy } from '../useIsRobotBusy'
 
@@ -12,7 +15,9 @@ jest.mock('../../../ProtocolUpload/hooks')
 const mockUseAllSessionsQuery = useAllSessionsQuery as jest.MockedFunction<
   typeof useAllSessionsQuery
 >
-const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<typeof useAllRunsQuery>
+const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
+  typeof useAllRunsQuery
+>
 
 describe('useIsRobotBusy', () => {
   beforeEach(() => {
@@ -22,9 +27,9 @@ describe('useIsRobotBusy', () => {
     } as UseQueryResult<Sessions, Error>)
     mockUseAllRunsQuery.mockReturnValue({
       data: {
-        links:{
+        links: {
           current: {},
-        }
+        },
       },
     } as UseQueryResult<Runs, Error>)
   })
@@ -34,21 +39,21 @@ describe('useIsRobotBusy', () => {
   })
 
   it('returns true when current runId is not null', () => {
-    const result = useIsRobotBusy({poll: false})
+    const result = useIsRobotBusy({ poll: false })
     expect(result).toBe(true)
   })
 
   it('returns true when sessions are not empty', () => {
-    const result = useIsRobotBusy({poll: false})
+    const result = useIsRobotBusy({ poll: false })
     expect(result).toBe(true)
   })
 
   it('returns false when current runId is null and sessions are empty', () => {
     mockUseAllRunsQuery.mockReturnValue({
       data: {
-        links:{
+        links: {
           current: null,
-        }
+        },
       },
     } as any)
     mockUseAllSessionsQuery.mockReturnValue(({
@@ -67,7 +72,7 @@ describe('useIsRobotBusy', () => {
     expect(result).toBe(false)
   })
 
-  it('should poll the run and sessions if poll option is true', async() => {
+  it('should poll the run and sessions if poll option is true', async () => {
     const result = useIsRobotBusy({ poll: true })
     expect(result).toBe(true)
 
