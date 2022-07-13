@@ -13,7 +13,7 @@ const mockUseTrackEvent = useTrackEvent as jest.Mock<typeof useTrackEvent>
 
 describe('UploadInput', () => {
   let onUpload: jest.MockedFunction<() => {}>
-  let trackEvent: jest.MockedFunction<() => {}>
+  let trackEvent: jest.MockedFunction<any>
   let render: () => ReturnType<typeof renderWithProviders>[0]
 
   beforeEach(() => {
@@ -58,11 +58,13 @@ describe('UploadInput', () => {
   it('calls onUpload callback on choose file and trigger analytics event', () => {
     const { getByTestId } = render()
     const input = getByTestId('file_input')
-    fireEvent.change(input, { target: { files: [{ path: 'dummyFile', name: 'dummyName' }] } })
+    fireEvent.change(input, {
+      target: { files: [{ path: 'dummyFile', name: 'dummyName' }] },
+    })
     expect(onUpload).toHaveBeenCalled()
     expect(trackEvent).toHaveBeenCalledWith({
       name: 'importProtocolToApp',
-      properties: {protocolFileName: 'dummyName'},
+      properties: { protocolFileName: 'dummyName' },
     })
   })
 })
