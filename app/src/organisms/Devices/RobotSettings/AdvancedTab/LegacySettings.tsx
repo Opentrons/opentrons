@@ -69,6 +69,7 @@ export function LegacySettings({
         toggledOn={settings?.value === true}
         onClick={handleClick}
         id="RobotSettings_legacySettingsToggleButton"
+        disabled={isBusy}
       />
     </Flex>
   )

@@ -66,6 +66,7 @@ export function UseOlderProtocol({
         toggledOn={settings?.value === true}
         onClick={handleClick}
         id="RobotSettings_useOlderProtocolToggleButton"
+        disabled={isBusy}
       />
     </Flex>
   )

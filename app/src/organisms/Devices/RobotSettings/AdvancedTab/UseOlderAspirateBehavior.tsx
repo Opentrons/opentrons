@@ -61,6 +61,7 @@ export function UseOlderAspirateBehavior({
         toggledOn={settings?.value === true}
         onClick={handleClick}
         id="AdvancedSettings_useOlderAspirate"
+        disabled={isBusy}
       />
     </Flex>
   )

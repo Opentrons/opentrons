@@ -18,7 +18,6 @@ import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { Tooltip } from '../../../../atoms/Tooltip'
-import { useIsRobotBusy } from '../../hooks'
 import {
   getBuildrootUpdateDisplayInfo,
   startBuildrootUpdate,
@@ -34,14 +33,14 @@ const HIDDEN_CSS = css`
 
 interface UpdateRobotSoftwareProps {
   robotName: string
-  updateIsRobotBusy: (isRobotBusy: boolean) => void
   onUpdateStart: () => void
+  isRobotBusy: boolean
 }
 
 export function UpdateRobotSoftware({
   robotName,
-  updateIsRobotBusy,
   onUpdateStart,
+  isRobotBusy,
 }: UpdateRobotSoftwareProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
@@ -50,7 +49,7 @@ export function UpdateRobotSoftware({
   })
   const updateDisabled = updateFromFileDisabledReason !== null
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
-  const isBusy = useIsRobotBusy()
+  // const isBusy = useIsRobotBusy()
   const inputRef = React.useRef<HTMLInputElement>(null)
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
@@ -62,11 +61,7 @@ export function UpdateRobotSoftware({
   }
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-    if (isBusy) {
-      updateIsRobotBusy(true)
-    } else {
-      inputRef.current?.click()
-    }
+    inputRef.current?.click()
   }
 
   return (
@@ -92,7 +87,7 @@ export function UpdateRobotSoftware({
         marginLeft={SPACING_AUTO}
         id="AdvancedSettings_softwareUpdateButton"
         {...updateButtonProps}
-        disabled={updateDisabled}
+        disabled={updateDisabled || isRobotBusy}
         onClick={handleClick}
       >
         {t('browse_file_system')}

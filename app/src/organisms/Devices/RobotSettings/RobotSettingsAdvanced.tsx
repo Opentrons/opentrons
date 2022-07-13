@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import { Box, SPACING, IconProps } from '@opentrons/components'
+import { useIsRobotBusyQuery } from '@opentrons/react-api-client'
 
 import { Divider } from '../../../atoms/structure'
 import { Toast } from '../../../atoms/Toast'
@@ -25,6 +26,8 @@ import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRo
 import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
 import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
 import { UpdateBuildroot } from './UpdateBuildroot'
+import { UNREACHABLE } from '../../../redux/discovery'
+import { Portal } from '../../../App/portal'
 
 import type { State, Dispatch } from '../../../redux/types'
 import type {
@@ -32,9 +35,8 @@ import type {
   RobotSettingsField,
 } from '../../../redux/robot-settings/types'
 import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
-import { UNREACHABLE } from '../../../redux/discovery'
-import { Portal } from '../../../App/portal'
 
+const ROBOT_STATUS_POLL_MS = 3000
 interface RobotSettingsAdvancedProps {
   robotName: string
   updateRobotStatus: (isRobotBusy: boolean) => void
@@ -64,6 +66,11 @@ export function RobotSettingsAdvanced({
   const [showDownloadToast, setShowDownloadToast] = React.useState<boolean>(
     false
   )
+
+  const isRobotBusy =
+    useIsRobotBusyQuery({ refetchInterval: ROBOT_STATUS_POLL_MS }).data ?? false
+
+  console.log('isRobotBusy', isRobotBusy)
 
   const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
   const robot = useRobot(robotName)
@@ -112,6 +119,10 @@ export function RobotSettingsAdvanced({
   React.useEffect(() => {
     dispatch(fetchSettings(robotName))
   }, [dispatch, robotName])
+
+  React.useEffect(() => {
+    updateRobotStatus(isRobotBusy)
+  }, [isRobotBusy, updateRobotStatus])
 
   return (
     <>
@@ -162,7 +173,7 @@ export function RobotSettingsAdvanced({
         <DisplayRobotName
           robotName={robotName}
           updateIsExpanded={updateIsExpanded}
-          updateIsRobotBusy={updateIsRobotBusy}
+          isRobotBusy={isRobotBusy}
         />
         <Divider marginY={SPACING.spacing4} />
         <RobotServerVersion robotName={robotName} />
@@ -185,7 +196,8 @@ export function RobotSettingsAdvanced({
         <Divider marginY={SPACING.spacing5} />
         <UpdateRobotSoftware
           robotName={robotName}
-          updateIsRobotBusy={updateIsRobotBusy}
+          // updateIsRobotBusy={updateIsRobotBusy}
+          isRobotBusy={isRobotBusy}
           onUpdateStart={() => setShowSoftwareUpdateModal(true)}
         />
         <Divider marginY={SPACING.spacing4} />
