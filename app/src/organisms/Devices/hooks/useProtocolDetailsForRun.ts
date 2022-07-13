@@ -13,7 +13,7 @@ export interface ProtocolDetails {
   displayName: string | null
   protocolData: ProtocolAnalysisFile<{}> | null
   protocolKey: string | null
-  isProtocolAnalyzing: boolean
+  isProtocolAnalyzing?: boolean
 }
 
 export function useProtocolDetailsForRun(
