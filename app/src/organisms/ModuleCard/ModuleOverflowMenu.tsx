@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
+import { ModuleType } from '@opentrons/shared-data'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
+import { useIsRobotBusy } from '../Devices/hooks'
 import { MenuItemsByModuleType, useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '../../redux/modules/types'
-import type { ModuleType } from '@opentrons/shared-data'
-import { useIsRobotBusy } from '../Devices/hooks'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule
@@ -43,16 +43,16 @@ export const ModuleOverflowMenu = (
   )
   const isBusy = useIsRobotBusy() && runId == null
   return (
-    <>
-      <Flex position={POSITION_RELATIVE}>
-        <MenuList
-          buttons={[
-            (menuOverflowItemsByModuleType[
-              module.moduleType
-            ] as MenuItemsByModuleType[ModuleType]).map(
-              (item: any, index: number) => {
-                return (
-                  <>
+    <Flex position={POSITION_RELATIVE}>
+      <MenuList
+        buttons={[
+          (menuOverflowItemsByModuleType[
+            module.moduleType
+          ] as MenuItemsByModuleType[ModuleType]).map(
+            (item: any, index: number) => {
+              return (
+                <>
+                  {item.disabledReason ? (
                     <MenuItem
                       minWidth="10.6rem"
                       key={`${index}_${module.moduleModel}`}
@@ -63,19 +63,29 @@ export const ModuleOverflowMenu = (
                     >
                       {item.setSetting}
                     </MenuItem>
-                    {item.disabledReason && (
-                      <Tooltip tooltipProps={tooltipProps}>
-                        {t('cannot_shake', { ns: 'heater_shaker' })}
-                      </Tooltip>
-                    )}
-                    {item.menuButtons}
-                  </>
-                )
-              }
-            ),
-          ]}
-        />
-      </Flex>
-    </>
+                  ) : (
+                    <MenuItem
+                      minWidth="10.6rem"
+                      key={`${index}_${module.moduleModel}`}
+                      onClick={() => item.onClick(item.isSecondary)}
+                      data-testid={`module_setting_${module.moduleModel}`}
+                      disabled={isBusy}
+                    >
+                      {item.setSetting}
+                    </MenuItem>
+                  )}
+                  {item.disabledReason && (
+                    <Tooltip tooltipProps={tooltipProps}>
+                      {t('heater_shaker:cannot_shake')}
+                    </Tooltip>
+                  )}
+                  {item.menuButtons}
+                </>
+              )
+            }
+          ),
+        ]}
+      />
+    </Flex>
   )
 }
