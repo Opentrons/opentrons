@@ -36,9 +36,9 @@ export interface SelectFieldProps {
   ) => void
   /** blur handler called with (name) */
   onLoseFocus?: (name: string) => void
-  /** optional prop to make select not searchable through typing into the search field*/
+  /** optional prop to make select not searchable through typing into the search field  */
   isSearchable?: boolean
-  /** optional width to specify the width of the select field and dropdown menu*/
+  /** optional width to specify the width of the select field and dropdown menu */
   width?: string
 }
 
