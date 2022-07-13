@@ -17,6 +17,7 @@ import {
   getReachableRobots,
   getUnreachableRobots,
 } from '../../../../../redux/discovery'
+import { useTrackEvent } from '../../../../../redux/analytics'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
 import { PrimaryButton } from '../../../../../atoms/buttons'
@@ -50,6 +51,7 @@ export function RenameRobotSlideout({
   const [previousRobotName, setPreviousRobotName] = React.useState<string>(
     robotName
   )
+  const trackEvent = useTrackEvent()
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
   const connectableRobots = useSelector((state: State) =>
@@ -113,6 +115,11 @@ export function RenameRobotSlideout({
     },
   })
 
+  const handleSubmitRobotRename = (): void => {
+    trackEvent({ name: 'renameARobot', properties: {} })
+    formik.handleSubmit()
+  }
+
   return (
     <Slideout
       title={t('rename_robot_slideout_title')}
@@ -120,7 +127,7 @@ export function RenameRobotSlideout({
       isExpanded={isExpanded}
       footer={
         <PrimaryButton
-          onClick={() => formik.handleSubmit()}
+          onClick={handleSubmitRobotRename}
           disabled={!(formik.isValid && formik.dirty)}
           width="100%"
         >

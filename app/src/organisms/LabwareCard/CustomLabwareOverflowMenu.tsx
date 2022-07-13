@@ -22,7 +22,6 @@ import {
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { AlertPrimaryButton } from '../../atoms/buttons'
-import { useTrackEvent } from '../../redux/analytics'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { Modal } from '../../atoms/Modal'
@@ -46,7 +45,6 @@ export function CustomLabwareOverflowMenu(
 ): JSX.Element {
   const { filename, onDelete } = props
   const { t } = useTranslation(['labware_landing', 'shared'])
-  const trackEvent = useTrackEvent()
   const dispatch = useDispatch<Dispatch>()
   const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
   const overflowMenuRef = useOnClickOutside<HTMLDivElement>({
@@ -81,10 +79,6 @@ export function CustomLabwareOverflowMenu(
   const handleClickLabwareCreator: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    trackEvent({
-      name: 'openLabwareCreatorFromBottomOfLabwareOverflowMenu',
-      properties: {},
-    })
     setShowOverflowMenu(false)
     window.open(LABWARE_CREATOR_HREF, '_blank')
   }
