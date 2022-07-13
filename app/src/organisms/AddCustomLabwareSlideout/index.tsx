@@ -15,6 +15,7 @@ import {
 } from '../../redux/custom-labware'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
+import { useTrackEvent } from '../../redux/analytics'
 import { UploadInput } from '../../molecules/UploadInput'
 import type { Dispatch } from '../../redux/types'
 
@@ -30,6 +31,7 @@ export function AddCustomLabwareSlideout(
 ): JSX.Element {
   const { t } = useTranslation(['labware_landing', 'shared'])
   const dispatch = useDispatch<Dispatch>()
+  const trackEvent = useTrackEvent()
 
   return (
     <Slideout
@@ -46,7 +48,13 @@ export function AddCustomLabwareSlideout(
           onUpload={(file: File) => {
             dispatch(addCustomLabwareFile(file.path))
           }}
-          onClick={() => dispatch(addCustomLabware())}
+          onClick={() => {
+            dispatch(addCustomLabware())
+            trackEvent({
+              name: 'addCustomLabware',
+              properties: {},
+            })
+          }}
           uploadText={t('choose_file_to_upload')}
           dragAndDropText={
             <StyledText as="p">
