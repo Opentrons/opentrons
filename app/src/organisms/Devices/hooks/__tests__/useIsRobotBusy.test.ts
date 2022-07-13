@@ -1,5 +1,4 @@
 import { UseQueryResult } from 'react-query'
-import { act } from '@testing-library/react'
 import {
   useAllSessionsQuery,
   useAllRunsQuery,
