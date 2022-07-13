@@ -6,6 +6,7 @@ from typing import Dict, Callable
 from typing_extensions import Final
 
 from opentrons.hardware_control.emulation.abstract_emulator import AbstractEmulator
+from opentrons.hardware_control.emulation.heater_shaker import HeaterShakerEmulator
 from opentrons.hardware_control.emulation.types import ModuleType
 from opentrons.hardware_control.emulation.magdeck import MagDeckEmulator
 from opentrons.hardware_control.emulation.parser import Parser
@@ -22,12 +23,16 @@ emulator_builder: Final[Dict[str, Callable[[Settings], AbstractEmulator]]] = {
     ModuleType.Thermocycler.value: lambda s: ThermocyclerEmulator(
         Parser(), s.thermocycler
     ),
+    ModuleType.Heatershaker.value: lambda s: HeaterShakerEmulator(
+        Parser(), s.heatershaker
+    ),
 }
 
 emulator_port: Final[Dict[str, Callable[[Settings], ProxySettings]]] = {
     ModuleType.Magnetic.value: lambda s: s.magdeck_proxy,
     ModuleType.Temperature.value: lambda s: s.temperature_proxy,
     ModuleType.Thermocycler.value: lambda s: s.thermocycler_proxy,
+    ModuleType.Heatershaker.value: lambda s: s.heatershaker_proxy,
 }
 
 

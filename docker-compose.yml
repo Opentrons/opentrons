@@ -62,6 +62,13 @@ services:
       - container-network
     depends_on:
       - 'emulator'
+  heatershaker:
+    build: .
+    command: python3 -m opentrons.hardware_control.emulation.scripts.run_module_emulator heatershaker emulator
+    networks:
+      - container-network
+    depends_on:
+      - 'emulator'
 
 networks:
   container-network:

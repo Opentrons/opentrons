@@ -29,6 +29,11 @@ class TemperatureModelSettings(BaseModel):
     starting: float = float(TEMPERATURE_ROOM)
 
 
+class RPMModelSettings(BaseModel):
+    rpm_per_tick: float = 100.0
+    starting: float = 0.0
+
+
 class MagDeckSettings(BaseModuleSettings):
     pass
 
@@ -40,6 +45,11 @@ class TempDeckSettings(BaseModuleSettings):
 class ThermocyclerSettings(BaseModuleSettings):
     lid_temperature: TemperatureModelSettings
     plate_temperature: TemperatureModelSettings
+
+
+class HeaterShakerSettings(BaseModuleSettings):
+    temperature: TemperatureModelSettings
+    rpm: RPMModelSettings
 
 
 class ProxySettings(BaseModel):
@@ -74,6 +84,13 @@ class Settings(BaseSettings):
         version="v1.1.0",
         lid_temperature=TemperatureModelSettings(),
         plate_temperature=TemperatureModelSettings(),
+    )
+    heatershaker: HeaterShakerSettings = HeaterShakerSettings(
+        serial_number="heater_shaker_emulator",
+        model="v01",
+        version="v0.0.1",
+        temperature=TemperatureModelSettings(),
+        rpm=RPMModelSettings(),
     )
 
     heatershaker_proxy: ProxySettings = ProxySettings(
