@@ -1,8 +1,8 @@
 import { HostConfig, Runs, getRuns } from '@opentrons/api-client'
-import { UseQueryResult, useQuery } from 'react-query'
+import { useQuery } from 'react-query'
 import { useHost } from '../api'
 
-import type { UseQueryOptions } from 'react-query'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 
 export function useAllRunsQuery(
   options: UseQueryOptions<Runs, Error, Runs, Array<string|HostConfig>> = {}
