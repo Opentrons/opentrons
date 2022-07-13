@@ -12,8 +12,10 @@ import {
 import { StyledText } from '../../atoms/text'
 import { UploadInput as FileImporter } from '../../molecules/UploadInput'
 import { addProtocol } from '../../redux/protocol-storage'
-import type { Dispatch } from '../../redux/types'
+import { useTrackEvent } from '../../redux/analytics'
 import { useLogger } from '../../logger'
+
+import type { Dispatch } from '../../redux/types'
 
 export interface UploadInputProps {
   onUpload?: () => void
@@ -24,12 +26,17 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const logger = useLogger(__filename)
+  const trackEvent = useTrackEvent()
 
   const handleUpload = (file: File): void => {
     if (file.path === null) {
       logger.warn('Failed to upload file, path not found')
     }
     dispatch(addProtocol(file.path))
+    trackEvent({
+      name: 'importProtocolToApp',
+      properties: { protocolFileName: file.name },
+    })
     props.onUpload?.()
   }
 
