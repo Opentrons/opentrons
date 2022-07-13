@@ -187,6 +187,7 @@ describe('ChooseRobotSlideout', () => {
     expect(proceedButton).not.toBeDisabled()
     const otherRobot = getByText('otherRobot')
     otherRobot.click() // unselect default robot
+    expect(proceedButton).not.toBeDisabled()
     const mockRobot = getByText('opentrons-robot-name')
     mockRobot.click()
     expect(proceedButton).not.toBeDisabled()
