@@ -9,7 +9,6 @@ import {
   Box,
   Link,
   Icon,
-  DropdownField,
   RadioGroup,
   SPACING_AUTO,
   ALIGN_CENTER,
@@ -34,6 +33,8 @@ import {
 } from '../../redux/discovery'
 import { Modal } from '../../atoms/Modal'
 import { Portal } from '../../App/portal'
+import { SelectOption } from '../../atoms/SelectField/Select'
+import { SelectField } from '../../atoms/SelectField'
 import { Toast } from '../../atoms/Toast'
 import { useTrackEvent } from '../../redux/analytics'
 import {
@@ -51,7 +52,6 @@ import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 
 import type { Dispatch, State } from '../../redux/types'
-import type { DropdownOption } from '@opentrons/components'
 
 const ALWAYS_BLOCK: 'always-block' = 'always-block'
 const ALWAYS_TRASH: 'always-trash' = 'always-trash'
@@ -77,7 +77,7 @@ export function AdvancedSettings(): JSX.Element {
   const trackEvent = useTrackEvent()
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
   const channel = useSelector(Config.getUpdateChannel)
-  const channelOptions: DropdownOption[] = useSelector(
+  const channelOptions: SelectOption[] = useSelector(
     Config.getUpdateChannelOptions
   )
   const labwarePath = useSelector(CustomLabware.getCustomLabwareDirectory)
@@ -180,11 +180,23 @@ export function AdvancedSettings(): JSX.Element {
   }
 
   const toggleDevtools = (): unknown => dispatch(Config.toggleDevtools())
-  const handleChannel: React.ChangeEventHandler<HTMLSelectElement> = event =>
-    dispatch(Config.updateConfigValue('update.channel', event.target.value))
+  const handleChannel = (_: string, value: string): void => {
+    dispatch(Config.updateConfigValue('update.channel', value))
+  }
   const displayUnavailRobots = useSelector((state: State) => {
     return Config.getConfig(state)?.discovery.disableCache ?? false
   })
+
+  const formatOptionLabel: React.ComponentProps<
+    typeof SelectField
+  >['formatOptionLabel'] = (option, index): JSX.Element => {
+    const { value } = option
+    return (
+      <StyledText as="p" textTransform={TEXT_TRANSFORM_CAPITALIZE} id={index}>
+        {value === 'latest' ? 'Stable' : value}
+      </StyledText>
+    )
+  }
 
   return (
     <>
@@ -258,11 +270,15 @@ export function AdvancedSettings(): JSX.Element {
             </StyledText>
           </Box>
           <Box width="10rem">
-            <DropdownField
+            <SelectField
+              name={'__updateChannel__'}
               options={channelOptions}
-              onChange={handleChannel}
+              onValueChange={handleChannel}
               value={channel}
-              id={`AdvancedSettings_${channel}`}
+              placeholder={channel}
+              formatOptionLabel={formatOptionLabel}
+              isSearchable={false}
+              width="10rem"
             />
           </Box>
         </Flex>

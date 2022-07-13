@@ -126,14 +126,12 @@ describe('AdvancedSettings', () => {
     getByText('Clear Unavailable Robots')
     getByText('Enable Developer Tools')
   })
-  it('renders the update channel section', () => {
+  it('renders the update channel combobox and section', () => {
     const [{ getByText, getByRole }] = render()
     getByText(
       'Stable receives the latest stable releases. Beta allows you to try out new features before they have completed testing and launch in the Stable channel.'
     )
-    getByRole('option', { name: 'Stable' })
-    getByRole('option', { name: 'Beta' })
-    getByRole('option', { name: 'Alpha' })
+    getByRole('combobox', { name: '' })
   })
   it('renders the custom labware section with source folder selected', () => {
     getCustomLabwarePath.mockReturnValue('/mock/custom-labware-path')

@@ -17,7 +17,7 @@ Basic.parameters = {
   docs: {
     description: {
       component:
-        'Thin wrapper around `react-select` to apply our Opentrons-specific styles. All props are passed directly to [`react-select`](https://react-select.com/props) except for `styles`, `components`, and `classNamePrefix`. The `className` prop appends to the `className` we pass `react-select`. Those props are not passed directly because they provide the base styling of the component',
+        'Thin wrapper around `react-select` to apply our Opentrons-specific styles in the app.',
     },
   },
 }

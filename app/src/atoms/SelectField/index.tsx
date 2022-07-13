@@ -15,7 +15,7 @@ export interface SelectFieldProps {
   /** react-Select option, usually label, value */
   options: NonNullable<SelectProps['options']>
   /** currently selected value */
-  value: string | null | undefined
+  value: string | null
   /** disable the select */
   disabled?: SelectProps['isDisabled']
   /** optional placeholder  */
@@ -27,7 +27,7 @@ export interface SelectFieldProps {
   /** optional caption. hidden when `error` is given */
   caption?: React.ReactNode
   /** if included, use error style and display error instead of caption */
-  error?: string | null | undefined
+  error?: string | null
   /** change handler called with (name, value, actionMeta) */
   onValueChange?: (
     name: string,
@@ -35,7 +35,11 @@ export interface SelectFieldProps {
     actionMeta: ActionMeta<SelectOption>
   ) => void
   /** blur handler called with (name) */
-  onLoseFocus?: (name: string) => unknown
+  onLoseFocus?: (name: string) => void
+  /** optional prop to make select not searchable through typing into the search field*/
+  isSearchable?: boolean
+  /** optional width to specify the width of the select field and dropdown menu*/
+  width?: string
 }
 
 const CAPTION_STYLE = css`
@@ -58,6 +62,8 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
     error,
     onValueChange,
     onLoseFocus,
+    isSearchable,
+    width,
   } = props
   // @ts-expect-error(mc, 2021-03-19): resolve this error
   const allOptions = options.flatMap(og => og.options || [og])
@@ -73,7 +79,10 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
         value={value}
         isDisabled={disabled}
         placeholder={placeholder}
+        isSearchable={isSearchable}
         menuPosition={menuPosition}
+        width={width}
+        tabIndex={2}
         formatOptionLabel={formatOptionLabel}
         onChange={(
           opt: SingleValue<SelectOption> | MultiValue<SelectOption>,
