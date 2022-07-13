@@ -10,7 +10,6 @@ import {
   SPACING,
   SPACING_AUTO,
   Box,
-  Tooltip,
   useHoverTooltip,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -18,6 +17,7 @@ import {
 import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 import { TertiaryButton } from '../../../../atoms/buttons'
+import { Tooltip } from '../../../../atoms/Tooltip'
 import { useIsRobotBusy } from '../../hooks'
 import {
   getBuildrootUpdateDisplayInfo,
@@ -62,9 +62,7 @@ export function UpdateRobotSoftware({
   }
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-    console.log('handleClick')
     if (isBusy) {
-      console.log('isBusy')
       updateIsRobotBusy(true)
     } else {
       inputRef.current?.click()
@@ -107,7 +105,7 @@ export function UpdateRobotSoftware({
         />
       </TertiaryButton>
       {updateFromFileDisabledReason != null && (
-        <Tooltip {...updateButtonTooltipProps}>
+        <Tooltip tooltipProps={updateButtonTooltipProps}>
           {updateFromFileDisabledReason}
         </Tooltip>
       )}
