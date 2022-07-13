@@ -25,6 +25,7 @@ import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/buttons'
 import { Toast } from '../../atoms/Toast'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { useTrackEvent } from '../../redux/analytics'
 import { DropdownMenu } from '../../atoms/MenuList/DropdownMenu'
 import { LabwareCard } from '../../organisms/LabwareCard'
 import { AddCustomLabwareSlideout } from '../../organisms/AddCustomLabwareSlideout'
@@ -73,7 +74,7 @@ export function Labware(): JSX.Element {
   const [sortBy, setSortBy] = React.useState<LabwareSort>('alphabetical')
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
-
+  const trackEvent = useTrackEvent()
   const [filterBy, setFilterBy] = React.useState<LabwareFilter>('all')
 
   const labware = useAllLabware(sortBy, filterBy)
@@ -229,6 +230,12 @@ export function Labware(): JSX.Element {
 
           <Link
             external
+            onClick={() =>
+              trackEvent({
+                name: 'openLabwareCreatorFromBottomOfLabwareLibraryList',
+                properties: {},
+              })
+            }
             href={LABWARE_CREATOR_HREF}
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
           >
