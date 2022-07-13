@@ -17,6 +17,7 @@ import {
   Icon,
   DIRECTION_ROW,
   ALIGN_FLEX_START,
+  JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 
@@ -56,7 +57,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
     >
       <Flex
         flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_FLEX_END}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_FLEX_START}
         gridGap={SPACING.spacing2}
       >
