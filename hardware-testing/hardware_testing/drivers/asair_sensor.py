@@ -9,6 +9,7 @@ import codecs
 import logging
 import random
 import time
+from typing import Tuple
 from abc import ABC
 from dataclasses import dataclass
 
@@ -16,6 +17,9 @@ import serial  # type: ignore[import]
 from serial.serialutil import SerialException  # type: ignore[import]
 
 log = logging.getLogger(__name__)
+
+USB_VID = 1027
+USB_PID = 24577
 
 
 addrs = {
@@ -50,6 +54,11 @@ class Reading:
 
 class AsairSensorBase(ABC):
     """Abstract base class of sensor."""
+
+    @classmethod
+    def vid_pid(cls) -> Tuple[int, int]:
+        """Asair sensor VID:PID."""
+        return USB_VID, USB_PID
 
     @abc.abstractmethod
     def get_reading(self) -> Reading:

@@ -4,12 +4,16 @@ from statistics import stdev
 from time import time
 from typing import List, Optional, Callable
 
-from hardware_testing.drivers.radwag.driver import RadwagScaleBase
+from opentrons.protocol_api import ProtocolContext
+
+from hardware_testing.drivers import RadwagScaleBase
 from hardware_testing.data import (
     dump_data_to_file,
     append_data_to_file,
     create_file_name,
 )
+
+from .scale import scale_connect_and_initialize
 
 
 @dataclass
@@ -159,10 +163,8 @@ def read_sample_from_scale(scale: RadwagScaleBase) -> GravimetricSample:
 @dataclass
 class RecordConfig:
     """Recording config."""
-
-    length: Optional[int]
     duration: Optional[float]
-    interval: Optional[float]
+    frequency: Optional[float]
     stable: Optional[bool]
 
 
@@ -186,57 +188,44 @@ def _record_get_interval_overlap(samples: GravimetricRecording, period: float) -
     return real_time - ideal_time
 
 
-def _record_validate_config(config: RecordConfig) -> RecordConfig:
-    if config.length and config.interval and config.duration:
-        raise ValueError(
-            "Cannot have all three (length, interval, duration) "
-            "arguments set, only use 2 at a time"
-        )
-    if config.duration and config.length:
-        config.interval = config.duration / (config.length - 1)
-    elif config.duration and config.interval:
-        config.length = int(config.duration / config.interval) + 1
-    if not config.length or not config.interval:
-        raise ValueError(
-            "Cannot record with 2 of the following arguments: "
-            "1) length, 2) interval, or 3) duration"
-        )
-    return config
-
-
 def record_samples(
-    scale: RadwagScaleBase,
+    protocol: ProtocolContext,
     config: RecordConfig,
     timeout: Optional[float] = None,
     on_new_sample: Optional[Callable] = None,
 ) -> GravimetricRecording:
     """Record samples from the scale."""
-    _cfg = _record_validate_config(config)
-    assert _cfg.length
-    assert _cfg.interval
+    assert config.duration
+    assert config.frequency
+    length = int(config.duration * config.frequency) + 1
+    interval = 1.0 / config.frequency
     _samples = GravimetricRecording()
-    _start_time = time()
-    while len(_samples) < _cfg.length and not _record_did_exceed_time(
-        _start_time, timeout
-    ):
-        _s = read_sample_from_scale(scale)
-        if _cfg.stable and not _s.stable:
-            _samples.clear()  # delete all previously recorded samples
-            continue
-        interval_w_overlap = _cfg.interval - _record_get_interval_overlap(
-            _samples, _cfg.interval
-        )
-        if not len(_samples) or _record_did_exceed_time(
-            _samples.end_time, interval_w_overlap
+    scale = scale_connect_and_initialize(protocol)
+    try:
+        _start_time = time()
+        while len(_samples) < length and not _record_did_exceed_time(
+            _start_time, timeout
         ):
-            _samples.append(_s)
-            if callable(on_new_sample):
-                on_new_sample(_samples)
-    assert len(_samples) == _cfg.length, (
-        f"Scale recording timed out before accumulating "
-        f"{_cfg.length} samples (recorded {len(_samples)} samples)"
-    )
-    return _samples
+            _s = read_sample_from_scale(scale)
+            if config.stable and not _s.stable:
+                _samples.clear()  # delete all previously recorded samples
+                continue
+            interval_w_overlap = interval - _record_get_interval_overlap(
+                _samples, interval
+            )
+            if not len(_samples) or _record_did_exceed_time(
+                _samples.end_time, interval_w_overlap
+            ):
+                _samples.append(_s)
+                if callable(on_new_sample):
+                    on_new_sample(_samples)
+        assert len(_samples) == length, (
+            f"Scale recording timed out before accumulating "
+            f"{length} samples (recorded {len(_samples)} samples)"
+        )
+        return _samples
+    finally:
+        scale.disconnect()
 
 
 @dataclass
@@ -249,7 +238,7 @@ class RecordToDiskConfig:
 
 
 def record_samples_to_disk(
-    scale: RadwagScaleBase, config: RecordToDiskConfig, timeout: Optional[float] = None
+    protocol: ProtocolContext, config: RecordToDiskConfig, timeout: Optional[float] = None
 ) -> GravimetricRecording:
     """Record samples to disk."""
     _file_name = create_file_name(config.test_name, config.tag)
@@ -264,7 +253,7 @@ def record_samples_to_disk(
         config.test_name, _file_name, GravimetricSample.csv_header() + "\n"
     )
     _recording = record_samples(
-        scale, config.record_config, timeout=timeout, on_new_sample=_on_new_sample
+        protocol, config.record_config, timeout=timeout, on_new_sample=_on_new_sample
     )
     # add a final newline character to the CSV file
     append_data_to_file(config.test_name, _file_name, "\n")

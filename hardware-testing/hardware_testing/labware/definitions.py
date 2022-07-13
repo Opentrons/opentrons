@@ -1,7 +1,5 @@
-"""Radwag drivers."""
 import json
 import os
-from .driver import RadwagScaleBase, RadwagScale, SimRadwagScale
 
 # the custom labware file for the pipette-calibration glass-vial
 # NOTE: if running through the App, this custom labware definition
@@ -9,8 +7,8 @@ from .driver import RadwagScaleBase, RadwagScale, SimRadwagScale
 SCALE_JSON_FILENAME = 'radwag_pipette_calibration_vial.json'
 
 
-def load_radwag_vial_definition():
-    # load custom labware definition
+def load_radwag_vial_definition() -> dict:
+    # load custom labware definition from this file's directory
     scale_json_filepath = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         SCALE_JSON_FILENAME
@@ -22,6 +20,3 @@ def load_radwag_vial_definition():
         #       we must load the labware definition from disk
         radwag_vial_def = json.load(f)
     return radwag_vial_def
-
-
-__all__ = ["RadwagScaleBase", "RadwagScale", "SimRadwagScale"]

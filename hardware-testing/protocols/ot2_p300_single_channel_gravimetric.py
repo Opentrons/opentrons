@@ -1,20 +1,36 @@
 import time
 from datetime import datetime
+from typing import Tuple
 
 from opentrons import protocol_api, execute, simulate
 
 from hardware_testing import config, data
-from hardware_testing.drivers.utils import (
-    connect_to_scale_and_temp_sensor,
-    load_radwag_vial_definition
-)
-from hardware_testing.pipetting import liquid_level, motions
+from hardware_testing.drivers import find_port, RadwagScaleBase, AsairSensorBase
+from hardware_testing.labware.definitions import load_radwag_vial_definition
+from hardware_testing.labware.liquid_level.liquid_level import LiquidTracker
+from hardware_testing.pipetting import motions
 from hardware_testing.protocol import metadata, load_labware_and_pipettes, apply_calibrated_labware_offsets
 
 CFG = config.default_config()
 CFG.scale.safe_z_offset = 10
 
 PRELOADED_SCALE_DEF = None
+
+liquid_level = LiquidTracker()
+
+
+def connect_to_scale_and_temp_sensor(is_simulating: bool) -> Tuple[RadwagScaleBase, AsairSensorBase]:
+    if is_simulating:
+        return SimRadwagScale()
+    vid, pid = RadwagScaleBase.vid_pid()
+    try:
+        scale_port = find_port(vid=vid, pid=pid)
+    except RuntimeError:
+        # also try looking for the RS232 USB adapter cable
+        scale_port = find_port(vid=1659, pid=8963)
+    vid, pid = AsairSensorBase.vid_pid()
+    temp_port = find_port(vid=vid, pid=pid)
+    return scale, temp_sensor
 
 
 def init_liquid_tracking(plate, vial):

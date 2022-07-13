@@ -195,7 +195,7 @@ class LiquidTracker:
 if __name__ == '__main__':
     import os
     import sys
-    sys.path.insert(0, os.path.abspath('.'))
+    sys.path.insert(0, os.path.abspath('../pipetting'))
     from lookup_tables import LIQUID_LEVEL_LOOKUP_NEXT_TROUGH_12_ROW as TROUGH_LOOKUP
     FakeWell = namedtuple('FakeWell', 'display_name depth diameter width length')
     fake_well = FakeWell('fake', TROUGH_LOOKUP[-1][1], None, None, None)
