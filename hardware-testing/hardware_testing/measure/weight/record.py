@@ -13,7 +13,7 @@ from hardware_testing.data import (
     create_file_name,
 )
 
-from .scale import scale_connect_and_initialize
+from .scale import scale_connect_and_initialize, scale_calibrate
 
 
 @dataclass
@@ -259,6 +259,11 @@ class GravimetricRecorder:
         self._ctx = ctx
         self._cfg = RecordConfig(test_name=test_name, duration=1.0, frequency=10)
         self._scale = None
+        self._active = False
+
+    @property
+    def active(self):
+        return self._active
 
     @property
     def config(self):
@@ -267,11 +272,17 @@ class GravimetricRecorder:
 
     def activate(self) -> None:
         """Activate."""
+        if self.active:
+            return
         self._scale = scale_connect_and_initialize(self._ctx)
+        self._active = True
 
     def deactivate(self) -> None:
         """Deactivate."""
+        if not self.active:
+            return
         self._scale.disconnect()
+        self._active = False
 
     def set_tag(self, tag: str) -> None:
         """Set tag."""
@@ -280,6 +291,15 @@ class GravimetricRecorder:
     def set_frequency(self, frequency: float) -> None:
         """Set frequency."""
         self._cfg.frequency = frequency
+
+    def calibrate_scale(self) -> None:
+        """Calibrate scale."""
+        was_active = self.active
+        if was_active:
+            self.deactivate()
+        scale_calibrate(self._ctx)
+        if was_active:
+            self.activate()
 
     def record(self, duration: Optional[float] = None) -> GravimetricRecording:
         """Record."""
