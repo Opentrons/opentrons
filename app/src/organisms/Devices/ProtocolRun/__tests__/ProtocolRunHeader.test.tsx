@@ -177,6 +177,7 @@ const PROTOCOL_DETAILS = {
   displayName: PROTOCOL_NAME,
   protocolData: simpleV6Protocol,
   protocolKey: 'fakeProtocolKey',
+  isProtocolAnalyzing: false,
 }
 
 const mockMovingHeaterShaker = {
@@ -344,6 +345,7 @@ describe('ProtocolRunHeader', () => {
       displayName: null,
       protocolData: null,
       protocolKey: null,
+      isProtocolAnalyzing: true,
     })
 
     const [{ getByRole }] = render()
@@ -734,5 +736,17 @@ describe('ProtocolRunHeader', () => {
     waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith('/devices')
     })
+  })
+  it('renders banner with spinner if currently closing current run', async () => {
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_SUCCEEDED)
+    when(mockUseCloseCurrentRun).calledWith().mockReturnValue({
+      isClosingCurrentRun: true,
+      closeCurrentRun: mockCloseCurrentRun,
+    })
+    const [{ getByText, getByLabelText }] = render()
+    getByText('Run completed.')
+    getByLabelText('ot-spinner')
   })
 })
