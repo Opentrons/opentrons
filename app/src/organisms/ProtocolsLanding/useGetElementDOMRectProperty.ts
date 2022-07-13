@@ -2,7 +2,7 @@ import * as React from 'react'
 
 type DOMRectProperty = keyof Omit<DOMRect, 'toJSON'>
 interface props {
-  getElementProperty: (property: DOMRectProperty) => number
+  getElementProperty: (property: DOMRectProperty) => number | null
 }
 
 /**
@@ -26,13 +26,13 @@ export const useGetElementDOMRectProperty = <T extends HTMLElement>(
   elementRef: React.RefObject<T>
 ): props => {
   const getElementProperty = React.useCallback(
-    (targetProperty: DOMRectProperty): number => {
+    (targetProperty: DOMRectProperty): number | null => {
       const clientRect = elementRef.current?.getBoundingClientRect()
       if (clientRect != null) {
         return clientRect[targetProperty]
       }
-      // if clientRect is undefined, return 0
-      return 0
+      // if clientRect is undefined, return null
+      return null
     },
     [elementRef]
   )
