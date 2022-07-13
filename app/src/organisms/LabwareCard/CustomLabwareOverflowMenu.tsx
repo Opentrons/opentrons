@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { useTrackEvent } from '../../redux/analytics'
 import {
   Flex,
   Icon,
@@ -50,6 +51,7 @@ export function CustomLabwareOverflowMenu(
   const overflowMenuRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
   })
+  const trackEvent = useTrackEvent()
 
   const {
     confirm: confirmDeleteLabware,
@@ -79,6 +81,10 @@ export function CustomLabwareOverflowMenu(
   const handleClickLabwareCreator: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
+    trackEvent({
+      name: 'openLabwareCreatorFromLabwareOverflowMenu',
+      properties: {},
+    })
     setShowOverflowMenu(false)
     window.open(LABWARE_CREATOR_HREF, '_blank')
   }
