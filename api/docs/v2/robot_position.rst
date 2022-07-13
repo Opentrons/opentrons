@@ -18,7 +18,7 @@ When you instruct the robot to move to a position on a piece of labware, the exa
 Top, Bottom, and Center
 =======================
 
-Every well on every piece of labware you load has three addressable positions — top, bottom, and center — that are determined by the labware definition. You can use these positions as-is or calculate other positions relative to them.
+Every well on every piece of labware you load has three addressable positions — top, bottom, and center — that are determined by the labware definition and whether the labware is on a module or directly on the deck. You can use these positions as-is or calculate other positions relative to them.
 
 :py:meth:`.Well.top` returns a position level with the top of the well, centered in both horizontal directions. 
 
