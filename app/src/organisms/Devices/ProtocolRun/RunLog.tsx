@@ -162,7 +162,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
         firstPostInitialPlayRunCommandIndex.current =
           lastKnownPrePlayRunCommandIndex.current +
           foundPostPlayRunCommandIndex +
-          2
+          1
       } else {
         lastKnownPrePlayRunCommandIndex.current =
           lastKnownPrePlayRunCommandIndex.current + runCommands.length
