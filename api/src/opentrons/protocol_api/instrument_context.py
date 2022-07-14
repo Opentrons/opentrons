@@ -708,10 +708,10 @@ class InstrumentContext(CommandPublisher):
         :type prep_after: bool
 
         .. versionchanged:: 2.13
-            ``prep_after=`` argument is added. API versions <2.13 can not prepare the
-            plunger for aspiration during :py:meth:.pick_up_tip, and will instead always
-            prepare during :py:meth:.aspirate. API versions <2.13 will raise an
-            ``APIVersionError`` if ``prep_after=`` is included as an argument.
+            Adds the ``prep_after`` argument. In version 2.12 and earlier, the plunger can't prepare
+            itself for aspiration during :py:meth:`.pick_up_tip`, and will instead always
+            prepare during :py:meth:`.aspirate`. Version 2.12 and earlier will raise an
+            ``APIVersionError`` if a value is set for ``prep_after``.
 
         :returns: This instance
         """
