@@ -3,7 +3,7 @@ import pytest
 from decoy import Decoy
 from typing import NamedTuple
 
-from opentrons.types import MountType, Mount, Point
+from opentrons.types import MountType, Mount, Point, DeckSlotName
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import (
     CriticalPoint,
@@ -12,7 +12,10 @@ from opentrons.hardware_control.types import (
 )
 from opentrons.motion_planning import Waypoint
 
-from opentrons.protocol_engine.errors import MustHomeError
+from opentrons.protocol_engine.errors import (
+    MustHomeError,
+    RestrictedPipetteMovementError,
+)
 from opentrons.protocol_engine.types import (
     DeckPoint,
     MotorAxis,
@@ -20,6 +23,7 @@ from opentrons.protocol_engine.types import (
     WellLocation,
     WellOrigin,
     WellOffset,
+    HeaterShakerMovementData,
 )
 from opentrons.protocol_engine.state import (
     StateStore,
@@ -34,10 +38,6 @@ from opentrons.protocol_engine.execution.movement import (
 )
 from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
     ThermocyclerMovementFlagger,
-)
-
-from opentrons.protocol_engine.execution.heater_shaker_restriction_flagger import (
-    HeaterShakerMovementFlagger,
 )
 
 from .mock_defs import MockPipettes
@@ -70,24 +70,16 @@ def thermocycler_movement_flagger(decoy: Decoy) -> ThermocyclerMovementFlagger:
 
 
 @pytest.fixture
-def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
-    """Get a mock in the shape of a ThermocyclerMovementFlagger."""
-    return decoy.mock(cls=HeaterShakerMovementFlagger)
-
-
-@pytest.fixture
 def subject(
     state_store: StateStore,
     hardware_api: HardwareAPI,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
-    heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
 ) -> MovementHandler:
     """Create a PipettingHandler with its dependencies mocked out."""
     return MovementHandler(
         state_store=state_store,
         hardware_api=hardware_api,
         thermocycler_movement_flagger=thermocycler_movement_flagger,
-        heater_shaker_movement_flagger=heater_shaker_movement_flagger,
     )
 
 
@@ -239,6 +231,84 @@ async def test_move_to_well_from_starting_location(
             critical_point=CriticalPoint.XY_CENTER,
         ),
     )
+
+
+async def test_move_to_well_restricted_by_heater_shaker(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    mock_hw_pipettes: MockPipettes,
+    subject: MovementHandler,
+) -> None:
+    """It should raise an exception when trying to move to well adjacent of shaking module."""
+    decoy.when(state_store.modules.get_heater_shaker_movement_data()).then_return(
+        [
+            HeaterShakerMovementData(
+                plate_shaking=True, latch_closed=True, slot_location=1
+            )
+        ]
+    )
+
+    decoy.when(state_store.geometry.get_ancestor_slot_name("labware-id")).then_return(
+        DeckSlotName.SLOT_4
+    )
+
+    decoy.when(
+        state_store.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes=mock_hw_pipettes.by_mount,
+        )
+    ).then_return(
+        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
+    )
+
+    decoy.when(state_store.labware.is_tiprack("labware-id")).then_return(True)
+
+    with pytest.raises(RestrictedPipetteMovementError):
+        await subject.move_to_well(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="A1",
+        )
+
+
+async def test_move_to_well_restricted_by_heater_shaker_multi_channel(
+    decoy: Decoy,
+    state_store: StateStore,
+    hardware_api: HardwareAPI,
+    mock_hw_pipettes: MockPipettes,
+    subject: MovementHandler,
+) -> None:
+    """It should raise an exception when trying to move to restricted location with multichannel pipette."""
+    decoy.when(state_store.modules.get_heater_shaker_movement_data()).then_return(
+        [
+            HeaterShakerMovementData(
+                plate_shaking=False, latch_closed=True, slot_location=1
+            )
+        ]
+    )
+
+    decoy.when(state_store.geometry.get_ancestor_slot_name("labware-id")).then_return(
+        DeckSlotName.SLOT_4
+    )
+
+    decoy.when(
+        state_store.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes=mock_hw_pipettes.by_mount,
+        )
+    ).then_return(
+        HardwarePipette(mount=Mount.RIGHT, config=mock_hw_pipettes.right_config)
+    )
+
+    decoy.when(state_store.labware.is_tiprack("labware-id")).then_return(False)
+
+    with pytest.raises(RestrictedPipetteMovementError):
+        await subject.move_to_well(
+            pipette_id="pipette-id",
+            labware_id="labware-id",
+            well_name="A1",
+        )
 
 
 class MoveRelativeSpec(NamedTuple):
