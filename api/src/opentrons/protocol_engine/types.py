@@ -361,6 +361,8 @@ class TemperatureRange(NamedTuple):
 
 
 class HeaterShakerMovementData(NamedTuple):
+    """Shaking status, latch status and slot location for determining movement restrictions."""
+
     plate_shaking: bool
     latch_closed: bool
     slot_location: int
