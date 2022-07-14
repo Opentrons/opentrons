@@ -72,6 +72,7 @@ class OT3Simulator:
     """OT3 Hardware Controller Backend."""
 
     _position: Dict[NodeId, float]
+    _encoder_position: Dict[NodeId, float]
 
     @classmethod
     async def build(
@@ -151,6 +152,7 @@ class OT3Simulator:
         }
         self._module_controls: Optional[AttachedModulesControl] = None
         self._position = self._get_home_position()
+        self._encoder_position = self._get_home_position()
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
 
@@ -188,6 +190,10 @@ class OT3Simulator:
         """Get the current position."""
         return axis_convert(self._position, 0.0)
 
+    async def update_encoder_position(self) -> OT3AxisMap[float]:
+        """Get the encoder current position."""
+        return axis_convert(self._encoder_position, 0.0)
+
     async def move(
         self,
         origin: Coordinates[OT3Axis, float],
@@ -207,6 +213,7 @@ class OT3Simulator:
         """
         _, final_positions = create_move_group(origin, moves, self._present_nodes)
         self._position.update(final_positions)
+        self._encoder_position.update(final_positions)
 
     async def home(self, axes: Optional[List[OT3Axis]] = None) -> OT3AxisMap[float]:
         """Home axes.

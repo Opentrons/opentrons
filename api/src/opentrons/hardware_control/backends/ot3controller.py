@@ -101,6 +101,7 @@ class OT3Controller:
 
     _messenger: CanMessenger
     _position: Dict[NodeId, float]
+    _encoder_position: Dict[NodeId, float]
     _tool_detector: detector.OneshotToolDetector
 
     @classmethod
@@ -130,6 +131,7 @@ class OT3Controller:
         self._messenger.start()
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
         self._position = self._get_home_position()
+        self._encoder_position = self._get_home_position()
         try:
             self._event_watcher = self._build_event_watcher()
         except AttributeError:
@@ -191,6 +193,10 @@ class OT3Controller:
         """Get the current position."""
         return axis_convert(self._position, 0.0)
 
+    async def update_encoder_position(self) -> OT3AxisMap[float]:
+        """Get the encoder current position."""
+        return axis_convert(self._encoder_position, 0.0)
+
     async def move(
         self,
         origin: Coordinates[OT3Axis, float],
@@ -211,7 +217,80 @@ class OT3Controller:
         move_group, _ = group
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
-        self._position.update(positions)
+        for axis, point in positions.items():
+            self._position.update({axis: point[0]})
+            self._encoder_position.update({axis: point[1]})
+
+    def _build_home_pipettes_runner(
+        self, axes: Sequence[OT3Axis]
+    ) -> Optional[MoveGroupRunner]:
+        speed_settings = (
+            self._configuration.motion_settings.max_speed_discontinuity.none
+        )
+
+        distances_pipette = {
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
+            for ax in axes
+            if ax in OT3Axis.pipette_axes()
+        }
+        velocities_pipette = {
+            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            for ax in axes
+            if ax in OT3Axis.pipette_axes()
+        }
+
+        move_group_pipette = []
+        if distances_pipette and velocities_pipette:
+            pipette_move = self._filter_move_group(
+                create_home_group(distances_pipette, velocities_pipette)
+            )
+            move_group_pipette.append(pipette_move)
+
+        if move_group_pipette:
+            return MoveGroupRunner(move_groups=move_group_pipette, start_at_index=2)
+        return None
+
+    def _build_home_gantry_z_runner(
+        self, axes: Sequence[OT3Axis]
+    ) -> Optional[MoveGroupRunner]:
+        speed_settings = (
+            self._configuration.motion_settings.max_speed_discontinuity.none
+        )
+
+        distances_gantry = {
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
+            for ax in axes
+            if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
+        }
+        velocities_gantry = {
+            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            for ax in axes
+            if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
+        }
+        distances_z = {
+            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
+            for ax in axes
+            if ax in OT3Axis.mount_axes()
+        }
+        velocities_z = {
+            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
+            for ax in axes
+            if ax in OT3Axis.mount_axes()
+        }
+        move_group_gantry_z = []
+        if distances_z and velocities_z:
+            z_move = self._filter_move_group(
+                create_home_group(distances_z, velocities_z)
+            )
+            move_group_gantry_z.append(z_move)
+        if distances_gantry and velocities_gantry:
+            gantry_move = self._filter_move_group(
+                create_home_group(distances_gantry, velocities_gantry)
+            )
+            move_group_gantry_z.append(gantry_move)
+        if move_group_gantry_z:
+            return MoveGroupRunner(move_groups=move_group_gantry_z)
+        return None
 
     async def home(self, axes: Sequence[OT3Axis]) -> OT3AxisMap[float]:
         """Home each axis passed in, and reset the positions to 0.
@@ -225,72 +304,23 @@ class OT3Controller:
         checked_axes = [axis for axis in axes if self._axis_is_present(axis)]
         if not checked_axes:
             return {}
-        speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.none
-        )
 
-        distances_gantry = {
-            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
-            for ax in checked_axes
-            if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
-        }
-        velocities_gantry = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
-            for ax in checked_axes
-            if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
-        }
-        distances_z = {
-            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
-            for ax in checked_axes
-            if ax in OT3Axis.mount_axes()
-        }
-        velocities_z = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
-            for ax in checked_axes
-            if ax in OT3Axis.mount_axes()
-        }
-        distances_pipette = {
-            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
-            for ax in checked_axes
-            if ax in OT3Axis.pipette_axes()
-        }
-        velocities_pipette = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
-            for ax in checked_axes
-            if ax in OT3Axis.pipette_axes()
-        }
-        move_group_gantry_z = []
-        move_group_pipette = []
-        if distances_z and velocities_z:
-            z_move = self._filter_move_group(
-                create_home_group(distances_z, velocities_z)
-            )
-            move_group_gantry_z.append(z_move)
-        if distances_gantry and velocities_gantry:
-            gantry_move = self._filter_move_group(
-                create_home_group(distances_gantry, velocities_gantry)
-            )
-            move_group_gantry_z.append(gantry_move)
-        if distances_pipette and velocities_pipette:
-            pipette_move = self._filter_move_group(
-                create_home_group(distances_pipette, velocities_pipette)
-            )
-            move_group_pipette.append(pipette_move)
-        runner_gantry_z = MoveGroupRunner(move_groups=move_group_gantry_z)
-        runner_pipette = MoveGroupRunner(
-            move_groups=move_group_pipette, start_at_index=2
+        maybe_runners = (
+            self._build_home_gantry_z_runner(checked_axes),
+            self._build_home_pipettes_runner(checked_axes),
         )
-        coros = []
-        if move_group_gantry_z:
-            coros.append(runner_gantry_z.run(can_messenger=self._messenger))
-        if move_group_pipette:
-            coros.append(runner_pipette.run(can_messenger=self._messenger))
+        coros = [
+            runner.run(can_messenger=self._messenger)
+            for runner in maybe_runners
+            if runner
+        ]
         positions = await asyncio.gather(*coros)
         if OT3Axis.G in checked_axes:
             await self.gripper_home_jaw()
         for position in positions:
-            self._position.update(position)
-
+            for p in position.items():
+                self._position.update({p[0]: p[1][0]})
+                self._encoder_position.update({p[0]: p[1][1]})
         return axis_convert(self._position, 0.0)
 
     def _filter_move_group(self, move_group: MoveGroup) -> MoveGroup:
@@ -685,7 +715,7 @@ class OT3Controller:
         distance_mm: float,
         speed_mm_per_s: float,
     ) -> None:
-        pos = await capacitive_probe(
+        pos, _ = await capacitive_probe(
             self._messenger,
             sensor_node_for_mount(mount),
             axis_to_node(moving),

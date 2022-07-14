@@ -170,6 +170,24 @@ class MoveCompleted:  # noqa: D101
 
 
 @dataclass
+class EncoderPositionRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.encoder_position_request
+    ] = MessageId.encoder_position_request
+
+
+@dataclass
+class EncoderPositionResponse:  # noqa: D101
+    payload: payloads.EncoderPositionResponse
+    payload_type: Type[
+        payloads.EncoderPositionResponse
+    ] = payloads.EncoderPositionResponse
+    message_id: Literal[
+        MessageId.encoder_position_response
+    ] = MessageId.encoder_position_response
+
+
+@dataclass
 class SetMotionConstraints:  # noqa: D101
     payload: payloads.MotionConstraintsPayload
     payload_type: Type[
