@@ -8,8 +8,8 @@ import pytest
 
 from opentrons.protocol_engine.types import HeaterShakerMovementData
 from opentrons.protocol_engine.errors import RestrictedPipetteMovementError
-from opentrons.protocol_engine.execution.heater_shaker_restriction_flagger import (
-    raise_if_movement_restricted,
+from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
+    raise_if_movement_restricted_by_heater_shaker,
 )
 
 
@@ -34,8 +34,8 @@ async def test_raises_when_shaking_on_restricted_movement(
     ]
 
     with expected_raise:
-        await raise_if_movement_restricted(
-            heater_shakers=heater_shaker_data,
+        await raise_if_movement_restricted_by_heater_shaker(
+            heater_shaker_data=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=False,
             is_tiprack=False,
@@ -65,8 +65,8 @@ async def test_raises_when_latch_open_on_restricted_movement(
     ]
 
     with expected_raise:
-        await raise_if_movement_restricted(
-            heater_shakers=heater_shaker_data,
+        await raise_if_movement_restricted_by_heater_shaker(
+            heater_shaker_data=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=False,
             is_tiprack=False,
@@ -99,8 +99,8 @@ async def test_raises_multi_channel_on_restricted_movement(
     ]
 
     with expected_raise:
-        await raise_if_movement_restricted(
-            heater_shakers=heater_shaker_data,
+        await raise_if_movement_restricted_by_heater_shaker(
+            heater_shaker_data=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=True,
             is_tiprack=is_tiprack,
@@ -129,8 +129,8 @@ async def test_does_not_raise_when_idle_and_latch_closed(
     ]
 
     with does_not_raise():
-        await raise_if_movement_restricted(
-            heater_shakers=heater_shaker_data,
+        await raise_if_movement_restricted_by_heater_shaker(
+            heater_shaker_data=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=False,
             is_tiprack=False,

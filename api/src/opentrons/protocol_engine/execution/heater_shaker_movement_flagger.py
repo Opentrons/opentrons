@@ -6,14 +6,14 @@ from ..errors import RestrictedPipetteMovementError
 from ..types import HeaterShakerMovementData
 
 
-async def raise_if_movement_restricted(
-    heater_shakers: List[HeaterShakerMovementData],
+async def raise_if_movement_restricted_by_heater_shaker(
+    heater_shaker_data: List[HeaterShakerMovementData],
     destination_slot: int,
     is_multi_channel: bool,
     is_tiprack: bool,
 ) -> None:
     """Flag restricted movement around/to a Heater-Shaker."""
-    for plate_shaking, latch_closed, heater_shaker_slot_int in heater_shakers:
+    for plate_shaking, latch_closed, heater_shaker_slot_int in heater_shaker_data:
         dest_east_west = _is_east_or_west(heater_shaker_slot_int, destination_slot)
         dest_north_south = _is_north_south(heater_shaker_slot_int, destination_slot)
         dest_heater_shaker = destination_slot == heater_shaker_slot_int
