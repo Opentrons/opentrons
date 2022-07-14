@@ -38,7 +38,7 @@ async def test_raises_when_moving_to_restricted_slots_while_shaking(
     ]
 
     with expected_raise:
-        await raise_if_movement_restricted(
+        raise_if_movement_restricted(
             hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=False,
@@ -69,7 +69,7 @@ async def test_raises_when_moving_to_restricted_slots_while_latch_open(
     ]
 
     with expected_raise:
-        await raise_if_movement_restricted(
+        raise_if_movement_restricted(
             hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=False,
@@ -111,7 +111,7 @@ async def test_raises_on_restricted_movement_with_multi_channel(
     ]
 
     with expected_raise:
-        await raise_if_movement_restricted(
+        raise_if_movement_restricted(
             hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=True,
@@ -141,7 +141,7 @@ async def test_does_not_raise_when_idle_and_latch_closed(
     ]
 
     with does_not_raise():
-        await raise_if_movement_restricted(
+        raise_if_movement_restricted(
             hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=False,

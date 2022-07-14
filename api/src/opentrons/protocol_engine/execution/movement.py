@@ -96,7 +96,7 @@ class MovementHandler:
             attached_pipettes=self._hardware_api.attached_instruments,
         )
 
-        await heater_shaker_movement_flagger.raise_if_movement_restricted(
+        heater_shaker_movement_flagger.raise_if_movement_restricted(
             hs_movement_restrictors=hs_movement_restrictors,
             destination_slot=dest_slot_int,
             is_multi_channel=hw_pipette.config["channels"] > 1,

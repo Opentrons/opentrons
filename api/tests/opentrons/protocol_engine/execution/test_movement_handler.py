@@ -176,7 +176,7 @@ async def test_move_to_well(
         await thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
             labware_id="labware-id"
         ),
-        await heater_shaker_movement_flagger.raise_if_movement_restricted(
+        heater_shaker_movement_flagger.raise_if_movement_restricted(
             hs_movement_restrictors=[],
             destination_slot=1,
             is_multi_channel=False,
@@ -282,7 +282,7 @@ async def test_move_to_well_from_starting_location(
         await thermocycler_movement_flagger.raise_if_labware_in_non_open_thermocycler(
             labware_id="labware-id"
         ),
-        await heater_shaker_movement_flagger.raise_if_movement_restricted(
+        heater_shaker_movement_flagger.raise_if_movement_restricted(
             hs_movement_restrictors=[],
             destination_slot=1,
             is_multi_channel=False,

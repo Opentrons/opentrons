@@ -11,7 +11,7 @@ from ..errors import PipetteMovementRestrictedByHeaterShakerError
 from ..types import HeaterShakerMovementRestrictors
 
 
-async def raise_if_movement_restricted(
+def raise_if_movement_restricted(
     hs_movement_restrictors: List[HeaterShakerMovementRestrictors],
     destination_slot: int,
     is_multi_channel: bool,
