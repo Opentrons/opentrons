@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-beta.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.2...v6.0.0-beta.3) (2022-07-13)
+
+
+### Bug Fixes
+
+* **app:** 6.0 overall design QA ([#11081](https://github.com/Opentrons/opentrons/issues/11081)) ([bec8e23](https://github.com/Opentrons/opentrons/commit/bec8e23b9dfc4d29c88d5b5de73dd315a0c00885))
+
+
+### Features
+
+* **app:** Robot Settings Design QA 2 ([#11020](https://github.com/Opentrons/opentrons/issues/11020)) ([8b43995](https://github.com/Opentrons/opentrons/commit/8b439959d97cc077e3795cfdfb82398ea6e62d9b)), closes [#10893](https://github.com/Opentrons/opentrons/issues/10893)
+
+
+
+
+
 # [6.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.1...v6.0.0-beta.2) (2022-07-12)
 
 

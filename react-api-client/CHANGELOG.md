@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-beta.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.2...v6.0.0-beta.3) (2022-07-13)
+
+
+### Bug Fixes
+
+* **app:** fix Browse file system button issues ([#11113](https://github.com/Opentrons/opentrons/issues/11113)) ([ec1a4bb](https://github.com/Opentrons/opentrons/commit/ec1a4bbeab8af136cd4162d156b7916a1c95f65d)), closes [#11105](https://github.com/Opentrons/opentrons/issues/11105)
+
+
+
+
+
 # [6.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.1...v6.0.0-beta.2) (2022-07-12)
 
 **Note:** Version bump only for package @opentrons/react-api-client

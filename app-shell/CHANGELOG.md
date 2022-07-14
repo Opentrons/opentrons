@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.0.0-beta.3](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.2...v6.0.0-beta.3) (2022-07-13)
+
+
+### Bug Fixes
+
+* **app:** no longer require app restart after python override path config is updated ([#11049](https://github.com/Opentrons/opentrons/issues/11049)) ([25cc201](https://github.com/Opentrons/opentrons/commit/25cc201c98a30a6431a26b18510bf827e10b978b)), closes [#10612](https://github.com/Opentrons/opentrons/issues/10612)
+
+
+
+
+
 # [6.0.0-beta.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-beta.1...v6.0.0-beta.2) (2022-07-12)
 
 **Note:** Version bump only for package @opentrons/app-shell
