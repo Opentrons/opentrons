@@ -31,7 +31,7 @@ publish_update := $(filter v%,$(OT_TAG))
 branch_suffix := $(if $(publish_update),,-$(subst /,-,$(OT_BRANCH)))
 build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
 
-# set this to anythin on commandline invocations of this makefile to skip bundling
+# set this to anything on command-line invocations of this makefile to skip bundling
 # standalone python, as is necessary for on-device app builds:
 # make dist no_python_bundle=true or =1 or whatever
 no_python_bundle ?=
