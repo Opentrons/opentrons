@@ -6,6 +6,7 @@ const download = require('download')
 const decompress = require('decompress')
 const crypto = require('crypto')
 const execa = require('execa')
+const USE_PYTHON = process.env.NO_PYTHON !== 'true'
 
 const HOST_PYTHON = process.env.HOST_PYTHON ?? 'python3.10'
 
@@ -44,12 +45,12 @@ module.exports = function beforeBuild(context) {
   const { platform, arch } = context
   const platformName = platform.nodeName
   const standalonePython = PYTHON_BY_PLATFORM?.[platformName]?.[arch]
-
-  if (standalonePython == null) {
-    console.warn(`No standalone Python found for ${platformName}+${arch}`)
-    return Promise.resolve()
+  if (!USE_PYTHON) {
+    return Promise.resolve(true)
   }
-
+  if (standalonePython == null) {
+    throw new Error(`No standalone Python found for ${platformName}+${arch}`)
+  }
   const { url, sha256 } = standalonePython
 
   console.log(
