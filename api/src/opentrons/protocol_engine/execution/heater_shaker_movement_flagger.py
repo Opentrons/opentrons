@@ -7,11 +7,11 @@ from opentrons.protocols.geometry.deck_conflict import (
     get_north_south_locations,
 )
 
-from ..errors import RestrictedPipetteMovementError
+from ..errors import PipetteMovementRestrictedByHeaterShakerError
 from ..types import HeaterShakerMovementRestrictors
 
 
-async def raise_if_movement_restricted_by_heater_shaker(
+async def raise_if_movement_restricted(
     hs_movement_restrictors: List[HeaterShakerMovementRestrictors],
     destination_slot: int,
     is_multi_channel: bool,
@@ -32,7 +32,7 @@ async def raise_if_movement_restricted_by_heater_shaker(
             any([dest_east_west, dest_north_south, dest_heater_shaker])
             and hs_movement_restrictor.plate_shaking
         ):
-            raise RestrictedPipetteMovementError(
+            raise PipetteMovementRestrictedByHeaterShakerError(
                 "Cannot move pipette to Heater-Shaker or adjacent slot while module is shaking"
             )
 
@@ -40,18 +40,18 @@ async def raise_if_movement_restricted_by_heater_shaker(
         elif (
             dest_east_west or dest_heater_shaker
         ) and not hs_movement_restrictor.latch_closed:
-            raise RestrictedPipetteMovementError(
+            raise PipetteMovementRestrictedByHeaterShakerError(
                 "Cannot move pipette east or west of or to Heater-Shaker while latch is open"
             )
 
         elif is_multi_channel:
             # Can't go to east/west slot under any circumstances if pipette is multi-channel
             if dest_east_west:
-                raise RestrictedPipetteMovementError(
+                raise PipetteMovementRestrictedByHeaterShakerError(
                     "Cannot move multi-channel pipette east or west of Heater-Shaker"
                 )
             # Can only go north/south if the labware is a tip rack
             elif dest_north_south and not destination_is_tip_rack:
-                raise RestrictedPipetteMovementError(
+                raise PipetteMovementRestrictedByHeaterShakerError(
                     "Cannot move multi-channel pipette to non-tip-rack labware north or south of Heater-Shaker"
                 )

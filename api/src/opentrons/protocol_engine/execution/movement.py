@@ -17,9 +17,7 @@ from ..state import StateStore, CurrentWell
 from ..errors import MustHomeError
 from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
-from .heater_shaker_movement_flagger import (
-    raise_if_movement_restricted_by_heater_shaker,
-)
+from . import heater_shaker_movement_flagger
 
 
 MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
@@ -98,7 +96,7 @@ class MovementHandler:
             attached_pipettes=self._hardware_api.attached_instruments,
         )
 
-        await raise_if_movement_restricted_by_heater_shaker(
+        await heater_shaker_movement_flagger.raise_if_movement_restricted(
             hs_movement_restrictors=hs_movement_restrictors,
             destination_slot=dest_slot_int,
             is_multi_channel=hw_pipette.config["channels"] > 1,
