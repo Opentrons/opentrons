@@ -358,3 +358,9 @@ class TemperatureRange(NamedTuple):
 
     min: float
     max: float
+
+
+class HeaterShakerMovementData(NamedTuple):
+    plate_shaking: bool
+    latch_closed: bool
+    slot_location: int

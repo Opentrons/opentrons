@@ -31,6 +31,7 @@ from ..types import (
     DeckSlotLocation,
     ModuleDimensions,
     LabwareOffsetVector,
+    HeaterShakerMovementData,
 )
 from .. import errors
 from ..commands import (
@@ -717,3 +718,20 @@ class ModuleView(HasState[ModuleState]):
                     return m
 
         raise errors.ModuleNotAttachedError(f"No available {model.value} found.")
+
+    def get_heater_shaker_movement_data(self) -> List[HeaterShakerMovementData]:
+        """Get shaking status, latch status, and location for every heater-shaker on deck."""
+        hs_substates = [
+            self.get_heater_shaker_module_substate(module_id=module.id)
+            for module in self.get_all()
+            if module.model == ModuleModel.HEATER_SHAKER_MODULE_V1
+        ]
+        hs_data = [
+            HeaterShakerMovementData(
+                plate_shaking=substate.is_plate_shaking,
+                latch_closed=substate.is_labware_latch_closed,
+                slot_location=int(self.get_location(substate.module_id).slotName),
+            )
+            for substate in hs_substates
+        ]
+        return hs_data

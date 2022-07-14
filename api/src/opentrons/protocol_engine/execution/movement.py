@@ -17,7 +17,7 @@ from ..state import StateStore, CurrentWell
 from ..errors import MustHomeError
 from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
-from .heater_shaker_restriction_flagger import HeaterShakerMovementFlagger
+from .heater_shaker_restriction_flagger import raise_if_movement_restricted
 
 
 MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
@@ -58,7 +58,6 @@ class MovementHandler:
         hardware_api: HardwareControlAPI,
         model_utils: Optional[ModelUtils] = None,
         thermocycler_movement_flagger: Optional[ThermocyclerMovementFlagger] = None,
-        heater_shaker_movement_flagger: Optional[HeaterShakerMovementFlagger] = None,
     ) -> None:
         """Initialize a MovementHandler instance."""
         self._state_store = state_store
@@ -67,12 +66,6 @@ class MovementHandler:
         self._tc_movement_flagger = (
             thermocycler_movement_flagger
             or ThermocyclerMovementFlagger(
-                state_store=self._state_store, hardware_api=self._hardware_api
-            )
-        )
-        self._hs_movement_flagger = (
-            heater_shaker_movement_flagger
-            or HeaterShakerMovementFlagger(
                 state_store=self._state_store, hardware_api=self._hardware_api
             )
         )
@@ -90,9 +83,24 @@ class MovementHandler:
             labware_id=labware_id
         )
 
-        await self._hs_movement_flagger.raise_if_movement_restricted(
-            labware_id=labware_id, pipette_id=pipette_id
-        )
+        # Check for presence of heater shakers on deck, and if planned
+        # pipette movement is allowed
+        hs_movement_data = self._state_store.modules.get_heater_shaker_movement_data()
+        if hs_movement_data:
+            dest_slot_int = int(
+                self._state_store.geometry.get_ancestor_slot_name(labware_id)
+            )
+            hw_pipette = self._state_store.pipettes.get_hardware_pipette(
+                pipette_id=pipette_id,
+                attached_pipettes=self._hardware_api.attached_instruments,
+            )
+
+            await raise_if_movement_restricted(
+                heater_shakers=hs_movement_data,
+                destination_slot=dest_slot_int,
+                is_multi_channel=hw_pipette.config["channels"] > 1,
+                is_tiprack=self._state_store.labware.is_tiprack(labware_id),
+            )
 
         # get the pipette's mount and current critical point, if applicable
         pipette_location = self._state_store.motion.get_pipette_location(
