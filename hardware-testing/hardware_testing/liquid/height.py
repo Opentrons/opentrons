@@ -1,8 +1,12 @@
 from abc import ABC, abstractmethod
-from collections import namedtuple
 from dataclasses import dataclass
 import math
-from typing import List
+from typing import List, Optional
+
+from opentrons.protocol_api.labware import Well
+from hardware_testing.liquid.liquid_class import LiquidClassSettings
+
+LABWARE_BOTTOM_CLEARANCE = 1.5  # FIXME: not sure who should own this
 
 
 @dataclass
@@ -88,40 +92,44 @@ class CalcTypeLookup(CalcType):
             f'Unable to find height ({height}) in lookup table')
 
 
-class LiquidHeight:
+class LiquidContent:
 
-    def __init__(self, calc_type):
+    def __init__(self, calc_type: CalcType) -> None:
         self._calc_type = calc_type
         self._volume = 0
         self._name = None
 
-    def set_volume(self, volume):
+    def set_volume(self, volume: float) -> None:
         self._volume = volume
 
-    def get_volume(self):
+    def get_volume(self) -> float:
         return float(self._volume)
 
-    def set_name(self, name):
+    def set_name(self, name: str) -> None:
         self._name = str(name)
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._name
 
-    def update_volume(self, after_aspirate=None, after_dispense=None):
+    def update_volume(self,
+                      after_aspirate: Optional[float] = None,
+                      after_dispense: Optional[float] = None) -> None:
         if after_aspirate is not None:
             self.set_volume(self.get_volume() - after_aspirate)
         elif after_dispense is not None:
             self.set_volume(self.get_volume() + after_dispense)
 
-    def set_volume_from_height(self, liquid_height):
-        max_vol = self._calc_type.max_volume
+    def set_volume_from_height(self, liquid_height: float) -> None:
+        max_vol = self._calc_type.max_volume()
         vol = self._calc_type.volume_from_height(liquid_height)
         assert vol >= 0, f'{vol} uL is less than 0 uL'
         assert vol <= max_vol, f'{vol} uL is greater than {max_vol} uL'
         self.set_volume(vol)
 
-    def get_height(self, after_aspirate=None, after_dispense=None):
+    def get_height(self,
+                   after_aspirate: Optional[float] = None,
+                   after_dispense: Optional[float] = None) -> float:
         vol = self.get_volume()
         if after_aspirate is not None:
             vol -= after_aspirate
@@ -136,11 +144,11 @@ class LiquidTracker:
         self._items = {}
         return
 
-    def reset(self):
+    def reset(self) -> None:
         for key in self._items:
             del self._items[key]
 
-    def print_setup_instructions(self, user_confirm=False):
+    def print_setup_instructions(self, user_confirm: bool = False) -> None:
         found = [(well, tracker)
                  for well, tracker in self._items.items()
                  if tracker.get_volume() > 0]
@@ -152,7 +160,7 @@ class LiquidTracker:
         if user_confirm:
             input('\npress ENTER when ready...')
 
-    def init_liquid_height(self, well, lookup_table=None):
+    def init_liquid_height(self, well: Well, lookup_table: Optional[list] = None) -> None:
         if lookup_table:
             calc_type = CalcTypeLookup(lookup=lookup_table)
         elif well.diameter:
@@ -161,50 +169,75 @@ class LiquidTracker:
             calc_type = CalcTypeCube(width=well.width, length=well.length, depth=well.depth)
         if well in self._items:
             del self._items[well]
-        self._items[well] = LiquidHeight(calc_type)
+        self._items[well] = LiquidContent(calc_type)
 
-    def set_start_volume(self, well, volume):
+    def set_start_volume(self, well: Well, volume: float) -> None:
         self._items[well].set_volume(volume)
 
-    def add_start_volume(self, well, volume, name=None):
+    def add_start_volume(self, well: Well, volume: float,
+                         name: Optional[str] = None) -> None:
         self.update_well_volume(well, after_dispense=volume)
         self._items[well].set_name(name)
 
-    def set_start_volume_from_liquid_height(self, well, liquid_height, name=None):
+    def set_start_volume_from_liquid_height(self, well: Well, liquid_height: float,
+                                            name: Optional[str] = None) -> None:
         self._items[well].set_volume_from_height(liquid_height)
         self._items[well].set_name(name)
 
-    def get_liquid_height(self, well, after_aspirate=None, after_dispense=None):
+    def get_liquid_height(self, well: Well,
+                          after_aspirate: Optional[float] = None,
+                          after_dispense: Optional[float] = None) -> float:
         return self._items[well].get_height(
             after_aspirate=after_aspirate, after_dispense=after_dispense)
 
-    def get_volume(self, well):
+    def get_volume(self, well: Well) -> float:
         return self._items[well].get_volume()
 
-    def get_height_change(self, well, after_aspirate=None, after_dispense=None):
+    def get_height_change(self, well: Well,
+                          after_aspirate: Optional[float] = None,
+                          after_dispense: Optional[float] = None) -> float:
         start = self.get_liquid_height(well)
         end = self.get_liquid_height(
             well, after_aspirate=after_aspirate, after_dispense=after_dispense)
         return end - start
 
-    def update_well_volume(self, well, after_aspirate=None, after_dispense=None):
+    def update_well_volume(self, well: Well,
+                           after_aspirate: Optional[float] = None,
+                           after_dispense: Optional[float] = None) -> None:
         self._items[well].update_volume(
             after_aspirate=after_aspirate, after_dispense=after_dispense)
 
 
-if __name__ == '__main__':
-    import os
-    import sys
-    sys.path.insert(0, os.path.abspath('../pipetting'))
-    from lookup_tables import LIQUID_LEVEL_LOOKUP_NEXT_TROUGH_12_ROW as TROUGH_LOOKUP
-    FakeWell = namedtuple('FakeWell', 'display_name depth diameter width length')
-    fake_well = FakeWell('fake', TROUGH_LOOKUP[-1][1], None, None, None)
-    tracker = LiquidTracker()
-    tracker.init_liquid_height(fake_well, TROUGH_LOOKUP)
-    tracker.set_start_volume(fake_well, 14500)
-    while tracker.get_volume(fake_well) > 0:
-        ul = tracker.get_volume(fake_well)
-        mm = tracker.get_liquid_height(fake_well)
-        tracker.update_well_volume(fake_well, after_aspirate=100)
-        print(f'{int(ul)} ul  \t({round(mm, 1)} mm)')
+@dataclass
+class LiquidSurfaceHeights:
+    above: float
+    below: float
 
+
+@dataclass
+class CarefulHeights:
+    start: LiquidSurfaceHeights
+    end: LiquidSurfaceHeights
+
+
+def create_careful_heights(start_mm: float, end_mm: float, lc: LiquidClassSettings) -> CarefulHeights:
+    # Calculates the:
+    #     1) current liquid-height of the well
+    #     2) the resulting liquid-height of the well, after a specified volume is
+    #        aspirated/dispensed
+    #
+    # Then, use these 2 liquid-heights (start & end heights) to return four Locations:
+    #     1) Above the starting liquid height
+    #     2) Submerged in the starting liquid height
+    #     3) Above the ending liquid height
+    #     4) Submerged in the ending liquid height
+    return CarefulHeights(
+        start=LiquidSurfaceHeights(
+            above=max(start_mm + lc.retract.distance, LABWARE_BOTTOM_CLEARANCE),
+            below=max(start_mm - lc.submerge.distance, LABWARE_BOTTOM_CLEARANCE)
+        ),
+        end=LiquidSurfaceHeights(
+            above=max(end_mm + lc.retract.distance, LABWARE_BOTTOM_CLEARANCE),
+            below=max(end_mm - lc.submerge.distance, LABWARE_BOTTOM_CLEARANCE)
+        )
+    )

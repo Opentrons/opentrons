@@ -1,160 +1,75 @@
 from dataclasses import dataclass
+from typing import Optional, Callable
 
-TRAVERSAL_SPEED = 50  # speed during movements between labware
-SUBMERGED_SPEED = 5  # speed while submerged within a liquid
+from opentrons.protocol_api import ProtocolContext, InstrumentContext
+from opentrons.protocol_api.labware import Well
 
-SAFE_HOVER_MM = 3  # distance above liquid-level that is considered safe
-SUBMERGED_MM = 1.5  # distance below liquid-level to aspirate/dispense
-WELL_BOTTOM_CLEARANCE = 1.5  # minimum Z distance to each well's bottom
+from hardware_testing.liquid.liquid_class import LiquidClassSettings
+from hardware_testing.liquid.height import CarefulHeights
 
-# BLOW_OUT
-API_BLOW_OUT_VOL = {  # DO NOT CHANGE VALUES (calculated by Nick Starno)
-    1000: 123.6,
-    300: 41.7,
-    20: 2.39
-}
-API_FLOW_RATE_MAX = {  # from "pipetteNameSpec.json" # TODO: actually load these values
-    1000: 812,
-    300: 275,
-    20: 24
-}
-SUBMERGED_AIR_GAP_VOL = {  # found empirically
-    1000: 30,
-    300: 4,
-    20: 0.6
-}
-SUBMERGED_AIR_GAP_FLOW_RATE = {
-    1000: 27.3,
-    300: 10,
-    20: 2
-}
 
-# VALUES FOR THIS TEST
-PLUNGER_FLOW_RATE_CFG = {
-    1000: {
-        'aspirate': 250, 'dispense': 250,
-        'blow_out': 500
-    },
-    300: {
-        'aspirate': 47, 'dispense': 47,
-        'blow_out': 200
-    },
-    20: {
-        'aspirate': 6, 'dispense': 6,
-        'blow_out': 12
-    }
-}
+def apply_pipette_speeds(pipette: InstrumentContext, settings: LiquidClassSettings):
+    pipette.default_speed = settings.traverse.speed
+    pipette.flow_rate.aspirate = settings.aspirate.flow_rate
+    pipette.flow_rate.dispense = settings.dispense.flow_rate
+    pipette.flow_rate.blow_out = settings.blow_out.flow_rate
 
 
 @dataclass
-class LiquidSurfaceHeights:
-    above: float
-    below: float
+class CarefulPipettingConfig:
+    pipette: InstrumentContext
+    well: Well
+    heights: CarefulHeights
+    settings: LiquidClassSettings
+    aspirate: Optional[float]
+    dispense: Optional[float]
 
 
-@dataclass
-class CarefulHeights:
-    start: LiquidSurfaceHeights
-    end: LiquidSurfaceHeights
-
-
-def create_careful_heights(start_mm: float, end_mm: float) -> CarefulHeights:
-    # Calculates the:
-    #     1) current liquid-height of the well
-    #     2) the resulting liquid-height of the well, after a specified volume is
-    #        aspirated/dispensed
-    #
-    # Then, use these 2 liquid-heights (start & end heights) to return four Locations:
-    #     1) Above the starting liquid height
-    #     2) Submerged in the starting liquid height
-    #     3) Above the ending liquid height
-    #     4) Submerged in the ending liquid height
-    return CarefulHeights(
-        start=LiquidSurfaceHeights(
-            above=max(start_mm + SAFE_HOVER_MM, WELL_BOTTOM_CLEARANCE),
-            below=max(start_mm - SUBMERGED_MM, WELL_BOTTOM_CLEARANCE)
-        ),
-        end=LiquidSurfaceHeights(
-            above=max(end_mm + SAFE_HOVER_MM, WELL_BOTTOM_CLEARANCE),
-            below=max(end_mm - SUBMERGED_MM, WELL_BOTTOM_CLEARANCE)
-        )
-    )
-
-
-def apply_additional_offset_to_labware(labware, x=0, y=0, z=0):
-    # NOTE: this will re-instantiate all the labware's WELLs
-    #       so this must be ran before rest of protocol
-    # FIXME: here we have officially left the API...
-    labware_imp = labware._implementation
-    labware_delta = labware.calibrated_offset - labware_imp.get_geometry().offset
-    labware.set_offset(
-        x=labware_delta.x + x,
-        y=labware_delta.y + y,
-        z=labware_delta.z + z)
-
-
-def apply_pipette_speeds(pipette):
-    pipette.default_speed = TRAVERSAL_SPEED  # gantry
-    plngr_flow_rate_cfg = PLUNGER_FLOW_RATE_CFG.get(int(pipette.max_volume), None)
-    if not plngr_flow_rate_cfg:
-        raise ValueError(f'Unexpected max volume for pipette: {pipette.max_volume}')
-    pipette.flow_rate.aspirate = plngr_flow_rate_cfg['aspirate']
-    pipette.flow_rate.dispense = plngr_flow_rate_cfg['dispense']
-    pipette.flow_rate.blow_out = plngr_flow_rate_cfg['blow_out']
-
-
-def carefully_pipette(protocol, pipette, well, heights,
-                      aspirate=None, dispense=None,
-                      on_pre_submerge=None, on_post_emerge=None,
-                      inspect=False):
-    assert (aspirate is not None or dispense is not None),\
+def carefully_pipette(protocol: ProtocolContext, cfg: CarefulPipettingConfig,
+                      on_pre_submerge: Optional[Callable[[], None]] = None,
+                      on_post_emerge: Optional[Callable[[], None]] = None):
+    assert (cfg.aspirate is not None or cfg.dispense is not None),\
         'must either aspirate or dispense'
-    assert (aspirate is None or dispense is None),\
+    assert (cfg.aspirate is None or cfg.dispense is None),\
         'cannot both aspirate and dispense'
-    if inspect:
-        input('Ready to inspect positions. Press ENTER when ready')
-
-    pipette.move_to(well.top())
-    if inspect:
-        input('Move to the TOP of the well')
-    if aspirate:
+    cfg.pipette.move_to(cfg.well.top())
+    if cfg.aspirate:
+        # FIXME: remove this and use latest API version once available
         # NOTE: this MUST happen before the .move_to()
         #       because the API automatically moves the pipette
         #       to well.top() before beginning the .aspirate()
-        pipette.aspirate(pipette.max_volume / 100)
-        pipette.dispense()
+        cfg.pipette.aspirate(cfg.pipette.max_volume / 100)
+        cfg.pipette.dispense()
     if callable(on_pre_submerge):
         on_pre_submerge()
-    if aspirate:
-        pipette.aspirate(SUBMERGED_AIR_GAP_VOL[pipette.max_volume])
+    if cfg.aspirate and cfg.settings.wet_air_gap.volume:
+        cfg.pipette.aspirate(cfg.settings.wet_air_gap.volume)
     # in case (start.above < end.below)
-    start_above = max(heights.start.above, heights.end.below)
-    pipette.move_to(well.bottom(start_above),
-                    force_direct=False)
-    if inspect:
-        input('Move above START liquid-height')
-    submerged_loc = well.bottom(heights.end.below)
-    pipette.move_to(submerged_loc, force_direct=True, speed=SUBMERGED_SPEED)
-    if inspect:
-        input('Move below END liquid-height')
-    if aspirate:
-        pipette.aspirate(aspirate)
+    start_above = max(cfg.heights.start.above, cfg.heights.end.below)
+    cfg.pipette.move_to(cfg.well.bottom(start_above),
+                        force_direct=False)
+    submerged_loc = cfg.well.bottom(cfg.heights.end.below)
+    cfg.pipette.move_to(submerged_loc, force_direct=True, speed=cfg.settings.submerge.speed)
+    if cfg.aspirate:
+        cfg.pipette.aspirate(cfg.aspirate)
     else:
-        pipette.dispense(dispense)
-        if pipette.current_volume > 0:
+        cfg.pipette.dispense(cfg.dispense)
+        if cfg.pipette.current_volume > 0:
             # temporarily change the dispense volume
-            pipette.flow_rate.dispense = SUBMERGED_AIR_GAP_FLOW_RATE[pipette.max_volume]
-            pipette.dispense()
-            apply_pipette_speeds(pipette)  # back to defaults
-    if inspect:
-        input('Aspirate/Dispense below END liquid-height')
-    protocol.delay(seconds=1)
-    pipette.move_to(well.bottom(heights.end.above),
-                    force_direct=True, speed=SUBMERGED_SPEED)
-    if dispense:
-        pipette.blow_out()  # nothing to loose
-    if inspect:
-        input('Move above END liquid-height')
-    pipette.move_to(well.top(), force_direct=True)
+            cfg.pipette.flow_rate.dispense = cfg.settings.wet_air_gap.flow_rate
+            cfg.pipette.dispense()
+            apply_pipette_speeds(cfg.pipette, cfg.settings)  # back to defaults
+    if cfg.aspirate and cfg.settings.aspirate.delay:
+        delay_time = cfg.settings.aspirate.delay
+    elif cfg.dispense and cfg.settings.dispense.delay:
+        delay_time = cfg.settings.dispense.delay
+    else:
+        delay_time = 0
+    protocol.delay(seconds=delay_time)
+    cfg.pipette.move_to(cfg.well.bottom(cfg.heights.end.above),
+                        force_direct=True, speed=cfg.settings.retract.speed)
+    if cfg.dispense and cfg.settings.blow_out.volume:
+        cfg.pipette.blow_out()  # nothing to loose
+    cfg.pipette.move_to(cfg.well.top(), force_direct=True)
     if callable(on_post_emerge):
         on_post_emerge()

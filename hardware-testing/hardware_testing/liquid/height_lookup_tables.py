@@ -1,3 +1,4 @@
+# TODO: make this a class?
 LIQUID_LEVEL_LOOKUP_NEXT_TROUGH_12_ROW = [
     (0, 0),
     (300, 1),

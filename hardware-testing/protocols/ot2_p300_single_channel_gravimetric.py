@@ -1,13 +1,10 @@
-import time
-from datetime import datetime
-from typing import Tuple
-
 from opentrons.protocol_api import ProtocolContext
 
-from hardware_testing.opentrons import get_api_context
+from hardware_testing.opentrons.helpers import get_api_context
+from hardware_testing.opentrons.workarounds import apply_additional_offset_to_labware
 from hardware_testing import config
 from hardware_testing.labware.definitions import load_radwag_vial_definition
-from hardware_testing.labware.liquid_level.liquid_level import LiquidTracker
+from hardware_testing.liquid.height import LiquidTracker
 from hardware_testing.measure.weight import GravimetricRecorder
 from hardware_testing.pipette import motions
 from hardware_testing.protocol import load_labware_and_pipettes, apply_calibrated_labware_offsets
@@ -141,10 +138,9 @@ def run(protocol: ProtocolContext):
     if __name__ == '__main__':
         apply_calibrated_labware_offsets(items)
     # must be after protocol.apply_calibrated_labware_offsets()
-    motions.apply_additional_offset_to_labware(
-        items.vial, z=CFG.scale.safe_z_offset)
+    apply_additional_offset_to_labware(items.vial, z=CFG.scale.safe_z_offset)
     # must be after all offsets/addition_offsets are applied
-    init_liquid_tracking(plate=items.plate, trough=items.trough, vial=items.vial)
+    init_liquid_tracking(plate=items.plate, vial=items.vial)
 
     # PIPETTE
     motions.apply_pipette_speeds(items.pipette)
