@@ -9,6 +9,7 @@ from opentrons.types import DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
+
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands
@@ -24,7 +25,7 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.execution import (
     QueueWorker,
     HardwareStopper,
-    HardwareEventForwarder,
+    DoorWatcher,
 )
 from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
 from opentrons.protocol_engine.state import StateStore
@@ -89,9 +90,9 @@ def hardware_stopper(decoy: Decoy) -> HardwareStopper:
 
 
 @pytest.fixture
-def hardware_event_forwarder(decoy: Decoy) -> HardwareEventForwarder:
-    """Get a mock HardwareListener."""
-    return decoy.mock(cls=HardwareEventForwarder)
+def door_watcher(decoy: Decoy) -> DoorWatcher:
+    """Get a mock DoorWatcher."""
+    return decoy.mock(cls=DoorWatcher)
 
 
 @pytest.fixture
@@ -109,7 +110,7 @@ def subject(
     queue_worker: QueueWorker,
     model_utils: ModelUtils,
     hardware_stopper: HardwareStopper,
-    hardware_event_forwarder: HardwareEventForwarder,
+    door_watcher: DoorWatcher,
     module_data_provider: ModuleDataProvider,
 ) -> ProtocolEngine:
     """Get a ProtocolEngine test subject with its dependencies stubbed out."""
@@ -121,7 +122,7 @@ def subject(
         queue_worker=queue_worker,
         model_utils=model_utils,
         hardware_stopper=hardware_stopper,
-        hardware_event_forwarder=hardware_event_forwarder,
+        door_watcher=door_watcher,
         module_data_provider=module_data_provider,
     )
 
@@ -129,11 +130,11 @@ def subject(
 def test_create_starts_background_tasks(
     decoy: Decoy,
     queue_worker: QueueWorker,
-    hardware_event_forwarder: HardwareEventForwarder,
+    door_watcher: DoorWatcher,
     subject: ProtocolEngine,
 ) -> None:
     """It should start the queue worker upon creation."""
-    decoy.verify(queue_worker.start(), hardware_event_forwarder.start())
+    decoy.verify(queue_worker.start(), door_watcher.start())
 
 
 def test_add_command(
@@ -166,7 +167,6 @@ def test_add_command(
         state_store.commands.validate_action_allowed(
             QueueCommandAction(
                 command_id="command-id",
-                command_key="command-id",
                 created_at=created_at,
                 request=request,
             )
@@ -174,7 +174,6 @@ def test_add_command(
     ).then_return(
         QueueCommandAction(
             command_id="command-id-validated",
-            command_key="command-id-validated",
             created_at=created_at,
             request=request,
         )
@@ -184,7 +183,6 @@ def test_add_command(
         action_dispatcher.dispatch(
             QueueCommandAction(
                 command_id="command-id-validated",
-                command_key="command-id-validated",
                 created_at=created_at,
                 request=request,
             )
@@ -237,7 +235,6 @@ async def test_add_and_execute_command(
         state_store.commands.validate_action_allowed(
             QueueCommandAction(
                 command_id="command-id",
-                command_key="command-id",
                 created_at=created_at,
                 request=request,
             )
@@ -245,7 +242,6 @@ async def test_add_and_execute_command(
     ).then_return(
         QueueCommandAction(
             command_id="command-id-validated",
-            command_key="command-id-validated",
             created_at=created_at,
             request=request,
         )
@@ -255,7 +251,6 @@ async def test_add_and_execute_command(
         action_dispatcher.dispatch(
             QueueCommandAction(
                 command_id="command-id-validated",
-                command_key="command-id-validated",
                 created_at=created_at,
                 request=request,
             )
@@ -450,7 +445,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     queue_worker: QueueWorker,
     hardware_api: HardwareControlAPI,
     hardware_stopper: HardwareStopper,
-    hardware_event_forwarder: HardwareEventForwarder,
+    door_watcher: DoorWatcher,
     action_dispatcher: ActionDispatcher,
     plugin_starter: PluginStarter,
     subject: ProtocolEngine,
@@ -469,7 +464,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         await subject.finish()
 
     decoy.verify(
-        hardware_event_forwarder.stop_soon(),
+        door_watcher.stop_soon(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
         action_dispatcher.dispatch(HardwareStoppedAction(completed_at=completed_at)),
         await plugin_starter.stop(),
@@ -604,13 +599,13 @@ def test_add_labware_definition(
     assert result == "some/definition/uri"
 
 
-async def test_use_attached_modules(
+async def test_use_attached_temp_and_mag_modules(
     decoy: Decoy,
     module_data_provider: ModuleDataProvider,
     action_dispatcher: ActionDispatcher,
     subject: ProtocolEngine,
     tempdeck_v1_def: ModuleDefinition,
-    magdeck_v1_def: ModuleDefinition,
+    magdeck_v2_def: ModuleDefinition,
 ) -> None:
     """It should be able to load attached hardware modules directly into state."""
     mod_1 = decoy.mock(cls=TempDeck)
@@ -619,15 +614,18 @@ async def test_use_attached_modules(
     decoy.when(mod_1.device_info).then_return({"serial": "serial-1"})
     decoy.when(mod_2.device_info).then_return({"serial": "serial-2"})
     decoy.when(mod_1.model()).then_return("temperatureModuleV1")
-    decoy.when(mod_2.model()).then_return("magneticModuleV1")
+    decoy.when(mod_2.model()).then_return("magneticModuleV2")
+
+    decoy.when(mod_1.live_data).then_return({"status": "some-status", "data": {}})
+    decoy.when(mod_2.live_data).then_return({"status": "other-status", "data": {}})
 
     decoy.when(
         module_data_provider.get_definition(ModuleModel.TEMPERATURE_MODULE_V1)
     ).then_return(tempdeck_v1_def)
 
     decoy.when(
-        module_data_provider.get_definition(ModuleModel.MAGNETIC_MODULE_V1)
-    ).then_return(magdeck_v1_def)
+        module_data_provider.get_definition(ModuleModel.MAGNETIC_MODULE_V2)
+    ).then_return(magdeck_v2_def)
 
     await subject.use_attached_modules(
         {
@@ -642,13 +640,15 @@ async def test_use_attached_modules(
                 module_id="module-1",
                 serial_number="serial-1",
                 definition=tempdeck_v1_def,
+                module_live_data={"status": "some-status", "data": {}},
             )
         ),
         action_dispatcher.dispatch(
             AddModuleAction(
                 module_id="module-2",
                 serial_number="serial-2",
-                definition=magdeck_v1_def,
+                definition=magdeck_v2_def,
+                module_live_data={"status": "other-status", "data": {}},
             ),
         ),
     )

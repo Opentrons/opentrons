@@ -5,6 +5,7 @@ import {
   getSlotLabwareName,
   getLiquidsByIdForLabware,
   getWellGroupForLiquidId,
+  getWellRangeForLiquidLabwarePair,
 } from '../utils'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import type { LabwareByLiquidId, Liquid } from '@opentrons/api-client'
@@ -201,6 +202,27 @@ const MOCK_LABWARE_BY_LIQUID_ID_FOR_LABWARE = {
   ],
 }
 
+const MOCK_WELL_ORDERING = [
+  ['A1', 'B1', 'C1', 'D1'],
+  ['A2', 'B2', 'C2', 'D2'],
+  ['A3', 'B3', 'C3', 'D3'],
+  ['A4', 'B4', 'C4', 'D4'],
+  ['A5', 'B5', 'C5', 'D5'],
+  ['A6', 'B6', 'C6', 'D6'],
+]
+const MOCK_VOLUME_BY_WELL = {
+  A1: 50,
+  C5: 100,
+  A3: 100,
+  A4: 100,
+  B3: 100,
+  B4: 100,
+  C3: 100,
+  C4: 100,
+  D3: 100,
+  D4: 100,
+}
+
 jest.mock('@opentrons/shared-data')
 const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
   typeof getLabwareDisplayName
@@ -314,6 +336,20 @@ describe('getWellGroupForLiquidId', () => {
     }
     expect(
       getWellGroupForLiquidId(MOCK_LABWARE_BY_LIQUID_ID_FOR_LABWARE, '7')
+    ).toEqual(expected)
+  })
+})
+
+describe('getWellRangeForLiquidLabwarePair', () => {
+  it('returns correctly ranged wells', () => {
+    const expected = [
+      { wellName: 'A1', volume: 50 },
+      { wellName: 'A3: D3', volume: 100 },
+      { wellName: 'A4: D4', volume: 100 },
+      { wellName: 'C5', volume: 100 },
+    ]
+    expect(
+      getWellRangeForLiquidLabwarePair(MOCK_VOLUME_BY_WELL, MOCK_WELL_ORDERING)
     ).toEqual(expected)
   })
 })

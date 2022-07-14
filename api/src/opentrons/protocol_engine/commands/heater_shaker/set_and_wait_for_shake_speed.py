@@ -51,6 +51,8 @@ class SetAndWaitForShakeSpeedImpl(
             module_id=params.moduleId
         )
 
+        hs_module_substate.raise_if_labware_latch_not_closed()
+
         # Verify speed from hs module view
         validated_speed = hs_module_substate.validate_target_speed(params.rpm)
 

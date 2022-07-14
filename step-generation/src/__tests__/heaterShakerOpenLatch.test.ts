@@ -11,13 +11,7 @@ import {
 import type { InvariantContext, RobotState } from '../types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-jest.mock('../utils', () => {
-  const actualUtils = jest.requireActual('../utils')
-  return {
-    ...actualUtils,
-    getIsTallLabwareEastWestOfHeaterShaker: jest.fn(),
-  }
-})
+jest.mock('../utils/heaterShakerCollision')
 
 const fixtureTiprack1000ul = _fixtureTiprack1000ul as LabwareDefinition2
 
@@ -97,6 +91,7 @@ describe('heaterShakerOpenLatch', () => {
       commands: [
         {
           commandType: 'heaterShaker/openLabwareLatch',
+          key: expect.any(String),
           params: { moduleId: 'heaterShakerId' },
         },
       ],

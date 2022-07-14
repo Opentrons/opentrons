@@ -1,12 +1,13 @@
 """The driver package."""
 
-from .radwag_scale import RadwagScale, RadwagScaleError
+from .radwag import RadwagScaleBase, RadwagScale, SimRadwagScale
 from .asair_sensor import AsairSensor, AsairSensorError
 from .limit_sensor import LimitSensor
 
 __all__ = [
+    "RadwagScaleBase",
     "RadwagScale",
-    "RadwagScaleError",
+    "SimRadwagScale",
     "AsairSensor",
     "AsairSensorError",
     "LimitSensor",
