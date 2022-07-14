@@ -81,7 +81,7 @@ const mockThermocycler = {
   quirks: [],
 }
 
-export const mockHeaterShakerLatchClosed: HeaterShakerModule = {
+const mockHeaterShakerLatchClosed: HeaterShakerModule = {
   id: 'heatershaker_id',
   moduleModel: 'heaterShakerModuleV1',
   moduleType: 'heaterShakerModuleType',
