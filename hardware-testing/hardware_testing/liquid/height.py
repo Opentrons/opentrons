@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import math
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from opentrons.protocol_api.labware import Well
-from hardware_testing.liquid.liquid_class import LiquidClassSettings
+from opentrons.protocol_api import InstrumentContext, ProtocolContext
 
-LABWARE_BOTTOM_CLEARANCE = 1.5  # FIXME: not sure who should own this
+from hardware_testing.opentrons_api.helpers import well_is_reservoir, get_list_of_wells_affected
 
 
 @dataclass
@@ -138,11 +138,39 @@ class LiquidContent:
         return self._calc_type.height_from_volume(vol)
 
 
+def _get_actual_volume_change_in_well(pipette: InstrumentContext,
+                                      well: Well,
+                                      volume: Optional[float]) -> Optional[float]:
+    """Get the actual volume change in well, depending on if the pipette is single or multi."""
+    if volume is None:
+        return None
+    if well_is_reservoir(well):
+        volume *= pipette.channels
+    return volume
+
+
 class LiquidTracker:
 
     def __init__(self) -> None:
         self._items = {}
         return
+
+    def initialize_from_deck(self, protocol: ProtocolContext) -> None:
+        # NOTE: For Corning 3631, assuming a perfect cylinder creates
+        #       an error of -0.78mm when Corning 3631 plate is full (~360uL)
+        #       This means the software will think the liquid is
+        #       0.78mm lower than it is in reality. To make it more
+        #       accurate, give .init_liquid_height() a lookup table
+        self.reset()
+        excluded_labware = [protocol.deck.get_fixed_trash()]
+        loaded_labware = [
+            lw
+            for lw in protocol.deck.values()
+            if lw and lw not in excluded_labware
+        ]
+        for lw in loaded_labware:
+            for w in lw.wells():
+                self.init_well_liquid_height(w)
 
     def reset(self) -> None:
         for key in self._items:
@@ -160,7 +188,7 @@ class LiquidTracker:
         if user_confirm:
             input('\npress ENTER when ready...')
 
-    def init_liquid_height(self, well: Well, lookup_table: Optional[list] = None) -> None:
+    def init_well_liquid_height(self, well: Well, lookup_table: Optional[list] = None) -> None:
         if lookup_table:
             calc_type = CalcTypeLookup(lookup=lookup_table)
         elif well.diameter:
@@ -207,38 +235,22 @@ class LiquidTracker:
         self._items[well].update_volume(
             after_aspirate=after_aspirate, after_dispense=after_dispense)
 
+    def get_before_and_after_heights(self, pipette: InstrumentContext, well: Well,
+                                     aspirate=None, dispense=None) -> Tuple[float, float]:
+        actual_aspirate_amount = _get_actual_volume_change_in_well(pipette, well, volume=aspirate)
+        actual_dispense_amount = _get_actual_volume_change_in_well(pipette, well, volume=dispense)
+        before = self.get_liquid_height(well)
+        after = self.get_liquid_height(well,
+                                       after_aspirate=actual_aspirate_amount,
+                                       after_dispense=actual_dispense_amount)
+        return before, after
 
-@dataclass
-class LiquidSurfaceHeights:
-    above: float
-    below: float
-
-
-@dataclass
-class CarefulHeights:
-    start: LiquidSurfaceHeights
-    end: LiquidSurfaceHeights
-
-
-def create_careful_heights(start_mm: float, end_mm: float,
-                           liquid_class: LiquidClassSettings) -> CarefulHeights:
-    # Calculates the:
-    #     1) current liquid-height of the well
-    #     2) the resulting liquid-height of the well, after a specified volume is
-    #        aspirated/dispensed
-    #
-    # Then, use these 2 liquid-heights (start & end heights) to return four Locations:
-    #     1) Above the starting liquid height
-    #     2) Submerged in the starting liquid height
-    #     3) Above the ending liquid height
-    #     4) Submerged in the ending liquid height
-    return CarefulHeights(
-        start=LiquidSurfaceHeights(
-            above=max(start_mm + lc.retract.distance, LABWARE_BOTTOM_CLEARANCE),
-            below=max(start_mm - lc.submerge.distance, LABWARE_BOTTOM_CLEARANCE)
-        ),
-        end=LiquidSurfaceHeights(
-            above=max(end_mm + lc.retract.distance, LABWARE_BOTTOM_CLEARANCE),
-            below=max(end_mm - lc.submerge.distance, LABWARE_BOTTOM_CLEARANCE)
-        )
-    )
+    def update_affected_wells(self, pipette: InstrumentContext, well: Well,
+                              aspirate: Optional[float] = None,
+                              dispense: Optional[float] = None) -> None:
+        actual_aspirate_amount = _get_actual_volume_change_in_well(pipette, well, volume=aspirate)
+        actual_dispense_amount = _get_actual_volume_change_in_well(pipette, well, volume=dispense)
+        for w in get_list_of_wells_affected(pipette, well):
+            self.update_well_volume(
+                w, after_aspirate=actual_aspirate_amount, after_dispense=actual_dispense_amount)
+        return

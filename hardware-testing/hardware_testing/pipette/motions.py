@@ -5,8 +5,9 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext
 from opentrons.protocol_api.labware import Well
 
 from hardware_testing.liquid.liquid_class import LiquidClassSettings
-from hardware_testing.liquid.height import CarefulHeights
 from hardware_testing.opentrons_api.workarounds import force_prepare_for_aspirate
+
+LABWARE_BOTTOM_CLEARANCE = 1.5  # FIXME: not sure who should own this
 
 
 def apply_pipette_speeds(pipette: InstrumentContext, settings: LiquidClassSettings):
@@ -14,6 +15,42 @@ def apply_pipette_speeds(pipette: InstrumentContext, settings: LiquidClassSettin
     pipette.flow_rate.aspirate = settings.aspirate.flow_rate
     pipette.flow_rate.dispense = settings.dispense.flow_rate
     pipette.flow_rate.blow_out = settings.blow_out.flow_rate
+
+
+@dataclass
+class LiquidSurfaceHeights:
+    above: float
+    below: float
+
+
+@dataclass
+class CarefulHeights:
+    start: LiquidSurfaceHeights
+    end: LiquidSurfaceHeights
+
+
+def create_careful_heights(start_mm: float, end_mm: float,
+                           liquid_class: LiquidClassSettings) -> CarefulHeights:
+    # Calculates the:
+    #     1) current liquid-height of the well
+    #     2) the resulting liquid-height of the well, after a specified volume is
+    #        aspirated/dispensed
+    #
+    # Then, use these 2 liquid-heights (start & end heights) to return four Locations:
+    #     1) Above the starting liquid height
+    #     2) Submerged in the starting liquid height
+    #     3) Above the ending liquid height
+    #     4) Submerged in the ending liquid height
+    return CarefulHeights(
+        start=LiquidSurfaceHeights(
+            above=max(start_mm + liquid_class.retract.distance, LABWARE_BOTTOM_CLEARANCE),
+            below=max(start_mm - liquid_class.submerge.distance, LABWARE_BOTTOM_CLEARANCE)
+        ),
+        end=LiquidSurfaceHeights(
+            above=max(end_mm + liquid_class.retract.distance, LABWARE_BOTTOM_CLEARANCE),
+            below=max(end_mm - liquid_class.submerge.distance, LABWARE_BOTTOM_CLEARANCE)
+        )
+    )
 
 
 @dataclass
