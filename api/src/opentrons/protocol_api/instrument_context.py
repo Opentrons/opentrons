@@ -694,10 +694,10 @@ class InstrumentContext(CommandPublisher):
 
                            If ``True``, the pipette will move its plunger position to
                            bottom in preparation for any following calls to
-                           :py:meth:.aspirate.
+                           :py:meth:`.aspirate`.
 
                            If ``False``, the pipette will prepare its plunger later,
-                           during the next call to :py:meth:.aspirate. This is
+                           during the next call to :py:meth:`.aspirate`. This is
                            accomplished by moving the tip to the top of the well,
                            and positioning the plunger outside any potential liquids.
 
