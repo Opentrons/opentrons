@@ -35,18 +35,14 @@ def patch_mock_next_available_tip(
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_validate_tiprack(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Replace validate_tiprack() with a mock."""
+def _patch_mock_instrument_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Replace instrument module method calls with a mock."""
     mock_validate_tiprack = decoy.mock(func=instrument.validate_tiprack)
     monkeypatch.setattr(
         "opentrons.protocols.api_support.instrument.validate_tiprack",
         mock_validate_tiprack,
     )
 
-
-@pytest.fixture(autouse=True)
-def patch_mock_tip_length_for(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Replace tip_length_for() with a mock."""
     mock_validate_tiprack = decoy.mock(func=instrument.tip_length_for)
     monkeypatch.setattr(
         "opentrons.protocols.api_support.instrument.tip_length_for",
@@ -245,7 +241,7 @@ def test_pick_up_from_no_location(
     mock_instrument_implementation: AbstractInstrument,
     mock_well_implementation: WellImplementation,
     mock_labware: Labware,
-    patch_mock_next_available_tip: Any
+    patch_mock_next_available_tip: Any,
 ) -> None:
     """Should pick up tip from next_available_tip.top()."""
     mock_well = decoy.mock(cls=Well)
