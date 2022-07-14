@@ -220,7 +220,8 @@ class CarefulHeights:
     end: LiquidSurfaceHeights
 
 
-def create_careful_heights(start_mm: float, end_mm: float, lc: LiquidClassSettings) -> CarefulHeights:
+def create_careful_heights(start_mm: float, end_mm: float,
+                           liquid_class: LiquidClassSettings) -> CarefulHeights:
     # Calculates the:
     #     1) current liquid-height of the well
     #     2) the resulting liquid-height of the well, after a specified volume is

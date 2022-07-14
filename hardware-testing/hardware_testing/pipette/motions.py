@@ -6,6 +6,7 @@ from opentrons.protocol_api.labware import Well
 
 from hardware_testing.liquid.liquid_class import LiquidClassSettings
 from hardware_testing.liquid.height import CarefulHeights
+from hardware_testing.opentrons_api.workarounds import force_prepare_for_aspirate
 
 
 def apply_pipette_speeds(pipette: InstrumentContext, settings: LiquidClassSettings):
@@ -34,12 +35,7 @@ def carefully_pipette(protocol: ProtocolContext, cfg: CarefulPipettingConfig,
         'cannot both aspirate and dispense'
     cfg.pipette.move_to(cfg.well.top())
     if cfg.aspirate:
-        # FIXME: remove this and use latest API version once available
-        # NOTE: this MUST happen before the .move_to()
-        #       because the API automatically moves the pipette
-        #       to well.top() before beginning the .aspirate()
-        cfg.pipette.aspirate(cfg.pipette.max_volume / 100)
-        cfg.pipette.dispense()
+        force_prepare_for_aspirate(cfg.pipette)
     if callable(on_pre_submerge):
         on_pre_submerge()
     if cfg.aspirate and cfg.settings.wet_air_gap.volume:

@@ -1,10 +1,11 @@
 from opentrons.protocol_api import ProtocolContext
 
-from hardware_testing.opentrons.helpers import get_api_context
-from hardware_testing.opentrons.workarounds import apply_additional_offset_to_labware
+from hardware_testing.opentrons_api.helpers import get_api_context
+from hardware_testing.opentrons_api.workarounds import apply_additional_offset_to_labware
 from hardware_testing import config
 from hardware_testing.labware.definitions import load_radwag_vial_definition
-from hardware_testing.liquid.height import LiquidTracker
+from hardware_testing.liquid.height import LiquidTracker, create_careful_heights
+from hardware_testing.liquid.liquid_class import LIQUID_CLASS_OT2_P300_SINGLE
 from hardware_testing.measure.weight import GravimetricRecorder
 from hardware_testing.pipette import motions
 from hardware_testing.protocol import load_labware_and_pipettes, apply_calibrated_labware_offsets
@@ -52,15 +53,18 @@ def test_aspirate_dispense(
     liq_mm_start = liquid_level.get_liquid_height(well)
     liq_mm_end = liquid_level.get_liquid_height(
         well, after_aspirate=liq_lvl_asp, after_dispense=liq_lvl_disp)
-    heights = motions.create_careful_heights(
-        start_mm=liq_mm_start, end_mm=liq_mm_end)
-    motions.carefully_pipette(
-        protocol, pipette, well, heights,
-        aspirate=aspirate, dispense=dispense,
-        inspect=CFG.inspect,
-        on_pre_submerge=on_pre_submerge, on_post_emerge=on_post_emerge)
+    heights = create_careful_heights(start_mm=liq_mm_start, end_mm=liq_mm_end,
+                                     liquid_class=LIQUID_CLASS_OT2_P300_SINGLE)
+    careful_cfg = motions.CarefulPipettingConfig(pipette=pipette, well=well, heights=heights,
+                                                 settings=LIQUID_CLASS_OT2_P300_SINGLE,
+                                                 aspirate=aspirate, dispense=dispense)
+    motions.carefully_pipette(protocol, careful_cfg,
+                              on_pre_submerge=on_pre_submerge, on_post_emerge=on_post_emerge)
     if pip_ch > 1 and not is_trough:
-        wells = [w for w in well.parent.columns_by_name()[well.well_name[1:]]]
+        well_col = well.well_name[1:]
+        parent_labware = well.parent
+        parent_cols = parent_labware.columns_by_name()
+        wells = [w for w in parent_cols[well_col]]
         assert well in wells, 'Well is not inside column'
     else:
         wells = [well]
