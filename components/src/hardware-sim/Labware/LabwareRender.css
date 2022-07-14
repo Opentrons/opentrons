@@ -1,10 +1,7 @@
 @import '../..';
 
 .highlighted_well {
-  stroke: var(--c-black);
-  stroke-width: 0.5px;
-  fill: color-mod(var(--c-highlight) alpha(10%));
-  filter: drop-shadow(0 0 1px rgba(0, 108, 250, 1));
+  filter: drop-shadow(0 0 1.5px rgba(0, 108, 250, 1));
 }
 
 .selected_well {

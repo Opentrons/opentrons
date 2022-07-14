@@ -78,17 +78,17 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
           strokeByWell={props.wellStroke}
         />
       )}
-      {props.wellFill && (
-        <FilledWells
-          definition={props.definition}
-          fillByWell={props.wellFill}
-        />
-      )}
       {props.highlightedWells && (
         <StyledWells
           className={styles.highlighted_well}
           definition={props.definition}
           wells={props.highlightedWells}
+        />
+      )}
+      {props.wellFill && (
+        <FilledWells
+          definition={props.definition}
+          fillByWell={props.wellFill}
         />
       )}
       {props.selectedWells && (

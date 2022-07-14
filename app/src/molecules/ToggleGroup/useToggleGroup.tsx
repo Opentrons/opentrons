@@ -9,7 +9,6 @@ import {
 import { PrimaryButton } from '../../atoms/buttons'
 
 const BUTTON_GROUP_STYLES = css`
-  border: 1px ${medGrey} solid;
   border-radius: ${BORDERS.radiusSoftCorners};
   margin-top: -1px;
   width: fit-content;
@@ -17,7 +16,6 @@ const BUTTON_GROUP_STYLES = css`
   button {
     height: 28px;
     width: auto;
-    border: none;
     font-weight: 400;
     font-size: 11px;
     line-height: 14px;
@@ -47,10 +45,12 @@ const BUTTON_GROUP_STYLES = css`
 
   button:first-child {
     border-radius: ${BORDERS.radiusSoftCorners} 0 0 ${BORDERS.radiusSoftCorners};
+    border-right: none;
   }
 
   button:last-child {
     border-radius: 0 ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} 0;
+    border-left: none;
   }
 `
 
@@ -67,6 +67,7 @@ const DEFAULT_STYLE = css`
   padding-right: ${SPACING.spacing3};
   background-color: ${COLORS.white};
   color: ${COLORS.black};
+  border: 1px ${medGrey} solid;
 `
 
 export const useToggleGroup = (
