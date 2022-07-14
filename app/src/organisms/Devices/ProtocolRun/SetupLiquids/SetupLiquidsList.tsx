@@ -54,6 +54,7 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
       maxHeight={'31.25rem'}
       overflowY={'auto'}
       data-testid={'SetupLiquidsList_ListView'}
+      gridGap={SPACING.spacing3}
     >
       {liquidsInLoadOrder?.map(liquid => (
         <LiquidsListItem
@@ -91,23 +92,21 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
     ${BORDERS.cardOutlineBorder}
 
     &:hover {
-      background-color: ${COLORS.background};
+      cursor: pointer;
       border: 1px solid ${COLORS.medGreyHover};
     }
   `
   const LIQUID_CARD_ITEM_STYLE = css`
-    ${BORDERS.cardOutlineBorder}
-
+    border: 1px solid ${COLORS.white};
     &:hover {
       cursor: pointer;
-      border: 1px solid ${COLORS.medGreyHover};
+      ${BORDERS.cardOutlineBorder}
     }
   `
 
   return (
     <Box
       css={LIQUID_CARD_STYLE}
-      marginBottom={SPACING.spacing3}
       padding={SPACING.spacing4}
       onClick={() => setOpenItem(!openItem)}
       backgroundColor={openItem ? COLORS.lightGrey : COLORS.white}
@@ -186,7 +185,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                   <StyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
-                    width="8.125rem"
+                    minWidth="8.125rem"
                   >
                     {t('slot_location', {
                       slotName: slotName,
@@ -198,7 +197,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                   <StyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
-                    width="4.25rem"
+                    minWidth="4.25rem"
                     flexShrink="0"
                     marginLeft="auto"
                   >

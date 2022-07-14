@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { BORDERS, COLORS, Flex } from '@opentrons/components'
+import { BORDERS, COLORS, Flex, SPACING } from '@opentrons/components'
 import {
   blue,
   lightGrey,
@@ -55,12 +55,16 @@ const BUTTON_GROUP_STYLES = css`
 `
 
 const ACTIVE_STYLE = css`
+  padding-left: ${SPACING.spacing3};
+  padding-right: ${SPACING.spacing3};
   background-color: ${blue};
   color: ${COLORS.white};
   pointer-events: none;
 `
 
 const DEFAULT_STYLE = css`
+  padding-left: ${SPACING.spacing3};
+  padding-right: ${SPACING.spacing3};
   background-color: ${COLORS.white};
   color: ${COLORS.black};
 `

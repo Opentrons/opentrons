@@ -115,7 +115,7 @@ export const LiquidsLabwareDetailsModal = (
               )
             })}
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} marginX={SPACING.spacingL}>
+          <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing4}>
             <Flex flexDirection={DIRECTION_ROW}>
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <StyledText
@@ -133,7 +133,10 @@ export const LiquidsLabwareDetailsModal = (
                   {slotName}
                 </StyledText>
               </Flex>
-              <Flex flexDirection={DIRECTION_COLUMN} marginX={SPACING.spacingL}>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                marginLeft={SPACING.spacing5}
+              >
                 <StyledText
                   as="h6"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
