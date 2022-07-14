@@ -22,6 +22,7 @@ import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
 import { PrimaryButton } from '../../../../../atoms/buttons'
 import { InputField } from '../../../../../atoms/InputField'
+import { Banner } from '../../../../../atoms/Banner'
 
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../../../../redux/types'
@@ -140,6 +141,9 @@ export function RenameRobotSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
+        <Banner type="informing" marginBottom={SPACING.spacing4}>
+          {t('rename_robot_prefer_usb_connection')}
+        </Banner>
         <StyledText as="p" marginBottom={SPACING.spacing4}>
           {t('rename_robot_input_limitation_detail')}
         </StyledText>
