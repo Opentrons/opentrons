@@ -1,20 +1,84 @@
 from dataclasses import dataclass
+from enum import Enum, auto
+from typing import Optional
 
 from opentrons import protocol_api
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.instrument_context import InstrumentContext
 
-metadata = {'apiLevel': '2.12'}
-PIP_SIZE = 300  # change to either 20, 300, or 1000
+APP_TIPRACK_CALIBRATION_SLOT = '8'  # where the App puts the tiprack
+SCALE_SLOT_ON_OT2 = '6'  # could also be 9, it's sort of between the two
+
+DEFAULT_SLOT_TIPRACK = APP_TIPRACK_CALIBRATION_SLOT
+DEFAULT_SLOT_TIPRACK_MULTI = '7'
+DEFAULT_SLOT_PLATE = '2'
+DEFAULT_SLOT_TROUGH = '5'
+
+
+test_labware = load_test_labware(get_layout(layouts.GravLayout))
+test_labware.plate
+test_labware.deck
 
 
 @dataclass
-class PhotometricLabwareSlots:
-    plate: str
+class LabwareLayout:
+    pass
+
+
+@dataclass
+class GravLayout(LabwareLayout):
     tiprack: str
-    tiprack_multi: str
+    vial_on_scale: str
+
+
+@dataclass
+class PhotoLayout(LabwareLayout):
+    tiprack: str
+    tiprack_multi: Optional[str]
     trough: str
-    vial: str
+    plate: str
+
+
+@dataclass
+class GravPhotoSideBySideLayout(LabwareLayout):
+    tiprack: str
+    tiprack_multi: Optional[str]
+    trough: str
+    plate: str
+    vial_on_scale: str
+
+
+@dataclass
+class GravPhotoLayout(LabwareLayout):
+    tiprack: str
+    tiprack_multi: Optional[str]
+    trough: str
+    plate_on_scale: str
+
+
+def get_layout(type: LayoutType) -> LabwareLayout:
+    return
+
+
+DEFAULT_GRAV_LAYOUT = GravLayout(tiprack=APP_TIPRACK_CALIBRATION_SLOT,
+                                 vial_on_scale=SCALE_SLOT_ON_OT2)
+DEFAULT_PHOTO_LAYOUT = PhotoLayout(tiprack=APP_TIPRACK_CALIBRATION_SLOT,
+                                   tiprack_multi=DEFAULT_SLOT_TIPRACK_MULTI,
+                                   trough=DEFAULT_SLOT_TROUGH,
+                                   plate=DEFAULT_SLOT_PLATE)
+DEFAULT_GRAV_PHOTO_SIDE_BY_SIDE_LAYOUT = GravPhotoSideBySideLayout(tiprack=APP_TIPRACK_CALIBRATION_SLOT,
+                                                                   tiprack_multi=DEFAULT_SLOT_TIPRACK_MULTI,
+                                                                   trough=DEFAULT_SLOT_TROUGH,
+                                                                   plate=DEFAULT_SLOT_PLATE,
+                                                                   vial_on_scale=SCALE_SLOT_ON_OT2)
+DEFAULT_GRAV_PHOTO_LAYOUT = GravPhotoLayout(tiprack=APP_TIPRACK_CALIBRATION_SLOT,
+                                            tiprack_multi=DEFAULT_SLOT_TIPRACK_MULTI,
+                                            trough=DEFAULT_SLOT_TROUGH,
+                                            plate_on_scale=SCALE_SLOT_ON_OT2)
+
+
+def load_layout_labware(layout: LabwareLayout) -> list:
+    return []
 
 
 @dataclass
@@ -26,15 +90,6 @@ class PhotometricProtocolItems:
     vial: Labware
     pipette: InstrumentContext
     multi: InstrumentContext
-
-
-DEFAULT_LABWARE_SLOTS = PhotometricLabwareSlots(
-    tiprack='8',
-    tiprack_multi='7',
-    vial='6',
-    plate='2',
-    trough='5'
-)
 
 
 def load_labware_and_pipettes(protocol: protocol_api.ProtocolContext, vial_def=None) -> PhotometricProtocolItems:
