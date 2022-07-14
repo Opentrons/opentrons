@@ -28,17 +28,14 @@ import {
 } from '@opentrons/shared-data'
 import { Slideout } from '../../atoms/Slideout'
 import { PrimaryButton, TertiaryButton } from '../../atoms/buttons'
-import { HeaterShakerModuleCard } from '../Devices/HeaterShakerWizard/HeaterShakerModuleCard'
 import { Divider } from '../../atoms/structure'
-import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { Tooltip } from '../../atoms/Tooltip'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
-import { Collapsible } from './Collapsible'
 import { useLatchControls } from './hooks'
 
-import type { HeaterShakerModule } from '../../redux/modules/types'
+import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
 import type {
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
@@ -66,7 +63,6 @@ export const TestShakeSlideout = (
     runId != null ? runId : null
   )
 
-  const [showCollapsed, setShowCollapsed] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const isShaking = module.data.speedStatus !== 'idle'
@@ -118,6 +114,22 @@ export const TestShakeSlideout = (
       ? t('input_out_of_range', { ns: 'device_details' })
       : null
 
+  const getLatchStatus = (latchStatus: LatchStatus): string => {
+    switch (latchStatus) {
+      case 'opening':
+      case 'idle_open':
+      case 'idle_unknown': {
+        return t('open', { ns: 'shared' })
+      }
+      case 'closing':
+      case 'idle_closed': {
+        return t('closed', { ns: 'heater_shaker' })
+      }
+      default:
+        return latchStatus
+    }
+  }
+
   return (
     <Slideout
       title={t('test_shake', { ns: 'heater_shaker' })}
@@ -159,24 +171,11 @@ export const TestShakeSlideout = (
         </Flex>
       </Flex>
       <Flex
-        border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}
-        borderRadius={SPACING.spacing2}
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         padding={`${SPACING.spacing4} ${SPACING.spacingM} ${SPACING.spacingM} ${SPACING.spacing4}`}
         width="100%"
-        marginBottom={SPACING.spacing3}
       >
-        <Text
-          fontSize={TYPOGRAPHY.fontSizeP}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkBlack}
-        >
-          {t('module_controls')}
-        </Text>
-        <Flex marginTop={SPACING.spacing3}>
-          <HeaterShakerModuleCard module={module} />
-        </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
           marginY={SPACING.spacingSM}
@@ -184,11 +183,15 @@ export const TestShakeSlideout = (
         >
           <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing3}>
             <Text
-              fontSize={TYPOGRAPHY.fontSizeP}
+              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              fontSize={TYPOGRAPHY.fontSizeLabel}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.darkBlack}
             >
-              {t('labware_latch', { ns: 'heater_shaker' })}
+              {t('labware_latch_status', {
+                ns: 'heater_shaker',
+                status: getLatchStatus(module.data.labwareLatchStatus),
+              })}
             </Text>
           </Flex>
           <TertiaryButton
@@ -202,8 +205,8 @@ export const TestShakeSlideout = (
             {...targetProps}
           >
             {!isLatchClosed
-              ? t('close', { ns: 'shared' })
-              : t('open', { ns: 'shared' })}
+              ? t('close_latch', { ns: 'heater_shaker' })
+              : t('open_latch', { ns: 'heater_shaker' })}
           </TertiaryButton>
           {isShaking ? (
             <Tooltip tooltipProps={tooltipProps}>
@@ -213,7 +216,7 @@ export const TestShakeSlideout = (
         </Flex>
         <Divider color={COLORS.medGrey} />
         <Text
-          fontSize={TYPOGRAPHY.fontSizeP}
+          fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.darkBlack}
           marginTop={SPACING.spacing4}
@@ -264,51 +267,19 @@ export const TestShakeSlideout = (
           ) : null}
         </Flex>
       </Flex>
-      <Flex
-        border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}
-        borderRadius={SPACING.spacing2}
-        flexDirection={DIRECTION_COLUMN}
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-        paddingY={SPACING.spacing4}
-        width="100%"
+      {showWizard && (
+        <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+      )}
+      <Link
+        marginTop={SPACING.spacing2}
+        fontSize={TYPOGRAPHY.fontSizeP}
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        color={COLORS.blue}
+        id={'HeaterShaker_Attachment_Instructions'}
+        onClick={() => setShowWizard(true)}
       >
-        <Collapsible
-          expanded={showCollapsed}
-          title={
-            <StyledText
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
-              as="h4"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            >
-              {t('troubleshooting', { ns: 'heater_shaker' })}
-            </StyledText>
-          }
-          expandedIcon="chevron-up"
-          collapsedIcon="chevron-down"
-          toggleExpanded={() =>
-            setShowCollapsed(showCollapsed => !showCollapsed)
-          }
-        >
-          <Text fontSize={TYPOGRAPHY.fontSizeP} marginTop={SPACING.spacing4}>
-            {t('test_shake_troubleshooting_slideout_description', {
-              ns: 'heater_shaker',
-            })}
-          </Text>
-          {showWizard && (
-            <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
-          )}
-          <Link
-            marginTop={SPACING.spacing2}
-            fontSize={TYPOGRAPHY.fontSizeP}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            color={COLORS.blue}
-            id={'HeaterShaker_Attachment_Instructions'}
-            onClick={() => setShowWizard(true)}
-          >
-            {t('go_to_attachment_instructions', { ns: 'heater_shaker' })}
-          </Link>
-        </Collapsible>
-      </Flex>
+        {t('show_attachment_instructions', { ns: 'heater_shaker' })}
+      </Link>
     </Slideout>
   )
 }
