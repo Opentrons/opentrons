@@ -87,22 +87,23 @@ class MovementHandler:
 
         # Check for presence of heater shakers on deck, and if planned
         # pipette movement is allowed
-        hs_movement_data = self._state_store.modules.get_heater_shaker_movement_data()
-        if hs_movement_data:
-            dest_slot_int = int(
-                self._state_store.geometry.get_ancestor_slot_name(labware_id)
-            )
-            hw_pipette = self._state_store.pipettes.get_hardware_pipette(
-                pipette_id=pipette_id,
-                attached_pipettes=self._hardware_api.attached_instruments,
-            )
+        hs_movement_restrictors = (
+            self._state_store.modules.get_heater_shaker_movement_restrictors()
+        )
+        dest_slot_int = int(
+            self._state_store.geometry.get_ancestor_slot_name(labware_id)
+        )
+        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware_api.attached_instruments,
+        )
 
-            await raise_if_movement_restricted_by_heater_shaker(
-                heater_shaker_data=hs_movement_data,
-                destination_slot=dest_slot_int,
-                is_multi_channel=hw_pipette.config["channels"] > 1,
-                is_tiprack=self._state_store.labware.is_tiprack(labware_id),
-            )
+        await raise_if_movement_restricted_by_heater_shaker(
+            hs_movement_restrictors=hs_movement_restrictors,
+            destination_slot=dest_slot_int,
+            is_multi_channel=hw_pipette.config["channels"] > 1,
+            destination_is_tip_rack=self._state_store.labware.is_tiprack(labware_id),
+        )
 
         # get the pipette's mount and current critical point, if applicable
         pipette_location = self._state_store.motion.get_pipette_location(

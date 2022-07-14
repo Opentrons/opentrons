@@ -1075,12 +1075,12 @@ def test_get_heater_shaker_movement_data(
             ),
         },
     )
-    subject = module_view.get_heater_shaker_movement_data()
+    subject = module_view.get_heater_shaker_movement_restrictors()
     assert len(subject) == 1
     for hs_movement_data in subject:
         assert not hs_movement_data.plate_shaking
         assert hs_movement_data.latch_closed
-        assert hs_movement_data.slot_location == 1
+        assert hs_movement_data.deck_slot == 1
 
 
 def test_tempdeck_get_plate_target_temperature(

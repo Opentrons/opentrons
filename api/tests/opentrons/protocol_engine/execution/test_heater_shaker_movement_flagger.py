@@ -6,7 +6,7 @@ from typing import ContextManager, Any
 
 import pytest
 
-from opentrons.protocol_engine.types import HeaterShakerMovementData
+from opentrons.protocol_engine.types import HeaterShakerMovementRestrictors
 from opentrons.protocol_engine.errors import RestrictedPipetteMovementError
 from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
     raise_if_movement_restricted_by_heater_shaker,
@@ -30,15 +30,17 @@ async def test_raises_when_shaking_on_restricted_movement(
 ) -> None:
     """It should raise if restricted movement around a heater-shaker is attempted while module is shaking."""
     heater_shaker_data = [
-        HeaterShakerMovementData(plate_shaking=True, latch_closed=True, slot_location=5)
+        HeaterShakerMovementRestrictors(
+            plate_shaking=True, latch_closed=True, deck_slot=5
+        )
     ]
 
     with expected_raise:
         await raise_if_movement_restricted_by_heater_shaker(
-            heater_shaker_data=heater_shaker_data,
+            hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=False,
-            is_tiprack=False,
+            destination_is_tip_rack=False,
         )
 
 
@@ -59,17 +61,17 @@ async def test_raises_when_latch_open_on_restricted_movement(
 ) -> None:
     """It should raise if restricted movement around a heater-shaker is attempted while latch is open."""
     heater_shaker_data = [
-        HeaterShakerMovementData(
-            plate_shaking=False, latch_closed=False, slot_location=5
+        HeaterShakerMovementRestrictors(
+            plate_shaking=False, latch_closed=False, deck_slot=5
         )
     ]
 
     with expected_raise:
         await raise_if_movement_restricted_by_heater_shaker(
-            heater_shaker_data=heater_shaker_data,
+            hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=False,
-            is_tiprack=False,
+            destination_is_tip_rack=False,
         )
 
 
@@ -93,17 +95,17 @@ async def test_raises_multi_channel_on_restricted_movement(
 ) -> None:
     """It should raise if restricted movement around a heater-shaker is attempted with a multi-channel pipette."""
     heater_shaker_data = [
-        HeaterShakerMovementData(
-            plate_shaking=False, latch_closed=True, slot_location=5
+        HeaterShakerMovementRestrictors(
+            plate_shaking=False, latch_closed=True, deck_slot=5
         )
     ]
 
     with expected_raise:
         await raise_if_movement_restricted_by_heater_shaker(
-            heater_shaker_data=heater_shaker_data,
+            hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=True,
-            is_tiprack=is_tiprack,
+            destination_is_tip_rack=is_tiprack,
         )
 
 
@@ -123,15 +125,15 @@ async def test_does_not_raise_when_idle_and_latch_closed(
 ) -> None:
     """It should not raise if single channel pipette moves anywhere near heater-shaker when idle and latch closed."""
     heater_shaker_data = [
-        HeaterShakerMovementData(
-            plate_shaking=False, latch_closed=True, slot_location=5
+        HeaterShakerMovementRestrictors(
+            plate_shaking=False, latch_closed=True, deck_slot=5
         )
     ]
 
     with does_not_raise():
         await raise_if_movement_restricted_by_heater_shaker(
-            heater_shaker_data=heater_shaker_data,
+            hs_movement_restrictors=heater_shaker_data,
             destination_slot=destination_slot,
             is_multi_channel=False,
-            is_tiprack=False,
+            destination_is_tip_rack=False,
         )
