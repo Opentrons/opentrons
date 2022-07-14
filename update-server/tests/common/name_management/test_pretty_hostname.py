@@ -53,3 +53,60 @@ def test_rewrite_machine_info_is_idempotent(initial_contents: str) -> None:
         first_rewrite, "new_pretty_hostname"
     )
     assert second_rewrite == first_rewrite
+
+
+@pytest.mark.parametrize(
+    ["input_pretty_hostname", "expected_line"],
+    [
+        # The value should be quoted.
+        ("", 'PRETTY_HOSTNAME=""'),
+        ("abcd", 'PRETTY_HOSTNAME="abcd"'),
+        # Spaces are allowed and shouldn't be escaped.
+        ("Hello world", 'PRETTY_HOSTNAME="hello world"'),
+        # Non-ASCII is allowed and shouldn't be escaped.
+        ("Oh boy 👉😎👉 non-ASCII", 'PRETTY_HOSTNAME="Oh boy 👉😎👉 non-ASCII"'),
+        # Backslashes, double-quote characters, dollar signs, and backticks
+        # should be escaped with backslashes.
+        (r"has one \ backslash", r'PRETTY_HOSTNAME="has one \\ backslash"'),
+        (r"has two \\ backslashes", r'PRETTY_HOSTNAME="has two \\\\ backslashes"'),
+        ('has " double-quote', r'PRETTY_HOSTNAME="has \" double-quote"'),
+        ("has $ dollar sign", r'PRETTY_HOSTNAME="has \$ dollar sign"'),
+        ("has ` backtick", r'PRETTY_HOSTNAME="has \` backtick'),
+        # Unlike double-quote characters, single-quote characters shouldn't be escaped.
+        # TODO: Verify this.
+        ("has ' single-quote", '''PRETTY_HOSTNAME=" has ' single-quote"'''),
+        # Other ASCII characters shouldn't be escaped.
+        ("!@#%^&*", 'PRETTY_HOSTNAME="!@#%^&*'),
+        # Character sequences that would be esape sequences in C, Python, or the shell
+        # should not be processed as such here. For example, setting the name to the
+        # string [<backslash>,<n>] should not cause an actual ASCII newline to be
+        # output.
+        (r"\" \n \t", r'PRETTY_HOSTNAME="\\\" \\n \\t"'),
+    ],
+)
+def test_escaping_and_quoting(input_pretty_hostname: str, expected_line: str) -> None:
+    # TODO(mm, 2022-07-14): Rework so we don't have to test a private function.
+    output = pretty_hostname._rewrite_machine_info_str(
+        current_machine_info_contents="", new_pretty_hostname=input_pretty_hostname
+    )
+    assert expected_line in output.splitlines()
+
+
+@pytest.mark.parametrize(
+    "invalid_pretty_hostname",
+    [
+        "bad \r input",
+        "bad \n input",
+        "bad \t input",
+        "bad \b input",
+        "bad \x00 input",  # ASCII NUL.
+        "bad \x7f input",  # ASCII DEL.
+        "bad \u0091 input",  # Unicode PRIVATE USE ONE.
+    ],
+)
+def test_raises_on_invalid_input(invalid_pretty_hostname: str) -> None:
+    # TODO(mm, 2022-07-14): Rework so we don't have to test a private function.
+    with pytest.raises(pretty_hostname.InvalidPrettyHostnameError):
+        pretty_hostname._rewrite_machine_info_str(
+            current_machine_info_contents="", new_pretty_hostname=invalid_pretty_hostname
+        )

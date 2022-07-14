@@ -11,6 +11,10 @@ from logging import getLogger
 _log = getLogger(__name__)
 
 
+class InvalidPrettyHostnameError(ValueError):
+    pass
+
+
 def get_pretty_hostname(default: str = "no name set") -> str:
     """Get the currently-configured pretty hostname"""
     try:
