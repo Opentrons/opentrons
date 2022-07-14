@@ -7,6 +7,7 @@ from hardware_testing.liquid.liquid_class import LIQUID_CLASS_OT2_P300_SINGLE
 from hardware_testing.measure.weight import GravimetricRecorder
 from hardware_testing.opentrons_api.helpers import get_api_context
 from hardware_testing.pipette import motions
+from hardware_testing.position import overwrite_default_labware_positions
 
 metadata = {'apiLevel': '2.12', 'protocolName': 'ot2_p300_single_channel_gravimetric'}
 
@@ -61,6 +62,7 @@ def test_gravimetric(protocol: ProtocolContext,
 
 def run(protocol: ProtocolContext):
     layout = LayoutLabware.build(protocol, DEFAULT_SLOTS_GRAV, tip_volume=300)
+    overwrite_default_labware_positions(layout=layout)
 
     liquid_level = LiquidTracker()
     liquid_level.initialize_from_deck(protocol)

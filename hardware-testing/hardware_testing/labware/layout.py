@@ -6,8 +6,6 @@ from opentrons.protocol_api.labware import Labware
 
 from hardware_testing.labware.definitions import load_radwag_vial_definition
 
-from .position import overwrite_default_labware_positions
-
 APP_TIPRACK_CALIBRATION_SLOT = '8'  # where the App puts the tiprack
 SCALE_SLOT_ON_OT2 = '6'  # could also be 9, it's sort of between the two
 
