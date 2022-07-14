@@ -2,6 +2,7 @@
 import pytest
 
 from decoy import Decoy, matchers
+from typing import Any
 
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api.instrument_context import InstrumentContext
@@ -23,18 +24,14 @@ def patch_mock_next_available_tip(
     decoy: Decoy,
     monkeypatch: pytest.MonkeyPatch,
     mock_labware: Labware,
-) -> None:
+) -> Any:
     """Replace next_available_tip() with a mock."""
-    mock_well = decoy.mock(cls=Well)
     mock_next_available_tip = decoy.mock(func=labware.next_available_tip)
     monkeypatch.setattr(
         "opentrons.protocol_api.labware.next_available_tip",
         mock_next_available_tip,
     )
-
-    decoy.when(mock_next_available_tip(None, [], 0)).then_return(
-        (mock_labware, mock_well)
-    )
+    return mock_next_available_tip
 
 
 @pytest.fixture(autouse=True)
@@ -248,12 +245,16 @@ def test_pick_up_from_no_location(
     mock_instrument_implementation: AbstractInstrument,
     mock_well_implementation: WellImplementation,
     mock_labware: Labware,
+    patch_mock_next_available_tip: Any
 ) -> None:
     """Should pick up tip from next_available_tip.top()."""
     mock_well = decoy.mock(cls=Well)
 
     expected_location = Location(Point(0, 0, 0), mock_well)
 
+    decoy.when(patch_mock_next_available_tip(None, [], 0)).then_return(
+        (mock_labware, mock_well)
+    )
     decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=0)).then_return(
         False
     )
