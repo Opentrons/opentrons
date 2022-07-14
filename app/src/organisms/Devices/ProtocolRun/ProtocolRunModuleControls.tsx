@@ -79,13 +79,16 @@ export const ProtocolRunModuleControls = ({
     <Flex
       gridGap={SPACING.spacing3}
       paddingTop={SPACING.spacing3}
-      paddingX={SPACING.spacing1}
+      paddingX={SPACING.spacing2}
       flexDirection={DIRECTION_ROW}
       width="100%"
     >
       <Box flex="50%">
         {firstHalfModules.map((module, index) => (
-          <Box key={`moduleCard_${module.moduleDef.moduleType}_${index}`}>
+          <Box
+            key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
+            marginBottom={SPACING.spacing4}
+          >
             {module.attachedModuleMatch != null ? (
               <ModuleCard
                 robotName={robotName}
