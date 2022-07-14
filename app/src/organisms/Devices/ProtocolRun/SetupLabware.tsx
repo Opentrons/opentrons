@@ -210,6 +210,7 @@ export function SetupLabware({
             <ModuleExtraAttention
               moduleTypes={moduleTypesThatRequireExtraAttention}
               modulesInfo={moduleRenderInfoById}
+              runId={runId}
             />
           ) : null}
           <RobotWorkSpace
