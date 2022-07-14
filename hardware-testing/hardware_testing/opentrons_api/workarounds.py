@@ -2,6 +2,10 @@ from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api import InstrumentContext
 
 
+def is_running_in_app() -> bool:
+    return False  # FIXME: how to detect if we are running in the App?
+
+
 def apply_additional_offset_to_labware(labware: Labware, x=0, y=0, z=0):
     # NOTE: this will re-instantiate all the labware's WELLs
     #       so this must be ran before rest of protocol

@@ -6,7 +6,8 @@ from typing import List, Optional, Tuple
 from opentrons.protocol_api.labware import Well
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 
-from hardware_testing.opentrons_api.helpers import well_is_reservoir, get_list_of_wells_affected
+from hardware_testing.opentrons_api.helpers import (
+    well_is_reservoir, get_list_of_wells_affected)
 
 
 @dataclass
@@ -162,13 +163,7 @@ class LiquidTracker:
         #       0.78mm lower than it is in reality. To make it more
         #       accurate, give .init_liquid_height() a lookup table
         self.reset()
-        excluded_labware = [protocol.deck.get_fixed_trash()]
-        loaded_labware = [
-            lw
-            for lw in protocol.deck.values()
-            if lw and lw not in excluded_labware
-        ]
-        for lw in loaded_labware:
+        for lw in protocol.loaded_labwares.values():
             for w in lw.wells():
                 self.init_well_liquid_height(w)
 

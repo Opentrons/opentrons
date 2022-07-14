@@ -1,10 +1,12 @@
 from dataclasses import dataclass
-from enum import Enum, auto
 from typing import Optional
 
 from opentrons import protocol_api
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.instrument_context import InstrumentContext
+
+from hardware_testing.labware.definitions import load_radwag_vial_definition
+
+from .position import overwrite_default_labware_positions
 
 APP_TIPRACK_CALIBRATION_SLOT = '8'  # where the App puts the tiprack
 SCALE_SLOT_ON_OT2 = '6'  # could also be 9, it's sort of between the two
@@ -14,113 +16,106 @@ DEFAULT_SLOT_TIPRACK_MULTI = '7'
 DEFAULT_SLOT_PLATE = '2'
 DEFAULT_SLOT_TROUGH = '5'
 
-
-test_labware = load_test_labware(get_layout(layouts.GravLayout))
-test_labware.plate
-test_labware.deck
-
-
-@dataclass
-class LabwareLayout:
-    pass
+# usually we would only use a p300 multi
+# when doing photometric testing
+DEFAULT_MULTI_TIP_VOLUME = 300
 
 
 @dataclass
-class GravLayout(LabwareLayout):
-    tiprack: str
-    vial_on_scale: str
-
-
-@dataclass
-class PhotoLayout(LabwareLayout):
-    tiprack: str
+class LayoutSlots:
+    tiprack: Optional[str]
     tiprack_multi: Optional[str]
-    trough: str
-    plate: str
+    trough: Optional[str]
+    plate: Optional[str]
+    vial: Optional[str]
 
 
-@dataclass
-class GravPhotoSideBySideLayout(LabwareLayout):
-    tiprack: str
-    tiprack_multi: Optional[str]
-    trough: str
-    plate: str
-    vial_on_scale: str
+class LayoutLabware:
+    def __init__(self, slots: LayoutSlots) -> None:
+        self.slots = slots
+        self._ctx = None
+
+    @classmethod
+    def build(cls, ctx: protocol_api.ProtocolContext, slots: LayoutSlots,
+              tip_volume: int, multi_tip_volume: int = DEFAULT_MULTI_TIP_VOLUME) -> "LayoutLabware":
+        layout = cls(slots=slots)
+        layout.load(ctx=ctx, tip_volume=tip_volume, multi_tip_volume=multi_tip_volume)
+        overwrite_default_labware_positions(layout=layout)
+        return layout
+
+    def load(self, ctx: protocol_api.ProtocolContext, tip_volume: int,
+             multi_tip_volume: int = DEFAULT_MULTI_TIP_VOLUME) -> None:
+        self._ctx = ctx
+        if self.slots.tiprack:
+            ctx.load_labware(f'opentrons_96_tiprack_{tip_volume}ul',
+                             location=self.slots.tiprack)
+        if self.slots.tiprack_multi:
+            ctx.load_labware(f'opentrons_96_tiprack_{multi_tip_volume}ul',
+                             location=self.slots.tiprack)
+        if self.slots.trough:
+            ctx.load_labware('nest_12_reservoir_15ml', location=self.slots.trough)
+        if self.slots.plate:
+            ctx.load_labware('corning_96_wellplate_360ul_flat', location=self.slots.plate)
+        if self.slots.vial:
+            vial_def = load_radwag_vial_definition()
+            if vial_def:
+                ctx.load_labware_from_definition(vial_def,
+                                                 location=self.slots.vial)
+            else:
+                ctx.load_labware('radwag_pipette_calibration_vial',
+                                 location=self.slots.vial)
+
+    def _get_labware(self, slot: str) -> Labware:
+        assert self._ctx
+        slot_as_int = int(slot)
+        return self._ctx.loaded_labwares[slot_as_int]
+
+    @property
+    def tiprack(self) -> Labware:
+        return self._get_labware(self.slots.tiprack)
+
+    @property
+    def tiprack_multi(self) -> Labware:
+        return self._get_labware(self.slots.tiprack_multi)
+
+    @property
+    def trough(self) -> Labware:
+        return self._get_labware(self.slots.trough)
+
+    @property
+    def plate(self) -> Labware:
+        return self._get_labware(self.slots.plate)
+
+    @property
+    def vial(self) -> Labware:
+        return self._get_labware(self.slots.vial)
 
 
-@dataclass
-class GravPhotoLayout(LabwareLayout):
-    tiprack: str
-    tiprack_multi: Optional[str]
-    trough: str
-    plate_on_scale: str
-
-
-def get_layout(type: LayoutType) -> LabwareLayout:
-    return
-
-
-DEFAULT_GRAV_LAYOUT = GravLayout(tiprack=APP_TIPRACK_CALIBRATION_SLOT,
-                                 vial_on_scale=SCALE_SLOT_ON_OT2)
-DEFAULT_PHOTO_LAYOUT = PhotoLayout(tiprack=APP_TIPRACK_CALIBRATION_SLOT,
-                                   tiprack_multi=DEFAULT_SLOT_TIPRACK_MULTI,
-                                   trough=DEFAULT_SLOT_TROUGH,
-                                   plate=DEFAULT_SLOT_PLATE)
-DEFAULT_GRAV_PHOTO_SIDE_BY_SIDE_LAYOUT = GravPhotoSideBySideLayout(tiprack=APP_TIPRACK_CALIBRATION_SLOT,
-                                                                   tiprack_multi=DEFAULT_SLOT_TIPRACK_MULTI,
-                                                                   trough=DEFAULT_SLOT_TROUGH,
-                                                                   plate=DEFAULT_SLOT_PLATE,
-                                                                   vial_on_scale=SCALE_SLOT_ON_OT2)
-DEFAULT_GRAV_PHOTO_LAYOUT = GravPhotoLayout(tiprack=APP_TIPRACK_CALIBRATION_SLOT,
-                                            tiprack_multi=DEFAULT_SLOT_TIPRACK_MULTI,
-                                            trough=DEFAULT_SLOT_TROUGH,
-                                            plate_on_scale=SCALE_SLOT_ON_OT2)
-
-
-def load_layout_labware(layout: LabwareLayout) -> list:
-    return []
-
-
-@dataclass
-class PhotometricProtocolItems:
-    plate: Labware
-    tiprack: Labware
-    tiprack_multi: Labware
-    trough: Labware
-    vial: Labware
-    pipette: InstrumentContext
-    multi: InstrumentContext
-
-
-def load_labware_and_pipettes(protocol: protocol_api.ProtocolContext, vial_def=None) -> PhotometricProtocolItems:
-    tiprack = protocol.load_labware(f'opentrons_96_tiprack_{PIP_SIZE}ul',
-                                    location=DEFAULT_LABWARE_SLOTS.tiprack)
-    tiprack_multi = protocol.load_labware(f'opentrons_96_tiprack_300ul',
-                                          location=DEFAULT_LABWARE_SLOTS.tiprack_multi)
-    plate = protocol.load_labware('corning_96_wellplate_360ul_flat',
-                                  location=DEFAULT_LABWARE_SLOTS.plate)
-    trough = protocol.load_labware('nest_12_reservoir_15ml',
-                                   location=DEFAULT_LABWARE_SLOTS.trough)
-    if vial_def:
-        vial = protocol.load_labware_from_definition(vial_def,
-                                                     location=DEFAULT_LABWARE_SLOTS.vial)
-    else:
-        vial = protocol.load_labware('radwag_pipette_calibration_vial',
-                                     location=DEFAULT_LABWARE_SLOTS.vial)
-    pipette = protocol.load_instrument(f'p{PIP_SIZE}_single_gen2', 'left',
-                                       tip_racks=[tiprack])
-    multi = protocol.load_instrument(f'p300_multi_gen2', 'right',
-                                     tip_racks=[tiprack_multi])
-    return PhotometricProtocolItems(
-        plate=plate, tiprack=tiprack, tiprack_multi=tiprack_multi, trough=trough, vial=vial,
-        pipette=pipette, multi=multi
-    )
-
-
-def apply_calibrated_labware_offsets(items: PhotometricProtocolItems) -> None:
-    # TODO: load these values automatically
-    items.tiprack.set_offset(x=-0.40, y=6.90, z=1.00)
-    items.tiprack_multi.set_offset(x=0.70, y=1.10, z=0.00)
-    items.plate.set_offset(x=136.00, y=105.40, z=-6.50)
-    items.trough.set_offset(x=0.00, y=0.00, z=0.00)
-    items.vial.set_offset(x=-4.00, y=-14.20, z=-39.30)
+DEFAULT_SLOTS_GRAV = LayoutSlots(
+    tiprack=APP_TIPRACK_CALIBRATION_SLOT,
+    tiprack_multi=None,
+    trough=None,
+    plate=None,
+    vial=SCALE_SLOT_ON_OT2
+)
+DEFAULT_SLOTS_PHOTO = LayoutSlots(
+    tiprack=APP_TIPRACK_CALIBRATION_SLOT,
+    tiprack_multi=DEFAULT_SLOT_TIPRACK_MULTI,
+    trough=DEFAULT_SLOT_TROUGH,
+    plate=DEFAULT_SLOT_PLATE,
+    vial=None
+)
+DEFAULT_SLOTS_GRAV_PHOTO_SIDE_BY_SIDE = LayoutSlots(
+    tiprack=APP_TIPRACK_CALIBRATION_SLOT,
+    tiprack_multi=DEFAULT_SLOT_TIPRACK_MULTI,
+    trough=DEFAULT_SLOT_TROUGH,
+    plate=DEFAULT_SLOT_PLATE,
+    vial=SCALE_SLOT_ON_OT2
+)
+DEFAULT_SLOTS_GRAV_PHOTO = LayoutSlots(
+    tiprack=APP_TIPRACK_CALIBRATION_SLOT,
+    tiprack_multi=DEFAULT_SLOT_TIPRACK_MULTI,
+    trough=DEFAULT_SLOT_TROUGH,
+    plate=SCALE_SLOT_ON_OT2,
+    vial=None
+)
