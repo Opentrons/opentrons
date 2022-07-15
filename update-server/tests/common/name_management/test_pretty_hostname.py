@@ -98,13 +98,13 @@ def test_escaping_and_quoting(input_pretty_hostname: str, expected_line: str) ->
 @pytest.mark.parametrize(
     "invalid_pretty_hostname",
     [
+        # A selection of inputs that `hostnamectl set-hostname --pretty` rejects.
         "bad \r input",
         "bad \n input",
         "bad \t input",
         "bad \b input",
         "bad \x00 input",  # ASCII NUL.
         "bad \x7f input",  # ASCII DEL.
-        "bad \u0091 input",  # Unicode PRIVATE USE ONE.
     ],
 )
 def test_raises_on_invalid_input(invalid_pretty_hostname: str) -> None:
