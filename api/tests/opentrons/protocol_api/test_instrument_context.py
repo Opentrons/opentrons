@@ -20,7 +20,7 @@ from opentrons.protocol_api import labware
 
 
 @pytest.fixture(autouse=True)
-def patch_mock_next_available_tip(
+def mock_labware_module(
     decoy: Decoy,
     monkeypatch: pytest.MonkeyPatch,
     mock_labware: Labware,
@@ -35,7 +35,7 @@ def patch_mock_next_available_tip(
 
 
 @pytest.fixture(autouse=True)
-def _patch_mock_instrument_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+def _mock_instrument_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
     """Replace instrument module method calls with a mock."""
     mock_validate_tiprack = decoy.mock(func=instrument.validate_tiprack)
     monkeypatch.setattr(
@@ -241,14 +241,14 @@ def test_pick_up_from_no_location(
     mock_instrument_implementation: AbstractInstrument,
     mock_well_implementation: WellImplementation,
     mock_labware: Labware,
-    patch_mock_next_available_tip: Any,
+    mock_labware_module: Any,
 ) -> None:
     """Should pick up tip from next_available_tip.top()."""
     mock_well = decoy.mock(cls=Well)
 
     expected_location = Location(Point(0, 0, 0), mock_well)
 
-    decoy.when(patch_mock_next_available_tip(None, [], 0)).then_return(
+    decoy.when(mock_labware_module(None, [], 0)).then_return(
         (mock_labware, mock_well)
     )
     decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=0)).then_return(
