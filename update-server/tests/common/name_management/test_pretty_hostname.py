@@ -14,7 +14,7 @@ machine_info_examples = [
 
 
 @pytest.mark.parametrize("initial_contents", machine_info_examples)
-def test_rewrite_machine_info_updates_pretty_hostname(initial_contents) -> None:
+def test_rewrite_machine_info_updates_pretty_hostname(initial_contents: str) -> None:
     # TODO(mm, 2022-04-27): Rework so we don't have to test a private function.
     rewrite = pretty_hostname._rewrite_machine_info_str(
         initial_contents, "new_pretty_hostname"
@@ -28,7 +28,7 @@ def test_rewrite_machine_info_updates_pretty_hostname(initial_contents) -> None:
 
 
 @pytest.mark.parametrize("initial_contents", machine_info_examples)
-def test_rewrite_machine_info_preserves_other_lines(initial_contents) -> None:
+def test_rewrite_machine_info_preserves_other_lines(initial_contents: str) -> None:
     # TODO(mm, 2022-04-27): Rework so we don't have to test a private function.
     initial_lines = Counter(initial_contents.splitlines())
     rewrite_string = pretty_hostname._rewrite_machine_info_str(
@@ -44,7 +44,7 @@ def test_rewrite_machine_info_preserves_other_lines(initial_contents) -> None:
 
 # Covers this bug: https://github.com/Opentrons/opentrons/pull/4671
 @pytest.mark.parametrize("initial_contents", machine_info_examples)
-def test_rewrite_machine_info_is_idempotent(initial_contents) -> None:
+def test_rewrite_machine_info_is_idempotent(initial_contents: str) -> None:
     # TODO(mm, 2022-04-27): Rework so we don't have to test a private function.
     first_rewrite = pretty_hostname._rewrite_machine_info_str(
         initial_contents, "new_pretty_hostname"

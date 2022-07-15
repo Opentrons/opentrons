@@ -1,35 +1,53 @@
-async def test_get_name(test_cli, mock_name_synchronizer, decoy) -> None:
+from typing import Tuple
+
+# Avoid pytest trying to collect TestClient because it begins with "Test".
+from aiohttp.test_utils import TestClient as HTTPTestClient
+
+from decoy import Decoy
+
+from otupdate.common.name_management.name_synchronizer import NameSynchronizer
+
+
+async def test_get_name(
+    test_cli: Tuple[HTTPTestClient, str],
+    mock_name_synchronizer: NameSynchronizer,
+    decoy: Decoy,
+) -> None:
     decoy.when(mock_name_synchronizer.get_name()).then_return("the returned name")
 
-    response = await (test_cli[0].get("/server/name"))
+    response = await (test_cli[0].get("/server/name"))  # type: ignore[no-untyped-call]
     assert response.status == 200
 
     body = await response.json()
     assert body["name"] == "the returned name"
 
 
-async def test_set_name_valid(test_cli, mock_name_synchronizer, decoy) -> None:
+async def test_set_name_valid(
+    test_cli: Tuple[HTTPTestClient, str],
+    mock_name_synchronizer: NameSynchronizer,
+    decoy: Decoy,
+) -> None:
     decoy.when(await mock_name_synchronizer.set_name("the input name")).then_return(
         "the returned name"
     )
 
-    response = await test_cli[0].post("/server/name", json={"name": "the input name"})
+    response = await test_cli[0].post("/server/name", json={"name": "the input name"})  # type: ignore[no-untyped-call]
     assert response.status == 200
 
     body = await response.json()
     assert body["name"] == "the returned name"
 
 
-async def test_set_name_not_json(test_cli) -> None:
-    response = await test_cli[0].post("/server/name", data="bada bing bada boom")
+async def test_set_name_not_json(test_cli: Tuple[HTTPTestClient, str]) -> None:
+    response = await test_cli[0].post("/server/name", data="bada bing bada boom")  # type: ignore[no-untyped-call]
     assert response.status == 400
 
 
-async def test_set_name_field_missing(test_cli) -> None:
-    response = await test_cli[0].post("/server/name", json={})
+async def test_set_name_field_missing(test_cli: Tuple[HTTPTestClient, str]) -> None:
+    response = await test_cli[0].post("/server/name", json={})  # type: ignore[no-untyped-call]
     assert response.status == 400
 
 
-async def test_set_name_field_not_a_str(test_cli) -> None:
-    response = await test_cli[0].post("/server/name", json={"name": 2})
+async def test_set_name_field_not_a_str(test_cli: Tuple[HTTPTestClient, str]) -> None:
+    response = await test_cli[0].post("/server/name", json={"name": 2})  # type: ignore[no-untyped-call]
     assert response.status == 400
