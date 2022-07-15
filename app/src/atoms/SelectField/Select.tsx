@@ -57,7 +57,12 @@ export function Select(props: SelectComponentProps): JSX.Element {
     }),
     dropdownIndicator: NO_STYLE_FN,
     group: NO_STYLE_FN,
-    groupHeading: NO_STYLE_FN,
+    groupHeading: (styles: any) => ({
+      ...styles,
+      color: COLORS.darkBlack,
+      fontWeight: TYPOGRAPHY.pSemiBold,
+      fontSize: TYPOGRAPHY.fontSizeP,
+    }),
     indicatorsContainer: NO_STYLE_FN,
     indicatorSeparator: NO_STYLE_FN,
     input: (styles: any) => ({
@@ -76,6 +81,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.2)',
       borderRadius: '4px 4px 0px 0px',
       marginTop: SPACING.spacing2,
+      fontSize: TYPOGRAPHY.fontSizeP,
     }),
     menuList: NO_STYLE_FN,
     menuPortal: NO_STYLE_FN,
@@ -89,7 +95,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     }),
     option: (styles: any, state: any) => ({
       ...styles,
-      color: COLORS.darkBlack,
+      color: state.isDisabled ? COLORS.greyDisabled : COLORS.darkBlack,
       backgroundColor: state.isSelected ? COLORS.lightBlue : COLORS.white,
       '&:hover': {
         backgroundColor: COLORS.lightBlue,
@@ -107,7 +113,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       ...styles,
       marginRight: '0.75rem',
       marginTop: SPACING.spacing1,
-      marginLeft: SPACING.spacing3,
+      marginLeft: SPACING.spacing2,
     }),
     valueContainer: NO_STYLE_FN,
   }

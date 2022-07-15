@@ -27,6 +27,7 @@ Basic.args = {
     { label: 'RNA', value: 'rna' },
     { label: 'Protein', value: 'protein', isDisabled: true },
   ],
+  width: '10rem',
 }
 
 export const GroupedOptions = Template.bind({})
@@ -54,6 +55,7 @@ GroupedOptions.args = {
       ],
     },
   ],
+  width: '10rem',
 }
 
 export const Controlled = Template.bind({})
@@ -72,6 +74,7 @@ Controlled.args = {
     { label: 'RNA', value: 'rna' },
     { label: 'Protein', value: 'protein' },
   ],
+  width: '10rem',
 }
 
 export const FormattedOptionLabel = Template.bind({})
@@ -89,6 +92,7 @@ FormattedOptionLabel.args = {
     { label: 'RNA', value: 'rna' },
     { label: 'Protein', value: 'protein' },
   ],
+  width: '10rem',
   formatOptionLabel: (option, { context }) =>
     context === 'menu' && option.value === 'rna' ? (
       <span style={{ color: 'green' }}>{option.label}</span>

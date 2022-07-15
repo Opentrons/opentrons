@@ -103,7 +103,7 @@ export function SelectSsid(props: SelectSsidProps): JSX.Element {
       placeholder={Copy.SELECT_NETWORK}
       onValueChange={handleValueChange}
       formatOptionLabel={formatOptionLabel}
-      width="14rem"
+      width="16rem"
     />
   )
 }
