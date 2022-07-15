@@ -1,6 +1,6 @@
 import * as React from 'react'
 import ReactSelect, { components, DropdownIndicatorProps } from 'react-select'
-import { css, CSSObject } from 'styled-components'
+import { CSSObject } from 'styled-components'
 import {
   Icon,
   BORDERS,
@@ -30,17 +30,6 @@ interface SelectComponentProps extends SelectProps {
 const VOID_STYLE: unknown = undefined
 const NO_STYLE_FN = (): CSSObject => VOID_STYLE as CSSObject
 
-const SELECT_STYLES = css`
-  position: ${POSITION_RELATIVE};
-  font-size: ${TYPOGRAPHY.fontSizeP};
-`
-
-const INDICATOR_STYLES = css`
-  position: ${POSITION_ABSOLUTE};
-  top: 0.75rem;
-  right: ${SPACING.spacing2};
-  width: ${SPACING.spacingM};
-`
 export function Select(props: SelectComponentProps): JSX.Element {
   const CLEAR_DEFAULT_STYLES_AND_SET_NEW_STYLES = {
     clearIndicator: NO_STYLE_FN,
@@ -53,7 +42,6 @@ export function Select(props: SelectComponentProps): JSX.Element {
       borderColor: COLORS.medGrey,
       boxShadow: 'none',
       padding: '0.375rem',
-      margin: '0rem',
       flexDirection: DIRECTION_ROW,
       '&:hover': {
         borderColor: COLORS.medGreyHover,
@@ -62,7 +50,11 @@ export function Select(props: SelectComponentProps): JSX.Element {
         borderColor: COLORS.medGreyHover,
       },
     }),
-    container: NO_STYLE_FN,
+    container: (styles: any) => ({
+      ...styles,
+      position: POSITION_RELATIVE,
+      fontSize: TYPOGRAPHY.fontSizeP,
+    }),
     dropdownIndicator: NO_STYLE_FN,
     group: NO_STYLE_FN,
     groupHeading: NO_STYLE_FN,
@@ -71,7 +63,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     input: (styles: any) => ({
       ...styles,
       zIndex: 5,
-      position: 'absolute',
+      position: POSITION_ABSOLUTE,
       top: SPACING.spacingXS,
       paddingLeft: '0.375rem',
     }),
@@ -83,6 +75,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       width: props.width != null ? props.width : 'auto',
       boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.2)',
       borderRadius: '4px 4px 0px 0px',
+      marginTop: SPACING.spacing2,
     }),
     menuList: NO_STYLE_FN,
     menuPortal: NO_STYLE_FN,
@@ -124,7 +117,6 @@ export function Select(props: SelectComponentProps): JSX.Element {
       {...props}
       styles={CLEAR_DEFAULT_STYLES_AND_SET_NEW_STYLES}
       components={{ DropdownIndicator }}
-      css={SELECT_STYLES}
     />
   )
 }
@@ -134,7 +126,12 @@ function DropdownIndicator(
 ): JSX.Element {
   return (
     <components.DropdownIndicator {...props}>
-      <Box css={INDICATOR_STYLES}>
+      <Box
+        position={POSITION_ABSOLUTE}
+        top="0.75rem"
+        right={SPACING.spacing2}
+        width={SPACING.spacingM}
+      >
         <Icon
           name={props.selectProps.menuIsOpen ? 'chevron-up' : 'chevron-down'}
           height={TYPOGRAPHY.lineHeight16}
