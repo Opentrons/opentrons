@@ -1,14 +1,5 @@
 import * as React from 'react'
-import {
-  Box,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_START,
-  SPACING,
-  WRAP,
-} from '@opentrons/components'
+import { Box, Flex, SPACING } from '@opentrons/components'
 import { ModuleCard } from '../../ModuleCard'
 import {
   useModuleRenderInfoForProtocolById,
@@ -71,50 +62,46 @@ export const ProtocolRunModuleControls = ({
     }
   }, [])
 
+  // split modules in half and map into ech column separately to avoid
+  // the need for hardcoded heights without limitation, array will  be split equally
+  // or left column will contain 1 more item than right column
   const halfAttachedModulesSize = Math.ceil(attachedModules?.length / 2)
-  const firstHalfModules = attachedModules?.slice(0, halfAttachedModulesSize)
-  const secondHalfModules = attachedModules?.slice(-halfAttachedModulesSize)
-  console.log(firstHalfModules, secondHalfModules)
+  const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
+  const rightColumnModules = attachedModules?.slice(-halfAttachedModulesSize)
+
   return (
     <Flex
       gridGap={SPACING.spacing3}
       paddingTop={SPACING.spacing3}
       paddingX={SPACING.spacing2}
-      flexDirection={DIRECTION_ROW}
-      width="100%"
     >
       <Box flex="50%">
-        {firstHalfModules.map((module, index) => (
-          <Box
-            key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
-            marginBottom={SPACING.spacing4}
-          >
-            {module.attachedModuleMatch != null ? (
-              <ModuleCard
-                robotName={robotName}
-                runId={runId}
-                module={module.attachedModuleMatch}
-                slotName={module.slotName}
-                isLoadedInRun={true}
-              />
-            ) : null}
-          </Box>
-        ))}
+        {leftColumnModules.map((module, index) =>
+          module.attachedModuleMatch != null ? (
+            <ModuleCard
+              key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
+              robotName={robotName}
+              runId={runId}
+              module={module.attachedModuleMatch}
+              slotName={module.slotName}
+              isLoadedInRun={true}
+            />
+          ) : null
+        )}
       </Box>
       <Box flex="50%">
-        {secondHalfModules.map((module, index) => (
-          <Box key={`moduleCard_${module.moduleDef.moduleType}_${index}`}>
-            {module.attachedModuleMatch != null ? (
-              <ModuleCard
-                robotName={robotName}
-                runId={runId}
-                module={module.attachedModuleMatch}
-                slotName={module.slotName}
-                isLoadedInRun={true}
-              />
-            ) : null}
-          </Box>
-        ))}
+        {rightColumnModules.map((module, index) =>
+          module.attachedModuleMatch != null ? (
+            <ModuleCard
+              key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
+              robotName={robotName}
+              runId={runId}
+              module={module.attachedModuleMatch}
+              slotName={module.slotName}
+              isLoadedInRun={true}
+            />
+          ) : null
+        )}
       </Box>
     </Flex>
   )
