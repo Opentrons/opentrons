@@ -8,8 +8,6 @@ import {
   Flex,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
   useMountEffect,
 } from '@opentrons/components'
 import { checkShellUpdate } from '../../redux/shell'
@@ -38,7 +36,7 @@ export const RobotOverviewOverflowMenu = (
   const { robot } = props
   const { t } = useTranslation(['devices_landing', 'robot_controls'])
   const {
-    MenuOverlay,
+    menuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
@@ -78,6 +76,7 @@ export const RobotOverviewOverflowMenu = (
   const { autoUpdateAction } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robot.name)
   })
+  const isRobotInUse = isRobotBusy || robot?.status !== CONNECTABLE
 
   return (
     <Flex
@@ -110,40 +109,39 @@ export const RobotOverviewOverflowMenu = (
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
-          top={SPACING.spacing7}
+          top="2.25rem"
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          {autoUpdateAction === 'upgrade' ? (
+          {autoUpdateAction === 'upgrade' && !isRobotInUse ? (
             <MenuItem
-              disabled={isRobotBusy || robot?.status !== CONNECTABLE}
               onClick={handleClickUpdateBuildroot}
               data-testid={`RobotOverviewOverflowMenu_updateSoftware_${robot.name}`}
             >
               {t('update_robot_software')}
             </MenuItem>
           ) : null}
-          <MenuItem
-            onClick={handleClickRestart}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            disabled={isRobotBusy || robot?.status !== CONNECTABLE}
-            data-testid={`RobotOverviewOverflowMenu_restartRobot_${robot.name}`}
-          >
-            {t('robot_controls:restart_label')}
-          </MenuItem>
-          <MenuItem
-            onClick={handleClickHomeGantry}
-            disabled={isRobotBusy || robot?.status !== CONNECTABLE}
-            data-testid={`RobotOverviewOverflowMenu_homeGantry_${robot.name}`}
-          >
-            {t('home_gantry')}
-          </MenuItem>
+          {isRobotInUse ? null : (
+            <>
+              <MenuItem
+                onClick={handleClickRestart}
+                data-testid={`RobotOverviewOverflowMenu_restartRobot_${robot.name}`}
+              >
+                {t('robot_controls:restart_label')}
+              </MenuItem>
+              <MenuItem
+                onClick={handleClickHomeGantry}
+                data-testid={`RobotOverviewOverflowMenu_homeGantry_${robot.name}`}
+              >
+                {t('home_gantry')}
+              </MenuItem>
+            </>
+          )}
           <Divider marginY={'0'} />
           <MenuItem
             onClick={() =>
               history.push(`/devices/${robot.name}/robot-settings`)
             }
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
             disabled={
               robot == null ||
               robot?.status === UNREACHABLE ||
@@ -156,7 +154,7 @@ export const RobotOverviewOverflowMenu = (
           </MenuItem>
         </Flex>
       ) : null}
-      <MenuOverlay />
+      {menuOverlay}
     </Flex>
   )
 }

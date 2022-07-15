@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+import { fireEvent } from '@testing-library/react'
 
 import { i18n } from '../../../../i18n'
 import { DevicesEmptyState } from '../../../../organisms/Devices/DevicesEmptyState'
@@ -16,14 +17,12 @@ import {
   mockUnreachableRobot,
 } from '../../../../redux/discovery/__fixtures__'
 import { DevicesLanding } from '..'
-import { fireEvent } from '@testing-library/react'
 
 jest.mock('../../../../organisms/Devices/DevicesEmptyState')
 jest.mock('../../../../organisms/Devices/RobotCard')
 jest.mock('../../../../redux/discovery')
 
 const mockGetScanning = getScanning as jest.MockedFunction<typeof getScanning>
-
 const mockRobotCard = RobotCard as jest.MockedFunction<typeof RobotCard>
 const mockDevicesEmptyState = DevicesEmptyState as jest.MockedFunction<
   typeof DevicesEmptyState
@@ -87,7 +86,7 @@ describe('DevicesLanding', () => {
     mockGetUnreachableRobots.mockReturnValue([])
     const [{ getByText }] = render()
 
-    getByText('Looking for robots...')
+    getByText('Looking for robots')
   })
 
   it('renders the Icon when scanning is true and there are no devices', () => {

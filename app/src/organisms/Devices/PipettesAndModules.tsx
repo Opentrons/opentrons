@@ -2,6 +2,8 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 import { useModulesQuery, usePipettesQuery } from '@opentrons/react-api-client'
+import { css } from 'styled-components'
+
 import {
   Flex,
   ALIGN_CENTER,
@@ -20,9 +22,40 @@ import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { ModuleCard } from '../ModuleCard'
-import { useIsRobotViewable } from './hooks'
+import { useIsRobotViewable, useRunStatuses } from './hooks'
 import { PipetteCard } from './PipetteCard'
 
+export const MIN_HEIGHT_OVER_3_STYLING = css`
+  max-height: 37rem;
+
+  @media (min-width: 700px) {
+    max-height: 32rem;
+  }
+
+  @media (min-width: 800px) {
+    max-height: 30rem;
+  }
+
+  @media (min-width: 900px) {
+    max-height: 22rem;
+  }
+`
+
+export const MIN_HEIGHT_UNDER_3_STYLING = css`
+  max-height: 29rem;
+
+  @media (min-width: 700px) {
+    max-height: 27rem;
+  }
+
+  @media (min-width: 800px) {
+    max-height: 25rem;
+  }
+
+  @media (min-width: 900px) {
+    max-height: 22rem;
+  }
+`
 const EQUIPMENT_POLL_MS = 5000
 interface PipettesAndModulesProps {
   robotName: string
@@ -40,6 +73,7 @@ export function PipettesAndModules({
   })?.data ?? { left: undefined, right: undefined }
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
+  const { isRunTerminal } = useRunStatuses()
 
   return (
     <Flex
@@ -59,12 +93,11 @@ export function PipettesAndModules({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         minHeight={SIZE_3}
-        paddingX={SPACING.spacing3}
         paddingBottom={SPACING.spacing3}
         width="100%"
         flexDirection={DIRECTION_COLUMN}
       >
-        {currentRunId != null && (
+        {currentRunId != null && !isRunTerminal && (
           <Flex
             paddingBottom={SPACING.spacing4}
             flexDirection={DIRECTION_COLUMN}
@@ -74,10 +107,9 @@ export function PipettesAndModules({
             <Banner type="warning">{t('robot_control_not_available')}</Banner>
           </Flex>
         )}
-        {/* TODO(jr, 4/15/22): This needs to be refactored to get a combined array of pipettes and modules so it can display with widths matching each column as the design shows */}
         {isRobotViewable ? (
           <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-            <Flex flexDirection={DIRECTION_ROW}>
+            <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
               <PipetteCard
                 pipetteId={attachedPipettes.left?.id}
                 pipetteInfo={
@@ -104,16 +136,25 @@ export function PipettesAndModules({
               justifyContent={JUSTIFY_START}
               flexDirection={DIRECTION_COLUMN}
               flexWrap={WRAP}
-              maxHeight="27rem"
+              css={
+                attachedModules.length > 3
+                  ? MIN_HEIGHT_OVER_3_STYLING
+                  : MIN_HEIGHT_UNDER_3_STYLING
+              }
             >
               {attachedModules.map((module, index) => {
                 return (
                   <Flex
                     flex="1"
-                    maxWidth="50%"
+                    marginRight={SPACING.spacing3}
                     key={`moduleCard_${module.moduleType}_${index}`}
+                    width={`calc(50% - ${SPACING.spacing2})`}
                   >
-                    <ModuleCard module={module} robotName={robotName} />
+                    <ModuleCard
+                      module={module}
+                      robotName={robotName}
+                      isLoadedInRun={false}
+                    />
                   </Flex>
                 )
               })}

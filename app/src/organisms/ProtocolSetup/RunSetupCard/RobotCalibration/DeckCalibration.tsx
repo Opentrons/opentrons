@@ -69,7 +69,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
             {t('deck_calibration_title')}
           </Text>
           <Link
-            role={'link'}
+            role="button"
             onClick={() => setHelpModalIsOpen(true)}
             color={C_BLUE}
             fontSize={FONT_SIZE_BODY_1}

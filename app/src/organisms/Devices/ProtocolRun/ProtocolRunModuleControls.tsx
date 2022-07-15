@@ -15,6 +15,10 @@ import { useCreateCommandMutation } from '@opentrons/react-api-client'
 
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { RunTimeCommand } from '@opentrons/shared-data'
+import {
+  MIN_HEIGHT_OVER_3_STYLING,
+  MIN_HEIGHT_UNDER_3_STYLING,
+} from '../PipettesAndModules'
 
 interface ProtocolRunModuleControlsProps {
   robotName: string
@@ -70,16 +74,21 @@ export const ProtocolRunModuleControls = ({
 
   return (
     <Flex
-      width={attachedModules.length === 1 ? '100%' : '50%'}
       justifyContent={JUSTIFY_START}
       flexWrap={WRAP}
       flexDirection={DIRECTION_COLUMN}
-      maxHeight="25rem"
+      css={
+        attachedModules.length > 3
+          ? MIN_HEIGHT_OVER_3_STYLING
+          : MIN_HEIGHT_UNDER_3_STYLING
+      }
     >
       {attachedModules.map((module, index) => {
         return (
           <Flex
+            width={`calc(50% - ${SPACING.spacing3})`}
             marginTop={SPACING.spacing3}
+            marginX={SPACING.spacing2}
             key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
           >
             {module.attachedModuleMatch != null ? (
@@ -88,6 +97,7 @@ export const ProtocolRunModuleControls = ({
                 runId={runId}
                 module={module.attachedModuleMatch}
                 slotName={module.slotName}
+                isLoadedInRun={true}
               />
             ) : null}
           </Flex>

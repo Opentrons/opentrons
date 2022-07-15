@@ -1,27 +1,35 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useHistory } from 'react-router-dom'
 import {
   Flex,
-  SPACING,
   POSITION_ABSOLUTE,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
   COLORS,
   useOnClickOutside,
+  useHoverTooltip,
+  Box,
 } from '@opentrons/components'
 import {
   useDeleteRunMutation,
   useAllCommandsQuery,
 } from '@opentrons/react-api-client'
 import { Divider } from '../../atoms/structure'
+import { Tooltip } from '../../atoms/Tooltip'
+import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useRunControls } from '../RunTimeControl/hooks'
 import { RUN_LOG_WINDOW_SIZE } from './constants'
 import { DownloadRunLogToast } from './DownloadRunLogToast'
+import { useTrackProtocolRunEvent } from './hooks'
+import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+
 import type { Run } from '@opentrons/api-client'
+import type { State } from '../../redux/types'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
   runId: string
@@ -33,19 +41,19 @@ export function HistoricalProtocolRunOverflowMenu(
   props: HistoricalProtocolRunOverflowMenuProps
 ): JSX.Element {
   const { runId, robotName } = props
-  const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
-  const protocolRunOverflowWrapperRef = useOnClickOutside({
+  const {
+    menuOverlay,
+    handleOverflowClick,
+    showOverflowMenu,
+    setShowOverflowMenu,
+  } = useMenuHandleClickOutside()
+  const protocolRunOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
-  }) as React.RefObject<HTMLDivElement>
+  })
   const [
     showDownloadRunLogToast,
     setShowDownloadRunLogToast,
   ] = React.useState<boolean>(false)
-  const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    setShowOverflowMenu(!showOverflowMenu)
-  }
 
   const commands = useAllCommandsQuery(
     runId,
@@ -62,16 +70,19 @@ export function HistoricalProtocolRunOverflowMenu(
     >
       <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
       {showOverflowMenu && (
-        <div
-          ref={protocolRunOverflowWrapperRef}
-          data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
-        >
-          <MenuDropdown
-            {...props}
-            closeOverflowMenu={handleOverflowClick}
-            setShowDownloadRunLogToast={setShowDownloadRunLogToast}
-          />
-        </div>
+        <>
+          <Box
+            ref={protocolRunOverflowWrapperRef}
+            data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
+          >
+            <MenuDropdown
+              {...props}
+              closeOverflowMenu={handleOverflowClick}
+              setShowDownloadRunLogToast={setShowDownloadRunLogToast}
+            />
+          </Box>
+          {menuOverlay}
+        </>
       )}
       {runTotalCommandCount != null && showDownloadRunLogToast ? (
         <DownloadRunLogToast
@@ -100,7 +111,12 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     closeOverflowMenu,
     setShowDownloadRunLogToast,
   } = props
-
+  const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
+    useSelector((state: State) => {
+      return getBuildrootUpdateDisplayInfo(state, robotName)
+    })?.autoUpdateAction
+  )
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const onResetSuccess = (createRunResponse: Run): void =>
     history.push(
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-log`
@@ -111,10 +127,22 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     setShowDownloadRunLogToast(true)
     closeOverflowMenu(e)
   }
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const { reset } = useRunControls(runId, onResetSuccess)
   const { deleteRun } = useDeleteRunMutation()
 
-  const handleDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
+  const handleResetClick: React.MouseEventHandler<HTMLButtonElement> = (
+    e
+  ): void => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    reset()
+
+    trackProtocolRunEvent({ name: 'runAgain' })
+  }
+
+  const handleDeleteClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
     deleteRun(runId)
@@ -129,10 +157,9 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}
-      top={SPACING.spacing6}
+      top={'2.3rem'}
       right={0}
       flexDirection={DIRECTION_COLUMN}
-      height="10.5rem"
     >
       <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}>
         <MenuItem data-testid={`RecentProtocolRun_OverflowMenu_viewRunRecord`}>
@@ -140,21 +167,27 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         </MenuItem>
       </NavLink>
       <MenuItem
-        onClick={reset}
-        disabled={robotIsBusy}
+        {...targetProps}
+        onClick={handleResetClick}
+        disabled={robotIsBusy || isRobotOnWrongVersionOfSoftware}
         data-testid={`RecentProtocolRun_OverflowMenu_rerunNow`}
       >
         {t('rerun_now')}
       </MenuItem>
+      {isRobotOnWrongVersionOfSoftware && (
+        <Tooltip tooltipProps={tooltipProps}>
+          {t('shared:a_software_update_is_available')}
+        </Tooltip>
+      )}
       <MenuItem
         data-testid={`RecentProtocolRun_OverflowMenu_downloadRunLog`}
         onClick={onDownloadClick}
       >
         {t('download_run_log')}
       </MenuItem>
-      <Divider />
+      <Divider marginY="0" />
       <MenuItem
-        onClick={handleDelete}
+        onClick={handleDeleteClick}
         data-testid={`RecentProtocolRun_OverflowMenu_deleteRun`}
       >
         {t('delete_run')}

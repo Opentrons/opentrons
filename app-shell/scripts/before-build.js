@@ -73,7 +73,9 @@ module.exports = function beforeBuild(context) {
       return decompress(data, PYTHON_DESTINATION)
     })
     .then(() => {
-      console.log('Standalone Python extracted, installing `opentrons` package')
+      console.log(
+        'Standalone Python extracted, installing `opentrons` and `pandas` packages'
+      )
 
       const sitePackages =
         platformName === 'win32'
@@ -89,10 +91,13 @@ module.exports = function beforeBuild(context) {
         `--target=${path.join(PYTHON_DESTINATION, sitePackages)}`,
         path.join(__dirname, '../../shared-data/python'),
         path.join(__dirname, '../../api'),
+        'pandas==1.4.3',
       ])
     })
     .then(({ stdout }) => {
-      console.log("`opentrons` package installed to app's Python environment")
+      console.log(
+        "`opentrons` and `pandas` packages installed to app's Python environment"
+      )
       console.debug('pip output:', stdout)
       // must return a truthy value, or else electron-builder will
       // skip installing project dependencies into the package

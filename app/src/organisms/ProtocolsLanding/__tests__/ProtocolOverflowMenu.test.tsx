@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-
+import { useTrackEvent } from '../../../redux/analytics'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
@@ -12,6 +12,7 @@ import {
 
 import { ProtocolOverflowMenu } from '../ProtocolOverflowMenu'
 
+jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/protocol-storage')
 
 const PROTOCOL_KEY = 'mock-protocol-key'
@@ -22,6 +23,9 @@ const mockViewProtocolSourceFolder = viewProtocolSourceFolder as jest.MockedFunc
 >
 const mockRemoveProtocol = removeProtocol as jest.MockedFunction<
   typeof removeProtocol
+>
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
 >
 
 const render = () => {
@@ -36,8 +40,13 @@ const render = () => {
   )
 }
 
+let mockTrackEvent: jest.Mock
+
 describe('ProtocolOverflowMenu', () => {
-  beforeEach(() => {})
+  beforeEach(() => {
+    mockTrackEvent = jest.fn()
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
+  })
 
   afterEach(() => {
     jest.resetAllMocks()

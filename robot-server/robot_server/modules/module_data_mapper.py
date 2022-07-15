@@ -9,6 +9,7 @@ from opentrons.hardware_control.modules import (
     HeaterShakerStatus,
     SpeedStatus,
 )
+from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 from opentrons.drivers.types import (
     ThermocyclerLidStatus,
     HeaterShakerLabwareLatchStatus,
@@ -54,10 +55,23 @@ class ModuleDataMapper:
         # rely on Pydantic to check/coerce data fields from dicts at run time
         if module_type == ModuleType.MAGNETIC:
             module_cls = MagneticModule
+
+            live_data_height = live_data["data"].get("height")
+            assert isinstance(
+                live_data_height, (int, float)
+            ), f"Expected magnetic module height, got {live_data_height}"
+
+            # Origin of height reported by hardware API is the magnet home
+            # Origin we report to the user should be labware bottom
+            # Also, magnetic module v1 reports height in half millimeters
+            height_from_base = live_data_height - OFFSET_TO_LABWARE_BOTTOM[model]
+            if module_model == ModuleModel.MAGNETIC_MODULE_V1:
+                height_from_base /= 2
+
             module_data = MagneticModuleData(
                 status=MagneticStatus(live_data["status"]),
                 engaged=cast(bool, live_data["data"].get("engaged")),
-                height=cast(float, live_data["data"].get("height")),
+                height=height_from_base,
             )
 
         elif module_type == ModuleType.TEMPERATURE:

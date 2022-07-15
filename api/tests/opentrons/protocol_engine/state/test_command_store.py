@@ -702,34 +702,35 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
 
 
 def test_command_store_save_started_completed_run_timestamp() -> None:
-    """Should return a none empty run_completed_at and run_started_at."""
-    subject = CommandStore(is_door_open=False, config=Config())
+    """It should save started and completed timestamps."""
+    subject = CommandStore()
     start_time = datetime(year=2021, month=1, day=1)
-    hardware_stopped_time = datetime(year=2021, month=1, day=2)
-    resume_time = datetime(year=2021, month=1, day=3)
-    second_resume_time = datetime(year=2021, month=1, day=4)
+    hardware_stopped_time = datetime(year=2022, month=2, day=2)
 
     subject.handle_action(PlayAction(requested_at=start_time))
-    subject.handle_action(PauseAction(source=PauseSource.CLIENT))
-
-    subject.handle_action(PlayAction(requested_at=resume_time))
     subject.handle_action(HardwareStoppedAction(completed_at=hardware_stopped_time))
 
-    subject.handle_action(PlayAction(requested_at=second_resume_time))
+    assert subject.state.run_started_at == start_time
+    assert subject.state.run_completed_at == hardware_stopped_time
 
-    assert subject.state == CommandState(
-        queue_status=QueueStatus.PAUSED,
-        run_result=RunResult.STOPPED,
-        run_completed_at=hardware_stopped_time,
-        is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
-        errors_by_id={},
-        run_started_at=start_time,
-    )
+
+def test_timestamps_are_latched() -> None:
+    """It should not change startedAt or completedAt once set."""
+    subject = CommandStore()
+
+    play_time_1 = datetime(year=2021, month=1, day=1)
+    play_time_2 = datetime(year=2022, month=2, day=2)
+    stop_time_1 = datetime(year=2023, month=3, day=3)
+    stop_time_2 = datetime(year=2024, month=4, day=4)
+
+    subject.handle_action(PlayAction(requested_at=play_time_1))
+    subject.handle_action(PauseAction(source=PauseSource.CLIENT))
+    subject.handle_action(PlayAction(requested_at=play_time_2))
+    subject.handle_action(HardwareStoppedAction(completed_at=stop_time_1))
+    subject.handle_action(HardwareStoppedAction(completed_at=stop_time_2))
+
+    assert subject.state.run_started_at == play_time_1
+    assert subject.state.run_completed_at == stop_time_1
 
 
 def test_command_store_saves_unknown_finish_error() -> None:

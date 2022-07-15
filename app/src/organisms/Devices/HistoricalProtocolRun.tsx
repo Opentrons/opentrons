@@ -17,12 +17,11 @@ import { StyledText } from '../../atoms/text'
 import { getStoredProtocols } from '../../redux/protocol-storage'
 import { formatInterval } from '../RunTimeControl/utils'
 import { formatTimestamp } from './utils'
+import { EMPTY_TIMESTAMP } from './constants'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
 import { HistoricalProtocolRunOffsetDrawer as OffsetDrawer } from './HistoricalProtocolRunOffsetDrawer'
 import type { RunData } from '@opentrons/api-client'
 import type { State } from '../../redux/types'
-
-const EMPTY_TIMESTAMP = '--:--:--'
 
 const CLICK_STYLE = css`
   cursor: pointer;
@@ -34,7 +33,6 @@ interface HistoricalProtocolRunProps {
   protocolName: string
   robotName: string
   robotIsBusy: boolean
-  key: number
   protocolKey?: string
 }
 
@@ -42,7 +40,7 @@ export function HistoricalProtocolRun(
   props: HistoricalProtocolRunProps
 ): JSX.Element | null {
   const { t } = useTranslation('run_details')
-  const { run, protocolName, robotIsBusy, robotName, protocolKey, key } = props
+  const { run, protocolName, robotIsBusy, robotName, protocolKey } = props
   const history = useHistory()
   const [offsetDrawerOpen, setOffsetDrawerOpen] = React.useState(false)
   const storedProtocols = useSelector((state: State) =>
@@ -52,10 +50,10 @@ export function HistoricalProtocolRun(
   const runDisplayName = formatTimestamp(run.createdAt)
   let duration = EMPTY_TIMESTAMP
   if (runStatus !== 'idle') {
-    if (run.completedAt != null) {
-      duration = formatInterval(run.createdAt, run.completedAt)
-    } else {
-      duration = formatInterval(run.createdAt, new Date().toString())
+    if (run.completedAt != null && run.startedAt != null) {
+      duration = formatInterval(run.startedAt, run.completedAt)
+    } else if (run.startedAt != null) {
+      duration = formatInterval(run.startedAt, new Date().toString())
     }
   }
   const protocolKeyInStoredKeys = storedProtocols.find(
@@ -86,7 +84,7 @@ export function HistoricalProtocolRun(
         <StyledText
           as="p"
           width="25%"
-          data-testid={`RecentProtocolRuns_Run_${key}`}
+          data-testid={`RecentProtocolRuns_Run_${protocolKey}`}
           onClick={() =>
             history.push(
               `${robotName}/protocol-runs/${run.id}/protocolRunDetailsTab?`
@@ -102,9 +100,10 @@ export function HistoricalProtocolRun(
           <StyledText
             as="p"
             width="35%"
-            data-testid={`RecentProtocolRuns_Protocol_${props.key}`}
+            data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
             onClick={() => history.push(`/protocols/${protocolKey}`)}
             css={CLICK_STYLE}
+            marginRight={SPACING.spacing4}
           >
             {protocolName}
           </StyledText>
@@ -112,7 +111,7 @@ export function HistoricalProtocolRun(
           <StyledText
             as="p"
             width="35%"
-            data-testid={`RecentProtocolRuns_Protocol_${props.key}`}
+            data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
             css={{ 'overflow-wrap': 'anywhere' }}
           >
             {protocolName}
@@ -122,7 +121,7 @@ export function HistoricalProtocolRun(
           as="p"
           width="20%"
           textTransform="capitalize"
-          data-testid={`RecentProtocolRuns_Status_${props.key}`}
+          data-testid={`RecentProtocolRuns_Status_${protocolKey}`}
         >
           {runStatus === 'running' && (
             <Icon

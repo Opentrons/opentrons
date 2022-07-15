@@ -3,10 +3,34 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../../i18n'
+import { useTrackEvent } from '../../../../../../redux/analytics'
+import {
+  getConnectableRobots,
+  getReachableRobots,
+} from '../../../../../../redux/discovery'
+import {
+  mockConnectableRobot,
+  mockReachableRobot,
+} from '../../../../../../redux/discovery/__fixtures__'
 
 import { RenameRobotSlideout } from '../RenameRobotSlideout'
 
+jest.mock('../../../../../../redux/discovery/selectors')
+jest.mock('../../../../../../redux/analytics')
+
+const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
+  typeof getConnectableRobots
+>
+const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
+  typeof getReachableRobots
+>
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
+
 const mockOnCloseClick = jest.fn()
+let mockTrackEvent: jest.Mock
+
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
@@ -21,7 +45,14 @@ const render = () => {
 }
 
 describe('RobotSettings RenameRobotSlideout', () => {
-  beforeEach(() => {})
+  beforeEach(() => {
+    mockTrackEvent = jest.fn()
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
+    mockConnectableRobot.name = 'connectableOtie'
+    mockReachableRobot.name = 'reachableOtie'
+    mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
+    mockGetReachableRobots.mockReturnValue([mockReachableRobot])
+  })
 
   afterEach(() => {
     jest.resetAllMocks()
@@ -51,6 +82,11 @@ describe('RobotSettings RenameRobotSlideout', () => {
       expect(input).toHaveValue('mockInput')
       const renameButton = getByRole('button', { name: 'Rename robot' })
       expect(renameButton).not.toBeDisabled()
+      fireEvent.click(renameButton)
+      expect(mockTrackEvent).toHaveBeenCalledWith({
+        name: 'renameRobot',
+        properties: { newRobotName: 'mockInput', previousRobotName: 'otie' },
+      })
     })
   })
 
@@ -114,6 +150,35 @@ describe('RobotSettings RenameRobotSlideout', () => {
     const error = await findByText(
       'Please enter 35 characters max using valid inputs: letters and numbers'
     )
+    await waitFor(() => {
+      expect(renameButton).toBeDisabled()
+      expect(error).toBeInTheDocument()
+    })
+  })
+
+  it('button should be disabled and render the error message when a user rename a robot to a name that used by a connectable robot', async () => {
+    const [{ getByRole, findByText }] = render()
+    const input = getByRole('textbox')
+    fireEvent.change(input, {
+      target: { value: 'connectableOtie' },
+    })
+    expect(input).toHaveValue('connectableOtie')
+    const renameButton = getByRole('button', { name: 'Rename robot' })
+    const error = await findByText('Robot name already exists')
+    await waitFor(() => {
+      expect(renameButton).toBeDisabled()
+      expect(error).toBeInTheDocument()
+    })
+  })
+  it('button should be disabled and render the error message when a user rename a robot to a name that used by a reachable robot', async () => {
+    const [{ getByRole, findByText }] = render()
+    const input = getByRole('textbox')
+    fireEvent.change(input, {
+      target: { value: 'reachableOtie' },
+    })
+    expect(input).toHaveValue('reachableOtie')
+    const renameButton = getByRole('button', { name: 'Rename robot' })
+    const error = await findByText('Robot name already exists')
     await waitFor(() => {
       expect(renameButton).toBeDisabled()
       expect(error).toBeInTheDocument()

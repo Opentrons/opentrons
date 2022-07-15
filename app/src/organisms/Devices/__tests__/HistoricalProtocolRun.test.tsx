@@ -4,7 +4,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { getStoredProtocols } from '../../../redux/protocol-storage'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
-import { useRunStatus } from '../../RunTimeControl/hooks'
+import { useRunStatus, useRunTimestamps } from '../../RunTimeControl/hooks'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 import type { RunStatus, RunData } from '@opentrons/api-client'
@@ -25,6 +25,9 @@ jest.mock('react-router-dom', () => {
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
+const mockUseRunTimestamps = useRunTimestamps as jest.MockedFunction<
+  typeof useRunTimestamps
+>
 const mockHistoricalProtocolRunOverflowMenu = HistoricalProtocolRunOverflowMenu as jest.MockedFunction<
   typeof HistoricalProtocolRunOverflowMenu
 >
@@ -33,7 +36,6 @@ const mockGetStoredProtocols = getStoredProtocols as jest.MockedFunction<
 >
 
 const run = {
-  createdAt: '2022-05-04T18:24:40.833862+00:00',
   current: false,
   id: 'test_id',
   protocolId: 'test_protocol_id',
@@ -56,12 +58,17 @@ describe('RecentProtocolRuns', () => {
       protocolKey: 'protocolKeyStub',
       robotIsBusy: false,
       run: run,
-      key: 1,
     }
     mockHistoricalProtocolRunOverflowMenu.mockReturnValue(
       <div>mock HistoricalProtocolRunOverflowMenu</div>
     )
     mockUseRunStatus.mockReturnValue('succeeded')
+    mockUseRunTimestamps.mockReturnValue({
+      startedAt: '2022-05-04T18:24:40.833862+00:00',
+      pausedAt: '',
+      stoppedAt: '',
+      completedAt: '2022-05-04T18:24:41.833862+00:00',
+    })
     mockGetStoredProtocols.mockReturnValue([storedProtocolDataFixture])
   })
   afterEach(() => {
@@ -83,7 +90,6 @@ describe('RecentProtocolRuns', () => {
       protocolKey: '12345',
       robotIsBusy: false,
       run: run,
-      key: 1,
     }
     const { getByText } = render(props)
     const protocolBtn = getByText('my protocol')

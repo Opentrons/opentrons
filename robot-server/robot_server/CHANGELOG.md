@@ -3,70 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [6.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2022-06-09)
-
-
-### Bug Fixes
-
-* **engine:** disallow setup commands while run is paused ([#10675](https://github.com/Opentrons/opentrons/issues/10675)) ([bd3a4e1](https://github.com/Opentrons/opentrons/commit/bd3a4e146ace8157687cf6913ec3794bae0f4411))
-
-
-
-
-
-# [6.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.0...v6.0.0-alpha.1) (2022-06-07)
-
-
-### Features
-
-* **api:** add Thermocycler Gen2 driver ([#9854](https://github.com/Opentrons/opentrons/issues/9854)) ([b12641d](https://github.com/Opentrons/opentrons/commit/b12641dd93c0c8fd24924d1f4d56dcccf055a8dc))
-* **robot-server:** add modules field to /runs responses ([#10462](https://github.com/Opentrons/opentrons/issues/10462)) ([b4389fb](https://github.com/Opentrons/opentrons/commit/b4389fbe9934193a963671fbce344e50a827db85)), closes [#10432](https://github.com/Opentrons/opentrons/issues/10432)
-* **robot-server:** add run completedAt and startedAt timestamps ([#10327](https://github.com/Opentrons/opentrons/issues/10327)) ([93a195d](https://github.com/Opentrons/opentrons/commit/93a195d26a1128a68a91f71514fb122b48f253b4))
-* **robot-server, api:** support running JSONv6 protocols ([#10170](https://github.com/Opentrons/opentrons/issues/10170)) ([9c30653](https://github.com/Opentrons/opentrons/commit/9c306534576847bd7bd6ea0b8454afd4e74ae476)), closes [#9584](https://github.com/Opentrons/opentrons/issues/9584)
-
-
-
-
-
-# [6.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.1.0-beta.0...v6.0.0-alpha.0) (2022-05-26)
-
-
-### Bug Fixes
-
-* **robot-server:** cancel background tasks when server shuts down ([#10052](https://github.com/Opentrons/opentrons/issues/10052)) ([9e20642](https://github.com/Opentrons/opentrons/commit/9e2064297fde04c291deaf3b75275f3a6cbaeb17))
-
-
-### Features
-
-* **app:** propose recent labware offsets to be reapplied for new protocol runs ([#10216](https://github.com/Opentrons/opentrons/issues/10216)) ([15c372c](https://github.com/Opentrons/opentrons/commit/15c372c523f376fcd592f784072aceb6254f108a)), closes [#9795](https://github.com/Opentrons/opentrons/issues/9795)
-* **robot-server:** add runs history removal to reset options ([#10395](https://github.com/Opentrons/opentrons/issues/10395)) ([e9294c3](https://github.com/Opentrons/opentrons/commit/e9294c3592783dcfdbcbc5ed91dcb60d37afe90e))
-* **robot-server:** Automatically delete old resources to make room for new ones ([#10248](https://github.com/Opentrons/opentrons/issues/10248)) ([9ab070f](https://github.com/Opentrons/opentrons/commit/9ab070fad8d932a153cbde5077a7674674d92c34)), closes [#9966](https://github.com/Opentrons/opentrons/issues/9966)
-* **robot-server:** persist previous run results and commands ([#10187](https://github.com/Opentrons/opentrons/issues/10187)) ([87677c6](https://github.com/Opentrons/opentrons/commit/87677c6919cb6257e8ad063b58b3faccea96d7fe)), closes [#8474](https://github.com/Opentrons/opentrons/issues/8474)
-* **robot-server:** Persist protocol analyses across reboots ([#10042](https://github.com/Opentrons/opentrons/issues/10042)) ([4f35cf4](https://github.com/Opentrons/opentrons/commit/4f35cf49abc5cae73ad8d6ac414bb5b1d3498c85)), closes [#9964](https://github.com/Opentrons/opentrons/issues/9964)
-
-
-
-
-
-# [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
+# [6.0.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v6.0.0) (2022-07-14)
 
 
 ### Bug Fixes
 
 * **api:** drop loop parameters removed in Python 3.10 ([#9368](https://github.com/Opentrons/opentrons/issues/9368)) ([e549c8c](https://github.com/Opentrons/opentrons/commit/e549c8c20205f7575700ed4df0adae18990305a9)), closes [#9331](https://github.com/Opentrons/opentrons/issues/9331)
 * **api:** set finished live runs to stopped rather than succeeded/failed ([#9936](https://github.com/Opentrons/opentrons/issues/9936)) ([d1a73cc](https://github.com/Opentrons/opentrons/commit/d1a73ccede564ec503a0d7d7053cc2c9b7dabb13)), closes [#9277](https://github.com/Opentrons/opentrons/issues/9277)
+* **engine:** disallow setup commands while run is paused ([#10675](https://github.com/Opentrons/opentrons/issues/10675)) ([bd3a4e1](https://github.com/Opentrons/opentrons/commit/bd3a4e146ace8157687cf6913ec3794bae0f4411))
+* **robot-server:** allow live commands if current run is terminal ([#10879](https://github.com/Opentrons/opentrons/issues/10879)) ([0ee0c72](https://github.com/Opentrons/opentrons/commit/0ee0c728a1517009336c2c6e2135eaaf0dab2150))
+* **robot-server:** calculate magnetic module gen 1 height  ([#10724](https://github.com/Opentrons/opentrons/issues/10724)) ([c231d1b](https://github.com/Opentrons/opentrons/commit/c231d1b841b40018ad891aeb5a3cb707d34e0ea8)), closes [#9515](https://github.com/Opentrons/opentrons/issues/9515)
+* **robot-server:** cancel background tasks when server shuts down ([#10052](https://github.com/Opentrons/opentrons/issues/10052)) ([9e20642](https://github.com/Opentrons/opentrons/commit/9e2064297fde04c291deaf3b75275f3a6cbaeb17))
+* **robot-server:** return 409 if client tries to delete a protocol used by a run ([#10459](https://github.com/Opentrons/opentrons/issues/10459)) ([fcd7052](https://github.com/Opentrons/opentrons/commit/fcd705247412c4d511cd45b85609907dc1c84bd8)), closes [#10407](https://github.com/Opentrons/opentrons/issues/10407)
 
 
 ### Features
 
 * **api:** add ProtocolEngine-based analysis CLI ([#9862](https://github.com/Opentrons/opentrons/issues/9862)) ([257b06d](https://github.com/Opentrons/opentrons/commit/257b06d9b82ff6ab0c472bde064f144b023cd4a2))
+* **api:** add Thermocycler Gen2 driver ([#9854](https://github.com/Opentrons/opentrons/issues/9854)) ([b12641d](https://github.com/Opentrons/opentrons/commit/b12641dd93c0c8fd24924d1f4d56dcccf055a8dc))
 * **api, robot-server:** wire up heater shaker live data to modules endpoint ([#9552](https://github.com/Opentrons/opentrons/issues/9552)) ([60c40bb](https://github.com/Opentrons/opentrons/commit/60c40bbf8934c7ccd83d5fb8b36717e5ecb8d806))
+* **app:** propose recent labware offsets to be reapplied for new protocol runs ([#10216](https://github.com/Opentrons/opentrons/issues/10216)) ([15c372c](https://github.com/Opentrons/opentrons/commit/15c372c523f376fcd592f784072aceb6254f108a)), closes [#9795](https://github.com/Opentrons/opentrons/issues/9795)
+* **engine:** open and close thermocycler lid ([#10760](https://github.com/Opentrons/opentrons/issues/10760)) ([1e82c26](https://github.com/Opentrons/opentrons/commit/1e82c26a8f8aa6d0f4821390109661216a095732))
 * **robot-server:** add key to POST /protocols and persist in SQL table ([#9868](https://github.com/Opentrons/opentrons/issues/9868)) ([8b5e721](https://github.com/Opentrons/opentrons/commit/8b5e72120a83233cecefc11d6973137369f32880))
+* **robot-server:** add modules field to /runs responses ([#10462](https://github.com/Opentrons/opentrons/issues/10462)) ([b4389fb](https://github.com/Opentrons/opentrons/commit/b4389fbe9934193a963671fbce344e50a827db85)), closes [#10432](https://github.com/Opentrons/opentrons/issues/10432)
+* **robot-server:** add run completedAt and startedAt timestamps ([#10327](https://github.com/Opentrons/opentrons/issues/10327)) ([93a195d](https://github.com/Opentrons/opentrons/commit/93a195d26a1128a68a91f71514fb122b48f253b4))
+* **robot-server:** add runs history removal to reset options ([#10395](https://github.com/Opentrons/opentrons/issues/10395)) ([e9294c3](https://github.com/Opentrons/opentrons/commit/e9294c3592783dcfdbcbc5ed91dcb60d37afe90e))
 * **robot-server:** add top-level stateless /commands endpoints ([#9696](https://github.com/Opentrons/opentrons/issues/9696)) ([f7988cb](https://github.com/Opentrons/opentrons/commit/f7988cb93c8b00d01541d5094cf77ea2ce9b74be))
 * **robot-server:** add unique IDs to GET /modules response ([#9758](https://github.com/Opentrons/opentrons/issues/9758)) ([8d5e6a1](https://github.com/Opentrons/opentrons/commit/8d5e6a16df96c96a1b719be419b359cfc7f9a357)), closes [#9533](https://github.com/Opentrons/opentrons/issues/9533)
 * **robot-server:** allow /commands to receive module commands ([#9776](https://github.com/Opentrons/opentrons/issues/9776)) ([db0a526](https://github.com/Opentrons/opentrons/commit/db0a5268a490b77cd6a00700df55a1de8460b786)), closes [#9617](https://github.com/Opentrons/opentrons/issues/9617)
+* **robot-server:** Automatically delete old resources to make room for new ones ([#10248](https://github.com/Opentrons/opentrons/issues/10248)) ([9ab070f](https://github.com/Opentrons/opentrons/commit/9ab070fad8d932a153cbde5077a7674674d92c34)), closes [#9966](https://github.com/Opentrons/opentrons/issues/9966)
+* **robot-server:** persist previous run results and commands ([#10187](https://github.com/Opentrons/opentrons/issues/10187)) ([87677c6](https://github.com/Opentrons/opentrons/commit/87677c6919cb6257e8ad063b58b3faccea96d7fe)), closes [#8474](https://github.com/Opentrons/opentrons/issues/8474)
+* **robot-server:** Persist protocol analyses across reboots ([#10042](https://github.com/Opentrons/opentrons/issues/10042)) ([4f35cf4](https://github.com/Opentrons/opentrons/commit/4f35cf49abc5cae73ad8d6ac414bb5b1d3498c85)), closes [#9964](https://github.com/Opentrons/opentrons/issues/9964)
 * **robot-server:** Persist protocols across reboots in a configurable directory ([#9864](https://github.com/Opentrons/opentrons/issues/9864)) ([fa3c6a2](https://github.com/Opentrons/opentrons/commit/fa3c6a2800c321d7c3647b0aaceb548ef9d91945))
 * **robot-server:** persist runs and action runs in sql db ([#9914](https://github.com/Opentrons/opentrons/issues/9914)) ([9c363e1](https://github.com/Opentrons/opentrons/commit/9c363e1ba1aa93fc789d526887b9df0242b907d0))
+* **robot-server, api:** support running JSONv6 protocols ([#10170](https://github.com/Opentrons/opentrons/issues/10170)) ([9c30653](https://github.com/Opentrons/opentrons/commit/9c306534576847bd7bd6ea0b8454afd4e74ae476)), closes [#9584](https://github.com/Opentrons/opentrons/issues/9584)
 
 
 

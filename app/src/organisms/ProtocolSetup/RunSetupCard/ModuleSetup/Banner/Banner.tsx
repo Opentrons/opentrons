@@ -9,10 +9,14 @@ import {
   TYPOGRAPHY,
   SPACING,
   Icon,
-  NewPrimaryBtn,
-  TEXT_TRANSFORM_NONE,
   SIZE_6,
+  SIZE_1,
+  JUSTIFY_CENTER,
+  ALIGN_FLEX_START,
 } from '@opentrons/components'
+
+import { StyledText } from '../../../../../atoms/text'
+import { TertiaryButton } from '../../../../../atoms/buttons'
 
 interface BannerProps {
   title: string
@@ -35,22 +39,25 @@ export function Banner(props: BannerProps): JSX.Element | null {
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <Flex flexDirection={DIRECTION_ROW}>
-            <Icon
-              size={SPACING.spacing6}
-              color={COLORS.darkGreyEnabled}
-              name="information"
-              paddingRight={SPACING.spacing3}
-              paddingBottom={TYPOGRAPHY.fontSizeCaption}
-              aria-label="information_icon"
-            />
-            <Text
-              fontSize={TYPOGRAPHY.fontSizeH3}
-              data-testid={`banner_title_${title}`}
-              color={COLORS.darkBlack}
-            >
-              {title}
-            </Text>
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+          >
+            <Flex alignItems={JUSTIFY_CENTER}>
+              <Icon
+                size={SIZE_1}
+                color={COLORS.darkGreyEnabled}
+                name="information"
+                marginRight={SPACING.spacing3}
+                aria-label="information_icon"
+              />
+              <StyledText
+                css={TYPOGRAPHY.h3SemiBold}
+                data-testid={`banner_title_${title}`}
+              >
+                {title}
+              </StyledText>
+            </Flex>
           </Flex>
         </Flex>
         {children}
@@ -90,17 +97,13 @@ export const BannerItem = (props: BannerItemProps): JSX.Element => {
         >
           {props.body}
         </Text>
-        <NewPrimaryBtn
-          backgroundColor={COLORS.blue}
-          borderRadius={SPACING.spacingM}
-          textTransform={TEXT_TRANSFORM_NONE}
-          css={TYPOGRAPHY.labelRegular}
-          marginBottom={SPACING.spacingXL}
+        <TertiaryButton
+          alignSelf={ALIGN_FLEX_START}
           data-testid={`banner_open_wizard_btn`}
           onClick={() => props.onClick()}
         >
           {props.btnText}
-        </NewPrimaryBtn>
+        </TertiaryButton>
       </Flex>
     </>
   )

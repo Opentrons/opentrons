@@ -48,10 +48,13 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const labwareByLiquidId = parseLabwareInfoByLiquidId()
 
   return (
+    // PR #10488 changed size
+    // revert the height
+    // Note add offset 18px to right and left
     <RobotWorkSpace
       deckLayerBlocklist={deckSetupLayerBlocklist}
       deckDef={deckDef}
-      viewBox="-90 -40 560 500"
+      viewBox="-75 -20 586 480"
     >
       {({ deckSlotsById }) =>
         map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {

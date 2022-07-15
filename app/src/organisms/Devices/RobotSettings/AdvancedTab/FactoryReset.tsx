@@ -5,9 +5,9 @@ import {
   Flex,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  Box,
   SPACING,
   SPACING_AUTO,
+  Box,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -42,9 +42,8 @@ export function FactoryReset({
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
         <StyledText
-          as="h2"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing4}
+          css={TYPOGRAPHY.pSemiBold}
+          marginBottom={SPACING.spacing2}
           id="AdvancedSettings_factoryReset"
         >
           {t('factory_reset')}

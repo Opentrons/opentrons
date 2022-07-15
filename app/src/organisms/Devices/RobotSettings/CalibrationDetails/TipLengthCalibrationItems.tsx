@@ -1,9 +1,15 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
-import { SPACING, TYPOGRAPHY, Mount } from '@opentrons/components'
+import {
+  SPACING,
+  TYPOGRAPHY,
+  Mount,
+  BORDERS,
+  COLORS,
+} from '@opentrons/components'
 
 import { StyledText } from '../../../../atoms/text'
 import { OverflowMenu } from './OverflowMenu'
@@ -28,13 +34,18 @@ const StyledTableHeader = styled.th`
   padding: ${SPACING.spacing3};
 `
 const StyledTableRow = styled.tr`
-  padding: ${SPACING.spacing3}; ;
+  padding: ${SPACING.spacing3};
+  border-bottom: ${BORDERS.lineBorder};
 `
 const StyledTableCell = styled.td`
   padding: ${SPACING.spacing3};
   text-overflow: wrap;
 `
 
+const BODY_STYLE = css`
+  box-shadow: 0 0 0 1px ${COLORS.medGrey};
+  border-radius: 3px;
+`
 interface TipLengthCalibrationItemsProps {
   robotName: string
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
@@ -91,7 +102,7 @@ export function TipLengthCalibrationItems({
           </StyledTableHeader>
         </tr>
       </thead>
-      <tbody>
+      <tbody css={BODY_STYLE}>
         {tipLengthCalibrations.map((calibration, index) => (
           <StyledTableRow key={index}>
             <StyledTableCell>

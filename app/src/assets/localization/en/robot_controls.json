@@ -6,6 +6,6 @@
   "lights_label": "lights",
   "restart_button": "restart",
   "restart_description": "Restart robot.",
-  "restart_label": "restart robot",
+  "restart_label": "Restart robot",
   "title": "robot controls"
 }

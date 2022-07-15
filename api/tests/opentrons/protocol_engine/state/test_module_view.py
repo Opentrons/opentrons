@@ -1245,3 +1245,33 @@ def test_thermocycler_validate_target_lid_temperature_raises(
 
     with pytest.raises(errors.InvalidTargetTemperatureError):
         subject.validate_target_lid_temperature(input_temperature)
+
+
+@pytest.mark.parametrize(
+    ("module_definition", "expected_height"),
+    [
+        (lazy_fixture("thermocycler_v1_def"), 98.0),
+        (lazy_fixture("tempdeck_v1_def"), 84.0),
+        (lazy_fixture("tempdeck_v2_def"), 84.0),
+        (lazy_fixture("magdeck_v1_def"), 110.152),
+        (lazy_fixture("magdeck_v2_def"), 110.152),
+        (lazy_fixture("heater_shaker_v1_def"), 82.0),
+    ],
+)
+def test_get_overall_height(
+    module_definition: ModuleDefinition,
+    expected_height: float,
+) -> None:
+    """It should get a module's overall height."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_7},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=module_definition,
+            )
+        },
+    )
+
+    result = subject.get_overall_height("module-id")
+    assert result == expected_height

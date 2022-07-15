@@ -8,6 +8,7 @@ import {
   Text,
   FONT_SIZE_BODY_2,
   DIRECTION_ROW,
+  SPACING,
   SPACING_3,
   SPACING_5,
   BORDER_SOLID_LIGHT,
@@ -238,7 +239,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element {
 
   const [allowVertical, setAllowVertical] = React.useState(false)
 
-  const AllowVerticalPrompt = (): JSX.Element => (
+  const allowVerticalPrompt: JSX.Element = (
     <Flex
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
@@ -307,7 +308,8 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element {
             ? [HORIZONTAL_PLANE, VERTICAL_PLANE]
             : [HORIZONTAL_PLANE]
         }
-        auxiliaryControl={allowVertical ? null : <AllowVerticalPrompt />}
+        auxiliaryControl={allowVertical ? null : allowVerticalPrompt}
+        marginBottom={SPACING.spacing5}
       />
       <Flex
         width="100%"

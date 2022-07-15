@@ -18,7 +18,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { HistoricalProtocolRun } from './HistoricalProtocolRun'
-import { useIsRobotViewable } from './hooks'
+import { useIsRobotViewable, useRunStatuses } from './hooks'
 
 interface RecentProtocolRunsProps {
   robotName: string
@@ -27,19 +27,21 @@ interface RecentProtocolRunsProps {
 export function RecentProtocolRuns({
   robotName,
 }: RecentProtocolRunsProps): JSX.Element | null {
-  const { t } = useTranslation('device_details')
+  const { t } = useTranslation(['device_details', 'shared'])
   const isRobotViewable = useIsRobotViewable(robotName)
   const runsQueryResponse = useAllRunsQuery()
   const runs = runsQueryResponse?.data?.data
   const protocols = useAllProtocolsQuery()
   const currentRunId = useCurrentRunId()
-  const robotIsBusy = currentRunId != null
+  const { isRunTerminal } = useRunStatuses()
+  const robotIsBusy = currentRunId != null ? !isRunTerminal : false
 
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.white}
-      css={BORDERS.cardOutlineBorder}
+      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid}  ${COLORS.medGrey}`}
+      borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_COLUMN}
       width="100%"
       marginBottom="6rem"
@@ -109,10 +111,11 @@ export function RecentProtocolRuns({
                 const protocol = protocols?.data?.data.find(
                   protocol => protocol.id === run.protocolId
                 )
+
                 const protocolName =
                   protocol?.metadata.protocolName ??
                   protocol?.files[0].name ??
-                  run.protocolId ??
+                  t('shared:loading') ??
                   ''
 
                 return (

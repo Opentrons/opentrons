@@ -21,6 +21,7 @@ interface ProtocolMetadata {
   lastUpdated?: number | null
   description?: string | null
   creationMethod?: 'json' | 'python'
+  [key: string]: any
 }
 
 export function useProtocolMetadata(): ProtocolMetadata {
@@ -31,7 +32,13 @@ export function useProtocolMetadata(): ProtocolMetadata {
   const description = protocolMetadata?.description
   const lastUpdated = protocolMetadata?.lastModified
 
-  return { author, lastUpdated, description, creationMethod }
+  return {
+    ...protocolMetadata,
+    author,
+    lastUpdated,
+    description,
+    creationMethod,
+  }
 }
 
 interface ModuleRenderInfo extends ProtocolModuleInfo {

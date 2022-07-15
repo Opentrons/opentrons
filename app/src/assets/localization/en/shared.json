@@ -31,5 +31,9 @@
   "confirm": "Confirm",
   "reset_all": "Reset all",
   "robot_is_reachable_but_not_responding": "This robot's API server is not responding correctly to requests at IP address {{hostname}}",
-  "robot_was_seen_but_is_unreachable": "This robot has been seen recently, but is currently not reachable at IP address {{hostname}}"
+  "robot_was_seen_but_is_unreachable": "This robot has been seen recently, but is currently not reachable at IP address {{hostname}}",
+  "protocol_run_general_error_msg": "Protocol run could not be created on the robot.",
+  "proceed_to_setup": "Proceed to setup",
+  "a_software_update_is_available": "A software update is available for this robot. Update to run protocols.",
+  "robot_is_busy_no_protocol_run_allowed": "This robot is busy and can’t run this protocol right now. <robotLink>Go to Robot</robotLink>"
 }

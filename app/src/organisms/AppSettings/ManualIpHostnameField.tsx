@@ -12,16 +12,16 @@ import {
 
 import { TertiaryButton } from '../../atoms/buttons'
 
-export interface ManualIpHostnameFieldProps {
+interface IpHostnameFieldProps {
   field: any
   inputRef: { current: null | HTMLInputElement }
 }
 
-export function ManualIpHostnameField(
-  props: ManualIpHostnameFieldProps
-): JSX.Element {
+export function IpHostnameField({
+  field,
+  inputRef,
+}: IpHostnameFieldProps): JSX.Element {
   const { t } = useTranslation('app_settings')
-  const { field, inputRef } = props
 
   return (
     <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>

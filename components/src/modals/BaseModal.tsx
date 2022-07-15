@@ -42,13 +42,12 @@ const FOOTER_STYLE = {
 } as const
 
 const CONTENT_STYLE = {
-  paddingX: SPACING.spacing6,
-  paddingY: SPACING.spacing4,
+  paddingTop: SPACING.spacing4,
+  paddingX: SPACING.spacing5,
+  paddingBottom: SPACING.spacing5,
 } as const
 
 export interface BaseModalProps extends StyleProps {
-  /** Content background color, defaults to white **/
-  contentBackgroundColor?: string
   /** Overlay color, defaults to `OVERLAY_GRAY_90` */
   overlayColor?: string
   /** Optional close on outside click **/
@@ -74,7 +73,6 @@ export interface BaseModalProps extends StyleProps {
  */
 export function BaseModal(props: BaseModalProps): JSX.Element {
   const {
-    contentBackgroundColor = COLORS.white,
     overlayColor = COLORS.backgroundOverlay,
     onOutsideClick,
     zIndex = 10,
@@ -110,9 +108,7 @@ export function BaseModal(props: BaseModalProps): JSX.Element {
           }}
         >
           {header != null ? <Box {...headerStyle}>{header}</Box> : null}
-          <Box {...CONTENT_STYLE} backgroundColor={contentBackgroundColor}>
-            {children}
-          </Box>
+          <Box {...CONTENT_STYLE}>{children}</Box>
           {footer != null ? <Box {...FOOTER_STYLE}>{footer}</Box> : null}
         </Box>
       </Flex>
