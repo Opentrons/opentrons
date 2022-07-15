@@ -1,15 +1,9 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
-	"$id": "opentronsPipetteGeometrySchemaV2",
 	"definitions": {
 	  "positiveNumber": {
 		"type": "number",
 		"minimum": 0
-	  },
-	  "idleCurrentRange": {
-		"type": "number",
-		"minimum": 0.01,
-		"maximum": 1.0
 	  },
 	  "xyzArray": {
 		"type": "array",
@@ -18,105 +12,240 @@
 		"minItems": 3,
 		"maxItems": 3
 	  },
-	  "linearEquations": {
-		"description": "Array containing any number of 3-arrays. Each inner 3-array describes a line segment: [boundary, slope, intercept]. So [1, 2, 3] would mean 'where (next_boundary > x >= 1), y = 2x + 3'",
+	  "unitVector": {
 		"type": "array",
+		"description": "Array of 3 unit directions, [x, y, z]",
 		"items": {
-		  "type": "array",
-		  "items": { "type": "number" },
-		  "minItems": 3,
-		  "maxItems": 3
-		}
+		  "type": "number",
+		  "enum": [1, -1]
+		},
+		"minItems": 3,
+		"maxItems": 3
 	  },
-	  "liquidHandlingSpecs": {
-		"description": "Object containing linear equations for translating between uL of liquid and mm of plunger travel. There is one linear equation for aspiration and one for dispense",
+	  "boundingBox": {
 		"type": "object",
-		"required": ["aspirate", "dispense"],
-		"additionalProperties": false,
+		"description": "The active area (both pipettes can reach) of a fixture on the deck",
+		"required": ["xDimension", "yDimension", "zDimension"],
 		"properties": {
-		  "aspirate": { "$ref": "#/definitions/linearEquations" },
-		  "dispense": { "$ref": "#/definitions/linearEquations" }
+		  "xDimension": { "$ref": "#/definitions/positiveNumber" },
+		  "yDimension": { "$ref": "#/definitions/positiveNumber" },
+		  "zDimension": { "$ref": "#/definitions/positiveNumber" }
 		}
 	  },
-	  "editConfigurations": {
+	  "pathDValue": {
+		"type": "string",
+		"description": "A valid d-attribute value for an svg path. Note: uses physical coordinate system which has origin at the bottom, front, left of the robot's workspace."
+	  },
+	  "feature": {
 		"type": "object",
-		"description": "Object allowing you to modify a config",
-		"required": ["value"],
+		"description": "A physical feature of the deck",
+		"required": ["footprint"],
 		"properties": {
-		  "value": { "type": ["number", "array"] },
-		  "min": { "type": "number" },
-		  "max": { "type": "number" },
-		  "units": { "type": "string" },
-		  "type": { "type": "string" },
-		  "displayName": { "type": "string" }
-		}
-	  },
-	  "tipConfigurations": {
-		"required": ["current"],
-		"properties": {
-			"current": {"$ref": "#/definitions/current"},
-			"distance": {},
-			"presses": {},
-			"increment": {}
+		  "footprint": { "$ref": "#/definitions/pathDValue" },
+		  "correspondingLocation": {
+			"type": "string",
+			"format": "uri-reference",
+			"description": "A path to a location entry that corresponds with this feature"
+		  }
 		}
 	  }
 	},
   
+	"description": "Pipette body specifications, where x,y,z (0,0,0) is at the bottom of the nozzle.",
 	"type": "object",
 	"additionalProperties": false,
-	"required": ["config", "mutableConfigs"],
+	"required": [
+	  "otId",
+	  "schemaVersion",
+	  "cornerOffsetFromOrigin",
+	  "dimensions",
+	  "metadata",
+	  "robot",
+	  "locations",
+	  "layers"
+	],
 	"properties": {
-		"description": "Version-level pipette specifications, which may vary across different versions of the same pipette",
+	  "otId": {
+		"description": "Unique internal ID generated using UUID",
+		"type": "string"
+	  },
+  
+	  "schemaVersion": {
+		"description": "Schema version of a deck is a single integer",
+		"enum": [3]
+	  },
+  
+	  "cornerOffsetFromOrigin": {
+		"$ref": "#/definitions/xyzArray",
+		"description": "Position of left-front-bottom corner of entire deck to robot coordinate system origin"
+	  },
+  
+	  "dimensions": {
+		"$ref": "#/definitions/xyzArray",
+		"description": "Outer dimensions of a deck bounding box"
+	  },
+  
+	  "metadata": {
+		"description": "Optional metadata about the Deck",
 		"type": "object",
-		"$comment": "Example key: 'p10_single_v1.3'",
-		"patternProperties": {
-		  ".*": {
-			"required": [
-			  "name",
-			  "top",
-			  "bottom",
-			  "blowout",
-			  "modelOffset",
-			  "plungerCurrent",
-			  "dropTipCurrent",
-			  "dropTipSpeed",
-			  "ulPerMm",
-			  "tipLength",
-			  "nozzleOffset"
-			],
-			"additionalProperties": false,
-			"properties": {
-			  "top": { "$ref": "#/definitions/editConfigurations" },
-			  "bottom": { "$ref": "#/definitions/editConfigurations" },
-			  "blowout": { "$ref": "#/definitions/editConfigurations" },
-			  "dropTip": { "$ref": "#/definitions/editConfigurations" },
-			  "pickUpCurrent": { "$ref": "#/definitions/editConfigurations" },
-			  "pickUpDistance": { "$ref": "#/definitions/editConfigurations" },
-			  "pickUpPresses": { "$ref": "#/definitions/editConfigurations" },
-			  "pickUpIncrement": { "$ref": "#/definitions/editConfigurations" },
-			  "pickUpSpeed": { "$ref": "#/definitions/editConfigurations" },
-			  "modelOffset": { "$ref": "#/definitions/xyzArray" },
-			  "nozzleOffset": { "$ref": "#/definitions/xyzArray" },
-			  "plungerCurrent": { "$ref": "#/definitions/editConfigurations" },
-			  "dropTipCurrent": { "$ref": "#/definitions/editConfigurations" },
-			  "dropTipSpeed": { "$ref": "#/definitions/editConfigurations" },
-			  "motorConfigurations": {
-				"$ref": "#/definitions/motorConfigurations"
-			  },
-			  "pickUpTipConfigurations" : {
-				"$ref": "#/definitions/tipConfigurations"
-			  },
-			  "dropTipConfigurations" : {
-				"$ref": "#/definitions/tipConfigurations"
-			  },
-			  "ulPerMm": {
-				"type": "array",
-				"items": { "$ref": "#/definitions/liquidHandlingSpecs" }
-			  },
-			  "idleCurrent": { "$ref": "#/definitions/idleCurrentRange" },
-			  "volumeRange": {}
+  
+		"properties": {
+		  "displayName": {
+			"description": "A short, human-readable name for the deck",
+			"type": "string"
+		  },
+  
+		  "tags": {
+			"description": "Tags to be used in searching for this deck",
+			"type": "array",
+			"items": {
+			  "type": "string"
+			}
 		  }
 		}
+	  },
+  
+	  "robot": {
+		"type": "object",
+		"required": ["model"],
+		"properties": {
+		  "model": {
+			"description": "Model of the robot",
+			"type": "string",
+			"enum": ["OT-3 Standard"]
+		  }
+		}
+	  },
+  
+	  "locations": {
+		"type": "object",
+		"required": ["orderedSlots", "calibrationPoints"],
+		"properties": {
+		  "orderedSlots": {
+			"type": "array",
+			"description": "Ordered slots available for placing labware",
+			"items": {
+			  "type": "object",
+			  "required": [
+				"id",
+				"position",
+				"boundingBox",
+				"displayName",
+				"compatibleModuleTypes"
+			  ],
+			  "properties": {
+				"id": {
+				  "description": "Unique identifier for slot",
+				  "type": "string"
+				},
+				"position": { "$ref": "#/definitions/xyzArray" },
+				"matingSurfaceUnitVector": {
+				  "$ref": "#/definitions/unitVector",
+				  "description": "An optional diagonal direction of force, defined by spring location, which governs the mating surface of objects placed in slot."
+				},
+				"boundingBox": { "$ref": "#/definitions/boundingBox" },
+				"displayName": {
+				  "description": "An optional human-readable nickname for this slot Eg \"Slot 1\" or \"Fixed Trash\"",
+				  "type": "string"
+				},
+				"compatibleModuleTypes": {
+				  "description": "An array of module types that can be placed in this slot.",
+				  "type": "array",
+				  "items": {
+					"type": "string",
+					"enum": [
+					  "magneticModuleType",
+					  "temperatureModuleType",
+					  "thermocyclerModuleType",
+					  "heaterShakerModuleType"
+					]
+				  }
+				}
+			  }
+			}
+		  },
+  
+		  "calibrationPoints": {
+			"type": "array",
+			"description": "Key points for deck calibration",
+			"items": {
+			  "type": "object",
+			  "required": ["id", "position", "displayName"],
+			  "properties": {
+				"id": {
+				  "description": "Unique identifier for calibration point",
+				  "type": "string"
+				},
+				"position": { "$ref": "#/definitions/xyzArray" },
+				"displayName": {
+				  "description": "An optional human-readable nickname for this point Eg \"Slot 3 Cross\" or \"Slot 1 Dot\"",
+				  "type": "string"
+				}
+			  }
+			}
+		  },
+  
+		  "fixtures": {
+			"type": "array",
+			"description": "Fixed position objects on the deck.",
+			"items": {
+			  "type": "object",
+			  "required": ["id", "displayName"],
+			  "properties": {
+				"id": {
+				  "description": "Unique identifier for fixed object",
+				  "type": "string"
+				},
+				"labware": {
+				  "description": "Valid labware loadName for fixed object",
+				  "type": "string"
+				},
+				"boundingBox": { "$ref": "#/definitions/boundingBox" },
+				"slot": {
+				  "description": "Slot location of the fixed object",
+				  "type": "string"
+				},
+				"position": { "$ref": "#/definitions/xyzArray" },
+				"displayName": {
+				  "description": "An optional human-readable nickname for this fixture Eg \"Tall Fixed Trash\" or \"Short Fixed Trash\"",
+				  "type": "string"
+				}
+			  },
+			  "oneOf": [
+				{
+				  "anyOf": [
+					{
+					  "required": ["labware", "slot"]
+					},
+					{
+					  "required": ["labware", "position"]
+					}
+				  ]
+				},
+				{
+				  "anyOf": [
+					{
+					  "required": ["boundingBox", "slot"]
+					},
+					{
+					  "required": ["boundingBox", "position"]
+					}
+				  ]
+				}
+			  ]
+			}
+		  }
+		}
+	  },
+	  "layers": {
+		"type": "object",
+		"description": "Layered feature groups of the deck.",
+		"additionalProperties": {
+		  "type": "array",
+		  "description": "Individual features within a layer",
+		  "items": { "$ref": "#/definitions/feature" }
+		}
 	  }
+	}
   }
   

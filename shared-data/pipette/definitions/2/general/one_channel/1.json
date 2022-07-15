@@ -1,4 +1,36 @@
 {
 	"$otSharedSchema": "pipette/schemas/2/pipettePropertiesSchema",
-	"model": "singleChannel"
+	"displayName": "oneChannel",
+	"displayCategory": "GEN1",
+	"pickUpTipConfigurations": {
+		"current": {},
+		"presses": {},
+		"speed": {},
+		"increment": {},
+		"distance": {}
+	},
+	"dropTipConfigurations":{
+		"current": {},
+		"speed": {}
+	},
+	"plungerMotorConfigurations": {
+		"idle": 0.5,
+		"run": 1.0
+	},
+	"plungerPositionsConfigurations": {
+		"top": 1,
+		"bottom": 1,
+		"blowout": 1,
+		"drop": 1
+	},
+	"availableSensors": {
+		"pressure": 1,
+		"capacitive": 1,
+		"environment": 1
+	},
+	"partialTipConfigurations": {
+		"partialTipSupported": false
+	},
+	"channels": 1
+
 }

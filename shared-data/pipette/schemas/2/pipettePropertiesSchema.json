@@ -3,7 +3,11 @@
 	"$id": "opentronsPipetteGeometrySchemaV2",
 	"definitions": {
 	"channels": {
-		"enum": [1, 8, 96]
+		"enum": [1, 8, 96, 384]
+	},
+	"displayCategory": {
+		"type": "string",
+		"enum": ["GEN1"]
 		},
 	  "positiveNumber": {
 		"type": "number",
@@ -62,7 +66,8 @@
 			"current": { "$ref": "#/definitions/currentRange" },
 			"presses": {},
 			"speed": { "$ref": "#/definitions/editConfigurations"},
-			"increment": {}
+			"increment": {},
+			"distance": {}
 
 		}
 	  }
@@ -71,49 +76,70 @@
 	"type": "object",
 	"$comment": "Example key: 'p10_single_v1.3'",
 	"required": [
-		"name",
-		"top",
-		"bottom",
-		"blowout",
-		"dropTip",
-		"modelOffset",
-		"plungerCurrent",
-		"dropTipCurrent",
-		"dropTipSpeed",
-		"ulPerMm",
-		"tipLength",
-		"nozzleOffset",
 		"pickUpTipConfigurations",
 		"dropTipConfigurations",
-		"partialTipConfigurations"
+		"partialTipConfigurations",
+		"plungerPositionsConfigurations",
+		"plungerMotorConfigurations",
+		"displayCategory",
+		"channels"
 		],
 		"properties": {
 			"additionalProperties": false,
-			"properties": {
-			  "name": {
-				"description": "reference to name of this version, should match a key in corresponding pipetteNameSpecs.json file",
-				"type": "string"
-			  },
-			  "backCompatNames": {
-				"description": "Optional reference for name of backwards compatible pipette corresponding to a key in pipetteNameSpecs.json, only relevant to gen2 pipettes",
-				"type": "array"
-			  },
-
-			  "pickUpCurrent": { "$ref": "#/definitions/editConfigurations" },
-			  "pickUpDistance": { "$ref": "#/definitions/editConfigurations" },
-			  "pickUpPresses": { "$ref": "#/definitions/editConfigurations" },
-			  "pickUpIncrement": { "$ref": "#/definitions/editConfigurations" },
-			  "pickUpSpeed": { "$ref": "#/definitions/editConfigurations" },
-			  "modelOffset": { "$ref": "#/definitions/xyzArray" },
-			  "nozzleOffset": { "$ref": "#/definitions/xyzArray" },
-			  "plungerCurrent": { "$ref": "#/definitions/editConfigurations" },
-			  "dropTipCurrent": { "$ref": "#/definitions/editConfigurations" },
-			  "dropTipSpeed": { "$ref": "#/definitions/editConfigurations" },
 			  "channels": { "$ref": "#/definitions/channels" },
-			  "partialTipConfigurations": {},
-			  "availableSensors": {},
-			  "motorConfigurations": {
-				"$ref": "#/definitions/motorConfigurations"
+			  "partialTipConfigurations": {
+				"type": "object",
+				"description": "Object containing information on partial tip configurations",
+				"required": ["partialTipSupported"],
+				"properties": {
+					"partialTipSupported": {"type": "boolean"},
+					"availableConfigurations": {
+						"type": "array",
+						"description": "Array of available configurations",
+						"items": {
+							"type": "number",
+							"enum": [1, 2, 3, 4, 5, 6, 7, 8, 12, 96, 384]}
+					}
+				}
+			  },
+			  "availableSensors": {
+				"type": "object",
+				"description": "object with keyed by sensor and number available",
+				"required": ["pressure", "capacitive", "environment"],
+				"properties": {
+					"pressure": {"enum": [1, 2]},
+					"capacitive": {"enum": [1, 2]},
+					"environment": {"enum": [1]}
+				}
+			  },
+			  "plungerPositionsConfigurations": {
+				"type": "object",
+				"description": "Object containing configurations specific to tip handling",
+				"required": ["top", "bottom", "blowout", "drop"],
+				"properties": {
+					"top": { "$ref": "#/definitions/currentRange" },
+					"bottom": {},
+					"blowout": { "$ref": "#/definitions/editConfigurations"},
+					"drop": {}
+			  }
+			},
+			  "plungerMotorConfigurations": {
+				"type": "object",
+				"description": "Object containing configurations specific to the plunger motor",
+				"required": ["idle", "run"],
+				"properties": {
+					"idle": { "$ref": "#/definitions/currentRange" },
+					"run": { "$ref": "#/definitions/currentRange" }
+			  }
+			},
+			  "gearMotorConfigurations": {
+				"type": "object",
+				"description": "Object containing configurations specific to the clamp motors, if applicable",
+				"required": ["idle", "run"],
+				"properties": {
+					"idle": { "$ref": "#/definitions/currentRange" },
+					"run": { "$ref": "#/definitions/currentRange" }
+			  }
 			  },
 			  "pickUpTipConfigurations" : {
 				"$ref": "#/definitions/tipConfigurations"
@@ -121,14 +147,8 @@
 			  "dropTipConfigurations" : {
 				"$ref": "#/definitions/tipConfigurations"
 			  },
-			  "ulPerMm": {
-				"type": "array",
-				"items": { "$ref": "#/definitions/liquidHandlingSpecs" }
-			  },
-			  "idleCurrent": { "$ref": "#/definitions/idleCurrentRange" },
-			  "volumeRange": {},
-			  "version": { "$ref": "#/definitions/version"}
+			  "displayName": { "type": "string" },
+			  "displayCategory": { "$ref": "#/definitions/displayCategory" }
 		  }
-		}
   }
   
