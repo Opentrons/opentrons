@@ -19,6 +19,7 @@ from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_runner.json_command_translator import JsonCommandTranslator
 from opentrons.protocol_engine import (
     commands as pe_commands,
+    DeckPoint,
     DeckSlotLocation,
     PipetteName,
     WellLocation,
@@ -32,6 +33,7 @@ VALID_TEST_PARAMS = [
     (
         protocol_schema_v6.Command(
             commandType="aspirate",
+            key=None,
             params=protocol_schema_v6.Params(
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
@@ -47,6 +49,7 @@ VALID_TEST_PARAMS = [
             ),
         ),
         pe_commands.AspirateCreate(
+            key=None,
             params=pe_commands.AspirateParams(
                 # todo: id
                 pipetteId="pipette-id-abc123",
@@ -58,12 +61,13 @@ VALID_TEST_PARAMS = [
                     origin=WellOrigin.BOTTOM,
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),
-            )
+            ),
         ),
     ),
     (
         protocol_schema_v6.Command(
             commandType="dispense",
+            key="dispense-key",
             params=protocol_schema_v6.Params(
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
@@ -77,6 +81,7 @@ VALID_TEST_PARAMS = [
             ),
         ),
         pe_commands.DispenseCreate(
+            key="dispense-key",
             params=pe_commands.DispenseParams(
                 pipetteId="pipette-id-abc123",
                 labwareId="labware-id-def456",
@@ -87,7 +92,7 @@ VALID_TEST_PARAMS = [
                     origin=WellOrigin.BOTTOM,
                     offset=WellOffset(x=0, y=0, z=7.89),
                 ),
-            )
+            ),
         ),
     ),
     (
@@ -265,6 +270,25 @@ VALID_TEST_PARAMS = [
             params=pe_commands.WaitForDurationParams(
                 seconds=12.34,
                 message="hello world",
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="moveToCoordinates",
+            params=protocol_schema_v6.Params(
+                pipetteId="pipette-id-abc123",
+                coordinates=protocol_schema_v6.OffsetVector(x=1.1, y=2.2, z=3.3),
+                minimumZHeight=123.4,
+                forceDirect=True,
+            ),
+        ),
+        pe_commands.MoveToCoordinatesCreate(
+            params=pe_commands.MoveToCoordinatesParams(
+                pipetteId="pipette-id-abc123",
+                coordinates=DeckPoint(x=1.1, y=2.2, z=3.3),
+                minimumZHeight=123.4,
+                forceDirect=True,
             )
         ),
     ),

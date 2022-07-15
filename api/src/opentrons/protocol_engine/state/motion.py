@@ -4,12 +4,7 @@ from typing import List, Optional
 
 from opentrons.types import MountType, Point, DeckSlotName
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.motion_planning import (
-    MoveType,
-    Waypoint,
-    MotionPlanningError,
-    get_waypoints,
-)
+from opentrons import motion_planning
 
 from .. import errors
 from ..types import WellLocation
@@ -68,7 +63,7 @@ class MotionView:
             critical_point = CriticalPoint.XY_CENTER
         return PipetteLocationData(mount=mount, critical_point=critical_point)
 
-    def get_movement_waypoints(
+    def get_movement_waypoints_to_well(
         self,
         pipette_id: str,
         labware_id: str,
@@ -78,8 +73,8 @@ class MotionView:
         origin_cp: Optional[CriticalPoint],
         max_travel_z: float,
         current_well: Optional[CurrentWell] = None,
-    ) -> List[Waypoint]:
-        """Get the movement waypoints from an origin to a given location."""
+    ) -> List[motion_planning.Waypoint]:
+        """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_well()
         center_dest = self._labware.get_has_quirk(
             labware_id,
@@ -100,13 +95,13 @@ class MotionView:
             and labware_id == location.labware_id
         ):
             move_type = (
-                MoveType.IN_LABWARE_ARC
+                motion_planning.MoveType.IN_LABWARE_ARC
                 if well_name != location.well_name
-                else MoveType.DIRECT
+                else motion_planning.MoveType.DIRECT
             )
             min_travel_z = self._geometry.get_labware_highest_z(labware_id)
         else:
-            move_type = MoveType.GENERAL_ARC
+            move_type = motion_planning.MoveType.GENERAL_ARC
             min_travel_z = self._geometry.get_all_labware_highest_z()
             if location is not None:
                 if self._module.should_dodge_thermocycler(
@@ -123,8 +118,7 @@ class MotionView:
             #  could crash onto the thermocycler if current well is not known.
 
         try:
-            # TODO(mc, 2021-01-08): inject `get_waypoints` via constructor
-            return get_waypoints(
+            return motion_planning.get_waypoints(
                 move_type=move_type,
                 origin=origin,
                 origin_cp=origin_cp,
@@ -134,5 +128,50 @@ class MotionView:
                 max_travel_z=max_travel_z,
                 xy_waypoints=extra_waypoints,
             )
-        except MotionPlanningError as error:
+        except motion_planning.MotionPlanningError as error:
+            raise errors.FailedToPlanMoveError(str(error))
+
+    def get_movement_waypoints_to_coords(
+        self,
+        origin: Point,
+        dest: Point,
+        max_travel_z: float,
+        direct: bool,
+        additional_min_travel_z: Optional[float],
+    ) -> List[motion_planning.Waypoint]:
+        """Calculate waypoints to a destination that's specified as deck coordinates.
+
+        Args:
+            origin: The start point of the movement.
+            dest: The end point of the movement.
+            max_travel_z: How high, in deck coordinates, the pipette can go.
+                This should be measured at the bottom of whatever tip is currently
+                attached (if any).
+            direct: If True, move directly. If False, move in an arc.
+            additional_min_travel_z: The minimum height to clear, if moving in an arc.
+                Ignored if `direct` is True. If lower than the default height,
+                the default is used; this can only increase the height, not decrease it.
+        """
+        all_labware_highest_z = self._geometry.get_all_labware_highest_z()
+        if additional_min_travel_z is None:
+            additional_min_travel_z = float("-inf")
+        min_travel_z = max(all_labware_highest_z, additional_min_travel_z)
+
+        move_type = (
+            motion_planning.MoveType.DIRECT
+            if direct
+            else motion_planning.MoveType.GENERAL_ARC
+        )
+
+        try:
+            return motion_planning.get_waypoints(
+                origin=origin,
+                dest=dest,
+                min_travel_z=min_travel_z,
+                max_travel_z=max_travel_z,
+                move_type=move_type,
+                origin_cp=None,
+                dest_cp=None,
+            )
+        except motion_planning.MotionPlanningError as error:
             raise errors.FailedToPlanMoveError(str(error))

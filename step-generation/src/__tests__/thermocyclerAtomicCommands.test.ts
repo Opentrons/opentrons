@@ -125,7 +125,6 @@ describe('thermocycler atomic commands', () => {
       const robotInitialState = getRobotInitialState()
       const result = commandCreator(params, invariantContext, robotInitialState)
       const res = getSuccessResult(result)
-      // delete this once params are changed to conform to v6 params
       const v6Params = {
         ...params,
         moduleId: params.module,
@@ -133,9 +132,22 @@ describe('thermocycler atomic commands', () => {
       }
       delete v6Params.module
       delete v6Params.temperature
+      if (v6Params.profile != null) {
+        v6Params.profile = v6Params.profile.map(
+          (profileItem: { temperature: number; holdTime: number }) => ({
+            celsius: profileItem.temperature,
+            holdSeconds: profileItem.holdTime,
+          })
+        )
+      }
+      if (v6Params.volume != null) {
+        v6Params.blockMaxVolumeUl = v6Params.volume
+        delete v6Params.volume
+      }
       expect(res.commands).toEqual([
         {
           commandType: expectedType,
+          key: expect.any(String),
           params: v6Params,
         },
       ])

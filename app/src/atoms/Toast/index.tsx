@@ -24,19 +24,22 @@ export interface ToastProps {
   closeButton?: boolean
   onClose: () => void
   disableTimeout?: boolean
+  duration?: number
 }
 
 const EXPANDED_STYLE = css`
   animation-duration: 300ms;
-  animation-name: slidein;
+  animation-name: slideup;
   overflow: hidden;
 
-  @keyframes slidein {
+  @keyframes slideup {
     from {
-      bottom: 0;
+      opacity: 0;
+      transform: translateY(30%);
     }
     to {
-      bottom: ${SPACING.spacing4};
+      opacity: 1;
+      transform: translateY(0%);
     }
   }
 `
@@ -78,15 +81,17 @@ export function Toast(props: ToastProps): JSX.Element {
     closeButton,
     onClose,
     disableTimeout = false,
+    duration = 5000,
   } = props
 
   if (!disableTimeout) {
     setTimeout(() => {
       onClose()
-    }, 3000)
+    }, duration)
   }
 
   return (
+    // maxWidth is based on default app size ratio
     <Flex
       css={EXPANDED_STYLE}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -98,10 +103,11 @@ export function Toast(props: ToastProps): JSX.Element {
       backgroundColor={toastStyleByType[type].backgroundColor}
       paddingX={SPACING.spacing3}
       paddingY={SPACING.spacing2}
-      right={SPACING.spacing4}
+      right={SPACING.spacing6}
       bottom={SPACING.spacing4}
       position="fixed"
       data-testid={`Toast_${type as string}`}
+      maxWidth="88%"
     >
       <Flex flexDirection="row">
         <Icon

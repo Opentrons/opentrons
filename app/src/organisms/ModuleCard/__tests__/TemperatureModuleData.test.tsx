@@ -75,7 +75,7 @@ describe('TemperatureModuleData', () => {
   it('renders correct temperature information when target temp is null', () => {
     const { getByText } = render(props)
     getByText('Target: N/A')
-    getByText(`Current: ${props.currentTemp}°C`)
+    getByText(`Current: ${props.currentTemp} °C`)
   })
 
   it('renders correct temperature information when target temp is not null', () => {
@@ -85,7 +85,7 @@ describe('TemperatureModuleData', () => {
       currentTemp: mockTemperatureModuleGen2.data.currentTemperature,
     }
     const { getByText } = render(props)
-    getByText(`Target: ${props.targetTemp}°C`)
-    getByText(`Current: ${props.currentTemp}°C`)
+    getByText(`Target: ${props.targetTemp} °C`)
+    getByText(`Current: ${props.currentTemp} °C`)
   })
 })

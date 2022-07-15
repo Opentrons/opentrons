@@ -16,16 +16,15 @@ import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
 import { getStoredProtocol } from '../../../../redux/protocol-storage'
 import { useStoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
+import {
+  LABWARE_BY_ID,
+  LABWARE_DEFINITIONS,
+  MODULE_MODELS_BY_ID,
+  PIPETTE_NAMES_BY_ID,
+  STORED_PROTOCOL_ANALYSIS,
+} from '../__fixtures__/storedProtocolAnalysis'
 
-import type {
-  LoadedLabwareById,
-  LoadedLabwareDefinitionsById,
-  ModuleModelsById,
-  PipetteNamesById,
-  Protocol,
-  Run,
-} from '@opentrons/api-client'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { Protocol, Run } from '@opentrons/api-client'
 
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')
@@ -55,22 +54,6 @@ const store: Store<any> = createStore(jest.fn(), {})
 const RUN_ID = 'the_run_id'
 const PROTOCOL_ID = 'the_protocol_id'
 const PROTOCOL_KEY = 'the_protocol_key'
-
-const LABWARE_BY_ID: LoadedLabwareById = {
-  'labware-0': {
-    definitionId: 'fakeLabwareDefinitionId',
-    displayName: 'a fake labware',
-  },
-}
-const LABWARE_DEFINITIONS: LoadedLabwareDefinitionsById = {
-  fakeLabwareDefinitionId: {} as LabwareDefinition2,
-}
-const MODULE_MODELS_BY_ID: ModuleModelsById = {
-  'module-0': { model: 'thermocyclerModuleV1' },
-}
-const PIPETTE_NAMES_BY_ID: PipetteNamesById = {
-  'pipette-0': { name: 'p10_single' },
-}
 
 describe('useStoredProtocolAnalysis hook', () => {
   let wrapper: React.FunctionComponent<{}>
@@ -156,12 +139,6 @@ describe('useStoredProtocolAnalysis hook', () => {
       wrapper,
     })
 
-    expect(result.current).toEqual({
-      ...storedProtocolData.mostRecentAnalysis,
-      modules: MODULE_MODELS_BY_ID,
-      labware: LABWARE_BY_ID,
-      labwareDefinitions: LABWARE_DEFINITIONS,
-      pipettes: PIPETTE_NAMES_BY_ID,
-    })
+    expect(result.current).toEqual(STORED_PROTOCOL_ANALYSIS)
   })
 })

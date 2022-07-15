@@ -2,7 +2,7 @@ from typing import List, Tuple
 from mock import call, MagicMock, patch
 
 import pytest
-from opentrons.hardware_control import pipette
+from opentrons.hardware_control.instruments import pipette
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage import get, modify, types as CSTypes
 from opentrons.config import robot_configs

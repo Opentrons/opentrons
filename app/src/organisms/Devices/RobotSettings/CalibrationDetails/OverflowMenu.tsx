@@ -34,6 +34,7 @@ import {
 } from '../../hooks'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { DeckCalibrationConfirmModal } from '../DeckCalibrationConfirmModal'
+import { useMenuHandleClickOutside } from '../../../../atoms/MenuList/hooks'
 
 const CAL_BLOCK_MODAL_CLOSED: 'cal_block_modal_closed' =
   'cal_block_modal_closed'
@@ -64,7 +65,12 @@ export function OverflowMenu({
 }: OverflowMenuProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
-  const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const {
+    menuOverlay,
+    handleOverflowClick,
+    showOverflowMenu,
+    setShowOverflowMenu,
+  } = useMenuHandleClickOutside()
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
 
   const calsOverflowWrapperRef = useOnClickOutside({
@@ -144,7 +150,10 @@ export function OverflowMenu({
           confirmStart()
         }
       } else {
-        startPipetteOffsetPossibleTLC({ keepTipLength: false })
+        startPipetteOffsetPossibleTLC({
+          keepTipLength: false,
+          hasBlockModalResponse: null,
+        })
       }
     }
     setShowOverflowMenu(!showOverflowMenu)
@@ -171,12 +180,6 @@ export function OverflowMenu({
         `opentrons-${robotName}-tip-length-calibration.json`
       )
     }
-    setShowOverflowMenu(!showOverflowMenu)
-  }
-
-  const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    e.stopPropagation()
     setShowOverflowMenu(!showOverflowMenu)
   }
 
@@ -211,13 +214,13 @@ export function OverflowMenu({
       {showOverflowMenu ? (
         <Flex
           ref={calsOverflowWrapperRef}
-          width={calType === 'pipetteOffset' ? '11.25rem' : '17.25rem'}
+          width={calType === 'pipetteOffset' ? '11.5rem' : '17.25rem'}
           zIndex={10}
           borderRadius={'4px 4px 0px 0px'}
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
-          top="3rem"
+          top="2.3rem"
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
@@ -254,6 +257,7 @@ export function OverflowMenu({
           />
         </Portal>
       ) : null}
+      {menuOverlay}
     </Flex>
   )
 }

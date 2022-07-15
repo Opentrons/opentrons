@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import isEqual from 'lodash/isEqual'
 import { getCommand } from '@opentrons/api-client'
@@ -8,7 +7,6 @@ import {
   getLabwareDefIsStandard,
   getLabwareDisplayName,
   IDENTITY_VECTOR,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   useHost,
@@ -16,16 +14,12 @@ import {
   useCreateCommandMutation,
 } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../../redux/analytics'
-import { sendModuleCommand } from '../../../redux/modules'
 import {
   useCurrentRunId,
   useCurrentRunCommands,
   useCurrentProtocol,
 } from '../../ProtocolUpload/hooks'
-import {
-  useAttachedModules,
-  useProtocolDetailsForRun,
-} from '../../Devices/hooks'
+import { useProtocolDetailsForRun } from '../../Devices/hooks'
 import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
 import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
 import { useSteps } from './useSteps'
@@ -256,9 +250,6 @@ export function useLabwarePositionCheck(
   const host = useHost()
   const trackEvent = useTrackEvent()
   const LPCSteps = useSteps(currentRunId)
-  const dispatch = useDispatch()
-  const robotName = host?.robotName ?? ''
-  const attachedModules = useAttachedModules()
 
   const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCreateCommand[]>(
     (commands, currentStep) => {
@@ -558,27 +549,13 @@ export function useLabwarePositionCheck(
 
     // execute prep commands
     prepCommands.forEach(prepCommand => {
-      // 11/18/21 intercept TCOpenLidCommand and use legacy modules endpoint
-      // delete this once PE supports themocycler open lid command
-      if (prepCommand.commandType === 'thermocycler/openLid') {
-        const serial = attachedModules.find(
-          module => module.moduleType === THERMOCYCLER_MODULE_TYPE
-        )?.serialNumber
-        if (serial == null) {
-          throw new Error(
-            'Expected to be able to find thermocycler serial number, but could not.'
-          )
-        }
-        dispatch(sendModuleCommand(robotName, serial, 'open'))
-      } else {
-        createCommand({
-          runId: currentRunId,
-          command: createCommandData(prepCommand),
-        }).catch((e: Error) => {
-          console.error(`error issuing command to robot: ${e.message}`)
-          setError(e)
-        })
-      }
+      createCommand({
+        runId: currentRunId,
+        command: createCommandData(prepCommand),
+      }).catch((e: Error) => {
+        console.error(`error issuing command to robot: ${e.message}`)
+        setError(e)
+      })
     })
     // issue first movement command
     createCommand({

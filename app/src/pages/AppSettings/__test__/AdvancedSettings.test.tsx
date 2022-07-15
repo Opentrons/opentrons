@@ -15,6 +15,7 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
+import { useTrackEvent } from '../../../redux/analytics'
 import * as CustomLabware from '../../../redux/custom-labware'
 import * as Config from '../../../redux/config'
 import * as SystemInfo from '../../../redux/system-info'
@@ -28,6 +29,7 @@ jest.mock('../../../redux/custom-labware')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/system-info')
 jest.mock('@opentrons/components/src/hooks')
+jest.mock('../../../redux/analytics')
 
 const render = (): ReturnType<typeof renderWithProviders> => {
   return renderWithProviders(
@@ -80,11 +82,18 @@ const mockOpenPythonInterpreterDirectory = Config.openPythonInterpreterDirectory
   typeof Config.openPythonInterpreterDirectory
 >
 
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
+
+let mockTrackEvent: jest.Mock
 const mockConfirm = jest.fn()
 const mockCancel = jest.fn()
 
 describe('AdvancedSettings', () => {
   beforeEach(() => {
+    mockTrackEvent = jest.fn()
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     getCustomLabwarePath.mockReturnValue('')
     getChannelOptions.mockReturnValue([
       {
@@ -138,7 +147,12 @@ describe('AdvancedSettings', () => {
   it('renders the custom labware section with no source folder selected', () => {
     const [{ getByText, getByRole }] = render()
     getByText('No additional source folder specified')
-    getByRole('button', { name: 'Add labware source folder' })
+    const btn = getByRole('button', { name: 'Add labware source folder' })
+    fireEvent.click(btn)
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'changeCustomLabwareSourceFolder',
+      properties: {},
+    })
   })
   it('renders the tip length cal section', () => {
     const [{ getByRole }] = render()
@@ -275,6 +289,10 @@ describe('AdvancedSettings', () => {
     input.click = jest.fn()
     fireEvent.click(button)
     expect(input.click).toHaveBeenCalled()
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'changePathToPythonDirectory',
+      properties: {},
+    })
   })
 
   it('renders the path to python override text and button with a selected path', () => {

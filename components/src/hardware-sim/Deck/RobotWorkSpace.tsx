@@ -48,7 +48,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
 
   let wholeDeckViewBox
   let deckSlotsById = {}
-  if (deckDef) {
+  if (deckDef != null) {
     const [viewBoxOriginX, viewBoxOriginY] = deckDef.cornerOffsetFromOrigin
     const [deckXDimension, deckYDimension] = deckDef.dimensions
 
@@ -66,10 +66,10 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element | null {
       ref={wrapperRef}
       id={id}
     >
-      {deckDef && (
+      {deckDef != null && (
         <DeckFromData def={deckDef} layerBlocklist={deckLayerBlocklist} />
       )}
-      {children && children({ deckSlotsById, getRobotCoordsFromDOMCoords })}
+      {children?.({ deckSlotsById, getRobotCoordsFromDOMCoords })}
     </svg>
   )
 }

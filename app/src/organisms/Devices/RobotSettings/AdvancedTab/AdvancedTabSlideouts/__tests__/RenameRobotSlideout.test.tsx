@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../../i18n'
+import { useTrackEvent } from '../../../../../../redux/analytics'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -15,6 +16,7 @@ import {
 import { RenameRobotSlideout } from '../RenameRobotSlideout'
 
 jest.mock('../../../../../../redux/discovery/selectors')
+jest.mock('../../../../../../redux/analytics')
 
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
@@ -22,8 +24,13 @@ const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
 const mockGetReachableRobots = getReachableRobots as jest.MockedFunction<
   typeof getReachableRobots
 >
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
 
 const mockOnCloseClick = jest.fn()
+let mockTrackEvent: jest.Mock
+
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
@@ -39,6 +46,8 @@ const render = () => {
 
 describe('RobotSettings RenameRobotSlideout', () => {
   beforeEach(() => {
+    mockTrackEvent = jest.fn()
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockConnectableRobot.name = 'connectableOtie'
     mockReachableRobot.name = 'reachableOtie'
     mockGetConnectableRobots.mockReturnValue([mockConnectableRobot])
@@ -73,6 +82,11 @@ describe('RobotSettings RenameRobotSlideout', () => {
       expect(input).toHaveValue('mockInput')
       const renameButton = getByRole('button', { name: 'Rename robot' })
       expect(renameButton).not.toBeDisabled()
+      fireEvent.click(renameButton)
+      expect(mockTrackEvent).toHaveBeenCalledWith({
+        name: 'renameRobot',
+        properties: { newRobotName: 'mockInput', previousRobotName: 'otie' },
+      })
     })
   })
 

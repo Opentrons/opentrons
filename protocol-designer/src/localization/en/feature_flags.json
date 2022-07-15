@@ -19,5 +19,9 @@
   "OT_PD_ENABLE_SCHEMA_V6": {
     "title": "Enable schema v6 support",
     "description": "Allow users to migrate older protocols to schema v6"
+  },
+  "OT_PD_ENABLE_LIQUID_COLOR_ENHANCEMENTS": {
+    "title": "Enable liquid color enhancements",
+    "description": "Allow users to enable liquid color picking"
   }
 }

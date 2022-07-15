@@ -1,6 +1,8 @@
 import * as React from 'react'
+
 import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 import { useCurrentRunId } from './useCurrentRunId'
+
 import type { UseDismissCurrentRunMutationOptions } from '@opentrons/react-api-client/src/runs/useDismissCurrentRunMutation'
 
 type CloseCallback = (options?: UseDismissCurrentRunMutationOptions) => void
@@ -10,6 +12,7 @@ export function useCloseCurrentRun(): {
   isClosingCurrentRun: boolean
 } {
   const currentRunId = useCurrentRunId()
+
   const {
     dismissCurrentRun,
     isLoading: isDismissing,
@@ -25,6 +28,7 @@ export function useCloseCurrentRun(): {
       })
     }
   }
+
   const closeCurrentRunCallback = React.useCallback(closeCurrentRun, [
     dismissCurrentRun,
     currentRunId,

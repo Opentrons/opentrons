@@ -9,7 +9,6 @@ from opentrons_hardware.drivers.can_bus import build, CanMessenger
 from opentrons_hardware.firmware_bindings.constants import NodeId
 
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    SetupRequest,
     EnableMotorRequest,
 )
 from opentrons_hardware.hardware_control.motion import (
@@ -47,7 +46,6 @@ LOG_CONFIG = {
 
 async def run_move(messenger: CanMessenger) -> None:
     """Run the move."""
-    await messenger.send(node_id=NodeId.broadcast, message=SetupRequest())
     await messenger.send(node_id=NodeId.broadcast, message=EnableMotorRequest())
 
     # TODO (al, 2021-11-11): Allow creating groups from command line or config file.

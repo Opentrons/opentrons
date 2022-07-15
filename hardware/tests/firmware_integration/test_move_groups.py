@@ -123,7 +123,7 @@ async def test_move_integration(
     ]
     home_runner = MoveGroupRunner([home_move])
     position = await home_runner.run(can_messenger)
-    assert position == {motor_node: 0.0 for motor_node in all_motor_nodes}
+    assert position == {motor_node: (0.0, 0.0) for motor_node in all_motor_nodes}
     # these moves test position accumulation to reasonably realistic values
     # and have to do it over a kind of long time so that the velocities are low
     # enough that the pipettes, with their extremely high steps/mm values,
@@ -183,7 +183,9 @@ async def test_move_integration(
     #   10e-3 mm
     #  All of this lines up to mean you have to give some wiggle room for positions.
     #  Also mypy doesn't like pytest.approx so we have to type ignore it
-    assert position == {  # type: ignore[comparison-overlap]
+
+    # We now store the position as a tuple of assumed position + encoder value.
+    assert {k: v[0] for k, v in position.items()} == {  # type: ignore[comparison-overlap]
         motor_node: pytest.approx(
             motor_node.value, abs=all_motor_node_step_sizes[motor_node] * 3
         )

@@ -7,6 +7,7 @@ from opentrons.protocol_engine.errors import (
     InvalidTargetTemperatureError,
     InvalidTargetSpeedError,
     NoTargetTemperatureSetError,
+    CannotPerformModuleAction,
 )
 
 HeaterShakerModuleId = NewType("HeaterShakerModuleId", str)
@@ -26,6 +27,8 @@ class HeaterShakerModuleSubState:
     """
 
     module_id: HeaterShakerModuleId
+    is_labware_latch_closed: bool
+    is_plate_shaking: bool
     plate_target_temperature: Optional[float]
 
     def get_plate_target_temperature(self) -> float:
@@ -63,4 +66,18 @@ class HeaterShakerModuleSubState:
             raise InvalidTargetSpeedError(
                 f"Heater-Shaker got invalid speed of {rpm}RPM. Valid range is "
                 f"{HEATER_SHAKER_SPEED_RANGE}."
+            )
+
+    def raise_if_labware_latch_not_closed(self) -> None:
+        """Raise an error if labware is not latched on the heater-shaker."""
+        if not self.is_labware_latch_closed:
+            raise CannotPerformModuleAction(
+                "Heater-Shaker can't start shaking while the labware latch is open."
+            )
+
+    def raise_if_shaking(self) -> None:
+        """Raise an error if the heater-shaker is currently shaking."""
+        if self.is_plate_shaking:
+            raise CannotPerformModuleAction(
+                "Heater-Shaker can't open its labware latch while it is shaking."
             )

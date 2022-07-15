@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
   DIRECTION_ROW,
   Flex,
@@ -49,7 +50,9 @@ export const FirmwareUpdateFailedModal = (
         data-testid={`FirmwareUpdateFailedModal_body_text_${module.serialNumber}`}
       >
         <Text paddingBottom={SPACING.spacing2}>
-          {t('an_error_occurred_while_updating_please_try_again')}
+          {t('an_error_occurred_while_updating_module', {
+            moduleName: getModuleDisplayName(module.moduleModel),
+          })}
         </Text>
         <Text>{errorMessage}</Text>
       </Flex>

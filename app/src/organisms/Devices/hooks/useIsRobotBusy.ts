@@ -1,10 +1,21 @@
-import { useAllSessionsQuery } from '@opentrons/react-api-client'
+import {
+  useAllSessionsQuery,
+  useAllRunsQuery,
+} from '@opentrons/react-api-client'
 
-import { useCurrentRunId } from '../../ProtocolUpload/hooks'
+const ROBOT_STATUS_POLL_MS = 30000
 
-export function useIsRobotBusy(): boolean {
-  const robotHasCurrentRun = useCurrentRunId() !== null
-  const allSessionsQueryResponse = useAllSessionsQuery()
+interface UseIsRobotBusyOptions {
+  poll: boolean
+}
+export function useIsRobotBusy(
+  options: UseIsRobotBusyOptions = { poll: false }
+): boolean {
+  const { poll } = options
+  const queryOptions = poll ? { refetchInterval: ROBOT_STATUS_POLL_MS } : {}
+  const robotHasCurrentRun =
+    useAllRunsQuery(queryOptions)?.data?.links?.current != null
+  const allSessionsQueryResponse = useAllSessionsQuery(queryOptions)
   return (
     robotHasCurrentRun ||
     (allSessionsQueryResponse?.data?.data != null &&

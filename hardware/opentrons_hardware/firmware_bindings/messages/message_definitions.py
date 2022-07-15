@@ -93,11 +93,6 @@ class MoveRequest:  # noqa: D101
 
 
 @dataclass
-class SetupRequest(EmptyPayloadMessage):  # noqa: D101
-    message_id: Literal[MessageId.setup_request] = MessageId.setup_request
-
-
-@dataclass
 class WriteToEEPromRequest:  # noqa: D101
     payload: payloads.EEPromDataPayload
     payload_type: Type[payloads.EEPromDataPayload] = payloads.EEPromDataPayload
@@ -172,6 +167,24 @@ class MoveCompleted:  # noqa: D101
     payload: payloads.MoveCompletedPayload
     payload_type: Type[payloads.MoveCompletedPayload] = payloads.MoveCompletedPayload
     message_id: Literal[MessageId.move_completed] = MessageId.move_completed
+
+
+@dataclass
+class EncoderPositionRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.encoder_position_request
+    ] = MessageId.encoder_position_request
+
+
+@dataclass
+class EncoderPositionResponse:  # noqa: D101
+    payload: payloads.EncoderPositionResponse
+    payload_type: Type[
+        payloads.EncoderPositionResponse
+    ] = payloads.EncoderPositionResponse
+    message_id: Literal[
+        MessageId.encoder_position_response
+    ] = MessageId.encoder_position_response
 
 
 @dataclass

@@ -81,6 +81,10 @@ load-g-code-configuration-comparison:
 	$(if $(name),,$(error name variable required))
 	$(pipenv) run python cli.py load-comparison ${name}
 
+.PHONY: diff-g-code-configuration-comparison
+diff-g-code-configuration-comparison:
+	$(if $(name),,$(error name variable required))
+	$(pipenv) run python cli.py diff ${name}
 
 .PHONY: update-g-code-configuration-comparison
 update-g-code-configuration-comparison:

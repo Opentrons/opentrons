@@ -35,6 +35,7 @@ import {
 import { Modal } from '../../atoms/Modal'
 import { Portal } from '../../App/portal'
 import { Toast } from '../../atoms/Toast'
+import { useTrackEvent } from '../../redux/analytics'
 import {
   getU2EAdapterDevice,
   getU2EWindowsDriverStatus,
@@ -73,6 +74,7 @@ export function AdvancedSettings(): JSX.Element {
   const useTrashSurfaceForTipCal = useSelector((state: State) =>
     Config.getUseTrashSurfaceForTipCal(state)
   )
+  const trackEvent = useTrackEvent()
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
   const channel = useSelector(Config.getUpdateChannel)
   const channelOptions: DropdownOption[] = useSelector(
@@ -163,6 +165,10 @@ export function AdvancedSettings(): JSX.Element {
 
   const handleClickPythonDirectoryChange: React.MouseEventHandler<HTMLButtonElement> = _event => {
     pythonDirectoryFileInput.current?.click()
+    trackEvent({
+      name: 'changePathToPythonDirectory',
+      properties: {},
+    })
   }
 
   const setPythonInterpreterDirectory: React.ChangeEventHandler<HTMLInputElement> = event => {
@@ -283,8 +289,8 @@ export function AdvancedSettings(): JSX.Element {
             </StyledText>
             {labwarePath !== '' ? (
               <Link
+                role="button"
                 css={TYPOGRAPHY.pRegular}
-                external
                 color={COLORS.darkBlack}
                 onClick={() =>
                   dispatch(CustomLabware.openCustomLabwareDirectory())
@@ -305,9 +311,13 @@ export function AdvancedSettings(): JSX.Element {
           {
             <TertiaryButton
               marginLeft={SPACING_AUTO}
-              onClick={() =>
+              onClick={() => {
                 dispatch(CustomLabware.changeCustomLabwareDirectory())
-              }
+                trackEvent({
+                  name: 'changeCustomLabwareSourceFolder',
+                  properties: {},
+                })
+              }}
               id="AdvancedSettings_changeLabwareSource"
             >
               {labwarePath !== ''
@@ -542,8 +552,8 @@ export function AdvancedSettings(): JSX.Element {
             </StyledText>
             {pathToPythonInterpreter !== null ? (
               <Link
+                role="button"
                 css={TYPOGRAPHY.pRegular}
-                external
                 color={COLORS.darkBlack}
                 onClick={() =>
                   dispatch(Config.openPythonInterpreterDirectory())

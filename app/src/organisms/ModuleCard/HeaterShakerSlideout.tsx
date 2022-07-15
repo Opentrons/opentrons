@@ -25,11 +25,13 @@ import {
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import { InputField } from '../../atoms/InputField'
-import { useModuleIdFromRun } from './useModuleIdFromRun'
+import { Portal } from '../../App/portal'
+import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { useRunStatuses } from '../Devices/hooks'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type { HeaterShakerModule } from '../../redux/modules/types'
 import type {
@@ -42,43 +44,62 @@ interface HeaterShakerSlideoutProps {
   onCloseClick: () => unknown
   isExpanded: boolean
   isSetShake: boolean
-  runId?: string
+  isLoadedInRun: boolean
+  currentRunId?: string
 }
 
 export const HeaterShakerSlideout = (
   props: HeaterShakerSlideoutProps
 ): JSX.Element | null => {
-  const { module, onCloseClick, isExpanded, isSetShake, runId } = props
+  const {
+    module,
+    onCloseClick,
+    isExpanded,
+    isSetShake,
+    isLoadedInRun,
+    currentRunId,
+  } = props
   const { t } = useTranslation('device_details')
-  const [hsValue, setHsValue] = React.useState<string | null>(null)
+  const [hsValue, setHsValue] = React.useState<number | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { isRunIdle, isRunTerminal } = useRunStatuses()
   const { createCommand } = useCreateCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const { moduleIdFromRun } = useModuleIdFromRun(
     module,
-    runId != null ? runId : null
+    currentRunId != null ? currentRunId : null
   )
   const modulePart = isSetShake ? t('shake_speed') : t('temperature')
+
+  let moduleId: string
+  if (isRunIdle && currentRunId != null && isLoadedInRun) {
+    moduleId = moduleIdFromRun
+  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
+    moduleId = module.id
+  }
 
   const sendShakeSpeedCommand = (): void => {
     if (hsValue != null && isSetShake) {
       const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
         commandType: 'heaterShaker/setAndWaitForShakeSpeed',
         params: {
-          moduleId: runId != null ? moduleIdFromRun : module.id,
-          rpm: parseInt(hsValue),
+          moduleId: moduleId,
+          rpm: hsValue,
         },
       }
-      if (runId != null) {
-        createCommand({ runId: runId, command: setShakeCommand }).catch(
+      if (isRunIdle && currentRunId != null && isLoadedInRun) {
+        createCommand({ runId: currentRunId, command: setShakeCommand }).catch(
           (e: Error) => {
             console.error(
-              `error setting heater shaker shake speed: ${e.message} with run id ${runId}`
+              `error setting heater shaker shake speed: ${e.message} with run id ${currentRunId}`
             )
           }
         )
-      } else {
+      } else if (
+        (currentRunId != null && isRunTerminal) ||
+        currentRunId == null
+      ) {
         createLiveCommand({
           command: setShakeCommand,
         }).catch((e: Error) => {
@@ -98,24 +119,30 @@ export const HeaterShakerSlideout = (
     !configHasHeaterShakerAttached
   )
 
-  const sendSetTemperatureOrShakeCommand = (): void => {
+  const sendSetTemperatureOrShakeCommand: React.MouseEventHandler<HTMLInputElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+
     if (hsValue != null && !isSetShake) {
       const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
         commandType: 'heaterShaker/setTargetTemperature',
         params: {
-          moduleId: runId != null ? moduleIdFromRun : module.id,
-          celsius: parseInt(hsValue),
+          moduleId: moduleId,
+          celsius: hsValue,
         },
       }
-      if (runId != null) {
-        createCommand({ runId: runId, command: setTempCommand }).catch(
+      if (isRunIdle && currentRunId != null && isLoadedInRun) {
+        createCommand({ runId: currentRunId, command: setTempCommand }).catch(
           (e: Error) => {
             console.error(
-              `error setting module status with command type ${setTempCommand.commandType} with run id ${runId}: ${e.message}`
+              `error setting module status with command type ${setTempCommand.commandType} with run id ${currentRunId}: ${e.message}`
             )
           }
         )
-      } else {
+      } else if (
+        (currentRunId != null && isRunTerminal) ||
+        currentRunId == null
+      ) {
         createLiveCommand({
           command: setTempCommand,
         }).catch((e: Error) => {
@@ -125,20 +152,23 @@ export const HeaterShakerSlideout = (
         })
       }
     }
-    isSetShake ? confirmAttachment() : setHsValue(null)
+    if (isSetShake) {
+      confirmAttachment()
+    } else {
+      setHsValue(null)
+      onCloseClick()
+    }
   }
 
   let errorMessage
   if (isSetShake) {
     errorMessage =
-      hsValue != null &&
-      (parseInt(hsValue) < HS_RPM_MIN || parseInt(hsValue) > HS_RPM_MAX)
+      hsValue != null && (hsValue < HS_RPM_MIN || hsValue > HS_RPM_MAX)
         ? t('input_out_of_range')
         : null
   } else {
     errorMessage =
-      hsValue != null &&
-      (parseInt(hsValue) < HS_TEMP_MIN || parseInt(hsValue) > HS_TEMP_MAX)
+      hsValue != null && (hsValue < HS_TEMP_MIN || hsValue > HS_TEMP_MAX)
         ? t('input_out_of_range')
         : null
   }
@@ -147,31 +177,37 @@ export const HeaterShakerSlideout = (
   const inputMin = isSetShake ? HS_RPM_MIN : HS_TEMP_MIN
   const unit = isSetShake ? RPM : CELSIUS
 
+  const handleCloseSlideout = (): void => {
+    setHsValue(null)
+    onCloseClick()
+  }
+
   return (
     <>
       {showConfirmationModal && (
-        <ConfirmAttachmentModal
-          onCloseClick={cancelExit}
-          isProceedToRunModal={false}
-          onConfirmClick={sendShakeSpeedCommand}
-        />
+        <Portal level="top">
+          <ConfirmAttachmentModal
+            onCloseClick={cancelExit}
+            isProceedToRunModal={false}
+            onConfirmClick={sendShakeSpeedCommand}
+          />
+        </Portal>
       )}
       <Slideout
         title={t('set_status_heater_shaker', {
           part: modulePart,
           name: moduleName,
         })}
-        onCloseClick={onCloseClick}
+        onCloseClick={handleCloseSlideout}
         isExpanded={isExpanded}
         footer={
-          <PrimaryButton
+          <SubmitPrimaryButton
+            form="HeaterShakerSlideout_submitValue"
+            value={t('confirm')}
             onClick={sendSetTemperatureOrShakeCommand}
             disabled={hsValue === null || errorMessage !== null}
-            width="100%"
             data-testid={`HeaterShakerSlideout_btn_${module.serialNumber}`}
-          >
-            {t('confirm')}
-          </PrimaryButton>
+          />
         }
       >
         <Text
@@ -195,21 +231,23 @@ export const HeaterShakerSlideout = (
           >
             {isSetShake ? t('set_shake_speed') : t('set_block_temp')}
           </Text>
-          <InputField
-            data-testid={`${module.moduleModel}_${isSetShake}`}
-            id={`${module.moduleModel}_${isSetShake}`}
-            autoFocus
-            units={unit}
-            value={hsValue}
-            onChange={e => setHsValue(e.target.value)}
-            type="number"
-            caption={t('module_status_range', {
-              min: inputMin,
-              max: inputMax,
-              unit: unit,
-            })}
-            error={errorMessage}
-          />
+          <form id="HeaterShakerSlideout_submitValue">
+            <InputField
+              data-testid={`${module.moduleModel}_${isSetShake}`}
+              id={`${module.moduleModel}_${isSetShake}`}
+              units={unit}
+              autoFocus
+              value={hsValue != null ? Math.round(hsValue) : null}
+              onChange={e => setHsValue(e.target.valueAsNumber)}
+              type="number"
+              caption={t('module_status_range', {
+                min: inputMin,
+                max: inputMax,
+                unit: unit,
+              })}
+              error={errorMessage}
+            />
+          </form>
         </Flex>
       </Slideout>
     </>

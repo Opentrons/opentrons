@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
-import { useRobot } from '../../../organisms/Devices/hooks'
+import { useRobot, useSyncRobotClock } from '../../../organisms/Devices/hooks'
 import { PipettesAndModules } from '../../../organisms/Devices/PipettesAndModules'
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
@@ -22,8 +22,9 @@ import type { NavRouteParams } from '../../../App/types'
 
 export function DeviceDetails(): JSX.Element | null {
   const { robotName } = useParams<NavRouteParams>()
-
   const robot = useRobot(robotName)
+
+  useSyncRobotClock(robotName)
 
   return robot != null ? (
     <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
@@ -31,9 +32,11 @@ export function DeviceDetails(): JSX.Element | null {
         minWidth={SIZE_6}
         height="100%"
         overflow={OVERFLOW_SCROLL}
-        padding={SPACING.spacing4}
+        paddingX={SPACING.spacing4}
+        paddingTop={SPACING.spacing4}
+        paddingBottom={SPACING.spacing7}
       >
-        {/* TODO(va, 2022-06-17) update border color to 
+        {/* TODO(va, 2022-06-17) update border color to
             COLORS.medGreyEnabled when PR #10664 is merged */}
         <Flex
           alignItems={ALIGN_CENTER}
@@ -43,7 +46,7 @@ export function DeviceDetails(): JSX.Element | null {
           flexDirection={DIRECTION_COLUMN}
           marginBottom={SPACING.spacing4}
           paddingX={SPACING.spacing4}
-          paddingBottom={SPACING.spacing4}
+          paddingBottom={SPACING.spacing2}
           width="100%"
         >
           <RobotOverview robotName={robotName} />

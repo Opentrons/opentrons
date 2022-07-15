@@ -56,7 +56,7 @@ DEFAULT_DECK_TRANSFORM: Final[OT3Transform] = [
 DEFAULT_CARRIAGE_OFFSET: Final[Offset] = (436.605, 484.975, 233.475)
 DEFAULT_LEFT_MOUNT_OFFSET: Final[Offset] = (-21.0, -63.05, 256.175)
 DEFAULT_RIGHT_MOUNT_OFFSET: Final[Offset] = (33, -63.05, 256.175)
-DEFAULT_GRIPPER_MOUNT_OFFSET: Final[Offset] = (-50.0, 0.0, 0.0)
+DEFAULT_GRIPPER_MOUNT_OFFSET: Final[Offset] = (82.15, -16, 92.55)
 DEFAULT_Z_RETRACT_DISTANCE: Final = 2
 
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
@@ -213,21 +213,22 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
     high_throughput={
         OT3AxisKind.X: 1.0,
         OT3AxisKind.Y: 1.0,
-        OT3AxisKind.Z: 1.0,
+        OT3AxisKind.Z: 1.4,
         OT3AxisKind.P: 1.0,
     },
     low_throughput={
         OT3AxisKind.X: 1.0,
         OT3AxisKind.Y: 1.0,
-        OT3AxisKind.Z: 1.0,
+        OT3AxisKind.Z: 1.4,
         OT3AxisKind.P: 1.0,
     },
     two_low_throughput={
         OT3AxisKind.X: 1.0,
         OT3AxisKind.Y: 1.0,
+        OT3AxisKind.Z: 1.4,
     },
     gripper={
-        OT3AxisKind.Z: 1.0,
+        OT3AxisKind.Z: 1.4,
     },
 )
 

@@ -17,6 +17,7 @@ const TYPOGRAPHY_PROPS = [
   'textAlign',
   'textTransform',
   'textDecoration',
+  'textOverflow',
 ] as const
 
 const SPACING_PROPS = [
@@ -55,6 +56,7 @@ const FLEXBOX_PROPS = [
   'flexDirection',
   'flexWrap',
   'alignSelf',
+  'whiteSpace',
 ] as const
 
 const GRID_PROPS = [
@@ -80,6 +82,7 @@ const LAYOUT_PROPS = [
   'whiteSpace',
   'wordSpacing',
   'cursor',
+  'overflowWrap',
 ] as const
 
 const POSITION_PROPS = [

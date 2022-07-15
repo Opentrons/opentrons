@@ -5,6 +5,7 @@ export const lightBlue = '#f1f8ff'
 export const medGrey = '#e3e3e3'
 export const black = '#000000'
 export const transparent = 'transparent'
+export const fundamentalsBackgroundShade = '#eeeeee'
 
 // colors with states
 export const blueFocus = '#deecff'
@@ -16,7 +17,7 @@ export const medBlue = '#d9e9fe'
 export const disabled = '#a0a0a0'
 export const medGreyHover = '#b8b8b8'
 export const darkBlack = '#16212D'
-export const darkBlackHover = '#24313f'
+export const darkBlackHover = '#24313F'
 export const darkBlackPressed = '#16212D'
 export const darkBlackSelected = '#39495B'
 // note: darkBlackDisabled = greyDisabled
@@ -58,3 +59,28 @@ export const warningBg = '#fffcf5'
 export const alphaToOpacity35 = '35'
 
 export const backgroundOverlay = `${darkBlack}${alphaToOpacity35}`
+
+// colors liquid
+export const electricPurple = '#b925ff'
+export const goldenYellow = '#ffd600'
+export const aquamarine = '#9dffd8'
+export const orangePeel = '#ff9900'
+export const skyBlue = '#50d5ff'
+export const popPink = '#ff80f5'
+export const richBlue = '#0380fb'
+export const springGreen = '#7eff42'
+export const tartRed = '#ff4f4f'
+export const whaleGrey = '#9395a0'
+
+export const liquidColors = [
+  electricPurple,
+  goldenYellow,
+  aquamarine,
+  orangePeel,
+  skyBlue,
+  popPink,
+  richBlue,
+  springGreen,
+  tartRed,
+  whaleGrey,
+]

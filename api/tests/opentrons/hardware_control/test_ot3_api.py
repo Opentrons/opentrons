@@ -6,12 +6,27 @@ from math import copysign
 import pytest
 from mock import AsyncMock, patch
 from opentrons.config.types import GantryLoad, CapacitivePassSettings
-from opentrons.hardware_control.dev_types import InstrumentDict
-from opentrons.hardware_control.types import OT3Mount, OT3Axis
+from opentrons.hardware_control.dev_types import (
+    InstrumentDict,
+    AttachedGripper,
+)
+from opentrons.hardware_control.instruments.gripper_handler import (
+    GripError,
+)
+from opentrons.hardware_control.types import (
+    OT3Mount,
+    OT3Axis,
+    GripperNotAttachedError,
+    InvalidMoveError,
+    CriticalPoint,
+)
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.backends.ot3utils import axis_to_node
 from opentrons.types import Point
+
+from opentrons.config import gripper_config as gc
+from opentrons_shared_data.gripper.dev_types import GripperModel
 
 
 @pytest.fixture
@@ -48,6 +63,42 @@ def mock_gantry_position(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncM
         ),
     ) as mock_gantry_pos:
         yield mock_gantry_pos
+
+
+@pytest.fixture
+def mock_grip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "_grip",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj._grip,
+            wraps=ot3_hardware.managed_obj._grip,
+        ),
+    ) as mock_move:
+        yield mock_move
+
+
+@pytest.fixture
+def mock_ungrip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "_ungrip",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj._ungrip,
+            wraps=ot3_hardware.managed_obj._ungrip,
+        ),
+    ) as mock_move:
+        yield mock_move
+
+
+@pytest.fixture
+async def mock_backend_move(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj._backend,
+        "move",
+        AsyncMock(spec=ot3_hardware.managed_obj._backend.move),
+    ) as mock_move:
+        yield mock_move
 
 
 @pytest.mark.parametrize(
@@ -296,3 +347,138 @@ async def test_capacitive_sweep_invalid_axes(
         )
     mock_move_to.assert_not_called()
     mock_backend_capacitive_probe.assert_not_called()
+
+
+async def test_cache_gripper(ot3_hardware: ThreadManager[OT3API]) -> None:
+    assert not ot3_hardware._gripper_handler.gripper
+    gripper_config = gc.load(GripperModel.V1, "g12345")
+    instr_data = AttachedGripper(config=gripper_config, id="g12345")
+    await ot3_hardware.cache_gripper(instr_data)
+    assert ot3_hardware._gripper_handler.gripper
+    assert ot3_hardware._gripper_handler.gripper.gripper_id == "g12345"
+    # make sure the property attached_gripper returns GripperDict
+    assert ot3_hardware.attached_gripper is not None
+    assert ot3_hardware.attached_gripper["gripper_id"] == "g12345"
+
+
+async def test_gripper_action(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_grip: AsyncMock,
+    mock_ungrip: AsyncMock,
+) -> None:
+    with pytest.raises(
+        GripperNotAttachedError, match="Cannot perform action without gripper attached"
+    ):
+        await ot3_hardware.grip(5.0)
+    mock_grip.assert_not_called()
+
+    with pytest.raises(
+        GripperNotAttachedError, match="Cannot perform action without gripper attached"
+    ):
+        await ot3_hardware.ungrip()
+    mock_ungrip.assert_not_called()
+
+    # cache gripper
+    gripper_config = gc.load(GripperModel.V1, "g12345")
+    instr_data = AttachedGripper(config=gripper_config, id="g12345")
+    await ot3_hardware.cache_gripper(instr_data)
+
+    with pytest.raises(GripError, match="Gripper jaw must be homed before moving"):
+        await ot3_hardware.grip(5.0)
+    await ot3_hardware.home_gripper_jaw()
+    mock_ungrip.assert_called_once()
+    mock_ungrip.reset_mock()
+    await ot3_hardware.home([OT3Axis.G])
+    await ot3_hardware.grip(5.0)
+    mock_grip.assert_called_once_with(
+        gc.piecewise_force_conversion(5.0, gripper_config.jaw_force_per_duty_cycle),
+    )
+
+    await ot3_hardware.ungrip()
+    mock_ungrip.assert_called_once()
+
+
+async def test_gripper_move_fails_with_no_gripper(
+    ot3_hardware: ThreadManager[OT3API],
+) -> None:
+    assert not ot3_hardware._gripper_handler.gripper
+    with pytest.raises(GripperNotAttachedError):
+        await ot3_hardware.move_to(OT3Mount.GRIPPER, Point(0, 0, 0))
+
+
+async def test_gripper_mount_not_movable(
+    ot3_hardware: ThreadManager[OT3API],
+) -> None:
+    gripper_config = gc.load(GripperModel.V1, "g12345")
+    instr_data = AttachedGripper(config=gripper_config, id="g12345")
+    await ot3_hardware.cache_gripper(instr_data)
+    assert ot3_hardware._gripper_handler.gripper
+    with pytest.raises(InvalidMoveError):
+        await ot3_hardware.move_to(
+            OT3Mount.GRIPPER, Point(0, 0, 0), critical_point=CriticalPoint.MOUNT
+        )
+
+
+@pytest.mark.parametrize(
+    "critical_point",
+    [
+        CriticalPoint.NOZZLE,
+        CriticalPoint.TIP,
+        CriticalPoint.XY_CENTER,
+        CriticalPoint.FRONT_NOZZLE,
+    ],
+)
+async def test_gripper_fails_for_pipette_cps(
+    ot3_hardware: ThreadManager[OT3API], critical_point: CriticalPoint
+) -> None:
+    gripper_config = gc.load(GripperModel.V1, "g12345")
+    instr_data = AttachedGripper(config=gripper_config, id="g12345")
+    await ot3_hardware.cache_gripper(instr_data)
+    assert ot3_hardware._gripper_handler.gripper
+    with pytest.raises(InvalidMoveError):
+        await ot3_hardware.move_to(
+            OT3Mount.GRIPPER, Point(0, 0, 0), critical_point=critical_point
+        )
+
+
+async def test_gripper_position(ot3_hardware: ThreadManager[OT3API]):
+    gripper_config = gc.load(GripperModel.V1, "g12345")
+    instr_data = AttachedGripper(config=gripper_config, id="g12345")
+    await ot3_hardware.cache_gripper(instr_data)
+    await ot3_hardware.home()
+    position = await ot3_hardware.gantry_position(OT3Mount.GRIPPER)
+    assert (
+        position
+        == Point(*ot3_hardware.config.carriage_offset)
+        + Point(*ot3_hardware.config.gripper_mount_offset)
+        + ot3_hardware._gripper_handler.gripper._jaw_center_offset
+    )
+
+
+async def test_gripper_move_to(
+    ot3_hardware: ThreadManager[OT3API], mock_backend_move: AsyncMock
+):
+    # Moving the gripper should, well, work
+    gripper_config = gc.load(GripperModel.V1, "g12345")
+    instr_data = AttachedGripper(config=gripper_config, id="g12345")
+    await ot3_hardware.cache_gripper(instr_data)
+
+    await ot3_hardware.move_to(OT3Mount.GRIPPER, Point(0, 0, 0))
+    origin, moves = mock_backend_move.call_args_list[0][0]
+    # The moves that it emits should move only x, y, and the gripper z
+    assert origin == {
+        OT3Axis.X: 0,
+        OT3Axis.Y: 0,
+        OT3Axis.Z_L: 0,
+        OT3Axis.Z_R: 0,
+        OT3Axis.P_L: 0,
+        OT3Axis.P_R: 0,
+        OT3Axis.Z_G: 0,
+        OT3Axis.G: 0,
+    }
+    for move in moves:
+        assert list(sorted(move.unit_vector.keys(), key=lambda elem: elem.value)) == [
+            OT3Axis.X,
+            OT3Axis.Y,
+            OT3Axis.Z_G,
+        ]

@@ -17,10 +17,12 @@ import {
   getReachableRobots,
   getUnreachableRobots,
 } from '../../../../../redux/discovery'
+import { useTrackEvent } from '../../../../../redux/analytics'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
 import { PrimaryButton } from '../../../../../atoms/buttons'
 import { InputField } from '../../../../../atoms/InputField'
+import { Banner } from '../../../../../atoms/Banner'
 
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../../../../redux/types'
@@ -50,6 +52,7 @@ export function RenameRobotSlideout({
   const [previousRobotName, setPreviousRobotName] = React.useState<string>(
     robotName
   )
+  const trackEvent = useTrackEvent()
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
   const connectableRobots = useSelector((state: State) =>
@@ -68,7 +71,6 @@ export function RenameRobotSlideout({
     },
     onSubmit: (values, { resetForm }) => {
       const newName = values.newRobotName
-      console.log('form robotName', robotName)
       setPreviousRobotName(robotName)
       const sameNameRobotInUnavailable = unreachableRobots.find(
         robot => robot.name === newName
@@ -112,6 +114,17 @@ export function RenameRobotSlideout({
     },
   })
 
+  const handleSubmitRobotRename = (): void => {
+    trackEvent({
+      name: 'renameRobot',
+      properties: {
+        previousRobotName,
+        newRobotName: formik.values.newRobotName,
+      },
+    })
+    formik.handleSubmit()
+  }
+
   return (
     <Slideout
       title={t('rename_robot_slideout_title')}
@@ -119,7 +132,7 @@ export function RenameRobotSlideout({
       isExpanded={isExpanded}
       footer={
         <PrimaryButton
-          onClick={() => formik.handleSubmit()}
+          onClick={handleSubmitRobotRename}
           disabled={!(formik.isValid && formik.dirty)}
           width="100%"
         >
@@ -128,6 +141,9 @@ export function RenameRobotSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
+        <Banner type="informing" marginBottom={SPACING.spacing4}>
+          {t('rename_robot_prefer_usb_connection')}
+        </Banner>
         <StyledText as="p" marginBottom={SPACING.spacing4}>
           {t('rename_robot_input_limitation_detail')}
         </StyledText>

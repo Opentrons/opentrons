@@ -13,6 +13,7 @@ export interface ProtocolDetails {
   displayName: string | null
   protocolData: ProtocolAnalysisFile<{}> | null
   protocolKey: string | null
+  isProtocolAnalyzing?: boolean
 }
 
 export function useProtocolDetailsForRun(
@@ -56,5 +57,7 @@ export function useProtocolDetailsForRun(
     protocolData:
       mostRecentAnalysis != null ? schemaV6Adapter(mostRecentAnalysis) : null,
     protocolKey: protocolRecord?.data.key ?? null,
+    isProtocolAnalyzing:
+      mostRecentAnalysis != null && mostRecentAnalysis?.status === 'pending',
   }
 }

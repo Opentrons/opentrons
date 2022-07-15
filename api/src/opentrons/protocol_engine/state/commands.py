@@ -8,7 +8,7 @@ from typing import Dict, List, Mapping, Optional, Union
 
 from opentrons.ordered_set import OrderedSet
 
-from opentrons.hardware_control.types import DoorStateNotification, DoorState
+from opentrons.hardware_control.types import DoorState
 
 from ..actions import (
     Action,
@@ -20,7 +20,7 @@ from ..actions import (
     StopAction,
     FinishAction,
     HardwareStoppedAction,
-    HardwareEventAction,
+    DoorChangeAction,
 )
 
 from ..commands import Command, CommandStatus, CommandIntent
@@ -35,6 +35,7 @@ from ..errors import (
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
+from .config import Config
 
 
 class QueueStatus(str, Enum):
@@ -152,11 +153,17 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
     _state: CommandState
 
-    def __init__(self, is_door_blocking: bool = False) -> None:
+    def __init__(
+        self,
+        *,
+        config: Config,
+        is_door_open: bool,
+    ) -> None:
         """Initialize a CommandStore and its state."""
+        self._config = config
         self._state = CommandState(
             queue_status=QueueStatus.SETUP,
-            is_door_blocking=is_door_blocking,
+            is_door_blocking=is_door_open and config.block_on_door_open,
             run_result=None,
             running_command_id=None,
             all_command_ids=[],
@@ -181,7 +188,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
             # For now, unit tests cover mapping every request type
             queued_command = action.request._CommandCls.construct(
                 id=action.command_id,
-                key=action.command_key,
+                key=(
+                    action.request.key
+                    if action.request.key is not None
+                    # TODO(mc, 2021-12-13): generate a command key from params and state
+                    # https://github.com/Opentrons/opentrons/issues/8986
+                    else action.command_id
+                ),
                 createdAt=action.created_at,
                 params=action.request.params,  # type: ignore[arg-type]
                 intent=action.request.intent,
@@ -296,6 +309,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if not self._state.run_result:
                 self._state.queue_status = QueueStatus.PAUSED
                 self._state.run_result = RunResult.STOPPED
+                self._state.queued_command_ids.clear()
 
         elif isinstance(action, FinishAction):
             if not self._state.run_result:
@@ -324,15 +338,17 @@ class CommandStore(HasState[CommandState], HandlesActions):
         elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.PAUSED
             self._state.run_result = self._state.run_result or RunResult.STOPPED
-            self._state.run_completed_at = action.completed_at
+            self._state.run_completed_at = (
+                self._state.run_completed_at or action.completed_at
+            )
 
-        elif isinstance(action, HardwareEventAction):
-            if isinstance(action.event, DoorStateNotification):
-                if action.event.blocking:
+        elif isinstance(action, DoorChangeAction):
+            if self._config.block_on_door_open:
+                if action.door_state == DoorState.OPEN:
                     self._state.is_door_blocking = True
                     if self._state.queue_status != QueueStatus.SETUP:
                         self._state.queue_status = QueueStatus.PAUSED
-                elif action.event.new_state == DoorState.CLOSED:
+                elif action.door_state == DoorState.CLOSED:
                     self._state.is_door_blocking = False
 
 

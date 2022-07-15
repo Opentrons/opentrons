@@ -15,6 +15,7 @@
   "liquid_edit": {
     "details": "Details",
     "description": "Description",
+    "displayColor": "Color",
     "name": "Liquid name",
     "serialize": "Serialize",
     "serialize_title": "Serialization",

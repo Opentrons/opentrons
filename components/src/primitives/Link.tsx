@@ -22,7 +22,7 @@ export const Link: PrimitiveComponent<'a', LinkProps> = styled.a
     (props: LinkProps): React.ComponentProps<PrimitiveComponent<'a'>> => {
       return props.external === true
         ? { target: '_blank', rel: 'noopener noreferrer' }
-        : {}
+        : { tabIndex: '0' }
     }
   )`
   text-decoration: none;

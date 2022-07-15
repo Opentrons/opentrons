@@ -117,7 +117,7 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'pause':
     case 'waitForResume': {
-      messageNode = displayCommand.params?.message ?? displayCommand.commandType
+      messageNode = displayCommand.params?.message ?? t('wait_for_resume')
       break
     }
     case 'loadLabware':
@@ -133,8 +133,15 @@ export function StepText(props: Props): JSX.Element | null {
       break
     }
     case 'custom': {
+      const { legacyCommandText } = displayCommand.params ?? {}
+      const sanitizedCommandText =
+        typeof legacyCommandText === 'object'
+          ? JSON.stringify(legacyCommandText)
+          : String(legacyCommandText)
       messageNode =
-        displayCommand.params?.legacyCommandText ?? displayCommand.commandType
+        legacyCommandText != null
+          ? sanitizedCommandText
+          : displayCommand.commandType
       break
     }
     default: {

@@ -33,9 +33,9 @@ import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { Tooltip } from '../../atoms/Tooltip'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
+import { useLatchControls } from './hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 import { Collapsible } from './Collapsible'
-import { useLatchControls } from './hooks'
 
 import type { HeaterShakerModule } from '../../redux/modules/types'
 import type {
@@ -195,7 +195,6 @@ export const TestShakeSlideout = (
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
-            paddingX={SPACING.spacing4}
             onClick={toggleLatch}
             disabled={isShaking}
             {...targetProps}
@@ -247,7 +246,6 @@ export const TestShakeSlideout = (
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             marginLeft={SIZE_AUTO}
             marginTop={SPACING.spacing3}
-            paddingX={SPACING.spacing4}
             onClick={handleShakeCommand}
             disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
             {...targetProps}
@@ -297,6 +295,7 @@ export const TestShakeSlideout = (
             <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
           )}
           <Link
+            role="button"
             marginTop={SPACING.spacing2}
             fontSize={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}

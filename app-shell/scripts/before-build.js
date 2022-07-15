@@ -6,6 +6,7 @@ const download = require('download')
 const decompress = require('decompress')
 const crypto = require('crypto')
 const execa = require('execa')
+const USE_PYTHON = process.env.NO_PYTHON !== 'true'
 
 const HOST_PYTHON = process.env.HOST_PYTHON ?? 'python3.10'
 
@@ -44,12 +45,12 @@ module.exports = function beforeBuild(context) {
   const { platform, arch } = context
   const platformName = platform.nodeName
   const standalonePython = PYTHON_BY_PLATFORM?.[platformName]?.[arch]
-
-  if (standalonePython == null) {
-    console.warn(`No standalone Python found for ${platformName}+${arch}`)
-    return Promise.resolve()
+  if (!USE_PYTHON) {
+    return Promise.resolve(true)
   }
-
+  if (standalonePython == null) {
+    throw new Error(`No standalone Python found for ${platformName}+${arch}`)
+  }
   const { url, sha256 } = standalonePython
 
   console.log(
@@ -72,7 +73,9 @@ module.exports = function beforeBuild(context) {
       return decompress(data, PYTHON_DESTINATION)
     })
     .then(() => {
-      console.log('Standalone Python extracted, installing `opentrons` package')
+      console.log(
+        'Standalone Python extracted, installing `opentrons` and `pandas` packages'
+      )
 
       const sitePackages =
         platformName === 'win32'
@@ -88,10 +91,13 @@ module.exports = function beforeBuild(context) {
         `--target=${path.join(PYTHON_DESTINATION, sitePackages)}`,
         path.join(__dirname, '../../shared-data/python'),
         path.join(__dirname, '../../api'),
+        'pandas==1.4.3',
       ])
     })
     .then(({ stdout }) => {
-      console.log("`opentrons` package installed to app's Python environment")
+      console.log(
+        "`opentrons` and `pandas` packages installed to app's Python environment"
+      )
       console.debug('pip output:', stdout)
       // must return a truthy value, or else electron-builder will
       // skip installing project dependencies into the package

@@ -16,7 +16,7 @@ from opentrons.protocols.context.protocol_api.protocol_context import (
 )
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError
-from opentrons.hardware_control.pipette import Pipette
+from opentrons.hardware_control.instruments.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.config.pipette_config import config_names

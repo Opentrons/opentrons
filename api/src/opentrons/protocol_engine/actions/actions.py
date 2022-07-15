@@ -9,7 +9,8 @@ from enum import Enum
 from typing import Optional, Union
 
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.hardware_control.types import HardwareEvent
+from opentrons.hardware_control.types import DoorState
+from opentrons.hardware_control.modules import LiveData
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
@@ -79,10 +80,10 @@ class HardwareStoppedAction:
 
 
 @dataclass(frozen=True)
-class HardwareEventAction:
+class DoorChangeAction:
     """Handle events coming in from hardware control."""
 
-    event: HardwareEvent
+    door_state: DoorState
 
 
 @dataclass(frozen=True)
@@ -90,7 +91,6 @@ class QueueCommandAction:
     """Add a command request to the queue."""
 
     command_id: str
-    command_key: str
     created_at: datetime
     request: CommandCreate
 
@@ -141,6 +141,7 @@ class AddModuleAction:
     module_id: str
     serial_number: str
     definition: ModuleDefinition
+    module_live_data: LiveData
 
 
 Action = Union[
@@ -149,7 +150,7 @@ Action = Union[
     StopAction,
     FinishAction,
     HardwareStoppedAction,
-    HardwareEventAction,
+    DoorChangeAction,
     QueueCommandAction,
     UpdateCommandAction,
     FailCommandAction,
