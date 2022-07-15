@@ -1,6 +1,10 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
+import { HeaterShakerModule } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
+import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
+import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 import { ModuleExtraAttention } from '../ModuleExtraAttention'
 import {
   mockHeaterShaker as mockHeaterShakerAttachedModule,
@@ -9,6 +13,12 @@ import {
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import type { AttachedModule } from '../../../../redux/modules/types'
+
+jest.mock('@opentrons/react-api-client')
+
+const mockUseCreateCommandMutation = useCreateCommandMutation as jest.MockedFunction<
+  typeof useCreateCommandMutation
+>
 
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
 const mockMagneticModule = {
@@ -71,6 +81,28 @@ const mockThermocycler = {
   quirks: [],
 }
 
+const mockHeaterShakerLatchClosed: HeaterShakerModule = {
+  id: 'heatershaker_id',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_closed',
+    speedStatus: 'idle',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemperature: null,
+    targetSpeed: null,
+    targetTemperature: null,
+    errorDetails: null,
+    status: 'idle',
+  },
+  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1, hub: null },
+}
+
 const render = (props: React.ComponentProps<typeof ModuleExtraAttention>) => {
   return renderWithProviders(<ModuleExtraAttention {...props} />, {
     i18nInstance: i18n,
@@ -79,8 +111,15 @@ const render = (props: React.ComponentProps<typeof ModuleExtraAttention>) => {
 
 describe('ModuleExtraAttention', () => {
   let props: React.ComponentProps<typeof ModuleExtraAttention>
+  let mockCreateCommand = jest.fn()
+
   beforeEach(() => {
-    props = { moduleTypes: [], modulesInfo: {} }
+    props = { moduleTypes: [], modulesInfo: {}, runId: RUN_ID_1 }
+    mockCreateCommand = jest.fn()
+    mockCreateCommand.mockResolvedValue(null)
+    mockUseCreateCommandMutation.mockReturnValue({
+      createCommand: mockCreateCommand,
+    } as any)
   })
 
   it('should render the correct title', () => {
@@ -106,6 +145,7 @@ describe('ModuleExtraAttention', () => {
           attachedModuleMatch: null,
         },
       },
+      runId: RUN_ID_1,
     }
 
     const { getByText } = render(props)
@@ -114,7 +154,7 @@ describe('ModuleExtraAttention', () => {
     getByText('View instructions')
   })
 
-  it('if there is a heater shaker module it should show the correct item and button function', () => {
+  it('if there is a heater shaker module it should show the correct item and clicking on button sends close command', () => {
     props = {
       moduleTypes: [mockHeaterShaker.moduleType],
       modulesInfo: {
@@ -132,12 +172,58 @@ describe('ModuleExtraAttention', () => {
           attachedModuleMatch: mockHeaterShakerAttachedModule as AttachedModule,
         },
       },
+      runId: RUN_ID_1,
     }
 
-    const { getByText } = render(props)
+    const { getByText, getByRole } = render(props)
     getByText('Heater Shaker Module in Slot 1')
     getByText('Use latch controls for easy placement of labware.')
-    getByText('Close Labware Latch')
+    const closeBtn = getByRole('button', { name: 'Close Labware Latch' })
+    fireEvent.click(closeBtn)
+    expect(mockCreateCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'heaterShaker/closeLabwareLatch',
+        params: {
+          moduleId: mockHeaterShaker.moduleId,
+        },
+      },
+      runId: RUN_ID_1,
+    })
+  })
+
+  it('if there is a heater shaker module and clicking on button sends open latch command', () => {
+    props = {
+      moduleTypes: [mockHeaterShaker.moduleType],
+      modulesInfo: {
+        [mockHeaterShaker.moduleId]: {
+          moduleId: mockHeaterShaker.moduleId,
+          x: 1,
+          y: 1,
+          z: 1,
+          moduleDef: mockHeaterShaker as any,
+          nestedLabwareDisplayName: 'Source Plate',
+          nestedLabwareDef: null,
+          nestedLabwareId: null,
+          protocolLoadOrder: 0,
+          slotName: '1',
+          attachedModuleMatch: mockHeaterShakerLatchClosed as AttachedModule,
+        },
+      },
+      runId: RUN_ID_1,
+    }
+
+    const { getByRole } = render(props)
+    const openBtn = getByRole('button', { name: 'Open Labware Latch' })
+    fireEvent.click(openBtn)
+    expect(mockCreateCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'heaterShaker/openLabwareLatch',
+        params: {
+          moduleId: mockHeaterShaker.moduleId,
+        },
+      },
+      runId: RUN_ID_1,
+    })
   })
 
   it('if there is a thermocycler module it should show the correct information', () => {
@@ -158,6 +244,7 @@ describe('ModuleExtraAttention', () => {
           attachedModuleMatch: mockThermocyclerAttachedModule as AttachedModule,
         },
       },
+      runId: RUN_ID_1,
     }
 
     const { getByText } = render(props)
