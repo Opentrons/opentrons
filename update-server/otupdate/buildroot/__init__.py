@@ -89,7 +89,7 @@ def get_app(
         "Setup: "
         + "\n\t".join(
             [
-                f"Device name: {name_synchronizer.get_name()}",
+                # f"Device name: {name_synchronizer.get_name()}",
                 "Buildroot version:         "
                 f'{version.get("buildroot_version", "unknown")}',
                 "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
