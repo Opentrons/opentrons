@@ -60,7 +60,7 @@ def test_rewrite_machine_info_is_idempotent(initial_contents: str) -> None:
     [
         # The value should be quoted.
         ("", 'PRETTY_HOSTNAME=""'),
-        ("abcd", 'PRETTY_HOSTNAME="abcd"'),
+        ("AaBbCcDd1234", 'PRETTY_HOSTNAME="AaBbCcDd1234"'),
         # Spaces are allowed and shouldn't be escaped.
         ("hello world", 'PRETTY_HOSTNAME="hello world"'),
         # Non-ASCII is allowed and shouldn't be escaped.
