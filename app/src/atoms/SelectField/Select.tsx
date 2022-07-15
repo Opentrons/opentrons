@@ -53,7 +53,6 @@ export function Select(props: SelectComponentProps): JSX.Element {
     container: (styles: any) => ({
       ...styles,
       position: POSITION_RELATIVE,
-      fontSize: TYPOGRAPHY.fontSizeP,
     }),
     dropdownIndicator: NO_STYLE_FN,
     group: NO_STYLE_FN,
@@ -71,6 +70,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       position: POSITION_ABSOLUTE,
       top: SPACING.spacingXS,
       paddingLeft: '0.375rem',
+      fontSize: TYPOGRAPHY.fontSizeP,
     }),
     loadingIndicator: NO_STYLE_FN,
     loadingMessage: NO_STYLE_FN,
@@ -83,7 +83,11 @@ export function Select(props: SelectComponentProps): JSX.Element {
       marginTop: SPACING.spacing2,
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
-    menuList: NO_STYLE_FN,
+    menuList: (styles: any) => ({
+      ...styles,
+      maxHeight: '38vh',
+      overflowY: 'scroll',
+    }),
     menuPortal: NO_STYLE_FN,
     multiValue: NO_STYLE_FN,
     multiValueLabel: NO_STYLE_FN,
