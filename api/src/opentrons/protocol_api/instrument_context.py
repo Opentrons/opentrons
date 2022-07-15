@@ -683,23 +683,23 @@ class InstrumentContext(publisher.CommandPublisher):
         if location and isinstance(location, types.Location):
             if location.labware.is_labware:
                 tiprack = location.labware.as_labware()
-                target: labware.Well = tiprack.next_tip(self.channels)  # type: ignore
-                move_to_location = target.top()
-                if not target:
+                target_well: labware.Well = tiprack.next_tip(self.channels)  # type: ignore
+                move_to_location = target_well.top()
+                if not target_well:
                     raise labware.OutOfTipsError
             elif location.labware.is_well:
-                target = location.labware.as_well()
-                tiprack = target.parent
+                target_well = location.labware.as_well()
+                tiprack = target_well.parent
                 move_to_location = location
         elif location and isinstance(location, labware.Well):
             tiprack = location.parent
-            target = location
-            move_to_location = target.top()
+            target_well = location
+            move_to_location = target_well.top()
         elif not location:
-            tiprack, target = labware.next_available_tip(
+            tiprack, target_well = labware.next_available_tip(
                 self.starting_tip, self.tip_racks, self.channels
             )
-            move_to_location = target.top()
+            move_to_location = target_well.top()
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
@@ -712,19 +712,19 @@ class InstrumentContext(publisher.CommandPublisher):
         instrument.validate_tiprack(self.name, tiprack, logger)
         with publisher.publish_context(
             broker=self.broker,
-            command=cmds.pick_up_tip(instrument=self, location=target),
+            command=cmds.pick_up_tip(instrument=self, location=target_well),
         ):
             self.move_to(move_to_location, publish=False)
             self._implementation.pick_up_tip(
-                well=target._impl,
+                well=target_well._impl,
                 tip_length=self._tip_length_for(tiprack),
                 presses=presses,
                 increment=increment,
             )
             # Note that the hardware API pick_up_tip action includes homing z after
 
-        tiprack.use_tips(target, self.channels)
-        self._last_tip_picked_up_from = target
+        tiprack.use_tips(target_well, self.channels)
+        self._last_tip_picked_up_from = target_well
 
         return self
 
