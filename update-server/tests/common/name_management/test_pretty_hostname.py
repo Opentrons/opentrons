@@ -108,5 +108,6 @@ def test_raises_on_invalid_input(invalid_pretty_hostname: str) -> None:
     # TODO(mm, 2022-07-14): Rework so we don't have to test a private function.
     with pytest.raises(pretty_hostname.InvalidPrettyHostnameError):
         pretty_hostname._rewrite_machine_info_str(
-            current_machine_info_contents="", new_pretty_hostname=invalid_pretty_hostname
+            current_machine_info_contents="",
+            new_pretty_hostname=invalid_pretty_hostname,
         )
