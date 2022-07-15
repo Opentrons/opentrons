@@ -38,7 +38,6 @@ class LayoutLabware:
               tip_volume: int, multi_tip_volume: int = DEFAULT_MULTI_TIP_VOLUME) -> "LayoutLabware":
         layout = cls(slots=slots)
         layout.load(ctx=ctx, tip_volume=tip_volume, multi_tip_volume=multi_tip_volume)
-        overwrite_default_labware_positions(layout=layout)
         return layout
 
     def load(self, ctx: protocol_api.ProtocolContext, tip_volume: int,
@@ -63,29 +62,31 @@ class LayoutLabware:
                 ctx.load_labware('radwag_pipette_calibration_vial',
                                  location=self.slots.vial)
 
-    def _get_labware(self, slot: str) -> Labware:
+    def _get_labware(self, slot: Optional[str]) -> Optional[Labware]:
+        if slot is None:
+            return None
         assert self._ctx
         slot_as_int = int(slot)
         return self._ctx.loaded_labwares[slot_as_int]
 
     @property
-    def tiprack(self) -> Labware:
+    def tiprack(self) -> Optional[Labware]:
         return self._get_labware(self.slots.tiprack)
 
     @property
-    def tiprack_multi(self) -> Labware:
+    def tiprack_multi(self) -> Optional[Labware]:
         return self._get_labware(self.slots.tiprack_multi)
 
     @property
-    def trough(self) -> Labware:
+    def trough(self) -> Optional[Labware]:
         return self._get_labware(self.slots.trough)
 
     @property
-    def plate(self) -> Labware:
+    def plate(self) -> Optional[Labware]:
         return self._get_labware(self.slots.plate)
 
     @property
-    def vial(self) -> Labware:
+    def vial(self) -> Optional[Labware]:
         return self._get_labware(self.slots.vial)
 
 

@@ -3,7 +3,6 @@ from serial.tools.list_ports import comports  # type: ignore[import]
 
 from .radwag import RadwagScaleBase, RadwagScale, SimRadwagScale
 from .asair_sensor import AsairSensor, AsairSensorError
-from .limit_sensor import LimitSensor
 
 
 def find_port(vid: int, pid: int) -> str:
@@ -22,5 +21,4 @@ __all__ = [
     "SimRadwagScale",
     "AsairSensor",
     "AsairSensorError",
-    "LimitSensor",
 ]

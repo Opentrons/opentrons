@@ -7,11 +7,14 @@ from hardware_testing.liquid.liquid_class import LIQUID_CLASS_OT2_P300_SINGLE
 from hardware_testing.measure.weight import GravimetricRecorder
 from hardware_testing.opentrons_api.helpers import get_api_context
 from hardware_testing.pipette import motions
-from hardware_testing.position import overwrite_default_labware_positions
+from hardware_testing.labware.position import overwrite_default_labware_positions
 
-metadata = {'apiLevel': '2.12', 'protocolName': 'ot2_p300_single_channel_gravimetric'}
+metadata = {
+    'apiLevel': '2.12',
+    'protocolName': 'ot2_p300_single_channel_gravimetric'
+}
 
-VOLUMES = [20, 150, 300]
+VOLUMES = [20, 150, 290]
 NUM_SAMPLES_PER_VOLUME = 10
 
 
@@ -85,6 +88,6 @@ if __name__ == '__main__':
     parser.add_argument("--simulate", action='store_true',
                         help='If set, the protocol will be simulated')
     args = parser.parse_args()
-    ctx = get_api_context(args.simulate)
+    ctx = get_api_context(metadata['apiLevel'], is_simulating=args.simulate)
     ctx.home()
     run(ctx)
