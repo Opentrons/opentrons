@@ -20,7 +20,7 @@ def test_rewrite_machine_info_updates_pretty_hostname(initial_contents: str) -> 
         initial_contents, "new_pretty_hostname"
     )
     assert (
-        "PRETTY_HOSTNAME=new_pretty_hostname" in rewrite.splitlines()
+        'PRETTY_HOSTNAME="new_pretty_hostname"' in rewrite.splitlines()
     ), "new PRETTY_HOSTNAME should be present."
     assert (
         rewrite.count("PRETTY_HOSTNAME") == 1
