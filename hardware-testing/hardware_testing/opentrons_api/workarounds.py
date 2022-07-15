@@ -1,13 +1,20 @@
+from datetime import datetime
 from typing import Tuple
-from pathlib import Path
 import json
+import urllib.request
+import time
+import platform
 
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api import InstrumentContext
+from opentrons.protocol_api import InstrumentContext, ProtocolContext
 
 
 def is_running_in_app() -> bool:
     return False  # FIXME: how to detect if we are running in the App?
+
+
+def is_running_on_robot() -> bool:
+    return str(platform.system()).lower() == 'linux'
 
 
 def apply_additional_offset_to_labware(labware: Labware, x=0, y=0, z=0):
@@ -31,18 +38,30 @@ def force_prepare_for_aspirate(pipette: InstrumentContext) -> None:
     pipette.dispense()
 
 
-def load_newest_offset_for_labware(name: str, slot: str) -> Tuple[float, float, float]:
-    # TODO: read from /runs, which returns a JSON dict
-    # Note: for testing right now, just read from the example output file
-    with open(Path(__file__).parent / 'example_runs_output.json') as f:
-        runs = json.load(f)
-    protocols_list = runs['data']
-    for p in protocols_list:
-        print(f'Protocol: {p["id"]}')
-        labware_offsets = p['labwareOffsets']
-        for offset in labware_offsets:
-            print(f'\tOffset URI: {offset["definitionUri"]}')
-            print(f'\t\tCreated at: {offset["createdAt"]}')
-            print(f'\t\tLocation: {offset["location"]}')
-            print(f'\t\tVector: {offset["vector"]}')
-    return 0, 0, 0
+def load_newest_offset_for_labware(ctx: ProtocolContext, labware: Labware) -> Tuple[float, float, float]:
+    if ctx.is_simulating() or not is_running_on_robot():
+        return 0, 0, 0
+
+    # FIXME: .urlopen() is slow
+    runs_response = urllib.request.urlopen('http://localhost:31950/runs')
+    runs_response_data = runs_response.read()
+    runs_json = json.loads(runs_response_data)
+
+    lw_uri = str(labware.uri)
+    lw_slot = str(labware.parent)
+
+    protocols_list = runs_json['data']
+    lw_offsets = [
+        offset
+        for p in protocols_list
+        for offset in p['labwareOffsets']
+        if offset['definitionUri'] == lw_uri and
+        offset['location']['slotName'] == lw_slot
+    ]
+
+    def _sort_by_created_at(_offset) -> datetime:
+        return datetime.fromisoformat(_offset['createdAt'])
+
+    lw_offsets.sort(key=_sort_by_created_at)
+    v = lw_offsets[-1]['vector']
+    return round(v['x'], 2), round(v['y'], 2), round(v['z'], 2)

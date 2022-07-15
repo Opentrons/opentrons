@@ -62,7 +62,7 @@ def test_gravimetric(protocol: ProtocolContext,
 
 def run(protocol: ProtocolContext):
     layout = LayoutLabware.build(protocol, DEFAULT_SLOTS_GRAV, tip_volume=300)
-    overwrite_default_labware_positions(layout=layout)
+    overwrite_default_labware_positions(protocol, layout=layout)
 
     liquid_level = LiquidTracker()
     liquid_level.initialize_from_deck(protocol)
