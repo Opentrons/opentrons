@@ -12,7 +12,6 @@ import {
   JUSTIFY_CENTER,
   SIZE_3,
   SPACING,
-  DIRECTION_ROW,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
