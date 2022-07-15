@@ -18,11 +18,36 @@ from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
 @pytest.mark.parametrize(
     argnames=["destination_slot", "expected_raise"],
     argvalues=[
-        [4, pytest.raises(PipetteMovementRestrictedByHeaterShakerError)],  # east
-        [6, pytest.raises(PipetteMovementRestrictedByHeaterShakerError)],  # west
-        [8, pytest.raises(PipetteMovementRestrictedByHeaterShakerError)],  # north
-        [2, pytest.raises(PipetteMovementRestrictedByHeaterShakerError)],  # south
-        [5, pytest.raises(PipetteMovementRestrictedByHeaterShakerError)],  # h/s
+        [
+            4,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="shaking"
+            ),
+        ],  # east
+        [
+            6,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="shaking"
+            ),
+        ],  # west
+        [
+            8,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="shaking"
+            ),
+        ],  # north
+        [
+            2,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="shaking"
+            ),
+        ],  # south
+        [
+            5,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="shaking"
+            ),
+        ],  # h/s
         [1, does_not_raise()],  # non-adjacent
     ],
 )
@@ -49,9 +74,18 @@ async def test_raises_when_moving_to_restricted_slots_while_shaking(
 @pytest.mark.parametrize(
     argnames=["destination_slot", "expected_raise"],
     argvalues=[
-        [4, pytest.raises(PipetteMovementRestrictedByHeaterShakerError)],  # east
-        [6, pytest.raises(PipetteMovementRestrictedByHeaterShakerError)],  # west
-        [5, pytest.raises(PipetteMovementRestrictedByHeaterShakerError)],  # h/s
+        [
+            4,
+            pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="latch"),
+        ],  # east
+        [
+            6,
+            pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="latch"),
+        ],  # west
+        [
+            5,
+            pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="latch"),
+        ],  # h/s
         [8, does_not_raise()],  # north
         [2, does_not_raise()],  # south
         [3, does_not_raise()],  # non-adjacent
@@ -80,17 +114,33 @@ async def test_raises_when_moving_to_restricted_slots_while_latch_open(
 @pytest.mark.parametrize(
     argnames=["destination_slot", "is_tiprack", "expected_raise"],
     argvalues=[
-        [4, False, pytest.raises(PipetteMovementRestrictedByHeaterShakerError)],  # east
-        [6, False, pytest.raises(PipetteMovementRestrictedByHeaterShakerError)],  # west
+        [
+            4,
+            False,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="east or west"
+            ),
+        ],  # east
+        [
+            6,
+            False,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="east or west"
+            ),
+        ],  # west
         [
             8,
             False,
-            pytest.raises(PipetteMovementRestrictedByHeaterShakerError),
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="tip rack"
+            ),
         ],  # north, non-tiprack
         [
             2,
             False,
-            pytest.raises(PipetteMovementRestrictedByHeaterShakerError),
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="tip rack"
+            ),
         ],  # south, non-tiprack
         [8, True, does_not_raise()],  # north, tiprack
         [2, True, does_not_raise()],  # south, tiprack

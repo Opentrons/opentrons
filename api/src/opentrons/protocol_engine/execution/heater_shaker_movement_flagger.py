@@ -53,5 +53,5 @@ def raise_if_movement_restricted(
             # Can only go north/south if the labware is a tip rack
             elif dest_north_south and not destination_is_tip_rack:
                 raise PipetteMovementRestrictedByHeaterShakerError(
-                    "Cannot move multi-channel pipette to non-tip-rack labware north or south of Heater-Shaker"
+                    "Cannot move multi-channel pipette to non-tip rack labware north or south of Heater-Shaker"
                 )
