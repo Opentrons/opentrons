@@ -8,7 +8,7 @@ from typing import Dict, List, Mapping, Optional, Union
 
 from opentrons.ordered_set import OrderedSet
 
-from opentrons.hardware_control.types import DoorStateNotification, DoorState
+from opentrons.hardware_control.types import DoorState
 
 from ..actions import (
     Action,
@@ -20,7 +20,7 @@ from ..actions import (
     StopAction,
     FinishAction,
     HardwareStoppedAction,
-    HardwareEventAction,
+    DoorChangeAction,
 )
 
 from ..commands import Command, CommandStatus, CommandIntent
@@ -188,7 +188,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
             # For now, unit tests cover mapping every request type
             queued_command = action.request._CommandCls.construct(
                 id=action.command_id,
-                key=action.command_key,
+                key=(
+                    action.request.key
+                    if action.request.key is not None
+                    # TODO(mc, 2021-12-13): generate a command key from params and state
+                    # https://github.com/Opentrons/opentrons/issues/8986
+                    else action.command_id
+                ),
                 createdAt=action.created_at,
                 params=action.request.params,  # type: ignore[arg-type]
                 intent=action.request.intent,
@@ -303,6 +309,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             if not self._state.run_result:
                 self._state.queue_status = QueueStatus.PAUSED
                 self._state.run_result = RunResult.STOPPED
+                self._state.queued_command_ids.clear()
 
         elif isinstance(action, FinishAction):
             if not self._state.run_result:
@@ -333,16 +340,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
             self._state.run_result = self._state.run_result or RunResult.STOPPED
             self._state.run_completed_at = action.completed_at
 
-        elif isinstance(action, HardwareEventAction):
-            if (
-                isinstance(action.event, DoorStateNotification)
-                and self._config.block_on_door_open
-            ):
-                if action.event.new_state == DoorState.OPEN:
+        elif isinstance(action, DoorChangeAction):
+            if self._config.block_on_door_open:
+                if action.door_state == DoorState.OPEN:
                     self._state.is_door_blocking = True
                     if self._state.queue_status != QueueStatus.SETUP:
                         self._state.queue_status = QueueStatus.PAUSED
-                elif action.event.new_state == DoorState.CLOSED:
+                elif action.door_state == DoorState.CLOSED:
                     self._state.is_door_blocking = False
 
 

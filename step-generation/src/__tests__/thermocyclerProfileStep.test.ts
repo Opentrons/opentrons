@@ -36,12 +36,14 @@ describe('thermocyclerProfileStep', () => {
       expected: [
         {
           commandType: 'thermocycler/closeLid',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/setTargetLidTemperature',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
             celsius: 55,
@@ -49,12 +51,14 @@ describe('thermocyclerProfileStep', () => {
         },
         {
           commandType: 'thermocycler/waitForLidTemperature',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/runProfile',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
             profile: [],
@@ -63,18 +67,21 @@ describe('thermocyclerProfileStep', () => {
         },
         {
           commandType: 'thermocycler/awaitProfileComplete',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/openLid',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/setTargetBlockTemperature',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
@@ -82,12 +89,14 @@ describe('thermocyclerProfileStep', () => {
         },
         {
           commandType: 'thermocycler/waitForBlockTemperature',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/deactivateLid',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
@@ -116,6 +125,7 @@ describe('thermocyclerProfileStep', () => {
       expected: [
         {
           commandType: 'thermocycler/runProfile',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
             profile: [{ celsius: 61, holdSeconds: 99 }],
@@ -124,18 +134,21 @@ describe('thermocyclerProfileStep', () => {
         },
         {
           commandType: 'thermocycler/awaitProfileComplete',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/openLid',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/setTargetBlockTemperature',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
@@ -143,12 +156,14 @@ describe('thermocyclerProfileStep', () => {
         },
         {
           commandType: 'thermocycler/waitForBlockTemperature',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/deactivateLid',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
@@ -177,12 +192,14 @@ describe('thermocyclerProfileStep', () => {
       expected: [
         {
           commandType: 'thermocycler/closeLid',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/runProfile',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
             profile: [{ celsius: 61, holdSeconds: 99 }],
@@ -191,18 +208,21 @@ describe('thermocyclerProfileStep', () => {
         },
         {
           commandType: 'thermocycler/awaitProfileComplete',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/openLid',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/setTargetBlockTemperature',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
@@ -210,12 +230,14 @@ describe('thermocyclerProfileStep', () => {
         },
         {
           commandType: 'thermocycler/waitForBlockTemperature',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/deactivateLid',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
@@ -244,6 +266,7 @@ describe('thermocyclerProfileStep', () => {
       expected: [
         {
           commandType: 'thermocycler/runProfile',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
             profile: [{ celsius: 61, holdSeconds: 99 }],
@@ -252,18 +275,21 @@ describe('thermocyclerProfileStep', () => {
         },
         {
           commandType: 'thermocycler/awaitProfileComplete',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/openLid',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/setTargetBlockTemperature',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
             celsius: 4,
@@ -271,12 +297,14 @@ describe('thermocyclerProfileStep', () => {
         },
         {
           commandType: 'thermocycler/waitForBlockTemperature',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },
         },
         {
           commandType: 'thermocycler/deactivateLid',
+          key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
           },

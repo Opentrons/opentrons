@@ -6,7 +6,7 @@ from typing import NamedTuple, Type
 
 from opentrons.ordered_set import OrderedSet
 from opentrons.types import MountType, DeckSlotName
-from opentrons.hardware_control.types import DoorStateNotification, DoorState
+from opentrons.hardware_control.types import DoorState
 
 from opentrons.protocol_engine import commands, errors
 from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, WellLocation
@@ -30,7 +30,7 @@ from opentrons.protocol_engine.actions import (
     FinishErrorDetails,
     StopAction,
     HardwareStoppedAction,
-    HardwareEventAction,
+    DoorChangeAction,
 )
 
 from .command_fixtures import (
@@ -96,6 +96,7 @@ class QueueCommandSpec(NamedTuple):
                     flowRate=1.23,
                     wellLocation=WellLocation(),
                 ),
+                key="command-key",
             ),
             expected_cls=commands.Aspirate,
         ),
@@ -108,9 +109,11 @@ class QueueCommandSpec(NamedTuple):
                     volume=42,
                     flowRate=1.23,
                     wellLocation=WellLocation(),
-                )
+                ),
             ),
             expected_cls=commands.Dispense,
+            # test when key prop is missing
+            command_key="command-id",
         ),
         QueueCommandSpec(
             command_request=commands.DropTipCreate(
@@ -119,6 +122,7 @@ class QueueCommandSpec(NamedTuple):
                     labwareId="labware-id",
                     wellName="well-name",
                 ),
+                key="command-key",
             ),
             expected_cls=commands.DropTip,
         ),
@@ -130,6 +134,7 @@ class QueueCommandSpec(NamedTuple):
                     namespace="namespace",
                     version=42,
                 ),
+                key="command-key",
             ),
             expected_cls=commands.LoadLabware,
         ),
@@ -139,6 +144,7 @@ class QueueCommandSpec(NamedTuple):
                     mount=MountType.LEFT,
                     pipetteName=PipetteName.P300_SINGLE,
                 ),
+                key="command-key",
             ),
             expected_cls=commands.LoadPipette,
         ),
@@ -149,6 +155,7 @@ class QueueCommandSpec(NamedTuple):
                     labwareId="labware-id",
                     wellName="well-name",
                 ),
+                key="command-key",
             ),
             expected_cls=commands.PickUpTip,
         ),
@@ -159,12 +166,14 @@ class QueueCommandSpec(NamedTuple):
                     labwareId="labware-id",
                     wellName="well-name",
                 ),
+                key="command-key",
             ),
             expected_cls=commands.MoveToWell,
         ),
         QueueCommandSpec(
             command_request=commands.WaitForResumeCreate(
                 params=commands.WaitForResumeParams(message="hello world"),
+                key="command-key",
             ),
             expected_cls=commands.WaitForResume,
         ),
@@ -174,6 +183,7 @@ class QueueCommandSpec(NamedTuple):
             command_request=commands.WaitForResumeCreate(
                 commandType="pause",
                 params=commands.WaitForResumeParams(message="hello world"),
+                key="command-key",
             ),
             expected_cls=commands.WaitForResume,
         ),
@@ -191,7 +201,6 @@ def test_command_store_queues_commands(
         request=command_request,
         created_at=created_at,
         command_id=command_id,
-        command_key=command_key,
     )
     expected_command = expected_cls(
         id=command_id,
@@ -207,6 +216,7 @@ def test_command_store_queues_commands(
     assert subject.state.commands_by_id == {
         "command-id": CommandEntry(index=0, command=expected_command),
     }
+
     assert subject.state.all_command_ids == ["command-id"]
     assert subject.state.queued_command_ids == OrderedSet(["command-id"])
 
@@ -217,13 +227,11 @@ def test_command_queue_and_unqueue() -> None:
         request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
-        command_key="command-key-1",
     )
     queue_2 = QueueCommandAction(
         request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
         created_at=datetime(year=2022, month=2, day=2),
         command_id="command-id-2",
-        command_key="command-key-2",
     )
     update_1 = UpdateCommandAction(
         command=create_running_command(command_id="command-id-1"),
@@ -258,7 +266,6 @@ def test_setup_command_queue_and_unqueue() -> None:
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
-        command_key="command-key-1",
     )
     queue_2 = QueueCommandAction(
         request=commands.WaitForResumeCreate(
@@ -267,7 +274,6 @@ def test_setup_command_queue_and_unqueue() -> None:
         ),
         created_at=datetime(year=2022, month=2, day=2),
         command_id="command-id-2",
-        command_key="command-key-2",
     )
     update_1 = UpdateCommandAction(
         command=create_running_command(command_id="command-id-1"),
@@ -299,10 +305,10 @@ def test_setup_queue_action_updates_command_intent() -> None:
         request=commands.WaitForResumeCreate(
             params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
+            key="command-key-1",
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
-        command_key="command-key-1",
     )
 
     expected_pause_cmd = commands.WaitForResume(
@@ -328,7 +334,6 @@ def test_running_command_id() -> None:
         request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
-        command_key="command-key-1",
     )
     running_update = UpdateCommandAction(
         command=create_running_command(command_id="command-id-1"),
@@ -372,16 +377,18 @@ def test_running_command_no_queue() -> None:
 def test_command_failure_clears_queues() -> None:
     """It should clear the command queue on command failure."""
     queue_1 = QueueCommandAction(
-        request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
+        request=commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(), key="command-key-1"
+        ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
-        command_key="command-key-1",
     )
     queue_2 = QueueCommandAction(
-        request=commands.WaitForResumeCreate(params=commands.WaitForResumeParams()),
+        request=commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(), key="command-key-2"
+        ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-2",
-        command_key="command-key-2",
     )
     running_1 = UpdateCommandAction(
         command=commands.WaitForResume(
@@ -455,28 +462,29 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         status=commands.CommandStatus.QUEUED,
     )
     queue_action_1_non_setup = QueueCommandAction(
-        request=commands.WaitForResumeCreate(params=cmd_1_non_setup.params),
+        request=commands.WaitForResumeCreate(
+            params=cmd_1_non_setup.params, key="command-key-1"
+        ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-1",
-        command_key="command-key-1",
     )
     queue_action_2_setup = QueueCommandAction(
         request=commands.WaitForResumeCreate(
             params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
+            key="command-key-2",
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-2",
-        command_key="command-key-2",
     )
     queue_action_3_setup = QueueCommandAction(
         request=commands.WaitForResumeCreate(
             params=commands.WaitForResumeParams(),
             intent=commands.CommandIntent.SETUP,
+            key="command-key-3",
         ),
         created_at=datetime(year=2021, month=1, day=1),
         command_id="command-id-3",
-        command_key="command-key-3",
     )
 
     running_cmd_2 = UpdateCommandAction(
@@ -905,15 +913,12 @@ def test_handles_door_open_and_close_event_before_play(
     """It should update state but not pause on door open whenis setup."""
     subject = CommandStore(is_door_open=False, config=config)
 
-    door_open_event = DoorStateNotification(new_state=DoorState.OPEN)
-    door_close_event = DoorStateNotification(new_state=DoorState.CLOSED)
-
-    subject.handle_action(HardwareEventAction(event=door_open_event))
+    subject.handle_action(DoorChangeAction(door_state=DoorState.OPEN))
 
     assert subject.state.queue_status == QueueStatus.SETUP
     assert subject.state.is_door_blocking is expected_is_door_blocking
 
-    subject.handle_action(HardwareEventAction(event=door_close_event))
+    subject.handle_action(DoorChangeAction(door_state=DoorState.CLOSED))
 
     assert subject.state.queue_status == QueueStatus.SETUP
     assert subject.state.is_door_blocking is False
@@ -932,16 +937,40 @@ def test_handles_door_open_and_close_event_after_play(
     """It should update state when door opened and closed after run is played."""
     subject = CommandStore(is_door_open=False, config=config)
 
-    door_open_event = DoorStateNotification(new_state=DoorState.OPEN)
-    door_close_event = DoorStateNotification(new_state=DoorState.CLOSED)
-
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
-    subject.handle_action(HardwareEventAction(event=door_open_event))
+    subject.handle_action(DoorChangeAction(door_state=DoorState.OPEN))
 
     assert subject.state.queue_status == expected_queue_status
     assert subject.state.is_door_blocking is expected_is_door_blocking
 
-    subject.handle_action(HardwareEventAction(event=door_close_event))
+    subject.handle_action(DoorChangeAction(door_state=DoorState.CLOSED))
 
     assert subject.state.queue_status == expected_queue_status
     assert subject.state.is_door_blocking is False
+
+
+def test_command_store_handles_stop_action_with_queued_commands() -> None:
+    """It should clear queued commands."""
+    subject = CommandStore(config=Config(block_on_door_open=False), is_door_open=False)
+
+    action = QueueCommandAction(
+        request=commands.WaitForResumeCreate(
+            params=commands.WaitForResumeParams(message="hello world"),
+        ),
+        created_at=datetime(year=2022, month=1, day=1),
+        command_id="command_id",
+    )
+
+    subject.handle_action(action)
+
+    assert len(subject.state.queued_command_ids) > 0
+
+    assert subject.state.run_result is None
+
+    subject.handle_action(StopAction())
+
+    assert len(subject.state.queued_command_ids) == 0
+
+    assert subject.state.queue_status == QueueStatus.PAUSED
+
+    assert subject.state.run_result == RunResult.STOPPED

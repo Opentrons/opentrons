@@ -36,7 +36,12 @@ async def test_broadcast(
             NodeId.pipette_left,
             NodeId.gantry_x,
             NodeId.gantry_y,
+            NodeId.pipette_left_bootloader,
         }
+        # The simulator loads up a bootloader simulator using the
+        # left pipette bootloader node id. Since we send a broadcast message
+        # out, we need to make sure we read all of the device info request
+        # messages so that `test_each_node` does not fail.
         while len(nodes):
             message, arbitration_id = await can_messenger_queue.read()
             assert arbitration_id.parts.message_id == MessageId.device_info_response

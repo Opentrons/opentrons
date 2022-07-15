@@ -1,4 +1,4 @@
-import uuidv1 from 'uuid/v1'
+import uuidv1 from 'uuid/v4'
 import { WellSetHelpers, makeWellSetHelpers } from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import { WellGroup } from '@opentrons/components'

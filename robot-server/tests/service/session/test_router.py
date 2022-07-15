@@ -1,7 +1,7 @@
 import pytest
-from mock import MagicMock
-from mock import AsyncMock
+from mock import AsyncMock, MagicMock
 from datetime import datetime
+from decoy import matchers
 
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError
@@ -20,6 +20,8 @@ from robot_server.service.session.models.common import EmptyModel
 from robot_server.service.session.models.command_definitions import ProtocolCommand
 from robot_server.service.session import router
 from robot_server.service.session.session_types import BaseSession
+from robot_server.robot.calibration.deck.models import DeckCalibrationSessionStatus
+from robot_server.robot.calibration.helper_classes import AttachedPipette
 
 
 @pytest.fixture
@@ -34,10 +36,15 @@ def mock_session():
     session.meta.created_at = datetime(2020, 1, 1)
     session.meta.create_params = None
     session.get_response_model.return_value = {
-        "createdAt": session.meta.created_at,
-        "details": EmptyModel(),
         "id": session.meta.identifier,
+        "createdAt": session.meta.created_at,
         "createParams": session.meta.create_params,
+        "details": DeckCalibrationSessionStatus(
+            instrument=AttachedPipette(),
+            currentStep="current-step",
+            labware=[],
+            supportedCommands=[],
+        ),
     }
     return session
 
@@ -85,7 +92,7 @@ def test_sessions_create_error(sessions_api_client, mock_session_manager):
     mock_session_manager.add.side_effect = raiser
 
     response = sessions_api_client.post(
-        "/sessions", json={"data": {"sessionType": "liveProtocol"}}
+        "/sessions", json={"data": {"sessionType": "deckCalibration"}}
     )
     assert response.json() == {
         "errors": [
@@ -104,12 +111,25 @@ def test_sessions_create(sessions_api_client, mock_session_manager, mock_session
     mock_session_manager.add.return_value = mock_session
 
     response = sessions_api_client.post(
-        "/sessions", json={"data": {"sessionType": "liveProtocol"}}
+        "/sessions",
+        json={"data": {"sessionType": "deckCalibration", "createParams": {}}},
     )
     assert response.json() == {
         "data": {
-            "details": {},
-            "sessionType": "liveProtocol",
+            "details": {
+                "instrument": {
+                    "model": None,
+                    "name": None,
+                    "tipLength": None,
+                    "mount": None,
+                    "serial": None,
+                    "defaultTipracks": None,
+                },
+                "currentStep": "current-step",
+                "labware": [],
+                "supportedCommands": [],
+            },
+            "sessionType": "deckCalibration",
             "createdAt": mock_session.meta.created_at.isoformat(),
             "createParams": None,
             "id": mock_session.meta.identifier,
@@ -166,8 +186,8 @@ def test_sessions_delete(sessions_api_client, mock_session_manager, mock_session
     mock_session_manager.remove.assert_called_once_with(mock_session.meta.identifier)
     assert response.json() == {
         "data": {
-            "details": {},
-            "sessionType": "liveProtocol",
+            "details": matchers.Anything(),
+            "sessionType": "deckCalibration",
             "createdAt": mock_session.meta.created_at.isoformat(),
             "createParams": None,
             "id": mock_session.meta.identifier,
@@ -214,8 +234,8 @@ def test_sessions_get(sessions_api_client, mock_session_manager, mock_session):
     response = sessions_api_client.get(f"/sessions/{mock_session.meta.identifier}")
     assert response.json() == {
         "data": {
-            "details": {},
-            "sessionType": "liveProtocol",
+            "details": matchers.Anything(),
+            "sessionType": "deckCalibration",
             "createdAt": mock_session.meta.created_at.isoformat(),
             "createParams": None,
             "id": mock_session.meta.identifier,
@@ -259,8 +279,8 @@ def test_sessions_get_all(sessions_api_client, mock_session_manager, mock_sessio
     assert response.json() == {
         "data": [
             {
-                "details": {},
-                "sessionType": "liveProtocol",
+                "details": matchers.Anything(),
+                "sessionType": "deckCalibration",
                 "createdAt": mock_session.meta.created_at.isoformat(),
                 "createParams": None,
                 "id": mock_session.meta.identifier,

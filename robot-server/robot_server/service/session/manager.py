@@ -19,9 +19,6 @@ from robot_server.service.session.session_types import (
     DeckCalibrationSession,
     PipetteOffsetCalibrationSession,
 )
-from robot_server.service.session.session_types.live_protocol.session import (
-    LiveProtocolSession,
-)
 
 log = logging.getLogger(__name__)
 
@@ -30,7 +27,6 @@ SessionTypeToClass: Dict[SessionType, Type[BaseSession]] = {
     SessionType.tip_length_calibration: TipLengthCalibration,
     SessionType.deck_calibration: DeckCalibrationSession,
     SessionType.pipette_offset_calibration: PipetteOffsetCalibrationSession,
-    SessionType.live_protocol: LiveProtocolSession,
 }
 
 

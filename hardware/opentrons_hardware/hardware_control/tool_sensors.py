@@ -1,6 +1,6 @@
 """Functions for commanding motion limited by tool sensors."""
 import asyncio
-from typing import Union, List, Iterator
+from typing import Union, List, Iterator, Tuple
 from logging import getLogger
 from numpy import float64
 from math import copysign
@@ -48,7 +48,7 @@ async def capacitive_probe(
     speed: float,
     relative_threshold_pf: float = 1.0,
     log_sensor_values: bool = False,
-) -> float:
+) -> Tuple[float, float]:
     """Move the specified tool down until its capacitive sensor triggers.
 
     Moves down by the specified distance at the specified speed until the

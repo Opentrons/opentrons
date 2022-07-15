@@ -63,6 +63,8 @@ from .types import (
     OT3Mount,
     OT3AxisMap,
     OT3SubSystem,
+    GripperJawState,
+    GripperNotAttachedError,
 )
 from . import modules
 from .robot_calibration import (
@@ -150,6 +152,7 @@ class OT3API(
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: OT3AxisMap[float] = {}
+        self._encoder_current_position: OT3AxisMap[float] = {}
 
         self._last_moved_mount: Optional[OT3Mount] = None
         # The motion lock synchronizes calls to long-running physical tasks
@@ -550,6 +553,14 @@ class OT3API(
             axes = [OT3Axis.Z_R, OT3Axis.Z_L]
         await self.home(axes)
 
+    async def home_gripper_jaw(self) -> None:
+        """
+        Home the jaw of the gripper.
+        """
+        gripper = self._gripper_handler.get_gripper()
+        await self._ungrip()
+        gripper.state = GripperJawState.HOMED_READY
+
     async def home_plunger(self, mount: Union[top_types.Mount, OT3Mount]) -> None:
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
@@ -564,7 +575,6 @@ class OT3API(
                 checked_mount, instr.config.bottom, self._current_position
             )
             await self._move(target_pos, acquire_lock=False, home_flagged_axes=False)
-
             await self.current_position_ot3(mount=checked_mount, refresh=True)
 
     @lru_cache(1)
@@ -619,6 +629,44 @@ class OT3API(
             return self._effector_pos_from_carriage_pos(
                 OT3Mount.from_mount(mount), self._current_position, critical_point
             )
+
+    async def encoder_current_position(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        critical_point: Optional[CriticalPoint] = None,
+        refresh: bool = False,
+        fail_on_not_homed: bool = False,
+    ) -> Dict[Axis, float]:
+        """
+        Return the encoder position in relative coords specified mount.
+        TODO: CF Might want to make these coordinates to absolute in deck
+        coordinates
+        """
+        z_ax = OT3Axis.by_mount(mount)
+        plunger_ax = OT3Axis.of_main_tool_actuator(mount)
+        position_axes = [OT3Axis.X, OT3Axis.Y, z_ax, plunger_ax]
+
+        if fail_on_not_homed and (
+            not self._backend.is_homed(position_axes)
+            or not self._encoder_current_position
+        ):
+            raise MustHomeError(
+                f"Current position of {str(mount)} pipette is unknown, please home."
+            )
+        elif not self._encoder_current_position and not refresh:
+            raise MustHomeError("Encoder position is unknown; please home motors.")
+        async with self._motion_lock:
+            self._encoder_current_position = deck_from_machine(
+                await self._backend.update_encoder_position(),
+                self._transforms.deck_calibration.attitude,
+                self._transforms.carriage_offset,
+            )
+            ot3pos = self._effector_pos_from_carriage_pos(
+                OT3Mount.from_mount(mount),
+                self._encoder_current_position,
+                critical_point,
+            )
+            return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
 
     def _effector_pos_from_carriage_pos(
         self,
@@ -804,12 +852,14 @@ class OT3API(
                 await stack.enter_async_context(self._motion_lock)
             try:
                 await self._backend.move(origin, moves[0])
+                encoder_pos = await self._backend.update_encoder_position()
             except Exception:
                 self._log.exception("Move failed")
                 self._current_position.clear()
                 raise
             else:
                 self._current_position.update(target_position)
+                self._encoder_current_position.update(encoder_pos)
 
     @ExecutionManagerProvider.wait_for_running
     async def home(
@@ -834,12 +884,20 @@ class OT3API(
                 raise
             else:
                 machine_pos = await self._backend.update_position()
+                encoder_pos = await self._backend.update_encoder_position()
                 position = deck_from_machine(
                     machine_pos,
                     self._transforms.deck_calibration.attitude,
                     self._transforms.carriage_offset,
                 )
                 self._current_position.update(position)
+                self._encoder_current_position.update(encoder_pos)
+                if OT3Axis.G in checked_axes:
+                    try:
+                        gripper = self._gripper_handler.get_gripper()
+                        gripper.state = GripperJawState.HOMED_READY
+                    except GripperNotAttachedError:
+                        pass
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
@@ -914,6 +972,35 @@ class OT3API(
 
     async def update_deck_calibration(self, new_transform: RobotCalibration) -> None:
         pass
+
+    @ExecutionManagerProvider.wait_for_running
+    async def _grip(self, duty_cycle: float) -> None:
+        """Move the gripper jaw inward to close."""
+        try:
+            await self._backend.gripper_move_jaw(duty_cycle=duty_cycle)
+        except Exception:
+            self._log.exception("Gripper grip failed")
+            raise
+
+    @ExecutionManagerProvider.wait_for_running
+    async def _ungrip(self) -> None:
+        """Move the gripper jaw outward to reach the homing switch."""
+        try:
+            await self._backend.gripper_home_jaw()
+        except Exception:
+            self._log.exception("Gripper home failed")
+            raise
+
+    async def grip(self, force_newtons: float) -> None:
+        self._gripper_handler.check_ready_for_grip()
+        dc = self._gripper_handler.get_duty_cycle_by_grip_force(force_newtons)
+        await self._grip(duty_cycle=dc)
+
+    async def ungrip(self) -> None:
+        # get default grip force for release if not provided
+        self._gripper_handler.check_ready_for_jaw_move()
+        await self._ungrip()
+        self._gripper_handler.set_jaw_state(GripperJawState.HOMED_READY)
 
     # Pipette action API
     async def prepare_for_aspirate(

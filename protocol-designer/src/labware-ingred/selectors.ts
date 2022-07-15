@@ -105,12 +105,13 @@ const allIngredientGroupFields: Selector<
 const allIngredientNamesIds: Selector<
   RootSlice,
   OrderedLiquids
-> = createSelector(getLiquidGroupsById, ingreds =>
-  Object.keys(ingreds).map(ingredId => ({
+> = createSelector(getLiquidGroupsById, ingreds => {
+  return Object.keys(ingreds).map(ingredId => ({
     ingredientId: ingredId,
     name: ingreds[ingredId].name,
+    displayColor: ingreds[ingredId].displayColor,
   }))
-)
+})
 const getLabwareSelectionMode: Selector<RootSlice, boolean> = createSelector(
   rootSelector,
   rootState => {
@@ -147,6 +148,14 @@ const getDeckHasLiquid: Selector<RootSlice, boolean> = createSelector(
   getLiquidGroupsOnDeck,
   liquidGroups => liquidGroups.length > 0
 )
+const getLiquidDisplayColors: Selector<RootSlice, string[]> = createSelector(
+  getLiquidGroupsById,
+  liquids =>
+    Object.values(liquids).reduce<string[]>((acc, curr) => {
+      acc.push(curr.displayColor)
+      return acc
+    }, [])
+)
 // TODO: prune selectors
 export const selectors = {
   rootSelector,
@@ -166,4 +175,5 @@ export const selectors = {
   allIngredientNamesIds,
   selectedAddLabwareSlot,
   getDeckHasLiquid,
+  getLiquidDisplayColors,
 }

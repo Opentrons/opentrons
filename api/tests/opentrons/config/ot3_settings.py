@@ -129,10 +129,7 @@ ot3_dummy_settings = {
                 "Z": 0.7,
                 "P": 0.8,
             },
-            "two_low_throughput": {
-                "X": 0.7,
-                "Y": 0.7,
-            },
+            "two_low_throughput": {"X": 0.7, "Y": 0.7, "Z": 0.6},
             "gripper": {
                 "Z": 0.7,
             },
@@ -156,10 +153,7 @@ ot3_dummy_settings = {
                 "Z": 0.4,
                 "P": 2.0,
             },
-            "two_low_throughput": {
-                "X": 9,
-                "Y": 0.1,
-            },
+            "two_low_throughput": {"X": 9, "Y": 0.1, "Z": 0.6},
             "gripper": {
                 "Z": 10,
             },
