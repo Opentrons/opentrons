@@ -335,16 +335,14 @@ async def test_module_update_integration(
     )
     monkeypatch.setattr(modules.update, "upload_via_dfu", upload_via_dfu_mock)
 
-    async def mock_find_dfu_bootloader_port():
-        return "ot_module_dfu_bootloader1"
+    async def mock_find_dfu_device(pid: str):
+        return "df11"
 
-    monkeypatch.setattr(
-        modules.update, "find_bootloader_port", mock_find_dfu_bootloader_port
-    )
+    monkeypatch.setattr(modules.update, "find_dfu_device", mock_find_dfu_device)
 
     await modules.update_firmware(mod_heatershaker, "fake_fw_file_path", loop)
     upload_via_dfu_mock.assert_called_once_with(
-        "ot_module_dfu_bootloader1", "fake_fw_file_path", bootloader_kwargs
+        "df11", "fake_fw_file_path", bootloader_kwargs
     )
 
 

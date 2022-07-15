@@ -25,9 +25,9 @@ async def update_firmware(
         "stderr": asyncio.subprocess.PIPE,
         "loop": loop,
     }
-    successful, res = await module.bootloader()(flash_port_or_dfu_serial,
-                                                str(firmware_file),
-                                                kwargs)
+    successful, res = await module.bootloader()(
+        flash_port_or_dfu_serial, str(firmware_file), kwargs
+    )
     if not successful:
         log.info(f"Bootloader reponse: {res}")
         raise UpdateError(res)
@@ -59,9 +59,12 @@ async def find_dfu_device(pid: str) -> str:
     while retries != 0:
         retries -= 1
         await asyncio.sleep(1)
-        proc = await asyncio.create_subprocess_exec("dfu-util", "-l",
-                                                    stdout=asyncio.subprocess.PIPE,
-                                                    stderr=asyncio.subprocess.PIPE)
+        proc = await asyncio.create_subprocess_exec(
+            "dfu-util",
+            "-l",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
         await proc.wait()
         stdout, stderr = await proc.communicate()
 
@@ -69,20 +72,28 @@ async def find_dfu_device(pid: str) -> str:
             # This probably needs to be refactored into just a check for empty stdout
             continue
         if stderr:
-            raise RuntimeError(f"Error finding dfu device: {stderr}")
+            raise RuntimeError(f"Error finding dfu device: {stderr.decode()}")
 
         result = stdout.decode()
         if pid not in result:
             # It could take a few seconds for the device to show up
             continue
+        devices_found = 0
         for line in result.splitlines():
             if pid in line:
                 log.info(f"Found device with PID {pid}")
-                # TODO: Make this return just the serial and not the entire string
-                return line[line.find("serial"):]
+                devices_found += 1
+                serial = line[(line.find("serial=") + 7) :]
+        if devices_found == 2:
+            # TODO: Make this return just the serial and not the entire string
+            return serial
+        elif devices_found > 2:
+            raise OSError("Multiple new bootloader devices" "found on mode switch")
 
-    raise RuntimeError("Could not update firmware via dfu. Possible issues- dfu-util"
-                       " not working or specified dfu device not found")
+    raise RuntimeError(
+        "Could not update firmware via dfu. Possible issues- dfu-util"
+        " not working or specified dfu device not found"
+    )
 
 
 async def upload_via_avrdude(
@@ -212,7 +223,7 @@ async def upload_via_dfu(
         log.error(
             f"Failed to update module firmware for {dfu_serial}. "
             # It isn't easy to decipher the issue from stderror alone
-            f"stdout: {res} \n"     
+            f"stdout: {res} \n"
             f"stderr: {stderr.decode()}"
         )
         return False, res
