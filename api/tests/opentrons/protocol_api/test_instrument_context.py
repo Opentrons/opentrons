@@ -43,10 +43,10 @@ def _mock_instrument_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> No
         mock_validate_tiprack,
     )
 
-    mock_validate_tiprack = decoy.mock(func=instrument.tip_length_for)
+    mock_tip_length_for = decoy.mock(func=instrument.tip_length_for)
     monkeypatch.setattr(
         "opentrons.protocols.api_support.instrument.tip_length_for",
-        mock_validate_tiprack,
+        mock_tip_length_for,
     )
 
 
@@ -248,9 +248,7 @@ def test_pick_up_from_no_location(
 
     expected_location = Location(Point(0, 0, 0), mock_well)
 
-    decoy.when(mock_labware_module(None, [], 0)).then_return(
-        (mock_labware, mock_well)
-    )
+    decoy.when(mock_labware_module(None, [], 0)).then_return((mock_labware, mock_well))
     decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=0)).then_return(
         False
     )
