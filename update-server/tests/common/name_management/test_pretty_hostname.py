@@ -62,7 +62,7 @@ def test_rewrite_machine_info_is_idempotent(initial_contents: str) -> None:
         ("", 'PRETTY_HOSTNAME=""'),
         ("abcd", 'PRETTY_HOSTNAME="abcd"'),
         # Spaces are allowed and shouldn't be escaped.
-        ("Hello world", 'PRETTY_HOSTNAME="hello world"'),
+        ("hello world", 'PRETTY_HOSTNAME="hello world"'),
         # Non-ASCII is allowed and shouldn't be escaped.
         ("Oh boy 👉😎👉 non-ASCII", 'PRETTY_HOSTNAME="Oh boy 👉😎👉 non-ASCII"'),
         # Backslashes, double-quote characters, dollar signs, and backticks
@@ -71,10 +71,10 @@ def test_rewrite_machine_info_is_idempotent(initial_contents: str) -> None:
         (r"has two \\ backslashes", r'PRETTY_HOSTNAME="has two \\\\ backslashes"'),
         ('has " double-quote', r'PRETTY_HOSTNAME="has \" double-quote"'),
         ("has $ dollar sign", r'PRETTY_HOSTNAME="has \$ dollar sign"'),
-        ("has ` backtick", r'PRETTY_HOSTNAME="has \` backtick'),
+        ("has ` backtick", r'PRETTY_HOSTNAME="has \` backtick"'),
         # Unlike double-quote characters, single-quote characters shouldn't be escaped.
         # TODO: Verify this.
-        ("has ' single-quote", '''PRETTY_HOSTNAME=" has ' single-quote"'''),
+        ("has ' single-quote", '''PRETTY_HOSTNAME="has ' single-quote"'''),
         # Other ASCII characters shouldn't be escaped.
         ("!@#%^&*", 'PRETTY_HOSTNAME="!@#%^&*'),
         # Character sequences that would be esape sequences in C, Python, or the shell
