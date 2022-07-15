@@ -63,11 +63,14 @@ export const ProtocolRunModuleControls = ({
   }, [])
 
   // split modules in half and map into ech column separately to avoid
-  // the need for hardcoded heights without limitation, array will  be split equally
+  // the need for hardcoded heights without limitation, array will be split equally
   // or left column will contain 1 more item than right column
   const halfAttachedModulesSize = Math.ceil(attachedModules?.length / 2)
   const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
-  const rightColumnModules = attachedModules?.slice(-halfAttachedModulesSize)
+  const rightColumnModules =
+    attachedModules?.length > 1
+      ? attachedModules?.slice(-halfAttachedModulesSize)
+      : []
 
   return (
     <Flex
