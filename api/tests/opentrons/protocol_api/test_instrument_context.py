@@ -94,8 +94,6 @@ def subject(
         at_version=APIVersion(2, 0),
     )
 
-    decoy.when(subject.channels).then_return(0)
-
     return subject
 
 
@@ -159,7 +157,7 @@ def test_pick_up_from_exact_labware_location(
     input_location = Location(point=Point(-100, -100, 0), labware=mock_labware)
     expected_location = Location(point=Point(-100, -100, 0), labware=mock_well)
 
-    decoy.when(mock_labware.next_tip(0)).then_return(mock_well)
+    decoy.when(mock_labware.next_tip(None)).then_return(mock_well)
 
     decoy.when(mock_well.top()).then_return(expected_location)
 
@@ -215,7 +213,7 @@ def test_pick_up_from_well(
     mock_well = decoy.mock(cls=Well)
     expected_location = Location(Point(0, 0, 0), mock_well)
 
-    decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=0)).then_return(
+    decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=None)).then_return(
         False
     )
 
@@ -248,8 +246,8 @@ def test_pick_up_from_no_location(
 
     expected_location = Location(Point(0, 0, 0), mock_well)
 
-    decoy.when(mock_labware_module(None, [], 0)).then_return((mock_labware, mock_well))
-    decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=0)).then_return(
+    decoy.when(mock_labware_module(None, [], None)).then_return((mock_labware, mock_well))
+    decoy.when(mock_labware.use_tips(start_well=mock_well, num_channels=None)).then_return(
         False
     )
 
