@@ -12,6 +12,7 @@ import {
   DIRECTION_COLUMN,
   COLORS,
   SPACING,
+  WRAP,
 } from '@opentrons/components'
 
 import type { ThermocyclerStatus } from '../../redux/modules/api-types'
@@ -23,15 +24,6 @@ interface ThermocyclerModuleProps {
   lidTemp: number | null
   lidTarget: number | null
 }
-
-const MODULE_STATUS_STYLING = css`
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-
-  @media (min-width: 800px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-`
 
 export const ThermocyclerModuleData = (
   props: ThermocyclerModuleProps
@@ -77,7 +69,7 @@ export const ThermocyclerModuleData = (
   }
 
   return (
-    <Flex css={MODULE_STATUS_STYLING}>
+    <Flex flexWrap={WRAP} gridGap={`${SPACING.spacing1} ${SPACING.spacing6}`}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         data-testid={`thermocycler_module_data_lid`}
