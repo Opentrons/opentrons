@@ -683,10 +683,11 @@ class InstrumentContext(publisher.CommandPublisher):
         if location and isinstance(location, types.Location):
             if location.labware.is_labware:
                 tiprack = location.labware.as_labware()
-                target_well: labware.Well = tiprack.next_tip(self.channels)  # type: ignore
-                move_to_location = target_well.top()
-                if not target_well:
+                next_tip = tiprack.next_tip(self.channels)
+                if not next_tip:
                     raise labware.OutOfTipsError
+                target_well = next_tip
+                move_to_location = target_well.top()
             elif location.labware.is_well:
                 target_well = location.labware.as_well()
                 tiprack = target_well.parent
