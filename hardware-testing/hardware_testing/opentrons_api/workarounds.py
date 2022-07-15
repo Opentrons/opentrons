@@ -1,3 +1,7 @@
+from typing import Tuple
+from pathlib import Path
+import json
+
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api import InstrumentContext
 
@@ -25,3 +29,20 @@ def force_prepare_for_aspirate(pipette: InstrumentContext) -> None:
     #       to well.top() before beginning the .aspirate()
     pipette.aspirate(pipette.min_volume)
     pipette.dispense()
+
+
+def load_newest_offset_for_labware(name: str, slot: str) -> Tuple[float, float, float]:
+    # TODO: read from /runs, which returns a JSON dict
+    # Note: for testing right now, just read from the example output file
+    with open(Path(__file__).parent / 'example_runs_output.json') as f:
+        runs = json.load(f)
+    protocols_list = runs['data']
+    for p in protocols_list:
+        print(f'Protocol: {p["id"]}')
+        labware_offsets = p['labwareOffsets']
+        for offset in labware_offsets:
+            print(f'\tOffset URI: {offset["definitionUri"]}')
+            print(f'\t\tCreated at: {offset["createdAt"]}')
+            print(f'\t\tLocation: {offset["location"]}')
+            print(f'\t\tVector: {offset["vector"]}')
+    return 0, 0, 0

@@ -74,7 +74,8 @@ def run(protocol: ProtocolContext):
     liq_pipette.set_liquid_class(LIQUID_CLASS_OT2_P300_SINGLE)
 
     recorder = GravimetricRecorder(protocol, test_name=metadata['protocolName'])
-    recorder.set_tag(liq_pipette.pipette.name)  # FIXME: get the serial number of the pipette
+    pip_sn = liq_pipette.pipette.hw_pipette["pipette_id"]
+    recorder.set_tag(f'P300-Single-Gen2-{pip_sn}')
 
     liquid_level.print_setup_instructions(user_confirm=not protocol.is_simulating())
     test_gravimetric(protocol, liq_pipette, layout, liquid_level, recorder)
