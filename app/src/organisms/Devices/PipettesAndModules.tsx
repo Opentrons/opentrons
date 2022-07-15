@@ -41,7 +41,7 @@ export function PipettesAndModules({
 
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
-  // split modules in half and map into ech column separately to avoid
+  // split modules in half and map into each column separately to avoid
   // the need for hardcoded heights without limitation, array will be split equally
   // or left column will contain 1 more item than right column
   const halfAttachedModulesSize = Math.ceil(attachedModules?.length / 2)
