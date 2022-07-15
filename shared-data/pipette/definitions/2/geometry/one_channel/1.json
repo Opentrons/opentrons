@@ -1,4 +1,5 @@
 {
 	"$otSharedSchema": "pipette/schemas/2/pipetteGeometrySchema",
-	"model": "singleChannel",
+	"model": "gripperV1",
+	"pathTo3D" : "pipette/definitions/2/single_channel/placeholder.gltf"
 }
