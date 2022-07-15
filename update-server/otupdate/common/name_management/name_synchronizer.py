@@ -7,8 +7,7 @@ from typing import AsyncGenerator, Optional
 from aiohttp import web
 
 from otupdate.common.constants import APP_VARIABLE_PREFIX
-from .avahi import AvahiClient, alternative_service_name
-from .pretty_hostname import get_pretty_hostname, persist_pretty_hostname
+from . import avahi, pretty_hostname
 
 
 _NAME_SYNCHRONIZER_VARNAME = APP_VARIABLE_PREFIX + "name_synchronizer"
@@ -41,14 +40,14 @@ class NameSynchronizer:
       configurable. https://datatracker.ietf.org/doc/html/rfc6763#section-4.1.1
     """
 
-    def __init__(self, avahi_client: AvahiClient) -> None:
+    def __init__(self, avahi_client: avahi.AvahiClient) -> None:
         """For internal use by this class only. Use `start()` instead."""
         self._avahi_client = avahi_client
 
     @classmethod
     @asynccontextmanager
     async def start(
-        cls, avahi_client: Optional[AvahiClient] = None
+        cls, avahi_client: Optional[avahi.AvahiClient] = None
     ) -> AsyncGenerator[NameSynchronizer, None]:
         """Build a NameSynchronizer and keep it running in the background.
 
@@ -68,7 +67,7 @@ class NameSynchronizer:
                 the default.
         """
         if avahi_client is None:
-            avahi_client = await AvahiClient.connect()
+            avahi_client = await avahi.AvahiClient.connect()
 
         name_synchronizer = cls(avahi_client)
         async with avahi_client.listen_for_collisions(
@@ -91,7 +90,9 @@ class NameSynchronizer:
         await self._avahi_client.start_advertising(service_name=new_name)
         # Setting the Avahi service name can fail if Avahi doesn't like the new name.
         # Persist only after it succeeds, so we don't persist something invalid.
-        persisted_pretty_hostname = await persist_pretty_hostname(new_name)
+        persisted_pretty_hostname = await pretty_hostname.persist_pretty_hostname(
+            new_name
+        )
         _log.info(
             f"Changed name to {repr(new_name)}"
             f" (persisted {repr(persisted_pretty_hostname)})."  # TODO
@@ -104,7 +105,7 @@ class NameSynchronizer:
         Note that this can change even if you haven't called `set_name()`,
         if it was necessary to avoid conflicts with other devices on the network.
         """
-        return await get_pretty_hostname()
+        return await pretty_hostname.get_pretty_hostname()
 
     async def _on_avahi_collision(self) -> None:
         current_name = await self.get_name()
@@ -112,7 +113,7 @@ class NameSynchronizer:
         # Assume that the service name was the thing that collided.
         # Theoretically it also could have been the static hostname,
         # but our static hostnames are unique in practice, so that's unlikely.
-        alternative_name = alternative_service_name(current_name)
+        alternative_name = avahi.alternative_service_name(current_name)
         _log.info(
             f"Name collision detected by Avahi."
             f" Changing name from {repr(current_name)} to {repr(alternative_name)}."
