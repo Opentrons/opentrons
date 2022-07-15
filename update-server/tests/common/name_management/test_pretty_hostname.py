@@ -76,7 +76,10 @@ def test_rewrite_machine_info_is_idempotent(initial_contents: str) -> None:
         # TODO: Verify this.
         ("has ' single-quote", '''PRETTY_HOSTNAME="has ' single-quote"'''),
         # Other ASCII characters shouldn't be escaped.
-        ("!@#%^&*", 'PRETTY_HOSTNAME="!@#%^&*'),
+        ("!#%&()*+,-./", 'PRETTY_HOSTNAME="!#%&()*+,-./"'),
+        (":;<=>?@", 'PRETTY_HOSTNAME=":;<=>?@"'),
+        ("[]^_", 'PRETTY_HOSTNAME="[]^_"'),
+        ("{|}~", 'PRETTY_HOSTNAME="{|}~"'),
         # Character sequences that would be esape sequences in C, Python, or the shell
         # should not be processed as such here. For example, setting the name to the
         # string [<backslash>,<n>] should not cause an actual ASCII newline to be
