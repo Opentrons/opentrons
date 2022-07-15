@@ -69,24 +69,28 @@ class RPM(Simulation):
         self._target: Optional[float] = None
 
     def tick(self) -> None:
-        if self._target is None:
-            return
 
-        diff = self._target - self._current
+        if self._target is None:
+            target = 0.0
+        else:
+            target = self._target
+
+        diff = target - self._current
 
         if abs(diff) < self._per_tick:
-            self._current = self._target
+            self._current = target
         elif diff > 0:
             self._current += self._per_tick
         else:
             self._current -= self._per_tick
+        self._current
 
     def deactivate(self, rpm: float) -> None:
         """Deactivate and reset to rpm"""
         self._target = None
         self._current = rpm
 
-    def set_target(self, target: float) -> None:
+    def set_target(self, target: Optional[float]) -> None:
         self._target = target
 
     @property

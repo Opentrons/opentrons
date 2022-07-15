@@ -2,9 +2,10 @@
 
 The purpose is to provide a fake backend that responds to GCODE commands.
 """
-
 import logging
-from typing import Optional
+from typing import (
+    Optional,
+)
 
 from opentrons.drivers.heater_shaker.driver import (
     GCODE,
@@ -15,7 +16,10 @@ from opentrons.hardware_control.emulation.settings import HeaterShakerSettings
 from . import util
 
 from .abstract_emulator import AbstractEmulator
-from .simulations import Temperature, RPM
+from .simulations import (
+    Temperature,
+    RPM,
+)
 from ...drivers.types import HeaterShakerLabwareLatchStatus
 
 logger = logging.getLogger(__name__)
@@ -101,8 +105,9 @@ class HeaterShakerEmulator(AbstractEmulator):
         self._temperature.tick()
         return res
 
-    def _home(self, command: Command) -> None:
-        self._rpm.set_target(0)
+    def _home(self, command: Command) -> str:
+        self._rpm.set_target(None)
+        return "G28"
 
     def _enter_bootloader(self, command: Command) -> None:
         pass

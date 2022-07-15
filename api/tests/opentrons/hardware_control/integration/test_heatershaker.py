@@ -50,11 +50,11 @@ async def test_speed(heatershaker: HeaterShaker) -> None:
     """It should speed up, then slow down."""
 
     await heatershaker.wait_next_poll()
-    await heatershaker.set_speed(650)
-    assert heatershaker.target_speed == 650
+    await heatershaker.set_speed(150)
+    assert heatershaker.target_speed == 150
 
     # The acceptable delta for actual speed is 100
-    assert 550 <= heatershaker.speed <= 750
+    assert 50 <= heatershaker.speed <= 250
 
 
 async def test_temp(heatershaker: HeaterShaker) -> None:
