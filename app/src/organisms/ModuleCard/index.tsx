@@ -275,7 +275,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           </Flex>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            flex={'100%'}
+            flex="100%"
             paddingLeft={SPACING.spacing3}
           >
             {showSuccessToast && (
