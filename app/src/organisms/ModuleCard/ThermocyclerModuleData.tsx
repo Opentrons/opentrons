@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import { StatusLabel } from '../../atoms/StatusLabel'
 import {
   Flex,
@@ -73,6 +72,7 @@ export const ThermocyclerModuleData = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
         data-testid={`thermocycler_module_data_lid`}
+        gridColumn="1/4"
       >
         <Text
           textTransform={TEXT_TRANSFORM_UPPERCASE}
@@ -100,6 +100,7 @@ export const ThermocyclerModuleData = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
         data-testid={`thermocycler_module_data_block`}
+        gridColumn="5/8"
       >
         <Text
           textTransform={TEXT_TRANSFORM_UPPERCASE}

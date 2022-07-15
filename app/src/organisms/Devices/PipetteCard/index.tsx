@@ -203,14 +203,22 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               />
             )}
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            flex="100%"
+            paddingLeft={SPACING.spacing3}
+          >
             {!isDeckCalibrated &&
             pipetteOffsetCalibration == null &&
             pipetteInfo != null &&
             showBanner &&
             !isFetching ? (
               <Flex paddingBottom={SPACING.spacing2}>
-                <Banner type="error" onCloseClick={() => setShowBanner(false)}>
+                <Banner
+                  type="error"
+                  flex="100%"
+                  onCloseClick={() => setShowBanner(false)}
+                >
                   {t('deck_cal_missing')}
                 </Banner>
               </Flex>
@@ -221,7 +229,11 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             showBanner &&
             !isFetching ? (
               <Flex paddingBottom={SPACING.spacing2}>
-                <Banner type="error" onCloseClick={() => setShowBanner(false)}>
+                <Banner
+                  type="error"
+                  flex="100%"
+                  onCloseClick={() => setShowBanner(false)}
+                >
                   <Flex flexDirection={DIRECTION_COLUMN}>
                     {t('pipette_offset_calibration_needed')}
                     <Btn
@@ -240,6 +252,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               <Flex paddingBottom={SPACING.spacing2}>
                 <Banner
                   type="warning"
+                  flex="100%"
                   onCloseClick={() => setShowBanner(false)}
                 >
                   <Flex flexDirection={DIRECTION_COLUMN}>

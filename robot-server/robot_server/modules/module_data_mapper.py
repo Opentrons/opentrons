@@ -125,7 +125,7 @@ class ModuleDataMapper:
             serialNumber=module_identity.serial_number,
             firmwareVersion=module_identity.firmware_version,
             hardwareRevision=module_identity.hardware_revision,
-            hasAvailableUpdate=has_available_update,
+            hasAvailableUpdate=True,
             usbPort=UsbPort(
                 port=usb_port.port_number,
                 hub=usb_port.hub,
