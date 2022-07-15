@@ -97,11 +97,11 @@ describe('AdvancedSettings', () => {
     getCustomLabwarePath.mockReturnValue('')
     getChannelOptions.mockReturnValue([
       {
-        name: 'Stable',
+        label: 'Stable',
         value: 'latest',
       },
-      { name: 'Beta', value: 'beta' },
-      { name: 'Alpha', value: 'alpha' },
+      { label: 'Beta', value: 'beta' },
+      { label: 'Alpha', value: 'alpha' },
     ])
     mockGetU2EAdapterDevice.mockReturnValue(Fixtures.mockWindowsRealtekDevice)
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])

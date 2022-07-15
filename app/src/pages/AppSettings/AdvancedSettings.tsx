@@ -190,10 +190,10 @@ export function AdvancedSettings(): JSX.Element {
   const formatOptionLabel: React.ComponentProps<
     typeof SelectField
   >['formatOptionLabel'] = (option, index): JSX.Element => {
-    const { value } = option
+    const { label, value } = option
     return (
       <StyledText as="p" textTransform={TEXT_TRANSFORM_CAPITALIZE} id={index}>
-        {value === 'latest' ? 'Stable' : value}
+        {value === 'latest' ? label : value}
       </StyledText>
     )
   }
