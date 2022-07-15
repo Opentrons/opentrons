@@ -183,7 +183,9 @@ async def test_move_integration(
     #   10e-3 mm
     #  All of this lines up to mean you have to give some wiggle room for positions.
     #  Also mypy doesn't like pytest.approx so we have to type ignore it
-    assert position == {  # type: ignore[comparison-overlap]
+
+    # We now store the position as a tuple of assumed position + encoder value.
+    assert {k: v[0] for k, v in position.items()} == {  # type: ignore[comparison-overlap]
         motor_node: pytest.approx(
             motor_node.value, abs=all_motor_node_step_sizes[motor_node] * 3
         )
