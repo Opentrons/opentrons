@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from typing import Optional, Callable
+from typing import Optional, Callable, List
 
 from opentrons.protocol_api import ProtocolContext, InstrumentContext
-from opentrons.protocol_api.labware import Well
+from opentrons.protocol_api.labware import Well, Labware
 
 from hardware_testing.liquid.height import LiquidTracker
 from hardware_testing.liquid.liquid_class import LiquidClassSettings
@@ -162,3 +162,51 @@ def pipette_liquid_settings(
     pip_runner.run(on_pre_submerge=on_pre_submerge, on_post_emerge=on_post_emerge)
     liquid_tracker.update_affected_wells(
         pipette, well, aspirate=aspirate, dispense=dispense)
+
+
+class PipetteLiquidClass:
+
+    def __init__(self, ctx: ProtocolContext,
+                 model: str, mount: str, tip_racks: List[Labware]) -> None:
+        self._ctx = ctx
+        self._pipette = ctx.load_instrument(model, mount, tip_racks=tip_racks)
+        self._liq_cls = None
+        self._on_pre_aspirate = None
+        self._on_post_aspirate = None
+        self._on_pre_dispense = None
+        self._on_post_dispense = None
+
+    @property
+    def pipette(self) -> InstrumentContext:
+        return self._pipette
+
+    def set_liquid_class(self, settings: LiquidClassSettings) -> None:
+        self._liq_cls = settings
+        apply_pipette_speeds(self._pipette, settings)
+
+    def assign_callbacks(self,
+                         on_pre_aspirate: Optional[Callable] = None,
+                         on_post_aspirate: Optional[Callable] = None,
+                         on_pre_dispense: Optional[Callable] = None,
+                         on_post_dispense: Optional[Callable] = None,
+                         ) -> None:
+        self._on_pre_aspirate = on_pre_aspirate
+        self._on_post_aspirate = on_post_aspirate
+        self._on_pre_dispense = on_pre_dispense
+        self._on_post_dispense = on_post_dispense
+
+    def aspirate(self, volume: float, well: Well, liquid_level: LiquidTracker) -> None:
+        pipette_liquid_settings(
+            self._ctx, self._pipette, well,
+            self._liq_cls, liquid_level,
+            aspirate=volume,
+            on_pre_submerge=self._on_pre_aspirate,
+            on_post_emerge=self._on_post_aspirate)
+
+    def dispense(self, volume: float, well: Well, liquid_level: LiquidTracker) -> None:
+        pipette_liquid_settings(
+            self._ctx, self._pipette, well,
+            self._liq_cls, liquid_level,
+            dispense=volume,
+            on_pre_submerge=self._on_pre_dispense,
+            on_post_emerge=self._on_post_dispense)

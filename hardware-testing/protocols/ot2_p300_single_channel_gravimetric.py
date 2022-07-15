@@ -1,4 +1,4 @@
-from opentrons.protocol_api import ProtocolContext, InstrumentContext, labware
+from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.labware.position import VIAL_SAFE_Z_OFFSET
 from hardware_testing.labware.layout import LayoutLabware, DEFAULT_SLOTS_GRAV
@@ -19,7 +19,7 @@ NUM_SAMPLES_PER_VOLUME = 10
 
 
 def test_gravimetric(protocol: ProtocolContext,
-                     pipette: InstrumentContext,
+                     liq_pipette: motions.PipetteLiquidClass,
                      layout: LayoutLabware,
                      liquid_level: LiquidTracker,
                      recorder: GravimetricRecorder):
@@ -43,24 +43,21 @@ def test_gravimetric(protocol: ProtocolContext,
         # FIXME: refactor so it uses Recorder
         return
 
+    liq_pipette.assign_callbacks(
+        on_pre_aspirate=_on_pre_aspirate,
+        on_post_aspirate=_on_post_aspirate,
+        on_pre_dispense=_on_pre_dispense,
+        on_post_dispense=_on_post_dispense,
+    )
+
     samples = [v for v in VOLUMES for _ in range(NUM_SAMPLES_PER_VOLUME)]
-    if pipette.has_tip:
-        pipette.drop_tip()
+    if liq_pipette.pipette.has_tip:
+        liq_pipette.pipette.drop_tip()
     for sample_volume in samples:
-        pipette.pick_up_tip()
-        motions.pipette_liquid_settings(
-            protocol, pipette, layout.vial['A1'],
-            LIQUID_CLASS_OT2_P300_SINGLE, liquid_level,
-            aspirate=sample_volume,
-            on_pre_submerge=_on_pre_aspirate,
-            on_post_emerge=_on_post_aspirate)
-        motions.pipette_liquid_settings(
-            protocol, pipette, layout.vial['A1'],
-            LIQUID_CLASS_OT2_P300_SINGLE, liquid_level,
-            dispense=sample_volume,
-            on_pre_submerge=_on_pre_dispense,
-            on_post_emerge=_on_post_dispense)
-        pipette.drop_tip()
+        liq_pipette.pipette.pick_up_tip()
+        liq_pipette.aspirate(sample_volume, layout.vial['A1'], liquid_level=liquid_level)
+        liq_pipette.dispense(sample_volume, layout.vial['A1'], liquid_level=liquid_level)
+        liq_pipette.pipette.drop_tip()
 
 
 def run(protocol: ProtocolContext):
@@ -72,14 +69,15 @@ def run(protocol: ProtocolContext):
     liquid_level.set_start_volume_from_liquid_height(
         layout.vial['A1'], layout.vial['A1'].depth - VIAL_SAFE_Z_OFFSET, name='Water')
 
-    pipette = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[layout.tiprack])
-    motions.apply_pipette_speeds(pipette, LIQUID_CLASS_OT2_P300_SINGLE)
+    liq_pipette = motions.PipetteLiquidClass(
+        ctx=protocol, model='p300_single_gen2', mount='left', tip_racks=[layout.tiprack])
+    liq_pipette.set_liquid_class(LIQUID_CLASS_OT2_P300_SINGLE)
 
     recorder = GravimetricRecorder(protocol, test_name=metadata['protocolName'])
-    recorder.set_tag(pipette.name)  # FIXME: get the serial number of the pipette
+    recorder.set_tag(liq_pipette.pipette.name)  # FIXME: get the serial number of the pipette
 
     liquid_level.print_setup_instructions(user_confirm=not protocol.is_simulating())
-    test_gravimetric(protocol, pipette, layout, liquid_level, recorder)
+    test_gravimetric(protocol, liq_pipette, layout, liquid_level, recorder)
 
 
 if __name__ == '__main__':
