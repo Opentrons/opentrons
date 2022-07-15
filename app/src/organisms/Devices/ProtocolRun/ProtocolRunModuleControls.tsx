@@ -75,8 +75,9 @@ export const ProtocolRunModuleControls = ({
   return (
     <Flex
       gridGap={SPACING.spacing3}
-      paddingTop={SPACING.spacing3}
-      paddingX={SPACING.spacing2}
+      paddingTop={SPACING.spacing4}
+      paddingBottom={SPACING.spacing3}
+      paddingX={SPACING.spacing4}
     >
       <Box flex="50%">
         {leftColumnModules.map((module, index) =>
