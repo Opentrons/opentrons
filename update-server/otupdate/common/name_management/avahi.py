@@ -7,27 +7,14 @@ import asyncio
 import contextlib
 import logging
 import re
+import unicodedata
 from typing import AsyncGenerator, Awaitable, Callable, cast
+from typing_extensions import Final
 
 try:
     import dbus
-
-    _DBUS_AVAILABLE = True
 except ImportError:
-    _DBUS_AVAILABLE = False
-
-
-_COLLISION_POLL_INTERVAL = 5
-
-SERVICE_NAME_MAXIMUM_OCTETS = 63
-"""The maximum length of an Avahi service name.
-
-Measured in UTF-8 octets (bytes) -- not code points or characters!
-
-This comes from the DNS-SD specification on instance names,
-which Avahi service names correspond to, under the hood.
-https://datatracker.ietf.org/doc/html/rfc6763#section-4.1.1
-"""
+    pass  # Not installed on non-Linux dev machines.
 
 
 _log = logging.getLogger(__name__)
@@ -53,6 +40,8 @@ async def restart_daemon() -> None:
 
 
 class AvahiClient:
+    _COLLISION_POLL_INTERVAL: Final = 5
+
     def __init__(self, sync_client: _SyncClient) -> None:
         """For internal use by this class only. Use `connect()` instead."""
         self._sync_client = sync_client
@@ -69,13 +58,6 @@ class AvahiClient:
     async def start_advertising(self, service_name: str) -> None:
         """Start advertising the machine over mDNS + DNS-SD.
 
-        Since the Avahi service name corresponds to the DNS-SD instance name,
-        it's a human-readable string of mostly arbitrary Unicode,
-        at most SERVICE_NAME_MAXIMUM_OCTETS long.
-
-        Avahi will raise an exception through this method if it thinks
-        the new service name is invalid.
-
         Avahi will stop advertising the machine when either of these happen:
 
         * This process dies.
@@ -84,7 +66,17 @@ class AvahiClient:
 
         It's safe to call this more than once. If we're already advertising,
         the existing service name will be replaced with the new one.
+
+        Args:
+            service_name: The new Avahi service name under which to start advertising.
+                See `service_name_is_valid()`.
+
+        Raises:
+            Exception: If Avahi thinks the new service name is invalid. Beware:
+                the old name may not be restored and we may be left not advertising
+                at all.
         """
+        assert service_name_is_valid(service_name)
         async with self._lock:
             await asyncio.get_running_loop().run_in_executor(
                 None, self._sync_client.start_advertising, service_name
@@ -138,7 +130,7 @@ class AvahiClient:
                     # Log it and keep polling.
                     _log.exception("Exception while handling Avahi name collision.")
 
-            await asyncio.sleep(_COLLISION_POLL_INTERVAL)
+            await asyncio.sleep(self._COLLISION_POLL_INTERVAL)
 
     async def _is_collided(self) -> bool:
         async with self._lock:
@@ -208,8 +200,47 @@ def alternative_service_name(current_service_name: str) -> str:
         # new digit that we don't have room for. Roll back to zero instead.
         result = f"{separator}0"
 
-    assert len(result.encode("utf-8")) <= SERVICE_NAME_MAXIMUM_OCTETS
+    assert service_name_is_valid(result)
     return result
+
+
+def service_name_is_valid(service_name: str) -> bool:
+    """Return whether a string would be valid as an Avahi service name.
+
+    The Avahi service name corresponds to the DNS-SD instance name.
+    So, it's a human-readable string of *mostly* arbitrary Unicode.
+
+    Specifically, the limitations are:
+
+    * It must not be longer than SERVICE_NAME_MAXIMUM_OCTETS when encoded as UTF-8,
+      per the DNS-SD spec (https://datatracker.ietf.org/doc/html/rfc6763#section-4.1.1).
+
+    * It must not contain control characters, per the specs of
+      DNS-SD (https://datatracker.ietf.org/doc/html/rfc6763#section-4.1.1)
+      and Net-Unicode (https://datatracker.ietf.org/doc/html/rfc5198#section-2).
+
+    * It must not be empty.
+      This doesn't seem formally documented anywhere, but Avahi enforces it.
+    """
+    octet_length = len(service_name.encode("utf-8"))
+    contains_control_characters = any(
+        unicodedata.category(c) == "Cc" for c in service_name
+    )
+    is_empty = service_name == ""
+    return (
+        (octet_length <= SERVICE_NAME_MAXIMUM_OCTETS)
+        and (not contains_control_characters)
+        and (not is_empty)
+    )
+
+
+SERVICE_NAME_MAXIMUM_OCTETS = 63
+"""The maximum length of an Avahi service name.
+
+Measured in UTF-8 octets (bytes) -- not code points or characters!
+
+See `service_name_is_valid()`.
+"""
 
 
 def _truncate_by_utf8_octets(s: str, maximum_utf8_octets: int) -> str:

@@ -68,6 +68,8 @@ async def test_set(
     """
     await started_up_subject.set_name("new name")
 
+    # TODO: Mock out is_valid() funcs.
+
     decoy.verify(
         await mock_avahi_client.start_advertising("new name"),
         await pretty_hostname.persist_pretty_hostname("new name"),

@@ -46,8 +46,10 @@ def pretty_hostname_is_valid(pretty_hostname: str) -> bool:
     To cover at least all of the above, we disallow code points in the Unicode
     "control" group.
     """
-    contains_control = any(unicodedata.category(c) == "Cc" for c in pretty_hostname)
-    return not contains_control
+    contains_control_characters = any(
+        unicodedata.category(c) == "Cc" for c in pretty_hostname
+    )
+    return not contains_control_characters
 
 
 async def get_pretty_hostname(default: str = "no name set") -> str:

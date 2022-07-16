@@ -87,12 +87,24 @@ class NameSynchronizer:
         Returns the new name. This is normally the same as the requested name,
         but it it might be different if it had to be truncated, sanitized, etc.
         """
+        # Check that the new name is valid for both places before setting it on either
+        # place, to avoid a messy torn state if one succeeds and the other fails.
+        if not (
+            avahi.service_name_is_valid(new_name)
+            and pretty_hostname.pretty_hostname_is_valid(new_name)
+        ):
+            # TODO: Better exception.
+            raise RuntimeError(f"{new_name!r} is not a valid name.")
+
+        # TODO: Add lock.
         await self._avahi_client.start_advertising(service_name=new_name)
+
         # Setting the Avahi service name can fail if Avahi doesn't like the new name.
         # Persist only after it succeeds, so we don't persist something invalid.
         persisted_pretty_hostname = await pretty_hostname.persist_pretty_hostname(
             new_name
         )
+
         _log.info(
             f"Changed name to {repr(new_name)}"
             f" (persisted {repr(persisted_pretty_hostname)})."  # TODO
