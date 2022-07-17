@@ -13,12 +13,21 @@ import {
   Flex,
   SPACING,
   TYPOGRAPHY,
+  LabwareRender,
 } from '@opentrons/components'
-import { useProtocolDetailsForRun } from '../../../Devices/hooks'
+import {
+  useProtocolDetailsForRun,
+  useLabwareRenderInfoForRunById,
+} from '../../../Devices/hooks'
 import { Modal } from '../../../../atoms/Modal'
 import { StyledText } from '../../../../atoms/text'
 import { LiquidDetailCard } from './LiquidDetailCard'
-import { getSlotLabwareName, getLiquidsByIdForLabware } from './utils'
+import {
+  getSlotLabwareName,
+  getLiquidsByIdForLabware,
+  getWellFillFromLabwareId,
+  getWellGroupForLiquidId,
+} from './utils'
 
 interface LiquidsLabwareDetailsModalProps {
   liquidId?: string
@@ -35,13 +44,21 @@ export const LiquidsLabwareDetailsModal = (
   const [selectedValue, setSelectedValue] = React.useState<typeof liquidId>(
     liquidId
   )
-
+  const labwareRenderInfo = useLabwareRenderInfoForRunById(runId)[labwareId]
   const commands = useProtocolDetailsForRun(runId).protocolData?.commands
   const liquids = parseLiquidsInLoadOrder()
   const labwareByLiquidId = parseLabwareInfoByLiquidId()
-
+  const wellFill = getWellFillFromLabwareId(
+    labwareId,
+    liquids,
+    labwareByLiquidId
+  )
   const labwareInfo = getLiquidsByIdForLabware(labwareId, labwareByLiquidId)
   const { slotName, labwareName } = getSlotLabwareName(labwareId, commands)
+  const loadLabwareCommand = commands
+    ?.filter(command => command.commandType === 'loadLabware')
+    ?.find(command => command.result.labwareId === labwareId)
+  const labwareWellOrdering = loadLabwareCommand?.result.definition.ordering
 
   const HIDE_SCROLLBAR = css`
     ::-webkit-scrollbar {
@@ -56,12 +73,13 @@ export const LiquidsLabwareDetailsModal = (
       width="46.875rem"
     >
       <Box>
-        <Flex flexDirection={DIRECTION_ROW}>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             css={HIDE_SCROLLBAR}
             maxHeight={'27.125rem'}
             overflowY={'auto'}
+            minWidth={'10.313rem'}
           >
             {Object.entries(labwareInfo).map((entry, index) => {
               const liquidInfo = liquids.find(
@@ -73,6 +91,7 @@ export const LiquidsLabwareDetailsModal = (
                     key={index}
                     {...liquidInfo}
                     volumeByWell={entry[1][0].volumeByWell}
+                    labwareWellOrdering={labwareWellOrdering}
                     setSelectedValue={setSelectedValue}
                     selectedValue={selectedValue}
                   />
@@ -115,7 +134,20 @@ export const LiquidsLabwareDetailsModal = (
                 </StyledText>
               </Flex>
             </Flex>
-            <Box>Labware render placeholder</Box>
+            <Box width={'30.625rem'}>
+              <svg viewBox="0 -10 130 100" transform="scale(1, -1)">
+                <LabwareRender
+                  definition={labwareRenderInfo.labwareDef}
+                  wellFill={wellFill}
+                  wellLabelOption="SHOW_LABEL_INSIDE"
+                  highlightedWells={
+                    selectedValue != null
+                      ? getWellGroupForLiquidId(labwareInfo, selectedValue)
+                      : {}
+                  }
+                />
+              </svg>
+            </Box>
           </Flex>
         </Flex>
       </Box>

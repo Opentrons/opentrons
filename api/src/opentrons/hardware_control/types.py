@@ -67,6 +67,10 @@ class Axis(enum.Enum):
             cls.C: top_types.Mount.RIGHT,
         }[inst]
 
+    @classmethod
+    def pipette_axes(cls) -> Tuple["Axis", "Axis"]:
+        return cls.B, cls.C
+
     def __str__(self) -> str:
         return self.name
 
@@ -162,18 +166,18 @@ class OT3Axis(enum.Enum):
         return cls.P_L, cls.P_R
 
     @classmethod
-    def mount_axes(cls) -> Tuple["OT3Axis", "OT3Axis"]:
-        """The axes which are used for moving pipettes up and down."""
-        return cls.Z_L, cls.Z_R
+    def mount_axes(cls) -> Tuple["OT3Axis", "OT3Axis", "OT3Axis"]:
+        """The axes which are used for moving instruments up and down."""
+        return cls.Z_L, cls.Z_R, cls.Z_G
 
     @classmethod
     def gantry_axes(
         cls,
-    ) -> Tuple["OT3Axis", "OT3Axis", "OT3Axis", "OT3Axis"]:
+    ) -> Tuple["OT3Axis", "OT3Axis", "OT3Axis", "OT3Axis", "OT3Axis"]:
         """The axes which are tied to the gantry and require the deck
         calibration transform
         """
-        return cls.X, cls.Y, cls.Z_L, cls.Z_R
+        return cls.X, cls.Y, cls.Z_L, cls.Z_R, cls.Z_G
 
     @classmethod
     def of_main_tool_actuator(
@@ -183,11 +187,7 @@ class OT3Axis(enum.Enum):
             checked_mount = OT3Mount.from_mount(mount)
         else:
             checked_mount = mount
-        pm = {
-            OT3Mount.LEFT: cls.P_L,
-            OT3Mount.RIGHT: cls.P_R,
-            OT3Mount.GRIPPER: cls.Z_G,
-        }
+        pm = {OT3Mount.LEFT: cls.P_L, OT3Mount.RIGHT: cls.P_R, OT3Mount.GRIPPER: cls.G}
         return pm[checked_mount]
 
     @classmethod
@@ -295,16 +295,15 @@ class HardwareEventType(enum.Enum):
     ERROR_MESSAGE = enum.auto()
 
 
-@dataclass
+@dataclass(frozen=True)
 class DoorStateNotification:
     event: Literal[
         HardwareEventType.DOOR_SWITCH_CHANGE
     ] = HardwareEventType.DOOR_SWITCH_CHANGE
     new_state: DoorState = DoorState.CLOSED
-    blocking: bool = False
 
 
-@dataclass
+@dataclass(frozen=True)
 class ErrorMessageNotification:
     message: str
     event: Literal[HardwareEventType.ERROR_MESSAGE] = HardwareEventType.ERROR_MESSAGE
@@ -388,6 +387,25 @@ class CriticalPoint(enum.Enum):
     Only relevant when a multichannel pipette is present.
     """
 
+    GRIPPER_JAW_CENTER = enum.auto()
+    """
+    The center of the gripper jaw engagement zone, such that if this critical
+    point is moved to the center of a labware the gripper will be ready to
+    grip it.
+    """
+
+    GRIPPER_FRONT_CALIBRATION_PIN = enum.auto()
+    """
+    The center of the bottom face of a calibration pin inserted in the gripper's
+    front calibration pin slot.
+    """
+
+    GRIPPER_BACK_CALIBRATION_PIN = enum.auto()
+    """
+    The center of the bottom face of a calibration pin inserted in the gripper's
+    back calibration pin slot.
+    """
+
 
 class ExecutionState(enum.Enum):
     RUNNING = enum.auto()
@@ -431,10 +449,6 @@ class AionotifyEvent:
         return cls(flags=Flag, name=name)
 
 
-class PauseResumeError(RuntimeError):
-    pass
-
-
 class ExecutionCancelledError(RuntimeError):
     pass
 
@@ -448,4 +462,32 @@ class NoTipAttachedError(RuntimeError):
 
 
 class TipAttachedError(RuntimeError):
+    pass
+
+
+class GripperJawState(enum.Enum):
+    UNHOMED = enum.auto()
+    #: the gripper must be homed before it can do anything
+    HOMED_READY = enum.auto()
+    #: the gripper has been homed and is at its fully-open homed position
+    GRIPPING = enum.auto()
+    #: the gripper is actively force-control gripping something
+    HOLDING_CLOSED = enum.auto()
+    #: the gripper is in position-control mode somewhere other than its
+    #: open position and probably should be opened before gripping something
+    HOLDING_OPENED = enum.auto()
+    #: the gripper is holding itself open but not quite at its homed position
+
+    @property
+    def ready_for_grip(self) -> bool:
+        return self in [GripperJawState.HOMED_READY, GripperJawState.HOLDING_OPENED]
+
+
+class InvalidMoveError(ValueError):
+    pass
+
+
+class GripperNotAttachedError(Exception):
+    """An error raised if a gripper is accessed that is not attached"""
+
     pass

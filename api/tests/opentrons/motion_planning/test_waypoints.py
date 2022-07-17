@@ -18,6 +18,7 @@ def test_get_waypoints_direct() -> None:
         origin=Point(1, 2, 3),
         dest=Point(1, 2, 4),
         move_type=MoveType.DIRECT,
+        min_travel_z=0,
         max_travel_z=100,
     )
 

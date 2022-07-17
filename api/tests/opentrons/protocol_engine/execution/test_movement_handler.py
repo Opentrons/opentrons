@@ -116,7 +116,7 @@ async def test_move_to_well(
     )
 
     decoy.when(
-        state_store.motion.get_movement_waypoints(
+        state_store.motion.get_movement_waypoints_to_well(
             origin=Point(1, 1, 1),
             origin_cp=CriticalPoint.FRONT_NOZZLE,
             max_travel_z=42.0,
@@ -197,7 +197,7 @@ async def test_move_to_well_from_starting_location(
     )
 
     decoy.when(
-        state_store.motion.get_movement_waypoints(
+        state_store.motion.get_movement_waypoints_to_well(
             current_well=current_well,
             origin=Point(1, 2, 5),
             origin_cp=CriticalPoint.XY_CENTER,

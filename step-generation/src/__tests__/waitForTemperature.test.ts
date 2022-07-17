@@ -58,6 +58,7 @@ describe('waitForTemperature', () => {
       commands: [
         {
           commandType: 'temperatureModule/waitForTemperature',
+          key: expect.any(String),
           params: {
             moduleId: temperatureModuleId,
             celsius: 20,
@@ -109,6 +110,7 @@ describe('waitForTemperature', () => {
       commands: [
         {
           commandType: 'temperatureModule/waitForTemperature',
+          key: expect.any(String),
           params: {
             moduleId: temperatureModuleId,
             celsius: 42,

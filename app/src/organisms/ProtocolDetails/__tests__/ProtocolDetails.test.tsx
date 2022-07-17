@@ -1,9 +1,11 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
+import { resetAllWhenMocks, when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
+import { useFeatureFlag } from '../../../redux/config'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -28,6 +30,7 @@ jest.mock('../../../redux/custom-labware/selectors')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/protocol-storage/selectors')
 jest.mock('../../../molecules/DeckThumbnail')
+jest.mock('../../../redux/config')
 jest.mock('../../ChooseRobotSlideout')
 
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
@@ -48,6 +51,9 @@ const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as j
 >
 const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.MockedFunction<
   typeof getValidCustomLabwareFiles
+>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
 >
 const mockChooseRobotSlideout = ChooseRobotSlideout as jest.MockedFunction<
   typeof ChooseRobotSlideout
@@ -86,9 +92,13 @@ describe('ProtocolDetails', () => {
       showSlideout ? <div>mock Choose Robot Slideout</div> : null
     )
     mockGetIsProtocolAnalysisInProgress.mockReturnValue(false)
+    when(mockUseFeatureFlag)
+      .calledWith('enableLiquidSetup')
+      .mockReturnValue(true)
   })
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('renders protocol title as display name if present in metadata', () => {

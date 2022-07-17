@@ -4,6 +4,7 @@ from typing import Dict, Optional
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
+from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
 from .resources import ModelUtils, ModuleDataProvider
 from .commands import Command, CommandCreate
@@ -11,7 +12,7 @@ from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel
 from .execution import (
     QueueWorker,
     create_queue_worker,
-    HardwareEventForwarder,
+    DoorWatcher,
     HardwareStopper,
 )
 from .state import StateStore, StateView
@@ -49,7 +50,7 @@ class ProtocolEngine:
         queue_worker: Optional[QueueWorker] = None,
         model_utils: Optional[ModelUtils] = None,
         hardware_stopper: Optional[HardwareStopper] = None,
-        hardware_event_forwarder: Optional[HardwareEventForwarder] = None,
+        door_watcher: Optional[DoorWatcher] = None,
         module_data_provider: Optional[ModuleDataProvider] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
@@ -59,6 +60,7 @@ class ProtocolEngine:
         This constructor does not inject provider implementations.
         Prefer the `create_protocol_engine()` factory function.
         """
+        self._hardware_api = hardware_api
         self._state_store = state_store
         self._model_utils = model_utils or ModelUtils()
 
@@ -77,17 +79,15 @@ class ProtocolEngine:
         self._hardware_stopper = hardware_stopper or HardwareStopper(
             hardware_api=hardware_api, state_store=state_store
         )
-        self._hardware_event_forwarder = (
-            hardware_event_forwarder
-            or HardwareEventForwarder(
-                hardware_api=hardware_api,
-                action_dispatcher=self._action_dispatcher,
-            )
+        self._door_watcher = door_watcher or DoorWatcher(
+            state_store=state_store,
+            hardware_api=hardware_api,
+            action_dispatcher=self._action_dispatcher,
         )
         self._module_data_provider = module_data_provider or ModuleDataProvider()
 
         self._queue_worker.start()
-        self._hardware_event_forwarder.start()
+        self._door_watcher.start()
 
     @property
     def state_view(self) -> StateView:
@@ -107,7 +107,11 @@ class ProtocolEngine:
             PlayAction(requested_at=requested_at)
         )
         self._action_dispatcher.dispatch(action)
-        self._queue_worker.start()
+
+        if self._state_store.commands.get_is_door_blocking():
+            self._hardware_api.pause(HardwarePauseType.PAUSE)
+        else:
+            self._hardware_api.resume(HardwarePauseType.PAUSE)
 
     def pause(self) -> None:
         """Pause executing commands in the queue."""
@@ -115,6 +119,7 @@ class ProtocolEngine:
             PauseAction(source=PauseSource.CLIENT)
         )
         self._action_dispatcher.dispatch(action)
+        self._hardware_api.pause(HardwarePauseType.PAUSE)
 
     def add_command(self, request: CommandCreate) -> Command:
         """Add a command to the `ProtocolEngine`'s queue.
@@ -138,9 +143,6 @@ class ProtocolEngine:
             QueueCommandAction(
                 request=request,
                 command_id=command_id,
-                # TODO(mc, 2021-12-13): generate a command key from params and state
-                # https://github.com/Opentrons/opentrons/issues/8986
-                command_key=command_id,
                 created_at=self._model_utils.get_timestamp(),
             )
         )
@@ -239,7 +241,7 @@ class ProtocolEngine:
             # Note: After we stop listening, straggling events might be processed
             # concurrently to the below lines in this .finish() call,
             # or even after this .finish() call completes.
-            self._hardware_event_forwarder.stop_soon()
+            self._door_watcher.stop_soon()
 
             await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
 
@@ -288,6 +290,7 @@ class ProtocolEngine:
                 definition=self._module_data_provider.get_definition(
                     ModuleModel(mod.model())
                 ),
+                module_live_data=mod.live_data,
             )
             for module_id, mod in modules_by_id.items()
         ]

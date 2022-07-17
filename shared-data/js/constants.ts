@@ -34,6 +34,8 @@ export const TEMPERATURE_MODULE_V2: 'temperatureModuleV2' =
   'temperatureModuleV2'
 export const THERMOCYCLER_MODULE_V1: 'thermocyclerModuleV1' =
   'thermocyclerModuleV1'
+export const THERMOCYCLER_MODULE_V2: 'thermocyclerModuleV2' =
+  'thermocyclerModuleV2'
 export const HEATERSHAKER_MODULE_V1: 'heaterShakerModuleV1' =
   'heaterShakerModuleV1'
 
@@ -64,7 +66,10 @@ export const TEMPERATURE_MODULE_MODELS = [
   TEMPERATURE_MODULE_V2,
 ]
 
-export const THERMOCYCLER_MODULE_MODELS = [THERMOCYCLER_MODULE_V1]
+export const THERMOCYCLER_MODULE_MODELS = [
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
+]
 
 export const HEATERSHAKER_MODULE_MODELS = [HEATERSHAKER_MODULE_V1]
 

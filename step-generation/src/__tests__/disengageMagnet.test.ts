@@ -40,6 +40,7 @@ describe('disengageMagnet', () => {
       commands: [
         {
           commandType: 'magneticModule/disengage',
+          key: expect.any(String),
           params: {
             moduleId: module,
           },

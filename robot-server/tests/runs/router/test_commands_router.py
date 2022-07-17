@@ -51,11 +51,6 @@ async def test_get_current_run_engine_from_url(
     assert result is mock_engine_store.engine
 
 
-# TODO(mm, 2022-05-19): Remove this xfail when we resolve mysteries about
-# performance problems and are able to add the call to run_store.has()
-# back into get_current_run_engine_from_url() without causing stalls.
-# https://github.com/Opentrons/opentrons/issues/10333
-@pytest.mark.xfail(strict=True)
 async def test_get_current_run_engine_no_run(
     decoy: Decoy,
     mock_engine_store: EngineStore,

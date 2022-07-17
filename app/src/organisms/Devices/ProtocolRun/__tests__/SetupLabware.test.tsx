@@ -516,6 +516,7 @@ describe('LabwareSetup', () => {
               attachedModuleMatch: null,
             },
           },
+          runId: RUN_ID,
         })
       )
       .mockReturnValue(

@@ -6,7 +6,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
-from opentrons.protocol_engine.state import State, StateStore
+from opentrons.protocol_engine.state import State, StateStore, Config
 from opentrons.protocol_engine.actions import PlayAction
 from opentrons.protocol_engine.state.change_notifier import ChangeNotifier
 
@@ -18,15 +18,24 @@ def change_notifier(decoy: Decoy) -> ChangeNotifier:
 
 
 @pytest.fixture
+def engine_config() -> Config:
+    """Get a ProtocolEngine config value object."""
+    return Config()
+
+
+@pytest.fixture
 def subject(
-    change_notifier: ChangeNotifier, standard_deck_def: DeckDefinitionV3
+    change_notifier: ChangeNotifier,
+    standard_deck_def: DeckDefinitionV3,
+    engine_config: Config,
 ) -> StateStore:
     """Get a StateStore test subject."""
     return StateStore(
+        config=engine_config,
         deck_definition=standard_deck_def,
         deck_fixed_labware=[],
         change_notifier=change_notifier,
-        is_door_blocking=False,
+        is_door_open=False,
     )
 
 

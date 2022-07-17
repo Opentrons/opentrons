@@ -70,6 +70,7 @@ const WellSelectionModalComponent = (
     wellContents,
     updateHighlightedWells,
   } = props
+  const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 
   return (
     <Modal
@@ -97,7 +98,10 @@ const WellSelectionModalComponent = (
             wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
             definition: labwareDef,
             highlightedWells,
-            wellFill: wellFillFromWellContents(wellContents),
+            wellFill: wellFillFromWellContents(
+              wellContents,
+              liquidDisplayColors
+            ),
           }}
           selectedPrimaryWells={selectedPrimaryWells}
           selectWells={selectWells}

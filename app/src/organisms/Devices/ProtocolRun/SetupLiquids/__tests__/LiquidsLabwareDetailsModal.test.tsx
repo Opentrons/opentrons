@@ -5,16 +5,32 @@ import {
   nestedTextMatcher,
   renderWithProviders,
   partialComponentPropsMatcher,
+  LabwareRender,
 } from '@opentrons/components'
 import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
-import { getSlotLabwareName, getLiquidsByIdForLabware } from '../utils'
-
+import {
+  getSlotLabwareName,
+  getLiquidsByIdForLabware,
+  getWellFillFromLabwareId,
+} from '../utils'
+import {
+  useLabwareRenderInfoForRunById,
+  useProtocolDetailsForRun,
+} from '../../../../Devices/hooks'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 import { LiquidDetailCard } from '../LiquidDetailCard'
 
+jest.mock('@opentrons/components', () => {
+  const actualComponents = jest.requireActual('@opentrons/components')
+  return {
+    ...actualComponents,
+    LabwareRender: jest.fn(() => <div>mock LabwareRender</div>),
+  }
+})
 jest.mock('@opentrons/api-client')
 jest.mock('../utils')
 jest.mock('../LiquidDetailCard')
+jest.mock('../../../../Devices/hooks')
 
 const mockLiquidDetailCard = LiquidDetailCard as jest.MockedFunction<
   typeof LiquidDetailCard
@@ -28,7 +44,18 @@ const mockGetLiquidsByIdForLabware = getLiquidsByIdForLabware as jest.MockedFunc
 const mockParseLiquidsInLoadOrder = parseLiquidsInLoadOrder as jest.MockedFunction<
   typeof parseLiquidsInLoadOrder
 >
-
+const mockLabwareRender = LabwareRender as jest.MockedFunction<
+  typeof LabwareRender
+>
+const mockGetWellFillFromLabwareId = getWellFillFromLabwareId as jest.MockedFunction<
+  typeof getWellFillFromLabwareId
+>
+const mockUseLabwareRenderInfoForRunById = useLabwareRenderInfoForRunById as jest.MockedFunction<
+  typeof useLabwareRenderInfoForRunById
+>
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
+>
 const render = (
   props: React.ComponentProps<typeof LiquidsLabwareDetailsModal>
 ) => {
@@ -76,6 +103,22 @@ describe('LiquidsLabwareDetailsModal', () => {
       },
     ])
     mockLiquidDetailCard.mockReturnValue(<div></div>)
+    mockGetWellFillFromLabwareId.mockReturnValue({})
+    mockUseLabwareRenderInfoForRunById.mockReturnValue({
+      '123': {
+        labwareDef: {},
+      },
+    } as any)
+    mockUseProtocolDetailsForRun.mockReturnValue({} as any)
+
+    when(mockLabwareRender)
+      .mockReturnValue(<div></div>) // this (default) empty div will be returned when LabwareRender isn't called with expected props
+      .calledWith(
+        partialComponentPropsMatcher({
+          wellFill: { C1: '#ff4888', C2: '#ff4888' },
+        })
+      )
+      .mockReturnValue(<div>mock labware render with well fill</div>)
   })
 
   afterEach(() => {
@@ -95,8 +138,12 @@ describe('LiquidsLabwareDetailsModal', () => {
     const [{ getByText }] = render(props)
     getByText(nestedTextMatcher('mock LiquidDetailCard'))
   })
-  it('should render labware render', () => {
+  it('should render labware render with well fill', () => {
+    mockGetWellFillFromLabwareId.mockReturnValue({
+      C1: '#ff4888',
+      C2: '#ff4888',
+    })
     const [{ getByText }] = render(props)
-    getByText('Labware render placeholder')
+    getByText('mock labware render with well fill')
   })
 })

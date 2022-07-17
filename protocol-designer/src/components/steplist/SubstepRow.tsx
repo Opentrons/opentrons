@@ -1,9 +1,11 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import map from 'lodash/map'
 import noop from 'lodash/noop'
 import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
 import { Tooltip, useHoverTooltip } from '@opentrons/components'
+import { selectors } from '../../labware-ingred/selectors'
 import { IngredPill } from './IngredPill'
 import { PDListItem } from '../lists'
 import { swatchColors } from '../swatchColors'
@@ -36,6 +38,7 @@ interface PillTooltipContentsProps {
 export const PillTooltipContents = (
   props: PillTooltipContentsProps
 ): JSX.Element => {
+  const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
   const totalLiquidVolume = reduce(
     props.ingreds,
     // @ts-expect-error(sa, 2021-6-20): TODO IMMEDIATELY, this could either be single channel OR multi channel volume data
@@ -53,7 +56,11 @@ export const PillTooltipContents = (
               <td>
                 <div
                   className={styles.liquid_circle}
-                  style={{ backgroundColor: swatchColors(groupId) }}
+                  style={{
+                    backgroundColor:
+                      liquidDisplayColors[Number(groupId)] ??
+                      swatchColors(groupId),
+                  }}
                 />
               </td>
               <td className={styles.ingred_name}>

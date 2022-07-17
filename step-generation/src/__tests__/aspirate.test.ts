@@ -83,6 +83,7 @@ describe('aspirate', () => {
     expect(getSuccessResult(result).commands).toEqual([
       {
         commandType: 'aspirate',
+        key: expect.any(String),
         params: {
           pipetteId: DEFAULT_PIPETTE,
           volume: 50,

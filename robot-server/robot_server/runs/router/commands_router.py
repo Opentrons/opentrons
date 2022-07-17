@@ -92,17 +92,10 @@ async def get_current_run_engine_from_url(
         engine_store: Engine store to pull current run ProtocolEngine.
         run_store: Run data storage.
     """
-    # HACK(mm, 2022-05-19):
-    # This call to run_store.has() is commented out because it
-    # seems to stall the robot, for mysterious reasons.
-    # While it's commented, requests with bad run IDs will incorrectly return
-    # HTTP 409 instead of 404.
-    # https://github.com/Opentrons/opentrons/issues/10333
-
-    # if not run_store.has(runId):
-    #     raise RunNotFound(detail=f"Run {runId} not found.").as_error(
-    #         status.HTTP_404_NOT_FOUND
-    #     )
+    if not run_store.has(runId):
+        raise RunNotFound(detail=f"Run {runId} not found.").as_error(
+            status.HTTP_404_NOT_FOUND
+        )
 
     if runId != engine_store.current_run_id:
         raise RunStopped(detail=f"Run {runId} is not the current run").as_error(

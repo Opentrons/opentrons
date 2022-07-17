@@ -1,7 +1,9 @@
 import assert from 'assert'
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import reduce from 'lodash/reduce'
 
+import { selectors } from '../../labware-ingred/selectors'
 import { SingleLabware } from './SingleLabware'
 import { wellFillFromWellContents } from './utils'
 import { ContentsByWell } from '../../labware-ingred/types'
@@ -19,6 +21,7 @@ interface Props {
 
 export function BrowsableLabware(props: Props): JSX.Element | null {
   const { definition, ingredNames, wellContents } = props
+  const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
   if (!definition) {
     assert(definition, 'BrowseLabwareModal expected definition')
     return null
@@ -34,7 +37,7 @@ export function BrowsableLabware(props: Props): JSX.Element | null {
         <SingleLabware
           definition={definition}
           wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE}
-          wellFill={wellFillFromWellContents(wellContents)}
+          wellFill={wellFillFromWellContents(wellContents, liquidDisplayColors)}
           highlightedWells={
             wellContents === null
               ? null
