@@ -518,7 +518,7 @@ export function ProtocolDetails(
                 isCurrent={currentTab === 'liquids'}
                 onClick={() => setCurrentTab('liquids')}
               >
-                <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+                <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
                   {t('liquids')}
                 </Text>
               </RoundTab>

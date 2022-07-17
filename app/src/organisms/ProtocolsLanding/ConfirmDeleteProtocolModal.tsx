@@ -9,7 +9,6 @@ import {
   JUSTIFY_FLEX_END,
   Link,
   ALIGN_CENTER,
-  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { Modal } from '../../atoms/Modal'
 import { StyledText } from '../../atoms/text'
@@ -38,7 +37,7 @@ export function ConfirmDeleteProtocolModal(
           <Link
             role="button"
             onClick={props.cancelDeleteProtocol}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
             marginRight={SPACING.spacing5}
             css={TYPOGRAPHY.linkPSemiBold}
           >
