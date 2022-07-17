@@ -9,7 +9,7 @@ from dash_html_components import Div  # type: ignore[import]
 
 from plotly.graph_objs import Layout, Scatter  # type: ignore[import]
 
-from hardware_testing.measuring.gravimetric import GravimetricRecording
+from .record import GravimetricRecording
 from hardware_testing.data import create_folder_for_test_data
 
 

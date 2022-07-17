@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Tuple
+from typing import Tuple, List
 import json
 import urllib.request
 import time
@@ -38,26 +38,37 @@ def force_prepare_for_aspirate(pipette: InstrumentContext) -> None:
     pipette.dispense()
 
 
-def load_newest_offset_for_labware(ctx: ProtocolContext, labware: Labware) -> Tuple[float, float, float]:
+def http_get_all_labware_offsets(ctx: ProtocolContext) -> List[dict]:
+    """Request (HTTP GET) from the local robot-server all runs information"""
     if ctx.is_simulating() or not is_running_on_robot():
-        return 0, 0, 0
+        return []
 
     # FIXME: .urlopen() is slow
     runs_response = urllib.request.urlopen('http://localhost:31950/runs')
     runs_response_data = runs_response.read()
     runs_json = json.loads(runs_response_data)
 
-    lw_uri = str(labware.uri)
-    lw_slot = str(labware.parent)
-
     protocols_list = runs_json['data']
-    lw_offsets = [
+    return [
         offset
         for p in protocols_list
         for offset in p['labwareOffsets']
+    ]
+
+
+def get_latest_offset_for_labware(labware_offsets: List[dict], labware: Labware) -> Tuple[float, float, float]:
+    lw_uri = str(labware.uri)
+    lw_slot = str(labware.parent)
+
+    lw_offsets = [
+        offset
+        for offset in labware_offsets
         if offset['definitionUri'] == lw_uri and
         offset['location']['slotName'] == lw_slot
     ]
+
+    if not lw_offsets:
+        return 0, 0, 0
 
     def _sort_by_created_at(_offset) -> datetime:
         return datetime.fromisoformat(_offset['createdAt'])
