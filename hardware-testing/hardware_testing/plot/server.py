@@ -56,12 +56,20 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
 
     def _respond_to_data_request(self) -> None:
         req_cmd = self.path_elements[1]
+        response_data = dict()
+        response_data[req_cmd] = {
+            'directory': str(self.server.plot_directory.resolve())
+        }
         if req_cmd == 'list':
-            response_data = self._get_file_name_list()
+            response_data['files'] = self._get_file_name_list()
         elif req_cmd == 'latest':
-            response_data = self._get_file_contents(self._get_file_name_list()[0])
+            file_name = self._get_file_name_list()[0]
+            response_data['name'] = file_name
+            response_data['csv'] = self._get_file_contents(file_name)
         elif req_cmd == 'file' and len(self.path_elements) > 1:
-            response_data = self._get_file_contents(self.path_elements[-1])
+            file_name = self.path_elements[-1]
+            response_data['name'] = file_name
+            response_data['csv'] = self._get_file_contents(file_name)
         else:
             raise ValueError(f'Unable to find response for request: {self.path}')
         response_str = json.dumps({req_cmd: response_data})

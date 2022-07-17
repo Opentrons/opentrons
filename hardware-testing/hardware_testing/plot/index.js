@@ -1,60 +1,96 @@
-var layout = {
-    title: 'Gravimetric',
-    uirevision: true,
-    xaxis: {autorange: true},
-    yaxis: {autorange: true},
-}
-
-function _on_screen_size_update(evt) {
-    var div = document.getElementById('plotly')
-    div.style.width = (window.innerWidth - 50) + 'px'
-    div.style.height = (window.innerHeight - 50) + 'px'
-}
-
-function _random() {
-    return Math.floor(Math.random() * 17) + 1
-}
-
-function _create_fake_data() {
-
-    function _random_array(len, sort) {
-        var ret = []
-        var rand_len = _random() + 3
-        for (var i=0;i<rand_len;i++) {
-            if (sort) {
-                ret.push(i * 2)
-            }
-            else {
-                ret.push(_random())
-            }
-        }
-        return ret
-    }
-
+function getEmptyPlotlyData() {
     return [
         {
-            x: _random_array(4, true),
-            y: _random_array(4),
-            type: 'scatter'
+            x: [],  // relative-time
+            y: [],  // stable-grams
+            type: 'scatter',
+            name: 'Stable Grams',
+            marker: {
+                color: '#006fff'
+            }
+        },
+        {
+            x: [],  // relative-time
+            y: [],  // unstable-grams
+            type: 'scatter',
+            name: 'Unstable Grams',
+            marker: {
+                color: '#d0241b'
+            }
         }
-    ]
+    ];
 }
 
-function _initialize_plot_with_data(data) {
-    Plotly.newPlot('plotly', data, layout, {responsive: true});
+function parseGravimetricCSV(CSVData) {
+    var retData = getEmptyPlotlyData();
+    if (!CSVData.length) {
+        return retData;
+    }
+    // split CSV by newline
+    var CSVDataLines = CSVData.split('\n');
+    // grab CSV header
+    var headerItems = CSVDataLines[0].split(',');
+    if (!headerItems.length) {
+        return retData
+    }
+    // get indices of desired columns
+    var relativeTimeIdx = headerItems.indexOf('relative-time');
+    var stableGramsIdx = headerItems.indexOf('stable-grams');
+    var unstableGramsIdx = headerItems.indexOf('unstable-grams');
+    // save each sample to the plotly data arrays
+    for (var i=1;i<CSVDataLines.length;i++) {
+        // ignore empty lines
+        if (!CSVDataLines[i].length) {
+            continue;
+        }
+        var CSVLineItems = CSVDataLines[i].split(',');
+        var relativeTime = Number(CSVLineItems[relativeTimeIdx]);
+        retData[0].x.push(relativeTime);
+        retData[1].x.push(relativeTime);
+        // set value as `undefined` to keep it blank in the plot
+        var stableGrams = undefined;
+        if (CSVLineItems[stableGramsIdx].length) {
+            stableGrams = Number(CSVLineItems[stableGramsIdx]);
+        }
+        retData[0].y.push(stableGrams); // stable
+        var unstableGrams = undefined;
+        if (CSVLineItems[unstableGramsIdx].length) {
+            unstableGrams = Number(CSVLineItems[unstableGramsIdx]);
+        }
+        retData[1].y.push(unstableGrams); // unstable
+    }
+    return retData;
 }
-
-function _update_plot_with_data(data) {
-    Plotly.react('plotly', data, layout, {responsive: true});
-}
-
-window.addEventListener('load', _on_screen_size_update);
-window.addEventListener('resize', _on_screen_size_update);
 
 window.addEventListener('load', function (evt) {
-    _initialize_plot_with_data(_create_fake_data())
-    // TODO: make server
-    setTimeout(function (evt) {
-        _update_plot_with_data(_create_fake_data())
-    }, 2000)
+    // resize the Plotly div so it's nearly the size of the screen
+    function _onScreenSizeUpdate(evt) {
+        var div = document.getElementById('plotly');
+        div.style.width = (window.innerWidth - 50) + 'px';
+        div.style.height = (window.innerHeight - 50) + 'px';
+    }
+    _onScreenSizeUpdate(evt);
+    window.addEventListener('resize', _onScreenSizeUpdate);
+
+    var layout = {
+        title: 'Untitled',
+        uirevision: true,
+        xaxis: {autorange: true},
+        yaxis: {autorange: true},
+    };
+    function _getLatestDataFromServer(evt) {
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener('load', function () {
+            var responseData = JSON.parse(this.responseText);
+            var newData = parseGravimetricCSV(responseData.latest.csv);
+            layout.title = responseData.latest.name
+            Plotly.react('plotly', newData, layout, {responsive: true});
+        });
+        oReq.open('GET', 'http://' + window.location.host + '/data/latest');
+        oReq.send();
+    }
+    var initData = getEmptyPlotlyData();
+    Plotly.newPlot('plotly', initData, layout, {responsive: true});
+    setInterval(_getLatestDataFromServer, 500);
+    _getLatestDataFromServer();
 });
