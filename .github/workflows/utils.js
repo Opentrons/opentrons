@@ -14,7 +14,7 @@ module.exports = {
   buildComplexEnvVars: (core, context) => {
     const branch = context.ref.replace(/^refs\/(?:tags|heads)\//, '')
     const tag = context.ref.startsWith('refs/tags/') ? branch : ''
-    const buildNumber = context.runNumber + 10000
+    const buildNumber = context.sha
     console.log(
       `OT_BRANCH: ${branch}\nOT_TAG: ${tag}\nOT_BUILD: ${buildNumber}\n`
     )

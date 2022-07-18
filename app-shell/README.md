@@ -394,7 +394,7 @@ These tasks use the following environment variables defined:
 | OT_APP_DEPLOY_BUCKET | AWS S3 bucket | yes      | Artifact deploy bucket                 |
 | OT_APP_DEPLOY_FOLDER | AWS S3 folder | yes      | Artifact deploy folder in bucket       |
 | OT_BRANCH            | Branch name   | no       | Sometimes added to the artifact name   |
-| OT_BUILD             | Build number  | no       | Appended to the artifact name          |
+| OT_BUILD             | Build hash    | no       | The commit hash that is built          |
 | OT_TAG               | Tag name      | no       | Flags autoupdate files to be published |
 
 The release channel is set according to the version string:

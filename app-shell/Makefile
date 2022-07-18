@@ -29,6 +29,7 @@ publish_dir := dist/publish
 # only copy update files publish directory on tagged builds
 publish_update := $(filter v%,$(OT_TAG))
 branch_suffix := $(if $(publish_update),,-$(subst /,-,$(OT_BRANCH)))
+# would we keep the 'b' ?
 build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
 
 # set this to anything on command-line invocations of this makefile to skip bundling
