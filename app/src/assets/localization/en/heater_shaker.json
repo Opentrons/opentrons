@@ -60,7 +60,6 @@
   "open_labware_latch": "Open Labware Latch",
   "close_labware_latch": "Close Labware Latch",
   "labware_latch": "Labware Latch",
-  "labware_latch_status": "Labware Latch - {{status}}",
   "set_shake_speed": "Set shake speed",
   "start_shaking": "Start Shaking",
   "troubleshooting": "Troubleshooting",

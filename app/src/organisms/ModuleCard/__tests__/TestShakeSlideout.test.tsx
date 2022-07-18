@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { i18n } from '../../../i18n'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, getByTestId } from '@testing-library/react'
 import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
@@ -149,7 +149,8 @@ describe('TestShakeSlideout', () => {
 
   it('renders the labware latch open button', () => {
     const { getByRole, getByText } = render(props)
-    getByText('Labware Latch - open')
+    getByText('Labware Latch')
+    getByText('open')
     const button = getByRole('button', { name: /Open Latch/i })
     expect(button).toBeEnabled()
   })

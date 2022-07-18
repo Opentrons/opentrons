@@ -181,16 +181,23 @@ export const TestShakeSlideout = (
           marginY={SPACING.spacingSM}
           alignItems={ALIGN_CENTER}
         >
-          <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacing3}>
+          <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing3}>
             <Text
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
               fontSize={TYPOGRAPHY.fontSizeLabel}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.darkBlack}
             >
-              {t('heater_shaker:labware_latch_status', {
-                status: getLatchStatus(module.data.labwareLatchStatus),
-              })}
+              {t('heater_shaker:labware_latch')}
+            </Text>
+            <Text
+              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              fontSize={TYPOGRAPHY.fontSizeLabel}
+              color={COLORS.darkBlack}
+              marginTop={SPACING.spacing3}
+              data-testid={`TestShake_Slideout_latch_status`}
+            >
+              {getLatchStatus(module.data.labwareLatchStatus)}
             </Text>
           </Flex>
           <TertiaryButton
