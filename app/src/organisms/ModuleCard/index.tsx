@@ -495,7 +495,6 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
         currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
-        isSetShake={isSecondary}
         isLoadedInRun={isLoadedInRun}
       />
     )
