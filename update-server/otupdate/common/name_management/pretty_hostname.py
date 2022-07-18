@@ -19,7 +19,7 @@ def pretty_hostname_is_valid(pretty_hostname: str) -> bool:
 
     Restrictions come from a few places:
 
-    1. For values in general that are stored in /etc/machine/info,
+    1. For values in general that are stored in /etc/machine-info,
        the file format documentation explicitly allows Unicode
        but says "non-printable characters should not be used."
        There isn't a formal definition of "non-printable" in Unicode,
@@ -32,7 +32,7 @@ def pretty_hostname_is_valid(pretty_hostname: str) -> bool:
 
        This is by experimenting with `hostnamectl set-hostname --pretty`
        and by reading the source code of systemd-hostnamed.
-       systemd doesn't formally document its limitations on the pretty hostname.
+       systemd doesn't formally document these restrictions.
 
        https://github.com/systemd/systemd/blob/v239/src/hostname/hostnamed.c#L524
 
@@ -67,7 +67,7 @@ async def get_pretty_hostname(default: str = "no name set") -> str:
 async def persist_pretty_hostname(new_pretty_hostname: str) -> None:
     """Change the robot's pretty hostname.
 
-    Writes the new name to /etc/machine-info so it persists across reboots.
+    The new name will persist across reboots.
 
     Args:
         new_pretty_hostname: The name to set. Must be valid;
