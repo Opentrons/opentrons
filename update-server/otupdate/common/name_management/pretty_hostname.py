@@ -87,7 +87,9 @@ async def persist_pretty_hostname(new_pretty_hostname: str) -> None:
     # As a workaround, rewrite /etc/machine-info ourselves.
     _rewrite_machine_info(new_pretty_hostname=new_pretty_hostname)
 
-    # TODO BEFORE MERGE: Explain this.
+    # Now that we've rewritten /etc/machine-info to contain the new pretty hostname,
+    # restart systemd-hostnamed so that commands like `hostnamectl status --pretty`
+    # pick it up immediately.
     await _run_command(command="systemctl", args=["restart", "systemd-hostnamed"])
 
     read_back_pretty_hostname = await get_pretty_hostname()
