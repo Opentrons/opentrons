@@ -1,11 +1,5 @@
 import * as React from 'react'
-import {
-  DIRECTION_COLUMN,
-  Flex,
-  JUSTIFY_START,
-  SPACING,
-  WRAP,
-} from '@opentrons/components'
+import { Box, Flex, SPACING } from '@opentrons/components'
 import { ModuleCard } from '../../ModuleCard'
 import {
   useModuleRenderInfoForProtocolById,
@@ -15,10 +9,6 @@ import { useCreateCommandMutation } from '@opentrons/react-api-client'
 
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { RunTimeCommand } from '@opentrons/shared-data'
-import {
-  MIN_HEIGHT_OVER_3_STYLING,
-  MIN_HEIGHT_UNDER_3_STYLING,
-} from '../PipettesAndModules'
 
 interface ProtocolRunModuleControlsProps {
   robotName: string
@@ -72,37 +62,51 @@ export const ProtocolRunModuleControls = ({
     }
   }, [])
 
+  // split modules in half and map into each column separately to avoid
+  // the need for hardcoded heights without limitation, array will be split equally
+  // or left column will contain 1 more item than right column
+  const halfAttachedModulesSize = Math.ceil(attachedModules?.length / 2)
+  const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
+  const rightColumnModules =
+    attachedModules?.length > 1
+      ? attachedModules?.slice(-halfAttachedModulesSize)
+      : []
+
   return (
     <Flex
-      justifyContent={JUSTIFY_START}
-      flexWrap={WRAP}
-      flexDirection={DIRECTION_COLUMN}
-      css={
-        attachedModules.length > 3
-          ? MIN_HEIGHT_OVER_3_STYLING
-          : MIN_HEIGHT_UNDER_3_STYLING
-      }
+      gridGap={SPACING.spacing3}
+      paddingTop={SPACING.spacing4}
+      paddingBottom={SPACING.spacing3}
+      paddingX={SPACING.spacing4}
     >
-      {attachedModules.map((module, index) => {
-        return (
-          <Flex
-            width={`calc(50% - ${SPACING.spacing3})`}
-            marginTop={SPACING.spacing3}
-            marginX={SPACING.spacing2}
-            key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
-          >
-            {module.attachedModuleMatch != null ? (
-              <ModuleCard
-                robotName={robotName}
-                runId={runId}
-                module={module.attachedModuleMatch}
-                slotName={module.slotName}
-                isLoadedInRun={true}
-              />
-            ) : null}
-          </Flex>
-        )
-      })}
+      <Box flex="50%">
+        {leftColumnModules.map((module, index) =>
+          module.attachedModuleMatch != null ? (
+            <ModuleCard
+              key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
+              robotName={robotName}
+              runId={runId}
+              module={module.attachedModuleMatch}
+              slotName={module.slotName}
+              isLoadedInRun={true}
+            />
+          ) : null
+        )}
+      </Box>
+      <Box flex="50%">
+        {rightColumnModules.map((module, index) =>
+          module.attachedModuleMatch != null ? (
+            <ModuleCard
+              key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
+              robotName={robotName}
+              runId={runId}
+              module={module.attachedModuleMatch}
+              slotName={module.slotName}
+              isLoadedInRun={true}
+            />
+          ) : null
+        )}
+      </Box>
     </Flex>
   )
 }

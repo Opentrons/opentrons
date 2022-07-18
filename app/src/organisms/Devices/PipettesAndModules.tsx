@@ -2,9 +2,9 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 import { useModulesQuery, usePipettesQuery } from '@opentrons/react-api-client'
-import { css } from 'styled-components'
 
 import {
+  Box,
   Flex,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -12,9 +12,6 @@ import {
   JUSTIFY_CENTER,
   SIZE_3,
   SPACING,
-  WRAP,
-  JUSTIFY_START,
-  DIRECTION_ROW,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -25,37 +22,6 @@ import { ModuleCard } from '../ModuleCard'
 import { useIsRobotViewable, useRunStatuses } from './hooks'
 import { PipetteCard } from './PipetteCard'
 
-export const MIN_HEIGHT_OVER_3_STYLING = css`
-  max-height: 37rem;
-
-  @media (min-width: 700px) {
-    max-height: 32rem;
-  }
-
-  @media (min-width: 800px) {
-    max-height: 30rem;
-  }
-
-  @media (min-width: 900px) {
-    max-height: 22rem;
-  }
-`
-
-export const MIN_HEIGHT_UNDER_3_STYLING = css`
-  max-height: 29rem;
-
-  @media (min-width: 700px) {
-    max-height: 27rem;
-  }
-
-  @media (min-width: 800px) {
-    max-height: 25rem;
-  }
-
-  @media (min-width: 900px) {
-    max-height: 22rem;
-  }
-`
 const EQUIPMENT_POLL_MS = 5000
 interface PipettesAndModulesProps {
   robotName: string
@@ -66,14 +32,24 @@ export function PipettesAndModules({
 }: PipettesAndModulesProps): JSX.Element | null {
   const { t } = useTranslation('device_details')
 
-  const attachedModules =
-    useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   const attachedPipettes = usePipettesQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
   })?.data ?? { left: undefined, right: undefined }
   const isRobotViewable = useIsRobotViewable(robotName)
   const currentRunId = useCurrentRunId()
   const { isRunTerminal } = useRunStatuses()
+
+  const attachedModules =
+    useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
+  // split modules in half and map into each column separately to avoid
+  // the need for hardcoded heights without limitation, array will be split equally
+  // or left column will contain 1 more item than right column
+  const halfAttachedModulesSize = Math.ceil(attachedModules?.length / 2)
+  const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
+  const rightColumnModules =
+    attachedModules?.length > 1
+      ? attachedModules?.slice(-halfAttachedModulesSize)
+      : []
 
   return (
     <Flex
@@ -108,8 +84,8 @@ export function PipettesAndModules({
           </Flex>
         )}
         {isRobotViewable ? (
-          <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-            <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
+          <Box width="100%">
+            <Flex gridGap={SPACING.spacing3}>
               <PipetteCard
                 pipetteId={attachedPipettes.left?.id}
                 pipetteInfo={
@@ -132,34 +108,29 @@ export function PipettesAndModules({
                 robotName={robotName}
               />
             </Flex>
-            <Flex
-              justifyContent={JUSTIFY_START}
-              flexDirection={DIRECTION_COLUMN}
-              flexWrap={WRAP}
-              css={
-                attachedModules.length > 3
-                  ? MIN_HEIGHT_OVER_3_STYLING
-                  : MIN_HEIGHT_UNDER_3_STYLING
-              }
-            >
-              {attachedModules.map((module, index) => {
-                return (
-                  <Flex
-                    flex="1"
-                    marginRight={SPACING.spacing3}
+            <Flex gridGap={SPACING.spacing3}>
+              <Box flex="50%">
+                {leftColumnModules.map((module, index) => (
+                  <ModuleCard
                     key={`moduleCard_${module.moduleType}_${index}`}
-                    width={`calc(50% - ${SPACING.spacing2})`}
-                  >
-                    <ModuleCard
-                      module={module}
-                      robotName={robotName}
-                      isLoadedInRun={false}
-                    />
-                  </Flex>
-                )
-              })}
+                    robotName={robotName}
+                    module={module}
+                    isLoadedInRun={false}
+                  />
+                ))}
+              </Box>
+              <Box flex="50%">
+                {rightColumnModules.map((module, index) => (
+                  <ModuleCard
+                    key={`moduleCard_${module.moduleType}_${index}`}
+                    robotName={robotName}
+                    module={module}
+                    isLoadedInRun={false}
+                  />
+                ))}
+              </Box>
             </Flex>
-          </Flex>
+          </Box>
         ) : (
           <StyledText as="p" id="PipettesAndModules_offline">
             {t('offline_pipettes_and_modules')}
