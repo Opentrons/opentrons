@@ -47,8 +47,8 @@ def http_get_all_labware_offsets(ctx: ProtocolContext) -> List[dict]:
     if ctx.is_simulating() or not is_running_on_robot():
         return []
 
-    req = Request('http://localhost:31950/runs')
-    req.add_header('Opentrons-Version', '2')
+    req = Request("http://localhost:31950/runs")
+    req.add_header("Opentrons-Version", "2")
     runs_response = urlopen(req)
     runs_response_data = runs_response.read()
     runs_json = json.loads(runs_response_data)
