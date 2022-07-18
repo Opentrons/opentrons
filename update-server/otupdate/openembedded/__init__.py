@@ -43,7 +43,7 @@ def get_version_dict(version_file: Optional[str]) -> Mapping[str, str]:
     return version
 
 
-def get_app(
+async def get_app(
     name_synchronizer: name_management.NameSynchronizer,
     system_version_file: Optional[str] = None,
     config_file_override: Optional[str] = None,
@@ -96,7 +96,7 @@ def get_app(
         "Setup: "
         + "\n\t".join(
             [
-                # f"Device name: {name_synchronizer.get_name()}",
+                f"Device name: {await name_synchronizer.get_name()}",
                 "Buildroot version:         "
                 f'{version.get("buildroot_version", "unknown")}',
                 "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
