@@ -5,15 +5,21 @@ import pytest
 from decoy import Decoy, matchers
 
 from otupdate.common.name_management import avahi, pretty_hostname
-from otupdate.common.name_management.name_synchronizer import NameSynchronizer
+from otupdate.common.name_management.name_synchronizer import (
+    NameSynchronizer,
+    InvalidNameError,
+)
 
 
 @pytest.fixture(autouse=True)
 def monkeypatch_pretty_hostname_functions(decoy: Decoy, monkeypatch: Any) -> None:
-    """Replace the functions of pretty_hostname with mocks."""
+    """Replace the functions of the pretty_hostname module with mocks."""
     mock_get_pretty_hostname = decoy.mock(func=pretty_hostname.get_pretty_hostname)
     mock_persist_pretty_hostname = decoy.mock(
         func=pretty_hostname.persist_pretty_hostname
+    )
+    mock_pretty_hostname_is_valid = decoy.mock(
+        func=pretty_hostname.pretty_hostname_is_valid
     )
     monkeypatch.setattr(
         pretty_hostname, "get_pretty_hostname", mock_get_pretty_hostname
@@ -21,13 +27,20 @@ def monkeypatch_pretty_hostname_functions(decoy: Decoy, monkeypatch: Any) -> Non
     monkeypatch.setattr(
         pretty_hostname, "persist_pretty_hostname", mock_persist_pretty_hostname
     )
+    monkeypatch.setattr(
+        pretty_hostname, "pretty_hostname_is_valid", mock_pretty_hostname_is_valid
+    )
 
 
 @pytest.fixture(autouse=True)
-def monkeypatch_alternative_service_name(decoy: Decoy, monkeypatch: Any) -> None:
-    """Replace avahi.alternative_service_name() with our mock."""
-    mock = decoy.mock(func=avahi.alternative_service_name)
-    monkeypatch.setattr(avahi, "alternative_service_name", mock)
+def monkeypatch_avahi_functions(decoy: Decoy, monkeypatch: Any) -> None:
+    """Replace the functions of the avahi module with mocks."""
+    mock_alternative_service_name = decoy.mock(func=avahi.alternative_service_name)
+    mock_service_name_is_valid = decoy.mock(func=avahi.service_name_is_valid)
+    monkeypatch.setattr(
+        avahi, "alternative_service_name", mock_alternative_service_name
+    )
+    monkeypatch.setattr(avahi, "service_name_is_valid", mock_service_name_is_valid)
 
 
 @pytest.fixture
@@ -58,7 +71,7 @@ async def started_up_subject(
         yield subject
 
 
-async def test_set(
+async def test_set_valid_name(
     started_up_subject: NameSynchronizer,
     mock_avahi_client: avahi.AvahiClient,
     decoy: Decoy,
@@ -66,9 +79,10 @@ async def test_set(
     """It should set the new name as the Avahi service name and then as the pretty
     hostname.
     """
-    await started_up_subject.set_name("new name")
+    decoy.when(avahi.service_name_is_valid("new name")).then_return(True)
+    decoy.when(pretty_hostname.pretty_hostname_is_valid("new name")).then_return(True)
 
-    # TODO: Mock out is_valid() funcs.
+    await started_up_subject.set_name("new name")
 
     decoy.verify(
         await mock_avahi_client.start_advertising("new name"),
@@ -76,16 +90,49 @@ async def test_set(
     )
 
 
-async def test_set_does_not_persist_invalid_avahi_service_name(
+@pytest.mark.parametrize(
+    ("valid_for_avahi", "valid_for_pretty_hostname"),
+    [(False, False), (False, True), (True, False)],
+)
+async def test_set_invalid_name(
+    started_up_subject: NameSynchronizer,
+    mock_avahi_client: avahi.AvahiClient,
+    decoy: Decoy,
+    valid_for_avahi: bool,
+    valid_for_pretty_hostname: bool,
+) -> None:
+    """It should set neither the Avahi service name nor the pretty hostname."""
+    decoy.when(avahi.service_name_is_valid("new name")).then_return(valid_for_avahi)
+    decoy.when(pretty_hostname.pretty_hostname_is_valid("new name")).then_return(
+        valid_for_pretty_hostname
+    )
+
+    with pytest.raises(InvalidNameError):
+        await started_up_subject.set_name("new name")
+
+    decoy.verify(
+        await mock_avahi_client.start_advertising(matchers.Anything()),
+        times=0,
+    )
+    decoy.verify(
+        await pretty_hostname.persist_pretty_hostname(matchers.Anything()),
+        times=0,
+    )
+
+
+async def test_set_does_not_persist_rejected_avahi_service_name(
     started_up_subject: NameSynchronizer,
     mock_avahi_client: avahi.AvahiClient,
     decoy: Decoy,
 ) -> None:
-    """It should not persist any name that's not valid as an Avahi service name.
+    """It should not persist anything that Avahi rejects as a service name.
 
-    Covers this bug:
+    Mitigates this bug:
     https://github.com/Opentrons/opentrons/issues/9960
     """
+    decoy.when(avahi.service_name_is_valid("danger!")).then_return(True)
+    decoy.when(pretty_hostname.pretty_hostname_is_valid("danger!")).then_return(True)
+
     decoy.when(await mock_avahi_client.start_advertising("danger!")).then_raise(
         Exception("oh the humanity")
     )
@@ -147,6 +194,10 @@ async def test_collision_handling(
     decoy.when(avahi.alternative_service_name("initial name")).then_return(
         "alternative name"
     )
+    decoy.when(avahi.service_name_is_valid("alternative name")).then_return(True)
+    decoy.when(
+        pretty_hostname.pretty_hostname_is_valid("alternative name")
+    ).then_return(True)
 
     # Expect the subject to do:
     #
