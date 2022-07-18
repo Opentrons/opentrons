@@ -30,15 +30,16 @@ def get_api_context(
 
 
 def well_is_reservoir(well: protocol_api.labware.Well) -> bool:
-    return 'reservoir' in well.parent.load_name
+    return "reservoir" in well.parent.load_name
 
 
-def get_list_of_wells_affected(pipette: protocol_api.InstrumentContext,
-                               well: Well) -> List[Well]:
+def get_list_of_wells_affected(
+    pipette: protocol_api.InstrumentContext, well: Well
+) -> List[Well]:
     if pipette.channels > 1 and not well_is_reservoir(well):
         well_col = well.well_name[1:]  # the "1" in "A1"
         wells_list = [w for w in well.parent.columns_by_name()[well_col]]
-        assert well in wells_list, 'Well is not inside column'
+        assert well in wells_list, "Well is not inside column"
     else:
         wells_list = [well]
     return wells_list

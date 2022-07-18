@@ -10,8 +10,7 @@ def find_port(vid: int, pid: int) -> str:
     for port in comports():
         if port.pid == pid and port.vid == vid:
             return port.device
-    raise RuntimeError(f'Unable to find serial '
-                       f'port for VID:PID={vid}:{pid}')
+    raise RuntimeError(f"Unable to find serial " f"port for VID:PID={vid}:{pid}")
 
 
 __all__ = [

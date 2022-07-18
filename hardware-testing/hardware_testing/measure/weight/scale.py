@@ -1,7 +1,12 @@
 """Scale."""
 from opentrons.protocol_api import ProtocolContext
 
-from hardware_testing.drivers import find_port, RadwagScaleBase, RadwagScale, SimRadwagScale
+from hardware_testing.drivers import (
+    find_port,
+    RadwagScaleBase,
+    RadwagScale,
+    SimRadwagScale,
+)
 from hardware_testing.drivers.radwag.commands import (
     RadwagWorkingMode,
     RadwagFilter,

@@ -8,9 +8,9 @@ metadata = {"protocolName": "example-test", "apiLevel": "2.12"}
 
 
 def _run(protocol: ProtocolContext) -> None:
-    recorder = GravimetricRecorder(protocol, test_name=metadata['protocolName'])
+    recorder = GravimetricRecorder(protocol, test_name=metadata["protocolName"])
     recorder.activate()
-    if 'y' in input('Calibrate the scale? (y/n): ').lower():
+    if "y" in input("Calibrate the scale? (y/n): ").lower():
         recorder.calibrate_scale()
     while True:
         try:
@@ -26,6 +26,7 @@ def _run(protocol: ProtocolContext) -> None:
 
 if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser(metadata["protocolName"])
     parser.add_argument("--simulate", action="store_true")
     args = parser.parse_args()

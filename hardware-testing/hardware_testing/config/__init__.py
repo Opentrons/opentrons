@@ -39,27 +39,18 @@ class ConfigTest:
 
 def default_config() -> ConfigTest:
     return ConfigTest(
-        pipette=PipetteConfigTest(
-            change_tip=True,
-            use_trash=True
-        ),
-        scale=ScaleConfigTest(
-            run=True,
-            use_lid=False,
-            safe_z_offset=0
-        ),
-        data=DataConfigTest(
-            directory='.'
-        ),
+        pipette=PipetteConfigTest(change_tip=True, use_trash=True),
+        scale=ScaleConfigTest(run=True, use_lid=False, safe_z_offset=0),
+        data=DataConfigTest(directory="."),
         photo=True,
         grav=True,
-        start_tip='A1',
+        start_tip="A1",
         baseline=False,
         plate_on_scale=False,
         volume=200,
         num_samples=12,
-        plate_rows='A',
-        trough_cols='1',
+        plate_rows="A",
+        trough_cols="1",
         inspect=False,
         measure_evaporation=False,
     )

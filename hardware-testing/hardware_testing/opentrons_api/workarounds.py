@@ -14,7 +14,7 @@ def is_running_in_app() -> bool:
 
 
 def is_running_on_robot() -> bool:
-    return str(platform.system()).lower() == 'linux'
+    return str(platform.system()).lower() == "linux"
 
 
 def apply_additional_offset_to_labware(labware: Labware, x=0, y=0, z=0):
@@ -23,9 +23,7 @@ def apply_additional_offset_to_labware(labware: Labware, x=0, y=0, z=0):
     labware_imp = labware._implementation
     labware_delta = labware.calibrated_offset - labware_imp.get_geometry().offset
     labware.set_offset(
-        x=labware_delta.x + x,
-        y=labware_delta.y + y,
-        z=labware_delta.z + z
+        x=labware_delta.x + x, y=labware_delta.y + y, z=labware_delta.z + z
     )
 
 
@@ -44,35 +42,33 @@ def http_get_all_labware_offsets(ctx: ProtocolContext) -> List[dict]:
         return []
 
     # FIXME: .urlopen() is slow
-    runs_response = urllib.request.urlopen('http://localhost:31950/runs')
+    runs_response = urllib.request.urlopen("http://localhost:31950/runs")
     runs_response_data = runs_response.read()
     runs_json = json.loads(runs_response_data)
 
-    protocols_list = runs_json['data']
-    return [
-        offset
-        for p in protocols_list
-        for offset in p['labwareOffsets']
-    ]
+    protocols_list = runs_json["data"]
+    return [offset for p in protocols_list for offset in p["labwareOffsets"]]
 
 
-def get_latest_offset_for_labware(labware_offsets: List[dict], labware: Labware) -> Tuple[float, float, float]:
+def get_latest_offset_for_labware(
+    labware_offsets: List[dict], labware: Labware
+) -> Tuple[float, float, float]:
     lw_uri = str(labware.uri)
     lw_slot = str(labware.parent)
 
     lw_offsets = [
         offset
         for offset in labware_offsets
-        if offset['definitionUri'] == lw_uri and
-        offset['location']['slotName'] == lw_slot
+        if offset["definitionUri"] == lw_uri
+        and offset["location"]["slotName"] == lw_slot
     ]
 
     if not lw_offsets:
         return 0, 0, 0
 
     def _sort_by_created_at(_offset) -> datetime:
-        return datetime.fromisoformat(_offset['createdAt'])
+        return datetime.fromisoformat(_offset["createdAt"])
 
     lw_offsets.sort(key=_sort_by_created_at)
-    v = lw_offsets[-1]['vector']
-    return round(v['x'], 2), round(v['y'], 2), round(v['z'], 2)
+    v = lw_offsets[-1]["vector"]
+    return round(v["x"], 2), round(v["y"], 2), round(v["z"], 2)

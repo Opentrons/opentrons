@@ -6,7 +6,7 @@ from typing import List, Optional, Callable
 
 from opentrons.protocol_api import ProtocolContext
 
-from hardware_testing.drivers import RadwagScaleBase
+from hardware_testing.drivers import RadwagScaleBase, SimRadwagScale, RadwagScale
 from hardware_testing.data import (
     dump_data_to_file,
     append_data_to_file,
@@ -157,8 +157,14 @@ class GravimetricRecording(List):
 class RecordConfig:
     """Recording config."""
 
-    def __init__(self, duration: float, frequency: float, stable: bool = False,
-                 test_name: Optional[str] = None, tag: Optional[str] = None):
+    def __init__(
+        self,
+        duration: float,
+        frequency: float,
+        stable: bool = False,
+        test_name: Optional[str] = None,
+        tag: Optional[str] = None,
+    ):
         self.duration = duration
         self.frequency = frequency
         self.stable = stable
@@ -237,7 +243,7 @@ def record_samples_to_disk(
 
     def _on_new_sample(recording: GravimetricRecording) -> None:
         append_data_to_file(
-            config.test_name, _file_name, recording[-1].as_csv(recording) + "\n"
+            str(config.test_name), _file_name, recording[-1].as_csv(recording) + "\n"
         )
 
     # add the header to the CSV file
@@ -258,7 +264,7 @@ class GravimetricRecorder:
     def __init__(self, ctx: ProtocolContext, test_name: str) -> None:
         self._ctx = ctx
         self._cfg = RecordConfig(test_name=test_name, duration=1.0, frequency=10)
-        self._scale = None
+        self._scale: RadwagScaleBase = SimRadwagScale()
         self._active = False
 
     @property

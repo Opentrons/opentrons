@@ -7,7 +7,7 @@ from hardware_testing.opentrons_api.workarounds import (
     apply_additional_offset_to_labware,
     is_running_in_app,
     http_get_all_labware_offsets,
-    get_latest_offset_for_labware
+    get_latest_offset_for_labware,
 )
 
 # FIXME: replace vial with something where
@@ -15,7 +15,9 @@ from hardware_testing.opentrons_api.workarounds import (
 VIAL_SAFE_Z_OFFSET = 10
 
 
-def _apply_calibrated_labware_offsets(protocol: ProtocolContext, layout: LayoutLabware) -> None:
+def _apply_calibrated_labware_offsets(
+    protocol: ProtocolContext, layout: LayoutLabware
+) -> None:
     offsets_list = http_get_all_labware_offsets(protocol)
 
     def _load_and_set_offset(labware: Labware) -> None:
@@ -34,7 +36,9 @@ def _apply_calibrated_labware_offsets(protocol: ProtocolContext, layout: LayoutL
         _load_and_set_offset(layout.vial)
 
 
-def overwrite_default_labware_positions(protocol: ProtocolContext, layout: LayoutLabware) -> None:
+def overwrite_default_labware_positions(
+    protocol: ProtocolContext, layout: LayoutLabware
+) -> None:
     if not is_running_in_app():
         _apply_calibrated_labware_offsets(protocol, layout)
     if layout.vial:
