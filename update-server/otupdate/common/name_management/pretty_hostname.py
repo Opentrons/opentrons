@@ -61,6 +61,9 @@ async def get_pretty_hostname(default: str = "no name set") -> str:
             args=["status", "--pretty"],
         )
     ).decode("utf-8")
+    # Strip the trailing newline, since it's not part of the actual name value.
+    # TODO(mm, 2022-07-18): When we upgrade to systemd 249, use `hostnamectl --json`
+    # for CLI output that we can parse more robustly.
     assert len(result) >= 1 and result[-1] == "\n"
     return result[:-1]
 
