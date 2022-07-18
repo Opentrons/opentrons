@@ -1,11 +1,13 @@
 """Labware layout."""
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional
 
 from opentrons import protocol_api
 from opentrons.protocol_api.labware import Labware
 
 from hardware_testing.labware.definitions import load_radwag_vial_definition
+from hardware_testing.opentrons_api.workarounds import is_running_in_app
 
 APP_TIPRACK_CALIBRATION_SLOT = "8"  # where the App puts the tiprack
 SCALE_SLOT_ON_OT2 = "6"  # could also be 9, it's sort of between the two
@@ -46,10 +48,16 @@ class LayoutLabware:
         slots: LayoutSlots,
         tip_volume: int,
         multi_tip_volume: int = DEFAULT_MULTI_TIP_VOLUME,
+        definitions_dir: Optional[Path] = None,
     ) -> "LayoutLabware":
         """Build."""
         layout = cls(slots=slots)
-        layout.load(ctx=ctx, tip_volume=tip_volume, multi_tip_volume=multi_tip_volume)
+        layout.load(
+            ctx=ctx,
+            tip_volume=tip_volume,
+            multi_tip_volume=multi_tip_volume,
+            definitions_dir=definitions_dir,
+        )
         return layout
 
     def load(
@@ -57,6 +65,7 @@ class LayoutLabware:
         ctx: protocol_api.ProtocolContext,
         tip_volume: int,
         multi_tip_volume: int = DEFAULT_MULTI_TIP_VOLUME,
+        definitions_dir: Optional[Path] = None,
     ) -> None:
         """Load."""
         self._ctx = ctx
@@ -76,13 +85,15 @@ class LayoutLabware:
                 "corning_96_wellplate_360ul_flat", location=self.slots.plate
             )
         if self.slots.vial:
-            vial_def = load_radwag_vial_definition()
-            if vial_def:
-                ctx.load_labware_from_definition(vial_def, location=self.slots.vial)
-            else:
+            if is_running_in_app():
                 ctx.load_labware(
                     "radwag_pipette_calibration_vial", location=self.slots.vial
                 )
+            elif definitions_dir:
+                vial_def = load_radwag_vial_definition(directory=definitions_dir)
+                ctx.load_labware_from_definition(vial_def, location=self.slots.vial)
+            else:
+                raise RuntimeError("Unable to load custom labware definition")
 
     def _get_labware(self, slot: Optional[str]) -> Optional[Labware]:
         if slot is None:

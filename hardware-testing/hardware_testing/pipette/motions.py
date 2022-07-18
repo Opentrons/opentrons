@@ -166,13 +166,17 @@ class PipettingLiquidSettings:
 
     def run(
         self,
-        on_pre_submerge: Optional[Callable[[], None]] = None,
-        on_post_emerge: Optional[Callable[[], None]] = None,
+        on_pre_submerge: Optional[
+            Callable[[PipettingLiquidSettingsConfig], None]
+        ] = None,
+        on_post_emerge: Optional[
+            Callable[[PipettingLiquidSettingsConfig], None]
+        ] = None,
     ) -> None:
         """Run."""
         self._approach()
         if callable(on_pre_submerge):
-            on_pre_submerge()
+            on_pre_submerge(self._cfg)
         self._gather_air_gaps()
         self._submerge()
         if self._cfg.aspirate:
@@ -184,7 +188,7 @@ class PipettingLiquidSettings:
         self._blow_out()
         self._finish()
         if callable(on_post_emerge):
-            on_post_emerge()
+            on_post_emerge(self._cfg)
 
 
 def pipette_liquid_settings(

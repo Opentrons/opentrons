@@ -1,9 +1,8 @@
 """Labware definitions."""
 import json
-import os
+from pathlib import Path
 
-from opentrons.protocol_api.labware import LabwareDefinition
-
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 # the custom labware file for the pipette-calibration glass-vial
 # NOTE: if running through the App, this custom labware definition
@@ -11,13 +10,10 @@ from opentrons.protocol_api.labware import LabwareDefinition
 SCALE_JSON_FILENAME = "radwag_pipette_calibration_vial.json"
 
 
-def load_radwag_vial_definition() -> LabwareDefinition:
+def load_radwag_vial_definition(directory: Path) -> LabwareDefinition:
     """Load Radwag Vial labware definition."""
     # load custom labware definition from this file's directory
-    scale_json_filepath = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), SCALE_JSON_FILENAME
-    )
-    with open(scale_json_filepath) as f:
+    with open(directory / SCALE_JSON_FILENAME) as f:
         # NOTE: b/c we are using the run() both inside and outside the App
         #       this means we must support loading our custom labware in
         #       both scenarios. So, because here we are outside the App,

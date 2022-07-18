@@ -45,3 +45,8 @@ def get_list_of_wells_affected(
     else:
         wells_list = [well]
     return wells_list
+
+
+def get_pipette_unique_name(pipette: protocol_api.InstrumentContext) -> str:
+    """Get a pipette's unique name."""
+    return str(pipette.hw_pipette["pipette_id"])

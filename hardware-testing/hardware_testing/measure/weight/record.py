@@ -302,6 +302,10 @@ class GravimetricRecorder:
         """Set frequency."""
         self._cfg.frequency = frequency
 
+    def set_stable(self, stable: bool) -> None:
+        """Set stable."""
+        self._cfg.stable = stable
+
     def calibrate_scale(self) -> None:
         """Calibrate scale."""
         was_active = self.active

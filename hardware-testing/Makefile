@@ -95,13 +95,19 @@ push-no-restart-ot3: sdist Pipfile.lock
 	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"hardware_testing")
 
 .PHONY: push
-push-ot3: push-no-restart
+push-ot3: push-no-restart-ot3
 	$(call restart-server,$(host),,$(ssh_opts),"opentrons-robot-server")
 
-.PHONE: push-protocols
+.PHONY: push-protocols
 push-protocols:
 	scp -r protocols root@$(host):/data/user_storage/opentrons_data
+
+.PHONY: push-all
+push-all: clean wheel push-no-restart push-protocols
 
 .PHONY: term
 term:
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
+
+.PHONY: push-all-and-term
+push-all-and-term: push-all term
