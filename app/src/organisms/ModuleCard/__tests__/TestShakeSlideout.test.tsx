@@ -10,10 +10,12 @@ import { TestShakeSlideout } from '../TestShakeSlideout'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
 import { useLatchControls } from '../hooks'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
+import { HeaterShakerWizard } from '../../Devices/HeaterShakerWizard'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../hooks')
 jest.mock('../useModuleIdFromRun')
+jest.mock('../../Devices/HeaterShakerWizard')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
@@ -26,6 +28,9 @@ const mockUseLatchControls = useLatchControls as jest.MockedFunction<
 >
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
+>
+const mockHeaterShakerWizard = HeaterShakerWizard as jest.MockedFunction<
+  typeof HeaterShakerWizard
 >
 
 const render = (props: React.ComponentProps<typeof TestShakeSlideout>) => {
@@ -159,9 +164,12 @@ describe('TestShakeSlideout', () => {
   })
 
   it('renders show attachment instructions link', () => {
+    mockHeaterShakerWizard.mockReturnValue(<div>mock HeaterShakerWizard</div>)
     const { getByText } = render(props)
 
-    getByText('Show attachment instructions')
+    const button = getByText('Show attachment instructions')
+    fireEvent.click(button)
+    getByText('mock HeaterShakerWizard')
   })
 
   it('start shake button should be disabled if the labware latch is open', () => {

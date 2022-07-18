@@ -192,7 +192,7 @@ export function useModuleOverflowMenu(
       data-testid={`hs_attach_to_deck_${module.moduleModel}`}
       onClick={() => handleWizardClick()}
     >
-      {t('how_to_attach_to_deck', { ns: 'heater_shaker' })}
+      {t('show_attachment_instructions', { ns: 'heater_shaker' })}
     </MenuItem>
   )
   const testShakeBtn =

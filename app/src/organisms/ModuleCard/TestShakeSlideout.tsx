@@ -123,7 +123,7 @@ export const TestShakeSlideout = (
       }
       case 'closing':
       case 'idle_closed': {
-        return t('closed', { ns: 'heater_shaker' })
+        return t('heater_shaker:closed')
       }
       default:
         return latchStatus
@@ -188,8 +188,7 @@ export const TestShakeSlideout = (
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.darkBlack}
             >
-              {t('labware_latch_status', {
-                ns: 'heater_shaker',
+              {t('heater_shaker:labware_latch_status', {
                 status: getLatchStatus(module.data.labwareLatchStatus),
               })}
             </Text>
@@ -204,12 +203,12 @@ export const TestShakeSlideout = (
             {...targetProps}
           >
             {!isLatchClosed
-              ? t('close_latch', { ns: 'heater_shaker' })
-              : t('open_latch', { ns: 'heater_shaker' })}
+              ? t('heater_shaker:close_latch')
+              : t('heater_shaker:open_latch')}
           </TertiaryButton>
           {isShaking ? (
             <Tooltip tooltipProps={tooltipProps}>
-              {t('cannot_open_latch', { ns: 'heater_shaker' })}
+              {t('heater_shaker:cannot_open_latch')}
             </Tooltip>
           ) : null}
         </Flex>
@@ -220,7 +219,7 @@ export const TestShakeSlideout = (
           color={COLORS.darkBlack}
           marginTop={SPACING.spacing4}
         >
-          {t('shake_speed', { ns: 'heater_shaker' })}
+          {t('heater_shaker:shake_speed')}
         </Text>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
           <Flex
@@ -254,13 +253,11 @@ export const TestShakeSlideout = (
             disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
             {...targetProps}
           >
-            {isShaking
-              ? t('stop', { ns: 'shared' })
-              : t('start', { ns: 'shared' })}
+            {isShaking ? t('shared:stop') : t('shared:start')}
           </TertiaryButton>
           {!isLatchClosed ? (
             <Tooltip tooltipProps={tooltipProps}>
-              {t('cannot_shake', { ns: 'heater_shaker' })}
+              {t('heater_shaker:cannot_shake')}
             </Tooltip>
           ) : null}
         </Flex>
@@ -276,7 +273,7 @@ export const TestShakeSlideout = (
         id={'HeaterShaker_Attachment_Instructions'}
         onClick={() => setShowWizard(true)}
       >
-        {t('show_attachment_instructions', { ns: 'heater_shaker' })}
+        {t('heater_shaker:show_attachment_instructions')}
       </Link>
     </Slideout>
   )

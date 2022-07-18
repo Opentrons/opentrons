@@ -248,14 +248,14 @@ describe('ModuleOverflowMenu', () => {
       name: 'Close Labware Latch',
     })
     const aboutButton = getByRole('button', { name: 'About module' })
-    getByRole('button', { name: 'See how to attach to deck' })
+    getByRole('button', { name: 'Show attachment instructions' })
     const testButton = getByRole('button', { name: 'Test shake' })
     fireEvent.click(testButton)
     expect(props.handleTestShakeClick).toHaveBeenCalled()
     fireEvent.click(aboutButton)
     expect(props.handleAboutClick).toHaveBeenCalled()
   })
-  it('renders heater shaker see how to attach to deck button and when clicked, launches hs wizard', () => {
+  it('renders heater shaker show attachment instructions button and when clicked, launches hs wizard', () => {
     props = {
       module: mockHeaterShaker,
       handleSlideoutClick: jest.fn(),
@@ -265,7 +265,7 @@ describe('ModuleOverflowMenu', () => {
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
-    const btn = getByRole('button', { name: 'See how to attach to deck' })
+    const btn = getByRole('button', { name: 'Show attachment instructions' })
     fireEvent.click(btn)
     expect(props.handleWizardClick).toHaveBeenCalled()
   })
