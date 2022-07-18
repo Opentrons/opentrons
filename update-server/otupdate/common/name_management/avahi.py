@@ -69,12 +69,7 @@ class AvahiClient:
 
         Args:
             service_name: The new Avahi service name under which to start advertising.
-                See `service_name_is_valid()`.
-
-        Raises:
-            Exception: If Avahi thinks the new service name is invalid. Beware:
-                the old name may not be restored and we may be left not advertising
-                at all.
+                Must be valid; see `service_name_is_valid()`.
         """
         assert service_name_is_valid(service_name)
         async with self._lock:
