@@ -90,14 +90,12 @@ async def persist_pretty_hostname(new_pretty_hostname: str) -> None:
     # TODO BEFORE MERGE: Explain this.
     await _run_command(command="systemctl", args=["restart", "systemd-hostnamed"])
 
-    set_pretty_hostname = await get_pretty_hostname()
-    if set_pretty_hostname != new_pretty_hostname:
-        # TODO BEFORE MERGE: Should we restore the original file contents here?
-        _log.error(
-            f"Tried to set pretty hostname to {new_pretty_hostname!r}"
-            f" but actually set it to {set_pretty_hostname!r}."
-            f" This is probably a bug in how we validate or escape it."
-        )
+    read_back_pretty_hostname = await get_pretty_hostname()
+    assert read_back_pretty_hostname == new_pretty_hostname, (
+        f"Tried to set pretty hostname to {new_pretty_hostname!r}"
+        f" but actually set it to {read_back_pretty_hostname!r}."
+        f" This is probably a bug in how we validate or escape the string."
+    )
 
 
 # TODO(mm, 2022-07-18): Deduplicate with identical subprocess error-checking code
