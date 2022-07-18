@@ -52,6 +52,7 @@ export const SecondaryTertiaryButton = styled(NewSecondaryBtn)`
   color: ${COLORS.blue};
   overflow: no-wrap;
   padding: 0.375rem 0.75rem;
+  text-transform: ${TYPOGRAPHY.textTransformNone};
   white-space: nowrap;
   ${TYPOGRAPHY.labelSemiBold}
 
@@ -72,6 +73,7 @@ export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
   background-color: ${COLORS.error};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
+  text-transform: ${TYPOGRAPHY.textTransformNone};
   box-shadow: 0 0 0;
   ${TYPOGRAPHY.pSemiBold}
 
@@ -88,6 +90,7 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   box-shadow: none;
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   line-height: ${TYPOGRAPHY.lineHeight20};
+  text-transform: ${TYPOGRAPHY.textTransformNone};
   box-shadow: 0 0 0;
   ${TYPOGRAPHY.pSemiBold}
 
