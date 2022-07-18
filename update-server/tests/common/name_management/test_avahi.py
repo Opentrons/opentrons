@@ -1,6 +1,7 @@
 import pytest
 from otupdate.common.name_management.avahi import (
     alternative_service_name,
+    service_name_is_valid,
     SERVICE_NAME_MAXIMUM_OCTETS,
 )
 
@@ -62,3 +63,31 @@ def test_alternative_service_name_truncation(
     alternative_name = alternative_service_name(current_name)
     assert alternative_name == expected_alternative_name
     assert len(alternative_name.encode("utf-8")) <= SERVICE_NAME_MAXIMUM_OCTETS
+
+
+@pytest.mark.parametrize(
+    ("service_name", "expected_is_valid"),
+    [
+        ("1, nothing wrong with me; 2, nothing wrong with me", True),
+        # 63 ASCII bytes, exactly at the maximum.
+        ("123456789012345678901234567890123456789012345678901234567890123", True),
+        #   21 kanji
+        # *  3 UTF-8 bytes per kanji
+        # = 63 UTF-8 bytes, exactly at the maximum.
+        ("名名名名名名名名名名名名名名名名名名名名名", True),
+        # 64 ASCII bytes, just barely too long.
+        ("1234567890123456789012345678901234567890123456789012345678901234", False),
+        #   21 kanji
+        # *  3 UTF-8 bytes per kanji
+        # +  1 ASCII
+        # = 64 UTF-8 bytes, just barely too long.
+        ("名名名名名名名名名名名名名名名名名名名名名x", False),
+        # Contains control characters, not valid.
+        ("abc \n 123", False),
+        ("abc \u0091 123", False),  # PRIVATE USE ONE, an arbitrary Unicode control char
+        # Empty, not valid.
+        ("", False),
+    ],
+)
+def test_service_name_is_valid(service_name: str, expected_is_valid: bool) -> None:
+    assert service_name_is_valid(service_name) == expected_is_valid
