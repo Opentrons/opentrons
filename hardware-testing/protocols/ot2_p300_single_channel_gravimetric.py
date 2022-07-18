@@ -1,3 +1,4 @@
+"""OT2 P300 Single Channel Gravimetric Test."""
 from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.labware.position import VIAL_SAFE_Z_OFFSET
@@ -15,30 +16,30 @@ VOLUMES = [20, 150, 290]
 NUM_SAMPLES_PER_VOLUME = 10
 
 
-def test_gravimetric(
+def _test_gravimetric(
     protocol: ProtocolContext,
     liq_pipette: motions.PipetteLiquidClass,
     layout: LayoutLabware,
     liquid_level: LiquidTracker,
     recorder: GravimetricRecorder,
-):
-    def _take_reading():
+) -> None:
+    def _take_reading() -> None:
         # FIXME: refactor so it uses Recorder
         return
 
-    def _on_pre_aspirate():
+    def _on_pre_aspirate() -> None:
         # FIXME: refactor so it uses Recorder
         return
 
-    def _on_post_aspirate():
+    def _on_post_aspirate() -> None:
         # FIXME: refactor so it uses Recorder
         return
 
-    def _on_pre_dispense():
+    def _on_pre_dispense() -> None:
         # FIXME: refactor so it uses Recorder
         return
 
-    def _on_post_dispense():
+    def _on_post_dispense() -> None:
         # FIXME: refactor so it uses Recorder
         return
 
@@ -60,7 +61,7 @@ def test_gravimetric(
         liq_pipette.pipette.drop_tip()
 
 
-def run(protocol: ProtocolContext):
+def _run(protocol: ProtocolContext) -> None:
     layout = LayoutLabware.build(protocol, DEFAULT_SLOTS_GRAV, tip_volume=300)
     overwrite_default_labware_positions(protocol, layout=layout)
 
@@ -84,7 +85,7 @@ def run(protocol: ProtocolContext):
     recorder.set_tag(f"P300-Single-Gen2-{pip_sn}")
 
     liquid_level.print_setup_instructions(user_confirm=not protocol.is_simulating())
-    test_gravimetric(protocol, liq_pipette, layout, liquid_level, recorder)
+    _test_gravimetric(protocol, liq_pipette, layout, liquid_level, recorder)
 
 
 if __name__ == "__main__":
@@ -97,4 +98,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     ctx = get_api_context(metadata["apiLevel"], is_simulating=args.simulate)
     ctx.home()
-    run(ctx)
+    _run(ctx)

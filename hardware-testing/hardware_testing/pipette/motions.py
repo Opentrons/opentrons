@@ -1,3 +1,4 @@
+"""Pipette motions."""
 from dataclasses import dataclass
 from typing import Optional, Callable, List
 
@@ -14,7 +15,10 @@ from hardware_testing.opentrons_api.workarounds import force_prepare_for_aspirat
 LABWARE_BOTTOM_CLEARANCE = 1.5  # FIXME: not sure who should own this
 
 
-def apply_pipette_speeds(pipette: InstrumentContext, settings: LiquidClassSettings):
+def apply_pipette_speeds(
+    pipette: InstrumentContext, settings: LiquidClassSettings
+) -> None:
+    """Apply pipette speeds."""
     assert settings.traverse.speed
     pipette.default_speed = settings.traverse.speed
     pipette.flow_rate.aspirate = settings.aspirate.flow_rate
@@ -24,12 +28,16 @@ def apply_pipette_speeds(pipette: InstrumentContext, settings: LiquidClassSettin
 
 @dataclass
 class LiquidSurfaceHeights:
+    """Liquid Surface Heights."""
+
     above: float
     below: float
 
 
 @dataclass
 class PipettingHeights:
+    """Pipetting heights."""
+
     start: LiquidSurfaceHeights
     end: LiquidSurfaceHeights
 
@@ -69,6 +77,8 @@ def _create_pipetting_heights(
 
 @dataclass
 class PipettingLiquidSettingsConfig:
+    """Pipetting Liquid Settings Config."""
+
     pipette: InstrumentContext
     well: Well
     heights: PipettingHeights
@@ -78,9 +88,12 @@ class PipettingLiquidSettingsConfig:
 
 
 class PipettingLiquidSettings:
+    """Pipetting Liquid Settings."""
+
     def __init__(
         self, ctx: ProtocolContext, cfg: PipettingLiquidSettingsConfig
     ) -> None:
+        """Pipetting Liquid Settings."""
         assert (
             cfg.aspirate is not None or cfg.dispense is not None
         ), "must either aspirate or dispense"
@@ -156,6 +169,7 @@ class PipettingLiquidSettings:
         on_pre_submerge: Optional[Callable[[], None]] = None,
         on_post_emerge: Optional[Callable[[], None]] = None,
     ) -> None:
+        """Run."""
         self._approach()
         if callable(on_pre_submerge):
             on_pre_submerge()
@@ -181,9 +195,10 @@ def pipette_liquid_settings(
     liquid_tracker: LiquidTracker,
     aspirate: Optional[float] = None,
     dispense: Optional[float] = None,
-    on_pre_submerge=None,
-    on_post_emerge=None,
-):
+    on_pre_submerge: Optional[Callable] = None,
+    on_post_emerge: Optional[Callable] = None,
+) -> None:
+    """Run a pipette given some Pipetting Liquid Settings."""
     height_before, height_after = liquid_tracker.get_before_and_after_heights(
         pipette, well, aspirate=aspirate, dispense=dispense
     )
@@ -206,9 +221,12 @@ def pipette_liquid_settings(
 
 
 class PipetteLiquidClass:
+    """Pipette Liquid Class."""
+
     def __init__(
         self, ctx: ProtocolContext, model: str, mount: str, tip_racks: List[Labware]
     ) -> None:
+        """Pipette Liquid Class."""
         self._ctx = ctx
         self._pipette = ctx.load_instrument(model, mount, tip_racks=tip_racks)
         self._liq_cls: LiquidClassSettings = LIQUID_CLASS_DEFAULT
@@ -219,9 +237,11 @@ class PipetteLiquidClass:
 
     @property
     def pipette(self) -> InstrumentContext:
+        """Pipette."""
         return self._pipette
 
     def set_liquid_class(self, settings: LiquidClassSettings) -> None:
+        """Set Liquid Class."""
         self._liq_cls = settings
         apply_pipette_speeds(self._pipette, settings)
 
@@ -232,12 +252,14 @@ class PipetteLiquidClass:
         on_pre_dispense: Optional[Callable] = None,
         on_post_dispense: Optional[Callable] = None,
     ) -> None:
+        """Assign callbacks."""
         self._on_pre_aspirate = on_pre_aspirate
         self._on_post_aspirate = on_post_aspirate
         self._on_pre_dispense = on_pre_dispense
         self._on_post_dispense = on_post_dispense
 
     def aspirate(self, volume: float, well: Well, liquid_level: LiquidTracker) -> None:
+        """Aspirate."""
         pipette_liquid_settings(
             self._ctx,
             self._pipette,
@@ -250,6 +272,7 @@ class PipetteLiquidClass:
         )
 
     def dispense(self, volume: float, well: Well, liquid_level: LiquidTracker) -> None:
+        """Dispense."""
         pipette_liquid_settings(
             self._ctx,
             self._pipette,

@@ -1,3 +1,4 @@
+"""Labware definitions."""
 import json
 import os
 
@@ -11,6 +12,7 @@ SCALE_JSON_FILENAME = "radwag_pipette_calibration_vial.json"
 
 
 def load_radwag_vial_definition() -> LabwareDefinition:
+    """Load Radwag Vial labware definition."""
     # load custom labware definition from this file's directory
     scale_json_filepath = os.path.join(
         os.path.dirname(os.path.realpath(__file__)), SCALE_JSON_FILENAME

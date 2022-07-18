@@ -6,7 +6,7 @@ from .asair_sensor import AsairSensor, AsairSensorError
 
 
 def find_port(vid: int, pid: int) -> str:
-    """Find COM port from provided VIP:PID"""
+    """Find COM port from provided VIP:PID."""
     for port in comports():
         if port.pid == pid and port.vid == vid:
             return port.device

@@ -1,4 +1,4 @@
-"""Gravimetric support package."""
+"""Measure weight."""
 
 from .record import GravimetricSample, GravimetricRecording
 from .record import (

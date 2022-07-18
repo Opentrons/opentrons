@@ -1,3 +1,4 @@
+"""Liquid Height."""
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import math
@@ -13,66 +14,86 @@ from hardware_testing.opentrons_api.helpers import (
 
 
 class CalcType(ABC):
+    """Calculation Type."""
+
     @abstractmethod
     def max_volume(self) -> float:
+        """Calculate the well maximum volume."""
         ...
 
     @abstractmethod
     def height_from_volume(self, volume: float) -> float:
+        """Calculate the liquid height given a volume."""
         ...
 
     @abstractmethod
     def volume_from_height(self, height: float) -> float:
+        """Calculate the liquid volume given a height."""
         ...
 
 
 @dataclass
 class CalcTypeCube(CalcType):
+    """Calculate Type Cube."""
+
     width: float
     length: float
     depth: float
 
     def max_volume(self) -> float:
+        """Calculate the well maximum volume."""
         return self.width * self.length * self.depth
 
     def height_from_volume(self, volume: float) -> float:
+        """Calculate the liquid height given a volume."""
         assert 0 <= volume <= self.max_volume(), f"Volume {volume} is out of range"
         return (volume / self.max_volume()) * self.depth
 
     def volume_from_height(self, height: float) -> float:
+        """Calculate the liquid volume given a height."""
         assert 0 <= height <= self.depth, f"Height {height} is out of range"
         return (height / self.depth) * self.max_volume()
 
 
 @dataclass
 class CalcTypeCylinder(CalcType):
+    """Calculate Type Cylinder."""
+
     diameter: float
     depth: float
 
     def max_volume(self) -> float:
+        """Calculate the well maximum volume."""
         return math.pi * pow(self.diameter / 2, 2) * self.depth
 
     def height_from_volume(self, volume: float) -> float:
+        """Calculate the liquid height given a volume."""
         assert 0 <= volume <= self.max_volume(), f"Volume {volume} is out of range"
         return (volume / self.max_volume()) * self.depth
 
     def volume_from_height(self, height: float) -> float:
+        """Calculate the liquid volume given a height."""
         assert 0 <= height <= self.depth, f"Height {height} is out of range"
         return (height / self.depth) * self.max_volume()
 
 
 @dataclass
 class CalcTypeLookup(CalcType):
+    """Calculate Type Lookup."""
+
     lookup: List[tuple]  # [(ul, mm), (ul, mm)]
 
     @property
     def depth(self) -> float:
+        """Well Depth."""
         return self.lookup[-1][1]
 
     def max_volume(self) -> float:
+        """Well Max Volume."""
         return self.lookup[-1][0]
 
     def height_from_volume(self, volume: float) -> float:
+        """Calculate the liquid height given a volume."""
         assert 0 <= volume <= self.max_volume(), f"Volume {volume} is out of range"
         for i, (lv, lh) in enumerate(self.lookup[1:]):
             plv, plh = self.lookup[i - 1]
@@ -82,6 +103,7 @@ class CalcTypeLookup(CalcType):
         raise ValueError(f"Unable to find volume ({volume}) in lookup table")
 
     def volume_from_height(self, height: float) -> float:
+        """Calculate the liquid volume given a height."""
         assert 0 <= height <= self.depth, f"Height {height} is out of range"
         for i, (lv, lh) in enumerate(self.lookup[1:]):
             plv, plh = self.lookup[i - 1]
@@ -92,22 +114,29 @@ class CalcTypeLookup(CalcType):
 
 
 class LiquidContent:
+    """Liquid Content."""
+
     def __init__(self, calc_type: CalcType) -> None:
+        """Liquid Content."""
         self._calc_type = calc_type
         self._volume: float = 0
         self._name: str = "Unknown"
 
     def set_volume(self, volume: float) -> None:
+        """Set volume."""
         self._volume = volume
 
     def get_volume(self) -> float:
+        """Get volume."""
         return float(self._volume)
 
     def set_name(self, name: str) -> None:
+        """Set name."""
         self._name = str(name)
 
     @property
     def name(self) -> str:
+        """Name."""
         return self._name
 
     def update_volume(
@@ -115,12 +144,14 @@ class LiquidContent:
         after_aspirate: Optional[float] = None,
         after_dispense: Optional[float] = None,
     ) -> None:
+        """Update volume."""
         if after_aspirate is not None:
             self.set_volume(self.get_volume() - after_aspirate)
         elif after_dispense is not None:
             self.set_volume(self.get_volume() + after_dispense)
 
     def set_volume_from_height(self, liquid_height: float) -> None:
+        """Set volume from height."""
         max_vol = self._calc_type.max_volume()
         vol = self._calc_type.volume_from_height(liquid_height)
         assert vol >= 0, f"{vol} uL is less than 0 uL"
@@ -132,6 +163,7 @@ class LiquidContent:
         after_aspirate: Optional[float] = None,
         after_dispense: Optional[float] = None,
     ) -> float:
+        """Get volume."""
         vol = self.get_volume()
         if after_aspirate is not None:
             vol -= after_aspirate
@@ -152,10 +184,14 @@ def _get_actual_volume_change_in_well(
 
 
 class LiquidTracker:
+    """Liquid Tracker."""
+
     def __init__(self) -> None:
+        """Liquid Tracker."""
         self._items: dict = dict({})
 
     def initialize_from_deck(self, protocol: ProtocolContext) -> None:
+        """Initialize from deck."""
         # NOTE: For Corning 3631, assuming a perfect cylinder creates
         #       an error of -0.78mm when Corning 3631 plate is full (~360uL)
         #       This means the software will think the liquid is
@@ -167,10 +203,12 @@ class LiquidTracker:
                 self.init_well_liquid_height(w)
 
     def reset(self) -> None:
+        """Reset."""
         for key in self._items:
             del self._items[key]
 
     def print_setup_instructions(self, user_confirm: bool = False) -> None:
+        """Print setup instructions."""
         found = [
             (well, tracker)
             for well, tracker in self._items.items()
@@ -189,6 +227,7 @@ class LiquidTracker:
     def init_well_liquid_height(
         self, well: Well, lookup_table: Optional[list] = None
     ) -> None:
+        """Init well liquid height."""
         calc_type: CalcType
         if lookup_table:
             calc_type = CalcTypeLookup(lookup=lookup_table)
@@ -205,17 +244,20 @@ class LiquidTracker:
         self._items[well] = LiquidContent(calc_type)
 
     def set_start_volume(self, well: Well, volume: float) -> None:
+        """Set start volume."""
         self._items[well].set_volume(volume)
 
     def add_start_volume(
         self, well: Well, volume: float, name: Optional[str] = None
     ) -> None:
+        """Add start volume."""
         self.update_well_volume(well, after_dispense=volume)
         self._items[well].set_name(name)
 
     def set_start_volume_from_liquid_height(
         self, well: Well, liquid_height: float, name: Optional[str] = None
     ) -> None:
+        """Set start volume from liquid height."""
         self._items[well].set_volume_from_height(liquid_height)
         self._items[well].set_name(name)
 
@@ -225,11 +267,13 @@ class LiquidTracker:
         after_aspirate: Optional[float] = None,
         after_dispense: Optional[float] = None,
     ) -> float:
+        """Get liquid height."""
         return self._items[well].get_height(
             after_aspirate=after_aspirate, after_dispense=after_dispense
         )
 
     def get_volume(self, well: Well) -> float:
+        """Get volume."""
         return self._items[well].get_volume()
 
     def get_height_change(
@@ -238,6 +282,7 @@ class LiquidTracker:
         after_aspirate: Optional[float] = None,
         after_dispense: Optional[float] = None,
     ) -> float:
+        """Get height change."""
         start = self.get_liquid_height(well)
         end = self.get_liquid_height(
             well, after_aspirate=after_aspirate, after_dispense=after_dispense
@@ -250,13 +295,19 @@ class LiquidTracker:
         after_aspirate: Optional[float] = None,
         after_dispense: Optional[float] = None,
     ) -> None:
+        """Update well volume."""
         self._items[well].update_volume(
             after_aspirate=after_aspirate, after_dispense=after_dispense
         )
 
     def get_before_and_after_heights(
-        self, pipette: InstrumentContext, well: Well, aspirate=None, dispense=None
+        self,
+        pipette: InstrumentContext,
+        well: Well,
+        aspirate: Optional[float] = None,
+        dispense: Optional[float] = None,
     ) -> Tuple[float, float]:
+        """Get before and after heights."""
         actual_aspirate_amount = _get_actual_volume_change_in_well(
             pipette, well, volume=aspirate
         )
@@ -278,6 +329,7 @@ class LiquidTracker:
         aspirate: Optional[float] = None,
         dispense: Optional[float] = None,
     ) -> None:
+        """Update affected wells."""
         actual_aspirate_amount = _get_actual_volume_change_in_well(
             pipette, well, volume=aspirate
         )

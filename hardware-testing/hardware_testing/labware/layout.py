@@ -1,3 +1,4 @@
+"""Labware layout."""
 from dataclasses import dataclass
 from typing import Optional
 
@@ -21,6 +22,8 @@ DEFAULT_MULTI_TIP_VOLUME = 300
 
 @dataclass
 class LayoutSlots:
+    """Layout Slots."""
+
     tiprack: Optional[str]
     tiprack_multi: Optional[str]
     trough: Optional[str]
@@ -29,7 +32,10 @@ class LayoutSlots:
 
 
 class LayoutLabware:
+    """Layout Labware."""
+
     def __init__(self, slots: LayoutSlots) -> None:
+        """Layout Labware."""
         self.slots = slots
         self._ctx: Optional[protocol_api.ProtocolContext] = None
 
@@ -41,6 +47,7 @@ class LayoutLabware:
         tip_volume: int,
         multi_tip_volume: int = DEFAULT_MULTI_TIP_VOLUME,
     ) -> "LayoutLabware":
+        """Build."""
         layout = cls(slots=slots)
         layout.load(ctx=ctx, tip_volume=tip_volume, multi_tip_volume=multi_tip_volume)
         return layout
@@ -51,6 +58,7 @@ class LayoutLabware:
         tip_volume: int,
         multi_tip_volume: int = DEFAULT_MULTI_TIP_VOLUME,
     ) -> None:
+        """Load."""
         self._ctx = ctx
         if self.slots.tiprack:
             ctx.load_labware(
@@ -85,22 +93,27 @@ class LayoutLabware:
 
     @property
     def tiprack(self) -> Optional[Labware]:
+        """Tiprack."""
         return self._get_labware(self.slots.tiprack)
 
     @property
     def tiprack_multi(self) -> Optional[Labware]:
+        """Tiprack for multi."""
         return self._get_labware(self.slots.tiprack_multi)
 
     @property
     def trough(self) -> Optional[Labware]:
+        """Trough."""
         return self._get_labware(self.slots.trough)
 
     @property
     def plate(self) -> Optional[Labware]:
+        """Plate."""
         return self._get_labware(self.slots.plate)
 
     @property
     def vial(self) -> Optional[Labware]:
+        """Vial."""
         return self._get_labware(self.slots.vial)
 
 

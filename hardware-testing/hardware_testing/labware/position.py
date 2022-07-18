@@ -1,3 +1,4 @@
+"""Labware position."""
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api.labware import Labware
 
@@ -39,6 +40,7 @@ def _apply_calibrated_labware_offsets(
 def overwrite_default_labware_positions(
     protocol: ProtocolContext, layout: LayoutLabware
 ) -> None:
+    """Overwrite default labware positions."""
     if not is_running_in_app():
         _apply_calibrated_labware_offsets(protocol, layout)
     if layout.vial:

@@ -1,8 +1,8 @@
+"""Opentrons API Workarounds."""
 from datetime import datetime
 from typing import Tuple, List
 import json
 import urllib.request
-import time
 import platform
 
 from opentrons.protocol_api.labware import Labware
@@ -10,14 +10,19 @@ from opentrons.protocol_api import InstrumentContext, ProtocolContext
 
 
 def is_running_in_app() -> bool:
+    """Is running in App."""
     return False  # FIXME: how to detect if we are running in the App?
 
 
 def is_running_on_robot() -> bool:
+    """Is running on Robot."""
     return str(platform.system()).lower() == "linux"
 
 
-def apply_additional_offset_to_labware(labware: Labware, x=0, y=0, z=0):
+def apply_additional_offset_to_labware(
+    labware: Labware, x: float = 0.0, y: float = 0.0, z: float = 0.0
+) -> None:
+    """Apply additional offset to labware."""
     # NOTE: this will re-instantiate all the labware's WELLs
     #       so this must be ran before rest of protocol
     labware_imp = labware._implementation
@@ -28,6 +33,7 @@ def apply_additional_offset_to_labware(labware: Labware, x=0, y=0, z=0):
 
 
 def force_prepare_for_aspirate(pipette: InstrumentContext) -> None:
+    """Force prepare for aspirate."""
     # FIXME: remove this and use latest API version once available
     # NOTE: this MUST happen before the .move_to()
     #       because the API automatically moves the pipette
@@ -37,7 +43,7 @@ def force_prepare_for_aspirate(pipette: InstrumentContext) -> None:
 
 
 def http_get_all_labware_offsets(ctx: ProtocolContext) -> List[dict]:
-    """Request (HTTP GET) from the local robot-server all runs information"""
+    """Request (HTTP GET) from the local robot-server all runs information."""
     if ctx.is_simulating() or not is_running_on_robot():
         return []
 
@@ -53,6 +59,7 @@ def http_get_all_labware_offsets(ctx: ProtocolContext) -> List[dict]:
 def get_latest_offset_for_labware(
     labware_offsets: List[dict], labware: Labware
 ) -> Tuple[float, float, float]:
+    """Get latest offset for labware."""
     lw_uri = str(labware.uri)
     lw_slot = str(labware.parent)
 
@@ -64,9 +71,9 @@ def get_latest_offset_for_labware(
     ]
 
     if not lw_offsets:
-        return 0, 0, 0
+        return 0.0, 0.0, 0.0
 
-    def _sort_by_created_at(_offset) -> datetime:
+    def _sort_by_created_at(_offset: dict) -> datetime:
         return datetime.fromisoformat(_offset["createdAt"])
 
     lw_offsets.sort(key=_sort_by_created_at)

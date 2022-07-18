@@ -1,3 +1,4 @@
+"""Liquid Class."""
 from dataclasses import dataclass
 from typing import Optional
 
@@ -9,6 +10,8 @@ ACTUAL_OT2_BLOW_OUT_VOLUME_P20 = 2.39
 
 @dataclass
 class SampleConfig:
+    """Sample Config."""
+
     acceleration: Optional[float]  # TODO: API update so acceleration is configurable
     flow_rate: float
     delay: float
@@ -16,12 +19,16 @@ class SampleConfig:
 
 @dataclass
 class AirConfig:
+    """Air Config."""
+
     flow_rate: float
     volume: float
 
 
 @dataclass
 class MovementConfig:
+    """Movement Config."""
+
     distance: Optional[float]
     speed: Optional[float]
     acceleration: Optional[float]  # TODO: API update so acceleration is configurable
@@ -30,6 +37,8 @@ class MovementConfig:
 
 @dataclass
 class LiquidClassSettings:
+    """Liquid Class Settings."""
+
     aspirate: SampleConfig
     dispense: SampleConfig
     blow_out: AirConfig

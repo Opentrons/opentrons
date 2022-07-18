@@ -1,15 +1,19 @@
+"""Plot Server."""
 from argparse import ArgumentParser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from pathlib import Path
-from typing import List
+from typing import List, Any
 
 from hardware_testing.data import create_folder_for_test_data
 
 
 class PlotRequestHandler(BaseHTTPRequestHandler):
+    """Plot Request Handler."""
+
     @property
     def path_elements(self) -> List[str]:
+        """Path elements."""
         return [el for el in self.path.split("/") if el]
 
     def _send_response_bytes(
@@ -74,6 +78,7 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         self._send_response_bytes(response_str.encode("utf-8"))
 
     def do_GET(self) -> None:
+        """Do GET."""
         try:
             if len(self.path_elements) > 1 and self.path_elements[0] == "data":
                 self._respond_to_data_request()
@@ -84,16 +89,20 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
 
 
 class PlotServer(HTTPServer):
-    def __init__(self, directory: Path, *args, **kwargs) -> None:
+    """Plot Server."""
+
+    def __init__(self, directory: Path, *args: Any, **kwargs: Any) -> None:
+        """Plot Server."""
         self._plot_directory = directory
         super().__init__(*args, **kwargs)
 
     @property
-    def plot_directory(self):
+    def plot_directory(self) -> Path:
+        """Plot directory."""
         return self._plot_directory
 
 
-def run(test_name: str, http_port: int) -> None:
+def _run(test_name: str, http_port: int) -> None:
     dir_path = create_folder_for_test_data(test_name)
     server = PlotServer(dir_path, ("0.0.0.0", http_port), PlotRequestHandler)
     print(f"Plot server running on port: {http_port}")
@@ -109,4 +118,4 @@ if __name__ == "__main__":
     parser.add_argument("--test-name", type=str, required=True)
     parser.add_argument("--port", type=int, default=8080)
     _args = parser.parse_args()
-    run(test_name=_args.test_name, http_port=_args.port)
+    _run(test_name=_args.test_name, http_port=_args.port)

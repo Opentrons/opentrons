@@ -1,4 +1,4 @@
-"""Gravimetric recording module."""
+"""Record weight measurements."""
 from dataclasses import dataclass
 from statistics import stdev
 from time import time
@@ -6,7 +6,7 @@ from typing import List, Optional, Callable
 
 from opentrons.protocol_api import ProtocolContext
 
-from hardware_testing.drivers import RadwagScaleBase, SimRadwagScale, RadwagScale
+from hardware_testing.drivers import RadwagScaleBase, SimRadwagScale
 from hardware_testing.data import (
     dump_data_to_file,
     append_data_to_file,
@@ -164,7 +164,8 @@ class RecordConfig:
         stable: bool = False,
         test_name: Optional[str] = None,
         tag: Optional[str] = None,
-    ):
+    ) -> None:
+        """Recording config."""
         self.duration = duration
         self.frequency = frequency
         self.stable = stable
@@ -173,6 +174,7 @@ class RecordConfig:
 
     @property
     def save_to_disk(self) -> bool:
+        """Save to disk."""
         return bool(self.test_name and self.tag)
 
 
@@ -262,17 +264,19 @@ class GravimetricRecorder:
     """Gravimetric Recorder."""
 
     def __init__(self, ctx: ProtocolContext, test_name: str) -> None:
+        """Gravimetric Recorder."""
         self._ctx = ctx
         self._cfg = RecordConfig(test_name=test_name, duration=1.0, frequency=10)
         self._scale: RadwagScaleBase = SimRadwagScale()
         self._active = False
 
     @property
-    def active(self):
+    def active(self) -> bool:
+        """Active."""
         return self._active
 
     @property
-    def config(self):
+    def config(self) -> RecordConfig:
         """Config."""
         return self._cfg
 
