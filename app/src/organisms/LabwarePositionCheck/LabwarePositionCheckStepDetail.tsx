@@ -184,11 +184,7 @@ export const LabwarePositionCheckStepDetail = (
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing3}
       >
-        <Flex
-          justifyContent={JUSTIFY_SPACE_AROUND}
-          alignItems={ALIGN_CENTER}
-          marginBottom={SPACING.spacing3}
-        >
+        <Flex justifyContent={JUSTIFY_SPACE_AROUND} alignItems={ALIGN_CENTER}>
           <Flex
             backgroundColor={COLORS.background}
             flexDirection={DIRECTION_COLUMN}
