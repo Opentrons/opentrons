@@ -112,7 +112,7 @@ export function HistoricalProtocolRun(
             as="p"
             width="35%"
             data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
-            css={{ 'overflow-wrap': 'anywhere' }}
+            overflowWrap="anywhere"
           >
             {protocolName}
           </StyledText>
