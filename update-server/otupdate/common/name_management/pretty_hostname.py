@@ -14,10 +14,6 @@ from typing import List, Optional, Union
 _log = getLogger(__name__)
 
 
-class InvalidPrettyHostnameError(ValueError):
-    pass
-
-
 def pretty_hostname_is_valid(pretty_hostname: str) -> bool:
     """Return whether we can persist ``pretty_hostname`` in /etc/machine-info.
 
@@ -74,19 +70,21 @@ async def persist_pretty_hostname(new_pretty_hostname: str) -> None:
     Writes the new name to /etc/machine-info so it persists across reboots.
 
     Args:
-        new_pretty_hostname: The name to set.
-
-    Raises:
-        InvalidPrettyHostnameError: If the given name wouldn't be valid.
-            The persisted name is left unchanged.
+        new_pretty_hostname: The name to set. Must be valid;
+            see `pretty_hostname_is_valid()`.
     """
-    if not pretty_hostname_is_valid(new_pretty_hostname):
-        # TODO BEFORE MERGE: Add a nice message.
-        raise InvalidPrettyHostnameError()
+    assert pretty_hostname_is_valid(new_pretty_hostname)
 
-    # We can't run `hostnamectl --pretty <name>` to write this for us
-    # because it fails with errors related to the filesystem being read-only
-    # or the mount point being busy, apparently because of our bind mount.
+    # Set the new pretty hostname.
+    #
+    # Ideally, we'd do this by running `hostnamectl set-hostname --pretty <new name>`.
+    # Unfortunately, that fails with errors related to the filesystem being read-only
+    # or the mount point being busy.
+    #
+    # This apparently has to do with us using a bind mount for the /etc/machine-info
+    # file, which is where `hostnamectl` stores the pretty hostname.
+    #
+    # As a workaround, rewrite /etc/machine-info ourselves.
     _rewrite_machine_info(new_pretty_hostname=new_pretty_hostname)
 
     # TODO BEFORE MERGE: Explain this.
@@ -128,8 +126,7 @@ async def _run_command(
 
 def _quote_and_escape_pretty_hostname_value(pretty_hostname: str) -> str:
     # TODO: Explain background of shell-ish syntax.
-    if not pretty_hostname_is_valid(pretty_hostname):
-        raise InvalidPrettyHostnameError()
+    assert pretty_hostname_is_valid(pretty_hostname)
     translation_table = str.maketrans(
         {
             "$": r"\$",

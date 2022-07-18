@@ -87,8 +87,11 @@ def test_rewrite_machine_info_is_idempotent(initial_contents: str) -> None:
         (r"\" \n \t", r'PRETTY_HOSTNAME="\\\" \\n \\t"'),
     ],
 )
-def test_escaping_and_quoting(input_pretty_hostname: str, expected_line: str) -> None:
+def test_valid_input_escaped_and_quoted(
+    input_pretty_hostname: str, expected_line: str
+) -> None:
     # TODO(mm, 2022-07-14): Rework so we don't have to test a private function.
+    assert pretty_hostname.pretty_hostname_is_valid(input_pretty_hostname)
     output = pretty_hostname._rewrite_machine_info_str(
         current_machine_info_contents="", new_pretty_hostname=input_pretty_hostname
     )
@@ -107,10 +110,5 @@ def test_escaping_and_quoting(input_pretty_hostname: str, expected_line: str) ->
         "bad \x7f input",  # ASCII DEL.
     ],
 )
-def test_raises_on_invalid_input(invalid_pretty_hostname: str) -> None:
-    # TODO(mm, 2022-07-14): Rework so we don't have to test a private function.
-    with pytest.raises(pretty_hostname.InvalidPrettyHostnameError):
-        pretty_hostname._rewrite_machine_info_str(
-            current_machine_info_contents="",
-            new_pretty_hostname=invalid_pretty_hostname,
-        )
+def test_invalid_input(invalid_pretty_hostname: str) -> None:
+    assert not pretty_hostname.pretty_hostname_is_valid(invalid_pretty_hostname)
