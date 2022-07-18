@@ -157,7 +157,7 @@ class SerialConnection:
             log.debug(f"{self.name}: Write -> {data_encode!r}")
             await self._serial.write(data=data_encode)
 
-            response = await self._serial.read_until(match=self._ack)
+            response = await self._serial.read_until()
             log.debug(f"{self.name}: Read <- {response!r}")
 
             if (
