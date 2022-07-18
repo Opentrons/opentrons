@@ -96,6 +96,7 @@ export function BaseModal(props: BaseModalProps): JSX.Element {
       bottom="0"
       zIndex="1"
       backgroundColor={overlayColor}
+      cursor="default"
       onClick={e => {
         e.stopPropagation()
         if (onOutsideClick) onOutsideClick(e)

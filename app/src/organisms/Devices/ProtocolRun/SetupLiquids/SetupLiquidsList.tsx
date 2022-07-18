@@ -133,7 +133,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_FLEX_START}
             gridGap={SPACING.spacing4}
-            marginTop={SPACING.spacing4}
+            marginY={SPACING.spacing4}
           >
             <StyledText
               as="p"
@@ -170,7 +170,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                 css={LIQUID_CARD_ITEM_STYLE}
                 key={index}
                 borderRadius={'4px'}
-                marginY={SPACING.spacing3}
+                marginBottom={SPACING.spacing3}
                 padding={SPACING.spacing4}
                 backgroundColor={COLORS.white}
                 data-testid={`LiquidsListItem_slotRow_${index}`}

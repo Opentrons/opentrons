@@ -91,7 +91,7 @@ export const LiquidsLabwareDetailsModal = (
             maxHeight={'27.125rem'}
             overflowY={'auto'}
             minWidth={'10.313rem'}
-            gridGap={SPACING.spacing4}
+            gridGap={SPACING.spacing3}
           >
             {filteredLiquidsInLoadOrder.map((liquid, index) => {
               const labwareInfoEntry = Object.entries(labwareInfo).find(
@@ -125,6 +125,7 @@ export const LiquidsLabwareDetailsModal = (
             width="100%"
             maxHeight="25rem"
             marginLeft={SPACING.spacing4}
+            marginTop={SPACING.spacing3}
           >
             <Flex flexDirection={DIRECTION_ROW}>
               <Flex flexDirection={DIRECTION_COLUMN}>

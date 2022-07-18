@@ -20,7 +20,8 @@ const BUTTON_GROUP_STYLES = css`
     font-size: 11px;
     line-height: 14px;
     box-shadow: none;
-
+    padding-top: 6px;
+    padding-bottom: 8px;
     &:focus {
       box-shadow: none;
       color: ${COLORS.white};

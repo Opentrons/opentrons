@@ -72,7 +72,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       >
         <Flex
           css={BORDERS.cardOutlineBorder}
-          padding={'0.75rem'}
+          padding={'0.5rem'}
           height={'max-content'}
           width={'max-content'}
           backgroundColor={COLORS.white}
@@ -80,7 +80,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           <Icon name="circle" color={displayColor} size={SIZE_1} />
         </Flex>
         <StyledText
-          as="p"
+          as="h3"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing3}
         >
