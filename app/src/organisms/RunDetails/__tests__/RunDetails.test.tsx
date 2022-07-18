@@ -20,6 +20,7 @@ import { RunDetails } from '..'
 import { i18n } from '../../../i18n'
 import { CommandList } from '../CommandList'
 import { useProtocolDetails } from '../hooks'
+import { useTrackProtocolRunEvent } from '../../Devices/hooks'
 import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import {
   useCurrentRunStatus,
@@ -36,8 +37,11 @@ import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 const mockPush = jest.fn()
 
 jest.mock('../hooks')
+jest.mock('../../Devices/hooks')
 jest.mock('../CommandList')
 jest.mock('../../../redux/robot/selectors')
+jest.mock('../../../redux/analytics')
+jest.mock('../../../redux/config')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -46,7 +50,7 @@ jest.mock('react-router-dom', () => {
   }
 })
 jest.mock('../../RunTimeControl/hooks')
-jest.mock('../../ProtocolUpload/hooks/')
+jest.mock('../../ProtocolUpload/hooks')
 
 const mockUseProtocolDetails = useProtocolDetails as jest.MockedFunction<
   typeof useProtocolDetails
@@ -61,6 +65,9 @@ const mockUseCurrentRunControls = useCurrentRunControls as jest.MockedFunction<
 >
 const mockUseRunControls = useRunControls as jest.MockedFunction<
   typeof useRunControls
+>
+const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
+  typeof useTrackProtocolRunEvent
 >
 const mockUseCloseCurrentRun = useCloseCurrentRun as jest.MockedFunction<
   typeof useCloseCurrentRun
@@ -89,13 +96,22 @@ const render = () => {
   )[0]
 }
 
+let mockTrackProtocolRunEvent: jest.Mock
+
 describe('RunDetails', () => {
   beforeEach(() => {
+    mockTrackProtocolRunEvent = jest.fn(
+      () => new Promise(resolve => resolve({}))
+    )
+
     when(mockUseProtocolDetails).calledWith().mockReturnValue({
       protocolData: simpleV6Protocol,
       displayName: 'mock display name',
     })
     when(mockCommandList).mockReturnValue(<div>Mock Command List</div>)
+    when(mockUseTrackProtocolRunEvent).calledWith('mockRunId').mockReturnValue({
+      trackProtocolRunEvent: mockTrackProtocolRunEvent,
+    })
     when(mockUseCloseCurrentRun)
       .calledWith()
       .mockReturnValue({
@@ -129,6 +145,7 @@ describe('RunDetails', () => {
 
   afterEach(() => {
     resetAllWhenMocks()
+    jest.restoreAllMocks()
   })
 
   it('pushes the /robots route if we somehow land on this page without a connected robot', () => {

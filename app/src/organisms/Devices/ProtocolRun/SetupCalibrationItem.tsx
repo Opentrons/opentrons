@@ -69,7 +69,7 @@ export function SetupCalibrationItem({
               size={SIZE_1}
               color={calibratedDate != null ? COLORS.success : COLORS.warning}
               marginRight={SPACING.spacing4}
-              name={calibratedDate != null ? 'check-circle' : 'alert-circle'}
+              name={calibratedDate != null ? 'ot-check' : 'alert-circle'}
             />
           ) : null}
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>

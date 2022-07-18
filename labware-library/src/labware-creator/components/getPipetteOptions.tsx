@@ -1,3 +1,4 @@
+import memoize from 'lodash/memoize'
 import {
   Box,
   Flex,
@@ -5,7 +6,6 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { memoize } from 'lodash'
 import upperFirst from 'lodash/upperFirst'
 import * as React from 'react'
 import { RichOptions } from '../fields'

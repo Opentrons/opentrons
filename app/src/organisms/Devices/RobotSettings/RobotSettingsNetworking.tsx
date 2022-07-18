@@ -69,31 +69,31 @@ export function RobotSettingsNetworking({
         {wifi?.ipAddress != null ? (
           <Icon
             size={SPACING.spacing4}
-            name="check-circle"
+            name="ot-check"
             color={COLORS.success}
             marginRight={SPACING.spacing3}
             data-testid="RobotSettings_Networking_check_circle"
-          ></Icon>
+          />
         ) : (
           <Box height={SPACING.spacing4} width={SPACING.spacing5}></Box>
         )}
         <Icon
           size="1.25rem"
           name="wifi"
-          marginRight={SPACING.spacing3}
+          marginRight={wifi?.ipAddress != null ? '0.5rem' : '0.75rem'}
           data-testid="RobotSettings_Networking_wifi_icon"
-        ></Icon>
+        />
         <StyledText as="h3">
           {t('wireless_network')}
           {activeNetwork?.ssid != null && ` - ${activeNetwork.ssid}`}
         </StyledText>
       </Flex>
-      <Flex paddingLeft={SPACING.spacing7} marginBottom={SPACING.spacing3}>
+      <Flex paddingLeft="3.5rem" marginBottom={SPACING.spacing3}>
         <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('wireless_network_name')}
         </StyledText>
       </Flex>
-      <Box paddingLeft={SPACING.spacing7} marginBottom={SPACING.spacing4}>
+      <Box paddingLeft="3.5rem" marginBottom={SPACING.spacing4}>
         {wifi?.ipAddress != null ? (
           <>
             <Flex marginBottom={SPACING.spacing5}>
@@ -149,45 +149,51 @@ export function RobotSettingsNetworking({
         {ethernet !== null && ethernet.ipAddress !== null ? (
           <Icon
             size={SPACING.spacing4}
-            name="check-circle"
+            name="ot-check"
             color={COLORS.success}
             marginRight={SPACING.spacing3}
             data-testid="RobotSettings_Networking_check_circle"
-          ></Icon>
+          />
         ) : (
-          <Box height={SPACING.spacing4} width={SPACING.spacing4}></Box>
+          <Box height={SPACING.spacing4} width={SPACING.spacing5}></Box>
         )}
         <Icon
           size="1.25rem"
           name="usb"
-          marginRight={SPACING.spacing4}
+          marginRight="0.75rem"
           data-testid="RobotSettings_Networking_usb_icon"
-        ></Icon>
+        />
         <StyledText as="h3">{t('wired_usb')}</StyledText>
       </Flex>
       <Box paddingLeft="3.5rem">
-        <Flex>
+        <Flex marginBottom={SPACING.spacing4}>
           {ethernet !== null && ethernet.ipAddress !== null ? (
             <>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 paddingRight={SPACING.spacing4}
               >
-                <StyledText as="p">{t('wired_ip')}</StyledText>
+                <StyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('wired_ip')}
+                </StyledText>
                 <StyledText as="p">{ethernet?.ipAddress}</StyledText>
               </Flex>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 paddingRight={SPACING.spacing4}
               >
-                <StyledText as="p">{t('wired_subnet')}</StyledText>
+                <StyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('wired_subnet')}
+                </StyledText>
                 <StyledText as="p">{ethernet?.subnetMask}</StyledText>
               </Flex>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 paddingRight={SPACING.spacing4}
               >
-                <StyledText as="p">{t('wired_mac')}</StyledText>
+                <StyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('wired_mac')}
+                </StyledText>
                 <StyledText as="p">{ethernet?.macAddress}</StyledText>
               </Flex>
             </>

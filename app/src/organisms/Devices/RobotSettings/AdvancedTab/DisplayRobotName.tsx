@@ -14,7 +14,6 @@ import {
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { useIsRobotBusy } from '../../hooks'
-
 interface DisplayRobotNameProps {
   robotName: string
   updateIsExpanded: (

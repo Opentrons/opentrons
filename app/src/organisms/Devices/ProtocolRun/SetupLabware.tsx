@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
+  Box,
   Icon,
   LabwareRender,
   Link,
@@ -210,77 +211,80 @@ export function SetupLabware({
             <ModuleExtraAttention
               moduleTypes={moduleTypesThatRequireExtraAttention}
               modulesInfo={moduleRenderInfoById}
+              runId={runId}
             />
           ) : null}
-          <RobotWorkSpace
-            deckDef={(standardDeckDef as unknown) as DeckDefinition}
-            viewBox={DECK_MAP_VIEWBOX}
-            deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-            id={'LabwareSetup_deckMap'}
-          >
-            {() => (
-              <>
-                {map(
-                  moduleRenderInfoById,
-                  ({
-                    x,
-                    y,
-                    moduleDef,
-                    nestedLabwareDef,
-                    nestedLabwareId,
-                    nestedLabwareDisplayName,
-                  }) => (
-                    <Module
-                      key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
-                      x={x}
-                      y={y}
-                      orientation={inferModuleOrientationFromXCoordinate(x)}
-                      def={moduleDef}
-                      innerProps={
-                        moduleDef.model === THERMOCYCLER_MODULE_V1
-                          ? { lidMotorState: 'open' }
-                          : {}
-                      }
-                    >
-                      {nestedLabwareDef != null && nestedLabwareId != null ? (
-                        <React.Fragment
-                          key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
-                        >
-                          <LabwareRender definition={nestedLabwareDef} />
-                          <LabwareInfoOverlay
-                            definition={nestedLabwareDef}
-                            labwareId={nestedLabwareId}
-                            displayName={nestedLabwareDisplayName}
-                            runId={runId}
-                          />
-                        </React.Fragment>
-                      ) : null}
-                    </Module>
-                  )
-                )}
-                {map(
-                  labwareRenderInfoById,
-                  ({ x, y, labwareDef, displayName }, labwareId) => {
-                    return (
-                      <React.Fragment
-                        key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
+          <Box margin="0 auto" maxWidth="46.25rem" width="100%">
+            <RobotWorkSpace
+              deckDef={(standardDeckDef as unknown) as DeckDefinition}
+              viewBox={DECK_MAP_VIEWBOX}
+              deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
+              id={'LabwareSetup_deckMap'}
+            >
+              {() => (
+                <>
+                  {map(
+                    moduleRenderInfoById,
+                    ({
+                      x,
+                      y,
+                      moduleDef,
+                      nestedLabwareDef,
+                      nestedLabwareId,
+                      nestedLabwareDisplayName,
+                    }) => (
+                      <Module
+                        key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
+                        x={x}
+                        y={y}
+                        orientation={inferModuleOrientationFromXCoordinate(x)}
+                        def={moduleDef}
+                        innerProps={
+                          moduleDef.model === THERMOCYCLER_MODULE_V1
+                            ? { lidMotorState: 'open' }
+                            : {}
+                        }
                       >
-                        <g transform={`translate(${x},${y})`}>
-                          <LabwareRender definition={labwareDef} />
-                          <LabwareInfoOverlay
-                            definition={labwareDef}
-                            labwareId={labwareId}
-                            displayName={displayName}
-                            runId={runId}
-                          />
-                        </g>
-                      </React.Fragment>
+                        {nestedLabwareDef != null && nestedLabwareId != null ? (
+                          <React.Fragment
+                            key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
+                          >
+                            <LabwareRender definition={nestedLabwareDef} />
+                            <LabwareInfoOverlay
+                              definition={nestedLabwareDef}
+                              labwareId={nestedLabwareId}
+                              displayName={nestedLabwareDisplayName}
+                              runId={runId}
+                            />
+                          </React.Fragment>
+                        ) : null}
+                      </Module>
                     )
-                  }
-                )}
-              </>
-            )}
-          </RobotWorkSpace>
+                  )}
+                  {map(
+                    labwareRenderInfoById,
+                    ({ x, y, labwareDef, displayName }, labwareId) => {
+                      return (
+                        <React.Fragment
+                          key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
+                        >
+                          <g transform={`translate(${x},${y})`}>
+                            <LabwareRender definition={labwareDef} />
+                            <LabwareInfoOverlay
+                              definition={labwareDef}
+                              labwareId={labwareId}
+                              displayName={displayName}
+                              runId={runId}
+                            />
+                          </g>
+                        </React.Fragment>
+                      )
+                    }
+                  )}
+                </>
+              )}
+            </RobotWorkSpace>
+          </Box>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
             <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_END}>
               <Flex color={COLORS.darkGreyEnabled} alignItems={ALIGN_CENTER}>
@@ -290,7 +294,7 @@ export function SetupLabware({
                   marginRight={SPACING.spacing2}
                 />
                 <StyledText css={TYPOGRAPHY.labelRegular}>
-                  {t('optional')}
+                  {t('recommended')}
                 </StyledText>
               </Flex>
             </Flex>
@@ -333,8 +337,7 @@ export function SetupLabware({
               >
                 <Link
                   role="link"
-                  css={TYPOGRAPHY.labelSemiBold}
-                  color={COLORS.darkBlack}
+                  css={TYPOGRAPHY.darkLinkLabelSemiBold}
                   onClick={() => setShowLabwareHelpModal(true)}
                   data-test={'LabwareSetup_helpLink'}
                 >

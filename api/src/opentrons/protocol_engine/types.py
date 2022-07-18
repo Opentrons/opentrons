@@ -358,3 +358,12 @@ class TemperatureRange(NamedTuple):
 
     min: float
     max: float
+
+
+@dataclass(frozen=True)
+class HeaterShakerMovementRestrictors:
+    """Shaking status, latch status and slot location for determining movement restrictions."""
+
+    plate_shaking: bool
+    latch_closed: bool
+    deck_slot: int

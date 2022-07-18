@@ -43,6 +43,15 @@ const COLLAPSED_STYLE = css`
   max-height: 0vh;
   overflow: hidden;
 `
+const ACCORDION_STYLE = css`
+  border-radius: 50%;
+  &:hover {
+    background: ${COLORS.lightGreyHover};
+  }
+  &:active {
+    background: #16212d40;
+  }
+`
 export function SetupStep({
   expanded,
   title,
@@ -104,9 +113,7 @@ export function SetupStep({
                     }
                     marginRight={SPACING.spacing3}
                     name={
-                      calibrationStatusComplete
-                        ? 'check-circle'
-                        : 'alert-circle'
+                      calibrationStatusComplete ? 'ot-check' : 'alert-circle'
                     }
                     id={'RunSetupCard_calibrationIcon'}
                   />
@@ -125,7 +132,8 @@ export function SetupStep({
               ) : null}
               <Icon
                 color={COLORS.darkBlack}
-                size={SIZE_1}
+                size="1.5rem"
+                css={ACCORDION_STYLE}
                 name={expanded ? 'minus' : 'plus'}
                 margin={SPACING.spacing2}
               />

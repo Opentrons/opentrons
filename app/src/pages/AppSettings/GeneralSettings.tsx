@@ -17,6 +17,7 @@ import {
   TYPOGRAPHY,
   COLORS,
   ALIGN_START,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { TertiaryButton, ToggleButton } from '../../atoms/buttons'
@@ -60,9 +61,6 @@ export function GeneralSettings(): JSX.Element {
     setShowPreviousVersionModal,
   ] = React.useState<boolean>(false)
   const updateAvailable = Boolean(useSelector(getAvailableShellUpdate))
-  const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(
-    updateAvailable
-  )
   const [showUpdateBanner, setShowUpdateBanner] = React.useState<boolean>(
     updateAvailable
   )
@@ -72,15 +70,17 @@ export function GeneralSettings(): JSX.Element {
   ] = React.useState(false)
 
   // may be enabled, disabled, or unknown (because config is loading)
-  const enabled = useSelector((s: State) => {
+  const updateAlertEnabled = useSelector((s: State) => {
     const ignored = getAlertIsPermanentlyIgnored(s, ALERT_APP_UPDATE_AVAILABLE)
     return ignored !== null ? !ignored : null
   })
-
+  const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(
+    updateAlertEnabled ? updateAvailable : false
+  )
   const handleToggle = (): void => {
-    if (enabled !== null) {
+    if (updateAlertEnabled !== null) {
       dispatch(
-        enabled
+        updateAlertEnabled
           ? alertPermanentlyIgnored(ALERT_APP_UPDATE_AVAILABLE)
           : alertUnignored(ALERT_APP_UPDATE_AVAILABLE)
       )
@@ -90,7 +90,7 @@ export function GeneralSettings(): JSX.Element {
         // this looks weird, but the control is a toggle, which makes the next
         // "enabled" setting `!enabled`. Therefore the next "ignored" setting is
         // `!!enabled`, or just `enabled`
-        properties: { updatesIgnored: enabled },
+        properties: { updatesIgnored: updateAlertEnabled },
       })
     }
   }
@@ -116,8 +116,10 @@ export function GeneralSettings(): JSX.Element {
             >
               {t('update_available')}
               <Link
+                role="button"
                 textDecoration={TEXT_DECORATION_UNDERLINE}
                 onClick={() => setShowUpdateModal(true)}
+                marginLeft={SPACING.spacing2}
               >
                 {t('view_update')}
               </Link>
@@ -187,20 +189,22 @@ export function GeneralSettings(): JSX.Element {
             </StyledText>
           </Box>
           <Box>
-            <Link
-              role="button"
-              css={TYPOGRAPHY.linkPSemiBold}
-              onClick={() => setShowPreviousVersionModal(true)}
-              id="GeneralSettings_previousVersionLink"
-            >
-              {t('restore_previous')}
-            </Link>
-            <ExternalLink
-              href={SOFTWARE_SYNC_URL}
-              id="GeneralSettings_appAndRobotSync"
-            >
-              {t('versions_sync')}
-            </ExternalLink>
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <Link
+                role="button"
+                css={TYPOGRAPHY.linkPSemiBold}
+                onClick={() => setShowPreviousVersionModal(true)}
+                id="GeneralSettings_previousVersionLink"
+              >
+                {t('restore_previous')}
+              </Link>
+              <ExternalLink
+                href={SOFTWARE_SYNC_URL}
+                id="GeneralSettings_appAndRobotSync"
+              >
+                {t('versions_sync')}
+              </ExternalLink>
+            </Flex>
           </Box>
         </Box>
         <Divider marginY={SPACING.spacing5} />
@@ -219,8 +223,8 @@ export function GeneralSettings(): JSX.Element {
           <ToggleButton
             label={ENABLE_APP_UPDATE_NOTIFICATIONS}
             marginRight={SPACING.spacing4}
-            disabled={enabled === null}
-            toggledOn={enabled === true}
+            disabled={updateAlertEnabled === null}
+            toggledOn={updateAlertEnabled === true}
             onClick={handleToggle}
             id="GeneralSettings_softwareUpdateAlerts"
           />

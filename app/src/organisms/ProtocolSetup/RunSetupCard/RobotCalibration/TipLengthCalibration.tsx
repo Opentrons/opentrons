@@ -220,6 +220,7 @@ export function TipLengthCalibration({
     </>
   ) : (
     <Link
+      role="button"
       onClick={() => confirm(true)}
       textDecoration={TEXT_DECORATION_UNDERLINE}
       css={FONT_BODY_2_DARK}

@@ -17,6 +17,7 @@ from ..state import StateStore, CurrentWell
 from ..errors import MustHomeError
 from ..resources import ModelUtils
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
+from . import heater_shaker_movement_flagger
 
 
 MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
@@ -80,6 +81,26 @@ class MovementHandler:
         """Move to a specific well."""
         await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
             labware_id=labware_id
+        )
+
+        # Check for presence of heater shakers on deck, and if planned
+        # pipette movement is allowed
+        hs_movement_restrictors = (
+            self._state_store.modules.get_heater_shaker_movement_restrictors()
+        )
+        dest_slot_int = int(
+            self._state_store.geometry.get_ancestor_slot_name(labware_id)
+        )
+        hw_pipette = self._state_store.pipettes.get_hardware_pipette(
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware_api.attached_instruments,
+        )
+
+        heater_shaker_movement_flagger.raise_if_movement_restricted(
+            hs_movement_restrictors=hs_movement_restrictors,
+            destination_slot=dest_slot_int,
+            is_multi_channel=hw_pipette.config["channels"] > 1,
+            destination_is_tip_rack=self._state_store.labware.is_tiprack(labware_id),
         )
 
         # get the pipette's mount and current critical point, if applicable

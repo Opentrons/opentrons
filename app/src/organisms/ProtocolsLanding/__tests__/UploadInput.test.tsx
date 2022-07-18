@@ -4,14 +4,22 @@ import { fireEvent } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
+import { useTrackEvent } from '../../../redux/analytics'
 import { UploadInput } from '../UploadInput'
+
+jest.mock('../../../redux/analytics')
+
+const mockUseTrackEvent = useTrackEvent as jest.Mock<typeof useTrackEvent>
 
 describe('UploadInput', () => {
   let onUpload: jest.MockedFunction<() => {}>
+  let trackEvent: jest.MockedFunction<any>
   let render: () => ReturnType<typeof renderWithProviders>[0]
 
   beforeEach(() => {
     onUpload = jest.fn()
+    trackEvent = jest.fn()
+    mockUseTrackEvent.mockReturnValue(trackEvent)
     render = () => {
       return renderWithProviders(
         <BrowserRouter>
@@ -47,10 +55,16 @@ describe('UploadInput', () => {
     fireEvent.click(button)
     expect(input.click).toHaveBeenCalled()
   })
-  it('calls onUpload callback on choose file', () => {
+  it('calls onUpload callback on choose file and trigger analytics event', () => {
     const { getByTestId } = render()
     const input = getByTestId('file_input')
-    fireEvent.change(input, { target: { files: [{ path: 'dummyFile' }] } })
+    fireEvent.change(input, {
+      target: { files: [{ path: 'dummyFile', name: 'dummyName' }] },
+    })
     expect(onUpload).toHaveBeenCalled()
+    expect(trackEvent).toHaveBeenCalledWith({
+      name: 'importProtocolToApp',
+      properties: { protocolFileName: 'dummyName' },
+    })
   })
 })

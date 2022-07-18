@@ -7,7 +7,6 @@ import {
   DIRECTION_ROW,
   Flex,
   ModuleIcon,
-  POSITION_ABSOLUTE,
   SIZE_1,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
@@ -30,6 +29,7 @@ interface RobotConfigurationDetailsProps {
   leftMountPipetteName: PipetteName | null
   rightMountPipetteName: PipetteName | null
   requiredModuleDetails: LoadModuleRunTimeCommand[] | null
+  isLoading: boolean
 }
 
 export const RobotConfigurationDetails = (
@@ -39,6 +39,7 @@ export const RobotConfigurationDetails = (
     leftMountPipetteName,
     rightMountPipetteName,
     requiredModuleDetails,
+    isLoading,
   } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
 
@@ -47,16 +48,20 @@ export const RobotConfigurationDetails = (
       <RobotConfigurationDetailsItem
         label={t('left_mount')}
         item={
-          getPipetteNameSpecs(leftMountPipetteName as PipetteName)
-            ?.displayName ?? t('shared:not_used')
+          isLoading
+            ? t('shared:loading')
+            : getPipetteNameSpecs(leftMountPipetteName as PipetteName)
+                ?.displayName ?? t('shared:not_used')
         }
       />
       <Divider width="100%" />
       <RobotConfigurationDetailsItem
         label={t('right_mount')}
         item={
-          getPipetteNameSpecs(rightMountPipetteName as PipetteName)
-            ?.displayName ?? t('shared:not_used')
+          isLoading
+            ? t('shared:loading')
+            : getPipetteNameSpecs(rightMountPipetteName as PipetteName)
+                ?.displayName ?? t('shared:not_used')
         }
       />
       {requiredModuleDetails != null
@@ -73,9 +78,9 @@ export const RobotConfigurationDetails = (
                   <StyledText
                     as="h6"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    marginRight={SPACING.spacing4}
                     color={COLORS.darkGreyPressed}
                     textTransform={TEXT_TRANSFORM_UPPERCASE}
+                    minWidth="6rem"
                   >
                     {t('run_details:module_slot_number', {
                       slot_number:
@@ -85,14 +90,17 @@ export const RobotConfigurationDetails = (
                           : module.params.location.slotName,
                     })}
                   </StyledText>
-                  <Flex marginX={'6rem'} position={POSITION_ABSOLUTE}>
+                  <Flex paddingLeft={SPACING.spacing4}>
                     <ModuleIcon
                       key={index}
                       moduleType={getModuleType(module.params.model)}
-                      height={SIZE_1}
-                      marginRight={SPACING.spacing3}
+                      marginRight={SPACING.spacing2}
                       alignSelf={ALIGN_CENTER}
+                      height={SIZE_1}
+                      minWidth={SIZE_1}
+                      minHeight={SIZE_1}
                     />
+
                     <StyledText as="p">
                       {getModuleDisplayName(module.params.model)}
                     </StyledText>
@@ -127,10 +135,11 @@ export const RobotConfigurationDetailsItem = (
         marginRight={SPACING.spacing4}
         color={COLORS.darkGreyPressed}
         textTransform={TEXT_TRANSFORM_UPPERCASE}
+        minWidth="6rem"
       >
         {label}
       </StyledText>
-      <Flex marginX={'6rem'} position={POSITION_ABSOLUTE}>
+      <Flex>
         <StyledText
           as="p"
           textTransform={TEXT_TRANSFORM_CAPITALIZE}

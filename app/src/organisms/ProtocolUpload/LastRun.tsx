@@ -27,7 +27,6 @@ import {
 } from '@opentrons/components'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
-import { useTrackEvent } from '../../redux/analytics'
 import { Divider } from '../../atoms/structure'
 import { getLatestLabwareOffsetCount } from '../LabwarePositionCheck/utils/getLatestLabwareOffsetCount'
 import { useProtocolDetails } from '../RunDetails/hooks'
@@ -40,7 +39,6 @@ import type { State } from '../../redux/types'
 export function LastRun(): JSX.Element | null {
   const { t } = useTranslation('protocol_info')
   const history = useHistory()
-  const trackEvent = useTrackEvent()
   const mostRecentRunId = useMostRecentRunId()
   const { data: runRecord, isFetching: isFetchingMostRecentRun } = useRunQuery(
     mostRecentRunId
@@ -73,7 +71,6 @@ export function LastRun(): JSX.Element | null {
   const labwareOffsetCount = getLatestLabwareOffsetCount(labwareOffsets ?? [])
 
   const handleCloneRun = (): void => {
-    trackEvent({ name: 'runAgain', properties: {} })
     cloneRun()
     history.push('/run')
   }
@@ -89,7 +86,7 @@ export function LastRun(): JSX.Element | null {
           values={{ robot_name: robotName }}
         />
         <Link
-          role={'link'}
+          role="button"
           fontSize={FONT_SIZE_BODY_1}
           color={C_BLUE}
           onClick={() => showRerunningProtocolModal(true)}

@@ -16,6 +16,7 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   FONT_WEIGHT_SEMIBOLD,
   FONT_SIZE_HEADER,
+  SPACING,
   SPACING_2,
   SPACING_3,
   SPACING_4,
@@ -212,6 +213,7 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
           stepSizes={[0.1, 1]}
           planes={[VERTICAL_PLANE]}
           width="100%"
+          marginBottom={SPACING.spacing5}
         />
         <Flex width="100%" justifyContent={JUSTIFY_CENTER} marginY={SPACING_3}>
           <PrimaryBtn title="saveTipLengthButton" onClick={proceed} flex="1">

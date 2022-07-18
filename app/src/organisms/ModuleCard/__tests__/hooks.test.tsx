@@ -14,7 +14,12 @@ import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useProtocolDetailsForRun } from '../../Devices/hooks'
+import {
+  useIsRobotBusy,
+  useProtocolDetailsForRun,
+  useRunStatuses,
+} from '../../Devices/hooks'
+
 import {
   useLatchControls,
   useModuleOverflowMenu,
@@ -56,6 +61,12 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
 >
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
+>
+const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
+  typeof useIsRobotBusy
+>
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
 >
 
 const mockCloseLatchHeaterShaker = {
@@ -215,10 +226,16 @@ describe('useLatchControls', () => {
     store.dispatch = jest.fn()
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: true,
+      isRunStill: true,
+      isRunIdle: false,
+      isRunTerminal: false,
+    })
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
-
+    mockUseIsRobotBusy.mockReturnValue(false)
     mockCreateCommand = jest.fn()
     mockCreateCommand.mockResolvedValue(null)
     mockUseCreateCommandMutation.mockReturnValue({
@@ -291,6 +308,12 @@ describe('useModuleOverflowMenu', () => {
     store.dispatch = jest.fn()
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: true,
+      isRunStill: true,
+      isRunTerminal: false,
+      isRunIdle: false,
+    })
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
@@ -319,7 +342,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          jest.fn()
+          jest.fn(),
+          false
         ),
       {
         wrapper,
@@ -353,7 +377,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          jest.fn()
+          jest.fn(),
+          false
         ),
       {
         wrapper,
@@ -390,7 +415,8 @@ describe('useModuleOverflowMenu', () => {
           mockAboutClick,
           mockTestShakeClick,
           mockHandleWizard,
-          mockHandleSlideoutClick
+          mockHandleSlideoutClick,
+          false
         ),
       {
         wrapper,
@@ -419,7 +445,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          mockHandleClick
+          mockHandleClick,
+          false
         ),
       {
         wrapper,
@@ -446,7 +473,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          jest.fn()
+          jest.fn(),
+          false
         ),
       {
         wrapper,
@@ -481,7 +509,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          mockHandleClick
+          mockHandleClick,
+          false
         ),
       {
         wrapper,
@@ -507,7 +536,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          jest.fn()
+          jest.fn(),
+          false
         ),
       {
         wrapper,
@@ -541,7 +571,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          mockHandleClick
+          mockHandleClick,
+          false
         ),
       {
         wrapper,
@@ -567,7 +598,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          jest.fn()
+          jest.fn(),
+          false
         ),
       {
         wrapper,
@@ -601,7 +633,8 @@ describe('useModuleOverflowMenu', () => {
           jest.fn(),
           jest.fn(),
           jest.fn(),
-          jest.fn()
+          jest.fn(),
+          false
         ),
       {
         wrapper,
@@ -653,7 +686,7 @@ const HEATER_SHAKER_MODULE_INFO = {
   slotName: '1',
 }
 
-describe('useProtocolMetadata', () => {
+describe('useIsHeaterShakerInProtocol', () => {
   const store: Store<State> = createStore(jest.fn(), {})
 
   beforeEach(() => {

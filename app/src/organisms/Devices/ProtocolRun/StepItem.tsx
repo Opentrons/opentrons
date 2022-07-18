@@ -7,6 +7,7 @@ import {
   RUN_STATUS_IDLE,
   RUN_STATUS_PAUSE_REQUESTED,
   RUN_STATUS_PAUSED,
+  RUN_STATUS_STOP_REQUESTED,
 } from '@opentrons/api-client'
 import {
   Flex,
@@ -213,7 +214,7 @@ function PauseTimer({ pausedAt }: PauseTimerProps): JSX.Element {
   useInterval(() => setNow(Date()), 500, true)
 
   return (
-    <StyledText>{`${t('user_paused_protocol_for')} ${formatInterval(
+    <StyledText>{`${t('protocol_paused_for')} ${formatInterval(
       pausedAt,
       now
     )}`}</StyledText>
@@ -230,10 +231,12 @@ export const StepItem = React.memo(
       ((([
         RUN_STATUS_PAUSED,
         RUN_STATUS_PAUSE_REQUESTED,
+        RUN_STATUS_STOP_REQUESTED,
       ] as RunStatus[]).includes(nextProps.runStatus) ||
         ([
           RUN_STATUS_PAUSED,
           RUN_STATUS_PAUSE_REQUESTED,
+          RUN_STATUS_STOP_REQUESTED,
         ] as RunStatus[]).includes(prevProps.runStatus)) &&
         (prevProps.runCommandSummary?.status === 'running' ||
           nextProps.runCommandSummary?.status === 'running'))
