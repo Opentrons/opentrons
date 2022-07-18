@@ -100,26 +100,28 @@ async def persist_pretty_hostname(new_pretty_hostname: str) -> None:
         )
 
 
-# TODO: Deduplicate with other subprocess stuff in update-server.
+# TODO(mm, 2022-07-18): Deduplicate with identical subprocess error-checking code
+# in .avahi and .static_hostname modules.
 async def _run_command(
     command: Union[str, bytes],
     args: List[Union[str, bytes]],
-    input: Optional[bytes] = None,
 ) -> bytes:
     process = await asyncio.create_subprocess_exec(
         command,
         *args,
-        stdin=asyncio.subprocess.DEVNULL if input is None else asyncio.subprocess.PIPE,
+        stdin=asyncio.subprocess.DEVNULL,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
-    stdout, stderr = await process.communicate(input)
+    stdout, stderr = await process.communicate()
     ret = process.returncode
     if ret != 0:
         _log.error(
             f"Error calling {command!r}: {ret} "
             f"stdout: {stdout!r} stderr: {stderr!r}"
         )
+        # TODO(mm, 2022-07-18): Use a structured and specific exception type
+        # once this function is deduplicated.
         raise RuntimeError(f"Error calling {command!r}")
     return stdout
 
