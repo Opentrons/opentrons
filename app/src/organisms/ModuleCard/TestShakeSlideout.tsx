@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
@@ -19,19 +20,23 @@ import {
   Link,
   useHoverTooltip,
   ALIGN_CENTER,
+  useConditionalConfirm,
 } from '@opentrons/components'
+import { getIsHeaterShakerAttached } from '../../redux/config'
 import {
   getModuleDisplayName,
   HS_RPM_MAX,
   HS_RPM_MIN,
   RPM,
 } from '@opentrons/shared-data'
+import { Portal } from '../../App/portal'
 import { Slideout } from '../../atoms/Slideout'
 import { PrimaryButton, TertiaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
 import { InputField } from '../../atoms/InputField'
 import { Tooltip } from '../../atoms/Tooltip'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
+import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 import { useLatchControls } from './hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
@@ -64,7 +69,7 @@ export const TestShakeSlideout = (
     module,
     runId != null ? runId : null
   )
-
+  const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const isShaking = module.data.speedStatus !== 'idle'
@@ -110,6 +115,12 @@ export const TestShakeSlideout = (
     setShakeValue(null)
   }
 
+  const {
+    confirm: confirmAttachment,
+    showConfirmation: showConfirmationModal,
+    cancel: cancelExit,
+  } = useConditionalConfirm(handleShakeCommand, !configHasHeaterShakerAttached)
+
   const errorMessage =
     shakeValue != null &&
     (parseInt(shakeValue) < HS_RPM_MIN || parseInt(shakeValue) > HS_RPM_MAX)
@@ -148,6 +159,15 @@ export const TestShakeSlideout = (
         </PrimaryButton>
       }
     >
+      {showConfirmationModal && (
+        <Portal level="top">
+          <ConfirmAttachmentModal
+            onCloseClick={cancelExit}
+            isProceedToRunModal={false}
+            onConfirmClick={handleShakeCommand}
+          />
+        </Portal>
+      )}
       <Flex
         borderRadius={SPACING.spacingS}
         marginBottom={SPACING.spacing3}
@@ -274,7 +294,7 @@ export const TestShakeSlideout = (
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
               marginLeft={SIZE_AUTO}
               marginTop={SPACING.spacing3}
-              onClick={handleShakeCommand}
+              onClick={confirmAttachment}
               disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
               {...targetProps}
             >
@@ -285,7 +305,7 @@ export const TestShakeSlideout = (
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
               marginLeft={SIZE_AUTO}
               marginTop={SPACING.spacing3}
-              onClick={handleShakeCommand}
+              onClick={confirmAttachment}
               disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
             >
               {isShaking ? t('shared:stop') : t('shared:start')}
