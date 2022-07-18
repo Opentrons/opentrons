@@ -73,7 +73,6 @@ def test_rewrite_machine_info_is_idempotent(initial_contents: str) -> None:
         ("has $ dollar sign", r'PRETTY_HOSTNAME="has \$ dollar sign"'),
         ("has ` backtick", r'PRETTY_HOSTNAME="has \` backtick"'),
         # Unlike double-quote characters, single-quote characters shouldn't be escaped.
-        # TODO: Verify this.
         ("has ' single-quote", '''PRETTY_HOSTNAME="has ' single-quote"'''),
         # Other ASCII characters shouldn't be escaped.
         ("!#%&()*+,-./", 'PRETTY_HOSTNAME="!#%&()*+,-./"'),
