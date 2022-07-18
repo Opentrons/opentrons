@@ -215,6 +215,7 @@ export const LabwarePositionCheckStepDetail = (
         </Flex>
         {showJogControls ? (
           <JogControls
+            marginTop={SPACING.spacing3}
             jog={handleJog}
             stepSizes={[0.1, 1, 10]}
             planes={[HORIZONTAL_PLANE, VERTICAL_PLANE]}
