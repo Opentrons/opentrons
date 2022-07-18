@@ -8,7 +8,7 @@ and how it's distinct from other names on the machine.
 import asyncio
 import unicodedata
 from logging import getLogger
-from typing import List, Optional, Union
+from typing import List, Union
 
 
 _log = getLogger(__name__)
