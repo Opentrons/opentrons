@@ -307,7 +307,9 @@ export function useLabwarePositionCheck(
     (
       command: LabwarePositionCheckCreateCommand
     ): command is LabwarePositionCheckMovementCommand =>
-      command.commandType !== 'thermocycler/openLid'
+      command.commandType !== 'thermocycler/openLid' &&
+      command.commandType !== 'heaterShaker/closeLabwareLatch' &&
+      command.commandType !== 'heaterShaker/deactivateShaker'
   )
   const currentCommand = LPCMovementCommands[currentCommandIndex]
   const prevCommand = LPCMovementCommands[currentCommandIndex - 1]

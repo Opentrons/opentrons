@@ -90,7 +90,9 @@ export const LabwarePositionCheckStepDetail = (
     (
       command: LabwarePositionCheckCreateCommand
     ): command is LabwarePositionCheckMovementCommand =>
-      command.commandType !== 'thermocycler/openLid'
+      command.commandType !== 'thermocycler/openLid' &&
+      command.commandType !== 'heaterShaker/deactivateShaker' &&
+      command.commandType !== 'heaterShaker/closeLabwareLatch'
   )
   const command = stepMovementCommands[0]
 
