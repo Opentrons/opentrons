@@ -162,7 +162,7 @@ export function ChooseProtocolSlideout(
                   <StyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    css={{ 'overflow-wrap': 'anywhere' }}
+                    overflowWrap="anywhere"
                   >
                     {storedProtocol.mostRecentAnalysis?.metadata
                       ?.protocolName ??
@@ -185,7 +185,7 @@ export function ChooseProtocolSlideout(
                 <StyledText
                   as="label"
                   color={COLORS.errorText}
-                  css={{ 'overflow-wrap': 'anywhere' }}
+                  overflowWrap="anywhere"
                   display={DISPLAY_BLOCK}
                   marginTop={`-${SPACING.spacing2}`}
                   marginBottom={SPACING.spacing3}

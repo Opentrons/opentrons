@@ -37,7 +37,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
         <StyledText
           as="label"
           paddingRight={SPACING.spacing3}
-          css={{ 'overflow-wrap': 'anywhere' }}
+          overflowWrap="anywhere"
         >
           {`${displayName}; ${t(`run_details:status_${currentRunStatus}`)}`}
         </StyledText>
@@ -71,7 +71,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
               as="h3"
               marginRight={SPACING.spacing3}
               id={`RobotStatusBanner_${name}_robotName`}
-              css={{ 'overflow-wrap': 'anywhere' }}
+              overflowWrap="anywhere"
             >
               {name}
             </StyledText>
