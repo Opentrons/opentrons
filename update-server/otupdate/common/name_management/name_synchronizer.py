@@ -86,15 +86,12 @@ class NameSynchronizer:
         This first sets the Avahi service name, and then persists it
         as the pretty hostname.
 
-        Returns the new name. This is normally the same as the requested name,
-        but it it might be different if it had to be truncated, sanitized, etc.
-
         Raises:
             InvalidNameError: If the name could not be set to the given string.
                 The name is left unchanged.
         """
-        # Check that the new name is valid for both places before setting it on either
-        # place. This avoids a messy torn state if one succeeds and the other fails.
+        # Ensure the new name will be valid for both places before setting it on either.
+        # This avoids a messy torn state if one succeeds and the other fails.
         if not (
             avahi.service_name_is_valid(new_name)
             and pretty_hostname.pretty_hostname_is_valid(new_name)
