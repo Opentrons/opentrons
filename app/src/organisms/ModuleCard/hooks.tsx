@@ -321,7 +321,7 @@ export function useModuleOverflowMenu(
         setSetting:
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
           module.data.temperatureStatus !== 'idle'
-            ? t('deactivate', { ns: 'heater_shaker' })
+            ? t('deactivate_heater', { ns: 'heater_shaker' })
             : t('set_temperature', { ns: 'heater_shaker' }),
         isSecondary: false,
         disabledReason: false,
