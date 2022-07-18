@@ -249,7 +249,7 @@ describe('ModuleOverflowMenu', () => {
     })
     const aboutButton = getByRole('button', { name: 'About module' })
     getByRole('button', { name: 'Show attachment instructions' })
-    const testButton = getByRole('button', { name: 'Test shake' })
+    const testButton = getByRole('button', { name: 'Test Shake' })
     fireEvent.click(testButton)
     expect(props.handleTestShakeClick).toHaveBeenCalled()
     fireEvent.click(aboutButton)

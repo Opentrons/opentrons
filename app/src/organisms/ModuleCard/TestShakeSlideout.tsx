@@ -56,7 +56,9 @@ export const TestShakeSlideout = (
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
   const name = getModuleDisplayName(module.moduleModel)
-  const [targetProps, tooltipProps] = useHoverTooltip()
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: 'left',
+  })
   const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const { moduleIdFromRun } = useModuleIdFromRun(
     module,
@@ -200,19 +202,34 @@ export const TestShakeSlideout = (
               {getLatchStatus(module.data.labwareLatchStatus)}
             </Text>
           </Flex>
-          <TertiaryButton
-            marginTop={SPACING.spacing2}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            fontSize={TYPOGRAPHY.fontSizeCaption}
-            marginLeft={SIZE_AUTO}
-            onClick={toggleLatch}
-            disabled={isShaking}
-            {...targetProps}
-          >
-            {!isLatchClosed
-              ? t('heater_shaker:close_latch')
-              : t('heater_shaker:open_latch')}
-          </TertiaryButton>
+          {isShaking ? (
+            <TertiaryButton
+              marginTop={SPACING.spacing2}
+              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              fontSize={TYPOGRAPHY.fontSizeCaption}
+              marginLeft={SIZE_AUTO}
+              onClick={toggleLatch}
+              disabled={isShaking}
+              {...targetProps}
+            >
+              {!isLatchClosed
+                ? t('heater_shaker:close_latch')
+                : t('heater_shaker:open_latch')}
+            </TertiaryButton>
+          ) : (
+            <TertiaryButton
+              marginTop={SPACING.spacing2}
+              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              fontSize={TYPOGRAPHY.fontSizeCaption}
+              marginLeft={SIZE_AUTO}
+              onClick={toggleLatch}
+              disabled={isShaking}
+            >
+              {!isLatchClosed
+                ? t('heater_shaker:close_latch')
+                : t('heater_shaker:open_latch')}
+            </TertiaryButton>
+          )}
           {isShaking ? (
             <Tooltip tooltipProps={tooltipProps}>
               {t('heater_shaker:cannot_open_latch')}
@@ -252,16 +269,28 @@ export const TestShakeSlideout = (
               fontSize={TYPOGRAPHY.fontSizeCaption}
             ></Text>
           </Flex>
-          <TertiaryButton
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            marginLeft={SIZE_AUTO}
-            marginTop={SPACING.spacing3}
-            onClick={handleShakeCommand}
-            disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
-            {...targetProps}
-          >
-            {isShaking ? t('shared:stop') : t('shared:start')}
-          </TertiaryButton>
+          {!isLatchClosed || (shakeValue === null && !isShaking) ? (
+            <TertiaryButton
+              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              marginLeft={SIZE_AUTO}
+              marginTop={SPACING.spacing3}
+              onClick={handleShakeCommand}
+              disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
+              {...targetProps}
+            >
+              {isShaking ? t('shared:stop') : t('shared:start')}
+            </TertiaryButton>
+          ) : (
+            <TertiaryButton
+              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              marginLeft={SIZE_AUTO}
+              marginTop={SPACING.spacing3}
+              onClick={handleShakeCommand}
+              disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
+            >
+              {isShaking ? t('shared:stop') : t('shared:start')}
+            </TertiaryButton>
+          )}
           {!isLatchClosed ? (
             <Tooltip tooltipProps={tooltipProps}>
               {t('heater_shaker:cannot_shake')}
