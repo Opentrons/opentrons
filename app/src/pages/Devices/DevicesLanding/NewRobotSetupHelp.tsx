@@ -28,9 +28,9 @@ export function NewRobotSetupHelp(): JSX.Element {
   return (
     <>
       <Link
-        css={TYPOGRAPHY.labelSemiBold}
+        css={TYPOGRAPHY.darkLinkLabelSemiBold}
+        role="button"
         onClick={() => setShowNewRobotHelpModal(true)}
-        opacity={'70%'}
       >
         {t('see_how_to_setup_new_robot')}
       </Link>

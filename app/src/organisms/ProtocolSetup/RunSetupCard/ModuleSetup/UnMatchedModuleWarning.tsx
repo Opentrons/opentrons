@@ -1,22 +1,16 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Btn,
-  Box,
+  COLORS,
   Flex,
-  Icon,
-  Text,
-  SIZE_2,
-  SPACING_1,
-  SPACING_2,
-  SPACING_3,
-  COLOR_WARNING,
-  COLOR_WARNING_LIGHT,
-  C_DARK_GRAY,
-  JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
-  COLOR_WARNING_DARK,
+  JUSTIFY_SPACE_BETWEEN,
+  DIRECTION_ROW,
+  SPACING,
+  Icon,
+  SIZE_2,
 } from '@opentrons/components'
+import { StyledText } from '../../../../atoms/text'
 
 interface UnMatchedModuleWarningProps {
   isAnyModuleUnnecessary: boolean
@@ -26,48 +20,49 @@ export const UnMatchedModuleWarning = (
   props: UnMatchedModuleWarningProps
 ): JSX.Element | null => {
   const { t } = useTranslation('protocol_setup')
-  const [showModulesMismatch, setShowModulesMismatch] = React.useState<boolean>(
-    true
-  )
-  const isVisible = showModulesMismatch && props.isAnyModuleUnnecessary
+  const isVisible = props.isAnyModuleUnnecessary
   if (!isVisible) return null
 
   return (
-    <React.Fragment>
+    <Flex
+      marginTop={SPACING.spacing4}
+      flexDirection={DIRECTION_COLUMN}
+      backgroundColor={COLORS.background}
+      padding={SPACING.spacing5}
+    >
       <Flex
-        marginY={SPACING_3}
-        backgroundColor={COLOR_WARNING_LIGHT}
-        color={C_DARK_GRAY}
-        id={'ModuleMismatch'}
+        flexDirection={DIRECTION_ROW}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Flex flexDirection={DIRECTION_COLUMN} flex={'auto'} margin={SPACING_3}>
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-            <Flex>
-              <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>
-                <Icon name="alert-circle" color={COLOR_WARNING} />
-              </Box>
-              <Text
-                as="h4"
-                marginY={SPACING_2}
-                id={`ModuleMismatch_title`}
-                color={COLOR_WARNING_DARK}
-              >
-                {t('module_mismatch_title')}
-              </Text>
-            </Flex>
-            <Btn
-              size={SIZE_2}
-              onClick={() => setShowModulesMismatch(false)}
-              aria-label="close"
-            >
-              <Icon name={'close'} color={COLOR_WARNING} />
-            </Btn>
-          </Flex>
-          <Text paddingTop={SPACING_1} fontSize={'0.7rem'}>
-            {t('module_mismatch_body')}
-          </Text>
+        <Flex>
+          <Icon
+            size={SIZE_2}
+            color={COLORS.darkGreyEnabled}
+            name="information"
+            paddingRight={SPACING.spacing3}
+            paddingBottom={SPACING.spacingSM}
+            aria-label="information_icon"
+          />
+          <StyledText
+            as="p"
+            data-testid={`UnMatchedModuleWarning_title`}
+            color={COLORS.darkBlack}
+          >
+            {t('module_mismatch_title')}
+          </StyledText>
         </Flex>
       </Flex>
-    </React.Fragment>
+
+      <StyledText
+        as="p"
+        marginLeft={SPACING.spacing6}
+        marginRight={SPACING.spacing4}
+        color={COLORS.darkGrey}
+        width="100%"
+        data-testid={`UnMatchedModuleWarning_body`}
+      >
+        {t('module_mismatch_body')}
+      </StyledText>
+    </Flex>
   )
 }

@@ -204,7 +204,7 @@ export const LabwarePositionCheckStepDetail = (
           <StyledText as="p">{t('jog_controls_adjustment')}</StyledText>
           {!showJogControls ? (
             <Link
-              role={'link'}
+              role="button"
               fontSize={FONT_SIZE_BODY_2}
               color={COLORS.blue}
               onClick={() => setShowJogControls(true)}

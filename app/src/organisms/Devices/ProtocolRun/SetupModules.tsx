@@ -4,6 +4,7 @@ import map from 'lodash/map'
 
 import {
   Flex,
+  Box,
   Link,
   Module,
   RobotWorkSpace,
@@ -115,41 +116,45 @@ export const SetupModules = ({
           remainingAttachedModules.length !== 0 && missingModuleIds.length !== 0
         }
       />
-      <RobotWorkSpace
-        deckDef={standardDeckDef as any}
-        viewBox={DECK_VIEW_BOX}
-        deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-        id={'ModuleSetup_deckMap'}
-      >
-        {() => (
-          <>
-            {map(
-              moduleRenderInfoForProtocolById,
-              ({ x, y, moduleDef, attachedModuleMatch }) => {
-                const { model } = moduleDef
-                return (
-                  <React.Fragment key={`ModuleSetup_Module_${model}_${x}${y}`}>
-                    <Module
-                      x={x}
-                      y={y}
-                      orientation={inferModuleOrientationFromXCoordinate(x)}
-                      def={moduleDef}
+      <Box margin="0 auto" maxWidth="46.25rem" width="100%">
+        <RobotWorkSpace
+          deckDef={standardDeckDef as any}
+          viewBox={DECK_VIEW_BOX}
+          deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
+          id={'ModuleSetup_deckMap'}
+        >
+          {() => (
+            <>
+              {map(
+                moduleRenderInfoForProtocolById,
+                ({ x, y, moduleDef, attachedModuleMatch }) => {
+                  const { model } = moduleDef
+                  return (
+                    <React.Fragment
+                      key={`ModuleSetup_Module_${model}_${x}${y}`}
                     >
-                      <ModuleInfo
-                        moduleModel={model}
-                        isAttached={attachedModuleMatch != null}
-                        usbPort={attachedModuleMatch?.usbPort.port ?? null}
-                        hubPort={attachedModuleMatch?.usbPort.hub ?? null}
-                        runId={runId}
-                      />
-                    </Module>
-                  </React.Fragment>
-                )
-              }
-            )}
-          </>
-        )}
-      </RobotWorkSpace>
+                      <Module
+                        x={x}
+                        y={y}
+                        orientation={inferModuleOrientationFromXCoordinate(x)}
+                        def={moduleDef}
+                      >
+                        <ModuleInfo
+                          moduleModel={model}
+                          isAttached={attachedModuleMatch != null}
+                          usbPort={attachedModuleMatch?.usbPort.port ?? null}
+                          hubPort={attachedModuleMatch?.usbPort.hub ?? null}
+                          runId={runId}
+                        />
+                      </Module>
+                    </React.Fragment>
+                  )
+                }
+              )}
+            </>
+          )}
+        </RobotWorkSpace>
+      </Box>
       <PrimaryButton
         title={t('proceed_to_labware_setup_step')}
         disabled={missingModuleIds.length > 0 || runHasStarted}

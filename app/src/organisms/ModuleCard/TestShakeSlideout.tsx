@@ -32,8 +32,8 @@ import { Divider } from '../../atoms/structure'
 import { InputField } from '../../atoms/InputField'
 import { Tooltip } from '../../atoms/Tooltip'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
-import { useModuleIdFromRun } from './useModuleIdFromRun'
 import { useLatchControls } from './hooks'
+import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
 import type {
@@ -199,7 +199,6 @@ export const TestShakeSlideout = (
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
-            paddingX={SPACING.spacing4}
             onClick={toggleLatch}
             disabled={isShaking}
             {...targetProps}
@@ -251,7 +250,6 @@ export const TestShakeSlideout = (
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
             marginLeft={SIZE_AUTO}
             marginTop={SPACING.spacing3}
-            paddingX={SPACING.spacing4}
             onClick={handleShakeCommand}
             disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
             {...targetProps}

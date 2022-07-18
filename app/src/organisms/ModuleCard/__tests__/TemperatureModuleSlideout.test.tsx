@@ -6,6 +6,7 @@ import {
 } from '@opentrons/react-api-client'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { useRunStatuses } from '../../Devices/hooks'
 import { TemperatureModuleSlideout } from '../TemperatureModuleSlideout'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import {
@@ -15,6 +16,7 @@ import {
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../useModuleIdFromRun')
+jest.mock('../../Devices/hooks')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
@@ -24,6 +26,9 @@ const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
 >
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
+>
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
 >
 
 const render = (
@@ -48,6 +53,7 @@ describe('TemperatureModuleSlideout', () => {
     props = {
       module: mockTemperatureModule,
       isExpanded: true,
+      isLoadedInRun: false,
       onCloseClick: jest.fn(),
     }
     mockUseLiveCommandMutation.mockReturnValue({
@@ -57,6 +63,12 @@ describe('TemperatureModuleSlideout', () => {
       createCommand: mockCreateCommand,
     } as any)
     mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'tempdeck_id' })
+    mockUseRunStatuses.mockReturnValue({
+      isRunStill: false,
+      isLegacySessionInProgress: false,
+      isRunIdle: false,
+      isRunTerminal: true,
+    })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -77,6 +89,7 @@ describe('TemperatureModuleSlideout', () => {
       module: mockTemperatureModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByText } = render(props)
 
@@ -92,6 +105,7 @@ describe('TemperatureModuleSlideout', () => {
       module: mockTemperatureModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Confirm' })
@@ -113,11 +127,18 @@ describe('TemperatureModuleSlideout', () => {
   })
 
   it('renders the button and it is not clickable until there is something in form field and a run id is present', () => {
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: true,
+      isRunTerminal: false,
+      isRunIdle: true,
+    })
     props = {
       module: mockTemperatureModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
-      runId: 'test123',
+      currentRunId: 'tempdeck_id',
+      isLoadedInRun: true,
     }
     const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Confirm' })
@@ -127,7 +148,7 @@ describe('TemperatureModuleSlideout', () => {
     fireEvent.click(button)
 
     expect(mockCreateCommand).toHaveBeenCalledWith({
-      runId: props.runId,
+      runId: props.currentRunId,
       command: {
         commandType: 'temperatureModule/setTargetTemperature',
         params: {

@@ -48,7 +48,11 @@ export function Troubleshooting({
   }, [robotLogsDownloading, updateDownloadLogsStatus])
 
   return (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      marginTop="2.5rem"
+    >
       <Box width="70%">
         <StyledText
           as="h2"

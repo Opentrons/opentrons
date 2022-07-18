@@ -77,16 +77,33 @@ const CLOSE_ICON_STYLE = css`
 
 export const Slideout = (props: Props): JSX.Element | null => {
   const { isExpanded, title, onCloseClick, children, footer } = props
+  const slideOutRef = React.useRef<HTMLDivElement>(null)
+  const [isReachedBottom, setIsReachedBottom] = React.useState<boolean>(false)
+
+  const handleScroll = (): void => {
+    if (slideOutRef.current == null) return
+    const { scrollTop, scrollHeight, clientHeight } = slideOutRef.current
+    if (scrollTop + clientHeight === scrollHeight) {
+      setIsReachedBottom(true)
+    } else {
+      setIsReachedBottom(false)
+    }
+  }
+
+  React.useEffect(() => {
+    handleScroll()
+  }, [slideOutRef])
+
   return (
     <>
-      {isExpanded ? (
+      {isExpanded ?? false ? (
         <Overlay
           onClick={onCloseClick}
           backgroundColor={COLORS.backgroundOverlay}
         />
       ) : null}
       <Box
-        css={isExpanded ? EXPANDED_STYLE : COLLAPSED_STYLE}
+        css={isExpanded ?? false ? EXPANDED_STYLE : COLLAPSED_STYLE}
         position={POSITION_FIXED}
         right="0"
         top="0"
@@ -120,7 +137,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
               </StyledText>
               <Flex alignItems={ALIGN_CENTER}>
                 <Btn
-                  size={'1.25rem'}
+                  size={'1.5rem'}
                   onClick={onCloseClick}
                   aria-label="exit"
                   data-testid={`Slideout_icon_close_${
@@ -144,6 +161,8 @@ export const Slideout = (props: Props): JSX.Element | null => {
             data-testid={`Slideout_body_${
               typeof title === 'string' ? title : ''
             }`}
+            ref={slideOutRef}
+            onScroll={handleScroll}
           >
             {children}
           </Box>
@@ -152,8 +171,8 @@ export const Slideout = (props: Props): JSX.Element | null => {
               paddingTop={SPACING.spacing4}
               paddingX={SPACING.spacing4}
               flex="0 0 auto"
-              //  TODO(jr, 6/6/22): add logic to hide this boxShadow if the children box is already scrolled to the max
-              boxShadow={'0px -4px 12px rgba(0, 0, 0, 0.15)'}
+              boxShadow={isReachedBottom ? 'none' : '0px -4px 12px #0000001a'}
+              zIndex="3"
             >
               {footer}
             </Box>

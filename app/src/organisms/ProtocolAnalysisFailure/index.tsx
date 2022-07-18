@@ -50,7 +50,12 @@ export function ProtocolAnalysisFailure(
     dispatch(analyzeProtocol(protocolKey))
   }
   return (
-    <Banner type="error" marginBottom={SPACING.spacing4}>
+    <Banner
+      type="error"
+      marginBottom={SPACING.spacing4}
+      paddingRight={SPACING.spacing4}
+      marginRight={SPACING.spacing5}
+    >
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}

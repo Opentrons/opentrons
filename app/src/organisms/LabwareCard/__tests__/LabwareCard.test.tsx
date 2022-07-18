@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { renderWithProviders, nestedTextMatcher } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { LabwareCard } from '..'
 import { useAllLabware } from '../../../pages/Labware/hooks'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
+import { CustomLabwareOverflowMenu } from '../CustomLabwareOverflowMenu'
+import { LabwareCard } from '..'
 
 jest.mock('../../../pages/Labware/hooks')
-jest.mock('../../../pages/Labware/helpers/getAllDefs')
+jest.mock('../CustomLabwareOverflowMenu')
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
   return {
@@ -15,6 +16,9 @@ jest.mock('@opentrons/components', () => {
   }
 })
 
+const mockCustomLabwareOverflowMenu = CustomLabwareOverflowMenu as jest.MockedFunction<
+  typeof CustomLabwareOverflowMenu
+>
 const mockUseAllLabware = useAllLabware as jest.MockedFunction<
   typeof useAllLabware
 >
@@ -27,6 +31,9 @@ const render = (props: React.ComponentProps<typeof LabwareCard>) => {
 describe('LabwareCard', () => {
   let props: React.ComponentProps<typeof LabwareCard>
   beforeEach(() => {
+    mockCustomLabwareOverflowMenu.mockReturnValue(
+      <div>Mock CustomLabwareOverflowMenu</div>
+    )
     mockUseAllLabware.mockReturnValue([{ definition: mockDefinition }])
     props = {
       labware: {
@@ -38,13 +45,12 @@ describe('LabwareCard', () => {
 
   it('renders correct info for opentrons labware card', () => {
     props.labware.definition.namespace = 'opentrons'
-    const [{ getByText, getByRole }] = render(props)
+    const [{ getByText }] = render(props)
     getByText('mock RobotWorkSpace')
     getByText('Well Plate')
     getByText('Mock Definition')
     getByText(`Opentrons Definition`)
     getByText('API Name')
-    getByRole('button', { name: 'mock_definition' })
   })
 
   it('renders additional info for custom labware card', () => {
@@ -53,6 +59,6 @@ describe('LabwareCard', () => {
     props.labware.definition.namespace = 'custom'
     const [{ getByText }] = render(props)
     getByText('Custom Definition')
-    getByText(nestedTextMatcher('Date added'))
+    getByText(nestedTextMatcher('Added'))
   })
 })

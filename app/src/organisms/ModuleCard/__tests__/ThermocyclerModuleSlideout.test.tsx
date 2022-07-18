@@ -6,6 +6,7 @@ import {
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
+import { useRunStatuses } from '../../Devices/hooks'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { ThermocyclerModuleSlideout } from '../ThermocyclerModuleSlideout'
 
@@ -13,6 +14,7 @@ import { mockThermocycler } from '../../../redux/modules/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../useModuleIdFromRun')
+jest.mock('../../Devices/hooks')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
@@ -22,6 +24,9 @@ const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
 >
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
+>
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
 >
 
 const render = (
@@ -39,6 +44,12 @@ describe('ThermocyclerModuleSlideout', () => {
   beforeEach(() => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: true,
+      isRunIdle: false,
+    })
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
@@ -62,6 +73,7 @@ describe('ThermocyclerModuleSlideout', () => {
       isSecondaryTemp: true,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByText } = render(props)
 
@@ -79,6 +91,7 @@ describe('ThermocyclerModuleSlideout', () => {
       isSecondaryTemp: false,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByText } = render(props)
 
@@ -96,6 +109,7 @@ describe('ThermocyclerModuleSlideout', () => {
       isSecondaryTemp: false,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Confirm' })
@@ -122,6 +136,7 @@ describe('ThermocyclerModuleSlideout', () => {
       isSecondaryTemp: true,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Confirm' })
@@ -142,13 +157,38 @@ describe('ThermocyclerModuleSlideout', () => {
     expect(button).not.toBeEnabled()
   })
 
+  it('renders the exit button and when clicked, deletes the value input', () => {
+    props = {
+      module: mockThermocycler,
+      isSecondaryTemp: true,
+      isExpanded: true,
+      onCloseClick: jest.fn(),
+      isLoadedInRun: false,
+    }
+    const { getByLabelText, getByTestId } = render(props)
+    const button = getByLabelText('exit')
+    const input = getByTestId('thermocyclerModuleV1_true')
+    fireEvent.change(input, { target: { value: '45' } })
+    fireEvent.click(button)
+
+    expect(props.onCloseClick).toHaveBeenCalled()
+    expect(input).not.toHaveValue()
+  })
+
   it('renders the button and it is not clickable until there is something in form field for the TC Block when there is a runId', () => {
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: false,
+      isRunIdle: true,
+    })
     props = {
       module: mockThermocycler,
       isSecondaryTemp: false,
       isExpanded: true,
       onCloseClick: jest.fn(),
-      runId: 'test123',
+      currentRunId: 'test123',
+      isLoadedInRun: true,
     }
     const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Confirm' })
@@ -158,7 +198,7 @@ describe('ThermocyclerModuleSlideout', () => {
     fireEvent.click(button)
 
     expect(mockCreateCommand).toHaveBeenCalledWith({
-      runId: props.runId,
+      runId: props.currentRunId,
       command: {
         commandType: 'thermocycler/setTargetBlockTemperature',
         params: {
@@ -171,12 +211,19 @@ describe('ThermocyclerModuleSlideout', () => {
   })
 
   it('renders the button and it is not clickable until there is something in form field for the TC Lid when there is a runId', () => {
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: false,
+      isRunIdle: true,
+    })
     props = {
       module: mockThermocycler,
       isSecondaryTemp: true,
       isExpanded: true,
       onCloseClick: jest.fn(),
-      runId: 'test123',
+      isLoadedInRun: true,
+      currentRunId: 'test123',
     }
     const { getByRole, getByTestId } = render(props)
     const button = getByRole('button', { name: 'Confirm' })
@@ -186,7 +233,7 @@ describe('ThermocyclerModuleSlideout', () => {
     fireEvent.click(button)
 
     expect(mockCreateCommand).toHaveBeenCalledWith({
-      runId: props.runId,
+      runId: props.currentRunId,
       command: {
         commandType: 'thermocycler/setTargetLidTemperature',
         params: {

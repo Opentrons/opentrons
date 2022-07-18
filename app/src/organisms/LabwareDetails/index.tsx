@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
+import { css } from 'styled-components'
+
 import {
   Box,
   Link,
@@ -31,6 +33,16 @@ import { Gallery } from './Gallery'
 import { CustomLabwareOverflowMenu } from '../LabwareCard/CustomLabwareOverflowMenu'
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
 
+const CLOSE_ICON_STYLE = css`
+  border-radius: 50%;
+
+  &:hover {
+    background: #16212d26;
+  }
+  &:active {
+    background: #16212d40;
+  }
+`
 export interface LabwareDetailsProps {
   onClose: () => void
   labware: LabwareDefAndDate
@@ -66,16 +78,20 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           {props.labware.definition.metadata.displayName}
         </StyledText>
         <Link onClick={props.onClose} role="button">
-          <Icon name="close" height={SPACING.spacing5} />
+          <Icon name="close" height={SPACING.spacing5} css={CLOSE_ICON_STYLE} />
         </Link>
       </Flex>
       {!isCustomDefinition && (
-        <>
-          <StyledText as="label" id="LabwareDetails_opentronsDef">
-            <Icon color={COLORS.blue} name="check-decagram" height=".7rem" />{' '}
+        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+          <Icon color={COLORS.blue} name="check-decagram" height=".7rem" />{' '}
+          <StyledText
+            as="label"
+            id="LabwareDetails_opentronsDef"
+            marginLeft={SPACING.spacing2}
+          >
             {t('opentrons_def')}
           </StyledText>
-        </>
+        </Flex>
       )}
       {modified != null && filename != null && (
         <Flex
@@ -115,7 +131,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           onClick={() => navigator.clipboard.writeText(apiName)}
           role="button"
         >
-          <Flex alignItems={ALIGN_CENTER}>
+          <Flex alignItems={ALIGN_CENTER} css={{ 'overflow-wrap': 'anywhere' }}>
             {apiName} <Icon height={SIZE_1} name="copy-text" />
           </Flex>
         </Link>

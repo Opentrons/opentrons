@@ -134,6 +134,8 @@ class ProtocolEngine:
         Raises:
             SetupCommandNotAllowed: the request specified a setup command,
                 but the engine was not idle or paused.
+            RunStoppedError: the run has been stopped, so no new commands
+                may be added.
         """
         command_id = self._model_utils.generate_id()
 

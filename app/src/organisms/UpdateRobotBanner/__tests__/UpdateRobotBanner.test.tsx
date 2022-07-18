@@ -46,7 +46,9 @@ describe('UpdateRobotBanner', () => {
 
   it('should display correct information', () => {
     const { getByText, getByRole } = render(props)
-    getByText('A software update is available for this robot.')
+    getByText(
+      'A robot software update is required to run protocols with this version of the Opentrons App.'
+    )
     const btn = getByRole('button', { name: 'View update' })
     fireEvent.click(btn)
     getByText('mockUpdateBuildroot')
@@ -59,7 +61,7 @@ describe('UpdateRobotBanner', () => {
       updateFromFileDisabledReason: null,
     })
     const bannerText = screen.queryByText(
-      'A software update is available for this robot.'
+      'A robot software update is required to run protocols with this version of the Opentrons App.'
     )
     expect(bannerText).toBeNull()
   })
@@ -71,7 +73,9 @@ describe('UpdateRobotBanner', () => {
       updateFromFileDisabledReason: null,
     })
     const { getByText } = render(props)
-    getByText('A software update is available for this robot.')
+    getByText(
+      'A robot software update is required to run protocols with this version of the Opentrons App.'
+    )
   })
 
   it('should render nothing if robot health status is not ok', () => {
@@ -79,7 +83,7 @@ describe('UpdateRobotBanner', () => {
       robot: mockReachableRobot,
     }
     const bannerText = screen.queryByText(
-      'A software update is available for this robot.'
+      'A robot software update is required to run protocols with this version of the Opentrons App.'
     )
     expect(bannerText).toBeNull()
   })

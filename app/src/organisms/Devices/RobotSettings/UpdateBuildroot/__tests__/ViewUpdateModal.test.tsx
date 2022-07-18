@@ -1,5 +1,5 @@
 import * as React from 'react'
-
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { mountWithStore } from '@opentrons/components'
 import * as Buildroot from '../../../../../redux/buildroot'
 
@@ -24,6 +24,7 @@ const getBuildrootDownloadError = Buildroot.getBuildrootDownloadError as jest.Mo
 
 const MOCK_STATE: State = { mockState: true } as any
 const MOCK_ROBOT_NAME = 'robot-name'
+const queryClient = new QueryClient()
 
 describe('ViewUpdateModal', () => {
   const handleClose = jest.fn()
@@ -38,17 +39,18 @@ describe('ViewUpdateModal', () => {
     >['robotSystemType'] = Buildroot.BUILDROOT
   ) => {
     return mountWithStore<React.ComponentProps<typeof ViewUpdateModal>>(
-      <ViewUpdateModal
-        robotName={MOCK_ROBOT_NAME}
-        robotUpdateType={robotUpdateType}
-        robotSystemType={robotSystemType}
-        close={handleClose}
-        proceed={handleProceed}
-      />,
+      <QueryClientProvider client={queryClient}>
+        <ViewUpdateModal
+          robotName={MOCK_ROBOT_NAME}
+          robotUpdateType={robotUpdateType}
+          robotSystemType={robotSystemType}
+          close={handleClose}
+          proceed={handleProceed}
+        />
+      </QueryClientProvider>,
       { initialState: MOCK_STATE }
     )
   }
-
   beforeEach(() => {
     getBuildrootUpdateInfo.mockReturnValue(null)
     getBuildrootDownloadProgress.mockReturnValue(50)

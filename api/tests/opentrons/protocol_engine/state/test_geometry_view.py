@@ -15,6 +15,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
     LoadedLabware,
+    LoadedModule,
     WellLocation,
     WellOrigin,
     WellOffset,
@@ -213,6 +214,7 @@ def test_get_all_labware_highest_z(
     well_plate_def: LabwareDefinition,
     reservoir_def: LabwareDefinition,
     labware_view: LabwareView,
+    module_view: ModuleView,
     subject: GeometryView,
 ) -> None:
     """It should get the highest Z amongst all labware."""
@@ -233,6 +235,8 @@ def test_get_all_labware_highest_z(
 
     plate_offset = LabwareOffsetVector(x=1, y=-2, z=3)
     reservoir_offset = LabwareOffsetVector(x=1, y=-2, z=3)
+
+    decoy.when(module_view.get_all()).then_return([])
 
     decoy.when(labware_view.get_all()).then_return([plate, reservoir])
     decoy.when(labware_view.get("plate-id")).then_return(plate)
@@ -260,6 +264,26 @@ def test_get_all_labware_highest_z(
     all_z = subject.get_all_labware_highest_z()
 
     assert all_z == max(plate_z, reservoir_z)
+
+
+def test_get_all_labware_highest_z_with_modules(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """It should get the highest Z including modules."""
+    module_1 = LoadedModule.construct(id="module-id-1")  # type: ignore[call-arg]
+    module_2 = LoadedModule.construct(id="module-id-2")  # type: ignore[call-arg]
+
+    decoy.when(labware_view.get_all()).then_return([])
+    decoy.when(module_view.get_all()).then_return([module_1, module_2])
+    decoy.when(module_view.get_overall_height("module-id-1")).then_return(42.0)
+    decoy.when(module_view.get_overall_height("module-id-2")).then_return(1337.0)
+
+    result = subject.get_all_labware_highest_z()
+
+    assert result == 1337.0
 
 
 def test_get_labware_position(

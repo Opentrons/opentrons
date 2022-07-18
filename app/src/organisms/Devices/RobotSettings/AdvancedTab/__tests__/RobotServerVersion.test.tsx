@@ -6,7 +6,7 @@ import { i18n } from '../../../../../i18n'
 import { getRobotApiVersion } from '../../../../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../../../../redux/buildroot'
 import { mockConnectableRobot } from '../../../../../redux/discovery/__fixtures__'
-import { useIsRobotBusy, useRobot } from '../../../hooks'
+import { useRobot } from '../../../hooks'
 import { UpdateBuildroot } from '../../UpdateBuildroot'
 import { RobotServerVersion } from '../RobotServerVersion'
 
@@ -24,9 +24,6 @@ const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.
 
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
->
 const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
   typeof UpdateBuildroot
 >
@@ -44,7 +41,6 @@ const render = () => {
 describe('RobotSettings RobotServerVersion', () => {
   beforeEach(() => {
     mockUpdateBuildroot.mockReturnValue(<div>mock update buildroot</div>)
-    mockUseIsRobotBusy.mockReturnValue(false)
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: 'reinstall',
@@ -66,9 +62,11 @@ describe('RobotSettings RobotServerVersion', () => {
   })
 
   it('should render the message, up to date, if the robot server version is the same as the latest version', () => {
-    // display 'up to data' message
-    const [{ getByText }] = render()
+    const [{ getByText, getByRole }] = render()
     getByText('up to date')
+    const reinstall = getByRole('button', { name: 'reinstall' })
+    fireEvent.click(reinstall)
+    getByText('mock update buildroot')
   })
 
   it('should render the warning message if the robot server version needs to upgrade', () => {
@@ -78,7 +76,9 @@ describe('RobotSettings RobotServerVersion', () => {
       updateFromFileDisabledReason: null,
     })
     const [{ getByText }] = render()
-    getByText('A software update is available for this robot.')
+    getByText(
+      'A robot software update is required to run protocols with this version of the Opentrons App.'
+    )
     const btn = getByText('View update')
     fireEvent.click(btn)
     getByText('mock update buildroot')
@@ -91,7 +91,9 @@ describe('RobotSettings RobotServerVersion', () => {
       updateFromFileDisabledReason: null,
     })
     const [{ getByText }] = render()
-    getByText('A software update is available for this robot.')
+    getByText(
+      'A robot software update is required to run protocols with this version of the Opentrons App.'
+    )
     const btn = getByText('View update')
     fireEvent.click(btn)
     getByText('mock update buildroot')
