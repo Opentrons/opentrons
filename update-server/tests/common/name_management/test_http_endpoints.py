@@ -5,7 +5,10 @@ from aiohttp.test_utils import TestClient as HTTPTestClient
 
 from decoy import Decoy
 
-from otupdate.common.name_management.name_synchronizer import NameSynchronizer
+from otupdate.common.name_management.name_synchronizer import (
+    NameSynchronizer,
+    InvalidNameError,
+)
 
 
 async def test_get_name(
@@ -27,15 +30,13 @@ async def test_set_name_valid(
     mock_name_synchronizer: NameSynchronizer,
     decoy: Decoy,
 ) -> None:
-    decoy.when(await mock_name_synchronizer.set_name("the input name")).then_return(
-        "the returned name"
-    )
-
     response = await test_cli[0].post("/server/name", json={"name": "the input name"})  # type: ignore[no-untyped-call]
-    assert response.status == 200
 
+    decoy.verify(await mock_name_synchronizer.set_name("the input name"))
+
+    assert response.status == 200
     body = await response.json()
-    assert body["name"] == "the returned name"
+    assert body["name"] == "the input name"
 
 
 async def test_set_name_not_json(test_cli: Tuple[HTTPTestClient, str]) -> None:
@@ -50,4 +51,17 @@ async def test_set_name_field_missing(test_cli: Tuple[HTTPTestClient, str]) -> N
 
 async def test_set_name_field_not_a_str(test_cli: Tuple[HTTPTestClient, str]) -> None:
     response = await test_cli[0].post("/server/name", json={"name": 2})  # type: ignore[no-untyped-call]
+    assert response.status == 400
+
+
+async def test_set_name_error_from_name_synchronizer(
+    test_cli: Tuple[HTTPTestClient, str],
+    mock_name_synchronizer: NameSynchronizer,
+    decoy: Decoy,
+) -> None:
+    decoy.when(await mock_name_synchronizer.set_name("the input name")).then_raise(
+        InvalidNameError()
+    )
+
+    response = await test_cli[0].post("/server/name", json={"name": "the input name"})  # type: ignore[no-untyped-call]
     assert response.status == 400

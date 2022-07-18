@@ -49,10 +49,17 @@ from aiohttp import web
 
 from .name_synchronizer import (
     NameSynchronizer,
+    InvalidNameError,
     install_name_synchronizer,
     get_name_synchronizer,
 )
 from .static_hostname import set_up_static_hostname
+
+
+def _build_400(msg: str) -> web.Response:
+    return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
+        data={"message": msg}, status=400
+    )
 
 
 async def set_name_endpoint(request: web.Request) -> web.Response:
@@ -66,39 +73,46 @@ async def set_name_endpoint(request: web.Request) -> web.Response:
 
     It does not include the static hostname.
 
-    Request with POST /server/name {"name": new_name}
-    Responds with 200 OK {"name": "set_name"}
-    or 400 Bad Request
+    Request with:
+        POST /server/name {"name": new_name}
 
-    In general, the name that is set will be the same name that was requested.
-    It may be different if it had to be truncated, sanitized, etc.
+    The name can be mostly arbitrary Unicode, with some restrictions.
+    The exact restrictions are left undefined by this API and may change over time.
+
+    Responds with:
+        200 OK {"name": "set_name"}
+
+        Currently, the name that is returned will be the same name that was requested.
+        In the future, it may be different if it was automatically truncated, sanitized,
+        etc.
+
+    Or:
+        400 Bad Request, if the body is malformed, or the given name is invalid.
     """
-
-    def build_400(msg: str) -> web.Response:
-        return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
-            data={"message": msg}, status=400
-        )
-
     try:
         body = await request.json()
     except json.JSONDecodeError as exception:
         # stringifying a JSONDecodeError will include an error summary and location,
         # e.g. "Expecting value: line 1 column 1 (char 0)"
-        return build_400(str(exception))
+        return _build_400(str(exception))
 
     try:
         name_to_set = body["name"]
     except KeyError:
-        return build_400('Body has no "name" key')
+        return _build_400('Body has no "name" key')
 
     if not isinstance(name_to_set, str):
-        return build_400('"name" key is not a string"')
+        return _build_400('"name" key is not a string')
 
     name_synchronizer = get_name_synchronizer(request)
-    new_name = await name_synchronizer.set_name(new_name=name_to_set)
+
+    try:
+        await name_synchronizer.set_name(new_name=name_to_set)
+    except InvalidNameError:
+        return _build_400("Invalid name")
 
     return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
-        data={"name": new_name}, status=200
+        data={"name": name_to_set}, status=200
     )
 
 
@@ -118,6 +132,7 @@ async def get_name_endpoint(request: web.Request) -> web.Response:
 
 __all__ = [
     "NameSynchronizer",
+    "InvalidNameError",
     "install_name_synchronizer",
     "get_name_synchronizer",
     "set_up_static_hostname",

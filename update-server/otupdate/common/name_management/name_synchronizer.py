@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from contextlib import asynccontextmanager
 from logging import getLogger
 from typing import AsyncGenerator, Optional
@@ -43,6 +44,7 @@ class NameSynchronizer:
     def __init__(self, avahi_client: avahi.AvahiClient) -> None:
         """For internal use by this class only. Use `start()` instead."""
         self._avahi_client = avahi_client
+        self._lock = asyncio.Lock()
 
     @classmethod
     @asynccontextmanager
@@ -78,7 +80,7 @@ class NameSynchronizer:
             )
             yield name_synchronizer
 
-    async def set_name(self, new_name: str) -> str:
+    async def set_name(self, new_name: str) -> None:
         """Set the machine's human-readable name.
 
         This first sets the Avahi service name, and then persists it
@@ -86,30 +88,33 @@ class NameSynchronizer:
 
         Returns the new name. This is normally the same as the requested name,
         but it it might be different if it had to be truncated, sanitized, etc.
+
+        Raises:
+            InvalidNameError: If the name could not be set to the given string.
+                The name is left unchanged.
         """
         # Check that the new name is valid for both places before setting it on either
-        # place, to avoid a messy torn state if one succeeds and the other fails.
+        # place. This avoids a messy torn state if one succeeds and the other fails.
         if not (
             avahi.service_name_is_valid(new_name)
             and pretty_hostname.pretty_hostname_is_valid(new_name)
         ):
-            # TODO: Better exception.
-            raise RuntimeError(f"{new_name!r} is not a valid name.")
+            raise InvalidNameError()
 
-        # TODO: Add lock.
-        await self._avahi_client.start_advertising(service_name=new_name)
+        # Lock to avoid a hazard like this:
+        # 1. Task A sets Avahi service name to "A".
+        # 2. Task B sets Avahi service name to "B".
+        # 3. Task B sets pretty hostname to "B".
+        # 4. Task A sets pretty hostname to "A".
+        # 5. Machine is left in a torn state with inconsistent names.
+        async with self._lock:
+            await self._avahi_client.start_advertising(service_name=new_name)
 
-        # Setting the Avahi service name can fail if Avahi doesn't like the new name.
-        # Persist only after it succeeds, so we don't persist something invalid.
-        persisted_pretty_hostname = await pretty_hostname.persist_pretty_hostname(
-            new_name
-        )
+            # Just in case Avahi doesn't like the new name despite our validation,
+            # Persist it only after it succeeds, so we don't persist something invalid.
+            await pretty_hostname.persist_pretty_hostname(new_name)
 
-        _log.info(
-            f"Changed name to {repr(new_name)}"
-            f" (persisted {repr(persisted_pretty_hostname)})."  # TODO
-        )
-        return new_name  # TODO
+        _log.info(f"Changed name to {repr(new_name)}.")
 
     async def get_name(self) -> str:
         """Return the machine's current human-readable name.
@@ -138,6 +143,10 @@ class NameSynchronizer:
         # It prevents two machines with the same name from flipping
         # which one is #1 and which one is #2 every time they reboot.
         await self.set_name(new_name=alternative_name)
+
+
+class InvalidNameError(ValueError):
+    pass
 
 
 def install_name_synchronizer(
