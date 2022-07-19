@@ -5,33 +5,33 @@ and how it's distinct from other names on the machine.
 """
 
 
+import asyncio
 from logging import getLogger
+from typing import List, Union
 
 
 _log = getLogger(__name__)
 
 
-def get_pretty_hostname(default: str = "no name set") -> str:
+async def get_pretty_hostname(default: str = "no name set") -> str:
     """Get the currently-configured pretty hostname"""
-    try:
-        with open("/etc/machine-info") as emi:
-            contents = emi.read()
-    except OSError:
-        _log.exception("Couldn't read /etc/machine-info")
-        contents = ""
-    for line in contents.split("\n"):
-        if line.startswith("PRETTY_HOSTNAME="):
-            # FIXME(mm, 2022-04-27): This will not correctly read the pretty hostname
-            # if it's quoted or contains escaped characters.
-            # https://github.com/Opentrons/opentrons/issues/10197
-            # Perhaps we should query the pretty hostname from hostnamectl instead of
-            # implementing our own parsing.
-            return "=".join(line.split("=")[1:])
-    _log.warning(f"No PRETTY_HOSTNAME in {contents}, defaulting to {default}")
-    return default
+    # NOTE: The `api` package also retrieves the pretty hostname.
+    # This logic must be kept in sync with the logic in `api`.
+    result = (
+        await _run_command(
+            command="hostnamectl",
+            # Only get the pretty hostname, not the static or transient one.
+            args=["status", "--pretty"],
+        )
+    ).decode("utf-8")
+    # Strip the trailing newline, since it's not part of the actual name value.
+    # TODO(mm, 2022-07-18): When we upgrade to systemd 249, use `hostnamectl --json`
+    # for CLI output that we can parse more robustly.
+    assert len(result) >= 1 and result[-1] == "\n"
+    return result[:-1]
 
 
-def persist_pretty_hostname(name: str) -> str:
+async def persist_pretty_hostname(name: str) -> str:
     """Change the robot's pretty hostname.
 
     Writes the new name to /etc/machine-info so it persists across reboots.
@@ -47,7 +47,13 @@ def persist_pretty_hostname(name: str) -> str:
         checked_name = name
     except OSError:
         _log.exception("Could not set pretty hostname")
-        checked_name = get_pretty_hostname()
+        checked_name = await get_pretty_hostname()
+
+    # Now that we've rewritten /etc/machine-info to contain the new pretty hostname,
+    # restart systemd-hostnamed so that commands like `hostnamectl status --pretty`
+    # pick it up immediately.
+    await _run_command(command="systemctl", args=["restart", "systemd-hostnamed"])
+
     return checked_name
 
 
@@ -87,3 +93,29 @@ def _rewrite_machine_info_str(
     new_lines = preserved_lines + [f"PRETTY_HOSTNAME={new_pretty_hostname}"]
     new_contents = "\n".join(new_lines) + "\n"
     return new_contents
+
+
+# TODO(mm, 2022-07-18): Deduplicate with identical subprocess error-checking code
+# in .avahi and .static_hostname modules.
+async def _run_command(
+    command: Union[str, bytes],
+    args: List[Union[str, bytes]],
+) -> bytes:
+    process = await asyncio.create_subprocess_exec(
+        command,
+        *args,
+        stdin=asyncio.subprocess.DEVNULL,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await process.communicate()
+    ret = process.returncode
+    if ret != 0:
+        _log.error(
+            f"Error calling {command!r}: {ret} "
+            f"stdout: {stdout!r} stderr: {stderr!r}"
+        )
+        # TODO(mm, 2022-07-18): Use a structured and specific exception type
+        # once this function is deduplicated.
+        raise RuntimeError(f"Error calling {command!r}")
+    return stdout

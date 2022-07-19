@@ -94,21 +94,31 @@ if IS_ROBOT:
 
 
 def name() -> str:
+    fallback = "opentrons-dev"
+
     if IS_ROBOT and ARCHITECTURE in (
         SystemArchitecture.BUILDROOT,
         SystemArchitecture.YOCTO,
     ):
         try:
-            return (
-                subprocess.check_output(["hostnamectl", "--pretty", "status"])
-                .strip()
-                .decode()
-            )
+            # Read the name from the machine's pretty hostname, which is maintained
+            # by update-server. This retrieval logic needs to be kept in sync with
+            # update-server.
+            result = subprocess.check_output(
+                ["hostnamectl", "--pretty", "status"]
+            ).decode("utf-8")
+            # Strip the trailing newline, since it's not part of the actual name value.
+            # TODO(mm, 2022-07-18): When we upgrade to systemd 249, use
+            # `hostnamectl --json` for CLI output that we can parse more robustly.
+            assert len(result) >= 1 and result[-1] == "\n"
+            return result[:-1]
+
         except Exception:
             log.exception(
-                "Couldn't load name from /etc/machine-info, defaulting to dev"
+                f"Couldn't load name from /etc/machine-info, defaulting to {fallback}"
             )
-    return "opentrons-dev"
+
+    return fallback
 
 
 class ConfigElementType(enum.Enum):
