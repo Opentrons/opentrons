@@ -26,12 +26,13 @@ import {
   /* postWifiDisconnect, */
 } from '../../../redux/networking'
 // import * as RobotApi from '../../../redux/robot-api'
+import { useIsRobotBusy } from '../hooks'
 import { TemporarySelectNetwork } from './TemporarySelectNetwork'
 
 import type { State, Dispatch } from '../../../redux/types'
 interface NetworkingProps {
   robotName: string
-  isRobotBusy: boolean
+  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 // ToDo kj modify ConnectModal to align with new design
@@ -43,11 +44,12 @@ const LIST_REFRESH_MS = 10000
 
 export function RobotSettingsNetworking({
   robotName,
-  isRobotBusy,
+  updateRobotStatus,
 }: NetworkingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const list = useSelector((state: State) => getWifiList(state, robotName))
   const dispatch = useDispatch<Dispatch>()
+  const isRobotBusy = useIsRobotBusy({ poll: true })
   // const [dispatchApi] = RobotApi.useDispatchApiRequest()
 
   const { wifi, ethernet } = useSelector((state: State) =>
@@ -62,6 +64,10 @@ export function RobotSettingsNetworking({
     dispatch(fetchStatus(robotName))
     dispatch(fetchWifiList(robotName))
   }, [robotName, dispatch])
+
+  React.useEffect(() => {
+    updateRobotStatus(isRobotBusy)
+  }, [isRobotBusy, updateRobotStatus])
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
