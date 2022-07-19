@@ -55,7 +55,9 @@ async def persist_pretty_hostname(name: str) -> str:
     # Now that we've rewritten /etc/machine-info to contain the new pretty hostname,
     # restart systemd-hostnamed so that commands like `hostnamectl status --pretty`
     # pick it up immediately.
-    await _run_command(command="systemctl", args=["restart", "systemd-hostnamed"])
+    await _run_command(
+        command="systemctl", args=["reload-or-restart", "systemd-hostnamed"]
+    )
 
     return checked_name
 
