@@ -80,11 +80,25 @@ async def test_deactivate_shaker(heatershaker: HeaterShaker) -> None:
     assert heatershaker.target_speed is None
     assert heatershaker.speed == 0
 
+async def test_deactivate_heater(heatershaker: HeaterShaker) -> None:
+    await heatershaker.wait_next_poll()
+    await heatershaker.start_set_temperature(50.0)
+    await heatershaker.await_temperature(50.0)
+    assert heatershaker.target_temperature == 50.0
+    assert 49.3 <= heatershaker.temperature <= 50.7
+
+    await heatershaker.deactivate_heater()
+    assert heatershaker.target_temperature is None
+
+    assert 49.3 <= heatershaker.temperature <= 50.7  # Temp should not change
+    await heatershaker.wait_next_poll()
+    await heatershaker.wait_next_poll()
+    await heatershaker.wait_next_poll()
+    assert 49.3 <= heatershaker.temperature <= 50.7  # Temp should not change
+
 
 async def test_temp(heatershaker: HeaterShaker) -> None:
     """Test setting temp"""
-    await heatershaker.wait_next_poll()
-    await heatershaker.start_set_temperature(50.0)
 
     # Have to wait for next poll because target temp will not update until then
     await heatershaker.wait_next_poll()

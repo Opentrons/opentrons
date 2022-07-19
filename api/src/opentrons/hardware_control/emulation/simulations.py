@@ -40,7 +40,7 @@ class Temperature(Simulation):
         self._target = None
         self._current = temperature
 
-    def set_target(self, target: float) -> None:
+    def set_target(self, target: Optional[float]) -> None:
         self._target = target
 
     @property
