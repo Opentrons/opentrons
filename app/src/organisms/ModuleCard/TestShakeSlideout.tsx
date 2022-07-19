@@ -112,7 +112,6 @@ export const TestShakeSlideout = (
       })
     }
     setShakeValue(null)
-    onCloseClick()
   }
 
   const {
