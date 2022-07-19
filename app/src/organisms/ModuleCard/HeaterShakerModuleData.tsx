@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import {
   Flex,
   Text,
@@ -11,6 +10,7 @@ import {
   DIRECTION_ROW,
   TYPOGRAPHY,
   SIZE_1,
+  WRAP,
 } from '@opentrons/components'
 import { StatusLabel } from '../../atoms/StatusLabel'
 import type {
@@ -24,27 +24,6 @@ interface HeaterShakerModuleDataProps {
   moduleData: HeaterShakerModule['data']
   showTemperatureData?: boolean
 }
-
-const MODULE_STATUS_STYLING = css`
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-
-  @media (min-width: 800px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media (min-width: 900px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-`
-
-const HS_MODULE_CARD_STYLING = css`
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-
-  @media (min-width: 800px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-`
 
 export const HeaterShakerModuleData = (
   props: HeaterShakerModuleDataProps
@@ -127,13 +106,10 @@ export const HeaterShakerModuleData = (
   }
 
   return (
-    <Flex
-      css={showTemperatureData ? MODULE_STATUS_STYLING : HS_MODULE_CARD_STYLING}
-    >
+    <Flex flexWrap={WRAP} gridGap={`${SPACING.spacing1} ${SPACING.spacing6}`}>
       {showTemperatureData && (
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          marginRight={SPACING.spacing6}
           data-testid={`heater_shaker_module_data_temp`}
         >
           <Text

@@ -192,19 +192,33 @@ export function useModuleOverflowMenu(
       data-testid={`hs_attach_to_deck_${module.moduleModel}`}
       onClick={() => handleWizardClick()}
     >
-      {t('how_to_attach_to_deck', { ns: 'heater_shaker' })}
+      {t('show_attachment_instructions', { ns: 'heater_shaker' })}
     </MenuItem>
   )
-  const testShakeBtn = (
-    <MenuItem
-      minWidth="10.6rem"
-      onClick={() => handleTestShakeClick()}
-      key={`hs_test_shake_btn_${module.moduleModel}`}
-      disabled={isDisabled}
-    >
-      {t('test_shake', { ns: 'heater_shaker' })}
-    </MenuItem>
-  )
+  const testShakeBtn =
+    module.moduleType === HEATERSHAKER_MODULE_TYPE &&
+    module.data.speedStatus !== 'idle' ? (
+      <MenuItem
+        minWidth="10.6rem"
+        key={`about_module_${module.moduleModel}`}
+        id={`about_module_${module.moduleModel}`}
+        data-testid={`about_module_${module.moduleModel}`}
+        onClick={() =>
+          handleDeactivationCommand('heaterShaker/deactivateShaker')
+        }
+      >
+        {t('deactivate_shaker', { ns: 'heater_shaker' })}
+      </MenuItem>
+    ) : (
+      <MenuItem
+        minWidth="10.6rem"
+        onClick={() => handleTestShakeClick()}
+        key={`hs_test_shake_btn_${module.moduleModel}`}
+        disabled={isDisabled}
+      >
+        {t('test_shake', { ns: 'heater_shaker' })}
+      </MenuItem>
+    )
 
   let moduleId: string
   if (isRunIdle && currentRunId != null && isLoadedInRun) {
@@ -321,31 +335,10 @@ export function useModuleOverflowMenu(
         setSetting:
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
           module.data.temperatureStatus !== 'idle'
-            ? t('deactivate', { ns: 'heater_shaker' })
+            ? t('deactivate_heater', { ns: 'heater_shaker' })
             : t('set_temperature', { ns: 'heater_shaker' }),
         isSecondary: false,
         disabledReason: false,
-        menuButtons: null,
-        onClick:
-          module.moduleType === HEATERSHAKER_MODULE_TYPE &&
-          module.data.temperatureStatus !== 'idle' &&
-          module.data.status !== 'idle'
-            ? () => handleDeactivationCommand('heaterShaker/deactivateHeater')
-            : () => handleSlideoutClick(false),
-      },
-      {
-        setSetting:
-          module.moduleType === HEATERSHAKER_MODULE_TYPE &&
-          module.data.speedStatus !== 'idle' &&
-          module.data.status !== 'idle'
-            ? t('stop_shaking', { ns: 'heater_shaker' })
-            : t('set_shake_speed', { ns: 'heater_shaker' }),
-        isSecondary: true,
-        disabledReason:
-          module.moduleType === HEATERSHAKER_MODULE_TYPE &&
-          (module.data.labwareLatchStatus === 'idle_open' ||
-            module.data.labwareLatchStatus === 'opening' ||
-            module.data.labwareLatchStatus === 'idle_unknown'),
         menuButtons: [
           labwareLatchBtn,
           aboutModuleBtn,
@@ -354,9 +347,10 @@ export function useModuleOverflowMenu(
         ],
         onClick:
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
-          module.data.speedStatus !== 'idle'
-            ? () => handleDeactivationCommand('heaterShaker/deactivateShaker')
-            : () => handleSlideoutClick(true),
+          module.data.temperatureStatus !== 'idle' &&
+          module.data.status !== 'idle'
+            ? () => handleDeactivationCommand('heaterShaker/deactivateHeater')
+            : () => handleSlideoutClick(false),
       },
     ],
   }

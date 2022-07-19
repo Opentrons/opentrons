@@ -413,7 +413,7 @@ export function ProtocolDetails(
               <StyledText
                 as="p"
                 marginRight={SPACING.spacingM}
-                css={{ 'overflow-wrap': 'anywhere' }}
+                overflowWrap="anywhere"
               >
                 {analysisStatus === 'loading' ? t('shared:loading') : author}
               </StyledText>

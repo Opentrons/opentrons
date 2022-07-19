@@ -247,7 +247,7 @@ export function ChooseRobotSlideout(
                   <StyledText
                     as="label"
                     color={COLORS.errorText}
-                    css={{ 'overflow-wrap': 'anywhere' }}
+                    overflowWrap="anywhere"
                     display={DISPLAY_INLINE_BLOCK}
                     marginTop={`-${SPACING.spacing2}`}
                     marginBottom={SPACING.spacing3}

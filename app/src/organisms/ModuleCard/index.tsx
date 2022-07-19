@@ -271,7 +271,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               alt={module.moduleModel}
             />
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            flex="100%"
+            paddingLeft={SPACING.spacing3}
+          >
             {showSuccessToast && (
               <Toast
                 message={t('firmware_update_installation_successful')}
@@ -489,7 +493,6 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
         currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
-        isSetShake={isSecondary}
         isLoadedInRun={isLoadedInRun}
       />
     )

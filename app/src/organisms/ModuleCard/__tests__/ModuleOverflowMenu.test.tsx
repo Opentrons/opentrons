@@ -56,50 +56,6 @@ const mockMovingHeaterShaker = {
   usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
 } as any
 
-const mockOpenLatchHeaterShaker = {
-  id: 'heatershaker_id',
-  moduleModel: 'heaterShakerModuleV1',
-  moduleType: 'heaterShakerModuleType',
-  serialNumber: 'jkl123',
-  hardwareRevision: 'heatershaker_v4.0',
-  firmwareVersion: 'v2.0.0',
-  hasAvailableUpdate: true,
-  data: {
-    labwareLatchStatus: 'idle_open',
-    speedStatus: 'idle',
-    temperatureStatus: 'idle',
-    currentSpeed: null,
-    currentTemperature: null,
-    targetSpeed: null,
-    targetTemp: null,
-    errorDetails: null,
-    status: 'idle',
-  },
-  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
-} as any
-
-const mockUnknownLatchHeaterShaker = {
-  id: 'heatershaker_id',
-  moduleModel: 'heaterShakerModuleV1',
-  moduleType: 'heaterShakerModuleType',
-  serialNumber: 'jkl123',
-  hardwareRevision: 'heatershaker_v4.0',
-  firmwareVersion: 'v2.0.0',
-  hasAvailableUpdate: true,
-  data: {
-    labwareLatchStatus: 'idle_unknown',
-    speedStatus: 'idle',
-    temperatureStatus: 'idle',
-    currentSpeed: null,
-    currentTemperature: null,
-    targetSpeed: null,
-    targetTemp: null,
-    errorDetails: null,
-    status: 'idle',
-  },
-  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
-} as any
-
 const mockCloseLatchHeaterShaker = {
   id: 'heatershaker_id',
   moduleModel: 'heaterShakerModuleV1',
@@ -289,20 +245,17 @@ describe('ModuleOverflowMenu', () => {
       name: 'Set module temperature',
     })
     getByRole('button', {
-      name: 'Set shake speed',
-    })
-    getByRole('button', {
       name: 'Close Labware Latch',
     })
     const aboutButton = getByRole('button', { name: 'About module' })
-    getByRole('button', { name: 'See how to attach to deck' })
-    const testButton = getByRole('button', { name: 'Test shake' })
+    getByRole('button', { name: 'Show attachment instructions' })
+    const testButton = getByRole('button', { name: 'Test Shake' })
     fireEvent.click(testButton)
     expect(props.handleTestShakeClick).toHaveBeenCalled()
     fireEvent.click(aboutButton)
     expect(props.handleAboutClick).toHaveBeenCalled()
   })
-  it('renders heater shaker see how to attach to deck button and when clicked, launches hs wizard', () => {
+  it('renders heater shaker show attachment instructions button and when clicked, launches hs wizard', () => {
     props = {
       module: mockHeaterShaker,
       handleSlideoutClick: jest.fn(),
@@ -312,7 +265,7 @@ describe('ModuleOverflowMenu', () => {
       isLoadedInRun: false,
     }
     const { getByRole } = render(props)
-    const btn = getByRole('button', { name: 'See how to attach to deck' })
+    const btn = getByRole('button', { name: 'Show attachment instructions' })
     fireEvent.click(btn)
     expect(props.handleWizardClick).toHaveBeenCalled()
   })
@@ -330,23 +283,6 @@ describe('ModuleOverflowMenu', () => {
     expect(
       getByRole('button', {
         name: 'Open Labware Latch',
-      })
-    ).toBeDisabled()
-  })
-
-  it('renders heater shaker shake button and is disabled when latch is opened', () => {
-    props = {
-      module: mockOpenLatchHeaterShaker,
-      handleSlideoutClick: jest.fn(),
-      handleAboutClick: jest.fn(),
-      handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
-      isLoadedInRun: false,
-    }
-    const { getByRole } = render(props)
-    expect(
-      getByRole('button', {
-        name: 'Set shake speed',
       })
     ).toBeDisabled()
   })
@@ -388,23 +324,6 @@ describe('ModuleOverflowMenu', () => {
     fireEvent.click(btn)
   })
 
-  it('renders heater shaker set shake speed button disabled when labware latch status is unknown', () => {
-    props = {
-      module: mockUnknownLatchHeaterShaker,
-      handleSlideoutClick: jest.fn(),
-      handleAboutClick: jest.fn(),
-      handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
-      isLoadedInRun: false,
-    }
-    const { getByRole } = render(props)
-    expect(
-      getByRole('button', {
-        name: 'Set shake speed',
-      })
-    ).toBeDisabled()
-  })
-
   it('renders heater shaker overflow menu and deactivates heater when status changes', () => {
     props = {
       module: mockDeactivateHeatHeaterShaker,
@@ -418,7 +337,7 @@ describe('ModuleOverflowMenu', () => {
     const { getByRole } = render(props)
 
     const btn = getByRole('button', {
-      name: 'Deactivate',
+      name: 'Deactivate heater',
     })
     expect(btn).not.toBeDisabled()
     fireEvent.click(btn)
