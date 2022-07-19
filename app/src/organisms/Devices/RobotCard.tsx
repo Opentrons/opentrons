@@ -35,7 +35,6 @@ import {
 } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
-import { useGetElementDOMRectProperty } from '../../organisms/ProtocolsLanding/useGetElementDOMRectProperty'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 
@@ -46,7 +45,29 @@ const ROBOT_CARD_STYLE = css`
   }
 `
 
-const ROBOT_CARD_WRAP_SIZE = 650
+const ROBOT_CARD_BREAKPOINT = '750px'
+
+const ROBOT_CARD_ATTACHMENTS_GRID = css`
+  display: grid;
+  grid-template-columns: none;
+  grid-template-rows: 2fr 1fr;
+
+  @media (min-width: ${ROBOT_CARD_BREAKPOINT}) {
+    grid-template-columns: 4fr 1fr;
+    grid-template-rows: none;
+  }
+`
+
+const ROBOT_CARD_PIPETTES_GRID = css`
+  display: grid;
+  grid-template-columns: none;
+  grid-template-rows: 1fr;
+
+  @media (min-width: ${ROBOT_CARD_BREAKPOINT}) {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: none;
+  }
+`
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -56,25 +77,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const { robot } = props
   const { name: robotName = null, local } = robot
   const history = useHistory()
-
-  const robotCardRef = React.useRef(null)
-  const { getElementProperty } = useGetElementDOMRectProperty<HTMLDivElement>(
-    robotCardRef
-  )
-  const [robotCardWidth, setRobotCardWidth] = React.useState<number | null>(
-    getElementProperty('width')
-  )
-
-  const handleResize = React.useCallback((): void => {
-    setRobotCardWidth(getElementProperty('width'))
-  }, [getElementProperty])
-
-  React.useEffect(() => {
-    window.addEventListener('resize', handleResize)
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [handleResize])
 
   return robotName != null ? (
     <Flex
@@ -88,7 +90,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       width="100%"
       onClick={() => history.push(`/devices/${robotName}`)}
       cursor="pointer"
-      ref={robotCardRef}
     >
       <img
         src={OT2_PNG}
@@ -135,18 +136,8 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
           ) : null}
         </Flex>
         {robot.status === CONNECTABLE ? (
-          <Box
-            display="grid"
-            css={
-              robotCardWidth == null || robotCardWidth >= ROBOT_CARD_WRAP_SIZE
-                ? { 'grid-template-columns': '4fr 1fr' }
-                : { 'grid-template-rows': '2fr 1fr' }
-            }
-          >
-            <AttachedPipettes
-              robotName={robotName}
-              robotCardWidth={robotCardWidth}
-            />
+          <Box css={ROBOT_CARD_ATTACHMENTS_GRID}>
+            <AttachedPipettes robotName={robotName} />
             <AttachedModules robotName={robotName} />
           </Box>
         ) : null}
@@ -190,23 +181,13 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
     <Flex width="100%"></Flex>
   )
 }
-function AttachedPipettes(props: {
-  robotName: string
-  robotCardWidth: number | null
-}): JSX.Element {
-  const { robotName, robotCardWidth } = props
+function AttachedPipettes(props: { robotName: string }): JSX.Element {
+  const { robotName } = props
   const { t } = useTranslation('devices_landing')
   const attachedPipettes = useAttachedPipettes()
 
   return (
-    <Box
-      display="grid"
-      css={
-        robotCardWidth == null || robotCardWidth >= ROBOT_CARD_WRAP_SIZE
-          ? { 'grid-template-columns': '1fr 1fr' }
-          : { 'grid-template-rows': '1fr' }
-      }
-    >
+    <Box css={ROBOT_CARD_PIPETTES_GRID}>
       <Box gridTemplateRows="1fr 1fr" paddingRight={SPACING.spacing4}>
         <StyledText
           as="h6"
