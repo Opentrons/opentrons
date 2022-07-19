@@ -24,8 +24,7 @@ async def get_pretty_hostname(default: str = "no name set") -> str:
     result = (
         await _run_command(
             command="hostnamectl",
-            # Only get the pretty hostname, not the static or transient one.
-            args=["status", "--pretty"],
+            args=["--pretty", "status"],
         )
     ).decode("utf-8")
     # Strip the trailing newline, since it's not part of the actual name value.
