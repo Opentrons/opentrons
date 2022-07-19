@@ -65,8 +65,9 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
     isSearchable = true,
     width,
   } = props
-  // @ts-expect-error(mc, 2021-03-19): resolve this error
-  const allOptions = options.flatMap(og => og.options || [og])
+  const allOptions = options.flatMap(og =>
+    'options' in og ? og.options : [og]
+  )
   const value = find(allOptions, opt => opt.value === props.value) || null
   const caption = error != null || props.caption
 
