@@ -250,6 +250,74 @@ class LegacyCommandMapper:
                     wellName=well_name,
                 ),
             )
+        elif (
+            command["name"] == legacy_command_types.ASPIRATE
+            and "instrument" in command["payload"]
+            and "location" in command["payload"]
+            and "volume" in command["payload"]
+            and "rate" in command["payload"]
+        ):
+            pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore
+            location = command["payload"].get("location")
+            volume = command["payload"].get("volume")
+            flowRate = command["payload"].get("rate")
+            if isinstance(location, Location):
+                well = location.labware.as_well()
+            else:
+                raise Exception("Unknown aspirate location.")
+            mount = MountType(pipette.mount)
+            slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
+            well_name = well.well_name
+            labware_id = self._labware_id_by_slot[slot]
+            pipette_id = self._pipette_id_by_mount[mount]
+            engine_command = pe_commands.Aspirate.construct(
+                id=command_id,
+                key=command_id,
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=now,
+                startedAt=now,
+                params=pe_commands.AspirateParams.construct(
+                    pipetteId=pipette_id,
+                    labwareId=labware_id,
+                    wellName=well_name,
+                    volume=volume,
+                    flowRate=flowRate
+                ),
+            )
+        elif (
+            command["name"] == legacy_command_types.DISPENSE
+            and "instrument" in command["payload"]
+            and "location" in command["payload"]
+            and "volume" in command["payload"]
+            and "rate" in command["payload"]
+        ):
+            pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore
+            location = command["payload"].get("location")
+            volume = command["payload"].get("volume")
+            flowRate = command["payload"].get("rate")
+            if isinstance(location, Location):
+                well = location.labware.as_well()
+            else:
+                raise Exception("Unknown dispense location.")
+            mount = MountType(pipette.mount)
+            slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
+            well_name = well.well_name
+            labware_id = self._labware_id_by_slot[slot]
+            pipette_id = self._pipette_id_by_mount[mount]
+            engine_command = pe_commands.Dispense.construct(
+                id=command_id,
+                key=command_id,
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=now,
+                startedAt=now,
+                params=pe_commands.DispenseParams.construct(
+                    pipetteId=pipette_id,
+                    labwareId=labware_id,
+                    wellName=well_name,
+                    volume=volume,
+                    flowRate=flowRate
+                ),
+            )
         elif command["name"] == legacy_command_types.PAUSE:
             engine_command = pe_commands.WaitForResume.construct(
                 id=command_id,
