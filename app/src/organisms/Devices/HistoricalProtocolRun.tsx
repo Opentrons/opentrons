@@ -79,6 +79,7 @@ export function HistoricalProtocolRun(
             name={offsetDrawerOpen ? 'chevron-up' : 'chevron-down'}
             width="15px"
             marginRight={SPACING.spacing3}
+            css={{ cursor: 'pointer' }}
           />
         </Box>
         <StyledText
