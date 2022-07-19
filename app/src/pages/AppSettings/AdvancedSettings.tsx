@@ -192,7 +192,11 @@ export function AdvancedSettings(): JSX.Element {
   >['formatOptionLabel'] = (option, index): JSX.Element => {
     const { label, value } = option
     return (
-      <StyledText as="p" textTransform={TEXT_TRANSFORM_CAPITALIZE} id={index}>
+      <StyledText
+        as="p"
+        textTransform={TYPOGRAPHY.textTransformCapitalize}
+        id={index}
+      >
         {value === 'latest' ? label : value}
       </StyledText>
     )
