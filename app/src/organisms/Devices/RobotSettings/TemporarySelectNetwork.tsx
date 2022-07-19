@@ -104,7 +104,7 @@ export const TemporarySelectNetwork = ({
   }
 
   const handleSelectJoinOther = (): void => {
-    if (isRobotBusy) {
+    if (!isRobotBusy) {
       setChangeState({ type: JOIN_OTHER, ssid: null })
     }
   }
@@ -127,7 +127,7 @@ export const TemporarySelectNetwork = ({
         onJoinOther={handleSelectJoinOther}
         onDisconnect={handleSelectDisconnect}
       />
-      {changeState.type != null && (
+      {changeState.type && (
         <Portal>
           {requestState != null ? (
             <ResultModal
@@ -135,7 +135,10 @@ export const TemporarySelectNetwork = ({
               ssid={changeState.ssid}
               isPending={requestState.status === RobotApi.PENDING}
               error={
-                'error' in requestState && 'message' in requestState.error
+                'error' in requestState &&
+                requestState.error &&
+                'message' in requestState.error &&
+                requestState.error.message
                   ? requestState.error
                   : null
               }
