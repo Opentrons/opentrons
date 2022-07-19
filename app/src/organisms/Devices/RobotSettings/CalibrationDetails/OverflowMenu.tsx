@@ -28,7 +28,6 @@ import { useTrackEvent } from '../../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../redux/calibration'
 import {
   useDeckCalibrationData,
-  useIsRobotBusy,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
 } from '../../hooks'
@@ -53,7 +52,7 @@ interface OverflowMenuProps {
   robotName: string
   mount: Mount
   serialNumber: string | null
-  updateRobotStatus: (isRobotBusy: boolean) => void
+  isRobotBusy: boolean
 }
 
 export function OverflowMenu({
@@ -61,7 +60,7 @@ export function OverflowMenu({
   robotName,
   mount,
   serialNumber,
-  updateRobotStatus,
+  isRobotBusy,
 }: OverflowMenuProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
@@ -88,7 +87,6 @@ export function OverflowMenu({
     calBlockModalState,
     setCalBlockModalState,
   ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
-  const isBusy = useIsRobotBusy()
 
   interface StartWizardOptions {
     keepTipLength: boolean
@@ -136,9 +134,7 @@ export function OverflowMenu({
     e: React.MouseEvent
   ): void => {
     e.preventDefault()
-    if (isBusy) {
-      updateRobotStatus(true)
-    } else {
+    if (!isRobotBusy) {
       if (calType === 'pipetteOffset') {
         if (applicablePipetteOffsetCal != null) {
           // recalibrate pipette offset
@@ -224,7 +220,10 @@ export function OverflowMenu({
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          <MenuItem onClick={e => handleCalibration(calType, e)}>
+          <MenuItem
+            onClick={e => handleCalibration(calType, e)}
+            disabled={isRobotBusy}
+          >
             {calType === 'pipetteOffset'
               ? applicablePipetteOffsetCal != null
                 ? t('overflow_menu_recalibrate_pipette')

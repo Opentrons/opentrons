@@ -50,14 +50,14 @@ interface TipLengthCalibrationItemsProps {
   robotName: string
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
   formattedTipLengthCalibrations: FormattedTipLengthCalibration[]
-  updateRobotStatus: (isRobotBusy: boolean) => void
+  isRobotBusy: boolean
 }
 
 export function TipLengthCalibrationItems({
   robotName,
   formattedPipetteOffsetCalibrations,
   formattedTipLengthCalibrations,
-  updateRobotStatus,
+  isRobotBusy,
 }: TipLengthCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const customLabwareDefs = useSelector((state: State) => {
@@ -133,7 +133,7 @@ export function TipLengthCalibrationItems({
                     ? calibration.mount
                     : checkMountWithAttachedPipettes(calibration.serialNumber)
                 }
-                updateRobotStatus={updateRobotStatus}
+                isRobotBusy={isRobotBusy}
               />
             </StyledTableCell>
           </StyledTableRow>

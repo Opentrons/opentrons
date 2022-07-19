@@ -138,7 +138,7 @@ export function RobotSettingsCalibration({
   ] = React.useState<string>('')
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
   const isRunStartedOrLegacySessionInProgress = useRunStartedOrLegacySessionInProgress()
-  const isBusy = useIsRobotBusy()
+  const isRobotBusy = useIsRobotBusy({ poll: true })
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
@@ -314,7 +314,7 @@ export function RobotSettingsCalibration({
   const handleHealthCheck = (
     hasBlockModalResponse: boolean | null = null
   ): void => {
-    if (isBusy) {
+    if (isRobotBusy) {
       updateRobotStatus(true)
     } else {
       if (
@@ -488,6 +488,10 @@ export function RobotSettingsCalibration({
     }
   }, [createStatus])
 
+  React.useEffect(() => {
+    updateRobotStatus(isRobotBusy)
+  }, [isRobotBusy, updateRobotStatus])
+
   // Note: following fetch need to reflect the latest state of calibrations
   // when a user does calibration or rename a robot.
   useInterval(
@@ -652,7 +656,7 @@ export function RobotSettingsCalibration({
             <PipetteOffsetCalibrationItems
               robotName={robotName}
               formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
-              updateRobotStatus={updateRobotStatus}
+              isRobotBusy={isRobotBusy}
             />
           ) : (
             <StyledText as="label">{t('not_calibrated')}</StyledText>
@@ -677,7 +681,7 @@ export function RobotSettingsCalibration({
               robotName={robotName}
               formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
               formattedTipLengthCalibrations={formatTipLengthCalibrations()}
-              updateRobotStatus={updateRobotStatus}
+              isRobotBusy={isRobotBusy}
             />
           ) : (
             <StyledText as="label">{t('not_calibrated')}</StyledText>
