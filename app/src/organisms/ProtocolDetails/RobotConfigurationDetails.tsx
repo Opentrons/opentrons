@@ -9,8 +9,6 @@ import {
   ModuleIcon,
   SIZE_1,
   SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
-  TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -79,7 +77,7 @@ export const RobotConfigurationDetails = (
                     as="h6"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     color={COLORS.darkGreyPressed}
-                    textTransform={TEXT_TRANSFORM_UPPERCASE}
+                    textTransform={TYPOGRAPHY.textTransformUppercase}
                     minWidth="6rem"
                   >
                     {t('run_details:module_slot_number', {
@@ -134,7 +132,7 @@ export const RobotConfigurationDetailsItem = (
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginRight={SPACING.spacing4}
         color={COLORS.darkGreyPressed}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        textTransform={TYPOGRAPHY.textTransformUppercase}
         minWidth="6rem"
       >
         {label}
@@ -142,7 +140,7 @@ export const RobotConfigurationDetailsItem = (
       <Flex>
         <StyledText
           as="p"
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
           data-testid={`RobotConfigurationDetails_${label}`}
         >
           {item}

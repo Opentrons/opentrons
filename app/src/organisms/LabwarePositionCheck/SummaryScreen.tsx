@@ -10,8 +10,8 @@ import {
   NewPrimaryBtn,
   SPACING,
   Text,
-  TEXT_TRANSFORM_UPPERCASE,
   JUSTIFY_SPACE_BETWEEN,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../redux/analytics'
@@ -81,7 +81,7 @@ export const SummaryScreen = (props: {
     >
       <Text
         as={'h3'}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        textTransform={TYPOGRAPHY.textTransformUppercase}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginBottom={SPACING.spacing4}
         marginLeft={SPACING.spacing4}

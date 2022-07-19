@@ -9,7 +9,6 @@ import {
   Link,
   TYPOGRAPHY,
   SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -62,7 +61,7 @@ export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
         <PrimaryButton
           onClick={() => props.onClose()}
           alignSelf={ALIGN_FLEX_END}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
         >
           {t('shared:close')}
         </PrimaryButton>

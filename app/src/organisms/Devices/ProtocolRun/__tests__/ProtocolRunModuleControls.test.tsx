@@ -227,4 +227,29 @@ describe('ProtocolRunModuleControls', () => {
 
     getByText('mock Heater-Shaker Module Card')
   })
+
+  it('renders correct text when module is not attached but required for protocol', () => {
+    when(mockUseModuleRenderInfoForProtocolById)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        [mockHeaterShakerDef.moduleId]: {
+          moduleId: 'heaterShakerModuleId',
+          x: '0',
+          y: '20',
+          z: '30',
+          moduleDef: mockHeaterShakerDef,
+          nestedLabwareDef: null,
+          nestedLabwareId: null,
+          protocolLoadOrder: 1,
+          attachedModuleMatch: null,
+        },
+      } as any)
+
+    const { getByText } = render({
+      robotName: 'otie',
+      runId: 'test123',
+    })
+
+    getByText('Connect modules to see controls')
+  })
 })

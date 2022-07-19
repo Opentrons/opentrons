@@ -20,7 +20,6 @@ import {
   SIZE_2,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
-  TEXT_TRANSFORM_CAPITALIZE,
   JUSTIFY_CENTER,
   SIZE_4,
   TEXT_ALIGN_CENTER,
@@ -200,7 +199,7 @@ export function ChooseRobotSlideout(
           ) : (
             <Link
               onClick={() => dispatch(startDiscovery())}
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
               role="button"
               css={TYPOGRAPHY.linkPSemiBold}
             >
@@ -248,7 +247,7 @@ export function ChooseRobotSlideout(
                   <StyledText
                     as="label"
                     color={COLORS.errorText}
-                    css={{ 'overflow-wrap': 'anywhere' }}
+                    overflowWrap="anywhere"
                     display={DISPLAY_INLINE_BLOCK}
                     marginTop={`-${SPACING.spacing2}`}
                     marginBottom={SPACING.spacing3}

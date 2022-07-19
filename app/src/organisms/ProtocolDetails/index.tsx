@@ -24,7 +24,6 @@ import {
   DISPLAY_BLOCK,
   Link,
   JUSTIFY_SPACE_BETWEEN,
-  TEXT_TRANSFORM_CAPITALIZE,
   Text,
 } from '@opentrons/components'
 import {
@@ -189,7 +188,7 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
           role="button"
           css={TYPOGRAPHY.linkPSemiBold}
           marginTop={SPACING.spacing3}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
           onClick={() => setIsReadMore(!isReadMore)}
         >
           {isReadMore ? t('read_more') : t('read_less')}
@@ -414,7 +413,7 @@ export function ProtocolDetails(
               <StyledText
                 as="p"
                 marginRight={SPACING.spacingM}
-                css={{ 'overflow-wrap': 'anywhere' }}
+                overflowWrap="anywhere"
               >
                 {analysisStatus === 'loading' ? t('shared:loading') : author}
               </StyledText>
@@ -465,7 +464,7 @@ export function ProtocolDetails(
           <StyledText
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
             margin={SPACING.spacing4}
           >
             {t('deck_setup')}
@@ -500,7 +499,7 @@ export function ProtocolDetails(
               isCurrent={currentTab === 'robot_config'}
               onClick={() => setCurrentTab('robot_config')}
             >
-              <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+              <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
                 {t('robot_configuration')}
               </Text>
             </RoundTab>
@@ -509,7 +508,7 @@ export function ProtocolDetails(
               isCurrent={currentTab === 'labware'}
               onClick={() => setCurrentTab('labware')}
             >
-              <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+              <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
                 {t('labware')}
               </Text>
             </RoundTab>
@@ -519,7 +518,7 @@ export function ProtocolDetails(
                 isCurrent={currentTab === 'liquids'}
                 onClick={() => setCurrentTab('liquids')}
               >
-                <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+                <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
                   {t('liquids')}
                 </Text>
               </RoundTab>

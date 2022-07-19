@@ -9,7 +9,6 @@ import {
   SPACING,
   Icon,
   COLORS,
-  TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
@@ -88,7 +87,10 @@ export function PipetteOffsetCalibrationItems({
                   <StyledText as="p">{calibration.serialNumber}</StyledText>
                 </StyledTableCell>
                 <StyledTableCell>
-                  <StyledText as="p" textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+                  <StyledText
+                    as="p"
+                    textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  >
                     {calibration.mount}
                   </StyledText>
                 </StyledTableCell>
