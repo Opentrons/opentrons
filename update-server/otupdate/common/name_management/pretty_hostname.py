@@ -107,32 +107,6 @@ async def persist_pretty_hostname(new_pretty_hostname: str) -> None:
     )
 
 
-# TODO(mm, 2022-07-18): Deduplicate with identical subprocess error-checking code
-# in .avahi and .static_hostname modules.
-async def _run_command(
-    command: Union[str, bytes],
-    args: List[Union[str, bytes]],
-) -> bytes:
-    process = await asyncio.create_subprocess_exec(
-        command,
-        *args,
-        stdin=asyncio.subprocess.DEVNULL,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-    stdout, stderr = await process.communicate()
-    ret = process.returncode
-    if ret != 0:
-        _log.error(
-            f"Error calling {command!r}: {ret} "
-            f"stdout: {stdout!r} stderr: {stderr!r}"
-        )
-        # TODO(mm, 2022-07-18): Use a structured and specific exception type
-        # once this function is deduplicated.
-        raise RuntimeError(f"Error calling {command!r}")
-    return stdout
-
-
 def _quote_and_escape_pretty_hostname_value(pretty_hostname: str) -> str:
     r"""Prepare a string to be used as the PRETTY_HOSTNAME value in /etc/machine-info.
 
