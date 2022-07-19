@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   Flex,
@@ -7,7 +8,6 @@ import {
   Box,
 } from '@opentrons/components'
 import { useCreateCommandMutation } from '@opentrons/react-api-client'
-import { useTranslation } from 'react-i18next'
 import { StyledText } from '../../../atoms/text'
 import { ModuleCard } from '../../ModuleCard'
 import {
