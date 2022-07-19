@@ -154,7 +154,7 @@ export function useModuleOverflowMenu(
   const labwareLatchBtn = (
     <>
       <MenuItem
-        minWidth="10.6rem"
+        width="100%"
         key={`hs_labware_latch_${module.moduleModel}`}
         data-testid={`hs_labware_latch_${module.moduleModel}`}
         onClick={toggleLatch}
@@ -175,7 +175,7 @@ export function useModuleOverflowMenu(
 
   const aboutModuleBtn = (
     <MenuItem
-      minWidth="10.6rem"
+      width="100%"
       key={`about_module_${module.moduleModel}`}
       id={`about_module_${module.moduleModel}`}
       data-testid={`about_module_${module.moduleModel}`}
@@ -187,7 +187,7 @@ export function useModuleOverflowMenu(
 
   const attachToDeckBtn = (
     <MenuItem
-      minWidth="10.6rem"
+      whiteSpace="nowrap"
       key={`hs_attach_to_deck_${module.moduleModel}`}
       data-testid={`hs_attach_to_deck_${module.moduleModel}`}
       onClick={() => handleWizardClick()}
@@ -199,7 +199,7 @@ export function useModuleOverflowMenu(
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
     module.data.speedStatus !== 'idle' ? (
       <MenuItem
-        minWidth="10.6rem"
+        width="100%"
         key={`about_module_${module.moduleModel}`}
         id={`about_module_${module.moduleModel}`}
         data-testid={`about_module_${module.moduleModel}`}
@@ -211,7 +211,7 @@ export function useModuleOverflowMenu(
       </MenuItem>
     ) : (
       <MenuItem
-        minWidth="10.6rem"
+        width="100%"
         onClick={() => handleTestShakeClick()}
         key={`hs_test_shake_btn_${module.moduleModel}`}
         disabled={isDisabled}
