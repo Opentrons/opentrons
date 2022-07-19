@@ -14,7 +14,11 @@ _log = getLogger(__name__)
 
 
 async def get_pretty_hostname(default: str = "no name set") -> str:
-    """Get the currently-configured pretty hostname"""
+    """Get the currently-configured pretty hostname.
+
+    May raise an exception from the underlying ``hostnamectl`` process
+    if this happens to run at the same time systemd-hostnamed is restarting.
+    """
     # NOTE: The `api` package also retrieves the pretty hostname.
     # This logic must be kept in sync with the logic in `api`.
     result = (
