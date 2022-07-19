@@ -232,7 +232,7 @@ describe('TestShakeSlideout', () => {
     const input = getByRole('spinbutton')
     fireEvent.change(input, { target: { value: '300' } })
     fireEvent.click(button)
-
+    expect(props.onCloseClick).toHaveBeenCalled()
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'heaterShaker/setAndWaitForShakeSpeed',
@@ -271,7 +271,7 @@ describe('TestShakeSlideout', () => {
     const input = getByRole('spinbutton')
     fireEvent.change(input, { target: { value: '300' } })
     fireEvent.click(button)
-
+    expect(props.onCloseClick).toHaveBeenCalled()
     expect(mockCreateCommand).toHaveBeenCalledWith({
       runId: props.runId,
       command: {

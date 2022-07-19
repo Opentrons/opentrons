@@ -112,6 +112,7 @@ export const TestShakeSlideout = (
       })
     }
     setShakeValue(null)
+    onCloseClick()
   }
 
   const {
@@ -131,7 +132,7 @@ export const TestShakeSlideout = (
       case 'opening':
       case 'idle_open':
       case 'idle_unknown': {
-        return t('open', { ns: 'shared' })
+        return t('shared:open')
       }
       case 'closing':
       case 'idle_closed': {
@@ -154,7 +155,7 @@ export const TestShakeSlideout = (
           onClick={onCloseClick}
           data-testid={`Temp_Slideout_set_temp_btn_${name}`}
         >
-          {t('close', { ns: 'shared' })}
+          {t('shared:close')}
         </PrimaryButton>
       }
     >
@@ -187,7 +188,7 @@ export const TestShakeSlideout = (
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} fontSize={TYPOGRAPHY.fontSizeP}>
           <Text fontWeight={TYPOGRAPHY.fontWeightRegular}>
-            {t('test_shake_slideout_banner_info', { ns: 'heater_shaker' })}
+            {t('heater_shaker:test_shake_slideout_banner_info')}
           </Text>
         </Flex>
       </Flex>
@@ -276,8 +277,7 @@ export const TestShakeSlideout = (
               value={shakeValue}
               onChange={e => setShakeValue(e.target.value)}
               type="number"
-              caption={t('min_max_rpm', {
-                ns: 'heater_shaker',
+              caption={t('heater_shaker:min_max_rpm', {
                 min: HS_RPM_MIN,
                 max: HS_RPM_MAX,
               })}
@@ -321,10 +321,9 @@ export const TestShakeSlideout = (
         <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
       )}
       <Link
+        role="button"
         marginTop={SPACING.spacing2}
-        fontSize={TYPOGRAPHY.fontSizeP}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        color={COLORS.blue}
+        css={TYPOGRAPHY.linkPSemiBold}
         id={'HeaterShaker_Attachment_Instructions'}
         onClick={() => setShowWizard(true)}
       >
