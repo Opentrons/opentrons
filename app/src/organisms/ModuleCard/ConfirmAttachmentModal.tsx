@@ -108,7 +108,6 @@ export const ConfirmAttachmentModal = (
             role="button"
             onClick={onCloseClick}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginRight={SPACING.spacing5}
             css={TYPOGRAPHY.linkPSemiBold}
           >
