@@ -161,13 +161,16 @@ export function useModuleOverflowMenu(
         disabled={isLatchDisabled || isDisabled}
         {...targetProps}
       >
-        {t(isLatchClosed ? 'open_labware_latch' : 'close_labware_latch', {
-          ns: 'heater_shaker',
-        })}
+        {t(
+          isLatchClosed
+            ? 'heater_shaker:open_labware_latch'
+            : 'heater_shaker:close_labware_latch',
+          {}
+        )}
       </MenuItem>
       {isLatchDisabled ? (
         <Tooltip tooltipProps={tooltipProps}>
-          {t('cannot_open_latch', { ns: 'heater_shaker' })}
+          {t('heater_shaker:cannot_open_latch')}
         </Tooltip>
       ) : null}
     </>
@@ -192,7 +195,7 @@ export function useModuleOverflowMenu(
       data-testid={`hs_attach_to_deck_${module.moduleModel}`}
       onClick={() => handleWizardClick()}
     >
-      {t('show_attachment_instructions', { ns: 'heater_shaker' })}
+      {t('heater_shaker:show_attachment_instructions')}
     </MenuItem>
   )
   const testShakeBtn =
@@ -200,14 +203,14 @@ export function useModuleOverflowMenu(
     module.data.speedStatus !== 'idle' ? (
       <MenuItem
         width="100%"
-        key={`about_module_${module.moduleModel}`}
-        id={`about_module_${module.moduleModel}`}
-        data-testid={`about_module_${module.moduleModel}`}
+        key={`test_shake_${module.moduleModel}`}
+        id={`test_shake_${module.moduleModel}`}
+        data-testid={`test_shake_${module.moduleModel}`}
         onClick={() =>
           handleDeactivationCommand('heaterShaker/deactivateShaker')
         }
       >
-        {t('deactivate_shaker', { ns: 'heater_shaker' })}
+        {t('heater_shaker:deactivate_shaker')}
       </MenuItem>
     ) : (
       <MenuItem
@@ -216,7 +219,7 @@ export function useModuleOverflowMenu(
         key={`hs_test_shake_btn_${module.moduleModel}`}
         disabled={isDisabled}
       >
-        {t('test_shake', { ns: 'heater_shaker' })}
+        {t('heater_shaker:test_shake')}
       </MenuItem>
     )
 
@@ -335,8 +338,8 @@ export function useModuleOverflowMenu(
         setSetting:
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
           module.data.temperatureStatus !== 'idle'
-            ? t('deactivate_heater', { ns: 'heater_shaker' })
-            : t('set_temperature', { ns: 'heater_shaker' }),
+            ? t('heater_shaker:deactivate_heater')
+            : t('heater_shaker:set_temperature'),
         isSecondary: false,
         disabledReason: false,
         menuButtons: [
