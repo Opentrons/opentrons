@@ -50,6 +50,8 @@ def pretty_hostname_is_valid(pretty_hostname: str) -> bool:
 
 async def get_pretty_hostname(default: str = "no name set") -> str:
     """Get the currently-configured pretty hostname"""
+    # NOTE: The `api` package also retrieves the pretty hostname.
+    # This logic must be kept in sync with the logic in `api`.
     result = (
         await _run_command(
             command="hostnamectl",

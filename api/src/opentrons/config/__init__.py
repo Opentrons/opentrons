@@ -101,6 +101,9 @@ def name() -> str:
         SystemArchitecture.YOCTO,
     ):
         try:
+            # Read the name from the machine's pretty hostname, which is maintained
+            # by update-server. This retrieval logic needs to be kept in sync with
+            # update-server.
             result = subprocess.check_output(
                 ["hostnamectl", "--pretty", "status"]
             ).decode("utf-8")
