@@ -52,7 +52,6 @@ const mockWifiKeys = [
 ]
 
 const mockEapOptions = [Fixtures.mockEapOption]
-const mockUpdateRobotStatus = jest.fn()
 
 const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
   typeof Networking.getWifiList
@@ -125,7 +124,7 @@ describe('<TemporarySelectNetwork />', () => {
       return mount(
         <TemporarySelectNetwork
           robotName={mockRobotName}
-          updateRobotStatus={mockUpdateRobotStatus}
+          isRobotBusy={false}
         />,
         {
           wrappingComponent: Provider,

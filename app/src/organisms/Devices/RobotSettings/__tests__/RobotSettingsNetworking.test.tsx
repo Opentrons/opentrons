@@ -11,8 +11,6 @@ import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
 jest.mock('../../../../redux/networking/selectors')
 jest.mock('../../../../redux/robot-api/selectors')
 
-const mockUpdateRobotStatus = jest.fn()
-
 const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
   typeof Networking.getNetworkInterfaces
 >
@@ -24,10 +22,7 @@ const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <RobotSettingsNetworking
-        robotName="otie"
-        updateRobotStatus={mockUpdateRobotStatus}
-      />
+      <RobotSettingsNetworking robotName="otie" isRobotBusy={false} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
