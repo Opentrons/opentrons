@@ -7,7 +7,7 @@ import { renderWithProviders, Mount } from '@opentrons/components'
 import { i18n } from '../../../../../i18n'
 import { mockDeckCalData } from '../../../../../redux/calibration/__fixtures__'
 import { useCalibratePipetteOffset } from '../../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { useDeckCalibrationData, useIsRobotBusy } from '../../../hooks'
+import { useDeckCalibrationData } from '../../../hooks'
 
 import { OverflowMenu } from '../OverflowMenu'
 
@@ -36,14 +36,9 @@ jest.mock('../../../hooks')
 const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFunction<
   typeof useCalibratePipetteOffset
 >
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
->
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
 >
-
-const mockUpdateRobotStatus = jest.fn()
 
 describe('OverflowMenu', () => {
   let props: React.ComponentProps<typeof OverflowMenu>
@@ -54,10 +49,9 @@ describe('OverflowMenu', () => {
       robotName: ROBOT_NAME,
       mount: 'left' as Mount,
       serialNumber: 'serialNumber',
-      updateRobotStatus: mockUpdateRobotStatus,
+      isRobotBusy: false,
     }
     mockUseCalibratePipetteOffset.mockReturnValue([startCalibration, null])
-    mockUseIsRobotBusy.mockReturnValue(false)
     mockUseDeckCalibrationData.mockReturnValue({
       isDeckCalibrated: true,
       deckCalibrationData: mockDeckCalData,
@@ -142,28 +136,29 @@ describe('OverflowMenu', () => {
   })
 
   it('should call update robot status if a robot is busy - pipette offset', () => {
-    mockUseIsRobotBusy.mockReturnValue(true)
+    props = {
+      ...props,
+      isRobotBusy: true,
+    }
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
     const calibrationButton = getByText('Calibrate Pipette Offset')
-    fireEvent.click(calibrationButton)
-    expect(mockUpdateRobotStatus).toHaveBeenCalled()
+    expect(calibrationButton).toBeDisabled()
   })
 
   it('should call update robot status if a robot is busy - tip length', () => {
     props = {
       ...props,
       calType: 'tipLength',
+      isRobotBusy: true,
     }
-    mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
     const calibrationButton = getByText(
       'Recalibrate Tip Length and Pipette Offset'
     )
-    fireEvent.click(calibrationButton)
-    expect(mockUpdateRobotStatus).toHaveBeenCalled()
+    expect(calibrationButton).toBeDisabled()
   })
 })
