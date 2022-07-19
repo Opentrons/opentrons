@@ -50,11 +50,35 @@ async def test_speed(heatershaker: HeaterShaker) -> None:
     """It should speed up, then slow down."""
 
     await heatershaker.wait_next_poll()
+    await heatershaker.set_speed(550)
+    assert heatershaker.target_speed == 550
+
+    # The acceptable delta for actual speed is 100
+    assert 450 <= heatershaker.speed <= 650
+
+
+async def test_deactivate_shaker(heatershaker: HeaterShaker) -> None:
+    """It should speed up, then slow down."""
+
+    await heatershaker.wait_next_poll()
     await heatershaker.set_speed(150)
     assert heatershaker.target_speed == 150
 
-    # The acceptable delta for actual speed is 100
-    assert 50 <= heatershaker.speed <= 250
+    await heatershaker.deactivate_shaker()
+
+    # Confirm that target speed is instantly set to None
+    assert heatershaker.target_speed is None
+
+    # H/S is set to slow down at 100 rpm/tick
+    # If we wait 1 tick it will be at 50rpm
+    await heatershaker.wait_next_poll()
+    assert heatershaker.target_speed is None
+    assert heatershaker.speed == 50
+
+    # If we wait another tick it should go to 50rpm (not -50)
+    await heatershaker.wait_next_poll()
+    assert heatershaker.target_speed is None
+    assert heatershaker.speed == 0
 
 
 async def test_temp(heatershaker: HeaterShaker) -> None:
@@ -69,15 +93,6 @@ async def test_temp(heatershaker: HeaterShaker) -> None:
 
     await heatershaker.await_temperature(50.0)
     assert heatershaker.target_temperature == 50.0
+
+    # Acceptable delta is 0.7 degrees
     assert 49.3 <= heatershaker.temperature <= 50.7
-
-
-async def test_deactivate(heatershaker: HeaterShaker) -> None:
-    await heatershaker.wait_next_poll()
-    await heatershaker.set_speed(150)
-    assert heatershaker.target_speed == 150
-
-    await heatershaker.wait_next_poll()
-    await heatershaker.deactivate_shaker()
-    assert heatershaker.target_speed is None
-    assert heatershaker.speed == 0

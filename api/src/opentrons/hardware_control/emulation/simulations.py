@@ -83,7 +83,6 @@ class RPM(Simulation):
             self._current += self._per_tick
         else:
             self._current -= self._per_tick
-        self._current
 
     def deactivate(self, rpm: float) -> None:
         """Deactivate and reset to rpm"""

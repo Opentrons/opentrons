@@ -87,7 +87,10 @@ class HeaterShakerEmulator(AbstractEmulator):
         return "M3"
 
     def _get_rpm(self, command: Command) -> str:
-        res = f"M123 C:{self._rpm.current} T:{self._rpm.target if self._rpm.target is not None else 0}"
+        res = (
+            f"M123 C:{self._rpm.current} "
+            f"T:{self._rpm.target if self._rpm.target is not None else 0}"
+        )
         self._rpm.tick()
         return res
 
@@ -106,7 +109,7 @@ class HeaterShakerEmulator(AbstractEmulator):
         return res
 
     def _home(self, command: Command) -> str:
-        self._rpm.set_target(None)
+        self._rpm.set_target(0.0)
         return "G28"
 
     def _enter_bootloader(self, command: Command) -> None:
