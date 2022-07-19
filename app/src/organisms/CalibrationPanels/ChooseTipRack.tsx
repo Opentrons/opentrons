@@ -202,10 +202,11 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
   const handleUseTipRack = (): void => {
     const value = (selectedValue as SelectOption).value
     const selectedTipRack = tipRackByUriMap[value]
-    // @ts-expect-error(sa, 2021-05-26): need to type narrow, avoiding src code change for now
-    if (!isEqual(chosenTipRack, selectedTipRack.definition)) {
-      // @ts-expect-error(sa, 2021-05-26): need to type narrow, avoiding src code change for now
-      handleChosenTipRack(selectedTipRack.definition)
+    if (!isEqual(chosenTipRack, selectedTipRack?.definition)) {
+      handleChosenTipRack(
+        (selectedTipRack?.definition != null && selectedTipRack.definition) ||
+          null
+      )
     }
     closeModal()
   }

@@ -62,13 +62,13 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
     error,
     onValueChange,
     onLoseFocus,
-    isSearchable,
+    isSearchable = true,
     width,
   } = props
   // @ts-expect-error(mc, 2021-03-19): resolve this error
   const allOptions = options.flatMap(og => og.options || [og])
   const value = find(allOptions, opt => opt.value === props.value) || null
-  const caption = error || props.caption
+  const caption = error != null || props.caption
 
   return (
     <>
@@ -91,9 +91,9 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
           const value = (opt as SelectOption).value
           onValueChange?.(name, value, e)
         }}
-        onBlur={() => onLoseFocus && onLoseFocus(name)}
+        onBlur={() => onLoseFocus?.(name)}
       />
-      {caption && <Flex css={CAPTION_STYLE}>{caption}</Flex>}
+      {caption != null && <Flex css={CAPTION_STYLE}>{caption}</Flex>}
     </>
   )
 }

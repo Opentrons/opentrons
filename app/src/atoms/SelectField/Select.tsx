@@ -99,8 +99,10 @@ export function Select(props: SelectComponentProps): JSX.Element {
     }),
     option: (styles: any, state: any) => ({
       ...styles,
-      color: state.isDisabled ? COLORS.greyDisabled : COLORS.darkBlack,
-      backgroundColor: state.isSelected ? COLORS.lightBlue : COLORS.white,
+      color: Boolean(state.isDisabled) ? COLORS.greyDisabled : COLORS.darkBlack,
+      backgroundColor: Boolean(state.isSelected)
+        ? COLORS.lightBlue
+        : COLORS.white,
       '&:hover': {
         backgroundColor: COLORS.lightBlue,
       },
@@ -112,6 +114,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       ...styles,
       marginLeft: SPACING.spacingSS,
       color: COLORS.darkBlack,
+      fontSize: TYPOGRAPHY.fontSizeP,
     }),
     singleValue: (styles: any) => ({
       ...styles,
@@ -143,7 +146,11 @@ function DropdownIndicator(
         width={SPACING.spacingM}
       >
         <Icon
-          name={props.selectProps.menuIsOpen ? 'chevron-up' : 'chevron-down'}
+          name={
+            Boolean(props.selectProps.menuIsOpen)
+              ? 'chevron-up'
+              : 'chevron-down'
+          }
           height={TYPOGRAPHY.lineHeight16}
         />
       </Box>
