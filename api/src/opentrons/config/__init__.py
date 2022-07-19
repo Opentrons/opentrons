@@ -108,9 +108,9 @@ def name() -> str:
         #
         # We let the exception propagate so the caller (probably an HTTP client
         # polling /health) can retry later.
-        result = subprocess.check_output(
-            ["hostnamectl", "--pretty", "status"]
-        ).decode("utf-8")
+        result = subprocess.check_output(["hostnamectl", "--pretty", "status"]).decode(
+            "utf-8"
+        )
 
         # Strip the trailing newline, since it's not part of the actual name value.
         # TODO(mm, 2022-07-18): When we upgrade to systemd 249, use
