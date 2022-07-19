@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   Box,
   Text,
-  TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
   FONT_BODY_1_DARK,
   FONT_WEIGHT_SEMIBOLD,
 } from '@opentrons/components'
@@ -30,7 +30,7 @@ export function LabeledValue(props: Props): JSX.Element {
       <Text
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         margin="0 0 0.25rem"
-        textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        textTransform={TYPOGRAPHY.textTransformCapitalize}
         {...labelProps}
       >
         {label}

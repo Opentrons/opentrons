@@ -18,9 +18,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
-  TEXT_DECORATION_UNDERLINE,
   useConditionalConfirm,
-  TEXT_TRANSFORM_CAPITALIZE,
   JUSTIFY_FLEX_END,
   Btn,
   DIRECTION_ROW,
@@ -230,7 +228,7 @@ export function AdvancedSettings(): JSX.Element {
                   >
                     <Btn
                       onClick={cancelExit}
-                      textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                      textTransform={TYPOGRAPHY.textTransformCapitalize}
                       color={COLORS.blue}
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                       marginRight={SPACING.spacing6}
@@ -416,7 +414,7 @@ export function AdvancedSettings(): JSX.Element {
                     href={REALTEK_URL}
                     css={TYPOGRAPHY.pRegular}
                     color={COLORS.darkBlack}
-                    textDecoration={TEXT_DECORATION_UNDERLINE}
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
                     id="AdvancedSettings_realtekLink"
                   >
                     {t('usb_to_ethernet_adapter_link')}

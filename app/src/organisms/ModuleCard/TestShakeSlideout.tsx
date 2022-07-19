@@ -14,7 +14,6 @@ import {
   DIRECTION_COLUMN,
   Icon,
   DIRECTION_ROW,
-  TEXT_TRANSFORM_CAPITALIZE,
   SIZE_AUTO,
   ALIGN_FLEX_START,
   Link,
@@ -150,7 +149,7 @@ export const TestShakeSlideout = (
       isExpanded={isExpanded}
       footer={
         <PrimaryButton
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
           width="100%"
           onClick={onCloseClick}
           data-testid={`Temp_Slideout_set_temp_btn_${name}`}
@@ -205,7 +204,7 @@ export const TestShakeSlideout = (
         >
           <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing3}>
             <Text
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.darkBlack}
@@ -213,7 +212,7 @@ export const TestShakeSlideout = (
               {t('heater_shaker:labware_latch')}
             </Text>
             <Text
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
               color={COLORS.darkBlack}
               marginTop={SPACING.spacing3}
@@ -225,7 +224,7 @@ export const TestShakeSlideout = (
           {isShaking ? (
             <TertiaryButton
               marginTop={SPACING.spacing2}
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeCaption}
               marginLeft={SIZE_AUTO}
               onClick={toggleLatch}
@@ -239,7 +238,7 @@ export const TestShakeSlideout = (
           ) : (
             <TertiaryButton
               marginTop={SPACING.spacing2}
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeCaption}
               marginLeft={SIZE_AUTO}
               onClick={toggleLatch}
@@ -291,7 +290,7 @@ export const TestShakeSlideout = (
           </Flex>
           {!isLatchClosed || (shakeValue === null && !isShaking) ? (
             <TertiaryButton
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
               marginLeft={SIZE_AUTO}
               marginTop={SPACING.spacing3}
               onClick={confirmAttachment}
@@ -302,7 +301,7 @@ export const TestShakeSlideout = (
             </TertiaryButton>
           ) : (
             <TertiaryButton
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
               marginLeft={SIZE_AUTO}
               marginTop={SPACING.spacing3}
               onClick={confirmAttachment}

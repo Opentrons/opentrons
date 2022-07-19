@@ -9,14 +9,12 @@ import {
   DIRECTION_ROW,
   ALIGN_START,
   DIRECTION_COLUMN,
-  TEXT_TRANSFORM_UPPERCASE,
   SPACING,
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_CAPTION,
   TYPOGRAPHY,
   useOnClickOutside,
   Btn,
-  TEXT_DECORATION_UNDERLINE,
   IconProps,
   useHoverTooltip,
   COLORS,
@@ -308,7 +306,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     <Btn
                       textAlign={ALIGN_START}
                       fontSize={TYPOGRAPHY.fontSizeP}
-                      textDecoration={TEXT_DECORATION_UNDERLINE}
+                      textDecoration={TYPOGRAPHY.textDecorationUnderline}
                       onClick={() => handleUpdateClick()}
                     >
                       {t('update_now')}
@@ -356,7 +354,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             ) : (
               <>
                 <Text
-                  textTransform={TEXT_TRANSFORM_UPPERCASE}
+                  textTransform={TYPOGRAPHY.textTransformUppercase}
                   color={COLORS.darkGrey}
                   fontWeight={FONT_WEIGHT_REGULAR}
                   fontSize={FONT_SIZE_CAPTION}

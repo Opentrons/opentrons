@@ -10,7 +10,6 @@ import {
   DIRECTION_ROW,
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
-  TEXT_TRANSFORM_UPPERCASE,
   COLORS,
   TYPOGRAPHY,
   SPACING,
@@ -194,7 +193,7 @@ export const MagneticModuleSlideout = (
         color={COLORS.darkGreyEnabled}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         paddingTop={SPACING.spacing4}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        textTransform={TYPOGRAPHY.textTransformUppercase}
         paddingBottom={SPACING.spacing3}
         data-testid={`MagneticModuleSlideout_body_subtitle_${module.serialNumber}`}
       >

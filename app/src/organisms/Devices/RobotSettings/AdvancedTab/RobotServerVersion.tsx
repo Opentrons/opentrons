@@ -11,7 +11,6 @@ import {
   COLORS,
   Link,
   JUSTIFY_FLEX_END,
-  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { StyledText } from '../../../../atoms/text'
 import { Portal } from '../../../../App/portal'
@@ -94,7 +93,7 @@ export function RobotServerVersion({
             </StyledText>
             <TertiaryButton
               onClick={() => setShowVersionInfoModal(true)}
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
             >
               {t('reinstall')}
             </TertiaryButton>

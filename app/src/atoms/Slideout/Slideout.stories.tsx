@@ -2,11 +2,10 @@ import * as React from 'react'
 import {
   Text,
   TYPOGRAPHY,
-  SPACING_1,
-  C_BLUE,
   PrimaryBtn,
-  TEXT_TRANSFORM_NONE,
   FONT_WEIGHT_REGULAR,
+  COLORS,
+  SPACING,
 } from '@opentrons/components'
 import { Slideout } from './index'
 
@@ -27,15 +26,15 @@ const Children = (
     <Text
       fontWeight={600}
       fontSize={TYPOGRAPHY.fontSizeP}
-      paddingTop={SPACING_1}
+      paddingTop={SPACING.spacing2}
     >
       {'this is where the slideout body goes'}
     </Text>
 
     <PrimaryBtn
-      backgroundColor={C_BLUE}
+      backgroundColor={COLORS.blue}
       marginTop={'28rem'}
-      textTransform={TEXT_TRANSFORM_NONE}
+      textTransform={TYPOGRAPHY.textTransformNone}
     >
       <Text fontWeight={FONT_WEIGHT_REGULAR} fontSize="0.6875rem">
         {'btn text'}

@@ -13,7 +13,7 @@ import {
   useHoverTooltip,
   C_DISABLED,
   SIZE_5,
-  TEXT_DECORATION_UNDERLINE,
+  TYPOGRAPHY,
   TEXT_ALIGN_CENTER,
   TOOLTIP_LEFT,
   FONT_BODY_2_DARK,
@@ -222,7 +222,7 @@ export function TipLengthCalibration({
     <Link
       role="button"
       onClick={() => confirm(true)}
-      textDecoration={TEXT_DECORATION_UNDERLINE}
+      textDecoration={TYPOGRAPHY.textDecorationUnderline}
       css={FONT_BODY_2_DARK}
       id={'TipRackCalibration_recalibrateTipRackLink'}
     >

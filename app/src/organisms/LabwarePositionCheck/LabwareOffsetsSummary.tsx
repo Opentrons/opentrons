@@ -15,7 +15,6 @@ import {
   SPACING,
   TYPOGRAPHY,
   COLORS,
-  TEXT_TRANSFORM_UPPERCASE,
   Text,
   SIZE_3,
 } from '@opentrons/components'
@@ -65,7 +64,7 @@ const OffsetDataLoader = (): JSX.Element | null => {
         marginTop={SPACING.spacing6}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         fontSize={FONT_SIZE_BODY_2}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        textTransform={TYPOGRAPHY.textTransformUppercase}
       >
         {t('loading_labware_offsets')}
       </Text>
