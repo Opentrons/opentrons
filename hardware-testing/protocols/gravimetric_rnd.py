@@ -4,7 +4,7 @@ from opentrons.protocol_api import ProtocolContext
 from hardware_testing.opentrons_api.helpers import get_api_context
 from hardware_testing.measure.weight import GravimetricRecorder
 
-metadata = {"protocolName": "example-test", "apiLevel": "2.12"}
+metadata = {"protocolName": "gravimetric-rnd", "apiLevel": "2.12"}
 
 
 def _run(protocol: ProtocolContext) -> None:

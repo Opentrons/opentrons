@@ -67,7 +67,7 @@ window.addEventListener('load', function (evt) {
     function _onScreenSizeUpdate(evt) {
         var div = document.getElementById('plotly');
         div.style.width = (window.innerWidth - 50) + 'px';
-        div.style.height = (window.innerHeight - 50) + 'px';
+        div.style.height = (window.innerHeight - 100) + 'px';
     }
     _onScreenSizeUpdate(evt);
     window.addEventListener('resize', _onScreenSizeUpdate);
@@ -93,4 +93,29 @@ window.addEventListener('load', function (evt) {
     Plotly.newPlot('plotly', initData, layout, {responsive: true});
     setInterval(_getLatestDataFromServer, 500);
     _getLatestDataFromServer();
+
+    var name_input_div = document.getElementById('testname');
+    name_input_div.value = 'hi';
+    function _getTestNameFromServer(evt) {
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener('load', function () {
+            var responseData = JSON.parse(this.responseText);
+            name_input_div.value = responseData.name;
+        });
+        oReq.open('GET', 'http://' + window.location.host + '/name');
+        oReq.send();
+    }
+    _getTestNameFromServer();
+
+    var name_input_button = document.getElementById('testnamebutton');
+    function _setTestNameOfServer(evt) {
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener('load', function () {
+            var responseData = JSON.parse(this.responseText);
+            name_input_div.value = responseData.name;
+        });
+        oReq.open('GET', 'http://' + window.location.host + '/name/' + name_input_div.value);
+        oReq.send();
+    }
+    name_input_button.onclick = _setTestNameOfServer;
 });

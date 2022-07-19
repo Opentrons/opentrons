@@ -85,14 +85,14 @@ define move-plot-webpage
 ssh -i $(2) $(3) root@$(1) \
 "function cleanup () { mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
-mv /data/plot/index.html /usr/lib/python3.7/site-packages/hardware_testing/plot &&\
-mv /data/plot/index.js /usr/lib/python3.7/site-packages/hardware_testing/plot &&\
+mv /data/plot/index.html /usr/lib/python3.7/site-packages/hardware_testing/tools/plot &&\
+mv /data/plot/index.js /usr/lib/python3.7/site-packages/hardware_testing/tools/plot &&\
 cleanup || cleanup"
 endef
 
 .PHONY: push-plot-webpage
 push-plot-webpage:
-	scp -r $(br_ssh_key) $(ssh_opts) hardware_testing/plot root@$(host):/data
+	scp -r $(br_ssh_key) $(ssh_opts) hardware_testing/tools/plot root@$(host):/data
 	$(call move-plot-webpage,$(host),$(br_ssh_key),$(ssh_opts))
 
 .PHONY: push-no-restart

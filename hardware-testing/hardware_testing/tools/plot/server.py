@@ -12,9 +12,16 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
     """Plot Request Handler."""
 
     @property
+    def plot_directory(self) -> Path:
+        return self.server.plot_directory  # type: ignore[attr-defined]
+
+    @property
     def path_elements(self) -> List[str]:
         """Path elements."""
         return [el for el in self.path.split("/") if el]
+
+    def _set_plot_directory(self, directory: Path) -> None:
+        self.server.plot_directory = directory  # type: ignore[attr-defined]
 
     def _send_response_bytes(
         self, response: bytes, code: int = 200, content_type: str = "application/json"
@@ -41,7 +48,7 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
     def _list_files_in_directory(self) -> List[Path]:
         _file_list = [
             Path(f).resolve()
-            for f in self.server.plot_directory.iterdir()  # type: ignore[attr-defined]
+            for f in self.plot_directory.iterdir()
             if f.is_file()
         ]
         _file_list.sort(key=lambda f: f.stat().st_mtime)
@@ -53,21 +60,26 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
 
     def _get_file_contents(self, file_name: str) -> str:
         req_file_name = f"{file_name}.csv"
-        req_file_path = self.server.plot_directory / req_file_name  # type: ignore[attr-defined]
+        req_file_path = self.plot_directory / req_file_name
         with open(req_file_path.resolve(), "r") as f:
             return f.read()
 
     def _respond_to_data_request(self) -> None:
         req_cmd = self.path_elements[1]
         response_data = {
-            "directory": str(self.server.plot_directory.resolve()),  # type: ignore[attr-defined]
+            "directory": str(self.plot_directory.resolve()),
         }
         if req_cmd == "list":
             response_data["files"] = self._get_file_name_list()  # type: ignore[assignment]
         elif req_cmd == "latest":
-            file_name = self._get_file_name_list()[0]
-            response_data["name"] = file_name
-            response_data["csv"] = self._get_file_contents(file_name)
+            file_list = self._get_file_name_list()
+            if file_list:
+                file_name = file_list[0]
+                response_data["name"] = file_name
+                response_data["csv"] = self._get_file_contents(file_name)
+            else:
+                response_data["name"] = ''
+                response_data["csv"] = ''
         elif req_cmd == "file" and len(self.path_elements) > 1:
             file_name = self.path_elements[-1]
             response_data["name"] = file_name
@@ -77,11 +89,23 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         response_str = json.dumps({req_cmd: response_data})
         self._send_response_bytes(response_str.encode("utf-8"))
 
+    def _respond_to_new_name_request(self) -> None:
+        if len(self.path_elements) == 1:
+            response_str = json.dumps({'name': str(self.plot_directory.stem)})
+        else:
+            new_name = self.path_elements[1]
+            dir_path = create_folder_for_test_data(new_name)
+            self._set_plot_directory(dir_path)
+            response_str = json.dumps({'name': new_name})
+        self._send_response_bytes(response_str.encode("utf-8"))
+
     def do_GET(self) -> None:
         """Do GET."""
         try:
             if len(self.path_elements) > 1 and self.path_elements[0] == "data":
                 self._respond_to_data_request()
+            elif len(self.path_elements) > 0 and self.path_elements[0] == "name":
+                self._respond_to_new_name_request()
             else:
                 self._respond_to_frontend_file_request()
         except Exception as e:
@@ -93,13 +117,8 @@ class PlotServer(HTTPServer):
 
     def __init__(self, directory: Path, *args: Any, **kwargs: Any) -> None:
         """Plot Server."""
-        self._plot_directory = directory
+        self.plot_directory = directory
         super().__init__(*args, **kwargs)
-
-    @property
-    def plot_directory(self) -> Path:
-        """Plot directory."""
-        return self._plot_directory
 
 
 def _run(test_name: str, http_port: int) -> None:
@@ -115,7 +134,7 @@ def _run(test_name: str, http_port: int) -> None:
 
 if __name__ == "__main__":
     parser = ArgumentParser("Plot Server")
-    parser.add_argument("--test-name", type=str, required=True)
+    parser.add_argument("--test-name", type=str, default='example-test')
     parser.add_argument("--port", type=int, default=8080)
     _args = parser.parse_args()
     _run(test_name=_args.test_name, http_port=_args.port)

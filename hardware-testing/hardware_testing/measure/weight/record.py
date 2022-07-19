@@ -50,7 +50,7 @@ class GravimetricSample:
 
 
 class GravimetricRecording(List):
-    """Class to store a list of GravimetricSample instances."""
+    """Gravimetric Recording."""
 
     def __str__(self) -> str:
         """Get string."""
@@ -75,21 +75,18 @@ class GravimetricRecording(List):
         time_idx = header_list.index("time")
         grams_idx = header_list.index("grams")
         stable_idx = header_list.index("stable")
-        recording = GravimetricRecording()
-        for line in lines[1:]:  # skip the header
-            if not line:
-                continue
-            line_list = line.strip().split(",")
-            if len(line) <= 1:
-                continue
-            recording.append(
-                GravimetricSample(
-                    time=float(line_list[time_idx]),
-                    grams=float(line_list[grams_idx]),
-                    stable=bool(int(line_list[stable_idx])),
-                )
+        split_lines = [
+            line.strip().split(',') for line in lines[1:] if line
+        ]
+        return GravimetricRecording([
+            GravimetricSample(
+                time=float(split_line[time_idx]),
+                grams=float(split_line[grams_idx]),
+                stable=bool(int(split_line[stable_idx])),
             )
-        return recording
+            for split_line in split_lines
+            if len(split_line) > 1
+        ])
 
     @property
     def start_time(self) -> float:
