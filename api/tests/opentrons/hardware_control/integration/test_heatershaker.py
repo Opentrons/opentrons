@@ -70,3 +70,14 @@ async def test_temp(heatershaker: HeaterShaker) -> None:
     await heatershaker.await_temperature(50.0)
     assert heatershaker.target_temperature == 50.0
     assert 49.3 <= heatershaker.temperature <= 50.7
+
+
+async def test_deactivate(heatershaker: HeaterShaker) -> None:
+    await heatershaker.wait_next_poll()
+    await heatershaker.set_speed(150)
+    assert heatershaker.target_speed == 150
+
+    await heatershaker.wait_next_poll()
+    await heatershaker.deactivate_shaker()
+    assert heatershaker.target_speed is None
+    assert heatershaker.speed == 0
