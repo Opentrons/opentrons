@@ -49,14 +49,17 @@ def pretty_hostname_is_valid(pretty_hostname: str) -> bool:
 
 
 async def get_pretty_hostname(default: str = "no name set") -> str:
-    """Get the currently-configured pretty hostname"""
+    """Get the currently-configured pretty hostname.
+
+    May raise an exception from the underlying ``hostnamectl`` process
+    if this happens to run at the same time systemd-hostnamed is restarting.
+    """
     # NOTE: The `api` package also retrieves the pretty hostname.
     # This logic must be kept in sync with the logic in `api`.
     result = (
         await _run_command(
             command="hostnamectl",
-            # Only get the pretty hostname, not the static or transient one.
-            args=["status", "--pretty"],
+            args=["--pretty", "status"],
         )
     ).decode("utf-8")
     # Strip the trailing newline, since it's not part of the actual name value.
@@ -92,7 +95,9 @@ async def persist_pretty_hostname(new_pretty_hostname: str) -> None:
     # Now that we've rewritten /etc/machine-info to contain the new pretty hostname,
     # restart systemd-hostnamed so that commands like `hostnamectl status --pretty`
     # pick it up immediately.
-    await _run_command(command="systemctl", args=["restart", "systemd-hostnamed"])
+    await _run_command(
+        command="systemctl", args=["reload-or-restart", "systemd-hostnamed"]
+    )
 
     read_back_pretty_hostname = await get_pretty_hostname()
     assert read_back_pretty_hostname == new_pretty_hostname, (
@@ -201,3 +206,29 @@ def _rewrite_machine_info_str(
     ]
     new_contents = "\n".join(new_lines) + "\n"
     return new_contents
+
+
+# TODO(mm, 2022-07-18): Deduplicate with identical subprocess error-checking code
+# in .avahi and .static_hostname modules.
+async def _run_command(
+    command: Union[str, bytes],
+    args: List[Union[str, bytes]],
+) -> bytes:
+    process = await asyncio.create_subprocess_exec(
+        command,
+        *args,
+        stdin=asyncio.subprocess.DEVNULL,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    stdout, stderr = await process.communicate()
+    ret = process.returncode
+    if ret != 0:
+        _log.error(
+            f"Error calling {command!r}: {ret} "
+            f"stdout: {stdout!r} stderr: {stderr!r}"
+        )
+        # TODO(mm, 2022-07-18): Use a structured and specific exception type
+        # once this function is deduplicated.
+        raise RuntimeError(f"Error calling {command!r}")
+    return stdout

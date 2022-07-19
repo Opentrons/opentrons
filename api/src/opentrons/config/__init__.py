@@ -94,31 +94,32 @@ if IS_ROBOT:
 
 
 def name() -> str:
-    fallback = "opentrons-dev"
-
     if IS_ROBOT and ARCHITECTURE in (
         SystemArchitecture.BUILDROOT,
         SystemArchitecture.YOCTO,
     ):
-        try:
-            # Read the name from the machine's pretty hostname, which is maintained
-            # by update-server. This retrieval logic needs to be kept in sync with
-            # update-server.
-            result = subprocess.check_output(
-                ["hostnamectl", "--pretty", "status"]
-            ).decode("utf-8")
-            # Strip the trailing newline, since it's not part of the actual name value.
-            # TODO(mm, 2022-07-18): When we upgrade to systemd 249, use
-            # `hostnamectl --json` for CLI output that we can parse more robustly.
-            assert len(result) >= 1 and result[-1] == "\n"
-            return result[:-1]
+        # Read the name from the machine's pretty hostname, which is maintained
+        # by update-server. This retrieval logic needs to be kept in sync with
+        # update-server.
 
-        except Exception:
-            log.exception(
-                f"Couldn't load name from /etc/machine-info, defaulting to {fallback}"
-            )
+        # NOTE: This call to hostnamectl can fail momentarily if it runs
+        # at the same time as a systemd-hostnamed restart.
+        # update-server triggers such restarts regularly, any time the name changes.
+        #
+        # We let the exception propagate so the caller (probably an HTTP client
+        # polling /health) can retry later.
+        result = subprocess.check_output(["hostnamectl", "--pretty", "status"]).decode(
+            "utf-8"
+        )
 
-    return fallback
+        # Strip the trailing newline, since it's not part of the actual name value.
+        # TODO(mm, 2022-07-18): When we upgrade to systemd 249, use
+        # `hostnamectl --json` for CLI output that we can parse more robustly.
+        assert len(result) >= 1 and result[-1] == "\n"
+        return result[:-1]
+
+    else:
+        return "opentrons-dev"
 
 
 class ConfigElementType(enum.Enum):
