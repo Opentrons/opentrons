@@ -127,9 +127,31 @@ async def _run_command(
 
 
 def _quote_and_escape_pretty_hostname_value(pretty_hostname: str) -> str:
-    # TODO: Explain background of shell-ish syntax.
+    r"""Prepare a string to be used as the PRETTY_HOSTNAME value in /etc/machine-info.
+
+    This function implements the shell-like quoting and escaping rules described in
+    the /etc/machine-info documentation.
+
+    Given a string like:
+
+        Hello $ world
+
+    This returns:
+
+        "Hello \$ world"
+
+    (Including adding the double-quote characters at the beginning and end.)
+
+    The returned string can then be inserted into /etc/machine-info, like:
+
+        PRETTY_HOSTNAME="Hello \$ world"
+
+    https://www.freedesktop.org/software/systemd/man/machine-info.html
+    """
     assert pretty_hostname_is_valid(pretty_hostname)
     translation_table = str.maketrans(
+        # Escape dollar signs, double-quote characters, backslashes, and backticks
+        # with a single backslash each.
         {
             "$": r"\$",
             '"': r"\"",
