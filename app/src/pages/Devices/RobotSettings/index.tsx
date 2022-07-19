@@ -18,7 +18,7 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import { CONNECTABLE, UNREACHABLE, REACHABLE } from '../../../redux/discovery'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
-import { useRobot } from '../../../organisms/Devices/hooks'
+import { useIsRobotBusy, useRobot } from '../../../organisms/Devices/hooks'
 import { Line } from '../../../atoms/structure'
 import { NavTab } from '../../../atoms/NavTab'
 import { RobotSettingsCalibration } from '../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
@@ -42,6 +42,8 @@ export function RobotSettings(): JSX.Element | null {
     if (isRobotBusy) setShowRobotBusyBanner(true)
   }
 
+  const isRobotBusy = useIsRobotBusy({ poll: true })
+
   const robotSettingsContentByTab: {
     [K in RobotSettingsTab]: () => JSX.Element
   } = {
@@ -54,7 +56,7 @@ export function RobotSettings(): JSX.Element | null {
     networking: () => (
       <RobotSettingsNetworking
         robotName={robotName}
-        updateRobotStatus={updateRobotStatus}
+        isRobotBusy={isRobotBusy}
       />
     ),
     advanced: () => (

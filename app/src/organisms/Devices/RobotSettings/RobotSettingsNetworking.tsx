@@ -31,10 +31,10 @@ import { TemporarySelectNetwork } from './TemporarySelectNetwork'
 import type { State, Dispatch } from '../../../redux/types'
 interface NetworkingProps {
   robotName: string
-  updateRobotStatus: (isRobotBusy: boolean) => void
+  isRobotBusy: boolean
 }
 
-// ToDo modify ConnectModal to align with new design
+// ToDo kj modify ConnectModal to align with new design
 // This is temporary until we can get the new design details
 const HELP_CENTER_URL =
   'https://support.opentrons.com/s/article/Get-started-Connect-to-your-OT-2-over-USB'
@@ -43,7 +43,7 @@ const LIST_REFRESH_MS = 10000
 
 export function RobotSettingsNetworking({
   robotName,
-  updateRobotStatus,
+  isRobotBusy,
 }: NetworkingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const list = useSelector((state: State) => getWifiList(state, robotName))
@@ -100,7 +100,7 @@ export function RobotSettingsNetworking({
               <Box width="25%" marginRight={SPACING.spacing3}>
                 <TemporarySelectNetwork
                   robotName={robotName}
-                  updateRobotStatus={updateRobotStatus}
+                  isRobotBusy={isRobotBusy}
                 />
               </Box>
             </Flex>
@@ -139,14 +139,14 @@ export function RobotSettingsNetworking({
           <Flex flexDirection={DIRECTION_COLUMN}>
             <TemporarySelectNetwork
               robotName={robotName}
-              updateRobotStatus={updateRobotStatus}
+              isRobotBusy={isRobotBusy}
             />
           </Flex>
         )}
       </Box>
       <Divider />
       <Flex marginTop={SPACING.spacing5} marginBottom={SPACING.spacing4}>
-        {ethernet !== null && ethernet.ipAddress !== null ? (
+        {ethernet?.ipAddress != null ? (
           <Icon
             size={SPACING.spacing4}
             name="ot-check"
@@ -167,7 +167,7 @@ export function RobotSettingsNetworking({
       </Flex>
       <Box paddingLeft="3.5rem">
         <Flex marginBottom={SPACING.spacing4}>
-          {ethernet !== null && ethernet.ipAddress !== null ? (
+          {ethernet?.ipAddress != null ? (
             <>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
