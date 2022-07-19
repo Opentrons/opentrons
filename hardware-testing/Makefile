@@ -81,6 +81,20 @@ lint:
 format:
 	$(python) -m black hardware_testing tests protocols setup.py
 
+define move-plot-webpage
+ssh -i $(2) $(3) root@$(1) \
+"function cleanup () { mount -o remount,ro / ; } ;\
+mount -o remount,rw / &&\
+mv /data/plot/index.html /usr/lib/python3.7/site-packages/hardware_testing/plot &&\
+mv /data/plot/index.js /usr/lib/python3.7/site-packages/hardware_testing/plot &&\
+cleanup || cleanup"
+endef
+
+.PHONY: push-plot-webpage
+push-plot-webpage:
+	scp -r $(br_ssh_key) $(ssh_opts) hardware_testing/plot root@$(host):/data
+	$(call move-plot-webpage,$(host),$(br_ssh_key),$(ssh_opts))
+
 .PHONY: push-no-restart
 push-no-restart:
 	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
@@ -100,10 +114,10 @@ push-ot3: push-no-restart-ot3
 
 .PHONY: push-protocols
 push-protocols:
-	scp -r protocols root@$(host):/data/user_storage/opentrons_data
+	scp -r $(br_ssh_key) $(ssh_opts) protocols root@$(host):/data/user_storage/opentrons_data
 
 .PHONY: push-all
-push-all: clean wheel push-no-restart push-protocols
+push-all: clean wheel push-no-restart push-plot-webpage push-protocols
 
 .PHONY: term
 term:
