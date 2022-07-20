@@ -1,12 +1,17 @@
 import asyncio
+from time import sleep
 from typing import AsyncIterator, Iterator
 
 import pytest
 from mock import AsyncMock
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.emulation.settings import Settings
+from opentrons.hardware_control.emulation.util import TEMPERATURE_ROOM
 
 from opentrons.hardware_control.modules import HeaterShaker
+
+TEMP_ROOM_LOW = TEMPERATURE_ROOM - 0.7
+TEMP_ROOM_HIGH = TEMPERATURE_ROOM + 0.7
 
 
 @pytest.fixture
@@ -66,35 +71,35 @@ async def test_deactivate_shaker(heatershaker: HeaterShaker) -> None:
 
     await heatershaker.deactivate_shaker()
 
-    # Confirm that target speed is instantly set to None
-    assert heatershaker.target_speed is None
-
-    # H/S is set to slow down at 100 rpm/tick
-    # If we wait 1 tick it will be at 50rpm
-    await heatershaker.wait_next_poll()
-    assert heatershaker.target_speed is None
-    assert heatershaker.speed == 50
-
-    # If we wait another tick it should go to 50rpm (not -50)
-    await heatershaker.wait_next_poll()
-    assert heatershaker.target_speed is None
     assert heatershaker.speed == 0
+    assert heatershaker.target_speed is None
+
 
 async def test_deactivate_heater(heatershaker: HeaterShaker) -> None:
     await heatershaker.wait_next_poll()
-    await heatershaker.start_set_temperature(50.0)
-    await heatershaker.await_temperature(50.0)
-    assert heatershaker.target_temperature == 50.0
-    assert 49.3 <= heatershaker.temperature <= 50.7
+    await heatershaker.start_set_temperature(30.0)
+    await heatershaker.await_temperature(30.0)
+    assert heatershaker.target_temperature == 30.0
+    assert 29.3 <= heatershaker.temperature <= 30.7
 
     await heatershaker.deactivate_heater()
-    assert heatershaker.target_temperature is None
+    assert heatershaker.target_temperature == TEMPERATURE_ROOM
 
-    assert 49.3 <= heatershaker.temperature <= 50.7  # Temp should not change
+    # Have to wait for temperature to go down.
+    # Goes down 2 degrees per tick
     await heatershaker.wait_next_poll()
     await heatershaker.wait_next_poll()
     await heatershaker.wait_next_poll()
-    assert 49.3 <= heatershaker.temperature <= 50.7  # Temp should not change
+    await heatershaker.wait_next_poll()
+
+    # Temp should be in range
+    assert TEMP_ROOM_LOW <= heatershaker.temperature <= TEMP_ROOM_HIGH
+
+    await heatershaker.wait_next_poll()
+    await heatershaker.wait_next_poll()
+    await heatershaker.wait_next_poll()
+    # Temp should remain in range
+    assert TEMP_ROOM_LOW <= heatershaker.temperature <= TEMP_ROOM_HIGH
 
 
 async def test_temp(heatershaker: HeaterShaker) -> None:

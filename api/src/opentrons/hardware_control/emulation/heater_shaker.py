@@ -3,6 +3,7 @@
 The purpose is to provide a fake backend that responds to GCODE commands.
 """
 import logging
+from time import sleep
 from typing import (
     Optional,
 )
@@ -20,6 +21,7 @@ from .simulations import (
     Temperature,
     RPM,
 )
+from .util import TEMPERATURE_ROOM
 from ...drivers.types import HeaterShakerLabwareLatchStatus
 
 logger = logging.getLogger(__name__)
@@ -109,6 +111,8 @@ class HeaterShakerEmulator(AbstractEmulator):
         return res
 
     def _home(self, command: Command) -> str:
+        sleep(2)
+        self._rpm.deactivate(0.0)
         self._rpm.set_target(0.0)
         return "G28"
 
@@ -134,7 +138,7 @@ class HeaterShakerEmulator(AbstractEmulator):
         return f"M241 STATUS:{self._latch_status.value.upper()}"
 
     def _deactivate_heater(self, command: Command) -> str:
-        self._temperature.set_target(None)
+        self._temperature.set_target(TEMPERATURE_ROOM)
         return f"M106"
 
     @staticmethod
