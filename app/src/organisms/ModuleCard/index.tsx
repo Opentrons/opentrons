@@ -218,7 +218,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     setShowWizard(true)
   }
 
-
   return (
     <Flex
       backgroundColor={COLORS.background}
@@ -231,10 +230,14 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
         (currentRunId != null ? (
           <HeaterShakerWizard
             onCloseClick={() => setShowWizard(false)}
+            isLoadedInRun={false}
             currentRunId={currentRunId}
           />
         ) : (
-          <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+          <HeaterShakerWizard
+            onCloseClick={() => setShowWizard(false)}
+            isLoadedInRun={false}
+          />
         ))}
       {showSlideout && (
         <ModuleSlideout
@@ -259,7 +262,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           module={module as HeaterShakerModule}
           isExpanded={showTestShake}
           onCloseClick={() => setShowTestShake(false)}
-          runId={currentRunId != null ? currentRunId : undefined}
+          isLoadedInRun={isLoadedInRun}
+          currentRunId={currentRunId != null ? currentRunId : undefined}
         />
       )}
       <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">

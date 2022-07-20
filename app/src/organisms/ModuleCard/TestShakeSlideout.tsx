@@ -35,6 +35,7 @@ import { Divider } from '../../atoms/structure'
 import { InputField } from '../../atoms/InputField'
 import { Tooltip } from '../../atoms/Tooltip'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
+import { useRunStatuses } from '../Devices/hooks'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 import { useLatchControls } from './hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
@@ -49,34 +50,53 @@ interface TestShakeSlideoutProps {
   module: HeaterShakerModule
   onCloseClick: () => unknown
   isExpanded: boolean
-  runId?: string
+  isLoadedInRun: boolean
+  currentRunId?: string
 }
 
 export const TestShakeSlideout = (
   props: TestShakeSlideoutProps
 ): JSX.Element | null => {
-  const { module, onCloseClick, isExpanded, runId } = props
+  const {
+    module,
+    onCloseClick,
+    isExpanded,
+    isLoadedInRun,
+    currentRunId,
+  } = props
   const { t } = useTranslation(['device_details', 'shared', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { isRunIdle, isRunTerminal } = useRunStatuses()
   const { createCommand } = useCreateCommandMutation()
   const name = getModuleDisplayName(module.moduleModel)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'left',
   })
-  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
+  const { toggleLatch, isLatchClosed } = useLatchControls(
+    module,
+    isLoadedInRun,
+    currentRunId
+  )
   const { moduleIdFromRun } = useModuleIdFromRun(
     module,
-    runId != null ? runId : null
+    currentRunId != null ? currentRunId : null
   )
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const isShaking = module.data.speedStatus !== 'idle'
 
+  let moduleId: string | null = null
+  if (isRunIdle && currentRunId != null && isLoadedInRun) {
+    moduleId = moduleIdFromRun
+  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
+    moduleId = module.id
+  }
+
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
     commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
-      moduleId: runId != null ? moduleIdFromRun : module.id,
+      moduleId: moduleId != null ? moduleId : '',
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
     },
   }
@@ -84,14 +104,14 @@ export const TestShakeSlideout = (
   const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
     commandType: 'heaterShaker/deactivateShaker',
     params: {
-      moduleId: runId != null ? moduleIdFromRun : module.id,
+      moduleId: moduleId != null ? moduleId : '',
     },
   }
 
   const handleShakeCommand = (): void => {
-    if (runId != null) {
+    if (isRunIdle && currentRunId != null && isLoadedInRun) {
       createCommand({
-        runId: runId,
+        runId: currentRunId,
         command: isShaking ? stopShakeCommand : setShakeCommand,
       }).catch((e: Error) => {
         console.error(
@@ -100,7 +120,10 @@ export const TestShakeSlideout = (
           }: ${e.message}`
         )
       })
-    } else {
+    } else if (
+      (currentRunId != null && isRunTerminal) ||
+      currentRunId == null
+    ) {
       createLiveCommand({
         command: isShaking ? stopShakeCommand : setShakeCommand,
       }).catch((e: Error) => {
@@ -317,7 +340,10 @@ export const TestShakeSlideout = (
         </Flex>
       </Flex>
       {showWizard && (
-        <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+        <HeaterShakerWizard
+          onCloseClick={() => setShowWizard(false)}
+          isLoadedInRun={isLoadedInRun}
+        />
       )}
       <Link
         role="button"

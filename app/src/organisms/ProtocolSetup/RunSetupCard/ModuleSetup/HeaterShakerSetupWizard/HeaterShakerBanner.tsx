@@ -28,6 +28,7 @@ export function HeaterShakerBanner(
               onCloseClick={() => setShowWizard(false)}
               moduleFromProtocol={module}
               currentRunId={currentRunId != null ? currentRunId : undefined}
+              isLoadedInRun={true}
             />
           )}
           {index > 0 && <Divider color={COLORS.medGrey} />}

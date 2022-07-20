@@ -136,6 +136,7 @@ describe('TestShake', () => {
       setCurrentPage: jest.fn(),
       module: mockHeaterShaker,
       moduleFromProtocol: undefined,
+      isLoadedInRun: false,
     }
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
@@ -152,7 +153,7 @@ describe('TestShake', () => {
     mockUseRunStatuses.mockReturnValue({
       isLegacySessionInProgress: false,
       isRunStill: false,
-      isRunTerminal: true,
+      isRunTerminal: false,
       isRunIdle: false,
     })
     mockUseLatchControls.mockReturnValue({
@@ -181,6 +182,7 @@ describe('TestShake', () => {
       setCurrentPage: jest.fn(),
       module: mockHeaterShaker,
       moduleFromProtocol: HEATER_SHAKER_PROTOCOL_MODULE_INFO,
+      isLoadedInRun: true,
     }
     const { getByText } = render(props)
     getByText(
@@ -201,6 +203,7 @@ describe('TestShake', () => {
       module: mockHeaterShaker,
       setCurrentPage: jest.fn(),
       moduleFromProtocol: undefined,
+      isLoadedInRun: false,
     }
 
     mockUseLatchControls.mockReturnValue({
@@ -218,6 +221,7 @@ describe('TestShake', () => {
       module: mockCloseLatchHeaterShaker,
       setCurrentPage: jest.fn(),
       moduleFromProtocol: undefined,
+      isLoadedInRun: false,
     }
 
     const { getByRole } = render(props)
@@ -256,6 +260,7 @@ describe('TestShake', () => {
       module: mockOpenLatchHeaterShaker,
       setCurrentPage: jest.fn(),
       moduleFromProtocol: undefined,
+      isLoadedInRun: false,
     }
 
     mockUseLatchControls.mockReturnValue({
@@ -273,6 +278,7 @@ describe('TestShake', () => {
       module: mockCloseLatchHeaterShaker,
       setCurrentPage: jest.fn(),
       moduleFromProtocol: undefined,
+      isLoadedInRun: false,
     }
 
     mockUseLatchControls.mockReturnValue({
@@ -291,6 +297,7 @@ describe('TestShake', () => {
       module: mockOpenLatchHeaterShaker,
       setCurrentPage: jest.fn(),
       moduleFromProtocol: undefined,
+      isLoadedInRun: false,
     }
 
     mockUseLatchControls.mockReturnValue({
@@ -309,6 +316,7 @@ describe('TestShake', () => {
       module: mockCloseLatchHeaterShaker,
       setCurrentPage: jest.fn(),
       moduleFromProtocol: undefined,
+      isLoadedInRun: false,
     }
 
     const { getByRole } = render(props)
@@ -333,6 +341,7 @@ describe('TestShake', () => {
       module: mockMovingHeaterShaker,
       setCurrentPage: jest.fn(),
       moduleFromProtocol: undefined,
+      isLoadedInRun: false,
     }
 
     const { getByRole } = render(props)
@@ -351,19 +360,20 @@ describe('TestShake', () => {
     })
   })
 
-  it('renders protocol with runId and entering an input for shake speed and clicking start should begin shaking', () => {
-    props = {
-      module: mockCloseLatchHeaterShaker,
-      setCurrentPage: jest.fn(),
-      moduleFromProtocol: HEATER_SHAKER_PROTOCOL_MODULE_INFO,
-      currentRunId: RUN_ID_1,
-    }
+  it.only('renders protocol with runId and entering an input for shake speed and clicking start should begin shaking when run is idle', () => {
     mockUseRunStatuses.mockReturnValue({
       isLegacySessionInProgress: false,
       isRunStill: true,
       isRunTerminal: false,
       isRunIdle: true,
     })
+    props = {
+      module: mockHeaterShaker,
+      setCurrentPage: jest.fn(),
+      moduleFromProtocol: HEATER_SHAKER_PROTOCOL_MODULE_INFO,
+      currentRunId: RUN_ID_1,
+      isLoadedInRun: true,
+    }
     const { getByRole } = render(props)
     const button = getByRole('button', { name: /Start Shaking/i })
     const input = getByRole('spinbutton')
@@ -371,6 +381,7 @@ describe('TestShake', () => {
     fireEvent.click(button)
 
     expect(mockCreateCommand).toHaveBeenCalledWith({
+      runId: RUN_ID_1,
       command: {
         commandType: 'heaterShaker/setAndWaitForShakeSpeed',
         params: {
@@ -378,7 +389,39 @@ describe('TestShake', () => {
           rpm: 300,
         },
       },
-      runId: RUN_ID_1,
+    })
+  })
+
+  it('entering an input for shake speed and clicking start should begin shaking when there is a runId and run is terminal', () => {
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: true,
+      isRunIdle: false,
+    })
+
+    props = {
+      module: mockHeaterShaker,
+      setCurrentPage: jest.fn(),
+      moduleFromProtocol: HEATER_SHAKER_PROTOCOL_MODULE_INFO,
+      currentRunId: RUN_ID_1,
+      isLoadedInRun: true,
+    }
+
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: /Start Shaking/i })
+    const input = getByRole('spinbutton')
+    fireEvent.change(input, { target: { value: '300' } })
+    fireEvent.click(button)
+
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
+        params: {
+          moduleId: 'heatershaker_id',
+          rpm: 300,
+        },
+      },
     })
   })
 })

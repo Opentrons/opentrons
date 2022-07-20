@@ -23,12 +23,12 @@ import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 interface AttachAdapterProps {
   module: HeaterShakerModule
+  isLoadedInRun: boolean
   currentRunId?: string
 }
 export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
-  const { module, currentRunId } = props
+  const { module, isLoadedInRun, currentRunId } = props
   const { t } = useTranslation('heater_shaker')
-  const isLoadedInRun = currentRunId != null ? true : false
   const { toggleLatch, isLatchClosed } = useLatchControls(
     module,
     isLoadedInRun,

@@ -30,7 +30,10 @@ import type {
   TemperatureModuleDeactivateCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
-import type { AttachedModule } from '../../redux/modules/types'
+import type {
+  AttachedModule,
+  HeaterShakerModule,
+} from '../../redux/modules/types'
 
 export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
@@ -50,23 +53,22 @@ interface LatchControls {
 }
 
 export function useLatchControls(
-  module: AttachedModule,
+  module: HeaterShakerModule,
   isLoadedInRun: boolean,
-  runId?: string | null
+  currentRunId?: string | null
 ): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
-  const currentRunId = useCurrentRunId()
   const { isRunTerminal, isRunIdle } = useRunStatuses()
 
-  // const { moduleIdFromRun } = useModuleIdFromRun(
-  //   module,
-  //   currentRunId != null ? currentRunId : null
-  // )
+  const { moduleIdFromRun } = useModuleIdFromRun(
+    module,
+    currentRunId != null ? currentRunId : null
+  )
 
   let moduleId: string | null = null
   if (isRunIdle && currentRunId != null && isLoadedInRun) {
-    moduleId = '123'
+    moduleId = moduleIdFromRun
   } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
     moduleId = module.id
   }
@@ -94,7 +96,7 @@ export function useLatchControls(
         command: latchCommand,
       }).catch((e: Error) => {
         console.error(
-          `error setting module status with command type ${latchCommand.commandType} and run id ${runId}: ${e.message}`
+          `error setting module status with command type ${latchCommand.commandType} and run id ${currentRunId}: ${e.message}`
         )
       })
     } else if (
@@ -147,7 +149,7 @@ export function useModuleOverflowMenu(
   const { createCommand } = useCreateCommandMutation()
   const currentRunId = useCurrentRunId()
   const { toggleLatch, isLatchClosed } = useLatchControls(
-    module,
+    module as HeaterShakerModule,
     isLoadedInRun,
     currentRunId
   )

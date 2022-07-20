@@ -30,6 +30,7 @@ import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProt
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
+  isLoadedInRun: boolean
   moduleFromProtocol?: ProtocolModuleInfo
   currentRunId?: string
 }
@@ -37,7 +38,12 @@ interface HeaterShakerWizardProps {
 export const HeaterShakerWizard = (
   props: HeaterShakerWizardProps
 ): JSX.Element | null => {
-  const { onCloseClick, moduleFromProtocol, currentRunId } = props
+  const {
+    onCloseClick,
+    isLoadedInRun,
+    moduleFromProtocol,
+    currentRunId,
+  } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
   const { robotName } = useParams<NavRouteParams>()
@@ -96,23 +102,22 @@ export const HeaterShakerWizard = (
           heaterShaker != null ? (
             <AttachAdapter
               module={heaterShaker}
+              isLoadedInRun={isLoadedInRun}
               currentRunId={currentRunId != null ? currentRunId : undefined}
             />
           ) : null
         )
       case 5:
         buttonContent = t('complete')
-        return (
-          // heaterShaker should never be null because isPrimaryCTAEnabled would be disabled otherwise
-          heaterShaker != null ? (
-            <TestShake
-              module={heaterShaker}
-              setCurrentPage={setCurrentPage}
-              moduleFromProtocol={moduleFromProtocol}
-              currentRunId={currentRunId != null ? currentRunId : undefined}
-            />
-          ) : null
-        )
+        return heaterShaker != null ? (
+          <TestShake
+            module={heaterShaker}
+            setCurrentPage={setCurrentPage}
+            isLoadedInRun={isLoadedInRun}
+            moduleFromProtocol={moduleFromProtocol}
+            currentRunId={currentRunId != null ? currentRunId : undefined}
+          />
+        ) : null
       default:
         return null
     }

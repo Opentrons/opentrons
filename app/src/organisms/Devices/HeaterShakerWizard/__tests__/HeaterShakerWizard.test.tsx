@@ -61,6 +61,7 @@ describe('HeaterShakerWizard', () => {
   beforeEach(() => {
     props = {
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     mockUseAttachedModules.mockReturnValue([mockHeaterShaker])
     mockIntroduction.mockReturnValue(<div>Mock Introduction</div>)
@@ -110,6 +111,7 @@ describe('HeaterShakerWizard', () => {
     props = {
       onCloseClick: jest.fn(),
       currentRunId: RUN_ID_1,
+      isLoadedInRun: true,
       moduleFromProtocol: {
         moduleId: 'heater_shaker_id',
         x: 0,

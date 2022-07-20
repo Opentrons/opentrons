@@ -39,19 +39,23 @@ import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProt
 interface TestShakeProps {
   module: HeaterShakerModule
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
+  isLoadedInRun: boolean
   moduleFromProtocol?: ProtocolModuleInfo
   currentRunId?: string
 }
 
 export function TestShake(props: TestShakeProps): JSX.Element {
-  const { module, setCurrentPage, moduleFromProtocol, currentRunId } = props
+  const {
+    module,
+    setCurrentPage,
+    isLoadedInRun,
+    moduleFromProtocol,
+    currentRunId,
+  } = props
   const { t } = useTranslation(['heater_shaker', 'device_details'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
-  const [isExpanded, setExpanded] = React.useState(false)
   const { isRunIdle, isRunTerminal } = useRunStatuses()
-  const isLoadedInRun = currentRunId != null ? true : false
-  const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { toggleLatch, isLatchClosed } = useLatchControls(
     module,
@@ -62,6 +66,9 @@ export function TestShake(props: TestShakeProps): JSX.Element {
     module,
     currentRunId != null ? currentRunId : null
   )
+  const [isExpanded, setExpanded] = React.useState<boolean>(false)
+  const [shakeValue, setShakeValue] = React.useState<string | null>(null)
+  const isShaking = module.data.speedStatus !== 'idle'
 
   let moduleId: string | null = null
   if (isRunIdle && currentRunId != null && isLoadedInRun) {
@@ -69,7 +76,6 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
     moduleId = module.id
   }
-  const isShaking = module.data.speedStatus !== 'idle'
 
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
     commandType: 'heaterShaker/setAndWaitForShakeSpeed',
@@ -86,9 +92,6 @@ export function TestShake(props: TestShakeProps): JSX.Element {
     },
   }
 
-  console.log(setShakeCommand)
-  console.log(currentRunId)
-
   const handleShakeCommand = (): void => {
     if (isRunIdle && currentRunId != null && isLoadedInRun) {
       createCommand({
@@ -98,7 +101,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
         console.error(
           `error setting module status with command type ${
             stopShakeCommand.commandType ?? setShakeCommand.commandType
-          } and run id ${currentRunId}: ${e.message}`
+          }: ${e.message}`
         )
       })
     } else if (

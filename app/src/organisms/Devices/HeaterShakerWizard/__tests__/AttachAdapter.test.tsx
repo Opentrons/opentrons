@@ -48,6 +48,7 @@ describe('AttachAdapter', () => {
   beforeEach(() => {
     props = {
       module: mockHeaterShaker,
+      isLoadedInRun: false,
     }
     mockUseLatchControls.mockReturnValue({
       toggleLatch: jest.fn(),
@@ -95,6 +96,7 @@ describe('AttachAdapter', () => {
   it('renders button and it is disabled when heater-shaker is shaking', () => {
     props = {
       module: mockHeaterShakeShaking,
+      isLoadedInRun: false,
     }
     const { getByRole } = render(props)
     const btn = getByRole('button', { name: 'Open Labware Latch' })
@@ -104,6 +106,7 @@ describe('AttachAdapter', () => {
     props = {
       module: mockHeaterShaker,
       currentRunId: RUN_ID_1,
+      isLoadedInRun: true,
     }
     const { getByRole } = render(props)
     const btn = getByRole('button', { name: 'Open Labware Latch' })
