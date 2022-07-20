@@ -139,7 +139,7 @@ class HeaterShakerEmulator(AbstractEmulator):
 
     def _deactivate_heater(self, command: Command) -> str:
         self._temperature.set_target(TEMPERATURE_ROOM)
-        return f"M106"
+        return "M106"
 
     @staticmethod
     def get_terminator() -> bytes:
