@@ -22,7 +22,7 @@ async def get_pretty_hostname(default: str = "no name set") -> str:
     # NOTE: The `api` package also retrieves the pretty hostname.
     # This logic must be kept in sync with the logic in `api`.
     result = (
-        await _run_command(
+        await _run_subprocess(
             command="hostnamectl",
             args=["--pretty", "status"],
         )
@@ -55,7 +55,7 @@ async def persist_pretty_hostname(name: str) -> str:
     # Now that we've rewritten /etc/machine-info to contain the new pretty hostname,
     # restart systemd-hostnamed so that commands like `hostnamectl status --pretty`
     # pick it up immediately.
-    await _run_command(
+    await _run_subprocess(
         command="systemctl", args=["reload-or-restart", "systemd-hostnamed"]
     )
 
@@ -102,7 +102,7 @@ def _rewrite_machine_info_str(
 
 # TODO(mm, 2022-07-18): Deduplicate with identical subprocess error-checking code
 # in .avahi and .static_hostname modules.
-async def _run_command(
+async def _run_subprocess(
     command: Union[str, bytes],
     args: List[Union[str, bytes]],
 ) -> bytes:
