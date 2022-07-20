@@ -52,8 +52,6 @@ const mockTipLengthCalibrations = [
   },
 ]
 
-const mockUpdateRobotStatus = jest.fn()
-
 const render = (
   props: React.ComponentProps<typeof TipLengthCalibrationItems>
 ): ReturnType<typeof renderWithProviders> => {
@@ -70,7 +68,7 @@ describe('TipLengthCalibrationItems', () => {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
       formattedTipLengthCalibrations: mockTipLengthCalibrations,
-      updateRobotStatus: mockUpdateRobotStatus,
+      isRobotBusy: false,
     }
   })
 
