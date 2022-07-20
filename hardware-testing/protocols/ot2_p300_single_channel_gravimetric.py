@@ -1,5 +1,6 @@
 """OT2 P300 Single Channel Gravimetric Test."""
 from pathlib import Path
+import threading
 
 from opentrons.protocol_api import ProtocolContext
 
@@ -51,7 +52,8 @@ def _test_gravimetric(
         pip_id = get_pipette_unique_name(liq_pipette.pipette)
         vol_str = str(round(volume, 2)).replace(".", "-")
         recorder.set_tag(tag=f"{pip_id}-{vol_str}-ul-{tag}")
-        rec = recorder.record(duration=STABLE_MEASURE_SECONDS)
+        recorder.record(duration=STABLE_MEASURE_SECONDS)
+        rec = recorder.recording
         print(
             f"\t[{tag}] average={round(rec.average, 5)}, "
             f"%cv={round(rec.calculate_cv() * 100, 3)}"
@@ -122,7 +124,9 @@ def _run(protocol: ProtocolContext) -> None:
     recorder.set_tag(f"P300-Single-Gen2-{pip_sn}")
 
     liquid_level.print_setup_instructions(user_confirm=not protocol.is_simulating())
+    # TODO: begin recording the scale
     _test_gravimetric(protocol, liq_pipette, layout, liquid_level, recorder)
+    # TODO: finish recording the scale
 
 
 if __name__ == "__main__":

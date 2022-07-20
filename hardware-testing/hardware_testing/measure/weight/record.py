@@ -1,7 +1,8 @@
 """Record weight measurements."""
 from dataclasses import dataclass
 from statistics import stdev
-from time import time
+from threading import Thread
+from time import sleep, time
 from typing import List, Optional, Callable
 
 from opentrons.protocol_api import ProtocolContext
@@ -195,7 +196,7 @@ def _record_get_interval_overlap(samples: GravimetricRecording, period: float) -
     return real_time - ideal_time
 
 
-class GravimetricRecorder:
+class GravimetricRecorder(Thread):
     """Gravimetric Recorder."""
 
     def __init__(self, ctx: ProtocolContext, test_name: str) -> None:
@@ -203,12 +204,9 @@ class GravimetricRecorder:
         self._ctx = ctx
         self._cfg = RecordConfig(test_name=test_name, duration=1.0, frequency=10)
         self._scale: Scale = Scale.build(ctx=ctx)
-        self._active = False
-
-    @property
-    def active(self) -> bool:
-        """Active."""
-        return self._active
+        self._recording = GravimetricRecording()
+        self._is_recording = False
+        super().__init__()
 
     @property
     def config(self) -> RecordConfig:
@@ -217,19 +215,13 @@ class GravimetricRecorder:
 
     def activate(self) -> None:
         """Activate."""
-        if self.active:
-            return
         self._scale.connect()
         self._scale.initialize()
         self._scale.tare(0.0)
-        self._active = True
 
     def deactivate(self) -> None:
         """Deactivate."""
-        if not self.active:
-            return
         self._scale.disconnect()
-        self._active = False
 
     def set_tag(self, tag: str) -> None:
         """Set tag."""
@@ -247,14 +239,47 @@ class GravimetricRecorder:
         """Calibrate scale."""
         self._scale.calibrate()
 
-    def record(self, duration: Optional[float] = None) -> GravimetricRecording:
+    def record(self, duration: Optional[float] = None, in_thread: bool = False) -> None:
         """Record."""
         if duration is not None:
             self._cfg.duration = duration
-        if self._cfg.save_to_disk:
-            return self._record_samples_to_disk()
+        if in_thread:
+            self.record_stop()
+            self.start()  # creates the thread
         else:
-            return self._record_samples()
+            self.record_start()
+            self.run()
+
+    def run(self) -> None:
+        self._wait_for_record_start()
+        if self._cfg.save_to_disk:
+            self._recording = self._record_samples_to_disk()
+        else:
+            self._recording = self._record_samples()
+        self.record_stop()
+
+    def wait_for_finish(self) -> None:
+        if self.is_alive():
+            self.join()
+
+    @property
+    def recording(self):
+        return self._recording
+
+    @property
+    def is_recording(self) -> bool:
+        return self._is_recording
+
+    def record_start(self) -> None:
+        self._is_recording = True
+
+    def record_stop(self) -> None:
+        self._is_recording = False
+
+    def _wait_for_record_start(self) -> None:
+        while not self.is_recording:
+            assert self.is_alive()
+            sleep(1.0 / self._cfg.frequency)
 
     def _record_samples(
             self,
@@ -271,6 +296,8 @@ class GravimetricRecorder:
         while len(_recording) < length and not _record_did_exceed_time(
                 _start_time, timeout
         ):
+            if not self.is_recording:
+                break
             mass = self._scale.read()
             _s = GravimetricSample(grams=mass.grams, stable=mass.stable, time=mass.time)
             if self._cfg.stable and not _s.stable:
@@ -285,7 +312,7 @@ class GravimetricRecorder:
                 _recording.append(_s)
                 if callable(on_new_sample):
                     on_new_sample(_recording)
-        assert len(_recording) == length, (
+        assert len(_recording) == length or not self.is_recording, (
             f"Scale recording timed out before accumulating "
             f"{length} samples (recorded {len(_recording)} samples)"
         )
@@ -306,8 +333,7 @@ class GravimetricRecorder:
         dump_data_to_file(
             self._cfg.test_name, _file_name, GravimetricSample.csv_header() + "\n"
         )
-        _recording = self._record_samples(
-            timeout=timeout, on_new_sample=_on_new_sample)
+        _rec = self._record_samples(timeout=timeout, on_new_sample=_on_new_sample)
         # add a final newline character to the CSV file
         append_data_to_file(self._cfg.test_name, _file_name, "\n")
-        return _recording
+        return _rec
