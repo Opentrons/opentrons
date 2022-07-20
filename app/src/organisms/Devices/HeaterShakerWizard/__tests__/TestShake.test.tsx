@@ -351,17 +351,17 @@ describe('TestShake', () => {
     })
   })
 
-  //  next test is sending module commands when run is idle and through module controls
-  it.only('entering an input for shake speed and clicking start should begin shaking when there is a run id', () => {
+  //  next test is sending module commands when run is terminal and through module controls
+  it('entering an input for shake speed and clicking start should begin shaking when there is a run id and run is terminal', () => {
     mockUseRunStatuses.mockReturnValue({
       isLegacySessionInProgress: false,
       isRunStill: false,
-      isRunTerminal: false,
-      isRunIdle: true,
+      isRunTerminal: true,
+      isRunIdle: false,
     })
 
     props = {
-      module: mockCloseLatchHeaterShaker,
+      module: mockHeaterShaker,
       setCurrentPage: jest.fn(),
       moduleFromProtocol: HEATER_SHAKER_PROTOCOL_MODULE_INFO,
       currentRunId: RUN_ID_1,
@@ -373,8 +373,7 @@ describe('TestShake', () => {
     fireEvent.change(input, { target: { value: '300' } })
     fireEvent.click(button)
 
-    expect(mockCreateCommand).toHaveBeenCalledWith({
-      runId: props.currentRunId,
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'heaterShaker/setAndWaitForShakeSpeed',
         params: {
