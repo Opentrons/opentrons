@@ -8,20 +8,27 @@
 	<style>
 		html, body {
 			height: 100%;
+			font-family: "Open Sans", verdana, arial, sans-serif;
 		}
 		#plotly {
-			border: solid 2px #006fff;
+			border: solid 2px black;
 			position: absolute;
 			left: 5px;
 			top: 55px;
 			display: inline-block;
 		}
+		#testnamecontainer {
+			position: absolute;
+			left: 8px;
+			top: 5px;
+			display: inline-block;
+		}
 	</style>
 </head>
 <body>
-	<div><p>
-		Test Name: <input type="text" id="testname" name="testname">
-		<button type="button" id="testnamebutton">Update</button>
+	<div><p id="testnamecontainer">
+		Test Name:
+		<input type="text" id="testname" name="testname">
 	</p></div>
 	<div id="plotly"></div>
 </body>

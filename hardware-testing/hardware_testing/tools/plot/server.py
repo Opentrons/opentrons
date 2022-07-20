@@ -121,7 +121,8 @@ class PlotServer(HTTPServer):
         super().__init__(*args, **kwargs)
 
 
-def _run(test_name: str, http_port: int) -> None:
+def run(test_name: str, http_port: int) -> None:
+    """Run a Plot Server Instance"""
     dir_path = create_folder_for_test_data(test_name)
     server = PlotServer(dir_path, ("0.0.0.0", http_port), PlotRequestHandler)
     print(f"Plot server running on port: {http_port}")
@@ -130,11 +131,3 @@ def _run(test_name: str, http_port: int) -> None:
     except KeyboardInterrupt:
         pass
     server.server_close()
-
-
-if __name__ == "__main__":
-    parser = ArgumentParser("Plot Server")
-    parser.add_argument("--test-name", type=str, default='example-test')
-    parser.add_argument("--port", type=int, default=8080)
-    _args = parser.parse_args()
-    _run(test_name=_args.test_name, http_port=_args.port)

@@ -63,59 +63,78 @@ function parseGravimetricCSV(CSVData) {
 }
 
 window.addEventListener('load', function (evt) {
-    // resize the Plotly div so it's nearly the size of the screen
-    function _onScreenSizeUpdate(evt) {
-        var div = document.getElementById('plotly');
-        div.style.width = (window.innerWidth - 50) + 'px';
-        div.style.height = (window.innerHeight - 100) + 'px';
-    }
-    _onScreenSizeUpdate(evt);
-    window.addEventListener('resize', _onScreenSizeUpdate);
-
+    var _updateIntervalMillis = 1000;
+    var _interval = undefined;
     var layout = {
         title: 'Untitled',
         uirevision: true,
         xaxis: {autorange: true},
         yaxis: {autorange: true},
     };
+    var name_input_div = document.getElementById('testname');
+    var plotlyDivName = 'plotly';
+
+    function _clearInterval() {
+        if (_interval) {
+            clearInterval(_interval);
+            _interval = undefined;
+        }
+    }
+
+    function _onScreenSizeUpdate(evt) {
+        var div = document.getElementById(plotlyDivName);
+        div.style.width = (window.innerWidth - 50) + 'px';
+        div.style.height = (window.innerHeight - 100) + 'px';
+    }
+
+    function _initializePlot() {
+        var initData = getEmptyPlotlyData();
+        layout.title = ''
+        Plotly.newPlot('plotly', initData, layout, {responsive: true});
+    }
+
+    function _onTestNameResponse() {
+        var responseData = JSON.parse(this.responseText);
+        name_input_div.value = responseData.name;
+        _clearInterval();
+        _interval = setInterval(_getLatestDataFromServer, _updateIntervalMillis);
+        _getLatestDataFromServer();
+    }
+
     function _getLatestDataFromServer(evt) {
         var oReq = new XMLHttpRequest();
         oReq.addEventListener('load', function () {
             var responseData = JSON.parse(this.responseText);
             var newData = parseGravimetricCSV(responseData.latest.csv);
             layout.title = responseData.latest.name
-            Plotly.react('plotly', newData, layout, {responsive: true});
+            Plotly.react(plotlyDivName, newData, layout, {responsive: true});
         });
         oReq.open('GET', 'http://' + window.location.host + '/data/latest');
         oReq.send();
     }
-    var initData = getEmptyPlotlyData();
-    Plotly.newPlot('plotly', initData, layout, {responsive: true});
-    setInterval(_getLatestDataFromServer, 500);
-    _getLatestDataFromServer();
 
-    var name_input_div = document.getElementById('testname');
-    name_input_div.value = 'hi';
     function _getTestNameFromServer(evt) {
         var oReq = new XMLHttpRequest();
-        oReq.addEventListener('load', function () {
-            var responseData = JSON.parse(this.responseText);
-            name_input_div.value = responseData.name;
-        });
+        oReq.addEventListener('load', _onTestNameResponse);
         oReq.open('GET', 'http://' + window.location.host + '/name');
         oReq.send();
     }
-    _getTestNameFromServer();
 
-    var name_input_button = document.getElementById('testnamebutton');
     function _setTestNameOfServer(evt) {
+        _clearInterval();
+        _initializePlot();
         var oReq = new XMLHttpRequest();
-        oReq.addEventListener('load', function () {
-            var responseData = JSON.parse(this.responseText);
-            name_input_div.value = responseData.name;
-        });
+        oReq.addEventListener('load', _onTestNameResponse);
         oReq.open('GET', 'http://' + window.location.host + '/name/' + name_input_div.value);
         oReq.send();
     }
-    name_input_button.onclick = _setTestNameOfServer;
+
+    name_input_div.addEventListener('keyup', function(evt) {
+        if (evt.keyCode == 13) {
+            _setTestNameOfServer(evt);
+        }
+    });
+    window.addEventListener('resize', _onScreenSizeUpdate);
+    _onScreenSizeUpdate(evt);
+    _getTestNameFromServer();
 });
