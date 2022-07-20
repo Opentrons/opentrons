@@ -5,6 +5,7 @@ import { i18n } from '../../../../i18n'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { AttachAdapter } from '../AttachAdapter'
 import { useLatchControls } from '../../../ModuleCard/hooks'
+import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 import type { HeaterShakerModule } from '../../../../redux/modules/types'
 
 jest.mock('../../../ModuleCard/hooks')
@@ -98,5 +99,15 @@ describe('AttachAdapter', () => {
     const { getByRole } = render(props)
     const btn = getByRole('button', { name: 'Open Labware Latch' })
     expect(btn).toBeDisabled()
+  })
+  it('renders button and clicking on it sends latch command to open when a run id is present', () => {
+    props = {
+      module: mockHeaterShaker,
+      currentRunId: RUN_ID_1,
+    }
+    const { getByRole } = render(props)
+    const btn = getByRole('button', { name: 'Open Labware Latch' })
+    fireEvent.click(btn)
+    expect(mockUseLatchControls).toHaveBeenCalled()
   })
 })

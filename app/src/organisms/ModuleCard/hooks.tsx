@@ -202,6 +202,7 @@ export function useModuleOverflowMenu(
         key={`test_shake_${module.moduleModel}`}
         id={`test_shake_${module.moduleModel}`}
         data-testid={`test_shake_${module.moduleModel}`}
+        disabled={isDisabled}
         onClick={() =>
           handleDeactivationCommand('heaterShaker/deactivateShaker')
         }

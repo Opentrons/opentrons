@@ -23,12 +23,12 @@ import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 interface AttachAdapterProps {
   module: HeaterShakerModule
-  runId?: string
+  currentRunId?: string
 }
 export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
-  const { module, runId } = props
+  const { module, currentRunId } = props
   const { t } = useTranslation('heater_shaker')
-  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module, currentRunId)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const isShaking = module.data.speedStatus !== 'idle'
 

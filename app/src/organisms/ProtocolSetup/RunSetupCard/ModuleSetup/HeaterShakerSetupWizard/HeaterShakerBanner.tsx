@@ -3,20 +3,21 @@ import { useTranslation } from 'react-i18next'
 import { COLORS } from '@opentrons/components'
 import { Divider } from '../../../../../atoms/structure/Divider'
 import { HeaterShakerWizard } from '../../../../Devices/HeaterShakerWizard'
+import { useCurrentRunId } from '../../../../ProtocolUpload/hooks'
 import { ModuleRenderInfoForProtocol } from '../../../../Devices/hooks'
 import { Banner, BannerItem } from '../Banner/Banner'
 
 interface HeaterShakerBannerProps {
   displayName: string
   modules: ModuleRenderInfoForProtocol[]
-  runId: string
 }
 
 export function HeaterShakerBanner(
   props: HeaterShakerBannerProps
 ): JSX.Element | null {
   const [showWizard, setShowWizard] = React.useState(false)
-  const { displayName, modules, runId } = props
+  const { displayName, modules } = props
+  const currentRunId = useCurrentRunId()
   const { t } = useTranslation('heater_shaker')
   return (
     <Banner title={t('attach_heater_shaker_to_deck', { name: displayName })}>
@@ -26,7 +27,7 @@ export function HeaterShakerBanner(
             <HeaterShakerWizard
               onCloseClick={() => setShowWizard(false)}
               moduleFromProtocol={module}
-              runId={runId}
+              currentRunId={currentRunId != null ? currentRunId : undefined}
             />
           )}
           {index > 0 && <Divider color={COLORS.medGrey} />}
