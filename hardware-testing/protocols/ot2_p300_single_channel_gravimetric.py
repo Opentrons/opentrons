@@ -1,6 +1,8 @@
 """OT2 P300 Single Channel Gravimetric Test."""
+from dataclasses import dataclass
 from pathlib import Path
-import threading
+from time import time, sleep
+from typing import List, Optional
 
 from opentrons.protocol_api import ProtocolContext
 
@@ -41,39 +43,68 @@ LIQUID_CLASS_OT2_P300_SINGLE = LiquidClassSettings(
 )
 
 
+@dataclass
+class Timestamp:
+
+    def __init__(self, tag: str) -> None:
+        self._tag = tag
+        self._time = time()
+
+    def __str__(self) -> str:
+        return f'[{self._tag}] {self._time}'
+
+    @property
+    def tag(self) -> str:
+        return self._tag
+
+    @property
+    def time(self) -> float:
+        return self._time
+
+
+@dataclass
+class SampleTimestamps:
+    pre_aspirate: Optional[Timestamp]
+    post_aspirate: Optional[Timestamp]
+    pre_dispense: Optional[Timestamp]
+    post_dispense: Optional[Timestamp]
+
+    def __str__(self) -> str:
+        return f'SampleTimestamps:' \
+               f'\n\t{self.pre_aspirate}' \
+               f'\n\t{self.post_aspirate}' \
+               f'\n\t{self.pre_dispense}' \
+               f'\n\t{self.post_dispense}'
+
+
+def _empty_sample_timestamp() -> SampleTimestamps:
+    return SampleTimestamps(pre_aspirate=None, post_aspirate=None,
+                            pre_dispense=None, post_dispense=None)
+
+
 def _test_gravimetric(
-    protocol: ProtocolContext,
     liq_pipette: motions.PipetteLiquidClass,
     layout: LayoutLabware,
     liquid_level: LiquidTracker,
-    recorder: GravimetricRecorder,
-) -> None:
-    def _take_reading(volume: float, tag: str) -> None:
-        pip_id = get_pipette_unique_name(liq_pipette.pipette)
-        vol_str = str(round(volume, 2)).replace(".", "-")
-        recorder.set_tag(tag=f"{pip_id}-{vol_str}-ul-{tag}")
-        recorder.record(duration=STABLE_MEASURE_SECONDS)
-        rec = recorder.recording
-        print(
-            f"\t[{tag}] average={round(rec.average, 5)}, "
-            f"%cv={round(rec.calculate_cv() * 100, 3)}"
-        )
+) -> List[SampleTimestamps]:
+
+    ret = []
 
     def _on_pre_aspirate(cfg: motions.PipettingLiquidSettingsConfig) -> None:
-        assert cfg.aspirate
-        _take_reading(cfg.aspirate, "pre-aspirate")
+        ret[-1].pre_aspirate = Timestamp(
+            tag=f'pre-aspirate-{cfg.aspirate}-{len(ret)}')
 
     def _on_post_aspirate(cfg: motions.PipettingLiquidSettingsConfig) -> None:
-        assert cfg.aspirate
-        _take_reading(cfg.aspirate, "post-aspirate")
+        ret[-1].post_aspirate = Timestamp(
+            tag=f'post-aspirate-{cfg.aspirate}-{len(ret)}')
 
     def _on_pre_dispense(cfg: motions.PipettingLiquidSettingsConfig) -> None:
-        assert cfg.dispense
-        _take_reading(cfg.dispense, "pre-dispense")
+        ret[-1].pre_dispense = Timestamp(
+            tag=f'pre-dispense-{cfg.dispense}-{len(ret)}')
 
     def _on_post_dispense(cfg: motions.PipettingLiquidSettingsConfig) -> None:
-        assert cfg.dispense
-        _take_reading(cfg.dispense, "post-dispense")
+        ret[-1].post_dispense = Timestamp(
+            tag=f'post-dispense-{cfg.dispense}-{len(ret)}')
 
     liq_pipette.assign_callbacks(
         on_pre_aspirate=_on_pre_aspirate,
@@ -87,11 +118,14 @@ def _test_gravimetric(
         liq_pipette.pipette.drop_tip()
     grav_well = layout.vial["A1"]  # type: ignore[index]
     for i, sample_volume in enumerate(samples):
-        print(f"{i + 1}/{len(samples)}: {sample_volume} uL")
+        ret.append(_empty_sample_timestamp())
+        print(f"{len(ret)}/{len(samples)}: {sample_volume} uL")
         liq_pipette.pipette.pick_up_tip()
         liq_pipette.aspirate(sample_volume, grav_well, liquid_level=liquid_level)
         liq_pipette.dispense(sample_volume, grav_well, liquid_level=liquid_level)
         liq_pipette.pipette.drop_tip()
+        sleep(0.1)
+    return ret
 
 
 def _run(protocol: ProtocolContext) -> None:
@@ -124,9 +158,14 @@ def _run(protocol: ProtocolContext) -> None:
     recorder.set_tag(f"P300-Single-Gen2-{pip_sn}")
 
     liquid_level.print_setup_instructions(user_confirm=not protocol.is_simulating())
-    # TODO: begin recording the scale
-    _test_gravimetric(protocol, liq_pipette, layout, liquid_level, recorder)
-    # TODO: finish recording the scale
+
+    recorder.record(duration=60 * 60, in_thread=True)
+    recorder.record_start()
+    _pip_timestamps = _test_gravimetric(liq_pipette, layout, liquid_level)
+    recorder.record_stop()
+    _rec = recorder.recording
+    [print(t) for t in _pip_timestamps]
+    print(_rec)
 
 
 if __name__ == "__main__":

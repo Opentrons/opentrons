@@ -1,7 +1,7 @@
 """Record weight measurements."""
 from dataclasses import dataclass
 from statistics import stdev
-from threading import Thread
+from threading import Thread, Event
 from time import sleep, time
 from typing import List, Optional, Callable
 
@@ -205,7 +205,8 @@ class GravimetricRecorder(Thread):
         self._cfg = RecordConfig(test_name=test_name, duration=1.0, frequency=10)
         self._scale: Scale = Scale.build(ctx=ctx)
         self._recording = GravimetricRecording()
-        self._is_recording = False
+        self._is_recording = Event()
+        self._reading_samples = Event()
         super().__init__()
 
     @property
@@ -244,10 +245,12 @@ class GravimetricRecorder(Thread):
         if duration is not None:
             self._cfg.duration = duration
         if in_thread:
-            self.record_stop()
+            if self._is_recording.is_set():
+                self._is_recording.clear()
             self.start()  # creates the thread
         else:
-            self.record_start()
+            if not self._is_recording.is_set():
+                self._is_recording.set()
             self.run()
 
     def run(self) -> None:
@@ -256,7 +259,11 @@ class GravimetricRecorder(Thread):
             self._recording = self._record_samples_to_disk()
         else:
             self._recording = self._record_samples()
-        self.record_stop()
+        self._is_recording.clear()
+
+    def wait_for_start(self) -> None:
+        if self.is_alive():
+            self._reading_samples.wait()
 
     def wait_for_finish(self) -> None:
         if self.is_alive():
@@ -268,13 +275,17 @@ class GravimetricRecorder(Thread):
 
     @property
     def is_recording(self) -> bool:
-        return self._is_recording
+        return self._is_recording.is_set()
 
-    def record_start(self) -> None:
-        self._is_recording = True
+    def record_start(self, wait_for_start: bool = True) -> None:
+        self._is_recording.set()
+        if wait_for_start:
+            self.wait_for_start()
 
-    def record_stop(self) -> None:
-        self._is_recording = False
+    def record_stop(self, wait_for_finish: bool = True) -> None:
+        self._is_recording.clear()
+        if wait_for_finish:
+            self.wait_for_finish()
 
     def _wait_for_record_start(self) -> None:
         while not self.is_recording:
@@ -298,6 +309,7 @@ class GravimetricRecorder(Thread):
         ):
             if not self.is_recording:
                 break
+            self._reading_samples.set()
             mass = self._scale.read()
             _s = GravimetricSample(grams=mass.grams, stable=mass.stable, time=mass.time)
             if self._cfg.stable and not _s.stable:
@@ -312,6 +324,7 @@ class GravimetricRecorder(Thread):
                 _recording.append(_s)
                 if callable(on_new_sample):
                     on_new_sample(_recording)
+        self._reading_samples.clear()
         assert len(_recording) == length or not self.is_recording, (
             f"Scale recording timed out before accumulating "
             f"{length} samples (recorded {len(_recording)} samples)"
