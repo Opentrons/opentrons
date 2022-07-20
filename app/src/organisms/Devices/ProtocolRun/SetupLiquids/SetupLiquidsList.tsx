@@ -133,10 +133,11 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_FLEX_START}
             gridGap={SPACING.spacing4}
-            marginY={SPACING.spacing4}
+            marginTop={SPACING.spacing4}
+            marginBottom={SPACING.spacing3}
           >
             <StyledText
-              as="p"
+              as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing4}
               width="8.125rem"
@@ -144,14 +145,14 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
               {t('location')}
             </StyledText>
             <StyledText
-              as="p"
+              as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginRight={SPACING.spacing6}
             >
               {t('labware_name')}
             </StyledText>
             <StyledText
-              as="p"
+              as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               width="4.25rem"
               marginLeft="auto"

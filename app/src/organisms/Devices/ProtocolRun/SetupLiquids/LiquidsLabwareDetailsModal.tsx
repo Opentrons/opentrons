@@ -81,7 +81,8 @@ export const LiquidsLabwareDetailsModal = (
       title={labwareName}
       contentBackgroundColor={COLORS.background}
       closeOnOutsideClick
-      width="46.875rem"
+      marginX={SPACING.spacing5}
+      width="45rem"
     >
       <Box>
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
