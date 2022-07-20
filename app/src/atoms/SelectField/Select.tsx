@@ -1,6 +1,5 @@
 import * as React from 'react'
 import ReactSelect, { components, DropdownIndicatorProps } from 'react-select'
-import { CSSObject } from 'styled-components'
 import {
   Icon,
   BORDERS,
@@ -13,7 +12,12 @@ import {
   POSITION_ABSOLUTE,
 } from '@opentrons/components'
 
-import type { Props as ReactSelectProps } from 'react-select'
+import type {
+  Props as ReactSelectProps,
+  StylesConfig,
+  OptionProps,
+  CSSObjectWithLabel,
+} from 'react-select'
 
 export interface SelectOption {
   value: string
@@ -28,12 +32,12 @@ interface SelectComponentProps extends SelectProps {
 }
 
 const VOID_STYLE: unknown = undefined
-const NO_STYLE_FN = (): CSSObject => VOID_STYLE as CSSObject
+const NO_STYLE_FN = (): CSSObjectWithLabel => VOID_STYLE as CSSObjectWithLabel
 
 export function Select(props: SelectComponentProps): JSX.Element {
-  const CLEAR_DEFAULT_STYLES_AND_SET_NEW_STYLES = {
+  const CLEAR_DEFAULT_STYLES_AND_SET_NEW_STYLES: StylesConfig<SelectOption> = {
     clearIndicator: NO_STYLE_FN,
-    control: (styles: any) => ({
+    control: (styles: CSSObjectWithLabel) => ({
       ...styles,
       borderRadius: BORDERS.radiusRoundEdge,
       border: BORDERS.lineBorder,
@@ -50,21 +54,21 @@ export function Select(props: SelectComponentProps): JSX.Element {
         borderColor: COLORS.medGreyHover,
       },
     }),
-    container: (styles: any) => ({
+    container: (styles: CSSObjectWithLabel) => ({
       ...styles,
       position: POSITION_RELATIVE,
     }),
     dropdownIndicator: NO_STYLE_FN,
     group: NO_STYLE_FN,
-    groupHeading: (styles: any) => ({
+    groupHeading: (styles: CSSObjectWithLabel) => ({
       ...styles,
       color: COLORS.darkBlack,
-      fontWeight: TYPOGRAPHY.pSemiBold,
+      fontWeight: TYPOGRAPHY.fontWeightSemiBold,
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
     indicatorsContainer: NO_STYLE_FN,
     indicatorSeparator: NO_STYLE_FN,
-    input: (styles: any) => ({
+    input: (styles: CSSObjectWithLabel) => ({
       ...styles,
       zIndex: 5,
       position: POSITION_ABSOLUTE,
@@ -74,7 +78,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     }),
     loadingIndicator: NO_STYLE_FN,
     loadingMessage: NO_STYLE_FN,
-    menu: (styles: any) => ({
+    menu: (styles: CSSObjectWithLabel) => ({
       ...styles,
       backgroundColor: COLORS.white,
       width: props.width != null ? props.width : 'auto',
@@ -83,7 +87,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       marginTop: SPACING.spacing2,
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
-    menuList: (styles: any) => ({
+    menuList: (styles: CSSObjectWithLabel) => ({
       ...styles,
       maxHeight: '38vh',
       overflowY: 'scroll',
@@ -92,12 +96,12 @@ export function Select(props: SelectComponentProps): JSX.Element {
     multiValue: NO_STYLE_FN,
     multiValueLabel: NO_STYLE_FN,
     multiValueRemove: NO_STYLE_FN,
-    noOptionsMessage: (styles: any) => ({
+    noOptionsMessage: (styles: CSSObjectWithLabel) => ({
       ...styles,
       padding: '0.375rem',
       color: COLORS.darkBlack,
     }),
-    option: (styles: any, state: any) => ({
+    option: (styles: CSSObjectWithLabel, state: OptionProps<SelectOption>) => ({
       ...styles,
       color: Boolean(state.isDisabled) ? COLORS.greyDisabled : COLORS.darkBlack,
       backgroundColor: Boolean(state.isSelected)
@@ -110,13 +114,13 @@ export function Select(props: SelectComponentProps): JSX.Element {
         backgroundColor: COLORS.lightBlue,
       },
     }),
-    placeholder: (styles: any) => ({
+    placeholder: (styles: CSSObjectWithLabel) => ({
       ...styles,
       marginLeft: SPACING.spacingSS,
       color: COLORS.darkBlack,
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
-    singleValue: (styles: any) => ({
+    singleValue: (styles: CSSObjectWithLabel) => ({
       ...styles,
       marginRight: '0.75rem',
       marginTop: SPACING.spacing1,
