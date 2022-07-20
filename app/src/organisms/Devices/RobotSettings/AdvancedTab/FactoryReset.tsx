@@ -13,27 +13,23 @@ import {
 
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
-import { useIsRobotBusy } from '../../hooks'
 
 interface FactoryResetProps {
   updateIsExpanded: (
     isExpanded: boolean,
     type: 'factoryReset' | 'renameRobot'
   ) => void
-  updateIsRobotBusy: (isRobotBusy: boolean) => void
+  isRobotBusy: boolean
 }
 
 export function FactoryReset({
   updateIsExpanded,
-  updateIsRobotBusy,
+  isRobotBusy,
 }: FactoryResetProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const isBusy = useIsRobotBusy()
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-    if (isBusy) {
-      updateIsRobotBusy(true)
-    } else {
+    if (!isRobotBusy) {
       updateIsExpanded(true, 'factoryReset')
     }
   }
@@ -54,6 +50,7 @@ export function FactoryReset({
         marginLeft={SPACING_AUTO}
         onClick={handleClick}
         id="RobotSettings_FactoryResetChooseButton"
+        disabled={isRobotBusy}
       >
         {t('factory_reset_settings_button')}
       </TertiaryButton>
