@@ -71,8 +71,6 @@ export const ModuleOverflowMenu = (
                 return (
                   <React.Fragment key={`${index}_${module.moduleType}`}>
                     <MenuItem
-                      width="100%"
-                      whiteSpace="nowrap"
                       key={`${index}_${module.moduleModel}`}
                       onClick={() => item.onClick(item.isSecondary)}
                       data-testid={`module_setting_${module.moduleModel}`}
