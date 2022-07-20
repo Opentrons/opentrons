@@ -6,6 +6,7 @@ import { i18n } from '../../../../i18n'
 import { useAttachedModules } from '../../hooks'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
+import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 import { HeaterShakerWizard } from '..'
 import { Introduction } from '../Introduction'
 import { KeyParts } from '../KeyParts'
@@ -108,6 +109,7 @@ describe('HeaterShakerWizard', () => {
   it('renders wizard and returns the correct pages when the buttons are clicked and protocol is known', () => {
     props = {
       onCloseClick: jest.fn(),
+      currentRunId: RUN_ID_1,
       moduleFromProtocol: {
         moduleId: 'heater_shaker_id',
         x: 0,

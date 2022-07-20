@@ -1,6 +1,6 @@
 import { useAttachedModules, useProtocolDetailsForRun } from '../Devices/hooks'
-import type { AttachedModule } from '../../redux/modules/types'
 import { getModuleDef2 } from '@opentrons/shared-data'
+import type { AttachedModule } from '../../redux/modules/types'
 
 export interface ModuleIdFromRun {
   moduleIdFromRun: string

@@ -1,11 +1,25 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
 import { HeaterShakerBanner } from '../HeaterShakerBanner'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { mockHeaterShaker } from '../../../../../../redux/modules/__fixtures__'
+import { useCurrentRunId } from '../../../../../ProtocolUpload/hooks'
+import { RUN_ID_1 } from '../../../../../RunTimeControl/__fixtures__'
+import { HeaterShakerWizard } from '../../../../../Devices/HeaterShakerWizard'
 import { ModuleRenderInfoForProtocol } from '../../../../../Devices/hooks'
-import { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
+
+jest.mock('../../../../../ProtocolUpload/hooks')
+jest.mock('../../../../../Devices/HeaterShakerWizard')
+
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
+>
+const mockHeaterShakerWizard = HeaterShakerWizard as jest.MockedFunction<
+  typeof HeaterShakerWizard
+>
 
 const mockHeaterShakerDefinition = {
   moduleId: 'someHeaterShakerModule',
@@ -63,10 +77,11 @@ describe('HeaterShakerBanner', () => {
   let props: React.ComponentProps<typeof HeaterShakerBanner>
   beforeEach(() => {
     props = {
-      runId: '1',
       displayName: 'HeaterShakerV1',
       modules: [HEATER_SHAKER_PROTOCOL_MODULE_INFO],
     }
+    mockHeaterShakerWizard.mockReturnValue(<div>mock wizard</div>)
+    mockUseCurrentRunId.mockReturnValue(RUN_ID_1)
   })
 
   it('should render banner component', () => {
@@ -78,13 +93,14 @@ describe('HeaterShakerBanner', () => {
   })
 
   it('should render heater shaker wizard button when a heater shaker is present', () => {
-    const { getByRole } = render(props)
-    getByRole('button', { name: 'View instructions' })
+    const { getByRole, getByText } = render(props)
+    const btn = getByRole('button', { name: 'View instructions' })
+    fireEvent.click(btn)
+    getByText('mock wizard')
   })
 
   it('should not render heater shaker wizard button if no heater shaker is present', () => {
     props = {
-      runId: '1',
       displayName: 'HeaterShakerV1',
       modules: [],
     }
@@ -96,7 +112,6 @@ describe('HeaterShakerBanner', () => {
 
   it('should render two heater shaker banner items when there are two heater shakers in the protocol', () => {
     props = {
-      runId: '1',
       displayName: 'HeaterShakerV1',
       modules: [
         HEATER_SHAKER_PROTOCOL_MODULE_INFO,

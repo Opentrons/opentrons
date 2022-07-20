@@ -7,6 +7,7 @@ import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
 import { HEATERSHAKER_MODULE_TYPE } from '../../../redux/modules'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useAttachedModules } from '../hooks'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
@@ -30,13 +31,13 @@ import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProt
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
   moduleFromProtocol?: ProtocolModuleInfo
-  runId?: string
+  currentRunId?: string
 }
 
 export const HeaterShakerWizard = (
   props: HeaterShakerWizardProps
 ): JSX.Element | null => {
-  const { onCloseClick, moduleFromProtocol, runId } = props
+  const { onCloseClick, moduleFromProtocol, currentRunId } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
   const { robotName } = useParams<NavRouteParams>()
@@ -93,7 +94,10 @@ export const HeaterShakerWizard = (
         return (
           // heaterShaker should never be null because isPrimaryCTAEnabled would be disabled otherwise
           heaterShaker != null ? (
-            <AttachAdapter module={heaterShaker} runId={runId} />
+            <AttachAdapter
+              module={heaterShaker}
+              currentRunId={currentRunId != null ? currentRunId : undefined}
+            />
           ) : null
         )
       case 5:
@@ -105,7 +109,7 @@ export const HeaterShakerWizard = (
               module={heaterShaker}
               setCurrentPage={setCurrentPage}
               moduleFromProtocol={moduleFromProtocol}
-              runId={runId}
+              currentRunId={currentRunId != null ? currentRunId : undefined}
             />
           ) : null
         )

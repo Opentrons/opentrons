@@ -234,9 +234,12 @@ describe('useLatchControls', () => {
     mockUseModuleIdFromRun.mockReturnValue({
       moduleIdFromRun: 'heatershaker_id',
     })
-    const { result } = renderHook(() => useLatchControls(mockHeaterShaker), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useLatchControls(mockHeaterShaker, false),
+      {
+        wrapper,
+      }
+    )
     const { isLatchClosed } = result.current
 
     expect(isLatchClosed).toBe(false)
@@ -257,7 +260,33 @@ describe('useLatchControls', () => {
       </I18nextProvider>
     )
     const { result } = renderHook(
-      () => useLatchControls(mockCloseLatchHeaterShaker),
+      () => useLatchControls(mockCloseLatchHeaterShaker, false),
+      {
+        wrapper,
+      }
+    )
+    const { isLatchClosed } = result.current
+
+    expect(isLatchClosed).toBe(true)
+    act(() => result.current.toggleLatch())
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'heaterShaker/openLabwareLatch',
+        params: {
+          moduleId: mockCloseLatchHeaterShaker.id,
+        },
+      },
+    })
+  })
+
+  it('should return if latch is close and handle latch function to open latch when runId is not null', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <I18nextProvider i18n={i18n}>
+        <Provider store={store}>{children}</Provider>
+      </I18nextProvider>
+    )
+    const { result } = renderHook(
+      () => useLatchControls(mockCloseLatchHeaterShaker, false),
       {
         wrapper,
       }

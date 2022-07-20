@@ -91,7 +91,6 @@ export const SetupModules = ({
         <HeaterShakerBanner
           displayName={heaterShakerModules[0]?.moduleDef.displayName}
           modules={heaterShakerModules}
-          runId={runId}
         />
       ) : null}
       {showMultipleModulesModal ? (
