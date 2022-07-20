@@ -312,8 +312,7 @@ describe('RobotSettingsCalibration', () => {
     mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Calibrate deck' })
-    fireEvent.click(button)
-    expect(mockUpdateRobotStatus).toHaveBeenCalled()
+    expect(button).toBeDisabled()
   })
 
   it('renders the warning banner when deck calibration is not good', () => {
@@ -442,7 +441,6 @@ describe('RobotSettingsCalibration', () => {
     mockUseIsRobotBusy.mockReturnValue(true)
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Check health' })
-    fireEvent.click(button)
-    expect(mockUpdateRobotStatus).toHaveBeenCalled()
+    expect(button).toBeDisabled()
   })
 })

@@ -621,7 +621,7 @@ export function RobotSettingsCalibration({
           </Box>
           <TertiaryButton
             onClick={() => handleClickDeckCalibration()}
-            disabled={disabledOrBusyReason != null}
+            disabled={disabledOrBusyReason != null || isRobotBusy}
           >
             {deckCalibrationButtonText}
           </TertiaryButton>
@@ -703,11 +703,11 @@ export function RobotSettingsCalibration({
           <TertiaryButton
             {...targetProps}
             onClick={handleHealthCheckClick}
-            disabled={calCheckButtonDisabled}
+            disabled={calCheckButtonDisabled || isRobotBusy}
           >
             {t('health_check_button')}
           </TertiaryButton>
-          {calCheckButtonDisabled && (
+          {calCheckButtonDisabled && !isRobotBusy && (
             <Tooltip tooltipProps={tooltipProps}>
               {t('fully_calibrate_before_checking_health')}
             </Tooltip>
