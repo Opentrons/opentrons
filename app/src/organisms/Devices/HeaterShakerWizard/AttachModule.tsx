@@ -45,7 +45,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <StyledText
-        as="h2"
+        fontSize={TYPOGRAPHY.h2Regular}
         paddingBottom={SPACING.spacingL}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >

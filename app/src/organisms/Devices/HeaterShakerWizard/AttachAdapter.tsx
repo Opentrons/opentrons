@@ -4,7 +4,6 @@ import {
   COLORS,
   Flex,
   DIRECTION_COLUMN,
-  Text,
   DIRECTION_ROW,
   Icon,
   TYPOGRAPHY,

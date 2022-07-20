@@ -4,7 +4,6 @@ import { css } from 'styled-components'
 import {
   Flex,
   DIRECTION_COLUMN,
-  Text,
   TYPOGRAPHY,
   COLORS,
   JUSTIFY_CENTER,
