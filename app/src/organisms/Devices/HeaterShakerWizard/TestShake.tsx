@@ -65,7 +65,6 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
     moduleId = module.id
   }
-
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
     commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
@@ -80,8 +79,6 @@ export function TestShake(props: TestShakeProps): JSX.Element {
       moduleId: moduleId != null ? moduleId : '',
     },
   }
-  console.log(isRunIdle && currentRunId != null)
-  console.log(moduleId)
 
   const handleShakeCommand = (): void => {
     if (isRunIdle && currentRunId != null) {
