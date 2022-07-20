@@ -41,6 +41,7 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
           components={{
             strong: (
               <Text
+                fontSize={TYPOGRAPHY.fontSizeH2}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 paddingBottom={SPACING.spacingSM}
               />
