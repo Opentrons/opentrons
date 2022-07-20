@@ -37,6 +37,7 @@ type GetUnreachableRobots = (state: State) => UnreachableRobot[]
 type GetAllRobots = (state: State) => DiscoveredRobot[]
 type GetViewableRobots = (state: State) => ViewableRobot[]
 type GetConnectedRobot = (state: State) => Robot | null
+type GetLocalRobot = (state: State) => DiscoveredRobot | null
 
 // from https://github.com/reduxjs/reselect#customize-equalitycheck-for-defaultmemoize
 const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)
@@ -150,6 +151,11 @@ export const getViewableRobots: GetViewableRobots = createSelector(
 export const getConnectedRobot: GetConnectedRobot = createSelector(
   getConnectableRobots,
   robots => find(robots, 'connected') ?? null
+)
+
+export const getLocalRobot: GetLocalRobot = createSelector(
+  getAllRobots,
+  robots => find(robots, { ip: 'localhost' }) ?? null
 )
 
 export const getRobotByName = (
