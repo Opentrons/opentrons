@@ -13,7 +13,7 @@ from hardware_testing.data import (
     create_file_name,
 )
 
-from .scale import scale_connect_and_initialize, scale_calibrate
+from .scale import Scale
 
 
 @dataclass
@@ -195,68 +195,6 @@ def _record_get_interval_overlap(samples: GravimetricRecording, period: float) -
     return real_time - ideal_time
 
 
-def record_samples(
-    scale: RadwagScaleBase,
-    config: RecordConfig,
-    timeout: Optional[float] = None,
-    on_new_sample: Optional[Callable] = None,
-) -> GravimetricRecording:
-    """Record samples from the scale."""
-    assert config.duration
-    assert config.frequency
-    length = int(config.duration * config.frequency) + 1
-    interval = 1.0 / config.frequency
-    _recording = GravimetricRecording()
-    _start_time = time()
-    while len(_recording) < length and not _record_did_exceed_time(
-        _start_time, timeout
-    ):
-        g, s = scale.read_mass()
-        _s = GravimetricSample(grams=g, stable=s, time=time())
-        if config.stable and not _s.stable:
-            _recording.clear()  # delete all previously recorded samples
-            continue
-        interval_w_overlap = interval - _record_get_interval_overlap(
-            _recording, interval
-        )
-        if not len(_recording) or _record_did_exceed_time(
-            _recording.end_time, interval_w_overlap
-        ):
-            _recording.append(_s)
-            if callable(on_new_sample):
-                on_new_sample(_recording)
-    assert len(_recording) == length, (
-        f"Scale recording timed out before accumulating "
-        f"{length} samples (recorded {len(_recording)} samples)"
-    )
-    return _recording
-
-
-def record_samples_to_disk(
-    scale: RadwagScaleBase, config: RecordConfig, timeout: Optional[float] = None
-) -> GravimetricRecording:
-    """Record samples to disk."""
-    assert config.test_name
-    assert config.tag
-    _file_name = create_file_name(config.test_name, config.tag)
-
-    def _on_new_sample(recording: GravimetricRecording) -> None:
-        append_data_to_file(
-            str(config.test_name), _file_name, recording[-1].as_csv(recording) + "\n"
-        )
-
-    # add the header to the CSV file
-    dump_data_to_file(
-        config.test_name, _file_name, GravimetricSample.csv_header() + "\n"
-    )
-    _recording = record_samples(
-        scale, config, timeout=timeout, on_new_sample=_on_new_sample
-    )
-    # add a final newline character to the CSV file
-    append_data_to_file(config.test_name, _file_name, "\n")
-    return _recording
-
-
 class GravimetricRecorder:
     """Gravimetric Recorder."""
 
@@ -264,7 +202,7 @@ class GravimetricRecorder:
         """Gravimetric Recorder."""
         self._ctx = ctx
         self._cfg = RecordConfig(test_name=test_name, duration=1.0, frequency=10)
-        self._scale: RadwagScaleBase = SimRadwagScale()
+        self._scale: Scale = Scale.build(ctx=ctx)
         self._active = False
 
     @property
@@ -281,7 +219,9 @@ class GravimetricRecorder:
         """Activate."""
         if self.active:
             return
-        self._scale = scale_connect_and_initialize(self._ctx)
+        self._scale.connect()
+        self._scale.initialize()
+        self._scale.tare(0.0)
         self._active = True
 
     def deactivate(self) -> None:
@@ -305,18 +245,69 @@ class GravimetricRecorder:
 
     def calibrate_scale(self) -> None:
         """Calibrate scale."""
-        was_active = self.active
-        if was_active:
-            self.deactivate()
-        scale_calibrate(self._ctx)
-        if was_active:
-            self.activate()
+        self._scale.calibrate()
 
     def record(self, duration: Optional[float] = None) -> GravimetricRecording:
         """Record."""
         if duration is not None:
             self._cfg.duration = duration
         if self._cfg.save_to_disk:
-            return record_samples_to_disk(self._scale, self._cfg)
+            return self._record_samples_to_disk()
         else:
-            return record_samples(self._scale, self._cfg)
+            return self._record_samples()
+
+    def _record_samples(
+            self,
+            timeout: Optional[float] = None,
+            on_new_sample: Optional[Callable] = None,
+    ) -> GravimetricRecording:
+        """Record samples from the scale."""
+        assert self._cfg.duration
+        assert self._cfg.frequency
+        length = int(self._cfg.duration * self._cfg.frequency) + 1
+        interval = 1.0 / self._cfg.frequency
+        _recording = GravimetricRecording()
+        _start_time = time()
+        while len(_recording) < length and not _record_did_exceed_time(
+                _start_time, timeout
+        ):
+            mass = self._scale.read()
+            _s = GravimetricSample(grams=mass.grams, stable=mass.stable, time=mass.time)
+            if self._cfg.stable and not _s.stable:
+                _recording.clear()  # delete all previously recorded samples
+                continue
+            interval_w_overlap = interval - _record_get_interval_overlap(
+                _recording, interval
+            )
+            if not len(_recording) or _record_did_exceed_time(
+                    _recording.end_time, interval_w_overlap
+            ):
+                _recording.append(_s)
+                if callable(on_new_sample):
+                    on_new_sample(_recording)
+        assert len(_recording) == length, (
+            f"Scale recording timed out before accumulating "
+            f"{length} samples (recorded {len(_recording)} samples)"
+        )
+        return _recording
+
+    def _record_samples_to_disk(self, timeout: Optional[float] = None) -> GravimetricRecording:
+        """Record samples to disk."""
+        assert self._cfg.test_name
+        assert self._cfg.tag
+        _file_name = create_file_name(self._cfg.test_name, self._cfg.tag)
+
+        def _on_new_sample(recording: GravimetricRecording) -> None:
+            append_data_to_file(
+                str(self._cfg.test_name), _file_name, recording[-1].as_csv(recording) + "\n"
+            )
+
+        # add the header to the CSV file
+        dump_data_to_file(
+            self._cfg.test_name, _file_name, GravimetricSample.csv_header() + "\n"
+        )
+        _recording = self._record_samples(
+            timeout=timeout, on_new_sample=_on_new_sample)
+        # add a final newline character to the CSV file
+        append_data_to_file(self._cfg.test_name, _file_name, "\n")
+        return _recording
