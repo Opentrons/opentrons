@@ -24,8 +24,6 @@ const render = () => {
 }
 
 describe('RobotSettings DisplayRobotName', () => {
-  beforeEach(() => {})
-
   afterEach(() => {
     jest.resetAllMocks()
   })

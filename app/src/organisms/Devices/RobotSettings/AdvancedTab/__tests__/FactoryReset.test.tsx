@@ -9,8 +9,8 @@ import { i18n } from '../../../../../i18n'
 import { FactoryReset } from '../FactoryReset'
 
 const mockUpdateIsEXpanded = jest.fn()
-
 let mockIsRobotBusy = false
+
 jest.mock('../../../../ProtocolUpload/hooks')
 
 const render = () => {
@@ -26,8 +26,6 @@ const render = () => {
 }
 
 describe('RobotSettings FactoryReset', () => {
-  beforeEach(() => {})
-
   afterEach(() => {
     jest.resetAllMocks()
   })
