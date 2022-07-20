@@ -18,11 +18,12 @@ def _run(protocol: ProtocolContext) -> None:
             recording_duration = float(input("\tDuration (sec): "))
             in_thread = False
         except ValueError:
-            recording_duration = 60 * 60  # an hour
+            recording_duration = 0  # run until stopped
             in_thread = True
         input("\tPress ENTER when ready...")
         recorder.set_tag(recording_name)
-        recorder.record(duration=recording_duration, in_thread=in_thread)
+        recorder.set_duration(recording_duration)
+        recorder.record(in_thread=in_thread)
         if in_thread:
             print('\tRunning in separate thread')
             recorder.record_start()

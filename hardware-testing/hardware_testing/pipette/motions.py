@@ -12,18 +12,9 @@ from hardware_testing.liquid.liquid_class import (
 )
 from hardware_testing.opentrons_api.workarounds import force_prepare_for_aspirate
 
+from .timestamp import Timestamp, SampleTimestamps, get_empty_sample_timestamp
+
 LABWARE_BOTTOM_CLEARANCE = 1.5  # FIXME: not sure who should own this
-
-
-def apply_pipette_speeds(
-    pipette: InstrumentContext, settings: LiquidClassSettings
-) -> None:
-    """Apply pipette speeds."""
-    assert settings.traverse.speed
-    pipette.default_speed = settings.traverse.speed
-    pipette.flow_rate.aspirate = settings.aspirate.flow_rate
-    pipette.flow_rate.dispense = settings.dispense.flow_rate
-    pipette.flow_rate.blow_out = settings.blow_out.flow_rate
 
 
 @dataclass
@@ -76,7 +67,7 @@ def _create_pipetting_heights(
 
 
 @dataclass
-class PipettingLiquidSettingsConfig:
+class LiquidSettingsRunnerConfig:
     """Pipetting Liquid Settings Config."""
 
     pipette: InstrumentContext
@@ -87,11 +78,11 @@ class PipettingLiquidSettingsConfig:
     dispense: Optional[float]
 
 
-class PipettingLiquidSettings:
+class LiquidSettingsRunner:
     """Pipetting Liquid Settings."""
 
     def __init__(
-        self, ctx: ProtocolContext, cfg: PipettingLiquidSettingsConfig
+        self, ctx: ProtocolContext, cfg: LiquidSettingsRunnerConfig, timestamp: SampleTimestamps
     ) -> None:
         """Pipetting Liquid Settings."""
         assert (
@@ -102,17 +93,71 @@ class PipettingLiquidSettings:
         ), "cannot both aspirate and dispense"
         self._ctx = ctx
         self._cfg = cfg
+        self._timestamps = timestamp
 
-    def _approach(self) -> None:
+    def run(
+        self,
+        on_pre_submerge: Optional[
+            Callable[[LiquidSettingsRunnerConfig], None]
+        ] = None,
+        on_post_emerge: Optional[
+            Callable[[LiquidSettingsRunnerConfig], None]
+        ] = None,
+    ) -> None:
+        """Run."""
+        self._run_approach()
+        self._timestamp_pre_submerge()
+        if callable(on_pre_submerge):
+            on_pre_submerge(self._cfg)
+        self._run_gather_air_gaps()
+        self._run_submerge()
+        if self._cfg.aspirate:
+            self._run_aspirate()
+        else:
+            self._run_dispense()
+        self._timestamp_sample()
+        self._run_delay()
+        self._run_retract()
+        self._run_blow_out()
+        self._run_finish()
+        self._timestamp_post_emerge()
+        if callable(on_post_emerge):
+            on_post_emerge(self._cfg)
+
+    def _timestamp_pre_submerge(self) -> None:
+        if self._cfg.aspirate:
+            t = Timestamp(f'{self._cfg.aspirate}-pre-aspirate')
+            self._timestamps.pre_aspirate = t
+        else:
+            t = Timestamp(f'{self._cfg.dispense}-pre-dispense')
+            self._timestamps.pre_dispense = t
+
+    def _timestamp_sample(self) -> None:
+        if self._cfg.aspirate:
+            t = Timestamp(f'{self._cfg.aspirate}-aspirate')
+            self._timestamps.aspirate = t
+        else:
+            t = Timestamp(f'{self._cfg.dispense}-dispense')
+            self._timestamps.dispense = t
+
+    def _timestamp_post_emerge(self) -> None:
+        if self._cfg.aspirate:
+            t = Timestamp(f'{self._cfg.aspirate}-post-aspirate')
+            self._timestamps.post_aspirate = t
+        else:
+            t = Timestamp(f'{self._cfg.dispense}-post-dispense')
+            self._timestamps.post_dispense = t
+
+    def _run_approach(self) -> None:
         self._cfg.pipette.move_to(self._cfg.well.top())
         if self._cfg.aspirate:
             force_prepare_for_aspirate(self._cfg.pipette)
 
-    def _gather_air_gaps(self) -> None:
+    def _run_gather_air_gaps(self) -> None:
         if self._cfg.aspirate and self._cfg.settings.wet_air_gap.volume:
             self._cfg.pipette.aspirate(self._cfg.settings.wet_air_gap.volume)
 
-    def _submerge(self) -> None:
+    def _run_submerge(self) -> None:
         # Note: in case (start.above < end.below)
         start_above = max(self._cfg.heights.start.above, self._cfg.heights.end.below)
         self._cfg.pipette.move_to(
@@ -123,25 +168,24 @@ class PipettingLiquidSettings:
             submerged_loc, force_direct=True, speed=self._cfg.settings.submerge.speed
         )
 
-    def _aspirate(self) -> None:
+    def _run_aspirate(self) -> None:
         if self._cfg.aspirate:
             self._cfg.pipette.aspirate(self._cfg.aspirate)
 
-    def _dispense(self) -> None:
+    def _run_dispense(self) -> None:
         if self._cfg.dispense:
             self._cfg.pipette.dispense(self._cfg.dispense)
             if self._cfg.pipette.current_volume > 0:
                 # temporarily change the dispense speed
+                _disp_flow_rate = float(self._cfg.pipette.flow_rate.dispense)
                 self._cfg.pipette.flow_rate.dispense = (
                     self._cfg.settings.wet_air_gap.flow_rate
                 )
                 self._cfg.pipette.dispense()
                 # go back to previous speed
-                apply_pipette_speeds(
-                    self._cfg.pipette, self._cfg.settings
-                )  # back to defaults
+                self._cfg.pipette.flow_rate.dispense = _disp_flow_rate
 
-    def _delay(self) -> None:
+    def _run_delay(self) -> None:
         if self._cfg.aspirate and self._cfg.settings.aspirate.delay:
             delay_time = self._cfg.settings.aspirate.delay
         elif self._cfg.dispense and self._cfg.settings.dispense.delay:
@@ -150,78 +194,19 @@ class PipettingLiquidSettings:
             delay_time = 0
         self._ctx.delay(seconds=delay_time)
 
-    def _retract(self) -> None:
+    def _run_retract(self) -> None:
         self._cfg.pipette.move_to(
             self._cfg.well.bottom(self._cfg.heights.end.above),
             force_direct=True,
             speed=self._cfg.settings.retract.speed,
         )
 
-    def _blow_out(self) -> None:
+    def _run_blow_out(self) -> None:
         if self._cfg.dispense and self._cfg.settings.blow_out.volume:
             self._cfg.pipette.blow_out()  # nothing to loose
 
-    def _finish(self) -> None:
+    def _run_finish(self) -> None:
         self._cfg.pipette.move_to(self._cfg.well.top(), force_direct=True)
-
-    def run(
-        self,
-        on_pre_submerge: Optional[
-            Callable[[PipettingLiquidSettingsConfig], None]
-        ] = None,
-        on_post_emerge: Optional[
-            Callable[[PipettingLiquidSettingsConfig], None]
-        ] = None,
-    ) -> None:
-        """Run."""
-        self._approach()
-        if callable(on_pre_submerge):
-            on_pre_submerge(self._cfg)
-        self._gather_air_gaps()
-        self._submerge()
-        if self._cfg.aspirate:
-            self._aspirate()
-        else:
-            self._dispense()
-        self._delay()
-        self._retract()
-        self._blow_out()
-        self._finish()
-        if callable(on_post_emerge):
-            on_post_emerge(self._cfg)
-
-
-def pipette_liquid_settings(
-    ctx: ProtocolContext,
-    pipette: InstrumentContext,
-    well: Well,
-    liquid_class: LiquidClassSettings,
-    liquid_tracker: LiquidTracker,
-    aspirate: Optional[float] = None,
-    dispense: Optional[float] = None,
-    on_pre_submerge: Optional[Callable] = None,
-    on_post_emerge: Optional[Callable] = None,
-) -> None:
-    """Run a pipette given some Pipetting Liquid Settings."""
-    height_before, height_after = liquid_tracker.get_before_and_after_heights(
-        pipette, well, aspirate=aspirate, dispense=dispense
-    )
-    pipetting_heights = _create_pipetting_heights(
-        start_mm=height_before, end_mm=height_after, liquid_class=liquid_class
-    )
-    pipetting_cfg = PipettingLiquidSettingsConfig(
-        pipette=pipette,
-        well=well,
-        heights=pipetting_heights,
-        settings=liquid_class,
-        aspirate=aspirate,
-        dispense=dispense,
-    )
-    pip_runner = PipettingLiquidSettings(ctx=ctx, cfg=pipetting_cfg)
-    pip_runner.run(on_pre_submerge=on_pre_submerge, on_post_emerge=on_post_emerge)
-    liquid_tracker.update_affected_wells(
-        pipette, well, aspirate=aspirate, dispense=dispense
-    )
 
 
 class PipetteLiquidClass:
@@ -238,16 +223,35 @@ class PipetteLiquidClass:
         self._on_post_aspirate: Optional[Callable] = None
         self._on_pre_dispense: Optional[Callable] = None
         self._on_post_dispense: Optional[Callable] = None
+        self._sample_timestamps_list = list()
 
     @property
     def pipette(self) -> InstrumentContext:
         """Pipette."""
         return self._pipette
 
+    def clear_timestamps(self) -> None:
+        """Clear timestamps."""
+        self._sample_timestamps_list = list()
+
+    def get_timestamps(self) -> List[SampleTimestamps]:
+        """Get timestamps."""
+        return self._sample_timestamps_list
+
+    def create_empty_timestamp(self) -> None:
+        self._sample_timestamps_list.append(get_empty_sample_timestamp())
+
     def set_liquid_class(self, settings: LiquidClassSettings) -> None:
         """Set Liquid Class."""
         self._liq_cls = settings
-        apply_pipette_speeds(self._pipette, settings)
+        self._apply_pipette_speeds()
+
+    def _apply_pipette_speeds(self) -> None:
+        assert self._liq_cls.traverse.speed
+        self._pipette.default_speed = self._liq_cls.traverse.speed
+        self._pipette.flow_rate.aspirate = self._liq_cls.aspirate.flow_rate
+        self._pipette.flow_rate.dispense = self._liq_cls.dispense.flow_rate
+        self._pipette.flow_rate.blow_out = self._liq_cls.blow_out.flow_rate
 
     def assign_callbacks(
         self,
@@ -262,28 +266,43 @@ class PipetteLiquidClass:
         self._on_pre_dispense = on_pre_dispense
         self._on_post_dispense = on_post_dispense
 
-    def aspirate(self, volume: float, well: Well, liquid_level: LiquidTracker) -> None:
+    def aspirate(self, volume: float, well: Well,
+                 liquid_level: LiquidTracker) -> None:
         """Aspirate."""
-        pipette_liquid_settings(
-            self._ctx,
-            self._pipette,
-            well,
-            self._liq_cls,
-            liquid_level,
-            aspirate=volume,
-            on_pre_submerge=self._on_pre_aspirate,
-            on_post_emerge=self._on_post_aspirate,
-        )
+        self._pipette_liquid_settings(well, liquid_level, aspirate=volume)
 
-    def dispense(self, volume: float, well: Well, liquid_level: LiquidTracker) -> None:
+    def dispense(self, volume: float, well: Well,
+                 liquid_level: LiquidTracker) -> None:
         """Dispense."""
-        pipette_liquid_settings(
-            self._ctx,
-            self._pipette,
-            well,
-            self._liq_cls,
-            liquid_level,
-            dispense=volume,
-            on_pre_submerge=self._on_pre_dispense,
-            on_post_emerge=self._on_post_dispense,
+        self._pipette_liquid_settings(well, liquid_level, dispense=volume)
+
+    def _pipette_liquid_settings(
+            self, well: Well, liquid_tracker: LiquidTracker,
+            aspirate: Optional[float] = None, dispense: Optional[float] = None) -> None:
+        """Run a pipette given some Pipetting Liquid Settings."""
+        height_before, height_after = liquid_tracker.get_before_and_after_heights(
+            self._pipette, well, aspirate=aspirate, dispense=dispense
+        )
+        pipetting_heights = _create_pipetting_heights(
+            start_mm=height_before, end_mm=height_after, liquid_class=self._liq_cls
+        )
+        pipetting_cfg = LiquidSettingsRunnerConfig(
+            pipette=self._pipette,
+            well=well,
+            heights=pipetting_heights,
+            settings=self._liq_cls,
+            aspirate=aspirate,
+            dispense=dispense,
+        )
+        timestamps = self._sample_timestamps_list[-1]
+        pip_runner = LiquidSettingsRunner(
+            ctx=self._ctx, cfg=pipetting_cfg, timestamp=timestamps)
+        if aspirate:
+            pip_runner.run(on_pre_submerge=self._on_pre_aspirate,
+                           on_post_emerge=self._on_post_aspirate)
+        else:
+            pip_runner.run(on_pre_submerge=self._on_pre_dispense,
+                           on_post_emerge=self._on_post_dispense)
+        liquid_tracker.update_affected_wells(
+            self._pipette, well, aspirate=aspirate, dispense=dispense
         )

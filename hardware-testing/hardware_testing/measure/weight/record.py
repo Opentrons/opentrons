@@ -236,14 +236,16 @@ class GravimetricRecorder(Thread):
         """Set stable."""
         self._cfg.stable = stable
 
+    def set_duration(self, duration: float) -> None:
+        """Set stable."""
+        self._cfg.duration = duration
+
     def calibrate_scale(self) -> None:
         """Calibrate scale."""
         self._scale.calibrate()
 
-    def record(self, duration: Optional[float] = None, in_thread: bool = False) -> None:
+    def record(self, in_thread: bool = False) -> None:
         """Record."""
-        if duration is not None:
-            self._cfg.duration = duration
         if in_thread:
             if self._is_recording.is_set():
                 self._is_recording.clear()
@@ -298,16 +300,19 @@ class GravimetricRecorder(Thread):
             on_new_sample: Optional[Callable] = None,
     ) -> GravimetricRecording:
         """Record samples from the scale."""
-        assert self._cfg.duration
+        assert self._cfg.duration or self.is_alive()
         assert self._cfg.frequency
-        length = int(self._cfg.duration * self._cfg.frequency) + 1
+        if self._cfg.duration:
+            length = int(self._cfg.duration * self._cfg.frequency) + 1
+        else:
+            length = 0
         interval = 1.0 / self._cfg.frequency
         _recording = GravimetricRecording()
         _start_time = time()
-        while len(_recording) < length and not _record_did_exceed_time(
-                _start_time, timeout
-        ):
-            if not self.is_recording:
+        while self.is_recording:
+            if length and len(_recording) >= length:
+                break
+            if _record_did_exceed_time(_start_time, timeout):
                 break
             self._reading_samples.set()
             mass = self._scale.read()
