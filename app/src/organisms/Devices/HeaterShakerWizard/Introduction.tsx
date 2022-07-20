@@ -23,6 +23,7 @@ import deepwell from '@opentrons/app/src/assets/images/deepwell_thermal_adapter.
 import pcr from '@opentrons/app/src/assets/images/pcr_thermal_adapter.png'
 import universal from '@opentrons/app/src/assets/images/universal_thermal_adapter.png'
 import screwdriver from '@opentrons/app/src/assets/images/t10_torx_screwdriver.png'
+import { StyledText } from '@opentrons/app/src/atoms/text/StyledText'
 
 import type {
   LabwareDefinition2,
@@ -129,29 +130,24 @@ export function Introduction(props: IntroductionProps): JSX.Element {
 
   return (
     <Flex
-      padding={TYPOGRAPHY.lineHeight20}
+      padding={SPACING.spacingM}
       flexDirection={DIRECTION_COLUMN}
-      color={COLORS.darkBlack}
-      fontWeight={TYPOGRAPHY.fontWeightRegular}
       marginBottom={labwareDefinition != null ? '4.313rem' : '9.375rem'}
     >
-      <Text
-        fontSize={TYPOGRAPHY.lineHeight16}
-        data-testid={`introduction_title`}
-      >
+      <StyledText css={TYPOGRAPHY.h2Regular} data-testid={`introduction_title`}>
         {t('use_this_heater_shaker_guide')}
-      </Text>
+      </StyledText>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex justifyContent={JUSTIFY_CENTER}>
-          <Text
-            paddingTop={TYPOGRAPHY.fontSizeH6}
+          <StyledText
+            paddingTop="0.563rem"
             fontSize={TYPOGRAPHY.fontSizeH4}
             flexDirection={DIRECTION_ROW}
             width={'21.5rem'}
             data-testid={`introduction_subtitle`}
           >
             {t('you_will_need')}
-          </Text>
+          </StyledText>
         </Flex>
         <Flex
           justifyContent={JUSTIFY_CENTER}

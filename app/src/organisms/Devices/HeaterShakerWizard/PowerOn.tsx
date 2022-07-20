@@ -12,6 +12,7 @@ import {
   RobotWorkSpace,
   SPACING,
   Text,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { ModuleInfo } from '../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
 
@@ -38,7 +39,12 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
           t={t}
           i18nKey="step_2_power_on"
           components={{
-            strong: <Text fontWeight={700} paddingBottom={SPACING.spacingSM} />,
+            strong: (
+              <Text
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                paddingBottom={SPACING.spacingSM}
+              />
+            ),
             block: <span />,
           }}
         />

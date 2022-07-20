@@ -21,6 +21,7 @@ import {
 import { RPM, HS_RPM_MAX, HS_RPM_MIN } from '@opentrons/shared-data'
 import { TertiaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
+import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
 import { InputField } from '../../../atoms/InputField'
 import { Collapsible } from '../../ModuleCard/Collapsible'
@@ -107,13 +108,12 @@ export function TestShake(props: TestShakeProps): JSX.Element {
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <Text
-        color={COLORS.darkBlack}
+      <StyledText
         fontSize={TYPOGRAPHY.fontSizeH2}
-        fontWeight={700}
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {t('step_4_of_4')}
-      </Text>
+      </StyledText>
       <Flex
         marginTop={SPACING.spacing3}
         marginBottom={SPACING.spacing4}
@@ -181,12 +181,12 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           alignItems={ALIGN_FLEX_START}
         >
           <Flex flexDirection={DIRECTION_COLUMN} maxWidth={'6.25rem'}>
-            <Text
+            <StyledText
               fontSize={TYPOGRAPHY.fontSizeCaption}
               color={COLORS.darkGreyEnabled}
             >
               {t('set_shake_speed')}
-            </Text>
+            </StyledText>
             <InputField
               data-testid={`TestShake_shake_input`}
               units={RPM}
@@ -229,7 +229,9 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           alignItems={ALIGN_FLEX_START}
           marginY={SPACING.spacing6}
         >
-          <Text width={'22rem'}>{t('troubleshoot_step1_description')}</Text>
+          <StyledText width={'22rem'} fontSize={TYPOGRAPHY.fontSizeH2}>
+            {t('troubleshoot_step1_description')}
+          </StyledText>
           <TertiaryButton
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
@@ -239,7 +241,9 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           </TertiaryButton>
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
-          <Text width={'22rem'}>{t('troubleshoot_step2_description')}</Text>
+          <StyledText width={'22rem'} fontSize={TYPOGRAPHY.fontSizeH2}>
+            {t('troubleshoot_step2_description')}
+          </StyledText>
           <TertiaryButton
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
