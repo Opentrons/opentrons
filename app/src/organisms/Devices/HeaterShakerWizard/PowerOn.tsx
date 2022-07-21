@@ -5,7 +5,6 @@ import {
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import {
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
   Module,
