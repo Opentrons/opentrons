@@ -77,7 +77,7 @@ describe('ResultsSummary', () => {
   beforeEach(() => {
     mockDeleteSession = jest.fn()
     const mockSendCommands = jest.fn()
-    mockGetCalibrationStatus.mockReturnValue(mockCalibrationStatus)
+    // mockGetCalibrationStatus.mockReturnValue(mockCalibrationStatus)
     dispatch = jest.fn()
     mockStore = {
       subscribe: () => {},

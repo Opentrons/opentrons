@@ -17,7 +17,6 @@ import { useRunQuery, useRunActionMutations } from '@opentrons/react-api-client'
 
 import {
   useCloneRun,
-  useCurrentRun,
   useCurrentRunId,
   useRunCommands,
 } from '../ProtocolUpload/hooks'
@@ -65,12 +64,6 @@ export function useRunControls(
   }
 }
 
-export function useCurrentRunControls(): RunControls {
-  const currentRunId = useCurrentRunId()
-
-  return useRunControls(currentRunId)
-}
-
 const DEFAULT_STATUS_REFETCH_INTERVAL = 10000 // 10 seconds
 export function useRunStatus(
   runId: string | null,
@@ -116,35 +109,6 @@ export function useCurrentRunStatus(
   return useRunStatus(currentRunId, options)
 }
 
-export function useRunStartTime(): string | null {
-  const actions = useCurrentRun()?.data?.actions ?? []
-  const firstPlay = actions.find(
-    action => action.actionType === RUN_ACTION_TYPE_PLAY
-  )
-  const runStartTime = firstPlay?.createdAt
-
-  return runStartTime ?? null
-}
-
-export function useRunPauseTime(): string | null {
-  const actions = useCurrentRun()?.data?.actions ?? []
-  const lastAction = last(actions)
-
-  return lastAction?.actionType === RUN_ACTION_TYPE_PAUSE
-    ? lastAction.createdAt
-    : null
-}
-
-export function useRunStopTime(): string | null {
-  const actions = useCurrentRun()?.data?.actions ?? []
-  const lastAction = last(actions)
-
-  return lastAction?.actionType === RUN_ACTION_TYPE_STOP
-    ? lastAction.createdAt
-    : null
-}
-
-// TODO(bc, 2022-02-01): replace all usage of the above individual timestamp hooks with useCurrentRunTimestamps
 export interface RunTimestamps {
   startedAt: string | null
   pausedAt: string | null
@@ -210,22 +174,10 @@ export function useRunTimestamps(runId: string | null): RunTimestamps {
   }
 }
 
-export function useCurrentRunTimestamps(): RunTimestamps {
-  const currentRunId = useCurrentRunId()
-
-  return useRunTimestamps(currentRunId)
-}
-
 export function useRunErrors(runId: string | null): RunData['errors'] {
   const { data: runRecord } = useRunQuery(runId, {
     refetchInterval: DEFAULT_RUN_QUERY_REFETCH_INTERVAL,
   })
 
   return runRecord?.data?.errors ?? []
-}
-
-export function useCurrentRunErrors(): RunData['errors'] {
-  const currentRunId = useCurrentRunId()
-
-  return useRunErrors(currentRunId)
 }
