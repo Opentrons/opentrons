@@ -22,13 +22,17 @@ def subject(decoy: Decoy, mock_pipette: Pipette) -> PipetteHandlerProvider:
     return subject
 
 
+@pytest.mark.parametrize("presses_input, expected_array_length", [(0, 0)])
 def test_plan_check_pick_up_tip_with_presses_0(
-    decoy: Decoy, subject: PipetteHandlerProvider, mock_pipette
+    decoy: Decoy, subject: PipetteHandlerProvider,
+    mock_pipette: Pipette,
+    presses_input: int,
+    expected_array_length: int
 ) -> None:
-    """Should return an array with 0 length."""
+    """Should return an array with expected length."""
     tip_length = 25.0
     mount = types.Mount.LEFT
-    presses = 0
+    presses = presses_input
     increment = None
 
     decoy.when(mock_pipette.has_tip).then_return(False)
@@ -38,4 +42,4 @@ def test_plan_check_pick_up_tip_with_presses_0(
 
     spec, _add_tip_to_instrs = subject.plan_check_pick_up_tip(mount, tip_length, presses, increment)
 
-    assert spec.presses == []
+    assert len(spec.presses) == expected_array_length
