@@ -36,4 +36,6 @@ def test_plan_check_pick_up_tip_with_presses_0(
     decoy.when(mock_pipette.config.pick_up_distance).then_return(0)
     decoy.when(mock_pipette.config.pick_up_increment).then_return(0)
 
-    result = subject.plan_check_pick_up_tip(mount, tip_length, presses, increment)
+    spec, _add_tip_to_instrs = subject.plan_check_pick_up_tip(mount, tip_length, presses, increment)
+
+    assert spec.presses == []
