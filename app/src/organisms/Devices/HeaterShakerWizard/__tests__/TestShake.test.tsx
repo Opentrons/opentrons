@@ -131,6 +131,7 @@ describe('TestShake', () => {
   let props: React.ComponentProps<typeof TestShake>
   let mockCreateLiveCommand = jest.fn()
   let mockCreateCommand = jest.fn()
+  const mockToggleLatch = jest.fn()
   beforeEach(() => {
     props = {
       setCurrentPage: jest.fn(),
@@ -204,7 +205,7 @@ describe('TestShake', () => {
     }
 
     mockUseLatchControls.mockReturnValue({
-      toggleLatch: jest.fn(),
+      toggleLatch: mockToggleLatch,
       isLatchClosed: false,
     })
 
@@ -259,7 +260,7 @@ describe('TestShake', () => {
     }
 
     mockUseLatchControls.mockReturnValue({
-      toggleLatch: jest.fn(),
+      toggleLatch: mockToggleLatch,
       isLatchClosed: false,
     })
 
@@ -276,14 +277,14 @@ describe('TestShake', () => {
     }
 
     mockUseLatchControls.mockReturnValue({
-      toggleLatch: jest.fn(),
+      toggleLatch: mockToggleLatch,
       isLatchClosed: true,
     })
 
     const { getByRole } = render(props)
     const button = getByRole('button', { name: /Open Labware Latch/i })
     fireEvent.click(button)
-    expect(mockUseLatchControls).toHaveBeenCalled()
+    expect(mockToggleLatch).toHaveBeenCalled()
   })
 
   it('clicking the close latch button should close the heater shaker latch', () => {
@@ -294,14 +295,14 @@ describe('TestShake', () => {
     }
 
     mockUseLatchControls.mockReturnValue({
-      toggleLatch: jest.fn(),
+      toggleLatch: mockToggleLatch,
       isLatchClosed: false,
     })
 
     const { getByRole } = render(props)
     const button = getByRole('button', { name: /Close Labware Latch/i })
     fireEvent.click(button)
-    expect(mockUseLatchControls).toHaveBeenCalled()
+    expect(mockToggleLatch).toHaveBeenCalled()
   })
 
   it('entering an input for shake speed and clicking start should begin shaking when there is no run id', () => {

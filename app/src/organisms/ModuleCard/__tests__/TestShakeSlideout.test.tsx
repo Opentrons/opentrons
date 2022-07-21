@@ -119,6 +119,7 @@ describe('TestShakeSlideout', () => {
   let props: React.ComponentProps<typeof TestShakeSlideout>
   let mockCreateLiveCommand = jest.fn()
   let mockCreateCommand = jest.fn()
+  const mockToggleLatch = jest.fn()
   beforeEach(() => {
     props = {
       module: mockHeaterShaker,
@@ -127,7 +128,7 @@ describe('TestShakeSlideout', () => {
       isLoadedInRun: false,
     }
     mockUseLatchControls.mockReturnValue({
-      handleLatch: jest.fn(),
+      toggleLatch: mockToggleLatch,
       isLatchClosed: true,
     } as any)
     mockCreateLiveCommand = jest.fn()
@@ -199,7 +200,7 @@ describe('TestShakeSlideout', () => {
       isLoadedInRun: false,
     }
     mockUseLatchControls.mockReturnValue({
-      toggleLatch: jest.fn(),
+      toggleLatch: mockToggleLatch,
       isLatchClosed: false,
     })
 
@@ -279,7 +280,7 @@ describe('TestShakeSlideout', () => {
     const { getByRole } = render(props)
     const button = getByRole('button', { name: /Open/i })
     fireEvent.click(button)
-    expect(mockUseLatchControls).toHaveBeenCalled()
+    expect(mockToggleLatch).toHaveBeenCalled()
   })
 
   it('entering an input for shake speed and clicking start should begin shaking when there is a runId and run is idle', () => {
