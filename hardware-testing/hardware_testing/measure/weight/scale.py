@@ -52,7 +52,7 @@ class Scale:
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "Scale":
         """Build."""
-        if ctx.is_simulating:
+        if ctx.is_simulating():
             _scale = SimRadwagScale()
         else:
             _scale = RadwagScale.create(cls.find_port())  # type: ignore[assignment]
