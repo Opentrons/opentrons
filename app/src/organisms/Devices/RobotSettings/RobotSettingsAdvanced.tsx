@@ -132,7 +132,7 @@ export function RobotSettingsAdvanced({
       ) : null}
       {showDownloadToast && (
         <Toast
-          message={t('update_robot_software_download_logs_toast_message')}
+          message={t('downloading_logs')}
           type="info"
           icon={toastIcon}
           closeButton={false}

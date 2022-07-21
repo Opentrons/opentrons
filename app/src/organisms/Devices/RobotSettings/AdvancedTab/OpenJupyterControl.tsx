@@ -52,7 +52,7 @@ export function OpenJupyterControl({
         marginLeft={SPACING.spacing6}
         external
       >
-        {t('launch_jupyter_notebook_button')}
+        {t('launch_jupyter_notebook')}
       </TertiaryButton>
     </Flex>
   )

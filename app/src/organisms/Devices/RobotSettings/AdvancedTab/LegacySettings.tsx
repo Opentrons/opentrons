@@ -60,7 +60,7 @@ export function LegacySettings({
           {t('legacy_settings')}
         </StyledText>
         <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
-          {t('calibrate_deck')}
+          {t('calibrate_deck_to_dots')}
         </StyledText>
         <StyledText as="p">{t('calibrate_deck_description')}</StyledText>
       </Box>

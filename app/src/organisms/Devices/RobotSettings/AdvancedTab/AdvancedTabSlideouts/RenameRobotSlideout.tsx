@@ -127,7 +127,7 @@ export function RenameRobotSlideout({
 
   return (
     <Slideout
-      title={t('rename_robot_slideout_title')}
+      title={t('rename_robot_title')}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
@@ -136,7 +136,7 @@ export function RenameRobotSlideout({
           disabled={!(formik.isValid && formik.dirty)}
           width="100%"
         >
-          {t('rename_robot_button')}
+          {t('rename_robot')}
         </PrimaryButton>
       }
     >
@@ -152,7 +152,7 @@ export function RenameRobotSlideout({
           css={TYPOGRAPHY.labelSemiBold}
           marginBottom={SPACING.spacing3}
         >
-          {t('rename_robot_slideout_label')}
+          {t('robot_name')}
         </StyledText>
         <InputField
           data-testid="rename-robot_input"
@@ -164,7 +164,7 @@ export function RenameRobotSlideout({
           error={formik.errors.newRobotName && ' '}
         />
         <StyledText as="label" color={COLORS.darkGreyEnabled}>
-          {t('rename_robot_input_limitation_label')}
+          {t('characters_max')}
         </StyledText>
         {formik.errors.newRobotName && (
           <StyledText as="label" color={COLORS.error}>
