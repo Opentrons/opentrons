@@ -55,7 +55,7 @@ export function FactoryReset({
         onClick={handleClick}
         id="RobotSettings_FactoryResetChooseButton"
       >
-        {t('factory_reset_settings_button')}
+        {t('choose_reset_settings')}
       </TertiaryButton>
     </Flex>
   )

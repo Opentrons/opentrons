@@ -273,8 +273,8 @@ export function RobotSettingsCalibration({
 
   const deckCalibrationButtonText =
     deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
-      ? t('deck_calibration_recalibrate_button')
-      : t('deck_calibration_calibrate_button')
+      ? t('recalibrate_deck')
+      : t('calibrate_deck')
 
   const disabledOrBusyReason = isPending
     ? t('robot_calibration:deck_calibration_spinner', {
@@ -701,7 +701,7 @@ export function RobotSettingsCalibration({
             onClick={handleHealthCheckClick}
             disabled={calCheckButtonDisabled}
           >
-            {t('health_check_button')}
+            {t('health_check')}
           </TertiaryButton>
           {calCheckButtonDisabled && (
             <Tooltip tooltipProps={tooltipProps}>

@@ -195,7 +195,7 @@ describe('RobotSettingsNetworking', () => {
     getByText('Not connected via wired USB')
   })
 
-  it('should render the right links to external resouce and internal resource', () => {
+  it('should render the right links to external resource and internal resource', () => {
     const usbExternalLink =
       'https://support.opentrons.com/s/article/Get-started-Connect-to-your-OT-2-over-USB'
     const usbInternalLink = '/app-settings/advanced'

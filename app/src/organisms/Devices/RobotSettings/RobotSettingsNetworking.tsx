@@ -84,13 +84,13 @@ export function RobotSettingsNetworking({
           data-testid="RobotSettings_Networking_wifi_icon"
         />
         <StyledText as="h3">
-          {t('wireless_network')}
+          {t('wifi')}
           {activeNetwork?.ssid != null && ` - ${activeNetwork.ssid}`}
         </StyledText>
       </Flex>
       <Flex paddingLeft="3.5rem" marginBottom={SPACING.spacing3}>
         <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {t('wireless_network_name')}
+          {t('network_name')}
         </StyledText>
       </Flex>
       <Box paddingLeft="3.5rem" marginBottom={SPACING.spacing4}>
@@ -119,7 +119,7 @@ export function RobotSettingsNetworking({
                 paddingRight={SPACING.spacing4}
               >
                 <StyledText css={TYPOGRAPHY.pSemiBold}>
-                  {t('wireless_subnet')}
+                  {t('wireless_subnet_mask')}
                 </StyledText>
                 <StyledText as="p">{wifi?.subnetMask}</StyledText>
               </Flex>
@@ -129,7 +129,7 @@ export function RobotSettingsNetworking({
                 paddingRight={SPACING.spacing4}
               >
                 <StyledText css={TYPOGRAPHY.pSemiBold}>
-                  {t('wireless_mac')}
+                  {t('wireless_mac_address')}
                 </StyledText>
                 <StyledText as="p">{wifi?.macAddress}</StyledText>
               </Flex>
@@ -183,7 +183,7 @@ export function RobotSettingsNetworking({
                 paddingRight={SPACING.spacing4}
               >
                 <StyledText css={TYPOGRAPHY.pSemiBold}>
-                  {t('wired_subnet')}
+                  {t('wired_subnet_mask')}
                 </StyledText>
                 <StyledText as="p">{ethernet?.subnetMask}</StyledText>
               </Flex>
@@ -192,14 +192,14 @@ export function RobotSettingsNetworking({
                 paddingRight={SPACING.spacing4}
               >
                 <StyledText css={TYPOGRAPHY.pSemiBold}>
-                  {t('wired_mac')}
+                  {t('wired_mac_address')}
                 </StyledText>
                 <StyledText as="p">{ethernet?.macAddress}</StyledText>
               </Flex>
             </>
           ) : (
             <StyledText as="p" marginBottom={SPACING.spacing4}>
-              {t('wired_usb_not_connected_description')}
+              {t('not_connected_via_wired_usb')}
             </StyledText>
           )}
         </Flex>
