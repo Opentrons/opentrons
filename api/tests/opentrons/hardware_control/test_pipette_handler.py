@@ -22,7 +22,7 @@ def subject(decoy: Decoy, mock_pipette: Pipette) -> PipetteHandlerProvider:
     return subject
 
 
-@pytest.mark.parametrize("presses_input, expected_array_length", [(0, 0)])
+@pytest.mark.parametrize("presses_input, expected_array_length", [(0, 0), (None, 3), (3, 3)])
 def test_plan_check_pick_up_tip_with_presses_0(
     decoy: Decoy, subject: PipetteHandlerProvider,
     mock_pipette: Pipette,
@@ -39,6 +39,9 @@ def test_plan_check_pick_up_tip_with_presses_0(
     decoy.when(mock_pipette.config.quirks).then_return([])
     decoy.when(mock_pipette.config.pick_up_distance).then_return(0)
     decoy.when(mock_pipette.config.pick_up_increment).then_return(0)
+
+    if presses_input is None:
+        decoy.when(mock_pipette.config.pick_up_presses).then_return(expected_array_length)
 
     spec, _add_tip_to_instrs = subject.plan_check_pick_up_tip(mount, tip_length, presses, increment)
 
