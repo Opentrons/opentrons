@@ -215,11 +215,12 @@ class PipetteLiquidClass:
     """Pipette Liquid Class."""
 
     def __init__(
-        self, ctx: ProtocolContext, model: str, mount: str, tip_racks: List[Labware], test_name: str,
+        self, ctx: ProtocolContext, model: str, mount: str, tip_racks: List[Labware], test_name: str, run_id: str
     ) -> None:
         """Pipette Liquid Class."""
         self._ctx = ctx
         self._test_name = test_name
+        self._run_id = run_id
         self._pipette = ctx.load_instrument(model, mount, tip_racks=tip_racks)
         self._liq_cls: LiquidClassSettings = LIQUID_CLASS_DEFAULT
         self._on_pre_aspirate: Optional[Callable] = None
@@ -239,7 +240,7 @@ class PipetteLiquidClass:
     @property
     def tag(self) -> str:
         """Tag."""
-        return f'{self.__class__.__name__}_{self.unique_name}'
+        return f'{self.__class__.__name__}-{self.unique_name}'
 
     @property
     def pipette(self) -> InstrumentContext:
@@ -264,7 +265,7 @@ class PipetteLiquidClass:
         append_data_to_file(self._test_name, self._file_name, _latest.as_csv() + "\n")
 
     def record_timestamp_enable(self) -> None:
-        self._file_name = create_file_name(self._test_name, self.tag)
+        self._file_name = create_file_name(self._test_name, self._run_id, self.tag)
         # add the header to the CSV file
         dump_data_to_file(
             self._test_name, self._file_name, SampleTimestamps.csv_header() + "\n"

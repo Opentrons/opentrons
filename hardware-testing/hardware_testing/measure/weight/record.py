@@ -7,7 +7,6 @@ from typing import List, Optional, Callable
 
 from opentrons.protocol_api import ProtocolContext
 
-from hardware_testing.drivers import RadwagScaleBase, SimRadwagScale
 from hardware_testing.data import (
     dump_data_to_file,
     append_data_to_file,
@@ -15,6 +14,8 @@ from hardware_testing.data import (
 )
 
 from .scale import Scale
+
+SLEEP_TIME_IN_RECORD_LOOP = 0.1
 
 
 @dataclass
@@ -195,6 +196,7 @@ class GravimetricRecorderConfig:
         frequency: float,
         stable: bool = False,
         test_name: Optional[str] = None,
+        run_id: Optional[str] = None,
         tag: Optional[str] = None,
     ) -> None:
         """Recording config."""
@@ -202,6 +204,7 @@ class GravimetricRecorderConfig:
         self.frequency = frequency
         self.stable = stable
         self.test_name = test_name
+        self.run_id = run_id
         self.tag = tag
 
     @property
@@ -246,7 +249,7 @@ class GravimetricRecorder(Thread):
     @property
     def tag(self) -> str:
         """Tag."""
-        return f'{self.__class__.__name__}_{self._cfg.tag}'
+        return f'{self.__class__.__name__}-{self._cfg.tag}'
 
     @property
     def config(self) -> GravimetricRecorderConfig:
@@ -329,9 +332,8 @@ class GravimetricRecorder(Thread):
             self.wait_for_finish()
 
     def _wait_for_record_start(self) -> None:
-        while not self.is_recording:
-            assert self.is_alive()
-            sleep(1.0 / self._cfg.frequency)
+        if not self.is_recording:
+            self._is_recording.wait()
 
     def _record_samples(
             self,
@@ -368,6 +370,7 @@ class GravimetricRecorder(Thread):
                 _recording.append(_s)
                 if callable(on_new_sample):
                     on_new_sample(_recording)
+            sleep(SLEEP_TIME_IN_RECORD_LOOP)
         self._reading_samples.clear()
         assert len(_recording) == length or not self.is_recording, (
             f"Scale recording timed out before accumulating "
@@ -379,7 +382,7 @@ class GravimetricRecorder(Thread):
         """Record samples to disk."""
         assert self._cfg.test_name, f'A test-name is required to record samples'
         assert self._cfg.tag, f'A tag is required to record samples'
-        _file_name = create_file_name(self._cfg.test_name, self.tag)
+        _file_name = create_file_name(self._cfg.test_name, self._cfg.run_id, self.tag)
 
         def _on_new_sample(recording: GravimetricRecording) -> None:
             append_data_to_file(

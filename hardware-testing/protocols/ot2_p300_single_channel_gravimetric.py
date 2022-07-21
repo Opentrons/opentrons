@@ -3,6 +3,7 @@ from pathlib import Path
 
 from opentrons.protocol_api import ProtocolContext
 
+from hardware_testing.data import create_run_id
 from hardware_testing.labware.position import \
     VIAL_SAFE_Z_OFFSET, overwrite_default_labware_positions
 from hardware_testing.labware.layout import \
@@ -16,12 +17,12 @@ from hardware_testing.opentrons_api.helpers import get_api_context
 from hardware_testing.pipette.liquid_class import PipetteLiquidClass
 
 metadata = {"apiLevel": "2.12",
-            "protocolName": "ot2_p300_single_channel_gravimetric"}
+            "protocolName": "ot2-p300-single-channel-gravimetric"}
 
 PIP_MODEL = 'p300_single_gen2'
 PIP_MOUNT = 'left'
 VOLUMES = [200]
-NUM_SAMPLES_PER_VOLUME = 3
+NUM_SAMPLES_PER_VOLUME = 12
 
 
 def _test_gravimetric(
@@ -47,6 +48,9 @@ def _test_gravimetric(
 
 
 def _run(protocol: ProtocolContext) -> None:
+    # RUN ID (for labelling data)
+    run_id = create_run_id()
+
     # LABWARE
     labware_defs_dir = Path(__file__).parent / 'definitions'
     layout = LayoutLabware.build(
@@ -69,14 +73,15 @@ def _run(protocol: ProtocolContext) -> None:
         model=PIP_MODEL,
         mount=PIP_MOUNT,
         tip_racks=[layout.tiprack],  # type: ignore[list-item]
-        test_name=metadata['protocolName']
+        test_name=metadata['protocolName'],
+        run_id=run_id
     )
     liq_pipette.set_liquid_class(DEFAULT_LIQUID_CLASS_OT2_P300_SINGLE)
     liq_pipette.record_timestamp_enable()
 
     # SCALE RECORDER
     recorder = GravimetricRecorder(protocol, GravimetricRecorderConfig(
-        test_name=metadata['protocolName'], tag=liq_pipette.unique_name,
+        test_name=metadata['protocolName'], run_id=run_id, tag=liq_pipette.unique_name,
         duration=0, frequency=10, stable=False
     ))
     recorder.activate()

@@ -1,14 +1,18 @@
 """Gravimetric RnD."""
 from opentrons.protocol_api import ProtocolContext
 
+from hardware_testing.data import create_run_id
 from hardware_testing.opentrons_api.helpers import get_api_context
-from hardware_testing.measure.weight import GravimetricRecorder
+from hardware_testing.measure.weight import GravimetricRecorder, GravimetricRecorderConfig
 
 metadata = {"protocolName": "gravimetric-rnd", "apiLevel": "2.12"}
 
 
 def _run(protocol: ProtocolContext) -> None:
-    recorder = GravimetricRecorder(protocol, test_name=metadata["protocolName"])
+    run_id = create_run_id()
+    recorder = GravimetricRecorder(protocol, GravimetricRecorderConfig(
+        test_name=metadata["protocolName"], run_id=run_id,
+        duration=0, frequency=10, stable=False))
     recorder.activate()
     if "y" in input("Calibrate the scale? (y/n): ").lower():
         recorder.calibrate_scale()
