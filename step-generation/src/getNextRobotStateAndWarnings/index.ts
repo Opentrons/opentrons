@@ -81,18 +81,27 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
+    // the following commands currently don't effect tracked robot state
+    // pipetting
+    case 'touchTip':
+    // setup
     case 'loadPipette':
     case 'loadLabware':
     case 'loadModule':
+    // gantry
     case 'home':
-    case 'pause':
     case 'moveRelative':
-    case 'savePosition':
-    case 'touchTip':
-    case 'delay':
+    case 'moveToSlot':
+    case 'moveToCoordinates':
     case 'moveToWell':
+    case 'savePosition':
+    // timing
+    case 'waitForResume':
+    case 'waitForDuration':
+    case 'pause': // deprecated, use waitForResume instead
+    case 'delay': // deprecated, use waitForDuration instead
+    // fall-back
     case 'custom':
-      // these commands don't have any effects on the state
       break
 
     case 'loadLiquid':
