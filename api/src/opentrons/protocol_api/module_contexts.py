@@ -809,6 +809,8 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         self._module = hw_module
         self._loop = loop
         super().__init__(ctx, geometry, requested_as, at_version)
+        self._geometry.is_labware_latch_closed = self._module.labware_latch_status is HeaterShakerLabwareLatchStatus.IDLE_CLOSED
+        self._geometry.is_shaking = self._module.speed_status is not module_types.SpeedStatus.IDLE
 
     # TODO: add API version requirement
     @property
@@ -931,6 +933,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         ):
             validated_speed = validate_heater_shaker_speed(rpm=rpm)
             self._module.set_speed(rpm=validated_speed)
+            self._geometry.set_is_shaking = True
         else:
             # TODO: Figure out whether to issue close latch behind the scenes instead
             raise CannotPerformModuleAction(
@@ -956,21 +959,45 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
                 """Cannot open labware latch while module is shaking."""
             )
         self._module.open_labware_latch()
+        self._geometry.is_labware_latch_closed = False
 
     # TODO: add API version requirement
     @publish(command=cmds.heater_shaker_close_labware_latch)
     def close_labware_latch(self) -> None:
         """Close heater-shaker's labware latch"""
         self._module.close_labware_latch()
+        self._geometry.is_labware_latch_closed = True
 
     # TODO: add API version requirement
     @publish(command=cmds.heater_shaker_deactivate_shaker)
     def deactivate_shaker(self) -> None:
         """Stop shaking."""
         self._module.deactivate_shaker()
+        self._geometry.is_shaking = False
 
     # TODO: add API version requirement
     @publish(command=cmds.heater_shaker_deactivate_heater)
     def deactivate_heater(self) -> None:
         """Stop heating."""
         self._module.deactivate_heater()
+
+    def flag_unsafe_move(
+            self,
+            to_loc: types.Location,
+            from_loc: types.Location,
+            is_multichannel: bool,
+    ) -> None:
+        """
+        Raise an error if attempting to perform a move that's deemed unsafe due to
+        the presence of the heater-shaker.
+        """
+        is_labware_latch_closed = self._module.labware_latch_status is HeaterShakerLabwareLatchStatus.IDLE_CLOSED
+        is_plate_shaking = self._module.speed_status is not module_types.SpeedStatus.IDLE
+
+        cast(HeaterShakerGeometry, self.geometry).flag_unsafe_move(
+            to_loc,
+            from_loc,
+            is_multichannel=is_multichannel,
+            is_plate_shaking=is_plate_shaking,
+            is_labware_latch_closed=is_labware_latch_closed,
+        )

@@ -84,6 +84,21 @@ def v1_mag_module_schema_v1_definition() -> ModuleDefinitionV1:
     }
 
 
+@pytest.fixture
+def heaterShakerGeometryFixture() -> HeaterShakerGeometry:
+    """Get a Heater-Shaker Geometry fixture."""
+    return HeaterShakerGeometry(
+        display_name="A new shiny module!",
+        model=HeaterShakerModuleModel.HEATER_SHAKER_V1,
+        module_type=ModuleType.HEATER_SHAKER,
+        offset=Point(0, 0, 0),
+        overall_height=111,
+        height_over_labware=222,
+        parent=Location(point=Point(1, 2, 3), labware=None),
+        api_level=APIVersion.from_string("22.22"),
+    )
+
+
 @pytest.mark.parametrize(
     argnames=["api_version", "module_definition", "expected_geometry", "expected_repr"],
     argvalues=[
@@ -182,5 +197,6 @@ def test_heater_shaker_geometry_properties() -> None:
     )
     assert subject.model == HeaterShakerModuleModel.HEATER_SHAKER_V1
     assert subject.labware is None
-    assert subject.latch_status == HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN
+    # assert subject.is == HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN
     assert subject.location.point == Point(1, 2, 3)
+

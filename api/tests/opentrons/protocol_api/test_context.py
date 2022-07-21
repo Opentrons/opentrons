@@ -3,7 +3,7 @@
 import asyncio
 import json
 from unittest import mock
-from typing import Any, Dict
+from typing import Any, Dict, AsyncGenerator
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette.dev_types import LabwareUri
@@ -15,7 +15,7 @@ from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
-from opentrons.hardware_control import API, NoTipAttachedError
+from opentrons.hardware_control import API, NoTipAttachedError, ThreadManagedHardware
 from opentrons.hardware_control.instruments.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
@@ -1143,11 +1143,27 @@ def test_home_plunger(monkeypatch, hardware):
     instr.home_plunger()
 
 
-def test_move_to_with_thermocycler(ctx):
+@pytest.mark.parametrize(
+    argnames=["module_name", "slot"],
+    argvalues=[
+        ["thermocycler", 7],
+        ["heaterShakerModuleV1", 1]
+    ]
+)
+def test_move_to_with_unsafe_module(
+        hardware: ThreadManagedHardware,
+        enable_heater_shaker_python_api: AsyncGenerator[None, None],
+        module_name: str,
+        slot: int
+) -> None:
     def raiser(*args, **kwargs):
         raise RuntimeError("Cannot")
 
-    mod = ctx.load_module("thermocycler")
+    # TODO (spp. 2022-07-20): use the ctx fixture once h/s ff is removed
+    ctx = papi.ProtocolContext(
+        implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
+    )
+    mod = ctx.load_module(module_name, slot)
     mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)
     instr = ctx.load_instrument("p1000_single", "left")
     with pytest.raises(RuntimeError, match="Cannot"):

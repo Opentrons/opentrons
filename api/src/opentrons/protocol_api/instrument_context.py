@@ -18,7 +18,10 @@ from opentrons.protocols.api_support.instrument import (
     validate_can_dispense,
 )
 from opentrons.protocols.api_support.labware_like import LabwareLike
-from opentrons.protocol_api.module_contexts import ThermocyclerContext
+from opentrons.protocol_api.module_contexts import (
+    ThermocyclerContext,
+    HeaterShakerContext
+)
 from opentrons.protocols.api_support.util import (
     FlowRates,
     PlungerSpeeds,
@@ -1202,6 +1205,10 @@ class InstrumentContext(CommandPublisher):
         for mod in self._ctx._modules:
             if isinstance(mod, ThermocyclerContext):
                 mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
+            if isinstance(mod, HeaterShakerContext):
+                mod.flag_unsafe_move(to_loc=location,
+                                     from_loc=from_loc,
+                                     is_multichannel=self.channels > 1)
 
         publish_ctx = nullcontext()
 

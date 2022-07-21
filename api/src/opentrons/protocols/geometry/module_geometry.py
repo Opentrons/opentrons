@@ -385,15 +385,39 @@ class HeaterShakerGeometry(ModuleGeometry):
             parent,
             api_level,
         )
-        self._latch_status = HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN
+        self._is_labware_latch_closed: Optional[bool] = None
+
+        # There is an issue in initializing this to false. If a protocol run begins
+        # while h/s is shaking then anything that depends on gating with is_shaking
+        # would behave incorrectly. But we also can't initialize it to true since that'd
+        # require a protocol to have a deactivate shake for a set shake.
+        self._is_shaking: Optional[bool] = None
 
     @property
-    def latch_status(self) -> HeaterShakerLabwareLatchStatus:
-        return self._latch_status
+    def is_labware_latch_closed(self) -> bool:
+        return self._is_labware_latch_closed
 
-    @latch_status.setter
-    def latch_status(self, status: HeaterShakerLabwareLatchStatus) -> None:
-        self._latch_status = status
+    @is_labware_latch_closed.setter
+    def is_labware_latch_closed(self, is_closed: bool) -> None:
+        self._is_labware_latch_closed = is_closed
+
+    @property
+    def is_shaking(self) -> bool:
+        return self._is_shaking
+
+    @is_shaking.setter
+    def is_shaking(self, is_shaking: bool) -> None:
+        self._is_shaking = is_shaking
+
+    def flag_unsafe_move(
+        self,
+        to_loc: types.Location,
+        from_loc: types.Location,
+        is_multichannel: bool,
+        is_labware_latch_closed: bool,
+        is_plate_shaking: bool,
+    ) -> None:
+        pass
 
 
 def _load_from_v1(
