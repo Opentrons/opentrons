@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from opentrons.types import MountType, DeckSlotName, Location
 from opentrons.commands import types as legacy_command_types
@@ -81,6 +81,7 @@ class LegacyCommandMapper:
         self._labware_id_by_slot: Dict[DeckSlotName, str] = {
             DeckSlotName.FIXED_TRASH: FIXED_TRASH_ID
         }
+        self._labware_id_by_module_id: Dict[str, str] = {}
         self._pipette_id_by_mount: Dict[MountType, str] = {}
         self._module_id_by_slot: Dict[DeckSlotName, str] = {}
 
@@ -265,10 +266,14 @@ class LegacyCommandMapper:
                 well = location.labware.as_well()
             else:
                 raise Exception("Unknown aspirate location.")
+            parentModuleId = self._module_id_by_slot.get(location.labware.first_parent())
+            if parentModuleId is not None:
+                labware_id = self._labware_id_by_module_id[parentModuleId]
+            else:
+                slot = DeckSlotName.from_primitive(location.labware.first_parent())  # type: ignore[arg-type]
+                labware_id = self._labware_id_by_slot[slot]
             mount = MountType(pipette.mount)
-            slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
             well_name = well.well_name
-            labware_id = self._labware_id_by_slot[slot]
             pipette_id = self._pipette_id_by_mount[mount]
             engine_command = pe_commands.Aspirate.construct(
                 id=command_id,
@@ -299,10 +304,14 @@ class LegacyCommandMapper:
                 well = location.labware.as_well()
             else:
                 raise Exception("Unknown dispense location.")
+            parentModuleId = self._module_id_by_slot.get(location.labware.first_parent())
+            if parentModuleId is not None:
+                labware_id = self._labware_id_by_module_id[parentModuleId]
+            else:
+                slot = DeckSlotName.from_primitive(location.labware.first_parent())  # type: ignore[arg-type]
+                labware_id = self._labware_id_by_slot[slot]
             mount = MountType(pipette.mount)
-            slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
             well_name = well.well_name
-            labware_id = self._labware_id_by_slot[slot]
             pipette_id = self._pipette_id_by_mount[mount]
             engine_command = pe_commands.Dispense.construct(
                 id=command_id,
@@ -387,9 +396,9 @@ class LegacyCommandMapper:
 
         self._command_count["LOAD_LABWARE"] = count + 1
         if isinstance(location, pe_types.DeckSlotLocation):
-            # TODO (spp, 2021-11-16): Account for labware on modules when mapping legacy
-            #  pipetting commands; either in self._labware_id_by_slot or something else
             self._labware_id_by_slot[location.slotName] = labware_id
+        elif isinstance(location, pe_types.ModuleLocation):
+            self._labware_id_by_module_id[location.moduleId] = labware_id
         return load_labware_command
 
     def _map_instrument_load(
