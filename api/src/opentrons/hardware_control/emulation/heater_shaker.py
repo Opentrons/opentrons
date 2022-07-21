@@ -111,7 +111,7 @@ class HeaterShakerEmulator(AbstractEmulator):
         return res
 
     def _home(self, command: Command) -> str:
-        sleep(2)
+        sleep(self._settings.home_delay_time)
         self._rpm.deactivate(0.0)
         self._rpm.set_target(0.0)
         return "G28"
