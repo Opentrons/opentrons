@@ -10,6 +10,7 @@ import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
 
 jest.mock('../../../../redux/networking/selectors')
 jest.mock('../../../../redux/robot-api/selectors')
+jest.mock('../../hooks')
 
 const mockUpdateRobotStatus = jest.fn()
 
