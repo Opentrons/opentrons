@@ -3,7 +3,12 @@ import asyncio
 from starlette import status
 from fastapi import Path, APIRouter, Depends
 
-from opentrons.hardware_control import modules, HardwareControlAPI, ThreadedAsyncLock, ThreadedAsyncForbidden
+from opentrons.hardware_control import (
+    modules,
+    HardwareControlAPI,
+    ThreadedAsyncLock,
+    ThreadedAsyncForbidden,
+)
 from opentrons.hardware_control.modules import AbstractModule
 
 from robot_server.errors import LegacyErrorResponse
