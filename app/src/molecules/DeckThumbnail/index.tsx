@@ -3,6 +3,7 @@ import map from 'lodash/map'
 
 import { RobotWorkSpace, Module, LabwareRender } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
+import { useFeatureFlag } from '../../redux/config'
 
 import {
   inferModuleOrientationFromXCoordinate,
@@ -13,12 +14,15 @@ import {
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
   parseInitialLoadedModulesBySlot,
+  parseLiquidsInLoadOrder,
+  parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
-
+import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
 import type { DeckSlot, RunTimeCommand } from '@opentrons/shared-data'
 
 interface DeckThumbnailProps {
   commands: RunTimeCommand[]
+  showLiquids?: boolean
 }
 const deckSetupLayerBlocklist = [
   'calibrationMarkings',
@@ -32,18 +36,25 @@ const deckSetupLayerBlocklist = [
 
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
-  const { commands } = props
+  const { commands, showLiquids } = props
+  const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
+
   const initialLoadedLabwareBySlot = parseInitialLoadedLabwareBySlot(commands)
   const initialLoadedModulesBySlot = parseInitialLoadedModulesBySlot(commands)
   const initialLoadedLabwareByModuleId = parseInitialLoadedLabwareByModuleId(
     commands
   )
+  const liquidsInLoadOrder = parseLiquidsInLoadOrder()
+  const labwareByLiquidId = parseLabwareInfoByLiquidId()
 
   return (
+    // PR #10488 changed size
+    // revert the height
+    // Note add offset 18px to right and left
     <RobotWorkSpace
       deckLayerBlocklist={deckSetupLayerBlocklist}
       deckDef={deckDef}
-      viewBox="-90 -40 560 500"
+      viewBox="-75 -20 586 480"
     >
       {({ deckSlotsById }) =>
         map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {
@@ -62,7 +73,18 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
             moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
               ? initialLoadedLabwareByModuleId[moduleInSlot.result.moduleId]
               : null
-
+          let labwareId = labwareInSlot ? labwareInSlot.result.labwareId : null
+          labwareId = labwareInModule
+            ? labwareInModule.result.labwareId
+            : labwareId
+          const wellFill =
+            labwareId && showLiquids && liquidSetupEnabled
+              ? getWellFillFromLabwareId(
+                  labwareId,
+                  liquidsInLoadOrder,
+                  labwareByLiquidId
+                )
+              : null
           return (
             <React.Fragment key={slotId}>
               {moduleInSlot != null ? (
@@ -82,6 +104,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                   {labwareInModule != null ? (
                     <LabwareRender
                       definition={labwareInModule.result.definition}
+                      wellFill={wellFill ?? undefined}
                     />
                   ) : null}
                 </Module>
@@ -90,7 +113,10 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                 <g
                   transform={`translate(${slot.position[0]},${slot.position[1]})`}
                 >
-                  <LabwareRender definition={labwareInSlot.result.definition} />
+                  <LabwareRender
+                    definition={labwareInSlot.result.definition}
+                    wellFill={wellFill ?? undefined}
+                  />
                 </g>
               ) : null}
             </React.Fragment>

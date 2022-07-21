@@ -9,8 +9,9 @@ import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useDispatchApiRequest } from '../../../redux/robot-api'
+import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import { fetchLights } from '../../../redux/robot-controls'
-import { useLights, useRobot } from '../hooks'
+import { useLights, useRobot, useRunStatuses } from '../hooks'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotOverview } from '../RobotOverview'
@@ -20,6 +21,7 @@ import type { DispatchApiRequestType } from '../../../redux/robot-api'
 
 jest.mock('../../../redux/robot-api')
 jest.mock('../../../redux/robot-controls')
+jest.mock('../../../redux/buildroot/selectors')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 jest.mock('../RobotStatusBanner')
@@ -49,6 +51,12 @@ const mockRobotOverviewOverflowMenu = RobotOverviewOverflowMenu as jest.MockedFu
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
 >
+const mockUseRunStatues = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
+>
+const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
+  typeof getBuildrootUpdateDisplayInfo
+>
 const mockFetchLights = fetchLights as jest.MockedFunction<typeof fetchLights>
 
 const mockToggleLights = jest.fn()
@@ -69,6 +77,17 @@ describe('RobotOverview', () => {
 
   beforeEach(() => {
     dispatchApiRequest = jest.fn()
+    mockUseRunStatues.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: true,
+      isRunIdle: false,
+    })
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'reinstall',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
     mockUseLights.mockReturnValue({
       lightsOn: false,
@@ -141,5 +160,44 @@ describe('RobotOverview', () => {
     const [{ getByText }] = render()
 
     getByText('mock RobotOverviewOverflowMenu')
+  })
+
+  it('renders run a protocol button as disabled when run is not terminal and run id is not null', () => {
+    mockUseCurrentRunId.mockReturnValue('id')
+    mockUseRunStatues.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: false,
+      isRunIdle: false,
+    })
+    const [{ getByRole }] = render()
+    const runButton = getByRole('button', { name: 'Run a protocol' })
+    expect(runButton).toBeDisabled()
+  })
+
+  it('disables the run a protocol button if robot software update is available', () => {
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Run a protocol' })
+    expect(button).toBeDisabled()
+  })
+
+  it('renders run a protocol button as not disabled when run id is null but run status is not terminal', () => {
+    mockUseCurrentRunId.mockReturnValue(null)
+    mockUseRunStatues.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: true,
+      isRunIdle: false,
+    })
+    const [{ getByText, getByRole }] = render()
+    const runButton = getByRole('button', { name: 'Run a protocol' })
+    fireEvent.click(runButton)
+    getByText('Mock Choose Protocol Slideout showing')
   })
 })

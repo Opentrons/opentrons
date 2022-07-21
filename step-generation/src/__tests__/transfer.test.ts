@@ -992,6 +992,7 @@ describe('advanced options', () => {
         // Pre-wet
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -1008,12 +1009,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -1030,13 +1033,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (asp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -1053,12 +1058,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -1075,13 +1082,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -1098,6 +1107,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1114,13 +1124,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1136,6 +1148,7 @@ describe('advanced options', () => {
         // aspirate > air gap
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -1152,13 +1165,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // dispense the aspirate > air gap
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -1175,12 +1190,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -1197,6 +1214,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -1213,13 +1231,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -1236,12 +1256,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -1258,13 +1280,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -1281,6 +1305,7 @@ describe('advanced options', () => {
         // blowout
         {
           commandType: 'blowout',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'fixedTrash',
@@ -1299,6 +1324,7 @@ describe('advanced options', () => {
         // mix (asp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -1315,12 +1341,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -1337,13 +1365,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate 81 (= total vol 350 - prev transfer's 269)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 81,
@@ -1360,6 +1390,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1376,13 +1407,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1398,6 +1431,7 @@ describe('advanced options', () => {
         // aspirate > air gap
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -1414,13 +1448,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // dispense aspirate > air gap then liquid
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -1437,12 +1473,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 81,
@@ -1459,6 +1497,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -1475,13 +1514,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -1498,12 +1539,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -1520,13 +1563,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -1541,6 +1586,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'blowout',
+          key: expect.any(String),
           params: {
             flowRate: 2.3,
             labwareId: 'fixedTrash',
@@ -1557,6 +1603,7 @@ describe('advanced options', () => {
         // use the dispense > air gap here before moving to trash
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 3,
@@ -1573,13 +1620,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // since we used dispense > air gap, drop the tip
         {
           commandType: 'dropTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'fixedTrash',
@@ -1602,6 +1651,7 @@ describe('advanced options', () => {
         // Pre-wet
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -1618,12 +1668,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -1640,13 +1692,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (asp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -1663,12 +1717,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -1685,13 +1741,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -1708,6 +1766,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1724,13 +1783,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1746,6 +1807,7 @@ describe('advanced options', () => {
         // aspirate > air gap
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -1762,13 +1824,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // dispense the aspirate > air gap
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -1785,12 +1849,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -1807,6 +1873,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -1823,13 +1890,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -1846,12 +1915,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -1868,13 +1939,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -1890,6 +1963,7 @@ describe('advanced options', () => {
         // blowout
         {
           commandType: 'blowout',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -1910,6 +1984,7 @@ describe('advanced options', () => {
         // mix (asp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -1926,12 +2001,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -1948,13 +2025,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate 81 (= total vol 350 - prev transfer's 269)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 81,
@@ -1971,6 +2050,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1987,13 +2067,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -2009,6 +2091,7 @@ describe('advanced options', () => {
         // aspirate > air gap
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             flowRate: 2.1,
             labwareId: 'sourcePlateId',
@@ -2025,12 +2108,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             flowRate: 2.2,
             labwareId: 'destPlateId',
@@ -2047,12 +2132,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 81,
@@ -2069,6 +2156,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2085,13 +2173,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -2108,12 +2198,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -2130,13 +2222,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2152,6 +2246,7 @@ describe('advanced options', () => {
         // blowout to dest well
         {
           commandType: 'blowout',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2168,6 +2263,7 @@ describe('advanced options', () => {
         // dispense > air gap on the way to trash
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2184,14 +2280,16 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // this step is over, and we used dispense > air gap, so
         // we will dispose of the tip
         {
           commandType: 'dropTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'fixedTrash',
@@ -2214,6 +2312,7 @@ describe('advanced options', () => {
         // get fresh tip b/c it's per source
         {
           commandType: 'dropTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'fixedTrash',
@@ -2222,6 +2321,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'pickUpTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'tiprack1Id',
@@ -2231,6 +2331,7 @@ describe('advanced options', () => {
         // Pre-wet
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -2247,12 +2348,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -2269,13 +2372,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (asp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -2292,12 +2397,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -2314,13 +2421,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -2337,6 +2446,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -2353,13 +2463,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -2375,6 +2487,7 @@ describe('advanced options', () => {
         // aspirate > air gap
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -2391,13 +2504,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // dispense
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -2414,12 +2529,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -2436,6 +2553,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2452,13 +2570,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -2475,12 +2595,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -2497,13 +2619,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2519,6 +2643,7 @@ describe('advanced options', () => {
         // blowout
         {
           commandType: 'blowout',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2539,6 +2664,7 @@ describe('advanced options', () => {
         // mix (asp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -2555,12 +2681,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -2577,13 +2705,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate 81 (= total vol 350 - prev transfer's 269)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 81,
@@ -2600,6 +2730,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -2616,13 +2747,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -2638,6 +2771,7 @@ describe('advanced options', () => {
         // aspirate > air gap
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -2654,13 +2788,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // dispense "aspirate > air gap" then dispense liquid
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -2677,12 +2813,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 81,
@@ -2699,6 +2837,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2715,13 +2854,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -2738,12 +2879,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -2760,13 +2903,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2782,6 +2927,7 @@ describe('advanced options', () => {
         // blowout
         {
           commandType: 'blowout',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2798,6 +2944,7 @@ describe('advanced options', () => {
         // dispense > air gap
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2814,13 +2961,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // we used dispense > air gap, so we will dispose of the tip
         {
           commandType: 'dropTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'fixedTrash',
@@ -2843,6 +2992,7 @@ describe('advanced options', () => {
         // get fresh tip b/c it's per source
         {
           commandType: 'dropTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'fixedTrash',
@@ -2851,6 +3001,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'pickUpTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'tiprack1Id',
@@ -2860,6 +3011,7 @@ describe('advanced options', () => {
         // Pre-wet
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -2876,12 +3028,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -2898,13 +3052,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (asp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -2921,12 +3077,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -2943,13 +3101,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -2966,6 +3126,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -2982,13 +3143,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -3004,6 +3167,7 @@ describe('advanced options', () => {
         // aspirate > air gap
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -3020,13 +3184,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // dispense
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -3043,12 +3209,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 269,
@@ -3065,6 +3233,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -3081,13 +3250,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -3104,12 +3275,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -3126,13 +3299,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -3148,6 +3323,7 @@ describe('advanced options', () => {
         // blowout
         {
           commandType: 'blowout',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -3164,6 +3340,7 @@ describe('advanced options', () => {
         // dispense > air gap
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -3180,11 +3357,13 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
-          params: { wait: 11 },
+          key: expect.any(String),
+          params: { seconds: 11 },
         },
         // we're not re-using the tip, so instead of dispenseAirGap we'll change the tip
         {
           commandType: 'dropTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'fixedTrash',
@@ -3193,6 +3372,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'pickUpTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'tiprack1Id',
@@ -3204,6 +3384,7 @@ describe('advanced options', () => {
         // mix (asp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -3220,12 +3401,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 35,
@@ -3242,13 +3425,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // aspirate 81 (= total vol 350 - prev transfer's 269)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 81,
@@ -3265,6 +3450,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -3281,13 +3467,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // touch tip (asp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -3303,6 +3491,7 @@ describe('advanced options', () => {
         // aspirate > air gap
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -3319,13 +3508,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // dispense "aspirate > air gap" then dispense liquid
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -3342,12 +3533,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 81,
@@ -3364,6 +3557,7 @@ describe('advanced options', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -3380,13 +3574,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // mix (disp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -3403,12 +3599,14 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -3425,13 +3623,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // touch tip (disp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -3447,6 +3647,7 @@ describe('advanced options', () => {
         // blowout
         {
           commandType: 'blowout',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -3463,6 +3664,7 @@ describe('advanced options', () => {
         // dispense > air gap
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -3479,13 +3681,15 @@ describe('advanced options', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // we used dispense > air gap, so we will dispose of the tip
         {
           commandType: 'dropTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'fixedTrash',

@@ -7,7 +7,6 @@ import {
   Flex,
   SPACING,
   TYPOGRAPHY,
-  TEXT_TRANSFORM_CAPITALIZE,
   COLORS,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
@@ -31,7 +30,7 @@ const OffsetTable = styled('table')`
   text-align: left;
 `
 const OffsetTableHeader = styled('th')`
-  text-transform: ${TEXT_TRANSFORM_CAPITALIZE};
+  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   padding: ${SPACING.spacing2};
 `
 const OffsetTableRow = styled('tr')`
@@ -84,7 +83,7 @@ export function ReapplyOffsetsModal(
       <OffsetTable>
         <tr>
           <OffsetTableHeader>{t('location')}</OffsetTableHeader>
-          <OffsetTableHeader>{t('run_id')}</OffsetTableHeader>
+          <OffsetTableHeader>{t('run')}</OffsetTableHeader>
           <OffsetTableHeader>{t('labware')}</OffsetTableHeader>
           <OffsetTableHeader>{t('labware_offset_data')}</OffsetTableHeader>
         </tr>

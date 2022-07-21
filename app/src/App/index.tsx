@@ -12,7 +12,6 @@ import {
   OVERFLOW_SCROLL,
 } from '@opentrons/components'
 
-import { useFeatureFlag } from '../redux/config'
 import { GlobalStyle } from '../atoms/GlobalStyle'
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
@@ -23,10 +22,9 @@ import { RobotSettings } from '../pages/Devices/RobotSettings'
 import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
 import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { ProtocolTimeline} from '../pages/Protocols/ProtocolDetails/ProtocolTimeline'
-import { AppSettings } from '../organisms/AppSettings'
-import { Labware } from '../organisms/Labware'
+import { AppSettings } from '../pages/AppSettings'
+import { Labware } from '../pages/Labware'
 import { Navbar } from './Navbar'
-import { LegacyApp } from './LegacyApp'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
 
 import type { RouteProps } from './types'
@@ -105,7 +103,6 @@ export const routes: RouteProps[] = [
 const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
 export const AppComponent = (): JSX.Element => {
-  const isLegacyApp = useFeatureFlag('hierarchyReorganization')
   useSoftwareUpdatePoll()
 
   return (
@@ -119,37 +116,31 @@ export const AppComponent = (): JSX.Element => {
         onDragOver={stopEvent}
         onDrop={stopEvent}
       >
-        {isLegacyApp ? (
-          <LegacyApp />
-        ) : (
-          <>
-            <TopPortalRoot />
-            <Navbar routes={routes} />
-            <Box width="100%">
-              <Switch>
-                {routes.map(({ Component, exact, path }: RouteProps) => {
-                  return (
-                    <Route key={path} exact={exact} path={path}>
-                      <Breadcrumbs />
-                      <Box
-                        position={POSITION_RELATIVE}
-                        width="100%"
-                        height="100%"
-                        backgroundColor={COLORS.background}
-                        overflow={OVERFLOW_SCROLL}
-                      >
-                        <ModalPortalRoot />
-                        <Component />
-                      </Box>
-                    </Route>
-                  )
-                })}
-                <Redirect exact from="/" to="/protocols" />
-              </Switch>
-              <Alerts />
-            </Box>
-          </>
-        )}
+        <TopPortalRoot />
+        <Navbar routes={routes} />
+        <Box width="100%">
+          <Switch>
+            {routes.map(({ Component, exact, path }: RouteProps) => {
+              return (
+                <Route key={path} exact={exact} path={path}>
+                  <Breadcrumbs />
+                  <Box
+                    position={POSITION_RELATIVE}
+                    width="100%"
+                    height="100%"
+                    backgroundColor={COLORS.background}
+                    overflow={OVERFLOW_SCROLL}
+                  >
+                    <ModalPortalRoot />
+                    <Component />
+                  </Box>
+                </Route>
+              )
+            })}
+            <Redirect exact from="/" to="/protocols" />
+          </Switch>
+          <Alerts />
+        </Box>
       </Flex>
     </>
   )

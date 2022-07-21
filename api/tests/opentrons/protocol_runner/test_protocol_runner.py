@@ -237,8 +237,12 @@ def test_load_json(
     json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
 
     commands: List[pe_commands.CommandCreate] = [
-        pe_commands.PauseCreate(params=pe_commands.PauseParams(message="hello")),
-        pe_commands.PauseCreate(params=pe_commands.PauseParams(message="goodbye")),
+        pe_commands.WaitForResumeCreate(
+            params=pe_commands.WaitForResumeParams(message="hello")
+        ),
+        pe_commands.WaitForResumeCreate(
+            params=pe_commands.WaitForResumeParams(message="goodbye")
+        ),
     ]
 
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
@@ -248,13 +252,13 @@ def test_load_json(
 
     decoy.verify(
         protocol_engine.add_command(
-            request=pe_commands.PauseCreate(
-                params=pe_commands.PauseParams(message="hello")
+            request=pe_commands.WaitForResumeCreate(
+                params=pe_commands.WaitForResumeParams(message="hello")
             )
         ),
         protocol_engine.add_command(
-            request=pe_commands.PauseCreate(
-                params=pe_commands.PauseParams(message="goodbye")
+            request=pe_commands.WaitForResumeCreate(
+                params=pe_commands.WaitForResumeParams(message="goodbye")
             )
         ),
         task_queue.set_run_func(func=protocol_engine.wait_until_complete),

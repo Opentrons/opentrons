@@ -1342,7 +1342,7 @@
       "commandType": "delay",
       "id": "10abc123",
       "params": {
-        "wait": 42
+        "seconds": 42
       }
     },
     {

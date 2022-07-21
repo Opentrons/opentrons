@@ -3,42 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [6.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.0...v6.0.0-alpha.1) (2022-06-07)
-
-
-### Bug Fixes
-
-* **app:** fix white screen issue after renaming clicking advanced tab ([#10463](https://github.com/Opentrons/opentrons/issues/10463)) ([e272382](https://github.com/Opentrons/opentrons/commit/e272382d0b3a2318fdf1b8271521bbfc8d164d32))
-
-
-
-
-
-# [6.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.1.0-beta.0...v6.0.0-alpha.0) (2022-05-26)
+# [6.0.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v6.0.0) (2022-07-14)
 
 
 ### Bug Fixes
 
 * **app:** cancelling a protocol run should patch the run to current false ([#10452](https://github.com/Opentrons/opentrons/issues/10452)) ([20848a1](https://github.com/Opentrons/opentrons/commit/20848a15b1ece3885489527ffd96dff302be1f62)), closes [#10412](https://github.com/Opentrons/opentrons/issues/10412)
+* **app:** fix Browse file system button issues ([#11113](https://github.com/Opentrons/opentrons/issues/11113)) ([ec1a4bb](https://github.com/Opentrons/opentrons/commit/ec1a4bbeab8af136cd4162d156b7916a1c95f65d)), closes [#11105](https://github.com/Opentrons/opentrons/issues/11105)
 * **app:** fix robot settings rename a robot name ([#10044](https://github.com/Opentrons/opentrons/issues/10044)) ([c561f2d](https://github.com/Opentrons/opentrons/commit/c561f2d61b2921de52e8df9ad42d07877c2cdcf3))
+* **app:** fix white screen issue after renaming clicking advanced tab ([#10463](https://github.com/Opentrons/opentrons/issues/10463)) ([e272382](https://github.com/Opentrons/opentrons/commit/e272382d0b3a2318fdf1b8271521bbfc8d164d32))
+* **app, react-api-client:** add run creation spinner and handle errors in slideouts during run creation ([#10944](https://github.com/Opentrons/opentrons/issues/10944)) ([3002093](https://github.com/Opentrons/opentrons/commit/300209338efcd77071632d88a677ab2a68636a71))
 * **react-api-client:** fix check for v3 module ([#10460](https://github.com/Opentrons/opentrons/issues/10460)) ([8a48ddc](https://github.com/Opentrons/opentrons/commit/8a48ddc5f429cca54cf58671d545d347e282f237))
-
-
-### Features
-
-* **app:** propose recent labware offsets to be reapplied for new protocol runs ([#10216](https://github.com/Opentrons/opentrons/issues/10216)) ([15c372c](https://github.com/Opentrons/opentrons/commit/15c372c523f376fcd592f784072aceb6254f108a)), closes [#9795](https://github.com/Opentrons/opentrons/issues/9795)
-
-
-
-
-
-# [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
 
 
 ### Features
 
 * **api-client, react-api-client:** add create live command hook ([#9656](https://github.com/Opentrons/opentrons/issues/9656)) ([3f147a8](https://github.com/Opentrons/opentrons/commit/3f147a8f4dccaa369f518238700d4f287dbb9a08)), closes [#9650](https://github.com/Opentrons/opentrons/issues/9650)
 * **app:**  App robot settings advanced tab robot update ([#10010](https://github.com/Opentrons/opentrons/issues/10010)) ([cf4e9ec](https://github.com/Opentrons/opentrons/commit/cf4e9ecf1bc825bf86339fb0867781a8e25f7e3a))
+* **app:** propose recent labware offsets to be reapplied for new protocol runs ([#10216](https://github.com/Opentrons/opentrons/issues/10216)) ([15c372c](https://github.com/Opentrons/opentrons/commit/15c372c523f376fcd592f784072aceb6254f108a)), closes [#9795](https://github.com/Opentrons/opentrons/issues/9795)
 * **app, app-shell, api-client:** include analysis as cli tool within app for protocol ingestion  ([#9825](https://github.com/Opentrons/opentrons/issues/9825)) ([cdf6c59](https://github.com/Opentrons/opentrons/commit/cdf6c59a96ea6ea5dca2ed79269537dbc0bc6ff7))
 
 

@@ -9,8 +9,8 @@ from otupdate.common import (
     config,
     constants,
     control,
-    ssh_key_management,
     name_management,
+    ssh_key_management,
     update,
 )
 
@@ -44,54 +44,33 @@ def get_version_dict(version_file: Optional[str]) -> Mapping[str, str]:
 
 
 def get_app(
+    name_synchronizer: name_management.NameSynchronizer,
     system_version_file: Optional[str] = None,
     config_file_override: Optional[str] = None,
     name_override: Optional[str] = None,
     boot_id_override: Optional[str] = None,
-    loop: Optional[asyncio.AbstractEventLoop] = None,
 ) -> web.Application:
     """Build and return the aiohttp.web.Application that runs the server"""
     if not system_version_file:
         system_version_file = OE_BUILTIN_VERSION_FILE
 
     version = get_version_dict(system_version_file)
-
-    if not loop:
-        loop = asyncio.get_event_loop()
-
+    boot_id = boot_id_override or control.get_boot_id()
     config_obj = config.load(config_file_override)
 
     app = web.Application(middlewares=[log_error_middleware])
-    name = name_override or name_management.get_pretty_hostname()
-    boot_id = boot_id_override or control.get_boot_id()
+
     app[config.CONFIG_VARNAME] = config_obj
     app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
     app[constants.DEVICE_BOOT_ID_NAME] = boot_id
-    app[constants.DEVICE_NAME_VARNAME] = name
 
-    LOG.info(
-        "Setup: "
-        + "\n\t".join(
-            [
-                f"Device name: {name}",
-                "Buildroot version:         "
-                f'{version.get("buildroot_version", "unknown")}',
-                "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
-                "API version:               "
-                f'{version.get("opentrons_api_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("opentrons_api_sha", "unknown")}',
-                "Update server version:     "
-                f'{version.get("update_server_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("update_server_sha", "unknown")}',
-            ]
-        )
-    )
     rfs = RootFSInterface()
     part_mgr = PartitionManager()
     updater = Updater(rfs, part_mgr)
     app[FILE_ACTIONS_VARNAME] = updater
+
+    name_management.install_name_synchronizer(name_synchronizer, app)
+
     app.router.add_routes(
         [
             web.get(
@@ -112,6 +91,27 @@ def get_app(
             web.get("/server/name", name_management.get_name_endpoint),
         ]
     )
+
+    LOG.info(
+        "Setup: "
+        + "\n\t".join(
+            [
+                f"Device name: {name_synchronizer.get_name()}",
+                "Buildroot version:         "
+                f'{version.get("buildroot_version", "unknown")}',
+                "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
+                "API version:               "
+                f'{version.get("opentrons_api_version", "unknown")}',
+                "\t(from git sha      "
+                f'{version.get("opentrons_api_sha", "unknown")}',
+                "Update server version:     "
+                f'{version.get("update_server_version", "unknown")}',
+                "\t(from git sha      "
+                f'{version.get("update_server_sha", "unknown")}',
+            ]
+        )
+    )
+
     return app
 
 

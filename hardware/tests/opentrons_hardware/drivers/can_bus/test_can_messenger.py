@@ -31,7 +31,11 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     MoveCompletedPayload,
     MoveGroupRequestPayload,
 )
-from opentrons_hardware.firmware_bindings.utils import UInt8Field, UInt32Field
+from opentrons_hardware.firmware_bindings.utils import (
+    UInt8Field,
+    UInt32Field,
+    Int32Field,
+)
 
 
 @pytest.fixture
@@ -74,7 +78,7 @@ async def test_context(mock_driver: AsyncMock) -> None:
                     group_id=UInt8Field(1),
                     seq_id=UInt8Field(2),
                     current_position_um=UInt32Field(3),
-                    encoder_position=UInt32Field(3),
+                    encoder_position=Int32Field(3),
                     ack_id=UInt8Field(4),
                 )
             ),

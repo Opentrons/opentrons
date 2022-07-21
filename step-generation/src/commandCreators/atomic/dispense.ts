@@ -7,6 +7,8 @@ import {
   getIsHeaterShakerEastWestWithLatchOpen,
   pipetteAdjacentHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  uuid,
 } from '../../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { DispenseParams } from '@opentrons/shared-data/protocol/types/schemaV3'
@@ -120,6 +122,18 @@ export const dispense: CommandCreator<DispenseParams> = (
   ) {
     errors.push(errorCreators.heaterShakerEastWestOfMultiChannelPipette())
   }
+  if (
+    getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
+      prevRobotState.modules,
+      prevRobotState.labware[labware]?.slot,
+      pipetteSpec,
+      invariantContext.labwareEntities[labware]
+    )
+  ) {
+    errors.push(
+      errorCreators.heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette()
+    )
+  }
 
   if (errors.length > 0) {
     return {
@@ -130,6 +144,7 @@ export const dispense: CommandCreator<DispenseParams> = (
   const commands: CreateCommand[] = [
     {
       commandType: 'dispense',
+      key: uuid(),
       params: {
         pipetteId: pipette,
         volume,

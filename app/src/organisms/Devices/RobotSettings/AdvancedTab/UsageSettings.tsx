@@ -6,9 +6,9 @@ import {
   Flex,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  Box,
   SPACING,
   TYPOGRAPHY,
+  Box,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../../atoms/text'
@@ -45,12 +45,15 @@ export function UsageSettings({
   }
 
   return (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      marginTop="2.5rem"
+    >
       <Box width="70%">
         <StyledText
-          as="h2"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          paddingBottom={SPACING.spacing4}
+          css={TYPOGRAPHY.h2SemiBold}
+          marginBottom={SPACING.spacing4}
           id="AdvancedSettings_UsageSettings"
         >
           {t('usage_settings')}

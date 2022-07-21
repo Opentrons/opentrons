@@ -3,45 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [6.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.0...v6.0.0-alpha.1) (2022-06-07)
+# [6.0.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v6.0.0) (2022-07-14)
 
 
 ### Bug Fixes
 
 * **app:** 6.0 feedback design QA T1 protocols landing page ([#10488](https://github.com/Opentrons/opentrons/issues/10488)) ([18149cc](https://github.com/Opentrons/opentrons/commit/18149cc99ef91cfd4ecc6ed04eed3324afc4892f))
+* **app:** 6.0 overall design QA ([#11081](https://github.com/Opentrons/opentrons/issues/11081)) ([bec8e23](https://github.com/Opentrons/opentrons/commit/bec8e23b9dfc4d29c88d5b5de73dd315a0c00885))
+* **app:** address design feedback initial protocols landing page  ([#10950](https://github.com/Opentrons/opentrons/issues/10950)) ([9346a8a](https://github.com/Opentrons/opentrons/commit/9346a8af2830a1d191558d2215e9feb7a696a1e5)), closes [#10907](https://github.com/Opentrons/opentrons/issues/10907)
+* **app:** Address labware landing page design feedback ([#10957](https://github.com/Opentrons/opentrons/issues/10957)) ([6baaa46](https://github.com/Opentrons/opentrons/commit/6baaa46169d6f6e7907a1bf75b88719cbccf729c)), closes [#10905](https://github.com/Opentrons/opentrons/issues/10905)
+* **app:** Address protocols landing design feedback ([#10993](https://github.com/Opentrons/opentrons/issues/10993)) ([1e83a0f](https://github.com/Opentrons/opentrons/commit/1e83a0f0a0ab0977d2accca9db0f67485e29de49)), closes [#10767](https://github.com/Opentrons/opentrons/issues/10767) [#10208](https://github.com/Opentrons/opentrons/issues/10208) [#10208](https://github.com/Opentrons/opentrons/issues/10208)
 * **app:** App fix design feedback navbar ([#10439](https://github.com/Opentrons/opentrons/issues/10439)) ([a2c2f3a](https://github.com/Opentrons/opentrons/commit/a2c2f3a6a6c997cb5d0f8f283ea301608b166c24))
-
-
-
-
-
-# [6.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.1.0-beta.0...v6.0.0-alpha.0) (2022-05-26)
-
-
-### Bug Fixes
-
 * **app:** App fix modal dialogs to delete protocol ([#10291](https://github.com/Opentrons/opentrons/issues/10291)) ([2580809](https://github.com/Opentrons/opentrons/commit/258080906c77fa582dbf725f62e164ce1e0f66b4))
 * **app:** App fix robot settings design feedback ([#10290](https://github.com/Opentrons/opentrons/issues/10290)) ([bb1d78d](https://github.com/Opentrons/opentrons/commit/bb1d78dc2627b3fee050726f48b01eef72eb4fb5))
-* **app:** fix propagation issues with overflow menu modals ([#10364](https://github.com/Opentrons/opentrons/issues/10364)) ([425ec48](https://github.com/Opentrons/opentrons/commit/425ec4824993956efc2b99aa95a39a49b05ef05d)), closes [#10206](https://github.com/Opentrons/opentrons/issues/10206)
-* **app:** Modify labware card and slideout style ([#10101](https://github.com/Opentrons/opentrons/issues/10101)) ([f7baa38](https://github.com/Opentrons/opentrons/commit/f7baa38744a77c3a2a9ff9af809e4c0ed2a5767d))
-* **components:** update labware render story to match new component interface ([#10169](https://github.com/Opentrons/opentrons/issues/10169)) ([6b77e75](https://github.com/Opentrons/opentrons/commit/6b77e75b676ff39b3971f524f089c66a909033dc))
-
-
-### Features
-
-* **app:** module slideout QA feedback touchups  ([#10110](https://github.com/Opentrons/opentrons/issues/10110)) ([a9b0738](https://github.com/Opentrons/opentrons/commit/a9b073854bd9d51ba79bfc25a24b07b3b30b3a07)), closes [#9869](https://github.com/Opentrons/opentrons/issues/9869)
-* **shared-data:** add H/S to deck definition, bump deck definition schema ([#10417](https://github.com/Opentrons/opentrons/issues/10417)) ([183a1ac](https://github.com/Opentrons/opentrons/commit/183a1acd2db56750148d59a6058345aa32618311))
-
-
-
-
-
-# [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
-
-
-### Bug Fixes
-
 * **app:** fix heater shaker intro pg and misc typography ([#9493](https://github.com/Opentrons/opentrons/issues/9493)) ([347ed6e](https://github.com/Opentrons/opentrons/commit/347ed6e1b90a87f97bb171be87620f20f2db28f2))
+* **app:** fix labware info overlay styling with vector ([#11008](https://github.com/Opentrons/opentrons/issues/11008)) ([ebe2ed5](https://github.com/Opentrons/opentrons/commit/ebe2ed559d0e5180a14f57250a7c1be5bc4acbc3)), closes [#10942](https://github.com/Opentrons/opentrons/issues/10942)
+* **app:** fix propagation issues with overflow menu modals ([#10364](https://github.com/Opentrons/opentrons/issues/10364)) ([425ec48](https://github.com/Opentrons/opentrons/commit/425ec4824993956efc2b99aa95a39a49b05ef05d)), closes [#10206](https://github.com/Opentrons/opentrons/issues/10206)
+* **app:** historical runs labware offset should list display names ([#11064](https://github.com/Opentrons/opentrons/issues/11064)) ([09fbb1f](https://github.com/Opentrons/opentrons/commit/09fbb1fb76e103af6378693f043f7db8ac1fc465)), closes [#11062](https://github.com/Opentrons/opentrons/issues/11062)
+* **app:** Modify labware card and slideout style ([#10101](https://github.com/Opentrons/opentrons/issues/10101)) ([f7baa38](https://github.com/Opentrons/opentrons/commit/f7baa38744a77c3a2a9ff9af809e4c0ed2a5767d))
+* **app:** remove legacy modal content background color override prop ([#10992](https://github.com/Opentrons/opentrons/issues/10992)) ([346fafc](https://github.com/Opentrons/opentrons/commit/346fafce067bfd805e073309d0660feb7603b0d9)), closes [#10742](https://github.com/Opentrons/opentrons/issues/10742)
+* **app:** remove slideout and modal from robot overflow menu conditional render ([#10990](https://github.com/Opentrons/opentrons/issues/10990)) ([884396d](https://github.com/Opentrons/opentrons/commit/884396d9cb04753fd21e802ae1e9d9ecb5a51e6a)), closes [#10782](https://github.com/Opentrons/opentrons/issues/10782) [#10536](https://github.com/Opentrons/opentrons/issues/10536)
+* **app:** this PR makes <Link> from opentrons componets tabbable ([#10930](https://github.com/Opentrons/opentrons/issues/10930)) ([c7fc0f0](https://github.com/Opentrons/opentrons/commit/c7fc0f0969b8c29325a153b61ac2796dda042703))
+* **components:** fix link tabIndex ([#10986](https://github.com/Opentrons/opentrons/issues/10986)) ([867e6b7](https://github.com/Opentrons/opentrons/commit/867e6b74d93bdf56b984d71522492fec31528929))
+* **components:** update labware render story to match new component interface ([#10169](https://github.com/Opentrons/opentrons/issues/10169)) ([6b77e75](https://github.com/Opentrons/opentrons/commit/6b77e75b676ff39b3971f524f089c66a909033dc))
 
 
 ### Features
@@ -62,13 +46,19 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **app:** creates temp module slideout ([#9415](https://github.com/Opentrons/opentrons/issues/9415)) ([4f85fd5](https://github.com/Opentrons/opentrons/commit/4f85fd560ba1b9f72fe8471b0b5ea6b4bcb32655)), closes [#8790](https://github.com/Opentrons/opentrons/issues/8790)
 * **app:** heater shaker banner ([#9424](https://github.com/Opentrons/opentrons/issues/9424)) ([17ee912](https://github.com/Opentrons/opentrons/commit/17ee91255c7dc996cec4cb7d54a9e26502a5e63a)), closes [#9243](https://github.com/Opentrons/opentrons/issues/9243)
 * **app:** heater shaker wizard thermal adapter page ([#9500](https://github.com/Opentrons/opentrons/issues/9500)) ([60b249b](https://github.com/Opentrons/opentrons/commit/60b249b8a088fc0604820416668cd45d31e55b8c)), closes [#9283](https://github.com/Opentrons/opentrons/issues/9283)
+* **app:** liquid setup labware detail modal ([#10742](https://github.com/Opentrons/opentrons/issues/10742)) ([bda60f1](https://github.com/Opentrons/opentrons/commit/bda60f115ab929367c01e7b931622c28163b7960)), closes [#10669](https://github.com/Opentrons/opentrons/issues/10669)
 * **app:** make pipette cards and overflow menus ([#9976](https://github.com/Opentrons/opentrons/issues/9976)) ([c2753cd](https://github.com/Opentrons/opentrons/commit/c2753cdb1b1f27c2d5762a220a5d3aba061bb921)), closes [#8692](https://github.com/Opentrons/opentrons/issues/8692) [#8693](https://github.com/Opentrons/opentrons/issues/8693)
+* **app:** map view of liquid setup  ([#10743](https://github.com/Opentrons/opentrons/issues/10743)) ([e8eab25](https://github.com/Opentrons/opentrons/commit/e8eab253444c546d0cefcfb116957a1666779b22)), closes [#10519](https://github.com/Opentrons/opentrons/issues/10519)
+* **app:** modal design qa feedback round 2 ([#10868](https://github.com/Opentrons/opentrons/issues/10868)) ([aba9664](https://github.com/Opentrons/opentrons/commit/aba9664450a668d3295c47908a2e6a5f1c12521c)), closes [#10866](https://github.com/Opentrons/opentrons/issues/10866)
+* **app:** module slideout QA feedback touchups  ([#10110](https://github.com/Opentrons/opentrons/issues/10110)) ([a9b0738](https://github.com/Opentrons/opentrons/commit/a9b073854bd9d51ba79bfc25a24b07b3b30b3a07)), closes [#9869](https://github.com/Opentrons/opentrons/issues/9869)
+* **app:** Robot Settings Design QA 2 ([#11020](https://github.com/Opentrons/opentrons/issues/11020)) ([8b43995](https://github.com/Opentrons/opentrons/commit/8b439959d97cc077e3795cfdfb82398ea6e62d9b)), closes [#10893](https://github.com/Opentrons/opentrons/issues/10893)
 * **app:** slideout and functionality to heater shaker overflow menu ([#9682](https://github.com/Opentrons/opentrons/issues/9682)) ([271dea6](https://github.com/Opentrons/opentrons/commit/271dea6d1924a795f56aee1e2a0839ef8d10bf61)), closes [#9304](https://github.com/Opentrons/opentrons/issues/9304) [#9303](https://github.com/Opentrons/opentrons/issues/9303) [#9302](https://github.com/Opentrons/opentrons/issues/9302) [#9450](https://github.com/Opentrons/opentrons/issues/9450)
 * **app, app-shell:** add labware details slideout and overflow menu ([#9894](https://github.com/Opentrons/opentrons/issues/9894)) ([dee5a11](https://github.com/Opentrons/opentrons/commit/dee5a11e594f48b9bd642755d5cc63c023d6c0dc)), closes [#8870](https://github.com/Opentrons/opentrons/issues/8870)
 * **app, app-shell, api-client:** include analysis as cli tool within app for protocol ingestion  ([#9825](https://github.com/Opentrons/opentrons/issues/9825)) ([cdf6c59](https://github.com/Opentrons/opentrons/commit/cdf6c59a96ea6ea5dca2ed79269537dbc0bc6ff7))
 * **components:** Add design system constants to components library ([#9398](https://github.com/Opentrons/opentrons/issues/9398)) ([657df06](https://github.com/Opentrons/opentrons/commit/657df06a813359d1a4ed519057c687f68b8559b0)), closes [#9389](https://github.com/Opentrons/opentrons/issues/9389)
 * **components:** Add single path icon data for new compound icons ([#9462](https://github.com/Opentrons/opentrons/issues/9462)) ([fe164a4](https://github.com/Opentrons/opentrons/commit/fe164a472205de559a054eeeaac81fc27990554c))
 * **protocol-designer:** add tooltips to H-S stepform ([#9944](https://github.com/Opentrons/opentrons/issues/9944)) ([d5d06b1](https://github.com/Opentrons/opentrons/commit/d5d06b100a88780d76f46f06a39d6b0c3ba964f1)), closes [#9733](https://github.com/Opentrons/opentrons/issues/9733)
+* **shared-data:** add H/S to deck definition, bump deck definition schema ([#10417](https://github.com/Opentrons/opentrons/issues/10417)) ([183a1ac](https://github.com/Opentrons/opentrons/commit/183a1acd2db56750148d59a6058345aa32618311))
 
 
 

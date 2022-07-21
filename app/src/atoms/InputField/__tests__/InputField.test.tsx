@@ -16,7 +16,7 @@ describe('HeaterShakerSlideout', () => {
       secondaryCaption: 'secondary caption',
       max: 10,
       min: 1,
-      units: 'RPM',
+      units: 'rpm',
       value: '5',
       disabled: false,
       onFocus: jest.fn(),
@@ -34,7 +34,7 @@ describe('HeaterShakerSlideout', () => {
     const { getByText } = render(props)
     getByText('caption')
     getByText('secondary caption')
-    getByText('RPM')
+    getByText('rpm')
   })
   it('renders correct information when type is text', () => {
     props = {
@@ -52,7 +52,7 @@ describe('HeaterShakerSlideout', () => {
       caption: 'caption',
       max: 10,
       min: 1,
-      units: 'RPM',
+      units: 'rpm',
       value: '9',
       error: 'error',
       onChange: jest.fn(),

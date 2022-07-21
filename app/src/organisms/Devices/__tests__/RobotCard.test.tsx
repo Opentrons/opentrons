@@ -13,6 +13,7 @@ import {
   mockRightProtoPipette,
 } from '../../../redux/pipettes/__fixtures__'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import {
   useAttachedModules,
   useAttachedPipettes,
@@ -26,6 +27,7 @@ import { RobotCard } from '../RobotCard'
 
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
+jest.mock('../../../redux/buildroot/selectors')
 jest.mock('../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../../ProtocolUpload/hooks')
@@ -55,6 +57,9 @@ const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction
 >
 const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
   typeof UpdateRobotBanner
+>
+const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
+  typeof getBuildrootUpdateDisplayInfo
 >
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
@@ -90,6 +95,11 @@ describe('RobotCard', () => {
       </div>
     ))
     mockUpdateRobotBanner.mockReturnValue(<div>Mock UpdateRobotBanner</div>)
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'reinstall',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
     when(mockUseCurrentRunId).calledWith().mockReturnValue(null)
     when(mockUseCurrentRunStatus).calledWith().mockReturnValue(null)
     when(mockUseProtocolDetailsForRun)

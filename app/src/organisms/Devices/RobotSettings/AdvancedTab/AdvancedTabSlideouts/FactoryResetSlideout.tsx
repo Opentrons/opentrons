@@ -10,8 +10,11 @@ import {
   SPACING,
   TYPOGRAPHY,
   Link,
-  CheckboxField,
   Box,
+  Icon,
+  COLORS,
+  SIZE_1,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
 
@@ -19,12 +22,13 @@ import { Slideout } from '../../../../../atoms/Slideout'
 import { PrimaryButton } from '../../../../../atoms/buttons'
 import { StyledText } from '../../../../../atoms/text'
 import { Divider } from '../../../../../atoms/structure'
-import { Banner } from '../../../../../atoms/Banner'
+import { CheckboxField } from '../../../../../atoms/CheckboxField'
 import {
   getResetConfigOptions,
   fetchResetConfigOptions,
 } from '../../../../../redux/robot-admin'
 import { useTrackEvent } from '../../../../../redux/analytics'
+import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../../redux/calibration'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
@@ -77,7 +81,7 @@ export function FactoryResetSlideout({
   const downloadCalibrationLogs: React.MouseEventHandler = e => {
     e.preventDefault()
     doTrackEvent({
-      name: 'EVENT_CALIBRATION_DOWNLOADED',
+      name: EVENT_CALIBRATION_DOWNLOADED,
       properties: {},
     })
     saveAs(
@@ -127,9 +131,17 @@ export function FactoryResetSlideout({
         <StyledText as="p" marginBottom={SPACING.spacing4}>
           {t('factory_reset_slideout_description')}
         </StyledText>
-        <Banner type="warning">
-          {t('factory_reset_slideout_warning_message')}
-        </Banner>
+        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+          <Icon
+            name="alert-circle"
+            size={SIZE_1}
+            marginRight={SPACING.spacing3}
+            color={COLORS.warning}
+          />
+          <StyledText as="p" color={COLORS.warningText}>
+            {t('factory_reset_slideout_warning_message')}
+          </StyledText>
+        </Flex>
         <Divider marginY={SPACING.spacing4} />
         <Box>
           <Flex
@@ -141,6 +153,7 @@ export function FactoryResetSlideout({
               {t('reset_option_calibration')}
             </StyledText>
             <Link
+              role="button"
               css={TYPOGRAPHY.linkPSemiBold}
               onClick={downloadCalibrationLogs}
             >
@@ -174,6 +187,7 @@ export function FactoryResetSlideout({
               {t('reset_option_protocol_run_history')}
             </StyledText>
             <Link
+              role="button"
               css={TYPOGRAPHY.linkPSemiBold}
               onClick={downloadRunHistoryLogs}
             >

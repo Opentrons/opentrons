@@ -41,6 +41,9 @@ export const RESET_CONFIG_FAILURE: 'robotAdmin:RESET_CONFIG_FAILURE' =
 export const RESTART_STATUS_CHANGED: 'robotAdmin:RESTART_STATUS_CHANGED' =
   'robotAdmin:RESTART_STATUS_CHANGED'
 
+export const SYNC_SYSTEM_TIME: 'robotAdmin:SYNC_SYSTEM_TIME' =
+  'robotAdmin:SYNC_SYSTEM_TIME'
+
 // http paths
 
 export const RESTART_PATH: '/server/restart' = '/server/restart'

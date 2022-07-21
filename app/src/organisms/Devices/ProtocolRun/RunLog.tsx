@@ -17,8 +17,6 @@ import {
   OVERFLOW_SCROLL,
   POSITION_FIXED,
   SIZE_1,
-  TEXT_TRANSFORM_CAPITALIZE,
-  TEXT_TRANSFORM_UPPERCASE,
   BORDERS,
   COLORS,
   SPACING,
@@ -29,7 +27,7 @@ import {
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
-import { useAllCommandsQuery } from '@opentrons/react-api-client'
+import { useAllCommandsQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { NAV_BAR_WIDTH } from '../../../App/constants'
 import { PrimaryButton } from '../../../atoms/buttons'
@@ -48,12 +46,13 @@ import { StepItem } from './StepItem'
 import type { RunCommandSummary } from '@opentrons/api-client'
 import type { RunTimeCommand, CommandStatus } from '@opentrons/shared-data'
 
-const AVERAGE_ITEM_HEIGHT_PX = 52 // average px height of a command item
+const AVERAGE_ITEM_HEIGHT_PX = 56 // average px height of a command item
 const WINDOW_OVERLAP = 40 // number of command items that fall within two adjacent windows
 const NUM_EAGER_ITEMS = 5 // number of command items away from the end of the current window that will trigger a window transition if scrolled into view
 const COMMANDS_REFETCH_INTERVAL = 3000
 const AVERAGE_WINDOW_HEIGHT_PX =
   (RUN_LOG_WINDOW_SIZE - WINDOW_OVERLAP) * AVERAGE_ITEM_HEIGHT_PX
+const NON_COMMAND_BUFFER_PX = 118 // px height of a the area below and above the windowed command items, but within the scrolled div
 interface CommandRuntimeInfo {
   analysisCommand: RunTimeCommand | null // analysisCommand will only be null if protocol is nondeterministic
   runCommandSummary: RunCommandSummary | null
@@ -77,6 +76,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   const listInnerRef = React.useRef<HTMLDivElement>(null)
   const currentItemRef = React.useRef<HTMLDivElement>(null)
   const firstPostInitialPlayRunCommandIndex = React.useRef<number | null>(null)
+  const lastKnownPrePlayRunCommandIndex = React.useRef<number>(-1)
   const [isDeterministic, setIsDeterministic] = React.useState<boolean>(true)
   const [windowIndex, setWindowIndex] = React.useState<number>(0)
   const [
@@ -89,7 +89,10 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   const prePlayCommandCount =
     firstPostInitialPlayRunCommandIndex.current != null
       ? firstPostInitialPlayRunCommandIndex.current
-      : 0
+      : lastKnownPrePlayRunCommandIndex.current + 1
+
+  const isCurrentRun =
+    useRunQuery(runId, { staleTime: Infinity }).data?.data.current ?? false
   const { data: commandsData } = useAllCommandsQuery(
     runId,
     {
@@ -108,10 +111,9 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
     commandsData?.links?.current?.meta?.createdAt ?? null
   const runTotalCommandCount = commandsData?.meta?.totalLength
 
-  const [
-    isInitiallyJumpingToCurrent,
-    setIsInitiallyJumpingToCurrent,
-  ] = React.useState<boolean>(false)
+  const [isJumpingToCurrent, setIsJumpingToCurrent] = React.useState<boolean>(
+    false
+  )
 
   const analysisCommandsWithStatus =
     protocolData?.commands != null
@@ -139,6 +141,33 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   )
 
   const runStartDateTime = runStartTime != null ? new Date(runStartTime) : null
+  React.useEffect(() => {
+    // if viewing an historical run log, because there is no current command
+    // we may get stuck with no  run commands as the default first window may
+    // contain only "pre-play" commands (e.g. more LPC commands than the window size)
+    // in this case, we'll walk the pointer to the first "post-play" command
+    if (
+      (runStatus === RUN_STATUS_FAILED ||
+        runStatus === RUN_STATUS_STOPPED ||
+        runStatus === RUN_STATUS_SUCCEEDED) &&
+      runStartDateTime != null &&
+      firstPostInitialPlayRunCommandIndex.current === null
+    ) {
+      const foundPostPlayRunCommandIndex = runCommands.findIndex(
+        command => new Date(command?.createdAt) > runStartDateTime
+      )
+      if (foundPostPlayRunCommandIndex >= 0) {
+        firstPostInitialPlayRunCommandIndex.current =
+          lastKnownPrePlayRunCommandIndex.current +
+          foundPostPlayRunCommandIndex +
+          firstNonSetupIndex +
+          1
+      } else {
+        lastKnownPrePlayRunCommandIndex.current =
+          lastKnownPrePlayRunCommandIndex.current + runCommands.length
+      }
+    }
+  }, [runId, runStatus, runCommands, runStartDateTime])
   const postInitialPlayRunCommands =
     runStartDateTime != null
       ? dropWhile(
@@ -181,7 +210,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
     windowFirstCommandIndex,
     windowFirstCommandIndex + RUN_LOG_WINDOW_SIZE
   )
-  const isFirstWindow = windowIndex === 0
+
   const isFinalWindow =
     currentCommandList.length <= windowFirstCommandIndex + RUN_LOG_WINDOW_SIZE
 
@@ -248,8 +277,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
       (RUN_LOG_WINDOW_SIZE - WINDOW_OVERLAP)
   )
 
-  // when we initially mount, if the current item is not in view, jump to it
-  React.useEffect(() => {
+  const jumpToCurrentCommandWindow = (): void => {
     if (
       indexOfFirstWindowContainingCurrentCommand !== windowIndex &&
       indexOfLastWindowContainingCurrentCommand !== windowIndex
@@ -257,9 +285,15 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
       const targetWindow = isCurrentCommandInFinalWindow
         ? indexOfFirstWindowContainingCurrentCommand
         : indexOfLastWindowContainingCurrentCommand
+
       setWindowIndex(Math.max(targetWindow, 0))
     }
-    setIsInitiallyJumpingToCurrent(true)
+    setIsJumpingToCurrent(true)
+  }
+
+  // when we initially mount, jump to current command window
+  React.useEffect(() => {
+    jumpToCurrentCommandWindow()
   }, [])
 
   const scrollToCurrentItem = (): void => {
@@ -269,14 +303,14 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   // if jumping to current item and on correct window index, scroll to current item
   React.useEffect(() => {
     if (
-      isInitiallyJumpingToCurrent &&
+      isJumpingToCurrent &&
       (windowIndex === indexOfFirstWindowContainingCurrentCommand ||
         windowIndex === indexOfLastWindowContainingCurrentCommand)
     ) {
       scrollToCurrentItem()
-      setIsInitiallyJumpingToCurrent(false)
+      setIsJumpingToCurrent(false)
     }
-  }, [windowIndex, isInitiallyJumpingToCurrent])
+  }, [windowIndex, isJumpingToCurrent])
 
   if (protocolData == null || runStatus == null) return null
 
@@ -327,15 +361,17 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
     setShowDownloadRunLogToast(true)
   }
 
-  const isRunStarted = currentItemRef.current != null
-
-  // check if edges of current step are below or above window
   const isCurrentStepBelow =
-    currentItemRef.current?.getBoundingClientRect().top != null &&
-    currentItemRef.current?.getBoundingClientRect().top > window.innerHeight
+    (currentItemRef.current?.getBoundingClientRect().top != null &&
+      listInnerRef.current?.getBoundingClientRect().bottom != null &&
+      currentItemRef.current?.getBoundingClientRect().top >
+        listInnerRef.current?.getBoundingClientRect().bottom) ||
+    windowIndex < indexOfFirstWindowContainingCurrentCommand
   const isCurrentStepAbove =
-    currentItemRef.current?.getBoundingClientRect().bottom != null &&
-    currentItemRef.current?.getBoundingClientRect().bottom < 0
+    (currentItemRef.current?.getBoundingClientRect().bottom != null &&
+      currentItemRef.current?.getBoundingClientRect().bottom <
+        NON_COMMAND_BUFFER_PX) ||
+    windowIndex > indexOfLastWindowContainingCurrentCommand
 
   const jumpToCurrentStepButton = (
     <PrimaryButton
@@ -345,11 +381,11 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
       transform="translate(-50%)"
       borderRadius={SPACING.spacing6}
       display={
-        isRunStarted && (isCurrentStepBelow || isCurrentStepAbove)
+        isCurrentRun && (isCurrentStepBelow || isCurrentStepAbove)
           ? DISPLAY_FLEX
           : DISPLAY_NONE
       }
-      onClick={scrollToCurrentItem}
+      onClick={jumpToCurrentCommandWindow}
       id="RunLog_jumpToCurrentStep"
     >
       <Icon
@@ -377,43 +413,39 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
         />
       ) : null}
       {jumpToCurrentStepButton}
-      {isFirstWindow ? (
-        <>
-          <Flex
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            alignItems={ALIGN_CENTER}
-            borderBottom={BORDERS.lineBorder}
-            padding={SPACING.spacing4}
+      <Flex
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+        borderBottom={BORDERS.lineBorder}
+        padding={SPACING.spacing4}
+      >
+        <Flex alignItems={ALIGN_CENTER}>
+          <StyledText
+            marginRight={SPACING.spacing3}
+            css={TYPOGRAPHY.h3SemiBold}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
-            <Flex alignItems={ALIGN_CENTER}>
-              <StyledText
-                marginRight={SPACING.spacing3}
-                css={TYPOGRAPHY.h3SemiBold}
-                textTransform={TEXT_TRANSFORM_CAPITALIZE}
-              >
-                {t('run_log')}
-              </StyledText>
-              <StyledText
-                as="label"
-                color={COLORS.darkGreyEnabled}
-                id="RunLog_totalStepCount"
-              >
-                {isDeterministic
-                  ? t('total_step_count', { count: currentCommandList.length })
-                  : t('unable_to_determine_steps')}
-              </StyledText>
-            </Flex>
-            <Btn
-              color={COLORS.darkGreyEnabled}
-              css={TYPOGRAPHY.labelSemiBold}
-              onClick={onClickDownloadRunLog}
-              id="RunLog_downloadRunLog"
-            >
-              {t('download_run_log')}
-            </Btn>
-          </Flex>
-        </>
-      ) : null}
+            {t('run_log')}
+          </StyledText>
+          <StyledText
+            as="label"
+            color={COLORS.darkGreyEnabled}
+            id="RunLog_totalStepCount"
+          >
+            {isDeterministic
+              ? t('total_step_count', { count: currentCommandList.length })
+              : t('unable_to_determine_steps')}
+          </StyledText>
+        </Flex>
+        <Btn
+          color={COLORS.darkGreyEnabled}
+          css={TYPOGRAPHY.labelSemiBold}
+          onClick={onClickDownloadRunLog}
+          id="RunLog_downloadRunLog"
+        >
+          {t('download_run_log')}
+        </Btn>
+      </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing4}
@@ -477,7 +509,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
                 color={COLORS.darkGreyEnabled}
                 css={TYPOGRAPHY.h6SemiBold}
                 paddingY={SPACING.spacing2}
-                textTransform={TEXT_TRANSFORM_UPPERCASE}
+                textTransform={TYPOGRAPHY.textTransformUppercase}
               >
                 {t('end_of_protocol')}
               </StyledText>
@@ -526,7 +558,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
       <Btn onClick={handleClick}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6SemiBold}
             id={`RunDetails_ProtocolSetupTitle`}

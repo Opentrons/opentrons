@@ -22,7 +22,6 @@ from robot_server.service.json_api import (
     DeprecatedResponseDataModel,
     DeprecatedMultiResponseModel,
 )
-from robot_server.service.session.models.common import EmptyModel
 
 
 class SessionType(str, Enum):
@@ -32,8 +31,6 @@ class SessionType(str, Enum):
     tip_length_calibration = "tipLengthCalibration"
     deck_calibration = "deckCalibration"
     pipette_offset_calibration = "pipetteOffsetCalibration"
-    protocol = "protocol"
-    live_protocol = "liveProtocol"
 
 
 """
@@ -43,17 +40,6 @@ SessionCreateParamType = typing.Union[
     SessionCreateParams,
     BaseModel,
     None,
-]
-
-"""
-A Union of all the possible session detail models.
-"""
-SessionDetails = typing.Union[
-    CalibrationCheckSessionStatus,
-    PipetteOffsetCalibrationSessionStatus,
-    TipCalibrationSessionStatus,
-    DeckCalibrationSessionStatus,
-    EmptyModel,
 ]
 
 
@@ -100,12 +86,6 @@ class PipetteOffsetCalibrationCreateAttributes(SessionCreateAttributes):
     createParams: SessionCreateParams
 
 
-class LiveProtocolCreateAttributes(SessionCreateAttributesNoParams):
-    """Live protocol session create request."""
-
-    sessionType: Literal[SessionType.live_protocol] = SessionType.live_protocol
-
-
 class SessionResponseAttributes(DeprecatedResponseDataModel):
     """Common session response attributes."""
 
@@ -147,20 +127,11 @@ class PipetteOffsetCalibrationResponseAttributes(
     details: PipetteOffsetCalibrationSessionStatus
 
 
-class LiveProtocolResponseAttributes(
-    LiveProtocolCreateAttributes, SessionResponseAttributes
-):
-    """Response attributes of live protocol session."""
-
-    pass
-
-
 RequestTypes = typing.Union[
     CalibrationCheckCreateAttributes,
     TipLengthCalibrationCreateAttributes,
     DeckCalibrationCreateAttributes,
     PipetteOffsetCalibrationCreateAttributes,
-    LiveProtocolCreateAttributes,
 ]
 
 
@@ -169,7 +140,6 @@ ResponseTypes = typing.Union[
     TipLengthCalibrationResponseAttributes,
     DeckCalibrationResponseAttributes,
     PipetteOffsetCalibrationResponseAttributes,
-    LiveProtocolResponseAttributes,
 ]
 
 

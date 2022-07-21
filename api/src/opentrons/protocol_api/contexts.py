@@ -5,6 +5,7 @@ from .module_contexts import (
     ThermocyclerContext,
     MagneticModuleContext,
     TemperatureModuleContext,
+    HeaterShakerContext,
 )
 
 
@@ -15,4 +16,5 @@ __all__ = [
     "ThermocyclerContext",
     "MagneticModuleContext",
     "TemperatureModuleContext",
+    "HeaterShakerContext",
 ]

@@ -8,6 +8,7 @@ from typing import Optional, Type, TypeVar, Callable, AsyncIterator, cast
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorOutputBinding,
+    SensorId,
     SensorType,
     MessageId,
 )
@@ -31,8 +32,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 )
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
+    SensorPayload,
     ReadFromSensorRequestPayload,
-    PeripheralStatusRequestPayload,
     SetSensorThresholdRequestPayload,
     WriteToSensorRequestPayload,
     BaselineSensorRequestPayload,
@@ -40,6 +41,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorTypeField,
+    SensorIdField,
     SensorOutputBindingField,
     SensorThresholdModeField,
 )
@@ -76,6 +78,7 @@ class SensorScheduler:
                 message=BaselineSensorRequest(
                     payload=BaselineSensorRequestPayload(
                         sensor=SensorTypeField(sensor.sensor_type),
+                        sensor_id=SensorIdField(sensor.sensor_id),
                         sample_rate=UInt16Field(sensor.poll_for),
                     )
                 ),
@@ -105,6 +108,7 @@ class SensorScheduler:
             message=WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(sensor.sensor_type),
+                    sensor_id=SensorIdField(sensor.sensor_id),
                     data=UInt32Field(sensor.data.to_int),
                     # TODO(lc, 03-29-2022, actually pass in a register value)
                     reg_address=UInt8Field(0x0),
@@ -123,6 +127,7 @@ class SensorScheduler:
                 message=ReadFromSensorRequest(
                     payload=ReadFromSensorRequestPayload(
                         sensor=SensorTypeField(sensor.sensor_type),
+                        sensor_id=SensorIdField(sensor.sensor_id),
                         offset_reading=UInt8Field(int(sensor.offset)),
                     )
                 ),
@@ -182,6 +187,7 @@ class SensorScheduler:
                 message=SetSensorThresholdRequest(
                     payload=SetSensorThresholdRequestPayload(
                         sensor=SensorTypeField(sensor.sensor_type),
+                        sensor_id=SensorIdField(sensor.sensor_id),
                         threshold=sensor.data.backing,
                         mode=SensorThresholdModeField(sensor.mode.value),
                     )
@@ -232,6 +238,7 @@ class SensorScheduler:
     async def request_peripheral_status(
         self,
         sensor: SensorType,
+        sensor_id: SensorId,
         node_id: NodeId,
         can_messenger: CanMessenger,
         timeout: int,
@@ -242,8 +249,9 @@ class SensorScheduler:
             await can_messenger.send(
                 node_id=node_id,
                 message=PeripheralStatusRequest(
-                    payload=PeripheralStatusRequestPayload(
+                    payload=SensorPayload(
                         sensor=SensorTypeField(sensor),
+                        sensor_id=SensorIdField(sensor_id),
                     )
                 ),
             )
@@ -283,6 +291,7 @@ class SensorScheduler:
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
                     sensor=SensorTypeField(target_sensor.sensor_type),
+                    sensor_id=SensorIdField(target_sensor.sensor_id),
                     binding=SensorOutputBindingField.from_flags(flags),
                 )
             ),
@@ -299,6 +308,7 @@ class SensorScheduler:
                 message=BindSensorOutputRequest(
                     payload=BindSensorOutputRequestPayload(
                         sensor=SensorTypeField(target_sensor.sensor_type),
+                        sensor_id=SensorIdField(target_sensor.sensor_id),
                         binding=SensorOutputBindingField(
                             SensorOutputBinding.none.value
                         ),
@@ -338,6 +348,7 @@ class SensorScheduler:
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
                     sensor=SensorTypeField(target_sensor.sensor_type),
+                    sensor_id=SensorIdField(target_sensor.sensor_id),
                     binding=SensorOutputBindingField(SensorOutputBinding.report.value),
                 )
             ),
@@ -351,6 +362,7 @@ class SensorScheduler:
                 message=BindSensorOutputRequest(
                     payload=BindSensorOutputRequestPayload(
                         sensor=SensorTypeField(target_sensor.sensor_type),
+                        sensor_id=SensorIdField(target_sensor.sensor_id),
                         binding=SensorOutputBindingField(
                             SensorOutputBinding.none.value
                         ),

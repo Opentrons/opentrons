@@ -35,29 +35,29 @@ def subject(sql_engine: Engine) -> RunStore:
 def protocol_commands() -> List[pe_commands.Command]:
     """Get a StateSummary value object."""
     return [
-        pe_commands.Pause(
+        pe_commands.WaitForResume(
             id="pause-1",
             key="command-key",
             status=pe_commands.CommandStatus.SUCCEEDED,
             createdAt=datetime(year=2021, month=1, day=1),
-            params=pe_commands.PauseParams(message="hello world"),
-            result=pe_commands.PauseResult(),
+            params=pe_commands.WaitForResumeParams(message="hello world"),
+            result=pe_commands.WaitForResumeResult(),
         ),
-        pe_commands.Pause(
+        pe_commands.WaitForResume(
             id="pause-2",
             key="command-key",
             status=pe_commands.CommandStatus.SUCCEEDED,
             createdAt=datetime(year=2022, month=2, day=2),
-            params=pe_commands.PauseParams(message="hey world"),
-            result=pe_commands.PauseResult(),
+            params=pe_commands.WaitForResumeParams(message="hey world"),
+            result=pe_commands.WaitForResumeResult(),
         ),
-        pe_commands.Pause(
+        pe_commands.WaitForResume(
             id="pause-3",
             key="command-key",
             status=pe_commands.CommandStatus.SUCCEEDED,
             createdAt=datetime(year=2023, month=3, day=3),
-            params=pe_commands.PauseParams(message="sup world"),
-            result=pe_commands.PauseResult(),
+            params=pe_commands.WaitForResumeParams(message="sup world"),
+            result=pe_commands.WaitForResumeResult(),
         ),
     ]
 

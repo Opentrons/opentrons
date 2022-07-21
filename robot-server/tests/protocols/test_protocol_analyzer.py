@@ -64,12 +64,12 @@ async def test_analyze(
         protocol_key="dummy-data-111",
     )
 
-    analysis_command = pe_commands.Pause(
+    analysis_command = pe_commands.WaitForResume(
         id="command-id",
         key="command-key",
         status=pe_commands.CommandStatus.SUCCEEDED,
         createdAt=datetime(year=2022, month=2, day=2),
-        params=pe_commands.PauseParams(message="hello world"),
+        params=pe_commands.WaitForResumeParams(message="hello world"),
     )
 
     analysis_error = pe_errors.ErrorOccurrence(

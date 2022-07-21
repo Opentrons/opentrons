@@ -8,8 +8,9 @@ from typing import Dict, List, NewType, Union
 
 from typing_extensions import Literal, TypedDict
 
-
+# TODO(mc, 2022-06-16): move to labware.dev_types
 LabwareUri = NewType("LabwareUri", str)
+
 # Explicit listing of pipette names because we don't frequently get new ones
 PipetteName = Union[
     Literal["p10_single"],

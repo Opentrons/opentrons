@@ -15,7 +15,7 @@ import {
   COLOR_WARNING,
   COLOR_WARNING_LIGHT,
   C_DARK_GRAY,
-  TEXT_DECORATION_UNDERLINE,
+  TYPOGRAPHY,
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
   COLOR_WARNING_DARK,
@@ -61,7 +61,7 @@ const ModuleWarning = (props: {
               id={`ExtraAttentionWarning_${snakeCase(moduleName)}_link`}
               alignSelf={ALIGN_FLEX_END}
               onClick={props.onLinkClick}
-              textDecoration={TEXT_DECORATION_UNDERLINE}
+              textDecoration={TYPOGRAPHY.textDecorationUnderline}
             />
           ),
         }}

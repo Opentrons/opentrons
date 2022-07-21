@@ -2,12 +2,18 @@ import some from 'lodash/some'
 import {
   getAreSlotsAdjacent,
   getAreSlotsHorizontallyAdjacent,
+  getAreSlotsVerticallyAdjacent,
   getIsLabwareAboveHeight,
   HEATERSHAKER_MODULE_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
-import type { LabwareEntities, RobotState, DeckSlot } from '../types'
+import type {
+  LabwareEntities,
+  RobotState,
+  DeckSlot,
+  LabwareEntity,
+} from '../types'
 
 export const getIsHeaterShakerEastWestWithLatchOpen = (
   hwModules: RobotState['modules'],
@@ -32,6 +38,21 @@ export const getIsHeaterShakerEastWestMultiChannelPipette = (
     hwModule =>
       hwModule.moduleState.type === HEATERSHAKER_MODULE_TYPE &&
       getAreSlotsHorizontallyAdjacent(hwModule.slot, slot)
+  )
+
+export const getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = (
+  hwModules: RobotState['modules'],
+  slot: DeckSlot,
+  pipetteSpecs: PipetteNameSpecs,
+  labwareEntity: LabwareEntity
+): boolean =>
+  pipetteSpecs.channels !== 1 &&
+  !labwareEntity.def.parameters.isTiprack &&
+  some(
+    hwModules,
+    hwModule =>
+      hwModule.moduleState.type === HEATERSHAKER_MODULE_TYPE &&
+      getAreSlotsVerticallyAdjacent(hwModule.slot, slot)
   )
 
 export const getIsTallLabwareEastWestOfHeaterShaker = (

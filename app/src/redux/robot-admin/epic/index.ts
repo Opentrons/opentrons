@@ -3,7 +3,7 @@ import { combineEpics } from 'redux-observable'
 import { restartEpic, startDiscoveryOnRestartEpic } from './restartEpic'
 import { fetchResetOptionsEpic } from './fetchResetOptionsEpic'
 import { resetConfigEpic, restartOnResetConfigEpic } from './resetConfigEpic'
-import { syncTimeOnConnectEpic } from './syncTimeOnConnectEpic'
+import { syncSystemTimeEpic } from './syncSystemTimeEpic'
 import { trackRestartsEpic } from './trackRestartsEpic'
 
 import type { Epic } from '../../types'
@@ -14,6 +14,6 @@ export const robotAdminEpic = combineEpics<Epic>(
   fetchResetOptionsEpic,
   resetConfigEpic,
   restartOnResetConfigEpic,
-  syncTimeOnConnectEpic,
+  syncSystemTimeEpic,
   trackRestartsEpic
 )

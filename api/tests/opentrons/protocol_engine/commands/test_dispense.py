@@ -26,6 +26,7 @@ async def test_dispense_implementation(
         wellName="A3",
         wellLocation=location,
         volume=50,
+        flowRate=1.23,
     )
 
     decoy.when(
@@ -35,6 +36,7 @@ async def test_dispense_implementation(
             well_name="A3",
             well_location=location,
             volume=50,
+            flow_rate=1.23,
         )
     ).then_return(42)
 

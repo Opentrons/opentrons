@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
+
 import {
   Box,
   Flex,
@@ -15,6 +17,7 @@ import {
   DIRECTION_COLUMN,
   Overlay,
 } from '@opentrons/components'
+
 import { useSortedProtocols } from './hooks'
 import { StyledText } from '../../atoms/text'
 import { SecondaryButton } from '../../atoms/buttons'
@@ -28,11 +31,23 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { ProtocolSort } from './hooks'
 
+const SORT_BY_BUTTON_STYLE = css`
+  background-color: ${COLORS.transparent};
+  cursor: pointer;
+  &:hover {
+    background-color: ${COLORS.medGreyHover};
+  }
+  &:active,
+  &:focus {
+    background-color: ${COLORS.medGrey};
+  }
+`
+
 interface ProtocolListProps {
   storedProtocols: StoredProtocolData[]
 }
 export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
-  const [showSlideout, setShowSlideout] = React.useState(false)
+  const [showSlideout, setShowSlideout] = React.useState<boolean>(false)
   const [sortBy, setSortBy] = React.useState<ProtocolSort>('alphabetical')
   const [showSortByMenu, setShowSortByMenu] = React.useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => setShowSortByMenu(!showSortByMenu)
@@ -89,20 +104,25 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             flexDirection={DIRECTION_ROW}
             alignItems={ALIGN_CENTER}
             marginRight={SPACING.spacing4}
-            onClick={toggleSetShowSortByMenu}
           >
-            <StyledText css={TYPOGRAPHY.pSemiBold}>
+            <StyledText
+              as="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              color={COLORS.darkGreyEnabled}
+            >
               {t('labware_landing:sort_by')}
             </StyledText>
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
-              backgroundColor={COLORS.medGrey}
               borderRadius={BORDERS.radiusSoftCorners}
               marginLeft={SPACING.spacing3}
+              css={SORT_BY_BUTTON_STYLE}
+              onClick={toggleSetShowSortByMenu}
             >
               <StyledText
-                css={TYPOGRAPHY.pSemiBold}
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 paddingLeft={SPACING.spacing3}
                 paddingRight={SPACING.spacing2}
                 paddingY={SPACING.spacing2}
@@ -125,8 +145,8 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
               position={POSITION_ABSOLUTE}
               backgroundColor={COLORS.white}
-              top="3rem"
-              right={'7rem'}
+              top="3.25rem"
+              right="7rem"
               flexDirection={DIRECTION_COLUMN}
             >
               <MenuItem

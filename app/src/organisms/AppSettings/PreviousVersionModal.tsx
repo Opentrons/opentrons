@@ -29,12 +29,11 @@ export function PreviousVersionModal(
         </StyledText>
         <ExternalLink
           href={UNINSTALL_APP_URL}
-          paddingBottom={SPACING.spacing3}
           id="PreviousVersionModal_uninstallingAppLink"
         >
           {t('learn_uninstalling')}
         </ExternalLink>
-        <br />
+        <Box marginY={SPACING.spacing3} />
         <ExternalLink
           href={PREVIOUS_RELEASES_URL}
           id="PreviousVersionModal_previousReleases"

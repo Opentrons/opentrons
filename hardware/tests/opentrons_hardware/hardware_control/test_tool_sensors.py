@@ -20,7 +20,10 @@ from opentrons_hardware.firmware_bindings.utils import (
     Int32Field,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    SensorIdField,
+    SensorTypeField,
+)
 
 
 from tests.conftest import CanLoopback
@@ -32,6 +35,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
 )
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
+    SensorId,
     SensorType,
     SensorThresholdMode,
 )
@@ -116,7 +120,7 @@ async def test_capacitive_probe(
                             group_id=UInt8Field(0),
                             seq_id=UInt8Field(0),
                             current_position_um=UInt32Field(10000),
-                            encoder_position=UInt32Field(10000),
+                            encoder_position=Int32Field(10000),
                             ack_id=UInt8Field(0),
                         )
                     ),
@@ -128,13 +132,15 @@ async def test_capacitive_probe(
 
     message_send_loopback.add_responder(move_responder)
 
-    result = await capacitive_probe(
+    position, encoder_position = await capacitive_probe(
         mock_messenger, target_node, motor_node, distance, speed
     )
-    assert result == 10  # this comes from the current_position_um above
+    assert position == 10  # this comes from the current_position_um above
+    assert encoder_position == 10
     # this mock assert is annoying because something's __eq__ doesn't work
     assert mock_sensor_threshold.call_args_list[0][0][0] == SensorThresholdInformation(
         sensor_type=SensorType.capacitive,
+        sensor_id=SensorId.S0,
         node_id=target_node,
         data=SensorDataType.build(1.0),
         mode=SensorThresholdMode.auto_baseline,
@@ -142,7 +148,11 @@ async def test_capacitive_probe(
     # this mock assert is annoying because, see below
     mock_bind_sync.assert_called_once_with(
         ANY,  # this is a mock of a function on a class not a method so this is self
-        SensorInformation(sensor_type=SensorType.capacitive, node_id=target_node),
+        SensorInformation(
+            sensor_type=SensorType.capacitive,
+            sensor_id=SensorId.S0,
+            node_id=target_node,
+        ),
         ANY,
         log=ANY,
     )
@@ -181,6 +191,7 @@ async def test_capacitive_sweep(
                     ReadFromSensorResponse(
                         payload=ReadFromSensorResponsePayload(
                             sensor=SensorTypeField(SensorType.capacitive.value),
+                            sensor_id=SensorIdField(SensorId.S0),
                             sensor_data=Int32Field(i << 16),
                         )
                     ),
@@ -196,7 +207,7 @@ async def test_capacitive_sweep(
                             group_id=UInt8Field(0),
                             seq_id=UInt8Field(0),
                             current_position_um=UInt32Field(10000),
-                            encoder_position=UInt32Field(10000),
+                            encoder_position=Int32Field(10000),
                             ack_id=UInt8Field(0),
                         )
                     ),

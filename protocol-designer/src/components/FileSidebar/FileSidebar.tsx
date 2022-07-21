@@ -16,7 +16,7 @@ import modalStyles from '../modals/modal.css'
 import styles from './FileSidebar.css'
 
 import { HintKey } from '../../tutorial'
-import {
+import type {
   InitialDeckSetup,
   SavedStepFormState,
   ModuleOnDeck,
@@ -33,7 +33,6 @@ export interface Props {
   pipettesOnDeck: InitialDeckSetup['pipettes']
   modulesOnDeck: InitialDeckSetup['modules']
   savedStepForms: SavedStepFormState
-  schemaVersion: number
 }
 
 interface WarningContent {
@@ -143,9 +142,9 @@ function getWarningContent({
 export const v6WarningContent: JSX.Element = (
   <div>
     <p>
-      {i18n.t(`alert.hint.export_v6_protocol_5_10.body1`)}{' '}
-      <strong>{i18n.t(`alert.hint.export_v6_protocol_5_10.body2`)}</strong>
-      {i18n.t(`alert.hint.export_v6_protocol_5_10.body3`)}
+      {i18n.t(`alert.hint.export_v6_protocol_6_10.body1`)}{' '}
+      <strong>{i18n.t(`alert.hint.export_v6_protocol_6_10.body2`)}</strong>
+      {i18n.t(`alert.hint.export_v6_protocol_6_10.body3`)}
     </p>
   </div>
 )
@@ -160,7 +159,6 @@ export function FileSidebar(props: Props): JSX.Element {
     modulesOnDeck,
     pipettesOnDeck,
     savedStepForms,
-    schemaVersion,
   } = props
   const [
     showExportWarningModal,
@@ -204,7 +202,7 @@ export function FileSidebar(props: Props): JSX.Element {
     content: React.ReactNode
   } => {
     return {
-      hintKey: 'export_v6_protocol_5_10',
+      hintKey: 'export_v6_protocol_6_10',
       content: v6WarningContent,
     }
   }
@@ -241,13 +239,8 @@ export function FileSidebar(props: Props): JSX.Element {
                 children: 'CONTINUE WITH EXPORT',
                 className: modalStyles.long_button,
                 onClick: () => {
-                  if (schemaVersion > 3) {
-                    setShowExportWarningModal(false)
-                    setShowBlockingHint(true)
-                  } else {
-                    onDownload()
-                    setShowExportWarningModal(false)
-                  }
+                  setShowExportWarningModal(false)
+                  setShowBlockingHint(true)
                 },
               },
             ]}
@@ -273,11 +266,9 @@ export function FileSidebar(props: Props): JSX.Element {
                 if (hasWarning) {
                   resetScrollElements()
                   setShowExportWarningModal(true)
-                } else if (schemaVersion > 3) {
+                } else {
                   resetScrollElements()
                   setShowBlockingHint(true)
-                } else {
-                  onDownload()
                 }
               }}
               disabled={!canDownload}

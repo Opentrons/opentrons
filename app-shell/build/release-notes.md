@@ -6,31 +6,33 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 6.0.0-alpha.1
+# Opentrons App Changes in 6.0.0
 
-Welcome to the alpha release of v6.0.0 release of the Opentrons App!
+Welcome to the v6.0.0 release of the Opentrons App! This release focuses on a visual redesign of the app that offers more ways to manage protocols even when you're not connected to a robot.
 
-After you update your app, please be sure to update any OT-2's you will be using with this alpha.
-The 6.0.0 release reshapes the main navigational structure. We're very excited for you to try this new experience out, and we appreciate your feedback (and patience) as you use this new software.
-
-This is alpha software! You may experience unexpected crashes or missing features not detailed here. Please see the [issue tracker][] for more details and to leave feedback.
-
-[issue tracker]: https://github.com/Opentrons/opentrons/issues/new?assignees=y3rsh%2Cnusrat813&labels=6.0-feedback&template=testing_feedback.yml&title=6.0+Feedback%3A++%3Ctitle%3E
+This release also includes updates to the robot operating system, so be sure to update any OT-2s before running protocols with this version of the app.
 
 ## New Features
 
-- A completely revamped look and feel of the app
-- You can now upload protocols to the app and manage them locally without connecting to a robot
-- You can now rename your robot easily!
-- Updates to running a protocol on a robot
+- Updated design: A more polished and modern design, built around the new, always-accessible Protocols, Labware, and Devices sections.
+- Protocols section
+  - Import multiple protocols and manage them all in one place.
+  - In-app protocol analysis lets you import Python and JSON protocol files without connecting to a robot.
+  - View deck setup, required hardware, and protocol metadata — before, during, or after a run.
+- Labware section
+  - Browse labware definitions from the Opentrons Labware Library right in the app.
+  - Import custom labware and manage it alongside standard labware.
+- Devices section
+  - New view for currently available and recently connected robots.
+  - See recently run protocols on a robot, including those run from other computers.
+  - Run a protocol directly from the robot details page.
+  - Easily change a robot's name from the new robot settings page.
 
-## Bug Fixes
+## Improved features
 
-Keep an eye on this space as we release new versions of the alpha.
-
-## Known Issues
-
-This alpha is a work in progress! We'll be addressing issues found in alpha testing in upcoming releases of 6.0.0.
+- Labware Position Check
+  - When re-running a protocol, the app will now automatically recommend stored Labware Offset data (from the last 20 runs on that robot) that applies to the same labware and deck slot.
+  - When running Labware Position Check, you will see live offset values as you jog the pipette.
 
 ---
 

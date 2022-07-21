@@ -234,6 +234,7 @@ describe('Run Details CommandItem', () => {
     expect(getByText('Comment')).toHaveStyle('backgroundColor: C_NEAR_WHITE')
     getByText('Mock RunTimeCommand Text')
   })
+
   it('renders the pause text when the command is a pause', () => {
     const MOCK_PAUSE_COMMAND: RunTimeCommand = {
       id: 'PAUSE',
@@ -271,6 +272,53 @@ describe('Run Details CommandItem', () => {
       runStartedAt: 'fake_timestamp',
     } as React.ComponentProps<typeof CommandItem>
     const { getByText } = render(props)
+    expect(getByText('Pause protocol')).toHaveStyle(
+      'backgroundColor: C_NEAR_WHITE'
+    )
+  })
+
+  it('renders the pause text when the command is a waitForResume', () => {
+    const MOCK_WAIT_FOR_RESUME_COMMAND: RunTimeCommand = {
+      id: 'WAIT_FOR_RESUME',
+      commandType: 'waitForResume',
+      params: {},
+      status: 'queued',
+      result: {},
+    } as any
+
+    const MOCK_WAIT_FOR_RESUME_COMMAND_SUMMARY: RunCommandSummary = {
+      id: 'WAIT_FOR_RESUME',
+      commandType: 'waitForResume',
+      status: 'queued',
+    } as any
+
+    const MOCK_COMMAND_DETAILS_PAUSE: RunTimeCommand = {
+      id: 'WAIT_FOR_RESUME',
+      commandType: 'waitForResume',
+      params: {},
+      status: 'running',
+      result: {},
+      startedAt: 'start timestamp',
+      completedAt: 'end timestamp',
+    } as any
+
+    when(mockUseCommandQuery)
+      .calledWith(RUN_ID, MOCK_WAIT_FOR_RESUME_COMMAND.id, expect.anything())
+      .mockReturnValue({
+        data: { data: MOCK_COMMAND_DETAILS_PAUSE },
+        refetch: jest.fn(),
+      } as any)
+
+    const props = {
+      runCommandSummary: MOCK_WAIT_FOR_RESUME_COMMAND_SUMMARY,
+      analysisCommand: MOCK_WAIT_FOR_RESUME_COMMAND,
+      runStatus: 'paused',
+      isMostRecentCommand: true,
+      stepNumber: 1,
+      runStartedAt: 'fake_timestamp',
+    } as React.ComponentProps<typeof CommandItem>
+    const { getByText } = render(props)
+
     expect(getByText('Pause protocol')).toHaveStyle(
       'backgroundColor: C_NEAR_WHITE'
     )

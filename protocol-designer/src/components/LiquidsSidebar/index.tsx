@@ -11,6 +11,8 @@ import { OrderedLiquids } from '../../labware-ingred/types'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { BaseState, ThunkDispatch } from '../../types'
 
+import styles from './styles.css'
+
 interface SP {
   liquids: OrderedLiquids
   selectedLiquid?: string | null
@@ -27,13 +29,16 @@ function LiquidsSidebarComponent(props: Props): JSX.Element {
   const { liquids, selectedLiquid, createNewLiquid, selectLiquid } = props
   return (
     <SidePanel title="Liquids">
-      {liquids.map(({ ingredientId, name }) => (
+      {liquids.map(({ ingredientId, name, displayColor }) => (
         <PDTitledList
           key={ingredientId}
           selected={selectedLiquid === ingredientId}
           onClick={() => selectLiquid(ingredientId)}
           iconName="circle"
-          iconProps={{ style: { fill: swatchColors(ingredientId) } }}
+          iconProps={{
+            style: { fill: displayColor ?? swatchColors(ingredientId) },
+            className: styles.liquid_icon_container,
+          }}
           title={name || `Unnamed Ingredient ${ingredientId}`} // fallback, should not happen
         />
       ))}

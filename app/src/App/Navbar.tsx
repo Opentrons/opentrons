@@ -21,9 +21,9 @@ import {
 
 import logoSvg from '../assets/images/logo_nav.svg'
 import { NAV_BAR_WIDTH } from './constants'
+import { StyledText } from '../atoms/text'
 
 import type { RouteProps } from './types'
-import { StyledText } from '../atoms/text'
 
 const SALESFORCE_HELP_LINK = 'https://support.opentrons.com/s/'
 
@@ -32,9 +32,19 @@ const NavbarLink = styled(NavLink)`
   align-self: ${ALIGN_STRETCH};
   background-color: ${COLORS.darkBlack};
 
-  &:hover,
-  &:focus {
+  &:hover {
+    background-color: ${COLORS.darkBlackHover};
+  }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 3px ${COLORS.warning};
+    outline: none;
     background-color: ${COLORS.darkGreyHover};
+  }
+
+  &:focus-visible.active {
+    box-shadow: none;
+    outline: none;
   }
 
   &:active {
@@ -69,10 +79,14 @@ const NavbarIcon = styled(Icon)`
   color: ${COLORS.medGrey};
   background-color: ${COLORS.transparent};
 
-  &:hover,
-  &:focus {
-    color: ${COLORS.medGrey};
+  &:hover {
     background-color: ${COLORS.darkBlackHover};
+  }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 3px ${COLORS.warning};
+    outline: none;
+    background-color: ${COLORS.darkGreyHover};
   }
 
   &:active {

@@ -5,23 +5,30 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 ---
-# OT-2 Software Changes in 6.0.0-alpha.1
 
-Welcome to the alpha release of v6.0.0 of the OT-2 software!
+# OT-2 Software Changes in 6.0.0
 
-In conjunction with changes on the app-side, the 6.0.0 release reshapes the way your OT-2 stores runs and protocols. We're very excited for you to try this new experience out, and we appreciate your feedback (and patience) as you use this new software.
+Welcome to the v6.0.0 release of the OT-2 software!
 
-This is alpha software! You may experience unexpected crashes or missing features not detailed here. Please see the [issue tracker][] for more details and to leave feedback.
-
-[issue tracker]: https://github.com/Opentrons/opentrons/issues/new?assignees=y3rsh%2Cnusrat813&labels=6.0-feedback&template=testing_feedback.yml&title=6.0+Feedback%3A++%3Ctitle%3E
+In conjunction with [changes on the app side](https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md), the 6.0.0 release reshapes the way your OT-2 stores runs and protocols.
 
 ## New Features
 
-- Your past 20 protocol runs will be persisted on the robot, even across reboots
+- The OT-2 will retain the past 20 protocol runs on the robot, even across reboots.
+- Supports renaming robots via the Opentrons App.
+
+## Bug Fixes
+
+- The `opentrons` Python module is now compatible with Python 3.10.
+- Protocols will correctly fail analysis when attempting to place a Thermocycler in a slot that conflicts with already-placed labware.
+- Improved handling of loading multiple modules of the same type.
+- Fixed various pipette bugs in protocol analysis.
+- Fixed [a bug](https://github.com/Opentrons/opentrons/issues/10126) where a robot would be undiscoverable if it happened to have the same name as another device on the network. 
 
 ## Known Issues
 
-This alpha is a work in progress! We'll be addressing issues in upcoming releases of 6.0.0.
+- Sometimes module load order is affected by the order in which you power the modules on. We strongly suggest connecting and powering on modules in the order they will be used in the protocol.
+
 
 ---
 
@@ -40,7 +47,7 @@ This release is a complete refactor of how the OT-2 communicates with the Opentr
 
 ### 5.0.1 to 5.0.2
 
-The 5.0.2 hotfix release contains two fixes in the robot software:
+The 5.0.2 hotfix release contains three fixes in the robot software:
 
 1. The robot now understands how to use labware loaded via `load_labware_from_definition` during Labware Position Check.
 2. User-defined labware labels are now returned to the Opentrons App from protocol analyses and runs.
@@ -95,7 +102,7 @@ The 4.6.2 hotfix release contains a small bug fix for an issue where the OT-2's 
 
 The 4.6.1 hotfix release contains a small configuration change to fix an issue with installing the `opentrons` PyPI package on computers running Python 3.8 and later. It does not affect the software running on your OT-2.
 
-## Known Issues
+### Known Issues
 
 In 4.6.0 and previous releases, the OT-2 will only use TLS 1.0 for WPA2 Enterprise association. Some RADIUS servers have disabled this version of TLS; it must be enabled to connect the OT-2 to a RADIUS-secured network.
 

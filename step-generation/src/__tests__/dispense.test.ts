@@ -6,6 +6,7 @@ import {
   getIsHeaterShakerEastWestWithLatchOpen,
   pipetteAdjacentHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestMultiChannelPipette,
+  getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
 } from '../utils'
 import {
   getInitialRobotStateStandard,
@@ -41,6 +42,9 @@ const mockGetIsHeaterShakerEastWestMultiChannelPipette = getIsHeaterShakerEastWe
 const mockPipetteAdjacentHeaterShakerWhileShaking = pipetteAdjacentHeaterShakerWhileShaking as jest.MockedFunction<
   typeof pipetteAdjacentHeaterShakerWhileShaking
 >
+const mockGetIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette as jest.MockedFunction<
+  typeof getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette
+>
 
 describe('dispense', () => {
   let initialRobotState: RobotState
@@ -71,6 +75,7 @@ describe('dispense', () => {
       expect(getSuccessResult(result).commands).toEqual([
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: DEFAULT_PIPETTE,
             volume: 50,
@@ -208,6 +213,22 @@ describe('dispense', () => {
       expect(getErrorResult(result).errors).toHaveLength(1)
       expect(getErrorResult(result).errors[0]).toMatchObject({
         type: 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING',
+      })
+    })
+    it('should return an error when dispensing north/south of a heater shaker into a non tiprack using a multi channel pipette', () => {
+      when(mockGetIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
+        .calledWith(
+          robotStateWithTip.modules,
+          robotStateWithTip.labware[SOURCE_LABWARE].slot,
+          expect.anything(),
+          expect.anything()
+        )
+        .mockReturnValue(true)
+
+      const result = dispense(params, invariantContext, robotStateWithTip)
+      expect(getErrorResult(result).errors).toHaveLength(1)
+      expect(getErrorResult(result).errors[0]).toMatchObject({
+        type: 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL',
       })
     })
   })

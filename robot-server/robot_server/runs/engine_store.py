@@ -1,10 +1,12 @@
 """In-memory storage of ProtocolEngine instances."""
 from typing import List, NamedTuple, Optional
 
+from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_runner import ProtocolRunner, ProtocolRunResult
 from opentrons.protocol_engine import (
     ProtocolEngine,
+    Config as ProtocolEngineConfig,
     StateSummary,
     LabwareOffsetCreate,
     create_protocol_engine,
@@ -73,14 +75,20 @@ class EngineStore:
         Raises:
             EngineConflictError: if a run-specific engine is active.
         """
-        if self._runner_engine_pair is not None:
+        if (
+            self._runner_engine_pair is not None
+            and not self.engine.state_view.commands.get_is_stopped()
+        ):
             raise EngineConflictError("An engine for a run is currently active")
 
         engine = self._default_engine
 
         if engine is None:
             # TODO(mc, 2022-03-21): potential race condition
-            engine = await create_protocol_engine(self._hardware_api)
+            engine = await create_protocol_engine(
+                hardware_api=self._hardware_api,
+                config=ProtocolEngineConfig(),
+            )
             self._default_engine = engine
 
         return engine
@@ -105,7 +113,12 @@ class EngineStore:
             EngineConflictError: The current runner/engine pair is not idle, so
             a new set may not be created.
         """
-        engine = await create_protocol_engine(hardware_api=self._hardware_api)
+        engine = await create_protocol_engine(
+            hardware_api=self._hardware_api,
+            config=ProtocolEngineConfig(
+                block_on_door_open=feature_flags.enable_door_safety_switch()
+            ),
+        )
         runner = ProtocolRunner(protocol_engine=engine, hardware_api=self._hardware_api)
 
         if self._runner_engine_pair is not None:

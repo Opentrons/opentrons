@@ -3,45 +3,40 @@ Entrypoint for the buildroot update server
 """
 import asyncio
 import logging
+from typing import NoReturn
 
-from . import get_app, constants
+from . import get_app
 
 from otupdate.common import name_management, cli, systemd
-from aiohttp import web
+from otupdate.common.run_application import run_and_notify_up
+
 
 LOG = logging.getLogger(__name__)
 
 
-def main() -> None:
+async def main() -> NoReturn:
     parser = cli.build_root_parser()
     args = parser.parse_args()
-    loop = asyncio.get_event_loop()
+
     systemd.configure_logging(getattr(logging, args.log_level.upper()))
 
+    # Because this involves restarting Avahi, this must happen early,
+    # before the NameSynchronizer starts up and connects to Avahi.
     LOG.info("Setting static hostname")
-    hostname = loop.run_until_complete(name_management.set_up_static_hostname())
-    LOG.info(f"Set static hostname to {hostname}")
+    static_hostname = await name_management.set_up_static_hostname()
+    LOG.info(f"Set static hostname to {static_hostname}")
 
-    LOG.info("Building buildroot update server")
-    app = get_app(args.version_file, args.config_file)
-
-    name = app[constants.DEVICE_NAME_VARNAME]  # Set by get_app().
-
-    LOG.info(f"Setting Avahi service name to {name}")
-    try:
-        loop.run_until_complete(name_management.set_avahi_service_name(name))
-    except Exception:
-        LOG.exception(
-            "Error setting the Avahi service name."
-            " mDNS + DNS-SD advertisement may not work."
+    async with name_management.NameSynchronizer.start() as name_synchronizer:
+        LOG.info("Building buildroot update server")
+        app = get_app(
+            system_version_file=args.version_file,
+            config_file_override=args.config_file,
+            name_synchronizer=name_synchronizer,
         )
 
-    LOG.info(f"Notifying {systemd.SOURCE} that service is up")
-    systemd.notify_up()
-
-    LOG.info(f"Starting buildroot update server on http://{args.host}:{args.port}")
-    web.run_app(app, host=args.host, port=args.port)  # type: ignore[no-untyped-call]
+        LOG.info(f"Starting buildroot update server on http://{args.host}:{args.port}")
+        await run_and_notify_up(app=app, host=args.host, port=args.port)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

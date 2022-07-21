@@ -8,103 +8,6 @@ Framework supporting the following:
 - Diffing human-readable text or JSON format
 - CLI access to all the above features
 
-## Test Cases
-
-The following section is to explain why each test case inside the `g-code-testing` project has either been included or
-omitted. Also, it will also explain at a high-level, the different categories of tests.
-
-## Test Categories
-
-### Protocol Tests
-
-**Description:** These tests have a Python Protocol file as an input. The framework will run the protocol and
-collect all G-Code output.
-
-**Tests**
-
-- protocol_2_modules - Test using 2 modules in the same protocol
-- protocol_2_single_channel - Test using 2 single channel pipettes in the same protocol
-- protocol_smoothie - Test an extremely simple protocol with no modules
-- protocol_swift_smoke - Test the "smoke" version of the Swift Turbo protocol
-- protocol_swift_turbo - Test the actual Swift Turbo protocol
-
-### HTTP Tests
-
-**Description:** The tests execute the underlying function from calling an HTTP endpoint and collect all the G-Code
-output. Some HTTP endpoints have been skipped.
-
-**[Control Tests:](https://github.com/Opentrons/opentrons/blob/edge/robot-server/robot_server/service/legacy/routers/control.py)**
-
-These tests cover the movement of the gantry and pipettes
-
-- Implemented Tests
-  - http_move_left_pipette - Test moving the left pipette with the `robot/move` HTTP endpoint
-  - http_move_right_pipette - Test moving the right pipette with the `robot/move` HTTP endpoint
-  - http_move_left_mount - Test moving the left mount with the `robot/move` HTTP endpoint
-  - http_move_right_mount - Test moving the right mount with the `robot/move` HTTP endpoint
-  - http_home_robot - Test homing the gantry with the `robot/home` HTTP endpoint
-  - http_home_left_pipette - Test homing the left pipette with the `robot/home` HTTP endpoint
-  - http_home_right_pipette - Test homing the right pipette with the `robot/home` HTTP endpoint
-- Skipped Tests
-  - `identify` endpoint - Only goes to the Raspberry Pi, does not generate any G-Code
-  - `robot/positions` endpoint - Tests by issuing move commands which is already covered
-  - `robot/lights` endpoint - Only goes to the Raspberry Pi, does not generate any G-Code
-
-**Module Tests:** <-- Insert link here
-
-These tests cover the functionality of all modules
-
-- Magdeck
-  - Implemented Tests
-    - http_magdeck_calibrate - Test the `calibrate` command with the `/modules/{serial}` HTTP endpoint. This command
-      performs the automatic calibration of the magdeck.
-    - http_magdeck_engage - Test `engage` command with the `/modules/{serial}` HTTP endpoint. This command lifts the
-      magnets.
-    - http_magdeck_deactivate - Test `deactivate` command with the `/modules/{serial}` HTTP endpoint. This command
-      returns the magnets to home.
-  - Skipped Tests
-    - Getters for all the properties on the magdeck because they do not generate any G-Code
-    - `bootloader` method - Because it is way too complicated to try to run this
-    - `/modules/{serial}/update` endpoint - Have to inject a `bundled_fw` arg into the function and the return isn't
-      worth it
-- Tempdeck
-  - Implemented Tests
-    - http_tempdeck_start_set_temp - Test `start_set_temperature` command with the `/modules/{serial}` HTTP endpoint.
-      This command sets the temperature and exits. It does not wait for the temp deck to come to temperature.
-    - http_tempdeck_set_temp - Test `set_temperature` command with the `/modules/{serial}` HTTP endpoint. This command
-      sets the temperature and waits for the tempdeck to come up to temperature.
-    - http_tempdeck_deactivate - Test `deactivate` command with the `/modules/{serial}` HTTP endpoint. This command
-      returns stops any heating or cooling and turns off the fan
-  - Skipped Tests
-    - Getters for all the properties on the tempdeck because they do not generate any G-Code
-    - `bootloader` method - Because it is way too complicated to try to run this
-    - `/modules/{serial}/update` endpoint - Have to inject a `bundled_fw` arg into the function and the return isn't
-      worth it
-    - `wait_next_poll` method - It is covered by `http_tempdeck_set_temp`
-    - `await_temperature` method - It does not return any unique G-Code
-- Thermocycler
-  - Implemented Tests
-    - `http_thermocycler_deactivate_lid` - Test `deactivate_lid` command with the `/modules/{serial}` HTTP endpoint.
-      This command turns off the heating pad on the thermocycler lid.
-    - `http_thermocycler_deactivate_block` - Test `deactivate_block` command with the `/modules/{serial}` HTTP endpoint.
-      This command turns off the heating pad on the thermocycler block.
-    - `http_thermocycler_deactivate` - Test `deactivate` command with the `/modules/{serial}` HTTP endpoint.
-      This command turns off the heating pad on the thermocycler block and lid.
-    - `http_thermocycler_open` - Test `open` command with the `/modules/{serial}` HTTP endpoint. This command opens
-      the thermocycler lid.
-    - `http_thermocycler_close` - Test `close` command with the `/modules/{serial}` HTTP endpoint. This command closes
-      the thermocycler lid.
-    - `http_thermocycler_set_temp` - Test `set_temperature` command with the `/modules/{serial}` HTTP endpoint.
-      This command sets the temperature of the thermocycler.
-    - `http_thermocycler_cycle_temps` - Test `cycle_temperatures` command with the `/modules/{serial}` HTTP endpoint.
-      This command cycles through multiple temperatures on the thermocycler.
-    - `http_thermocycler_set_lid_temp` - Test `set_lid_temperature` command with the `/modules/{serial}` HTTP endpoint.
-      This command sets the lid temperature of the thermocycler.
-  - Skipped Tests
-    - Getters for all the properties on the thermocycler because they do not generate any G-Code
-    - `bootloader` method - Because it is way too complicated to try to run this
-    - `hold_time_probably_set` method - Because it doesn't generate any G-Code
-
 ## Setup
 
 1. Navigate into `g-code-testing` directory
@@ -112,13 +15,135 @@ These tests cover the functionality of all modules
 
 ## Running tests
 
-Use the various Make targets in the `Makefile` to run tests using pytest
+### Acceptance Tests
 
-## Saving new comparison files
+To run `g-code-testing` framework acceptance tests run
 
-To update comparison files override files in `g-code-testing/g_code_test_data/comparison_files` with the output of
-the G-Code Parser
+```bash
+make test
+```
 
-You can do this by using `make update-g-code-configuration-comparison name=<comparison_name>`
+### G-Code Program Tests
 
-To get a list of comparison names run `make get-g-code-configurations`
+The G-Code Program tests run various protocols or HTTP requests, capture the sent G-Codes, and compare them against
+comparison files in `g_code_test_data/comparison_files`
+
+#### Fast G-Code Program Tests
+
+All G-Code program test cases that take under a minute are grouped together in one execution `test-g-code-fast`
+
+To run these run
+
+```bash
+make test-g-code-fast
+```
+
+#### Slow G-Code Program Tests
+
+All G-Code program tests that take over a minute are pulled out into their own Makefile target so they can be called
+in parallel inside a Github Action.
+
+To run these run the specific make target related to the test.
+
+For instance, to run the `swift-turbo` test run
+
+```bash
+make test-g-code-swift-turbo
+```
+
+## Running Individual G-Code Programs Manually
+
+You can run the various G-Code Programs without pytest, directly in your terminal with the following commands:
+
+### Get Configuration Names
+
+`get-g-code-configurations` prints a list of all available g-code programs to run. Use these printed names
+to specify which program to run
+
+**Command:**
+
+```bash
+make get-g-code-configurations
+```
+
+**Sample Output:**
+
+```
+Runnable Configurations:
+http/robot_home_robot
+http/robot_home_left_pipette
+http/robot_home_right_pipette
+http/robot_move_left_mount
+http/robot_move_left_pipette
+http/robot_move_right_mount
+http/robot_move_right_pipette
+http/magdeck_calibrate
+http/magdeck_deactivate
+http/magdeck_engage
+http/tempdeck_deactivate
+http/tempdeck_set_temperature
+http/tempdeck_start_set_temperature
+http/thermocycler_close
+http/thermocycler_open
+http/thermocycler_deactivate
+http/thermocycler_deactivate_block
+http/thermocycler_deactivate_lid
+http/thermocycler_cycle_temperatures
+http/thermocycler_set_lid_temperature
+http/thermocycler_set_temperature
+protocol/omega_biotek_magbind_totalpure_ngs
+protocol/swift_smoke
+protocol/swift_turbo
+protocol/2_modules
+protocol/basic_smoothie
+protocol/beckman_coulter_rna_advance_viral_rna_isolation
+protocol/cherrypicking
+protocol/customizable_serial_dilution_ot2
+protocol/illumina_nextera_xt_library_prep_part1
+protocol/opentrons_logo
+protocol/pcr_prep_part_1
+protocol/pcr_prep_part_2
+protocol/set_max_speed
+protocol/2_single_channel
+```
+
+### Run G-Code Program
+
+To run the G-Code Program locally use `run-g-code-configuration` and specify the name of the program you want to run.
+
+**Command:**
+
+```bash
+make run-g-code-configuration name=protocol/swift_turbo
+```
+
+### Load Stored G-Code Program Comparison
+
+To load the stored comparision file use `load-g-code-configuration-comparison
+
+**Command:**
+
+```bash
+make load-g-code-configuration-comparison name=protocol/swift_turbo
+```
+
+### Print Diff Between Comparison and Local Code
+
+To run the G-Code Program locally and print the diff between the result and the stored comparison use
+`diff-g-code-configuration-comparison`
+
+**Command:**
+
+```bash
+make diff-g-code-configuration-comparison name=protocol/swift_turbo
+```
+
+### Update Storage Comparision
+
+To update comparison files, with output of a locally ran G-Code Program, use `update-g-code-configuration-comparison`
+
+**Command:**
+
+```bash
+make update-g-code-configuration-comparison name=protocol/swift_turbo
+```

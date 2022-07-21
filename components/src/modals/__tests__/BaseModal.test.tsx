@@ -10,7 +10,7 @@ import { BaseModal } from '../BaseModal'
 describe('BaseModal', () => {
   it('should take up the whole parent', () => {
     const wrapper = shallow(<BaseModal />)
-    const box = wrapper.find(Flex).first()
+    const box = wrapper.find(Flex).at(1)
 
     expect({ ...box.props() }).toMatchObject({
       position: 'absolute',
@@ -40,17 +40,17 @@ describe('BaseModal', () => {
 
   it('should have a zIndex that can be overridden', () => {
     const wrapper = shallow(<BaseModal />)
-    const box = wrapper.find(Flex).first()
+    const box = wrapper.find(Flex).at(1)
 
     expect(box.prop('zIndex')).toBe(10)
 
     wrapper.setProps({ zIndex: 5 })
-    expect(wrapper.find(Flex).first().prop('zIndex')).toBe(5)
+    expect(wrapper.find(Flex).at(1).prop('zIndex')).toBe(5)
   })
 
   it('should have a white content box', () => {
     const wrapper = shallow(<BaseModal />)
-    const modal = wrapper.find(Flex).first()
+    const modal = wrapper.find(Flex).at(1)
     const content = modal.children(Box).first()
 
     expect({ ...content.props() }).toMatchObject({
@@ -64,7 +64,7 @@ describe('BaseModal', () => {
 
   it('should apply style props to content box', () => {
     const wrapper = shallow(<BaseModal maxWidth="32rem" />)
-    const modal = wrapper.find(Flex).first()
+    const modal = wrapper.find(Flex).at(1)
     const content = modal.children(Box).first()
 
     expect(content.prop('maxWidth')).toBe('32rem')
@@ -108,8 +108,9 @@ describe('BaseModal', () => {
     const contentWrapper = text.closest(Box)
 
     expect({ ...contentWrapper.props() }).toMatchObject({
-      paddingY: '1rem',
-      paddingX: '2rem',
+      paddingTop: '1rem',
+      paddingX: '1.5rem',
+      paddingBottom: '1.5rem',
     })
   })
 })

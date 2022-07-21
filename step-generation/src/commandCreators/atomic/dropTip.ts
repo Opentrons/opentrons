@@ -1,3 +1,4 @@
+import { uuid } from '../../utils'
 import { FIXED_TRASH_ID } from '../../constants'
 import type { CommandCreator } from '../../types'
 interface DropTipArgs {
@@ -22,6 +23,7 @@ export const dropTip: CommandCreator<DropTipArgs> = (
   const commands = [
     {
       commandType: 'dropTip' as const,
+      key: uuid(),
       params: {
         pipetteId: pipette,
         labwareId: FIXED_TRASH_ID,

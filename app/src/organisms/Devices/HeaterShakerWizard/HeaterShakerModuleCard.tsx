@@ -6,7 +6,6 @@ import {
   Icon,
   SIZE_1,
   TYPOGRAPHY,
-  TEXT_TRANSFORM_UPPERCASE,
   DIRECTION_ROW,
   DIRECTION_COLUMN,
   SPACING,
@@ -15,7 +14,7 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import heaterShakerModule from '../../../assets/images/heatershaker_module_transparent.svg'
-import { HeaterShakerModuleData } from '../ModuleCard/HeaterShakerModuleData'
+import { HeaterShakerModuleData } from '../../ModuleCard/HeaterShakerModuleData'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 
@@ -45,7 +44,7 @@ export const HeaterShakerModuleCard = (
         <img src={heaterShakerModule} alt={'Heater-Shaker'} />
         <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
           <Text
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeCaption}

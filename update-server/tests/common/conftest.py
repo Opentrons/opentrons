@@ -8,7 +8,9 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
-from aiohttp.test_utils import TestClient
+
+# Avoid pytest trying to collect TestClient because it begins with "Test".
+from aiohttp.test_utils import TestClient as HTTPTestClient
 
 from otupdate import buildroot, common
 
@@ -23,20 +25,19 @@ one_up = os.path.abspath(os.path.join(__file__, "../../"))
 
 @pytest.fixture(params=[openembedded, buildroot])
 async def test_cli(
-    aiohttp_client, loop, otupdate_config, request, version_file_path
-) -> Tuple[TestClient, str]:
+    aiohttp_client, otupdate_config, request, version_file_path, mock_name_synchronizer
+) -> Tuple[HTTPTestClient, str]:
     """
     Build an app using dummy versions, then build a test client and return it
     """
     cli_client_pkg = request.param
     app = cli_client_pkg.get_app(
+        name_synchronizer=mock_name_synchronizer,
         system_version_file=version_file_path,
         config_file_override=otupdate_config,
-        name_override="opentrons-test",
         boot_id_override="dummy-boot-id-abc123",
-        loop=loop,
     )
-    client = await loop.create_task(aiohttp_client(app))
+    client = await aiohttp_client(app)
     return client, cli_client_pkg.__name__
 
 

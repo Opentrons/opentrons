@@ -2,19 +2,33 @@
 import copy
 from dataclasses import replace
 import pytest
+import json
 from typing import Iterator, Tuple
 from typing_extensions import Literal
-from mock import patch, AsyncMock
+from mock import patch, AsyncMock, Mock
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.config.types import OT3CalibrationSettings, Offset
 from opentrons.hardware_control.ot3_calibration import (
     find_edge,
+    find_axis_center,
     EarlyCapacitiveSenseTrigger,
     find_deck_position,
+    find_slot_center_binary,
+    find_slot_center_noncontact,
+    calibrate_mount,
+    CalibrationMethod,
+    _edges_from_data,
+    InaccurateNonContactSweepError,
 )
 from opentrons.types import Point
+
+
+@pytest.fixture(autouse=True)
+def mock_save_json():
+    with patch("json.dump", Mock(spec=json.dump)) as jd:
+        yield jd
 
 
 @pytest.fixture
@@ -41,6 +55,28 @@ def mock_capacitive_probe(ot3_hardware: ThreadManager[OT3API]) -> Iterator[Async
         ),
     ) as mock_probe:
         yield mock_probe
+
+
+@pytest.fixture
+def mock_capacitive_sweep(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "capacitive_sweep",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj.capacitive_sweep,
+            wraps=ot3_hardware.managed_obj.capacitive_sweep,
+        ),
+    ) as mock_sweep:
+        yield mock_sweep
+
+
+@pytest.fixture
+def mock_data_analysis() -> Iterator[Mock]:
+    with patch(
+        "opentrons.hardware_control.ot3_calibration._edges_from_data",
+        Mock(spec=_edges_from_data),
+    ) as efd:
+        yield efd
 
 
 def _update_edge_sense_config(
@@ -171,3 +207,57 @@ async def test_find_deck_checks_z_only(
     second_move_point = mock_move_to.call_args_list[1][0][1]
     assert second_move_point.x == config_point.x
     assert second_move_point.y == config_point.y
+
+
+async def test_method_enum(ot3_hardware: ThreadManager[OT3API]) -> None:
+    with patch(
+        "opentrons.hardware_control.ot3_calibration.find_slot_center_binary",
+        AsyncMock(spec=find_slot_center_binary),
+    ) as binary, patch(
+        "opentrons.hardware_control.ot3_calibration.find_slot_center_noncontact",
+        AsyncMock(spec=find_slot_center_noncontact),
+    ) as noncontact, patch(
+        "opentrons.hardware_control.ot3_calibration.find_deck_position",
+        AsyncMock(spec=find_deck_position),
+    ) as find_deck:
+        find_deck.return_value = 10
+        binary.return_value = (1.0, 2.0)
+        noncontact.return_value = (3.0, 4.0)
+        binval = await calibrate_mount(
+            ot3_hardware, OT3Mount.RIGHT, CalibrationMethod.BINARY_SEARCH
+        )
+        find_deck.assert_called_once()
+        binary.assert_called_once()
+        noncontact.assert_not_called()
+        assert binval == Point(1.0, 2.0, 10)
+
+        find_deck.reset_mock()
+        binary.reset_mock()
+        noncontact.reset_mock()
+
+        ncval = await calibrate_mount(
+            ot3_hardware, OT3Mount.LEFT, CalibrationMethod.NONCONTACT_PASS
+        )
+        find_deck.assert_called_once()
+        binary.assert_not_called()
+        noncontact.assert_called_once()
+        assert ncval == Point(3.0, 4.0, 10)
+
+
+async def test_noncontact_sanity(
+    ot3_hardware: ThreadManager[OT3API],
+    override_cal_config: None,
+    mock_move_to: AsyncMock,
+    mock_capacitive_sweep: AsyncMock,
+    mock_data_analysis: Mock,
+) -> None:
+    mock_data_analysis.return_value = (-1000, 1000)
+    await ot3_hardware.home()
+    with pytest.raises(InaccurateNonContactSweepError):
+        await find_axis_center(
+            ot3_hardware,
+            OT3Mount.RIGHT,
+            Point(*ot3_hardware.config.calibration.edge_sense.minus_x_pos),
+            Point(*ot3_hardware.config.calibration.edge_sense.plus_x_pos),
+            OT3Axis.X,
+        )

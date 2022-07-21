@@ -5,7 +5,6 @@ import {
   Flex,
   JUSTIFY_FLEX_END,
   SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -60,7 +59,7 @@ export function ProtocolAnalysisErrorModal({
           >
             <StyledText
               css={TYPOGRAPHY.pSemiBold}
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
             >
               {t('shared:close')}
             </StyledText>

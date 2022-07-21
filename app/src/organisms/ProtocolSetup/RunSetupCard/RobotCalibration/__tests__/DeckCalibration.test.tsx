@@ -49,21 +49,21 @@ describe('DeckCalibration', () => {
     const { getByRole } = render()
     expect(getByRole('heading', { name: 'Deck Calibration' })).toBeTruthy()
     expect(
-      getByRole('link', { name: 'See How Robot Calibration Works' })
+      getByRole('button', { name: 'See How Robot Calibration Works' })
     ).toBeTruthy()
   })
   it('opens robot cal help modal on click', () => {
     const { getByText, getByRole } = render()
     expect(screen.queryByText('mock deckCalibration modal')).toBeNull()
     fireEvent.click(
-      getByRole('link', { name: 'See How Robot Calibration Works' })
+      getByRole('button', { name: 'See How Robot Calibration Works' })
     )
     getByText('mock deckCalibration modal')
   })
   it('closes robot cal help modal on click', () => {
     const { getByText, getByRole } = render()
     fireEvent.click(
-      getByRole('link', { name: 'See How Robot Calibration Works' })
+      getByRole('button', { name: 'See How Robot Calibration Works' })
     )
     const mockModal = getByText('mock deckCalibration modal')
     fireEvent.click(mockModal)

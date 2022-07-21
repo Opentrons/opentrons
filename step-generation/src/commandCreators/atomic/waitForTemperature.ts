@@ -2,6 +2,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { uuid } from '../../utils'
 import { TEMPERATURE_AT_TARGET, TEMPERATURE_DEACTIVATED } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import type { CommandCreator, WaitForTemperatureArgs } from '../../types'
@@ -59,6 +60,7 @@ export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
         commands: [
           {
             commandType: 'temperatureModule/waitForTemperature',
+            key: uuid(),
             params: {
               moduleId: module,
               celsius: temperature,
@@ -72,6 +74,7 @@ export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
         commands: [
           {
             commandType: 'heaterShaker/waitForTemperature',
+            key: uuid(),
             params: {
               moduleId: module,
             },

@@ -120,7 +120,7 @@ def get_plunger_speed(api):
     if isinstance(api, API):
         return api.plunger_speed
     else:
-        return api._instrument_handler.plunger_speed
+        return api._pipette_handler.plunger_speed
 
 
 async def test_cache_instruments(sim_and_instr):

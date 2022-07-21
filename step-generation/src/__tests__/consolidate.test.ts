@@ -1027,6 +1027,7 @@ describe('consolidate single-channel', () => {
         // Pre-wet
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -1043,12 +1044,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -1065,13 +1068,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // First aspirate: source well A1
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -1088,6 +1093,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1104,12 +1110,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1125,6 +1133,7 @@ describe('consolidate single-channel', () => {
         // Air Gap: after aspirating from A1
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -1141,13 +1150,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Second aspirate: source well A2
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -1164,6 +1175,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1180,12 +1192,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1201,6 +1215,7 @@ describe('consolidate single-channel', () => {
         // Aspirate > air gap: after aspirating from A2
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -1217,13 +1232,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Dispense full air + liquid volume all together to dest well (100+31+100+31 = 262uL)
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 262,
@@ -1240,6 +1257,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -1256,13 +1274,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Mix (disp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -1279,12 +1299,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -1301,13 +1323,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Touch tip (disp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -1327,6 +1351,7 @@ describe('consolidate single-channel', () => {
         // Blowout to trash
         {
           commandType: 'blowout',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'fixedTrash',
@@ -1345,6 +1370,7 @@ describe('consolidate single-channel', () => {
         // pre-wet
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -1361,12 +1387,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -1383,13 +1411,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // actual aspirate A3
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -1406,6 +1436,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1422,12 +1453,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1443,6 +1476,7 @@ describe('consolidate single-channel', () => {
         // Aspirate > air gap: after aspirating from A3
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -1459,13 +1493,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Dispense full air + liquid volume all together to dest well (100+31 = 131uL)
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 131,
@@ -1482,6 +1518,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -1498,13 +1535,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Mix (disp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -1521,12 +1560,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -1543,13 +1584,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Touch tip (disp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -1566,6 +1609,7 @@ describe('consolidate single-channel', () => {
         // Blowout to trash
         {
           commandType: 'blowout',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'fixedTrash',
@@ -1583,6 +1627,7 @@ describe('consolidate single-channel', () => {
         // Dispense > air gap in dest well
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -1599,14 +1644,16 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
 
         // we used dispense > air gap, so we will dispose of the tip
         {
           commandType: 'dropTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'fixedTrash',
@@ -1648,6 +1695,7 @@ describe('consolidate single-channel', () => {
         // pick up tip
         {
           commandType: 'pickUpTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'tiprack1Id',
@@ -1657,6 +1705,7 @@ describe('consolidate single-channel', () => {
         // Pre-wet
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -1673,12 +1722,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -1695,13 +1746,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // First aspirate: source well A1
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -1718,6 +1771,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1734,12 +1788,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1755,6 +1811,7 @@ describe('consolidate single-channel', () => {
         // Air Gap: after aspirating from A1
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -1771,13 +1828,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Second aspirate: source well A2
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -1794,6 +1853,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1810,12 +1870,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -1831,6 +1893,7 @@ describe('consolidate single-channel', () => {
         // Aspirate > air gap: after aspirating from A2
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -1847,13 +1910,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Dispense full air + liquid volume all together to dest well (100+31+100+31 = 262uL)
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 262,
@@ -1870,6 +1935,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -1886,13 +1952,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Mix (disp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -1909,12 +1977,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -1931,13 +2001,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Touch tip (disp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -1957,6 +2029,7 @@ describe('consolidate single-channel', () => {
         // Blowout to dest well
         {
           commandType: 'blowout',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -1975,6 +2048,7 @@ describe('consolidate single-channel', () => {
         // pre-wet
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -1991,12 +2065,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -2013,13 +2089,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // actual aspirate A3
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -2036,6 +2114,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -2052,12 +2131,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -2073,6 +2154,7 @@ describe('consolidate single-channel', () => {
         // Aspirate > air gap: after aspirating from A3
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -2089,13 +2171,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Dispense full air + liquid volume all together to dest well (100+31 = 131uL)
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 131,
@@ -2112,6 +2196,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2128,13 +2213,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Mix (disp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -2151,12 +2238,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -2173,13 +2262,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Touch tip (disp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2195,6 +2286,7 @@ describe('consolidate single-channel', () => {
         // Blowout to dest
         {
           commandType: 'blowout',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2211,6 +2303,7 @@ describe('consolidate single-channel', () => {
         // Dispense > air gap in dest well
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2227,14 +2320,16 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
 
         // we used dispense > air gap, so we will dispose of the tip
         {
           commandType: 'dropTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'fixedTrash',
@@ -2276,6 +2371,7 @@ describe('consolidate single-channel', () => {
         // pick up tip
         {
           commandType: 'pickUpTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'tiprack1Id',
@@ -2285,6 +2381,7 @@ describe('consolidate single-channel', () => {
         // Pre-wet
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -2301,12 +2398,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -2323,13 +2422,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // First aspirate: source well A1
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -2346,6 +2447,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -2362,12 +2464,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -2383,6 +2487,7 @@ describe('consolidate single-channel', () => {
         // Air Gap: after aspirating from A1
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -2399,13 +2504,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Second aspirate: source well A2
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -2422,6 +2529,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -2438,12 +2546,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -2459,6 +2569,7 @@ describe('consolidate single-channel', () => {
         // Aspirate > air gap: after aspirating from A2
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -2475,13 +2586,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Dispense full air + liquid volume all together to dest well (100+31+100+31 = 262uL)
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 262,
@@ -2498,6 +2611,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2514,13 +2628,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Mix (disp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -2537,12 +2653,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -2559,13 +2677,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Touch tip (disp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2582,6 +2702,7 @@ describe('consolidate single-channel', () => {
         // Blowout to dest well
         {
           commandType: 'blowout',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2599,6 +2720,7 @@ describe('consolidate single-channel', () => {
         // Change tip is "always" so we can Dispense > Air Gap here
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2615,13 +2737,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // replace tip
         {
           commandType: 'dropTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'fixedTrash',
@@ -2630,6 +2754,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'pickUpTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'tiprack1Id',
@@ -2641,6 +2766,7 @@ describe('consolidate single-channel', () => {
         // pre-wet
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -2657,12 +2783,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -2679,13 +2807,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // actual aspirate A3
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 100,
@@ -2702,6 +2832,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -2718,12 +2849,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'sourcePlateId',
@@ -2739,6 +2872,7 @@ describe('consolidate single-channel', () => {
         // Aspirate > air gap: after aspirating from A3
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -2755,13 +2889,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         // Dispense full air + liquid volume all together to dest well (100+31 = 131uL)
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 131,
@@ -2778,6 +2914,7 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'moveToWell',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2794,13 +2931,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Mix (disp)
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -2817,12 +2956,14 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
         {
           commandType: 'dispense',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 36,
@@ -2839,13 +2980,15 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 12,
+            seconds: 12,
           },
         },
         // Touch tip (disp)
         {
           commandType: 'touchTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2861,6 +3004,7 @@ describe('consolidate single-channel', () => {
         // Blowout to dest
         {
           commandType: 'blowout',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2877,6 +3021,7 @@ describe('consolidate single-channel', () => {
         // Dispense > air gap in dest well
         {
           commandType: 'aspirate',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
@@ -2893,14 +3038,16 @@ describe('consolidate single-channel', () => {
         },
         {
           commandType: 'delay',
+          key: expect.any(String),
           params: {
-            wait: 11,
+            seconds: 11,
           },
         },
 
         // we used dispense > air gap, so we will dispose of the tip
         {
           commandType: 'dropTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'fixedTrash',

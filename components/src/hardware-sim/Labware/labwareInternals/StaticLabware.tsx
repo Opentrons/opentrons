@@ -15,6 +15,7 @@ export interface StaticLabwareProps {
   selectableWellClass?: string
   onMouseEnterWell?: (e: WellMouseEvent) => unknown
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
+  hover?: boolean
 }
 
 const TipDecoration = React.memo(function TipDecoration(props: {
@@ -39,7 +40,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
   return (
     <g>
       <g className={styles.labware_detail_group}>
-        <LabwareOutline definition={props.definition} />
+        <LabwareOutline definition={props.definition} hover={props.hover} />
       </g>
       <g>
         {flatMap(

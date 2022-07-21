@@ -166,7 +166,7 @@ def parse_key_values(value: str) -> Dict[str, str]:
 
 def parse_optional_number(value: str, rounding_val: int) -> Optional[float]:
     """Convert number to float. 'none' will be converted to None"""
-    return None if value == "none" else parse_number(value, rounding_val)
+    return None if value.lower() == "none" else parse_number(value, rounding_val)
 
 
 def parse_number(value: str, rounding_val: int) -> float:

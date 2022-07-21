@@ -9,7 +9,6 @@ from logging.config import dictConfig
 
 from opentrons_hardware.drivers.can_bus import build
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    SetupRequest,
     DisableMotorRequest,
     ExecuteMoveGroupRequest,
 )
@@ -81,26 +80,24 @@ async def run_test(messenger: CanMessenger) -> None:
     v_ref = prompt_float_input(
         "Set reference voltage in A (float, \033[96m0.5A\033[0m)"
     )
-    pwm_freq = prompt_int_input("Set PWM frequency in Hz (int, \033[96m32000Hz\033[0m)")
 
     try:
-        await messenger.send(node_id=NodeId.gripper, message=SetupRequest())
         await set_reference_voltage(messenger, v_ref)
 
         while True:
             duty = prompt_int_input("\nDuty cycle in % (int)")
-            await set_pwm_param(messenger, pwm_freq, duty)
+            await set_pwm_param(messenger, duty)
             print(f"\n\033[95m{duty}%\033[0m")
             print("--------")
 
             input(in_green("Press Enter to grip...\n"))
 
-            await grip(messenger, 0, 0, 0, 0, 0)
+            await grip(messenger, 0, 0, 0, 0)
             await execute_move(messenger)
 
             input(in_green("Press Enter to release...\n"))
 
-            await home(messenger, 0, 0, 0, 0)
+            await home(messenger, 0, 0, 0)
             await execute_move(messenger)
 
     except asyncio.CancelledError:

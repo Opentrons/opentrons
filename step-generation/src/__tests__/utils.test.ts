@@ -44,10 +44,12 @@ import {
 import type { RobotState } from '../'
 import type {
   LabwareEntities,
+  LabwareEntity,
   ThermocyclerModuleState,
   ThermocyclerStateStepArgs,
   WellOrderOption,
 } from '../types'
+import { getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette } from '../utils/heaterShakerCollision'
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
@@ -1003,6 +1005,72 @@ describe('getIsHeaterShakerEastWestMultiChannelPipette', () => {
     ).toBe(false)
   })
 })
+describe('getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette', () => {
+  let slot: string
+  let modules: RobotState['modules']
+  let pipetteSpecs: PipetteNameSpecs
+  let labwareEntity: LabwareEntity
+  beforeEach(() => {
+    slot = '4'
+    modules = {
+      heaterShakerId: {
+        slot: '1',
+        moduleState: {
+          type: HEATERSHAKER_MODULE_TYPE,
+          targetTemp: null,
+          targetSpeed: null,
+          latchOpen: true,
+        },
+      },
+    }
+    pipetteSpecs = pipetteNameSpecsFixtures.p10_multi as PipetteNameSpecs
+    labwareEntity = {
+      id: 'fixture96PlateId',
+      labwareDefURI: getLabwareDefURI(fixture96Plate),
+      def: fixture96Plate,
+    }
+  })
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+  it('should return true when there is a heater shaker north/south and the pipette is a multi channel and the labware is not a tiprack', () => {
+    expect(
+      getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
+        modules,
+        slot,
+        pipetteSpecs,
+        labwareEntity
+      )
+    ).toBe(true)
+  })
+  it('should return false when the labware is not a tiprack', () => {
+    labwareEntity = {
+      id: 'fixtureTiprack10ulId',
+      labwareDefURI: getLabwareDefURI(fixtureTiprack10ul),
+      def: fixtureTiprack10ul,
+    }
+    expect(
+      getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
+        modules,
+        slot,
+        pipetteSpecs,
+        labwareEntity
+      )
+    ).toBe(false)
+  })
+  it('should return false when the labware is not north/south of a heater shaker', () => {
+    slot = '2'
+    expect(
+      getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
+        modules,
+        slot,
+        pipetteSpecs,
+        labwareEntity
+      )
+    ).toBe(false)
+  })
+})
+
 describe('pipetteAdjacentHeaterShakerWhileShaking', () => {
   let slot: string
   let modules: RobotState['modules']

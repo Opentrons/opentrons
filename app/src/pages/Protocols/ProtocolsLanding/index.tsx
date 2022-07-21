@@ -16,7 +16,7 @@ export function ProtocolsLanding(): JSX.Element {
   )
   React.useEffect(() => {
     dispatch(fetchProtocols())
-  }, [])
+  }, [dispatch])
 
   return storedProtocols.length > 0 ? (
     <ProtocolList storedProtocols={storedProtocols} />

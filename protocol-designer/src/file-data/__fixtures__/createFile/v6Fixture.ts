@@ -76,7 +76,7 @@ export const robotStateTimeline: Timeline = {
         {
           commandType: 'delay',
           params: {
-            wait: 1,
+            seconds: 1,
           },
         },
         {
@@ -98,7 +98,7 @@ export const robotStateTimeline: Timeline = {
         {
           commandType: 'delay',
           params: {
-            wait: 1,
+            seconds: 1,
           },
         },
         {
@@ -182,7 +182,7 @@ export const robotStateTimeline: Timeline = {
         {
           commandType: 'delay',
           params: {
-            wait: 1,
+            seconds: 1,
           },
         },
         {
@@ -204,7 +204,7 @@ export const robotStateTimeline: Timeline = {
         {
           commandType: 'delay',
           params: {
-            wait: 1,
+            seconds: 1,
           },
         },
         {

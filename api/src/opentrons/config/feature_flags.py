@@ -29,3 +29,8 @@ def enable_ot3_hardware_controller() -> bool:
     """Get whether to use the ot3 hardware controller."""
 
     return advs.get_setting_with_env_overload("enableOT3HardwareController")
+
+
+def enable_heater_shaker_python_api() -> bool:
+    """Get whether to use the Heater-Shaker python API."""
+    return advs.get_setting_with_env_overload("enableHeaterShakerPAPI")

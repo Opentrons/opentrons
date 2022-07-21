@@ -141,7 +141,7 @@ export const hostsByIpReducer = (
         return robotName === targetRobotName
       })
 
-      return removals.length > 1 ? omit(state, removals) : state
+      return removals.length > 0 ? omit(state, removals) : state
     }
 
     case Actions.SERVICE_FOUND: {

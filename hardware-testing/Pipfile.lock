@@ -111,6 +111,10 @@
             "editable": true,
             "path": "./../api"
         },
+        "opentrons-shared-data": {
+            "editable": true,
+            "path": "./../shared-data/python"
+        },
         "pydantic": {
             "hashes": [
                 "sha256:021ea0e4133e8c824775a0cfe098677acf6fa5a3cbf9206a376eed3fc09302cd",

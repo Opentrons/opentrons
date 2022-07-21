@@ -401,24 +401,24 @@ def test_map_pause() -> None:
 
     assert result == [
         pe_actions.UpdateCommandAction(
-            pe_commands.Pause.construct(
+            pe_commands.WaitForResume.construct(
                 id="command.PAUSE-0",
                 key="command.PAUSE-0",
                 status=pe_commands.CommandStatus.RUNNING,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
-                params=pe_commands.PauseParams(message="hello world"),
+                params=pe_commands.WaitForResumeParams(message="hello world"),
             )
         ),
         pe_actions.UpdateCommandAction(
-            pe_commands.Pause.construct(
+            pe_commands.WaitForResume.construct(
                 id="command.PAUSE-0",
                 key="command.PAUSE-0",
                 status=pe_commands.CommandStatus.SUCCEEDED,
                 createdAt=matchers.IsA(datetime),
                 startedAt=matchers.IsA(datetime),
                 completedAt=matchers.IsA(datetime),
-                params=pe_commands.PauseParams(message="hello world"),
+                params=pe_commands.WaitForResumeParams(message="hello world"),
             )
         ),
         pe_actions.PauseAction(source=pe_actions.PauseSource.PROTOCOL),

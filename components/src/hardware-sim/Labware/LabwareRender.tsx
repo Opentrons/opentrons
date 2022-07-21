@@ -52,6 +52,8 @@ export interface LabwareRenderProps {
     allows drag-to-select behavior */
   selectableWellClass?: string
   gRef?: React.RefObject<SVGGElement>
+  // adds blue border with drop shadow to labware
+  hover?: boolean
 }
 
 export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
@@ -68,6 +70,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         onMouseEnterWell={props.onMouseEnterWell}
         onMouseLeaveWell={props.onMouseLeaveWell}
         selectableWellClass={props.selectableWellClass}
+        hover={props.hover}
       />
       {props.wellStroke && (
         <StrokedWells
@@ -75,17 +78,17 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
           strokeByWell={props.wellStroke}
         />
       )}
-      {props.wellFill && (
-        <FilledWells
-          definition={props.definition}
-          fillByWell={props.wellFill}
-        />
-      )}
       {props.highlightedWells && (
         <StyledWells
           className={styles.highlighted_well}
           definition={props.definition}
           wells={props.highlightedWells}
+        />
+      )}
+      {props.wellFill && (
+        <FilledWells
+          definition={props.definition}
+          fillByWell={props.wellFill}
         />
       )}
       {props.selectedWells && (

@@ -11,16 +11,20 @@ import {
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
   TYPOGRAPHY,
+  useConditionalConfirm,
 } from '@opentrons/components'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
+import { Portal } from '../../App/portal'
 import {
   analyzeProtocol,
+  removeProtocol,
   viewProtocolSourceFolder,
 } from '../../redux/protocol-storage'
+import { ConfirmDeleteProtocolModal } from '../ProtocolsLanding/ConfirmDeleteProtocolModal'
 
 import type { Dispatch } from '../../redux/types'
 
@@ -31,15 +35,20 @@ interface OverflowMenuProps {
 
 export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
   const { protocolKey, protocolType } = props
-  const { t } = useTranslation('protocol_details')
+  const { t } = useTranslation(['protocol_details', 'protocol_list'])
   const {
-    MenuOverlay,
+    menuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
+  const {
+    confirm: confirmDeleteProtocol,
+    showConfirmation: showDeleteConfirmation,
+    cancel: cancelDeleteProtocol,
+  } = useConditionalConfirm(() => dispatch(removeProtocol(protocolKey)), true)
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -56,9 +65,21 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
     history.push(`/protocols/${protocolKey}/timeline`)
     setShowOverflowMenu(!showOverflowMenu)
   }
+
+  const handleClickDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    confirmDeleteProtocol()
+    setShowOverflowMenu(!showOverflowMenu)
+  }
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
-      <OverflowBtn alignSelf={ALIGN_FLEX_END} onClick={handleOverflowClick} />
+      <OverflowBtn
+        data-testid="ProtocolDetailsOverflowMenu_overflowBtn"
+        alignSelf={ALIGN_FLEX_END}
+        onClick={handleOverflowClick}
+      />
       {showOverflowMenu ? (
         <Flex
           width={'12rem'}
@@ -67,17 +88,31 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
-          top="3rem"
+          top="2.3rem"
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          <MenuItem onClick={handleClickShowInFolder}>
+          <MenuItem
+            onClick={handleClickShowInFolder}
+            data-testid="ProtocolDetailsOverflowMenu_showInFolder"
+          >
             {t('show_in_folder')}
           </MenuItem>
           <MenuItem onClick={handleClickTimeline}>
             {t('go_to_timeline')}
           </MenuItem>
-          <MenuItem onClick={handleClickReanalyze}>{t('reanalyze')}</MenuItem>
+          <MenuItem
+            onClick={handleClickReanalyze}
+            data-testid="ProtocolDetailsOverflowMenu_reanalyze"
+          >
+            {t('reanalyze')}
+          </MenuItem>
+          <MenuItem
+            onClick={handleClickDelete}
+            data-testid="ProtocolDetailsOverflowMenu_deleteProtocol"
+          >
+            {t('protocol_list:delete_protocol')}
+          </MenuItem>
           {protocolType === 'json' ? (
             <>
               <Divider />
@@ -94,7 +129,19 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
           ) : null}
         </Flex>
       ) : null}
-      <MenuOverlay />
+      {showDeleteConfirmation ? (
+        <Portal level="top">
+          <ConfirmDeleteProtocolModal
+            cancelDeleteProtocol={(e: React.MouseEvent) => {
+              e.preventDefault()
+              e.stopPropagation()
+              cancelDeleteProtocol()
+            }}
+            handleClickDelete={handleClickDelete}
+          />
+        </Portal>
+      ) : null}
+      {menuOverlay}
     </Flex>
   )
 }
