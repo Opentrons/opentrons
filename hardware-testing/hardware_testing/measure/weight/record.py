@@ -151,8 +151,42 @@ class GravimetricRecording(List):
             csv_file_str += s.as_csv(self) + "\n"
         return csv_file_str + "\n"
 
+    def _get_nearest_sample_index(self, _time: float) -> int:
+        if _time < self.start_time or _time > self.end_time:
+            raise ValueError(f'Time (_time) is not within recording')
+        for i in range(len(self) - 1):
+            diff_before = _time - self[i].time
+            diff_after = self[i + 1].time - _time
+            if diff_before > 0 and diff_after > 0:
+                if diff_before < diff_after:
+                    return i
+                else:
+                    return i + 1
+        raise ValueError(f'Unable to find time ({time}) in recording')
 
-class RecordConfig:
+    def get_time_slice(self, start: float, end: float,
+                       stable: bool = False) -> "GravimetricRecording":
+        """Get time slice."""
+        assert len(self), f'Cannot slice an empty recording'
+        start_idx = self._get_nearest_sample_index(start)
+        end_idx = self._get_nearest_sample_index(end)
+        wanted_samples = self[start_idx:end_idx + 1]
+        if not stable:
+            return GravimetricRecording(wanted_samples)
+        else:
+            # only include the first stable segment of samples
+            # once the samples become unstable, stop including
+            stable_samples = list()
+            for s in wanted_samples:
+                if s.stable:
+                    stable_samples.append(s)
+                if not s.stable and len(stable_samples):
+                    break
+            assert len(stable_samples), f'No stable samples found'
+            return GravimetricRecording(stable_samples)
+
+
+class GravimetricRecorderConfig:
     """Recording config."""
 
     def __init__(
@@ -199,10 +233,10 @@ def _record_get_interval_overlap(samples: GravimetricRecording, period: float) -
 class GravimetricRecorder(Thread):
     """Gravimetric Recorder."""
 
-    def __init__(self, ctx: ProtocolContext, test_name: str) -> None:
+    def __init__(self, ctx: ProtocolContext, cfg: GravimetricRecorderConfig) -> None:
         """Gravimetric Recorder."""
         self._ctx = ctx
-        self._cfg = RecordConfig(test_name=test_name, duration=1.0, frequency=10)
+        self._cfg = cfg
         self._scale: Scale = Scale.build(ctx=ctx)
         self._recording = GravimetricRecording()
         self._is_recording = Event()
@@ -210,7 +244,12 @@ class GravimetricRecorder(Thread):
         super().__init__()
 
     @property
-    def config(self) -> RecordConfig:
+    def tag(self) -> str:
+        """Tag."""
+        return f'{self.__class__.__name__}_{self._cfg.tag}'
+
+    @property
+    def config(self) -> GravimetricRecorderConfig:
         """Config."""
         return self._cfg
 
@@ -338,9 +377,9 @@ class GravimetricRecorder(Thread):
 
     def _record_samples_to_disk(self, timeout: Optional[float] = None) -> GravimetricRecording:
         """Record samples to disk."""
-        assert self._cfg.test_name
-        assert self._cfg.tag
-        _file_name = create_file_name(self._cfg.test_name, self._cfg.tag)
+        assert self._cfg.test_name, f'A test-name is required to record samples'
+        assert self._cfg.tag, f'A tag is required to record samples'
+        _file_name = create_file_name(self._cfg.test_name, self.tag)
 
         def _on_new_sample(recording: GravimetricRecording) -> None:
             append_data_to_file(

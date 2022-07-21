@@ -2,13 +2,13 @@
 
 from .record import GravimetricSample, GravimetricRecording
 from .record import (
-    RecordConfig,
+    GravimetricRecorderConfig,
     GravimetricRecorder,
 )
 
 __all__ = [
     "GravimetricRecorder",
-    "RecordConfig",
+    "GravimetricRecorderConfig",
     "GravimetricSample",
     "GravimetricRecording",
 ]

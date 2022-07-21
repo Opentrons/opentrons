@@ -5,12 +5,14 @@ from typing import Optional, Callable, List
 from opentrons.protocol_api import ProtocolContext, InstrumentContext
 from opentrons.protocol_api.labware import Well, Labware
 
+from hardware_testing.data import create_file_name, dump_data_to_file, append_data_to_file
 from hardware_testing.liquid.height import LiquidTracker
 from hardware_testing.liquid.liquid_class import (
     LiquidClassSettings,
     LIQUID_CLASS_DEFAULT,
 )
 from hardware_testing.opentrons_api.workarounds import force_prepare_for_aspirate
+from hardware_testing.opentrons_api.helpers import get_pipette_unique_name
 
 from .timestamp import Timestamp, SampleTimestamps, get_empty_sample_timestamp
 
@@ -213,10 +215,11 @@ class PipetteLiquidClass:
     """Pipette Liquid Class."""
 
     def __init__(
-        self, ctx: ProtocolContext, model: str, mount: str, tip_racks: List[Labware]
+        self, ctx: ProtocolContext, model: str, mount: str, tip_racks: List[Labware], test_name: str,
     ) -> None:
         """Pipette Liquid Class."""
         self._ctx = ctx
+        self._test_name = test_name
         self._pipette = ctx.load_instrument(model, mount, tip_racks=tip_racks)
         self._liq_cls: LiquidClassSettings = LIQUID_CLASS_DEFAULT
         self._on_pre_aspirate: Optional[Callable] = None
@@ -224,6 +227,19 @@ class PipetteLiquidClass:
         self._on_pre_dispense: Optional[Callable] = None
         self._on_post_dispense: Optional[Callable] = None
         self._sample_timestamps_list = list()
+        self._file_name: Optional[str] = None
+
+    @property
+    def unique_name(self) -> str:
+        """Unique name."""
+        if self._ctx.is_simulating():
+            return 'SIMULATE'
+        return get_pipette_unique_name(self.pipette)
+
+    @property
+    def tag(self) -> str:
+        """Tag."""
+        return f'{self.__class__.__name__}_{self.unique_name}'
 
     @property
     def pipette(self) -> InstrumentContext:
@@ -238,8 +254,24 @@ class PipetteLiquidClass:
         """Get timestamps."""
         return self._sample_timestamps_list
 
-    def create_empty_timestamp(self) -> None:
-        self._sample_timestamps_list.append(get_empty_sample_timestamp())
+    def create_empty_timestamp(self, tag: str = '') -> None:
+        self._sample_timestamps_list.append(get_empty_sample_timestamp(tag=tag))
+
+    def save_latest_timestamp(self) -> None:
+        # TODO: append latest timestamp to a CSV file
+        assert self._file_name, f'No file to save to, please activate recording first'
+        _latest = self._sample_timestamps_list[-1]
+        append_data_to_file(self._test_name, self._file_name, _latest.as_csv() + "\n")
+
+    def record_timestamp_enable(self) -> None:
+        self._file_name = create_file_name(self._test_name, self.tag)
+        # add the header to the CSV file
+        dump_data_to_file(
+            self._test_name, self._file_name, SampleTimestamps.csv_header() + "\n"
+        )
+
+    def record_timestamp_disable(self) -> None:
+        self._file_name = None
 
     def set_liquid_class(self, settings: LiquidClassSettings) -> None:
         """Set Liquid Class."""

@@ -29,6 +29,7 @@ class Timestamp:
 @dataclass
 class SampleTimestamps:
     """SampleTimestamps."""
+    tag: str
     pre_aspirate: Optional[Timestamp]
     aspirate: Optional[Timestamp]
     post_aspirate: Optional[Timestamp]
@@ -36,8 +37,14 @@ class SampleTimestamps:
     dispense: Optional[Timestamp]
     post_dispense: Optional[Timestamp]
 
+    @classmethod
+    def csv_header(cls) -> str:
+        """CSV Header."""
+        return 'pre-aspirate,aspirate,post-aspirate,' \
+               'pre-dispense,dispense,post-dispense'
+
     def __str__(self) -> str:
-        return f'SampleTimestamps:' \
+        return f'SampleTimestamps ({self.tag}):' \
                f'\n\t{self.pre_aspirate}' \
                f'\n\t{self.aspirate}' \
                f'\n\t{self.post_aspirate}' \
@@ -45,8 +52,15 @@ class SampleTimestamps:
                f'\n\t{self.dispense}' \
                f'\n\t{self.post_dispense}'
 
+    def as_csv(self) -> str:
+        """As CSV."""
+        return f'{self.tag},' \
+               f'{self.pre_aspirate},{self.aspirate},{self.post_aspirate},' \
+               f'{self.pre_dispense},{self.dispense},{self.post_dispense}'
 
-def get_empty_sample_timestamp() -> SampleTimestamps:
+
+def get_empty_sample_timestamp(tag: str = '') -> SampleTimestamps:
     """Get empty SampleTimestamp."""
-    return SampleTimestamps(pre_aspirate=None, aspirate=None, post_aspirate=None,
+    return SampleTimestamps(tag=tag,
+                            pre_aspirate=None, aspirate=None, post_aspirate=None,
                             pre_dispense=None, dispense=None, post_dispense=None)
