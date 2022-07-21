@@ -28,6 +28,7 @@ import { useTrackEvent } from '../../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../redux/calibration'
 import {
   useDeckCalibrationData,
+  useIsRobotBusy,
   usePipetteOffsetCalibrations,
   useTipLengthCalibrations,
 } from '../../hooks'
@@ -52,7 +53,7 @@ interface OverflowMenuProps {
   robotName: string
   mount: Mount
   serialNumber: string | null
-  isRobotBusy: boolean
+  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export function OverflowMenu({
@@ -60,7 +61,7 @@ export function OverflowMenu({
   robotName,
   mount,
   serialNumber,
-  isRobotBusy,
+  updateRobotStatus,
 }: OverflowMenuProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
@@ -87,6 +88,7 @@ export function OverflowMenu({
     calBlockModalState,
     setCalBlockModalState,
   ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
+  const isBusy = useIsRobotBusy()
 
   interface StartWizardOptions {
     keepTipLength: boolean
@@ -134,7 +136,9 @@ export function OverflowMenu({
     e: React.MouseEvent
   ): void => {
     e.preventDefault()
-    if (!isRobotBusy) {
+    if (isBusy) {
+      updateRobotStatus(true)
+    } else {
       if (calType === 'pipetteOffset') {
         if (applicablePipetteOffsetCal != null) {
           // recalibrate pipette offset
@@ -210,7 +214,7 @@ export function OverflowMenu({
       {showOverflowMenu ? (
         <Flex
           ref={calsOverflowWrapperRef}
-          whiteSpace="nowrap"
+          width={calType === 'pipetteOffset' ? '11.5rem' : '17.25rem'}
           zIndex={10}
           borderRadius={'4px 4px 0px 0px'}
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
@@ -220,10 +224,7 @@ export function OverflowMenu({
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          <MenuItem
-            onClick={e => handleCalibration(calType, e)}
-            disabled={isRobotBusy}
-          >
+          <MenuItem onClick={e => handleCalibration(calType, e)}>
             {calType === 'pipetteOffset'
               ? applicablePipetteOffsetCal != null
                 ? t('overflow_menu_recalibrate_pipette')

@@ -48,13 +48,13 @@ const BODY_STYLE = css`
 interface PipetteOffsetCalibrationItemsProps {
   robotName: string
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
-  isRobotBusy: boolean
+  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export function PipetteOffsetCalibrationItems({
   robotName,
   formattedPipetteOffsetCalibrations,
-  isRobotBusy,
+  updateRobotStatus,
 }: PipetteOffsetCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -159,7 +159,7 @@ export function PipetteOffsetCalibrationItems({
                     robotName={robotName}
                     mount={calibration.mount}
                     serialNumber={calibration.serialNumber ?? null}
-                    isRobotBusy={isRobotBusy}
+                    updateRobotStatus={updateRobotStatus}
                   />
                 </StyledTableCell>
               </StyledTableRow>
