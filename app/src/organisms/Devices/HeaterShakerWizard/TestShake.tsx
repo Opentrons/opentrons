@@ -59,16 +59,15 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   )
   const isShaking = module.data.speedStatus !== 'idle'
 
-  let moduleId: string | null = null
+  let moduleId: string = module.id
   if (isRunIdle && currentRunId != null) {
     moduleId = moduleIdFromRun
-  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
-    moduleId = module.id
   }
+
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
     commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
-      moduleId: moduleId != null ? moduleId : '',
+      moduleId,
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
     },
   }
@@ -76,7 +75,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
     commandType: 'heaterShaker/deactivateShaker',
     params: {
-      moduleId: moduleId != null ? moduleId : '',
+      moduleId,
     },
   }
 

@@ -19,6 +19,9 @@ export function HeaterShakerBanner(
   const { displayName, modules } = props
   const currentRunId = useCurrentRunId()
   const { t } = useTranslation('heater_shaker')
+
+  if (currentRunId == null) return null
+
   return (
     <Banner title={t('attach_heater_shaker_to_deck', { name: displayName })}>
       {modules.map((module, index) => (
@@ -27,7 +30,7 @@ export function HeaterShakerBanner(
             <HeaterShakerWizard
               onCloseClick={() => setShowWizard(false)}
               moduleFromProtocol={module}
-              currentRunId={currentRunId != null ? currentRunId : undefined}
+              currentRunId={currentRunId}
             />
           )}
           {index > 0 && <Divider color={COLORS.medGrey} />}
