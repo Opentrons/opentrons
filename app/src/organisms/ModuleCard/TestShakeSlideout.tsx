@@ -82,15 +82,10 @@ export const TestShakeSlideout = (
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const isShaking = module.data.speedStatus !== 'idle'
 
-  let moduleId: string = module.id
-  if (isRunIdle && currentRunId != null && isLoadedInRun) {
-    moduleId = moduleIdFromRun
-  }
-
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
     commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
-      moduleId,
+      moduleId: isRunIdle ? moduleIdFromRun : module.id,
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
     },
   }
@@ -98,7 +93,7 @@ export const TestShakeSlideout = (
   const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
     commandType: 'heaterShaker/deactivateShaker',
     params: {
-      moduleId,
+      moduleId: isRunIdle ? moduleIdFromRun : module.id,
     },
   }
 
@@ -114,10 +109,7 @@ export const TestShakeSlideout = (
           }: ${e.message}`
         )
       })
-    } else if (
-      (currentRunId != null && isRunTerminal) ||
-      currentRunId == null
-    ) {
+    } else if (isRunTerminal || currentRunId == null) {
       createLiveCommand({
         command: isShaking ? stopShakeCommand : setShakeCommand,
       }).catch((e: Error) => {
