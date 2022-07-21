@@ -64,7 +64,7 @@ export const TestShakeSlideout = (
     isLoadedInRun,
     currentRunId,
   } = props
-  const { t } = useTranslation(['device_details', 'shared', 'heater_shaker'])
+  const { t } = useTranslation(['heater_shaker', 'device_details', 'shared'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { isRunIdle, isRunTerminal } = useRunStatuses()
   const { createCommand } = useCreateCommandMutation()
@@ -140,7 +140,7 @@ export const TestShakeSlideout = (
   const errorMessage =
     shakeValue != null &&
     (parseInt(shakeValue) < HS_RPM_MIN || parseInt(shakeValue) > HS_RPM_MAX)
-      ? t('input_out_of_range', { ns: 'device_details' })
+      ? t('device_details:input_out_of_range')
       : null
 
   const getLatchStatus = (latchStatus: LatchStatus): string => {
@@ -152,7 +152,7 @@ export const TestShakeSlideout = (
       }
       case 'closing':
       case 'idle_closed': {
-        return t('heater_shaker:closed')
+        return t('closed')
       }
       default:
         return latchStatus
@@ -161,7 +161,7 @@ export const TestShakeSlideout = (
 
   return (
     <Slideout
-      title={t('test_shake', { ns: 'heater_shaker' })}
+      title={t('test_shake')}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
@@ -226,7 +226,7 @@ export const TestShakeSlideout = (
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.darkBlack}
             >
-              {t('heater_shaker:labware_latch')}
+              {t('labware_latch')}
             </Text>
             <Text
               textTransform={TYPOGRAPHY.textTransformCapitalize}
@@ -248,9 +248,7 @@ export const TestShakeSlideout = (
               disabled={isShaking}
               {...targetProps}
             >
-              {!isLatchClosed
-                ? t('heater_shaker:close_latch')
-                : t('heater_shaker:open_latch')}
+              {!isLatchClosed ? t('close_latch') : t('open_latch')}
             </TertiaryButton>
           ) : (
             <TertiaryButton
@@ -261,14 +259,12 @@ export const TestShakeSlideout = (
               onClick={toggleLatch}
               disabled={isShaking}
             >
-              {!isLatchClosed
-                ? t('heater_shaker:close_latch')
-                : t('heater_shaker:open_latch')}
+              {!isLatchClosed ? t('close_latch') : t('open_latch')}
             </TertiaryButton>
           )}
           {isShaking ? (
             <Tooltip tooltipProps={tooltipProps}>
-              {t('heater_shaker:cannot_open_latch')}
+              {t('cannot_open_latch')}
             </Tooltip>
           ) : null}
         </Flex>
@@ -279,7 +275,7 @@ export const TestShakeSlideout = (
           color={COLORS.darkBlack}
           marginTop={SPACING.spacing4}
         >
-          {t('heater_shaker:shake_speed')}
+          {t('shake_speed')}
         </Text>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
           <Flex
@@ -293,7 +289,7 @@ export const TestShakeSlideout = (
               value={shakeValue}
               onChange={e => setShakeValue(e.target.value)}
               type="number"
-              caption={t('heater_shaker:min_max_rpm', {
+              caption={t('min_max_rpm', {
                 min: HS_RPM_MIN,
                 max: HS_RPM_MAX,
               })}
@@ -327,9 +323,7 @@ export const TestShakeSlideout = (
             </TertiaryButton>
           )}
           {!isLatchClosed ? (
-            <Tooltip tooltipProps={tooltipProps}>
-              {t('heater_shaker:cannot_shake')}
-            </Tooltip>
+            <Tooltip tooltipProps={tooltipProps}>{t('cannot_shake')}</Tooltip>
           ) : null}
         </Flex>
       </Flex>
@@ -343,7 +337,7 @@ export const TestShakeSlideout = (
         id={'HeaterShaker_Attachment_Instructions'}
         onClick={() => setShowWizard(true)}
       >
-        {t('heater_shaker:show_attachment_instructions')}
+        {t('show_attachment_instructions')}
       </Link>
     </Slideout>
   )
