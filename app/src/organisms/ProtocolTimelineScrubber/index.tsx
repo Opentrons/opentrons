@@ -2,6 +2,8 @@ import * as React from 'react'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
 import isEmpty from 'lodash/isEmpty'
+import { FixedSizeList } from 'react-window'
+
 import {
   RobotWorkSpace,
   Module,
@@ -208,82 +210,25 @@ export function ProtocolTimelineScrubber(
           invariantContext={invariantContext}
         />
       </Flex>
-      <Flex width="100%" overflowX="scroll" ref={commandListRef}>
-        {commands.map((command, index) => (
-          <Flex
-            key={index}
-            backgroundColor={
-              index === currentCommandIndex
-                ? COLORS.blueFocus
-                : index < currentCommandIndex
-                ? '#00002222'
-                : '#fff'
-            }
-            border={
-              index === currentCommandIndex
-                ? `3px solid ${COLORS.blue}`
-                : '1px solid #000'
-            }
-            padding={SPACING.spacing1}
-            flexDirection={DIRECTION_COLUMN}
-            minWidth={`${COMMAND_WIDTH_PX}px`}
-            width={`${COMMAND_WIDTH_PX}px`}
-            height="10rem"
-            overflowX="hidden"
-            overflowY="scroll"
-            cursor="pointer"
-            onClick={() => setCurrentCommandIndex(index)}
-          >
-            <Text as="p" fontSize="0.5rem" alignSelf={ALIGN_FLEX_END}>
-              {index + 1}
-            </Text>
-            <StyledText
-              as="p"
-              fontSize="0.6rem"
-              marginBottom={SPACING.spacing2}
-              fontWeight={FONT_WEIGHT_BOLD}
-            >
-              {command.commandType}
-            </StyledText>
-            {Object.entries(command.params ?? {}).map(([key, value]) => (
-              <Flex
-                key={key}
-                flexDirection={DIRECTION_COLUMN}
-                marginBottom={SPACING.spacing1}
-                paddingLeft={SPACING.spacing1}
-              >
-                <Text
-                  as="label"
-                  fontSize="0.6rem"
-                  marginRight={SPACING.spacing1}
-                >
-                  {key}:
-                </Text>
-                {value != null && typeof value === 'object' ? (
-                  Object.entries(value).map(([innerKey, innerValue]) => (
-                    <Flex key={innerKey}>
-                      <Text
-                        as="label"
-                        fontSize="0.6rem"
-                        marginRight={SPACING.spacing1}
-                      >
-                        {key}:
-                      </Text>
-                      <Text as="p" fontSize="0.6rem" title={String(innerValue)}>
-                        {String(innerValue)}
-                      </Text>
-                    </Flex>
-                  ))
-                ) : (
-                  <Text as="p" fontSize="0.6rem" title={String(value)}>
-                    {String(value)}
-                  </Text>
-                )}
-              </Flex>
-            ))}
-          </Flex>
-        ))}
-      </Flex>
+      <FixedSizeList
+        ref={commandListRef}
+        height={160}
+        itemCount={commands.length}
+        itemSize={COMMAND_WIDTH_PX}
+        layout="horizontal"
+        width={1000}
+      >
+        {({ index, style }) => (
+          <div style={style}>
+            <CommandItem
+              index={index}
+              command={commands[index]}
+              currentCommandIndex={currentCommandIndex}
+              setCurrentCommandIndex={setCurrentCommandIndex}
+            />
+          </div>
+        )}
+      </FixedSizeList>
       <StyledText as="label" marginY={SPACING.spacing2}>
         Jump to command
       </StyledText>
@@ -296,9 +241,7 @@ export function ProtocolTimelineScrubber(
           const nextIndex = Number(e.target.value) - 1
           setCurrentCommandIndex(nextIndex)
           const progressOffset = window.innerWidth / 2
-          commandListRef.current?.scrollTo({
-            left: nextIndex * COMMAND_WIDTH_PX - progressOffset,
-          })
+          commandListRef.current?.scrollToItem(nextIndex, 'center')
         }}
       />
       <Flex alignSelf={ALIGN_STRETCH} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -316,7 +259,7 @@ export function ProtocolTimelineScrubber(
           fontSize="0.5rem"
           marginLeft={
             (currentCommandIndex / (commands.length - 1)) *
-            ((wrapperRef.current?.getBoundingClientRect()?.width - 6) ?? 0)
+            (wrapperRef.current?.getBoundingClientRect()?.width - 6 ?? 0)
           }
         >
           {currentCommandIndex + 1}
@@ -341,6 +284,15 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
     invariantContext,
   } = props
   const { robotState } = timelineFrame
+
+  const maxVolume = (Object.entries(
+    invariantContext.pipetteEntities[pipetteId]?.tiprackLabwareDef?.wells ?? {}
+  ).find(([_wellName, { totalLiquidVolume }]) => totalLiquidVolume != null) ?? [
+    null,
+    { totalLiquidVolume: 0 },
+  ])[1].totalLiquidVolume
+
+
   return (
     <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
       <StyledText as="h1" textTransform={TEXT_TRANSFORM_UPPERCASE}>
@@ -354,14 +306,7 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
           allNozzlesHaveTips={robotState.tipState.pipettes[pipetteId]}
           allNozzleTipContents={robotState.liquidState.pipettes[pipetteId]}
           liquidEntities={invariantContext.liquidEntities}
-          maxVolume={
-            (Object.entries(
-              invariantContext.pipetteEntities[pipetteId]?.tiprackLabwareDef
-                ?.wells ?? {}
-            ).find(
-              ([_wellName, { totalLiquidVolume }]) => totalLiquidVolume != null
-            ) ?? [null, { totalLiquidVolume: 0 }])[1].totalLiquidVolume
-          }
+          maxVolume={maxVolume}
         />
       ) : (
         <Box size="8rem" />
@@ -454,14 +399,18 @@ function TipSideView({
   const emptyVolumeLeft =
     maxVolume -
     Object.entries(tipContents).reduce((acc, [liquidId, { volume }]) => {
+      if (liquidId === '__air__') return acc
       return acc + volume
     }, 0)
   const yOfFirstLiquid = (emptyVolumeLeft / maxVolume) * 50
+
+  console.log('emptyVolumeLeft', emptyVolumeLeft)
+  console.log('yOfFirstLiquid', yOfFirstLiquid)
   return (
     <>
       <rect x={x} y={y} height={yOfFirstLiquid} width="10" fill="#FFF" />
       {Object.entries(tipContents).map(([liquidId, { volume }]) => {
-        console.table({ liquidId, volume, emptyVolumeLeft, yOfFirstLiquid })
+        if (liquidId === '__air__') return null
         return (
           <rect
             key={liquidId}
@@ -488,5 +437,85 @@ function TipSideView({
         stroke="none"
       />
     </>
+  )
+}
+
+interface CommandItemProps {
+  command: RunTimeCommand
+  index: number
+  currentCommandIndex: number
+  setCurrentCommandIndex: (number) => void
+}
+function CommandItem(props: CommandItemProps): JSX.Element {
+  const { index, command, currentCommandIndex, setCurrentCommandIndex } = props
+  return (
+    <Flex
+      key={index}
+      backgroundColor={
+        index === currentCommandIndex
+          ? COLORS.blueFocus
+          : index < currentCommandIndex
+          ? '#00002222'
+          : '#fff'
+      }
+      border={
+        index === currentCommandIndex
+          ? `3px solid ${COLORS.blue}`
+          : '1px solid #000'
+      }
+      padding={SPACING.spacing1}
+      flexDirection={DIRECTION_COLUMN}
+      minWidth={`${COMMAND_WIDTH_PX}px`}
+      width={`${COMMAND_WIDTH_PX}px`}
+      height="10rem"
+      overflowX="hidden"
+      overflowY="scroll"
+      cursor="pointer"
+      onClick={() => setCurrentCommandIndex(index)}
+    >
+      <Text as="p" fontSize="0.5rem" alignSelf={ALIGN_FLEX_END}>
+        {index + 1}
+      </Text>
+      <StyledText
+        as="p"
+        fontSize="0.6rem"
+        marginBottom={SPACING.spacing2}
+        fontWeight={FONT_WEIGHT_BOLD}
+      >
+        {command.commandType}
+      </StyledText>
+      {Object.entries(command.params ?? {}).map(([key, value]) => (
+        <Flex
+          key={key}
+          flexDirection={DIRECTION_COLUMN}
+          marginBottom={SPACING.spacing1}
+          paddingLeft={SPACING.spacing1}
+        >
+          <Text as="label" fontSize="0.6rem" marginRight={SPACING.spacing1}>
+            {key}:
+          </Text>
+          {value != null && typeof value === 'object' ? (
+            Object.entries(value).map(([innerKey, innerValue]) => (
+              <Flex key={innerKey}>
+                <Text
+                  as="label"
+                  fontSize="0.6rem"
+                  marginRight={SPACING.spacing1}
+                >
+                  {key}:
+                </Text>
+                <Text as="p" fontSize="0.6rem" title={String(innerValue)}>
+                  {String(innerValue)}
+                </Text>
+              </Flex>
+            ))
+          ) : (
+            <Text as="p" fontSize="0.6rem" title={String(value)}>
+              {String(value)}
+            </Text>
+          )}
+        </Flex>
+      ))}
+    </Flex>
   )
 }
