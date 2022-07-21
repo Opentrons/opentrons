@@ -236,14 +236,14 @@ export function TestShake(props: TestShakeProps): JSX.Element {
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
           <StyledText width="22rem">
-            {t('troubleshoot_step2_description')}
+            {t('troubleshoot_step3_description')}
           </StyledText>
           <TertiaryButton
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
-            onClick={() => setCurrentPage(3)}
+            onClick={() => setCurrentPage(4)}
           >
-            {t('go_to_step_2')}
+            {t('go_to_step_3')}
           </TertiaryButton>
         </Flex>
       </Collapsible>
