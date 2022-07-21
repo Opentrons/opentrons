@@ -2,8 +2,6 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { HTMLAttributes, mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
-import * as Calibration from '../../../redux/calibration'
-import { mockCalibrationStatus } from '../../../redux/calibration/__fixtures__'
 import * as Fixtures from '../../../redux/sessions/__fixtures__'
 import * as Sessions from '../../../redux/sessions'
 import { ResultsSummary } from '../ResultsSummary'
@@ -27,10 +25,6 @@ jest.mock('@opentrons/shared-data', () => ({
 }))
 
 const mockSaveAs = saveAs as jest.MockedFunction<typeof saveAs>
-
-const mockGetCalibrationStatus = Calibration.getCalibrationStatus as jest.MockedFunction<
-  typeof Calibration.getCalibrationStatus
->
 
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
 
@@ -77,7 +71,6 @@ describe('ResultsSummary', () => {
   beforeEach(() => {
     mockDeleteSession = jest.fn()
     const mockSendCommands = jest.fn()
-    // mockGetCalibrationStatus.mockReturnValue(mockCalibrationStatus)
     dispatch = jest.fn()
     mockStore = {
       subscribe: () => {},
