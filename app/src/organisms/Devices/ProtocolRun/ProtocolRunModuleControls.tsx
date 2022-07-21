@@ -74,10 +74,7 @@ export const ProtocolRunModuleControls = ({
   // or left column will contain 1 more item than right column
   const halfAttachedModulesSize = Math.ceil(attachedModules?.length / 2)
   const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
-  const rightColumnModules =
-    attachedModules?.length > 1
-      ? attachedModules?.slice(-halfAttachedModulesSize)
-      : []
+  const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
 
   return attachedModules.length === 0 ? (
     <Flex justifyContent={JUSTIFY_CENTER}>
