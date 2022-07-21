@@ -1,5 +1,4 @@
 """Plot Server."""
-from argparse import ArgumentParser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from pathlib import Path
@@ -45,18 +44,27 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
             file = f.read()
         self._send_response_bytes(file.encode("utf-8"), content_type="text/html")
 
-    def _list_files_in_directory(self) -> List[Path]:
+    def _list_files_in_directory(self, includes: str = '') -> List[Path]:
         _file_list = [
             Path(f).resolve()
             for f in self.plot_directory.iterdir()
             if f.is_file()
         ]
+        if includes:
+            _file_list = [
+                f
+                for f in _file_list
+                if includes in f.stem
+            ]
         _file_list.sort(key=lambda f: f.stat().st_mtime)
         _file_list.reverse()
         return _file_list
 
     def _get_file_name_list(self) -> List[str]:
-        return [f.stem for f in self._list_files_in_directory()]
+        return [
+            f.stem
+            for f in self._list_files_in_directory('GravimetricRecorder')
+        ]
 
     def _get_file_contents(self, file_name: str) -> str:
         req_file_name = f"{file_name}.csv"

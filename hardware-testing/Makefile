@@ -92,7 +92,7 @@ endef
 
 .PHONY: push-plot-webpage
 push-plot-webpage:
-	scp -r $(br_ssh_key) $(ssh_opts) hardware_testing/tools/plot root@$(host):/data
+	scp -r hardware_testing/tools/plot root@$(host):/data
 	$(call move-plot-webpage,$(host),$(br_ssh_key),$(ssh_opts))
 
 .PHONY: push-no-restart
@@ -114,7 +114,7 @@ push-ot3: push-no-restart-ot3
 
 .PHONY: push-protocols
 push-protocols:
-	scp -r $(br_ssh_key) $(ssh_opts) protocols root@$(host):/data/user_storage/opentrons_data
+	scp -r protocols root@$(host):/data/user_storage/opentrons_data
 
 .PHONY: push-all
 push-all: clean wheel push-no-restart push-plot-webpage push-protocols
