@@ -1,36 +1,39 @@
 """Tests for the HardwareApi class."""
 import pytest
-import asyncio
 
 from decoy import Decoy
-from typing import Dict, Optional
 
 from opentrons import types
 from opentrons.hardware_control.instruments.pipette import Pipette
-from opentrons.hardware_control.instruments.pipette_handler import PipetteHandlerProvider
-from opentrons.hardware_control.backends import Controller
-from opentrons.config.types import RobotConfig
+from opentrons.hardware_control.instruments.pipette_handler import (
+    PipetteHandlerProvider,
+)
 
 
 @pytest.fixture
-def subject(
-    decoy: Decoy
-) -> PipetteHandlerProvider:
-    inst_by_mount = {types.MountType.LEFT, decoy.mock(cls=Pipette)}
-    subject = PipetteHandlerProvider(attached_instruments=inst_by_mount)
+def mock_pipette(decoy: Decoy) -> Pipette:
+    return decoy.mock(cls=Pipette)
 
+
+@pytest.fixture
+def subject(decoy: Decoy, mock_pipette: Pipette) -> PipetteHandlerProvider:
+    inst_by_mount = {types.Mount.LEFT: mock_pipette}
+    subject = PipetteHandlerProvider(attached_instruments=inst_by_mount)
     return subject
 
 
-async def test_plan_check_pick_up_tip_with_presses_0(decoy: Decoy, subject: PipetteHandlerProvider) -> None:
+def test_plan_check_pick_up_tip_with_presses_0(
+    decoy: Decoy, subject: PipetteHandlerProvider, mock_pipette
+) -> None:
     """Should return an array with 0 length."""
     tip_length = 25.0
     mount = types.Mount.LEFT
     presses = 0
     increment = None
 
-    # decoy.when(subject.get_pipette(mount)).then_return(decoy.mock(cls=Pipette))
-    await subject.plan_check_pick_up_tip(mount, tip_length, presses, increment)
+    decoy.when(mock_pipette.has_tip).then_return(False)
+    decoy.when(mock_pipette.config.quirks).then_return([])
+    decoy.when(mock_pipette.config.pick_up_distance).then_return(0)
+    decoy.when(mock_pipette.config.pick_up_increment).then_return(0)
 
-
-
+    result = subject.plan_check_pick_up_tip(mount, tip_length, presses, increment)
