@@ -138,7 +138,7 @@ class HeaterShakerEmulator(AbstractEmulator):
         return f"M241 STATUS:{self._latch_status.value.upper()}"
 
     def _deactivate_heater(self, command: Command) -> str:
-        self._temperature.set_target(TEMPERATURE_ROOM)
+        self._temperature.deactivate(TEMPERATURE_ROOM)
         return "M106"
 
     @staticmethod

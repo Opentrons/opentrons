@@ -82,22 +82,7 @@ async def test_deactivate_heater(heatershaker: HeaterShaker) -> None:
     assert 29.3 <= heatershaker.temperature <= 30.7
 
     await heatershaker.deactivate_heater()
-    assert heatershaker.target_temperature == TEMPERATURE_ROOM
-
-    # Have to wait for temperature to go down.
-    # Goes down 2 degrees per tick
-    await heatershaker.wait_next_poll()
-    await heatershaker.wait_next_poll()
-    await heatershaker.wait_next_poll()
-    await heatershaker.wait_next_poll()
-
-    # Temp should be in range
-    assert TEMP_ROOM_LOW <= heatershaker.temperature <= TEMP_ROOM_HIGH
-
-    await heatershaker.wait_next_poll()
-    await heatershaker.wait_next_poll()
-    await heatershaker.wait_next_poll()
-    # Temp should remain in range
+    assert heatershaker.target_temperature is None
     assert TEMP_ROOM_LOW <= heatershaker.temperature <= TEMP_ROOM_HIGH
 
 
@@ -106,12 +91,12 @@ async def test_temp(heatershaker: HeaterShaker) -> None:
 
     # Have to wait for next poll because target temp will not update until then
     await heatershaker.wait_next_poll()
-    await heatershaker.start_set_temperature(100.0)
-    assert heatershaker.target_temperature == 100.0
-    assert heatershaker.temperature != 100.0
+    await heatershaker.start_set_temperature(50.0)
+    assert heatershaker.target_temperature == 50.0
+    assert heatershaker.temperature != 50.0
 
-    await heatershaker.await_temperature(100.0)
-    assert heatershaker.target_temperature == 100.0
+    await heatershaker.await_temperature(50.0)
+    assert heatershaker.target_temperature == 50.0
 
     # Acceptable delta is 0.7 degrees
-    assert 99.3 <= heatershaker.temperature <= 100.7
+    assert 49.3 <= heatershaker.temperature <= 50.7
