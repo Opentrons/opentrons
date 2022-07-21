@@ -67,27 +67,28 @@ interface BannerItemProps {
 }
 
 export const BannerItem = (props: BannerItemProps): JSX.Element => {
+  const { title, body, btnText, onClick } = props
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText css={TYPOGRAPHY.pSemiBold} paddingTop={SPACING.spacing4}>
-          {props.title}
+          {title}
         </StyledText>
         <StyledText
           as="p"
           marginTop={SPACING.spacing3}
           color={COLORS.darkGrey}
           maxWidth={SIZE_6}
-          data-testid={`banner_subtitle_${props.title}`}
+          data-testid={`banner_subtitle_${title}`}
         >
-          {props.body}
+          {body}
         </StyledText>
       </Flex>
       <TertiaryButton
         data-testid={`banner_open_wizard_btn`}
-        onClick={() => props.onClick()}
+        onClick={() => onClick()}
       >
-        {props.btnText}
+        {btnText}
       </TertiaryButton>
     </Flex>
   )

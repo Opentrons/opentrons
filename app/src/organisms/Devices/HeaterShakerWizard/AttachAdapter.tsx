@@ -34,9 +34,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
 
   return (
     <Flex
-      color={COLORS.darkBlack}
       flexDirection={DIRECTION_COLUMN}
-      fontSize={TYPOGRAPHY.fontSizeH2}
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
     >
       <Flex paddingBottom={SPACING.spacingL}>
@@ -52,7 +50,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
         </StyledText>
         <Flex border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}>
           <Flex
-            padding={`${SPACING.spacing2} 5rem ${SPACING.spacing4} 3rem`}
+            padding={`${SPACING.spacing2} 5rem ${SPACING.spacing4} ${SPACING.spacing7}`}
             data-testid={`attach_adapter_screw_in_adapter_image`}
           >
             <img height="160px" src={screwInAdapter} alt="screw_in_adapter" />

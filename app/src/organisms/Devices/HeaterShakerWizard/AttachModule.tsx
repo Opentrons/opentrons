@@ -45,7 +45,6 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <StyledText
-        fontSize={TYPOGRAPHY.fontSizeH2}
         paddingBottom={SPACING.spacingL}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
@@ -176,7 +175,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                     marginBottom={SPACING.spacing5}
                   />
                 ),
-                icon: <Icon name="clockwise-arrow" size={'1.313rem'} />,
+                icon: <Icon name="clockwise-arrow" size="1.313rem" />,
               }}
             />
           </Flex>
@@ -199,7 +198,7 @@ interface AttachedModuleItemProps {
 function AttachedModuleItem(props: AttachedModuleItemProps): JSX.Element {
   const { step } = props
   return (
-    <Flex flexDirection={DIRECTION_ROW} marginTop={'0.625rem'}>
+    <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacingSM}>
       <StyledText
         color={COLORS.darkGrey}
         paddingRight={SPACING.spacing4}

@@ -142,7 +142,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
             paddingTop="0.563rem"
             fontSize={TYPOGRAPHY.fontSizeH4}
             flexDirection={DIRECTION_ROW}
-            width={'21.5rem'}
+            width="21.5rem"
             data-testid={`introduction_subtitle`}
           >
             {t('you_will_need')}
@@ -162,8 +162,8 @@ export function Introduction(props: IntroductionProps): JSX.Element {
             image={
               thermalAdapterName != null ? (
                 <Flex
-                  width={'6.2rem'}
-                  height={'4.313rem'}
+                  width="6.2rem"
+                  height="4.313rem"
                   css={THERMAL_ADAPTER_TRANSFORM}
                 >
                   <img src={adapterImage} alt={`${thermalAdapterName}`} />
@@ -184,7 +184,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
             }
             image={
               labwareDefinition != null ? (
-                <Flex width={'6.2rem'} height={'4.3rem'}>
+                <Flex width="6.2rem" height="4.3rem">
                   <RobotWorkSpace viewBox={VIEW_BOX}>
                     {() => {
                       return (

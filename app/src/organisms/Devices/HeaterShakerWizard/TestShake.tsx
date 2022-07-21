@@ -103,15 +103,12 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const errorMessage =
     shakeValue != null &&
     (parseInt(shakeValue) < HS_RPM_MIN || parseInt(shakeValue) > HS_RPM_MAX)
-      ? t('input_out_of_range', { ns: 'device_details' })
+      ? t('device_details:input_out_of_range')
       : null
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <StyledText
-        fontSize={TYPOGRAPHY.fontSizeH2}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('step_4_of_4')}
       </StyledText>
       <Flex
@@ -180,7 +177,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           marginY={SPACING.spacingL}
           alignItems={ALIGN_FLEX_START}
         >
-          <Flex flexDirection={DIRECTION_COLUMN} maxWidth={'6.25rem'}>
+          <Flex flexDirection={DIRECTION_COLUMN} maxWidth="6.25rem">
             <StyledText
               fontSize={TYPOGRAPHY.fontSizeCaption}
               color={COLORS.darkGreyEnabled}
@@ -194,7 +191,6 @@ export function TestShake(props: TestShakeProps): JSX.Element {
               onChange={e => setShakeValue(e.target.value)}
               type="number"
               caption={t('min_max_rpm', {
-                ns: 'heater_shaker',
                 min: HS_RPM_MIN,
                 max: HS_RPM_MAX,
               })}
@@ -212,9 +208,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             {isShaking ? t('stop_shaking') : t('start_shaking')}
           </TertiaryButton>
           {!isLatchClosed ? (
-            <Tooltip tooltipProps={tooltipProps}>
-              {t('cannot_shake', { ns: 'heater_shaker' })}
-            </Tooltip>
+            <Tooltip tooltipProps={tooltipProps}>{t('cannot_shake')}</Tooltip>
           ) : null}
         </Flex>
       </Flex>
@@ -229,7 +223,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           alignItems={ALIGN_FLEX_START}
           marginY={SPACING.spacing6}
         >
-          <StyledText width={'22rem'} fontSize={TYPOGRAPHY.fontSizeH2}>
+          <StyledText width="22rem">
             {t('troubleshoot_step1_description')}
           </StyledText>
           <TertiaryButton
@@ -241,7 +235,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           </TertiaryButton>
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
-          <StyledText width={'22rem'} fontSize={TYPOGRAPHY.fontSizeH2}>
+          <StyledText width="22rem">
             {t('troubleshoot_step2_description')}
           </StyledText>
           <TertiaryButton
