@@ -50,7 +50,7 @@ const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
   right: mockAttachedPipette,
 } as any
-
+const mockUpdateRobotStatus = jest.fn()
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
 >
@@ -67,7 +67,7 @@ describe('PipetteOffsetCalibrationItems', () => {
     props = {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
-      isRobotBusy: false,
+      updateRobotStatus: mockUpdateRobotStatus,
     }
   })
 
