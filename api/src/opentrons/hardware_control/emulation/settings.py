@@ -92,7 +92,7 @@ class Settings(BaseSettings):
         version="v0.0.1",
         temperature=TemperatureModelSettings(),
         rpm=RPMModelSettings(),
-        home_delay_time=0
+        home_delay_time=0,
     )
 
     heatershaker_proxy: ProxySettings = ProxySettings(
