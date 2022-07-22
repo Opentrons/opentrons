@@ -18,6 +18,7 @@ describe('SelectSsid component', () => {
   const handleConnect = jest.fn()
   const handleJoinOther = jest.fn()
   const handleDisconnect = jest.fn()
+  let mockIsRobotBusy = false
 
   const render = (showDisconnect = true) => {
     return mount(
@@ -28,6 +29,7 @@ describe('SelectSsid component', () => {
         onJoinOther={handleJoinOther}
         onDisconnect={handleDisconnect}
         showWifiDisconnect={showDisconnect}
+        isRobotBusy={mockIsRobotBusy}
       />
     )
   }
@@ -41,6 +43,14 @@ describe('SelectSsid component', () => {
     const selectField = wrapper.find(SelectField)
 
     expect(selectField).toHaveLength(1)
+  })
+
+  it('renders a disabled SeleectField if a robot is busy', () => {
+    mockIsRobotBusy = true
+    const wrapper = render()
+    const selectField = wrapper.find(SelectField)
+
+    expect(selectField.prop('disabled')).toBe(true)
   })
 
   it('maps ssid list to an ssid option group', () => {

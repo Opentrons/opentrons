@@ -126,6 +126,7 @@ export const TemporarySelectNetwork = ({
         onConnect={handleSelectConnect}
         onJoinOther={handleSelectJoinOther}
         onDisconnect={handleSelectDisconnect}
+        isRobotBusy={isRobotBusy}
       />
       {changeState.type && (
         <Portal>
