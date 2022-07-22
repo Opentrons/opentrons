@@ -15,7 +15,10 @@ jest.mock('../../../../ProtocolUpload/hooks')
 const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
-      <FactoryReset updateIsExpanded={mockUpdateIsEXpanded} isRobotBusy />
+      <FactoryReset
+        updateIsExpanded={mockUpdateIsEXpanded}
+        isRobotBusy={isRobotBusy}
+      />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
@@ -39,10 +42,10 @@ describe('RobotSettings FactoryReset', () => {
 
   it('should render a slideout when clicking the button', () => {
     const [{ getByRole }] = render()
-    const factoryResetChooseButton = getByRole('button', {
+    const button = getByRole('button', {
       name: 'Choose reset settings',
     })
-    fireEvent.click(factoryResetChooseButton)
+    fireEvent.click(button)
     expect(mockUpdateIsEXpanded).toHaveBeenCalled()
   })
 
