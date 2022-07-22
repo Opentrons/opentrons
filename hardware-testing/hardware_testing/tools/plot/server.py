@@ -97,14 +97,17 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
             if req_cmd == "latest":
                 file_list_grav = self._get_file_name_list(_grav_name)
                 file_list_pip = self._get_file_name_list(_pip_name)
-                if file_list_grav and file_list_pip:
+                if file_list_grav:
                     file_name_grav = file_list_grav[0]
+                if file_list_pip:
                     file_name_pip = file_list_pip[0]
             else:
                 raise ValueError(f"Unable to find response for request: {self.path}")
             response_data["name"] = file_name_grav
             response_data["csv"] = self._get_file_contents(file_name_grav) if file_name_grav else ''
-            response_data["csvPipette"] = self._get_file_contents(file_name_pip) if file_name_pip else ''
+            response_data["csvPipette"] = ''
+            if file_name_pip:
+                response_data["csvPipette"] = self._get_file_contents(file_name_pip) if file_name_pip else ''
         response_str = json.dumps({req_cmd: response_data})
         self._send_response_bytes(response_str.encode("utf-8"))
 
