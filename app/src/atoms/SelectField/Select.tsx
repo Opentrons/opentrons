@@ -10,6 +10,7 @@ import {
   DIRECTION_ROW,
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
+  SIZE_1,
 } from '@opentrons/components'
 
 import type {
@@ -123,7 +124,6 @@ export function Select(props: SelectComponentProps): JSX.Element {
     singleValue: (styles: CSSObjectWithLabel) => ({
       ...styles,
       marginRight: '0.75rem',
-      marginTop: SPACING.spacing1,
       marginLeft: SPACING.spacing2,
     }),
     valueContainer: NO_STYLE_FN,
@@ -155,7 +155,7 @@ function DropdownIndicator(
               ? 'chevron-up'
               : 'chevron-down'
           }
-          height={TYPOGRAPHY.lineHeight16}
+          height={SIZE_1}
         />
       </Box>
     </components.DropdownIndicator>

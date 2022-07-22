@@ -273,18 +273,16 @@ export function AdvancedSettings(): JSX.Element {
               {t('update_description')}
             </StyledText>
           </Box>
-          <Box width="10rem">
-            <SelectField
-              name={'__updateChannel__'}
-              options={channelOptions}
-              onValueChange={handleChannel}
-              value={channel}
-              placeholder={channel}
-              formatOptionLabel={formatOptionLabel}
-              isSearchable={false}
-              width="10rem"
-            />
-          </Box>
+          <SelectField
+            name={'__UpdateChannel__'}
+            options={channelOptions}
+            onValueChange={handleChannel}
+            value={channel}
+            placeholder={channel}
+            formatOptionLabel={formatOptionLabel}
+            isSearchable={false}
+            width="10rem"
+          />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
