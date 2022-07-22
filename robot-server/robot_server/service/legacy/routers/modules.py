@@ -3,19 +3,13 @@ import asyncio
 from starlette import status
 from fastapi import Path, APIRouter, Depends
 
-from opentrons.hardware_control import (
-    modules,
-    HardwareControlAPI,
-    ThreadedAsyncLock,
-    ThreadedAsyncForbidden,
-)
+from opentrons.hardware_control import modules, HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule
 
 from robot_server.errors import LegacyErrorResponse
 from robot_server.hardware import get_hardware
 from robot_server.versioning import get_requested_version
 from robot_server.service.legacy.models import V1BasicResponse
-from robot_server.service.dependencies import get_motion_lock
 from robot_server.service.legacy.models.modules import (
     Module,
     Modules,
@@ -134,7 +128,6 @@ async def post_serial_command(
 async def post_serial_update(
     serial: str = Path(..., description="Serial number of the module"),
     hardware: HardwareControlAPI = Depends(get_hardware),
-    motion_lock: ThreadedAsyncLock = Depends(get_motion_lock),
 ) -> V1BasicResponse:
     """Update module firmware"""
     attached_modules = hardware.attached_modules
@@ -146,25 +139,22 @@ async def post_serial_update(
         )
 
     try:
-        async with motion_lock.forbid():
-            if matching_module.bundled_fw:
-                await asyncio.wait_for(
-                    modules.update_firmware(
-                        matching_module,
-                        matching_module.bundled_fw.path,
-                        asyncio.get_event_loop(),
-                    ),
-                    100,
-                )
-                return V1BasicResponse(message=f"Successfully updated module {serial}")
-            else:
-                res = (
-                    f"Bundled fw file not found for module of "
-                    f"type: {matching_module.name()}"
-                )
-                status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    except ThreadedAsyncForbidden as e:
-        raise LegacyErrorResponse(message=str(e)).as_error(status.HTTP_403_FORBIDDEN)
+        if matching_module.bundled_fw:
+            await asyncio.wait_for(
+                modules.update_firmware(
+                    matching_module,
+                    matching_module.bundled_fw.path,
+                    asyncio.get_event_loop(),
+                ),
+                100,
+            )
+            return V1BasicResponse(message=f"Successfully updated module {serial}")
+        else:
+            res = (
+                f"Bundled fw file not found for module of "
+                f"type: {matching_module.name()}"
+            )
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     except modules.UpdateError as e:
         res = f"Update error: {e}"
         status_code = status.HTTP_500_INTERNAL_SERVER_ERROR

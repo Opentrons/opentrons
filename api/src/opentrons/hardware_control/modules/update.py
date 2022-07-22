@@ -3,11 +3,21 @@ import logging
 import os
 from pathlib import Path
 from glob import glob
-from typing import Any, Dict, Tuple, Optional, Union
+from typing import Any, AsyncGenerator, Dict, Tuple, Optional, Union
 from .types import UpdateError
 from .mod_abc import AbstractModule
+from opentrons.hardware_control.threaded_async_lock import ThreadedAsyncLock
+from contextlib import asynccontextmanager
 
 log = logging.getLogger(__name__)
+
+_dfu_transition_lock = ThreadedAsyncLock()
+
+
+@asynccontextmanager
+async def protect_dfu_transition() -> AsyncGenerator[None, None]:
+    async with _dfu_transition_lock.lock():
+        yield
 
 
 async def update_firmware(
