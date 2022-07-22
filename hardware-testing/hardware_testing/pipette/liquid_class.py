@@ -215,12 +215,14 @@ class PipetteLiquidClass:
     """Pipette Liquid Class."""
 
     def __init__(
-        self, ctx: ProtocolContext, model: str, mount: str, tip_racks: List[Labware], test_name: str, run_id: str
+        self, ctx: ProtocolContext, model: str, mount: str, tip_racks: List[Labware],
+            test_name: str, run_id: str, start_time: float,
     ) -> None:
         """Pipette Liquid Class."""
         self._ctx = ctx
         self._test_name = test_name
         self._run_id = run_id
+        self._start_time = start_time
         self._pipette = ctx.load_instrument(model, mount, tip_racks=tip_racks)
         self._liq_cls: LiquidClassSettings = LIQUID_CLASS_DEFAULT
         self._on_pre_aspirate: Optional[Callable] = None
@@ -259,10 +261,10 @@ class PipetteLiquidClass:
         self._sample_timestamps_list.append(get_empty_sample_timestamp(tag=tag))
 
     def save_latest_timestamp(self) -> None:
-        # TODO: append latest timestamp to a CSV file
         assert self._file_name, f'No file to save to, please activate recording first'
         _latest = self._sample_timestamps_list[-1]
-        append_data_to_file(self._test_name, self._file_name, _latest.as_csv() + "\n")
+        csv_line = _latest.as_csv(self._start_time)
+        append_data_to_file(self._test_name, self._file_name, csv_line + "\n")
 
     def record_timestamp_enable(self) -> None:
         self._file_name = create_file_name(self._test_name, self._run_id, self.tag)

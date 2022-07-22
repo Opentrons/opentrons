@@ -2,6 +2,8 @@
 from datetime import datetime
 import os
 from pathlib import Path
+from time import time
+from typing import Tuple
 
 from opentrons.config import infer_config_base_dir
 
@@ -29,6 +31,11 @@ def create_folder_for_test_data(test_name: str) -> Path:
 def create_run_id() -> str:
     """Create a run ID using datetime string."""
     return f'run-{datetime.now().strftime("%y%m%d%H%M%S")}'
+
+
+def create_run_id_and_start_time() -> Tuple[str, float]:
+    """Create a run ID using datetime string."""
+    return create_run_id(), time()
 
 
 def create_file_name(test_name: str, run_id: str, tag: str, extension: str = "csv") -> str:

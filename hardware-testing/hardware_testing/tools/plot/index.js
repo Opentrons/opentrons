@@ -50,6 +50,20 @@ function parsePipetteCSV(CSVData, retData) {
     if (!CSVData.length) {
         return retData;
     }
+    example = {
+        x: [1, 2, 3, 4, 5],
+        y: [1, 6, 3, 6, 1],
+        mode: 'markers+text',
+        type: 'scatter',
+        name: 'Team A',
+        text: ['A-1', 'A-2', 'A-3', 'A-4', 'A-5'],
+        textposition: 'top center',
+        textfont: {
+            family:  'Raleway, sans-serif'
+        },
+        marker: { size: 12 }
+    }
+    return retData;
 }
 
 function parseGravimetricCSV(CSVData, retData) {

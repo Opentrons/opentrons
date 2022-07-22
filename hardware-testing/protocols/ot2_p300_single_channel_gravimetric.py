@@ -3,7 +3,7 @@ from pathlib import Path
 
 from opentrons.protocol_api import ProtocolContext
 
-from hardware_testing.data import create_run_id
+from hardware_testing.data import create_run_id_and_start_time
 from hardware_testing.labware.position import \
     VIAL_SAFE_Z_OFFSET, overwrite_default_labware_positions
 from hardware_testing.labware.layout import \
@@ -49,7 +49,7 @@ def _test_gravimetric(
 
 def _run(protocol: ProtocolContext) -> None:
     # RUN ID (for labelling data)
-    run_id = create_run_id()
+    run_id, start_time = create_run_id_and_start_time()
 
     # LABWARE
     labware_defs_dir = Path(__file__).parent / 'definitions'
@@ -74,14 +74,16 @@ def _run(protocol: ProtocolContext) -> None:
         mount=PIP_MOUNT,
         tip_racks=[layout.tiprack],  # type: ignore[list-item]
         test_name=metadata['protocolName'],
-        run_id=run_id
+        run_id=run_id,
+        start_time=start_time
     )
     liq_pipette.set_liquid_class(DEFAULT_LIQUID_CLASS_OT2_P300_SINGLE)
     liq_pipette.record_timestamp_enable()
 
     # SCALE RECORDER
     recorder = GravimetricRecorder(protocol, GravimetricRecorderConfig(
-        test_name=metadata['protocolName'], run_id=run_id, tag=liq_pipette.unique_name,
+        test_name=metadata['protocolName'],
+        run_id=run_id, tag=liq_pipette.unique_name, start_time=start_time,
         duration=0, frequency=10, stable=False
     ))
     recorder.activate()

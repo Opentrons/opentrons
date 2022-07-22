@@ -31,9 +31,8 @@ class GravimetricSample:
         """Get CSV header line."""
         return "time,relative-time,grams,unstable-grams,stable-grams,stable"
 
-    def as_csv(self, parent: Optional["GravimetricRecording"] = None) -> str:
+    def as_csv(self, start_time: float) -> str:
         """Get data as a single CSV line."""
-        start_time = parent.start_time if parent else self.time
         rel_time = self.relative_time(start_time)
         unstable_grams = str(self.grams) if not self.stable else ""
         stable_grams = str(self.grams) if self.stable else ""
@@ -145,11 +144,11 @@ class GravimetricRecording(List):
         """Calculate the percent D of the recording."""
         return (self.average - target) / target
 
-    def as_csv(self) -> str:
+    def as_csv(self, start_time: float) -> str:
         """Convert the recording into a string that can be saved to a CSV file."""
         csv_file_str = GravimetricSample.csv_header() + "\n"
         for s in self:
-            csv_file_str += s.as_csv(self) + "\n"
+            csv_file_str += s.as_csv(start_time) + "\n"
         return csv_file_str + "\n"
 
     def _get_nearest_sample_index(self, _time: float) -> int:
@@ -198,6 +197,7 @@ class GravimetricRecorderConfig:
         test_name: Optional[str] = None,
         run_id: Optional[str] = None,
         tag: Optional[str] = None,
+        start_time: Optional[float] = None,
     ) -> None:
         """Recording config."""
         self.duration = duration
@@ -206,6 +206,7 @@ class GravimetricRecorderConfig:
         self.test_name = test_name
         self.run_id = run_id
         self.tag = tag
+        self.start_time = start_time
 
     @property
     def save_to_disk(self) -> bool:
@@ -382,11 +383,13 @@ class GravimetricRecorder(Thread):
         """Record samples to disk."""
         assert self._cfg.test_name, f'A test-name is required to record samples'
         assert self._cfg.tag, f'A tag is required to record samples'
+        assert self._cfg.start_time
         _file_name = create_file_name(self._cfg.test_name, self._cfg.run_id, self.tag)
 
         def _on_new_sample(recording: GravimetricRecording) -> None:
+            csv_line = recording[-1].as_csv(self._cfg.start_time)
             append_data_to_file(
-                str(self._cfg.test_name), _file_name, recording[-1].as_csv(recording) + "\n"
+                str(self._cfg.test_name), _file_name, csv_line + "\n"
             )
 
         # add the header to the CSV file
