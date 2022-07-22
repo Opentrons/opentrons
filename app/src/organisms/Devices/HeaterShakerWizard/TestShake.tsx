@@ -27,7 +27,7 @@ import { InputField } from '../../../atoms/InputField'
 import { Collapsible } from '../../ModuleCard/Collapsible'
 import { useLatchControls } from '../../ModuleCard/hooks'
 import { useModuleIdFromRun } from '../../ModuleCard/useModuleIdFromRun'
-
+import { useRunStatuses } from '../hooks'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
@@ -41,28 +41,26 @@ interface TestShakeProps {
   module: HeaterShakerModule
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
   moduleFromProtocol?: ProtocolModuleInfo
-  runId?: string
+  currentRunId?: string
 }
 
 export function TestShake(props: TestShakeProps): JSX.Element {
-  const { module, setCurrentPage, moduleFromProtocol, runId } = props
+  const { module, setCurrentPage, moduleFromProtocol, currentRunId } = props
   const { t } = useTranslation(['heater_shaker', 'device_details'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
   const [isExpanded, setExpanded] = React.useState(false)
+  const { isRunIdle, isRunTerminal } = useRunStatuses()
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
-  const { moduleIdFromRun } = useModuleIdFromRun(
-    module,
-    runId != null ? runId : null
-  )
+  const { toggleLatch, isLatchClosed } = useLatchControls(module, currentRunId)
+  const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
   const isShaking = module.data.speedStatus !== 'idle'
 
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
     commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
-      moduleId: runId != null ? moduleIdFromRun : module.id,
+      moduleId: isRunIdle ? moduleIdFromRun : module.id,
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
     },
   }
@@ -70,23 +68,23 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
     commandType: 'heaterShaker/deactivateShaker',
     params: {
-      moduleId: runId != null ? moduleIdFromRun : module.id,
+      moduleId: isRunIdle ? moduleIdFromRun : module.id,
     },
   }
 
   const handleShakeCommand = (): void => {
-    if (runId != null) {
+    if (isRunIdle && currentRunId != null) {
       createCommand({
-        runId: runId,
+        runId: currentRunId,
         command: isShaking ? stopShakeCommand : setShakeCommand,
       }).catch((e: Error) => {
         console.error(
           `error setting module status with command type ${
             stopShakeCommand.commandType ?? setShakeCommand.commandType
-          } and run id ${runId}: ${e.message}`
+          }: ${e.message}`
         )
       })
-    } else {
+    } else if (isRunTerminal || currentRunId == null) {
       createLiveCommand({
         command: isShaking ? stopShakeCommand : setShakeCommand,
       }).catch((e: Error) => {
