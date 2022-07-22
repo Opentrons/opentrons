@@ -21,6 +21,14 @@ function getEmptyPlotlyData() {
     ];
 }
 
+function parsePipetteCSV(CSVData) {
+    // TODO: figure out how to parse this
+    var retData = getEmptyPlotlyData();
+    if (!CSVData.length) {
+        return retData;
+    }
+}
+
 function parseGravimetricCSV(CSVData) {
     var retData = getEmptyPlotlyData();
     if (!CSVData.length) {
@@ -106,6 +114,8 @@ window.addEventListener('load', function (evt) {
         oReq.addEventListener('load', function () {
             var responseData = JSON.parse(this.responseText);
             var newData = parseGravimetricCSV(responseData.latest.csv);
+            var newDataPipette = parsePipetteCSV(responseData.latest.csvPipette);
+            // TODO: figure out how to plot this...
             layout.title = responseData.latest.name
             Plotly.react(plotlyDivName, newData, layout, {responsive: true});
         });

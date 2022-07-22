@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List, Any
 
 from hardware_testing.data import create_folder_for_test_data
+from hardware_testing.measure.weight.record import GravimetricRecorder
 
 
 class PlotRequestHandler(BaseHTTPRequestHandler):
@@ -60,10 +61,10 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         _file_list.reverse()
         return _file_list
 
-    def _get_file_name_list(self) -> List[str]:
+    def _get_file_name_list(self, substring: str = '') -> List[str]:
         return [
             f.stem
-            for f in self._list_files_in_directory('GravimetricRecorder')
+            for f in self._list_files_in_directory(substring)
         ]
 
     def _get_file_contents(self, file_name: str) -> str:
@@ -77,23 +78,24 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         response_data = {
             "directory": str(self.plot_directory.resolve()),
         }
+        _grav_name = 'GravimetricRecorder'
+        _pip_name = 'PipetteLiquidClass'
         if req_cmd == "list":
-            response_data["files"] = self._get_file_name_list()  # type: ignore[assignment]
-        elif req_cmd == "latest":
-            file_list = self._get_file_name_list()
-            if file_list:
-                file_name = file_list[0]
-                response_data["name"] = file_name
-                response_data["csv"] = self._get_file_contents(file_name)
-            else:
-                response_data["name"] = ''
-                response_data["csv"] = ''
-        elif req_cmd == "file" and len(self.path_elements) > 1:
-            file_name = self.path_elements[-1]
-            response_data["name"] = file_name
-            response_data["csv"] = self._get_file_contents(file_name)
+            response_data["files"] = self._get_file_name_list(_grav_name)  # type: ignore[assignment]
         else:
-            raise ValueError(f"Unable to find response for request: {self.path}")
+            file_name_grav = ''
+            file_name_pip = ''
+            if req_cmd == "latest":
+                file_list_grav = self._get_file_name_list(_grav_name)
+                file_list_pip = self._get_file_name_list(_pip_name)
+                if file_list_grav and file_list_pip:
+                    file_name_grav = file_list_grav[0]
+                    file_name_pip = file_list_pip[0]
+            else:
+                raise ValueError(f"Unable to find response for request: {self.path}")
+            response_data["name"] = file_name_grav
+            response_data["csv"] = self._get_file_contents(file_name_grav) if file_name_grav else ''
+            response_data["csvPipette"] = self._get_file_contents(file_name_pip) if file_name_pip else ''
         response_str = json.dumps({req_cmd: response_data})
         self._send_response_bytes(response_str.encode("utf-8"))
 
