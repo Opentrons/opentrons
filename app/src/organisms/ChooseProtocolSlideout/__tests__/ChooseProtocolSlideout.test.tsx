@@ -7,12 +7,14 @@ import { getStoredProtocols } from '../../../redux/protocol-storage'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
+import { useTrackCreateProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { useCreateRunFromProtocol } from '../../ChooseRobotSlideout/useCreateRunFromProtocol'
 import { ChooseProtocolSlideout } from '../'
 
 jest.mock('../../ChooseRobotSlideout/useCreateRunFromProtocol')
 jest.mock('../../../redux/protocol-storage')
 jest.mock('../../../molecules/DeckThumbnail')
+jest.mock('../../../organisms/Devices/hooks')
 
 const mockGetStoredProtocols = getStoredProtocols as jest.MockedFunction<
   typeof getStoredProtocols
@@ -22,6 +24,9 @@ const mockUseCreateRunFromProtocol = useCreateRunFromProtocol as jest.MockedFunc
 >
 const mockDeckThumbnail = DeckThumbnail as jest.MockedFunction<
   typeof DeckThumbnail
+>
+const mockUseTrackCreateProtocolRunEvent = useTrackCreateProtocolRunEvent as jest.MockedFunction<
+  typeof useTrackCreateProtocolRunEvent
 >
 
 const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
@@ -37,13 +42,20 @@ const render = (props: React.ComponentProps<typeof ChooseProtocolSlideout>) => {
 
 describe('ChooseProtocolSlideout', () => {
   let mockCreateRunFromProtocol: jest.Mock
+  let mockTrackCreateProtocolRunEvent: jest.Mock
   beforeEach(() => {
     mockCreateRunFromProtocol = jest.fn()
+    mockTrackCreateProtocolRunEvent = jest.fn(
+      () => new Promise(resolve => resolve({}))
+    )
     mockGetStoredProtocols.mockReturnValue([storedProtocolDataFixture])
     mockDeckThumbnail.mockReturnValue(<div>mock Deck Thumbnail</div>)
     mockUseCreateRunFromProtocol.mockReturnValue({
       createRunFromProtocolSource: mockCreateRunFromProtocol,
     } as any)
+    mockUseTrackCreateProtocolRunEvent.mockReturnValue({
+      trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
+    })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -102,5 +114,54 @@ describe('ChooseProtocolSlideout', () => {
       files: [expect.any(File)],
       protocolKey: storedProtocolDataFixture.protocolKey,
     })
+    expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
+  })
+  it('renders error state when there is a run creation error', () => {
+    mockUseCreateRunFromProtocol.mockReturnValue({
+      runCreationError: 'run creation error',
+      createRunFromProtocolSource: mockCreateRunFromProtocol,
+      isCreatingRun: false,
+      reset: jest.fn(),
+      runCreationErrorCode: 500,
+    })
+    const [{ getByRole, getByText }] = render({
+      robot: mockConnectableRobot,
+      onCloseClick: jest.fn(),
+      showSlideout: true,
+    })
+    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    proceedButton.click()
+    expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
+      files: [expect.any(File)],
+      protocolKey: storedProtocolDataFixture.protocolKey,
+    })
+    expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
+    expect(getByText('run creation error')).toBeInTheDocument()
+  })
+
+  it('renders error state when run creation error code is 409', () => {
+    mockUseCreateRunFromProtocol.mockReturnValue({
+      runCreationError: 'Current run is not idle or stopped.',
+      createRunFromProtocolSource: mockCreateRunFromProtocol,
+      isCreatingRun: false,
+      reset: jest.fn(),
+      runCreationErrorCode: 409,
+    })
+    const [{ getByRole, getByText }] = render({
+      robot: mockConnectableRobot,
+      onCloseClick: jest.fn(),
+      showSlideout: true,
+    })
+    const proceedButton = getByRole('button', { name: 'Proceed to setup' })
+    proceedButton.click()
+    expect(mockCreateRunFromProtocol).toHaveBeenCalledWith({
+      files: [expect.any(File)],
+      protocolKey: storedProtocolDataFixture.protocolKey,
+    })
+    expect(mockTrackCreateProtocolRunEvent).toHaveBeenCalled()
+    getByText('This robot is busy and can’t run this protocol right now.')
+    const link = getByRole('link', { name: 'Go to Robot' })
+    fireEvent.click(link)
+    expect(link.getAttribute('href')).toEqual('/devices/opentrons-robot-name')
   })
 })

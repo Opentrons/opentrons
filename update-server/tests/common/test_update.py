@@ -8,7 +8,9 @@ import zipfile
 from typing import Tuple
 
 import pytest
-from aiohttp.test_utils import TestClient
+
+# Avoid pytest trying to collect TestClient because it begins with "Test".
+from aiohttp.test_utils import TestClient as HTTPTestClient
 
 from otupdate.buildroot import update, config, update_actions
 from otupdate.common import file_actions
@@ -21,7 +23,7 @@ from tests.openembedded.conftest import (
 
 
 @pytest.fixture
-async def update_session(test_cli: Tuple[TestClient, str]):
+async def update_session(test_cli: Tuple[HTTPTestClient, str]):
     resp = await test_cli[0].post("/server/update/begin")
     body = await resp.json()
     yield body["token"]
@@ -32,7 +34,7 @@ def session_endpoint(token, endpoint):
     return f"/server/update/{token}/{endpoint}"
 
 
-async def test_begin(test_cli: Tuple[TestClient, str]):
+async def test_begin(test_cli: Tuple[HTTPTestClient, str]):
     # Creating a session should work
     resp = await test_cli[0].post("/server/update/begin")
     body = await resp.json()
@@ -48,7 +50,7 @@ async def test_begin(test_cli: Tuple[TestClient, str]):
     assert "message" in body
 
 
-async def test_cancel(test_cli: Tuple[TestClient, str]):
+async def test_cancel(test_cli: Tuple[HTTPTestClient, str]):
     # cancelling when there’s a session should work great
     resp = await test_cli[0].post("/server/update/begin")
     assert test_cli[0].server.app.get(update.SESSION_VARNAME)
@@ -139,7 +141,7 @@ async def test_session_catches_validation_fail(
 
 
 async def test_update_happypath(
-    test_cli: Tuple[TestClient, str],
+    test_cli: Tuple[HTTPTestClient, str],
     update_session,
     downloaded_update_file_consolidated,
     loop,

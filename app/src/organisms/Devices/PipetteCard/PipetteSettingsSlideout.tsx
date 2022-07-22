@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { last } from 'lodash'
+import last from 'lodash/last'
 import { useDispatch, useSelector } from 'react-redux'
 import { Flex, useInterval } from '@opentrons/components'
 import { PipetteModelSpecs } from '@opentrons/shared-data'

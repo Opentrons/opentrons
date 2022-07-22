@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '../../../atoms/text'
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
-
-const EMPTY_TIMESTAMP = '--:--:--'
+import { EMPTY_TIMESTAMP } from '../constants'
 
 interface TimerProps {
   commandStartedAt: string | null

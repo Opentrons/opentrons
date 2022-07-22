@@ -19,6 +19,7 @@ class MockPipettes:
                 "aspirate_flow_rate": 1.23,
                 "dispense_flow_rate": 1.23,
                 "blow_out_flow_rate": 1.23,
+                "channels": 1,
             },
         )
     )
@@ -31,6 +32,7 @@ class MockPipettes:
                 "aspirate_flow_rate": 1.23,
                 "dispense_flow_rate": 1.23,
                 "blow_out_flow_rate": 1.23,
+                "channels": 8,
             },
         )
     )

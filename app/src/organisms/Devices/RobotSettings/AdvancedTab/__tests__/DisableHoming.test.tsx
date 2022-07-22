@@ -6,7 +6,6 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
 import { getRobotSettings } from '../../../../../redux/robot-settings'
-import { useIsRobotBusy } from '../../../hooks'
 
 import { DisableHoming } from '../DisableHoming'
 
@@ -15,9 +14,6 @@ jest.mock('../../../hooks')
 
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
->
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
 >
 
 const mockSettings = {
@@ -28,16 +24,10 @@ const mockSettings = {
   restart_required: false,
 }
 
-const mockUpdateRobotStatus = jest.fn()
-
-const render = () => {
+const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
-      <DisableHoming
-        settings={mockSettings}
-        robotName="otie"
-        updateIsRobotBusy={mockUpdateRobotStatus}
-      />
+      <DisableHoming settings={mockSettings} robotName="otie" isRobotBusy />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
@@ -46,7 +36,6 @@ const render = () => {
 describe('RobotSettings DisableHoming', () => {
   beforeEach(() => {
     mockGetRobotSettings.mockReturnValue([mockSettings])
-    mockUseIsRobotBusy.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -76,12 +65,10 @@ describe('RobotSettings DisableHoming', () => {
   })
 
   it('should call update robot status if a robot is busy', () => {
-    mockUseIsRobotBusy.mockReturnValue(true)
-    const [{ getByRole }] = render()
+    const [{ getByRole }] = render(true)
     const toggleButton = getByRole('switch', {
       name: 'disable_homing',
     })
-    fireEvent.click(toggleButton)
-    expect(mockUpdateRobotStatus).toHaveBeenCalled()
+    expect(toggleButton).toBeDisabled()
   })
 })

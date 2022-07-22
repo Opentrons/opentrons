@@ -1,18 +1,23 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+
 import { getConfig, removeManualIp } from '../../redux/config'
 import { getViewableRobots } from '../../redux/discovery'
 import { ManualIpHostnameItem } from './ManualIpHostnameItem'
 
 import type { State, Dispatch } from '../../redux/types'
 
-interface ManualIpHostnameListProps {
+interface IpHostnameListProps {
   mostRecentAddition: string | null
+  setMostRecentAddition: (ip: string | null) => void
+  setMostRecentDiscovered: (discovered: boolean) => void
 }
 
 export function ManualIpHostnameList({
   mostRecentAddition,
-}: ManualIpHostnameListProps): JSX.Element {
+  setMostRecentAddition,
+  setMostRecentDiscovered,
+}: IpHostnameListProps): JSX.Element {
   const candidates = useSelector(
     (state: State) => getConfig(state)?.discovery.candidates ?? []
   )
@@ -35,7 +40,9 @@ export function ManualIpHostnameList({
             key={index}
             removeIp={() => dispatch(removeManualIp(candidate))}
             discovered={discovered}
-            justAdded={candidate === mostRecentAddition}
+            mostRecentAddition={mostRecentAddition}
+            setMostRecentAddition={setMostRecentAddition}
+            setMostRecentDiscovered={setMostRecentDiscovered}
             isLast={index === candidates.length - 1}
           />
         ))}

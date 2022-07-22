@@ -5,6 +5,7 @@ export const lightBlue = '#f1f8ff'
 export const medGrey = '#e3e3e3'
 export const black = '#000000'
 export const transparent = 'transparent'
+export const fundamentalsBackgroundShade = '#eeeeee'
 
 // colors with states
 export const blueFocus = '#deecff'
@@ -16,14 +17,14 @@ export const medBlue = '#d9e9fe'
 export const disabled = '#a0a0a0'
 export const medGreyHover = '#b8b8b8'
 export const darkBlack = '#16212D'
-export const darkBlackHover = '#24313f'
+export const darkBlackHover = '#24313F'
 export const darkBlackPressed = '#16212D'
 export const darkBlackSelected = '#39495B'
 // note: darkBlackDisabled = greyDisabled
 
 export const darkGrey = '#4a4a4a'
-export const darkGreyHover = '#283d52'
-export const darkGreyPressed = '#646668'
+export const darkGreyHover = '#646668'
+export const darkGreyPressed = '#5a5a5e'
 export const darkGreyEnabled = '#707075'
 // note: darkGreyDisabled = greyDisabled
 // note: darkGraySelected = darkBlackSelected

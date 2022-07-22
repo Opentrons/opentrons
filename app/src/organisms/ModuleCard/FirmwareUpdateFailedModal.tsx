@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
   DIRECTION_ROW,
   Flex,
@@ -9,7 +10,7 @@ import {
   DIRECTION_COLUMN,
   Icon,
   COLORS,
-  TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
@@ -49,7 +50,9 @@ export const FirmwareUpdateFailedModal = (
         data-testid={`FirmwareUpdateFailedModal_body_text_${module.serialNumber}`}
       >
         <Text paddingBottom={SPACING.spacing2}>
-          {t('an_error_occurred_while_updating_please_try_again')}
+          {t('an_error_occurred_while_updating_module', {
+            moduleName: getModuleDisplayName(module.moduleModel),
+          })}
         </Text>
         <Text>{errorMessage}</Text>
       </Flex>
@@ -61,7 +64,7 @@ export const FirmwareUpdateFailedModal = (
       >
         <PrimaryButton
           onClick={onCloseClick}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
         >
           {t('shared:close')}
         </PrimaryButton>

@@ -16,7 +16,6 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 } from '@opentrons/api-client'
 import {
-  useDismissCurrentRunMutation,
   useRunQuery,
   useModulesQuery,
   usePipettesQuery,
@@ -27,27 +26,23 @@ import {
   Flex,
   Icon,
   IconName,
-  Tooltip,
   useHoverTooltip,
   useInterval,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
-  DIRECTION_ROW,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
-  SIZE_3,
-  SIZE_4,
-  SIZE_5,
-  TEXT_TRANSFORM_UPPERCASE,
   BORDERS,
   COLORS,
   SPACING,
   TYPOGRAPHY,
   useConditionalConfirm,
+  SPACING_AUTO,
 } from '@opentrons/components'
 
+import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
 import { ProtocolAnalysisErrorModal } from './ProtocolAnalysisErrorModal'
 import { Banner } from '../../../atoms/Banner'
@@ -55,6 +50,7 @@ import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { useTrackEvent } from '../../../redux/analytics'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
 import { StyledText } from '../../../atoms/text'
+import { Tooltip } from '../../../atoms/Tooltip'
 import {
   useCloseCurrentRun,
   useCurrentRunId,
@@ -69,17 +65,21 @@ import {
 import { formatInterval } from '../../../organisms/RunTimeControl/utils'
 import { useIsHeaterShakerInProtocol } from '../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../ModuleCard/ConfirmAttachmentModal'
-
 import {
   useProtocolDetailsForRun,
   useProtocolAnalysisErrors,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
+  useIsRobotViewable,
+  useTrackProtocolRunEvent,
+  useRobotAnalyticsData,
 } from '../hooks'
 import { formatTimestamp } from '../utils'
+import { EMPTY_TIMESTAMP } from '../constants'
 
 import type { Run } from '@opentrons/api-client'
+import type { State } from '../../../redux/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 const EQUIPMENT_POLL_MS = 5000
@@ -110,13 +110,9 @@ function RunTimer({
       : completedAt ?? now
 
   const runTime =
-    startedAt != null ? formatInterval(startedAt, endTime) : '--:--:--'
+    startedAt != null ? formatInterval(startedAt, endTime) : EMPTY_TIMESTAMP
 
-  return (
-    <StyledText css={TYPOGRAPHY.pRegular} color={COLORS.darkBlack}>
-      {runTime}
-    </StyledText>
-  )
+  return <StyledText css={TYPOGRAPHY.pRegular}>{runTime}</StyledText>
 }
 
 export function ProtocolRunHeader({
@@ -131,31 +127,51 @@ export function ProtocolRunHeader({
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
-  const { protocolData, displayName, protocolKey } = useProtocolDetailsForRun(
-    runId
-  )
-  const isProtocolAnalyzing = protocolData == null
+  const {
+    protocolData,
+    displayName,
+    protocolKey,
+    isProtocolAnalyzing,
+  } = useProtocolDetailsForRun(runId)
+  const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
+  const robotAnalyticsData = useRobotAnalyticsData(robotName)
+  const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = useRunStatus(runId)
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const isRunCurrent = Boolean(useRunQuery(runId)?.data?.data?.current)
-  const { dismissCurrentRun } = useDismissCurrentRunMutation()
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const attachedModules =
     useModulesQuery({ refetchInterval: EQUIPMENT_POLL_MS })?.data?.data ?? []
   // NOTE: we are polling pipettes, though not using their value directly here
   usePipettesQuery({ refetchInterval: EQUIPMENT_POLL_MS })
-
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
+
+  React.useEffect(() => {
+    if (protocolData != null && !isRobotViewable) {
+      history.push(`/devices`)
+    }
+  }, [protocolData, isRobotViewable, history])
+
   React.useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED && isRunCurrent) {
-      runId != null && dismissCurrentRun(runId)
+      if (runId != null) {
+        trackProtocolRunEvent({
+          name: 'runFinish',
+          properties: {
+            ...robotAnalyticsData,
+          },
+        })
+
+        closeCurrentRun()
+      }
     }
-  }, [runStatus, isRunCurrent, runId, dismissCurrentRun])
+  }, [runStatus, isRunCurrent, runId, closeCurrentRun])
 
   const startedAtTimestamp =
-    startedAt != null ? formatTimestamp(startedAt) : '--:--:--'
+    startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
 
   const completedAtTimestamp =
-    completedAt != null ? formatTimestamp(completedAt) : '--:--:--'
+    completedAt != null ? formatTimestamp(completedAt) : EMPTY_TIMESTAMP
 
   // redirect to new run after successful reset
   const onResetSuccess = (createRunResponse: Run): void =>
@@ -229,18 +245,49 @@ export function ProtocolRunHeader({
       setShowIsShakingModal(true)
     } else if (isHeaterShakerInProtocol && !isShaking) {
       confirmAttachment()
-    } else play()
+    } else {
+      play()
+
+      const isIdle = runStatus === RUN_STATUS_IDLE
+      const eventProperties =
+        isIdle && robotAnalyticsData != null ? robotAnalyticsData : {}
+      const eventName = isIdle ? 'runStart' : 'runResume'
+
+      trackProtocolRunEvent({
+        name: eventName,
+        properties: eventProperties,
+      })
+    }
   }
 
+  const handlePauseButtonClick = (): void => {
+    pause()
+
+    trackProtocolRunEvent({ name: 'runPause' })
+  }
+
+  const handleResetButtonClick = (): void => {
+    reset()
+
+    trackProtocolRunEvent({ name: 'runAgain' })
+  }
+
+  const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
+    useSelector((state: State) => {
+      return getBuildrootUpdateDisplayInfo(state, robotName)
+    })?.autoUpdateAction
+  )
   const isRunControlButtonDisabled =
     (isCurrentRun && !isSetupComplete) ||
     isMutationLoading ||
     isRobotBusy ||
     isProtocolAnalyzing ||
+    protocolData == null ||
     runStatus === RUN_STATUS_FINISHING ||
     runStatus === RUN_STATUS_PAUSE_REQUESTED ||
     runStatus === RUN_STATUS_STOP_REQUESTED ||
-    runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR
+    runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
+    isRobotOnWrongVersionOfSoftware
 
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
@@ -259,12 +306,12 @@ export function ProtocolRunHeader({
     case RUN_STATUS_RUNNING:
       buttonIconName = 'pause'
       buttonText = t('pause_run')
-      handleButtonClick = pause
+      handleButtonClick = handlePauseButtonClick
       break
     case RUN_STATUS_STOP_REQUESTED:
       buttonIconName = null
       buttonText = t('canceling_run')
-      handleButtonClick = reset
+      handleButtonClick = handleResetButtonClick
       break
     case RUN_STATUS_STOPPED:
     case RUN_STATUS_FINISHING:
@@ -272,7 +319,7 @@ export function ProtocolRunHeader({
     case RUN_STATUS_SUCCEEDED:
       buttonIconName = 'play'
       buttonText = t('run_again')
-      handleButtonClick = reset
+      handleButtonClick = handleResetButtonClick
       break
   }
 
@@ -286,6 +333,8 @@ export function ProtocolRunHeader({
     disableReason = t('setup_incomplete')
   } else if (isRobotBusy) {
     disableReason = t('robot_is_busy')
+  } else if (isRobotOnWrongVersionOfSoftware) {
+    disableReason = t('shared:a_software_update_is_available')
   }
 
   const buttonIcon =
@@ -315,91 +364,109 @@ export function ProtocolRunHeader({
     runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
     runStatus === RUN_STATUS_IDLE
 
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
-
   const handleClearClick = (): void => {
+    trackProtocolRunEvent({
+      name: 'runFinish',
+      properties: {
+        ...robotAnalyticsData,
+      },
+    })
+
     closeCurrentRun()
   }
 
-  const ClearProtocolBanner = (): JSX.Element | null => {
-    switch (runStatus) {
-      case RUN_STATUS_FAILED: {
-        return (
-          <Banner type="error" onCloseClick={handleClearClick}>
-            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-              {`${t('run_failed')}.`}
-            </Flex>
-          </Banner>
-        )
-      }
-      case RUN_STATUS_SUCCEEDED: {
-        return (
-          <Banner type="success" onCloseClick={handleClearClick}>
-            <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-              {`${t('run_completed')}.`}
-            </Flex>
-          </Banner>
-        )
-      }
+  let clearProtocolBanner: JSX.Element | null
+  switch (runStatus) {
+    case RUN_STATUS_FAILED: {
+      clearProtocolBanner = (
+        <Banner
+          type="error"
+          onCloseClick={handleClearClick}
+          isCloseActionLoading={isClosingCurrentRun}
+        >
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+            {`${t('run_failed')}.`}
+          </Flex>
+        </Banner>
+      )
+      break
     }
-    return null
+    case RUN_STATUS_SUCCEEDED: {
+      clearProtocolBanner = (
+        <Banner
+          type="success"
+          onCloseClick={handleClearClick}
+          isCloseActionLoading={isClosingCurrentRun}
+        >
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+            {`${t('run_completed')}.`}
+          </Flex>
+        </Banner>
+      )
+      break
+    }
+    default:
+      clearProtocolBanner = null
   }
 
-  const ProtocolRunningContent = (): JSX.Element | null =>
+  const protocolRunningContent: JSX.Element | null =
     runStatus != null ? (
-      <Flex
+      <Box
         backgroundColor={COLORS.lightGrey}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        display="grid"
+        gridTemplateColumns="4fr 6fr 4fr"
         padding={SPACING.spacing3}
       >
-        <Flex gridGap={SPACING.spacing6}>
-          <Box>
-            <StyledText
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
-              color={COLORS.darkGreyEnabled}
-              css={TYPOGRAPHY.h6Default}
-              paddingBottom={SPACING.spacing2}
-            >
-              {t('protocol_start')}
-            </StyledText>
-            <StyledText
-              css={TYPOGRAPHY.pRegular}
-              color={COLORS.darkBlack}
-              id="ProtocolRunHeader_protocolStart"
-            >
-              {startedAtTimestamp}
-            </StyledText>
-          </Box>
-          <Box>
-            <StyledText
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
-              color={COLORS.darkGreyEnabled}
-              css={TYPOGRAPHY.h6Default}
-              paddingBottom={SPACING.spacing2}
-            >
-              {t('protocol_end')}
-            </StyledText>
-            <StyledText
-              css={TYPOGRAPHY.pRegular}
-              color={COLORS.darkBlack}
-              id="ProtocolRunHeader_protocolEnd"
-            >
-              {completedAtTimestamp}
-            </StyledText>
-          </Box>
-        </Flex>
-        {showCancelButton ? (
-          <SecondaryButton
-            color={COLORS.errorText}
-            padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
-            onClick={handleCancelClick}
-            id="ProtocolRunHeader_cancelRunButton"
-            disabled={isClosingCurrentRun}
+        <Box>
+          <StyledText
+            textTransform={TYPOGRAPHY.textTransformUppercase}
+            color={COLORS.darkGreyEnabled}
+            css={TYPOGRAPHY.h6Default}
+            paddingBottom={SPACING.spacing2}
           >
-            {t('cancel_run')}
-          </SecondaryButton>
-        ) : null}
-      </Flex>
+            {t('protocol_start')}
+          </StyledText>
+          <StyledText
+            css={TYPOGRAPHY.pRegular}
+            id="ProtocolRunHeader_protocolStart"
+          >
+            {startedAtTimestamp}
+          </StyledText>
+        </Box>
+        <Box>
+          <StyledText
+            textTransform={TYPOGRAPHY.textTransformUppercase}
+            color={COLORS.darkGreyEnabled}
+            css={TYPOGRAPHY.h6Default}
+            paddingBottom={SPACING.spacing2}
+          >
+            {t('protocol_end')}
+          </StyledText>
+          <StyledText
+            css={TYPOGRAPHY.pRegular}
+            id="ProtocolRunHeader_protocolEnd"
+          >
+            {completedAtTimestamp}
+          </StyledText>
+        </Box>
+        <Box marginLeft={SPACING_AUTO}>
+          {showCancelButton && (
+            <SecondaryButton
+              style={{
+                color: `${COLORS.errorText}`,
+                backgroundColor: 'none',
+                borderColor: `${COLORS.error}`,
+              }}
+              padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
+              onClick={handleCancelClick}
+              id="ProtocolRunHeader_cancelRunButton"
+              disabled={isClosingCurrentRun}
+            >
+              {t('cancel_run')}
+            </SecondaryButton>
+          )}
+        </Box>
+      </Box>
     ) : null
 
   return (
@@ -452,7 +519,7 @@ export function ProtocolRunHeader({
           </StyledText>
         )}
       </Flex>
-      {analysisErrors && analysisErrors?.length > 0 && (
+      {analysisErrors != null && analysisErrors?.length > 0 && (
         <ProtocolAnalysisErrorBanner errors={analysisErrors} />
       )}
       {runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ? (
@@ -461,29 +528,28 @@ export function ProtocolRunHeader({
       {runStatus === RUN_STATUS_STOPPED ? (
         <Banner type="warning">{`${t('run_canceled')}.`}</Banner>
       ) : null}
-      {isCurrentRun ? <ClearProtocolBanner /> : null}
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Box minWidth={SIZE_4}>
+      {isCurrentRun ? clearProtocolBanner : null}
+      <Box display="grid" gridTemplateColumns="4fr 3fr 3fr 4fr">
+        <Box>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6Default}
             paddingBottom={SPACING.spacing2}
           >
-            {t('run_id')}
+            {t('run')}
           </StyledText>
           {/* this is the createdAt timestamp, not the run id */}
           <StyledText
             css={TYPOGRAPHY.pRegular}
-            color={COLORS.darkBlack}
             id="ProtocolRunHeader_runRecordId"
           >
             {createdAtTimestamp}
           </StyledText>
         </Box>
-        <Box minWidth={SIZE_3}>
+        <Box>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6Default}
             paddingBottom={SPACING.spacing2}
@@ -511,16 +577,15 @@ export function ProtocolRunHeader({
             ) : null}
             <StyledText
               css={TYPOGRAPHY.pRegular}
-              color={COLORS.darkBlack}
               id="ProtocolRunHeader_runStatus"
             >
               {runStatus != null ? t(`status_${runStatus}`) : ''}
             </StyledText>
           </Flex>
         </Box>
-        <Box minWidth={SIZE_3}>
+        <Box>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6Default}
             paddingBottom={SPACING.spacing2}
@@ -541,12 +606,7 @@ export function ProtocolRunHeader({
             startRun={play}
           />
         )}
-        <Flex
-          justifyContent={'flex-end'}
-          flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacingSM}
-          width={SIZE_5}
-        >
+        <Box marginLeft={SPACING_AUTO}>
           <PrimaryButton
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
@@ -562,11 +622,11 @@ export function ProtocolRunHeader({
             <StyledText css={TYPOGRAPHY.pSemiBold}>{buttonText}</StyledText>
           </PrimaryButton>
           {disableReason != null && (
-            <Tooltip {...tooltipProps}>{disableReason}</Tooltip>
+            <Tooltip tooltipProps={tooltipProps}>{disableReason}</Tooltip>
           )}
-        </Flex>
-      </Flex>
-      <ProtocolRunningContent />
+        </Box>
+      </Box>
+      {protocolRunningContent}
       {showConfirmCancelModal ? (
         <ConfirmCancelModal
           onClose={() => setShowConfirmCancelModal(false)}

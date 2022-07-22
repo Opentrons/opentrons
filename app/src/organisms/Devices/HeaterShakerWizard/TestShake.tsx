@@ -21,12 +21,13 @@ import {
 import { RPM, HS_RPM_MAX, HS_RPM_MIN } from '@opentrons/shared-data'
 import { TertiaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
+import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
 import { InputField } from '../../../atoms/InputField'
 import { Collapsible } from '../../ModuleCard/Collapsible'
 import { useLatchControls } from '../../ModuleCard/hooks'
 import { useModuleIdFromRun } from '../../ModuleCard/useModuleIdFromRun'
-
+import { useRunStatuses } from '../hooks'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
@@ -40,28 +41,26 @@ interface TestShakeProps {
   module: HeaterShakerModule
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
   moduleFromProtocol?: ProtocolModuleInfo
-  runId?: string
+  currentRunId?: string
 }
 
 export function TestShake(props: TestShakeProps): JSX.Element {
-  const { module, setCurrentPage, moduleFromProtocol, runId } = props
+  const { module, setCurrentPage, moduleFromProtocol, currentRunId } = props
   const { t } = useTranslation(['heater_shaker', 'device_details'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
   const [isExpanded, setExpanded] = React.useState(false)
+  const { isRunIdle, isRunTerminal } = useRunStatuses()
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
-  const { moduleIdFromRun } = useModuleIdFromRun(
-    module,
-    runId != null ? runId : null
-  )
+  const { toggleLatch, isLatchClosed } = useLatchControls(module, currentRunId)
+  const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
   const isShaking = module.data.speedStatus !== 'idle'
 
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
     commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
-      moduleId: runId != null ? moduleIdFromRun : module.id,
+      moduleId: isRunIdle ? moduleIdFromRun : module.id,
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
     },
   }
@@ -69,23 +68,23 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
     commandType: 'heaterShaker/deactivateShaker',
     params: {
-      moduleId: runId != null ? moduleIdFromRun : module.id,
+      moduleId: isRunIdle ? moduleIdFromRun : module.id,
     },
   }
 
   const handleShakeCommand = (): void => {
-    if (runId != null) {
+    if (isRunIdle && currentRunId != null) {
       createCommand({
-        runId: runId,
+        runId: currentRunId,
         command: isShaking ? stopShakeCommand : setShakeCommand,
       }).catch((e: Error) => {
         console.error(
           `error setting module status with command type ${
             stopShakeCommand.commandType ?? setShakeCommand.commandType
-          } and run id ${runId}: ${e.message}`
+          }: ${e.message}`
         )
       })
-    } else {
+    } else if (isRunTerminal || currentRunId == null) {
       createLiveCommand({
         command: isShaking ? stopShakeCommand : setShakeCommand,
       }).catch((e: Error) => {
@@ -102,18 +101,14 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const errorMessage =
     shakeValue != null &&
     (parseInt(shakeValue) < HS_RPM_MIN || parseInt(shakeValue) > HS_RPM_MAX)
-      ? t('input_out_of_range', { ns: 'device_details' })
+      ? t('device_details:input_out_of_range')
       : null
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <Text
-        color={COLORS.darkBlack}
-        fontSize={TYPOGRAPHY.fontSizeH2}
-        fontWeight={700}
-      >
+      <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('step_4_of_4')}
-      </Text>
+      </StyledText>
       <Flex
         marginTop={SPACING.spacing3}
         marginBottom={SPACING.spacing4}
@@ -180,13 +175,13 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           marginY={SPACING.spacingL}
           alignItems={ALIGN_FLEX_START}
         >
-          <Flex flexDirection={DIRECTION_COLUMN} maxWidth={'6.25rem'}>
-            <Text
+          <Flex flexDirection={DIRECTION_COLUMN} maxWidth="6.25rem">
+            <StyledText
               fontSize={TYPOGRAPHY.fontSizeCaption}
               color={COLORS.darkGreyEnabled}
             >
               {t('set_shake_speed')}
-            </Text>
+            </StyledText>
             <InputField
               data-testid={`TestShake_shake_input`}
               units={RPM}
@@ -194,7 +189,6 @@ export function TestShake(props: TestShakeProps): JSX.Element {
               onChange={e => setShakeValue(e.target.value)}
               type="number"
               caption={t('min_max_rpm', {
-                ns: 'heater_shaker',
                 min: HS_RPM_MIN,
                 max: HS_RPM_MAX,
               })}
@@ -212,9 +206,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             {isShaking ? t('stop_shaking') : t('start_shaking')}
           </TertiaryButton>
           {!isLatchClosed ? (
-            <Tooltip tooltipProps={tooltipProps}>
-              {t('cannot_shake', { ns: 'heater_shaker' })}
-            </Tooltip>
+            <Tooltip tooltipProps={tooltipProps}>{t('cannot_shake')}</Tooltip>
           ) : null}
         </Flex>
       </Flex>
@@ -229,7 +221,9 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           alignItems={ALIGN_FLEX_START}
           marginY={SPACING.spacing6}
         >
-          <Text width={'22rem'}>{t('troubleshoot_step1_description')}</Text>
+          <StyledText width="22rem">
+            {t('troubleshoot_step1_description')}
+          </StyledText>
           <TertiaryButton
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
@@ -239,7 +233,9 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           </TertiaryButton>
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
-          <Text width={'22rem'}>{t('troubleshoot_step2_description')}</Text>
+          <StyledText width="22rem">
+            {t('troubleshoot_step2_description')}
+          </StyledText>
           <TertiaryButton
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { act } from 'react-dom/test-utils'
 import { fireEvent } from '@testing-library/dom'
+import { useTrackEvent } from '../../../redux/analytics'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
@@ -14,6 +15,7 @@ import { useIntroInfo, useLabwareOffsets } from '../hooks'
 import { Section } from '../types'
 import { useLPCSuccessToast } from '../../ProtocolSetup/hooks'
 
+jest.mock('../../../redux/analytics')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../../Devices/hooks')
 jest.mock('../../ProtocolSetup/hooks')
@@ -43,6 +45,9 @@ const mockUseLPCSuccessToast = useLPCSuccessToast as jest.MockedFunction<
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
 
 const MOCK_SECTIONS = ['PRIMARY_PIPETTE_TIPRACKS' as Section]
 const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
@@ -59,6 +64,7 @@ const render = (props: React.ComponentProps<typeof SummaryScreen>) => {
   })[0]
 }
 
+let mockTrackEvent: jest.Mock
 describe('SummaryScreen', () => {
   let props: React.ComponentProps<typeof SummaryScreen>
 
@@ -107,6 +113,8 @@ describe('SummaryScreen', () => {
     when(mockUseLPCSuccessToast)
       .calledWith()
       .mockReturnValue({ setIsShowingLPCSuccessToast: _isShowing => {} })
+    mockTrackEvent = jest.fn()
+    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -135,5 +143,9 @@ describe('SummaryScreen', () => {
     })
     expect(props.onCloseClick).toHaveBeenCalled()
     expect(mockSetIsShowingLPCSuccessToast).toHaveBeenCalled()
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'applyLabwareOffsetData',
+      properties: {},
+    })
   })
 })

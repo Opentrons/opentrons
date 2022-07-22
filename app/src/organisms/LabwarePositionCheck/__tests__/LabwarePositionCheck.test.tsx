@@ -12,6 +12,7 @@ import { RobotMotionLoadingModal } from '../RobotMotionLoadingModal'
 import { ConfirmPickUpTipModal } from '../ConfirmPickUpTipModal'
 import { ExitPreventionModal } from '../ExitPreventionModal'
 import { useSteps, useLabwarePositionCheck } from '../hooks'
+import { useRestartRun } from '../../ProtocolUpload/hooks'
 import type { LabwarePositionCheckStep } from '../types'
 
 jest.mock('../../../redux/analytics')
@@ -21,6 +22,7 @@ jest.mock('../SummaryScreen')
 jest.mock('../RobotMotionLoadingModal')
 jest.mock('../ConfirmPickUpTipModal')
 jest.mock('../ExitPreventionModal')
+jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 
 const mockGenericStepScreen = GenericStepScreen as jest.MockedFunction<
@@ -39,9 +41,10 @@ const mockConfirmPickUpTipModal = ConfirmPickUpTipModal as jest.MockedFunction<
 const mockExitPreventionModal = ExitPreventionModal as jest.MockedFunction<
   typeof ExitPreventionModal
 >
-
 const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
-
+const mockUseRestartRun = useRestartRun as jest.MockedFunction<
+  typeof useRestartRun
+>
 const mockUseLabwarePositionCheck = useLabwarePositionCheck as jest.MockedFunction<
   typeof useLabwarePositionCheck
 >
@@ -60,6 +63,7 @@ const render = (props: React.ComponentProps<typeof LabwarePositionCheck>) => {
 }
 
 let mockTrackEvent: jest.Mock
+let mockRestartRun: jest.Mock
 
 describe('LabwarePositionCheck', () => {
   let props: React.ComponentProps<typeof LabwarePositionCheck>
@@ -86,7 +90,8 @@ describe('LabwarePositionCheck', () => {
           section: 'PRIMARY_PIPETTE_TIPRACKS',
         } as LabwarePositionCheckStep,
       ])
-
+    mockRestartRun = jest.fn()
+    when(mockUseRestartRun).calledWith().mockReturnValue(mockRestartRun)
     when(mockUseLabwarePositionCheck)
       .calledWith(expect.anything(), expect.anything())
       .mockReturnValue({} as any)

@@ -453,7 +453,7 @@ describe('LabwareSetup', () => {
 
     getByText('Labware Position Check and Labware Offset Data')
     getByText(
-      'Labware Position Check is an optional workflow that helps you verify the position of each labware on the deck. During this check, you can create Labware Offsets that adjust how the robot moves to each labware in the X, Y and Z directions.'
+      'Labware Position Check is a recommended workflow that helps you verify the position of each labware on the deck. During this check, you can create Labware Offsets that adjust how the robot moves to each labware in the X, Y and Z directions.'
     )
   })
   it('should render LPC button and clicking should launch modal', () => {
@@ -516,6 +516,7 @@ describe('LabwareSetup', () => {
               attachedModuleMatch: null,
             },
           },
+          runId: RUN_ID,
         })
       )
       .mockReturnValue(

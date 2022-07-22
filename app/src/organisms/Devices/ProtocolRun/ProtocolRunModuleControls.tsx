@@ -1,17 +1,19 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
-  DIRECTION_COLUMN,
+  COLORS,
   Flex,
-  JUSTIFY_START,
   SPACING,
-  WRAP,
+  JUSTIFY_CENTER,
+  Box,
 } from '@opentrons/components'
+import { useCreateCommandMutation } from '@opentrons/react-api-client'
+import { StyledText } from '../../../atoms/text'
 import { ModuleCard } from '../../ModuleCard'
 import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
 } from '../hooks'
-import { useCreateCommandMutation } from '@opentrons/react-api-client'
 
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { RunTimeCommand } from '@opentrons/shared-data'
@@ -24,7 +26,8 @@ interface ProtocolRunModuleControlsProps {
 export const ProtocolRunModuleControls = ({
   robotName,
   runId,
-}: ProtocolRunModuleControlsProps): JSX.Element | null => {
+}: ProtocolRunModuleControlsProps): JSX.Element => {
+  const { t } = useTranslation('protocol_details')
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
     robotName,
     runId
@@ -32,10 +35,8 @@ export const ProtocolRunModuleControls = ({
   const attachedModules = Object.values(moduleRenderInfoForProtocolById).filter(
     module => module.attachedModuleMatch != null
   )
-
   const { protocolData } = useProtocolDetailsForRun(runId)
   const { createCommand } = useCreateCommandMutation()
-
   const loadCommands: LoadModuleRunTimeCommand[] =
     protocolData !== null
       ? protocolData?.commands.filter(
@@ -68,31 +69,58 @@ export const ProtocolRunModuleControls = ({
     }
   }, [])
 
-  return (
+  // split modules in half and map into each column separately to avoid
+  // the need for hardcoded heights without limitation, array will be split equally
+  // or left column will contain 1 more item than right column
+  const halfAttachedModulesSize = Math.ceil(attachedModules?.length / 2)
+  const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
+  const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
+
+  return attachedModules.length === 0 ? (
+    <Flex justifyContent={JUSTIFY_CENTER}>
+      <StyledText
+        as="p"
+        color={COLORS.darkGreyEnabled}
+        marginY={SPACING.spacing4}
+      >
+        {t('connect_modules_to_see_controls')}
+      </StyledText>
+    </Flex>
+  ) : (
     <Flex
-      width={attachedModules.length === 1 ? '100%' : '50%'}
-      justifyContent={JUSTIFY_START}
-      flexWrap={WRAP}
-      flexDirection={DIRECTION_COLUMN}
-      maxHeight="25rem"
+      gridGap={SPACING.spacing3}
+      paddingTop={SPACING.spacing4}
+      paddingBottom={SPACING.spacing3}
+      paddingX={SPACING.spacing4}
     >
-      {attachedModules.map((module, index) => {
-        return (
-          <Flex
-            marginTop={SPACING.spacing3}
-            key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
-          >
-            {module.attachedModuleMatch != null ? (
-              <ModuleCard
-                robotName={robotName}
-                runId={runId}
-                module={module.attachedModuleMatch}
-                slotName={module.slotName}
-              />
-            ) : null}
-          </Flex>
-        )
-      })}
+      <Box flex="50%">
+        {leftColumnModules.map((module, index) =>
+          module.attachedModuleMatch != null ? (
+            <ModuleCard
+              key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
+              robotName={robotName}
+              runId={runId}
+              module={module.attachedModuleMatch}
+              slotName={module.slotName}
+              isLoadedInRun={true}
+            />
+          ) : null
+        )}
+      </Box>
+      <Box flex="50%">
+        {rightColumnModules.map((module, index) =>
+          module.attachedModuleMatch != null ? (
+            <ModuleCard
+              key={`moduleCard_${module.moduleDef.moduleType}_${index}`}
+              robotName={robotName}
+              runId={runId}
+              module={module.attachedModuleMatch}
+              slotName={module.slotName}
+              isLoadedInRun={true}
+            />
+          ) : null
+        )}
+      </Box>
     </Flex>
   )
 }

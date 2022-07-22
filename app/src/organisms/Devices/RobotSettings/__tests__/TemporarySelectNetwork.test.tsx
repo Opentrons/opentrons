@@ -14,7 +14,6 @@ import { SelectSsid } from '../ConnectNetwork/SelectSsid'
 import { ConnectModal } from '../ConnectNetwork/ConnectModal'
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
 import { ResultModal } from '../ConnectNetwork/ResultModal'
-import { useIsRobotBusy } from '../../hooks'
 
 import { TemporarySelectNetwork } from '../TemporarySelectNetwork'
 
@@ -23,7 +22,6 @@ import { RequestState } from '../../../../redux/robot-api/types'
 
 jest.mock('../../../../redux/networking/selectors')
 jest.mock('../../../../redux/robot-api/selectors')
-jest.mock('../../hooks')
 
 // mock out ConnectModal to prevent warning logs from async formik
 // validation happening outside an `act`
@@ -52,7 +50,6 @@ const mockWifiKeys = [
 ]
 
 const mockEapOptions = [Fixtures.mockEapOption]
-const mockUpdateRobotStatus = jest.fn()
 
 const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
   typeof Networking.getWifiList
@@ -72,9 +69,6 @@ const mockGetCanDisconnect = Networking.getCanDisconnect as jest.MockedFunction<
 
 const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
   typeof RobotApi.getRequestById
->
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
 >
 
 describe('<TemporarySelectNetwork />', () => {
@@ -119,13 +113,11 @@ describe('<TemporarySelectNetwork />', () => {
       return true
     })
 
-    mockUseIsRobotBusy.mockReturnValue(false)
-
     render = () => {
       return mount(
         <TemporarySelectNetwork
           robotName={mockRobotName}
-          updateRobotStatus={mockUpdateRobotStatus}
+          isRobotBusy={false}
         />,
         {
           wrappingComponent: Provider,

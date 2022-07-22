@@ -182,7 +182,7 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
                 )
             )
 
-        for covered_location in _get_east_west_locations(location):
+        for covered_location in get_east_west_locations(location):
             restrictions.append(
                 _MaxHeight(
                     location=covered_location,
@@ -265,17 +265,17 @@ def _get_west_location(location: int) -> Optional[int]:
         return location - 1
 
 
-def _get_east_west_locations(location: int) -> List[int]:
+def get_east_west_locations(location: int) -> List[int]:
     east = _get_east_location(location)
     west = _get_west_location(location)
     return [maybe_loc for maybe_loc in [east, west] if maybe_loc is not None]
 
 
-def _get_north_south_locations(location: int) -> List[int]:
+def get_north_south_locations(location: int) -> List[int]:
     north = _get_north_location(location)
     south = _get_south_location(location)
     return [maybe_loc for maybe_loc in [north, south] if maybe_loc is not None]
 
 
 def _get_adjacent_locations(location: int) -> List[int]:
-    return _get_east_west_locations(location) + _get_north_south_locations(location)
+    return get_east_west_locations(location) + get_north_south_locations(location)

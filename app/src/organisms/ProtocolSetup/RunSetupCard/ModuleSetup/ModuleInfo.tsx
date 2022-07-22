@@ -67,7 +67,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
         {!runHasStarted ? (
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <Icon
-              name={isAttached ? 'check-circle' : 'alert-circle'}
+              name={isAttached ? 'ot-check' : 'alert-circle'}
               color={isAttached ? COLORS.success : COLORS.warning}
               key="icon"
               size="10px"

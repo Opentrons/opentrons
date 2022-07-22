@@ -1042,6 +1042,47 @@ def test_heater_shaker_raise_if_shaking(
         subject.raise_if_shaking()
 
 
+def test_get_heater_shaker_movement_data(
+    heater_shaker_v1_def: ModuleDefinition,
+    tempdeck_v2_def: ModuleDefinition,
+) -> None:
+    """It should get heater-shaker movement data."""
+    module_view = make_module_view(
+        slot_by_module_id={
+            "module-id": DeckSlotName.SLOT_1,
+            "other-module-id": DeckSlotName.SLOT_5,
+        },
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=heater_shaker_v1_def,
+            ),
+            "other-module-id": HardwareModule(
+                serial_number="other-serial-number",
+                definition=tempdeck_v2_def,
+            ),
+        },
+        substate_by_module_id={
+            "module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("module-id"),
+                is_labware_latch_closed=True,
+                is_plate_shaking=False,
+                plate_target_temperature=None,
+            ),
+            "other-module-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("other-module-id"),
+                plate_target_temperature=None,
+            ),
+        },
+    )
+    subject = module_view.get_heater_shaker_movement_restrictors()
+    assert len(subject) == 1
+    for hs_movement_data in subject:
+        assert not hs_movement_data.plate_shaking
+        assert hs_movement_data.latch_closed
+        assert hs_movement_data.deck_slot == 1
+
+
 def test_tempdeck_get_plate_target_temperature(
     tempdeck_v2_def: ModuleDefinition,
 ) -> None:
@@ -1245,3 +1286,33 @@ def test_thermocycler_validate_target_lid_temperature_raises(
 
     with pytest.raises(errors.InvalidTargetTemperatureError):
         subject.validate_target_lid_temperature(input_temperature)
+
+
+@pytest.mark.parametrize(
+    ("module_definition", "expected_height"),
+    [
+        (lazy_fixture("thermocycler_v1_def"), 98.0),
+        (lazy_fixture("tempdeck_v1_def"), 84.0),
+        (lazy_fixture("tempdeck_v2_def"), 84.0),
+        (lazy_fixture("magdeck_v1_def"), 110.152),
+        (lazy_fixture("magdeck_v2_def"), 110.152),
+        (lazy_fixture("heater_shaker_v1_def"), 82.0),
+    ],
+)
+def test_get_overall_height(
+    module_definition: ModuleDefinition,
+    expected_height: float,
+) -> None:
+    """It should get a module's overall height."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_7},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=module_definition,
+            )
+        },
+    )
+
+    result = subject.get_overall_height("module-id")
+    assert result == expected_height

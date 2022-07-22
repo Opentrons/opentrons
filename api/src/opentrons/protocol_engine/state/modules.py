@@ -31,6 +31,7 @@ from ..types import (
     DeckSlotLocation,
     ModuleDimensions,
     LabwareOffsetVector,
+    HeaterShakerMovementRestrictors,
 )
 from .. import errors
 from ..commands import (
@@ -520,8 +521,6 @@ class ModuleView(HasState[ModuleState]):
             z=definition.labwareOffset.z,
         )
 
-    # TODO(mc, 2022-01-19): this method is missing unit test coverage and
-    # is also unused. Remove or add tests.
     def get_overall_height(self, module_id: str) -> float:
         """Get the height of the module."""
         return self.get_dimensions(module_id).bareOverallHeight
@@ -717,3 +716,22 @@ class ModuleView(HasState[ModuleState]):
                     return m
 
         raise errors.ModuleNotAttachedError(f"No available {model.value} found.")
+
+    def get_heater_shaker_movement_restrictors(
+        self,
+    ) -> List[HeaterShakerMovementRestrictors]:
+        """Get shaking status, latch status, and location for every heater-shaker on deck."""
+        hs_substates = [
+            self.get_heater_shaker_module_substate(module_id=module.id)
+            for module in self.get_all()
+            if module.model == ModuleModel.HEATER_SHAKER_MODULE_V1
+        ]
+        hs_restrictors = [
+            HeaterShakerMovementRestrictors(
+                plate_shaking=substate.is_plate_shaking,
+                latch_closed=substate.is_labware_latch_closed,
+                deck_slot=int(self.get_location(substate.module_id).slotName),
+            )
+            for substate in hs_substates
+        ]
+        return hs_restrictors

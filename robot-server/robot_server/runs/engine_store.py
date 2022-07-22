@@ -75,7 +75,10 @@ class EngineStore:
         Raises:
             EngineConflictError: if a run-specific engine is active.
         """
-        if self._runner_engine_pair is not None:
+        if (
+            self._runner_engine_pair is not None
+            and not self.engine.state_view.commands.get_is_stopped()
+        ):
             raise EngineConflictError("An engine for a run is currently active")
 
         engine = self._default_engine
