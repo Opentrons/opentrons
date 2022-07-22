@@ -37,13 +37,22 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
 
     def _respond_to_frontend_file_request(self) -> None:
         if not self.path_elements:
-            _path = "index.html"
+            _file_name = "index.html"
         else:
-            _path = self.path_elements[-1]
-        file_path = Path(__file__).parent / _path
-        with open(file_path, "r") as f:
-            file = f.read()
-        self._send_response_bytes(file.encode("utf-8"), content_type="text/html")
+            _file_name = self.path_elements[-1]
+        file_path = Path(__file__).parent / _file_name
+        print(file_path)
+        with open(file_path, "rb") as f:
+            file = f.read(-1)
+        if '.html' in _file_name:
+            c_type = 'text/html'
+        elif '.js' in _file_name:
+            c_type = 'text/javascript'
+        elif '.png' in _file_name:
+            c_type = 'image/png'
+        else:
+            raise ValueError(f'Unexpected file type for file \"{_file_name}\"')
+        self._send_response_bytes(file, content_type=c_type)
 
     def _list_files_in_directory(self, includes: str = '') -> List[Path]:
         _file_list = [

@@ -1,4 +1,4 @@
-function getEmptyPlotlyData() {
+function getEmptyGravData() {
     return [
         {
             x: [],  // relative-time
@@ -21,16 +21,38 @@ function getEmptyPlotlyData() {
     ];
 }
 
-function parsePipetteCSV(CSVData) {
+function getEmptyPipetteData() {
+    return [
+        {
+            x: [],  // relative-time
+            y: [],  // event-timestamp
+            type: 'scatter',
+            name: 'Pipette Event',
+            marker: {
+                color: '#006fff'
+            }
+        }
+    ];
+}
+
+function getEmptyPlotlyData() {
+    var emptyGravData = getEmptyGravData()
+    var emptyPipetteData = getEmptyPipetteData()
+    return [
+        emptyGravData[0],
+        emptyGravData[1],
+        emptyPipetteData[0]
+    ]
+}
+
+function parsePipetteCSV(CSVData, retData) {
     // TODO: figure out how to parse this
-    var retData = getEmptyPlotlyData();
     if (!CSVData.length) {
         return retData;
     }
 }
 
-function parseGravimetricCSV(CSVData) {
-    var retData = getEmptyPlotlyData();
+function parseGravimetricCSV(CSVData, retData) {
     if (!CSVData.length) {
         return retData;
     }
@@ -105,7 +127,7 @@ window.addEventListener('load', function (evt) {
         var responseData = JSON.parse(this.responseText);
         name_input_div.value = responseData.name;
         _clearInterval();
-        _interval = setInterval(_getLatestDataFromServer, _updateIntervalMillis);
+        //_interval = setInterval(_getLatestDataFromServer, _updateIntervalMillis);
         _getLatestDataFromServer();
     }
 
@@ -113,7 +135,9 @@ window.addEventListener('load', function (evt) {
         var oReq = new XMLHttpRequest();
         oReq.addEventListener('load', function () {
             var responseData = JSON.parse(this.responseText);
-            var newData = parseGravimetricCSV(responseData.latest.csv);
+            var newData = getEmptyPlotlyData();
+            newData = parseGravimetricCSV(responseData.latest.csv, newData);
+            newData = parsePipetteCSV(responseData.latest.csvPipette, newData);
             var newDataPipette = parsePipetteCSV(responseData.latest.csvPipette);
             // TODO: figure out how to plot this...
             layout.title = responseData.latest.name
