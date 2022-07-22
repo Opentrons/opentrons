@@ -376,7 +376,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   const jumpToCurrentStepButton = (
     <PrimaryButton
       position={POSITION_FIXED}
-      bottom="2.5rem" // 40px
+      bottom={SPACING.spacingXXL}
       left={`calc(calc(100% + ${NAV_BAR_WIDTH})/2)`} // add width of half of nav bar to center within run tab
       transform="translate(-50%)"
       borderRadius={SPACING.spacing6}
