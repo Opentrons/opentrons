@@ -15,7 +15,7 @@ from hardware_testing.data import (
 
 from .scale import Scale
 
-SLEEP_TIME_IN_RECORD_LOOP = 0.1
+SLEEP_TIME_IN_RECORD_LOOP = 0.01
 
 
 @dataclass
@@ -234,7 +234,7 @@ def _record_get_interval_overlap(samples: GravimetricRecording, period: float) -
     return real_time - ideal_time
 
 
-class GravimetricRecorder(Thread):
+class GravimetricRecorder:
     """Gravimetric Recorder."""
 
     def __init__(self, ctx: ProtocolContext, cfg: GravimetricRecorderConfig) -> None:
@@ -245,6 +245,7 @@ class GravimetricRecorder(Thread):
         self._recording = GravimetricRecording()
         self._is_recording = Event()
         self._reading_samples = Event()
+        self._thread: Optional[Thread] = None
         super().__init__()
 
     @property
@@ -290,9 +291,12 @@ class GravimetricRecorder(Thread):
     def record(self, in_thread: bool = False) -> None:
         """Record."""
         if in_thread:
+            if self._thread is not None:
+                assert not self._thread.is_alive()
             if self._is_recording.is_set():
                 self._is_recording.clear()
-            self.start()  # creates the thread
+            self._thread = Thread(target=self.run)
+            self._thread.start()  # creates the thread
         else:
             if not self._is_recording.is_set():
                 self._is_recording.set()
@@ -307,12 +311,12 @@ class GravimetricRecorder(Thread):
         self._is_recording.clear()
 
     def wait_for_start(self) -> None:
-        if self.is_alive():
+        if self._thread.is_alive():
             self._reading_samples.wait()
 
     def wait_for_finish(self) -> None:
-        if self.is_alive():
-            self.join()
+        if self._thread.is_alive():
+            self._thread.join()
 
     @property
     def recording(self):
@@ -342,7 +346,7 @@ class GravimetricRecorder(Thread):
             on_new_sample: Optional[Callable] = None,
     ) -> GravimetricRecording:
         """Record samples from the scale."""
-        assert self._cfg.duration or self.is_alive()
+        assert self._cfg.duration or self._thread.is_alive()
         assert self._cfg.frequency
         if self._cfg.duration:
             length = int(self._cfg.duration * self._cfg.frequency) + 1

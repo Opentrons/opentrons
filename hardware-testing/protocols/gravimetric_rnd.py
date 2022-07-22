@@ -12,12 +12,14 @@ metadata = {"protocolName": "gravimetric-rnd", "apiLevel": "2.12"}
 
 def _run(protocol: ProtocolContext) -> None:
     run_id = create_run_id()
-    recorder = GravimetricRecorder(protocol, GravimetricRecorderConfig(
+
+    _rec = GravimetricRecorder(protocol, GravimetricRecorderConfig(
         test_name=metadata["protocolName"], run_id=run_id, start_time=time(),
-        duration=0, frequency=10, stable=False))
-    recorder.activate()
+        duration=1, frequency=10, stable=False))
+    _rec.activate()
+
     if "y" in input("Calibrate the scale? (y/n): ").lower():
-        recorder.calibrate_scale()
+        _rec.calibrate_scale()
     while True:
         recording_name = input("Name of recording: ")
         try:
@@ -27,15 +29,15 @@ def _run(protocol: ProtocolContext) -> None:
             recording_duration = 0  # run until stopped
             in_thread = True
         input("\tPress ENTER when ready...")
-        recorder.set_tag(recording_name)
-        recorder.set_duration(recording_duration)
-        recorder.record(in_thread=in_thread)
+        _rec.set_tag(recording_name)
+        _rec.set_duration(recording_duration)
+        _rec.record(in_thread=in_thread)
         if in_thread:
             print('\tRunning in separate thread')
-            recorder.record_start()
+            _rec.record_start()
             input("\tPress ENTER to stop")
-            recorder.record_stop()
-            recorder.wait_for_finish()
+            _rec.record_stop()
+            _rec.wait_for_finish()
         print("\tdone")
 
 
