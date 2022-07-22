@@ -8,24 +8,28 @@ from opentrons.hardware_control.thread_manager import ThreadManagerException
 
 
 def get_api_context(
-    api_level: str, is_simulating: bool = False
+    api_level: str, is_simulating: bool = False, connect_to_smoothie: bool = True
 ) -> protocol_api.ProtocolContext:
     """Create an Opentrons API ProtocolContext instance."""
-    if is_simulating:
-        ctx = simulate.get_protocol_api(api_level)
-    else:
+    able_to_execute = False
+    ctx = None
+    if not is_simulating and connect_to_smoothie:
         try:
             ctx = execute.get_protocol_api(api_level)
+            able_to_execute = True
         except ThreadManagerException:
             # Unable to build non-simulated Protocol Context
             # Probably be running on a non-Linux machine
             # Creating simulated Protocol Context, with .is_simulated() overridden
-            ctx = simulate.get_protocol_api(api_level)
+            pass
+    if not able_to_execute or is_simulating or not connect_to_smoothie:
+        ctx = simulate.get_protocol_api(api_level)
 
-            def _fake_context_is_simulating(_: Any) -> bool:
-                return False
+    if not able_to_execute or not connect_to_smoothie:
+        def _fake_context_is_simulating(_: Any) -> bool:
+            return is_simulating
 
-            setattr(ctx, "is_simulating", MethodType(_fake_context_is_simulating, ctx))
+        setattr(ctx, "is_simulating", MethodType(_fake_context_is_simulating, ctx))
     return ctx
 
 

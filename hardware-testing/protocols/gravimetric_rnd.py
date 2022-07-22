@@ -44,6 +44,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(metadata["protocolName"])
     parser.add_argument("--simulate", action="store_true")
     args = parser.parse_args()
-    ctx = get_api_context(api_level=metadata["apiLevel"], is_simulating=args.simulate)
-    ctx.home()
+    ctx = get_api_context(
+        api_level=metadata["apiLevel"], is_simulating=args.simulate,
+        connect_to_smoothie=False)
     _run(ctx)

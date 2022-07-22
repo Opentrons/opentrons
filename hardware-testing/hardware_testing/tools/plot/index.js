@@ -141,7 +141,7 @@ window.addEventListener('load', function (evt) {
         var responseData = JSON.parse(this.responseText);
         name_input_div.value = responseData.name;
         _clearInterval();
-        //_interval = setInterval(_getLatestDataFromServer, _updateIntervalMillis);
+        _interval = setInterval(_getLatestDataFromServer, _updateIntervalMillis);
         _getLatestDataFromServer();
     }
 
