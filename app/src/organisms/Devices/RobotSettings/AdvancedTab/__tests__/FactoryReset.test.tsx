@@ -9,17 +9,13 @@ import { i18n } from '../../../../../i18n'
 import { FactoryReset } from '../FactoryReset'
 
 const mockUpdateIsEXpanded = jest.fn()
-let mockIsRobotBusy = false
 
 jest.mock('../../../../ProtocolUpload/hooks')
 
-const render = () => {
+const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
-      <FactoryReset
-        updateIsExpanded={mockUpdateIsEXpanded}
-        isRobotBusy={mockIsRobotBusy}
-      />
+      <FactoryReset updateIsExpanded={mockUpdateIsEXpanded} isRobotBusy />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
@@ -51,8 +47,7 @@ describe('RobotSettings FactoryReset', () => {
   })
 
   it('should call update robot status if a robot is busy', () => {
-    mockIsRobotBusy = true
-    const [{ getByRole }] = render()
+    const [{ getByRole }] = render(true)
     const button = getByRole('button', {
       name: 'Choose reset settings',
     })

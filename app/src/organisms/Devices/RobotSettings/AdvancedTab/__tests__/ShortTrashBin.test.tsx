@@ -15,8 +15,6 @@ const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
 >
 
-let mockIsRobotBusy = false
-
 const mockSettings = {
   id: 'shortFixedTrash',
   title: 'Short (55mm) fixed trash',
@@ -25,14 +23,10 @@ const mockSettings = {
   restart_required: false,
 }
 
-const render = () => {
+const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
-      <ShortTrashBin
-        settings={mockSettings}
-        robotName="otie"
-        isRobotBusy={mockIsRobotBusy}
-      />
+      <ShortTrashBin settings={mockSettings} robotName="otie" isRobotBusy />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
@@ -72,8 +66,7 @@ describe('RobotSettings ShortTrashBin', () => {
   })
 
   it('should call update robot status if a robot is busy', () => {
-    mockIsRobotBusy = true
-    const [{ getByRole }] = render()
+    const [{ getByRole }] = render(true)
     const toggleButton = getByRole('switch', {
       name: 'short_trash_bin',
     })

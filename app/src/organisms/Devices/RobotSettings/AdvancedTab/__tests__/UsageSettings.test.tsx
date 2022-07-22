@@ -15,8 +15,6 @@ const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
 >
 
-let mockIsRobotBusy = false
-
 const mockSettings = {
   id: 'enableDoorSafetySwitch',
   title: 'Enable robot door safety switch',
@@ -26,14 +24,10 @@ const mockSettings = {
   restart_required: false,
 }
 
-const render = () => {
+const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
-      <UsageSettings
-        settings={mockSettings}
-        robotName="otie"
-        isRobotBusy={mockIsRobotBusy}
-      />
+      <UsageSettings settings={mockSettings} robotName="otie" isRobotBusy />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
@@ -76,8 +70,7 @@ describe('RobotSettings DisableHoming', () => {
   })
 
   it('should call update robot status if a robot is busy', () => {
-    mockIsRobotBusy = true
-    const [{ getByRole }] = render()
+    const [{ getByRole }] = render(true)
     const toggleButton = getByRole('switch', {
       name: 'usage_settings_pause_protocol',
     })

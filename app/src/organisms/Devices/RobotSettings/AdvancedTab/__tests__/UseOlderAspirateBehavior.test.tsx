@@ -15,8 +15,6 @@ const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
 >
 
-let mockIsRobotBusy = false
-
 const mockSettings = {
   id: 'useOldAspirationFunctions',
   title: 'Use older aspirate behavior',
@@ -26,13 +24,13 @@ const mockSettings = {
   restart_required: false,
 }
 
-const render = () => {
+const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
       <UseOlderAspirateBehavior
         settings={mockSettings}
         robotName="otie"
-        isRobotBusy={mockIsRobotBusy}
+        isRobotBusy
       />
     </MemoryRouter>,
     { i18nInstance: i18n }
@@ -75,8 +73,7 @@ describe('RobotSettings UseOlderAspirateBehavior', () => {
   })
 
   it('should call update robot status if a robot is busy', () => {
-    mockIsRobotBusy = true
-    const [{ getByRole }] = render()
+    const [{ getByRole }] = render(true)
     const toggleButton = getByRole('switch', {
       name: 'use_older_aspirate_behavior',
     })

@@ -9,14 +9,13 @@ import { i18n } from '../../../../../i18n'
 import { DisplayRobotName } from '../DisplayRobotName'
 
 const mockUpdateIsEXpanded = jest.fn()
-let mockIsRobotBusy = false
-const render = () => {
+const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
       <DisplayRobotName
         robotName="otie"
         updateIsExpanded={mockUpdateIsEXpanded}
-        isRobotBusy={mockIsRobotBusy}
+        isRobotBusy={isRobotBusy}
       />
     </MemoryRouter>,
     { i18nInstance: i18n }
@@ -44,8 +43,7 @@ describe('RobotSettings DisplayRobotName', () => {
   })
 
   it('should call update robot status if a robot is busy', () => {
-    mockIsRobotBusy = true
-    const [{ getByRole }] = render()
+    const [{ getByRole }] = render(true)
     const button = getByRole('button', { name: 'Rename robot' })
     expect(button).toBeDisabled()
   })

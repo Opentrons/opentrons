@@ -14,7 +14,6 @@ jest.mock('../../../../../redux/robot-settings/selectors')
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
 >
-let mockIsRobotBusy = false
 
 const mockSettings = {
   id: 'deckCalibrationDots',
@@ -25,14 +24,10 @@ const mockSettings = {
   restart_required: false,
 }
 
-const render = () => {
+const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
-      <LegacySettings
-        settings={mockSettings}
-        robotName="otie"
-        isRobotBusy={mockIsRobotBusy}
-      />
+      <LegacySettings settings={mockSettings} robotName="otie" isRobotBusy />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
@@ -73,8 +68,7 @@ describe('RobotSettings LegacySettings', () => {
   })
 
   it('should call update robot status if a robot is busy', () => {
-    mockIsRobotBusy = true
-    const [{ getByRole }] = render()
+    const [{ getByRole }] = render(true)
     const toggleButton = getByRole('switch', {
       name: 'legacy_settings',
     })

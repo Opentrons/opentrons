@@ -15,8 +15,6 @@ const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
 >
 
-let mockIsRobotBusy = false
-
 const mockSettings = {
   id: 'disableFastProtocolUpload',
   title: 'Use older protocol analysis method',
@@ -26,14 +24,10 @@ const mockSettings = {
   restart_required: false,
 }
 
-const render = () => {
+const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
-      <UseOlderProtocol
-        settings={mockSettings}
-        robotName="otie"
-        isRobotBusy={mockIsRobotBusy}
-      />
+      <UseOlderProtocol settings={mockSettings} robotName="otie" isRobotBusy />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
@@ -76,8 +70,7 @@ describe('RobotSettings ShortTrashBin', () => {
   })
 
   it('should call update robot status if a robot is busy', () => {
-    mockIsRobotBusy = true
-    const [{ getByRole }] = render()
+    const [{ getByRole }] = render(true)
     const toggleButton = getByRole('switch', {
       name: 'use_older_protocol_analysis_method',
     })
