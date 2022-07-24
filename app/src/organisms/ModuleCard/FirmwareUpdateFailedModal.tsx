@@ -5,7 +5,6 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_FLEX_END,
-  Text,
   SPACING,
   DIRECTION_COLUMN,
   Icon,
@@ -49,12 +48,12 @@ export const FirmwareUpdateFailedModal = (
         flexDirection={DIRECTION_COLUMN}
         data-testid={`FirmwareUpdateFailedModal_body_text_${module.serialNumber}`}
       >
-        <Text paddingBottom={SPACING.spacing2}>
+        <StyledText paddingBottom={SPACING.spacing2}>
           {t('an_error_occurred_while_updating_module', {
             moduleName: getModuleDisplayName(module.moduleModel),
           })}
-        </Text>
-        <Text>{errorMessage}</Text>
+        </StyledText>
+        <StyledText>{errorMessage}</StyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}

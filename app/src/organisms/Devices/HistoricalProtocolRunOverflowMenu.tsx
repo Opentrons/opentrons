@@ -157,7 +157,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}
-      top={'2.3rem'}
+      top="2.3rem"
       right={0}
       flexDirection={DIRECTION_COLUMN}
     >

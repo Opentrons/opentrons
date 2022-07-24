@@ -70,7 +70,8 @@ function startUp(): void {
   contextMenu({
     menu: actions => [
       actions.copy({}),
-      actions.lookUpSelection({}),
+      actions.searchWithGoogle({}),
+      // actions.lookUpSelection({}),
       actions.inspect(),
     ],
   })

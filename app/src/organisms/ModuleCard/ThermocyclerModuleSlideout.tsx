@@ -12,17 +12,16 @@ import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
-import { Slideout } from '../../atoms/Slideout'
-import { InputField } from '../../atoms/InputField'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  FONT_WEIGHT_REGULAR,
   SPACING,
-  Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { Slideout } from '../../atoms/Slideout'
+import { InputField } from '../../atoms/InputField'
+import { StyledText } from '../../atoms/text'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 import { useRunStatuses } from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
@@ -154,8 +153,8 @@ export const ThermocyclerModuleSlideout = (
         />
       }
     >
-      <Text
-        fontWeight={FONT_WEIGHT_REGULAR}
+      <StyledText
+        fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing2}
         data-testid={`ThermocyclerSlideout_text_${module.serialNumber}`}
@@ -165,20 +164,20 @@ export const ThermocyclerModuleSlideout = (
           min: tempRanges.min,
           max: tempRanges.max,
         })}
-      </Text>
+      </StyledText>
       <Flex
         marginTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`ThermocyclerSlideout_input_field_${module.serialNumber}`}
       >
-        <Text
+        <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.darkGrey}
           paddingBottom={SPACING.spacing3}
         >
           {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}
-        </Text>
+        </StyledText>
         <form id="ThermocyclerModuleSlideout_submitValue">
           <InputField
             data-testid={`${module.moduleModel}_${isSecondaryTemp}`}

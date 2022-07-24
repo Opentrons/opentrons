@@ -14,7 +14,6 @@ import {
   Icon,
   SIZE_AUTO,
   SPACING,
-  Text,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -131,7 +130,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           fontSize={TYPOGRAPHY.fontSizeP}
           paddingBottom={SPACING.spacing4}
         >
-          <Text fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
             <Trans
               t={t}
               i18nKey={
@@ -145,14 +144,14 @@ export function TestShake(props: TestShakeProps): JSX.Element {
               components={{
                 bold: <strong />,
                 block: (
-                  <Text
+                  <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
                     marginBottom={SPACING.spacing5}
                   />
                 ),
               }}
             />
-          </Text>
+          </StyledText>
         </Flex>
       </Flex>
       <Flex

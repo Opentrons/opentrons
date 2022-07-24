@@ -20,7 +20,7 @@ export const ProtocolLiquidsDetails = (): JSX.Element => {
     <Flex
       css={HIDE_SCROLLBAR}
       flexDirection={DIRECTION_COLUMN}
-      maxHeight={'25rem'}
+      maxHeight="25rem"
       overflowY={'auto'}
       data-testid={'LiquidsDetailsTab'}
     >

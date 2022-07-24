@@ -5,13 +5,10 @@ import last from 'lodash/last'
 import {
   Box,
   Flex,
-  Text,
   DIRECTION_ROW,
   ALIGN_START,
   DIRECTION_COLUMN,
   SPACING,
-  FONT_WEIGHT_REGULAR,
-  FONT_SIZE_CAPTION,
   TYPOGRAPHY,
   useOnClickOutside,
   Btn,
@@ -45,6 +42,7 @@ import { Banner } from '../../atoms/Banner'
 import { Toast } from '../../atoms/Toast'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
+import { StyledText } from '../../atoms/Text'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
@@ -330,7 +328,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     i18nKey="hot_to_the_touch"
                     components={{
                       bold: <strong />,
-                      block: <Text fontSize={TYPOGRAPHY.fontSizeP} />,
+                      block: <StyledText fontSize={TYPOGRAPHY.fontSizeP} />,
                     }}
                   />
                 </Banner>
@@ -348,17 +346,17 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   spin
                   aria-label="ot-spinner"
                 />
-                <Text marginLeft={SPACING.spacing3}>
+                <StyledText marginLeft={SPACING.spacing3}>
                   {t('updating_firmware')}
-                </Text>
+                </StyledText>
               </Flex>
             ) : (
               <>
-                <Text
+                <StyledText
                   textTransform={TYPOGRAPHY.textTransformUppercase}
                   color={COLORS.darkGrey}
-                  fontWeight={FONT_WEIGHT_REGULAR}
-                  fontSize={FONT_SIZE_CAPTION}
+                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                  fontSize={TYPOGRAPHY.fontSizeCaption}
                   paddingBottom={SPACING.spacing2}
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
@@ -369,7 +367,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
                     port: module.usbPort.hub ?? module.usbPort.port,
                   })}
-                </Text>
+                </StyledText>
                 <Flex
                   paddingBottom={SPACING.spacing2}
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}
@@ -381,7 +379,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     marginRight={SPACING.spacing1}
                     color={COLORS.darkGreyEnabled}
                   />
-                  <Text>{getModuleDisplayName(module.moduleModel)}</Text>
+                  <StyledText>
+                    {getModuleDisplayName(module.moduleModel)}
+                  </StyledText>
                 </Flex>
               </>
             )}

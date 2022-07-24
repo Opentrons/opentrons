@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Card,
-  Text,
   Flex,
   Icon,
   SPACING_2,
@@ -30,6 +29,7 @@ import {
 } from '@opentrons/components'
 import { protocolHasModules } from '@opentrons/shared-data'
 import { Divider } from '../../../atoms/structure'
+import { StyledText } from '../../../atoms/text'
 import { getConnectedRobot } from '../../../redux/discovery/selectors'
 import { useProtocolCalibrationStatus } from '../RunSetupCard/hooks/useProtocolCalibrationStatus'
 import { useProtocolDetails } from '../../RunDetails/hooks'
@@ -139,14 +139,14 @@ export function RunSetupCard(): JSX.Element | null {
       paddingY={SPACING_3}
       backgroundColor={C_WHITE}
     >
-      <Text
+      <StyledText
         as="h2"
         paddingX={SPACING_3}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         id={'RunSetupCard_setupForRun'}
       >
         {t('setup_for_run')}
-      </Text>
+      </StyledText>
       {protocolData == null ? (
         <RunSetupLoader />
       ) : (
@@ -186,14 +186,14 @@ export function RunSetupCard(): JSX.Element | null {
                         }
                         id={'RunSetupCard_calibrationIcon'}
                       />
-                      <Text
+                      <StyledText
                         fontSize={FONT_SIZE_BODY_1}
                         id={'RunSetupCard_calibrationText'}
                       >
                         {calibrationStatus.complete
                           ? t('calibration_ready')
                           : t('calibration_needed')}
-                      </Text>
+                      </StyledText>
                     </Flex>
                   ) : null
                 }
@@ -227,16 +227,16 @@ function RunSetupLoader(): JSX.Element | null {
           color={C_LIGHT_GRAY}
           spin
         />
-        <Text
+        <StyledText
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          as={'h3'}
+          as="h3"
           color={C_DARK_GRAY}
           marginBottom={SPACING_5}
           fontWeight={FONT_WEIGHT_REGULAR}
           fontSize={FONT_SIZE_BODY_2}
         >
           {t('loading_protocol_details')}
-        </Text>
+        </StyledText>
       </Flex>
     </>
   )
