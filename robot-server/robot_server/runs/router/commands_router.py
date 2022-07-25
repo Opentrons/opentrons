@@ -198,6 +198,8 @@ async def create_run_command(
 
     except pe_errors.SetupCommandNotAllowedError as e:
         raise CommandNotAllowed(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
+    except pe_errors.RunStoppedError as e:
+        raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
     if waitUntilComplete:
         with move_on_after(timeout / 1000.0):

@@ -39,7 +39,8 @@ def _translate_labware_command(
                 LabwareLocation,  # type: ignore[arg-type]
                 command.params.location,
             ),
-        )
+        ),
+        key=command.key,
     )
     return labware_command
 
@@ -58,7 +59,8 @@ def _translate_module_command(
             model=ModuleModel(modules[module_id].model),
             location=DeckSlotLocation.parse_obj(command.params.location),
             moduleId=command.params.moduleId,
-        )
+        ),
+        key=command.key,
     )
     return translated_obj
 
@@ -75,7 +77,8 @@ def _translate_pipette_command(
             pipetteName=PipetteName(protocol.pipettes[pipette_id].name),
             mount=MountType(command.params.mount),
             pipetteId=command.params.pipetteId,
-        )
+        ),
+        key=command.key,
     )
     return translated_obj
 
@@ -115,7 +118,6 @@ class JsonCommandTranslator:
         exclude_commands = [
             "loadLiquid",
             "moveToSlot",
-            "moveToCoordinates",
         ]
         commands_to_parse = [
             command

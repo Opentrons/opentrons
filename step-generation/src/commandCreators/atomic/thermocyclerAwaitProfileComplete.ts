@@ -1,3 +1,4 @@
+import { uuid } from '../../utils'
 import type { ModuleOnlyParams } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { CommandCreator } from '../../types'
 export const thermocyclerAwaitProfileComplete: CommandCreator<ModuleOnlyParams> = (
@@ -9,6 +10,7 @@ export const thermocyclerAwaitProfileComplete: CommandCreator<ModuleOnlyParams> 
     commands: [
       {
         commandType: 'thermocycler/awaitProfileComplete',
+        key: uuid(),
         params: {
           moduleId: args.module,
         },

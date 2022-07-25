@@ -8,7 +8,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
-  TEXT_TRANSFORM_UPPERCASE,
   SIZE_1,
   BORDERS,
   COLORS,
@@ -69,7 +68,7 @@ export function SetupCalibrationItem({
               size={SIZE_1}
               color={calibratedDate != null ? COLORS.success : COLORS.warning}
               marginRight={SPACING.spacing4}
-              name={calibratedDate != null ? 'check-circle' : 'alert-circle'}
+              name={calibratedDate != null ? 'ot-check' : 'alert-circle'}
             />
           ) : null}
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
@@ -77,7 +76,7 @@ export function SetupCalibrationItem({
               <StyledText
                 color={COLORS.darkGreyEnabled}
                 css={TYPOGRAPHY.h6SemiBold}
-                textTransform={TEXT_TRANSFORM_UPPERCASE}
+                textTransform={TYPOGRAPHY.textTransformUppercase}
                 id={id}
               >
                 {label}

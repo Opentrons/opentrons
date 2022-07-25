@@ -64,6 +64,15 @@ from .close_lid import (
     CloseLidCreate,
 )
 
+from .run_profile import (
+    RunProfileCommandType,
+    RunProfileParams,
+    RunProfileStepParams,
+    RunProfileResult,
+    RunProfile,
+    RunProfileCreate,
+)
+
 
 __all__ = [
     # Set target block temperature command models
@@ -114,4 +123,11 @@ __all__ = [
     "CloseLidResult",
     "CloseLid",
     "CloseLidCreate",
+    # Run profile command models,
+    "RunProfileCommandType",
+    "RunProfileParams",
+    "RunProfileStepParams",
+    "RunProfileResult",
+    "RunProfile",
+    "RunProfileCreate",
 ]

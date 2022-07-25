@@ -15,6 +15,7 @@ from typing import (
     Sequence,
     Set,
     Any,
+    TypeVar,
 )
 
 from opentrons_shared_data.pipette import name_config
@@ -121,7 +122,7 @@ class API(
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock()
         self._door_state = DoorState.CLOSED
-        self._pause_manager = PauseManager(self._door_state)
+        self._pause_manager = PauseManager()
         ExecutionManagerProvider.__init__(self, isinstance(backend, Simulator))
         RobotCalibrationProvider.__init__(self)
         PipetteHandlerProvider.__init__(
@@ -139,11 +140,8 @@ class API(
     def _update_door_state(self, door_state: DoorState) -> None:
         mod_log.info(f"Updating the window switch status: {door_state}")
         self.door_state = door_state
-        self._pause_manager.set_door(self.door_state)
         for cb in self._callbacks:
-            hw_event = DoorStateNotification(
-                new_state=door_state, blocking=self._pause_manager.blocked_by_door
-            )
+            hw_event = DoorStateNotification(new_state=door_state)
             try:
                 cb(hw_event)
             except Exception:
@@ -562,10 +560,9 @@ class API(
             if smoothie_gantry:
                 smoothie_pos.update(await self._backend.home(smoothie_gantry))
                 self._current_position = deck_from_machine(
-                    smoothie_pos,
+                    self._axis_map_from_string_map(smoothie_pos),
                     self._robot_calibration.deck_calibration.attitude,
                     top_types.Point(0, 0, 0),
-                    Axis,
                 )
             for plunger in plungers:
                 await self._do_plunger_home(axis=plunger, acquire_lock=False)
@@ -598,11 +595,11 @@ class API(
             raise MustHomeError("Current position is unknown; please home motors.")
         async with self._motion_lock:
             if refresh:
+                smoothie_pos = await self._backend.update_position()
                 self._current_position = deck_from_machine(
-                    await self._backend.update_position(),
+                    self._axis_map_from_string_map(smoothie_pos),
                     self._robot_calibration.deck_calibration.attitude,
                     top_types.Point(0, 0, 0),
-                    Axis,
                 )
             if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
@@ -738,10 +735,12 @@ class API(
         at most one of a ZA or BC components. The frame in which to move
         is identified by the presence of (ZA) or (BC).
         """
-        machine_pos = machine_from_deck(
-            target_position,
-            self._robot_calibration.deck_calibration.attitude,
-            top_types.Point(0, 0, 0),
+        machine_pos = self._string_map_from_axis_map(
+            machine_from_deck(
+                target_position,
+                self._robot_calibration.deck_calibration.attitude,
+                top_types.Point(0, 0, 0),
+            )
         )
 
         bounds = self._backend.axis_bounds
@@ -797,10 +796,9 @@ class API(
         async with self._motion_lock:
             smoothie_pos = await self._fast_home(smoothie_ax, margin)
             self._current_position = deck_from_machine(
-                smoothie_pos,
+                self._axis_map_from_string_map(smoothie_pos),
                 self._robot_calibration.deck_calibration.attitude,
                 top_types.Point(0, 0, 0),
-                Axis,
             )
 
     # Gantry/frame (i.e. not pipette) config API
@@ -973,6 +971,7 @@ class API(
         tip_length: float,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
+        prep_after: bool = True,
     ) -> None:
         """
         Pick up tip from current location.
@@ -1009,6 +1008,8 @@ class API(
             await self.move_rel(mount, rel_point, speed=speed)
 
         await self.retract(mount, spec.retract_target)
+        if prep_after:
+            await self.prepare_for_aspirate(mount)
 
     async def drop_tip(self, mount: top_types.Mount, home_after: bool = True) -> None:
         """Drop tip at the current location."""
@@ -1031,10 +1032,9 @@ class API(
                     move.home_after_safety_margin,
                 )
                 self._current_position = deck_from_machine(
-                    smoothie_pos,
+                    self._axis_map_from_string_map(smoothie_pos),
                     self._robot_calibration.deck_calibration.attitude,
                     top_types.Point(0, 0, 0),
-                    Axis,
                 )
 
         for shake in spec.shake_moves:
@@ -1063,3 +1063,17 @@ class API(
     async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""
         await self._backend.clean_up()
+
+    MapPayload = TypeVar("MapPayload")
+
+    @staticmethod
+    def _axis_map_from_string_map(
+        input_map: Dict[str, "API.MapPayload"]
+    ) -> Dict[Axis, "API.MapPayload"]:
+        return {Axis[k]: v for k, v in input_map.items()}
+
+    @staticmethod
+    def _string_map_from_axis_map(
+        input_map: Dict[Axis, "API.MapPayload"]
+    ) -> Dict[str, "API.MapPayload"]:
+        return {k.name: v for k, v in input_map.items()}

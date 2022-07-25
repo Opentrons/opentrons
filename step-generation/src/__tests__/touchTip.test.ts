@@ -38,6 +38,7 @@ describe('touchTip', () => {
     expect(res.commands).toEqual([
       {
         commandType: 'touchTip',
+        key: expect.any(String),
         params: {
           pipetteId: DEFAULT_PIPETTE,
           labwareId: SOURCE_LABWARE,

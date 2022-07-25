@@ -48,6 +48,7 @@ describe('dropTip', () => {
       expect(res.commands).toEqual([
         {
           commandType: 'dropTip',
+          key: expect.any(String),
           params: {
             pipetteId: DEFAULT_PIPETTE,
             labwareId: FIXED_TRASH_ID,
@@ -88,6 +89,7 @@ describe('dropTip', () => {
       expect(res.commands).toEqual([
         {
           commandType: 'dropTip',
+          key: expect.any(String),
           params: {
             pipetteId: 'p300MultiId',
             labwareId: FIXED_TRASH_ID,

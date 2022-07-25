@@ -43,6 +43,7 @@ describe('engageMagnet', () => {
       commands: [
         {
           commandType: 'magneticModule/engage',
+          key: expect.any(String),
           params: {
             moduleId: module,
             height: engageHeight,

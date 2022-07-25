@@ -71,12 +71,14 @@ describe('heaterShaker compound command creator', () => {
     expect(getSuccessResult(result).commands).toEqual([
       {
         commandType: 'heaterShaker/closeLabwareLatch',
+        key: expect.any(String),
         params: {
           moduleId: 'heaterShakerId',
         },
       },
       {
         commandType: 'heaterShaker/setTargetTemperature',
+        key: expect.any(String),
         params: {
           celsius: 80,
           moduleId: 'heaterShakerId',
@@ -84,12 +86,14 @@ describe('heaterShaker compound command creator', () => {
       },
       {
         commandType: 'heaterShaker/waitForTemperature',
+        key: expect.any(String),
         params: {
           moduleId: 'heaterShakerId',
         },
       },
       {
         commandType: 'heaterShaker/setAndWaitForShakeSpeed',
+        key: expect.any(String),
         params: {
           moduleId: 'heaterShakerId',
           rpm: 444,
@@ -97,18 +101,21 @@ describe('heaterShaker compound command creator', () => {
       },
       {
         commandType: 'delay',
+        key: expect.any(String),
         params: {
           seconds: 30,
         },
       },
       {
         commandType: 'heaterShaker/deactivateShaker',
+        key: expect.any(String),
         params: {
           moduleId: 'heaterShakerId',
         },
       },
       {
         commandType: 'heaterShaker/deactivateHeater',
+        key: expect.any(String),
         params: {
           moduleId: 'heaterShakerId',
         },
@@ -128,12 +135,14 @@ describe('heaterShaker compound command creator', () => {
     expect(getSuccessResult(result).commands).toEqual([
       {
         commandType: 'heaterShaker/closeLabwareLatch',
+        key: expect.any(String),
         params: {
           moduleId: 'heaterShakerId',
         },
       },
       {
         commandType: 'heaterShaker/setTargetTemperature',
+        key: expect.any(String),
         params: {
           celsius: 80,
           moduleId: 'heaterShakerId',
@@ -141,12 +150,14 @@ describe('heaterShaker compound command creator', () => {
       },
       {
         commandType: 'heaterShaker/waitForTemperature',
+        key: expect.any(String),
         params: {
           moduleId: 'heaterShakerId',
         },
       },
       {
         commandType: 'heaterShaker/setAndWaitForShakeSpeed',
+        key: expect.any(String),
         params: {
           moduleId: 'heaterShakerId',
           rpm: 444,

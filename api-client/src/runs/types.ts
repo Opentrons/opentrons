@@ -30,6 +30,7 @@ export interface RunData {
   id: string
   createdAt: string
   completedAt?: string
+  startedAt?: string
   current: boolean
   status: RunStatus
   actions: RunAction[]

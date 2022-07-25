@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../../../i18n'
-import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 import { renderWithProviders } from '@opentrons/components'
+import { UnMatchedModuleWarning } from '../UnMatchedModuleWarning'
 
 const render = (props: React.ComponentProps<typeof UnMatchedModuleWarning>) => {
   return renderWithProviders(<UnMatchedModuleWarning {...props} />, {
@@ -16,12 +15,12 @@ describe('UnMatchedModuleWarning', () => {
     props = { isAnyModuleUnnecessary: true }
   })
 
-  it('should render the correct header', () => {
-    const { getByRole } = render(props)
-    getByRole('heading', {
-      name:
-        'This robot has connected modules that are not specified in this protocol',
-    })
+  it('should render the correct title', () => {
+    const { getByText, getByLabelText } = render(props)
+    getByText(
+      'This robot has connected modules that are not specified in this protocol'
+    )
+    getByLabelText('information_icon')
   })
   it('should render the correct body', () => {
     const { getByText } = render(props)
@@ -30,12 +29,9 @@ describe('UnMatchedModuleWarning', () => {
     )
   })
 
-  it('should close warning when button is clicked', () => {
-    const { queryByText, getByRole } = render(props)
-    const closeButton = getByRole('button', {
-      name: /close/i,
-    })
-    fireEvent.click(closeButton)
+  it('should not render text when boolean is false', () => {
+    props = { isAnyModuleUnnecessary: false }
+    const { queryByText } = render(props)
     expect(
       queryByText(
         'This robot has connected modules that are not specified in this protocol'

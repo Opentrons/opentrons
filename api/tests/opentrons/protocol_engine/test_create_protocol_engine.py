@@ -1,7 +1,4 @@
 """Smoke tests for the ProtocolEngine creation factory."""
-import pytest
-from decoy import Decoy
-
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.protocols.models import LabwareDefinition
@@ -10,7 +7,11 @@ from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocols.geometry.deck import FIXED_TRASH_ID
 
-from opentrons.protocol_engine import ProtocolEngine, create_protocol_engine
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    Config as EngineConfig,
+    create_protocol_engine,
+)
 from opentrons.protocol_engine.types import DeckSlotLocation, LoadedLabware
 
 
@@ -20,7 +21,10 @@ async def test_create_engine_initializes_state_with_deck_geometry(
     fixed_trash_def: LabwareDefinition,
 ) -> None:
     """It should load deck geometry data into the store on create."""
-    engine = await create_protocol_engine(hardware_api=hardware_api)
+    engine = await create_protocol_engine(
+        hardware_api=hardware_api,
+        config=EngineConfig(),
+    )
     state = engine.state_view
 
     assert isinstance(engine, ProtocolEngine)
@@ -40,14 +44,14 @@ async def test_create_engine_initializes_state_with_deck_geometry(
     ]
 
 
-@pytest.mark.xfail
-# TODO: Figure out how to mock feature flag value and finish is test
 async def test_create_engine_initializes_state_with_door_state(
-    decoy: Decoy,
     hardware_api: HardwareAPI,
 ) -> None:
     """It should load current door status into the store on create."""
     hardware_api.door_state = DoorState.OPEN
-    engine = await create_protocol_engine(hardware_api=hardware_api)
+    engine = await create_protocol_engine(
+        hardware_api=hardware_api,
+        config=EngineConfig(block_on_door_open=True),
+    )
     state = engine.state_view
     assert state.commands.get_is_door_blocking() is True

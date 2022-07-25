@@ -147,8 +147,15 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 
     seq_id: utils.UInt8Field
     current_position_um: utils.UInt32Field
-    encoder_position: utils.UInt32Field
+    encoder_position: utils.Int32Field
     ack_id: utils.UInt8Field
+
+
+@dataclass
+class EncoderPositionResponse(utils.BinarySerializable):
+    """Read Encoder Position."""
+
+    encoder_position: utils.Int32Field
 
 
 @dataclass
@@ -391,7 +398,6 @@ class BrushedMotorVrefPayload(utils.BinarySerializable):
 class BrushedMotorPwmPayload(utils.BinarySerializable):
     """A request to set the pwm of a brushed motor."""
 
-    freq: utils.UInt32Field
     duty_cycle: utils.UInt32Field
 
 
@@ -407,7 +413,6 @@ class GripperInfoResponsePayload(utils.BinarySerializable):
 class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
     """A request to move gripper."""
 
-    freq: utils.UInt32Field
     duty_cycle: utils.UInt32Field
 
 

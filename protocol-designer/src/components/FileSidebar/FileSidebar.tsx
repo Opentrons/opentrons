@@ -16,7 +16,7 @@ import modalStyles from '../modals/modal.css'
 import styles from './FileSidebar.css'
 
 import { HintKey } from '../../tutorial'
-import {
+import type {
   InitialDeckSetup,
   SavedStepFormState,
   ModuleOnDeck,

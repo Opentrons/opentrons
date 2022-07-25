@@ -29,7 +29,6 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
-import { swatchColors } from '../../components/swatchColors'
 import type {
   ModuleEntity,
   PipetteEntity,
@@ -47,6 +46,7 @@ import type {
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import { swatchColors } from '../../components/swatchColors'
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
 if (isEmpty(process.env.OT_PD_VERSION))
@@ -186,7 +186,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           [liquidId]: {
             displayName: liquidData.name,
             description: liquidData.description ?? '',
-            displayColor: swatchColors(liquidId),
+            displayColor: liquidData.displayColor ?? swatchColors(liquidId),
           },
         }
       },

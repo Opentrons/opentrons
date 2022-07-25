@@ -9,6 +9,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field, UInt32Field
 from opentrons_hardware.firmware_bindings.constants import NodeId
+from .constants import brushed_motor_interrupts_per_sec
 
 
 async def set_reference_voltage(
@@ -28,16 +29,13 @@ async def set_reference_voltage(
 
 async def set_pwm_param(
     can_messenger: CanMessenger,
-    freq: int,
     duty_cycle: int,
 ) -> None:
     """Set gripper brushed motor reference voltage."""
     await can_messenger.send(
         node_id=NodeId.gripper,
         message=SetBrushedMotorPwmRequest(
-            payload=payloads.BrushedMotorPwmPayload(
-                freq=UInt32Field(freq), duty_cycle=UInt32Field(duty_cycle)
-            )
+            payload=payloads.BrushedMotorPwmPayload(duty_cycle=UInt32Field(duty_cycle))
         ),
     )
 
@@ -47,7 +45,6 @@ async def grip(
     group_id: int,
     seq_id: int,
     duration_sec: float,
-    freq: int,
     duty_cycle: int,
 ) -> None:
     """Start grip motion."""
@@ -57,8 +54,9 @@ async def grip(
             payload=payloads.GripperMoveRequestPayload(
                 group_id=UInt8Field(group_id),
                 seq_id=UInt8Field(seq_id),
-                duration=UInt32Field(int(duration_sec * freq)),
-                freq=UInt32Field(freq),
+                duration=UInt32Field(
+                    int(duration_sec * brushed_motor_interrupts_per_sec)
+                ),
                 duty_cycle=UInt32Field(duty_cycle),
             )
         ),
@@ -66,7 +64,7 @@ async def grip(
 
 
 async def home(
-    can_messenger: CanMessenger, group_id: int, seq_id: int, freq: int, duty_cycle: int
+    can_messenger: CanMessenger, group_id: int, seq_id: int, duty_cycle: int
 ) -> None:
     """Start home motion."""
     await can_messenger.send(
@@ -76,7 +74,6 @@ async def home(
                 group_id=UInt8Field(group_id),
                 seq_id=UInt8Field(seq_id),
                 duration=UInt32Field(0),
-                freq=UInt32Field(freq),
                 duty_cycle=UInt32Field(duty_cycle),
             )
         ),

@@ -34,6 +34,7 @@ import {
 } from '../../hooks'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { DeckCalibrationConfirmModal } from '../DeckCalibrationConfirmModal'
+import { useMenuHandleClickOutside } from '../../../../atoms/MenuList/hooks'
 
 const CAL_BLOCK_MODAL_CLOSED: 'cal_block_modal_closed' =
   'cal_block_modal_closed'
@@ -64,7 +65,12 @@ export function OverflowMenu({
 }: OverflowMenuProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
-  const [showOverflowMenu, setShowOverflowMenu] = React.useState<boolean>(false)
+  const {
+    menuOverlay,
+    handleOverflowClick,
+    showOverflowMenu,
+    setShowOverflowMenu,
+  } = useMenuHandleClickOutside()
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
 
   const calsOverflowWrapperRef = useOnClickOutside({
@@ -144,7 +150,10 @@ export function OverflowMenu({
           confirmStart()
         }
       } else {
-        startPipetteOffsetPossibleTLC({ keepTipLength: false })
+        startPipetteOffsetPossibleTLC({
+          keepTipLength: false,
+          hasBlockModalResponse: null,
+        })
       }
     }
     setShowOverflowMenu(!showOverflowMenu)
@@ -171,12 +180,6 @@ export function OverflowMenu({
         `opentrons-${robotName}-tip-length-calibration.json`
       )
     }
-    setShowOverflowMenu(!showOverflowMenu)
-  }
-
-  const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
-    e.preventDefault()
-    e.stopPropagation()
     setShowOverflowMenu(!showOverflowMenu)
   }
 
@@ -211,25 +214,25 @@ export function OverflowMenu({
       {showOverflowMenu ? (
         <Flex
           ref={calsOverflowWrapperRef}
-          width={calType === 'pipetteOffset' ? '11.25rem' : '17.25rem'}
+          width={calType === 'pipetteOffset' ? '11.5rem' : '17.25rem'}
           zIndex={10}
           borderRadius={'4px 4px 0px 0px'}
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
-          top="3rem"
+          top="2.3rem"
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
           <MenuItem onClick={e => handleCalibration(calType, e)}>
             {calType === 'pipetteOffset'
               ? applicablePipetteOffsetCal != null
-                ? t('overflow_menu_recalibrate_pipette')
-                : t('overflow_menu_calibrate_pipette')
-              : t('overflow_menu_recalibrate_tip_and_pipette')}
+                ? t('recalibrate_pipette')
+                : t('calibrate_pipette')
+              : t('recalibrate_tip_and_pipette')}
           </MenuItem>
           <MenuItem onClick={e => handleDownload(calType, e)}>
-            {t('overflow_menu_download_calibration_data')}
+            {t('download_calibration_data')}
           </MenuItem>
           {/* TODO 5/6/2021 kj: This is scoped out from 6.0 */}
           {/* <Divider /> */}
@@ -254,6 +257,7 @@ export function OverflowMenu({
           />
         </Portal>
       ) : null}
+      {menuOverlay}
     </Flex>
   )
 }

@@ -33,9 +33,11 @@ export type UseCreateProtocolMutationOptions = UseMutationOptions<
 >
 
 export function useCreateProtocolMutation(
-  options: UseCreateProtocolMutationOptions = {}
+  options: UseCreateProtocolMutationOptions = {},
+  hostOverride?: HostConfig | null
 ): UseCreateProtocolMutationResult {
-  const host = useHost()
+  const contextHost = useHost()
+  const host = hostOverride ?? contextHost
   const queryClient = useQueryClient()
 
   const mutation = useMutation<
@@ -45,8 +47,8 @@ export function useCreateProtocolMutation(
   >(
     [host, 'protocols'],
     ({ files: protocolFiles, protocolKey }) =>
-      createProtocol(host as HostConfig, protocolFiles, protocolKey).then(
-        response => {
+      createProtocol(host as HostConfig, protocolFiles, protocolKey)
+        .then(response => {
           const protocolId = response.data.data.id
           queryClient
             .invalidateQueries([host, 'protocols'])
@@ -57,11 +59,13 @@ export function useCreateProtocolMutation(
               )
             )
             .catch(e => {
-              console.error(e)
+              throw e
             })
           return response.data
-        }
-      ),
+        })
+        .catch(e => {
+          throw e
+        }),
     options
   )
   return {

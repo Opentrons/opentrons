@@ -4,11 +4,11 @@ import {
   Icon,
   Link,
   Box,
-  SPACING,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   TYPOGRAPHY,
+  SIZE_1,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
@@ -37,7 +37,7 @@ export function ExpandingTitle(props: ExpandingTitleProps): JSX.Element {
           <Link role="button" onClick={toggleDiagramVisible}>
             <Icon
               name={diagramVisible ? 'chevron-up' : 'chevron-down'}
-              width={SPACING.spacingSM}
+              size={SIZE_1}
             />
           </Link>
         )}

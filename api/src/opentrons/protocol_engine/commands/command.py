@@ -76,6 +76,14 @@ class BaseCommandCreate(GenericModel, Generic[CommandParamsT]):
             " and module setup, like pre-heating."
         ),
     )
+    key: Optional[str] = Field(
+        None,
+        description=(
+            "A key value, unique in this run, that can be used to track"
+            " the same logical command across multiple runs of the same protocol."
+            " If a value is not provided, one will be generated."
+        ),
+    )
 
 
 class BaseCommand(GenericModel, Generic[CommandParamsT, CommandResultT]):

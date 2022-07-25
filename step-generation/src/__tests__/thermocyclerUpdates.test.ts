@@ -19,7 +19,6 @@ import { makeImmutableStateUpdater } from '../__utils__'
 import { makeContext, getInitialRobotStateStandard } from '../fixtures'
 import type {
   ModuleOnlyParams,
-  TCProfileParams,
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureParams,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
@@ -206,7 +205,7 @@ describe('thermocycler state updaters', () => {
       testName: 'forThermocyclerOpenLid should set lidOpen to true',
     },
   ]
-  const profileCases: TestCases<TCProfileParams> = [
+  const profileCases: TestCases<any> = [
     {
       params: {
         moduleId,

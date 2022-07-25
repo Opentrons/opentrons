@@ -1,12 +1,10 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
 import { getBuildrootUpdateDisplayInfo } from '../../../../../redux/buildroot'
-import { useIsRobotBusy } from '../../../hooks'
 
 import { UpdateRobotSoftware } from '../UpdateRobotSoftware'
 
@@ -15,12 +13,8 @@ jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../../redux/buildroot/selectors')
 jest.mock('../../../hooks')
 
-const mockUpdateRobotStatus = jest.fn()
 const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof getBuildrootUpdateDisplayInfo
->
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
 >
 
 const mockOnUpdateStart = jest.fn()
@@ -30,7 +24,7 @@ const render = () => {
     <MemoryRouter>
       <UpdateRobotSoftware
         robotName="otie"
-        updateIsRobotBusy={mockUpdateRobotStatus}
+        isRobotBusy={false}
         onUpdateStart={mockOnUpdateStart}
       />
     </MemoryRouter>,
@@ -41,11 +35,10 @@ const render = () => {
 describe('RobotSettings UpdateRobotSoftware', () => {
   beforeEach(() => {
     mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
-      autoUpdateAction: 'reinstall',
+      autoUpdateAction: 'update',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    mockUseIsRobotBusy.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -53,12 +46,12 @@ describe('RobotSettings UpdateRobotSoftware', () => {
   })
 
   it('should render title, description and toggle button', () => {
-    const [{ getByText, getByLabelText }] = render()
+    const [{ getByText }] = render()
     getByText('Update robot software manually with a local file (.zip)')
     getByText(
       'Bypass the Opentrons App auto-update process and update the robot software manually.'
     )
-    getByLabelText('Browse file system')
+    getByText('Browse file system')
     getByText('Launch Opentrons software update page')
   })
 
@@ -69,11 +62,14 @@ describe('RobotSettings UpdateRobotSoftware', () => {
     expect(link.closest('a')).toHaveAttribute('href', targetLink)
   })
 
-  it('should call update robot status if a robot is busy', () => {
-    mockUseIsRobotBusy.mockReturnValue(true)
-    const [{ getByLabelText }] = render()
-    const button = getByLabelText('Browse file system')
-    fireEvent.change(button)
-    expect(mockUpdateRobotStatus).toHaveBeenCalled()
+  it('should be disabled if updateFromFileDisabledReason is not null', () => {
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'update',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: 'mock reason',
+    })
+    const [{ getByText }] = render()
+    const button = getByText('Browse file system')
+    expect(button).toBeDisabled()
   })
 })

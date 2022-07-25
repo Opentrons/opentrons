@@ -2,6 +2,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { LabwareRender, WellGroup } from '@opentrons/components'
 
+import { selectors } from '../../labware-ingred/selectors'
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import * as highlightSelectors from '../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../top-selectors/tip-contents'
@@ -19,6 +20,7 @@ interface OP {
 
 interface SP {
   wellContents: ContentsByWell
+  liquidDisplayColors: string[]
   missingTips?: WellGroup | null
   highlightedWells?: WellGroup | null
 }
@@ -32,7 +34,10 @@ const LabwareOnDeckComponent = (props: Props): JSX.Element => (
   >
     <LabwareRender
       definition={props.labwareOnDeck.def}
-      wellFill={wellFillFromWellContents(props.wellContents)}
+      wellFill={wellFillFromWellContents(
+        props.wellContents,
+        props.liquidDisplayColors
+      )}
       highlightedWells={props.highlightedWells}
       missingTips={props.missingTips}
     />
@@ -60,6 +65,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
     missingTips: missingTipsByLabwareId
       ? missingTipsByLabwareId[labwareOnDeck.id]
       : null,
+    liquidDisplayColors: selectors.getLiquidDisplayColors(state),
   }
 }
 

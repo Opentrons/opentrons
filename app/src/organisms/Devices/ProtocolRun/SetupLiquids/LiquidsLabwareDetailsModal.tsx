@@ -7,10 +7,10 @@ import {
 } from '@opentrons/api-client'
 import {
   Box,
+  Flex,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  Flex,
   SPACING,
   TYPOGRAPHY,
   LabwareRender,
@@ -41,9 +41,7 @@ export const LiquidsLabwareDetailsModal = (
 ): JSX.Element | null => {
   const { liquidId, labwareId, runId, closeModal } = props
   const { t } = useTranslation('protocol_setup')
-  const [selectedValue, setSelectedValue] = React.useState<typeof liquidId>(
-    liquidId
-  )
+  const currentLiquidRef = React.useRef<HTMLDivElement>(null)
   const labwareRenderInfo = useLabwareRenderInfoForRunById(runId)[labwareId]
   const commands = useProtocolDetailsForRun(runId).protocolData?.commands
   const liquids = parseLiquidsInLoadOrder()
@@ -55,7 +53,23 @@ export const LiquidsLabwareDetailsModal = (
   )
   const labwareInfo = getLiquidsByIdForLabware(labwareId, labwareByLiquidId)
   const { slotName, labwareName } = getSlotLabwareName(labwareId, commands)
+  const loadLabwareCommand = commands
+    ?.filter(command => command.commandType === 'loadLabware')
+    ?.find(command => command.result.labwareId === labwareId)
+  const labwareWellOrdering = loadLabwareCommand?.result.definition.ordering
+  const filteredLiquidsInLoadOrder = liquids.filter(liquid => {
+    return Object.keys(labwareInfo).some(key => key === liquid.liquidId)
+  })
+  const [selectedValue, setSelectedValue] = React.useState<typeof liquidId>(
+    liquidId ?? filteredLiquidsInLoadOrder[0].liquidId
+  )
 
+  const scrollToCurrentItem = (): void => {
+    currentLiquidRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+  React.useEffect(() => {
+    scrollToCurrentItem()
+  }, [])
   const HIDE_SCROLLBAR = css`
     ::-webkit-scrollbar {
       display: none;
@@ -65,9 +79,9 @@ export const LiquidsLabwareDetailsModal = (
     <Modal
       onClose={closeModal}
       title={labwareName}
-      contentBackgroundColor={COLORS.background}
       closeOnOutsideClick
-      width="46.875rem"
+      marginX={SPACING.spacing5}
+      width="45rem"
     >
       <Box>
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
@@ -77,25 +91,42 @@ export const LiquidsLabwareDetailsModal = (
             maxHeight={'27.125rem'}
             overflowY={'auto'}
             minWidth={'10.313rem'}
+            gridGap={SPACING.spacing3}
           >
-            {Object.entries(labwareInfo).map((entry, index) => {
-              const liquidInfo = liquids.find(
-                liquid => liquid.liquidId === entry[0]
+            {filteredLiquidsInLoadOrder.map((liquid, index) => {
+              const labwareInfoEntry = Object.entries(labwareInfo).find(
+                entry => entry[0] === liquid.liquidId
               )
+
               return (
-                liquidInfo != null && (
-                  <LiquidDetailCard
+                labwareInfoEntry != null && (
+                  <Flex
                     key={index}
-                    {...liquidInfo}
-                    volumeByWell={entry[1][0].volumeByWell}
-                    setSelectedValue={setSelectedValue}
-                    selectedValue={selectedValue}
-                  />
+                    ref={
+                      selectedValue === liquid.liquidId
+                        ? currentLiquidRef
+                        : undefined
+                    }
+                  >
+                    <LiquidDetailCard
+                      {...liquid}
+                      volumeByWell={labwareInfoEntry[1][0].volumeByWell}
+                      labwareWellOrdering={labwareWellOrdering}
+                      setSelectedValue={setSelectedValue}
+                      selectedValue={selectedValue}
+                    />
+                  </Flex>
                 )
               )
             })}
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} marginX={SPACING.spacingL}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            width="100%"
+            maxHeight="25rem"
+            marginLeft={SPACING.spacing4}
+            marginTop={SPACING.spacing3}
+          >
             <Flex flexDirection={DIRECTION_ROW}>
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <StyledText
@@ -113,7 +144,10 @@ export const LiquidsLabwareDetailsModal = (
                   {slotName}
                 </StyledText>
               </Flex>
-              <Flex flexDirection={DIRECTION_COLUMN} marginX={SPACING.spacingL}>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                marginLeft={SPACING.spacing5}
+              >
                 <StyledText
                   as="h6"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -130,7 +164,7 @@ export const LiquidsLabwareDetailsModal = (
                 </StyledText>
               </Flex>
             </Flex>
-            <Box width={'30.625rem'}>
+            <Flex flex="1 1 30rem" flexDirection={DIRECTION_COLUMN}>
               <svg viewBox="0 -10 130 100" transform="scale(1, -1)">
                 <LabwareRender
                   definition={labwareRenderInfo.labwareDef}
@@ -143,7 +177,7 @@ export const LiquidsLabwareDetailsModal = (
                   }
                 />
               </svg>
-            </Box>
+            </Flex>
           </Flex>
         </Flex>
       </Box>

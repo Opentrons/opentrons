@@ -65,6 +65,7 @@ describe('moveToWell', () => {
     expect(getSuccessResult(result).commands).toEqual([
       {
         commandType: 'moveToWell',
+        key: expect.any(String),
         params: {
           pipetteId: DEFAULT_PIPETTE,
           labwareId: SOURCE_LABWARE,
@@ -90,6 +91,7 @@ describe('moveToWell', () => {
     expect(getSuccessResult(result).commands).toEqual([
       {
         commandType: 'moveToWell',
+        key: expect.any(String),
         params: {
           pipetteId: DEFAULT_PIPETTE,
           labwareId: SOURCE_LABWARE,

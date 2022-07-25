@@ -133,6 +133,10 @@ class RobotDoorOpenError(ProtocolEngineError):
     """An error raised when executing a protocol command when a robot door is open."""
 
 
+class PipetteMovementRestrictedByHeaterShakerError(ProtocolEngineError):
+    """An error raised when trying to move to labware that's restricted by a module."""
+
+
 class EngageHeightOutOfRangeError(ProtocolEngineError):
     """An error raised when a Magnetic Module engage height is out of bounds."""
 
@@ -151,6 +155,10 @@ class InvalidBlockVolumeError(ProtocolEngineError):
 
 class InvalidTargetSpeedError(ProtocolEngineError):
     """An error raised when attempting to set an invalid target speed."""
+
+
+class CannotPerformModuleAction(ProtocolEngineError):
+    """An error raised when trying to perform an illegal hardware module action."""
 
 
 class ProtocolCommandFailedError(ProtocolEngineError):

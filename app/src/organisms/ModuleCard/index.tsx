@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { last } from 'lodash'
+import last from 'lodash/last'
 import {
   Box,
   Flex,
@@ -9,16 +9,13 @@ import {
   DIRECTION_ROW,
   ALIGN_START,
   DIRECTION_COLUMN,
-  TEXT_TRANSFORM_UPPERCASE,
   SPACING,
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_CAPTION,
   TYPOGRAPHY,
   useOnClickOutside,
   Btn,
-  TEXT_DECORATION_UNDERLINE,
   IconProps,
-  Tooltip,
   useHoverTooltip,
   COLORS,
   Icon,
@@ -46,8 +43,11 @@ import {
 } from '../../redux/robot-api'
 import { Banner } from '../../atoms/Banner'
 import { Toast } from '../../atoms/Toast'
+import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
+import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
+import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { MagneticModuleData } from './MagneticModuleData'
 import { TemperatureModuleData } from './TemperatureModuleData'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
@@ -76,15 +76,24 @@ import type { RequestState } from '../../redux/robot-api/types'
 interface ModuleCardProps {
   module: AttachedModule
   robotName: string
+  isLoadedInRun: boolean
   runId?: string
   slotName?: string
 }
 
 export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
-  const { module, robotName, runId, slotName } = props
+  const { module, robotName, isLoadedInRun, runId, slotName } = props
   const dispatch = useDispatch<Dispatch>()
-  const [showOverflowMenu, setShowOverflowMenu] = React.useState(false)
+  const {
+    menuOverlay,
+    handleOverflowClick,
+    showOverflowMenu,
+    setShowOverflowMenu,
+  } = useMenuHandleClickOutside()
+  const moduleOverflowWrapperRef = useOnClickOutside({
+    onClickOutside: () => setShowOverflowMenu(false),
+  }) as React.RefObject<HTMLDivElement>
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [hasSecondary, setHasSecondary] = React.useState(false)
   const [showSuccessToast, setShowSuccessToast] = React.useState(false)
@@ -94,6 +103,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const history = useHistory()
+  const currentRunId = useCurrentRunId()
   const [dispatchApiRequest, requestIds] = useDispatchApiRequest()
   const runStatus = useCurrentRunStatus({
     onSettled: data => {
@@ -129,10 +139,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
   const isOverflowBtnDisabled =
     runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
-
-  const moduleOverflowWrapperRef = useOnClickOutside({
-    onClickOutside: () => setShowOverflowMenu(false),
-  }) as React.RefObject<HTMLDivElement>
 
   const isTooHot =
     module.moduleModel === 'heaterShakerModuleV1' &&
@@ -213,210 +219,202 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   }
 
   return (
-    <React.Fragment>
-      <Flex
-        backgroundColor={COLORS.background}
-        borderRadius={SPACING.spacing2}
-        marginBottom={SPACING.spacing3}
-        marginLeft={SPACING.spacing2}
-        marginRight={SPACING.spacing2}
-        width={'100%'}
-        data-testid={`ModuleCard_${module.serialNumber}`}
-      >
-        {showWizard &&
-          (runId != null ? (
-            <HeaterShakerWizard
-              onCloseClick={() => setShowWizard(false)}
-              runId={runId}
-            />
-          ) : (
-            <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
-          ))}
-        {showSlideout && runId != null ? (
-          <ModuleSlideout
-            module={module}
-            runId={runId}
-            isSecondary={hasSecondary}
-            showSlideout={showSlideout}
-            onCloseClick={() => setShowSlideout(false)}
+    <Flex
+      backgroundColor={COLORS.background}
+      borderRadius={SPACING.spacing2}
+      marginBottom={SPACING.spacing3}
+      width={'100%'}
+      data-testid={`ModuleCard_${module.serialNumber}`}
+    >
+      {showWizard &&
+        (currentRunId != null ? (
+          <HeaterShakerWizard
+            onCloseClick={() => setShowWizard(false)}
+            currentRunId={currentRunId}
           />
         ) : (
-          <ModuleSlideout
-            module={module}
-            isSecondary={hasSecondary}
-            showSlideout={showSlideout}
-            onCloseClick={() => setShowSlideout(false)}
-          />
-        )}
-        {showAboutModule && (
-          <AboutModuleSlideout
-            module={module}
-            isExpanded={showAboutModule}
-            onCloseClick={() => setShowAboutModule(false)}
-            firmwareUpdateClick={handleUpdateClick}
-          />
-        )}
-        {showTestShake && (
-          <TestShakeSlideout
-            module={module as HeaterShakerModule}
-            isExpanded={showTestShake}
-            onCloseClick={() => setShowTestShake(false)}
-            runId={runId}
-          />
-        )}
-        <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">
-          <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
-            <Flex alignItems={ALIGN_START} opacity={isPending ? '50%' : '100%'}>
-              <img
-                width="60px"
-                height="54px"
-                src={image}
-                alt={module.moduleModel}
+          <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+        ))}
+      {showSlideout && (
+        <ModuleSlideout
+          module={module}
+          runId={currentRunId != null ? currentRunId : undefined}
+          isSecondary={hasSecondary}
+          showSlideout={showSlideout}
+          onCloseClick={() => setShowSlideout(false)}
+          isLoadedInRun={isLoadedInRun}
+        />
+      )}
+      {showAboutModule && (
+        <AboutModuleSlideout
+          module={module}
+          isExpanded={showAboutModule}
+          onCloseClick={() => setShowAboutModule(false)}
+          firmwareUpdateClick={handleUpdateClick}
+        />
+      )}
+      {showTestShake && (
+        <TestShakeSlideout
+          module={module as HeaterShakerModule}
+          isExpanded={showTestShake}
+          onCloseClick={() => setShowTestShake(false)}
+          isLoadedInRun={isLoadedInRun}
+          currentRunId={currentRunId != null ? currentRunId : undefined}
+        />
+      )}
+      <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">
+        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
+          <Flex alignItems={ALIGN_START} opacity={isPending ? '50%' : '100%'}>
+            <img
+              width="60px"
+              height="54px"
+              src={image}
+              alt={module.moduleModel}
+            />
+          </Flex>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            flex="100%"
+            paddingLeft={SPACING.spacing3}
+          >
+            {showSuccessToast && (
+              <Toast
+                message={t('firmware_update_installation_successful')}
+                type="success"
+                onClose={() => setShowSuccessToast(false)}
               />
-            </Flex>
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              paddingLeft={SPACING.spacing3}
-            >
-              {showSuccessToast && (
-                <Toast
-                  message={t('firmware_update_installation_successful')}
-                  type="success"
-                  onClose={() => setShowSuccessToast(false)}
+            )}
+            {latestRequest != null && latestRequest.status === FAILURE && (
+              <FirmwareUpdateFailedModal
+                module={module}
+                onCloseClick={handleCloseErrorModal}
+                errorMessage={getErrorResponseMessage(latestRequest.error)}
+              />
+            )}
+            {module.hasAvailableUpdate && showBanner && !isPending ? (
+              <Flex
+                paddingBottom={SPACING.spacing2}
+                width="100%"
+                flexDirection={DIRECTION_COLUMN}
+                data-testid={`ModuleCard_firmware_update_banner_${module.serialNumber}`}
+              >
+                <Banner
+                  type="warning"
+                  onCloseClick={() => setShowBanner(false)}
+                >
+                  <Flex flexDirection={DIRECTION_COLUMN}>
+                    {t('firmware_update_available')}
+                    <Btn
+                      textAlign={ALIGN_START}
+                      fontSize={TYPOGRAPHY.fontSizeP}
+                      textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                      onClick={() => handleUpdateClick()}
+                    >
+                      {t('update_now')}
+                    </Btn>
+                  </Flex>
+                </Banner>
+              </Flex>
+            ) : null}
+            {isTooHot ? (
+              <Flex
+                width="100%"
+                flexDirection={DIRECTION_COLUMN}
+                paddingRight={SPACING.spacingM}
+                paddingBottom={SPACING.spacing3}
+                data-testid={`ModuleCard_too_hot_banner_${module.serialNumber}`}
+              >
+                <Banner type="warning" icon={hotToTouch}>
+                  <Trans
+                    t={t}
+                    i18nKey="hot_to_the_touch"
+                    components={{
+                      bold: <strong />,
+                      block: <Text fontSize={TYPOGRAPHY.fontSizeP} />,
+                    }}
+                  />
+                </Banner>
+              </Flex>
+            ) : null}
+            {isPending ? (
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                fontSize={TYPOGRAPHY.fontSizeP}
+                data-testid={`ModuleCard_update_pending_${module.serialNumber}`}
+              >
+                <Icon
+                  width={SPACING.spacingSM}
+                  name="ot-spinner"
+                  spin
+                  aria-label="ot-spinner"
                 />
-              )}
-              {latestRequest != null && latestRequest.status === FAILURE && (
-                <FirmwareUpdateFailedModal
-                  module={module}
-                  onCloseClick={handleCloseErrorModal}
-                  errorMessage={getErrorResponseMessage(latestRequest.error)}
-                />
-              )}
-              {module.hasAvailableUpdate && showBanner && !isPending ? (
+                <Text marginLeft={SPACING.spacing3}>
+                  {t('updating_firmware')}
+                </Text>
+              </Flex>
+            ) : (
+              <>
+                <Text
+                  textTransform={TYPOGRAPHY.textTransformUppercase}
+                  color={COLORS.darkGrey}
+                  fontWeight={FONT_WEIGHT_REGULAR}
+                  fontSize={FONT_SIZE_CAPTION}
+                  paddingBottom={SPACING.spacing2}
+                  data-testid={`module_card_usb_port_${module.serialNumber}`}
+                >
+                  {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
+                  slotName != null
+                    ? t('deck_slot', { slot: slotName }) + ' - '
+                    : null}
+                  {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
+                    port: module.usbPort.hub ?? module.usbPort.port,
+                  })}
+                </Text>
                 <Flex
                   paddingBottom={SPACING.spacing2}
-                  width="100%"
-                  flexDirection={DIRECTION_COLUMN}
-                  data-testid={`ModuleCard_firmware_update_banner_${module.serialNumber}`}
-                >
-                  <Banner
-                    type="warning"
-                    onCloseClick={() => setShowBanner(false)}
-                  >
-                    <Flex flexDirection={DIRECTION_COLUMN}>
-                      {t('firmware_update_available')}
-                      <Btn
-                        textAlign={ALIGN_START}
-                        fontSize={TYPOGRAPHY.fontSizeP}
-                        textDecoration={TEXT_DECORATION_UNDERLINE}
-                        onClick={() => handleUpdateClick()}
-                      >
-                        {t('update_now')}
-                      </Btn>
-                    </Flex>
-                  </Banner>
-                </Flex>
-              ) : null}
-              {isTooHot ? (
-                <Flex
-                  width="100%"
-                  flexDirection={DIRECTION_COLUMN}
-                  paddingRight={SPACING.spacingM}
-                  paddingBottom={SPACING.spacing3}
-                  data-testid={`ModuleCard_too_hot_banner_${module.serialNumber}`}
-                >
-                  <Banner type="warning" icon={hotToTouch}>
-                    <Trans
-                      t={t}
-                      i18nKey="hot_to_the_touch"
-                      components={{
-                        bold: <strong />,
-                        block: <Text fontSize={TYPOGRAPHY.fontSizeP} />,
-                      }}
-                    />
-                  </Banner>
-                </Flex>
-              ) : null}
-              {isPending ? (
-                <Flex
-                  flexDirection={DIRECTION_ROW}
+                  data-testid={`ModuleCard_display_name_${module.serialNumber}`}
                   fontSize={TYPOGRAPHY.fontSizeP}
-                  data-testid={`ModuleCard_update_pending_${module.serialNumber}`}
                 >
-                  <Icon
-                    width={SPACING.spacingSM}
-                    name="ot-spinner"
-                    spin
-                    aria-label="ot-spinner"
+                  <ModuleIcon
+                    moduleType={module.moduleType}
+                    size="1rem"
+                    marginRight={SPACING.spacing1}
+                    color={COLORS.darkGreyEnabled}
                   />
-                  <Text marginLeft={SPACING.spacing3}>
-                    {t('updating_firmware')}
-                  </Text>
+                  <Text>{getModuleDisplayName(module.moduleModel)}</Text>
                 </Flex>
-              ) : (
-                <>
-                  <Text
-                    textTransform={TEXT_TRANSFORM_UPPERCASE}
-                    color={COLORS.darkGrey}
-                    fontWeight={FONT_WEIGHT_REGULAR}
-                    fontSize={FONT_SIZE_CAPTION}
-                    paddingBottom={SPACING.spacing2}
-                    data-testid={`module_card_usb_port_${module.serialNumber}`}
-                  >
-                    {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
-                    slotName != null
-                      ? t('deck_slot', { slot: slotName }) + ' - '
-                      : null}
-                    {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
-                      port: module.usbPort.hub ?? module.usbPort.port,
-                    })}
-                  </Text>
-                  <Flex
-                    paddingBottom={SPACING.spacing2}
-                    data-testid={`ModuleCard_display_name_${module.serialNumber}`}
-                    fontSize={TYPOGRAPHY.fontSizeP}
-                  >
-                    <ModuleIcon
-                      moduleType={module.moduleType}
-                      size="1rem"
-                      marginRight={SPACING.spacing1}
-                      color={COLORS.darkGreyEnabled}
-                    />
-                    <Text>{getModuleDisplayName(module.moduleModel)}</Text>
-                  </Flex>
-                </>
-              )}
-              <Flex
-                opacity={isPending ? '50%' : '100%'}
-                flexDirection={DIRECTION_COLUMN}
-              >
-                {moduleData}
-              </Flex>
+              </>
+            )}
+            <Flex
+              opacity={isPending ? '50%' : '100%'}
+              flexDirection={DIRECTION_COLUMN}
+            >
+              {moduleData}
             </Flex>
           </Flex>
-        </Box>
+        </Flex>
+      </Box>
 
-        <Box
-          alignSelf={ALIGN_START}
-          padding={SPACING.spacing2}
-          data-testid={`ModuleCard_overflow_btn_${module.serialNumber}`}
-          opacity={isPending ? '50%' : '100%'}
-        >
-          <OverflowBtn
-            aria-label="overflow"
-            disabled={isOverflowBtnDisabled}
-            {...targetProps}
-            onClick={() => {
-              setShowOverflowMenu(prevShowOverflowMenu => !prevShowOverflowMenu)
-            }}
-          />
-          {isOverflowBtnDisabled && (
-            <Tooltip {...tooltipProps}>
-              {t('module_actions_unavailable')}
-            </Tooltip>
-          )}
-        </Box>
-        {showOverflowMenu && (
+      <Box
+        alignSelf={ALIGN_START}
+        padding={SPACING.spacing2}
+        data-testid={`ModuleCard_overflow_btn_${module.serialNumber}`}
+        opacity={isPending ? '50%' : '100%'}
+      >
+        <OverflowBtn
+          aria-label="overflow"
+          disabled={isOverflowBtnDisabled}
+          {...targetProps}
+          onClick={handleOverflowClick}
+        />
+        {isOverflowBtnDisabled && (
+          <Tooltip tooltipProps={tooltipProps}>
+            {t('module_actions_unavailable')}
+          </Tooltip>
+        )}
+      </Box>
+      {showOverflowMenu && (
+        <>
           <Box
             ref={moduleOverflowWrapperRef}
             data-testid={`ModuleCard_overflow_menu_${module.serialNumber}`}
@@ -429,11 +427,13 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               handleSlideoutClick={handleMenuItemClick}
               handleTestShakeClick={handleTestShakeClick}
               handleWizardClick={handleWizardClick}
+              isLoadedInRun={isLoadedInRun}
             />
           </Box>
-        )}
-      </Flex>
-    </React.Fragment>
+          {menuOverlay}
+        </>
+      )}
+    </Flex>
   )
 }
 
@@ -442,48 +442,59 @@ interface ModuleSlideoutProps {
   runId?: string
   isSecondary: boolean
   showSlideout: boolean
+  isLoadedInRun: boolean
   onCloseClick: () => unknown
 }
 
 const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
-  const { module, runId, isSecondary, showSlideout, onCloseClick } = props
+  const {
+    module,
+    runId,
+    isSecondary,
+    showSlideout,
+    onCloseClick,
+    isLoadedInRun,
+  } = props
 
   if (module.moduleType === THERMOCYCLER_MODULE_TYPE) {
     return (
       <ThermocyclerModuleSlideout
         module={module}
-        runId={runId}
+        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
         isSecondaryTemp={isSecondary}
+        isLoadedInRun={isLoadedInRun}
       />
     )
   } else if (module.moduleType === MAGNETIC_MODULE_TYPE) {
     return (
       <MagneticModuleSlideout
         module={module}
-        runId={runId}
+        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
+        isLoadedInRun={isLoadedInRun}
       />
     )
   } else if (module.moduleType === TEMPERATURE_MODULE_TYPE) {
     return (
       <TemperatureModuleSlideout
         module={module}
-        runId={runId}
+        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
+        isLoadedInRun={isLoadedInRun}
       />
     )
   } else {
     return (
       <HeaterShakerSlideout
         module={module}
-        runId={runId}
+        currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
-        isSetShake={isSecondary}
+        isLoadedInRun={isLoadedInRun}
       />
     )
   }
