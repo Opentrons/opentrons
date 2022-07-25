@@ -1145,11 +1145,9 @@ def test_home_plunger(monkeypatch, hardware):
 
 
 def test_move_to_with_thermocycler(
-    hardware: ThreadManagedHardware,
     ctx: papi.ProtocolContext,
 ) -> None:
     """Test move_to raises for unsafe moves with thermocycler."""
-
     def raiser(*args, **kwargs):
         raise RuntimeError("Cannot")
 

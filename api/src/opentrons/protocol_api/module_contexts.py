@@ -992,7 +992,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             self._module.speed_status is not module_types.SpeedStatus.IDLE
         )
 
-        destination_slot = int(to_loc.labware.first_parent())
+        destination_slot = to_loc.labware.first_parent()
         if destination_slot is None:
             raise Exception(
                 "Destination has no slot associated with it. "
@@ -1014,7 +1014,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             )
 
         cast(HeaterShakerGeometry, self.geometry).flag_unsafe_move(
-            to_slot=destination_slot,
+            to_slot=int(destination_slot),
             is_tiprack=is_tiprack,
             is_using_multichannel=is_multichannel,
             is_plate_shaking=is_plate_shaking,

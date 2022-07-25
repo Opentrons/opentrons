@@ -520,13 +520,13 @@ def test_thermocycler_flag_unsafe_move(ctx_with_thermocycler, mock_module_contro
 
 
 @pytest.mark.parametrize(
-    argnames=["labware", "is_tiprack"],
+    argnames=["labware_name", "is_tiprack"],
     argvalues=[("geb_96_tiprack_1000ul", True), ("biorad_384_wellplate_50ul", False)],
 )
 def test_heater_shaker_unsafe_move_flagger(
     ctx_with_heater_shaker: ProtocolContext,
     mock_module_controller: mock.MagicMock,
-    labware: str,
+    labware_name: str,
     is_tiprack: bool,
 ) -> None:
     """It should call unsafe movement flagger with correct args."""
@@ -538,7 +538,7 @@ def test_heater_shaker_unsafe_move_flagger(
     type(mock_module_controller).labware_latch_status = mock_latch_status
 
     mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 3)
-    labware = ctx_with_heater_shaker.load_labware(labware, 5)
+    labware = ctx_with_heater_shaker.load_labware(labware_name, 5)
 
     mod._geometry.flag_unsafe_move = mock.MagicMock()
 
