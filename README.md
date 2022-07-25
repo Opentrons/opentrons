@@ -34,7 +34,7 @@ Easily upload a protocol, calibrate positions, and run your experiment from your
 - [Documentation](https://support.opentrons.com/)
 - [Source code](./app)
 
-![The Opentrons App, showing a map of where labware should be placed on the OT-2's deck for a certain protocol, and showing positional calibration data for pipettes and labware.](.github/images/opentrons_app.png)
+![The Opentrons App, showing a sortable list of four protocols on the Protocols page. Each entry shows a small map of the OT-2 deck and lists the protocol's name, pipettes and modules used, and when the protocol was updated.](.github/images/opentrons_app.png)
 
 ## Opentrons Protocol Designer
 

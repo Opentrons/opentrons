@@ -4,7 +4,7 @@ import {
   ALIGN_CENTER,
   Flex,
   SPACING_1,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { ProtocolSetupInfo } from './ProtocolSetupInfo'
@@ -50,7 +50,7 @@ export function CommandText(props: Props): JSX.Element | null {
       messageNode = (
         <>
           <Flex
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             padding={SPACING_1}
             id={`RunDetails_CommandList`}
           >
@@ -126,8 +126,15 @@ export function CommandText(props: Props): JSX.Element | null {
       break
     }
     case 'custom': {
+      const { legacyCommandText } = displayCommand.params ?? {}
+      const sanitizedCommandText =
+        typeof legacyCommandText === 'object'
+          ? JSON.stringify(legacyCommandText)
+          : String(legacyCommandText)
       messageNode =
-        displayCommand.params?.legacyCommandText ?? displayCommand.commandType
+        legacyCommandText != null
+          ? sanitizedCommandText
+          : displayCommand.commandType
       break
     }
     default: {

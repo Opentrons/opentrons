@@ -1,7 +1,9 @@
 import * as React from 'react'
-import { Formik, FormikProps } from 'formik'
+import { useSelector } from 'react-redux'
+import { Field, Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
 import { i18n } from '../../localization'
+import { swatchColors } from '../swatchColors'
 import {
   Card,
   CheckboxField,
@@ -10,10 +12,13 @@ import {
   OutlineButton,
   PrimaryButton,
 } from '@opentrons/components'
+import { selectors } from '../../labware-ingred/selectors'
 import styles from './LiquidEditForm.css'
 import formStyles from '../forms/forms.css'
 
 import { LiquidGroup } from '../../labware-ingred/types'
+import { ColorPicker } from '../ColorPicker'
+import { ColorResult } from 'react-color'
 
 type Props = LiquidGroup & {
   canDelete: boolean
@@ -24,6 +29,7 @@ type Props = LiquidGroup & {
 
 interface LiquidEditFormValues {
   name: string
+  displayColor: string
   description?: string | null
   serialize?: boolean
   [key: string]: unknown
@@ -37,15 +43,20 @@ export const liquidEditFormSchema: Yup.Schema<
       name: i18n.t('form.liquid_edit.name'),
     })
   ),
+  displayColor: Yup.string(),
   description: Yup.string(),
   serialize: Yup.boolean(),
 })
 
 export function LiquidEditForm(props: Props): JSX.Element {
   const { deleteLiquidGroup, cancelForm, canDelete, saveForm } = props
+  const selectedLiquid = useSelector(selectors.getSelectedLiquidGroupState)
+  const nextGroupId = useSelector(selectors.getNextLiquidGroupId)
+  const liquidId = selectedLiquid.liquidGroupId ?? nextGroupId
 
   const initialValues: LiquidEditFormValues = {
     name: props.name || '',
+    displayColor: props.displayColor ?? swatchColors(liquidId),
     description: props.description || '',
     serialize: props.serialize || false,
   }
@@ -57,6 +68,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
       onSubmit={(values: LiquidEditFormValues) => {
         saveForm({
           name: values.name,
+          displayColor: values.displayColor,
           description: values.description || null,
           serialize: values.serialize || false,
         })
@@ -66,6 +78,7 @@ export function LiquidEditForm(props: Props): JSX.Element {
         handleChange,
         handleBlur,
         handleSubmit,
+        setFieldValue,
         dirty,
         errors,
         isValid,
@@ -78,10 +91,10 @@ export function LiquidEditForm(props: Props): JSX.Element {
               <div className={formStyles.header}>
                 {i18n.t('form.liquid_edit.details')}
               </div>
-              <div className={formStyles.row_wrapper}>
+              <div className={formStyles.row_container}>
                 <FormGroup
                   label={i18n.t('form.liquid_edit.name')}
-                  className={formStyles.column_1_2}
+                  className={formStyles.column}
                 >
                   <InputField
                     name="name"
@@ -93,12 +106,22 @@ export function LiquidEditForm(props: Props): JSX.Element {
                 </FormGroup>
                 <FormGroup
                   label={i18n.t('form.liquid_edit.description')}
-                  className={formStyles.column_1_2}
+                  className={formStyles.column}
                 >
                   <InputField
                     name="description"
                     value={values.description}
                     onChange={handleChange}
+                  />
+                </FormGroup>
+                <FormGroup label={i18n.t('form.liquid_edit.displayColor')}>
+                  <Field
+                    name="displayColor"
+                    component={ColorPicker}
+                    value={values.displayColor}
+                    onChange={(color: ColorResult['hex']) => {
+                      setFieldValue('displayColor', color)
+                    }}
                   />
                 </FormGroup>
               </div>

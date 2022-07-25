@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
@@ -8,6 +8,7 @@ import { mockFetchModulesSuccessActionPayloadModules } from '../../../../redux/m
 import {
   useAttachedModules,
   useRobot,
+  useSyncRobotClock,
 } from '../../../../organisms/Devices/hooks'
 import { PipettesAndModules } from '../../../../organisms/Devices/PipettesAndModules'
 import { RecentProtocolRuns } from '../../../../organisms/Devices/RecentProtocolRuns'
@@ -19,6 +20,9 @@ jest.mock('../../../../organisms/Devices/PipettesAndModules')
 jest.mock('../../../../organisms/Devices/RecentProtocolRuns')
 jest.mock('../../../../organisms/Devices/RobotOverview')
 
+const mockUseSyncRobotClock = useSyncRobotClock as jest.MockedFunction<
+  typeof useSyncRobotClock
+>
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
 >
@@ -36,7 +40,9 @@ const mockRecentProtocolRuns = RecentProtocolRuns as jest.MockedFunction<
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <DeviceDetails />
+      <Route path="/devices/:robotName">
+        <DeviceDetails />
+      </Route>
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -64,11 +70,12 @@ describe('DeviceDetails', () => {
     expect(queryByText('Mock RobotOverview')).toBeFalsy()
   })
 
-  it('renders a RobotOverview when a robot is found', () => {
+  it('renders a RobotOverview when a robot is found and syncs clock', () => {
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     const [{ getByText }] = render('/devices/otie')
 
     getByText('Mock RobotOverview')
+    expect(mockUseSyncRobotClock).toHaveBeenCalledWith('otie')
   })
 
   it('renders PipettesAndModules when a robot is found', () => {

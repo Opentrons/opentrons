@@ -16,7 +16,7 @@ from opentrons.hardware_control.modules import (
 )
 from opentrons.protocols.models import LabwareDefinition
 
-from opentrons.protocol_engine import EngineConfigs, errors
+from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
@@ -29,7 +29,7 @@ from opentrons.protocol_engine.types import (
     ModuleDefinition,
 )
 
-from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state import Config, StateStore
 from opentrons.protocol_engine.state.modules import HardwareModule
 from opentrons.protocol_engine.resources import (
     ModelUtils,
@@ -446,9 +446,7 @@ async def test_load_module(
         ]
     )
 
-    decoy.when(state_store.get_configs()).then_return(
-        EngineConfigs(use_virtual_modules=False)
-    )
+    decoy.when(state_store.config).then_return(Config(use_virtual_modules=False))
 
     decoy.when(
         state_store.modules.select_hardware_module_to_load(
@@ -497,9 +495,7 @@ async def test_load_module_using_virtual(
         module_data_provider.get_definition(ModuleModel.TEMPERATURE_MODULE_V1)
     ).then_return(tempdeck_v1_def)
 
-    decoy.when(state_store.get_configs()).then_return(
-        EngineConfigs(use_virtual_modules=True)
-    )
+    decoy.when(state_store.config).then_return(Config(use_virtual_modules=True))
 
     result = await subject.load_module(
         model=ModuleModel.TEMPERATURE_MODULE_V1,
@@ -525,9 +521,7 @@ def test_get_module_hardware_api(
     module_2 = decoy.mock(cls=MagDeck)
     module_3 = decoy.mock(cls=HeaterShaker)
 
-    decoy.when(state_store.get_configs()).then_return(
-        EngineConfigs(use_virtual_modules=False)
-    )
+    decoy.when(state_store.config).then_return(Config(use_virtual_modules=False))
     decoy.when(state_store.modules.get_serial_number("module-id")).then_return(
         "serial-2"
     )
@@ -554,9 +548,7 @@ def test_get_module_hardware_api_virtual(
     module_2 = decoy.mock(cls=MagDeck)
     module_3 = decoy.mock(cls=HeaterShaker)
 
-    decoy.when(state_store.get_configs()).then_return(
-        EngineConfigs(use_virtual_modules=True)
-    )
+    decoy.when(state_store.config).then_return(Config(use_virtual_modules=True))
     decoy.when(state_store.modules.get_serial_number("module-id")).then_return(
         "serial-2"
     )
@@ -583,9 +575,7 @@ def test_get_module_hardware_api_missing(
     module_2 = decoy.mock(cls=MagDeck)
     module_3 = decoy.mock(cls=HeaterShaker)
 
-    decoy.when(state_store.get_configs()).then_return(
-        EngineConfigs(use_virtual_modules=False)
-    )
+    decoy.when(state_store.config).then_return(Config(use_virtual_modules=False))
     decoy.when(state_store.modules.get_serial_number("module-id")).then_return(
         "the-limit-does-not-exist"
     )

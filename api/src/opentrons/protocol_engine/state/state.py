@@ -17,7 +17,7 @@ from .pipettes import PipetteState, PipetteStore, PipetteView
 from .modules import ModuleState, ModuleStore, ModuleView
 from .geometry import GeometryView
 from .motion import MotionView
-from .configs import EngineConfigs
+from .config import Config
 from .state_summary import StateSummary
 
 ReturnT = TypeVar("ReturnT")
@@ -43,7 +43,7 @@ class StateView(HasState[State]):
     _modules: ModuleView
     _geometry: GeometryView
     _motion: MotionView
-    _configs: EngineConfigs
+    _config: Config
 
     @property
     def commands(self) -> CommandView:
@@ -75,10 +75,10 @@ class StateView(HasState[State]):
         """Get state view selectors for derived motion state."""
         return self._motion
 
-    # TODO (spp, 2021-10-19): make this a property once EngineConfigsView is added.
-    def get_configs(self) -> EngineConfigs:
-        """Get Protocol Engine configurations."""
-        return self._configs
+    @property
+    def config(self) -> Config:
+        """Get ProtocolEngine configuration."""
+        return self._config
 
     def get_summary(self) -> StateSummary:
         """Get protocol run data."""
@@ -104,24 +104,25 @@ class StateStore(StateView, ActionHandler):
 
     def __init__(
         self,
+        *,
+        config: Config,
         deck_definition: DeckDefinitionV3,
         deck_fixed_labware: Sequence[DeckFixedLabware],
-        is_door_blocking: bool,
-        configs: EngineConfigs = EngineConfigs(),
+        is_door_open: bool,
         change_notifier: Optional[ChangeNotifier] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
         Arguments:
+            config: Top-level configuration.
             deck_definition: The deck definition to preload into
                 labware state.
             deck_fixed_labware: Labware definitions from the deck
                 definition to preload into labware state.
-            is_door_blocking: Whether the robot's door state is blocking protocol run
-            configs: Configurations for the engine.
+            is_door_open: Whether the robot's door is currently open.
             change_notifier: Internal state change notifier.
         """
-        self._command_store = CommandStore(is_door_blocking)
+        self._command_store = CommandStore(config=config, is_door_open=is_door_open)
         self._pipette_store = PipetteStore()
         self._labware_store = LabwareStore(
             deck_fixed_labware=deck_fixed_labware,
@@ -135,7 +136,7 @@ class StateStore(StateView, ActionHandler):
             self._labware_store,
             self._module_store,
         ]
-        self._configs = configs
+        self._config = config
         self._change_notifier = change_notifier or ChangeNotifier()
         self._initialize_state()
 
@@ -228,9 +229,7 @@ class StateStore(StateView, ActionHandler):
         self._commands = CommandView(state.commands)
         self._labware = LabwareView(state.labware)
         self._pipettes = PipetteView(state.pipettes)
-        self._modules = ModuleView(
-            state.modules, virtualize_modules=self._configs.use_virtual_modules
-        )
+        self._modules = ModuleView(state.modules)
 
         # Derived states
         self._geometry = GeometryView(

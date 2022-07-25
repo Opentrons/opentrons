@@ -5,6 +5,7 @@ import {
   curryCommandCreator,
   reduceCommandCreators,
   modulePipetteCollision,
+  uuid,
 } from '../../utils'
 import type { CurriedCommandCreator, CommandCreator } from '../../types'
 interface PickUpTipArgs {
@@ -22,6 +23,7 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
     commands: [
       {
         commandType: 'pickUpTip',
+        key: uuid(),
         params: {
           pipetteId: args.pipette,
           labwareId: args.tiprack,

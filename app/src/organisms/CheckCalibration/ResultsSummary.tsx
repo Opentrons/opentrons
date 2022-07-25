@@ -365,7 +365,7 @@ function WarningText(props: {
         <Link
           display={DISPLAY_INLINE_BLOCK}
           color={C_BLUE}
-          external={true}
+          external
           href={SUPPORT_URL}
         >
           {CONTACT_SUPPORT}

@@ -3,20 +3,22 @@ import { fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
+import { useTrackEvent } from '../../../redux/analytics'
 import { LabwareCard } from '../../../organisms/LabwareCard'
-import { AddCustomLabware } from '../../../organisms/AddCustomLabware'
+import { AddCustomLabwareSlideout } from '../../../organisms/AddCustomLabwareSlideout'
 import { useAllLabware, useLabwareFailure, useNewLabwareName } from '../hooks'
 import { Labware } from '..'
 import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
 
 jest.mock('../../../organisms/LabwareCard')
-jest.mock('../../../organisms/AddCustomLabware')
+jest.mock('../../../organisms/AddCustomLabwareSlideout')
 jest.mock('../hooks')
 jest.mock('../helpers/getAllDefs')
+jest.mock('../../../redux/analytics')
 
 const mockLabwareCard = LabwareCard as jest.MockedFunction<typeof LabwareCard>
-const mockAddCustomLabware = AddCustomLabware as jest.MockedFunction<
-  typeof AddCustomLabware
+const mockAddCustomLabwareSlideout = AddCustomLabwareSlideout as jest.MockedFunction<
+  typeof AddCustomLabwareSlideout
 >
 const mockUseAllLabware = useAllLabware as jest.MockedFunction<
   typeof useAllLabware
@@ -27,6 +29,11 @@ const mockUseLabwareFailure = useLabwareFailure as jest.MockedFunction<
 const mockUseNewLabwareName = useNewLabwareName as jest.MockedFunction<
   typeof useNewLabwareName
 >
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
+
+let mockTrackEvent: jest.Mock
 
 const render = () => {
   return renderWithProviders(
@@ -41,8 +48,12 @@ const render = () => {
 
 describe('Labware', () => {
   beforeEach(() => {
+    mockTrackEvent = jest.fn()
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockLabwareCard.mockReturnValue(<div>Mock Labware Card</div>)
-    mockAddCustomLabware.mockReturnValue(<div>Mock Add Custom Labware</div>)
+    mockAddCustomLabwareSlideout.mockReturnValue(
+      <div>Mock Add Custom Labware</div>
+    )
     mockUseAllLabware.mockReturnValue([{ definition: mockDefinition }])
     mockUseLabwareFailure.mockReturnValue({
       labwareFailureMessage: null,
@@ -77,7 +88,12 @@ describe('Labware', () => {
   it('renders footer with labware creator link', () => {
     const [{ getByText, getByRole }] = render()
     getByText('Create a new labware definition')
-    getByRole('link', { name: 'Open Labware Creator' })
+    const btn = getByRole('link', { name: 'Open Labware Creator' })
+    fireEvent.click(btn)
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: 'openLabwareCreatorFromBottomOfLabwareLibraryList',
+      properties: {},
+    })
   })
   it('renders error toast if there is a failure', () => {
     mockUseLabwareFailure.mockReturnValue({

@@ -38,9 +38,8 @@ from opentrons.hardware_control.constants import (
 from opentrons.hardware_control.robot_calibration import load_pipette_offset
 from opentrons.hardware_control.dev_types import PipetteDict
 from .pipette import Pipette
+from .instrument_abc import MountType
 
-
-MountType = TypeVar("MountType", top_types.Mount, OT3Mount)
 
 InstrumentsByMount = Dict[MountType, Optional[Pipette]]
 PipetteHandlingData = Tuple[Pipette, MountType]
@@ -658,7 +657,7 @@ class PipetteHandlerProvider(Generic[MountType]):
             raise TipAttachedError("Cannot pick up tip with a tip attached")
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
 
-        if not presses or presses < 0:
+        if presses is None or presses < 0:
             checked_presses = instrument.config.pick_up_presses
         else:
             checked_presses = presses

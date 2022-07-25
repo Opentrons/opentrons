@@ -3,7 +3,7 @@
   "opentrons_def": "Opentrons Definition",
   "custom_def": "Custom Definition",
   "api_name": "API Name",
-  "date_added": "Date added",
+  "date_added": "Added",
   "go_to_def": "Go to labware definition",
   "delete": "Delete",
   "import_custom_def": "Import a Custom Labware Definition",

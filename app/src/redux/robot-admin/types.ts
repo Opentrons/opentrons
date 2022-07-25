@@ -92,6 +92,12 @@ export interface ResetConfigFailureAction {
   meta: RobotApiRequestMeta
 }
 
+export interface SyncSystemTimeAction {
+  type: 'robotAdmin:SYNC_SYSTEM_TIME'
+  payload: { robotName: string }
+  meta: RobotApiRequestMeta | {}
+}
+
 export type RobotAdminAction =
   | RestartRobotAction
   | RestartStatusChangedAction
@@ -103,6 +109,7 @@ export type RobotAdminAction =
   | ResetConfigAction
   | ResetConfigSuccessAction
   | ResetConfigFailureAction
+  | SyncSystemTimeAction
 
 // state types
 

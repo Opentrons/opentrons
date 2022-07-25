@@ -1,5 +1,6 @@
 """SQLite table schemas."""
 import sqlalchemy
+from .utc_datetime import UTCDateTime
 
 _metadata = sqlalchemy.MetaData()
 
@@ -24,12 +25,9 @@ protocol_table = sqlalchemy.Table(
         sqlalchemy.String,
         primary_key=True,
     ),
-    # NOTE: This column stores naive (timezone-less) datetimes.
-    # Timezones are stripped from inserted values, due to SQLite limitations.
-    # To ensure proper functionality, all inserted datetimes must be UTC.
     sqlalchemy.Column(
         "created_at",
-        sqlalchemy.DateTime,
+        UTCDateTime,
         nullable=False,
     ),
     sqlalchemy.Column("protocol_key", sqlalchemy.String, nullable=True),
@@ -71,10 +69,9 @@ run_table = sqlalchemy.Table(
         sqlalchemy.String,
         primary_key=True,
     ),
-    # NOTE: See above note about naive datetimes
     sqlalchemy.Column(
         "created_at",
-        sqlalchemy.DateTime,
+        UTCDateTime,
         nullable=False,
     ),
     sqlalchemy.Column(
@@ -90,11 +87,7 @@ run_table = sqlalchemy.Table(
     # column added in schema v1
     sqlalchemy.Column("engine_status", sqlalchemy.String, nullable=True),
     # column added in schema v1
-    sqlalchemy.Column(
-        "_updated_at",
-        sqlalchemy.DateTime,
-        nullable=True,
-    ),
+    sqlalchemy.Column("_updated_at", UTCDateTime, nullable=True),
 )
 
 action_table = sqlalchemy.Table(
@@ -105,8 +98,7 @@ action_table = sqlalchemy.Table(
         sqlalchemy.String,
         primary_key=True,
     ),
-    # NOTE: See above note about naive datetimes
-    sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False),
+    sqlalchemy.Column("created_at", UTCDateTime, nullable=False),
     sqlalchemy.Column("action_type", sqlalchemy.String, nullable=False),
     sqlalchemy.Column(
         "run_id",

@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional, Generic, TypeVar
 
-from opentrons.types import Point
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.types import Point, Mount
+from opentrons.hardware_control.types import CriticalPoint, OT3Mount
 
 
 InstrumentConfig = TypeVar("InstrumentConfig")
+MountType = TypeVar("MountType", Mount, OT3Mount)
 
 
 class AbstractInstrument(ABC, Generic[InstrumentConfig]):

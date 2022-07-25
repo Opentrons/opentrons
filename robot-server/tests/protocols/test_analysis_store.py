@@ -1,7 +1,7 @@
 """Tests for the AnalysisStore interface."""
 import pytest
 
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, NamedTuple
 
@@ -60,7 +60,7 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
     """
     return ProtocolResource(
         protocol_id=protocol_id,
-        created_at=datetime(year=2021, month=1, day=1),
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         source=ProtocolSource(
             directory=Path("/dev/null"),
             main_file=Path("/dev/null"),
@@ -213,7 +213,7 @@ analysis_result_specs: List[AnalysisResultSpec] = [
                 id="pause-1",
                 key="command-key",
                 status=pe_commands.CommandStatus.SUCCEEDED,
-                createdAt=datetime(year=2021, month=1, day=1),
+                createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
                 params=pe_commands.WaitForResumeParams(message="hello world"),
                 result=pe_commands.WaitForResumeResult(),
             )
@@ -226,7 +226,7 @@ analysis_result_specs: List[AnalysisResultSpec] = [
         errors=[
             pe_errors.ErrorOccurrence(
                 id="error-id",
-                createdAt=datetime(year=2021, month=1, day=1),
+                createdAt=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
                 errorType="BadError",
                 detail="oh no",
             )

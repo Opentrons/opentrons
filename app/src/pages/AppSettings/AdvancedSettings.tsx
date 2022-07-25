@@ -18,9 +18,7 @@ import {
   SPACING,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
-  TEXT_DECORATION_UNDERLINE,
   useConditionalConfirm,
-  TEXT_TRANSFORM_CAPITALIZE,
   JUSTIFY_FLEX_END,
   Btn,
   DIRECTION_ROW,
@@ -37,6 +35,7 @@ import {
 import { Modal } from '../../atoms/Modal'
 import { Portal } from '../../App/portal'
 import { Toast } from '../../atoms/Toast'
+import { useTrackEvent } from '../../redux/analytics'
 import {
   getU2EAdapterDevice,
   getU2EWindowsDriverStatus,
@@ -75,6 +74,7 @@ export function AdvancedSettings(): JSX.Element {
   const useTrashSurfaceForTipCal = useSelector((state: State) =>
     Config.getUseTrashSurfaceForTipCal(state)
   )
+  const trackEvent = useTrackEvent()
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
   const channel = useSelector(Config.getUpdateChannel)
   const channelOptions: DropdownOption[] = useSelector(
@@ -165,6 +165,10 @@ export function AdvancedSettings(): JSX.Element {
 
   const handleClickPythonDirectoryChange: React.MouseEventHandler<HTMLButtonElement> = _event => {
     pythonDirectoryFileInput.current?.click()
+    trackEvent({
+      name: 'changePathToPythonDirectory',
+      properties: {},
+    })
   }
 
   const setPythonInterpreterDirectory: React.ChangeEventHandler<HTMLInputElement> = event => {
@@ -224,7 +228,7 @@ export function AdvancedSettings(): JSX.Element {
                   >
                     <Btn
                       onClick={cancelExit}
-                      textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                      textTransform={TYPOGRAPHY.textTransformCapitalize}
                       color={COLORS.blue}
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                       marginRight={SPACING.spacing6}
@@ -285,8 +289,8 @@ export function AdvancedSettings(): JSX.Element {
             </StyledText>
             {labwarePath !== '' ? (
               <Link
+                role="button"
                 css={TYPOGRAPHY.pRegular}
-                external
                 color={COLORS.darkBlack}
                 onClick={() =>
                   dispatch(CustomLabware.openCustomLabwareDirectory())
@@ -307,9 +311,13 @@ export function AdvancedSettings(): JSX.Element {
           {
             <TertiaryButton
               marginLeft={SPACING_AUTO}
-              onClick={() =>
+              onClick={() => {
                 dispatch(CustomLabware.changeCustomLabwareDirectory())
-              }
+                trackEvent({
+                  name: 'changeCustomLabwareSourceFolder',
+                  properties: {},
+                })
+              }}
               id="AdvancedSettings_changeLabwareSource"
             >
               {labwarePath !== ''
@@ -364,10 +372,13 @@ export function AdvancedSettings(): JSX.Element {
               paddingBottom={SPACING.spacing3}
               id="AdvancedSettings_unavailableRobots"
             >
-              {t('display_unavail_robots')}
+              {t('disable_robot_caching')}
+            </StyledText>
+            <StyledText as="p" marginBottom={SPACING.spacing4}>
+              {t('note_this_will_clear_caching')}
             </StyledText>
             <StyledText as="p">
-              {t('display_unavail_robots_description')}
+              {t('disable_robot_caching_descriptions')}
             </StyledText>
           </Box>
           <ToggleButton
@@ -403,7 +414,7 @@ export function AdvancedSettings(): JSX.Element {
                     href={REALTEK_URL}
                     css={TYPOGRAPHY.pRegular}
                     color={COLORS.darkBlack}
-                    textDecoration={TEXT_DECORATION_UNDERLINE}
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
                     id="AdvancedSettings_realtekLink"
                   >
                     {t('usb_to_ethernet_adapter_link')}
@@ -541,8 +552,8 @@ export function AdvancedSettings(): JSX.Element {
             </StyledText>
             {pathToPythonInterpreter !== null ? (
               <Link
+                role="button"
                 css={TYPOGRAPHY.pRegular}
-                external
                 color={COLORS.darkBlack}
                 onClick={() =>
                   dispatch(Config.openPythonInterpreterDirectory())

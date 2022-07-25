@@ -3,31 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [6.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2022-06-09)
-
-**Note:** Version bump only for package @opentrons/discovery-client
+# [6.0.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v6.0.0) (2022-07-14)
 
 
+### Bug Fixes
 
-
-
-# [6.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.0...v6.0.0-alpha.1) (2022-06-07)
-
-**Note:** Version bump only for package @opentrons/discovery-client
-
-
-
-
-
-# [6.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.1.0-beta.0...v6.0.0-alpha.0) (2022-05-26)
-
-**Note:** Version bump only for package @opentrons/discovery-client
-
-
-
-
-
-# [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
+* **discovery-client:** fix off by one error in remove logic ([#10711](https://github.com/Opentrons/opentrons/issues/10711)) ([70cb3cb](https://github.com/Opentrons/opentrons/commit/70cb3cba7a78ab3fff5858b41590920e408cc884))
 
 
 ### Features

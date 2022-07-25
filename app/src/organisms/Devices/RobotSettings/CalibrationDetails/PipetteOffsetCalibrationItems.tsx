@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   Flex,
@@ -9,8 +9,8 @@ import {
   SPACING,
   Icon,
   COLORS,
-  TEXT_TRANSFORM_CAPITALIZE,
   TYPOGRAPHY,
+  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../../atoms/text'
@@ -33,13 +33,18 @@ const StyledTableHeader = styled.th`
   padding: ${SPACING.spacing3};
 `
 const StyledTableRow = styled.tr`
-  padding: ${SPACING.spacing3}; ;
+  padding: ${SPACING.spacing3};
+  border-bottom: ${BORDERS.lineBorder};
 `
 const StyledTableCell = styled.td`
   padding: ${SPACING.spacing3};
   text-overflow: wrap;
 `
 
+const BODY_STYLE = css`
+  box-shadow: 0 0 0 1px ${COLORS.medGrey};
+  border-radius: 3px;
+`
 interface PipetteOffsetCalibrationItemsProps {
   robotName: string
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
@@ -62,17 +67,13 @@ export function PipetteOffsetCalibrationItems({
     <StyledTable>
       <thead>
         <tr>
-          <StyledTableHeader>
-            {t('table_header_model_and_serial')}
-          </StyledTableHeader>
-          <StyledTableHeader>{t('table_header_mount')}</StyledTableHeader>
-          <StyledTableHeader>{t('table_header_tiprack')}</StyledTableHeader>
-          <StyledTableHeader>
-            {t('table_header_last_calibrated')}
-          </StyledTableHeader>
+          <StyledTableHeader>{t('model_and_serial')}</StyledTableHeader>
+          <StyledTableHeader>{t('mount')}</StyledTableHeader>
+          <StyledTableHeader>{t('tiprack')}</StyledTableHeader>
+          <StyledTableHeader>{t('last_calibrated_label')}</StyledTableHeader>
         </tr>
       </thead>
-      <tbody>
+      <tbody css={BODY_STYLE}>
         {formattedPipetteOffsetCalibrations.map(
           (calibration, index) =>
             attachedPipettes?.[calibration.mount] != null && (
@@ -82,7 +83,10 @@ export function PipetteOffsetCalibrationItems({
                   <StyledText as="p">{calibration.serialNumber}</StyledText>
                 </StyledTableCell>
                 <StyledTableCell>
-                  <StyledText as="p" textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+                  <StyledText
+                    as="p"
+                    textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  >
                     {calibration.mount}
                   </StyledText>
                 </StyledTableCell>

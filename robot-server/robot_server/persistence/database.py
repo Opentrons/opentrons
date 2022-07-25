@@ -1,5 +1,4 @@
 """SQLite database initialization and utilities."""
-from datetime import datetime, timezone
 from pathlib import Path
 
 import sqlalchemy
@@ -57,22 +56,3 @@ def _open_db_no_cleanup(db_file_path: Path) -> sqlalchemy.engine.Engine:
         cursor.close()
 
     return engine
-
-
-def ensure_utc_datetime(dt: object) -> datetime:
-    """Ensure an object is a TZ-aware UTC datetime.
-
-    Args:
-        dt: A UTC-coded datetime to be insterted into the database,
-            or a naive (timezone-less) datetime pulled from the database.
-
-    Returns:
-        A datetime with its timezone set to UTC.
-    """
-    assert isinstance(dt, datetime), f"{dt} is not a datetime"
-
-    if dt.tzinfo is None:
-        return dt.replace(tzinfo=timezone.utc)
-    else:
-        assert dt.tzinfo == timezone.utc, f"Expected '{dt}' to be UTC"
-        return dt

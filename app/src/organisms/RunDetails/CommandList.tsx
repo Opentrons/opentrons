@@ -4,7 +4,6 @@ import dropWhile from 'lodash/dropWhile'
 import {
   Flex,
   DIRECTION_COLUMN,
-  TEXT_TRANSFORM_UPPERCASE,
   FONT_SIZE_CAPTION,
   SPACING_1,
   SPACING_2,
@@ -18,7 +17,7 @@ import {
   JUSTIFY_START,
   Text,
   C_NEAR_WHITE,
-  TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
   AlertItem,
   Box,
   ALIGN_STRETCH,
@@ -343,7 +342,7 @@ export function CommandList(): JSX.Element | null {
               <Text
                 paddingY={SPACING_2}
                 css={FONT_HEADER_DARK}
-                textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                textTransform={TYPOGRAPHY.textTransformCapitalize}
               >
                 {t('protocol_steps')}
               </Text>
@@ -440,7 +439,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
         >
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} color={C_MED_DARK_GRAY}>
             <Text
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              textTransform={TYPOGRAPHY.textTransformUppercase}
               fontSize={FONT_SIZE_CAPTION}
               marginBottom={SPACING_2}
               id={`RunDetails_ProtocolSetupTitle`}
@@ -469,7 +468,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
           <Flex
             fontSize={FONT_SIZE_CAPTION}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={C_MED_DARK_GRAY}
             backgroundColor={C_NEAR_WHITE}
           >

@@ -20,3 +20,8 @@ export const getEnabledHeaterShaker: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_HEATER_SHAKER ?? false
 )
+
+export const getEnabledLiquidColorEnhancements: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_LIQUID_COLOR_ENHANCEMENTS ?? false
+)

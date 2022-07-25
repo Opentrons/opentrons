@@ -8,19 +8,24 @@ import {
   mockThermocycler,
   mockHeaterShaker,
 } from '../../../redux/modules/__fixtures__'
+import { useRunStatuses } from '../../Devices/hooks'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
-import { useIsRobotBusy } from '../../Devices/hooks'
 
 jest.mock('../useModuleIdFromRun')
 jest.mock('../../Devices/hooks')
+jest.mock('../../RunTimeControl/hooks')
+jest.mock('../../ProtocolUpload/hooks')
 
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
 >
-
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
+>
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
 
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
@@ -40,50 +45,6 @@ const mockMovingHeaterShaker = {
   data: {
     labwareLatchStatus: 'idle_closed',
     speedStatus: 'speeding up',
-    temperatureStatus: 'idle',
-    currentSpeed: null,
-    currentTemperature: null,
-    targetSpeed: null,
-    targetTemp: null,
-    errorDetails: null,
-    status: 'idle',
-  },
-  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
-} as any
-
-const mockOpenLatchHeaterShaker = {
-  id: 'heatershaker_id',
-  moduleModel: 'heaterShakerModuleV1',
-  moduleType: 'heaterShakerModuleType',
-  serialNumber: 'jkl123',
-  hardwareRevision: 'heatershaker_v4.0',
-  firmwareVersion: 'v2.0.0',
-  hasAvailableUpdate: true,
-  data: {
-    labwareLatchStatus: 'idle_open',
-    speedStatus: 'idle',
-    temperatureStatus: 'idle',
-    currentSpeed: null,
-    currentTemperature: null,
-    targetSpeed: null,
-    targetTemp: null,
-    errorDetails: null,
-    status: 'idle',
-  },
-  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
-} as any
-
-const mockUnknownLatchHeaterShaker = {
-  id: 'heatershaker_id',
-  moduleModel: 'heaterShakerModuleV1',
-  moduleType: 'heaterShakerModuleType',
-  serialNumber: 'jkl123',
-  hardwareRevision: 'heatershaker_v4.0',
-  firmwareVersion: 'v2.0.0',
-  hasAvailableUpdate: true,
-  data: {
-    labwareLatchStatus: 'idle_unknown',
-    speedStatus: 'idle',
     temperatureStatus: 'idle',
     currentSpeed: null,
     currentTemperature: null,
@@ -200,12 +161,20 @@ describe('ModuleOverflowMenu', () => {
   let props: React.ComponentProps<typeof ModuleOverflowMenu>
   beforeEach(() => {
     mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: true,
+      isRunTerminal: false,
+      isRunIdle: false,
+    })
+    mockUseCurrentRunId.mockReturnValue(null)
     props = {
       module: mockMagneticModule,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
+      isLoadedInRun: false,
     }
   })
 
@@ -226,6 +195,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByRole } = render(props)
     const buttonSetting = getByRole('button', {
@@ -244,6 +214,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByRole } = render(props)
     const buttonSettingLid = getByRole('button', {
@@ -267,35 +238,34 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByRole } = render(props)
     getByRole('button', {
       name: 'Set module temperature',
     })
     getByRole('button', {
-      name: 'Set shake speed',
-    })
-    getByRole('button', {
       name: 'Close Labware Latch',
     })
     const aboutButton = getByRole('button', { name: 'About module' })
-    getByRole('button', { name: 'See how to attach to deck' })
-    const testButton = getByRole('button', { name: 'Test shake' })
+    getByRole('button', { name: 'Show attachment instructions' })
+    const testButton = getByRole('button', { name: 'Test Shake' })
     fireEvent.click(testButton)
     expect(props.handleTestShakeClick).toHaveBeenCalled()
     fireEvent.click(aboutButton)
     expect(props.handleAboutClick).toHaveBeenCalled()
   })
-  it('renders heater shaker see how to attach to deck button and when clicked, launches hs wizard', () => {
+  it('renders heater shaker show attachment instructions button and when clicked, launches hs wizard', () => {
     props = {
       module: mockHeaterShaker,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByRole } = render(props)
-    const btn = getByRole('button', { name: 'See how to attach to deck' })
+    const btn = getByRole('button', { name: 'Show attachment instructions' })
     fireEvent.click(btn)
     expect(props.handleWizardClick).toHaveBeenCalled()
   })
@@ -307,27 +277,12 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByRole } = render(props)
     expect(
       getByRole('button', {
         name: 'Open Labware Latch',
-      })
-    ).toBeDisabled()
-  })
-
-  it('renders heater shaker shake button and is disabled when latch is opened', () => {
-    props = {
-      module: mockOpenLatchHeaterShaker,
-      handleSlideoutClick: jest.fn(),
-      handleAboutClick: jest.fn(),
-      handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
-    }
-    const { getByRole } = render(props)
-    expect(
-      getByRole('button', {
-        name: 'Set shake speed',
       })
     ).toBeDisabled()
   })
@@ -339,6 +294,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
+      isLoadedInRun: false,
     }
 
     const { getByRole } = render(props)
@@ -357,6 +313,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByRole } = render(props)
 
@@ -367,22 +324,6 @@ describe('ModuleOverflowMenu', () => {
     fireEvent.click(btn)
   })
 
-  it('renders heater shaker set shake speed button disabled when labware latch status is unknown', () => {
-    props = {
-      module: mockUnknownLatchHeaterShaker,
-      handleSlideoutClick: jest.fn(),
-      handleAboutClick: jest.fn(),
-      handleTestShakeClick: jest.fn(),
-      handleWizardClick: jest.fn(),
-    }
-    const { getByRole } = render(props)
-    expect(
-      getByRole('button', {
-        name: 'Set shake speed',
-      })
-    ).toBeDisabled()
-  })
-
   it('renders heater shaker overflow menu and deactivates heater when status changes', () => {
     props = {
       module: mockDeactivateHeatHeaterShaker,
@@ -390,12 +331,13 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
+      isLoadedInRun: false,
     }
 
     const { getByRole } = render(props)
 
     const btn = getByRole('button', {
-      name: 'Deactivate',
+      name: 'Deactivate heater',
     })
     expect(btn).not.toBeDisabled()
     fireEvent.click(btn)
@@ -408,6 +350,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
+      isLoadedInRun: false,
     }
 
     const { getByRole } = render(props)
@@ -426,6 +369,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
+      isLoadedInRun: false,
     }
 
     const { getByRole } = render(props)
@@ -444,6 +388,7 @@ describe('ModuleOverflowMenu', () => {
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
+      isLoadedInRun: false,
     }
 
     const { getByRole } = render(props)
@@ -455,15 +400,21 @@ describe('ModuleOverflowMenu', () => {
     fireEvent.click(btn)
   })
 
-  it('should disable module control buttons when the robot is busy', () => {
-    mockUseIsRobotBusy.mockReturnValue(true)
-
+  it('should disable module control buttons when the robot is busy and run status not null', () => {
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: false,
+      isRunIdle: true,
+    })
     props = {
       module: mockTCBlockHeating,
       handleSlideoutClick: jest.fn(),
       handleAboutClick: jest.fn(),
       handleTestShakeClick: jest.fn(),
       handleWizardClick: jest.fn(),
+      isLoadedInRun: true,
+      runId: 'id',
     }
 
     const { getByRole } = render(props)

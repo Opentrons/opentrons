@@ -1,32 +1,28 @@
+from typing import Optional, Callable
+import pytest
+
 from opentrons.types import Point
 from opentrons.hardware_control.robot_calibration import load_gripper_calibration_offset
 from opentrons.hardware_control.instruments import gripper
-from opentrons.config import gripper_config
+from opentrons.hardware_control.types import CriticalPoint
 from opentrons.calibration_storage.delete import clear_gripper_calibration_offsets
+from opentrons.config import gripper_config
+from opentrons_shared_data.gripper.dev_types import GripperModel
 
-
-fake_gripper_conf = gripper_config.GripperConfig(
-    gripper_offset=(0, 0, 0),
-    gripper_current=1.0,
-    display_name="Display Name of This Gripper",
-    name="gripper",
-    model="gripper_v1",
-    max_travel=10.0,
-    home_position=0.0,
-    steps_per_mm=0.0,
-    idle_current=0.0,
-)
+fake_gripper_conf = gripper_config.load(GripperModel.V1)
 
 FAKE_OFFSET = load_gripper_calibration_offset("fakeid123")
 
 
 def test_config_update():
-    gripr = gripper.Gripper(fake_gripper_conf, "fakeid123")
-    config_to_update = {"idle_current": 1.0, "gripper_offset": (1.0, 2.0, 3.0)}
+    gripr = gripper.Gripper(fake_gripper_conf, FAKE_OFFSET, "fakeid123")
+    config_to_update = {"z_idle_current": 1.0, "jaw_reference_voltage": 0.5}
     for k, v in config_to_update.items():
         gripr.update_config_item(k, v)
-    assert gripr.config.idle_current == config_to_update["idle_current"]
-    assert gripr.config.gripper_offset == config_to_update["gripper_offset"]
+    assert gripr.config.z_idle_current == config_to_update["z_idle_current"]
+    assert (
+        gripr.config.jaw_reference_voltage == config_to_update["jaw_reference_voltage"]
+    )
 
 
 def test_id_get_added_to_dict():
@@ -34,10 +30,27 @@ def test_id_get_added_to_dict():
     assert gripr.as_dict()["gripper_id"] == "fakeid123"
 
 
-def test_critical_point():
+@pytest.mark.parametrize(
+    "override,result_accessor",
+    [
+        (None, lambda g: g._jaw_center_offset),
+        (CriticalPoint.GRIPPER_JAW_CENTER, lambda g: g._jaw_center_offset),
+        (
+            CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN,
+            lambda g: g._front_calibration_pin_offset,
+        ),
+        (
+            CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN,
+            lambda g: g._back_calibration_pin_offset,
+        ),
+    ],
+)
+def test_critical_point(
+    override: Optional[CriticalPoint],
+    result_accessor: Callable[[gripper.Gripper], Point],
+):
     gripr = gripper.Gripper(fake_gripper_conf, FAKE_OFFSET, "fakeid123")
-    # TODO: update test when critical_point() is fully implemented
-    assert gripr.critical_point() == Point(0, 0, 0)
+    assert gripr.critical_point(override) == result_accessor(gripr)
 
 
 def test_load_gripper_cal_offset():

@@ -83,6 +83,16 @@ const MOCK_WAIT_FOR_RESUME_COMMAND: RunTimeCommand = {
   completedAt: 'end timestamp',
 } as any
 
+const MOCK_WAIT_FOR_RESUME_NO_MESSAGE_COMMAND: RunTimeCommand = {
+  id: '1234',
+  commandType: 'waitForResume',
+  params: {},
+  status: 'running',
+  result: {},
+  startedAt: 'start timestamp',
+  completedAt: 'end timestamp',
+} as any
+
 const MOCK_LOAD_COMMAND = {
   id: '1234',
   commandType: 'loadModule',
@@ -141,6 +151,16 @@ describe('StepText', () => {
     getByText('THIS IS THE PAUSE MESSAGE')
   })
 
+  it('renders correct text for wait for resume without message', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: MOCK_WAIT_FOR_RESUME_NO_MESSAGE_COMMAND as RunCommandSummary,
+    })
+    getByText('Pausing protocol')
+  })
+
   it('renders correct command text for load commands', () => {
     const { getByText } = render({
       robotName: ROBOT_NAME,
@@ -181,5 +201,22 @@ describe('StepText', () => {
     getByText(
       'Picking up tip from wellName of fake_display_name in fake_labware_location'
     )
+  })
+
+  it('renders correct command text for for legacy command with non-string text', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'custom',
+        params: {
+          legacyCommandType: 'anyLegacyCommand',
+          legacyCommandText: { someKey: ['someValue', 'someOtherValue'] },
+        },
+      },
+    })
+    getByText('{"someKey":["someValue","someOtherValue"]}')
   })
 })

@@ -51,7 +51,7 @@ describe('RobotSettings FactoryResetModal', () => {
     getByText('Reset to factory settings?')
     getByText('This data cannot be retrieved later.')
     getByRole('button', { name: 'cancel' })
-    getByRole('button', { name: 'Yes' })
+    getByRole('button', { name: 'Yes, clear data and restart robot' })
   })
 
   it('should close the modal when the user clicks the Yes button', () => {
@@ -66,7 +66,7 @@ describe('RobotSettings FactoryResetModal', () => {
       resetOptions: clearMockResetOptions,
     })
     const clearDataAndRestartRobotButton = getByRole('button', {
-      name: 'Yes',
+      name: 'Yes, clear data and restart robot',
     })
     fireEvent.click(clearDataAndRestartRobotButton)
     expect(dispatchApiRequest).toBeCalledWith(
@@ -112,7 +112,7 @@ describe('RobotSettings FactoryResetModal', () => {
     getByText(
       'The Opentrons App is unable to communicate with this robot right now. Double check the USB or Wifi connection to the robot, then try to reconnect.'
     )
-    getByRole('button', { name: 'Close' })
+    getByRole('button', { name: 'close' })
   })
 
   it('should close the modal when clicking the Close button-UNREACHABLE', () => {
@@ -123,7 +123,7 @@ describe('RobotSettings FactoryResetModal', () => {
       resetOptions: {},
     })
 
-    const closeButton = getByRole('button', { name: 'Close' })
+    const closeButton = getByRole('button', { name: 'close' })
     fireEvent.click(closeButton)
     expect(mockCloseModal).toHaveBeenCalled()
   })

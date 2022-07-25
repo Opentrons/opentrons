@@ -29,7 +29,6 @@ import {
   useCurrentRunControls,
 } from '../RunTimeControl/hooks'
 import { ConfirmExitProtocolUploadModal } from '../ProtocolUpload/ConfirmExitProtocolUploadModal'
-import { useCloseCurrentRun } from '../ProtocolUpload/hooks/useCloseCurrentRun'
 import { CommandList } from './CommandList'
 import { ConfirmCancelModal } from './ConfirmCancelModal'
 
@@ -37,6 +36,7 @@ import styles from '../ProtocolUpload/styles.css'
 import {
   useCurrentRunId,
   useIsProtocolRunLoaded,
+  useCloseCurrentRun,
 } from '../ProtocolUpload/hooks'
 import { getConnectedRobotName } from '../../redux/robot/selectors'
 import type { State } from '../../redux/types'

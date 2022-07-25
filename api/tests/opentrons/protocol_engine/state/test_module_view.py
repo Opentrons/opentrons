@@ -2,7 +2,7 @@
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
-from contextlib import nullcontext
+from contextlib import nullcontext as does_not_raise
 from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union
 
 from opentrons_shared_data import load_shared_data
@@ -37,7 +37,6 @@ def make_module_view(
     slot_by_module_id: Optional[Dict[str, Optional[DeckSlotName]]] = None,
     hardware_by_module_id: Optional[Dict[str, HardwareModule]] = None,
     substate_by_module_id: Optional[Dict[str, ModuleSubStateType]] = None,
-    virtualize_modules: bool = False,
 ) -> ModuleView:
     """Get a module view test subject with the specified state."""
     state = ModuleState(
@@ -46,7 +45,7 @@ def make_module_view(
         substate_by_module_id=substate_by_module_id or {},
     )
 
-    return ModuleView(state=state, virtualize_modules=virtualize_modules)
+    return ModuleView(state=state)
 
 
 def get_sample_parent_module_view(
@@ -218,6 +217,8 @@ def test_get_magnetic_module_substate(
             ),
             "heatshake-module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("heatshake-module-id"),
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             ),
         },
@@ -270,6 +271,8 @@ def test_get_heater_shaker_module_substate(
             "heatshake-module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("heatshake-module-id"),
                 plate_target_temperature=432,
+                is_labware_latch_closed=True,
+                is_plate_shaking=True,
             ),
         },
     )
@@ -279,6 +282,8 @@ def test_get_heater_shaker_module_substate(
     )
     assert hs_substate.module_id == "heatshake-module-id"
     assert hs_substate.plate_target_temperature == 432
+    assert hs_substate.is_plate_shaking is True
+    assert hs_substate.is_labware_latch_closed is True
 
     with pytest.raises(errors.WrongModuleTypeError):
         subject.get_heater_shaker_module_substate(module_id="magnetic-module-gen2-id")
@@ -324,6 +329,8 @@ def test_get_temperature_module_substate(
             ),
             "heatshake-module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("heatshake-module-id"),
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             ),
         },
@@ -403,6 +410,8 @@ def test_get_plate_target_temperature(heater_shaker_v1_def: ModuleDefinition) ->
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=12.3,
             )
         },
@@ -426,6 +435,8 @@ def test_get_plate_target_temperature_no_target(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             )
         },
@@ -803,7 +814,7 @@ def test_magnetic_module_view_calculate_magnet_hardware_height(
     subject = module_view.get_magnetic_module_substate("module-id")
     expected_raise: ContextManager[None] = (
         # Not sure why mypy has trouble with this.
-        nullcontext()  # type: ignore[assignment]
+        does_not_raise()  # type: ignore[assignment]
         if expected_exception_type is None
         else pytest.raises(expected_exception_type)
     )
@@ -829,6 +840,8 @@ def test_validate_heater_shaker_target_temperature_raises(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             )
         },
@@ -855,6 +868,8 @@ def test_validate_heater_shaker_target_temperature(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             )
         },
@@ -934,6 +949,8 @@ def test_validate_heater_shaker_target_speed_converts_to_int(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             )
         },
@@ -961,6 +978,8 @@ def test_validate_heater_shaker_target_speed_raises_error(
         substate_by_module_id={
             "module-id": HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
                 plate_target_temperature=None,
             )
         },
@@ -969,6 +988,99 @@ def test_validate_heater_shaker_target_speed_raises_error(
     if not expected_valid:
         with pytest.raises(errors.InvalidTargetSpeedError):
             subject.validate_target_speed(rpm_param)
+
+
+def test_raise_if_labware_latch_not_closed(
+    heater_shaker_v1_def: ModuleDefinition,
+) -> None:
+    """It should raise an error if labware latch is not closed."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=heater_shaker_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("module-id"),
+                is_labware_latch_closed=False,
+                is_plate_shaking=False,
+                plate_target_temperature=None,
+            )
+        },
+    )
+    subject = module_view.get_heater_shaker_module_substate("module-id")
+    with pytest.raises(errors.CannotPerformModuleAction):
+        subject.raise_if_labware_latch_not_closed()
+
+
+def test_heater_shaker_raise_if_shaking(
+    heater_shaker_v1_def: ModuleDefinition,
+) -> None:
+    """It should raise when heater-shaker is shaking."""
+    module_view = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=heater_shaker_v1_def,
+            )
+        },
+        substate_by_module_id={
+            "module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("module-id"),
+                is_labware_latch_closed=False,
+                is_plate_shaking=True,
+                plate_target_temperature=None,
+            )
+        },
+    )
+    subject = module_view.get_heater_shaker_module_substate("module-id")
+    with pytest.raises(errors.CannotPerformModuleAction):
+        subject.raise_if_shaking()
+
+
+def test_get_heater_shaker_movement_data(
+    heater_shaker_v1_def: ModuleDefinition,
+    tempdeck_v2_def: ModuleDefinition,
+) -> None:
+    """It should get heater-shaker movement data."""
+    module_view = make_module_view(
+        slot_by_module_id={
+            "module-id": DeckSlotName.SLOT_1,
+            "other-module-id": DeckSlotName.SLOT_5,
+        },
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=heater_shaker_v1_def,
+            ),
+            "other-module-id": HardwareModule(
+                serial_number="other-serial-number",
+                definition=tempdeck_v2_def,
+            ),
+        },
+        substate_by_module_id={
+            "module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("module-id"),
+                is_labware_latch_closed=True,
+                is_plate_shaking=False,
+                plate_target_temperature=None,
+            ),
+            "other-module-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("other-module-id"),
+                plate_target_temperature=None,
+            ),
+        },
+    )
+    subject = module_view.get_heater_shaker_movement_restrictors()
+    assert len(subject) == 1
+    for hs_movement_data in subject:
+        assert not hs_movement_data.plate_shaking
+        assert hs_movement_data.latch_closed
+        assert hs_movement_data.deck_slot == 1
 
 
 def test_tempdeck_get_plate_target_temperature(
@@ -1174,3 +1286,33 @@ def test_thermocycler_validate_target_lid_temperature_raises(
 
     with pytest.raises(errors.InvalidTargetTemperatureError):
         subject.validate_target_lid_temperature(input_temperature)
+
+
+@pytest.mark.parametrize(
+    ("module_definition", "expected_height"),
+    [
+        (lazy_fixture("thermocycler_v1_def"), 98.0),
+        (lazy_fixture("tempdeck_v1_def"), 84.0),
+        (lazy_fixture("tempdeck_v2_def"), 84.0),
+        (lazy_fixture("magdeck_v1_def"), 110.152),
+        (lazy_fixture("magdeck_v2_def"), 110.152),
+        (lazy_fixture("heater_shaker_v1_def"), 82.0),
+    ],
+)
+def test_get_overall_height(
+    module_definition: ModuleDefinition,
+    expected_height: float,
+) -> None:
+    """It should get a module's overall height."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_7},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=module_definition,
+            )
+        },
+    )
+
+    result = subject.get_overall_height("module-id")
+    assert result == expected_height

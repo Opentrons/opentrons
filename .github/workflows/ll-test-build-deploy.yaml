@@ -68,20 +68,16 @@ jobs:
           flags: labware-library
 
   e2e-test:
-    name: 'labware library e2e tests on ${{ matrix.os }}'
+    name: 'labware library e2e tests'
     needs: ['js-unit-test']
     timeout-minutes: 30
-    strategy:
-      matrix:
-        os: ['ubuntu-18.04', 'macos-latest']
-    runs-on: '${{ matrix.os }}'
+    runs-on: 'ubuntu-18.04'
     steps:
       - uses: 'actions/checkout@v2'
       - uses: 'actions/setup-node@v1'
         with:
           node-version: '14'
       - name: 'install libudev for usb-detection'
-        if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
         uses: actions/cache@v2
@@ -167,6 +163,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
+          AWS_DEFAULT_REGION: us-east-2
         uses: './.github/actions/webstack/deploy-to-sandbox'
         with:
           domain: 'labware.opentrons.com'

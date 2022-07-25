@@ -51,16 +51,15 @@ class RobotClient:
                 )
 
     async def alive(self) -> bool:
-        """Are /health and /openapi.json both reachable?"""
+        """Is /health reachable?"""
         try:
             await self.get_health()
-            await self.get_openapi()
             return True
         except (httpx.ConnectError, httpx.HTTPStatusError):
             return False
 
     async def dead(self) -> bool:
-        """Are /health and /openapi.json both unreachable?"""
+        """Is /health unreachable?"""
         try:
             await self.get_health()
             return False
@@ -68,24 +67,18 @@ class RobotClient:
             return False
         except httpx.ConnectError:
             pass
-        try:
-            await self.get_openapi()
-            return False
-        except httpx.HTTPStatusError:
-            return False
-        except httpx.ConnectError:
-            # Now both /health and /openapi.json have returned ConnectError.
-            return True
+
+        return True
 
     async def _poll_for_alive(self) -> None:
-        """Retry the /health and /openapi.json until both reachable."""
+        """Retry GET /health until reachable."""
         while not await self.alive():
             # Avoid spamming the server in case a request immediately
             # returns some kind of "not ready."
             await asyncio.sleep(0.1)
 
     async def _poll_for_dead(self) -> None:
-        """Poll the /health and /openapi.json until both unreachable."""
+        """Poll GET /health until unreachable."""
         while not await self.dead():
             # Avoid spamming the server in case a request immediately
             # returns some kind of "not ready."
@@ -99,7 +92,7 @@ class RobotClient:
             return False
 
     async def wait_until_dead(self, timeout_sec: float = SHUTDOWN_WAIT) -> bool:
-        """Retry the /health and /openapi.json until both unreachable."""
+        """Retry GET /health and until unreachable."""
         try:
             await asyncio.wait_for(self._poll_for_dead(), timeout=timeout_sec)
             return True
@@ -109,12 +102,6 @@ class RobotClient:
     async def get_health(self) -> Response:
         """GET /health."""
         response = await self.httpx_client.get(url=f"{self.base_url}/health")
-        response.raise_for_status()
-        return response
-
-    async def get_openapi(self) -> Response:
-        """GET /openapi.json."""
-        response = await self.httpx_client.get(url=f"{self.base_url}/openapi.json")
         response.raise_for_status()
         return response
 

@@ -237,7 +237,7 @@ export const LabwareSetup = (): JSX.Element | null => {
             </Text>
             {isLabwareOffsetCodeSnippetsOn ? (
               <Link
-                role={'link'}
+                role="button"
                 fontSize={FONT_SIZE_BODY_1}
                 color={C_BLUE}
                 onClick={() => showDownloadOffsetDataModal(true)}

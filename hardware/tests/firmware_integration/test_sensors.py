@@ -74,7 +74,7 @@ async def test_write_to_sensors(
         [SensorType.capacitive, 0.46],
         [SensorType.humidity, 83.92],
         [SensorType.temperature, 22.44],
-        [SensorType.pressure, 5.88],
+        [SensorType.pressure, 0.02],
     ],
 )
 @pytest.mark.requires_emulator
@@ -107,7 +107,7 @@ async def test_read_from_sensors(
     argnames=["sensor_type", "expected_value"],
     argvalues=[
         [SensorType.capacitive, 0.46],
-        [SensorType.pressure, 5.88],
+        [SensorType.pressure, 0.02],
     ],
 )
 @pytest.mark.requires_emulator
