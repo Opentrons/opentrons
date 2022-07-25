@@ -79,6 +79,7 @@ describe('useProtocolDetailsForRun hook', () => {
       displayName: null,
       protocolData: null,
       protocolKey: null,
+      isProtocolAnalyzing: false,
     })
   })
 
@@ -111,6 +112,7 @@ describe('useProtocolDetailsForRun hook', () => {
       displayName: 'fake protocol',
       protocolData: simpleV6Protocol,
       protocolKey: 'fakeProtocolKey',
+      isProtocolAnalyzing: false,
     })
   })
 })

@@ -68,6 +68,7 @@ describe('RobotConfigurationDetails', () => {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
       requiredModuleDetails: null,
+      isLoading: false,
     }
     const { getByText } = render(props)
     getByText('left mount')
@@ -81,6 +82,7 @@ describe('RobotConfigurationDetails', () => {
       leftMountPipetteName: null,
       rightMountPipetteName: 'p10_single',
       requiredModuleDetails: null,
+      isLoading: false,
     }
     const { getByText } = render(props)
     getByText('left mount')
@@ -94,10 +96,23 @@ describe('RobotConfigurationDetails', () => {
       leftMountPipetteName: null,
       rightMountPipetteName: 'p10_single',
       requiredModuleDetails: mockRequiredModuleDetails,
+      isLoading: false,
     }
 
     const { getByText } = render(props)
     getByText('Slot 1')
     getByText('Magnetic Module GEN2')
+  })
+
+  it('renders loading for both pipettes when it is in a loading state', () => {
+    props = {
+      leftMountPipetteName: 'p10_single',
+      rightMountPipetteName: null,
+      requiredModuleDetails: null,
+      isLoading: true,
+    }
+    const { getAllByText, getByText } = render(props)
+    getByText('right mount')
+    getAllByText('Loading...')
   })
 })

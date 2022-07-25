@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { head } from 'lodash'
+import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
 
 import {

@@ -216,6 +216,31 @@ async def test_add_conflicting_setup_command(
     assert exc_info.value.content["errors"][0]["detail"] == "oh no"
 
 
+async def test_add_command_to_stopped_engine(
+    decoy: Decoy,
+    mock_protocol_engine: ProtocolEngine,
+) -> None:
+    """It should raise an error if the setup command cannot be added."""
+    command_request = pe_commands.HomeCreate(
+        params=pe_commands.HomeParams(),
+        intent=pe_commands.CommandIntent.SETUP,
+    )
+
+    decoy.when(mock_protocol_engine.add_command(command_request)).then_raise(
+        pe_errors.RunStoppedError("oh no")
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await create_run_command(
+            request_body=RequestModel(data=command_request),
+            waitUntilComplete=False,
+            protocol_engine=mock_protocol_engine,
+        )
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["detail"] == "oh no"
+
+
 async def test_get_run_commands(
     decoy: Decoy, mock_run_data_manager: RunDataManager
 ) -> None:

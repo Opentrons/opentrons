@@ -11,6 +11,8 @@ import {
   RobotWorkSpace,
   LabwareRender,
   Module,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -58,7 +60,13 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
   >(null)
 
   return (
-    <Flex flex="1" maxHeight="180vh" flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      flex="1"
+      maxHeight="80vh"
+      flexDirection={DIRECTION_COLUMN}
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_CENTER}
+    >
       <RobotWorkSpace
         deckDef={(standardDeckDef as unknown) as DeckDefinition}
         viewBox={DECK_MAP_VIEWBOX}

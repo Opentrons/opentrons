@@ -5,25 +5,17 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
-import { useIsRobotBusy } from '../../../hooks'
 
 import { DisplayRobotName } from '../DisplayRobotName'
 
 const mockUpdateIsEXpanded = jest.fn()
-const mockUpdateIsRobotBusy = jest.fn()
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
->
-
-jest.mock('../../../hooks')
-
-const render = () => {
+const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
       <DisplayRobotName
         robotName="otie"
         updateIsExpanded={mockUpdateIsEXpanded}
-        updateIsRobotBusy={mockUpdateIsRobotBusy}
+        isRobotBusy={isRobotBusy}
       />
     </MemoryRouter>,
     { i18nInstance: i18n }
@@ -31,10 +23,6 @@ const render = () => {
 }
 
 describe('RobotSettings DisplayRobotName', () => {
-  beforeEach(() => {
-    mockUseIsRobotBusy.mockReturnValue(false)
-  })
-
   afterEach(() => {
     jest.resetAllMocks()
   })
@@ -55,10 +43,8 @@ describe('RobotSettings DisplayRobotName', () => {
   })
 
   it('should call update robot status if a robot is busy', () => {
-    mockUseIsRobotBusy.mockReturnValue(true)
-    const [{ getByRole }] = render()
+    const [{ getByRole }] = render(true)
     const button = getByRole('button', { name: 'Rename robot' })
-    fireEvent.click(button)
-    expect(mockUpdateIsRobotBusy).toHaveBeenCalled()
+    expect(button).toBeDisabled()
   })
 })

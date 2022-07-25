@@ -2,7 +2,7 @@ import * as React from 'react'
 import { COLORS, Overlay } from '@opentrons/components'
 
 interface MenuHandleClickOutside {
-  MenuOverlay: React.FC
+  menuOverlay: JSX.Element
   handleOverflowClick: React.MouseEventHandler<HTMLButtonElement>
   showOverflowMenu: boolean
   setShowOverflowMenu: React.Dispatch<React.SetStateAction<boolean>>
@@ -23,7 +23,7 @@ export function useMenuHandleClickOutside(): MenuHandleClickOutside {
     setShowOverflowMenu(false)
   }
 
-  const MenuOverlay = (): JSX.Element => (
+  const menuOverlay: JSX.Element = (
     <>
       {showOverflowMenu ? (
         <Overlay
@@ -35,7 +35,7 @@ export function useMenuHandleClickOutside(): MenuHandleClickOutside {
   )
 
   return {
-    MenuOverlay,
+    menuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,

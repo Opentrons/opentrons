@@ -31,9 +31,15 @@ publish_update := $(filter v%,$(OT_TAG))
 branch_suffix := $(if $(publish_update),,-$(subst /,-,$(OT_BRANCH)))
 build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
 
+# set this to anything on command-line invocations of this makefile to skip bundling
+# standalone python, as is necessary for on-device app builds:
+# make dist no_python_bundle=true or =1 or whatever
+no_python_bundle ?=
+
 builder := electron-builder \
 	--config electron-builder.config.js \
 	--publish never
+
 
 electron := electron . \
 	--devtools \
@@ -80,6 +86,7 @@ package-deps: clean lib deps
 
 package dist-posix dist-osx dist-linux dist-win: export NODE_ENV := production
 package dist-posix dist-osx dist-linux dist-win: export BUILD_ID := $(build_id)
+package dist-posix dist-osx dist-linux dist-win: export NO_PYTHON := $(if $(no_python_bundle),true,false)
 
 .PHONY: package
 package: package-deps

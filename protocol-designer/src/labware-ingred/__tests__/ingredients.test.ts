@@ -18,6 +18,7 @@ describe('DUPLICATE_LABWARE action', () => {
         wellDetailsByLocation: null,
         concentration: '50 mol/ng',
         description: '',
+        displayColor: '#b925ff',
         serialize: false,
       },
       ingred4: {
@@ -25,6 +26,7 @@ describe('DUPLICATE_LABWARE action', () => {
         wellDetailsByLocation: null,
         concentration: '100%',
         description: '',
+        displayColor: '#ffd600',
         serialize: false,
       },
     }

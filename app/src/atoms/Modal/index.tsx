@@ -27,7 +27,6 @@ export interface ModalProps extends BaseModalProps {
   title?: React.ReactNode
   children?: React.ReactNode
   icon?: IconProps
-  contentBackgroundColor?: string
 }
 
 const closeIconStyles = css`
@@ -52,7 +51,6 @@ export const Modal = (props: ModalProps): JSX.Element => {
     onClose,
     closeOnOutsideClick,
     title,
-    contentBackgroundColor,
     children,
     maxHeight,
   } = props
@@ -68,7 +66,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
           <Flex>
             {['error', 'warning'].includes(type) ? (
               <Icon
-                name="alert-circle"
+                name="ot-alert"
                 color={type === 'error' ? COLORS.error : COLORS.warning}
                 size={SPACING.spacingM}
                 marginRight={SPACING.spacing3}
@@ -109,7 +107,6 @@ export const Modal = (props: ModalProps): JSX.Element => {
         max-height: ${maxHeight};
       `}
       onOutsideClick={closeOnOutsideClick ? onClose : undefined}
-      contentBackgroundColor={contentBackgroundColor}
     >
       {children}
     </BaseModal>

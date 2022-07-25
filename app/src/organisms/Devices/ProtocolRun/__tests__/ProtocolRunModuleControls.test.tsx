@@ -111,6 +111,7 @@ describe('ProtocolRunModuleControls', () => {
           robotName: 'otie',
           module: mockMagneticModuleGen2,
           runId: 'test123',
+          isLoadedInRun: true, // this can never be false in this component since isModuleControl true is hardcoded in
         })
       )
       .mockReturnValue(<div>mock Magnetic Module Card</div>)
@@ -144,6 +145,7 @@ describe('ProtocolRunModuleControls', () => {
           robotName: 'otie',
           module: mockTemperatureModuleGen2,
           runId: 'test123',
+          isLoadedInRun: true,
         })
       )
       .mockReturnValue(<div>mock Temperature Module Card</div>)
@@ -178,6 +180,7 @@ describe('ProtocolRunModuleControls', () => {
           robotName: 'otie',
           module: mockThermocycler,
           runId: 'test123',
+          isLoadedInRun: true,
         })
       )
       .mockReturnValue(<div>mock Thermocycler Module Card</div>)
@@ -212,6 +215,7 @@ describe('ProtocolRunModuleControls', () => {
           robotName: 'otie',
           module: mockHeaterShaker,
           runId: 'test123',
+          isLoadedInRun: true,
         })
       )
       .mockReturnValue(<div>mock Heater-Shaker Module Card</div>)
@@ -222,5 +226,30 @@ describe('ProtocolRunModuleControls', () => {
     })
 
     getByText('mock Heater-Shaker Module Card')
+  })
+
+  it('renders correct text when module is not attached but required for protocol', () => {
+    when(mockUseModuleRenderInfoForProtocolById)
+      .calledWith(ROBOT_NAME, RUN_ID)
+      .mockReturnValue({
+        [mockHeaterShakerDef.moduleId]: {
+          moduleId: 'heaterShakerModuleId',
+          x: '0',
+          y: '20',
+          z: '30',
+          moduleDef: mockHeaterShakerDef,
+          nestedLabwareDef: null,
+          nestedLabwareId: null,
+          protocolLoadOrder: 1,
+          attachedModuleMatch: null,
+        },
+      } as any)
+
+    const { getByText } = render({
+      robotName: 'otie',
+      runId: 'test123',
+    })
+
+    getByText('Connect modules to see controls')
   })
 })

@@ -3,53 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [6.0.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2022-06-09)
-
-**Note:** Version bump only for package @opentrons/app-shell
-
-
-
-
-
-# [6.0.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.0.0-alpha.0...v6.0.0-alpha.1) (2022-06-07)
+# [6.0.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v6.0.0) (2022-07-14)
 
 
 ### Bug Fixes
 
-* **docs:** link fix, upcoming issues ([c385668](https://github.com/Opentrons/opentrons/commit/c385668f6d1384b7ca42a97d2f5b4ced581f4037))
-
-
-
-
-
-# [6.0.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v5.1.0-beta.0...v6.0.0-alpha.0) (2022-05-26)
-
-
-### Bug Fixes
-
+* **app:** no longer require app restart after python override path config is updated ([#11049](https://github.com/Opentrons/opentrons/issues/11049)) ([25cc201](https://github.com/Opentrons/opentrons/commit/25cc201c98a30a6431a26b18510bf827e10b978b)), closes [#10612](https://github.com/Opentrons/opentrons/issues/10612)
 * **app:** remove copy link from context menu ([#10328](https://github.com/Opentrons/opentrons/issues/10328)) ([4237331](https://github.com/Opentrons/opentrons/commit/4237331d025decab22d1f148c306b0d17f46f98c))
+* **app:** remove legacy modal content background color override prop ([#10992](https://github.com/Opentrons/opentrons/issues/10992)) ([346fafc](https://github.com/Opentrons/opentrons/commit/346fafce067bfd805e073309d0660feb7603b0d9)), closes [#10742](https://github.com/Opentrons/opentrons/issues/10742)
+* **app-shell:** allow corrupt protocol analysis files to error gracefully ([#10969](https://github.com/Opentrons/opentrons/issues/10969)) ([ed72dc3](https://github.com/Opentrons/opentrons/commit/ed72dc3003f2de4bbfb931526ebaddd506f9b7cd)), closes [#10828](https://github.com/Opentrons/opentrons/issues/10828)
 * **app-shell:** ensure Windows build can analyze protocols ([#10347](https://github.com/Opentrons/opentrons/issues/10347)) ([66a96bc](https://github.com/Opentrons/opentrons/commit/66a96bc9e76911a3a63b9dae5730607c5ee4cebc)), closes [#10378](https://github.com/Opentrons/opentrons/issues/10378)
-
-
-### Features
-
-* **app:** add protocol overview section ([#10212](https://github.com/Opentrons/opentrons/issues/10212)) ([1066ff0](https://github.com/Opentrons/opentrons/commit/1066ff0238e091c9bcfeac23e729a4b74a063211)), closes [#8821](https://github.com/Opentrons/opentrons/issues/8821)
-* **app:** edit Robot Overflow Menu, Pipette Card banner and Advanced Settings ([#10188](https://github.com/Opentrons/opentrons/issues/10188)) ([e21d8db](https://github.com/Opentrons/opentrons/commit/e21d8db51eac5818477264a45ef12c0a2d15fb72)), closes [#10117](https://github.com/Opentrons/opentrons/issues/10117) [#8673](https://github.com/Opentrons/opentrons/issues/8673)
-* **app:** wire up don't show me again checkbox for HS modal ([#10139](https://github.com/Opentrons/opentrons/issues/10139)) ([f86b664](https://github.com/Opentrons/opentrons/commit/f86b6646b9fb15cd493bb5302cf4e5dd222ae0f3)), closes [#9814](https://github.com/Opentrons/opentrons/issues/9814)
-* **app-shell, app:** change window width, height; add minWidth ([#10343](https://github.com/Opentrons/opentrons/issues/10343)) ([69685e3](https://github.com/Opentrons/opentrons/commit/69685e38a786a23de4bcf251cee39a00c7314aa7))
-
-
-
-
-
-# [5.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v5.1.0-beta.0) (2022-04-20)
+* **app-shell:** use existing logic to feed custom labware to analysis ([#10827](https://github.com/Opentrons/opentrons/issues/10827)) ([d210ac5](https://github.com/Opentrons/opentrons/commit/d210ac54ba9d962cd40970e41327aa9785fd373b))
+* **docs:** link fix, upcoming issues ([c385668](https://github.com/Opentrons/opentrons/commit/c385668f6d1384b7ca42a97d2f5b4ced581f4037))
 
 
 ### Features
 
 * **app:**  App robot settings advanced tab robot update ([#10010](https://github.com/Opentrons/opentrons/issues/10010)) ([cf4e9ec](https://github.com/Opentrons/opentrons/commit/cf4e9ecf1bc825bf86339fb0867781a8e25f7e3a))
 * **app:** add managed file system storage for protocols ([#9703](https://github.com/Opentrons/opentrons/issues/9703)) ([153431f](https://github.com/Opentrons/opentrons/commit/153431f7092ce542d068fcd603f423cd3f5442ad)), closes [#9483](https://github.com/Opentrons/opentrons/issues/9483) [#9405](https://github.com/Opentrons/opentrons/issues/9405)
+* **app:** add protocol overview section ([#10212](https://github.com/Opentrons/opentrons/issues/10212)) ([1066ff0](https://github.com/Opentrons/opentrons/commit/1066ff0238e091c9bcfeac23e729a4b74a063211)), closes [#8821](https://github.com/Opentrons/opentrons/issues/8821)
+* **app:** edit Robot Overflow Menu, Pipette Card banner and Advanced Settings ([#10188](https://github.com/Opentrons/opentrons/issues/10188)) ([e21d8db](https://github.com/Opentrons/opentrons/commit/e21d8db51eac5818477264a45ef12c0a2d15fb72)), closes [#10117](https://github.com/Opentrons/opentrons/issues/10117) [#8673](https://github.com/Opentrons/opentrons/issues/8673)
 * **app:** import new custom labware definition ([#9749](https://github.com/Opentrons/opentrons/issues/9749)) ([d3479fd](https://github.com/Opentrons/opentrons/commit/d3479fdb07ab12cf8199e8d7160478ef99061601)), closes [#8866](https://github.com/Opentrons/opentrons/issues/8866)
+* **app:** wire up don't show me again checkbox for HS modal ([#10139](https://github.com/Opentrons/opentrons/issues/10139)) ([f86b664](https://github.com/Opentrons/opentrons/commit/f86b6646b9fb15cd493bb5302cf4e5dd222ae0f3)), closes [#9814](https://github.com/Opentrons/opentrons/issues/9814)
+* **app-shell, app:** change window width, height; add minWidth ([#10343](https://github.com/Opentrons/opentrons/issues/10343)) ([69685e3](https://github.com/Opentrons/opentrons/commit/69685e38a786a23de4bcf251cee39a00c7314aa7))
 * **app, app-shell:** add labware details slideout and overflow menu ([#9894](https://github.com/Opentrons/opentrons/issues/9894)) ([dee5a11](https://github.com/Opentrons/opentrons/commit/dee5a11e594f48b9bd642755d5cc63c023d6c0dc)), closes [#8870](https://github.com/Opentrons/opentrons/issues/8870)
 * **app, app-shell, api-client:** include analysis as cli tool within app for protocol ingestion  ([#9825](https://github.com/Opentrons/opentrons/issues/9825)) ([cdf6c59](https://github.com/Opentrons/opentrons/commit/cdf6c59a96ea6ea5dca2ed79269537dbc0bc6ff7))
 

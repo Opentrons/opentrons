@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import {
-  CheckboxField,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_FLEX_END,
@@ -10,16 +9,16 @@ import {
   TEXT_ALIGN_CENTER,
   SPACING,
   TYPOGRAPHY,
-  TEXT_TRANSFORM_CAPITALIZE,
   DIRECTION_COLUMN,
-  Btn,
-  COLORS,
+  Link,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { Modal } from '../../atoms/Modal'
 import { Dispatch } from '../../redux/types'
 import { UpdateConfigValueAction } from '../../redux/config/types'
 import { updateConfigValue } from '../../redux/config'
+import { CheckboxField } from '../../atoms/CheckboxField'
 
 export function setHeaterShakerAttached(
   heaterShakerAttached: boolean
@@ -97,6 +96,7 @@ export const ConfirmAttachmentModal = (
         flexDirection={DIRECTION_ROW}
         paddingTop={SPACING.spacingXL}
         justifyContent={JUSTIFY_FLEX_END}
+        alignItems={ALIGN_CENTER}
       >
         <Flex
           paddingRight={SPACING.spacing2}
@@ -104,15 +104,15 @@ export const ConfirmAttachmentModal = (
             isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
           }`}
         >
-          <Btn
+          <Link
+            role="button"
             onClick={onCloseClick}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            color={COLORS.blue}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            marginRight={SPACING.spacing6}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            marginRight={SPACING.spacing5}
+            css={TYPOGRAPHY.linkPSemiBold}
           >
             {t('shared:cancel')}
-          </Btn>
+          </Link>
         </Flex>
 
         <Flex

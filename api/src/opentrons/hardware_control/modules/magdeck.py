@@ -20,6 +20,9 @@ MAX_ENGAGE_HEIGHT = {
 }
 
 # Measured in model-specific units (half-mm for GEN1, mm for GEN2).
+# TODO(mc, 2022-06-13): the value for gen1 is off by 1.5 mm
+# The correct value is 8.0 half-mm (4.0 mm)
+# https://github.com/Opentrons/opentrons/issues/9529
 OFFSET_TO_LABWARE_BOTTOM = {"magneticModuleV1": 5, "magneticModuleV2": 2.5}
 
 

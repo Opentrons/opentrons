@@ -198,9 +198,9 @@
     "0": {
       "displayName": "samples",
       "description": "",
-      "displayColor": "#00d781"
+      "displayColor": "#b925ff"
     },
-    "1": { "displayName": "dna", "description": "", "displayColor": "#0076ff" }
+    "1": { "displayName": "dna", "description": "", "displayColor": "#ffd600" }
   },
   "labwareDefinitions": {
     "opentrons/opentrons_96_tiprack_10ul/1": {

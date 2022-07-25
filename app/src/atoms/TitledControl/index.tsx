@@ -9,7 +9,7 @@ import {
   SPACING_1,
   SPACING_2,
   SPACING_3,
-  TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_SEMIBOLD,
 } from '@opentrons/components'
@@ -38,7 +38,7 @@ export function TitledControl({
             as="h4"
             fontWeight={FONT_WEIGHT_SEMIBOLD}
             marginBottom={SPACING_2}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {title}
           </Text>

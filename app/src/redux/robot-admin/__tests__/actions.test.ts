@@ -113,6 +113,16 @@ describe('robot admin actions', () => {
         meta: { requestId: 'foo' } as any,
       },
     },
+    {
+      name: 'robotAdmin:SYNC_SYSTEM_TIME',
+      creator: Actions.syncSystemTime,
+      args: ['robotName'],
+      expected: {
+        type: 'robotAdmin:SYNC_SYSTEM_TIME',
+        payload: { robotName: 'robotName' },
+        meta: {} as any,
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

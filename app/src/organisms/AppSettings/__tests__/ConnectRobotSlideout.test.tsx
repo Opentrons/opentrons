@@ -70,25 +70,20 @@ describe('ConnectRobotSlideout', () => {
 
   it('renders correct title, body, and footer for ConnectRobotSlideout', () => {
     const { getByText } = render(props)
-    expect(getByText('Connect to a Robot via IP Address')).toBeInTheDocument()
-    expect(
-      getByText('Enter an IP address or hostname to connect to a robot.')
-    ).toBeInTheDocument()
-    expect(
-      getByText(
-        'Opentrons recommends working with your network administrator to assign a static IP address to the robot.'
-      )
-    ).toBeInTheDocument()
-    expect(
-      getByText('Learn more about connecting a robot manually')
-    ).toBeInTheDocument()
-    expect(getByText('Add IP Address or Hostname')).toBeInTheDocument()
+    getByText('Connect to a Robot via IP Address')
+    getByText('Enter an IP address or hostname to connect to a robot.')
+    getByText(
+      'Opentrons recommends working with your network administrator to assign a static IP address to the robot.'
+    )
+    getByText('Learn more about connecting a robot manually')
+
+    getByText('Add IP Address or Hostname')
   })
 
   it('renders the Add button, Done button, and input form', () => {
     const { getByRole } = render(props)
-    expect(getByRole('button', { name: 'Add' })).toBeInTheDocument()
-    expect(getByRole('button', { name: 'Done' })).toBeInTheDocument()
+    getByRole('button', { name: 'Add' })
+    getByRole('button', { name: 'Done' })
     expect(getByRole('textbox')).toBeInTheDocument()
   })
 
@@ -110,18 +105,6 @@ describe('ConnectRobotSlideout', () => {
   })
 
   it('Clicking Add button with an IP address/hostname should display the IP address/hostname', async () => {
-    mockGetConfig.mockReturnValue({
-      discovery: {
-        candidates: ['localhost'],
-      },
-    } as any)
-    mockGetViewableRobots.mockReturnValue([
-      {
-        name: 'test-robot-name',
-        host: 'localhost',
-        port: 31950,
-      },
-    ] as any[])
     const { getByRole, getByText, queryByText } = render(props)
     const newIpAddress = 'localhost'
     const inputBox = getByRole('textbox')
@@ -131,9 +114,9 @@ describe('ConnectRobotSlideout', () => {
       await fireEvent.click(addButton)
     })
 
-    expect(getByText(newIpAddress)).toBeInTheDocument()
-    expect(queryByText('Available')).toBeFalsy()
-    expect(queryByText('Not Found')).toBeFalsy()
+    getByText(newIpAddress)
+    getByText('Searching for 30s')
+    expect(queryByText('Available')).toBeInTheDocument()
   })
 
   it('Clicking Add button with an IP address/hostname should display the IP address/hostname and Available label', async () => {
@@ -147,13 +130,13 @@ describe('ConnectRobotSlideout', () => {
       })
       await fireEvent.click(addButton)
     })
-    expect(getByText(availableIpAddress)).toBeInTheDocument()
-    expect(queryByText('Available')).toBeTruthy()
+    getByText(availableIpAddress)
+    queryByText('Available')
   })
 
   it('Clicking Add button with an IP address/hostname should display the IP address/hostname and Not Found label', async () => {
-    const { getByRole, getByText } = render(props)
-    const notFoundIpAddress = '1.1.1.1'
+    const { getByRole, findByText } = render(props)
+    const notFoundIpAddress = '1.1.1.2'
     const inputBox = getByRole('textbox')
     const addButton = getByRole('button', { name: 'Add' })
     await act(async () => {
@@ -162,8 +145,8 @@ describe('ConnectRobotSlideout', () => {
       })
       await fireEvent.click(addButton)
     })
-    expect(getByText(notFoundIpAddress)).toBeInTheDocument()
-    expect(getByText('Not Found')).toBeInTheDocument()
+    findByText(notFoundIpAddress)
+    findByText('Not Found')
   })
 
   it('Clicking Close button in a row should remove an IP address/hostname', async () => {

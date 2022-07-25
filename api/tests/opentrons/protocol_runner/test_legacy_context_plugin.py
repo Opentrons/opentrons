@@ -7,11 +7,6 @@ from typing import Callable
 
 from opentrons.commands.types import CommandMessage as LegacyCommand, PauseMessage
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.types import (
-    PauseType,
-    DoorStateNotification,
-    DoorState,
-)
 from opentrons.protocol_engine import (
     StateView,
     actions as pe_actions,
@@ -78,25 +73,6 @@ def subject(
     )
     plugin._configure(state=state_view, action_dispatcher=action_dispatcher)
     return plugin
-
-
-def test_hardware_event_action(
-    decoy: Decoy,
-    hardware_api: HardwareAPI,
-    state_view: StateView,
-    subject: LegacyContextPlugin,
-) -> None:
-    """It should pause the hardware controller upon a blocking HardwareEventAction."""
-    door_open_event = DoorStateNotification(new_state=DoorState.OPEN)
-    decoy.when(state_view.commands.get_is_implicitly_active()).then_return(True)
-    subject.handle_action(pe_actions.HardwareEventAction(event=door_open_event))
-    # Should not pause when engine queue is implicitly active
-    decoy.verify(hardware_api.pause(PauseType.PAUSE), times=0)
-
-    decoy.when(state_view.commands.get_is_implicitly_active()).then_return(False)
-    subject.handle_action(pe_actions.HardwareEventAction(event=door_open_event))
-    # Should pause
-    decoy.verify(hardware_api.pause(PauseType.PAUSE), times=1)
 
 
 async def test_broker_subscribe_unsubscribe(

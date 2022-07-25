@@ -8,7 +8,7 @@ from typing import Dict, List, Mapping, Optional, Union
 
 from opentrons.ordered_set import OrderedSet
 
-from opentrons.hardware_control.types import DoorStateNotification, DoorState
+from opentrons.hardware_control.types import DoorState
 
 from ..actions import (
     Action,
@@ -20,7 +20,7 @@ from ..actions import (
     StopAction,
     FinishAction,
     HardwareStoppedAction,
-    HardwareEventAction,
+    DoorChangeAction,
 )
 
 from ..commands import Command, CommandStatus, CommandIntent
@@ -338,18 +338,17 @@ class CommandStore(HasState[CommandState], HandlesActions):
         elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.PAUSED
             self._state.run_result = self._state.run_result or RunResult.STOPPED
-            self._state.run_completed_at = action.completed_at
+            self._state.run_completed_at = (
+                self._state.run_completed_at or action.completed_at
+            )
 
-        elif isinstance(action, HardwareEventAction):
-            if (
-                isinstance(action.event, DoorStateNotification)
-                and self._config.block_on_door_open
-            ):
-                if action.event.new_state == DoorState.OPEN:
+        elif isinstance(action, DoorChangeAction):
+            if self._config.block_on_door_open:
+                if action.door_state == DoorState.OPEN:
                     self._state.is_door_blocking = True
                     if self._state.queue_status != QueueStatus.SETUP:
                         self._state.queue_status = QueueStatus.PAUSED
-                elif action.event.new_state == DoorState.CLOSED:
+                elif action.door_state == DoorState.CLOSED:
                     self._state.is_door_blocking = False
 
 

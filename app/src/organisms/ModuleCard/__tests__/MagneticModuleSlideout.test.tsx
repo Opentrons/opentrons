@@ -6,6 +6,7 @@ import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
+import { useRunStatuses } from '../../Devices/hooks'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { MagneticModuleSlideout } from '../MagneticModuleSlideout'
 
@@ -16,6 +17,7 @@ import {
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../useModuleIdFromRun')
+jest.mock('../../Devices/hooks')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
@@ -25,6 +27,9 @@ const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
 >
 const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
   typeof useModuleIdFromRun
+>
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
 >
 
 const render = (props: React.ComponentProps<typeof MagneticModuleSlideout>) => {
@@ -39,10 +44,17 @@ describe('MagneticModuleSlideout', () => {
   beforeEach(() => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: true,
+      isRunIdle: false,
+    })
     props = {
       module: mockMagneticModule,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
@@ -64,15 +76,15 @@ describe('MagneticModuleSlideout', () => {
 
     getByText('Set Engage Height for Magnetic Module GEN1')
     getByText(
-      'Set the engage height for this Magnetic Module. Enter an integer between -5 and 40.'
+      'Set the engage height for this Magnetic Module. Enter an integer between -2.5 and 20.'
     )
     getByText('GEN 1 Height Ranges')
     getByText('Max Engage Height')
     getByText('Labware Bottom')
     getByText('Disengaged')
-    getByText('40')
-    getByText('0')
-    getByText('-5')
+    getByText('20 mm')
+    getByText('0 mm')
+    getByText('-2.5 mm')
     getByText('Set Engage Height')
     getByText('Confirm')
   })
@@ -82,20 +94,21 @@ describe('MagneticModuleSlideout', () => {
       module: mockMagneticModuleGen2,
       isExpanded: true,
       onCloseClick: jest.fn(),
+      isLoadedInRun: false,
     }
     const { getByText } = render(props)
 
     getByText('Set Engage Height for Magnetic Module GEN2')
     getByText(
-      'Set the engage height for this Magnetic Module. Enter an integer between -4 and 16.'
+      'Set the engage height for this Magnetic Module. Enter an integer between -2.5 and 20.'
     )
     getByText('GEN 2 Height Ranges')
     getByText('Max Engage Height')
     getByText('Labware Bottom')
     getByText('Disengaged')
-    getByText('16 mm')
+    getByText('20 mm')
     getByText('0 mm')
-    getByText('-4 mm')
+    getByText('-2.5 mm') // TODO(jr, 6/14/22): change this to -4 when ticket #9585 merges
     getByText('Set Engage Height')
     getByText('Confirm')
   })
@@ -120,11 +133,18 @@ describe('MagneticModuleSlideout', () => {
   })
 
   it('renders the button and it is not clickable until there is something in form field when there is a runId', () => {
+    mockUseRunStatuses.mockReturnValue({
+      isLegacySessionInProgress: false,
+      isRunStill: false,
+      isRunTerminal: false,
+      isRunIdle: true,
+    })
     props = {
       module: mockMagneticModule,
       isExpanded: true,
       onCloseClick: jest.fn(),
-      runId: 'test123',
+      isLoadedInRun: true,
+      currentRunId: 'test123',
     }
 
     const { getByRole, getByTestId } = render(props)
@@ -134,7 +154,7 @@ describe('MagneticModuleSlideout', () => {
     expect(button).toBeEnabled()
     fireEvent.click(button)
     expect(mockCreateCommand).toHaveBeenCalledWith({
-      runId: props.runId,
+      runId: props.currentRunId,
       command: {
         commandType: 'magneticModule/engage',
         params: {

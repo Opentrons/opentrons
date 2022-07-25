@@ -12,7 +12,7 @@ from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel
 from .execution import (
     QueueWorker,
     create_queue_worker,
-    HardwareEventForwarder,
+    DoorWatcher,
     HardwareStopper,
 )
 from .state import StateStore, StateView
@@ -50,7 +50,7 @@ class ProtocolEngine:
         queue_worker: Optional[QueueWorker] = None,
         model_utils: Optional[ModelUtils] = None,
         hardware_stopper: Optional[HardwareStopper] = None,
-        hardware_event_forwarder: Optional[HardwareEventForwarder] = None,
+        door_watcher: Optional[DoorWatcher] = None,
         module_data_provider: Optional[ModuleDataProvider] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
@@ -79,17 +79,15 @@ class ProtocolEngine:
         self._hardware_stopper = hardware_stopper or HardwareStopper(
             hardware_api=hardware_api, state_store=state_store
         )
-        self._hardware_event_forwarder = (
-            hardware_event_forwarder
-            or HardwareEventForwarder(
-                hardware_api=hardware_api,
-                action_dispatcher=self._action_dispatcher,
-            )
+        self._door_watcher = door_watcher or DoorWatcher(
+            state_store=state_store,
+            hardware_api=hardware_api,
+            action_dispatcher=self._action_dispatcher,
         )
         self._module_data_provider = module_data_provider or ModuleDataProvider()
 
         self._queue_worker.start()
-        self._hardware_event_forwarder.start()
+        self._door_watcher.start()
 
     @property
     def state_view(self) -> StateView:
@@ -136,6 +134,8 @@ class ProtocolEngine:
         Raises:
             SetupCommandNotAllowed: the request specified a setup command,
                 but the engine was not idle or paused.
+            RunStoppedError: the run has been stopped, so no new commands
+                may be added.
         """
         command_id = self._model_utils.generate_id()
 
@@ -241,7 +241,7 @@ class ProtocolEngine:
             # Note: After we stop listening, straggling events might be processed
             # concurrently to the below lines in this .finish() call,
             # or even after this .finish() call completes.
-            self._hardware_event_forwarder.stop_soon()
+            self._door_watcher.stop_soon()
 
             await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
 

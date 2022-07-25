@@ -6,7 +6,7 @@ from typing import NamedTuple, Type
 
 from opentrons.ordered_set import OrderedSet
 from opentrons.types import MountType, DeckSlotName
-from opentrons.hardware_control.types import DoorStateNotification, DoorState
+from opentrons.hardware_control.types import DoorState
 
 from opentrons.protocol_engine import commands, errors
 from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, WellLocation
@@ -30,7 +30,7 @@ from opentrons.protocol_engine.actions import (
     FinishErrorDetails,
     StopAction,
     HardwareStoppedAction,
-    HardwareEventAction,
+    DoorChangeAction,
 )
 
 from .command_fixtures import (
@@ -702,34 +702,35 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
 
 
 def test_command_store_save_started_completed_run_timestamp() -> None:
-    """Should return a none empty run_completed_at and run_started_at."""
-    subject = CommandStore(is_door_open=False, config=Config())
+    """It should save started and completed timestamps."""
+    subject = CommandStore(config=Config(), is_door_open=False)
     start_time = datetime(year=2021, month=1, day=1)
-    hardware_stopped_time = datetime(year=2021, month=1, day=2)
-    resume_time = datetime(year=2021, month=1, day=3)
-    second_resume_time = datetime(year=2021, month=1, day=4)
+    hardware_stopped_time = datetime(year=2022, month=2, day=2)
 
     subject.handle_action(PlayAction(requested_at=start_time))
-    subject.handle_action(PauseAction(source=PauseSource.CLIENT))
-
-    subject.handle_action(PlayAction(requested_at=resume_time))
     subject.handle_action(HardwareStoppedAction(completed_at=hardware_stopped_time))
 
-    subject.handle_action(PlayAction(requested_at=second_resume_time))
+    assert subject.state.run_started_at == start_time
+    assert subject.state.run_completed_at == hardware_stopped_time
 
-    assert subject.state == CommandState(
-        queue_status=QueueStatus.PAUSED,
-        run_result=RunResult.STOPPED,
-        run_completed_at=hardware_stopped_time,
-        is_door_blocking=False,
-        running_command_id=None,
-        all_command_ids=[],
-        queued_command_ids=OrderedSet(),
-        queued_setup_command_ids=OrderedSet(),
-        commands_by_id=OrderedDict(),
-        errors_by_id={},
-        run_started_at=start_time,
-    )
+
+def test_timestamps_are_latched() -> None:
+    """It should not change startedAt or completedAt once set."""
+    subject = CommandStore(config=Config(), is_door_open=False)
+
+    play_time_1 = datetime(year=2021, month=1, day=1)
+    play_time_2 = datetime(year=2022, month=2, day=2)
+    stop_time_1 = datetime(year=2023, month=3, day=3)
+    stop_time_2 = datetime(year=2024, month=4, day=4)
+
+    subject.handle_action(PlayAction(requested_at=play_time_1))
+    subject.handle_action(PauseAction(source=PauseSource.CLIENT))
+    subject.handle_action(PlayAction(requested_at=play_time_2))
+    subject.handle_action(HardwareStoppedAction(completed_at=stop_time_1))
+    subject.handle_action(HardwareStoppedAction(completed_at=stop_time_2))
+
+    assert subject.state.run_started_at == play_time_1
+    assert subject.state.run_completed_at == stop_time_1
 
 
 def test_command_store_saves_unknown_finish_error() -> None:
@@ -913,15 +914,12 @@ def test_handles_door_open_and_close_event_before_play(
     """It should update state but not pause on door open whenis setup."""
     subject = CommandStore(is_door_open=False, config=config)
 
-    door_open_event = DoorStateNotification(new_state=DoorState.OPEN)
-    door_close_event = DoorStateNotification(new_state=DoorState.CLOSED)
-
-    subject.handle_action(HardwareEventAction(event=door_open_event))
+    subject.handle_action(DoorChangeAction(door_state=DoorState.OPEN))
 
     assert subject.state.queue_status == QueueStatus.SETUP
     assert subject.state.is_door_blocking is expected_is_door_blocking
 
-    subject.handle_action(HardwareEventAction(event=door_close_event))
+    subject.handle_action(DoorChangeAction(door_state=DoorState.CLOSED))
 
     assert subject.state.queue_status == QueueStatus.SETUP
     assert subject.state.is_door_blocking is False
@@ -940,16 +938,13 @@ def test_handles_door_open_and_close_event_after_play(
     """It should update state when door opened and closed after run is played."""
     subject = CommandStore(is_door_open=False, config=config)
 
-    door_open_event = DoorStateNotification(new_state=DoorState.OPEN)
-    door_close_event = DoorStateNotification(new_state=DoorState.CLOSED)
-
     subject.handle_action(PlayAction(requested_at=datetime(year=2021, month=1, day=1)))
-    subject.handle_action(HardwareEventAction(event=door_open_event))
+    subject.handle_action(DoorChangeAction(door_state=DoorState.OPEN))
 
     assert subject.state.queue_status == expected_queue_status
     assert subject.state.is_door_blocking is expected_is_door_blocking
 
-    subject.handle_action(HardwareEventAction(event=door_close_event))
+    subject.handle_action(DoorChangeAction(door_state=DoorState.CLOSED))
 
     assert subject.state.queue_status == expected_queue_status
     assert subject.state.is_door_blocking is False

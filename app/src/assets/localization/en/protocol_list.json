@@ -1,4 +1,5 @@
 {
+  "a_software_update_is_available_please_update": "A software update is available for this robot. Update to run protocols. <robotLink>Go to Robot</robotLink>",
   "delete_protocol": "Delete protocol",
   "should_delete_this_protocol": "Delete this protocol?",
   "yes_delete_this_protocol": "Yes, delete protocol",

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import '@testing-library/jest-dom'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import {
   RUN_STATUS_IDLE,
@@ -46,14 +46,17 @@ import {
 } from '../../../../organisms/RunTimeControl/__fixtures__'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { useTrackEvent } from '../../../../redux/analytics'
+import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
 
 import {
   useProtocolDetailsForRun,
   useProtocolAnalysisErrors,
+  useTrackProtocolRunEvent,
   useRunCalibrationStatus,
   useRunCreatedAtTimestamp,
   useUnmatchedModulesForProtocol,
+  useIsRobotViewable,
 } from '../../hooks'
 import { useIsHeaterShakerInProtocol } from '../../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../../ModuleCard/ConfirmAttachmentModal'
@@ -91,6 +94,7 @@ jest.mock('../../../ModuleCard/ConfirmAttachmentModal')
 jest.mock('../../../ModuleCard/hooks')
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
+jest.mock('../../../../redux/buildroot/selectors')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
   typeof getIsHeaterShakerAttached
@@ -112,6 +116,9 @@ const mockUseRunStatus = useRunStatus as jest.MockedFunction<
 >
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
+>
+const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
+  typeof useTrackProtocolRunEvent
 >
 const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFunction<
   typeof useProtocolAnalysisErrors
@@ -150,6 +157,12 @@ const mockConfirmAttachmentModal = ConfirmAttachmentModal as jest.MockedFunction
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
+const mockUseIsRobotViewable = useIsRobotViewable as jest.MockedFunction<
+  typeof useIsRobotViewable
+>
+const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
+  typeof getBuildrootUpdateDisplayInfo
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '95e67900-bc9f-4fbf-92c6-cc4d7226a51b'
@@ -164,6 +177,7 @@ const PROTOCOL_DETAILS = {
   displayName: PROTOCOL_NAME,
   protocolData: simpleV6Protocol,
   protocolKey: 'fakeProtocolKey',
+  isProtocolAnalyzing: false,
 }
 
 const mockMovingHeaterShaker = {
@@ -201,11 +215,15 @@ const render = () => {
   )
 }
 let mockTrackEvent: jest.Mock
+let mockTrackProtocolRunEvent: jest.Mock
 let mockCloseCurrentRun: jest.Mock
 
 describe('ProtocolRunHeader', () => {
   beforeEach(() => {
     mockTrackEvent = jest.fn()
+    mockTrackProtocolRunEvent = jest.fn(
+      () => new Promise(resolve => resolve({}))
+    )
     mockCloseCurrentRun = jest.fn()
 
     when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
@@ -225,6 +243,7 @@ describe('ProtocolRunHeader', () => {
       },
     } as any)
     mockGetIsHeaterShakerAttached.mockReturnValue(false)
+    mockUseIsRobotViewable.mockReturnValue(true)
     mockConfirmAttachmentModal.mockReturnValue(
       <div>mock confirm attachment modal</div>
     )
@@ -232,6 +251,11 @@ describe('ProtocolRunHeader', () => {
       analysisErrors: null,
     })
     mockUseIsHeaterShakerInProtocol.mockReturnValue(false)
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'reinstall',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
     when(mockUseCurrentRunId).calledWith().mockReturnValue(RUN_ID)
     when(mockUseCloseCurrentRun).calledWith().mockReturnValue({
       isClosingCurrentRun: false,
@@ -272,6 +296,9 @@ describe('ProtocolRunHeader', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue(PROTOCOL_DETAILS)
+    when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
+      trackProtocolRunEvent: mockTrackProtocolRunEvent,
+    })
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
       .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
@@ -288,7 +315,7 @@ describe('ProtocolRunHeader', () => {
     const [{ getByText }] = render()
 
     getByText('A Protocol for Otie')
-    getByText('Run ID')
+    getByText('Run')
     getByText('03/03/2022 19:08:49')
     getByText('Status')
     getByText('Not started')
@@ -318,6 +345,7 @@ describe('ProtocolRunHeader', () => {
       displayName: null,
       protocolData: null,
       protocolKey: null,
+      isProtocolAnalyzing: true,
     })
 
     const [{ getByRole }] = render()
@@ -337,21 +365,34 @@ describe('ProtocolRunHeader', () => {
     getByText('Mock ConfirmCancelModal')
   })
 
-  it('dismisses a current but canceled run', () => {
-    const dismissCurrentRun = jest.fn()
+  it('calls trackProtocolRunEvent when start run button clicked', () => {
+    const [{ getByRole }] = render()
+
+    const button = getByRole('button', { name: 'Start run' })
+    fireEvent.click(button)
+    expect(mockTrackProtocolRunEvent).toBeCalledTimes(1)
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: 'runStart',
+      properties: {},
+    })
+  })
+
+  it('dismisses a current but canceled run and calls trackProtocolRunEvent', () => {
     when(mockUseRunStatus)
       .calledWith(RUN_ID)
       .mockReturnValue(RUN_STATUS_STOPPED)
-    when(mockUseDismissCurrentRunMutation)
-      .calledWith()
-      .mockReturnValue({ dismissCurrentRun } as any)
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
         data: { data: { ...mockIdleUnstartedRun, current: true } },
       } as UseQueryResult<Run>)
     render()
-    expect(dismissCurrentRun).toHaveBeenCalledWith(RUN_ID)
+    expect(mockCloseCurrentRun).toBeCalled()
+    expect(mockTrackProtocolRunEvent).toBeCalled()
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: 'runFinish',
+      properties: {},
+    })
   })
 
   it('disables the Start Run button with tooltip if calibration is incomplete', () => {
@@ -380,7 +421,22 @@ describe('ProtocolRunHeader', () => {
     getByText('Complete required steps in Setup tab')
   })
 
-  it('renders a pause run button, start time, and end time when run is running', () => {
+  it('disables the Start Run button with tooltip if robot software update is available', () => {
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+
+    const [{ getByRole, getByText }] = render()
+    const button = getByRole('button', { name: 'Start run' })
+    expect(button).toBeDisabled()
+    getByText(
+      'A software update is available for this robot. Update to run protocols.'
+    )
+  })
+
+  it('renders a pause run button, start time, and end time when run is running, and calls trackProtocolRunEvent when button clicked', () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -391,10 +447,12 @@ describe('ProtocolRunHeader', () => {
       .mockReturnValue(RUN_STATUS_RUNNING)
     const [{ getByRole, getByText }] = render()
 
-    getByRole('button', { name: 'Pause run' })
+    const button = getByRole('button', { name: 'Pause run' })
     getByText(formatTimestamp(STARTED_AT))
     getByText('Protocol start')
     getByText('Protocol end')
+    fireEvent.click(button)
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runPause' })
   })
 
   it('renders a cancel run button when running and shows a confirm cancel modal when clicked', () => {
@@ -414,7 +472,7 @@ describe('ProtocolRunHeader', () => {
     getByText('Mock ConfirmCancelModal')
   })
 
-  it('renders a Resume Run button and Cancel Run button when paused', () => {
+  it('renders a Resume Run button and Cancel Run button when paused and call trackProtocolRunEvent when resume button clicked', () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -424,9 +482,14 @@ describe('ProtocolRunHeader', () => {
 
     const [{ getByRole, getByText }] = render()
 
-    getByRole('button', { name: 'Resume run' })
+    const button = getByRole('button', { name: 'Resume run' })
     getByRole('button', { name: 'Cancel run' })
     getByText('Paused')
+    fireEvent.click(button)
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: 'runResume',
+      properties: {},
+    })
   })
 
   it('renders a disabled Resume Run button and when pause requested', () => {
@@ -464,7 +527,7 @@ describe('ProtocolRunHeader', () => {
     getByText('Stop requested')
   })
 
-  it('renders a Run Again button and end time when run has stopped', () => {
+  it('renders a Run Again button and end time when run has stopped and calls trackProtocolRunEvent when run again button clicked', () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -482,12 +545,14 @@ describe('ProtocolRunHeader', () => {
 
     const [{ getByText }] = render()
 
-    getByText('Run again')
+    const button = getByText('Run again')
     getByText('Canceled')
     getByText(formatTimestamp(COMPLETED_AT))
+    fireEvent.click(button)
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
   })
 
-  it('renders a Run Again button and end time when run has failed', () => {
+  it('renders a Run Again button and end time when run has failed and calls trackProtocolRunEvent when run again button clicked', () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -503,12 +568,14 @@ describe('ProtocolRunHeader', () => {
 
     const [{ getByText }] = render()
 
-    getByText('Run again')
+    const button = getByText('Run again')
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
+    fireEvent.click(button)
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
   })
 
-  it('renders a Run Again button and end time when run has succeeded', () => {
+  it('renders a Run Again button and end time when run has succeeded and calls trackProtocolRunEvent when run again button clicked', () => {
     when(mockUseRunQuery)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -526,9 +593,11 @@ describe('ProtocolRunHeader', () => {
 
     const [{ getByText }] = render()
 
-    getByText('Run again')
+    const button = getByText('Run again')
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
+    fireEvent.click(button)
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
   })
 
   it('disables the Run Again button with tooltip for a completed run if the robot is busy', () => {
@@ -614,6 +683,7 @@ describe('ProtocolRunHeader', () => {
     const button = getByRole('button', { name: 'Start run' })
     fireEvent.click(button)
     getByText('mock confirm attachment modal')
+    expect(mockTrackProtocolRunEvent).toBeCalledTimes(0)
   })
 
   it('does NOT render confirm attachment modal when the user already confirmed the heater shaker is attached', () => {
@@ -660,5 +730,23 @@ describe('ProtocolRunHeader', () => {
       })
     const [{ getByText }] = render()
     getByText('Protocol analysis failed.')
+  })
+  it('renders the devices page when robot is not viewable but protocol is loaded', async () => {
+    mockUseIsRobotViewable.mockReturnValue(false)
+    waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/devices')
+    })
+  })
+  it('renders banner with spinner if currently closing current run', async () => {
+    when(mockUseRunStatus)
+      .calledWith(RUN_ID)
+      .mockReturnValue(RUN_STATUS_SUCCEEDED)
+    when(mockUseCloseCurrentRun).calledWith().mockReturnValue({
+      isClosingCurrentRun: true,
+      closeCurrentRun: mockCloseCurrentRun,
+    })
+    const [{ getByText, getByLabelText }] = render()
+    getByText('Run completed.')
+    getByLabelText('ot-spinner')
   })
 })
