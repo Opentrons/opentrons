@@ -146,7 +146,7 @@ class MoveGroupRunner:
                         completion.payload.seq_id.value,
                     ),
                     float(completion.payload.current_position_um.value) / 1000.0,
-                    float(completion.payload.encoder_position.value) / 1000.0,
+                    float(completion.payload.encoder_position_um.value) / 1000.0,
                 )
             )
         # for each node, pull the position from the completion with the largest
