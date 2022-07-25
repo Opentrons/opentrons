@@ -4619,16 +4619,16 @@ smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
 thermocycler: M104 S20.2 H1.0 -> Setting thermocycler plate temp to 20.2C ->
 thermocycler: M104 S4.0 H0.0 -> Setting thermocycler plate temp to 4.0C ->
-smoothie: M907 A0.8 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
+smoothie: M907 A0.8 B0.05 C0.3 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.8 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
-smoothie: G28.2 A -> Homing the following axes: A ->
+smoothie: G28.2 A Z -> Homing the following axes: Z, A ->
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 381.84 Y Axis: 351.5 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 381.84 Y Axis: 351.5 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 381.84 Y Axis: 351.5 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 381.84 Y Axis: 351.5 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 1.0 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
@@ -4637,7 +4637,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: 19.0 X Axis: 381.84 Y Axis: 351.5 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: 19.0 X Axis: 381.84 Y Axis: 351.5 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 1.0 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
@@ -4675,7 +4675,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 146.88 Y Axis: 133.24 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 146.88 Y Axis: 133.24 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
@@ -4769,7 +4769,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 1.0 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
@@ -4807,7 +4807,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 155.88 Y Axis: 133.24 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 155.88 Y Axis: 133.24 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
@@ -5052,7 +5052,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 1.0 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
@@ -5092,7 +5092,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 164.88 Y Axis: 133.24 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 164.88 Y Axis: 133.24 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
@@ -5190,7 +5190,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 1.0 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
@@ -5232,7 +5232,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 173.88 Y Axis: 133.24 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 173.88 Y Axis: 133.24 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: G0 F12000.0 -> Setting speed to 12000.0 ->
 smoothie: M907 A0.1 B0.05 C0.3 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
@@ -5439,7 +5439,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 1.0 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
@@ -5481,7 +5481,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 182.88 Y Axis: 133.24 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 182.88 Y Axis: 133.24 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: G0 F12000.0 -> Setting speed to 12000.0 ->
 smoothie: M907 A0.1 B0.05 C0.3 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
@@ -5688,7 +5688,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 1.0 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
@@ -5730,7 +5730,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 191.88 Y Axis: 133.24 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 191.88 Y Axis: 133.24 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: G0 F12000.0 -> Setting speed to 12000.0 ->
 smoothie: M907 A0.1 B0.05 C0.3 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
@@ -5819,7 +5819,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 1.0 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
@@ -5864,7 +5864,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 200.88 Y Axis: 133.24 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 200.88 Y Axis: 133.24 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: G0 F12000.0 -> Setting speed to 12000.0 ->
 smoothie: M907 A0.1 B0.05 C0.3 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
@@ -6201,7 +6201,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 1.0 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
@@ -6245,7 +6245,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 209.88 Y Axis: 133.24 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 209.88 Y Axis: 133.24 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: G0 F12000.0 -> Setting speed to 12000.0 ->
 smoothie: M907 A0.1 B0.05 C0.3 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
@@ -6361,7 +6361,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 102.5
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 97.58 B Axis: -8.5 C Axis: 19.0 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C1.0 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 1.0 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
@@ -6384,11 +6384,7 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 347.84 Y Axis: 351.5 Z Axis: 102.5
-smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
-smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
-smoothie: G0 Z121.64 -> Moving the robot as follows: The left pipette arm height to 121.64 ->
+smoothie: M114.2 -> Getting current position for all axes -> The current position of the robot is: A Axis: 218.0 B Axis: -8.5 C Axis: -14.5 X Axis: 347.84 Y Axis: 351.5 Z Axis: 218.0
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
