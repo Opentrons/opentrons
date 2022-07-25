@@ -22,11 +22,7 @@ export function useRunStatuses(): RunStatusesInfo {
     runStatus === RUN_STATUS_STOPPED ||
     runStatus === RUN_STATUS_FAILED
 
-  const isRunStill =
-    runStatus === RUN_STATUS_SUCCEEDED ||
-    runStatus === RUN_STATUS_STOPPED ||
-    runStatus === RUN_STATUS_FAILED ||
-    runStatus === RUN_STATUS_IDLE
+  const isRunStill = isRunTerminal || isRunIdle
 
   return { isRunStill, isRunTerminal, isRunIdle }
 }

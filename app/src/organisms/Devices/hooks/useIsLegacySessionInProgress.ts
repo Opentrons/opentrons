@@ -3,9 +3,8 @@ import { useAllSessionsQuery } from '@opentrons/react-api-client'
 export function useIsLegacySessionInProgress(): Boolean {
   const allSessionsQueryResponse = useAllSessionsQuery()
 
-  const isLegacySessionInProgress =
+  return (
     allSessionsQueryResponse?.data?.data != null &&
     allSessionsQueryResponse?.data?.data?.length !== 0
-
-  return isLegacySessionInProgress
+  )
 }
