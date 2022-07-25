@@ -725,7 +725,7 @@ To pipette while the Heater-Shaker is heating, use :py:meth:`~.HeaterShakerConte
     protocol.delay(minutes=1)
     hs_mod.deactivate_heater()
 
-This example would likely take just as long as the blocking version above; it’s unlikely that one aspirate and one dispense action would take longer than the time for the module to heat. However, be careful when putting a lot of commands between a ``set_target_temperature()`` call and a ``delay()`` call. In this situation, you’re relying on ``wait_for_temperature()`` to resume execution of commands once heating is complete. But if the temperature has already been reached, the delay will begin later than expected the Heater-Shaker will hold at its target temperature longer than intended.
+This example would likely take just as long as the blocking version above; it’s unlikely that one aspirate and one dispense action would take longer than the time for the module to heat. However, be careful when putting a lot of commands between a ``set_target_temperature()`` call and a ``delay()`` call. In this situation, you’re relying on ``wait_for_temperature()`` to resume execution of commands once heating is complete. But if the temperature has already been reached, the delay will begin later than expected and the Heater-Shaker will hold at its target temperature longer than intended.
 
 Additionally, if you want to pipette while the module is holding at a speed and/or temperature, you need to parallelize the commands yourself. One of the simplest ways to do this is with Python’s ``time`` library. Add ``import time`` at the start of your protocol, and then use :py:meth:`time.time` to compare the current time to a reference time set when the target is reached:
 
