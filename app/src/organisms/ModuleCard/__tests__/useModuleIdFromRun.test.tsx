@@ -47,7 +47,6 @@ describe('useModuleIdFromRun', () => {
   const store: Store<State> = createStore(jest.fn(), {})
 
   beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => {})
     store.dispatch = jest.fn()
     mockUseProtocolDetailsForRun.mockReturnValue({
       protocolData: {
@@ -163,7 +162,6 @@ describe('useModuleIdFromRun', () => {
     const moduleIdFromRun = result.current
 
     expect(moduleIdFromRun.moduleIdFromRun).toBe('magneticModuleId_1')
-    expect(console.error).not.toHaveBeenCalled()
   })
 
   it('should return the correct module id when there is multiples of a module', () => {
@@ -181,7 +179,6 @@ describe('useModuleIdFromRun', () => {
     const moduleIdFromRun = result.current
 
     expect(moduleIdFromRun.moduleIdFromRun).toBe('magneticModuleId_2')
-    expect(console.error).not.toHaveBeenCalled()
   })
 
   it('should return an empty string if moduleIndex equals null meaning module is not included in protocol', () => {
@@ -196,6 +193,5 @@ describe('useModuleIdFromRun', () => {
     const moduleIdFromRun = result.current
 
     expect(moduleIdFromRun.moduleIdFromRun).toBe('')
-    expect(console.error).toHaveBeenCalled()
   })
 })

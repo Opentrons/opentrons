@@ -37,11 +37,5 @@ export function useModuleIdFromRun(
       ? loadModuleCommands?.[moduleIndex].result.moduleId
       : ''
 
-  if (moduleIdFromRun === '') {
-    console.error(
-      `there is no specific module id associated with the attached module ${module.moduleModel} passed in the hook`
-    )
-  }
-
   return { moduleIdFromRun }
 }
