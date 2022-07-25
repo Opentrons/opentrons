@@ -13,13 +13,17 @@ from typing import Mapping, Optional, Union, TYPE_CHECKING
 
 import numpy as np
 import jsonschema  # type: ignore[import]
-from opentrons import types
+
 from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 
 from opentrons_shared_data import module
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
+from opentrons.types import Location, Point, LocationLabware
+from opentrons.util.adjacent_slots_getters import (
+    get_north_south_locations,
+    get_east_west_locations,
+)
 
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
@@ -29,7 +33,6 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
 )
-from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import (
     MAX_SUPPORTED_VERSION,
@@ -72,6 +75,10 @@ class NoSuchModuleError(Exception):
 
     def __str__(self) -> str:
         return self.message
+
+
+class PipetteMovementRestrictedByHeaterShakerError(Exception):
+    """Error raised when trying to move to labware restricted by heater-shaker."""
 
 
 # TODO (spp, 2022-05-09): add tests
@@ -317,8 +324,8 @@ class ThermocyclerGeometry(ModuleGeometry):
 
     def flag_unsafe_move(
         self,
-        to_loc: types.Location,
-        from_loc: types.Location,
+        to_loc: Location,
+        from_loc: Location,
         lid_position: Optional[str],
     ):
         to_lw, to_well = to_loc.labware.get_parent_labware_and_well()
@@ -411,13 +418,46 @@ class HeaterShakerGeometry(ModuleGeometry):
 
     def flag_unsafe_move(
         self,
-        to_loc: types.Location,
-        from_loc: types.Location,
-        is_multichannel: bool,
+        to_slot: int,
+        is_tiprack: bool,
+        is_using_multichannel: bool,
         is_labware_latch_closed: bool,
         is_plate_shaking: bool,
     ) -> None:
-        pass
+        """Raise error if unsafe to move pipette due to heater-shaker placement."""
+        assert isinstance(self.parent, str), "Could not determine module slot location"
+
+        heater_shaker_slot = int(self.parent)
+        dest_east_west = to_slot in get_east_west_locations(heater_shaker_slot)
+        dest_north_south = to_slot in get_north_south_locations(heater_shaker_slot)
+        dest_heater_shaker = to_slot == heater_shaker_slot
+
+        # If heater-shaker is running, can't move to or around it
+        if (
+            any([dest_east_west, dest_north_south, dest_heater_shaker])
+            and is_plate_shaking
+        ):
+            raise PipetteMovementRestrictedByHeaterShakerError(
+                "Cannot move pipette to Heater-Shaker or adjacent slot while module is shaking"
+            )
+
+        # If heater-shaker's latch is open, can't move to it or east and west of it
+        elif (dest_east_west or dest_heater_shaker) and not is_labware_latch_closed:
+            raise PipetteMovementRestrictedByHeaterShakerError(
+                "Cannot move pipette east or west of or to Heater-Shaker while latch is open"
+            )
+
+        elif is_using_multichannel:
+            # Can't go to east/west slot under any circumstances if pipette is multi-channel
+            if dest_east_west:
+                raise PipetteMovementRestrictedByHeaterShakerError(
+                    "Cannot move multi-channel pipette east or west of Heater-Shaker"
+                )
+            # Can only go north/south if the labware is a tip rack
+            elif dest_north_south and not is_tiprack:
+                raise PipetteMovementRestrictedByHeaterShakerError(
+                    "Cannot move multi-channel pipette to non-tip rack labware north or south of Heater-Shaker"
+                )
 
 
 def _load_from_v1(

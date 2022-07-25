@@ -156,6 +156,7 @@ async def test_location_cache(ctx, monkeypatch, get_labware_def, hardware):
     # Once we have a location cache, that should be our from_loc
     right.move_to(lw.wells()[1].top())
     assert test_args[0].labware.as_well() == lw.wells()[0]  # type: ignore[index]
+    print(f"#### Well Location= {lw.wells()[1].top()} ####")
 
 
 async def test_location_cache_two_pipettes(ctx, get_labware_def, hardware):
@@ -1145,16 +1146,13 @@ def test_home_plunger(monkeypatch, hardware):
 
 @pytest.mark.parametrize(
     argnames=["module_name", "slot"],
-    argvalues=[
-        ["thermocycler", 7],
-        ["heaterShakerModuleV1", 1]
-    ]
+    argvalues=[["thermocycler", 7], ["heaterShakerModuleV1", 1]],
 )
 def test_move_to_with_unsafe_module(
-        hardware: ThreadManagedHardware,
-        enable_heater_shaker_python_api: AsyncGenerator[None, None],
-        module_name: str,
-        slot: int
+    hardware: ThreadManagedHardware,
+    enable_heater_shaker_python_api: AsyncGenerator[None, None],
+    module_name: str,
+    slot: int,
 ) -> None:
     def raiser(*args, **kwargs):
         raise RuntimeError("Cannot")
@@ -1168,3 +1166,47 @@ def test_move_to_with_unsafe_module(
     instr = ctx.load_instrument("p1000_single", "left")
     with pytest.raises(RuntimeError, match="Cannot"):
         instr.move_to(Location(Point(0, 0, 0), None))
+
+
+def test_move_to_with_thermocycler(
+    hardware: ThreadManagedHardware,
+    ctx: papi.ProtocolContext,
+) -> None:
+    """Test move_to raises for unsafe moves with thermocycler."""
+
+    def raiser(*args, **kwargs):
+        raise RuntimeError("Cannot")
+
+    mod = ctx.load_module("thermocycler")
+    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)
+    instr = ctx.load_instrument("p1000_single", "left")
+    with pytest.raises(RuntimeError, match="Cannot"):
+        instr.move_to(Location(Point(0, 0, 0), None))
+    mod.flag_unsafe_move.assert_called_once_with(
+        to_loc=Location(Point(0, 0, 0), None), from_loc=Location(Point(0, 0, 0), None)
+    )
+
+
+def test_move_to_with_heater_shaker(
+    hardware: ThreadManagedHardware,
+    enable_heater_shaker_python_api: AsyncGenerator[None, None],
+) -> None:
+    """Test move_to raises for unsafe moves with heater-shaker."""
+
+    def raiser(*args, **kwargs):
+        raise RuntimeError("Cannot")
+
+    # TODO (spp. 2022-07-20): use the ctx fixture once h/s ff is removed
+    ctx = papi.ProtocolContext(
+        implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
+    )
+    mod = ctx.load_module("heaterShakerModuleV1", 1)
+    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)
+    instr = ctx.load_instrument("p300_multi", "left")
+    with pytest.raises(RuntimeError, match="Cannot"):
+        instr.move_to(Location(Point(0, 0, 0), None))
+    mod.flag_unsafe_move.assert_called_once_with(
+        to_loc=Location(Point(0, 0, 0), None),
+        is_multichannel=True,
+    )
+    mod._module.cleanup()

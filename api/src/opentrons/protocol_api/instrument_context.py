@@ -20,7 +20,7 @@ from opentrons.protocols.api_support.instrument import (
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocol_api.module_contexts import (
     ThermocyclerContext,
-    HeaterShakerContext
+    HeaterShakerContext,
 )
 from opentrons.protocols.api_support.util import (
     FlowRates,
@@ -1206,9 +1206,7 @@ class InstrumentContext(CommandPublisher):
             if isinstance(mod, ThermocyclerContext):
                 mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
             if isinstance(mod, HeaterShakerContext):
-                mod.flag_unsafe_move(to_loc=location,
-                                     from_loc=from_loc,
-                                     is_multichannel=self.channels > 1)
+                mod.flag_unsafe_move(to_loc=location, is_multichannel=self.channels > 1)
 
         publish_ctx = nullcontext()
 

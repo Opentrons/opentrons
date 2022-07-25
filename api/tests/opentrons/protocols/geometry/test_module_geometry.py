@@ -1,10 +1,10 @@
 import pytest
-from typing import Union
-from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
+from typing import Union, ContextManager, Any
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from contextlib import nullcontext as does_not_raise
 from opentrons.types import Location, Point
 
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control.modules.types import (
     ModuleType,
     MagneticModuleModel,
@@ -16,7 +16,10 @@ from opentrons.protocols.geometry.module_geometry import (
     load_module_from_definition,
     ModuleGeometry,
     HeaterShakerGeometry,
+    PipetteMovementRestrictedByHeaterShakerError,
 )
+from opentrons.protocols.geometry.deck import Deck
+
 from opentrons_shared_data.module.dev_types import (
     ModuleDefinitionV3,
     ModuleDefinitionV1,
@@ -85,8 +88,9 @@ def v1_mag_module_schema_v1_definition() -> ModuleDefinitionV1:
 
 
 @pytest.fixture
-def heaterShakerGeometryFixture() -> HeaterShakerGeometry:
+def heater_shaker_geometry() -> HeaterShakerGeometry:
     """Get a Heater-Shaker Geometry fixture."""
+    heater_shaker_slot_location = Deck().position_for(5)
     return HeaterShakerGeometry(
         display_name="A new shiny module!",
         model=HeaterShakerModuleModel.HEATER_SHAKER_V1,
@@ -94,7 +98,7 @@ def heaterShakerGeometryFixture() -> HeaterShakerGeometry:
         offset=Point(0, 0, 0),
         overall_height=111,
         height_over_labware=222,
-        parent=Location(point=Point(1, 2, 3), labware=None),
+        parent=heater_shaker_slot_location,
         api_level=APIVersion.from_string("22.22"),
     )
 
@@ -197,6 +201,175 @@ def test_heater_shaker_geometry_properties() -> None:
     )
     assert subject.model == HeaterShakerModuleModel.HEATER_SHAKER_V1
     assert subject.labware is None
-    # assert subject.is == HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN
     assert subject.location.point == Point(1, 2, 3)
 
+
+@pytest.mark.parametrize(
+    argnames=["destination_slot", "expected_raise"],
+    argvalues=[
+        [
+            4,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="shaking"
+            ),
+        ],  # east
+        [
+            6,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="shaking"
+            ),
+        ],  # west
+        [
+            8,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="shaking"
+            ),
+        ],  # north
+        [
+            2,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="shaking"
+            ),
+        ],  # south
+        [
+            5,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="shaking"
+            ),
+        ],  # h/s
+        [1, does_not_raise()],  # non-adjacent
+    ],
+)
+def test_hs_raises_when_moving_to_restricted_slots_while_shaking(
+    heater_shaker_geometry: HeaterShakerGeometry,
+    destination_slot: int,
+    expected_raise: ContextManager[Any],
+) -> None:
+    """It should raise if restricted movement around a heater-shaker is attempted while module is shaking."""
+
+    with expected_raise:
+        heater_shaker_geometry.flag_unsafe_move(
+            to_slot=destination_slot,
+            is_tiprack=False,
+            is_using_multichannel=False,
+            is_labware_latch_closed=True,
+            is_plate_shaking=True,
+        )
+
+
+@pytest.mark.parametrize(
+    argnames=["destination_slot", "expected_raise"],
+    argvalues=[
+        [
+            4,
+            pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="latch"),
+        ],  # east
+        [
+            6,
+            pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="latch"),
+        ],  # west
+        [
+            5,
+            pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="latch"),
+        ],  # h/s
+        [8, does_not_raise()],  # north
+        [2, does_not_raise()],  # south
+        [3, does_not_raise()],  # non-adjacent
+    ],
+)
+async def test_raises_when_moving_to_restricted_slots_while_latch_open(
+    heater_shaker_geometry: HeaterShakerGeometry,
+    destination_slot: int,
+    expected_raise: ContextManager[Any],
+) -> None:
+    """It should raise if restricted movement around a heater-shaker is attempted while latch is open."""
+
+    with expected_raise:
+        heater_shaker_geometry.flag_unsafe_move(
+            to_slot=destination_slot,
+            is_tiprack=False,
+            is_using_multichannel=False,
+            is_labware_latch_closed=False,
+            is_plate_shaking=False,
+        )
+
+
+@pytest.mark.parametrize(
+    argnames=["destination_slot", "is_tiprack", "expected_raise"],
+    argvalues=[
+        [
+            4,
+            False,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="east or west"
+            ),
+        ],  # east
+        [
+            6,
+            False,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="east or west"
+            ),
+        ],  # west
+        [
+            8,
+            False,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="tip rack"
+            ),
+        ],  # north, non-tiprack
+        [
+            2,
+            False,
+            pytest.raises(
+                PipetteMovementRestrictedByHeaterShakerError, match="tip rack"
+            ),
+        ],  # south, non-tiprack
+        [8, True, does_not_raise()],  # north, tiprack
+        [2, True, does_not_raise()],  # south, tiprack
+        [5, False, does_not_raise()],  # h/s
+        [7, False, does_not_raise()],  # non-adjacent
+    ],
+)
+async def test_raises_on_restricted_movement_with_multi_channel(
+    heater_shaker_geometry: HeaterShakerGeometry,
+    destination_slot: int,
+    is_tiprack: bool,
+    expected_raise: ContextManager[Any],
+) -> None:
+    """It should raise if restricted movement around a heater-shaker is attempted with a multi-channel pipette."""
+
+    with expected_raise:
+        heater_shaker_geometry.flag_unsafe_move(
+            to_slot=destination_slot,
+            is_tiprack=is_tiprack,
+            is_using_multichannel=True,
+            is_labware_latch_closed=True,
+            is_plate_shaking=False,
+        )
+
+
+@pytest.mark.parametrize(
+    argnames=["destination_slot"],
+    argvalues=[
+        [4],  # east
+        [6],  # west
+        [5],  # h/s
+        [8],  # north
+        [2],  # south
+        [9],  # non-adjacent
+    ],
+)
+async def test_does_not_raise_when_idle_and_latch_closed(
+    heater_shaker_geometry: HeaterShakerGeometry,
+    destination_slot: int,
+) -> None:
+    """It should not raise if single channel pipette moves anywhere near heater-shaker when idle and latch closed."""
+    with does_not_raise():
+        heater_shaker_geometry.flag_unsafe_move(
+            to_slot=destination_slot,
+            is_tiprack=False,
+            is_using_multichannel=False,
+            is_labware_latch_closed=True,
+            is_plate_shaking=False,
+        )
