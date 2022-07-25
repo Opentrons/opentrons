@@ -247,6 +247,7 @@ class GravimetricRecorder:
         self._reading_samples = Event()
         self._thread: Optional[Thread] = None
         super().__init__()
+        self.activate()
 
     @property
     def tag(self) -> str:
@@ -297,6 +298,8 @@ class GravimetricRecorder:
                 self._is_recording.clear()
             self._thread = Thread(target=self.run)
             self._thread.start()  # creates the thread
+            self._is_recording.set()
+            self._reading_samples.wait()
         else:
             if not self._is_recording.is_set():
                 self._is_recording.set()
@@ -310,14 +313,6 @@ class GravimetricRecorder:
             self._recording = self._record_samples()
         self._is_recording.clear()
 
-    def wait_for_start(self) -> None:
-        if self._thread.is_alive():
-            self._reading_samples.wait()
-
-    def wait_for_finish(self) -> None:
-        if self._thread.is_alive():
-            self._thread.join()
-
     @property
     def recording(self):
         return self._recording
@@ -326,15 +321,10 @@ class GravimetricRecorder:
     def is_recording(self) -> bool:
         return self._is_recording.is_set()
 
-    def record_start(self, wait_for_start: bool = True) -> None:
-        self._is_recording.set()
-        if wait_for_start:
-            self.wait_for_start()
-
-    def record_stop(self, wait_for_finish: bool = True) -> None:
+    def stop(self) -> None:
         self._is_recording.clear()
-        if wait_for_finish:
-            self.wait_for_finish()
+        if self._thread.is_alive():
+            self._thread.join()
 
     def _wait_for_record_start(self) -> None:
         if not self.is_recording:

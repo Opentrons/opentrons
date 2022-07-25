@@ -16,7 +16,6 @@ def _run(protocol: ProtocolContext) -> None:
     _rec = GravimetricRecorder(protocol, GravimetricRecorderConfig(
         test_name=metadata["protocolName"], run_id=run_id, start_time=time(),
         duration=1, frequency=10, stable=False))
-    _rec.activate()
 
     if "y" in input("Calibrate the scale? (y/n): ").lower():
         _rec.calibrate_scale()
@@ -34,10 +33,8 @@ def _run(protocol: ProtocolContext) -> None:
         _rec.record(in_thread=in_thread)
         if in_thread:
             print('\tRunning in separate thread')
-            _rec.record_start()
             input("\tPress ENTER to stop")
-            _rec.record_stop()
-            _rec.wait_for_finish()
+            _rec.stop()
         print("\tdone")
 
 
