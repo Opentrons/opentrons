@@ -609,3 +609,38 @@ async def test_home_z_both_mounts(decoy: Decoy) -> None:
 
     assert left_result == 112.3 + subject.critical_point_for(types.Mount.LEFT, None).z
     assert right_result == 45.6 + subject.critical_point_for(types.Mount.RIGHT, None).z
+
+
+async def test_home_z_ignore_other_mount(decoy: Decoy) -> None:
+    """It should only home one mount, even if other needs homing, if not `allow_other_mount`."""
+    loop = asyncio.get_running_loop()
+    mock_config = decoy.mock(cls=config.types.RobotConfig)
+    mock_backend = decoy.mock(cls=hc.Controller)
+
+    subject = hc.API(backend=mock_backend, config=mock_config, loop=loop)
+
+    decoy.when(mock_config.left_mount_offset).then_return(types.Point(0, 0, 100))
+    decoy.when(mock_backend.axis_bounds).then_return(
+        {
+            Axis.X: (0, 1),
+            Axis.Y: (0, 1),
+            Axis.Z: (0, 1),
+            Axis.A: (0, 1),
+        }
+    )
+
+    decoy.when(await mock_backend.home(["X", "Y", "Z", "A"])).then_return(
+        {"X": 0, "Y": 0, "Z": 0, "A": 0, "B": 0, "C": 0}
+    )
+    decoy.when(await mock_backend.home(["A"])).then_return(
+        {"X": 0, "Y": 0, "Z": 0, "A": 45.6, "B": 0, "C": 0}
+    )
+
+    await subject.move_rel(mount=types.Mount.LEFT, delta=types.Point(0, 0, 0))
+    await subject.home_z(types.Mount.RIGHT, allow_home_other=False)
+
+    left_result = (await subject.current_position(types.Mount.LEFT))[Axis.Z]
+    right_result = (await subject.current_position(types.Mount.RIGHT))[Axis.A]
+
+    assert left_result == 100.0 + subject.critical_point_for(types.Mount.LEFT, None).z
+    assert right_result == 45.6 + subject.critical_point_for(types.Mount.RIGHT, None).z
