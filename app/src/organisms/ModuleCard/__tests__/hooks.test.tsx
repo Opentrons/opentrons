@@ -15,6 +15,7 @@ import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/hea
 import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import {
+  useIsLegacySessionInProgress,
   useIsRobotBusy,
   useProtocolDetailsForRun,
   useRunStatuses,
@@ -67,6 +68,9 @@ const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
 >
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
+>
+const mockUseIsLegacySessionsInProgress = useIsLegacySessionInProgress as jest.MockedFunction<
+  typeof useIsLegacySessionInProgress
 >
 
 const mockCloseLatchHeaterShaker = {
@@ -205,7 +209,6 @@ describe('useLatchControls', () => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: true,
       isRunStill: true,
       isRunIdle: false,
       isRunTerminal: false,
@@ -286,8 +289,8 @@ describe('useModuleOverflowMenu', () => {
     store.dispatch = jest.fn()
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseIsLegacySessionsInProgress.mockReturnValue(true)
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: true,
       isRunStill: true,
       isRunTerminal: false,
       isRunIdle: false,

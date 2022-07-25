@@ -65,7 +65,6 @@ describe('TemperatureModuleSlideout', () => {
     mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'tempdeck_id' })
     mockUseRunStatuses.mockReturnValue({
       isRunStill: false,
-      isLegacySessionInProgress: false,
       isRunIdle: false,
       isRunTerminal: true,
     })
@@ -128,7 +127,6 @@ describe('TemperatureModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field and a run id is present', () => {
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: false,
       isRunStill: true,
       isRunTerminal: false,
       isRunIdle: true,

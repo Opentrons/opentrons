@@ -16,7 +16,11 @@ import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocol
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { useProtocolDetailsForRun, useRunStatuses } from '../Devices/hooks'
+import {
+  useProtocolDetailsForRun,
+  useRunStatuses,
+  useIsLegacySessionInProgress,
+} from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
@@ -134,12 +138,8 @@ export function useModuleOverflowMenu(
   const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
-  const {
-    isLegacySessionInProgress,
-    isRunTerminal,
-    isRunStill,
-    isRunIdle,
-  } = useRunStatuses()
+  const isLegacySessionInProgress = useIsLegacySessionInProgress()
+  const { isRunTerminal, isRunStill, isRunIdle } = useRunStatuses()
   const currentRunId = useCurrentRunId()
   let isDisabled: boolean = false
   if (runId != null && isLoadedInRun) {

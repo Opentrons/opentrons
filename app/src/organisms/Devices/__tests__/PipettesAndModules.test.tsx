@@ -48,7 +48,6 @@ describe('PipettesAndModules', () => {
     mockUseCurrentRunId.mockReturnValue(null)
     mockUseRunStatuses.mockReturnValue({
       isRunIdle: false,
-      isLegacySessionInProgress: false,
       isRunStill: true,
       isRunTerminal: false,
     })
