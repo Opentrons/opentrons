@@ -82,6 +82,7 @@ class InstrumentContextSimulation(AbstractInstrument):
         tip_length: float,
         presses: typing.Optional[int],
         increment: typing.Optional[float],
+        prep_after: bool,
     ) -> None:
         geometry = well.get_geometry()
         self._raise_if_tip("pick up tip")
@@ -92,6 +93,8 @@ class InstrumentContextSimulation(AbstractInstrument):
             geometry.max_volume, self.get_max_volume()
         )
         self._pipette_dict["available_volume"] = self._pipette_dict["working_volume"]
+        if prep_after:
+            self._pipette_dict["ready_to_aspirate"] = True
 
     def drop_tip(self, home_after: bool) -> None:
         self._raise_if_no_tip(HardwareAction.DROPTIP.name)

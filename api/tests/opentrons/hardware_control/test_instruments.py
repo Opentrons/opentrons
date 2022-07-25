@@ -307,8 +307,11 @@ async def test_prep_aspirate(sim_and_instr):
 
     mount = types.Mount.LEFT
     await hw_api.pick_up_tip(mount, 20.0)
+    # If we just picked up a new tip, we should be fine
+    await hw_api.aspirate(mount, 1)
 
-    # If we're empty and haven't prepared, we should get an error
+    # If we just did blow-out and haven't prepared, we should get an error
+    await hw_api.blow_out(mount)
     with pytest.raises(RuntimeError):
         await hw_api.aspirate(mount, 1, 1.0)
     # If we're empty and have prepared, we should be fine
@@ -316,6 +319,11 @@ async def test_prep_aspirate(sim_and_instr):
     await hw_api.aspirate(mount, 1)
     # If we're not empty, we should be fine
     await hw_api.aspirate(mount, 1)
+
+    # If we don't prep_after, we should still be fine
+    await hw_api.drop_tip(mount)
+    await hw_api.pick_up_tip(mount, 20.0, prep_after=False)
+    await hw_api.aspirate(mount, 1, 1.0)
 
 
 async def test_aspirate_new(dummy_instruments):

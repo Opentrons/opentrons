@@ -66,12 +66,48 @@ def test_pick_up_tip_no_tip(
     """It should raise an error if a tip is already attached."""
     subject.home()
     subject.pick_up_tip(
-        well=labware.get_wells()[0], tip_length=1, presses=None, increment=None
+        well=labware.get_wells()[0],
+        tip_length=1,
+        presses=None,
+        increment=None,
+        prep_after=False,
     )
     with pytest.raises(TipAttachedError):
         subject.pick_up_tip(
-            well=labware.get_wells()[0], tip_length=1, presses=None, increment=None
+            well=labware.get_wells()[0],
+            tip_length=1,
+            presses=None,
+            increment=None,
+            prep_after=False,
         )
+
+
+def test_pick_up_tip_prep_after(
+    subject: AbstractInstrument, labware: AbstractLabware
+) -> None:
+    """It should not raise an error, regardless of prep_after value."""
+    subject.home()
+    subject.pick_up_tip(
+        well=labware.get_wells()[0],
+        tip_length=1,
+        presses=None,
+        increment=None,
+        prep_after=True,
+    )
+    subject.aspirate(1, rate=1)
+    subject.dispense(1, rate=1)
+    subject.drop_tip(home_after=True)
+    # and again, without preparing for aspirate
+    subject.pick_up_tip(
+        well=labware.get_wells()[0],
+        tip_length=1,
+        presses=None,
+        increment=None,
+        prep_after=False,
+    )
+    subject.aspirate(1, rate=1)
+    subject.dispense(1, rate=1)
+    subject.drop_tip(home_after=True)
 
 
 def test_aspirate_too_much(
@@ -80,7 +116,11 @@ def test_aspirate_too_much(
     """It should raise an error if try to aspirate more than possible."""
     subject.home()
     subject.pick_up_tip(
-        well=labware.get_wells()[0], tip_length=1, presses=None, increment=None
+        well=labware.get_wells()[0],
+        tip_length=1,
+        presses=None,
+        increment=None,
+        prep_after=False,
     )
     subject.prepare_for_aspirate()
     with pytest.raises(
@@ -94,7 +134,11 @@ def test_working_volume(subject: AbstractInstrument, labware: AbstractLabware) -
     subject.home()
     assert subject.get_pipette()["working_volume"] == 300
     subject.pick_up_tip(
-        well=labware.get_wells()[0], tip_length=1, presses=None, increment=None
+        well=labware.get_wells()[0],
+        tip_length=1,
+        presses=None,
+        increment=None,
+        prep_after=False,
     )
     assert subject.get_pipette()["working_volume"] == 100
 
@@ -161,10 +205,18 @@ def test_pipette_dict_with_tip(
     simulating_instrument_context.home()
     # Pickup tip
     instrument_context.pick_up_tip(
-        well=labware.get_wells()[0], tip_length=2, presses=3, increment=4
+        well=labware.get_wells()[0],
+        tip_length=2,
+        presses=3,
+        increment=4,
+        prep_after=False,
     )
     simulating_instrument_context.pick_up_tip(
-        well=labware.get_wells()[0], tip_length=2, presses=3, increment=4
+        well=labware.get_wells()[0],
+        tip_length=2,
+        presses=3,
+        increment=4,
+        prep_after=False,
     )
 
     side_effector(instrument_context)
