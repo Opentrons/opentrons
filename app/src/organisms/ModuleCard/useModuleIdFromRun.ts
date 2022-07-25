@@ -32,12 +32,16 @@ export function useModuleIdFromRun(
     attachedModule => attachedModule.serialNumber === module.serialNumber
   )
 
-  //  result is possibly undefined if you send a module command when run is terminal
-  //  to a module that is not in the protocol but plugged into the robot
   const moduleIdFromRun =
     loadModuleCommands?.[moduleIndex] != null
       ? loadModuleCommands?.[moduleIndex].result.moduleId
       : ''
+
+  if (moduleIdFromRun === '') {
+    console.error(
+      `there is no specific module id associated with the attached module ${module.moduleModel} passed in the hook`
+    )
+  }
 
   return { moduleIdFromRun }
 }
