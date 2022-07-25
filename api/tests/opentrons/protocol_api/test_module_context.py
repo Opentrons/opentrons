@@ -744,7 +744,6 @@ def test_heater_shaker_set_and_wait_for_shake_speed(
         hs_mod.set_and_wait_for_shake_speed(rpm=400)  # type: ignore[union-attr]
         mock_validator.assert_called_once_with(rpm=400)
         mock_module_controller.set_speed.assert_called_once_with(rpm=10)
-        assert hs_mod.geometry.is_shaking is True
 
 
 @pytest.mark.parametrize(
@@ -781,7 +780,6 @@ def test_heater_shaker_open_labware_latch(
     hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
     hs_mod.open_labware_latch()  # type: ignore[union-attr]
     mock_module_controller.open_labware_latch.assert_called_once()
-    assert hs_mod.geometry.is_labware_latch_closed is False
 
 
 @pytest.mark.parametrize(
@@ -812,11 +810,9 @@ def test_heater_shaker_close_labware_latch(
 ) -> None:
     """It should issue a labware latch close command."""
     hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
-    assert hs_mod.geometry.is_labware_latch_closed is False
 
     hs_mod.close_labware_latch()  # type: ignore[union-attr]
     mock_module_controller.close_labware_latch.assert_called_once()
-    assert hs_mod.geometry.is_labware_latch_closed is True
 
 
 def test_heater_shaker_deactivate_heater(
@@ -835,7 +831,6 @@ def test_heater_shaker_deactivate_shaker(
     hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
     hs_mod.deactivate_shaker()  # type: ignore[union-attr]
     mock_module_controller.deactivate_shaker.assert_called_once()
-    assert hs_mod.geometry.is_shaking is False
 
 
 # __________ Testing loading Labware on modules ___________
