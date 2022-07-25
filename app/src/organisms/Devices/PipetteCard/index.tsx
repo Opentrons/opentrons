@@ -8,7 +8,6 @@ import {
   DIRECTION_ROW,
   ALIGN_START,
   DIRECTION_COLUMN,
-  TEXT_TRANSFORM_UPPERCASE,
   SPACING,
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_CAPTION,
@@ -19,7 +18,6 @@ import {
   InstrumentDiagram,
   BORDERS,
   Btn,
-  TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
 import { fetchPipettes, LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
@@ -239,7 +237,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                     <Btn
                       textAlign={ALIGN_START}
                       fontSize={TYPOGRAPHY.fontSizeP}
-                      textDecoration={TEXT_DECORATION_UNDERLINE}
+                      textDecoration={TYPOGRAPHY.textDecorationUnderline}
                       onClick={handleCalibrate}
                     >
                       {t('calibrate_now')}
@@ -260,7 +258,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                     <Btn
                       textAlign={ALIGN_START}
                       fontSize={TYPOGRAPHY.fontSizeP}
-                      textDecoration={TEXT_DECORATION_UNDERLINE}
+                      textDecoration={TYPOGRAPHY.textDecorationUnderline}
                       onClick={handleCalibrate}
                     >
                       {t('recalibrate_now')}
@@ -270,7 +268,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               </Flex>
             ) : null}
             <StyledText
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.darkGrey}
               fontWeight={FONT_WEIGHT_REGULAR}
               fontSize={FONT_SIZE_CAPTION}

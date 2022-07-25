@@ -10,7 +10,7 @@ import {
   DIRECTION_COLUMN,
   Icon,
   COLORS,
-  TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
@@ -64,7 +64,7 @@ export const FirmwareUpdateFailedModal = (
       >
         <PrimaryButton
           onClick={onCloseClick}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
         >
           {t('shared:close')}
         </PrimaryButton>

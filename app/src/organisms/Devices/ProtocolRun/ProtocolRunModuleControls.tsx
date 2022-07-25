@@ -1,11 +1,19 @@
 import * as React from 'react'
-import { Box, Flex, SPACING } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+import {
+  COLORS,
+  Flex,
+  SPACING,
+  JUSTIFY_CENTER,
+  Box,
+} from '@opentrons/components'
+import { useCreateCommandMutation } from '@opentrons/react-api-client'
+import { StyledText } from '../../../atoms/text'
 import { ModuleCard } from '../../ModuleCard'
 import {
   useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
 } from '../hooks'
-import { useCreateCommandMutation } from '@opentrons/react-api-client'
 
 import type { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { RunTimeCommand } from '@opentrons/shared-data'
@@ -18,7 +26,8 @@ interface ProtocolRunModuleControlsProps {
 export const ProtocolRunModuleControls = ({
   robotName,
   runId,
-}: ProtocolRunModuleControlsProps): JSX.Element | null => {
+}: ProtocolRunModuleControlsProps): JSX.Element => {
+  const { t } = useTranslation('protocol_details')
   const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
     robotName,
     runId
@@ -26,10 +35,8 @@ export const ProtocolRunModuleControls = ({
   const attachedModules = Object.values(moduleRenderInfoForProtocolById).filter(
     module => module.attachedModuleMatch != null
   )
-
   const { protocolData } = useProtocolDetailsForRun(runId)
   const { createCommand } = useCreateCommandMutation()
-
   const loadCommands: LoadModuleRunTimeCommand[] =
     protocolData !== null
       ? protocolData?.commands.filter(
@@ -67,12 +74,19 @@ export const ProtocolRunModuleControls = ({
   // or left column will contain 1 more item than right column
   const halfAttachedModulesSize = Math.ceil(attachedModules?.length / 2)
   const leftColumnModules = attachedModules?.slice(0, halfAttachedModulesSize)
-  const rightColumnModules =
-    attachedModules?.length > 1
-      ? attachedModules?.slice(-halfAttachedModulesSize)
-      : []
+  const rightColumnModules = attachedModules?.slice(halfAttachedModulesSize)
 
-  return (
+  return attachedModules.length === 0 ? (
+    <Flex justifyContent={JUSTIFY_CENTER}>
+      <StyledText
+        as="p"
+        color={COLORS.darkGreyEnabled}
+        marginY={SPACING.spacing4}
+      >
+        {t('connect_modules_to_see_controls')}
+      </StyledText>
+    </Flex>
+  ) : (
     <Flex
       gridGap={SPACING.spacing3}
       paddingTop={SPACING.spacing4}

@@ -9,14 +9,12 @@ import {
   DIRECTION_ROW,
   ALIGN_START,
   DIRECTION_COLUMN,
-  TEXT_TRANSFORM_UPPERCASE,
   SPACING,
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_CAPTION,
   TYPOGRAPHY,
   useOnClickOutside,
   Btn,
-  TEXT_DECORATION_UNDERLINE,
   IconProps,
   useHoverTooltip,
   COLORS,
@@ -229,10 +227,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       data-testid={`ModuleCard_${module.serialNumber}`}
     >
       {showWizard &&
-        (runId != null ? (
+        (currentRunId != null ? (
           <HeaterShakerWizard
             onCloseClick={() => setShowWizard(false)}
-            runId={runId}
+            currentRunId={currentRunId}
           />
         ) : (
           <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
@@ -260,7 +258,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           module={module as HeaterShakerModule}
           isExpanded={showTestShake}
           onCloseClick={() => setShowTestShake(false)}
-          runId={runId}
+          isLoadedInRun={isLoadedInRun}
+          currentRunId={currentRunId != null ? currentRunId : undefined}
         />
       )}
       <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">
@@ -308,7 +307,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     <Btn
                       textAlign={ALIGN_START}
                       fontSize={TYPOGRAPHY.fontSizeP}
-                      textDecoration={TEXT_DECORATION_UNDERLINE}
+                      textDecoration={TYPOGRAPHY.textDecorationUnderline}
                       onClick={() => handleUpdateClick()}
                     >
                       {t('update_now')}
@@ -356,7 +355,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             ) : (
               <>
                 <Text
-                  textTransform={TEXT_TRANSFORM_UPPERCASE}
+                  textTransform={TYPOGRAPHY.textTransformUppercase}
                   color={COLORS.darkGrey}
                   fontWeight={FONT_WEIGHT_REGULAR}
                   fontSize={FONT_SIZE_CAPTION}
@@ -495,7 +494,6 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
         currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
-        isSetShake={isSecondary}
         isLoadedInRun={isLoadedInRun}
       />
     )

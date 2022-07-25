@@ -113,28 +113,6 @@ const mockHeatHeaterShaker = {
   usbPort: { hub: 1, port: 1, path: '/dev/ot_module_heatershaker0' },
 } as any
 
-const mockDeactivateShakeHeaterShaker = {
-  id: 'heatershaker_id',
-  moduleModel: 'heaterShakerModuleV1',
-  moduleType: 'heaterShakerModuleType',
-  serialNumber: 'jkl123',
-  hardwareRevision: 'heatershaker_v4.0',
-  firmwareVersion: 'v2.0.0',
-  hasAvailableUpdate: true,
-  data: {
-    labwareLatchStatus: 'idle_open',
-    speedStatus: 'speeding up',
-    temperatureStatus: 'idle',
-    currentSpeed: null,
-    currentTemperature: null,
-    targetSpeed: null,
-    targetTemp: null,
-    errorDetails: null,
-    status: 'idle',
-  },
-  usbPort: { hub: 1, port: 1 },
-} as any
-
 const mockMagDeckEngaged = {
   id: 'magdeck_id',
   moduleType: 'magneticModuleType',
@@ -363,40 +341,6 @@ describe('useModuleOverflowMenu', () => {
       },
     })
   })
-  it('should render heater shaker module and create deactive shaker command', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <I18nextProvider i18n={i18n}>
-        <Provider store={store}>{children}</Provider>
-      </I18nextProvider>
-    )
-    const { result } = renderHook(
-      () =>
-        useModuleOverflowMenu(
-          mockDeactivateShakeHeaterShaker,
-          null,
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
-          false
-        ),
-      {
-        wrapper,
-      }
-    )
-    const { menuOverflowItemsByModuleType } = result.current
-    const heaterShakerMenu =
-      menuOverflowItemsByModuleType.heaterShakerModuleType
-    act(() => heaterShakerMenu[1].onClick(true))
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'heaterShaker/deactivateShaker',
-        params: {
-          moduleId: mockDeactivateShakeHeaterShaker.id,
-        },
-      },
-    })
-  })
   it('should render heater shaker module and calls handleClick when module is idle and calls other handles when button is selected', () => {
     const mockHandleSlideoutClick = jest.fn()
     const mockAboutClick = jest.fn()
@@ -426,7 +370,7 @@ describe('useModuleOverflowMenu', () => {
     const heaterShakerMenu =
       menuOverflowItemsByModuleType.heaterShakerModuleType
 
-    act(() => heaterShakerMenu[1].onClick(true))
+    act(() => heaterShakerMenu[0].onClick(true))
     expect(mockHandleSlideoutClick).toHaveBeenCalled()
   })
 

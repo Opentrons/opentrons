@@ -703,7 +703,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
 
 def test_command_store_save_started_completed_run_timestamp() -> None:
     """It should save started and completed timestamps."""
-    subject = CommandStore()
+    subject = CommandStore(config=Config(), is_door_open=False)
     start_time = datetime(year=2021, month=1, day=1)
     hardware_stopped_time = datetime(year=2022, month=2, day=2)
 
@@ -716,7 +716,7 @@ def test_command_store_save_started_completed_run_timestamp() -> None:
 
 def test_timestamps_are_latched() -> None:
     """It should not change startedAt or completedAt once set."""
-    subject = CommandStore()
+    subject = CommandStore(config=Config(), is_door_open=False)
 
     play_time_1 = datetime(year=2021, month=1, day=1)
     play_time_2 = datetime(year=2022, month=2, day=2)

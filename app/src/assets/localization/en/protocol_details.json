@@ -30,5 +30,6 @@
   "quantity": "Quantity",
   "go_to_labware_definition": "Go to labware definition",
   "protocol_designer_version": "Protocol Designer {{version}}",
-  "python_api_version": "Python API {{version}}"
+  "python_api_version": "Python API {{version}}",
+  "connect_modules_to_see_controls": "Connect modules to see controls"
 }

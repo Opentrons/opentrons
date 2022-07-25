@@ -65,28 +65,24 @@ export function SoftwareUpdateModal({
   return showUpdateModal ? (
     <UpdateBuildroot robot={robot} close={handleCloseModal} />
   ) : (
-    <Modal title={t('software_update_modal_title')} onClose={closeModal}>
-      <Banner type="informing">
-        {currentRunId == null
-          ? t('software_update_modal_available_banner_message')
-          : t('software_update_modal_protocol_running_banner_message')}
-      </Banner>
+    <Modal title={t('robot_update_available')} onClose={closeModal}>
+      <Banner type="informing">{t('requires_restarting_the_robot')}</Banner>
       <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing4}>
         {/* <ReleaseNotes source={releaseNotes} /> ToDo: align with new design */}
         <StyledText css={TYPOGRAPHY.pSemiBold}>
-          {t('software_update_modal_app_change_label', { version })}
+          {t('app_change_in', { version })}
         </StyledText>
         <StyledText as="p">
           {'None in the Opentrons (Here will be change logs)'}
         </StyledText>
         <StyledText css={TYPOGRAPHY.pSemiBold} marginTop={SPACING.spacing3}>
-          {t('software_update_modal_new_features_label')}
+          {t('new_features')}
         </StyledText>
         <StyledText as="p">
           {'None in the Opentrons (Here will be features info)'}
         </StyledText>
         <StyledText css={TYPOGRAPHY.pSemiBold} marginTop={SPACING.spacing3}>
-          {t('software_update_modal_but_fixes_label')}
+          {t('bug_fixes')}
         </StyledText>
         <StyledText as="p" marginBottom={SPACING.spacing4}>
           {'None in the Opentrons (Here will be fixes info)'}
@@ -99,7 +95,7 @@ export function SoftwareUpdateModal({
           marginTop={SPACING.spacing4}
           marginBottom={SPACING.spacing3}
         >
-          {t('software_update_modal_technical_change_log_link')}
+          {t('view_opentrons_technical_change_log')}
         </ExternalLink>
         <ExternalLink
           href={ISSUE_TRACKER_URL}
@@ -107,7 +103,7 @@ export function SoftwareUpdateModal({
           id="SoftwareUpdateIssueTrackerLink"
           marginBottom={SPACING.spacing3}
         >
-          {t('software_update_modal_issue_tracker_link')}
+          {t('view_opentrons_issue_tracker')}
         </ExternalLink>
         <ExternalLink
           href={RELEASE_NOTES_URL}
@@ -115,17 +111,17 @@ export function SoftwareUpdateModal({
           id="SoftwareUpdateReleaseNotesLink"
           marginBottom={SPACING.spacing3}
         >
-          {t('software_update_modal_release_notes_link')}
+          {t('view_opentrons_release_notes')}
         </ExternalLink>
         <Flex justifyContent={JUSTIFY_FLEX_END}>
           <SecondaryButton onClick={closeModal} marginRight={SPACING.spacing3}>
-            {t('software_update_modal_remind_me_later_button')}
+            {t('remind_me_later')}
           </SecondaryButton>
           <PrimaryButton
             onClick={handleLaunchUpdateModal}
             disabled={currentRunId != null}
           >
-            {t('software_update_modal_update_button')}
+            {t('update_robot_now')}
           </PrimaryButton>
         </Flex>
       </Flex>

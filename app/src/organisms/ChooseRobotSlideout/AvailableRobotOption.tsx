@@ -64,9 +64,7 @@ export function AvailableRobotOption(
           <Box maxWidth="9.5rem">
             <StyledText
               as="p"
-              css={css`
-                overflow-wrap: break-word;
-              `}
+              overflowWrap="break-word"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {robotName}

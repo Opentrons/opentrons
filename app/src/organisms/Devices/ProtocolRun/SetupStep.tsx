@@ -12,8 +12,6 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
-  TEXT_ALIGN_LEFT,
-  TEXT_TRANSFORM_CAPITALIZE,
   COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -65,7 +63,7 @@ export function SetupStep({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <Btn textAlign={TEXT_ALIGN_LEFT}>
+      <Btn textAlign={TYPOGRAPHY.textAlignLeft}>
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -121,7 +119,7 @@ export function SetupStep({
                     color={COLORS.black}
                     css={TYPOGRAPHY.pSemiBold}
                     marginRight={SPACING.spacing4}
-                    textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                    textTransform={TYPOGRAPHY.textTransformCapitalize}
                     id={'RunSetupCard_calibrationText'}
                   >
                     {calibrationStatusComplete

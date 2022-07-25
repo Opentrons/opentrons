@@ -19,6 +19,7 @@ import {
   ALIGN_START,
   BORDERS,
   ALIGN_CENTER,
+  JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
 import {
   getIsTiprack,
@@ -183,11 +184,7 @@ export const LabwarePositionCheckStepDetail = (
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing3}
       >
-        <Flex
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          alignItems={ALIGN_CENTER}
-          marginBottom={SPACING.spacing3}
-        >
+        <Flex justifyContent={JUSTIFY_SPACE_AROUND} alignItems={ALIGN_CENTER}>
           <Flex
             backgroundColor={COLORS.background}
             flexDirection={DIRECTION_COLUMN}
@@ -201,21 +198,24 @@ export const LabwarePositionCheckStepDetail = (
               data-testid="LabwarePositionCheckStepDetail_liveOffset"
             />
           </Flex>
-          <StyledText as="p">{t('jog_controls_adjustment')}</StyledText>
-          {!showJogControls ? (
-            <Link
-              role="button"
-              fontSize={FONT_SIZE_BODY_2}
-              color={COLORS.blue}
-              onClick={() => setShowJogControls(true)}
-              id={`LabwarePositionCheckStepDetail_reveal_jog_controls`}
-            >
-              {t('reveal_jog_controls')}
-            </Link>
-          ) : null}
+          <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing4}>
+            <StyledText as="p">{t('jog_controls_adjustment')}</StyledText>
+            {!showJogControls ? (
+              <Link
+                role="button"
+                fontSize={FONT_SIZE_BODY_2}
+                color={COLORS.blue}
+                onClick={() => setShowJogControls(true)}
+                id={`LabwarePositionCheckStepDetail_reveal_jog_controls`}
+              >
+                {t('reveal_jog_controls')}
+              </Link>
+            ) : null}
+          </Flex>
         </Flex>
         {showJogControls ? (
           <JogControls
+            marginTop={SPACING.spacing3}
             jog={handleJog}
             stepSizes={[0.1, 1, 10]}
             planes={[HORIZONTAL_PLANE, VERTICAL_PLANE]}

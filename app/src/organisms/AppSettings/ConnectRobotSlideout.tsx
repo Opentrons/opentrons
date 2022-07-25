@@ -12,7 +12,6 @@ import {
   COLORS,
   Icon,
   Link,
-  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 
 import { ManualIpHostnameForm } from './ManualIpHostnameForm'
@@ -57,7 +56,7 @@ export function ConnectRobotSlideout({
         color={COLORS.blue}
         onClick={refreshDiscovery}
         id="AppSettings_Connection_Button"
-        textTransform={TEXT_TRANSFORM_CAPITALIZE}
+        textTransform={TYPOGRAPHY.textTransformCapitalize}
       >
         {buttonLabel}
       </Link>

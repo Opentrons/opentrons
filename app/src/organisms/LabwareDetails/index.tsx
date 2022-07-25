@@ -123,7 +123,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         backgroundColor={COLORS.lightGrey}
         padding={SPACING.spacing4}
         marginBottom={SPACING.spacing5}
-        css={{ 'overflow-wrap': 'break-word' }}
+        overflowWrap="break-word"
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
         <Link
@@ -131,7 +131,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           onClick={() => navigator.clipboard.writeText(apiName)}
           role="button"
         >
-          <Flex alignItems={ALIGN_CENTER} css={{ 'overflow-wrap': 'anywhere' }}>
+          <Flex alignItems={ALIGN_CENTER} overflowWrap="anywhere">
             {apiName} <Icon height={SIZE_1} name="copy-text" />
           </Flex>
         </Link>

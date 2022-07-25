@@ -19,7 +19,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
   SIZE_2,
-  TEXT_TRANSFORM_UPPERCASE,
   BORDERS,
   COLORS,
   SPACING,
@@ -170,7 +169,7 @@ export function StepItemComponent(props: StepItemProps): JSX.Element | null {
                   <StyledText
                     as="h6"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    textTransform={TEXT_TRANSFORM_UPPERCASE}
+                    textTransform={TYPOGRAPHY.textTransformUppercase}
                   >
                     {t('comment_step')}
                   </StyledText>
