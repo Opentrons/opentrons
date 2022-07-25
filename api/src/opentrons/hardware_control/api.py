@@ -971,6 +971,7 @@ class API(
         tip_length: float,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
+        prep_after: bool = True,
     ) -> None:
         """
         Pick up tip from current location.
@@ -1007,6 +1008,8 @@ class API(
             await self.move_rel(mount, rel_point, speed=speed)
 
         await self.retract(mount, spec.retract_target)
+        if prep_after:
+            await self.prepare_for_aspirate(mount)
 
     async def drop_tip(self, mount: top_types.Mount, home_after: bool = True) -> None:
         """Drop tip at the current location."""

@@ -13,7 +13,6 @@ import {
 
 import { StyledText } from '../../../../atoms/text'
 import { ToggleButton } from '../../../../atoms/buttons'
-import { useIsRobotBusy } from '../../hooks'
 import { updateSetting } from '../../../../redux/robot-settings'
 
 import type { Dispatch } from '../../../../redux/types'
@@ -22,24 +21,21 @@ import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
 interface LegacySettingsProps {
   settings: RobotSettingsField | undefined
   robotName: string
-  updateIsRobotBusy: (isRobotBusy: boolean) => void
+  isRobotBusy: boolean
 }
 
 export function LegacySettings({
   settings,
   robotName,
-  updateIsRobotBusy,
+  isRobotBusy,
 }: LegacySettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
   const value = settings?.value ? settings.value : false
   const id = settings?.id ? settings.id : 'deckCalibrationDots'
-  const isBusy = useIsRobotBusy()
 
   const handleClick: React.MouseEventHandler<Element> = () => {
-    if (isBusy) {
-      updateIsRobotBusy(true)
-    } else {
+    if (!isRobotBusy) {
       dispatch(updateSetting(robotName, id, !value))
     }
   }
@@ -60,7 +56,7 @@ export function LegacySettings({
           {t('legacy_settings')}
         </StyledText>
         <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
-          {t('calibrate_deck')}
+          {t('calibrate_deck_to_dots')}
         </StyledText>
         <StyledText as="p">{t('calibrate_deck_description')}</StyledText>
       </Box>
@@ -69,6 +65,7 @@ export function LegacySettings({
         toggledOn={settings?.value === true}
         onClick={handleClick}
         id="RobotSettings_legacySettingsToggleButton"
+        disabled={isRobotBusy}
       />
     </Flex>
   )

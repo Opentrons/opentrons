@@ -13,7 +13,6 @@ import {
 
 import { StyledText } from '../../../../atoms/text'
 import { ToggleButton } from '../../../../atoms/buttons'
-import { useIsRobotBusy } from '../../hooks'
 import { updateSetting } from '../../../../redux/robot-settings'
 
 import type { Dispatch } from '../../../../redux/types'
@@ -22,24 +21,21 @@ import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
 interface DisableHomingProps {
   settings: RobotSettingsField | undefined
   robotName: string
-  updateIsRobotBusy: (isRobotBusy: boolean) => void
+  isRobotBusy: boolean
 }
 
 export function DisableHoming({
   settings,
   robotName,
-  updateIsRobotBusy,
+  isRobotBusy,
 }: DisableHomingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
   const value = settings?.value ? settings.value : false
   const id = settings?.id ? settings.id : 'disableHomeOnBoot'
-  const isBusy = useIsRobotBusy()
 
   const handleClick: React.MouseEventHandler<Element> = () => {
-    if (isBusy) {
-      updateIsRobotBusy(true)
-    } else {
+    if (!isRobotBusy) {
       dispatch(updateSetting(robotName, id, !value))
     }
   }
@@ -61,6 +57,7 @@ export function DisableHoming({
         toggledOn={value}
         onClick={handleClick}
         id="RobotSettings_disableHomingToggleButton"
+        disabled={isRobotBusy}
       />
     </Flex>
   )

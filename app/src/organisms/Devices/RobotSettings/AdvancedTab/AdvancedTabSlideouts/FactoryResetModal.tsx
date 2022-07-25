@@ -72,7 +72,7 @@ export function FactoryResetModal({
       {isRobotConnected ? (
         <Modal
           type="warning"
-          title={t('factory_reset_modal_title')}
+          title={t('reset_to_factory_settings')}
           onClose={closeModal}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
@@ -94,14 +94,14 @@ export function FactoryResetModal({
                 onClick={triggerReset}
                 disabled={PENDING_STATUS}
               >
-                {t('factory_reset_modal_confirm_button')}
+                {t('yes_clear_data_and_restart_robot')}
               </AlertPrimaryButton>
             </Flex>
           </Flex>
         </Modal>
       ) : (
         <Modal
-          title={t('factory_reset_modal_connection_lost_title')}
+          title={t('connection_to_robot_lost')}
           icon={reconnectModalIcon}
           onClose={closeModal}
         >
@@ -110,11 +110,14 @@ export function FactoryResetModal({
             marginBottom={SPACING.spacing5}
             paddingBottom={SPACING.spacing5}
           >
-            {t('factory_reset_modal_connection_lost_description')}
+            {t('connection_lost_description')}
           </StyledText>
           <Flex justifyContent={JUSTIFY_FLEX_END}>
-            <PrimaryButton onClick={closeModal}>
-              {t('factory_reset_modal_connection_lost_close_button')}
+            <PrimaryButton
+              onClick={closeModal}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+            >
+              {t('shared:close')}
             </PrimaryButton>
           </Flex>
         </Modal>

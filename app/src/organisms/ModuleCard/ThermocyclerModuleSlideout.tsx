@@ -58,20 +58,10 @@ export const ThermocyclerModuleSlideout = (
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
   const { isRunIdle, isRunTerminal } = useRunStatuses()
-  const { moduleIdFromRun } = useModuleIdFromRun(
-    module,
-    currentRunId != null ? currentRunId : null
-  )
+  const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
-
-  let moduleId: string
-  if (isRunIdle && currentRunId != null && isLoadedInRun) {
-    moduleId = moduleIdFromRun
-  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
-    moduleId = module.id
-  }
 
   let errorMessage
   if (isSecondaryTemp) {
@@ -92,14 +82,14 @@ export const ThermocyclerModuleSlideout = (
       const saveLidCommand: TCSetTargetLidTemperatureCreateCommand = {
         commandType: 'thermocycler/setTargetLidTemperature',
         params: {
-          moduleId: moduleId,
+          moduleId: isRunIdle ? moduleIdFromRun : module.id,
           celsius: tempValue,
         },
       }
       const saveBlockCommand: TCSetTargetBlockTemperatureCreateCommand = {
         commandType: 'thermocycler/setTargetBlockTemperature',
         params: {
-          moduleId: moduleId,
+          moduleId: isRunIdle ? moduleIdFromRun : module.id,
           celsius: tempValue,
           //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
         },
@@ -115,10 +105,7 @@ export const ThermocyclerModuleSlideout = (
             } and run id ${currentRunId}: ${e.message}`
           )
         })
-      } else if (
-        (currentRunId != null && isRunTerminal) ||
-        currentRunId == null
-      ) {
+      } else if (isRunTerminal || currentRunId == null) {
         createLiveCommand({
           command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
         }).catch((e: Error) => {

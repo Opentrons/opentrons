@@ -123,7 +123,7 @@ export function FactoryResetSlideout({
           onClick={handleClearData}
           width="100%"
         >
-          {t('data_clear_button')}
+          {t('clear_data_and_restart_robot')}
         </PrimaryButton>
       }
     >
@@ -139,7 +139,7 @@ export function FactoryResetSlideout({
             color={COLORS.warning}
           />
           <StyledText as="p" color={COLORS.warningText}>
-            {t('factory_reset_slideout_warning_message')}
+            {t('factory_resets_cannot_be_undone')}
           </StyledText>
         </Flex>
         <Divider marginY={SPACING.spacing4} />
@@ -150,7 +150,7 @@ export function FactoryResetSlideout({
             marginBottom={SPACING.spacing3}
           >
             <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
-              {t('reset_option_calibration')}
+              {t('robot_calibration_data')}
             </StyledText>
             <Link
               role="button"
@@ -184,7 +184,7 @@ export function FactoryResetSlideout({
             marginBottom={SPACING.spacing3}
           >
             <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
-              {t('reset_option_protocol_run_history')}
+              {t('protocol_run_history')}
             </StyledText>
             <Link
               role="button"
@@ -214,7 +214,7 @@ export function FactoryResetSlideout({
             css={TYPOGRAPHY.pSemiBold}
             marginBottom={SPACING.spacing3}
           >
-            {t('reset_option_boot_scripts')}
+            {t('boot_scripts')}
           </StyledText>
           {bootScriptOption.map(opt => (
             <CheckboxField

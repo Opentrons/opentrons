@@ -19,6 +19,7 @@ export interface SelectSsidProps {
   onConnect: (ssid: string) => unknown
   onJoinOther: () => unknown
   onDisconnect: () => unknown
+  isRobotBusy: boolean
 }
 
 const FIELD_NAME = '__SelectSsid__'
@@ -70,6 +71,7 @@ export function SelectSsid(props: SelectSsidProps): JSX.Element {
     onJoinOther,
     onDisconnect,
     showWifiDisconnect,
+    isRobotBusy,
   } = props
 
   const handleValueChange = (_: string, value: string): void => {
@@ -104,6 +106,7 @@ export function SelectSsid(props: SelectSsidProps): JSX.Element {
 
   return (
     <StyledSelectField
+      disabled={isRobotBusy}
       name={FIELD_NAME}
       value={value}
       options={formatOptions(list, showWifiDisconnect)}

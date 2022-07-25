@@ -112,7 +112,7 @@ describe('RobotSettings FactoryResetModal', () => {
     getByText(
       'The Opentrons App is unable to communicate with this robot right now. Double check the USB or Wifi connection to the robot, then try to reconnect.'
     )
-    getByRole('button', { name: 'Close' })
+    getByRole('button', { name: 'close' })
   })
 
   it('should close the modal when clicking the Close button-UNREACHABLE', () => {
@@ -123,7 +123,7 @@ describe('RobotSettings FactoryResetModal', () => {
       resetOptions: {},
     })
 
-    const closeButton = getByRole('button', { name: 'Close' })
+    const closeButton = getByRole('button', { name: 'close' })
     fireEvent.click(closeButton)
     expect(mockCloseModal).toHaveBeenCalled()
   })
