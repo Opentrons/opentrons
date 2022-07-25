@@ -16,7 +16,11 @@ import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocol
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { useProtocolDetailsForRun, useRunStatuses } from '../Devices/hooks'
+import {
+  useProtocolDetailsForRun,
+  useRunStatuses,
+  useIsLegacySessionInProgress,
+} from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
@@ -72,7 +76,7 @@ export function useLatchControls(
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',
     params: {
-      moduleId: runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
+      moduleId: !isRunTerminal ? moduleIdFromRun : module.id,
     },
   }
 
@@ -134,12 +138,8 @@ export function useModuleOverflowMenu(
   const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
-  const {
-    isLegacySessionInProgress,
-    isRunTerminal,
-    isRunStill,
-    isRunIdle,
-  } = useRunStatuses()
+  const isLegacySessionInProgress = useIsLegacySessionInProgress()
+  const { isRunTerminal, isRunStill, isRunIdle } = useRunStatuses()
   const currentRunId = useCurrentRunId()
   let isDisabled: boolean = false
   if (runId != null && isLoadedInRun) {
@@ -219,13 +219,6 @@ export function useModuleOverflowMenu(
       </MenuItem>
     )
 
-  let moduleId: string
-  if (isRunIdle && currentRunId != null && isLoadedInRun) {
-    moduleId = moduleIdFromRun
-  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
-    moduleId = module.id
-  }
-
   const handleDeactivationCommand = (
     deactivateModuleCommandType: deactivateCommandTypes
   ): void => {
@@ -238,7 +231,7 @@ export function useModuleOverflowMenu(
       | HeaterShakerDeactivateShakerCreateCommand = {
       commandType: deactivateModuleCommandType,
       params: {
-        moduleId,
+        moduleId: isRunIdle ? moduleIdFromRun : module.id,
       },
     }
     if (isRunIdle && currentRunId != null && isLoadedInRun) {
@@ -250,10 +243,7 @@ export function useModuleOverflowMenu(
           `error setting module status with command type ${deactivateCommand.commandType} and run id ${runId}: ${e.message}`
         )
       })
-    } else if (
-      (currentRunId != null && isRunTerminal) ||
-      currentRunId == null
-    ) {
+    } else if (isRunTerminal || currentRunId == null) {
       createLiveCommand({
         command: deactivateCommand,
       }).catch((e: Error) => {
