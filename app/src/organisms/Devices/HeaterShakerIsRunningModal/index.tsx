@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { useTranslation } from 'react-i18next'
+import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import {
   Icon,
   COLORS,
@@ -11,7 +12,7 @@ import {
   TYPOGRAPHY,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
+import { useModuleIdFromRun } from '../../ModuleCard/useModuleIdFromRun'
 import { Modal } from '../../../atoms/Modal'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { HeaterShakerModule } from '../../../redux/modules/types'
@@ -23,14 +24,16 @@ interface HeaterShakerIsRunningModalProps {
   closeModal: () => void
   module: HeaterShakerModule
   startRun: () => void
+  currentRunId: string
 }
 
 export const HeaterShakerIsRunningModal = (
   props: HeaterShakerIsRunningModalProps
 ): JSX.Element => {
-  const { closeModal, module, startRun } = props
+  const { closeModal, module, startRun, currentRunId } = props
   const { t } = useTranslation('heater_shaker')
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { createCommand } = useCreateCommandMutation()
+  const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
 
   const title = (
     <Flex flexDirection={DIRECTION_ROW}>
@@ -48,7 +51,7 @@ export const HeaterShakerIsRunningModal = (
   const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
     commandType: 'heaterShaker/deactivateShaker',
     params: {
-      moduleId: module.id,
+      moduleId: moduleIdFromRun,
     },
   }
 
@@ -58,7 +61,8 @@ export const HeaterShakerIsRunningModal = (
   }
 
   const handleStopShake = (): void => {
-    createLiveCommand({
+    createCommand({
+      runId: currentRunId,
       command: stopShakeCommand,
     }).catch((e: Error) => {
       console.error(

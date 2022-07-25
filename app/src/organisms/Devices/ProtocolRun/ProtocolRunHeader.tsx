@@ -241,7 +241,7 @@ export function ProtocolRunHeader({
   }, [analysisErrors])
 
   const handlePlayButtonClick = (): void => {
-    if (isShaking) {
+    if (isShaking && isHeaterShakerInProtocol) {
       setShowIsShakingModal(true)
     } else if (isHeaterShakerInProtocol && !isShaking) {
       confirmAttachment()
@@ -599,13 +599,17 @@ export function ProtocolRunHeader({
             completedAt={completedAt}
           />
         </Box>
-        {showIsShakingModal && heaterShaker != null && (
-          <HeaterShakerIsRunningModal
-            closeModal={() => setShowIsShakingModal(false)}
-            module={heaterShaker}
-            startRun={play}
-          />
-        )}
+        {showIsShakingModal &&
+          heaterShaker != null &&
+          isHeaterShakerInProtocol &&
+          runId != null && (
+            <HeaterShakerIsRunningModal
+              closeModal={() => setShowIsShakingModal(false)}
+              module={heaterShaker}
+              startRun={play}
+              currentRunId={runId}
+            />
+          )}
         <Box marginLeft={SPACING_AUTO}>
           <PrimaryButton
             justifyContent={JUSTIFY_CENTER}
