@@ -72,7 +72,7 @@ export function useLatchControls(
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',
     params: {
-      moduleId: runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
+      moduleId: !isRunTerminal ? moduleIdFromRun : module.id,
     },
   }
 
@@ -219,13 +219,6 @@ export function useModuleOverflowMenu(
       </MenuItem>
     )
 
-  let moduleId: string
-  if (isRunIdle && currentRunId != null && isLoadedInRun) {
-    moduleId = moduleIdFromRun
-  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
-    moduleId = module.id
-  }
-
   const handleDeactivationCommand = (
     deactivateModuleCommandType: deactivateCommandTypes
   ): void => {
@@ -238,7 +231,7 @@ export function useModuleOverflowMenu(
       | HeaterShakerDeactivateShakerCreateCommand = {
       commandType: deactivateModuleCommandType,
       params: {
-        moduleId,
+        moduleId: isRunIdle ? moduleIdFromRun : module.id,
       },
     }
     if (isRunIdle && currentRunId != null && isLoadedInRun) {
@@ -250,10 +243,7 @@ export function useModuleOverflowMenu(
           `error setting module status with command type ${deactivateCommand.commandType} and run id ${runId}: ${e.message}`
         )
       })
-    } else if (
-      (currentRunId != null && isRunTerminal) ||
-      currentRunId == null
-    ) {
+    } else if (isRunTerminal || currentRunId == null) {
       createLiveCommand({
         command: deactivateCommand,
       }).catch((e: Error) => {

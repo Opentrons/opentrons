@@ -52,18 +52,8 @@ export const HeaterShakerSlideout = (
   const { isRunIdle, isRunTerminal } = useRunStatuses()
   const { createCommand } = useCreateCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
-  const { moduleIdFromRun } = useModuleIdFromRun(
-    module,
-    currentRunId != null ? currentRunId : null
-  )
+  const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
   const modulePart = t('temperature')
-
-  let moduleId: string
-  if (isRunIdle && currentRunId != null && isLoadedInRun) {
-    moduleId = moduleIdFromRun
-  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
-    moduleId = module.id
-  }
 
   const sendSetTemperatureOrShakeCommand: React.MouseEventHandler<HTMLInputElement> = e => {
     e.preventDefault()
@@ -73,7 +63,7 @@ export const HeaterShakerSlideout = (
       const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
         commandType: 'heaterShaker/setTargetTemperature',
         params: {
-          moduleId: moduleId,
+          moduleId: isRunIdle ? moduleIdFromRun : module.id,
           celsius: hsValue,
         },
       }
@@ -85,10 +75,7 @@ export const HeaterShakerSlideout = (
             )
           }
         )
-      } else if (
-        (currentRunId != null && isRunTerminal) ||
-        currentRunId == null
-      ) {
+      } else if (isRunTerminal || currentRunId == null) {
         createLiveCommand({
           command: setTempCommand,
         }).catch((e: Error) => {
