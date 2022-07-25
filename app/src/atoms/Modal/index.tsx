@@ -3,6 +3,7 @@ import { css } from 'styled-components'
 import {
   Btn,
   Icon,
+  Box,
   BaseModal,
   BaseModalProps,
   TYPOGRAPHY,
@@ -14,17 +15,23 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
+import { useFeatureFlag } from '../../redux/config'
 import { StyledText } from '../text'
 import { Divider } from '../structure'
-
+import { ModalShell } from './ModalShell'
+import { ModalHeader } from './ModalHeader'
 import type { IconProps } from '@opentrons/components'
 
 type ModalType = 'info' | 'warning' | 'error'
+export * from './ModalShell'
+export * from './ModalHeader'
+
 export interface ModalProps extends BaseModalProps {
   type?: ModalType
   onClose?: React.MouseEventHandler
   closeOnOutsideClick?: boolean
   title?: React.ReactNode
+  footer?: React.ReactNode
   children?: React.ReactNode
   icon?: IconProps
 }
@@ -54,7 +61,8 @@ export const Modal = (props: ModalProps): JSX.Element => {
     children,
     maxHeight,
   } = props
-  const header =
+  const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
+  const defaultHeader =
     title != null ? (
       <>
         <Flex
@@ -95,12 +103,45 @@ export const Modal = (props: ModalProps): JSX.Element => {
         <Divider width="100%" marginY="0" />
       </>
     ) : null
+  const modalHeader = (
+    <ModalHeader
+      onClose={onClose}
+      title={title}
+      icon={
+        ['error', 'warning'].includes(type)
+          ? {
+              name: 'ot-alert',
+              color: type === 'error' ? COLORS.error : COLORS.warning,
+              size: SPACING.spacingM,
+              marginRight: SPACING.spacing3,
+            }
+          : undefined
+      }
+    />
+  )
 
-  return (
+  return liquidSetupEnabled ? (
+    <ModalShell
+      width="31.25rem"
+      header={modalHeader}
+      onOutsideClick={closeOnOutsideClick ? onClose : undefined}
+      // center within viewport aside from nav
+      marginLeft="7.125rem"
+      {...props}
+    >
+      <Box
+        paddingTop={SPACING.spacing4}
+        paddingBottom={SPACING.spacing5}
+        paddingX={SPACING.spacing5}
+      >
+        {children}
+      </Box>
+    </ModalShell>
+  ) : (
     <BaseModal
       width={props.width ? props.width : '31.25rem'}
       noHeaderStyles
-      header={header}
+      header={defaultHeader}
       css={css`
         border-radius: ${BORDERS.radiusSoftCorners};
         box-shadow: ${BORDERS.smallDropShadow};
