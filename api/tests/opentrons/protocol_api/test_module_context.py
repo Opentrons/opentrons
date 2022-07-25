@@ -25,6 +25,7 @@ from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api.module_contexts import (
     NoTargetTemperatureSetError,
     CannotPerformModuleAction,
+    HeaterShakerContext,
 )
 from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation,
@@ -538,9 +539,11 @@ def test_heater_shaker_unsafe_move_flagger(
     type(mock_module_controller).labware_latch_status = mock_latch_status
 
     mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 3)
+    assert isinstance(mod, HeaterShakerContext)
+
     labware = ctx_with_heater_shaker.load_labware(labware_name, 5)
 
-    mod._geometry.flag_unsafe_move = mock.MagicMock()
+    mod._geometry.flag_unsafe_move = mock.MagicMock()  # type: ignore[assignment]
 
     mod.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)
 
@@ -564,7 +567,8 @@ def test_hs_flag_unsafe_move_raises(
     mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 3)
     labware = ctx_with_heater_shaker.load_labware("geb_96_tiprack_1000ul", 5)
 
-    mod._geometry.flag_unsafe_move = mock.MagicMock(side_effect=raiser)
+    assert isinstance(mod, HeaterShakerContext)
+    mod._geometry.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[assignment]
 
     with pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="uh oh"):
         mod.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)

@@ -11,8 +11,13 @@ from opentrons_shared_data.pipette.dev_types import LabwareUri
 import opentrons.protocol_api as papi
 import opentrons.protocols.api_support as papi_support
 import opentrons.protocols.geometry as papi_geometry
+
 from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation,
+)
+from opentrons.protocol_api.module_contexts import (
+    ThermocyclerContext,
+    HeaterShakerContext,
 )
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError, ThreadManagedHardware
@@ -1148,11 +1153,14 @@ def test_move_to_with_thermocycler(
     ctx: papi.ProtocolContext,
 ) -> None:
     """Test move_to raises for unsafe moves with thermocycler."""
+
     def raiser(*args, **kwargs):
         raise RuntimeError("Cannot")
 
     mod = ctx.load_module("thermocycler")
-    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)
+
+    assert isinstance(mod, ThermocyclerContext)
+    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[assignment]
     instr = ctx.load_instrument("p1000_single", "left")
     with pytest.raises(RuntimeError, match="Cannot"):
         instr.move_to(Location(Point(0, 0, 0), None))
@@ -1175,7 +1183,10 @@ def test_move_to_with_heater_shaker(
         implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
     )
     mod = ctx.load_module("heaterShakerModuleV1", 1)
-    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)
+
+    assert isinstance(mod, HeaterShakerContext)
+    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[assignment]
+
     instr = ctx.load_instrument("p300_multi", "left")
     with pytest.raises(RuntimeError, match="Cannot"):
         instr.move_to(Location(Point(0, 0, 0), None))
