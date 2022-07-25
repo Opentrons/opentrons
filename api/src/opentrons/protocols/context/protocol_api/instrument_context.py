@@ -124,7 +124,7 @@ class InstrumentContextImplementation(AbstractInstrument):
         """Home the mount"""
         self._protocol_interface.get_hardware().home_z(
             mount=self._mount,
-            # preserve buggy behavior in <= 2.12 strict back. compat.
+            # preserve buggy behavior in <= 2.12 for strict back. compat.
             # https://github.com/Opentrons/opentrons/issues/7499
             allow_home_other=self._api_version >= APIVersion(2, 13),
         )
