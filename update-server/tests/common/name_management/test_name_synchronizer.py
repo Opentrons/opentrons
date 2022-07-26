@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, AsyncGenerator, Callable
+from typing import Any, AsyncGenerator, Awaitable, Callable
 
 import pytest
 from decoy import Decoy, matchers
@@ -16,8 +16,10 @@ from otupdate.common.name_management.pretty_hostname import (
 )
 
 
-_GET_PRETTY_HOSTNAME_SIGNATURE = Callable[[], str]
-_PERSIST_PRETTY_HOSTNAME_SIGNATURE = Callable[[str], str]
+# TODO(mm, 2022-07-19): Mock out these functions differently so we don't have to
+# write out their signatures.
+_GET_PRETTY_HOSTNAME_SIGNATURE = Callable[[], Awaitable[str]]
+_PERSIST_PRETTY_HOSTNAME_SIGNATURE = Callable[[str], Awaitable[str]]
 _ALTERNATIVE_SERVICE_NAME_SIGNATURE = Callable[[str], str]
 
 
@@ -112,7 +114,7 @@ async def test_set(
 
     decoy.verify(
         await mock_avahi_client.start_advertising("new name"),
-        mock_persist_pretty_hostname("new name"),
+        await mock_persist_pretty_hostname("new name"),
     )
 
 
@@ -134,7 +136,7 @@ async def test_set_does_not_persist_invalid_avahi_service_name(
     with pytest.raises(Exception, match="oh the humanity"):
         await started_up_subject.set_name("danger!")
 
-    decoy.verify(mock_persist_pretty_hostname(matchers.Anything()), times=0)
+    decoy.verify(await mock_persist_pretty_hostname(matchers.Anything()), times=0)
 
 
 async def test_get(
@@ -142,8 +144,8 @@ async def test_get(
     mock_get_pretty_hostname: _GET_PRETTY_HOSTNAME_SIGNATURE,
     decoy: Decoy,
 ) -> None:
-    decoy.when(mock_get_pretty_hostname()).then_return("the current name")
-    assert started_up_subject.get_name() == "the current name"
+    decoy.when(await mock_get_pretty_hostname()).then_return("the current name")
+    assert await started_up_subject.get_name() == "the current name"
 
 
 async def test_advertises_initial_name(
@@ -159,7 +161,7 @@ async def test_advertises_initial_name(
     as the Avahi service name, when it's started up.
     """
 
-    decoy.when(mock_get_pretty_hostname()).then_return("initial name")
+    decoy.when(await mock_get_pretty_hostname()).then_return("initial name")
     mock_collision_subscription_context_manager = decoy.mock()
     decoy.when(
         mock_avahi_client.listen_for_collisions(matchers.Anything())
@@ -191,7 +193,7 @@ async def test_collision_handling(
     2. Start advertising with it.
     3. Persist it as the pretty hostname.
     """
-    decoy.when(mock_get_pretty_hostname()).then_return("initial name")
+    decoy.when(await mock_get_pretty_hostname()).then_return("initial name")
     decoy.when(mock_alternative_service_name("initial name")).then_return(
         "alternative name"
     )
@@ -224,5 +226,5 @@ async def test_collision_handling(
         # just in case the alternative name turns out to be invalid in some way.
         # https://github.com/Opentrons/opentrons/issues/9960
         await mock_avahi_client.start_advertising("alternative name"),
-        mock_persist_pretty_hostname("alternative name"),
+        await mock_persist_pretty_hostname("alternative name"),
     )

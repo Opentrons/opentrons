@@ -173,7 +173,9 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
       ? dropWhile(
           runCommands,
           runCommandSummary =>
-            new Date(runCommandSummary.createdAt) <= runStartDateTime
+            new Date(
+              runCommandSummary.startedAt ?? runCommandSummary.createdAt
+            ) <= runStartDateTime
         )
       : []
 
