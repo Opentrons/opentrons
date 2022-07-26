@@ -18,7 +18,7 @@ const Template: Story<React.ComponentProps<typeof Slideout>> = args => (
 const Children = (
   <React.Fragment>
     <StyledText
-      fontWeight={600}
+      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       fontSize={TYPOGRAPHY.fontSizeP}
       paddingTop={SPACING.spacing2}
     >
