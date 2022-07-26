@@ -21,7 +21,7 @@ export interface PipetteSelectProps {
   onPipetteChange: (
     pipetteName: string | null,
     e: ActionMeta<SelectOption>
-  ) => unknown
+  ) => void
   /** list of pipette names to omit */
   nameBlocklist?: string[]
   /** whether or not "None" shows up as the default option */

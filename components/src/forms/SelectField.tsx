@@ -31,7 +31,7 @@ export interface SelectFieldProps {
   /** optional caption. hidden when `error` is given */
   caption?: React.ReactNode
   /** if included, use error style and display error instead of caption */
-  error?: string | null | undefined
+  error?: string | null
   /** change handler called with (name, value) */
   onValueChange?: (
     name: string,
