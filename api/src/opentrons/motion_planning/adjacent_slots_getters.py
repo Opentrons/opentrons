@@ -1,4 +1,4 @@
-"""Getters for different types of adjacent slots."""
+"""Getters for specific adjacent slots."""
 
 from typing import Optional, List
 

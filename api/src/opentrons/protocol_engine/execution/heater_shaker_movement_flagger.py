@@ -2,7 +2,7 @@
 
 from typing import List
 
-from opentrons.util.adjacent_slots_getters import (
+from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_west_locations,
     get_north_south_locations,
 )

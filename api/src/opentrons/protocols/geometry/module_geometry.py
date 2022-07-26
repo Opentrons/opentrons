@@ -20,7 +20,7 @@ from opentrons_shared_data import module
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.types import Location, Point, LocationLabware
-from opentrons.util.adjacent_slots_getters import (
+from opentrons.motion_planning.adjacent_slots_getters import (
     get_north_south_locations,
     get_east_west_locations,
 )

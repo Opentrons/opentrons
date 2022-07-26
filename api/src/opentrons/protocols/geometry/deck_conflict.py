@@ -6,7 +6,7 @@ from typing_extensions import Final
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
-from opentrons.util.adjacent_slots_getters import (
+from opentrons.motion_planning.adjacent_slots_getters import (
     get_east_west_locations,
     get_south_location,
     get_adjacent_locations,
