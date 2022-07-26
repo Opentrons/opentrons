@@ -20,9 +20,11 @@ def raise_if_movement_restricted(
     """Flag restricted movement around/to a Heater-Shaker."""
     for hs_movement_restrictor in hs_movement_restrictors:
         dest_east_west = destination_slot in get_east_west_slots(
-            hs_movement_restrictor.deck_slot)
+            hs_movement_restrictor.deck_slot
+        )
         dest_north_south = destination_slot in get_north_south_slots(
-            hs_movement_restrictor.deck_slot)
+            hs_movement_restrictor.deck_slot
+        )
         dest_heater_shaker = destination_slot == hs_movement_restrictor.deck_slot
 
         # If heater-shaker is running, can't move to or around it
