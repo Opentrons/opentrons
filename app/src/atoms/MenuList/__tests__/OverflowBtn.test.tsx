@@ -67,8 +67,12 @@ describe('OverflowBtn', () => {
       onClick: jest.fn(),
     })
 
-    expect(getByRole('button')).toHaveStyleRule('fill', `${COLORS.errorText}`, {
-      modifier: ':disabled circle',
-    })
+    expect(getByRole('button')).toHaveStyleRule(
+      'fill',
+      `${COLORS.successDisabled}`,
+      {
+        modifier: ':disabled circle',
+      }
+    )
   })
 })
