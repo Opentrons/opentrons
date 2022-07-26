@@ -1,0 +1,50 @@
+# https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms#top-level-syntax
+name: Feature request
+description: Suggest a new feature
+title: "feat: "
+labels: [feature-request]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Thanks for taking the time to file a feature request!
+
+        > Please make sure you've read the "Opening Issues" section of our [Contributing Guide.](https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#opening-issues)
+  - type: textarea
+    attributes:
+      label: Overview
+      description: |
+        Use this section to describe your idea at a high level.
+        Please include some context about why you want this feature.
+
+        - What would this feature allow you to accomplish?
+        - Are there any workarounds you use to partially achieve your goal?
+        - Are there any Github issues you could find that may be related?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Implementation details
+      description: |
+        List any implementation steps, specs, links to docs, or files here.
+
+        Tip: You can attach files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Design
+      description: |
+        Attach or link images and designs.
+
+        Tip: You can attach files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Acceptance criteria
+      description: |
+        A checklist of requirements and/or testing steps that must be complete before this feature is considered complete.
+        This can also be used as a testing plan for associated PRs.
+    validations:
+      required: false
