@@ -7,7 +7,7 @@ from robot_server.service.legacy.models.modules import SerialCommand
 
 MAGDECK_CALIBRATE = HTTPGCodeConfirmConfig(
     name='magdeck_calibrate',
-    results_path=f"{DIRECTORY}/magdeck_calibrate.txt",
+    results_dir=DIRECTORY,
     executable=partial(
         post_serial_command,
         command=SerialCommand(command_type='calibrate'),
@@ -19,7 +19,7 @@ MAGDECK_CALIBRATE = HTTPGCodeConfirmConfig(
 
 MAGDECK_DEACTIVATE = HTTPGCodeConfirmConfig(
     name='magdeck_deactivate',
-    results_path=f"{DIRECTORY}/magdeck_deactivate.txt",
+    results_dir=DIRECTORY,
     executable=partial(
         post_serial_command,
         command=SerialCommand(command_type='deactivate'),
@@ -31,7 +31,7 @@ MAGDECK_DEACTIVATE = HTTPGCodeConfirmConfig(
 
 MAGDECK_ENGAGE = HTTPGCodeConfirmConfig(
     name='magdeck_engage',
-    results_path=f"{DIRECTORY}/magdeck_engage.txt",
+    results_dir=DIRECTORY,
     executable=partial(
         post_serial_command,
         command=SerialCommand(command_type='engage', args=[5.1]),

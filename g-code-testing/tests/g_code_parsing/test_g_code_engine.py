@@ -1,5 +1,8 @@
 import pytest
 import os
+
+from opentrons import APIVersion
+
 from g_code_parsing.g_code_engine import GCodeEngine
 from g_code_parsing.g_code_program.supported_text_modes import (
     SupportedTextModes,
@@ -34,9 +37,9 @@ async def test_watcher_command_list_is_cleared(protocol_g_code_engine: GCodeEngi
     If everything is cleaning up correctly then 2 runs of the same protocol
     should return the same exact G-Code
     """
-    with protocol_g_code_engine.run_protocol(PROTOCOL_PATH) as run_1:
+    with protocol_g_code_engine.run_protocol(PROTOCOL_PATH, APIVersion(2, 13)) as run_1:
         run_1_desc = run_1.get_text_explanation(SupportedTextModes.G_CODE)
-    with protocol_g_code_engine.run_protocol(PROTOCOL_PATH) as run_2:
+    with protocol_g_code_engine.run_protocol(PROTOCOL_PATH, APIVersion(2, 13)) as run_2:
         run_2_desc = run_2.get_text_explanation(SupportedTextModes.G_CODE)
 
     assert run_1_desc == run_2_desc

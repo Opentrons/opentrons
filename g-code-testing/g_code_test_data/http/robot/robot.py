@@ -16,7 +16,7 @@ from robot_server.service.legacy.models.control import (
 
 ROBOT_HOME_ROBOT = HTTPGCodeConfirmConfig(
     name='robot_home_robot',
-    results_path=f"{DIRECTORY}/robot_home_robot.txt",
+    results_dir=DIRECTORY,
     executable=partial(
         post_home_robot,
         robot_home_target=RobotHomeTarget(target=HomeTarget.robot),
@@ -28,7 +28,7 @@ ROBOT_HOME_ROBOT = HTTPGCodeConfirmConfig(
 
 ROBOT_HOME_LEFT_PIPETTE = HTTPGCodeConfirmConfig(
     name='robot_home_left_pipette',
-    results_path=f"{DIRECTORY}/robot_home_left_pipette.txt",
+    results_dir=DIRECTORY,
     executable=partial(
         post_home_robot,
         robot_home_target=RobotHomeTarget(target=HomeTarget.pipette, mount=Mount.left),
@@ -40,7 +40,7 @@ ROBOT_HOME_LEFT_PIPETTE = HTTPGCodeConfirmConfig(
 
 ROBOT_HOME_RIGHT_PIPETTE = HTTPGCodeConfirmConfig(
     name='robot_home_right_pipette',
-    results_path=f"{DIRECTORY}/robot_home_right_pipette.txt",
+    results_dir=DIRECTORY,
     executable=partial(
         post_home_robot,
         robot_home_target=RobotHomeTarget(target=HomeTarget.pipette, mount=Mount.right),
@@ -52,7 +52,7 @@ ROBOT_HOME_RIGHT_PIPETTE = HTTPGCodeConfirmConfig(
 
 ROBOT_MOVE_LEFT_MOUNT = HTTPGCodeConfirmConfig(
     name='robot_move_left_mount',
-    results_path=f"{DIRECTORY}/robot_move_left_mount.txt",
+    results_dir=DIRECTORY,
     executable=partial(
         post_move_robot,
         robot_move_target=RobotMoveTarget(
@@ -66,7 +66,7 @@ ROBOT_MOVE_LEFT_MOUNT = HTTPGCodeConfirmConfig(
 
 ROBOT_MOVE_LEFT_PIPETTE = HTTPGCodeConfirmConfig(
     name='robot_move_left_pipette',
-    results_path=f"{DIRECTORY}/robot_move_left_pipette.txt",
+    results_dir=DIRECTORY,
     executable=partial(
         post_move_robot,
         RobotMoveTarget(target=MotionTarget.pipette, point=[100.0, 90.0, 150.0], mount=Mount.left),
@@ -78,7 +78,7 @@ ROBOT_MOVE_LEFT_PIPETTE = HTTPGCodeConfirmConfig(
 
 ROBOT_MOVE_RIGHT_MOUNT = HTTPGCodeConfirmConfig(
     name='robot_move_right_mount',
-    results_path=f"{DIRECTORY}/robot_move_right_mount.txt",
+    results_dir=DIRECTORY,
     executable=partial(
         post_move_robot,
         robot_move_target=RobotMoveTarget(
@@ -92,7 +92,7 @@ ROBOT_MOVE_RIGHT_MOUNT = HTTPGCodeConfirmConfig(
 
 ROBOT_MOVE_RIGHT_PIPETTE = HTTPGCodeConfirmConfig(
     name='robot_move_right_pipette',
-    results_path=f"{DIRECTORY}/robot_move_right_pipette.txt",
+    results_dir=DIRECTORY,
     executable=partial(
         post_move_robot,
         robot_move_target=RobotMoveTarget(
