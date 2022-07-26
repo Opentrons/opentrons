@@ -23,7 +23,7 @@ body:
       label: Steps to reproduce
       description: |
         List precise steps to reproduce the bug.
-        Please include screenshots or videos if possible.
+        Please include screenshots videos and/or logs if possible.
 
         Tip: You can attach files by clicking this area to highlight it and then dragging files in.
     validations:
@@ -53,6 +53,11 @@ body:
   - type: textarea
     attributes:
       label: System and robot setup or anything else?
-      description: Please share how you are connecting to your robot (Wi-Fi or USB) and any other context that may help us understand the bug.
+      description: |
+        Please share
+
+        - App version
+        - How you are connecting to your robot (Wi-Fi or USB)
+        - Any other context that may help us understand the bug
     validations:
       required: false
