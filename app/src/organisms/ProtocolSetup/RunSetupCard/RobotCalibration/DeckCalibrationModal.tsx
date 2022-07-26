@@ -95,7 +95,10 @@ export function DeckCalibrationModal({
               t('pipette_offset_cal_description_bullet_3'),
             ]}
           />
-          <Divider marginTop="2.5rem" marginBottom={SPACING.spacing4} />
+          <Divider
+            marginTop={SPACING.spacingXXL}
+            marginBottom={SPACING.spacing4}
+          />
           <PrimaryButton
             onClick={onCloseClick}
             alignSelf={ALIGN_FLEX_END}

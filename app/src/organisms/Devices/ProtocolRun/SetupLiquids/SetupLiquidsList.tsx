@@ -198,7 +198,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
                     minWidth="4.25rem"
-                    marginLeft="auto"
+                    marginLeft={SPACING.spacingAuto}
                   >
                     {getTotalVolumePerLiquidLabwarePair(
                       liquidId,
