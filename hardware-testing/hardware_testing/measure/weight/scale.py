@@ -19,6 +19,8 @@ from hardware_testing.drivers.radwag.commands import (
 
 @dataclass
 class ScaleConfig:
+    """Scale Config."""
+
     continuous_transmission: bool
     automatic_internal_adjustment: bool
     working_mode: RadwagWorkingMode
@@ -28,14 +30,19 @@ class ScaleConfig:
 
 
 DEFAULT_SCALE_CONFIG = ScaleConfig(
-    continuous_transmission=False, automatic_internal_adjustment=False,
-    working_mode=RadwagWorkingMode.weighing, filter=RadwagFilter.very_fast,
-    value_release=RadwagValueRelease.fast, tare=0.0,
+    continuous_transmission=False,
+    automatic_internal_adjustment=False,
+    working_mode=RadwagWorkingMode.weighing,
+    filter=RadwagFilter.very_fast,
+    value_release=RadwagValueRelease.fast,
+    tare=0.0,
 )
 
 
 @dataclass
 class ScaleReading:
+    """Scale Reading."""
+
     grams: float
     stable: bool
     time: float
@@ -83,7 +90,9 @@ class Scale:
         #   1) Set profile to USER
         #   2) Set screensaver to NONE
         self._scale.continuous_transmission(enable=cfg.continuous_transmission)
-        self._scale.automatic_internal_adjustment(enable=cfg.automatic_internal_adjustment)
+        self._scale.automatic_internal_adjustment(
+            enable=cfg.automatic_internal_adjustment
+        )
         self._scale.working_mode(mode=cfg.working_mode)
         self._scale.filter(cfg.filter)
         self._scale.value_release(cfg.value_release)

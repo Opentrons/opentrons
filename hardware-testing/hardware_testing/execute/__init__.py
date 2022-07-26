@@ -1,7 +1,4 @@
 """Execute."""
 from . import gravimetric
 
-__all__ = [
-    "gravimetric"
-]
-
+__all__ = ["gravimetric"]

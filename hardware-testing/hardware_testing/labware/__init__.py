@@ -1,6 +1,4 @@
 """Labware."""
 from . import layout
 
-__all__ = [
-    "layout"
-]
+__all__ = ["layout"]

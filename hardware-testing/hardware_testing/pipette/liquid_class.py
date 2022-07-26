@@ -5,7 +5,11 @@ from typing import Optional, Callable, List
 from opentrons.protocol_api import ProtocolContext, InstrumentContext
 from opentrons.protocol_api.labware import Well, Labware
 
-from hardware_testing.data import create_file_name, dump_data_to_file, append_data_to_file
+from hardware_testing.data import (
+    create_file_name,
+    dump_data_to_file,
+    append_data_to_file,
+)
 from hardware_testing.liquid.height import LiquidTracker
 from hardware_testing.liquid.liquid_class import (
     LiquidClassSettings,
@@ -84,7 +88,10 @@ class LiquidSettingsRunner:
     """Pipetting Liquid Settings."""
 
     def __init__(
-        self, ctx: ProtocolContext, cfg: LiquidSettingsRunnerConfig, timestamp: SampleTimestamps
+        self,
+        ctx: ProtocolContext,
+        cfg: LiquidSettingsRunnerConfig,
+        timestamp: SampleTimestamps,
     ) -> None:
         """Pipetting Liquid Settings."""
         assert (
@@ -99,12 +106,8 @@ class LiquidSettingsRunner:
 
     def run(
         self,
-        on_pre_submerge: Optional[
-            Callable[[LiquidSettingsRunnerConfig], None]
-        ] = None,
-        on_post_emerge: Optional[
-            Callable[[LiquidSettingsRunnerConfig], None]
-        ] = None,
+        on_pre_submerge: Optional[Callable[[LiquidSettingsRunnerConfig], None]] = None,
+        on_post_emerge: Optional[Callable[[LiquidSettingsRunnerConfig], None]] = None,
     ) -> None:
         """Run."""
         self._run_approach()
@@ -128,26 +131,26 @@ class LiquidSettingsRunner:
 
     def _timestamp_pre_submerge(self) -> None:
         if self._cfg.aspirate:
-            t = Timestamp(f'{self._cfg.aspirate}-pre-aspirate')
+            t = Timestamp(f"{self._cfg.aspirate}-pre-aspirate")
             self._timestamps.pre_aspirate = t
         else:
-            t = Timestamp(f'{self._cfg.dispense}-pre-dispense')
+            t = Timestamp(f"{self._cfg.dispense}-pre-dispense")
             self._timestamps.pre_dispense = t
 
     def _timestamp_sample(self) -> None:
         if self._cfg.aspirate:
-            t = Timestamp(f'{self._cfg.aspirate}-aspirate')
+            t = Timestamp(f"{self._cfg.aspirate}-aspirate")
             self._timestamps.aspirate = t
         else:
-            t = Timestamp(f'{self._cfg.dispense}-dispense')
+            t = Timestamp(f"{self._cfg.dispense}-dispense")
             self._timestamps.dispense = t
 
     def _timestamp_post_emerge(self) -> None:
         if self._cfg.aspirate:
-            t = Timestamp(f'{self._cfg.aspirate}-post-aspirate')
+            t = Timestamp(f"{self._cfg.aspirate}-post-aspirate")
             self._timestamps.post_aspirate = t
         else:
-            t = Timestamp(f'{self._cfg.dispense}-post-dispense')
+            t = Timestamp(f"{self._cfg.dispense}-post-dispense")
             self._timestamps.post_dispense = t
 
     def _run_approach(self) -> None:
@@ -215,8 +218,14 @@ class PipetteLiquidClass:
     """Pipette Liquid Class."""
 
     def __init__(
-        self, ctx: ProtocolContext, model: str, mount: str, tip_racks: List[Labware],
-            test_name: str, run_id: str, start_time: float,
+        self,
+        ctx: ProtocolContext,
+        model: str,
+        mount: str,
+        tip_racks: List[Labware],
+        test_name: str,
+        run_id: str,
+        start_time: float,
     ) -> None:
         """Pipette Liquid Class."""
         self._ctx = ctx
@@ -229,20 +238,20 @@ class PipetteLiquidClass:
         self._on_post_aspirate: Optional[Callable] = None
         self._on_pre_dispense: Optional[Callable] = None
         self._on_post_dispense: Optional[Callable] = None
-        self._sample_timestamps_list = list()
+        self._sample_timestamps_list: List = list()
         self._file_name: Optional[str] = None
 
     @property
     def unique_name(self) -> str:
         """Unique name."""
         if self._ctx.is_simulating():
-            return 'SIMULATE'
+            return "SIMULATE"
         return get_pipette_unique_name(self.pipette)
 
     @property
     def tag(self) -> str:
         """Tag."""
-        return f'{self.__class__.__name__}-{self.unique_name}'
+        return f"{self.__class__.__name__}-{self.unique_name}"
 
     @property
     def pipette(self) -> InstrumentContext:
@@ -257,16 +266,19 @@ class PipetteLiquidClass:
         """Get timestamps."""
         return self._sample_timestamps_list
 
-    def create_empty_timestamp(self, tag: str = '') -> None:
+    def create_empty_timestamp(self, tag: str = "") -> None:
+        """Create empty timestamp."""
         self._sample_timestamps_list.append(get_empty_sample_timestamp(tag=tag))
 
     def save_latest_timestamp(self) -> None:
-        assert self._file_name, f'No file to save to, please activate recording first'
+        """Save latest timestamp."""
+        assert self._file_name, "No file to save to, please activate recording first"
         _latest = self._sample_timestamps_list[-1]
         csv_line = _latest.as_csv(self._start_time)
         append_data_to_file(self._test_name, self._file_name, csv_line + "\n")
 
     def record_timestamp_enable(self) -> None:
+        """Enable recording timestamps."""
         self._file_name = create_file_name(self._test_name, self._run_id, self.tag)
         # add the header to the CSV file
         dump_data_to_file(
@@ -274,6 +286,7 @@ class PipetteLiquidClass:
         )
 
     def record_timestamp_disable(self) -> None:
+        """Disable recording timestamps."""
         self._file_name = None
 
     def set_liquid_class(self, settings: LiquidClassSettings) -> None:
@@ -301,19 +314,21 @@ class PipetteLiquidClass:
         self._on_pre_dispense = on_pre_dispense
         self._on_post_dispense = on_post_dispense
 
-    def aspirate(self, volume: float, well: Well,
-                 liquid_level: LiquidTracker) -> None:
+    def aspirate(self, volume: float, well: Well, liquid_level: LiquidTracker) -> None:
         """Aspirate."""
         self._pipette_liquid_settings(well, liquid_level, aspirate=volume)
 
-    def dispense(self, volume: float, well: Well,
-                 liquid_level: LiquidTracker) -> None:
+    def dispense(self, volume: float, well: Well, liquid_level: LiquidTracker) -> None:
         """Dispense."""
         self._pipette_liquid_settings(well, liquid_level, dispense=volume)
 
     def _pipette_liquid_settings(
-            self, well: Well, liquid_tracker: LiquidTracker,
-            aspirate: Optional[float] = None, dispense: Optional[float] = None) -> None:
+        self,
+        well: Well,
+        liquid_tracker: LiquidTracker,
+        aspirate: Optional[float] = None,
+        dispense: Optional[float] = None,
+    ) -> None:
         """Run a pipette given some Pipetting Liquid Settings."""
         height_before, height_after = liquid_tracker.get_before_and_after_heights(
             self._pipette, well, aspirate=aspirate, dispense=dispense
@@ -331,13 +346,18 @@ class PipetteLiquidClass:
         )
         timestamps = self._sample_timestamps_list[-1]
         pip_runner = LiquidSettingsRunner(
-            ctx=self._ctx, cfg=pipetting_cfg, timestamp=timestamps)
+            ctx=self._ctx, cfg=pipetting_cfg, timestamp=timestamps
+        )
         if aspirate:
-            pip_runner.run(on_pre_submerge=self._on_pre_aspirate,
-                           on_post_emerge=self._on_post_aspirate)
+            pip_runner.run(
+                on_pre_submerge=self._on_pre_aspirate,
+                on_post_emerge=self._on_post_aspirate,
+            )
         else:
-            pip_runner.run(on_pre_submerge=self._on_pre_dispense,
-                           on_post_emerge=self._on_post_dispense)
+            pip_runner.run(
+                on_pre_submerge=self._on_pre_dispense,
+                on_post_emerge=self._on_post_dispense,
+            )
         liquid_tracker.update_affected_wells(
             self._pipette, well, aspirate=aspirate, dispense=dispense
         )

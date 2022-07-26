@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import List, Any
 
 from hardware_testing.data import create_folder_for_test_data
-from hardware_testing.measure.weight.record import GravimetricRecorder
 
 
 class PlotRequestHandler(BaseHTTPRequestHandler):
@@ -13,6 +12,7 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
 
     @property
     def plot_directory(self) -> Path:
+        """Plot directory."""
         return self.server.plot_directory  # type: ignore[attr-defined]
 
     @property
@@ -44,37 +44,28 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         print(file_path)
         with open(file_path, "rb") as f:
             file = f.read(-1)
-        if '.html' in _file_name:
-            c_type = 'text/html'
-        elif '.js' in _file_name:
-            c_type = 'text/javascript'
-        elif '.png' in _file_name:
-            c_type = 'image/png'
+        if ".html" in _file_name:
+            c_type = "text/html"
+        elif ".js" in _file_name:
+            c_type = "text/javascript"
+        elif ".png" in _file_name:
+            c_type = "image/png"
         else:
-            raise ValueError(f'Unexpected file type for file \"{_file_name}\"')
+            raise ValueError(f'Unexpected file type for file "{_file_name}"')
         self._send_response_bytes(file, content_type=c_type)
 
-    def _list_files_in_directory(self, includes: str = '') -> List[Path]:
+    def _list_files_in_directory(self, includes: str = "") -> List[Path]:
         _file_list = [
-            Path(f).resolve()
-            for f in self.plot_directory.iterdir()
-            if f.is_file()
+            Path(f).resolve() for f in self.plot_directory.iterdir() if f.is_file()
         ]
         if includes:
-            _file_list = [
-                f
-                for f in _file_list
-                if includes in f.stem
-            ]
+            _file_list = [f for f in _file_list if includes in f.stem]
         _file_list.sort(key=lambda f: f.stat().st_mtime)
         _file_list.reverse()
         return _file_list
 
-    def _get_file_name_list(self, substring: str = '') -> List[str]:
-        return [
-            f.stem
-            for f in self._list_files_in_directory(substring)
-        ]
+    def _get_file_name_list(self, substring: str = "") -> List[str]:
+        return [f.stem for f in self._list_files_in_directory(substring)]
 
     def _get_file_contents(self, file_name: str) -> str:
         req_file_name = f"{file_name}.csv"
@@ -86,14 +77,19 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
         req_cmd = self.path_elements[1]
         response_data = {
             "directory": str(self.plot_directory.resolve()),
+            "files": [],
+            "name": None,
+            "csv": None,
+            "csvPipette": None,
         }
-        _grav_name = 'GravimetricRecorder'
-        _pip_name = 'PipetteLiquidClass'
+        _grav_name = "GravimetricRecorder"
+        _pip_name = "PipetteLiquidClass"
         if req_cmd == "list":
-            response_data["files"] = self._get_file_name_list(_grav_name)  # type: ignore[assignment]
+            f = self._get_file_name_list(_grav_name)  # type: ignore[assignment]
+            response_data["files"] = f
         else:
-            file_name_grav = ''
-            file_name_pip = ''
+            file_name_grav = ""
+            file_name_pip = ""
             if req_cmd == "latest":
                 file_list_grav = self._get_file_name_list(_grav_name)
                 file_list_pip = self._get_file_name_list(_pip_name)
@@ -104,21 +100,25 @@ class PlotRequestHandler(BaseHTTPRequestHandler):
             else:
                 raise ValueError(f"Unable to find response for request: {self.path}")
             response_data["name"] = file_name_grav
-            response_data["csv"] = self._get_file_contents(file_name_grav) if file_name_grav else ''
-            response_data["csvPipette"] = ''
+            response_data["csv"] = (
+                self._get_file_contents(file_name_grav) if file_name_grav else ""
+            )
+            response_data["csvPipette"] = ""
             if file_name_pip:
-                response_data["csvPipette"] = self._get_file_contents(file_name_pip) if file_name_pip else ''
+                response_data["csvPipette"] = (
+                    self._get_file_contents(file_name_pip) if file_name_pip else ""
+                )
         response_str = json.dumps({req_cmd: response_data})
         self._send_response_bytes(response_str.encode("utf-8"))
 
     def _respond_to_new_name_request(self) -> None:
         if len(self.path_elements) == 1:
-            response_str = json.dumps({'name': str(self.plot_directory.stem)})
+            response_str = json.dumps({"name": str(self.plot_directory.stem)})
         else:
             new_name = self.path_elements[1]
             dir_path = create_folder_for_test_data(new_name)
             self._set_plot_directory(dir_path)
-            response_str = json.dumps({'name': new_name})
+            response_str = json.dumps({"name": new_name})
         self._send_response_bytes(response_str.encode("utf-8"))
 
     def do_GET(self) -> None:
@@ -144,7 +144,7 @@ class PlotServer(HTTPServer):
 
 
 def run(test_name: str, http_port: int) -> None:
-    """Run a Plot Server Instance"""
+    """Run a Plot Server Instance."""
     dir_path = create_folder_for_test_data(test_name)
     server = PlotServer(dir_path, ("0.0.0.0", http_port), PlotRequestHandler)
     print(f"Plot server running on port: {http_port}")

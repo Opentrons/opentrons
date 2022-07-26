@@ -76,18 +76,18 @@ class GravimetricRecording(List):
         time_idx = header_list.index("time")
         grams_idx = header_list.index("grams")
         stable_idx = header_list.index("stable")
-        split_lines = [
-            line.strip().split(',') for line in lines[1:] if line
-        ]
-        return GravimetricRecording([
-            GravimetricSample(
-                time=float(split_line[time_idx]),
-                grams=float(split_line[grams_idx]),
-                stable=bool(int(split_line[stable_idx])),
-            )
-            for split_line in split_lines
-            if len(split_line) > 1
-        ])
+        split_lines = [line.strip().split(",") for line in lines[1:] if line]
+        return GravimetricRecording(
+            [
+                GravimetricSample(
+                    time=float(split_line[time_idx]),
+                    grams=float(split_line[grams_idx]),
+                    stable=bool(int(split_line[stable_idx])),
+                )
+                for split_line in split_lines
+                if len(split_line) > 1
+            ]
+        )
 
     @property
     def start_time(self) -> float:
@@ -153,7 +153,7 @@ class GravimetricRecording(List):
 
     def _get_nearest_sample_index(self, _time: float) -> int:
         if _time < self.start_time or _time > self.end_time:
-            raise ValueError(f'Time (_time) is not within recording')
+            raise ValueError(f"Time ({_time}) is not within recording")
         for i in range(len(self) - 1):
             diff_before = _time - self[i].time
             diff_after = self[i + 1].time - _time
@@ -162,15 +162,16 @@ class GravimetricRecording(List):
                     return i
                 else:
                     return i + 1
-        raise ValueError(f'Unable to find time ({time}) in recording')
+        raise ValueError(f"Unable to find time ({time}) in recording")
 
-    def get_time_slice(self, start: float, end: float,
-                       stable: bool = False) -> "GravimetricRecording":
+    def get_time_slice(
+        self, start: float, end: float, stable: bool = False
+    ) -> "GravimetricRecording":
         """Get time slice."""
-        assert len(self), f'Cannot slice an empty recording'
+        assert len(self), "Cannot slice an empty recording"
         start_idx = self._get_nearest_sample_index(start)
         end_idx = self._get_nearest_sample_index(end)
-        wanted_samples = self[start_idx:end_idx + 1]
+        wanted_samples = self[start_idx : end_idx + 1]
         if not stable:
             return GravimetricRecording(wanted_samples)
         else:
@@ -182,7 +183,7 @@ class GravimetricRecording(List):
                     stable_samples.append(s)
                 if not s.stable and len(stable_samples):
                     break
-            assert len(stable_samples), f'No stable samples found'
+            assert len(stable_samples), "No stable samples found"
             return GravimetricRecording(stable_samples)
 
 
@@ -252,7 +253,7 @@ class GravimetricRecorder:
     @property
     def tag(self) -> str:
         """Tag."""
-        return f'{self.__class__.__name__}-{self._cfg.tag}'
+        return f"{self.__class__.__name__}-{self._cfg.tag}"
 
     @property
     def config(self) -> GravimetricRecorderConfig:
@@ -306,6 +307,7 @@ class GravimetricRecorder:
             self.run()
 
     def run(self) -> None:
+        """Run."""
         self._wait_for_record_start()
         if self._cfg.save_to_disk:
             self._recording = self._record_samples_to_disk()
@@ -314,16 +316,19 @@ class GravimetricRecorder:
         self._is_recording.clear()
 
     @property
-    def recording(self):
+    def recording(self) -> GravimetricRecording:
+        """Recording."""
         return self._recording
 
     @property
     def is_recording(self) -> bool:
+        """Is Recording."""
         return self._is_recording.is_set()
 
     def stop(self) -> None:
+        """Stop."""
         self._is_recording.clear()
-        if self._thread.is_alive():
+        if self._thread is not None and self._thread.is_alive():
             self._thread.join()
 
     def _wait_for_record_start(self) -> None:
@@ -331,12 +336,12 @@ class GravimetricRecorder:
             self._is_recording.wait()
 
     def _record_samples(
-            self,
-            timeout: Optional[float] = None,
-            on_new_sample: Optional[Callable] = None,
+        self,
+        timeout: Optional[float] = None,
+        on_new_sample: Optional[Callable] = None,
     ) -> GravimetricRecording:
         """Record samples from the scale."""
-        assert self._cfg.duration or self._thread.is_alive()
+        assert self._cfg.duration or (self._thread and self._thread.is_alive())
         assert self._cfg.frequency
         if self._cfg.duration:
             length = int(self._cfg.duration * self._cfg.frequency) + 1
@@ -360,7 +365,7 @@ class GravimetricRecorder:
                 _recording, interval
             )
             if not len(_recording) or _record_did_exceed_time(
-                    _recording.end_time, interval_w_overlap
+                _recording.end_time, interval_w_overlap
             ):
                 _recording.append(_s)
                 if callable(on_new_sample):
@@ -373,18 +378,19 @@ class GravimetricRecorder:
         )
         return _recording
 
-    def _record_samples_to_disk(self, timeout: Optional[float] = None) -> GravimetricRecording:
+    def _record_samples_to_disk(
+        self, timeout: Optional[float] = None
+    ) -> GravimetricRecording:
         """Record samples to disk."""
-        assert self._cfg.test_name, f'A test-name is required to record samples'
-        assert self._cfg.tag, f'A tag is required to record samples'
+        assert self._cfg.test_name, "A test-name is required to record samples"
+        assert self._cfg.tag, "A tag is required to record samples"
         assert self._cfg.start_time
+        assert self._cfg.run_id
         _file_name = create_file_name(self._cfg.test_name, self._cfg.run_id, self.tag)
 
         def _on_new_sample(recording: GravimetricRecording) -> None:
             csv_line = recording[-1].as_csv(self._cfg.start_time)
-            append_data_to_file(
-                str(self._cfg.test_name), _file_name, csv_line + "\n"
-            )
+            append_data_to_file(str(self._cfg.test_name), _file_name, csv_line + "\n")
 
         # add the header to the CSV file
         dump_data_to_file(

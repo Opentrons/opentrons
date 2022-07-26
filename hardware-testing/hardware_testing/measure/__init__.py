@@ -1,6 +1,4 @@
 """Measure."""
 from . import weight
 
-__all__ = [
-    "weight"
-]
+__all__ = ["weight"]

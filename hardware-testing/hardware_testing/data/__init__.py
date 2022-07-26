@@ -38,7 +38,9 @@ def create_run_id_and_start_time() -> Tuple[str, float]:
     return create_run_id(), time()
 
 
-def create_file_name(test_name: str, run_id: str, tag: str, extension: str = "csv") -> str:
+def create_file_name(
+    test_name: str, run_id: str, tag: str, extension: str = "csv"
+) -> str:
     """Create a file name, given a test name."""
     return f"{test_name}_{run_id}_{tag}.{extension}"
 

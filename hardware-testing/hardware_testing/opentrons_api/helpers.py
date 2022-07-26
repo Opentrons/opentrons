@@ -26,10 +26,12 @@ def get_api_context(
         ctx = simulate.get_protocol_api(api_level)
 
     if not able_to_execute or not connect_to_smoothie:
+
         def _fake_context_is_simulating(_: Any) -> bool:
             return is_simulating
 
         setattr(ctx, "is_simulating", MethodType(_fake_context_is_simulating, ctx))
+    assert ctx
     return ctx
 
 
