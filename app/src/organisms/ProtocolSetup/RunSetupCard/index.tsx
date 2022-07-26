@@ -12,8 +12,6 @@ import {
   ALIGN_START,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  FONT_SIZE_BODY_2,
-  FONT_WEIGHT_SEMIBOLD,
   FONT_SIZE_BODY_1,
   C_WHITE,
   COLOR_SUCCESS,
@@ -139,7 +137,7 @@ export function RunSetupCard(): JSX.Element | null {
       <StyledText
         as="h2"
         paddingX={SPACING.spacing4}
-        fontWeight={FONT_WEIGHT_SEMIBOLD}
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         id={'RunSetupCard_setupForRun'}
       >
         {t('setup_for_run')}
