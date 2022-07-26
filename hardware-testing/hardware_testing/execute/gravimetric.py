@@ -14,6 +14,7 @@ from hardware_testing.labware.position import (
 from hardware_testing.labware.layout import LayoutLabware, DEFAULT_SLOTS_GRAV
 from hardware_testing.liquid.height import LiquidTracker
 from hardware_testing.measure.weight import (
+    GravimetricRecording,
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
@@ -21,6 +22,7 @@ from hardware_testing.pipette.liquid_class import PipetteLiquidClass
 
 
 LIQUID_CLASS_LOOKUP = {300: liquid.defaults.DEFAULT_LIQUID_CLASS_OT2_P300_SINGLE}
+GRAV_SETTLE_SECONDS = 3
 
 
 @dataclass
@@ -119,9 +121,11 @@ def run(
             items.liquid_pipette.aspirate(
                 sample_volume, grav_well, liquid_level=items.liquid_tracker
             )
+            ctx.delay(GRAV_SETTLE_SECONDS)
             items.liquid_pipette.dispense(
                 sample_volume, grav_well, liquid_level=items.liquid_tracker
             )
+            ctx.delay(GRAV_SETTLE_SECONDS)
             items.liquid_pipette.pipette.drop_tip()
             items.liquid_pipette.save_latest_timestamp()
     finally:
@@ -130,4 +134,29 @@ def run(
 
 def analyze(ctx: ProtocolContext, items: ExecuteGravItems) -> None:
     """Analyze."""
-    print("skipping analysis")
+    entire_recording = items.recorder.recording
+
+    def _get_rec_slice(_time: float) -> GravimetricRecording:
+        # FIXME: some ugliness so that simulating doesn't break
+        _is_sim = ctx.is_simulating()
+        start = _time if not _is_sim else entire_recording.start_time
+        duration = 1.0 if not _is_sim else 2.0 / items.recorder.config.frequency
+        timeout = 3 if not _is_sim else 4.0 / items.recorder.config.frequency
+        return entire_recording.get_time_slice(start=start, duration=duration,
+                                               stable=True, timeout=timeout)
+
+    recorded_dispense_slices = [
+        {
+            'pre': _get_rec_slice(t.pre_dispense.time),
+            'post': _get_rec_slice(t.post_dispense.time)
+        }
+        for t in items.liquid_pipette.get_timestamps()
+    ]
+    dispense_volumes = [
+        r['post'].average - r['pre'].average
+        for r in recorded_dispense_slices
+    ]
+    ctx.comment("Volumes Dispense:")
+    for i, v in enumerate(dispense_volumes):
+        ctx.comment(f"\t({i + 1}/{len(dispense_volumes)}) "
+                    f"{round(v, 2)} uL")

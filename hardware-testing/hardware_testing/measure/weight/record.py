@@ -157,34 +157,37 @@ class GravimetricRecording(List):
         for i in range(len(self) - 1):
             diff_before = _time - self[i].time
             diff_after = self[i + 1].time - _time
-            if diff_before > 0 and diff_after > 0:
+            if diff_before >= 0 and diff_after >= 0:
                 if diff_before < diff_after:
                     return i
                 else:
                     return i + 1
-        raise ValueError(f"Unable to find time ({time}) in recording")
+        raise ValueError(f"Unable to find time ({_time}) in recording (start={self.start_time}, end={self.end_time})")
 
     def get_time_slice(
-        self, start: float, end: float, stable: bool = False
+        self, start: float, duration: float, stable: bool = False, timeout: float = 3
     ) -> "GravimetricRecording":
         """Get time slice."""
         assert len(self), "Cannot slice an empty recording"
-        start_idx = self._get_nearest_sample_index(start)
-        end_idx = self._get_nearest_sample_index(end)
-        wanted_samples = self[start_idx : end_idx + 1]
+        avail_start_idx = self._get_nearest_sample_index(start)
+        avail_timeout_idx = self._get_nearest_sample_index(start + timeout)
+        available_samples = GravimetricRecording(self[avail_start_idx:avail_timeout_idx])
         if not stable:
-            return GravimetricRecording(wanted_samples)
+            end_idx = available_samples._get_nearest_sample_index(duration)
+            return GravimetricRecording(available_samples[:end_idx + 1])
         else:
             # only include the first stable segment of samples
             # once the samples become unstable, stop including
-            stable_samples = list()
-            for s in wanted_samples:
+            stable_samples = GravimetricRecording()
+            for s in available_samples:
                 if s.stable:
                     stable_samples.append(s)
-                if not s.stable and len(stable_samples):
-                    break
-            assert len(stable_samples), "No stable samples found"
-            return GravimetricRecording(stable_samples)
+                    if stable_samples.duration >= duration:
+                        return stable_samples
+                elif len(stable_samples):
+                    stable_samples = GravimetricRecording()
+        raise RuntimeError(f"Unable to slice recording "
+                           f"(start={start}, duration={duration})")
 
 
 class GravimetricRecorderConfig:
