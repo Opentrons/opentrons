@@ -122,7 +122,9 @@ class GCodeCLI:
 
     def _configurations(self) -> str:
         """Get a list of runnable G-Code Configurations."""
-        path_string = "\n".join(self.configurations.keys())
+        configs = list(self.configurations.keys())
+        configs.sort()
+        path_string = "\n".join(configs)
         return f"Runnable Configurations:\n{path_string}"
 
     def _pull(self, version: Optional[APIVersion]) -> str:
