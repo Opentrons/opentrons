@@ -39,7 +39,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
           marginX={SPACING_1}
           data-testid="status_circle"
         >
-          {pulse ?? false ? (
+          {pulse != null && pulse ? (
             <animate
               attributeName="fill"
               values={`${iconColor}; transparent`}
