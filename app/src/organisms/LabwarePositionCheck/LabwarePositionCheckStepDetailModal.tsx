@@ -165,7 +165,7 @@ export const LabwarePositionCheckStepDetailModal = (
                 position={POSITION_ABSOLUTE}
                 top="25%"
                 marginLeft="6.7rem"
-                color={'#ff5b5b'}
+                color="#ff5b5b"
                 fontWeight={FONT_WEIGHT_SEMIBOLD}
               >
                 {t(
