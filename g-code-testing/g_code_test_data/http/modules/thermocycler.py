@@ -1,5 +1,5 @@
 from functools import partial
-from g_code_test_data.http.http_settings import HTTP_SETTINGS, DIRECTORY
+from g_code_test_data.http.http_settings import HTTP_SETTINGS
 from g_code_test_data.g_code_configuration import HTTPGCodeConfirmConfig
 from robot_server.service.legacy.routers.modules import post_serial_command
 from robot_server.service.legacy.models.modules import SerialCommand
@@ -7,7 +7,6 @@ from robot_server.service.legacy.models.modules import SerialCommand
 
 THERMOCYCLER_CLOSE = HTTPGCodeConfirmConfig(
         name='thermocycler_close',
-        results_dir=DIRECTORY,
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='close'),
@@ -19,7 +18,6 @@ THERMOCYCLER_CLOSE = HTTPGCodeConfirmConfig(
 
 THERMOCYCLER_OPEN = HTTPGCodeConfirmConfig(
         name='thermocycler_open',
-        results_dir=DIRECTORY,
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='open'),
@@ -31,7 +29,6 @@ THERMOCYCLER_OPEN = HTTPGCodeConfirmConfig(
 
 THERMOCYCLER_DEACTIVATE = HTTPGCodeConfirmConfig(
         name='thermocycler_deactivate',
-        results_dir=DIRECTORY,
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='deactivate'),
@@ -43,7 +40,6 @@ THERMOCYCLER_DEACTIVATE = HTTPGCodeConfirmConfig(
 
 THERMOCYCLER_DEACTIVATE_BLOCK = HTTPGCodeConfirmConfig(
         name='thermocycler_deactivate_block',
-        results_dir=DIRECTORY,
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='deactivate_block'),
@@ -55,7 +51,6 @@ THERMOCYCLER_DEACTIVATE_BLOCK = HTTPGCodeConfirmConfig(
 
 THERMOCYCLER_DEACTIVATE_LID = HTTPGCodeConfirmConfig(
         name='thermocycler_deactivate_lid',
-        results_dir=DIRECTORY,
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='deactivate_lid'),
@@ -67,7 +62,6 @@ THERMOCYCLER_DEACTIVATE_LID = HTTPGCodeConfirmConfig(
 
 THERMOCYCLER_CYCLE_TEMPERATURES = HTTPGCodeConfirmConfig(
         name='thermocycler_cycle_temperatures',
-        results_dir=DIRECTORY,
         executable=partial(
             post_serial_command,
             command=SerialCommand(
@@ -84,7 +78,6 @@ THERMOCYCLER_CYCLE_TEMPERATURES = HTTPGCodeConfirmConfig(
 
 THERMOCYCLER_SET_LID_TEMPERATURE = HTTPGCodeConfirmConfig(
         name='thermocycler_set_lid_temperature',
-        results_dir=DIRECTORY,
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='set_lid_temperature', args=[37.0]),
@@ -96,7 +89,6 @@ THERMOCYCLER_SET_LID_TEMPERATURE = HTTPGCodeConfirmConfig(
 
 THERMOCYCLER_SET_TEMPERATURE = HTTPGCodeConfirmConfig(
         name='thermocycler_set_temperature',
-        results_dir=DIRECTORY,
         executable=partial(
             post_serial_command,
             command=SerialCommand(command_type='set_temperature', args=[1.0]),

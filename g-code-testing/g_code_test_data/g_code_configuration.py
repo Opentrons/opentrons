@@ -2,11 +2,15 @@ import os
 from pathlib import Path
 from typing import (
     Callable,
+    ClassVar,
     List,
     Set,
     Type,
 )
-from typing_extensions import Final
+from typing_extensions import (
+    Final,
+    Literal,
+)
 
 import pytest
 from _pytest.mark.structures import Mark
@@ -35,7 +39,7 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     name: constr(regex=r'^[a-z0-9_]*$')
     path: str
     settings: Settings
-    results_dir: str
+    results_dir: ClassVar[str] = "protocols"
     driver: str = 'protocol'
     marks: List[Mark] = [pytest.mark.g_code_confirm]
     versions: Set[APIVersion] = Field(..., min_items=1)
@@ -82,7 +86,7 @@ class HTTPGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     name: constr(regex=r'^[a-z0-9_]*$')
     executable: Callable
     settings: Settings
-    results_dir: str
+    results_dir: ClassVar[str] = "http"
     driver: str = 'http'
     marks: List[Mark] = [pytest.mark.g_code_confirm]
 
