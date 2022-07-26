@@ -99,7 +99,7 @@ export function ManualIpHostnameItem({
         </StyledText>
         <Btn
           size={TYPOGRAPHY.lineHeight20}
-          color={COLORS.darkBlack}
+          color={COLORS.darkBlackEnabled}
           onClick={remove}
           marginLeft={SPACING.spacing4}
           data-testid="close-button"
