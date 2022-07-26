@@ -175,7 +175,7 @@ export function ChooseProtocolSlideout(
                     <Icon
                       name="alert-circle"
                       size="1.25rem"
-                      color={COLORS.error}
+                      color={COLORS.errorEnabled}
                     />
                   </>
                 ) : null}

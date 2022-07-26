@@ -82,7 +82,11 @@ export function AvailableRobotOption(
         {(isError || isOnDifferentSoftwareVersion) && isSelected ? (
           <>
             <Box flex="1 1 auto" />
-            <Icon name="alert-circle" size="1.25rem" color={COLORS.error} />
+            <Icon
+              name="alert-circle"
+              size="1.25rem"
+              color={COLORS.errorEnabled}
+            />
           </>
         ) : null}
       </MiniCard>

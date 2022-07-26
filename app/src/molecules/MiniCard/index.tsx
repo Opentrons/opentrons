@@ -36,12 +36,12 @@ const selectedOptionStyles = css`
 
 const errorOptionStyles = css`
   ${selectedOptionStyles}
-  border: 1px solid ${COLORS.error};
-  background-color: ${COLORS.errorBg};
+  border: 1px solid ${COLORS.errorEnabled};
+  background-color: ${COLORS.errorBackground};
 
   &:hover {
-    border: 1px solid ${COLORS.error};
-    background-color: ${COLORS.errorBg};
+    border: 1px solid ${COLORS.errorEnabled};
+    background-color: ${COLORS.errorBackground};
   }
 `
 

@@ -42,7 +42,7 @@ const StyledTableCell = styled.td`
 `
 
 const BODY_STYLE = css`
-  box-shadow: 0 0 0 1px ${COLORS.medGrey};
+  box-shadow: 0 0 0 1px ${COLORS.medGreyEnabled};
   border-radius: 3px;
 `
 interface PipetteOffsetCalibrationItemsProps {

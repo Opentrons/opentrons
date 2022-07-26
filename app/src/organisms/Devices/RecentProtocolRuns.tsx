@@ -40,7 +40,7 @@ export function RecentProtocolRuns({
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.white}
-      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid}  ${COLORS.medGrey}`}
+      border={`${SPACING.spacingXXS} ${BORDERS.styleSolid}  ${COLORS.medGreyEnabled}`}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_COLUMN}
       width="100%"

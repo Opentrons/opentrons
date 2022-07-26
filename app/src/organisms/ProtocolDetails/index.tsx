@@ -320,7 +320,7 @@ export function ProtocolDetails(
 
       <Flex
         backgroundColor={COLORS.white}
-        border={`1px solid ${COLORS.medGrey}`}
+        border={`1px solid ${COLORS.medGreyEnabled}`}
         borderRadius={BORDERS.radiusSoftCorners}
         position={POSITION_RELATIVE}
         flexDirection={DIRECTION_ROW}
@@ -458,7 +458,7 @@ export function ProtocolDetails(
           flex="0 0 20rem"
           backgroundColor={COLORS.white}
           data-testid={`ProtocolDetails_deckMap`}
-          border={`1px solid ${COLORS.medGrey}`}
+          border={`1px solid ${COLORS.medGreyEnabled}`}
           borderRadius={BORDERS.radiusSoftCorners}
         >
           <StyledText
