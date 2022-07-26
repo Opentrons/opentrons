@@ -58,17 +58,17 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
         return os.path.join(self.results_dir, version.__str__(), f"{self.name}")
 
     def get_comparison_file_path(self, version: APIVersion) -> str:
-        """Get that path of the file in S3."""
+        """Get that path of comparison file."""
         return os.path.join(self.results_dir, version.__str__(), f"{self.name}.txt")
 
     def get_comparison_file(self, version: APIVersion) -> str:
-        """Pull file from S3 and print it's content."""
+        """Pull comparison file and print it's content."""
         file_path = self._get_full_path(version)
         file = open(file_path, "r")
         return ''.join(file.readlines()).strip()
 
     def update_comparison(self, version: APIVersion) -> str:
-        """Run config and upload it to S3."""
+        """Run config and override the comparison file with output."""
         Path(os.path.dirname(self._get_full_path(version))).mkdir(parents=True, exist_ok=True)
         with open(self._get_full_path(version), 'w') as file:
             file.write(self.execute(version))
@@ -104,16 +104,16 @@ class HTTPGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
         return os.path.join(self.results_dir, f"{self.name}")
 
     def get_comparison_file_path(self) -> str:
-        """Get that path of the file in S3."""
+        """Get that path of comparison file."""
         return os.path.join(self.results_dir, f"{self.name}.txt")
 
     def get_comparison_file(self) -> str:
-        """Pull file from S3 and print it's content."""
+        """Pull comparison file and print it's content."""
         file = open(self._get_full_path(), "r")
         return ''.join(file.readlines()).strip()
 
     def update_comparison(self) -> str:
-        """Run config and upload it to S3."""
+        """Run config and override the comparison file with output."""
         with open(self._get_full_path(), 'w') as file:
             file.write(self.execute())
         return "File uploaded successfully"
