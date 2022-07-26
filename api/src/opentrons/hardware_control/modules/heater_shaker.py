@@ -2,7 +2,7 @@ import asyncio
 import logging
 from anyio import create_task_group
 from dataclasses import dataclass
-from typing import Optional, Mapping, Callable
+from typing import Optional, Mapping
 from typing_extensions import Final
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.heater_shaker.driver import HeaterShakerDriver
@@ -105,8 +105,6 @@ class HeaterShaker(mod_abc.AbstractModule):
             interval_seconds=polling_period,
             listener=self._listener,
         )
-        # TODO (spp, 2022-02-23): refine this to include user-facing error message.
-        self._error_status: Optional[str] = None
 
     async def cleanup(self) -> None:
         """Stop the poller task"""
@@ -195,7 +193,7 @@ class HeaterShaker(mod_abc.AbstractModule):
                 "targetTemp": self.target_temperature,
                 "currentSpeed": self.speed,
                 "targetSpeed": self.target_speed,
-                "errorDetails": self._error_status,
+                "errorDetails": self._listener.state.error,
             },
         }
 
@@ -232,14 +230,13 @@ class HeaterShaker(mod_abc.AbstractModule):
         """Module status or error state details."""
         # TODO (spp, 2022-2-22): Does this make sense as the overarching 'status'?
         #  Or maybe consolidate the above 3 statuses into this one?
-        if (
+        if self._listener.state.error:
+            return HeaterShakerStatus.ERROR
+        elif (
             self.temperature_status == TemperatureStatus.IDLE
             and self.speed_status == SpeedStatus.IDLE
         ):
             return HeaterShakerStatus.IDLE
-        elif self._error_status:
-            # TODO (spp, 2022-02-23): actually implement error checking
-            return HeaterShakerStatus.ERROR
         else:
             return HeaterShakerStatus.RUNNING
 
@@ -452,6 +449,11 @@ class PollResult:
     labware_latch: HeaterShakerLabwareLatchStatus
 
 
+@dataclass
+class ListenerState(PollResult):
+    error: Optional[str]
+
+
 class PollerReader(Reader[PollResult]):
     """Polled data reader."""
 
@@ -475,27 +477,36 @@ class HeaterShakerListener(WaitableListener[PollResult]):
     def __init__(
         self,
         loop: Optional[asyncio.AbstractEventLoop] = None,
-        interrupt_callback: Optional[Callable[[Exception], None]] = None,
     ) -> None:
         """Constructor."""
         super().__init__(loop=loop)
-        self._callback = interrupt_callback
-        self._polled_data = PollResult(
+        self._state = ListenerState(
             temperature=Temperature(current=25, target=None),
             rpm=RPM(current=0, target=None),
             labware_latch=HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
+            error=None,
         )
 
+    @staticmethod
+    def _exc_to_errorstr(exc: Exception) -> str:
+        try:
+            return str(exc.args[0])
+        except Exception:
+            return repr(exc)
+
     @property
-    def state(self) -> PollResult:
-        return self._polled_data
+    def state(self) -> ListenerState:
+        return self._state
 
     def on_poll(self, result: PollResult) -> None:
         """On new poll."""
-        self._polled_data = result
+        self._state.temperature = result.temperature
+        self._state.rpm = result.rpm
+        self._state.labware_latch = result.labware_latch
+        self._state.error = None
         return super().on_poll(result)
 
     def on_error(self, exc: Exception) -> None:
         """On error."""
-        if self._callback:
-            self._callback(exc)
+        self._state.error = self._exc_to_errorstr(exc)
+        super().on_error(exc)

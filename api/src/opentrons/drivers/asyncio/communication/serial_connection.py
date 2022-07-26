@@ -160,7 +160,10 @@ class SerialConnection:
             response = await self._serial.read_until(match=self._ack)
             log.debug(f"{self.name}: Read <- {response!r}")
 
-            if self._ack in response:
+            if (
+                self._ack in response
+                or self._error_keyword.encode() in response.lower()
+            ):
                 # Remove ack from response
                 response = response.replace(self._ack, b"")
                 str_response = self.process_raw_response(
