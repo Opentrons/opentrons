@@ -245,9 +245,9 @@ describe('TestShake', () => {
     expect(buttonStep1).toBeEnabled()
 
     getByText(
-      'Return to Step 2 to see instructions for securing the thermal adapter to the module.'
+      'Return to Step 3 to see instructions for securing the thermal adapter to the module.'
     )
-    const buttonStep2 = getByRole('button', { name: /Go to Step 2/i })
+    const buttonStep2 = getByRole('button', { name: /Go to Step 3/i })
     expect(buttonStep2).toBeEnabled()
   })
 
