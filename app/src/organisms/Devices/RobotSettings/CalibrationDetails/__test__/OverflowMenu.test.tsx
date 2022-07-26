@@ -143,7 +143,7 @@ describe('OverflowMenu', () => {
     expect(startCalibration).toHaveBeenCalled()
   })
 
-  it('should call update robot status if a robot is busy - pipette offset', () => {
+  it('alibration button should be disabled if a protocol is running - pipette offset', () => {
     mockGetIsRunning.mockReturnValue(true)
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
@@ -152,7 +152,7 @@ describe('OverflowMenu', () => {
     expect(calibrationButton).toBeDisabled()
   })
 
-  it('should call update robot status if a robot is busy - tip length', () => {
+  it('calibration button should be disabled if a protocol is running - tip length', () => {
     props = {
       ...props,
       calType: 'tipLength',
