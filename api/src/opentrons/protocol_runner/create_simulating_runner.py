@@ -1,11 +1,7 @@
 """Simulating ProtocolRunner factory."""
 
 from opentrons.config import feature_flags
-from opentrons.hardware_control import (
-    API as HardwareAPI,
-    SynchronousAdapter,
-    HardwareControlAPI,
-)
+from opentrons.hardware_control import API as HardwareAPI, HardwareControlAPI
 from opentrons.protocol_engine import EngineConfigs, create_protocol_engine
 
 from .legacy_wrappers import LegacySimulatingContextCreator
@@ -63,7 +59,7 @@ async def create_simulating_runner() -> ProtocolRunner:
 
     simulating_legacy_context_creator = (
         LegacySimulatingContextCreator(
-            sync_hardware_api=SynchronousAdapter(simulating_hardware_api),
+            hardware_api=simulating_hardware_api,
             labware_offset_provider=offset_provider,
         )
         if not feature_flags.disable_fast_protocol_upload()
