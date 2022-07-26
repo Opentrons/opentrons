@@ -1,7 +1,7 @@
 # https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms#top-level-syntax
 name: Feature request
 description: Suggest a new feature
-title: "feat: "
+title: 'feat: '
 labels: [feature-request]
 body:
   - type: markdown

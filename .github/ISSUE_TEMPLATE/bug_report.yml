@@ -1,7 +1,7 @@
 # https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms#top-level-syntax
 name: Bug Report
 description: File a bug
-title: "bug: "
+title: 'bug: '
 labels: [bug]
 body:
   - type: markdown
