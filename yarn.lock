@@ -6697,7 +6697,7 @@ cli-truncate@^1.1.0:
     slice-ansi "^1.0.0"
     string-width "^2.0.0"
 
-cli-truncate@^2.0.0:
+cli-truncate@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/cli-truncate/-/cli-truncate-2.1.0.tgz#c39e28bf05edcde5be3b98992a22deed5a2b93c7"
   integrity sha512-n8fOixwDD6b/ObinzTrp1ZKFzbgvKZvuz/TvejnLn1aQfC6r52XEx85FmuC+3HI+JM7coBRXUvNqEU2PHVrHpg==
@@ -8780,14 +8780,14 @@ electron-builder@^22.12.0:
     update-notifier "^5.1.0"
     yargs "^17.0.1"
 
-electron-context-menu@0.15.1:
-  version "0.15.1"
-  resolved "https://registry.yarnpkg.com/electron-context-menu/-/electron-context-menu-0.15.1.tgz#30d776ff889f220de688bde762870d5fcf9c83c2"
-  integrity sha512-+uiTR8c/GKT1D4jxkV5GGEuAJz+RJGFJmdCXD3yIzhQ6BwpjEC99F9DqJJfTzHK1P3R5sxiZ7qoSNvg/3dBgzw==
+electron-context-menu@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/electron-context-menu/-/electron-context-menu-3.3.0.tgz#cbcc4544ede2bf5629d4ad9911eaa94ae23cd38f"
+  integrity sha512-7VuDaJQK3ybCm/Buzo9rVhOiZ3VJloHJ/xVtZ4xN6n4fEk1fqOeELSk3tMDVQKnu8pUhayvzsAL0f5tSHwvHAQ==
   dependencies:
-    cli-truncate "^2.0.0"
-    electron-dl "^1.2.0"
-    electron-is-dev "^1.0.1"
+    cli-truncate "^2.1.0"
+    electron-dl "^3.2.1"
+    electron-is-dev "^2.0.0"
 
 electron-debug@3.0.1:
   version "3.0.1"
@@ -8806,7 +8806,7 @@ electron-devtools-installer@3.1.1:
     semver "^7.2.1"
     unzip-crx-3 "^0.2.0"
 
-electron-dl@1.14.0, electron-dl@^1.2.0:
+electron-dl@1.14.0:
   version "1.14.0"
   resolved "https://registry.yarnpkg.com/electron-dl/-/electron-dl-1.14.0.tgz#1466f1b945664ca3d784268307c2b935728177bf"
   integrity sha512-4okyei42a1mLsvLK7hLrIfd20EQzB18nIlLTwBV992aMSmTGLUEFRTmO1MfSslGNrzD8nuPuy1l/VxO8so4lig==
@@ -8815,15 +8815,29 @@ electron-dl@1.14.0, electron-dl@^1.2.0:
     pupa "^1.0.0"
     unused-filename "^1.0.0"
 
+electron-dl@^3.2.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/electron-dl/-/electron-dl-3.3.1.tgz#14164595bebcc636c671eb791b2a3265003f76c4"
+  integrity sha512-kmcSYZyHVEHHHFKlZWW58GiCmu2NSu3Rdwnl3+/fr/ftQYHJULVf1QkrCBPFE2bp/Ly113Za7c8wJZs1nBy04A==
+  dependencies:
+    ext-name "^5.0.0"
+    pupa "^2.0.1"
+    unused-filename "^2.1.0"
+
 electron-is-accelerator@^0.1.0:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/electron-is-accelerator/-/electron-is-accelerator-0.1.2.tgz#509e510c26a56b55e17f863a4b04e111846ab27b"
   integrity sha1-UJ5RDCala1Xhf4Y6SwThEYRqsns=
 
-electron-is-dev@^1.0.1, electron-is-dev@^1.1.0:
+electron-is-dev@^1.1.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/electron-is-dev/-/electron-is-dev-1.2.0.tgz#2e5cea0a1b3ccf1c86f577cee77363ef55deb05e"
   integrity sha512-R1oD5gMBPS7PVU8gJwH6CtT0e6VSoD0+SzSnYpNm+dBkcijgA+K7VAMHDfnRq/lkKPZArpzplTW6jfiMYosdzw==
+
+electron-is-dev@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/electron-is-dev/-/electron-is-dev-2.0.0.tgz#833487a069b8dad21425c67a19847d9064ab19bd"
+  integrity sha512-3X99K852Yoqu9AcW50qz3ibYBWY79/pBhlMCab8ToEWS48R0T9tyxRiQhwylE7zQdXrMnx2JKqUJyMPmt5FBqA==
 
 electron-localshortcut@^3.1.0:
   version "3.2.1"
@@ -17735,7 +17749,7 @@ pupa@^1.0.0:
   resolved "https://registry.yarnpkg.com/pupa/-/pupa-1.0.0.tgz#9a9568a5af7e657b8462a6e9d5328743560ceff6"
   integrity sha1-mpVopa9+ZXuEYqbp1TKHQ1YM7/Y=
 
-pupa@^2.1.1:
+pupa@^2.0.1, pupa@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/pupa/-/pupa-2.1.1.tgz#f5e8fd4afc2c5d97828faa523549ed8744a20d62"
   integrity sha512-l1jNAspIBSFqbT+y+5FosojNpVpF94nlI+wDUpqP9enwOTfHx9f0gh5nB96vl+6yTpsJsypeNrwfzPrKuHB41A==
@@ -21952,6 +21966,14 @@ unused-filename@^1.0.0:
   dependencies:
     modify-filename "^1.1.0"
     path-exists "^3.0.0"
+
+unused-filename@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/unused-filename/-/unused-filename-2.1.0.tgz#33719c4e8d9644f32d2dec1bc8525c6aaeb4ba51"
+  integrity sha512-BMiNwJbuWmqCpAM1FqxCTD7lXF97AvfQC8Kr/DIeA6VtvhJaMDupZ82+inbjl5yVP44PcxOuCSxye1QMS0wZyg==
+  dependencies:
+    modify-filename "^1.1.0"
+    path-exists "^4.0.0"
 
 unzip-crx-3@^0.2.0:
   version "0.2.0"

@@ -65,12 +65,10 @@ function startUp(): void {
 
   mainWindow.once('closed', () => (mainWindow = null))
 
-  // TODO kj: remove {} once https://github.com/sindresorhus/electron-context-menu/issues/153 is solved
-  // After upgrading electron-context-menu to after 0.16.0 remove lookUpSelection() and add searchWithGoogle()
   contextMenu({
     menu: actions => [
       actions.copy({}),
-      actions.lookUpSelection({}),
+      actions.searchWithGoogle({}),
       actions.inspect(),
     ],
   })
