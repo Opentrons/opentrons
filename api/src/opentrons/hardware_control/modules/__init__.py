@@ -40,6 +40,5 @@ __all__ = [
     "MagneticStatus",
     "HeaterShakerStatus",
     "SpeedStatus",
-    "ThermocyclerLidStatus",
     "LiveData",
 ]

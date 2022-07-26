@@ -8,7 +8,7 @@ import {
   SPACING_3,
   SPACING_4,
   SPACING_5,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
   FONT_WEIGHT_SEMIBOLD,
   FONT_WEIGHT_REGULAR,
   JUSTIFY_CENTER,
@@ -34,7 +34,7 @@ export const RobotMotionLoadingModal = (
       <Text
         as={'h3'}
         marginBottom={SPACING_3}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        textTransform={TYPOGRAPHY.textTransformUppercase}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginLeft={SPACING_3}
       >

@@ -21,7 +21,7 @@ import {
   SPACING_1,
   SPACING_2,
   SPACING_3,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
   C_MED_DARK_GRAY,
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
@@ -110,7 +110,9 @@ export function CommandItemComponent(
 
   const isPause =
     analysisCommand?.commandType === 'pause' ||
-    runCommandSummary?.commandType === 'pause'
+    analysisCommand?.commandType === 'waitForResume' ||
+    runCommandSummary?.commandType === 'pause' ||
+    runCommandSummary?.commandType === 'waitForResume'
 
   const WRAPPER_STYLE = css`
     font-size: ${FONT_SIZE_BODY_1};
@@ -128,7 +130,7 @@ export function CommandItemComponent(
       {commandStatus === 'failed' ? <CommandFailedMessage /> : null}
       {isComment ? (
         <Flex
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          textTransform={TYPOGRAPHY.textTransformUppercase}
           fontSize={FONT_SIZE_CAPTION}
           color={C_MED_DARK_GRAY}
           marginBottom={SPACING_1}
@@ -138,7 +140,7 @@ export function CommandItemComponent(
       ) : null}
       {isPause ? (
         <Flex
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
+          textTransform={TYPOGRAPHY.textTransformUppercase}
           fontSize={FONT_SIZE_CAPTION}
           color={C_MED_DARK_GRAY}
           marginBottom={SPACING_1}
@@ -228,7 +230,7 @@ function CurrentCommandLabel(props: CurrentCommandLabelProps): JSX.Element {
       fontWeight={FONT_WEIGHT_BOLD}
       marginBottom={SPACING_1}
       marginTop={SPACING_1}
-      textTransform={TEXT_TRANSFORM_UPPERCASE}
+      textTransform={TYPOGRAPHY.textTransformUppercase}
       fontSize={FONT_SIZE_CAPTION}
     >
       {getCommandTypeLabel()}

@@ -10,6 +10,7 @@ from opentrons_hardware.firmware_bindings import utils, ErrorCode
 from opentrons_hardware.firmware_bindings.constants import (
     ToolType,
     SensorType,
+    SensorId,
     PipetteName,
     SensorOutputBinding,
     SensorThresholdMode,
@@ -97,6 +98,18 @@ class SensorTypeField(utils.UInt8Field):
         except ValueError:
             sensor_val = str(self.value)
         return f"{self.__class__.__name__}(value={sensor_val})"
+
+
+class SensorIdField(utils.UInt8Field):
+    """sensor id."""
+
+    def __repr__(self) -> str:
+        """Print sensor id."""
+        try:
+            sensor_id = SensorId(self.value).name
+        except ValueError:
+            sensor_id = str(self.value)
+        return f"{self.__class__.__name__}(value={sensor_id})"
 
 
 class PipetteNameField(utils.UInt16Field):

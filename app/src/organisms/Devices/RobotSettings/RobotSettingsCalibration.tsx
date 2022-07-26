@@ -12,13 +12,13 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
-  TEXT_DECORATION_UNDERLINE,
   useHoverTooltip,
   TOOLTIP_LEFT,
   Mount,
   SpinnerModalPage,
   AlertModal,
   useInterval,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
@@ -273,8 +273,8 @@ export function RobotSettingsCalibration({
 
   const deckCalibrationButtonText =
     deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
-      ? t('deck_calibration_recalibrate_button')
-      : t('deck_calibration_calibrate_button')
+      ? t('recalibrate_deck')
+      : t('calibrate_deck')
 
   const disabledOrBusyReason = isPending
     ? t('robot_calibration:deck_calibration_spinner', {
@@ -305,6 +305,7 @@ export function RobotSettingsCalibration({
       session &&
       session.sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
     ) {
+      // TODO: add this analytics event when we deprecate this event firing in redux/analytics makeEvent
       return session
     }
     return null
@@ -447,6 +448,40 @@ export function RobotSettingsCalibration({
     }
   }
 
+  const currentDeckStatus = checkDeckCalibrationStatus()
+
+  const deckCalibrationBanner = !pipettePresent
+    ? currentDeckStatus === 'error' && (
+        <Banner marginTop={SPACING.spacing5} type="error">
+          <StyledText>{t('deck_calibration_missing_no_pipette')}</StyledText>
+        </Banner>
+      )
+    : currentDeckStatus != null && (
+        <Banner
+          marginTop={SPACING.spacing5}
+          type={currentDeckStatus === 'error' ? 'error' : 'warning'}
+        >
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+            <StyledText as="p">
+              {currentDeckStatus === 'error'
+                ? t('deck_calibration_missing')
+                : t('deck_calibration_recommended')}
+            </StyledText>
+            <Link
+              role="button"
+              color={COLORS.darkBlack}
+              css={TYPOGRAPHY.pRegular}
+              textDecoration={TYPOGRAPHY.textDecorationUnderline}
+              onClick={() => handleClickDeckCalibration()}
+            >
+              {currentDeckStatus === 'error'
+                ? t('calibrate_now')
+                : t('recalibrate_now')}
+            </Link>
+          </Flex>
+        </Banner>
+      )
+
   React.useEffect(() => {
     if (createStatus === RobotApi.SUCCESS) {
       createRequestId.current = null
@@ -465,6 +500,14 @@ export function RobotSettingsCalibration({
     CALS_FETCH_MS,
     true
   )
+
+  const handleHealthCheckClick = (): void => {
+    handleHealthCheck(null)
+    doTrackEvent({
+      name: 'calibrationHealthCheckButtonClicked',
+      properties: {},
+    })
+  }
 
   return (
     <>
@@ -544,6 +587,7 @@ export function RobotSettingsCalibration({
               />
             ) : null}
             <Link
+              role="button"
               css={TYPOGRAPHY.linkPSemiBold}
               onClick={() => setShowDeckCalibrationModal(true)}
             >
@@ -557,31 +601,7 @@ export function RobotSettingsCalibration({
       </Box>
       <Line />
       {/* DeckCalibration Section */}
-      {checkDeckCalibrationStatus() !== null && (
-        <Banner
-          marginTop={SPACING.spacing5}
-          type={checkDeckCalibrationStatus() === 'error' ? 'error' : 'warning'}
-        >
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-            <StyledText as="p">
-              {checkDeckCalibrationStatus() === 'error'
-                ? t('deck_calibration_missing')
-                : t('deck_calibration_recommended')}
-            </StyledText>
-            <Link
-              role="button"
-              color={COLORS.darkBlackEnabled}
-              css={TYPOGRAPHY.pRegular}
-              textDecoration={TEXT_DECORATION_UNDERLINE}
-              onClick={() => handleClickDeckCalibration()}
-            >
-              {checkDeckCalibrationStatus() === 'error'
-                ? t('calibrate_now')
-                : t('recalibrate_now')}
-            </Link>
-          </Flex>
-        </Banner>
-      )}
+      {deckCalibrationBanner}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
@@ -591,7 +611,9 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing3}>
               {t('deck_calibration_description')}
             </StyledText>
-            <StyledText as="label">{deckLastModified()}</StyledText>
+            <StyledText as="label" color={COLORS.darkGreyEnabled}>
+              {deckLastModified()}
+            </StyledText>
           </Box>
           <TertiaryButton
             onClick={() => handleClickDeckCalibration()}
@@ -601,7 +623,11 @@ export function RobotSettingsCalibration({
           </TertiaryButton>
         </Flex>
       </Box>
-      <Line />
+      <Line
+        marginBottom={
+          showPipetteOffsetCalibrationBanner ? SPACING.spacing4 : null
+        }
+      />
       {/* Pipette Offset Calibration Section */}
       {showPipetteOffsetCalibrationBanner && (
         <Banner
@@ -613,7 +639,7 @@ export function RobotSettingsCalibration({
         </Banner>
       )}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER}>
+        <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
           <Box marginRight={SPACING.spacing6}>
             <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
               {t('pipette_offset_calibrations_title')}
@@ -621,22 +647,22 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing4}>
               {t('pipette_offset_calibrations_description')}
             </StyledText>
-            {pipetteOffsetCalibrations != null ? (
-              <PipetteOffsetCalibrationItems
-                robotName={robotName}
-                formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
-                updateRobotStatus={updateRobotStatus}
-              />
-            ) : (
-              <StyledText as="label">{t('not_calibrated')}</StyledText>
-            )}
           </Box>
+          {pipetteOffsetCalibrations != null ? (
+            <PipetteOffsetCalibrationItems
+              robotName={robotName}
+              formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
+              updateRobotStatus={updateRobotStatus}
+            />
+          ) : (
+            <StyledText as="label">{t('not_calibrated')}</StyledText>
+          )}
         </Flex>
       </Box>
       <Line />
       {/* Tip Length Calibration Section */}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER}>
+        <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
           <Box marginRight={SPACING.spacing6}>
             <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
               {t('tip_length_calibrations_title')}
@@ -644,23 +670,23 @@ export function RobotSettingsCalibration({
             <StyledText as="p" marginBottom={SPACING.spacing4}>
               {t('tip_length_calibrations_description')}
             </StyledText>
-            {tipLengthCalibrations != null &&
-            tipLengthCalibrations.length !== 0 ? (
-              <TipLengthCalibrationItems
-                robotName={robotName}
-                formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
-                formattedTipLengthCalibrations={formatTipLengthCalibrations()}
-                updateRobotStatus={updateRobotStatus}
-              />
-            ) : (
-              <StyledText as="label">{t('not_calibrated')}</StyledText>
-            )}
           </Box>
+          {tipLengthCalibrations != null &&
+          tipLengthCalibrations.length !== 0 ? (
+            <TipLengthCalibrationItems
+              robotName={robotName}
+              formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
+              formattedTipLengthCalibrations={formatTipLengthCalibrations()}
+              updateRobotStatus={updateRobotStatus}
+            />
+          ) : (
+            <StyledText as="label">{t('not_calibrated')}</StyledText>
+          )}
         </Flex>
       </Box>
       <Line />
       {/* Calibration Health Check Section */}
-      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
+      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing2}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box marginRight={SPACING.spacing6}>
             <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
@@ -672,10 +698,10 @@ export function RobotSettingsCalibration({
           </Box>
           <TertiaryButton
             {...targetProps}
-            onClick={() => handleHealthCheck(null)}
+            onClick={handleHealthCheckClick}
             disabled={calCheckButtonDisabled}
           >
-            {t('health_check_button')}
+            {t('health_check')}
           </TertiaryButton>
           {calCheckButtonDisabled && (
             <Tooltip tooltipProps={tooltipProps}>

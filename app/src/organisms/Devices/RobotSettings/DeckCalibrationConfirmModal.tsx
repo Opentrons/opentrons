@@ -9,7 +9,6 @@ import {
   TYPOGRAPHY,
   SPACING,
   Link,
-  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { Modal } from '../../../atoms/Modal'
 import { StyledText } from '../../../atoms/text'
@@ -47,7 +46,7 @@ export function DeckCalibrationConfirmModal({
           <Link
             role="button"
             onClick={cancel}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
             marginRight={SPACING.spacing5}
             color={COLORS.blueEnabled}
             css={TYPOGRAPHY.fontSizeP}
@@ -57,7 +56,7 @@ export function DeckCalibrationConfirmModal({
           </Link>
           <PrimaryButton
             backgroundColor={COLORS.errorEnabled}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
             css={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             onClick={confirm}

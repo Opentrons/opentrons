@@ -169,14 +169,6 @@ smoothie: M203.1 Z18.0 -> Setting the max speed for the following axes: Z-Axis: 
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.8 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
-smoothie: G0 A29.8 -> Moving the robot as follows: The right pipette arm height to 29.8 ->
-smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M203.1 A125.0 B40.0 C40.0 X600.0 Y400.0 Z125.0 -> Setting the max speed for the following axes: X-Axis: 600.0 Y-Axis: 400.0 Z-Axis: 125.0 A-Axis: 125.0 B-Axis: 40.0 C-Axis: 40.0 ->
-smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M203.1 Z18.0 -> Setting the max speed for the following axes: Z-Axis: 18.0 ->
-smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M907 A0.8 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
-smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: G0 A19.37 -> Moving the robot as follows: The right pipette arm height to 19.37 ->
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M203.1 A125.0 B40.0 C40.0 X600.0 Y400.0 Z125.0 -> Setting the max speed for the following axes: X-Axis: 600.0 Y-Axis: 400.0 Z-Axis: 125.0 A-Axis: 125.0 B-Axis: 40.0 C-Axis: 40.0 ->

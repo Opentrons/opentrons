@@ -37,6 +37,10 @@ class APIVersionError(Exception):
     pass
 
 
+class UnsupportedAPIError(Exception):
+    """Error raised when a protocol attempts to use unsupported API."""
+
+
 def _assert_gzero(val: Any, message: str) -> float:
     try:
         new_val = float(val)

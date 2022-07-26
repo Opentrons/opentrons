@@ -16,7 +16,7 @@ from opentrons.protocols.context.protocol_api.protocol_context import (
 )
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError
-from opentrons.hardware_control.pipette import Pipette
+from opentrons.hardware_control.instruments.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.config.pipette_config import config_names
@@ -251,6 +251,7 @@ def test_pick_up_and_drop_tip(ctx, get_labware_def):
     target_location = tiprack["A1"].top()
 
     instr.pick_up_tip(target_location)
+    assert pipette.ready_to_aspirate
     assert not tiprack.wells()[0].has_tip
     overlap = instr.hw_pipette["tip_overlap"][tiprack.uri]
     new_offset = nozzle_offset - Point(0, 0, tip_length - overlap)
@@ -260,6 +261,60 @@ def test_pick_up_and_drop_tip(ctx, get_labware_def):
     instr.drop_tip(target_location)
     assert not pipette.has_tip
     assert pipette.critical_point() == nozzle_offset
+
+
+def test_pick_up_without_prep_after(ctx, get_labware_def):
+    ctx.home()
+    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
+    lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 2)
+    mount = Mount.LEFT
+
+    instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
+
+    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
+
+    # will not be prepared until after an aspirate
+    instr.pick_up_tip(tiprack["A2"].top(), prep_after=False)
+    assert not pipette.ready_to_aspirate
+    instr.aspirate(1, lw.wells()[0].bottom())
+    assert pipette.ready_to_aspirate
+    instr.drop_tip(tiprack["A2"].top())
+
+
+async def test_pick_up_tip_old_version(hardware, get_labware_def):
+    # API version 2.12, a pick-up tip would not prepare-for-aspirate
+    api_version = APIVersion(2, 12)
+    ctx = papi.ProtocolContext(
+        implementation=ProtocolContextImplementation(
+            api_version=api_version,
+            sync_hardware=hardware.sync,
+        ),
+        loop=asyncio.get_running_loop(),
+        api_version=api_version,
+    )
+    ctx.home()
+    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
+    lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 2)
+    mount = Mount.LEFT
+
+    instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
+
+    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
+
+    # will not be prepared until after an aspirate
+    assert not pipette.has_tip
+    instr.pick_up_tip(tiprack["A1"].top())
+    assert not pipette.ready_to_aspirate
+    instr.aspirate(1, lw.wells()[0].bottom())
+    assert pipette.ready_to_aspirate
+    instr.drop_tip()
+
+    # cannot run pick_up_tip() with a prep_after= arg
+    assert not pipette.has_tip
+    with pytest.raises(papi_support.util.APIVersionError):
+        instr.pick_up_tip(tiprack["A2"].top(), prep_after=False)
+    with pytest.raises(papi_support.util.APIVersionError):
+        instr.pick_up_tip(tiprack["A2"].top(), prep_after=True)
 
 
 async def test_return_tip_old_version(hardware, get_labware_def):

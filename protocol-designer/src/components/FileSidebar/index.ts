@@ -19,7 +19,6 @@ interface SP {
   pipettesOnDeck: InitialDeckSetup['pipettes']
   modulesOnDeck: InitialDeckSetup['modules']
   savedStepForms: SavedStepFormState
-  schemaVersion: 6
 }
 export const FileSidebar = connect(
   mapStateToProps,
@@ -41,7 +40,6 @@ function mapStateToProps(state: BaseState): SP {
     // Ignore clicking 'CREATE NEW' button in these cases
     _canCreateNew: !selectors.getNewProtocolModal(state),
     _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
-    schemaVersion: 6,
   }
 }
 
@@ -59,7 +57,6 @@ function mergeProps(
     pipettesOnDeck,
     modulesOnDeck,
     savedStepForms,
-    schemaVersion,
   } = stateProps
   const { dispatch } = dispatchProps
   return {
@@ -80,6 +77,5 @@ function mergeProps(
     pipettesOnDeck,
     modulesOnDeck,
     savedStepForms,
-    schemaVersion,
   }
 }

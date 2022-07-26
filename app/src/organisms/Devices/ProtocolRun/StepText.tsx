@@ -1,11 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import {
-  Flex,
-  ALIGN_CENTER,
-  SPACING,
-  TEXT_TRANSFORM_UPPERCASE,
-} from '@opentrons/components'
+import { Flex, ALIGN_CENTER, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { getLabwareLocation } from '../ProtocolRun/utils/getLabwareLocation'
@@ -56,7 +51,7 @@ export function StepText(props: Props): JSX.Element | null {
       messageNode = (
         <>
           <Flex
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             padding={SPACING.spacing2}
             id={`RunDetails_CommandList`}
           >
@@ -120,8 +115,9 @@ export function StepText(props: Props): JSX.Element | null {
       )
       break
     }
-    case 'pause': {
-      messageNode = displayCommand.params?.message ?? displayCommand.commandType
+    case 'pause':
+    case 'waitForResume': {
+      messageNode = displayCommand.params?.message ?? t('wait_for_resume')
       break
     }
     case 'loadLabware':
@@ -137,8 +133,15 @@ export function StepText(props: Props): JSX.Element | null {
       break
     }
     case 'custom': {
+      const { legacyCommandText } = displayCommand.params ?? {}
+      const sanitizedCommandText =
+        typeof legacyCommandText === 'object'
+          ? JSON.stringify(legacyCommandText)
+          : String(legacyCommandText)
       messageNode =
-        displayCommand.params?.legacyCommandText ?? displayCommand.commandType
+        legacyCommandText != null
+          ? sanitizedCommandText
+          : displayCommand.commandType
       break
     }
     default: {

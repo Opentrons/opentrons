@@ -8,13 +8,12 @@ import {
   Icon,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
-  SIZE_1,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   COLORS,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '../../atoms/buttons'
+import { SecondaryTertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
@@ -32,13 +31,13 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
   const currentRunStatus = useCurrentRunStatus()
   const { displayName } = useProtocolDetailsForRun(currentRunId)
 
-  const RunningProtocolBanner = (): JSX.Element | null =>
+  const runningProtocolBanner: JSX.Element | null =
     currentRunId != null ? (
       <Flex alignItems={ALIGN_CENTER}>
         <StyledText
           as="label"
           paddingRight={SPACING.spacing3}
-          css={{ 'overflow-wrap': 'anywhere' }}
+          overflowWrap="anywhere"
         >
           {`${displayName}; ${t(`run_details:status_${currentRunStatus}`)}`}
         </StyledText>
@@ -48,7 +47,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
           }`}
           id={`RobotStatusBanner_${name}_goToRun`}
         >
-          <TertiaryButton>{t('go_to_run')}</TertiaryButton>
+          <SecondaryTertiaryButton>{t('go_to_run')}</SecondaryTertiaryButton>
         </Link>
       </Flex>
     ) : null
@@ -72,20 +71,20 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
               as="h3"
               marginRight={SPACING.spacing3}
               id={`RobotStatusBanner_${name}_robotName`}
-              css={{ 'overflow-wrap': 'anywhere' }}
+              overflowWrap="anywhere"
             >
               {name}
             </StyledText>
             <Icon
               // local boolean corresponds to a wired usb connection
               name={local ? 'usb' : 'wifi'}
-              size={SIZE_1}
+              size="1.25rem"
               marginRight={SPACING.spacing3}
             />
           </Flex>
         </Flex>
       </Flex>
-      <RunningProtocolBanner />
+      {runningProtocolBanner}
     </Flex>
   )
 }

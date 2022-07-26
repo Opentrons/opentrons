@@ -7,10 +7,8 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  JUSTIFY_SPACE_BETWEEN,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  SIZE_5,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -20,11 +18,11 @@ import { Divider } from '../../atoms/structure'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Portal } from '../../App/portal'
-import { LabwareDetails } from '../Labware/LabwareDetails'
+import { LabwareDetails } from '../LabwareDetails'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { LabwareDefAndDate } from '../Labware/hooks'
+import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
 
 interface ProtocolLabwareDetailsProps {
   requiredLabwareDetails: LoadLabwareRunTimeCommand[] | null
@@ -54,21 +52,24 @@ export const ProtocolLabwareDetails = (
       : []
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      width="100%"
+      marginBottom={SPACING.spacing3}
+    >
       <Flex flexDirection={DIRECTION_ROW}>
         <StyledText
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkBlackEnabled}
+          marginBottom={SPACING.spacing3}
           data-testid={'ProtocolLabwareDetails_labware_name'}
+          width="66%"
         >
           {t('labware_name')}
         </StyledText>
         <StyledText
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkBlackEnabled}
-          marginLeft={SIZE_5}
           data-testid={'ProtocolLabwareDetails_quantity'}
         >
           {t('quantity')}
@@ -109,26 +110,30 @@ export const ProtocolLabwareDetailItem = (
         flexDirection={DIRECTION_ROW}
         marginY={SPACING.spacing3}
         alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_CENTER}
+          width="66%"
+          marginRight={SPACING.spacingM}
+        >
           {namespace === 'opentrons' ? (
             <Icon
               color={COLORS.blueEnabled}
               name="check-decagram"
-              height=".75rem"
+              height="0.75rem"
+              minHeight="0.75rem"
+              minWidth="0.75rem"
               marginRight={SPACING.spacing3}
             />
           ) : (
             <Flex marginLeft={SPACING.spacingM} />
           )}
-          <StyledText as="p" color={COLORS.darkBlackEnabled} width={SIZE_5}>
+          <StyledText as="p" paddingRight={SPACING.spacing6}>
             {displayName}
           </StyledText>
         </Flex>
-        <StyledText as="p" color={COLORS.darkBlackEnabled} marginLeft="5rem">
-          {quantity}
-        </StyledText>
+        <StyledText as="p">{quantity}</StyledText>
         <LabwareDetailOverflowMenu labware={labware} />
       </Flex>
     </>
@@ -145,7 +150,7 @@ export const LabwareDetailOverflowMenu = (
   const { labware } = props
   const { t } = useTranslation('protocol_details')
   const {
-    MenuOverlay,
+    menuOverlay,
     handleOverflowClick,
     showOverflowMenu,
     setShowOverflowMenu,
@@ -165,20 +170,20 @@ export const LabwareDetailOverflowMenu = (
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
       marginRight={SPACING.spacing3}
-      marginLeft={'auto'}
+      marginLeft={SPACING.spacingAuto}
     >
       <Flex>
         <OverflowBtn onClick={handleOverflowClick} />
       </Flex>
       {showOverflowMenu ? (
         <Flex
-          width={'11rem'}
+          width="11rem"
           zIndex={10}
           borderRadius={'4px 4px 0px 0px'}
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
-          top="3rem"
+          top="2.3rem"
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
@@ -188,7 +193,7 @@ export const LabwareDetailOverflowMenu = (
         </Flex>
       ) : null}
       <Portal level="top">
-        <MenuOverlay />
+        {menuOverlay}
         {showLabwareDetailSlideout ? (
           <LabwareDetails
             labware={labware}

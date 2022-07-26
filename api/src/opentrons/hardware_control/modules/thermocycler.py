@@ -232,6 +232,22 @@ class Thermocycler(mod_abc.AbstractModule):
         Returns: None
         """
         await self.wait_for_is_running()
+        await self._set_temperature_no_pause(
+            temperature=temperature,
+            hold_time_seconds=hold_time_seconds,
+            hold_time_minutes=hold_time_minutes,
+            ramp_rate=ramp_rate,
+            volume=volume,
+        )
+
+    async def _set_temperature_no_pause(
+        self,
+        temperature: float,
+        hold_time_seconds: Optional[float],
+        hold_time_minutes: Optional[float],
+        ramp_rate: Optional[float],
+        volume: Optional[float],
+    ) -> None:
         seconds = hold_time_seconds if hold_time_seconds is not None else 0
         minutes = hold_time_minutes if hold_time_minutes is not None else 0
         total_seconds = seconds + (minutes * 60)
@@ -245,7 +261,6 @@ class Thermocycler(mod_abc.AbstractModule):
         # Wait for target temperature to be set.
         retries = 0
         while self.target != temperature or not self.hold_time_probably_set(hold_time):
-            await self.wait_for_is_running()
             # Wait for the poller to update
             await self.wait_next_poll()
             retries += 1
@@ -282,7 +297,6 @@ class Thermocycler(mod_abc.AbstractModule):
         # Wait for target temperature to be set.
         retries = 0
         while self.target != temperature:
-            await self.wait_for_is_running()
             # Wait for the poller to update
             await self.wait_next_poll()
             retries += 1
@@ -328,7 +342,6 @@ class Thermocycler(mod_abc.AbstractModule):
         # Wait for target to be set
         retries = 0
         while self.lid_target != temperature:
-            await self.wait_for_is_running()
             # Wait for the poller to update
             await self.wait_next_poll()
             retries += 1
@@ -348,7 +361,6 @@ class Thermocycler(mod_abc.AbstractModule):
         # Wait for target to be set
         retries = 0
         while self.lid_target != temperature:
-            await self.wait_for_is_running()
             # Wait for the poller to update
             await self.wait_next_poll()
             retries += 1
@@ -570,13 +582,11 @@ class Thermocycler(mod_abc.AbstractModule):
 
         Returns: None
         """
-        await self.wait_for_is_running()
-
         temperature = step.get("temperature")
         hold_time_minutes = step.get("hold_time_minutes", None)
         hold_time_seconds = step.get("hold_time_seconds", None)
         ramp_rate = step.get("ramp_rate", None)
-        await self.set_temperature(
+        await self._set_temperature_no_pause(
             temperature=temperature,  # type: ignore
             hold_time_minutes=hold_time_minutes,
             hold_time_seconds=hold_time_seconds,

@@ -120,4 +120,27 @@ export const announcements: Announcement[] = [
       </>
     ),
   },
+  {
+    announcementKey: 'heaterShakerSupport',
+    image: (
+      <div className={styles.modules_diagrams_row}>
+        <img
+          className={styles.modules_diagram}
+          src={require('../../../images/modules/heatershaker.png')}
+        />
+      </div>
+    ),
+    heading: "We've updated the Protocol Designer",
+    message: (
+      <>
+        <p>
+          The Opentrons Protocol Designer now supports our Heater-Shaker Module!
+        </p>
+        <p>
+          All protocols now require Opentrons App version
+          <strong> 6.1+ </strong> to run.
+        </p>
+      </>
+    ),
+  },
 ]

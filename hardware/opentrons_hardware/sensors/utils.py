@@ -5,6 +5,7 @@ from typing_extensions import Final
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
+    SensorId,
     SensorType,
     SensorThresholdMode,
 )
@@ -77,6 +78,7 @@ class SensorInformation:
     """Basic sensor information."""
 
     sensor_type: SensorType
+    sensor_id: SensorId
     node_id: NodeId
 
 

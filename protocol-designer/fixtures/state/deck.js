@@ -55,6 +55,7 @@ const mockDeckSetup = {
   modules: {
     mag_mod: mockMagneticModule,
     temp_mod: mockTemperatureModule,
+    hs_mod: mockHeaterShakerModule,
   },
   pipettes: {},
 }

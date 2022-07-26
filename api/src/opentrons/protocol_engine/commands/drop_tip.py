@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from .pipetting_common import BasePipettingParams
+from .pipetting_common import PipetteIdMixin, WellLocationMixin
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 DropTipCommandType = Literal["dropTip"]
 
 
-class DropTipParams(BasePipettingParams):
+class DropTipParams(PipetteIdMixin, WellLocationMixin):
     """Payload required to drop a tip in a specific well."""
 
     pass

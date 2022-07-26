@@ -226,7 +226,7 @@ class ProtocolContext:
             msg: An optional message to attach to the pause command. This message
                 will be available to the app or client controlling the protocol.
         """
-        self._engine_client.pause(message=msg)
+        self._engine_client.wait_for_resume(message=msg)
 
     def set_rail_lights(self, on: bool) -> None:
         """Controls the robot rail lights.

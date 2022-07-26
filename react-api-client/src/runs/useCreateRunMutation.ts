@@ -28,9 +28,11 @@ export type UseCreateRunMutationOptions = UseMutationOptions<
 >
 
 export function useCreateRunMutation(
-  options: UseCreateRunMutationOptions = {}
+  options: UseCreateRunMutationOptions = {},
+  hostOverride?: HostConfig | null
 ): UseCreateRunMutationResult {
-  const host = useHost()
+  const contextHost = useHost()
+  const host = hostOverride ?? contextHost
   const mutation = useMutation<Run, AxiosError, CreateRunData>(
     [host, 'runs'],
     createRunData =>

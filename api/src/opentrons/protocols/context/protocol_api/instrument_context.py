@@ -103,6 +103,7 @@ class InstrumentContextImplementation(AbstractInstrument):
         tip_length: float,
         presses: Optional[int],
         increment: Optional[float],
+        prep_after: bool,
     ) -> None:
         """Pick up a tip for the pipette to run liquid-handling commands."""
         hw = self._protocol_interface.get_hardware()
@@ -110,7 +111,7 @@ class InstrumentContextImplementation(AbstractInstrument):
 
         hw.set_current_tiprack_diameter(self._mount, geometry.diameter)
 
-        hw.pick_up_tip(self._mount, tip_length, presses, increment)
+        hw.pick_up_tip(self._mount, tip_length, presses, increment, prep_after)
         hw.set_working_volume(self._mount, geometry.max_volume)
 
     def drop_tip(self, home_after: bool) -> None:

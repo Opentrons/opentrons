@@ -10,7 +10,7 @@ from tests.conftest import MockCanMessageNotifier
 
 from opentrons_hardware.sensors import fdc1004, hdc2080, mmr920C04, sensor_abc
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
-from opentrons_hardware.firmware_bindings.constants import SensorType, NodeId
+from opentrons_hardware.firmware_bindings.constants import SensorType, SensorId, NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
 )
@@ -44,6 +44,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorTypeField,
+    SensorIdField,
     SensorOutputBindingField,
 )
 from opentrons_hardware.sensors.utils import SensorDataType
@@ -83,6 +84,7 @@ def humidity_sensor() -> hdc2080.EnvironmentSensor:
             BaselineSensorRequest(
                 payload=BaselineSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.pressure),
+                    sensor_id=SensorIdField(SensorId.S0),
                     sample_rate=UInt16Field(10),
                 )
             ),
@@ -93,6 +95,7 @@ def humidity_sensor() -> hdc2080.EnvironmentSensor:
             BaselineSensorRequest(
                 payload=BaselineSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.capacitive),
+                    sensor_id=SensorIdField(SensorId.S0),
                     sample_rate=UInt16Field(10),
                 )
             ),
@@ -128,6 +131,7 @@ async def test_receive_data_polling(
             ReadFromSensorResponse(
                 payload=ReadFromSensorResponsePayload(
                     sensor_data=Int32Field(256),
+                    sensor_id=SensorIdField(SensorId.S0),
                     sensor=SensorTypeField(sensor._sensor_type),
                 )
             ),
@@ -155,6 +159,7 @@ async def test_receive_data_polling(
             WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.pressure),
+                    sensor_id=SensorIdField(SensorId.S0),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
                     reg_address=UInt8Field(0x0),
                 )
@@ -166,6 +171,7 @@ async def test_receive_data_polling(
             WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.capacitive),
+                    sensor_id=SensorIdField(SensorId.S0),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
                     reg_address=UInt8Field(0x0),
                 )
@@ -177,6 +183,7 @@ async def test_receive_data_polling(
             WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.temperature),
+                    sensor_id=SensorIdField(SensorId.S0),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
                     reg_address=UInt8Field(0x0),
                 )
@@ -188,6 +195,7 @@ async def test_receive_data_polling(
             WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.humidity),
+                    sensor_id=SensorIdField(SensorId.S0),
                     data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
                     reg_address=UInt8Field(0x0),
                 )
@@ -214,6 +222,7 @@ async def test_write(
             ReadFromSensorRequest(
                 payload=ReadFromSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.pressure),
+                    sensor_id=SensorIdField(SensorId.S0),
                     offset_reading=UInt8Field(False),
                 )
             ),
@@ -224,6 +233,7 @@ async def test_write(
             ReadFromSensorRequest(
                 payload=ReadFromSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.capacitive),
+                    sensor_id=SensorIdField(SensorId.S0),
                     offset_reading=UInt8Field(False),
                 )
             ),
@@ -234,6 +244,7 @@ async def test_write(
             ReadFromSensorRequest(
                 payload=ReadFromSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.temperature),
+                    sensor_id=SensorIdField(SensorId.S0),
                     offset_reading=UInt8Field(False),
                 )
             ),
@@ -244,6 +255,7 @@ async def test_write(
             ReadFromSensorRequest(
                 payload=ReadFromSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.humidity),
+                    sensor_id=SensorIdField(SensorId.S0),
                     offset_reading=UInt8Field(False),
                 )
             ),
@@ -281,6 +293,7 @@ async def test_receive_data_read(
             ReadFromSensorResponse(
                 payload=ReadFromSensorResponsePayload(
                     sensor_data=Int32Field(256),
+                    sensor_id=SensorIdField(SensorId.S0),
                     sensor=SensorTypeField(sensor._sensor_type),
                 )
             ),
@@ -318,6 +331,7 @@ async def test_threshold(
                     payload=SensorThresholdResponsePayload(
                         threshold=message.payload.threshold,
                         sensor=SensorTypeField(sensor._sensor_type),
+                        sensor_id=SensorIdField(SensorId.S0),
                         mode=message.payload.mode,
                     )
                 ),
@@ -368,6 +382,7 @@ async def test_bind_to_sync(
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
                     sensor=SensorTypeField(sensor._sensor_type),
+                    sensor_id=SensorIdField(SensorId.S0),
                     binding=SensorOutputBindingField(SensorOutputBinding.sync),
                 )
             ),
@@ -377,6 +392,7 @@ async def test_bind_to_sync(
         message=BindSensorOutputRequest(
             payload=BindSensorOutputRequestPayload(
                 sensor=SensorTypeField(sensor._sensor_type),
+                sensor_id=SensorIdField(SensorId.S0),
                 binding=SensorOutputBindingField(SensorOutputBinding.none),
             )
         ),
@@ -411,6 +427,7 @@ async def test_get_baseline(
                 ReadFromSensorResponse(
                     payload=ReadFromSensorResponsePayload(
                         sensor=SensorTypeField(sensor._sensor_type),
+                        sensor_id=SensorIdField(SensorId.S0),
                         sensor_data=Int32Field(50),
                     )
                 ),
@@ -458,6 +475,7 @@ async def test_debug_poll(
         message=BindSensorOutputRequest(
             payload=BindSensorOutputRequestPayload(
                 sensor=SensorTypeField(sensor._sensor_type),
+                sensor_id=SensorIdField(SensorId.S0),
                 binding=SensorOutputBindingField(SensorOutputBinding.none),
             )
         ),
@@ -489,6 +507,7 @@ async def test_peripheral_status(
                 PeripheralStatusResponse(
                     payload=PeripheralStatusResponsePayload(
                         sensor=SensorTypeField(sensor._sensor_type),
+                        sensor_id=SensorIdField(SensorId.S0),
                         status=UInt8Field(0x1),
                     )
                 ),

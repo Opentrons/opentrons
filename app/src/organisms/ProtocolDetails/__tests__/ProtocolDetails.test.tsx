@@ -1,9 +1,11 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
+import { resetAllWhenMocks, when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
+import { useFeatureFlag } from '../../../redux/config'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -20,12 +22,16 @@ import { storedProtocolData } from '../../../redux/protocol-storage/__fixtures__
 import { ProtocolDetails } from '..'
 import { DeckThumbnail } from '../../../molecules/DeckThumbnail'
 import { getValidCustomLabwareFiles } from '../../../redux/custom-labware/selectors'
-import { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import { ChooseRobotSlideout } from '../../ChooseRobotSlideout'
+
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 jest.mock('../../../redux/custom-labware/selectors')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/protocol-storage/selectors')
 jest.mock('../../../molecules/DeckThumbnail')
+jest.mock('../../../redux/config')
+jest.mock('../../ChooseRobotSlideout')
 
 const mockGetConnectableRobots = getConnectableRobots as jest.MockedFunction<
   typeof getConnectableRobots
@@ -45,6 +51,12 @@ const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as j
 >
 const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.MockedFunction<
   typeof getValidCustomLabwareFiles
+>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
+const mockChooseRobotSlideout = ChooseRobotSlideout as jest.MockedFunction<
+  typeof ChooseRobotSlideout
 >
 
 const render = (
@@ -76,15 +88,22 @@ describe('ProtocolDetails', () => {
     mockGetReachableRobots.mockReturnValue([mockReachableRobot])
     mockGetScanning.mockReturnValue(false)
     mockDeckThumbnail.mockReturnValue(<div>mock Deck Thumbnail</div>)
+    mockChooseRobotSlideout.mockImplementation(({ showSlideout }) =>
+      showSlideout ? <div>mock Choose Robot Slideout</div> : null
+    )
     mockGetIsProtocolAnalysisInProgress.mockReturnValue(false)
+    when(mockUseFeatureFlag)
+      .calledWith('enableLiquidSetup')
+      .mockReturnValue(true)
   })
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('renders protocol title as display name if present in metadata', () => {
     const protocolName = 'fakeProtocolDisplayName'
-    const { getByRole } = render({
+    const { getByText } = render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -99,10 +118,10 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    getByRole('heading', { name: 'fakeProtocolDisplayName' })
+    getByText('fakeProtocolDisplayName')
   })
   it('renders protocol title as file name if not in metadata', () => {
-    const { getByRole } = render({
+    const { getByText } = render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -117,9 +136,7 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    expect(
-      getByRole('heading', { name: 'fakeSrcFileName' })
-    ).toBeInTheDocument()
+    expect(getByText('fakeSrcFileName')).toBeInTheDocument()
   })
   it('renders deck setup section', () => {
     const { getByRole, getByText } = render({
@@ -140,7 +157,7 @@ describe('ProtocolDetails', () => {
     expect(getByText('mock Deck Thumbnail')).toBeInTheDocument()
   })
   it('opens choose robot slideout when run protocol button is clicked', () => {
-    const { getByRole, queryByRole } = render({
+    const { getByRole, getByText, queryByText } = render({
       mostRecentAnalysis: {
         ...mockMostRecentAnalysis,
         createdAt,
@@ -155,13 +172,9 @@ describe('ProtocolDetails', () => {
       },
     })
     const runProtocolButton = getByRole('button', { name: 'Run protocol' })
-    expect(
-      queryByRole('heading', { name: 'Choose Robot to Run\nfakeSrcFileName' })
-    ).toBeNull()
+    expect(queryByText('mock Choose Robot Slideout')).toBeNull()
     fireEvent.click(runProtocolButton)
-    expect(
-      getByRole('heading', { name: 'Choose Robot to Run\nfakeSrcFileName' })
-    ).toBeVisible()
+    expect(getByText('mock Choose Robot Slideout')).toBeVisible()
   })
   it('renders the protocol creation method', () => {
     const { getByRole, getByText } = render({

@@ -5,18 +5,24 @@ import logging
 from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, cast
 
 from opentrons import types
+from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control import modules
-from opentrons.hardware_control.modules import ModuleModel
+from opentrons.hardware_control.modules import ModuleModel, types as module_types
 from opentrons.hardware_control.types import Axis
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
 
+from .module_validation_and_errors import (
+    validate_heater_shaker_temperature,
+    validate_heater_shaker_speed,
+)
 from .labware import Labware, load, load_from_definition
 from .load_info import LabwareLoadInfo
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
     ThermocyclerGeometry,
+    HeaterShakerGeometry,
 )
 from opentrons.protocols.api_support.util import requires_version
 
@@ -36,6 +42,14 @@ MAGDECK_HALF_MM_LABWARE = [
 MODULE_LOG = logging.getLogger(__name__)
 
 GeometryType = TypeVar("GeometryType", bound=ModuleGeometry)
+
+
+class NoTargetTemperatureSetError(RuntimeError):
+    """An error raised when awaiting temperature when no target was set."""
+
+
+class CannotPerformModuleAction(RuntimeError):
+    """An error raised when attempting to execute an invalid module action."""
 
 
 class ModuleContext(CommandPublisher, Generic[GeometryType]):
@@ -770,3 +784,193 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     def current_step_index(self) -> Optional[int]:
         """Index of the current step within the current cycle"""
         return self._module.current_step_index
+
+
+class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
+    """An object representing a connected Heater-Shaker Module.
+
+    It should not be instantiated directly; instead, it should be
+    created through :py:meth:`.ProtocolContext.load_module`.
+
+    .. versionadded:: 2.13
+    """
+
+    def __init__(
+        self,
+        ctx: ProtocolContext,
+        # TODO(mc, 2022-02-05): this type annotation is misleading;
+        # a SynchronousAdapter wrapper is actually passed in
+        hw_module: modules.heater_shaker.HeaterShaker,
+        geometry: HeaterShakerGeometry,
+        requested_as: ModuleModel,
+        at_version: APIVersion,
+        loop: asyncio.AbstractEventLoop,
+    ) -> None:
+        self._module = hw_module
+        self._loop = loop
+        super().__init__(ctx, geometry, requested_as, at_version)
+
+    # TODO: add API version requirement
+    @property
+    def target_temperature(self) -> Optional[float]:
+        """Target temperature of the heater-shaker's plate."""
+        return self._module.target_temperature
+
+    # TODO: add API version requirement
+    @property
+    def current_temperature(self) -> float:
+        """Current temperature of the heater-shaker's plate."""
+        return self._module.temperature
+
+    # TODO: add API version requirement
+    @property
+    def current_speed(self) -> int:
+        """Current speed of the heater-shaker's plate."""
+        return self._module.speed
+
+    # TODO: add API version requirement
+    @property
+    def target_speed(self) -> Optional[int]:
+        """Target speed of the heater-shaker's plate."""
+        return self._module.target_speed
+
+    # TODO: add API version requirement
+    @property
+    def temperature_status(self) -> str:
+        """Heater-shaker's temperature status string.
+
+        Returns one of these possible status values:
+        - "holding at target"
+        - "cooling"
+        - "heating"
+        - "idle"
+        - "error"
+        """
+        return self._module.temperature_status.value
+
+    # TODO: add API version requirement
+    @property
+    def speed_status(self) -> str:
+        """Heater-shaker's speed status string.
+
+        Returns one of these possible status values:
+        - "holding at target"
+        - "speeding up"
+        - "slowing down"
+        - "idle"
+        - "error"
+        """
+        return self._module.speed_status.value
+
+    # TODO: add API version requirement
+    @property
+    def labware_latch_status(self) -> str:
+        """Heater-shaker's labware latch status string.
+
+        Returns one of these possible status values:
+        - "opening": latch is opening
+        - "idle_open": latch is open and idle
+        - "closing": latch is closing
+        - "idle_closed": latch is closed and idle
+        - "idle_unknown": status upon reset
+        - "unknown": latch status cannot be reached, likely due to an error
+        """
+        return self._module.labware_latch_status.value
+
+    # TODO: add API version requirement
+    def set_and_wait_for_temperature(self, celsius: float) -> None:
+        """Set the target temperature and wait for it to be reached.
+
+        Note: The Heater-Shaker truncates the ``temperature`` parameter to 2 decimal places.
+
+        :param celsius: The target temperature, in °C in range 37°C to 95°C.
+        """
+        self.set_target_temperature(celsius=celsius)
+        self.wait_for_temperature()
+
+    # TODO: add API version requirement
+    @publish(command=cmds.heater_shaker_set_target_temperature)
+    def set_target_temperature(self, celsius: float) -> None:
+        """Set target temperature and return immediately.
+
+        Sets the heater-shaker's target temperature and returns immediately without
+        waiting for the target to be reached. Does not delay the protocol until
+        target temperature has reached. Use `wait_for_target_temperature` to delay
+        protocol execution.
+
+        Note: The H/S truncates the temperature param to 2 decimal places
+        """
+        validated_temp = validate_heater_shaker_temperature(celsius=celsius)
+        self._module.start_set_temperature(celsius=validated_temp)
+
+    # TODO: add API version requirement
+    @publish(command=cmds.heater_shaker_wait_for_temperature)
+    def wait_for_temperature(self) -> None:
+        """Wait for the Heater-Shaker to reach its target temperature.
+
+        Delays protocol execution until the Heater-Shaker has reached its target
+        temperature. The module must have a target temperature set previously.
+        """
+        if self.target_temperature is None:
+            raise NoTargetTemperatureSetError(
+                f"Heater-shaker module {self} does not have a target temperature set."
+            )
+        self._module.await_temperature(awaiting_temperature=self.target_temperature)
+
+    # TODO: add API version requirement
+    @publish(command=cmds.heater_shaker_set_and_wait_for_shake_speed)
+    def set_and_wait_for_shake_speed(self, rpm: int) -> None:
+        """Set and wait for target speed.
+
+        Set the heater shaker's target speed and wait until the specified speed has
+        reached. Delays protocol execution until the target speed has been achieved.
+        """
+        if (
+            self._module.labware_latch_status
+            == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
+        ):
+            validated_speed = validate_heater_shaker_speed(rpm=rpm)
+            self._module.set_speed(rpm=validated_speed)
+        else:
+            # TODO: Figure out whether to issue close latch behind the scenes instead
+            raise CannotPerformModuleAction(
+                "Cannot start H/S shake unless labware latch is closed."
+            )
+
+    # TODO: add API version requirement
+    @publish(command=cmds.heater_shaker_open_labware_latch)
+    def open_labware_latch(self) -> None:
+        """Open the Heater-Shaker's labware latch.
+
+        Note that the labware latch needs to be closed before:
+
+        * Shaking
+        * Pipetting to or from the labware on the Heater-Shaker
+        * Pipetting to or from labware to the left or right of the Heater-Shaker
+
+        Raises an error when attempting to open the latch while the Heater-Shaker is shaking.
+        """
+        if self._module.speed_status != module_types.SpeedStatus.IDLE:
+            # TODO: What to do when speed status is ERROR?
+            raise CannotPerformModuleAction(
+                """Cannot open labware latch while module is shaking."""
+            )
+        self._module.open_labware_latch()
+
+    # TODO: add API version requirement
+    @publish(command=cmds.heater_shaker_close_labware_latch)
+    def close_labware_latch(self) -> None:
+        """Close heater-shaker's labware latch"""
+        self._module.close_labware_latch()
+
+    # TODO: add API version requirement
+    @publish(command=cmds.heater_shaker_deactivate_shaker)
+    def deactivate_shaker(self) -> None:
+        """Stop shaking."""
+        self._module.deactivate_shaker()
+
+    # TODO: add API version requirement
+    @publish(command=cmds.heater_shaker_deactivate_heater)
+    def deactivate_heater(self) -> None:
+        """Stop heating."""
+        self._module.deactivate_heater()

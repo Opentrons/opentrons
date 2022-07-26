@@ -11,13 +11,14 @@ from opentrons.protocol_engine import (
     create_protocol_engine,
     ProtocolEngine,
     DeckSlotLocation,
+    Config as EngineConfig,
 )
 
 
 @pytest.fixture
 async def protocol_engine(hardware: HardwareAPI) -> AsyncIterable[ProtocolEngine]:
     """Get a ProtocolEngine wired to a simulating HardwareAPI."""
-    engine = await create_protocol_engine(hardware_api=hardware)
+    engine = await create_protocol_engine(hardware_api=hardware, config=EngineConfig())
     engine.play()
     yield engine
     await engine.finish()

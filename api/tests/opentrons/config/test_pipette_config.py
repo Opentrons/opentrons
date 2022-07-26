@@ -1,18 +1,24 @@
 import json
+from pathlib import Path
+from typing import Any, AsyncGenerator, Dict, Generator, Sequence, cast
 from unittest.mock import patch
-from numpy import isclose
-from typing import Any, Dict, Iterator
 
 import pytest
+from numpy import isclose
 
-from opentrons.config import pipette_config, feature_flags as ff, CONFIG
+from opentrons.config import CONFIG, pipette_config, feature_flags as ff
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.dev_types import PipetteSpec
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette.dev_types import PipetteModel
 
 defs = json.loads(load_shared_data("pipette/definitions/pipetteModelSpecs.json"))
 
 
-def check_sequences_close(first, second):
+def check_sequences_close(
+    first: Sequence[Sequence[float]],
+    second: Sequence[Sequence[float]],
+) -> None:
     """
     Check two ul/mm sequences are the same (replaces pytest.approx nested )
     """
@@ -24,7 +30,7 @@ def check_sequences_close(first, second):
 @pytest.mark.parametrize(
     "pipette_model",
     [
-        c
+        PipetteModel(c)
         for c in pipette_config.config_models
         if not (
             c.startswith("p1000")
@@ -36,7 +42,10 @@ def check_sequences_close(first, second):
         )
     ],
 )
-def test_versioned_aspiration(pipette_model, monkeypatch):
+def test_versioned_aspiration(
+    pipette_model: PipetteModel,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
 
     monkeypatch.setattr(ff, "use_old_aspiration_functions", lambda: True)
     was = pipette_config.load(pipette_model)
@@ -65,7 +74,7 @@ def test_versioned_aspiration(pipette_model, monkeypatch):
 # TODO:
 # TODO: dispense agree
 @pytest.mark.parametrize("pipette_model", pipette_config.config_models)
-def test_ul_per_mm_continuous(pipette_model):
+def test_ul_per_mm_continuous(pipette_model: PipetteModel) -> None:
     """
     For each model of pipette, for each boundary between pieces of the
     piecewise function describing the ul/mm relationship, test that the
@@ -115,7 +124,7 @@ def test_ul_per_mm_continuous(pipette_model):
     assert isclose(round(aspirate_mm), round(dispense_mm))
 
 
-def test_override_load(ot_config_tempdir):
+def test_override_load(ot_config_tempdir: Path) -> None:
     cdir = CONFIG["pipette_config_overrides_dir"]
 
     existing_overrides: Dict[str, Dict[str, Any]] = {
@@ -143,7 +152,7 @@ def test_override_load(ot_config_tempdir):
     assert unspecced == new_pconf
 
 
-def test_override_save(ot_config_tempdir):
+def test_override_save(ot_config_tempdir: Path) -> None:
     cdir = CONFIG["pipette_config_overrides_dir"]
 
     overrides = {"pickUpCurrent": 1231.213, "dropTipSpeed": 121, "dropTipShake": False}
@@ -169,7 +178,7 @@ def test_override_save(ot_config_tempdir):
 
 
 @pytest.fixture
-def new_id_for_save() -> Iterator[str]:
+def new_id_for_save() -> Generator[str, None, None]:
     """Fixture to provide a pipette id then delete it's generated file."""
     r = "aoa2109j09cj2a"
     yield r
@@ -177,7 +186,10 @@ def new_id_for_save() -> Iterator[str]:
     (CONFIG["pipette_config_overrides_dir"] / f"{r}.json").unlink()
 
 
-def test_mutable_configs_only(monkeypatch, new_id_for_save):
+def test_mutable_configs_only(
+    monkeypatch: pytest.MonkeyPatch,
+    new_id_for_save: str,
+) -> None:
     # Test that only set mutable configs are populated in this dictionary
 
     monkeypatch.setattr(
@@ -196,14 +208,14 @@ def test_mutable_configs_only(monkeypatch, new_id_for_save):
     assert bool(difference) is False
 
 
-def test_mutable_configs_unknown_pipette_id():
+def test_mutable_configs_unknown_pipette_id() -> None:
     with patch("opentrons.config.pipette_config.known_pipettes", return_val={}):
         config = pipette_config.list_mutable_configs("a")
         assert config == {}
 
 
 @pytest.fixture
-def mock_pipette_config_model():
+def mock_pipette_config_model() -> Generator[Dict[str, Any], None, None]:
     model = {
         "fieldName": {
             "min": 1,
@@ -230,8 +242,10 @@ def mock_pipette_config_model():
     ],
 )
 def test_validate_overrides_fail(
-    override_field, expected_error, mock_pipette_config_model
-):
+    override_field: Dict[str, Any],
+    expected_error: str,
+    mock_pipette_config_model: Dict[str, Any],
+) -> None:
     with pytest.raises(ValueError, match=expected_error):
         pipette_config.validate_overrides(override_field, mock_pipette_config_model)
 
@@ -246,13 +260,22 @@ def test_validate_overrides_fail(
         [{"fieldName": 2}],
     ],
 )
-def test_validate_overrides_pass(override_field, mock_pipette_config_model):
+def test_validate_overrides_pass(
+    override_field: Dict[str, Any],
+    mock_pipette_config_model: Dict[str, Any],
+) -> None:
     # calling validate_overrides should not raise
     pipette_config.validate_overrides(override_field, mock_pipette_config_model)
 
 
+# TODO(mc, 2022-06-10): this fixture reaches into internals of the HardwareAPI
+# that are only present in the simulator, not the actual controller. It is not
+# an effective test of whether anything actually works
 @pytest.fixture
-async def attached_pipettes(hardware, request):
+async def attached_pipettes(
+    hardware: HardwareControlAPI,
+    request: pytest.FixtureRequest,
+) -> AsyncGenerator[Dict[str, PipetteSpec], None]:
     """Fixture the robot to have attached pipettes
 
     Mark the node with
@@ -274,14 +297,15 @@ async def attached_pipettes(hardware, request):
     right_name = right_mod.split("_v")[0]
     left_id = marker_with_default("attach_left_id", "abc123")
     right_id = marker_with_default("attach_right_id", "abcd123")
-    mount_type = type(list(hardware._backend._attached_instruments.keys())[0])
-    hardware._backend._attached_instruments = {
+    mount_type = type(list(hardware._backend._attached_instruments.keys())[0])  # type: ignore[attr-defined]
+
+    hardware._backend._attached_instruments = {  # type: ignore[attr-defined]
         mount_type.RIGHT: {"model": right_mod, "id": right_id, "name": right_name},
         mount_type.LEFT: {"model": left_mod, "id": left_id, "name": left_name},
     }
     await hardware.cache_instruments()
     yield {
-        k.name.lower(): v for k, v in hardware._backend._attached_instruments.items()
+        k.name.lower(): v for k, v in hardware._backend._attached_instruments.items()  # type: ignore[attr-defined]
     }
 
     # Delete created config files
@@ -289,12 +313,12 @@ async def attached_pipettes(hardware, request):
     (CONFIG["pipette_config_overrides_dir"] / "abcd123.json").unlink()
 
 
-async def test_override(attached_pipettes):
+async def test_override(attached_pipettes: Dict[str, PipetteSpec]) -> None:
     # This test will check that setting modified pipette configs
     # works as expected
     changes = {"pickUpCurrent": 1}
 
-    test_id = attached_pipettes["left"]["id"]
+    test_id = cast(str, attached_pipettes["left"]["id"])
     # Check data has not been changed yet
     c, _ = pipette_config.load_config_dict(test_id)
     assert (
@@ -322,10 +346,13 @@ async def test_override(attached_pipettes):
     )
 
 
-async def test_incorrect_modify_pipette_settings(attached_pipettes):
+async def test_incorrect_modify_pipette_settings(
+    attached_pipettes: Dict[str, PipetteSpec]
+) -> None:
     out_of_range = {"pickUpCurrent": 1000}
     with pytest.raises(ValueError, match="pickUpCurrent out of range with 1000"):
         # check over max fails
         pipette_config.override(
-            pipette_id=attached_pipettes["left"]["id"], fields=out_of_range
+            pipette_id=attached_pipettes["left"]["id"],  # type: ignore[arg-type]
+            fields=out_of_range,
         )

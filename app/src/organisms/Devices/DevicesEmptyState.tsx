@@ -12,11 +12,10 @@ import {
   FONT_WEIGHT_REGULAR,
   SPACING_5,
   JUSTIFY_SPACE_BETWEEN,
-  COLORS,
   TYPOGRAPHY,
   SPACING,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
-import { css } from 'styled-components'
 
 import { startDiscovery } from '../../redux/discovery'
 import { PrimaryButton } from '../../atoms/buttons'
@@ -25,13 +24,6 @@ import { StyledText } from '../../atoms/text'
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'
 
-const LINK_STYLES = css`
-  opacity: 70%;
-
-  &:hover {
-    opacity: 100%;
-  }
-`
 export function DevicesEmptyState(): JSX.Element {
   const { t } = useTranslation('devices_landing')
   const dispatch = useDispatch()
@@ -68,17 +60,20 @@ export function DevicesEmptyState(): JSX.Element {
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
-        marginBottom={SPACING.spacing6}
+        position={POSITION_ABSOLUTE}
+        bottom={SPACING.spacingXXL}
+        left="0"
+        right="0"
+        marginLeft={SPACING.spacingAuto}
+        marginRight={SPACING.spacingAuto}
+        textAlign={TYPOGRAPHY.textAlignCenter}
       >
         <Link
-          css={LINK_STYLES}
+          css={TYPOGRAPHY.darkLinkLabelSemiBold}
           external
           href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
           display="flex"
           alignItems={ALIGN_CENTER}
-          color={COLORS.darkBlackEnabled}
-          fontSize={TYPOGRAPHY.fontSizeLabel}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           id="DevicesEmptyState_troubleshootingConnectionProblems"
         >
           {t('troubleshooting_connection_problems')}

@@ -1,0 +1,31 @@
+test_name: Create and delete a run
+
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: Create Empty Run
+    request:
+      url: '{host:s}:{port:d}/runs'
+      json:
+        data: {}
+      method: POST
+    response:
+      status_code: 201
+      save:
+        json:
+          run_id: data.id
+  - name: Delete run
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}'
+      method: DELETE
+    response:
+      status_code: 200
+      json: {}
+  - name: Try to get deleted run
+    request:
+      url: '{host:s}:{port:d}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 404

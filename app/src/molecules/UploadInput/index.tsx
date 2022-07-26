@@ -11,6 +11,7 @@ import {
   DIRECTION_COLUMN,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
@@ -103,7 +104,13 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       alignItems={ALIGN_CENTER}
       gridGap={SPACING.spacing5}
     >
-      <StyledText as="p">{props.uploadText}</StyledText>
+      <StyledText
+        as="p"
+        textAlign={TYPOGRAPHY.textAlignCenter}
+        marginTop={SPACING.spacing4}
+      >
+        {props.uploadText}
+      </StyledText>
       <PrimaryButton
         onClick={handleClick}
         id={'UploadInput_protocolUploadButton'}

@@ -49,7 +49,6 @@ def subject(
     # a contaminated test subject that reduces the value of these tests
     # https://github.com/testdouble/contributing-tests/wiki/Partial-Mock
     modules_control.build_module = build_module  # type: ignore[assignment]
-
     return modules_control
 
 

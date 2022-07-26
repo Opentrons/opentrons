@@ -1,20 +1,21 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+
 import {
   Flex,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   SPACING,
-  Text,
   TYPOGRAPHY,
   COLORS,
   Icon,
-  SIZE_2,
   Link,
 } from '@opentrons/components'
+
 import { ManualIpHostnameForm } from './ManualIpHostnameForm'
-import { IpHostnameList } from './IpHostnameList'
+import { ManualIpHostnameList } from './ManualIpHostnameList'
 import { Slideout } from '../../atoms/Slideout'
 import { PrimaryButton } from '../../atoms/buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
@@ -27,19 +28,22 @@ import type { Dispatch, State } from '../../redux/types'
 const SUPPORT_PAGE_LINK =
   'https://support.opentrons.com/s/article/Manually-adding-a-robot-s-IP-address'
 
-export interface ConnectRobotSlideoutProps {
+interface ConnectRobotSlideoutProps {
   isExpanded: boolean
   onCloseClick: () => void
 }
 
-export function ConnectRobotSlideout(
-  props: ConnectRobotSlideoutProps
-): JSX.Element | null {
+export function ConnectRobotSlideout({
+  isExpanded,
+  onCloseClick,
+}: ConnectRobotSlideoutProps): JSX.Element | null {
   const [mostRecentAddition, setMostRecentAddition] = React.useState<
     string | null
   >(null)
-  const { onCloseClick, isExpanded } = props
-  const { t } = useTranslation('app_settings')
+  const [mostRecentDiscovered, setMostRecentDiscovered] = React.useState<
+    boolean | null
+  >(null)
+  const { t } = useTranslation(['app_settings', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const refreshDiscovery = (): unknown => dispatch(startDiscovery())
   const isScanning = useSelector<State>(getScanning)
@@ -52,6 +56,7 @@ export function ConnectRobotSlideout(
         color={COLORS.blueEnabled}
         onClick={refreshDiscovery}
         id="AppSettings_Connection_Button"
+        textTransform={TYPOGRAPHY.textTransformCapitalize}
       >
         {buttonLabel}
       </Link>
@@ -59,10 +64,8 @@ export function ConnectRobotSlideout(
   }
 
   React.useEffect(() => {
-    if (!isScanning) {
-      setMostRecentAddition(null)
-    }
-  }, [isScanning])
+    dispatch(startDiscovery())
+  }, [dispatch])
 
   return (
     <Slideout
@@ -76,12 +79,10 @@ export function ConnectRobotSlideout(
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <Text fontSize={TYPOGRAPHY.fontSizeP} marginBottom={SPACING.spacing3}>
+        <StyledText as="p" marginBottom={SPACING.spacing3}>
           {t('ip_description_first')}
-        </Text>
-        <Text fontSize={TYPOGRAPHY.fontSizeP}>
-          {t('ip_description_second')}
-        </Text>
+        </StyledText>
+        <StyledText as="p">{t('ip_description_second')}</StyledText>
         <ExternalLink
           href={SUPPORT_PAGE_LINK}
           css={TYPOGRAPHY.pSemiBold}
@@ -91,7 +92,9 @@ export function ConnectRobotSlideout(
           {t('connect_ip_link')}
         </ExternalLink>
         <Divider marginY={SPACING.spacing5} />
-        <Text css={TYPOGRAPHY.pSemiBold}>{t('add_ip_hostname')}</Text>
+        <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+          {t('add_ip_hostname')}
+        </StyledText>
         <ManualIpHostnameForm setMostRecentAddition={setMostRecentAddition} />
 
         <Flex
@@ -100,27 +103,40 @@ export function ConnectRobotSlideout(
           justifyContent={ALIGN_FLEX_END}
         >
           {isScanning ? (
-            <Icon name="ot-spinner" size={SIZE_2} spin />
+            <Flex flexDirection={DIRECTION_ROW}>
+              <StyledText
+                as="p"
+                color={COLORS.darkGreyEnabled}
+                marginRight={SPACING.spacing3}
+              >
+                {t('searching')}
+              </StyledText>{' '}
+              <Icon name="ot-spinner" size="1.25rem" spin />
+            </Flex>
           ) : (
             [
-              mostRecentAddition !== null ? (
-                displayLinkButton(t('ip_refresh_button'))
-              ) : (
+              mostRecentAddition != null && !(mostRecentDiscovered ?? false) ? (
                 <>
                   <StyledText
                     as="p"
                     color={COLORS.darkGreyEnabled}
                     margin={`0 ${SPACING.spacing2}`}
                   >
-                    {t('ip_connect_timeout')}
+                    {t('discovery_timeout')}
                   </StyledText>
-                  {displayLinkButton(t('ip_reconnect_button'))}
+                  {displayLinkButton(t('try_again'))}
                 </>
+              ) : (
+                displayLinkButton(t('shared:refresh'))
               ),
             ]
           )}
         </Flex>
-        <IpHostnameList mostRecentAddition={mostRecentAddition} />
+        <ManualIpHostnameList
+          mostRecentAddition={mostRecentAddition}
+          setMostRecentDiscovered={setMostRecentDiscovered}
+          setMostRecentAddition={setMostRecentAddition}
+        />
       </Flex>
     </Slideout>
   )

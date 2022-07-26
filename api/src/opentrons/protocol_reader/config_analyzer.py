@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Union
 
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.parse import extract_metadata as extract_python_metadata
 from opentrons.protocols.models import JsonProtocol as ProtocolSchemaV5
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6
@@ -82,6 +83,13 @@ def _analyze_python(main_file: RoleAnalysisFile) -> ConfigAnalysis:  # noqa: C90
             f'metadata.apiLevel "{api_level}" is not of the format X.Y'
             f" in {main_file.name}."
         ) from e
+
+    if api_version > MAX_SUPPORTED_VERSION:
+        raise ConfigAnalysisError(
+            f"API version {api_version} is not supported by this "
+            f"robot software. Please either reduce your requested API "
+            f"version or update your robot."
+        )
 
     return ConfigAnalysis(
         metadata=metadata,

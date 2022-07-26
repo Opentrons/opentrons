@@ -174,8 +174,7 @@ class RunDataManager:
         """
         if run_id == self._engine_store.current_run_id:
             await self._engine_store.clear()
-        else:
-            self._run_store.remove(run_id=run_id)
+        self._run_store.remove(run_id=run_id)
 
     async def update(self, run_id: str, current: Optional[bool]) -> Run:
         """Get and potentially archive a run.

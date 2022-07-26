@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
@@ -14,10 +13,10 @@ import {
   mockRightProtoPipette,
 } from '../../../redux/pipettes/__fixtures__'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
+import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import {
   useAttachedModules,
   useAttachedPipettes,
-  useIsRobotBusy,
   useProtocolDetailsForRun,
 } from '../hooks'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
@@ -28,6 +27,7 @@ import { RobotCard } from '../RobotCard'
 
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
+jest.mock('../../../redux/buildroot/selectors')
 jest.mock('../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../../ProtocolUpload/hooks')
@@ -58,8 +58,8 @@ const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction
 const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
   typeof UpdateRobotBanner
 >
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
+const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
+  typeof getBuildrootUpdateDisplayInfo
 >
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
@@ -82,7 +82,6 @@ const render = () => {
 
 describe('RobotCard', () => {
   beforeEach(() => {
-    mockUseIsRobotBusy.mockReturnValue(false)
     mockUseAttachedModules.mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
@@ -96,6 +95,11 @@ describe('RobotCard', () => {
       </div>
     ))
     mockUpdateRobotBanner.mockReturnValue(<div>Mock UpdateRobotBanner</div>)
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'reinstall',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
     when(mockUseCurrentRunId).calledWith().mockReturnValue(null)
     when(mockUseCurrentRunStatus).calledWith().mockReturnValue(null)
     when(mockUseProtocolDetailsForRun)
@@ -121,11 +125,6 @@ describe('RobotCard', () => {
   it('renders a UpdateRobotBanner component', () => {
     const [{ getByText }] = render()
     getByText('Mock UpdateRobotBanner')
-  })
-
-  it('does not render a UpdateRobotBanner component when robot is busy', () => {
-    mockUseIsRobotBusy.mockReturnValue(true)
-    expect(screen.queryByText('Mock UpdateRobotBanner')).toBeNull()
   })
 
   it('renders the type of pipettes attached to left and right mounts', () => {

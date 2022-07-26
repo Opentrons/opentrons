@@ -1270,11 +1270,21 @@ class SmoothieDriver:
             log.info(f"No axes move in {target} from position {self.position}")
             return
 
-        backlash_target = {
-            axis: value + PLUNGER_BACKLASH_MM
+        # Multi-axis movements should include the added backlash.
+        # After all axes arrive at target, finally then apply
+        # a backlash correction to just the plunger axes
+        plunger_backlash_axes = [
+            axis
             for axis, value in target.items()
             if axis in "BC" and self.position[axis] < value
-        }
+        ]
+        backlash_target = {ax: moving_target[ax] for ax in plunger_backlash_axes}
+        moving_target.update(
+            {
+                ax: moving_target[ax] + PLUNGER_BACKLASH_MM
+                for ax in plunger_backlash_axes
+            }
+        )
 
         # whatever else we do to our motion target, if nothing moves in the
         # input we will not command it to move
@@ -1295,7 +1305,7 @@ class SmoothieDriver:
         split_target = {
             ax: build_split(
                 self.position[ax],
-                backlash_target.get(ax, moving_target[ax]),
+                moving_target[ax],
                 split.split_distance,
             )
             for ax, split in self._move_split_config.items()
@@ -1365,12 +1375,14 @@ class SmoothieDriver:
         # introduce the standard currents
         command.add_builder(builder=self._generate_current_command())
 
+        # move to target position, including any added backlash to B/C axes
+        command.add_gcode(GCODE.MOVE).add_builder(builder=primary_command_string)
         if backlash_command_string:
+            # correct the B/C positions
             command.add_gcode(gcode=GCODE.MOVE).add_builder(
                 builder=backlash_command_string
             )
 
-        command.add_gcode(GCODE.MOVE).add_builder(builder=primary_command_string)
         if checked_speed != self._combined_speed:
             command.add_builder(builder=self._build_speed_command(self._combined_speed))
 

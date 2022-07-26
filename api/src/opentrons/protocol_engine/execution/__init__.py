@@ -14,7 +14,7 @@ from .queue_worker import QueueWorker
 from .rail_lights import RailLightsHandler
 from .run_control import RunControlHandler
 from .hardware_stopper import HardwareStopper
-from .hardware_event_forwarder import HardwareEventForwarder
+from .door_watcher import DoorWatcher
 
 # .thermocycler_movement_flagger omitted from package's public interface.
 
@@ -33,6 +33,6 @@ __all__ = [
     "QueueWorker",
     "RunControlHandler",
     "HardwareStopper",
-    "HardwareEventForwarder",
+    "DoorWatcher",
     "RailLightsHandler",
 ]

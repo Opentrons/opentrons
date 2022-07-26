@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -9,8 +9,9 @@ import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { useDispatchApiRequest } from '../../../redux/robot-api'
+import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 import { fetchLights } from '../../../redux/robot-controls'
-import { useIsRobotBusy, useLights, useRobot } from '../hooks'
+import { useLights, useRobot, useRunStatuses } from '../hooks'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotStatusBanner } from '../RobotStatusBanner'
 import { RobotOverview } from '../RobotOverview'
@@ -20,6 +21,7 @@ import type { DispatchApiRequestType } from '../../../redux/robot-api'
 
 jest.mock('../../../redux/robot-api')
 jest.mock('../../../redux/robot-controls')
+jest.mock('../../../redux/buildroot/selectors')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 jest.mock('../RobotStatusBanner')
@@ -29,9 +31,6 @@ jest.mock('../RobotOverviewOverflowMenu')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
 
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
->
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
@@ -51,6 +50,12 @@ const mockRobotOverviewOverflowMenu = RobotOverviewOverflowMenu as jest.MockedFu
 >
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
+>
+const mockUseRunStatues = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
+>
+const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
+  typeof getBuildrootUpdateDisplayInfo
 >
 const mockFetchLights = fetchLights as jest.MockedFunction<typeof fetchLights>
 
@@ -72,7 +77,16 @@ describe('RobotOverview', () => {
 
   beforeEach(() => {
     dispatchApiRequest = jest.fn()
-    mockUseIsRobotBusy.mockReturnValue(false)
+    mockUseRunStatues.mockReturnValue({
+      isRunStill: false,
+      isRunTerminal: true,
+      isRunIdle: false,
+    })
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'reinstall',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
     mockUseLights.mockReturnValue({
       lightsOn: false,
@@ -111,11 +125,6 @@ describe('RobotOverview', () => {
     getByText('Mock UpdateRobotBanner')
   })
 
-  it('does not render a UpdateRobotBanner component when robot is busy', () => {
-    mockUseIsRobotBusy.mockReturnValue(true)
-    expect(screen.queryByText('Mock UpdateRobotBanner')).toBeNull()
-  })
-
   it('fetches lights status', () => {
     render()
     expect(dispatchApiRequest).toBeCalledWith(mockFetchLights('otie'))
@@ -150,5 +159,42 @@ describe('RobotOverview', () => {
     const [{ getByText }] = render()
 
     getByText('mock RobotOverviewOverflowMenu')
+  })
+
+  it('renders run a protocol button as disabled when run is not terminal and run id is not null', () => {
+    mockUseCurrentRunId.mockReturnValue('id')
+    mockUseRunStatues.mockReturnValue({
+      isRunStill: false,
+      isRunTerminal: false,
+      isRunIdle: false,
+    })
+    const [{ getByRole }] = render()
+    const runButton = getByRole('button', { name: 'Run a protocol' })
+    expect(runButton).toBeDisabled()
+  })
+
+  it('disables the run a protocol button if robot software update is available', () => {
+    mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
+      autoUpdateAction: 'upgrade',
+      autoUpdateDisabledReason: null,
+      updateFromFileDisabledReason: null,
+    })
+
+    const [{ getByRole }] = render()
+    const button = getByRole('button', { name: 'Run a protocol' })
+    expect(button).toBeDisabled()
+  })
+
+  it('renders run a protocol button as not disabled when run id is null but run status is not terminal', () => {
+    mockUseCurrentRunId.mockReturnValue(null)
+    mockUseRunStatues.mockReturnValue({
+      isRunStill: false,
+      isRunTerminal: true,
+      isRunIdle: false,
+    })
+    const [{ getByText, getByRole }] = render()
+    const runButton = getByRole('button', { name: 'Run a protocol' })
+    fireEvent.click(runButton)
+    getByText('Mock Choose Protocol Slideout showing')
   })
 })

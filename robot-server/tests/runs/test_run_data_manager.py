@@ -81,12 +81,12 @@ def run_resource() -> RunResource:
 @pytest.fixture
 def run_command() -> commands.Command:
     """Get a ProtocolEngine Command value object."""
-    return commands.Pause(
+    return commands.WaitForResume(
         id="command-id",
         key="command-key",
         createdAt=datetime(year=2021, month=1, day=1),
         status=commands.CommandStatus.SUCCEEDED,
-        params=commands.PauseParams(message="Hello"),
+        params=commands.WaitForResumeParams(message="Hello"),
     )
 
 
@@ -438,8 +438,10 @@ async def test_delete_current_run(
 
     await subject.delete(run_id=run_id)
 
-    decoy.verify(await mock_engine_store.clear(), times=1)
-    decoy.verify(mock_run_store.remove(run_id=run_id), times=0)
+    decoy.verify(
+        await mock_engine_store.clear(),
+        mock_run_store.remove(run_id=run_id),
+    )
 
 
 async def test_delete_historical_run(
@@ -620,12 +622,12 @@ def test_get_commands_slice_from_db(
 ) -> None:
     """Should get a sliced command list from run store."""
     expected_commands_result = [
-        commands.Pause(
+        commands.WaitForResume(
             id="command-id-2",
             key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
             status=commands.CommandStatus.SUCCEEDED,
-            params=commands.PauseParams(message="Hello"),
+            params=commands.WaitForResumeParams(message="Hello"),
         ),
         run_command,
     ]
@@ -650,12 +652,12 @@ def test_get_commands_slice_current_run(
 ) -> None:
     """Should get a sliced command list from engine store."""
     expected_commands_result = [
-        commands.Pause(
+        commands.WaitForResume(
             id="command-id-2",
             key="command-key",
             createdAt=datetime(year=2021, month=1, day=1),
             status=commands.CommandStatus.SUCCEEDED,
-            params=commands.PauseParams(message="Hello"),
+            params=commands.WaitForResumeParams(message="Hello"),
         ),
         run_command,
     ]

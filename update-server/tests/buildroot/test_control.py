@@ -1,19 +1,21 @@
 """test the buildroot endpoints in otupdate.common.control """
 from typing import Dict
 
-from aiohttp.test_utils import TestClient
+# Avoid pytest trying to collect TestClient because it begins with "Test".
+from aiohttp.test_utils import TestClient as HTTPTestClient
+
 from decoy import Decoy
 
 from otupdate.common.name_management import NameSynchronizer
 
 
 async def test_health(
-    test_cli: TestClient,
+    test_cli: HTTPTestClient,
     version_dict: Dict[str, str],
     mock_name_synchronizer: NameSynchronizer,
     decoy: Decoy,
 ):
-    decoy.when(mock_name_synchronizer.get_name()).then_return("test name")
+    decoy.when(await mock_name_synchronizer.get_name()).then_return("test name")
     resp = await test_cli.get("/server/update/health")
     assert resp.status == 200
     body = await resp.json()

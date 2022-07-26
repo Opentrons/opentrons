@@ -2,12 +2,14 @@ import * as React from 'react'
 import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
+import { css } from 'styled-components'
+
 import {
   getModuleType,
   getPipetteNameSpecs,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-
 import {
   Box,
   Flex,
@@ -22,9 +24,14 @@ import {
   SIZE_4,
   ModuleIcon,
   POSITION_ABSOLUTE,
-  TEXT_ALIGN_RIGHT,
+  BORDERS,
+  TYPOGRAPHY,
+  WRAP,
+  ALIGN_START,
+  JUSTIFY_FLEX_END,
+  FLEX_NONE,
 } from '@opentrons/components'
-import { useHistory } from 'react-router-dom'
+
 import {
   parseInitialPipetteNamesByMount,
   parseAllRequiredModuleModels,
@@ -43,6 +50,26 @@ import type { State } from '../../redux/types'
 interface ProtocolCardProps extends StoredProtocolData {
   handleRunProtocol: () => void
 }
+
+// TODO kj 07/06/2022: Currently, using hardcoded number to align elements
+// This should be removed in the future
+const PROTOCOL_CARD_BREAKPOINT = '800px'
+
+const PROTOCOL_CARD_ALIGN_ITEMS_STYLING = css`
+  align-items: ${ALIGN_START};
+
+  @media (min-width: ${PROTOCOL_CARD_BREAKPOINT}) {
+    align-items: ${ALIGN_CENTER};
+  }
+`
+
+const PROTOCOL_CARD_UPDATED_JUSTIFY_CONTENT_STYLING = css`
+  justify-content: ${JUSTIFY_FLEX_END};
+
+  @media (min-width: ${PROTOCOL_CARD_BREAKPOINT}) {
+    justify-content: ${FLEX_NONE};
+  }
+`
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const history = useHistory()
@@ -68,13 +95,14 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       border={`1px solid ${COLORS.medGreyEnabled}`}
       borderRadius="4px"
       flexDirection={DIRECTION_ROW}
-      marginBottom={SPACING.spacing3}
+      marginBottom={SPACING.spacing2}
       padding={SPACING.spacing4}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       width="100%"
       position="relative"
       cursor="pointer"
       onClick={() => history.push(`/protocols/${protocolKey}`)}
+      css={BORDERS.cardOutlineBorder}
     >
       <AnalysisInfo
         protocolKey={protocolKey}
@@ -129,8 +157,9 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
       <Flex
         marginRight={SPACING.spacing4}
         size="6rem"
+        height="auto"
         justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
+        css={PROTOCOL_CARD_ALIGN_ITEMS_STYLING}
         data-testid={`ProtocolCard_deckLayout_${protocolDisplayName}`}
       >
         {
@@ -144,11 +173,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           }[analysisStatus]
         }
       </Flex>
-      <Flex
-        flex="1"
-        flexDirection={DIRECTION_COLUMN}
-        marginRight={SPACING.spacing4}
-      >
+      <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
         {analysisStatus === 'error' ? (
           <ProtocolAnalysisFailure
             protocolKey={protocolKey}
@@ -164,18 +189,25 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         </StyledText>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           {analysisStatus === 'loading' ? (
-            <StyledText as="p" flex="1" css={COLORS.darkGreyEnabled}>
+            <StyledText as="p" flex="1" color={COLORS.darkGreyEnabled}>
               {t('loading_data')}
             </StyledText>
           ) : (
-            <>
+            <Flex flexWrap={WRAP}>
+              {/* TODO: kj 07/01/2022 for 6.1 we need to user flex-wrap */}
               <Flex
                 flex="1"
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_leftMount_${protocolDisplayName}`}
+                minWidth="10.625rem"
               >
-                <StyledText as="h6" marginBottom={SPACING.spacing3}>
+                <StyledText
+                  as="h6"
+                  marginTop={SPACING.spacing3}
+                  marginBottom={SPACING.spacing2}
+                  color={COLORS.darkGreyEnabled}
+                >
                   {t('left_mount')}
                 </StyledText>
                 <StyledText as="p">
@@ -198,8 +230,14 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 flexDirection={DIRECTION_COLUMN}
                 marginRight={SPACING.spacing4}
                 data-testid={`ProtocolCard_rightMount_${protocolDisplayName}`}
+                minWidth="10.625rem"
               >
-                <StyledText as="h6" marginBottom={SPACING.spacing3}>
+                <StyledText
+                  as="h6"
+                  marginTop={SPACING.spacing3}
+                  marginBottom={SPACING.spacing2}
+                  color={COLORS.darkGreyEnabled}
+                >
                   {t('right_mount')}
                 </StyledText>
                 <StyledText as="p">
@@ -224,7 +262,12 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               >
                 {requiredModuleTypes.length > 0 ? (
                   <>
-                    <StyledText as="h6" marginBottom={SPACING.spacing3}>
+                    <StyledText
+                      as="h6"
+                      marginTop={SPACING.spacing3}
+                      marginBottom={SPACING.spacing2}
+                      color={COLORS.darkGreyEnabled}
+                    >
                       {t('modules')}
                     </StyledText>
                     <Flex>
@@ -240,26 +283,27 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                   </>
                 ) : null}
               </Flex>
-            </>
+            </Flex>
           )}
           <Flex
             flex="0 0 8rem"
             flexDirection={DIRECTION_COLUMN}
-            marginRight={SPACING.spacing4}
             data-testid={`ProtocolCard_date_${protocolDisplayName}`}
+            marginTop={SPACING.spacing3}
+            css={PROTOCOL_CARD_UPDATED_JUSTIFY_CONTENT_STYLING}
           >
             <StyledText
-              as="h6"
+              as="label"
               marginBottom={SPACING.spacing3}
               color={COLORS.darkGreyEnabled}
-              textAlign={TEXT_ALIGN_RIGHT}
+              textAlign={TYPOGRAPHY.textAlignRight}
             >
               {t('updated')}
             </StyledText>
             <StyledText
-              as="p"
+              as="label"
               color={COLORS.darkGreyEnabled}
-              textAlign={TEXT_ALIGN_RIGHT}
+              textAlign={TYPOGRAPHY.textAlignRight}
             >
               {format(new Date(modified), 'MM/dd/yy HH:mm:ss')}
             </StyledText>

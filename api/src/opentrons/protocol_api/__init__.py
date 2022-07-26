@@ -15,6 +15,7 @@ from .contexts import (
     TemperatureModuleContext,
     MagneticModuleContext,
     ThermocyclerContext,
+    HeaterShakerContext,
 )
 
 __all__ = [
@@ -25,5 +26,6 @@ __all__ = [
     "TemperatureModuleContext",
     "MagneticModuleContext",
     "ThermocyclerContext",
+    "HeaterShakerContext",
     "labware",
 ]

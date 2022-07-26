@@ -12,8 +12,6 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
-  TEXT_ALIGN_LEFT,
-  TEXT_TRANSFORM_CAPITALIZE,
   COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -43,6 +41,15 @@ const COLLAPSED_STYLE = css`
   max-height: 0vh;
   overflow: hidden;
 `
+const ACCORDION_STYLE = css`
+  border-radius: 50%;
+  &:hover {
+    background: ${COLORS.lightGreyHover};
+  }
+  &:active {
+    background: #16212d40;
+  }
+`
 export function SetupStep({
   expanded,
   title,
@@ -56,7 +63,7 @@ export function SetupStep({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <Btn textAlign={TEXT_ALIGN_LEFT}>
+      <Btn textAlign={TYPOGRAPHY.textAlignLeft}>
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -104,9 +111,7 @@ export function SetupStep({
                     }
                     marginRight={SPACING.spacing3}
                     name={
-                      calibrationStatusComplete
-                        ? 'check-circle'
-                        : 'alert-circle'
+                      calibrationStatusComplete ? 'ot-check' : 'alert-circle'
                     }
                     id={'RunSetupCard_calibrationIcon'}
                   />
@@ -114,7 +119,7 @@ export function SetupStep({
                     color={COLORS.black}
                     css={TYPOGRAPHY.pSemiBold}
                     marginRight={SPACING.spacing4}
-                    textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                    textTransform={TYPOGRAPHY.textTransformCapitalize}
                     id={'RunSetupCard_calibrationText'}
                   >
                     {calibrationStatusComplete
@@ -124,8 +129,9 @@ export function SetupStep({
                 </Flex>
               ) : null}
               <Icon
-                color={COLORS.darkBlackEnabled}
-                size={SIZE_1}
+                color={COLORS.darkBlack}
+                size="1.5rem"
+                css={ACCORDION_STYLE}
                 name={expanded ? 'minus' : 'plus'}
                 margin={SPACING.spacing2}
               />

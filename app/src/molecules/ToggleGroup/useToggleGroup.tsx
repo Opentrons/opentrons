@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { BORDERS, COLORS, Flex } from '@opentrons/components'
+import { BORDERS, COLORS, Flex, SPACING } from '@opentrons/components'
 import {
   blueEnabled,
   background,
@@ -9,7 +9,6 @@ import {
 import { PrimaryButton } from '../../atoms/buttons'
 
 const BUTTON_GROUP_STYLES = css`
-  border: 1px ${medGreyEnabled} solid;
   border-radius: ${BORDERS.radiusSoftCorners};
   margin-top: -1px;
   width: fit-content;
@@ -17,12 +16,12 @@ const BUTTON_GROUP_STYLES = css`
   button {
     height: 28px;
     width: auto;
-    border: none;
     font-weight: 400;
     font-size: 11px;
     line-height: 14px;
     box-shadow: none;
-
+    padding-top: 6px;
+    padding-bottom: 8px;
     &:focus {
       box-shadow: none;
       color: ${COLORS.white};
@@ -47,22 +46,29 @@ const BUTTON_GROUP_STYLES = css`
 
   button:first-child {
     border-radius: ${BORDERS.radiusSoftCorners} 0 0 ${BORDERS.radiusSoftCorners};
+    border-right: none;
   }
 
   button:last-child {
     border-radius: 0 ${BORDERS.radiusSoftCorners} ${BORDERS.radiusSoftCorners} 0;
+    border-left: none;
   }
 `
 
 const ACTIVE_STYLE = css`
+  padding-left: ${SPACING.spacing3};
+  padding-right: ${SPACING.spacing3};
   background-color: ${blueEnabled};
   color: ${COLORS.white};
   pointer-events: none;
 `
 
 const DEFAULT_STYLE = css`
+  padding-left: ${SPACING.spacing3};
+  padding-right: ${SPACING.spacing3};
   background-color: ${COLORS.white};
   color: ${COLORS.black};
+  border: 1px ${medGreyEnabled} solid;
 `
 
 export const useToggleGroup = (

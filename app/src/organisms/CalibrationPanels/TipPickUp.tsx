@@ -13,6 +13,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_RELATIVE,
+  SPACING,
   SPACING_1,
   SPACING_2,
   SPACING_3,
@@ -154,7 +155,7 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
             </Box>
           </Flex>
         </Box>
-        <JogControls jog={jog} />
+        <JogControls jog={jog} marginBottom={SPACING.spacing5} />
         <Flex width="100%" justifyContent={JUSTIFY_CENTER}>
           <PrimaryBtn onClick={pickUpTip} flex="1" marginX={SPACING_5}>
             {TIP_PICK_UP_BUTTON_TEXT}

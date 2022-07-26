@@ -1,4 +1,5 @@
 from typing import List
+from math import trunc
 
 from opentrons.drivers import utils
 from opentrons.hardware_control.modules import ThermocyclerStep
@@ -22,6 +23,7 @@ def magdeck_calibrate() -> command_types.MagdeckCalibrateCommand:
 
 
 def tempdeck_set_temp(celsius: float) -> command_types.TempdeckSetTempCommand:
+    # TODO: SB 2022-06-03 Investigate if we should change this to match hs style below
     temp = round(float(celsius), utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
     text = (
         f"Setting Temperature Module temperature "
@@ -150,3 +152,64 @@ def thermocycler_wait_for_lid_temp() -> command_types.ThermocyclerWaitForLidTemp
 def thermocycler_close() -> command_types.ThermocyclerCloseCommand:
     text = "Closing Thermocycler lid"
     return {"name": command_types.THERMOCYCLER_CLOSE, "payload": {"text": text}}
+
+
+def heater_shaker_set_target_temperature(
+    celsius: float,
+) -> command_types.HeaterShakerSetTargetTemperatureCommand:
+    formatted_temp = trunc(celsius)
+    text = f"Setting Target Temperature of Heater-Shaker to {formatted_temp} °C"
+    return {
+        "name": command_types.HEATER_SHAKER_SET_TARGET_TEMPERATURE,
+        "payload": {"text": text},
+    }
+
+
+def heater_shaker_wait_for_temperature() -> command_types.HeaterShakerWaitForTemperatureCommand:
+    text = "Waiting for Heater-Shaker to reach target temperature"
+    return {
+        "name": command_types.HEATER_SHAKER_WAIT_FOR_TEMPERATURE,
+        "payload": {"text": text},
+    }
+
+
+def heater_shaker_set_and_wait_for_shake_speed(
+    rpm: int,
+) -> command_types.HeaterShakerSetAndWaitForShakeSpeedCommand:
+    text = f"Setting Heater-Shaker to Shake at {rpm} RPM and waiting until reached"
+    return {
+        "name": command_types.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED,
+        "payload": {"text": text},
+    }
+
+
+def heater_shaker_open_labware_latch() -> command_types.HeaterShakerOpenLabwareLatchCommand:
+    text = "Unlatching labware on Heater-Shaker"
+    return {
+        "name": command_types.HEATER_SHAKER_OPEN_LABWARE_LATCH,
+        "payload": {"text": text},
+    }
+
+
+def heater_shaker_close_labware_latch() -> command_types.HeaterShakerCloseLabwareLatchCommand:
+    text = "Latching labware on Heater-Shaker"
+    return {
+        "name": command_types.HEATER_SHAKER_CLOSE_LABWARE_LATCH,
+        "payload": {"text": text},
+    }
+
+
+def heater_shaker_deactivate_shaker() -> command_types.HeaterShakerDeactivateShakerCommand:
+    text = "Deactivating Shaker"
+    return {
+        "name": command_types.HEATER_SHAKER_DEACTIVATE_SHAKER,
+        "payload": {"text": text},
+    }
+
+
+def heater_shaker_deactivate_heater() -> command_types.HeaterShakerDeactivateHeaterCommand:
+    text = "Deactivating Heater"
+    return {
+        "name": command_types.HEATER_SHAKER_DEACTIVATE_HEATER,
+        "payload": {"text": text},
+    }

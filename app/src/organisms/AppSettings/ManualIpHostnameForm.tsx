@@ -3,27 +3,23 @@ import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useFormik } from 'formik'
 import styled from 'styled-components'
+
 import {
   Flex,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SPACING,
-  Text,
   COLORS,
+  SIZE_2,
+  BORDERS,
 } from '@opentrons/components'
+
 import { TertiaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
 import { addManualIp } from '../../redux/config'
 import { startDiscovery } from '../../redux/discovery'
 
 import type { Dispatch } from '../../redux/types'
-
-interface FormikErrors {
-  ip?: string
-}
-
-interface Props {
-  setMostRecentAddition: (ip: string) => void
-}
 
 const FlexForm = styled.form`
   display: flex;
@@ -33,14 +29,44 @@ const FlexForm = styled.form`
 `
 
 const StyledInput = styled.input`
-  height: ${SPACING.spacing5};
   width: 100%;
   flex: 6;
   margin: ${SPACING.spacing2} 0;
-  border: 1px solid ${COLORS.medGreyEnabled};
+  background-color: ${COLORS.white};
+  border-radius: ${SPACING.spacing2};
+  border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled};
+  height: ${SIZE_2};
+  font-size: ${TYPOGRAPHY.fontSizeP};
+
+  &:active {
+    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+      ${COLORS.darkGreyEnabled};
+  }
+
+  &:hover {
+    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.blueEnabled};
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:disabled {
+    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+      ${COLORS.darkGreyDisabled};
+  }
 `
 
-export function ManualIpHostnameForm(props: Props): JSX.Element {
+interface FormikErrors {
+  ip?: string
+}
+interface ManualIpHostnameFormProps {
+  setMostRecentAddition: (ip: string) => void
+}
+
+export function ManualIpHostnameForm({
+  setMostRecentAddition,
+}: ManualIpHostnameFormProps): JSX.Element {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const addManualIpAndHostname = (ip: string): void => {
@@ -54,12 +80,11 @@ export function ManualIpHostnameForm(props: Props): JSX.Element {
     onSubmit: (values, { resetForm }) => {
       const ip = values.ip.trim()
       const inputForm = document.getElementById('ip')
-      if (inputForm != null) {
+      if (inputForm != null)
         inputForm.style.border = `1px solid ${COLORS.medGreyEnabled}`
-      }
       addManualIpAndHostname(ip)
-      props.setMostRecentAddition(ip)
-      resetForm({ values: undefined })
+      resetForm()
+      setMostRecentAddition(ip)
     },
     validate: values => {
       const errors: FormikErrors = {}
@@ -88,29 +113,26 @@ export function ManualIpHostnameForm(props: Props): JSX.Element {
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           value={formik.values.ip}
+          data-testid="manual-ip-hostname-input"
         />
         <TertiaryButton
           fontSize={TYPOGRAPHY.fontSizeH6}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight12}
           marginLeft={SPACING.spacing3}
-          padding={`6px 12px}`}
           type="submit"
         >
           {t('add_ip_button')}
         </TertiaryButton>
       </FlexForm>
-      {formik.errors.ip && (
-        <Text
+      {formik.errors.ip != null && (
+        <StyledText
+          as="label"
           marginTop={SPACING.spacing2}
-          fontSize={TYPOGRAPHY.fontSizeH6}
-          lineHeight={TYPOGRAPHY.lineHeight12}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          fontStyle={TYPOGRAPHY.fontStyleNormal}
           color={COLORS.errorEnabled}
         >
           {formik.errors.ip}
-        </Text>
+        </StyledText>
       )}
     </Flex>
   )

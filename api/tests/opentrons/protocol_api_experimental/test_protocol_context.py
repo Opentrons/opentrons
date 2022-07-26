@@ -236,10 +236,10 @@ def test_pause(
 ) -> None:
     """It should be able to issue a Pause command through the client."""
     subject.pause()
-    decoy.verify(engine_client.pause(message=None), times=1)
+    decoy.verify(engine_client.wait_for_resume(message=None), times=1)
 
     subject.pause(msg="hello world")
-    decoy.verify(engine_client.pause(message="hello world"), times=1)
+    decoy.verify(engine_client.wait_for_resume(message="hello world"), times=1)
 
 
 @pytest.mark.parametrize(

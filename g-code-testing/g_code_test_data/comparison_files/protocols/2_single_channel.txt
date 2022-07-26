@@ -167,10 +167,6 @@ smoothie: G0 X48.38 Y255.24 -> Moving the robot as follows: The gantry to 48.38 
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
-smoothie: G0 Z34.72 -> Moving the robot as follows: The left pipette arm height to 34.72 ->
-smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M907 A0.1 B0.05 C0.3 X0.3 Y0.3 Z0.8 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.8 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
-smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: G0 Z25.05 -> Moving the robot as follows: The left pipette arm height to 25.05 ->
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: G0 F601.0 -> Setting speed to 601.0 ->
@@ -597,10 +593,6 @@ smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.1 B0.05 C0.3 X1.25 Y1.25 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 1.25 Y-Axis Motor: 1.25 Z-Axis Motor: 0.1 A-Axis Motor: 0.1 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: G0 X23.38 Y255.24 -> Moving the robot as follows: The gantry to 23.38 on the X-Axis The gantry to 255.24 on the Y-Axis ->
-smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M907 A0.8 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
-smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
-smoothie: G0 A35.87 -> Moving the robot as follows: The right pipette arm height to 35.87 ->
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.8 B0.05 C0.3 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.05 C-Axis Motor: 0.3 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->

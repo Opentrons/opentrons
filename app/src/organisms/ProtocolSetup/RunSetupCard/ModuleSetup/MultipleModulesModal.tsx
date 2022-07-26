@@ -59,6 +59,7 @@ export const MultipleModulesModal = (
               {t('multiple_modules_explanation')}
             </Text>
             <Link
+              external
               fontSize={FONT_SIZE_BODY_1}
               color={C_BLUE}
               href={HOW_TO_MULTIPLE_MODULES_HREF}

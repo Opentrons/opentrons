@@ -2,7 +2,7 @@ import logging
 import contextlib
 from typing import Set, Dict, Any, Union, List, Optional, TYPE_CHECKING
 
-from opentrons.hardware_control import Pipette
+from opentrons.hardware_control.instruments import Pipette
 from opentrons.hardware_control.util import plan_arc
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api import labware

@@ -72,6 +72,8 @@ def parse_rpm_response(rpm_string: str) -> RPM:
     """Example input: T:1233 C:212"""
     data = parse_key_values(rpm_string)
     try:
+        # target is listed as Optional for below assignment,
+        # but None will be represented as 0 in G-code
         target: Optional[int] = int(parse_number(data["T"], 0))
         if target == 0:
             target = None
@@ -166,7 +168,7 @@ def parse_key_values(value: str) -> Dict[str, str]:
 
 def parse_optional_number(value: str, rounding_val: int) -> Optional[float]:
     """Convert number to float. 'none' will be converted to None"""
-    return None if value == "none" else parse_number(value, rounding_val)
+    return None if value.lower() == "none" else parse_number(value, rounding_val)
 
 
 def parse_number(value: str, rounding_val: int) -> float:

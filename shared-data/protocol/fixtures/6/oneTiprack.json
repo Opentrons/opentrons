@@ -1299,7 +1299,7 @@
       "id": "2",
       "commandType": "delay",
       "params": {
-        "wait": 42
+        "seconds": 42
       }
     },
     {

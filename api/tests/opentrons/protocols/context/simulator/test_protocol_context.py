@@ -40,7 +40,11 @@ def test_replacing_instrument_tip_state(
     pip2 = subject.load_instrument("p300_single_gen2", types.Mount.RIGHT, replace=True)
 
     pip1.pick_up_tip(
-        well=labware.get_wells()[0], tip_length=1, presses=None, increment=None
+        well=labware.get_wells()[0],
+        tip_length=1,
+        presses=None,
+        increment=None,
+        prep_after=False,
     )
     assert pip1.has_tip() is True
     assert pip2.has_tip() is True

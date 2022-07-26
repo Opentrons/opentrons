@@ -1,0 +1,33 @@
+{
+  "$otSharedSchema": "#/protocol/schemas/6",
+  "schemaVersion": 6,
+  "metadata": {
+    "protocolName": "Simple test protocol",
+    "author": "engineering <engineering@opentrons.com>",
+    "description": "A short test protocol",
+    "created": 1223131231,
+    "tags": ["unitTest"]
+  },
+  "robot": {
+    "model": "OT-2 Standard",
+    "deckId": "ot2_standard"
+  },
+  "pipettes": {},
+  "modules": {},
+  "labware": {},
+  "liquids": {},
+  "labwareDefinitions": {},
+  "commands": [
+    {
+      "commandType": "waitForDuration",
+      "params": {
+        "seconds": 1
+      }
+    },
+    {
+      "commandType": "home",
+      "params": {}
+    }
+  ],
+  "commandAnnotations": []
+}

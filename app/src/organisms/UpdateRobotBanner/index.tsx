@@ -40,26 +40,22 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
     e.stopPropagation()
     setShowSoftwareUpdateModal(true)
   }
-  const handleCloseBanner: React.MouseEventHandler = e => {
-    e.preventDefault()
-    e.stopPropagation()
-  }
 
   return (
     <Flex onClick={e => e.stopPropagation()} flexDirection={DIRECTION_COLUMN}>
       {(autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade') &&
       robot !== null &&
       robot.healthStatus === 'ok' ? (
-        <Banner type="warning" onCloseClick={handleCloseBanner} {...styleProps}>
+        <Banner type="error" {...styleProps}>
           <StyledText as="p" marginRight={SPACING.spacing2}>
-            {t('robot_server_versions_banner_title')}
+            {t('robot_software_update_required')}
           </StyledText>
           <Btn
             onClick={handleLaunchModal}
             css={TYPOGRAPHY.pRegular}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
           >
-            {t('robot_server_versions_view_update')}
+            {t('view_update')}
           </Btn>
         </Banner>
       ) : null}

@@ -4,11 +4,10 @@ import {
   Icon,
   Text,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING_1,
-  TEXT_TRANSFORM_CAPITALIZE,
+  SPACING,
   ALIGN_CENTER,
   C_BLUE_PRESSED,
-  FONT_SIZE_CAPTION,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 interface StatusLabelProps {
   status: string
@@ -25,18 +24,18 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Flex
         backgroundColor={backgroundColor}
-        borderRadius={SPACING_1}
+        borderRadius={SPACING.spacing2}
         padding="0.2rem"
         alignItems={ALIGN_CENTER}
-        marginTop={SPACING_1}
-        marginBottom={SPACING_1}
+        marginTop={SPACING.spacing2}
+        marginBottom={SPACING.spacing2}
         data-testid={`status_label+${status}`}
       >
         <Icon
           name="circle"
           color={iconColor}
-          size={SPACING_1}
-          marginX={SPACING_1}
+          size={SPACING.spacing2}
+          marginX={SPACING.spacing2}
           data-testid="status_circle"
         >
           {pulse ? (
@@ -51,10 +50,10 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
           ) : null}
         </Icon>
         <Text
-          fontSize={FONT_SIZE_CAPTION}
+          fontSize={TYPOGRAPHY.fontSizeCaption}
           color={textColor ?? C_BLUE_PRESSED}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
-          marginRight={SPACING_1}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
+          marginRight={SPACING.spacing2}
         >
           {status}
         </Text>

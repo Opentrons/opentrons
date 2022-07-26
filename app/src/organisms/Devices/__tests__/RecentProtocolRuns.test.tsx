@@ -3,7 +3,7 @@ import { UseQueryResult } from 'react-query'
 import { renderWithProviders } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
-import { useIsRobotViewable } from '../hooks'
+import { useIsRobotViewable, useRunStatuses } from '../hooks'
 import { RecentProtocolRuns } from '../RecentProtocolRuns'
 import { HistoricalProtocolRun } from '../HistoricalProtocolRun'
 
@@ -23,7 +23,9 @@ const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
 const mockHistoricalProtocolRun = HistoricalProtocolRun as jest.MockedFunction<
   typeof HistoricalProtocolRun
 >
-
+const mockUseRunStatues = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
+>
 const render = () => {
   return renderWithProviders(<RecentProtocolRuns robotName="otie" />, {
     i18nInstance: i18n,
@@ -32,6 +34,11 @@ const render = () => {
 
 describe('RecentProtocolRuns', () => {
   beforeEach(() => {
+    mockUseRunStatues.mockReturnValue({
+      isRunStill: false,
+      isRunTerminal: true,
+      isRunIdle: false,
+    })
     mockHistoricalProtocolRun.mockReturnValue(
       <div>mock HistoricalProtocolRun</div>
     )
@@ -49,7 +56,7 @@ describe('RecentProtocolRuns', () => {
     mockUseIsRobotViewable.mockReturnValue(true)
     mockUseAllRunsQuery.mockReturnValue({
       data: {},
-    } as UseQueryResult<Runs>)
+    } as UseQueryResult<Runs, Error>)
     const [{ getByText }] = render()
 
     getByText('No protocol runs yet!')
@@ -68,7 +75,7 @@ describe('RecentProtocolRuns', () => {
           },
         ],
       },
-    } as UseQueryResult<Runs>)
+    } as UseQueryResult<Runs, Error>)
     const [{ getByText }] = render()
     getByText(`otie's Protocol Runs`)
     getByText('Run')

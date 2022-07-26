@@ -10,7 +10,6 @@ import {
   TYPOGRAPHY,
   SPACING,
   ALIGN_FLEX_END,
-  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 
 import RobotCalHelpImage from '../../../../assets/images/robot_calibration_help.png'
@@ -96,11 +95,14 @@ export function DeckCalibrationModal({
               t('pipette_offset_cal_description_bullet_3'),
             ]}
           />
-          <Divider marginTop="2.5rem" marginBottom={SPACING.spacing4} />
+          <Divider
+            marginTop={SPACING.spacingXXL}
+            marginBottom={SPACING.spacing4}
+          />
           <PrimaryButton
             onClick={onCloseClick}
             alignSelf={ALIGN_FLEX_END}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {t('shared:close')}
           </PrimaryButton>

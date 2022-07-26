@@ -12,11 +12,16 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
     ChannelCount,
 )
+from opentrons_shared_data.gripper.dev_types import (
+    GripperModel,
+    GripperName,
+)
 
 from opentrons.drivers.types import MoveSplit
 from opentrons.types import Mount
 from opentrons.config.pipette_config import PipetteConfig
-from opentrons.config.gripper_config import GripperConfig, GripperName, GripperModel
+from opentrons.config.gripper_config import GripperConfig
+from opentrons.hardware_control.types import GripperJawState
 
 
 class InstrumentSpec(TypedDict):
@@ -86,6 +91,8 @@ class PipetteDict(InstrumentDict):
 class GripperDict(InstrumentDict):
     name: GripperName
     model: GripperModel
+    gripper_id: str
+    state: GripperJawState
 
 
 class InstrumentHardwareConfigs(TypedDict):

@@ -10,9 +10,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
-  SIZE_2,
   SIZE_6,
   SPACING,
+  COLORS,
+  Link,
+  TYPOGRAPHY,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import {
@@ -27,7 +30,6 @@ import { CollapsibleSection } from '../../../molecules/CollapsibleSection'
 
 import { Divider } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
-import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'
 
 import type { State } from '../../../redux/types'
@@ -68,6 +70,7 @@ export function DevicesLanding(): JSX.Element {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
         marginTop={SPACING.spacing3}
+        height="2.25rem"
       >
         <StyledText as="h1" id="DevicesLanding_title">
           {t('devices')}
@@ -75,12 +78,11 @@ export function DevicesLanding(): JSX.Element {
         <NewRobotSetupHelp />
       </Flex>
       {isScanning && noRobots ? <DevicesLoadingState /> : null}
-      {!isScanning && noRobots ? (
-        <DevicesEmptyState />
-      ) : (
+      {!isScanning && noRobots ? <DevicesEmptyState /> : null}
+      {!noRobots ? (
         <>
           <CollapsibleSection
-            marginY={SPACING.spacing4}
+            marginY={SPACING.spacing3}
             title={t('available', {
               count: [...healthyReachableRobots, ...unhealthyReachableRobots]
                 .length,
@@ -99,7 +101,7 @@ export function DevicesLanding(): JSX.Element {
           </CollapsibleSection>
           <Divider />
           <CollapsibleSection
-            marginY={SPACING.spacing4}
+            marginY={SPACING.spacing3}
             title={t('unavailable', {
               count: [...recentlySeenRobots, ...unreachableRobots].length,
             })}
@@ -113,7 +115,7 @@ export function DevicesLanding(): JSX.Element {
             ))}
           </CollapsibleSection>
         </>
-      )}
+      ) : null}
     </Box>
   )
 }
@@ -132,16 +134,38 @@ function DevicesLoadingState(): JSX.Element {
         name="ot-spinner"
         aria-label="ot-spinner"
         spin
-        size={SIZE_2}
+        size="3.25rem"
         marginTop={SPACING.spacing4}
         marginBottom={SPACING.spacing4}
+        color={COLORS.darkGreyEnabled}
       />
-      <ExternalLink
-        href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
-        id="DevicesEmptyState_troubleshootingConnectionProblems"
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        alignItems={ALIGN_CENTER}
+        position={POSITION_ABSOLUTE}
+        bottom={SPACING.spacingXXL}
+        left="0"
+        right="0"
+        marginLeft={SPACING.spacingAuto}
+        marginRight={SPACING.spacingAuto}
+        textAlign={TYPOGRAPHY.textAlignCenter}
       >
-        {t('troubleshooting_connection_problems')}
-      </ExternalLink>
+        <Link
+          css={TYPOGRAPHY.darkLinkLabelSemiBold}
+          external
+          href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
+          display="flex"
+          alignItems={ALIGN_CENTER}
+          id="DevicesEmptyState_troubleshootingConnectionProblems"
+        >
+          {t('troubleshooting_connection_problems')}
+          <Icon
+            name="open-in-new"
+            size="0.5rem"
+            marginLeft={SPACING.spacing2}
+          />
+        </Link>
+      </Flex>
     </Flex>
   )
 }

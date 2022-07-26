@@ -6,7 +6,7 @@ from typing import List, Tuple, Dict, Any
 from opentrons import config
 from opentrons.calibration_storage import helpers, types as CSTypes
 from opentrons.types import Mount, Point
-from opentrons.hardware_control import pipette
+from opentrons.hardware_control.instruments import pipette
 from opentrons.config.pipette_config import load
 from opentrons.protocol_api import labware
 

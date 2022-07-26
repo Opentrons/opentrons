@@ -338,7 +338,6 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         action=QueueCommandAction(
             request=cmd.HomeCreate(params=cmd.HomeParams()),
             command_id="command-id",
-            command_key="command-key",
             created_at=datetime(year=2021, month=1, day=1),
         ),
         expected_error=None,
@@ -387,7 +386,6 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         action=QueueCommandAction(
             request=cmd.HomeCreate(params=cmd.HomeParams()),
             command_id="command-id",
-            command_key="command-key",
             created_at=datetime(year=2021, month=1, day=1),
         ),
         expected_error=errors.RunStoppedError,
@@ -401,7 +399,6 @@ action_allowed_specs: List[ActionAllowedSpec] = [
                 intent=cmd.CommandIntent.SETUP,
             ),
             command_id="command-id",
-            command_key="command-key",
             created_at=datetime(year=2021, month=1, day=1),
         ),
         expected_error=errors.SetupCommandNotAllowedError,
@@ -415,7 +412,6 @@ action_allowed_specs: List[ActionAllowedSpec] = [
                 intent=cmd.CommandIntent.SETUP,
             ),
             command_id="command-id",
-            command_key="command-key",
             created_at=datetime(year=2021, month=1, day=1),
         ),
         expected_error=errors.SetupCommandNotAllowedError,

@@ -40,6 +40,18 @@ MOVE_TO: Final = "command.MOVE_TO"
 
 # Modules #
 
+HEATER_SHAKER_SET_TARGET_TEMPERATURE: Final = (
+    "command.HEATER_SHAKER_SET_TARGET_TEMPERATURE"
+)
+HEATER_SHAKER_WAIT_FOR_TEMPERATURE: Final = "command.HEATER_SHAKER_WAIT_FOR_TEMPERATURE"
+HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED: Final = (
+    "command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"
+)
+HEATER_SHAKER_OPEN_LABWARE_LATCH: Final = "command.HEATER_SHAKER_OPEN_LABWARE_LATCH"
+HEATER_SHAKER_CLOSE_LABWARE_LATCH: Final = "command.HEATER_SHAKER_CLOSE_LABWARE_LATCH"
+HEATER_SHAKER_DEACTIVATE_SHAKER: Final = "command.HEATER_SHAKER_DEACTIVATE_SHAKER"
+HEATER_SHAKER_DEACTIVATE_HEATER: Final = "command.HEATER_SHAKER_DEACTIVATE_HEATER"
+
 MAGDECK_CALIBRATE: Final = "command.MAGDECK_CALIBRATE"
 MAGDECK_DISENGAGE: Final = "command.MAGDECK_DISENGAGE"
 MAGDECK_ENGAGE: Final = "command.MAGDECK_ENGAGE"
@@ -135,6 +147,69 @@ class ResumeCommandPayload(TextOnlyPayload):
 class ResumeCommand(TypedDict):
     name: Literal["command.RESUME"]
     payload: ResumeCommandPayload
+
+
+class HeaterShakerSetTargetTemperaturePayload(TextOnlyPayload):
+    pass
+
+
+class HeaterShakerSetTargetTemperatureCommand(TypedDict):
+    name: Literal["command.HEATER_SHAKER_SET_TARGET_TEMPERATURE"]
+    payload: HeaterShakerSetTargetTemperaturePayload
+
+
+class HeaterShakerWaitForTemperaturePayload(TextOnlyPayload):
+    pass
+
+
+class HeaterShakerWaitForTemperatureCommand(TypedDict):
+    name: Literal["command.HEATER_SHAKER_WAIT_FOR_TEMPERATURE"]
+    payload: HeaterShakerWaitForTemperaturePayload
+
+
+class HeaterShakerSetAndWaitForShakeSpeedPayload(TextOnlyPayload):
+    pass
+
+
+class HeaterShakerSetAndWaitForShakeSpeedCommand(TypedDict):
+    name: Literal["command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"]
+    payload: HeaterShakerSetAndWaitForShakeSpeedPayload
+
+
+class HeaterShakerOpenLabwareLatchPayload(TextOnlyPayload):
+    pass
+
+
+class HeaterShakerOpenLabwareLatchCommand(TypedDict):
+    name: Literal["command.HEATER_SHAKER_OPEN_LABWARE_LATCH"]
+    payload: HeaterShakerOpenLabwareLatchPayload
+
+
+class HeaterShakerCloseLabwareLatchPayload(TextOnlyPayload):
+    pass
+
+
+class HeaterShakerCloseLabwareLatchCommand(TypedDict):
+    name: Literal["command.HEATER_SHAKER_CLOSE_LABWARE_LATCH"]
+    payload: HeaterShakerCloseLabwareLatchPayload
+
+
+class HeaterShakerDeactivateShakerPayload(TextOnlyPayload):
+    pass
+
+
+class HeaterShakerDeactivateShakerCommand(TypedDict):
+    name: Literal["command.HEATER_SHAKER_DEACTIVATE_SHAKER"]
+    payload: HeaterShakerDeactivateShakerPayload
+
+
+class HeaterShakerDeactivateHeaterPayload(TextOnlyPayload):
+    pass
+
+
+class HeaterShakerDeactivateHeaterCommand(TypedDict):
+    name: Literal["command.HEATER_SHAKER_DEACTIVATE_HEATER"]
+    payload: HeaterShakerDeactivateHeaterPayload
 
 
 class MagdeckEngageCommandPayload(TextOnlyPayload):
@@ -454,6 +529,13 @@ Command = Union[
     DispenseCommand,
     AspirateCommand,
     HomeCommand,
+    HeaterShakerSetTargetTemperatureCommand,
+    HeaterShakerWaitForTemperatureCommand,
+    HeaterShakerSetAndWaitForShakeSpeedCommand,
+    HeaterShakerOpenLabwareLatchCommand,
+    HeaterShakerCloseLabwareLatchCommand,
+    HeaterShakerDeactivateShakerCommand,
+    HeaterShakerDeactivateHeaterCommand,
     ThermocyclerCloseCommand,
     ThermocyclerWaitForLidTempCommand,
     ThermocyclerDeactivateCommand,
@@ -482,6 +564,13 @@ Command = Union[
 CommandPayload = Union[
     CommentCommandPayload,
     ResumeCommandPayload,
+    HeaterShakerSetTargetTemperaturePayload,
+    HeaterShakerWaitForTemperaturePayload,
+    HeaterShakerSetAndWaitForShakeSpeedPayload,
+    HeaterShakerOpenLabwareLatchPayload,
+    HeaterShakerCloseLabwareLatchPayload,
+    HeaterShakerDeactivateShakerPayload,
+    HeaterShakerDeactivateHeaterPayload,
     MagdeckEngageCommandPayload,
     MagdeckDisengageCommandPayload,
     MagdeckCalibrateCommandPayload,
@@ -578,6 +667,48 @@ class AspirateMessage(CommandMessageFields, AspirateCommand):
 
 
 class HomeMessage(CommandMessageFields, HomeCommand):
+    pass
+
+
+class HeaterShakerSetTargetTemperatureMessage(
+    CommandMessageFields, HeaterShakerSetTargetTemperatureCommand
+):
+    pass
+
+
+class HeaterShakerWaitForTemperatureMessage(
+    CommandMessageFields, HeaterShakerWaitForTemperatureCommand
+):
+    pass
+
+
+class HeaterShakerSetAndWaitForShakeSpeedMessage(
+    CommandMessageFields, HeaterShakerSetAndWaitForShakeSpeedCommand
+):
+    pass
+
+
+class HeaterShakerOpenLabwareLatchMessage(
+    CommandMessageFields, HeaterShakerOpenLabwareLatchCommand
+):
+    pass
+
+
+class HeaterShakerCloseLabwareLatchMessage(
+    CommandMessageFields, HeaterShakerCloseLabwareLatchCommand
+):
+    pass
+
+
+class HeaterShakerDeactivateShakerMessage(
+    CommandMessageFields, HeaterShakerDeactivateShakerCommand
+):
+    pass
+
+
+class HeaterShakerDeactivateHeaterMessage(
+    CommandMessageFields, HeaterShakerDeactivateHeaterCommand
+):
     pass
 
 
@@ -697,6 +828,13 @@ CommandMessage = Union[
     DispenseMessage,
     AspirateMessage,
     HomeMessage,
+    HeaterShakerSetTargetTemperatureMessage,
+    HeaterShakerWaitForTemperatureMessage,
+    HeaterShakerSetAndWaitForShakeSpeedMessage,
+    HeaterShakerOpenLabwareLatchMessage,
+    HeaterShakerCloseLabwareLatchMessage,
+    HeaterShakerDeactivateShakerMessage,
+    HeaterShakerDeactivateHeaterMessage,
     ThermocyclerCloseMessage,
     ThermocyclerWaitForLidTempMessage,
     ThermocyclerDeactivateMessage,

@@ -1,3 +1,4 @@
+import { uuid } from '../../utils'
 import type { ThermocyclerSetBlockTemperatureArgs } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { CommandCreator } from '../../types'
 export const thermocyclerSetTargetBlockTemperature: CommandCreator<ThermocyclerSetBlockTemperatureArgs> = (
@@ -15,6 +16,7 @@ export const thermocyclerSetTargetBlockTemperature: CommandCreator<ThermocyclerS
     commands: [
       {
         commandType: 'thermocycler/setTargetBlockTemperature',
+        key: uuid(),
         params: {
           moduleId: args.module,
           celsius: args.temperature,

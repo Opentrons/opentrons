@@ -5,10 +5,8 @@ include ../scripts/python.mk
 
 SHX := npx shx
 
-# Find the version of the sdist from package.json using a helper script. We
-# use python here so we can use the same version normalization that will be
-# used to create the sdist.
-sdist_file = dist/hardware-testing-0.0.1-py2.py3-none-any.whl
+sdist_file = dist/hardware_testing-0.0.1.tar.gz
+wheel_file = dist/hardware_testing-0.0.1-py3-none-any.whl
 
 
 # These variables can be overriden when make is invoked to customize the
@@ -49,13 +47,21 @@ teardown:
 clean:
 	$(clean_cmd)
 
-$(sdist_file): setup.py $(ot_sources)
+$(sdist_file): setup.py $(ot_sources) clean
 	$(python) setup.py sdist
+	$(SHX) rm -rf build
+	$(SHX) ls dist
+
+$(wheel_file): setup.py $(ot_sources) clean
+	$(python) setup.py bdist_wheel
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 .PHONY: sdist
 sdist: $(sdist_file)
+
+.PHONY: wheel
+wheel: $(wheel_file)
 
 .PHONY: test
 test:
@@ -76,9 +82,26 @@ format:
 	$(python) -m black hardware_testing tests protocols setup.py
 
 .PHONY: push-no-restart
-push-no-restart: sdist Pipfile.lock
+push-no-restart:
+	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
+
+.PHONY: push
+push: push-no-restart
+	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"opentrons-robot-server")
+
+
+.PHONY: push-no-restart-ot3
+push-no-restart-ot3: sdist Pipfile.lock
 	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"hardware_testing")
 
 .PHONY: push
 push-ot3: push-no-restart
 	$(call restart-server,$(host),,$(ssh_opts),"opentrons-robot-server")
+
+.PHONE: push-protocols
+push-protocols:
+	scp -r protocols root@$(host):/data/user_storage/opentrons_data
+
+.PHONY: term
+term:
+	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)

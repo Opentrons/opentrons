@@ -1,5 +1,6 @@
 import assert from 'assert'
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
+import { uuid } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import type { CommandCreator, EngageMagnetArgs } from '../../types'
 
@@ -26,6 +27,7 @@ export const engageMagnet: CommandCreator<EngageMagnetArgs> = (
     commands: [
       {
         commandType,
+        key: uuid(),
         params: {
           moduleId,
           height: engageHeight,
