@@ -40,6 +40,7 @@ class GCodeCLI:
     FILE_PATH_1_KEY = "file_path_1"
     FILE_PATH_2_KEY = "file_path_2"
     ERROR_ON_DIFFERENT_FILES = "error_on_different_files"
+    ERROR_ON_MISSING_FILES = "error_on_missing_configuration_files"
 
     CONFIGURATION_COMMAND = "configurations"
     CONFIGURATIONS = HTTP_CONFIGURATIONS + PROTOCOL_CONFIGURATIONS
@@ -143,7 +144,25 @@ class GCodeCLI:
         )
 
     def _check_for_missing_comparison_files(self) -> str:
-        print(self.configurations)
+        able_to_respond_with_error_code = self.args[self.ERROR_ON_MISSING_FILES]
+        missing_files = set()
+
+        for config in self.configurations.values():
+            if isinstance(config, ProtocolGCodeConfirmConfig):
+                for version in config.versions:
+                    if not config.comparison_file_exists(version):
+                        missing_files.add(config.get_comparison_file_path(version))
+
+        missing_files = list(missing_files)
+        response = "\nNo missing configuration files."
+        if len(missing_files) > 0:
+            missing_files_string = '\n'.join(missing_files)
+            response = f"\nThe following files are missing: \n\n{missing_files_string}\n"
+
+        if len(missing_files) > 0 and able_to_respond_with_error_code:
+            self.respond_with_error_code = True
+
+        return response
 
     def _get_command_func(self, passed_command_name: str) -> Callable:
         try:
@@ -169,8 +188,14 @@ class GCodeCLI:
         """Run command and return it's output."""
         passed_command_name = self.args[self.COMMAND_KEY]
 
+        # The check-for-missing-comparison-files and configurations commands do not
+        # except a configuration, so we need to run those commands before looking up
+        # the config
+
         if passed_command_name == self.CONFIGURATION_COMMAND:
             return self._configurations()
+        elif passed_command_name == self.CHECK_MISSING_COMP_FILES:
+            return self._check_for_missing_comparison_files()
 
         config = self.configurations[self.args[self.CONFIGURATION_NAME]]
 
@@ -223,9 +248,15 @@ class GCodeCLI:
             cls.CONFIGURATION_COMMAND, help="List of available configurations"
         )
 
-        subparsers.add_parser(
+        missing_comp_file_parser = subparsers.add_parser(
             cls.CHECK_MISSING_COMP_FILES,
             help="Check if there are any comparison files missing.",
+        )
+        missing_comp_file_parser.add_argument(
+            f"--{cls.ERROR_ON_MISSING_FILES}",
+            help="If set, return code 1 when configuration files are missing",
+            action="store_true",
+            default=False,
         )
 
         load_comparison_parser = subparsers.add_parser(

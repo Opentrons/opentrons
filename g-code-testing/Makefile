@@ -90,3 +90,7 @@ diff-g-code-configuration-comparison:
 update-g-code-configuration-comparison:
 	$(if $(name),,$(error name variable required))
 	$(pipenv) run python cli.py update-comparison ${name}
+
+.PHONY: check-for-missing-comparison-files
+check-for-missing-comparison-files:
+	$(pipenv) run python cli.py check-for-missing-comparison-files --error_on_missing_configuration_files
