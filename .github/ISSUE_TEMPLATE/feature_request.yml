@@ -19,7 +19,7 @@ body:
 
         - What would this feature allow you to accomplish?
         - Are there any workarounds you use to partially achieve your goal?
-        - Are there any Github issues you could find that may be related?
+        - Are there any GitHub issues you could find that may be related?
     validations:
       required: true
   - type: textarea
