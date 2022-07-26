@@ -158,8 +158,10 @@ class GCodeCLI:
         missing_files = list(missing_files)
         response = "\nNo missing configuration files."
         if len(missing_files) > 0:
-            missing_files_string = '\n'.join(missing_files)
-            response = f"\nThe following files are missing: \n\n{missing_files_string}\n"
+            missing_files_string = "\n".join(missing_files)
+            response = (
+                f"\nThe following files are missing: \n\n{missing_files_string}\n"
+            )
 
         if len(missing_files) > 0 and able_to_respond_with_error_code:
             self.respond_with_error_code = True
