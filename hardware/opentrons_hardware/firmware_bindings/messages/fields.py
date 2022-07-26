@@ -132,7 +132,7 @@ class SerialField(utils.BinaryFieldBase[bytes]):
     model number, and the name.
     """
 
-    NUM_BYTES = 12
+    NUM_BYTES = 20
     FORMAT = f"{NUM_BYTES}s"
 
     @classmethod
