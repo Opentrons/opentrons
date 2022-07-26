@@ -1,6 +1,6 @@
+import { getModuleDef2 } from '@opentrons/shared-data'
 import { useAttachedModules, useProtocolDetailsForRun } from '../Devices/hooks'
 import type { AttachedModule } from '../../redux/modules/types'
-import { getModuleDef2 } from '@opentrons/shared-data'
 
 export interface ModuleIdFromRun {
   moduleIdFromRun: string
@@ -32,7 +32,10 @@ export function useModuleIdFromRun(
     attachedModule => attachedModule.serialNumber === module.serialNumber
   )
 
-  const moduleIdFromRun = loadModuleCommands?.[moduleIndex].result.moduleId
+  const moduleIdFromRun =
+    loadModuleCommands?.[moduleIndex] != null
+      ? loadModuleCommands?.[moduleIndex].result.moduleId
+      : ''
 
   return { moduleIdFromRun }
 }

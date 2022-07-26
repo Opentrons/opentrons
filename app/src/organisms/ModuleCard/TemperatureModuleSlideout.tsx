@@ -49,29 +49,19 @@ export const TemperatureModuleSlideout = (
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
 
-  const { moduleIdFromRun } = useModuleIdFromRun(
-    module,
-    currentRunId != null ? currentRunId : null
-  )
+  const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
   const name = getModuleDisplayName(module.moduleModel)
   const [temperatureValue, setTemperatureValue] = React.useState<number | null>(
     null
   )
   const { isRunIdle, isRunTerminal } = useRunStatuses()
 
-  let moduleId: string | null = null
-  if (isRunIdle && currentRunId != null && isLoadedInRun) {
-    moduleId = moduleIdFromRun
-  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
-    moduleId = module.id
-  }
-
   const handleSubmitTemperature = (): void => {
     if (temperatureValue != null) {
       const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {
         commandType: 'temperatureModule/setTargetTemperature',
         params: {
-          moduleId: moduleId != null ? moduleId : '',
+          moduleId: isRunIdle ? moduleIdFromRun : module.id,
           celsius: temperatureValue,
         },
       }
@@ -84,10 +74,7 @@ export const TemperatureModuleSlideout = (
             `error setting module status with command type ${saveTempCommand.commandType} and run id ${currentRunId}: ${e.message}`
           )
         })
-      } else if (
-        (currentRunId != null && isRunTerminal) ||
-        currentRunId == null
-      ) {
+      } else if (isRunTerminal || currentRunId == null) {
         createLiveCommand({
           command: saveTempCommand,
         }).catch((e: Error) => {

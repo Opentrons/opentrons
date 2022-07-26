@@ -127,7 +127,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           width="100%"
         >
           <Flex
-            padding={`${SPACING.spacingM} 2.5rem ${SPACING.spacingXL} ${SPACING.spacingXL}`}
+            padding={`${SPACING.spacingM} ${SPACING.spacingXXL} ${SPACING.spacingXL} ${SPACING.spacingXL}`}
             data-testid={`attach_adapter_alignment_image`}
           >
             <img

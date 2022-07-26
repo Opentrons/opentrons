@@ -143,10 +143,6 @@ smoothie: G0 X146.88 -> Moving the robot as follows: The gantry to 146.88 on the
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: M907 A0.8 B0.05 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.05 C-Axis Motor: 0.05 ->
 smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
-smoothie: G0 A54.82 -> Moving the robot as follows: The right pipette arm height to 54.82 ->
-smoothie: M400 -> Waiting for motors to stop moving ->
-smoothie: M907 A0.8 B0.05 C0.05 X0.3 Y0.3 Z0.1 -> Setting the current (in amps) to: X-Axis Motor: 0.3 Y-Axis Motor: 0.3 Z-Axis Motor: 0.1 A-Axis Motor: 0.8 B-Axis Motor: 0.05 C-Axis Motor: 0.05 ->
-smoothie: G4 P0.005 -> Pausing movement for 0.005ms ->
 smoothie: G0 A44.15 -> Moving the robot as follows: The right pipette arm height to 44.15 ->
 smoothie: M400 -> Waiting for motors to stop moving ->
 smoothie: G0 F601.0 -> Setting speed to 601.0 ->

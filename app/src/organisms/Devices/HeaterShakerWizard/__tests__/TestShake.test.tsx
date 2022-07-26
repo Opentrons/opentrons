@@ -7,15 +7,15 @@ import {
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
 import { useLatchControls } from '../../../ModuleCard/hooks'
-import { TestShake } from '../TestShake'
-import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
+import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { useModuleIdFromRun } from '../../../ModuleCard/useModuleIdFromRun'
 import { useRunStatuses } from '../../hooks'
+import { TestShake } from '../TestShake'
+import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
 
 import type { ProtocolModuleInfo } from '../../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../HeaterShakerModuleCard')
@@ -158,7 +158,6 @@ describe('TestShake', () => {
       moduleIdFromRun: 'heatershaker_id',
     })
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: false,
       isRunIdle: false,
@@ -355,7 +354,6 @@ describe('TestShake', () => {
   //  next test is sending module commands when run is terminal and through module controls
   it('entering an input for shake speed and clicking start should begin shaking when there is a run id and run is terminal', () => {
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,
@@ -388,7 +386,6 @@ describe('TestShake', () => {
   //  next test is sending module commands when run is terminal and through device details module cards
   it('entering an input for shake speed and clicking start should begin shaking when there is a run id, run is terminal, and through device details', () => {
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,

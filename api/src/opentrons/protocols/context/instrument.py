@@ -45,6 +45,7 @@ class AbstractInstrument(ABC):
         tip_length: float,
         presses: typing.Optional[int],
         increment: typing.Optional[float],
+        prep_after: bool,
     ) -> None:
         ...
 
