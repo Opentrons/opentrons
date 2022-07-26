@@ -7,9 +7,9 @@ from typing_extensions import Final
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.motion_planning.adjacent_slots_getters import (
-    get_east_west_locations,
-    get_south_location,
-    get_adjacent_locations,
+    get_east_west_slots,
+    get_south_slot,
+    get_adjacent_slots,
 )
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.context.labware import AbstractLabware
@@ -157,7 +157,7 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
         # A Heater-Shaker can't safely be placed just south of the fixed trash,
         # because the fixed trash blocks access to the screw that locks the
         # Heater-Shaker onto the deck.
-        location_south_of_fixed_trash = get_south_location(location)
+        location_south_of_fixed_trash = get_south_slot(location)
         if location_south_of_fixed_trash is not None:
             restrictions.append(
                 _NoHeaterShakerModule(
@@ -178,7 +178,7 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
             )
 
     if isinstance(item, HeaterShakerGeometry):
-        for covered_location in get_adjacent_locations(location):
+        for covered_location in get_adjacent_slots(location):
             restrictions.append(
                 _NoModule(
                     location=covered_location,
@@ -187,7 +187,7 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
                 )
             )
 
-        for covered_location in get_east_west_locations(location):
+        for covered_location in get_east_west_slots(location):
             restrictions.append(
                 _MaxHeight(
                     location=covered_location,

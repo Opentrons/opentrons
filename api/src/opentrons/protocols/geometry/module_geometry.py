@@ -21,8 +21,8 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.motion_planning.adjacent_slots_getters import (
-    get_north_south_locations,
-    get_east_west_locations,
+    get_north_south_slots,
+    get_east_west_slots,
 )
 
 from opentrons.hardware_control.modules.types import (
@@ -405,8 +405,8 @@ class HeaterShakerGeometry(ModuleGeometry):
         assert isinstance(self.parent, str), "Could not determine module slot location"
 
         heater_shaker_slot = int(self.parent)
-        dest_east_west = to_slot in get_east_west_locations(heater_shaker_slot)
-        dest_north_south = to_slot in get_north_south_locations(heater_shaker_slot)
+        dest_east_west = to_slot in get_east_west_slots(heater_shaker_slot)
+        dest_north_south = to_slot in get_north_south_slots(heater_shaker_slot)
         dest_heater_shaker = to_slot == heater_shaker_slot
 
         # If heater-shaker is running, can't move to or around it
