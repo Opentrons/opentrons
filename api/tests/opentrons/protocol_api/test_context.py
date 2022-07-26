@@ -1225,6 +1225,7 @@ def test_move_to_with_thermocycler(
 
 
 def test_move_to_with_heater_shaker(
+    ctx: papi.ProtocolContext,
     hardware: ThreadManagedHardware,
     enable_heater_shaker_python_api: AsyncGenerator[None, None],
 ) -> None:
@@ -1233,10 +1234,6 @@ def test_move_to_with_heater_shaker(
     def raiser(*args, **kwargs):
         raise RuntimeError("Cannot")
 
-    # TODO (spp. 2022-07-20): use the ctx fixture once h/s ff is removed
-    ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
-    )
     mod = ctx.load_module("heaterShakerModuleV1", 1)
 
     assert isinstance(mod, HeaterShakerContext)
