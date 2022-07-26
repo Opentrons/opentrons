@@ -608,6 +608,9 @@ describe('StepText', () => {
     getByText(
       'Thermocycler starting 3 repetitions of cycle composed of the following steps:'
     )
+    getByText('temperature: 50°C, seconds: 60')
+    getByText('temperature: 20°C, seconds: 30')
+    getByText('temperature: 10°C, seconds: 10')
   })
 
   it('renders correct command text for holding tc time', () => {

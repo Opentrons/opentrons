@@ -128,5 +128,5 @@
   "latching_hs_latch": "Latching labware on Heater-Shaker",
   "deactivate_hs_shake": "Deactivating Heater-Shaker Shaker",
   "wait_for_duration": "Pause for {{seconds}} seconds",
-  "tc_run_profile_steps": "<li>temperature: {{celsius}}°C, seconds: {{seconds}}</li>"
+  "tc_run_profile_steps": "temperature: {{celsius}}°C, seconds: {{seconds}}"
 }

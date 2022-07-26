@@ -7,7 +7,6 @@ import { StyledText } from '../../../atoms/text'
 import { getLabwareLocation } from '../ProtocolRun/utils/getLabwareLocation'
 import {
   useLabwareRenderInfoForRunById,
-  useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
 } from '../hooks'
 import { RunLogProtocolSetupInfo } from './RunLogProtocolSetupInfo'
