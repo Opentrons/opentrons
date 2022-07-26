@@ -1,13 +1,11 @@
 """Gravimetric."""
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Tuple, List
+from typing import List
 
 from opentrons.protocol_api import ProtocolContext
 
-from hardware_testing import labware
 from hardware_testing import liquid
-from hardware_testing import pipette
 from hardware_testing.data import create_run_id_and_start_time
 from hardware_testing.labware.position import (
     VIAL_SAFE_Z_OFFSET,
@@ -26,8 +24,8 @@ LIQUID_CLASS_LOOKUP = {300: liquid.defaults.DEFAULT_LIQUID_CLASS_OT2_P300_SINGLE
 
 
 @dataclass
-class SetupConfig:
-    """Setup Config."""
+class ExecuteGravConfig:
+    """Execute Gravimetric Setup Config."""
 
     name: str
     labware_dir: Path
@@ -35,9 +33,17 @@ class SetupConfig:
     pipette_mount: str
 
 
-def setup(
-    ctx: ProtocolContext, cfg: SetupConfig
-) -> Tuple[PipetteLiquidClass, LiquidTracker, LayoutLabware, GravimetricRecorder]:
+@dataclass
+class ExecuteGravItems:
+    """Execute Gravimetric Items."""
+
+    liquid_pipette: PipetteLiquidClass
+    liquid_tracker: LiquidTracker
+    layout: LayoutLabware
+    recorder: GravimetricRecorder
+
+
+def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> ExecuteGravItems:
     """Setup."""
     # RUN ID (for labelling data)
     run_id, start_time = create_run_id_and_start_time()
@@ -84,39 +90,44 @@ def setup(
             stable=False,
         ),
     )
-    return _liq_pip, _liq_track, _layout, _recorder
+    return ExecuteGravItems(
+        liquid_pipette=_liq_pip,
+        liquid_tracker=_liq_track,
+        layout=_layout,
+        recorder=_recorder,
+    )
 
 
 def run(
-    liq_pipette: pipette.liquid_class.PipetteLiquidClass,
-    layout: labware.layout.LayoutLabware,
-    liquid_level: liquid.height.LiquidTracker,
-    recorder: GravimetricRecorder,
+    ctx: ProtocolContext,
+    items: ExecuteGravItems,
     volumes: List[float],
     samples: int,
 ) -> None:
     """Run."""
-    liq_pipette.record_timestamp_enable()
+    items.liquid_pipette.record_timestamp_enable()
     try:
-        recorder.record(in_thread=True)
+        items.recorder.record(in_thread=True)
         sample_volumes = [v for v in volumes for _ in range(samples)]
-        if liq_pipette.pipette.has_tip:
-            liq_pipette.pipette.drop_tip()
-        grav_well = layout.vial["A1"]  # type: ignore[index]
+        if items.liquid_pipette.pipette.has_tip:
+            items.liquid_pipette.pipette.drop_tip()
+        grav_well = items.layout.vial["A1"]  # type: ignore[index]
         for i, sample_volume in enumerate(sample_volumes):
-            print(f"{i + 1}/{len(sample_volumes)}: {sample_volume} uL")
-            liq_pipette.create_empty_timestamp(tag=str(sample_volume))
-            liq_pipette.pipette.pick_up_tip()
-            liq_pipette.aspirate(sample_volume, grav_well, liquid_level=liquid_level)
-            liq_pipette.dispense(sample_volume, grav_well, liquid_level=liquid_level)
-            liq_pipette.pipette.drop_tip()
-            liq_pipette.save_latest_timestamp()
+            ctx.comment(f"{i + 1}/{len(sample_volumes)}: {sample_volume} uL")
+            items.liquid_pipette.create_empty_timestamp(tag=str(sample_volume))
+            items.liquid_pipette.pipette.pick_up_tip()
+            items.liquid_pipette.aspirate(
+                sample_volume, grav_well, liquid_level=items.liquid_tracker
+            )
+            items.liquid_pipette.dispense(
+                sample_volume, grav_well, liquid_level=items.liquid_tracker
+            )
+            items.liquid_pipette.pipette.drop_tip()
+            items.liquid_pipette.save_latest_timestamp()
     finally:
-        recorder.stop()
+        items.recorder.stop()
 
 
-def analyze(
-    recorder: GravimetricRecorder, liq_pipette: pipette.liquid_class.PipetteLiquidClass
-) -> None:
+def analyze(ctx: ProtocolContext, items: ExecuteGravItems) -> None:
     """Analyze."""
     print("skipping analysis")

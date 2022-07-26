@@ -28,9 +28,14 @@ def create_folder_for_test_data(test_name: str) -> Path:
     return test_path
 
 
+def create_datetime_string() -> str:
+    """Create datetime string."""
+    return datetime.now().strftime("%y%m%d%H%M%S")
+
+
 def create_run_id() -> str:
     """Create a run ID using datetime string."""
-    return f'run-{datetime.now().strftime("%y%m%d%H%M%S")}'
+    return f"run-{create_datetime_string()}"
 
 
 def create_run_id_and_start_time() -> Tuple[str, float]:

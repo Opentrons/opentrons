@@ -6,6 +6,32 @@ from opentrons import protocol_api, execute, simulate
 from opentrons.protocol_api.labware import Well
 from opentrons.hardware_control.thread_manager import ThreadManagerException
 
+from .workarounds import is_running_in_app
+
+
+def _add_fake_simulate(
+    ctx: protocol_api.ProtocolContext, is_simulating: bool
+) -> protocol_api.ProtocolContext:
+    def _is_simulating(_: protocol_api.ProtocolContext) -> bool:
+        return is_simulating
+
+    setattr(ctx, "is_simulating", MethodType(_is_simulating, ctx))
+    return ctx
+
+
+def _add_fake_comment_pause(
+    ctx: protocol_api.ProtocolContext,
+) -> protocol_api.ProtocolContext:
+    def _comment(_: protocol_api.ProtocolContext, a: Any) -> None:
+        print(a)
+
+    def _pause(_: protocol_api.ProtocolContext, a: Any) -> None:
+        input(a)
+
+    setattr(ctx, "comment", MethodType(_comment, ctx))
+    setattr(ctx, "pause", MethodType(_pause, ctx))
+    return ctx
+
 
 def get_api_context(
     api_level: str, is_simulating: bool = False, connect_to_smoothie: bool = True
@@ -24,14 +50,11 @@ def get_api_context(
             pass
     if not able_to_execute or is_simulating or not connect_to_smoothie:
         ctx = simulate.get_protocol_api(api_level)
-
-    if not able_to_execute or not connect_to_smoothie:
-
-        def _fake_context_is_simulating(_: Any) -> bool:
-            return is_simulating
-
-        setattr(ctx, "is_simulating", MethodType(_fake_context_is_simulating, ctx))
     assert ctx
+    if not able_to_execute or not connect_to_smoothie:
+        _add_fake_simulate(ctx, is_simulating)
+    if not is_running_in_app():
+        _add_fake_comment_pause(ctx)
     return ctx
 
 

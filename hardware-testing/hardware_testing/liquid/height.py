@@ -207,7 +207,9 @@ class LiquidTracker:
         for key in self._items:
             del self._items[key]
 
-    def print_setup_instructions(self, user_confirm: bool = False) -> None:
+    def print_setup_instructions(
+        self, ctx: ProtocolContext, user_confirm: bool = False
+    ) -> None:
         """Print setup instructions."""
         found = [
             (well, tracker)
@@ -216,13 +218,13 @@ class LiquidTracker:
         ]
         if not len(found):
             return
-        print("Add the following volumes (uL) to the specified wells:")
+        ctx.comment("Add the following volumes (uL) to the specified wells:")
         for well, tracker in found:
-            print(
+            ctx.comment(
                 f"\t{tracker.name}   -> {int(tracker.get_volume())} uL -> {well.display_name}"
             )
         if user_confirm:
-            input("\npress ENTER when ready...")
+            ctx.pause("press ENTER when ready...")
 
     def init_well_liquid_height(
         self, well: Well, lookup_table: Optional[list] = None

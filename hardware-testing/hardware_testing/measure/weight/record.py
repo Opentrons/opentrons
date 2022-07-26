@@ -293,14 +293,14 @@ class GravimetricRecorder:
     def record(self, in_thread: bool = False) -> None:
         """Record."""
         if in_thread:
-            if self._thread is not None:
-                assert not self._thread.is_alive()
+            assert not self.is_in_thread
             if self._is_recording.is_set():
                 self._is_recording.clear()
             self._thread = Thread(target=self.run)
             self._thread.start()  # creates the thread
             self._is_recording.set()
             self._reading_samples.wait()
+            assert self.is_in_thread
         else:
             if not self._is_recording.is_set():
                 self._is_recording.set()
@@ -325,10 +325,15 @@ class GravimetricRecorder:
         """Is Recording."""
         return self._is_recording.is_set()
 
+    @property
+    def is_in_thread(self) -> bool:
+        """Is in thread."""
+        return self._thread is not None and self._thread.is_alive()
+
     def stop(self) -> None:
         """Stop."""
         self._is_recording.clear()
-        if self._thread is not None and self._thread.is_alive():
+        if self._thread and self.is_in_thread:
             self._thread.join()
 
     def _wait_for_record_start(self) -> None:
@@ -341,7 +346,7 @@ class GravimetricRecorder:
         on_new_sample: Optional[Callable] = None,
     ) -> GravimetricRecording:
         """Record samples from the scale."""
-        assert self._cfg.duration or (self._thread and self._thread.is_alive())
+        assert self._cfg.duration or self.is_in_thread
         assert self._cfg.frequency
         if self._cfg.duration:
             length = int(self._cfg.duration * self._cfg.frequency) + 1
@@ -370,7 +375,8 @@ class GravimetricRecorder:
                 _recording.append(_s)
                 if callable(on_new_sample):
                     on_new_sample(_recording)
-            sleep(SLEEP_TIME_IN_RECORD_LOOP)
+            if self.is_in_thread:
+                sleep(SLEEP_TIME_IN_RECORD_LOOP)
         self._reading_samples.clear()
         assert len(_recording) == length or not self.is_recording, (
             f"Scale recording timed out before accumulating "
