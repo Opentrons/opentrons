@@ -76,10 +76,10 @@ export function RobotSettings(): JSX.Element | null {
     return <Redirect to={`/devices/${robotName}/robot-settings/networking`} />
   }
 
-  const robotSettingsContent =
-    robotSettingsContentByTab[robotSettingsTab] ??
+  const robotSettingsContent = robotSettingsContentByTab[robotSettingsTab] ?? (
     // default to the calibration tab if no tab or nonexistent tab is passed as a param
-    (() => <Redirect to={`/devices/${robotName}/robot-settings/calibration`} />)
+    <Redirect to={`/devices/${robotName}/robot-settings/calibration`} />
+  )
 
   return (
     <Box
