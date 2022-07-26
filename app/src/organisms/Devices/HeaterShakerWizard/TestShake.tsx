@@ -223,9 +223,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           alignItems={ALIGN_FLEX_START}
           marginY={SPACING.spacing6}
         >
-          <StyledText width="22rem">
-            {t('troubleshoot_step1_description')}
-          </StyledText>
+          <StyledText width="22rem">{t('troubleshoot_step_1')}</StyledText>
           <TertiaryButton
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
@@ -235,9 +233,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           </TertiaryButton>
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
-          <StyledText width="22rem">
-            {t('troubleshoot_step3_description')}
-          </StyledText>
+          <StyledText width="22rem">{t('troubleshoot_step_3')}</StyledText>
           <TertiaryButton
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
