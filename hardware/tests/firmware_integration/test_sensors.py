@@ -2,6 +2,7 @@
 import asyncio
 
 import pytest
+from typing import Union, Tuple
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorId,
@@ -42,8 +43,6 @@ from opentrons_hardware.sensors.utils import SensorDataType
     argnames=["sensor_type", "register_address"],
     argvalues=[
         [SensorType.capacitive, 0xFF],
-        [SensorType.humidity, 0xFE],
-        [SensorType.temperature, 0xFE],
         [SensorType.pressure, 0xC2],
     ],
 )
@@ -72,8 +71,7 @@ async def test_write_to_sensors(
     argnames=["sensor_type", "expected_data"],
     argvalues=[
         [SensorType.capacitive, 0.46],
-        [SensorType.humidity, 83.92],
-        [SensorType.temperature, 22.44],
+        [SensorType.environment, (83.92, 22.44)],
         [SensorType.pressure, 0.02],
     ],
 )
@@ -82,7 +80,7 @@ async def test_read_from_sensors(
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     sensor_type: SensorType,
-    expected_data: float,
+    expected_data: Union[float, Tuple],
 ) -> None:
     """We should be able to read from all the sensors."""
     read_message = ReadFromSensorRequest(
