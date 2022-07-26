@@ -3,9 +3,11 @@ import { Trans, useTranslation } from 'react-i18next'
 import { Flex, ALIGN_CENTER, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
+import { StyledText } from '../../../atoms/text'
 import { getLabwareLocation } from '../ProtocolRun/utils/getLabwareLocation'
 import {
   useLabwareRenderInfoForRunById,
+  useModuleRenderInfoForProtocolById,
   useProtocolDetailsForRun,
 } from '../hooks'
 import { RunLogProtocolSetupInfo } from './RunLogProtocolSetupInfo'
@@ -130,6 +132,123 @@ export function StepText(props: Props): JSX.Element | null {
           setupCommand={displayCommand}
         />
       )
+      break
+    }
+    case 'magneticModule/engage': {
+      messageNode = t('engaging_magnetic_module')
+      break
+    }
+    case 'magneticModule/disengage': {
+      messageNode = t('disengaging_magnetic_module')
+      break
+    }
+    case 'temperatureModule/setTargetTemperature': {
+      const { celsius } = displayCommand.params
+      messageNode = t('setting_temperature_module_temp', { temp: celsius })
+      break
+    }
+    case 'temperatureModule/deactivate': {
+      messageNode = t('deactivate_temperature_module')
+      break
+    }
+    case 'temperatureModule/waitForTemperature': {
+      const { celsius } = displayCommand.params
+      messageNode = t('waiting_to_reach_temp_module', { temp: celsius })
+      break
+    }
+    case 'thermocycler/setTargetBlockTemperature': {
+      const { celsius } = displayCommand.params
+      messageNode = t('setting_thermocycler_block_temp', { temp: celsius })
+      break
+    }
+    case 'thermocycler/setTargetLidTemperature': {
+      const { celsius } = displayCommand.params
+      messageNode = t('setting_thermocycler_lid_temp', { temp: celsius })
+      break
+    }
+    case 'thermocycler/waitForBlockTemperature': {
+      messageNode = t('waiting_for_tc_block_to_reach')
+      break
+    }
+    case 'thermocycler/waitForLidTemperature': {
+      messageNode = t('waiting_for_tc_lid_to_reach')
+      break
+    }
+    case 'thermocycler/openLid': {
+      messageNode = t('opening_tc_lid')
+      break
+    }
+    case 'thermocycler/closeLid': {
+      messageNode = t('closing_tc_lid')
+      break
+    }
+    case 'thermocycler/deactivateBlock': {
+      messageNode = t('deactivating_tc_block')
+      break
+    }
+    case 'thermocycler/deactivateLid': {
+      messageNode = t('deactivating_tc_lid')
+      break
+    }
+    case 'thermocycler/runProfile': {
+      const { profile } = displayCommand.params
+      const steps = profile.map(
+        ({ holdSeconds, celsius }: { holdSeconds: number; celsius: number }) =>
+          t('tc_run_profile_steps', { celsius: celsius, seconds: holdSeconds })
+      )
+      messageNode = (
+        <Flex>
+          <StyledText>
+            {t('tc_starting_profile', {
+              repetitions: Object.keys(steps).length,
+            })}
+          </StyledText>
+          <ul>
+            {steps.map((step: string, index: number) => (
+              <li key={index}> {step}</li>
+            ))}
+          </ul>
+        </Flex>
+      )
+      break
+    }
+    case 'thermocycler/awaitProfileComplete': {
+      messageNode = t('tc_awaiting_for_duration')
+      break
+    }
+    case 'heaterShaker/setTargetTemperature': {
+      const { celsius } = displayCommand.params
+      messageNode = t('setting_hs_temp', { temp: celsius })
+      break
+    }
+    case 'heaterShaker/waitForTemperature': {
+      messageNode = t('waiting_for_hs_to_reach')
+      break
+    }
+    case 'heaterShaker/setAndWaitForShakeSpeed': {
+      const { rpm } = displayCommand.params
+      messageNode = t('set_and_await_hs_shake', { rpm: rpm })
+      break
+    }
+    case 'heaterShaker/deactivateHeater': {
+      messageNode = t('deactivating_hs_heater')
+      break
+    }
+    case 'heaterShaker/openLabwareLatch': {
+      messageNode = t('unlatching_hs_latch')
+      break
+    }
+    case 'heaterShaker/closeLabwareLatch': {
+      messageNode = t('latching_hs_latch')
+      break
+    }
+    case 'heaterShaker/deactivateShaker': {
+      messageNode = t('deactivate_hs_shake')
+      break
+    }
+    case 'waitForDuration': {
+      const { seconds } = displayCommand.params
+      messageNode = t('wait_for_duration', { seconds: seconds })
       break
     }
     case 'custom': {

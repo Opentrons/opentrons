@@ -22,6 +22,7 @@ export type ModuleRunTimeCommand =
   | HeaterShakerOpenLatchRunTimeCommand
   | HeaterShakerCloseLatchRunTimeCommand
   | HeaterShakerDeactivateHeaterRunTimeCommand
+  | HeaterShakerDeactivateShakerCreateCommand
 
 export type ModuleCreateCommand =
   | MagneticModuleEngageMagnetCreateCommand
