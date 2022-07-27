@@ -107,36 +107,57 @@ http/thermocycler_deactivate_lid
 http/thermocycler_open
 http/thermocycler_set_lid_temperature
 http/thermocycler_set_temperature
-protocols/2.12/2_modules
-protocols/2.12/2_single_channel
-protocols/2.12/basic_smoothie
-protocols/2.12/beckman_coulter_rna_advance_viral_rna_isolation
-protocols/2.12/cherrypicking
-protocols/2.12/customizable_serial_dilution_ot2
-protocols/2.12/illumina_nextera_xt_library_prep_part1
-protocols/2.12/omega_biotek_magbind_totalpure_ngs
-protocols/2.12/opentrons_logo
-protocols/2.12/pcr_prep_part_1
-protocols/2.12/pcr_prep_part_2
-protocols/2.12/set_max_speed
-protocols/2.12/swift_smoke
-protocols/2.12/swift_turbo
-protocols/2.13/2_modules
-protocols/2.13/2_single_channel
-protocols/2.13/basic_smoothie
-protocols/2.13/beckman_coulter_rna_advance_viral_rna_isolation
-protocols/2.13/cherrypicking
-protocols/2.13/customizable_serial_dilution_ot2
-protocols/2.13/illumina_nextera_xt_library_prep_part1
-protocols/2.13/omega_biotek_magbind_totalpure_ngs
-protocols/2.13/opentrons_logo
-protocols/2.13/pcr_prep_part_1
-protocols/2.13/pcr_prep_part_2
-protocols/2.13/set_max_speed
-protocols/2.13/swift_smoke
-protocols/2.13/swift_turbo
-
+protocols/2_modules/2.12
+protocols/2_modules/2.13
+protocols/2_single_channel/2.12
+protocols/2_single_channel/2.13
+protocols/basic_smoothie/2.12
+protocols/basic_smoothie/2.13
+protocols/beckman_coulter_rna_advance_viral_rna_isolation/2.12
+protocols/beckman_coulter_rna_advance_viral_rna_isolation/2.13
+protocols/cherrypicking/2.12
+protocols/cherrypicking/2.13
+protocols/customizable_serial_dilution_ot2/2.12
+protocols/customizable_serial_dilution_ot2/2.13
+protocols/illumina_nextera_xt_library_prep_part1/2.12
+protocols/illumina_nextera_xt_library_prep_part1/2.13
+protocols/omega_biotek_magbind_totalpure_ngs/2.12
+protocols/omega_biotek_magbind_totalpure_ngs/2.13
+protocols/opentrons_logo/2.12
+protocols/opentrons_logo/2.13
+protocols/pcr_prep_part_1/2.12
+protocols/pcr_prep_part_1/2.13
+protocols/pcr_prep_part_2/2.12
+protocols/pcr_prep_part_2/2.13
+protocols/set_max_speed/2.12
+protocols/set_max_speed/2.13
+protocols/swift_smoke/2.12
+protocols/swift_smoke/2.13
+protocols/swift_turbo/2.12
+protocols/swift_turbo/2.13
 ```
+
+### G-Code Command Globbing
+
+The following commands support globbing of the passed `name` argument:
+
+- `run-g-code-configuration`
+- `load-g-code-configuration-comparison`
+- `diff-g-code-configuration-comparison`
+- `update-g-code-configuration-comparison`
+
+Examples: 
+
+- Run all `protocols` configurations
+  - `make run-g-code-configuration name=protocols/*/*`
+- Load all `basic_smoothie` configurations with versions 2.1x or greater 
+  - `make load-g-code-configuration-comparison name=protocols/basic_smoothie/2.1*`
+- Diff all `basic_smoothie` configurations
+  - `make diff-g-code-configuration-comparison name=protocols/basic_smoothie/*`
+- Update all `http` configurations
+  - `make update-g-code-configuration-comparison name=http/*`
+- Run all `magdeck` configurations
+  - `make run-g-code-configuration name=http/magdeck*` 
 
 ### Run G-Code Program
 
@@ -150,7 +171,7 @@ make run-g-code-configuration name=protocol/2.13/swift_turbo
 
 ### Load Stored G-Code Program Comparison
 
-To load the stored comparision file use `load-g-code-configuration-comparison
+To load the stored comparision file use `load-g-code-configuration-comparison`
 
 **Command:**
 
@@ -224,7 +245,7 @@ generate a comparison file. To do this follow thse steps:
 1. Run `make check-for-missing-comparison-files` and confirm that it errors out, and lists your
    new protocol/new version as missing
 2. Run `make get-g-code-configurations` and verify that your protocol configuration shows up in the list
-   1. Configuration will be in format of `protocol/<version>/<protocol_name>`
+   1. Configuration will be in format of `protocol/<protocol_name>/<version>`
 3. Run `make run-g-code-configuration name=<configuration_path>` and verify the output of your
    protocol is correct.
 4. Run `update-g-code-configuration-comparison name=<configuration_path>`
