@@ -1,4 +1,7 @@
 # flake8: noqa
+# Note that any apiLevel value passed to metadata will be ignored.
+# Instead apiVersions from g-code-testing/g_code_test_data/protocol/protocol_configurations.py # noqa: E501
+# will be used instead
 metadata = {"apiLevel": "2.7"}
 
 
