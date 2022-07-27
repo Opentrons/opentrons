@@ -492,9 +492,7 @@ describe('StepText', () => {
       analysisCommand: null,
       runCommand: MOCK_SET_TARGET_TEMP_COMMAND as RunCommandSummary,
     })
-    getByText(
-      'Setting Temperature Module temperature to 50°C (rounded off to nearest integer)'
-    )
+    getByText('Setting Temperature Module to 50°C (rounded to nearest integer)')
   })
 
   it('renders correct command text for deactivating temp module', () => {
@@ -515,7 +513,7 @@ describe('StepText', () => {
       runCommand: MOCK_AWAIT_TEMP_COMMAND as RunCommandSummary,
     })
     getByText(
-      'Waiting for Temperature Module to reach temperature 50°C (rounded off to nearest integer)'
+      'Waiting for Temperature Module to reach 50°C (rounded to nearest integer)'
     )
   })
 
@@ -526,7 +524,7 @@ describe('StepText', () => {
       analysisCommand: null,
       runCommand: MOCK_SET_TC_BLOCK_COMMAND as RunCommandSummary,
     })
-    getByText('Setting Thermocycler well block temperature to 50°C')
+    getByText('Setting Thermocycler block temperature to 50°C')
   })
 
   it('renders correct command text for setting TC lid temp', () => {
@@ -662,7 +660,7 @@ describe('StepText', () => {
       analysisCommand: null,
       runCommand: MOCK_HS_DEACTIVATE_TEMP as RunCommandSummary,
     })
-    getByText('Deactivating Heater-Shaker Heater')
+    getByText('Deactivating heater')
   })
 
   it('renders correct command text for deactivate HS shake', () => {
@@ -672,7 +670,7 @@ describe('StepText', () => {
       analysisCommand: null,
       runCommand: MOCK_HS_DEACTIVATE_SHAKE as RunCommandSummary,
     })
-    getByText('Deactivating Heater-Shaker Shaker')
+    getByText('Deactivating shaker')
   })
 
   it('renders correct command text for close hs latch', () => {
