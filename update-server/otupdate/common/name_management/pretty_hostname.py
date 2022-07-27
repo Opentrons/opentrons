@@ -109,11 +109,62 @@ async def persist_pretty_hostname(new_pretty_hostname: str) -> None:
     )
 
 
-def _quote_and_escape_pretty_hostname_value(pretty_hostname: str) -> str:
-    r"""Prepare a string to be used as the PRETTY_HOSTNAME value in /etc/machine-info.
+def _rewrite_machine_info(new_pretty_hostname: str) -> None:
+    """Write a new pretty hostname value to ``/etc/machine-info``.
+
+    Given initial file contents like this:
+
+        DEPLOYMENT=production
+        PRETTY_HOSTNAME="the old name"
+
+    This will rewrite the file like:
+
+        DEPLOYMENT=production
+        PRETTY_HOSTNAME="the NEW name"
+
+    Limitations:
+
+        Preexisting assignments in the file are assumed not to contain
+        any internal newlines, like this:
+
+            MY_VALUE="line 1
+            line 2"
+
+        If they do, this function may not handle it correctly.
+    """
+    encoding = "utf-8"
+    try:
+        with open("/etc/machine-info", encoding=encoding) as emi:
+            contents = emi.read()
+    except OSError:
+        _log.exception("Couldn't read /etc/machine-info")
+        contents = ""
+    new_contents = _rewrite_machine_info_str(
+        current_machine_info_contents=contents, new_pretty_hostname=new_pretty_hostname
+    )
+    with open("/etc/machine-info", "w", encoding=encoding) as emi:
+        emi.write(new_contents)
+
+
+def _rewrite_machine_info_str(
+    current_machine_info_contents: str, new_pretty_hostname: str
+) -> str:
+    current_lines = current_machine_info_contents.splitlines()
+    preserved_lines = [
+        ln for ln in current_lines if not ln.startswith("PRETTY_HOSTNAME")
+    ]
+    new_lines = preserved_lines + [
+        f"PRETTY_HOSTNAME={_quote_and_escape_machine_info_value(new_pretty_hostname)}"
+    ]
+    new_contents = "\n".join(new_lines) + "\n"
+    return new_contents
+
+
+def _quote_and_escape_machine_info_value(value: str) -> str:
+    r"""Prepare a string to be used as a value in /etc/machine-info.
 
     This function implements the shell-like quoting and escaping rules described in
-    the /etc/machine-info documentation.
+    the ``/etc/machine-info`` documentation.
 
     Given a string like:
 
@@ -131,7 +182,6 @@ def _quote_and_escape_pretty_hostname_value(pretty_hostname: str) -> str:
 
     https://www.freedesktop.org/software/systemd/man/machine-info.html
     """
-    assert pretty_hostname_is_valid(pretty_hostname)
     translation_table = str.maketrans(
         # Escape dollar signs, double-quote characters, backslashes, and backticks
         # with a single backslash each.
@@ -142,46 +192,9 @@ def _quote_and_escape_pretty_hostname_value(pretty_hostname: str) -> str:
             "`": r"\`",
         }
     )
-    escaped = pretty_hostname.translate(translation_table)
+    escaped = value.translate(translation_table)
     quoted_and_escaped = f'"{escaped}"'
     return quoted_and_escaped
-
-
-def _rewrite_machine_info(new_pretty_hostname: str) -> None:
-    """Write a new value for the pretty hostname.
-
-    :raises OSError: If the new value could not be written.
-    """
-    try:
-        with open("/etc/machine-info") as emi:
-            contents = emi.read()
-    except OSError:
-        _log.exception("Couldn't read /etc/machine-info")
-        contents = ""
-    new_contents = _rewrite_machine_info_str(
-        current_machine_info_contents=contents, new_pretty_hostname=new_pretty_hostname
-    )
-    with open("/etc/machine-info", "w") as emi:
-        emi.write(new_contents)
-
-
-def _rewrite_machine_info_str(
-    current_machine_info_contents: str, new_pretty_hostname: str
-) -> str:
-    """
-    Return current_machine_info_contents - the full contents of
-    /etc/machine-info - with the PRETTY_HOSTNAME=... line rewritten to refer
-    to new_pretty_hostname.
-    """
-    current_lines = current_machine_info_contents.splitlines()
-    preserved_lines = [
-        ln for ln in current_lines if not ln.startswith("PRETTY_HOSTNAME")
-    ]
-    new_lines = preserved_lines + [
-        f"PRETTY_HOSTNAME={_quote_and_escape_pretty_hostname_value(new_pretty_hostname)}"
-    ]
-    new_contents = "\n".join(new_lines) + "\n"
-    return new_contents
 
 
 # TODO(mm, 2022-07-18): Deduplicate with identical subprocess error-checking code
