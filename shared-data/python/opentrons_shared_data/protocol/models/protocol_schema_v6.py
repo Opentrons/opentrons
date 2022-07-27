@@ -25,6 +25,7 @@ class ProfileStep(BaseModel):
     celsius: float
     holdSeconds: float
 
+
 class WellLocation(BaseModel):
     origin: Optional[str]
     offset: Optional[OffsetVector]

@@ -308,7 +308,7 @@ VALID_TEST_PARAMS = [
                         holdSeconds=5.55,
                     ),
                 ],
-            )
+            ),
         ),
         pe_commands.thermocycler.RunProfileCreate(
             params=pe_commands.thermocycler.RunProfileParams(
@@ -316,17 +316,15 @@ VALID_TEST_PARAMS = [
                 blockMaxVolumeUl=1.11,
                 profile=[
                     pe_commands.thermocycler.RunProfileStepParams(
-                        celsius=2.22,
-                        holdSeconds=3.33
+                        celsius=2.22, holdSeconds=3.33
                     ),
                     pe_commands.thermocycler.RunProfileStepParams(
-                        celsius=4.44,
-                        holdSeconds=5.55
+                        celsius=4.44, holdSeconds=5.55
                     ),
                 ],
             ),
         ),
-    )
+    ),
 ]
 
 
