@@ -37,10 +37,10 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: #16212d26;
+    background: ${COLORS.lightGreyEnabled};
   }
   &:active {
-    background: #16212d40;
+    background: ${COLORS.lightGreyHover};
   }
 `
 export interface LabwareDetailsProps {

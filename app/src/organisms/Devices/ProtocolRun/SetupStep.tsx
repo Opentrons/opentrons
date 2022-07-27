@@ -129,7 +129,7 @@ export function SetupStep({
                 </Flex>
               ) : null}
               <Icon
-                color={COLORS.darkBlack}
+                color={COLORS.darkBlackEnabled}
                 size="1.5rem"
                 css={ACCORDION_STYLE}
                 name={expanded ? 'minus' : 'plus'}

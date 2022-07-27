@@ -469,7 +469,7 @@ export function RobotSettingsCalibration({
             </StyledText>
             <Link
               role="button"
-              color={COLORS.darkBlack}
+              color={COLORS.darkBlackEnabled}
               css={TYPOGRAPHY.pRegular}
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               onClick={() => handleClickDeckCalibration()}

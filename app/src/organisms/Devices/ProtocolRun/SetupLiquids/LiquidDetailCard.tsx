@@ -50,7 +50,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   `
   const ACTIVE_STYLE = css`
     background-color: ${COLORS.lightBlue};
-    border: 1px solid ${COLORS.blue};
+    border: 1px solid ${COLORS.blueEnabled};
   `
   const volumePerWellRange = getWellRangeForLiquidLabwarePair(
     volumeByWell,
@@ -94,7 +94,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           {description != null ? description : null}
         </StyledText>
         <Flex
-          backgroundColor={COLORS.darkBlack + '1A'}
+          backgroundColor={COLORS.darkBlackEnabled + '1A'}
           borderRadius={BORDERS.radiusSoftCorners}
           height={'max-content'}
           width={'max-content'}

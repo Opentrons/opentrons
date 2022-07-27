@@ -46,7 +46,7 @@ export const UnMatchedModuleWarning = (
           <StyledText
             as="p"
             data-testid={`UnMatchedModuleWarning_title`}
-            color={COLORS.darkBlack}
+            color={COLORS.darkBlackEnabled}
           >
             {t('module_mismatch_title')}
           </StyledText>
