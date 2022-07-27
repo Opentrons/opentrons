@@ -42,6 +42,11 @@ async def restart_daemon() -> None:
 
 
 class AvahiClient:
+    """Control how Avahi advertises this machine over mDNS and DNS-SD.
+
+    There should only be one object of this class at a time.
+    """
+
     _COLLISION_POLL_INTERVAL: Final = 5
 
     def __init__(self, sync_client: _SyncClient) -> None:
@@ -51,6 +56,7 @@ class AvahiClient:
 
     @classmethod
     async def connect(cls) -> AvahiClient:
+        """Connect to the system's Avahi daemon and return a client to control it."""
         sync_client = await asyncio.get_running_loop().run_in_executor(
             executor=None,
             func=_SyncClient.connect,
@@ -66,8 +72,8 @@ class AvahiClient:
         * We have a name collision with another device on the network.
           See `listen_for_collisions()`.
 
-        It's safe to call this more than once. If we're already advertising,
-        the existing service name will be replaced with the new one.
+        It's safe to call this more than once. If we're already advertising through
+        this client, the existing service name will be replaced with the new one.
 
         Args:
             service_name: The new Avahi service name under which to start advertising.
