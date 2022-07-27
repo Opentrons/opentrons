@@ -48,7 +48,7 @@ def pretty_hostname_is_valid(pretty_hostname: str) -> bool:
     return not contains_control_characters
 
 
-async def get_pretty_hostname(default: str = "no name set") -> str:
+async def get_pretty_hostname() -> str:
     """Get the currently-configured pretty hostname.
 
     May raise an exception from the underlying ``hostnamectl`` process
