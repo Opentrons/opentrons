@@ -24,7 +24,6 @@ import {
   DISPLAY_BLOCK,
   Link,
   JUSTIFY_SPACE_BETWEEN,
-  Text,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
@@ -505,18 +504,18 @@ export function ProtocolDetails(
               isCurrent={currentTab === 'robot_config'}
               onClick={() => setCurrentTab('robot_config')}
             >
-              <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
+              <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
                 {t('robot_configuration')}
-              </Text>
+              </StyledText>
             </RoundTab>
             <RoundTab
               data-testid={`ProtocolDetails_labware`}
               isCurrent={currentTab === 'labware'}
               onClick={() => setCurrentTab('labware')}
             >
-              <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
+              <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
                 {t('labware')}
-              </Text>
+              </StyledText>
             </RoundTab>
             {liquidSetupEnabled && (
               <RoundTab
@@ -524,9 +523,9 @@ export function ProtocolDetails(
                 isCurrent={currentTab === 'liquids'}
                 onClick={() => setCurrentTab('liquids')}
               >
-                <Text textTransform={TYPOGRAPHY.textTransformCapitalize}>
+                <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
                   {t('liquids')}
-                </Text>
+                </StyledText>
               </RoundTab>
             )}
           </Flex>

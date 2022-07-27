@@ -88,9 +88,9 @@ export const LiquidsLabwareDetailsModal = (
           <Flex
             flexDirection={DIRECTION_COLUMN}
             css={HIDE_SCROLLBAR}
-            maxHeight={'27.125rem'}
+            maxHeight="27.125rem"
             overflowY={'auto'}
-            minWidth={'10.313rem'}
+            minWidth="10.313rem"
             gridGap={SPACING.spacing3}
           >
             {filteredLiquidsInLoadOrder.map((liquid, index) => {

@@ -131,7 +131,7 @@ export const LabwarePositionCheckStepDetail = (
 
   return (
     <Flex
-      padding={'0.75rem'}
+      padding="0.75rem"
       justifyContent={JUSTIFY_CENTER}
       boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
       borderRadius="4px"

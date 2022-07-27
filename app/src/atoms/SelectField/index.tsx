@@ -1,13 +1,11 @@
 import * as React from 'react'
-import cx from 'classnames'
 import find from 'lodash/find'
-
 import { Select } from './Select'
-import styles from './SelectField.css'
+import { COLORS, Flex, TYPOGRAPHY } from '@opentrons/components'
+import { css } from 'styled-components'
 
-import type { SelectProps } from './Select'
+import type { SelectProps, SelectOption } from './Select'
 import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
-import type { SelectOption } from '.'
 
 export interface SelectFieldProps {
   /** optional HTML id for container */
@@ -17,7 +15,7 @@ export interface SelectFieldProps {
   /** react-Select option, usually label, value */
   options: NonNullable<SelectProps['options']>
   /** currently selected value */
-  value?: string | null
+  value: string | null
   /** disable the select */
   disabled?: SelectProps['isDisabled']
   /** optional placeholder  */
@@ -26,13 +24,11 @@ export interface SelectFieldProps {
   menuPosition?: SelectProps['menuPosition']
   /** render function for the option label passed to react-select */
   formatOptionLabel?: SelectProps['formatOptionLabel']
-  /** optional className */
-  className?: string
   /** optional caption. hidden when `error` is given */
   caption?: React.ReactNode
   /** if included, use error style and display error instead of caption */
   error?: string | null
-  /** change handler called with (name, value) */
+  /** change handler called with (name, value, actionMeta) */
   onValueChange?: (
     name: string,
     value: string,
@@ -40,7 +36,19 @@ export interface SelectFieldProps {
   ) => void
   /** blur handler called with (name) */
   onLoseFocus?: (name: string) => void
+  /** optional prop to make select not searchable through typing into the search field  */
+  isSearchable?: boolean
+  /** optional width to specify the width of the select field and dropdown menu */
+  width?: string
 }
+
+const CAPTION_STYLE = css`
+  font-size: ${TYPOGRAPHY.fontSizeCaption};
+  &.error {
+    color: ${COLORS.error};
+    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  }
+`
 
 export function SelectField(props: SelectFieldProps): JSX.Element {
   const {
@@ -51,31 +59,31 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
     placeholder,
     menuPosition,
     formatOptionLabel,
-    className,
     error,
     onValueChange,
     onLoseFocus,
+    isSearchable = true,
+    width,
   } = props
-  // @ts-expect-error(mc, 2021-03-19): resolve this error
-  const allOptions = options.flatMap(og => og.options || [og])
+  const allOptions = options.flatMap(og =>
+    'options' in og ? og.options : [og]
+  )
   const value = find(allOptions, opt => opt.value === props.value) || null
-  const caption = error || props.caption
-  // @ts-expect-error(sa, 2021-6-23): cast value to boolean
-  const captionCx = cx(styles.select_caption, { [styles.error]: error })
-  // @ts-expect-error(sa, 2021-6-23): cast value to boolean
-  const fieldCx = cx(styles.select_field, { [styles.error]: error }, className)
+  const caption = error != null || props.caption
 
   return (
-    <div>
+    <>
       <Select
-        className={fieldCx}
         id={id}
         name={name}
         options={options}
         value={value}
         isDisabled={disabled}
         placeholder={placeholder}
+        isSearchable={isSearchable}
         menuPosition={menuPosition}
+        width={width}
+        tabIndex={2}
         formatOptionLabel={formatOptionLabel}
         onChange={(
           opt: SingleValue<SelectOption> | MultiValue<SelectOption>,
@@ -84,9 +92,9 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
           const value = (opt as SelectOption).value
           onValueChange?.(name, value, e)
         }}
-        onBlur={() => onLoseFocus && onLoseFocus(name)}
+        onBlur={() => onLoseFocus?.(name)}
       />
-      {caption && <p className={captionCx}>{caption}</p>}
-    </div>
+      {caption != null && <Flex css={CAPTION_STYLE}>{caption}</Flex>}
+    </>
   )
 }

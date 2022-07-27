@@ -3,11 +3,21 @@ import logging
 import os
 from pathlib import Path
 from glob import glob
-from typing import Any, Dict, Tuple, Optional, Union
+from typing import Any, AsyncGenerator, Dict, Tuple, Optional, Union
 from .types import UpdateError
 from .mod_abc import AbstractModule
+from opentrons.hardware_control.threaded_async_lock import ThreadedAsyncLock
+from contextlib import asynccontextmanager
 
 log = logging.getLogger(__name__)
+
+_dfu_transition_lock = ThreadedAsyncLock()
+
+
+@asynccontextmanager
+async def protect_dfu_transition() -> AsyncGenerator[None, None]:
+    async with _dfu_transition_lock.lock():
+        yield
 
 
 async def update_firmware(
@@ -19,13 +29,15 @@ async def update_firmware(
 
     raises an UpdateError with the reason for the failure.
     """
-    flash_port = await module.prep_for_update()
+    flash_port_or_dfu_serial = await module.prep_for_update()
     kwargs: Dict[str, Any] = {
         "stdout": asyncio.subprocess.PIPE,
         "stderr": asyncio.subprocess.PIPE,
         "loop": loop,
     }
-    successful, res = await module.bootloader()(flash_port, str(firmware_file), kwargs)
+    successful, res = await module.bootloader()(
+        flash_port_or_dfu_serial, str(firmware_file), kwargs
+    )
     if not successful:
         log.info(f"Bootloader reponse: {res}")
         raise UpdateError(res)
@@ -48,6 +60,48 @@ async def find_bootloader_port() -> str:
                 raise OSError("Multiple new bootloader ports" "found on mode switch")
         await asyncio.sleep(2)
     raise Exception("No ot_module bootloaders found in /dev. Try again")
+
+
+async def find_dfu_device(pid: str) -> str:
+    """Find the dfu device and return its serial number (separate from module serial)"""
+    retries = 5
+    log.info(f"Searching for a dfu device with PID {pid}")
+    while retries != 0:
+        retries -= 1
+        await asyncio.sleep(1)
+        proc = await asyncio.create_subprocess_exec(
+            "dfu-util",
+            "-l",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        await proc.wait()
+        stdout, stderr = await proc.communicate()
+
+        if stdout is None and stderr is None:
+            continue
+        if stderr:
+            raise RuntimeError(f"Error finding dfu device: {stderr.decode()}")
+
+        result = stdout.decode()
+        if pid not in result:
+            # It could take a few seconds for the device to show up
+            continue
+        devices_found = 0
+        for line in result.splitlines():
+            if pid in line:
+                log.info(f"Found device with PID {pid}")
+                devices_found += 1
+                serial = line[(line.find("serial=") + 7) :]
+        if devices_found == 2:
+            return serial
+        elif devices_found > 2:
+            raise OSError("Multiple new bootloader devices" "found on mode switch")
+
+    raise RuntimeError(
+        "Could not update firmware via dfu. Possible issues- dfu-util"
+        " not working or specified dfu device not found"
+    )
 
 
 async def upload_via_avrdude(
@@ -141,10 +195,37 @@ async def upload_via_bossa(
 
 
 async def upload_via_dfu(
-    port: str, firmware_file: str, kwargs: Dict[str, Any]
+    dfu_serial: str, firmware_file_path: str, kwargs: Dict[str, Any]
 ) -> Tuple[bool, str]:
-    """Run a TBD firmware upload command for heater/shaker.
+    """Run firmware upload command for DFU.
 
     Returns tuple of success boolean and message from bootloader
     """
-    return False, ""
+    log.info("Starting firmware upload via dfu util")
+
+    # We don't specify a port since the dfu device doesn't get one &
+    # dfu-util doesn't need it either so I've replaced the 'port' arg with an arg to
+    # fetch dfu device serial. I haven't used it in the below command though.
+    dfu_args = [
+        "dfu-util",
+        "-a 0",
+        "-s 0x08000000:leave",
+        f"-D{firmware_file_path}",
+        "-R",
+    ]
+    proc = await asyncio.create_subprocess_exec(*dfu_args, **kwargs)
+    stdout, stderr = await proc.communicate()
+    res = stdout.decode()
+
+    if "File downloaded successfully" in res:
+        log.debug(res)
+        log.info("Firmware upload successful")
+        return True, res
+    else:
+        log.error(
+            f"Failed to update module firmware for {dfu_serial}. "
+            # It isn't easy to decipher the issue from stderror alone
+            f"stdout: {res} \n"
+            f"stderr: {stderr.decode()}"
+        )
+        return False, res

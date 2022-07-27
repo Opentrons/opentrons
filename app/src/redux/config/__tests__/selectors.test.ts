@@ -47,8 +47,8 @@ describe('shell selectors', () => {
     it('should return "latest" and "beta" options if config is unknown', () => {
       const state: State = { config: null } as any
       expect(Selectors.getUpdateChannelOptions(state)).toEqual([
-        { name: 'Stable', value: 'latest' },
-        { name: 'Beta', value: 'beta' },
+        { label: 'Stable', value: 'latest' },
+        { label: 'Beta', value: 'beta' },
       ])
     })
 
@@ -57,8 +57,8 @@ describe('shell selectors', () => {
         config: { devtools: false, update: { channel: 'latest' } },
       } as any
       expect(Selectors.getUpdateChannelOptions(state)).toEqual([
-        { name: 'Stable', value: 'latest' },
-        { name: 'Beta', value: 'beta' },
+        { label: 'Stable', value: 'latest' },
+        { label: 'Beta', value: 'beta' },
       ])
     })
 
@@ -67,9 +67,9 @@ describe('shell selectors', () => {
         config: { devtools: true, update: { channel: 'latest' } },
       } as any
       expect(Selectors.getUpdateChannelOptions(state)).toEqual([
-        { name: 'Stable', value: 'latest' },
-        { name: 'Beta', value: 'beta' },
-        { name: 'Alpha', value: 'alpha' },
+        { label: 'Stable', value: 'latest' },
+        { label: 'Beta', value: 'beta' },
+        { label: 'Alpha', value: 'alpha' },
       ])
     })
 
@@ -78,9 +78,9 @@ describe('shell selectors', () => {
         config: { devtools: false, update: { channel: 'alpha' } },
       } as any
       expect(Selectors.getUpdateChannelOptions(state)).toEqual([
-        { name: 'Stable', value: 'latest' },
-        { name: 'Beta', value: 'beta' },
-        { name: 'Alpha', value: 'alpha' },
+        { label: 'Stable', value: 'latest' },
+        { label: 'Beta', value: 'beta' },
+        { label: 'Alpha', value: 'alpha' },
       ])
     })
   })

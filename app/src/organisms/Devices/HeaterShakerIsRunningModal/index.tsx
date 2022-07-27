@@ -7,13 +7,13 @@ import {
   Box,
   DIRECTION_ROW,
   SPACING,
-  Text,
   TYPOGRAPHY,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { Modal } from '../../../atoms/Modal'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
 import { HeaterShakerModule } from '../../../redux/modules/types'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
 
@@ -73,9 +73,9 @@ export const HeaterShakerIsRunningModal = (
       <Box>
         <HeaterShakerModuleCard module={module} />
       </Box>
-      <Text fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.darkBlackEnabled}>
+      <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
         {t('continue_shaking_protocol_start_prompt')}
-      </Text>
+      </StyledText>
 
       <Flex justifyContent={JUSTIFY_FLEX_END}>
         <SecondaryButton

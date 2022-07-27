@@ -80,7 +80,7 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
       marginTop={SPACING.spacing3}
       border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
       flexDirection={DIRECTION_ROW}
-      width={'21.5rem'}
+      width="21.5rem"
       paddingBottom={SPACING.spacing3}
     >
       {props.image != null ? (
