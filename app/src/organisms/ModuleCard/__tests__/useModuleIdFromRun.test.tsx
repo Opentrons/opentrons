@@ -7,11 +7,14 @@ import {
   useProtocolDetailsForRun,
 } from '../../Devices/hooks'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
-import { mockMagneticModule } from '../../../redux/modules/__fixtures__'
+import {
+  mockMagneticModule,
+  mockThermocycler,
+} from '../../../redux/modules/__fixtures__'
 
 import type { Store } from 'redux'
 import type { State } from '../../../redux/types'
-import { MagneticModule } from '../../../redux/modules/types'
+import type { MagneticModule } from '../../../redux/modules/types'
 
 jest.mock('../../Devices/hooks')
 
@@ -161,7 +164,7 @@ describe('useModuleIdFromRun', () => {
     expect(moduleIdFromRun.moduleIdFromRun).toBe('magneticModuleId_1')
   })
 
-  it('should return a the correct module id when there is multiples of a module', () => {
+  it('should return the correct module id when there is multiples of a module', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <Provider store={store}>{children}</Provider>
     )
@@ -176,5 +179,19 @@ describe('useModuleIdFromRun', () => {
     const moduleIdFromRun = result.current
 
     expect(moduleIdFromRun.moduleIdFromRun).toBe('magneticModuleId_2')
+  })
+
+  it('should return an empty string if moduleIndex equals null meaning module is not included in protocol', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <Provider store={store}>{children}</Provider>
+    )
+    mockUseAttachedModules.mockReturnValue([mockThermocycler])
+    const { result } = renderHook(
+      () => useModuleIdFromRun(mockMagneticModule, RUN_ID),
+      { wrapper }
+    )
+    const moduleIdFromRun = result.current
+
+    expect(moduleIdFromRun.moduleIdFromRun).toBe('')
   })
 })

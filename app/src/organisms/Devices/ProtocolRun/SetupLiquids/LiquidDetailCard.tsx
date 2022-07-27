@@ -60,11 +60,10 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     <Box
       css={selectedValue === liquidId ? ACTIVE_STYLE : LIQUID_CARD_STYLE}
       borderRadius={BORDERS.radiusSoftCorners}
-      marginBottom={SPACING.spacing3}
       padding={SPACING.spacing4}
       backgroundColor={COLORS.white}
       onClick={() => setSelectedValue(liquidId)}
-      width={'10.3rem'}
+      width="10.3rem"
       minHeight={'max-content'}
     >
       <Flex
@@ -73,7 +72,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       >
         <Flex
           css={BORDERS.cardOutlineBorder}
-          padding={'0.75rem'}
+          padding={SPACING.spacing3}
           height={'max-content'}
           width={'max-content'}
           backgroundColor={COLORS.white}
@@ -81,7 +80,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           <Icon name="circle" color={displayColor} size={SIZE_1} />
         </Flex>
         <StyledText
-          as="p"
+          as="h3"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing3}
         >
@@ -118,20 +117,20 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                 key={index}
                 flexDirection={DIRECTION_ROW}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
+                paddingBottom={
+                  index !== volumePerWellRange.length - 1
+                    ? SPACING.spacing3
+                    : '0'
+                }
               >
                 <StyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  marginTop={SPACING.spacing3}
                   marginRight={SPACING.spacing2}
                 >
                   {well.wellName}
                 </StyledText>
-                <StyledText
-                  as="p"
-                  fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  marginTop={SPACING.spacing3}
-                >
+                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
                   {well.volume} {MICRO_LITERS}
                 </StyledText>
               </Flex>

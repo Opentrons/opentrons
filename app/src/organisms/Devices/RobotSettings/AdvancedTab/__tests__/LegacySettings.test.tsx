@@ -6,19 +6,13 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
 import { getRobotSettings } from '../../../../../redux/robot-settings'
-import { useIsRobotBusy } from '../../../hooks'
 
 import { LegacySettings } from '../LegacySettings'
 
 jest.mock('../../../../../redux/robot-settings/selectors')
-jest.mock('../../../hooks')
 
-const mockUpdateRobotStatus = jest.fn()
 const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
   typeof getRobotSettings
->
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
 >
 
 const mockSettings = {
@@ -30,14 +24,10 @@ const mockSettings = {
   restart_required: false,
 }
 
-const render = () => {
+const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
-      <LegacySettings
-        settings={mockSettings}
-        robotName="otie"
-        updateIsRobotBusy={mockUpdateRobotStatus}
-      />
+      <LegacySettings settings={mockSettings} robotName="otie" isRobotBusy />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
@@ -46,7 +36,6 @@ const render = () => {
 describe('RobotSettings LegacySettings', () => {
   beforeEach(() => {
     mockGetRobotSettings.mockReturnValue([mockSettings])
-    mockUseIsRobotBusy.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -79,12 +68,10 @@ describe('RobotSettings LegacySettings', () => {
   })
 
   it('should call update robot status if a robot is busy', () => {
-    mockUseIsRobotBusy.mockReturnValue(true)
-    const [{ getByRole }] = render()
+    const [{ getByRole }] = render(true)
     const toggleButton = getByRole('switch', {
       name: 'legacy_settings',
     })
-    fireEvent.click(toggleButton)
-    expect(mockUpdateRobotStatus).toHaveBeenCalled()
+    expect(toggleButton).toBeDisabled()
   })
 })

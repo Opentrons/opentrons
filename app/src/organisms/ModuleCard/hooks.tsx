@@ -16,7 +16,11 @@ import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocol
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { useProtocolDetailsForRun, useRunStatuses } from '../Devices/hooks'
+import {
+  useProtocolDetailsForRun,
+  useRunStatuses,
+  useIsLegacySessionInProgress,
+} from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
@@ -72,7 +76,7 @@ export function useLatchControls(
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',
     params: {
-      moduleId: runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
+      moduleId: !isRunTerminal ? moduleIdFromRun : module.id,
     },
   }
 
@@ -134,12 +138,8 @@ export function useModuleOverflowMenu(
   const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
-  const {
-    isLegacySessionInProgress,
-    isRunTerminal,
-    isRunStill,
-    isRunIdle,
-  } = useRunStatuses()
+  const isLegacySessionInProgress = useIsLegacySessionInProgress()
+  const { isRunTerminal, isRunStill, isRunIdle } = useRunStatuses()
   const currentRunId = useCurrentRunId()
   let isDisabled: boolean = false
   if (runId != null && isLoadedInRun) {
@@ -154,20 +154,22 @@ export function useModuleOverflowMenu(
   const labwareLatchBtn = (
     <>
       <MenuItem
-        minWidth="10.6rem"
         key={`hs_labware_latch_${module.moduleModel}`}
         data-testid={`hs_labware_latch_${module.moduleModel}`}
         onClick={toggleLatch}
         disabled={isLatchDisabled || isDisabled}
         {...targetProps}
       >
-        {t(isLatchClosed ? 'open_labware_latch' : 'close_labware_latch', {
-          ns: 'heater_shaker',
-        })}
+        {t(
+          isLatchClosed
+            ? 'heater_shaker:open_labware_latch'
+            : 'heater_shaker:close_labware_latch',
+          {}
+        )}
       </MenuItem>
       {isLatchDisabled ? (
         <Tooltip tooltipProps={tooltipProps}>
-          {t('cannot_open_latch', { ns: 'heater_shaker' })}
+          {t('heater_shaker:cannot_open_latch')}
         </Tooltip>
       ) : null}
     </>
@@ -175,7 +177,6 @@ export function useModuleOverflowMenu(
 
   const aboutModuleBtn = (
     <MenuItem
-      minWidth="10.6rem"
       key={`about_module_${module.moduleModel}`}
       id={`about_module_${module.moduleModel}`}
       data-testid={`about_module_${module.moduleModel}`}
@@ -187,45 +188,36 @@ export function useModuleOverflowMenu(
 
   const attachToDeckBtn = (
     <MenuItem
-      minWidth="10.6rem"
       key={`hs_attach_to_deck_${module.moduleModel}`}
       data-testid={`hs_attach_to_deck_${module.moduleModel}`}
       onClick={() => handleWizardClick()}
     >
-      {t('show_attachment_instructions', { ns: 'heater_shaker' })}
+      {t('heater_shaker:show_attachment_instructions')}
     </MenuItem>
   )
   const testShakeBtn =
     module.moduleType === HEATERSHAKER_MODULE_TYPE &&
     module.data.speedStatus !== 'idle' ? (
       <MenuItem
-        minWidth="10.6rem"
-        key={`about_module_${module.moduleModel}`}
-        id={`about_module_${module.moduleModel}`}
-        data-testid={`about_module_${module.moduleModel}`}
+        key={`test_shake_${module.moduleModel}`}
+        id={`test_shake_${module.moduleModel}`}
+        data-testid={`test_shake_${module.moduleModel}`}
+        disabled={isDisabled}
         onClick={() =>
           handleDeactivationCommand('heaterShaker/deactivateShaker')
         }
       >
-        {t('deactivate_shaker', { ns: 'heater_shaker' })}
+        {t('heater_shaker:deactivate_shaker')}
       </MenuItem>
     ) : (
       <MenuItem
-        minWidth="10.6rem"
         onClick={() => handleTestShakeClick()}
         key={`hs_test_shake_btn_${module.moduleModel}`}
         disabled={isDisabled}
       >
-        {t('test_shake', { ns: 'heater_shaker' })}
+        {t('heater_shaker:test_shake')}
       </MenuItem>
     )
-
-  let moduleId: string
-  if (isRunIdle && currentRunId != null && isLoadedInRun) {
-    moduleId = moduleIdFromRun
-  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
-    moduleId = module.id
-  }
 
   const handleDeactivationCommand = (
     deactivateModuleCommandType: deactivateCommandTypes
@@ -239,7 +231,7 @@ export function useModuleOverflowMenu(
       | HeaterShakerDeactivateShakerCreateCommand = {
       commandType: deactivateModuleCommandType,
       params: {
-        moduleId,
+        moduleId: isRunIdle ? moduleIdFromRun : module.id,
       },
     }
     if (isRunIdle && currentRunId != null && isLoadedInRun) {
@@ -251,10 +243,7 @@ export function useModuleOverflowMenu(
           `error setting module status with command type ${deactivateCommand.commandType} and run id ${runId}: ${e.message}`
         )
       })
-    } else if (
-      (currentRunId != null && isRunTerminal) ||
-      currentRunId == null
-    ) {
+    } else if (isRunTerminal || currentRunId == null) {
       createLiveCommand({
         command: deactivateCommand,
       }).catch((e: Error) => {
@@ -335,8 +324,8 @@ export function useModuleOverflowMenu(
         setSetting:
           module.moduleType === HEATERSHAKER_MODULE_TYPE &&
           module.data.temperatureStatus !== 'idle'
-            ? t('deactivate_heater', { ns: 'heater_shaker' })
-            : t('set_temperature', { ns: 'heater_shaker' }),
+            ? t('heater_shaker:deactivate_heater')
+            : t('heater_shaker:set_temperature'),
         isSecondary: false,
         disabledReason: false,
         menuButtons: [

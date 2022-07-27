@@ -70,12 +70,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
           {displayName ?? definitionDisplayName}
         </StyledText>
         {props.labwareHasLiquid && (
-          <Icon
-            name="water"
-            color={COLORS.white}
-            width={'0'}
-            minWidth={'1rem'}
-          />
+          <Icon name="water" color={COLORS.white} width={'0'} minWidth="1rem" />
         )}
       </Flex>
       {vector != null && (

@@ -15,7 +15,6 @@ import {
   TYPOGRAPHY,
   SPACING,
   POSITION_ABSOLUTE,
-  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
 import { startDiscovery } from '../../redux/discovery'
@@ -62,12 +61,12 @@ export function DevicesEmptyState(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
         position={POSITION_ABSOLUTE}
-        bottom="2.5rem"
+        bottom={SPACING.spacingXXL}
         left="0"
         right="0"
-        marginLeft="auto"
-        marginRight="auto"
-        textAlign={TEXT_ALIGN_CENTER}
+        marginLeft={SPACING.spacingAuto}
+        marginRight={SPACING.spacingAuto}
+        textAlign={TYPOGRAPHY.textAlignCenter}
       >
         <Link
           css={TYPOGRAPHY.darkLinkLabelSemiBold}

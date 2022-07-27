@@ -20,7 +20,6 @@ import {
   DISPLAY_BLOCK,
   Icon,
   COLORS,
-  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
@@ -147,7 +146,7 @@ export function ChooseProtocolSlideout(
               >
                 <Box display="grid" gridTemplateColumns="1fr 3fr">
                   <Box
-                    marginY="auto"
+                    marginY={SPACING.spacingAuto}
                     backgroundColor={isSelected ? COLORS.white : 'inherit'}
                     marginRight={SPACING.spacing4}
                     height="4.25rem"
@@ -236,7 +235,7 @@ export function ChooseProtocolSlideout(
           <StyledText
             as="p"
             marginTop={SPACING.spacing3}
-            textAlign={TEXT_ALIGN_CENTER}
+            textAlign={TYPOGRAPHY.textAlignCenter}
           >
             <Trans
               t={t}

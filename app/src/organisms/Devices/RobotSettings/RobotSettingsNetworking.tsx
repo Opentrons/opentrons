@@ -26,6 +26,7 @@ import {
   /* postWifiDisconnect, */
 } from '../../../redux/networking'
 // import * as RobotApi from '../../../redux/robot-api'
+import { useIsRobotBusy } from '../hooks'
 import { TemporarySelectNetwork } from './TemporarySelectNetwork'
 
 import type { State, Dispatch } from '../../../redux/types'
@@ -34,8 +35,6 @@ interface NetworkingProps {
   updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
-// ToDo modify ConnectModal to align with new design
-// This is temporary until we can get the new design details
 const HELP_CENTER_URL =
   'https://support.opentrons.com/s/article/Get-started-Connect-to-your-OT-2-over-USB'
 const STATUS_REFRESH_MS = 5000
@@ -48,6 +47,7 @@ export function RobotSettingsNetworking({
   const { t } = useTranslation('device_settings')
   const list = useSelector((state: State) => getWifiList(state, robotName))
   const dispatch = useDispatch<Dispatch>()
+  const isRobotBusy = useIsRobotBusy({ poll: true })
   // const [dispatchApi] = RobotApi.useDispatchApiRequest()
 
   const { wifi, ethernet } = useSelector((state: State) =>
@@ -62,6 +62,10 @@ export function RobotSettingsNetworking({
     dispatch(fetchStatus(robotName))
     dispatch(fetchWifiList(robotName))
   }, [robotName, dispatch])
+
+  React.useEffect(() => {
+    updateRobotStatus(isRobotBusy)
+  }, [isRobotBusy, updateRobotStatus])
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -84,13 +88,13 @@ export function RobotSettingsNetworking({
           data-testid="RobotSettings_Networking_wifi_icon"
         />
         <StyledText as="h3">
-          {t('wireless_network')}
+          {t('wifi')}
           {activeNetwork?.ssid != null && ` - ${activeNetwork.ssid}`}
         </StyledText>
       </Flex>
       <Flex paddingLeft="3.5rem" marginBottom={SPACING.spacing3}>
         <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-          {t('wireless_network_name')}
+          {t('network_name')}
         </StyledText>
       </Flex>
       <Box paddingLeft="3.5rem" marginBottom={SPACING.spacing4}>
@@ -100,7 +104,7 @@ export function RobotSettingsNetworking({
               <Box width="25%" marginRight={SPACING.spacing3}>
                 <TemporarySelectNetwork
                   robotName={robotName}
-                  updateRobotStatus={updateRobotStatus}
+                  isRobotBusy={isRobotBusy}
                 />
               </Box>
             </Flex>
@@ -119,7 +123,7 @@ export function RobotSettingsNetworking({
                 paddingRight={SPACING.spacing4}
               >
                 <StyledText css={TYPOGRAPHY.pSemiBold}>
-                  {t('wireless_subnet')}
+                  {t('wireless_subnet_mask')}
                 </StyledText>
                 <StyledText as="p">{wifi?.subnetMask}</StyledText>
               </Flex>
@@ -129,7 +133,7 @@ export function RobotSettingsNetworking({
                 paddingRight={SPACING.spacing4}
               >
                 <StyledText css={TYPOGRAPHY.pSemiBold}>
-                  {t('wireless_mac')}
+                  {t('wireless_mac_address')}
                 </StyledText>
                 <StyledText as="p">{wifi?.macAddress}</StyledText>
               </Flex>
@@ -139,14 +143,14 @@ export function RobotSettingsNetworking({
           <Flex flexDirection={DIRECTION_COLUMN}>
             <TemporarySelectNetwork
               robotName={robotName}
-              updateRobotStatus={updateRobotStatus}
+              isRobotBusy={isRobotBusy}
             />
           </Flex>
         )}
       </Box>
       <Divider />
       <Flex marginTop={SPACING.spacing5} marginBottom={SPACING.spacing4}>
-        {ethernet !== null && ethernet.ipAddress !== null ? (
+        {ethernet?.ipAddress != null ? (
           <Icon
             size={SPACING.spacing4}
             name="ot-check"
@@ -167,7 +171,7 @@ export function RobotSettingsNetworking({
       </Flex>
       <Box paddingLeft="3.5rem">
         <Flex marginBottom={SPACING.spacing4}>
-          {ethernet !== null && ethernet.ipAddress !== null ? (
+          {ethernet?.ipAddress != null ? (
             <>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
@@ -183,7 +187,7 @@ export function RobotSettingsNetworking({
                 paddingRight={SPACING.spacing4}
               >
                 <StyledText css={TYPOGRAPHY.pSemiBold}>
-                  {t('wired_subnet')}
+                  {t('wired_subnet_mask')}
                 </StyledText>
                 <StyledText as="p">{ethernet?.subnetMask}</StyledText>
               </Flex>
@@ -192,14 +196,14 @@ export function RobotSettingsNetworking({
                 paddingRight={SPACING.spacing4}
               >
                 <StyledText css={TYPOGRAPHY.pSemiBold}>
-                  {t('wired_mac')}
+                  {t('wired_mac_address')}
                 </StyledText>
                 <StyledText as="p">{ethernet?.macAddress}</StyledText>
               </Flex>
             </>
           ) : (
             <StyledText as="p" marginBottom={SPACING.spacing4}>
-              {t('wired_usb_not_connected_description')}
+              {t('not_connected_via_wired_usb')}
             </StyledText>
           )}
         </Flex>

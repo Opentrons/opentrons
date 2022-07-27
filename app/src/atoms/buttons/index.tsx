@@ -152,7 +152,7 @@ const TOGGLE_DISABLED_STYLES = css`
   }
 
   &:disabled {
-    colors: ${COLORS.greyDisabled};
+    color: ${COLORS.greyDisabled};
   }
 `
 
@@ -168,7 +168,7 @@ const TOGGLE_ENABLED_STYLES = css`
   }
 
   &:disabled {
-    colors: ${COLORS.greyDisabled};
+    color: ${COLORS.greyDisabled};
   }
 `
 

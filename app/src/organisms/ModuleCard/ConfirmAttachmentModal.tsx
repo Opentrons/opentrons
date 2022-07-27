@@ -2,23 +2,23 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import {
-  CheckboxField,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_FLEX_END,
-  Text,
   TEXT_ALIGN_CENTER,
   SPACING,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
-  Btn,
-  COLORS,
+  Link,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { Modal } from '../../atoms/Modal'
+import { StyledText } from '../../atoms/text'
 import { Dispatch } from '../../redux/types'
 import { UpdateConfigValueAction } from '../../redux/config/types'
 import { updateConfigValue } from '../../redux/config'
+import { CheckboxField } from '../../atoms/CheckboxField'
 
 export function setHeaterShakerAttached(
   heaterShakerAttached: boolean
@@ -61,14 +61,14 @@ export const ConfirmAttachmentModal = (
         flexDirection={DIRECTION_COLUMN}
         fontSize={TYPOGRAPHY.fontSizeP}
       >
-        <Text paddingBottom={SPACING.spacing2}>
+        <StyledText paddingBottom={SPACING.spacing2}>
           {t(
             isProceedToRunModal
               ? 'module_anchors_extended'
               : 'module_should_have_anchors'
           )}
-        </Text>
-        <Text>{t('thermal_adapter_attached_to_module')}</Text>
+        </StyledText>
+        <StyledText>{t('thermal_adapter_attached_to_module')}</StyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -84,18 +84,19 @@ export const ConfirmAttachmentModal = (
           }
           value={isDismissed}
         />
-        <Text
+        <StyledText
           paddingTop={SPACING.spacingXXS}
           paddingLeft={SPACING.spacing3}
           fontSize={TYPOGRAPHY.fontSizeP}
         >
           {t('dont_show_me_again', { ns: 'shared' })}
-        </Text>
+        </StyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
         paddingTop={SPACING.spacingXL}
         justifyContent={JUSTIFY_FLEX_END}
+        alignItems={ALIGN_CENTER}
       >
         <Flex
           paddingRight={SPACING.spacing2}
@@ -103,15 +104,15 @@ export const ConfirmAttachmentModal = (
             isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
           }`}
         >
-          <Btn
+          <Link
+            role="button"
             onClick={onCloseClick}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
-            color={COLORS.blue}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            marginRight={SPACING.spacing6}
+            marginRight={SPACING.spacing5}
+            css={TYPOGRAPHY.linkPSemiBold}
           >
             {t('shared:cancel')}
-          </Btn>
+          </Link>
         </Flex>
 
         <Flex

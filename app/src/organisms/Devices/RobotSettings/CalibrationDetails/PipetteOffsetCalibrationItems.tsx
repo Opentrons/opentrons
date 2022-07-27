@@ -67,14 +67,10 @@ export function PipetteOffsetCalibrationItems({
     <StyledTable>
       <thead>
         <tr>
-          <StyledTableHeader>
-            {t('table_header_model_and_serial')}
-          </StyledTableHeader>
-          <StyledTableHeader>{t('table_header_mount')}</StyledTableHeader>
-          <StyledTableHeader>{t('table_header_tiprack')}</StyledTableHeader>
-          <StyledTableHeader>
-            {t('table_header_last_calibrated')}
-          </StyledTableHeader>
+          <StyledTableHeader>{t('model_and_serial')}</StyledTableHeader>
+          <StyledTableHeader>{t('mount')}</StyledTableHeader>
+          <StyledTableHeader>{t('tiprack')}</StyledTableHeader>
+          <StyledTableHeader>{t('last_calibrated_label')}</StyledTableHeader>
         </tr>
       </thead>
       <tbody css={BODY_STYLE}>

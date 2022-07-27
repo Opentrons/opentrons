@@ -127,7 +127,9 @@ export function CommandList(): JSX.Element | null {
       ? dropWhile(
           runCommands,
           runCommandSummary =>
-            new Date(runCommandSummary.createdAt) <= runStartDateTime
+            new Date(
+              runCommandSummary.startedAt ?? runCommandSummary.createdAt
+            ) <= runStartDateTime
         )
       : []
 

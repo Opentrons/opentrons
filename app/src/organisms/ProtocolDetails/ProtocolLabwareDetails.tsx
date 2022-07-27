@@ -170,7 +170,7 @@ export const LabwareDetailOverflowMenu = (
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
       marginRight={SPACING.spacing3}
-      marginLeft="auto"
+      marginLeft={SPACING.spacingAuto}
     >
       <Flex>
         <OverflowBtn onClick={handleOverflowClick} />

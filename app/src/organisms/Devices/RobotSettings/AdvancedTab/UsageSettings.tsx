@@ -13,7 +13,6 @@ import {
 
 import { StyledText } from '../../../../atoms/text'
 import { ToggleButton } from '../../../../atoms/buttons'
-import { useIsRobotBusy } from '../../hooks'
 import { updateSetting } from '../../../../redux/robot-settings'
 
 import type { Dispatch } from '../../../../redux/types'
@@ -22,24 +21,21 @@ import type { RobotSettingsField } from '../../../../redux/robot-settings/types'
 interface UsageSettingsProps {
   settings: RobotSettingsField | undefined
   robotName: string
-  updateIsRobotBusy: (isRobotBusy: boolean) => void
+  isRobotBusy: boolean
 }
 
 export function UsageSettings({
   settings,
   robotName,
-  updateIsRobotBusy,
+  isRobotBusy,
 }: UsageSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
   const value = settings?.value ? settings.value : false
   const id = settings?.id ? settings.id : 'enableDoorSafetySwitch'
-  const isBusy = useIsRobotBusy()
 
   const handleClick: React.MouseEventHandler<Element> = () => {
-    if (isBusy) {
-      updateIsRobotBusy(true)
-    } else {
+    if (!isRobotBusy) {
       dispatch(updateSetting(robotName, id, !value))
     }
   }
@@ -48,7 +44,7 @@ export function UsageSettings({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginTop="2.5rem"
+      marginTop={SPACING.spacingXXL}
     >
       <Box width="70%">
         <StyledText
@@ -68,6 +64,7 @@ export function UsageSettings({
         toggledOn={settings?.value === true}
         onClick={handleClick}
         id="RobotSettings_usageSettingsToggleButton"
+        disabled={isRobotBusy}
       />
     </Flex>
   )

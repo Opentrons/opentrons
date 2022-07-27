@@ -4,7 +4,6 @@ import {
   COLORS,
   Flex,
   DIRECTION_COLUMN,
-  Text,
   DIRECTION_ROW,
   Icon,
   TYPOGRAPHY,
@@ -17,6 +16,7 @@ import {
   getModuleDef2,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
+import { StyledText } from '../../../atoms/text'
 import attachHeaterShakerModule from '../../../assets/images/heater_shaker_module_diagram.svg'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import screwdriverOrientedLeft from '../../../assets/images/screwdriver_oriented_left.svg'
@@ -42,14 +42,13 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
   ]
 
   return (
-    <Flex
-      color={COLORS.darkBlack}
-      flexDirection={DIRECTION_COLUMN}
-      fontSize={TYPOGRAPHY.fontSizeH2}
-    >
-      <Text paddingBottom={SPACING.spacingL} fontWeight={700}>
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <StyledText
+        paddingBottom={SPACING.spacingL}
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+      >
         {t('step_1_of_4_attach_module')}
-      </Text>
+      </StyledText>
       <AttachedModuleItem step={t('1a')}>
         <Flex flexDirection={DIRECTION_ROW} marginLeft={SPACING.spacingXL}>
           <img src={attachHeaterShakerModule} alt="Attach Module to Deck" />
@@ -65,7 +64,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
               components={{
                 bold: <strong />,
                 block: (
-                  <Text
+                  <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
                     marginBottom={SPACING.spacing5}
                   />
@@ -78,12 +77,12 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
               components={{
                 bold: <strong />,
                 block: (
-                  <Text
+                  <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
                     marginBottom={SPACING.spacing5}
                   />
                 ),
-                icon: <Icon name="counter-clockwise-arrow" size={'1.313rem'} />,
+                icon: <Icon name="counter-clockwise-arrow" size="1.313rem" />,
               }}
             />
           </Flex>
@@ -139,7 +138,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
               components={{
                 bold: <strong />,
                 block: (
-                  <Text
+                  <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
                     marginBottom={SPACING.spacing5}
                   />
@@ -157,7 +156,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
               components={{
                 bold: <strong />,
                 block: (
-                  <Text
+                  <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
                     marginBottom={SPACING.spacing5}
                   />
@@ -170,21 +169,21 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
               components={{
                 bold: <strong />,
                 block: (
-                  <Text
+                  <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
                     marginBottom={SPACING.spacing5}
                   />
                 ),
-                icon: <Icon name="clockwise-arrow" size={'1.313rem'} />,
+                icon: <Icon name="clockwise-arrow" size="1.313rem" />,
               }}
             />
           </Flex>
         </Flex>
       </AttachedModuleItem>
       <AttachedModuleItem step={t('1c')}>
-        <Text fontSize={TYPOGRAPHY.fontSizeH2}>
+        <StyledText fontSize={TYPOGRAPHY.fontSizeH2}>
           {t('attach_module_check_attachment')}
-        </Text>
+        </StyledText>
       </AttachedModuleItem>
     </Flex>
   )
@@ -198,14 +197,14 @@ interface AttachedModuleItemProps {
 function AttachedModuleItem(props: AttachedModuleItemProps): JSX.Element {
   const { step } = props
   return (
-    <Flex flexDirection={DIRECTION_ROW} marginTop={'0.625rem'}>
-      <Text
+    <Flex flexDirection={DIRECTION_ROW} marginTop={SPACING.spacingSM}>
+      <StyledText
         color={COLORS.darkGrey}
         paddingRight={SPACING.spacing4}
         data-testid={`attach_module_${step}`}
       >
         {step}
-      </Text>
+      </StyledText>
       <Flex
         border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}
         flexDirection={DIRECTION_COLUMN}

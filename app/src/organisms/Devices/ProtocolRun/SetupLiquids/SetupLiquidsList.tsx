@@ -19,8 +19,8 @@ import {
   BORDERS,
   ALIGN_CENTER,
   SIZE_AUTO,
-  JUSTIFY_SPACE_BETWEEN,
   Box,
+  JUSTIFY_FLEX_START,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
@@ -51,9 +51,10 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
     <Flex
       css={HIDE_SCROLLBAR}
       flexDirection={DIRECTION_COLUMN}
-      maxHeight={'31.25rem'}
+      maxHeight="31.25rem"
       overflowY={'auto'}
       data-testid={'SetupLiquidsList_ListView'}
+      gridGap={SPACING.spacing3}
     >
       {liquidsInLoadOrder?.map(liquid => (
         <LiquidsListItem
@@ -91,23 +92,21 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
     ${BORDERS.cardOutlineBorder}
 
     &:hover {
-      background-color: ${COLORS.background};
+      cursor: pointer;
       border: 1px solid ${COLORS.medGreyHover};
     }
   `
   const LIQUID_CARD_ITEM_STYLE = css`
-    ${BORDERS.cardOutlineBorder}
-
+    border: 1px solid ${COLORS.white};
     &:hover {
       cursor: pointer;
-      border: 1px solid ${COLORS.medGreyHover};
+      ${BORDERS.cardOutlineBorder}
     }
   `
 
   return (
     <Box
       css={LIQUID_CARD_STYLE}
-      marginBottom={SPACING.spacing3}
       padding={SPACING.spacing4}
       onClick={() => setOpenItem(!openItem)}
       backgroundColor={openItem ? COLORS.lightGrey : COLORS.white}
@@ -132,26 +131,31 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex
             flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            justifyContent={JUSTIFY_FLEX_START}
+            gridGap={SPACING.spacing4}
             marginTop={SPACING.spacing4}
+            marginBottom={SPACING.spacing3}
           >
             <StyledText
-              as="p"
+              as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing4}
+              width="8.125rem"
             >
               {t('location')}
             </StyledText>
             <StyledText
-              as="p"
+              as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginRight={SPACING.spacing6}
             >
               {t('labware_name')}
             </StyledText>
             <StyledText
-              as="p"
+              as="label"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              width="4.25rem"
+              marginLeft="auto"
               marginRight={SPACING.spacing4}
             >
               {t('volume')}
@@ -167,7 +171,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                 css={LIQUID_CARD_ITEM_STYLE}
                 key={index}
                 borderRadius={'4px'}
-                marginY={SPACING.spacing3}
+                marginBottom={SPACING.spacing3}
                 padding={SPACING.spacing4}
                 backgroundColor={COLORS.white}
                 data-testid={`LiquidsListItem_slotRow_${index}`}
@@ -175,9 +179,14 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
               >
                 <Flex
                   flexDirection={DIRECTION_ROW}
-                  justifyContent={JUSTIFY_SPACE_BETWEEN}
+                  justifyContent={JUSTIFY_FLEX_START}
+                  gridGap={SPACING.spacing4}
                 >
-                  <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+                  <StyledText
+                    as="p"
+                    fontWeight={TYPOGRAPHY.fontWeightRegular}
+                    minWidth="8.125rem"
+                  >
                     {t('slot_location', {
                       slotName: slotName,
                     })}
@@ -185,7 +194,12 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                   <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
                     {labwareName}
                   </StyledText>
-                  <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+                  <StyledText
+                    as="p"
+                    fontWeight={TYPOGRAPHY.fontWeightRegular}
+                    minWidth="4.25rem"
+                    marginLeft={SPACING.spacingAuto}
+                  >
                     {getTotalVolumePerLiquidLabwarePair(
                       liquidId,
                       labware.labwareId,
@@ -225,7 +239,7 @@ export const LiquidsListItemDetails = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Flex
         css={BORDERS.cardOutlineBorder}
-        padding={'0.75rem'}
+        padding="0.75rem"
         height={'max-content'}
         backgroundColor={COLORS.white}
       >

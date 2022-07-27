@@ -45,6 +45,7 @@
     "react-intersection-observer": "^8.33.1",
     "react-redux": "7.2.1",
     "react-router-dom": "5.1.1",
+    "react-select": "5.4.0",
     "redux": "4.0.5",
     "redux-observable": "1.1.0",
     "redux-thunk": "2.3.0",
