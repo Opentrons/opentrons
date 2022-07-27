@@ -988,9 +988,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             self._module.labware_latch_status
             == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
         )
-        is_plate_shaking = (
-            self._module.speed_status != module_types.SpeedStatus.IDLE
-        )
+        is_plate_shaking = self._module.speed_status != module_types.SpeedStatus.IDLE
 
         destination_slot = to_loc.labware.first_parent()
         if destination_slot is None:
