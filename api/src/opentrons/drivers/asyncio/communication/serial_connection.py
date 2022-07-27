@@ -119,6 +119,19 @@ class SerialConnection:
             data=command.build(), retries=retries, timeout=timeout
         )
 
+    async def send_dfu_command(self, command: CommandBuilder) -> None:
+        """
+        Send a dfu command to enter device bootloader.
+
+        This method doesn't wait for a response after sending the command since the
+        module port gets disconnected once it enters its bootloader.
+        """
+        encoded_command = command.build().encode()
+
+        async with self._send_data_lock:
+            log.debug(f"{self.name}: Write -> {encoded_command!r}")
+            await self._serial.write(data=encoded_command)
+
     async def send_data(
         self, data: str, retries: int = 0, timeout: Optional[float] = None
     ) -> str:

@@ -29,6 +29,8 @@ POLL_PERIOD = 1.0
 # module simulation in PAPIv2 needs to be seriously rethought
 SIMULATING_POLL_PERIOD = POLL_PERIOD / 20.0
 
+DFU_PID = "df11"
+
 
 class HeaterShakerError(RuntimeError):
     """An error propagated from the heater-shaker module."""
@@ -439,7 +441,11 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self._wait_for_labware_latch(HeaterShakerLabwareLatchStatus.IDLE_CLOSED)
 
     async def prep_for_update(self) -> str:
-        return "no"
+        await self._poller.stop_and_wait()
+        async with update.protect_dfu_transition():
+            await self._driver.enter_programming_mode()
+            dfu_info = await update.find_dfu_device(pid=DFU_PID)
+            return dfu_info
 
 
 @dataclass
