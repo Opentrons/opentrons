@@ -444,12 +444,10 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self._wait_for_labware_latch(HeaterShakerLabwareLatchStatus.IDLE_CLOSED)
 
     async def prep_for_update(self) -> str:
-        await self._poller.stop_and_wait()  # Check if this is really needed
+        await self._poller.stop_and_wait()
         async with update.protect_dfu_transition():
             await self._driver.enter_programming_mode()
-            dfu_info = await update.find_dfu_device(
-                pid=DFU_PID
-            )  # TODO: no magic strings. Also check if PID is correct
+            dfu_info = await update.find_dfu_device(pid=DFU_PID)
             return dfu_info
 
 

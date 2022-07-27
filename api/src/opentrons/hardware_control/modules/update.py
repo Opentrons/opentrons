@@ -79,7 +79,6 @@ async def find_dfu_device(pid: str) -> str:
         stdout, stderr = await proc.communicate()
 
         if stdout is None and stderr is None:
-            # This probably needs to be refactored into just a check for empty stdout
             continue
         if stderr:
             raise RuntimeError(f"Error finding dfu device: {stderr.decode()}")
@@ -95,7 +94,6 @@ async def find_dfu_device(pid: str) -> str:
                 devices_found += 1
                 serial = line[(line.find("serial=") + 7) :]
         if devices_found == 2:
-            # TODO: Make this return just the serial and not the entire string
             return serial
         elif devices_found > 2:
             raise OSError("Multiple new bootloader devices" "found on mode switch")
@@ -208,12 +206,6 @@ async def upload_via_dfu(
     # We don't specify a port since the dfu device doesn't get one &
     # dfu-util doesn't need it either so I've replaced the 'port' arg with an arg to
     # fetch dfu device serial. I haven't used it in the below command though.
-
-    # The below command works but if we want to be super-specific about
-    # which dfu device to upload firmware to, then we can specify the device serial
-    # (or the vid:pid) in the command. This will take care of the super rare case where
-    # a robot has two stm32 devices plugged in and a user initiates firmware upload for
-    # both of them in quick succession. It's a rare case but has happened before.
     dfu_args = [
         "dfu-util",
         "-a 0",
