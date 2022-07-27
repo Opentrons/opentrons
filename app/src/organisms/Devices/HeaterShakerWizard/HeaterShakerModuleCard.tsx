@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Flex,
-  Text,
   Icon,
   SIZE_1,
   TYPOGRAPHY,
@@ -13,6 +12,7 @@ import {
   COLORS,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
+import { StyledText } from '../../../atoms/text'
 import heaterShakerModule from '../../../assets/images/heatershaker_module_transparent.svg'
 import { HeaterShakerModuleData } from '../../ModuleCard/HeaterShakerModuleData'
 
@@ -43,7 +43,7 @@ export const HeaterShakerModuleCard = (
       >
         <img src={heaterShakerModule} alt="Heater-Shaker" />
         <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
-          <Text
+          <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -53,7 +53,7 @@ export const HeaterShakerModuleCard = (
             {t(module?.usbPort.port === null ? 'usb_hub' : 'usb_port', {
               port: module?.usbPort.hub ?? module?.usbPort.port,
             })}
-          </Text>
+          </StyledText>
           <Flex paddingBottom={SPACING.spacing2}>
             <Icon
               name="ot-heater-shaker"
@@ -62,9 +62,9 @@ export const HeaterShakerModuleCard = (
               marginRight={SPACING.spacing2}
               color={COLORS.darkGreyEnabled}
             />
-            <Text fontSize={TYPOGRAPHY.fontSizeP}>
+            <StyledText fontSize={TYPOGRAPHY.fontSizeP}>
               {getModuleDisplayName(module.moduleModel)}
-            </Text>
+            </StyledText>
           </Flex>
           <HeaterShakerModuleData
             moduleData={module.data}

@@ -4,7 +4,6 @@ import {
   COLORS,
   Flex,
   DIRECTION_COLUMN,
-  Text,
   DIRECTION_ROW,
   Icon,
   TYPOGRAPHY,
@@ -65,7 +64,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
               components={{
                 bold: <strong />,
                 block: (
-                  <Text
+                  <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
                     marginBottom={SPACING.spacing5}
                   />
@@ -78,7 +77,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
               components={{
                 bold: <strong />,
                 block: (
-                  <Text
+                  <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
                     marginBottom={SPACING.spacing5}
                   />
@@ -139,7 +138,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
               components={{
                 bold: <strong />,
                 block: (
-                  <Text
+                  <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
                     marginBottom={SPACING.spacing5}
                   />
@@ -157,7 +156,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
               components={{
                 bold: <strong />,
                 block: (
-                  <Text
+                  <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
                     marginBottom={SPACING.spacing5}
                   />
@@ -170,7 +169,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
               components={{
                 bold: <strong />,
                 block: (
-                  <Text
+                  <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
                     marginBottom={SPACING.spacing5}
                   />
@@ -182,9 +181,9 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
         </Flex>
       </AttachedModuleItem>
       <AttachedModuleItem step={t('1c')}>
-        <Text fontSize={TYPOGRAPHY.fontSizeH2}>
+        <StyledText fontSize={TYPOGRAPHY.fontSizeH2}>
           {t('attach_module_check_attachment')}
-        </Text>
+        </StyledText>
       </AttachedModuleItem>
     </Flex>
   )

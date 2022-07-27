@@ -6,6 +6,7 @@ import { modulePipetteCollision } from './modulePipetteCollision'
 import { thermocyclerPipetteCollision } from './thermocyclerPipetteCollision'
 import { orderWells } from './orderWells'
 import { isValidSlot } from './isValidSlot'
+import { getLabwareSlot } from './getLabwareSlot'
 export {
   commandCreatorsTimeline,
   curryCommandCreator,
@@ -14,6 +15,7 @@ export {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
   isValidSlot,
+  getLabwareSlot,
 }
 export * from './commandCreatorArgsGetters'
 export * from './misc'

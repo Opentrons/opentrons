@@ -72,7 +72,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       >
         <Flex
           css={BORDERS.cardOutlineBorder}
-          padding="0.5rem"
+          padding={SPACING.spacing3}
           height="max-content"
           width="max-content"
           backgroundColor={COLORS.white}

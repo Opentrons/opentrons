@@ -51,7 +51,8 @@ import type {
 import type { State } from '../../redux/types'
 import type { SelectOption, SelectOptionOrGroup } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import { Mount } from '../../redux/pipettes/types'
+import type { Mount } from '../../redux/pipettes/types'
+import type { MultiValue, SingleValue } from 'react-select'
 
 const HEADER = 'choose tip rack'
 const INTRO = 'Choose what tip rack you would like to use to calibrate your'
@@ -184,24 +185,28 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
         ]
       : [...opentronsTipRacksOptions]
 
-  const [selectedValue, setSelectedValue] = React.useState<SelectOption>(
+  const [selectedValue, setSelectedValue] = React.useState<
+    SingleValue<SelectOption> | MultiValue<SelectOption>
+  >(
     chosenTipRack
       ? formatOptionsFromLabwareDef(chosenTipRack)
       : formatOptionsFromLabwareDef(tipRack.definition)
   )
 
   const handleValueChange = (
-    selected: SelectOption | null,
+    selected: SingleValue<SelectOption> | MultiValue<SelectOption>,
     _: unknown
   ): void => {
     selected && setSelectedValue(selected)
   }
   const handleUseTipRack = (): void => {
-    const selectedTipRack = tipRackByUriMap[selectedValue.value]
-    // @ts-expect-error(sa, 2021-05-26): need to type narrow, avoiding src code change for now
-    if (!isEqual(chosenTipRack, selectedTipRack.definition)) {
-      // @ts-expect-error(sa, 2021-05-26): need to type narrow, avoiding src code change for now
-      handleChosenTipRack(selectedTipRack.definition)
+    const value = (selectedValue as SelectOption).value
+    const selectedTipRack = tipRackByUriMap[value]
+    if (!isEqual(chosenTipRack, selectedTipRack?.definition)) {
+      handleChosenTipRack(
+        (selectedTipRack?.definition != null && selectedTipRack.definition) ||
+          null
+      )
     }
     closeModal()
   }
@@ -268,7 +273,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
               showCalibrationText={
                 sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
               }
-              selectedValue={selectedValue}
+              selectedValue={selectedValue as SelectOption}
               tipRackByUriMap={tipRackByUriMap}
             />
           </Box>

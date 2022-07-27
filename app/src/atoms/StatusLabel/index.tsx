@@ -2,13 +2,14 @@ import * as React from 'react'
 import {
   Flex,
   Icon,
-  Text,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   ALIGN_CENTER,
   C_BLUE_PRESSED,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
+import { StyledText } from '../text'
 interface StatusLabelProps {
   status: string
   backgroundColor: string
@@ -38,7 +39,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
           marginX={SPACING.spacing2}
           data-testid="status_circle"
         >
-          {pulse ? (
+          {pulse != null && pulse ? (
             <animate
               attributeName="fill"
               values={`${iconColor}; transparent`}
@@ -49,14 +50,14 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
             />
           ) : null}
         </Icon>
-        <Text
+        <StyledText
           fontSize={TYPOGRAPHY.fontSizeCaption}
           color={textColor ?? C_BLUE_PRESSED}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           marginRight={SPACING.spacing2}
         >
           {status}
-        </Text>
+        </StyledText>
       </Flex>
     </Flex>
   )

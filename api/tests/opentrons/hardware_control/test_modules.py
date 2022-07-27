@@ -243,8 +243,33 @@ async def mod_thermocycler():
     await thermocycler.cleanup()
 
 
+@pytest.fixture
+async def mod_heatershaker():
+    from opentrons.hardware_control import modules
+
+    loop = asyncio.get_running_loop()
+
+    usb_port = USBPort(
+        name="",
+        hub=None,
+        port_number=0,
+        device_path="/dev/ot_module_sim_heatershaker0",
+    )
+
+    heatershaker = await modules.build(
+        port="/dev/ot_module_sim_heatershaker0",
+        usb_port=usb_port,
+        which="heatershaker",
+        simulating=True,
+        loop=loop,
+        execution_manager=ExecutionManager(),
+    )
+    yield heatershaker
+    await heatershaker.cleanup()
+
+
 async def test_module_update_integration(
-    monkeypatch, mod_tempdeck, mod_magdeck, mod_thermocycler
+    monkeypatch, mod_tempdeck, mod_magdeck, mod_thermocycler, mod_heatershaker
 ):
     from opentrons.hardware_control import modules
 
@@ -302,6 +327,22 @@ async def test_module_update_integration(
     await modules.update_firmware(mod_thermocycler, "fake_fw_file_path", loop)
     upload_via_bossa_mock.assert_called_once_with(
         "ot_module_bossa_bootloader1", "fake_fw_file_path", bootloader_kwargs
+    )
+
+    # test heater-shaker module update with dfu bootloader
+    upload_via_dfu_mock = mock.Mock(
+        return_value=(async_return((True, "dfu bootloader worked")))
+    )
+    monkeypatch.setattr(modules.update, "upload_via_dfu", upload_via_dfu_mock)
+
+    async def mock_find_dfu_device(pid: str):
+        return "df11"
+
+    monkeypatch.setattr(modules.update, "find_dfu_device", mock_find_dfu_device)
+
+    await modules.update_firmware(mod_heatershaker, "fake_fw_file_path", loop)
+    upload_via_dfu_mock.assert_called_once_with(
+        "df11", "fake_fw_file_path", bootloader_kwargs
     )
 
 

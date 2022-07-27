@@ -78,7 +78,7 @@ export const ModuleOverflowMenu = (
                     </MenuItem>
                     {item.disabledReason && (
                       <Tooltip tooltipProps={tooltipProps}>
-                        {t('cannot_shake', { ns: 'heater_shaker' })}
+                        {t('heater_shaker:cannot_shake')}
                       </Tooltip>
                     )}
                     {item.menuButtons}
