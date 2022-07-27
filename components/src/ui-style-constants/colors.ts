@@ -145,7 +145,6 @@ export const darkGrey = '#4a4a4a'
 
 // export const alphaToOpacity35 = '35'
 
-
 // colors liquid
 export const liquidColors = [
   electricPurple,
