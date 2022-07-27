@@ -1,5 +1,5 @@
 from typing import Optional
-
+from threading import Timer
 
 class Simulation:
     def tick(self) -> None:
@@ -90,7 +90,14 @@ class RPM(Simulation):
         self._current = rpm
 
     def set_target(self, target: Optional[float]) -> None:
+        timer = Timer(15, self.handle_timeout)
+        timer.start()
         self._target = target
+
+    def handle_timeout(self):
+        print("had timer")
+        raise ValueError("err: 555")
+
 
     @property
     def current(self) -> float:
