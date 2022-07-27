@@ -2,9 +2,9 @@
 
 from typing import List
 
-from opentrons.protocols.geometry.deck_conflict import (
-    get_east_west_locations,
-    get_north_south_locations,
+from opentrons.motion_planning.adjacent_slots_getters import (
+    get_east_west_slots,
+    get_north_south_slots,
 )
 
 from ..errors import PipetteMovementRestrictedByHeaterShakerError
@@ -19,10 +19,10 @@ def raise_if_movement_restricted(
 ) -> None:
     """Flag restricted movement around/to a Heater-Shaker."""
     for hs_movement_restrictor in hs_movement_restrictors:
-        dest_east_west = destination_slot in get_east_west_locations(
+        dest_east_west = destination_slot in get_east_west_slots(
             hs_movement_restrictor.deck_slot
         )
-        dest_north_south = destination_slot in get_north_south_locations(
+        dest_north_south = destination_slot in get_north_south_slots(
             hs_movement_restrictor.deck_slot
         )
         dest_heater_shaker = destination_slot == hs_movement_restrictor.deck_slot

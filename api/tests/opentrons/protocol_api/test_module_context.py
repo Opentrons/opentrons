@@ -25,9 +25,13 @@ from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api.module_contexts import (
     NoTargetTemperatureSetError,
     CannotPerformModuleAction,
+    HeaterShakerContext,
 )
 from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation,
+)
+from opentrons.protocols.geometry.module_geometry import (
+    PipetteMovementRestrictedByHeaterShakerError,
 )
 from opentrons.protocols.api_support import util as api_util
 from opentrons_shared_data import load_shared_data
@@ -511,6 +515,60 @@ def test_thermocycler_flag_unsafe_move(ctx_with_thermocycler, mock_module_contro
 # __________ Heater Shaker tests __________
 
 
+@pytest.mark.parametrize(
+    argnames=["labware_name", "is_tiprack"],
+    argvalues=[("geb_96_tiprack_1000ul", True), ("biorad_384_wellplate_50ul", False)],
+)
+def test_heater_shaker_unsafe_move_flagger(
+    ctx_with_heater_shaker: ProtocolContext,
+    mock_module_controller: mock.MagicMock,
+    labware_name: str,
+    is_tiprack: bool,
+) -> None:
+    """It should call unsafe movement flagger with correct args."""
+    mock_speed_status = mock.PropertyMock(return_value=SpeedStatus.DECELERATING)
+    mock_latch_status = mock.PropertyMock(
+        return_value=HeaterShakerLabwareLatchStatus.IDLE_CLOSED
+    )
+    type(mock_module_controller).speed_status = mock_speed_status
+    type(mock_module_controller).labware_latch_status = mock_latch_status
+
+    mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 3)
+    assert isinstance(mod, HeaterShakerContext)
+
+    labware = ctx_with_heater_shaker.load_labware(labware_name, 5)
+
+    mod._geometry.flag_unsafe_move = mock.MagicMock()  # type: ignore[assignment]
+
+    mod.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)
+
+    mod._geometry.flag_unsafe_move.assert_called_once_with(
+        to_slot=5,
+        is_tiprack=is_tiprack,
+        is_using_multichannel=False,
+        is_labware_latch_closed=True,
+        is_plate_shaking=True,
+    )
+
+
+def test_hs_flag_unsafe_move_raises(
+    ctx_with_heater_shaker: ProtocolContext,
+) -> None:
+    """Test unsafe move raises underlying error."""
+
+    def raiser(*args, **kwargs):
+        raise PipetteMovementRestrictedByHeaterShakerError("uh oh")
+
+    mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 3)
+    labware = ctx_with_heater_shaker.load_labware("geb_96_tiprack_1000ul", 5)
+
+    assert isinstance(mod, HeaterShakerContext)
+    mod._geometry.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[assignment]
+
+    with pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="uh oh"):
+        mod.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)
+
+
 def test_heater_shaker_loading(
     ctx_with_heater_shaker: ProtocolContext,
     mock_module_controller: mock.MagicMock,
@@ -668,7 +726,8 @@ def test_heater_shaker_latch_status(
 
 
 def test_heater_shaker_set_and_wait_for_shake_speed(
-    ctx_with_heater_shaker: ProtocolContext, mock_module_controller: mock.MagicMock
+    ctx_with_heater_shaker: ProtocolContext,
+    mock_module_controller: mock.MagicMock,
 ) -> None:
     """It should issue a blocking set target shake speed."""
     mock_latch_status = mock.PropertyMock(
@@ -750,6 +809,7 @@ def test_heater_shaker_close_labware_latch(
 ) -> None:
     """It should issue a labware latch close command."""
     hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
+
     hs_mod.close_labware_latch()  # type: ignore[union-attr]
     mock_module_controller.close_labware_latch.assert_called_once()
 
