@@ -135,7 +135,9 @@ class GCodeEngine:
         with self._emulate() as h:
             protocol = self._get_protocol(file_path)
             context = ProtocolContext(
-                implementation=ProtocolContextImplementation(sync_hardware=h.sync),
+                implementation=ProtocolContextImplementation(
+                    sync_hardware=h.sync, api_version=version
+                ),
                 loop=self._get_loop(),
                 api_version=version,
             )
