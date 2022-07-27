@@ -1,12 +1,32 @@
 """Opentrons API Workarounds."""
 from datetime import datetime
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 import json
 from urllib.request import Request, urlopen
 import platform
 
+from opentrons.config import robot_configs
+from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver
+from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
+
+DEFAULT_ACCELERATION_XYZA = 500
+DEFAULT_ACCELERATION_BC = 100
+DEFAULT_ACCELERATION_X = DEFAULT_ACCELERATION_XYZA  # API's default is 3000
+DEFAULT_ACCELERATION_Y = DEFAULT_ACCELERATION_XYZA  # API's default is 2000
+DEFAULT_ACCELERATION_Z = DEFAULT_ACCELERATION_XYZA  # API's default is 1500
+DEFAULT_ACCELERATION_A = DEFAULT_ACCELERATION_XYZA  # API's default is 1500
+DEFAULT_ACCELERATION_B = DEFAULT_ACCELERATION_BC  # API's default is 200
+DEFAULT_ACCELERATION_C = DEFAULT_ACCELERATION_BC  # API's default is 200
+DEFAULT_ACCELERATION: Dict[str, float] = {
+    "X": DEFAULT_ACCELERATION_X,
+    "Y": DEFAULT_ACCELERATION_Y,
+    "Z": DEFAULT_ACCELERATION_Z,
+    "A": DEFAULT_ACCELERATION_A,
+    "B": DEFAULT_ACCELERATION_B,
+    "C": DEFAULT_ACCELERATION_C,
+}
 
 
 def is_running_in_app() -> bool:
@@ -80,3 +100,29 @@ def get_latest_offset_for_labware(
     lw_offsets.sort(key=_sort_by_created_at)
     v = lw_offsets[-1]["vector"]
     return round(v["x"], 2), round(v["y"], 2), round(v["z"], 2)
+
+
+def get_hw_api(ctx: ProtocolContext) -> SyncHardwareAPI:
+    return ctx._hw_manager.hardware
+
+
+def get_smoothie_driver(ctx: ProtocolContext) -> SmoothieDriver:
+    return get_hw_api(ctx)._backend._smoothie_driver
+
+
+def set_robot_acceleration(ctx: ProtocolContext,
+                           x: float = DEFAULT_ACCELERATION_X,
+                           y: float = DEFAULT_ACCELERATION_Y,
+                           z: float = DEFAULT_ACCELERATION_Z,
+                           a: float = DEFAULT_ACCELERATION_A,
+                           b: float = DEFAULT_ACCELERATION_B,
+                           c: float = DEFAULT_ACCELERATION_C,
+                           store: bool = False) -> None:
+    cfg = robot_configs.load_ot2()
+    settings = {'x': x, 'y': y, 'z': z, 'a': a, 'b': b, 'c': c}
+    if store:
+        for ax, val in settings.items():
+            cfg.acceleration[ax.upper()] = val
+        robot_configs.save_robot_settings(cfg)
+    if not ctx.is_simulating() and is_running_on_robot():
+        get_smoothie_driver(ctx).set_acceleration(settings=settings)
