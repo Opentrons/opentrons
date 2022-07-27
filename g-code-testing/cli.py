@@ -3,6 +3,8 @@
 import sys
 import re
 import argparse
+from dataclasses import dataclass
+from pathlib import PurePath
 from typing import (
     Callable,
     Dict,
@@ -22,6 +24,19 @@ from g_code_test_data.g_code_configuration import (
 )
 from g_code_test_data.http.http_configurations import HTTP_CONFIGURATIONS
 from g_code_test_data.protocol.protocol_configurations import PROTOCOL_CONFIGURATIONS
+from functools import partial
+
+
+@dataclass
+class RunnableConfiguration:
+    """All the information necessary to perform an operation against a configuration."""
+
+    configuration: Union[ProtocolGCodeConfirmConfig, HTTPGCodeConfirmConfig]
+    version: Optional[APIVersion]
+
+    def __hash__(self) -> int:
+        """Make it hashable."""
+        return hash(repr(self))
 
 
 class GCodeCLI:
@@ -49,7 +64,7 @@ class GCodeCLI:
     UPDATE_COMPARISON_COMMAND = "update-comparison"
     CHECK_MISSING_COMP_FILES = "check-for-missing-comparison-files"
 
-    API_VERSION_REGEX = re.compile(r"\/(\d+\.\d+)\/")
+    API_VERSION_REGEX = re.compile(r"\/(\d+\.\d+)$")
 
     @classmethod
     def parse_args(cls, args: List[str]) -> Dict[str, Any]:
@@ -86,18 +101,21 @@ class GCodeCLI:
             self.CHECK_MISSING_COMP_FILES: self._check_for_missing_comparison_files,
         }
 
-    def _run(self, version: Optional[APIVersion]) -> str:
+    @staticmethod
+    def _run(run_config: RunnableConfiguration) -> str:
         """Execute G-Code Configuration."""
-        configuration = self.configurations[self.args[self.CONFIGURATION_NAME]]
+        configuration = run_config.configuration
+        version = run_config.version
         return (
             configuration.execute(version)
             if version is not None
             else configuration.execute()
         )
 
-    def _diff(self, version: Optional[APIVersion]) -> str:
+    def _diff(self, run_config: RunnableConfiguration) -> str:
         """Diff G-Code Configuration against stored comparison file."""
-        configuration = self.configurations[self.args[self.CONFIGURATION_NAME]]
+        configuration = run_config.configuration
+        version = run_config.version
         able_to_respond_with_error_code = self.args[self.ERROR_ON_DIFFERENT_FILES]
 
         if version is not None:
@@ -127,22 +145,26 @@ class GCodeCLI:
         path_string = "\n".join(configs)
         return f"Runnable Configurations:\n{path_string}"
 
-    def _pull(self, version: Optional[APIVersion]) -> str:
+    @staticmethod
+    def _pull(run_config: RunnableConfiguration) -> str:
         """Load comparison file."""
-        config = self.configurations[self.args[self.CONFIGURATION_NAME]]
+        configuration = run_config.configuration
+        version = run_config.version
         return (
-            config.get_comparison_file(version)
+            configuration.get_comparison_file(version)
             if version is not None
-            else config.get_comparison_file()
+            else configuration.get_comparison_file()
         )
 
-    def _update_comparison(self, version: Optional[APIVersion]) -> str:
+    @staticmethod
+    def _update_comparison(run_config: RunnableConfiguration) -> str:
         """Create/Override comparison file with output of execution."""
-        config = self.configurations[self.args[self.CONFIGURATION_NAME]]
+        configuration = run_config.configuration
+        version = run_config.version
         return (
-            config.update_comparison(version)
+            configuration.update_comparison(version)
             if version is not None
-            else config.update_comparison()
+            else configuration.update_comparison()
         )
 
     def _check_for_missing_comparison_files(self) -> str:
@@ -177,18 +199,60 @@ class GCodeCLI:
             )
         return command_func
 
-    def _get_version(
-        self, config: Union[ProtocolGCodeConfirmConfig, HTTPGCodeConfirmConfig]
-    ) -> APIVersion:
-        if isinstance(config, ProtocolGCodeConfirmConfig):
-            match = self.API_VERSION_REGEX.search(self.args[self.CONFIGURATION_NAME])
-            version = APIVersion.from_string(match.group(1))
+    def _get_config_matches(self, config_string: str) -> List[str]:
+        """Gets a list of matches to available configurations. Supports globbing."""
+        exact_match = config_string in self.configurations.keys()
+        glob_matches = [
+            configuration_key
+            for configuration_key in self.configurations.keys()
+            if PurePath(configuration_key).match(config_string)
+            or config_string in configuration_key
+        ]
+
+        if exact_match:
+            matches = [config_string]
+        elif len(glob_matches) > 0:
+            matches = glob_matches
         else:
-            version = None
+            raise ValueError(f'Configuration path "{config_string}" was not found.')
 
-        return version
+        return matches
 
-    def run_command(self) -> str:
+    def _parse_runnable_configs(
+        self, config_string_list: List[str]
+    ) -> List[RunnableConfiguration]:
+        """Parses config_string_list into RunnableConfiguration objects."""
+        runnable_configurations = []
+
+        for config_string in config_string_list:
+            if config_string.startswith(HTTPGCodeConfirmConfig.results_dir):
+                runnable_configurations.append(
+                    RunnableConfiguration(
+                        configuration=self.configurations[config_string], version=None
+                    )
+                )
+            elif config_string.startswith(ProtocolGCodeConfirmConfig.results_dir):
+                runnable_configurations.append(
+                    RunnableConfiguration(
+                        configuration=self.configurations[config_string],
+                        version=APIVersion.from_string(
+                            config_string.rsplit("/", maxsplit=1)[-1]
+                        ),
+                    )
+                )
+            else:
+                raise ValueError(
+                    "Something happened that wasn't supposed to."
+                    f"Cannot find configuration: {config_string}"
+                )
+
+        return runnable_configurations
+
+    # Derek Maggio (7/27/22): Split run_command into get_runnable_commands and
+    # run_commands to allow for validation that get_runnable_commands is returning the
+    # correct commands. Tests for this are in test_cli.py
+
+    def get_runnable_commands(self) -> List[Callable]:
         """Run command and return it's output."""
         passed_command_name = self.args[self.COMMAND_KEY]
 
@@ -197,15 +261,24 @@ class GCodeCLI:
         # the config
 
         if passed_command_name == self.CONFIGURATION_COMMAND:
-            return self._configurations()
+            return [self._configurations]
         elif passed_command_name == self.CHECK_MISSING_COMP_FILES:
-            return self._check_for_missing_comparison_files()
+            return [self._check_for_missing_comparison_files]
 
-        config = self.configurations[self.args[self.CONFIGURATION_NAME]]
+        config_name = self.args[self.CONFIGURATION_NAME]
+        runnable_configurations = self._parse_runnable_configs(
+            self._get_config_matches(config_name)
+        )
 
-        version = self._get_version(config)
-        command_func = self._get_command_func(passed_command_name)
-        return command_func(version)
+        return [
+            partial(self._get_command_func(passed_command_name), run_config)
+            for run_config in runnable_configurations
+        ]
+
+    @staticmethod
+    def run_commands(commands_to_run: List[Callable]) -> str:
+        """Runs passed commands and returns their output."""
+        return "\n".join([command() for command in commands_to_run])
 
     @classmethod
     def parser(cls) -> argparse.ArgumentParser:
@@ -300,7 +373,8 @@ class GCodeCLI:
 
 if __name__ == "__main__":
     cli = GCodeCLI()
-    output = cli.run_command()
+    funcs_to_run = cli.get_runnable_commands()
+    output = cli.run_commands(funcs_to_run)
 
     if cli.respond_with_error:
         sys.exit(output)

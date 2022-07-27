@@ -55,7 +55,7 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
 
     def get_configuration_paths(self, version: APIVersion) -> str:
         """Get the configuration file path."""
-        return os.path.join(self.results_dir, version.__str__(), f"{self.name}")
+        return os.path.join(self.results_dir, self.name, version.__str__())
 
     def get_comparison_file_path(self, version: APIVersion) -> str:
         """Get that path of comparison file."""
