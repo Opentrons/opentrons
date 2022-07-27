@@ -6,6 +6,8 @@ export const medBlue = '#d9e9fe'
 export const focus = '#f09d20'
 export const black = '#000000'
 export const fundamentalsBackgroundShade = '#eeeeee'
+// note 07/27/2022 kj keep this color to avoid break H/S design
+// this will be fixed in the future
 export const darkGrey = '#4a4a4a'
 
 // colors blue
