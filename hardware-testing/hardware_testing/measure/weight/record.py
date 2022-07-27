@@ -187,8 +187,8 @@ class GravimetricRecording(List):
                         return stable_samples
                 elif len(stable_samples):
                     stable_samples = GravimetricRecording()
-        raise RuntimeError(f"Unable to slice recording "
-                           f"(start={start}, duration={duration})")
+            raise RuntimeError(f"Unable to slice recording into stable piece"
+                               f"(start={start}, duration={duration})")
 
 
 class GravimetricRecorderConfig:

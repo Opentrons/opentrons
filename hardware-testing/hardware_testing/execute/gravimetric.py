@@ -1,5 +1,6 @@
 """Gravimetric."""
 from dataclasses import dataclass
+from statistics import stdev
 from pathlib import Path
 from typing import List
 
@@ -19,6 +20,7 @@ from hardware_testing.measure.weight import (
     GravimetricRecorderConfig,
 )
 from hardware_testing.pipette.liquid_class import PipetteLiquidClass
+from hardware_testing.pipette.timestamp import SampleTimestamps
 
 
 LIQUID_CLASS_LOOKUP = {300: liquid.defaults.DEFAULT_LIQUID_CLASS_OT2_P300_SINGLE}
@@ -132,31 +134,37 @@ def run(
         items.recorder.stop()
 
 
-def analyze(ctx: ProtocolContext, items: ExecuteGravItems) -> None:
-    """Analyze."""
-    entire_recording = items.recorder.recording
+def _analyze_recording_and_timestamps(ctx: ProtocolContext,
+                                      recording: GravimetricRecording,
+                                      timestamps: List[SampleTimestamps]) -> None:
 
     def _get_rec_slice(_time: float) -> GravimetricRecording:
-        # FIXME: some ugliness so that simulating doesn't break
-        _is_sim = ctx.is_simulating()
-        start = _time if not _is_sim else entire_recording.start_time
-        duration = 1.0 if not _is_sim else 1.0 / items.recorder.config.frequency
-        timeout = 3 if not _is_sim else 2.0 / items.recorder.config.frequency
-        return entire_recording.get_time_slice(start=start, duration=duration,
-                                               stable=True, timeout=timeout)
+        return recording.get_time_slice(start=_time, duration=0.3,
+                                        stable=True, timeout=4)
 
     recorded_dispense_slices = [
         {
             'pre': _get_rec_slice(t.pre_dispense.time),
             'post': _get_rec_slice(t.post_dispense.time)
         }
-        for t in items.liquid_pipette.get_timestamps()
+        for t in timestamps
     ]
     dispense_volumes = [
         r['post'].average - r['pre'].average
         for r in recorded_dispense_slices
     ]
-    ctx.comment("Volumes Dispense:")
+    dispense_avg = sum(dispense_volumes) / len(dispense_volumes)
+    dispense_cv = stdev(dispense_volumes) / dispense_avg
+    ctx.comment("Summary:")
+    ctx.comment(f"\tAverage: {round(dispense_avg * 1000, 2)} mg")
+    ctx.comment(f"\tCV: {round(dispense_cv * 100, 3)}%")
+    ctx.comment("\tVolumes:")
     for i, v in enumerate(dispense_volumes):
-        ctx.comment(f"\t({i + 1}/{len(dispense_volumes)}) "
-                    f"{round(v, 2)} uL")
+        ctx.comment(f"\t\t{i + 1})\t{round(v * 1000.0, 2)} mg")
+
+
+def analyze(ctx: ProtocolContext, items: ExecuteGravItems) -> None:
+    """Analyze."""
+    _analyze_recording_and_timestamps(ctx,
+                                      items.recorder.recording,
+                                      items.liquid_pipette.get_timestamps())
