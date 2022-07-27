@@ -139,7 +139,7 @@ export const LiquidsLabwareDetailsModal = (
                 <StyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkBlack}
+                  color={COLORS.darkBlackEnabled}
                 >
                   {slotName}
                 </StyledText>
@@ -158,7 +158,7 @@ export const LiquidsLabwareDetailsModal = (
                 <StyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkBlack}
+                  color={COLORS.darkBlackEnabled}
                 >
                   {labwareName}
                 </StyledText>
