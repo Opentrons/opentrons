@@ -47,11 +47,6 @@ def mock_module_controller() -> mock.MagicMock:
     return mock.MagicMock()
 
 
-@pytest.fixture
-def mock_heater_shaker_geometry() -> mock.MagicMock:
-    return mock.MagicMock()
-
-
 # Async because ProtocolContext.__init__() needs an event loop,
 # so this fixture needs to run in an event loop.
 @pytest.fixture

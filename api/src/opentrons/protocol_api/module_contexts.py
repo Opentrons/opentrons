@@ -209,6 +209,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
+    # TODO (spp, 2022-07-27): Check if it is better to use GeometryType as the returnType
     def geometry(self) -> ModuleGeometry:
         """The object representing the module as an item on the deck
 
