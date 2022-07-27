@@ -8257,6 +8257,7 @@
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
     },
+    "p200_single_v4.3": {
       "name": "p50_single_200_evt",
       "backCompatNames": [ "p50_single" ],
       "top": {
