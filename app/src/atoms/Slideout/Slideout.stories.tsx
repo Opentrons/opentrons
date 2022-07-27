@@ -33,7 +33,7 @@ const Children = (
 
     <PrimaryBtn
       backgroundColor={COLORS.blue}
-      marginTop={'28rem'}
+      marginTop="28rem"
       textTransform={TYPOGRAPHY.textTransformNone}
     >
       <Text fontWeight={FONT_WEIGHT_REGULAR} fontSize="0.6875rem">

@@ -176,7 +176,7 @@ export function Labware(): JSX.Element {
               width="9.375rem"
               zIndex={2}
               borderRadius={BORDERS.radiusSoftCorners}
-              boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+              boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
               position={POSITION_ABSOLUTE}
               backgroundColor={COLORS.white}
               top="8.5rem"

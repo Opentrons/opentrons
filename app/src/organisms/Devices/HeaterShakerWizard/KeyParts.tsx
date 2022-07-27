@@ -23,7 +23,7 @@ export function KeyParts(): JSX.Element {
         color={COLORS.darkBlack}
         paddingTop={SPACING.spacing3}
         fontWeight={TYPOGRAPHY.fontWeightBold}
-        data-testid={'heater_shaker_wizard_keyparts_title'}
+        data-testid="heater_shaker_wizard_keyparts_title"
       >
         {t('heater_shaker_key_parts')}
       </Text>
@@ -31,11 +31,11 @@ export function KeyParts(): JSX.Element {
         color={COLORS.darkBlack}
         paddingTop={SPACING.spacing3}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        data-testid={'heater_shaker_wizard_keyparts_subtitle'}
+        data-testid="heater_shaker_wizard_keyparts_subtitle"
       >
         <Trans
           t={t}
-          i18nKey={'heater_shaker_orient_module'}
+          i18nKey="heater_shaker_orient_module"
           components={{
             bold: <strong />,
           }}
@@ -56,12 +56,12 @@ export function KeyParts(): JSX.Element {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          marginTop={'8rem'}
+          marginTop="8rem"
           marginRight={SPACING.spacing6}
         >
           <Trans
             t={t}
-            i18nKey={'heater_shaker_latch_description'}
+            i18nKey="heater_shaker_latch_description"
             components={{
               bold: <strong />,
               block: (
@@ -74,7 +74,7 @@ export function KeyParts(): JSX.Element {
           />
           <Trans
             t={t}
-            i18nKey={'heater_shaker_anchor_description'}
+            i18nKey="heater_shaker_anchor_description"
             components={{
               bold: <strong />,
               block: (
@@ -93,7 +93,7 @@ export function KeyParts(): JSX.Element {
             autoPlay={true}
             loop={true}
             controls={false}
-            data-testid={'heater_shaker_deck_lock'}
+            data-testid="heater_shaker_deck_lock"
           >
             <source src={HeaterShakerDeckLock} />
           </video>

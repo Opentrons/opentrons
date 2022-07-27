@@ -90,7 +90,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
             {t('shared:a_software_update_is_available')}
           </Tooltip>
         )}
-        <Divider marginY={'0'} />
+        <Divider marginY="0" />
         <MenuItem
           to={`/devices/${robot.name}/robot-settings`}
           as={Link}
@@ -147,10 +147,10 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
       />
       {showOverflowMenu && !showConnectionTroubleshootingModal ? (
         <Flex
-          width={'11rem'}
+          width="11rem"
           zIndex={10}
-          borderRadius={'4px 4px 0px 0px'}
-          boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+          borderRadius="4px 4px 0px 0px"
+          boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
           top="2.25rem"

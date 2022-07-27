@@ -164,7 +164,7 @@ export const LabwareSetup = (): JSX.Element | null => {
           viewBox={DECK_MAP_VIEWBOX}
           className={styles.deck_map}
           deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-          id={'LabwareSetup_deckMap'}
+          id="LabwareSetup_deckMap"
         >
           {() => {
             return (
@@ -241,7 +241,7 @@ export const LabwareSetup = (): JSX.Element | null => {
                 fontSize={FONT_SIZE_BODY_1}
                 color={C_BLUE}
                 onClick={() => showDownloadOffsetDataModal(true)}
-                id={'DownloadOffsetData'}
+                id="DownloadOffsetData"
               >
                 {t('get_labware_offset_data')}
               </Link>
@@ -254,7 +254,7 @@ export const LabwareSetup = (): JSX.Element | null => {
               color={C_BLUE}
               alignSelf={ALIGN_FLEX_END}
               onClick={() => setShowLabwareHelpModal(true)}
-              data-test={'LabwareSetup_helpLink'}
+              data-test="LabwareSetup_helpLink"
               marginY={SPACING_3}
             >
               {t('labware_help_link_title')}
@@ -266,7 +266,7 @@ export const LabwareSetup = (): JSX.Element | null => {
                   setShowLabwarePositionCheckModal(true)
                   setIsShowingLPCSuccessToast(false)
                 }}
-                id={'LabwareSetup_checkLabwarePositionsButton'}
+                id="LabwareSetup_checkLabwarePositionsButton"
                 {...targetProps}
                 disabled={lpcDisabledReason !== null}
               >

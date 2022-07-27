@@ -47,7 +47,7 @@ export const RunLogProtocolSetupInfo = ({
       <Trans
         t={t}
         id={`RunDetails_PipetteSetup`}
-        i18nKey={'load_pipette_protocol_setup'}
+        i18nKey="load_pipette_protocol_setup"
         values={{
           pipette_name: pipetteData.pipetteSpecs.displayName,
           mount_name: setupCommand.params.mount === 'left' ? 'Left' : 'Right',
@@ -63,7 +63,7 @@ export const RunLogProtocolSetupInfo = ({
       <Trans
         t={t}
         id={`RunDetails_ModuleSetup`}
-        i18nKey={'load_modules_protocol_setup'}
+        i18nKey="load_modules_protocol_setup"
         count={moduleSlotNumber}
         values={{
           module: getModuleDisplayName(moduleModel.model),
@@ -100,7 +100,7 @@ export const RunLogProtocolSetupInfo = ({
         <Trans
           t={t}
           id={`RunDetails_LabwareSetup_NoModules`}
-          i18nKey={'load_labware_info_protocol_setup_no_module'}
+          i18nKey="load_labware_info_protocol_setup_no_module"
           values={{
             labware_loadname:
               setupCommand.result?.definition.metadata.displayName,
@@ -112,7 +112,7 @@ export const RunLogProtocolSetupInfo = ({
         <Trans
           t={t}
           id={`RunDetails_LabwareSetup_WithModules`}
-          i18nKey={'load_labware_info_protocol_setup'}
+          i18nKey="load_labware_info_protocol_setup"
           count={moduleSlots}
           values={{
             labware_loadname:

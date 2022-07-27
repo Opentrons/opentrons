@@ -49,7 +49,7 @@ export function SetupDeckCalibration({
         <StyledText
           color={COLORS.black}
           css={TYPOGRAPHY.pSemiBold}
-          id={'DeckCalibration_deckCalibrationTitle'}
+          id="DeckCalibration_deckCalibrationTitle"
         >
           {t('deck_calibration_title')}
         </StyledText>

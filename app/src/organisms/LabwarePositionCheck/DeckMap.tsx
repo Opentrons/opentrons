@@ -62,7 +62,7 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
       viewBox={DECK_MAP_VIEWBOX}
       className={styles.deck_map}
       deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-      id={'LabwarePositionCheck_deckMap'}
+      id="LabwarePositionCheck_deckMap"
     >
       {() => (
         <>
@@ -89,9 +89,9 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                       <rect
                         width={nestedLabwareDef.dimensions.xDimension - 2}
                         height={nestedLabwareDef.dimensions.yDimension - 2}
-                        fill={'none'}
+                        fill="none"
                         stroke={C_SELECTED_DARK}
-                        strokeWidth={'3px'}
+                        strokeWidth="3px"
                         data-testid={`DeckMap_module_${nestedLabwareId}_highlight`}
                       />
                     ) : null}
@@ -124,9 +124,9 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                 <rect
                   width={labwareDef.dimensions.xDimension - 2}
                   height={labwareDef.dimensions.yDimension - 2}
-                  fill={'none'}
+                  fill="none"
                   stroke={C_SELECTED_DARK}
-                  strokeWidth={'3px'}
+                  strokeWidth="3px'"
                   data-testid={`DeckMap_${labwareId}_highlight`}
                 />
               )}

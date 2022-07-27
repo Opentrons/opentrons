@@ -73,8 +73,8 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
           <Icon
             name="water"
             color={COLORS.white}
-            width={'0'}
-            minWidth={'1rem'}
+            width="0"
+            minWidth="1rem"
           />
         )}
       </Flex>
@@ -84,7 +84,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
             as="h6"
             lineHeight={TYPOGRAPHY.fontSizeCaption}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            textTransform={'uppercase'}
+            textTransform="uppercase"
           >
             {t('offset_data')}
           </StyledText>

@@ -39,7 +39,7 @@ export const RerunningProtocolModal = (
   const { t } = useTranslation(['protocol_info', 'shared'])
 
   return (
-    <Portal level={'top'}>
+    <Portal level="top">
       <BaseModal borderRadius={SIZE_1}>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex
@@ -53,9 +53,9 @@ export const RerunningProtocolModal = (
             </Text>
             <Box
               onClick={props.onCloseClick}
-              id={'RerunningProtocolModal_xButton'}
+              id="RerunningProtocolModal_xButton"
             >
-              <Icon name={'close'} size={SIZE_2} />
+              <Icon name="close" size={SIZE_2} />
             </Box>
           </Flex>
           <Trans
@@ -71,18 +71,18 @@ export const RerunningProtocolModal = (
             color={C_BLUE}
             href={UPLOAD_PROTOCOL_URL}
             marginTop={SPACING_2}
-            id={'RerunningProtocolModal_Link'}
+            id="RerunningProtocolModal_Link"
             external
           >
             {t('rerunning_protocol_modal_link')}
-            <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
+            <Icon name="open-in-new" marginLeft={SPACING_1} size="10px" />
           </Link>
           <Box textAlign={ALIGN_CENTER} marginTop={SPACING_4}>
             <NewPrimaryBtn
               onClick={props.onCloseClick}
               width={SIZE_4}
               name="close"
-              id={'RerunningProtocolModal_closeButton'}
+              id="RerunningProtocolModal_closeButton"
             >
               {t('shared:close')}
             </NewPrimaryBtn>

@@ -61,10 +61,10 @@ export function DeckCalibration(props: Props): JSX.Element | null {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Text
-            as={'h2'}
+            as="h2"
             css={FONT_HEADER_THIN}
             paddingBottom={SPACING_2}
-            id={'DeckCalibration_deckCalibrationTitle'}
+            id="DeckCalibration_deckCalibrationTitle"
           >
             {t('deck_calibration_title')}
           </Text>
@@ -73,7 +73,7 @@ export function DeckCalibration(props: Props): JSX.Element | null {
             onClick={() => setHelpModalIsOpen(true)}
             color={C_BLUE}
             fontSize={FONT_SIZE_BODY_1}
-            id={'DeckCalibration_robotCalibrationHelpLink'}
+            id="DeckCalibration_robotCalibrationHelpLink"
           >
             {t('robot_cal_help_title')}
           </Link>

@@ -34,14 +34,14 @@ export const HeaterShakerModuleCard = (
       borderRadius={SPACING.spacing2}
       marginBottom={SPACING.spacing3}
       padding={`${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing3}`}
-      width={'20rem'}
+      width="20rem"
     >
       <Flex
         flexDirection={DIRECTION_ROW}
         paddingRight={SPACING.spacing3}
         alignItems={ALIGN_FLEX_START}
       >
-        <img src={heaterShakerModule} alt={'Heater-Shaker'} />
+        <img src={heaterShakerModule} alt="Heater-Shaker" />
         <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
           <Text
             textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -56,8 +56,8 @@ export const HeaterShakerModuleCard = (
           </Text>
           <Flex paddingBottom={SPACING.spacing2}>
             <Icon
-              name={'ot-heater-shaker'}
-              aria-label={'heater-shaker'}
+              name="ot-heater-shaker"
+              aria-label="heater-shaker"
               size={SIZE_1}
               marginRight={SPACING.spacing2}
               color={COLORS.darkGreyEnabled}

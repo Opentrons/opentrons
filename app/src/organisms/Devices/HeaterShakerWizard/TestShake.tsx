@@ -116,7 +116,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
         paddingTop={SPACING.spacing4}
         paddingLeft={SPACING.spacing4}
         flexDirection={DIRECTION_ROW}
-        data-testid={'test_shake_banner_info'}
+        data-testid="test_shake_banner_info"
       >
         <Flex
           size={SPACING.spacing6}

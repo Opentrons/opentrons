@@ -51,9 +51,9 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
     <Flex
       css={HIDE_SCROLLBAR}
       flexDirection={DIRECTION_COLUMN}
-      maxHeight={'31.25rem'}
-      overflowY={'auto'}
-      data-testid={'SetupLiquidsList_ListView'}
+      maxHeight="31.25rem"
+      overflowY="auto"
+      data-testid="SetupLiquidsList_ListView"
       gridGap={SPACING.spacing3}
     >
       {liquidsInLoadOrder?.map(liquid => (
@@ -110,7 +110,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       padding={SPACING.spacing4}
       onClick={() => setOpenItem(!openItem)}
       backgroundColor={openItem ? COLORS.lightGrey : COLORS.white}
-      data-testid={'LiquidsListItem_Row'}
+      data-testid="LiquidsListItem_Row"
     >
       <LiquidsListItemDetails
         liquidId={liquidId}
@@ -170,7 +170,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
               <Box
                 css={LIQUID_CARD_ITEM_STYLE}
                 key={index}
-                borderRadius={'4px'}
+                borderRadius="4px"
                 marginBottom={SPACING.spacing3}
                 padding={SPACING.spacing4}
                 backgroundColor={COLORS.white}
@@ -239,8 +239,8 @@ export const LiquidsListItemDetails = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Flex
         css={BORDERS.cardOutlineBorder}
-        padding={'0.75rem'}
-        height={'max-content'}
+        padding="0.75rem"
+        height="max-content"
         backgroundColor={COLORS.white}
       >
         <Icon name="circle" color={displayColor} size={SIZE_1} />
@@ -265,7 +265,7 @@ export const LiquidsListItemDetails = (
       <Flex
         backgroundColor={COLORS.darkBlack + '1A'}
         borderRadius={BORDERS.radiusSoftCorners}
-        height={'max-content'}
+        height="max-content"
         paddingY={SPACING.spacing2}
         paddingX={SPACING.spacing3}
         alignSelf={ALIGN_CENTER}

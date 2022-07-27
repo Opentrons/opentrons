@@ -113,7 +113,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       </StyledText>
       <PrimaryButton
         onClick={handleClick}
-        id={'UploadInput_protocolUploadButton'}
+        id="UploadInput_protocolUploadButton"
       >
         {t('choose_protocol_file')}
       </PrimaryButton>

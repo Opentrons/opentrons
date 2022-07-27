@@ -48,10 +48,10 @@ export const LabwarePositionCheckStepDetailModal = (
   return (
     <Portal level="top">
       <Modal className={styles.modal} contentsClassName={styles.modal_contents}>
-        <Flex flexDirection={'column'} margin={`${SPACING_1} ${SPACING_3}`}>
+        <Flex flexDirection="column" margin={`${SPACING_1} ${SPACING_3}`}>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
             <Text
-              as={'h3'}
+              as="h3"
               marginBottom={SPACING_3}
               textTransform={TYPOGRAPHY.textTransformUppercase}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -59,11 +59,11 @@ export const LabwarePositionCheckStepDetailModal = (
               {t('labware_step_detail_modal_heading')}
             </Text>
             <Btn size={SIZE_2} onClick={props.onCloseClick}>
-              <Icon name={'close'} color={C_MED_DARK_GRAY}></Icon>
+              <Icon name="close" color={C_MED_DARK_GRAY}></Icon>
             </Btn>
           </Flex>
           <Text
-            as={'h4'}
+            as="h4"
             fontWeight={FONT_WEIGHT_SEMIBOLD}
             marginBottom={SPACING_3}
           >
@@ -77,7 +77,7 @@ export const LabwarePositionCheckStepDetailModal = (
             >
               <img src={POSITION_IMGS.modalNozzle1} width="100%" />
               <Text
-                as={'h5'}
+                as="h5"
                 position={POSITION_ABSOLUTE}
                 top={SPACING_2}
                 marginLeft={SPACING_3}
@@ -100,17 +100,17 @@ export const LabwarePositionCheckStepDetailModal = (
                 top={SPACING_2}
                 marginLeft={SPACING_3}
                 color={C_NEAR_WHITE}
-                as={'h5'}
+                as="h5"
                 fontWeight={FONT_WEIGHT_SEMIBOLD}
               >
                 {t('labware_step_detail_modal_nozzle_image_2_text')}
               </Text>
               <Text
-                as={'h5'}
+                as="h5"
                 position={POSITION_ABSOLUTE}
                 top="35%"
                 left="40%"
-                color={'#ff5b5b'}
+                color="#ff5b5b"
                 fontWeight={FONT_WEIGHT_SEMIBOLD}
               >
                 {t('labware_step_detail_modal_nozzle_image_2_nozzle_text')}
@@ -118,7 +118,7 @@ export const LabwarePositionCheckStepDetailModal = (
             </Box>
           </Flex>
           <Text
-            as={'h4'}
+            as="h4"
             marginTop={SPACING_3}
             marginBottom={SPACING_3}
             fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -133,7 +133,7 @@ export const LabwarePositionCheckStepDetailModal = (
             >
               <img src={POSITION_IMGS.modalNozzle3} width="100%" />
               <Text
-                as={'h5'}
+                as="h5"
                 position={POSITION_ABSOLUTE}
                 top={SPACING_2}
                 marginLeft={SPACING_3}
@@ -151,7 +151,7 @@ export const LabwarePositionCheckStepDetailModal = (
             >
               <img src={POSITION_IMGS.modalNozzle4} width="100%" />
               <Text
-                as={'h5'}
+                as="h5"
                 position={POSITION_ABSOLUTE}
                 top={SPACING_2}
                 marginLeft={SPACING_3}
@@ -161,11 +161,11 @@ export const LabwarePositionCheckStepDetailModal = (
                 {t('labware_step_detail_modal_nozzle_or_tip_image_2_text')}
               </Text>
               <Text
-                as={'h5'}
+                as="h5"
                 position={POSITION_ABSOLUTE}
                 top="25%"
-                marginLeft={'6.7rem'}
-                color={'#ff5b5b'}
+                marginLeft="6.7rem"
+                color="#ff5b5b"
                 fontWeight={FONT_WEIGHT_SEMIBOLD}
               >
                 {t(
@@ -186,7 +186,7 @@ export const LabwarePositionCheckStepDetailModal = (
                 backgroundColor={C_LIGHT_GRAY}
               >
                 <Text
-                  as={'h6'}
+                  as="h6"
                   margin={SPACING_2}
                   padding={SPACING_1}
                   fontWeight={FONT_WEIGHT_SEMIBOLD}

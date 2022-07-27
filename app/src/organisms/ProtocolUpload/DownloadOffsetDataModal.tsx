@@ -52,7 +52,7 @@ export const DownloadOffsetDataModal = (
   const [mode, setMode] = React.useState<typeof MODES[number]>('jupyter')
 
   return (
-    <Portal level={'top'}>
+    <Portal level="top">
       <BaseModal borderRadius={SIZE_1}>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex
@@ -62,8 +62,8 @@ export const DownloadOffsetDataModal = (
             marginBottom={SPACING_3}
           >
             <Text css={FONT_HEADER_DARK}>{t('get_labware_offset_data')}</Text>
-            <Box onClick={onCloseClick} id={'DownloadOffsetDataModal_xButton'}>
-              <Icon name={'close'} size={SIZE_2} />
+            <Box onClick={onCloseClick} id="DownloadOffsetDataModal_xButton">
+              <Icon name="close" size={SIZE_2} />
             </Box>
           </Flex>
           <Text css={FONT_BODY_1_DARK} marginBottom={SPACING_3}>
@@ -107,7 +107,7 @@ export const DownloadOffsetDataModal = (
               onClick={onCloseClick}
               width={SIZE_4}
               name="close"
-              id={'DownloadOffsetDataModal_closeButton'}
+              id="DownloadOffsetDataModal_closeButton"
             >
               {t('shared:close')}
             </NewPrimaryBtn>
