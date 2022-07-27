@@ -13,8 +13,10 @@ from typing_extensions import Final
 
 try:
     import dbus
+
+    _DBUS_AVAILABLE = True
 except ImportError:
-    pass  # Not installed on non-Linux dev machines.
+    _DBUS_AVAILABLE = False
 
 
 _log = logging.getLogger(__name__)
