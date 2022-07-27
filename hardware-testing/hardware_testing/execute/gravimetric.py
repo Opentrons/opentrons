@@ -24,7 +24,10 @@ from hardware_testing.pipette.timestamp import SampleTimestamps
 
 
 LIQUID_CLASS_LOOKUP = {300: liquid.defaults.DEFAULT_LIQUID_CLASS_OT2_P300_SINGLE}
-GRAV_SETTLE_SECONDS = 3
+SCALE_SECONDS_TO_SETTLE = 15
+GRAV_STABLE_DURATION = 10
+GRAV_STABLE_TIMEOUT = GRAV_STABLE_DURATION + 5
+DELAY_SECONDS_AFTER_ASPIRATE = SCALE_SECONDS_TO_SETTLE + GRAV_STABLE_TIMEOUT
 
 
 @dataclass
@@ -123,13 +126,13 @@ def run(
             items.liquid_pipette.aspirate(
                 sample_volume, grav_well, liquid_level=items.liquid_tracker
             )
-            ctx.delay(GRAV_SETTLE_SECONDS)
+            ctx.delay(DELAY_SECONDS_AFTER_ASPIRATE)
             items.liquid_pipette.dispense(
                 sample_volume, grav_well, liquid_level=items.liquid_tracker
             )
-            ctx.delay(GRAV_SETTLE_SECONDS)
             items.liquid_pipette.pipette.drop_tip()
             items.liquid_pipette.save_latest_timestamp()
+        ctx.delay(DELAY_SECONDS_AFTER_ASPIRATE)
     finally:
         items.recorder.stop()
 
@@ -139,8 +142,15 @@ def _analyze_recording_and_timestamps(ctx: ProtocolContext,
                                       timestamps: List[SampleTimestamps]) -> None:
 
     def _get_rec_slice(_time: float) -> GravimetricRecording:
-        return recording.get_time_slice(start=_time, duration=0.3,
-                                        stable=True, timeout=4)
+        if ctx.is_simulating():
+            return recording.get_time_slice(start=recording.start_time,
+                                            duration=0.1,
+                                            stable=True,
+                                            timeout=0.2)
+        return recording.get_time_slice(start=_time + SCALE_SECONDS_TO_SETTLE,
+                                        duration=GRAV_STABLE_DURATION,
+                                        stable=True,
+                                        timeout=GRAV_STABLE_TIMEOUT)
 
     recorded_dispense_slices = [
         {
@@ -153,8 +163,9 @@ def _analyze_recording_and_timestamps(ctx: ProtocolContext,
         r['post'].average - r['pre'].average
         for r in recorded_dispense_slices
     ]
+    assert len(dispense_volumes)
     dispense_avg = sum(dispense_volumes) / len(dispense_volumes)
-    dispense_cv = stdev(dispense_volumes) / dispense_avg
+    dispense_cv = stdev(dispense_volumes) / max(dispense_avg, 0.00000001)
     ctx.comment("Summary:")
     ctx.comment(f"\tAverage: {round(dispense_avg * 1000, 2)} mg")
     ctx.comment(f"\tCV: {round(dispense_cv * 100, 3)}%")
