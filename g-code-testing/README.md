@@ -146,18 +146,18 @@ The following commands support globbing of the passed `name` argument:
 - `diff-g-code-configuration-comparison`
 - `update-g-code-configuration-comparison`
 
-Examples: 
+Examples:
 
 - Run all `protocols` configurations
   - `make run-g-code-configuration name=protocols/*/*`
-- Load all `basic_smoothie` configurations with versions 2.1x or greater 
+- Load all `basic_smoothie` configurations with versions 2.1x or greater
   - `make load-g-code-configuration-comparison name=protocols/basic_smoothie/2.1*`
 - Diff all `basic_smoothie` configurations
   - `make diff-g-code-configuration-comparison name=protocols/basic_smoothie/*`
 - Update all `http` configurations
   - `make update-g-code-configuration-comparison name=http/*`
 - Run all `magdeck` configurations
-  - `make run-g-code-configuration name=http/magdeck*` 
+  - `make run-g-code-configuration name=http/magdeck*`
 
 ### Run G-Code Program
 
