@@ -6,7 +6,7 @@ from opentrons import protocol_api, execute, simulate
 from opentrons.protocol_api.labware import Well
 from opentrons.hardware_control.thread_manager import ThreadManagerException
 
-from .workarounds import is_running_in_app, set_robot_acceleration
+from .workarounds import is_running_in_app, store_robot_acceleration
 
 
 def _add_fake_simulate(
@@ -56,7 +56,7 @@ def get_api_context(
     if not is_running_in_app():
         _add_fake_comment_pause(ctx)
     # NOTE: goshdarnit, all robots will have slower acceleration
-    set_robot_acceleration(ctx, store=True)
+    store_robot_acceleration()
     return ctx
 
 

@@ -95,22 +95,27 @@ push-plot-webpage:
 	scp -r hardware_testing/tools/plot root@$(host):/data
 	$(call move-plot-webpage,$(host),$(br_ssh_key),$(ssh_opts))
 
+.PHONY: restart
+restart:
+	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"opentrons-robot-server")
+
 .PHONY: push-no-restart
 push-no-restart:
 	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
 
 .PHONY: push
-push: push-no-restart
-	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"opentrons-robot-server")
+push: push-no-restart restart
 
+.PHONY: restart-ot3
+restart-ot3:
+	$(call restart-server,$(host),,$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
 push-no-restart-ot3: sdist Pipfile.lock
 	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"hardware_testing")
 
-.PHONY: push
-push-ot3: push-no-restart-ot3
-	$(call restart-server,$(host),,$(ssh_opts),"opentrons-robot-server")
+.PHONY: push-ot3
+push-ot3: push-no-restart-ot3 restart-ot3
 
 .PHONY: push-protocols
 push-protocols:

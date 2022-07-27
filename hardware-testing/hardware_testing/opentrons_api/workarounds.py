@@ -1,4 +1,5 @@
 """Opentrons API Workarounds."""
+import asyncio
 from datetime import datetime
 from typing import Tuple, List, Dict
 import json
@@ -103,26 +104,18 @@ def get_latest_offset_for_labware(
 
 
 def get_hw_api(ctx: ProtocolContext) -> SyncHardwareAPI:
-    return ctx._hw_manager.hardware
+    return ctx._implementation.get_hardware()
 
 
-def get_smoothie_driver(ctx: ProtocolContext) -> SmoothieDriver:
-    return get_hw_api(ctx)._backend._smoothie_driver
-
-
-def set_robot_acceleration(ctx: ProtocolContext,
-                           x: float = DEFAULT_ACCELERATION_X,
-                           y: float = DEFAULT_ACCELERATION_Y,
-                           z: float = DEFAULT_ACCELERATION_Z,
-                           a: float = DEFAULT_ACCELERATION_A,
-                           b: float = DEFAULT_ACCELERATION_B,
-                           c: float = DEFAULT_ACCELERATION_C,
-                           store: bool = False) -> None:
+def store_robot_acceleration(x: float = DEFAULT_ACCELERATION_X,
+                             y: float = DEFAULT_ACCELERATION_Y,
+                             z: float = DEFAULT_ACCELERATION_Z,
+                             a: float = DEFAULT_ACCELERATION_A,
+                             b: float = DEFAULT_ACCELERATION_B,
+                             c: float = DEFAULT_ACCELERATION_C) -> None:
+    # TODO: figure out way to immediately set in smoothie
     cfg = robot_configs.load_ot2()
     settings = {'x': x, 'y': y, 'z': z, 'a': a, 'b': b, 'c': c}
-    if store:
-        for ax, val in settings.items():
-            cfg.acceleration[ax.upper()] = val
-        robot_configs.save_robot_settings(cfg)
-    if not ctx.is_simulating() and is_running_on_robot():
-        get_smoothie_driver(ctx).set_acceleration(settings=settings)
+    for ax, val in settings.items():
+        cfg.acceleration[ax.upper()] = val
+    robot_configs.save_robot_settings(cfg)

@@ -132,6 +132,7 @@ def run(
             )
             items.liquid_pipette.pipette.drop_tip()
             items.liquid_pipette.save_latest_timestamp()
+        ctx.comment("One final pause to wait for final reading to settle")
         ctx.delay(DELAY_SECONDS_AFTER_ASPIRATE)
     finally:
         items.recorder.stop()
@@ -154,11 +155,12 @@ def _analyze_recording_and_timestamps(ctx: ProtocolContext,
 
     recorded_dispense_slices = [
         {
-            'pre': _get_rec_slice(t.pre_dispense.time),
+            'pre': _get_rec_slice(t.post_aspirate.time),
             'post': _get_rec_slice(t.post_dispense.time)
         }
         for t in timestamps
     ]
+
     dispense_volumes = [
         r['post'].average - r['pre'].average
         for r in recorded_dispense_slices
