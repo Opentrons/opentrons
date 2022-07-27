@@ -542,8 +542,12 @@ class OT3API(
         await self.cache_instruments()
 
     # Gantry/frame (i.e. not pipette) action API
+    # TODO(mc, 2022-07-25): add "home both if necessary" functionality
+    # https://github.com/Opentrons/opentrons/pull/11072
     async def home_z(
-        self, mount: Optional[Union[top_types.Mount, OT3Mount]] = None
+        self,
+        mount: Optional[Union[top_types.Mount, OT3Mount]] = None,
+        allow_home_other: bool = True,
     ) -> None:
         """Home the two z-axes"""
         self._reset_last_mount()

@@ -492,13 +492,28 @@ class API(
         await PipetteHandlerProvider.reset(self)
 
     # Gantry/frame (i.e. not pipette) action API
-    async def home_z(self, mount: Optional[top_types.Mount] = None) -> None:
-        """Home the two z-axes"""
-        self._reset_last_mount()
-        if not mount:
-            axes = [Axis.Z, Axis.A]
-        else:
+    async def home_z(
+        self,
+        mount: Optional[top_types.Mount] = None,
+        allow_home_other: bool = True,
+    ) -> None:
+        """Home the Z-stage(s) of the instrument mounts.
+
+        If given a mount, will try to only home that mount.
+        However, if the other mount is currently extended,
+        both mounts will be homed, unless `allow_home_other`
+        is explicitly set to `False`.
+
+        Setting `allow_home_other` to `False` is a bad idea,
+        but the option exists for strict backwards compatibility.
+        """
+        if mount is not None and (
+            self._last_moved_mount in [mount, None] or allow_home_other is False
+        ):
             axes = [Axis.by_mount(mount)]
+        else:
+            axes = [Axis.Z, Axis.A]
+
         await self.home(axes)
 
     async def _do_plunger_home(

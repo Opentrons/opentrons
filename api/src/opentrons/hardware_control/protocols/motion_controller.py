@@ -41,7 +41,11 @@ class MotionController(Protocol):
         ...
 
     # Gantry/frame (i.e. not pipette) action API
-    async def home_z(self, mount: Optional[Mount] = None) -> None:
+    async def home_z(
+        self,
+        mount: Optional[Mount] = None,
+        allow_home_other: bool = True,
+    ) -> None:
         """Home a selected z-axis, or both if not specified."""
         ...
 
