@@ -51,7 +51,7 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
     <Flex
       css={HIDE_SCROLLBAR}
       flexDirection={DIRECTION_COLUMN}
-      maxHeight={'31.25rem'}
+      maxHeight="31.25rem"
       overflowY={'auto'}
       data-testid={'SetupLiquidsList_ListView'}
       gridGap={SPACING.spacing3}
@@ -198,7 +198,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
                     minWidth="4.25rem"
-                    marginLeft="auto"
+                    marginLeft={SPACING.spacingAuto}
                   >
                     {getTotalVolumePerLiquidLabwarePair(
                       liquidId,
@@ -239,7 +239,7 @@ export const LiquidsListItemDetails = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Flex
         css={BORDERS.cardOutlineBorder}
-        padding={'0.75rem'}
+        padding="0.75rem"
         height={'max-content'}
         backgroundColor={COLORS.white}
       >

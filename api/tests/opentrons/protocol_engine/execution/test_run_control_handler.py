@@ -84,7 +84,7 @@ async def test_wait_for_duration(
 
     # NOTE: margin of error selected empirically
     # this is flakey test risk in CI
-    assert end - start == pytest.approx(0.2, abs=0.1)
+    assert end - start >= 0.1
 
 
 async def test_wait_for_duration_ignore_pause(
@@ -108,4 +108,4 @@ async def test_wait_for_duration_ignore_pause(
 
     # NOTE: margin of error selected empirically
     # this is flakey test risk in CI
-    assert end - start == pytest.approx(0, abs=0.1)
+    assert end - start <= 0.1

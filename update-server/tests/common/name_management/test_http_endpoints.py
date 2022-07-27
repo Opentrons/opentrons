@@ -13,7 +13,7 @@ async def test_get_name(
     mock_name_synchronizer: NameSynchronizer,
     decoy: Decoy,
 ) -> None:
-    decoy.when(mock_name_synchronizer.get_name()).then_return("the returned name")
+    decoy.when(await mock_name_synchronizer.get_name()).then_return("the returned name")
 
     response = await (test_cli[0].get("/server/name"))  # type: ignore[no-untyped-call]
     assert response.status == 200

@@ -14,7 +14,6 @@ import {
   Icon,
   SIZE_AUTO,
   SPACING,
-  Text,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -131,7 +130,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           fontSize={TYPOGRAPHY.fontSizeP}
           paddingBottom={SPACING.spacing4}
         >
-          <Text fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
             <Trans
               t={t}
               i18nKey={
@@ -145,14 +144,14 @@ export function TestShake(props: TestShakeProps): JSX.Element {
               components={{
                 bold: <strong />,
                 block: (
-                  <Text
+                  <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
                     marginBottom={SPACING.spacing5}
                   />
                 ),
               }}
             />
-          </Text>
+          </StyledText>
         </Flex>
       </Flex>
       <Flex
@@ -221,9 +220,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           alignItems={ALIGN_FLEX_START}
           marginY={SPACING.spacing6}
         >
-          <StyledText width="22rem">
-            {t('troubleshoot_step1_description')}
-          </StyledText>
+          <StyledText width="22rem">{t('troubleshoot_step_1')}</StyledText>
           <TertiaryButton
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
@@ -233,15 +230,13 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           </TertiaryButton>
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
-          <StyledText width="22rem">
-            {t('troubleshoot_step2_description')}
-          </StyledText>
+          <StyledText width="22rem">{t('troubleshoot_step_3')}</StyledText>
           <TertiaryButton
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
-            onClick={() => setCurrentPage(3)}
+            onClick={() => setCurrentPage(4)}
           >
-            {t('go_to_step_2')}
+            {t('go_to_step_3')}
           </TertiaryButton>
         </Flex>
       </Collapsible>

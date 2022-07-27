@@ -63,7 +63,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       padding={SPACING.spacing4}
       backgroundColor={COLORS.white}
       onClick={() => setSelectedValue(liquidId)}
-      width={'10.3rem'}
+      width="10.3rem"
       minHeight={'max-content'}
     >
       <Flex
@@ -72,7 +72,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       >
         <Flex
           css={BORDERS.cardOutlineBorder}
-          padding={'0.5rem'}
+          padding={SPACING.spacing3}
           height={'max-content'}
           width={'max-content'}
           backgroundColor={COLORS.white}

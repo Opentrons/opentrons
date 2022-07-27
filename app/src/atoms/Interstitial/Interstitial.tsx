@@ -36,7 +36,7 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
       top="0"
       bottom="0"
       justifyContent={JUSTIFY_FLEX_START}
-      padding={`2.5rem 3rem 1rem 3rem`}
+      padding={`${SPACING.spacingXXL} ${SPACING.spacing7} ${SPACING.spacing4} ${SPACING.spacing7}`}
       data-testid={`interstitial`}
       {...outerProps}
     >
@@ -54,13 +54,13 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
         backgroundColor={COLORS.white}
         maxHeight="100%"
         overflowY="auto"
-        paddingTop={TYPOGRAPHY.lineHeight16}
+        paddingTop={SPACING.spacing4}
         {...innerProps}
       >
         {heading && (
           <Flex
             marginTop="0"
-            marginBottom={TYPOGRAPHY.lineHeight16}
+            marginBottom={SPACING.spacing4}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             fontWeight={TYPOGRAPHY.fontWeightBold}
           >

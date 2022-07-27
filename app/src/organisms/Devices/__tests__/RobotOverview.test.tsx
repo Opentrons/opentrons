@@ -78,7 +78,6 @@ describe('RobotOverview', () => {
   beforeEach(() => {
     dispatchApiRequest = jest.fn()
     mockUseRunStatues.mockReturnValue({
-      isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,
@@ -165,7 +164,6 @@ describe('RobotOverview', () => {
   it('renders run a protocol button as disabled when run is not terminal and run id is not null', () => {
     mockUseCurrentRunId.mockReturnValue('id')
     mockUseRunStatues.mockReturnValue({
-      isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: false,
       isRunIdle: false,
@@ -190,7 +188,6 @@ describe('RobotOverview', () => {
   it('renders run a protocol button as not disabled when run id is null but run status is not terminal', () => {
     mockUseCurrentRunId.mockReturnValue(null)
     mockUseRunStatues.mockReturnValue({
-      isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,

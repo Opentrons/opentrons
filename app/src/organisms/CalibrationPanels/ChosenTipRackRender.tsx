@@ -52,7 +52,7 @@ export function ChosenTipRackRender(
   const loadName: keyof typeof labwareImages = selectedValue.value.split(
     '/'
   )[1] as any
-  const displayName = selectedValue.label
+  const displayName = selectedValue?.label
   const calibrationData = tipRackByUriMap[selectedValue.value]?.calibration
 
   const imageSrc =
