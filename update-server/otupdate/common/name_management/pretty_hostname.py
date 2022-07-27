@@ -27,8 +27,9 @@ def pretty_hostname_is_valid(pretty_hostname: str) -> bool:
 
        https://www.freedesktop.org/software/systemd/man/machine-info.html
 
-    2. For the pretty hostname specifically, systemd disallows
-       ASCII < 0x20 (space) and ASCII 0x7f (DEL), but allows everything else.
+    2. For the pretty hostname specifically,
+       systemd disallows ASCII 0x00-0x20 and ASCII 0x7f,
+       but allows everything else.
 
        This is by experimenting with `hostnamectl set-hostname --pretty`
        and by reading the source code of systemd-hostnamed.
