@@ -4,6 +4,7 @@ from typing import (
     Callable,
     ClassVar,
     List,
+    Optional,
     Set,
     Type,
 )
@@ -23,6 +24,7 @@ from pydantic import (
     BaseModel,
     Field,
     constr,
+    validator,
 )
 
 BUCKET_NAME = "g-code-comparison"
@@ -36,8 +38,8 @@ class SharedFunctionsMixin:
 
 
 class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
-    name: constr(regex=r'^[a-z0-9_]*$')
     path: str
+    name: Optional[constr(regex=r'^[a-z0-9_]*$')]
     settings: Settings
     results_dir: ClassVar[str] = "protocols"
     driver: str = 'protocol'
@@ -46,6 +48,11 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
 
     class Config:
         arbitrary_types_allowed = True
+
+    @validator("name", pre=True, always=True)
+    def name_from_path(cls, name, values) -> str:
+        derived_name = os.path.splitext(os.path.basename(values["path"]))[0]
+        return derived_name if name is None else name
 
     def _get_full_path(self, version: APIVersion):
         return os.path.join(

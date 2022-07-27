@@ -40,7 +40,6 @@ BASIC_SMOOTHIE = ProtocolGCodeConfirmConfig(
 )
 
 BECKMAN = ProtocolGCodeConfirmConfig(
-    name="beckman_coulter_rna_advance_viral_rna_isolation",
     path="protocol/protocols/fast/beckman_coulter_rna_advance_viral_rna_isolation.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
     settings=Settings(
@@ -52,7 +51,6 @@ BECKMAN = ProtocolGCodeConfirmConfig(
 )
 
 CHERRY_PICKING = ProtocolGCodeConfirmConfig(
-    name='cherrypicking',
     path="protocol/protocols/fast/cherrypicking.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
     settings=Settings(
@@ -64,7 +62,6 @@ CHERRY_PICKING = ProtocolGCodeConfirmConfig(
 )
 
 CUSTOMIZABLE_SERIAL_DILUTION = ProtocolGCodeConfirmConfig(
-    name="customizable_serial_dilution_ot2",
     path="protocol/protocols/fast/customizable_serial_dilution_ot2.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
     settings=Settings(
@@ -88,7 +85,6 @@ TWO_SINGLE_CHANNEL = ProtocolGCodeConfirmConfig(
 )
 
 SET_MAX_SPEED = ProtocolGCodeConfirmConfig(
-    name="set_max_speed",
     path="protocol/protocols/fast/set_max_speed.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
     settings=SWIFT_SMOOTHIE_SETTINGS
@@ -108,7 +104,6 @@ TWO_MODULES = ProtocolGCodeConfirmConfig(
 
 
 OPENTRONS_LOGO = ProtocolGCodeConfirmConfig(
-    name="opentrons_logo",
     path="protocol/protocols/fast/opentrons_logo.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
     settings=Settings(
@@ -120,7 +115,6 @@ OPENTRONS_LOGO = ProtocolGCodeConfirmConfig(
 )
 
 OMEGA = ProtocolGCodeConfirmConfig(
-    name="omega_biotek_magbind_totalpure_ngs",
     path="protocol/protocols/slow/omega_biotek_magbind_totalpure_ngs.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
     settings=Settings(
@@ -132,7 +126,6 @@ OMEGA = ProtocolGCodeConfirmConfig(
 )
 
 ILLUMINA = ProtocolGCodeConfirmConfig(
-    name="illumina_nextera_xt_library_prep_part1",
     path="protocol/protocols/fast/illumina_nextera_xt_library_prep_part1.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
     settings=Settings(
@@ -144,7 +137,6 @@ ILLUMINA = ProtocolGCodeConfirmConfig(
 )
 
 PCR_PREP_PART_1 = ProtocolGCodeConfirmConfig(
-    name="pcr_prep_part_1",
     path="protocol/protocols/fast/pcr_prep_part_1.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
     settings=Settings(
@@ -156,7 +148,6 @@ PCR_PREP_PART_1 = ProtocolGCodeConfirmConfig(
 )
 
 PCR_PREP_PART_2 = ProtocolGCodeConfirmConfig(
-    name="pcr_prep_part_2",
     path="protocol/protocols/fast/pcr_prep_part_2.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
     settings=Settings(
@@ -168,14 +159,12 @@ PCR_PREP_PART_2 = ProtocolGCodeConfirmConfig(
 )
 
 SWIFT_SMOKE = ProtocolGCodeConfirmConfig(
-    name='swift_smoke',
     path="protocol/protocols/slow/swift_smoke.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
     settings=SWIFT_SMOOTHIE_SETTINGS
 )
 
 SWIFT_TURBO = ProtocolGCodeConfirmConfig(
-    name='swift_turbo',
     path="protocol/protocols/slow/swift_turbo.py",
     versions={APIVersion(2, 12), APIVersion(2, 13)},
     settings=SWIFT_SMOOTHIE_SETTINGS
