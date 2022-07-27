@@ -59,7 +59,7 @@ export function useLatchControls(
 ): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
-  const { isRunTerminal } = useRunStatuses()
+  const { isRunIdle } = useRunStatuses()
   const { moduleIdFromRun } = useModuleIdFromRun(
     module,
     runId != null ? runId : null
@@ -76,12 +76,12 @@ export function useLatchControls(
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',
     params: {
-      moduleId: !isRunTerminal ? moduleIdFromRun : module.id,
+      moduleId: isRunIdle ? moduleIdFromRun : module.id,
     },
   }
 
   const toggleLatch = (): void => {
-    if (runId != null && !isRunTerminal) {
+    if (runId != null && isRunIdle) {
       createCommand({
         runId: runId,
         command: latchCommand,
