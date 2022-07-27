@@ -82,7 +82,11 @@ export const LiquidsLabwareDetailsModal = (
       marginLeft="7.125rem"
       header={<ModalHeader onClose={closeModal} title={labwareName} />}
     >
-      <Box padding={SPACING.spacing4} backgroundColor={COLORS.lightGrey}>
+      <Box
+        paddingX={SPACING.spacing4}
+        paddingTop={SPACING.spacing4}
+        backgroundColor={COLORS.lightGrey}
+      >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
