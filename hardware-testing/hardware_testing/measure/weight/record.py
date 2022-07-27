@@ -153,7 +153,8 @@ class GravimetricRecording(List):
 
     def _get_nearest_sample_index(self, _time: float) -> int:
         if _time < self.start_time or _time > self.end_time:
-            raise ValueError(f"Time ({_time}) is not within recording")
+            raise ValueError(f"Time ({_time}) is not within recording "
+                             f"(start={self.start_time}, end={self.end_time})")
         for i in range(len(self) - 1):
             diff_before = _time - self[i].time
             diff_after = self[i + 1].time - _time

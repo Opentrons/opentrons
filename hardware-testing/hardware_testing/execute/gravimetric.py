@@ -107,9 +107,9 @@ def run(
     samples: int,
 ) -> None:
     """Run."""
-    items.liquid_pipette.record_timestamp_enable()
     try:
         items.recorder.record(in_thread=True)
+        items.liquid_pipette.record_timestamp_enable()
         sample_volumes = [v for v in volumes for _ in range(samples)]
         if items.liquid_pipette.pipette.has_tip:
             items.liquid_pipette.pipette.drop_tip()
@@ -140,8 +140,8 @@ def analyze(ctx: ProtocolContext, items: ExecuteGravItems) -> None:
         # FIXME: some ugliness so that simulating doesn't break
         _is_sim = ctx.is_simulating()
         start = _time if not _is_sim else entire_recording.start_time
-        duration = 1.0 if not _is_sim else 2.0 / items.recorder.config.frequency
-        timeout = 3 if not _is_sim else 4.0 / items.recorder.config.frequency
+        duration = 1.0 if not _is_sim else 1.0 / items.recorder.config.frequency
+        timeout = 3 if not _is_sim else 2.0 / items.recorder.config.frequency
         return entire_recording.get_time_slice(start=start, duration=duration,
                                                stable=True, timeout=timeout)
 
