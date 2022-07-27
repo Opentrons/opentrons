@@ -6,8 +6,6 @@ import {
 } from '@opentrons/react-api-client'
 import {
   Flex,
-  Text,
-  FONT_WEIGHT_REGULAR,
   TYPOGRAPHY,
   SPACING,
   COLORS,
@@ -22,6 +20,7 @@ import {
 import { Slideout } from '../../atoms/Slideout'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
 import { InputField } from '../../atoms/InputField'
+import { StyledText } from '../../atoms/text'
 import { useRunStatuses } from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 import { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
@@ -108,8 +107,8 @@ export const TemperatureModuleSlideout = (
         />
       }
     >
-      <Text
-        fontWeight={FONT_WEIGHT_REGULAR}
+      <StyledText
+        fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
         paddingTop={SPACING.spacing2}
         data-testid={`TemperatureSlideout_body_text_${module.serialNumber}`}
@@ -117,20 +116,20 @@ export const TemperatureModuleSlideout = (
         {t('tempdeck_slideout_body', {
           model: name,
         })}
-      </Text>
+      </StyledText>
       <Flex
         marginTop={SPACING.spacing4}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`TemperatureSlideout_input_field_${module.serialNumber}`}
       >
-        <Text
+        <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.black}
           paddingBottom={SPACING.spacing3}
         >
           {t('set_temperature')}
-        </Text>
+        </StyledText>
         <form id="TemperatureModuleSlideout_submitValue">
           <InputField
             id={`${module.moduleModel}`}

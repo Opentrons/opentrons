@@ -20,7 +20,7 @@ export function Tooltip(props: TooltipProps): JSX.Element {
       {...tooltipProps}
       backgroundColor={COLORS.darkBlack}
       fontSize={TYPOGRAPHY.fontSizeCaption}
-      width={'8.75rem'}
+      width="8.75rem"
     >
       {children}
     </SharedTooltip>
