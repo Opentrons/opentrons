@@ -613,14 +613,14 @@ describe('StepText', () => {
     getByText('temperature: 10°C, seconds: 10')
   })
 
-  it('renders correct command text for holding tc time', () => {
+  it('renders correct command text for TC profile to complete', () => {
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
       runCommand: MOCK_TC_WAIT_FOR_PROFILE_COMMAND as RunCommandSummary,
     })
-    getByText('Waiting for hold time duration')
+    getByText('Waiting for Thermocycler profile to complete')
   })
 
   it('renders correct command text for setting HS temp', () => {
@@ -695,7 +695,7 @@ describe('StepText', () => {
     getByText('Unlatching labware on Heater-Shaker')
   })
 
-  it('renders correct command text for wait for duration', () => {
+  it('renders correct command text for wait for duration with minutes', () => {
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,

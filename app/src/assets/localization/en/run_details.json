@@ -119,7 +119,7 @@
   "deactivating_tc_block": "Deactivating Thermocycler block",
   "deactivating_tc_lid": "Deactivating Thermocycler lid",
   "tc_starting_profile": "Thermocycler starting {{repetitions}} repetitions of cycle composed of the following steps:",
-  "tc_awaiting_for_duration": "Waiting for hold time duration",
+  "tc_awaiting_for_duration": "Waiting for Thermocycler profile to complete",
   "setting_hs_temp": "Setting Target Temperature of Heater-Shaker to {{temp}}°C",
   "waiting_for_hs_to_reach": "Waiting for Heater-Shaker to reach target temperature",
   "set_and_await_hs_shake": "Setting Heater-Shaker to shake at {{rpm}} rpm and waiting until reached",
