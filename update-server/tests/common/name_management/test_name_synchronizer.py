@@ -14,33 +14,36 @@ from otupdate.common.name_management.name_synchronizer import (
 @pytest.fixture(autouse=True)
 def monkeypatch_pretty_hostname_functions(decoy: Decoy, monkeypatch: Any) -> None:
     """Replace the functions of the pretty_hostname module with mocks."""
-    mock_get_pretty_hostname = decoy.mock(func=pretty_hostname.get_pretty_hostname)
-    mock_persist_pretty_hostname = decoy.mock(
-        func=pretty_hostname.persist_pretty_hostname
-    )
-    mock_pretty_hostname_is_valid = decoy.mock(
-        func=pretty_hostname.pretty_hostname_is_valid
+    monkeypatch.setattr(
+        pretty_hostname,
+        "get_pretty_hostname",
+        decoy.mock(func=pretty_hostname.get_pretty_hostname),
     )
     monkeypatch.setattr(
-        pretty_hostname, "get_pretty_hostname", mock_get_pretty_hostname
+        pretty_hostname,
+        "persist_pretty_hostname",
+        decoy.mock(func=pretty_hostname.persist_pretty_hostname),
     )
     monkeypatch.setattr(
-        pretty_hostname, "persist_pretty_hostname", mock_persist_pretty_hostname
-    )
-    monkeypatch.setattr(
-        pretty_hostname, "pretty_hostname_is_valid", mock_pretty_hostname_is_valid
+        pretty_hostname,
+        "pretty_hostname_is_valid",
+        decoy.mock(func=pretty_hostname.pretty_hostname_is_valid),
     )
 
 
 @pytest.fixture(autouse=True)
 def monkeypatch_avahi_functions(decoy: Decoy, monkeypatch: Any) -> None:
     """Replace the functions of the avahi module with mocks."""
-    mock_alternative_service_name = decoy.mock(func=avahi.alternative_service_name)
-    mock_service_name_is_valid = decoy.mock(func=avahi.service_name_is_valid)
+    # TODO(mm, 2022-07-27): Turn these two functions into static methods
+    # of the AvahiClient class, for more uniform mocking.
     monkeypatch.setattr(
-        avahi, "alternative_service_name", mock_alternative_service_name
+        avahi,
+        "alternative_service_name",
+        decoy.mock(func=avahi.alternative_service_name),
     )
-    monkeypatch.setattr(avahi, "service_name_is_valid", mock_service_name_is_valid)
+    monkeypatch.setattr(
+        avahi, "service_name_is_valid", decoy.mock(func=avahi.service_name_is_valid)
+    )
 
 
 @pytest.fixture
