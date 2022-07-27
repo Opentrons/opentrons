@@ -157,6 +157,3 @@ export const liquidColors = [
 // note: warningDisabled = successDisabled
 
 // export const alphaToOpacity35 = '35'
-
-
-
