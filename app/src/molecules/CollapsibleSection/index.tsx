@@ -12,7 +12,6 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
-// Note hex codes will be replaced when PR-10664 is merged into release-6.0.0
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
