@@ -218,7 +218,7 @@ export const SubmitPrimaryButton = (
 
     &:disabled {
       background-color: ${COLORS.darkGreyDisabled};
-      color: ${COLORS.disabled}; // COLOR-TODO #a0a0a0
+      color: ${COLORS.successDisabled};
     }
   `
   return <input {...props} css={SUBMIT_INPUT_STYLE} type="submit" />
