@@ -8,6 +8,7 @@ import {
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 
 import { StyledText } from '../text'
@@ -23,9 +24,9 @@ export interface ModalHeaderProps {
 
 const closeIconStyles = css`
   display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 14px;
+  justify-content: ${JUSTIFY_CENTER};
+  align-items: ${ALIGN_CENTER};
+  border-radius: 0.875rem;
   width: ${SPACING.spacingL};
   height: ${SPACING.spacingL};
   &:hover {
@@ -64,7 +65,7 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
                 }`}
               >
                 <Icon
-                  name={'close'}
+                  name="close"
                   width={SPACING.spacing5}
                   height={SPACING.spacing5}
                 />
