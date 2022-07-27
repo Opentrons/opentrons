@@ -68,7 +68,7 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: #${COLORS.lightGreyEnabled};
+    background: ${COLORS.lightGreyEnabled};
   }
   &:active {
     background: ${COLORS.lightGreyHover};
