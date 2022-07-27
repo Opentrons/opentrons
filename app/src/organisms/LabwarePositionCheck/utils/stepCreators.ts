@@ -111,21 +111,21 @@ export const getMoveToLabwareSteps = (
     } else if (isLabwareOnTopOfHS) {
       // @ts-expect-error we know there is a moduleId key on type LabwareLocation because the labware is on top of a HS
       const moduleId = getLabwareLocation(labwareId, commands).moduleId
-      const stopShakingCommand: HeaterShakerDeactivateShakerCreateCommand = {
-        commandType: 'heaterShaker/deactivateShaker',
-        params: {
-          moduleId,
-        },
-      }
       const closeLatchCommand: HeaterShakerCloseLatchCreateCommand = {
         commandType: 'heaterShaker/closeLabwareLatch',
         params: {
           moduleId,
         },
       }
+      const stopShakingCommand: HeaterShakerDeactivateShakerCreateCommand = {
+        commandType: 'heaterShaker/deactivateShaker',
+        params: {
+          moduleId,
+        },
+      }
       moveToLabwareCommands = [
-        stopShakingCommand,
         closeLatchCommand,
+        stopShakingCommand,
         moveToWellCommand,
       ]
     } else {
