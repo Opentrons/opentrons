@@ -142,24 +142,30 @@ def _analyze_recording_and_timestamps(ctx: ProtocolContext,
                                       recording: GravimetricRecording,
                                       timestamps: List[SampleTimestamps]) -> None:
 
-    def _get_rec_slice(_time: float) -> GravimetricRecording:
+    def _get_rec_slice(start: float, end: float) -> GravimetricRecording:
         if ctx.is_simulating():
             return recording.get_time_slice(start=recording.start_time,
                                             duration=0.1,
                                             stable=True,
                                             timeout=0.2)
-        return recording.get_time_slice(start=_time + SCALE_SECONDS_TO_SETTLE,
+
+        _start = start + SCALE_SECONDS_TO_SETTLE
+        _timeout = end - _start
+        return recording.get_time_slice(start=_start,
                                         duration=GRAV_STABLE_DURATION,
                                         stable=True,
-                                        timeout=GRAV_STABLE_TIMEOUT)
+                                        timeout=_timeout)
 
-    recorded_dispense_slices = [
-        {
-            'pre': _get_rec_slice(t.post_aspirate.time),
-            'post': _get_rec_slice(t.post_dispense.time)
-        }
-        for t in timestamps
-    ]
+    recorded_dispense_slices = list()
+    for i, t in enumerate(timestamps):
+        if i < len(timestamps) - 1:
+            post_boundary = timestamps[i + 1].pre_aspirate.time
+        else:
+            post_boundary = recording.end_time
+        recorded_dispense_slices.append({
+            'pre': _get_rec_slice(start=t.post_aspirate.time, end=t.pre_dispense.time),
+            'post': _get_rec_slice(start=t.post_dispense.time, end=post_boundary)
+        })
 
     dispense_volumes = [
         r['post'].average - r['pre'].average
