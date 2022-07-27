@@ -99,6 +99,8 @@ async def persist_pretty_hostname(new_pretty_hostname: str) -> None:
         command="systemctl", args=["reload-or-restart", "systemd-hostnamed"]
     )
 
+    # TODO(mm, 2022-07-27): This is a race condition if two tasks call this function
+    # concurrently. Resolve this by protecting this function with a lock.
     read_back_pretty_hostname = await get_pretty_hostname()
     assert read_back_pretty_hostname == new_pretty_hostname, (
         f"Tried to set pretty hostname to {new_pretty_hostname!r}"
