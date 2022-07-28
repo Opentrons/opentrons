@@ -1,5 +1,5 @@
 """Environment Sensor Driver Class."""
-from typing import Optional, AsyncIterator
+from typing import Optional, AsyncIterator, Tuple
 from contextlib import asynccontextmanager
 
 from opentrons_hardware.firmware_bindings.messages.payloads import (
@@ -18,6 +18,7 @@ from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding, 
 from opentrons_hardware.sensors.utils import (
     ReadSensorInformation,
     WriteSensorInformation,
+    PollSensorInformation,
     SensorDataType,
 )
 from typing import Optional
@@ -39,12 +40,14 @@ class EnvironmentSensor(AbstractBasicSensor):
         node_id: NodeId,
         offset: bool = False,
         timeout: int = 1,
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[Tuple[SensorDataType]]:
         """Single read of the environment sensor."""
         read = ReadSensorInformation(
             self._sensor_type, self._sensor_id, node_id, offset
         )
-        return await self._scheduler.send_read(read, can_messenger, timeout)
+        humidity = await self._scheduler.send_read(read, can_messenger, timeout)
+        temperature = await self._scheduler.read(can_messenger, node_id)
+        return humidity, temperature
 
     async def poll(
         self,
@@ -52,21 +55,15 @@ class EnvironmentSensor(AbstractBasicSensor):
         node_id: NodeId,
         offset: bool = False,
         timeout: int = 1,
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[Tuple[SensorDataType]]:
         """Single read of the environment sensor."""
-        read = ReadSensorInformation(
+        read = PollSensorInformation(
             self._sensor_type, self._sensor_id, node_id, offset
         )
-        return await self._scheduler.send_read(read, can_messenger, timeout)
+        humidity = await self._scheduler.run_poll(read, can_messenger, timeout)
+        temperature = await self._scheduler.read(can_messenger, node_id)
+        return humidity, temperature
 
-    async def write(
-        self, can_messenger: CanMessenger, node_id: NodeId, data: SensorDataType
-    ) -> None:
-        """Write to a register of the environment sensor."""
-        write = WriteSensorInformation(
-            self._sensor_type, self._sensor_id, node_id, data
-        )
-        await self._scheduler.send_write(write, can_messenger)
 
     @asynccontextmanager
     async def bind_output(
