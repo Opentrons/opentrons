@@ -865,6 +865,19 @@ describe('StepText', () => {
     })
     getByText('Moving 4 mm along y axis')
   })
+  it('renders correct command text for moveToCoordinates', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'moveToCoordinates',
+        params: { coordinates: { x: '4', y: '5', z: '2' } },
+      },
+    })
+    getByText('Moving to (X: 4, Y: 5, Z: 2)')
+  })
 
   it('renders correct command text for home', () => {
     const { getByText } = render({

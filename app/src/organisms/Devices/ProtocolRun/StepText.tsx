@@ -2,7 +2,6 @@ import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { Flex, ALIGN_CENTER, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-
 import { StyledText } from '../../../atoms/text'
 import { getLabwareLocation } from '../ProtocolRun/utils/getLabwareLocation'
 import {
@@ -123,7 +122,8 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'loadLabware':
     case 'loadPipette':
-    case 'loadModule': {
+    case 'loadModule':
+    case 'loadLiquid': {
       messageNode = (
         <RunLogProtocolSetupInfo
           robotName={robotName}
@@ -256,6 +256,9 @@ export function StepText(props: Props): JSX.Element | null {
         labwareId,
         protocolData.commands
       )
+      if (!('slotName' in labwareLocation)) {
+        throw new Error('expected tip rack to be in a slot')
+      }
       messageNode = (
         <Trans
           t={t}
@@ -280,6 +283,9 @@ export function StepText(props: Props): JSX.Element | null {
         labwareId,
         protocolData.commands
       )
+      if (!('slotName' in labwareLocation)) {
+        throw new Error('expected tip rack to be in a slot')
+      }
       messageNode = (
         <Trans
           t={t}
@@ -304,6 +310,9 @@ export function StepText(props: Props): JSX.Element | null {
         labwareId,
         protocolData.commands
       )
+      if (!('slotName' in labwareLocation)) {
+        throw new Error('expected tip rack to be in a slot')
+      }
       messageNode = (
         <Trans
           t={t}
@@ -345,6 +354,9 @@ export function StepText(props: Props): JSX.Element | null {
         labwareId,
         protocolData.commands
       )
+      if (!('slotName' in labwareLocation)) {
+        throw new Error('expected tip rack to be in a slot')
+      }
       messageNode = (
         <Trans
           t={t}
@@ -369,6 +381,21 @@ export function StepText(props: Props): JSX.Element | null {
           values={{
             axis: axis,
             distance: distance,
+          }}
+        />
+      )
+      break
+    }
+    case 'moveToCoordinates': {
+      const { coordinates } = displayCommand.params
+      messageNode = (
+        <Trans
+          t={t}
+          i18nKey={'move_to_coordinates'}
+          values={{
+            x: coordinates.x,
+            y: coordinates.y,
+            z: coordinates.z,
           }}
         />
       )

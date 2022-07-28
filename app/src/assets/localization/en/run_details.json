@@ -44,6 +44,7 @@
   "cancel_run_module_info": "Additionally, any hardware modules used within the protocol will remain active and maintain their current states until deactivated.",
   "protocol_setup": "Protocol Setup",
   "load_pipette_protocol_setup": "Load {{pipette_name}} in {{mount_name}} Mount",
+  "load_liquids_info_protocol_setup": "Load {{liquid}} into {{labware}}",
   "load_modules_protocol_setup": "Load {{module}} in Slot {{slot_name}}",
   "load_modules_protocol_setup_plural": "Load {{module}}",
   "load_labware_info_protocol_setup_no_module": "Load {{labware_loadname}} v{{labware_version}} in Slot {{slot_number}}",
@@ -136,6 +137,7 @@
   "move_to_slot": "Moving to {{slot_name}}",
   "move_to_well": "Moving to {{well_name}} of {{labware}} in {{labware_location}}",
   "move_relative": "Moving {{distance}} mm along {{axis}} axis",
+  "move_to_coordinates": "Moving to (X: {{x}}, Y: {{y}}, Z: {{z}})",
   "home_gantry": "Homing the following axes: Gantry X, Gantry Y, Left Pipette Mount Z, Right Pipette Mount Z, Left Pipette Plunger, Right Pipette Plunger",
   "save_position": "Saving position"
 }
