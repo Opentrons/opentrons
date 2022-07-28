@@ -361,6 +361,20 @@ export function StepText(props: Props): JSX.Element | null {
       )
       break
     }
+    case 'moveRelative': {
+      const { axis, distance } = displayCommand.params
+      messageNode = (
+        <Trans
+          t={t}
+          i18nKey={'move_relative'}
+          values={{
+            axis: axis,
+            distance: distance,
+          }}
+        />
+      )
+      break
+    }
 
     case 'custom': {
       const { legacyCommandText } = displayCommand.params ?? {}

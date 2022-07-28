@@ -852,4 +852,17 @@ describe('StepText', () => {
       'Moving to wellName of fake_display_name in fake_labware_location'
     )
   })
+  it('renders correct command text for moveRelative', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'moveRelative',
+        params: { distance: '4', axis: 'y' },
+      },
+    })
+    getByText('Moving 4 mm along y axis')
+  })
 })
