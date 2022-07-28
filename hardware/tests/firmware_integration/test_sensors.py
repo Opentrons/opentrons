@@ -70,9 +70,9 @@ async def test_write_to_sensors(
 @pytest.mark.parametrize(
     argnames=["sensor_type", "expected_data"],
     argvalues=[
-        [SensorType.capacitive, 0.46],
-        [SensorType.environment, (83.92, 22.44)],
-        [SensorType.pressure, 0.02],
+        # [SensorType.capacitive, 0.46],
+        [SensorType.environment, (12.7291, 10.0729)],
+        # [SensorType.pressure, 0.02],
     ],
 )
 @pytest.mark.requires_emulator
@@ -94,11 +94,24 @@ async def test_read_from_sensors(
     await can_messenger.send(node_id=NodeId.pipette_left, message=read_message)
     response, _ = await asyncio.wait_for(can_messenger_queue.read(), 3)
 
-    assert isinstance(response, ReadFromSensorResponse)
-    assert (
-        round(SensorDataType.build(response.payload.sensor_data).to_float(), 2)
-        == expected_data
-    )
+    if (sensor_type == SensorType.environment and isinstance(expected_data, tuple)):
+        response2, _ = await asyncio.wait_for(can_messenger_queue.read(), 3)
+        assert isinstance(response, ReadFromSensorResponse)
+        assert isinstance(response2, ReadFromSensorResponse)
+        assert (
+            round(SensorDataType.build(response.payload.sensor_data).to_float(), 2)
+            == expected_data[0]
+        )
+        assert (
+            round(SensorDataType.build(response2.payload.sensor_data).to_float(), 2)
+            == expected_data[1]
+        )
+    else:
+        assert isinstance(response, ReadFromSensorResponse)
+        assert (
+            round(SensorDataType.build(response.payload.sensor_data).to_float(), 2)
+            == expected_data
+        )
 
 
 @pytest.mark.parametrize(
