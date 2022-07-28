@@ -702,4 +702,111 @@ describe('StepText', () => {
     })
     getByText('Pause for 60 seconds')
   })
+  it('renders correct command text for aspirate', () => {
+    const labwareId = 'labwareId'
+    when(mockGetLabwareDisplayName)
+      .calledWith('fake_def' as any)
+      .mockReturnValue('fake_display_name')
+    when(mockGetLabwareLocation)
+      .calledWith(labwareId, [])
+      .mockReturnValue({ slotName: 'fake_labware_location' })
+    mockUseLabwareRenderInfoForRunById.mockReturnValue({
+      labwareId: {
+        labwareDef: 'fake_def',
+      },
+    } as any)
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'aspirate',
+        params: {
+          volume: 100,
+          flowRate: 130,
+          wellName: 'wellName',
+          labwareId: 'labwareId',
+        },
+      },
+    })
+    getByText(
+      'Aspirating 100 uL from wellName of fake_display_name in fake_labware_location at 130 uL/sec'
+    )
+  })
+  it('renders correct command text for dispense', () => {
+    const labwareId = 'labwareId'
+    when(mockGetLabwareDisplayName)
+      .calledWith('fake_def' as any)
+      .mockReturnValue('fake_display_name')
+    when(mockGetLabwareLocation)
+      .calledWith(labwareId, [])
+      .mockReturnValue({ slotName: 'fake_labware_location' })
+    mockUseLabwareRenderInfoForRunById.mockReturnValue({
+      labwareId: {
+        labwareDef: 'fake_def',
+      },
+    } as any)
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'dispense',
+        params: {
+          volume: 100,
+          flowRate: 130,
+          wellName: 'wellName',
+          labwareId: 'labwareId',
+        },
+      },
+    })
+    getByText(
+      'Dispensing 100 uL into wellName of fake_display_name in fake_labware_location at 130 uL/sec'
+    )
+  })
+  it('renders correct command text for blowout', () => {
+    const labwareId = 'labwareId'
+    when(mockGetLabwareDisplayName)
+      .calledWith('fake_def' as any)
+      .mockReturnValue('fake_display_name')
+    when(mockGetLabwareLocation)
+      .calledWith(labwareId, [])
+      .mockReturnValue({ slotName: 'fake_labware_location' })
+    mockUseLabwareRenderInfoForRunById.mockReturnValue({
+      labwareId: {
+        labwareDef: 'fake_def',
+      },
+    } as any)
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'blowout',
+        params: {
+          flowRate: 130,
+          wellName: 'wellName',
+          labwareId: 'labwareId',
+        },
+      },
+    })
+    getByText(
+      'Blowing out at wellName of fake_display_name in fake_labware_location at 130 uL/sec'
+    )
+  })
+  it('renders correct command text for touchTip', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'touchTip',
+      },
+    })
+    getByText('Touching tip')
+  })
 })

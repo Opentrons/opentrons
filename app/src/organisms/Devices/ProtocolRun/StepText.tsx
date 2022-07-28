@@ -250,6 +250,82 @@ export function StepText(props: Props): JSX.Element | null {
       messageNode = t('wait_for_duration', { seconds: seconds })
       break
     }
+    case 'aspirate': {
+      const { wellName, labwareId, volume, flowRate } = displayCommand.params
+      const labwareLocation = getLabwareLocation(
+        labwareId,
+        protocolData.commands
+      )
+      messageNode = (
+        <Trans
+          t={t}
+          i18nKey={'aspirate'}
+          values={{
+            well_name: wellName,
+            labware: getLabwareDisplayName(
+              labwareRenderInfoById[labwareId].labwareDef
+            ),
+            labware_location: labwareLocation.slotName,
+            volume: volume,
+            flowRate: flowRate,
+          }}
+        />
+      )
+
+      break
+    }
+    case 'dispense': {
+      const { wellName, labwareId, volume, flowRate } = displayCommand.params
+      const labwareLocation = getLabwareLocation(
+        labwareId,
+        protocolData.commands
+      )
+      messageNode = (
+        <Trans
+          t={t}
+          i18nKey={'dispense'}
+          values={{
+            well_name: wellName,
+            labware: getLabwareDisplayName(
+              labwareRenderInfoById[labwareId].labwareDef
+            ),
+            labware_location: labwareLocation.slotName,
+            volume: volume,
+            flowRate: flowRate,
+          }}
+        />
+      )
+
+      break
+    }
+    case 'blowout': {
+      const { wellName, labwareId, flowRate } = displayCommand.params
+      const labwareLocation = getLabwareLocation(
+        labwareId,
+        protocolData.commands
+      )
+      messageNode = (
+        <Trans
+          t={t}
+          i18nKey={'blowout'}
+          values={{
+            well_name: wellName,
+            labware: getLabwareDisplayName(
+              labwareRenderInfoById[labwareId].labwareDef
+            ),
+            labware_location: labwareLocation.slotName,
+            flowRate: flowRate,
+          }}
+        />
+      )
+
+      break
+    }
+    case 'touchTip': {
+      messageNode = t('touch_tip')
+      break
+    }
+
     case 'custom': {
       const { legacyCommandText } = displayCommand.params ?? {}
       const sanitizedCommandText =

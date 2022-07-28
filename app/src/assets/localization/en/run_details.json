@@ -128,5 +128,9 @@
   "latching_hs_latch": "Latching labware on Heater-Shaker",
   "deactivate_hs_shake": "Deactivating shaker",
   "wait_for_duration": "Pause for {{seconds}} seconds",
-  "tc_run_profile_steps": "temperature: {{celsius}}°C, seconds: {{seconds}}"
+  "tc_run_profile_steps": "temperature: {{celsius}}°C, seconds: {{seconds}}",
+  "aspirate": "Aspirating {{volume}} uL from {{well_name}} of {{labware}} in {{labware_location}} at {{flowRate}} uL/sec",
+  "dispense": "Dispensing {{volume}} uL into {{well_name}} of {{labware}} in {{labware_location}} at {{flowRate}} uL/sec",
+  "blowout": "Blowing out at {{well_name}} of {{labware}} in {{labware_location}} at {{flowRate}} uL/sec",
+  "touch_tip": "Touching tip"
 }
