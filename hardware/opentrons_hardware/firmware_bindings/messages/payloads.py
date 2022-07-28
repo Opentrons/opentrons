@@ -384,7 +384,7 @@ class PipetteInfoResponsePayload(utils.BinarySerializable):
 
     name: PipetteNameField
     model: utils.UInt16Field
-    serial: SerialField
+    serial: SerialDataCode
 
 
 @dataclass
@@ -406,7 +406,7 @@ class GripperInfoResponsePayload(utils.BinarySerializable):
     """A response carrying data about an attached gripper."""
 
     model: utils.UInt16Field
-    serial: SerialField
+    serial: SerialDataCode
 
 
 @dataclass
