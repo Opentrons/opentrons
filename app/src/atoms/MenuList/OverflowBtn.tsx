@@ -34,7 +34,10 @@ const overflowButtonStyles = css`
   }
 
   &:disabled circle {
-    fill: ${COLORS.errorText};
+    fill: ${COLORS.successDisabled};
+  }
+  &:disabled {
+    background-color: transparent;
   }
 `
 
