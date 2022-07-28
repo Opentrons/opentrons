@@ -15,6 +15,8 @@ from opentrons.protocol_engine.types import (
     WellOffset,
     PipetteName,
     LoadedPipette,
+    DeckSlotName,
+    DeckSlotLocation,
 )
 from opentrons.protocol_engine.state import PipetteLocationData
 from opentrons.protocol_engine.state.labware import LabwareView
@@ -22,6 +24,7 @@ from opentrons.protocol_engine.state.pipettes import PipetteView, CurrentWell
 from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.motion import MotionView
 from opentrons.protocol_engine.state.modules import ModuleView
+from opentrons.protocol_engine.state.module_substates import HeaterShakerModuleId
 
 
 @pytest.fixture
@@ -571,3 +574,69 @@ def test_get_movement_waypoints_to_coords_raises(
             direct=False,
             additional_min_travel_z=None,
         )
+
+
+@pytest.mark.parametrize(
+    ("labware_deck_slot", "expected_result"),
+    [
+        (DeckSlotName.SLOT_4, True),
+        (DeckSlotName.SLOT_5, True),
+        (DeckSlotName.SLOT_6, True),
+        (DeckSlotName.SLOT_2, False),
+        (DeckSlotName.SLOT_8, False),
+        (DeckSlotName.SLOT_1, False),
+    ],
+)
+def test_check_pipette_blocking_hs_latch(
+    decoy: Decoy,
+    geometry_view: GeometryView,
+    pipette_view: PipetteView,
+    mock_module_view: ModuleView,
+    subject: MotionView,
+    labware_deck_slot: DeckSlotName,
+    expected_result: bool,
+) -> None:
+    decoy.when(pipette_view.get_current_well()).then_return(
+        CurrentWell(pipette_id="pipette-id", labware_id="labware-id", well_name="A1"))
+
+    decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(labware_deck_slot)
+
+    decoy.when(mock_module_view.get_location(HeaterShakerModuleId("heater-shaker-id"))).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_5))
+
+    result = subject.check_pipette_blocking_hs_latch(HeaterShakerModuleId("heater-shaker-id"))
+
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    ("labware_deck_slot", "expected_result"),
+    [
+        (DeckSlotName.SLOT_4, True),
+        (DeckSlotName.SLOT_5, True),
+        (DeckSlotName.SLOT_6, True),
+        (DeckSlotName.SLOT_2, True),
+        (DeckSlotName.SLOT_8, True),
+        (DeckSlotName.SLOT_1, False),
+    ],
+)
+def test_check_pipette_blocking_hs_shake(
+    decoy: Decoy,
+    geometry_view: GeometryView,
+    pipette_view: PipetteView,
+    mock_module_view: ModuleView,
+    subject: MotionView,
+    labware_deck_slot: DeckSlotName,
+    expected_result: bool,
+) -> None:
+    decoy.when(pipette_view.get_current_well()).then_return(
+        CurrentWell(pipette_id="pipette-id", labware_id="labware-id", well_name="A1"))
+
+    decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(labware_deck_slot)
+
+    decoy.when(mock_module_view.get_location(HeaterShakerModuleId("heater-shaker-id"))).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_5))
+
+    result = subject.check_pipette_blocking_hs_shaker(HeaterShakerModuleId("heater-shaker-id"))
+
+    assert result == expected_result

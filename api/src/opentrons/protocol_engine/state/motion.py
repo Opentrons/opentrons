@@ -184,7 +184,7 @@ class MotionView:
     def check_pipette_blocking_hs_latch(
         self, hs_module_id: HeaterShakerModuleId
     ) -> bool:
-        """Check if pipette would block h/s latch from opening"""
+        """Check if pipette would block h/s latch from opening."""
         pipette_blocking = True
         current_well = self._pipettes.get_current_well()
         if current_well is not None:
@@ -199,7 +199,7 @@ class MotionView:
     def check_pipette_blocking_hs_shaker(
         self, hs_module_id: HeaterShakerModuleId
     ) -> bool:
-        """Check if pipette would block h/s latch from starting shake"""
+        """Check if pipette would block h/s latch from starting shake."""
         pipette_blocking = True
         current_well = self._pipettes.get_current_well()
         if current_well is not None:

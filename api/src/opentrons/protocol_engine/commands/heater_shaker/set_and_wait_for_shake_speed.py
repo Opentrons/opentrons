@@ -6,7 +6,6 @@ from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
 
 from opentrons.protocol_engine.types import MotorAxis
-from opentrons.motion_planning.adjacent_slots_getters import get_adjacent_slots
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
