@@ -15,7 +15,6 @@ from opentrons.protocol_engine.types import (
     WellOffset,
     PipetteName,
     LoadedPipette,
-    DeckSlotName,
     DeckSlotLocation,
 )
 from opentrons.protocol_engine.state import PipetteLocationData
@@ -596,15 +595,22 @@ def test_check_pipette_blocking_hs_latch(
     labware_deck_slot: DeckSlotName,
     expected_result: bool,
 ) -> None:
+    """It should return True if pipette is blocking opening the latch."""
     decoy.when(pipette_view.get_current_well()).then_return(
-        CurrentWell(pipette_id="pipette-id", labware_id="labware-id", well_name="A1"))
+        CurrentWell(pipette_id="pipette-id", labware_id="labware-id", well_name="A1")
+    )
 
-    decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(labware_deck_slot)
+    decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(
+        labware_deck_slot
+    )
 
-    decoy.when(mock_module_view.get_location(HeaterShakerModuleId("heater-shaker-id"))).then_return(
-        DeckSlotLocation(slotName=DeckSlotName.SLOT_5))
+    decoy.when(
+        mock_module_view.get_location(HeaterShakerModuleId("heater-shaker-id"))
+    ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_5))
 
-    result = subject.check_pipette_blocking_hs_latch(HeaterShakerModuleId("heater-shaker-id"))
+    result = subject.check_pipette_blocking_hs_latch(
+        HeaterShakerModuleId("heater-shaker-id")
+    )
 
     assert result == expected_result
 
@@ -629,14 +635,21 @@ def test_check_pipette_blocking_hs_shake(
     labware_deck_slot: DeckSlotName,
     expected_result: bool,
 ) -> None:
+    """It should return True if pipette is blocking the h/s from shaking."""
     decoy.when(pipette_view.get_current_well()).then_return(
-        CurrentWell(pipette_id="pipette-id", labware_id="labware-id", well_name="A1"))
+        CurrentWell(pipette_id="pipette-id", labware_id="labware-id", well_name="A1")
+    )
 
-    decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(labware_deck_slot)
+    decoy.when(geometry_view.get_ancestor_slot_name("labware-id")).then_return(
+        labware_deck_slot
+    )
 
-    decoy.when(mock_module_view.get_location(HeaterShakerModuleId("heater-shaker-id"))).then_return(
-        DeckSlotLocation(slotName=DeckSlotName.SLOT_5))
+    decoy.when(
+        mock_module_view.get_location(HeaterShakerModuleId("heater-shaker-id"))
+    ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_5))
 
-    result = subject.check_pipette_blocking_hs_shaker(HeaterShakerModuleId("heater-shaker-id"))
+    result = subject.check_pipette_blocking_hs_shaker(
+        HeaterShakerModuleId("heater-shaker-id")
+    )
 
     assert result == expected_result
