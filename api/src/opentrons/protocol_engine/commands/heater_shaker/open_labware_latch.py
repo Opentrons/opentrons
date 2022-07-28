@@ -51,10 +51,11 @@ class OpenLabwareLatchImpl(
 
         hs_module_substate.raise_if_shaking()
 
-        # Check if pipette would block opening latch if east, west, or on top of module
+        # Move pipette away if it is close to the heater-shaker
         if self._state_view.motion.check_pipette_blocking_hs_latch(
             hs_module_substate.module_id
         ):
+            # TODO(jbl 2022-07-28) replace home movement with a retract movement
             await self._movement.home(
                 [
                     MotorAxis.RIGHT_Z,

@@ -60,10 +60,11 @@ class SetAndWaitForShakeSpeedImpl(
         # Verify speed from hs module view
         validated_speed = hs_module_substate.validate_target_speed(params.rpm)
 
-        # Check if pipette would block opening latch if adjacent or on top of module
+        # Move pipette away if it is close to the heater-shaker
         if self._state_view.motion.check_pipette_blocking_hs_shaker(
             hs_module_substate.module_id
         ):
+            # TODO(jbl 2022-07-28) replace home movement with a retract movement
             await self._movement.home(
                 [
                     MotorAxis.RIGHT_Z,
