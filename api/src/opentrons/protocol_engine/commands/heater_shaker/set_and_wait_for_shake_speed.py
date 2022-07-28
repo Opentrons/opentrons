@@ -5,11 +5,14 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
+from opentrons.protocol_engine.types import MotorAxis
+from opentrons.motion_planning.adjacent_slots_getters import get_adjacent_slots
+
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
-    from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
 SetAndWaitForShakeSpeedCommandType = Literal["heaterShaker/setAndWaitForShakeSpeed"]
 
@@ -36,10 +39,12 @@ class SetAndWaitForShakeSpeedImpl(
         self,
         state_view: StateView,
         equipment: EquipmentHandler,
+        movement: MovementHandler,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
+        self._movement = movement
 
     async def execute(
         self,
@@ -55,6 +60,24 @@ class SetAndWaitForShakeSpeedImpl(
 
         # Verify speed from hs module view
         validated_speed = hs_module_substate.validate_target_speed(params.rpm)
+
+        # Check if pipette would block starting a shake
+        current_well = self._state_view.pipettes.get_current_well()
+        if current_well is not None:
+            pipette_deck_slot = int(self._state_view.geometry.get_ancestor_slot_name(current_well.labware_id))
+            hs_deck_slot = int(self._state_view.modules.get_location(hs_module_substate.module_id).slotName)
+            conflicting_slots = get_adjacent_slots(hs_deck_slot) + [hs_deck_slot]
+            pipette_blocking = pipette_deck_slot in conflicting_slots
+        else:
+            pipette_blocking = True
+
+        if pipette_blocking:
+            await self._movement.home(
+                [
+                    MotorAxis.RIGHT_Z,
+                    MotorAxis.LEFT_Z,
+                ]
+            )
 
         # Allow propagation of ModuleNotAttachedError.
         hs_hardware_module = self._equipment.get_module_hardware_api(
