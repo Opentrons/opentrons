@@ -36,7 +36,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.focus};
+    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
   }
 
   &:disabled {
@@ -132,7 +132,7 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.focus};
+    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
   }
 
   &:disabled {

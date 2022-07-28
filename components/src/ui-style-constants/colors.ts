@@ -3,7 +3,7 @@ export const white = '#ffffff'
 export const fundamentalsBackground = '#f8f8f8'
 export const lightBlue = '#f1f8ff'
 export const medBlue = '#d9e9fe'
-export const focus = '#f09d20'
+export const fundamentalsFocus = '#f09d20'
 export const black = '#000000'
 export const fundamentalsBackgroundShade = '#eeeeee'
 // note 07/27/2022 kj keep this color to avoid break H/S design

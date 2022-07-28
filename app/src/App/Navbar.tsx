@@ -37,7 +37,7 @@ const NavbarLink = styled(NavLink)`
   }
 
   &:focus-visible {
-    box-shadow: inset 0 0 0 3px ${COLORS.focus};
+    box-shadow: inset 0 0 0 3px ${COLORS.fundamentalsFocus};
     outline: none;
     background-color: ${COLORS.darkGreyHover};
   }
@@ -84,7 +84,7 @@ const NavbarIcon = styled(Icon)`
   }
 
   &:focus-visible {
-    box-shadow: inset 0 0 0 3px ${COLORS.focus};
+    box-shadow: inset 0 0 0 3px ${COLORS.fundamentalsFocus};
     outline: none;
     background-color: ${COLORS.darkGreyHover};
   }
