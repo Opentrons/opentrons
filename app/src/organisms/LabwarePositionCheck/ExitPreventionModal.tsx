@@ -28,7 +28,7 @@ export const ExitPreventionModal = (
   return (
     <Modal className={styles.modal} contentsClassName={styles.modal_contents}>
       <Text
-        as={'h3'}
+        as="h3"
         marginBottom={SPACING_3}
         textTransform={TYPOGRAPHY.textTransformUppercase}
         fontWeight={FONT_WEIGHT_SEMIBOLD}

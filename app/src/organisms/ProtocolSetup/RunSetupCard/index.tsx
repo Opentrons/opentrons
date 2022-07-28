@@ -138,7 +138,7 @@ export function RunSetupCard(): JSX.Element | null {
         as="h2"
         paddingX={SPACING.spacing4}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        id={'RunSetupCard_setupForRun'}
+        id="RunSetupCard_setupForRun"
       >
         {t('setup_for_run')}
       </StyledText>
@@ -179,11 +179,11 @@ export function RunSetupCard(): JSX.Element | null {
                             ? 'check-circle'
                             : 'alert-circle'
                         }
-                        id={'RunSetupCard_calibrationIcon'}
+                        id="RunSetupCard_calibrationIcon"
                       />
                       <StyledText
                         fontSize={FONT_SIZE_BODY_1}
-                        id={'RunSetupCard_calibrationText'}
+                        id="RunSetupCard_calibrationText"
                       >
                         {calibrationStatus.complete
                           ? t('calibration_ready')

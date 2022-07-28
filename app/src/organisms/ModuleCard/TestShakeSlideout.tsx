@@ -181,7 +181,7 @@ export const TestShakeSlideout = (
         paddingLeft={SPACING.spacing2}
         paddingRight={SPACING.spacing4}
         flexDirection={DIRECTION_ROW}
-        data-testid={'test_shake_slideout_banner_info'}
+        data-testid="test_shake_slideout_banner_info"
       >
         <Flex color={COLORS.darkGreyEnabled}>
           <Icon
@@ -302,7 +302,7 @@ export const TestShakeSlideout = (
         role="button"
         marginTop={SPACING.spacing2}
         css={TYPOGRAPHY.linkPSemiBold}
-        id={'HeaterShaker_Attachment_Instructions'}
+        id="HeaterShaker_Attachment_Instructions"
         onClick={() => setShowWizard(true)}
       >
         {t('show_attachment_instructions')}

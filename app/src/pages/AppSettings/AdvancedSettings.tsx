@@ -213,14 +213,14 @@ export function AdvancedSettings(): JSX.Element {
           {showSuccessToast && (
             <Toast
               message={t('successfully_deleted_unavail_robots')}
-              type={'success'}
+              type="success"
               onClose={() => setShowSuccessToast(false)}
             />
           )}
           {showErrorToast && (
             <Toast
               message={t('no_unavail_robots_to_clear')}
-              type={'error'}
+              type="error"
               onClose={() => setShowErrorToast(false)}
             />
           )}

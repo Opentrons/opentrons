@@ -89,7 +89,7 @@ export const LiquidsLabwareDetailsModal = (
             flexDirection={DIRECTION_COLUMN}
             css={HIDE_SCROLLBAR}
             maxHeight="27.125rem"
-            overflowY={'auto'}
+            overflowY="auto"
             minWidth="10.313rem"
             gridGap={SPACING.spacing3}
           >

@@ -109,7 +109,7 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
               <MenuItem>
                 <ExternalLink
                   css={TYPOGRAPHY.linkPSemiBold}
-                  href={'https://designer.opentrons.com/'}
+                  href="https://designer.opentrons.com/"
                   id="Overflowmenu_protocol_designer"
                 >
                   {t('protocol_info:launch_protocol_designer')}

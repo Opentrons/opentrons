@@ -93,7 +93,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
           color={C_BLUE}
           alignSelf={ALIGN_FLEX_END}
           onClick={() => setShowMultipleModulesModal(true)}
-          data-test={'LabwareSetup_helpLink'}
+          data-test="LabwareSetup_helpLink"
         >
           {t('multiple_modules_help_link_title')}
         </Btn>
@@ -109,7 +109,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         viewBox={DECK_VIEW_BOX}
         className={styles.deck_map}
         deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-        id={'ModuleSetup_deckMap'}
+        id="ModuleSetup_deckMap"
       >
         {() => (
           <>
@@ -143,7 +143,7 @@ export function ModuleSetup(props: ModuleSetupProps): JSX.Element {
         title={t('proceed_to_labware_setup_step')}
         disabled={proceedToLabwareDisabledReason != null}
         onClick={expandLabwareSetupStep}
-        id={'ModuleSetup_proceedToLabwareSetup'}
+        id="ModuleSetup_proceedToLabwareSetup"
         width="18rem"
         alignSelf={ALIGN_CENTER}
         {...targetProps}

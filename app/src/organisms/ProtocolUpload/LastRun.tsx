@@ -77,7 +77,7 @@ export function LastRun(): JSX.Element | null {
 
   if (mostRecentRun == null && !isFetchingMostRecentRun) return null
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} width={'80%'}>
+    <Flex flexDirection={DIRECTION_COLUMN} width="80%">
       <Divider marginY={SPACING_3} />
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} marginBottom={SPACING_2}>
         <Trans
@@ -90,8 +90,8 @@ export function LastRun(): JSX.Element | null {
           fontSize={FONT_SIZE_BODY_1}
           color={C_BLUE}
           onClick={() => showRerunningProtocolModal(true)}
-          id={'RerunningProtocol_Modal'}
-          data-testid={'RerunningProtocol_ModalLink'}
+          id="RerunningProtocol_Modal"
+          data-testid="RerunningProtocol_ModalLink"
         >
           {t('rerunning_protocol_modal_title')}
         </Link>
@@ -169,7 +169,7 @@ export function LastRun(): JSX.Element | null {
             </Flex>
             <NewSecondaryBtn
               onClick={handleCloneRun}
-              id={'UploadInput_runAgainButton'}
+              id="UploadInput_runAgainButton"
             >
               {t('run_again')}
             </NewSecondaryBtn>

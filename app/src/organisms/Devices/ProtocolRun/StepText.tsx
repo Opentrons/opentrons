@@ -75,7 +75,7 @@ export function StepText(props: Props): JSX.Element | null {
       messageNode = (
         <Trans
           t={t}
-          i18nKey={'drop_tip'}
+          i18nKey="drop_tip"
           values={{
             well_name: wellName,
             labware:
@@ -104,7 +104,7 @@ export function StepText(props: Props): JSX.Element | null {
       messageNode = (
         <Trans
           t={t}
-          i18nKey={'pickup_tip'}
+          i18nKey="pickup_tip"
           values={{
             well_name: wellName,
             labware: getLabwareDisplayName(

@@ -108,7 +108,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
         right="0"
         top="0"
         backgroundColor={COLORS.white}
-        boxShadow={'0px 3px 6px rgba(0, 0, 0, 0.23)'}
+        boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
         height="100%"
       >
         <Flex

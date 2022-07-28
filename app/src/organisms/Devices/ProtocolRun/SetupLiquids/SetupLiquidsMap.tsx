@@ -71,7 +71,7 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
         deckDef={(standardDeckDef as unknown) as DeckDefinition}
         viewBox={DECK_MAP_VIEWBOX}
         deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-        id={'LabwareSetup_deckMap'}
+        id="LabwareSetup_deckMap"
       >
         {() => (
           <>
