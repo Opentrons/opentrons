@@ -6,7 +6,6 @@ from typing_extensions import Literal, Type
 from pydantic import BaseModel, Field
 
 from opentrons.protocol_engine.types import MotorAxis
-from opentrons.motion_planning.adjacent_slots_getters import get_east_west_slots
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
@@ -52,17 +51,10 @@ class OpenLabwareLatchImpl(
 
         hs_module_substate.raise_if_shaking()
 
-        # Check if pipette would block opening the latch
-        current_well = self._state_view.pipettes.get_current_well()
-        if current_well is not None:
-            pipette_deck_slot = int(self._state_view.geometry.get_ancestor_slot_name(current_well.labware_id))
-            hs_deck_slot = int(self._state_view.modules.get_location(hs_module_substate.module_id).slotName)
-            conflicting_slots = get_east_west_slots(hs_deck_slot) + [hs_deck_slot]
-            pipette_blocking = pipette_deck_slot in conflicting_slots
-        else:
-            pipette_blocking = True
-
-        if pipette_blocking:
+        # Check if pipette would block opening latch if east, west, or on top of module
+        if self._state_view.motion.check_pipette_blocking_hs_latch(
+            hs_module_substate.module_id
+        ):
             await self._movement.home(
                 [
                     MotorAxis.RIGHT_Z,

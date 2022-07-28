@@ -61,17 +61,10 @@ class SetAndWaitForShakeSpeedImpl(
         # Verify speed from hs module view
         validated_speed = hs_module_substate.validate_target_speed(params.rpm)
 
-        # Check if pipette would block starting a shake
-        current_well = self._state_view.pipettes.get_current_well()
-        if current_well is not None:
-            pipette_deck_slot = int(self._state_view.geometry.get_ancestor_slot_name(current_well.labware_id))
-            hs_deck_slot = int(self._state_view.modules.get_location(hs_module_substate.module_id).slotName)
-            conflicting_slots = get_adjacent_slots(hs_deck_slot) + [hs_deck_slot]
-            pipette_blocking = pipette_deck_slot in conflicting_slots
-        else:
-            pipette_blocking = True
-
-        if pipette_blocking:
+        # Check if pipette would block opening latch if adjacent or on top of module
+        if self._state_view.motion.check_pipette_blocking_hs_shaker(
+            hs_module_substate.module_id
+        ):
             await self._movement.home(
                 [
                     MotorAxis.RIGHT_Z,

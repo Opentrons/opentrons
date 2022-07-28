@@ -4,6 +4,10 @@ from typing import List, Optional
 
 from opentrons.types import MountType, Point, DeckSlotName
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.motion_planning.adjacent_slots_getters import (
+    get_east_west_slots,
+    get_adjacent_slots,
+)
 from opentrons import motion_planning
 
 from .. import errors
@@ -12,6 +16,7 @@ from .labware import LabwareView
 from .pipettes import PipetteView, CurrentWell
 from .geometry import GeometryView
 from .modules import ModuleView
+from .module_substates import HeaterShakerModuleId
 
 
 @dataclass(frozen=True)
@@ -175,3 +180,33 @@ class MotionView:
             )
         except motion_planning.MotionPlanningError as error:
             raise errors.FailedToPlanMoveError(str(error))
+
+    def check_pipette_blocking_hs_latch(
+        self, hs_module_id: HeaterShakerModuleId
+    ) -> bool:
+        """Check if pipette would block h/s latch from opening"""
+        pipette_blocking = True
+        current_well = self._pipettes.get_current_well()
+        if current_well is not None:
+            pipette_deck_slot = int(
+                self._geometry.get_ancestor_slot_name(current_well.labware_id)
+            )
+            hs_deck_slot = int(self._module.get_location(hs_module_id).slotName)
+            conflicting_slots = get_east_west_slots(hs_deck_slot) + [hs_deck_slot]
+            pipette_blocking = pipette_deck_slot in conflicting_slots
+        return pipette_blocking
+
+    def check_pipette_blocking_hs_shaker(
+        self, hs_module_id: HeaterShakerModuleId
+    ) -> bool:
+        """Check if pipette would block h/s latch from starting shake"""
+        pipette_blocking = True
+        current_well = self._pipettes.get_current_well()
+        if current_well is not None:
+            pipette_deck_slot = int(
+                self._geometry.get_ancestor_slot_name(current_well.labware_id)
+            )
+            hs_deck_slot = int(self._module.get_location(hs_module_id).slotName)
+            conflicting_slots = get_adjacent_slots(hs_deck_slot) + [hs_deck_slot]
+            pipette_blocking = pipette_deck_slot in conflicting_slots
+        return pipette_blocking
