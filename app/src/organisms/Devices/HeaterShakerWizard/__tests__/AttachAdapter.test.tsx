@@ -4,13 +4,13 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { AttachAdapter } from '../AttachAdapter'
-import { useLatchControlsLiveEndpoint } from '../../../ModuleCard/hooks'
+import { useLatchControls } from '../../../ModuleCard/hooks'
 import type { HeaterShakerModule } from '../../../../redux/modules/types'
 
 jest.mock('../../../ModuleCard/hooks')
 
-const mockUseLatchControlsLiveEndpoint = useLatchControlsLiveEndpoint as jest.MockedFunction<
-  typeof useLatchControlsLiveEndpoint
+const mockUseLatchControls = useLatchControls as jest.MockedFunction<
+  typeof useLatchControls
 >
 
 const render = (props: React.ComponentProps<typeof AttachAdapter>) => {
@@ -48,7 +48,7 @@ describe('AttachAdapter', () => {
     props = {
       module: mockHeaterShaker,
     }
-    mockUseLatchControlsLiveEndpoint.mockReturnValue({
+    mockUseLatchControls.mockReturnValue({
       toggleLatch: mockToggleLatch,
       isLatchClosed: true,
     })
@@ -82,7 +82,7 @@ describe('AttachAdapter', () => {
     expect(mockToggleLatch).toHaveBeenCalled()
   })
   it('renders button and clicking on it sends latch command to close', () => {
-    mockUseLatchControlsLiveEndpoint.mockReturnValue({
+    mockUseLatchControls.mockReturnValue({
       toggleLatch: mockToggleLatch,
       isLatchClosed: false,
     })

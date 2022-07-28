@@ -17,7 +17,7 @@ import heaterShakerAdapterAlignment from '@opentrons/app/src/assets/images/heate
 import { TertiaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { StyledText } from '../../../atoms/text'
-import { useLatchControlsLiveEndpoint } from '../../ModuleCard/hooks'
+import { useLatchControls } from '../../ModuleCard/hooks'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 
@@ -27,7 +27,7 @@ interface AttachAdapterProps {
 export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
   const { module } = props
   const { t } = useTranslation('heater_shaker')
-  const { toggleLatch, isLatchClosed } = useLatchControlsLiveEndpoint(module)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const isShaking = module.data.speedStatus !== 'idle'
 

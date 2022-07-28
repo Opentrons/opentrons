@@ -270,28 +270,6 @@ describe('TestShakeSlideout', () => {
       })
     })
   })
-  //  next 2 tests are sending module commands when run is idle and through module controls
-  it('renders the open labware latch button and clicking it opens the latch when there is a runId and run is idle', () => {
-    mockUseRunStatuses.mockReturnValue({
-      isRunStill: false,
-      isRunTerminal: false,
-      isRunIdle: true,
-    })
-
-    props = {
-      module: mockCloseLatchHeaterShaker,
-      onCloseClick: jest.fn(),
-      isExpanded: true,
-      isLoadedInRun: true,
-      currentRunId: 'test123',
-    }
-
-    const { getByRole } = render(props)
-    const button = getByRole('button', { name: /Open/i })
-    fireEvent.click(button)
-    expect(mockToggleLatch).toHaveBeenCalled()
-  })
-
   it('entering an input for shake speed and clicking start should begin shaking when there is a runId and run is idle', async () => {
     mockUseRunStatuses.mockReturnValue({
       isRunStill: false,

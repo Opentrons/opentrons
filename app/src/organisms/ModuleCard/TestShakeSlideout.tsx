@@ -74,7 +74,7 @@ export const TestShakeSlideout = (
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'left',
   })
-  const { toggleLatch, isLatchClosed } = useLatchControls(module, currentRunId)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)

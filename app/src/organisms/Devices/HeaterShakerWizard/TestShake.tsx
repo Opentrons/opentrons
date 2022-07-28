@@ -26,7 +26,7 @@ import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
 import { InputField } from '../../../atoms/InputField'
 import { Collapsible } from '../../ModuleCard/Collapsible'
-import { useLatchControlsLiveEndpoint } from '../../ModuleCard/hooks'
+import { useLatchControls } from '../../ModuleCard/hooks'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
@@ -50,7 +50,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const [isExpanded, setExpanded] = React.useState(false)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { toggleLatch, isLatchClosed } = useLatchControlsLiveEndpoint(module)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const isShaking = module.data.speedStatus !== 'idle'
 
   const closeLatchCommand: HeaterShakerCloseLatchCreateCommand = {

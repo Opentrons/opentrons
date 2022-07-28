@@ -53,12 +53,8 @@ interface LatchControls {
   isLatchClosed: boolean
 }
 
-//  TODO(jr, 7/28/22): delete this hook when all module commands are sent using live endpoint
-export function useLatchControlsLiveEndpoint(
-  module: AttachedModule
-): LatchControls {
+export function useLatchControls(module: AttachedModule): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
-
   const isLatchClosed =
     module.moduleType === 'heaterShakerModuleType' &&
     (module.data.labwareLatchStatus === 'idle_closed' ||
@@ -85,56 +81,6 @@ export function useLatchControlsLiveEndpoint(
     })
   }
 
-  return { toggleLatch, isLatchClosed }
-}
-
-export function useLatchControls(
-  module: AttachedModule,
-  runId?: string | null
-): LatchControls {
-  const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { createCommand } = useCreateCommandMutation()
-  const { isRunIdle } = useRunStatuses()
-  const { moduleIdFromRun } = useModuleIdFromRun(
-    module,
-    runId != null ? runId : null
-  )
-  const isLatchClosed =
-    module.moduleType === 'heaterShakerModuleType' &&
-    (module.data.labwareLatchStatus === 'idle_closed' ||
-      module.data.labwareLatchStatus === 'closing')
-
-  const latchCommand:
-    | HeaterShakerOpenLatchCreateCommand
-    | HeaterShakerCloseLatchCreateCommand = {
-    commandType: isLatchClosed
-      ? 'heaterShaker/openLabwareLatch'
-      : 'heaterShaker/closeLabwareLatch',
-    params: {
-      moduleId: isRunIdle ? moduleIdFromRun : module.id,
-    },
-  }
-
-  const toggleLatch = (): void => {
-    if (runId != null && isRunIdle) {
-      createCommand({
-        runId: runId,
-        command: latchCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${latchCommand.commandType} and run id ${runId}: ${e.message}`
-        )
-      })
-    } else {
-      createLiveCommand({
-        command: latchCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
-        )
-      })
-    }
-  }
   return { toggleLatch, isLatchClosed }
 }
 export type MenuItemsByModuleType = {
@@ -170,7 +116,7 @@ export function useModuleOverflowMenu(
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
-  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
   const isLegacySessionInProgress = useIsLegacySessionInProgress()

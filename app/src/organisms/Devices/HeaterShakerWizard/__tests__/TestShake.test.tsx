@@ -6,7 +6,7 @@ import {
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
-import { useLatchControlsLiveEndpoint } from '../../../ModuleCard/hooks'
+import { useLatchControls } from '../../../ModuleCard/hooks'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { useModuleIdFromRun } from '../../../ModuleCard/useModuleIdFromRun'
@@ -25,8 +25,8 @@ jest.mock('../../hooks')
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
-const mockUseLatchControlsLiveEndpoint = useLatchControlsLiveEndpoint as jest.MockedFunction<
-  typeof useLatchControlsLiveEndpoint
+const mockUseLatchControls = useLatchControls as jest.MockedFunction<
+  typeof useLatchControls
 >
 const mockHeaterShakerModuleCard = HeaterShakerModuleCard as jest.MockedFunction<
   typeof HeaterShakerModuleCard
@@ -141,7 +141,7 @@ describe('TestShake', () => {
     mockHeaterShakerModuleCard.mockReturnValue(
       <div>Mock Heater Shaker Module Card</div>
     )
-    mockUseLatchControlsLiveEndpoint.mockReturnValue({
+    mockUseLatchControls.mockReturnValue({
       toggleLatch: jest.fn(),
       isLatchClosed: true,
     } as any)
@@ -194,7 +194,7 @@ describe('TestShake', () => {
       moduleFromProtocol: undefined,
     }
 
-    mockUseLatchControlsLiveEndpoint.mockReturnValue({
+    mockUseLatchControls.mockReturnValue({
       toggleLatch: mockToggleLatch,
       isLatchClosed: false,
     })
@@ -249,7 +249,7 @@ describe('TestShake', () => {
       moduleFromProtocol: undefined,
     }
 
-    mockUseLatchControlsLiveEndpoint.mockReturnValue({
+    mockUseLatchControls.mockReturnValue({
       toggleLatch: mockToggleLatch,
       isLatchClosed: false,
     })
@@ -285,7 +285,7 @@ describe('TestShake', () => {
       moduleFromProtocol: undefined,
     }
 
-    mockUseLatchControlsLiveEndpoint.mockReturnValue({
+    mockUseLatchControls.mockReturnValue({
       toggleLatch: mockToggleLatch,
       isLatchClosed: true,
     })
@@ -303,7 +303,7 @@ describe('TestShake', () => {
       moduleFromProtocol: undefined,
     }
 
-    mockUseLatchControlsLiveEndpoint.mockReturnValue({
+    mockUseLatchControls.mockReturnValue({
       toggleLatch: mockToggleLatch,
       isLatchClosed: false,
     })
