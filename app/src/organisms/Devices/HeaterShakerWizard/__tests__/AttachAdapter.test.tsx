@@ -4,14 +4,13 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import { AttachAdapter } from '../AttachAdapter'
-import { useLatchControls } from '../../../ModuleCard/hooks'
-import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
+import { useLatchControlsLiveEndpoint } from '../../../ModuleCard/hooks'
 import type { HeaterShakerModule } from '../../../../redux/modules/types'
 
 jest.mock('../../../ModuleCard/hooks')
 
-const mockUseLatchControls = useLatchControls as jest.MockedFunction<
-  typeof useLatchControls
+const mockUseLatchControlsLiveEndpoint = useLatchControlsLiveEndpoint as jest.MockedFunction<
+  typeof useLatchControlsLiveEndpoint
 >
 
 const render = (props: React.ComponentProps<typeof AttachAdapter>) => {
@@ -49,7 +48,7 @@ describe('AttachAdapter', () => {
     props = {
       module: mockHeaterShaker,
     }
-    mockUseLatchControls.mockReturnValue({
+    mockUseLatchControlsLiveEndpoint.mockReturnValue({
       toggleLatch: mockToggleLatch,
       isLatchClosed: true,
     })
@@ -83,7 +82,7 @@ describe('AttachAdapter', () => {
     expect(mockToggleLatch).toHaveBeenCalled()
   })
   it('renders button and clicking on it sends latch command to close', () => {
-    mockUseLatchControls.mockReturnValue({
+    mockUseLatchControlsLiveEndpoint.mockReturnValue({
       toggleLatch: mockToggleLatch,
       isLatchClosed: false,
     })
@@ -99,15 +98,5 @@ describe('AttachAdapter', () => {
     const { getByRole } = render(props)
     const btn = getByRole('button', { name: 'Open Labware Latch' })
     expect(btn).toBeDisabled()
-  })
-  it('renders button and clicking on it sends latch command to open when a run id is present', () => {
-    props = {
-      module: mockHeaterShaker,
-      currentRunId: RUN_ID_1,
-    }
-    const { getByRole } = render(props)
-    const btn = getByRole('button', { name: 'Open Labware Latch' })
-    fireEvent.click(btn)
-    expect(mockToggleLatch).toHaveBeenCalled()
   })
 })

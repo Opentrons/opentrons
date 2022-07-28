@@ -53,6 +53,41 @@ interface LatchControls {
   isLatchClosed: boolean
 }
 
+//  TODO(jr, 7/28/22): delete this hook when all module commands are sent using live endpoint
+export function useLatchControlsLiveEndpoint(
+  module: AttachedModule
+): LatchControls {
+  const { createLiveCommand } = useCreateLiveCommandMutation()
+
+  const isLatchClosed =
+    module.moduleType === 'heaterShakerModuleType' &&
+    (module.data.labwareLatchStatus === 'idle_closed' ||
+      module.data.labwareLatchStatus === 'closing')
+
+  const latchCommand:
+    | HeaterShakerOpenLatchCreateCommand
+    | HeaterShakerCloseLatchCreateCommand = {
+    commandType: isLatchClosed
+      ? 'heaterShaker/openLabwareLatch'
+      : 'heaterShaker/closeLabwareLatch',
+    params: {
+      moduleId: module.id,
+    },
+  }
+
+  const toggleLatch = (): void => {
+    createLiveCommand({
+      command: latchCommand,
+    }).catch((e: Error) => {
+      console.error(
+        `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
+      )
+    })
+  }
+
+  return { toggleLatch, isLatchClosed }
+}
+
 export function useLatchControls(
   module: AttachedModule,
   runId?: string | null

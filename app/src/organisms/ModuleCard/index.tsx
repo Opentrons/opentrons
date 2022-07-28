@@ -224,15 +224,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >
-      {showWizard &&
-        (currentRunId != null ? (
-          <HeaterShakerWizard
-            onCloseClick={() => setShowWizard(false)}
-            currentRunId={currentRunId}
-          />
-        ) : (
-          <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
-        ))}
+      {showWizard && (
+        <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+      )}
       {showSlideout && (
         <ModuleSlideout
           module={module}
