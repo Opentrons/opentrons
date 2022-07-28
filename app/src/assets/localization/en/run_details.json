@@ -132,5 +132,7 @@
   "aspirate": "Aspirating {{volume}} uL from {{well_name}} of {{labware}} in {{labware_location}} at {{flowRate}} uL/sec",
   "dispense": "Dispensing {{volume}} uL into {{well_name}} of {{labware}} in {{labware_location}} at {{flowRate}} uL/sec",
   "blowout": "Blowing out at {{well_name}} of {{labware}} in {{labware_location}} at {{flowRate}} uL/sec",
-  "touch_tip": "Touching tip"
+  "touch_tip": "Touching tip",
+  "move_to_slot": "Moving to {{slot_name}}",
+  "move_to_well": "Moving to {{well_name}} of {{labware}} in {{labware_location}}"
 }

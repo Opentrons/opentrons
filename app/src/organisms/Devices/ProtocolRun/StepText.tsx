@@ -325,6 +325,42 @@ export function StepText(props: Props): JSX.Element | null {
       messageNode = t('touch_tip')
       break
     }
+    case 'moveToSlot': {
+      const { slotName } = displayCommand.params
+      console.log(slotName)
+      messageNode = (
+        <Trans
+          t={t}
+          i18nKey={'move_to_slot'}
+          values={{
+            slot_name: slotName,
+          }}
+        />
+      )
+
+      break
+    }
+    case 'moveToWell': {
+      const { wellName, labwareId } = displayCommand.params
+      const labwareLocation = getLabwareLocation(
+        labwareId,
+        protocolData.commands
+      )
+      messageNode = (
+        <Trans
+          t={t}
+          i18nKey={'move_to_well'}
+          values={{
+            well_name: wellName,
+            labware: getLabwareDisplayName(
+              labwareRenderInfoById[labwareId].labwareDef
+            ),
+            labware_location: labwareLocation.slotName,
+          }}
+        />
+      )
+      break
+    }
 
     case 'custom': {
       const { legacyCommandText } = displayCommand.params ?? {}

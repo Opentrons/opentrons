@@ -809,4 +809,47 @@ describe('StepText', () => {
     })
     getByText('Touching tip')
   })
+  it('renders correct command text for moveToSlot', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'moveToSlot',
+        params: { slotName: 'slot 5' },
+      },
+    })
+    getByText('Moving to slot 5')
+  })
+  it('renders correct command text for moveToWell', () => {
+    const labwareId = 'labwareId'
+    when(mockGetLabwareDisplayName)
+      .calledWith('fake_def' as any)
+      .mockReturnValue('fake_display_name')
+    when(mockGetLabwareLocation)
+      .calledWith(labwareId, [])
+      .mockReturnValue({ slotName: 'fake_labware_location' })
+    mockUseLabwareRenderInfoForRunById.mockReturnValue({
+      labwareId: {
+        labwareDef: 'fake_def',
+      },
+    } as any)
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'moveToWell',
+        params: {
+          wellName: 'wellName',
+          labwareId: 'labwareId',
+        },
+      },
+    })
+    getByText(
+      'Moving to wellName of fake_display_name in fake_labware_location'
+    )
+  })
 })
