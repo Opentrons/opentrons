@@ -3,7 +3,7 @@ import { css } from 'styled-components'
 import { BORDERS, COLORS, Flex, SPACING } from '@opentrons/components'
 import {
   blueEnabled,
-  background,
+  fundamentalsBackground,
   medGreyEnabled,
 } from '@opentrons/components/src/ui-style-constants/colors'
 import { PrimaryButton } from '../../atoms/buttons'
@@ -28,7 +28,7 @@ const BUTTON_GROUP_STYLES = css`
     }
 
     &:hover {
-      background-color: ${background};
+      background-color: ${fundamentalsBackground};
       color: ${COLORS.black};
       box-shadow: 0 0 0;
     }
