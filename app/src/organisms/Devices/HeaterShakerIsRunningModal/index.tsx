@@ -11,7 +11,7 @@ import {
   TYPOGRAPHY,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { useModuleIdFromRun } from '../../ModuleCard/useModuleIdFromRun'
+import { useHeaterShakerModuleIdsFromRun } from './hooks'
 import { Modal } from '../../../atoms/Modal'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
@@ -33,7 +33,7 @@ export const HeaterShakerIsRunningModal = (
   const { closeModal, module, startRun, currentRunId } = props
   const { t } = useTranslation('heater_shaker')
   const { createCommand } = useCreateCommandMutation()
-  const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
+  const { moduleIdsFromRun } = useHeaterShakerModuleIdsFromRun(currentRunId)
 
   const title = (
     <Flex flexDirection={DIRECTION_ROW}>
@@ -48,26 +48,28 @@ export const HeaterShakerIsRunningModal = (
     </Flex>
   )
 
-  const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
-    commandType: 'heaterShaker/deactivateShaker',
-    params: {
-      moduleId: moduleIdFromRun,
-    },
-  }
-
   const handleContinueShaking = (): void => {
     startRun()
     closeModal()
   }
 
   const handleStopShake = (): void => {
-    createCommand({
-      runId: currentRunId,
-      command: stopShakeCommand,
-    }).catch((e: Error) => {
-      console.error(
-        `error setting module status with command type ${stopShakeCommand.commandType}: ${e.message}`
-      )
+    moduleIdsFromRun.forEach(moduleIdFromRun => {
+      const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
+        commandType: 'heaterShaker/deactivateShaker',
+        params: {
+          moduleId: moduleIdFromRun,
+        },
+      }
+
+      createCommand({
+        runId: currentRunId,
+        command: stopShakeCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${stopShakeCommand.commandType}: ${e.message}`
+        )
+      })
     })
     handleContinueShaking()
   }

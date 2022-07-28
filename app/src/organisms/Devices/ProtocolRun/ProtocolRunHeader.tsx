@@ -209,8 +209,12 @@ export function ProtocolRunHeader({
     (module): module is HeaterShakerModule =>
       module.moduleType === HEATERSHAKER_MODULE_TYPE
   )
-  const isShaking =
-    heaterShaker?.data != null && heaterShaker.data.speedStatus !== 'idle'
+  const isShaking = attachedModules
+    .filter(
+      (module): module is HeaterShakerModule =>
+        module.moduleType === HEATERSHAKER_MODULE_TYPE
+    )
+    .some(module => module?.data != null && module.data.speedStatus !== 'idle')
 
   const handleProceedToRunClick = (): void => {
     trackEvent({ name: 'proceedToRun', properties: {} })

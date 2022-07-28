@@ -664,6 +664,7 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', () => {
+    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
     mockUseModulesQuery.mockReturnValue({
       data: { data: [mockMovingHeaterShaker] },
     } as any)
