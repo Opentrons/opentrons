@@ -132,7 +132,7 @@ export const HeaterShakerWizard = (
         >
           {currentPage > 0 ? (
             <SecondaryButton
-              data-testid={`wizard_back_btn`}
+              data-testid="wizard_back_btn"
               onClick={() => setCurrentPage(currentPage => currentPage - 1)}
             >
               {t('back')}
@@ -142,7 +142,7 @@ export const HeaterShakerWizard = (
             <PrimaryButton
               disabled={!isPrimaryCTAEnabled}
               {...targetProps}
-              data-testid={`wizard_next_btn`}
+              data-testid="wizard_next_btn"
               onClick={
                 currentPage === 5
                   ? () => onCloseClick()

@@ -220,7 +220,7 @@ export const TestShakeSlideout = (
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
               marginTop={SPACING.spacing3}
-              data-testid={`TestShake_Slideout_latch_status`}
+              data-testid="TestShake_Slideout_latch_status"
             >
               {getLatchStatus(module.data.labwareLatchStatus)}
             </StyledText>
@@ -258,7 +258,7 @@ export const TestShakeSlideout = (
             paddingRight={SPACING.spacing4}
           >
             <InputField
-              data-testid={`TestShakeSlideout_shake_input`}
+              data-testid="TestShakeSlideout_shake_input"
               units={RPM}
               value={shakeValue}
               onChange={e => setShakeValue(e.target.value)}

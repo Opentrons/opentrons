@@ -44,14 +44,14 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
         <StyledText
           color={COLORS.darkGrey}
           paddingRight={SPACING.spacing4}
-          data-testid={`attach_adapter_2a`}
+          data-testid="attach_adapter_2a"
         >
           {t('3a')}
         </StyledText>
         <Flex border={`${SPACING.spacingXXS} solid ${COLORS.medGrey}`}>
           <Flex
             padding={`${SPACING.spacing2} 5rem ${SPACING.spacing4} ${SPACING.spacing7}`}
-            data-testid={`attach_adapter_screw_in_adapter_image`}
+            data-testid="attach_adapter_screw_in_adapter_image"
           >
             <img height="160px" src={screwInAdapter} alt="screw_in_adapter" />
           </Flex>
@@ -59,7 +59,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
             <Flex
               marginTop={SPACING.spacing4}
               fontWeight={TYPOGRAPHY.fontWeightRegular}
-              data-testid={`attach_adapter_to_module`}
+              data-testid="attach_adapter_to_module"
             >
               {t('attach_adapter_to_module')}
             </Flex>
@@ -71,7 +71,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
               paddingLeft={SPACING.spacing4}
               flexDirection={DIRECTION_ROW}
               marginRight={SPACING.spacingSM}
-              data-testid={`attach_adapter_2a_body_text`}
+              data-testid="attach_adapter_2a_body_text"
             >
               <Flex
                 size="2rem"
@@ -118,7 +118,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
         <StyledText
           color={COLORS.darkGrey}
           paddingRight={SPACING.spacing4}
-          data-testid={`attach_adapter_2b`}
+          data-testid="attach_adapter_2b"
         >
           {t('3b')}
         </StyledText>
@@ -128,7 +128,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
         >
           <Flex
             padding={`${SPACING.spacingM} ${SPACING.spacingXXL} ${SPACING.spacingXL} ${SPACING.spacingXL}`}
-            data-testid={`attach_adapter_alignment_image`}
+            data-testid="attach_adapter_alignment_image"
           >
             <img
               src={heaterShakerAdapterAlignment}
@@ -140,7 +140,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
             marginTop={SPACING.spacingL}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             marginRight="3rem"
-            data-testid={`attach_adapter_alignment_text`}
+            data-testid="attach_adapter_alignment_text"
           >
             <StyledText>{t('check_alignment')}</StyledText>
             <StyledText paddingTop={SPACING.spacing4}>
@@ -153,7 +153,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
         <StyledText
           color={COLORS.darkGrey}
           paddingRight={SPACING.spacing4}
-          data-testid={`attach_adapter_3a`}
+          data-testid="attach_adapter_3a"
         >
           {t('3c')}
         </StyledText>
@@ -164,7 +164,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
           padding={`${SPACING.spacing4} ${SPACING.spacingM} ${SPACING.spacingM} ${SPACING.spacing4}`}
           width="100%"
           marginBottom={SPACING.spacingSM}
-          data-testid={`attach_adapter_check_alignment_instructions`}
+          data-testid="attach_adapter_check_alignment_instructions"
         >
           <StyledText>{t('check_alignment_instructions')}</StyledText>
         </Flex>

@@ -110,7 +110,7 @@ export const ExtraAttentionWarning = (
               <Text
                 as="h4"
                 marginY={SPACING_2}
-                id={`ExtraAttentionWarning_title`}
+                id="ExtraAttentionWarning_title"
                 color={COLOR_WARNING_DARK}
               >
                 {t('extra_attention_warning_title')}

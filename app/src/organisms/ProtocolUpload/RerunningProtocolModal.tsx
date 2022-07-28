@@ -60,7 +60,7 @@ export const RerunningProtocolModal = (
           </Flex>
           <Trans
             t={t}
-            i18nKey={`rerunning_protocol_modal_body`}
+            i18nKey="rerunning_protocol_modal_body"
             components={{
               block: <Text css={FONT_BODY_1_DARK} marginTop={SPACING_1} />,
               list: <li />,

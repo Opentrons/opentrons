@@ -444,7 +444,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
               textTransform={TYPOGRAPHY.textTransformUppercase}
               fontSize={FONT_SIZE_CAPTION}
               marginBottom={SPACING_2}
-              id={`RunDetails_ProtocolSetupTitle`}
+              id="RunDetails_ProtocolSetupTitle"
             >
               {t('protocol_setup')}
             </Text>
@@ -453,7 +453,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
             </Btn>
           </Flex>
           <Flex
-            id={`RunDetails_ProtocolSetup_CommandList`}
+            id="RunDetails_ProtocolSetup_CommandList"
             flexDirection={DIRECTION_COLUMN}
           >
             {protocolSetupCommandList.map(command => (

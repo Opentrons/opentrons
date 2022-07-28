@@ -31,7 +31,7 @@ export const MagneticModuleData = (
       />
       <StyledText
         fontSize={TYPOGRAPHY.fontSizeCaption}
-        data-testid={`mag_module_data`}
+        data-testid="mag_module_data"
       >
         {t(
           moduleModel === MAGNETIC_MODULE_V2

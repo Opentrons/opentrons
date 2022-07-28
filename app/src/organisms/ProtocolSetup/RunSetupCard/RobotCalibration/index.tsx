@@ -66,7 +66,7 @@ export function RobotCalibration(props: Props): JSX.Element {
         as="h2"
         paddingBottom={SPACING_2}
         css={FONT_HEADER_THIN}
-        id={`PipetteCalibration_requiredPipettesTitle`}
+        id="PipetteCalibration_requiredPipettesTitle"
       >
         {t('required_pipettes_title')}
       </Text>

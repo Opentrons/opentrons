@@ -52,7 +52,7 @@ export function CommandText(props: Props): JSX.Element | null {
           <Flex
             textTransform={TYPOGRAPHY.textTransformUppercase}
             padding={SPACING_1}
-            id={`RunDetails_CommandList`}
+            id="RunDetails_CommandList"
           >
             {t('comment')}
           </Flex>

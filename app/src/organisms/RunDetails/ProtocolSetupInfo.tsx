@@ -48,7 +48,7 @@ export const ProtocolSetupInfo = (
     SetupCommandText = (
       <Trans
         t={t}
-        id={`RunDetails_PipetteSetup`}
+        id="RunDetails_PipetteSetup"
         i18nKey="load_pipette_protocol_setup"
         values={{
           pipette_name: pipetteData.pipetteSpecs.displayName,
@@ -63,7 +63,7 @@ export const ProtocolSetupInfo = (
     SetupCommandText = (
       <Trans
         t={t}
-        id={`RunDetails_ModuleSetup`}
+        id="RunDetails_ModuleSetup"
         i18nKey="load_modules_protocol_setup"
         count={moduleSlotNumber}
         values={{
@@ -99,7 +99,7 @@ export const ProtocolSetupInfo = (
       moduleName === null ? (
         <Trans
           t={t}
-          id={`RunDetails_LabwareSetup_NoModules`}
+          id="RunDetails_LabwareSetup_NoModules"
           i18nKey="load_labware_info_protocol_setup_no_module"
           values={{
             labware_loadname:
@@ -111,7 +111,7 @@ export const ProtocolSetupInfo = (
       ) : (
         <Trans
           t={t}
-          id={`RunDetails_LabwareSetup_WithModules`}
+          id="RunDetails_LabwareSetup_WithModules"
           i18nKey="load_labware_info_protocol_setup"
           count={moduleSlots}
           values={{
