@@ -57,7 +57,7 @@ const WRAPPER_STYLE_BY_STATUS: {
 } = {
   queued: {
     border: 'none',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.fundamentalsBackground,
     color: COLORS.darkBlackEnabled,
   },
   running: {
@@ -67,7 +67,7 @@ const WRAPPER_STYLE_BY_STATUS: {
   },
   succeeded: {
     border: 'none',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.fundamentalsBackground,
     color: COLORS.darkGreyEnabled,
   },
   failed: {

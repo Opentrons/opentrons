@@ -27,7 +27,7 @@ export const UnMatchedModuleWarning = (
     <Flex
       marginTop={SPACING.spacing4}
       flexDirection={DIRECTION_COLUMN}
-      backgroundColor={COLORS.background}
+      backgroundColor={COLORS.fundamentalsBackground}
       padding={SPACING.spacing5}
     >
       <Flex

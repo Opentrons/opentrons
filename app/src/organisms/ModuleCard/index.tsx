@@ -218,7 +218,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
   return (
     <Flex
-      backgroundColor={COLORS.background}
+      backgroundColor={COLORS.fundamentalsBackground}
       borderRadius={SPACING.spacing2}
       marginBottom={SPACING.spacing3}
       width="100%"

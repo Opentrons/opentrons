@@ -65,7 +65,7 @@ export function AttachAdapter(props: AttachAdapterProps): JSX.Element {
             </Flex>
             <Flex
               marginTop={SPACING.spacing3}
-              backgroundColor={COLORS.background}
+              backgroundColor={COLORS.fundamentalsBackground}
               paddingTop={SPACING.spacing4}
               paddingRight={SPACING.spacing4}
               paddingLeft={SPACING.spacing4}

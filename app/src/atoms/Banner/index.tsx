@@ -62,7 +62,7 @@ const BANNER_PROPS_BY_TYPE: Record<
   },
   informing: {
     icon: { name: 'information' },
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.fundamentalsBackground,
     color: COLORS.darkGreyEnabled,
   },
 }

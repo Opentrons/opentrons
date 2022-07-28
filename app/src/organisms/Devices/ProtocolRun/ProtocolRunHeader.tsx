@@ -412,7 +412,7 @@ export function ProtocolRunHeader({
   const protocolRunningContent: JSX.Element | null =
     runStatus != null ? (
       <Box
-        backgroundColor={COLORS.background}
+        backgroundColor={COLORS.fundamentalsBackground}
         display="grid"
         gridTemplateColumns="4fr 6fr 4fr"
         padding={SPACING.spacing3}

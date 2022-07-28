@@ -124,7 +124,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
     <Slideout onCloseClick={props.onClose} title={slideoutHeader} isExpanded>
       <Gallery definition={definition} />
       <Box
-        backgroundColor={COLORS.background}
+        backgroundColor={COLORS.fundamentalsBackground}
         padding={SPACING.spacing4}
         marginBottom={SPACING.spacing5}
         overflowWrap="break-word"

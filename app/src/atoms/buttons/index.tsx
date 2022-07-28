@@ -17,7 +17,7 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   background-color: ${COLORS.blueEnabled};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${COLORS.background};
+  color: ${COLORS.fundamentalsBackground};
   overflow: no-wrap;
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};

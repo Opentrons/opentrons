@@ -54,7 +54,7 @@ export function SetupCalibrationItem({
   ) : null
   return (
     <Flex
-      backgroundColor={COLORS.background}
+      backgroundColor={COLORS.fundamentalsBackground}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}

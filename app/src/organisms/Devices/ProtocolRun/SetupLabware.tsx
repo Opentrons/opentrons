@@ -300,7 +300,7 @@ export function SetupLabware({
             <Flex
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing4}
-              backgroundColor={COLORS.background}
+              backgroundColor={COLORS.fundamentalsBackground}
               padding={SPACING.spacing5}
             >
               <Flex

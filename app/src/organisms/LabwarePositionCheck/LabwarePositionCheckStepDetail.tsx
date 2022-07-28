@@ -137,7 +137,7 @@ export const LabwarePositionCheckStepDetail = (
       justifyContent={JUSTIFY_CENTER}
       boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
       borderRadius="4px"
-      backgroundColor={COLORS.background}
+      backgroundColor={COLORS.fundamentalsBackground}
       flexDirection={DIRECTION_COLUMN}
       width="106%"
     >
@@ -188,7 +188,7 @@ export const LabwarePositionCheckStepDetail = (
       >
         <Flex justifyContent={JUSTIFY_SPACE_AROUND} alignItems={ALIGN_CENTER}>
           <Flex
-            backgroundColor={COLORS.background}
+            backgroundColor={COLORS.fundamentalsBackground}
             flexDirection={DIRECTION_COLUMN}
             borderRadius={BORDERS.radiusSoftCorners}
             padding={SPACING.spacing3}

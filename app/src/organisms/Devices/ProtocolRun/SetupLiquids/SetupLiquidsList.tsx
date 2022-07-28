@@ -109,7 +109,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       css={LIQUID_CARD_STYLE}
       padding={SPACING.spacing4}
       onClick={() => setOpenItem(!openItem)}
-      backgroundColor={openItem ? COLORS.background : COLORS.white}
+      backgroundColor={openItem ? COLORS.fundamentalsBackground : COLORS.white}
       data-testid="LiquidsListItem_Row"
     >
       <LiquidsListItemDetails

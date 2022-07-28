@@ -176,7 +176,7 @@ export const TestShakeSlideout = (
       <Flex
         borderRadius={SPACING.spacingS}
         marginBottom={SPACING.spacing3}
-        backgroundColor={COLORS.background}
+        backgroundColor={COLORS.fundamentalsBackground}
         paddingY={SPACING.spacing4}
         paddingLeft={SPACING.spacing2}
         paddingRight={SPACING.spacing4}

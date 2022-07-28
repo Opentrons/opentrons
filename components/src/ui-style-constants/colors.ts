@@ -1,6 +1,6 @@
 // colors fundamentals
 export const white = '#ffffff'
-export const background = '#f8f8f8'
+export const fundamentalsBackground = '#f8f8f8'
 export const lightBlue = '#f1f8ff'
 export const medBlue = '#d9e9fe'
 export const focus = '#f09d20'
