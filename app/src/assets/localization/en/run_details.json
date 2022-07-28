@@ -135,5 +135,7 @@
   "touch_tip": "Touching tip",
   "move_to_slot": "Moving to {{slot_name}}",
   "move_to_well": "Moving to {{well_name}} of {{labware}} in {{labware_location}}",
-  "move_relative": "Moving {{distance}} mm along {{axis}} axis"
+  "move_relative": "Moving {{distance}} mm along {{axis}} axis",
+  "home_gantry": "Homing the following axes: Gantry X, Gantry Y, Left Pipette Mount Z, Right Pipette Mount Z, Left Pipette Plunger, Right Pipette Plunger",
+  "save_position": "Saving position"
 }

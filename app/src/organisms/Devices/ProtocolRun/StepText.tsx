@@ -327,7 +327,6 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'moveToSlot': {
       const { slotName } = displayCommand.params
-      console.log(slotName)
       messageNode = (
         <Trans
           t={t}
@@ -375,7 +374,14 @@ export function StepText(props: Props): JSX.Element | null {
       )
       break
     }
-
+    case 'home': {
+      messageNode = t('home_gantry')
+      break
+    }
+    case 'savePosition': {
+      messageNode = t('save_position')
+      break
+    }
     case 'custom': {
       const { legacyCommandText } = displayCommand.params ?? {}
       const sanitizedCommandText =

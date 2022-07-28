@@ -865,4 +865,38 @@ describe('StepText', () => {
     })
     getByText('Moving 4 mm along y axis')
   })
+
+  it('renders correct command text for home', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'home',
+        params: {
+          axes: ['x', 'y', 'leftZ', 'rightZ', 'leftPLunger', 'rightPlunger'],
+        },
+      },
+    })
+    getByText(
+      'Homing the following axes: Gantry X, Gantry Y, Left Pipette Mount Z, Right Pipette Mount Z, Left Pipette Plunger, Right Pipette Plunger'
+    )
+  })
+
+  it('renders correct command text for savingPosition', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'savePosition',
+        params: {
+          pipetteId: 'pipetteId',
+        },
+      },
+    })
+    getByText('Saving position')
+  })
 })
