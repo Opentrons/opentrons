@@ -366,7 +366,7 @@ export function StepText(props: Props): JSX.Element | null {
       break
     }
     default: {
-      messageNode = JSON.stringify(displayCommand.commandType)
+      messageNode = JSON.stringify(displayCommand)
       break
     }
   }
