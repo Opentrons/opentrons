@@ -64,7 +64,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       backgroundColor={COLORS.white}
       onClick={() => setSelectedValue(liquidId)}
       width="10.3rem"
-      minHeight={'max-content'}
+      minHeight="max-content"
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -73,8 +73,8 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         <Flex
           css={BORDERS.cardOutlineBorder}
           padding={SPACING.spacing3}
-          height={'max-content'}
-          width={'max-content'}
+          height="max-content"
+          width="max-content"
           backgroundColor={COLORS.white}
         >
           <Icon name="circle" color={displayColor} size={SIZE_1} />
@@ -96,8 +96,8 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         <Flex
           backgroundColor={COLORS.darkBlackEnabled + '1A'}
           borderRadius={BORDERS.radiusSoftCorners}
-          height={'max-content'}
-          width={'max-content'}
+          height="max-content"
+          width="max-content"
           paddingY={SPACING.spacing2}
           paddingX={SPACING.spacing3}
           marginTop={SPACING.spacing3}
@@ -110,7 +110,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       </Flex>
       {selectedValue === liquidId ? (
         <>
-          <Divider marginX={'-1rem'} marginY={SPACING.spacing4} />
+          <Divider marginX="-1rem" marginY={SPACING.spacing4} />
           {volumePerWellRange.map((well, index) => {
             return (
               <Flex

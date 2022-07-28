@@ -224,7 +224,7 @@ export function TipLengthCalibration({
       onClick={() => confirm(true)}
       textDecoration={TYPOGRAPHY.textDecorationUnderline}
       css={FONT_BODY_2_DARK}
-      id={'TipRackCalibration_recalibrateTipRackLink'}
+      id="TipRackCalibration_recalibrateTipRackLink"
     >
       {t('recalibrate')}
     </Link>
@@ -237,7 +237,7 @@ export function TipLengthCalibration({
       ) : (
         <NewPrimaryBtn
           onClick={() => handleStart()}
-          id={'TipRackCalibration_calibrateTipRackButton'}
+          id="TipRackCalibration_calibrateTipRackButton"
           disabled={disabled}
         >
           {t('calibrate_now_cta')}

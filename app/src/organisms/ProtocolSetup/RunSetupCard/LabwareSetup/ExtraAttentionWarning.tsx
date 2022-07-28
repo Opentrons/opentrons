@@ -52,12 +52,12 @@ const ModuleWarning = (props: {
             <Text
               marginX={SPACING_2}
               marginBottom={SPACING_2}
-              fontSize={'0.7rem'}
+              fontSize="0.7rem"
             />
           ),
           a: (
             <Btn
-              as={'span'}
+              as="span"
               id={`ExtraAttentionWarning_${snakeCase(moduleName)}_link`}
               alignSelf={ALIGN_FLEX_END}
               onClick={props.onLinkClick}
@@ -99,7 +99,7 @@ export const ExtraAttentionWarning = (
         marginY={SPACING_3}
         backgroundColor={COLOR_WARNING_LIGHT}
         color={C_DARK_GRAY}
-        id={'ExtraAttentionWarning'}
+        id="ExtraAttentionWarning"
       >
         <Flex flexDirection={DIRECTION_COLUMN} margin={SPACING_3}>
           <Flex margin={SPACING_2} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -121,7 +121,7 @@ export const ExtraAttentionWarning = (
               onClick={() => setHideExtraAttentionWarning(true)}
               aria-label="close"
             >
-              <Icon name={'close'} color={COLOR_WARNING} />
+              <Icon name="close" color={COLOR_WARNING} />
             </Btn>
           </Flex>
           {moduleTypes.map(moduleType => (

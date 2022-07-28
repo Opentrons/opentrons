@@ -40,7 +40,11 @@ import type {
   SetupRunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { TCOpenLidCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type {
+  HeaterShakerCloseLatchCreateCommand,
+  HeaterShakerDeactivateShakerCreateCommand,
+  TCOpenLidCreateCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type {
   HomeCreateCommand,
   SavePositionCreateCommand,
@@ -78,6 +82,8 @@ type LPCPrepCommand =
   | HomeCreateCommand
   | SetupRunTimeCommand
   | TCOpenLidCreateCommand
+  | HeaterShakerDeactivateShakerCreateCommand
+  | HeaterShakerCloseLatchCreateCommand
 
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 
@@ -109,6 +115,8 @@ const useLpcCtaText = (
                 .location.slotName,
       })
     }
+    case 'heaterShaker/deactivateShaker':
+    case 'heaterShaker/closeLabwareLatch':
     case 'thermocycler/openLid': {
       const moduleId = command.params.moduleId
       const slot = getModuleInitialLoadInfo(moduleId, commands).location
@@ -215,6 +223,14 @@ const isTCOpenCommand = (
 ): command is TCOpenLidCreateCommand =>
   command.commandType === 'thermocycler/openLid'
 
+const isHSCommand = (
+  command: CreateCommand
+): command is
+  | HeaterShakerDeactivateShakerCreateCommand
+  | HeaterShakerCloseLatchCreateCommand =>
+  command.commandType === 'heaterShaker/deactivateShaker' ||
+  command.commandType === 'heaterShaker/closeLabwareLatch'
+
 const isLoadLabwareCommand = (
   command: RunTimeCommand
 ): command is LoadLabwareRunTimeCommand => command.commandType === 'loadLabware'
@@ -272,8 +288,9 @@ export function useLabwarePositionCheck(
       }
       return command
     }) ?? []
-  // TC open lid commands come from the LPC command generator
+  // TC open lid commands + HS commands come from the LPC command generator
   const TCOpenCommands = LPCCommands.filter(isTCOpenCommand) ?? []
+  const HSCommands = LPCCommands.filter(isHSCommand) ?? []
   const homeCommand: HomeCreateCommand = {
     commandType: 'home',
     params: {},
@@ -282,6 +299,7 @@ export function useLabwarePositionCheck(
   const prepCommands: LPCPrepCommand[] = [
     ...loadCommands,
     ...TCOpenCommands,
+    ...HSCommands,
     homeCommand,
   ]
   // LPCMovementCommands will be run during the guided LPC flow
@@ -289,7 +307,9 @@ export function useLabwarePositionCheck(
     (
       command: LabwarePositionCheckCreateCommand
     ): command is LabwarePositionCheckMovementCommand =>
-      command.commandType !== 'thermocycler/openLid'
+      command.commandType !== 'thermocycler/openLid' &&
+      command.commandType !== 'heaterShaker/closeLabwareLatch' &&
+      command.commandType !== 'heaterShaker/deactivateShaker'
   )
   const currentCommand = LPCMovementCommands[currentCommandIndex]
   const prevCommand = LPCMovementCommands[currentCommandIndex - 1]

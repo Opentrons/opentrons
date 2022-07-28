@@ -42,11 +42,11 @@ export const LabwareOffsetModal = (
       <Modal className={styles.modal} contentsClassName={styles.modal_contents}>
         <Box marginX={SPACING_3}>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-            <Text as={'h3'} marginBottom={SPACING_3}>
+            <Text as="h3" marginBottom={SPACING_3}>
               {t('how_offset_data_works_title')}
             </Text>
             <Btn size={SIZE_2} onClick={props.onCloseClick}>
-              <Icon name={'close'} color={C_MED_DARK_GRAY}></Icon>
+              <Icon name="close" color={C_MED_DARK_GRAY}></Icon>
             </Btn>
           </Flex>
           <Trans
@@ -55,7 +55,7 @@ export const LabwareOffsetModal = (
             components={{
               h4: (
                 <Text
-                  as={'h4'}
+                  as="h4"
                   fontWeight={FONT_WEIGHT_SEMIBOLD}
                   marginBottom={SPACING_2}
                 />
@@ -67,11 +67,11 @@ export const LabwareOffsetModal = (
             fontSize={FONT_SIZE_BODY_1}
             color={C_BLUE}
             href={ROBOT_CAL_HELP_ARTICLE}
-            id={'LabwareOffsetModal_helpArticleLink1'}
+            id="LabwareOffsetModal_helpArticleLink1"
             external
           >
             {t('learn_more_about_robot_cal_offset_modal_link')}
-            <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
+            <Icon name="open-in-new" marginLeft={SPACING_1} size="10px" />
           </Link>
           <Text
             marginTop={SPACING_2}
@@ -84,11 +84,11 @@ export const LabwareOffsetModal = (
             fontSize={FONT_SIZE_BODY_1}
             color={C_BLUE}
             href={OFFSET_DATA_HELP_ARTICLE}
-            id={'LabwareOffsetModal_helpArticleLink2'}
+            id="LabwareOffsetModal_helpArticleLink2"
             external
           >
             {t('learn_more_about_offset_data_link')}
-            <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
+            <Icon name="open-in-new" marginLeft={SPACING_1} size="10px" />
           </Link>
           <Trans
             t={t}
@@ -96,7 +96,7 @@ export const LabwareOffsetModal = (
             components={{
               h4: (
                 <Text
-                  as={'h4'}
+                  as="h4"
                   marginTop={SPACING_3}
                   fontWeight={FONT_WEIGHT_SEMIBOLD}
                   marginBottom={SPACING_2}
@@ -113,7 +113,7 @@ export const LabwareOffsetModal = (
             components={{
               h4: (
                 <Text
-                  as={'h4'}
+                  as="h4"
                   marginTop={SPACING_3}
                   fontWeight={FONT_WEIGHT_SEMIBOLD}
                   marginBottom={SPACING_2}
@@ -128,7 +128,7 @@ export const LabwareOffsetModal = (
             <NewPrimaryBtn
               onClick={props.onCloseClick}
               width={SIZE_4}
-              id={'LabwareSetupModal_closeButton'}
+              id="LabwareSetupModal_closeButton"
             >
               {t('shared:close')}
             </NewPrimaryBtn>

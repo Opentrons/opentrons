@@ -7,6 +7,7 @@ import {
   pipetteIntoHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestWithLatchOpen,
   pipetteAdjacentHeaterShakerWhileShaking,
+  getLabwareSlot,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   uuid,
@@ -25,6 +26,12 @@ export const aspirate: CommandCreator<AspirateParams> = (
   const actionName = 'aspirate'
   const errors: CommandCreatorError[] = []
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
+
+  const slotName = getLabwareSlot(
+    labware,
+    prevRobotState.labware,
+    prevRobotState.modules
+  )
 
   if (!pipetteSpec) {
     errors.push(
@@ -96,18 +103,12 @@ export const aspirate: CommandCreator<AspirateParams> = (
     errors.push(errorCreators.heaterShakerIsShaking())
   }
   if (
-    pipetteAdjacentHeaterShakerWhileShaking(
-      prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot
-    )
+    pipetteAdjacentHeaterShakerWhileShaking(prevRobotState.modules, slotName)
   ) {
     errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
   }
   if (
-    getIsHeaterShakerEastWestWithLatchOpen(
-      prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot
-    )
+    getIsHeaterShakerEastWestWithLatchOpen(prevRobotState.modules, slotName)
   ) {
     errors.push(errorCreators.heaterShakerEastWestWithLatchOpen())
   }
@@ -115,7 +116,7 @@ export const aspirate: CommandCreator<AspirateParams> = (
   if (
     getIsHeaterShakerEastWestMultiChannelPipette(
       prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot,
+      slotName,
       pipetteSpec
     )
   ) {
@@ -124,7 +125,7 @@ export const aspirate: CommandCreator<AspirateParams> = (
   if (
     getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
       prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot,
+      slotName,
       pipetteSpec,
       invariantContext.labwareEntities[labware]
     )

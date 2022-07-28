@@ -47,7 +47,7 @@ export function SetupTipLengthCalibration({
       <StyledText
         color={COLORS.black}
         css={TYPOGRAPHY.pSemiBold}
-        id={'TipRackCalibration_requiredTipLengthTitle'}
+        id="TipRackCalibration_requiredTipLengthTitle"
       >
         {t('required_tip_racks_title')}
       </StyledText>

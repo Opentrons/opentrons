@@ -292,6 +292,39 @@ VALID_TEST_PARAMS = [
             )
         ),
     ),
+    (
+        protocol_schema_v6.Command(
+            commandType="thermocycler/runProfile",
+            params=protocol_schema_v6.Params(
+                moduleId="module-id-abc123",
+                blockMaxVolumeUl=1.11,
+                profile=[
+                    protocol_schema_v6.ProfileStep(
+                        celsius=2.22,
+                        holdSeconds=3.33,
+                    ),
+                    protocol_schema_v6.ProfileStep(
+                        celsius=4.44,
+                        holdSeconds=5.55,
+                    ),
+                ],
+            ),
+        ),
+        pe_commands.thermocycler.RunProfileCreate(
+            params=pe_commands.thermocycler.RunProfileParams(
+                moduleId="module-id-abc123",
+                blockMaxVolumeUl=1.11,
+                profile=[
+                    pe_commands.thermocycler.RunProfileStepParams(
+                        celsius=2.22, holdSeconds=3.33
+                    ),
+                    pe_commands.thermocycler.RunProfileStepParams(
+                        celsius=4.44, holdSeconds=5.55
+                    ),
+                ],
+            ),
+        ),
+    ),
 ]
 
 

@@ -56,7 +56,7 @@ export function CalibrationItem(props: Props): JSX.Element | null {
           />
           <span>
             {title !== undefined && (
-              <Text role={'heading'} fontSize={FONT_SIZE_BODY_2} id={id}>
+              <Text role="heading" fontSize={FONT_SIZE_BODY_2} id={id}>
                 {title}
               </Text>
             )}

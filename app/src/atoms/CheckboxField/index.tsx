@@ -109,7 +109,7 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
   return (
     <label css={OUTER_STYLE}>
       {props.isIndeterminate ? (
-        <Icon name={'minus-box'} width="100%" css={INNER_STYLE_VALUE} />
+        <Icon name="minus-box" width="100%" css={INNER_STYLE_VALUE} />
       ) : (
         <Icon
           css={props.value ? INNER_STYLE_VALUE : INNER_STYLE_NO_VALUE}

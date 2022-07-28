@@ -87,7 +87,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
               }`}
             >
               <Icon
-                name={'close'}
+                name="close"
                 width={SPACING.spacing5}
                 height={SPACING.spacing5}
               />

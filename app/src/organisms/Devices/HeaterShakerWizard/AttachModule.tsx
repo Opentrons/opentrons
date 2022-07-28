@@ -60,7 +60,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
           >
             <Trans
               t={t}
-              i18nKey={'attach_module_anchor_not_extended'}
+              i18nKey="attach_module_anchor_not_extended"
               components={{
                 bold: <strong />,
                 block: (
@@ -73,7 +73,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
             />
             <Trans
               t={t}
-              i18nKey={'attach_module_turn_screws'}
+              i18nKey="attach_module_turn_screws"
               components={{
                 bold: <strong />,
                 block: (
@@ -93,14 +93,14 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
           <Box
             width="60%"
             padding={SPACING.spacing3}
-            data-testid={'HeaterShakerWizard_deckMap'}
+            data-testid="HeaterShakerWizard_deckMap"
           >
             {moduleFromProtocol != null ? (
               <RobotWorkSpace
                 deckDef={standardDeckDef as any}
                 viewBox={DECK_MAP_VIEWBOX}
                 deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-                id={'HeaterShakerWizard_AttachModule_deckMap'}
+                id="HeaterShakerWizard_AttachModule_deckMap"
                 data-testid={`AttachModule_${moduleFromProtocol.moduleId}`}
               >
                 {() => (
@@ -121,7 +121,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 deckDef={standardDeckDef as any}
                 viewBox={DECK_MAP_VIEWBOX}
                 deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-                id={'HeaterShakerWizard_AttachModule_deckMap'}
+                id="HeaterShakerWizard_AttachModule_deckMap"
                 data-testid={`AttachModule_empty_deck`}
               />
             )}
@@ -134,7 +134,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
           >
             <Trans
               t={t}
-              i18nKey={'orient_heater_shaker_module'}
+              i18nKey="orient_heater_shaker_module"
               components={{
                 bold: <strong />,
                 block: (
@@ -165,7 +165,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
             />
             <Trans
               t={t}
-              i18nKey={'attach_module_extend_anchors'}
+              i18nKey="attach_module_extend_anchors"
               components={{
                 bold: <strong />,
                 block: (

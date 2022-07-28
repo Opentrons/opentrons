@@ -43,13 +43,13 @@ export const SecureLabwareModal = (
       <Modal className={styles.modal} contentsClassName={styles.modal_contents}>
         <Box>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-            <Text as={'h3'} marginBottom={SPACING_3}>
+            <Text as="h3" marginBottom={SPACING_3}>
               {t(`secure_labware_modal_title`, {
                 name: moduleName,
               })}
             </Text>
             <Btn size={SIZE_2} onClick={props.onCloseClick}>
-              <Icon name={'close'} color={C_MED_DARK_GRAY}></Icon>
+              <Icon name="close" color={C_MED_DARK_GRAY}></Icon>
             </Btn>
           </Flex>
 

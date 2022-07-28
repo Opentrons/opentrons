@@ -1,5 +1,5 @@
 from functools import partial
-from g_code_test_data.http.http_settings import HTTP_SETTINGS, DIRECTORY
+from g_code_test_data.http.http_settings import HTTP_SETTINGS
 from g_code_test_data.g_code_configuration import HTTPGCodeConfirmConfig
 from robot_server.service.legacy.routers.modules import post_serial_command
 from robot_server.service.legacy.models.modules import SerialCommand
@@ -7,7 +7,6 @@ from robot_server.service.legacy.models.modules import SerialCommand
 
 TEMPDECK_DEACTIVATE = HTTPGCodeConfirmConfig(
     name='tempdeck_deactivate',
-    results_path=f"{DIRECTORY}/tempdeck_deactivate.txt",
     executable=partial(
         post_serial_command,
         command=SerialCommand(command_type='deactivate'),
@@ -19,7 +18,6 @@ TEMPDECK_DEACTIVATE = HTTPGCodeConfirmConfig(
 
 TEMPDECK_SET_TEMPERATURE = HTTPGCodeConfirmConfig(
     name='tempdeck_set_temperature',
-    results_path=f"{DIRECTORY}/tempdeck_set_temperature.txt",
     executable=partial(
         post_serial_command,
         # Keep the args at a low value because the temp starts and 0.0 and only
@@ -33,7 +31,6 @@ TEMPDECK_SET_TEMPERATURE = HTTPGCodeConfirmConfig(
 
 TEMPDECK_START_SET_TEMPERATURE = HTTPGCodeConfirmConfig(
     name='tempdeck_start_set_temperature',
-    results_path=f"{DIRECTORY}/tempdeck_start_set_temperature.txt",
     executable=partial(
         post_serial_command,
         # This function does not wait on the tempdeck to finish coming to temp

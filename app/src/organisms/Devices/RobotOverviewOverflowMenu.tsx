@@ -99,7 +99,7 @@ export const RobotOverviewOverflowMenu = (
       <OverflowBtn
         aria-label="overflow"
         onClick={handleOverflowClick}
-        disabled={robot.status === UNREACHABLE}
+        disabled={robot.status !== CONNECTABLE}
       />
       {showOverflowMenu ? (
         <Flex
@@ -137,7 +137,7 @@ export const RobotOverviewOverflowMenu = (
               </MenuItem>
             </>
           )}
-          <Divider marginY={'0'} />
+          <Divider marginY="0" />
           <MenuItem
             onClick={() =>
               history.push(`/devices/${robot.name}/robot-settings`)

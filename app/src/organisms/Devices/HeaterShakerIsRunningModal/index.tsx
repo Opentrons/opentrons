@@ -39,7 +39,7 @@ export const HeaterShakerIsRunningModal = (
         marginX={SPACING.spacing3}
         size={SPACING.spacingM}
         color={COLORS.warningEnabled}
-        data-testid={'HeaterShakerIsRunning_warning_icon'}
+        data-testid="HeaterShakerIsRunning_warning_icon"
       />
       {t('heater_shaker_is_shaking')}
     </Flex>

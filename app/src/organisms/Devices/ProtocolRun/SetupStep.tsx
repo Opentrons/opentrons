@@ -113,14 +113,14 @@ export function SetupStep({
                     name={
                       calibrationStatusComplete ? 'ot-check' : 'alert-circle'
                     }
-                    id={'RunSetupCard_calibrationIcon'}
+                    id="RunSetupCard_calibrationIcon"
                   />
                   <StyledText
                     color={COLORS.black}
                     css={TYPOGRAPHY.pSemiBold}
                     marginRight={SPACING.spacing4}
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
-                    id={'RunSetupCard_calibrationText'}
+                    id="RunSetupCard_calibrationText"
                   >
                     {calibrationStatusComplete
                       ? t('calibration_ready')

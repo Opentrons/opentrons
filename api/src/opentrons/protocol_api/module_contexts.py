@@ -209,6 +209,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
+    # TODO (spp, 2022-07-27): Check if it is better to use GeometryType as the returnType
     def geometry(self) -> ModuleGeometry:
         """The object representing the module as an item on the deck
 
@@ -974,3 +975,47 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     def deactivate_heater(self) -> None:
         """Stop heating."""
         self._module.deactivate_heater()
+
+    def flag_unsafe_move(
+        self,
+        to_loc: types.Location,
+        is_multichannel: bool,
+    ) -> None:
+        """
+        Raise an error if attempting to perform a move that's deemed unsafe due to
+        the presence of the heater-shaker.
+        """
+        is_labware_latch_closed = (
+            self._module.labware_latch_status
+            == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
+        )
+        is_plate_shaking = self._module.speed_status != module_types.SpeedStatus.IDLE
+
+        destination_slot = to_loc.labware.first_parent()
+        if destination_slot is None:
+            raise Exception(
+                "Destination has no slot associated with it. "
+                "Cannot determine pipette movement safety."
+            )
+
+        to_labware_like = to_loc.labware
+        is_tiprack: bool
+        if (
+            to_labware_like.is_labware
+        ):  # Do we consider this a valid location for move_to?
+            is_tiprack = to_labware_like.as_labware().is_tiprack
+        elif to_labware_like.parent.is_labware:
+            is_tiprack = to_labware_like.parent.as_labware().is_tiprack
+        else:
+            raise Exception(
+                "Invalid destination location type. "
+                "Cannot determine pipette movement safety."
+            )
+
+        cast(HeaterShakerGeometry, self.geometry).flag_unsafe_move(
+            to_slot=int(destination_slot),
+            is_tiprack=is_tiprack,
+            is_using_multichannel=is_multichannel,
+            is_plate_shaking=is_plate_shaking,
+            is_labware_latch_closed=is_labware_latch_closed,
+        )
