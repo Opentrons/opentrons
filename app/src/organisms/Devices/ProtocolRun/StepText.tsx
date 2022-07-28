@@ -421,10 +421,6 @@ export function StepText(props: Props): JSX.Element | null {
           : displayCommand.commandType
       break
     }
-    default: {
-      messageNode = displayCommand.commandType
-      break
-    }
   }
 
   return <Flex alignItems={ALIGN_CENTER}>{messageNode}</Flex>
