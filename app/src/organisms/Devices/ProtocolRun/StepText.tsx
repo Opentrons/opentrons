@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { Flex, ALIGN_CENTER, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { StyledText } from '../../../atoms/text'
@@ -71,24 +71,18 @@ export function StepText(props: Props): JSX.Element | null {
       if (!('slotName' in labwareLocation)) {
         throw new Error('expected tip rack to be in a slot')
       }
-      messageNode = (
-        <Trans
-          t={t}
-          i18nKey="drop_tip"
-          values={{
-            well_name: wellName,
-            labware:
-              labwareId === TRASH_ID
-                ? 'Opentrons Fixed Trash'
-                : getLabwareDisplayName(
-                    protocolData.labwareDefinitions[
-                      protocolData.labware[labwareId].definitionId
-                    ]
-                  ),
-            labware_location: labwareLocation.slotName,
-          }}
-        />
-      )
+      messageNode = t('drop_tip', {
+        well_name: wellName,
+        labware:
+          labwareId === TRASH_ID
+            ? 'Opentrons Fixed Trash'
+            : getLabwareDisplayName(
+                protocolData.labwareDefinitions[
+                  protocolData.labware[labwareId].definitionId
+                ]
+              ),
+        labware_location: labwareLocation.slotName,
+      })
       break
     }
     case 'pickUpTip': {
@@ -100,19 +94,13 @@ export function StepText(props: Props): JSX.Element | null {
       if (!('slotName' in labwareLocation)) {
         throw new Error('expected tip rack to be in a slot')
       }
-      messageNode = (
-        <Trans
-          t={t}
-          i18nKey="pickup_tip"
-          values={{
-            well_name: wellName,
-            labware: getLabwareDisplayName(
-              labwareRenderInfoById[labwareId].labwareDef
-            ),
-            labware_location: labwareLocation.slotName,
-          }}
-        />
-      )
+      messageNode = t('pickup_tip', {
+        well_name: wellName,
+        labware: getLabwareDisplayName(
+          labwareRenderInfoById[labwareId].labwareDef
+        ),
+        labware_location: labwareLocation.slotName,
+      })
       break
     }
     case 'pause':
@@ -259,21 +247,15 @@ export function StepText(props: Props): JSX.Element | null {
       if (!('slotName' in labwareLocation)) {
         throw new Error('expected tip rack to be in a slot')
       }
-      messageNode = (
-        <Trans
-          t={t}
-          i18nKey={'aspirate'}
-          values={{
-            well_name: wellName,
-            labware: getLabwareDisplayName(
-              labwareRenderInfoById[labwareId].labwareDef
-            ),
-            labware_location: labwareLocation.slotName,
-            volume: volume,
-            flowRate: flowRate,
-          }}
-        />
-      )
+      messageNode = t('aspirate', {
+        well_name: wellName,
+        labware: getLabwareDisplayName(
+          labwareRenderInfoById[labwareId].labwareDef
+        ),
+        labware_location: labwareLocation.slotName,
+        volume: volume,
+        flow_rate: flowRate,
+      })
 
       break
     }
@@ -286,21 +268,15 @@ export function StepText(props: Props): JSX.Element | null {
       if (!('slotName' in labwareLocation)) {
         throw new Error('expected tip rack to be in a slot')
       }
-      messageNode = (
-        <Trans
-          t={t}
-          i18nKey={'dispense'}
-          values={{
-            well_name: wellName,
-            labware: getLabwareDisplayName(
-              labwareRenderInfoById[labwareId].labwareDef
-            ),
-            labware_location: labwareLocation.slotName,
-            volume: volume,
-            flowRate: flowRate,
-          }}
-        />
-      )
+      messageNode = t('dispense', {
+        well_name: wellName,
+        labware: getLabwareDisplayName(
+          labwareRenderInfoById[labwareId].labwareDef
+        ),
+        labware_location: labwareLocation.slotName,
+        volume: volume,
+        flow_rate: flowRate,
+      })
 
       break
     }
@@ -313,21 +289,14 @@ export function StepText(props: Props): JSX.Element | null {
       if (!('slotName' in labwareLocation)) {
         throw new Error('expected tip rack to be in a slot')
       }
-      messageNode = (
-        <Trans
-          t={t}
-          i18nKey={'blowout'}
-          values={{
-            well_name: wellName,
-            labware: getLabwareDisplayName(
-              labwareRenderInfoById[labwareId].labwareDef
-            ),
-            labware_location: labwareLocation.slotName,
-            flowRate: flowRate,
-          }}
-        />
-      )
-
+      messageNode = t('blowout', {
+        well_name: wellName,
+        labware: getLabwareDisplayName(
+          labwareRenderInfoById[labwareId].labwareDef
+        ),
+        labware_location: labwareLocation.slotName,
+        flow_rate: flowRate,
+      })
       break
     }
     case 'touchTip': {
@@ -336,16 +305,9 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'moveToSlot': {
       const { slotName } = displayCommand.params
-      messageNode = (
-        <Trans
-          t={t}
-          i18nKey={'move_to_slot'}
-          values={{
-            slot_name: slotName,
-          }}
-        />
-      )
-
+      messageNode = t('move_to_slot', {
+        slot_name: slotName,
+      })
       break
     }
     case 'moveToWell': {
@@ -357,48 +319,30 @@ export function StepText(props: Props): JSX.Element | null {
       if (!('slotName' in labwareLocation)) {
         throw new Error('expected tip rack to be in a slot')
       }
-      messageNode = (
-        <Trans
-          t={t}
-          i18nKey={'move_to_well'}
-          values={{
-            well_name: wellName,
-            labware: getLabwareDisplayName(
-              labwareRenderInfoById[labwareId].labwareDef
-            ),
-            labware_location: labwareLocation.slotName,
-          }}
-        />
-      )
+      messageNode = t('move_to_well', {
+        well_name: wellName,
+        labware: getLabwareDisplayName(
+          labwareRenderInfoById[labwareId].labwareDef
+        ),
+        labware_location: labwareLocation.slotName,
+      })
       break
     }
     case 'moveRelative': {
       const { axis, distance } = displayCommand.params
-      messageNode = (
-        <Trans
-          t={t}
-          i18nKey={'move_relative'}
-          values={{
-            axis: axis,
-            distance: distance,
-          }}
-        />
-      )
+      messageNode = t('move_relative', {
+        axis: axis,
+        distance: distance,
+      })
       break
     }
     case 'moveToCoordinates': {
       const { coordinates } = displayCommand.params
-      messageNode = (
-        <Trans
-          t={t}
-          i18nKey={'move_to_coordinates'}
-          values={{
-            x: coordinates.x,
-            y: coordinates.y,
-            z: coordinates.z,
-          }}
-        />
-      )
+      messageNode = t('move_to_coordinates', {
+        x: coordinates.x,
+        y: coordinates.y,
+        z: coordinates.z,
+      })
       break
     }
     case 'home': {
@@ -419,6 +363,10 @@ export function StepText(props: Props): JSX.Element | null {
         legacyCommandText != null
           ? sanitizedCommandText
           : displayCommand.commandType
+      break
+    }
+    default: {
+      messageNode = JSON.stringify(displayCommand.commandType)
       break
     }
   }
