@@ -148,7 +148,13 @@ def get_current_settings(
 ) -> OT3AxisMap[CurrentConfig]:
     conf_by_pip = config.by_gantry_load(gantry_load)
     currents = {}
-    for axis_kind in [OT3AxisKind.P, OT3AxisKind.X, OT3AxisKind.Y, OT3AxisKind.Z]:
+    for axis_kind in [
+        OT3AxisKind.P,
+        OT3AxisKind.X,
+        OT3AxisKind.Y,
+        OT3AxisKind.Z,
+        OT3AxisKind.Z_G,
+    ]:
         for axis in OT3Axis.of_kind(axis_kind):
             currents[axis] = CurrentConfig(
                 conf_by_pip["hold_current"][axis_kind],
@@ -163,7 +169,13 @@ def get_system_constraints(
 ) -> "SystemConstraints[OT3Axis]":
     conf_by_pip = config.by_gantry_load(gantry_load)
     constraints = {}
-    for axis_kind in [OT3AxisKind.P, OT3AxisKind.X, OT3AxisKind.Y, OT3AxisKind.Z]:
+    for axis_kind in [
+        OT3AxisKind.P,
+        OT3AxisKind.X,
+        OT3AxisKind.Y,
+        OT3AxisKind.Z,
+        OT3AxisKind.Z_G,
+    ]:
         for axis in OT3Axis.of_kind(axis_kind):
             constraints[axis] = AxisConstraints.build(
                 conf_by_pip["acceleration"][axis_kind],
