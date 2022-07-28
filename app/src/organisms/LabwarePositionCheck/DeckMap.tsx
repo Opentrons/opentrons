@@ -126,7 +126,7 @@ export const DeckMap = (props: DeckMapProps): JSX.Element | null => {
                   height={labwareDef.dimensions.yDimension - 2}
                   fill="none"
                   stroke={C_SELECTED_DARK}
-                  strokeWidth="3px'"
+                  strokeWidth="3px"
                   data-testid={`DeckMap_${labwareId}_highlight`}
                 />
               )}
