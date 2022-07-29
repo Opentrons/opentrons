@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { Flex, ALIGN_CENTER, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-
 import { StyledText } from '../../../atoms/text'
 import { getLabwareLocation } from '../ProtocolRun/utils/getLabwareLocation'
 import {
@@ -72,24 +71,18 @@ export function StepText(props: Props): JSX.Element | null {
       if (!('slotName' in labwareLocation)) {
         throw new Error('expected tip rack to be in a slot')
       }
-      messageNode = (
-        <Trans
-          t={t}
-          i18nKey="drop_tip"
-          values={{
-            well_name: wellName,
-            labware:
-              labwareId === TRASH_ID
-                ? 'Opentrons Fixed Trash'
-                : getLabwareDisplayName(
-                    protocolData.labwareDefinitions[
-                      protocolData.labware[labwareId].definitionId
-                    ]
-                  ),
-            labware_location: labwareLocation.slotName,
-          }}
-        />
-      )
+      messageNode = t('drop_tip', {
+        well_name: wellName,
+        labware:
+          labwareId === TRASH_ID
+            ? 'Opentrons Fixed Trash'
+            : getLabwareDisplayName(
+                protocolData.labwareDefinitions[
+                  protocolData.labware[labwareId].definitionId
+                ]
+              ),
+        labware_location: labwareLocation.slotName,
+      })
       break
     }
     case 'pickUpTip': {
@@ -101,19 +94,13 @@ export function StepText(props: Props): JSX.Element | null {
       if (!('slotName' in labwareLocation)) {
         throw new Error('expected tip rack to be in a slot')
       }
-      messageNode = (
-        <Trans
-          t={t}
-          i18nKey="pickup_tip"
-          values={{
-            well_name: wellName,
-            labware: getLabwareDisplayName(
-              labwareRenderInfoById[labwareId].labwareDef
-            ),
-            labware_location: labwareLocation.slotName,
-          }}
-        />
-      )
+      messageNode = t('pickup_tip', {
+        well_name: wellName,
+        labware: getLabwareDisplayName(
+          labwareRenderInfoById[labwareId].labwareDef
+        ),
+        labware_location: labwareLocation.slotName,
+      })
       break
     }
     case 'pause':
@@ -123,7 +110,8 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'loadLabware':
     case 'loadPipette':
-    case 'loadModule': {
+    case 'loadModule':
+    case 'loadLiquid': {
       messageNode = (
         <RunLogProtocolSetupInfo
           robotName={robotName}
@@ -250,6 +238,121 @@ export function StepText(props: Props): JSX.Element | null {
       messageNode = t('wait_for_duration', { seconds: seconds })
       break
     }
+    case 'aspirate': {
+      const { wellName, labwareId, volume, flowRate } = displayCommand.params
+      const labwareLocation = getLabwareLocation(
+        labwareId,
+        protocolData.commands
+      )
+      if (!('slotName' in labwareLocation)) {
+        throw new Error('expected tip rack to be in a slot')
+      }
+      messageNode = t('aspirate', {
+        well_name: wellName,
+        labware: getLabwareDisplayName(
+          labwareRenderInfoById[labwareId].labwareDef
+        ),
+        labware_location: labwareLocation.slotName,
+        volume: volume,
+        flow_rate: flowRate,
+      })
+
+      break
+    }
+    case 'dispense': {
+      const { wellName, labwareId, volume, flowRate } = displayCommand.params
+      const labwareLocation = getLabwareLocation(
+        labwareId,
+        protocolData.commands
+      )
+      if (!('slotName' in labwareLocation)) {
+        throw new Error('expected tip rack to be in a slot')
+      }
+      messageNode = t('dispense', {
+        well_name: wellName,
+        labware: getLabwareDisplayName(
+          labwareRenderInfoById[labwareId].labwareDef
+        ),
+        labware_location: labwareLocation.slotName,
+        volume: volume,
+        flow_rate: flowRate,
+      })
+
+      break
+    }
+    case 'blowout': {
+      const { wellName, labwareId, flowRate } = displayCommand.params
+      const labwareLocation = getLabwareLocation(
+        labwareId,
+        protocolData.commands
+      )
+      if (!('slotName' in labwareLocation)) {
+        throw new Error('expected tip rack to be in a slot')
+      }
+      messageNode = t('blowout', {
+        well_name: wellName,
+        labware: getLabwareDisplayName(
+          labwareRenderInfoById[labwareId].labwareDef
+        ),
+        labware_location: labwareLocation.slotName,
+        flow_rate: flowRate,
+      })
+      break
+    }
+    case 'touchTip': {
+      messageNode = t('touch_tip')
+      break
+    }
+    case 'moveToSlot': {
+      const { slotName } = displayCommand.params
+      messageNode = t('move_to_slot', {
+        slot_name: slotName,
+      })
+      break
+    }
+    case 'moveToWell': {
+      const { wellName, labwareId } = displayCommand.params
+      const labwareLocation = getLabwareLocation(
+        labwareId,
+        protocolData.commands
+      )
+      if (!('slotName' in labwareLocation)) {
+        throw new Error('expected tip rack to be in a slot')
+      }
+      messageNode = t('move_to_well', {
+        well_name: wellName,
+        labware: getLabwareDisplayName(
+          labwareRenderInfoById[labwareId].labwareDef
+        ),
+        labware_location: labwareLocation.slotName,
+      })
+      break
+    }
+    case 'moveRelative': {
+      const { axis, distance } = displayCommand.params
+      messageNode = t('move_relative', {
+        axis: axis,
+        distance: distance,
+      })
+      break
+    }
+    case 'moveToCoordinates': {
+      const { coordinates } = displayCommand.params
+      messageNode = t('move_to_coordinates', {
+        x: coordinates.x,
+        y: coordinates.y,
+        z: coordinates.z,
+      })
+      break
+    }
+    case 'home': {
+      messageNode = t('home_gantry')
+      break
+    }
+    case 'savePosition': {
+      messageNode = t('save_position')
+      break
+    }
     case 'custom': {
       const { legacyCommandText } = displayCommand.params ?? {}
       const sanitizedCommandText =
@@ -263,7 +366,7 @@ export function StepText(props: Props): JSX.Element | null {
       break
     }
     default: {
-      messageNode = displayCommand.commandType
+      messageNode = JSON.stringify(displayCommand)
       break
     }
   }

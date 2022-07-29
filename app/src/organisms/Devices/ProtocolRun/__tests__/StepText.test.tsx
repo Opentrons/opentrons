@@ -702,4 +702,212 @@ describe('StepText', () => {
     })
     getByText('Pause for 60 seconds')
   })
+  it('renders correct command text for aspirate', () => {
+    const labwareId = 'labwareId'
+    when(mockGetLabwareDisplayName)
+      .calledWith('fake_def' as any)
+      .mockReturnValue('fake_display_name')
+    when(mockGetLabwareLocation)
+      .calledWith(labwareId, [])
+      .mockReturnValue({ slotName: 'fake_labware_location' })
+    mockUseLabwareRenderInfoForRunById.mockReturnValue({
+      labwareId: {
+        labwareDef: 'fake_def',
+      },
+    } as any)
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'aspirate',
+        params: {
+          volume: 100,
+          flowRate: 130,
+          wellName: 'wellName',
+          labwareId: 'labwareId',
+        },
+      },
+    })
+    getByText(
+      'Aspirating 100 uL from wellName of fake_display_name in fake_labware_location at 130 uL/sec'
+    )
+  })
+  it('renders correct command text for dispense', () => {
+    const labwareId = 'labwareId'
+    when(mockGetLabwareDisplayName)
+      .calledWith('fake_def' as any)
+      .mockReturnValue('fake_display_name')
+    when(mockGetLabwareLocation)
+      .calledWith(labwareId, [])
+      .mockReturnValue({ slotName: 'fake_labware_location' })
+    mockUseLabwareRenderInfoForRunById.mockReturnValue({
+      labwareId: {
+        labwareDef: 'fake_def',
+      },
+    } as any)
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'dispense',
+        params: {
+          volume: 100,
+          flowRate: 130,
+          wellName: 'wellName',
+          labwareId: 'labwareId',
+        },
+      },
+    })
+    getByText(
+      'Dispensing 100 uL into wellName of fake_display_name in fake_labware_location at 130 uL/sec'
+    )
+  })
+  it('renders correct command text for blowout', () => {
+    const labwareId = 'labwareId'
+    when(mockGetLabwareDisplayName)
+      .calledWith('fake_def' as any)
+      .mockReturnValue('fake_display_name')
+    when(mockGetLabwareLocation)
+      .calledWith(labwareId, [])
+      .mockReturnValue({ slotName: 'fake_labware_location' })
+    mockUseLabwareRenderInfoForRunById.mockReturnValue({
+      labwareId: {
+        labwareDef: 'fake_def',
+      },
+    } as any)
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'blowout',
+        params: {
+          flowRate: 130,
+          wellName: 'wellName',
+          labwareId: 'labwareId',
+        },
+      },
+    })
+    getByText(
+      'Blowing out at wellName of fake_display_name in fake_labware_location at 130 uL/sec'
+    )
+  })
+  it('renders correct command text for touchTip', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'touchTip',
+      },
+    })
+    getByText('Touching tip')
+  })
+  it('renders correct command text for moveToSlot', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'moveToSlot',
+        params: { slotName: 'slot 5' },
+      },
+    })
+    getByText('Moving to slot 5')
+  })
+  it('renders correct command text for moveToWell', () => {
+    const labwareId = 'labwareId'
+    when(mockGetLabwareDisplayName)
+      .calledWith('fake_def' as any)
+      .mockReturnValue('fake_display_name')
+    when(mockGetLabwareLocation)
+      .calledWith(labwareId, [])
+      .mockReturnValue({ slotName: 'fake_labware_location' })
+    mockUseLabwareRenderInfoForRunById.mockReturnValue({
+      labwareId: {
+        labwareDef: 'fake_def',
+      },
+    } as any)
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'moveToWell',
+        params: {
+          wellName: 'wellName',
+          labwareId: 'labwareId',
+        },
+      },
+    })
+    getByText(
+      'Moving to wellName of fake_display_name in fake_labware_location'
+    )
+  })
+  it('renders correct command text for moveRelative', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'moveRelative',
+        params: { distance: '4', axis: 'y' },
+      },
+    })
+    getByText('Moving 4 mm along y axis')
+  })
+  it('renders correct command text for moveToCoordinates', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'moveToCoordinates',
+        params: { coordinates: { x: '4', y: '5', z: '2' } },
+      },
+    })
+    getByText('Moving to (X: 4, Y: 5, Z: 2)')
+  })
+
+  it('renders correct command text for home', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'home',
+        params: {
+          axes: ['x', 'y', 'leftZ', 'rightZ', 'leftPLunger', 'rightPlunger'],
+        },
+      },
+    })
+    getByText('Homing all gantry, pipette, and plunger axes')
+  })
+
+  it('renders correct command text for savingPosition', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'savePosition',
+        params: {
+          pipetteId: 'pipetteId',
+        },
+      },
+    })
+    getByText('Saving position')
+  })
 })
