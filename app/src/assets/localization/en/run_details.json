@@ -138,6 +138,6 @@
   "move_to_well": "Moving to {{well_name}} of {{labware}} in {{labware_location}}",
   "move_relative": "Moving {{distance}} mm along {{axis}} axis",
   "move_to_coordinates": "Moving to (X: {{x}}, Y: {{y}}, Z: {{z}})",
-  "home_gantry": "Homing the following axes: Gantry X, Gantry Y, Left Pipette Mount Z, Right Pipette Mount Z, Left Pipette Plunger, Right Pipette Plunger",
+  "home_gantry": "Homing all gantry, pipette, and plunger axes",
   "save_position": "Saving position"
 }
