@@ -73,9 +73,9 @@ export function OverflowMenu({
   } = useMenuHandleClickOutside()
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
 
-  const calsOverflowWrapperRef = useOnClickOutside({
+  const calsOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
-  }) as React.RefObject<HTMLDivElement>
+  })
   const [
     startPipetteOffsetCalibration,
     PipetteOffsetCalibrationWizard,
@@ -214,7 +214,7 @@ export function OverflowMenu({
       {showOverflowMenu ? (
         <Flex
           ref={calsOverflowWrapperRef}
-          width={calType === 'pipetteOffset' ? '11.5rem' : '17.25rem'}
+          whiteSpace="nowrap"
           zIndex={10}
           borderRadius={'4px 4px 0px 0px'}
           boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
