@@ -60,8 +60,8 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
               <Btn
                 onClick={onClose}
                 css={closeIconStyles}
-                data-testid={`ModalHeader_icon_close_${
-                  typeof title === 'string' ? title : ''
+                data-testid={`ModalHeader_icon_close${
+                  typeof title === 'string' ? `_${title}` : ''
                 }`}
               >
                 <Icon
