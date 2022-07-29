@@ -147,6 +147,7 @@ export function registerPythonPath(): Dispatch {
       case Cfg.OPEN_PYTHON_DIRECTORY: {
         const dir = getFullConfig().python.pathToPythonOverride
         if (dir != null) {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           shell.openPath(dir)
         }
         break

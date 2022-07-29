@@ -39,6 +39,7 @@ describe('config module dispatches', () => {
     jest.resetAllMocks()
   })
 
+  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('opens file picker on UPDATE_CONFIG when path is python.pathToPythonOverride', () => {
     handleAction(Config.updateConfigValue('python.pathToPythonOverride', null))
 
