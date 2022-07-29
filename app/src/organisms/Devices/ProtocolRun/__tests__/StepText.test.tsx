@@ -892,9 +892,7 @@ describe('StepText', () => {
         },
       },
     })
-    getByText(
-      'Homing the following axes: Gantry X, Gantry Y, Left Pipette Mount Z, Right Pipette Mount Z, Left Pipette Plunger, Right Pipette Plunger'
-    )
+    getByText('Homing all gantry, pipette, and plunger axes')
   })
 
   it('renders correct command text for savingPosition', () => {
