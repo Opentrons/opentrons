@@ -131,38 +131,29 @@ export function ProtocolRunDetails(): JSX.Element | null {
 
   const robot = useRobot(robotName)
   useSyncRobotClock(robotName)
-  interface ProtocolRunDetailsTabProps {
-    protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
-    robotName: string
-    runId: string
-  }
 
   const protocolRunDetailsContentByTab: {
-    [K in ProtocolRunDetailsTab]: ({
-      protocolRunHeaderRef,
-      robotName,
-      runId,
-    }: ProtocolRunDetailsTabProps) => JSX.Element | null
+    [K in ProtocolRunDetailsTab]: JSX.Element | null
   } = {
-    setup: () => (
+    setup: (
       <ProtocolRunSetup
         protocolRunHeaderRef={protocolRunHeaderRef}
         robotName={robotName}
         runId={runId}
       />
     ),
-    'module-controls': () => (
+    'module-controls': (
       <ProtocolRunModuleControls robotName={robotName} runId={runId} />
     ),
-    'run-log': () => <RunLog robotName={robotName} runId={runId} />,
+    'run-log': <RunLog robotName={robotName} runId={runId} />,
   }
 
-  const ProtocolRunDetailsContent =
-    protocolRunDetailsContentByTab[protocolRunDetailsTab] ??
+  const protocolRunDetailsContent = protocolRunDetailsContentByTab[
+    protocolRunDetailsTab
+  ] ?? (
     // default to the setup tab if no tab or nonexistent tab is passed as a param
-    (() => (
-      <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
-    ))
+    <Redirect to={`/devices/${robotName}/protocol-runs/${runId}/setup`} />
+  )
 
   React.useEffect(() => {
     dispatch(fetchProtocols())
@@ -207,11 +198,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
               BORDERS.radiusSoftCorners
             }`}
           >
-            <ProtocolRunDetailsContent
-              protocolRunHeaderRef={protocolRunHeaderRef}
-              robotName={robotName}
-              runId={runId}
-            />
+            {protocolRunDetailsContent}
           </Box>
         </Flex>
       </Box>
