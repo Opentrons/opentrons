@@ -84,6 +84,7 @@ export function registerConfig(
           store().set(path, nextValue)
           dispatch(Cfg.configValueUpdated(path, nextValue))
         }
+
         if (
           action.type === Cfg.UPDATE_VALUE &&
           path === 'python.pathToPythonOverride'
