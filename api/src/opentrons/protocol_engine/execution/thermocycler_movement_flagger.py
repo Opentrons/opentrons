@@ -15,9 +15,9 @@ from opentrons.hardware_control.modules import (
     Thermocycler as HardwareThermocycler,
 )
 
-from ..types import ModuleLocation, ModuleModel as PEModuleModel
+from ..types import ModuleLocation
 from ..state import StateStore
-from ..errors import ThermocyclerNotOpenError
+from ..errors import ThermocyclerNotOpenError, WrongModuleTypeError
 
 
 class ThermocyclerMovementFlagger:
@@ -45,7 +45,8 @@ class ThermocyclerMovementFlagger:
         """Flag unsafe movements to a Thermocycler.
 
         If the given labware is in a Thermocycler, and that Thermocycler's lid isn't
-        currently open according to the hardware API, raises ThermocyclerNotOpenError.
+        currently open according the engine's thermocycler state as well as
+        the hardware API (for non-virtual modules), raises ThermocyclerNotOpenError.
 
         Otherwise, no-ops.
 
@@ -67,55 +68,59 @@ class ThermocyclerMovementFlagger:
                Thermocycler through this method, this method may see the lid as open
                even though it's in transit.
         """
+        module_id = self._get_parent_module_id(labware_id=labware_id)
+        if module_id is None:
+            return  # Labware not on a module.
         try:
-            thermocycler = await self._find_containing_thermocycler(
-                labware_id=labware_id
+            tc_substate = self._state_store.modules.get_thermocycler_module_substate(
+                module_id=module_id
+            )
+        except WrongModuleTypeError:
+            return  # Labware on a module, but not a Thermocycler.
+
+        if not tc_substate.is_lid_open:
+            raise ThermocyclerNotOpenError(
+                "Thermocycler must be open when moving to labware inside it."
             )
 
-        except self._HardwareThermocyclerMissingError as e:
-            raise ThermocyclerNotOpenError(
-                "Thermocycler must be open when moving to labware inside it,"
-                " but can't confirm Thermocycler's current status."
-            ) from e
-
-        if thermocycler is not None:
-            lid_status = thermocycler.lid_status
-            if lid_status != ThermocyclerLidStatus.OPEN:
-                raise ThermocyclerNotOpenError(
-                    f"Thermocycler must be open when moving to labware inside it,"
-                    f' but Thermocycler is currently "{lid_status}".'
+        # There is a chance that the engine might not have the most latest lid status.
+        # Do a hardware state check just to be sure that the lid is truly open.
+        if not self._state_store.config.use_virtual_modules:
+            try:
+                thermocycler = await self._find_hardware_thermocycler(
+                    module_id=module_id
                 )
+            except self._HardwareThermocyclerMissingError as e:
+                raise ThermocyclerNotOpenError(
+                    "Thermocycler must be open when moving to labware inside it,"
+                    " but can't confirm Thermocycler's current status."
+                ) from e
 
-    async def _find_containing_thermocycler(
+            if thermocycler is not None:
+                lid_status = thermocycler.lid_status
+                if lid_status != ThermocyclerLidStatus.OPEN:
+                    raise ThermocyclerNotOpenError(
+                        f"Thermocycler must be open when moving to labware inside it,"
+                        f' but Thermocycler is currently "{lid_status}".'
+                    )
+
+    async def _find_hardware_thermocycler(
         self,
-        labware_id: str,
+        module_id: str,
     ) -> Optional[HardwareThermocycler]:
-        """Find the hardware Thermocycler containing the given labware.
+        """Find the hardware Thermocycler corresponding with the module ID.
 
         Returns:
-            If the labware was loaded into a Thermocycler,
-            the interface to control that Thermocycler's hardware.
+            The interface to control that Thermocycler's hardware.
             Otherwise, None.
 
         Raises:
-            _HardwareThermocyclerMissingError: If the labware was loaded into a
-                Thermocycler, but we can't find that Thermocycler in the hardware API,
-                so we can't fetch its current lid status.
+            _HardwareThermocyclerMissingError: If we can't find that Thermocycler in
+                the hardware API, so we can't fetch its current lid status.
                 It's unclear if this can happen in practice...
                 maybe if the module disconnects between when it was loaded into
                 Protocol Engine and when this function is called?
         """
-        module_id = self._get_parent_module_id(labware_id=labware_id)
-        if module_id is None:
-            return None  # Labware not on a module.
-
-        module_model = self._state_store.modules.get_model(module_id=module_id)
-        if module_model not in [
-            PEModuleModel.THERMOCYCLER_MODULE_V1,
-            PEModuleModel.THERMOCYCLER_MODULE_V2,
-        ]:
-            return None  # Labware on a module, but not a Thermocycler.
-
         thermocycler_serial = self._state_store.modules.get_serial_number(
             module_id=module_id
         )
@@ -145,6 +150,8 @@ class ThermocyclerMovementFlagger:
             The matching hardware Thermocycler, or None if none was found.
         """
         available_modules, simulating_module = await self._hardware_api.find_modules(
+            # Using a placeholder model since it is only required for creating
+            # a simulating module, which we don't use here.
             by_model=OpentronsThermocyclerModuleModel.THERMOCYCLER_V1,
             # Hard-coding instead of using
             # opentrons.protocols.geometry.module_geometry.resolve_module_type(),

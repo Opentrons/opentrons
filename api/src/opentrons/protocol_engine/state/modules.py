@@ -163,6 +163,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 thermocycler.DeactivateBlockResult,
                 thermocycler.SetTargetLidTemperatureResult,
                 thermocycler.DeactivateLidResult,
+                thermocycler.OpenLidResult,
+                thermocycler.CloseLidResult,
             ),
         ):
             self._handle_thermocycler_module_commands(command)
@@ -209,6 +211,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         elif ModuleModel.is_thermocycler_module_model(model):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
+                is_lid_open=live_data is not None and live_data["lid"] == "open",
                 target_block_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
                 target_lid_temperature=live_data["lidTarget"] if live_data else None,  # type: ignore[arg-type]
             )
@@ -306,6 +309,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             thermocycler.DeactivateBlock,
             thermocycler.SetTargetLidTemperature,
             thermocycler.DeactivateLid,
+            thermocycler.OpenLid,
+            thermocycler.CloseLid,
         ],
     ) -> None:
         module_id = command.params.moduleId
@@ -317,30 +322,49 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         # Get current values to preserve target temperature not being set/deactivated
         block_temperature = thermocycler_substate.target_block_temperature
         lid_temperature = thermocycler_substate.target_lid_temperature
+        is_lid_open = thermocycler_substate.is_lid_open
 
         if isinstance(command.result, thermocycler.SetTargetBlockTemperatureResult):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
+                is_lid_open=is_lid_open,
                 target_block_temperature=command.result.targetBlockTemperature,
                 target_lid_temperature=lid_temperature,
             )
         elif isinstance(command.result, thermocycler.DeactivateBlockResult):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
+                is_lid_open=is_lid_open,
                 target_block_temperature=None,
                 target_lid_temperature=lid_temperature,
             )
         elif isinstance(command.result, thermocycler.SetTargetLidTemperatureResult):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
+                is_lid_open=is_lid_open,
                 target_block_temperature=block_temperature,
                 target_lid_temperature=command.result.targetLidTemperature,
             )
         elif isinstance(command.result, thermocycler.DeactivateLidResult):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
+                is_lid_open=is_lid_open,
                 target_block_temperature=block_temperature,
                 target_lid_temperature=None,
+            )
+        elif isinstance(command.result, thermocycler.OpenLidResult):
+            self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId(module_id),
+                is_lid_open=True,
+                target_block_temperature=block_temperature,
+                target_lid_temperature=lid_temperature,
+            )
+        elif isinstance(command.result, thermocycler.CloseLidResult):
+            self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId(module_id),
+                is_lid_open=False,
+                target_block_temperature=block_temperature,
+                target_lid_temperature=lid_temperature,
             )
 
 
