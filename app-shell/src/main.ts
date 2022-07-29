@@ -67,10 +67,23 @@ function startUp(): void {
 
   // TODO kj: remove {} once https://github.com/sindresorhus/electron-context-menu/issues/153 is solved
   // After upgrading electron-context-menu to after 0.16.0 remove lookUpSelection() and add searchWithGoogle()
+  // const contextMenuOptions = {
+  //   // searchWithGoogle: true,
+  //   lookUpSelection: true,
+  //   showInspectElement: config.devtools,
+  // }
   contextMenu({
-    menu: actions => [actions.copy({}), actions.lookUpSelection({})],
     showInspectElement: config.devtools,
-  })
+  }
+    // menu: actions => [
+    //   actions.copy({}),
+    //   actions.lookUpSelection({}),
+    //   // actions.inspect({}),
+    //   // actions.inspect({
+    //   //   visible: config.devtools,
+    //   // })
+    // ],
+  )
 
   initializeMenu()
   initializePython()
