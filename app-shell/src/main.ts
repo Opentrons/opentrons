@@ -71,8 +71,8 @@ function startUp(): void {
     menu: actions => [
       actions.copy({}),
       actions.lookUpSelection({}),
-      actions.inspect(),
     ],
+    showInspectElement: config.devtools
   })
 
   initializeMenu()
