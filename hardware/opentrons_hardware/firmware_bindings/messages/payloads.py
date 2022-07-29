@@ -17,6 +17,7 @@ from .fields import (
     SensorOutputBindingField,
     EepromDataField,
     SerialField,
+    SerialDataCodeField,
     SensorThresholdModeField,
     PipetteTipActionTypeField,
 )
@@ -384,7 +385,7 @@ class PipetteInfoResponsePayload(utils.BinarySerializable):
 
     name: PipetteNameField
     model: utils.UInt16Field
-    serial: SerialDataCode
+    serial: SerialDataCodeField
 
 
 @dataclass
@@ -406,7 +407,7 @@ class GripperInfoResponsePayload(utils.BinarySerializable):
     """A response carrying data about an attached gripper."""
 
     model: utils.UInt16Field
-    serial: SerialDataCode
+    serial: SerialDataCodeField
 
 
 @dataclass

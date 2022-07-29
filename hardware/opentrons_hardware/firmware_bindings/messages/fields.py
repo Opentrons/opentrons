@@ -125,8 +125,7 @@ class PipetteNameField(utils.UInt16Field):
 
 
 class SerialField(utils.BinaryFieldBase[bytes]):
-    """The full serial number of a pipette or gripper.
-    """
+    """The full serial number of a pipette or gripper."""
 
     NUM_BYTES = 20
     FORMAT = f"{NUM_BYTES}s"
@@ -149,7 +148,7 @@ class SerialDataCodeField(utils.BinaryFieldBase[bytes]):
     FORMAT = f"{NUM_BYTES}s"
 
     @classmethod
-    def from_string(cls, t: str) -> SerialField:
+    def from_string(cls, t: str) -> SerialDataCodeField:
         """Create from a string."""
         return cls(binascii.unhexlify(t)[: cls.NUM_BYTES])
 
