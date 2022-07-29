@@ -47,6 +47,7 @@ class ThermocyclerMovementFlagger:
         If the given labware is in a Thermocycler, and that Thermocycler's lid isn't
         currently open according the engine's thermocycler state as well as
         the hardware API (for non-virtual modules), raises ThermocyclerNotOpenError.
+        If it is a virtual module, checks only for thermocycler lid state in engine.
 
         Otherwise, no-ops.
 
@@ -84,8 +85,8 @@ class ThermocyclerMovementFlagger:
                 "Thermocycler must be open when moving to labware inside it."
             )
 
-        # There is a chance that the engine might not have the most latest lid status.
-        # Do a hardware state check just to be sure that the lid is truly open.
+        # There is a chance that the engine might not have the latest lid status;
+        # do a hardware state check just to be sure that the lid is truly open.
         if not self._state_store.config.use_virtual_modules:
             try:
                 hw_tc_lid_status = await self._get_hardware_thermocycler_lid_status(
@@ -107,11 +108,10 @@ class ThermocyclerMovementFlagger:
         self,
         module_id: str,
     ) -> ThermocyclerLidStatus:
-        """Find the hardware Thermocycler corresponding with the module ID.
+        """Get lid status of the hardware Thermocycler corresponding with the module ID.
 
         Returns:
-            The interface to control that Thermocycler's hardware.
-            Otherwise, None.
+            Lid status of the requested attached thermocycler.
 
         Raises:
             _HardwareThermocyclerMissingError: If we can't find that Thermocycler in
@@ -133,8 +133,11 @@ class ThermocyclerMovementFlagger:
 
         lid_status = thermocycler.lid_status
         # An attached thermocycler should always have lid status unless it's in error
-        assert lid_status is not None, "Error retrieving lid status from thermocycler."
-
+        # or it was just connected and hasn't been polled for status yet.
+        assert lid_status is not None, (
+            "Did not receive a valid lid status from thermocycler. "
+            "Cannot verify safe pipette movement"
+        )
         return lid_status
 
     def _get_parent_module_id(self, labware_id: str) -> Optional[str]:
