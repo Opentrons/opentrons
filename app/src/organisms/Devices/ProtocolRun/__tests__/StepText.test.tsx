@@ -63,36 +63,6 @@ const MOCK_COMMAND_SUMMARY: RunCommandSummary = {
   completedAt: 'end timestamp',
 } as any
 
-const MOCK_PAUSE_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'pause',
-  params: { message: 'THIS IS THE PAUSE MESSAGE' },
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_WAIT_FOR_RESUME_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'waitForResume',
-  params: { message: 'THIS IS THE PAUSE MESSAGE' },
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_WAIT_FOR_RESUME_NO_MESSAGE_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'waitForResume',
-  params: {},
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
 const MOCK_LOAD_COMMAND = {
   id: '1234',
   commandType: 'loadModule',
@@ -102,251 +72,6 @@ const MOCK_LOAD_COMMAND = {
   startedAt: 'start timestamp',
   completedAt: 'end timestamp',
 }
-
-const MOCK_ENGAGE_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'magneticModule/engage',
-  params: {},
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_DISENGAGE_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'magneticModule/disengage',
-  params: {},
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_SET_TARGET_TEMP_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'temperatureModule/setTargetTemperature',
-  params: { celsius: 50 },
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_DEACTIVATE_TEMP_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'temperatureModule/deactivate',
-  params: { celsius: 50 },
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_AWAIT_TEMP_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'temperatureModule/waitForTemperature',
-  params: { celsius: 50 },
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_SET_TC_BLOCK_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'thermocycler/setTargetBlockTemperature',
-  params: { celsius: 50 },
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_SET_TC_LID_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'thermocycler/setTargetLidTemperature',
-  params: { celsius: 50 },
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_AWAIT_TC_BLOCK_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'thermocycler/waitForBlockTemperature',
-  params: { celsius: 50 },
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_AWAIT_TC_LID_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'thermocycler/waitForLidTemperature',
-  params: { celsius: 50 },
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_OPEN_TC_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'thermocycler/openLid',
-  params: {},
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_CLOSE_TC_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'thermocycler/closeLid',
-  params: {},
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_DEACTIVATE_TC_BLOCK_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'thermocycler/deactivateBlock',
-  params: {},
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_DEACTIVATE_TC_LID_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'thermocycler/deactivateLid',
-  params: {},
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_TC_PROFILE_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'thermocycler/runProfile',
-  params: {
-    profile: [
-      {
-        holdSeconds: 60,
-        celsius: 50,
-      },
-      {
-        holdSeconds: 30,
-        celsius: 20,
-      },
-      {
-        holdSeconds: 10,
-        celsius: 10,
-      },
-    ],
-  },
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_TC_WAIT_FOR_PROFILE_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'thermocycler/awaitProfileComplete',
-  params: {},
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_HS_SET_TEMP: RunTimeCommand = {
-  id: '1234',
-  commandType: 'heaterShaker/setTargetTemperature',
-  params: { celsius: 50 },
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_HS_AWAIT_TEMP: RunTimeCommand = {
-  id: '1234',
-  commandType: 'heaterShaker/waitForTemperature',
-  params: { celsius: 50 },
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_HS_SET_SHAKE: RunTimeCommand = {
-  id: '1234',
-  commandType: 'heaterShaker/setAndWaitForShakeSpeed',
-  params: { rpm: 500 },
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_HS_DEACTIVATE_TEMP: RunTimeCommand = {
-  id: '1234',
-  commandType: 'heaterShaker/deactivateHeater',
-  params: {},
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_HS_OPEN_LATCH: RunTimeCommand = {
-  id: '1234',
-  commandType: 'heaterShaker/openLabwareLatch',
-  params: {},
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_HS_CLOSE_LATCH: RunTimeCommand = {
-  id: '1234',
-  commandType: 'heaterShaker/closeLabwareLatch',
-  params: {},
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_HS_DEACTIVATE_SHAKE: RunTimeCommand = {
-  id: '1234',
-  commandType: 'heaterShaker/deactivateShaker',
-  params: {},
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
-
-const MOCK_WAIT_FOR_DURATION_COMMAND: RunTimeCommand = {
-  id: '1234',
-  commandType: 'waitForDuration',
-  params: { seconds: 60 },
-  status: 'running',
-  result: {},
-  startedAt: 'start timestamp',
-  completedAt: 'end timestamp',
-} as any
 
 describe('StepText', () => {
   beforeEach(() => {
@@ -381,7 +106,13 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_PAUSE_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'pause',
+        params: {
+          message: 'THIS IS THE PAUSE MESSAGE',
+        },
+      },
     })
     getByText('THIS IS THE PAUSE MESSAGE')
   })
@@ -391,7 +122,13 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_WAIT_FOR_RESUME_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'waitForResume',
+        params: {
+          message: 'THIS IS THE PAUSE MESSAGE',
+        },
+      },
     })
     getByText('THIS IS THE PAUSE MESSAGE')
   })
@@ -401,7 +138,11 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_WAIT_FOR_RESUME_NO_MESSAGE_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'waitForResume',
+        params: {},
+      },
     })
     getByText('Pausing protocol')
   })
@@ -470,7 +211,14 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_ENGAGE_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'magneticModule/engage',
+        params: {
+          moduleId: 'moduleId',
+          height: 10,
+        },
+      },
     })
     getByText('Engaging Magnetic Module')
   })
@@ -480,7 +228,13 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_DISENGAGE_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'magneticModule/disengage',
+        params: {
+          moduleId: 'moduleId',
+        },
+      },
     })
     getByText('Disengaging Magnetic Module')
   })
@@ -490,7 +244,14 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_SET_TARGET_TEMP_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'temperatureModule/setTargetTemperature',
+        params: {
+          moduleId: 'moduleId',
+          celsius: 50,
+        },
+      },
     })
     getByText('Setting Temperature Module to 50°C (rounded to nearest integer)')
   })
@@ -500,7 +261,13 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_DEACTIVATE_TEMP_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'temperatureModule/deactivate',
+        params: {
+          moduleId: 'moduleId',
+        },
+      },
     })
     getByText('Deactivating Temperature Module')
   })
@@ -510,7 +277,14 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_AWAIT_TEMP_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'temperatureModule/waitForTemperature',
+        params: {
+          moduleId: 'moduleId',
+          celsius: 50,
+        },
+      },
     })
     getByText(
       'Waiting for Temperature Module to reach 50°C (rounded to nearest integer)'
@@ -522,7 +296,15 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_SET_TC_BLOCK_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'thermocycler/setTargetBlockTemperature',
+        params: {
+          moduleId: 'moduleId',
+          celsius: 50,
+          volume: 10,
+        },
+      },
     })
     getByText('Setting Thermocycler block temperature to 50°C')
   })
@@ -532,7 +314,14 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_SET_TC_LID_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'thermocycler/setTargetLidTemperature',
+        params: {
+          moduleId: 'moduleId',
+          celsius: 50,
+        },
+      },
     })
     getByText('Setting Thermocycler lid temperature to 50°C')
   })
@@ -542,7 +331,13 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_AWAIT_TC_BLOCK_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'thermocycler/waitForBlockTemperature',
+        params: {
+          moduleId: 'moduleId',
+        },
+      },
     })
     getByText('Waiting for Thermocycler block to reach target temperature')
   })
@@ -552,7 +347,13 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_AWAIT_TC_LID_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'thermocycler/waitForLidTemperature',
+        params: {
+          moduleId: 'moduleId',
+        },
+      },
     })
     getByText('Waiting for Thermocycler lid to reach target temperature')
   })
@@ -562,7 +363,13 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_OPEN_TC_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'thermocycler/openLid',
+        params: {
+          moduleId: 'moduleId',
+        },
+      },
     })
     getByText('Opening Thermocycler lid')
   })
@@ -572,7 +379,13 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_CLOSE_TC_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'thermocycler/closeLid',
+        params: {
+          moduleId: 'moduleId',
+        },
+      },
     })
     getByText('Closing Thermocycler lid')
   })
@@ -582,7 +395,13 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_DEACTIVATE_TC_BLOCK_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'thermocycler/deactivateBlock',
+        params: {
+          moduleId: 'moduleId',
+        },
+      },
     })
     getByText('Deactivating Thermocycler block')
   })
@@ -592,7 +411,13 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_DEACTIVATE_TC_LID_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'thermocycler/deactivateLid',
+        params: {
+          moduleId: 'moduleId',
+        },
+      },
     })
     getByText('Deactivating Thermocycler lid')
   })
@@ -601,13 +426,25 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_TC_PROFILE_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'thermocycler/runProfile',
+        params: {
+          moduleId: 'moduleId',
+          profile: [
+            { holdSeconds: 60, celsius: 50 },
+            { holdSeconds: 20, celsius: 30 },
+            { holdSeconds: 10, celsius: 10 },
+          ],
+          blockMaxVolumeUl: 40,
+        },
+      },
     })
     getByText(
       'Thermocycler starting 3 repetitions of cycle composed of the following steps:'
     )
     getByText('temperature: 50°C, seconds: 60')
-    getByText('temperature: 20°C, seconds: 30')
+    getByText('temperature: 30°C, seconds: 20')
     getByText('temperature: 10°C, seconds: 10')
   })
 
@@ -616,7 +453,13 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_TC_WAIT_FOR_PROFILE_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'thermocycler/awaitProfileComplete',
+        params: {
+          moduleId: 'moduleId',
+        },
+      },
     })
     getByText('Waiting for Thermocycler profile to complete')
   })
@@ -626,7 +469,14 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_HS_SET_TEMP as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'heaterShaker/setTargetTemperature',
+        params: {
+          moduleId: 'moduleId',
+          celsius: 50,
+        },
+      },
     })
     getByText('Setting Target Temperature of Heater-Shaker to 50°C')
   })
@@ -636,7 +486,14 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_HS_SET_SHAKE as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
+        params: {
+          moduleId: 'moduleId',
+          rpm: 500,
+        },
+      },
     })
     getByText(
       'Setting Heater-Shaker to shake at 500 rpm and waiting until reached'
@@ -648,7 +505,13 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_HS_AWAIT_TEMP as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'heaterShaker/waitForTemperature',
+        params: {
+          moduleId: 'moduleId',
+        },
+      },
     })
     getByText('Waiting for Heater-Shaker to reach target temperature')
   })
@@ -658,7 +521,13 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_HS_DEACTIVATE_TEMP as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'heaterShaker/deactivateHeater',
+        params: {
+          moduleId: 'moduleId',
+        },
+      },
     })
     getByText('Deactivating heater')
   })
@@ -668,7 +537,13 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_HS_DEACTIVATE_SHAKE as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'heaterShaker/deactivateShaker',
+        params: {
+          moduleId: 'moduleId',
+        },
+      },
     })
     getByText('Deactivating shaker')
   })
@@ -678,7 +553,13 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_HS_CLOSE_LATCH as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'heaterShaker/closeLabwareLatch',
+        params: {
+          moduleId: 'moduleId',
+        },
+      },
     })
     getByText('Latching labware on Heater-Shaker')
   })
@@ -688,20 +569,50 @@ describe('StepText', () => {
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_HS_OPEN_LATCH as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'heaterShaker/openLabwareLatch',
+        params: {
+          moduleId: 'moduleId',
+        },
+      },
     })
     getByText('Unlatching labware on Heater-Shaker')
   })
 
-  it('renders correct command text for wait for duration with minutes', () => {
+  it('renders correct command text for wait for duration with message', () => {
     const { getByText } = render({
       robotName: ROBOT_NAME,
       runId: RUN_ID,
       analysisCommand: null,
-      runCommand: MOCK_WAIT_FOR_DURATION_COMMAND as RunCommandSummary,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'waitForDuration',
+        params: {
+          seconds: 60,
+          message: 'Wait to thaw reagent',
+        },
+      },
     })
-    getByText('Pause for 60 seconds')
+    getByText('Pausing for 60 seconds. Wait to thaw reagent')
   })
+
+  it('renders correct command text for wait for duration with no message', () => {
+    const { getByText } = render({
+      robotName: ROBOT_NAME,
+      runId: RUN_ID,
+      analysisCommand: null,
+      runCommand: {
+        ...MOCK_COMMAND_SUMMARY,
+        commandType: 'waitForDuration',
+        params: {
+          seconds: 60,
+        },
+      },
+    })
+    getByText('Pausing for 60 seconds.')
+  })
+
   it('renders correct command text for aspirate', () => {
     const labwareId = 'labwareId'
     when(mockGetLabwareDisplayName)

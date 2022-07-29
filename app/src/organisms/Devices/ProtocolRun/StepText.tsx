@@ -23,7 +23,7 @@ interface Props {
 }
 export function StepText(props: Props): JSX.Element | null {
   const { analysisCommand, robotName, runCommand, runId } = props
-  const { t } = useTranslation('run_details')
+  const { t } = useTranslation('commands_run_log')
   const { protocolData } = useProtocolDetailsForRun(runId)
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
 
@@ -234,8 +234,11 @@ export function StepText(props: Props): JSX.Element | null {
       break
     }
     case 'waitForDuration': {
-      const { seconds } = displayCommand.params
-      messageNode = t('wait_for_duration', { seconds: seconds })
+      const { seconds, message } = displayCommand.params
+      messageNode = t('wait_for_duration', {
+        seconds: seconds,
+        message: message,
+      })
       break
     }
     case 'aspirate': {
