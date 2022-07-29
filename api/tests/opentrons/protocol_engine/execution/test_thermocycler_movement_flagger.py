@@ -111,7 +111,7 @@ class LidStatusAndRaiseSpec(NamedTuple):
         ),
         LidStatusAndRaiseSpec(
             lid_status=None,
-            expected_raise_cm=pytest.raises(ThermocyclerNotOpenError),
+            expected_raise_cm=pytest.raises(AssertionError),
         ),
         LidStatusAndRaiseSpec(
             lid_status=ThermocyclerLidStatus.OPEN,

@@ -69,6 +69,7 @@ class ThermocyclerMovementFlagger:
                even though it's in transit.
         """
         module_id = self._get_parent_module_id(labware_id=labware_id)
+
         if module_id is None:
             return  # Labware not on a module.
         try:
@@ -87,7 +88,7 @@ class ThermocyclerMovementFlagger:
         # Do a hardware state check just to be sure that the lid is truly open.
         if not self._state_store.config.use_virtual_modules:
             try:
-                thermocycler = await self._find_hardware_thermocycler(
+                hw_tc_lid_status = await self._get_hardware_thermocycler_lid_status(
                     module_id=module_id
                 )
             except self._HardwareThermocyclerMissingError as e:
@@ -96,18 +97,16 @@ class ThermocyclerMovementFlagger:
                     " but can't confirm Thermocycler's current status."
                 ) from e
 
-            if thermocycler is not None:
-                lid_status = thermocycler.lid_status
-                if lid_status != ThermocyclerLidStatus.OPEN:
-                    raise ThermocyclerNotOpenError(
-                        f"Thermocycler must be open when moving to labware inside it,"
-                        f' but Thermocycler is currently "{lid_status}".'
-                    )
+            if hw_tc_lid_status != ThermocyclerLidStatus.OPEN:
+                raise ThermocyclerNotOpenError(
+                    f"Thermocycler must be open when moving to labware inside it,"
+                    f' but Thermocycler is currently "{hw_tc_lid_status}".'
+                )
 
-    async def _find_hardware_thermocycler(
+    async def _get_hardware_thermocycler_lid_status(
         self,
         module_id: str,
-    ) -> Optional[HardwareThermocycler]:
+    ) -> ThermocyclerLidStatus:
         """Find the hardware Thermocycler corresponding with the module ID.
 
         Returns:
@@ -132,7 +131,11 @@ class ThermocyclerMovementFlagger:
                 f"No Thermocycler found" f' with serial number "{thermocycler_serial}".'
             )
 
-        return thermocycler
+        lid_status = thermocycler.lid_status
+        # An attached thermocycler should always have lid status unless it's in error
+        assert lid_status is not None, "Error retrieving lid status from thermocycler."
+
+        return lid_status
 
     def _get_parent_module_id(self, labware_id: str) -> Optional[str]:
         labware_location = self._state_store.labware.get_location(labware_id=labware_id)
