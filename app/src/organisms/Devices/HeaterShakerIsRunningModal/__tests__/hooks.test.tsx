@@ -2,8 +2,10 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
+import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 import { useProtocolDetailsForRun } from '../../hooks'
 import { useHeaterShakerModuleIdsFromRun } from '../hooks'
+import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 
 import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'
@@ -14,9 +16,7 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
   typeof useProtocolDetailsForRun
 >
 
-const RUN_ID = '1'
-
-describe('useProtocolDetailsForRun', () => {
+describe('useHeaterShakerModuleIdsFromRun', () => {
   const store: Store<State> = createStore(jest.fn(), {})
 
   beforeEach(() => {
@@ -34,7 +34,7 @@ describe('useProtocolDetailsForRun', () => {
         labware: {},
         modules: {
           heatershaker_id: {
-            model: 'heaterShakerModuleV1',
+            model: HEATERSHAKER_MODULE_V1,
           },
         },
         labwareDefinitions: {},
@@ -46,7 +46,7 @@ describe('useProtocolDetailsForRun', () => {
             key: '286d7201-bfdc-4c2c-ae67-544367dbbabe',
             status: 'succeeded',
             params: {
-              model: 'heaterShakerModuleV1',
+              model: HEATERSHAKER_MODULE_V1,
               location: {
                 slotName: '1',
               },
@@ -55,7 +55,7 @@ describe('useProtocolDetailsForRun', () => {
             result: {
               moduleId: 'heatershaker_id',
               definition: {},
-              model: 'heaterShakerModuleV1',
+              model: HEATERSHAKER_MODULE_V1,
               serialNumber: 'fake-serial-number-1',
             },
             startedAt: '2022-07-27T22:26:33.875106+00:00',
@@ -68,7 +68,7 @@ describe('useProtocolDetailsForRun', () => {
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(
-      () => useHeaterShakerModuleIdsFromRun(RUN_ID),
+      () => useHeaterShakerModuleIdsFromRun(RUN_ID_1),
       { wrapper }
     )
 
@@ -83,7 +83,7 @@ describe('useProtocolDetailsForRun', () => {
         labware: {},
         modules: {
           heatershaker_id: {
-            model: 'heaterShakerModuleV1',
+            model: HEATERSHAKER_MODULE_V1,
           },
         },
         labwareDefinitions: {},
@@ -95,7 +95,7 @@ describe('useProtocolDetailsForRun', () => {
             key: '286d7201-bfdc-4c2c-ae67-544367dbbabe',
             status: 'succeeded',
             params: {
-              model: 'heaterShakerModuleV1',
+              model: HEATERSHAKER_MODULE_V1,
               location: {
                 slotName: '1',
               },
@@ -104,7 +104,7 @@ describe('useProtocolDetailsForRun', () => {
             result: {
               moduleId: 'heatershaker_id_1',
               definition: {},
-              model: 'heaterShakerModuleV1',
+              model: HEATERSHAKER_MODULE_V1,
               serialNumber: 'fake-serial-number-1',
             },
             startedAt: '2022-07-27T22:26:33.875106+00:00',
@@ -117,7 +117,7 @@ describe('useProtocolDetailsForRun', () => {
             key: '286d7201-bfdc-4c2c-ae67-544367dbbabe',
             status: 'succeeded',
             params: {
-              model: 'heaterShakerModuleV1',
+              model: HEATERSHAKER_MODULE_V1,
               location: {
                 slotName: '1',
               },
@@ -140,7 +140,7 @@ describe('useProtocolDetailsForRun', () => {
       <Provider store={store}>{children}</Provider>
     )
     const { result } = renderHook(
-      () => useHeaterShakerModuleIdsFromRun(RUN_ID),
+      () => useHeaterShakerModuleIdsFromRun(RUN_ID_1),
       { wrapper }
     )
 

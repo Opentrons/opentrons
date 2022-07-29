@@ -1,14 +1,8 @@
 import * as React from 'react'
-import { when } from 'jest-when'
-import { UseQueryResult } from 'react-query'
 import { i18n } from '../../../i18n'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import {
-  useCreateCommandMutation,
-  useRunQuery,
-} from '@opentrons/react-api-client'
-import { Run } from '@opentrons/api-client'
+import { useCreateCommandMutation } from '@opentrons/react-api-client'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
@@ -23,7 +17,6 @@ jest.mock('../HeaterShakerWizard/HeaterShakerModuleCard')
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
 >
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 const mockUseHeaterShakerModuleIdsFromRun = useHeaterShakerModuleIdsFromRun as jest.MockedFunction<
   typeof useHeaterShakerModuleIdsFromRun
 >
@@ -35,32 +28,6 @@ const mockHeaterShakerModuleCard = HeaterShakerModuleCard as jest.MockedFunction
 >
 
 const RUN_ID = '1'
-const runRecord = {
-  data: {
-    id: 'c9e251ab-5fda-44c1-a1b2-adc6a5c7b99c',
-    createdAt: '2022-07-27T20:35:49.107194+00:00',
-    status: 'succeeded',
-    current: true,
-    actions: [],
-    errors: [],
-    pipettes: [],
-    modules: [
-      {
-        id: 'heatershaker_id',
-        model: 'heaterShakerModuleV1',
-        location: {
-          slotName: '1',
-        },
-        serialNumber: 'shakey-and-warm',
-      },
-    ],
-    labware: [],
-    labwareOffsets: [],
-    protocolId: '9754a61f-c479-4131-bd7f-4cb852850acb',
-    completedAt: '2022-07-27T20:35:56.926994+00:00',
-    startedAt: '2022-07-27T20:35:53.059176+00:00',
-  },
-}
 
 const render = (
   props: React.ComponentProps<typeof HeaterShakerIsRunningModal>
@@ -124,14 +91,13 @@ describe('HeaterShakerIsRunningModal', () => {
         ],
       },
     } as any)
-    when(mockUseRunQuery)
-      .calledWith(RUN_ID, { staleTime: Infinity })
-      .mockReturnValue(({
-        data: runRecord,
-      } as unknown) as UseQueryResult<Run>)
     mockUseHeaterShakerModuleIdsFromRun.mockReturnValue({
       moduleIdsFromRun: ['heatershaker_id'],
     })
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   it('renders the correct modal icon and title', () => {
@@ -165,6 +131,18 @@ describe('HeaterShakerIsRunningModal', () => {
     })
     expect(props.startRun).toHaveBeenCalled()
     expect(props.closeModal).toHaveBeenCalled()
+  })
+
+  it('should call the stop shaker command twice for two heater shakers', () => {
+    mockUseHeaterShakerModuleIdsFromRun.mockReturnValue({
+      moduleIdsFromRun: ['heatershaker_id_1', 'heatershaker_id_2'],
+    })
+    const { getByRole } = render(props)
+    const button = getByRole('button', {
+      name: /Stop shaking and start run/i,
+    })
+    fireEvent.click(button)
+    expect(mockCreateCommand).toHaveBeenCalledTimes(2)
   })
 
   it('renders the keep shaking and start run button and calls startRun and closeModal', () => {
