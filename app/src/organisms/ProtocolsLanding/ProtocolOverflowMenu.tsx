@@ -9,7 +9,6 @@ import {
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
-  SIZE_4,
   useConditionalConfirm,
 } from '@opentrons/components'
 
