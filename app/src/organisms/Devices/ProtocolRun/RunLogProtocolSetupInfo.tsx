@@ -2,10 +2,18 @@ import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import { SPACING } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  getModuleDisplayName,
+  getLabwareDisplayName,
+} from '@opentrons/shared-data'
+import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
 
 import { StyledText } from '../../../atoms/text'
-import { useProtocolDetailsForRun, useRunPipetteInfoByMount } from '../hooks'
+import {
+  useProtocolDetailsForRun,
+  useRunPipetteInfoByMount,
+  useLabwareRenderInfoForRunById,
+} from '../hooks'
 
 import type { RunCommandSummary } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
@@ -26,6 +34,7 @@ export const RunLogProtocolSetupInfo = ({
   const { t } = useTranslation('run_details')
   const { protocolData } = useProtocolDetailsForRun(runId)
   const protocolPipetteData = useRunPipetteInfoByMount(robotName, runId)
+  const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
 
   if (protocolData == null) return null
   if (setupCommand === undefined) return null
@@ -47,7 +56,7 @@ export const RunLogProtocolSetupInfo = ({
       <Trans
         t={t}
         id={`RunDetails_PipetteSetup`}
-        i18nKey={'load_pipette_protocol_setup'}
+        i18nKey="load_pipette_protocol_setup"
         values={{
           pipette_name: pipetteData.pipetteSpecs.displayName,
           mount_name: setupCommand.params.mount === 'left' ? 'Left' : 'Right',
@@ -63,7 +72,7 @@ export const RunLogProtocolSetupInfo = ({
       <Trans
         t={t}
         id={`RunDetails_ModuleSetup`}
-        i18nKey={'load_modules_protocol_setup'}
+        i18nKey="load_modules_protocol_setup"
         count={moduleSlotNumber}
         values={{
           module: getModuleDisplayName(moduleModel.model),
@@ -100,7 +109,7 @@ export const RunLogProtocolSetupInfo = ({
         <Trans
           t={t}
           id={`RunDetails_LabwareSetup_NoModules`}
-          i18nKey={'load_labware_info_protocol_setup_no_module'}
+          i18nKey="load_labware_info_protocol_setup_no_module"
           values={{
             labware_loadname:
               setupCommand.result?.definition.metadata.displayName,
@@ -112,7 +121,7 @@ export const RunLogProtocolSetupInfo = ({
         <Trans
           t={t}
           id={`RunDetails_LabwareSetup_WithModules`}
-          i18nKey={'load_labware_info_protocol_setup'}
+          i18nKey="load_labware_info_protocol_setup"
           count={moduleSlots}
           values={{
             labware_loadname:
@@ -123,6 +132,25 @@ export const RunLogProtocolSetupInfo = ({
           }}
         />
       )
+  } else if (setupCommand.commandType === 'loadLiquid') {
+    const liquidInfo = parseLiquidsInLoadOrder()
+    const { liquidId, labwareId } = setupCommand.params
+    const liquidDisplayName = liquidInfo.find(
+      liquid => liquid.liquidId === liquidId
+    )?.displayName
+    setupCommandText = (
+      <Trans
+        t={t}
+        id={`RunDetails_LabwareSetup_WithLiquids`}
+        i18nKey={'load_liquids_info_protocol_setup'}
+        values={{
+          liquid: liquidDisplayName ?? 'liquid',
+          labware: getLabwareDisplayName(
+            labwareRenderInfoById[labwareId].labwareDef
+          ),
+        }}
+      />
+    )
   }
 
   return (

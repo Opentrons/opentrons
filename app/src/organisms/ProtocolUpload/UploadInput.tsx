@@ -112,7 +112,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       <NewPrimaryBtn
         onClick={handleClick}
         marginBottom={SPACING_4}
-        id={'UploadInput_protocolUploadButton'}
+        id="UploadInput_protocolUploadButton"
       >
         {t('choose_file')}
       </NewPrimaryBtn>
@@ -130,7 +130,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
         <span
           aria-controls="file_input"
           role="button"
-          id={'UploadInput_fileUploadLabel'}
+          id="UploadInput_fileUploadLabel"
         >
           {t('drag_file_here')}
         </span>
@@ -158,22 +158,22 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           fontSize={FONT_SIZE_BODY_2}
           color={C_BLUE}
           href={PROTOCOL_LIBRARY_URL}
-          id={'UploadInput_protocolLibraryButton'}
+          id="UploadInput_protocolLibraryButton"
           marginBottom={SPACING_1}
           external
         >
           {t('browse_protocol_library')}
-          <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
+          <Icon name="open-in-new" marginLeft={SPACING_1} size="10px" />
         </Link>
         <Link
           fontSize={FONT_SIZE_BODY_2}
           color={C_BLUE}
           href={PROTOCOL_DESIGNER_URL}
-          id={'UploadInput_protocolDesignerButton'}
+          id="UploadInput_protocolDesignerButton"
           external
         >
           {t('launch_protocol_designer')}
-          <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
+          <Icon name="open-in-new" marginLeft={SPACING_1} size="10px" />
         </Link>
       </Flex>
     </Flex>

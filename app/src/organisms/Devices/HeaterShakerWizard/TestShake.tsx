@@ -115,7 +115,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
         paddingTop={SPACING.spacing4}
         paddingLeft={SPACING.spacing4}
         flexDirection={DIRECTION_ROW}
-        data-testid={'test_shake_banner_info'}
+        data-testid="test_shake_banner_info"
       >
         <Flex
           size={SPACING.spacing6}
@@ -199,7 +199,11 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             marginLeft={SIZE_AUTO}
             marginTop={SPACING.spacing4}
             onClick={handleShakeCommand}
-            disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
+            disabled={
+              !isLatchClosed ||
+              (shakeValue === null && !isShaking) ||
+              errorMessage != null
+            }
             {...targetProps}
           >
             {isShaking ? t('stop_shaking') : t('start_shaking')}

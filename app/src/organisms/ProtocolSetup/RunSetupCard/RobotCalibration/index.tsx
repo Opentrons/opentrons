@@ -88,7 +88,7 @@ export function RobotCalibration(props: Props): JSX.Element {
       <Text
         as="h2"
         css={FONT_HEADER_THIN}
-        id={'TipRackCalibration_requiredTipLengthTitle'}
+        id="TipRackCalibration_requiredTipLengthTitle"
       >
         {t('required_tip_racks_title')}
       </Text>
@@ -151,7 +151,7 @@ export function RobotCalibration(props: Props): JSX.Element {
             })
           }}
           {...targetProps}
-          id={'RobotCalStep_proceedButton'}
+          id="RobotCalStep_proceedButton"
         >
           {t(nextStepButtonKey)}
         </NewPrimaryBtn>

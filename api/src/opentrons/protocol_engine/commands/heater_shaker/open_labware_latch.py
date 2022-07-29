@@ -5,11 +5,13 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
+from opentrons.protocol_engine.types import MotorAxis
+
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
-    from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
 OpenLabwareLatchCommandType = Literal["heaterShaker/openLabwareLatch"]
 
@@ -33,10 +35,12 @@ class OpenLabwareLatchImpl(
         self,
         state_view: StateView,
         equipment: EquipmentHandler,
+        movement: MovementHandler,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
+        self._movement = movement
 
     async def execute(self, params: OpenLabwareLatchParams) -> OpenLabwareLatchResult:
         """Open a Heater-Shaker's labware latch."""
@@ -46,6 +50,18 @@ class OpenLabwareLatchImpl(
         )
 
         hs_module_substate.raise_if_shaking()
+
+        # Move pipette away if it is close to the heater-shaker
+        if self._state_view.motion.check_pipette_blocking_hs_latch(
+            hs_module_substate.module_id
+        ):
+            # TODO(jbl 2022-07-28) replace home movement with a retract movement
+            await self._movement.home(
+                [
+                    MotorAxis.RIGHT_Z,
+                    MotorAxis.LEFT_Z,
+                ]
+            )
 
         # Allow propagation of ModuleNotAttachedError.
         hs_hardware_module = self._equipment.get_module_hardware_api(

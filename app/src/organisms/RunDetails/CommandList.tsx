@@ -475,7 +475,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
             backgroundColor={C_NEAR_WHITE}
           >
             <Text padding={SPACING_2}>{t('protocol_setup')}</Text>
-            <Icon name={'chevron-left'} width={SIZE_1} />
+            <Icon name="chevron-left" width={SIZE_1} />
           </Flex>
         </Btn>
       )}

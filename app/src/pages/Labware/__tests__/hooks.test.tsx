@@ -102,6 +102,22 @@ describe('useAllLabware hook', () => {
     expect(labware2.modified).toBe(mockValidLabware.modified)
     expect(labware2.definition).toBe(mockValidLabware.definition)
   })
+  it('should return custom labware with customLabware filter', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <Provider store={store}>{children}</Provider>
+    )
+    const { result } = renderHook(
+      () => useAllLabware('alphabetical', 'customLabware'),
+      {
+        wrapper,
+      }
+    )
+    const labware1 = result.current[0]
+    const labware2 = result.current[1]
+
+    expect(labware1).toBe(mockValidLabware)
+    expect(labware2).toBeUndefined()
+  })
 })
 
 describe('useLabwareFailure hook', () => {

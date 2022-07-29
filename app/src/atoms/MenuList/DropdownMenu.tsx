@@ -66,7 +66,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           ref={dropDownMenuWrapperRef}
           zIndex={2}
           borderRadius={BORDERS.radiusSoftCorners}
-          boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+          boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
           top="8.5rem"

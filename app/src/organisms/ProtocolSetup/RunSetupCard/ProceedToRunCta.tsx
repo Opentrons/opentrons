@@ -45,7 +45,7 @@ export const ProceedToRunCta = (): JSX.Element | null => {
         title={t('proceed_to_run')}
         disabled={proceedToRunDisabledReason != null}
         as={LinkComponent}
-        id={'LabwareSetup_proceedToRunButton'}
+        id="LabwareSetup_proceedToRunButton"
         onClick={() => trackEvent({ name: 'proceedToRun', properties: {} })}
         {...linkProps}
         {...targetProps}

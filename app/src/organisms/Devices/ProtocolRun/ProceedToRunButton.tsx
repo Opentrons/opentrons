@@ -66,7 +66,7 @@ export function ProceedToRunButton({
     >
       <PrimaryButton
         disabled={proceedToRunDisabledReason != null}
-        id={'LabwareSetup_proceedToRunButton'}
+        id="LabwareSetup_proceedToRunButton"
         {...targetProps}
       >
         {t('proceed_to_run')}

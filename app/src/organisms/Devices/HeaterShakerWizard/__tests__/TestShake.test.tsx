@@ -213,7 +213,7 @@ describe('TestShake', () => {
     expect(button).toBeEnabled()
   })
 
-  it('renders the start shaking button and is enabled', () => {
+  it('renders the start shaking button and is disabled', () => {
     props = {
       module: mockCloseLatchHeaterShaker,
       setCurrentPage: jest.fn(),
@@ -264,6 +264,25 @@ describe('TestShake', () => {
     })
 
     const { getByRole } = render(props)
+    const button = getByRole('button', { name: /Start/i })
+    expect(button).toBeDisabled()
+  })
+
+  it('start shake button should be disabled if the input is out of range', () => {
+    props = {
+      module: mockOpenLatchHeaterShaker,
+      setCurrentPage: jest.fn(),
+      moduleFromProtocol: undefined,
+    }
+
+    mockUseLatchControls.mockReturnValue({
+      toggleLatch: mockToggleLatch,
+      isLatchClosed: false,
+    })
+
+    const { getByRole } = render(props)
+    const input = getByRole('spinbutton')
+    fireEvent.change(input, { target: { value: '0' } })
     const button = getByRole('button', { name: /Start/i })
     expect(button).toBeDisabled()
   })
@@ -338,7 +357,7 @@ describe('TestShake', () => {
     const { getByRole } = render(props)
     const button = getByRole('button', { name: /Stop Shaking/i })
     const input = getByRole('spinbutton')
-    fireEvent.change(input, { target: { value: '0' } })
+    fireEvent.change(input, { target: { value: '200' } })
     fireEvent.click(button)
 
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
