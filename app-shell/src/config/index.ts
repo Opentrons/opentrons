@@ -8,10 +8,12 @@ import yargsParser from 'yargs-parser'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import * as Cfg from '@opentrons/app/src/redux/config'
+import { showOpenDirectoryDialog } from '../dialogs'
 import { createLogger } from '../log'
 import { DEFAULTS_V0, migrate } from './migrate'
 import { shouldUpdate, getNextValue } from './update'
 
+import type { BrowserWindow } from 'electron'
 import type {
   ConfigV0,
   ConfigValueChangeAction,
@@ -55,7 +57,10 @@ const overrides = (): Overrides => {
 const log = (): Logger => _log ?? (_log = createLogger('config'))
 
 // initialize and register the config module with dispatches from the UI
-export function registerConfig(dispatch: Dispatch): (action: Action) => void {
+export function registerConfig(
+  dispatch: Dispatch,
+  mainWindow: BrowserWindow
+): (action: Action) => void {
   return function handleIncomingAction(action: Action) {
     if (action.type === UI_INITIALIZED) {
       dispatch(Cfg.configInitialized(getFullConfig()))
@@ -69,14 +74,30 @@ export function registerConfig(dispatch: Dispatch): (action: Action) => void {
       const { path } = action.payload as { path: string }
 
       if (shouldUpdate(path, overrides())) {
-        const nextValue = getNextValue(
+        let nextValue = getNextValue(
           action as ConfigValueChangeAction,
           getFullConfig()
         )
 
-        log().debug('Updating config', { path, nextValue })
-        store().set(path, nextValue)
-        dispatch(Cfg.configValueUpdated(path, nextValue))
+        const update = (): void => {
+          log().debug('Updating config', { path, nextValue })
+          store().set(path, nextValue)
+          dispatch(Cfg.configValueUpdated(path, nextValue))
+        }
+        if (
+          action.type === Cfg.UPDATE_VALUE &&
+          path === 'python.pathToPythonOverride'
+        ) {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          showOpenDirectoryDialog(mainWindow).then(filePaths => {
+            if (filePaths.length > 0) {
+              nextValue = filePaths[0]
+              update()
+            }
+          })
+        } else {
+          update()
+        }
       } else {
         log().debug(`config path in overrides; not updating`, { path })
       }

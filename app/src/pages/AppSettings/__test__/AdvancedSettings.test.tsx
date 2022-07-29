@@ -277,7 +277,7 @@ describe('AdvancedSettings', () => {
 
   it('renders the path to python override text and button with no default path', () => {
     mockGetPathToPythonOverride.mockReturnValue(null)
-    const [{ getByText, getByRole, getByTestId }] = render()
+    const [{ getByText, getByRole }] = render()
     getByText('Override Path to Python')
     getByText(
       'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
@@ -285,10 +285,7 @@ describe('AdvancedSettings', () => {
     getByText('override path')
     getByText('No path specified')
     const button = getByRole('button', { name: 'Add override path' })
-    const input = getByTestId('AdvancedSetting_pythonPathDirectoryInput')
-    input.click = jest.fn()
     fireEvent.click(button)
-    expect(input.click).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'changePathToPythonDirectory',
       properties: {},

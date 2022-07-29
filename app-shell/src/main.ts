@@ -88,7 +88,7 @@ function startUp(): void {
   }
 
   const actionHandlers: Dispatch[] = [
-    registerConfig(dispatch),
+    registerConfig(dispatch, mainWindow),
     registerDiscovery(dispatch),
     registerRobotLogs(dispatch, mainWindow),
     registerUpdate(dispatch),
