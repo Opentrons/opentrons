@@ -1,0 +1,63 @@
+# https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms#top-level-syntax
+name: Bug Report
+description: File a bug
+title: 'bug: '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Thanks for taking the time to file a bug!
+
+        > Please make sure you've read the "Opening Issues" section of our [Contributing Guide.](https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#opening-issues)
+  - type: textarea
+    attributes:
+      label: Overview
+      description: |
+        Use this section to describe the bug at a high level.
+        Please include any issues you can find that may be related.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: |
+        List precise steps to reproduce the bug.
+        Please include screenshots, videos, and/or logs if possible.
+
+        Tip: You can attach files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Current behavior
+      description: Describe how the software currently behaves and how that differs from how you think the software should behave.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: |
+        Describe how you think the software should behave.
+    validations:
+      required: false
+  - type: dropdown
+    attributes:
+      label: Operating system
+      description: What operating system are you running the app on?
+      multiple: false
+      options:
+        - Mac
+        - Windows
+        - Linux
+  - type: textarea
+    attributes:
+      label: System and robot setup or anything else?
+      description: |
+        Please share
+
+        - App version
+        - How you are connecting to your robot (Wi-Fi or USB)
+        - Any other context that may help us understand the bug
+    validations:
+      required: false

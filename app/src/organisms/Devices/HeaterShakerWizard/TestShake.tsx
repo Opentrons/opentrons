@@ -14,7 +14,6 @@ import {
   Icon,
   SIZE_AUTO,
   SPACING,
-  Text,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
@@ -116,7 +115,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
         paddingTop={SPACING.spacing4}
         paddingLeft={SPACING.spacing4}
         flexDirection={DIRECTION_ROW}
-        data-testid={'test_shake_banner_info'}
+        data-testid="test_shake_banner_info"
       >
         <Flex
           size={SPACING.spacing6}
@@ -131,7 +130,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           fontSize={TYPOGRAPHY.fontSizeP}
           paddingBottom={SPACING.spacing4}
         >
-          <Text fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
             <Trans
               t={t}
               i18nKey={
@@ -145,14 +144,14 @@ export function TestShake(props: TestShakeProps): JSX.Element {
               components={{
                 bold: <strong />,
                 block: (
-                  <Text
+                  <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
                     marginBottom={SPACING.spacing5}
                   />
                 ),
               }}
             />
-          </Text>
+          </StyledText>
         </Flex>
       </Flex>
       <Flex
@@ -200,7 +199,11 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             marginLeft={SIZE_AUTO}
             marginTop={SPACING.spacing4}
             onClick={handleShakeCommand}
-            disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
+            disabled={
+              !isLatchClosed ||
+              (shakeValue === null && !isShaking) ||
+              errorMessage != null
+            }
             {...targetProps}
           >
             {isShaking ? t('stop_shaking') : t('start_shaking')}

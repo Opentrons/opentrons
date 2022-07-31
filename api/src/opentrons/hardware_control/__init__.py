@@ -52,4 +52,5 @@ __all__ = [
     "ThreadedAsyncLock",
     "ThreadedAsyncForbidden",
     "ThreadManagedHardware",
+    "SyncHardwareAPI",
 ]

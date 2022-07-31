@@ -20,6 +20,8 @@ from ..commands import (
     DropTipResult,
     HomeResult,
     BlowOutResult,
+    TouchTipResult,
+    thermocycler,
 )
 from ..actions import Action, UpdateCommandAction
 from .abstract_store import HasState, HandlesActions
@@ -81,6 +83,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 AspirateResult,
                 DispenseResult,
                 BlowOutResult,
+                TouchTipResult,
             ),
         ):
             self._state.current_well = CurrentWell(
@@ -90,7 +93,15 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             )
 
         # TODO(mc, 2021-11-12): wipe out current_well on movement failures, too
-        elif isinstance(command.result, (HomeResult, MoveToCoordinatesResult)):
+        elif isinstance(
+            command.result,
+            (
+                HomeResult,
+                MoveToCoordinatesResult,
+                thermocycler.OpenLidResult,
+                thermocycler.CloseLidResult,
+            ),
+        ):
             # A command left the pipette in a place that we can't associate
             # with a logical well location. Set the current well to None
             # to reflect the fact that it's now unknown.

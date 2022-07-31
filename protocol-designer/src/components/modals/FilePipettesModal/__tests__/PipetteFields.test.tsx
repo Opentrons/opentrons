@@ -15,6 +15,9 @@ import { PipetteDiagram } from '../PipetteDiagram'
 import { FormPipette } from '../../../../step-forms'
 import { LabwareDefinition2 } from '../../../../../../shared-data/lib/js/types.d'
 
+import type { ActionMeta } from 'react-select'
+import type { SelectOption } from '@opentrons/components'
+
 jest.mock('../../../../feature-flags/selectors')
 jest.mock('../../../../labware-defs/selectors')
 jest.mock('../../../../labware-defs/utils')
@@ -113,7 +116,10 @@ describe('PipetteFields', () => {
     const wrapper = render(props)
     const leftPipette = wrapper.find(PipetteSelect).at(0)
 
-    leftPipette.prop('onPipetteChange')('p50')
+    leftPipette.prop('onPipetteChange')(
+      'p50',
+      ('input-change' as unknown) as ActionMeta<SelectOption>
+    )
 
     expect(props.onSetFieldTouched).toHaveBeenCalledWith(leftTiprackKey, false)
     expect((props.onSetFieldValue as jest.Mock).mock.calls).toEqual([

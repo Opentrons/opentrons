@@ -49,14 +49,14 @@ export function CalibrationItem(props: Props): JSX.Element | null {
       >
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           <Icon
-            size={'1.5rem'}
+            size="1.5rem"
             color={calibratedDate != null ? COLOR_SUCCESS : COLOR_WARNING}
             marginRight={SPACING_2}
             name={calibratedDate != null ? 'check-circle' : 'alert-circle'}
           />
           <span>
             {title !== undefined && (
-              <Text role={'heading'} fontSize={FONT_SIZE_BODY_2} id={id}>
+              <Text role="heading" fontSize={FONT_SIZE_BODY_2} id={id}>
                 {title}
               </Text>
             )}

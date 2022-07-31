@@ -43,7 +43,7 @@ export function DeckCalibrationModal({
           </StyledText>
           <ExternalLink
             href={ROBOT_CAL_HELP_ARTICLE}
-            id={'RobotCalModal_helpArticleLink'}
+            id="RobotCalModal_helpArticleLink"
           >
             {t('learn_more_about_robot_cal_link')}
           </ExternalLink>

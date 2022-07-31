@@ -3,7 +3,9 @@ def get_values(*names):
     _all_values = json.loads("""{"right_pipette":"p1000_single_gen2","left_pipette":"p1000_single_gen2","master_mix_csv":"Reagent,Slot,Well,Volume\\nBuffer,1,A2,3\\nMgCl,1,A3,40\\ndNTPs,2,A2,90\\nWater,2,A3,248\\nprimer 1,1,A4,25\\nprimer 2,1,A5,25\\n"}""")
     return [_all_values[n] for n in names]
 
-
+# Note that any apiLevel value passed to metadata will be ignored.
+# Instead apiVersions from g-code-testing/g_code_test_data/protocol/protocol_configurations.py # noqa: E501
+# will be used instead
 metadata = {
     'protocolName': 'PCR Prep',
     'author': 'Opentrons <protocols@opentrons.com>',

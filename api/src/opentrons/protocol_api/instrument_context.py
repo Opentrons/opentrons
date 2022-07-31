@@ -10,22 +10,27 @@ from opentrons.commands import commands as cmds
 
 from opentrons.commands import publisher
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
+from opentrons.protocols.advanced_control import transfers
+
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support import instrument
 from opentrons.protocols.api_support.labware_like import LabwareLike
-from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocols.api_support.util import (
     FlowRates,
     PlungerSpeeds,
     Clearances,
     clamp_value,
     requires_version,
+    APIVersionError,
 )
+
 from opentrons.protocols.context.instrument import AbstractInstrument
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocol_api.module_contexts import (
+    ThermocyclerContext,
+    HeaterShakerContext,
+)
 
 from . import labware
-from opentrons.protocols.advanced_control import transfers
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import ProtocolContext
@@ -1250,6 +1255,8 @@ class InstrumentContext(publisher.CommandPublisher):
         for mod in self._ctx._modules:
             if isinstance(mod, ThermocyclerContext):
                 mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
+            if isinstance(mod, HeaterShakerContext):
+                mod.flag_unsafe_move(to_loc=location, is_multichannel=self.channels > 1)
 
         publish_ctx = nullcontext()
 

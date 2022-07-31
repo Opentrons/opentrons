@@ -3,22 +3,15 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   Card,
-  Text,
   Flex,
   Icon,
-  SPACING_2,
-  SPACING_3,
-  SPACING_4,
-  SPACING_5,
+  SPACING,
   SPACING_7,
   SIZE_1,
   DIRECTION_ROW,
   ALIGN_START,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  FONT_WEIGHT_REGULAR,
-  FONT_SIZE_BODY_2,
-  FONT_WEIGHT_SEMIBOLD,
   FONT_SIZE_BODY_1,
   C_WHITE,
   COLOR_SUCCESS,
@@ -27,9 +20,11 @@ import {
   C_DARK_GRAY,
   JUSTIFY_CENTER,
   DIRECTION_COLUMN,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { protocolHasModules } from '@opentrons/shared-data'
 import { Divider } from '../../../atoms/structure'
+import { StyledText } from '../../../atoms/text'
 import { getConnectedRobot } from '../../../redux/discovery/selectors'
 import { useProtocolCalibrationStatus } from '../RunSetupCard/hooks/useProtocolCalibrationStatus'
 import { useProtocolDetails } from '../../RunDetails/hooks'
@@ -135,25 +130,25 @@ export function RunSetupCard(): JSX.Element | null {
   return (
     <Card
       width="100%"
-      marginTop={SPACING_3}
-      paddingY={SPACING_3}
+      marginTop={SPACING.spacing4}
+      paddingY={SPACING.spacing4}
       backgroundColor={C_WHITE}
     >
-      <Text
+      <StyledText
         as="h2"
-        paddingX={SPACING_3}
-        fontWeight={FONT_WEIGHT_SEMIBOLD}
-        id={'RunSetupCard_setupForRun'}
+        paddingX={SPACING.spacing4}
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        id="RunSetupCard_setupForRun"
       >
         {t('setup_for_run')}
-      </Text>
+      </StyledText>
       {protocolData == null ? (
         <RunSetupLoader />
       ) : (
         <>
           {stepsKeysInOrder.map((stepKey, index) => (
             <React.Fragment key={stepKey}>
-              <Divider marginY={SPACING_3} />
+              <Divider marginY={SPACING.spacing4} />
               <CollapsibleStep
                 expanded={stepKey === expandedStepKey}
                 label={t('step', { index: index + 1 })}
@@ -178,22 +173,22 @@ export function RunSetupCard(): JSX.Element | null {
                             ? COLOR_SUCCESS
                             : COLOR_WARNING
                         }
-                        marginRight={SPACING_2}
+                        marginRight={SPACING.spacing3}
                         name={
                           calibrationStatus.complete
                             ? 'check-circle'
                             : 'alert-circle'
                         }
-                        id={'RunSetupCard_calibrationIcon'}
+                        id="RunSetupCard_calibrationIcon"
                       />
-                      <Text
+                      <StyledText
                         fontSize={FONT_SIZE_BODY_1}
-                        id={'RunSetupCard_calibrationText'}
+                        id="RunSetupCard_calibrationText"
                       >
                         {calibrationStatus.complete
                           ? t('calibration_ready')
                           : t('calibration_needed')}
-                      </Text>
+                      </StyledText>
                     </Flex>
                   ) : null
                 }
@@ -202,7 +197,7 @@ export function RunSetupCard(): JSX.Element | null {
               </CollapsibleStep>
             </React.Fragment>
           ))}
-          <Divider marginY={SPACING_3} />
+          <Divider marginY={SPACING.spacing4} />
           <ProceedToRunCta />
         </>
       )}
@@ -221,22 +216,21 @@ function RunSetupLoader(): JSX.Element | null {
       >
         <Icon
           name="ot-spinner"
-          width={SPACING_5}
-          marginTop={SPACING_4}
-          marginBottom={SPACING_4}
+          width="4rem"
+          marginTop={SPACING.spacing6}
+          marginBottom={SPACING.spacing6}
           color={C_LIGHT_GRAY}
           spin
         />
-        <Text
+        <StyledText
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          as={'h3'}
           color={C_DARK_GRAY}
-          marginBottom={SPACING_5}
-          fontWeight={FONT_WEIGHT_REGULAR}
-          fontSize={FONT_SIZE_BODY_2}
+          marginBottom="4rem"
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          fontSize={TYPOGRAPHY.fontSizeH3}
         >
           {t('loading_protocol_details')}
-        </Text>
+        </StyledText>
       </Flex>
     </>
   )

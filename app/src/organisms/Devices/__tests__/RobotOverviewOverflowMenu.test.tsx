@@ -11,6 +11,7 @@ import { restartRobot } from '../../../redux/robot-admin'
 import {
   mockConnectableRobot,
   mockReachableRobot,
+  mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
@@ -109,21 +110,14 @@ describe('RobotOverviewOverflowMenu', () => {
     getByRole('button', { name: 'Robot settings' })
   })
 
-  it('should not render menu items when the robot is not connectable', () => {
+  it('should not render menu items when the robot is reachable', () => {
     when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
     when(mockUseCurrentRunStatus)
       .calledWith()
       .mockReturnValue(RUN_STATUS_RUNNING)
-
     const { getByRole } = render({ robot: mockReachableRobot })
-
     const btn = getByRole('button')
-    fireEvent.click(btn)
-
-    expect(screen.queryByText('Update robot software')).toBeNull()
-    expect(screen.queryByText('Restart robot')).toBeNull()
-    expect(screen.queryByText('Home gantry')).toBeNull()
-    getByRole('button', { name: 'Robot settings' })
+    expect(btn).toBeDisabled()
   })
 
   it('clicking home gantry should home the gantry', () => {
@@ -161,5 +155,14 @@ describe('RobotOverviewOverflowMenu', () => {
     getByRole('button', { name: 'Restart robot' })
     getByRole('button', { name: 'Home gantry' })
     getByRole('button', { name: 'Robot settings' })
+  })
+  it('should not render menu items when the robot is unreachable', () => {
+    when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
+    when(mockUseCurrentRunStatus)
+      .calledWith()
+      .mockReturnValue(RUN_STATUS_RUNNING)
+    const { getByRole } = render({ robot: mockUnreachableRobot })
+    const btn = getByRole('button')
+    expect(btn).toBeDisabled()
   })
 })

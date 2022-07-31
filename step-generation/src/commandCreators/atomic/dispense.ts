@@ -6,6 +6,7 @@ import {
   pipetteIntoHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestWithLatchOpen,
   pipetteAdjacentHeaterShakerWhileShaking,
+  getLabwareSlot,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   uuid,
@@ -24,6 +25,11 @@ export const dispense: CommandCreator<DispenseParams> = (
   const actionName = 'dispense'
   const errors: CommandCreatorError[] = []
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
+  const slotName = getLabwareSlot(
+    labware,
+    prevRobotState.labware,
+    prevRobotState.modules
+  )
 
   if (!pipetteSpec) {
     errors.push(
@@ -96,19 +102,13 @@ export const dispense: CommandCreator<DispenseParams> = (
   }
 
   if (
-    pipetteAdjacentHeaterShakerWhileShaking(
-      prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot
-    )
+    pipetteAdjacentHeaterShakerWhileShaking(prevRobotState.modules, slotName)
   ) {
     errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
   }
 
   if (
-    getIsHeaterShakerEastWestWithLatchOpen(
-      prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot
-    )
+    getIsHeaterShakerEastWestWithLatchOpen(prevRobotState.modules, slotName)
   ) {
     errors.push(errorCreators.heaterShakerEastWestWithLatchOpen())
   }
@@ -116,7 +116,7 @@ export const dispense: CommandCreator<DispenseParams> = (
   if (
     getIsHeaterShakerEastWestMultiChannelPipette(
       prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot,
+      slotName,
       pipetteSpec
     )
   ) {
@@ -125,7 +125,7 @@ export const dispense: CommandCreator<DispenseParams> = (
   if (
     getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
       prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot,
+      slotName,
       pipetteSpec,
       invariantContext.labwareEntities[labware]
     )

@@ -7,7 +7,6 @@ import {
 } from '@opentrons/react-api-client'
 import {
   Flex,
-  Text,
   TYPOGRAPHY,
   SPACING,
   COLORS,
@@ -34,6 +33,7 @@ import { PrimaryButton, TertiaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
 import { InputField } from '../../atoms/InputField'
 import { Tooltip } from '../../atoms/Tooltip'
+import { StyledText } from '../../atoms/text'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
 import { useRunStatuses } from '../Devices/hooks'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
@@ -181,7 +181,7 @@ export const TestShakeSlideout = (
         paddingLeft={SPACING.spacing2}
         paddingRight={SPACING.spacing4}
         flexDirection={DIRECTION_ROW}
-        data-testid={'test_shake_slideout_banner_info'}
+        data-testid="test_shake_slideout_banner_info"
       >
         <Flex color={COLORS.darkGreyEnabled}>
           <Icon
@@ -192,9 +192,9 @@ export const TestShakeSlideout = (
           />
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} fontSize={TYPOGRAPHY.fontSizeP}>
-          <Text fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {t('heater_shaker:test_shake_slideout_banner_info')}
-          </Text>
+          </StyledText>
         </Flex>
       </Flex>
       <Flex
@@ -209,48 +209,34 @@ export const TestShakeSlideout = (
           alignItems={ALIGN_CENTER}
         >
           <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing3}>
-            <Text
+            <StyledText
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkBlack}
             >
               {t('labware_latch')}
-            </Text>
-            <Text
+            </StyledText>
+            <StyledText
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
-              color={COLORS.darkBlack}
               marginTop={SPACING.spacing3}
               data-testid={`TestShake_Slideout_latch_status`}
             >
               {getLatchStatus(module.data.labwareLatchStatus)}
-            </Text>
+            </StyledText>
           </Flex>
-          {isShaking ? (
-            <TertiaryButton
-              marginTop={SPACING.spacing2}
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              fontSize={TYPOGRAPHY.fontSizeCaption}
-              marginLeft={SIZE_AUTO}
-              onClick={toggleLatch}
-              disabled={isShaking}
-              {...targetProps}
-            >
-              {!isLatchClosed ? t('close_latch') : t('open_latch')}
-            </TertiaryButton>
-          ) : (
-            <TertiaryButton
-              marginTop={SPACING.spacing2}
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              fontSize={TYPOGRAPHY.fontSizeCaption}
-              marginLeft={SIZE_AUTO}
-              onClick={toggleLatch}
-              disabled={isShaking}
-            >
-              {!isLatchClosed ? t('close_latch') : t('open_latch')}
-            </TertiaryButton>
-          )}
+          <TertiaryButton
+            marginTop={SPACING.spacing2}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            fontSize={TYPOGRAPHY.fontSizeCaption}
+            marginLeft={SIZE_AUTO}
+            onClick={toggleLatch}
+            disabled={isShaking}
+            {...(isShaking && targetProps)}
+          >
+            {!isLatchClosed ? t('close_latch') : t('open_latch')}
+          </TertiaryButton>
+
           {isShaking ? (
             <Tooltip tooltipProps={tooltipProps}>
               {t('cannot_open_latch')}
@@ -258,14 +244,13 @@ export const TestShakeSlideout = (
           ) : null}
         </Flex>
         <Divider color={COLORS.medGrey} />
-        <Text
+        <StyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkBlack}
           marginTop={SPACING.spacing4}
         >
           {t('shake_speed')}
-        </Text>
+        </StyledText>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -284,33 +269,27 @@ export const TestShakeSlideout = (
               })}
               error={errorMessage}
             />
-            <Text
+            <StyledText
               color={COLORS.darkGreyEnabled}
               fontSize={TYPOGRAPHY.fontSizeCaption}
-            ></Text>
+            ></StyledText>
           </Flex>
-          {!isLatchClosed || (shakeValue === null && !isShaking) ? (
-            <TertiaryButton
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              marginLeft={SIZE_AUTO}
-              marginTop={SPACING.spacing3}
-              onClick={confirmAttachment}
-              disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
-              {...targetProps}
-            >
-              {isShaking ? t('shared:stop') : t('shared:start')}
-            </TertiaryButton>
-          ) : (
-            <TertiaryButton
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              marginLeft={SIZE_AUTO}
-              marginTop={SPACING.spacing3}
-              onClick={confirmAttachment}
-              disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
-            >
-              {isShaking ? t('shared:stop') : t('shared:start')}
-            </TertiaryButton>
-          )}
+          <TertiaryButton
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            marginLeft={SIZE_AUTO}
+            marginTop={SPACING.spacing3}
+            onClick={confirmAttachment}
+            disabled={
+              !isLatchClosed ||
+              (shakeValue === null && !isShaking) ||
+              errorMessage != null
+            }
+            {...((!isLatchClosed || (shakeValue === null && !isShaking)) &&
+              targetProps)}
+          >
+            {isShaking ? t('shared:stop') : t('shared:start')}
+          </TertiaryButton>
+
           {!isLatchClosed ? (
             <Tooltip tooltipProps={tooltipProps}>{t('cannot_shake')}</Tooltip>
           ) : null}
@@ -323,7 +302,7 @@ export const TestShakeSlideout = (
         role="button"
         marginTop={SPACING.spacing2}
         css={TYPOGRAPHY.linkPSemiBold}
-        id={'HeaterShaker_Attachment_Instructions'}
+        id="HeaterShaker_Attachment_Instructions"
         onClick={() => setShowWizard(true)}
       >
         {t('show_attachment_instructions')}
