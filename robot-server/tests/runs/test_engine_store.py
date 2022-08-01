@@ -161,7 +161,7 @@ async def test_get_default_engine_current_unstarted(subject: EngineStore) -> Non
 
 
 async def test_get_default_engine_conflict(subject: EngineStore) -> None:
-    """It should not allow a default engine if another engine is unstarted."""
+    """It should not allow a default engine if another engine is executing commands."""
     await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
     subject.engine.play()
 
