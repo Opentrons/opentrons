@@ -66,6 +66,7 @@ function startUp(): void {
   mainWindow.once('closed', () => (mainWindow = null))
 
   contextMenu({
+    showLookUpSelection: true,
     showInspectElement: config.devtools,
   })
 
