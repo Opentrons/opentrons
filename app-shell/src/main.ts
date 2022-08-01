@@ -67,15 +67,10 @@ function startUp(): void {
 
   contextMenu({
     menu: actions => {
-      return config.devtools ? [
-        actions.copy({}),
-        actions.searchWithGoogle({}),
-        actions.inspect(),
-      ] : [
-        actions.copy({}),
-        actions.searchWithGoogle({}),
-      ]
-    }
+      return config.devtools
+        ? [actions.copy({}), actions.searchWithGoogle({}), actions.inspect()]
+        : [actions.copy({}), actions.searchWithGoogle({})]
+    },
   })
 
   initializeMenu()
