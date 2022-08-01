@@ -28,7 +28,7 @@ export function registerProtocolAnalysis(
     selectPythonPath(newValue)
   })
 
-  return function handleIncomingAction(action: Action) {
+  return function handleIncomingAction(action: Action): void {
     switch (action.type) {
       case ProtocolAnalysis.OPEN_PYTHON_DIRECTORY: {
         const dir = getConfig().python.pathToPythonOverride
