@@ -77,6 +77,7 @@ class EngineStore:
         """
         if (
             self._runner_engine_pair is not None
+            and self.engine.state_view.commands.has_been_played()
             and not self.engine.state_view.commands.get_is_stopped()
         ):
             raise EngineConflictError("An engine for a run is currently active")
