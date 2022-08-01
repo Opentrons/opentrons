@@ -255,7 +255,7 @@ def test_hs_raises_when_moving_to_restricted_slots_while_shaking(
     """It should raise if restricted movement around a heater-shaker is attempted while module is shaking."""
 
     with expected_raise:
-        mock_heater_shaker_geometry.flag_unsafe_move(
+        heater_shaker_geometry.flag_unsafe_move(
             to_slot=destination_slot,
             is_tiprack=False,
             is_using_multichannel=False,
@@ -292,7 +292,7 @@ def test_raises_when_moving_to_restricted_slots_while_latch_open(
     """It should raise if restricted movement around a heater-shaker is attempted while latch is open."""
 
     with expected_raise:
-        mock_heater_shaker_geometry.flag_unsafe_move(
+        heater_shaker_geometry.flag_unsafe_move(
             to_slot=destination_slot,
             is_tiprack=False,
             is_using_multichannel=False,
@@ -347,7 +347,7 @@ def test_raises_on_restricted_movement_with_multi_channel(
     """It should raise if restricted movement around a heater-shaker is attempted with a multi-channel pipette."""
 
     with expected_raise:
-        mock_heater_shaker_geometry.flag_unsafe_move(
+        heater_shaker_geometry.flag_unsafe_move(
             to_slot=destination_slot,
             is_tiprack=is_tiprack,
             is_using_multichannel=True,
@@ -376,7 +376,7 @@ def test_does_not_raise_when_idle_and_latch_closed(
     when idle and latch closed.
     """
     with does_not_raise():
-        mock_heater_shaker_geometry.flag_unsafe_move(
+        heater_shaker_geometry.flag_unsafe_move(
             to_slot=destination_slot,
             is_tiprack=False,
             is_using_multichannel=False,
@@ -407,7 +407,7 @@ def test_pipette_is_blocking_shake_movement(
     mock_location.labware.first_parent = mock.MagicMock(return_value=pipette_slot)
 
     assert (
-        mock_heater_shaker_geometry.is_pipette_blocking_shake_movement(
+        heater_shaker_geometry.is_pipette_blocking_shake_movement(
             pipette_location=mock_location
         )
         == expected_is_blocking
@@ -428,7 +428,7 @@ def test_pipette_is_blocking_latch_movement(
     mock_location.labware.first_parent = mock.MagicMock(return_value=pipette_slot)
 
     assert (
-        mock_heater_shaker_geometry.is_pipette_blocking_latch_movement(
+        heater_shaker_geometry.is_pipette_blocking_latch_movement(
             pipette_location=mock_location
         )
         == expected_is_blocking
@@ -442,13 +442,13 @@ def test_pipette_is_blocking_shake_and_latch_movements_with_no_pipette_slot(
     """It should return True if pipette's last location slot is not known."""
 
     assert (
-        mock_heater_shaker_geometry.is_pipette_blocking_shake_movement(
+        heater_shaker_geometry.is_pipette_blocking_shake_movement(
             pipette_location=Location(point=Point(3, 2, 1), labware=None)
         )
         is True
     )
     assert (
-        mock_heater_shaker_geometry.is_pipette_blocking_latch_movement(
+        heater_shaker_geometry.is_pipette_blocking_latch_movement(
             pipette_location=Location(point=Point(3, 2, 1), labware=None)
         )
         is True
