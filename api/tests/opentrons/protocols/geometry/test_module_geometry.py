@@ -1,6 +1,7 @@
 import pytest
+import mock
 
-from typing import Union, ContextManager, Any
+from typing import Union, ContextManager, Any, Optional
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 from contextlib import nullcontext as does_not_raise
 from opentrons.types import Location, Point
@@ -101,6 +102,12 @@ def heater_shaker_geometry() -> HeaterShakerGeometry:
         parent=heater_shaker_slot_location,
         api_level=APIVersion.from_string("22.22"),
     )
+
+
+@pytest.fixture
+def mock_location() -> mock.MagicMock:
+    """Get a mocked out Location object."""
+    return mock.MagicMock(return_value=Location(point=Point(1, 2, 3), labware=None))
 
 
 @pytest.mark.parametrize(
@@ -248,7 +255,7 @@ def test_hs_raises_when_moving_to_restricted_slots_while_shaking(
     """It should raise if restricted movement around a heater-shaker is attempted while module is shaking."""
 
     with expected_raise:
-        heater_shaker_geometry.flag_unsafe_move(
+        mock_heater_shaker_geometry.flag_unsafe_move(
             to_slot=destination_slot,
             is_tiprack=False,
             is_using_multichannel=False,
@@ -277,7 +284,7 @@ def test_hs_raises_when_moving_to_restricted_slots_while_shaking(
         [3, does_not_raise()],  # non-adjacent
     ],
 )
-async def test_raises_when_moving_to_restricted_slots_while_latch_open(
+def test_raises_when_moving_to_restricted_slots_while_latch_open(
     heater_shaker_geometry: HeaterShakerGeometry,
     destination_slot: int,
     expected_raise: ContextManager[Any],
@@ -285,7 +292,7 @@ async def test_raises_when_moving_to_restricted_slots_while_latch_open(
     """It should raise if restricted movement around a heater-shaker is attempted while latch is open."""
 
     with expected_raise:
-        heater_shaker_geometry.flag_unsafe_move(
+        mock_heater_shaker_geometry.flag_unsafe_move(
             to_slot=destination_slot,
             is_tiprack=False,
             is_using_multichannel=False,
@@ -331,7 +338,7 @@ async def test_raises_when_moving_to_restricted_slots_while_latch_open(
         [7, False, does_not_raise()],  # non-adjacent
     ],
 )
-async def test_raises_on_restricted_movement_with_multi_channel(
+def test_raises_on_restricted_movement_with_multi_channel(
     heater_shaker_geometry: HeaterShakerGeometry,
     destination_slot: int,
     is_tiprack: bool,
@@ -340,7 +347,7 @@ async def test_raises_on_restricted_movement_with_multi_channel(
     """It should raise if restricted movement around a heater-shaker is attempted with a multi-channel pipette."""
 
     with expected_raise:
-        heater_shaker_geometry.flag_unsafe_move(
+        mock_heater_shaker_geometry.flag_unsafe_move(
             to_slot=destination_slot,
             is_tiprack=is_tiprack,
             is_using_multichannel=True,
@@ -360,16 +367,89 @@ async def test_raises_on_restricted_movement_with_multi_channel(
         [9],  # non-adjacent
     ],
 )
-async def test_does_not_raise_when_idle_and_latch_closed(
+def test_does_not_raise_when_idle_and_latch_closed(
     heater_shaker_geometry: HeaterShakerGeometry,
     destination_slot: int,
 ) -> None:
-    """It should not raise if single channel pipette moves anywhere near heater-shaker when idle and latch closed."""
+    """
+    It should not raise if single channel pipette moves anywhere near heater-shaker
+    when idle and latch closed.
+    """
     with does_not_raise():
-        heater_shaker_geometry.flag_unsafe_move(
+        mock_heater_shaker_geometry.flag_unsafe_move(
             to_slot=destination_slot,
             is_tiprack=False,
             is_using_multichannel=False,
             is_labware_latch_closed=True,
             is_plate_shaking=False,
         )
+
+
+@pytest.mark.parametrize(
+    argnames=["pipette_slot", "expected_is_blocking"],
+    argvalues=[
+        ("4", True),
+        ("6", True),
+        ("2", True),
+        ("5", True),
+        ("8", True),
+        (None, True),
+        ("1", False),
+    ],
+)
+def test_pipette_is_blocking_shake_movement(
+    heater_shaker_geometry: HeaterShakerGeometry,
+    mock_location: mock.MagicMock,
+    pipette_slot: Optional[str],
+    expected_is_blocking: bool,
+) -> None:
+    """It should return True if pipette is blocking shake movement."""
+    mock_location.labware.first_parent = mock.MagicMock(return_value=pipette_slot)
+
+    assert (
+        mock_heater_shaker_geometry.is_pipette_blocking_shake_movement(
+            pipette_location=mock_location
+        )
+        == expected_is_blocking
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["pipette_slot", "expected_is_blocking"],
+    argvalues=[("4", True), ("6", True), ("2", False), (None, True), ("1", False)],
+)
+def test_pipette_is_blocking_latch_movement(
+    heater_shaker_geometry: HeaterShakerGeometry,
+    mock_location: mock.MagicMock,
+    pipette_slot: Optional[str],
+    expected_is_blocking: bool,
+) -> None:
+    """It should return True if pipette is blocking latch movement."""
+    mock_location.labware.first_parent = mock.MagicMock(return_value=pipette_slot)
+
+    assert (
+        mock_heater_shaker_geometry.is_pipette_blocking_latch_movement(
+            pipette_location=mock_location
+        )
+        == expected_is_blocking
+    )
+
+
+def test_pipette_is_blocking_shake_and_latch_movements_with_no_pipette_slot(
+    heater_shaker_geometry: HeaterShakerGeometry,
+    mock_location: mock.MagicMock,
+) -> None:
+    """It should return True if pipette's last location slot is not known."""
+
+    assert (
+        mock_heater_shaker_geometry.is_pipette_blocking_shake_movement(
+            pipette_location=Location(point=Point(3, 2, 1), labware=None)
+        )
+        is True
+    )
+    assert (
+        mock_heater_shaker_geometry.is_pipette_blocking_latch_movement(
+            pipette_location=Location(point=Point(3, 2, 1), labware=None)
+        )
+        is True
+    )
