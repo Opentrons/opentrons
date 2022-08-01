@@ -16,9 +16,9 @@ In conjunction with [changes in the Opentrons App](https://github.com/Opentrons/
 
 The `6.0.1` hotfix release fixes one robot software bug present in the original `6.0.0` release:
 
-- Enabling the robot's "Use older protocol analysis method" advanced setting will no longer break protocol uploads to your OT-2
+- Fixed protocol uploads to the OT-2 when the robot's "Use older protocol analysis method" advanced setting is enabled
 
-As noted below, the `6.0.0` release fixed various protocol analysis bugs. **If you have been using the "Use older protocol analysis method" setting, we recommend you turn it off;** you might no longer need it, and your protocols will upload to your OT-2 faster with the setting disabled!
+As noted below, the `6.0.0` release fixed various protocol analysis bugs. **If you have been using the "Use older protocol analysis method" setting, we recommend you turn it off.** You might no longer need it, and your protocols will upload to your OT-2 faster with the setting disabled!
 
 ## New Features
 

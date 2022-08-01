@@ -16,7 +16,7 @@ This release also includes updates to the robot operating system, so be sure to 
 
 The `6.0.1` hotfix release fixes one Opentrons App bug present in the original `6.0.0` release:
 
-- The app's "Override Path to Python" setting is no longer broken on Windows
+- Fixed the app's "Override Path to Python" advanced setting on Windows
 
 ## New Features
 
