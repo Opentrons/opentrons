@@ -1,15 +1,11 @@
 import * as React from 'react'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { fireEvent, waitFor } from '@testing-library/react'
-import {
-  useCreateCommandMutation,
-  useCreateLiveCommandMutation,
-} from '@opentrons/react-api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
 import { useLatchControls } from '../../../ModuleCard/hooks'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
-import { useModuleIdFromRun } from '../../../ModuleCard/useModuleIdFromRun'
 import { useRunStatuses } from '../../hooks'
 import { TestShake } from '../TestShake'
 import { HeaterShakerModuleCard } from '../HeaterShakerModuleCard'
@@ -19,7 +15,6 @@ import type { ProtocolModuleInfo } from '../../../Devices/ProtocolRun/utils/getP
 jest.mock('@opentrons/react-api-client')
 jest.mock('../HeaterShakerModuleCard')
 jest.mock('../../../ModuleCard/hooks')
-jest.mock('../../../ModuleCard/useModuleIdFromRun')
 jest.mock('../../hooks')
 
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
@@ -30,9 +25,6 @@ const mockUseLatchControls = useLatchControls as jest.MockedFunction<
 >
 const mockHeaterShakerModuleCard = HeaterShakerModuleCard as jest.MockedFunction<
   typeof HeaterShakerModuleCard
->
-const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
-  typeof useModuleIdFromRun
 >
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
@@ -145,9 +137,6 @@ describe('TestShake', () => {
       toggleLatch: jest.fn(),
       isLatchClosed: true,
     } as any)
-    mockUseModuleIdFromRun.mockReturnValue({
-      moduleIdFromRun: 'heatershaker_id',
-    })
     mockUseRunStatuses.mockReturnValue({
       isRunStill: false,
       isRunTerminal: false,
@@ -266,7 +255,7 @@ describe('TestShake', () => {
       moduleFromProtocol: undefined,
     }
 
-    mockUseLatchControlsLiveEndpoint.mockReturnValue({
+    mockUseLatchControls.mockReturnValue({
       toggleLatch: mockToggleLatch,
       isLatchClosed: false,
     })
@@ -314,7 +303,7 @@ describe('TestShake', () => {
     expect(mockToggleLatch).toHaveBeenCalled()
   })
 
-  it('entering an input for shake speed and clicking start should begin shaking when there is no run id', async () => {
+  it('entering an input for shake speed and clicking start should begin shaking', async () => {
     props = {
       module: mockCloseLatchHeaterShaker,
       setCurrentPage: jest.fn(),
@@ -373,7 +362,7 @@ describe('TestShake', () => {
   })
 
   //  next test is sending module commands when run is terminal and through module controls
-  it('entering an input for shake speed and clicking start should close the latch and begin shaking when there is a run id and run is terminal', async () => {
+  it('entering an input for shake speed and clicking start should close the latch and begin shaking when run is terminal', async () => {
     mockUseRunStatuses.mockReturnValue({
       isRunStill: false,
       isRunTerminal: true,
