@@ -66,14 +66,16 @@ function startUp(): void {
   mainWindow.once('closed', () => (mainWindow = null))
 
   contextMenu({
-    // showLookUpSelection: false,
-    showSearchWithGoogle: true,
-    showInspectElement: config.devtools,
-    // menu: actions => [
-    //   actions.copy({}),
-    //   actions.searchWithGoogle({}),
-    //   actions.inspect(),
-    // ],
+    menu: actions => {
+      return config.devtools ? [
+        actions.copy({}),
+        actions.searchWithGoogle({}),
+        actions.inspect(),
+      ] : [
+        actions.copy({}),
+        actions.searchWithGoogle({}),
+      ]
+    }
   })
 
   initializeMenu()
