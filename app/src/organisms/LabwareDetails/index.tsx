@@ -17,9 +17,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   SIZE_1,
+  useHoverTooltip,
+  TOOLTIP_TOP_END,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
+import { Tooltip } from '../../atoms/Tooltip'
 import { getWellLabel } from './helpers/labels'
 import { getUniqueWellProperties } from './helpers/labwareInference'
 import { WellCount } from './WellCount'
@@ -62,6 +65,22 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const irregular = wellGroups.length > 1
   const isMultiRow = ordering.some(row => row.length > 1)
   const isCustomDefinition = definition.namespace !== 'opentrons'
+  const [showToolTip, setShowToolTip] = React.useState<boolean>(false)
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_TOP_END,
+  })
+
+  const handleCopy = async (): Promise<void> => {
+    await navigator.clipboard.writeText(apiName)
+    setShowToolTip(true)
+  }
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setShowToolTip(false), 2000)
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [showToolTip])
 
   const slideoutHeader = (
     <Flex
@@ -127,13 +146,19 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
         <Link
+          {...targetProps}
           css={TYPOGRAPHY.pRegular}
-          onClick={() => navigator.clipboard.writeText(apiName)}
+          onClick={async () => await handleCopy()}
           role="button"
         >
           <Flex alignItems={ALIGN_CENTER} overflowWrap="anywhere">
             {apiName} <Icon height={SIZE_1} name="copy-text" />
           </Flex>
+          {showToolTip && (
+            <Tooltip width="3.25rem" tooltipProps={tooltipProps}>
+              {t('copied')}
+            </Tooltip>
+          )}
         </Link>
       </Box>
       <Box border={BORDERS.lineBorder}>
