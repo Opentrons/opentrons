@@ -23,6 +23,7 @@ import type {
   ProtocolStorageState,
   ProtocolStorageAction,
 } from './protocol-storage/types'
+import { ProtocolAnalysisAction } from './protocol-analysis/types'
 import type {
   CustomLabwareState,
   CustomLabwareAction,
@@ -80,6 +81,7 @@ export type Action =
   | RouterAction
   | DiscoveryAction
   | ProtocolAction
+  | ProtocolAnalysisAction
   | ProtocolStorageAction
   | CustomLabwareAction
   | NetworkingAction

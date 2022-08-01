@@ -3,17 +3,14 @@
 import Store from 'electron-store'
 import get from 'lodash/get'
 import mergeOptions from 'merge-options'
-import { shell } from 'electron'
 import yargsParser from 'yargs-parser'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import * as Cfg from '@opentrons/app/src/redux/config'
-import { showOpenDirectoryDialog } from '../dialogs'
 import { createLogger } from '../log'
 import { DEFAULTS_V0, migrate } from './migrate'
 import { shouldUpdate, getNextValue } from './update'
 
-import type { BrowserWindow } from 'electron'
 import type {
   ConfigV0,
   ConfigValueChangeAction,
@@ -57,10 +54,7 @@ const overrides = (): Overrides => {
 const log = (): Logger => _log ?? (_log = createLogger('config'))
 
 // initialize and register the config module with dispatches from the UI
-export function registerConfig(
-  dispatch: Dispatch,
-  mainWindow: BrowserWindow
-): (action: Action) => void {
+export function registerConfig(dispatch: Dispatch): (action: Action) => void {
   return function handleIncomingAction(action: Action) {
     if (action.type === UI_INITIALIZED) {
       dispatch(Cfg.configInitialized(getFullConfig()))
@@ -74,31 +68,14 @@ export function registerConfig(
       const { path } = action.payload as { path: string }
 
       if (shouldUpdate(path, overrides())) {
-        let nextValue = getNextValue(
+        const nextValue = getNextValue(
           action as ConfigValueChangeAction,
           getFullConfig()
         )
 
-        const update = (): void => {
-          log().debug('Updating config', { path, nextValue })
-          store().set(path, nextValue)
-          dispatch(Cfg.configValueUpdated(path, nextValue))
-        }
-
-        if (
-          action.type === Cfg.UPDATE_VALUE &&
-          path === 'python.pathToPythonOverride'
-        ) {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          showOpenDirectoryDialog(mainWindow).then(filePaths => {
-            if (filePaths.length > 0) {
-              nextValue = filePaths[0]
-              update()
-            }
-          })
-        } else {
-          update()
-        }
+        log().debug('Updating config', { path, nextValue })
+        store().set(path, nextValue)
+        dispatch(Cfg.configValueUpdated(path, nextValue))
       } else {
         log().debug(`config path in overrides; not updating`, { path })
       }
@@ -140,20 +117,4 @@ export function handleConfigChange(
   changeHandler: (newValue: any, oldValue: any) => unknown
 ): void {
   store().onDidChange(path, changeHandler)
-}
-
-export function registerPythonPath(): Dispatch {
-  return function handleActionForPython(action: Action) {
-    switch (action.type) {
-      case Cfg.OPEN_PYTHON_DIRECTORY: {
-        const dir = getFullConfig().python.pathToPythonOverride
-        if (dir != null) {
-          shell.openPath(dir).catch(err => {
-            log().debug('Error opening python directory', err.message)
-          })
-        }
-        break
-      }
-    }
-  }
 }

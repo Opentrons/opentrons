@@ -1,14 +1,19 @@
 import { when, resetAllWhenMocks } from 'jest-when'
+import electron from 'electron'
+import * as ProtocolAnalysis from '@opentrons/app/src/redux/protocol-analysis'
 
+import * as Dialogs from '../../dialogs'
 import { Config, getConfig, handleConfigChange } from '../../config'
 import { getValidLabwareFilePaths } from '../../labware'
 import { selectPythonPath, getPythonPath } from '../getPythonPath'
 import { executeAnalyzeCli } from '../executeAnalyzeCli'
 import { writeFailedAnalysis } from '../writeFailedAnalysis'
 
-import { initializePython, analyzeProtocolSource } from '..'
+import { registerPython, analyzeProtocolSource } from '..'
+import { Dispatch } from '../../types'
 
 jest.mock('../../labware')
+jest.mock('../../dialogs')
 jest.mock('../getPythonPath')
 jest.mock('../executeAnalyzeCli')
 jest.mock('../writeFailedAnalysis')
@@ -33,19 +38,37 @@ const mockHandleConfigChange = handleConfigChange as jest.MockedFunction<
   typeof handleConfigChange
 >
 
+const showOpenDirectoryDialog = Dialogs.showOpenDirectoryDialog as jest.MockedFunction<
+  typeof Dialogs.showOpenDirectoryDialog
+>
+
+// wait a few ticks to let the mock Promises clear
+const flush = (): Promise<void> =>
+  new Promise(resolve => setTimeout(resolve, 0))
+
 describe('analyzeProtocolSource', () => {
+  const mockMainWindow = ({
+    browserWindow: true,
+  } as unknown) as electron.BrowserWindow
+  let dispatch: jest.MockedFunction<Dispatch>
+  let handleAction: Dispatch
+
+  beforeEach(() => {
+    dispatch = jest.fn()
+    handleAction = registerPython(dispatch, mockMainWindow)
+
+    mockGetConfig.mockReturnValue({
+      python: { pathToPythonOverride: '/some/override/python' },
+    } as Config)
+    showOpenDirectoryDialog.mockResolvedValue([])
+  })
+
   afterEach(() => {
     resetAllWhenMocks()
   })
 
   it('should be able to initialize the Python path', () => {
-    when(mockGetConfig)
-      .calledWith()
-      .mockReturnValue({
-        python: { pathToPythonOverride: '/some/override/python' },
-      } as Config)
-
-    initializePython()
+    registerPython(dispatch, mockMainWindow)
 
     expect(mockSelectPythonPath).toHaveBeenCalledWith('/some/override/python')
     expect(mockHandleConfigChange).toHaveBeenCalledWith(
@@ -109,6 +132,15 @@ describe('analyzeProtocolSource', () => {
 
     return analyzeProtocolSource(sourcePath, outputPath).then(() => {
       expect(mockWriteFailedAnalysis).toHaveBeenCalledWith(outputPath, 'oh no')
+    })
+  })
+
+  it('opens file picker on CHANGE_PYTHON_PATH_OVERRIDE', () => {
+    handleAction(ProtocolAnalysis.changePythonPathOverrideConfig())
+
+    return flush().then(() => {
+      expect(showOpenDirectoryDialog).toHaveBeenCalledWith(mockMainWindow, {})
+      expect(dispatch).not.toHaveBeenCalled()
     })
   })
 })

@@ -26,6 +26,7 @@ import {
 } from '@opentrons/components'
 
 import * as Config from '../../redux/config'
+import * as ProtocolAnalysis from '../../redux/protocol-analysis'
 import * as Calibration from '../../redux/calibration'
 import * as CustomLabware from '../../redux/custom-labware'
 import {
@@ -151,9 +152,7 @@ export function AdvancedSettings(): JSX.Element {
     )
 
   const handleClickPythonDirectoryChange: React.MouseEventHandler<HTMLButtonElement> = _event => {
-    // sending a null value here as this dispatch will kick off an open dialog in app-shell,
-    // after which the configValueUpdated action will be dispatched with the directory chosen as new value
-    dispatch(Config.updateConfigValue('python.pathToPythonOverride', null))
+    dispatch(ProtocolAnalysis.changePythonPathOverrideConfig())
     trackEvent({
       name: 'changePathToPythonDirectory',
       properties: {},
@@ -537,7 +536,7 @@ export function AdvancedSettings(): JSX.Element {
                 css={TYPOGRAPHY.pRegular}
                 color={COLORS.darkBlack}
                 onClick={() =>
-                  dispatch(Config.openPythonInterpreterDirectory())
+                  dispatch(ProtocolAnalysis.openPythonInterpreterDirectory())
                 }
                 id="AdvancedSettings_sourceFolderLinkPython"
               >
