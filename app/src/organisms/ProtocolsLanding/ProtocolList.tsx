@@ -119,6 +119,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               marginLeft={SPACING.spacing3}
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
+              data-testId={`ProtocolList_SortByMenu`}
             >
               <StyledText
                 as="p"
