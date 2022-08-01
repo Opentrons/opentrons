@@ -6,7 +6,7 @@ import type {
   RobotApiResponseMeta,
 } from '../../robot-api/types'
 import { mockTipRackDefinition } from '../../custom-labware/__fixtures__'
-import { PipetteInfo } from '../../../organisms/ProtocolSetup/RunSetupCard/hooks/useCurrentRunPipetteInfoByMount'
+import type { PipetteInfo } from '../../../organisms/Devices/hooks'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
