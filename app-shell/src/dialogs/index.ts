@@ -1,9 +1,13 @@
-import { dialog } from 'electron'
+import { dialog, shell } from 'electron'
 import type {
   BrowserWindow,
   OpenDialogOptions,
   OpenDialogReturnValue,
 } from 'electron'
+
+import { createLogger } from '../log'
+
+const log = createLogger('dialogs')
 
 interface BaseDialogOptions {
   defaultPath: string
@@ -60,4 +64,11 @@ export function showOpenFileDialog(
     .then((result: OpenDialogReturnValue) => {
       return result.canceled ? [] : (result.filePaths as string[])
     })
+}
+
+export function openDirectoryInFileExplorer(
+  directory: string | null
+): Promise<string | null> {
+  if (directory == null) return Promise.resolve(null)
+  return shell.openPath(directory)
 }

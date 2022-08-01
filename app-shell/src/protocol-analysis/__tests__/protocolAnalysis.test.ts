@@ -9,7 +9,7 @@ import { selectPythonPath, getPythonPath } from '../getPythonPath'
 import { executeAnalyzeCli } from '../executeAnalyzeCli'
 import { writeFailedAnalysis } from '../writeFailedAnalysis'
 
-import { registerPython, analyzeProtocolSource } from '..'
+import { registerProtocolAnalysis, analyzeProtocolSource } from '..'
 import { Dispatch } from '../../types'
 
 jest.mock('../../labware')
@@ -58,7 +58,7 @@ describe('analyzeProtocolSource', () => {
     mockGetConfig.mockReturnValue({
       python: { pathToPythonOverride: '/some/override/python' },
     } as Config)
-    handleAction = registerPython(dispatch, mockMainWindow)
+    handleAction = registerProtocolAnalysis(dispatch, mockMainWindow)
     showOpenDirectoryDialog.mockResolvedValue([])
   })
 

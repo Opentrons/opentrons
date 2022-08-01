@@ -23,7 +23,7 @@ import type {
   ProtocolStorageState,
   ProtocolStorageAction,
 } from './protocol-storage/types'
-import { ProtocolAnalysisAction } from './protocol-analysis/types'
+import type { ProtocolAnalysisAction } from './protocol-analysis'
 import type {
   CustomLabwareState,
   CustomLabwareAction,

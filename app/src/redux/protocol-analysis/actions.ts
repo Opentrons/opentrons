@@ -1,12 +1,28 @@
-import * as Types from './types'
-import * as Constants from './constants'
+export const OPEN_PYTHON_DIRECTORY: 'protocol-analysis:OPEN_PYTHON_DIRECTORY' =
+  'protocol-analysis:OPEN_PYTHON_DIRECTORY'
 
-export const openPythonInterpreterDirectory = (): Types.OpenPythonInterpreterDirectoryAction => ({
-  type: Constants.OPEN_PYTHON_DIRECTORY,
+export const CHANGE_PYTHON_PATH_OVERRIDE: 'protocol-analysis:CHANGE_PYTHON_PATH_OVERRIDE' =
+  'protocol-analysis:CHANGE_PYTHON_PATH_OVERRIDE'
+export interface OpenPythonInterpreterDirectoryAction {
+  type: typeof OPEN_PYTHON_DIRECTORY
+  meta: { shell: true }
+}
+
+export interface ChangePythonPathOverrideConfigAction {
+  type: typeof CHANGE_PYTHON_PATH_OVERRIDE
+  meta: { shell: true }
+}
+
+export type ProtocolAnalysisAction =
+  | OpenPythonInterpreterDirectoryAction
+  | ChangePythonPathOverrideConfigAction
+
+export const openPythonInterpreterDirectory = (): OpenPythonInterpreterDirectoryAction => ({
+  type: OPEN_PYTHON_DIRECTORY,
   meta: { shell: true },
 })
 
-export const changePythonPathOverrideConfig = (): Types.ChangePythonPathOverrideConfigAction => ({
-  type: Constants.CHANGE_PYTHON_PATH_OVERRIDE,
+export const changePythonPathOverrideConfig = (): ChangePythonPathOverrideConfigAction => ({
+  type: CHANGE_PYTHON_PATH_OVERRIDE,
   meta: { shell: true },
 })

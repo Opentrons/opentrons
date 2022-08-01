@@ -5,7 +5,7 @@ import contextMenu from 'electron-context-menu'
 import { createUi } from './ui'
 import { initializeMenu } from './menu'
 import { createLogger } from './log'
-import { registerPython } from './protocol-analysis'
+import { registerProtocolAnalysis } from './protocol-analysis'
 import { registerDiscovery } from './discovery'
 import { registerLabware } from './labware'
 import { registerRobotLogs } from './robot-logs'
@@ -83,7 +83,7 @@ function startUp(): void {
   const actionHandlers: Dispatch[] = [
     registerConfig(dispatch),
     registerDiscovery(dispatch),
-    registerPython(dispatch, mainWindow),
+    registerProtocolAnalysis(dispatch, mainWindow),
     registerRobotLogs(dispatch, mainWindow),
     registerUpdate(dispatch),
     registerBuildrootUpdate(dispatch),

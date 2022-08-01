@@ -1,11 +1,13 @@
-import { shell } from 'electron'
 import * as ProtocolAnalysis from '@opentrons/app/src/redux/protocol-analysis'
 import * as Cfg from '@opentrons/app/src/redux/config'
 
 import { createLogger } from '../log'
 import { getConfig, handleConfigChange } from '../config'
 import { getValidLabwareFilePaths } from '../labware'
-import { showOpenDirectoryDialog } from '../dialogs'
+import {
+  showOpenDirectoryDialog,
+  openDirectoryInFileExplorer,
+} from '../dialogs'
 import { selectPythonPath, getPythonPath } from './getPythonPath'
 import { executeAnalyzeCli } from './executeAnalyzeCli'
 import { writeFailedAnalysis } from './writeFailedAnalysis'
@@ -15,7 +17,7 @@ import type { Action, Dispatch } from '../types'
 
 const log = createLogger('protocol-analysis')
 
-export function registerPython(
+export function registerProtocolAnalysis(
   dispatch: Dispatch,
   mainWindow: BrowserWindow
 ): (action: Action) => void {
@@ -30,11 +32,9 @@ export function registerPython(
     switch (action.type) {
       case ProtocolAnalysis.OPEN_PYTHON_DIRECTORY: {
         const dir = getConfig().python.pathToPythonOverride
-        if (dir != null) {
-          shell.openPath(dir).catch(err => {
-            log.debug('Error opening python directory', err.message)
-          })
-        }
+        openDirectoryInFileExplorer(dir).catch(err => {
+          log.debug('Error opening python directory', err.message)
+        })
         break
       }
       case ProtocolAnalysis.CHANGE_PYTHON_PATH_OVERRIDE: {
@@ -42,7 +42,9 @@ export function registerPython(
           .then(filePaths => {
             if (filePaths.length > 0) {
               const nextValue = filePaths[0]
-              Cfg.updateConfigValue('python.pathToPythonOverride', nextValue)
+              dispatch(
+                Cfg.updateConfigValue('python.pathToPythonOverride', nextValue)
+              )
             }
           })
           .catch(err => {
