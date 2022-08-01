@@ -150,7 +150,7 @@ stages:
         waitUntilComplete: true
       json:
         data:
-          commandType: magneticModule/disengage"
+          commandType: magneticModule/disengage
           params:
             moduleId: '{magneticModuleV1_id}'
     response:
