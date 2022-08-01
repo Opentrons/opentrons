@@ -333,12 +333,12 @@ async def test_handles_bad_serials(
     )
 
 
-async def test_not_present(
+async def test_no_instrument_info_response(
     subject: detector.OneshotToolDetector,
     mock_messenger: AsyncMock,
     message_send_loopback: CanLoopback,
 ) -> None:
-    """It should accept serial values that cannot be decoded."""
+    """It should not crash when a tool does not respond."""
 
     def attached_tool_responder(
         node_id: NodeId, message: MessageDefinition
