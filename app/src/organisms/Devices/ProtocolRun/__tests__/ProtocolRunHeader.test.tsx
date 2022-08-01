@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import '@testing-library/jest-dom'
-import { fireEvent, waitFor, screen } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { when, resetAllWhenMocks } from 'jest-when'
 import {
   RUN_STATUS_IDLE,
@@ -695,11 +695,11 @@ describe('ProtocolRunHeader', () => {
       data: { data: [mockHeaterShaker] },
     } as any)
     mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
-    const [{ getByRole }] = render()
+    const [{ queryByText, getByRole }] = render()
 
     const button = getByRole('button', { name: 'Resume run' })
     fireEvent.click(button)
-    expect(mockConfirmAttachmentModal).not.toHaveBeenCalled()
+    expect(queryByText('mock confirm attachment modal')).toBeFalsy()
     expect(mockTrackProtocolRunEvent).toBeCalledTimes(1)
   })
 
