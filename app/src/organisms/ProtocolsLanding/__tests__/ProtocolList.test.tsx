@@ -67,7 +67,8 @@ describe('ProtocolList', () => {
     getByRole('button', { name: 'Import' })
     getByText('All Protocols')
     getByText('mock empty state links')
-    getAllByText('mock protocol card')
+    const cards = getAllByText('mock protocol card')
+    expect(cards.length).toBe(2)
   })
 
   it('renders and clicks on import button and opens slideout', () => {
