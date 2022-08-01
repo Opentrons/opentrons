@@ -461,7 +461,7 @@ class HeaterShakerGeometry(ModuleGeometry):
         heater_shaker_slot = self.parent
 
         assert isinstance(heater_shaker_slot, str), (
-            "Could not determine module slot " "location"
+            "Could not determine module slot location"
         )
 
         return heater_shaker_slot == pipette_location_slot or int(
@@ -492,7 +492,7 @@ class HeaterShakerGeometry(ModuleGeometry):
         heater_shaker_slot = self.parent
 
         assert isinstance(heater_shaker_slot, str), (
-            "Could not determine module slot " "location"
+            "Could not determine module slot location"
         )
 
         return heater_shaker_slot == pipette_location_slot or int(
