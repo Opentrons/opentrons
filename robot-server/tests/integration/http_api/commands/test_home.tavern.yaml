@@ -105,7 +105,7 @@ stages:
       save:
         json:
           run_id: data.id
-  - name: issue home Command is blocked
+  - name: issue home Command
     request:
       url: '{host:s}:{port:d}/commands'
       method: POST
@@ -118,9 +118,7 @@ stages:
     response:
       strict:
         - json:off
-      status_code: 409
+      status_code: 201
       json:
-        errors:
-          - id: RunActive
-            title: Run Active
-            detail: There is an active run. Close the current run to issue commands via POST /commands.
+        data:
+          status: succeeded

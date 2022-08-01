@@ -17,7 +17,12 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-import { RPM, HS_RPM_MAX, HS_RPM_MIN } from '@opentrons/shared-data'
+import {
+  RPM,
+  HS_RPM_MAX,
+  HS_RPM_MIN,
+  CreateCommand,
+} from '@opentrons/shared-data'
 import { TertiaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { StyledText } from '../../../atoms/text'
@@ -33,6 +38,7 @@ import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
+  HeaterShakerCloseLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
@@ -55,11 +61,19 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const { toggleLatch, isLatchClosed } = useLatchControls(module, currentRunId)
   const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
   const isShaking = module.data.speedStatus !== 'idle'
+  const moduleId = isRunIdle ? moduleIdFromRun : module.id
+
+  const closeLatchCommand: HeaterShakerCloseLatchCreateCommand = {
+    commandType: 'heaterShaker/closeLabwareLatch',
+    params: {
+      moduleId,
+    },
+  }
 
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
     commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
-      moduleId: isRunIdle ? moduleIdFromRun : module.id,
+      moduleId,
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
     },
   }
@@ -67,32 +81,35 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
     commandType: 'heaterShaker/deactivateShaker',
     params: {
-      moduleId: isRunIdle ? moduleIdFromRun : module.id,
+      moduleId,
     },
   }
 
-  const handleShakeCommand = (): void => {
-    if (isRunIdle && currentRunId != null) {
-      createCommand({
-        runId: currentRunId,
-        command: isShaking ? stopShakeCommand : setShakeCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${
-            stopShakeCommand.commandType ?? setShakeCommand.commandType
-          }: ${e.message}`
-        )
-      })
-    } else if (isRunTerminal || currentRunId == null) {
-      createLiveCommand({
-        command: isShaking ? stopShakeCommand : setShakeCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${
-            stopShakeCommand.commandType ?? setShakeCommand.commandType
-          }: ${e.message}`
-        )
-      })
+  const sendCommands = async (): Promise<void> => {
+    const commands: CreateCommand[] = isShaking
+      ? [stopShakeCommand]
+      : [closeLatchCommand, setShakeCommand]
+
+    for (const command of commands) {
+      // await each promise to make sure the server receives requests in the right order
+      if (isRunIdle && currentRunId != null) {
+        await createCommand({
+          runId: currentRunId,
+          command,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${command.commandType}: ${e.message}`
+          )
+        })
+      } else if (isRunTerminal || currentRunId == null) {
+        await createLiveCommand({
+          command,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${command.commandType}: ${e.message}`
+          )
+        })
+      }
     }
     setShakeValue(null)
   }
@@ -198,7 +215,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
             marginTop={SPACING.spacing4}
-            onClick={handleShakeCommand}
+            onClick={sendCommands}
             disabled={
               !isLatchClosed ||
               (shakeValue === null && !isShaking) ||

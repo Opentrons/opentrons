@@ -22,6 +22,7 @@ import {
 } from '@opentrons/components'
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import {
+  CreateCommand,
   getModuleDisplayName,
   HS_RPM_MAX,
   HS_RPM_MIN,
@@ -44,6 +45,7 @@ import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
 import type {
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
+  HeaterShakerCloseLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface TestShakeSlideoutProps {
@@ -78,45 +80,57 @@ export const TestShakeSlideout = (
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const isShaking = module.data.speedStatus !== 'idle'
+  const moduleId = isRunIdle ? moduleIdFromRun : module.id
 
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
     commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
-      moduleId: isRunIdle ? moduleIdFromRun : module.id,
+      moduleId,
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
+    },
+  }
+
+  const closeLatchCommand: HeaterShakerCloseLatchCreateCommand = {
+    commandType: 'heaterShaker/closeLabwareLatch',
+    params: {
+      moduleId,
     },
   }
 
   const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
     commandType: 'heaterShaker/deactivateShaker',
     params: {
-      moduleId: isRunIdle ? moduleIdFromRun : module.id,
+      moduleId,
     },
   }
 
-  const handleShakeCommand = (): void => {
-    if (isRunIdle && currentRunId != null && isLoadedInRun) {
-      createCommand({
-        runId: currentRunId,
-        command: isShaking ? stopShakeCommand : setShakeCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${
-            stopShakeCommand.commandType ?? setShakeCommand.commandType
-          }: ${e.message}`
-        )
-      })
-    } else if (isRunTerminal || currentRunId == null) {
-      createLiveCommand({
-        command: isShaking ? stopShakeCommand : setShakeCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${
-            stopShakeCommand.commandType ?? setShakeCommand.commandType
-          }: ${e.message}`
-        )
-      })
+  const sendCommands = async (): Promise<void> => {
+    const commands: CreateCommand[] = isShaking
+      ? [stopShakeCommand]
+      : [closeLatchCommand, setShakeCommand]
+
+    for (const command of commands) {
+      // await each promise to make sure the server receives requests in the right order
+      if (isRunIdle && currentRunId != null && isLoadedInRun) {
+        await createCommand({
+          runId: currentRunId,
+          command,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${command.commandType}: ${e.message}`
+          )
+        })
+      } else if (isRunTerminal || currentRunId == null) {
+        await createLiveCommand({
+          command,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${command.commandType}: ${e.message}`
+          )
+        })
+      }
     }
+
     setShakeValue(null)
   }
 
@@ -124,7 +138,7 @@ export const TestShakeSlideout = (
     confirm: confirmAttachment,
     showConfirmation: showConfirmationModal,
     cancel: cancelExit,
-  } = useConditionalConfirm(handleShakeCommand, !configHasHeaterShakerAttached)
+  } = useConditionalConfirm(sendCommands, !configHasHeaterShakerAttached)
 
   const errorMessage =
     shakeValue != null &&
@@ -169,7 +183,7 @@ export const TestShakeSlideout = (
           <ConfirmAttachmentModal
             onCloseClick={cancelExit}
             isProceedToRunModal={false}
-            onConfirmClick={handleShakeCommand}
+            onConfirmClick={sendCommands}
           />
         </Portal>
       )}
