@@ -11,10 +11,6 @@ from opentrons.hardware_control.modules import ModuleModel, types as module_type
 from opentrons.hardware_control.types import Axis
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
-from opentrons.motion_planning.adjacent_slots_getters import (
-    get_adjacent_slots,
-    get_east_west_slots,
-)
 from opentrons.protocols.api_support.types import APIVersion
 
 from .module_validation_and_errors import (

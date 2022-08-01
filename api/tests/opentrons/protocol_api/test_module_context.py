@@ -30,13 +30,10 @@ from opentrons.protocol_api.module_contexts import (
 from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
-from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.module_geometry import (
     PipetteMovementRestrictedByHeaterShakerError,
-    HeaterShakerGeometry,
 )
 from opentrons.protocols.api_support import util as api_util
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data import load_shared_data
 
 
