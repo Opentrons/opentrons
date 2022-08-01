@@ -1028,8 +1028,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         )
 
     def _prepare_for_shake(self) -> None:
-        """Retract pipettes before shaking if necessary.
-
+        """
         Before shaking, retracts pipettes if they're parked over a slot
         adjacent to the heater-shaker.
         """
@@ -1043,8 +1042,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
                 hardware.retract(mount=mount)
 
     def _prepare_for_latch_open(self) -> None:
-        """Retract pipettes before opening labware latch if necessary.
-
+        """
         Before opening latch, retracts pipettes if they're parked over a slot
         east/ west of the heater-shaker.
         """
