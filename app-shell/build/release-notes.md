@@ -6,11 +6,17 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 6.0.0
+# Opentrons App Changes in 6.0.x
 
-Welcome to the v6.0.0 release of the Opentrons App! This release focuses on a visual redesign of the app that offers more ways to manage protocols even when you're not connected to a robot.
+Welcome to the v6.0 release of the Opentrons App! This release focuses on a visual redesign of the app that offers more ways to manage protocols even when you're not connected to a robot.
 
 This release also includes updates to the robot operating system, so be sure to update any OT-2s before running protocols with this version of the app.
+
+## 6.0.0 to 6.0.1
+
+The `6.0.1` hotfix release fixes one Opentrons App bug present in the original `6.0.0` release:
+
+- The app's "Override Path to Python" setting is no longer broken on Windows
 
 ## New Features
 
