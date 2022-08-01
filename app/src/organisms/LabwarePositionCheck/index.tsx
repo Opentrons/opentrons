@@ -100,7 +100,6 @@ const LabwarePositionCheckComponent = (
           alertOverlay
         >
           <Box>
-            <Text>{t('error_modal_text')}</Text>
             <Text marginTop={SPACING_2}>Error: {error.message}</Text>
           </Box>
         </AlertModal>
