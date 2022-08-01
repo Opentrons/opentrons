@@ -26,6 +26,7 @@ interface SetupCalibrationItemProps {
   title?: string
   subText?: string
   button?: JSX.Element
+  banner?: JSX.Element
   id?: string
 }
 
@@ -35,6 +36,7 @@ export function SetupCalibrationItem({
   subText,
   calibratedDate,
   button,
+  banner,
   id,
   runId,
 }: SetupCalibrationItemProps): JSX.Element | null {
@@ -93,6 +95,7 @@ export function SetupCalibrationItem({
           </Flex>
         </Flex>
       </Flex>
+      {banner}
       {button}
     </Flex>
   )
