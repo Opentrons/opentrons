@@ -5,10 +5,6 @@ import type {
   OpenDialogReturnValue,
 } from 'electron'
 
-import { createLogger } from '../log'
-
-const log = createLogger('dialogs')
-
 interface BaseDialogOptions {
   defaultPath: string
 }
