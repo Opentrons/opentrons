@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, waitFor } from '@testing-library/react'
 import {
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
@@ -323,7 +323,7 @@ describe('TestShake', () => {
     expect(mockToggleLatch).toHaveBeenCalled()
   })
 
-  it('entering an input for shake speed and clicking start should begin shaking when there is no run id', () => {
+  it('entering an input for shake speed and clicking start should begin shaking when there is no run id', async () => {
     props = {
       module: mockCloseLatchHeaterShaker,
       setCurrentPage: jest.fn(),
@@ -336,14 +336,25 @@ describe('TestShake', () => {
     fireEvent.change(input, { target: { value: '300' } })
     fireEvent.click(button)
 
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
-        params: {
-          moduleId: 'heatershaker_id',
-          rpm: 300,
+    await waitFor(() => {
+      expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+        command: {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: {
+            moduleId: 'heatershaker_id',
+          },
         },
-      },
+      })
+
+      expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+        command: {
+          commandType: 'heaterShaker/setAndWaitForShakeSpeed',
+          params: {
+            moduleId: 'heatershaker_id',
+            rpm: 300,
+          },
+        },
+      })
     })
   })
 
@@ -371,7 +382,7 @@ describe('TestShake', () => {
   })
 
   //  next test is sending module commands when run is terminal and through module controls
-  it('entering an input for shake speed and clicking start should begin shaking when there is a run id and run is terminal', () => {
+  it('entering an input for shake speed and clicking start should close the latch and begin shaking when there is a run id and run is terminal', async () => {
     mockUseRunStatuses.mockReturnValue({
       isRunStill: false,
       isRunTerminal: true,
@@ -391,19 +402,30 @@ describe('TestShake', () => {
     fireEvent.change(input, { target: { value: '300' } })
     fireEvent.click(button)
 
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
-        params: {
-          moduleId: 'heatershaker_id',
-          rpm: 300,
+    await waitFor(() => {
+      expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+        command: {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: {
+            moduleId: 'heatershaker_id',
+          },
         },
-      },
+      })
+
+      expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+        command: {
+          commandType: 'heaterShaker/setAndWaitForShakeSpeed',
+          params: {
+            moduleId: 'heatershaker_id',
+            rpm: 300,
+          },
+        },
+      })
     })
   })
 
   //  next test is sending module commands when run is terminal and through device details module cards
-  it('entering an input for shake speed and clicking start should begin shaking when there is a run id, run is terminal, and through device details', () => {
+  it('entering an input for shake speed and clicking start should close the labware latch and begin shaking when there is a run id, run is terminal, and through device details', async () => {
     mockUseRunStatuses.mockReturnValue({
       isRunStill: false,
       isRunTerminal: true,
@@ -422,14 +444,25 @@ describe('TestShake', () => {
     fireEvent.change(input, { target: { value: '300' } })
     fireEvent.click(button)
 
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
-        params: {
-          moduleId: 'heatershaker_id',
-          rpm: 300,
+    await waitFor(() => {
+      expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+        command: {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: {
+            moduleId: 'heatershaker_id',
+          },
         },
-      },
+      })
+
+      expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+        command: {
+          commandType: 'heaterShaker/setAndWaitForShakeSpeed',
+          params: {
+            moduleId: 'heatershaker_id',
+            rpm: 300,
+          },
+        },
+      })
     })
   })
 })
