@@ -55,11 +55,10 @@ describe('analyzeProtocolSource', () => {
 
   beforeEach(() => {
     dispatch = jest.fn()
-    handleAction = registerPython(dispatch, mockMainWindow)
-
     mockGetConfig.mockReturnValue({
       python: { pathToPythonOverride: '/some/override/python' },
     } as Config)
+    handleAction = registerPython(dispatch, mockMainWindow)
     showOpenDirectoryDialog.mockResolvedValue([])
   })
 
@@ -68,8 +67,6 @@ describe('analyzeProtocolSource', () => {
   })
 
   it('should be able to initialize the Python path', () => {
-    registerPython(dispatch, mockMainWindow)
-
     expect(mockSelectPythonPath).toHaveBeenCalledWith('/some/override/python')
     expect(mockHandleConfigChange).toHaveBeenCalledWith(
       'python.pathToPythonOverride',
@@ -139,7 +136,7 @@ describe('analyzeProtocolSource', () => {
     handleAction(ProtocolAnalysis.changePythonPathOverrideConfig())
 
     return flush().then(() => {
-      expect(showOpenDirectoryDialog).toHaveBeenCalledWith(mockMainWindow, {})
+      expect(showOpenDirectoryDialog).toHaveBeenCalledWith(mockMainWindow)
       expect(dispatch).not.toHaveBeenCalled()
     })
   })
