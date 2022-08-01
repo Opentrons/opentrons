@@ -15,11 +15,12 @@ import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/hea
 import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import {
+  useIsLegacySessionInProgress,
   useIsRobotBusy,
   useProtocolDetailsForRun,
   useRunStatuses,
 } from '../../Devices/hooks'
-
+import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import {
   useLatchControls,
   useModuleOverflowMenu,
@@ -67,6 +68,9 @@ const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
 >
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
+>
+const mockUseIsLegacySessionsInProgress = useIsLegacySessionInProgress as jest.MockedFunction<
+  typeof useIsLegacySessionInProgress
 >
 
 const mockCloseLatchHeaterShaker = {
@@ -205,8 +209,7 @@ describe('useLatchControls', () => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: true,
-      isRunStill: true,
+      isRunStill: false,
       isRunIdle: false,
       isRunTerminal: false,
     })
@@ -250,7 +253,7 @@ describe('useLatchControls', () => {
       },
     })
   })
-  it('should return if latch is close and handle latch function to open latch', () => {
+  it('should return if latch is closed and handle latch function opens latch', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
@@ -275,6 +278,39 @@ describe('useLatchControls', () => {
       },
     })
   })
+
+  it('should return if latch is closed and handle latch function opens latch when run is idle', () => {
+    mockUseRunStatuses.mockReturnValue({
+      isRunStill: false,
+      isRunIdle: true,
+      isRunTerminal: false,
+    })
+
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <I18nextProvider i18n={i18n}>
+        <Provider store={store}>{children}</Provider>
+      </I18nextProvider>
+    )
+    const { result } = renderHook(
+      () => useLatchControls(mockCloseLatchHeaterShaker, RUN_ID_1),
+      {
+        wrapper,
+      }
+    )
+    const { isLatchClosed } = result.current
+
+    expect(isLatchClosed).toBe(true)
+    act(() => result.current.toggleLatch())
+    expect(mockCreateCommand).toHaveBeenCalledWith({
+      runId: RUN_ID_1,
+      command: {
+        commandType: 'heaterShaker/openLabwareLatch',
+        params: {
+          moduleId: mockCloseLatchHeaterShaker.id,
+        },
+      },
+    })
+  })
 })
 
 describe('useModuleOverflowMenu', () => {
@@ -286,8 +322,8 @@ describe('useModuleOverflowMenu', () => {
     store.dispatch = jest.fn()
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseIsLegacySessionsInProgress.mockReturnValue(true)
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: true,
       isRunStill: true,
       isRunTerminal: false,
       isRunIdle: false,

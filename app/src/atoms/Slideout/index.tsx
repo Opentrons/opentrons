@@ -108,7 +108,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
         right="0"
         top="0"
         backgroundColor={COLORS.white}
-        boxShadow={'0px 3px 6px rgba(0, 0, 0, 0.23)'}
+        boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
         height="100%"
       >
         <Flex
@@ -137,7 +137,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
               </StyledText>
               <Flex alignItems={ALIGN_CENTER}>
                 <Btn
-                  size={'1.5rem'}
+                  size="1.5rem"
                   onClick={onCloseClick}
                   aria-label="exit"
                   data-testid={`Slideout_icon_close_${

@@ -91,7 +91,6 @@ export const SetupModules = ({
         <HeaterShakerBanner
           displayName={heaterShakerModules[0]?.moduleDef.displayName}
           modules={heaterShakerModules}
-          runId={runId}
         />
       ) : null}
       {showMultipleModulesModal ? (
@@ -106,7 +105,7 @@ export const SetupModules = ({
           css={TYPOGRAPHY.labelSemiBold}
           color={COLORS.darkBlack}
           onClick={() => setShowMultipleModulesModal(true)}
-          data-test={'ModuleSetup_helpLink'}
+          data-test="ModuleSetup_helpLink"
         >
           {t('multiple_modules_help_link_title')}
         </Link>
@@ -121,7 +120,7 @@ export const SetupModules = ({
           deckDef={standardDeckDef as any}
           viewBox={DECK_VIEW_BOX}
           deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-          id={'ModuleSetup_deckMap'}
+          id="ModuleSetup_deckMap"
         >
           {() => (
             <>
@@ -159,7 +158,7 @@ export const SetupModules = ({
         title={t('proceed_to_labware_setup_step')}
         disabled={missingModuleIds.length > 0 || runHasStarted}
         onClick={expandLabwareSetupStep}
-        id={'ModuleSetup_proceedToLabwareSetup'}
+        id="ModuleSetup_proceedToLabwareSetup"
         alignSelf={ALIGN_CENTER}
         padding={`${SPACING.spacing3} ${SPACING.spacing4}`}
         {...targetProps}

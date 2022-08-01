@@ -5,7 +5,6 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_FLEX_END,
-  Text,
   TEXT_ALIGN_CENTER,
   SPACING,
   TYPOGRAPHY,
@@ -15,6 +14,7 @@ import {
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { Modal } from '../../atoms/Modal'
+import { StyledText } from '../../atoms/text'
 import { Dispatch } from '../../redux/types'
 import { UpdateConfigValueAction } from '../../redux/config/types'
 import { updateConfigValue } from '../../redux/config'
@@ -61,14 +61,14 @@ export const ConfirmAttachmentModal = (
         flexDirection={DIRECTION_COLUMN}
         fontSize={TYPOGRAPHY.fontSizeP}
       >
-        <Text paddingBottom={SPACING.spacing2}>
+        <StyledText paddingBottom={SPACING.spacing2}>
           {t(
             isProceedToRunModal
               ? 'module_anchors_extended'
               : 'module_should_have_anchors'
           )}
-        </Text>
-        <Text>{t('thermal_adapter_attached_to_module')}</Text>
+        </StyledText>
+        <StyledText>{t('thermal_adapter_attached_to_module')}</StyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -84,13 +84,13 @@ export const ConfirmAttachmentModal = (
           }
           value={isDismissed}
         />
-        <Text
+        <StyledText
           paddingTop={SPACING.spacingXXS}
           paddingLeft={SPACING.spacing3}
           fontSize={TYPOGRAPHY.fontSizeP}
         >
           {t('dont_show_me_again', { ns: 'shared' })}
-        </Text>
+        </StyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}

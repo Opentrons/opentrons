@@ -88,10 +88,7 @@ export const MagneticModuleSlideout = (
   const [engageHeightValue, setEngageHeightValue] = React.useState<
     string | null
   >(null)
-  const { moduleIdFromRun } = useModuleIdFromRun(
-    module,
-    currentRunId != null ? currentRunId : null
-  )
+  const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
 
   const moduleName = getModuleDisplayName(module.moduleModel)
   const info = getInfoByModel(module.moduleModel)
@@ -114,12 +111,6 @@ export const MagneticModuleSlideout = (
     }
   }
 
-  let moduleId: string
-  if (isRunIdle && currentRunId != null && isLoadedInRun) {
-    moduleId = moduleIdFromRun
-  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
-    moduleId = module.id
-  }
   const errorMessage =
     engageHeightValue != null &&
     (parseInt(engageHeightValue) < info.disengagedHeight ||
@@ -132,7 +123,7 @@ export const MagneticModuleSlideout = (
       const setEngageCommand: MagneticModuleEngageMagnetCreateCommand = {
         commandType: 'magneticModule/engage',
         params: {
-          moduleId: moduleId,
+          moduleId: isRunIdle ? moduleIdFromRun : module.id,
           height: parseInt(engageHeightValue),
         },
       }
@@ -144,10 +135,7 @@ export const MagneticModuleSlideout = (
             )
           }
         )
-      } else if (
-        (currentRunId != null && isRunTerminal) ||
-        currentRunId == null
-      ) {
+      } else if (isRunTerminal || currentRunId == null) {
         createLiveCommand({ command: setEngageCommand }).catch((e: Error) => {
           console.error(
             `error setting module status with command type ${setEngageCommand.commandType}: ${e.message}`

@@ -80,7 +80,7 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
       marginTop={SPACING.spacing3}
       border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGrey}`}
       flexDirection={DIRECTION_ROW}
-      width={'21.5rem'}
+      width="21.5rem"
       paddingBottom={SPACING.spacing3}
     >
       {props.image != null ? (
@@ -204,7 +204,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
           data-testid={`introduction_item_heater_shaker`}
         >
           <IntroItem
-            image={<img src={heaterShaker} alt={'heater_shaker_image'} />}
+            image={<img src={heaterShaker} alt="heater_shaker_image" />}
             text={getModuleDisplayName(props.moduleModel)}
           />
         </Flex>
@@ -213,7 +213,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
           data-testid={`intrudction_intro_item_screwdriver`}
         >
           <IntroItem
-            image={<img src={screwdriver} alt={'screwdriver_image'} />}
+            image={<img src={screwdriver} alt="screwdriver_image" />}
             text={t('t10_torx_screwdriver', { name: 'T10 Torx' })}
             subtext={t('about_screwdriver')}
           />

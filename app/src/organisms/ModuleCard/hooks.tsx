@@ -16,7 +16,11 @@ import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocol
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { useProtocolDetailsForRun, useRunStatuses } from '../Devices/hooks'
+import {
+  useProtocolDetailsForRun,
+  useRunStatuses,
+  useIsLegacySessionInProgress,
+} from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
@@ -55,7 +59,7 @@ export function useLatchControls(
 ): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
-  const { isRunTerminal } = useRunStatuses()
+  const { isRunIdle } = useRunStatuses()
   const { moduleIdFromRun } = useModuleIdFromRun(
     module,
     runId != null ? runId : null
@@ -72,12 +76,12 @@ export function useLatchControls(
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',
     params: {
-      moduleId: runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
+      moduleId: isRunIdle ? moduleIdFromRun : module.id,
     },
   }
 
   const toggleLatch = (): void => {
-    if (runId != null && !isRunTerminal) {
+    if (runId != null && isRunIdle) {
       createCommand({
         runId: runId,
         command: latchCommand,
@@ -134,12 +138,8 @@ export function useModuleOverflowMenu(
   const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
-  const {
-    isLegacySessionInProgress,
-    isRunTerminal,
-    isRunStill,
-    isRunIdle,
-  } = useRunStatuses()
+  const isLegacySessionInProgress = useIsLegacySessionInProgress()
+  const { isRunTerminal, isRunStill, isRunIdle } = useRunStatuses()
   const currentRunId = useCurrentRunId()
   let isDisabled: boolean = false
   if (runId != null && isLoadedInRun) {
@@ -202,6 +202,7 @@ export function useModuleOverflowMenu(
         key={`test_shake_${module.moduleModel}`}
         id={`test_shake_${module.moduleModel}`}
         data-testid={`test_shake_${module.moduleModel}`}
+        disabled={isDisabled}
         onClick={() =>
           handleDeactivationCommand('heaterShaker/deactivateShaker')
         }
@@ -218,13 +219,6 @@ export function useModuleOverflowMenu(
       </MenuItem>
     )
 
-  let moduleId: string
-  if (isRunIdle && currentRunId != null && isLoadedInRun) {
-    moduleId = moduleIdFromRun
-  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
-    moduleId = module.id
-  }
-
   const handleDeactivationCommand = (
     deactivateModuleCommandType: deactivateCommandTypes
   ): void => {
@@ -237,7 +231,7 @@ export function useModuleOverflowMenu(
       | HeaterShakerDeactivateShakerCreateCommand = {
       commandType: deactivateModuleCommandType,
       params: {
-        moduleId,
+        moduleId: isRunIdle ? moduleIdFromRun : module.id,
       },
     }
     if (isRunIdle && currentRunId != null && isLoadedInRun) {
@@ -249,10 +243,7 @@ export function useModuleOverflowMenu(
           `error setting module status with command type ${deactivateCommand.commandType} and run id ${runId}: ${e.message}`
         )
       })
-    } else if (
-      (currentRunId != null && isRunTerminal) ||
-      currentRunId == null
-    ) {
+    } else if (isRunTerminal || currentRunId == null) {
       createLiveCommand({
         command: deactivateCommand,
       }).catch((e: Error) => {

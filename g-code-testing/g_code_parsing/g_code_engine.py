@@ -6,6 +6,7 @@ from multiprocessing import Process
 from typing import Generator, Callable, Iterator
 from collections import namedtuple
 
+from opentrons import APIVersion
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.emulation.types import ModuleType
 from opentrons.protocols.parse import parse
@@ -122,19 +123,23 @@ class GCodeEngine:
         return Protocol(text=text, filename=file_path, filelike=file)
 
     @contextmanager
-    def run_protocol(self, path: str) -> Generator:
+    def run_protocol(self, path: str, version: APIVersion) -> Generator:
         """
         Runs passed protocol file and collects all G-Code I/O from it.
         Will cleanup emulation after execution
         :param path: Path to file
+        :param version: API version to use
         :return: GCodeProgram with all the parsed data
         """
         file_path = os.path.join(get_configuration_dir(), path)
         with self._emulate() as h:
             protocol = self._get_protocol(file_path)
             context = ProtocolContext(
-                implementation=ProtocolContextImplementation(sync_hardware=h.sync),
+                implementation=ProtocolContextImplementation(
+                    sync_hardware=h.sync, api_version=version
+                ),
                 loop=self._get_loop(),
+                api_version=version,
             )
             parsed_protocol = parse(protocol.text, protocol.filename)
             with GCodeWatcher(emulator_settings=self._config) as watcher:

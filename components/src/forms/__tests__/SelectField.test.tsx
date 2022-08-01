@@ -103,7 +103,7 @@ describe('SelectField', () => {
     ).find(Select)
 
     selectWrapper.invoke('onChange')?.(options[1], {} as any)
-    expect(handleValueChange).toHaveBeenCalledWith('field', 'bar')
+    expect(handleValueChange).toHaveBeenCalledWith('field', 'bar', {})
     selectWrapper.invoke('onBlur')?.({} as any)
     expect(handleLoseFocus).toHaveBeenCalledWith('field')
   })

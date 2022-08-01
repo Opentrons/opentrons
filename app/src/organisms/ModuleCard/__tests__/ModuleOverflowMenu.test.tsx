@@ -8,7 +8,10 @@ import {
   mockThermocycler,
   mockHeaterShaker,
 } from '../../../redux/modules/__fixtures__'
-import { useRunStatuses } from '../../Devices/hooks'
+import {
+  useRunStatuses,
+  useIsLegacySessionInProgress,
+} from '../../Devices/hooks'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { useModuleIdFromRun } from '../useModuleIdFromRun'
@@ -27,7 +30,9 @@ const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
-
+const mockUseIsLegacySessionsInProgress = useIsLegacySessionInProgress as jest.MockedFunction<
+  typeof useIsLegacySessionInProgress
+>
 const render = (props: React.ComponentProps<typeof ModuleOverflowMenu>) => {
   return renderWithProviders(<ModuleOverflowMenu {...props} />, {
     i18nInstance: i18n,
@@ -161,8 +166,8 @@ describe('ModuleOverflowMenu', () => {
   let props: React.ComponentProps<typeof ModuleOverflowMenu>
   beforeEach(() => {
     mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
+    mockUseIsLegacySessionsInProgress.mockReturnValue(false)
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: false,
       isRunStill: true,
       isRunTerminal: false,
       isRunIdle: false,
@@ -401,8 +406,8 @@ describe('ModuleOverflowMenu', () => {
   })
 
   it('should disable module control buttons when the robot is busy and run status not null', () => {
+    mockUseIsLegacySessionsInProgress.mockReturnValue(true)
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: false,
       isRunIdle: true,

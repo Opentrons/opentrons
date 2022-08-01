@@ -89,7 +89,7 @@ export function RobotServerVersion({
               color={COLORS.darkGreyEnabled}
               paddingRight={SPACING.spacing4}
             >
-              {t('robot_server_versions_status')}
+              {t('up_to_date')}
             </StyledText>
             <TertiaryButton
               onClick={() => setShowVersionInfoModal(true)}

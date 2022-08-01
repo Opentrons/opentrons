@@ -52,7 +52,7 @@ export function CollapsibleSection(
           }
         >
           <Icon
-            size={'1.5rem'}
+            size="1.5rem"
             name={isExpanded ? 'minus' : 'plus'}
             css={ACCORDION_STYLE}
           />

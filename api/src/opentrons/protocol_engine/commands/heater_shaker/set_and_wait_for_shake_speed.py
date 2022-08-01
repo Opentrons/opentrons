@@ -5,11 +5,13 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
+from opentrons.protocol_engine.types import MotorAxis
+
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
-    from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
 SetAndWaitForShakeSpeedCommandType = Literal["heaterShaker/setAndWaitForShakeSpeed"]
 
@@ -36,10 +38,12 @@ class SetAndWaitForShakeSpeedImpl(
         self,
         state_view: StateView,
         equipment: EquipmentHandler,
+        movement: MovementHandler,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
+        self._movement = movement
 
     async def execute(
         self,
@@ -55,6 +59,18 @@ class SetAndWaitForShakeSpeedImpl(
 
         # Verify speed from hs module view
         validated_speed = hs_module_substate.validate_target_speed(params.rpm)
+
+        # Move pipette away if it is close to the heater-shaker
+        if self._state_view.motion.check_pipette_blocking_hs_shaker(
+            hs_module_substate.module_id
+        ):
+            # TODO(jbl 2022-07-28) replace home movement with a retract movement
+            await self._movement.home(
+                [
+                    MotorAxis.RIGHT_Z,
+                    MotorAxis.LEFT_Z,
+                ]
+            )
 
         # Allow propagation of ModuleNotAttachedError.
         hs_hardware_module = self._equipment.get_module_hardware_api(

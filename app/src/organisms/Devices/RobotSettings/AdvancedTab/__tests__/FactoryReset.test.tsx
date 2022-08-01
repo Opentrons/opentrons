@@ -5,26 +5,19 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
-import { useIsRobotBusy } from '../../../hooks'
 
 import { FactoryReset } from '../FactoryReset'
 
 const mockUpdateIsEXpanded = jest.fn()
-const mockUpdateRobotStatus = jest.fn()
 
-jest.mock('../../../hooks')
 jest.mock('../../../../ProtocolUpload/hooks')
 
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
->
-
-const render = () => {
+const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
       <FactoryReset
         updateIsExpanded={mockUpdateIsEXpanded}
-        updateIsRobotBusy={mockUpdateRobotStatus}
+        isRobotBusy={isRobotBusy}
       />
     </MemoryRouter>,
     { i18nInstance: i18n }
@@ -32,10 +25,6 @@ const render = () => {
 }
 
 describe('RobotSettings FactoryReset', () => {
-  beforeEach(() => {
-    mockUseIsRobotBusy.mockReturnValue(false)
-  })
-
   afterEach(() => {
     jest.resetAllMocks()
   })
@@ -53,20 +42,18 @@ describe('RobotSettings FactoryReset', () => {
 
   it('should render a slideout when clicking the button', () => {
     const [{ getByRole }] = render()
-    const factoryResetChooseButton = getByRole('button', {
-      name: 'Choose reset settings',
-    })
-    fireEvent.click(factoryResetChooseButton)
-    expect(mockUpdateIsEXpanded).toHaveBeenCalled()
-  })
-
-  it('should call update robot status if a robot is busy', () => {
-    mockUseIsRobotBusy.mockReturnValue(true)
-    const [{ getByRole }] = render()
     const button = getByRole('button', {
       name: 'Choose reset settings',
     })
     fireEvent.click(button)
-    expect(mockUpdateRobotStatus).toHaveBeenCalled()
+    expect(mockUpdateIsEXpanded).toHaveBeenCalled()
+  })
+
+  it('should call update robot status if a robot is busy', () => {
+    const [{ getByRole }] = render(true)
+    const button = getByRole('button', {
+      name: 'Choose reset settings',
+    })
+    expect(button).toBeDisabled()
   })
 })
