@@ -156,9 +156,7 @@ stages:
     response:
       strict:
         - json:off
-      status_code: 409
+      status_code: 201
       json:
-        errors:
-          - id: RunActive
-            title: Run Active
-            detail: There is an active run. Close the current run to issue commands via POST /commands.
+        data:
+          status: succeeded
