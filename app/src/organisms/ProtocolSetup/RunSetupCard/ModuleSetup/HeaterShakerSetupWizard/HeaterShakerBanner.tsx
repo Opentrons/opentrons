@@ -6,6 +6,7 @@ import { HeaterShakerWizard } from '../../../../Devices/HeaterShakerWizard'
 import { useCurrentRunId } from '../../../../ProtocolUpload/hooks'
 import { ModuleRenderInfoForProtocol } from '../../../../Devices/hooks'
 import { Banner, BannerItem } from '../Banner/Banner'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 interface HeaterShakerBannerProps {
   displayName: string
@@ -15,7 +16,7 @@ interface HeaterShakerBannerProps {
 export function HeaterShakerBanner(
   props: HeaterShakerBannerProps
 ): JSX.Element | null {
-  const [showWizard, setShowWizard] = React.useState(false)
+  const [wizardId, setWizardId] = React.useState<String | null>(null)
   const { displayName, modules } = props
   const currentRunId = useCurrentRunId()
   const { t } = useTranslation('heater_shaker')
@@ -26,13 +27,16 @@ export function HeaterShakerBanner(
     <Banner title={t('attach_heater_shaker_to_deck', { name: displayName })}>
       {modules.map((module, index) => (
         <React.Fragment key={index}>
-          {showWizard && (
-            <HeaterShakerWizard
-              onCloseClick={() => setShowWizard(false)}
-              moduleFromProtocol={module}
-              currentRunId={currentRunId}
-            />
-          )}
+          {wizardId === module.moduleId &&
+            module.attachedModuleMatch?.moduleType ===
+              HEATERSHAKER_MODULE_TYPE && (
+              <HeaterShakerWizard
+                onCloseClick={() => setWizardId(null)}
+                moduleFromProtocol={module}
+                currentRunId={currentRunId}
+                attachedModule={module.attachedModuleMatch}
+              />
+            )}
           {index > 0 && <Divider color={COLORS.medGrey} />}
           <BannerItem
             title={t('module_in_slot', {
@@ -41,7 +45,7 @@ export function HeaterShakerBanner(
             })}
             body={t('improperly_fastened_description')}
             btnText={t('view_instructions')}
-            onClick={() => setShowWizard(true)}
+            onClick={() => setWizardId(module.moduleId)}
           />
         </React.Fragment>
       ))}
