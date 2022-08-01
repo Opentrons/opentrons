@@ -126,32 +126,10 @@ async def ctx_with_thermocycler(
 
 
 @pytest.fixture
-def mock_heater_shaker_geometry() -> mock.MagicMock:
-    """Get a Heater-Shaker Geometry fixture."""
-    heater_shaker_slot_location = Deck().position_for(5)
-    hs_geometry = mock.MagicMock(
-        return_value=HeaterShakerGeometry(
-            display_name="A new shiny module!",
-            model=HeaterShakerModuleModel.HEATER_SHAKER_V1,
-            module_type=ModuleType.HEATER_SHAKER,
-            offset=Point(0, 0, 0),
-            overall_height=111,
-            height_over_labware=222,
-            parent=heater_shaker_slot_location,
-            api_level=APIVersion.from_string("22.22"),
-        )
-    )
-    hs_geometry.highest_z = 100
-    hs_geometry.parent = 5
-    return hs_geometry
-
-
-@pytest.fixture
 async def ctx_with_heater_shaker(
     mock_hardware: mock.AsyncMock,
     mock_module_controller: mock.MagicMock,
     mock_pipette_location: mock.MagicMock,
-    mock_heater_shaker_geometry: mock.MagicMock,
     enable_heater_shaker_python_api: AsyncGenerator[None, None],
 ) -> ProtocolContext:
     """Context fixture with a mock heater-shaker."""
@@ -166,7 +144,6 @@ async def ctx_with_heater_shaker(
         return []
 
     mock_hardware.find_modules.side_effect = find_modules
-
     ctx = ProtocolContext(
         implementation=ProtocolContextImplementation(sync_hardware=mock_hardware),
     )
@@ -782,7 +759,6 @@ def test_heater_shaker_set_and_wait_for_shake_speed(
         mock_validator.return_value = 10
         hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
         assert isinstance(hs_mod, HeaterShakerContext)
-        # assert isinstance(hs_mod.geometry, HeaterShakerGeometry)
         hs_mod.geometry.is_pipette_blocking_shake_movement = mock.MagicMock(  # type: ignore[attr-defined]
             return_value=True
         )
