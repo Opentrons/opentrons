@@ -70,6 +70,13 @@ describe('ProtocolList', () => {
     getAllByText('mock protocol card')
   })
 
+  it('renders and clicks on import button and opens slideout', () => {
+    const { getByText, getByRole } = render(props)
+    const btn = getByRole('button', { name: 'Import' })
+    fireEvent.click(btn)
+    getByText('Import a Protocol')
+  })
+
   it('renders Alphabetical button and clicking on it open overflow menu and can select alphabetical', () => {
     const { getByRole, getByTestId } = render(props)
     fireEvent.click(getByTestId('ProtocolList_SortByMenu'))
