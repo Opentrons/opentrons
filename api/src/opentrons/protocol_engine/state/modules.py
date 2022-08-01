@@ -352,6 +352,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 target_block_temperature=block_temperature,
                 target_lid_temperature=None,
             )
+        # TODO (spp, 2022-08-01): set is_lid_open to False upon lid commands' failure
         elif isinstance(command.result, thermocycler.OpenLidResult):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
