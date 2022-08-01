@@ -28,7 +28,7 @@ import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProt
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
   moduleFromProtocol?: ProtocolModuleInfo
-  attachedModule: HeaterShakerModule
+  attachedModule: HeaterShakerModule | null
   currentRunId?: string
 }
 
