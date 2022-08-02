@@ -60,8 +60,8 @@ export const errorDisabled = '#8f8f8f'
 
 // others
 export const transparent = 'transparent'
-export const Opacity35 = '35'
-export const backgroundOverlay = `${darkBlackEnabled}${Opacity35}`
+export const opacity35HexCode = '59' // 35% opacity
+export const backgroundOverlay = `${darkBlackEnabled}${opacity35HexCode}`
 
 // colors pd liquid
 export const electricPurple = '#b925ff'
