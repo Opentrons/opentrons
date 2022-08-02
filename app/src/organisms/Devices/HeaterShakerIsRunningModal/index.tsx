@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   Icon,
@@ -10,12 +11,13 @@ import {
   TYPOGRAPHY,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
+import { useAttachedModules } from '../hooks'
 import { Modal } from '../../../atoms/Modal'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
 import { HeaterShakerModule } from '../../../redux/modules/types'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
@@ -31,6 +33,15 @@ export const HeaterShakerIsRunningModal = (
   const { closeModal, module, startRun } = props
   const { t } = useTranslation('heater_shaker')
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const attachedModules = useAttachedModules()
+  const moduleIds = attachedModules
+    .filter(
+      (module): module is HeaterShakerModule =>
+        module.moduleType === HEATERSHAKER_MODULE_TYPE &&
+        module?.data != null &&
+        module.data.speedStatus !== 'idle'
+    )
+    .map(module => module.id)
 
   const title = (
     <Flex flexDirection={DIRECTION_ROW}>
@@ -45,25 +56,27 @@ export const HeaterShakerIsRunningModal = (
     </Flex>
   )
 
-  const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
-    commandType: 'heaterShaker/deactivateShaker',
-    params: {
-      moduleId: module.id,
-    },
-  }
-
   const handleContinueShaking = (): void => {
     startRun()
     closeModal()
   }
 
   const handleStopShake = (): void => {
-    createLiveCommand({
-      command: stopShakeCommand,
-    }).catch((e: Error) => {
-      console.error(
-        `error setting module status with command type ${stopShakeCommand.commandType}: ${e.message}`
-      )
+    moduleIds.forEach(moduleId => {
+      const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
+        commandType: 'heaterShaker/deactivateShaker',
+        params: {
+          moduleId: moduleId,
+        },
+      }
+
+      createLiveCommand({
+        command: stopShakeCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${stopShakeCommand.commandType}: ${e.message}`
+        )
+      })
     })
     handleContinueShaking()
   }

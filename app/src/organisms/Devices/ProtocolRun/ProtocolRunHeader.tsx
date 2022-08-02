@@ -205,12 +205,18 @@ export function ProtocolRunHeader({
   const [showIsShakingModal, setShowIsShakingModal] = React.useState<boolean>(
     false
   )
-  const heaterShaker = attachedModules.find(
+  const activeHeaterShaker = attachedModules.find(
     (module): module is HeaterShakerModule =>
-      module.moduleType === HEATERSHAKER_MODULE_TYPE
+      module.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      module?.data != null &&
+      module.data.speedStatus !== 'idle'
   )
-  const isShaking =
-    heaterShaker?.data != null && heaterShaker.data.speedStatus !== 'idle'
+  const isShaking = attachedModules
+    .filter(
+      (module): module is HeaterShakerModule =>
+        module.moduleType === HEATERSHAKER_MODULE_TYPE
+    )
+    .some(module => module?.data != null && module.data.speedStatus !== 'idle')
 
   const handleProceedToRunClick = (): void => {
     trackEvent({ name: 'proceedToRun', properties: {} })
@@ -243,7 +249,7 @@ export function ProtocolRunHeader({
   const isIdle = runStatus === RUN_STATUS_IDLE
 
   const handlePlayButtonClick = (): void => {
-    if (isShaking) {
+    if (isShaking && isHeaterShakerInProtocol) {
       setShowIsShakingModal(true)
     } else if (
       isHeaterShakerInProtocol &&
@@ -604,13 +610,16 @@ export function ProtocolRunHeader({
             completedAt={completedAt}
           />
         </Box>
-        {showIsShakingModal && heaterShaker != null && (
-          <HeaterShakerIsRunningModal
-            closeModal={() => setShowIsShakingModal(false)}
-            module={heaterShaker}
-            startRun={play}
-          />
-        )}
+        {showIsShakingModal &&
+          activeHeaterShaker != null &&
+          isHeaterShakerInProtocol &&
+          runId != null && (
+            <HeaterShakerIsRunningModal
+              closeModal={() => setShowIsShakingModal(false)}
+              module={activeHeaterShaker}
+              startRun={play}
+            />
+          )}
         <Box marginLeft={SPACING_AUTO}>
           <PrimaryButton
             justifyContent={JUSTIFY_CENTER}
