@@ -7,12 +7,10 @@ from logging.config import dictConfig
 from typing import Iterator, List, Any, Dict
 
 from opentrons_hardware.drivers.can_bus import build, CanMessenger
-from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorType,
     SensorId,
-    SensorThresholdMode,
 )
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.hardware_control.network import probe
@@ -33,8 +31,13 @@ from opentrons_hardware.hardware_control.motion import (
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
-
 log = logging.getLogger(__name__)
+
+
+class InvalidInput(Exception):
+    """Invalid input exception."""
+
+    pass
 
 
 def build_log_config(level: str) -> Dict[str, Any]:
@@ -93,6 +96,24 @@ class Capturer:
             )
 
 
+# take in input: which pipette (left, right, both) - list
+# take in input: height of well in mm
+# home target axes (head and pipette)
+# send BindSensorOutputRequest w binding = 3 to target pipettes
+
+# send a move for target axes, and sensor should stop the move
+# may or may not cause a timeouterror
+
+# figure out logging
+
+
+def prompt_well_height() -> int:
+    try:
+        return int(input("enter well height(mm):"))
+    except (ValueError, IndexError) as e:
+        raise InvalidInput(str(e))
+
+
 async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
     """Run the test."""
     target_z = NodeId["head_" + args.mount[0]]
@@ -130,36 +151,37 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
             ),
         ],
     ]
+    # TODO: change MoveStopCondition.cap_sensor to sync
 
-    threshold_payload = payloads.SetSensorThresholdRequestPayload(
-        sensor=fields.SensorTypeField(SensorType.capacitive),
-        sensor_id=fields.SensorIdField(SensorId.S0),
-        threshold=Int32Field(
-            int(args.threshold * sensor_utils.sensor_fixed_point_conversion)
-        ),
-        mode=fields.SensorThresholdModeField(SensorThresholdMode.auto_baseline),
-    )
-    threshold_message = message_definitions.SetSensorThresholdRequest(
-        payload=threshold_payload
-    )
+    # threshold_payload = payloads.SetSensorThresholdRequestPayload(
+    #     sensor=fields.SensorTypeField(SensorType.capacitive),
+    #     sensor_id=fields.SensorIdField(SensorId.S0),
+    #     threshold=Int32Field(
+    #         int(args.threshold * sensor_utils.sensor_fixed_point_conversion)
+    #     ),
+    #     mode=fields.SensorThresholdModeField(SensorThresholdMode.auto_baseline),
+    # )
+    # threshold_message = message_definitions.SetSensorThresholdRequest(
+    #     payload=threshold_payload
+    # )
     if args.verbose_monitoring:
         binding = 3
     else:
         binding = 1
     stim_payload = payloads.BindSensorOutputRequestPayload(
-        sensor=fields.SensorTypeField(SensorType.capacitive),
+        sensor=fields.SensorTypeField(SensorType.pressure),
         sensor_id=fields.SensorIdField(SensorId.S0),
         binding=fields.SensorOutputBindingField(binding),
     )
     stim_message = message_definitions.BindSensorOutputRequest(payload=stim_payload)
     reset_payload = payloads.BindSensorOutputRequestPayload(
-        sensor=fields.SensorTypeField(SensorType.capacitive),
+        sensor=fields.SensorTypeField(SensorType.pressure),
         sensor_id=fields.SensorIdField(SensorId.S0),
         binding=fields.SensorOutputBindingField(0),
     )
     reset_message = message_definitions.BindSensorOutputRequest(payload=reset_payload)
     runner = MoveGroupRunner(move_groups=move_groups)
-    await messenger.send(target_pipette, threshold_message)
+    # move head and pipette to well height before starting
     await messenger.send(target_pipette, stim_message)
     position = await runner.run(can_messenger=messenger)
     if args.verbose_monitoring:
@@ -191,7 +213,6 @@ def main() -> None:
     parser.add_argument("-d", "--distance", type=float, default=7)
     parser.add_argument("-pd", "--prep-distance", type=float, default=12)
     parser.add_argument("-ps", "--prep-speed", type=float, default=50)
-    parser.add_argument("-t", "--threshold", type=float, default=17)
     parser.add_argument("-v", "--verbose-monitoring", action="store_true")
     parser.add_argument(
         "-l",
