@@ -29,18 +29,12 @@ interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
   moduleFromProtocol?: ProtocolModuleInfo
   attachedModule: HeaterShakerModule | null
-  currentRunId?: string
 }
 
 export const HeaterShakerWizard = (
   props: HeaterShakerWizardProps
 ): JSX.Element | null => {
-  const {
-    onCloseClick,
-    moduleFromProtocol,
-    attachedModule,
-    currentRunId,
-  } = props
+  const { onCloseClick, moduleFromProtocol, attachedModule } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
   const { robotName } = useParams<NavRouteParams>()
@@ -88,12 +82,9 @@ export const HeaterShakerWizard = (
       case 4:
         buttonContent = t('btn_test_shake')
         return (
-          // heaterShaker should never be null because isPrimaryCTAEnabled would be disabled otherwise
+          // attachedModule should never be null because isPrimaryCTAEnabled would be disabled otherwise
           attachedModule != null ? (
-            <AttachAdapter
-              module={attachedModule}
-              currentRunId={currentRunId}
-            />
+            <AttachAdapter module={attachedModule} />
           ) : null
         )
       case 5:
@@ -103,7 +94,6 @@ export const HeaterShakerWizard = (
             module={attachedModule}
             setCurrentPage={setCurrentPage}
             moduleFromProtocol={moduleFromProtocol}
-            currentRunId={currentRunId}
           />
         ) : null
       default:
@@ -132,7 +122,7 @@ export const HeaterShakerWizard = (
         >
           {currentPage > 0 ? (
             <SecondaryButton
-              data-testid={`wizard_back_btn`}
+              data-testid="wizard_back_btn"
               onClick={() => setCurrentPage(currentPage => currentPage - 1)}
             >
               {t('back')}
@@ -142,7 +132,7 @@ export const HeaterShakerWizard = (
             <PrimaryButton
               disabled={!isPrimaryCTAEnabled}
               {...targetProps}
-              data-testid={`wizard_next_btn`}
+              data-testid="wizard_next_btn"
               onClick={
                 currentPage === 5
                   ? () => onCloseClick()

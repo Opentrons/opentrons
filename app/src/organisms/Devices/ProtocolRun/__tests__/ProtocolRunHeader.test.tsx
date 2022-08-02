@@ -664,7 +664,8 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', () => {
-    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
+    when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
+
     mockUseModulesQuery.mockReturnValue({
       data: { data: [mockMovingHeaterShaker] },
     } as any)
@@ -674,7 +675,7 @@ describe('ProtocolRunHeader', () => {
     getByText('Mock HeaterShakerIsRunningModal')
   })
 
-  it('renders the confirm attachment modal when there is a heater shaker in the protocol and the heater shaker is idle status', () => {
+  it('does not render the confirm attachment modal when there is a heater shaker in the protocol and run is idle', () => {
     mockUseModulesQuery.mockReturnValue({
       data: { data: [mockHeaterShaker] },
     } as any)
@@ -685,6 +686,21 @@ describe('ProtocolRunHeader', () => {
     fireEvent.click(button)
     getByText('mock confirm attachment modal')
     expect(mockTrackProtocolRunEvent).toBeCalledTimes(0)
+  })
+
+  it('renders the confirm attachment modal when there is a heater shaker in the protocol and the heater shaker is idle status and run is paused', () => {
+    when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_PAUSED)
+
+    mockUseModulesQuery.mockReturnValue({
+      data: { data: [mockHeaterShaker] },
+    } as any)
+    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
+    const [{ queryByText, getByRole }] = render()
+
+    const button = getByRole('button', { name: 'Resume run' })
+    fireEvent.click(button)
+    expect(queryByText('mock confirm attachment modal')).toBeFalsy()
+    expect(mockTrackProtocolRunEvent).toBeCalledTimes(1)
   })
 
   it('does NOT render confirm attachment modal when the user already confirmed the heater shaker is attached', () => {

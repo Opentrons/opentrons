@@ -80,7 +80,7 @@ export const RobotOverviewOverflowMenu = (
 
   return (
     <Flex
-      data-testid={`RobotOverview_overflowMenu`}
+      data-testid="RobotOverview_overflowMenu"
       position={POSITION_RELATIVE}
       onClick={e => {
         e.preventDefault()
@@ -137,7 +137,7 @@ export const RobotOverviewOverflowMenu = (
               </MenuItem>
             </>
           )}
-          <Divider marginY={'0'} />
+          <Divider marginY="0" />
           <MenuItem
             onClick={() =>
               history.push(`/devices/${robot.name}/robot-settings`)

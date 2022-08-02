@@ -19,6 +19,7 @@ import {
   useProtocolDetailsForRun,
 } from '../../../Devices/hooks'
 import { getLabwareLocation } from '../../../Devices/ProtocolRun/utils/getLabwareLocation'
+import { getModuleInitialLoadInfo } from '../../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
 import { useSteps } from '../useSteps'
 import { useLabwarePositionCheck } from '../useLabwarePositionCheck'
 
@@ -31,6 +32,7 @@ jest.mock('../../../../redux/modules')
 jest.mock('../../../Devices/hooks')
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../../../Devices/ProtocolRun/utils/getLabwareLocation')
+jest.mock('../../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo')
 jest.mock('../useSteps')
 
 const queryClient = new QueryClient()
@@ -66,6 +68,9 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 >
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
+>
+const mockGetModuleInitialLoadInfo = getModuleInitialLoadInfo as jest.MockedFunction<
+  typeof getModuleInitialLoadInfo
 >
 let mockTrackEvent: jest.Mock
 describe('useLabwarePositionCheck', () => {
@@ -143,6 +148,83 @@ describe('useLabwarePositionCheck', () => {
       expect(mockTrackEvent).toHaveBeenCalledWith({
         name: 'LabwarePositionCheckStarted',
         properties: {},
+      })
+    })
+    it('should stop the heater shaker from shaking and close its labware latch', async () => {
+      mockGetModuleInitialLoadInfo.mockReturnValue({
+        location: { slotName: 'does not matter' },
+      } as any)
+      when(mockUseSteps)
+        .calledWith(MOCK_RUN_ID)
+        .mockReturnValue([
+          {
+            commands: [
+              // this first movement command always gets executed after prep commands get executed
+              {
+                commandType: 'pickUpTip',
+                params: {
+                  pipetteId: MOCK_PIPETTE_ID,
+                  labwareId: MOCK_LABWARE_ID,
+                },
+              },
+              {
+                commandType: 'heaterShaker/deactivateShaker',
+                params: {
+                  moduleId: 'hs_id',
+                },
+              },
+              {
+                commandType: 'heaterShaker/closeLabwareLatch',
+                params: {
+                  moduleId: 'hs_id',
+                },
+              },
+            ],
+            labwareId: MOCK_LABWARE_ID,
+            section: 'PRIMARY_PIPETTE_TIPRACKS',
+          } as LabwarePositionCheckStep,
+        ])
+      const { result, waitForNextUpdate } = renderHook(
+        () => useLabwarePositionCheck(() => null, {}),
+        { wrapper }
+      )
+      if ('error' in result.current) {
+        throw new Error('error should not be present')
+      }
+      const { beginLPC } = result.current
+      // HS commands should not be called until beginLPC is called
+
+      expect(mockCreateCommand).not.toHaveBeenCalledWith({
+        runId: MOCK_RUN_ID,
+        command: {
+          commandType: 'heaterShaker/deactivateShaker',
+          params: { moduleId: 'hs_id' },
+        },
+      })
+      expect(mockCreateCommand).not.toHaveBeenCalledWith({
+        runId: MOCK_RUN_ID,
+        command: {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: { moduleId: 'hs_id' },
+        },
+      })
+
+      beginLPC()
+      await waitForNextUpdate()
+
+      expect(mockCreateCommand).toHaveBeenCalledWith({
+        runId: MOCK_RUN_ID,
+        command: {
+          commandType: 'heaterShaker/deactivateShaker',
+          params: { moduleId: 'hs_id' },
+        },
+      })
+      expect(mockCreateCommand).toHaveBeenCalledWith({
+        runId: MOCK_RUN_ID,
+        command: {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: { moduleId: 'hs_id' },
+        },
       })
     })
   })

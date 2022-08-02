@@ -213,14 +213,14 @@ export function AdvancedSettings(): JSX.Element {
           {showSuccessToast && (
             <Toast
               message={t('successfully_deleted_unavail_robots')}
-              type={'success'}
+              type="success"
               onClose={() => setShowSuccessToast(false)}
             />
           )}
           {showErrorToast && (
             <Toast
               message={t('no_unavail_robots_to_clear')}
-              type={'error'}
+              type="error"
               onClose={() => setShowErrorToast(false)}
             />
           )}
@@ -239,8 +239,7 @@ export function AdvancedSettings(): JSX.Element {
                 >
                   <Flex
                     paddingRight={SPACING.spacing2}
-                    data-testid={`AdvancedSettings_ConfirmClear_Cancel
-                    `}
+                    data-testid="AdvancedSettings_ConfirmClear_Cancel"
                   >
                     <Btn
                       onClick={cancelExit}
@@ -252,7 +251,7 @@ export function AdvancedSettings(): JSX.Element {
                       {t('shared:cancel')}
                     </Btn>
                   </Flex>
-                  <Flex data-testid={`AdvancedSettings_ConfirmClear_Proceed`}>
+                  <Flex data-testid="AdvancedSettings_ConfirmClear_Proceed">
                     <AlertPrimaryButton onClick={confirmDeleteUnavailRobots}>
                       {t('clear_confirm')}
                     </AlertPrimaryButton>

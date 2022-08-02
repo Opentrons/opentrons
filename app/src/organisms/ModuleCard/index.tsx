@@ -222,23 +222,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       backgroundColor={COLORS.background}
       borderRadius={SPACING.spacing2}
       marginBottom={SPACING.spacing3}
-      width={'100%'}
+      width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >
-      {showWizard &&
-        module.moduleType === HEATERSHAKER_MODULE_TYPE &&
-        (currentRunId != null ? (
-          <HeaterShakerWizard
-            onCloseClick={() => setShowWizard(false)}
-            currentRunId={currentRunId}
-            attachedModule={module}
-          />
-        ) : (
-          <HeaterShakerWizard
-            onCloseClick={() => setShowWizard(false)}
-            attachedModule={module}
-          />
-        ))}
+      {showWizard && module.moduleType === HEATERSHAKER_MODULE_TYPE && (
+        <HeaterShakerWizard
+          onCloseClick={() => setShowWizard(false)}
+          attachedModule={module}
+        />
+      )}
       {showSlideout && (
         <ModuleSlideout
           module={module}

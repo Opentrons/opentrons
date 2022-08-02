@@ -100,7 +100,6 @@ const LabwarePositionCheckComponent = (
           alertOverlay
         >
           <Box>
-            <Text>{t('error_modal_text')}</Text>
             <Text marginTop={SPACING_2}>Error: {error.message}</Text>
           </Box>
         </AlertModal>
@@ -293,7 +292,9 @@ function CrashingErrorModal(props: CrashingErrorModalProps): JSX.Element {
       >
         <Box>
           <Text>{t('error_modal_problem_in_app')}</Text>
-          <Text marginTop={SPACING_2}>Error: {props.errorMessage}</Text>
+          <Text marginTop={SPACING_2}>
+            `${t('shared:error')}: ${props.errorMessage}`
+          </Text>
         </Box>
       </AlertModal>
     </Portal>

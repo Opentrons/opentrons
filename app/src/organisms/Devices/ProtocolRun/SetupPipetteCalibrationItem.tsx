@@ -100,7 +100,7 @@ export function SetupPipetteCalibrationItem({
         <ExternalLink
           css={TYPOGRAPHY.pSemiBold}
           href={inexactPipetteSupportArticle}
-          id={'PipetteCalibration_pipetteMismatchHelpLink'}
+          id="PipetteCalibration_pipetteMismatchHelpLink"
         >
           {t('pipette_compat_help')}
         </ExternalLink>
@@ -117,7 +117,7 @@ export function SetupPipetteCalibrationItem({
         <TertiaryButton
           as={RRDLink}
           to={deviceDetailsUrl}
-          id={'PipetteCalibration_attachPipetteButton'}
+          id="PipetteCalibration_attachPipetteButton"
         >
           {t('attach_pipette_cta')}
         </TertiaryButton>
@@ -131,7 +131,7 @@ export function SetupPipetteCalibrationItem({
           <TertiaryButton
             onClick={() => startPipetteOffsetCalibrationBlockModal(null)}
             disabled={!isDeckCalibrated}
-            id={'PipetteCalibration_calibratePipetteButton'}
+            id="PipetteCalibration_calibratePipetteButton"
             {...targetProps}
           >
             {t('calibrate_now_cta')}

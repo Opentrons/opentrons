@@ -58,7 +58,6 @@ from opentrons.hardware_control.dev_types import (
     AttachedGripper,
     OT3AttachedInstruments,
 )
-from opentrons_hardware.drivers.gpio import OT3GPIO
 
 log = logging.getLogger(__name__)
 
@@ -115,7 +114,6 @@ class OT3Simulator:
         """
         self._configuration = config
         self._loop = loop
-        self._gpio_dev = OT3GPIO()
         self._strict_attached = bool(strict_attached_instruments)
         self._stubbed_attached_modules = attached_modules
 
@@ -155,11 +153,6 @@ class OT3Simulator:
         self._encoder_position = self._get_home_position()
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
-
-    @property
-    def gpio_chardev(self) -> OT3GPIO:
-        """Get the GPIO device."""
-        return self._gpio_dev
 
     @property
     def board_revision(self) -> BoardRevision:

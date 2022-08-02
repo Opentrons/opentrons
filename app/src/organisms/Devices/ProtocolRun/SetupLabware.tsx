@@ -210,7 +210,6 @@ export function SetupLabware({
             <ModuleExtraAttention
               moduleTypes={moduleTypesThatRequireExtraAttention}
               modulesInfo={moduleRenderInfoById}
-              runId={runId}
             />
           ) : null}
           <Box margin="0 auto" maxWidth="46.25rem" width="100%">
@@ -218,7 +217,7 @@ export function SetupLabware({
               deckDef={(standardDeckDef as unknown) as DeckDefinition}
               viewBox={DECK_MAP_VIEWBOX}
               deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-              id={'LabwareSetup_deckMap'}
+              id="LabwareSetup_deckMap"
             >
               {() => (
                 <>
@@ -320,7 +319,7 @@ export function SetupLabware({
                     css={TYPOGRAPHY.labelSemiBold}
                     color={COLORS.darkBlack}
                     onClick={() => showDownloadOffsetDataModal(true)}
-                    id={'DownloadOffsetData'}
+                    id="DownloadOffsetData"
                   >
                     {t('get_labware_offset_data')}
                   </Link>
@@ -338,7 +337,7 @@ export function SetupLabware({
                   role="link"
                   css={TYPOGRAPHY.darkLinkLabelSemiBold}
                   onClick={() => setShowLabwareHelpModal(true)}
-                  data-test={'LabwareSetup_helpLink'}
+                  data-test="LabwareSetup_helpLink"
                 >
                   {t('labware_help_link_title')}
                 </Link>
@@ -350,7 +349,7 @@ export function SetupLabware({
                       setShowLabwarePositionCheckModal(true)
                       setIsShowingLPCSuccessToast(false)
                     }}
-                    id={'LabwareSetup_checkLabwarePositionsButton'}
+                    id="LabwareSetup_checkLabwarePositionsButton"
                     {...targetProps}
                     disabled={lpcDisabledReason !== null}
                   >

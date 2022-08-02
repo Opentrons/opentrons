@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { COLORS } from '@opentrons/components'
 import { Divider } from '../../../../../atoms/structure/Divider'
 import { HeaterShakerWizard } from '../../../../Devices/HeaterShakerWizard'
-import { useCurrentRunId } from '../../../../ProtocolUpload/hooks'
 import { ModuleRenderInfoForProtocol } from '../../../../Devices/hooks'
 import { Banner, BannerItem } from '../Banner/Banner'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
@@ -18,10 +17,7 @@ export function HeaterShakerBanner(
 ): JSX.Element | null {
   const [wizardId, setWizardId] = React.useState<String | null>(null)
   const { displayName, modules } = props
-  const currentRunId = useCurrentRunId()
   const { t } = useTranslation('heater_shaker')
-
-  if (currentRunId == null) return null
 
   return (
     <Banner title={t('attach_heater_shaker_to_deck', { name: displayName })}>
@@ -33,7 +29,6 @@ export function HeaterShakerBanner(
               <HeaterShakerWizard
                 onCloseClick={() => setWizardId(null)}
                 moduleFromProtocol={module}
-                currentRunId={currentRunId}
                 attachedModule={module.attachedModuleMatch}
               />
             )}

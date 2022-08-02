@@ -91,7 +91,9 @@ export const LabwarePositionCheckStepDetail = (
     (
       command: LabwarePositionCheckCreateCommand
     ): command is LabwarePositionCheckMovementCommand =>
-      command.commandType !== 'thermocycler/openLid'
+      command.commandType !== 'thermocycler/openLid' &&
+      command.commandType !== 'heaterShaker/deactivateShaker' &&
+      command.commandType !== 'heaterShaker/closeLabwareLatch'
   )
   const command = stepMovementCommands[0]
 
@@ -206,7 +208,7 @@ export const LabwarePositionCheckStepDetail = (
                 fontSize={FONT_SIZE_BODY_2}
                 color={COLORS.blue}
                 onClick={() => setShowJogControls(true)}
-                id={`LabwarePositionCheckStepDetail_reveal_jog_controls`}
+                id="LabwarePositionCheckStepDetail_reveal_jog_controls"
               >
                 {t('reveal_jog_controls')}
               </Link>
