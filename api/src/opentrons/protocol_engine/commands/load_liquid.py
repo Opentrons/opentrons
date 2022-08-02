@@ -1,16 +1,9 @@
 """Load liquid command request, result, and implementation models."""
-from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from opentrons.protocols.models import LabwareDefinition
-
-from ..types import LabwareLocation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-
-if TYPE_CHECKING:
-    from ..execution import EquipmentHandler
 
 
 LoadLiquidCommandType = Literal["loadLiquid"]
@@ -39,7 +32,7 @@ class LoadLiquidParams(BaseModel):
     )
     volumeByWell: VolumeByWell = Field(
         ...,
-        description="Unique identifier of labware to load liquid into.",
+        description="Well and associated liquid volume.",
     )
 
 
@@ -73,20 +66,20 @@ class LoadLiquidImplementation(
         )
 
 #
-# class LoadLabware(BaseCommand[LoadLabwareParams, LoadLabwareResult]):
-#     """Load labware command resource model."""
-#
-#     commandType: LoadLabwareCommandType = "loadLabware"
-#     params: LoadLabwareParams
-#     result: Optional[LoadLabwareResult]
-#
-#     _ImplementationCls: Type[LoadLabwareImplementation] = LoadLabwareImplementation
-#
-#
-# class LoadLabwareCreate(BaseCommandCreate[LoadLabwareParams]):
-#     """Load labware command creation request."""
-#
-#     commandType: LoadLabwareCommandType = "loadLabware"
-#     params: LoadLabwareParams
-#
-#     _CommandCls: Type[LoadLabware] = LoadLabware
+class LoadLiquid(BaseCommand[LoadLiquidParams, LoadLiquidResult]):
+    """Load liquid command resource model."""
+
+    commandType: LoadLiquidCommandType = "loadLiquid"
+    params: LoadLiquidParams
+    result: Optional[LoadLiquidResult]
+
+    _ImplementationCls: Type[LoadLiquidImplementation] = LoadLiquidImplementation
+
+
+class LoadLabwareCreate(BaseCommandCreate[LoadLiquidParams]):
+    """Load liquid command creation request."""
+
+    commandType: LoadLiquidCommandType = "loadLiquid"
+    params: LoadLiquidParams
+
+    _CommandCls: Type[LoadLiquid] = LoadLiquid
