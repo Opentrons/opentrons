@@ -949,7 +949,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
 
         NOTE:
         1. This command will retract the pipettes up if they are parked east or west
-           of the heater-shaker.
+           of the Heater-Shaker.
         2. The labware latch needs to be closed before:
             * Shaking
             * Pipetting to or from the labware on the Heater-Shaker
