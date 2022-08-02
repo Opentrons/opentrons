@@ -20,7 +20,6 @@ import {
   useProtocolDetailsForRun,
   useRunStatuses,
 } from '../../Devices/hooks'
-import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import {
   useLatchControls,
   useModuleOverflowMenu,
@@ -202,7 +201,6 @@ const mockTCLidHeating = {
 describe('useLatchControls', () => {
   const store: Store<any> = createStore(jest.fn(), {})
   let mockCreateLiveCommand = jest.fn()
-  let mockCreateCommand = jest.fn()
 
   beforeEach(() => {
     store.dispatch = jest.fn()
@@ -217,11 +215,6 @@ describe('useLatchControls', () => {
       createLiveCommand: mockCreateLiveCommand,
     } as any)
     mockUseIsRobotBusy.mockReturnValue(false)
-    mockCreateCommand = jest.fn()
-    mockCreateCommand.mockResolvedValue(null)
-    mockUseCreateCommandMutation.mockReturnValue({
-      createCommand: mockCreateCommand,
-    } as any)
   })
 
   afterEach(() => {
@@ -270,39 +263,6 @@ describe('useLatchControls', () => {
     expect(isLatchClosed).toBe(true)
     act(() => result.current.toggleLatch())
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'heaterShaker/openLabwareLatch',
-        params: {
-          moduleId: mockCloseLatchHeaterShaker.id,
-        },
-      },
-    })
-  })
-
-  it('should return if latch is closed and handle latch function opens latch when run is idle', () => {
-    mockUseRunStatuses.mockReturnValue({
-      isRunStill: false,
-      isRunIdle: true,
-      isRunTerminal: false,
-    })
-
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <I18nextProvider i18n={i18n}>
-        <Provider store={store}>{children}</Provider>
-      </I18nextProvider>
-    )
-    const { result } = renderHook(
-      () => useLatchControls(mockCloseLatchHeaterShaker, RUN_ID_1),
-      {
-        wrapper,
-      }
-    )
-    const { isLatchClosed } = result.current
-
-    expect(isLatchClosed).toBe(true)
-    act(() => result.current.toggleLatch())
-    expect(mockCreateCommand).toHaveBeenCalledWith({
-      runId: RUN_ID_1,
       command: {
         commandType: 'heaterShaker/openLabwareLatch',
         params: {

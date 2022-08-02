@@ -240,15 +240,20 @@ export function ProtocolRunHeader({
     }
   }, [analysisErrors])
 
+  const isIdle = runStatus === RUN_STATUS_IDLE
+
   const handlePlayButtonClick = (): void => {
     if (isShaking) {
       setShowIsShakingModal(true)
-    } else if (isHeaterShakerInProtocol && !isShaking) {
+    } else if (
+      isHeaterShakerInProtocol &&
+      !isShaking &&
+      (isIdle || runStatus === RUN_STATUS_STOPPED)
+    ) {
       confirmAttachment()
     } else {
       play()
 
-      const isIdle = runStatus === RUN_STATUS_IDLE
       const eventProperties =
         isIdle && robotAnalyticsData != null ? robotAnalyticsData : {}
       const eventName = isIdle ? 'runStart' : 'runResume'

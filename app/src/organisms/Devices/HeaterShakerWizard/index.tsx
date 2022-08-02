@@ -30,13 +30,12 @@ import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProt
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
   moduleFromProtocol?: ProtocolModuleInfo
-  currentRunId?: string
 }
 
 export const HeaterShakerWizard = (
   props: HeaterShakerWizardProps
 ): JSX.Element | null => {
-  const { onCloseClick, moduleFromProtocol, currentRunId } = props
+  const { onCloseClick, moduleFromProtocol } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
   const { robotName } = useParams<NavRouteParams>()
@@ -92,9 +91,7 @@ export const HeaterShakerWizard = (
         buttonContent = t('btn_test_shake')
         return (
           // heaterShaker should never be null because isPrimaryCTAEnabled would be disabled otherwise
-          heaterShaker != null ? (
-            <AttachAdapter module={heaterShaker} currentRunId={currentRunId} />
-          ) : null
+          heaterShaker != null ? <AttachAdapter module={heaterShaker} /> : null
         )
       case 5:
         buttonContent = t('complete')
@@ -103,7 +100,6 @@ export const HeaterShakerWizard = (
             module={heaterShaker}
             setCurrentPage={setCurrentPage}
             moduleFromProtocol={moduleFromProtocol}
-            currentRunId={currentRunId}
           />
         ) : null
       default:
