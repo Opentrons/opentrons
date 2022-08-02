@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { Link as RRDLink } from 'react-router-dom'
 import {
   Box,
@@ -10,20 +10,17 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  JUSTIFY_CENTER,
   SIZE_4,
   TOOLTIP_LEFT,
   TYPOGRAPHY,
-  ALIGN_FLEX_START,
   Link,
   COLORS,
   SPACING,
-  IconProps,
+  JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
 import { TertiaryButton } from '../../../atoms/buttons'
-import { StyledText } from '../../../atoms/text'
 import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../../organisms/CalibrationPanels'
 import { useCalibratePipetteOffset } from '../../../organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
@@ -34,7 +31,6 @@ import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
 import type { PipetteInfo } from '../hooks'
-import { Toast } from '../../../atoms/Toast'
 
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/s/article/GEN2-pipette-compatibility'
@@ -56,7 +52,6 @@ export function SetupPipetteCalibrationItem({
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
   const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
   const deviceDetailsUrl = `/devices/${robotName}`
-  const bannerIcon: IconProps = { name: 'ot-alert' }
 
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
 
@@ -100,13 +95,14 @@ export function SetupPipetteCalibrationItem({
   if (pipetteMismatch) {
     pipetteMismatchInfo = (
       <Flex alignItems={ALIGN_CENTER}>
-        <Banner type="warning">
+        <Banner type="warning" padding={SPACING.spacing2}>
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p"> {t('pipette_mismatch')}</StyledText>
+            {t('pipette_mismatch')}
             <Link
               external
               color={COLORS.darkBlack}
-              css={TYPOGRAPHY.pRegular}
+              fontSize={TYPOGRAPHY.fontSizeP}
+              lineHeight={TYPOGRAPHY.lineHeight12}
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               href={inexactPipetteSupportArticle}
               id="PipetteCalibration_pipetteMismatchHelpLink"
@@ -115,25 +111,6 @@ export function SetupPipetteCalibrationItem({
             </Link>
           </Flex>
         </Banner>
-        {/* <Toast
-          type={'warning'}
-          icon={bannerIcon}
-          message={
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="p"> {t('pipette_mismatch')}</StyledText>
-              <Link
-                external
-                color={COLORS.darkBlack}
-                css={TYPOGRAPHY.pRegular}
-                textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                href={inexactPipetteSupportArticle}
-                id="PipetteCalibration_pipetteMismatchHelpLink"
-              >
-                {t('learn_more')}
-              </Link>
-            </Flex>
-          }
-        /> */}
       </Flex>
     )
   }
@@ -156,7 +133,15 @@ export function SetupPipetteCalibrationItem({
   } else {
     button = (
       <>
-        <Flex alignItems={ALIGN_CENTER}>
+        <Flex
+          alignItems={ALIGN_CENTER}
+          marginLeft={SPACING.spacing4}
+          flexWrap="wrap-reverse"
+          justifyContent={JUSTIFY_FLEX_END}
+          gridGap={SPACING.spacing3}
+        >
+          <Flex>{pipetteMismatchInfo}</Flex>
+
           <TertiaryButton
             onClick={() => startPipetteOffsetCalibrationBlockModal(null)}
             disabled={!isDeckCalibrated}
@@ -165,6 +150,7 @@ export function SetupPipetteCalibrationItem({
           >
             {t('calibrate_now_cta')}
           </TertiaryButton>
+
           {!isDeckCalibrated ? (
             <Tooltip {...tooltipProps}>
               <Box width={SIZE_4}>
@@ -180,7 +166,6 @@ export function SetupPipetteCalibrationItem({
   return (
     <>
       <SetupCalibrationItem
-        banner={pipetteMismatch ? pipetteMismatchInfo : undefined}
         button={button}
         calibratedDate={attached ? pipetteInfo.pipetteCalDate : null}
         subText={subText}

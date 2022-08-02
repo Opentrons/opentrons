@@ -74,6 +74,7 @@ export function Banner(props: BannerProps): JSX.Element {
     icon,
     children,
     isCloseActionLoading,
+    padding,
     ...styleProps
   } = props
   const bannerProps = BANNER_PROPS_BY_TYPE[type]
@@ -95,7 +96,7 @@ export function Banner(props: BannerProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      padding={SPACING.spacing3}
+      padding={padding ?? SPACING.spacing3}
       onClick={e => e.stopPropagation()}
       data-testid={`Banner_${type}`}
       {...styleProps}
