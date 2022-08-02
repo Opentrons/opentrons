@@ -145,7 +145,7 @@ const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as jest.Mo
 const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
   typeof ConfirmCancelModal
 >
-const mockMockHeaterShakerIsRunningModal = HeaterShakerIsRunningModal as jest.MockedFunction<
+const mockHeaterShakerIsRunningModal = HeaterShakerIsRunningModal as jest.MockedFunction<
   typeof HeaterShakerIsRunningModal
 >
 const mockUseIsHeaterShakerInProtocol = useIsHeaterShakerInProtocol as jest.MockedFunction<
@@ -228,7 +228,7 @@ describe('ProtocolRunHeader', () => {
 
     when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
     mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
-    mockMockHeaterShakerIsRunningModal.mockReturnValue(
+    mockHeaterShakerIsRunningModal.mockReturnValue(
       <div>Mock HeaterShakerIsRunningModal</div>
     )
     mockUseModulesQuery.mockReturnValue({
@@ -665,7 +665,7 @@ describe('ProtocolRunHeader', () => {
 
   it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', () => {
     when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
-
+    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
     mockUseModulesQuery.mockReturnValue({
       data: { data: [mockMovingHeaterShaker] },
     } as any)

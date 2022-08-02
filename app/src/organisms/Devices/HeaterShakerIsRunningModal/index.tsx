@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useCreateCommandMutation } from '@opentrons/react-api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   Icon,
   COLORS,
@@ -11,12 +11,13 @@ import {
   TYPOGRAPHY,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { useHeaterShakerModuleIdsFromRun } from './hooks'
+import { useAttachedModules } from '../hooks'
 import { Modal } from '../../../atoms/Modal'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
 import { HeaterShakerModule } from '../../../redux/modules/types'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
@@ -24,16 +25,23 @@ interface HeaterShakerIsRunningModalProps {
   closeModal: () => void
   module: HeaterShakerModule
   startRun: () => void
-  currentRunId: string
 }
 
 export const HeaterShakerIsRunningModal = (
   props: HeaterShakerIsRunningModalProps
 ): JSX.Element => {
-  const { closeModal, module, startRun, currentRunId } = props
+  const { closeModal, module, startRun } = props
   const { t } = useTranslation('heater_shaker')
-  const { createCommand } = useCreateCommandMutation()
-  const { moduleIdsFromRun } = useHeaterShakerModuleIdsFromRun(currentRunId)
+  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const attachedModules = useAttachedModules()
+  const moduleIds = attachedModules
+    .filter(
+      (module): module is HeaterShakerModule =>
+        module.moduleType === HEATERSHAKER_MODULE_TYPE &&
+        module?.data != null &&
+        module.data.speedStatus !== 'idle'
+    )
+    .map(module => module.id)
 
   const title = (
     <Flex flexDirection={DIRECTION_ROW}>
@@ -54,16 +62,15 @@ export const HeaterShakerIsRunningModal = (
   }
 
   const handleStopShake = (): void => {
-    moduleIdsFromRun.forEach(moduleIdFromRun => {
+    moduleIds.forEach(moduleId => {
       const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
         commandType: 'heaterShaker/deactivateShaker',
         params: {
-          moduleId: moduleIdFromRun,
+          moduleId: moduleId,
         },
       }
 
-      createCommand({
-        runId: currentRunId,
+      createLiveCommand({
         command: stopShakeCommand,
       }).catch((e: Error) => {
         console.error(

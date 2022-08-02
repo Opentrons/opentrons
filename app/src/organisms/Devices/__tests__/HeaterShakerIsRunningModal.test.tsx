@@ -2,32 +2,72 @@ import * as React from 'react'
 import { i18n } from '../../../i18n'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { useCreateCommandMutation } from '@opentrons/react-api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
 import { HeaterShakerIsRunningModal } from '../HeaterShakerIsRunningModal'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
-import { useProtocolDetailsForRun } from '../hooks'
-import { useHeaterShakerModuleIdsFromRun } from '../HeaterShakerIsRunningModal/hooks'
+import { useAttachedModules, useProtocolDetailsForRun } from '../hooks'
 
 jest.mock('@opentrons/react-api-client')
-jest.mock('../HeaterShakerIsRunningModal/hooks')
 jest.mock('../hooks')
 jest.mock('../HeaterShakerWizard/HeaterShakerModuleCard')
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
 >
-const mockUseHeaterShakerModuleIdsFromRun = useHeaterShakerModuleIdsFromRun as jest.MockedFunction<
-  typeof useHeaterShakerModuleIdsFromRun
+const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
+  typeof useCreateLiveCommandMutation
 >
-const mockUseCreateCommandMutation = useCreateCommandMutation as jest.MockedFunction<
-  typeof useCreateCommandMutation
+const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
+  typeof useAttachedModules
 >
 const mockHeaterShakerModuleCard = HeaterShakerModuleCard as jest.MockedFunction<
   typeof HeaterShakerModuleCard
 >
 
-const RUN_ID = '1'
+const mockMovingHeaterShakerOne = {
+  id: 'heatershaker_id_1',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_closed',
+    speedStatus: 'speeding up',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemperature: null,
+    targetSpeed: null,
+    targetTemp: null,
+    errorDetails: null,
+    status: 'idle',
+  },
+  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
+} as any
+
+const mockMovingHeaterShakerTwo = {
+  id: 'heatershaker_id_2',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_closed',
+    speedStatus: 'speeding up',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemperature: null,
+    targetSpeed: null,
+    targetTemp: null,
+    errorDetails: null,
+    status: 'idle',
+  },
+  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
+} as any
 
 const render = (
   props: React.ComponentProps<typeof HeaterShakerIsRunningModal>
@@ -39,20 +79,21 @@ const render = (
 
 describe('HeaterShakerIsRunningModal', () => {
   let props: React.ComponentProps<typeof HeaterShakerIsRunningModal>
-  const mockCreateCommand = jest.fn()
+  let mockCreateLiveCommand = jest.fn()
   beforeEach(() => {
     props = {
       closeModal: jest.fn(),
       module: mockHeaterShaker,
       startRun: jest.fn(),
-      currentRunId: RUN_ID,
     }
     mockHeaterShakerModuleCard.mockReturnValue(
       <div>mock HeaterShakerModuleCard</div>
     )
-    mockCreateCommand.mockResolvedValue(null)
-    mockUseCreateCommandMutation.mockReturnValue({
-      createCommand: mockCreateCommand,
+    mockUseAttachedModules.mockReturnValue([mockMovingHeaterShakerOne])
+    mockCreateLiveCommand = jest.fn()
+    mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseLiveCommandMutation.mockReturnValue({
+      createLiveCommand: mockCreateLiveCommand,
     } as any)
     mockUseProtocolDetailsForRun.mockReturnValue({
       protocolData: {
@@ -91,9 +132,6 @@ describe('HeaterShakerIsRunningModal', () => {
         ],
       },
     } as any)
-    mockUseHeaterShakerModuleIdsFromRun.mockReturnValue({
-      moduleIdsFromRun: ['heatershaker_id'],
-    })
   })
 
   afterEach(() => {
@@ -120,29 +158,29 @@ describe('HeaterShakerIsRunningModal', () => {
       name: /Stop shaking and start run/i,
     })
     fireEvent.click(button)
-    expect(mockCreateCommand).toHaveBeenCalledWith({
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'heaterShaker/deactivateShaker',
         params: {
-          moduleId: mockHeaterShaker.id,
+          moduleId: mockMovingHeaterShakerOne.id,
         },
       },
-      runId: RUN_ID,
     })
     expect(props.startRun).toHaveBeenCalled()
     expect(props.closeModal).toHaveBeenCalled()
   })
 
   it('should call the stop shaker command twice for two heater shakers', () => {
-    mockUseHeaterShakerModuleIdsFromRun.mockReturnValue({
-      moduleIdsFromRun: ['heatershaker_id_1', 'heatershaker_id_2'],
-    })
+    mockUseAttachedModules.mockReturnValue([
+      mockMovingHeaterShakerOne,
+      mockMovingHeaterShakerTwo,
+    ])
     const { getByRole } = render(props)
     const button = getByRole('button', {
       name: /Stop shaking and start run/i,
     })
     fireEvent.click(button)
-    expect(mockCreateCommand).toHaveBeenCalledTimes(2)
+    expect(mockCreateLiveCommand).toHaveBeenCalledTimes(2)
   })
 
   it('renders the keep shaking and start run button and calls startRun and closeModal', () => {

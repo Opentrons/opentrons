@@ -205,9 +205,11 @@ export function ProtocolRunHeader({
   const [showIsShakingModal, setShowIsShakingModal] = React.useState<boolean>(
     false
   )
-  const heaterShaker = attachedModules.find(
+  const activeHeaterShaker = attachedModules.find(
     (module): module is HeaterShakerModule =>
-      module.moduleType === HEATERSHAKER_MODULE_TYPE
+      module.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      module?.data != null &&
+      module.data.speedStatus !== 'idle'
   )
   const isShaking = attachedModules
     .filter(
@@ -609,14 +611,13 @@ export function ProtocolRunHeader({
           />
         </Box>
         {showIsShakingModal &&
-          heaterShaker != null &&
+          activeHeaterShaker != null &&
           isHeaterShakerInProtocol &&
           runId != null && (
             <HeaterShakerIsRunningModal
               closeModal={() => setShowIsShakingModal(false)}
-              module={heaterShaker}
+              module={activeHeaterShaker}
               startRun={play}
-              currentRunId={runId}
             />
           )}
         <Box marginLeft={SPACING_AUTO}>
