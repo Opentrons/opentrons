@@ -17,6 +17,7 @@ import {
   COLORS,
   SPACING,
   JUSTIFY_FLEX_END,
+  WRAP,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
@@ -134,12 +135,11 @@ export function SetupPipetteCalibrationItem({
         <Flex
           alignItems={ALIGN_CENTER}
           marginLeft={SPACING.spacing4}
-          flexWrap="wrap-reverse"
+          flexWrap={WRAP}
           justifyContent={JUSTIFY_FLEX_END}
           gridGap={SPACING.spacing3}
         >
           <Flex>{pipetteMismatchInfo}</Flex>
-
           <TertiaryButton
             onClick={() => startPipetteOffsetCalibrationBlockModal(null)}
             disabled={!isDeckCalibrated}
