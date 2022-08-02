@@ -11,11 +11,11 @@ import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
+import { getSlotLabwareName } from '../../utils/getSlotLabwareName'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import {
   getTotalVolumePerLiquidId,
   getTotalVolumePerLiquidLabwarePair,
-  getSlotLabwareName,
 } from '../utils'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 
@@ -47,6 +47,7 @@ const MOCK_LABWARE_INFO_BY_LIQUID_ID = {
 }
 
 jest.mock('../utils')
+jest.mock('../../utils/getSlotLabwareName')
 jest.mock('../LiquidsLabwareDetailsModal')
 jest.mock('@opentrons/api-client')
 

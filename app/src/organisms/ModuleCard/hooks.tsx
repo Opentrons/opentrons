@@ -53,17 +53,8 @@ interface LatchControls {
   isLatchClosed: boolean
 }
 
-export function useLatchControls(
-  module: AttachedModule,
-  runId?: string | null
-): LatchControls {
+export function useLatchControls(module: AttachedModule): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { createCommand } = useCreateCommandMutation()
-  const { isRunIdle } = useRunStatuses()
-  const { moduleIdFromRun } = useModuleIdFromRun(
-    module,
-    runId != null ? runId : null
-  )
   const isLatchClosed =
     module.moduleType === 'heaterShakerModuleType' &&
     (module.data.labwareLatchStatus === 'idle_closed' ||
@@ -76,30 +67,20 @@ export function useLatchControls(
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',
     params: {
-      moduleId: isRunIdle ? moduleIdFromRun : module.id,
+      moduleId: module.id,
     },
   }
 
   const toggleLatch = (): void => {
-    if (runId != null && isRunIdle) {
-      createCommand({
-        runId: runId,
-        command: latchCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${latchCommand.commandType} and run id ${runId}: ${e.message}`
-        )
-      })
-    } else {
-      createLiveCommand({
-        command: latchCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
-        )
-      })
-    }
+    createLiveCommand({
+      command: latchCommand,
+    }).catch((e: Error) => {
+      console.error(
+        `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
+      )
+    })
   }
+
   return { toggleLatch, isLatchClosed }
 }
 export type MenuItemsByModuleType = {
@@ -135,7 +116,7 @@ export function useModuleOverflowMenu(
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
-  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
   const isLegacySessionInProgress = useIsLegacySessionInProgress()

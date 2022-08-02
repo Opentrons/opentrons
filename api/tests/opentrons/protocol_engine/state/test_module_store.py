@@ -81,6 +81,7 @@ def test_initial_state() -> None:
             ModuleModel.THERMOCYCLER_MODULE_V1,
             ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
+                is_lid_open=False,
                 target_block_temperature=None,
                 target_lid_temperature=None,
             ),
@@ -167,10 +168,12 @@ def test_load_module(
                 "data": {
                     "targetTemp": 123,
                     "lidTarget": 321,
+                    "lid": "open",
                 },
             },
             ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
+                is_lid_open=True,
                 target_block_temperature=123,
                 target_lid_temperature=321,
             ),
@@ -385,10 +388,10 @@ def test_handle_tempdeck_temperature_commands(
     }
 
 
-def test_handle_thermocycler_block_temperature_commands(
+def test_handle_thermocycler_temperature_commands(
     thermocycler_v1_def: ModuleDefinition,
 ) -> None:
-    """It should update Tempdeck's `plate_target_temperature` correctly."""
+    """It should update thermocycler's temperature statuses correctly."""
     load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
         params=commands.LoadModuleParams(
             model=ModuleModel.THERMOCYCLER_MODULE_V1,
@@ -428,6 +431,7 @@ def test_handle_thermocycler_block_temperature_commands(
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
             module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=False,
             target_block_temperature=42.4,
             target_lid_temperature=None,
         )
@@ -436,6 +440,7 @@ def test_handle_thermocycler_block_temperature_commands(
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
             module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=False,
             target_block_temperature=42.4,
             target_lid_temperature=35.3,
         )
@@ -444,6 +449,7 @@ def test_handle_thermocycler_block_temperature_commands(
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
             module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=False,
             target_block_temperature=42.4,
             target_lid_temperature=None,
         )
@@ -452,6 +458,57 @@ def test_handle_thermocycler_block_temperature_commands(
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
             module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=False,
+            target_block_temperature=None,
+            target_lid_temperature=None,
+        )
+    }
+
+
+def test_handle_thermocycler_lid_commands(
+    thermocycler_v1_def: ModuleDefinition,
+) -> None:
+    """It should update thermocycler's lid status after executing lid commands."""
+    load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
+        params=commands.LoadModuleParams(
+            model=ModuleModel.THERMOCYCLER_MODULE_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        ),
+        result=commands.LoadModuleResult(
+            moduleId="module-id",
+            model=ModuleModel.THERMOCYCLER_MODULE_V1,
+            serialNumber="serial-number",
+            definition=thermocycler_v1_def,
+        ),
+    )
+
+    open_lid_cmd = tc_commands.OpenLid.construct(  # type: ignore[call-arg]
+        params=tc_commands.OpenLidParams(moduleId="module-id"),
+        result=tc_commands.OpenLidResult(),
+    )
+    close_lid_cmd = tc_commands.CloseLid.construct(  # type: ignore[call-arg]
+        params=tc_commands.CloseLidParams(moduleId="module-id"),
+        result=tc_commands.CloseLidResult(),
+    )
+
+    subject = ModuleStore()
+
+    subject.handle_action(actions.UpdateCommandAction(command=load_module_cmd))
+    subject.handle_action(actions.UpdateCommandAction(command=open_lid_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": ThermocyclerModuleSubState(
+            module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=True,
+            target_block_temperature=None,
+            target_lid_temperature=None,
+        )
+    }
+
+    subject.handle_action(actions.UpdateCommandAction(command=close_lid_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": ThermocyclerModuleSubState(
+            module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=False,
             target_block_temperature=None,
             target_lid_temperature=None,
         )
