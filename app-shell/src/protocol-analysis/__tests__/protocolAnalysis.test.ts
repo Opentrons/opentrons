@@ -1,6 +1,7 @@
 import { when, resetAllWhenMocks } from 'jest-when'
 import electron from 'electron'
 import * as ProtocolAnalysis from '@opentrons/app/src/redux/protocol-analysis'
+import * as Cfg from '@opentrons/app/src/redux/config'
 
 import * as Dialogs from '../../dialogs'
 import { Config, getConfig, handleConfigChange } from '../../config'
@@ -9,7 +10,11 @@ import { selectPythonPath, getPythonPath } from '../getPythonPath'
 import { executeAnalyzeCli } from '../executeAnalyzeCli'
 import { writeFailedAnalysis } from '../writeFailedAnalysis'
 
-import { registerProtocolAnalysis, analyzeProtocolSource } from '..'
+import {
+  registerProtocolAnalysis,
+  analyzeProtocolSource,
+  CONFIG_PYTHON_PATH_TO_PYTHON_OVERRIDE,
+} from '..'
 import { Dispatch } from '../../types'
 
 jest.mock('../../labware')
@@ -37,9 +42,11 @@ const mockGetValidLabwareFilePaths = getValidLabwareFilePaths as jest.MockedFunc
 const mockHandleConfigChange = handleConfigChange as jest.MockedFunction<
   typeof handleConfigChange
 >
-
-const showOpenDirectoryDialog = Dialogs.showOpenDirectoryDialog as jest.MockedFunction<
+const mockShowOpenDirectoryDialog = Dialogs.showOpenDirectoryDialog as jest.MockedFunction<
   typeof Dialogs.showOpenDirectoryDialog
+>
+const mockOpenDirectoryInFileExplorer = Dialogs.openDirectoryInFileExplorer as jest.MockedFunction<
+  typeof Dialogs.openDirectoryInFileExplorer
 >
 
 // wait a few ticks to let the mock Promises clear
@@ -59,7 +66,6 @@ describe('analyzeProtocolSource', () => {
       python: { pathToPythonOverride: '/some/override/python' },
     } as Config)
     handleAction = registerProtocolAnalysis(dispatch, mockMainWindow)
-    showOpenDirectoryDialog.mockResolvedValue([])
   })
 
   afterEach(() => {
@@ -132,12 +138,45 @@ describe('analyzeProtocolSource', () => {
     })
   })
 
-  it('opens file picker on CHANGE_PYTHON_PATH_OVERRIDE', () => {
+  it('should open file picker in response to CHANGE_PYTHON_PATH_OVERRIDE and not call dispatch if no directory is returned from showOpenDirectoryDialog', () => {
+    when(mockShowOpenDirectoryDialog)
+      .calledWith(mockMainWindow)
+      .mockResolvedValue([])
     handleAction(ProtocolAnalysis.changePythonPathOverrideConfig())
 
     return flush().then(() => {
-      expect(showOpenDirectoryDialog).toHaveBeenCalledWith(mockMainWindow)
+      expect(mockShowOpenDirectoryDialog).toHaveBeenCalledWith(mockMainWindow)
       expect(dispatch).not.toHaveBeenCalled()
+    })
+  })
+
+  it('should open file picker in response to CHANGE_PYTHON_PATH_OVERRIDE and call dispatch with directory returned from showOpenDirectoryDialog', () => {
+    when(mockShowOpenDirectoryDialog)
+      .calledWith(mockMainWindow)
+      .mockResolvedValue(['path/to/override'])
+    handleAction(ProtocolAnalysis.changePythonPathOverrideConfig())
+
+    return flush().then(() => {
+      expect(mockShowOpenDirectoryDialog).toHaveBeenCalledWith(mockMainWindow)
+      expect(dispatch).toHaveBeenCalledWith(
+        Cfg.updateConfigValue(
+          CONFIG_PYTHON_PATH_TO_PYTHON_OVERRIDE,
+          'path/to/override'
+        )
+      )
+    })
+  })
+
+  it('should call openDirectoryInFileExplorer in response to OPEN_PYTHON_DIRECTORY', () => {
+    when(mockOpenDirectoryInFileExplorer)
+      .calledWith('/some/override/python')
+      .mockResolvedValue(null)
+    handleAction(ProtocolAnalysis.openPythonInterpreterDirectory())
+
+    return flush().then(() => {
+      expect(mockOpenDirectoryInFileExplorer).toHaveBeenCalledWith(
+        '/some/override/python'
+      )
     })
   })
 })

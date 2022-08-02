@@ -17,6 +17,9 @@ import type { Action, Dispatch } from '../types'
 
 const log = createLogger('protocol-analysis')
 
+export const CONFIG_PYTHON_PATH_TO_PYTHON_OVERRIDE =
+  'python.pathToPythonOverride'
+
 export function registerProtocolAnalysis(
   dispatch: Dispatch,
   mainWindow: BrowserWindow
@@ -24,7 +27,7 @@ export function registerProtocolAnalysis(
   const pathToPythonOverride = getConfig().python.pathToPythonOverride
   selectPythonPath(pathToPythonOverride)
 
-  handleConfigChange('python.pathToPythonOverride', newValue => {
+  handleConfigChange(CONFIG_PYTHON_PATH_TO_PYTHON_OVERRIDE, newValue => {
     selectPythonPath(newValue)
   })
 
@@ -43,7 +46,10 @@ export function registerProtocolAnalysis(
             if (filePaths.length > 0) {
               const nextValue = filePaths[0]
               dispatch(
-                Cfg.updateConfigValue('python.pathToPythonOverride', nextValue)
+                Cfg.updateConfigValue(
+                  CONFIG_PYTHON_PATH_TO_PYTHON_OVERRIDE,
+                  nextValue
+                )
               )
             }
           })
