@@ -1,0 +1,48 @@
+{
+    "name": "Monorepo Container",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "mounts": [
+        "source=commandhistory-monorepo,target=/commandhistory,type=volume",
+        "source=extensions-monorepo,target=/root/.vscode-server/extensions,type=volume",
+        "source=pipcache-monorepo,target=/root/.cache,type=volume",
+        "source=local-monorepo,target=/root/.local,type=volume"
+    ],
+    "runArgs": [
+        "--cap-add=SYS_PTRACE",
+        "--security-opt",
+        "seccomp=unconfined"
+    ],
+    "settings": {
+        "python.linting.enabled": true,
+        "python.formatting.provider": "black"
+    },
+    "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "editorconfig.editorconfig",
+        "streetsidesoftware.code-spell-checker",
+        "humao.rest-client",
+        "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
+        "bierner.markdown-mermaid",
+        "redhat.vscode-yaml",
+        "ms-vscode.makefile-tools",
+        "yzhang.markdown-all-in-one",
+        "eamodio.gitlens"
+    ],
+    "postCreateCommand": "pip install -U pipenv==2021.5.29 && git config codespaces-theme.hide-status 1",
+    "features": {
+        "common": {
+            "installZsh": false,
+            "installOhMyZsh": false,
+            "upgradePackages": true,
+            "nonFreePackages": false
+        },
+        "docker-from-docker": "20.10",
+        "git": "2.37.1"
+    }
+}
