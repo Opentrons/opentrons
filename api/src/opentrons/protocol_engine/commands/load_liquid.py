@@ -10,7 +10,7 @@ LoadLiquidCommandType = Literal["loadLiquid"]
 
 
 class VolumeByWell(BaseModel):
-    """Representation of well and volume associated."""
+    """Request data of well and associated volume."""
 
     wellId: int = Field(
         ...,

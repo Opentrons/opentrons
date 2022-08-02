@@ -62,6 +62,14 @@ from .load_labware import (
     LoadLabwareCommandType,
 )
 
+from .load_liquid import (
+    LoadLiquid,
+    LoadLiquidParams,
+    LoadLiquidCreate,
+    LoadLiquidResult,
+    LoadLiquidCommandType,
+)
+
 from .load_module import (
     LoadModule,
     LoadModuleParams,
@@ -190,6 +198,7 @@ Command = Union[
     thermocycler.OpenLid,
     thermocycler.CloseLid,
     thermocycler.RunProfile,
+    LoadLiquid
 ]
 
 CommandParams = Union[
@@ -233,6 +242,7 @@ CommandParams = Union[
     thermocycler.CloseLidParams,
     thermocycler.RunProfileParams,
     thermocycler.RunProfileStepParams,
+    LoadLiquidParams
 ]
 
 CommandType = Union[
@@ -275,6 +285,7 @@ CommandType = Union[
     thermocycler.OpenLidCommandType,
     thermocycler.CloseLidCommandType,
     thermocycler.RunProfileCommandType,
+    LoadLiquidCommandType
 ]
 
 CommandCreate = Union[
@@ -316,6 +327,7 @@ CommandCreate = Union[
     thermocycler.OpenLidCreate,
     thermocycler.CloseLidCreate,
     thermocycler.RunProfileCreate,
+    LoadLiquidCreate
 ]
 
 CommandResult = Union[
@@ -358,4 +370,5 @@ CommandResult = Union[
     thermocycler.OpenLidResult,
     thermocycler.CloseLidResult,
     thermocycler.RunProfileResult,
+    LoadLiquidResult
 ]
