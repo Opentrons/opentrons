@@ -327,6 +327,46 @@ class LegacyCommandMapper:
                     flowRate=flowRate
                 ),
             )
+        elif (
+            command["name"] == legacy_command_types.BLOW_OUT
+            # and "instrument" in command["payload"]
+            # and "location" in command["payload"]
+            # and "rate" in command["payload"]
+        ):
+            print("WE MADE IT")
+            print(command["payload"])
+            print("TESTING")
+            pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore
+            location = command["payload"].get("location")
+            flowRate = command["payload"].get("rate")
+            wellLocation = { "origin": "bottom", "offset": { "x": 0, "y": 0, "z": command["payload"].get("offsetFromBottomMm") }}
+            if isinstance(location, Location):
+                well = location.labware.as_well()
+            else:
+                raise Exception("Unknown blow out location.")
+            parentModuleId = self._module_id_by_slot.get(location.labware.first_parent())
+            if parentModuleId is not None:
+                labware_id = self._labware_id_by_module_id[parentModuleId]
+            else:
+                slot = DeckSlotName.from_primitive(location.labware.first_parent())  # type: ignore[arg-type]
+                labware_id = self._labware_id_by_slot[slot]
+            mount = MountType(pipette.mount)
+            well_name = well.well_name
+            pipette_id = self._pipette_id_by_mount[mount]
+            engine_command = pe_commands.BlowOut.construct(
+                id=command_id,
+                key=command_id,
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=now,
+                startedAt=now,
+                params=pe_commands.BlowOutParams.construct(
+                    pipetteId=pipette_id,
+                    labwareId=labware_id,
+                    wellName=well_name,
+                    flowRate=flowRate,
+                    # wellLocation=wellLocation
+                ),
+            )
         elif command["name"] == legacy_command_types.PAUSE:
             engine_command = pe_commands.WaitForResume.construct(
                 id=command_id,
