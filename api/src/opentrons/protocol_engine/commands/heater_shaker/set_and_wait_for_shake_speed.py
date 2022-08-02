@@ -28,7 +28,7 @@ class SetAndWaitForShakeSpeedParams(BaseModel):
 class SetAndWaitForShakeSpeedResult(BaseModel):
     """Result data from setting and waiting for a Heater-Shaker's shake speed."""
 
-    pipetteMovedAway: bool = Field(
+    pipetteRetracted: bool = Field(
         ...,
         description="Whether the pipette was retracted/ homed before starting shake.",
     )
@@ -87,7 +87,7 @@ class SetAndWaitForShakeSpeedImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.set_speed(rpm=validated_speed)
 
-        return SetAndWaitForShakeSpeedResult(pipetteMovedAway=pipette_homed)
+        return SetAndWaitForShakeSpeedResult(pipetteRetracted=pipette_homed)
 
 
 class SetAndWaitForShakeSpeed(

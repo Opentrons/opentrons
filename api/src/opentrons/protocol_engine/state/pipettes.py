@@ -168,7 +168,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     heater_shaker.OpenLabwareLatchResult,
                 ),
             )
-            or command_result.pipetteMovedAway
+            or command_result.pipetteRetracted
         ):
             # Clear current_well for all above commands except h/s commands.
             # For h/s commands, clear current_well only if pipettes were moved before

@@ -287,7 +287,7 @@ def test_movement_commands_update_current_well(
                 rpm=123,
             ),
             result=cmd.heater_shaker.SetAndWaitForShakeSpeedResult(
-                pipetteMovedAway=True
+                pipetteRetracted=True
             ),
         ),
         cmd.heater_shaker.OpenLabwareLatch(
@@ -296,7 +296,7 @@ def test_movement_commands_update_current_well(
             status=cmd.CommandStatus.SUCCEEDED,
             createdAt=datetime(year=2021, month=1, day=1),
             params=cmd.heater_shaker.OpenLabwareLatchParams(moduleId="xyz"),
-            result=cmd.heater_shaker.OpenLabwareLatchResult(pipetteMovedAway=True),
+            result=cmd.heater_shaker.OpenLabwareLatchResult(pipetteRetracted=True),
         ),
     ],
 )
@@ -335,7 +335,7 @@ def test_movement_commands_without_well_clear_current_well(
                 rpm=123,
             ),
             result=cmd.heater_shaker.SetAndWaitForShakeSpeedResult(
-                pipetteMovedAway=False
+                pipetteRetracted=False
             ),
         ),
         cmd.heater_shaker.OpenLabwareLatch(
@@ -344,7 +344,7 @@ def test_movement_commands_without_well_clear_current_well(
             status=cmd.CommandStatus.SUCCEEDED,
             createdAt=datetime(year=2021, month=1, day=1),
             params=cmd.heater_shaker.OpenLabwareLatchParams(moduleId="xyz"),
-            result=cmd.heater_shaker.OpenLabwareLatchResult(pipetteMovedAway=False),
+            result=cmd.heater_shaker.OpenLabwareLatchResult(pipetteRetracted=False),
         ),
     ],
 )
