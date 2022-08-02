@@ -4,7 +4,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { RunCommandSummary } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { getSlotLabwareName } from '../SetupLiquids/utils'
+import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 import { i18n } from '../../../../i18n'
 import { getLabwareLocation } from '../../ProtocolRun/utils/getLabwareLocation'
 import {
@@ -20,7 +20,7 @@ jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('../../ProtocolRun/utils/getLabwareLocation')
 jest.mock('../../hooks')
 jest.mock('./../RunLogProtocolSetupInfo')
-jest.mock('../SetupLiquids/utils')
+jest.mock('../utils/getSlotLabwareName')
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun

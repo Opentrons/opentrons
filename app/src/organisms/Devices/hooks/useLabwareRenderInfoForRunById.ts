@@ -13,6 +13,7 @@ export function useLabwareRenderInfoForRunById(
   )
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
+
   return protocolData != null
     ? getLabwareRenderInfo(protocolData, standardDeckDef as any)
     : {}
