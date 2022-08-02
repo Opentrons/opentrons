@@ -198,7 +198,7 @@ Command = Union[
     thermocycler.OpenLid,
     thermocycler.CloseLid,
     thermocycler.RunProfile,
-    LoadLiquid
+    LoadLiquid,
 ]
 
 CommandParams = Union[
@@ -242,7 +242,7 @@ CommandParams = Union[
     thermocycler.CloseLidParams,
     thermocycler.RunProfileParams,
     thermocycler.RunProfileStepParams,
-    LoadLiquidParams
+    LoadLiquidParams,
 ]
 
 CommandType = Union[
@@ -285,7 +285,7 @@ CommandType = Union[
     thermocycler.OpenLidCommandType,
     thermocycler.CloseLidCommandType,
     thermocycler.RunProfileCommandType,
-    LoadLiquidCommandType
+    LoadLiquidCommandType,
 ]
 
 CommandCreate = Union[
@@ -327,7 +327,7 @@ CommandCreate = Union[
     thermocycler.OpenLidCreate,
     thermocycler.CloseLidCreate,
     thermocycler.RunProfileCreate,
-    LoadLiquidCreate
+    LoadLiquidCreate,
 ]
 
 CommandResult = Union[
@@ -370,5 +370,5 @@ CommandResult = Union[
     thermocycler.OpenLidResult,
     thermocycler.CloseLidResult,
     thermocycler.RunProfileResult,
-    LoadLiquidResult
+    LoadLiquidResult,
 ]

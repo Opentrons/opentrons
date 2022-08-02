@@ -20,7 +20,4 @@ async def test_load_liquid_implementation(decoy: Decoy) -> None:
     )
     result = await subject.execute(data)
 
-    assert result == LoadLiquidResult(
-        labwareId="labware-id",
-        liquidId="liquid-id",
-    )
+    assert result == LoadLiquidResult()
