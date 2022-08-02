@@ -663,7 +663,7 @@ For preparing the deck before running a protocol, run these methods in Jupyter n
 Loading Labware
 ===============
 
-Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_labware` method to specify what you will place on the module. For the Heater-Shaker, the you must use a definition that describes the combination of a thermal adapter and labware that fits it. Currently, only the following combinations are supported in the Opentrons Labware Library:
+Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_labware` method to specify what you will place on the module. For the Heater-Shaker, you must use a definition that describes the combination of a thermal adapter and labware that fits it. Currently, only the following combinations are supported in the Opentrons Labware Library:
 
 +-------------------------+-------------------------------------------+----------------------------------------------------------------------+
 | Adapter                 | Labware                                   | Definition                                                           |
@@ -680,13 +680,13 @@ Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext
 +-------------------------+-------------------------------------------+----------------------------------------------------------------------+
 
 
-Custom flat-bottom labware can be used with the Universal Flat Adapter. `Contact Opentrons Support <mailto:support@opentrons.com>`_ for assistance creating custom labware definitions for the Heater-Shaker.
+Custom flat-bottom labware can be used with the Universal Flat Adapter. If you need assistance creating custom labware definitions for the Heater-Shaker, `submit a request to Opentrons Support <https://support.opentrons.com/s/article/Requesting-a-custom-labware-definition>`_.
 
 
 Heating and Shaking
 ===================
 
-Heating and shaking operations are started and deactivate independently, and are treated differently due to the amount of time they take. Speeding up or slowing down the shaker takes at most a few seconds, so it is treated as a *blocking* command — all other command execution must wait until it is complete. In contrast, heating the module or letting it passively cool can take much longer, so the Python API gives you the flexibility to perform other pipetting actions while waiting to reach a target temperature. When holding at a target, you can design your protocol to run in a blocking or non-blocking manner.
+Heating and shaking operations are controlled independently, and are treated differently due to the amount of time they take. Speeding up or slowing down the shaker takes at most a few seconds, so it is treated as a *blocking* command — all other command execution must wait until it is complete. In contrast, heating the module or letting it passively cool can take much longer, so the Python API gives you the flexibility to perform other pipetting actions while waiting to reach a target temperature. When holding at a target, you can design your protocol to run in a blocking or non-blocking manner.
 
 Blocking commands
 -----------------
@@ -748,7 +748,7 @@ Provided that the parallel pipetting actions don’t take more than one minute, 
 You’ll also notice that the timing ``while`` loop has been embedded in an ``if`` statement. Without this, the protocol will wait the entire duration, even in simulation and when loading the protocol onto a robot. This is because the Python API’s :py:meth:`.ProtocolContext.delay` method is designed to run instantaneously in simulation, but the methods from the ``time`` module (or any other module) run as they ordinarily would. Skipping these steps when simulating — yet performing them when ``not protocol.is_simulating()`` — saves considerable time.
 
 
-Deactivation
+Deactivating
 ============
 
 As with setting targets, deactivating the heater and shaker are done separately, with :py:meth:`~.HeaterShakerContext.deactivate_heater` and :py:meth:`~.HeaterShakerContext.deactivate_shaker` respectively. There is no method to deactivate both simultaneously, so call the two methods in sequence if you need to stop both heating and shaking.
