@@ -33,13 +33,13 @@ class Liquid(BaseModel):
 class VolumeByWell(BaseModel):
     """Request data of well and associated volume."""
 
-    wellId: int = Field(
+    wellName: str = Field(
         ...,
-        description="Well id to capture liquid.",
+        description="Well name from the specified labware to capture liquid.",
     )
     volume: int = Field(
         ...,
-        description="Volume within associated well.",
+        description="Volume in µL within associated well.",
     )
 
 
