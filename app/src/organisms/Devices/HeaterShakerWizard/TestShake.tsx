@@ -1,9 +1,6 @@
 import React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import {
-  useCreateCommandMutation,
-  useCreateLiveCommandMutation,
-} from '@opentrons/react-api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -30,8 +27,6 @@ import { Divider } from '../../../atoms/structure'
 import { InputField } from '../../../atoms/InputField'
 import { Collapsible } from '../../ModuleCard/Collapsible'
 import { useLatchControls } from '../../ModuleCard/hooks'
-import { useModuleIdFromRun } from '../../ModuleCard/useModuleIdFromRun'
-import { useRunStatuses } from '../hooks'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
@@ -46,34 +41,29 @@ interface TestShakeProps {
   module: HeaterShakerModule
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
   moduleFromProtocol?: ProtocolModuleInfo
-  currentRunId?: string
 }
 
 export function TestShake(props: TestShakeProps): JSX.Element {
-  const { module, setCurrentPage, moduleFromProtocol, currentRunId } = props
+  const { module, setCurrentPage, moduleFromProtocol } = props
   const { t } = useTranslation(['heater_shaker', 'device_details'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { createCommand } = useCreateCommandMutation()
   const [isExpanded, setExpanded] = React.useState(false)
-  const { isRunIdle, isRunTerminal } = useRunStatuses()
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { toggleLatch, isLatchClosed } = useLatchControls(module, currentRunId)
-  const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const isShaking = module.data.speedStatus !== 'idle'
-  const moduleId = isRunIdle ? moduleIdFromRun : module.id
 
   const closeLatchCommand: HeaterShakerCloseLatchCreateCommand = {
     commandType: 'heaterShaker/closeLabwareLatch',
     params: {
-      moduleId,
+      moduleId: module.id,
     },
   }
 
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
     commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
-      moduleId,
+      moduleId: module.id,
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
     },
   }
@@ -81,7 +71,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
     commandType: 'heaterShaker/deactivateShaker',
     params: {
-      moduleId,
+      moduleId: module.id,
     },
   }
 
@@ -92,25 +82,15 @@ export function TestShake(props: TestShakeProps): JSX.Element {
 
     for (const command of commands) {
       // await each promise to make sure the server receives requests in the right order
-      if (isRunIdle && currentRunId != null) {
-        await createCommand({
-          runId: currentRunId,
-          command,
-        }).catch((e: Error) => {
-          console.error(
-            `error setting module status with command type ${command.commandType}: ${e.message}`
-          )
-        })
-      } else if (isRunTerminal || currentRunId == null) {
-        await createLiveCommand({
-          command,
-        }).catch((e: Error) => {
-          console.error(
-            `error setting module status with command type ${command.commandType}: ${e.message}`
-          )
-        })
-      }
+      await createLiveCommand({
+        command,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${command.commandType}: ${e.message}`
+        )
+      })
     }
+
     setShakeValue(null)
   }
 
@@ -199,7 +179,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
               {t('set_shake_speed')}
             </StyledText>
             <InputField
-              data-testid={`TestShake_shake_input`}
+              data-testid="TestShake_shake_input"
               units={RPM}
               value={shakeValue}
               onChange={e => setShakeValue(e.target.value)}

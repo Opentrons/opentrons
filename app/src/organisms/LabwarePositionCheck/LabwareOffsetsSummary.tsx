@@ -69,7 +69,7 @@ const OffsetDataLoader = (): JSX.Element | null => {
       </StyledText>
       <Icon
         name="ot-spinner"
-        id={`LabwareOffsetsSummary_loadingSpinner`}
+        id="LabwareOffsetsSummary_loadingSpinner"
         width={SIZE_3}
         marginTop={SPACING.spacing6}
         marginBottom={SPACING.spacing6}

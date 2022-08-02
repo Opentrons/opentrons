@@ -49,7 +49,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
   return (
     <Box
       backgroundColor={hover ? COLORS.blueEnabled : OVERLAY_BLACK_80}
-      borderRadius={`0 0 0.4rem 0.4rem`}
+      borderRadius="0 0 0.4rem 0.4rem"
       fontSize={FONT_SIZE_CAPTION}
       padding={SPACING.spacing2}
       color={COLORS.white}

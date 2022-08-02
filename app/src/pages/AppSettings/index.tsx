@@ -41,7 +41,7 @@ export function AppSettings(): JSX.Element {
 
   const appSettingsContent = appSettingsContentByTab[appSettingsTab] ?? (
     // default to the general tab if no tab or nonexistent tab is passed as a param
-    <Redirect to={`/app-settings/general`} />
+    <Redirect to="/app-settings/general" />
   )
 
   return (

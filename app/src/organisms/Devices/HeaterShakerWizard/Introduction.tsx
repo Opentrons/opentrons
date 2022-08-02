@@ -133,7 +133,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       marginBottom={labwareDefinition != null ? '4.313rem' : '9.375rem'}
     >
-      <StyledText css={TYPOGRAPHY.h2Regular} data-testid={`introduction_title`}>
+      <StyledText css={TYPOGRAPHY.h2Regular} data-testid="introduction_title">
         {t('use_this_heater_shaker_guide')}
       </StyledText>
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -143,14 +143,14 @@ export function Introduction(props: IntroductionProps): JSX.Element {
             fontSize={TYPOGRAPHY.fontSizeH4}
             flexDirection={DIRECTION_ROW}
             width="21.5rem"
-            data-testid={`introduction_subtitle`}
+            data-testid="introduction_subtitle"
           >
             {t('you_will_need')}
           </StyledText>
         </Flex>
         <Flex
           justifyContent={JUSTIFY_CENTER}
-          data-testid={`introduction_item_adapter`}
+          data-testid="introduction_item_adapter"
         >
           <IntroItem
             text={
@@ -174,7 +174,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
         </Flex>
         <Flex
           justifyContent={JUSTIFY_CENTER}
-          data-testid={`introduction_item_labware`}
+          data-testid="introduction_item_labware"
         >
           <IntroItem
             text={
@@ -201,7 +201,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
         </Flex>
         <Flex
           justifyContent={JUSTIFY_CENTER}
-          data-testid={`introduction_item_heater_shaker`}
+          data-testid="introduction_item_heater_shaker"
         >
           <IntroItem
             image={<img src={heaterShaker} alt="heater_shaker_image" />}
@@ -210,7 +210,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
         </Flex>
         <Flex
           justifyContent={JUSTIFY_CENTER}
-          data-testid={`intrudction_intro_item_screwdriver`}
+          data-testid="intrudction_intro_item_screwdriver"
         >
           <IntroItem
             image={<img src={screwdriver} alt="screwdriver_image" />}

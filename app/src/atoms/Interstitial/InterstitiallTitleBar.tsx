@@ -41,7 +41,7 @@ export function InterstitialTitleBar(
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       css={TITLE_BAR}
-      data-testid={`titlebar`}
+      data-testid="titlebar"
     >
       <Flex padding={SPACING.spacingXS} data-testid={`titlebar_${title}`}>
         <Icon

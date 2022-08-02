@@ -563,7 +563,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
             textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6SemiBold}
-            id={`RunDetails_ProtocolSetupTitle`}
+            id="RunDetails_ProtocolSetupTitle"
           >
             {t('protocol_setup')}
           </StyledText>
@@ -575,7 +575,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
         </Flex>
       </Btn>
       <Flex
-        id={`RunDetails_ProtocolSetup_CommandList`}
+        id="RunDetails_ProtocolSetup_CommandList"
         flexDirection={DIRECTION_COLUMN}
       >
         {showProtocolSetupInfo

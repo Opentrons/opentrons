@@ -110,7 +110,7 @@ export const HeaterShakerModuleData = (
       {showTemperatureData && (
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          data-testid={`heater_shaker_module_data_temp`}
+          data-testid="heater_shaker_module_data_temp"
         >
           <StyledText
             textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -144,7 +144,7 @@ export const HeaterShakerModuleData = (
       )}
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`heater_shaker_module_data_shaker`}
+        data-testid="heater_shaker_module_data_shaker"
       >
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -179,7 +179,7 @@ export const HeaterShakerModuleData = (
 
       <Flex
         flexDirection={DIRECTION_ROW}
-        data-testid={`heater_shaker_module_data_latch`}
+        data-testid="heater_shaker_module_data_latch"
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText
