@@ -86,7 +86,7 @@ export function Toast(props: ToastProps): JSX.Element {
     duration = 5000,
   } = props
 
-  if (!disableTimeout && onClose != null) {
+  if (!disableTimeout) {
     setTimeout(() => {
       onClose()
     }, duration)

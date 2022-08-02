@@ -90,9 +90,7 @@ export function SetupPipetteCalibrationItem({
     pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH ||
     pipetteInfo.requestedPipetteMatch === PipetteConstants.MATCH
 
-  const pipetteMismatch =
-    pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH
-  if (pipetteMismatch) {
+  if (pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH) {
     pipetteMismatchInfo = (
       <Flex alignItems={ALIGN_CENTER}>
         <Banner type="warning" padding={SPACING.spacing2}>
