@@ -1,6 +1,6 @@
 """Load liquid command request, result, and implementation models."""
 from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Optional, Type
+from typing import Optional, Type
 from typing_extensions import Literal
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
@@ -8,7 +8,10 @@ from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 LoadLiquidCommandType = Literal["loadLiquid"]
 
+
 class VolumeByWell(BaseModel):
+    """Representation of well and volume associated."""
+
     wellId: int = Field(
         ...,
         description="Well id to capture liquid.",
@@ -49,23 +52,14 @@ class LoadLiquidResult(BaseModel):
     )
 
 
-
-class LoadLiquidImplementation(
-    AbstractCommandImpl[LoadLiquidParams, LoadLiquidResult]
-):
+class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidResult]):
     """Load liquid command implementation."""
-
-    def __init__(self, **kwargs: object) -> None:
 
     async def execute(self, params: LoadLiquidParams) -> LoadLiquidResult:
         """Load definition and calibration data necessary for a liquid."""
+        return LoadLiquidResult(labwareId=params.labwareId, liquidId=params.liquidId)
 
-        return LoadLiquidResult(
-            labwareId=params.labware_id,
-            liquidId=params.liquidId
-        )
 
-#
 class LoadLiquid(BaseCommand[LoadLiquidParams, LoadLiquidResult]):
     """Load liquid command resource model."""
 
