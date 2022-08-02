@@ -6,7 +6,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 6.0.x
+# Opentrons App Changes in 6.0
 
 Welcome to the v6.0 release of the Opentrons App! This release focuses on a visual redesign of the app that offers more ways to manage protocols even when you're not connected to a robot.
 
