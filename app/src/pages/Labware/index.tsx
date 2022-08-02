@@ -48,6 +48,7 @@ const labwareDisplayCategoryFilters: LabwareFilter[] = [
   'tubeRack',
   'reservoir',
   'aluminumBlock',
+  'customLabware',
 ]
 
 const FILTER_OPTIONS: DropdownOption[] = []
