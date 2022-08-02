@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { Link as RRDLink } from 'react-router-dom'
 import {
   Box,
@@ -18,6 +18,7 @@ import {
   Link,
   COLORS,
   SPACING,
+  IconProps,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
@@ -33,6 +34,7 @@ import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
 import type { PipetteInfo } from '../hooks'
+import { Toast } from '../../../atoms/Toast'
 
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/s/article/GEN2-pipette-compatibility'
@@ -54,6 +56,7 @@ export function SetupPipetteCalibrationItem({
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
   const configHasCalibrationBlock = useSelector(getHasCalibrationBlock)
   const deviceDetailsUrl = `/devices/${robotName}`
+  const bannerIcon: IconProps = { name: 'ot-alert' }
 
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
 
@@ -96,13 +99,9 @@ export function SetupPipetteCalibrationItem({
     pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH
   if (pipetteMismatch) {
     pipetteMismatchInfo = (
-      <Flex>
+      <Flex alignItems={ALIGN_CENTER}>
         <Banner type="warning">
-          <Flex
-            justifyContent={JUSTIFY_CENTER}
-            flexDirection={DIRECTION_COLUMN}
-            alignItems={ALIGN_FLEX_START}
-          >
+          <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText as="p"> {t('pipette_mismatch')}</StyledText>
             <Link
               external
@@ -116,6 +115,25 @@ export function SetupPipetteCalibrationItem({
             </Link>
           </Flex>
         </Banner>
+        {/* <Toast
+          type={'warning'}
+          icon={bannerIcon}
+          message={
+            <Flex flexDirection={DIRECTION_COLUMN}>
+              <StyledText as="p"> {t('pipette_mismatch')}</StyledText>
+              <Link
+                external
+                color={COLORS.darkBlack}
+                css={TYPOGRAPHY.pRegular}
+                textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                href={inexactPipetteSupportArticle}
+                id="PipetteCalibration_pipetteMismatchHelpLink"
+              >
+                {t('learn_more')}
+              </Link>
+            </Flex>
+          }
+        /> */}
       </Flex>
     )
   }

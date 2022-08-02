@@ -95,8 +95,8 @@ export function SetupCalibrationItem({
           </Flex>
         </Flex>
       </Flex>
-      {banner}
-      {button}
+      <Flex>{banner}</Flex>
+      <Flex> {button}</Flex>
     </Flex>
   )
 }

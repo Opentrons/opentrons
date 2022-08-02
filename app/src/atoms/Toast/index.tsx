@@ -11,9 +11,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   BORDER_STYLE_SOLID,
   ALIGN_CENTER,
+  DIRECTION_ROW,
+  POSITION_FIXED,
 } from '@opentrons/components'
-import type { IconProps } from '@opentrons/components'
 import { StyledText } from '../text'
+import type { IconProps } from '@opentrons/components'
 
 type ToastType = 'success' | 'warning' | 'error' | 'info'
 
@@ -84,7 +86,7 @@ export function Toast(props: ToastProps): JSX.Element {
     duration = 5000,
   } = props
 
-  if (!disableTimeout) {
+  if (!disableTimeout && onClose != null) {
     setTimeout(() => {
       onClose()
     }, duration)
@@ -105,11 +107,11 @@ export function Toast(props: ToastProps): JSX.Element {
       paddingY={SPACING.spacing2}
       right={SPACING.spacing6}
       bottom={SPACING.spacing4}
-      position="fixed"
+      position={POSITION_FIXED}
       data-testid={`Toast_${type as string}`}
       maxWidth="88%"
     >
-      <Flex flexDirection="row">
+      <Flex flexDirection={DIRECTION_ROW}>
         <Icon
           name={icon?.name ?? toastStyleByType[type].iconName}
           color={toastStyleByType[type].color}
