@@ -1040,6 +1040,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             hardware = ctx_implementation.get_hardware()
             for mount in types.Mount:
                 hardware.retract(mount=mount)
+            self._ctx.location_cache = None
 
     def _prepare_for_latch_open(self) -> None:
         """
@@ -1053,3 +1054,4 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             hardware = ctx_implementation.get_hardware()
             for mount in types.Mount:
                 hardware.retract(mount=mount)
+            self._ctx.location_cache = None

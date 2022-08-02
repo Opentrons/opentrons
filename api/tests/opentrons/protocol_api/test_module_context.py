@@ -771,6 +771,7 @@ def test_heater_shaker_set_and_wait_for_shake_speed(
         calls = [mock.call(mount=Mount.LEFT), mock.call(mount=Mount.RIGHT)]
         mock_hardware.retract.assert_has_calls(calls, any_order=True)
         mock_module_controller.set_speed.assert_called_once_with(rpm=10)
+        assert ctx_with_heater_shaker.location_cache is None
 
 
 @pytest.mark.parametrize(
@@ -824,6 +825,7 @@ def test_heater_shaker_open_labware_latch(
     calls = [mock.call(mount=Mount.LEFT), mock.call(mount=Mount.RIGHT)]
     mock_hardware.retract.assert_has_calls(calls, any_order=True)
     mock_module_controller.open_labware_latch.assert_called_once()
+    assert ctx_with_heater_shaker.location_cache is None
 
 
 @pytest.mark.parametrize(

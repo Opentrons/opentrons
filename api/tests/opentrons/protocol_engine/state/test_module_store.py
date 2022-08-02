@@ -266,7 +266,7 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
     )
     set_shake_cmd = hs_commands.SetAndWaitForShakeSpeed.construct(  # type: ignore[call-arg]
         params=hs_commands.SetAndWaitForShakeSpeedParams(moduleId="module-id", rpm=111),
-        result=hs_commands.SetAndWaitForShakeSpeedResult(),
+        result=hs_commands.SetAndWaitForShakeSpeedResult(pipetteMovedAway=False),
     )
     deactivate_cmd = hs_commands.DeactivateShaker.construct(  # type: ignore[call-arg]
         params=hs_commands.DeactivateShakerParams(moduleId="module-id"),
@@ -317,7 +317,7 @@ def test_handle_hs_labware_latch_commands(
     )
     open_latch_cmd = hs_commands.OpenLabwareLatch.construct(  # type: ignore[call-arg]
         params=hs_commands.OpenLabwareLatchParams(moduleId="module-id"),
-        result=hs_commands.OpenLabwareLatchResult(),
+        result=hs_commands.OpenLabwareLatchResult(pipetteMovedAway=False),
     )
     subject = ModuleStore()
 
