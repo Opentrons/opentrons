@@ -55,6 +55,9 @@ class LoadLiquidResult(BaseModel):
 class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidResult]):
     """Load liquid command implementation."""
 
+    def __init__(self) -> None:
+        pass
+
     async def execute(self, params: LoadLiquidParams) -> LoadLiquidResult:
         """Load definition and calibration data necessary for a liquid."""
         return LoadLiquidResult(labwareId=params.labwareId, liquidId=params.liquidId)
@@ -70,7 +73,7 @@ class LoadLiquid(BaseCommand[LoadLiquidParams, LoadLiquidResult]):
     _ImplementationCls: Type[LoadLiquidImplementation] = LoadLiquidImplementation
 
 
-class LoadLabwareCreate(BaseCommandCreate[LoadLiquidParams]):
+class LoadLiquidCreate(BaseCommandCreate[LoadLiquidParams]):
     """Load liquid command creation request."""
 
     commandType: LoadLiquidCommandType = "loadLiquid"
