@@ -261,6 +261,43 @@ def test_movement_commands_update_current_well(
             ),
             result=cmd.MoveToCoordinatesResult(),
         ),
+        cmd.thermocycler.OpenLid(
+            id="command-id-2",
+            key="command-key-2",
+            status=cmd.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=cmd.thermocycler.OpenLidParams(moduleId="xyz"),
+            result=cmd.thermocycler.OpenLidResult(),
+        ),
+        cmd.thermocycler.CloseLid(
+            id="command-id-2",
+            key="command-key-2",
+            status=cmd.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=cmd.thermocycler.CloseLidParams(moduleId="xyz"),
+            result=cmd.thermocycler.CloseLidResult(),
+        ),
+        cmd.heater_shaker.SetAndWaitForShakeSpeed(
+            id="command-id-2",
+            key="command-key-2",
+            status=cmd.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=cmd.heater_shaker.SetAndWaitForShakeSpeedParams(
+                moduleId="xyz",
+                rpm=123,
+            ),
+            result=cmd.heater_shaker.SetAndWaitForShakeSpeedResult(
+                pipetteRetracted=True
+            ),
+        ),
+        cmd.heater_shaker.OpenLabwareLatch(
+            id="command-id-2",
+            key="command-key-2",
+            status=cmd.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=cmd.heater_shaker.OpenLabwareLatchParams(moduleId="xyz"),
+            result=cmd.heater_shaker.OpenLabwareLatchResult(pipetteRetracted=True),
+        ),
     ],
 )
 def test_movement_commands_without_well_clear_current_well(
@@ -283,6 +320,58 @@ def test_movement_commands_without_well_clear_current_well(
     subject.handle_action(UpdateCommandAction(command=command))
 
     assert subject.state.current_well is None
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        cmd.heater_shaker.SetAndWaitForShakeSpeed(
+            id="command-id-2",
+            key="command-key-2",
+            status=cmd.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=cmd.heater_shaker.SetAndWaitForShakeSpeedParams(
+                moduleId="xyz",
+                rpm=123,
+            ),
+            result=cmd.heater_shaker.SetAndWaitForShakeSpeedResult(
+                pipetteRetracted=False
+            ),
+        ),
+        cmd.heater_shaker.OpenLabwareLatch(
+            id="command-id-2",
+            key="command-key-2",
+            status=cmd.CommandStatus.SUCCEEDED,
+            createdAt=datetime(year=2021, month=1, day=1),
+            params=cmd.heater_shaker.OpenLabwareLatchParams(moduleId="xyz"),
+            result=cmd.heater_shaker.OpenLabwareLatchResult(pipetteRetracted=False),
+        ),
+    ],
+)
+def test_heater_shaker_command_without_movement(
+    subject: PipetteStore, command: cmd.Command
+) -> None:
+    """Heater Shaker commands that dont't move pipettes shouldn't clear current_well."""
+    load_pipette_command = create_load_pipette_command(
+        pipette_id="pipette-id",
+        pipette_name=PipetteName.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+    move_command = create_move_to_well_command(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="well-name",
+    )
+
+    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+    subject.handle_action(UpdateCommandAction(command=move_command))
+    subject.handle_action(UpdateCommandAction(command=command))
+
+    assert subject.state.current_well == CurrentWell(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="well-name",
+    )
 
 
 def test_tip_commands_update_has_tip(subject: PipetteStore) -> None:
