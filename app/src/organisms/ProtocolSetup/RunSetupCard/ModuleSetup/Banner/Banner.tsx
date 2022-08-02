@@ -85,7 +85,7 @@ export const BannerItem = (props: BannerItemProps): JSX.Element => {
         </StyledText>
       </Flex>
       <TertiaryButton
-        data-testid={`banner_open_wizard_btn`}
+        data-testid="banner_open_wizard_btn"
         onClick={() => onClick()}
       >
         {btnText}

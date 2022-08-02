@@ -111,7 +111,7 @@ export function HistoricalProtocolRunOffsetDrawer(
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
-          datatest-id={`RecentProtocolRun_OffsetDrawer_locationTitle`}
+          datatest-id="RecentProtocolRun_OffsetDrawer_locationTitle"
         >
           {t('location')}
         </StyledText>
@@ -120,7 +120,7 @@ export function HistoricalProtocolRunOffsetDrawer(
           width="33%"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
-          datatest-id={`RecentProtocolRun_OffsetDrawer_labwareTitle`}
+          datatest-id="RecentProtocolRun_OffsetDrawer_labwareTitle"
         >
           {t('labware')}
         </StyledText>
@@ -129,7 +129,7 @@ export function HistoricalProtocolRunOffsetDrawer(
           width="40%"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
-          datatest-id={`RecentProtocolRun_OffsetDrawer_labwareOffsetDataTitle`}
+          datatest-id="RecentProtocolRun_OffsetDrawer_labwareOffsetDataTitle"
         >
           {t('labware_offset_data')}
         </StyledText>

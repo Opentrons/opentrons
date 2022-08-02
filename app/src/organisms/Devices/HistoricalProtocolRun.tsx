@@ -138,7 +138,7 @@ export function HistoricalProtocolRun(
         <StyledText
           as="p"
           width="20%"
-          data-testid={`RecentProtocolRuns_Duration`}
+          data-testid="RecentProtocolRuns_Duration"
         >
           {duration}
         </StyledText>

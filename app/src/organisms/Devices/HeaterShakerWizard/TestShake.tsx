@@ -179,7 +179,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
               {t('set_shake_speed')}
             </StyledText>
             <InputField
-              data-testid={`TestShake_shake_input`}
+              data-testid="TestShake_shake_input"
               units={RPM}
               value={shakeValue}
               onChange={e => setShakeValue(e.target.value)}
