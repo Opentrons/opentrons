@@ -16,7 +16,7 @@ async def test_load_liquid_implementation(decoy: Decoy) -> None:
     data = LoadLiquidParams(
         labwareId="labware-id",
         liquidId="liquid-id",
-        volumeByWell=VolumeByWell(wellId=0, volume=30),
+        volumeByWell=VolumeByWell(wellName="A1", volume=30),
     )
     result = await subject.execute(data)
 
