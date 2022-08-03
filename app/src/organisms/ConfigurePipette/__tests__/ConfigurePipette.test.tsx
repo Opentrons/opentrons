@@ -35,7 +35,6 @@ const mockRobotName = 'mockRobotName'
 
 describe('ConfigurePipette', () => {
   let dispatchApiRequest: DispatchApiRequestType
-
   let props: React.ComponentProps<typeof ConfigurePipette>
 
   beforeEach(() => {
