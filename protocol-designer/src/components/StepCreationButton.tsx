@@ -27,7 +27,6 @@ import {
 } from './modals/ConfirmDeleteModal'
 import { Portal } from './portals/MainPageModalPortal'
 import { stepIconsByType, StepType } from '../form-types'
-import { selectors as featureFlagSelectors } from '../feature-flags'
 import styles from './listButtons.css'
 
 interface StepButtonComponentProps {
@@ -104,34 +103,18 @@ export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
 }
 
 export const StepCreationButton = (): JSX.Element => {
-  const enableHeaterShaker = useSelector(
-    featureFlagSelectors.getEnabledHeaterShaker
-  )
-
   const getSupportedSteps = (): Array<
     Exclude<StepType, 'manualIntervention'>
-  > => {
-    if (enableHeaterShaker) {
-      return [
-        'moveLiquid',
-        'mix',
-        'pause',
-        'heaterShaker',
-        'magnet',
-        'temperature',
-        'thermocycler',
-      ]
-    } else {
-      return [
-        'moveLiquid',
-        'mix',
-        'pause',
-        'magnet',
-        'temperature',
-        'thermocycler',
-      ]
-    }
-  }
+  > => [
+    'moveLiquid',
+    'mix',
+    'pause',
+    'heaterShaker',
+    'magnet',
+    'temperature',
+    'thermocycler',
+  ]
+
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
