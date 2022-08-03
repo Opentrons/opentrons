@@ -24,7 +24,11 @@ export function ConfigFormSubmitButton(
       textTransform={TEXT_TRANSFORM_UPPERCASE}
       boxShadow={'0px -4px 12px rgba(0, 0, 0, 0.15)'}
     >
-      <PrimaryButton type={'submit'} disabled={disabled}>
+      <PrimaryButton
+        type={'submit'}
+        form={'configurePipetteForm'}
+        disabled={disabled}
+      >
         {t('confirm')}
       </PrimaryButton>
     </Flex>

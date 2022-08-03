@@ -217,7 +217,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
           }
           return (
             <Box overflowY="scroll">
-              <Form>
+              <Form id="configurePipetteForm">
                 <ConfigFormResetButton
                   onClick={handleReset}
                   disabled={updateInProgress}

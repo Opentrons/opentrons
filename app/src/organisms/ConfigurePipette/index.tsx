@@ -33,6 +33,8 @@ export function ConfigurePipette(props: Props): JSX.Element {
     t('power_force'),
   ]
 
+  console.log('SETTINGS', settings)
+
   const updateError: string | null =
     updateRequest && updateRequest.status === FAILURE
       ? // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
