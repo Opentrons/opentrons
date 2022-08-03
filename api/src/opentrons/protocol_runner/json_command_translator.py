@@ -94,17 +94,15 @@ def _translate_liquid_command(
     assert labwareId is not None
     liquid = protocol.liquids[liquidId]
     assert liquid is not None
-    print(command.params.volumeByWell)
-    volume_by_well = parse_obj_as(
-                # https://github.com/samuelcolvin/pydantic/issues/1847
-                pe_commands.VolumeByWell,  # type: ignore[arg-type]
-                command.params.volumeByWell,
-            ),
     liquid_command = pe_commands.LoadLiquidCreate(
         params=pe_commands.LoadLiquidParams(
             labwareId=labwareId,
             liquidId=liquidId,
-            volumeByWell=volume_by_well
+            volumeByWell=parse_obj_as(
+                # https://github.com/samuelcolvin/pydantic/issues/1847
+                pe_commands.VolumeByWell,  # type: ignore[arg-type]
+                command.params.volumeByWell,
+            ),
         ),
         key=command.key,
     )
