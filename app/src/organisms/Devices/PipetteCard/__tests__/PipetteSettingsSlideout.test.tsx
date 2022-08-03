@@ -68,7 +68,6 @@ describe('PipetteSettingsSlideout', () => {
     )
     dispatchApiRequest = jest.fn()
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, ['id']])
-    // mockConfigurePipette.mockReturnValue(<div>mock configure pipette</div>)
   })
   afterEach(() => {
     jest.resetAllMocks()
