@@ -1226,7 +1226,6 @@ def test_move_to_with_thermocycler(
 def test_move_to_with_heater_shaker(
     ctx: papi.ProtocolContext,
     hardware: ThreadManagedHardware,
-    enable_heater_shaker_python_api: AsyncGenerator[None, None],
 ) -> None:
     """Test move_to raises for unsafe moves with heater-shaker."""
 

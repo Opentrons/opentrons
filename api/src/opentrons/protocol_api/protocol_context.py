@@ -487,13 +487,6 @@ class ProtocolContext(CommandPublisher):
         if not load_result:
             raise RuntimeError(f"Could not find specified module: {module_name}")
 
-        # TODO(mc, 2022-06-14): remove guard for heater-shaker production release
-        if (
-            load_result.type == ModuleType.HEATER_SHAKER
-            and not ff.enable_heater_shaker_python_api()
-        ):
-            raise UnsupportedAPIError("Heater-Shaker module is not yet supported")
-
         mod_class = {
             ModuleType.MAGNETIC: MagneticModuleContext,
             ModuleType.TEMPERATURE: TemperatureModuleContext,
