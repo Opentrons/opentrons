@@ -3,7 +3,7 @@
 import asyncio
 import json
 from unittest import mock
-from typing import Any, Dict, AsyncGenerator
+from typing import Any, Dict
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette.dev_types import LabwareUri
@@ -1226,7 +1226,6 @@ def test_move_to_with_thermocycler(
 def test_move_to_with_heater_shaker(
     ctx: papi.ProtocolContext,
     hardware: ThreadManagedHardware,
-    enable_heater_shaker_python_api: AsyncGenerator[None, None],
 ) -> None:
     """Test move_to raises for unsafe moves with heater-shaker."""
 
