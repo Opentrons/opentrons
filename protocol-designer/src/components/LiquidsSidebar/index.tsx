@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { i18n } from '../../localization'
 import { PrimaryButton, SidePanel } from '@opentrons/components'
 import { PDTitledList } from '../lists'
 import { swatchColors } from '../swatchColors'
 import listButtonStyles from '../listButtons.css'
 
+import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { OrderedLiquids } from '../../labware-ingred/types'
 import * as labwareIngredActions from '../../labware-ingred/actions'
@@ -27,6 +28,9 @@ type Props = SP & DP
 
 function LiquidsSidebarComponent(props: Props): JSX.Element {
   const { liquids, selectedLiquid, createNewLiquid, selectLiquid } = props
+  const enableLiquidColorEnhancements = useSelector(
+    featureFlagSelectors.getEnabledLiquidColorEnhancements
+  )
   return (
     <SidePanel title="Liquids">
       {liquids.map(({ ingredientId, name, displayColor }) => (
@@ -36,8 +40,14 @@ function LiquidsSidebarComponent(props: Props): JSX.Element {
           onClick={() => selectLiquid(ingredientId)}
           iconName="circle"
           iconProps={{
-            style: { fill: displayColor ?? swatchColors(ingredientId) },
-            className: styles.liquid_icon_container,
+            style: {
+              fill: enableLiquidColorEnhancements
+                ? displayColor ?? swatchColors(ingredientId)
+                : swatchColors(ingredientId),
+            },
+            ...(enableLiquidColorEnhancements && {
+              className: styles.liquid_icon_container,
+            }),
           }}
           title={name || `Unnamed Ingredient ${ingredientId}`} // fallback, should not happen
         />
