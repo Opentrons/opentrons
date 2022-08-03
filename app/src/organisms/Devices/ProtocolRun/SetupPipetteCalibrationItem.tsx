@@ -99,7 +99,7 @@ export function SetupPipetteCalibrationItem({
             {t('pipette_mismatch')}
             <Link
               external
-              color={COLORS.darkBlack}
+              color={COLORS.darkBlackEnabled}
               fontSize={TYPOGRAPHY.fontSizeP}
               lineHeight={TYPOGRAPHY.lineHeight12}
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
