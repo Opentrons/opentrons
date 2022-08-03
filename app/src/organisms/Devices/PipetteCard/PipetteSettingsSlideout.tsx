@@ -71,6 +71,7 @@ export const PipetteSettingsSlideout = (
           pipetteId={pipetteId}
           updateRequest={updateRequest}
           updateSettings={updateSettings}
+          robotName={robotName}
         />
       </Flex>
     </Slideout>

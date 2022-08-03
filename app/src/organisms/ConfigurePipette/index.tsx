@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Box } from '@opentrons/components'
-import { usePipetteSettingsQuery } from '@opentrons/react-api-client'
 import { SUCCESS, FAILURE, PENDING } from '../../redux/robot-api'
 import { useFeatureFlag } from '../../redux/config'
 import { ConfigForm } from './ConfigForm'
@@ -11,29 +11,36 @@ import type {
   PipetteSettingsFieldsUpdate,
 } from '../../redux/pipettes/types'
 import type { RequestState } from '../../redux/robot-api/types'
+import type { State } from '../../redux/types'
 
-const PIPETTE_SETTINGS_POLL_MS = 5000
 interface Props {
   closeModal: () => unknown
   pipetteId: AttachedPipette['id']
   updateRequest: RequestState | null
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => void
+  robotName: string
 }
 
 export function ConfigurePipette(props: Props): JSX.Element {
-  const { closeModal, pipetteId, updateRequest, updateSettings } = props
+  const {
+    closeModal,
+    pipetteId,
+    updateRequest,
+    updateSettings,
+    robotName,
+  } = props
   const { t } = useTranslation('device_details')
-  const settings = usePipetteSettingsQuery({
-    refetchInterval: PIPETTE_SETTINGS_POLL_MS,
-  })?.data
+
+  const settings = useSelector(
+    (state: State) =>
+      state?.pipettes?.[robotName]?.settingsById?.[pipetteId]?.fields
+  )
   const groupLabels = [
     t('plunger_positions'),
     t('tip_pickup_drop'),
     t('for_dev_use_only'),
     t('power_force'),
   ]
-
-  console.log('SETTINGS', settings)
 
   const updateError: string | null =
     updateRequest && updateRequest.status === FAILURE
@@ -56,8 +63,7 @@ export function ConfigurePipette(props: Props): JSX.Element {
       {updateError && <ConfigErrorBanner message={updateError} />}
       {settings != null && pipetteId != null && (
         <ConfigForm
-          //  @ts-expect-error: pipetteId and settings should not be undefined
-          settings={settings[pipetteId].fields}
+          settings={settings}
           updateInProgress={updateRequest?.status === PENDING}
           updateSettings={updateSettings}
           closeModal={closeModal}
