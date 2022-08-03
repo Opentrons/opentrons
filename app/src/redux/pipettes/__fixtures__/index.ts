@@ -1,6 +1,6 @@
 // mock HTTP responses for pipettes endpoints
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import type { PipetteSettings, PipetteSettingsFieldsMap } from '../types'
+import type { PipetteSettings } from '../types'
 import type {
   RobotApiResponse,
   RobotApiResponseMeta,
