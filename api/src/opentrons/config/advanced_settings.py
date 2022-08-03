@@ -455,7 +455,7 @@ def _migrate14to15(previous: SettingsMap) -> SettingsMap:
 def _migrate15to16(previous: SettingsMap) -> SettingsMap:
     """Migrate to version 16 of the feature flags file.
 
-    - Removes deprecated enableProtocolEngine option
+    - Removes deprecated enableHeaterShakerPAPI option
     """
     removals = ["enableHeaterShakerPAPI"]
     newmap = {k: v for k, v in previous.items() if k not in removals}
