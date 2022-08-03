@@ -10,6 +10,7 @@ import type {
   AttachedPipette,
   PipetteSettingsFieldsUpdate,
 } from '../../redux/pipettes/types'
+import { getAttachedPipetteSettingsFieldsById } from '../../redux/pipettes'
 import type { RequestState } from '../../redux/robot-api/types'
 import type { State } from '../../redux/types'
 
@@ -31,9 +32,8 @@ export function ConfigurePipette(props: Props): JSX.Element {
   } = props
   const { t } = useTranslation('device_details')
 
-  const settings = useSelector(
-    (state: State) =>
-      state?.pipettes?.[robotName]?.settingsById?.[pipetteId]?.fields
+  const settings = useSelector((state: State) =>
+    getAttachedPipetteSettingsFieldsById(state, robotName, pipetteId)
   )
   const groupLabels = [
     t('plunger_positions'),
