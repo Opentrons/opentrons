@@ -25,11 +25,11 @@ import {
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { StyledText } from '../../../../atoms/text'
+import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 import {
   getTotalVolumePerLiquidId,
   getTotalVolumePerLiquidLabwarePair,
-  getSlotLabwareName,
 } from './utils'
 
 import type { LabwareByLiquidId } from '@opentrons/api-client'

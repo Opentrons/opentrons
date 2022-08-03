@@ -1,5 +1,4 @@
 """Test one-shot tool detector."""
-import asyncio
 from opentrons_hardware.firmware_bindings.constants import ToolType, PipetteName
 from opentrons_hardware.firmware_bindings.messages import (
     MessageDefinition,
@@ -334,12 +333,12 @@ async def test_handles_bad_serials(
     )
 
 
-async def test_timeout(
+async def test_no_instrument_info_response(
     subject: detector.OneshotToolDetector,
     mock_messenger: AsyncMock,
     message_send_loopback: CanLoopback,
 ) -> None:
-    """It should accept serial values that cannot be decoded."""
+    """It should not crash when a tool does not respond."""
 
     def attached_tool_responder(
         node_id: NodeId, message: MessageDefinition
@@ -362,5 +361,7 @@ async def test_timeout(
 
     message_send_loopback.add_responder(attached_tool_responder)
 
-    with pytest.raises(asyncio.TimeoutError):
-        await subject.detect(timeout_sec=0.1)
+    responses = await subject.detect(timeout_sec=0.1)
+    assert responses.left is None
+    assert responses.right is None
+    assert responses.gripper is None

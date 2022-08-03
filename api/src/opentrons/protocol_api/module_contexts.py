@@ -925,12 +925,16 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
 
         Set the heater shaker's target speed and wait until the specified speed has
         reached. Delays protocol execution until the target speed has been achieved.
+
+        NOTE: Before shaking, this command will retract the pipettes up if they are
+              parked adjacent to the heater-shaker.
         """
         if (
             self._module.labware_latch_status
             == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
         ):
             validated_speed = validate_heater_shaker_speed(rpm=rpm)
+            self._prepare_for_shake()
             self._module.set_speed(rpm=validated_speed)
         else:
             # TODO: Figure out whether to issue close latch behind the scenes instead
@@ -943,11 +947,13 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     def open_labware_latch(self) -> None:
         """Open the Heater-Shaker's labware latch.
 
-        Note that the labware latch needs to be closed before:
-
-        * Shaking
-        * Pipetting to or from the labware on the Heater-Shaker
-        * Pipetting to or from labware to the left or right of the Heater-Shaker
+        NOTE:
+        1. This command will retract the pipettes up if they are parked east or west
+           of the Heater-Shaker.
+        2. The labware latch needs to be closed before:
+            * Shaking
+            * Pipetting to or from the labware on the Heater-Shaker
+            * Pipetting to or from labware to the left or right of the Heater-Shaker
 
         Raises an error when attempting to open the latch while the Heater-Shaker is shaking.
         """
@@ -956,6 +962,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             raise CannotPerformModuleAction(
                 """Cannot open labware latch while module is shaking."""
             )
+        self._prepare_for_latch_open()
         self._module.open_labware_latch()
 
     # TODO: add API version requirement
@@ -1019,3 +1026,32 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             is_plate_shaking=is_plate_shaking,
             is_labware_latch_closed=is_labware_latch_closed,
         )
+
+    def _prepare_for_shake(self) -> None:
+        """
+        Before shaking, retracts pipettes if they're parked over a slot
+        adjacent to the heater-shaker.
+        """
+
+        if cast(HeaterShakerGeometry, self.geometry).is_pipette_blocking_shake_movement(
+            pipette_location=self._ctx.location_cache
+        ):
+            ctx_implementation = self._ctx._implementation
+            hardware = ctx_implementation.get_hardware()
+            for mount in types.Mount:
+                hardware.retract(mount=mount)
+            self._ctx.location_cache = None
+
+    def _prepare_for_latch_open(self) -> None:
+        """
+        Before opening latch, retracts pipettes if they're parked over a slot
+        east/ west of the heater-shaker.
+        """
+        if cast(HeaterShakerGeometry, self.geometry).is_pipette_blocking_latch_movement(
+            pipette_location=self._ctx.location_cache
+        ):
+            ctx_implementation = self._ctx._implementation
+            hardware = ctx_implementation.get_hardware()
+            for mount in types.Mount:
+                hardware.retract(mount=mount)
+            self._ctx.location_cache = None

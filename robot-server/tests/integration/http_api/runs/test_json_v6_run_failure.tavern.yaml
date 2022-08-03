@@ -58,8 +58,7 @@ stages:
             - id: !anystr
               errorType: ProtocolCommandFailedError
               createdAt: !anystr
-              detail: !re_search '^Command [a-f0-9-]+ failed to execute$'
-
+              detail: 'Cannot perform DROPTIP without a tip attached'
   - name: Verify commands contain the expected results
     request:
       url: '{host:s}:{port:d}/runs/{run_id}/commands'

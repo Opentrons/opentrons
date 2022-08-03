@@ -20,6 +20,7 @@ import {
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
+  HEATERSHAKER_MODULE_TYPE,
   HS_TOO_HOT_TEMP,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -224,8 +225,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >
-      {showWizard && (
-        <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+      {showWizard && module.moduleType === HEATERSHAKER_MODULE_TYPE && (
+        <HeaterShakerWizard
+          onCloseClick={() => setShowWizard(false)}
+          attachedModule={module}
+        />
       )}
       {showSlideout && (
         <ModuleSlideout

@@ -8,11 +8,8 @@ import {
   LabwareRender,
 } from '@opentrons/components'
 import { parseLiquidsInLoadOrder } from '@opentrons/api-client'
-import {
-  getSlotLabwareName,
-  getLiquidsByIdForLabware,
-  getWellFillFromLabwareId,
-} from '../utils'
+import { getSlotLabwareName } from '../../utils/getSlotLabwareName'
+import { getLiquidsByIdForLabware, getWellFillFromLabwareId } from '../utils'
 import {
   useLabwareRenderInfoForRunById,
   useProtocolDetailsForRun,
@@ -28,6 +25,7 @@ jest.mock('@opentrons/components', () => {
   }
 })
 jest.mock('@opentrons/api-client')
+jest.mock('../../utils/getSlotLabwareName')
 jest.mock('../utils')
 jest.mock('../LiquidDetailCard')
 jest.mock('../../../../Devices/hooks')

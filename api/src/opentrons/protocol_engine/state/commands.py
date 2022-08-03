@@ -522,7 +522,7 @@ class CommandView(HasState[CommandState]):
             for command_id in self._state.all_command_ids:
                 command = self._state.commands_by_id[command_id].command
                 if command.error and command.intent != CommandIntent.SETUP:
-                    raise ProtocolCommandFailedError(command_id=command_id)
+                    raise ProtocolCommandFailedError(command.error.detail)
             return True
         else:
             return False

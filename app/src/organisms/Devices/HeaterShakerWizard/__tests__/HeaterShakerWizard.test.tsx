@@ -3,7 +3,6 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { MemoryRouter } from 'react-router-dom'
 import { i18n } from '../../../../i18n'
-import { useAttachedModules } from '../../hooks'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { HeaterShakerWizard } from '..'
@@ -22,11 +21,6 @@ jest.mock('../AttachModule')
 jest.mock('../AttachAdapter')
 jest.mock('../PowerOn')
 jest.mock('../TestShake')
-jest.mock('../../hooks')
-
-const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
-  typeof useAttachedModules
->
 
 const mockIntroduction = Introduction as jest.MockedFunction<
   typeof Introduction
@@ -60,8 +54,8 @@ describe('HeaterShakerWizard', () => {
   beforeEach(() => {
     props = {
       onCloseClick: jest.fn(),
+      attachedModule: mockHeaterShaker,
     }
-    mockUseAttachedModules.mockReturnValue([mockHeaterShaker])
     mockIntroduction.mockReturnValue(<div>Mock Introduction</div>)
     mockKeyParts.mockReturnValue(<div>Mock Key Parts</div>)
     mockAttachModule.mockReturnValue(<div>Mock Attach Module</div>)
@@ -121,6 +115,7 @@ describe('HeaterShakerWizard', () => {
         protocolLoadOrder: 1,
         slotName: '1',
       } as ProtocolModuleInfo,
+      attachedModule: mockHeaterShaker,
     }
     const { getByText, getByRole } = render(props)
 
@@ -148,8 +143,10 @@ describe('HeaterShakerWizard', () => {
   })
 
   it('renders power on component and the test shake button is disabled', () => {
-    mockUseAttachedModules.mockReturnValue([])
-
+    props = {
+      ...props,
+      attachedModule: null,
+    }
     const { getByText, getByRole } = render(props)
 
     let button = getByRole('button', { name: 'Continue to attachment guide' })

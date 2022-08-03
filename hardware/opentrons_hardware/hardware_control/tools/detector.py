@@ -2,7 +2,7 @@
 
 import logging
 import asyncio
-from typing import AsyncIterator, Set, Dict, Tuple
+from typing import AsyncIterator, Set, Dict, Tuple, Union
 
 from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
 from opentrons_hardware.firmware_bindings.constants import ToolType, PipetteName
@@ -81,10 +81,12 @@ class OneshotToolDetector:
 
     @staticmethod
     async def _await_responses(
-        callback: WaitableCallback, for_nodes: Set[NodeId]
-    ) -> Tuple[Dict[NodeId, PipetteInformation], Dict[NodeId, GripperInformation]]:
-        pipette_to_ret: Dict[NodeId, PipetteInformation] = {}
-        gripper_to_ret: Dict[NodeId, GripperInformation] = {}
+        callback: WaitableCallback,
+        for_nodes: Set[NodeId],
+        response_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation]]]",
+    ) -> None:
+        """Wait for pipette or gripper information and send back through a queue."""
+        seen: Set[NodeId] = set()
 
         def _decode_or_default(orig: bytes) -> str:
             try:
@@ -92,28 +94,39 @@ class OneshotToolDetector:
             except UnicodeDecodeError:
                 return repr(orig)
 
-        while not for_nodes.issubset(
-            set(pipette_to_ret.keys()).union(gripper_to_ret.keys())
-        ):
+        while not for_nodes.issubset(seen):
             async for response, arbitration_id in callback:
                 if isinstance(response, message_definitions.PipetteInfoResponse):
-                    pipette_to_ret[
-                        NodeId(arbitration_id.parts.originating_node_id)
-                    ] = PipetteInformation(
-                        name=PipetteName(response.payload.name.value),
-                        model=response.payload.model.value,
-                        serial=_decode_or_default(response.payload.serial.value),
+                    node = NodeId(arbitration_id.parts.originating_node_id)
+                    seen.add(node)
+                    await response_queue.put(
+                        (
+                            node,
+                            PipetteInformation(
+                                name=PipetteName(response.payload.name.value),
+                                model=response.payload.model.value,
+                                serial=_decode_or_default(
+                                    response.payload.serial.value
+                                ),
+                            ),
+                        )
                     )
                     break
                 elif isinstance(response, message_definitions.GripperInfoResponse):
-                    gripper_to_ret[
-                        NodeId(arbitration_id.parts.originating_node_id)
-                    ] = GripperInformation(
-                        model=response.payload.model.value,
-                        serial=_decode_or_default(response.payload.serial.value),
+                    node = NodeId(arbitration_id.parts.originating_node_id)
+                    seen.add(node)
+                    await response_queue.put(
+                        (
+                            node,
+                            GripperInformation(
+                                model=response.payload.model.value,
+                                serial=_decode_or_default(
+                                    response.payload.serial.value
+                                ),
+                            ),
+                        )
                     )
                     break
-        return pipette_to_ret, gripper_to_ret
 
     async def detect(self, timeout_sec: float = 1.0) -> ToolSummary:
         """Run once and detect tools."""
@@ -141,11 +154,26 @@ class OneshotToolDetector:
                 node_id=NodeId.broadcast,
                 message=message_definitions.InstrumentInfoRequest(),
             )
-            pipette_res, gripper_res = await asyncio.wait_for(
-                self._await_responses(wc, should_respond), timeout=timeout_sec
+            incoming_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation]]]" = (
+                asyncio.Queue()
             )
+            try:
+                await asyncio.wait_for(
+                    self._await_responses(wc, should_respond, incoming_queue),
+                    timeout=timeout_sec,
+                )
+            except asyncio.TimeoutError:
+                pass
+        pipettes: Dict[NodeId, PipetteInformation] = {}
+        gripper: Dict[NodeId, GripperInformation] = {}
+        while not incoming_queue.empty():
+            node, info = incoming_queue.get_nowait()
+            if isinstance(info, PipetteInformation):
+                pipettes[node] = info
+            else:
+                gripper[node] = info
         return ToolSummary(
-            left=pipette_res.get(NodeId.pipette_left, None),
-            right=pipette_res.get(NodeId.pipette_right, None),
-            gripper=gripper_res.get(NodeId.gripper, None),
+            left=pipettes.get(NodeId.pipette_left, None),
+            right=pipettes.get(NodeId.pipette_right, None),
+            gripper=gripper.get(NodeId.gripper, None),
         )

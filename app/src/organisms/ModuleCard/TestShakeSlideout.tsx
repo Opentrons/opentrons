@@ -310,7 +310,10 @@ export const TestShakeSlideout = (
         </Flex>
       </Flex>
       {showWizard && (
-        <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+        <HeaterShakerWizard
+          onCloseClick={() => setShowWizard(false)}
+          attachedModule={module}
+        />
       )}
       <Link
         role="button"
