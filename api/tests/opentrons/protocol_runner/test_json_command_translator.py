@@ -331,7 +331,7 @@ VALID_TEST_PARAMS = [
             key=None,
             params=protocol_schema_v6.Params(
                 labwareId="labware-id-def456",
-                liquidId="labware-id-555",
+                liquidId="liquid-id-555",
                 volumeByWell={
                     "wellName": "A1",
                     "volume": 32
@@ -342,8 +342,8 @@ VALID_TEST_PARAMS = [
             key=None,
             params=pe_commands.LoadLiquidParams(
                 labwareId="labware-id-def456",
-                liquidId="labware-id-555",
-                volumeByWell=WellLocation(
+                liquidId="liquid-id-555",
+                volumeByWell=pe_commands.VolumeByWell(
                     wellName="A1",
                     volume=32
                 ),
@@ -406,6 +406,12 @@ def _make_json_protocol(
             displayName="Source Plate", definitionId="example/plate/1"
         )
     },
+    liquids: Dict[str, protocol_schema_v6.Liquid] = {
+        "liquid-id-555": protocol_schema_v6.Liquid(
+            displayName="water",
+            description="water description"
+        )
+    },
     commands: List[protocol_schema_v6.Command] = [],
     modules: Dict[str, protocol_schema_v6.Module] = {
         "magneticModuleId": protocol_schema_v6.Module(model="magneticModuleV2")
@@ -423,6 +429,7 @@ def _make_json_protocol(
         labwareDefinitions=labware_definitions,
         labware=labware,
         commands=commands,
+        liquids=liquids,
         modules=modules,
     )
 

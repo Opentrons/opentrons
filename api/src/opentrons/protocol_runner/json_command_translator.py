@@ -83,6 +83,34 @@ def _translate_pipette_command(
     return translated_obj
 
 
+def _translate_liquid_command(
+        protocol: ProtocolSchemaV6, command: protocol_schema_v6.Command
+) -> pe_commands.LoadLabwareCreate:
+    liquidId = command.params.liquidId
+    labwareId = command.params.labwareId
+    # v6 data model supports all commands and therefor most props are optional.
+    # load liquid command must contain labware_id and definition_id.
+    assert liquidId is not None
+    assert labwareId is not None
+    liquid = protocol.liquids[liquidId]
+    assert liquid is not None
+    print(command.params.volumeByWell)
+    volume_by_well = parse_obj_as(
+                # https://github.com/samuelcolvin/pydantic/issues/1847
+                pe_commands.VolumeByWell,  # type: ignore[arg-type]
+                command.params.volumeByWell,
+            ),
+    liquid_command = pe_commands.LoadLiquidCreate(
+        params=pe_commands.LoadLiquidParams(
+            labwareId=labwareId,
+            liquidId=liquidId,
+            volumeByWell=volume_by_well
+        ),
+        key=command.key,
+    )
+    return liquid_command
+
+
 def _translate_simple_command(
     command: protocol_schema_v6.Command,
 ) -> pe_commands.CommandCreate:
@@ -116,7 +144,6 @@ class JsonCommandTranslator:
         """Takes json protocol v6 and translates commands->protocol engine commands."""
         commands_list: List[pe_commands.CommandCreate] = []
         exclude_commands = [
-            "loadLiquid",
             "moveToSlot",
         ]
         commands_to_parse = [
@@ -131,6 +158,8 @@ class JsonCommandTranslator:
                 translated_obj = _translate_module_command(protocol, command)
             elif command.commandType == "loadLabware":
                 translated_obj = _translate_labware_command(protocol, command)
+            elif command.commandType == "loadLiquid":
+                translated_obj = _translate_liquid_command(protocol, command)
             else:
                 translated_obj = _translate_simple_command(command)
             commands_list.append(translated_obj)
