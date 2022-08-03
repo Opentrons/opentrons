@@ -19,11 +19,17 @@ interface ConfigurePipetteProps {
   pipetteId: AttachedPipette['id']
   updateRequest: RequestState | null
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => void
-  ref: React.Ref<RefObject>
+  configFormRef: React.Ref<RefObject>
 }
 
 export function ConfigurePipette(props: ConfigurePipetteProps): JSX.Element {
-  const { closeModal, pipetteId, updateRequest, updateSettings, ref } = props
+  const {
+    closeModal,
+    pipetteId,
+    updateRequest,
+    updateSettings,
+    configFormRef,
+  } = props
   const { t } = useTranslation('device_details')
   const settings = usePipetteSettingsQuery({
     refetchInterval: PIPETTE_SETTINGS_POLL_MS,
@@ -62,7 +68,7 @@ export function ConfigurePipette(props: ConfigurePipetteProps): JSX.Element {
           updateSettings={updateSettings}
           groupLabels={groupLabels}
           __showHiddenFields={__showHiddenFields}
-          ref={ref}
+          configFormRef={configFormRef}
         />
       )}
     </Box>

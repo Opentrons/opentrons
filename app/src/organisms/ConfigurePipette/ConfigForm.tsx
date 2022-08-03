@@ -42,11 +42,11 @@ export interface ConfigFormProps {
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => unknown
   groupLabels: string[]
   __showHiddenFields: boolean
-  ref: any
+  configFormRef: React.Ref<RefObject>
 }
 
 export interface RefObject {
-  handleSubmit: () => void
+  handleSubmit: (values: FormValues) => void
 }
 
 const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
@@ -103,7 +103,7 @@ export const ConfigForm = React.forwardRef(
       )
     }
 
-    React.useImperativeHandle(props.ref, () => ({ handleSubmit }))
+    React.useImperativeHandle(props.configFormRef, () => ({ handleSubmit }))
 
     const handleSubmit = (values: FormValues): void => {
       const params = mapValues<FormValues, number | boolean | null>(

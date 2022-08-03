@@ -53,7 +53,7 @@ export const PipetteSettingsSlideout = (
 
   const handleUpdateSettings = (): void => {
     if (configFormRef.current != null) {
-      configFormRef.current?.handleSubmit()
+      // configFormRef.current?.handleSubmit()
       onCloseClick()
     }
   }
@@ -88,7 +88,7 @@ export const PipetteSettingsSlideout = (
           pipetteId={pipetteId}
           updateRequest={updateRequest}
           updateSettings={updateSettings}
-          ref={configFormRef}
+          configFormRef={configFormRef}
         />
       </Flex>
     </Slideout>
