@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { resetAllWhenMocks } from 'jest-when'
+import omit from 'lodash/omit'
 import { renderWithProviders } from '@opentrons/components'
+import { pipetteSettingsResponseFixture } from '@opentrons/api-client/src/pipettes'
 import { act } from 'react-dom/test-utils'
 import { i18n } from '../../../../i18n'
 import * as RobotApi from '../../../../redux/robot-api'
@@ -8,12 +10,13 @@ import { getAttachedPipetteSettingsFieldsById } from '../../../../redux/pipettes
 import { getConfig } from '../../../../redux/config'
 import { PipetteSettingsSlideout } from '../PipetteSettingsSlideout'
 
-import {
-  mockLeftSpecs,
-  mockPipetteSettingsFieldsMap,
-} from '../../../../redux/pipettes/__fixtures__'
+import { mockLeftSpecs } from '../../../../redux/pipettes/__fixtures__'
 
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
+import {
+  PipetteQuirksField,
+  PipetteSettingsFieldsMap,
+} from '../../../../redux/pipettes/types'
 
 jest.mock('../../../../redux/robot-api')
 jest.mock('../../../../redux/config')
@@ -64,7 +67,7 @@ describe('PipetteSettingsSlideout', () => {
     })
     mockGetConfig.mockReturnValue({} as any)
     mockGetAttachedPipetteSettingsFieldById.mockReturnValue(
-      mockPipetteSettingsFieldsMap
+      omit(pipetteSettingsResponseFixture.fakePipetteIdOne.fields, 'quirks')
     )
     dispatchApiRequest = jest.fn()
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, ['id']])
