@@ -14,7 +14,7 @@ import type { RequestState } from '../../redux/robot-api/types'
 import type { State } from '../../redux/types'
 
 interface Props {
-  closeModal: () => unknown
+  closeModal: () => void
   pipetteId: AttachedPipette['id']
   updateRequest: RequestState | null
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => void
@@ -66,7 +66,6 @@ export function ConfigurePipette(props: Props): JSX.Element {
           settings={settings}
           updateInProgress={updateRequest?.status === PENDING}
           updateSettings={updateSettings}
-          closeModal={closeModal}
           groupLabels={groupLabels}
           __showHiddenFields={__showHiddenFields}
         />

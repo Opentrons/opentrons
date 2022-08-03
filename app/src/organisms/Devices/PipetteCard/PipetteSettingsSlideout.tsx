@@ -28,7 +28,7 @@ const FETCH_PIPETTES_INTERVAL_MS = 5000
 interface PipetteSettingsSlideoutProps {
   robotName: string
   pipetteName: PipetteModelSpecs['displayName']
-  onCloseClick: () => unknown
+  onCloseClick: () => void
   isExpanded: boolean
   pipetteId: AttachedPipette['id']
 }

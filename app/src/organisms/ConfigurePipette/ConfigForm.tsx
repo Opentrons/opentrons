@@ -40,7 +40,6 @@ export interface ConfigFormProps {
   settings: PipetteSettingsFieldsMap
   updateInProgress: boolean
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => unknown
-  closeModal: () => unknown
   groupLabels: string[]
   __showHiddenFields: boolean
 }
