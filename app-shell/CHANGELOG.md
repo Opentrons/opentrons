@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.1.0-alpha.0) (2022-08-03)
+
+
+### Features
+
+* **app:** replace lookup with search with google in electron-context-menu ([#11232](https://github.com/Opentrons/opentrons/issues/11232)) ([047978f](https://github.com/Opentrons/opentrons/commit/047978f8a64830e790360451a3a3e529986b38e1)), closes [#11220](https://github.com/Opentrons/opentrons/issues/11220)
+
+
+
+
+
 # [6.0.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v6.0.0) (2022-07-14)
 
 

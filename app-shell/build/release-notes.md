@@ -5,6 +5,15 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 ---
+# Opentrons App Changes in 6.1.0
+
+Welcome to the v6.1.0 release of the Opentrons App! This release adds Heater-Shaker support to the Opentrons software ecosystem
+
+## New Features
+
+- Heater-Shaker support
+
+---
 
 # Opentrons App Changes in 6.0.0
 
