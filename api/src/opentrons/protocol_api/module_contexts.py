@@ -811,31 +811,31 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         self._loop = loop
         super().__init__(ctx, geometry, requested_as, at_version)
 
-    @property
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
     def target_temperature(self) -> Optional[float]:
         """Target temperature of the heater-shaker's plate."""
         return self._module.target_temperature
 
-    @property
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
     def current_temperature(self) -> float:
         """Current temperature of the heater-shaker's plate."""
         return self._module.temperature
 
-    @property
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
     def current_speed(self) -> int:
         """Current speed of the heater-shaker's plate."""
         return self._module.speed
 
-    @property
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
     def target_speed(self) -> Optional[int]:
         """Target speed of the heater-shaker's plate."""
         return self._module.target_speed
 
-    @property
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
     def temperature_status(self) -> str:
         """Heater-shaker's temperature status string.
@@ -849,7 +849,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """
         return self._module.temperature_status.value
 
-    @property
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
     def speed_status(self) -> str:
         """Heater-shaker's speed status string.
@@ -863,7 +863,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """
         return self._module.speed_status.value
 
-    @property
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
     def labware_latch_status(self) -> str:
         """Heater-shaker's labware latch status string.
