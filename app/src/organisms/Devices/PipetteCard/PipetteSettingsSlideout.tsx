@@ -15,7 +15,6 @@ import {
   PENDING,
   useDispatchApiRequest,
 } from '../../../redux/robot-api'
-// import { ConfigFormSubmitButton } from '../../ConfigurePipette/ConfigFormSubmitButton'
 import { ConfigurePipette } from '../../ConfigurePipette'
 
 import type {
@@ -72,7 +71,6 @@ export const PipetteSettingsSlideout = (
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
-        // <ConfigFormSubmitButton disabled={updateRequest?.status === PENDING} />
         <PrimaryButton
           onClick={handleUpdateSettings}
           disabled={updateRequest?.status === PENDING}
