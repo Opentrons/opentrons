@@ -79,7 +79,7 @@ class NoSuchModuleError(Exception):
 
 
 class PipetteMovementRestrictedByHeaterShakerError(Exception):
-    """Error raised when trying to move to labware restricted by heater-shaker."""
+    """Error raised when trying to move to labware restricted by Heater-Shaker."""
 
 
 # TODO (spp, 2022-05-09): add tests
@@ -343,14 +343,14 @@ class ThermocyclerGeometry(ModuleGeometry):
 
 
 class HeaterShakerGeometry(ModuleGeometry):
-    """Class holding the state of a heater-shaker's physical geometry."""
+    """Class holding the state of a Heater-Shaker's physical geometry."""
 
     # TODO(mc, 2022-06-16): move these constants to the module definition
     MAX_X_ADJACENT_ITEM_HEIGHT = 53.0
     """Maximum height of an adjacent item in the x-direction.
 
     This value selected to avoid interference
-    with the heater-shaker's labware latch.
+    with the Heater-Shaker's labware latch.
 
     For background, see: https://github.com/Opentrons/opentrons/issues/10316
     """
@@ -402,7 +402,7 @@ class HeaterShakerGeometry(ModuleGeometry):
         is_labware_latch_closed: bool,
         is_plate_shaking: bool,
     ) -> None:
-        """Raise error if unsafe to move pipette due to heater-shaker placement."""
+        """Raise error if unsafe to move pipette due to Heater-Shaker placement."""
         assert isinstance(self.parent, str), "Could not determine module slot location"
 
         heater_shaker_slot = int(self.parent)
@@ -410,7 +410,7 @@ class HeaterShakerGeometry(ModuleGeometry):
         dest_north_south = to_slot in get_north_south_slots(heater_shaker_slot)
         dest_heater_shaker = to_slot == heater_shaker_slot
 
-        # If heater-shaker is running, can't move to or around it
+        # If Heater-Shaker is running, can't move to or around it
         if (
             any([dest_east_west, dest_north_south, dest_heater_shaker])
             and is_plate_shaking
@@ -419,31 +419,31 @@ class HeaterShakerGeometry(ModuleGeometry):
                 "Cannot move pipette to Heater-Shaker or adjacent slot while module is shaking"
             )
 
-        # If heater-shaker's latch is open, can't move to it or east and west of it
+        # If Heater-Shaker's latch is open, can't move to it or east and west of it
         elif (dest_east_west or dest_heater_shaker) and not is_labware_latch_closed:
             raise PipetteMovementRestrictedByHeaterShakerError(
-                "Cannot move pipette east or west of or to Heater-Shaker while latch is open"
+                "Cannot move pipette to Heater-Shaker or adjacent slot to the left or right while labware latch is open"
             )
 
         elif is_using_multichannel:
             # Can't go to east/west slot under any circumstances if pipette is multi-channel
             if dest_east_west:
                 raise PipetteMovementRestrictedByHeaterShakerError(
-                    "Cannot move multi-channel pipette east or west of Heater-Shaker"
+                    "Cannot move 8-Channel pipette to slot adjacent to the left or right of Heater-Shaker"
                 )
             # Can only go north/south if the labware is a tip rack
             elif dest_north_south and not is_tiprack:
                 raise PipetteMovementRestrictedByHeaterShakerError(
-                    "Cannot move multi-channel pipette to non-tip rack labware north or south of Heater-Shaker"
+                    "Cannot move 8-Channel pipette to non-tip-rack labware adjacent to the front or back of Heater-Shaker"
                 )
 
     def is_pipette_blocking_shake_movement(
         self, pipette_location: Optional[Location]
     ) -> bool:
-        """Check whether pipette is parked adjacent to heater-shaker.
+        """Check whether pipette is parked adjacent to Heater-Shaker.
 
-        Returns True if pipette's last known location was on east/west/north/south of or
-        on the heater-shaker. Also returns True if last location is not known or is
+        Returns True if pipette's last known location was in a slot adjacent to or
+        on the Heater-Shaker. Also returns True if last location is not known or is
         not associated with a slot.
         """
         if pipette_location is None:
@@ -471,11 +471,11 @@ class HeaterShakerGeometry(ModuleGeometry):
     def is_pipette_blocking_latch_movement(
         self, pipette_location: Optional[Location]
     ) -> bool:
-        """Check whether pipette is parked east or west of heater-shaker.
+        """Check whether pipette is parked left or right of Heater-Shaker.
 
-        Returns True is pipette's last known location was on east/west of or on the
-        heater-shaker. Also returns True if last location is not known or is not
-        associated with a slot.
+        Returns True is pipette's last known location was on the Heater-Shaker
+        or in a slot adjacent to its left or right. Also returns True if last
+        location is not known or is not associated with a slot.
         """
         if pipette_location is None:
             # If we don't know the pipette's latest location then let's be extra
@@ -805,7 +805,7 @@ def resolve_module_model(module_model_or_load_name: str) -> ModuleModel:
         "thermocycler": ThermocyclerModuleModel.THERMOCYCLER_V1,
         "thermocycler module": ThermocyclerModuleModel.THERMOCYCLER_V1,
         "thermocycler module gen2": ThermocyclerModuleModel.THERMOCYCLER_V2,
-        # No alias for heater-shaker. Use heater-shaker model name for loading.
+        # No alias for Heater-Shaker. Use Heater-Shaker model name for loading.
     }
 
     lower_name = module_model_or_load_name.lower()
