@@ -11,17 +11,19 @@ import type {
   PipetteSettingsFieldsUpdate,
 } from '../../redux/pipettes/types'
 import type { RequestState } from '../../redux/robot-api/types'
+import type { RefObject } from './ConfigForm'
 
 const PIPETTE_SETTINGS_POLL_MS = 5000
-interface Props {
+interface ConfigurePipetteProps {
   closeModal: () => unknown
   pipetteId: AttachedPipette['id']
   updateRequest: RequestState | null
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => void
+  ref: React.Ref<RefObject>
 }
 
-export function ConfigurePipette(props: Props): JSX.Element {
-  const { closeModal, pipetteId, updateRequest, updateSettings } = props
+export function ConfigurePipette(props: ConfigurePipetteProps): JSX.Element {
+  const { closeModal, pipetteId, updateRequest, updateSettings, ref } = props
   const { t } = useTranslation('device_details')
   const settings = usePipetteSettingsQuery({
     refetchInterval: PIPETTE_SETTINGS_POLL_MS,
@@ -58,9 +60,9 @@ export function ConfigurePipette(props: Props): JSX.Element {
           settings={settings[pipetteId].fields}
           updateInProgress={updateRequest?.status === PENDING}
           updateSettings={updateSettings}
-          closeModal={closeModal}
           groupLabels={groupLabels}
           __showHiddenFields={__showHiddenFields}
+          ref={ref}
         />
       )}
     </Box>

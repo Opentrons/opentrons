@@ -9,12 +9,13 @@ import {
   updatePipetteSettings,
 } from '../../../redux/pipettes'
 import { Slideout } from '../../../atoms/Slideout'
+import { PrimaryButton } from '../../../atoms/buttons'
 import {
   getRequestById,
   PENDING,
   useDispatchApiRequest,
 } from '../../../redux/robot-api'
-import { ConfigFormSubmitButton } from '../../ConfigurePipette/ConfigFormSubmitButton'
+// import { ConfigFormSubmitButton } from '../../ConfigurePipette/ConfigFormSubmitButton'
 import { ConfigurePipette } from '../../ConfigurePipette'
 
 import type {
@@ -22,6 +23,7 @@ import type {
   PipetteSettingsFieldsUpdate,
 } from '../../../redux/pipettes/types'
 import type { Dispatch, State } from '../../../redux/types'
+import type { RefObject } from '../../ConfigurePipette/ConfigForm'
 
 const FETCH_PIPETTES_INTERVAL_MS = 5000
 
@@ -37,9 +39,10 @@ export const PipetteSettingsSlideout = (
   props: PipetteSettingsSlideoutProps
 ): JSX.Element | null => {
   const { pipetteName, robotName, isExpanded, pipetteId, onCloseClick } = props
-  const { t } = useTranslation('device_details')
+  const { t } = useTranslation(['device_details', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
+  const configFormRef = React.useRef<RefObject>(null)
   const updateSettings = (fields: PipetteSettingsFieldsUpdate): void => {
     dispatchRequest(updatePipetteSettings(robotName, pipetteId, fields))
   }
@@ -47,6 +50,13 @@ export const PipetteSettingsSlideout = (
   const updateRequest = useSelector((state: State) =>
     latestRequestId != null ? getRequestById(state, latestRequestId) : null
   )
+
+  const handleUpdateSettings = (): void => {
+    if (configFormRef.current != null) {
+      configFormRef.current?.handleSubmit()
+      onCloseClick()
+    }
+  }
 
   useInterval(
     () => {
@@ -62,7 +72,14 @@ export const PipetteSettingsSlideout = (
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
-        <ConfigFormSubmitButton disabled={updateRequest?.status === PENDING} />
+        // <ConfigFormSubmitButton disabled={updateRequest?.status === PENDING} />
+        <PrimaryButton
+          onClick={handleUpdateSettings}
+          disabled={updateRequest?.status === PENDING}
+          width="100%"
+        >
+          {t('shared:confirm')}
+        </PrimaryButton>
       }
     >
       <Flex data-testid={`PipetteSettingsSlideout_${robotName}_${pipetteId}`}>
@@ -71,6 +88,7 @@ export const PipetteSettingsSlideout = (
           pipetteId={pipetteId}
           updateRequest={updateRequest}
           updateSettings={updateSettings}
+          ref={configFormRef}
         />
       </Flex>
     </Slideout>
