@@ -13,10 +13,6 @@ import { PipetteSettingsSlideout } from '../PipetteSettingsSlideout'
 import { mockLeftSpecs } from '../../../../redux/pipettes/__fixtures__'
 
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
-import {
-  PipetteQuirksField,
-  PipetteSettingsFieldsMap,
-} from '../../../../redux/pipettes/types'
 
 jest.mock('../../../../redux/robot-api')
 jest.mock('../../../../redux/config')
