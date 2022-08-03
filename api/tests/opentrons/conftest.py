@@ -150,15 +150,6 @@ async def enable_ot3_hardware_controller(
     yield
     await config.advanced_settings.set_adv_setting("enableOT3HardwareController", False)
 
-
-@pytest.fixture()
-async def enable_heater_shaker_python_api() -> AsyncGenerator[None, None]:
-    """Fixture enabling heater-shaker PAPI support."""
-    await config.advanced_settings.set_adv_setting("enableHeaterShakerPAPI", True)
-    yield
-    await config.advanced_settings.set_adv_setting("enableHeaterShakerPAPI", False)
-
-
 # -----end feature flag fixtures-----------
 
 
