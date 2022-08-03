@@ -116,7 +116,7 @@ export const ConfigForm = React.forwardRef(
       )
 
       // @ts-expect-error TODO updateSettings type doesn't include boolean for values of params, but they could be returned.
-      this.props.updateSettings(params)
+      props.updateSettings(params)
     }
 
     const getFieldValue = (
