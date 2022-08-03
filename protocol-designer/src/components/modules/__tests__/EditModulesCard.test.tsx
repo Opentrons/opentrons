@@ -29,9 +29,6 @@ const getDisableModuleRestrictionsMock = featureFlagSelectors.getDisableModuleRe
 const getPipettesForEditPipetteFormMock = stepFormSelectors.getPipettesForEditPipetteForm as jest.MockedFunction<
   typeof stepFormSelectors.getPipettesForEditPipetteForm
 >
-const getEnabledHeaterShakerMock = featureFlagSelectors.getEnabledHeaterShaker as jest.MockedFunction<
-  typeof featureFlagSelectors.getEnabledHeaterShaker
->
 
 describe('EditModulesCard', () => {
   let store: any
@@ -79,7 +76,6 @@ describe('EditModulesCard', () => {
         tiprackDefURI: null,
       },
     })
-    getEnabledHeaterShakerMock.mockReturnValue(true)
 
     props = {
       modules: {},
