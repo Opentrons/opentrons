@@ -1,6 +1,6 @@
 // mock HTTP responses for pipettes endpoints
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import type { PipetteSettings } from '../types'
+import type { PipetteSettings, PipetteSettingsFieldsMap } from '../types'
 import type {
   RobotApiResponse,
   RobotApiResponseMeta,
@@ -69,6 +69,113 @@ export const mockFetchPipettesFailure: RobotApiResponse = {
 export const mockPipetteSettings: PipetteSettings = {
   info: { name: 'p300_single_gen2', model: 'p300_single_v2.0' },
   fields: { fieldId: { value: 42, default: 42 } },
+}
+
+export const mockPipetteSettingsFieldsMap: PipetteSettingsFieldsMap = {
+  blowout: {
+    units: 'mm',
+    type: 'float',
+    min: -4,
+    max: 10,
+    default: -1,
+    value: 1,
+  },
+  bottom: {
+    units: 'mm',
+    type: 'float',
+    min: -2,
+    max: 19,
+    default: 2,
+    value: 1,
+  },
+  dropTip: {
+    units: 'mm',
+    type: 'float',
+    min: -6,
+    max: 2,
+    default: -4.5,
+    value: 1,
+  },
+  dropTipCurrent: {
+    units: 'amps',
+    type: 'float',
+    min: 0.1,
+    max: 0.8,
+    default: 0.5,
+    value: 1,
+  },
+  dropTipSpeed: {
+    units: 'mm/sec',
+    type: 'float',
+    min: 0.001,
+    max: 30,
+    default: 5,
+    value: 1,
+  },
+  pickUpCurrent: {
+    units: 'amps',
+    type: 'float',
+    min: 0.05,
+    max: 2,
+    default: 0.1,
+    value: 1,
+  },
+  pickUpDistance: {
+    units: 'mm',
+    type: 'float',
+    min: 1,
+    max: 30,
+    default: 10,
+    value: 1,
+  },
+  pickUpIncrement: {
+    units: 'mm',
+    type: 'float',
+    min: 0,
+    max: 10,
+    default: 1,
+    value: 1,
+  },
+  pickUpPresses: {
+    units: 'presses',
+    type: 'int',
+    min: 0,
+    max: 10,
+    default: 3,
+    value: 1,
+  },
+  pickUpSpeed: {
+    units: 'mm/s',
+    type: 'float',
+    min: 1,
+    max: 100,
+    default: 30,
+    value: 1,
+  },
+  plungerCurrent: {
+    units: 'amps',
+    type: 'float',
+    min: 0.1,
+    max: 0.5,
+    default: 0.3,
+    value: 1,
+  },
+  tipLength: {
+    units: 'mm',
+    type: 'float',
+    min: 0,
+    max: 100,
+    default: 33,
+    value: 1,
+  },
+  top: {
+    units: 'mm',
+    type: 'float',
+    min: 5,
+    max: 19.5,
+    default: 19.5,
+    value: 1,
+  },
 }
 
 export const mockFetchPipetteSettingsSuccessMeta: RobotApiResponseMeta = {
