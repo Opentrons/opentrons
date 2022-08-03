@@ -3,7 +3,7 @@
 import asyncio
 import json
 from unittest import mock
-from typing import Any, Dict, AsyncGenerator
+from typing import Any, Dict
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette.dev_types import LabwareUri

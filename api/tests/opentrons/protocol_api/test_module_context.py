@@ -2,8 +2,6 @@ import pytest
 import json
 import mock
 
-from typing import AsyncGenerator
-
 import opentrons.protocol_api as papi
 import opentrons.protocols.geometry as papi_geometry
 
@@ -33,7 +31,6 @@ from opentrons.protocols.context.protocol_api.protocol_context import (
 from opentrons.protocols.geometry.module_geometry import (
     PipetteMovementRestrictedByHeaterShakerError,
 )
-from opentrons.protocols.api_support import util as api_util
 from opentrons_shared_data import load_shared_data
 
 
@@ -205,9 +202,7 @@ def test_incorrect_module_error(ctx_with_tempdeck):
         ("heaterShakerModuleV1", papi.HeaterShakerContext, "heaterShakerModuleV1"),
     ],
 )
-def test_load_simulating_module(
-    ctx, loadname, klass, model
-):
+def test_load_simulating_module(ctx, loadname, klass, model):
     """Check that a known module will not throw an error if in simulation mode.
 
     Note: This is basically an integration test that checks that a module can be

@@ -17,7 +17,6 @@ from collections import OrderedDict
 
 from opentrons import types
 from opentrons.broker import Broker
-from opentrons.config import feature_flags as ff
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleType
@@ -28,7 +27,6 @@ from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
     requires_version,
     APIVersionError,
-    UnsupportedAPIError,
 )
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.context.protocol import AbstractProtocol
