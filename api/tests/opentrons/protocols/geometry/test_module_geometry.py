@@ -308,28 +308,28 @@ def test_raises_when_moving_to_restricted_slots_while_latch_open(
             4,
             False,
             pytest.raises(
-                PipetteMovementRestrictedByHeaterShakerError, match="east or west"
+                PipetteMovementRestrictedByHeaterShakerError, match="left or right"
             ),
         ],  # east
         [
             6,
             False,
             pytest.raises(
-                PipetteMovementRestrictedByHeaterShakerError, match="east or west"
+                PipetteMovementRestrictedByHeaterShakerError, match="left or right"
             ),
         ],  # west
         [
             8,
             False,
             pytest.raises(
-                PipetteMovementRestrictedByHeaterShakerError, match="tip rack"
+                PipetteMovementRestrictedByHeaterShakerError, match="non-tip-rack labware"
             ),
         ],  # north, non-tiprack
         [
             2,
             False,
             pytest.raises(
-                PipetteMovementRestrictedByHeaterShakerError, match="tip rack"
+                PipetteMovementRestrictedByHeaterShakerError, match="non-tip-rack labware"
             ),
         ],  # south, non-tiprack
         [8, True, does_not_raise()],  # north, tiprack
