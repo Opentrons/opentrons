@@ -138,38 +138,79 @@ def run(
         items.recorder.stop()
 
 
+@dataclass
+class TimestampedGravRecording:
+    before: GravimetricRecording
+    pre_aspirate: GravimetricRecording
+    aspirate: GravimetricRecording
+    post_aspirate: GravimetricRecording
+    pre_dispense: GravimetricRecording
+    dispense: GravimetricRecording
+    post_dispense: GravimetricRecording
+
+
+@dataclass
+class BeforeAfterGravRecordings:
+    before: GravimetricRecording
+    after: GravimetricRecording
+
+
+def _split_recording_from_timestamps(recording: GravimetricRecording,
+                                     timestamps: List[SampleTimestamps]) -> List[TimestampedGravRecording]:
+    def _get_rec_slice(start: float, end: float) -> GravimetricRecording:
+        duration = min(end - start, recording.end_time - start)
+        return recording.get_time_slice(start=start,
+                                        duration=duration,
+                                        stable=False,
+                                        timeout=duration)
+    split_recs = list()
+    for i, t in enumerate(timestamps):
+        if i == 0:
+            before_start = recording.start_time
+            post_dispense_end = timestamps[i + 1].pre_aspirate.time
+        elif i == len(timestamps) - 1:
+            before_start = timestamps[i - 1].post_dispense.time
+            post_dispense_end = recording.end_time
+        else:
+            before_start = timestamps[i - 1].post_dispense.time
+            post_dispense_end = timestamps[i + 1].pre_aspirate.time
+        s = TimestampedGravRecording(
+            before=_get_rec_slice(before_start, t.pre_aspirate.time),
+            pre_aspirate=_get_rec_slice(t.pre_aspirate.time, t.aspirate.time),
+            aspirate=_get_rec_slice(t.aspirate.time, t.post_aspirate.time),
+            post_aspirate=_get_rec_slice(t.post_aspirate.time, t.pre_dispense.time),
+            pre_dispense=_get_rec_slice(t.pre_dispense.time, t.dispense.time),
+            dispense=_get_rec_slice(t.dispense.time, t.post_dispense.time),
+            post_dispense=_get_rec_slice(t.post_dispense.time, post_dispense_end)
+        )
+        split_recs.append(s)
+    return split_recs
+
+
+def _isolate_before_after_recordings(recordings: List[TimestampedGravRecording]) -> List[BeforeAfterGravRecordings]:
+    before_after_recordings = list()
+    for s in recordings:
+        b = s.post_aspirate
+        a = s.post_dispense
+        b_start = b.start_time + SCALE_SECONDS_TO_SETTLE
+        a_start = a.start_time + SCALE_SECONDS_TO_SETTLE
+        before_after_recordings.append(BeforeAfterGravRecordings(
+            before=b.get_time_slice(start=b_start, duration=GRAV_STABLE_DURATION,
+                                    stable=True, timeout=GRAV_STABLE_TIMEOUT),
+            after=a.get_time_slice(start=a_start, duration=GRAV_STABLE_DURATION,
+                                   stable=True, timeout=GRAV_STABLE_TIMEOUT)
+        ))
+    return before_after_recordings
+
+
 def _analyze_recording_and_timestamps(ctx: ProtocolContext,
                                       recording: GravimetricRecording,
                                       timestamps: List[SampleTimestamps]) -> None:
-
-    def _get_rec_slice(start: float, end: float) -> GravimetricRecording:
-        if ctx.is_simulating():
-            return recording.get_time_slice(start=recording.start_time,
-                                            duration=0.1,
-                                            stable=True,
-                                            timeout=0.2)
-
-        _start = start + SCALE_SECONDS_TO_SETTLE
-        _timeout = end - _start
-        return recording.get_time_slice(start=_start,
-                                        duration=GRAV_STABLE_DURATION,
-                                        stable=True,
-                                        timeout=_timeout)
-
-    recorded_dispense_slices = list()
-    for i, t in enumerate(timestamps):
-        if i < len(timestamps) - 1:
-            post_boundary = timestamps[i + 1].pre_aspirate.time
-        else:
-            post_boundary = recording.end_time
-        recorded_dispense_slices.append({
-            'pre': _get_rec_slice(start=t.post_aspirate.time, end=t.pre_dispense.time),
-            'post': _get_rec_slice(start=t.post_dispense.time, end=post_boundary)
-        })
-
+    recorded_slices = _split_recording_from_timestamps(recording, timestamps)
+    before_after_recordings = _isolate_before_after_recordings(recorded_slices)
     dispense_volumes = [
-        r['post'].average - r['pre'].average
-        for r in recorded_dispense_slices
+        r.after.average - r.before.average
+        for r in before_after_recordings
     ]
     assert len(dispense_volumes)
     dispense_avg = sum(dispense_volumes) / len(dispense_volumes)

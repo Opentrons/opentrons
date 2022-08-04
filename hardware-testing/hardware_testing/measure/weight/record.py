@@ -151,7 +151,7 @@ class GravimetricRecording(List):
             csv_file_str += s.as_csv(start_time) + "\n"
         return csv_file_str + "\n"
 
-    def _get_nearest_sample_index(self, _time: float) -> int:
+    def _get_nearest_sample_index(self, _time: float, round_to: str = 'closest') -> int:
         if _time < self.start_time or _time > self.end_time:
             raise ValueError(f"Time ({_time}) is not within recording "
                              f"(start={self.start_time}, end={self.end_time})")
@@ -159,7 +159,7 @@ class GravimetricRecording(List):
             diff_before = _time - self[i].time
             diff_after = self[i + 1].time - _time
             if diff_before >= 0 and diff_after >= 0:
-                if diff_before < diff_after:
+                if round_to == 'down' or (round_to == 'closest' and diff_before < diff_after):
                     return i
                 else:
                     return i + 1
@@ -170,11 +170,11 @@ class GravimetricRecording(List):
     ) -> "GravimetricRecording":
         """Get time slice."""
         assert len(self), "Cannot slice an empty recording"
-        avail_start_idx = self._get_nearest_sample_index(start)
-        avail_timeout_idx = self._get_nearest_sample_index(start + timeout)
-        available_samples = GravimetricRecording(self[avail_start_idx:avail_timeout_idx])
+        avail_start_idx = self._get_nearest_sample_index(start, round_to='down')
+        avail_timeout_idx = self._get_nearest_sample_index(start + timeout, round_to='up')
+        available_samples = GravimetricRecording(self[avail_start_idx:avail_timeout_idx + 1])
         if not stable:
-            end_idx = available_samples._get_nearest_sample_index(duration)
+            end_idx = available_samples._get_nearest_sample_index(start + duration)
             return GravimetricRecording(available_samples[:end_idx + 1])
         else:
             # only include the first stable segment of samples
