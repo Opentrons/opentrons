@@ -16,6 +16,10 @@ import {
   CONNECTABLE,
   REACHABLE,
   UNREACHABLE,
+  RE_ROBOT_MODEL_OT3,
+  RE_ROBOT_MODEL_OT2,
+  ROBOT_MODEL_OT2,
+  ROBOT_MODEL_OT3,
 } from './constants'
 
 // TODO(mc, 2018-10-10): fix circular dependency with RPC API client
@@ -29,6 +33,7 @@ import {
   ReachableRobot,
   UnreachableRobot,
   ViewableRobot,
+  RobotModel,
 } from './types'
 
 type GetConnectableRobots = (state: State) => Robot[]
@@ -54,6 +59,27 @@ const isLocal = (ip: string): boolean => {
 
 const ipToHostname = (ip: string): string => (isIp.v6(ip) ? `[${ip}]` : ip)
 
+const makeRobotModel = (
+  healthModel: string | null,
+  serverHealthModel: string | null,
+  advertisedModel: string | null
+): RobotModel => {
+  return (
+    [healthModel, serverHealthModel, advertisedModel].reduce(
+      (
+        bestModel: RobotModel | null,
+        modelEntry: string | null
+      ): RobotModel | null => {
+        if (bestModel || !modelEntry) return bestModel
+        if (RE_ROBOT_MODEL_OT3.test(modelEntry)) return ROBOT_MODEL_OT3
+        if (RE_ROBOT_MODEL_OT2.test(modelEntry)) return ROBOT_MODEL_OT2
+        return null
+      },
+      null
+    ) ?? ROBOT_MODEL_OT2
+  )
+}
+
 export function getScanning(state: State): boolean {
   return state.discovery.scanning
 }
@@ -67,8 +93,9 @@ export const getDiscoveredRobots: (
     return Object.keys(robotsMap).map((robotName: string) => {
       const robot = robotsMap[robotName]
       const { addresses, ...robotState } = robot
-      const { health } = robotState
+      const { health, serverHealth } = robotState
       const addr = head(addresses)
+      const advertisedModel = addr?.advertisedModel ?? null
       const ip = addr?.ip ? ipToHostname(addr.ip) : null
       const port = addr?.port ?? null
       const healthStatus = addr?.healthStatus ?? null
@@ -79,6 +106,11 @@ export const getDiscoveredRobots: (
         connected: robotName === connectedRobotName,
         local: ip !== null ? isLocal(ip) : null,
         seen: addr?.seen === true,
+        robotModel: makeRobotModel(
+          health?.robot_model ?? null,
+          serverHealth?.robotModel ?? null,
+          advertisedModel ?? null
+        ),
       }
 
       if (ip !== null && port !== null && healthStatus && serverHealthStatus) {
@@ -207,4 +239,16 @@ export const getRobotApiVersionByName = (
 ): string | null => {
   const robot = getRobotByName(state, robotName)
   return robot ? getRobotApiVersion(robot) : null
+}
+
+export const getRobotModel = (robot: DiscoveredRobot): RobotModel => {
+  return robot.robotModel
+}
+
+export const getRobotModelByName = (
+  state: State,
+  robotName: string
+): RobotType | null => {
+  const robot = getRobotByName(state, robotName)
+  return robot ? getRobotModel(robot) : null
 }

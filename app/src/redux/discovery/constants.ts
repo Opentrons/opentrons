@@ -1,6 +1,8 @@
 export const CONNECTABLE: 'connectable' = 'connectable'
 export const REACHABLE: 'reachable' = 'reachable'
 export const UNREACHABLE: 'unreachable' = 'unreachable'
+export const ROBOT_MODEL_OT2: 'OT-2 Standard' = 'OT-2 Standard'
+export const ROBOT_MODEL_OT3: 'OT-3 Standard' = 'OT-3 Standard'
 
 // TODO(mc, 2021-02-17): values below duplicated from Discovery Client source
 // discovery-client/src/constants.ts
@@ -24,3 +26,6 @@ export const RE_HOSTNAME_IPV6_LL: RegExp = /^\[?(?:fd00|fe80)/
 export const RE_HOSTNAME_IPV4_LL: RegExp = /^169\.254\.\d+\.\d+$/
 export const RE_HOSTNAME_LOCALHOST: RegExp = /^localhost$/
 export const RE_HOSTNAME_LOOPBACK: RegExp = /^127\.0\.0\.1$/
+
+export const RE_ROBOT_MODEL_OT3: RegExp = /^OT-3.*/
+export const RE_ROBOT_MODEL_OT2: RegExp = /^OT-2.*/
