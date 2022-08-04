@@ -52,8 +52,9 @@ class HeaterShakerModuleSubState:
             return celsius
         else:
             raise InvalidTargetTemperatureError(
-                f"Heater-Shaker got an invalid temperature {celsius} degree Celsius."
-                f" Valid range is {HEATER_SHAKER_TEMPERATURE_RANGE}."
+                f"Cannot set Heater-Shaker to {celsius} °C."
+                f" Valid range is {HEATER_SHAKER_TEMPERATURE_MIN}-"
+                f" {HEATER_SHAKER_TEMPERATURE_MAX} °C."
             )
 
     @staticmethod

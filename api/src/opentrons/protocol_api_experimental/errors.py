@@ -41,7 +41,7 @@ class InvalidMagnetEngageHeightError(ValueError):
 
 
 class InvalidTargetTemperatureError(ValueError):
-    """Error raised if a module with heating abilities gets an invalid target temp."""
+    """Error raised if a module with heating abilities gets an invalid target temperature."""
 
 
 class NoTargetTemperatureError(ValueError):
