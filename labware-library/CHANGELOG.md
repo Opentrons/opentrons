@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.1.0-alpha.0) (2022-08-03)
+
+
+### Features
+
+* **app:** update React Select to 5.4.0 and add to App package.json ([#11104](https://github.com/Opentrons/opentrons/issues/11104)) ([8cbd3b8](https://github.com/Opentrons/opentrons/commit/8cbd3b851f317c2b36c5e5eb5212119364d68e60)), closes [#11020](https://github.com/Opentrons/opentrons/issues/11020)
+
+
+
+
+
 # [6.0.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v6.0.0) (2022-07-14)
 
 

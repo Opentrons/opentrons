@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.1.0-alpha.0) (2022-08-03)
+
+
+### Bug Fixes
+
+* **app:** add firstNonSetupIndex to historical run commands query cursor ([#11158](https://github.com/Opentrons/opentrons/issues/11158)) ([a8f8619](https://github.com/Opentrons/opentrons/commit/a8f8619dc40bba6c64714d9465b540a2bc21d0fc)), closes [#11135](https://github.com/Opentrons/opentrons/issues/11135)
+* **app:** add support for labware on modules in run log ([#11276](https://github.com/Opentrons/opentrons/issues/11276)) ([b370f5d](https://github.com/Opentrons/opentrons/commit/b370f5d85df9d6f203ba43e00fc676bd88872568))
+* **app:** Fix text spacing issue on LPC screen ([#11159](https://github.com/Opentrons/opentrons/issues/11159)) ([95a01cd](https://github.com/Opentrons/opentrons/commit/95a01cd2d3372d21a6905901f70408c6d945b194)), closes [#110671](https://github.com/Opentrons/opentrons/issues/110671)
+* **app:** fixes extra module bug in module controls ([#11195](https://github.com/Opentrons/opentrons/issues/11195)) ([7582870](https://github.com/Opentrons/opentrons/commit/7582870843d460631788cfed1bf947b57b19c194))
+* **app:** labware setup H-S latch command add runId ([#11133](https://github.com/Opentrons/opentrons/issues/11133)) ([75cc2f2](https://github.com/Opentrons/opentrons/commit/75cc2f2071f98b4026c92603ccecea3c7929ac8c)), closes [#11048](https://github.com/Opentrons/opentrons/issues/11048) [#11125](https://github.com/Opentrons/opentrons/issues/11125)
+* **app:** this will close [#11223](https://github.com/Opentrons/opentrons/issues/11223) ([#11231](https://github.com/Opentrons/opentrons/issues/11231)) ([c718356](https://github.com/Opentrons/opentrons/commit/c718356cc4a7e42a532788816c8a7b422a0ca611))
+* **app:** update hover state of historical run chevron ([#11153](https://github.com/Opentrons/opentrons/issues/11153)) ([bb861c5](https://github.com/Opentrons/opentrons/commit/bb861c5a779bdfebf703aebba355e2d634869814))
+
+
+### Features
+
+* **app:** add customLabware to labware filterBy ([#11236](https://github.com/Opentrons/opentrons/issues/11236)) ([3ea1731](https://github.com/Opentrons/opentrons/commit/3ea1731afe0409c6b745d353b8c49c4b5cb4faac)), closes [#10917](https://github.com/Opentrons/opentrons/issues/10917)
+* **app:** add map view to liquid labware modal ([#10869](https://github.com/Opentrons/opentrons/issues/10869)) ([94ca292](https://github.com/Opentrons/opentrons/commit/94ca2923c649298d695820d3ad542cc5fa2704d1)), closes [#10521](https://github.com/Opentrons/opentrons/issues/10521)
+* **app:** adding support for v6 commands in run log ([#11254](https://github.com/Opentrons/opentrons/issues/11254)) ([41a5a39](https://github.com/Opentrons/opentrons/commit/41a5a39a959b9a1bed3f9e96e1287385c1647075)), closes [#11247](https://github.com/Opentrons/opentrons/issues/11247)
+* **app:** display rows of wells with same liquid as a range ([#10974](https://github.com/Opentrons/opentrons/issues/10974)) ([f73c484](https://github.com/Opentrons/opentrons/commit/f73c484246f75615e60430bd9c5f476d8b58b2b3)), closes [#10671](https://github.com/Opentrons/opentrons/issues/10671)
+* **app:** liquids tab in protocol details ([#10812](https://github.com/Opentrons/opentrons/issues/10812)) ([7745817](https://github.com/Opentrons/opentrons/commit/77458172c4a15bebb5bb136c427c926c7c7fc61e)), closes [#8826](https://github.com/Opentrons/opentrons/issues/8826)
+* **app:** show text if no modules plugged in but required during setup ([#11140](https://github.com/Opentrons/opentrons/issues/11140)) ([efa56d9](https://github.com/Opentrons/opentrons/commit/efa56d90abaf0f6894d7552a28797fb8802ebbac)), closes [#10947](https://github.com/Opentrons/opentrons/issues/10947)
+* **app:** support module JSON v6 commands in run log ([#11234](https://github.com/Opentrons/opentrons/issues/11234)) ([5f0cc21](https://github.com/Opentrons/opentrons/commit/5f0cc21a3b7d1958f98910065e87d45869c8939e)), closes [#11228](https://github.com/Opentrons/opentrons/issues/11228)
+* **app:** update modal component and labware liquid modal ([#11216](https://github.com/Opentrons/opentrons/issues/11216)) ([3bd4b3a](https://github.com/Opentrons/opentrons/commit/3bd4b3ac83d500680aec48cc79d3b8ec9b12b118)), closes [#11142](https://github.com/Opentrons/opentrons/issues/11142)
+* **app:** update React Select to 5.4.0 and add to App package.json ([#11104](https://github.com/Opentrons/opentrons/issues/11104)) ([8cbd3b8](https://github.com/Opentrons/opentrons/commit/8cbd3b851f317c2b36c5e5eb5212119364d68e60)), closes [#11020](https://github.com/Opentrons/opentrons/issues/11020)
+* **app:** use started at timestamp in run log ([#11213](https://github.com/Opentrons/opentrons/issues/11213)) ([3878f05](https://github.com/Opentrons/opentrons/commit/3878f05f52b1ecde83b84de19350db92c68907e5))
+* **app, components:** align Liquid Setup UI with Figma ([#11044](https://github.com/Opentrons/opentrons/issues/11044)) ([dfd8526](https://github.com/Opentrons/opentrons/commit/dfd8526d133c5954063b416b16b7b5db2a6211fe))
+
+
+
+
+
 # [6.0.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v6.0.0) (2022-07-14)
 
 

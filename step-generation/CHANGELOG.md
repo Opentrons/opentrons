@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.1.0-alpha.0) (2022-08-03)
+
+
+### Features
+
+* **api, step-generation:** emit and ingest command keys ([#10885](https://github.com/Opentrons/opentrons/issues/10885)) ([4f81309](https://github.com/Opentrons/opentrons/commit/4f81309c4cc546cd36b90f637cd4be447ddd08a5))
+* **engine:** thermocycler run profile ([#10921](https://github.com/Opentrons/opentrons/issues/10921)) ([8a70b53](https://github.com/Opentrons/opentrons/commit/8a70b53ed35d33951b130bb1299026f02cf81d7b))
+* **step-generation:** deactivate heater shaker after timer finishes ([#10876](https://github.com/Opentrons/opentrons/issues/10876)) ([21cf672](https://github.com/Opentrons/opentrons/commit/21cf6728409857dfd645d6861cf85408c7bcc41f)), closes [#10875](https://github.com/Opentrons/opentrons/issues/10875)
+* **step-generation, shared-data:** delete TC await profile complete command ([#11273](https://github.com/Opentrons/opentrons/issues/11273)) ([9654cf2](https://github.com/Opentrons/opentrons/commit/9654cf2c86f7908bf718053a5bbab222d6103a73)), closes [#11272](https://github.com/Opentrons/opentrons/issues/11272)
+
+
+
+
+
 # [6.0.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v6.0.0) (2022-07-14)
 
 

@@ -5,6 +5,18 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 ---
+# OT-2 Software Changes in 6.1.0
+
+Welcome to the v6.1.0 release of OT-2 software! This release adds Heater-Shaker support to the Opentrons software ecosystem
+
+## New Features
+
+- Heater-Shaker support
+
+## Known Issues
+
+This alpha is a work in progress! We'll be addressing issues in upcoming releases of 6.1.0.
+---
 
 # OT-2 Software Changes in 6.0.0
 
