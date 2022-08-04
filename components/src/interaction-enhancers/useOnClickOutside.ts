@@ -24,7 +24,7 @@ export const useOnClickOutside = <E extends Element>(
 
       if (
         onClickOutside != null &&
-        node !=null &&
+        node != null &&
         node.current != null &&
         node.current.contains != null &&
         !node.current.contains(clickedElem as Node)
