@@ -152,6 +152,7 @@ class WaitableCallback:
         self,
         messenger: CanMessenger,
         filter: Optional[MessageListenerCallbackFilter] = None,
+        number_of_messages: Optional[int] = None,
     ) -> None:
         """Constructor.
 
@@ -164,6 +165,7 @@ class WaitableCallback:
         self._queue: asyncio.Queue[
             Tuple[MessageDefinition, ArbitrationId]
         ] = asyncio.Queue()
+        self._number_of_messages: int = number_of_messages or 1
 
     def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
@@ -188,8 +190,12 @@ class WaitableCallback:
 
     async def __anext__(self) -> Tuple[MessageDefinition, ArbitrationId]:
         """Async next."""
+        if (self._number_of_messages < 1):
+            raise StopAsyncIteration
+        self._number_of_messages -= 1
         return await self.read()
 
     async def read(self) -> Tuple[MessageDefinition, ArbitrationId]:
         """Read next message."""
         return await self._queue.get()
+
