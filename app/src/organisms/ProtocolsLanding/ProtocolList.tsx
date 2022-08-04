@@ -140,7 +140,6 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           </Flex>
           {showSortByMenu && (
             <Flex
-              width="10rem"
               zIndex={2}
               borderRadius={BORDERS.radiusSoftCorners}
               boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
