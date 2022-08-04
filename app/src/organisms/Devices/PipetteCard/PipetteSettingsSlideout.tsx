@@ -24,6 +24,7 @@ import type {
 import type { Dispatch, State } from '../../../redux/types'
 
 const FETCH_PIPETTES_INTERVAL_MS = 5000
+const FORM_ID = 'configurePipetteForm'
 
 interface PipetteSettingsSlideoutProps {
   robotName: string
@@ -62,7 +63,10 @@ export const PipetteSettingsSlideout = (
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
-        <ConfigFormSubmitButton disabled={updateRequest?.status === PENDING} />
+        <ConfigFormSubmitButton
+          disabled={updateRequest?.status === PENDING}
+          formId={FORM_ID}
+        />
       }
     >
       <Flex data-testid={`PipetteSettingsSlideout_${robotName}_${pipetteId}`}>
@@ -72,6 +76,7 @@ export const PipetteSettingsSlideout = (
           updateRequest={updateRequest}
           updateSettings={updateSettings}
           robotName={robotName}
+          formId={FORM_ID}
         />
       </Flex>
     </Slideout>

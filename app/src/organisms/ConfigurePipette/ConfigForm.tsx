@@ -41,6 +41,7 @@ export interface ConfigFormProps {
   updateInProgress: boolean
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => unknown
   groupLabels: string[]
+  formId: string
   __showHiddenFields: boolean
 }
 
@@ -183,7 +184,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
   }
 
   render(): JSX.Element {
-    const { updateInProgress } = this.props
+    const { updateInProgress, formId } = this.props
     const fields = this.getVisibleFields()
     const UNKNOWN_KEYS = this.getUnknownKeys()
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
@@ -216,7 +217,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
           }
           return (
             <Box overflowY="scroll">
-              <Form id="configurePipetteForm" data-testid="ConfigForm_form">
+              <Form id={formId} aria-label="configure_pipette_form">
                 <ConfigFormResetButton
                   onClick={handleReset}
                   disabled={updateInProgress}

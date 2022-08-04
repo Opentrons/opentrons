@@ -25,7 +25,7 @@ const mockUseDispatchApiRequest = RobotApi.useDispatchApiRequest as jest.MockedF
 const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
   typeof RobotApi.getRequestById
 >
-const mockGetAttachedPipetteSettingsFieldById = getAttachedPipetteSettingsFieldsById as jest.MockedFunction<
+const mockGetAttachedPipetteSettingsFieldsById = getAttachedPipetteSettingsFieldsById as jest.MockedFunction<
   typeof getAttachedPipetteSettingsFieldsById
 >
 
@@ -62,7 +62,7 @@ describe('PipetteSettingsSlideout', () => {
       },
     })
     mockGetConfig.mockReturnValue({} as any)
-    mockGetAttachedPipetteSettingsFieldById.mockReturnValue(
+    mockGetAttachedPipetteSettingsFieldsById.mockReturnValue(
       omit(pipetteSettingsResponseFixture.fakePipetteIdOne.fields, 'quirks')
     )
     dispatchApiRequest = jest.fn()
@@ -73,20 +73,26 @@ describe('PipetteSettingsSlideout', () => {
     resetAllWhenMocks()
   })
 
-  it('renders correct text', () => {
-    const { getByText, getByRole } = render(props)
+  it('renders correct heading and number of text boxes', () => {
+    const { getByRole, getAllByRole } = render(props)
 
-    getByText('Left Pipette Settings')
-    getByText('Bottom')
+    getByRole('heading', { name: 'Left Pipette Settings' })
+    const inputs = getAllByRole('textbox')
+    expect(inputs.length).toBe(9)
+  })
+
+  it('renders close button that calls props.onCloseClick when clicked', () => {
+    const { getByRole } = render(props)
+
     const button = getByRole('button', { name: /exit/i })
-    act(() => button.click())
+    button.click()
     expect(props.onCloseClick).toHaveBeenCalled()
   })
-  it('renders confirm button and calls form onsubmit when clicked', () => {
-    const { getByText, getByRole, getByTestId } = render(props)
 
-    getByText('Bottom')
-    const form = getByTestId('ConfigForm_form')
+  it('renders confirm button and calls form onsubmit when clicked', () => {
+    const { getByRole } = render(props)
+
+    const form = getByRole('form', { name: 'configure_pipette_form' })
     form.onsubmit = jest.fn()
     const button = getByRole('button', { name: 'Confirm' })
     act(() => button.click())

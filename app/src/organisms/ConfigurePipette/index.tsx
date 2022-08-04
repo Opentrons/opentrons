@@ -20,6 +20,7 @@ interface Props {
   updateRequest: RequestState | null
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => void
   robotName: string
+  formId: string
 }
 
 export function ConfigurePipette(props: Props): JSX.Element {
@@ -29,6 +30,7 @@ export function ConfigurePipette(props: Props): JSX.Element {
     updateRequest,
     updateSettings,
     robotName,
+    formId,
   } = props
   const { t } = useTranslation('device_details')
 
@@ -67,6 +69,7 @@ export function ConfigurePipette(props: Props): JSX.Element {
           updateInProgress={updateRequest?.status === PENDING}
           updateSettings={updateSettings}
           groupLabels={groupLabels}
+          formId={formId}
           __showHiddenFields={__showHiddenFields}
         />
       )}
