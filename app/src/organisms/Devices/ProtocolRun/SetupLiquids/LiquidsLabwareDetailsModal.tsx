@@ -21,9 +21,9 @@ import {
 } from '../../../Devices/hooks'
 import { ModalShell, ModalHeader } from '../../../../atoms/Modal'
 import { StyledText } from '../../../../atoms/text'
+import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 import { LiquidDetailCard } from './LiquidDetailCard'
 import {
-  getSlotLabwareName,
   getLiquidsByIdForLabware,
   getWellFillFromLabwareId,
   getWellGroupForLiquidId,

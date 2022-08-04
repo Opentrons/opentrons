@@ -58,4 +58,4 @@ async def test_open_labware_latch(
         await movement.home([MotorAxis.RIGHT_Z, MotorAxis.LEFT_Z]),
         await hs_hardware.open_labware_latch(),
     )
-    assert result == heater_shaker.OpenLabwareLatchResult()
+    assert result == heater_shaker.OpenLabwareLatchResult(pipetteRetracted=True)

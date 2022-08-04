@@ -8,23 +8,25 @@ import {
   Tooltip,
   useHoverTooltip,
   ALIGN_CENTER,
-  ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  JUSTIFY_CENTER,
   SIZE_4,
   TOOLTIP_LEFT,
   TYPOGRAPHY,
+  Link,
+  COLORS,
+  SPACING,
+  JUSTIFY_FLEX_END,
+  WRAP,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
 import { TertiaryButton } from '../../../atoms/buttons'
-import { ExternalLink } from '../../../atoms/Link/ExternalLink'
-import { StyledText } from '../../../atoms/text'
 import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../../organisms/CalibrationPanels'
 import { useCalibratePipetteOffset } from '../../../organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { getHasCalibrationBlock } from '../../../redux/config'
+import { Banner } from '../../../atoms/Banner'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
 import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
@@ -91,19 +93,23 @@ export function SetupPipetteCalibrationItem({
 
   if (pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH) {
     pipetteMismatchInfo = (
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        alignItems={ALIGN_FLEX_END}
-        justifyContent={JUSTIFY_CENTER}
-      >
-        <StyledText as="p">{t('pipette_mismatch')}</StyledText>
-        <ExternalLink
-          css={TYPOGRAPHY.pSemiBold}
-          href={inexactPipetteSupportArticle}
-          id="PipetteCalibration_pipetteMismatchHelpLink"
-        >
-          {t('pipette_compat_help')}
-        </ExternalLink>
+      <Flex alignItems={ALIGN_CENTER}>
+        <Banner type="warning" padding={SPACING.spacing2}>
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            {t('pipette_mismatch')}
+            <Link
+              external
+              color={COLORS.darkBlack}
+              fontSize={TYPOGRAPHY.fontSizeP}
+              lineHeight={TYPOGRAPHY.lineHeight12}
+              textDecoration={TYPOGRAPHY.textDecorationUnderline}
+              href={inexactPipetteSupportArticle}
+              id="PipetteCalibration_pipetteMismatchHelpLink"
+            >
+              {t('learn_more')}
+            </Link>
+          </Flex>
+        </Banner>
       </Flex>
     )
   }
@@ -126,8 +132,14 @@ export function SetupPipetteCalibrationItem({
   } else {
     button = (
       <>
-        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          {pipetteMismatchInfo}
+        <Flex
+          alignItems={ALIGN_CENTER}
+          marginLeft={SPACING.spacing4}
+          flexWrap={WRAP}
+          justifyContent={JUSTIFY_FLEX_END}
+          gridGap={SPACING.spacing3}
+        >
+          <Flex>{pipetteMismatchInfo}</Flex>
           <TertiaryButton
             onClick={() => startPipetteOffsetCalibrationBlockModal(null)}
             disabled={!isDeckCalibrated}
@@ -136,6 +148,7 @@ export function SetupPipetteCalibrationItem({
           >
             {t('calibrate_now_cta')}
           </TertiaryButton>
+
           {!isDeckCalibrated ? (
             <Tooltip {...tooltipProps}>
               <Box width={SIZE_4}>

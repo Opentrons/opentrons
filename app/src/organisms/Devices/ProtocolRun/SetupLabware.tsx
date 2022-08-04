@@ -210,7 +210,6 @@ export function SetupLabware({
             <ModuleExtraAttention
               moduleTypes={moduleTypesThatRequireExtraAttention}
               modulesInfo={moduleRenderInfoById}
-              runId={runId}
             />
           ) : null}
           <Box margin="0 auto" maxWidth="46.25rem" width="100%">

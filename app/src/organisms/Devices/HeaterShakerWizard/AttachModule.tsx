@@ -122,7 +122,7 @@ export function AttachModule(props: AttachModuleProps): JSX.Element {
                 viewBox={DECK_MAP_VIEWBOX}
                 deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
                 id="HeaterShakerWizard_AttachModule_deckMap"
-                data-testid={`AttachModule_empty_deck`}
+                data-testid="AttachModule_empty_deck"
               />
             )}
           </Box>

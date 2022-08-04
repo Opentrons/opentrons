@@ -12,13 +12,6 @@ import { CheckboxField } from '@opentrons/components'
 import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../../constants'
 import { ModuleDiagram } from '../../../modules'
 import { ModuleFields, ModuleFieldsProps } from '../ModuleFields'
-import { selectors as featureFlagSelectors } from '../../../../feature-flags'
-
-jest.mock('../../../../feature-flags')
-
-const getEnabledHeaterShakerMock = featureFlagSelectors.getEnabledHeaterShaker as jest.MockedFunction<
-  typeof featureFlagSelectors.getEnabledHeaterShaker
->
 
 describe('ModuleFields', () => {
   let magnetModuleOnDeck,
@@ -69,8 +62,6 @@ describe('ModuleFields', () => {
       touched: null,
       errors: null,
     }
-
-    getEnabledHeaterShakerMock.mockReturnValue(false)
   })
 
   function render(props: ModuleFieldsProps) {
@@ -84,7 +75,7 @@ describe('ModuleFields', () => {
   it('renders a module selection element for every module', () => {
     const wrapper = render(props)
 
-    expect(wrapper.find(CheckboxField)).toHaveLength(3)
+    expect(wrapper.find(CheckboxField)).toHaveLength(4)
   })
 
   it('adds module to protocol when checkbox is selected and resets the model field', () => {

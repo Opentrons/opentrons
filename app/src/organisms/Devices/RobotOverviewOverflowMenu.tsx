@@ -80,7 +80,7 @@ export const RobotOverviewOverflowMenu = (
 
   return (
     <Flex
-      data-testid={`RobotOverview_overflowMenu`}
+      data-testid="RobotOverview_overflowMenu"
       position={POSITION_RELATIVE}
       onClick={e => {
         e.preventDefault()

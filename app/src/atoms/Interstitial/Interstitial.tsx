@@ -37,7 +37,7 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
       bottom="0"
       justifyContent={JUSTIFY_FLEX_START}
       padding={`${SPACING.spacingXXL} ${SPACING.spacing7} ${SPACING.spacing4} ${SPACING.spacing7}`}
-      data-testid={`interstitial`}
+      data-testid="interstitial"
       {...outerProps}
     >
       <Overlay backgroundColor={COLORS.white} />

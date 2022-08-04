@@ -17,3 +17,11 @@ export const storedProtocolDir: StoredProtocolDir = {
   srcFilePaths: ['path/to/protocol/dir/src/mainFile'],
   analysisFilePaths: ['path/to/protocol/dir/analysis/8675309.json'],
 }
+
+export const storedProtocolDataTwo: StoredProtocolData = {
+  protocolKey: 'protocolKeyStubTwo',
+  mostRecentAnalysis: (simpleAnalysisFileFixture as any) as ProtocolAnalysisOutput,
+  srcFileNames: ['fakeSrcFileNameTwo'],
+  srcFiles: ['fakeSrcFileTwo' as any],
+  modified: 987654321,
+}

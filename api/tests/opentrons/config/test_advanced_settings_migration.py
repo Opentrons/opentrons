@@ -7,7 +7,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 15
+    return 16
 
 
 @pytest.fixture
@@ -21,7 +21,6 @@ def default_file_settings() -> Dict[str, Any]:
         "enableDoorSafetySwitch": None,
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
-        "enableHeaterShakerPAPI": None,
     }
 
 
@@ -305,5 +304,4 @@ def test_ensures_config() -> None:
         "enableDoorSafetySwitch": None,
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
-        "enableHeaterShakerPAPI": None,
     }
