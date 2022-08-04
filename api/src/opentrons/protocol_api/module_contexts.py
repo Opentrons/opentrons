@@ -914,7 +914,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """
         if self.target_temperature is None:
             raise NoTargetTemperatureSetError(
-                f"Heater-shaker module {self} does not have a target temperature set."
+                f"Heater-Shaker Module {self} does not have a target temperature set."
             )
         self._module.await_temperature(awaiting_temperature=self.target_temperature)
 
@@ -939,7 +939,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         else:
             # TODO: Figure out whether to issue close latch behind the scenes instead
             raise CannotPerformModuleAction(
-                "Cannot start H/S shake unless labware latch is closed."
+                "Cannot start shaking unless labware latch is closed."
             )
 
     @requires_version(2, 13)
@@ -990,7 +990,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     ) -> None:
         """
         Raise an error if attempting to perform a move that's deemed unsafe due to
-        the presence of the heater-shaker.
+        the presence of the Heater-Shaker.
         """
         is_labware_latch_closed = (
             self._module.labware_latch_status
