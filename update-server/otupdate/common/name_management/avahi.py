@@ -315,7 +315,9 @@ class _SyncClient:
             # supplementary txt record with encoded machine type. this is
             # a dbus byte array rather than a dbus string for some reason
             # so it has to be manually encoded.
-            dbus.Array([f"robotModel={machine_type}".encode('UTF-8')], signature="ay"),  # TXT records
+            dbus.Array(
+                [f"robotModel={machine_type}".encode("UTF-8")], signature="ay"
+            ),  # TXT records
         )
 
         self._entry_group.Commit()
