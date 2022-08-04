@@ -53,8 +53,7 @@ class HeaterShakerModuleSubState:
         else:
             raise InvalidTargetTemperatureError(
                 f"Cannot set Heater-Shaker to {celsius} °C."
-                f" Valid range is {HEATER_SHAKER_TEMPERATURE_MIN}-"
-                f" {HEATER_SHAKER_TEMPERATURE_MAX} °C."
+                f" Valid range is {HEATER_SHAKER_TEMPERATURE_RANGE} °C."
             )
 
     @staticmethod
@@ -66,7 +65,7 @@ class HeaterShakerModuleSubState:
         else:
             raise InvalidTargetSpeedError(
                 f"Cannot set Heater-Shaker to shake at {rpm} rpm. Valid speed range is "
-                f"{HEATER_SHAKER_SPEED_MIN}-{HEATER_SHAKER_SPEED_MAX} rpm."
+                f"{HEATER_SHAKER_SPEED_RANGE} rpm."
             )
 
     def raise_if_labware_latch_not_closed(self) -> None:
