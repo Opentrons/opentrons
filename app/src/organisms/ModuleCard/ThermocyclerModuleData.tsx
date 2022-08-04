@@ -6,7 +6,6 @@ import {
   Text,
   TYPOGRAPHY,
   SPACING_2,
-  FONT_SIZE_CAPTION,
   FONT_WEIGHT_REGULAR,
   DIRECTION_COLUMN,
   COLORS,
@@ -78,7 +77,7 @@ export const ThermocyclerModuleData = (
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
           fontWeight={FONT_WEIGHT_REGULAR}
-          fontSize={FONT_SIZE_CAPTION}
+          fontSize={TYPOGRAPHY.fontSizeH3}
           marginTop={SPACING_2}
           marginBottom={SPACING.spacing2}
         >
@@ -86,14 +85,14 @@ export const ThermocyclerModuleData = (
         </Text>
         <Text
           title="lid_target_temp"
-          fontSize={FONT_SIZE_CAPTION}
+          fontSize={TYPOGRAPHY.fontSizeH3}
           marginBottom={SPACING.spacing1}
         >
           {t(lidTarget == null ? 'na_temp' : 'target_temp', {
             temp: lidTarget,
           })}
         </Text>
-        <Text title="lid_temp" fontSize={FONT_SIZE_CAPTION}>
+        <Text title="lid_temp" fontSize={TYPOGRAPHY.fontSizeH3}>
           {t('current_temp', { temp: lidTemp })}
         </Text>
       </Flex>
@@ -106,7 +105,7 @@ export const ThermocyclerModuleData = (
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
           fontWeight={FONT_WEIGHT_REGULAR}
-          fontSize={FONT_SIZE_CAPTION}
+          fontSize={TYPOGRAPHY.fontSizeH3}
           marginTop={SPACING_2}
         >
           {t('tc_block')}
@@ -114,14 +113,14 @@ export const ThermocyclerModuleData = (
         <StatusLabel status={status} {...getStatusLabelProps(status)} />
         <Text
           title="tc_target_temp"
-          fontSize={FONT_SIZE_CAPTION}
+          fontSize={TYPOGRAPHY.fontSizeH3}
           marginBottom={SPACING.spacing1}
         >
           {t(targetTemp == null ? 'na_temp' : 'target_temp', {
             temp: targetTemp,
           })}
         </Text>
-        <Text title="tc_current_temp" fontSize={FONT_SIZE_CAPTION}>
+        <Text title="tc_current_temp" fontSize={TYPOGRAPHY.fontSizeH3}>
           {t('current_temp', { temp: currentTemp })}
         </Text>
       </Flex>

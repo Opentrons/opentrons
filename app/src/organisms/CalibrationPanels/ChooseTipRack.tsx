@@ -11,7 +11,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   FONT_HEADER_DARK,
-  FONT_SIZE_BODY_2,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
   POSITION_RELATIVE,
@@ -28,6 +27,7 @@ import {
   ALIGN_CENTER,
   SecondaryBtn,
   SIZE_5,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 
@@ -219,7 +219,7 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_FLEX_START}
       position={POSITION_RELATIVE}
-      fontSize={FONT_SIZE_BODY_2}
+      fontSize={TYPOGRAPHY.fontSizeH3}
       width="100%"
     >
       <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>

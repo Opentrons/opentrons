@@ -9,13 +9,13 @@ import {
   C_MED_DARK_GRAY,
   DIRECTION_COLUMN,
   FONT_SIZE_BODY_1,
-  FONT_SIZE_BODY_2,
   FONT_STYLE_ITALIC,
   JUSTIFY_CENTER,
   SIZE_4,
   SPACING_2,
   SPACING_3,
   TEXT_ALIGN_CENTER,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { labwareImages } from './labwareImages'
 import { formatLastModified } from './utils'
@@ -67,7 +67,7 @@ export function ChosenTipRackRender(
       justifyContent={JUSTIFY_CENTER}
       paddingRight={SPACING_2}
       paddingBottom={SPACING_3}
-      fontSize={FONT_SIZE_BODY_2}
+      fontSize={TYPOGRAPHY.fontSizeH3}
     >
       <img
         css={css`
