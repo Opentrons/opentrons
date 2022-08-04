@@ -24,7 +24,6 @@ import type {
 import type { Dispatch, State } from '../../../redux/types'
 
 const FETCH_PIPETTES_INTERVAL_MS = 5000
-const FORM_ID = 'configurePipetteForm'
 
 interface PipetteSettingsSlideoutProps {
   robotName: string
@@ -48,6 +47,7 @@ export const PipetteSettingsSlideout = (
   const updateRequest = useSelector((state: State) =>
     latestRequestId != null ? getRequestById(state, latestRequestId) : null
   )
+  const FORM_ID = `configurePipetteForm_${pipetteId}`
 
   useInterval(
     () => {
