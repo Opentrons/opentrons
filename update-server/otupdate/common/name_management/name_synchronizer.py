@@ -41,14 +41,17 @@ class NameSynchronizer:
       configurable. https://datatracker.ietf.org/doc/html/rfc6763#section-4.1.1
     """
 
-    def __init__(self, avahi_client: AvahiClient) -> None:
+    def __init__(self, avahi_client: AvahiClient, machine_type: str) -> None:
         """For internal use by this class only. Use `start()` instead."""
         self._avahi_client = avahi_client
+        self._machine_type = machine_type
 
     @classmethod
     @asynccontextmanager
     async def start(
-        cls, avahi_client: Optional[AvahiClient] = None
+        cls,
+        machine_type: str,
+        avahi_client: Optional[AvahiClient] = None,
     ) -> AsyncGenerator[NameSynchronizer, None]:
         """Build a NameSynchronizer and keep it running in the background.
 
@@ -70,12 +73,13 @@ class NameSynchronizer:
         if avahi_client is None:
             avahi_client = await AvahiClient.connect()
 
-        name_synchronizer = cls(avahi_client)
+        name_synchronizer = cls(avahi_client, machine_type)
         async with avahi_client.listen_for_collisions(
             callback=name_synchronizer._on_avahi_collision
         ):
             await avahi_client.start_advertising(
-                service_name=await name_synchronizer.get_name()
+                service_name=await name_synchronizer.get_name(),
+                machine_type=machine_type,
             )
             yield name_synchronizer
 
@@ -88,7 +92,9 @@ class NameSynchronizer:
         Returns the new name. This is normally the same as the requested name,
         but it it might be different if it had to be truncated, sanitized, etc.
         """
-        await self._avahi_client.start_advertising(service_name=new_name)
+        await self._avahi_client.start_advertising(
+            service_name=new_name, machine_type=self._machine_type
+        )
         # Setting the Avahi service name can fail if Avahi doesn't like the new name.
         # Persist only after it succeeds, so we don't persist something invalid.
         persisted_pretty_hostname = await persist_pretty_hostname(new_name)

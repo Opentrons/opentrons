@@ -66,7 +66,7 @@ class AvahiClient:
         )
         return cls(sync_client=sync_client)
 
-    async def start_advertising(self, service_name: str) -> None:
+    async def start_advertising(self, service_name: str, machine_type: str) -> None:
         """Start advertising the machine over mDNS + DNS-SD.
 
         Since the Avahi service name corresponds to the DNS-SD instance name,
@@ -87,7 +87,7 @@ class AvahiClient:
         """
         async with self._lock:
             await asyncio.get_running_loop().run_in_executor(
-                None, self._sync_client.start_advertising, service_name
+                None, self._sync_client.start_advertising, service_name, machine_type
             )
 
     @contextlib.asynccontextmanager
@@ -289,7 +289,7 @@ class _SyncClient:
             entry_group=entry_group_if,
         )
 
-    def start_advertising(self, service_name: str) -> None:
+    def start_advertising(self, service_name: str, machine_type: str) -> None:
         # TODO(mm, 2022-05-26): Can we leave these as the empty string?
         # The avahi_entry_group_add_service() C API recommends passing NULL
         # to let the daemon decide these values.
@@ -312,7 +312,10 @@ class _SyncClient:
             domainname,  # sdomain (.local)
             f"{hostname}.{domainname}",  # shost (hostname.local)
             dbus.UInt16(31950),  # port
-            dbus.Array([], signature="ay"),
+            # supplementary txt record with encoded machine type. this is
+            # a dbus byte array rather than a dbus string for some reason
+            # so it has to be manually encoded.
+            dbus.Array([f"robotModel={machine_type}".encode('UTF-8')], signature="ay"),  # TXT records
         )
 
         self._entry_group.Commit()
