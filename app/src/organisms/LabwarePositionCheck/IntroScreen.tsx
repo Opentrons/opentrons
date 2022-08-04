@@ -62,7 +62,9 @@ export const IntroScreen = (props: {
         t={t}
         i18nKey="position_check_description"
         components={{
-          block: <Text fontSize={TYPOGRAPHY.fontSizeH3} marginBottom={SPACING_2} />,
+          block: (
+            <Text fontSize={TYPOGRAPHY.fontSizeH3} marginBottom={SPACING_2} />
+          ),
         }}
       ></Trans>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
