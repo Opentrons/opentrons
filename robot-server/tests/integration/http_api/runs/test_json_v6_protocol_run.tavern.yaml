@@ -87,10 +87,10 @@ stages:
               commandId: '{setup_command_id}'
               key: '{setup_command_key}'
               createdAt: '{setup_command_created_at}'
-              index: 13
+              index: 14
         meta:
           cursor: 0
-          totalLength: 14
+          totalLength: 15
         data:
           - id: !anystr
             key: !anystr
@@ -173,6 +173,17 @@ stages:
               version: 1
               labwareId: fixedTrash
               displayName: Trash
+          - id: !anystr
+            createdAt: !anystr
+            commandType: loadLiquid
+            key: !anystr
+            status: queued
+            params:
+              liquidId: "waterId"
+              labwareId: "sourcePlateId"
+              volumeByWell:
+                A1: 100
+                B1: 100
           - id: !anystr
             key: !anystr
             commandType: pickUpTip
@@ -317,7 +328,7 @@ stages:
           current: !anydict
         meta:
           cursor: 0
-          totalLength: 14
+          totalLength: 15
         data:
           - id: !anystr
             key: !anystr
@@ -414,6 +425,19 @@ stages:
               version: 1
               labwareId: fixedTrash
               displayName: Trash
+          - id: !anystr
+            key: !anystr
+            commandType: loadLiquid
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              labwareId: sourcePlateId
+              liquidId: waterId
+              volumeByWell:
+                A1: 100
+                B1: 100
           - id: !anystr
             key: !anystr
             commandType: pickUpTip
