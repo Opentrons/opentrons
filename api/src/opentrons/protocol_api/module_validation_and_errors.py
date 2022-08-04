@@ -23,7 +23,7 @@ def validate_heater_shaker_temperature(celsius: float) -> float:
         raise InvalidTargetTemperatureError(
             f"Cannot set Heater-Shaker to {celsius} °C."
             f" Valid range is {HEATER_SHAKER_TEMPERATURE_MIN}-"
-            f" {HEATER_SHAKER_TEMPERATURE_MAX} °C."
+            f"{HEATER_SHAKER_TEMPERATURE_MAX} °C."
         )
 
 
