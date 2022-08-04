@@ -329,19 +329,17 @@ class LegacyCommandMapper:
             )
         elif (
             command["name"] == legacy_command_types.BLOW_OUT
-            # and "instrument" in command["payload"]
-            # and "location" in command["payload"]
-            # and "rate" in command["payload"]
         ):
-            print("WE MADE IT")
-            print(command["payload"])
-            print("TESTING")
             pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore
             location = command["payload"].get("location")
-            flowRate = command["payload"].get("rate")
-            wellLocation = { "origin": "bottom", "offset": { "x": 0, "y": 0, "z": command["payload"].get("offsetFromBottomMm") }}
+            last_location = pipette._ctx.location_cache
             if isinstance(location, Location):
                 well = location.labware.as_well()
+            elif isinstance(last_location, Location):
+                location = last_location
+                well = location.labware.as_well()
+                # add this line back in to quickly reanalyze protocols 
+                # raise Exception("Unknown dispense location.")
             else:
                 raise Exception("Unknown blow out location.")
             parentModuleId = self._module_id_by_slot.get(location.labware.first_parent())
@@ -363,8 +361,6 @@ class LegacyCommandMapper:
                     pipetteId=pipette_id,
                     labwareId=labware_id,
                     wellName=well_name,
-                    flowRate=flowRate,
-                    # wellLocation=wellLocation
                 ),
             )
         elif command["name"] == legacy_command_types.PAUSE:
