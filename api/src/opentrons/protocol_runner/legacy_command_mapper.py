@@ -150,6 +150,17 @@ class LegacyCommandMapper:
                             "completedAt": now,
                         }
                     )
+                elif isinstance(running_command, pe_commands.Aspirate):
+                    completed_command = running_command.copy(
+                        update={
+                            "result": pe_commands.AspirateResult.construct(
+                                volume = 40
+                            ),
+                            "status": pe_commands.CommandStatus.SUCCEEDED,
+                            "completedAt": now,
+                        }
+                    )
+
                 else:
                     completed_command = running_command.copy(
                         update={
