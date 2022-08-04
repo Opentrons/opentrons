@@ -33,6 +33,6 @@ def validate_heater_shaker_speed(rpm: int) -> int:
         return rpm
     else:
         raise InvalidTargetSpeedError(
-            f"Heater-Shaker got invalid speed of {rpm} rpm. Valid range is "
-            f"{HEATER_SHAKER_SPEED_MIN} -> {HEATER_SHAKER_SPEED_MAX}."
+            f"Cannot set Heater-Shaker to shake at {rpm} rpm. Valid speed range is "
+            f"{HEATER_SHAKER_SPEED_MIN}-{HEATER_SHAKER_SPEED_MAX} rpm."
         )

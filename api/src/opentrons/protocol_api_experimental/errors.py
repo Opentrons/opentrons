@@ -49,7 +49,7 @@ class NoTargetTemperatureError(ValueError):
 
 
 class InvalidTargetSpeedError(ValueError):
-    """Error raised if a heater-shaker target speed is invalid."""
+    """Error raised if a Heater-Shaker target speed is invalid."""
 
 
 __all__ = [
