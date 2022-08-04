@@ -332,10 +332,7 @@ VALID_TEST_PARAMS = [
             params=protocol_schema_v6.Params(
                 labwareId="labware-id-def456",
                 liquidId="liquid-id-555",
-                volumeByWell={
-                    "wellName": "A1",
-                    "volume": 32
-                },
+                volumeByWell={"A1": 32},
             ),
         ),
         pe_commands.LoadLiquidCreate(
@@ -343,10 +340,7 @@ VALID_TEST_PARAMS = [
             params=pe_commands.LoadLiquidParams(
                 labwareId="labware-id-def456",
                 liquidId="liquid-id-555",
-                volumeByWell=pe_commands.VolumeByWell(
-                    wellName="A1",
-                    volume=32
-                ),
+                volumeByWell={"A1": 32},
             ),
         ),
     ),
@@ -408,8 +402,7 @@ def _make_json_protocol(
     },
     liquids: Dict[str, protocol_schema_v6.Liquid] = {
         "liquid-id-555": protocol_schema_v6.Liquid(
-            displayName="water",
-            description="water description"
+            displayName="water", description="water description"
         )
     },
     commands: List[protocol_schema_v6.Command] = [],

@@ -84,25 +84,24 @@ def _translate_pipette_command(
 
 
 def _translate_liquid_command(
-        protocol: ProtocolSchemaV6, command: protocol_schema_v6.Command
-) -> pe_commands.LoadLabwareCreate:
+    protocol: ProtocolSchemaV6, command: protocol_schema_v6.Command
+) -> pe_commands.LoadLiquidCreate:
     liquidId = command.params.liquidId
     labwareId = command.params.labwareId
+    volumeByWell = command.params.volumeByWell
     # v6 data model supports all commands and therefor most props are optional.
     # load liquid command must contain labware_id and definition_id.
     assert liquidId is not None
     assert labwareId is not None
-    liquid = protocol.liquids[liquidId]
+    assert volumeByWell is not None
+    print(volumeByWell)
+    liquid = protocol.liquids[liquidId]  # type: ignore[index]
     assert liquid is not None
     liquid_command = pe_commands.LoadLiquidCreate(
         params=pe_commands.LoadLiquidParams(
             labwareId=labwareId,
             liquidId=liquidId,
-            volumeByWell=parse_obj_as(
-                # https://github.com/samuelcolvin/pydantic/issues/1847
-                pe_commands.VolumeByWell,  # type: ignore[arg-type]
-                command.params.volumeByWell,
-            ),
+            volumeByWell=volumeByWell,
         ),
         key=command.key,
     )

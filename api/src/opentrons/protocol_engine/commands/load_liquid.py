@@ -1,6 +1,6 @@
 """Load liquid command request, result, and implementation models."""
 from pydantic import BaseModel, Field
-from typing import Optional, Type
+from typing import Optional, Type, Dict
 from typing_extensions import Literal
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
@@ -30,19 +30,6 @@ class Liquid(BaseModel):
     )
 
 
-class VolumeByWell(BaseModel):
-    """Request data of well and associated volume."""
-
-    wellName: str = Field(
-        ...,
-        description="Well name from the specified labware to capture liquid.",
-    )
-    volume: int = Field(
-        ...,
-        description="Volume in µL within associated well.",
-    )
-
-
 class LoadLiquidParams(BaseModel):
     """Payload required to load a liquid into a well."""
 
@@ -54,7 +41,7 @@ class LoadLiquidParams(BaseModel):
         ...,
         description="Unique identifier of labware to load liquid into.",
     )
-    volumeByWell: VolumeByWell = Field(
+    volumeByWell: Dict[str, int] = Field(
         ...,
         description="Well and associated liquid volume.",
     )

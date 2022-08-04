@@ -5,7 +5,6 @@ from opentrons.protocol_engine.commands import (
     LoadLiquidResult,
     LoadLiquidImplementation,
     LoadLiquidParams,
-    VolumeByWell,
 )
 
 
@@ -16,7 +15,7 @@ async def test_load_liquid_implementation(decoy: Decoy) -> None:
     data = LoadLiquidParams(
         labwareId="labware-id",
         liquidId="liquid-id",
-        volumeByWell=VolumeByWell(wellName="A1", volume=30),
+        volumeByWell={"A1": 30, "B2": 100},
     )
     result = await subject.execute(data)
 
