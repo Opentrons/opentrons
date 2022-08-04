@@ -112,7 +112,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               {t('api_name')}
             </StyledText>
 
-            <Box fontSize={TYPOGRAPHY.fontSizeP} overflowWrap="anywhere">
+            <Box overflowWrap="anywhere">
               <StyledText as="p">{apiName}</StyledText>
             </Box>
           </Box>
