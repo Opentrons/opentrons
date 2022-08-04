@@ -30,6 +30,10 @@ PICK_UP_TIP_PROTOCOL = textwrap.dedent(
             load_name="opentrons_96_tiprack_300ul",
             location="2",
         )
+        well_plate_1 = ctx.load_labware(
+            load_name="opentrons_96_aluminumblock_nest_wellplate_100ul",
+            location="3",
+        )
 
         pipette_left = ctx.load_instrument(
             instrument_name="p300_single",
@@ -47,7 +51,18 @@ PICK_UP_TIP_PROTOCOL = textwrap.dedent(
         pipette_right.pick_up_tip(
             location=tip_rack_2.wells_by_name()["A2"].top(),
         )
-
+        pipette_right.aspirate(
+            volume=40,
+            rate=130,
+            location=well_plate_1["A1"],
+        )
+        pipette_right.blow_out(
+            location=well_plate_1["A1"],
+        )
+        pipette_right.dispense(
+            volume=35,
+            location=well_plate_1["B1"],
+        )
         pipette_left.drop_tip()
         pipette_left.pick_up_tip()
         pipette_left.drop_tip(
@@ -76,13 +91,16 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)
     commands_result = result.commands
+    for command in commands_result:
+        print(command.key)
 
     tiprack_1_result_captor = matchers.Captor()
     tiprack_2_result_captor = matchers.Captor()
+    well_plate_1_result_captor = matchers.Captor()
     pipette_left_result_captor = matchers.Captor()
     pipette_right_result_captor = matchers.Captor()
 
-    assert len(commands_result) == 9
+    assert len(commands_result) == 13
 
     assert commands_result[0] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
@@ -106,7 +124,18 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
         result=tiprack_2_result_captor,
     )
 
-    assert commands_result[2] == commands.LoadPipette.construct(
+    assert commands_result[2] == commands.LoadLabware.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=matchers.Anything(),
+        result=well_plate_1_result_captor,
+    )
+
+    assert commands_result[3] == commands.LoadPipette.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -117,7 +146,7 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
         result=pipette_left_result_captor,
     )
 
-    assert commands_result[3] == commands.LoadPipette.construct(
+    assert commands_result[4] == commands.LoadPipette.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -132,10 +161,11 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
     # might be a bug in Decoy, might be something weird that Pydantic does
     tiprack_1_id = tiprack_1_result_captor.value["labwareId"]
     tiprack_2_id = tiprack_2_result_captor.value["labwareId"]
+    well_plate_1_id = well_plate_1_result_captor.value["labwareId"]
     pipette_left_id = pipette_left_result_captor.value["pipetteId"]
     pipette_right_id = pipette_right_result_captor.value["pipetteId"]
 
-    assert commands_result[4] == commands.PickUpTip.construct(
+    assert commands_result[5] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -150,7 +180,51 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
         result=commands.PickUpTipResult(),
     )
 
-    assert commands_result[5] == commands.PickUpTip.construct(
+    assert commands_result[6] == commands.Aspirate.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.AspirateParams(
+            pipetteId=pipette_right_id,
+            labwareId=well_plate_1_id,
+            wellName="A1",
+            volume=40,
+            flowRate=130
+        ),
+        result=commands.AspirateResult(),
+    )
+    assert commands_result[7] == commands.BlowOut.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.BlowOutParams(
+            pipetteId=pipette_right_id,
+            labwareId=well_plate_1_id,
+        ),
+        result=commands.BlowOutResult(),
+    )
+    assert commands_result[8] == commands.Dispense.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.DispenseParams(
+            pipetteId=pipette_right_id,
+            labwareId=well_plate_1_id,
+            wellName="B1",
+            volume=35,
+        ),
+        result=commands.DispenseResult(),
+    )
+    assert commands_result[9] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -165,7 +239,7 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
         result=commands.PickUpTipResult(),
     )
 
-    assert commands_result[6] == commands.DropTip.construct(
+    assert commands_result[10] == commands.DropTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -180,7 +254,7 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
         result=commands.DropTipResult(),
     )
 
-    assert commands_result[7] == commands.PickUpTip.construct(
+    assert commands_result[11] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -195,7 +269,7 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
         result=commands.PickUpTipResult(),
     )
 
-    assert commands_result[8] == commands.DropTip.construct(
+    assert commands_result[12] == commands.DropTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
