@@ -3,7 +3,7 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
-from typing import Optional, Type, TypeVar, Callable, AsyncIterator, cast
+from typing import Optional, Type, TypeVar, Callable, AsyncIterator, cast, List
 
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -68,10 +68,10 @@ class SensorScheduler:
     """Sensor message scheduler."""
 
     async def run_poll(
-        self, sensor: PollSensorInformation, can_messenger: CanMessenger, timeout: int
+        self, sensor: PollSensorInformation, can_messenger: CanMessenger, timeout: int, expected_responses: int = 1
     ) -> Optional[SensorDataType]:
         """Send poll message."""
-        with WaitableCallback(can_messenger) as reader:
+        with WaitableCallback(can_messenger, number_of_messages=expected_responses) as reader:
             data: Optional[SensorDataType] = None
             await can_messenger.send(
                 node_id=sensor.node_id,
@@ -86,11 +86,10 @@ class SensorScheduler:
             try:
 
                 def _format(message: ReadFromSensorResponse) -> SensorDataType:
-                    return SensorDataType.build(message.payload.sensor_data)
-
+                    return SensorDataType.build(message.payload.sensor_data, message.payload.sensor)
                 data = await asyncio.wait_for(
-                    self._wait_for_response(
-                        sensor.node_id, reader, ReadFromSensorResponse, _format
+                    self._multi_wait_for_response(
+                        sensor.node_id, reader, ReadFromSensorResponse, _format, expected_responses
                     ),
                     timeout,
                 )
@@ -117,11 +116,12 @@ class SensorScheduler:
         )
 
     async def send_read(
-        self, sensor: ReadSensorInformation, can_messenger: CanMessenger, timeout: int
-    ) -> Optional[SensorDataType]:
+        self, sensor: ReadSensorInformation, can_messenger: CanMessenger, timeout: int,
+        expected_responses: int = 1,
+    ) -> List[Optional[SensorDataType]]:
         """Send read message."""
-        with WaitableCallback(can_messenger) as reader:
-            data: Optional[SensorDataType] = None
+        with WaitableCallback(can_messenger, number_of_messages=expected_responses) as reader:
+            data_list: List[Optional[SensorDataType]] = []
             await can_messenger.send(
                 node_id=sensor.node_id,
                 message=ReadFromSensorRequest(
@@ -135,43 +135,50 @@ class SensorScheduler:
             try:
 
                 def _format(response: ReadFromSensorResponse) -> SensorDataType:
-                    return SensorDataType.build(response.payload.sensor_data)
-
-                data = await asyncio.wait_for(
-                    self._wait_for_response(
-                        sensor.node_id, reader, ReadFromSensorResponse, _format
+                    return SensorDataType.build(response.payload.sensor_data, response.payload.sensor)
+                
+                data_list = await asyncio.wait_for(
+                    self._multi_wait_for_response(
+                        sensor.node_id, reader, ReadFromSensorResponse, _format, expected_responses
                     ),
                     timeout,
                 )
             except asyncio.TimeoutError:
                 log.warning("Sensor Read timed out")
             finally:
-                return data
+                print("finished data list")
+                print(data_list)
+                return data_list
 
     async def read(
         self,
         can_messenger: CanMessenger,
         node_id: NodeId,
-    ) -> Optional[SensorDataType]:
+        timeout: float = 1.0,
+        expected_responses = 1,
+    ) -> List[SensorDataType]:
         """Helper function for the get_report sensor driver.
 
         This simply retrieves CAN messages without first
         sending a ReadFromSensorRequest.
         """
-        data: Optional[SensorDataType] = SensorDataType.build(0)
+        data_list: List[Optional[SensorDataType]] = []
 
         def _format(response: ReadFromSensorResponse) -> SensorDataType:
-            return SensorDataType.build(response.payload.sensor_data)
+            return SensorDataType.build(response.payload.sensor_data, response.payload.sensor)
 
         with WaitableCallback(can_messenger) as reader:
             try:
-                data = await self._wait_for_response(
-                    node_id, reader, ReadFromSensorResponse, _format
+                data_list = await asyncio.wait_for(
+                    self._multi_wait_for_response(
+                        node_id, reader, ReadFromSensorResponse, _format, expected_responses
+                    ),
+                    timeout,
                 )
             except asyncio.TimeoutError:
                 log.warning("Sensor Read timed out")
             finally:
-                return data
+                return data_list
 
     async def send_threshold(
         self,
@@ -196,7 +203,7 @@ class SensorScheduler:
             try:
 
                 def _format(response: SensorThresholdResponse) -> SensorDataType:
-                    return SensorDataType.build(response.payload.threshold)
+                    return SensorDataType.build(response.payload.threshold, response.payload.sensor)
 
                 data = await asyncio.wait_for(
                     self._wait_for_response(
@@ -208,6 +215,24 @@ class SensorScheduler:
                 log.warning("Sensor Read timed out")
             finally:
                 return data
+
+    @staticmethod
+    async def _multi_wait_for_response(
+        node_id: NodeId,
+        reader: WaitableCallback,
+        response_def: Type[ResponseType],
+        response_handler: Callable[[ResponseType], Optional[SensorDataType]],
+        expected_responses: int,
+    ) -> Optional[List[SensorDataType]]:
+        """Listener for receiving messages back."""
+        data: Optional[List[SensorDataType]] = []
+        async for response, arbitration_id in reader:
+            if arbitration_id.parts.originating_node_id == node_id:
+                if isinstance(response, response_def):
+                    data.append(response_handler(response))
+        print("finished multi wait")
+        print(data)
+        return data
 
     @staticmethod
     async def _wait_for_response(

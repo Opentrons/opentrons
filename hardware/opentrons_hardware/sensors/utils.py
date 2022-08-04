@@ -13,6 +13,7 @@ from opentrons_hardware.firmware_bindings.constants import (
 from opentrons_hardware.firmware_bindings.utils.binary_serializable import (
     Int32Field,
 )
+from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
 
 sensor_fixed_point_conversion: Final[float] = 2**16
 
@@ -23,29 +24,30 @@ class SensorDataType:
 
     backing: Int32Field
     as_int: int
+    sensor_id: SensorType
 
     @overload
     @classmethod
-    def build(cls, data: int) -> "SensorDataType":
+    def build(cls, data: int, _id: SensorTypeField) -> "SensorDataType":
         ...
 
     @overload
     @classmethod
-    def build(cls, data: float) -> "SensorDataType":
+    def build(cls, data: float, _id: SensorTypeField) -> "SensorDataType":
         ...
 
     @overload
     @classmethod
-    def build(cls, data: Int32Field) -> "SensorDataType":
+    def build(cls, data: Int32Field, _id: SensorTypeField) -> "SensorDataType":
         ...
 
     @overload
     @classmethod
-    def build(cls, data: List[int]) -> "SensorDataType":
+    def build(cls, data: List[int], _id: SensorTypeField) -> "SensorDataType":
         ...
 
     @classmethod
-    def build(cls, data):  # type: ignore[no-untyped-def]
+    def build(cls, data, _id):  # type: ignore[no-untyped-def]
         """Build function for sensor data type."""
         if isinstance(data, list):
             backing = Int32Field(cls._convert_to_int(data))
@@ -56,7 +58,7 @@ class SensorDataType:
         else:
             backing = Int32Field(data)
         as_int = int(backing.value)
-        return cls(backing, as_int)
+        return cls(backing, as_int, SensorType(_id.value))
 
     def to_float(self) -> float:
         """Convert data to float."""
@@ -71,6 +73,23 @@ class SensorDataType:
     def _convert_to_int(backing: List[int]) -> int:
         """Convert data to int."""
         return int.from_bytes(backing, byteorder="little", signed=True)
+
+
+@dataclass
+class EnvironmentSensorData:
+    humidity: SensorDataType
+    temperature: SensorDataType
+
+    @classmethod
+    def build(cls, data_list: List[SensorDataType]) -> "EnvironmentSensorData":
+        humidity = SensorDataType.build(0, SensorType.humidity)
+        temperature = SensorDataType.build(0, SensorType.temperature)
+        for item in data_list:
+            if item.sensor_id == SensorType.humidity:
+                humidity = item
+            else:
+                temperature = item
+        return cls(humidity, temperature)
 
 
 @dataclass

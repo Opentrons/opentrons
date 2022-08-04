@@ -1,17 +1,20 @@
 """Abstract base classes for the sensor drivers."""
 from abc import ABC, abstractmethod
 
-from typing import Optional, AsyncIterator
+from typing import Optional, AsyncIterator, Union, Tuple
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorId,
     SensorType,
 )
-from opentrons_hardware.sensors.utils import SensorDataType
+from opentrons_hardware.sensors.utils import SensorDataType, EnvironmentSensorData
 from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
 from .scheduler import SensorScheduler
 from contextlib import asynccontextmanager
+
+
+SensorReturnType = Union[SensorDataType, EnvironmentSensorData]
 
 
 class AbstractBasicSensor(ABC):
@@ -30,7 +33,7 @@ class AbstractBasicSensor(ABC):
         node_id: NodeId,
         offset: bool,
         timeout: int = 1,
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[SensorReturnType]:
         """Perform a single read to a given sensor."""
         ...
 
@@ -107,7 +110,7 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
         poll_for_ms: int,
         sample_rate: int,
         timeout: int = 1,
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[SensorReturnType]:
         """Poll the sensor for data."""
         ...
 
@@ -118,7 +121,7 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
         node_id: NodeId,
         threshold: SensorDataType,
         timeout: int = 1,
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[SensorReturnType]:
         """Send the zero threshold to the sensor."""
         ...
 
@@ -127,7 +130,7 @@ class AbstractAdvancedSensor(AbstractBasicSensor):
         node_id: NodeId,
         can_messenger: CanMessenger,
         timeout: int = 1,
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[SensorReturnType]:
         """This function retrieves ReadFromResponse messages.
 
         This is meant to be called after a bind_to_sync call,

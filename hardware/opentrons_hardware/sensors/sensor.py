@@ -17,6 +17,7 @@ from opentrons_hardware.sensors.utils import (
     WriteSensorInformation,
     SensorThresholdInformation,
     SensorDataType,
+    EnvironmentSensorData
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     BindSensorOutputRequestPayload,
@@ -29,14 +30,19 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BindSensorOutputRequest,
 )
-from .sensor_abc import AbstractAdvancedSensor
+from .sensor_abc import AbstractAdvancedSensor, SensorReturnType
 
 
-class CapacitiveSensor(AbstractAdvancedSensor):
-    """FDC1004 Driver."""
+class Sensor(AbstractAdvancedSensor):
+    """Generic Sensor Driver."""
 
+    # probably should remove sensor type so that only one object
+    # needs to be created.
+    # have data classes that hold respective state info about
+    # each sensor.
     def __init__(
         self,
+        sensor_type: SensorType,
         zero_threshold: float = 0.0,
         stop_threshold: float = 0.0,
         offset: float = 0.0,
@@ -44,21 +50,30 @@ class CapacitiveSensor(AbstractAdvancedSensor):
     ) -> None:
         """Constructor."""
         super().__init__(
-            zero_threshold, stop_threshold, offset, SensorType.capacitive, sensor_id
+            zero_threshold, stop_threshold, offset, sensor_type, sensor_id
         )
+
+    def __repr__(self) -> str:
+        return f"<{self._sensor_type} sensor: {self._sensor_id}>"
 
     async def get_report(
         self,
         node_id: NodeId,
         can_messenger: CanMessenger,
         timeout: int = 1,
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[SensorReturnType]:
         """This function retrieves ReadFromResponse messages.
 
         This is meant to be called after a bind_to_sync call,
         with the sensor being bound to "report".
         """
-        return await self._scheduler.read(can_messenger, node_id)
+        sensor_data = await self._scheduler.read(can_messenger, timeout)
+        if not sensor_data:
+            return sensor_data
+        if len(sensor_data) > 1 and self._sensor_type == SensorType.environment:
+            return EnvironmentSensorData.build(sensor_data) 
+        else:
+            return sensor_data[0]
 
     async def get_baseline(
         self,
@@ -67,12 +82,22 @@ class CapacitiveSensor(AbstractAdvancedSensor):
         poll_for_ms: int,
         sample_rate: int,
         timeout: int = 1,
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[SensorReturnType]:
         """Poll the capacitive sensor."""
         poll = PollSensorInformation(
             self._sensor_type, self._sensor_id, node_id, poll_for_ms
         )
-        return await self._scheduler.run_poll(poll, can_messenger, timeout)
+        if self._sensor_type == SensorType.environment:
+            expected_responses = 2
+        else:
+            expected_responses = 1
+        sensor_data = await self._scheduler.run_poll(poll, can_messenger, timeout, expected_responses)
+        if not sensor_data:
+            return sensor_data
+        if len(sensor_data) > 1 and self._sensor_type == SensorType.environment:
+            return EnvironmentSensorData.build(sensor_data)
+        else:
+            return sensor_data[0]
 
     async def read(
         self,
@@ -80,12 +105,18 @@ class CapacitiveSensor(AbstractAdvancedSensor):
         node_id: NodeId,
         offset: bool,
         timeout: int = 1,
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[SensorReturnType]:
         """Single read of the capacitive sensor."""
         read = ReadSensorInformation(
             self._sensor_type, self._sensor_id, node_id, offset
         )
-        return await self._scheduler.send_read(read, can_messenger, timeout)
+        sensor_data = await self._scheduler.send_read(read, can_messenger, timeout)
+        if not sensor_data:
+            return sensor_data
+        if len(sensor_data) > 1 and self._sensor_type == SensorType.environment:
+            return EnvironmentSensorData.build(sensor_data)
+        else:
+            return sensor_data[0]
 
     async def write(
         self, can_messenger: CanMessenger, node_id: NodeId, data: SensorDataType
@@ -102,7 +133,7 @@ class CapacitiveSensor(AbstractAdvancedSensor):
         node_id: NodeId,
         threshold: SensorDataType,
         timeout: int = 1,
-    ) -> Optional[SensorDataType]:
+    ) -> Optional[SensorReturnType]:
         """Send the zero threshold which the offset value is compared to."""
         write = SensorThresholdInformation(
             self._sensor_type,
