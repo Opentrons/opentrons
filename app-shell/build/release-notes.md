@@ -16,6 +16,10 @@ Welcome to the v6.1.0 release of the Opentrons App! This release adds Heater-Sha
 
 ---
 
+## Known Issues
+
+This alpha is a work in progress! We'll be addressing issues in upcoming releases of 6.1.0.
+
 # Opentrons App Changes in 6.0.0
 
 Welcome to the v6.0.0 release of the Opentrons App! This release focuses on a visual redesign of the app that offers more ways to manage protocols even when you're not connected to a robot.
