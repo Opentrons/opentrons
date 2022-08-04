@@ -18,7 +18,7 @@ import {
   ALIGN_CENTER,
   SIZE_1,
   useHoverTooltip,
-  TOOLTIP_TOP_END,
+  TOOLTIP_TOP_START,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
@@ -46,6 +46,18 @@ const CLOSE_ICON_STYLE = css`
     background: #16212d40;
   }
 `
+
+const COPY_ICON_STYLE = css`
+  transform: translateY(${SPACING.spacing2});
+  &:hover {
+    color: ${COLORS.blue};
+  }
+  &:active,
+  &:focus {
+    color: ${COLORS.darkBlack};
+  }
+`
+
 export interface LabwareDetailsProps {
   onClose: () => void
   labware: LabwareDefAndDate
@@ -67,7 +79,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const isCustomDefinition = definition.namespace !== 'opentrons'
   const [showToolTip, setShowToolTip] = React.useState<boolean>(false)
   const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: TOOLTIP_TOP_END,
+    placement: TOOLTIP_TOP_START,
   })
 
   const handleCopy = async (): Promise<void> => {
@@ -142,17 +154,20 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         backgroundColor={COLORS.lightGrey}
         padding={SPACING.spacing4}
         marginBottom={SPACING.spacing5}
-        overflowWrap="break-word"
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
         <Link
-          {...targetProps}
           css={TYPOGRAPHY.pRegular}
           onClick={async () => await handleCopy()}
           role="button"
         >
-          <Flex alignItems={ALIGN_CENTER} overflowWrap="anywhere">
-            {apiName} <Icon height={SIZE_1} name="copy-text" />
+          <Flex overflowWrap="anywhere">
+            <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black}>
+              {apiName}
+              <span {...targetProps}>
+                <Icon size={SIZE_1} name="copy-text" css={COPY_ICON_STYLE} />
+              </span>
+            </Box>
           </Flex>
           {showToolTip && (
             <Tooltip width="3.25rem" tooltipProps={tooltipProps}>
