@@ -1,9 +1,9 @@
 """Input file role analysis."""
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Union
+from typing import List, Optional, Sequence, Union, Dict
 from typing_extensions import Literal
 
-from opentrons_shared_data.protocol.models import ProtocolSchemaV6
+from opentrons_shared_data.protocol.models import ProtocolSchemaV6, protocol_schema_v6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocols.models import JsonProtocol as ProtocolSchemaV5
 from .protocol_source import ProtocolFileRole
@@ -41,6 +41,7 @@ class RoleAnalysis:
     main_file: MainFile
     labware_files: List[LabwareFile]
     labware_definitions: List[LabwareDefinition]
+    liquids: Optional[Dict[str, protocol_schema_v6.Liquid]] = None
 
 
 class RoleAnalysisError(ValueError):
@@ -98,9 +99,12 @@ class RoleAnalyzer:
 
         # ignore extra custom labware files for JSON protocols, while
         # maintaining a reference to the protocol's labware
+        liquids = None
         if isinstance(main_file.data, (ProtocolSchemaV5, ProtocolSchemaV6)):
             labware_files = []
             labware_definitions = list(main_file.data.labwareDefinitions.values())
+            if isinstance(main_file.data, ProtocolSchemaV6):
+                liquids = main_file.data.liquids.values()
         else:
             labware_definitions = [f.data for f in labware_files]
 
@@ -108,4 +112,5 @@ class RoleAnalyzer:
             main_file=main_file,
             labware_files=labware_files,
             labware_definitions=labware_definitions,
+            liquids=liquids
         )

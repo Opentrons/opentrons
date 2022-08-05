@@ -4,7 +4,7 @@ from decoy import matchers
 from pathlib import Path
 from typing import List, NamedTuple
 
-from opentrons_shared_data.protocol.models import ProtocolSchemaV6
+from opentrons_shared_data.protocol.models import ProtocolSchemaV6, protocol_schema_v6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocols.models import JsonProtocol
 from opentrons.protocol_reader.file_reader_writer import BufferedFile
@@ -41,6 +41,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             main_file=MainFile(name="protocol.py", contents=b"", path=None),
             labware_files=[],
             labware_definitions=[],
+            liquids=None
         ),
     ),
     RoleAnalyzerSpec(
@@ -67,7 +68,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             ),
             labware_files=[],
             labware_definitions=[
-                LabwareDefinition.construct()  # type: ignore[call-arg]
+                LabwareDefinition.construct(),  # type: ignore[call-arg]
             ],
         ),
     ),
@@ -159,6 +160,11 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                     labwareDefinitions={
                         "uri": LabwareDefinition.construct()  # type: ignore[call-arg]
                     },
+                    liquids={"liquid-id": protocol_schema_v6.Liquid (
+                        displayName="water",
+                        description="water desc"
+                    )
+                    }
                 ),
             ),
         ],
@@ -168,13 +174,15 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                 contents=b"",
                 path=None,
                 data=ProtocolSchemaV6.construct(  # type: ignore[call-arg]
-                    labwareDefinitions=matchers.Anything()
+                    labwareDefinitions=matchers.Anything(),
+                    liquids=matchers.Anything()
                 ),
             ),
             labware_files=[],
             labware_definitions=[
                 LabwareDefinition.construct()  # type: ignore[call-arg]
             ],
+            liquids=matchers.Anything()
         ),
     ),
 ]
