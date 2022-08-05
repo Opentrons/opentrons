@@ -628,9 +628,9 @@ The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerCon
 Placement Restrictions
 ======================
 
-To allow for proper anchoring and cable routing, the Heater-Shaker should only be loaded in slots 1, 3, 4, 6, 7, and 10. 
+To allow for proper anchoring and cable routing, the Heater-Shaker should only be loaded in slot 1, 3, 4, 6, 7, or 10. 
 
-In general, it is best to leave all slots adjacent to the Heater-Shaker empty, in both directions. If your protocol requires filling those slots, you’ll need to observe certain restrictions to avoid physical crashes involving the Heater-Shaker.
+In general, it's best to leave all slots adjacent to the Heater-Shaker empty, in both directions. If your protocol requires filling those slots, you’ll need to observe certain restrictions put in place to avoid physical crashes involving the Heater-Shaker.
 
 First, you can’t place any other modules adjacent to the Heater-Shaker in any direction. This prevents collisions both while shaking and while opening the labware latch. Attempting to load a module next to the Heater-Shaker will raise a ``DeckConflictError``.
 
