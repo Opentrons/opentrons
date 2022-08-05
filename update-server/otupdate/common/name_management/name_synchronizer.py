@@ -66,6 +66,9 @@ class NameSynchronizer:
         Collision monitoring will stop when this context manager exits.
 
         Args:
+            machine_type: The robot model to advertise. This will be set in a TXT
+                record as "robotModel=${machine_type}" for clients to use to
+                identify the robot.
             avahi_client: The interface for communicating with Avahi.
                 Changeable for testing this class; should normally be left as
                 the default.
