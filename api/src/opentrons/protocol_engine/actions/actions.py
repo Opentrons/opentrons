@@ -165,4 +165,5 @@ Action = Union[
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddModuleAction,
+    AddLiquidAction,
 ]

@@ -232,7 +232,7 @@ def test_load_json(
         metadata={},
         config=JsonProtocolConfig(schema_version=6),
         labware_definitions=[],
-        liquids={}
+        liquids={},
     )
 
     json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]

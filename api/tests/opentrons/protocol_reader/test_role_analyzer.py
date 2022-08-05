@@ -41,7 +41,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             main_file=MainFile(name="protocol.py", contents=b"", path=None),
             labware_files=[],
             labware_definitions=[],
-            liquids=None
+            liquids=None,
         ),
     ),
     RoleAnalyzerSpec(
@@ -160,11 +160,11 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                     labwareDefinitions={
                         "uri": LabwareDefinition.construct()  # type: ignore[call-arg]
                     },
-                    liquids={"liquid-id": protocol_schema_v6.Liquid (
-                        displayName="water",
-                        description="water desc"
-                    )
-                    }
+                    liquids={
+                        "liquid-id": protocol_schema_v6.Liquid(
+                            displayName="water", description="water desc"
+                        )
+                    },
                 ),
             ),
         ],
@@ -174,15 +174,14 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                 contents=b"",
                 path=None,
                 data=ProtocolSchemaV6.construct(  # type: ignore[call-arg]
-                    labwareDefinitions=matchers.Anything(),
-                    liquids=matchers.Anything()
+                    labwareDefinitions=matchers.Anything(), liquids=matchers.Anything()
                 ),
             ),
             labware_files=[],
             labware_definitions=[
                 LabwareDefinition.construct()  # type: ignore[call-arg]
             ],
-            liquids=matchers.Anything()
+            liquids=matchers.Anything(),
         ),
     ),
 ]

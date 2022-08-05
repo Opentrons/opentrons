@@ -99,12 +99,12 @@ class RoleAnalyzer:
 
         # ignore extra custom labware files for JSON protocols, while
         # maintaining a reference to the protocol's labware
-        liquids = None
+        liquids: Optional[Dict[str, protocol_schema_v6.Liquid]] = {}
         if isinstance(main_file.data, (ProtocolSchemaV5, ProtocolSchemaV6)):
             labware_files = []
             labware_definitions = list(main_file.data.labwareDefinitions.values())
             if isinstance(main_file.data, ProtocolSchemaV6):
-                liquids = main_file.data.liquids.values()
+                liquids = main_file.data.liquids
         else:
             labware_definitions = [f.data for f in labware_files]
 
@@ -112,5 +112,5 @@ class RoleAnalyzer:
             main_file=main_file,
             labware_files=labware_files,
             labware_definitions=labware_definitions,
-            liquids=liquids
+            liquids=liquids,
         )

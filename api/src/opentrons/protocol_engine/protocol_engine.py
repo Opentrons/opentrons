@@ -280,12 +280,9 @@ class ProtocolEngine:
         )
         return self._state_store.labware.get_uri_from_definition(definition)
 
-    def add_liquid(self, liquid: protocol_schema_v6.Liquid) -> LabwareUri:
-        """Add a labware definition to the state for subsequent labware loads."""
-        self._action_dispatcher.dispatch(
-            AddLiquidAction(liquid=liquid)
-        )
-        return self._state_store.labware.get_uri_from_definition(definition)
+    def add_liquid(self, liquid: protocol_schema_v6.Liquid) -> None:
+        """Add a liquid to the state for subsequent liquid loads."""
+        self._action_dispatcher.dispatch(AddLiquidAction(liquid=liquid))
 
     async def use_attached_modules(
         self,

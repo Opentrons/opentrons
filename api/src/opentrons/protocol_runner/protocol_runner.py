@@ -108,8 +108,10 @@ class ProtocolRunner:
 
             if schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF:
                 self._load_json(protocol_source)
-                for liquid in protocol_source.liquids:
-                    self._protocol_engine.add_liquid(liquid)
+                for liquid_key in protocol_source.liquids:
+                    self._protocol_engine.add_liquid(
+                        protocol_source.liquids[liquid_key]
+                    )
             else:
                 self._load_legacy(protocol_source)
 
