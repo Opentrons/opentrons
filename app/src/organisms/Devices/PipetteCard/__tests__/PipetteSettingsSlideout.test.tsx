@@ -1,18 +1,24 @@
 import * as React from 'react'
 import { resetAllWhenMocks, when } from 'jest-when'
-import omit from 'lodash/omit'
+import { waitFor } from '@testing-library/dom'
+import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { pipetteSettingsResponseFixture } from '@opentrons/api-client/src/pipettes'
 import { i18n } from '../../../../i18n'
 import * as RobotApi from '../../../../redux/robot-api'
-import { getAttachedPipetteSettingsFieldsById } from '../../../../redux/pipettes'
+import {
+  getAttachedPipetteSettingsFieldsById,
+  updatePipetteSettings,
+} from '../../../../redux/pipettes'
 import { getConfig } from '../../../../redux/config'
 import { PipetteSettingsSlideout } from '../PipetteSettingsSlideout'
 
-import { mockLeftSpecs } from '../../../../redux/pipettes/__fixtures__'
+import {
+  mockLeftSpecs,
+  mockPipetteSettingsFieldsMap,
+} from '../../../../redux/pipettes/__fixtures__'
 
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
-import { waitFor } from '@testing-library/dom'
+import type { UpdatePipetteSettingsAction } from '../../../../redux/pipettes/types'
 
 jest.mock('../../../../redux/robot-api')
 jest.mock('../../../../redux/config')
@@ -27,6 +33,9 @@ const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
 >
 const mockGetAttachedPipetteSettingsFieldsById = getAttachedPipetteSettingsFieldsById as jest.MockedFunction<
   typeof getAttachedPipetteSettingsFieldsById
+>
+const mockUpdatePipetteSettings = updatePipetteSettings as jest.MockedFunction<
+  typeof updatePipetteSettings
 >
 
 const render = (
@@ -63,7 +72,7 @@ describe('PipetteSettingsSlideout', () => {
     })
     mockGetConfig.mockReturnValue({} as any)
     mockGetAttachedPipetteSettingsFieldsById.mockReturnValue(
-      omit(pipetteSettingsResponseFixture.fakePipetteIdOne.fields, 'quirks')
+      mockPipetteSettingsFieldsMap
     )
     dispatchApiRequest = jest.fn()
     when(mockUseDispatchApiRequest)
@@ -87,19 +96,26 @@ describe('PipetteSettingsSlideout', () => {
     const { getByRole } = render(props)
 
     const button = getByRole('button', { name: /exit/i })
-    button.click()
+    fireEvent.click(button)
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 
-  it('renders confirm button and calls form onsubmit when clicked', async () => {
+  it('renders confirm button and calls dispatchApiRequest with updatePipetteSettings action object when clicked', async () => {
     const { getByRole } = render(props)
-
-    const form = getByRole('form', { name: 'configure_pipette_form' })
-    form.onsubmit = jest.fn()
     const button = getByRole('button', { name: 'Confirm' })
+
+    when(mockUpdatePipetteSettings)
+      .calledWith(mockRobotName, props.pipetteId, expect.any(Object))
+      .mockReturnValue({
+        type: 'pipettes:UPDATE_PIPETTE_SETTINGS',
+      } as UpdatePipetteSettingsAction)
+
+    fireEvent.click(button)
+
     await waitFor(() => {
-      button.click()
+      expect(dispatchApiRequest).toHaveBeenCalledWith({
+        type: 'pipettes:UPDATE_PIPETTE_SETTINGS',
+      })
     })
-    expect(form.onsubmit).toHaveBeenCalled()
   })
 })

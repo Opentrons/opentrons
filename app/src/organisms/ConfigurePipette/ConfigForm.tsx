@@ -217,7 +217,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
           }
           return (
             <Box overflowY="scroll">
-              <Form id={formId} aria-label="configure_pipette_form">
+              <Form id={formId}>
                 <ConfigFormResetButton
                   onClick={handleReset}
                   disabled={updateInProgress}
