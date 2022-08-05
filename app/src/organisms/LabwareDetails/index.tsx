@@ -156,11 +156,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         marginBottom={SPACING.spacing5}
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
-        <Link
-          css={TYPOGRAPHY.pRegular}
-          onClick={async () => await handleCopy()}
-          role="button"
-        >
+        <Link css={TYPOGRAPHY.pRegular} onClick={handleCopy} role="button">
           <Flex overflowWrap="anywhere">
             <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black}>
               {apiName}
