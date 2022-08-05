@@ -154,13 +154,30 @@ class LegacyCommandMapper:
                     completed_command = running_command.copy(
                         update={
                             "result": pe_commands.AspirateResult.construct(
-                                volume = 40
+                                volume=running_command.params.volume,
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
                         }
                     )
-
+                elif isinstance(running_command, pe_commands.BlowOut):
+                    completed_command = running_command.copy(
+                        update={
+                            "result": pe_commands.BlowOutResult.construct(),
+                            "status": pe_commands.CommandStatus.SUCCEEDED,
+                            "completedAt": now,
+                        }
+                    )
+                elif isinstance(running_command, pe_commands.Dispense):
+                    completed_command = running_command.copy(
+                        update={
+                            "result": pe_commands.DispenseResult.construct(
+                                volume=running_command.params.volume,
+                            ),
+                            "status": pe_commands.CommandStatus.SUCCEEDED,
+                            "completedAt": now,
+                        }
+                    )
                 else:
                     completed_command = running_command.copy(
                         update={
@@ -277,7 +294,9 @@ class LegacyCommandMapper:
                 well = location.labware.as_well()
             else:
                 raise Exception("Unknown aspirate location.")
-            parentModuleId = self._module_id_by_slot.get(location.labware.first_parent())
+            parentModuleId = self._module_id_by_slot.get(
+                location.labware.first_parent()
+            )
             if parentModuleId is not None:
                 labware_id = self._labware_id_by_module_id[parentModuleId]
             else:
@@ -297,7 +316,7 @@ class LegacyCommandMapper:
                     labwareId=labware_id,
                     wellName=well_name,
                     volume=volume,
-                    flowRate=flowRate
+                    flowRate=flowRate,
                 ),
             )
         elif (
@@ -315,7 +334,9 @@ class LegacyCommandMapper:
                 well = location.labware.as_well()
             else:
                 raise Exception("Unknown dispense location.")
-            parentModuleId = self._module_id_by_slot.get(location.labware.first_parent())
+            parentModuleId = self._module_id_by_slot.get(
+                location.labware.first_parent()
+            )
             if parentModuleId is not None:
                 labware_id = self._labware_id_by_module_id[parentModuleId]
             else:
@@ -335,12 +356,10 @@ class LegacyCommandMapper:
                     labwareId=labware_id,
                     wellName=well_name,
                     volume=volume,
-                    flowRate=flowRate
+                    flowRate=flowRate,
                 ),
             )
-        elif (
-            command["name"] == legacy_command_types.BLOW_OUT
-        ):
+        elif command["name"] == legacy_command_types.BLOW_OUT:
             pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore
             location = command["payload"].get("location")
             flow_rate = pipette.flow_rate.blow_out
@@ -352,7 +371,9 @@ class LegacyCommandMapper:
                 well = location.labware.as_well()
             else:
                 raise Exception("Unknown blow out location.")
-            parentModuleId = self._module_id_by_slot.get(location.labware.first_parent())
+            parentModuleId = self._module_id_by_slot.get(
+                location.labware.first_parent()
+            )
             if parentModuleId is not None:
                 labware_id = self._labware_id_by_module_id[parentModuleId]
             else:
@@ -371,7 +392,7 @@ class LegacyCommandMapper:
                     pipetteId=pipette_id,
                     labwareId=labware_id,
                     wellName=well_name,
-                    flowRate=flow_rate
+                    flowRate=flow_rate,
                 ),
             )
         elif command["name"] == legacy_command_types.PAUSE:
