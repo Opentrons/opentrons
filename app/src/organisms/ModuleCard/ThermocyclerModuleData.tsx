@@ -77,7 +77,7 @@ export const ThermocyclerModuleData = (
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
           fontWeight={FONT_WEIGHT_REGULAR}
-          fontSize={TYPOGRAPHY.fontSizeH3}
+          fontSize={TYPOGRAPHY.fontSizeCaption}
           marginTop={SPACING_2}
           marginBottom={SPACING.spacing2}
         >
@@ -85,14 +85,14 @@ export const ThermocyclerModuleData = (
         </Text>
         <Text
           title="lid_target_temp"
-          fontSize={TYPOGRAPHY.fontSizeH3}
+          fontSize={TYPOGRAPHY.fontSizeCaption}
           marginBottom={SPACING.spacing1}
         >
           {t(lidTarget == null ? 'na_temp' : 'target_temp', {
             temp: lidTarget,
           })}
         </Text>
-        <Text title="lid_temp" fontSize={TYPOGRAPHY.fontSizeH3}>
+        <Text title="lid_temp" fontSize={TYPOGRAPHY.fontSizeCaption}>
           {t('current_temp', { temp: lidTemp })}
         </Text>
       </Flex>
@@ -105,7 +105,7 @@ export const ThermocyclerModuleData = (
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
           fontWeight={FONT_WEIGHT_REGULAR}
-          fontSize={TYPOGRAPHY.fontSizeH3}
+          fontSize={TYPOGRAPHY.fontSizeCaption}
           marginTop={SPACING_2}
         >
           {t('tc_block')}
@@ -113,14 +113,14 @@ export const ThermocyclerModuleData = (
         <StatusLabel status={status} {...getStatusLabelProps(status)} />
         <Text
           title="tc_target_temp"
-          fontSize={TYPOGRAPHY.fontSizeH3}
+          fontSize={TYPOGRAPHY.fontSizeCaption}
           marginBottom={SPACING.spacing1}
         >
           {t(targetTemp == null ? 'na_temp' : 'target_temp', {
             temp: targetTemp,
           })}
         </Text>
-        <Text title="tc_current_temp" fontSize={TYPOGRAPHY.fontSizeH3}>
+        <Text title="tc_current_temp" fontSize={TYPOGRAPHY.fontSizeCaption}>
           {t('current_temp', { temp: currentTemp })}
         </Text>
       </Flex>

@@ -45,7 +45,7 @@ export const StepDetailText = (
       <Box
         padding={SPACING_2}
         justifyContent={JUSTIFY_CENTER}
-        fontSize={TYPOGRAPHY.fontSizeCaption}
+        fontSize={TYPOGRAPHY.fontSizeH3}
       >
         <Trans
           t={t}
