@@ -46,7 +46,7 @@ const render = (
   })[0]
 }
 
-const mockRobotName = 'mock robotName'
+const mockRobotName = 'mockRobotName'
 
 describe('PipetteSettingsSlideout', () => {
   let dispatchApiRequest: DispatchApiRequestType
@@ -105,13 +105,26 @@ describe('PipetteSettingsSlideout', () => {
     const button = getByRole('button', { name: 'Confirm' })
 
     when(mockUpdatePipetteSettings)
-      .calledWith(mockRobotName, props.pipetteId, expect.any(Object))
+      .calledWith(
+        mockRobotName,
+        props.pipetteId,
+        expect.objectContaining({
+          blowout: 2,
+          bottom: 3,
+          dropTip: 1,
+          dropTipCurrent: null,
+          dropTipSpeed: null,
+          pickUpCurrent: null,
+          pickUpDistance: null,
+          plungerCurrent: null,
+          top: 4,
+        })
+      )
       .mockReturnValue({
         type: 'pipettes:UPDATE_PIPETTE_SETTINGS',
       } as UpdatePipetteSettingsAction)
 
     fireEvent.click(button)
-
     await waitFor(() => {
       expect(dispatchApiRequest).toHaveBeenCalledWith({
         type: 'pipettes:UPDATE_PIPETTE_SETTINGS',
