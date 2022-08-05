@@ -34,7 +34,6 @@ PICK_UP_TIP_PROTOCOL = textwrap.dedent(
             load_name="opentrons_96_aluminumblock_nest_wellplate_100ul",
             location="3",
         )
-
         pipette_left = ctx.load_instrument(
             instrument_name="p300_single",
             mount="left",
@@ -44,27 +43,27 @@ PICK_UP_TIP_PROTOCOL = textwrap.dedent(
             instrument_name="p300_multi",
             mount="right",
         )
-
         pipette_left.pick_up_tip(
             location=tip_rack_1.wells_by_name()["A1"],
         )
         pipette_right.pick_up_tip(
-            location=tip_rack_2.wells_by_name()["A2"].top(),
+            location=tip_rack_2.wells_by_name()["A1"].top(),
         )
-        pipette_right.aspirate(
+        pipette_left.drop_tip()
+        pipette_left.pick_up_tip()
+        pipette_left.aspirate(
             volume=40,
             rate=130,
             location=well_plate_1["A1"],
         )
-        pipette_right.blow_out(
+        pipette_left.blow_out(
             location=well_plate_1["A1"],
         )
-        pipette_right.dispense(
+        pipette_left.dispense(
             volume=35,
+            rate=130,
             location=well_plate_1["B1"],
         )
-        pipette_left.drop_tip()
-        pipette_left.pick_up_tip()
         pipette_left.drop_tip(
             location=tip_rack_1.wells_by_name()["A1"]
         )
@@ -91,8 +90,6 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
     subject = await create_simulating_runner()
     result = await subject.run(protocol_source)
     commands_result = result.commands
-    for command in commands_result:
-        print(command.key)
 
     tiprack_1_result_captor = matchers.Captor()
     tiprack_2_result_captor = matchers.Captor()
@@ -112,7 +109,6 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
         params=matchers.Anything(),
         result=tiprack_1_result_captor,
     )
-
     assert commands_result[1] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
@@ -123,7 +119,6 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
         params=matchers.Anything(),
         result=tiprack_2_result_captor,
     )
-
     assert commands_result[2] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
@@ -179,52 +174,7 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
         ),
         result=commands.PickUpTipResult(),
     )
-
-    assert commands_result[6] == commands.Aspirate.construct(
-        id=matchers.IsA(str),
-        key=matchers.IsA(str),
-        status=commands.CommandStatus.SUCCEEDED,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        completedAt=matchers.IsA(datetime),
-        params=commands.AspirateParams(
-            pipetteId=pipette_right_id,
-            labwareId=well_plate_1_id,
-            wellName="A1",
-            volume=40,
-            flowRate=130
-        ),
-        result=commands.AspirateResult(),
-    )
-    assert commands_result[7] == commands.BlowOut.construct(
-        id=matchers.IsA(str),
-        key=matchers.IsA(str),
-        status=commands.CommandStatus.SUCCEEDED,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        completedAt=matchers.IsA(datetime),
-        params=commands.BlowOutParams(
-            pipetteId=pipette_right_id,
-            labwareId=well_plate_1_id,
-        ),
-        result=commands.BlowOutResult(),
-    )
-    assert commands_result[8] == commands.Dispense.construct(
-        id=matchers.IsA(str),
-        key=matchers.IsA(str),
-        status=commands.CommandStatus.SUCCEEDED,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        completedAt=matchers.IsA(datetime),
-        params=commands.DispenseParams(
-            pipetteId=pipette_right_id,
-            labwareId=well_plate_1_id,
-            wellName="B1",
-            volume=35,
-        ),
-        result=commands.DispenseResult(),
-    )
-    assert commands_result[9] == commands.PickUpTip.construct(
+    assert commands_result[6] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -234,12 +184,12 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
         params=commands.PickUpTipParams(
             pipetteId=pipette_right_id,
             labwareId=tiprack_2_id,
-            wellName="A2",
+            wellName="A1",
         ),
         result=commands.PickUpTipResult(),
     )
 
-    assert commands_result[10] == commands.DropTip.construct(
+    assert commands_result[7] == commands.DropTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -254,7 +204,7 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
         result=commands.DropTipResult(),
     )
 
-    assert commands_result[11] == commands.PickUpTip.construct(
+    assert commands_result[8] == commands.PickUpTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -268,7 +218,53 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
         ),
         result=commands.PickUpTipResult(),
     )
-
+    assert commands_result[9] == commands.Aspirate.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.AspirateParams(
+            pipetteId=pipette_left_id,
+            labwareId=well_plate_1_id,
+            wellName="A1",
+            volume=40,
+            flowRate=130,
+        ),
+        result=commands.AspirateResult(volume=40),
+    )
+    assert commands_result[10] == commands.BlowOut.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.BlowOutParams(
+            pipetteId=pipette_left_id,
+            labwareId=well_plate_1_id,
+            wellName="A1",
+            flowRate=1000.0,
+        ),
+        result=commands.BlowOutResult(),
+    )
+    assert commands_result[11] == commands.Dispense.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.DispenseParams(
+            pipetteId=pipette_left_id,
+            labwareId=well_plate_1_id,
+            wellName="B1",
+            volume=35,
+            flowRate=130,
+        ),
+        result=commands.DispenseResult(volume=35),
+    )
     assert commands_result[12] == commands.DropTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
