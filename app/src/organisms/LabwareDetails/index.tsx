@@ -108,7 +108,11 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         <StyledText css={TYPOGRAPHY.h2SemiBold}>
           {props.labware.definition.metadata.displayName}
         </StyledText>
-        <Link onClick={props.onClose} role="button">
+        <Link
+          onClick={props.onClose}
+          role="button"
+          data-testid="labwareDetails_slideout_close_button"
+        >
           <Icon name="close" height={SPACING.spacing5} css={CLOSE_ICON_STYLE} />
         </Link>
       </Flex>
