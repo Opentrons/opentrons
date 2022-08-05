@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { resetAllWhenMocks, when} from 'jest-when'
+import { resetAllWhenMocks, when } from 'jest-when'
 import omit from 'lodash/omit'
 import { renderWithProviders } from '@opentrons/components'
 import { pipetteSettingsResponseFixture } from '@opentrons/api-client/src/pipettes'
