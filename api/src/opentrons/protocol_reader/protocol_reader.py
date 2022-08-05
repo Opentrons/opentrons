@@ -77,6 +77,7 @@ class ProtocolReader:
             config=config_analysis.config,
             metadata=config_analysis.metadata,
             labware_definitions=role_analysis.labware_definitions,
+            liquids=role_analysis.liquids
         )
 
     async def read_saved(
@@ -128,4 +129,5 @@ class ProtocolReader:
             config=config_analysis.config,
             metadata=config_analysis.metadata,
             labware_definitions=role_analysis.labware_definitions,
+            liquids=role_analysis.liquids
         )

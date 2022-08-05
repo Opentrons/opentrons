@@ -11,6 +11,7 @@ from typing import Optional, Union
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.types import DoorState
 from opentrons.hardware_control.modules import LiveData
+from opentrons_shared_data.protocol.models import protocol_schema_v6
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
@@ -132,6 +133,13 @@ class AddLabwareDefinitionAction:
     """Add a labware definition, to apply to subsequent `LoadLabwareCommand`s."""
 
     definition: LabwareDefinition
+
+
+@dataclass(frozen=True)
+class AddLiquidAction:
+    """Add a liquid, to apply to subsequent `LoadLiquid`s."""
+
+    liquid: protocol_schema_v6.Liquid
 
 
 @dataclass(frozen=True)

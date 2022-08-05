@@ -18,6 +18,7 @@ from .actions import (
     FailCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
+    AddLiquidAction,
     AddModuleAction,
     FinishErrorDetails,
     DoorChangeAction,
@@ -40,6 +41,7 @@ __all__ = [
     "FailCommandAction",
     "AddLabwareOffsetAction",
     "AddLabwareDefinitionAction",
+    "AddLiquidAction",
     "AddModuleAction",
     "DoorChangeAction",
     # action payload values
