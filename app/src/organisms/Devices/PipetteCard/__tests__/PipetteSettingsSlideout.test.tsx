@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { resetAllWhenMocks, when } from 'jest-when'
+import { resetAllWhenMocks, when} from 'jest-when'
 import omit from 'lodash/omit'
 import { renderWithProviders } from '@opentrons/components'
 import { pipetteSettingsResponseFixture } from '@opentrons/api-client/src/pipettes'
@@ -13,6 +13,7 @@ import { PipetteSettingsSlideout } from '../PipetteSettingsSlideout'
 import { mockLeftSpecs } from '../../../../redux/pipettes/__fixtures__'
 
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
+import { waitFor } from '@testing-library/dom'
 
 jest.mock('../../../../redux/robot-api')
 jest.mock('../../../../redux/config')
@@ -91,13 +92,15 @@ describe('PipetteSettingsSlideout', () => {
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 
-  it('renders confirm button and calls form onsubmit when clicked', () => {
+  it('renders confirm button and calls form onsubmit when clicked', async () => {
     const { getByRole } = render(props)
 
     const form = getByRole('form', { name: 'configure_pipette_form' })
     form.onsubmit = jest.fn()
     const button = getByRole('button', { name: 'Confirm' })
-    act(() => button.click())
+    await waitFor(() => {
+      button.click()
+    })
     expect(form.onsubmit).toHaveBeenCalled()
   })
 })
