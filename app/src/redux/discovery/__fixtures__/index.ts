@@ -58,6 +58,7 @@ export const mockBaseRobot: BaseRobot = {
   local: null,
   health: null,
   serverHealth: null,
+  robotModel: 'OT-2 Standard',
 }
 
 export const mockConnectableRobot: Robot = {

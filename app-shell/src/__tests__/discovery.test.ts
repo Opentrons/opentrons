@@ -294,6 +294,7 @@ describe('app-shell/discovery', () => {
                   serverHealthStatus: null,
                   healthError: null,
                   serverHealthError: null,
+                  advertisedModel: null,
                 },
                 {
                   ip: '169.254.92.130',
@@ -303,6 +304,7 @@ describe('app-shell/discovery', () => {
                   serverHealthStatus: null,
                   healthError: null,
                   serverHealthError: null,
+                  advertisedModel: null,
                 },
                 {
                   ip: '169.254.239.127',
@@ -312,6 +314,7 @@ describe('app-shell/discovery', () => {
                   serverHealthStatus: null,
                   healthError: null,
                   serverHealthError: null,
+                  advertisedModel: null,
                 },
               ],
             },

@@ -105,6 +105,7 @@ describe('robotsByName reducer', () => {
       name: 'opentrons-dev',
       ip: '127.0.0.1',
       port: 31950,
+      robotModel: null,
     })
     const initialState: RobotsByNameMap = {
       'opentrons-dev': {
