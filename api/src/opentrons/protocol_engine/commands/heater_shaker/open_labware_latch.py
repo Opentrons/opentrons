@@ -25,6 +25,11 @@ class OpenLabwareLatchParams(BaseModel):
 class OpenLabwareLatchResult(BaseModel):
     """Result data from opening a Heater-Shaker's labware latch."""
 
+    pipetteRetracted: bool = Field(
+        ...,
+        description="Whether the pipette was retracted/ homed before starting shake.",
+    )
+
 
 class OpenLabwareLatchImpl(
     AbstractCommandImpl[OpenLabwareLatchParams, OpenLabwareLatchResult]
@@ -51,10 +56,13 @@ class OpenLabwareLatchImpl(
 
         hs_module_substate.raise_if_shaking()
 
-        # Move pipette away if it is close to the heater-shaker
-        if self._state_view.motion.check_pipette_blocking_hs_latch(
-            hs_module_substate.module_id
-        ):
+        pipette_should_retract = (
+            self._state_view.motion.check_pipette_blocking_hs_latch(
+                hs_module_substate.module_id
+            )
+        )
+        if pipette_should_retract:
+            # Move pipette away if it is close to the heater-shaker
             # TODO(jbl 2022-07-28) replace home movement with a retract movement
             await self._movement.home(
                 [
@@ -71,7 +79,7 @@ class OpenLabwareLatchImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.open_labware_latch()
 
-        return OpenLabwareLatchResult()
+        return OpenLabwareLatchResult(pipetteRetracted=pipette_should_retract)
 
 
 class OpenLabwareLatch(BaseCommand[OpenLabwareLatchParams, OpenLabwareLatchResult]):

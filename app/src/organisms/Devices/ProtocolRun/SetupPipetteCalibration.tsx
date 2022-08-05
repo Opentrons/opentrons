@@ -50,7 +50,7 @@ export function SetupPipetteCalibration({
       <StyledText
         color={COLORS.black}
         css={TYPOGRAPHY.pSemiBold}
-        id={`PipetteCalibration_requiredPipettesTitle`}
+        id="PipetteCalibration_requiredPipettesTitle"
       >
         {t('required_pipettes_title')}
       </StyledText>

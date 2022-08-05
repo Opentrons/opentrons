@@ -31,7 +31,7 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
       <Flex
         flexDirection={DIRECTION_COLUMN}
         marginBottom="4rem"
-        data-testid={`heater_shaker_power_on_text`}
+        data-testid="heater_shaker_power_on_text"
       >
         <Trans
           t={t}
@@ -49,7 +49,7 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
       </Flex>
       <RobotWorkSpace
         viewBox={VIEW_BOX}
-        data-testid={`heater_shaker_svg_and_info`}
+        data-testid="heater_shaker_svg_and_info"
       >
         {() => (
           <React.Fragment key={`Power_on_${moduleDef.model}`}>

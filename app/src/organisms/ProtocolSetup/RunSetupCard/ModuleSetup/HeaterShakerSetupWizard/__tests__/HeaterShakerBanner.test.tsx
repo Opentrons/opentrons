@@ -4,12 +4,9 @@ import { renderWithProviders } from '@opentrons/components'
 import { HeaterShakerBanner } from '../HeaterShakerBanner'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { mockHeaterShaker } from '../../../../../../redux/modules/__fixtures__'
-import { useCurrentRunId } from '../../../../../ProtocolUpload/hooks'
 import { ModuleRenderInfoForProtocol } from '../../../../../Devices/hooks'
-import { RUN_ID_1 } from '../../../../../RunTimeControl/__fixtures__'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
-jest.mock('../../../../../ProtocolUpload/hooks')
 const mockHeaterShakerDefinition = {
   moduleId: 'someHeaterShakerModule',
   model: 'heaterShakerModuleV1' as ModuleModel,
@@ -56,10 +53,6 @@ const HEATER_SHAKER_PROTOCOL_MODULE_INFO_2 = {
   slotName: '3',
 } as ModuleRenderInfoForProtocol
 
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
->
-
 const render = (props: React.ComponentProps<typeof HeaterShakerBanner>) => {
   return renderWithProviders(<HeaterShakerBanner {...props} />, {
     i18nInstance: i18n,
@@ -73,7 +66,6 @@ describe('HeaterShakerBanner', () => {
       displayName: 'HeaterShakerV1',
       modules: [HEATER_SHAKER_PROTOCOL_MODULE_INFO],
     }
-    mockUseCurrentRunId.mockReturnValue(RUN_ID_1)
   })
 
   it('should render banner component', () => {
