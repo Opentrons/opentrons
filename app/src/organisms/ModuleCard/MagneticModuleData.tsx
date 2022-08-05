@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { COLORS, FONT_SIZE_CAPTION, Text } from '@opentrons/components'
+import { COLORS, TYPOGRAPHY } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data/js/constants'
 import { StatusLabel } from '../../atoms/StatusLabel'
+import { StyledText } from '../../atoms/text'
 import type { MagneticStatus } from '../../redux/modules/api-types'
 
 interface MagModuleProps {
@@ -28,7 +29,10 @@ export const MagneticModuleData = (
         iconColor={COLORS.blue}
         pulse={moduleStatus === 'engaged'}
       />
-      <Text fontSize={FONT_SIZE_CAPTION} data-testid={`mag_module_data`}>
+      <StyledText
+        fontSize={TYPOGRAPHY.fontSizeCaption}
+        data-testid="mag_module_data"
+      >
         {t(
           moduleModel === MAGNETIC_MODULE_V2
             ? 'magdeck_gen2_height'
@@ -37,7 +41,7 @@ export const MagneticModuleData = (
             height: moduleHeight,
           }
         )}
-      </Text>
+      </StyledText>
     </>
   )
 }

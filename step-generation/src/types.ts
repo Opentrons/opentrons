@@ -323,7 +323,7 @@ export type SetShakeSpeedArgs = ShakeSpeedParams & {
 }
 
 export interface HeaterShakerArgs {
-  module: string
+  module: string | null
   rpm: number | null
   commandCreatorFnName: 'heaterShaker'
   targetTemperature: number | null

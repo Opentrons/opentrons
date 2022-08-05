@@ -162,12 +162,4 @@ class CannotPerformModuleAction(ProtocolEngineError):
 
 
 class ProtocolCommandFailedError(ProtocolEngineError):
-    """An error raised if a fatal command execution error has occurred.
-
-    Args:
-        command_id: The ID of the command that failed.
-    """
-
-    def __init__(self, command_id: str) -> None:
-        super().__init__(f"Command {command_id} failed to execute")
-        self.command_id = command_id
+    """An error raised if a fatal command execution error has occurred."""

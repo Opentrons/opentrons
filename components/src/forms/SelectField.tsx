@@ -6,6 +6,8 @@ import { Select } from './Select'
 import styles from './SelectField.css'
 
 import type { SelectProps } from './Select'
+import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
+import type { SelectOption } from '.'
 
 export interface SelectFieldProps {
   /** optional HTML id for container */
@@ -15,7 +17,7 @@ export interface SelectFieldProps {
   /** react-Select option, usually label, value */
   options: NonNullable<SelectProps['options']>
   /** currently selected value */
-  value: string | null | undefined
+  value?: string | null
   /** disable the select */
   disabled?: SelectProps['isDisabled']
   /** optional placeholder  */
@@ -29,11 +31,15 @@ export interface SelectFieldProps {
   /** optional caption. hidden when `error` is given */
   caption?: React.ReactNode
   /** if included, use error style and display error instead of caption */
-  error?: string | null | undefined
+  error?: string | null
   /** change handler called with (name, value) */
-  onValueChange?: (name: string, value: string) => unknown
+  onValueChange?: (
+    name: string,
+    value: string,
+    actionMeta: ActionMeta<SelectOption>
+  ) => void
   /** blur handler called with (name) */
-  onLoseFocus?: (name: string) => unknown
+  onLoseFocus?: (name: string) => void
 }
 
 export function SelectField(props: SelectFieldProps): JSX.Element {
@@ -71,7 +77,13 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
         placeholder={placeholder}
         menuPosition={menuPosition}
         formatOptionLabel={formatOptionLabel}
-        onChange={opt => onValueChange && onValueChange(name, opt?.value || '')}
+        onChange={(
+          opt: SingleValue<SelectOption> | MultiValue<SelectOption>,
+          e: ActionMeta<SelectOption>
+        ) => {
+          const value = (opt as SelectOption).value
+          onValueChange?.(name, value, e)
+        }}
         onBlur={() => onLoseFocus && onLoseFocus(name)}
       />
       {caption && <p className={captionCx}>{caption}</p>}

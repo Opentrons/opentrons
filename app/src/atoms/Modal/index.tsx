@@ -16,15 +16,18 @@ import {
 
 import { StyledText } from '../text'
 import { Divider } from '../structure'
-
 import type { IconProps } from '@opentrons/components'
 
 type ModalType = 'info' | 'warning' | 'error'
+export * from './ModalShell'
+export * from './ModalHeader'
+
 export interface ModalProps extends BaseModalProps {
   type?: ModalType
   onClose?: React.MouseEventHandler
   closeOnOutsideClick?: boolean
   title?: React.ReactNode
+  footer?: React.ReactNode
   children?: React.ReactNode
   icon?: IconProps
 }
@@ -54,7 +57,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
     children,
     maxHeight,
   } = props
-  const header =
+  const defaultHeader =
     title != null ? (
       <>
         <Flex
@@ -85,7 +88,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
               }`}
             >
               <Icon
-                name={'close'}
+                name="close"
                 width={SPACING.spacing5}
                 height={SPACING.spacing5}
               />
@@ -100,7 +103,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
     <BaseModal
       width={props.width ? props.width : '31.25rem'}
       noHeaderStyles
-      header={header}
+      header={defaultHeader}
       css={css`
         border-radius: ${BORDERS.radiusSoftCorners};
         box-shadow: ${BORDERS.smallDropShadow};

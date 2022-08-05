@@ -456,7 +456,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
   ) : (
     <>
       <Flex
-        key={'intro'}
+        key="intro"
         marginY={SPACING_2}
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_FLEX_START}

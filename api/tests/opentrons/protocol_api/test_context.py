@@ -11,11 +11,16 @@ from opentrons_shared_data.pipette.dev_types import LabwareUri
 import opentrons.protocol_api as papi
 import opentrons.protocols.api_support as papi_support
 import opentrons.protocols.geometry as papi_geometry
+
 from opentrons.protocols.context.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
+from opentrons.protocol_api.module_contexts import (
+    ThermocyclerContext,
+    HeaterShakerContext,
+)
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
-from opentrons.hardware_control import API, NoTipAttachedError
+from opentrons.hardware_control import API, NoTipAttachedError, ThreadManagedHardware
 from opentrons.hardware_control.instruments.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
@@ -251,6 +256,7 @@ def test_pick_up_and_drop_tip(ctx, get_labware_def):
     target_location = tiprack["A1"].top()
 
     instr.pick_up_tip(target_location)
+    assert pipette.ready_to_aspirate
     assert not tiprack.wells()[0].has_tip
     overlap = instr.hw_pipette["tip_overlap"][tiprack.uri]
     new_offset = nozzle_offset - Point(0, 0, tip_length - overlap)
@@ -260,6 +266,60 @@ def test_pick_up_and_drop_tip(ctx, get_labware_def):
     instr.drop_tip(target_location)
     assert not pipette.has_tip
     assert pipette.critical_point() == nozzle_offset
+
+
+def test_pick_up_without_prep_after(ctx, get_labware_def):
+    ctx.home()
+    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
+    lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 2)
+    mount = Mount.LEFT
+
+    instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
+
+    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
+
+    # will not be prepared until after an aspirate
+    instr.pick_up_tip(tiprack["A2"].top(), prep_after=False)
+    assert not pipette.ready_to_aspirate
+    instr.aspirate(1, lw.wells()[0].bottom())
+    assert pipette.ready_to_aspirate
+    instr.drop_tip(tiprack["A2"].top())
+
+
+async def test_pick_up_tip_old_version(hardware, get_labware_def):
+    # API version 2.12, a pick-up tip would not prepare-for-aspirate
+    api_version = APIVersion(2, 12)
+    ctx = papi.ProtocolContext(
+        implementation=ProtocolContextImplementation(
+            api_version=api_version,
+            sync_hardware=hardware.sync,
+        ),
+        loop=asyncio.get_running_loop(),
+        api_version=api_version,
+    )
+    ctx.home()
+    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
+    lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 2)
+    mount = Mount.LEFT
+
+    instr = ctx.load_instrument("p300_single", mount, tip_racks=[tiprack])
+
+    pipette: Pipette = ctx._implementation.get_hardware().hardware_instruments[mount]
+
+    # will not be prepared until after an aspirate
+    assert not pipette.has_tip
+    instr.pick_up_tip(tiprack["A1"].top())
+    assert not pipette.ready_to_aspirate
+    instr.aspirate(1, lw.wells()[0].bottom())
+    assert pipette.ready_to_aspirate
+    instr.drop_tip()
+
+    # cannot run pick_up_tip() with a prep_after= arg
+    assert not pipette.has_tip
+    with pytest.raises(papi_support.util.APIVersionError):
+        instr.pick_up_tip(tiprack["A2"].top(), prep_after=False)
+    with pytest.raises(papi_support.util.APIVersionError):
+        instr.pick_up_tip(tiprack["A2"].top(), prep_after=True)
 
 
 async def test_return_tip_old_version(hardware, get_labware_def):
@@ -1143,12 +1203,45 @@ def test_home_plunger(monkeypatch, hardware):
     instr.home_plunger()
 
 
-def test_move_to_with_thermocycler(ctx):
+def test_move_to_with_thermocycler(
+    ctx: papi.ProtocolContext,
+) -> None:
+    """Test move_to raises for unsafe moves with thermocycler."""
+
     def raiser(*args, **kwargs):
         raise RuntimeError("Cannot")
 
     mod = ctx.load_module("thermocycler")
-    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)
+
+    assert isinstance(mod, ThermocyclerContext)
+    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[assignment]
     instr = ctx.load_instrument("p1000_single", "left")
     with pytest.raises(RuntimeError, match="Cannot"):
         instr.move_to(Location(Point(0, 0, 0), None))
+    mod.flag_unsafe_move.assert_called_once_with(
+        to_loc=Location(Point(0, 0, 0), None), from_loc=Location(Point(0, 0, 0), None)
+    )
+
+
+def test_move_to_with_heater_shaker(
+    ctx: papi.ProtocolContext,
+    hardware: ThreadManagedHardware,
+) -> None:
+    """Test move_to raises for unsafe moves with heater-shaker."""
+
+    def raiser(*args, **kwargs):
+        raise RuntimeError("Cannot")
+
+    mod = ctx.load_module("heaterShakerModuleV1", 1)
+
+    assert isinstance(mod, HeaterShakerContext)
+    mod.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[assignment]
+
+    instr = ctx.load_instrument("p300_multi", "left")
+    with pytest.raises(RuntimeError, match="Cannot"):
+        instr.move_to(Location(Point(0, 0, 0), None))
+    mod.flag_unsafe_move.assert_called_once_with(
+        to_loc=Location(Point(0, 0, 0), None),
+        is_multichannel=True,
+    )
+    mod._module.cleanup()

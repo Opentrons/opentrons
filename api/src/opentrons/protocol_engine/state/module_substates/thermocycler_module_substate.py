@@ -31,6 +31,7 @@ class ThermocyclerModuleSubState:
     """
 
     module_id: ThermocyclerModuleId
+    is_lid_open: bool
     target_block_temperature: Optional[float]
     target_lid_temperature: Optional[float]
 

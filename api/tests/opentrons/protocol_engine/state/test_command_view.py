@@ -230,10 +230,8 @@ def test_get_all_complete_fatal_command_failure() -> None:
         commands=[completed_command, failed_command],
     )
 
-    with pytest.raises(errors.ProtocolCommandFailedError) as exc_info:
+    with pytest.raises(errors.ProtocolCommandFailedError, match="Oh no"):
         subject.get_all_complete()
-
-    assert exc_info.value.command_id == "command-id-2"
 
 
 def test_get_all_complete_setup_not_fatal() -> None:

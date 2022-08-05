@@ -48,5 +48,8 @@ jobs:
         with:
           project: 'g-code-testing'
 
+      - name: "Verify no missing comparison files"
+        run: make -C g-code-testing check-for-missing-comparison-files
+
       - name: 'Run & Compare to comparison files'
         run: make -C g-code-testing test-g-code-${{ matrix.command }}

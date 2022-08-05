@@ -172,24 +172,28 @@ def test_motion_settings_dataclass() -> None:
         OT3AxisKind.Y: 2,
         OT3AxisKind.Z: 15,
         OT3AxisKind.P: 2,
+        OT3AxisKind.Z_G: 5,
     }
     assert none_setting["default_max_speed"] == {
         OT3AxisKind.X: 1,
         OT3AxisKind.Y: 2,
         OT3AxisKind.Z: 3,
         OT3AxisKind.P: 4,
+        OT3AxisKind.Z_G: 5,
     }
     assert none_setting["max_speed_discontinuity"] == {
         OT3AxisKind.X: 10,
         OT3AxisKind.Y: 20,
         OT3AxisKind.Z: 30,
         OT3AxisKind.P: 40,
+        OT3AxisKind.Z_G: 50,
     }
     assert none_setting["direction_change_speed_discontinuity"] == {
         OT3AxisKind.X: 5,
         OT3AxisKind.Y: 10,
         OT3AxisKind.Z: 15,
         OT3AxisKind.P: 20,
+        OT3AxisKind.Z_G: 15,
     }
 
     gripper_setting = motion_settings.by_gantry_load(GantryLoad.GRIPPER)
@@ -198,24 +202,28 @@ def test_motion_settings_dataclass() -> None:
         OT3AxisKind.Y: 2,
         OT3AxisKind.Z: 2.8,
         OT3AxisKind.P: 2,
+        OT3AxisKind.Z_G: 6,
     }
     assert gripper_setting["default_max_speed"] == {
         OT3AxisKind.X: 1,
         OT3AxisKind.Y: 2,
         OT3AxisKind.Z: 2.8,
         OT3AxisKind.P: 4,
+        OT3AxisKind.Z_G: 5,
     }
     assert gripper_setting["max_speed_discontinuity"] == {
         OT3AxisKind.X: 10,
         OT3AxisKind.Y: 20,
         OT3AxisKind.Z: 2.8,
         OT3AxisKind.P: 40,
+        OT3AxisKind.Z_G: 50,
     }
     assert gripper_setting["direction_change_speed_discontinuity"] == {
         OT3AxisKind.X: 5,
         OT3AxisKind.Y: 10,
         OT3AxisKind.Z: 2.8,
         OT3AxisKind.P: 20,
+        OT3AxisKind.Z_G: 15,
     }
 
     two_low_setting = motion_settings.by_gantry_load(GantryLoad.TWO_LOW_THROUGHPUT)
@@ -224,22 +232,26 @@ def test_motion_settings_dataclass() -> None:
         OT3AxisKind.Y: 2.2,
         OT3AxisKind.Z: 15,
         OT3AxisKind.P: 2,
+        OT3AxisKind.Z_G: 5,
     }
     assert two_low_setting["default_max_speed"] == {
         OT3AxisKind.X: 4,
         OT3AxisKind.Y: 3,
         OT3AxisKind.Z: 2,
         OT3AxisKind.P: 1,
+        OT3AxisKind.Z_G: 5,
     }
     assert two_low_setting["max_speed_discontinuity"] == {
         OT3AxisKind.X: 1,
         OT3AxisKind.Y: 2,
         OT3AxisKind.Z: 3,
         OT3AxisKind.P: 6,
+        OT3AxisKind.Z_G: 50,
     }
     assert two_low_setting["direction_change_speed_discontinuity"] == {
         OT3AxisKind.X: 0.5,
         OT3AxisKind.Y: 1,
         OT3AxisKind.Z: 1.5,
         OT3AxisKind.P: 3,
+        OT3AxisKind.Z_G: 15,
     }

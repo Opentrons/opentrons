@@ -216,8 +216,8 @@ export function OverflowMenu({
           ref={calsOverflowWrapperRef}
           width={calType === 'pipetteOffset' ? '11.5rem' : '17.25rem'}
           zIndex={10}
-          borderRadius={'4px 4px 0px 0px'}
-          boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+          borderRadius="4px 4px 0px 0px"
+          boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
           top="2.3rem"
@@ -227,12 +227,12 @@ export function OverflowMenu({
           <MenuItem onClick={e => handleCalibration(calType, e)}>
             {calType === 'pipetteOffset'
               ? applicablePipetteOffsetCal != null
-                ? t('overflow_menu_recalibrate_pipette')
-                : t('overflow_menu_calibrate_pipette')
-              : t('overflow_menu_recalibrate_tip_and_pipette')}
+                ? t('recalibrate_pipette')
+                : t('calibrate_pipette')
+              : t('recalibrate_tip_and_pipette')}
           </MenuItem>
           <MenuItem onClick={e => handleDownload(calType, e)}>
-            {t('overflow_menu_download_calibration_data')}
+            {t('download_calibration_data')}
           </MenuItem>
           {/* TODO 5/6/2021 kj: This is scoped out from 6.0 */}
           {/* <Divider /> */}

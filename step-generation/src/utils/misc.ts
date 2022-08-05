@@ -307,7 +307,7 @@ export function makeInitialRobotState(args: {
   const {
     invariantContext,
     labwareLocations,
-    moduleLocations,
+    moduleLocations = {},
     pipetteLocations,
   } = args
   return {

@@ -6,13 +6,13 @@ import {
   Icon,
   POSITION_ABSOLUTE,
   SPACING,
-  Text,
   TYPOGRAPHY,
   Flex,
   COLORS,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
+import { StyledText } from '../text'
 
 export interface InterstitialTitleBarProps {
   title: React.ReactNode
@@ -41,7 +41,7 @@ export function InterstitialTitleBar(
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       css={TITLE_BAR}
-      data-testid={`titlebar`}
+      data-testid="titlebar"
     >
       <Flex padding={SPACING.spacingXS} data-testid={`titlebar_${title}`}>
         <Icon
@@ -64,7 +64,7 @@ export function InterstitialTitleBar(
           paddingRight={TYPOGRAPHY.fontSizeH6}
           data-testid={`titlebar_${exit.title}`}
         >
-          <Text
+          <StyledText
             paddingRight={SPACING.spacingSS}
             paddingTop={SPACING.spacingXS}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -72,9 +72,9 @@ export function InterstitialTitleBar(
             textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {exit.title}
-          </Text>
+          </StyledText>
           <Btn
-            size={'1.5rem'}
+            size="1.5rem"
             onClick={exit.onClick}
             paddingTop={SPACING.spacingS}
             aria-label="close_btn"

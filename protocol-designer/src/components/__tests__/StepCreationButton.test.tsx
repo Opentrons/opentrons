@@ -13,7 +13,6 @@ import {
 
 import * as stepFormSelectors from '../../step-forms/selectors'
 import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
-import { selectors } from '../../feature-flags'
 
 import { PrimaryButton, Tooltip } from '@opentrons/components'
 import {
@@ -33,17 +32,11 @@ const getCurrentFormHasUnsavedChangesMock =
   stepFormSelectors.getCurrentFormHasUnsavedChanges
 const getInitialDeckSetupMock = stepFormSelectors.getInitialDeckSetup
 const getIsMultiSelectModeMock = getIsMultiSelectMode
-const getEnabledHeaterShaker = selectors.getEnabledHeaterShaker
-
 describe('StepCreationButton', () => {
   let store: any
 
   beforeEach(() => {
     store = mockStore()
-
-    when(getEnabledHeaterShaker)
-      .calledWith(expect.anything())
-      .mockReturnValue(true)
 
     when(getCurrentFormIsPresavedMock)
       .calledWith(expect.anything())

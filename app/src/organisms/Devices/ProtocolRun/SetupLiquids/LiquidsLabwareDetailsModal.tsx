@@ -19,11 +19,11 @@ import {
   useProtocolDetailsForRun,
   useLabwareRenderInfoForRunById,
 } from '../../../Devices/hooks'
-import { Modal } from '../../../../atoms/Modal'
+import { ModalShell, ModalHeader } from '../../../../atoms/Modal'
 import { StyledText } from '../../../../atoms/text'
+import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 import { LiquidDetailCard } from './LiquidDetailCard'
 import {
-  getSlotLabwareName,
   getLiquidsByIdForLabware,
   getWellFillFromLabwareId,
   getWellGroupForLiquidId,
@@ -76,21 +76,24 @@ export const LiquidsLabwareDetailsModal = (
     }
   `
   return (
-    <Modal
-      onClose={closeModal}
-      title={labwareName}
-      closeOnOutsideClick
-      marginX={SPACING.spacing5}
+    <ModalShell
+      onOutsideClick={closeModal}
       width="45rem"
+      marginLeft="7.125rem"
+      header={<ModalHeader onClose={closeModal} title={labwareName} />}
     >
-      <Box>
+      <Box
+        paddingX={SPACING.spacing4}
+        paddingTop={SPACING.spacing4}
+        backgroundColor={COLORS.lightGrey}
+      >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             css={HIDE_SCROLLBAR}
-            maxHeight={'27.125rem'}
-            overflowY={'auto'}
-            minWidth={'10.313rem'}
+            maxHeight="27.125rem"
+            overflowY="auto"
+            minWidth="10.313rem"
             gridGap={SPACING.spacing3}
           >
             {filteredLiquidsInLoadOrder.map((liquid, index) => {
@@ -181,6 +184,6 @@ export const LiquidsLabwareDetailsModal = (
           </Flex>
         </Flex>
       </Box>
-    </Modal>
+    </ModalShell>
   )
 }

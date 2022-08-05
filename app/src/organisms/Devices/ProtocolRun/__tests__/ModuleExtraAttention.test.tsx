@@ -2,9 +2,8 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { HeaterShakerModule } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
-import { useCreateCommandMutation } from '@opentrons/react-api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
-import { RUN_ID_1 } from '../../../RunTimeControl/__fixtures__'
 import { ModuleExtraAttention } from '../ModuleExtraAttention'
 import {
   mockHeaterShaker as mockHeaterShakerAttachedModule,
@@ -16,8 +15,8 @@ import type { AttachedModule } from '../../../../redux/modules/types'
 
 jest.mock('@opentrons/react-api-client')
 
-const mockUseCreateCommandMutation = useCreateCommandMutation as jest.MockedFunction<
-  typeof useCreateCommandMutation
+const mockUseCreateLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
+  typeof useCreateLiveCommandMutation
 >
 
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
@@ -111,14 +110,14 @@ const render = (props: React.ComponentProps<typeof ModuleExtraAttention>) => {
 
 describe('ModuleExtraAttention', () => {
   let props: React.ComponentProps<typeof ModuleExtraAttention>
-  let mockCreateCommand = jest.fn()
+  let mockCreateLiveCommand = jest.fn()
 
   beforeEach(() => {
-    props = { moduleTypes: [], modulesInfo: {}, runId: RUN_ID_1 }
-    mockCreateCommand = jest.fn()
-    mockCreateCommand.mockResolvedValue(null)
-    mockUseCreateCommandMutation.mockReturnValue({
-      createCommand: mockCreateCommand,
+    props = { moduleTypes: [], modulesInfo: {} }
+    mockCreateLiveCommand = jest.fn()
+    mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseCreateLiveCommandMutation.mockReturnValue({
+      createLiveCommand: mockCreateLiveCommand,
     } as any)
   })
 
@@ -145,7 +144,6 @@ describe('ModuleExtraAttention', () => {
           attachedModuleMatch: null,
         },
       },
-      runId: RUN_ID_1,
     }
 
     const { getByText } = render(props)
@@ -172,7 +170,6 @@ describe('ModuleExtraAttention', () => {
           attachedModuleMatch: mockHeaterShakerAttachedModule as AttachedModule,
         },
       },
-      runId: RUN_ID_1,
     }
 
     const { getByText, getByRole } = render(props)
@@ -180,14 +177,13 @@ describe('ModuleExtraAttention', () => {
     getByText('Use latch controls for easy placement of labware.')
     const closeBtn = getByRole('button', { name: 'Close Labware Latch' })
     fireEvent.click(closeBtn)
-    expect(mockCreateCommand).toHaveBeenCalledWith({
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'heaterShaker/closeLabwareLatch',
         params: {
-          moduleId: mockHeaterShaker.moduleId,
+          moduleId: mockHeaterShakerAttachedModule.id,
         },
       },
-      runId: RUN_ID_1,
     })
   })
 
@@ -209,20 +205,18 @@ describe('ModuleExtraAttention', () => {
           attachedModuleMatch: mockHeaterShakerLatchClosed as AttachedModule,
         },
       },
-      runId: RUN_ID_1,
     }
 
     const { getByRole } = render(props)
     const openBtn = getByRole('button', { name: 'Open Labware Latch' })
     fireEvent.click(openBtn)
-    expect(mockCreateCommand).toHaveBeenCalledWith({
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'heaterShaker/openLabwareLatch',
         params: {
-          moduleId: mockHeaterShaker.moduleId,
+          moduleId: mockHeaterShakerLatchClosed.id,
         },
       },
-      runId: RUN_ID_1,
     })
   })
 
@@ -244,7 +238,6 @@ describe('ModuleExtraAttention', () => {
           attachedModuleMatch: mockThermocyclerAttachedModule as AttachedModule,
         },
       },
-      runId: RUN_ID_1,
     }
 
     const { getByText } = render(props)

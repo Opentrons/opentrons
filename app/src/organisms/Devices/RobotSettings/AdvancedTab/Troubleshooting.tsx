@@ -51,7 +51,7 @@ export function Troubleshooting({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginTop="2.5rem"
+      marginTop={SPACING.spacingXXL}
     >
       <Box width="70%">
         <StyledText
@@ -59,14 +59,14 @@ export function Troubleshooting({
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing4}
         >
-          {t('update_robot_software_troubleshooting')}
+          {t('troubleshooting')}
         </StyledText>
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           data-testid="RobotSettings_Troubleshooting"
         >
-          {t('update_robot_software_download_logs')}
+          {t('download_logs')}
         </StyledText>
       </Box>
       <TertiaryButton
@@ -77,7 +77,7 @@ export function Troubleshooting({
         onClick={handleClick}
         id="AdvancedSettings_downloadLogsButton"
       >
-        {t('update_robot_software_download_logs')}
+        {t('download_logs')}
       </TertiaryButton>
     </Flex>
   )

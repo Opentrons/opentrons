@@ -104,7 +104,7 @@ The `Opentrons App <https://opentrons.com/ot-app/>`_ is the easiest way to run y
 Support
 +++++++
 
-Questions about `setting up your OT-2 <https://support.opentrons.com/en/collections/1559720-ot-2-get-started>`_, `using Opentrons software <https://support.opentrons.com/en/collections/2426939-ot-2-software>`_, or `troubleshooting <https://support.opentrons.com/en/collections/2426964-ot-2-troubleshooting>`_? Check out our `support articles <https://support.opentrons.com/en/>`_ or `get in touch directly <https://support.opentrons.com/en/articles/789515-getting-help-from-opentrons-support>`_ with Opentrons Support.
+Questions about `setting up your OT-2 <https://support.opentrons.com/s/ot2-get-started>`_, `using Opentrons software <https://support.opentrons.com/s/ot2-software>`_, or `troubleshooting <https://support.opentrons.com/s/ot2-troubleshooting>`_? Check out our `support articles <https://support.opentrons.com/s/>`_ or `get in touch directly <https://support.opentrons.com/s/article/Getting-help-from-Opentrons-Support>`_ with Opentrons Support.
 
 Custom Protocol Service
 +++++++++++++++++++++++

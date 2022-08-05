@@ -1,4 +1,3 @@
-import { getLabwareDisplayName, RunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareByLiquidId, Liquid } from '@opentrons/api-client'
 import { WellGroup } from '@opentrons/components'
 
@@ -56,48 +55,6 @@ export function getTotalVolumePerLiquidLabwarePair(
     .reduce((prev, curr) => prev + curr, 0)
 
   return totalVolume
-}
-
-export function getSlotLabwareName(
-  labwareId: string,
-  commands?: RunTimeCommand[]
-): { slotName: string; labwareName: string } {
-  const loadLabwareCommands = commands?.filter(
-    command => command.commandType === 'loadLabware'
-  )
-  const loadLabwareCommand = loadLabwareCommands?.find(
-    command => command.result.labwareId === labwareId
-  )
-  if (loadLabwareCommand == null) {
-    return { slotName: '', labwareName: labwareId }
-  }
-  const labwareName = getLabwareDisplayName(
-    loadLabwareCommand.result.definition
-  )
-  let slotName = ''
-  const labwareLocation =
-    'location' in loadLabwareCommand.params
-      ? loadLabwareCommand.params.location
-      : ''
-  if ('slotName' in labwareLocation) {
-    slotName = labwareLocation.slotName
-  } else {
-    const loadModuleCommands = commands?.filter(
-      command => command.commandType === 'loadModule'
-    )
-    const loadModuleCommand = loadModuleCommands?.find(
-      command => command.result.moduleId === labwareLocation.moduleId
-    )
-    slotName =
-      loadModuleCommand != null && 'location' in loadModuleCommand.params
-        ? loadModuleCommand?.params.location.slotName
-        : ''
-  }
-
-  return {
-    slotName,
-    labwareName,
-  }
 }
 
 export function getLiquidsByIdForLabware(

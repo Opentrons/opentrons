@@ -5,11 +5,13 @@ from typing_extensions import Literal, Type
 
 from pydantic import BaseModel, Field
 
+from opentrons.protocol_engine.types import MotorAxis
+
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
-    from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
 SetAndWaitForShakeSpeedCommandType = Literal["heaterShaker/setAndWaitForShakeSpeed"]
 
@@ -26,6 +28,11 @@ class SetAndWaitForShakeSpeedParams(BaseModel):
 class SetAndWaitForShakeSpeedResult(BaseModel):
     """Result data from setting and waiting for a Heater-Shaker's shake speed."""
 
+    pipetteRetracted: bool = Field(
+        ...,
+        description="Whether the pipette was retracted/ homed before starting shake.",
+    )
+
 
 class SetAndWaitForShakeSpeedImpl(
     AbstractCommandImpl[SetAndWaitForShakeSpeedParams, SetAndWaitForShakeSpeedResult]
@@ -36,10 +43,12 @@ class SetAndWaitForShakeSpeedImpl(
         self,
         state_view: StateView,
         equipment: EquipmentHandler,
+        movement: MovementHandler,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
+        self._movement = movement
 
     async def execute(
         self,
@@ -56,6 +65,21 @@ class SetAndWaitForShakeSpeedImpl(
         # Verify speed from hs module view
         validated_speed = hs_module_substate.validate_target_speed(params.rpm)
 
+        pipette_should_retract = (
+            self._state_view.motion.check_pipette_blocking_hs_shaker(
+                hs_module_substate.module_id
+            )
+        )
+        if pipette_should_retract:
+            # Move pipette away if it is close to the heater-shaker
+            # TODO(jbl 2022-07-28) replace home movement with a retract movement
+            await self._movement.home(
+                [
+                    MotorAxis.RIGHT_Z,
+                    MotorAxis.LEFT_Z,
+                ]
+            )
+
         # Allow propagation of ModuleNotAttachedError.
         hs_hardware_module = self._equipment.get_module_hardware_api(
             hs_module_substate.module_id
@@ -64,7 +88,7 @@ class SetAndWaitForShakeSpeedImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.set_speed(rpm=validated_speed)
 
-        return SetAndWaitForShakeSpeedResult()
+        return SetAndWaitForShakeSpeedResult(pipetteRetracted=pipette_should_retract)
 
 
 class SetAndWaitForShakeSpeed(

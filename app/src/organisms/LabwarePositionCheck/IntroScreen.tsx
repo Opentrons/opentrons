@@ -52,10 +52,10 @@ export const IntroScreen = (props: {
   return (
     <Box margin={SPACING_3}>
       <Text
-        as={'h3'}
+        as="h3"
         textTransform={TYPOGRAPHY.textTransformUppercase}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
-        id={`IntroScreen_labware_position_check_overview`}
+        id="IntroScreen_labware_position_check_overview"
       >
         {t('labware_position_check_overview')}
       </Text>

@@ -23,7 +23,7 @@ export function ConfigFormResetButton(props: ButtonProps): JSX.Element {
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Trans
         t={t}
-        i18nKey={'device_details:these_are_advanced_settings'}
+        i18nKey="device_details:these_are_advanced_settings"
         components={{
           block: (
             <StyledText

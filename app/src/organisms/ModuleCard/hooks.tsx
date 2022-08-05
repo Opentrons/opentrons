@@ -16,7 +16,11 @@ import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocol
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { useProtocolDetailsForRun, useRunStatuses } from '../Devices/hooks'
+import {
+  useProtocolDetailsForRun,
+  useRunStatuses,
+  useIsLegacySessionInProgress,
+} from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type {
@@ -49,17 +53,8 @@ interface LatchControls {
   isLatchClosed: boolean
 }
 
-export function useLatchControls(
-  module: AttachedModule,
-  runId?: string | null
-): LatchControls {
+export function useLatchControls(module: AttachedModule): LatchControls {
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { createCommand } = useCreateCommandMutation()
-  const { isRunTerminal } = useRunStatuses()
-  const { moduleIdFromRun } = useModuleIdFromRun(
-    module,
-    runId != null ? runId : null
-  )
   const isLatchClosed =
     module.moduleType === 'heaterShakerModuleType' &&
     (module.data.labwareLatchStatus === 'idle_closed' ||
@@ -72,30 +67,20 @@ export function useLatchControls(
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',
     params: {
-      moduleId: runId != null && !isRunTerminal ? moduleIdFromRun : module.id,
+      moduleId: module.id,
     },
   }
 
   const toggleLatch = (): void => {
-    if (runId != null && !isRunTerminal) {
-      createCommand({
-        runId: runId,
-        command: latchCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${latchCommand.commandType} and run id ${runId}: ${e.message}`
-        )
-      })
-    } else {
-      createLiveCommand({
-        command: latchCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
-        )
-      })
-    }
+    createLiveCommand({
+      command: latchCommand,
+    }).catch((e: Error) => {
+      console.error(
+        `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
+      )
+    })
   }
+
   return { toggleLatch, isLatchClosed }
 }
 export type MenuItemsByModuleType = {
@@ -131,15 +116,11 @@ export function useModuleOverflowMenu(
   const { t } = useTranslation(['device_details', 'heater_shaker'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
-  const { toggleLatch, isLatchClosed } = useLatchControls(module, runId)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { moduleIdFromRun } = useModuleIdFromRun(module, runId)
-  const {
-    isLegacySessionInProgress,
-    isRunTerminal,
-    isRunStill,
-    isRunIdle,
-  } = useRunStatuses()
+  const isLegacySessionInProgress = useIsLegacySessionInProgress()
+  const { isRunTerminal, isRunStill, isRunIdle } = useRunStatuses()
   const currentRunId = useCurrentRunId()
   let isDisabled: boolean = false
   if (runId != null && isLoadedInRun) {
@@ -202,6 +183,7 @@ export function useModuleOverflowMenu(
         key={`test_shake_${module.moduleModel}`}
         id={`test_shake_${module.moduleModel}`}
         data-testid={`test_shake_${module.moduleModel}`}
+        disabled={isDisabled}
         onClick={() =>
           handleDeactivationCommand('heaterShaker/deactivateShaker')
         }
@@ -218,13 +200,6 @@ export function useModuleOverflowMenu(
       </MenuItem>
     )
 
-  let moduleId: string
-  if (isRunIdle && currentRunId != null && isLoadedInRun) {
-    moduleId = moduleIdFromRun
-  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
-    moduleId = module.id
-  }
-
   const handleDeactivationCommand = (
     deactivateModuleCommandType: deactivateCommandTypes
   ): void => {
@@ -237,7 +212,7 @@ export function useModuleOverflowMenu(
       | HeaterShakerDeactivateShakerCreateCommand = {
       commandType: deactivateModuleCommandType,
       params: {
-        moduleId,
+        moduleId: isRunIdle ? moduleIdFromRun : module.id,
       },
     }
     if (isRunIdle && currentRunId != null && isLoadedInRun) {
@@ -249,10 +224,7 @@ export function useModuleOverflowMenu(
           `error setting module status with command type ${deactivateCommand.commandType} and run id ${runId}: ${e.message}`
         )
       })
-    } else if (
-      (currentRunId != null && isRunTerminal) ||
-      currentRunId == null
-    ) {
+    } else if (isRunTerminal || currentRunId == null) {
       createLiveCommand({
         command: deactivateCommand,
       }).catch((e: Error) => {

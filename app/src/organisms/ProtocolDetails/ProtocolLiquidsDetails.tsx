@@ -20,9 +20,9 @@ export const ProtocolLiquidsDetails = (): JSX.Element => {
     <Flex
       css={HIDE_SCROLLBAR}
       flexDirection={DIRECTION_COLUMN}
-      maxHeight={'25rem'}
-      overflowY={'auto'}
-      data-testid={'LiquidsDetailsTab'}
+      maxHeight="25rem"
+      overflowY="auto"
+      data-testid="LiquidsDetailsTab"
     >
       {liquidsInLoadOrder?.map((liquid, index) => {
         return (

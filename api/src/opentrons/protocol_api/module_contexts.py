@@ -209,6 +209,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
+    # TODO (spp, 2022-07-27): Check if it is better to use GeometryType as the returnType
     def geometry(self) -> ModuleGeometry:
         """The object representing the module as an item on the deck
 
@@ -810,32 +811,32 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         self._loop = loop
         super().__init__(ctx, geometry, requested_as, at_version)
 
-    # TODO: add API version requirement
-    @property
+    @property  # type: ignore[misc]
+    @requires_version(2, 13)
     def target_temperature(self) -> Optional[float]:
         """Target temperature of the heater-shaker's plate."""
         return self._module.target_temperature
 
-    # TODO: add API version requirement
-    @property
+    @property  # type: ignore[misc]
+    @requires_version(2, 13)
     def current_temperature(self) -> float:
         """Current temperature of the heater-shaker's plate."""
         return self._module.temperature
 
-    # TODO: add API version requirement
-    @property
+    @property  # type: ignore[misc]
+    @requires_version(2, 13)
     def current_speed(self) -> int:
         """Current speed of the heater-shaker's plate."""
         return self._module.speed
 
-    # TODO: add API version requirement
-    @property
+    @property  # type: ignore[misc]
+    @requires_version(2, 13)
     def target_speed(self) -> Optional[int]:
         """Target speed of the heater-shaker's plate."""
         return self._module.target_speed
 
-    # TODO: add API version requirement
-    @property
+    @property  # type: ignore[misc]
+    @requires_version(2, 13)
     def temperature_status(self) -> str:
         """Heater-shaker's temperature status string.
 
@@ -848,8 +849,8 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """
         return self._module.temperature_status.value
 
-    # TODO: add API version requirement
-    @property
+    @property  # type: ignore[misc]
+    @requires_version(2, 13)
     def speed_status(self) -> str:
         """Heater-shaker's speed status string.
 
@@ -862,8 +863,8 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """
         return self._module.speed_status.value
 
-    # TODO: add API version requirement
-    @property
+    @property  # type: ignore[misc]
+    @requires_version(2, 13)
     def labware_latch_status(self) -> str:
         """Heater-shaker's labware latch status string.
 
@@ -877,7 +878,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """
         return self._module.labware_latch_status.value
 
-    # TODO: add API version requirement
+    @requires_version(2, 13)
     def set_and_wait_for_temperature(self, celsius: float) -> None:
         """Set the target temperature and wait for it to be reached.
 
@@ -888,7 +889,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         self.set_target_temperature(celsius=celsius)
         self.wait_for_temperature()
 
-    # TODO: add API version requirement
+    @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_set_target_temperature)
     def set_target_temperature(self, celsius: float) -> None:
         """Set target temperature and return immediately.
@@ -903,7 +904,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         validated_temp = validate_heater_shaker_temperature(celsius=celsius)
         self._module.start_set_temperature(celsius=validated_temp)
 
-    # TODO: add API version requirement
+    @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_wait_for_temperature)
     def wait_for_temperature(self) -> None:
         """Wait for the Heater-Shaker to reach its target temperature.
@@ -917,19 +918,23 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             )
         self._module.await_temperature(awaiting_temperature=self.target_temperature)
 
-    # TODO: add API version requirement
+    @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_set_and_wait_for_shake_speed)
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set and wait for target speed.
 
         Set the heater shaker's target speed and wait until the specified speed has
         reached. Delays protocol execution until the target speed has been achieved.
+
+        NOTE: Before shaking, this command will retract the pipettes up if they are
+              parked adjacent to the heater-shaker.
         """
         if (
             self._module.labware_latch_status
             == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
         ):
             validated_speed = validate_heater_shaker_speed(rpm=rpm)
+            self._prepare_for_shake()
             self._module.set_speed(rpm=validated_speed)
         else:
             # TODO: Figure out whether to issue close latch behind the scenes instead
@@ -937,16 +942,18 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
                 "Cannot start H/S shake unless labware latch is closed."
             )
 
-    # TODO: add API version requirement
+    @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_open_labware_latch)
     def open_labware_latch(self) -> None:
         """Open the Heater-Shaker's labware latch.
 
-        Note that the labware latch needs to be closed before:
-
-        * Shaking
-        * Pipetting to or from the labware on the Heater-Shaker
-        * Pipetting to or from labware to the left or right of the Heater-Shaker
+        NOTE:
+        1. This command will retract the pipettes up if they are parked east or west
+           of the Heater-Shaker.
+        2. The labware latch needs to be closed before:
+            * Shaking
+            * Pipetting to or from the labware on the Heater-Shaker
+            * Pipetting to or from labware to the left or right of the Heater-Shaker
 
         Raises an error when attempting to open the latch while the Heater-Shaker is shaking.
         """
@@ -955,22 +962,96 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             raise CannotPerformModuleAction(
                 """Cannot open labware latch while module is shaking."""
             )
+        self._prepare_for_latch_open()
         self._module.open_labware_latch()
 
-    # TODO: add API version requirement
+    @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_close_labware_latch)
     def close_labware_latch(self) -> None:
         """Close heater-shaker's labware latch"""
         self._module.close_labware_latch()
 
-    # TODO: add API version requirement
+    @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_deactivate_shaker)
     def deactivate_shaker(self) -> None:
         """Stop shaking."""
         self._module.deactivate_shaker()
 
-    # TODO: add API version requirement
+    @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_deactivate_heater)
     def deactivate_heater(self) -> None:
         """Stop heating."""
         self._module.deactivate_heater()
+
+    def flag_unsafe_move(
+        self,
+        to_loc: types.Location,
+        is_multichannel: bool,
+    ) -> None:
+        """
+        Raise an error if attempting to perform a move that's deemed unsafe due to
+        the presence of the heater-shaker.
+        """
+        is_labware_latch_closed = (
+            self._module.labware_latch_status
+            == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
+        )
+        is_plate_shaking = self._module.speed_status != module_types.SpeedStatus.IDLE
+
+        destination_slot = to_loc.labware.first_parent()
+        if destination_slot is None:
+            raise Exception(
+                "Destination has no slot associated with it. "
+                "Cannot determine pipette movement safety."
+            )
+
+        to_labware_like = to_loc.labware
+        is_tiprack: bool
+        if (
+            to_labware_like.is_labware
+        ):  # Do we consider this a valid location for move_to?
+            is_tiprack = to_labware_like.as_labware().is_tiprack
+        elif to_labware_like.parent.is_labware:
+            is_tiprack = to_labware_like.parent.as_labware().is_tiprack
+        else:
+            raise Exception(
+                "Invalid destination location type. "
+                "Cannot determine pipette movement safety."
+            )
+
+        cast(HeaterShakerGeometry, self.geometry).flag_unsafe_move(
+            to_slot=int(destination_slot),
+            is_tiprack=is_tiprack,
+            is_using_multichannel=is_multichannel,
+            is_plate_shaking=is_plate_shaking,
+            is_labware_latch_closed=is_labware_latch_closed,
+        )
+
+    def _prepare_for_shake(self) -> None:
+        """
+        Before shaking, retracts pipettes if they're parked over a slot
+        adjacent to the heater-shaker.
+        """
+
+        if cast(HeaterShakerGeometry, self.geometry).is_pipette_blocking_shake_movement(
+            pipette_location=self._ctx.location_cache
+        ):
+            ctx_implementation = self._ctx._implementation
+            hardware = ctx_implementation.get_hardware()
+            for mount in types.Mount:
+                hardware.retract(mount=mount)
+            self._ctx.location_cache = None
+
+    def _prepare_for_latch_open(self) -> None:
+        """
+        Before opening latch, retracts pipettes if they're parked over a slot
+        east/ west of the heater-shaker.
+        """
+        if cast(HeaterShakerGeometry, self.geometry).is_pipette_blocking_latch_movement(
+            pipette_location=self._ctx.location_cache
+        ):
+            ctx_implementation = self._ctx._implementation
+            hardware = ctx_implementation.get_hardware()
+            for mount in types.Mount:
+                hardware.retract(mount=mount)
+            self._ctx.location_cache = None

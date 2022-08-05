@@ -5,14 +5,14 @@ import {
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import {
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
   Module,
   RobotWorkSpace,
   SPACING,
-  Text,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+import { StyledText } from '../../../atoms/text'
 import { ModuleInfo } from '../../ProtocolSetup/RunSetupCard/ModuleSetup/ModuleInfo'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
@@ -27,25 +27,29 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
   const moduleDef = getModuleDef2('heaterShakerModuleV1')
 
   return (
-    <React.Fragment>
+    <>
       <Flex
-        color={COLORS.darkBlack}
         flexDirection={DIRECTION_COLUMN}
         marginBottom="4rem"
-        data-testid={`heater_shaker_power_on_text`}
+        data-testid="heater_shaker_power_on_text"
       >
         <Trans
           t={t}
           i18nKey="step_2_power_on"
           components={{
-            strong: <Text fontWeight={700} paddingBottom={SPACING.spacingSM} />,
+            strong: (
+              <StyledText
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                paddingBottom={SPACING.spacingSM}
+              />
+            ),
             block: <span />,
           }}
         />
       </Flex>
       <RobotWorkSpace
         viewBox={VIEW_BOX}
-        data-testid={`heater_shaker_svg_and_info`}
+        data-testid="heater_shaker_svg_and_info"
       >
         {() => (
           <React.Fragment key={`Power_on_${moduleDef.model}`}>
@@ -65,6 +69,6 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
           </React.Fragment>
         )}
       </RobotWorkSpace>
-    </React.Fragment>
+    </>
   )
 }

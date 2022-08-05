@@ -1,12 +1,16 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
-import { SelectField, CONTEXT_VALUE, CONTEXT_MENU } from '@opentrons/components'
+import { CONTEXT_VALUE, CONTEXT_MENU } from '@opentrons/components'
 
+import { SelectField } from '../../../../../../atoms/SelectField'
 import * as Fixtures from '../../../../../../redux/networking/__fixtures__'
 import { LABEL_JOIN_OTHER_NETWORK, DISCONNECT_FROM_SSID } from '../../i18n'
 
 import { SelectSsid } from '..'
 import { NetworkOptionLabel } from '../NetworkOptionLabel'
+
+import type { ActionMeta } from 'react-select'
+import type { SelectOption } from '../../../../../../atoms/SelectField/Select'
 
 const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
@@ -18,6 +22,7 @@ describe('SelectSsid component', () => {
   const handleConnect = jest.fn()
   const handleJoinOther = jest.fn()
   const handleDisconnect = jest.fn()
+  let mockIsRobotBusy = false
 
   const render = (showDisconnect = true) => {
     return mount(
@@ -28,6 +33,7 @@ describe('SelectSsid component', () => {
         onJoinOther={handleJoinOther}
         onDisconnect={handleDisconnect}
         showWifiDisconnect={showDisconnect}
+        isRobotBusy={mockIsRobotBusy}
       />
     )
   }
@@ -41,6 +47,14 @@ describe('SelectSsid component', () => {
     const selectField = wrapper.find(SelectField)
 
     expect(selectField).toHaveLength(1)
+  })
+
+  it('renders a disabled SeleectField if a robot is busy', () => {
+    mockIsRobotBusy = true
+    const wrapper = render()
+    const selectField = wrapper.find(SelectField)
+
+    expect(selectField.prop('disabled')).toBe(true)
   })
 
   it('maps ssid list to an ssid option group', () => {
@@ -97,7 +111,11 @@ describe('SelectSsid component', () => {
     const wrapper = render()
     const selectField = wrapper.find(SelectField)
 
-    selectField.invoke('onValueChange')?.('_', 'foo')
+    selectField.invoke('onValueChange')?.(
+      '_',
+      'foo',
+      ('input-change' as unknown) as ActionMeta<SelectOption>
+    )
 
     expect(handleConnect).toHaveBeenCalledWith('foo')
   })
@@ -111,7 +129,11 @@ describe('SelectSsid component', () => {
     )?.value
 
     expect(joinOtherValue).toEqual(expect.any(String))
-    selectField.invoke('onValueChange')?.('_', joinOtherValue)
+    selectField.invoke('onValueChange')?.(
+      '_',
+      joinOtherValue,
+      ('input-change' as unknown) as ActionMeta<SelectOption>
+    )
 
     expect(handleJoinOther).toHaveBeenCalled()
   })
@@ -125,7 +147,11 @@ describe('SelectSsid component', () => {
     )?.value
 
     expect(disconectValue).toEqual(expect.any(String))
-    selectField.invoke('onValueChange')?.('_', disconectValue)
+    selectField.invoke('onValueChange')?.(
+      '_',
+      disconectValue,
+      ('input-change' as unknown) as ActionMeta<SelectOption>
+    )
 
     expect(handleDisconnect).toHaveBeenCalled()
   })

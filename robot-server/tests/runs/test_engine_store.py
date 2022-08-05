@@ -152,9 +152,18 @@ async def test_get_default_engine(subject: EngineStore) -> None:
     assert repeated_result is result
 
 
-async def test_get_default_engine_conflict(subject: EngineStore) -> None:
-    """It should not allow a default engine if another engine is active."""
+async def test_get_default_engine_current_unstarted(subject: EngineStore) -> None:
+    """It should allow a default engine if another engine current but unstarted."""
     await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
+
+    result = await subject.get_default_engine()
+    assert isinstance(result, ProtocolEngine)
+
+
+async def test_get_default_engine_conflict(subject: EngineStore) -> None:
+    """It should not allow a default engine if another engine is executing commands."""
+    await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
+    subject.engine.play()
 
     with pytest.raises(EngineConflictError):
         await subject.get_default_engine()

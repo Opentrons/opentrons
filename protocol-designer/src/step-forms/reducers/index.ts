@@ -873,6 +873,7 @@ export const savedStepForms = (
         } else if (
           (form.stepType === 'magnet' ||
             form.stepType === 'temperature' ||
+            form.stepType === 'heaterShaker' ||
             form.stepType === 'pause') &&
           form.moduleId === moduleId
         ) {

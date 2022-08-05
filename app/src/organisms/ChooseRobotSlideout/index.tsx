@@ -22,7 +22,6 @@ import {
   ALIGN_FLEX_END,
   JUSTIFY_CENTER,
   SIZE_4,
-  TEXT_ALIGN_CENTER,
   DIRECTION_ROW,
 } from '@opentrons/components'
 
@@ -281,7 +280,7 @@ export function ChooseRobotSlideout(
           <Flex
             flexDirection={DIRECTION_COLUMN}
             alignItems={ALIGN_CENTER}
-            textAlign={TEXT_ALIGN_CENTER}
+            textAlign={TYPOGRAPHY.textAlignCenter}
             marginTop={SPACING.spacing5}
           >
             <StyledText as="p">

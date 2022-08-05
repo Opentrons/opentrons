@@ -5,7 +5,7 @@ import { HeaterShakerBanner } from '../HeaterShakerBanner'
 import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommands.json'
 import { mockHeaterShaker } from '../../../../../../redux/modules/__fixtures__'
 import { ModuleRenderInfoForProtocol } from '../../../../../Devices/hooks'
-import { ModuleModel, ModuleType } from '@opentrons/shared-data'
+import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
 const mockHeaterShakerDefinition = {
   moduleId: 'someHeaterShakerModule',
@@ -63,7 +63,6 @@ describe('HeaterShakerBanner', () => {
   let props: React.ComponentProps<typeof HeaterShakerBanner>
   beforeEach(() => {
     props = {
-      runId: '1',
       displayName: 'HeaterShakerV1',
       modules: [HEATER_SHAKER_PROTOCOL_MODULE_INFO],
     }
@@ -84,7 +83,6 @@ describe('HeaterShakerBanner', () => {
 
   it('should not render heater shaker wizard button if no heater shaker is present', () => {
     props = {
-      runId: '1',
       displayName: 'HeaterShakerV1',
       modules: [],
     }
@@ -96,7 +94,6 @@ describe('HeaterShakerBanner', () => {
 
   it('should render two heater shaker banner items when there are two heater shakers in the protocol', () => {
     props = {
-      runId: '1',
       displayName: 'HeaterShakerV1',
       modules: [
         HEATER_SHAKER_PROTOCOL_MODULE_INFO,
