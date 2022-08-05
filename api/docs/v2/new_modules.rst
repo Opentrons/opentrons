@@ -636,15 +636,7 @@ First, you can’t place any other modules adjacent to the Heater-Shaker in any 
 
 Next, you can’t place tall labware (defined as >53 mm) to the left or right of the Heater-Shaker. This prevents the Heater-Shaker’s latch from colliding with the adjacent labware. Attempting to load tall labware to the right or left of the Heater-Shaker will also raise a ``DeckConflictError``. Common labware that exceed the height limit include tube racks and Opentrons 1000 µL Tip Racks.
 
-Finally, if you are using an 8-channel pipette, you should avoid performing pipetting actions in `any` adjacent slots, with few exceptions:
-
-- To the front or back of the Heater-Shaker, an 8-channel pipette can access tip racks, but will crash on other labware.
-- To the right of the Heater-Shaker, an 8-channel pipette can access most columns but will crash on column 1.
-- To the left of the Heater-Shaker, an 8-channel pipette can access most columns but will crash on column 12.
-
-.. warning::
-
-    Failure to observe these restrictions with an 8-channel pipette will result in a physical crash and may damage your module, pipette, or both. The Python Protocol API will not raise exceptions to prevent restricted pipetting actions. You may want to perform a dry run of your protocol without the Heater-Shaker installed to ensure that none of your pipetting actions violate these restrictions.
+Finally, if you are using an 8-channel pipette, you can't perform pipetting actions in `any` adjacent slots. Attempting to do so will raise a ``PipetteMovementRestrictedByHeaterShakerError``. This prevents the pipette ejector from crashing on the module housing or labware latch. The one exception is that to the front or back of the Heater-Shaker, an 8-channel pipette can access tip racks only. Attempting to pipette to non-tip-rack labware will also raise a ``PipetteMovementRestrictedByHeaterShakerError``.
 
 Latch Control
 =============
@@ -658,7 +650,7 @@ To easily add and remove labware from the Heater-Shaker, you can control its lab
 
 If the labware latch is already closed, ``close_labware_latch()`` will succeed immediately; you don’t have to check the status of the latch before opening or closing it.
 
-For preparing the deck before running a protocol, run these methods in Jupyter notebook or use the labware latch controls in the Opentrons App.
+For preparing the deck before running a protocol, use the labware latch controls in the Opentrons App or run these methods in Jupyter notebook.
 
 Loading Labware
 ===============
@@ -680,7 +672,7 @@ Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext
 +-------------------------+-------------------------------------------+----------------------------------------------------------------------+
 
 
-Custom flat-bottom labware can be used with the Universal Flat Adapter. If you need assistance creating custom labware definitions for the Heater-Shaker, `submit a request to Opentrons Support <https://support.opentrons.com/s/article/Requesting-a-custom-labware-definition>`_.
+Custom flat-bottom labware can be used with the Universal Flat Adapter. If you need assistance creating custom labware definitions for the Heater-Shaker, `submit a request <https://support.opentrons.com/s/article/Requesting-a-custom-labware-definition>`_.
 
 
 Heating and Shaking
@@ -727,7 +719,7 @@ To pipette while the Heater-Shaker is heating, use :py:meth:`~.HeaterShakerConte
 
 This example would likely take just as long as the blocking version above; it’s unlikely that one aspirate and one dispense action would take longer than the time for the module to heat. However, be careful when putting a lot of commands between a ``set_target_temperature()`` call and a ``delay()`` call. In this situation, you’re relying on ``wait_for_temperature()`` to resume execution of commands once heating is complete. But if the temperature has already been reached, the delay will begin later than expected and the Heater-Shaker will hold at its target temperature longer than intended.
 
-Additionally, if you want to pipette while the module is holding at a speed and/or temperature, you need to parallelize the commands yourself. One of the simplest ways to do this is with Python’s ``time`` library. Add ``import time`` at the start of your protocol, and then use :py:meth:`time.time` to compare the current time to a reference time set when the target is reached:
+Additionally, if you want to pipette while the module is holding at a speed and/or temperature, you need to parallelize the commands yourself. One of the simplest ways to do this is with Python’s ``time`` library. First, add ``import time`` at the start of your protocol. Then use :py:func:`time.time` to set a reference time when the target is reached, and a ``while`` loop to check if the desired amount of time has elapsed:
 
 .. code-block:: python
 
@@ -755,7 +747,7 @@ As with setting targets, deactivating the heater and shaker are done separately,
 
 .. note:: 
 
-    The OT-2 will not automatically deactivate the Heater-Shaker at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, you can use the Heater-Shaker module controls on the device detail page in the Opentrons App.
+    The OT-2 will not automatically deactivate the Heater-Shaker at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Heater-Shaker module controls on the device detail page in the Opentrons App or run these methods in Jupyter notebook.
 
 
 
