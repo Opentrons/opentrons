@@ -32,7 +32,7 @@ export function StepText(props: Props): JSX.Element | null {
   let messageNode = null
 
   const displayCommand = runCommand !== null ? runCommand : analysisCommand
-  console.log(protocolData)
+
   if (displayCommand === null) {
     console.warn(
       'display command should never be null, command text could find no source'
