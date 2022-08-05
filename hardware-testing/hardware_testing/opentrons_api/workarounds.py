@@ -75,7 +75,12 @@ def http_get_all_labware_offsets(ctx: ProtocolContext) -> List[dict]:
     runs_json = json.loads(runs_response_data)
 
     protocols_list = runs_json["data"]
-    return [offset for p in protocols_list for offset in p["labwareOffsets"]]
+    return [
+        offset
+        for p in protocols_list
+        for offset in p["labwareOffsets"]
+
+    ]
 
 
 def get_latest_offset_for_labware(
@@ -85,11 +90,21 @@ def get_latest_offset_for_labware(
     lw_uri = str(labware.uri)
     lw_slot = str(labware.parent)
 
+    def _is_offset_present(_o) -> bool:
+        _v = _o["vector"]
+        return _v["x"] != 0 or _v["y"] != 0 or _v["z"] != 0
+
+    def _offset_applies_to_labware(_o) -> bool:
+        if _o["definitionUri"] != lw_uri:
+            return False
+        if _o["location"]["slotName"] != lw_slot:
+            return False
+        return _is_offset_present(_o)
+
     lw_offsets = [
         offset
         for offset in labware_offsets
-        if offset["definitionUri"] == lw_uri
-        and offset["location"]["slotName"] == lw_slot
+        if _offset_applies_to_labware(offset)
     ]
 
     if not lw_offsets:
