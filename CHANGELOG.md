@@ -5,7 +5,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 # [6.1.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.0...v6.1.0-alpha.1) (2022-08-05)
 
-**Note:** Version bump only for package opentrons
+**Note:** Version bump to bundle [newest robot OS](https://github.com/Opentrons/buildroot/releases/tag/v1.11.0)
 
 
 
