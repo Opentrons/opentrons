@@ -48,19 +48,28 @@ describe('LabwareDetails', () => {
     jest.resetAllMocks()
   })
   it('should render correct info for opentrons labware', () => {
+    props.labware.definition.namespace = 'opentrons'
+    const [{ getByText }] = render(props)
+
     // slideout title
     // render close button
     // svg
     // image
     // api name label
+    getByText('API Name')
     // api name
     // well count label
+    getByText('Well Count')
     // max volume, well shape label
     // svg
     // Footprint (mm) label
+    getByText('Footprint (mm)')
     // length label and value
+    getByText('length')
     // width label and value
+    getByText('width')
     // height label and value
+    getByText('height')
     // well measurement (mm) label
     // depth label and value
     // x-size label and value
@@ -71,6 +80,8 @@ describe('LabwareDetails', () => {
     // x-spacing label and value
     // y-spacing label and value
     // manufacturer label and value
+    getByText('manufacturer')
+    getByText('Opentrons')
     // manufacturer/catalog label and value
     // website label and href
   })
@@ -107,7 +118,6 @@ describe('LabwareDetails', () => {
   it('when clicking copy icon, should show tooltip as feedback', () => {})
 
   it('should close the slideout when clicking the close button', () => {
-    props.labware.definition.namespace = 'opentrons'
     const [{ getByTestId }] = render(props)
     const closeButton = getByTestId('labwareDetails_slideout_close_button')
     fireEvent.click(closeButton)
