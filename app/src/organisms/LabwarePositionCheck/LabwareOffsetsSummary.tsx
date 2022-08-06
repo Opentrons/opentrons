@@ -15,7 +15,6 @@ import {
   SPACING,
   TYPOGRAPHY,
   COLORS,
-  TEXT_TRANSFORM_UPPERCASE,
   Text,
   SIZE_3,
 } from '@opentrons/components'
@@ -60,18 +59,18 @@ const OffsetDataLoader = (): JSX.Element | null => {
       alignItems={ALIGN_CENTER}
     >
       <Text
-        as={'h3'}
+        as="h3"
         color={C_DARK_GRAY}
         marginTop={SPACING.spacing6}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         fontSize={FONT_SIZE_BODY_2}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        textTransform={TYPOGRAPHY.textTransformUppercase}
       >
         {t('loading_labware_offsets')}
       </Text>
       <Icon
         name="ot-spinner"
-        id={`LabwareOffsetsSummary_loadingSpinner`}
+        id="LabwareOffsetsSummary_loadingSpinner"
         width={SIZE_3}
         marginTop={SPACING.spacing6}
         marginBottom={SPACING.spacing6}
@@ -129,14 +128,14 @@ export const LabwareOffsetsSummary = (
   const { t } = useTranslation('labware_position_check')
   return (
     <Flex
-      flex={'auto'}
+      flex="auto"
       padding={SPACING.spacing4}
       boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
       borderRadius="4px"
       backgroundColor={C_NEAR_WHITE}
       flexDirection={DIRECTION_COLUMN}
     >
-      <StyledText as={'h5'} marginBottom={SPACING.spacing3}>
+      <StyledText as="h5" marginBottom={SPACING.spacing3}>
         {t('labware_offsets_summary_title')}
       </StyledText>
       {offsetData.length === 0 ? (

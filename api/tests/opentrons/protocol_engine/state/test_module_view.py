@@ -1042,6 +1042,47 @@ def test_heater_shaker_raise_if_shaking(
         subject.raise_if_shaking()
 
 
+def test_get_heater_shaker_movement_data(
+    heater_shaker_v1_def: ModuleDefinition,
+    tempdeck_v2_def: ModuleDefinition,
+) -> None:
+    """It should get heater-shaker movement data."""
+    module_view = make_module_view(
+        slot_by_module_id={
+            "module-id": DeckSlotName.SLOT_1,
+            "other-module-id": DeckSlotName.SLOT_5,
+        },
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=heater_shaker_v1_def,
+            ),
+            "other-module-id": HardwareModule(
+                serial_number="other-serial-number",
+                definition=tempdeck_v2_def,
+            ),
+        },
+        substate_by_module_id={
+            "module-id": HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId("module-id"),
+                is_labware_latch_closed=True,
+                is_plate_shaking=False,
+                plate_target_temperature=None,
+            ),
+            "other-module-id": TemperatureModuleSubState(
+                module_id=TemperatureModuleId("other-module-id"),
+                plate_target_temperature=None,
+            ),
+        },
+    )
+    subject = module_view.get_heater_shaker_movement_restrictors()
+    assert len(subject) == 1
+    for hs_movement_data in subject:
+        assert not hs_movement_data.plate_shaking
+        assert hs_movement_data.latch_closed
+        assert hs_movement_data.deck_slot == 1
+
+
 def test_tempdeck_get_plate_target_temperature(
     tempdeck_v2_def: ModuleDefinition,
 ) -> None:
@@ -1105,6 +1146,7 @@ def test_thermocycler_get_target_temperatures(
         substate_by_module_id={
             "module-id": ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
+                is_lid_open=False,
                 target_block_temperature=14,
                 target_lid_temperature=28,
             )
@@ -1130,6 +1172,7 @@ def test_thermocycler_get_target_temperatures_no_target(
         substate_by_module_id={
             "module-id": ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
+                is_lid_open=False,
                 target_block_temperature=None,
                 target_lid_temperature=None,
             )
@@ -1158,6 +1201,7 @@ def module_view_with_thermocycler(thermocycler_v1_def: ModuleDefinition) -> Modu
                 module_id=ThermocyclerModuleId("module-id"),
                 target_block_temperature=None,
                 target_lid_temperature=None,
+                is_lid_open=False,
             )
         },
     )

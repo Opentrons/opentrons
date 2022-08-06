@@ -8,7 +8,7 @@ import {
   SPACING_3,
   SPACING_4,
   SPACING_5,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
   FONT_WEIGHT_SEMIBOLD,
   FONT_WEIGHT_REGULAR,
   JUSTIFY_CENTER,
@@ -32,9 +32,9 @@ export const RobotMotionLoadingModal = (
   return (
     <>
       <Text
-        as={'h3'}
+        as="h3"
         marginBottom={SPACING_3}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        textTransform={TYPOGRAPHY.textTransformUppercase}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginLeft={SPACING_3}
       >
@@ -63,7 +63,7 @@ export const RobotMotionLoadingModal = (
         <Flex alignItems={ALIGN_CENTER}>
           <Text
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            as={'h3'}
+            as="h3"
             marginBottom={SPACING_5}
             fontWeight={FONT_WEIGHT_REGULAR}
             fontSize={FONT_SIZE_DEFAULT}

@@ -10,8 +10,8 @@ import {
   NewPrimaryBtn,
   SPACING,
   Text,
-  TEXT_TRANSFORM_UPPERCASE,
   JUSTIFY_SPACE_BETWEEN,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
 import { useTrackEvent } from '../../redux/analytics'
@@ -80,8 +80,8 @@ export const SummaryScreen = (props: {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >
       <Text
-        as={'h3'}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        as="h3"
+        textTransform={TYPOGRAPHY.textTransformUppercase}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginBottom={SPACING.spacing4}
         marginLeft={SPACING.spacing4}
@@ -89,7 +89,7 @@ export const SummaryScreen = (props: {
         {t('lpc_complete_summary_screen_heading')}
       </Text>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_START}>
-        <Flex flex={'1 1 22%'} flexDirection={DIRECTION_COLUMN}>
+        <Flex flex="1 1 22%" flexDirection={DIRECTION_COLUMN}>
           <SectionList
             primaryPipetteMount={primaryPipetteMount}
             secondaryPipetteMount={secondaryPipetteMount}
@@ -105,7 +105,7 @@ export const SummaryScreen = (props: {
       <Flex justifyContent={JUSTIFY_CENTER} marginY={SPACING.spacing4}>
         <NewPrimaryBtn
           title={t('close_and_apply_offset_data')}
-          id={'Lpc_summaryScreen_applyOffsetButton'}
+          id="Lpc_summaryScreen_applyOffsetButton"
           onClick={() => {
             applyLabwareOffsets()
             setIsShowingLPCSuccessToast(true)

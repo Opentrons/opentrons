@@ -41,10 +41,10 @@ export const PipetteOverflowMenu = (
   return (
     <Flex position={POSITION_RELATIVE}>
       <Flex
-        width={'12rem'}
+        width="12rem"
         zIndex={10}
-        borderRadius={'4px 4px 0px 0px'}
-        boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+        borderRadius="4px 4px 0px 0px"
+        boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
         position={POSITION_ABSOLUTE}
         backgroundColor={COLORS.white}
         top="2.6rem"
@@ -86,7 +86,7 @@ export const PipetteOverflowMenu = (
             >
               {t('about_pipette')}
             </MenuItem>
-            <Divider marginY={'0'} />
+            <Divider marginY="0" />
             <MenuItem
               key={`${pipetteName}_${mount}_view_settings`}
               onClick={() => handleSettingsSlideout()}

@@ -13,7 +13,7 @@ import {
   SPACING_3,
   SPACING_5,
   Text,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 interface Props {
@@ -28,8 +28,8 @@ export const ConfirmPickUpTipModal = (props: Props): JSX.Element => {
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Text
-        as={'h4'}
-        textTransform={TEXT_TRANSFORM_UPPERCASE}
+        as="h4"
+        textTransform={TYPOGRAPHY.textTransformUppercase}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginBottom={SPACING_3}
         marginLeft={SPACING_1}
@@ -44,20 +44,20 @@ export const ConfirmPickUpTipModal = (props: Props): JSX.Element => {
         <Flex paddingRight={SPACING_3}>
           <NewSecondaryBtn
             onClick={props.onDeny}
-            width={'auto'}
+            width="auto"
             backgroundColor={C_WHITE}
             color={C_BLUE}
-            id={'ConfirmPickUpTipModal_Deny'}
+            id="ConfirmPickUpTipModal_Deny"
           >
             {t('confirm_pick_up_tip_modal_try_again_text')}
           </NewSecondaryBtn>
         </Flex>
         <NewPrimaryBtn
           onClick={props.onConfirm}
-          width={'auto'}
+          width="auto"
           backgroundColor={C_BLUE}
           color={C_WHITE}
-          id={'ConfirmPickUpTipModal_Deny'}
+          id="ConfirmPickUpTipModal_Deny"
         >
           {props.confirmText}
         </NewPrimaryBtn>

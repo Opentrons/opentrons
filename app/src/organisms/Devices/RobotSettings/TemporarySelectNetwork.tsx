@@ -11,7 +11,6 @@ import { SelectSsid } from './ConnectNetwork/SelectSsid'
 import { ConnectModal } from './ConnectNetwork/ConnectModal'
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { ResultModal } from './ConnectNetwork/ResultModal'
-import { useIsRobotBusy } from '../hooks'
 import { CONNECT, DISCONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
 
 import type { State, Dispatch } from '../../../redux/types'
@@ -23,14 +22,14 @@ import type {
 
 interface TempSelectNetworkProps {
   robotName: string
-  updateRobotStatus: (isRobotBusy: boolean) => void
+  isRobotBusy: boolean
 }
 
 const LIST_REFRESH_MS = 10000
 
 export const TemporarySelectNetwork = ({
   robotName,
-  updateRobotStatus,
+  isRobotBusy,
 }: TempSelectNetworkProps): JSX.Element => {
   const list = useSelector((state: State) =>
     Networking.getWifiList(state, robotName)
@@ -47,7 +46,6 @@ export const TemporarySelectNetwork = ({
   const [changeState, setChangeState] = React.useState<NetworkChangeState>({
     type: null,
   })
-  const isBusy = useIsRobotBusy()
   const dispatch = useDispatch<Dispatch>()
   const [dispatchApi, requestIds] = RobotApi.useDispatchApiRequest()
   const requestState = useSelector((state: State) => {
@@ -85,9 +83,7 @@ export const TemporarySelectNetwork = ({
   }, [robotName, dispatch, changeState.type])
 
   const handleSelectConnect = (ssid: string): void => {
-    if (isBusy) {
-      updateRobotStatus(true)
-    } else {
+    if (!isRobotBusy) {
       const network = list.find((nw: WifiNetwork) => nw.ssid === ssid)
       if (network != null) {
         const { ssid, securityType } = network
@@ -101,18 +97,14 @@ export const TemporarySelectNetwork = ({
   }
 
   const handleSelectDisconnect = (): void => {
-    if (isBusy) {
-      updateRobotStatus(true)
-    } else {
+    if (!isRobotBusy) {
       const ssid = activeNetwork?.ssid
       ssid != null && setChangeState({ type: DISCONNECT, ssid })
     }
   }
 
   const handleSelectJoinOther = (): void => {
-    if (isBusy) {
-      updateRobotStatus(true)
-    } else {
+    if (!isRobotBusy) {
       setChangeState({ type: JOIN_OTHER, ssid: null })
     }
   }
@@ -134,6 +126,7 @@ export const TemporarySelectNetwork = ({
         onConnect={handleSelectConnect}
         onJoinOther={handleSelectJoinOther}
         onDisconnect={handleSelectDisconnect}
+        isRobotBusy={isRobotBusy}
       />
       {changeState.type && (
         <Portal>

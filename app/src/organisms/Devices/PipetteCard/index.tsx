@@ -8,7 +8,6 @@ import {
   DIRECTION_ROW,
   ALIGN_START,
   DIRECTION_COLUMN,
-  TEXT_TRANSFORM_UPPERCASE,
   SPACING,
   FONT_WEIGHT_REGULAR,
   FONT_SIZE_CAPTION,
@@ -19,7 +18,6 @@ import {
   InstrumentDiagram,
   BORDERS,
   Btn,
-  TEXT_DECORATION_UNDERLINE,
 } from '@opentrons/components'
 import { fetchPipettes, LEFT } from '../../../redux/pipettes'
 import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
@@ -151,7 +149,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
       backgroundColor={COLORS.background}
       borderRadius={BORDERS.radiusSoftCorners}
       marginBottom={SPACING.spacing3}
-      width={'100%'}
+      width="100%"
       data-testid={`PipetteCard_${pipetteName}`}
     >
       {showChangePipette && (
@@ -203,14 +201,22 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               />
             )}
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            flex="100%"
+            paddingLeft={SPACING.spacing3}
+          >
             {!isDeckCalibrated &&
             pipetteOffsetCalibration == null &&
             pipetteInfo != null &&
             showBanner &&
             !isFetching ? (
               <Flex paddingBottom={SPACING.spacing2}>
-                <Banner type="error" onCloseClick={() => setShowBanner(false)}>
+                <Banner
+                  type="error"
+                  flex="100%"
+                  onCloseClick={() => setShowBanner(false)}
+                >
                   {t('deck_cal_missing')}
                 </Banner>
               </Flex>
@@ -221,13 +227,17 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
             showBanner &&
             !isFetching ? (
               <Flex paddingBottom={SPACING.spacing2}>
-                <Banner type="error" onCloseClick={() => setShowBanner(false)}>
+                <Banner
+                  type="error"
+                  flex="100%"
+                  onCloseClick={() => setShowBanner(false)}
+                >
                   <Flex flexDirection={DIRECTION_COLUMN}>
                     {t('pipette_offset_calibration_needed')}
                     <Btn
                       textAlign={ALIGN_START}
                       fontSize={TYPOGRAPHY.fontSizeP}
-                      textDecoration={TEXT_DECORATION_UNDERLINE}
+                      textDecoration={TYPOGRAPHY.textDecorationUnderline}
                       onClick={handleCalibrate}
                     >
                       {t('calibrate_now')}
@@ -240,6 +250,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               <Flex paddingBottom={SPACING.spacing2}>
                 <Banner
                   type="warning"
+                  flex="100%"
                   onCloseClick={() => setShowBanner(false)}
                 >
                   <Flex flexDirection={DIRECTION_COLUMN}>
@@ -247,7 +258,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
                     <Btn
                       textAlign={ALIGN_START}
                       fontSize={TYPOGRAPHY.fontSizeP}
-                      textDecoration={TEXT_DECORATION_UNDERLINE}
+                      textDecoration={TYPOGRAPHY.textDecorationUnderline}
                       onClick={handleCalibrate}
                     >
                       {t('recalibrate_now')}
@@ -257,7 +268,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               </Flex>
             ) : null}
             <StyledText
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.darkGrey}
               fontWeight={FONT_WEIGHT_REGULAR}
               fontSize={FONT_SIZE_CAPTION}

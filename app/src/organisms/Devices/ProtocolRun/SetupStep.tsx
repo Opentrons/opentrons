@@ -12,8 +12,6 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   SIZE_1,
-  TEXT_ALIGN_LEFT,
-  TEXT_TRANSFORM_CAPITALIZE,
   COLORS,
   SPACING,
   TYPOGRAPHY,
@@ -65,7 +63,7 @@ export function SetupStep({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <Btn textAlign={TEXT_ALIGN_LEFT}>
+      <Btn textAlign={TYPOGRAPHY.textAlignLeft}>
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -115,14 +113,14 @@ export function SetupStep({
                     name={
                       calibrationStatusComplete ? 'ot-check' : 'alert-circle'
                     }
-                    id={'RunSetupCard_calibrationIcon'}
+                    id="RunSetupCard_calibrationIcon"
                   />
                   <StyledText
                     color={COLORS.black}
                     css={TYPOGRAPHY.pSemiBold}
                     marginRight={SPACING.spacing4}
-                    textTransform={TEXT_TRANSFORM_CAPITALIZE}
-                    id={'RunSetupCard_calibrationText'}
+                    textTransform={TYPOGRAPHY.textTransformCapitalize}
+                    id="RunSetupCard_calibrationText"
                   >
                     {calibrationStatusComplete
                       ? t('calibration_ready')

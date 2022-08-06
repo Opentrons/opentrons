@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
+import { css } from 'styled-components'
 
 import {
   getModuleType,
@@ -42,7 +43,6 @@ import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
 import { getAnalysisStatus, getProtocolDisplayName } from './utils'
-import { useGetElementDOMRectProperty } from './useGetElementDOMRectProperty'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
@@ -50,6 +50,26 @@ import type { State } from '../../redux/types'
 interface ProtocolCardProps extends StoredProtocolData {
   handleRunProtocol: () => void
 }
+
+// TODO kj 07/06/2022: Currently, using hardcoded number to align elements
+// This should be removed in the future
+const PROTOCOL_CARD_BREAKPOINT = '800px'
+
+const PROTOCOL_CARD_ALIGN_ITEMS_STYLING = css`
+  align-items: ${ALIGN_START};
+
+  @media (min-width: ${PROTOCOL_CARD_BREAKPOINT}) {
+    align-items: ${ALIGN_CENTER};
+  }
+`
+
+const PROTOCOL_CARD_UPDATED_JUSTIFY_CONTENT_STYLING = css`
+  justify-content: ${JUSTIFY_FLEX_END};
+
+  @media (min-width: ${PROTOCOL_CARD_BREAKPOINT}) {
+    justify-content: ${FLEX_NONE};
+  }
+`
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const history = useHistory()
@@ -131,23 +151,15 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
   const requiredModuleTypes = parseAllRequiredModuleModels(
     mostRecentAnalysis != null ? mostRecentAnalysis.commands : []
   ).map(getModuleType)
-  const targetRef = React.useRef(null)
-  const { getElementProperty } = useGetElementDOMRectProperty<HTMLDivElement>(
-    targetRef
-  )
-  const width = getElementProperty('width')
-
-  // TODO kj 07/06/2022: Currently, using hardcoded number to align elements
-  // This should be removed in the future
 
   return (
-    <Flex flex="1" ref={targetRef}>
+    <Flex flex="1">
       <Flex
         marginRight={SPACING.spacing4}
         size="6rem"
         height="auto"
         justifyContent={JUSTIFY_CENTER}
-        alignItems={width == null || width <= 800 ? ALIGN_START : ALIGN_CENTER}
+        css={PROTOCOL_CARD_ALIGN_ITEMS_STYLING}
         data-testid={`ProtocolCard_deckLayout_${protocolDisplayName}`}
       >
         {
@@ -278,9 +290,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             data-testid={`ProtocolCard_date_${protocolDisplayName}`}
             marginTop={SPACING.spacing3}
-            justifyContent={
-              width == null || width <= 880 ? JUSTIFY_FLEX_END : FLEX_NONE
-            }
+            css={PROTOCOL_CARD_UPDATED_JUSTIFY_CONTENT_STYLING}
           >
             <StyledText
               as="label"

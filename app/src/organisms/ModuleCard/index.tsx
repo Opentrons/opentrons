@@ -5,18 +5,13 @@ import last from 'lodash/last'
 import {
   Box,
   Flex,
-  Text,
   DIRECTION_ROW,
   ALIGN_START,
   DIRECTION_COLUMN,
-  TEXT_TRANSFORM_UPPERCASE,
   SPACING,
-  FONT_WEIGHT_REGULAR,
-  FONT_SIZE_CAPTION,
   TYPOGRAPHY,
   useOnClickOutside,
   Btn,
-  TEXT_DECORATION_UNDERLINE,
   IconProps,
   useHoverTooltip,
   COLORS,
@@ -25,6 +20,7 @@ import {
 } from '@opentrons/components'
 import {
   getModuleDisplayName,
+  HEATERSHAKER_MODULE_TYPE,
   HS_TOO_HOT_TEMP,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -47,6 +43,7 @@ import { Banner } from '../../atoms/Banner'
 import { Toast } from '../../atoms/Toast'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Tooltip } from '../../atoms/Tooltip'
+import { StyledText } from '../../atoms/text'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
@@ -225,18 +222,15 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       backgroundColor={COLORS.background}
       borderRadius={SPACING.spacing2}
       marginBottom={SPACING.spacing3}
-      width={'100%'}
+      width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >
-      {showWizard &&
-        (runId != null ? (
-          <HeaterShakerWizard
-            onCloseClick={() => setShowWizard(false)}
-            runId={runId}
-          />
-        ) : (
-          <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
-        ))}
+      {showWizard && module.moduleType === HEATERSHAKER_MODULE_TYPE && (
+        <HeaterShakerWizard
+          onCloseClick={() => setShowWizard(false)}
+          attachedModule={module}
+        />
+      )}
       {showSlideout && (
         <ModuleSlideout
           module={module}
@@ -260,7 +254,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           module={module as HeaterShakerModule}
           isExpanded={showTestShake}
           onCloseClick={() => setShowTestShake(false)}
-          runId={runId}
+          isLoadedInRun={isLoadedInRun}
+          currentRunId={currentRunId != null ? currentRunId : undefined}
         />
       )}
       <Box padding={`${SPACING.spacing4} ${SPACING.spacing3}`} width="100%">
@@ -273,7 +268,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               alt={module.moduleModel}
             />
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING.spacing3}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            flex="100%"
+            paddingLeft={SPACING.spacing3}
+          >
             {showSuccessToast && (
               <Toast
                 message={t('firmware_update_installation_successful')}
@@ -304,7 +303,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     <Btn
                       textAlign={ALIGN_START}
                       fontSize={TYPOGRAPHY.fontSizeP}
-                      textDecoration={TEXT_DECORATION_UNDERLINE}
+                      textDecoration={TYPOGRAPHY.textDecorationUnderline}
                       onClick={() => handleUpdateClick()}
                     >
                       {t('update_now')}
@@ -327,7 +326,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     i18nKey="hot_to_the_touch"
                     components={{
                       bold: <strong />,
-                      block: <Text fontSize={TYPOGRAPHY.fontSizeP} />,
+                      block: <StyledText fontSize={TYPOGRAPHY.fontSizeP} />,
                     }}
                   />
                 </Banner>
@@ -345,17 +344,17 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   spin
                   aria-label="ot-spinner"
                 />
-                <Text marginLeft={SPACING.spacing3}>
+                <StyledText marginLeft={SPACING.spacing3}>
                   {t('updating_firmware')}
-                </Text>
+                </StyledText>
               </Flex>
             ) : (
               <>
-                <Text
-                  textTransform={TEXT_TRANSFORM_UPPERCASE}
+                <StyledText
+                  textTransform={TYPOGRAPHY.textTransformUppercase}
                   color={COLORS.darkGrey}
-                  fontWeight={FONT_WEIGHT_REGULAR}
-                  fontSize={FONT_SIZE_CAPTION}
+                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                  fontSize={TYPOGRAPHY.fontSizeCaption}
                   paddingBottom={SPACING.spacing2}
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
@@ -366,7 +365,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
                     port: module.usbPort.hub ?? module.usbPort.port,
                   })}
-                </Text>
+                </StyledText>
                 <Flex
                   paddingBottom={SPACING.spacing2}
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}
@@ -378,7 +377,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                     marginRight={SPACING.spacing1}
                     color={COLORS.darkGreyEnabled}
                   />
-                  <Text>{getModuleDisplayName(module.moduleModel)}</Text>
+                  <StyledText>
+                    {getModuleDisplayName(module.moduleModel)}
+                  </StyledText>
                 </Flex>
               </>
             )}
@@ -491,7 +492,6 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
         currentRunId={runId}
         onCloseClick={onCloseClick}
         isExpanded={showSlideout}
-        isSetShake={isSecondary}
         isLoadedInRun={isLoadedInRun}
       />
     )

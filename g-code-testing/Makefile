@@ -59,12 +59,12 @@ test-g-code-omega:
 .PHONY: lint
 lint:
 	$(python) -m mypy g_code_parsing $(tests_to_typecheck)
-	$(python) -m black --check g_code_parsing tests setup.py
-	$(python) -m flake8 g_code_parsing tests setup.py
+	$(python) -m black --check g_code_parsing tests setup.py cli.py
+	$(python) -m flake8 g_code_parsing tests setup.py cli.py
 
 .PHONY: format
 format:
-	$(python) -m black g_code_parsing tests setup.py
+	$(python) -m black g_code_parsing tests setup.py cli.py
 
 
 .PHONY: get-g-code-configurations
@@ -90,3 +90,7 @@ diff-g-code-configuration-comparison:
 update-g-code-configuration-comparison:
 	$(if $(name),,$(error name variable required))
 	$(pipenv) run python cli.py update-comparison ${name}
+
+.PHONY: check-for-missing-comparison-files
+check-for-missing-comparison-files:
+	$(pipenv) run python cli.py check-for-missing-comparison-files --error_on_missing_configuration_files

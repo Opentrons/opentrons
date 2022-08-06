@@ -24,8 +24,6 @@ import {
   DISPLAY_BLOCK,
   Link,
   JUSTIFY_SPACE_BETWEEN,
-  TEXT_TRANSFORM_CAPITALIZE,
-  Text,
 } from '@opentrons/components'
 import {
   parseInitialPipetteNamesByMount,
@@ -159,7 +157,7 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}
-          data-testid={`ProtocolDetails_description`}
+          data-testid="ProtocolDetails_description"
         >
           <StyledText as="p">{description}</StyledText>
           {filteredMetaData.map((item, index) => {
@@ -189,7 +187,7 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
           role="button"
           css={TYPOGRAPHY.linkPSemiBold}
           marginTop={SPACING.spacing3}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
           onClick={() => setIsReadMore(!isReadMore)}
         >
           {isReadMore ? t('read_more') : t('read_less')}
@@ -350,7 +348,7 @@ export function ProtocolDetails(
           <Flex css={GRID_STYLE}>
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              data-testid={`ProtocolDetails_creationMethod`}
+              data-testid="ProtocolDetails_creationMethod"
             >
               <StyledText as="h6" color={COLORS.darkGreyEnabled}>
                 {t('creation_method')}
@@ -363,7 +361,7 @@ export function ProtocolDetails(
             </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              data-testid={`ProtocolDetails_lastUpdated`}
+              data-testid="ProtocolDetails_lastUpdated"
             >
               <StyledText as="h6" color={COLORS.darkGreyEnabled}>
                 {t('last_updated')}
@@ -376,7 +374,7 @@ export function ProtocolDetails(
             </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              data-testid={`ProtocolDetails_lastAnalyzed`}
+              data-testid="ProtocolDetails_lastAnalyzed"
             >
               <StyledText as="h6" color={COLORS.darkGreyEnabled}>
                 {t('last_analyzed')}
@@ -395,7 +393,7 @@ export function ProtocolDetails(
             >
               <PrimaryButton
                 onClick={() => setShowSlideout(true)}
-                data-testid={`ProtocolDetails_runProtocol`}
+                data-testid="ProtocolDetails_runProtocol"
                 disabled={analysisStatus === 'loading'}
               >
                 {t('run_protocol')}
@@ -406,7 +404,7 @@ export function ProtocolDetails(
           <Flex css={GRID_STYLE}>
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              data-testid={`ProtocolDetails_author`}
+              data-testid="ProtocolDetails_author"
             >
               <StyledText as="h6" color={COLORS.darkGreyEnabled}>
                 {t('org_or_author')}
@@ -414,14 +412,14 @@ export function ProtocolDetails(
               <StyledText
                 as="p"
                 marginRight={SPACING.spacingM}
-                css={{ 'overflow-wrap': 'anywhere' }}
+                overflowWrap="anywhere"
               >
                 {analysisStatus === 'loading' ? t('shared:loading') : author}
               </StyledText>
             </Flex>
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              data-testid={`ProtocolDetails_description`}
+              data-testid="ProtocolDetails_description"
             >
               <StyledText as="h6" color={COLORS.darkGreyEnabled}>
                 {t('description')}
@@ -446,7 +444,7 @@ export function ProtocolDetails(
           <OverflowMenu
             protocolKey={protocolKey}
             protocolType={mostRecentAnalysis?.config?.protocolType ?? 'python'}
-            data-testid={`ProtocolDetails_overFlowMenu`}
+            data-testid="ProtocolDetails_overFlowMenu"
           />
         </Box>
       </Flex>
@@ -458,14 +456,14 @@ export function ProtocolDetails(
         <Box
           flex="0 0 20rem"
           backgroundColor={COLORS.white}
-          data-testid={`ProtocolDetails_deckMap`}
+          data-testid="ProtocolDetails_deckMap"
           border={`1px solid ${COLORS.medGrey}`}
           borderRadius={BORDERS.radiusSoftCorners}
         >
           <StyledText
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
             margin={SPACING.spacing4}
           >
             {t('deck_setup')}
@@ -496,32 +494,32 @@ export function ProtocolDetails(
         >
           <Flex>
             <RoundTab
-              data-testid={`ProtocolDetails_robotConfig`}
+              data-testid="ProtocolDetails_robotConfig"
               isCurrent={currentTab === 'robot_config'}
               onClick={() => setCurrentTab('robot_config')}
             >
-              <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+              <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
                 {t('robot_configuration')}
-              </Text>
+              </StyledText>
             </RoundTab>
             <RoundTab
-              data-testid={`ProtocolDetails_labware`}
+              data-testid="ProtocolDetails_labware"
               isCurrent={currentTab === 'labware'}
               onClick={() => setCurrentTab('labware')}
             >
-              <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+              <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
                 {t('labware')}
-              </Text>
+              </StyledText>
             </RoundTab>
             {liquidSetupEnabled && (
               <RoundTab
-                data-testid={`ProtocolDetails_liquids`}
+                data-testid="ProtocolDetails_liquids"
                 isCurrent={currentTab === 'liquids'}
                 onClick={() => setCurrentTab('liquids')}
               >
-                <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+                <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
                   {t('liquids')}
-                </Text>
+                </StyledText>
               </RoundTab>
             )}
           </Flex>

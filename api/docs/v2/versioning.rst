@@ -118,6 +118,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+-----------------------------+
 |     2.12    |          5.0.0              |
 +-------------+-----------------------------+
+|     2.13    |          6.1.0              |
++-------------+-----------------------------+
 
 
 Changes in API Versions
@@ -126,7 +128,7 @@ Changes in API Versions
 Version 2.0
 +++++++++++
 
-Version 2 of the API is a new way to write Python protocols, with support for new modules like the Thermocycler. To transition your protocols from version 1 to version 2 of the API, follow `this migration guide <http://support.opentrons.com/en/articles/3425727-switching-your-protocols-from-api-version-1-to-version-2>`_. 
+Version 2 of the API is a new way to write Python protocols, with support for new modules like the Thermocycler. To transition your protocols from version 1 to version 2 of the API, follow `this migration guide <http://support.opentrons.com/en/articles/3425727-switching-your-protocols-from-api-version-1-to-version-2>`_.
 
 We've also published a `more in-depth discussion <http://support.opentrons.com/en/articles/3418212-opentrons-protocol-api-version-2>`_ of why we developed version 2 of the API and how it differs from version 1.
 
@@ -219,7 +221,7 @@ Version 2.8
 
   - **Note** that you will need to create a location object to use this function in a protocol. See :ref:`protocol-api-labware` for more information.
 
-- You can now pass in a blowout location to transfer, distribute, and consolidate 
+- You can now pass in a blowout location to transfer, distribute, and consolidate
   with the ``blowout_location`` parameter. See :py:meth:`.InstrumentContext.transfer` for more detail!
 
 
@@ -248,3 +250,8 @@ Version 2.12
 - :py:meth:`.ProtocolContext.set_offset` has been added to apply labware offsets to protocols run (exclusively) outside of the Opentrons app (Jupyter Notebook and SSH).
 
 
+Version 2.13
+++++++++++++
+
+- :py:meth:`.InstrumentContext.drop_tip` now has a ``prep_after`` parameter.
+- :py:meth:`.InstrumentContext.home` may home *both* pipettes as needed to avoid collision risks.

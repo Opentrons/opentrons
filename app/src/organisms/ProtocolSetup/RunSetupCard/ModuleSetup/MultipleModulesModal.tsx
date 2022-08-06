@@ -42,11 +42,11 @@ export const MultipleModulesModal = (
     <Portal level="top">
       <Modal className={styles.modal} contentsClassName={styles.modal_contents}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Text as={'h3'} marginBottom={SPACING_3}>
+          <Text as="h3" marginBottom={SPACING_3}>
             {t('multiple_modules_modal_title')}
           </Text>
           <Btn size={SIZE_2} onClick={props.onCloseClick}>
-            <Icon name={'close'} color={C_MED_DARK_GRAY}></Icon>
+            <Icon name="close" color={C_MED_DARK_GRAY}></Icon>
           </Btn>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} paddingLeft={SPACING_3}>
@@ -68,10 +68,10 @@ export const MultipleModulesModal = (
               marginBottom={SPACING_3}
             >
               {t('multiple_modules_link')}
-              <Icon name={'open-in-new'} marginLeft={SPACING_1} size="10px" />
+              <Icon name="open-in-new" marginLeft={SPACING_1} size="10px" />
             </Link>
             <Text
-              as={'h4'}
+              as="h4"
               fontWeight={FONT_WEIGHT_SEMIBOLD}
               marginBottom={SPACING_2}
             >

@@ -6,6 +6,7 @@ import {
   pipetteIntoHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestWithLatchOpen,
   pipetteAdjacentHeaterShakerWhileShaking,
+  getLabwareSlot,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   uuid,
@@ -27,6 +28,11 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
   // TODO(2020-07-30, IL): the below is duplicated or at least similar
   // across aspirate/dispense/blowout, we can probably DRY it up
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
+  const slotName = getLabwareSlot(
+    labware,
+    prevRobotState.labware,
+    prevRobotState.modules
+  )
 
   if (!pipetteSpec) {
     errors.push(
@@ -88,19 +94,13 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
   }
 
   if (
-    pipetteAdjacentHeaterShakerWhileShaking(
-      prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot
-    )
+    pipetteAdjacentHeaterShakerWhileShaking(prevRobotState.modules, slotName)
   ) {
     errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
   }
 
   if (
-    getIsHeaterShakerEastWestWithLatchOpen(
-      prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot
-    )
+    getIsHeaterShakerEastWestWithLatchOpen(prevRobotState.modules, slotName)
   ) {
     errors.push(errorCreators.heaterShakerEastWestWithLatchOpen())
   }
@@ -108,7 +108,7 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
   if (
     getIsHeaterShakerEastWestMultiChannelPipette(
       prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot,
+      slotName,
       pipetteSpec
     )
   ) {
@@ -118,7 +118,7 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
   if (
     getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
       prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot,
+      slotName,
       pipetteSpec,
       invariantContext.labwareEntities[labware]
     )

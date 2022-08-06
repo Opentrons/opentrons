@@ -17,8 +17,6 @@ import {
   OVERFLOW_SCROLL,
   POSITION_FIXED,
   SIZE_1,
-  TEXT_TRANSFORM_CAPITALIZE,
-  TEXT_TRANSFORM_UPPERCASE,
   BORDERS,
   COLORS,
   SPACING,
@@ -162,6 +160,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
         firstPostInitialPlayRunCommandIndex.current =
           lastKnownPrePlayRunCommandIndex.current +
           foundPostPlayRunCommandIndex +
+          firstNonSetupIndex +
           1
       } else {
         lastKnownPrePlayRunCommandIndex.current =
@@ -174,7 +173,9 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
       ? dropWhile(
           runCommands,
           runCommandSummary =>
-            new Date(runCommandSummary.createdAt) <= runStartDateTime
+            new Date(
+              runCommandSummary.startedAt ?? runCommandSummary.createdAt
+            ) <= runStartDateTime
         )
       : []
 
@@ -377,7 +378,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   const jumpToCurrentStepButton = (
     <PrimaryButton
       position={POSITION_FIXED}
-      bottom="2.5rem" // 40px
+      bottom={SPACING.spacingXXL}
       left={`calc(calc(100% + ${NAV_BAR_WIDTH})/2)`} // add width of half of nav bar to center within run tab
       transform="translate(-50%)"
       borderRadius={SPACING.spacing6}
@@ -424,7 +425,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
           <StyledText
             marginRight={SPACING.spacing3}
             css={TYPOGRAPHY.h3SemiBold}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {t('run_log')}
           </StyledText>
@@ -510,7 +511,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
                 color={COLORS.darkGreyEnabled}
                 css={TYPOGRAPHY.h6SemiBold}
                 paddingY={SPACING.spacing2}
-                textTransform={TEXT_TRANSFORM_UPPERCASE}
+                textTransform={TYPOGRAPHY.textTransformUppercase}
               >
                 {t('end_of_protocol')}
               </StyledText>
@@ -559,10 +560,10 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
       <Btn onClick={handleClick}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
           <StyledText
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6SemiBold}
-            id={`RunDetails_ProtocolSetupTitle`}
+            id="RunDetails_ProtocolSetupTitle"
           >
             {t('protocol_setup')}
           </StyledText>
@@ -574,7 +575,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
         </Flex>
       </Btn>
       <Flex
-        id={`RunDetails_ProtocolSetup_CommandList`}
+        id="RunDetails_ProtocolSetup_CommandList"
         flexDirection={DIRECTION_COLUMN}
       >
         {showProtocolSetupInfo

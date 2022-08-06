@@ -3,9 +3,13 @@ import * as errorCreators from '../../errorCreators'
 import { dropTip } from './dropTip'
 import {
   curryCommandCreator,
+  getLabwareSlot,
   reduceCommandCreators,
   modulePipetteCollision,
   uuid,
+  pipetteAdjacentHeaterShakerWhileShaking,
+  getIsHeaterShakerEastWestWithLatchOpen,
+  getIsHeaterShakerEastWestMultiChannelPipette,
 } from '../../utils'
 import type { CurriedCommandCreator, CommandCreator } from '../../types'
 interface PickUpTipArgs {
@@ -56,29 +60,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     return {
       errors: [errorCreators.insufficientTips()],
     }
-  } else if (
-    modulePipetteCollision({
-      pipette,
-      labware: nextTiprack.tiprackId,
-      invariantContext,
-      prevRobotState,
-    })
-  ) {
-    return {
-      errors: [errorCreators.modulePipetteCollisionDanger()],
-    }
   }
-
-  const commandCreators: CurriedCommandCreator[] = [
-    curryCommandCreator(dropTip, {
-      pipette,
-    }),
-    curryCommandCreator(_pickUpTip, {
-      pipette,
-      tiprack: nextTiprack.tiprackId,
-      well: nextTiprack.well,
-    }),
-  ]
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
   if (!pipetteSpec)
     return {
@@ -102,6 +84,58 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       ],
     }
   }
+  if (
+    modulePipetteCollision({
+      pipette,
+      labware: nextTiprack.tiprackId,
+      invariantContext,
+      prevRobotState,
+    })
+  ) {
+    return {
+      errors: [errorCreators.modulePipetteCollisionDanger()],
+    }
+  }
+
+  const slotName = getLabwareSlot(
+    nextTiprack.tiprackId,
+    prevRobotState.labware,
+    prevRobotState.modules
+  )
+
+  if (
+    pipetteAdjacentHeaterShakerWhileShaking(prevRobotState.modules, slotName)
+  ) {
+    return { errors: [errorCreators.heaterShakerNorthSouthEastWestShaking()] }
+  }
+  if (
+    getIsHeaterShakerEastWestWithLatchOpen(prevRobotState.modules, slotName)
+  ) {
+    return { errors: [errorCreators.heaterShakerEastWestWithLatchOpen()] }
+  }
+
+  if (
+    getIsHeaterShakerEastWestMultiChannelPipette(
+      prevRobotState.modules,
+      slotName,
+      pipetteSpec
+    )
+  ) {
+    return {
+      errors: [errorCreators.heaterShakerEastWestOfMultiChannelPipette()],
+    }
+  }
+
+  const commandCreators: CurriedCommandCreator[] = [
+    curryCommandCreator(dropTip, {
+      pipette,
+    }),
+    curryCommandCreator(_pickUpTip, {
+      pipette,
+      tiprack: nextTiprack.tiprackId,
+      well: nextTiprack.well,
+    }),
+  ]
 
   return reduceCommandCreators(
     commandCreators,

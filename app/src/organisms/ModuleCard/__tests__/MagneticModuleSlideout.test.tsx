@@ -45,7 +45,6 @@ describe('MagneticModuleSlideout', () => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,
@@ -134,7 +133,6 @@ describe('MagneticModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field when there is a runId', () => {
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: false,
       isRunIdle: true,

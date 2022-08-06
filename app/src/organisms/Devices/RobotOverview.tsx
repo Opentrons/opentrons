@@ -15,8 +15,7 @@ import {
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  TEXT_TRANSFORM_NONE,
-  TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   useHoverTooltip,
@@ -109,7 +108,7 @@ export function RobotOverview({
               as="h6"
               color={COLORS.darkGreyEnabled}
               paddingBottom={SPACING.spacing1}
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
+              textTransform={TYPOGRAPHY.textTransformUppercase}
             >
               {t('controls')}
             </StyledText>
@@ -122,7 +121,7 @@ export function RobotOverview({
                 height=".875rem"
                 width="1.375rem"
                 marginRight={SPACING.spacing3}
-                id={`RobotOverview_lightsToggle`}
+                id="RobotOverview_lightsToggle"
               />
               <StyledText as="p">{t('lights')}</StyledText>
             </Flex>
@@ -130,7 +129,7 @@ export function RobotOverview({
           <PrimaryButton
             {...targetProps}
             marginBottom={SPACING.spacing4}
-            textTransform={TEXT_TRANSFORM_NONE}
+            textTransform={TYPOGRAPHY.textTransformNone}
             disabled={
               (currentRunId != null ? !isRunTerminal : false) ||
               robot.status !== CONNECTABLE ||

@@ -8,9 +8,8 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   Btn,
-  TEXT_DECORATION_UNDERLINE,
   JUSTIFY_FLEX_END,
-  TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -71,7 +70,7 @@ export function ProtocolAnalysisFailure(
                 <Btn
                   as="a"
                   role="button"
-                  textDecoration={TEXT_DECORATION_UNDERLINE}
+                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={handleClickShowDetails}
                 />
               ),
@@ -79,7 +78,7 @@ export function ProtocolAnalysisFailure(
                 <Btn
                   as="a"
                   role="button"
-                  textDecoration={TEXT_DECORATION_UNDERLINE}
+                  textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   onClick={handleClickReanalyze}
                 />
               ),
@@ -102,7 +101,7 @@ export function ProtocolAnalysisFailure(
             <Flex justifyContent={JUSTIFY_FLEX_END}>
               <PrimaryButton
                 onClick={handleClickHideDetails}
-                textTransform={TEXT_TRANSFORM_CAPITALIZE}
+                textTransform={TYPOGRAPHY.textTransformCapitalize}
                 marginTop={SPACING.spacing4}
               >
                 {t('shared:close')}

@@ -1,20 +1,18 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 import {
   Flex,
-  Text,
-  TEXT_TRANSFORM_UPPERCASE,
   COLORS,
   DIRECTION_COLUMN,
   SPACING,
   Icon,
   DIRECTION_ROW,
   TYPOGRAPHY,
-  TEXT_TRANSFORM_CAPITALIZE,
   SIZE_1,
+  WRAP,
 } from '@opentrons/components'
 import { StatusLabel } from '../../atoms/StatusLabel'
+import { StyledText } from '../../atoms/text'
 import type {
   LatchStatus,
   SpeedStatus,
@@ -26,27 +24,6 @@ interface HeaterShakerModuleDataProps {
   moduleData: HeaterShakerModule['data']
   showTemperatureData?: boolean
 }
-
-const MODULE_STATUS_STYLING = css`
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-
-  @media (min-width: 800px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media (min-width: 900px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-`
-
-const HS_MODULE_CARD_STYLING = css`
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-
-  @media (min-width: 800px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-`
 
 export const HeaterShakerModuleData = (
   props: HeaterShakerModuleDataProps
@@ -102,24 +79,24 @@ export const HeaterShakerModuleData = (
       case 'idle_open':
       case 'idle_unknown': {
         return (
-          <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+          <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
             {t('open', { ns: 'shared' })}
-          </Text>
+          </StyledText>
         )
       }
       case 'closing':
       case 'idle_closed': {
         if (isShaking) {
           return (
-            <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+            <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
               {t('closed_and_locked', { ns: 'heater_shaker' })}
-            </Text>
+            </StyledText>
           )
         } else {
           return (
-            <Text textTransform={TEXT_TRANSFORM_CAPITALIZE}>
+            <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
               {t('closed', { ns: 'heater_shaker' })}
-            </Text>
+            </StyledText>
           )
         }
       }
@@ -129,29 +106,26 @@ export const HeaterShakerModuleData = (
   }
 
   return (
-    <Flex
-      css={showTemperatureData ? MODULE_STATUS_STYLING : HS_MODULE_CARD_STYLING}
-    >
+    <Flex flexWrap={WRAP} gridGap={`${SPACING.spacing1} ${SPACING.spacing6}`}>
       {showTemperatureData && (
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          marginRight={SPACING.spacing6}
-          data-testid={`heater_shaker_module_data_temp`}
+          data-testid="heater_shaker_module_data_temp"
         >
-          <Text
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+          <StyledText
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginTop={SPACING.spacing3}
           >
             {t('heater')}
-          </Text>
+          </StyledText>
           <StatusLabel
             status={moduleData.temperatureStatus}
             {...getStatusLabelProps(moduleData.temperatureStatus)}
           />
-          <Text
+          <StyledText
             title="heater_target_temp"
             fontSize={TYPOGRAPHY.fontSizeH6}
             marginBottom={SPACING.spacing1}
@@ -162,31 +136,31 @@ export const HeaterShakerModuleData = (
                 temp: moduleData.targetTemperature,
               }
             )}
-          </Text>
-          <Text title="heater_temp" fontSize={TYPOGRAPHY.fontSizeH6}>
+          </StyledText>
+          <StyledText title="heater_temp" fontSize={TYPOGRAPHY.fontSizeH6}>
             {t('current_temp', { temp: moduleData.currentTemperature })}
-          </Text>
+          </StyledText>
         </Flex>
       )}
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`heater_shaker_module_data_shaker`}
+        data-testid="heater_shaker_module_data_shaker"
       >
-        <Text
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
+        <StyledText
+          textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           fontSize={TYPOGRAPHY.fontSizeH6}
           marginTop={SPACING.spacing3}
         >
           {t('shaker')}
-        </Text>
+        </StyledText>
         <StatusLabel
           status={moduleData.speedStatus}
           {...getStatusLabelProps(moduleData.speedStatus)}
         />
 
-        <Text
+        <StyledText
           title="shaker_target_speed"
           fontSize={TYPOGRAPHY.fontSizeH6}
           marginBottom={SPACING.spacing1}
@@ -194,19 +168,22 @@ export const HeaterShakerModuleData = (
           {t(moduleData.targetSpeed != null ? 'target_speed' : 'na_speed', {
             speed: moduleData.targetSpeed,
           })}
-        </Text>
-        <Text title="shaker_current_speed" fontSize={TYPOGRAPHY.fontSizeH6}>
+        </StyledText>
+        <StyledText
+          title="shaker_current_speed"
+          fontSize={TYPOGRAPHY.fontSizeH6}
+        >
           {t('current_speed', { speed: moduleData.currentSpeed })}
-        </Text>
+        </StyledText>
       </Flex>
 
       <Flex
         flexDirection={DIRECTION_ROW}
-        data-testid={`heater_shaker_module_data_latch`}
+        data-testid="heater_shaker_module_data_latch"
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <Text
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
+          <StyledText
+            textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
@@ -214,7 +191,7 @@ export const HeaterShakerModuleData = (
             title="latch_status"
           >
             {t('labware_latch', { ns: 'heater_shaker' })}
-          </Text>
+          </StyledText>
           <Flex
             flexDirection={DIRECTION_ROW}
             marginTop={SPACING.spacing2}

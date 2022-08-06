@@ -79,6 +79,7 @@ export function HistoricalProtocolRun(
             name={offsetDrawerOpen ? 'chevron-up' : 'chevron-down'}
             width="15px"
             marginRight={SPACING.spacing3}
+            css={{ cursor: 'pointer' }}
           />
         </Box>
         <StyledText
@@ -112,7 +113,7 @@ export function HistoricalProtocolRun(
             as="p"
             width="35%"
             data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
-            css={{ 'overflow-wrap': 'anywhere' }}
+            overflowWrap="anywhere"
           >
             {protocolName}
           </StyledText>
@@ -137,7 +138,7 @@ export function HistoricalProtocolRun(
         <StyledText
           as="p"
           width="20%"
-          data-testid={`RecentProtocolRuns_Duration`}
+          data-testid="RecentProtocolRuns_Duration"
         >
           {duration}
         </StyledText>

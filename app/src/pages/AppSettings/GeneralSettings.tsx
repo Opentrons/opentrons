@@ -12,7 +12,6 @@ import {
   DIRECTION_ROW,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  TEXT_DECORATION_UNDERLINE,
   SPACING,
   TYPOGRAPHY,
   COLORS,
@@ -116,8 +115,8 @@ export function GeneralSettings(): JSX.Element {
             >
               {t('update_available')}
               <Link
+                textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 role="button"
-                textDecoration={TEXT_DECORATION_UNDERLINE}
                 onClick={() => setShowUpdateModal(true)}
                 marginLeft={SPACING.spacing2}
               >

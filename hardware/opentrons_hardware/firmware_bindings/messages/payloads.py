@@ -147,7 +147,7 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 
     seq_id: utils.UInt8Field
     current_position_um: utils.UInt32Field
-    encoder_position: utils.Int32Field
+    encoder_position_um: utils.Int32Field
     ack_id: utils.UInt8Field
 
 

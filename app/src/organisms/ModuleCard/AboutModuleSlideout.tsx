@@ -8,10 +8,8 @@ import {
   TYPOGRAPHY,
   SPACING,
   JUSTIFY_SPACE_BETWEEN,
-  TEXT_DECORATION_UNDERLINE,
   Btn,
   ALIGN_START,
-  TEXT_TRANSFORM_CAPITALIZE,
   COLORS,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
@@ -63,7 +61,7 @@ export const AboutModuleSlideout = (
           data-testid={`AboutModuleSlideout_btn_${module.serialNumber}`}
         >
           <StyledText
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
           >
             {t('shared:close')}
@@ -84,7 +82,7 @@ export const AboutModuleSlideout = (
               textAlign={ALIGN_START}
               paddingLeft={SPACING.spacing2}
               fontSize={TYPOGRAPHY.fontSizeP}
-              textDecoration={TEXT_DECORATION_UNDERLINE}
+              textDecoration={TYPOGRAPHY.textDecorationUnderline}
               onClick={handleFirmwareUpdateClick}
             >
               {t('update_now')}

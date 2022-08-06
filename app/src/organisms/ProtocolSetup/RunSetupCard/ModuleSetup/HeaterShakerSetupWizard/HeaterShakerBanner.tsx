@@ -5,30 +5,33 @@ import { Divider } from '../../../../../atoms/structure/Divider'
 import { HeaterShakerWizard } from '../../../../Devices/HeaterShakerWizard'
 import { ModuleRenderInfoForProtocol } from '../../../../Devices/hooks'
 import { Banner, BannerItem } from '../Banner/Banner'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 interface HeaterShakerBannerProps {
   displayName: string
   modules: ModuleRenderInfoForProtocol[]
-  runId: string
 }
 
 export function HeaterShakerBanner(
   props: HeaterShakerBannerProps
 ): JSX.Element | null {
-  const [showWizard, setShowWizard] = React.useState(false)
-  const { displayName, modules, runId } = props
+  const [wizardId, setWizardId] = React.useState<String | null>(null)
+  const { displayName, modules } = props
   const { t } = useTranslation('heater_shaker')
+
   return (
     <Banner title={t('attach_heater_shaker_to_deck', { name: displayName })}>
       {modules.map((module, index) => (
         <React.Fragment key={index}>
-          {showWizard && (
-            <HeaterShakerWizard
-              onCloseClick={() => setShowWizard(false)}
-              moduleFromProtocol={module}
-              runId={runId}
-            />
-          )}
+          {wizardId === module.moduleId &&
+            module.attachedModuleMatch?.moduleType ===
+              HEATERSHAKER_MODULE_TYPE && (
+              <HeaterShakerWizard
+                onCloseClick={() => setWizardId(null)}
+                moduleFromProtocol={module}
+                attachedModule={module.attachedModuleMatch}
+              />
+            )}
           {index > 0 && <Divider color={COLORS.medGrey} />}
           <BannerItem
             title={t('module_in_slot', {
@@ -37,7 +40,7 @@ export function HeaterShakerBanner(
             })}
             body={t('improperly_fastened_description')}
             btnText={t('view_instructions')}
-            onClick={() => setShowWizard(true)}
+            onClick={() => setWizardId(module.moduleId)}
           />
         </React.Fragment>
       ))}

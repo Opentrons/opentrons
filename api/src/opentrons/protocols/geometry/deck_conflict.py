@@ -6,6 +6,11 @@ from typing_extensions import Final
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
+from opentrons.motion_planning.adjacent_slots_getters import (
+    get_east_west_slots,
+    get_south_slot,
+    get_adjacent_slots,
+)
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.geometry.module_geometry import (
@@ -152,7 +157,7 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
         # A Heater-Shaker can't safely be placed just south of the fixed trash,
         # because the fixed trash blocks access to the screw that locks the
         # Heater-Shaker onto the deck.
-        location_south_of_fixed_trash = _get_south_location(location)
+        location_south_of_fixed_trash = get_south_slot(location)
         if location_south_of_fixed_trash is not None:
             restrictions.append(
                 _NoHeaterShakerModule(
@@ -173,7 +178,7 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
             )
 
     if isinstance(item, HeaterShakerGeometry):
-        for covered_location in _get_adjacent_locations(location):
+        for covered_location in get_adjacent_slots(location):
             restrictions.append(
                 _NoModule(
                     location=covered_location,
@@ -182,7 +187,7 @@ def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction
                 )
             )
 
-        for covered_location in _get_east_west_locations(location):
+        for covered_location in get_east_west_slots(location):
             restrictions.append(
                 _MaxHeight(
                     location=covered_location,
@@ -235,47 +240,3 @@ def _is_fixed_trash(item: DeckItem) -> bool:
     if isinstance(item, Labware):
         return "fixedTrash" in item.quirks
     return False
-
-
-def _get_north_location(location: int) -> Optional[int]:
-    if location in [10, 11, 12]:
-        return None
-    else:
-        return location + 3
-
-
-def _get_south_location(location: int) -> Optional[int]:
-    if location in [1, 2, 3]:
-        return None
-    else:
-        return location - 3
-
-
-def _get_east_location(location: int) -> Optional[int]:
-    if location in [3, 6, 9, 12]:
-        return None
-    else:
-        return location + 1
-
-
-def _get_west_location(location: int) -> Optional[int]:
-    if location in [1, 4, 7, 10]:
-        return None
-    else:
-        return location - 1
-
-
-def _get_east_west_locations(location: int) -> List[int]:
-    east = _get_east_location(location)
-    west = _get_west_location(location)
-    return [maybe_loc for maybe_loc in [east, west] if maybe_loc is not None]
-
-
-def _get_north_south_locations(location: int) -> List[int]:
-    north = _get_north_location(location)
-    south = _get_south_location(location)
-    return [maybe_loc for maybe_loc in [north, south] if maybe_loc is not None]
-
-
-def _get_adjacent_locations(location: int) -> List[int]:
-    return _get_east_west_locations(location) + _get_north_south_locations(location)

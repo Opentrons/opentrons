@@ -31,18 +31,18 @@ export function AppSettings(): JSX.Element {
   const { appSettingsTab } = useParams<NavRouteParams>()
 
   const appSettingsContentByTab: {
-    [K in AppSettingsTab]: () => JSX.Element
+    [K in AppSettingsTab]: JSX.Element
   } = {
-    general: GeneralSettings,
-    privacy: PrivacySettings,
-    advanced: AdvancedSettings,
-    'feature-flags': FeatureFlags,
+    general: <GeneralSettings />,
+    privacy: <PrivacySettings />,
+    advanced: <AdvancedSettings />,
+    'feature-flags': <FeatureFlags />,
   }
 
-  const AppSettingsContent =
-    appSettingsContentByTab[appSettingsTab] ??
+  const appSettingsContent = appSettingsContentByTab[appSettingsTab] ?? (
     // default to the general tab if no tab or nonexistent tab is passed as a param
-    (() => <Redirect to={`/app-settings/general`} />)
+    <Redirect to="/app-settings/general" />
+  )
 
   return (
     <Flex paddingX={SPACING.spacing4} paddingY={SPACING.spacing4}>
@@ -76,7 +76,7 @@ export function AppSettings(): JSX.Element {
           </Flex>
         </Box>
         <Line />
-        <AppSettingsContent />
+        {appSettingsContent}
       </Box>
     </Flex>
   )

@@ -45,7 +45,7 @@ export const UnMatchedModuleWarning = (
           />
           <StyledText
             as="p"
-            data-testid={`UnMatchedModuleWarning_title`}
+            data-testid="UnMatchedModuleWarning_title"
             color={COLORS.darkBlack}
           >
             {t('module_mismatch_title')}
@@ -59,7 +59,7 @@ export const UnMatchedModuleWarning = (
         marginRight={SPACING.spacing4}
         color={COLORS.darkGrey}
         width="100%"
-        data-testid={`UnMatchedModuleWarning_body`}
+        data-testid="UnMatchedModuleWarning_body"
       >
         {t('module_mismatch_body')}
       </StyledText>

@@ -119,6 +119,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               marginLeft={SPACING.spacing3}
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
+              data-testid="ProtocolList_SortByMenu"
             >
               <StyledText
                 as="p"
@@ -142,7 +143,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               width="10rem"
               zIndex={2}
               borderRadius={BORDERS.radiusSoftCorners}
-              boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+              boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
               position={POSITION_ABSOLUTE}
               backgroundColor={COLORS.white}
               top="3.25rem"

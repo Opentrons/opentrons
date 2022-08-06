@@ -35,7 +35,6 @@ const render = () => {
 describe('RecentProtocolRuns', () => {
   beforeEach(() => {
     mockUseRunStatues.mockReturnValue({
-      isLegacySessionInProgress: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,

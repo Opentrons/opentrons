@@ -15,11 +15,11 @@ import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/hea
 import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import {
+  useIsLegacySessionInProgress,
   useIsRobotBusy,
   useProtocolDetailsForRun,
   useRunStatuses,
 } from '../../Devices/hooks'
-
 import {
   useLatchControls,
   useModuleOverflowMenu,
@@ -68,6 +68,9 @@ const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
+const mockUseIsLegacySessionsInProgress = useIsLegacySessionInProgress as jest.MockedFunction<
+  typeof useIsLegacySessionInProgress
+>
 
 const mockCloseLatchHeaterShaker = {
   id: 'heatershaker_id',
@@ -111,28 +114,6 @@ const mockHeatHeaterShaker = {
     status: 'heating',
   },
   usbPort: { hub: 1, port: 1, path: '/dev/ot_module_heatershaker0' },
-} as any
-
-const mockDeactivateShakeHeaterShaker = {
-  id: 'heatershaker_id',
-  moduleModel: 'heaterShakerModuleV1',
-  moduleType: 'heaterShakerModuleType',
-  serialNumber: 'jkl123',
-  hardwareRevision: 'heatershaker_v4.0',
-  firmwareVersion: 'v2.0.0',
-  hasAvailableUpdate: true,
-  data: {
-    labwareLatchStatus: 'idle_open',
-    speedStatus: 'speeding up',
-    temperatureStatus: 'idle',
-    currentSpeed: null,
-    currentTemperature: null,
-    targetSpeed: null,
-    targetTemp: null,
-    errorDetails: null,
-    status: 'idle',
-  },
-  usbPort: { hub: 1, port: 1 },
 } as any
 
 const mockMagDeckEngaged = {
@@ -220,15 +201,13 @@ const mockTCLidHeating = {
 describe('useLatchControls', () => {
   const store: Store<any> = createStore(jest.fn(), {})
   let mockCreateLiveCommand = jest.fn()
-  let mockCreateCommand = jest.fn()
 
   beforeEach(() => {
     store.dispatch = jest.fn()
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: true,
-      isRunStill: true,
+      isRunStill: false,
       isRunIdle: false,
       isRunTerminal: false,
     })
@@ -236,11 +215,6 @@ describe('useLatchControls', () => {
       createLiveCommand: mockCreateLiveCommand,
     } as any)
     mockUseIsRobotBusy.mockReturnValue(false)
-    mockCreateCommand = jest.fn()
-    mockCreateCommand.mockResolvedValue(null)
-    mockUseCreateCommandMutation.mockReturnValue({
-      createCommand: mockCreateCommand,
-    } as any)
   })
 
   afterEach(() => {
@@ -272,7 +246,7 @@ describe('useLatchControls', () => {
       },
     })
   })
-  it('should return if latch is close and handle latch function to open latch', () => {
+  it('should return if latch is closed and handle latch function opens latch', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
@@ -308,8 +282,8 @@ describe('useModuleOverflowMenu', () => {
     store.dispatch = jest.fn()
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseIsLegacySessionsInProgress.mockReturnValue(true)
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: true,
       isRunStill: true,
       isRunTerminal: false,
       isRunIdle: false,
@@ -363,40 +337,6 @@ describe('useModuleOverflowMenu', () => {
       },
     })
   })
-  it('should render heater shaker module and create deactive shaker command', () => {
-    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
-      <I18nextProvider i18n={i18n}>
-        <Provider store={store}>{children}</Provider>
-      </I18nextProvider>
-    )
-    const { result } = renderHook(
-      () =>
-        useModuleOverflowMenu(
-          mockDeactivateShakeHeaterShaker,
-          null,
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
-          jest.fn(),
-          false
-        ),
-      {
-        wrapper,
-      }
-    )
-    const { menuOverflowItemsByModuleType } = result.current
-    const heaterShakerMenu =
-      menuOverflowItemsByModuleType.heaterShakerModuleType
-    act(() => heaterShakerMenu[1].onClick(true))
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'heaterShaker/deactivateShaker',
-        params: {
-          moduleId: mockDeactivateShakeHeaterShaker.id,
-        },
-      },
-    })
-  })
   it('should render heater shaker module and calls handleClick when module is idle and calls other handles when button is selected', () => {
     const mockHandleSlideoutClick = jest.fn()
     const mockAboutClick = jest.fn()
@@ -426,7 +366,7 @@ describe('useModuleOverflowMenu', () => {
     const heaterShakerMenu =
       menuOverflowItemsByModuleType.heaterShakerModuleType
 
-    act(() => heaterShakerMenu[1].onClick(true))
+    act(() => heaterShakerMenu[0].onClick(true))
     expect(mockHandleSlideoutClick).toHaveBeenCalled()
   })
 

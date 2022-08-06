@@ -28,7 +28,7 @@ async def main() -> NoReturn:
 
     async with name_management.NameSynchronizer.start() as name_synchronizer:
         LOG.info("Building openembedded update server")
-        app = get_app(
+        app = await get_app(
             system_version_file=args.version_file,
             config_file_override=args.config_file,
             name_synchronizer=name_synchronizer,

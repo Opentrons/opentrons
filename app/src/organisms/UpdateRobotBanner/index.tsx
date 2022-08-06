@@ -55,7 +55,7 @@ export function UpdateRobotBanner(props: UpdateRobotBannerProps): JSX.Element {
             css={TYPOGRAPHY.pRegular}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
           >
-            {t('robot_server_versions_view_update')}
+            {t('view_update')}
           </Btn>
         </Banner>
       ) : null}

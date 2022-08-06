@@ -60,12 +60,11 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
     <Box
       css={selectedValue === liquidId ? ACTIVE_STYLE : LIQUID_CARD_STYLE}
       borderRadius={BORDERS.radiusSoftCorners}
-      marginBottom={SPACING.spacing3}
       padding={SPACING.spacing4}
       backgroundColor={COLORS.white}
       onClick={() => setSelectedValue(liquidId)}
-      width={'10.3rem'}
-      minHeight={'max-content'}
+      width="10.3rem"
+      minHeight="max-content"
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
@@ -73,15 +72,15 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       >
         <Flex
           css={BORDERS.cardOutlineBorder}
-          padding={'0.75rem'}
-          height={'max-content'}
-          width={'max-content'}
+          padding={SPACING.spacing3}
+          height="max-content"
+          width="max-content"
           backgroundColor={COLORS.white}
         >
           <Icon name="circle" color={displayColor} size={SIZE_1} />
         </Flex>
         <StyledText
-          as="p"
+          as="h3"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing3}
         >
@@ -97,8 +96,8 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
         <Flex
           backgroundColor={COLORS.darkBlack + '1A'}
           borderRadius={BORDERS.radiusSoftCorners}
-          height={'max-content'}
-          width={'max-content'}
+          height="max-content"
+          width="max-content"
           paddingY={SPACING.spacing2}
           paddingX={SPACING.spacing3}
           marginTop={SPACING.spacing3}
@@ -111,27 +110,27 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
       </Flex>
       {selectedValue === liquidId ? (
         <>
-          <Divider marginX={'-1rem'} marginY={SPACING.spacing4} />
+          <Divider marginX="-1rem" marginY={SPACING.spacing4} />
           {volumePerWellRange.map((well, index) => {
             return (
               <Flex
                 key={index}
                 flexDirection={DIRECTION_ROW}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
+                paddingBottom={
+                  index !== volumePerWellRange.length - 1
+                    ? SPACING.spacing3
+                    : '0'
+                }
               >
                 <StyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  marginTop={SPACING.spacing3}
                   marginRight={SPACING.spacing2}
                 >
                   {well.wellName}
                 </StyledText>
-                <StyledText
-                  as="p"
-                  fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  marginTop={SPACING.spacing3}
-                >
+                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
                   {well.volume} {MICRO_LITERS}
                 </StyledText>
               </Flex>

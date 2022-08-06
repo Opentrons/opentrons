@@ -32,7 +32,7 @@ async def test_cli(
     """
     Build an app using dummy versions, then build a test client and return it
     """
-    app = openembedded.get_app(
+    app = await openembedded.get_app(
         name_synchronizer=mock_name_synchronizer,
         system_version_file=version_file_path,
         config_file_override=otupdate_config,
@@ -40,11 +40,6 @@ async def test_cli(
     )
     client = await aiohttp_client(app)
     return client
-
-
-def mock_root_fs_interface_() -> MagicMock:
-    """Mock RootFSInterface."""
-    return MagicMock(spec=RootFSInterface)
 
 
 @pytest.fixture

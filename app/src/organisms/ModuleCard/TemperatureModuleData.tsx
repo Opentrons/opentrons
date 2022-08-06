@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  FONT_SIZE_CAPTION,
-  Text,
   SPACING,
   COLORS,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { StatusLabel } from '../../atoms/StatusLabel'
+import { StyledText } from '../../atoms/text'
 import type { TemperatureStatus } from '../../redux/modules/api-types'
 
 interface TemperatureModuleProps {
@@ -57,16 +57,16 @@ export const TemperatureModuleData = (
         pulse={pulse}
       />
       <Flex
-        fontSize={FONT_SIZE_CAPTION}
+        fontSize={TYPOGRAPHY.fontSizeCaption}
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`temp_module_data`}
+        data-testid="temp_module_data"
       >
-        <Text marginBottom={SPACING.spacing1}>
+        <StyledText marginBottom={SPACING.spacing1}>
           {t(targetTemp == null ? 'na_temp' : 'target_temp', {
             temp: targetTemp,
           })}
-        </Text>
-        <Text>{t('current_temp', { temp: currentTemp })}</Text>
+        </StyledText>
+        <StyledText>{t('current_temp', { temp: currentTemp })}</StyledText>
       </Flex>
     </>
   )

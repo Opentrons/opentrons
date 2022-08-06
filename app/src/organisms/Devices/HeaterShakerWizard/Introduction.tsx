@@ -4,7 +4,6 @@ import { css } from 'styled-components'
 import {
   Flex,
   DIRECTION_COLUMN,
-  Text,
   TYPOGRAPHY,
   COLORS,
   JUSTIFY_CENTER,
@@ -23,6 +22,7 @@ import deepwell from '@opentrons/app/src/assets/images/deepwell_thermal_adapter.
 import pcr from '@opentrons/app/src/assets/images/pcr_thermal_adapter.png'
 import universal from '@opentrons/app/src/assets/images/universal_thermal_adapter.png'
 import screwdriver from '@opentrons/app/src/assets/images/t10_torx_screwdriver.png'
+import { StyledText } from '@opentrons/app/src/atoms/text/StyledText'
 
 import type {
   LabwareDefinition2,
@@ -80,7 +80,7 @@ const IntroItem = (props: IntroContainerProps): JSX.Element => {
       marginTop={SPACING.spacing3}
       border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGrey}`}
       flexDirection={DIRECTION_ROW}
-      width={'21.5rem'}
+      width="21.5rem"
       paddingBottom={SPACING.spacing3}
     >
       {props.image != null ? (
@@ -129,33 +129,28 @@ export function Introduction(props: IntroductionProps): JSX.Element {
 
   return (
     <Flex
-      padding={TYPOGRAPHY.lineHeight20}
+      padding={SPACING.spacingM}
       flexDirection={DIRECTION_COLUMN}
-      color={COLORS.darkBlack}
-      fontWeight={TYPOGRAPHY.fontWeightRegular}
       marginBottom={labwareDefinition != null ? '4.313rem' : '9.375rem'}
     >
-      <Text
-        fontSize={TYPOGRAPHY.lineHeight16}
-        data-testid={`introduction_title`}
-      >
+      <StyledText css={TYPOGRAPHY.h2Regular} data-testid="introduction_title">
         {t('use_this_heater_shaker_guide')}
-      </Text>
+      </StyledText>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex justifyContent={JUSTIFY_CENTER}>
-          <Text
-            paddingTop={TYPOGRAPHY.fontSizeH6}
+          <StyledText
+            paddingTop="0.563rem"
             fontSize={TYPOGRAPHY.fontSizeH4}
             flexDirection={DIRECTION_ROW}
-            width={'21.5rem'}
-            data-testid={`introduction_subtitle`}
+            width="21.5rem"
+            data-testid="introduction_subtitle"
           >
             {t('you_will_need')}
-          </Text>
+          </StyledText>
         </Flex>
         <Flex
           justifyContent={JUSTIFY_CENTER}
-          data-testid={`introduction_item_adapter`}
+          data-testid="introduction_item_adapter"
         >
           <IntroItem
             text={
@@ -167,8 +162,8 @@ export function Introduction(props: IntroductionProps): JSX.Element {
             image={
               thermalAdapterName != null ? (
                 <Flex
-                  width={'6.2rem'}
-                  height={'4.313rem'}
+                  width="6.2rem"
+                  height="4.313rem"
                   css={THERMAL_ADAPTER_TRANSFORM}
                 >
                   <img src={adapterImage} alt={`${thermalAdapterName}`} />
@@ -179,7 +174,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
         </Flex>
         <Flex
           justifyContent={JUSTIFY_CENTER}
-          data-testid={`introduction_item_labware`}
+          data-testid="introduction_item_labware"
         >
           <IntroItem
             text={
@@ -189,7 +184,7 @@ export function Introduction(props: IntroductionProps): JSX.Element {
             }
             image={
               labwareDefinition != null ? (
-                <Flex width={'6.2rem'} height={'4.3rem'}>
+                <Flex width="6.2rem" height="4.3rem">
                   <RobotWorkSpace viewBox={VIEW_BOX}>
                     {() => {
                       return (
@@ -206,19 +201,19 @@ export function Introduction(props: IntroductionProps): JSX.Element {
         </Flex>
         <Flex
           justifyContent={JUSTIFY_CENTER}
-          data-testid={`introduction_item_heater_shaker`}
+          data-testid="introduction_item_heater_shaker"
         >
           <IntroItem
-            image={<img src={heaterShaker} alt={'heater_shaker_image'} />}
+            image={<img src={heaterShaker} alt="heater_shaker_image" />}
             text={getModuleDisplayName(props.moduleModel)}
           />
         </Flex>
         <Flex
           justifyContent={JUSTIFY_CENTER}
-          data-testid={`intrudction_intro_item_screwdriver`}
+          data-testid="intrudction_intro_item_screwdriver"
         >
           <IntroItem
-            image={<img src={screwdriver} alt={'screwdriver_image'} />}
+            image={<img src={screwdriver} alt="screwdriver_image" />}
             text={t('t10_torx_screwdriver', { name: 'T10 Torx' })}
             subtext={t('about_screwdriver')}
           />

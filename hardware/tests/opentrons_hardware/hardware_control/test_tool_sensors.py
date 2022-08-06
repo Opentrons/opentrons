@@ -120,7 +120,7 @@ async def test_capacitive_probe(
                             group_id=UInt8Field(0),
                             seq_id=UInt8Field(0),
                             current_position_um=UInt32Field(10000),
-                            encoder_position=Int32Field(10000),
+                            encoder_position_um=Int32Field(10000),
                             ack_id=UInt8Field(0),
                         )
                     ),
@@ -207,7 +207,7 @@ async def test_capacitive_sweep(
                             group_id=UInt8Field(0),
                             seq_id=UInt8Field(0),
                             current_position_um=UInt32Field(10000),
-                            encoder_position=Int32Field(10000),
+                            encoder_position_um=Int32Field(10000),
                             ack_id=UInt8Field(0),
                         )
                     ),

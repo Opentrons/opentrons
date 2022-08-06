@@ -21,12 +21,17 @@ class Location(BaseModel):
     moduleId: Optional[str]
 
 
-# TODO (tamar 3/15/22): split apart all the command payloads when we tackle #9583
+class ProfileStep(BaseModel):
+    celsius: float
+    holdSeconds: float
+
+
 class WellLocation(BaseModel):
     origin: Optional[str]
     offset: Optional[OffsetVector]
 
 
+# TODO (tamar 3/15/22): split apart all the command payloads when we tackle #9583
 class Params(BaseModel):
     slotName: Optional[str]
     axes: Optional[List[str]]
@@ -57,6 +62,7 @@ class Params(BaseModel):
     rpm: Optional[float]
     height: Optional[float]
     offset: Optional[OffsetVector]
+    profile: Optional[List[ProfileStep]]
 
 
 class Command(BaseModel):

@@ -8,20 +8,24 @@ from opentrons.protocol_engine.state.module_substates import (
     HeaterShakerModuleSubState,
     HeaterShakerModuleId,
 )
-from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.protocol_engine.commands import heater_shaker
 from opentrons.protocol_engine.commands.heater_shaker.open_labware_latch import (
     OpenLabwareLatchImpl,
 )
+from opentrons.protocol_engine.types import MotorAxis
 
 
 async def test_open_labware_latch(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
+    movement: MovementHandler,
 ) -> None:
     """It should be able to open the module's labware latch."""
-    subject = OpenLabwareLatchImpl(state_view=state_view, equipment=equipment)
+    subject = OpenLabwareLatchImpl(
+        state_view=state_view, equipment=equipment, movement=movement
+    )
     data = heater_shaker.OpenLabwareLatchParams(moduleId="input-heater-shaker-id")
 
     hs_module_substate = decoy.mock(cls=HeaterShakerModuleSubState)
@@ -37,6 +41,12 @@ async def test_open_labware_latch(
         HeaterShakerModuleId("heater-shaker-id")
     )
 
+    decoy.when(
+        state_view.motion.check_pipette_blocking_hs_latch(
+            HeaterShakerModuleId("heater-shaker-id")
+        )
+    ).then_return(True)
+
     # Get stubbed hardware module
     decoy.when(
         equipment.get_module_hardware_api(HeaterShakerModuleId("heater-shaker-id"))
@@ -44,6 +54,8 @@ async def test_open_labware_latch(
 
     result = await subject.execute(data)
     decoy.verify(
-        hs_module_substate.raise_if_shaking(), await hs_hardware.open_labware_latch()
+        hs_module_substate.raise_if_shaking(),
+        await movement.home([MotorAxis.RIGHT_Z, MotorAxis.LEFT_Z]),
+        await hs_hardware.open_labware_latch(),
     )
-    assert result == heater_shaker.OpenLabwareLatchResult()
+    assert result == heater_shaker.OpenLabwareLatchResult(pipetteRetracted=True)

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useCreateCommandMutation } from '@opentrons/react-api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -15,7 +15,7 @@ import {
 } from '../../ProtocolSetup/RunSetupCard/ModuleSetup/Banner/Banner'
 import { SecureLabwareModal } from '../../ProtocolSetup/RunSetupCard/LabwareSetup/SecureLabwareModal'
 
-import type { ModuleRenderInfoForProtocol } from '../hooks'
+import { ModuleRenderInfoForProtocol } from '../hooks'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
@@ -25,13 +25,12 @@ import type { ModuleTypesThatRequiresExtraAttention } from '../../ProtocolSetup/
 interface ModuleExtraAttentionProps {
   moduleTypes: ModuleType[]
   modulesInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
-  runId: string
 }
 
 export const ModuleExtraAttention = (
   props: ModuleExtraAttentionProps
 ): JSX.Element => {
-  const { moduleTypes, modulesInfo, runId } = props
+  const { moduleTypes, modulesInfo } = props
   const { t } = useTranslation('protocol_setup')
   const [
     secureLabwareModalType,
@@ -56,7 +55,6 @@ export const ModuleExtraAttention = (
             {index > 0 && <Divider color={COLORS.medGrey} />}
             {
               <ModuleExtraAttentionItem
-                runId={runId}
                 moduleInfo={module}
                 onClick={() =>
                   setSecureLabwareModalType(module.moduleDef.moduleType)
@@ -73,15 +71,14 @@ export const ModuleExtraAttention = (
 interface ModuleExtraAttentionItemProps {
   moduleInfo: ModuleRenderInfoForProtocol
   onClick: () => unknown
-  runId: string
 }
 
 const ModuleExtraAttentionItem = (
   props: ModuleExtraAttentionItemProps
 ): JSX.Element | null => {
-  const { moduleInfo, onClick, runId } = props
+  const { moduleInfo, onClick } = props
   const { t } = useTranslation(['heater_shaker', 'protocol_setup'])
-  const { createCommand } = useCreateCommandMutation()
+  const { createLiveCommand } = useCreateLiveCommandMutation()
 
   switch (moduleInfo.moduleDef.moduleType) {
     case MAGNETIC_MODULE_TYPE:
@@ -112,12 +109,11 @@ const ModuleExtraAttentionItem = (
           commandType: isLatchClosed
             ? 'heaterShaker/openLabwareLatch'
             : 'heaterShaker/closeLabwareLatch',
-          params: { moduleId: moduleInfo.moduleId },
+          params: { moduleId: moduleInfo.attachedModuleMatch.id },
         }
 
         const toggleLatch = (): void => {
-          createCommand({
-            runId: runId,
+          createLiveCommand({
             command: latchCommand,
           }).catch((e: Error) => {
             console.error(

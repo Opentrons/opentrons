@@ -5,7 +5,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import {
   Flex,
   Box,
-  Text,
   SIZE_2,
   TYPOGRAPHY,
   JUSTIFY_SPACE_BETWEEN,
@@ -17,6 +16,7 @@ import {
   getAnalyticsOptedIn,
 } from '../../redux/analytics'
 import { ToggleButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
 
 import type { Dispatch, State } from '../../redux/types'
 
@@ -34,12 +34,15 @@ export function PrivacySettings(): JSX.Element {
       gridGap={SPACING.spacing4}
     >
       <Box width="70%">
-        <Text css={TYPOGRAPHY.h3SemiBold} paddingBottom={SPACING.spacing3}>
+        <StyledText
+          css={TYPOGRAPHY.h3SemiBold}
+          paddingBottom={SPACING.spacing3}
+        >
           {t('share_analytics')}
-        </Text>
-        <Text css={TYPOGRAPHY.pRegular} paddingBottom={SPACING.spacing3}>
+        </StyledText>
+        <StyledText css={TYPOGRAPHY.pRegular} paddingBottom={SPACING.spacing3}>
           {t('analytics_description')}
-        </Text>
+        </StyledText>
       </Box>
       <ToggleButton
         label="analytics_opt_in"
