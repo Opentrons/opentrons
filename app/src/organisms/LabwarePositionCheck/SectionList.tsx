@@ -39,7 +39,7 @@ export function SectionList(props: Props): JSX.Element {
 
   return (
     <Box
-      fontSize={TYPOGRAPHY.fontSizeH3}
+      fontSize={TYPOGRAPHY.fontSizeCaption}
       padding={SPACING.spacing3}
       width="14rem"
       boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
