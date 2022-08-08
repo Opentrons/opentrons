@@ -138,7 +138,6 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
             ),
         ],
     ]
-    # TODO: change MoveStopCondition.cap_sensor to sync
 
     # threshold_payload = payloads.SetSensorThresholdRequestPayload(
     #     sensor=fields.SensorTypeField(SensorType.capacitive),
