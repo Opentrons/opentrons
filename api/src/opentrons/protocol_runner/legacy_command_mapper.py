@@ -302,7 +302,7 @@ class LegacyCommandMapper:
             if parentModuleId is not None:
                 labware_id = self._labware_id_by_module_id[parentModuleId]
             else:
-            slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
+                slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
                 labware_id = self._labware_id_by_slot[slot]
             mount = MountType(pipette.mount)
             well_name = well.well_name
