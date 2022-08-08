@@ -290,19 +290,19 @@ class LegacyCommandMapper:
             location = command["payload"].get("location")
             volume = command["payload"].get("volume")
             flowRate = command["payload"].get("rate")
-            assert volume is not None
-            assert flowRate is not None
+            if flowRate is None:
+                flowRate = pipette.flow_rate.aspirate
+            if volume is None:
+                raise Exception("Unknown asiprate volume.")
             if isinstance(location, Location):
                 well = location.labware.as_well()
             else:
                 raise Exception("Unknown aspirate location.")
-            parentModuleId = self._module_id_by_slot.get(  # type: ignore
-                location.labware.first_parent()
-            )
+            parentModuleId = self._module_id_by_slot.get(location.labware.first_parent())  # type: ignore
             if parentModuleId is not None:
                 labware_id = self._labware_id_by_module_id[parentModuleId]
             else:
-                slot = DeckSlotName.from_primitive(location.labware.first_parent())  # type: ignore[arg-type]
+            slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
                 labware_id = self._labware_id_by_slot[slot]
             mount = MountType(pipette.mount)
             well_name = well.well_name
@@ -332,15 +332,15 @@ class LegacyCommandMapper:
             location = command["payload"].get("location")
             volume = command["payload"].get("volume")
             flowRate = command["payload"].get("rate")
-            assert volume is not None
-            assert flowRate is not None
+            if flowRate is None:
+                flowRate = pipette.flow_rate.dispense
+            if volume is None:
+                raise Exception("Unknown dispense volume.")
             if isinstance(location, Location):
                 well = location.labware.as_well()
             else:
                 raise Exception("Unknown dispense location.")
-            parentModuleId = self._module_id_by_slot.get(  # type: ignore
-                location.labware.first_parent()
-            )
+            parentModuleId = self._module_id_by_slot.get(location.labware.first_parent())  # type: ignore
             if parentModuleId is not None:
                 labware_id = self._labware_id_by_module_id[parentModuleId]
             else:
@@ -375,9 +375,7 @@ class LegacyCommandMapper:
                 well = location.labware.as_well()
             else:
                 raise Exception("Unknown blow out location.")
-            parentModuleId = self._module_id_by_slot.get(  # type: ignore
-                location.labware.first_parent()
-            )
+            parentModuleId = self._module_id_by_slot.get(location.labware.first_parent())  # type: ignore
             if parentModuleId is not None:
                 labware_id = self._labware_id_by_module_id[parentModuleId]
             else:
