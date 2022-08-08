@@ -4,7 +4,7 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { useAllLabware } from '../../../pages/Labware/hooks'
-import { mockDefinition } from '../../../redux/custom-labware/__fixtures__'
+import { mockOpentronsLabwareDetailsDefinition } from '../../../redux/custom-labware/__fixtures__'
 import { CustomLabwareOverflowMenu } from '../../LabwareCard/CustomLabwareOverflowMenu'
 
 import { LabwareDetails } from '..'
@@ -35,10 +35,12 @@ describe('LabwareDetails', () => {
     mockCustomLabwareOverflowMenu.mockReturnValue(
       <div>Mock CustomLabwareOverflowMenu</div>
     )
-    mockUseAllLabware.mockReturnValue([{ definition: mockDefinition }])
+    mockUseAllLabware.mockReturnValue([
+      { definition: mockOpentronsLabwareDetailsDefinition },
+    ])
     props = {
       labware: {
-        definition: mockDefinition,
+        definition: mockOpentronsLabwareDetailsDefinition,
       },
       onClose: jest.fn(),
     }
@@ -69,10 +71,13 @@ describe('LabwareDetails', () => {
     getByText('Footprint (mm)')
     // length label and value
     getByText('length')
+    getByText('10.00')
     // width label and value
     getByText('width')
+    getByText('20.00')
     // height label and value
     getByText('height')
+    getByText('30.00')
     // well measurement (mm) label
     // depth label and value
     // x-size label and value
