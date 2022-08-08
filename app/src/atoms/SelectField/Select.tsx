@@ -44,7 +44,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       border: BORDERS.lineBorder,
       width: props.width != null ? props.width : 'auto',
       height: SPACING.spacing4,
-      borderColor: COLORS.medGrey,
+      borderColor: COLORS.medGreyEnabled,
       boxShadow: 'none',
       padding: '0.375rem',
       flexDirection: DIRECTION_ROW,
@@ -63,7 +63,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     group: NO_STYLE_FN,
     groupHeading: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      color: COLORS.darkBlack,
+      color: COLORS.darkBlackEnabled,
       fontWeight: TYPOGRAPHY.fontWeightSemiBold,
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
@@ -100,11 +100,13 @@ export function Select(props: SelectComponentProps): JSX.Element {
     noOptionsMessage: (styles: CSSObjectWithLabel) => ({
       ...styles,
       padding: '0.375rem',
-      color: COLORS.darkBlack,
+      color: COLORS.darkBlackEnabled,
     }),
     option: (styles: CSSObjectWithLabel, state: OptionProps<SelectOption>) => ({
       ...styles,
-      color: Boolean(state.isDisabled) ? COLORS.greyDisabled : COLORS.darkBlack,
+      color: Boolean(state.isDisabled)
+        ? COLORS.darkGreyDisabled
+        : COLORS.darkBlackEnabled,
       backgroundColor: Boolean(state.isSelected)
         ? COLORS.lightBlue
         : COLORS.white,
@@ -118,7 +120,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     placeholder: (styles: CSSObjectWithLabel) => ({
       ...styles,
       marginLeft: SPACING.spacingSS,
-      color: COLORS.darkBlack,
+      color: COLORS.darkBlackEnabled,
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
     singleValue: (styles: CSSObjectWithLabel) => ({

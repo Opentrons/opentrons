@@ -37,10 +37,10 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: #16212d26;
+    background: ${COLORS.lightGreyEnabled};
   }
   &:active {
-    background: #16212d40;
+    background: ${COLORS.lightGreyHover};
   }
 `
 export interface LabwareDetailsProps {
@@ -83,7 +83,11 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       </Flex>
       {!isCustomDefinition && (
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <Icon color={COLORS.blue} name="check-decagram" height=".7rem" />{' '}
+          <Icon
+            color={COLORS.blueEnabled}
+            name="check-decagram"
+            height=".7rem"
+          />{' '}
           <StyledText
             as="label"
             id="LabwareDetails_opentronsDef"
@@ -120,7 +124,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
     <Slideout onCloseClick={props.onClose} title={slideoutHeader} isExpanded>
       <Gallery definition={definition} />
       <Box
-        backgroundColor={COLORS.lightGrey}
+        backgroundColor={COLORS.fundamentalsBackground}
         padding={SPACING.spacing4}
         marginBottom={SPACING.spacing5}
         overflowWrap="break-word"

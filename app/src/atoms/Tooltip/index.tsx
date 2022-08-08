@@ -18,7 +18,7 @@ export function Tooltip(props: TooltipProps): JSX.Element {
   return (
     <SharedTooltip
       {...tooltipProps}
-      backgroundColor={COLORS.darkBlack}
+      backgroundColor={COLORS.darkBlackEnabled}
       fontSize={TYPOGRAPHY.fontSizeCaption}
       width="8.75rem"
     >

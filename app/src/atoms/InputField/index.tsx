@@ -69,7 +69,7 @@ export function InputField(props: InputFieldProps): JSX.Element {
       lineHeight={1}
       fontSize={TYPOGRAPHY.fontSizeP}
       fontWeight={TYPOGRAPHY.fontWeightRegular}
-      color={props.error ? COLOR_WARNING_DARK : COLORS.darkBlack}
+      color={props.error ? COLOR_WARNING_DARK : COLORS.darkBlackEnabled}
       opacity={props.disabled ? 0.5 : ''}
     >
       <Input {...props} />
@@ -88,7 +88,7 @@ function Input(props: InputFieldProps): JSX.Element {
     border-radius: ${SPACING.spacing2};
     padding: ${SPACING.spacing3};
     border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
-      ${error ? COLORS.error : COLORS.medGrey};
+      ${error ? COLORS.errorEnabled : COLORS.medGreyEnabled};
     font-size: ${TYPOGRAPHY.fontSizeP};
 
     &:active {
@@ -98,7 +98,7 @@ function Input(props: InputFieldProps): JSX.Element {
 
     & input {
       border-radius: inherit;
-      color: ${COLORS.darkBlack};
+      color: ${COLORS.darkBlackEnabled};
       border: none;
       flex: 1 1 auto;
       width: 100%;
@@ -110,13 +110,14 @@ function Input(props: InputFieldProps): JSX.Element {
 
     &:hover {
       border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
-        ${error ? COLORS.error : COLORS.medGreyHover};
+        ${error ? COLORS.errorEnabled : COLORS.medGreyHover};
     }
     &:focus {
-      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.blue};
+      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.blueEnabled};
     }
     &:disabled {
-      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.greyDisabled};
+      border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+        ${COLORS.darkGreyDisabled};
     }
     input[type='number']::-webkit-inner-spin-button,
     input[type='number']::-webkit-outer-spin-button {
@@ -156,7 +157,7 @@ function Input(props: InputFieldProps): JSX.Element {
         {props.secondaryCaption ? (
           <Flex paddingBottom={SPACING.spacing2}>{props.secondaryCaption}</Flex>
         ) : null}
-        <Flex color={COLORS.error}>{props.error}</Flex>
+        <Flex color={COLORS.errorEnabled}>{props.error}</Flex>
       </Flex>
     </Flex>
   )

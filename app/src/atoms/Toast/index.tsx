@@ -55,23 +55,23 @@ const toastStyleByType: {
 } = {
   error: {
     iconName: 'alert-circle',
-    color: COLORS.error,
-    backgroundColor: COLORS.errorBg,
+    color: COLORS.errorEnabled,
+    backgroundColor: COLORS.errorBackground,
   },
   warning: {
     iconName: 'alert-circle',
-    color: COLORS.warning,
-    backgroundColor: COLORS.warningBg,
+    color: COLORS.warningEnabled,
+    backgroundColor: COLORS.warningBackground,
   },
   success: {
     iconName: 'check-circle',
-    color: COLORS.success,
-    backgroundColor: COLORS.successBg,
+    color: COLORS.successEnabled,
+    backgroundColor: COLORS.successBackground,
   },
   info: {
     iconName: 'information',
     color: COLORS.darkGreyEnabled,
-    backgroundColor: COLORS.greyDisabled,
+    backgroundColor: COLORS.darkGreyDisabled,
   },
 }
 

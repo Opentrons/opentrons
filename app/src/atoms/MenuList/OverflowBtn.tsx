@@ -7,7 +7,7 @@ const overflowButtonStyles = css`
   max-height: ${SPACING.spacing6};
 
   &:hover {
-    background-color: #16212d26;
+    background-color: ${COLORS.lightGreyEnabled};
   }
   &:hover circle {
     fill: ${COLORS.darkGreyHover};
@@ -15,7 +15,7 @@ const overflowButtonStyles = css`
 
   &:active,
   &:focus {
-    background-color: #16212d40;
+    background-color: ${COLORS.lightGreyHover};
   }
 
   &:active circle,
@@ -24,7 +24,7 @@ const overflowButtonStyles = css`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
     // focus-visible takes over focus background-color tried focus-only but didn't work
     background-color: transparent;
   }
