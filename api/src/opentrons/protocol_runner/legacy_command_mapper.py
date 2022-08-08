@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from datetime import datetime
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 from opentrons.types import MountType, DeckSlotName, Location
 from opentrons.commands import types as legacy_command_types
@@ -154,7 +154,17 @@ class LegacyCommandMapper:
                     completed_command = running_command.copy(
                         update={
                             "result": pe_commands.AspirateResult.construct(
-                                volume=running_command.params.volume,
+                                volume=running_command.params.volume
+                            ),
+                            "status": pe_commands.CommandStatus.SUCCEEDED,
+                            "completedAt": now,
+                        }
+                    )
+                elif isinstance(running_command, pe_commands.Dispense):
+                    completed_command = running_command.copy(
+                        update={
+                            "result": pe_commands.DispenseResult.construct(
+                                volume=running_command.params.volume
                             ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
@@ -164,16 +174,6 @@ class LegacyCommandMapper:
                     completed_command = running_command.copy(
                         update={
                             "result": pe_commands.BlowOutResult.construct(),
-                            "status": pe_commands.CommandStatus.SUCCEEDED,
-                            "completedAt": now,
-                        }
-                    )
-                elif isinstance(running_command, pe_commands.Dispense):
-                    completed_command = running_command.copy(
-                        update={
-                            "result": pe_commands.DispenseResult.construct(
-                                volume=running_command.params.volume,
-                            ),
                             "status": pe_commands.CommandStatus.SUCCEEDED,
                             "completedAt": now,
                         }
@@ -290,11 +290,13 @@ class LegacyCommandMapper:
             location = command["payload"].get("location")
             volume = command["payload"].get("volume")
             flowRate = command["payload"].get("rate")
+            assert volume is not None
+            assert flowRate is not None
             if isinstance(location, Location):
                 well = location.labware.as_well()
             else:
                 raise Exception("Unknown aspirate location.")
-            parentModuleId = self._module_id_by_slot.get(
+            parentModuleId = self._module_id_by_slot.get(  # type: ignore
                 location.labware.first_parent()
             )
             if parentModuleId is not None:
@@ -330,11 +332,13 @@ class LegacyCommandMapper:
             location = command["payload"].get("location")
             volume = command["payload"].get("volume")
             flowRate = command["payload"].get("rate")
+            assert volume is not None
+            assert flowRate is not None
             if isinstance(location, Location):
                 well = location.labware.as_well()
             else:
                 raise Exception("Unknown dispense location.")
-            parentModuleId = self._module_id_by_slot.get(
+            parentModuleId = self._module_id_by_slot.get(  # type: ignore
                 location.labware.first_parent()
             )
             if parentModuleId is not None:
@@ -371,7 +375,7 @@ class LegacyCommandMapper:
                 well = location.labware.as_well()
             else:
                 raise Exception("Unknown blow out location.")
-            parentModuleId = self._module_id_by_slot.get(
+            parentModuleId = self._module_id_by_slot.get(  # type: ignore
                 location.labware.first_parent()
             )
             if parentModuleId is not None:
