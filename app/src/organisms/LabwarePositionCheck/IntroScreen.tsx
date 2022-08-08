@@ -13,7 +13,6 @@ import {
   ALIGN_CENTER,
   SPACING_2,
   SPACING_3,
-  FONT_SIZE_BODY_2,
   SPACING_6,
 } from '@opentrons/components'
 import { useCurrentRun } from '../ProtocolUpload/hooks'
@@ -63,7 +62,9 @@ export const IntroScreen = (props: {
         t={t}
         i18nKey="position_check_description"
         components={{
-          block: <Text fontSize={FONT_SIZE_BODY_2} marginBottom={SPACING_2} />,
+          block: (
+            <Text fontSize={TYPOGRAPHY.fontSizeH3} marginBottom={SPACING_2} />
+          ),
         }}
       ></Trans>
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>

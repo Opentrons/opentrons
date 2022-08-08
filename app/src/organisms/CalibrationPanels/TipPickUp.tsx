@@ -9,7 +9,6 @@ import {
   ALIGN_FLEX_START,
   BORDER_SOLID_LIGHT,
   DIRECTION_COLUMN,
-  FONT_SIZE_BODY_2,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_RELATIVE,
@@ -21,6 +20,7 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   FONT_HEADER_DARK,
   SPACING_5,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
@@ -126,11 +126,11 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
             alignItems={ALIGN_CENTER}
             textAlign={TEXT_ALIGN_CENTER}
           >
-            <Text fontSize={FONT_SIZE_BODY_2} paddingX={SPACING_2}>
+            <Text fontSize={TYPOGRAPHY.fontSizeH3} paddingX={SPACING_2}>
               {jogUntilAbove}
             </Text>
             <Text
-              fontSize={FONT_SIZE_BODY_2}
+              fontSize={TYPOGRAPHY.fontSizeH3}
               marginBottom={SPACING_3}
               paddingX={SPACING_2}
             >

@@ -15,6 +15,7 @@ from otupdate.common.name_management.pretty_hostname import (
     persist_pretty_hostname as real_persist_pretty_hostname,
 )
 
+TEST_MACHINE_TYPE = "test machine"
 
 # TODO(mm, 2022-07-19): Mock out these functions differently so we don't have to
 # write out their signatures.
@@ -97,7 +98,9 @@ async def started_up_subject(
         mock_avahi_client.listen_for_collisions(matchers.Anything())
     ).then_enter_with(None)
 
-    async with NameSynchronizer.start(avahi_client=mock_avahi_client) as subject:
+    async with NameSynchronizer.start(
+        avahi_client=mock_avahi_client, machine_type=TEST_MACHINE_TYPE
+    ) as subject:
         yield subject
 
 
@@ -113,7 +116,7 @@ async def test_set(
     await started_up_subject.set_name("new name")
 
     decoy.verify(
-        await mock_avahi_client.start_advertising("new name"),
+        await mock_avahi_client.start_advertising("new name", TEST_MACHINE_TYPE),
         await mock_persist_pretty_hostname("new name"),
     )
 
@@ -129,9 +132,9 @@ async def test_set_does_not_persist_invalid_avahi_service_name(
     Covers this bug:
     https://github.com/Opentrons/opentrons/issues/9960
     """
-    decoy.when(await mock_avahi_client.start_advertising("danger!")).then_raise(
-        Exception("oh the humanity")
-    )
+    decoy.when(
+        await mock_avahi_client.start_advertising("danger!", TEST_MACHINE_TYPE)
+    ).then_raise(Exception("oh the humanity"))
 
     with pytest.raises(Exception, match="oh the humanity"):
         await started_up_subject.set_name("danger!")
@@ -167,11 +170,15 @@ async def test_advertises_initial_name(
         mock_avahi_client.listen_for_collisions(matchers.Anything())
     ).then_return(mock_collision_subscription_context_manager)
 
-    async with NameSynchronizer.start(avahi_client=mock_avahi_client):
+    async with NameSynchronizer.start(
+        avahi_client=mock_avahi_client, machine_type=TEST_MACHINE_TYPE
+    ):
         decoy.verify(
             # It should only start advertising after subscribing to collisions.
             await mock_collision_subscription_context_manager.__aenter__(),
-            await mock_avahi_client.start_advertising("initial name"),
+            await mock_avahi_client.start_advertising(
+                "initial name", TEST_MACHINE_TYPE
+            ),
         )
 
 
@@ -211,7 +218,9 @@ async def test_collision_handling(
         mock_avahi_client.listen_for_collisions(collision_callback_captor)
     ).then_return(mock_listen_context_manager)
 
-    async with NameSynchronizer.start(avahi_client=mock_avahi_client):
+    async with NameSynchronizer.start(
+        avahi_client=mock_avahi_client, machine_type=TEST_MACHINE_TYPE
+    ):
         captured_collision_callback = collision_callback_captor.value
         # Prompt the subject to run its collision-handling logic.
         await captured_collision_callback()
@@ -220,11 +229,13 @@ async def test_collision_handling(
 
     decoy.verify(
         await mock_listen_context_manager.__aenter__(),
-        await mock_avahi_client.start_advertising("initial name"),
+        await mock_avahi_client.start_advertising("initial name", TEST_MACHINE_TYPE),
         # The subject should only persist the alternative name *after*
         # the Avahi client accepts it for advertisement,
         # just in case the alternative name turns out to be invalid in some way.
         # https://github.com/Opentrons/opentrons/issues/9960
-        await mock_avahi_client.start_advertising("alternative name"),
+        await mock_avahi_client.start_advertising(
+            "alternative name", TEST_MACHINE_TYPE
+        ),
         await mock_persist_pretty_hostname("alternative name"),
     )
