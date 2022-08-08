@@ -1,17 +1,22 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { i18n } from '../../../i18n'
 import { renderWithProviders } from '@opentrons/components'
-import { StepMeter } from '..'
+import { i18n } from '../../../i18n'
+import { StepMeter } from '../../StepMeter'
+import { WizardHeader } from '..'
 
-const render = (props: React.ComponentProps<typeof StepMeter>) => {
-  return renderWithProviders(<StepMeter {...props} />, {
+jest.mock('../../StepMeter')
+
+const mockStepMeter = StepMeter as jest.MockedFunction<typeof StepMeter>
+
+const render = (props: React.ComponentProps<typeof WizardHeader>) => {
+  return renderWithProviders(<WizardHeader {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('StepMeter', () => {
-  let props: React.ComponentProps<typeof StepMeter>
+describe('WizardHeader', () => {
+  let props: React.ComponentProps<typeof WizardHeader>
 
   beforeEach(() => {
     props = {
@@ -19,8 +24,9 @@ describe('StepMeter', () => {
       totalSteps: 5,
       currentStep: 1,
       body: <div>this is a body</div>,
-      exit: jest.fn(),
+      onExit: jest.fn(),
     }
+    mockStepMeter.mockReturnValue(<div>step meter</div>)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -32,7 +38,8 @@ describe('StepMeter', () => {
     const exit = getByRole('button', { name: 'exit' })
     getByText('this is a body')
     fireEvent.click(exit)
-    expect(props.exit).toHaveBeenCalled()
+    expect(props.onExit).toHaveBeenCalled()
+    getByText('step meter')
   })
 
   it('renders correct information with step count visible', () => {
