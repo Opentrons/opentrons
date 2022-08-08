@@ -95,3 +95,60 @@ export const mockTipRackDefinition: LabwareDefinition2 = {
   wells: {},
   groups: [],
 }
+
+export const mockOpentronsLabwareDetailsDefinition: LabwareDefinition2 = {
+  version: 1,
+  schemaVersion: 2,
+  namespace: 'opentrons',
+  metadata: {
+    displayName: 'Mock Definition',
+    displayCategory: 'wellPlate',
+    displayVolumeUnits: 'mL',
+  },
+  dimensions: { xDimension: 10, yDimension: 20, zDimension: 30 },
+  cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
+  parameters: {
+    loadName: 'mock_definition',
+    format: 'mock',
+    isTiprack: false,
+    isMagneticModuleCompatible: false,
+  },
+  brand: { brand: 'Opentrons', brandId: ['mockOpentrons-123'] },
+  ordering: [],
+  wells: {
+    A1: {
+      depth: 10,
+      shape: 'rectangular',
+      totalLiquidVolume: 290000,
+      x: 11,
+      xDimension: 10,
+      y: 22,
+      yDimension: 72,
+      z: 33,
+    },
+  },
+  groups: [],
+}
+
+export const mockCustomLabwareDetailsDefinition: LabwareDefinition2 = {
+  version: 1,
+  schemaVersion: 2,
+  namespace: 'custom',
+  metadata: {
+    displayName: 'Mock Definition',
+    displayCategory: 'wellPlate',
+    displayVolumeUnits: 'mL',
+  },
+  dimensions: { xDimension: 0, yDimension: 0, zDimension: 0 },
+  cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
+  parameters: {
+    loadName: 'mock_definition',
+    format: 'mock',
+    isTiprack: false,
+    isMagneticModuleCompatible: false,
+  },
+  brand: { brand: 'Opentrons' },
+  ordering: [],
+  wells: {},
+  groups: [],
+}
