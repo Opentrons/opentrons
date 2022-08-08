@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.1-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.0.1-alpha.0...v6.0.1-alpha.1) (2022-08-08)
+
+
+### Bug Fixes
+
+* **app:** connect pipette settings form's submit button ([#11288](https://github.com/Opentrons/opentrons/issues/11288)) ([14228ac](https://github.com/Opentrons/opentrons/commit/14228ac5540d61c31f3dcf18543d9e3630bced51))
+
+
+
+
+
 ## [6.0.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.0.1-alpha.0) (2022-08-02)
 
 
