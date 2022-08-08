@@ -32,6 +32,7 @@ from ..actions import (
     UpdateCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
+    AddLiquidAction
 )
 from .abstract_store import HasState, HandlesActions
 
@@ -120,6 +121,9 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 version=action.definition.version,
             )
             self._state.definitions_by_uri[uri] = action.definition
+
+        elif isinstance(action, AddLiquidAction):
+            self._state.liquids[action.liquid_id] = action.liquid
 
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
