@@ -936,15 +936,15 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     def open_labware_latch(self) -> None:
         """Open the Heater-Shaker's labware latch.
 
-        NOTE:
-        1. This command will retract the pipettes up if they are parked east or west
-           of the Heater-Shaker.
-        2. The labware latch needs to be closed before:
+        The labware latch needs to be closed before:
             * Shaking
             * Pipetting to or from the labware on the Heater-Shaker
             * Pipetting to or from labware to the left or right of the Heater-Shaker
 
         Attempting to open the latch while the Heater-Shaker is shaking will raise an error.
+
+        .. note::
+            Before opening the latch, this command will retract the pipettes upward if they are parked adjacent to the left or right of the Heater-Shaker.
         """
         if self._module.speed_status != module_types.SpeedStatus.IDLE:
             # TODO: What to do when speed status is ERROR?
