@@ -93,12 +93,14 @@ export const mockTipRackDefinition: LabwareDefinition2 = {
   brand: { brand: 'Opentrons' },
   ordering: [],
   wells: {},
-  groups: [{
-    metadata: {
-      wellBottomShape: "v",
+  groups: [
+    {
+      metadata: {
+        wellBottomShape: 'v',
+      },
+      wells: ['A1'],
     },
-    wells: ["A1"]
-  },],
+  ],
 }
 
 export const mockOpentronsLabwareDetailsDefinition: LabwareDefinition2 = {
@@ -135,9 +137,9 @@ export const mockOpentronsLabwareDetailsDefinition: LabwareDefinition2 = {
   groups: [
     {
       metadata: {
-        wellBottomShape: "v",
+        wellBottomShape: 'v',
       },
-      wells: ["A1"]
+      wells: ['A1'],
     },
   ],
 }
