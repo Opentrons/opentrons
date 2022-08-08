@@ -93,7 +93,12 @@ export const mockTipRackDefinition: LabwareDefinition2 = {
   brand: { brand: 'Opentrons' },
   ordering: [],
   wells: {},
-  groups: [],
+  groups: [{
+    metadata: {
+      wellBottomShape: "v",
+    },
+    wells: ["A1"]
+  },],
 }
 
 export const mockOpentronsLabwareDetailsDefinition: LabwareDefinition2 = {
@@ -102,7 +107,7 @@ export const mockOpentronsLabwareDetailsDefinition: LabwareDefinition2 = {
   namespace: 'opentrons',
   metadata: {
     displayName: 'Mock Definition',
-    displayCategory: 'wellPlate',
+    displayCategory: 'reservoir',
     displayVolumeUnits: 'mL',
   },
   dimensions: { xDimension: 10, yDimension: 20, zDimension: 30 },
@@ -127,28 +132,12 @@ export const mockOpentronsLabwareDetailsDefinition: LabwareDefinition2 = {
       z: 33,
     },
   },
-  groups: [],
-}
-
-export const mockCustomLabwareDetailsDefinition: LabwareDefinition2 = {
-  version: 1,
-  schemaVersion: 2,
-  namespace: 'custom',
-  metadata: {
-    displayName: 'Mock Definition',
-    displayCategory: 'wellPlate',
-    displayVolumeUnits: 'mL',
-  },
-  dimensions: { xDimension: 0, yDimension: 0, zDimension: 0 },
-  cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
-  parameters: {
-    loadName: 'mock_definition',
-    format: 'mock',
-    isTiprack: false,
-    isMagneticModuleCompatible: false,
-  },
-  brand: { brand: 'Opentrons' },
-  ordering: [],
-  wells: {},
-  groups: [],
+  groups: [
+    {
+      metadata: {
+        wellBottomShape: "v",
+      },
+      wells: ["A1"]
+    },
+  ],
 }

@@ -6,20 +6,45 @@ import { i18n } from '../../../i18n'
 import { useAllLabware } from '../../../pages/Labware/hooks'
 import { mockOpentronsLabwareDetailsDefinition } from '../../../redux/custom-labware/__fixtures__'
 import { CustomLabwareOverflowMenu } from '../../LabwareCard/CustomLabwareOverflowMenu'
+import { Dimensions } from '../Dimensions'
+import { Gallery } from '../Gallery'
+import { ManufacturerDetails } from '../ManufacturerDetails'
+import { WellCount } from '../WellCount'
+import { WellProperties } from '../WellProperties'
+import { WellDimensions } from '../WellDimensions'
+import { WellSpacing } from '../WellSpacing'
 
 import { LabwareDetails } from '..'
 
-// import type { LabwareDefAndDate } from '../../../pages/Labware/hooks'
-
 jest.mock('../../../pages/Labware/hooks')
 jest.mock('../../LabwareCard/CustomLabwareOverflowMenu')
+jest.mock('../Dimensions')
+jest.mock('../Gallery')
+jest.mock('../ManufacturerDetails')
+jest.mock('../WellProperties')
+jest.mock('../WellCount')
+jest.mock('../WellDimensions')
+jest.mock('../WellSpacing')
 
 const mockCustomLabwareOverflowMenu = CustomLabwareOverflowMenu as jest.MockedFunction<
   typeof CustomLabwareOverflowMenu
 >
+const mockDimensions = Dimensions as jest.MockedFunction<typeof Dimensions>
+const mockGallery = Gallery as jest.MockedFunction<typeof Gallery>
+const mockManufacturerDetails = ManufacturerDetails as jest.MockedFunction<
+  typeof ManufacturerDetails
+>
 const mockUseAllLabware = useAllLabware as jest.MockedFunction<
   typeof useAllLabware
 >
+const mockWellCount = WellCount as jest.MockedFunction<typeof WellCount>
+const mockWellProperties = WellProperties as jest.MockedFunction<
+  typeof WellProperties
+>
+const mockWellDimensions = WellDimensions as jest.MockedFunction<
+  typeof WellDimensions
+>
+const mockWellSpacing = WellSpacing as jest.MockedFunction<typeof WellSpacing>
 
 const render = (
   props: React.ComponentProps<typeof LabwareDetails>
@@ -38,6 +63,13 @@ describe('LabwareDetails', () => {
     mockUseAllLabware.mockReturnValue([
       { definition: mockOpentronsLabwareDetailsDefinition },
     ])
+    mockDimensions.mockReturnValue(<div>Mock Dimensions</div>)
+    mockGallery.mockReturnValue(<div>Mock Gallery</div>)
+    mockManufacturerDetails.mockReturnValue(<div>Mock ManufacturerDetails</div>)
+    mockWellCount.mockReturnValue(<div>Mock WellCount</div>)
+    mockWellProperties.mockReturnValue(<div>Mock WellProperties</div>)
+    mockWellDimensions.mockReturnValue(<div>Mock WellDimensions</div>)
+    mockWellSpacing.mockReturnValue(<div>Mock WellSpacing</div>)
     props = {
       labware: {
         definition: mockOpentronsLabwareDetailsDefinition,
@@ -50,80 +82,38 @@ describe('LabwareDetails', () => {
     jest.resetAllMocks()
   })
   it('should render correct info for opentrons labware', () => {
-    props.labware.definition.namespace = 'opentrons'
     const [{ getByText }] = render(props)
-
-    // slideout title
-    // render close button
-    // svg
-    // image
-    // api name label
+    getByText('Mock Definition')
+    getByText('Opentrons Definition')
     getByText('API Name')
     getByText('mock_definition')
-    // well count label
-    getByText('Well Count')
-    // max volume, well shape label
-    getByText('max volume')
+    getByText('Mock Dimensions')
+    getByText('Mock Gallery')
+    getByText('Mock ManufacturerDetails')
+    getByText('Mock WellCount')
+    getByText('Mock WellProperties')
+    getByText('Mock WellDimensions')
+    getByText('Mock WellSpacing')
+  })
 
-    getByText('various')
-    // svg
-    // Footprint (mm) label
-    getByText('Footprint (mm)')
-    // length label and value
-    getByText('length')
-    getByText('10.00')
-    // width label and value
-    getByText('width')
-    getByText('20.00')
-    // height label and value
-    getByText('height')
-    getByText('30.00')
-    // well measurement (mm) label
-    // depth label and value
-    // x-size label and value
-    // y-size label and value
-    // spacing (mm) label and value
-    // x-offset label and value
-    // y-offset label and value
-    // x-spacing label and value
-    // y-spacing label and value
-    // manufacturer label and value
-    getByText('manufacturer')
-    getByText('Opentrons')
-    // manufacturer/catalog label and value
-    // website label and href
+  it('should no render Mock Well Dimensions, if a labware does not have groupMetaData', () => {
+    props.labware.definition.groups = []
+    const [{ queryByText }] = render(props)
+    expect(queryByText('Mock WellDimensions')).not.toBeInTheDocument()
   })
 
   it('should render correct info for custom labware', () => {
-    // slideout title
-    // custom labware label
-    // render close button
-    // svg
-    // image
-    // api name label
-    // api name
-    // well count label
-    // max volume, well shape label
-    // svg
-    // Footprint (mm) label
-    // length label and value
-    // width label and value
-    // height label and value
-    // well measurement (mm) label
-    // depth label and value
-    // x-size label and value
-    // y-size label and value
-    // spacing (mm) label and value
-    // x-offset label and value
-    // y-offset label and value
-    // x-spacing label and value
-    // y-spacing label and value
-    // manufacturer label and value
-    // manufacturer/catalog label and value
-    // website label and href <- no website
+    props.labware.definition.namespace = 'custom'
+    const [{ queryByText }] = render(props)
+    expect(queryByText('Opentrons Definition')).not.toBeInTheDocument()
   })
 
-  it('when clicking copy icon, should show tooltip as feedback', () => {})
+  it('when clicking copy icon, should show tooltip as feedback', () => {
+    const [{ getByTestId, findByText }] = render(props)
+    const button = getByTestId('labwareDetails_slideout_close_button')
+    fireEvent.click(button)
+    findByText('Copied')
+  })
 
   it('should close the slideout when clicking the close button', () => {
     const [{ getByTestId }] = render(props)

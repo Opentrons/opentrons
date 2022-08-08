@@ -82,10 +82,6 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
     placement: TOOLTIP_TOP_START,
   })
 
-  console.log('========LabwareDetails========')
-  console.log(props.labware)
-  console.log('========LabwareDetails========')
-
   const handleCopy = async (): Promise<void> => {
     await navigator.clipboard.writeText(apiName)
     setShowToolTip(true)
