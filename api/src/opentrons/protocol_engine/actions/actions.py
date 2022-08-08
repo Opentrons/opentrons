@@ -140,6 +140,7 @@ class AddLiquidAction:
     """Add a liquid, to apply to subsequent `LoadLiquid`s."""
 
     liquid: protocol_schema_v6.Liquid
+    liquid_id: str
 
 
 @dataclass(frozen=True)

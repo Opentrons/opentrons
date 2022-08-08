@@ -5,6 +5,7 @@ from datetime import datetime
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+from opentrons_shared_data.protocol.models import protocol_schema_v6
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 
@@ -21,6 +22,7 @@ from opentrons.protocol_engine.actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     UpdateCommandAction,
+    AddLiquidAction
 )
 from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
 
@@ -41,7 +43,7 @@ def subject(
                 location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
                 definition=fixed_trash_def,
             )
-        ],
+        ]
     )
 
 
@@ -70,6 +72,7 @@ def test_initial_state(
         },
         labware_offsets_by_id={},
         definitions_by_uri={expected_trash_uri: fixed_trash_def},
+        liquids={}
     )
 
 
@@ -162,3 +165,16 @@ def test_handles_add_labware_definition(
     subject.handle_action(AddLabwareDefinitionAction(definition=well_plate_def))
 
     assert subject.state.definitions_by_uri[expected_uri] == well_plate_def
+
+
+def test_handles_add_liquid(
+    subject: LabwareStore
+) -> None:
+    """It should add the liquid to the state."""
+    expected_liquid = protocol_schema_v6.Liquid(
+        displayName="water",
+        description="water-desc"
+    )
+    subject.handle_action(AddLiquidAction(liquid_id="water-id", liquid=expected_liquid))
+
+    assert subject.state.liquids["water-id"] == expected_liquid

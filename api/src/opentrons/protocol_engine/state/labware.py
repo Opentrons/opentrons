@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Sequence
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.protocol.models.protocol_schema_v6 import Liquid
 
 from opentrons.types import DeckSlotName, Point
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
@@ -46,7 +47,7 @@ class LabwareState:
     # If a LoadedLabware here has a non-None offsetId,
     # it must point to an existing element of labware_offsets_by_id.
     labware_by_id: Dict[str, LoadedLabware]
-
+    liquids: Dict[str, Liquid]
     # Indexed by LabwareOffset.id.
     # We rely on Python 3.7+ preservation of dict insertion order.
     labware_offsets_by_id: Dict[str, LabwareOffset]
@@ -94,6 +95,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             labware_offsets_by_id={},
             labware_by_id=labware_by_id,
             deck_definition=deck_definition,
+            liquids={}
         )
 
     def handle_action(self, action: Action) -> None:

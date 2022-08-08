@@ -49,6 +49,7 @@ from opentrons.protocol_engine.actions import (
 
 from opentrons_shared_data.protocol.models import protocol_schema_v6
 
+
 @pytest.fixture
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mock StateStore."""
@@ -608,10 +609,17 @@ def test_add_liquid(
     subject: ProtocolEngine,
 ) -> None:
     """It should dispatch an AddLiquidAction action."""
+    subject.add_liquid(
+        protocol_schema_v6.Liquid(displayName="water", description="water desc")
+    )
 
-    subject.add_liquid(protocol_schema_v6.Liquid(displayName="water", description="water desc"))
-
-    decoy.verify(action_dispatcher.dispatch(AddLiquidAction(protocol_schema_v6.Liquid(displayName="water", description="water desc"))))
+    decoy.verify(
+        action_dispatcher.dispatch(
+            AddLiquidAction(
+                protocol_schema_v6.Liquid(displayName="water", description="water desc")
+            )
+        )
+    )
 
 
 async def test_use_attached_temp_and_mag_modules(

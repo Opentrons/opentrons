@@ -30,301 +30,301 @@ from opentrons.protocol_engine import (
 )
 
 VALID_TEST_PARAMS = [
-    # (
-    #     protocol_schema_v6.Command(
-    #         commandType="aspirate",
-    #         key=None,
-    #         params=protocol_schema_v6.Params(
-    #             pipetteId="pipette-id-abc123",
-    #             labwareId="labware-id-def456",
-    #             volume=1.23,
-    #             # todo (Max and Tamar 3/17/22):needs to be added to the aspirate command
-    #             #  https://github.com/Opentrons/opentrons/issues/8204
-    #             flowRate=4.56,
-    #             wellName="A1",
-    #             wellLocation=protocol_schema_v6.WellLocation(
-    #                 origin="bottom",
-    #                 offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=7.89),
-    #             ),
-    #         ),
-    #     ),
-    #     pe_commands.AspirateCreate(
-    #         key=None,
-    #         params=pe_commands.AspirateParams(
-    #             # todo: id
-    #             pipetteId="pipette-id-abc123",
-    #             labwareId="labware-id-def456",
-    #             volume=1.23,
-    #             flowRate=4.56,
-    #             wellName="A1",
-    #             wellLocation=WellLocation(
-    #                 origin=WellOrigin.BOTTOM,
-    #                 offset=WellOffset(x=0, y=0, z=7.89),
-    #             ),
-    #         ),
-    #     ),
-    # ),
-    # (
-    #     protocol_schema_v6.Command(
-    #         commandType="dispense",
-    #         key="dispense-key",
-    #         params=protocol_schema_v6.Params(
-    #             pipetteId="pipette-id-abc123",
-    #             labwareId="labware-id-def456",
-    #             volume=1.23,
-    #             flowRate=4.56,
-    #             wellName="A1",
-    #             wellLocation=protocol_schema_v6.WellLocation(
-    #                 origin="bottom",
-    #                 offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=7.89),
-    #             ),
-    #         ),
-    #     ),
-    #     pe_commands.DispenseCreate(
-    #         key="dispense-key",
-    #         params=pe_commands.DispenseParams(
-    #             pipetteId="pipette-id-abc123",
-    #             labwareId="labware-id-def456",
-    #             volume=1.23,
-    #             flowRate=4.56,
-    #             wellName="A1",
-    #             wellLocation=WellLocation(
-    #                 origin=WellOrigin.BOTTOM,
-    #                 offset=WellOffset(x=0, y=0, z=7.89),
-    #             ),
-    #         ),
-    #     ),
-    # ),
-    # (
-    #     protocol_schema_v6.Command(
-    #         commandType="dropTip",
-    #         params=protocol_schema_v6.Params(
-    #             pipetteId="pipette-id-abc123",
-    #             labwareId="labware-id-def456",
-    #             wellName="A1",
-    #         ),
-    #     ),
-    #     pe_commands.DropTipCreate(
-    #         params=pe_commands.DropTipParams(
-    #             pipetteId="pipette-id-abc123",
-    #             labwareId="labware-id-def456",
-    #             wellName="A1",
-    #             wellLocation=WellLocation(),
-    #         )
-    #     ),
-    # ),
-    # (
-    #     protocol_schema_v6.Command(
-    #         commandType="pickUpTip",
-    #         params=protocol_schema_v6.Params(
-    #             pipetteId="pipette-id-abc123",
-    #             labwareId="labware-id-def456",
-    #             wellName="A1",
-    #         ),
-    #     ),
-    #     pe_commands.PickUpTipCreate(
-    #         params=pe_commands.PickUpTipParams(
-    #             pipetteId="pipette-id-abc123",
-    #             labwareId="labware-id-def456",
-    #             wellName="A1",
-    #             wellLocation=WellLocation(),
-    #         )
-    #     ),
-    # ),
-    # (
-    #     protocol_schema_v6.Command(
-    #         commandType="touchTip",
-    #         params=protocol_schema_v6.Params(
-    #             pipetteId="pipette-id-abc123",
-    #             labwareId="labware-id-def456",
-    #             wellName="A1",
-    #             wellLocation=protocol_schema_v6.WellLocation(
-    #                 origin="bottom",
-    #                 offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=-1.23),
-    #             ),
-    #         ),
-    #     ),
-    #     pe_commands.TouchTipCreate(
-    #         params=pe_commands.TouchTipParams(
-    #             pipetteId="pipette-id-abc123",
-    #             labwareId="labware-id-def456",
-    #             wellName="A1",
-    #             wellLocation=WellLocation(
-    #                 origin=WellOrigin.BOTTOM,
-    #                 offset=WellOffset(x=0, y=0, z=-1.23),
-    #             ),
-    #         )
-    #     ),
-    # ),
-    # (
-    #     protocol_schema_v6.Command(
-    #         commandType="loadPipette",
-    #         params=protocol_schema_v6.Params(pipetteId="pipetteId", mount="left"),
-    #     ),
-    #     pe_commands.LoadPipetteCreate(
-    #         params=pe_commands.LoadPipetteParams(
-    #             pipetteId="pipetteId",
-    #             pipetteName=PipetteName("p10_single"),
-    #             mount=MountType("left"),
-    #         )
-    #     ),
-    # ),
-    # (
-    #     protocol_schema_v6.Command(
-    #         commandType="loadModule",
-    #         params=protocol_schema_v6.Params(
-    #             moduleId="magneticModuleId",
-    #             location=protocol_schema_v6.Location(slotName="3"),
-    #         ),
-    #     ),
-    #     pe_commands.LoadModuleCreate(
-    #         params=pe_commands.LoadModuleParams(
-    #             model=ModuleModel("magneticModuleV2"),
-    #             moduleId="magneticModuleId",
-    #             location=DeckSlotLocation(slotName=(DeckSlotName("3"))),
-    #         )
-    #     ),
-    # ),
-    # (
-    #     protocol_schema_v6.Command(
-    #         commandType="loadLabware",
-    #         params=protocol_schema_v6.Params(
-    #             labwareId="sourcePlateId",
-    #             location=protocol_schema_v6.Location(moduleId="temperatureModuleId"),
-    #         ),
-    #     ),
-    #     pe_commands.LoadLabwareCreate(
-    #         params=pe_commands.LoadLabwareParams(
-    #             loadName="foo_8_plate_33ul",
-    #             displayName="Source Plate",
-    #             labwareId="sourcePlateId",
-    #             location=ModuleLocation(moduleId="temperatureModuleId"),
-    #             version=1,
-    #             namespace="example",
-    #         )
-    #     ),
-    # ),
-    # (
-    #     protocol_schema_v6.Command(
-    #         commandType="blowout",
-    #         params=protocol_schema_v6.Params(
-    #             pipetteId="pipette-id-abc123",
-    #             labwareId="labware-id-def456",
-    #             wellName="A1",
-    #             wellLocation=protocol_schema_v6.WellLocation(
-    #                 origin="bottom",
-    #                 offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=7.89),
-    #             ),
-    #             flowRate=1.23,
-    #         ),
-    #     ),
-    #     pe_commands.BlowOutCreate(
-    #         params=pe_commands.BlowOutParams(
-    #             pipetteId="pipette-id-abc123",
-    #             labwareId="labware-id-def456",
-    #             wellName="A1",
-    #             wellLocation=WellLocation(
-    #                 origin=WellOrigin.BOTTOM,
-    #                 offset=WellOffset(x=0, y=0, z=7.89),
-    #             ),
-    #             flowRate=1.23,
-    #         )
-    #     ),
-    # ),
-    # (
-    #     protocol_schema_v6.Command(
-    #         commandType="delay",
-    #         params=protocol_schema_v6.Params(waitForResume=True, message="hello world"),
-    #     ),
-    #     pe_commands.WaitForResumeCreate(
-    #         params=pe_commands.WaitForResumeParams(message="hello world")
-    #     ),
-    # ),
-    # (
-    #     protocol_schema_v6.Command(
-    #         commandType="delay",
-    #         params=protocol_schema_v6.Params(seconds=12.34, message="hello world"),
-    #     ),
-    #     pe_commands.WaitForDurationCreate(
-    #         params=pe_commands.WaitForDurationParams(
-    #             seconds=12.34,
-    #             message="hello world",
-    #         )
-    #     ),
-    # ),
-    # (
-    #     protocol_schema_v6.Command(
-    #         commandType="waitForResume",
-    #         params=protocol_schema_v6.Params(message="hello world"),
-    #     ),
-    #     pe_commands.WaitForResumeCreate(
-    #         params=pe_commands.WaitForResumeParams(message="hello world")
-    #     ),
-    # ),
-    # (
-    #     protocol_schema_v6.Command(
-    #         commandType="waitForDuration",
-    #         params=protocol_schema_v6.Params(seconds=12.34, message="hello world"),
-    #     ),
-    #     pe_commands.WaitForDurationCreate(
-    #         params=pe_commands.WaitForDurationParams(
-    #             seconds=12.34,
-    #             message="hello world",
-    #         )
-    #     ),
-    # ),
-    # (
-    #     protocol_schema_v6.Command(
-    #         commandType="moveToCoordinates",
-    #         params=protocol_schema_v6.Params(
-    #             pipetteId="pipette-id-abc123",
-    #             coordinates=protocol_schema_v6.OffsetVector(x=1.1, y=2.2, z=3.3),
-    #             minimumZHeight=123.4,
-    #             forceDirect=True,
-    #         ),
-    #     ),
-    #     pe_commands.MoveToCoordinatesCreate(
-    #         params=pe_commands.MoveToCoordinatesParams(
-    #             pipetteId="pipette-id-abc123",
-    #             coordinates=DeckPoint(x=1.1, y=2.2, z=3.3),
-    #             minimumZHeight=123.4,
-    #             forceDirect=True,
-    #         )
-    #     ),
-    # ),
-    # (
-    #     protocol_schema_v6.Command(
-    #         commandType="thermocycler/runProfile",
-    #         params=protocol_schema_v6.Params(
-    #             moduleId="module-id-abc123",
-    #             blockMaxVolumeUl=1.11,
-    #             profile=[
-    #                 protocol_schema_v6.ProfileStep(
-    #                     celsius=2.22,
-    #                     holdSeconds=3.33,
-    #                 ),
-    #                 protocol_schema_v6.ProfileStep(
-    #                     celsius=4.44,
-    #                     holdSeconds=5.55,
-    #                 ),
-    #             ],
-    #         ),
-    #     ),
-    #     pe_commands.thermocycler.RunProfileCreate(
-    #         params=pe_commands.thermocycler.RunProfileParams(
-    #             moduleId="module-id-abc123",
-    #             blockMaxVolumeUl=1.11,
-    #             profile=[
-    #                 pe_commands.thermocycler.RunProfileStepParams(
-    #                     celsius=2.22, holdSeconds=3.33
-    #                 ),
-    #                 pe_commands.thermocycler.RunProfileStepParams(
-    #                     celsius=4.44, holdSeconds=5.55
-    #                 ),
-    #             ],
-    #         ),
-    #     ),
-    # ),
+    (
+        protocol_schema_v6.Command(
+            commandType="aspirate",
+            key=None,
+            params=protocol_schema_v6.Params(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                volume=1.23,
+                # todo (Max and Tamar 3/17/22):needs to be added to the aspirate command
+                #  https://github.com/Opentrons/opentrons/issues/8204
+                flowRate=4.56,
+                wellName="A1",
+                wellLocation=protocol_schema_v6.WellLocation(
+                    origin="bottom",
+                    offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=7.89),
+                ),
+            ),
+        ),
+        pe_commands.AspirateCreate(
+            key=None,
+            params=pe_commands.AspirateParams(
+                # todo: id
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                volume=1.23,
+                flowRate=4.56,
+                wellName="A1",
+                wellLocation=WellLocation(
+                    origin=WellOrigin.BOTTOM,
+                    offset=WellOffset(x=0, y=0, z=7.89),
+                ),
+            ),
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="dispense",
+            key="dispense-key",
+            params=protocol_schema_v6.Params(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                volume=1.23,
+                flowRate=4.56,
+                wellName="A1",
+                wellLocation=protocol_schema_v6.WellLocation(
+                    origin="bottom",
+                    offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=7.89),
+                ),
+            ),
+        ),
+        pe_commands.DispenseCreate(
+            key="dispense-key",
+            params=pe_commands.DispenseParams(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                volume=1.23,
+                flowRate=4.56,
+                wellName="A1",
+                wellLocation=WellLocation(
+                    origin=WellOrigin.BOTTOM,
+                    offset=WellOffset(x=0, y=0, z=7.89),
+                ),
+            ),
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="dropTip",
+            params=protocol_schema_v6.Params(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                wellName="A1",
+            ),
+        ),
+        pe_commands.DropTipCreate(
+            params=pe_commands.DropTipParams(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                wellName="A1",
+                wellLocation=WellLocation(),
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="pickUpTip",
+            params=protocol_schema_v6.Params(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                wellName="A1",
+            ),
+        ),
+        pe_commands.PickUpTipCreate(
+            params=pe_commands.PickUpTipParams(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                wellName="A1",
+                wellLocation=WellLocation(),
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="touchTip",
+            params=protocol_schema_v6.Params(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                wellName="A1",
+                wellLocation=protocol_schema_v6.WellLocation(
+                    origin="bottom",
+                    offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=-1.23),
+                ),
+            ),
+        ),
+        pe_commands.TouchTipCreate(
+            params=pe_commands.TouchTipParams(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                wellName="A1",
+                wellLocation=WellLocation(
+                    origin=WellOrigin.BOTTOM,
+                    offset=WellOffset(x=0, y=0, z=-1.23),
+                ),
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="loadPipette",
+            params=protocol_schema_v6.Params(pipetteId="pipetteId", mount="left"),
+        ),
+        pe_commands.LoadPipetteCreate(
+            params=pe_commands.LoadPipetteParams(
+                pipetteId="pipetteId",
+                pipetteName=PipetteName("p10_single"),
+                mount=MountType("left"),
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="loadModule",
+            params=protocol_schema_v6.Params(
+                moduleId="magneticModuleId",
+                location=protocol_schema_v6.Location(slotName="3"),
+            ),
+        ),
+        pe_commands.LoadModuleCreate(
+            params=pe_commands.LoadModuleParams(
+                model=ModuleModel("magneticModuleV2"),
+                moduleId="magneticModuleId",
+                location=DeckSlotLocation(slotName=(DeckSlotName("3"))),
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="loadLabware",
+            params=protocol_schema_v6.Params(
+                labwareId="sourcePlateId",
+                location=protocol_schema_v6.Location(moduleId="temperatureModuleId"),
+            ),
+        ),
+        pe_commands.LoadLabwareCreate(
+            params=pe_commands.LoadLabwareParams(
+                loadName="foo_8_plate_33ul",
+                displayName="Source Plate",
+                labwareId="sourcePlateId",
+                location=ModuleLocation(moduleId="temperatureModuleId"),
+                version=1,
+                namespace="example",
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="blowout",
+            params=protocol_schema_v6.Params(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                wellName="A1",
+                wellLocation=protocol_schema_v6.WellLocation(
+                    origin="bottom",
+                    offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=7.89),
+                ),
+                flowRate=1.23,
+            ),
+        ),
+        pe_commands.BlowOutCreate(
+            params=pe_commands.BlowOutParams(
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
+                wellName="A1",
+                wellLocation=WellLocation(
+                    origin=WellOrigin.BOTTOM,
+                    offset=WellOffset(x=0, y=0, z=7.89),
+                ),
+                flowRate=1.23,
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="delay",
+            params=protocol_schema_v6.Params(waitForResume=True, message="hello world"),
+        ),
+        pe_commands.WaitForResumeCreate(
+            params=pe_commands.WaitForResumeParams(message="hello world")
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="delay",
+            params=protocol_schema_v6.Params(seconds=12.34, message="hello world"),
+        ),
+        pe_commands.WaitForDurationCreate(
+            params=pe_commands.WaitForDurationParams(
+                seconds=12.34,
+                message="hello world",
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="waitForResume",
+            params=protocol_schema_v6.Params(message="hello world"),
+        ),
+        pe_commands.WaitForResumeCreate(
+            params=pe_commands.WaitForResumeParams(message="hello world")
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="waitForDuration",
+            params=protocol_schema_v6.Params(seconds=12.34, message="hello world"),
+        ),
+        pe_commands.WaitForDurationCreate(
+            params=pe_commands.WaitForDurationParams(
+                seconds=12.34,
+                message="hello world",
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="moveToCoordinates",
+            params=protocol_schema_v6.Params(
+                pipetteId="pipette-id-abc123",
+                coordinates=protocol_schema_v6.OffsetVector(x=1.1, y=2.2, z=3.3),
+                minimumZHeight=123.4,
+                forceDirect=True,
+            ),
+        ),
+        pe_commands.MoveToCoordinatesCreate(
+            params=pe_commands.MoveToCoordinatesParams(
+                pipetteId="pipette-id-abc123",
+                coordinates=DeckPoint(x=1.1, y=2.2, z=3.3),
+                minimumZHeight=123.4,
+                forceDirect=True,
+            )
+        ),
+    ),
+    (
+        protocol_schema_v6.Command(
+            commandType="thermocycler/runProfile",
+            params=protocol_schema_v6.Params(
+                moduleId="module-id-abc123",
+                blockMaxVolumeUl=1.11,
+                profile=[
+                    protocol_schema_v6.ProfileStep(
+                        celsius=2.22,
+                        holdSeconds=3.33,
+                    ),
+                    protocol_schema_v6.ProfileStep(
+                        celsius=4.44,
+                        holdSeconds=5.55,
+                    ),
+                ],
+            ),
+        ),
+        pe_commands.thermocycler.RunProfileCreate(
+            params=pe_commands.thermocycler.RunProfileParams(
+                moduleId="module-id-abc123",
+                blockMaxVolumeUl=1.11,
+                profile=[
+                    pe_commands.thermocycler.RunProfileStepParams(
+                        celsius=2.22, holdSeconds=3.33
+                    ),
+                    pe_commands.thermocycler.RunProfileStepParams(
+                        celsius=4.44, holdSeconds=5.55
+                    ),
+                ],
+            ),
+        ),
+    ),
     (
         protocol_schema_v6.Command(
             commandType="loadLiquid",
