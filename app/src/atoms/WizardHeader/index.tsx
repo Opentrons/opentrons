@@ -20,20 +20,11 @@ interface WizardHeaderProps {
   title: string
   body: JSX.Element
   onExit: () => void
-  showStepCount?: boolean
   footer?: JSX.Element
 }
 
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
-  const {
-    totalSteps,
-    currentStep,
-    title,
-    body,
-    onExit,
-    showStepCount,
-    footer,
-  } = props
+  const { totalSteps, currentStep, title, body, onExit, footer } = props
   const { t } = useTranslation('shared')
 
   return (
@@ -51,7 +42,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           <StyledText css={TYPOGRAPHY.pSemiBold} marginRight={SPACING.spacing3}>
             {title}
           </StyledText>
-          {showStepCount ? (
+          {currentStep != null && currentStep > 0 ? (
             <StyledText
               css={TYPOGRAPHY.pSemiBold}
               color={COLORS.darkGreyEnabled}

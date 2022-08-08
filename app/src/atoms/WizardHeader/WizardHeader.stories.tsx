@@ -39,25 +39,4 @@ Primary.args = {
       <SecondaryButton color={COLORS.blue}>{'Proceed'}</SecondaryButton>
     </Flex>
   ),
-  showStepCount: true,
-}
-
-export const NoStepCount = Template.bind({})
-NoStepCount.args = {
-  totalSteps: 5,
-  currentStep: 0,
-  title: 'Tip Length Calibration',
-  body: (
-    <Flex flexDirection={DIRECTION_COLUMN}>
-      {'this is the body part of the StepMeter'}
-    </Flex>
-  ),
-  footer: (
-    <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_FLEX_END}>
-      <Flex marginRight={SPACING.spacing4}>
-        <PrimaryButton backgroundColor={COLORS.blue}>{'Back'}</PrimaryButton>
-      </Flex>
-      <SecondaryButton color={COLORS.blue}>{'Proceed'}</SecondaryButton>
-    </Flex>
-  ),
 }

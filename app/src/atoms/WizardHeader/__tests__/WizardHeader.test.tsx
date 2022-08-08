@@ -32,7 +32,7 @@ describe('WizardHeader', () => {
     jest.resetAllMocks()
   })
 
-  it('renders correct information with no step count visible and pressing on button calls props', () => {
+  it('renders correct information with step count visible and pressing on button calls props', () => {
     const { getByText, getByRole } = render(props)
     getByText('Tip Length Calibrations')
     const exit = getByRole('button', { name: 'exit' })
@@ -40,19 +40,22 @@ describe('WizardHeader', () => {
     fireEvent.click(exit)
     expect(props.onExit).toHaveBeenCalled()
     getByText('step meter')
+    getByText('Step: 1 / 5')
   })
 
-  it('renders correct information with step count visible', () => {
+  it('renders correct information with no step count visible', () => {
     props = {
-      ...props,
-      showStepCount: true,
+      title: 'Tip Length Calibrations',
+      totalSteps: 5,
+      currentStep: 0,
+      body: <div>this is a body</div>,
+      onExit: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
     getByText('Tip Length Calibrations')
     getByRole('button', { name: 'exit' })
     getByText('this is a body')
-    getByText('Step: 1 / 5')
   })
   it('renders correct information with a footer', () => {
     props = {
