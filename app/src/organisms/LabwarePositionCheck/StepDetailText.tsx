@@ -7,7 +7,7 @@ import {
   Link,
   SPACING_2,
   JUSTIFY_CENTER,
-  FONT_SIZE_BODY_2,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { LabwarePositionCheckStepDetailModal } from './LabwarePositionCheckStepDetailModal'
 import type { LabwarePositionCheckStep } from './types'
@@ -45,7 +45,7 @@ export const StepDetailText = (
       <Box
         padding={SPACING_2}
         justifyContent={JUSTIFY_CENTER}
-        fontSize={FONT_SIZE_BODY_2}
+        fontSize={TYPOGRAPHY.fontSizeH3}
       >
         <Trans
           t={t}

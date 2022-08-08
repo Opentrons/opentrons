@@ -8,7 +8,6 @@ import {
   C_NEAR_WHITE,
   DIRECTION_COLUMN,
   Flex,
-  FONT_SIZE_BODY_2,
   FONT_WEIGHT_SEMIBOLD,
   Icon,
   JUSTIFY_CENTER,
@@ -63,7 +62,7 @@ const OffsetDataLoader = (): JSX.Element | null => {
         color={C_DARK_GRAY}
         marginTop={SPACING.spacing6}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
-        fontSize={FONT_SIZE_BODY_2}
+        fontSize={TYPOGRAPHY.fontSizeH3}
         textTransform={TYPOGRAPHY.textTransformUppercase}
       >
         {t('loading_labware_offsets')}

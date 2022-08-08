@@ -8,7 +8,6 @@ import {
   Text,
   FONT_WEIGHT_SEMIBOLD,
   FONT_SIZE_HEADER,
-  FONT_SIZE_BODY_2,
   FONT_BODY_2_DARK,
   DIRECTION_ROW,
   SPACING,
@@ -22,6 +21,7 @@ import {
   TEXT_DECORATION_UNDERLINE,
   TEXT_ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
@@ -182,7 +182,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
         border={BORDER_SOLID_LIGHT}
         marginTop={SPACING_3}
       >
-        <Text fontSize={FONT_SIZE_BODY_2} alignSelf={ALIGN_CENTER}>
+        <Text fontSize={TYPOGRAPHY.fontSizeH3} alignSelf={ALIGN_CENTER}>
           {JOG_UNTIL}
           <b>{` ${JUST_BARELY_TOUCHING} `}</b>
           {DECK_IN}
