@@ -291,7 +291,7 @@ class LegacyCommandMapper:
             volume = command["payload"].get("volume")
             flowRate = command["payload"].get("rate")
             if flowRate is None:
-                flowRate = pipette.flow_rate.aspirate
+                raise Exception("Unknown aspirate rate.")
             if volume is None:
                 raise Exception("Unknown asiprate volume.")
             if isinstance(location, Location):
@@ -333,7 +333,7 @@ class LegacyCommandMapper:
             volume = command["payload"].get("volume")
             flowRate = command["payload"].get("rate")
             if flowRate is None:
-                flowRate = pipette.flow_rate.dispense
+                raise Exception("Unknown dispense rate.")
             if volume is None:
                 raise Exception("Unknown dispense volume.")
             if isinstance(location, Location):

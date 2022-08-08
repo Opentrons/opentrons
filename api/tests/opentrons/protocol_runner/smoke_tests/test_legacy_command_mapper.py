@@ -64,6 +64,14 @@ PICK_UP_TIP_PROTOCOL = textwrap.dedent(
             rate=130,
             location=well_plate_1["B1"],
         )
+        pipette_left.aspirate(
+            volume=40,
+            location=well_plate_1["A1"],
+        )
+        pipette_left.dispense(
+            volume=35,
+            location=well_plate_1["B1"],
+        )
         pipette_left.drop_tip(
             location=tip_rack_1.wells_by_name()["A1"]
         )
@@ -97,7 +105,7 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
     pipette_left_result_captor = matchers.Captor()
     pipette_right_result_captor = matchers.Captor()
 
-    assert len(commands_result) == 13
+    assert len(commands_result) == 15
 
     assert commands_result[0] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
@@ -265,7 +273,39 @@ async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=35),
     )
-    assert commands_result[12] == commands.DropTip.construct(
+    assert commands_result[12] == commands.Aspirate.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.AspirateParams(
+            pipetteId=pipette_left_id,
+            labwareId=well_plate_1_id,
+            wellName="A1",
+            volume=40,
+            flowRate=1.0,
+        ),
+        result=commands.AspirateResult(volume=40),
+    )
+    assert commands_result[13] == commands.Dispense.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.DispenseParams(
+            pipetteId=pipette_left_id,
+            labwareId=well_plate_1_id,
+            wellName="B1",
+            volume=35,
+            flowRate=1.0,
+        ),
+        result=commands.DispenseResult(volume=35),
+    )
+    assert commands_result[14] == commands.DropTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
