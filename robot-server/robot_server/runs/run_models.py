@@ -1,7 +1,7 @@
 """Request and response models for run resources."""
 from datetime import datetime
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from opentrons.protocol_engine import (
     CommandStatus,
@@ -18,6 +18,8 @@ from opentrons.protocol_engine import (
 )
 from robot_server.service.json_api import ResourceModel
 from .action_models import RunAction
+
+from opentrons_shared_data.protocol.models.protocol_schema_v6 import Liquid
 
 
 # TODO(mc, 2022-02-01): since the `/runs/:run_id/commands` response is now paginated,
@@ -107,6 +109,10 @@ class Run(ResourceModel):
     startedAt: Optional[datetime] = Field(
         None,
         description="Run started at timestamp.",
+    )
+    liquids: Dict[str, Liquid] = Field(
+        ...,
+        description="Liquids loaded to the run.",
     )
 
 

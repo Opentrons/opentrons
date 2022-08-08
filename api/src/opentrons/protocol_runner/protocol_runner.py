@@ -111,7 +111,7 @@ class ProtocolRunner:
                 for liquid_key in protocol_source.liquids:  # type: ignore[union-attr]
                     self._protocol_engine.add_liquid(
                         liquid_id=liquid_key,
-                        liquid=protocol_source.liquids[liquid_key]  # type: ignore[index]
+                        liquid=protocol_source.liquids[liquid_key],  # type: ignore[index]
                     )
             else:
                 self._load_legacy(protocol_source)

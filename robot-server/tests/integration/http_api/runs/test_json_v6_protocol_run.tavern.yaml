@@ -44,6 +44,11 @@ stages:
               definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
               location: !anydict
           labwareOffsets: []
+          liquids:
+            waterId:
+              displayName: Water
+              description: Liquid H2O
+              displayColor: '#7332a8'
           protocolId: '{protocol_id}'
 
   - name: Execute a setup command

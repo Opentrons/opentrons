@@ -91,6 +91,7 @@ class StateView(HasState[State]):
             modules=self.modules.get_all(),
             completedAt=self._state.commands.run_completed_at,
             startedAt=self._state.commands.run_started_at,
+            liquids=self._labware.get_liquids()
         )
 
 

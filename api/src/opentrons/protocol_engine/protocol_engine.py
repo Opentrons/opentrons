@@ -282,7 +282,9 @@ class ProtocolEngine:
 
     def add_liquid(self, liquid_id: str, liquid: protocol_schema_v6.Liquid) -> None:
         """Add a liquid to the state for subsequent liquid loads."""
-        self._action_dispatcher.dispatch(AddLiquidAction(liduid_id=liquid_id, liquid=liquid))
+        self._action_dispatcher.dispatch(
+            AddLiquidAction(liquid_id=liquid_id, liquid=liquid)
+        )
 
     async def use_attached_modules(
         self,

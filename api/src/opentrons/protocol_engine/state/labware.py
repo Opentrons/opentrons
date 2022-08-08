@@ -32,7 +32,7 @@ from ..actions import (
     UpdateCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
-    AddLiquidAction
+    AddLiquidAction,
 )
 from .abstract_store import HasState, HandlesActions
 
@@ -96,7 +96,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             labware_offsets_by_id={},
             labware_by_id=labware_by_id,
             deck_definition=deck_definition,
-            liquids={}
+            liquids={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -405,3 +405,7 @@ class LabwareView(HasState[LabwareState]):
             ):
                 return candidate
         return None
+
+    def get_liquids(self) -> Dict[str, Liquid]:
+        """Get all liquids, in the order they were added."""
+        return self._state.liquids

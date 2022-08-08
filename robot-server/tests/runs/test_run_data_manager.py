@@ -33,6 +33,8 @@ from robot_server.runs.run_store import (
 )
 from robot_server.service.task_runner import TaskRunner
 
+from opentrons_shared_data.protocol.models.protocol_schema_v6 import Liquid
+
 
 @pytest.fixture
 def mock_engine_store(decoy: Decoy) -> EngineStore:
@@ -64,6 +66,7 @@ def engine_state_summary() -> StateSummary:
         labwareOffsets=[LabwareOffset.construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="some-module-id")],  # type: ignore[call-arg]
+        liquids={"some-liquid-id": Liquid(displayName="liquid", description="desc")},
     )
 
 
@@ -146,6 +149,7 @@ async def test_create(
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
+        liquids=engine_state_summary.liquids,
     )
 
 
@@ -209,6 +213,7 @@ async def test_create_with_options(
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
+        liquids=engine_state_summary.liquids,
     )
 
 
@@ -275,6 +280,7 @@ async def test_get_current_run(
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
+        liquids=engine_state_summary.liquids,
     )
     assert subject.current_run_id == run_id
 
@@ -310,6 +316,7 @@ async def test_get_historical_run(
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
+        liquids=engine_state_summary.liquids,
     )
 
 
@@ -341,6 +348,7 @@ async def test_get_historical_run_no_data(
         labwareOffsets=[],
         pipettes=[],
         modules=[],
+        liquids={},
     )
 
 
@@ -358,6 +366,7 @@ async def test_get_all_runs(
         labwareOffsets=[LabwareOffset.construct(id="current-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="current-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="current-module-id")],  # type: ignore[call-arg]
+        liquids={"some-liquid-id": Liquid(displayName="liquid", description="desc")},
     )
 
     historical_run_data = StateSummary(
@@ -367,6 +376,7 @@ async def test_get_all_runs(
         labwareOffsets=[LabwareOffset.construct(id="old-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="old-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="old-module-id")],  # type: ignore[call-arg]
+        liquids={},
     )
 
     current_run_resource = RunResource(
@@ -409,6 +419,7 @@ async def test_get_all_runs(
             labwareOffsets=historical_run_data.labwareOffsets,
             pipettes=historical_run_data.pipettes,
             modules=historical_run_data.modules,
+            liquids=historical_run_data.liquids,
         ),
         Run(
             current=True,
@@ -422,6 +433,7 @@ async def test_get_all_runs(
             labwareOffsets=current_run_data.labwareOffsets,
             pipettes=current_run_data.pipettes,
             modules=current_run_data.modules,
+            liquids=current_run_data.liquids,
         ),
     ]
 
@@ -498,6 +510,7 @@ async def test_update_current(
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
+        liquids=engine_state_summary.liquids,
     )
 
 
@@ -544,6 +557,7 @@ async def test_update_current_noop(
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
+        liquids=engine_state_summary.liquids,
     )
 
 

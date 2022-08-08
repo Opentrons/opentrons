@@ -67,6 +67,7 @@ def get_labware_view(
         labware_offsets_by_id=labware_offsets_by_id or {},
         definitions_by_uri=definitions_by_uri or {},
         deck_definition=deck_definition or cast(DeckDefinitionV3, {"fake": True}),
+        liquids={},
     )
 
     return LabwareView(state=state)

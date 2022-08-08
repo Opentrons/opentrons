@@ -22,7 +22,7 @@ from opentrons.protocol_engine.actions import (
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     UpdateCommandAction,
-    AddLiquidAction
+    AddLiquidAction,
 )
 from opentrons.protocol_engine.state.labware import LabwareStore, LabwareState
 
@@ -43,7 +43,7 @@ def subject(
                 location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
                 definition=fixed_trash_def,
             )
-        ]
+        ],
     )
 
 
@@ -72,7 +72,7 @@ def test_initial_state(
         },
         labware_offsets_by_id={},
         definitions_by_uri={expected_trash_uri: fixed_trash_def},
-        liquids={}
+        liquids={},
     )
 
 
@@ -167,13 +167,10 @@ def test_handles_add_labware_definition(
     assert subject.state.definitions_by_uri[expected_uri] == well_plate_def
 
 
-def test_handles_add_liquid(
-    subject: LabwareStore
-) -> None:
+def test_handles_add_liquid(subject: LabwareStore) -> None:
     """It should add the liquid to the state."""
     expected_liquid = protocol_schema_v6.Liquid(
-        displayName="water",
-        description="water-desc"
+        displayName="water", description="water-desc"
     )
     subject.handle_action(AddLiquidAction(liquid_id="water-id", liquid=expected_liquid))
 

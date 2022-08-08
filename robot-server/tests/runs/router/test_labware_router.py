@@ -34,6 +34,7 @@ def run() -> Run:
         modules=[],
         labwareOffsets=[],
         protocolId=None,
+        liquids={},
     )
 
 

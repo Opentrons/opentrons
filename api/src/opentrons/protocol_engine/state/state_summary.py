@@ -1,6 +1,6 @@
 """Public protocol run data models."""
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict
 from datetime import datetime
 
 from ..errors import ErrorOccurrence
@@ -11,6 +11,8 @@ from ..types import (
     LoadedModule,
     LoadedPipette,
 )
+
+from opentrons_shared_data.protocol.models.protocol_schema_v6 import Liquid
 
 
 class StateSummary(BaseModel):
@@ -24,3 +26,4 @@ class StateSummary(BaseModel):
     labwareOffsets: List[LabwareOffset]
     startedAt: Optional[datetime]
     completedAt: Optional[datetime]
+    liquids: Dict[str, Liquid]
