@@ -9,7 +9,6 @@ import {
   TYPOGRAPHY,
   COLORS,
   SPACING,
-  BORDERS,
 } from '@opentrons/components'
 import { StyledText } from '../text'
 import { StepMeter } from '../StepMeter'
@@ -18,21 +17,15 @@ interface WizardHeaderProps {
   totalSteps: number
   currentStep: number | null
   title: string
-  body: JSX.Element
   onExit: () => void
-  footer?: JSX.Element
 }
 
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
-  const { totalSteps, currentStep, title, body, onExit, footer } = props
+  const { totalSteps, currentStep, title, onExit } = props
   const { t } = useTranslation('shared')
 
   return (
-    <Box
-      backgroundColor={COLORS.white}
-      boxShadow={BORDERS.smallDropShadow}
-      borderRadius="0px 0px 4px 4px"
-    >
+    <Box backgroundColor={COLORS.white}>
       <Flex
         padding={`${SPACING.spacing4} ${SPACING.spacing6}`}
         flexDirection={DIRECTION_ROW}
@@ -64,16 +57,6 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
       </Flex>
 
       <StepMeter totalSteps={totalSteps} currentStep={currentStep} />
-      <Box
-        paddingTop={SPACING.spacing6}
-        paddingX={SPACING.spacing6}
-        overflowY="scroll"
-      >
-        {body}
-      </Box>
-      {footer != null ? (
-        <Box padding={`${SPACING.spacing5} ${SPACING.spacing6}`}>{footer}</Box>
-      ) : null}
     </Box>
   )
 }
