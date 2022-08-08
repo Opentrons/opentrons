@@ -107,17 +107,11 @@ class Capturer:
 # figure out logging
 
 
-def prompt_well_height() -> int:
-    try:
-        return int(input("enter well height(mm):"))
-    except (ValueError, IndexError) as e:
-        raise InvalidInput(str(e))
-
-
 async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
     """Run the test."""
     target_z = NodeId["head_" + args.mount[0]]
     target_pipette = NodeId["pipette_" + args.mount]
+    print(f"target pipette = {target_pipette}")
     found = await probe(messenger, {NodeId.head, target_pipette}, 10)
     if NodeId.head not in found or target_pipette not in found:
         raise RuntimeError(f"could not find targets for {args.mount} in {found}")
@@ -128,6 +122,7 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
 
     sensor_cap = Capturer()
     messenger.add_listener(sensor_cap, None)
+    prep_dist = args.prep_distance  # + args.pipette_height
 
     move_groups = [
         # Group 0 - home
@@ -135,19 +130,11 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
         # Group 1
         [
             create_step(
-                {target_z: float64(args.prep_distance)},
+                {target_z: float64(prep_dist)},
                 {target_z: float64(args.prep_speed)},
                 {},
-                float64(args.prep_distance / args.prep_speed),
+                float64(prep_dist / args.prep_speed),
                 [target_z],
-            ),
-            create_step(
-                {target_z: float64(args.distance)},
-                {target_z: float64(args.speed)},
-                {},
-                float64(args.distance / args.speed),
-                [target_z],
-                MoveStopCondition.sync,
             ),
         ],
     ]
@@ -174,23 +161,72 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
         binding=fields.SensorOutputBindingField(binding),
     )
     stim_message = message_definitions.BindSensorOutputRequest(payload=stim_payload)
+    runner = MoveGroupRunner(move_groups=move_groups)
+
+    position = await runner.run(can_messenger=messenger)
+
+    # await messenger.send(target_pipette, reset_message)
+    await asyncio.get_running_loop().run_in_executor(
+        None, lambda: input("press enter to start reading")
+    )
+    await messenger.send(target_pipette, stim_message)
+
+    test_move_group = [
+        [
+            create_step(
+                {
+                    target_z: float64(args.distance),
+                    target_pipette: float64(args.distance),
+                },
+                {target_z: float64(args.speed), target_pipette: float64(args.speed)},
+                {},
+                float64(args.distance / args.speed),
+                [target_z, target_pipette],
+                MoveStopCondition.sync,
+            ),
+        ]
+    ]
+
+    # test_move_group = [
+    #     [
+    #         create_step(
+    #             {
+    #                 target_z: float64(args.distance),
+    #             },
+    #             {target_z: float64(args.speed)},
+    #             {},
+    #             float64(args.distance / args.speed),
+    #             [target_z],
+    #             MoveStopCondition.sync,
+    #         ),
+    #     ]
+    # ]
+    runner = MoveGroupRunner(move_groups=test_move_group)
+    await runner.run(can_messenger=messenger)
+    if args.verbose_monitoring:
+        print(f"Sensor data: {sensor_cap.get_all()}")
+    print(f"Position: {position[target_z]}")
+
+    # move manager stuff
+    # manager = move_manager.MoveManager(constraints=constraints)
+    # _, blend_log = manager.plan_motion(
+    #     origin=origin,
+    #     target_list=target_list,
+    #     iteration_limit=params["iteration_limit"],
+    # )
+
     reset_payload = payloads.BindSensorOutputRequestPayload(
         sensor=fields.SensorTypeField(SensorType.pressure),
         sensor_id=fields.SensorIdField(SensorId.S0),
         binding=fields.SensorOutputBindingField(0),
     )
     reset_message = message_definitions.BindSensorOutputRequest(payload=reset_payload)
-    runner = MoveGroupRunner(move_groups=move_groups)
-    # move head and pipette to well height before starting
-    await messenger.send(target_pipette, stim_message)
-    position = await runner.run(can_messenger=messenger)
-    if args.verbose_monitoring:
-        print(f"Sensor data: {sensor_cap.get_all()}")
-    print(f"Position: {position[target_z]}")
-    await messenger.send(target_pipette, reset_message)
+
+    # end
     await asyncio.get_running_loop().run_in_executor(
-        None, lambda: input("press enter to home")
+        None, lambda: input("press enter to finish test")
     )
+    await messenger.send(target_pipette, reset_message)
     runner = MoveGroupRunner(move_groups=[move_groups[0]])
     await runner.run(can_messenger=messenger)
     await messenger.send(NodeId.broadcast, message_definitions.DisableMotorRequest())
@@ -210,9 +246,10 @@ def main() -> None:
         "-m", "--mount", type=str, choices=["left", "right"], default="left"
     )
     parser.add_argument("-s", "--speed", type=float, default=5)
-    parser.add_argument("-d", "--distance", type=float, default=7)
-    parser.add_argument("-pd", "--prep-distance", type=float, default=12)
+    parser.add_argument("-d", "--distance", type=float, default=50)
+    parser.add_argument("-pd", "--prep-distance", type=float, default=25)
     parser.add_argument("-ps", "--prep-speed", type=float, default=50)
+    # parser.add_argument("--ph", "--pipette-height", type=float, default=0)
     parser.add_argument("-v", "--verbose-monitoring", action="store_true")
     parser.add_argument(
         "-l",
