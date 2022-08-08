@@ -4,16 +4,14 @@
 Hardware Modules
 ################
 
-Modules are peripherals that attach to the OT-2 to extend its capabilities.
-
-We currently support the Temperature, Magnetic and Thermocycler Modules.
+Hardware modules are first-party peripherals that attach to the OT-2 to extend its capabilities. The Python API currently supports four modules that attach to the OT-2 deck and are controlled over a USB connection: the :ref:`Temperature <temperature-module>`, :ref:`Magnetic <magnetic-module>`, :ref:`Thermocycler <thermocycler-module>`, and :ref:`Heater-Shaker <heater-shaker-module>` Modules.
 
 ************
 Module Setup
 ************
 
-Loading Your Module Onto the Deck
-=================================
+Loading a Module onto the Deck
+==============================
 
 Like labware and pipettes, you must inform the Protocol API of the modules you will use in your protocol.
 
@@ -42,65 +40,36 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.  It will return an
 Available Modules
 -----------------
 
-The first parameter to :py:meth:`.ProtocolContext.load_module`, the module's *load name,* specifies the kind of module to load.
-Check the table below for the proper load name to use for each kind of module.
+The first parameter to :py:meth:`.ProtocolContext.load_module`, the module's *load name*, specifies the kind of module to load. The table below lists the load names for each kind of module.
 
-Some modules were added to the Protocol API later than others.
-Make sure you use a :ref:`Protocol API version <v2-versioning>` high enough to support all the modules you want to use.
+Some modules were added to the Protocol API later than others, and some modules have multiple hardware generations (GEN2 modules have a "GEN2" label on the device). Make sure your protocol's metadata specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the modules you want to use.
 
 .. table::
-   :widths: 2 1 3 3
+   :widths: 4 5 2
    
-   +--------------------+-------------------------------+------------------------------------+
-   | Module             | Load name                     | Minimum                            |
-   |                    |                               | :ref:`API version <v2-versioning>` |
-   +=============+======+===============================+====================================+
-   | Temperature | GEN1 | ``'temperature module'``      | 2.0                                |
-   | Module      |      | or ``'tempdeck'``             |                                    |
-   |             +------+-------------------------------+------------------------------------+
-   |             | GEN2 | ``'temperature module gen2'`` | 2.3                                |
-   +-------------+------+-------------------------------+------------------------------------+
-   | Magnetic    | GEN1 | ``'magnetic module'``         | 2.0                                |
-   | Module      |      | or ``'magdeck'``              |                                    |
-   |             +------+-------------------------------+------------------------------------+
-   |             | GEN2 | ``'magnetic module gen2'``    | 2.3                                |
-   +-------------+------+-------------------------------+------------------------------------+
-   | Thermocycler       | ``'thermocycler module'``     | 2.0                                |
-   | Module             | or ``'thermocycler'``         |                                    |
-   +--------------------+-------------------------------+------------------------------------+
+   +--------------------+-------------------------------+---------------------+
+   | Module             | Load Name                     | Minimum API Version |
+   +====================+===============================+=====================+
+   | Temperature Module | ``temperature module``        | 2.0                 |
+   | GEN1               | or ``tempdeck``               |                     |
+   +--------------------+-------------------------------+---------------------+
+   | Temperature Module | ``temperature module gen2``   | 2.3                 |
+   | GEN2               |                               |                     |
+   +--------------------+-------------------------------+---------------------+
+   | Magnetic Module    | ``magnetic module``           | 2.0                 |
+   | GEN1               | or ``magdeck``                |                     |
+   +--------------------+-------------------------------+---------------------+
+   | Magnetic Module    | ``magnetic module gen2``      | 2.3                 |
+   | GEN2               |                               |                     |
+   +--------------------+-------------------------------+---------------------+
+   | Thermocycler       | ``thermocycler module``       | 2.0                 |
+   | Module             | or ``thermocycler``           |                     |
+   +--------------------+-------------------------------+---------------------+
+   | Heater-Shaker      | ``heaterShakerModuleV1``      | 2.13                |
+   | Module             |                               |                     |
+   +--------------------+-------------------------------+---------------------+
 
-
-GEN1 vs. GEN2 Modules
-=====================
-
-GEN2 modules are newer.
-They have improvements that make them more reliable and easier to use.
-
-Identifying a GEN2 Module
--------------------------
-
-You can determine if your module is a GEN2 model by inspecting the sides of the device for a label that specifies `GEN2`.
-
-Changes with the GEN2 Temperature Module
-----------------------------------------
-
-The GEN2 Temperature Module has a plastic insulating rim around the plate, and plastic insulating shrouds designed to fit over our aluminum blocks.
-This mitigates an issue where the GEN1 Temperature Module would have trouble cooling to very low temperatures, especially if it shared the deck with a running Thermocycler.
-
-Changes with the GEN2 Magnetic Module
--------------------------------------
-
-The GEN2 Magnetic Module uses smaller magnets than the GEN1 version.
-This mitigates an issue where beads would be attracted even when the magnets were retracted.
-
-This means it will take longer for the GEN2 module to attract beads.
-
-Recommended Magnetic Module GEN2 bead attraction time:
-    - Total liquid volume <= 50 uL: 5 minutes
-    - Total liquid volume > 50 uL: 7 minutes
-
-
-Loading Labware Onto Your Module
+Loading Labware onto Your Module
 ================================
 
 Like specifying labware that will be present on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded.
@@ -118,10 +87,7 @@ You do this using ``module.load_labware()``. For instance, to load a Temperature
          my_labware = module.load_labware('opentrons_24_aluminumblock_generic_2ml_screwcap',
                                           label='Temperature-Controlled Tubes')
 
-See
-:py:meth:`.MagneticModuleContext.load_labware`,
-:py:meth:`.TemperatureModuleContext.load_labware`,
-or :py:meth:`.ThermocyclerContext.load_labware`.
+See :py:meth:`.MagneticModuleContext.load_labware`, :py:meth:`.TemperatureModuleContext.load_labware`, :py:meth:`.ThermocyclerContext.load_labware`, or :py:meth:`.HeaterShakerContext.load_labware` for more details.
 
 Notice that when you load labware on a module, you don't specify the labware's deck slot.  The labware is loaded on the module, on whichever deck slot the module occupies.
 
@@ -147,6 +113,8 @@ Any custom labware added to your Opentrons App (see :ref:`v2-custom-labware`) is
 
     In API version 2.0, ``module.load_labware()`` only took a ``load_name`` argument. In API version 2.1 (introduced in Robot Software version 3.15.2) or higher you can now specify a label, version, and namespace (though most of the time you won't have to).
 
+
+.. _temperature-module:
 
 **************************
 Using a Temperature Module
@@ -242,6 +210,16 @@ After deactivating your Temperature module, you can later call :py:meth:`.Temper
 
 .. versionadded:: 2.0
 
+Changes with the GEN2 Temperature Module
+========================================
+
+The GEN2 Temperature Module has a plastic insulating rim around the plate, and plastic insulating shrouds designed to fit over our aluminum blocks.
+This mitigates an issue where the GEN1 Temperature Module would have trouble cooling to very low temperatures, especially if it shared the deck with a running Thermocycler.
+
+
+
+.. _magnetic-module:
+
 ***********************
 Using a Magnetic Module
 ***********************
@@ -335,9 +313,22 @@ The :py:obj:`.MagneticModuleContext.status` property is a string that is one of 
 .. code-block:: python
 
     mag_mod.status
+    
+Changes with the GEN2 Magnetic Module
+=====================================
+
+The GEN2 Magnetic Module uses smaller magnets than the GEN1 version.
+This mitigates an issue where beads would be attracted even when the magnets were retracted.
+
+This means it will take longer for the GEN2 module to attract beads.
+
+Recommended Magnetic Module GEN2 bead attraction time:
+    - Total liquid volume <= 50 uL: 5 minutes
+    - Total liquid volume > 50 uL: 7 minutes
 
 
-.. _thermocycler-section:
+
+.. _thermocycler-module:
 
 ***************************
 Using a Thermocycler Module
@@ -604,6 +595,9 @@ This deactivates only the well block of the Thermocycler.
   tc_mod.deactivate_block()
 
 .. versionadded:: 2.0
+
+
+.. _heater-shaker-module:
 
 ****************************
 Using a Heater-Shaker Module
