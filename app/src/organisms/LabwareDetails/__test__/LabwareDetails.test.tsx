@@ -57,10 +57,13 @@ describe('LabwareDetails', () => {
     // image
     // api name label
     getByText('API Name')
-    // api name
+    getByText('mock_definition')
     // well count label
     getByText('Well Count')
     // max volume, well shape label
+    getByText('max volume')
+
+    getByText('various')
     // svg
     // Footprint (mm) label
     getByText('Footprint (mm)')
