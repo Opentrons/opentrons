@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Link, useHistory } from 'react-router-dom'
 import { css } from 'styled-components'
@@ -23,7 +24,11 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { StyledText } from '../../atoms/text'
 import { SecondaryTertiaryButton } from '../../atoms/buttons'
-import { CONNECTABLE, UNREACHABLE } from '../../redux/discovery'
+import {
+  CONNECTABLE,
+  UNREACHABLE,
+  getRobotModelByName,
+} from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
@@ -37,6 +42,7 @@ import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
+import type { State } from '../../redux/types'
 
 const ROBOT_CARD_STYLE = css`
   border: 1px solid ${COLORS.medGrey};
@@ -77,6 +83,9 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const { robot } = props
   const { name: robotName = null, local } = robot
   const history = useHistory()
+  const robotModel = useSelector((state: State) =>
+    getRobotModelByName(state, robot?.name)
+  )?.split(' ')[0]
 
   return robotName != null ? (
     <Flex
@@ -108,7 +117,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
               color={COLORS.darkGreyEnabled}
             >
               {/* robot_model can be seen in the health response, but only for "connectable" robots. Probably best to leave as "OT-2" for now */}
-              OT-2
+              {robotModel}
             </StyledText>
             <Flex alignItems={ALIGN_CENTER} paddingBottom={SPACING.spacing4}>
               <Flex alignItems={ALIGN_CENTER}>
