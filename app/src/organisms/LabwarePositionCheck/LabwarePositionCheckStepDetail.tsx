@@ -14,12 +14,12 @@ import {
   DIRECTION_COLUMN,
   Box,
   JUSTIFY_SPACE_BETWEEN,
-  FONT_SIZE_BODY_2,
   Link,
   ALIGN_START,
   BORDERS,
   ALIGN_CENTER,
   JUSTIFY_SPACE_AROUND,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getIsTiprack,
@@ -205,7 +205,7 @@ export const LabwarePositionCheckStepDetail = (
             {!showJogControls ? (
               <Link
                 role="button"
-                fontSize={FONT_SIZE_BODY_2}
+                fontSize={TYPOGRAPHY.fontSizeH3}
                 color={COLORS.blueEnabled}
                 onClick={() => setShowJogControls(true)}
                 id="LabwarePositionCheckStepDetail_reveal_jog_controls"

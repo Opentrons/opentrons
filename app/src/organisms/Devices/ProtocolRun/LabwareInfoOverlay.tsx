@@ -13,7 +13,6 @@ import {
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
-  FONT_SIZE_CAPTION,
   Icon,
   DIRECTION_ROW,
   ALIGN_FLEX_START,
@@ -50,7 +49,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
     <Box
       backgroundColor={hover ? COLORS.blueEnabled : OVERLAY_BLACK_80}
       borderRadius="0 0 0.4rem 0.4rem"
-      fontSize={FONT_SIZE_CAPTION}
+      fontSize={TYPOGRAPHY.fontSizeCaption}
       padding={SPACING.spacing2}
       color={COLORS.white}
       id={`LabwareInfoOverlay_slot_${labwareId}_offsetBox`}

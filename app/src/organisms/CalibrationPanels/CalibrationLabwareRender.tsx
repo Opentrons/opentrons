@@ -8,8 +8,8 @@ import {
   C_MED_DARK_GRAY,
   C_MED_GRAY,
   C_MED_LIGHT_GRAY,
-  FONT_SIZE_CAPTION,
   FONT_WEIGHT_SEMIBOLD,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getLabwareDisplayName, getIsTiprack } from '@opentrons/shared-data'
 import styles from './styles.css'
@@ -86,7 +86,7 @@ export function CalibrationBlockRender(
               x={-55}
               y={5}
               fill={C_MED_LIGHT_GRAY}
-              fontSize={FONT_SIZE_CAPTION}
+              fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
             >
               {TALL}
@@ -97,7 +97,7 @@ export function CalibrationBlockRender(
               x={25}
               y={-labwareDef.dimensions.xDimension + 5}
               fill={C_MED_LIGHT_GRAY}
-              fontSize={FONT_SIZE_CAPTION}
+              fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
             >
               {SHORT}
@@ -134,7 +134,7 @@ export function CalibrationBlockRender(
               x={-55}
               y={5}
               fill={C_MED_LIGHT_GRAY}
-              fontSize={FONT_SIZE_CAPTION}
+              fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
             >
               {SHORT}
@@ -145,7 +145,7 @@ export function CalibrationBlockRender(
               x={30}
               y={-labwareDef.dimensions.xDimension + 5}
               fill={C_MED_LIGHT_GRAY}
-              fontSize={FONT_SIZE_CAPTION}
+              fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
             >
               {TALL}
