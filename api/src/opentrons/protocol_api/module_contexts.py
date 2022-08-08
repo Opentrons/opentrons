@@ -839,7 +839,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     @requires_version(2, 13)
     def temperature_status(self) -> str:
         """One of five possible temperature statuses:
-        
+
         - ``holding at target``: The module has reached its target temperature and is actively maintaining that temperature.
         - ``cooling``: The module has previously heated and is now passively cooling. `The Heater-Shaker does not have active cooling.`
         - ``heating``: The module is heating to a target temperature.
@@ -852,7 +852,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     @requires_version(2, 13)
     def speed_status(self) -> str:
         """One of five possible shaking statuses:
-        
+
         - ``holding at target`` - The module has reached its target shake speed and is actively maintaining that speed.
         - ``speeding up`` - The module is increasing its shake speed towards a target.
         - ``slowing down`` - The module was previously shaking at a faster speed and is currently reducing its speed to a lower target or to deactivate.
@@ -865,7 +865,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     @requires_version(2, 13)
     def labware_latch_status(self) -> str:
         """One of six possible latch statuses:
-        
+
         - ``opening``: The latch is currently opening (in motion).
         - ``idle_open``: The latch is open and not moving.
         - ``closing``: The latch is currently closing (in motion).
@@ -877,7 +877,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
 
     @requires_version(2, 13)
     def set_and_wait_for_temperature(self, celsius: float) -> None:
-        """Set a target temperature and block execution of further commands until the module reaches the target. 
+        """Set a target temperature and block execution of further commands until the module reaches the target.
 
         :param celsius: A value between 27 and 95, representing the target temperature in °C. Values are automatically truncated to two decimal places, and the Heater-Shaker module has a temperature accuracy of ±0.5 °C.
         """
@@ -913,9 +913,9 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """Set a target shake speed and block execution of further commands until the module reaches the target. Reaching a target shake speed typically only takes a few seconds.
 
         .. note::
-        
+
             Before shaking, this command will retract the pipettes upward if they are parked adjacent to the Heater-Shaker.
-        
+
         :param rpm: A value between 200 and 3000, representing the target shake speed in revolutions per minute.
         """
         if (
