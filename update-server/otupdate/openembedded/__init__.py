@@ -125,4 +125,5 @@ def health_response(version_dict: Mapping[str, str]) -> Mapping[str, Any]:
             "openembeddedUpdate": "/server/update/begin",
             "restart": "/server/restart",
         },
+        "robotModel": constants.MODEL_OT3,
     }
