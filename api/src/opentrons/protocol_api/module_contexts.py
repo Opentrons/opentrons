@@ -980,6 +980,8 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """
         Raise an error if attempting to perform a move that's deemed unsafe due to
         the presence of the Heater-Shaker.
+
+        :meta private:
         """
         destination_slot = to_loc.labware.first_parent()
         if destination_slot is None:
