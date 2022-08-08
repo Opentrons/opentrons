@@ -26,6 +26,11 @@ SIM_POLLING_FREQUENCY_SEC = POLLING_FREQUENCY_SEC / 20.0
 
 TEMP_UPDATE_RETRIES = 50
 
+V1_MODULE_STRING = "thermocyclerModuleV1"
+V2_MODULE_STRING = "thermocyclerModuleV2"
+
+DFU_PID = "df11"
+
 
 class ThermocyclerError(Exception):
     pass
@@ -106,10 +111,10 @@ class Thermocycler(mod_abc.AbstractModule):
             loop: Optional loop.
             polling_interval_sec: How often to poll thermocycler for status
         """
+        self._driver = driver
         super().__init__(
             port=port, usb_port=usb_port, loop=loop, execution_manager=execution_manager
         )
-        self._driver = driver
         self._device_info = device_info
         self._listener = ThermocyclerListener(
             loop=loop, interrupt_callback=self._enter_error_state
@@ -136,17 +141,24 @@ class Thermocycler(mod_abc.AbstractModule):
     def name(cls) -> str:
         return "thermocycler"
 
+    def firmware_prefix(self) -> str:
+        """The prefix used for looking up firmware"""
+        if self.model() == V1_MODULE_STRING:
+            return "thermocycler"
+        else:
+            return "thermocycler-gen2"
+
     def model(self) -> str:
         if isinstance(self._driver, SimulatingDriver):
             return self._driver.model()
         elif isinstance(self._driver, ThermocyclerDriverV2):
-            return "thermocyclerModuleV2"
+            return V2_MODULE_STRING
         else:
             # Real module that is not a V2
-            return "thermocyclerModuleV1"
+            return V1_MODULE_STRING
 
     def bootloader(self) -> types.UploadFunction:
-        if isinstance(self._driver, ThermocyclerDriverV2):
+        if self.model() == V2_MODULE_STRING:
             return update.upload_via_dfu
         else:
             return update.upload_via_bossa
@@ -566,7 +578,10 @@ class Thermocycler(mod_abc.AbstractModule):
     async def prep_for_update(self) -> str:
         await self._driver.enter_programming_mode()
 
-        new_port = await update.find_bootloader_port()
+        if self.model() == V2_MODULE_STRING:
+            new_port = await update.find_dfu_device(pid=DFU_PID)
+        else:
+            new_port = await update.find_bootloader_port()
 
         return new_port or self.port
 

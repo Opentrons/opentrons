@@ -117,6 +117,10 @@ class HeaterShaker(mod_abc.AbstractModule):
         """Used for picking up serial port symlinks"""
         return "heatershaker"
 
+    def firmware_prefix(self) -> str:
+        """The prefix used for looking up firmware"""
+        return "heater-shaker"
+
     @staticmethod
     def _model_from_revision(revision: Optional[str]) -> str:
         """Defines the revision -> model mapping"""
