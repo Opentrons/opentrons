@@ -18,7 +18,7 @@ class MoveStopCondition(int, Enum):
 
     none = 0x0
     limit_switch = 0x1
-    sync = 0x2
+    cap_sensor = 0x2
 
 
 @unique
@@ -35,7 +35,7 @@ class MoveType(int, Enum):
         mapping = {
             MoveStopCondition.none: cls.linear,
             MoveStopCondition.limit_switch: cls.home,
-            MoveStopCondition.sync: cls.calibration,
+            MoveStopCondition.cap_sensor: cls.calibration,
         }
         return mapping[condition]
 

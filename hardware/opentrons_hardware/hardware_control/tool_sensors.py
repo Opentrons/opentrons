@@ -36,7 +36,7 @@ def _build_pass_step(mover: NodeId, distance: float, speed: float) -> MoveGroupS
         acceleration={},
         duration=float64(abs(distance / speed)),
         present_nodes=[mover],
-        stop_condition=MoveStopCondition.sync,
+        stop_condition=MoveStopCondition.cap_sensor,
     )
 
 

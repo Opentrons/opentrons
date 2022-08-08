@@ -126,7 +126,7 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
                 {},
                 float64(args.distance / args.speed),
                 [target_z],
-                MoveStopCondition.sync,
+                MoveStopCondition.cap_sensor,
             ),
         ],
     ]
