@@ -123,6 +123,7 @@ async def test_get_protocols(
             files=[],
             metadata={},
             labware_definitions=[],
+            liquids={}
         ),
         protocol_key="dummy-key-111",
     )
@@ -136,6 +137,7 @@ async def test_get_protocols(
             files=[],
             metadata={},
             labware_definitions=[],
+            liquids={}
         ),
         protocol_key="dummy-key-222",
     )
@@ -196,6 +198,7 @@ async def test_get_protocol_by_id(
             files=[],
             metadata={},
             labware_definitions=[],
+            liquids={}
         ),
         protocol_key="dummy-key-111",
     )
@@ -274,6 +277,7 @@ async def test_create_protocol(
         metadata={"this_is_fake_metadata": True},
         config=JsonProtocolConfig(schema_version=123),
         labware_definitions=[],
+        liquids={}
     )
 
     protocol_resource = ProtocolResource(

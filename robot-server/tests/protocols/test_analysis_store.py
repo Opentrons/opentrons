@@ -68,6 +68,7 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
             files=[],
             metadata={},
             labware_definitions=[],
+            liquids={}
         ),
         protocol_key=None,
     )

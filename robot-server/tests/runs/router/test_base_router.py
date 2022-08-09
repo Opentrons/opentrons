@@ -122,6 +122,7 @@ async def test_create_protocol_run(
             files=[],
             metadata={},
             labware_definitions=[],
+            liquids={}
         ),
     )
 
