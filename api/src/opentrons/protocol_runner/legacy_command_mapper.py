@@ -277,9 +277,12 @@ class LegacyCommandMapper:
         elif command["name"] == legacy_command_types.TOUCH_TIP:
             pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore
             location = command["payload"].get("location")
+            last_location = pipette._ctx.location_cache
             if isinstance(location, Location):
                 well = location.labware.as_well()
-            else:
+            elif isinstance(last_location, Location):
+                location = last_location
+                well = location.labware.as_well()
                 raise Exception("Unknown touch tip location.")
             parentModuleId = self._module_id_by_slot.get(location.labware.first_parent())  # type: ignore
             if parentModuleId is not None:
