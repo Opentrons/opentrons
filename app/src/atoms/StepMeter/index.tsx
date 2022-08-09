@@ -16,7 +16,12 @@ interface StepMeterProps {
 export const StepMeter = (props: StepMeterProps): JSX.Element => {
   const { totalSteps, currentStep } = props
   const progress = currentStep || 0
-  const percentComplete = `${(progress / totalSteps) * 100}%`
+  const percentComplete = `${
+    //    this logic puts a cap at 100% percentComplete which we should never run into
+    currentStep != null && currentStep > totalSteps
+      ? 100
+      : (progress / totalSteps) * 100
+  }%`
 
   const StepMeterContainer = css`
     position: ${POSITION_RELATIVE};

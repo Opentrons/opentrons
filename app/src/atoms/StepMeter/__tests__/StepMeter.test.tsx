@@ -39,4 +39,16 @@ describe('StepMeter', () => {
     const bar = getByTestId('StepMeter_StepMeterBar')
     expect(bar).toHaveStyle('width: 40%')
   })
+
+  //  this case should never happen
+  it('renders StepMeterBar at 100% width when currentStep is above totalStep', () => {
+    props = {
+      ...props,
+      currentStep: 6,
+    }
+    const { getByTestId } = render(props)
+    getByTestId('StepMeter_StepMeterContainer')
+    const bar = getByTestId('StepMeter_StepMeterBar')
+    expect(bar).toHaveStyle('width: 100%')
+  })
 })
