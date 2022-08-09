@@ -5,7 +5,7 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
-from opentrons_shared_data.protocol.models import protocol_schema_v6
+from opentrons_shared_data.protocol.models.protocol_schema_v6 import Liquid
 
 from .resources import ModelUtils, ModuleDataProvider
 from .commands import Command, CommandCreate
@@ -280,7 +280,7 @@ class ProtocolEngine:
         )
         return self._state_store.labware.get_uri_from_definition(definition)
 
-    def add_liquid(self, liquid_id: str, liquid: protocol_schema_v6.Liquid) -> None:
+    def add_liquid(self, liquid_id: str, liquid: Liquid) -> None:
         """Add a liquid to the state for subsequent liquid loads."""
         self._action_dispatcher.dispatch(
             AddLiquidAction(liquid_id=liquid_id, liquid=liquid)

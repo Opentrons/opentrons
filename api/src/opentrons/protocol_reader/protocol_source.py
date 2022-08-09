@@ -7,7 +7,7 @@ from typing_extensions import Literal
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.models import LabwareDefinition
-from opentrons_shared_data.protocol.models import protocol_schema_v6
+from opentrons_shared_data.protocol.models.protocol_schema_v6 import Liquid
 
 
 class ProtocolType(str, Enum):
@@ -116,4 +116,4 @@ class ProtocolSource:
     metadata: Metadata
     config: ProtocolConfig
     labware_definitions: List[LabwareDefinition]
-    liquids: Optional[Dict[str, protocol_schema_v6.Liquid]] = None
+    liquids: Optional[Dict[str, Liquid]] = None
