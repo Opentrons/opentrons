@@ -39,7 +39,7 @@ class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidR
         pass
 
     async def execute(self, params: LoadLiquidParams) -> LoadLiquidResult:
-        """Load definition and calibration data necessary for a liquid."""
+        """Load data necessary for a liquid."""
         return LoadLiquidResult()
 
 
