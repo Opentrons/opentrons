@@ -26,7 +26,7 @@ const Children = (
     </StyledText>
 
     <PrimaryBtn
-      backgroundColor={COLORS.blue}
+      backgroundColor={COLORS.blueEnabled}
       marginTop="28rem"
       textTransform={TYPOGRAPHY.textTransformNone}
     >

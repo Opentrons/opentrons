@@ -6,6 +6,7 @@ import pytest
 
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.fields import SerialField
+
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     GripperInfoResponse,
     PipetteInfoResponse,
@@ -44,9 +45,15 @@ async def test_set_serial(
     info_response_type: Type[MessageDefinition],
 ) -> None:
     """It should write a serial number and read it back."""
-    sns = [b"01234567\x00\x00\x00\x00", b"76543210\x00\x00\x00\x00"]
-    for sn in sns:
-        s = SerialNumberPayload(serial=SerialField(sn))
+    sns_datacodes = [b"202019072430", b"1234567890\x00\x00"]
+    sns = [b"", b""]
+    if node_id == NodeId.pipette_left:
+        sns = [b"P1KSV" + sns_datacodes[0], b"P3HMV" + sns_datacodes[1]]
+    else:
+        sns = [b"GP" + sns_datacodes[0], b"GP" + sns_datacodes[1]]
+    assert len(sns_datacodes) == len(sns)
+    for i in range(len(sns)):
+        s = SerialNumberPayload(serial=SerialField(sns[i]))
 
         await can_messenger.send(node_id=node_id, message=SetSerialNumber(payload=s))
         await can_messenger.send(node_id=node_id, message=InstrumentInfoRequest())
@@ -57,4 +64,4 @@ async def test_set_serial(
         assert isinstance(response, GripperInfoResponse) or isinstance(
             response, PipetteInfoResponse
         )
-        assert response.payload.serial == s.serial
+        assert response.payload.serial.value == sns_datacodes[i]

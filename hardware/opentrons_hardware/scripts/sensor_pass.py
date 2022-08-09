@@ -16,7 +16,7 @@ from opentrons_hardware.firmware_bindings.constants import (
 )
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.hardware_control.network import probe
-import opentrons_hardware.sensors.utils as sensor_utils
+import opentrons_hardware.sensors.types as sensor_types
 
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions,
@@ -87,8 +87,8 @@ class Capturer:
         """Callback entry point for capturing messages."""
         if isinstance(message, message_definitions.ReadFromSensorResponse):
             self.response_queue.put_nowait(
-                sensor_utils.SensorDataType.build(
-                    message.payload.sensor_data
+                sensor_types.SensorDataType.build(
+                    message.payload.sensor_data, message.payload.sensor
                 ).to_float()
             )
 
@@ -135,7 +135,7 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
         sensor=fields.SensorTypeField(SensorType.capacitive),
         sensor_id=fields.SensorIdField(SensorId.S0),
         threshold=Int32Field(
-            int(args.threshold * sensor_utils.sensor_fixed_point_conversion)
+            int(args.threshold * sensor_types.sensor_fixed_point_conversion)
         ),
         mode=fields.SensorThresholdModeField(SensorThresholdMode.auto_baseline),
     )
