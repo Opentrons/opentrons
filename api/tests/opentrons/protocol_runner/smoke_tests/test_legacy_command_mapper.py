@@ -68,6 +68,12 @@ LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
             volume=40,
             location=well_plate_1["A1"],
         )
+        pipette_left.touch_tip(
+            location=well_plate_1["A1"],
+            radius=0.75,
+            v_offset=2,
+            speed=100,
+        )
         pipette_left.dispense(
             volume=35,
             location=well_plate_1["B1"],
@@ -77,6 +83,7 @@ LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
         pipette_left.dispense(50)
         pipette_left.aspirate()
         pipette_left.dispense()
+        pipette_left.touch_tip()
         pipette_left.drop_tip(
             location=tip_rack_1.wells_by_name()["A1"]
         )
@@ -110,7 +117,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
     pipette_left_result_captor = matchers.Captor()
     pipette_right_result_captor = matchers.Captor()
 
-    assert len(commands_result) == 20
+    assert len(commands_result) == 21
 
     assert commands_result[0] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
@@ -294,7 +301,21 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.AspirateResult(volume=40),
     )
-    assert commands_result[13] == commands.Dispense.construct(
+    assert commands_result[13] == commands.TouchTip.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.TouchTipParams(
+            pipetteId=pipette_left_id,
+            labwareId=well_plate_1_id,
+            wellName="A1",
+        ),
+        result=commands.TouchTipResult(),
+    )
+    assert commands_result[14] == commands.Dispense.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -389,7 +410,15 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=300),
     )
-    assert commands_result[19] == commands.DropTip.construct(
+    assert commands_result[19] == commands.TouchTip.construct(
+        params=commands.TouchTipParams(
+            pipetteId=pipette_left_id,
+            labwareId=well_plate_1_id,
+            wellName="B1",
+        ),
+        result=commands.TouchTipResult(),
+    )
+    assert commands_result[20] == commands.DropTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,

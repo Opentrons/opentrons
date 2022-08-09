@@ -178,6 +178,14 @@ class LegacyCommandMapper:
                             "completedAt": now,
                         }
                     )
+                elif isinstance(running_command, pe_commands.TouchTip):
+                    completed_command = running_command.copy(
+                        update={
+                            "result": pe_commands.TouchTipResult.construct(),
+                            "status": pe_commands.CommandStatus.SUCCEEDED,
+                            "completedAt": now,
+                        }
+                    )
                 else:
                     completed_command = running_command.copy(
                         update={
@@ -213,7 +221,7 @@ class LegacyCommandMapper:
         elif isinstance(load_info, LegacyModuleLoadInfo):
             return self._map_module_load(load_info)
 
-    def _build_initial_command(
+    def _build_initial_command(  # noqa: C901
         self,
         command: legacy_command_types.CommandMessage,
         command_id: str,
@@ -264,6 +272,34 @@ class LegacyCommandMapper:
                 startedAt=now,
                 params=pe_commands.WaitForResumeParams.construct(
                     message=command["payload"]["userMessage"],
+                ),
+            )
+        elif command["name"] == legacy_command_types.TOUCH_TIP:
+            pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore
+            location = command["payload"].get("location")
+            if isinstance(location, Location):
+                well = location.labware.as_well()
+            else:
+                raise Exception("Unknown touch tip location.")
+            parentModuleId = self._module_id_by_slot.get(location.labware.first_parent())  # type: ignore
+            if parentModuleId is not None:
+                labware_id = self._labware_id_by_module_id[parentModuleId]
+            else:
+                slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
+                labware_id = self._labware_id_by_slot[slot]
+            mount = MountType(pipette.mount)
+            well_name = well.well_name
+            pipette_id = self._pipette_id_by_mount[mount]
+            engine_command = pe_commands.TouchTip.construct(
+                id=command_id,
+                key=command_id,
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=now,
+                startedAt=now,
+                params=pe_commands.TouchTipParams.construct(
+                    pipetteId=pipette_id,
+                    labwareId=labware_id,
+                    wellName=well_name,
                 ),
             )
         else:
