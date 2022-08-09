@@ -3,7 +3,7 @@
 import mock
 import asyncio
 from typing import Iterator
-from opentrons_hardware.sensors import scheduler, utils
+from opentrons_hardware.sensors import scheduler, sensor_types
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorId,
@@ -56,7 +56,7 @@ async def test_capture_output(
         )
     )
     async with subject.capture_output(
-        utils.SensorInformation(
+        sensor_types.SensorInformation(
             sensor_type=SensorType.capacitive,
             sensor_id=SensorId.S0,
             node_id=NodeId.pipette_left,

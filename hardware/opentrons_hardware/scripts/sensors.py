@@ -16,7 +16,6 @@ from .sensor_utils import (
     handle_capacitive_sensor,
     handle_environment_sensor,
     handle_pressure_sensor,
-    read_temp_from_pressure_sensor,
 )
 
 GetInputFunc = Callable[[str], str]
@@ -136,8 +135,6 @@ async def send_sensor_command(
         await handle_pressure_sensor(command, driver, node, csv, log)
     elif command.sensor_type == SensorType.capacitive:
         await handle_capacitive_sensor(command, driver, node, csv, log)
-    elif command.sensor_type == SensorType.pressure_temperature:
-        await read_temp_from_pressure_sensor(command, driver, node, csv, log)
     else:
         await handle_environment_sensor(command, driver, node, csv, log)
 
