@@ -5,6 +5,7 @@ import device_details from './device_details.json'
 import device_settings from './device_settings.json'
 import devices_landing from './devices_landing.json'
 import heater_shaker from './heater_shaker.json'
+import jog_controls from './jog_controls.json'
 import labware_details from './labware_details.json'
 import labware_landing from './labware_landing.json'
 import labware_position_check from './labware_position_check.json'
@@ -31,6 +32,7 @@ export const en = {
   device_settings,
   devices_landing,
   heater_shaker,
+  jog_controls,
   labware_details,
   labware_landing,
   labware_position_check,
