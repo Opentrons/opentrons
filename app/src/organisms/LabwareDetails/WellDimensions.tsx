@@ -65,7 +65,7 @@ export function WellDimensions(props: WellDimensionsProps): JSX.Element {
   return (
     <Box marginBottom={SPACING.spacing4}>
       <ExpandingTitle
-        label={`${wellLabel} ${t('measurements')} ${
+        label={`${t(wellLabel)} ${t('measurements')} ${
           labelSuffix != null ? labelSuffix : ''
         }`}
         diagram={diagram.length > 0 ? diagram : null}

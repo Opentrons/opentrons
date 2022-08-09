@@ -73,7 +73,7 @@ export function WellProperties(props: WellPropertiesProps): JSX.Element {
               marginRight={SPACING.spacing4}
             >
               <StyledText as="h6">
-                {wellLabel} {t('shape')}
+                {t(wellLabel)} {t('shape')}
               </StyledText>
               <StyledText as="p">{wellBottomValue}</StyledText>
             </Flex>
