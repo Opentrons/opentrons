@@ -78,7 +78,7 @@ class EEPromReadPayload(utils.BinarySerializable):
     """Eeprom read request payload ."""
 
     address: utils.UInt16Field
-    data_length: utils.UInt8Field
+    data_length: utils.UInt16Field
 
 
 @dataclass
