@@ -112,6 +112,10 @@ dist-win: package-deps
 	$(builder) --win --x64
 	$(MAKE) _dist-collect-artifacts
 
+.PHONY: dist-ot3
+dist-ot3: package-deps
+	NO_PYTHON=true $(builder) --linux --arm64 --dir
+
 # Aliases matching github actions OS names for easier calling in
 # workflows
 .PHONY: dist-macos-latest
