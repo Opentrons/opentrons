@@ -11,7 +11,7 @@ import {
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
-import { Modal } from '../../atoms/Modal'
+import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
 import { OffsetVector } from '../../molecules/OffsetVector'
 import {

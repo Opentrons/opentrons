@@ -10,7 +10,7 @@ import {
   ALIGN_CENTER,
   Btn,
 } from '@opentrons/components'
-import { Modal } from '../../../../atoms/Modal'
+import { Modal } from '../../../../molecules/Modal'
 import { PrimaryButton } from '../../../../atoms/buttons'
 import { StyledText } from '../../../../atoms/text'
 

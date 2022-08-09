@@ -16,7 +16,7 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../../../atoms/text'
 import { AlertPrimaryButton, PrimaryButton } from '../../../../../atoms/buttons'
-import { Modal } from '../../../../../atoms/Modal'
+import { Modal } from '../../../../../molecules/Modal'
 import {
   useDispatchApiRequest,
   getRequestById,

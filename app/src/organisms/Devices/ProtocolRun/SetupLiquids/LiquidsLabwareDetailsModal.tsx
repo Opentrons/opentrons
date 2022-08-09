@@ -19,7 +19,7 @@ import {
   useProtocolDetailsForRun,
   useLabwareRenderInfoForRunById,
 } from '../../../Devices/hooks'
-import { ModalShell, ModalHeader } from '../../../../atoms/Modal'
+import { ModalShell, ModalHeader } from '../../../../molecules/Modal'
 import { StyledText } from '../../../../atoms/text'
 import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 import { LiquidDetailCard } from './LiquidDetailCard'

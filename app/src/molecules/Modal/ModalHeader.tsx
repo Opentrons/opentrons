@@ -11,8 +11,8 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 
-import { StyledText } from '../text'
-import { Divider } from '../structure'
+import { StyledText } from '../../atoms/text'
+import { Divider } from '../../atoms/structure'
 import type { IconProps } from '@opentrons/components'
 
 export interface ModalHeaderProps {

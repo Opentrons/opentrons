@@ -10,7 +10,7 @@ import {
   Link,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { Modal } from '../../atoms/Modal'
+import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
 import { AlertPrimaryButton } from '../../atoms/buttons'
 

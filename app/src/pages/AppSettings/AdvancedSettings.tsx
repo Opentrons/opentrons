@@ -31,7 +31,7 @@ import {
   getReachableRobots,
   getUnreachableRobots,
 } from '../../redux/discovery'
-import { Modal } from '../../atoms/Modal'
+import { Modal } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { SelectOption } from '../../atoms/SelectField/Select'
 import { SelectField } from '../../atoms/SelectField'
