@@ -7,17 +7,27 @@ import { renderWithProviders } from '@opentrons/components'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
 
 import { i18n } from '../../../i18n'
+import { getRobotModelByName } from '../../../redux/discovery'
+import {
+  ROBOT_MODEL_OT2,
+  ROBOT_MODEL_OT3,
+} from '../../../redux/discovery/constants'
 import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
 import { useProtocolDetailsForRun } from '../hooks'
+
 import { RobotStatusBanner } from '../RobotStatusBanner'
 
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
+jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../hooks')
 
+const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
+  typeof getRobotModelByName
+>
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
@@ -49,6 +59,7 @@ const render = () => {
 
 describe('RobotStatusBanner', () => {
   beforeEach(() => {
+    mockGetRobotModelByName.mockReturnValue(ROBOT_MODEL_OT2)
     when(mockUseCurrentRunId).calledWith().mockReturnValue(null)
     when(mockUseCurrentRunStatus).calledWith().mockReturnValue(null)
     when(mockUseProtocolDetailsForRun)
@@ -63,9 +74,16 @@ describe('RobotStatusBanner', () => {
     resetAllWhenMocks()
   })
 
-  it('renders the type of robot and robot name', () => {
+  it('renders the model of robot and robot name - OT-2', () => {
     const [{ getByText }] = render()
     getByText('OT-2')
+    getByText('otie')
+  })
+
+  it('renders the model of robot and robot name - OT-3', () => {
+    mockGetRobotModelByName.mockReturnValue(ROBOT_MODEL_OT3)
+    const [{ getByText }] = render()
+    getByText('OT-3')
     getByText('otie')
   })
 

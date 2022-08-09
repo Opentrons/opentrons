@@ -14,6 +14,11 @@ import {
 } from '../../../redux/pipettes/__fixtures__'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getRobotModelByName } from '../../../redux/discovery'
+import {
+  ROBOT_MODEL_OT2,
+  ROBOT_MODEL_OT3,
+} from '../../../redux/discovery/constants'
 import {
   useAttachedModules,
   useAttachedPipettes,
@@ -28,6 +33,7 @@ import { RobotCard } from '../RobotCard'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 jest.mock('../../../redux/buildroot/selectors')
+jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../../ProtocolUpload/hooks')
@@ -60,6 +66,9 @@ const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
 >
 const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof getBuildrootUpdateDisplayInfo
+>
+const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
+  typeof getRobotModelByName
 >
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
@@ -109,6 +118,7 @@ describe('RobotCard', () => {
         protocolData: {} as ProtocolAnalysisFile<{}>,
         protocolKey: null,
       })
+    mockGetRobotModelByName.mockReturnValue(ROBOT_MODEL_OT2)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -142,9 +152,16 @@ describe('RobotCard', () => {
     getByText('Modules')
   })
 
-  it('renders the type of robot and robot name', () => {
+  it('renders the model of robot and robot name - OT-2', () => {
     const [{ getByText }] = render()
     getByText('OT-2')
+    getByText(mockConnectableRobot.name)
+  })
+
+  it('renders the model of robot and robot name - OT-3', () => {
+    mockGetRobotModelByName.mockReturnValue(ROBOT_MODEL_OT3)
+    const [{ getByText }] = render()
+    getByText('OT-3')
     getByText(mockConnectableRobot.name)
   })
 

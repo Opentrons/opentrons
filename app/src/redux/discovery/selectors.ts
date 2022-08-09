@@ -250,5 +250,5 @@ export const getRobotModelByName = (
   robotName: string
 ): RobotModel | null => {
   const robot = getRobotByName(state, robotName)
-  return robot !=null ? getRobotModel(robot) : null
+  return robot != null ? getRobotModel(robot) : null
 }

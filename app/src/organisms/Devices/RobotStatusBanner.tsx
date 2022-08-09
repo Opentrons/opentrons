@@ -60,8 +60,6 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-      {/* robot_model can be seen in the health response, but only for "connectable" robots.
-    Probably best to leave as "OT-2" for now */}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText
           as="h6"

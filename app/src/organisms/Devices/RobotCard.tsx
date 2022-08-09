@@ -116,7 +116,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
               id={`RobotStatusBanner_${robotName}_robotModel`}
               color={COLORS.darkGreyEnabled}
             >
-              {/* robot_model can be seen in the health response, but only for "connectable" robots. Probably best to leave as "OT-2" for now */}
               {robotModel}
             </StyledText>
             <Flex alignItems={ALIGN_CENTER} paddingBottom={SPACING.spacing4}>
