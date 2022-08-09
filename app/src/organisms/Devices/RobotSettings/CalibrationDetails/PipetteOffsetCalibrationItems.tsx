@@ -42,7 +42,7 @@ const StyledTableCell = styled.td`
 `
 
 const BODY_STYLE = css`
-  box-shadow: 0 0 0 1px ${COLORS.medGrey};
+  box-shadow: 0 0 0 1px ${COLORS.medGreyEnabled};
   border-radius: 3px;
 `
 interface PipetteOffsetCalibrationItemsProps {
@@ -114,8 +114,8 @@ export function PipetteOffsetCalibrationItems({
                           <>
                             <Icon
                               name="alert-circle"
-                              backgroundColor={COLORS.warningBg}
-                              color={COLORS.warning}
+                              backgroundColor={COLORS.warningBackground}
+                              color={COLORS.warningEnabled}
                               size={SPACING.spacing4}
                             />
                             <StyledText
@@ -131,8 +131,8 @@ export function PipetteOffsetCalibrationItems({
                           <>
                             <Icon
                               name="alert-circle"
-                              backgroundColor={COLORS.errorBg}
-                              color={COLORS.error}
+                              backgroundColor={COLORS.errorBackground}
+                              color={COLORS.errorEnabled}
                               size={SPACING.spacing4}
                             />
                             <StyledText

@@ -40,11 +40,11 @@ const closeIconStyles = css`
   width: ${SPACING.spacingL};
   height: ${SPACING.spacingL};
   &:hover {
-    background-color: #16212d26;
+    background-color: ${COLORS.lightGreyEnabled};
   }
 
   &:active {
-    background-color: #16212d40;
+    background-color: ${COLORS.lightGreyHover};
   }
 `
 
@@ -70,7 +70,9 @@ export const Modal = (props: ModalProps): JSX.Element => {
             {['error', 'warning'].includes(type) ? (
               <Icon
                 name="ot-alert"
-                color={type === 'error' ? COLORS.error : COLORS.warning}
+                color={
+                  type === 'error' ? COLORS.errorEnabled : COLORS.warningEnabled
+                }
                 size={SPACING.spacingM}
                 marginRight={SPACING.spacing3}
               />

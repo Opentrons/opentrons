@@ -74,7 +74,7 @@ export function RobotSettingsNetworking({
           <Icon
             size={SPACING.spacing4}
             name="ot-check"
-            color={COLORS.success}
+            color={COLORS.successEnabled}
             marginRight={SPACING.spacing3}
             data-testid="RobotSettings_Networking_check_circle"
           />
@@ -154,7 +154,7 @@ export function RobotSettingsNetworking({
           <Icon
             size={SPACING.spacing4}
             name="ot-check"
-            color={COLORS.success}
+            color={COLORS.successEnabled}
             marginRight={SPACING.spacing3}
             data-testid="RobotSettings_Networking_check_circle"
           />

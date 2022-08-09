@@ -78,7 +78,7 @@ const currentTabStyle = css`
   border-top: ${BORDERS.lineBorder};
   border-left: ${BORDERS.lineBorder};
   border-right: ${BORDERS.lineBorder};
-  color: ${COLORS.blue};
+  color: ${COLORS.blueEnabled};
 
   /* extend below the tab when active to flow into the content */
   &:after {
@@ -319,7 +319,7 @@ export function ProtocolDetails(
 
       <Flex
         backgroundColor={COLORS.white}
-        border={`1px solid ${COLORS.medGrey}`}
+        border={`1px solid ${COLORS.medGreyEnabled}`}
         borderRadius={BORDERS.radiusSoftCorners}
         position={POSITION_RELATIVE}
         flexDirection={DIRECTION_ROW}
@@ -457,7 +457,7 @@ export function ProtocolDetails(
           flex="0 0 20rem"
           backgroundColor={COLORS.white}
           data-testid="ProtocolDetails_deckMap"
-          border={`1px solid ${COLORS.medGrey}`}
+          border={`1px solid ${COLORS.medGreyEnabled}`}
           borderRadius={BORDERS.radiusSoftCorners}
         >
           <StyledText
@@ -472,9 +472,15 @@ export function ProtocolDetails(
           <Box padding={SPACING.spacing4} backgroundColor={COLORS.white}>
             {
               {
-                missing: <Box size="15rem" backgroundColor={COLORS.medGrey} />,
-                loading: <Box size="15rem" backgroundColor={COLORS.medGrey} />,
-                error: <Box size="15rem" backgroundColor={COLORS.medGrey} />,
+                missing: (
+                  <Box size="15rem" backgroundColor={COLORS.medGreyEnabled} />
+                ),
+                loading: (
+                  <Box size="15rem" backgroundColor={COLORS.medGreyEnabled} />
+                ),
+                error: (
+                  <Box size="15rem" backgroundColor={COLORS.medGreyEnabled} />
+                ),
                 complete: (
                   <DeckThumbnail
                     commands={mostRecentAnalysis?.commands ?? []}
@@ -525,7 +531,7 @@ export function ProtocolDetails(
           </Flex>
           <Box
             backgroundColor={COLORS.white}
-            border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGrey}`}
+            border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
             // remove left upper corner border radius when first tab is active
             borderRadius={`${
               currentTab === 'robot_config' ? '0' : BORDERS.radiusSoftCorners

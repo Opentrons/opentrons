@@ -14,7 +14,6 @@ import {
   SPACING,
   TYPOGRAPHY,
   COLORS,
-  Text,
   SIZE_3,
 } from '@opentrons/components'
 import { OffsetVector } from '../../molecules/OffsetVector'
@@ -31,13 +30,13 @@ const OffsetTable = styled('table')`
 `
 const OffsetTableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformUppercase};
-  color: ${COLORS.disabled};
+  color: ${COLORS.darkBlackEnabled};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   padding: ${SPACING.spacing2};
 `
 const OffsetTableRow = styled('tr')`
-  background-color: ${COLORS.background};
+  background-color: ${COLORS.fundamentalsBackground};
 `
 
 const OffsetTableDatum = styled('td')`
@@ -57,7 +56,7 @@ const OffsetDataLoader = (): JSX.Element | null => {
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
     >
-      <Text
+      <StyledText
         as="h3"
         color={C_DARK_GRAY}
         marginTop={SPACING.spacing6}
@@ -66,7 +65,7 @@ const OffsetDataLoader = (): JSX.Element | null => {
         textTransform={TYPOGRAPHY.textTransformUppercase}
       >
         {t('loading_labware_offsets')}
-      </Text>
+      </StyledText>
       <Icon
         name="ot-spinner"
         id="LabwareOffsetsSummary_loadingSpinner"

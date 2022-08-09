@@ -5,7 +5,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   ALIGN_CENTER,
-  C_BLUE_PRESSED,
+  COLORS,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -52,7 +52,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
         </Icon>
         <StyledText
           fontSize={TYPOGRAPHY.fontSizeCaption}
-          color={textColor ?? C_BLUE_PRESSED}
+          color={textColor ?? COLORS.bluePressed}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           marginRight={SPACING.spacing2}
         >
