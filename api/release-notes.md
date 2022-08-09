@@ -6,24 +6,24 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 6.0
+# OT-2 Software Changes in 6.0.1
 
-Welcome to the v6.0 release of the OT-2 software!
+Welcome to the v6.0.1 release of the OT-2 software!
 
 In conjunction with [changes in the Opentrons App](https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md), the 6.0 release reshapes the way your OT-2 stores runs and protocols.
-
-## 6.0.0 to 6.0.1
-
-The `6.0.1` hotfix release fixes one robot software bug present in the original `6.0.0` release:
-
-- Fixed protocol uploads to the OT-2 when the robot's "Use older protocol analysis method" advanced setting is enabled
-
-As noted below, the `6.0.0` release fixed various protocol analysis bugs. **If you have been using the "Use older protocol analysis method" setting, we recommend you turn it off.** You might no longer need it, and your protocols will upload to your OT-2 faster with the setting disabled!
 
 ## New Features
 
 - The OT-2 will retain the past 20 protocol runs on the robot, even across reboots.
 - Supports renaming robots via the Opentrons App.
+
+## 6.0.0 to 6.0.1
+
+The 6.0.1 hotfix release fixes one robot software bug:
+
+- Protocol uploads to the OT-2 work again when the robot's "Use older protocol analysis method" advanced setting is enabled
+
+As noted below, the 6.0.0 release fixed various protocol analysis bugs. **If you have been using the "Use older protocol analysis method" setting, we recommend you turn it off.** You might no longer need it, and your protocols will upload to your OT-2 faster with the setting disabled!
 
 ## Bug Fixes
 
