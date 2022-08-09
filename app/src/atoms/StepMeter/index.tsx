@@ -18,13 +18,13 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
   const progress = currentStep || 0
   const percentComplete = `${(progress / totalSteps) * 100}%`
 
-  const progressBarContainer = css`
+  const StepMeterContainer = css`
     position: ${POSITION_RELATIVE};
     height: ${SPACING.spacing2};
     margin-bottom: ${SPACING.spacing4};
     background-color: ${COLORS.medGreyEnabled};
   `
-  const progressBar = css`
+  const StepMeterBar = css`
     position: ${POSITION_ABSOLUTE};
     top: 0;
     height: 100%;
@@ -37,11 +37,8 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
   `
 
   return (
-    <Box
-      data-testid="StepMeter_ProgressBarContainer"
-      css={progressBarContainer}
-    >
-      <Box data-testid="StepMeter_ProgressBar" css={progressBar} />
+    <Box data-testid="StepMeter_StepMeterContainer" css={StepMeterContainer}>
+      <Box data-testid="StepMeter_StepMeterBar" css={StepMeterBar} />
     </Box>
   )
 }

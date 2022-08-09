@@ -22,21 +22,21 @@ describe('StepMeter', () => {
     jest.resetAllMocks()
   })
 
-  it('renders progress bar at 0% width', () => {
+  it('renders StepMeterBar at 0% width', () => {
     const { getByTestId } = render(props)
-    getByTestId('StepMeter_ProgressBarContainer')
-    const bar = getByTestId('StepMeter_ProgressBar')
+    getByTestId('StepMeter_StepMeterContainer')
+    const bar = getByTestId('StepMeter_StepMeterBar')
     expect(bar).toHaveStyle('width: 0%')
   })
 
-  it('renders progress bar at 40% width', () => {
+  it('renders StepMeterBar at 40% width', () => {
     props = {
       ...props,
       currentStep: 2,
     }
     const { getByTestId } = render(props)
-    getByTestId('StepMeter_ProgressBarContainer')
-    const bar = getByTestId('StepMeter_ProgressBar')
+    getByTestId('StepMeter_StepMeterContainer')
+    const bar = getByTestId('StepMeter_StepMeterBar')
     expect(bar).toHaveStyle('width: 40%')
   })
 })
