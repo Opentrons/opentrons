@@ -37,8 +37,11 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
   `
 
   return (
-    <Box css={progressBarContainer}>
-      <Box css={progressBar} />
+    <Box
+      data-testid="StepMeter_ProgressBarContainer"
+      css={progressBarContainer}
+    >
+      <Box data-testid="StepMeter_ProgressBar" css={progressBar} />
     </Box>
   )
 }
