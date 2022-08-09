@@ -60,7 +60,7 @@ async def test_analyze(
             files=[],
             metadata={},
             labware_definitions=[],
-            liquids={}
+            liquids={},
         ),
         protocol_key="dummy-data-111",
     )
