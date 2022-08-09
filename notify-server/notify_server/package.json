@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/notify-server",
-  "version": "6.0.1-alpha.1",
+  "version": "6.0.1",
   "description": "Notification pub/sub server for Opentrons robots",
   "repository": {
     "type": "git",
