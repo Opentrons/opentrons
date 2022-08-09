@@ -177,7 +177,6 @@ class SensorType(int, Enum):
     temperature = 0x06
 
 
-
 @unique
 class SensorId(int, Enum):
     """Sensor IDs available.
