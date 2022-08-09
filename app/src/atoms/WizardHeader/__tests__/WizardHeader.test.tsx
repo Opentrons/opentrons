@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { StepMeter } from '../../StepMeter'
@@ -50,5 +50,6 @@ describe('WizardHeader', () => {
     const { getByText, getByRole } = render(props)
     getByText('Tip Length Calibrations')
     getByRole('button', { name: 'exit' })
+    expect(screen.queryByText('Step: 0 / 5')).not.toBeInTheDocument()
   })
 })
