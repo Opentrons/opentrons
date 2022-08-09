@@ -1,7 +1,6 @@
-"""The types of sensors supported by the system"""
-from abc import abstractmethod
+"""The types of sensors supported by the system."""
 from dataclasses import dataclass
-from typing import List, Union, Optional
+from typing import List, Union
 from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
 
 from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId, SensorType
@@ -43,6 +42,9 @@ class BaseSensorType:
     def set_sensor_data(
         self, sensor_data: List[SensorDataType]
     ) -> Union[SensorDataType, EnvironmentSensorDataType]:
+        """Set the sensor data on the class and return the new data."""
+        # TODO there is probably a better way to
+        # type this function for inheritance.
         return SensorDataType.build(0.0, SensorType.environment)
 
 
@@ -76,8 +78,8 @@ class ThresholdSensorType(BaseSensorType):
 
 @dataclass
 class PressureSensor(ThresholdSensorType):
-    # unsure if this should be manipulated or
-    # stored after the fact
+    """A pressure sensor type."""
+
     data: SensorDataType
 
     @classmethod
@@ -89,17 +91,21 @@ class PressureSensor(ThresholdSensorType):
         zero_threshold: float = 0.0,
         stop_threshold: float = 0.0,
     ) -> "PressureSensor":
+        """Build a pressure sensor class."""
         info = SensorInformation(SensorType.pressure, sensor_id, node_id)
         sensor_data = SensorDataType.build(0, SensorTypeField(SensorType.pressure))
         return cls(info, offset, 1, zero_threshold, stop_threshold, sensor_data)
 
     def set_sensor_data(self, sensor_data: List[SensorDataType]) -> SensorDataType:
+        """Set the sensor data on the class and return the new data."""
         self.data = sensor_data[0]
         return self.data
 
 
 @dataclass
 class CapacitiveSensor(ThresholdSensorType):
+    """A capacitive sensor type."""
+
     data: SensorDataType
 
     @classmethod
@@ -111,23 +117,28 @@ class CapacitiveSensor(ThresholdSensorType):
         zero_threshold: float = 0.0,
         stop_threshold: float = 0.0,
     ) -> "CapacitiveSensor":
+        """Build a capacitive sensor class."""
         info = SensorInformation(SensorType.capacitive, sensor_id, node_id)
         sensor_data = SensorDataType.build(0, SensorTypeField(SensorType.capacitive))
         return cls(info, offset, 1, zero_threshold, stop_threshold, sensor_data)
 
     def set_sensor_data(self, sensor_data: List[SensorDataType]) -> SensorDataType:
+        """Set the sensor data on the class and return the new data."""
         self.data = sensor_data[0]
         return self.data
 
 
 @dataclass
 class EnvironmentSensor(BaseSensorType):
+    """An environment sensor type."""
+
     data: EnvironmentSensorDataType
 
     @classmethod
     def build(
         cls, sensor_id: SensorId, node_id: NodeId, offset: float = 0.0
     ) -> "EnvironmentSensor":
+        """Build an environment sensor class."""
         info = SensorInformation(SensorType.environment, sensor_id, node_id)
         empty_list = [
             SensorDataType.build(0, SensorTypeField(SensorType.temperature)),
@@ -139,5 +150,6 @@ class EnvironmentSensor(BaseSensorType):
     def set_sensor_data(
         self, sensor_data: List[SensorDataType]
     ) -> EnvironmentSensorDataType:
+        """Set the sensor data on the class and return the new data."""
         self.data = EnvironmentSensorDataType.build(sensor_data)
         return self.data

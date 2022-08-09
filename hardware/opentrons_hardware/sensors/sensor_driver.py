@@ -1,6 +1,5 @@
 """Capacitve Sensor Driver Class."""
 
-import re
 from typing import Optional, AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -11,10 +10,8 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorOutputBinding,
     SensorThresholdMode,
 )
-from opentrons_hardware.firmware_bindings.constants import SensorType
 from opentrons_hardware.sensors.types import (
     SensorDataType,
-    EnvironmentSensorDataType,
     SensorReturnType,
 )
 from opentrons_hardware.sensors.utils import (
@@ -53,6 +50,7 @@ class SensorDriver(AbstractSensorDriver):
         self._scheduler = SensorScheduler()
 
     def __repr__(self) -> str:
+        """String representation of class."""
         return "<Sensor Driver>"
 
     async def get_report(

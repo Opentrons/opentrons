@@ -17,6 +17,7 @@ from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     WaitableCallback,
+    MultipleMessagesWaitableCallback,
 )
 
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
@@ -45,14 +46,14 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorOutputBindingField,
     SensorThresholdModeField,
 )
+from opentrons_hardware.sensors.types import SensorDataType
+from opentrons_hardware.sensors.sensor_types import SensorInformation
 
 from opentrons_hardware.sensors.utils import (
     ReadSensorInformation,
-    SensorDataType,
     WriteSensorInformation,
     PollSensorInformation,
     SensorThresholdInformation,
-    SensorInformation,
 )
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
@@ -68,17 +69,24 @@ class SensorScheduler:
     """Sensor message scheduler."""
 
     async def run_poll(
-        self, sensor: PollSensorInformation, can_messenger: CanMessenger, timeout: int, expected_responses: int = 1
-    ) -> Optional[SensorDataType]:
+        self,
+        sensor: PollSensorInformation,
+        can_messenger: CanMessenger,
+        timeout: int,
+        expected_num_messages: int = 1,
+    ) -> List[SensorDataType]:
         """Send poll message."""
-        with WaitableCallback(can_messenger, number_of_messages=expected_responses) as reader:
-            data: Optional[SensorDataType] = None
+        sensor_info = sensor.sensor
+        with MultipleMessagesWaitableCallback(
+            can_messenger, number_of_messages=expected_num_messages
+        ) as reader:
+            data_list: List[SensorDataType] = []
             await can_messenger.send(
-                node_id=sensor.node_id,
+                node_id=sensor_info.node_id,
                 message=BaselineSensorRequest(
                     payload=BaselineSensorRequestPayload(
-                        sensor=SensorTypeField(sensor.sensor_type),
-                        sensor_id=SensorIdField(sensor.sensor_id),
+                        sensor=SensorTypeField(sensor_info.sensor_type),
+                        sensor_id=SensorIdField(sensor_info.sensor_id),
                         sample_rate=UInt16Field(sensor.poll_for),
                     )
                 ),
@@ -86,28 +94,32 @@ class SensorScheduler:
             try:
 
                 def _format(message: ReadFromSensorResponse) -> SensorDataType:
-                    return SensorDataType.build(message.payload.sensor_data, message.payload.sensor)
-                data = await asyncio.wait_for(
+                    return SensorDataType.build(
+                        message.payload.sensor_data, message.payload.sensor
+                    )
+
+                data_list = await asyncio.wait_for(
                     self._multi_wait_for_response(
-                        sensor.node_id, reader, ReadFromSensorResponse, _format, expected_responses
+                        sensor_info.node_id, reader, ReadFromSensorResponse, _format
                     ),
                     timeout,
                 )
             except asyncio.TimeoutError:
                 log.warning("Sensor poll timed out")
             finally:
-                return data
+                return data_list
 
     async def send_write(
         self, sensor: WriteSensorInformation, can_messenger: CanMessenger
     ) -> None:
         """Send write message."""
+        sensor_info = sensor.sensor
         await can_messenger.send(
-            node_id=sensor.node_id,
+            node_id=sensor_info.node_id,
             message=WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
-                    sensor=SensorTypeField(sensor.sensor_type),
-                    sensor_id=SensorIdField(sensor.sensor_id),
+                    sensor=SensorTypeField(sensor_info.sensor_type),
+                    sensor_id=SensorIdField(sensor_info.sensor_id),
                     data=UInt32Field(sensor.data.to_int),
                     # TODO(lc, 03-29-2022, actually pass in a register value)
                     reg_address=UInt8Field(0x0),
@@ -116,18 +128,24 @@ class SensorScheduler:
         )
 
     async def send_read(
-        self, sensor: ReadSensorInformation, can_messenger: CanMessenger, timeout: int,
-        expected_responses: int = 1,
-    ) -> List[Optional[SensorDataType]]:
+        self,
+        sensor: ReadSensorInformation,
+        can_messenger: CanMessenger,
+        timeout: int,
+        expected_num_messages: int = 1,
+    ) -> List[SensorDataType]:
         """Send read message."""
-        with WaitableCallback(can_messenger, number_of_messages=expected_responses) as reader:
-            data_list: List[Optional[SensorDataType]] = []
+        sensor_info = sensor.sensor
+        with MultipleMessagesWaitableCallback(
+            can_messenger, number_of_messages=expected_num_messages
+        ) as reader:
+            data_list: List[SensorDataType] = []
             await can_messenger.send(
-                node_id=sensor.node_id,
+                node_id=sensor_info.node_id,
                 message=ReadFromSensorRequest(
                     payload=ReadFromSensorRequestPayload(
-                        sensor=SensorTypeField(sensor.sensor_type),
-                        sensor_id=SensorIdField(sensor.sensor_id),
+                        sensor=SensorTypeField(sensor_info.sensor_type),
+                        sensor_id=SensorIdField(sensor_info.sensor_id),
                         offset_reading=UInt8Field(int(sensor.offset)),
                     )
                 ),
@@ -135,19 +153,19 @@ class SensorScheduler:
             try:
 
                 def _format(response: ReadFromSensorResponse) -> SensorDataType:
-                    return SensorDataType.build(response.payload.sensor_data, response.payload.sensor)
-                
+                    return SensorDataType.build(
+                        response.payload.sensor_data, response.payload.sensor
+                    )
+
                 data_list = await asyncio.wait_for(
                     self._multi_wait_for_response(
-                        sensor.node_id, reader, ReadFromSensorResponse, _format, expected_responses
+                        sensor_info.node_id, reader, ReadFromSensorResponse, _format
                     ),
                     timeout,
                 )
             except asyncio.TimeoutError:
                 log.warning("Sensor Read timed out")
             finally:
-                print("finished data list")
-                print(data_list)
                 return data_list
 
     async def read(
@@ -155,23 +173,28 @@ class SensorScheduler:
         can_messenger: CanMessenger,
         node_id: NodeId,
         timeout: float = 1.0,
-        expected_responses = 1,
+        expected_num_messages: int = 1,
     ) -> List[SensorDataType]:
         """Helper function for the get_report sensor driver.
 
         This simply retrieves CAN messages without first
         sending a ReadFromSensorRequest.
         """
-        data_list: List[Optional[SensorDataType]] = []
+        data_list: List[SensorDataType] = []
 
         def _format(response: ReadFromSensorResponse) -> SensorDataType:
-            return SensorDataType.build(response.payload.sensor_data, response.payload.sensor)
+            return SensorDataType.build(
+                response.payload.sensor_data, response.payload.sensor
+            )
 
-        with WaitableCallback(can_messenger) as reader:
+        with MultipleMessagesWaitableCallback(
+            can_messenger,
+            number_of_messages=expected_num_messages,
+        ) as reader:
             try:
                 data_list = await asyncio.wait_for(
                     self._multi_wait_for_response(
-                        node_id, reader, ReadFromSensorResponse, _format, expected_responses
+                        node_id, reader, ReadFromSensorResponse, _format
                     ),
                     timeout,
                 )
@@ -187,14 +210,15 @@ class SensorScheduler:
         timeout: float = 1.0,
     ) -> Optional[SensorDataType]:
         """Send threshold message."""
-        with WaitableCallback(can_messenger) as reader:
+        sensor_info = sensor.sensor
+        with MultipleMessagesWaitableCallback(can_messenger) as reader:
             data: Optional[SensorDataType] = None
             await can_messenger.send(
-                node_id=sensor.node_id,
+                node_id=sensor_info.node_id,
                 message=SetSensorThresholdRequest(
                     payload=SetSensorThresholdRequestPayload(
-                        sensor=SensorTypeField(sensor.sensor_type),
-                        sensor_id=SensorIdField(sensor.sensor_id),
+                        sensor=SensorTypeField(sensor_info.sensor_type),
+                        sensor_id=SensorIdField(sensor_info.sensor_id),
                         threshold=sensor.data.backing,
                         mode=SensorThresholdModeField(sensor.mode.value),
                     )
@@ -203,11 +227,13 @@ class SensorScheduler:
             try:
 
                 def _format(response: SensorThresholdResponse) -> SensorDataType:
-                    return SensorDataType.build(response.payload.threshold, response.payload.sensor)
+                    return SensorDataType.build(
+                        response.payload.threshold, response.payload.sensor
+                    )
 
                 data = await asyncio.wait_for(
                     self._wait_for_response(
-                        sensor.node_id, reader, SensorThresholdResponse, _format
+                        sensor_info.node_id, reader, SensorThresholdResponse, _format
                     ),
                     timeout,
                 )
@@ -221,17 +247,18 @@ class SensorScheduler:
         node_id: NodeId,
         reader: WaitableCallback,
         response_def: Type[ResponseType],
-        response_handler: Callable[[ResponseType], Optional[SensorDataType]],
-        expected_responses: int,
-    ) -> Optional[List[SensorDataType]]:
+        response_handler: Callable[[ResponseType], SensorDataType],
+    ) -> List[SensorDataType]:
         """Listener for receiving messages back."""
-        data: Optional[List[SensorDataType]] = []
+        # TODO we should refactor the rest of the code that relies on
+        # waitable callback to specify how many messages it would like to wait
+        # for. Otherwise, the code will timeout unless you return directly
+        # from an async for loop.
+        data: List[SensorDataType] = []
         async for response, arbitration_id in reader:
             if arbitration_id.parts.originating_node_id == node_id:
                 if isinstance(response, response_def):
                     data.append(response_handler(response))
-        print("finished multi wait")
-        print(data)
         return data
 
     @staticmethod
@@ -269,7 +296,7 @@ class SensorScheduler:
         timeout: int,
     ) -> bool:
         """Send threshold message."""
-        with WaitableCallback(can_messenger) as reader:
+        with MultipleMessagesWaitableCallback(can_messenger) as reader:
             status = False
             await can_messenger.send(
                 node_id=node_id,
@@ -296,7 +323,7 @@ class SensorScheduler:
         if isinstance(message, ReadFromSensorResponse):
             log.info(
                 f"{SensorType(message.payload.sensor.value).name}: "
-                f"{SensorDataType.build(message.payload.sensor_data).to_float()}"
+                f"{SensorDataType.build(message.payload.sensor_data, message.payload.sensor).to_float()}"
             )
 
     @asynccontextmanager
@@ -355,7 +382,7 @@ class SensorScheduler:
         ) -> None:
             payload = cast(ReadFromSensorResponse, message).payload
             response_queue.put_nowait(
-                SensorDataType.build(payload.sensor_data).to_float()
+                SensorDataType.build(payload.sensor_data, payload.sensor).to_float()
             )
 
         def _filter(arbitration_id: ArbitrationId) -> bool:

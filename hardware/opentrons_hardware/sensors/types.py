@@ -1,5 +1,6 @@
+"""Data types for sensors."""
 from dataclasses import dataclass
-from typing import List, Union, overload, Optional
+from typing import List, Union, overload
 from typing_extensions import Final
 
 from opentrons_hardware.firmware_bindings.constants import SensorType
@@ -94,11 +95,14 @@ class SensorDataType:
 
 @dataclass
 class EnvironmentSensorDataType:
+    """Storage class for the environment sensor to hold two different data types."""
+
     humidity: SensorDataType
     temperature: SensorDataType
 
     @classmethod
     def build(cls, data_list: List[SensorDataType]) -> "EnvironmentSensorDataType":
+        """Build a new environment sensor data type."""
         humidity = SensorDataType.build(0, SensorType.humidity)
         temperature = SensorDataType.build(0, SensorType.temperature)
         for item in data_list:
