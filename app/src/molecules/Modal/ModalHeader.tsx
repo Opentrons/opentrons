@@ -9,6 +9,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   JUSTIFY_CENTER,
+  COLORS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -30,11 +31,11 @@ const closeIconStyles = css`
   width: ${SPACING.spacingL};
   height: ${SPACING.spacingL};
   &:hover {
-    background-color: #16212d26;
+    background-color: ${COLORS.lightGreyEnabled};
   }
 
   &:active {
-    background-color: #16212d40;
+    background-color: ${COLORS.lightGreyHover};
   }
 `
 

@@ -110,7 +110,7 @@ export const LabwarePositionCheckStepDetail = (
   const wellStroke: WellStroke = wellsToHighlight.reduce(
     (acc, wellName) => ({
       ...acc,
-      [wellName]: COLORS.blue,
+      [wellName]: COLORS.blueEnabled,
     }),
     {}
   )
@@ -137,7 +137,7 @@ export const LabwarePositionCheckStepDetail = (
       justifyContent={JUSTIFY_CENTER}
       boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
       borderRadius="4px"
-      backgroundColor={COLORS.background}
+      backgroundColor={COLORS.fundamentalsBackground}
       flexDirection={DIRECTION_COLUMN}
       width="106%"
     >
@@ -159,8 +159,8 @@ export const LabwarePositionCheckStepDetail = (
                 wellStroke={wellStroke}
                 wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
                 highlightedWellLabels={{ wells: wellsToHighlight }}
-                labwareStroke={COLORS.medGrey}
-                wellLabelColor={COLORS.medGrey}
+                labwareStroke={COLORS.medGreyEnabled}
+                wellLabelColor={COLORS.medGreyEnabled}
               />
               <PipetteRender
                 labwareDef={labwareDef}
@@ -188,7 +188,7 @@ export const LabwarePositionCheckStepDetail = (
       >
         <Flex justifyContent={JUSTIFY_SPACE_AROUND} alignItems={ALIGN_CENTER}>
           <Flex
-            backgroundColor={COLORS.background}
+            backgroundColor={COLORS.fundamentalsBackground}
             flexDirection={DIRECTION_COLUMN}
             borderRadius={BORDERS.radiusSoftCorners}
             padding={SPACING.spacing3}
@@ -206,7 +206,7 @@ export const LabwarePositionCheckStepDetail = (
               <Link
                 role="button"
                 fontSize={TYPOGRAPHY.fontSizeH3}
-                color={COLORS.blue}
+                color={COLORS.blueEnabled}
                 onClick={() => setShowJogControls(true)}
                 id="LabwarePositionCheckStepDetail_reveal_jog_controls"
               >
@@ -222,7 +222,7 @@ export const LabwarePositionCheckStepDetail = (
             stepSizes={[0.1, 1, 10]}
             planes={[HORIZONTAL_PLANE, VERTICAL_PLANE]}
             width="100%"
-            directionControlButtonColor={COLORS.blue}
+            directionControlButtonColor={COLORS.blueEnabled}
             isLPC={true}
           />
         ) : null}

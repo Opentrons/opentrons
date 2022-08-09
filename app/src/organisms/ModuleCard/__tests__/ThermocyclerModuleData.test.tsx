@@ -85,7 +85,7 @@ describe('ThermocyclerModuleData', () => {
     const { getByText } = render(props)
 
     expect(getByText('Mock Thermocycler StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.warningBg'
+      'backgroundColor: COLORS.warningBackground'
     )
   })
 

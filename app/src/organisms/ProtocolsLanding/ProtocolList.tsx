@@ -39,7 +39,7 @@ const SORT_BY_BUTTON_STYLE = css`
   }
   &:active,
   &:focus {
-    background-color: ${COLORS.medGrey};
+    background-color: ${COLORS.medGreyEnabled};
   }
 `
 

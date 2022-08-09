@@ -37,7 +37,8 @@ export const Modal = (props: ModalProps): JSX.Element => {
         ['error', 'warning'].includes(type)
           ? {
               name: 'ot-alert',
-              color: type === 'error' ? COLORS.error : COLORS.warning,
+              color:
+                type === 'error' ? COLORS.errorEnabled : COLORS.warningEnabled,
               size: SPACING.spacingM,
               marginRight: SPACING.spacing3,
             }

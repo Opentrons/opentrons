@@ -15,7 +15,7 @@ export const MenuItem: BtnComponent = styled(Btn)`
   text-align: ${TEXT_ALIGN_LEFT};
   font-size: ${TYPOGRAPHY.fontSizeP};
   background-color: transparent;
-  color: ${COLORS.darkBlack};
+  color: ${COLORS.darkBlackEnabled};
   padding: ${SPACING.spacing3} 0.75rem ${SPACING.spacing3} 0.75rem;
 
   &:hover {
@@ -24,6 +24,6 @@ export const MenuItem: BtnComponent = styled(Btn)`
 
   &:disabled,
   &.disabled {
-    color: ${COLORS.greyDisabled};
+    color: ${COLORS.darkGreyDisabled};
   }
 `

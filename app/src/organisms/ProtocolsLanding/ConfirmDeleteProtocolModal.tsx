@@ -44,7 +44,7 @@ export function ConfirmDeleteProtocolModal(
             {t('shared:cancel')}
           </Link>
           <AlertPrimaryButton
-            backgroundColor={COLORS.error}
+            backgroundColor={COLORS.errorEnabled}
             onClick={props.handleClickDelete}
           >
             {t('yes_delete_this_protocol')}

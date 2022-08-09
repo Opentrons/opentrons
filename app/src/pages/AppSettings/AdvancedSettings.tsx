@@ -244,7 +244,7 @@ export function AdvancedSettings(): JSX.Element {
                     <Btn
                       onClick={cancelExit}
                       textTransform={TYPOGRAPHY.textTransformCapitalize}
-                      color={COLORS.blue}
+                      color={COLORS.blueEnabled}
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                       marginRight={SPACING.spacing6}
                     >
@@ -308,7 +308,7 @@ export function AdvancedSettings(): JSX.Element {
               <Link
                 role="button"
                 css={TYPOGRAPHY.pRegular}
-                color={COLORS.darkBlack}
+                color={COLORS.darkBlackEnabled}
                 onClick={() =>
                   dispatch(CustomLabware.openCustomLabwareDirectory())
                 }
@@ -423,14 +423,14 @@ export function AdvancedSettings(): JSX.Element {
             {driverOutdated && (
               <Banner type="warning" marginTop={SPACING.spacing4}>
                 <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-                  <StyledText as="p" color={COLORS.darkBlack}>
+                  <StyledText as="p" color={COLORS.darkBlackEnabled}>
                     {t('usb_to_ethernet_adapter_toast_message')}
                   </StyledText>
                   <Link
                     external
                     href={REALTEK_URL}
                     css={TYPOGRAPHY.pRegular}
-                    color={COLORS.darkBlack}
+                    color={COLORS.darkBlackEnabled}
                     textDecoration={TYPOGRAPHY.textDecorationUnderline}
                     id="AdvancedSettings_realtekLink"
                   >
@@ -571,7 +571,7 @@ export function AdvancedSettings(): JSX.Element {
               <Link
                 role="button"
                 css={TYPOGRAPHY.pRegular}
-                color={COLORS.darkBlack}
+                color={COLORS.darkBlackEnabled}
                 onClick={() =>
                   dispatch(Config.openPythonInterpreterDirectory())
                 }
