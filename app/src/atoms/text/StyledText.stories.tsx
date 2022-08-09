@@ -49,3 +49,33 @@ label.args = {
   as: 'label',
   children: dummyText,
 }
+
+export const h2SemiBold = Template.bind({})
+h2SemiBold.args = {
+  as: 'h2SemiBold',
+  children: dummyText,
+}
+
+export const h3SemiBold = Template.bind({})
+h3SemiBold.args = {
+  as: 'h3SemiBold',
+  children: dummyText,
+}
+
+export const h6SemiBold = Template.bind({})
+h6SemiBold.args = {
+  as: 'h6SemiBold',
+  children: dummyText,
+}
+
+export const pSemiBold = Template.bind({})
+pSemiBold.args = {
+  as: 'pSemiBold',
+  children: dummyText,
+}
+
+export const labelSemiBold = Template.bind({})
+labelSemiBold.args = {
+  as: 'labelSemiBold',
+  children: dummyText,
+}
