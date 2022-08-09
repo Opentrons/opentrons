@@ -152,7 +152,6 @@ class WaitableCallback:
         self,
         messenger: CanMessenger,
         filter: Optional[MessageListenerCallbackFilter] = None,
-        number_of_messages: Optional[int] = None,
     ) -> None:
         """Constructor.
 
@@ -165,7 +164,6 @@ class WaitableCallback:
         self._queue: asyncio.Queue[
             Tuple[MessageDefinition, ArbitrationId]
         ] = asyncio.Queue()
-        self._number_of_messages: int = number_of_messages or 1
 
     def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
@@ -190,12 +188,40 @@ class WaitableCallback:
 
     async def __anext__(self) -> Tuple[MessageDefinition, ArbitrationId]:
         """Async next."""
-        if (self._number_of_messages < 1):
-            raise StopAsyncIteration
-        self._number_of_messages -= 1
         return await self.read()
 
     async def read(self) -> Tuple[MessageDefinition, ArbitrationId]:
         """Read next message."""
         return await self._queue.get()
 
+
+class MultipleMessagesWaitableCallback(WaitableCallback):
+    """MessageListenerCallback that can be awaited or iterated."""
+
+    # TODO we should refactor the rest of the code that relies on
+    # waitable callback to specify how many messages it would like to wait
+    # for. Otherwise, the code will timeout unless you return directly
+    # from an async for loop.
+    def __init__(
+        self,
+        messenger: CanMessenger,
+        filter: Optional[MessageListenerCallbackFilter] = None,
+        number_of_messages: Optional[int] = None,
+    ) -> None:
+        """Constructor.
+
+        Args:
+            messenger: Messenger to listen on.
+            filter: Optional message filtering function
+            number_of_messages: Optional number of messages to wait for or
+            default to 1.
+        """
+        super().__init__(messenger, filter)
+        self._number_of_messages: int = number_of_messages or 1
+
+    async def __anext__(self) -> Tuple[MessageDefinition, ArbitrationId]:
+        """Async next."""
+        if self._number_of_messages < 1:
+            raise StopAsyncIteration
+        self._number_of_messages -= 1
+        return await self.read()
