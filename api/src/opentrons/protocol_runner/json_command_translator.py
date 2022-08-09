@@ -90,13 +90,14 @@ def _translate_liquid_command(
     labwareId = command.params.labwareId
     volumeByWell = command.params.volumeByWell
     # v6 data model supports all commands and therefor most props are optional.
-    # load liquid command must contain labware_id and definition_id.
+    # load liquid command must contain liquidId, labwareId and volumeByWell.
     assert liquidId is not None
     assert labwareId is not None
     assert volumeByWell is not None
-    print(volumeByWell)
+
     liquid = protocol.liquids[liquidId]  # type: ignore[index]
     assert liquid is not None
+
     liquid_command = pe_commands.LoadLiquidCreate(
         params=pe_commands.LoadLiquidParams(
             labwareId=labwareId,
