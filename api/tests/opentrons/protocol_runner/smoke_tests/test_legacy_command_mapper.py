@@ -14,7 +14,7 @@ from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
 
 
-PICK_UP_TIP_PROTOCOL = textwrap.dedent(
+LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
     """
     # my protocol
     metadata = {
@@ -80,18 +80,18 @@ PICK_UP_TIP_PROTOCOL = textwrap.dedent(
 
 
 @pytest.fixture
-def pick_up_tip_protocol_file(tmp_path: Path) -> Path:
+def legacy_commands_protocol_file(tmp_path: Path) -> Path:
     """Put the pick up tip mapping test protocol on disk."""
     path = tmp_path / "protocol-name.py"
-    path.write_text(PICK_UP_TIP_PROTOCOL)
+    path.write_text(LEGACY_COMMANDS_PROTOCOL)
     return path
 
 
-async def test_legacy_pick_up_tip(pick_up_tip_protocol_file: Path) -> None:
+async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
     """It should map legacy pick up tip commands."""
     protocol_reader = ProtocolReader()
     protocol_source = await protocol_reader.read_saved(
-        files=[pick_up_tip_protocol_file],
+        files=[legacy_commands_protocol_file],
         directory=None,
     )
 
