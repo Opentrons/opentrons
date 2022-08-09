@@ -65,13 +65,17 @@ export function WellDimensions(props: WellDimensionsProps): JSX.Element {
   return (
     <Box marginBottom={SPACING.spacing4}>
       <ExpandingTitle
-        label={`${t(wellLabel)} ${t('measurements')} ${
+        label={`${wellLabel} ${t('measurements')} ${
           labelSuffix != null ? labelSuffix : ''
         }`}
         diagram={diagram.length > 0 ? diagram : null}
       />
       {dimensions.map(d => (
-        <LabeledValue key={d.value} label={d.label} value={d.value} />
+        <LabeledValue
+          key={`${d.label}_${d.value}`}
+          label={d.label}
+          value={d.value}
+        />
       ))}
     </Box>
   )

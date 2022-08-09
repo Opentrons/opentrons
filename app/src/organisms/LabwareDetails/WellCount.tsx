@@ -27,7 +27,7 @@ export function WellCount(props: WellCountProps): JSX.Element {
       marginBottom={SPACING.spacing4}
     >
       <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {t(wellLabel)} {t('count')}
+        {wellLabel} {t('count')}
       </StyledText>
       <StyledText as="p">{count}</StyledText>
     </Flex>
