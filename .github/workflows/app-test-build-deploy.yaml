@@ -89,7 +89,7 @@ jobs:
     # to run cross-platform just like builds, might as well do them in the same job
     strategy:
       matrix:
-        os: ['windows-2019', 'ubuntu-18.04', 'macos-latest']
+        os: ['ubuntu-18.04']
     name: 'opentrons app backend unit tests and build'
     needs: ['js-unit-test']
     runs-on: ${{ matrix.os }}
@@ -134,7 +134,7 @@ jobs:
 
       # build the app and deploy it
       - if: github.event_name != 'pull_request'
-        name: 'build app for ${{ matrix.os }}'
+        name: 'build app for ot-3'
         timeout-minutes: 60
         env:
           OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
@@ -147,7 +147,7 @@ jobs:
           APPLE_ID_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
           HOST_PYTHON: python
         run: |
-          make -C app-shell dist-${{ matrix.os }}
+          make -C app-shell dist-ot3
 
       - if: github.event_name != 'pull_request'
         name: 'upload github artifact'

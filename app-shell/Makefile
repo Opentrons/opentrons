@@ -114,7 +114,7 @@ dist-win: package-deps
 
 .PHONY: dist-ot3
 dist-ot3: package-deps
-	NO_PYTHON=true $(builder) --linux --arm64 --dir
+		  NO_PYTHON=true $(builder) --linux --arm64 --dir
 
 # Aliases matching github actions OS names for easier calling in
 # workflows
