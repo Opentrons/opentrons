@@ -91,7 +91,7 @@ class LegacyCommandMapper:
         ] = {}
         self._module_data_provider = module_data_provider or ModuleDataProvider()
 
-    def map_command(
+    def map_command(    # noqa: C901
         self,
         command: legacy_command_types.CommandMessage,
     ) -> List[pe_actions.Action]:
@@ -213,7 +213,7 @@ class LegacyCommandMapper:
         elif isinstance(load_info, LegacyModuleLoadInfo):
             return self._map_module_load(load_info)
 
-    def _build_initial_command(
+    def _build_initial_command( # noqa: C901
         self,
         command: legacy_command_types.CommandMessage,
         command_id: str,
@@ -290,10 +290,8 @@ class LegacyCommandMapper:
             location = command["payload"].get("location")
             volume = command["payload"].get("volume")
             flowRate = command["payload"].get("rate")
-            if flowRate is None:
-                raise Exception("Unknown aspirate rate.")
-            if volume is None:
-                raise Exception("Unknown asiprate volume.")
+            assert flowRate is not None, "Unknown aspirate rate."
+            assert volume is not None, "Unknown asiprate volume."
             if isinstance(location, Location):
                 well = location.labware.as_well()
             else:
@@ -332,10 +330,8 @@ class LegacyCommandMapper:
             location = command["payload"].get("location")
             volume = command["payload"].get("volume")
             flowRate = command["payload"].get("rate")
-            if flowRate is None:
-                raise Exception("Unknown dispense rate.")
-            if volume is None:
-                raise Exception("Unknown dispense volume.")
+            assert flowRate is not None, "Unknown dispense rate."
+            assert volume is not None, "Unknown dispense volume."
             if isinstance(location, Location):
                 well = location.labware.as_well()
             else:
