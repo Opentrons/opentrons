@@ -283,6 +283,7 @@ def test_load_python(
         metadata={},
         config=PythonProtocolConfig(api_version=APIVersion(3, 0)),
         labware_definitions=[],
+        liquids={},
     )
 
     python_protocol = decoy.mock(cls=PythonProtocol)
@@ -325,6 +326,7 @@ def test_load_legacy_python(
         metadata={},
         config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
         labware_definitions=[labware_definition],
+        liquids={},
     )
 
     extra_labware = {"definition-uri": cast(LegacyLabwareDefinition, {})}
@@ -382,6 +384,7 @@ def test_load_legacy_json(
         metadata={},
         config=JsonProtocolConfig(schema_version=5),
         labware_definitions=[labware_definition],
+        liquids={},
     )
 
     legacy_protocol = LegacyJsonProtocol(

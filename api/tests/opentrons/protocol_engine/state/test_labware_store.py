@@ -5,7 +5,7 @@ from datetime import datetime
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
-from opentrons_shared_data.protocol.models import protocol_schema_v6
+from opentrons_shared_data.protocol.models.protocol_schema_v6 import Liquid
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
 
@@ -169,9 +169,7 @@ def test_handles_add_labware_definition(
 
 def test_handles_add_liquid(subject: LabwareStore) -> None:
     """It should add the liquid to the state."""
-    expected_liquid = protocol_schema_v6.Liquid(
-        displayName="water", description="water-desc"
-    )
+    expected_liquid = Liquid(displayName="water", description="water-desc")
     subject.handle_action(AddLiquidAction(liquid_id="water-id", liquid=expected_liquid))
 
     assert subject.state.liquids["water-id"] == expected_liquid

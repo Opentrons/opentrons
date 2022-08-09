@@ -116,4 +116,4 @@ class ProtocolSource:
     metadata: Metadata
     config: ProtocolConfig
     labware_definitions: List[LabwareDefinition]
-    liquids: Optional[Dict[str, Liquid]] = None
+    liquids: Dict[str, Liquid]
