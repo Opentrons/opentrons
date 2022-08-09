@@ -91,7 +91,7 @@ class LegacyCommandMapper:
         ] = {}
         self._module_data_provider = module_data_provider or ModuleDataProvider()
 
-    def map_command(    # noqa: C901
+    def map_command(  # noqa: C901
         self,
         command: legacy_command_types.CommandMessage,
     ) -> List[pe_actions.Action]:
@@ -213,7 +213,7 @@ class LegacyCommandMapper:
         elif isinstance(load_info, LegacyModuleLoadInfo):
             return self._map_module_load(load_info)
 
-    def _build_initial_command( # noqa: C901
+    def _build_initial_command(  # noqa: C901
         self,
         command: legacy_command_types.CommandMessage,
         command_id: str,
