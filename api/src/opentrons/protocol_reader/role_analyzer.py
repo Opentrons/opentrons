@@ -51,7 +51,7 @@ class RoleAnalysisError(ValueError):
 class RoleAnalyzer:
     """Input file role analysis interface."""
 
-    @staticmethod
+    @staticmethod  # noqa: C901
     def analyze(files: Sequence[BufferedFile]) -> RoleAnalysis:
         """Analyze a set of input files to determine each of their roles."""
         if len(files) == 0:
