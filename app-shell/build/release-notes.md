@@ -13,12 +13,13 @@ Welcome to the v6.1.0 release of the Opentrons App! This release focuses on addi
 ## New Features
 
 - Heater-Shaker support
-	- Access guided setup instructions for attaching the Heater-Shaker to the deck.
-	- Analyze, upload, and run protocols that include the Heater-Shaker.
-	- View the status of a Heater-Shaker connected to an OT-2 and control its heater, shaker, and labware latch.
-	- Update the Heater-Shaker's firmware from the module card.
+  - Access guided setup instructions for attaching the Heater-Shaker to the deck.
+  - Analyze, upload, and run protocols that include the Heater-Shaker.
+  - View the status of a Heater-Shaker connected to an OT-2 and control its heater, shaker, and labware latch.
+  - Update the Heater-Shaker's firmware from the module card.
 
 ## Bug Fixes
+
 - Improvements to the run log, including properly listing labware that is on top of a module.
 - Interface fixes and improvements.
 
