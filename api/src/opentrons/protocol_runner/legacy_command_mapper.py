@@ -293,7 +293,7 @@ class LegacyCommandMapper:
         if isinstance(location, Location):
             well = location.labware.as_well()
         else:
-            raise Exception("Unknown drop_tip location.")
+            assert location is not None, "Unknown drop_tip location."
         mount = MountType(pipette.mount)
         slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
         well_name = well.well_name
@@ -324,7 +324,7 @@ class LegacyCommandMapper:
         if isinstance(_well, LegacyWell):
             well = _well
         else:
-            raise Exception("Unknown pick_up_tip location.")
+            assert _well is not None, "Unknown pick_up_tip location."
         mount = MountType(pipette.mount)
         slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
         well_name = well.well_name
@@ -421,7 +421,7 @@ class LegacyCommandMapper:
             location = last_location
             well = location.labware.as_well()
         else:
-            raise Exception("Unknown blow out location.")
+            raise Exception("Unknown blow_out location.")
         first_parent = location.labware.first_parent()
         assert first_parent is not None, "Labware needs to be associated with a slot"
         parent_module_id = self._module_id_by_slot.get(DeckSlotName(first_parent))
