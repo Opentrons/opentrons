@@ -6119,6 +6119,242 @@
       "quirks": ["pickupTipShake"],
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
+    },
+    "p1000_multi_v3.0": {
+      "name": "p1000_multi_gen3",
+      "backCompatNames": [],
+      "top": {
+        "value": 0.5,
+        "min": 0,
+        "max": 45,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 61,
+        "min": 55,
+        "max": 80,
+        "type": "float",
+        "units": "mm"
+      },
+      "blowout": {
+        "value": 66,
+        "min": 60,
+        "max": 85,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": 80,
+        "min": 78,
+        "max": 110,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpCurrent": {
+        "value": 1.4,
+        "min": 0.05,
+        "max": 2.0,
+        "units": "amps",
+        "type": "float"
+      },
+      "pickUpDistance": {
+        "value": 17,
+        "min": 1,
+        "max": 30,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpIncrement": {
+        "value": 0.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 1,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 10,
+        "min": 1,
+        "max": 30,
+        "units": "mm/s",
+        "type": "float"
+      },
+      "nozzleOffset": [0.5, -22.0, -259.15],
+      "modelOffset": [0.0, 0.0, 25.14],
+      "ulPerMm": [
+        {
+          "aspirate": [
+            [0, 0, 15.904],
+            [1000, 0, 15.904]
+          ],
+          "dispense": [
+            [0, 0, 15.904],
+            [1000, 0, 15.904]
+          ]
+        }
+      ],
+      "plungerCurrent": {
+        "value": 1,
+        "min": 0.1,
+        "max": 1.5,
+        "units": "amps",
+        "type": "float"
+      },
+      "dropTipCurrent": {
+        "value": 1,
+        "min": 0.1,
+        "max": 1.25,
+        "units": "amps",
+        "type": "float"
+      },
+      "dropTipSpeed": {
+        "value": 7,
+        "min": 0.001,
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
+      },
+      "tipOverlap": {
+        "default": 9.7,
+        "opentrons/opentrons_96_tiprack_1000ul/1": 11.5,
+        "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5,
+        "opentrons/geb_96_tiprack_1000ul/1": 9.5
+      },
+      "tipLength": {
+        "value": 78.3,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      },
+      "quirks": ["pickupTipShake"],
+      "returnTipHeight": 0.83,
+      "idleCurrent": 0.3
+    },
+    "p50_multi_v3.0": {
+      "name": "p50_multi_gen3",
+      "backCompatNames": [],
+      "top": {
+        "value": 0.5,
+        "min": 0,
+        "max": 45,
+        "units": "mm",
+        "type": "float"
+      },
+      "bottom": {
+        "value": 61,
+        "min": 55,
+        "max": 80,
+        "type": "float",
+        "units": "mm"
+      },
+      "blowout": {
+        "value": 66,
+        "min": 60,
+        "max": 85,
+        "units": "mm",
+        "type": "float"
+      },
+      "dropTip": {
+        "value": 80,
+        "min": 78,
+        "max": 119,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpCurrent": {
+        "value": 1.4,
+        "min": 0.05,
+        "max": 2.0,
+        "units": "amps",
+        "type": "float"
+      },
+      "pickUpDistance": {
+        "value": 17,
+        "min": 1,
+        "max": 30,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpIncrement": {
+        "value": 0.0,
+        "min": 0.0,
+        "max": 10.0,
+        "units": "mm",
+        "type": "float"
+      },
+      "pickUpPresses": {
+        "value": 1,
+        "min": 0,
+        "max": 10,
+        "units": "presses",
+        "type": "int"
+      },
+      "pickUpSpeed": {
+        "value": 10,
+        "min": 1,
+        "max": 30,
+        "units": "mm/s",
+        "type": "float"
+      },
+      "nozzleOffset": [0.5, -22.0, -259.15],
+      "modelOffset": [0.0, 0.0, 25.14],
+      "ulPerMm": [
+        {
+          "aspirate": [
+            [0, 0, 0.785],
+            [50, 0, 0.785]
+          ],
+          "dispense": [
+            [0, 0, 0.785],
+            [50, 0, 0.785]
+          ]
+        }
+      ],
+      "plungerCurrent": {
+        "value": 1,
+        "min": 0.1,
+        "max": 1.5,
+        "units": "amps",
+        "type": "float"
+      },
+      "dropTipCurrent": {
+        "value": 1,
+        "min": 0.1,
+        "max": 1.25,
+        "units": "amps",
+        "type": "float"
+      },
+      "dropTipSpeed": {
+        "value": 7,
+        "min": 0.001,
+        "max": 30,
+        "units": "mm/sec",
+        "type": "float"
+      },
+      "tipOverlap": {
+        "default": 9.7,
+        "opentrons/opentrons_96_tiprack_1000ul/1": 11.5,
+        "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5,
+        "opentrons/geb_96_tiprack_1000ul/1": 9.5
+      },
+      "tipLength": {
+        "value": 78.3,
+        "units": "mm",
+        "type": "float",
+        "min": 0,
+        "max": 100
+      },
+      "quirks": ["pickupTipShake"],
+      "returnTipHeight": 0.83,
+      "idleCurrent": 0.3
     }
   },
   "mutableConfigs": [

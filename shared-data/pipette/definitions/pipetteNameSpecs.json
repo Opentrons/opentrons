@@ -588,5 +588,87 @@
       "opentrons/opentrons_96_filtertiprack_1000ul/1",
       "opentrons/geb_96_tiprack_1000ul/1"
     ]
+  },
+  "p1000_multi_gen3": {
+    "displayName": "P1000 8-Channel GEN3",
+    "displayCategory": "GEN2",
+    "defaultAspirateFlowRate": {
+      "value": 137.35,
+      "min": 3,
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 137.35,
+        "2.6": 274.7
+      }
+    },
+    "defaultDispenseFlowRate": {
+      "value": 159.04,
+      "min": 3,
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 159.04
+      }
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 159.04,
+      "min": 3,
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 159.04
+      }
+    },
+    "channels": 8,
+    "minVolume": 5,
+    "maxVolume": 1000,
+    "smoothieConfigs": {
+      "stepsPerMM": 2133.33,
+      "homePosition": 230.15,
+      "travelDistance": 80
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_1000ul/1",
+      "opentrons/opentrons_96_filtertiprack_1000ul/1",
+      "opentrons/geb_96_tiprack_1000ul/1"
+    ]
+  },
+  "p50_multi_gen3": {
+    "displayName": "P50 8-Channel GEN3",
+    "displayCategory": "GEN2",
+    "defaultAspirateFlowRate": {
+      "value": 7.85,
+      "min": 3,
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 7.85
+      }
+    },
+    "defaultDispenseFlowRate": {
+      "value": 7.85,
+      "min": 3,
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 7.85
+      }
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 7.85,
+      "min": 3,
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 7.85
+      }
+    },
+    "channels": 8,
+    "minVolume": 1,
+    "maxVolume": 50,
+    "smoothieConfigs": {
+      "stepsPerMM": 2133.33,
+      "homePosition": 230.15,
+      "travelDistance": 80
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_96_tiprack_300ul/1",
+      "opentrons/opentrons_96_filtertiprack_200ul/1"
+    ]
   }
 }
