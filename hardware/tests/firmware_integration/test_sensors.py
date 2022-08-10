@@ -152,7 +152,7 @@ async def test_baseline_poll_sensors(
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     sensor_type: SensorType,
-    expected_value: Union[float, Tuple],
+    expected_value: Union[float, Tuple[float, float]],
 ) -> None:
     """We should be able to poll the pressure and capacitive sensor."""
     poll_sensor = BaselineSensorRequest(
@@ -232,7 +232,7 @@ async def test_set_threshold_sensors(
     await can_messenger.send(node_id=NodeId.pipette_left, message=set_threshold)
 
     response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
-
+    breakpoint()
     assert isinstance(response, SensorThresholdResponse)
     expected_data = set_threshold.payload.threshold.value
 
