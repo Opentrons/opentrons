@@ -232,7 +232,6 @@ async def test_set_threshold_sensors(
     await can_messenger.send(node_id=NodeId.pipette_left, message=set_threshold)
 
     response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
-    breakpoint()
     assert isinstance(response, SensorThresholdResponse)
     expected_data = set_threshold.payload.threshold.value
 
