@@ -72,6 +72,11 @@ LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
             volume=35,
             location=well_plate_1["B1"],
         )
+        pipette_left.aspirate(50)
+        pipette_left.blow_out()
+        pipette_left.dispense(50)
+        pipette_left.aspirate()
+        pipette_left.dispense()
         pipette_left.drop_tip(
             location=tip_rack_1.wells_by_name()["A1"]
         )
@@ -105,7 +110,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
     pipette_left_result_captor = matchers.Captor()
     pipette_right_result_captor = matchers.Captor()
 
-    assert len(commands_result) == 15
+    assert len(commands_result) == 20
 
     assert commands_result[0] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
@@ -305,7 +310,86 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=35),
     )
-    assert commands_result[14] == commands.DropTip.construct(
+    assert commands_result[14] == commands.Aspirate.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.AspirateParams(
+            pipetteId=pipette_left_id,
+            labwareId=well_plate_1_id,
+            wellName="B1",
+            volume=50,
+            flowRate=1.0,
+        ),
+        result=commands.AspirateResult(volume=50),
+    )
+    assert commands_result[15] == commands.BlowOut.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.BlowOutParams(
+            pipetteId=pipette_left_id,
+            labwareId=well_plate_1_id,
+            wellName="B1",
+            flowRate=1000.0,
+        ),
+        result=commands.BlowOutResult(),
+    )
+    assert commands_result[16] == commands.Dispense.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.DispenseParams(
+            pipetteId=pipette_left_id,
+            labwareId=well_plate_1_id,
+            wellName="B1",
+            volume=50,
+            flowRate=1.0,
+        ),
+        result=commands.DispenseResult(volume=50),
+    )
+    assert commands_result[17] == commands.Aspirate.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.AspirateParams(
+            pipetteId=pipette_left_id,
+            labwareId=well_plate_1_id,
+            wellName="B1",
+            volume=350,
+            flowRate=1.0,
+        ),
+        result=commands.AspirateResult(volume=350),
+    )
+    assert commands_result[18] == commands.Dispense.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.DispenseParams(
+            pipetteId=pipette_left_id,
+            labwareId=well_plate_1_id,
+            wellName="B1",
+            volume=300,
+            flowRate=1.0,
+        ),
+        result=commands.DispenseResult(volume=300),
+    )
+    assert commands_result[19] == commands.DropTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
