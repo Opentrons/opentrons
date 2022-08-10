@@ -172,4 +172,4 @@ def test_handles_add_liquid(subject: LabwareStore) -> None:
     expected_liquid = Liquid(displayName="water", description="water-desc")
     subject.handle_action(AddLiquidAction(liquid_id="water-id", liquid=expected_liquid))
 
-    assert subject.state.liquids["water-id"] == expected_liquid
+    assert subject.state.liquids_by_id["water-id"] == expected_liquid
