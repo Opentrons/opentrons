@@ -407,6 +407,6 @@ class LabwareView(HasState[LabwareState]):
                 return candidate
         return None
 
-    def get_liquids(self) -> Dict[str, Liquid]:
+    def get_liquids(self) -> List[Liquid]:
         """Get all protocol liquids."""
-        return self._state.liquids_by_id
+        return list(self._state.liquids_by_id.values())

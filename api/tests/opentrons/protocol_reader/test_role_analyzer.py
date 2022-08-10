@@ -41,7 +41,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             main_file=MainFile(name="protocol.py", contents=b"", path=None),
             labware_files=[],
             labware_definitions=[],
-            liquids={},
         ),
     ),
     RoleAnalyzerSpec(
@@ -70,7 +69,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             labware_definitions=[
                 LabwareDefinition.construct(),  # type: ignore[call-arg]
             ],
-            liquids={},
         ),
     ),
     RoleAnalyzerSpec(
@@ -103,7 +101,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             labware_definitions=[
                 LabwareDefinition.construct(),  # type: ignore[call-arg]
             ],
-            liquids={},
         ),
     ),
     RoleAnalyzerSpec(
@@ -140,7 +137,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             labware_definitions=[
                 LabwareDefinition.construct(version=1)  # type: ignore[call-arg]
             ],
-            liquids={},
         ),
     ),
     RoleAnalyzerSpec(
@@ -151,7 +147,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             main_file=MainFile(name="PROTOCOL.PY", contents=b"", path=None),
             labware_files=[],
             labware_definitions=[],
-            liquids={},
         ),
     ),
     RoleAnalyzerSpec(
@@ -185,7 +180,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             labware_definitions=[
                 LabwareDefinition.construct()  # type: ignore[call-arg]
             ],
-            liquids=matchers.Anything(),
         ),
     ),
 ]

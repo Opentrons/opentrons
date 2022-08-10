@@ -26,4 +26,4 @@ class StateSummary(BaseModel):
     labwareOffsets: List[LabwareOffset]
     startedAt: Optional[datetime]
     completedAt: Optional[datetime]
-    liquids: Dict[str, Liquid]
+    liquids: List[Liquid]
