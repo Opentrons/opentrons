@@ -55,16 +55,10 @@ export const AppComponent = (): JSX.Element => {
       path: '/protocols/:protocolKey',
     },
     {
-      Component: () => <div>deck setup</div>,
-      name: 'Deck Setup',
-      path: '/protocols/:protocolKey/deck-setup',
-    },
-    {
       Component: Labware,
       name: 'Labware',
       navLinkTo: '/labware',
-      // labwareId param is for details slideout
-      path: '/labware/:labwareId?',
+      path: '/labware',
     },
     {
       Component: DevicesLanding,
@@ -77,7 +71,10 @@ export const AppComponent = (): JSX.Element => {
       Component: DeviceDetails,
       exact: true,
       name: 'Device',
-      navLinkTo: isOnDevice ? `/devices/${localRobot?.name ?? ''}` : undefined,
+      navLinkTo: isOnDevice
+        ? // placeholder robot name, for empty localhost discovery cache
+          `/devices/${localRobot?.name ?? 'localhost-robot-name'}`
+        : undefined,
       path: '/devices/:robotName',
     },
     {
@@ -85,12 +82,6 @@ export const AppComponent = (): JSX.Element => {
       exact: true,
       name: 'Robot Settings',
       path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
-    },
-    {
-      Component: () => <div>protocol runs landing</div>,
-      exact: true,
-      name: 'Protocol Runs',
-      path: '/devices/:robotName/protocol-runs',
     },
     {
       Component: ProtocolRunDetails,
