@@ -19,7 +19,7 @@ import {
   useProtocolDetailsForRun,
   useLabwareRenderInfoForRunById,
 } from '../../../Devices/hooks'
-import { ModalShell, ModalHeader } from '../../../../molecules/Modal'
+import { Modal } from '../../../../molecules/Modal'
 import { StyledText } from '../../../../atoms/text'
 import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 import { LiquidDetailCard } from './LiquidDetailCard'
@@ -76,11 +76,12 @@ export const LiquidsLabwareDetailsModal = (
     }
   `
   return (
-    <ModalShell
-      onOutsideClick={closeModal}
+    <Modal
+      onClose={closeModal}
+      closeOnOutsideClick
+      title={labwareName}
+      childrenPadding={0}
       width="45rem"
-      marginLeft="7.125rem"
-      header={<ModalHeader onClose={closeModal} title={labwareName} />}
     >
       <Box
         paddingX={SPACING.spacing4}
@@ -184,6 +185,6 @@ export const LiquidsLabwareDetailsModal = (
           </Flex>
         </Flex>
       </Box>
-    </ModalShell>
+    </Modal>
   )
 }

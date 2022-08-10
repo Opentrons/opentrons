@@ -1,22 +1,20 @@
 import * as React from 'react'
-import { BaseModalProps, SPACING, COLORS, Box } from '@opentrons/components'
+import { StyleProps, SPACING, COLORS, Box } from '@opentrons/components'
 import { ModalHeader } from './ModalHeader'
 import { ModalShell } from './ModalShell'
-
-import type { IconProps } from '@opentrons/components'
 
 type ModalType = 'info' | 'warning' | 'error'
 export * from './ModalShell'
 export * from './ModalHeader'
 
-export interface ModalProps extends BaseModalProps {
+export interface ModalProps extends StyleProps {
   type?: ModalType
   onClose?: React.MouseEventHandler
   closeOnOutsideClick?: boolean
   title?: React.ReactNode
   footer?: React.ReactNode
+  childrenPadding?: string | number
   children?: React.ReactNode
-  icon?: IconProps
 }
 
 export const Modal = (props: ModalProps): JSX.Element => {
@@ -25,8 +23,8 @@ export const Modal = (props: ModalProps): JSX.Element => {
     onClose,
     closeOnOutsideClick,
     title,
+    childrenPadding = `${SPACING.spacing4} ${SPACING.spacing5} ${SPACING.spacing5}`,
     children,
-    maxHeight,
   } = props
 
   const modalHeader = (
@@ -56,14 +54,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
       marginLeft="7.125rem"
       {...props}
     >
-      <Box
-        paddingTop={SPACING.spacing4}
-        paddingBottom={SPACING.spacing5}
-        paddingX={SPACING.spacing5}
-        maxHeight={maxHeight}
-      >
-        {children}
-      </Box>
+      <Box padding={childrenPadding}>{children}</Box>
     </ModalShell>
   )
 }
