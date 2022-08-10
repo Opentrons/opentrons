@@ -138,7 +138,9 @@ class AddLabwareDefinitionAction:
 class AddLiquidAction:
     """Add a liquid, to apply to subsequent `LoadLiquid`s."""
 
-    liquid: Liquid
+    display_name: str
+    description: str
+    display_color: Optional[str]
     liquid_id: str
 
 
