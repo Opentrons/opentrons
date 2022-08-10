@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from opentrons.types import MountType, DeckSlotName, Location
 from opentrons.commands import types as legacy_command_types
@@ -213,197 +213,47 @@ class LegacyCommandMapper:
         elif isinstance(load_info, LegacyModuleLoadInfo):
             return self._map_module_load(load_info)
 
-    def _build_initial_command(  # noqa: C901
+    def _build_initial_command(
         self,
         command: legacy_command_types.CommandMessage,
         command_id: str,
         now: datetime,
     ) -> pe_commands.Command:
         engine_command: pe_commands.Command
-        well: LegacyWell
         if (
             command["name"] == legacy_command_types.PICK_UP_TIP
             and "instrument" in command["payload"]
             and "location" in command["payload"]
             and isinstance(command["payload"]["location"], LegacyWell)
         ):
-            pipette: LegacyPipetteContext = command["payload"]["instrument"]
-            _well = command["payload"].get("location")
-            if isinstance(_well, LegacyWell):
-                well = _well
-            else:
-                raise Exception("Unknown pick_up_tip location.")
-            mount = MountType(pipette.mount)
-            slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
-            well_name = well.well_name
-            labware_id = self._labware_id_by_slot[slot]
-            pipette_id = self._pipette_id_by_mount[mount]
-
-            engine_command = pe_commands.PickUpTip.construct(
-                id=command_id,
-                key=command_id,
-                status=pe_commands.CommandStatus.RUNNING,
-                createdAt=now,
-                startedAt=now,
-                params=pe_commands.PickUpTipParams.construct(
-                    pipetteId=pipette_id,
-                    labwareId=labware_id,
-                    wellName=well_name,
-                ),
+            engine_command = self._build_pick_up_tip_command(
+                command=command, command_id=command_id, now=now
             )
         elif (
             command["name"] == legacy_command_types.DROP_TIP
             and "instrument" in command["payload"]
             and "location" in command["payload"]
         ):
-            pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore
-            location = command["payload"].get("location")
-            if isinstance(location, Location):
-                well = location.labware.as_well()
-            else:
-                raise Exception("Unknown drop_tip location.")
-            mount = MountType(pipette.mount)
-            slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
-            well_name = well.well_name
-            labware_id = self._labware_id_by_slot[slot]
-            pipette_id = self._pipette_id_by_mount[mount]
-            engine_command = pe_commands.DropTip.construct(
-                id=command_id,
-                key=command_id,
-                status=pe_commands.CommandStatus.RUNNING,
-                createdAt=now,
-                startedAt=now,
-                params=pe_commands.DropTipParams.construct(
-                    pipetteId=pipette_id,
-                    labwareId=labware_id,
-                    wellName=well_name,
-                ),
+            engine_command = self._build_drop_tip_command(
+                command=command, command_id=command_id, now=now
             )
+
         elif (
-            command["name"] == legacy_command_types.ASPIRATE
+            (
+                command["name"] == legacy_command_types.ASPIRATE
+                or command["name"] == legacy_command_types.DISPENSE
+            )
             and "instrument" in command["payload"]
             and "location" in command["payload"]
             and "volume" in command["payload"]
             and "rate" in command["payload"]
         ):
-            pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore
-            location = command["payload"]["location"]
-            volume = command["payload"]["volume"]
-            flow_rate = command["payload"]["rate"]
-            assert flow_rate is not None, "Unknown aspirate rate."
-            assert volume is not None, "Unknown asiprate volume."
-            if isinstance(location, Location):
-                well = location.labware.as_well()
-            else:
-                raise Exception("Unknown aspirate location.")
-            first_parent = location.labware.first_parent()
-            assert (
-                first_parent is not None
-            ), "Labware needs to be associated with a slot"
-            parent_module_id = self._module_id_by_slot.get(DeckSlotName(first_parent))
-            if parent_module_id is not None:
-                labware_id = self._labware_id_by_module_id[parent_module_id]
-            else:
-                slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
-                labware_id = self._labware_id_by_slot[slot]
-            mount = MountType(pipette.mount)
-            well_name = well.well_name
-            pipette_id = self._pipette_id_by_mount[mount]
-            engine_command = pe_commands.Aspirate.construct(
-                id=command_id,
-                key=command_id,
-                status=pe_commands.CommandStatus.RUNNING,
-                createdAt=now,
-                startedAt=now,
-                params=pe_commands.AspirateParams.construct(
-                    pipetteId=pipette_id,
-                    labwareId=labware_id,
-                    wellName=well_name,
-                    volume=volume,
-                    flowRate=flow_rate,
-                ),
-            )
-        elif (
-            command["name"] == legacy_command_types.DISPENSE
-            and "instrument" in command["payload"]
-            and "location" in command["payload"]
-            and "volume" in command["payload"]
-            and "rate" in command["payload"]
-        ):
-            pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore
-            location = command["payload"]["location"]
-            volume = command["payload"]["volume"]
-            flow_rate = command["payload"]["rate"]
-            assert flow_rate is not None, "Unknown dispense rate."
-            assert volume is not None, "Unknown dispense volume."
-            if isinstance(location, Location):
-                well = location.labware.as_well()
-            else:
-                raise Exception("Unknown dispense location.")
-            first_parent = location.labware.first_parent()
-            assert (
-                first_parent is not None
-            ), "Labware needs to be associated with a slot"
-            parent_module_id = self._module_id_by_slot.get(DeckSlotName(first_parent))
-            if parent_module_id is not None:
-                labware_id = self._labware_id_by_module_id[parent_module_id]
-            else:
-                slot = DeckSlotName.from_primitive(location.labware.first_parent())  # type: ignore[arg-type]
-                labware_id = self._labware_id_by_slot[slot]
-            mount = MountType(pipette.mount)
-            well_name = well.well_name
-            pipette_id = self._pipette_id_by_mount[mount]
-            engine_command = pe_commands.Dispense.construct(
-                id=command_id,
-                key=command_id,
-                status=pe_commands.CommandStatus.RUNNING,
-                createdAt=now,
-                startedAt=now,
-                params=pe_commands.DispenseParams.construct(
-                    pipetteId=pipette_id,
-                    labwareId=labware_id,
-                    wellName=well_name,
-                    volume=volume,
-                    flowRate=flow_rate,
-                ),
+            engine_command = self._build_liquid_handling_commands(
+                command=command, command_id=command_id, now=now
             )
         elif command["name"] == legacy_command_types.BLOW_OUT:
-            pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore
-            location = command["payload"]["location"]
-            flow_rate = pipette.flow_rate.blow_out
-            last_location = pipette._ctx.location_cache
-            if isinstance(location, Location):
-                well = location.labware.as_well()
-            elif isinstance(last_location, Location):
-                location = last_location
-                well = location.labware.as_well()
-            else:
-                raise Exception("Unknown blow out location.")
-            first_parent = location.labware.first_parent()
-            assert (
-                first_parent is not None
-            ), "Labware needs to be associated with a slot"
-            parent_module_id = self._module_id_by_slot.get(DeckSlotName(first_parent))
-            if parent_module_id is not None:
-                labware_id = self._labware_id_by_module_id[parent_module_id]
-            else:
-                slot = DeckSlotName.from_primitive(location.labware.first_parent())  # type: ignore[arg-type]
-                labware_id = self._labware_id_by_slot[slot]
-            mount = MountType(pipette.mount)
-            well_name = well.well_name
-            pipette_id = self._pipette_id_by_mount[mount]
-            engine_command = pe_commands.BlowOut.construct(
-                id=command_id,
-                key=command_id,
-                status=pe_commands.CommandStatus.RUNNING,
-                createdAt=now,
-                startedAt=now,
-                params=pe_commands.BlowOutParams.construct(
-                    pipetteId=pipette_id,
-                    labwareId=labware_id,
-                    wellName=well_name,
-                    flowRate=flow_rate,
-                ),
+            engine_command = self._build_blow_out_command(
+                command=command, command_id=command_id, now=now
             )
         elif command["name"] == legacy_command_types.PAUSE:
             engine_command = pe_commands.WaitForResume.construct(
@@ -430,6 +280,172 @@ class LegacyCommandMapper:
             )
 
         return engine_command
+
+    def _build_drop_tip_command(
+        self,
+        command: legacy_command_types.DropTipMessage,
+        command_id: str,
+        now: datetime,
+    ) -> pe_commands.Command:
+        well: LegacyWell
+        pipette: LegacyPipetteContext = command["payload"]["instrument"]
+        location = command["payload"].get("location")
+        if isinstance(location, Location):
+            well = location.labware.as_well()
+        else:
+            raise Exception("Unknown drop_tip location.")
+        mount = MountType(pipette.mount)
+        slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
+        well_name = well.well_name
+        labware_id = self._labware_id_by_slot[slot]
+        pipette_id = self._pipette_id_by_mount[mount]
+        return pe_commands.DropTip.construct(
+            id=command_id,
+            key=command_id,
+            status=pe_commands.CommandStatus.RUNNING,
+            createdAt=now,
+            startedAt=now,
+            params=pe_commands.DropTipParams.construct(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+            ),
+        )
+
+    def _build_pick_up_tip_command(
+        self,
+        command: legacy_command_types.PickUpTipMessage,
+        command_id: str,
+        now: datetime,
+    ) -> pe_commands.Command:
+        well: LegacyWell
+        pipette: LegacyPipetteContext = command["payload"]["instrument"]
+        _well = command["payload"]["location"]
+        if isinstance(_well, LegacyWell):
+            well = _well
+        else:
+            raise Exception("Unknown pick_up_tip location.")
+        mount = MountType(pipette.mount)
+        slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
+        well_name = well.well_name
+        labware_id = self._labware_id_by_slot[slot]
+        pipette_id = self._pipette_id_by_mount[mount]
+
+        return pe_commands.PickUpTip.construct(
+            id=command_id,
+            key=command_id,
+            status=pe_commands.CommandStatus.RUNNING,
+            createdAt=now,
+            startedAt=now,
+            params=pe_commands.PickUpTipParams.construct(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+            ),
+        )
+
+    def _build_liquid_handling_commands(
+        self,
+        command: Union[
+            legacy_command_types.AspirateMessage, legacy_command_types.DispenseMessage
+        ],
+        command_id: str,
+        now: datetime,
+    ) -> pe_commands.Command:
+        well: LegacyWell
+        pipette: LegacyPipetteContext = command["payload"]["instrument"]
+        location = command["payload"]["location"]
+        volume = command["payload"]["volume"]
+        flow_rate = command["payload"]["rate"]
+        if isinstance(location, Location):
+            well = location.labware.as_well()
+        else:
+            raise Exception("Unknown pipetting location.")
+        first_parent = location.labware.first_parent()
+        assert first_parent is not None, "Labware needs to be associated with a slot"
+        parent_module_id = self._module_id_by_slot.get(DeckSlotName(first_parent))
+        if parent_module_id is not None:
+            labware_id = self._labware_id_by_module_id[parent_module_id]
+        else:
+            slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
+            labware_id = self._labware_id_by_slot[slot]
+        mount = MountType(pipette.mount)
+        well_name = well.well_name
+        pipette_id = self._pipette_id_by_mount[mount]
+
+        if command["name"] == legacy_command_types.ASPIRATE:
+            return pe_commands.Aspirate.construct(
+                id=command_id,
+                key=command_id,
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=now,
+                startedAt=now,
+                params=pe_commands.AspirateParams.construct(
+                    pipetteId=pipette_id,
+                    labwareId=labware_id,
+                    wellName=well_name,
+                    volume=volume,
+                    flowRate=flow_rate,
+                ),
+            )
+        else:
+            return pe_commands.Dispense.construct(
+                id=command_id,
+                key=command_id,
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=now,
+                startedAt=now,
+                params=pe_commands.DispenseParams.construct(
+                    pipetteId=pipette_id,
+                    labwareId=labware_id,
+                    wellName=well_name,
+                    volume=volume,
+                    flowRate=flow_rate,
+                ),
+            )
+
+    def _build_blow_out_command(
+        self,
+        command: legacy_command_types.BlowOutMessage,
+        command_id: str,
+        now: datetime,
+    ) -> pe_commands.Command:
+        well: LegacyWell
+        pipette: LegacyPipetteContext = command["payload"]["instrument"]
+        location = command["payload"]["location"]
+        flow_rate = pipette.flow_rate.blow_out
+        last_location = pipette._ctx.location_cache
+        if isinstance(location, Location):
+            well = location.labware.as_well()
+        elif isinstance(last_location, Location):
+            location = last_location
+            well = location.labware.as_well()
+        else:
+            raise Exception("Unknown blow out location.")
+        first_parent = location.labware.first_parent()
+        assert first_parent is not None, "Labware needs to be associated with a slot"
+        parent_module_id = self._module_id_by_slot.get(DeckSlotName(first_parent))
+        if parent_module_id is not None:
+            labware_id = self._labware_id_by_module_id[parent_module_id]
+        else:
+            slot = DeckSlotName.from_primitive(location.labware.first_parent())  # type: ignore[arg-type]
+            labware_id = self._labware_id_by_slot[slot]
+        mount = MountType(pipette.mount)
+        well_name = well.well_name
+        pipette_id = self._pipette_id_by_mount[mount]
+        return pe_commands.BlowOut.construct(
+            id=command_id,
+            key=command_id,
+            status=pe_commands.CommandStatus.RUNNING,
+            createdAt=now,
+            startedAt=now,
+            params=pe_commands.BlowOutParams.construct(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+                flowRate=flow_rate,
+            ),
+        )
 
     def _map_labware_load(
         self, labware_load_info: LegacyLabwareLoadInfo

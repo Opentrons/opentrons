@@ -31,6 +31,9 @@ from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 from opentrons.types import DeckSlotName, Mount, MountType
 
 
+#   TODO(jr, 8/10/22): add PICK_UP_TIP, DROP_TIP, ASPIRATE, and DISPENSE unit tests
+
+
 @pytest.fixture
 def module_data_provider(decoy: Decoy) -> ModuleDataProvider:
     """Mock module definition fetcher."""
