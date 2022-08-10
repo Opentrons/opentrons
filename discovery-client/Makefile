@@ -25,5 +25,5 @@ clean:
 lib: export NODE_ENV := production
 lib: $(main_out) $(cli_out)
 
-$(main_out) $(cli_out): src/*.ts src/mdns-browser/*.ts src/store/*.ts package.json webpack.config.js tsconfig.json
+$(main_out) $(cli_out):
 	yarn webpack
