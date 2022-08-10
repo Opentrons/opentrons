@@ -287,18 +287,22 @@ class LegacyCommandMapper:
             and "rate" in command["payload"]
         ):
             pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore
-            location = command["payload"].get("location")
-            volume = command["payload"].get("volume")
-            flowRate = command["payload"].get("rate")
-            assert flowRate is not None, "Unknown aspirate rate."
+            location = command["payload"]["location"]
+            volume = command["payload"]["volume"]
+            flow_rate = command["payload"]["rate"]
+            assert flow_rate is not None, "Unknown aspirate rate."
             assert volume is not None, "Unknown asiprate volume."
             if isinstance(location, Location):
                 well = location.labware.as_well()
             else:
                 raise Exception("Unknown aspirate location.")
-            parentModuleId = self._module_id_by_slot.get(location.labware.first_parent())  # type: ignore
-            if parentModuleId is not None:
-                labware_id = self._labware_id_by_module_id[parentModuleId]
+            first_parent = location.labware.first_parent()
+            assert (
+                first_parent is not None
+            ), "Labware needs to be associated with a slot"
+            parent_module_id = self._module_id_by_slot.get(DeckSlotName(first_parent))
+            if parent_module_id is not None:
+                labware_id = self._labware_id_by_module_id[parent_module_id]
             else:
                 slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
                 labware_id = self._labware_id_by_slot[slot]
@@ -316,7 +320,7 @@ class LegacyCommandMapper:
                     labwareId=labware_id,
                     wellName=well_name,
                     volume=volume,
-                    flowRate=flowRate,
+                    flowRate=flow_rate,
                 ),
             )
         elif (
@@ -327,18 +331,22 @@ class LegacyCommandMapper:
             and "rate" in command["payload"]
         ):
             pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore
-            location = command["payload"].get("location")
-            volume = command["payload"].get("volume")
-            flowRate = command["payload"].get("rate")
-            assert flowRate is not None, "Unknown dispense rate."
+            location = command["payload"]["location"]
+            volume = command["payload"]["volume"]
+            flow_rate = command["payload"]["rate"]
+            assert flow_rate is not None, "Unknown dispense rate."
             assert volume is not None, "Unknown dispense volume."
             if isinstance(location, Location):
                 well = location.labware.as_well()
             else:
                 raise Exception("Unknown dispense location.")
-            parentModuleId = self._module_id_by_slot.get(location.labware.first_parent())  # type: ignore
-            if parentModuleId is not None:
-                labware_id = self._labware_id_by_module_id[parentModuleId]
+            first_parent = location.labware.first_parent()
+            assert (
+                first_parent is not None
+            ), "Labware needs to be associated with a slot"
+            parent_module_id = self._module_id_by_slot.get(DeckSlotName(first_parent))
+            if parent_module_id is not None:
+                labware_id = self._labware_id_by_module_id[parent_module_id]
             else:
                 slot = DeckSlotName.from_primitive(location.labware.first_parent())  # type: ignore[arg-type]
                 labware_id = self._labware_id_by_slot[slot]
@@ -356,12 +364,12 @@ class LegacyCommandMapper:
                     labwareId=labware_id,
                     wellName=well_name,
                     volume=volume,
-                    flowRate=flowRate,
+                    flowRate=flow_rate,
                 ),
             )
         elif command["name"] == legacy_command_types.BLOW_OUT:
             pipette: LegacyPipetteContext = command["payload"]["instrument"]  # type: ignore
-            location = command["payload"].get("location")
+            location = command["payload"]["location"]
             flow_rate = pipette.flow_rate.blow_out
             last_location = pipette._ctx.location_cache
             if isinstance(location, Location):
@@ -371,9 +379,13 @@ class LegacyCommandMapper:
                 well = location.labware.as_well()
             else:
                 raise Exception("Unknown blow out location.")
-            parentModuleId = self._module_id_by_slot.get(location.labware.first_parent())  # type: ignore
-            if parentModuleId is not None:
-                labware_id = self._labware_id_by_module_id[parentModuleId]
+            first_parent = location.labware.first_parent()
+            assert (
+                first_parent is not None
+            ), "Labware needs to be associated with a slot"
+            parent_module_id = self._module_id_by_slot.get(DeckSlotName(first_parent))
+            if parent_module_id is not None:
+                labware_id = self._labware_id_by_module_id[parent_module_id]
             else:
                 slot = DeckSlotName.from_primitive(location.labware.first_parent())  # type: ignore[arg-type]
                 labware_id = self._labware_id_by_slot[slot]
