@@ -50,11 +50,11 @@ const CLOSE_ICON_STYLE = css`
 const COPY_ICON_STYLE = css`
   transform: translateY(${SPACING.spacing2});
   &:hover {
-    color: ${COLORS.blue};
+    color: ${COLORS.blueEnabled};
   }
   &:active,
   &:focus {
-    color: ${COLORS.darkBlack};
+    color: ${COLORS.darkBlackEnabled};
   }
 `
 
