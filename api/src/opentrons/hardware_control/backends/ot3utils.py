@@ -246,6 +246,7 @@ def create_gripper_jaw_move_group(
         duration=np.float64(GRIPPER_JAW_GRIP_TIME),
         duty_cycle=np.float32(duty_cycle),
         stop_condition=stop_condition,
+        move_type=MoveType.grip
     )
     move_group: MoveGroup = [step]
     return move_group

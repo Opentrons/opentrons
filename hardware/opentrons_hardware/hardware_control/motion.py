@@ -19,6 +19,8 @@ class MoveStopCondition(int, Enum):
     none = 0x0
     limit_switch = 0x1
     cap_sensor = 0x2
+    encoder_position = 0x4
+    gripper_force = 0x5
 
 
 @unique
@@ -28,6 +30,7 @@ class MoveType(int, Enum):
     linear = 0x0
     home = 0x1
     calibration = 0x2
+    grip = 0x3
 
     @classmethod
     def get_move_type(cls, condition: MoveStopCondition) -> "MoveType":
@@ -36,6 +39,8 @@ class MoveType(int, Enum):
             MoveStopCondition.none: cls.linear,
             MoveStopCondition.limit_switch: cls.home,
             MoveStopCondition.cap_sensor: cls.calibration,
+            MoveStopCondition.encoder_position: cls.linear,
+            MoveStopCondition.gripper_force: cls.grip,
         }
         return mapping[condition]
 
@@ -68,9 +73,10 @@ class MoveGroupSingleGripperStep:
 
     duration_sec: np.float64
     pwm_duty_cycle: np.float32
+    encoder_position_um: np.int32
     pwm_frequency: np.float32 = np.float32(320000)
-    stop_condition: MoveStopCondition = MoveStopCondition.none
-    move_type: MoveType = MoveType.linear
+    stop_condition: MoveStopCondition = MoveStopCondition.gripper_force
+    move_type: MoveType = MoveType.grip
 
 
 SingleMoveStep = Union[
@@ -172,9 +178,10 @@ def create_tip_action_step(
 def create_gripper_jaw_step(
     duration: np.float64,
     duty_cycle: np.float32,
+    encoder_position_um: np.int32,
     frequency: np.float32 = np.float32(320000),
-    stop_condition: MoveStopCondition = MoveStopCondition.none,
-    move_type: MoveType = MoveType.linear,
+    stop_condition: MoveStopCondition = MoveStopCondition.gripper_force,
+    move_type: MoveType = MoveType.grip,
 ) -> MoveGroupStep:
     """Creates a step for gripper jaw action."""
     step: MoveGroupStep = {}
@@ -184,5 +191,6 @@ def create_gripper_jaw_step(
         pwm_duty_cycle=duty_cycle,
         stop_condition=stop_condition,
         move_type=move_type,
+        encoder_position_um=encoder_position_um,
     )
     return step
