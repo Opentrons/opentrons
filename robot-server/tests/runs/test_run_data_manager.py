@@ -33,7 +33,7 @@ from robot_server.runs.run_store import (
 )
 from robot_server.service.task_runner import TaskRunner
 
-from opentrons_shared_data.protocol.models.protocol_schema_v6 import Liquid
+from opentrons_shared_data.protocol.models.protocol_schema_v6 import LiquidCreate
 
 
 @pytest.fixture

@@ -19,7 +19,7 @@ from opentrons.protocol_engine import (
 from robot_server.service.json_api import ResourceModel
 from .action_models import RunAction
 
-from opentrons_shared_data.protocol.models.protocol_schema_v6 import Liquid
+from opentrons_shared_data.protocol.models.protocol_schema_v6 import LiquidCreate
 
 
 # TODO(mc, 2022-02-01): since the `/runs/:run_id/commands` response is now paginated,

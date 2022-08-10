@@ -27,7 +27,7 @@ from .analysis_models import (
     AnalysisStatus,
 )
 
-from opentrons_shared_data.protocol.models.protocol_schema_v6 import Liquid
+from opentrons_shared_data.protocol.models.protocol_schema_v6 import LiquidCreate
 
 _log = getLogger(__name__)
 

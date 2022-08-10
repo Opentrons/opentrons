@@ -4,7 +4,7 @@ from typing import List, Optional, Sequence, Union, Dict
 from typing_extensions import Literal
 
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6
-from opentrons_shared_data.protocol.models.protocol_schema_v6 import Liquid
+from opentrons.protocol_engine.commands.load_liquid import Liquid
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocols.models import JsonProtocol as ProtocolSchemaV5
 from .protocol_source import ProtocolFileRole

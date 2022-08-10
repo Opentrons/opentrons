@@ -42,7 +42,7 @@ class Params(BaseModel):
     labwareId: Optional[str]
     displayName: Optional[str]
     liquidId: Optional[str]
-    volumeByWellName: Optional[Dict[str, Any]]
+    volumeByWell: Optional[Dict[str, Any]]
     wellName: Optional[str]
     volume: Optional[float]
     flowRate: Optional[float]
@@ -108,7 +108,7 @@ class WellDefinition(BaseModel):
     xDimension: Optional[float]
 
 
-class Liquid(BaseModel):
+class LiquidCreate(BaseModel):
     displayName: str
     description: str
     displayColor: Optional[str]
@@ -159,7 +159,7 @@ class ProtocolSchemaV6(BaseModel):
     labwareDefinitions: Dict[str, LabwareDefinition]
     commands: List[Command]
     modules: Optional[Dict[str, Module]]
-    liquids: Optional[Dict[str, Liquid]]
+    liquids: Optional[Dict[str, LiquidCreate]]
     commandAnnotations: Optional[List[CommandAnnotation]]
     designerApplication: Optional[DesignerApplication]
 

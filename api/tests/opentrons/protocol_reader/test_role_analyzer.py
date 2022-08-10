@@ -165,7 +165,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                         "uri": LabwareDefinition.construct()  # type: ignore[call-arg]
                     },
                     liquids={
-                        "liquid-id": protocol_schema_v6.Liquid(
+                        "liquid-id": protocol_schema_v6.LiquidCreate(
                             displayName="water", description="water desc"
                         )
                     },
