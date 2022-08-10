@@ -160,7 +160,7 @@ export const ThermocyclerModuleSlideout = (
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          color={COLORS.darkGrey}
+          color={COLORS.darkGreyEnabled}
           paddingBottom={SPACING.spacing3}
         >
           {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}

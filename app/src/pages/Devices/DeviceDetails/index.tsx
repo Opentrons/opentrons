@@ -36,12 +36,10 @@ export function DeviceDetails(): JSX.Element | null {
         paddingTop={SPACING.spacing4}
         paddingBottom={SPACING.spacing7}
       >
-        {/* TODO(va, 2022-06-17) update border color to
-            COLORS.medGreyEnabled when PR #10664 is merged */}
         <Flex
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.white}
-          border={`1px solid ${COLORS.medGrey}`}
+          border={`1px solid ${COLORS.medGreyEnabled}`}
           borderRadius="3px"
           flexDirection={DIRECTION_COLUMN}
           marginBottom={SPACING.spacing4}

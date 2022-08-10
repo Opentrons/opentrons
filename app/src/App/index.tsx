@@ -123,7 +123,7 @@ export const AppComponent = (): JSX.Element => {
                     position={POSITION_RELATIVE}
                     width="100%"
                     height="100%"
-                    backgroundColor={COLORS.background}
+                    backgroundColor={COLORS.fundamentalsBackground}
                     overflow={OVERFLOW_SCROLL}
                   >
                     <ModalPortalRoot />

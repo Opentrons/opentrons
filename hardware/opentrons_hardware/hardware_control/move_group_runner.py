@@ -313,20 +313,23 @@ class MoveScheduler:
         seq_id = message.payload.seq_id.value
         group_id = message.payload.group_id.value
         node_id = arbitration_id.parts.originating_node_id
-        log.info(
-            f"Received completion for {node_id} group {group_id} seq {seq_id}"
-            ", which "
-            f"{'is' if (node_id, seq_id) in self._moves[group_id] else 'isn''t'}"
-            " in group"
-        )
         try:
+            in_group = (node_id, seq_id) in self._moves[group_id]
             self._moves[group_id].remove((node_id, seq_id))
             self._completion_queue.put_nowait((arbitration_id, message))
+            log.info(
+                f"Received completion for {node_id} group {group_id} seq {seq_id}"
+                f", which {'is' if in_group else 'isn''t'} in group"
+            )
         except KeyError:
             log.warning(
                 f"Got a move ack for ({node_id}, {seq_id}) which is not in this "
                 "group; may have leaked from an earlier timed-out group"
             )
+        except IndexError:
+            # If we have two move groups running at once, we need to handle
+            # moves from a group we don't own
+            return
 
         if not self._moves[group_id]:
             log.info(f"Move group {group_id} has completed.")
@@ -335,20 +338,28 @@ class MoveScheduler:
     def _handle_move_completed(self, message: MoveCompleted) -> None:
         group_id = message.payload.group_id.value
         ack_id = message.payload.ack_id.value
-        if self._stop_condition[
-            group_id
-        ] == MoveStopCondition.limit_switch and ack_id != UInt8Field(2):
-            if ack_id == UInt8Field(1):
-                condition = "Homing timed out."
-                log.warning(f"Homing failed. Condition: {condition}")
-                raise MoveConditionNotMet()
+        try:
+            if self._stop_condition[
+                group_id
+            ] == MoveStopCondition.limit_switch and ack_id != UInt8Field(2):
+                if ack_id == UInt8Field(1):
+                    condition = "Homing timed out."
+                    log.warning(f"Homing failed. Condition: {condition}")
+                    raise MoveConditionNotMet()
+        except IndexError:
+            # If we have two move group runners running at once, they each
+            # pick up groups they don't care about, and need to not fail.
+            pass
 
     def _handle_tip_action(self, message: TipActionResponse) -> None:
         group_id = message.payload.group_id.value
         ack_id = message.payload.ack_id.value
-        limit_switch = bool(
-            self._stop_condition[group_id] == MoveStopCondition.limit_switch
-        )
+        try:
+            limit_switch = bool(
+                self._stop_condition[group_id] == MoveStopCondition.limit_switch
+            )
+        except IndexError:
+            return
         success = message.payload.success.value
         # TODO need to add tip action type to the response message.
         if limit_switch and limit_switch != ack_id and not success:

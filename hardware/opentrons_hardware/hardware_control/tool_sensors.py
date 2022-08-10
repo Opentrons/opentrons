@@ -11,12 +11,10 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorType,
     SensorThresholdMode,
 )
+from opentrons_hardware.sensors.types import SensorDataType
+from opentrons_hardware.sensors.sensor_types import SensorInformation
 from opentrons_hardware.sensors.scheduler import SensorScheduler
-from opentrons_hardware.sensors.utils import (
-    SensorInformation,
-    SensorThresholdInformation,
-    SensorDataType,
-)
+from opentrons_hardware.sensors.utils import SensorThresholdInformation
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -58,12 +56,11 @@ async def capacitive_probe(
     either by negating speed or negating distance.
     """
     sensor_scheduler = SensorScheduler()
+    sensor_info = SensorInformation(SensorType.capacitive, SensorId.S0, tool)
     threshold = await sensor_scheduler.send_threshold(
         SensorThresholdInformation(
-            sensor_type=SensorType.capacitive,
-            sensor_id=SensorId.S0,
-            node_id=tool,
-            data=SensorDataType.build(relative_threshold_pf),
+            sensor=sensor_info,
+            data=SensorDataType.build(relative_threshold_pf, SensorType.capacitive),
             mode=SensorThresholdMode.auto_baseline,
         ),
         messenger,
@@ -74,9 +71,7 @@ async def capacitive_probe(
     pass_group = _build_pass_step(mover, distance, speed)
     runner = MoveGroupRunner(move_groups=[[pass_group]])
     async with sensor_scheduler.bind_sync(
-        SensorInformation(
-            sensor_type=SensorType.capacitive, sensor_id=SensorId.S0, node_id=tool
-        ),
+        sensor_info,
         messenger,
         log=log_sensor_values,
     ):
@@ -93,13 +88,13 @@ async def capacitive_pass(
 ) -> List[float]:
     """Move the specified axis while capturing capacitive sensor readings."""
     sensor_scheduler = SensorScheduler()
-    sensor = SensorInformation(
+    sensor_info = SensorInformation(
         sensor_type=SensorType.capacitive, sensor_id=SensorId.S0, node_id=tool
     )
     pass_group = _build_pass_step(mover, distance, speed)
     runner = MoveGroupRunner(move_groups=[[pass_group]])
     await runner.prep(messenger)
-    async with sensor_scheduler.capture_output(sensor, messenger) as output_queue:
+    async with sensor_scheduler.capture_output(sensor_info, messenger) as output_queue:
         await runner.execute(messenger)
 
     def _drain() -> Iterator[float]:

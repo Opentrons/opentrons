@@ -119,7 +119,7 @@ export const ProtocolLabwareDetailItem = (
         >
           {namespace === 'opentrons' ? (
             <Icon
-              color={COLORS.blue}
+              color={COLORS.blueEnabled}
               name="check-decagram"
               height="0.75rem"
               minHeight="0.75rem"

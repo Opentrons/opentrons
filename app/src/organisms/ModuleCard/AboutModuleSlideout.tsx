@@ -107,7 +107,7 @@ export const AboutModuleSlideout = (
           paddingTop={SPACING.spacing4}
           as="h6"
           data-testid={`alert_item_serial_number_text_${module.moduleModel}`}
-          color={COLORS.darkBlack}
+          color={COLORS.darkBlackEnabled}
         >
           {t('serial_number')}
         </StyledText>

@@ -136,7 +136,7 @@ export function FactoryResetSlideout({
             name="alert-circle"
             size={SIZE_1}
             marginRight={SPACING.spacing3}
-            color={COLORS.warning}
+            color={COLORS.warningEnabled}
           />
           <StyledText as="p" color={COLORS.warningText}>
             {t('factory_resets_cannot_be_undone')}

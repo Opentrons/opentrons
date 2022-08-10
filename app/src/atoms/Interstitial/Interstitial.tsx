@@ -50,7 +50,7 @@ export function Interstitial(props: InterstitialProps): JSX.Element {
         padding={SPACING.spacing4}
         position={POSITION_RELATIVE}
         boxShadow="0px 1px 3px rgba(0, 0, 0, 0.3)"
-        border={`1px solid ${COLORS.medGrey}`}
+        border={`1px solid ${COLORS.medGreyEnabled}`}
         backgroundColor={COLORS.white}
         maxHeight="100%"
         overflowY="auto"

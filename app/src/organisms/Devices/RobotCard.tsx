@@ -39,7 +39,7 @@ import { RobotOverflowMenu } from './RobotOverflowMenu'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 
 const ROBOT_CARD_STYLE = css`
-  border: 1px solid ${COLORS.medGrey};
+  border: 1px solid ${COLORS.medGreyEnabled};
   &:hover {
     border: 1px solid ${COLORS.medGreyHover};
   }

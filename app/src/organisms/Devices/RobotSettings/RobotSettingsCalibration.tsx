@@ -48,7 +48,6 @@ import {
   useRobot,
   useTipLengthCalibrations,
   useDeckCalibrationStatus,
-  useIsRobotBusy,
   useAttachedPipettes,
   useAttachedPipetteCalibrations,
   useRunStartedOrLegacySessionInProgress,
@@ -138,7 +137,6 @@ export function RobotSettingsCalibration({
   ] = React.useState<string>('')
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
   const isRunStartedOrLegacySessionInProgress = useRunStartedOrLegacySessionInProgress()
-  const isBusy = useIsRobotBusy()
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
@@ -250,7 +248,7 @@ export function RobotSettingsCalibration({
     pipettePresent
 
   const calCheckButtonDisabled = healthCheckIsPossible
-    ? Boolean(buttonDisabledReason) || isPending
+    ? Boolean(buttonDisabledReason) || isPending || isRunning
     : true
 
   const onClickSaveAs: React.MouseEventHandler = e => {
@@ -314,29 +312,22 @@ export function RobotSettingsCalibration({
   const handleHealthCheck = (
     hasBlockModalResponse: boolean | null = null
   ): void => {
-    if (isBusy) {
-      updateRobotStatus(true)
+    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
+      setShowCalBlockModal(true)
     } else {
-      if (
-        hasBlockModalResponse === null &&
-        configHasCalibrationBlock === null
-      ) {
-        setShowCalBlockModal(true)
-      } else {
-        setShowCalBlockModal(false)
-        dispatchRequests(
-          Sessions.ensureSession(
-            robotName,
-            Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
-            {
-              tipRacks: [],
-              hasCalibrationBlock: Boolean(
-                configHasCalibrationBlock ?? hasBlockModalResponse
-              ),
-            }
-          )
+      setShowCalBlockModal(false)
+      dispatchRequests(
+        Sessions.ensureSession(
+          robotName,
+          Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+          {
+            tipRacks: [],
+            hasCalibrationBlock: Boolean(
+              configHasCalibrationBlock ?? hasBlockModalResponse
+            ),
+          }
         )
-      }
+      )
     }
   }
 
@@ -469,7 +460,7 @@ export function RobotSettingsCalibration({
             </StyledText>
             <Link
               role="button"
-              color={COLORS.darkBlack}
+              color={COLORS.darkBlackEnabled}
               css={TYPOGRAPHY.pRegular}
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               onClick={() => handleClickDeckCalibration()}

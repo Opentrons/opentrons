@@ -103,7 +103,7 @@ export const SetupModules = ({
           role="link"
           alignSelf={ALIGN_FLEX_END}
           css={TYPOGRAPHY.labelSemiBold}
-          color={COLORS.darkBlack}
+          color={COLORS.darkBlackEnabled}
           onClick={() => setShowMultipleModulesModal(true)}
           data-test="ModuleSetup_helpLink"
         >
