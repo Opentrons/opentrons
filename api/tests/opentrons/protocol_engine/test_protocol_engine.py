@@ -47,7 +47,7 @@ from opentrons.protocol_engine.actions import (
     HardwareStoppedAction,
 )
 
-from opentrons_shared_data.protocol.models.protocol_schema_v6 import Liquid
+from opentrons.protocol_engine.commands.load_liquid import Liquid
 
 
 @pytest.fixture
@@ -610,15 +610,15 @@ def test_add_liquid(
 ) -> None:
     """It should dispatch an AddLiquidAction action."""
     subject.add_liquid(
-        liquid_id="water-id",
-        liquid=Liquid(displayName="water", description="water desc"),
+        liquid=Liquid(id="water-id", display_name="water", description="water desc"),
     )
 
     decoy.verify(
         action_dispatcher.dispatch(
             AddLiquidAction(
-                liquid_id="water-id",
-                liquid=Liquid(displayName="water", description="water desc"),
+                liquid=Liquid(
+                    id="water-id", display_name="water", description="water desc"
+                ),
             )
         )
     )

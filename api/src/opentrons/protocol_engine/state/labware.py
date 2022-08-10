@@ -97,7 +97,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             labware_offsets_by_id={},
             labware_by_id=labware_by_id,
             deck_definition=deck_definition,
-            liquids={},
+            liquids_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:

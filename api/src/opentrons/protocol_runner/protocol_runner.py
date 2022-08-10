@@ -8,6 +8,7 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
 )
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, Command
+from opentrons.protocol_engine.commands.load_liquid import Liquid
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
@@ -110,8 +111,16 @@ class ProtocolRunner:
                 self._load_json(protocol_source)
                 for liquid_key in protocol_source.liquids:
                     self._protocol_engine.add_liquid(
-                        liquid_id=liquid_key,
-                        liquid=protocol_source.liquids[liquid_key],
+                        Liquid(
+                            id=liquid_key,
+                            display_name=protocol_source.liquids[
+                                liquid_key
+                            ].displayName,
+                            description=protocol_source.liquids[liquid_key].description,
+                            display_color=protocol_source.liquids[
+                                liquid_key
+                            ].displayColor,
+                        )
                     )
             else:
                 self._load_legacy(protocol_source)

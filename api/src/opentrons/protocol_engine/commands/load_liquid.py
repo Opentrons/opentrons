@@ -10,6 +10,8 @@ LoadLiquidCommandType = Literal["loadLiquid"]
 
 
 class Liquid(BaseModel):
+    """Payload required to create a liquid."""
+
     id: str
     display_name: str
     description: str
