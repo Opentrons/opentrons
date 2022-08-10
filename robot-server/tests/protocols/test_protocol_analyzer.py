@@ -122,5 +122,6 @@ async def test_analyze(
             labware=[analysis_labware],
             pipettes=[analysis_pipette],
             errors=[analysis_error],
+            liquids={},
         ),
     )
