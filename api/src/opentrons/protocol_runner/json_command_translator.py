@@ -102,7 +102,7 @@ def _translate_liquid_command(
         params=pe_commands.LoadLiquidParams(
             labwareId=labwareId,
             liquidId=liquidId,
-            volumeByWell=volumeByWell,
+            volumeByWellName=volumeByWell,
         ),
         key=command.key,
     )

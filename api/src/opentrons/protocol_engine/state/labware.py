@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Sequence
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.pipette.dev_types import LabwareUri
-from opentrons_shared_data.protocol.models.protocol_schema_v6 import Liquid
+from opentrons.protocol_engine.commands.load_liquid import Liquid
 
 from opentrons.types import DeckSlotName, Point
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
@@ -49,8 +49,7 @@ class LabwareState:
     # it must point to an existing element of labware_offsets_by_id.
     labware_by_id: Dict[str, LoadedLabware]
     # Indexed by liquidId.
-    # We rely on Json v6+ preservation of dict insertion order.
-    liquids: Dict[str, Liquid]
+    liquids_by_id: Dict[str, Liquid]
     # Indexed by LabwareOffset.id.
     # We rely on Python 3.7+ preservation of dict insertion order.
     labware_offsets_by_id: Dict[str, LabwareOffset]
@@ -125,7 +124,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             self._state.definitions_by_uri[uri] = action.definition
 
         elif isinstance(action, AddLiquidAction):
-            self._state.liquids[action.liquid_id] = action.liquid
+            self._state.liquids_by_id[action.liquid.id] = action.liquid
 
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
@@ -409,5 +408,5 @@ class LabwareView(HasState[LabwareState]):
         return None
 
     def get_liquids(self) -> Dict[str, Liquid]:
-        """Get all liquids, in the order they were added."""
-        return self._state.liquids
+        """Get all protocol liquids."""
+        return self._state.liquids_by_id

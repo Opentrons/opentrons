@@ -9,6 +9,13 @@ from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 LoadLiquidCommandType = Literal["loadLiquid"]
 
 
+class Liquid(BaseModel):
+    id: str
+    display_name: str
+    description: str
+    display_color: Optional[str]
+
+
 class LoadLiquidParams(BaseModel):
     """Payload required to load a liquid into a well."""
 

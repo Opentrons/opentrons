@@ -11,6 +11,7 @@ from typing import Optional, Union
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.types import DoorState
 from opentrons.hardware_control.modules import LiveData
+from opentrons.protocol_engine.commands.load_liquid import Liquid
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
@@ -138,10 +139,7 @@ class AddLabwareDefinitionAction:
 class AddLiquidAction:
     """Add a liquid, to apply to subsequent `LoadLiquid`s."""
 
-    display_name: str
-    description: str
-    display_color: Optional[str]
-    liquid_id: str
+    liquid: Liquid
 
 
 @dataclass(frozen=True)
