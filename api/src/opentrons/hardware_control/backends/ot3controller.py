@@ -377,18 +377,15 @@ class OT3Controller:
         await self._probe_core()
         attached = await self._tool_detector.detect()
 
-        def _synthesize_model_name(
-            name: FirmwarePipetteName, model: int
-        ) -> "PipetteModel":
+        def _synthesize_model_name(name: FirmwarePipetteName) -> "PipetteModel":
+            model = 0
             return cast("PipetteModel", name.name + "_v3." + str(model))
 
         def _build_attached_pip(
             attached: ohc_tool_types.PipetteInformation,
         ) -> AttachedPipette:
             return {
-                "config": pipette_config.load(
-                    _synthesize_model_name(attached.name, attached.model)
-                ),
+                "config": pipette_config.load(_synthesize_model_name(attached.name)),
                 "id": attached.serial,
             }
 
