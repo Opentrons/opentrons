@@ -166,6 +166,7 @@ Command = Union[
     DropTip,
     Home,
     LoadLabware,
+    LoadLiquid,
     LoadModule,
     LoadPipette,
     MoveRelative,
@@ -198,7 +199,6 @@ Command = Union[
     thermocycler.OpenLid,
     thermocycler.CloseLid,
     thermocycler.RunProfile,
-    LoadLiquid,
 ]
 
 CommandParams = Union[
@@ -209,6 +209,7 @@ CommandParams = Union[
     DropTipParams,
     HomeParams,
     LoadLabwareParams,
+    LoadLiquidParams,
     LoadModuleParams,
     LoadPipetteParams,
     MoveRelativeParams,
@@ -242,7 +243,6 @@ CommandParams = Union[
     thermocycler.CloseLidParams,
     thermocycler.RunProfileParams,
     thermocycler.RunProfileStepParams,
-    LoadLiquidParams,
 ]
 
 CommandType = Union[
@@ -253,6 +253,7 @@ CommandType = Union[
     DropTipCommandType,
     HomeCommandType,
     LoadLabwareCommandType,
+    LoadLiquidCommandType,
     LoadModuleCommandType,
     LoadPipetteCommandType,
     MoveRelativeCommandType,
@@ -285,7 +286,6 @@ CommandType = Union[
     thermocycler.OpenLidCommandType,
     thermocycler.CloseLidCommandType,
     thermocycler.RunProfileCommandType,
-    LoadLiquidCommandType,
 ]
 
 CommandCreate = Union[
@@ -295,6 +295,7 @@ CommandCreate = Union[
     DropTipCreate,
     HomeCreate,
     LoadLabwareCreate,
+    LoadLiquidCreate,
     LoadModuleCreate,
     LoadPipetteCreate,
     MoveRelativeCreate,
@@ -327,7 +328,6 @@ CommandCreate = Union[
     thermocycler.OpenLidCreate,
     thermocycler.CloseLidCreate,
     thermocycler.RunProfileCreate,
-    LoadLiquidCreate,
 ]
 
 CommandResult = Union[
@@ -338,6 +338,7 @@ CommandResult = Union[
     DropTipResult,
     HomeResult,
     LoadLabwareResult,
+    LoadLiquidResult,
     LoadModuleResult,
     LoadPipetteResult,
     MoveRelativeResult,
@@ -370,5 +371,4 @@ CommandResult = Union[
     thermocycler.OpenLidResult,
     thermocycler.CloseLidResult,
     thermocycler.RunProfileResult,
-    LoadLiquidResult,
 ]

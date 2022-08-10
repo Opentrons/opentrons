@@ -88,7 +88,7 @@ def _translate_liquid_command(
 ) -> pe_commands.LoadLiquidCreate:
     liquidId = command.params.liquidId
     labwareId = command.params.labwareId
-    volumeByWell = command.params.volumeByWell
+    volumeByWell = command.params.volumeByWellName
     # v6 data model supports all commands and therefor most props are optional.
     # load liquid command must contain liquidId, labwareId and volumeByWell.
     assert liquidId is not None

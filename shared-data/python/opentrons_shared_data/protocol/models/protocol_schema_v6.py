@@ -42,7 +42,7 @@ class Params(BaseModel):
     labwareId: Optional[str]
     displayName: Optional[str]
     liquidId: Optional[str]
-    volumeByWell: Optional[Dict[str, Any]]
+    volumeByWellName: Optional[Dict[str, Any]]
     wellName: Optional[str]
     volume: Optional[float]
     flowRate: Optional[float]

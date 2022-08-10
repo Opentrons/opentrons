@@ -332,7 +332,7 @@ VALID_TEST_PARAMS = [
             params=protocol_schema_v6.Params(
                 labwareId="labware-id-def456",
                 liquidId="liquid-id-555",
-                volumeByWell={"A1": 32},
+                volumeByWellName={"A1": 32},
             ),
         ),
         pe_commands.LoadLiquidCreate(
@@ -340,7 +340,7 @@ VALID_TEST_PARAMS = [
             params=pe_commands.LoadLiquidParams(
                 labwareId="labware-id-def456",
                 liquidId="liquid-id-555",
-                volumeByWell={"A1": 32},
+                volumeByWellName={"A1": 32},
             ),
         ),
     ),

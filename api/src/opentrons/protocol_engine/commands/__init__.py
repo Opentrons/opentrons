@@ -313,7 +313,6 @@ __all__ = [
     "LoadLiquidParams",
     "LoadLiquidResult",
     "LoadLiquidCommandType",
-    "VolumeByWell",
     # module command bundles
     "heater_shaker",
     "magnetic_module",
