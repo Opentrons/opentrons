@@ -132,10 +132,13 @@ def _translate_simple_command(
     return translated_obj
 
 
-class JsonCommandTranslator:
+class JsonTranslator:
     """Class that translates commands from PD/JSON to ProtocolEngine."""
 
-    def translate(
+    def translate_liquids(self) -> None:
+        pass
+
+    def translate_commands(
         self,
         protocol: ProtocolSchemaV6,
     ) -> List[pe_commands.CommandCreate]:

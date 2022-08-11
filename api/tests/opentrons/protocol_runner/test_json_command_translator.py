@@ -1,4 +1,4 @@
-"""Tests for the JSON JsonCommandTranslator interface."""
+"""Tests for the JSON JsonTranslator interface."""
 import pytest
 from typing import Dict, List
 
@@ -16,7 +16,7 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.protocol.models import protocol_schema_v6
 from opentrons.types import DeckSlotName, MountType
-from opentrons.protocol_runner.json_command_translator import JsonCommandTranslator
+from opentrons.protocol_runner.json_command_translator import JsonTranslator
 from opentrons.protocol_engine import (
     commands as pe_commands,
     DeckPoint,
@@ -348,9 +348,9 @@ VALID_TEST_PARAMS = [
 
 
 @pytest.fixture
-def subject() -> JsonCommandTranslator:
-    """Get a JsonCommandTranslator test subject."""
-    return JsonCommandTranslator()
+def subject() -> JsonTranslator:
+    """Get a JsonTranslator test subject."""
+    return JsonTranslator()
 
 
 def _load_labware_definition_data() -> LabwareDefinition:
@@ -429,10 +429,10 @@ def _make_json_protocol(
 
 @pytest.mark.parametrize("test_input, expected_output", VALID_TEST_PARAMS)
 def test_load_command(
-    subject: JsonCommandTranslator,
+    subject: JsonTranslator,
     test_input: protocol_schema_v6.Command,
     expected_output: pe_commands.CommandCreate,
 ) -> None:
     """Test translating v6 commands to protocol engine commands."""
-    output = subject.translate(_make_json_protocol(commands=[test_input]))
+    output = subject.translate_commands(_make_json_protocol(commands=[test_input]))
     assert output == [expected_output]

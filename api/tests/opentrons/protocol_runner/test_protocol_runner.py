@@ -22,7 +22,7 @@ from opentrons.protocol_reader import (
 from opentrons.protocol_runner import ProtocolRunner
 from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
-from opentrons.protocol_runner.json_command_translator import JsonCommandTranslator
+from opentrons.protocol_runner.json_command_translator import JsonTranslator
 from opentrons.protocol_runner.python_file_reader import (
     PythonFileReader,
     PythonProtocol,
@@ -66,9 +66,9 @@ def json_file_reader(decoy: Decoy) -> JsonFileReader:
 
 
 @pytest.fixture
-def json_command_translator(decoy: Decoy) -> JsonCommandTranslator:
-    """Get a mocked out JsonCommandTranslator dependency."""
-    return decoy.mock(cls=JsonCommandTranslator)
+def json_command_translator(decoy: Decoy) -> JsonTranslator:
+    """Get a mocked out JsonTranslator dependency."""
+    return decoy.mock(cls=JsonTranslator)
 
 
 @pytest.fixture
@@ -113,7 +113,7 @@ def subject(
     hardware_api: HardwareAPI,
     task_queue: TaskQueue,
     json_file_reader: JsonFileReader,
-    json_command_translator: JsonCommandTranslator,
+    json_command_translator: JsonTranslator,
     python_file_reader: PythonFileReader,
     python_context_creator: PythonContextCreator,
     python_executor: PythonExecutor,
@@ -219,7 +219,7 @@ async def test_run(
 def test_load_json(
     decoy: Decoy,
     json_file_reader: JsonFileReader,
-    json_command_translator: JsonCommandTranslator,
+    json_command_translator: JsonTranslator,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
     subject: ProtocolRunner,
@@ -246,7 +246,7 @@ def test_load_json(
     ]
 
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
-    decoy.when(json_command_translator.translate(json_protocol)).then_return(commands)
+    decoy.when(json_command_translator.translate_commands(json_protocol)).then_return(commands)
 
     subject.load(json_protocol_source)
 
