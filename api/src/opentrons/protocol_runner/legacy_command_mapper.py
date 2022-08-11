@@ -267,6 +267,10 @@ class LegacyCommandMapper:
             engine_command = self._build_liquid_handling_commands(
                 command=command, command_id=command_id, now=now
             )
+        # elif command["name"] == legacy_command_types.AIR_GAP:
+        #     engine_command = self._build_air_gap_command(
+        #         command=command, command_id=command_id, now=now
+        #     )
         elif command["name"] == legacy_command_types.BLOW_OUT:
             engine_command = self._build_blow_out_command(
                 command=command, command_id=command_id, now=now
@@ -284,6 +288,10 @@ class LegacyCommandMapper:
             )
         elif command["name"] == legacy_command_types.TOUCH_TIP:
             engine_command = self._build_touch_tip_command(
+                command=command, command_id=command_id, now=now
+            )
+        elif command["name"] == legacy_command_types.MOVE_TO:
+            engine_command = self._build_move_to_command(
                 command=command, command_id=command_id, now=now
             )
         else:
@@ -362,7 +370,8 @@ class LegacyCommandMapper:
                 labwareId=labware_id,
                 wellName=well_name,
             ),
-        )    
+        )
+
     def _build_touch_tip_command(
         self,
         command: legacy_command_types.TouchTipMessage,
@@ -374,7 +383,7 @@ class LegacyCommandMapper:
         if isinstance(location, Location):
             well = location.labware.as_well()
         else:
-            raise Exception("Unknown touch tip location.")
+            assert well is None, "Unknown touch_tip location."
         first_parent = location.labware.first_parent()
         assert first_parent is not None, "Labware needs to be associated with a slot"
         parent_module_id = self._module_id_by_slot.get(DeckSlotName(first_parent))
@@ -398,7 +407,8 @@ class LegacyCommandMapper:
                 wellName=well_name,
             ),
         )
-    def _build_move_to_commands(
+
+    def _build_move_to_command(
         self,
         command: legacy_command_types.MoveToMessage,
         command_id: str,
@@ -409,7 +419,7 @@ class LegacyCommandMapper:
         if isinstance(location, Location):
             well = location.labware.as_well()
         else:
-            raise Exception("Unknown move to location.")
+            assert well is None, "Unknown move_to location."
         first_parent = location.labware.first_parent()
         assert first_parent is not None, "Labware needs to be associated with a slot"
         parent_module_id = self._module_id_by_slot.get(DeckSlotName(first_parent))
@@ -433,6 +443,7 @@ class LegacyCommandMapper:
                 wellName=well_name,
             ),
         )
+
     def _build_liquid_handling_commands(
         self,
         command: Union[
@@ -492,6 +503,40 @@ class LegacyCommandMapper:
                     flowRate=flow_rate,
                 ),
             )
+
+    # def _build_air_gap_command(
+    #     self,
+    #     command: legacy_command_types.AirGapMessage,
+    #     command_id: str,
+    #     now: datetime,
+    # ) -> pe_commands.Command:
+    #     well: LegacyWell
+    #     pipette = command["payload"]["text"]
+    #     location = pipette._ctx.location_cache
+    #     if isinstance(location, Location):
+    #         well = location.labware.as_well()
+    #     else:
+    #         assert well is None, "Unknown pipetting location."
+    #     first_parent = location.labware.first_parent()
+    #     assert first_parent is not None, "Labware needs to be associated with a slot"
+    #     parent_module_id = self._module_id_by_slot.get(DeckSlotName(first_parent))
+    #     if parent_module_id is not None:
+    #         labware_id = self._labware_id_by_module_id[parent_module_id]
+    #     else:
+    #         slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
+    #         labware_id = self._labware_id_by_slot[slot]
+    #     well_name = well.well_name
+    #     return pe_commands.Aspirate.construct(
+    #         id=command_id,
+    #         key=command_id,
+    #         status=pe_commands.CommandStatus.RUNNING,
+    #         createdAt=now,
+    #         startedAt=now,
+    #         params=pe_commands.AspirateParams.construct(
+    #             labwareId=labware_id,
+    #             wellName=well_name,
+    #         ),
+    #     )
 
     def _build_blow_out_command(
         self,
