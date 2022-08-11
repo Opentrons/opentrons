@@ -66,17 +66,20 @@ LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
         )
         pipette_left.aspirate(
             volume=40,
-            location=well_plate_1["A1"],
+            location=well_plate_1.wells_by_name()["A1"],
         )
         pipette_left.dispense(
             volume=35,
-            location=well_plate_1["B1"],
+            location=well_plate_1.wells_by_name()["B1"],
         )
         pipette_left.aspirate(50)
-        pipette_left.blow_out()
+        pipette_left.blow_out(
+            location=well_plate_1.wells_by_name()["B1"],
+        )
         pipette_left.dispense(50)
         pipette_left.aspirate()
         pipette_left.dispense()
+        pipette_left.blow_out()
         pipette_left.drop_tip(
             location=tip_rack_1.wells_by_name()["A1"]
         )
@@ -110,7 +113,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
     pipette_left_result_captor = matchers.Captor()
     pipette_right_result_captor = matchers.Captor()
 
-    assert len(commands_result) == 20
+    assert len(commands_result) == 21
 
     assert commands_result[0] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
@@ -389,7 +392,22 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=300),
     )
-    assert commands_result[19] == commands.DropTip.construct(
+    assert commands_result[19] == commands.BlowOut.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.BlowOutParams(
+            pipetteId=pipette_left_id,
+            labwareId=well_plate_1_id,
+            wellName="B1",
+            flowRate=1000.0,
+        ),
+        result=commands.BlowOutResult(),
+    )
+    assert commands_result[20] == commands.DropTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
