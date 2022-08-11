@@ -1,6 +1,3 @@
-import * as Protocol from '../../protocol'
-import * as Hash from '../hash'
-
 import * as Selectors from '../selectors'
 import * as CalibrationSelectors from '../../calibration/selectors'
 import * as SessionsSelectors from '../../sessions/selectors'
