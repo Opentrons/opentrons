@@ -87,13 +87,14 @@ export const LiquidsLabwareDetailsModal = (
         paddingX={SPACING.spacing4}
         paddingTop={SPACING.spacing4}
         backgroundColor={COLORS.fundamentalsBackground}
+        height="28.125rem"
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            css={HIDE_SCROLLBAR}
             maxHeight="27.125rem"
             overflowY="auto"
+            css={HIDE_SCROLLBAR}
             minWidth="10.313rem"
             gridGap={SPACING.spacing3}
           >
