@@ -239,10 +239,8 @@ class LegacyCommandMapper:
             )
 
         elif (
-            (
-                command["name"] == legacy_command_types.ASPIRATE
-                or command["name"] == legacy_command_types.DISPENSE
-            )
+            command["name"] == legacy_command_types.ASPIRATE
+            or command["name"] == legacy_command_types.DISPENSE
         ):
             engine_command = self._build_liquid_handling_commands(
                 command=command, command_id=command_id, now=now
@@ -290,8 +288,8 @@ class LegacyCommandMapper:
             location if isinstance(location, LegacyWell) else location.labware.as_well()
         )
         mount = MountType(pipette.mount)
-        #   the following type checking suppression assumes the tiprack is not loaded on top of a module 
-        slot = DeckSlotName.from_primitive(well.parent.parent) # type: ignore[arg-type]
+        #   the following type checking suppression assumes the tiprack is not loaded on top of a module
+        slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
         well_name = well.well_name
         labware_id = self._labware_id_by_slot[slot]
         pipette_id = self._pipette_id_by_mount[mount]
@@ -321,7 +319,7 @@ class LegacyCommandMapper:
             location if isinstance(location, LegacyWell) else location.labware.as_well()
         )
         mount = MountType(pipette.mount)
-        #   the following type checking suppression assumes the tiprack is not loaded on top of a module 
+        #   the following type checking suppression assumes the tiprack is not loaded on top of a module
         slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
         well_name = well.well_name
         labware_id = self._labware_id_by_slot[slot]
@@ -356,8 +354,10 @@ class LegacyCommandMapper:
         well = (
             location if isinstance(location, LegacyWell) else location.labware.as_well()
         )
-        first_parent= (
-            location if isinstance(location, LegacyWell) else location.labware.first_parent()
+        first_parent = (
+            location
+            if isinstance(location, LegacyWell)
+            else location.labware.first_parent()
         )
         assert first_parent is not None, "Labware needs to be associated with a slot"
         slot = DeckSlotName(first_parent)
@@ -413,14 +413,14 @@ class LegacyCommandMapper:
         location = command["payload"]["location"]
         flow_rate = pipette.flow_rate.blow_out
         last_location = pipette._ctx.location_cache
+        assert location is not None, "Unknown blow_out location."
         if isinstance(location, Location):
             well = location.labware.as_well()
+            first_parent = location.labware.first_parent()
         elif isinstance(last_location, Location):
             location = last_location
             well = location.labware.as_well()
-        else:
-            assert well is None, "Unknown blow_out location."
-        first_parent = location.labware.first_parent()
+            first_parent = location.labware.first_parent()
         assert first_parent is not None, "Labware needs to be associated with a slot"
         slot = DeckSlotName(first_parent)
         parent_module_id = self._module_id_by_slot.get(slot)
