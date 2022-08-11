@@ -35,6 +35,7 @@ from ..actions import (
     AddLiquidAction,
 )
 from .abstract_store import HasState, HandlesActions
+from .labware_substates import LiquidsLabwareSubState
 
 
 _TRASH_LOCATION = DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH)
@@ -48,12 +49,11 @@ class LabwareState:
     # If a LoadedLabware here has a non-None offsetId,
     # it must point to an existing element of labware_offsets_by_id.
     labware_by_id: Dict[str, LoadedLabware]
-    # Indexed by liquidId.
-    liquids_by_id: Dict[str, Liquid]
     # Indexed by LabwareOffset.id.
     # We rely on Python 3.7+ preservation of dict insertion order.
     labware_offsets_by_id: Dict[str, LabwareOffset]
-
+    # Indexed by labware id
+    liquids_substate: LiquidsLabwareSubState
     definitions_by_uri: Dict[str, LabwareDefinition]
     deck_definition: DeckDefinitionV3
 
@@ -97,7 +97,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             labware_offsets_by_id={},
             labware_by_id=labware_by_id,
             deck_definition=deck_definition,
-            liquids_by_id={},
+            liquids_substate=LiquidsLabwareSubState(),
         )
 
     def handle_action(self, action: Action) -> None:
@@ -124,7 +124,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             self._state.definitions_by_uri[uri] = action.definition
 
         elif isinstance(action, AddLiquidAction):
-            self._state.liquids_by_id[action.liquid.id] = action.liquid
+            self._state.liquids_substate.liquids_by_id[action.liquid.id] = action.liquid
 
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
@@ -409,4 +409,4 @@ class LabwareView(HasState[LabwareState]):
 
     def get_liquids(self) -> List[Liquid]:
         """Get all protocol liquids."""
-        return list(self._state.liquids_by_id.values())
+        return self._state.liquids_substate.get_liquids()

@@ -72,7 +72,6 @@ def test_initial_state(
         },
         labware_offsets_by_id={},
         definitions_by_uri={expected_trash_uri: fixed_trash_def},
-        liquids_by_id={},
     )
 
 
@@ -174,4 +173,4 @@ def test_handles_add_liquid(subject: LabwareStore) -> None:
     )
     subject.handle_action(AddLiquidAction(liquid=expected_liquid))
 
-    assert subject.state.liquids_by_id["water-id"] == expected_liquid
+    assert subject.state.liquids_substate.liquids_by_id["water-id"] == expected_liquid
