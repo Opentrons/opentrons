@@ -246,12 +246,12 @@ def test_load_json(
         ),
     ]
 
-    liquids: List[Liquid] = [Liquid(id="water-id", display_name="water", description=" water desc")]
+    liquids: List[Liquid] = [
+        Liquid(id="water-id", display_name="water", description=" water desc")
+    ]
 
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
-    decoy.when(json_translator.translate_commands(json_protocol)).then_return(
-        commands
-    )
+    decoy.when(json_translator.translate_commands(json_protocol)).then_return(commands)
     decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
 
     subject.load(json_protocol_source)
@@ -268,7 +268,9 @@ def test_load_json(
             )
         ),
         protocol_engine.add_liquid(
-            liquid=Liquid(id="water-id", display_name="water", description=" water desc")
+            liquid=Liquid(
+                id="water-id", display_name="water", description=" water desc"
+            )
         ),
         task_queue.set_run_func(func=protocol_engine.wait_until_complete),
     )

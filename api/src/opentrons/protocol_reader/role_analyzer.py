@@ -1,10 +1,9 @@
 """Input file role analysis."""
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Union, Dict
+from typing import List, Optional, Sequence, Union
 from typing_extensions import Literal
 
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6
-from opentrons.protocol_engine.commands.load_liquid import Liquid
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocols.models import JsonProtocol as ProtocolSchemaV5
 from .protocol_source import ProtocolFileRole
@@ -51,7 +50,7 @@ class RoleAnalysisError(ValueError):
 class RoleAnalyzer:
     """Input file role analysis interface."""
 
-    @staticmethod  # noqa: C901
+    @staticmethod
     def analyze(files: Sequence[BufferedFile]) -> RoleAnalysis:
         """Analyze a set of input files to determine each of their roles."""
         if len(files) == 0:

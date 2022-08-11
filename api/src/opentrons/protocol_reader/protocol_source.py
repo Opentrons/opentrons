@@ -7,7 +7,6 @@ from typing_extensions import Literal
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine.commands.load_liquid import Liquid
 
 
 class ProtocolType(str, Enum):

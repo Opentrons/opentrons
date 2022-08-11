@@ -8,7 +8,6 @@ from opentrons.protocol_reader import (
     JsonProtocolConfig,
 )
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, Command
-from opentrons.protocol_engine.commands.load_liquid import Liquid
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
