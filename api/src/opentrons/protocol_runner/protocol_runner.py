@@ -54,7 +54,7 @@ class ProtocolRunner:
         hardware_api: HardwareControlAPI,
         task_queue: Optional[TaskQueue] = None,
         json_file_reader: Optional[JsonFileReader] = None,
-        json_command_translator: Optional[JsonTranslator] = None,
+        json_translator: Optional[JsonTranslator] = None,
         python_file_reader: Optional[PythonFileReader] = None,
         python_context_creator: Optional[PythonContextCreator] = None,
         python_executor: Optional[PythonExecutor] = None,
@@ -66,9 +66,7 @@ class ProtocolRunner:
         self._protocol_engine = protocol_engine
         self._hardware_api = hardware_api
         self._json_file_reader = json_file_reader or JsonFileReader()
-        self._json_command_translator = (
-                json_command_translator or JsonTranslator()
-        )
+        self._json_translator = json_translator or JsonTranslator()
         self._python_file_reader = python_file_reader or PythonFileReader()
         self._python_context_creator = python_context_creator or PythonContextCreator()
         self._python_executor = python_executor or PythonExecutor()
@@ -159,9 +157,12 @@ class ProtocolRunner:
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
         protocol = self._json_file_reader.read(protocol_source)
-        commands = self._json_command_translator.translate_commands(protocol)
+        commands = self._json_translator.translate_commands(protocol)
+        liquids = self._json_translator.translate_liquids(protocol)
         for command in commands:
             self._protocol_engine.add_command(request=command)
+        for liquid in liquids:
+            self._protocol_engine.add_liquid(liquid=liquid)
         self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)
 
     def _load_python(self, protocol_source: ProtocolSource) -> None:

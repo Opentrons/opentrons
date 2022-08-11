@@ -134,21 +134,22 @@ def _translate_simple_command(
 
 
 class JsonTranslator:
-    """Class that translates commands\liquids from PD/JSON to ProtocolEngine."""
+    """Class that translates commands/liquids from PD/JSON to ProtocolEngine."""
 
     def translate_liquids(self, protocol: ProtocolSchemaV6) -> List[Liquid]:
         """Takes json protocol v6 and translates liquids->protocol engine liquids."""
         liquids = []
-        for liquid_key in protocol.liquids:
-            liquid = protocol.liquids[liquid_key]
-            liquids.append(
-                Liquid(
-                    id=liquid_key,
-                    display_name=liquid.displayName,
-                    description=liquid.description,
-                    display_color=liquid.displayColor,
+        if protocol.liquids:
+            for liquid_key in protocol.liquids:
+                liquid = protocol.liquids[liquid_key]
+                liquids.append(
+                    Liquid(
+                        id=liquid_key,
+                        display_name=liquid.displayName,
+                        description=liquid.description,
+                        display_color=liquid.displayColor,
+                    )
                 )
-            )
         return liquids
 
     def translate_commands(

@@ -14,6 +14,7 @@ from opentrons_shared_data.protocol.models.protocol_schema_v6 import ProtocolSch
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.protocol_engine import ProtocolEngine, commands as pe_commands
+from opentrons.protocol_engine.commands.load_liquid import Liquid
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,
@@ -66,7 +67,7 @@ def json_file_reader(decoy: Decoy) -> JsonFileReader:
 
 
 @pytest.fixture
-def json_command_translator(decoy: Decoy) -> JsonTranslator:
+def json_translator(decoy: Decoy) -> JsonTranslator:
     """Get a mocked out JsonTranslator dependency."""
     return decoy.mock(cls=JsonTranslator)
 
@@ -113,7 +114,7 @@ def subject(
     hardware_api: HardwareAPI,
     task_queue: TaskQueue,
     json_file_reader: JsonFileReader,
-    json_command_translator: JsonTranslator,
+    json_translator: JsonTranslator,
     python_file_reader: PythonFileReader,
     python_context_creator: PythonContextCreator,
     python_executor: PythonExecutor,
@@ -127,7 +128,7 @@ def subject(
         hardware_api=hardware_api,
         task_queue=task_queue,
         json_file_reader=json_file_reader,
-        json_command_translator=json_command_translator,
+        json_translator=json_translator,
         python_file_reader=python_file_reader,
         python_context_creator=python_context_creator,
         python_executor=python_executor,
@@ -219,7 +220,7 @@ async def test_run(
 def test_load_json(
     decoy: Decoy,
     json_file_reader: JsonFileReader,
-    json_command_translator: JsonTranslator,
+    json_translator: JsonTranslator,
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
     subject: ProtocolRunner,
@@ -245,8 +246,13 @@ def test_load_json(
         ),
     ]
 
+    liquids: List[Liquid] = [Liquid(id="water-id", display_name="water", description=" water desc")]
+
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
-    decoy.when(json_command_translator.translate_commands(json_protocol)).then_return(commands)
+    decoy.when(json_translator.translate_commands(json_protocol)).then_return(
+        commands
+    )
+    decoy.when(json_translator.translate_liquids(json_protocol)).then_return(liquids)
 
     subject.load(json_protocol_source)
 
@@ -260,6 +266,9 @@ def test_load_json(
             request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="goodbye")
             )
+        ),
+        protocol_engine.add_liquid(
+            liquid=Liquid(id="water-id", display_name="water", description=" water desc")
         ),
         task_queue.set_run_func(func=protocol_engine.wait_until_complete),
     )

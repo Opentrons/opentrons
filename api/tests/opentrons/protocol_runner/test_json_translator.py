@@ -443,11 +443,29 @@ def test_load_liquid(
     subject: JsonTranslator,
 ) -> None:
     """Test translating v6 commands to protocol engine commands."""
-    test = _make_json_protocol()
-    output = subject.translate_liquids(test)
+    protocol = _make_json_protocol()
+    result = subject.translate_liquids(protocol)
 
-    assert output == [Liquid(
-        id="liquid-id-555",
-        display_name="water", description="water description"
-    )]
+    assert result == [
+        Liquid(
+            id="liquid-id-555", display_name="water", description="water description"
+        )
+    ]
 
+    empty_liquids = protocol_schema_v6.ProtocolSchemaV6(
+        # schemaVersion is arbitrary. Currently (2021-06-28), JsonProtocol.parse_obj()
+        # isn't smart enough to validate differently depending on this field.
+        otSharedSchema="#/protocol/schemas/6",
+        schemaVersion=6,
+        metadata=protocol_schema_v6.Metadata(),
+        robot=protocol_schema_v6.Robot(model="OT-2 Standard", deckId="ot2_standard"),
+        pipettes={},
+        labwareDefinitions={},
+        labware={},
+        commands=[],
+        liquids={},
+        modules={},
+    )
+
+    result = subject.translate_liquids(empty_liquids)
+    assert result == []
