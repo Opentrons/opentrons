@@ -132,6 +132,7 @@ class EngineStore:
 
         # if isinstance(main_file.data, ProtocolSchemaV6):
         liquids = protocol.source.liquids or []
+        print(liquids)
 
         self._runner_engine_pair = RunnerEnginePair(
             run_id=run_id,

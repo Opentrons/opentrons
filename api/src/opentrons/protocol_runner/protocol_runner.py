@@ -109,19 +109,19 @@ class ProtocolRunner:
 
             if schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF:
                 self._load_json(protocol_source)
-                for liquid_key in protocol_source.liquids:
-                    self._protocol_engine.add_liquid(
-                        Liquid(
-                            id=liquid_key,
-                            display_name=protocol_source.liquids[
-                                liquid_key
-                            ].displayName,
-                            description=protocol_source.liquids[liquid_key].description,
-                            display_color=protocol_source.liquids[
-                                liquid_key
-                            ].displayColor,
-                        )
-                    )
+                # for liquid_key in protocol_source.liquids:
+                #     self._protocol_engine.add_liquid(
+                #         Liquid(
+                #             id=liquid_key,
+                #             display_name=protocol_source.liquids[
+                #                 liquid_key
+                #             ].displayName,
+                #             description=protocol_source.liquids[liquid_key].description,
+                #             display_color=protocol_source.liquids[
+                #                 liquid_key
+                #             ].displayColor,
+                #         )
+                #     )
             else:
                 self._load_legacy(protocol_source)
 
@@ -172,6 +172,7 @@ class ProtocolRunner:
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
         protocol = self._json_file_reader.read(protocol_source)
+        print(protocol)
         commands = self._json_command_translator.translate(protocol)
         for command in commands:
             self._protocol_engine.add_command(request=command)

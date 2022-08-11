@@ -116,4 +116,3 @@ class ProtocolSource:
     metadata: Metadata
     config: ProtocolConfig
     labware_definitions: List[LabwareDefinition]
-    liquids: Dict[str, Liquid]
