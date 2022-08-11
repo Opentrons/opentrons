@@ -85,7 +85,9 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const history = useHistory()
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robot?.name)
-  )?.split(' ')[0]
+  )
+
+  console.log('robotModel', robotModel)
 
   return robotName != null ? (
     <Flex

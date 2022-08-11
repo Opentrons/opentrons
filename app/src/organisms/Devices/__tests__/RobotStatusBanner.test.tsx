@@ -125,7 +125,7 @@ describe('RobotStatusBanner', () => {
       })
     when(mockGetRobotModelByName)
       .calledWith(MOCK_STATE, 'otie')
-      .mockReturnValue(ROBOT_MODEL_OT2)
+      .mockReturnValue('OT-2')
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -141,7 +141,7 @@ describe('RobotStatusBanner', () => {
     props.name = 'buzz'
     when(mockGetRobotModelByName)
       .calledWith(MOCK_STATE, props.name)
-      .mockReturnValue(ROBOT_MODEL_OT3)
+      .mockReturnValue('OT-3')
     const [{ getByText }] = render(props)
     getByText('OT-3')
     getByText('buzz')

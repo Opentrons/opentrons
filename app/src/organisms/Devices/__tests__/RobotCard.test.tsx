@@ -173,7 +173,7 @@ describe('RobotCard', () => {
       })
     when(mockGetRobotModelByName)
       .calledWith(MOCK_STATE, mockConnectableRobot.name)
-      .mockReturnValue(ROBOT_MODEL_OT2)
+      .mockReturnValue('OT-2')
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -217,7 +217,7 @@ describe('RobotCard', () => {
     props = { robot: { ...mockConnectableRobot, name: 'buzz' } }
     when(mockGetRobotModelByName)
       .calledWith(MOCK_STATE, 'buzz')
-      .mockReturnValue(ROBOT_MODEL_OT3)
+      .mockReturnValue('OT-3')
     const [{ getByText }] = render(props)
     getByText('OT-3')
     getByText('buzz')

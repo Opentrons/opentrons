@@ -580,28 +580,28 @@ describe('discovery selectors', () => {
       selector: discovery.getRobotModelByName,
       state: MOCK_STATE,
       args: ['fizzbuzz'],
-      expected: EXPECTED_FIZZBUZZ.robotModel,
+      expected: 'OT-3',
     },
     {
       name: 'getRobotType returns type of a connectable OT-2',
       selector: discovery.getRobotModelByName,
       state: MOCK_STATE,
       args: ['foo'],
-      expected: EXPECTED_FOO.robotModel,
+      expected: 'OT-2',
     },
     {
       name: 'getRobotType returns OT-2 for a reachable but cached robot',
       selector: discovery.getRobotModelByName,
       state: MOCK_STATE,
       args: ['baz'],
-      expected: EXPECTED_BAZ.robotModel,
+      expected: 'OT-2',
     },
     {
       name: 'getRobotType returns OT-2 by default for an unreachable robot',
       selector: discovery.getRobotModelByName,
       state: MOCK_STATE,
       args: ['qux'],
-      expected: EXPECTED_QUX.robotModel,
+      expected: 'OT-3',
     },
   ]
 

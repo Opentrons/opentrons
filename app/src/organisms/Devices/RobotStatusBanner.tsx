@@ -35,7 +35,9 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
   const { displayName } = useProtocolDetailsForRun(currentRunId)
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, name)
-  )?.split(' ')[0]
+  )
+
+  console.log('robotModel', robotModel)
 
   const runningProtocolBanner: JSX.Element | null =
     currentRunId != null ? (

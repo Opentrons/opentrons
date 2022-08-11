@@ -248,7 +248,7 @@ export const getRobotModel = (robot: DiscoveredRobot): RobotModel => {
 export const getRobotModelByName = (
   state: State,
   robotName: string
-): RobotModel | null => {
+): string | null => {
   const robot = getRobotByName(state, robotName)
-  return robot != null ? getRobotModel(robot) : null
+  return robot != null ? getRobotModel(robot)?.split(/\s/)[0] : null
 }
