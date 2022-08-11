@@ -56,9 +56,6 @@ LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
             rate=130,
             location=well_plate_1["A1"],
         )
-        pipette_left.blow_out(
-            location=well_plate_1["A1"],
-        )
         pipette_left.dispense(
             volume=35,
             rate=130,
@@ -73,9 +70,6 @@ LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
             location=well_plate_1.wells_by_name()["B1"],
         )
         pipette_left.aspirate(50)
-        pipette_left.blow_out(
-            location=well_plate_1.wells_by_name()["B1"],
-        )
         pipette_left.dispense(50)
         pipette_left.aspirate()
         pipette_left.dispense()
@@ -113,7 +107,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
     pipette_left_result_captor = matchers.Captor()
     pipette_right_result_captor = matchers.Captor()
 
-    assert len(commands_result) == 21
+    assert len(commands_result) == 19
 
     assert commands_result[0] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
@@ -250,22 +244,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.AspirateResult(volume=40),
     )
-    assert commands_result[10] == commands.BlowOut.construct(
-        id=matchers.IsA(str),
-        key=matchers.IsA(str),
-        status=commands.CommandStatus.SUCCEEDED,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        completedAt=matchers.IsA(datetime),
-        params=commands.BlowOutParams(
-            pipetteId=pipette_left_id,
-            labwareId=well_plate_1_id,
-            wellName="A1",
-            flowRate=1000.0,
-        ),
-        result=commands.BlowOutResult(),
-    )
-    assert commands_result[11] == commands.Dispense.construct(
+    assert commands_result[10] == commands.Dispense.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -281,7 +260,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=35),
     )
-    assert commands_result[12] == commands.Aspirate.construct(
+    assert commands_result[11] == commands.Aspirate.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -297,7 +276,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.AspirateResult(volume=40),
     )
-    assert commands_result[13] == commands.Dispense.construct(
+    assert commands_result[12] == commands.Dispense.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -313,7 +292,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=35),
     )
-    assert commands_result[14] == commands.Aspirate.construct(
+    assert commands_result[13] == commands.Aspirate.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -329,22 +308,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.AspirateResult(volume=50),
     )
-    assert commands_result[15] == commands.BlowOut.construct(
-        id=matchers.IsA(str),
-        key=matchers.IsA(str),
-        status=commands.CommandStatus.SUCCEEDED,
-        createdAt=matchers.IsA(datetime),
-        startedAt=matchers.IsA(datetime),
-        completedAt=matchers.IsA(datetime),
-        params=commands.BlowOutParams(
-            pipetteId=pipette_left_id,
-            labwareId=well_plate_1_id,
-            wellName="B1",
-            flowRate=1000.0,
-        ),
-        result=commands.BlowOutResult(),
-    )
-    assert commands_result[16] == commands.Dispense.construct(
+    assert commands_result[14] == commands.Dispense.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -360,7 +324,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=50),
     )
-    assert commands_result[17] == commands.Aspirate.construct(
+    assert commands_result[15] == commands.Aspirate.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -371,12 +335,12 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
             pipetteId=pipette_left_id,
             labwareId=well_plate_1_id,
             wellName="B1",
-            volume=350,
+            volume=290,
             flowRate=1.0,
         ),
-        result=commands.AspirateResult(volume=350),
+        result=commands.AspirateResult(volume=290),
     )
-    assert commands_result[18] == commands.Dispense.construct(
+    assert commands_result[16] == commands.Dispense.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -392,7 +356,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=300),
     )
-    assert commands_result[19] == commands.BlowOut.construct(
+    assert commands_result[17] == commands.BlowOut.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -407,7 +371,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.BlowOutResult(),
     )
-    assert commands_result[20] == commands.DropTip.construct(
+    assert commands_result[18] == commands.DropTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,

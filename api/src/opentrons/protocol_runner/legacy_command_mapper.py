@@ -281,7 +281,6 @@ class LegacyCommandMapper:
         command_id: str,
         now: datetime,
     ) -> pe_commands.Command:
-        well: LegacyWell
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         well = (
@@ -312,7 +311,6 @@ class LegacyCommandMapper:
         command_id: str,
         now: datetime,
     ) -> pe_commands.Command:
-        well: LegacyWell
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         well = (
@@ -346,7 +344,6 @@ class LegacyCommandMapper:
         command_id: str,
         now: datetime,
     ) -> pe_commands.Command:
-        well: LegacyWell
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         volume = command["payload"]["volume"]
@@ -354,11 +351,8 @@ class LegacyCommandMapper:
         well = (
             location if isinstance(location, LegacyWell) else location.labware.as_well()
         )
-        first_parent = (
-            location
-            if isinstance(location, LegacyWell)
-            else location.labware.first_parent()
-        )
+        if isinstance(location, Location):
+            first_parent = location.labware.first_parent()
         assert first_parent is not None, "Labware needs to be associated with a slot"
         slot = DeckSlotName(first_parent)
         parent_module_id = self._module_id_by_slot.get(slot)
@@ -408,18 +402,14 @@ class LegacyCommandMapper:
         command_id: str,
         now: datetime,
     ) -> pe_commands.Command:
-        well: LegacyWell
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         flow_rate = pipette.flow_rate.blow_out
-        last_location = pipette._ctx.location_cache
         assert location is not None, "Unknown blow_out location."
+        well = (
+            location if isinstance(location, LegacyWell) else location.labware.as_well()
+        )
         if isinstance(location, Location):
-            well = location.labware.as_well()
-            first_parent = location.labware.first_parent()
-        elif isinstance(last_location, Location):
-            location = last_location
-            well = location.labware.as_well()
             first_parent = location.labware.first_parent()
         assert first_parent is not None, "Labware needs to be associated with a slot"
         slot = DeckSlotName(first_parent)
