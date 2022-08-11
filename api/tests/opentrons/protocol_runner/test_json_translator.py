@@ -16,7 +16,7 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.protocol.models import protocol_schema_v6
 from opentrons.types import DeckSlotName, MountType
-from opentrons.protocol_runner.json_command_translator import JsonTranslator
+from opentrons.protocol_runner.json_translator import JsonTranslator
 from opentrons.protocol_engine import (
     commands as pe_commands,
     DeckPoint,
@@ -28,6 +28,7 @@ from opentrons.protocol_engine import (
     ModuleModel,
     ModuleLocation,
 )
+from opentrons.protocol_engine.commands.load_liquid import Liquid
 
 VALID_TEST_PARAMS = [
     (
@@ -436,3 +437,17 @@ def test_load_command(
     """Test translating v6 commands to protocol engine commands."""
     output = subject.translate_commands(_make_json_protocol(commands=[test_input]))
     assert output == [expected_output]
+
+
+def test_load_liquid(
+    subject: JsonTranslator,
+) -> None:
+    """Test translating v6 commands to protocol engine commands."""
+    test = _make_json_protocol()
+    output = subject.translate_liquids(test)
+
+    assert output == [Liquid(
+        id="liquid-id-555",
+        display_name="water", description="water description"
+    )]
+

@@ -22,7 +22,7 @@ from opentrons.protocol_reader import (
 from opentrons.protocol_runner import ProtocolRunner
 from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
-from opentrons.protocol_runner.json_command_translator import JsonTranslator
+from opentrons.protocol_runner.json_translator import JsonTranslator
 from opentrons.protocol_runner.python_file_reader import (
     PythonFileReader,
     PythonProtocol,

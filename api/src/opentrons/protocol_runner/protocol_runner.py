@@ -12,7 +12,7 @@ from opentrons.protocol_engine.commands.load_liquid import Liquid
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
-from .json_command_translator import JsonTranslator
+from .json_translator import JsonTranslator
 from .python_file_reader import PythonFileReader
 from .python_context_creator import PythonContextCreator
 from .python_executor import PythonExecutor
@@ -109,19 +109,6 @@ class ProtocolRunner:
 
             if schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF:
                 self._load_json(protocol_source)
-                # for liquid_key in protocol_source.liquids:
-                #     self._protocol_engine.add_liquid(
-                #         Liquid(
-                #             id=liquid_key,
-                #             display_name=protocol_source.liquids[
-                #                 liquid_key
-                #             ].displayName,
-                #             description=protocol_source.liquids[liquid_key].description,
-                #             display_color=protocol_source.liquids[
-                #                 liquid_key
-                #             ].displayColor,
-                #         )
-                #     )
             else:
                 self._load_legacy(protocol_source)
 
