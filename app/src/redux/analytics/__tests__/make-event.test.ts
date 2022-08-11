@@ -5,7 +5,6 @@ import * as discoverySelectors from '../../discovery/selectors'
 import * as selectors from '../selectors'
 
 jest.mock('../selectors')
-jest.mock('../../robot/selectors')
 jest.mock('../../sessions/selectors')
 jest.mock('../../discovery/selectors')
 jest.mock('../../pipettes/selectors')
@@ -31,9 +30,6 @@ const getAnalyticsPipetteCalibrationData = selectors.getAnalyticsPipetteCalibrat
 >
 const getAnalyticsTipLengthCalibrationData = selectors.getAnalyticsTipLengthCalibrationData as jest.MockedFunction<
   typeof selectors.getAnalyticsTipLengthCalibrationData
->
-const getProtocolAnalyticsData = selectors.getProtocolAnalyticsData as jest.MockedFunction<
-  typeof selectors.getProtocolAnalyticsData
 >
 
 describe('analytics events map', () => {
@@ -88,22 +84,6 @@ describe('analytics events map', () => {
   })
 
   describe('events with protocol data', () => {
-    const protocolData = { foo: 'bar' } as any
-
-    beforeEach(() => {
-      getProtocolAnalyticsData.mockResolvedValue(protocolData)
-    })
-
-    it('robot:PROTOCOL_LOAD > protocolUploadRequest', () => {
-      const nextState = {} as any
-      const success = { type: 'protocol:LOAD', payload: {} } as any
-
-      return expect(makeEvent(success, nextState)).resolves.toEqual({
-        name: 'protocolUploadRequest',
-        properties: protocolData,
-      })
-    })
-
     it('robotAdmin:RESET_CONFIG -> resetRobotConfig event', () => {
       const state = {} as any
       const action = {

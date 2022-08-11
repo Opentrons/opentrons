@@ -5,10 +5,9 @@ import { saveAs } from 'file-saver'
 import { renderWithProviders, Mount } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
-import { getIsRunning } from '../../../../../redux/robot/selectors'
 import { mockDeckCalData } from '../../../../../redux/calibration/__fixtures__'
 import { useCalibratePipetteOffset } from '../../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { useDeckCalibrationData } from '../../../hooks'
+import { useDeckCalibrationData, useRunStatuses } from '../../../hooks'
 
 import { OverflowMenu } from '../OverflowMenu'
 
@@ -30,7 +29,6 @@ jest.mock('../../../../../redux/config')
 jest.mock('../../../../../redux/sessions/selectors')
 jest.mock('../../../../../redux/discovery')
 jest.mock('../../../../../redux/robot-api/selectors')
-jest.mock('../../../../../redux/robot/selectors')
 jest.mock('../../../../CalibratePipetteOffset/useCalibratePipetteOffset')
 jest.mock('../../../../ProtocolUpload/hooks')
 jest.mock('../../../hooks')
@@ -38,12 +36,19 @@ jest.mock('../../../hooks')
 const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFunction<
   typeof useCalibratePipetteOffset
 >
-const mockGetIsRunning = getIsRunning as jest.MockedFunction<
-  typeof getIsRunning
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
 >
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
 >
+
+const RUN_STATUSES = {
+  isRunRunning: false,
+  isRunStill: false,
+  isRunTerminal: false,
+  isRunIdle: false,
+}
 
 const mockUpdateRobotStatus = jest.fn()
 
@@ -59,7 +64,7 @@ describe('OverflowMenu', () => {
       updateRobotStatus: mockUpdateRobotStatus,
     }
     mockUseCalibratePipetteOffset.mockReturnValue([startCalibration, null])
-    mockGetIsRunning.mockReturnValue(false)
+    mockUseRunStatuses.mockReturnValue(RUN_STATUSES)
     mockUseDeckCalibrationData.mockReturnValue({
       isDeckCalibrated: true,
       deckCalibrationData: mockDeckCalData,
@@ -144,7 +149,7 @@ describe('OverflowMenu', () => {
   })
 
   it('alibration button should be disabled if a protocol is running - pipette offset', () => {
-    mockGetIsRunning.mockReturnValue(true)
+    mockUseRunStatuses.mockReturnValue({ ...RUN_STATUSES, isRunRunning: true })
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)
@@ -157,7 +162,7 @@ describe('OverflowMenu', () => {
       ...props,
       calType: 'tipLength',
     }
-    mockGetIsRunning.mockReturnValue(true)
+    mockUseRunStatuses.mockReturnValue({ ...RUN_STATUSES, isRunRunning: true })
     const [{ getByText, getByLabelText }] = render(props)
     const button = getByLabelText('CalibrationOverflowMenu_button')
     fireEvent.click(button)

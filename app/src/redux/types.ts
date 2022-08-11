@@ -12,7 +12,7 @@ import type {
 } from './robot-controls/types'
 import type { BuildrootState, BuildrootAction } from './buildroot/types'
 import type { PipettesState, PipettesAction } from './pipettes/types'
-import type { ModulesState, ModulesAction } from './modules/types'
+import type { ModulesAction } from './modules/types'
 import type { RobotState, Action as RobotAction } from './robot'
 import type { ShellState, ShellAction } from './shell/types'
 import type { ConfigState, ConfigAction } from './config/types'
@@ -51,7 +51,6 @@ export interface State {
   readonly robotSettings: RobotSettingsState
   readonly buildroot: BuildrootState
   readonly pipettes: PipettesState
-  readonly modules: ModulesState
   readonly config: ConfigState
   readonly discovery: DiscoveryState
   readonly networking: NetworkingState

@@ -23,9 +23,6 @@ import { buildrootReducer } from './buildroot/reducer'
 // pipettes state
 import { pipettesReducer } from './pipettes/reducer'
 
-// modules state
-import { modulesReducer } from './modules/reducer'
-
 // networking state
 import { networkingReducer } from './networking/reducer'
 
@@ -75,7 +72,6 @@ export const rootReducer: Reducer<State, Action> = combineReducers<
   robotSettings: robotSettingsReducer,
   buildroot: buildrootReducer,
   pipettes: pipettesReducer,
-  modules: modulesReducer,
   networking: networkingReducer,
   config: configReducer,
   discovery: discoveryReducer,

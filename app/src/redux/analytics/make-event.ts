@@ -15,7 +15,6 @@ import { sharedCalCommands } from '../sessions/common-calibration/constants'
 import * as RobotAdmin from '../robot-admin'
 
 import {
-  getProtocolAnalyticsData,
   getRobotAnalyticsData,
   getBuildrootAnalyticsData,
   getAnalyticsPipetteCalibrationData,
@@ -59,15 +58,15 @@ export function makeEvent(
       })
     }
 
-    case 'protocol:LOAD': {
-      return getProtocolAnalyticsData(state).then(data => ({
-        name: 'protocolUploadRequest',
-        properties: {
-          ...getRobotAnalyticsData(state),
-          ...data,
-        },
-      }))
-    }
+    // case 'protocol:LOAD': {
+    //   return getProtocolAnalyticsData(state).then(data => ({
+    //     name: 'protocolUploadRequest',
+    //     properties: {
+    //       ...getRobotAnalyticsData(state),
+    //       ...data,
+    //     },
+    //   }))
+    // }
 
     // case 'robot:SESSION_RESPONSE':
     // case 'robot:SESSION_ERROR': {

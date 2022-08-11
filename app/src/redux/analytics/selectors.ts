@@ -1,17 +1,17 @@
-import { createSelector } from 'reselect'
+// import { createSelector } from 'reselect'
 import pick from 'lodash/pick'
 import some from 'lodash/some'
 import * as Sessions from '../sessions'
 
-import {
-  getProtocolType,
-  getProtocolCreatorApp,
-  getProtocolApiVersion,
-  getProtocolName,
-  getProtocolSource,
-  getProtocolAuthor,
-  getProtocolContents,
-} from '../protocol'
+// import {
+//   getProtocolType,
+//   getProtocolCreatorApp,
+//   getProtocolApiVersion,
+//   getProtocolName,
+//   getProtocolSource,
+//   getProtocolAuthor,
+//   getProtocolContents,
+// } from '../protocol'
 
 import {
   getViewableRobots,
@@ -32,7 +32,7 @@ import {
   getAttachedPipettes,
   getAttachedPipetteCalibrations,
 } from '../pipettes'
-import { getPipettes, getModules } from '../robot/selectors'
+// import { getPipettes, getModules } from '../robot/selectors'
 import {
   getDeckCalibrationStatus,
   getDeckCalibrationData,
@@ -40,9 +40,9 @@ import {
 import { getRobotSessionById } from '../sessions/selectors'
 import { getCalibrationCheckSession } from '../sessions/calibration-check/selectors'
 
-import { hash } from './hash'
+// import { hash } from './hash'
 
-import type { Selector } from 'reselect'
+// import type { Selector } from 'reselect'
 import type { State } from '../types'
 import type {
   CalibrationCheckComparisonsPerCalibration,
@@ -53,7 +53,7 @@ import type { Mount } from '../pipettes/types'
 import type {
   AnalyticsConfig,
   CalibrationCheckByMount,
-  ProtocolAnalyticsData,
+  // ProtocolAnalyticsData,
   RobotAnalyticsData,
   BuildrootAnalyticsData,
   PipetteOffsetCalibrationAnalyticsData,
@@ -67,58 +67,58 @@ import type {
 
 export const FF_PREFIX = 'robotFF_'
 
-const _getUnhashedProtocolAnalyticsData: Selector<
-  State,
-  ProtocolAnalyticsData
-> = createSelector(
-  getProtocolType,
-  getProtocolCreatorApp,
-  getProtocolApiVersion,
-  getProtocolName,
-  getProtocolSource,
-  getProtocolAuthor,
-  getProtocolContents,
-  getPipettes,
-  getModules,
-  (
-    type,
-    app,
-    apiVersion,
-    name,
-    source,
-    author,
-    contents,
-    pipettes,
-    modules
-  ) => ({
-    protocolType: type || '',
-    protocolAppName: app.name || '',
-    protocolAppVersion: app.version || '',
-    protocolApiVersion: apiVersion || '',
-    protocolName: name || '',
-    protocolSource: source || '',
-    protocolAuthor: author || '',
-    protocolText: contents || '',
-    pipettes: pipettes.map(p => p.requestedAs ?? p.name).join(','),
-    modules: modules.map(m => m.model).join(','),
-  })
-)
+// const _getUnhashedProtocolAnalyticsData: Selector<
+//   State,
+//   ProtocolAnalyticsData
+// > = createSelector(
+//   getProtocolType,
+//   getProtocolCreatorApp,
+//   getProtocolApiVersion,
+//   getProtocolName,
+//   getProtocolSource,
+//   getProtocolAuthor,
+//   getProtocolContents,
+//   getPipettes,
+//   getModules,
+//   (
+//     type,
+//     app,
+//     apiVersion,
+//     name,
+//     source,
+//     author,
+//     contents,
+//     pipettes,
+//     modules
+//   ) => ({
+//     protocolType: type || '',
+//     protocolAppName: app.name || '',
+//     protocolAppVersion: app.version || '',
+//     protocolApiVersion: apiVersion || '',
+//     protocolName: name || '',
+//     protocolSource: source || '',
+//     protocolAuthor: author || '',
+//     protocolText: contents || '',
+//     pipettes: pipettes.map(p => p.requestedAs ?? p.name).join(','),
+//     modules: modules.map(m => m.model).join(','),
+//   })
+// )
 
-export const getProtocolAnalyticsData: (
-  state: State
-) => Promise<ProtocolAnalyticsData> = createSelector<
-  State,
-  ProtocolAnalyticsData,
-  Promise<ProtocolAnalyticsData>
->(_getUnhashedProtocolAnalyticsData, (data: ProtocolAnalyticsData) => {
-  const hashTasks = [hash(data.protocolAuthor), hash(data.protocolText)]
+// export const getProtocolAnalyticsData: (
+//   state: State
+// ) => Promise<ProtocolAnalyticsData> = createSelector<
+//   State,
+//   ProtocolAnalyticsData,
+//   Promise<ProtocolAnalyticsData>
+// >(_getUnhashedProtocolAnalyticsData, (data: ProtocolAnalyticsData) => {
+//   const hashTasks = [hash(data.protocolAuthor), hash(data.protocolText)]
 
-  return Promise.all(hashTasks).then(([protocolAuthor, protocolText]) => ({
-    ...data,
-    protocolAuthor: data.protocolAuthor !== '' ? protocolAuthor : '',
-    protocolText: data.protocolText !== '' ? protocolText : '',
-  }))
-})
+//   return Promise.all(hashTasks).then(([protocolAuthor, protocolText]) => ({
+//     ...data,
+//     protocolAuthor: data.protocolAuthor !== '' ? protocolAuthor : '',
+//     protocolText: data.protocolText !== '' ? protocolText : '',
+//   }))
+// })
 
 export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
   const robot = getConnectedRobot(state)
