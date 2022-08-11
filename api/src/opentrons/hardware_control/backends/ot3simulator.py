@@ -336,6 +336,15 @@ class OT3Simulator:
             for mount in OT3Mount
         }
 
+    # might wanna simulate synthesize model name
+    def synthesize_model_name(self, model: int) -> "PipetteModel":
+        # TODO: the way we look up pipette config info is changing, so this
+        #   may need to change also
+        unknown_model_num = 65535
+        if model == unknown_model_num:
+            model = 0
+        return cast("PipetteModel", "DummyPipette" + "_v3." + str(model))
+
     async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the active current.
 

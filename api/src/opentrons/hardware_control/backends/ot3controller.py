@@ -363,7 +363,7 @@ class OT3Controller:
         runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
 
-    async def get_attached_instruments(
+    async def get_attached_instruments(  # noqa: C901
         self, expected: Dict[OT3Mount, PipetteName]
     ) -> Dict[OT3Mount, OT3AttachedInstruments]:
         """Get attached instruments.
@@ -377,15 +377,30 @@ class OT3Controller:
         await self._probe_core()
         attached = await self._tool_detector.detect()
 
-        def _synthesize_model_name(name: FirmwarePipetteName) -> "PipetteModel":
-            model = 0
-            return cast("PipetteModel", name.name + "_v3." + str(model))
+        def _check_if_eeprom_unwritten(model: int) -> int:
+            unknown_model_num = 65535
+            if model == unknown_model_num:
+                log.warning("Changing unknown model number to 0")
+                return 0
+            return model
+
+        def _synthesize_model_name(
+            name: FirmwarePipetteName, model: int
+        ) -> "PipetteModel":
+            # TODO: the way we look up pipette config info is changing, so this
+            #   may need to change also
+            return cast(
+                "PipetteModel",
+                name.name + "_v3." + str(_check_if_eeprom_unwritten(model)),
+            )
 
         def _build_attached_pip(
             attached: ohc_tool_types.PipetteInformation,
         ) -> AttachedPipette:
             return {
-                "config": pipette_config.load(_synthesize_model_name(attached.name)),
+                "config": pipette_config.load(
+                    _synthesize_model_name(attached.name, attached.model)
+                ),
                 "id": attached.serial,
             }
 
