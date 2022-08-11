@@ -639,7 +639,7 @@ export function RobotSettingsCalibration({
         </Banner>
       )}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN}>
           <Box marginRight={SPACING.spacing6}>
             <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
               {t('pipette_offset_calibrations_title')}
@@ -662,7 +662,7 @@ export function RobotSettingsCalibration({
       <Line />
       {/* Tip Length Calibration Section */}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN}>
           <Box marginRight={SPACING.spacing6}>
             <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
               {t('tip_length_calibrations_title')}
