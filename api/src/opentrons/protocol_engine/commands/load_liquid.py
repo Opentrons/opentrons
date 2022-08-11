@@ -29,7 +29,7 @@ class LoadLiquidParams(BaseModel):
         ...,
         description="Unique identifier of labware to load liquid into.",
     )
-    volumeByWellName: Dict[str, float] = Field(
+    volumeByWell: Dict[str, float] = Field(
         ...,
         description="Volume of liquid, in µL, loaded into each well by name, in this labware.",
     )
