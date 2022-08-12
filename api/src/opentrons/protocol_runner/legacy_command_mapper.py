@@ -178,6 +178,14 @@ class LegacyCommandMapper:
                             "completedAt": now,
                         }
                     )
+                elif isinstance(running_command, pe_commands.Custom):
+                    completed_command = running_command.copy(
+                        update={
+                            "result": pe_commands.CustomResult.construct(),
+                            "status": pe_commands.CommandStatus.SUCCEEDED,
+                            "completedAt": now,
+                        }
+                    )
                 else:
                     completed_command = running_command.copy(
                         update={
@@ -405,36 +413,49 @@ class LegacyCommandMapper:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         flow_rate = pipette.flow_rate.blow_out
-        assert location is not None, "Unknown blow_out location."
-        well = (
-            location if isinstance(location, LegacyWell) else location.labware.as_well()
-        )
         if isinstance(location, Location):
+            well = location.labware.as_well()
             first_parent = location.labware.first_parent()
-        assert first_parent is not None, "Labware needs to be associated with a slot"
-        slot = DeckSlotName(first_parent)
-        parent_module_id = self._module_id_by_slot.get(slot)
-        labware_id = (
-            self._labware_id_by_module_id[parent_module_id]
-            if parent_module_id is not None
-            else self._labware_id_by_slot[slot]
-        )
-        mount = MountType(pipette.mount)
-        well_name = well.well_name
-        pipette_id = self._pipette_id_by_mount[mount]
-        return pe_commands.BlowOut.construct(
-            id=command_id,
-            key=command_id,
-            status=pe_commands.CommandStatus.RUNNING,
-            createdAt=now,
-            startedAt=now,
-            params=pe_commands.BlowOutParams.construct(
-                pipetteId=pipette_id,
-                labwareId=labware_id,
-                wellName=well_name,
-                flowRate=flow_rate,
-            ),
-        )
+            assert (
+                first_parent is not None
+            ), "Labware needs to be associated with a slot"
+            slot = DeckSlotName(first_parent)
+            parent_module_id = self._module_id_by_slot.get(slot)
+            labware_id = (
+                self._labware_id_by_module_id[parent_module_id]
+                if parent_module_id is not None
+                else self._labware_id_by_slot[slot]
+            )
+            mount = MountType(pipette.mount)
+            well_name = well.well_name
+            pipette_id = self._pipette_id_by_mount[mount]
+            return pe_commands.BlowOut.construct(
+                id=command_id,
+                key=command_id,
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=now,
+                startedAt=now,
+                params=pe_commands.BlowOutParams.construct(
+                    pipetteId=pipette_id,
+                    labwareId=labware_id,
+                    wellName=well_name,
+                    flowRate=flow_rate,
+                ),
+            )
+        #   TODO:(jr, 12.08.2022): blow_out commands with no location get filtered
+        #   into custom. Refactor this in followup legacy command mapping
+        else:
+            return pe_commands.Custom.construct(
+                id=command_id,
+                key=command_id,
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=now,
+                startedAt=now,
+                params=LegacyCommandParams.construct(
+                    legacyCommandType=command["name"],
+                    legacyCommandText=command["payload"]["text"],
+                ),
+            )
 
     def _map_labware_load(
         self, labware_load_info: LegacyLabwareLoadInfo
