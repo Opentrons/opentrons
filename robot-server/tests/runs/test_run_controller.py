@@ -56,7 +56,7 @@ def engine_state_summary() -> StateSummary:
         labwareOffsets=[],
         pipettes=[],
         modules=[],
-        liquids={},
+        liquids=[],
     )
 
 

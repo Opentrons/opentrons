@@ -27,7 +27,7 @@ from .analysis_models import (
     AnalysisStatus,
 )
 
-from opentrons_shared_data.protocol.models.protocol_schema_v6 import LiquidCreate
+from opentrons.protocol_engine.commands.load_liquid import Liquid
 
 _log = getLogger(__name__)
 
@@ -111,7 +111,7 @@ class AnalysisStore:
         labware: List[LoadedLabware],
         pipettes: List[LoadedPipette],
         errors: List[ErrorOccurrence],
-        liquids: Dict[str, Liquid],
+        liquids: List[Liquid],
     ) -> None:
         """Promote a pending analysis to completed, adding details of its results.
 

@@ -130,10 +130,6 @@ class EngineStore:
         for offset in labware_offsets:
             engine.add_labware_offset(offset)
 
-        # if isinstance(main_file.data, ProtocolSchemaV6):
-        liquids = protocol.source.liquids or []
-        print(liquids)
-
         self._runner_engine_pair = RunnerEnginePair(
             run_id=run_id,
             runner=runner,

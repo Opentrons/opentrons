@@ -33,7 +33,7 @@ from robot_server.runs.run_store import (
 )
 from robot_server.service.task_runner import TaskRunner
 
-from opentrons_shared_data.protocol.models.protocol_schema_v6 import LiquidCreate
+from opentrons.protocol_engine.commands.load_liquid import Liquid
 
 
 @pytest.fixture
@@ -66,7 +66,9 @@ def engine_state_summary() -> StateSummary:
         labwareOffsets=[LabwareOffset.construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="some-module-id")],  # type: ignore[call-arg]
-        liquids={"some-liquid-id": Liquid(displayName="liquid", description="desc")},
+        liquids=[
+            Liquid(id="some-liquid-id", display_name="liquid", description="desc")
+        ],
     )
 
 
@@ -348,7 +350,7 @@ async def test_get_historical_run_no_data(
         labwareOffsets=[],
         pipettes=[],
         modules=[],
-        liquids={},
+        liquids=[],
     )
 
 
@@ -366,7 +368,9 @@ async def test_get_all_runs(
         labwareOffsets=[LabwareOffset.construct(id="current-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="current-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="current-module-id")],  # type: ignore[call-arg]
-        liquids={"some-liquid-id": Liquid(displayName="liquid", description="desc")},
+        liquids=[
+            Liquid(id="some-liquid-id", display_name="liquid", description="desc")
+        ],
     )
 
     historical_run_data = StateSummary(
@@ -376,7 +380,7 @@ async def test_get_all_runs(
         labwareOffsets=[LabwareOffset.construct(id="old-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="old-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="old-module-id")],  # type: ignore[call-arg]
-        liquids={},
+        liquids=[],
     )
 
     current_run_resource = RunResource(

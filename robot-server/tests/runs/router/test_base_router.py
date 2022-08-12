@@ -72,7 +72,7 @@ async def test_create_run(
         labware=[],
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
-        liquids={},
+        liquids=[],
     )
 
     decoy.when(
@@ -122,7 +122,6 @@ async def test_create_protocol_run(
             files=[],
             metadata={},
             labware_definitions=[],
-            liquids={},
         ),
     )
 
@@ -138,7 +137,7 @@ async def test_create_protocol_run(
         labware=[],
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
-        liquids={},
+        liquids=[],
     )
 
     decoy.when(mock_protocol_store.get(protocol_id=protocol_id)).then_return(
@@ -235,7 +234,7 @@ async def test_get_run_data_from_url(
         modules=[],
         labware=[],
         labwareOffsets=[],
-        liquids={},
+        liquids=[],
     )
 
     decoy.when(mock_run_data_manager.get("run-id")).then_return(expected_response)
@@ -281,7 +280,7 @@ async def test_get_run() -> None:
         modules=[],
         labware=[],
         labwareOffsets=[],
-        liquids={},
+        liquids=[],
     )
 
     result = await get_run(run_data=run_data)
@@ -326,7 +325,7 @@ async def test_get_runs_not_empty(
         modules=[],
         labware=[],
         labwareOffsets=[],
-        liquids={},
+        liquids=[],
     )
 
     response_2 = Run(
@@ -341,7 +340,7 @@ async def test_get_runs_not_empty(
         modules=[],
         labware=[],
         labwareOffsets=[],
-        liquids={},
+        liquids=[],
     )
 
     decoy.when(mock_run_data_manager.get_all()).then_return([response_1, response_2])
@@ -419,7 +418,7 @@ async def test_update_run_to_not_current(
         modules=[],
         labware=[],
         labwareOffsets=[],
-        liquids={},
+        liquids=[],
     )
 
     decoy.when(await mock_run_data_manager.update("run-id", current=False)).then_return(
@@ -453,7 +452,7 @@ async def test_update_current_none_noop(
         modules=[],
         labware=[],
         labwareOffsets=[],
-        liquids={},
+        liquids=[],
     )
 
     decoy.when(await mock_run_data_manager.update("run-id", current=None)).then_return(

@@ -33,7 +33,7 @@ def _build_run(
         labwareOffsets=[],
         pipettes=[],
         modules=[],
-        liquids={},
+        liquids=[],
     )
     return Run.construct(
         id=run_resource.run_id,

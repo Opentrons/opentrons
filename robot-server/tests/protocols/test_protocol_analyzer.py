@@ -60,7 +60,6 @@ async def test_analyze(
             files=[],
             metadata={},
             labware_definitions=[],
-            liquids={},
         ),
         protocol_key="dummy-data-111",
     )
@@ -105,7 +104,7 @@ async def test_analyze(
                 # TODO(mc, 2022-02-14): evaluate usage of modules in the analysis resp.
                 modules=[],
                 labwareOffsets=[],
-                liquids={},
+                liquids=[],
             ),
         )
     )
@@ -122,6 +121,6 @@ async def test_analyze(
             labware=[analysis_labware],
             pipettes=[analysis_pipette],
             errors=[analysis_error],
-            liquids={},
+            liquids=[],
         ),
     )

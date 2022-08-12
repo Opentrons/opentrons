@@ -95,7 +95,7 @@ def state_summary() -> StateSummary:
         # TODO (tz 22-4-19): added the field to class. make sure what to initialize
         labwareOffsets=[],
         status=EngineStatus.IDLE,
-        liquids={},
+        liquids=[],
     )
 
 

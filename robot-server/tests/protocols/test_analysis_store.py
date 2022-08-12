@@ -68,7 +68,6 @@ def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
             files=[],
             metadata={},
             labware_definitions=[],
-            liquids={},
         ),
         protocol_key=None,
     )
@@ -121,7 +120,7 @@ async def test_returned_in_order_added(
         pipettes=[],
         commands=[],
         errors=[],
-        liquids={},
+        liquids=[],
     )
 
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id-2")
@@ -131,7 +130,7 @@ async def test_returned_in_order_added(
         pipettes=[],
         commands=[],
         errors=[],
-        liquids={},
+        liquids=[],
     )
 
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id-3")
@@ -141,7 +140,7 @@ async def test_returned_in_order_added(
         pipettes=[],
         commands=[],
         errors=[],
-        liquids={},
+        liquids=[],
     )
 
     subject.add_pending(protocol_id="protocol-id", analysis_id="analysis-id-4")
@@ -187,7 +186,7 @@ async def test_add_analysis_equipment(
         pipettes=[pipette],
         commands=[],
         errors=[],
-        liquids={},
+        liquids=[],
     )
 
     result = await subject.get("analysis-id")
@@ -199,7 +198,7 @@ async def test_add_analysis_equipment(
         pipettes=[pipette],
         commands=[],
         errors=[],
-        liquids={},
+        liquids=[],
     )
     assert await subject.get_by_protocol("protocol-id") == [result]
 
@@ -259,7 +258,7 @@ async def test_update_infers_status_from_errors(
         errors=errors,
         labware=[],
         pipettes=[],
-        liquids={},
+        liquids=[],
     )
     analysis = (await subject.get_by_protocol("protocol-id"))[0]
     assert isinstance(analysis, CompletedAnalysis)
