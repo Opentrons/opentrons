@@ -145,9 +145,9 @@ class JsonTranslator:
                 liquids.append(
                     Liquid(
                         id=liquid_key,
-                        display_name=liquid.displayName,
+                        displayName=liquid.displayName,
                         description=liquid.description,
-                        display_color=liquid.displayColor,
+                        displayColor=liquid.displayColor,
                     )
                 )
         return liquids

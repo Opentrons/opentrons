@@ -66,9 +66,7 @@ def engine_state_summary() -> StateSummary:
         labwareOffsets=[LabwareOffset.construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="some-module-id")],  # type: ignore[call-arg]
-        liquids=[
-            Liquid(id="some-liquid-id", display_name="liquid", description="desc")
-        ],
+        liquids=[Liquid(id="some-liquid-id", displayName="liquid", description="desc")],
     )
 
 
@@ -368,9 +366,7 @@ async def test_get_all_runs(
         labwareOffsets=[LabwareOffset.construct(id="current-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="current-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="current-module-id")],  # type: ignore[call-arg]
-        liquids=[
-            Liquid(id="some-liquid-id", display_name="liquid", description="desc")
-        ],
+        liquids=[Liquid(id="some-liquid-id", displayName="liquid", description="desc")],
     )
 
     historical_run_data = StateSummary(

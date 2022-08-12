@@ -15,7 +15,7 @@ def subject() -> LiquidStore:
 def test_handles_add_liquid(subject: LiquidStore) -> None:
     """It should add the liquid to the state."""
     expected_liquid = Liquid(
-        id="water-id", display_name="water", description="water-desc"
+        id="water-id", displayName="water", description="water-desc"
     )
     subject.handle_action(AddLiquidAction(liquid=expected_liquid))
 

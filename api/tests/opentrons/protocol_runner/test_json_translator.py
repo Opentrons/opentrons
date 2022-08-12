@@ -447,9 +447,7 @@ def test_load_liquid(
     result = subject.translate_liquids(protocol)
 
     assert result == [
-        Liquid(
-            id="liquid-id-555", display_name="water", description="water description"
-        )
+        Liquid(id="liquid-id-555", displayName="water", description="water description")
     ]
 
     empty_liquids = protocol_schema_v6.ProtocolSchemaV6(

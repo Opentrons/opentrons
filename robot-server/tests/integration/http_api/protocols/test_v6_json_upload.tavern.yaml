@@ -516,7 +516,7 @@ stages:
                 completedAt: !anystr
             errors: []
             liquids:
-              waterId:
+              - id: waterId
                 displayName: Water
                 description: Liquid H2O
                 displayColor: '#7332a8'

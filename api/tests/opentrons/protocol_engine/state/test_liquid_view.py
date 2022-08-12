@@ -9,7 +9,7 @@ from opentrons.protocol_engine.commands.load_liquid import Liquid
 def subject() -> LiquidView:
     """Get a liquid view test subject."""
     state = LiquidState(
-        liquids=[Liquid(id="water-id", display_name="water", description="water desc")]
+        liquids=[Liquid(id="water-id", displayName="water", description="water desc")]
     )
 
     return LiquidView(state)
@@ -18,5 +18,5 @@ def subject() -> LiquidView:
 def test_get_all(subject: LiquidView) -> None:
     """Should return a list of liquids."""
     assert subject.get_all() == [
-        Liquid(id="water-id", display_name="water", description="water desc")
+        Liquid(id="water-id", displayName="water", description="water desc")
     ]

@@ -610,14 +610,14 @@ def test_add_liquid(
 ) -> None:
     """It should dispatch an AddLiquidAction action."""
     subject.add_liquid(
-        liquid=Liquid(id="water-id", display_name="water", description="water desc"),
+        liquid=Liquid(id="water-id", displayName="water", description="water desc"),
     )
 
     decoy.verify(
         action_dispatcher.dispatch(
             AddLiquidAction(
                 liquid=Liquid(
-                    id="water-id", display_name="water", description="water desc"
+                    id="water-id", displayName="water", description="water desc"
                 ),
             )
         )

@@ -247,7 +247,7 @@ def test_load_json(
     ]
 
     liquids: List[Liquid] = [
-        Liquid(id="water-id", display_name="water", description=" water desc")
+        Liquid(id="water-id", displayName="water", description=" water desc")
     ]
 
     decoy.when(json_file_reader.read(json_protocol_source)).then_return(json_protocol)
@@ -268,9 +268,7 @@ def test_load_json(
             )
         ),
         protocol_engine.add_liquid(
-            liquid=Liquid(
-                id="water-id", display_name="water", description=" water desc"
-            )
+            liquid=Liquid(id="water-id", displayName="water", description=" water desc")
         ),
         task_queue.set_run_func(func=protocol_engine.wait_until_complete),
     )

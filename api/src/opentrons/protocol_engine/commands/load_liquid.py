@@ -13,9 +13,9 @@ class Liquid(BaseModel):
     """Payload required to create a liquid."""
 
     id: str
-    display_name: str
+    displayName: str
     description: str
-    display_color: Optional[str]
+    displayColor: Optional[str]
 
 
 class LoadLiquidParams(BaseModel):
