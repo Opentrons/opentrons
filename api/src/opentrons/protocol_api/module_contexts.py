@@ -996,7 +996,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         if destination_slot is None:
             MODULE_LOG.warning(
                 "Pipette movement destination has no slot associated with it. Cannot"
-                " determine movement safety to avoid colliding with the heater-shaker."
+                " determine whether movement will safely avoid colliding with the Heater-Shaker."
             )
             return
 
