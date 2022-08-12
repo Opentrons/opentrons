@@ -108,8 +108,8 @@ export function FactoryResetSlideout({
   }
 
   const handleClearData = (): void => {
-    const connected = robot?.status !== UNREACHABLE
-    updateResetStatus(connected, resetOptions)
+    const reachable = robot?.status !== UNREACHABLE
+    updateResetStatus(reachable, resetOptions)
     onCloseClick()
   }
 
