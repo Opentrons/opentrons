@@ -3,7 +3,6 @@
 // out because RPC-based analytics events were not replaced with
 // the switch to the HTTP APIs. Commented out code left to aid with
 // analytics replacement.
-import { createLogger } from '../../logger'
 import * as CustomLabware from '../custom-labware'
 import * as SystemInfo from '../system-info'
 import * as brActions from '../buildroot/constants'
@@ -26,8 +25,6 @@ import {
 import type { State, Action } from '../types'
 import type { AnalyticsEvent } from './types'
 import type { Mount } from '../pipettes/types'
-
-const log = createLogger(__filename)
 
 const EVENT_APP_UPDATE_DISMISSED = 'appUpdateDismissed'
 
