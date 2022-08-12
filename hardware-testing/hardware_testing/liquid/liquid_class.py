@@ -57,7 +57,8 @@ LIQUID_CLASS_DEFAULT = LiquidClassSettings(
     wet_air_gap=AirConfig(flow_rate=10, volume=0),
     dry_air_gap=AirConfig(flow_rate=20, volume=0),
     submerge=MovementConfig(distance=1.5, speed=5, delay=None, acceleration=None),
-    tracking=MovementConfig(distance=0, speed=None, delay=None, acceleration=None),
+    tracking=MovementConfig(distance=0, speed=None, delay=None, acceleration=None),  # TODO: implement w/ API >=2.13
     retract=MovementConfig(distance=3, speed=5, delay=None, acceleration=None),
     traverse=MovementConfig(distance=None, speed=200, delay=None, acceleration=None),
+    # TODO: add Accuracy Adjust parameter (requires disabling ul_per_mm conversion in HW-API)
 )
