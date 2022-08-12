@@ -38,7 +38,7 @@ export default {
             marginBottom={SPACING.spacing3}
             padding={SPACING.spacing4}
           >
-            <IconComponent key={name} name={name as IconName} />
+            <IconComponent name={name as IconName} />
             <Text
               textAlign={TYPOGRAPHY.textAlignCenter}
               marginTop={SPACING.spacing3}
