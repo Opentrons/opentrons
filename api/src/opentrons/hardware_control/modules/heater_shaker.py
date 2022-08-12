@@ -411,12 +411,15 @@ class HeaterShaker(mod_abc.AbstractModule):
         while self.labware_latch_status != status:
             await self.wait_next_poll()
 
+    async def _wait_for_shake_deactivation(self) -> None:
+        """Wait until hardware reports that module has stopped shaking and has homed."""
+        while self.speed_status != SpeedStatus.IDLE:
+            await self.wait_next_poll()
+
     async def deactivate(self) -> None:
         """Stop heating/cooling; stop shaking and home the plate"""
-        await self.wait_for_is_running()
-        await self._driver.deactivate_heater()
-        await self._driver.home()
-        await self.wait_next_poll()
+        await self.deactivate_heater()
+        await self.deactivate_shaker()
 
     async def deactivate_heater(self) -> None:
         """Stop heating/cooling"""
@@ -428,6 +431,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         """Stop shaking and home the plate"""
         await self.wait_for_is_running()
         await self._driver.home()
+        await self._wait_for_shake_deactivation()
         await self.wait_next_poll()
 
     async def open_labware_latch(self) -> None:
