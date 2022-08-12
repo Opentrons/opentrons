@@ -9,6 +9,7 @@ import {
 import { PrimaryButton } from '../../atoms/buttons'
 export interface ConfigFormSubmitButtonProps {
   disabled: boolean
+  formId: string
 }
 
 export function ConfigFormSubmitButton(
