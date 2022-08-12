@@ -18,44 +18,39 @@ import type { Story, Meta } from '@storybook/react'
 
 export default {
   title: 'Library/Atoms/IconList',
-  argTypes: {
-    name: {
-      options: Object.keys(ICON_DATA_BY_NAME),
-    },
-  },
-  decorators: [
-    Story => (
-      <Flex flexWrap={WRAP}>
-        {Object.keys(ICON_DATA_BY_NAME).map(name => (
-          <Flex
-            key={`icon_${name}`}
-            width="8.75rem"
-            flexDirection={DIRECTION_COLUMN}
-            alignItems={ALIGN_CENTER}
-            backgroundColor={COLORS.medGreyHover}
-            borderRadius={BORDERS.radiusSoftCorners}
-            marginRight={SPACING.spacing3}
-            marginBottom={SPACING.spacing3}
-            padding={SPACING.spacing4}
-          >
-            <IconComponent name={name as IconName} />
-            <Text
-              textAlign={TYPOGRAPHY.textAlignCenter}
-              marginTop={SPACING.spacing3}
-            >
-              {name}
-            </Text>
-          </Flex>
-        ))}
-      </Flex>
-    ),
-  ],
+  decorators: [Story => <Story />],
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
-  return <IconComponent {...args} />
+  const { backgroundColor } = args
+  return (
+    <Flex flexWrap={WRAP}>
+      {Object.keys(ICON_DATA_BY_NAME).map(name => (
+        <Flex
+          key={`icon_${name}`}
+          width="8.75rem"
+          flexDirection={DIRECTION_COLUMN}
+          alignItems={ALIGN_CENTER}
+          backgroundColor={backgroundColor}
+          borderRadius={BORDERS.radiusSoftCorners}
+          marginRight={SPACING.spacing3}
+          marginBottom={SPACING.spacing3}
+          padding={SPACING.spacing4}
+        >
+          <IconComponent name={name as IconName} />
+          <Text
+            textAlign={TYPOGRAPHY.textAlignCenter}
+            marginTop={SPACING.spacing3}
+            fontSize={TYPOGRAPHY.fontSizeP}
+          >
+            {name}
+          </Text>
+        </Flex>
+      ))}
+    </Flex>
+  )
 }
-export const Icon = Template.bind({})
-Icon.args = {
-  color: COLORS.darkBlackEnabled,
+export const IconList = Template.bind({})
+IconList.args = {
+  backgroundColor: COLORS.medGreyHover,
 }
