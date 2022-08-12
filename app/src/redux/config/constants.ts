@@ -6,6 +6,7 @@ export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'allPipetteConfig',
   'enableBundleUpload',
   'enableLiquidSetup',
+  'enableChangePipetteWizard',
 ]
 
 // action type constants

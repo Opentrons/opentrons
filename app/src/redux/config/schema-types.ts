@@ -10,6 +10,7 @@ export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'enableBundleUpload'
   | 'enableLiquidSetup'
+  | 'enableChangePipetteWizard'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
