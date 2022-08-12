@@ -9,7 +9,6 @@ from typing import Dict, List, Optional, Sequence
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.pipette.dev_types import LabwareUri
-from opentrons.protocol_engine.commands.load_liquid import Liquid
 
 from opentrons.types import DeckSlotName, Point
 from opentrons.protocols.models import LabwareDefinition, WellDefinition
@@ -32,11 +31,8 @@ from ..actions import (
     UpdateCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
-    AddLiquidAction,
 )
 from .abstract_store import HasState, HandlesActions
-from .labware_substates import LiquidsLabwareSubState
-
 
 _TRASH_LOCATION = DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH)
 
@@ -53,7 +49,6 @@ class LabwareState:
     # We rely on Python 3.7+ preservation of dict insertion order.
     labware_offsets_by_id: Dict[str, LabwareOffset]
     # Indexed by labware id
-    liquids_substate: LiquidsLabwareSubState
     definitions_by_uri: Dict[str, LabwareDefinition]
     deck_definition: DeckDefinitionV3
 
@@ -97,7 +92,6 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             labware_offsets_by_id={},
             labware_by_id=labware_by_id,
             deck_definition=deck_definition,
-            liquids_substate=LiquidsLabwareSubState(),
         )
 
     def handle_action(self, action: Action) -> None:
@@ -122,9 +116,6 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 version=action.definition.version,
             )
             self._state.definitions_by_uri[uri] = action.definition
-
-        elif isinstance(action, AddLiquidAction):
-            self._state.liquids_substate.liquids_by_id[action.liquid.id] = action.liquid
 
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
@@ -406,7 +397,3 @@ class LabwareView(HasState[LabwareState]):
             ):
                 return candidate
         return None
-
-    def get_liquids(self) -> List[Liquid]:
-        """Get all protocol liquids."""
-        return self._state.liquids_substate.get_liquids()

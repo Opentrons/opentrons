@@ -20,7 +20,6 @@ from opentrons.protocol_engine.types import (
 )
 
 from opentrons.protocol_engine.state.labware import LabwareState, LabwareView
-from opentrons.protocol_engine.state.labware_substates import LiquidsLabwareSubState
 
 plate = LoadedLabware(
     id="plate-id",
@@ -56,7 +55,6 @@ tip_rack = LoadedLabware(
 
 
 def get_labware_view(
-    liquids_substate: LiquidsLabwareSubState = None,
     labware_by_id: Optional[Dict[str, LoadedLabware]] = None,
     labware_offsets_by_id: Optional[Dict[str, LabwareOffset]] = None,
     definitions_by_uri: Optional[Dict[str, LabwareDefinition]] = None,
@@ -68,7 +66,6 @@ def get_labware_view(
         labware_offsets_by_id=labware_offsets_by_id or {},
         definitions_by_uri=definitions_by_uri or {},
         deck_definition=deck_definition or cast(DeckDefinitionV3, {"fake": True}),
-        liquids_substate=liquids_substate,
     )
 
     return LabwareView(state=state)

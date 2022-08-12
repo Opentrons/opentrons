@@ -15,6 +15,7 @@ from .commands import CommandState, CommandStore, CommandView
 from .labware import LabwareState, LabwareStore, LabwareView
 from .pipettes import PipetteState, PipetteStore, PipetteView
 from .modules import ModuleState, ModuleStore, ModuleView
+from .liquids import LiquidState, LiquidView, LiquidStore
 from .geometry import GeometryView
 from .motion import MotionView
 from .config import Config
@@ -31,6 +32,7 @@ class State:
     labware: LabwareState
     pipettes: PipetteState
     modules: ModuleState
+    liquids: LiquidState
 
 
 class StateView(HasState[State]):
@@ -42,6 +44,7 @@ class StateView(HasState[State]):
     _pipettes: PipetteView
     _modules: ModuleView
     _geometry: GeometryView
+    _liquid: LiquidView
     _motion: MotionView
     _config: Config
 
@@ -76,6 +79,11 @@ class StateView(HasState[State]):
         return self._motion
 
     @property
+    def liquid(self) -> LiquidView:
+        """Get state view selectors for liquid state."""
+        return self._liquid
+
+    @property
     def config(self) -> Config:
         """Get ProtocolEngine configuration."""
         return self._config
@@ -91,7 +99,7 @@ class StateView(HasState[State]):
             modules=self.modules.get_all(),
             completedAt=self._state.commands.run_completed_at,
             startedAt=self._state.commands.run_started_at,
-            liquids=self._labware.get_liquids(),
+            liquids=self._liquid.get_all(),
         )
 
 
@@ -130,6 +138,7 @@ class StateStore(StateView, ActionHandler):
             deck_definition=deck_definition,
         )
         self._module_store = ModuleStore()
+        self._liquid_store = LiquidStore()
 
         self._substores: List[HandlesActions] = [
             self._command_store,
@@ -219,6 +228,7 @@ class StateStore(StateView, ActionHandler):
             labware=self._labware_store.state,
             pipettes=self._pipette_store.state,
             modules=self._module_store.state,
+            liquids=self._liquid_store.state,
         )
 
     def _initialize_state(self) -> None:

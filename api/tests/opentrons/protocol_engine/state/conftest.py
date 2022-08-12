@@ -5,7 +5,6 @@ from decoy import Decoy
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.pipettes import PipetteView
 from opentrons.protocol_engine.state.geometry import GeometryView
-from opentrons.protocol_engine.state.labware_substates import LiquidsLabwareSubState
 
 
 @pytest.fixture
@@ -24,9 +23,3 @@ def pipette_view(decoy: Decoy) -> PipetteView:
 def geometry_view(decoy: Decoy) -> GeometryView:
     """Get a mock in the shape of a GeometryView."""
     return decoy.mock(cls=GeometryView)
-
-
-@pytest.fixture
-def liquids_substate(decoy: Decoy) -> LiquidsLabwareSubState:
-    """Get a mock in the shape of a LiquidsLabwareSubState."""
-    return decoy.mock(cls=LiquidsLabwareSubState)
