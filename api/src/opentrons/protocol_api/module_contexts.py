@@ -992,18 +992,19 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         Raise an error if attempting to perform a move that's deemed unsafe due to
         the presence of the Heater-Shaker.
         """
+        destination_slot = to_loc.labware.first_parent()
+        if destination_slot is None:
+            MODULE_LOG.warning(
+                "Pipette movement destination has no slot associated with it. Cannot"
+                " determine movement safety to avoid colliding with the heater-shaker."
+            )
+            return
+
         is_labware_latch_closed = (
             self._module.labware_latch_status
             == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
         )
         is_plate_shaking = self._module.speed_status != module_types.SpeedStatus.IDLE
-
-        destination_slot = to_loc.labware.first_parent()
-        if destination_slot is None:
-            raise Exception(
-                "Destination has no slot associated with it. "
-                "Cannot determine pipette movement safety."
-            )
 
         to_labware_like = to_loc.labware
         is_tiprack: bool
@@ -1032,7 +1033,6 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         Before shaking, retracts pipettes if they're parked over a slot
         adjacent to the heater-shaker.
         """
-
         if cast(HeaterShakerGeometry, self.geometry).is_pipette_blocking_shake_movement(
             pipette_location=self._ctx.location_cache
         ):

@@ -1255,7 +1255,7 @@ class InstrumentContext(publisher.CommandPublisher):
         for mod in self._ctx._modules:
             if isinstance(mod, ThermocyclerContext):
                 mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
-            if isinstance(mod, HeaterShakerContext):
+            elif isinstance(mod, HeaterShakerContext):
                 mod.flag_unsafe_move(to_loc=location, is_multichannel=self.channels > 1)
 
         publish_ctx = nullcontext()
