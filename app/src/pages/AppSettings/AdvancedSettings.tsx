@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import path from 'path'
 import { useSelector, useDispatch } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -24,6 +23,7 @@ import {
 } from '@opentrons/components'
 
 import * as Config from '../../redux/config'
+import * as ProtocolAnalysis from '../../redux/protocol-analysis'
 import * as Calibration from '../../redux/calibration'
 import * as CustomLabware from '../../redux/custom-labware'
 import {
@@ -58,11 +58,6 @@ const ALWAYS_TRASH: 'always-trash' = 'always-trash'
 const ALWAYS_PROMPT: 'always-prompt' = 'always-prompt'
 const REALTEK_URL = 'https://www.realtek.com/en/'
 
-const INPUT_STYLES = css`
-  position: fixed;
-  clip: rect(1px 1px 1px 1px);
-`
-
 type BlockSelection =
   | typeof ALWAYS_BLOCK
   | typeof ALWAYS_TRASH
@@ -70,7 +65,6 @@ type BlockSelection =
 
 export function AdvancedSettings(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared'])
-  const pythonDirectoryFileInput = React.useRef<HTMLInputElement>(null)
   const useTrashSurfaceForTipCal = useSelector((state: State) =>
     Config.getUseTrashSurfaceForTipCal(state)
   )
@@ -155,28 +149,12 @@ export function AdvancedSettings(): JSX.Element {
       )
     )
 
-  //  TODO(jr, 5/6/22): find another way to get webkitdirectory to work in the input DOM https://github.com/facebook/react/issues/3468
-  React.useEffect(() => {
-    if (pythonDirectoryFileInput.current !== null) {
-      pythonDirectoryFileInput.current.setAttribute('directory', 'true')
-      pythonDirectoryFileInput.current.setAttribute('webkitdirectory', 'true')
-    }
-  }, [pythonDirectoryFileInput])
-
   const handleClickPythonDirectoryChange: React.MouseEventHandler<HTMLButtonElement> = _event => {
-    pythonDirectoryFileInput.current?.click()
+    dispatch(ProtocolAnalysis.changePythonPathOverrideConfig())
     trackEvent({
       name: 'changePathToPythonDirectory',
       properties: {},
     })
-  }
-
-  const setPythonInterpreterDirectory: React.ChangeEventHandler<HTMLInputElement> = event => {
-    const { files = [] } = event.target ?? {}
-    const dirName =
-      files?.[0]?.path != null ? path.dirname(files?.[0]?.path) : null
-    dispatch(Config.updateConfigValue('python.pathToPythonOverride', dirName))
-    event.target.value = ''
   }
 
   const toggleDevtools = (): unknown => dispatch(Config.toggleDevtools())
@@ -573,7 +551,7 @@ export function AdvancedSettings(): JSX.Element {
                 css={TYPOGRAPHY.pRegular}
                 color={COLORS.darkBlackEnabled}
                 onClick={() =>
-                  dispatch(Config.openPythonInterpreterDirectory())
+                  dispatch(ProtocolAnalysis.openPythonInterpreterDirectory())
                 }
                 id="AdvancedSettings_sourceFolderLinkPython"
               >
@@ -607,14 +585,6 @@ export function AdvancedSettings(): JSX.Element {
               {t('add_override_path')}
             </TertiaryButton>
           )}
-          <input
-            id="AdvancedSetting_pythonPathDirectoryInput"
-            data-testid="AdvancedSetting_pythonPathDirectoryInput"
-            type="file"
-            css={INPUT_STYLES}
-            ref={pythonDirectoryFileInput}
-            onChange={setPythonInterpreterDirectory}
-          />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>

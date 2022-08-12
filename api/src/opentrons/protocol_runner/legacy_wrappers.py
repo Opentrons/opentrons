@@ -8,7 +8,11 @@ from opentrons_shared_data.labware.dev_types import (
 
 from opentrons.calibration_storage.helpers import uri_from_details
 
-from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.hardware_control import (
+    HardwareControlAPI,
+    ThreadManager,
+    SynchronousAdapter,
+)
 from opentrons.hardware_control.modules.types import (
     ModuleModel as LegacyModuleModel,
     TemperatureModuleModel as LegacyTemperatureModuleModel,
@@ -94,19 +98,18 @@ class LegacyContextCreator:
 
     def __init__(
         self,
-        sync_hardware_api: SyncHardwareAPI,
+        hardware_api: HardwareControlAPI,
         labware_offset_provider: LegacyLabwareOffsetProvider,
     ) -> None:
         """Prepare the LegacyContextCreator.
 
         Args:
-            sync_hardware_api: The interface to the hardware API that the created
-                Protocol API v2 contexts will use. Regardless of
-                ``use_simulating_implementation``, this can either be a real hardware
-                API to actually control the robot, or a simulating hardware API.
+            hardware_api: The hardware control interface.
+                Will be wrapped in a `SynchronousAdapter`.
+                May be real hardware or a simluator.
             labware_offset_provider: Interface for the context to load labware offsets.
         """
-        self._sync_hardware_api = sync_hardware_api
+        self._hardware_api = hardware_api
         self._labware_offset_provider = labware_offset_provider
 
     def create(self, protocol: LegacyProtocol) -> LegacyProtocolContext:
@@ -118,11 +121,16 @@ class LegacyContextCreator:
             else None
         )
 
+        if isinstance(self._hardware_api, ThreadManager):
+            sync_hardware = self._hardware_api.sync
+        else:
+            sync_hardware = SynchronousAdapter(self._hardware_api)
+
         return LegacyProtocolContext(
             api_version=api_version,
             labware_offset_provider=self._labware_offset_provider,
             implementation=self._ContextImplementation(
-                sync_hardware=self._sync_hardware_api,
+                sync_hardware=sync_hardware,
                 api_version=api_version,
                 extra_labware=extra_labware,
             ),
