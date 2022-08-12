@@ -106,7 +106,7 @@ class LegacyContextCreator:
         Args:
             hardware_api: The hardware control interface.
                 Will be wrapped in a `SynchronousAdapter`.
-                May be real hardware or a simluator.
+                May be real hardware or a simulator.
             labware_offset_provider: Interface for the context to load labware offsets.
         """
         self._hardware_api = hardware_api
