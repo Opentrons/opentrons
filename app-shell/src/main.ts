@@ -4,8 +4,8 @@ import contextMenu from 'electron-context-menu'
 
 import { createUi } from './ui'
 import { initializeMenu } from './menu'
-import { initializePython } from './protocol-analysis'
 import { createLogger } from './log'
+import { registerProtocolAnalysis } from './protocol-analysis'
 import { registerDiscovery } from './discovery'
 import { registerLabware } from './labware'
 import { registerRobotLogs } from './robot-logs'
@@ -13,13 +13,7 @@ import { registerUpdate } from './update'
 import { registerBuildrootUpdate } from './buildroot'
 import { registerSystemInfo } from './system-info'
 import { registerProtocolStorage } from './protocol-storage'
-import {
-  getConfig,
-  getStore,
-  getOverrides,
-  registerConfig,
-  registerPythonPath,
-} from './config'
+import { getConfig, getStore, getOverrides, registerConfig } from './config'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
@@ -74,7 +68,6 @@ function startUp(): void {
   })
 
   initializeMenu()
-  initializePython()
 
   // wire modules to UI dispatches
   const dispatch: Dispatch = action => {
@@ -88,11 +81,11 @@ function startUp(): void {
   const actionHandlers: Dispatch[] = [
     registerConfig(dispatch),
     registerDiscovery(dispatch),
+    registerProtocolAnalysis(dispatch, mainWindow),
     registerRobotLogs(dispatch, mainWindow),
     registerUpdate(dispatch),
     registerBuildrootUpdate(dispatch),
     registerLabware(dispatch, mainWindow),
-    registerPythonPath(),
     registerSystemInfo(dispatch),
     registerProtocolStorage(dispatch),
   ]

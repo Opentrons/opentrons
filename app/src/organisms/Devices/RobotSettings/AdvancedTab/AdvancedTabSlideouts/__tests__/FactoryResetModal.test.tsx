@@ -94,7 +94,7 @@ describe('RobotSettings FactoryResetModal', () => {
       resetOptions: mockResetOptions,
     })
     const closeIconButton = getByTestId(
-      'Modal_icon_close_Reset to factory settings?'
+      'ModalHeader_icon_close_Reset to factory settings?'
     )
     fireEvent.click(closeIconButton)
     expect(mockCloseModal).toHaveBeenCalled()
@@ -136,7 +136,7 @@ describe('RobotSettings FactoryResetModal', () => {
       resetOptions: {},
     })
     const closeIconButton = getByTestId(
-      'Modal_icon_close_Connection to robot lost'
+      'ModalHeader_icon_close_Connection to robot lost'
     )
     fireEvent.click(closeIconButton)
     expect(mockCloseModal).toHaveBeenCalled()
