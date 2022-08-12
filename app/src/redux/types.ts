@@ -44,7 +44,6 @@ import type { SessionState, SessionsAction } from './sessions/types'
 import type { AnalyticsTriggerAction } from './analytics/types'
 
 export interface State {
-  // readonly robot: RobotState
   readonly robotApi: RobotApiState
   readonly robotAdmin: RobotAdminState
   readonly robotControls: RobotControlsState
