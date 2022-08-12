@@ -1,6 +1,4 @@
 // import { createSelector } from 'reselect'
-import pick from 'lodash/pick'
-import some from 'lodash/some'
 import * as Sessions from '../sessions'
 
 // import {
@@ -22,29 +20,21 @@ import {
   getRobotSystemType,
 } from '../buildroot'
 
-import { getAttachedPipettes } from '../pipettes'
 import { getRobotSessionById } from '../sessions/selectors'
-import { getCalibrationCheckSession } from '../sessions/calibration-check/selectors'
 
 // import { hash } from './hash'
 
 // import type { Selector } from 'reselect'
 import type { State } from '../types'
-import type {
-  CalibrationCheckComparisonsPerCalibration,
-  CalibrationCheckInstrument,
-} from '../sessions/calibration-check/types'
 import type { Mount } from '../pipettes/types'
 
 import type {
   AnalyticsConfig,
-  CalibrationCheckByMount,
   BuildrootAnalyticsData,
   PipetteOffsetCalibrationAnalyticsData,
   TipLengthCalibrationAnalyticsData,
   DeckCalibrationAnalyticsData,
   CalibrationHealthCheckAnalyticsData,
-  ModelsByMount,
   AnalyticsSessionExitDetails,
   SessionInstrumentAnalyticsData,
 } from './types'
