@@ -27,10 +27,9 @@ export default {
     Story => (
       <Flex flexWrap={WRAP}>
         {Object.keys(ICON_DATA_BY_NAME).map(name => (
-          // eslint-disable-next-line react/jsx-key
           <Flex
             key={`icon_${name}`}
-            width="7.5rem"
+            width="8.75rem"
             flexDirection={DIRECTION_COLUMN}
             alignItems={ALIGN_CENTER}
             backgroundColor={COLORS.medGreyHover}
@@ -57,6 +56,6 @@ const Template: Story<React.ComponentProps<typeof IconComponent>> = args => {
   return <IconComponent {...args} />
 }
 export const Icon = Template.bind({})
-Icon.args = { spin: false }
-
-// console.log(Object.keys(ICON_DATA_BY_NAME))
+Icon.args = {
+  color: COLORS.darkBlackEnabled,
+}
