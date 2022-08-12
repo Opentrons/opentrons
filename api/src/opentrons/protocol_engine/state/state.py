@@ -145,6 +145,7 @@ class StateStore(StateView, ActionHandler):
             self._pipette_store,
             self._labware_store,
             self._module_store,
+            self._liquid_store,
         ]
         self._config = config
         self._change_notifier = change_notifier or ChangeNotifier()
@@ -241,6 +242,7 @@ class StateStore(StateView, ActionHandler):
         self._labware = LabwareView(state.labware)
         self._pipettes = PipetteView(state.pipettes)
         self._modules = ModuleView(state.modules)
+        self._liquid = LiquidView(state.liquids)
 
         # Derived states
         self._geometry = GeometryView(
@@ -262,4 +264,5 @@ class StateStore(StateView, ActionHandler):
         self._labware._state = next_state.labware
         self._pipettes._state = next_state.pipettes
         self._modules._state = next_state.modules
+        self._liquid._state = next_state.liquids
         self._change_notifier.notify()
