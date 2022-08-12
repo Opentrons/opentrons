@@ -73,7 +73,7 @@ export function RobotSettingsAdvanced({
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)
   )
-  const connected = robot?.connected != null && robot.connected
+  const connected = robot?.status === 'connectable'
 
   const [isRobotConnected, setIsRobotConnected] = React.useState<boolean>(
     connected

@@ -27,7 +27,6 @@ export interface DiscoveryState {
 
 export interface BaseRobot extends Omit<DiscoveryClientRobot, 'addresses'> {
   displayName: string
-  connected: boolean
   local: boolean | null
   seen: boolean
 }

@@ -53,7 +53,6 @@ export const mockBaseRobot: BaseRobot = {
   // different in this fixture to ensure proper test coverage
   name: 'opentrons-robot-name',
   displayName: 'robot-name',
-  connected: false,
   seen: false,
   local: null,
   health: null,
@@ -74,7 +73,6 @@ export const mockConnectableRobot: Robot = {
 
 export const mockConnectedRobot: Robot = {
   ...mockConnectableRobot,
-  connected: true,
 }
 
 export const mockReachableRobot: ReachableRobot = {

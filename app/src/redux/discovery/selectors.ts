@@ -18,10 +18,6 @@ import {
   UNREACHABLE,
 } from './constants'
 
-// TODO(mc, 2018-10-10): fix circular dependency with RPC API client
-// that requires us to bypass the robot entry point here
-import { getConnectedRobotName } from '../robot/selectors'
-
 import type { State } from '../types'
 import {
   DiscoveredRobot,
@@ -62,8 +58,7 @@ export const getDiscoveredRobots: (
   state: State
 ) => DiscoveredRobot[] = createSelector(
   state => state.discovery.robotsByName,
-  getConnectedRobotName,
-  (robotsMap, connectedRobotName) => {
+  robotsMap => {
     return Object.keys(robotsMap).map((robotName: string) => {
       const robot = robotsMap[robotName]
       const { addresses, ...robotState } = robot
@@ -76,7 +71,6 @@ export const getDiscoveredRobots: (
       const baseRobot = {
         ...robotState,
         displayName: makeDisplayName(robotName),
-        connected: robotName === connectedRobotName,
         local: ip !== null ? isLocal(ip) : null,
         seen: addr?.seen === true,
       }
@@ -145,11 +139,6 @@ export const getViewableRobots: GetViewableRobots = createSelector(
   getConnectableRobots,
   getReachableRobots,
   (cr: ViewableRobot[], rr: ViewableRobot[]) => concat<ViewableRobot>(cr, rr)
-)
-
-export const getConnectedRobot: GetConnectedRobot = createSelector(
-  getConnectableRobots,
-  robots => find(robots, 'connected') ?? null
 )
 
 export const getRobotByName = (

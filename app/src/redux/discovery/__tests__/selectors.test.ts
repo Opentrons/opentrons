@@ -20,7 +20,6 @@ import * as discovery from '../selectors'
 import type { State } from '../../types'
 
 const MOCK_STATE: State = {
-  robot: { connection: { connectedTo: 'bar' } },
   discovery: {
     robotsByName: {
       foo: {
@@ -119,7 +118,6 @@ const EXPECTED_FOO = {
   name: 'foo',
   displayName: 'foo',
   status: CONNECTABLE,
-  connected: false,
   local: false,
   seen: true,
   health: mockHealthResponse,
@@ -131,12 +129,11 @@ const EXPECTED_FOO = {
 }
 
 // bar is connectable because health is defined and healthStatus of primary
-// address is "ok", and bar is connected because of connectedTo state
+// address is "ok"
 const EXPECTED_BAR = {
   name: 'bar',
   displayName: 'bar',
   status: CONNECTABLE,
-  connected: true,
   local: false,
   seen: true,
   health: mockHealthResponse,
@@ -153,7 +150,6 @@ const EXPECTED_BAZ = {
   name: 'baz',
   displayName: 'baz',
   status: REACHABLE,
-  connected: false,
   local: false,
   seen: true,
   health: mockHealthResponse,
@@ -170,7 +166,6 @@ const EXPECTED_QUX = {
   name: 'qux',
   displayName: 'qux',
   status: REACHABLE,
-  connected: false,
   local: false,
   seen: true,
   health: mockHealthResponse,
@@ -187,7 +182,6 @@ const EXPECTED_FIZZ = {
   name: 'fizz',
   displayName: 'fizz',
   status: UNREACHABLE,
-  connected: false,
   local: false,
   seen: false,
   health: mockHealthResponse,
@@ -203,7 +197,6 @@ const EXPECTED_BUZZ = {
   name: 'buzz',
   displayName: 'buzz',
   status: UNREACHABLE,
-  connected: false,
   local: null,
   seen: false,
   health: mockHealthResponse,
@@ -326,18 +319,6 @@ describe('discovery selectors', () => {
       selector: discovery.getViewableRobots,
       state: MOCK_STATE,
       expected: [EXPECTED_FOO, EXPECTED_BAR, EXPECTED_BAZ, EXPECTED_QUX],
-    },
-    {
-      name: 'getConnectedRobot returns connected robot if connectable',
-      selector: discovery.getConnectedRobot,
-      state: MOCK_STATE,
-      expected: EXPECTED_BAR,
-    },
-    {
-      name: 'getConnectedRobot returns null if not connectable',
-      selector: discovery.getConnectedRobot,
-      state: { ...MOCK_STATE, robot: { connection: { connectedTo: 'fizz' } } },
-      expected: null,
     },
     {
       name: 'getRobotApiVersion returns health.apiServerVersion',

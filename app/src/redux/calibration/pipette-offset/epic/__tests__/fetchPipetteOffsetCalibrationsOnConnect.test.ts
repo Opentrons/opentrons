@@ -5,7 +5,6 @@ import { pipetteOffsetCalibrationsEpic } from '..'
 import type { Action, State } from '../../../../types'
 
 jest.mock('../../actions')
-jest.mock('../../../../robot/selectors')
 jest.mock('../../../../discovery/selectors')
 
 const mockState = { state: true }

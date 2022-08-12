@@ -2,9 +2,6 @@ import createHistory from 'history/createHashHistory'
 import { combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
 
-// oldest robot api state
-import { robotReducer } from './robot'
-
 // api state
 import { robotApiReducer } from './robot-api/reducer'
 
@@ -65,7 +62,6 @@ export const rootReducer: Reducer<State, Action> = combineReducers<
   State,
   Action
 >({
-  robot: robotReducer,
   robotApi: robotApiReducer,
   robotAdmin: robotAdminReducer,
   robotControls: robotControlsReducer,

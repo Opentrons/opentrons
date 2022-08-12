@@ -15,7 +15,6 @@ import * as Sessions from '../sessions'
 
 import {
   getViewableRobots,
-  getConnectedRobot,
   getRobotApiVersion,
   getRobotFirmwareVersion,
 } from '../discovery'
@@ -120,31 +119,31 @@ export const FF_PREFIX = 'robotFF_'
 //   }))
 // })
 
-export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
-  const robot = getConnectedRobot(state)
+// export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
+//   const robot = getConnectedRobot(state)
 
-  if (robot) {
-    const pipettes = getAttachedPipettes(state, robot.name)
-    const settings = getRobotSettings(state, robot.name)
+//   if (robot) {
+//     const pipettes = getAttachedPipettes(state, robot.name)
+//     const settings = getRobotSettings(state, robot.name)
 
-    // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
-    return settings.reduce<RobotAnalyticsData>(
-      (result, setting) => ({
-        ...result,
-        [`${FF_PREFIX}${setting.id}`]: !!setting.value,
-      }),
-      // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
-      {
-        robotApiServerVersion: getRobotApiVersion(robot) || '',
-        robotSmoothieVersion: getRobotFirmwareVersion(robot) || '',
-        robotLeftPipette: pipettes.left?.model || '',
-        robotRightPipette: pipettes.right?.model || '',
-      }
-    )
-  }
+//     // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
+//     return settings.reduce<RobotAnalyticsData>(
+//       (result, setting) => ({
+//         ...result,
+//         [`${FF_PREFIX}${setting.id}`]: !!setting.value,
+//       }),
+//       // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
+//       {
+//         robotApiServerVersion: getRobotApiVersion(robot) || '',
+//         robotSmoothieVersion: getRobotFirmwareVersion(robot) || '',
+//         robotLeftPipette: pipettes.left?.model || '',
+//         robotRightPipette: pipettes.right?.model || '',
+//       }
+//     )
+//   }
 
-  return null
-}
+//   return null
+// }
 
 export function getBuildrootAnalyticsData(
   state: State,
@@ -186,19 +185,19 @@ export function getAnalyticsPipetteCalibrationData(
   state: State,
   mount: Mount
 ): PipetteOffsetCalibrationAnalyticsData | null {
-  const robot = getConnectedRobot(state)
+  // const robot = getConnectedRobot(state)
 
-  if (robot) {
-    const pipcal =
-      getAttachedPipetteCalibrations(state, robot.name)[mount]?.offset ?? null
-    const pip = getAttachedPipettes(state, robot.name)[mount]
-    return {
-      calibrationExists: Boolean(pipcal),
-      markedBad: pipcal?.status?.markedBad ?? false,
-      // @ts-expect-error protect for cases where model is not on pip
-      pipetteModel: pip.model,
-    }
-  }
+  // if (robot) {
+  //   const pipcal =
+  //     getAttachedPipetteCalibrations(state, robot.name)[mount]?.offset ?? null
+  //   const pip = getAttachedPipettes(state, robot.name)[mount]
+  //   return {
+  //     calibrationExists: Boolean(pipcal),
+  //     markedBad: pipcal?.status?.markedBad ?? false,
+  //     // @ts-expect-error protect for cases where model is not on pip
+  //     pipetteModel: pip.model,
+  //   }
+  // }
   return null
 }
 
@@ -206,20 +205,20 @@ export function getAnalyticsTipLengthCalibrationData(
   state: State,
   mount: Mount
 ): TipLengthCalibrationAnalyticsData | null {
-  const robot = getConnectedRobot(state)
+  // const robot = getConnectedRobot(state)
 
-  if (robot) {
-    const tipcal =
-      getAttachedPipetteCalibrations(state, robot.name)[mount]?.tipLength ??
-      null
-    const pip = getAttachedPipettes(state, robot.name)[mount]
-    return {
-      calibrationExists: Boolean(tipcal),
-      markedBad: tipcal?.status?.markedBad ?? false,
-      // @ts-expect-error protect for cases where model is not on pip
-      pipetteModel: pip.model,
-    }
-  }
+  // if (robot) {
+  //   const tipcal =
+  //     getAttachedPipetteCalibrations(state, robot.name)[mount]?.tipLength ??
+  //     null
+  //   const pip = getAttachedPipettes(state, robot.name)[mount]
+  //   return {
+  //     calibrationExists: Boolean(tipcal),
+  //     markedBad: tipcal?.status?.markedBad ?? false,
+  //     // @ts-expect-error protect for cases where model is not on pip
+  //     pipetteModel: pip.model,
+  //   }
+  // }
   return null
 }
 
@@ -271,29 +270,29 @@ function getCalibrationCheckData(
 export function getAnalyticsDeckCalibrationData(
   state: State
 ): DeckCalibrationAnalyticsData | null {
-  const robot = getConnectedRobot(state)
-  if (robot) {
-    const dcData = getDeckCalibrationData(state, robot.name)
-    return {
-      calibrationStatus: getDeckCalibrationStatus(state, robot.name),
-      markedBad: !Array.isArray(dcData)
-        ? dcData?.status?.markedBad || null
-        : null,
-      pipettes: getPipetteModels(state, robot.name),
-    }
-  }
+  // const robot = getConnectedRobot(state)
+  // if (robot) {
+  //   const dcData = getDeckCalibrationData(state, robot.name)
+  //   return {
+  //     calibrationStatus: getDeckCalibrationStatus(state, robot.name),
+  //     markedBad: !Array.isArray(dcData)
+  //       ? dcData?.status?.markedBad || null
+  //       : null,
+  //     pipettes: getPipetteModels(state, robot.name),
+  //   }
+  // }
   return null
 }
 
 export function getAnalyticsHealthCheckData(
   state: State
 ): CalibrationHealthCheckAnalyticsData | null {
-  const robot = getConnectedRobot(state)
-  if (robot) {
-    return {
-      pipettes: getCalibrationCheckData(state, robot.name),
-    }
-  }
+  // const robot = getConnectedRobot(state)
+  // if (robot) {
+  //   return {
+  //     pipettes: getCalibrationCheckData(state, robot.name),
+  //   }
+  // }
   return null
 }
 

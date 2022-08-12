@@ -1,11 +1,11 @@
 // robot state module
 // split up into reducer.js, action.js, etc if / when necessary
-import * as selectors from './selectors'
+// import * as selectors from './selectors'
 import * as constants from './constants'
 
 export type { Action } from './actions'
 
 export * from './types'
-export * from './reducer'
+// export * from './reducer'
 export * from './actions'
-export { constants, selectors }
+export { constants }

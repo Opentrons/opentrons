@@ -4,7 +4,6 @@
 // the switch to the HTTP APIs. Commented out code left to aid with
 // analytics replacement.
 import { createLogger } from '../../logger'
-import { getConnectedRobot } from '../discovery'
 import * as CustomLabware from '../custom-labware'
 import * as SystemInfo from '../system-info'
 import * as brActions from '../buildroot/constants'
@@ -15,7 +14,6 @@ import { sharedCalCommands } from '../sessions/common-calibration/constants'
 import * as RobotAdmin from '../robot-admin'
 
 import {
-  getRobotAnalyticsData,
   getBuildrootAnalyticsData,
   getAnalyticsPipetteCalibrationData,
   getAnalyticsTipLengthCalibrationData,
@@ -38,25 +36,25 @@ export function makeEvent(
   state: State
 ): Promise<AnalyticsEvent | null> {
   switch (action.type) {
-    case 'robot:CONNECT': {
-      const robot = getConnectedRobot(state)
+    // case 'robot:CONNECT': {
+    //   const robot = getConnectedRobot(state)
 
-      if (!robot) {
-        log.warn('No robot found for connect response')
-        return Promise.resolve(null)
-      }
+    //   if (!robot) {
+    //     log.warn('No robot found for connect response')
+    //     return Promise.resolve(null)
+    //   }
 
-      const data = getRobotAnalyticsData(state)
+    //   const data = getRobotAnalyticsData(state)
 
-      return Promise.resolve({
-        name: 'robotConnect',
-        properties: {
-          ...data,
-          method: robot.local ? 'usb' : 'wifi',
-          success: true,
-        },
-      })
-    }
+    //   return Promise.resolve({
+    //     name: 'robotConnect',
+    //     properties: {
+    //       ...data,
+    //       method: robot.local ? 'usb' : 'wifi',
+    //       success: true,
+    //     },
+    //   })
+    // }
 
     // case 'protocol:LOAD': {
     //   return getProtocolAnalyticsData(state).then(data => ({
