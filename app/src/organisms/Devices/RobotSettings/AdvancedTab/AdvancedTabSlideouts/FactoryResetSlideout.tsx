@@ -38,6 +38,7 @@ import {
 
 import type { State, Dispatch } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
+import { UNREACHABLE } from '../../../../../redux/discovery'
 
 interface FactoryResetSlideoutProps {
   isExpanded: boolean
@@ -107,7 +108,7 @@ export function FactoryResetSlideout({
   }
 
   const handleClearData = (): void => {
-    const connected = robot?.status !== 'unreachable'
+    const connected = robot?.status !== UNREACHABLE
     updateResetStatus(connected, resetOptions)
     onCloseClick()
   }

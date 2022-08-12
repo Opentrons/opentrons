@@ -31,14 +31,14 @@ import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
 
 interface FactoryResetModalProps {
   closeModal: () => void
-  isRobotConnected: boolean
+  isRobotReachable: boolean
   robotName: string
   resetOptions?: ResetConfigRequest
 }
 
 export function FactoryResetModal({
   closeModal,
-  isRobotConnected,
+  isRobotReachable,
   robotName,
   resetOptions,
 }: FactoryResetModalProps): JSX.Element {
@@ -69,7 +69,7 @@ export function FactoryResetModal({
 
   return (
     <>
-      {isRobotConnected ? (
+      {isRobotReachable ? (
         <Modal
           type="warning"
           title={t('reset_to_factory_settings')}

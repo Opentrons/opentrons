@@ -13,7 +13,6 @@ import type {
 import type { BuildrootState, BuildrootAction } from './buildroot/types'
 import type { PipettesState, PipettesAction } from './pipettes/types'
 import type { ModulesAction } from './modules/types'
-import type { Action as RobotAction } from './robot'
 import type { ShellState, ShellAction } from './shell/types'
 import type { ConfigState, ConfigAction } from './config/types'
 import type { DiscoveryState, DiscoveryAction } from './discovery/types'
@@ -65,7 +64,6 @@ export interface State {
 }
 
 export type Action =
-  | RobotAction
   | RobotApiAction
   | RobotAdminAction
   | RobotControlsAction
