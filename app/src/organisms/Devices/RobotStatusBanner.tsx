@@ -37,8 +37,6 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
     getRobotModelByName(state, name)
   )
 
-  console.log('robotModel', robotModel)
-
   const runningProtocolBanner: JSX.Element | null =
     currentRunId != null ? (
       <Flex alignItems={ALIGN_CENTER}>

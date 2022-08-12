@@ -87,8 +87,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
     getRobotModelByName(state, robot?.name)
   )
 
-  console.log('robotModel', robotModel)
-
   return robotName != null ? (
     <Flex
       alignItems={ALIGN_CENTER}
