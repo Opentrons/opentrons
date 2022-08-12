@@ -1,6 +1,5 @@
 import isIp from 'is-ip'
 import concat from 'lodash/concat'
-import find from 'lodash/find'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
 import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
@@ -32,7 +31,6 @@ type GetReachableRobots = (state: State) => ReachableRobot[]
 type GetUnreachableRobots = (state: State) => UnreachableRobot[]
 type GetAllRobots = (state: State) => DiscoveredRobot[]
 type GetViewableRobots = (state: State) => ViewableRobot[]
-type GetConnectedRobot = (state: State) => Robot | null
 
 // from https://github.com/reduxjs/reselect#customize-equalitycheck-for-defaultmemoize
 const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)

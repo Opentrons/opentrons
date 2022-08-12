@@ -13,11 +13,7 @@ import * as Sessions from '../sessions'
 //   getProtocolContents,
 // } from '../protocol'
 
-import {
-  getViewableRobots,
-  getRobotApiVersion,
-  getRobotFirmwareVersion,
-} from '../discovery'
+import { getViewableRobots, getRobotApiVersion } from '../discovery'
 
 import {
   getBuildrootUpdateVersion,
@@ -26,16 +22,7 @@ import {
   getRobotSystemType,
 } from '../buildroot'
 
-import { getRobotSettings } from '../robot-settings'
-import {
-  getAttachedPipettes,
-  getAttachedPipetteCalibrations,
-} from '../pipettes'
-// import { getPipettes, getModules } from '../robot/selectors'
-import {
-  getDeckCalibrationStatus,
-  getDeckCalibrationData,
-} from '../calibration/selectors'
+import { getAttachedPipettes } from '../pipettes'
 import { getRobotSessionById } from '../sessions/selectors'
 import { getCalibrationCheckSession } from '../sessions/calibration-check/selectors'
 
@@ -52,8 +39,6 @@ import type { Mount } from '../pipettes/types'
 import type {
   AnalyticsConfig,
   CalibrationCheckByMount,
-  // ProtocolAnalyticsData,
-  RobotAnalyticsData,
   BuildrootAnalyticsData,
   PipetteOffsetCalibrationAnalyticsData,
   TipLengthCalibrationAnalyticsData,
@@ -222,50 +207,50 @@ export function getAnalyticsTipLengthCalibrationData(
   return null
 }
 
-function getPipetteModels(state: State, robotName: string): ModelsByMount {
-  // @ts-expect-error ensure that both mount keys exist on returned object
-  return Object.entries(
-    getAttachedPipettes(state, robotName)
-  ).reduce<ModelsByMount>((obj, [mount, pipData]): ModelsByMount => {
-    if (pipData) {
-      obj[mount as Mount] = pick(pipData, ['model'])
-    }
-    return obj
-    // @ts-expect-error ensure that both mount keys exist on returned object
-  }, {})
-}
+// function getPipetteModels(state: State, robotName: string): ModelsByMount {
+//   // @ts-expect-error ensure that both mount keys exist on returned object
+//   return Object.entries(
+//     getAttachedPipettes(state, robotName)
+//   ).reduce<ModelsByMount>((obj, [mount, pipData]): ModelsByMount => {
+//     if (pipData) {
+//       obj[mount as Mount] = pick(pipData, ['model'])
+//     }
+//     return obj
+//     // @ts-expect-error ensure that both mount keys exist on returned object
+//   }, {})
+// }
 
-function getCalibrationCheckData(
-  state: State,
-  robotName: string
-): CalibrationCheckByMount | null {
-  const session = getCalibrationCheckSession(state, robotName)
-  if (!session) {
-    return null
-  }
-  const { comparisonsByPipette, instruments } = session.details
-  return instruments.reduce<CalibrationCheckByMount>(
-    (obj, instrument: CalibrationCheckInstrument) => {
-      const { rank, mount, model } = instrument
-      const succeeded = !some(
-        Object.keys(comparisonsByPipette[rank]).map(k =>
-          Boolean(
-            comparisonsByPipette[rank][
-              k as keyof CalibrationCheckComparisonsPerCalibration
-            ]?.status === 'OUTSIDE_THRESHOLD'
-          )
-        )
-      )
-      obj[mount] = {
-        comparisons: comparisonsByPipette[rank],
-        succeeded: succeeded,
-        model: model,
-      }
-      return obj
-    },
-    { left: null, right: null }
-  )
-}
+// function getCalibrationCheckData(
+//   state: State,
+//   robotName: string
+// ): CalibrationCheckByMount | null {
+//   const session = getCalibrationCheckSession(state, robotName)
+//   if (!session) {
+//     return null
+//   }
+//   const { comparisonsByPipette, instruments } = session.details
+//   return instruments.reduce<CalibrationCheckByMount>(
+//     (obj, instrument: CalibrationCheckInstrument) => {
+//       const { rank, mount, model } = instrument
+//       const succeeded = !some(
+//         Object.keys(comparisonsByPipette[rank]).map(k =>
+//           Boolean(
+//             comparisonsByPipette[rank][
+//               k as keyof CalibrationCheckComparisonsPerCalibration
+//             ]?.status === 'OUTSIDE_THRESHOLD'
+//           )
+//         )
+//       )
+//       obj[mount] = {
+//         comparisons: comparisonsByPipette[rank],
+//         succeeded: succeeded,
+//         model: model,
+//       }
+//       return obj
+//     },
+//     { left: null, right: null }
+//   )
+// }
 
 export function getAnalyticsDeckCalibrationData(
   state: State
