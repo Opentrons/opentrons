@@ -14,6 +14,8 @@ on:
       - '!shared-data/js/**/*'
       - 'robot-server/**/*'
       - 'notify-server/**/*'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
       - '.github/workflows/robot-server-test-lint.yaml'
       - '.github/actions/python/**'
     branches:
@@ -31,6 +33,10 @@ on:
       - '!shared-data/js/**/*'
       - 'robot-server/**/*'
       - 'notify-server/**/*'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
+      - '.github/workflows/robot-server-test-lint.yaml'
+      - '.github/actions/python/**'
   workflow_dispatch:
 
 defaults:
