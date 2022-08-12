@@ -5,7 +5,6 @@ import type {
   MagneticModuleModel,
   HeaterShakerModuleModel,
 } from '@opentrons/shared-data'
-import type { Slot } from '../robot/api-types'
 
 import {
   TEMPERATURE_MODULE_TYPE,
@@ -23,6 +22,19 @@ export type CommonModuleInfo = Omit<
   ApiTypes.ApiBaseModule,
   'model' | 'displayName' | 'moduleModel'
 >
+
+export type Slot =
+  | '1'
+  | '2'
+  | '3'
+  | '4'
+  | '5'
+  | '6'
+  | '7'
+  | '8'
+  | '9'
+  | '10'
+  | '11'
 
 export interface TemperatureModule extends CommonModuleInfo {
   moduleType: typeof TEMPERATURE_MODULE_TYPE
