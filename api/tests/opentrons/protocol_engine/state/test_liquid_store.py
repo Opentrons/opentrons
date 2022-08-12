@@ -8,6 +8,7 @@ from opentrons.protocol_engine.actions.actions import AddLiquidAction
 
 @pytest.fixture
 def subject() -> LiquidStore:
+    """Liquid store test subject."""
     return LiquidStore()
 
 
