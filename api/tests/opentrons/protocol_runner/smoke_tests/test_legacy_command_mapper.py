@@ -16,7 +16,6 @@ from opentrons.protocol_runner import create_simulating_runner
 from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.types import PipetteName
-from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
 from opentrons.types import MountType
 
 LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
@@ -74,10 +73,13 @@ LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
             volume=35,
             location=well_plate_1.wells_by_name()["B1"],
         )
+        pipette_left.blow_out(
+            location=well_plate_1.wells_by_name()["B1"].top(),
+        )
         pipette_left.aspirate(50)
         pipette_left.dispense(50)
         pipette_left.blow_out(
-            location=well_plate_1.wells_by_name()["B1"],
+            location=well_plate_1["B1"].bottom(),
         )
         pipette_left.aspirate()
         pipette_left.dispense()
@@ -115,7 +117,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
     pipette_left_result_captor = matchers.Captor()
     pipette_right_result_captor = matchers.Captor()
 
-    assert len(commands_result) == 20
+    assert len(commands_result) == 21
 
     assert commands_result[0] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
@@ -319,7 +321,22 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=35),
     )
-    assert commands_result[13] == commands.Aspirate.construct(
+    assert commands_result[13] == commands.BlowOut.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.BlowOutParams(
+            pipetteId=pipette_left_id,
+            labwareId=well_plate_1_id,
+            wellName="B1",
+            flowRate=1000.0,
+        ),
+        result=commands.BlowOutResult(),
+    )
+    assert commands_result[14] == commands.Aspirate.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -335,7 +352,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.AspirateResult(volume=50),
     )
-    assert commands_result[14] == commands.Dispense.construct(
+    assert commands_result[15] == commands.Dispense.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -351,22 +368,22 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=50),
     )
-    #   TODO:(jr, 12.08.2022): blow_out commands with no location get filtered
-    #   into custom. Refactor this in followup legacy command mapping
-    assert commands_result[15] == commands.Custom.construct(
+    assert commands_result[16] == commands.BlowOut.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
         createdAt=matchers.IsA(datetime),
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
-        params=LegacyCommandParams(
-            legacyCommandText="Blowing out at B1 of Opentrons 96 Well Aluminum Block with NEST Well Plate 100 µL on 3",
-            legacyCommandType="command.BLOW_OUT",
+        params=commands.BlowOutParams(
+            pipetteId=pipette_left_id,
+            labwareId=well_plate_1_id,
+            wellName="B1",
+            flowRate=1000.0,
         ),
-        result=commands.CustomResult(),
+        result=commands.BlowOutResult(),
     )
-    assert commands_result[16] == commands.Aspirate.construct(
+    assert commands_result[17] == commands.Aspirate.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -382,7 +399,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.AspirateResult(volume=300),
     )
-    assert commands_result[17] == commands.Dispense.construct(
+    assert commands_result[18] == commands.Dispense.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -398,7 +415,22 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=300),
     )
-    assert commands_result[18] == commands.BlowOut.construct(
+    #   TODO:(jr, 12.08.2022): blow_out commands with no location get filtered
+    #   into custom. Refactor this in followup legacy command mapping
+    # assert commands_result[19] == commands.Custom.construct(
+    #     id=matchers.IsA(str),
+    #     key=matchers.IsA(str),
+    #     status=commands.CommandStatus.SUCCEEDED,
+    #     createdAt=matchers.IsA(datetime),
+    #     startedAt=matchers.IsA(datetime),
+    #     completedAt=matchers.IsA(datetime),
+    #     params=LegacyCommandParams(
+    #         legacyCommandText="Blowing out at B1 of Opentrons 96 Well Aluminum Block with NEST Well Plate 100 µL on 3",
+    #         legacyCommandType="command.BLOW_OUT",
+    #     ),
+    #     result=commands.CustomResult(),
+    # )
+    assert commands_result[19] == commands.BlowOut.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
@@ -413,7 +445,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.BlowOutResult(),
     )
-    assert commands_result[19] == commands.DropTip.construct(
+    assert commands_result[20] == commands.DropTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,

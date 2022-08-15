@@ -291,9 +291,10 @@ class LegacyCommandMapper:
     ) -> pe_commands.Command:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
-        well = (
-            location if isinstance(location, LegacyWell) else location.labware.as_well()
-        )
+        if isinstance(location, LegacyWell):
+            well = location
+        elif location.labware.is_well:
+            well = location.labware.as_well()
         mount = MountType(pipette.mount)
         #   the following type checking suppression assumes the tiprack is not loaded on top of a module
         slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
@@ -321,9 +322,10 @@ class LegacyCommandMapper:
     ) -> pe_commands.Command:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
-        well = (
-            location if isinstance(location, LegacyWell) else location.labware.as_well()
-        )
+        if isinstance(location, LegacyWell):
+            well = location
+        elif location.labware.is_well:
+            well = location.labware.as_well()
         mount = MountType(pipette.mount)
         #   the following type checking suppression assumes the tiprack is not loaded on top of a module
         slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
@@ -356,13 +358,12 @@ class LegacyCommandMapper:
         location = command["payload"]["location"]
         volume = command["payload"]["volume"]
         flow_rate = command["payload"]["rate"]
-        well = (
-            location if isinstance(location, LegacyWell) else location.labware.as_well()
-        )
-        if isinstance(location, Location):
-            first_parent = location.labware.first_parent()
-        assert first_parent is not None, "Labware needs to be associated with a slot"
-        slot = DeckSlotName(first_parent)
+        if isinstance(location, LegacyWell):
+            well = location
+        elif isinstance(location, Location):
+            if location.labware.is_well:
+                well = location.labware.as_well()
+            slot = DeckSlotName(location.labware.first_parent())
         parent_module_id = self._module_id_by_slot.get(slot)
         labware_id = (
             self._labware_id_by_module_id[parent_module_id]
@@ -413,13 +414,13 @@ class LegacyCommandMapper:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         flow_rate = pipette.flow_rate.blow_out
-        if isinstance(location, Location):
-            well = location.labware.as_well()
-            first_parent = location.labware.first_parent()
-            assert (
-                first_parent is not None
-            ), "Labware needs to be associated with a slot"
-            slot = DeckSlotName(first_parent)
+        if location is not None:
+            if isinstance(location, LegacyWell):
+                well = location
+            elif isinstance(location, Location):
+                if location.labware.is_well:
+                    well = location.labware.as_well()
+                slot = DeckSlotName(location.labware.first_parent())
             parent_module_id = self._module_id_by_slot.get(slot)
             labware_id = (
                 self._labware_id_by_module_id[parent_module_id]
