@@ -1,4 +1,11 @@
-import { mockHealthResponse, mockServerHealthResponse } from '../__fixtures__'
+import {
+  mockLegacyHealthResponse,
+  mockLegacyServerHealthResponse,
+  mockOT2HealthResponse,
+  mockOT2ServerHealthResponse,
+  mockOT3HealthResponse,
+  mockOT3ServerHealthResponse,
+} from '../__fixtures__'
 import { HEALTH_STATUS_OK } from '../constants'
 import * as HealthPollerModule from '../health-poller'
 import * as MdnsBrowserModule from '../mdns-browser'
@@ -103,7 +110,12 @@ describe('discovery client', () => {
     const client = createDiscoveryClient({ onListChange, logger })
 
     client.start({ healthPollInterval: 5000 })
-    emitService({ name: 'opentrons-dev', ip: '127.0.0.1', port: 31950 })
+    emitService({
+      name: 'opentrons-dev',
+      ip: '127.0.0.1',
+      port: 31950,
+      robotModel: 'OT-3 Standard',
+    })
 
     expect(onListChange).toHaveBeenCalledWith([
       {
@@ -119,6 +131,7 @@ describe('discovery client', () => {
             serverHealthStatus: null,
             healthError: null,
             serverHealthError: null,
+            advertisedModel: 'OT-3 Standard',
           },
         ],
       },
@@ -129,12 +142,17 @@ describe('discovery client', () => {
     const client = createDiscoveryClient({ onListChange, logger })
 
     client.start({ healthPollInterval: 5000 })
-    emitService({ name: 'opentrons-dev', ip: '127.0.0.1', port: 31950 })
+    emitService({
+      name: 'opentrons-dev',
+      ip: '127.0.0.1',
+      port: 31950,
+      robotModel: null,
+    })
     emitPollResult({
       ip: '127.0.0.1',
       port: 31950,
-      health: mockHealthResponse,
-      serverHealth: mockServerHealthResponse,
+      health: mockLegacyHealthResponse,
+      serverHealth: mockLegacyServerHealthResponse,
       healthError: null,
       serverHealthError: null,
     })
@@ -142,8 +160,8 @@ describe('discovery client', () => {
     expect(onListChange).toHaveBeenLastCalledWith([
       {
         name: 'opentrons-dev',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
         addresses: [
           {
             ip: '127.0.0.1',
@@ -153,6 +171,7 @@ describe('discovery client', () => {
             serverHealthStatus: HEALTH_STATUS_OK,
             healthError: null,
             serverHealthError: null,
+            advertisedModel: null,
           },
         ],
       },
@@ -163,8 +182,18 @@ describe('discovery client', () => {
     const client = createDiscoveryClient({ onListChange, logger })
 
     client.start({ healthPollInterval: 5000 })
-    emitService({ name: 'opentrons-dev', ip: '127.0.0.1', port: 31950 })
-    emitService({ name: 'opentrons-dev', ip: '127.0.0.1', port: 31950 })
+    emitService({
+      name: 'opentrons-dev',
+      ip: '127.0.0.1',
+      port: 31950,
+      robotModel: 'OT-2 Standard',
+    })
+    emitService({
+      name: 'opentrons-dev',
+      ip: '127.0.0.1',
+      port: 31950,
+      robotModel: 'OT-2 Standard',
+    })
 
     expect(onListChange).toHaveBeenCalledTimes(1)
   })
@@ -173,7 +202,12 @@ describe('discovery client', () => {
     const client = createDiscoveryClient({ onListChange, logger })
 
     client.start({ healthPollInterval: 5000 })
-    emitService({ name: 'opentrons-dev', ip: '127.0.0.1', port: 31950 })
+    emitService({
+      name: 'opentrons-dev',
+      ip: '127.0.0.1',
+      port: 31950,
+      robotModel: 'OT-3 Standard',
+    })
 
     expect(healthPoller.start).toHaveBeenLastCalledWith({
       list: [{ ip: '127.0.0.1', port: 31950 }],
@@ -184,8 +218,18 @@ describe('discovery client', () => {
     const client = createDiscoveryClient({ onListChange, logger })
 
     client.start({ healthPollInterval: 5000 })
-    emitService({ name: 'opentrons-dev', ip: '127.0.0.1', port: 31950 })
-    emitService({ name: 'opentrons-dev', ip: '127.0.0.1', port: 31950 })
+    emitService({
+      name: 'opentrons-dev',
+      ip: '127.0.0.1',
+      port: 31950,
+      robotModel: null,
+    })
+    emitService({
+      name: 'opentrons-dev',
+      ip: '127.0.0.1',
+      port: 31950,
+      robotModel: null,
+    })
 
     expect(healthPoller.start).toHaveBeenCalledTimes(2)
   })
@@ -209,7 +253,12 @@ describe('discovery client', () => {
     healthPoller.start.mockClear()
 
     // this shouldn't happen while the mDNS browser stopped but is useful to testing
-    emitService({ name: 'opentrons-dev', ip: '127.0.0.1', port: 31950 })
+    emitService({
+      name: 'opentrons-dev',
+      ip: '127.0.0.1',
+      port: 31950,
+      robotModel: null,
+    })
 
     expect(onListChange).toHaveBeenCalledTimes(0)
     expect(healthPoller.start).toHaveBeenCalledTimes(0)
@@ -220,8 +269,8 @@ describe('discovery client', () => {
     const initialRobots = [
       {
         name: 'opentrons-dev',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockOT3HealthResponse,
+        serverHealth: mockOT3ServerHealthResponse,
         addresses: [
           {
             ip: '127.0.0.1',
@@ -231,6 +280,7 @@ describe('discovery client', () => {
             serverHealthStatus: HEALTH_STATUS_OK,
             healthError: null,
             serverHealthError: null,
+            advertisedModel: 'OT-3 Standard',
           },
         ],
       },
@@ -245,8 +295,8 @@ describe('discovery client', () => {
     expect(client.getRobots()).toEqual([
       {
         name: 'opentrons-dev',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockOT3HealthResponse,
+        serverHealth: mockOT3ServerHealthResponse,
         addresses: [
           {
             ip: '127.0.0.1',
@@ -256,6 +306,7 @@ describe('discovery client', () => {
             serverHealthStatus: null,
             healthError: null,
             serverHealthError: null,
+            advertisedModel: 'OT-3 Standard',
           },
         ],
       },
@@ -267,8 +318,8 @@ describe('discovery client', () => {
     const initialRobots = [
       {
         name: 'opentrons-dev',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockOT2HealthResponse,
+        serverHealth: mockOT2ServerHealthResponse,
         addresses: [
           {
             ip: '127.0.0.1',
@@ -278,6 +329,7 @@ describe('discovery client', () => {
             serverHealthStatus: HEALTH_STATUS_OK,
             healthError: null,
             serverHealthError: null,
+            advertisedModel: 'OT-2 Standard',
           },
         ],
       },
@@ -312,8 +364,8 @@ describe('discovery client', () => {
     const initialRobots = [
       {
         name: 'opentrons-dev',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
         addresses: [
           {
             ip: '127.0.0.1',
@@ -323,6 +375,7 @@ describe('discovery client', () => {
             serverHealthStatus: HEALTH_STATUS_OK,
             healthError: null,
             serverHealthError: null,
+            advertisedModel: null,
           },
           {
             ip: '127.0.0.2',
@@ -332,6 +385,7 @@ describe('discovery client', () => {
             serverHealthStatus: HEALTH_STATUS_OK,
             healthError: null,
             serverHealthError: null,
+            advertisedModel: null,
           },
         ],
       },

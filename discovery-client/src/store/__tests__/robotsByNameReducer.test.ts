@@ -1,7 +1,7 @@
 // discovery client reducer
 import {
-  mockHealthResponse,
-  mockServerHealthResponse,
+  mockLegacyHealthResponse,
+  mockLegacyServerHealthResponse,
   mockHealthErrorJsonResponse,
 } from '../../__fixtures__/health'
 
@@ -43,19 +43,19 @@ describe('robotsByName reducer', () => {
       initialRobots: [
         {
           name: 'opentrons-1',
-          health: mockHealthResponse,
-          serverHealth: mockServerHealthResponse,
+          health: mockLegacyHealthResponse,
+          serverHealth: mockLegacyServerHealthResponse,
           addresses: [],
         },
         {
           name: 'opentrons-2',
           health: null,
-          serverHealth: mockServerHealthResponse,
+          serverHealth: mockLegacyServerHealthResponse,
           addresses: [],
         },
         {
           name: 'opentrons-3',
-          health: mockHealthResponse,
+          health: mockLegacyHealthResponse,
           serverHealth: null,
           addresses: [],
         },
@@ -66,17 +66,17 @@ describe('robotsByName reducer', () => {
     expect(state).toEqual({
       'opentrons-1': {
         name: 'opentrons-1',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
       },
       'opentrons-2': {
         name: 'opentrons-2',
         health: null,
-        serverHealth: mockServerHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
       },
       'opentrons-3': {
         name: 'opentrons-3',
-        health: mockHealthResponse,
+        health: mockLegacyHealthResponse,
         serverHealth: null,
       },
     })
@@ -87,6 +87,7 @@ describe('robotsByName reducer', () => {
       name: 'opentrons-dev',
       ip: '127.0.0.1',
       port: 31950,
+      robotModel: null,
     })
     const initialState = {}
 
@@ -104,6 +105,7 @@ describe('robotsByName reducer', () => {
       name: 'opentrons-dev',
       ip: '127.0.0.1',
       port: 31950,
+      robotModel: null,
     })
     const initialState: RobotsByNameMap = {
       'opentrons-dev': {
@@ -125,8 +127,8 @@ describe('robotsByName reducer', () => {
     const action = Actions.healthPolled({
       ip: '127.0.0.1',
       port: 31950,
-      health: mockHealthResponse,
-      serverHealth: mockServerHealthResponse,
+      health: mockLegacyHealthResponse,
+      serverHealth: mockLegacyServerHealthResponse,
       healthError: null,
       serverHealthError: null,
     })
@@ -136,8 +138,8 @@ describe('robotsByName reducer', () => {
     expect(nextState).toEqual({
       'opentrons-dev': {
         name: 'opentrons-dev',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
       },
     })
   })
@@ -146,8 +148,8 @@ describe('robotsByName reducer', () => {
     const action = Actions.healthPolled({
       ip: '127.0.0.1',
       port: 31950,
-      health: mockHealthResponse,
-      serverHealth: mockServerHealthResponse,
+      health: mockLegacyHealthResponse,
+      serverHealth: mockLegacyServerHealthResponse,
       healthError: null,
       serverHealthError: null,
     })
@@ -163,8 +165,8 @@ describe('robotsByName reducer', () => {
     expect(nextState).toEqual({
       'opentrons-dev': {
         name: 'opentrons-dev',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
       },
     })
   })
@@ -181,8 +183,8 @@ describe('robotsByName reducer', () => {
     const initialState = {
       'opentrons-dev': {
         name: 'opentrons-dev',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
       },
     }
     const nextState = robotsByNameReducer(initialState, action)
@@ -196,7 +198,7 @@ describe('robotsByName reducer', () => {
     const action = Actions.healthPolled({
       ip: '127.0.0.1',
       port: 31950,
-      health: mockHealthResponse,
+      health: mockLegacyHealthResponse,
       serverHealth: null,
       healthError: null,
       serverHealthError: mockHealthErrorJsonResponse,
@@ -205,7 +207,7 @@ describe('robotsByName reducer', () => {
       'opentrons-dev': {
         name: 'opentrons-dev',
         health: null,
-        serverHealth: mockServerHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
       },
     }
     const nextState = robotsByNameReducer(initialState, action)
@@ -213,8 +215,8 @@ describe('robotsByName reducer', () => {
     expect(nextState).toEqual({
       'opentrons-dev': {
         name: 'opentrons-dev',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
       },
     })
   })
@@ -224,14 +226,14 @@ describe('robotsByName reducer', () => {
       ip: '127.0.0.1',
       port: 31950,
       health: null,
-      serverHealth: mockServerHealthResponse,
+      serverHealth: mockLegacyServerHealthResponse,
       healthError: mockHealthErrorJsonResponse,
       serverHealthError: null,
     })
     const initialState = {
       'opentrons-dev': {
         name: 'opentrons-dev',
-        health: mockHealthResponse,
+        health: mockLegacyHealthResponse,
         serverHealth: null,
       },
     }
@@ -240,8 +242,8 @@ describe('robotsByName reducer', () => {
     expect(nextState).toEqual({
       'opentrons-dev': {
         name: 'opentrons-dev',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
       },
     })
   })
@@ -250,17 +252,17 @@ describe('robotsByName reducer', () => {
     const action = Actions.healthPolled({
       ip: '127.0.0.1',
       port: 31950,
-      health: mockHealthResponse,
-      serverHealth: mockServerHealthResponse,
+      health: mockLegacyHealthResponse,
+      serverHealth: mockLegacyServerHealthResponse,
       healthError: null,
       serverHealthError: null,
     })
     const initialState = {
       'opentrons-dev': {
         name: 'opentrons-dev',
-        health: { ...mockHealthResponse, api_version: '0.0.0' },
+        health: { ...mockLegacyHealthResponse, api_version: '0.0.0' },
         serverHealth: {
-          ...mockServerHealthResponse,
+          ...mockLegacyServerHealthResponse,
           apiServerVersion: '0.0.0',
         },
       },
@@ -270,8 +272,8 @@ describe('robotsByName reducer', () => {
     expect(nextState).toEqual({
       'opentrons-dev': {
         name: 'opentrons-dev',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
       },
     })
   })
@@ -280,16 +282,16 @@ describe('robotsByName reducer', () => {
     const action = Actions.healthPolled({
       ip: '127.0.0.1',
       port: 31950,
-      health: mockHealthResponse,
-      serverHealth: mockServerHealthResponse,
+      health: mockLegacyHealthResponse,
+      serverHealth: mockLegacyServerHealthResponse,
       healthError: null,
       serverHealthError: null,
     })
     const initialState = {
       'opentrons-dev': {
         name: 'opentrons-dev',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
       },
     }
     const nextState = robotsByNameReducer(initialState, action)
@@ -304,8 +306,8 @@ describe('robotsByName reducer', () => {
     const initialState = {
       'opentrons-dev': {
         name: 'opentrons-dev',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
       },
     }
     const nextState = robotsByNameReducer(initialState, action)
@@ -318,8 +320,8 @@ describe('robotsByName reducer', () => {
     const initialState = {
       'opentrons-other': {
         name: 'opentrons-dev',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
       },
     }
     const nextState = robotsByNameReducer(initialState, action)
