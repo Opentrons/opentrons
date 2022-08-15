@@ -1,4 +1,9 @@
 """Dispense-in-place command request, result, and implementation models."""
+
+# TODO(mm, 2022-08-15): This command is not yet in the JSON protocol schema.
+# Before our production code emits this command, we must add it to the schema,
+# and probably bump the schema version.
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
