@@ -48,7 +48,7 @@ describe('ConfigurePipette', () => {
       formId: 'id',
     }
     when(mockGetRequestById)
-      .calledWith((undefined as any) as State, 'id')
+      .calledWith({} as State, 'id')
       .mockReturnValue({
         status: RobotApi.SUCCESS,
         response: {
@@ -60,7 +60,7 @@ describe('ConfigurePipette', () => {
       })
     mockGetConfig.mockReturnValue({} as any)
     when(mockGetAttachedPipetteSettingsFieldsById)
-      .calledWith((undefined as any) as State, mockRobotName, 'id')
+      .calledWith({} as State, mockRobotName, 'id')
       .mockReturnValue(mockPipetteSettingsFieldsMap)
     dispatchApiRequest = jest.fn()
     when(mockUseDispatchApiRequest)
