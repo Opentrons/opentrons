@@ -103,64 +103,62 @@ export const HeaterShakerSlideout = (
   }
 
   return (
-    <>
-      <Slideout
-        title={t('set_status_heater_shaker', {
-          part: modulePart,
-          name: moduleName,
-        })}
-        onCloseClick={handleCloseSlideout}
-        isExpanded={isExpanded}
-        footer={
-          <SubmitPrimaryButton
-            form="HeaterShakerSlideout_submitValue"
-            value={t('confirm')}
-            onClick={sendSetTemperatureOrShakeCommand}
-            disabled={hsValue === null || errorMessage !== null}
-            data-testid={`HeaterShakerSlideout_btn_${module.serialNumber}`}
-          />
-        }
+    <Slideout
+      title={t('set_status_heater_shaker', {
+        part: modulePart,
+        name: moduleName,
+      })}
+      onCloseClick={handleCloseSlideout}
+      isExpanded={isExpanded}
+      footer={
+        <SubmitPrimaryButton
+          form="HeaterShakerSlideout_submitValue"
+          value={t('confirm')}
+          onClick={sendSetTemperatureOrShakeCommand}
+          disabled={hsValue === null || errorMessage !== null}
+          data-testid={`HeaterShakerSlideout_btn_${module.serialNumber}`}
+        />
+      }
+    >
+      <StyledText
+        fontWeight={TYPOGRAPHY.fontWeightRegular}
+        fontSize={TYPOGRAPHY.fontSizeP}
+        paddingTop={SPACING.spacing2}
+        data-testid={`HeaterShakerSlideout_title_${module.serialNumber}`}
+      >
+        {t('set_target_temp_of_hs')}
+      </StyledText>
+      <Flex
+        marginTop={SPACING.spacing4}
+        flexDirection={DIRECTION_COLUMN}
+        data-testid={`HeaterShakerSlideout_input_field_${module.serialNumber}`}
       >
         <StyledText
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          fontSize={TYPOGRAPHY.fontSizeP}
-          paddingTop={SPACING.spacing2}
-          data-testid={`HeaterShakerSlideout_title_${module.serialNumber}`}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          fontSize={TYPOGRAPHY.fontSizeH6}
+          color={COLORS.darkGrey}
+          marginBottom={SPACING.spacing3}
         >
-          {t('set_target_temp_of_hs')}
+          {t('set_block_temp')}
         </StyledText>
-        <Flex
-          marginTop={SPACING.spacing4}
-          flexDirection={DIRECTION_COLUMN}
-          data-testid={`HeaterShakerSlideout_input_field_${module.serialNumber}`}
-        >
-          <StyledText
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            fontSize={TYPOGRAPHY.fontSizeH6}
-            color={COLORS.darkGrey}
-            marginBottom={SPACING.spacing3}
-          >
-            {t('set_block_temp')}
-          </StyledText>
-          <form id="HeaterShakerSlideout_submitValue">
-            <InputField
-              data-testid={`${module.moduleModel}_setTemp`}
-              id={`${module.moduleModel}_setTemp`}
-              units={unit}
-              autoFocus
-              value={hsValue != null ? Math.round(hsValue) : null}
-              onChange={e => setHsValue(e.target.valueAsNumber)}
-              type="number"
-              caption={t('module_status_range', {
-                min: inputMin,
-                max: inputMax,
-                unit: unit,
-              })}
-              error={errorMessage}
-            />
-          </form>
-        </Flex>
-      </Slideout>
-    </>
+        <form id="HeaterShakerSlideout_submitValue">
+          <InputField
+            data-testid={`${module.moduleModel}_setTemp`}
+            id={`${module.moduleModel}_setTemp`}
+            units={unit}
+            autoFocus
+            value={hsValue != null ? Math.round(hsValue) : null}
+            onChange={e => setHsValue(e.target.valueAsNumber)}
+            type="number"
+            caption={t('module_status_range', {
+              min: inputMin,
+              max: inputMax,
+              unit: unit,
+            })}
+            error={errorMessage}
+          />
+        </form>
+      </Flex>
+    </Slideout>
   )
 }

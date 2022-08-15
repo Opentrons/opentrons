@@ -48,7 +48,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const { t } = useTranslation(['heater_shaker', 'device_details'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const [isExpanded, setExpanded] = React.useState(false)
-  const [shakeValue, setShakeValue] = React.useState<string | null>(null)
+  const [shakeValue, setShakeValue] = React.useState<number | null>(null)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const isShaking = module.data.speedStatus !== 'idle'
@@ -64,7 +64,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
     commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
       moduleId: module.id,
-      rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
+      rpm: shakeValue !== null ? shakeValue : 0,
     },
   }
 
@@ -95,8 +95,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   }
 
   const errorMessage =
-    shakeValue != null &&
-    (parseInt(shakeValue) < HS_RPM_MIN || parseInt(shakeValue) > HS_RPM_MAX)
+    shakeValue != null && (shakeValue < HS_RPM_MIN || shakeValue > HS_RPM_MAX)
       ? t('device_details:input_out_of_range')
       : null
 
@@ -181,8 +180,8 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             <InputField
               data-testid="TestShake_shake_input"
               units={RPM}
-              value={shakeValue}
-              onChange={e => setShakeValue(e.target.value)}
+              value={shakeValue != null ? Math.round(shakeValue) : null}
+              onChange={e => setShakeValue(e.target.valueAsNumber)}
               type="number"
               caption={t('min_max_rpm', {
                 min: HS_RPM_MIN,
