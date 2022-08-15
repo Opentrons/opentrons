@@ -56,3 +56,8 @@ export const getUpdateChannelOptions = (state: State): SelectOption[] => {
     ? UPDATE_CHANNEL_OPTS_WITH_ALPHA
     : UPDATE_CHANNEL_OPTS
 }
+
+export const getIsOnDevice: (state: State) => boolean = createSelector(
+  getConfig,
+  config => config?.isOnDevice ?? false
+)
