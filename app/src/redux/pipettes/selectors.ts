@@ -83,6 +83,13 @@ export const getAttachedPipetteSettings: (
   }
 )
 
+export const getAttachedPipetteSettingsFieldsById = (
+  state: State,
+  robotName: string,
+  pipetteId: string
+): Types.PipetteSettingsFieldsMap | null =>
+  state?.pipettes?.[robotName]?.settingsById?.[pipetteId]?.fields ?? null
+
 export const getAttachedPipetteCalibrations: (
   state: State,
   robotName: string | null
