@@ -122,7 +122,7 @@ class DurationEstimator:
         duration = 0.0
         # TODO (al, 2021-09-09):
         #  - Make this into a map
-        #  - Remove "# noqa: C901"
+        #  - Remove "noqa: C901"
         #  - type the payload in the on_X methods.
         if message_name == types.PICK_UP_TIP:
             duration = self.on_pick_up_tip(payload=payload)
