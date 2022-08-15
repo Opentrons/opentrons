@@ -358,6 +358,20 @@ class LegacyCommandMapper:
         location = command["payload"]["location"]
         volume = command["payload"]["volume"]
         flow_rate = command["payload"]["rate"]
+        #   TODO:(jr, 15.08.2022): aspirate and dispense commands with no specified labware
+        #   get filtered into custom. Refactor this in followup legacy command mapping
+        if isinstance(location, Location) and location.labware.is_empty:
+            return pe_commands.Custom.construct(
+                id=command_id,
+                key=command_id,
+                status=pe_commands.CommandStatus.RUNNING,
+                createdAt=now,
+                startedAt=now,
+                params=LegacyCommandParams.construct(
+                    legacyCommandType=command["name"],
+                    legacyCommandText=command["payload"]["text"],
+                ),
+            )
         if isinstance(location, LegacyWell):
             well = location
         elif isinstance(location, Location):
