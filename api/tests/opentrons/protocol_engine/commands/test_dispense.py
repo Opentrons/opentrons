@@ -32,7 +32,7 @@ async def test_dispense_implementation(
         flowRate=1.23,
     )
 
-    async def _rehearse_dispense() -> None:
+    async def _rehearse_dispense(*args: object, **kwargs: object) -> None:
         decoy.when(
             await pipetting.dispense_in_place(
                 pipette_id="pipette-id-abc123",
@@ -48,7 +48,7 @@ async def test_dispense_implementation(
             well_name="A3",
             well_location=well_location,
         )
-    ).then_do(_rehearse_dispense)  # TODO: Update Decoy to latest for this to work.
+    ).then_do(_rehearse_dispense)
 
     result = await subject.execute(data)
 
