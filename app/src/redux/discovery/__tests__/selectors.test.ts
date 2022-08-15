@@ -251,7 +251,6 @@ const EXPECTED_FIZZBUZZ = {
   name: 'fizzbuzz',
   displayName: 'fizzbuzz',
   status: CONNECTABLE,
-  connected: false,
   local: false,
   seen: true,
   health: mockOT3HealthResponse,
