@@ -39,7 +39,8 @@ const INITIAL_STATE: State = {
 const makeHostState = (
   ip: string,
   port: number,
-  robotName: string
+  robotName: string,
+  advertisedModel: string | null
 ): HostState => ({
   ip,
   port,
@@ -49,6 +50,7 @@ const makeHostState = (
   serverHealthStatus: null,
   healthError: null,
   serverHealthError: null,
+  advertisedModel: advertisedModel,
 })
 
 const getHealthStatus = (
@@ -128,7 +130,9 @@ export const hostsByIpReducer = (
       if (!initialRobots) return state
 
       const states = initialRobots.flatMap<HostState>(({ name, addresses }) => {
-        return addresses.map(({ ip, port }) => makeHostState(ip, port, name))
+        return addresses.map(({ ip, port, advertisedModel }) =>
+          makeHostState(ip, port, name, advertisedModel)
+        )
       })
 
       return keyBy(states, 'ip')
@@ -145,7 +149,7 @@ export const hostsByIpReducer = (
     }
 
     case Actions.SERVICE_FOUND: {
-      const { ip, port, name: robotName } = action.payload
+      const { ip, port, name: robotName, robotModel } = action.payload
       const host: HostState | undefined = state[ip]
       const newHost = host?.robotName !== robotName
       const nextHostState = {
@@ -157,6 +161,7 @@ export const hostsByIpReducer = (
         serverHealthStatus: newHost ? null : host?.serverHealthStatus ?? null,
         healthError: newHost ? null : host?.healthError ?? null,
         serverHealthError: newHost ? null : host?.serverHealthError ?? null,
+        advertisedModel: robotModel,
       }
 
       return isEqual(host, nextHostState)
@@ -187,6 +192,8 @@ export const hostsByIpReducer = (
         healthStatus !== HEALTH_STATUS_UNREACHABLE ||
         serverHealthStatus !== HEALTH_STATUS_UNREACHABLE
 
+      const advertisedModel = host?.advertisedModel ?? null
+
       const nextHostState = {
         ip,
         port,
@@ -196,6 +203,7 @@ export const hostsByIpReducer = (
         healthError,
         serverHealthError,
         robotName,
+        advertisedModel,
       }
 
       // if we get a healthy poll on a given IP, remove any unhealthy, unseen

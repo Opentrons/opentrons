@@ -213,7 +213,7 @@ describe('ChooseRobotSlideout', () => {
   })
   it('if selected robot is on a different version of the software than the app, disable CTA and show link to device details in options', () => {
     when(mockGetBuildrootUpdateDisplayInfo)
-      .calledWith((undefined as any) as State, 'opentrons-robot-name')
+      .calledWith(({} as any) as State, 'opentrons-robot-name')
       .mockReturnValue({
         autoUpdateAction: 'upgrade',
         autoUpdateDisabledReason: null,
