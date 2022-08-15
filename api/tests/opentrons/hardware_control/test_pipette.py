@@ -124,20 +124,6 @@ def test_tip_overlap(config_model):
     assert pip.config.tip_overlap == pipette_config.configs[config_model]["tipOverlap"]
 
 
-model_numbers = [0, 1, 65535, 700]
-
-
-@pytest.mark.parametrize("model", model_numbers)
-def test_synthesize_model_name(model):
-    """This test makes sure that pipette model names are not being set to an unknown model number
-    as a result of the eeprom being unwritten.
-    """
-    model_name = OT3Simulator.synthesize_model_name(model)
-    unknown_model_num = 65535
-    if model != unknown_model_num:
-        assert model_name[-(len(str(model))) :] == str(model)
-    else:
-        assert model_name[-1] == "0"
 
 
 def test_flow_rate_setting():

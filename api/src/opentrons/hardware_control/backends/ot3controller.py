@@ -377,12 +377,12 @@ class OT3Controller:
         await self._probe_core()
         attached = await self._tool_detector.detect()
 
-        def _check_if_eeprom_unwritten(model: int) -> int:
+        def _check_if_eeprom_unwritten(model: int) -> str:
             unknown_model_num = 65535
             if model == unknown_model_num:
                 log.warning("Changing unknown model number to 0")
-                return 0
-            return model
+                return "0"
+            return str(model)
 
         def _synthesize_model_name(
             name: FirmwarePipetteName, model: int
@@ -391,7 +391,7 @@ class OT3Controller:
             #   may need to change also
             return cast(
                 "PipetteModel",
-                name.name + "_v3." + str(_check_if_eeprom_unwritten(model)),
+                name.name + "_v3." + _check_if_eeprom_unwritten(model),
             )
 
         def _build_attached_pip(
