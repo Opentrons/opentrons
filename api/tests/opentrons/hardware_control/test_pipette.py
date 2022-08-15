@@ -4,7 +4,6 @@ from opentrons.types import Point
 from opentrons.hardware_control.instruments import pipette
 from opentrons.hardware_control import types
 from opentrons.config import pipette_config
-from opentrons.hardware_control.backends.ot3simulator import OT3Simulator
 
 
 PIP_CAL = cal_types.PipetteOffsetByPipetteMount(
