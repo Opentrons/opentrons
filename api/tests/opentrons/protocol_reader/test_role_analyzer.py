@@ -4,7 +4,7 @@ from decoy import matchers
 from pathlib import Path
 from typing import List, NamedTuple
 
-from opentrons_shared_data.protocol.models import ProtocolSchemaV6, protocol_schema_v6
+from opentrons_shared_data.protocol.models import ProtocolSchemaV6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocols.models import JsonProtocol
 from opentrons.protocol_reader.file_reader_writer import BufferedFile
@@ -159,11 +159,6 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                     labwareDefinitions={
                         "uri": LabwareDefinition.construct()  # type: ignore[call-arg]
                     },
-                    liquids={
-                        "liquid-id": protocol_schema_v6.LiquidCreate(
-                            displayName="water", description="water desc"
-                        )
-                    },
                 ),
             ),
         ],
@@ -173,7 +168,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
                 contents=b"",
                 path=None,
                 data=ProtocolSchemaV6.construct(  # type: ignore[call-arg]
-                    labwareDefinitions=matchers.Anything(), liquids=matchers.Anything()
+                    labwareDefinitions=matchers.Anything()
                 ),
             ),
             labware_files=[],

@@ -45,7 +45,6 @@ def json_protocol_file(tmp_path: Path) -> Path:
                 "labwareDefinitions": {
                     "opentrons/opentrons_96_tiprack_300ul/1": tip_rack_def,
                 },
-                "liquids_by_id": {},
                 "commands": [
                     {
                         "id": "command-id-1",

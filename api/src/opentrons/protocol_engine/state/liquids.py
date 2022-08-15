@@ -34,7 +34,7 @@ class LiquidStore(HasState[LiquidState], HandlesActions):
 
 
 class LiquidView(HasState[LiquidState]):
-    """Read-only labware state view."""
+    """Read-only liquid state view."""
 
     _state: LiquidState
 
@@ -42,7 +42,7 @@ class LiquidView(HasState[LiquidState]):
         """Initialize the computed view of liquid state.
 
         Arguments:
-            state: Labware state dataclass used for all calculations.
+            state: Liquid state dataclass used for all calculations.
         """
         self._state = state
 

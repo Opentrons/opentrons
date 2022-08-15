@@ -48,7 +48,7 @@ class LabwareState:
     # Indexed by LabwareOffset.id.
     # We rely on Python 3.7+ preservation of dict insertion order.
     labware_offsets_by_id: Dict[str, LabwareOffset]
-    # Indexed by labware id
+
     definitions_by_uri: Dict[str, LabwareDefinition]
     deck_definition: DeckDefinitionV3
 
