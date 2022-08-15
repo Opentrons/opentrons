@@ -228,20 +228,11 @@ class LegacyCommandMapper:
         now: datetime,
     ) -> pe_commands.Command:
         engine_command: pe_commands.Command
-        if (
-            command["name"] == legacy_command_types.PICK_UP_TIP
-            and "instrument" in command["payload"]
-            and "location" in command["payload"]
-            and isinstance(command["payload"]["location"], LegacyWell)
-        ):
+        if command["name"] == legacy_command_types.PICK_UP_TIP:
             engine_command = self._build_pick_up_tip_command(
                 command=command, command_id=command_id, now=now
             )
-        elif (
-            command["name"] == legacy_command_types.DROP_TIP
-            and "instrument" in command["payload"]
-            and "location" in command["payload"]
-        ):
+        elif command["name"] == legacy_command_types.DROP_TIP:
             engine_command = self._build_drop_tip_command(
                 command=command, command_id=command_id, now=now
             )
