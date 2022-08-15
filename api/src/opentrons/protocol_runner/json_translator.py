@@ -159,8 +159,7 @@ class JsonTranslator:
     ) -> List[pe_commands.CommandCreate]:
         """Takes json protocol v6 and translates commands->protocol engine commands."""
         commands_list: List[pe_commands.CommandCreate] = []
-        commands_to_parse = [command for command in protocol.commands]
-        for command in commands_to_parse:
+        for command in protocol.commands:
             if command.commandType == "loadPipette":
                 translated_obj = _translate_pipette_command(protocol, command)
             elif command.commandType == "loadModule":
