@@ -195,6 +195,8 @@ class PipetteName(int, Enum):
 
     p1000_single = 0x00
     p1000_multi = 0x01
+    p50_single = 0x02
+    p50_multi = 0x03
 
 
 @unique
