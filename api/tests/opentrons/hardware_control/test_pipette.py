@@ -124,8 +124,6 @@ def test_tip_overlap(config_model):
     assert pip.config.tip_overlap == pipette_config.configs[config_model]["tipOverlap"]
 
 
-
-
 def test_flow_rate_setting():
     pip = pipette.Pipette(pipette_config.load("p300_single_v2.0"), PIP_CAL, "testId")
     # pipettes should load settings from config at init time

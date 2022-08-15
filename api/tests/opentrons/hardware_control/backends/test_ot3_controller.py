@@ -256,9 +256,12 @@ async def test_probing(
 
 
 model_numbers = [0, 65535]
+
+
 @pytest.mark.parametrize("model", model_numbers)
-async def test_get_attached_instruments(model: int,
-    controller: OT3Controller, mock_tool_detector: OneshotToolDetector):
+async def test_get_attached_instruments(
+    model: int, controller: OT3Controller, mock_tool_detector: OneshotToolDetector
+):
     async def fake_probe(can_messenger, expected, timeout):
         return set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head, NodeId.gripper))
 
@@ -266,7 +269,9 @@ async def test_get_attached_instruments(model: int,
         assert await controller.get_attached_instruments({}) == {}
 
     mock_tool_detector.return_value = ToolSummary(
-        left=PipetteInformation(name=PipetteName.p1000_single, model=model, serial="hello"),
+        left=PipetteInformation(
+            name=PipetteName.p1000_single, model=model, serial="hello"
+        ),
         right=None,
         gripper=GripperInformation(model=model, serial="fake_serial"),
     )
@@ -278,6 +283,7 @@ async def test_get_attached_instruments(model: int,
     assert detected[OT3Mount.LEFT]["config"].name == "p1000_single_gen3"
     assert detected[OT3Mount.GRIPPER]["id"] == "fake_serial"
     assert detected[OT3Mount.GRIPPER]["config"].name == "gripper"
+
 
 def test_nodeid_replace_head():
     assert OT3Controller._replace_head_node(set([NodeId.head, NodeId.gantry_x])) == set(
