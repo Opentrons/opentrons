@@ -26,8 +26,10 @@ def _translate_labware_command(
     # v6 data model supports all commands and therefor most props are optional.
     # load labware command must contain labware_id and definition_id.
     assert labware_id is not None
-    definition_id = protocol.labware[labware_id].definitionId
-    assert definition_id is not None
+    try:
+        definition_id = protocol.labware[labware_id].definitionId
+    except KeyError:
+        raise CommandTranslatorError()
     labware_command = pe_commands.LoadLabwareCreate(
         params=pe_commands.LoadLabwareParams(
             labwareId=command.params.labwareId,
@@ -95,10 +97,6 @@ def _translate_liquid_command(
     assert liquidId is not None
     assert labwareId is not None
     assert volumeByWell is not None
-
-    assert protocol.liquids is not None
-    liquid = protocol.liquids[liquidId]
-    assert liquid is not None
 
     liquid_command = pe_commands.LoadLiquidCreate(
         params=pe_commands.LoadLiquidParams(
