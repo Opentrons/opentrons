@@ -16,11 +16,15 @@ from opentrons.protocol_runner import create_simulating_runner
 from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.types import PipetteName
+from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
 from opentrons.types import MountType
 
 LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
     """
     # my protocol
+
+    from opentrons.types import Location, Point
+
     metadata = {
         "apiLevel": "2.11",
     }
@@ -84,11 +88,14 @@ LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
         pipette_left.aspirate()
         pipette_left.dispense()
         pipette_left.blow_out()
+        pipette_left.move_to(Location(point=Point(100, 100, 10),labware=None))
+        pipette_left.blow_out()
         pipette_left.drop_tip(
             location=tip_rack_1.wells_by_name()["A1"]
         )
     """
 )
+# p300.move_to(location=types.Location(point=pt, labware=None))
 
 
 @pytest.fixture
@@ -117,7 +124,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
     pipette_left_result_captor = matchers.Captor()
     pipette_right_result_captor = matchers.Captor()
 
-    assert len(commands_result) == 21
+    assert len(commands_result) == 23
 
     assert commands_result[0] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
@@ -415,21 +422,6 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.DispenseResult(volume=300),
     )
-    #   TODO:(jr, 12.08.2022): blow_out commands with no location get filtered
-    #   into custom. Refactor this in followup legacy command mapping
-    # assert commands_result[19] == commands.Custom.construct(
-    #     id=matchers.IsA(str),
-    #     key=matchers.IsA(str),
-    #     status=commands.CommandStatus.SUCCEEDED,
-    #     createdAt=matchers.IsA(datetime),
-    #     startedAt=matchers.IsA(datetime),
-    #     completedAt=matchers.IsA(datetime),
-    #     params=LegacyCommandParams(
-    #         legacyCommandText="Blowing out at B1 of Opentrons 96 Well Aluminum Block with NEST Well Plate 100 µL on 3",
-    #         legacyCommandType="command.BLOW_OUT",
-    #     ),
-    #     result=commands.CustomResult(),
-    # )
     assert commands_result[19] == commands.BlowOut.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
@@ -445,7 +437,36 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=commands.BlowOutResult(),
     )
-    assert commands_result[20] == commands.DropTip.construct(
+    #   TODO:(jr, 15.08.2022): this should map to move_to when move_to is mapped in a followup ticket RSS-62
+    assert commands_result[20] == commands.Custom.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=LegacyCommandParams(
+            legacyCommandText="Moving to (100, 100, 10)",
+            legacyCommandType="command.MOVE_TO",
+        ),
+        result=commands.CustomResult(),
+    )
+    #   TODO:(jr, 12.08.2022): blow_out commands with no location get filtered
+    #   into custom. Refactor this in followup legacy command mapping
+    assert commands_result[21] == commands.Custom.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=LegacyCommandParams(
+            legacyCommandText="Blowing out at (100, 100, 10)",
+            legacyCommandType="command.BLOW_OUT",
+        ),
+        result=commands.CustomResult(),
+    )
+    assert commands_result[22] == commands.DropTip.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
         status=commands.CommandStatus.SUCCEEDED,
