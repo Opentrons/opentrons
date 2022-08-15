@@ -4,7 +4,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { RunCommandSummary } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-
+import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 import { i18n } from '../../../../i18n'
 import { getLabwareLocation } from '../../ProtocolRun/utils/getLabwareLocation'
 import {
@@ -20,6 +20,7 @@ jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('../../ProtocolRun/utils/getLabwareLocation')
 jest.mock('../../hooks')
 jest.mock('./../RunLogProtocolSetupInfo')
+jest.mock('../utils/getSlotLabwareName')
 
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
@@ -35,6 +36,9 @@ const mockGetLabwareLocation = getLabwareLocation as jest.MockedFunction<
 >
 const mockRunLogProtocolSetupInfo = RunLogProtocolSetupInfo as jest.MockedFunction<
   typeof RunLogProtocolSetupInfo
+>
+const mockGetSlotLabwareName = getSlotLabwareName as jest.MockedFunction<
+  typeof getSlotLabwareName
 >
 
 const render = (props: React.ComponentProps<typeof StepText>) => {
@@ -82,6 +86,10 @@ describe('StepText', () => {
     mockRunLogProtocolSetupInfo.mockReturnValue(
       <div>Mock Protocol Setup Step</div>
     )
+    mockGetSlotLabwareName.mockReturnValue({
+      slotName: 'fake_labware_location',
+      labwareName: 'fake_display_name',
+    })
   })
   afterEach(() => {
     jest.resetAllMocks()

@@ -84,6 +84,10 @@ const HEATER_SHAKER_SLOTS: DropdownOption[] = [
     value: '4',
   },
   {
+    name: 'Slot 6',
+    value: '6',
+  },
+  {
     name: 'Slot 7',
     value: '7',
   },

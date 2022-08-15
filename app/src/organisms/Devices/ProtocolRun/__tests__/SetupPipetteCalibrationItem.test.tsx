@@ -109,7 +109,7 @@ describe('SetupPipetteCalibrationItem', () => {
         pipetteCalDate: 'september 3, 2020',
       },
     })
-    getByRole('link', { name: 'Learn more about pipette compatibility' })
-    getByText('Pipette generation mismatch')
+    getByRole('link', { name: 'Learn more' })
+    getByText('Pipette generation mismatch.')
   })
 })

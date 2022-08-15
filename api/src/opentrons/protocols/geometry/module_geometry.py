@@ -23,6 +23,7 @@ from opentrons.types import Location, Point, LocationLabware
 from opentrons.motion_planning.adjacent_slots_getters import (
     get_north_south_slots,
     get_east_west_slots,
+    get_adjacent_slots,
 )
 
 from opentrons.hardware_control.modules.types import (
@@ -435,6 +436,68 @@ class HeaterShakerGeometry(ModuleGeometry):
                 raise PipetteMovementRestrictedByHeaterShakerError(
                     "Cannot move multi-channel pipette to non-tip rack labware north or south of Heater-Shaker"
                 )
+
+    def is_pipette_blocking_shake_movement(
+        self, pipette_location: Optional[Location]
+    ) -> bool:
+        """Check whether pipette is parked adjacent to heater-shaker.
+
+        Returns True if pipette's last known location was on east/west/north/south of or
+        on the heater-shaker. Also returns True if last location is not known or is
+        not associated with a slot.
+        """
+        if pipette_location is None:
+            # If we don't know the pipette's latest location then let's be extra
+            # cautious and call it blocking
+            return True
+
+        pipette_location_slot = pipette_location.labware.first_parent()
+        if pipette_location_slot is None:
+            # If a location is not associated w/ a slot (e.g., if it has labware=None)
+            # then we don't know if it's close to the h/s, so, we will be cautious
+            # and call it blocking
+            return True
+
+        heater_shaker_slot = self.parent
+
+        assert isinstance(
+            heater_shaker_slot, str
+        ), "Could not determine module slot location"
+
+        return heater_shaker_slot == pipette_location_slot or int(
+            pipette_location_slot
+        ) in get_adjacent_slots(int(heater_shaker_slot))
+
+    def is_pipette_blocking_latch_movement(
+        self, pipette_location: Optional[Location]
+    ) -> bool:
+        """Check whether pipette is parked east or west of heater-shaker.
+
+        Returns True is pipette's last known location was on east/west of or on the
+        heater-shaker. Also returns True if last location is not known or is not
+        associated with a slot.
+        """
+        if pipette_location is None:
+            # If we don't know the pipette's latest location then let's be extra
+            # cautious and call it blocking
+            return True
+
+        pipette_location_slot = pipette_location.labware.first_parent()
+        if pipette_location_slot is None:
+            # If a location is not associated w/ a slot (e.g., if it has labware=None)
+            # then we don't know if it's close to the h/s, so, we will be cautious
+            # and call it blocking
+            return True
+
+        heater_shaker_slot = self.parent
+
+        assert isinstance(
+            heater_shaker_slot, str
+        ), "Could not determine module slot location"
+
+        return heater_shaker_slot == pipette_location_slot or int(
+            pipette_location_slot
+        ) in get_east_west_slots(int(heater_shaker_slot))
 
 
 def _load_from_v1(

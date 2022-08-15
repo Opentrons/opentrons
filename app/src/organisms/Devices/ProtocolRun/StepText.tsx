@@ -4,6 +4,8 @@ import { Flex, ALIGN_CENTER, SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { StyledText } from '../../../atoms/text'
 import { getLabwareLocation } from '../ProtocolRun/utils/getLabwareLocation'
+import { getSlotLabwareName } from './utils/getSlotLabwareName'
+
 import {
   useLabwareRenderInfoForRunById,
   useProtocolDetailsForRun,
@@ -53,7 +55,7 @@ export function StepText(props: Props): JSX.Element | null {
           <Flex
             textTransform={TYPOGRAPHY.textTransformUppercase}
             padding={SPACING.spacing2}
-            id={`RunDetails_CommandList`}
+            id="RunDetails_CommandList"
           >
             {t('comment')}
           </Flex>
@@ -243,40 +245,29 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'aspirate': {
       const { wellName, labwareId, volume, flowRate } = displayCommand.params
-      const labwareLocation = getLabwareLocation(
+      const { slotName, labwareName } = getSlotLabwareName(
         labwareId,
         protocolData.commands
       )
-      if (!('slotName' in labwareLocation)) {
-        throw new Error('expected tip rack to be in a slot')
-      }
       messageNode = t('aspirate', {
         well_name: wellName,
-        labware: getLabwareDisplayName(
-          labwareRenderInfoById[labwareId].labwareDef
-        ),
-        labware_location: labwareLocation.slotName,
+        labware: labwareName,
+        labware_location: slotName,
         volume: volume,
         flow_rate: flowRate,
       })
-
       break
     }
     case 'dispense': {
       const { wellName, labwareId, volume, flowRate } = displayCommand.params
-      const labwareLocation = getLabwareLocation(
+      const { slotName, labwareName } = getSlotLabwareName(
         labwareId,
         protocolData.commands
       )
-      if (!('slotName' in labwareLocation)) {
-        throw new Error('expected tip rack to be in a slot')
-      }
       messageNode = t('dispense', {
         well_name: wellName,
-        labware: getLabwareDisplayName(
-          labwareRenderInfoById[labwareId].labwareDef
-        ),
-        labware_location: labwareLocation.slotName,
+        labware: labwareName,
+        labware_location: slotName,
         volume: volume,
         flow_rate: flowRate,
       })
@@ -285,19 +276,14 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'blowout': {
       const { wellName, labwareId, flowRate } = displayCommand.params
-      const labwareLocation = getLabwareLocation(
+      const { slotName, labwareName } = getSlotLabwareName(
         labwareId,
         protocolData.commands
       )
-      if (!('slotName' in labwareLocation)) {
-        throw new Error('expected tip rack to be in a slot')
-      }
       messageNode = t('blowout', {
         well_name: wellName,
-        labware: getLabwareDisplayName(
-          labwareRenderInfoById[labwareId].labwareDef
-        ),
-        labware_location: labwareLocation.slotName,
+        labware: labwareName,
+        labware_location: slotName,
         flow_rate: flowRate,
       })
       break
@@ -315,19 +301,15 @@ export function StepText(props: Props): JSX.Element | null {
     }
     case 'moveToWell': {
       const { wellName, labwareId } = displayCommand.params
-      const labwareLocation = getLabwareLocation(
+      const { slotName, labwareName } = getSlotLabwareName(
         labwareId,
         protocolData.commands
       )
-      if (!('slotName' in labwareLocation)) {
-        throw new Error('expected tip rack to be in a slot')
-      }
+
       messageNode = t('move_to_well', {
         well_name: wellName,
-        labware: getLabwareDisplayName(
-          labwareRenderInfoById[labwareId].labwareDef
-        ),
-        labware_location: labwareLocation.slotName,
+        labware: labwareName,
+        labware_location: slotName,
       })
       break
     }
