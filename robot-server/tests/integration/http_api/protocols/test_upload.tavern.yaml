@@ -65,3 +65,47 @@ stages:
         errors:
           - id: ProtocolNotFound
             title: Protocol Not Found
+
+---
+test_name: Upload, analyze and analyze using "slow analysis"
+
+marks:
+  - usefixtures:
+      - run_server
+      - set_disable_fast_analysis
+
+stages:
+  - name: Upload simple Python protocol
+    request:
+      url: '{host:s}:{port:d}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/simple.py'
+    response:
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      status_code: 201
+
+  - name: Retry until analyses status is completed and result is ok.
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{host:s}:{port:d}/protocols/{protocol_id}/analyses'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{analysis_id}'
+            status: completed
+            result: ok
+  - name: Delete the protocol
+    request:
+      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      method: DELETE
+    response:
+      status_code: 200

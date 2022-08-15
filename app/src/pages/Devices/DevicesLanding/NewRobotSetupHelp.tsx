@@ -11,7 +11,7 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import { Portal } from '../../../App/portal'
-import { Modal } from '../../../atoms/Modal'
+import { Modal } from '../../../molecules/Modal'
 import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { PrimaryButton } from '../../../atoms/buttons'
 
