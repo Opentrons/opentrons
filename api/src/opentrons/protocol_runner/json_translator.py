@@ -96,7 +96,8 @@ def _translate_liquid_command(
     assert labwareId is not None
     assert volumeByWell is not None
 
-    liquid = protocol.liquids[liquidId]  # type: ignore[index]
+    assert protocol.liquids is not None
+    liquid = protocol.liquids[liquidId]
     assert liquid is not None
 
     liquid_command = pe_commands.LoadLiquidCreate(
