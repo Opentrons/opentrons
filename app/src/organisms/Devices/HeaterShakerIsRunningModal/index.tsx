@@ -12,7 +12,7 @@ import {
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { useAttachedModules } from '../hooks'
-import { Modal } from '../../../atoms/Modal'
+import { Modal } from '../../../molecules/Modal'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
 import { HeaterShakerModule } from '../../../redux/modules/types'
