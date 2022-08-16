@@ -70,7 +70,7 @@ async def test_write_to_sensors(
 @pytest.mark.parametrize(
     argnames=["sensor_type", "expected_data"],
     argvalues=[
-        [SensorType.capacitive, 0.46],
+        [SensorType.capacitive, 0.02],
         # Data should be 12.7291 for humidity
         [SensorType.environment, (0.0, 57.67)],
         [SensorType.pressure, 0.02],
@@ -141,7 +141,7 @@ async def test_read_from_sensors(
         # a request is sent in simulation. When the capacitive
         # driver refactor happens, we should investigate this
         # further. For now this should allow the tests to pass.
-        [SensorType.capacitive, 0.92],
+        [SensorType.capacitive, 0.05],
         [SensorType.pressure, 0.02],
         # Data should be 12.7291 for humidity
         [SensorType.environment, (0.0, 57.67)],
