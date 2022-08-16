@@ -19,7 +19,7 @@ describe('Line', () => {
     const { getByTestId } = render(props)
     const line = getByTestId('line')
     expect(line).toHaveStyle('width: 100%')
-    expect(line).toHaveStyle('borderBottom: 1px solid #e3e3e3')
+    expect(line).toHaveStyle(`borderBottom: 1px solid ${COLORS.medGreyEnabled}`)
   })
 
   it('renders line with additional props', () => {
@@ -32,7 +32,7 @@ describe('Line', () => {
     }
     const { getByTestId } = render(props)
     const line = getByTestId('line')
-    expect(line).toHaveStyle('color: #006cfa')
+    expect(line).toHaveStyle(`color: ${COLORS.blueEnabled}`)
     expect(line).toHaveStyle('width: 80%')
     expect(line).toHaveStyle('margin-top: 0')
     expect(line).toHaveStyle('margin-bottom: 0')
