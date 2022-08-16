@@ -3,6 +3,7 @@ import {
   renderWithProviders,
   TOOLTIP_TOP,
   SPACING,
+  COLORS,
 } from '@opentrons/components'
 import { Tooltip } from '..'
 
@@ -48,8 +49,8 @@ describe('Tooltip', () => {
     expect(tooltip).toBeInTheDocument()
     expect(tooltip).toHaveStyle('position: absolute')
     expect(tooltip).toHaveStyle('left: 0.25rem')
-    expect(tooltip).toHaveStyle('background: #16212d')
-    expect(tooltip).toHaveStyle('color: #fff')
+    expect(tooltip).toHaveStyle(`background: ${COLORS.darkBlackEnabled}`)
+    expect(tooltip).toHaveStyle(`color: ${COLORS.white}`)
     expect(tooltip).toHaveStyle('width: 8.75rem')
     expect(tooltip).toHaveStyle('font-size: 0.625rem')
     expect(tooltip).toHaveAttribute('role', 'tooltip')
@@ -62,7 +63,7 @@ describe('Tooltip', () => {
     expect(tooltip).toHaveStyle('width: 3rem')
   })
 
-  it('not renders children when the tooltip is invisible', () => {
+  it('does not render children when the tooltip is invisible', () => {
     MockTooltipProps.visible = false
     const { queryByText } = render(props)
     const tooltip = queryByText('mock children')
