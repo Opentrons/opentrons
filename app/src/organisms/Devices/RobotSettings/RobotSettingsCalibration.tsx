@@ -424,7 +424,7 @@ export function RobotSettingsCalibration({
 
   const checkDeckCalibrationStatus = (): 'error' | 'warning' | null => {
     if (
-      deckCalibrationStatus &&
+      deckCalibrationStatus != null &&
       deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_OK
     ) {
       return 'error'
