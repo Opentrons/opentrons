@@ -7,11 +7,36 @@ from opentrons_hardware.firmware_bindings.constants import PipetteName
 @pytest.mark.parametrize(
     "scanned_val,name,model,serial",
     [
-        ("P1KSV0102022022", PipetteName.p1000_single, 1, b"02022022"),
-        ("P1KSV3120211129A08", PipetteName.p1000_single, 31, b"20211129A008"),
-        ("P50MV29AABBCCDD", PipetteName.p50_multi, 29, b"AABBCCDD"),
-        ("P1KMV1000000000", PipetteName.p1000_multi, 10, b"00000000"),
-        ("P50SV01", PipetteName.p50_single, 1, b"\x00\x00\x00\x00\x00\x00\x00\x00"),
+        (
+            "P1KSV0102022022",
+            PipetteName.p1000_single,
+            1,
+            b"02022022\x00\x00\x00\x00\x00\x00\x00\x00",
+        ),
+        (
+            "P1KSV3120211129A08",
+            PipetteName.p1000_single,
+            31,
+            b"20211129A08\x00\x00\x00\x00\x00",
+        ),
+        (
+            "P50MV29AABBCCDD",
+            PipetteName.p50_multi,
+            29,
+            b"AABBCCDD\x00\x00\x00\x00\x00\x00\x00\x00",
+        ),
+        (
+            "P1KMV1000000000",
+            PipetteName.p1000_multi,
+            10,
+            b"00000000\x00\x00\x00\x00\x00\x00\x00\x00",
+        ),
+        (
+            "P50SV01",
+            PipetteName.p50_single,
+            1,
+            b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+        ),
     ],
 )
 def test_scan_valid_serials(
@@ -55,9 +80,9 @@ def test_serial_validity(scannedval: str) -> None:
 @pytest.mark.parametrize(
     "data",
     [
-        b"\x00\x00\x00\x00\x00\x00\x00\x00",
-        b"\xff\xff\xff\xff\xff\xff\xff\xff",
-        b"hello  ",
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+        b"\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00",
+        b"hello  \x00\x00\x00\x00",
     ],
 )
 def test_serial_val_from_parts(name: PipetteName, model: int, data: bytes) -> None:
