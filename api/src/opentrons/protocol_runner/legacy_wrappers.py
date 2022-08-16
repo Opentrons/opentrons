@@ -21,10 +21,10 @@ from opentrons.hardware_control.modules.types import (
     HeaterShakerModuleModel as LegacyHeaterShakerModuleModel,
 )
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.context.protocol_api.protocol_context import (
+from opentrons.protocol_api._core.protocol_api.protocol_context import (
     ProtocolContextImplementation as LegacyProtocolContextImplementation,
 )
-from opentrons.protocols.context.simulator.protocol_context import (
+from opentrons.protocol_api._core.simulator.protocol_context import (
     ProtocolContextSimulation as LegacyProtocolContextSimulation,
 )
 

@@ -1,7 +1,8 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, Sequence
-from opentrons.protocols.context.well import WellImplementation
+
+from opentrons.protocol_api._core.well import WellImplementation
 
 
 Wells = Sequence[WellImplementation]

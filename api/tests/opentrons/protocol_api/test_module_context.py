@@ -25,7 +25,7 @@ from opentrons.protocol_api.module_contexts import (
     CannotPerformModuleAction,
     HeaterShakerContext,
 )
-from opentrons.protocols.context.protocol_api.protocol_context import (
+from opentrons.protocol_api._core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
 from opentrons.protocols.geometry.module_geometry import (

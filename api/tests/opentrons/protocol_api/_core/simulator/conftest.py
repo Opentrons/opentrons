@@ -1,15 +1,16 @@
 import pytest
-from opentrons import ThreadManagedHardware, types
-from opentrons.protocols.context.instrument import AbstractInstrument
-from opentrons.protocols.context.labware import AbstractLabware
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
-from opentrons.protocols.context.protocol_api.protocol_context import (
+from opentrons import types
+from opentrons.hardware_control import ThreadManagedHardware
+from opentrons.protocol_api._core.instrument import AbstractInstrument
+from opentrons.protocol_api._core.labware import AbstractLabware
+from opentrons.protocol_api._core.protocol_api.labware import LabwareImplementation
+from opentrons.protocol_api._core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
-from opentrons.protocols.context.simulator.instrument_context import (
+from opentrons.protocol_api._core.simulator.instrument_context import (
     InstrumentContextSimulation,
 )
-from opentrons.protocols.context.simulator.protocol_context import (
+from opentrons.protocol_api._core.simulator.protocol_context import (
     ProtocolContextSimulation,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition

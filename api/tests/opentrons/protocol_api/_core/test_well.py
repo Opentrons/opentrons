@@ -1,5 +1,5 @@
 import pytest
-from opentrons.protocols.context.well import WellImplementation
+from opentrons.protocol_api._core.well import WellImplementation
 
 
 @pytest.mark.parametrize(
@@ -13,7 +13,7 @@ from opentrons.protocols.context.well import WellImplementation
     ],
 )
 def test_row_column(name, row, col):
-    w = WellImplementation(None, None, None, name=name)
+    w = WellImplementation(None, None, None, name=name)  # type: ignore[arg-type]
     assert w.get_name() == name
     assert w.get_row_name() == row
     assert w.get_column_name() == col
@@ -29,4 +29,4 @@ def test_row_column(name, row, col):
 )
 def test_row_column_fail(name):
     with pytest.raises(AssertionError, match=f"could not match '{name}'"):
-        WellImplementation(None, None, None, name=name)
+        WellImplementation(None, None, None, name=name)  # type: ignore[arg-type]

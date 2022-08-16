@@ -28,14 +28,15 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
 )
-from opentrons.protocols.context.labware import AbstractLabware
-from opentrons.protocols.context.protocol import AbstractProtocol
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
     resolve_module_model,
 )
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+
+from ._core.labware import AbstractLabware
+from ._core.protocol import AbstractProtocol
 
 from .instrument_context import InstrumentContext
 from .labware import Labware

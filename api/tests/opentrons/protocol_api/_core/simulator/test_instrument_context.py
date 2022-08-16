@@ -2,12 +2,12 @@
 from typing import Callable
 
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 from opentrons.hardware_control import NoTipAttachedError
 from opentrons.hardware_control.types import TipAttachedError
-from opentrons.protocols.context.labware import AbstractLabware
-from opentrons.protocols.context.instrument import AbstractInstrument
+from opentrons.protocol_api._core.labware import AbstractLabware
+from opentrons.protocol_api._core.instrument import AbstractInstrument
 
 
 @pytest.fixture(
@@ -16,8 +16,8 @@ from opentrons.protocols.context.instrument import AbstractInstrument
         lazy_fixture("simulating_instrument_context"),
     ]
 )
-def subject(request) -> AbstractInstrument:
-    return request.param
+def subject(request: pytest.FixtureRequest) -> AbstractInstrument:
+    return request.param  # type: ignore[attr-defined, no-any-return]
 
 
 def test_same_pipette(

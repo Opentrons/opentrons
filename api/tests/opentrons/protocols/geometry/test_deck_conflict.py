@@ -11,7 +11,7 @@ from opentrons.protocols.geometry.module_geometry import (
     ThermocyclerGeometry,
     HeaterShakerGeometry,
 )
-from opentrons.protocols.context.labware import AbstractLabware
+from opentrons.protocol_api._core.labware import AbstractLabware
 
 from opentrons.protocols.geometry.deck_conflict import DeckConflictError, check
 

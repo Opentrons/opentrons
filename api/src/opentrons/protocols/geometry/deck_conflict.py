@@ -12,7 +12,7 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_adjacent_slots,
 )
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocols.context.labware import AbstractLabware
+from opentrons.protocol_api._core.labware import AbstractLabware
 from opentrons.protocols.geometry.module_geometry import (
     ModuleGeometry,
     ThermocyclerGeometry,

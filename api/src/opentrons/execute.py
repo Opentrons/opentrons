@@ -16,7 +16,7 @@ from opentrons import protocol_api, __version__
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution import execute as execute_apiv2
-from opentrons.protocols.context.protocol_api.protocol_context import (
+from opentrons.protocol_api._core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
 from opentrons.commands import types as command_types

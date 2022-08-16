@@ -1,9 +1,9 @@
 """Test instrument context simulation."""
 import pytest
-from opentrons.protocols.context.protocol import AbstractProtocol
-from pytest_lazyfixture import lazy_fixture
+from opentrons.protocol_api._core.protocol import AbstractProtocol
+from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
-from opentrons.protocols.context.labware import AbstractLabware
+from opentrons.protocol_api._core.labware import AbstractLabware
 from opentrons import types
 
 
@@ -13,8 +13,8 @@ from opentrons import types
         lazy_fixture("simulating_protocol_context"),
     ]
 )
-def subject(request) -> AbstractProtocol:
-    return request.param
+def subject(request: pytest.FixtureRequest) -> AbstractProtocol:
+    return request.param  # type: ignore[attr-defined, no-any-return]
 
 
 def test_load_instrument_fails_when_present(subject: AbstractProtocol) -> None:

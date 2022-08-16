@@ -63,10 +63,10 @@ class WellImplementation:
     def get_geometry(self) -> WellGeometry:
         return self._geometry
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.get_display_name()
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Assume that if name is the same then it's the same well"""
         return (
             isinstance(other, WellImplementation)
