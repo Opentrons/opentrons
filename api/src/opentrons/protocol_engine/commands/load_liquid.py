@@ -4,10 +4,14 @@ from typing import Optional, Type, Dict
 from typing_extensions import Literal
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-
+from ..state import StateView
 
 LoadLiquidCommandType = Literal["loadLiquid"]
 
+class LiquidNotFoundError(Exception):
+    """Liquid not found error."""
+
+    pass
 
 class Liquid(BaseModel):
     """Payload required to create a liquid."""
@@ -44,11 +48,16 @@ class LoadLiquidResult(BaseModel):
 class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidResult]):
     """Load liquid command implementation."""
 
-    def __init__(self, **kwargs: object) -> None:
-        pass
+    def __init__(self, state_view: StateView, **kwargs: object) -> None:
+        self._state_view = state_view
 
     async def execute(self, params: LoadLiquidParams) -> LoadLiquidResult:
         """Load data necessary for a liquid."""
+        liquids = self._state_view.liquid.get_all()
+
+        if not any(x.id == params.liquidId for x in liquids):
+            raise LiquidNotFoundError()
+
         return LoadLiquidResult()
 
 
