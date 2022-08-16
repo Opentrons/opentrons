@@ -8,6 +8,8 @@ on:
     paths:
       - 'update-server/**/*'
       - 'Makefile'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
       - '.github/workflows/update-server-lint-test.yaml'
       - '.github/actions/python/**'
     branches: # ignore any release-related thing (handled elsewhere)
@@ -19,6 +21,8 @@ on:
     paths:
       - 'update-server/**/*'
       - 'Makefile'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
       - '.github/workflows/update-server-lint-test.yaml'
       - '.github/actions/python/**'
   workflow_dispatch:

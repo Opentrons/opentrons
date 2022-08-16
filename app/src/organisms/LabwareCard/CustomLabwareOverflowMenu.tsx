@@ -24,7 +24,7 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { AlertPrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
-import { Modal } from '../../atoms/Modal'
+import { Modal } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import {
   deleteCustomLabwareFile,

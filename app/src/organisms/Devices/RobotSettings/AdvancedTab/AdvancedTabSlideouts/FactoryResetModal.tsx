@@ -6,7 +6,6 @@ import { useHistory } from 'react-router-dom'
 
 import {
   Flex,
-  COLORS,
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
   SPACING,
@@ -16,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../../../../atoms/text'
 import { AlertPrimaryButton, PrimaryButton } from '../../../../../atoms/buttons'
-import { Modal } from '../../../../../atoms/Modal'
+import { Modal } from '../../../../../molecules/Modal'
 import {
   useDispatchApiRequest,
   getRequestById,
@@ -25,7 +24,6 @@ import {
 } from '../../../../../redux/robot-api'
 import { resetConfig } from '../../../../../redux/robot-admin'
 
-import type { IconProps } from '@opentrons/components'
 import type { State } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
 
@@ -42,10 +40,6 @@ export function FactoryResetModal({
   robotName,
   resetOptions,
 }: FactoryResetModalProps): JSX.Element {
-  const reconnectModalIcon: IconProps = {
-    name: 'alert-circle',
-    color: COLORS.blueEnabled,
-  }
   const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
@@ -101,8 +95,8 @@ export function FactoryResetModal({
         </Modal>
       ) : (
         <Modal
+          type="warning"
           title={t('connection_to_robot_lost')}
-          icon={reconnectModalIcon}
           onClose={closeModal}
         >
           <StyledText
