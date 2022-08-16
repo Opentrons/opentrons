@@ -10,11 +10,9 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-
 # [6.1.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.0...v6.1.0-alpha.1) (2022-08-05)
 
 **Note:** Version bump only for package @opentrons/api-server
-
 
 
 
@@ -56,6 +54,15 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **heater-shaker:** add firmware upload capability ([#10307](https://github.com/Opentrons/opentrons/issues/10307)) ([a77b08d](https://github.com/Opentrons/opentrons/commit/a77b08d85dea1b64e7cbe5d71251f21d8e444747))
 * **papiv2:** retract pipettes before shaking or opening latch ([#11268](https://github.com/Opentrons/opentrons/issues/11268)) ([f0913d7](https://github.com/Opentrons/opentrons/commit/f0913d7219ab41b55b3980a1262a884007223ad6)), closes [#11210](https://github.com/Opentrons/opentrons/issues/11210) [#11209](https://github.com/Opentrons/opentrons/issues/11209)
 
+
+
+
+## [6.0.1](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.0.1) (2022-08-09)
+
+
+### Bug Fixes
+
+* **api:** ensure correct sync hardware API is used for analysis ([#11227](https://github.com/Opentrons/opentrons/issues/11227)) ([503dc95](https://github.com/Opentrons/opentrons/commit/503dc957e2d2bd9906db7770be0a09295a141eaa))
 
 
 
