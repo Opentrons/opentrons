@@ -572,6 +572,21 @@ def test_hs_flag_unsafe_move_raises(
         mod.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)
 
 
+def test_hs_flag_unsafe_move_skips_non_labware_locations(
+    ctx_with_heater_shaker: ProtocolContext,
+    mock_module_controller: mock.MagicMock,
+) -> None:
+    """Test that purely point locations do not raise error."""
+    mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 3)
+    assert isinstance(mod, HeaterShakerContext)
+    mod._geometry.flag_unsafe_move = mock.MagicMock()  # type: ignore[assignment]
+
+    mod.flag_unsafe_move(
+        to_loc=Location(point=Point(1, 2, 3), labware=None), is_multichannel=False
+    )
+    mod._geometry.flag_unsafe_move.assert_not_called()
+
+
 def test_heater_shaker_loading(
     ctx_with_heater_shaker: ProtocolContext,
     mock_module_controller: mock.MagicMock,
