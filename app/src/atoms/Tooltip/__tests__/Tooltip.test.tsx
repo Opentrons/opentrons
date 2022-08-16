@@ -4,6 +4,7 @@ import {
   TOOLTIP_TOP,
   SPACING,
   COLORS,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
 import { Tooltip } from '..'
 
@@ -14,9 +15,15 @@ const render = (props: React.ComponentProps<typeof Tooltip>) => {
 const placement = TOOLTIP_TOP
 const id = 'Tooltip_123'
 const tooltipRef = jest.fn()
-const tooltipStyle = { position: 'absolute', left: SPACING.spacing2 } as const
+const tooltipStyle = {
+  position: POSITION_ABSOLUTE,
+  left: SPACING.spacing2,
+} as const
 const arrowRef = jest.fn()
-const arrowStyle = { position: 'absolute', left: SPACING.spacing3 } as const
+const arrowStyle = {
+  position: POSITION_ABSOLUTE,
+  left: SPACING.spacing3,
+} as const
 
 const MockTooltipProps = {
   id: id,
