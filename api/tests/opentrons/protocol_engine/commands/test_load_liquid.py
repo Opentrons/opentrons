@@ -8,7 +8,11 @@ from opentrons.protocol_engine.commands import (
     LoadLiquidParams,
 )
 from opentrons.protocol_engine.types import Liquid
-from opentrons.protocol_engine.errors.exceptions import LiquidNotFoundError
+from opentrons.protocol_engine.errors.exceptions import (
+    LiquidNotFoundError,
+    LabwareNotLoadedError,
+    WellDoesNotExistError,
+)
 from opentrons.protocol_engine.state import StateView
 
 
@@ -32,6 +36,10 @@ async def test_load_liquid_implementation(
         [Liquid(id="liquid-id", displayName="liquid", description="desc")]
     )
 
+    decoy.when(mock_state_view.labware.get_wells("labware-id")).then_return(
+        ["A1", "B2"]
+    )
+
     data = LoadLiquidParams(
         labwareId="labware-id",
         liquidId="liquid-id",
@@ -50,10 +58,57 @@ async def test_load_liquid_liquid_not_found(
         [Liquid(id="liquid-id", displayName="liquid", description="desc")]
     )
 
+    decoy.when(mock_state_view.labware.get_wells("labware-id")).then_return(
+        ["A1", "B2"]
+    )
+
     data = LoadLiquidParams(
         labwareId="labware-id",
         liquidId="liquid-not-found",
         volumeByWell={"A1": 30, "B2": 100},
     )
     with pytest.raises(LiquidNotFoundError):
+        await subject.execute(data)
+
+
+async def test_load_liquid_labware_not_found(
+    decoy: Decoy, subject: LoadLiquidImplementation, mock_state_view: StateView
+) -> None:
+    """Should raise an error that liquid not found."""
+    decoy.when(mock_state_view.labware.get_wells("labware-not-found")).then_raise(
+        LabwareNotLoadedError()
+    )
+
+    decoy.when(mock_state_view.liquid.get_all()).then_return(
+        [Liquid(id="liquid-id", displayName="liquid", description="desc")]
+    )
+
+    data = LoadLiquidParams(
+        labwareId="labware-not-found",
+        liquidId="liquid-id",
+        volumeByWell={"A1": 30, "B2": 100},
+    )
+    with pytest.raises(LabwareNotLoadedError):
+        await subject.execute(data)
+
+
+async def test_load_liquid_well_not_found(
+    decoy: Decoy, subject: LoadLiquidImplementation, mock_state_view: StateView
+) -> None:
+    """Should raise an error that liquid not found."""
+    decoy.when(mock_state_view.labware.get_wells("labware-id")).then_return(
+        ["A1", "B2"]
+    )
+
+    decoy.when(mock_state_view.liquid.get_all()).then_return(
+        [Liquid(id="liquid-id", displayName="liquid", description="desc")]
+    )
+
+    data = LoadLiquidParams(
+        labwareId="labware-id",
+        liquidId="liquid-id",
+        volumeByWell={"C1": 30, "B2": 100},
+    )
+
+    with pytest.raises(WellDoesNotExistError):
         await subject.execute(data)
