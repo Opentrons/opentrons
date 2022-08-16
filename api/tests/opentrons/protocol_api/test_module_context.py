@@ -5,8 +5,9 @@ import mock
 import opentrons.protocol_api as papi
 import opentrons.protocols.geometry as papi_geometry
 
-from opentrons.types import Point, Location, Mount
+from opentrons.types import Point, Location
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
+from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
@@ -752,8 +753,7 @@ def test_heater_shaker_set_and_wait_for_shake_speed(
         hs_mod.geometry.is_pipette_blocking_shake_movement.assert_called_with(  # type: ignore[attr-defined]
             pipette_location=mock_pipette_location
         )
-        calls = [mock.call(mount=Mount.LEFT), mock.call(mount=Mount.RIGHT)]
-        mock_hardware.retract.assert_has_calls(calls, any_order=True)
+        mock_hardware.home.assert_called_once_with(axes=[Axis.Z, Axis.A])
         mock_module_controller.set_speed.assert_called_once_with(rpm=10)
         assert ctx_with_heater_shaker.location_cache is None
 
@@ -806,8 +806,7 @@ def test_heater_shaker_open_labware_latch(
     hs_mod.geometry.is_pipette_blocking_latch_movement.assert_called_with(  # type: ignore[attr-defined]
         pipette_location=mock_pipette_location
     )
-    calls = [mock.call(mount=Mount.LEFT), mock.call(mount=Mount.RIGHT)]
-    mock_hardware.retract.assert_has_calls(calls, any_order=True)
+    mock_hardware.home.assert_called_once_with(axes=[Axis.Z, Axis.A])
     mock_module_controller.open_labware_latch.assert_called_once()
     assert ctx_with_heater_shaker.location_cache is None
 
