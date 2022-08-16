@@ -4,6 +4,7 @@ import * as React from 'react'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   ModalPage,
+  Flex,
   SpinnerModalPage,
   useConditionalConfirm,
   DISPLAY_FLEX,
@@ -17,7 +18,7 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-
+import { useFeatureFlag } from '../../redux/config'
 import {
   DeckSetup,
   Introduction,
@@ -29,6 +30,7 @@ import {
   ConfirmExitModal,
   INTENT_DECK_CALIBRATION,
 } from '../../organisms/CalibrationPanels'
+import { Modal } from '../../molecules/Modal'
 
 import type { StyleProps, Mount } from '@opentrons/components'
 import type {
@@ -38,6 +40,8 @@ import type {
 } from '../../redux/sessions/types'
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { CalibrateDeckParentProps } from './types'
+import { WizardHeader } from '../../atoms/WizardHeader'
+import { Portal } from '../../App/portal'
 
 const DECK_CALIBRATION_SUBTITLE = 'Deck calibration'
 const EXIT = 'exit'
@@ -100,6 +104,8 @@ export function CalibrateDeck(
   const { currentStep, instrument, labware, supportedCommands } =
     session?.details || {}
 
+  const enableCalibrationWizards = useFeatureFlag('enableCalibrationWizards')
+
   const {
     showConfirmation: showConfirmExit,
     confirm: confirmExit,
@@ -154,7 +160,35 @@ export function CalibrateDeck(
   }
   // @ts-expect-error TODO: cannot index with undefined. Also, add test coverage for null case when no panel
   const Panel = PANEL_BY_STEP[currentStep]
-  return Panel ? (
+  if (Panel == null) return null
+  return enableCalibrationWizards ? (
+    <Portal level="top">
+      <Modal>
+        <WizardHeader
+          title={DECK_CALIBRATION_SUBTITLE}
+          currentStep={1}
+          totalSteps={5}
+          onExit={confirmExit}
+        />
+        <Panel
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
+          tipRack={tipRack}
+          isMulti={isMulti}
+          mount={instrument?.mount.toLowerCase() as Mount}
+          currentStep={currentStep}
+          sessionType={session.sessionType}
+          intent={INTENT_DECK_CALIBRATION}
+          supportedCommands={supportedCommands}
+          defaultTipracks={instrument?.defaultTipracks}
+        />
+        {showConfirmExit && (
+          // @ts-expect-error TODO: ConfirmExitModal expects sessionType
+          <ConfirmExitModal exit={confirmExit} back={cancelExit} />
+        )}
+      </Modal>
+    </Portal>
+  ) : (
     <>
       <ModalPage
         titleBar={titleBarProps}
@@ -178,5 +212,5 @@ export function CalibrateDeck(
         <ConfirmExitModal exit={confirmExit} back={cancelExit} />
       )}
     </>
-  ) : null
+  )
 }
