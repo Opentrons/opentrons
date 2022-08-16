@@ -28,6 +28,7 @@ from .ot3utils import (
     axis_to_node,
     create_gripper_jaw_move_group,
     create_gripper_jaw_home_group,
+    EEPROM_UNWRITTEN,
 )
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
@@ -340,8 +341,7 @@ class OT3Simulator:
     def synthesize_model_name(self, model: int) -> "PipetteModel":
         # TODO: the way we look up pipette config info is changing, so this
         #   may need to change also
-        unknown_model_num = 65535
-        if model == unknown_model_num:
+        if model == EEPROM_UNWRITTEN:
             model = 0
         return cast("PipetteModel", "DummyPipette" + "_v3." + str(model))
 

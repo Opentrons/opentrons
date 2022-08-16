@@ -31,6 +31,7 @@ from .ot3utils import (
     sensor_node_for_mount,
     create_gripper_jaw_move_group,
     create_gripper_jaw_home_group,
+    EEPROM_UNWRITTEN,
 )
 
 try:
@@ -378,8 +379,7 @@ class OT3Controller:
         attached = await self._tool_detector.detect()
 
         def _check_if_eeprom_unwritten(model: int) -> str:
-            unknown_model_num = 65535
-            if model == unknown_model_num:
+            if model == EEPROM_UNWRITTEN:
                 log.warning("Changing unknown model number to 0")
                 return "0"
             return str(model)

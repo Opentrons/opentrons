@@ -37,6 +37,8 @@ GRIPPER_JAW_HOME_TIME: float = 120
 GRIPPER_JAW_GRIP_TIME: float = 1
 GRIPPER_JAW_HOME_DC: float = 100
 
+EEPROM_UNWRITTEN = 65535
+
 # TODO: These methods exist to defer uses of NodeId to inside
 # method bodies, which won't be evaluated until called. This is needed
 # because the robot server doesn't have opentrons_ot3_firmware as a dep

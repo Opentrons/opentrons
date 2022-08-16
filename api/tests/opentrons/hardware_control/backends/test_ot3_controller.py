@@ -2,9 +2,7 @@ import pytest
 from itertools import chain
 from mock import AsyncMock, patch
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
-from opentrons.hardware_control.backends.ot3utils import (
-    node_to_axis,
-)
+from opentrons.hardware_control.backends.ot3utils import node_to_axis, EEPROM_UNWRITTEN
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons.config.types import OT3Config
 from opentrons.config.robot_configs import build_config_ot3
@@ -255,7 +253,7 @@ async def test_probing(
     )
 
 
-model_numbers = [0, 65535]
+model_numbers = [0, EEPROM_UNWRITTEN, 750]
 
 
 @pytest.mark.parametrize("model", model_numbers)
@@ -277,12 +275,17 @@ async def test_get_attached_instruments(
     )
 
     with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
-        detected = await controller.get_attached_instruments({})
-    assert list(detected.keys()) == [OT3Mount.LEFT, OT3Mount.GRIPPER]
-    assert detected[OT3Mount.LEFT]["id"] == "hello"
-    assert detected[OT3Mount.LEFT]["config"].name == "p1000_single_gen3"
-    assert detected[OT3Mount.GRIPPER]["id"] == "fake_serial"
-    assert detected[OT3Mount.GRIPPER]["config"].name == "gripper"
+        if model != 0 and model != EEPROM_UNWRITTEN:
+            with pytest.raises(KeyError):
+                detected = await controller.get_attached_instruments({})
+        else:
+            detected = await controller.get_attached_instruments({})
+
+            assert list(detected.keys()) == [OT3Mount.LEFT, OT3Mount.GRIPPER]
+            assert detected[OT3Mount.LEFT]["id"] == "hello"
+            assert detected[OT3Mount.LEFT]["config"].name == "p1000_single_gen3"
+            assert detected[OT3Mount.GRIPPER]["id"] == "fake_serial"
+            assert detected[OT3Mount.GRIPPER]["config"].name == "gripper"
 
 
 def test_nodeid_replace_head():
