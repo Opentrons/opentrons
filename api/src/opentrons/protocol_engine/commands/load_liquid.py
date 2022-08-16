@@ -44,9 +44,7 @@ class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidR
 
     async def execute(self, params: LoadLiquidParams) -> LoadLiquidResult:
         """Load data necessary for a liquid."""
-        liquids = self._state_view.liquid.get_all()
-
-        if not any(x.id == params.liquidId for x in liquids):
+        if params.liquidId not in self._state_view.liquid.get_all():
             raise LiquidNotFoundError()
 
         return LoadLiquidResult()
