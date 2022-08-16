@@ -8,7 +8,7 @@ from opentrons.protocol_engine.commands import (
     LoadLiquidParams,
 )
 from opentrons.protocol_engine.types import Liquid
-from opentrons.protocol_engine.commands.load_liquid import LiquidNotFoundError
+from opentrons.protocol_engine.errors.exceptions import LiquidNotFoundError
 from opentrons.protocol_engine.state import StateView
 
 

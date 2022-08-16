@@ -47,7 +47,7 @@ from opentrons.protocol_engine.actions import (
     HardwareStoppedAction,
 )
 
-from opentrons.protocol_engine.commands.load_liquid import Liquid
+from opentrons.protocol_engine.types import Liquid
 
 
 @pytest.fixture

@@ -1,7 +1,7 @@
 """Basic liquid data state and store."""
 from dataclasses import dataclass
 from typing import List
-from opentrons.protocol_engine.commands.load_liquid import Liquid
+from opentrons.protocol_engine.types import Liquid
 
 from .abstract_store import HasState, HandlesActions
 from ..actions import Action, AddLiquidAction

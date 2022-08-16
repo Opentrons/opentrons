@@ -11,11 +11,10 @@ from typing import Optional, Union
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.types import DoorState
 from opentrons.hardware_control.modules import LiveData
-from opentrons.protocol_engine.commands.load_liquid import Liquid
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
-from ..types import LabwareOffsetCreate, ModuleDefinition
+from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
 
 
 @dataclass(frozen=True)

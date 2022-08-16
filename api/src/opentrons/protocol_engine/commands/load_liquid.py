@@ -1,25 +1,16 @@
 """Load liquid command request, result, and implementation models."""
+from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import Optional, Type, Dict
+from typing import Optional, Type, Dict, TYPE_CHECKING
 from typing_extensions import Literal
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from ..state import StateView
+from ..errors.exceptions import LiquidNotFoundError
+
+if TYPE_CHECKING:
+    from ..state import StateView
 
 LoadLiquidCommandType = Literal["loadLiquid"]
-
-class LiquidNotFoundError(Exception):
-    """Liquid not found error."""
-
-    pass
-
-class Liquid(BaseModel):
-    """Payload required to create a liquid."""
-
-    id: str
-    displayName: str
-    description: str
-    displayColor: Optional[str]
 
 
 class LoadLiquidParams(BaseModel):

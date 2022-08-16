@@ -10,9 +10,9 @@ from ..types import (
     LabwareOffset,
     LoadedModule,
     LoadedPipette,
+    Liquid
 )
 
-from opentrons.protocol_engine.commands.load_liquid import Liquid
 
 
 class StateSummary(BaseModel):

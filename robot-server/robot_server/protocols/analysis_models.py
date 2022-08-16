@@ -12,7 +12,7 @@ from opentrons.protocol_engine import (
     LoadedPipette,
 )
 
-from opentrons.protocol_engine.commands.load_liquid import Liquid
+from opentrons.protocol_engine.commands.types import Liquid
 
 
 class AnalysisStatus(str, Enum):

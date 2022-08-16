@@ -28,7 +28,7 @@ from opentrons.protocol_engine import (
     ModuleModel,
     ModuleLocation,
 )
-from opentrons.protocol_engine.commands.load_liquid import Liquid
+from opentrons.protocol_engine.types import Liquid
 
 VALID_TEST_PARAMS = [
     (

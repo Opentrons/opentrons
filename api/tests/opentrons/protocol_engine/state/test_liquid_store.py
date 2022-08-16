@@ -2,7 +2,7 @@
 import pytest
 
 from opentrons.protocol_engine.state.liquids import LiquidStore
-from opentrons.protocol_engine.commands.load_liquid import Liquid
+from opentrons.protocol_engine.types import Liquid
 from opentrons.protocol_engine.actions.actions import AddLiquidAction
 
 
