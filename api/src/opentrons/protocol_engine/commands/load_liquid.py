@@ -5,7 +5,7 @@ from typing import Optional, Type, Dict, TYPE_CHECKING
 from typing_extensions import Literal
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
-from ..errors.exceptions import LiquidNotFoundError
+from ..errors.exceptions import LiquidNotFoundError, LabwareNotLoadedError, WellDoesNotExistError
 
 if TYPE_CHECKING:
     from ..state import StateView
@@ -44,8 +44,16 @@ class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidR
 
     async def execute(self, params: LoadLiquidParams) -> LoadLiquidResult:
         """Load data necessary for a liquid."""
-        if params.liquidId not in self._state_view.liquid.get_all():
+        if not any(x.id == params.liquidId for x in self._state_view.liquid.get_all()):
             raise LiquidNotFoundError()
+
+        try:
+            labware_wells = self._state_view.labware.get_wells(params.labwareId)
+            for item in params.volumeByWell:
+                if item.wellName not in labware_wells:
+                    raise WellDoesNotExistError()
+        except KeyError:
+            raise LabwareNotLoadedError()
 
         return LoadLiquidResult()
 
