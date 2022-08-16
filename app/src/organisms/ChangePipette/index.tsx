@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { getPipetteNameSpecs, shouldLevel } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
 
 import {
   useDispatchApiRequests,
@@ -64,6 +65,7 @@ const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
 
 export function ChangePipette(props: Props): JSX.Element | null {
   const { robotName, mount, closeModal } = props
+  const { t } = useTranslation('change_pipette')
   const enableChangePipetteWizard = useFeatureFlag('enableChangePipetteWizard')
   const dispatch = useDispatch<Dispatch>()
   const finalRequestId = React.useRef<string | null | undefined>(null)
@@ -166,8 +168,14 @@ export function ChangePipette(props: Props): JSX.Element | null {
         <ClearDeckModal
           totalSteps={5}
           currentStep={1}
-          mount={mount}
-          pipetteName={actualPipette?.displayName}
+          title={
+            actualPipette?.displayName != null
+              ? t('detach_pipette', {
+                  pipette: actualPipette.displayName,
+                  mount: mount[0].toUpperCase() + mount.slice(1),
+                })
+              : t('attach_pipette')
+          }
           onCancelClick={closeModal}
           onContinueClick={() => {
             dispatch(move(robotName, CHANGE_PIPETTE, mount, true))

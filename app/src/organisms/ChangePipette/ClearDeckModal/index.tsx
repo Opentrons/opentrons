@@ -10,16 +10,12 @@ import { WizardHeader } from '../../../atoms/WizardHeader'
 import { StyledText } from '../../../atoms/text'
 import { PrimaryButton } from '../../../atoms/buttons'
 
-import type { Mount } from '../../../redux/robot/types'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
-
 export interface ClearDeckModalProps {
   onContinueClick: () => unknown
   onCancelClick: () => unknown
   totalSteps: number
   currentStep: number
-  mount: Mount
-  pipetteName?: PipetteModelSpecs['displayName']
+  title: string
 }
 
 export function ClearDeckModal(props: ClearDeckModalProps): JSX.Element {
@@ -28,8 +24,7 @@ export function ClearDeckModal(props: ClearDeckModalProps): JSX.Element {
     onCancelClick,
     totalSteps,
     currentStep,
-    mount,
-    pipetteName,
+    title,
   } = props
   const { t } = useTranslation('change_pipette')
 
@@ -38,14 +33,7 @@ export function ClearDeckModal(props: ClearDeckModalProps): JSX.Element {
       <WizardHeader
         totalSteps={totalSteps}
         currentStep={currentStep}
-        title={
-          pipetteName != null
-            ? t('detach_pipette', {
-                pipette: pipetteName,
-                mount: mount[0].toUpperCase() + mount.slice(1),
-              })
-            : t('attach_pipette')
-        }
+        title={title}
         onExit={onCancelClick}
       />
       <Flex

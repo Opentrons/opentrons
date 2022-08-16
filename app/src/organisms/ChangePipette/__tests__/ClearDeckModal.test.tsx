@@ -1,10 +1,8 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { ClearDeckModal } from '../ClearDeckModal'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 const render = (props: React.ComponentProps<typeof ClearDeckModal>) => {
   return renderWithProviders(<ClearDeckModal {...props} />, {
@@ -19,7 +17,7 @@ describe('ClearDeckModal', () => {
       onCancelClick: jest.fn(),
       totalSteps: 5,
       currentStep: 1,
-      mount: LEFT,
+      title: 'Attach a pipette',
     }
   })
   it('renders the correct information when pipette is not attached', () => {
@@ -40,8 +38,7 @@ describe('ClearDeckModal', () => {
   it('renders the correct information when a p10 single gen 1 is attached', () => {
     props = {
       ...props,
-      mount: RIGHT,
-      pipetteName: 'P10 Single-Channel GEN1' as PipetteModelSpecs['displayName'],
+      title: 'Detach P10 Single-Channel GEN1 from Right Mount',
     }
     const { getByText, getByRole } = render(props)
     getByText('Detach P10 Single-Channel GEN1 from Right Mount')
