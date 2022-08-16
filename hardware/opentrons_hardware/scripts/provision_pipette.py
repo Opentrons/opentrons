@@ -69,6 +69,9 @@ async def get_serial(
                 raise
             print(str(e))
         else:
+            base_log.info(
+                f"parsed name {name} model {model} datecode {data!r} from {serial}"
+            )
             return name, model, data
 
 
@@ -85,12 +88,13 @@ async def update_serial_and_confirm(
 ) -> None:
     """Update and verify the update of serial data."""
     for attempt in range(attempts):
-        base_log.debug(f"beginning set and confirm attempt {attempt}")
+        serial_bytes = serials.serial_val_from_parts(name, model, data)
+        base_log.debug(
+            f"beginning set and confirm attempt {attempt} with bytes {serial_bytes!r}"
+        )
         set_message = message_definitions.SetSerialNumber(
             payload=payloads.SerialNumberPayload(
-                serial=fields.SerialField(
-                    serials.serial_val_from_parts(name, model, data)
-                )
+                serial=fields.SerialField(serial_bytes)
             )
         )
         await messenger.send(which_pipette, set_message)
@@ -106,7 +110,7 @@ async def update_serial_and_confirm(
                     )
                     if (
                         isinstance(message, message_definitions.PipetteInfoResponse)
-                        and arb.originating_node_id == which_pipette
+                        and arb.parts.originating_node_id == which_pipette
                     ):
                         if (
                             message.payload.name == fields.PipetteNameField(name.value)
@@ -139,10 +143,10 @@ async def get_and_update_serial_once(
         await update_serial_and_confirm(
             messenger, which_pipette, name, model, data, base_log, trace_log
         )
-        trace_log.info('SUCCESS,{name.name},{model},{data.encode("ascii")}')
+        trace_log.info(f"SUCCESS,{name.name},{model},{data!r}")
     except Exception:
         base_log.exception("Update failed")
-        trace_log.info('FAILURE,{name.name},{model},{data.encode("ascii")}')
+        trace_log.info(f"FAILURE,{name.name},{model},{data!r}")
         raise
 
 
@@ -166,7 +170,7 @@ def log_config(log_level: int) -> Tuple[logging.Logger, logging.Logger]:
                     "backupCount": 3,
                 },
                 "stream_handler": {
-                    "class": "logging.handlers.StreamHandler",
+                    "class": "logging.StreamHandler",
                     "formatter": "basic",
                     "level": log_level,
                 },
