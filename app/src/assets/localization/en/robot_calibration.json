@@ -24,5 +24,7 @@
   "serial_number": "Serial number",
   "tip_length": "tip length calibration",
   "title": "robot calibration",
-  "unknown_custom_tiprack": "unknown custom tip rack"
+  "unknown_custom_tiprack": "unknown custom tip rack",
+  "jump_size": "jump size",
+  "direction_controls": "direction controls"
 }
