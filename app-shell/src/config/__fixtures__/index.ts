@@ -8,6 +8,7 @@ import type {
   ConfigV6,
   ConfigV7,
   ConfigV8,
+  ConfigV9,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -140,4 +141,10 @@ export const MOCK_CONFIG_V8: ConfigV8 = {
     width: 1024,
     height: 768,
   },
+}
+
+export const MOCK_CONFIG_V9: ConfigV9 = {
+  ...MOCK_CONFIG_V8,
+  version: 9,
+  isOnDevice: false,
 }

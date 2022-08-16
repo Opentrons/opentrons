@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { Modal } from '../../atoms/Modal'
+import { Modal } from '../../molecules/Modal'
 
 import type { AttachedModule } from '../../redux/modules/types'
 

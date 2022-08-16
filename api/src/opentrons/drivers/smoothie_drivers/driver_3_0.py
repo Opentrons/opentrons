@@ -1849,7 +1849,7 @@ class SmoothieDriver:
             self.run_flag.set()
 
     async def update_firmware(  # noqa: C901
-        self,  # noqa: C901
+        self,
         filename: str,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         explicit_modeset: bool = True,

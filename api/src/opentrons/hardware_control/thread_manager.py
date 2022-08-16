@@ -140,7 +140,7 @@ class ThreadManager(Generic[WrappedObj]):
             AbstractModule, CallBridger[AbstractModule]
         ] = weakref.WeakKeyDictionary()
         # TODO: remove this if we switch to python 3.8
-        # https://docs.python.org/3/library/asyncio-subprocess.html#subprocess-and-threads  # noqa
+        # https://docs.python.org/3/library/asyncio-subprocess.html#subprocess-and-threads
         # On windows, the event loop and system interface is different and
         # this won't work.
         try:
