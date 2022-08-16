@@ -432,7 +432,6 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self.wait_for_is_running()
         await self._driver.home()
         await self._wait_for_shake_deactivation()
-        await self.wait_next_poll()
 
     async def open_labware_latch(self) -> None:
         await self.wait_for_is_running()
