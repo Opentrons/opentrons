@@ -380,7 +380,7 @@ class OT3Controller:
         def _synthesize_model_name(
             name: FirmwarePipetteName, model: int
         ) -> "PipetteModel":
-            return cast("PipetteModel", name.name + "_v3." + str(model))
+            return cast("PipetteModel", f"{name.name}_v{model//10}.{model%10}")
 
         def _build_attached_pip(
             attached: ohc_tool_types.PipetteInformation,
