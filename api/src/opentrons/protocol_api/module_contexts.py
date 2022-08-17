@@ -814,77 +814,72 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def target_temperature(self) -> Optional[float]:
-        """Target temperature of the heater-shaker's plate."""
+        """The target temperature of the Heater-Shaker's plate in °C, or ``None`` if no target has been set."""
         return self._module.target_temperature
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def current_temperature(self) -> float:
-        """Current temperature of the heater-shaker's plate."""
+        """The current temperature of the Heater-Shaker's plate in °C. Returns ``23`` in simulation if no target temperature has been set."""
         return self._module.temperature
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def current_speed(self) -> int:
-        """Current speed of the heater-shaker's plate."""
+        """The current rpm of the Heater-Shaker's plate."""
         return self._module.speed
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def target_speed(self) -> Optional[int]:
-        """Target speed of the heater-shaker's plate."""
+        """The target rpm of the Heater-Shaker's plate."""
         return self._module.target_speed
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def temperature_status(self) -> str:
-        """Heater-shaker's temperature status string.
+        """One of five possible temperature statuses:
 
-        Returns one of these possible status values:
-        - "holding at target"
-        - "cooling"
-        - "heating"
-        - "idle"
-        - "error"
+        - ``holding at target``: The module has reached its target temperature and is actively maintaining that temperature.
+        - ``cooling``: The module has previously heated and is now passively cooling. `The Heater-Shaker does not have active cooling.`
+        - ``heating``: The module is heating to a target temperature.
+        - ``idle``: The module has not heated since the beginning of the protocol.
+        - ``error``: The temperature status can't be determined.
         """
         return self._module.temperature_status.value
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def speed_status(self) -> str:
-        """Heater-shaker's speed status string.
+        """One of five possible shaking statuses:
 
-        Returns one of these possible status values:
-        - "holding at target"
-        - "speeding up"
-        - "slowing down"
-        - "idle"
-        - "error"
+        - ``holding at target``: The module has reached its target shake speed and is actively maintaining that speed.
+        - ``speeding up``: The module is increasing its shake speed towards a target.
+        - ``slowing down``: The module was previously shaking at a faster speed and is currently reducing its speed to a lower target or to deactivate.
+        - ``idle``: The module is not shaking.
+        - ``error``: The shaking status can't be determined.
         """
         return self._module.speed_status.value
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
     def labware_latch_status(self) -> str:
-        """Heater-shaker's labware latch status string.
+        """One of six possible latch statuses:
 
-        Returns one of these possible status values:
-        - "opening": latch is opening
-        - "idle_open": latch is open and idle
-        - "closing": latch is closing
-        - "idle_closed": latch is closed and idle
-        - "idle_unknown": status upon reset
-        - "unknown": latch status cannot be reached, likely due to an error
+        - ``opening``: The latch is currently opening (in motion).
+        - ``idle_open``: The latch is open and not moving.
+        - ``closing``: The latch is currently closing (in motion).
+        - ``idle_closed``: The latch is closed and not moving.
+        - ``idle_unknown``: The default status upon reset, regardless of physical latch position. Use :py:meth:`~HeaterShakerContext.close_labware_latch` before other commands requiring confirmation that the latch is closed.
+        - ``unknown``: The latch status can't be determined.
         """
         return self._module.labware_latch_status.value
 
     @requires_version(2, 13)
     def set_and_wait_for_temperature(self, celsius: float) -> None:
-        """Set the target temperature and wait for it to be reached.
+        """Set a target temperature and block execution of further commands until the module reaches the target.
 
-        Note: The Heater-Shaker truncates the ``temperature`` parameter to 2 decimal places.
-
-        :param celsius: The target temperature, in °C in range 37°C to 95°C.
+        :param celsius: A value between 27 and 95, representing the target temperature in °C. Values are automatically truncated to two decimal places, and the Heater-Shaker module has a temperature accuracy of ±0.5 °C.
         """
         self.set_target_temperature(celsius=celsius)
         self.wait_for_temperature()
@@ -892,14 +887,10 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_set_target_temperature)
     def set_target_temperature(self, celsius: float) -> None:
-        """Set target temperature and return immediately.
+        """Set a target temperature `and return immediately` without
+        waiting for the target to be reached. This allows other commands to be executed while the Heater-Shaker is heating. If, after performing some other commands, you need to wait until the target temperature is reached, use :py:meth:`~HeaterShakerContext.wait_for_temperature` to delay protocol execution.
 
-        Sets the heater-shaker's target temperature and returns immediately without
-        waiting for the target to be reached. Does not delay the protocol until
-        target temperature has reached. Use `wait_for_target_temperature` to delay
-        protocol execution.
-
-        Note: The H/S truncates the temperature param to 2 decimal places
+        :param celsius: A value between 27 and 95, representing the target temperature in °C. Values are automatically truncated to two decimal places, and the Heater-Shaker module has a temperature accuracy of ±0.5 °C.
         """
         validated_temp = validate_heater_shaker_temperature(celsius=celsius)
         self._module.start_set_temperature(celsius=validated_temp)
@@ -907,10 +898,8 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_wait_for_temperature)
     def wait_for_temperature(self) -> None:
-        """Wait for the Heater-Shaker to reach its target temperature.
-
-        Delays protocol execution until the Heater-Shaker has reached its target
-        temperature. The module must have a target temperature set previously.
+        """Delays protocol execution until the Heater-Shaker has reached its target
+        temperature. Returns an error if no target temperature was previously set.
         """
         if self.target_temperature is None:
             raise NoTargetTemperatureSetError(
@@ -921,13 +910,13 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_set_and_wait_for_shake_speed)
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
-        """Set and wait for target speed.
+        """Set a target shake speed and block execution of further commands until the module reaches the target. Reaching a target shake speed typically only takes a few seconds.
 
-        Set the heater shaker's target speed and wait until the specified speed has
-        reached. Delays protocol execution until the target speed has been achieved.
+        .. note::
 
-        NOTE: Before shaking, this command will retract the pipettes up if they are
-              parked adjacent to the heater-shaker.
+            Before shaking, this command will retract the pipettes upward if they are parked adjacent to the Heater-Shaker.
+
+        :param rpm: A value between 200 and 3000, representing the target shake speed in revolutions per minute.
         """
         if (
             self._module.labware_latch_status
@@ -947,15 +936,15 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     def open_labware_latch(self) -> None:
         """Open the Heater-Shaker's labware latch.
 
-        NOTE:
-        1. This command will retract the pipettes up if they are parked east or west
-           of the Heater-Shaker.
-        2. The labware latch needs to be closed before:
+        The labware latch needs to be closed before:
             * Shaking
             * Pipetting to or from the labware on the Heater-Shaker
             * Pipetting to or from labware to the left or right of the Heater-Shaker
 
-        Raises an error when attempting to open the latch while the Heater-Shaker is shaking.
+        Attempting to open the latch while the Heater-Shaker is shaking will raise an error.
+
+        .. note::
+            Before opening the latch, this command will retract the pipettes upward if they are parked adjacent to the left or right of the Heater-Shaker.
         """
         if self._module.speed_status != module_types.SpeedStatus.IDLE:
             # TODO: What to do when speed status is ERROR?
@@ -968,19 +957,19 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_close_labware_latch)
     def close_labware_latch(self) -> None:
-        """Close heater-shaker's labware latch"""
+        """Closes the labware latch. The labware latch needs to be closed using this method before sending a shake command, even if the latch was manually closed before starting the protocol."""
         self._module.close_labware_latch()
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_deactivate_shaker)
     def deactivate_shaker(self) -> None:
-        """Stop shaking."""
+        """Stops shaking. Decelerating to 0 rpm typically only takes a few seconds."""
         self._module.deactivate_shaker()
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_deactivate_heater)
     def deactivate_heater(self) -> None:
-        """Stop heating."""
+        """Stops heating. The module will passively cool to room temperature. `The Heater-Shaker does not have active cooling.`"""
         self._module.deactivate_heater()
 
     def flag_unsafe_move(
@@ -991,6 +980,8 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         """
         Raise an error if attempting to perform a move that's deemed unsafe due to
         the presence of the Heater-Shaker.
+
+        :meta private:
         """
         destination_slot = to_loc.labware.first_parent()
         if destination_slot is None:

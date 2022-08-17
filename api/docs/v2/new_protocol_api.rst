@@ -41,6 +41,10 @@ Modules
    :members:
    :exclude-members: total_step_count, current_cycle_index, total_cycle_count, hold_time, ramp_rate, current_step_index, flag_unsafe_move
    :inherited-members:
+   
+.. autoclass:: opentrons.protocol_api.contexts.HeaterShakerContext
+   :members:
+   :inherited-members:
 
 
 .. _protocol-api-types:
