@@ -51,6 +51,7 @@ import {
 import type { Mount } from '@opentrons/components'
 import type { State, Dispatch } from '../../redux/types'
 import type { WizardStep } from './types'
+import { InProgressModal } from './InProgressModal'
 
 interface Props {
   robotName: string
@@ -155,7 +156,18 @@ export function ChangePipette(props: Props): JSX.Element | null {
     movementStatus !== null &&
     (movementStatus === HOMING || movementStatus === MOVING)
   ) {
-    return (
+    return enableChangePipetteWizard ? (
+      <ModalShell height="28.12rem">
+        <InProgressModal
+          title={t('attach_pipette')}
+          mount={mount}
+          currentStep={1}
+          totalSteps={5}
+          movementStatus={movementStatus}
+          isPipetteHoming={homePipStatus === PENDING}
+        />
+      </ModalShell>
+    ) : (
       <RequestInProgressModal
         {...baseProps}
         movementStatus={movementStatus}
@@ -169,7 +181,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
       <ModalShell height="28.12rem" width="47rem">
         <ClearDeckModal
           totalSteps={5}
-          currentStep={1}
+          currentStep={0}
           title={
             actualPipette?.displayName != null
               ? t('detach_pipette', {

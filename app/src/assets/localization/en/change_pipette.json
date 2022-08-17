@@ -16,5 +16,11 @@
   "tighten_screws_multi": "<block>Starting with screw #1, <strong>loosely</strong> tighten the screws with a clockwise motion. You will tighten them fully in a later step.</block>",
   "attach_pipette_type": "Attach a {{pipetteName}} Pipette",
   "level_the_pipette": "<h1>Level the pipette</h1><block>Using your hand, <strong>gently and slowly</strong> push the pipette up.</block><block>Place the calibration block in slot1/3 with the tall/short surface on the left/right side.</block><block>Pull the pipette down so <strong>all 8 nozzles touch</strong> the surface of the block.</block><block>While <strong>holding the pipette down,</strong> tighten the three screws.</block><block>Gently and slowly push the pipette back up.</block>",
-  "confirm_level": "Confirm level"
+  "confirm_level": "Confirm level",
+  "moving_gantry": "Moving gantry",
+  "pipette_movement": "{{mount}} pipette carriage moving {{location}}.",
+  "to_front_right": "to front right",
+  "to_front_left": "to front left",
+  "up": "up",
+  "homing": "Robot is homing"
 }

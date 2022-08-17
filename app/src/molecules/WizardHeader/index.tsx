@@ -17,7 +17,7 @@ interface WizardHeaderProps {
   totalSteps: number
   currentStep: number | null
   title: string
-  onExit: () => void
+  onExit?: () => void
 }
 
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
@@ -44,18 +44,18 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
             </StyledText>
           ) : null}
         </Flex>
-
-        <Btn onClick={onExit} aria-label="Exit">
-          <StyledText
-            css={TYPOGRAPHY.pSemiBold}
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-            color={COLORS.darkGreyEnabled}
-          >
-            {t('exit')}
-          </StyledText>
-        </Btn>
+        {onExit != null ? (
+          <Btn onClick={onExit} aria-label="Exit">
+            <StyledText
+              css={TYPOGRAPHY.pSemiBold}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              color={COLORS.darkGreyEnabled}
+            >
+              {t('exit')}
+            </StyledText>
+          </Btn>
+        ) : null}
       </Flex>
-
       <StepMeter totalSteps={totalSteps} currentStep={currentStep} />
     </Box>
   )
