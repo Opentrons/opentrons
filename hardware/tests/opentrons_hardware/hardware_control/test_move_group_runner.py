@@ -344,6 +344,11 @@ class MockSendMoveCompleter:
         self._move_groups = move_groups
         self._listener = listener
 
+    @property
+    def groups(self) -> MoveGroups:
+        """Retrieve the groups, for instance from a child class."""
+        return self._move_groups
+
     async def mock_send(
         self,
         node_id: NodeId,
@@ -562,3 +567,37 @@ async def test_empty_groups(
     mg = MoveGroupRunner(empty_group)
     await mg.run(mock_can_messenger)
     mock_can_messenger.send.assert_not_called()
+
+
+class MockSendMoveCompleterWithUnknown(MockSendMoveCompleter):
+    """Completes moves, injecting an unknown group ID."""
+
+    async def mock_send(self, node_id: NodeId, message: MessageDefinition) -> None:
+        """Overrides the send method of the messenger."""
+        if isinstance(message, md.ExecuteMoveGroupRequest):
+            groups = super().groups
+            bad_id = len(groups)
+            payload = MoveCompletedPayload(
+                group_id=UInt8Field(bad_id),
+                seq_id=UInt8Field(0),
+                current_position_um=UInt32Field(0),
+                encoder_position_um=Int32Field(0),
+                ack_id=UInt8Field(1),
+            )
+            sender = next(iter(groups[0][0].keys()))
+            arbitration_id = ArbitrationId(
+                parts=ArbitrationIdParts(originating_node_id=sender)
+            )
+            self._listener(md.MoveCompleted(payload=payload), arbitration_id)
+        await super().mock_send(node_id, message)
+
+
+async def test_handles_unknown_group_ids(
+    mock_can_messenger: AsyncMock, move_group_single: MoveGroups
+) -> None:
+    """Acks with unknown group ids should not cause crashes."""
+    subject = MoveScheduler(move_group_single)
+    mock_sender = MockSendMoveCompleterWithUnknown(move_group_single, subject)
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    # this should not throw
+    await subject.run(can_messenger=mock_can_messenger)
