@@ -4,13 +4,14 @@ import * as React from 'react'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   ModalPage,
-  Flex,
+  Box,
   SpinnerModalPage,
   useConditionalConfirm,
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
+  SPACING,
   SPACING_3,
   C_TRANSPARENT,
   ALIGN_FLEX_START,
@@ -30,7 +31,7 @@ import {
   ConfirmExitModal,
   INTENT_DECK_CALIBRATION,
 } from '../../organisms/CalibrationPanels'
-import { Modal } from '../../molecules/Modal'
+import { ModalShell } from '../../molecules/Modal'
 
 import type { StyleProps, Mount } from '@opentrons/components'
 import type {
@@ -163,13 +164,18 @@ export function CalibrateDeck(
   if (Panel == null) return null
   return enableCalibrationWizards ? (
     <Portal level="top">
-      <Modal>
-        <WizardHeader
-          title={DECK_CALIBRATION_SUBTITLE}
-          currentStep={1}
-          totalSteps={5}
-          onExit={confirmExit}
-        />
+      <ModalShell
+        width="47rem"
+        header={
+          <WizardHeader
+            title={DECK_CALIBRATION_SUBTITLE}
+            currentStep={1}
+            totalSteps={5}
+            onExit={confirmExit}
+          />
+        }
+      >
+        <Box padding={SPACING.spacing6}>
         <Panel
           sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
@@ -182,11 +188,12 @@ export function CalibrateDeck(
           supportedCommands={supportedCommands}
           defaultTipracks={instrument?.defaultTipracks}
         />
+        </Box>
+      </ModalShell>
         {showConfirmExit && (
           // @ts-expect-error TODO: ConfirmExitModal expects sessionType
           <ConfirmExitModal exit={confirmExit} back={cancelExit} />
         )}
-      </Modal>
     </Portal>
   ) : (
     <>
