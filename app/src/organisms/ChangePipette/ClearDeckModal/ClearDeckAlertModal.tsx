@@ -6,9 +6,14 @@ import removeTrashSrc from '../../../assets/images/remove-trash@3x.png'
 import { Portal } from '../../../App/portal'
 import styles from './styles.css'
 
-export interface ClearDeckAlertModalProps {
+const HEADING = 'Before continuing, please remove:'
+
+/**
+ * @deprecated Use CheckDeckModalProps
+ */
+interface ClearDeckAlertModalProps {
   onContinueClick?: () => unknown
-  onCancelClick?: () => unknown
+  onCancelClick: () => unknown
   parentUrl?: string
   cancelText: string
   continueText: string
@@ -16,8 +21,9 @@ export interface ClearDeckAlertModalProps {
   children?: React.ReactNode
 }
 
-const HEADING = 'Before continuing, please remove:'
-
+/**
+ * @deprecated Use {@link CheckDeckModal}
+ */
 export function ClearDeckAlertModal(
   props: ClearDeckAlertModalProps
 ): JSX.Element {
