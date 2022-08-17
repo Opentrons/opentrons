@@ -245,6 +245,8 @@ export function getAnalyticsTipLengthCalibrationData(
 export function getAnalyticsDeckCalibrationData(
   state: State
 ): DeckCalibrationAnalyticsData | null {
+  // TODO(va, 08-17-22): this selector was broken and was always returning null because getConnectedRobot
+  // always returned null, this should be fixed at the epic level in a future ticket RAUT-150
   // const robot = getConnectedRobot(state)
   // if (robot) {
   //   const dcData = getDeckCalibrationData(state, robot.name)
@@ -262,6 +264,8 @@ export function getAnalyticsDeckCalibrationData(
 export function getAnalyticsHealthCheckData(
   state: State
 ): CalibrationHealthCheckAnalyticsData | null {
+  // TODO(va, 08-17-22): this selector was broken and was always returning null because getConnectedRobot
+  // always returned null, this should be fixed at the epic level in a future ticket RAUT-150
   // const robot = getConnectedRobot(state)
   // if (robot) {
   //   return {
