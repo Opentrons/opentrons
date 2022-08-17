@@ -43,4 +43,12 @@ describe('Gallery', () => {
     images = getAllByRole('img')
     expect(images).toHaveLength(2)
   })
+
+  it('renders one main SVG and three mini images if definition contains two images', () => {
+    labwareImages.mock_definition = ['image1', 'image2']
+    const [{ getByTestId, queryAllByTestId }] = render(props)
+
+    getByTestId('gallery_main_svg')
+    expect(queryAllByTestId('gallery_mini_image')).toHaveLength(3)
+  })
 })

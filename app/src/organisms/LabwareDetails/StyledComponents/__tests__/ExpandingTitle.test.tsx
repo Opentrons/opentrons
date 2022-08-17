@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { renderWithProviders } from '@opentrons/components'
-import { ExpandingTitle } from '../ExpandingTitle'
-import { getFootprintDiagram } from '../../measurementGuide'
 import { fireEvent } from '@testing-library/react'
+import { renderWithProviders } from '@opentrons/components'
+import { getFootprintDiagram } from '../../measurementGuide'
+import { ExpandingTitle } from '../ExpandingTitle'
 
 const render = (props: React.ComponentProps<typeof ExpandingTitle>) => {
   return renderWithProviders(<ExpandingTitle {...props} />)
