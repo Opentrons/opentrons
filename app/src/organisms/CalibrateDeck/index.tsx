@@ -32,6 +32,8 @@ import {
   INTENT_DECK_CALIBRATION,
 } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
+import { WizardHeader } from '../../atoms/WizardHeader'
+import { Portal } from '../../App/portal'
 
 import type { StyleProps, Mount } from '@opentrons/components'
 import type {
@@ -41,8 +43,6 @@ import type {
 } from '../../redux/sessions/types'
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { CalibrateDeckParentProps } from './types'
-import { WizardHeader } from '../../atoms/WizardHeader'
-import { Portal } from '../../App/portal'
 
 const DECK_CALIBRATION_SUBTITLE = 'Deck calibration'
 const EXIT = 'exit'
@@ -176,24 +176,24 @@ export function CalibrateDeck(
         }
       >
         <Box padding={SPACING.spacing6}>
-        <Panel
-          sendCommands={sendCommands}
-          cleanUpAndExit={cleanUpAndExit}
-          tipRack={tipRack}
-          isMulti={isMulti}
-          mount={instrument?.mount.toLowerCase() as Mount}
-          currentStep={currentStep}
-          sessionType={session.sessionType}
-          intent={INTENT_DECK_CALIBRATION}
-          supportedCommands={supportedCommands}
-          defaultTipracks={instrument?.defaultTipracks}
-        />
+          <Panel
+            sendCommands={sendCommands}
+            cleanUpAndExit={cleanUpAndExit}
+            tipRack={tipRack}
+            isMulti={isMulti}
+            mount={instrument?.mount.toLowerCase() as Mount}
+            currentStep={currentStep}
+            sessionType={session.sessionType}
+            intent={INTENT_DECK_CALIBRATION}
+            supportedCommands={supportedCommands}
+            defaultTipracks={instrument?.defaultTipracks}
+          />
         </Box>
       </ModalShell>
-        {showConfirmExit && (
-          // @ts-expect-error TODO: ConfirmExitModal expects sessionType
-          <ConfirmExitModal exit={confirmExit} back={cancelExit} />
-        )}
+      {showConfirmExit && (
+        // @ts-expect-error TODO: ConfirmExitModal expects sessionType
+        <ConfirmExitModal exit={confirmExit} back={cancelExit} />
+      )}
     </Portal>
   ) : (
     <>

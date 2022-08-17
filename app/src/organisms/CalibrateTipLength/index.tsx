@@ -4,12 +4,14 @@ import * as React from 'react'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   ModalPage,
+  Box,
   SpinnerModalPage,
   useConditionalConfirm,
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
+  SPACING,
   SPACING_3,
   C_TRANSPARENT,
   ALIGN_FLEX_START,
@@ -17,6 +19,7 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
+import { useFeatureFlag } from '../../redux/config'
 
 import {
   Introduction,
@@ -29,6 +32,9 @@ import {
   MeasureTip,
   INTENT_TIP_LENGTH_IN_PROTOCOL,
 } from '../../organisms/CalibrationPanels'
+import { ModalShell } from '../../molecules/Modal'
+import { WizardHeader } from '../../atoms/WizardHeader'
+import { Portal } from '../../App/portal'
 
 import type { StyleProps, Mount } from '@opentrons/components'
 import type {
@@ -97,6 +103,8 @@ export function CalibrateTipLength(
   const { session, robotName, showSpinner, dispatchRequests, isJogging } = props
   const { currentStep, instrument, labware } = session?.details || {}
 
+  const enableCalibrationWizards = useFeatureFlag('enableCalibrationWizards')
+
   const isMulti = React.useMemo(() => {
     const spec = instrument && getPipetteModelSpecs(instrument.model)
     return spec ? spec.channels > 1 : false
@@ -154,8 +162,40 @@ export function CalibrateTipLength(
   }
   // @ts-expect-error(sa, 2021-05-26): cannot index undefined, leaving to avoid src code change
   const Panel = PANEL_BY_STEP[currentStep]
-
-  return Panel ? (
+  if (Panel == null) return null
+  return enableCalibrationWizards ? (
+    <Portal level="top">
+      <ModalShell
+        width="47rem"
+        header={
+          <WizardHeader
+            title={TIP_LENGTH_CALIBRATION_SUBTITLE}
+            currentStep={1}
+            totalSteps={5}
+            onExit={confirmExit}
+          />
+        }
+      >
+        <Box padding={SPACING.spacing6}>
+          <Panel
+            sendCommands={sendCommands}
+            cleanUpAndExit={cleanUpAndExit}
+            isMulti={isMulti}
+            mount={instrument?.mount.toLowerCase() as Mount}
+            tipRack={tipRack}
+            calBlock={calBlock}
+            currentStep={currentStep}
+            sessionType={session.sessionType}
+            intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
+          />
+        </Box>
+      </ModalShell>
+      {showConfirmExit && (
+        // @ts-expect-error TODO: ConfirmExitModal expects sessionType
+        <ConfirmExitModal exit={confirmExit} back={cancelExit} />
+      )}
+    </Portal>
+  ) : (
     <>
       <ModalPage
         titleBar={titleBarProps}
@@ -179,5 +219,5 @@ export function CalibrateTipLength(
         <ConfirmExitModal exit={confirmExit} back={cancelExit} />
       )}
     </>
-  ) : null
+  )
 }

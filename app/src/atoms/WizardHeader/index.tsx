@@ -45,7 +45,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           ) : null}
         </Flex>
 
-        <Btn onClick={onExit}>
+        <Btn onClick={onExit} aria-label="Exit">
           <StyledText
             css={TYPOGRAPHY.pSemiBold}
             textTransform={TYPOGRAPHY.textTransformCapitalize}

@@ -3,12 +3,14 @@ import * as React from 'react'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   ModalPage,
+  Box,
   SpinnerModalPage,
   useConditionalConfirm,
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
+  SPACING,
   SPACING_3,
   C_TRANSPARENT,
   ALIGN_FLEX_START,
@@ -16,6 +18,7 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
+import { useFeatureFlag } from '../../redux/config'
 import {
   Introduction,
   DeckSetup,
@@ -27,6 +30,9 @@ import {
   MeasureNozzle,
   MeasureTip,
 } from '../../organisms/CalibrationPanels'
+import { ModalShell } from '../../molecules/Modal'
+import { WizardHeader } from '../../atoms/WizardHeader'
+import { Portal } from '../../App/portal'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
 
@@ -113,6 +119,8 @@ export function CheckCalibration(
     labware,
   } = session?.details || {}
 
+  const enableCalibrationWizards = useFeatureFlag('enableCalibrationWizards')
+
   const {
     showConfirmation: showConfirmExit,
     confirm: confirmExit,
@@ -177,7 +185,46 @@ export function CheckCalibration(
   }
   // @ts-expect-error(sa, 2021-05-27): avoiding src code change, currentStep might be undefined
   const Panel = PANEL_BY_STEP[currentStep]
-  return Panel ? (
+  if (Panel == null) return null
+  return enableCalibrationWizards ? (
+    <Portal level="top">
+      <ModalShell
+        width="47rem"
+        header={
+          <WizardHeader
+            title={ROBOT_CALIBRATION_CHECK_SUBTITLE}
+            currentStep={1}
+            totalSteps={5}
+            onExit={confirmExit}
+          />
+        }
+      >
+        <Box padding={SPACING.spacing6}>
+          <Panel
+            sendCommands={sendCommands}
+            cleanUpAndExit={cleanUpAndExit}
+            tipRack={activeTipRack}
+            calBlock={calBlock}
+            isMulti={isMulti}
+            mount={activePipette?.mount.toLowerCase() as Mount}
+            currentStep={currentStep}
+            sessionType={session.sessionType}
+            checkBothPipettes={checkBothPipettes}
+            instruments={instruments}
+            comparisonsByPipette={comparisonsByPipette}
+            activePipette={activePipette}
+          />
+        </Box>
+      </ModalShell>
+      {showConfirmExit && (
+        <ConfirmExitModal
+          exit={confirmExit}
+          back={cancelExit}
+          sessionType={session.sessionType}
+        />
+      )}
+    </Portal>
+  ) : (
     <>
       <ModalPage
         titleBar={titleBarProps}
@@ -207,5 +254,5 @@ export function CheckCalibration(
         />
       )}
     </>
-  ) : null
+  )
 }
