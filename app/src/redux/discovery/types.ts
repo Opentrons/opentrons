@@ -9,6 +9,8 @@ import {
   CONNECTABLE,
   REACHABLE,
   UNREACHABLE,
+  ROBOT_MODEL_OT2,
+  ROBOT_MODEL_OT3,
 } from './constants'
 
 export type { DiscoveryClientRobot, HealthStatus }
@@ -20,6 +22,8 @@ export type ConnectivityStatus =
   | typeof REACHABLE
   | typeof UNREACHABLE
 
+export type RobotModel = typeof ROBOT_MODEL_OT2 | typeof ROBOT_MODEL_OT3
+
 export interface DiscoveryState {
   scanning: boolean
   robotsByName: RobotsMap
@@ -30,6 +34,7 @@ export interface BaseRobot extends Omit<DiscoveryClientRobot, 'addresses'> {
   connected: boolean
   local: boolean | null
   seen: boolean
+  robotModel: RobotModel
 }
 
 // fully connectable robot
