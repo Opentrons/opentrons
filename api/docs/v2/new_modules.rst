@@ -720,15 +720,12 @@ Additionally, if you want to pipette while the module is holding at a speed and/
 .. code-block:: python
 
     hs_mod.set_and_wait_for_target_temperature(75)
-    start_time = time.time()  # set reference time
+    start_time = time.monotonic()  # set reference time
     pipette.pick_up_tip()   
     pipette.aspirate(50, plate['A1'])
     pipette.dispense(50, plate['B1'])
     pipette.drop_tip()
-    if not protocol.is_simulating()
-        # check if 60 seconds have elapsed since reference time
-        while time.time() - start_time < 60
-            time.sleep(1)
+    protocol.delay(max(0, start_time+60 - time.monotonic()))
     hs_mod.deactivate_heater()
 
 Provided that the parallel pipetting actions don’t take more than one minute, this code will deactivate the heater one minute after its target was reached. 
