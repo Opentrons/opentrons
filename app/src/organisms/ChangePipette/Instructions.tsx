@@ -97,7 +97,11 @@ export function Instructions(props: Props): JSX.Element {
         }
       />
       {!actualPipette && !wantedPipette && (
-        <Flex paddingX={SPACING.spacing6} paddingTop={SPACING.spacing6} marginBottom='12.9rem'>
+        <Flex
+          paddingX={SPACING.spacing6}
+          paddingTop={SPACING.spacing6}
+          marginBottom="12.9rem"
+        >
           <PipetteSelection onPipetteChange={setWantedName} />
         </Flex>
       )}
