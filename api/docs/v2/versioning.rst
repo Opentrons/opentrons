@@ -255,3 +255,4 @@ Version 2.13
 
 - :py:meth:`.InstrumentContext.drop_tip` now has a ``prep_after`` parameter.
 - :py:meth:`.InstrumentContext.home` may home *both* pipettes as needed to avoid collision risks.
+- :py:meth:`.InstrumentContext.aspirate` and :py:meth:`.InstrumentContext.dispense` will avoid interacting directly with modules.

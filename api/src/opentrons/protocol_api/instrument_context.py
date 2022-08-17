@@ -195,7 +195,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 "knows where it is."
             )
         if self.api_version >= APIVersion(2, 11):
-            instrument.validate_can_aspirate(dest)
+            instrument.validate_takes_liquid(
+                location=dest, reject_module=self.api_version >= APIVersion(2, 13)
+            )
 
         if self.current_volume == 0:
             # Make sure we're at the top of the labware and clear of any
@@ -314,7 +316,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 "knows where it is."
             )
         if self.api_version >= APIVersion(2, 11):
-            instrument.validate_can_dispense(loc)
+            instrument.validate_takes_liquid(
+                location=loc, reject_module=self.api_version >= APIVersion(2, 13)
+            )
 
         c_vol = self.current_volume if not volume else volume
 
