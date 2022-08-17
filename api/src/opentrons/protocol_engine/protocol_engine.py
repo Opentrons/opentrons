@@ -5,11 +5,10 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
-from opentrons.protocol_engine import Liquid
 
 from .resources import ModelUtils, ModuleDataProvider
 from .commands import Command, CommandCreate
-from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel
+from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel, Liquid
 from .execution import (
     QueueWorker,
     create_queue_worker,
