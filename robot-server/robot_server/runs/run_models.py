@@ -110,7 +110,7 @@ class Run(ResourceModel):
         None,
         description="Run started at timestamp.",
     )
-    liquids: List[Liquid] = Field(
+    liquids: Optional[List[Liquid]] = Field(
         ...,
         description="Liquids loaded to the run.",
     )

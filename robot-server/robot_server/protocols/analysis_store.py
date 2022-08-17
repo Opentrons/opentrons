@@ -111,7 +111,7 @@ class AnalysisStore:
         labware: List[LoadedLabware],
         pipettes: List[LoadedPipette],
         errors: List[ErrorOccurrence],
-        liquids: List[Liquid],
+        liquids: Optional[List[Liquid]],
     ) -> None:
         """Promote a pending analysis to completed, adding details of its results.
 

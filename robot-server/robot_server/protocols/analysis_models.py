@@ -2,7 +2,7 @@
 # TODO(mc, 2021-08-25): add modules to simulation result
 from enum import Enum
 from pydantic import BaseModel, Field
-from typing import List, Union
+from typing import List, Union, Optional
 from typing_extensions import Literal
 
 from opentrons.protocol_engine import (
@@ -100,7 +100,7 @@ class CompletedAnalysis(BaseModel):
         ...,
         description="Any errors the protocol run produced",
     )
-    liquids: List[Liquid] = Field(
+    liquids: Optional[List[Liquid]] = Field(
         ...,
         description="Liquids used by the protocol",
     )
