@@ -18,6 +18,16 @@ describe('WellSpacing', () => {
     }
   })
 
+  it('renders correct labels', () => {
+    props.wellProperties = {
+      ...props.wellProperties,
+      xSpacing: 2.22227,
+      ySpacing: 2.22227,
+    }
+    const [{ getAllByText }] = render(props)
+    expect(getAllByText('2.22')).toHaveLength(2)
+  })
+
   it('renders correct labels when xSpacing and ySpacing have values', () => {
     const [{ getAllByText, getByRole }] = render(props)
 
