@@ -53,11 +53,12 @@ class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidR
 
         try:
             labware_wells = self._state_view.labware.get_wells(params.labwareId)
-            for well in params.volumeByWell:
-                if well not in labware_wells:
-                    raise WellDoesNotExistError()
         except KeyError:
             raise LabwareNotLoadedError()
+
+        for well in params.volumeByWell:
+            if well not in labware_wells:
+                raise WellDoesNotExistError()
 
         return LoadLiquidResult()
 
