@@ -257,6 +257,9 @@ def test_load_json(
     subject.load(json_protocol_source)
 
     decoy.verify(
+        protocol_engine.add_liquid(
+            liquid=Liquid(id="water-id", displayName="water", description=" water desc")
+        ),
         protocol_engine.add_command(
             request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="hello")
@@ -266,9 +269,6 @@ def test_load_json(
             request=pe_commands.WaitForResumeCreate(
                 params=pe_commands.WaitForResumeParams(message="goodbye")
             )
-        ),
-        protocol_engine.add_liquid(
-            liquid=Liquid(id="water-id", displayName="water", description=" water desc")
         ),
         task_queue.set_run_func(func=protocol_engine.wait_until_complete),
     )

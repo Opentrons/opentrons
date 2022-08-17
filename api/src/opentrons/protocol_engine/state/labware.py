@@ -45,6 +45,7 @@ class LabwareState:
     # If a LoadedLabware here has a non-None offsetId,
     # it must point to an existing element of labware_offsets_by_id.
     labware_by_id: Dict[str, LoadedLabware]
+
     # Indexed by LabwareOffset.id.
     # We rely on Python 3.7+ preservation of dict insertion order.
     labware_offsets_by_id: Dict[str, LabwareOffset]

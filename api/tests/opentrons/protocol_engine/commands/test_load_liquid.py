@@ -7,7 +7,6 @@ from opentrons.protocol_engine.commands import (
     LoadLiquidImplementation,
     LoadLiquidParams,
 )
-from opentrons.protocol_engine.types import Liquid
 from opentrons.protocol_engine.errors import (
     LiquidNotFoundError,
     LabwareNotLoadedError,
@@ -32,13 +31,9 @@ async def test_load_liquid_implementation(
     decoy: Decoy, subject: LoadLiquidImplementation, mock_state_view: StateView
 ) -> None:
     """Test LoadLiquid command execution."""
-    decoy.when(mock_state_view.liquid.has("liquid-id")).then_return(
-        True
-    )
+    decoy.when(mock_state_view.liquid.has("liquid-id")).then_return(True)
 
-    decoy.when(mock_state_view.liquid.has("no-id")).then_return(
-        False
-    )
+    decoy.when(mock_state_view.liquid.has("no-id")).then_return(False)
 
     decoy.when(mock_state_view.labware.get_wells("labware-id")).then_return(
         ["A1", "B2"]
@@ -58,9 +53,7 @@ async def test_load_liquid_liquid_not_found(
     decoy: Decoy, subject: LoadLiquidImplementation, mock_state_view: StateView
 ) -> None:
     """Should raise an error that liquid not found."""
-    decoy.when(mock_state_view.liquid.has("liquid-not-found")).then_return(
-        False
-    )
+    decoy.when(mock_state_view.liquid.has("liquid-not-found")).then_return(False)
 
     decoy.when(mock_state_view.labware.get_wells("labware-id")).then_return(
         ["A1", "B2"]
@@ -83,9 +76,7 @@ async def test_load_liquid_labware_not_found(
         LabwareNotLoadedError()
     )
 
-    decoy.when(mock_state_view.liquid.has("liquid-id")).then_return(
-        True
-    )
+    decoy.when(mock_state_view.liquid.has("liquid-id")).then_return(True)
 
     data = LoadLiquidParams(
         labwareId="labware-not-found",
@@ -104,9 +95,7 @@ async def test_load_liquid_well_not_found(
         ["A1", "B2"]
     )
 
-    decoy.when(mock_state_view.liquid.has("liquid-id")).then_return(
-        True
-    )
+    decoy.when(mock_state_view.liquid.has("liquid-id")).then_return(True)
 
     data = LoadLiquidParams(
         labwareId="labware-id",
