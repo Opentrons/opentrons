@@ -86,29 +86,6 @@ def _translate_pipette_command(
     return translated_obj
 
 
-def _translate_liquid_command(
-    protocol: ProtocolSchemaV6, command: protocol_schema_v6.Command
-) -> pe_commands.LoadLiquidCreate:
-    liquidId = command.params.liquidId
-    labwareId = command.params.labwareId
-    volumeByWell = command.params.volumeByWell
-    # v6 data model supports all commands and therefor most props are optional.
-    # load liquid command must contain liquidId, labwareId and volumeByWell.
-    assert liquidId is not None
-    assert labwareId is not None
-    assert volumeByWell is not None
-
-    liquid_command = pe_commands.LoadLiquidCreate(
-        params=pe_commands.LoadLiquidParams(
-            labwareId=labwareId,
-            liquidId=liquidId,
-            volumeByWell=volumeByWell,
-        ),
-        key=command.key,
-    )
-    return liquid_command
-
-
 def _translate_simple_command(
     command: protocol_schema_v6.Command,
 ) -> pe_commands.CommandCreate:
@@ -162,8 +139,6 @@ class JsonTranslator:
                 translated_obj = _translate_module_command(protocol, command)
             elif command.commandType == "loadLabware":
                 translated_obj = _translate_labware_command(protocol, command)
-            elif command.commandType == "loadLiquid":
-                translated_obj = _translate_liquid_command(protocol, command)
             else:
                 translated_obj = _translate_simple_command(command)
             commands_list.append(translated_obj)
