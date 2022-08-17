@@ -853,11 +853,11 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     def speed_status(self) -> str:
         """One of five possible shaking statuses:
 
-        - ``holding at target`` - The module has reached its target shake speed and is actively maintaining that speed.
-        - ``speeding up`` - The module is increasing its shake speed towards a target.
-        - ``slowing down`` - The module was previously shaking at a faster speed and is currently reducing its speed to a lower target or to deactivate.
-        - ``idle`` - The module is not shaking.
-        - ``error`` - The shaking status can't be determined.
+        - ``holding at target``: The module has reached its target shake speed and is actively maintaining that speed.
+        - ``speeding up``: The module is increasing its shake speed towards a target.
+        - ``slowing down``: The module was previously shaking at a faster speed and is currently reducing its speed to a lower target or to deactivate.
+        - ``idle``: The module is not shaking.
+        - ``error``: The shaking status can't be determined.
         """
         return self._module.speed_status.value
 
