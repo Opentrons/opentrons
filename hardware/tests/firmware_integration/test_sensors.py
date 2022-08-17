@@ -136,23 +136,15 @@ async def test_read_from_sensors(
 @pytest.mark.parametrize(
     argnames=["sensor_type", "expected_value"],
     argvalues=[
-        # TODO (lc 8-10-2022) the capacitive sensor seems to
-        # double the value returned for a reading, each time
-        # a request is sent in simulation. When the capacitive
-        # driver refactor happens, we should investigate this
-        # further. For now this should allow the tests to pass.
-        [SensorType.capacitive, 0.05],
-        [SensorType.pressure, 0.02],
-        # Data should be 12.7291 for humidity
         [SensorType.environment, (0.0, 57.67)],
     ],
 )
 @pytest.mark.requires_emulator
-async def test_baseline_poll_sensors(
+async def test_baseline_poll_environment(
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
     sensor_type: SensorType,
-    expected_value: Union[float, Tuple[float, float]],
+    expected_value: Tuple[float, float],
 ) -> None:
     """We should be able to poll the pressure and capacitive sensor."""
     poll_sensor = BaselineSensorRequest(
@@ -164,6 +156,99 @@ async def test_baseline_poll_sensors(
     )
     await can_messenger.send(node_id=NodeId.pipette_left, message=poll_sensor)
 
+    for response_idx in range(5):
+        try:
+            response, arbitration_id = await asyncio.wait_for(
+                can_messenger_queue.read(), 1
+            )
+        except Exception as e:
+            pytest.fail(f"Did not get response #{response_idx+1}: {str(e)}")
+        assert isinstance(response, ReadFromSensorResponse)
+        assert response.payload.sensor.value in (
+            SensorType.humidity.value,
+            SensorType.temperature.value,
+        )
+        if response.payload.sensor.value == SensorType.temperature.value:
+            assert (
+                round(
+                    SensorDataType.build(
+                        response.payload.sensor_data, response.payload.sensor
+                    ).to_float(),
+                    2,
+                )
+                == expected_value[1]
+            )
+        else:
+            assert (
+                round(
+                    SensorDataType.build(
+                        response.payload.sensor_data, response.payload.sensor
+                    ).to_float(),
+                    2,
+                )
+                == expected_value[0]
+            )
+
+
+@pytest.mark.parametrize(
+    argnames=["sensor_type", "expected_value"],
+    argvalues=[
+        [SensorType.capacitive, 0.02],
+    ],
+)
+@pytest.mark.requires_emulator
+async def test_baseline_poll_capacitance(
+    can_messenger: CanMessenger,
+    can_messenger_queue: WaitableCallback,
+    sensor_type: SensorType,
+    expected_value: float,
+) -> None:
+    """We should be able to poll the pressure and capacitive sensor."""
+    poll_sensor = BaselineSensorRequest(
+        payload=BaselineSensorRequestPayload(
+            sensor=SensorTypeField(sensor_type),
+            sensor_id=SensorIdField(SensorId.S0),
+            sample_rate=UInt16Field(5),
+        )
+    )
+    await can_messenger.send(node_id=NodeId.pipette_left, message=poll_sensor)
+
+    response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 5)
+    assert isinstance(response, ReadFromSensorResponse)
+    assert response.payload.sensor.value == sensor_type.value
+    assert (
+        round(
+            SensorDataType.build(
+                response.payload.sensor_data, response.payload.sensor
+            ).to_float(),
+            2,
+        )
+        == expected_value
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["sensor_type", "expected_value"],
+    argvalues=[
+        [SensorType.pressure, 0.02],
+    ],
+)
+@pytest.mark.requires_emulator
+async def test_baseline_poll_pressure(
+    can_messenger: CanMessenger,
+    can_messenger_queue: WaitableCallback,
+    sensor_type: SensorType,
+    expected_value: float,
+) -> None:
+    """We should be able to poll the pressure and capacitive sensor."""
+    poll_sensor = BaselineSensorRequest(
+        payload=BaselineSensorRequestPayload(
+            sensor=SensorTypeField(sensor_type),
+            sensor_id=SensorIdField(SensorId.S0),
+            sample_rate=UInt16Field(5),
+        )
+    )
+    await can_messenger.send(node_id=NodeId.pipette_left, message=poll_sensor)
     await can_messenger.send(
         node_id=NodeId.pipette_left,
         message=ReadFromSensorRequest(
@@ -176,39 +261,17 @@ async def test_baseline_poll_sensors(
     )
 
     response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
-    if sensor_type == SensorType.environment and isinstance(expected_value, tuple):
-        response2, _ = await asyncio.wait_for(can_messenger_queue.read(), 3)
-        assert isinstance(response, ReadFromSensorResponse)
-        assert isinstance(response2, ReadFromSensorResponse)
-        assert (
-            round(
-                SensorDataType.build(
-                    response.payload.sensor_data, response.payload.sensor
-                ).to_float(),
-                2,
-            )
-            == expected_value[0]
+    assert isinstance(response, ReadFromSensorResponse)
+    assert response.payload.sensor.value == sensor_type.value
+    assert (
+        round(
+            SensorDataType.build(
+                response.payload.sensor_data, response.payload.sensor
+            ).to_float(),
+            2,
         )
-        assert (
-            round(
-                SensorDataType.build(
-                    response2.payload.sensor_data, response.payload.sensor
-                ).to_float(),
-                2,
-            )
-            == expected_value[1]
-        )
-    else:
-        assert isinstance(response, ReadFromSensorResponse)
-        assert (
-            round(
-                SensorDataType.build(
-                    response.payload.sensor_data, response.payload.sensor
-                ).to_float(),
-                2,
-            )
-            == expected_value
-        )
+        == expected_value
+    )
 
 
 @pytest.mark.parametrize(
