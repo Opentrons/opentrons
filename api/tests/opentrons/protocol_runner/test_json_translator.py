@@ -28,7 +28,7 @@ from opentrons.protocol_engine import (
     ModuleModel,
     ModuleLocation,
 )
-from opentrons.protocol_engine.types import Liquid
+from opentrons.protocol_engine import Liquid
 
 VALID_TEST_PARAMS = [
     (
@@ -449,21 +449,3 @@ def test_load_liquid(
     assert result == [
         Liquid(id="liquid-id-555", displayName="water", description="water description")
     ]
-
-    empty_liquids = protocol_schema_v6.ProtocolSchemaV6(
-        # schemaVersion is arbitrary. Currently (2021-06-28), JsonProtocol.parse_obj()
-        # isn't smart enough to validate differently depending on this field.
-        otSharedSchema="#/protocol/schemas/6",
-        schemaVersion=6,
-        metadata=protocol_schema_v6.Metadata(),
-        robot=protocol_schema_v6.Robot(model="OT-2 Standard", deckId="ot2_standard"),
-        pipettes={},
-        labwareDefinitions={},
-        labware={},
-        commands=[],
-        liquids={},
-        modules={},
-    )
-
-    result = subject.translate_liquids(empty_liquids)
-    assert result == []
