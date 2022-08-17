@@ -57,26 +57,38 @@ describe('TipPickUp', () => {
     jest.resetAllMocks()
   })
 
+  const jogVectorsByDirection: { [dir: string]: VectorTuple } = {
+    up: [0, 0, 0.1],
+    down: [0, 0, -0.1],
+    left: [-0.1, 0, 0],
+    right: [0.1, 0, 0],
+    back: [0, 0.1, 0],
+    forward: [0, -0.1, 0],
+  }
+
   it('allows jogging in z axis', () => {
     const wrapper = render()
+    wrapper.find('button[title="vertical"]').simulate('click')
+    wrapper.update()
 
-    const jogDirections: string[] = [
-      'left',
-      'right',
-      'back',
-      'forward',
-      'up',
-      'down',
-    ]
-    const jogVectorsByDirection: { [dir: string]: VectorTuple } = {
-      up: [0, 0, 0.1],
-      down: [0, 0, -0.1],
-      left: [-0.1, 0, 0],
-      right: [0.1, 0, 0],
-      back: [0, 0.1, 0],
-      forward: [0, -0.1, 0],
-    }
-    jogDirections.forEach(direction => {
+    const zAxisJogDirections: string[] = ['up', 'down']
+    zAxisJogDirections.forEach(direction => {
+      getJogButton(wrapper, direction).invoke('onClick')?.(
+        {} as React.MouseEvent
+      )
+      wrapper.update()
+
+      expect(mockSendCommands).toHaveBeenCalledWith({
+        command: Sessions.sharedCalCommands.JOG,
+        data: { vector: jogVectorsByDirection[direction] },
+      })
+    })
+  })
+  it('allows jogging in x-y axes', () => {
+    const wrapper = render()
+
+    const xyAxesJogDirections: string[] = ['left', 'right', 'back', 'forward']
+    xyAxesJogDirections.forEach(direction => {
       getJogButton(wrapper, direction).invoke('onClick')?.(
         {} as React.MouseEvent
       )

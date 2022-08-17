@@ -134,6 +134,7 @@ describe('SaveZPoint', () => {
     wrapper
       .find('button[children="Reveal XY jog controls to move across deck"]')
       .invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[title="horizontal"]').simulate('click')
     jogDirections.forEach(direction => {
       getJogButton(wrapper, direction).invoke('onClick')?.(
         {} as React.MouseEvent

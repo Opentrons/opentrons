@@ -207,6 +207,7 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
             return (
               <Flex key={plane}>
                 <PrimaryButton
+                  title={plane}
                   css={currentPlane === plane ? ACTIVE_STYLE : DEFAULT_STYLE}
                   minWidth="157px"
                   height="58px"
