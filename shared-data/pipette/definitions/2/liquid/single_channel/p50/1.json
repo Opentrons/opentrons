@@ -101,8 +101,8 @@
           ]
         }
       ],
-	"maxVolume": 1,
-	"minVolume": 1000,
+	"maxVolume": 50,
+	"minVolume": 0.5,
 	"defaultTipracks": [
 		"opentrons/opentrons_96_tiprack_20ul/1",
 		"opentrons/opentrons_96_filtertiprack_10ul/1",

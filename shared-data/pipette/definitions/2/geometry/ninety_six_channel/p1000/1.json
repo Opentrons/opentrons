@@ -1,0 +1,6 @@
+{
+	"$otSharedSchema": "pipette/schemas/2/pipetteGeometrySchema",
+	"model": "ninetySixChannel",
+	"pathTo3D" : "pipette/definitions/2/ninety_six_channel/p1000/placeholder.gltf",
+	"nozzleOffset": []
+}
