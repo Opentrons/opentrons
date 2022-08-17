@@ -85,18 +85,19 @@ export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
 `
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
-  background-color: ${COLORS.blueEnabled};
-  border-radius: ${BORDERS.radiusSoftCorners};
-  box-shadow: none;
-  padding: ${SPACING.spacing3} ${SPACING.spacing4};
-  line-height: ${TYPOGRAPHY.lineHeight20};
-  text-transform: ${TYPOGRAPHY.textTransformNone};
-  box-shadow: 0 0 0;
-  ${TYPOGRAPHY.pSemiBold}
+  && {
+    background-color: ${COLORS.blueEnabled};
+    border-radius: ${BORDERS.radiusSoftCorners};
+    box-shadow: none;
+    padding: ${SPACING.spacing3} ${SPACING.spacing4};
+    line-height: ${TYPOGRAPHY.lineHeight20};
+    text-transform: ${TYPOGRAPHY.textTransformNone};
+    ${TYPOGRAPHY.pSemiBold}
 
-  ${styleProps}
-
-  &:hover, &:focus {
+    ${styleProps}
+  }
+  &:hover,
+  &:focus {
     background-color: ${COLORS.blueHover};
     box-shadow: none;
   }
