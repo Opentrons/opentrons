@@ -188,6 +188,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
                 max: HS_RPM_MAX,
               })}
               error={errorMessage}
+              disabled={isShaking}
             />
           </Flex>
           <TertiaryButton

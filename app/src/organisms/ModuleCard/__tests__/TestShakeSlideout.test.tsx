@@ -208,7 +208,7 @@ describe('TestShakeSlideout', () => {
     expect(button).toBeDisabled()
   })
 
-  it('open latch button should be disabled if the module is shaking', () => {
+  it('open latch button and input field should be disabled if the module is shaking', () => {
     props = {
       module: mockMovingHeaterShaker,
       onCloseClick: jest.fn(),
@@ -218,6 +218,8 @@ describe('TestShakeSlideout', () => {
 
     const { getByRole } = render(props)
     const button = getByRole('button', { name: /Open/i })
+    const input = getByRole('spinbutton')
+    expect(input).toBeDisabled()
     expect(button).toBeDisabled()
   })
 

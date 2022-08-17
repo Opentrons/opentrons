@@ -53,6 +53,7 @@ export const HeaterShakerSlideout = (
   const moduleName = getModuleDisplayName(module.moduleModel)
   const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
   const modulePart = t('temperature')
+  const isShaking = module.data.speedStatus !== 'idle'
 
   const sendSetTemperatureOrShakeCommand: React.MouseEventHandler<HTMLInputElement> = e => {
     e.preventDefault()
@@ -156,6 +157,7 @@ export const HeaterShakerSlideout = (
               unit: unit,
             })}
             error={errorMessage}
+            disabled={isShaking}
           />
         </form>
       </Flex>
