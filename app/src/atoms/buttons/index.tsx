@@ -14,18 +14,19 @@ import {
 import { ToggleBtn, ToggleBtnProps } from '../ToggleBtn'
 
 export const TertiaryButton = styled(NewPrimaryBtn)`
-  background-color: ${COLORS.blueEnabled};
-  border-radius: ${BORDERS.radiusRoundEdge};
-  box-shadow: none;
-  color: ${COLORS.fundamentalsBackground};
-  overflow: no-wrap;
-  padding: ${SPACING.spacing3} ${SPACING.spacing4};
-  text-transform: ${TYPOGRAPHY.textTransformNone};
-  white-space: nowrap;
-  ${TYPOGRAPHY.labelSemiBold}
+  && {
+    background-color: ${COLORS.blueEnabled};
+    border-radius: ${BORDERS.radiusRoundEdge};
+    box-shadow: none;
+    color: ${COLORS.fundamentalsBackground};
+    overflow: no-wrap;
+    padding: ${SPACING.spacing3} ${SPACING.spacing4};
+    text-transform: ${TYPOGRAPHY.textTransformNone};
+    white-space: nowrap;
+    ${TYPOGRAPHY.labelSemiBold}
 
-  ${styleProps}
-
+    ${styleProps}
+  }
   &:hover {
     background-color: ${COLORS.blueHover};
     box-shadow: none;
@@ -70,15 +71,16 @@ export const SecondaryTertiaryButton = styled(NewSecondaryBtn)`
 `
 
 export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
-  background-color: ${COLORS.errorEnabled};
-  border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing3} ${SPACING.spacing4};
-  text-transform: ${TYPOGRAPHY.textTransformNone};
-  box-shadow: 0 0 0;
-  ${TYPOGRAPHY.pSemiBold}
+  && {
+    background-color: ${COLORS.errorEnabled};
+    border-radius: ${BORDERS.radiusSoftCorners};
+    padding: ${SPACING.spacing3} ${SPACING.spacing4};
+    text-transform: ${TYPOGRAPHY.textTransformNone};
+    box-shadow: 0 0 0;
+    ${TYPOGRAPHY.pSemiBold}
 
-  ${styleProps}
-
+    ${styleProps}
+  }
   &:hover {
     box-shadow: 0 0 0;
   }
