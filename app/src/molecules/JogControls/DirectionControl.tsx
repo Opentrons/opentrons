@@ -175,7 +175,7 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
     background-color: ${COLORS.white};
   `
 
-  const handlePlane: React.ChangeEventHandler<HTMLInputElement> = event => {
+  const handlePlane = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setCurrentPlane(event.currentTarget.value as Plane)
     event.currentTarget.blur()
   }
@@ -218,7 +218,11 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                 >
                   <Flex flexDirection={DIRECTION_ROW}>
                     <Icon
-                      name={`${plane}-plane`}
+                      name={
+                        plane === 'vertical'
+                          ? 'vertical-plane'
+                          : 'horizontal-plane'
+                      }
                       width="1.2rem"
                       marginRight={SPACING.spacing3}
                     />

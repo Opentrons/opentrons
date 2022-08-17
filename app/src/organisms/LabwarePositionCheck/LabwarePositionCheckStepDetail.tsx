@@ -223,7 +223,6 @@ export const LabwarePositionCheckStepDetail = (
             planes={[HORIZONTAL_PLANE, VERTICAL_PLANE]}
             width="100%"
             directionControlButtonColor={COLORS.blueEnabled}
-            isLPC={true}
           />
         ) : null}
       </Flex>

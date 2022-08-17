@@ -42,7 +42,9 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
     if (i > 0) setCurrentStepSize(stepSizes[i - 1])
   }
 
-  const handleStepSelect: React.ChangeEventHandler<HTMLInputElement> = event => {
+  const handleStepSelect = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ): void => {
     setCurrentStepSize(Number(event.currentTarget.value))
     event.currentTarget.blur()
   }
@@ -51,7 +53,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
     flex-shrink: 0;
   `
 
-  const STEP_SIZE_LABELS: { [stepSize: StepSize]: string } = {
+  const STEP_SIZE_LABELS: { [stepSize: number]: string } = {
     0.1: 'Tiny',
     1: 'Small',
     10: 'Large',
