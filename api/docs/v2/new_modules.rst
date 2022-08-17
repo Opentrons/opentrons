@@ -217,7 +217,6 @@ The GEN2 Temperature Module has a plastic insulating rim around the plate, and p
 This mitigates an issue where the GEN1 Temperature Module would have trouble cooling to very low temperatures, especially if it shared the deck with a running Thermocycler.
 
 
-
 .. _magnetic-module:
 
 ***********************
@@ -325,7 +324,6 @@ This means it will take longer for the GEN2 module to attract beads.
 Recommended Magnetic Module GEN2 bead attraction time:
     - Total liquid volume <= 50 uL: 5 minutes
     - Total liquid volume > 50 uL: 7 minutes
-
 
 
 .. _thermocycler-module:
@@ -628,9 +626,9 @@ In general, it's best to leave all slots adjacent to the Heater-Shaker empty, in
 
 First, you can’t place any other modules adjacent to the Heater-Shaker in any direction. This prevents collisions both while shaking and while opening the labware latch. Attempting to load a module next to the Heater-Shaker will raise a ``DeckConflictError``.
 
-Next, you can’t place tall labware (defined as >53 mm) to the left or right of the Heater-Shaker. This prevents the Heater-Shaker’s latch from colliding with the adjacent labware. Attempting to load tall labware to the right or left of the Heater-Shaker will also raise a ``DeckConflictError``. Common labware that exceed the height limit include tube racks and Opentrons 1000 µL Tip Racks.
+Next, you can’t place tall labware (defined as >53 mm) to the left or right of the Heater-Shaker. This prevents the Heater-Shaker’s latch from colliding with the adjacent labware. Attempting to load tall labware to the right or left of the Heater-Shaker will also raise a ``DeckConflictError``. Common labware that exceed the height limit include Opentrons tube racks and Opentrons 1000 µL Tip Racks.
 
-Finally, if you are using an 8-channel pipette, you can't perform pipetting actions in `any` adjacent slots. Attempting to do so will raise a ``PipetteMovementRestrictedByHeaterShakerError``. This prevents the pipette ejector from crashing on the module housing or labware latch. The one exception is that to the front or back of the Heater-Shaker, an 8-channel pipette can access tip racks only. Attempting to pipette to non-tip-rack labware will also raise a ``PipetteMovementRestrictedByHeaterShakerError``.
+Finally, if you are using an 8-channel pipette, you can't perform pipetting actions in `any` adjacent slots. Attempting to do so will raise a ``PipetteMovementRestrictedByHeaterShakerError``. This prevents the pipette ejector from crashing on the module housing or labware latch. There is one exception: to the front or back of the Heater-Shaker, an 8-channel pipette can access tip racks only. Attempting to pipette to non-tip-rack labware will also raise a ``PipetteMovementRestrictedByHeaterShakerError``.
 
 Latch Control
 =============
@@ -644,7 +642,7 @@ To easily add and remove labware from the Heater-Shaker, you can control its lab
 
 If the labware latch is already closed, ``close_labware_latch()`` will succeed immediately; you don’t have to check the status of the latch before opening or closing it.
 
-For preparing the deck before running a protocol, use the labware latch controls in the Opentrons App or run these methods in Jupyter notebook.
+To prepare the deck before running a protocol, use the labware latch controls in the Opentrons App or run these methods in Jupyter notebook.
 
 Loading Labware
 ===============
@@ -673,6 +671,10 @@ Heating and Shaking
 ===================
 
 Heating and shaking operations are controlled independently, and are treated differently due to the amount of time they take. Speeding up or slowing down the shaker takes at most a few seconds, so it is treated as a *blocking* command — all other command execution must wait until it is complete. In contrast, heating the module or letting it passively cool can take much longer, so the Python API gives you the flexibility to perform other pipetting actions while waiting to reach a target temperature. When holding at a target, you can design your protocol to run in a blocking or non-blocking manner.
+
+.. note::
+
+	As of version 2.13 of the API, only the Heater-Shaker Module supports non-blocking command execution. All other modules' methods are blocking commands.
 
 Blocking commands
 -----------------
@@ -742,7 +744,6 @@ As with setting targets, deactivating the heater and shaker are done separately,
 .. note:: 
 
     The OT-2 will not automatically deactivate the Heater-Shaker at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Heater-Shaker module controls on the device detail page in the Opentrons App or run these methods in Jupyter notebook.
-
 
 
 ***************************************
