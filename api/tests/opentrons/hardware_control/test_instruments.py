@@ -378,7 +378,7 @@ async def test_aspirate_ot3(dummy_instruments_ot3, ot3_api_obj):
     aspirate_rate = 2
     await hw_api.prepare_for_aspirate(mount)
     await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
-    new_plunger_pos = 59.319451
+    new_plunger_pos = 42.833333
     pos = await hw_api.current_position(mount)
     assert pos[Axis.B] == new_plunger_pos
 
@@ -427,12 +427,16 @@ async def test_dispense_ot3(dummy_instruments_ot3, ot3_api_obj):
 
     dispense_1 = 3.0
     await hw_api.dispense(mount, dispense_1)
-    plunger_pos_1 = 59.051839
-    assert (await hw_api.current_position(mount))[Axis.B] == plunger_pos_1
+    plunger_pos_1 = 42.83333
+    assert (await hw_api.current_position(mount))[Axis.B] == pytest.approx(
+        plunger_pos_1
+    )
 
     await hw_api.dispense(mount, rate=2)
     plunger_pos_2 = 59.5
-    assert (await hw_api.current_position(mount))[Axis.B] == plunger_pos_2
+    assert (await hw_api.current_position(mount))[Axis.B] == pytest.approx(
+        plunger_pos_2
+    )
 
 
 async def test_no_pipette(sim_and_instr):
