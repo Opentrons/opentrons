@@ -49,16 +49,16 @@ class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidR
     async def execute(self, params: LoadLiquidParams) -> LoadLiquidResult:
         """Load data necessary for a liquid."""
         if not self._state_view.liquid.has(params.liquidId):
-            raise LiquidNotFoundError()
+            raise LiquidNotFoundError(f"Supplied liquidId: {params.liquidId} does not exist in the loaded liquids.")
 
         try:
             labware_wells = self._state_view.labware.get_wells(params.labwareId)
         except KeyError:
-            raise LabwareNotLoadedError()
+            raise LabwareNotLoadedError(f"Supplied labwareId: {params.labwareId} does not exist in the loaded labware.")
 
         for well in params.volumeByWell:
             if well not in labware_wells:
-                raise WellDoesNotExistError()
+                raise WellDoesNotExistError(f"Supplied wellName: {well} does not exist in the loaded labware.")
 
         return LoadLiquidResult()
 
