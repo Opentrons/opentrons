@@ -14,7 +14,7 @@ from opentrons_shared_data.protocol.models.protocol_schema_v6 import ProtocolSch
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocol_api_experimental import ProtocolContext
 from opentrons.protocol_engine import ProtocolEngine, commands as pe_commands
-from opentrons.protocol_engine.types import Liquid
+from opentrons.protocol_engine import Liquid
 from opentrons.protocol_reader import (
     ProtocolSource,
     JsonProtocolConfig,

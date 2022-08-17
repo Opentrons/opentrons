@@ -138,13 +138,13 @@ class JsonTranslator:
     def translate_liquids(self, protocol: ProtocolSchemaV6) -> List[Liquid]:
         """Takes json protocol v6 and translates liquids->protocol engine liquids."""
         protocol_liquids = protocol.liquids or {}
-        
+
         return [
             Liquid(
-                 id=liquid_id,
-                 displayName=liquid.displayName,
-                 description=liquid.description,
-                 displayColor=liquid.displayColor,
+                id=liquid_id,
+                displayName=liquid.displayName,
+                description=liquid.description,
+                displayColor=liquid.displayColor,
             )
             for liquid_id, liquid in protocol_liquids.items()
         ]
