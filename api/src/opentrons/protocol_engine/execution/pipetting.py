@@ -232,7 +232,7 @@ class PipettingHandler:
         volume: float,
         flow_rate: float,
     ) -> float:
-        """Dispense liquid to a well."""
+        """Dispense liquid without moving the pipette."""
         hw_pipette = self._state_store.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
             attached_pipettes=self._hardware_api.attached_instruments,

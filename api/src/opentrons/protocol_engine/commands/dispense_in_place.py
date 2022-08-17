@@ -66,7 +66,7 @@ class DispenseInPlace(BaseCommand[DispenseInPlaceParams, DispenseInPlaceResult])
 
 
 class DispenseInPlaceCreate(BaseCommandCreate[DispenseInPlaceParams]):
-    """Create dispense command request model."""
+    """DispenseInPlace command request model."""
 
     commandType: DispenseInPlaceCommandType = "dispenseInPlace"
     params: DispenseInPlaceParams
