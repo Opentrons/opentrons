@@ -20,3 +20,10 @@ def test_get_all(subject: LiquidView) -> None:
     assert subject.get_all() == [
         Liquid(id="water-id", displayName="water", description="water desc")
     ]
+
+
+def test_has_liquid(subject: LiquidView) -> None:
+    """Should return true if an item exists in the liquids list."""
+    assert subject.has("water-id") == True
+
+    assert subject.has("no-id") == False

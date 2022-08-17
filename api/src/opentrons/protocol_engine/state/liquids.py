@@ -49,3 +49,9 @@ class LiquidView(HasState[LiquidState]):
     def get_all(self) -> List[Liquid]:
         """Get all protocol liquids."""
         return self._state.liquids
+
+    def has(self, liquid_id: str) -> bool:
+        """Check if liquid_id exists in liquids."""
+        return any(
+            liquid.id == liquid_id for liquid in self.get_all()
+        )
