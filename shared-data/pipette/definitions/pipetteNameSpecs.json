@@ -456,85 +456,36 @@
       "opentrons/geb_96_tiprack_1000ul/1"
     ]
   },
-  "p20_single_gen3": {
-    "displayName": "P20 Single-Channel GEN3",
+  "p50_single_gen3": {
+    "displayName": "P50 Single-Channel GEN3",
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
-      "value": 3.78,
-      "min": 0.08,
-      "max": 24,
+      "value": 7.85,
+      "min": 3,
+      "max": 812,
       "valuesByApiLevel": {
-        "2.0": 3.78,
-        "2.6": 7.56
+        "2.0": 7.85
       }
     },
     "defaultDispenseFlowRate": {
-      "value": 3.78,
-      "min": 0.08,
-      "max": 24,
+      "value": 7.85,
+      "min": 3,
+      "max": 812,
       "valuesByApiLevel": {
-        "2.0": 3.78,
-        "2.6": 7.56
+        "2.0": 7.85
       }
     },
     "defaultBlowOutFlowRate": {
-      "value": 3.78,
-      "min": 0.08,
-      "max": 24,
+      "value": 7.85,
+      "min": 3,
+      "max": 812,
       "valuesByApiLevel": {
-        "2.0": 3.78,
-        "2.6": 7.56
+        "2.0": 7.85
       }
     },
+    "channels": 1,
     "minVolume": 1,
-    "maxVolume": 20,
-    "channels": 1,
-    "smoothieConfigs": {
-      "stepsPerMM": 2133.33,
-      "homePosition": 230.15,
-      "travelDistance": 80
-    },
-    "defaultTipracks": [
-      "opentrons/opentrons_96_tiprack_20ul/1",
-      "opentrons/opentrons_96_filtertiprack_20ul/1",
-      "opentrons/opentrons_96_tiprack_10ul/1",
-      "opentrons/opentrons_96_filtertiprack_10ul/1",
-      "opentrons/geb_96_tiprack_10ul/1"
-    ]
-  },
-  "p300_single_gen3": {
-    "displayName": "P300 Single-Channel GEN3",
-    "displayCategory": "GEN2",
-    "defaultAspirateFlowRate": {
-      "value": 46.43,
-      "min": 1,
-      "max": 275,
-      "valuesByApiLevel": {
-        "2.0": 46.43,
-        "2.6": 92.86
-      }
-    },
-    "defaultDispenseFlowRate": {
-      "value": 46.43,
-      "min": 1,
-      "max": 275.31,
-      "valuesByApiLevel": {
-        "2.0": 46.43,
-        "2.6": 92.86
-      }
-    },
-    "defaultBlowOutFlowRate": {
-      "value": 46.43,
-      "min": 1,
-      "max": 275,
-      "valuesByApiLevel": {
-        "2.0": 46.43,
-        "2.6": 92.86
-      }
-    },
-    "channels": 1,
-    "minVolume": 20,
-    "maxVolume": 300,
+    "maxVolume": 50,
     "smoothieConfigs": {
       "stepsPerMM": 2133.33,
       "homePosition": 230.15,
