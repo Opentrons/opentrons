@@ -282,6 +282,7 @@ export const TestShakeSlideout = (
                 max: HS_RPM_MAX,
               })}
               error={errorMessage}
+              disabled={isShaking}
             />
             <StyledText
               color={COLORS.darkGreyEnabled}
