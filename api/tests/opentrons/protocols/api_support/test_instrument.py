@@ -96,7 +96,7 @@ def test_validate_takes_liquid(ctx: ProtocolContext, reject_module: bool) -> Non
         )
 
 
-def test_validate_validate_takes_liquid_module_location(ctx):
+def test_validate_takes_liquid_module_location(ctx):
     module = ctx.load_module("magdeck", 1)
 
     validate_takes_liquid(
