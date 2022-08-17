@@ -180,20 +180,6 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
     event.currentTarget.blur()
   }
 
-  const handleShift = (e: KeyboardEvent): void => {
-    if (e.key === 'Shift') {
-      setCurrentPlane('vertical')
-    }
-  }
-
-  React.useEffect(() => {
-    window.addEventListener('keydown', handleShift)
-
-    return () => {
-      window.removeEventListener('keydown', handleShift)
-    }
-  }, [])
-
   return (
     <ControlContainer title={t('direction_controls')}>
       <Flex flexDirection={DIRECTION_ROW}>
@@ -245,11 +231,22 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
             )
           })}
         </Flex>
-        {currentPlane === 'horizontal' ? (
-          <ArrowKeys plane={'horizontal'} jog={jog} stepSize={stepSize} />
-        ) : (
-          <ArrowKeys plane={'vertical'} jog={jog} stepSize={stepSize} />
-        )}
+        <HandleKeypress
+          preventDefault
+          handlers={[
+            ...CONTROLS_CONTENTS_BY_PLANE.vertical.controls,
+            ...CONTROLS_CONTENTS_BY_PLANE.horizontal.controls,
+          ].map(({ keyName, shiftKey, axis, sign }) => ({
+            key: keyName,
+            shiftKey,
+            onPress: () => {
+              setCurrentPlane(shiftKey ? 'vertical' : 'horizontal')
+              jog(axis, sign, stepSize)
+            },
+          }))}
+        >
+          <ArrowKeys plane={currentPlane} jog={jog} stepSize={stepSize} />
+        </HandleKeypress>
       </Flex>
     </ControlContainer>
   )
@@ -294,51 +291,40 @@ export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
   `
 
   return (
-    <HandleKeypress
-      preventDefault
-      handlers={controls.map(({ keyName, shiftKey, axis, sign }) => ({
-        key: keyName,
-        shiftKey,
-        onPress: () => {
-          jog(axis, sign, stepSize)
-        },
-      }))}
+    <Box
+      css={ARROW_BUTTON_STYLING}
+      display="grid"
+      gridGap={SPACING.spacing1}
+      gridTemplateRows="repeat(2, [row] 2rem)"
+      gridTemplateColumns="repeat(3, [col] 2rem)"
+      margin={SIZE_AUTO}
+      paddingLeft={SPACING.spacing3}
     >
-      <Box
-        css={ARROW_BUTTON_STYLING}
-        display="grid"
-        gridGap={SPACING.spacing1}
-        gridTemplateRows="repeat(2, [row] 2rem)"
-        gridTemplateColumns="repeat(3, [col] 2rem)"
-        margin={SIZE_AUTO}
-        paddingLeft={SPACING.spacing3}
-      >
-        {controls.map(
-          ({ bearing, gridRow, gridColumn, margin, iconName, axis, sign }) => (
-            <PrimaryButton
-              key={bearing}
-              backgroundColor={COLORS.white}
-              color={COLORS.darkGreyEnabled}
-              border={BORDERS.lineBorder}
-              title={bearing}
-              width={'2.75rem'}
-              height={'2.75rem'}
-              alignSelf={ALIGN_CENTER}
-              padding={0}
-              onClick={() => jog(axis, sign, stepSize)}
-              {...{ gridRow, gridColumn, margin }}
+      {controls.map(
+        ({ bearing, gridRow, gridColumn, margin, iconName, axis, sign }) => (
+          <PrimaryButton
+            key={bearing}
+            backgroundColor={COLORS.white}
+            color={COLORS.darkGreyEnabled}
+            border={BORDERS.lineBorder}
+            title={bearing}
+            width={'2.75rem'}
+            height={'2.75rem'}
+            alignSelf={ALIGN_CENTER}
+            padding={0}
+            onClick={() => jog(axis, sign, stepSize)}
+            {...{ gridRow, gridColumn, margin }}
+          >
+            <Flex
+              alignItems={ALIGN_CENTER}
+              justifyContent={JUSTIFY_CENTER}
+              width="100%"
             >
-              <Flex
-                alignItems={ALIGN_CENTER}
-                justifyContent={JUSTIFY_CENTER}
-                width="100%"
-              >
-                <Icon size="1.5rem" name={iconName} />
-              </Flex>
-            </PrimaryButton>
-          )
-        )}
-      </Box>
-    </HandleKeypress>
+              <Icon size="1.5rem" name={iconName} />
+            </Flex>
+          </PrimaryButton>
+        )
+      )}
+    </Box>
   )
 }
