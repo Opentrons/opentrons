@@ -61,6 +61,7 @@ async def test_set_serial_gripper(
         (PipetteName.p1000_single, 31, b"2020190802A02"),
         (PipetteName.p50_multi, 500, b""),
         (PipetteName.p50_single, 0, b"asdasdasdasdasda"),
+        (PipetteName.unknown, 0xFFFF, b"\xff" * 16),
     ],
 )
 @pytest.mark.requires_emulator

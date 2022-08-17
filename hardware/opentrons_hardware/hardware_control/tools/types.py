@@ -27,6 +27,7 @@ class PipetteInformation:
     """Model the information you can retrieve from a pipette."""
 
     name: PipetteName
+    name_int: int
     model: int
     serial: str
 
