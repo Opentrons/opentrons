@@ -117,16 +117,17 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
 `
 
 export const SecondaryButton = styled(NewSecondaryBtn)`
-  color: ${COLORS.blueEnabled};
-  border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing3} ${SPACING.spacing4};
-  text-transform: ${TYPOGRAPHY.textTransformNone};
-  background-color: ${COLORS.transparent};
-  ${TYPOGRAPHY.pSemiBold}
-  background-color: ${COLORS.transparent};
+  && {
+    color: ${COLORS.blueEnabled};
+    border-radius: ${BORDERS.radiusSoftCorners};
+    padding: ${SPACING.spacing3} ${SPACING.spacing4};
+    text-transform: ${TYPOGRAPHY.textTransformNone};
+    background-color: ${COLORS.transparent};
+    ${TYPOGRAPHY.pSemiBold}
+    background-color: ${COLORS.transparent};
 
-  ${styleProps}
-
+    ${styleProps}
+  }
   &:hover {
     opacity: 70%;
     box-shadow: 0 0 0;

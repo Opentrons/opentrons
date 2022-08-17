@@ -22,10 +22,9 @@ describe('PrimaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('primary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.blueEnabled}`)
-    expect(button).toHaveStyle(`padding-top: ${SPACING.spacing3}`)
-    expect(button).toHaveStyle(`padding-bottom: ${SPACING.spacing3}`)
-    expect(button).toHaveStyle(`padding-right: ${SPACING.spacing4}`)
-    expect(button).toHaveStyle(`padding-left: ${SPACING.spacing4}`)
+    expect(button).toHaveStyle(
+      `padding: ${SPACING.spacing3} ${SPACING.spacing4}`
+    )
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeP}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
     expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight20}`)
