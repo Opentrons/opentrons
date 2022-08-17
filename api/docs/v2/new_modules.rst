@@ -626,7 +626,7 @@ In general, it's best to leave all slots adjacent to the Heater-Shaker empty, in
 
 First, you can’t place any other modules adjacent to the Heater-Shaker in any direction. This prevents collisions both while shaking and while opening the labware latch. Attempting to load a module next to the Heater-Shaker will raise a ``DeckConflictError``.
 
-Next, you can’t place tall labware (defined as >53 mm) to the left or right of the Heater-Shaker. This prevents the Heater-Shaker’s latch from colliding with the adjacent labware. Attempting to load tall labware to the right or left of the Heater-Shaker will also raise a ``DeckConflictError``. Common labware that exceed the height limit include Opentrons tube racks and Opentrons 1000 µL Tip Racks.
+Next, you can’t place tall labware (defined as >53 mm) to the left or right of the Heater-Shaker. This prevents the Heater-Shaker’s latch from colliding with the adjacent labware. Attempting to load tall labware to the right or left of the Heater-Shaker will also raise a ``DeckConflictError``. Common labware that exceed the height limit include Opentrons tube racks and Opentrons 1000 µL tip racks.
 
 Finally, if you are using an 8-channel pipette, you can't perform pipetting actions in `any` adjacent slots. Attempting to do so will raise a ``PipetteMovementRestrictedByHeaterShakerError``. This prevents the pipette ejector from crashing on the module housing or labware latch. There is one exception: to the front or back of the Heater-Shaker, an 8-channel pipette can access tip racks only. Attempting to pipette to non-tip-rack labware will also raise a ``PipetteMovementRestrictedByHeaterShakerError``.
 
@@ -715,23 +715,21 @@ To pipette while the Heater-Shaker is heating, use :py:meth:`~.HeaterShakerConte
 
 This example would likely take just as long as the blocking version above; it’s unlikely that one aspirate and one dispense action would take longer than the time for the module to heat. However, be careful when putting a lot of commands between a ``set_target_temperature()`` call and a ``delay()`` call. In this situation, you’re relying on ``wait_for_temperature()`` to resume execution of commands once heating is complete. But if the temperature has already been reached, the delay will begin later than expected and the Heater-Shaker will hold at its target temperature longer than intended.
 
-Additionally, if you want to pipette while the module is holding at a speed and/or temperature, you need to parallelize the commands yourself. One of the simplest ways to do this is with Python’s ``time`` library. First, add ``import time`` at the start of your protocol. Then use :py:func:`time.time` to set a reference time when the target is reached, and a ``while`` loop to check if the desired amount of time has elapsed:
+Additionally, if you want to pipette while the module holds at a target for a certain length of time, you need to track the holding time yourself. One of the simplest ways to do this is with Python’s ``time`` module. First, add ``import time`` at the start of your protocol. Then, use :py:func:`time.monotonic` to set a reference time when the target is reached. Finally, add a delay that calculates how much holding time is remaining after the pipetting actions:
 
 .. code-block:: python
 
-    hs_mod.set_and_wait_for_target_temperature(75)
+    hs_mod.set_and_wait_for_temperature(75)
     start_time = time.monotonic()  # set reference time
     pipette.pick_up_tip()   
     pipette.aspirate(50, plate['A1'])
     pipette.dispense(50, plate['B1'])
     pipette.drop_tip()
+    # delay for the difference between now and 60 seconds after the reference time
     protocol.delay(max(0, start_time+60 - time.monotonic()))
     hs_mod.deactivate_heater()
 
-Provided that the parallel pipetting actions don’t take more than one minute, this code will deactivate the heater one minute after its target was reached. 
-
-You’ll also notice that the timing ``while`` loop has been embedded in an ``if`` statement. Without this, the protocol will wait the entire duration, even in simulation and when loading the protocol onto a robot. This is because the Python API’s :py:meth:`.ProtocolContext.delay` method is designed to run instantaneously in simulation, but the methods from the ``time`` module (or any other module) run as they ordinarily would. Skipping these steps when simulating — yet performing them when ``not protocol.is_simulating()`` — saves considerable time.
-
+Provided that the parallel pipetting actions don’t take more than one minute, this code will deactivate the heater one minute after its target was reached. If more than one minute has elapsed, the value passed to ``protocol.delay`` will equal 0, and the protocol will continue immediately.
 
 Deactivating
 ============
