@@ -9,7 +9,7 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     PipetteName,
 )
-from opentrons.protocol_engine.types import Liquid
+from opentrons.protocol_engine import Liquid
 from opentrons.types import MountType
 
 
