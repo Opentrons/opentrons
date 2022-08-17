@@ -67,7 +67,7 @@ ROLE_ANALYZER_SPECS: List[RoleAnalyzerSpec] = [
             ),
             labware_files=[],
             labware_definitions=[
-                LabwareDefinition.construct(),  # type: ignore[call-arg]
+                LabwareDefinition.construct()  # type: ignore[call-arg]
             ],
         ),
     ),

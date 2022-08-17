@@ -221,7 +221,9 @@ async def test_config_error(
         path=None,
     )
     analyzed_roles = RoleAnalysis(
-        main_file=main_file, labware_files=[], labware_definitions=[]
+        main_file=main_file,
+        labware_files=[],
+        labware_definitions=[],
     )
 
     decoy.when(await file_reader_writer.read([input_file])).then_return([buffered_file])
