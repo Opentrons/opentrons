@@ -10,8 +10,8 @@ import {
   COLORS,
   SPACING,
 } from '@opentrons/components'
-import { StyledText } from '../text'
-import { StepMeter } from '../StepMeter'
+import { StyledText } from '../../atoms/text'
+import { StepMeter } from '../../atoms/StepMeter'
 
 interface WizardHeaderProps {
   totalSteps: number
