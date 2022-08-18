@@ -25,7 +25,7 @@ interface ModuleOverflowMenuProps {
 export const ModuleOverflowMenu = (
   props: ModuleOverflowMenuProps
 ): JSX.Element | null => {
-  const { t } = useTranslation(['device_details', 'heater_shaker'])
+  const { t } = useTranslation(['heater_shaker'])
   const {
     module,
     runId,
@@ -57,38 +57,37 @@ export const ModuleOverflowMenu = (
   }
 
   return (
-    <>
-      <Flex position={POSITION_RELATIVE}>
-        <MenuList
-          buttons={[
-            (menuOverflowItemsByModuleType[
-              module.moduleType
-            ] as MenuItemsByModuleType[ModuleType]).map(
-              (item: any, index: number) => {
-                return (
-                  <React.Fragment key={`${index}_${module.moduleType}`}>
-                    <MenuItem
-                      key={`${index}_${module.moduleModel}`}
-                      onClick={() => item.onClick(item.isSecondary)}
-                      data-testid={`module_setting_${module.moduleModel}`}
-                      disabled={item.disabledReason || isDisabled}
-                      {...targetProps}
-                    >
-                      {item.setSetting}
-                    </MenuItem>
-                    {item.disabledReason && (
-                      <Tooltip tooltipProps={tooltipProps}>
-                        {t('heater_shaker:cannot_shake')}
-                      </Tooltip>
-                    )}
-                    {item.menuButtons}
-                  </React.Fragment>
-                )
-              }
-            ),
-          ]}
-        />
-      </Flex>
-    </>
+    <Flex position={POSITION_RELATIVE}>
+      <MenuList
+        buttons={[
+          (menuOverflowItemsByModuleType[
+            module.moduleType
+          ] as MenuItemsByModuleType[ModuleType]).map(
+            (item: any, index: number) => {
+              return (
+                <React.Fragment key={`${index}_${module.moduleType}`}>
+                  <MenuItem
+                    key={`${index}_${module.moduleModel}`}
+                    onClick={() => item.onClick(item.isSecondary)}
+                    data-testid={`module_setting_${module.moduleModel}`}
+                    disabled={item.disabledReason || isDisabled}
+                    whiteSpace="nowrap"
+                    {...targetProps}
+                  >
+                    {item.setSetting}
+                  </MenuItem>
+                  {item.disabledReason && (
+                    <Tooltip tooltipProps={tooltipProps}>
+                      {t('cannot_shake')}
+                    </Tooltip>
+                  )}
+                  {item.menuButtons}
+                </React.Fragment>
+              )
+            }
+          ),
+        ]}
+      />
+    </Flex>
   )
 }

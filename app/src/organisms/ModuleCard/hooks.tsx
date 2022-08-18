@@ -172,6 +172,7 @@ export function useModuleOverflowMenu(
       key={`hs_attach_to_deck_${module.moduleModel}`}
       data-testid={`hs_attach_to_deck_${module.moduleModel}`}
       onClick={() => handleWizardClick()}
+      whiteSpace="nowrap"
     >
       {t('heater_shaker:show_attachment_instructions')}
     </MenuItem>
