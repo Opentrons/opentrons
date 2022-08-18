@@ -238,6 +238,20 @@ def test_get_wells(falcon_tuberack_def: LabwareDefinition) -> None:
     assert result == expected_wells
 
 
+def test_labware_has_well(falcon_tuberack_def: LabwareDefinition) -> None:
+    """It should return a list of wells from definition."""
+    subject = get_labware_view(
+        labware_by_id={"tube-rack-id": tube_rack},
+        definitions_by_uri={"some-tube-rack-uri": falcon_tuberack_def},
+    )
+
+    result = subject.labware_has_well(labware_id="tube-rack-id", well_name="A1")
+    assert result is True
+
+    result = subject.labware_has_well(labware_id="tube-rack-id", well_name="AA")
+    assert result is False
+
+
 def test_get_well_columns(falcon_tuberack_def: LabwareDefinition) -> None:
     """It should return wells as dict of list of columns."""
     subject = get_labware_view(

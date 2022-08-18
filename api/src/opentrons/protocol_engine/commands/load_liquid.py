@@ -6,7 +6,7 @@ from typing_extensions import Literal
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 from ..errors import (
-    LiquidNotFoundError,
+    LiquidDoesNotExistError,
     LabwareNotLoadedError,
     WellDoesNotExistError,
 )
@@ -49,7 +49,7 @@ class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidR
     async def execute(self, params: LoadLiquidParams) -> LoadLiquidResult:
         """Load data necessary for a liquid."""
         if not self._state_view.liquid.has(params.liquidId):
-            raise LiquidNotFoundError(
+            raise LiquidDoesNotExistError(
                 f"Supplied liquidId: {params.liquidId} does not exist in the loaded liquids."
             )
 

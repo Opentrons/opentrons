@@ -27,8 +27,8 @@ from opentrons.protocol_engine import (
     WellOffset,
     ModuleModel,
     ModuleLocation,
+    Liquid,
 )
-from opentrons.protocol_engine import Liquid
 
 VALID_TEST_PARAMS = [
     (

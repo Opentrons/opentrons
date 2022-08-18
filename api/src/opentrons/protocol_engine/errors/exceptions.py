@@ -47,7 +47,7 @@ class LabwareNotLoadedError(ProtocolEngineError):
     """An error raised when referencing a labware that has not been loaded."""
 
 
-class LiquidNotFoundError(ProtocolEngineError):
+class LiquidDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a liquid that has not been loaded."""
 
 

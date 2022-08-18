@@ -14,6 +14,7 @@ from opentrons.protocol_engine import (
     ErrorOccurrence,
     LoadedPipette,
     LoadedLabware,
+    Liquid,
 )
 
 from robot_server.persistence import analysis_table, sqlite_rowid
@@ -26,8 +27,6 @@ from .analysis_models import (
     AnalysisResult,
     AnalysisStatus,
 )
-
-from opentrons.protocol_engine import Liquid
 
 _log = getLogger(__name__)
 

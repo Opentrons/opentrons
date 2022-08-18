@@ -15,11 +15,10 @@ from opentrons.protocol_engine import (
     LoadedModule,
     LabwareOffset,
     LabwareOffsetCreate,
+    Liquid,
 )
 from robot_server.service.json_api import ResourceModel
 from .action_models import RunAction
-
-from opentrons.protocol_engine import Liquid
 
 
 # TODO(mc, 2022-02-01): since the `/runs/:run_id/commands` response is now paginated,
@@ -91,6 +90,10 @@ class Run(ResourceModel):
         ...,
         description="Labware that has been loaded into the run.",
     )
+    liquids: Optional[List[Liquid]] = Field(
+        ...,
+        description="Liquids loaded to the run.",
+    )
     labwareOffsets: List[LabwareOffset] = Field(
         ...,
         description="Labware offsets to apply as labware are loaded.",
@@ -109,10 +112,6 @@ class Run(ResourceModel):
     startedAt: Optional[datetime] = Field(
         None,
         description="Run started at timestamp.",
-    )
-    liquids: Optional[List[Liquid]] = Field(
-        ...,
-        description="Liquids loaded to the run.",
     )
 
 

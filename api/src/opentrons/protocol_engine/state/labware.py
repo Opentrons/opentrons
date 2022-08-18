@@ -277,6 +277,11 @@ class LabwareView(HasState[LabwareState]):
                 wells.append(well_name)
         return wells
 
+    def labware_has_well(self, labware_id: str, well_name: str) -> bool:
+        """Check if wells associated to a labware_id has well by name."""
+        wells = self.get_wells(labware_id)
+        return well_name in wells
+
     def get_well_columns(self, labware_id: str) -> Dict[str, List[str]]:
         """Get well columns."""
         definition = self.get_definition(labware_id=labware_id)

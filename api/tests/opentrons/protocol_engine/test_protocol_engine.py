@@ -21,6 +21,7 @@ from opentrons.protocol_engine.types import (
     LabwareUri,
     ModuleDefinition,
     ModuleModel,
+    Liquid,
 )
 from opentrons.protocol_engine.execution import (
     QueueWorker,
@@ -46,8 +47,6 @@ from opentrons.protocol_engine.actions import (
     QueueCommandAction,
     HardwareStoppedAction,
 )
-
-from opentrons.protocol_engine import Liquid
 
 
 @pytest.fixture

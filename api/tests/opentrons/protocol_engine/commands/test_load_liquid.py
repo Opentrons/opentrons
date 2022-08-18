@@ -8,7 +8,7 @@ from opentrons.protocol_engine.commands import (
     LoadLiquidParams,
 )
 from opentrons.protocol_engine.errors import (
-    LiquidNotFoundError,
+    LiquidDoesNotExistError,
     LabwareNotLoadedError,
     WellDoesNotExistError,
 )
@@ -64,7 +64,7 @@ async def test_load_liquid_liquid_not_found(
         liquidId="liquid-not-found",
         volumeByWell={"A1": 30, "B2": 100},
     )
-    with pytest.raises(LiquidNotFoundError):
+    with pytest.raises(LiquidDoesNotExistError):
         await subject.execute(data)
 
 

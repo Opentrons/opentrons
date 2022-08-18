@@ -10,9 +10,8 @@ from opentrons.protocol_engine import (
     ErrorOccurrence,
     LoadedLabware,
     LoadedPipette,
+    Liquid,
 )
-
-from opentrons.protocol_engine import Liquid
 
 
 class AnalysisStatus(str, Enum):
