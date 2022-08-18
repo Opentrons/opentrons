@@ -157,7 +157,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     (movementStatus === HOMING || movementStatus === MOVING)
   ) {
     return enableChangePipetteWizard ? (
-      <ModalShell height="28.12rem">
+      <ModalShell height="28.12rem" width="47rem">
         <InProgressModal
           title={t('attach_pipette')}
           mount={mount}
