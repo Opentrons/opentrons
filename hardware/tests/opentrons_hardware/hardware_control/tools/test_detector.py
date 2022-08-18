@@ -30,25 +30,25 @@ def subject(
     argvalues=[
         [
             payloads.ToolsDetectedNotificationPayload(
-                z_motor=ToolField(ToolType.pipette_96_chan.value),
-                a_motor=ToolField(ToolType.pipette_384_chan.value),
+                z_motor=ToolField(ToolType.pipette.value),
+                a_motor=ToolField(ToolType.pipette.value),
                 gripper=ToolField(ToolType.gripper.value),
             ),
             ToolDetectionResult(
-                left=ToolType.pipette_96_chan,
-                right=ToolType.pipette_384_chan,
+                left=ToolType.pipette,
+                right=ToolType.pipette,
                 gripper=ToolType.gripper,
             ),
         ],
         [
             payloads.ToolsDetectedNotificationPayload(
                 z_motor=ToolField(221),
-                a_motor=ToolField(ToolType.pipette_384_chan.value),
+                a_motor=ToolField(ToolType.pipette.value),
                 gripper=ToolField(ToolType.gripper.value),
             ),
             ToolDetectionResult(
                 left=ToolType.undefined_tool,
-                right=ToolType.pipette_384_chan,
+                right=ToolType.pipette,
                 gripper=ToolType.gripper,
             ),
         ],

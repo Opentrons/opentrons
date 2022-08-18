@@ -132,7 +132,7 @@ async def test_sends_only_required_followups(
                     message_definitions.PushToolsDetectedNotification(
                         payload=payloads.ToolsDetectedNotificationPayload(
                             z_motor=ToolField(ToolType.nothing_attached.value),
-                            a_motor=ToolField(ToolType.pipette_multi_chan.value),
+                            a_motor=ToolField(ToolType.pipette.value),
                             gripper=ToolField(ToolType.nothing_attached.value),
                         )
                     ),
@@ -198,8 +198,8 @@ async def test_sends_all_required_followups(
                     NodeId.host,
                     message_definitions.PushToolsDetectedNotification(
                         payload=payloads.ToolsDetectedNotificationPayload(
-                            z_motor=ToolField(ToolType.pipette_single_chan.value),
-                            a_motor=ToolField(ToolType.pipette_multi_chan.value),
+                            z_motor=ToolField(ToolType.pipette.value),
+                            a_motor=ToolField(ToolType.pipette.value),
                             gripper=ToolField(ToolType.gripper.value),
                         )
                     ),
@@ -291,7 +291,7 @@ async def test_handles_bad_serials(
                     NodeId.host,
                     message_definitions.PushToolsDetectedNotification(
                         payload=payloads.ToolsDetectedNotificationPayload(
-                            z_motor=ToolField(ToolType.pipette_single_chan.value),
+                            z_motor=ToolField(ToolType.pipette.value),
                             a_motor=ToolField(ToolType.nothing_attached.value),
                             gripper=ToolField(ToolType.nothing_attached.value),
                         )
@@ -350,7 +350,7 @@ async def test_no_instrument_info_response(
                     message_definitions.PushToolsDetectedNotification(
                         payload=payloads.ToolsDetectedNotificationPayload(
                             z_motor=ToolField(ToolType.nothing_attached.value),
-                            a_motor=ToolField(ToolType.pipette_single_chan.value),
+                            a_motor=ToolField(ToolType.pipette.value),
                             gripper=ToolField(ToolType.nothing_attached.value),
                         )
                     ),
