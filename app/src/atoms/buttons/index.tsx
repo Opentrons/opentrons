@@ -47,18 +47,21 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
 `
 
 export const SecondaryTertiaryButton = styled(NewSecondaryBtn)`
-  background-color: ${COLORS.white};
-  border-radius: ${BORDERS.radiusRoundEdge};
-  box-shadow: none;
-  color: ${COLORS.blueEnabled};
-  overflow: no-wrap;
-  padding: 0.375rem 0.75rem;
-  text-transform: ${TYPOGRAPHY.textTransformNone};
-  white-space: nowrap;
-  ${TYPOGRAPHY.labelSemiBold}
+  && {
+    background-color: ${COLORS.white};
+    border-radius: ${BORDERS.radiusRoundEdge};
+    box-shadow: none;
+    color: ${COLORS.blueEnabled};
+    overflow: no-wrap;
+    padding: ${SPACING.spacing3} ${SPACING.spacing4};
+    text-transform: ${TYPOGRAPHY.textTransformNone};
+    white-space: nowrap;
+    ${TYPOGRAPHY.labelSemiBold}
 
+    ${styleProps}
+  }
   &:hover {
-    opacity: 0.7;
+    opacity: 70%;
     box-shadow: 0 0 0;
   }
   &:focus-visible {
