@@ -28,10 +28,6 @@ describe('SubmitPrimaryButton', () => {
     }
   })
 
-  afterEach(() => {
-    mockOnClick.mockClear()
-  })
-
   it('renders submit primary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('submit primary button')
