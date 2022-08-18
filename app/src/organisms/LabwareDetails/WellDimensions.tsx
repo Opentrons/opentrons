@@ -71,7 +71,11 @@ export function WellDimensions(props: WellDimensionsProps): JSX.Element {
         diagram={diagram.length > 0 ? diagram : null}
       />
       {dimensions.map(d => (
-        <LabeledValue key={d.value} label={d.label} value={d.value} />
+        <LabeledValue
+          key={`${d.label}_${d.value}`}
+          label={d.label}
+          value={d.value}
+        />
       ))}
     </Box>
   )

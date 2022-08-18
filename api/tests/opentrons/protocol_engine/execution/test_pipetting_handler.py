@@ -406,7 +406,7 @@ async def test_handle_aspirate_request_with_prep(
     )
 
 
-async def test_handle_dispense_request(
+async def test_handle_dispense_in_place_request(
     decoy: Decoy,
     state_store: StateStore,
     hardware_api: HardwareAPI,
@@ -414,12 +414,7 @@ async def test_handle_dispense_request(
     mock_hw_pipettes: MockPipettes,
     subject: PipettingHandler,
 ) -> None:
-    """It should be able to dispense to a well."""
-    well_location = WellLocation(
-        origin=WellOrigin.BOTTOM,
-        offset=WellOffset(x=0, y=0, z=1),
-    )
-
+    """It should find the pipette by ID and use it to dispense."""
     decoy.when(
         state_store.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
@@ -432,11 +427,8 @@ async def test_handle_dispense_request(
         )
     )
 
-    volume = await subject.dispense(
+    volume = await subject.dispense_in_place(
         pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="C6",
-        well_location=well_location,
         volume=25,
         flow_rate=2.5,
     )
@@ -444,12 +436,6 @@ async def test_handle_dispense_request(
     assert volume == 25
 
     decoy.verify(
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="C6",
-            well_location=well_location,
-        ),
         hardware_api.set_flow_rate(
             mount=Mount.RIGHT, aspirate=None, dispense=2.5, blow_out=None
         ),

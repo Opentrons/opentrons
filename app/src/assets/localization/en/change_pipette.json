@@ -1,0 +1,6 @@
+{
+  "attach_pipette": "Attach a pipette",
+  "detach_pipette": "Detach {{pipette}} from {{mount}} Mount",
+  "remove_labware_before_start": "<h1>Before you begin</h1><block>Before starting, remove all labware from the deck and all tips from pipettes. The gantry will move to the front of the robot.</block>",
+  "get_started": "Get started"
+}
