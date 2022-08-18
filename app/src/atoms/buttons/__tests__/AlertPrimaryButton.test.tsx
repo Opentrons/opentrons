@@ -53,12 +53,4 @@ describe('AlertPrimaryButton', () => {
       modifier: ':hover',
     })
   })
-
-  it('renders alert primary button with text and different background color', () => {
-    props.backgroundColor = COLORS.errorEnabled
-    const { getByText } = render(props)
-    const button = getByText('alert primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.errorEnabled}`)
-    expect(button).toHaveStyle(`color: ${COLORS.white}`)
-  })
 })
