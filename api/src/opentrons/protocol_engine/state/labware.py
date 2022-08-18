@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Optional, Sequence, Iterable
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
@@ -279,8 +279,8 @@ class LabwareView(HasState[LabwareState]):
         return wells
 
     def validate_labware_has_wells(
-        self, labware_id: str, wells: List[str]
-    ) -> List[str]:
+        self, labware_id: str, wells: Iterable[str]
+    ) -> Iterable[str]:
         """Check if wells associated to a labware_id has well by name."""
         labware_wells = self.get_definition(labware_id).wells
         contains_wells = all(item in labware_wells for item in wells)

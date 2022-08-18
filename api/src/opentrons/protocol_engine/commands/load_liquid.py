@@ -46,7 +46,7 @@ class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidR
         self._state_view.liquid.has(params.liquidId)
 
         self._state_view.labware.validate_labware_has_wells(
-            labware_id=params.labwareId, wells=list(params.volumeByWell.keys())
+            labware_id=params.labwareId, wells=iter(params.volumeByWell)
         )
 
         return LoadLiquidResult()
