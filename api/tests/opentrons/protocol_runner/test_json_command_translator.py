@@ -28,6 +28,7 @@ from opentrons.protocol_engine import (
     ModuleModel,
     ModuleLocation,
 )
+from opentrons.protocol_engine.errors import LabwareNotLoadedError
 
 VALID_TEST_PARAMS = [
     (
@@ -411,3 +412,17 @@ def test_load_command(
     """Test translating v6 commands to protocol engine commands."""
     output = subject.translate(_make_json_protocol(commands=[test_input]))
     assert output == [expected_output]
+
+
+def test_load_labware_not_found(
+        subject: JsonCommandTranslator
+) -> None:
+    """Should raise an exception that labware is not found."""
+    with pytest.raises(LabwareNotLoadedError):
+         subject.translate(_make_json_protocol(commands=[protocol_schema_v6.Command(
+                commandType="loadLabware",
+                params=protocol_schema_v6.Params(
+                    labwareId="no-labware",
+                    location=protocol_schema_v6.Location(moduleId="temperatureModuleId"),
+                ),
+            )]))
