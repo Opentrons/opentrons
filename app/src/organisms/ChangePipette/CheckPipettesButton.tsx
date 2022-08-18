@@ -65,7 +65,7 @@ export function CheckPipettesButton(
       disabled={pending}
       className={className}
     >
-      {pending ? <Icon name="ot-spinner" height="1em" spin /> : children}
+      {pending ? <Icon name="ot-spinner" height="1rem" spin /> : children}
     </DeprecatedPrimaryButton>
   )
 
@@ -79,7 +79,7 @@ export function CheckPipettesButton(
         {pending ? (
           <Icon
             name="ot-spinner"
-            height="1em"
+            height="1rem"
             spin
             marginRight={SPACING.spacing2}
           />

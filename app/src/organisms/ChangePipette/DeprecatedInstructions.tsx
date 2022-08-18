@@ -2,6 +2,7 @@ import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 
 import { ModalPage } from '@opentrons/components'
+import { shouldLevel } from '@opentrons/shared-data'
 import { DeprecatedPipetteSelection } from './DeprecatedPipetteSelection'
 import { DeprecatedInstructionStep } from './DeprecatedInstructionStep'
 import { CheckPipettesButton } from './CheckPipettesButton'
@@ -12,7 +13,6 @@ import type {
   PipetteModelSpecs,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
-import { shouldLevel } from '@opentrons/shared-data'
 import type { Mount } from '../../redux/pipettes/types'
 import type { Direction } from './types'
 
@@ -56,9 +56,10 @@ export function DeprecatedInstructions(props: Props): JSX.Element {
   const titleBar = {
     title: title,
     subtitle: subtitle,
-    back: wantedPipette
-      ? { onClick: () => setWantedName(null) }
-      : { onClick: exit, children: EXIT },
+    back:
+      wantedPipette != null
+        ? { onClick: () => setWantedName(null) }
+        : { onClick: exit, children: EXIT },
   }
 
   return (
@@ -75,7 +76,7 @@ export function DeprecatedInstructions(props: Props): JSX.Element {
         className={styles.check_pipette_button}
         robotName={robotName}
         onDone={confirm}
-        hidden={!actualPipette && !wantedPipette}
+        hidden={actualPipette == null && wantedPipette == null}
       >
         {actualPipette ? DETACH_CONFIRM : ATTACH_CONFIRM}
       </CheckPipettesButton>

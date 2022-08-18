@@ -165,7 +165,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
 
   if (wizardStep === CLEAR_DECK) {
     return enableChangePipetteWizard ? (
-      <ModalShell height="28.12rem">
+      <ModalShell height="28.12rem" width="47rem">
         <ClearDeckModal
           totalSteps={5}
           currentStep={1}
@@ -219,7 +219,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
           />
         )}
         {enableChangePipetteWizard ? (
-          <ModalShell height="28.12rem">
+          <ModalShell height="28.12rem" width="47rem">
             <Instructions
               {...{
                 ...basePropsWithPipettes,

@@ -19,7 +19,7 @@ import { CheckPipettesButton } from './CheckPipettesButton'
 import { InstructionStep } from './InstructionStep'
 import { PipetteSelection } from './PipetteSelection'
 
-import {
+import type {
   PipetteNameSpecs,
   PipetteModelSpecs,
   PipetteDisplayCategory,
@@ -57,7 +57,7 @@ export function Instructions(props: Props): JSX.Element {
     mount,
   } = props
   const { t } = useTranslation('change_pipette')
-  const [stepPage, setStepPage] = React.useState(0)
+  const [stepPage, setStepPage] = React.useState<number>(0)
 
   const channels = actualPipette
     ? actualPipette.channels

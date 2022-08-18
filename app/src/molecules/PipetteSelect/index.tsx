@@ -79,7 +79,7 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
       options={groupedOptions}
       value={value}
       defaultValue={defaultValue}
-      tabIndex={tabIndex as number}
+      tabIndex={tabIndex}
       onChange={(
         option: SingleValue<SelectOption> | MultiValue<SelectOption>,
         e: ActionMeta<SelectOption>
@@ -94,7 +94,7 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
         const label = option.label != null || value
         const specs = allPipetteNameSpecs.find(s => s.name === value)
 
-        return context === 'value' || value === '' || !specs ? (
+        return context === 'value' || value === '' || specs == null ? (
           label
         ) : (
           <PipetteNameItem {...specs} />
@@ -107,7 +107,8 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
 const PipetteNameItem = (props: PipetteNameSpecs): JSX.Element => {
   const { channels, displayName, displayCategory } = props
   const volumeClassMaybeMatch = displayName.match(/P\d+/)
-  const volumeClass = volumeClassMaybeMatch ? volumeClassMaybeMatch[0] : ''
+  const volumeClass =
+    volumeClassMaybeMatch != null ? volumeClassMaybeMatch[0] : ''
 
   let displayChannels = ''
   if (channels === 1) {
