@@ -29,7 +29,7 @@ export interface PipetteSelectProps {
   /** whether or not "None" shows up as the default option */
   enableNoneOption?: boolean
   /** input tabIndex */
-  tabIndex?: string | number
+  tabIndex?: number
 }
 
 const PIPETTE_SORT = ['maxVolume', 'channels'] as const
@@ -62,12 +62,12 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
   const gen2Options = specsByCategory[GEN2].map(specToOption).filter(allowlist)
   const gen1Options = specsByCategory[GEN1].map(specToOption).filter(allowlist)
   const groupedOptions = [
-    ...(enableNoneOption ? [OPTION_NONE] : []),
+    ...(enableNoneOption != null ? [OPTION_NONE] : []),
     ...(gen2Options.length > 0 ? [{ options: gen2Options }] : []),
     ...(gen1Options.length > 0 ? [{ options: gen1Options }] : []),
   ]
 
-  const defaultValue = enableNoneOption ? OPTION_NONE : null
+  const defaultValue = enableNoneOption != null ? OPTION_NONE : null
   const value =
     allPipetteNameSpecs
       .filter(s => s.name === props.pipetteName)
@@ -91,7 +91,7 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
       }}
       formatOptionLabel={(option, { context }) => {
         const { value } = option
-        const label = option.label || value
+        const label = option.label != null || value
         const specs = allPipetteNameSpecs.find(s => s.name === value)
 
         return context === 'value' || value === '' || !specs ? (
@@ -106,7 +106,7 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
 
 const PipetteNameItem = (props: PipetteNameSpecs): JSX.Element => {
   const { channels, displayName, displayCategory } = props
-  const volumeClassMaybeMatch = displayName && displayName.match(/P\d+/)
+  const volumeClassMaybeMatch = displayName.match(/P\d+/)
   const volumeClass = volumeClassMaybeMatch ? volumeClassMaybeMatch[0] : ''
 
   let displayChannels = ''
