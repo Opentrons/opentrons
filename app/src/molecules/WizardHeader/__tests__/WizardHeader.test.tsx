@@ -34,7 +34,7 @@ describe('WizardHeader', () => {
   it('renders correct information with step count visible and pressing on button calls props', () => {
     const { getByText, getByRole } = render(props)
     getByText('Tip Length Calibrations')
-    const exit = getByRole('button', { name: 'exit' })
+    const exit = getByRole('button', { name: 'Exit' })
     fireEvent.click(exit)
     expect(props.onExit).toHaveBeenCalled()
     getByText('step meter')
@@ -49,7 +49,7 @@ describe('WizardHeader', () => {
 
     const { getByText, getByRole } = render(props)
     getByText('Tip Length Calibrations')
-    getByRole('button', { name: 'exit' })
+    getByRole('button', { name: 'Exit' })
     expect(screen.queryByText('Step: 0 / 5')).not.toBeInTheDocument()
   })
 })

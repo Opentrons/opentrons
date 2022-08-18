@@ -4,7 +4,7 @@ import { WizardHeader } from './index'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Atoms/WizardHeader',
+  title: 'App/Molecules/WizardHeader',
   component: WizardHeader,
 } as Meta
 

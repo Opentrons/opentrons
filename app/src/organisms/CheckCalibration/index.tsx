@@ -31,7 +31,7 @@ import {
   MeasureTip,
 } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
-import { WizardHeader } from '../../atoms/WizardHeader'
+import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
 import { ReturnTip } from './ReturnTip'
 import { ResultsSummary } from './ResultsSummary'
