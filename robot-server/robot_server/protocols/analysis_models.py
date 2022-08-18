@@ -99,8 +99,8 @@ class CompletedAnalysis(BaseModel):
         ...,
         description="Any errors the protocol run produced",
     )
-    liquids: Optional[List[Liquid]] = Field(
-        ...,
+    liquids: List[Liquid] = Field(
+        default_factory=[],
         description="Liquids used by the protocol",
     )
 
