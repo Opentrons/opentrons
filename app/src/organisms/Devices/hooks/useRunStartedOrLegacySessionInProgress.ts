@@ -7,7 +7,6 @@ export function useRunStartedOrLegacySessionInProgress(): boolean {
   const runId = useCurrentRunId()
   const runStatus = useRunStatus(runId)
   const allSessionsQueryResponse = useAllSessionsQuery()
-  console.log(allSessionsQueryResponse.data)
 
   return (
     (runStatus != null && runStatus !== RUN_STATUS_IDLE) ||
