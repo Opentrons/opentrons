@@ -203,7 +203,6 @@ export const SubmitPrimaryButton = (
     border-radius: ${BORDERS.radiusSoftCorners};
     padding: ${SPACING.spacing3} ${SPACING.spacing4};
     color: ${COLORS.white};
-    line-height: ${TYPOGRAPHY.lineHeight20};
     ${TYPOGRAPHY.pSemiBold}
     width: 100%;
     border: none;
