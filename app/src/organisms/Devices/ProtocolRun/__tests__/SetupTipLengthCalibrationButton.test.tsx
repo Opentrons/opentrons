@@ -24,7 +24,7 @@ jest.mock(
   '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 )
 jest.mock('../../../../organisms/RunTimeControl/hooks')
-jest.mock('../../../../redux/config/selectors')
+jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/sessions/selectors')
 jest.mock('../../hooks')
 
