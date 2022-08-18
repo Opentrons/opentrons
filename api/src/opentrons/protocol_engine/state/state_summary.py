@@ -25,4 +25,4 @@ class StateSummary(BaseModel):
     labwareOffsets: List[LabwareOffset]
     startedAt: Optional[datetime]
     completedAt: Optional[datetime]
-    liquids: Optional[List[Liquid]] = Field(default_factory=list)
+    liquids: List[Liquid] = Field(default_factory=list)
