@@ -29,9 +29,9 @@ This alpha is a work in progress! We'll be addressing issues in upcoming release
 
 ---
 
-# Opentrons App Changes in 6.0.0
+# Opentrons App Changes in 6.0.1
 
-Welcome to the v6.0.0 release of the Opentrons App! This release focuses on a visual redesign of the app that offers more ways to manage protocols even when you're not connected to a robot.
+Welcome to the v6.0.1 release of the Opentrons App! This release focuses on a visual redesign of the app that offers more ways to manage protocols even when you're not connected to a robot.
 
 This release also includes updates to the robot operating system, so be sure to update any OT-2s before running protocols with this version of the app.
 
@@ -50,6 +50,13 @@ This release also includes updates to the robot operating system, so be sure to 
   - See recently run protocols on a robot, including those run from other computers.
   - Run a protocol directly from the robot details page.
   - Easily change a robot's name from the new robot settings page.
+
+## 6.0.0 to 6.0.1
+
+The 6.0.1 hotfix release fixes two issues:
+
+- The app's "Override Path to Python" advanced setting now works properly on Windows
+- It's once again possible to save changes made to pipette settings
 
 ## Improved features
 

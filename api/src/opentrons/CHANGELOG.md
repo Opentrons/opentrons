@@ -60,6 +60,17 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
+## [6.0.1](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.0.1) (2022-08-09)
+
+
+### Bug Fixes
+
+* **api:** ensure correct sync hardware API is used for analysis ([#11227](https://github.com/Opentrons/opentrons/issues/11227)) ([503dc95](https://github.com/Opentrons/opentrons/commit/503dc957e2d2bd9906db7770be0a09295a141eaa))
+
+
+
+
+
 # [6.0.0](https://github.com/Opentrons/opentrons/compare/v5.0.2...v6.0.0) (2022-07-14)
 
 

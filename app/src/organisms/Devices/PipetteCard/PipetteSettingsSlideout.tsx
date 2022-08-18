@@ -28,7 +28,7 @@ const FETCH_PIPETTES_INTERVAL_MS = 5000
 interface PipetteSettingsSlideoutProps {
   robotName: string
   pipetteName: PipetteModelSpecs['displayName']
-  onCloseClick: () => unknown
+  onCloseClick: () => void
   isExpanded: boolean
   pipetteId: AttachedPipette['id']
 }
@@ -47,6 +47,7 @@ export const PipetteSettingsSlideout = (
   const updateRequest = useSelector((state: State) =>
     latestRequestId != null ? getRequestById(state, latestRequestId) : null
   )
+  const FORM_ID = `configurePipetteForm_${pipetteId}`
 
   useInterval(
     () => {
@@ -62,7 +63,10 @@ export const PipetteSettingsSlideout = (
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
-        <ConfigFormSubmitButton disabled={updateRequest?.status === PENDING} />
+        <ConfigFormSubmitButton
+          disabled={updateRequest?.status === PENDING}
+          formId={FORM_ID}
+        />
       }
     >
       <Flex data-testid={`PipetteSettingsSlideout_${robotName}_${pipetteId}`}>
@@ -71,6 +75,8 @@ export const PipetteSettingsSlideout = (
           pipetteId={pipetteId}
           updateRequest={updateRequest}
           updateSettings={updateSettings}
+          robotName={robotName}
+          formId={FORM_ID}
         />
       </Flex>
     </Slideout>
