@@ -10,7 +10,10 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 import { i18n } from '../../../../i18n'
 import { AskForCalibrationBlockModal } from '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import { getHasCalibrationBlock, useFeatureFlag } from '../../../../redux/config'
+import {
+  getHasCalibrationBlock,
+  useFeatureFlag,
+} from '../../../../redux/config'
 import { useDeckCalibrationData, useRunHasStarted } from '../../hooks'
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
 
@@ -86,7 +89,9 @@ describe('SetupTipLengthCalibrationButton', () => {
       cancel: mockCancel,
     })
     when(mockGetHasCalibrationBlock).mockReturnValue(null)
-    when(mockUseFeatureFlag).calledWith('enableCalibrationWizards').mockReturnValue(false)
+    when(mockUseFeatureFlag)
+      .calledWith('enableCalibrationWizards')
+      .mockReturnValue(false)
     when(mockAskForCalibrationBlockModal).mockReturnValue(
       <div>Mock AskForCalibrationBlockModal</div>
     )
