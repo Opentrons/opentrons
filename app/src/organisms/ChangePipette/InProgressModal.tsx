@@ -69,7 +69,7 @@ export function InProgressModal(props: Props): JSX.Element {
         >
           {t('moving_gantry')}
         </StyledText>
-        {/* extra protection in case movement status errors */}
+        {/* extra protection for error movement status  */}
         {movementStatus !== 'moveError' && movementStatus !== 'homeError' ? (
           <StyledText as="p">
             {movementStatus === HOMING && !isPipetteHoming
