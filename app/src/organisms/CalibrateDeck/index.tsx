@@ -16,6 +16,9 @@ import {
   C_TRANSPARENT,
   ALIGN_FLEX_START,
   C_WHITE,
+  Flex,
+  Icon,
+  SIZE_4,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
@@ -156,12 +159,13 @@ export function CalibrateDeck(
     back: { onClick: confirmExit, title: EXIT, children: EXIT },
   }
 
-  if (showSpinner) {
+  if (showSpinner && !enableCalibrationWizards) {
+    // TODO: this is the old spinner modal, remove it when the `enableCalibrationWizards` FF is removed
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
   // @ts-expect-error TODO: cannot index with undefined. Also, add test coverage for null case when no panel
   const Panel = PANEL_BY_STEP[currentStep]
-  if (Panel == null) return null
+  if (!showSpinner && Panel == null) return null
   return enableCalibrationWizards ? (
     <Portal level="top">
       <ModalShell
@@ -176,18 +180,24 @@ export function CalibrateDeck(
         }
       >
         <Box padding={SPACING.spacing6}>
-          <Panel
-            sendCommands={sendCommands}
-            cleanUpAndExit={cleanUpAndExit}
-            tipRack={tipRack}
-            isMulti={isMulti}
-            mount={instrument?.mount.toLowerCase() as Mount}
-            currentStep={currentStep}
-            sessionType={session.sessionType}
-            intent={INTENT_DECK_CALIBRATION}
-            supportedCommands={supportedCommands}
-            defaultTipracks={instrument?.defaultTipracks}
-          />
+          {(true || showSpinner) ? (
+            <Flex justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_CENTER}>
+              <Icon name="ot-spinner" spin size={SIZE_4} />
+            </Flex>
+          ) : (
+            <Panel
+              sendCommands={sendCommands}
+              cleanUpAndExit={cleanUpAndExit}
+              tipRack={tipRack}
+              isMulti={isMulti}
+              mount={instrument?.mount.toLowerCase() as Mount}
+              currentStep={currentStep}
+              sessionType={session.sessionType}
+              intent={INTENT_DECK_CALIBRATION}
+              supportedCommands={supportedCommands}
+              defaultTipracks={instrument?.defaultTipracks}
+            />
+          )}
         </Box>
       </ModalShell>
       {showConfirmExit && (

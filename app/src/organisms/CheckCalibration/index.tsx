@@ -180,12 +180,13 @@ export function CheckCalibration(
     },
   }
 
-  if (showSpinner) {
+  if (showSpinner && !enableCalibrationWizards) {
+    // TODO: this is the old spinner modal, remove it when the `enableCalibrationWizards` FF is removed
     return <SpinnerModalPage titleBar={titleBarProps} />
   }
   // @ts-expect-error(sa, 2021-05-27): avoiding src code change, currentStep might be undefined
   const Panel = PANEL_BY_STEP[currentStep]
-  if (Panel == null) return null
+  if (!showSpinner && Panel == null) return null
   return enableCalibrationWizards ? (
     <Portal level="top">
       <ModalShell

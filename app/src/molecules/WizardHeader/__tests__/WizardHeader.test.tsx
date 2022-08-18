@@ -5,7 +5,7 @@ import { i18n } from '../../../i18n'
 import { StepMeter } from '../../../atoms/StepMeter'
 import { WizardHeader } from '..'
 
-jest.mock('../../StepMeter')
+jest.mock('../../../StepMeter')
 
 const mockStepMeter = StepMeter as jest.MockedFunction<typeof StepMeter>
 
