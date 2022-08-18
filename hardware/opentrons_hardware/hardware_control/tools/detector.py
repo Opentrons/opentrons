@@ -8,6 +8,7 @@ from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
 from opentrons_hardware.firmware_bindings.constants import ToolType, PipetteName
 from opentrons_hardware.firmware_bindings.messages import message_definitions
 from opentrons_hardware.firmware_bindings import NodeId, ArbitrationId
+from opentrons_hardware.pipettes.serials import model_versionstring_from_int
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from .types import (
     PipetteInformation,
@@ -146,7 +147,7 @@ class OneshotToolDetector:
                 PipetteInformation(
                     name=name,
                     name_int=response.payload.name.value,
-                    model=response.payload.model.value,
+                    model=model_versionstring_from_int(response.payload.model.value),
                     serial=OneshotToolDetector._decode_or_default(
                         response.payload.serial.value
                     ),

@@ -68,3 +68,8 @@ def serial_val_from_parts(name: PipetteName, model: int, serialval: bytes) -> by
     you will not get what you put in.
     """
     return struct.pack(">HH16s", name.value, model, _ensure_length(serialval, 16))
+
+
+def model_versionstring_from_int(model: int) -> str:
+    """Format the encoded model from an int into a dotted version string."""
+    return f"{model//10}.{model%10}"

@@ -14,7 +14,13 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteName as FirmwarePipetteName,
 )
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-from opentrons.hardware_control.types import OT3Axis, OT3Mount
+from opentrons.hardware_control.types import (
+    OT3Axis,
+    OT3Mount,
+    InvalidPipetteName,
+    InvalidPipetteModel,
+)
+
 
 from opentrons_hardware.hardware_control.motion import (
     MoveType,
@@ -268,7 +274,10 @@ async def test_probing(
         (
             ToolSummary(
                 left=PipetteInformation(
-                    name=FirmwarePipetteName.p1000_single, model=30, serial="hello"
+                    name=FirmwarePipetteName.p1000_single,
+                    name_int=FirmwarePipetteName.p1000_single.value,
+                    model="3.0",
+                    serial="hello",
                 ),
                 right=None,
                 gripper=GripperInformation(model=0, serial="fake_serial"),
@@ -307,6 +316,52 @@ async def test_get_attached_instruments(
     assert detected[OT3Mount.LEFT]["config"].model == pipette_model
     assert detected[OT3Mount.GRIPPER]["id"] == gripper_id
     assert detected[OT3Mount.GRIPPER]["config"].name == gripper_name
+
+
+async def test_get_attached_instruments_handles_unknown_name(
+    controller: OT3Controller, mock_tool_detector: OneshotToolDetector
+) -> None:
+    async def fake_probe(can_messenger, expected, timeout):
+        return set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head, NodeId.gripper))
+
+    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+        assert await controller.get_attached_instruments({}) == {}
+
+    tool_summary = ToolSummary(
+        left=PipetteInformation(
+            name=FirmwarePipetteName.unknown, name_int=41, model=30, serial="hello"
+        ),
+        right=None,
+        gripper=GripperInformation(model=0, serial="fake_serial"),
+    )
+    mock_tool_detector.return_value = tool_summary
+
+    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+        with pytest.raises(InvalidPipetteName):
+            await controller.get_attached_instruments({})
+
+
+async def test_get_attached_instruments_handles_unknown_model(
+    controller: OT3Controller, mock_tool_detector: OneshotToolDetector
+) -> None:
+    async def fake_probe(can_messenger, expected, timeout):
+        return set((NodeId.gantry_x, NodeId.gantry_y, NodeId.head, NodeId.gripper))
+
+    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+        assert await controller.get_attached_instruments({}) == {}
+
+    tool_summary = ToolSummary(
+        left=PipetteInformation(
+            name=FirmwarePipetteName.p1000_single, name_int=0, model=41, serial="hello"
+        ),
+        right=None,
+        gripper=GripperInformation(model=0, serial="fake_serial"),
+    )
+    mock_tool_detector.return_value = tool_summary
+
+    with patch("opentrons.hardware_control.backends.ot3controller.probe", fake_probe):
+        with pytest.raises(InvalidPipetteModel):
+            await controller.get_attached_instruments({})
 
 
 def test_nodeid_replace_head():

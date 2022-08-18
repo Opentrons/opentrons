@@ -88,3 +88,20 @@ def test_serial_validity(scannedval: str) -> None:
 def test_serial_val_from_parts(name: PipetteName, model: int, data: bytes) -> None:
     """Make sure that valid inputs don't cause exceptions."""
     serials.serial_val_from_parts(name, model, data)
+
+
+@pytest.mark.parametrize(
+    "model,versionstr",
+    [
+        (0, "0.0"),
+        (10, "1.0"),
+        (1, "0.1"),
+        (30, "3.0"),
+        (31, "3.1"),
+        (4150, "415.0"),
+        (0xFFFF, "6553.5"),
+    ],
+)
+def test_versionstring_from_int(model: int, versionstr: str) -> None:
+    """Test versionstring."""
+    assert serials.model_versionstring_from_int(model) == versionstr

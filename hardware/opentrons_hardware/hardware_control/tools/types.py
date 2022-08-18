@@ -28,7 +28,7 @@ class PipetteInformation:
 
     name: PipetteName
     name_int: int
-    model: int
+    model: str
     serial: str
 
 
