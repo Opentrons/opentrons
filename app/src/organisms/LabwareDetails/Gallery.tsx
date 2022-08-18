@@ -47,7 +47,7 @@ export function Gallery(props: GalleryProps): JSX.Element {
         display={DISPLAY_BLOCK}
         margin={SPACING_AUTO}
       >
-        <Box>{images[currentImage]}</Box>
+        <Box data-testid="gallery_main_svg">{images[currentImage]}</Box>
       </Box>
       {images.length > 1 && (
         <Flex
@@ -61,6 +61,7 @@ export function Gallery(props: GalleryProps): JSX.Element {
                 padding={SPACING.spacing3}
                 key={index}
                 onClick={() => setCurrentImage(index)}
+                data-testid="gallery_mini_image"
               >
                 <Box width="5rem">{img}</Box>
               </Box>
