@@ -1,13 +1,6 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import {
-  renderWithProviders,
-  COLORS,
-  SPACING,
-  TYPOGRAPHY,
-  BORDERS,
-  SIZE_2,
-} from '@opentrons/components'
+import { renderWithProviders, COLORS, SIZE_2 } from '@opentrons/components'
 
 import { ToggleButton } from '..'
 
