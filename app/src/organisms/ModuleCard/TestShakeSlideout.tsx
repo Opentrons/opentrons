@@ -293,7 +293,7 @@ export const TestShakeSlideout = (
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             marginLeft={SIZE_AUTO}
             marginTop={SPACING.spacing3}
-            onClick={confirmAttachment}
+            onClick={isShaking ? sendCommands : confirmAttachment}
             disabled={
               !isLatchClosed ||
               (shakeValue === null && !isShaking) ||
