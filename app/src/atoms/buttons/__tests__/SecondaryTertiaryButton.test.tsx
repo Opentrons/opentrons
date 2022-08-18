@@ -17,10 +17,14 @@ const render = (
 
 describe('SecondaryTertiaryButton', () => {
   let props: React.ComponentProps<typeof SecondaryTertiaryButton>
-  it('renders secondary tertiary button with text', () => {
+
+  beforeEach(() => {
     props = {
       children: 'secondary tertiary button',
     }
+  })
+
+  it('renders secondary tertiary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('secondary tertiary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.white}`)
@@ -40,10 +44,7 @@ describe('SecondaryTertiaryButton', () => {
   })
 
   it('renders secondary tertiary button with text and disabled', () => {
-    props = {
-      children: 'secondary tertiary button',
-      disabled: true,
-    }
+    props.disabled = true
     const { getByText } = render(props)
     const button = getByText('secondary tertiary button')
     expect(button).toBeDisabled()
@@ -51,9 +52,6 @@ describe('SecondaryTertiaryButton', () => {
   })
 
   it('applies the correct states to the button - hover', () => {
-    props = {
-      children: 'secondary tertiary button',
-    }
     const { getByText } = render(props)
     const button = getByText('secondary tertiary button')
     expect(button).toHaveStyleRule('opacity', '70%', {
@@ -65,9 +63,6 @@ describe('SecondaryTertiaryButton', () => {
   })
 
   it('applies the correct states to the button - focus-visible', () => {
-    props = {
-      children: 'secondary tertiary button',
-    }
     const { getByText } = render(props)
     const button = getByText('secondary tertiary button')
     expect(button).toHaveStyleRule(
@@ -80,10 +75,7 @@ describe('SecondaryTertiaryButton', () => {
   })
 
   it('renders secondary tertiary button with text and different background color', () => {
-    props = {
-      children: 'secondary tertiary button',
-      color: COLORS.errorEnabled,
-    }
+    props.color = COLORS.errorEnabled
     const { getByText } = render(props)
     const button = getByText('secondary tertiary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.white}`)

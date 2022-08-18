@@ -15,10 +15,14 @@ const render = (props: React.ComponentProps<typeof PrimaryButton>) => {
 
 describe('PrimaryButton', () => {
   let props: React.ComponentProps<typeof PrimaryButton>
-  it('renders primary button with text', () => {
+
+  beforeEach(() => {
     props = {
       children: 'primary button',
     }
+  })
+
+  it('renders primary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('primary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.blueEnabled}`)
@@ -37,10 +41,7 @@ describe('PrimaryButton', () => {
   })
 
   it('renders primary button with text and disabled', () => {
-    props = {
-      children: 'primary button',
-      disabled: true,
-    }
+    props.disabled = true
     const { getByText } = render(props)
     const button = getByText('primary button')
     expect(button).toBeDisabled()
@@ -49,9 +50,6 @@ describe('PrimaryButton', () => {
   })
 
   it('applies the correct states to the button - focus', () => {
-    props = {
-      children: 'primary button',
-    }
     const { getByText } = render(props)
     const button = getByText('primary button')
     expect(button).toHaveStyleRule('background-color', `${COLORS.blueHover}`, {
@@ -60,9 +58,6 @@ describe('PrimaryButton', () => {
   })
 
   it('applies the correct states to the button - hover', () => {
-    props = {
-      children: 'primary button',
-    }
     const { getByText } = render(props)
     const button = getByText('primary button')
     expect(button).toHaveStyleRule('background-color', `${COLORS.blueHover}`, {
@@ -71,9 +66,6 @@ describe('PrimaryButton', () => {
   })
 
   it('applies the correct states to the button - active', () => {
-    props = {
-      children: 'primary button',
-    }
     const { getByText } = render(props)
     const button = getByText('primary button')
     expect(button).toHaveStyleRule(
@@ -86,9 +78,6 @@ describe('PrimaryButton', () => {
   })
 
   it('applies the correct states to the button - focus-visible', () => {
-    props = {
-      children: 'primary button',
-    }
     const { getByText } = render(props)
     const button = getByText('primary button')
     expect(button).toHaveStyleRule(
@@ -101,10 +90,7 @@ describe('PrimaryButton', () => {
   })
 
   it('renders primary button with text and different background color', () => {
-    props = {
-      children: 'primary button',
-      backgroundColor: COLORS.errorEnabled,
-    }
+    props.backgroundColor = COLORS.errorEnabled
     const { getByText } = render(props)
     const button = getByText('primary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.errorEnabled}`)

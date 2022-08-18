@@ -15,10 +15,14 @@ const render = (props: React.ComponentProps<typeof AlertPrimaryButton>) => {
 
 describe('AlertPrimaryButton', () => {
   let props: React.ComponentProps<typeof AlertPrimaryButton>
-  it('renders alert primary button with text', () => {
+
+  beforeEach(() => {
     props = {
       children: 'alert primary button',
     }
+  })
+
+  it('renders alert primary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('alert primary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.errorEnabled}`)
@@ -36,19 +40,13 @@ describe('AlertPrimaryButton', () => {
   })
 
   it('renders alert primary button with text and disabled', () => {
-    props = {
-      children: 'alert primary button',
-      disabled: true,
-    }
+    props.disabled = true
     const { getByText } = render(props)
     const button = getByText('alert primary button')
     expect(button).toBeDisabled()
   })
 
   it('applies the correct states to the button - hover', () => {
-    props = {
-      children: 'alert primary button',
-    }
     const { getByText } = render(props)
     const button = getByText('alert primary button')
     expect(button).toHaveStyleRule('box-shadow', '0 0 0', {
@@ -57,10 +55,7 @@ describe('AlertPrimaryButton', () => {
   })
 
   it('renders alert primary button with text and different background color', () => {
-    props = {
-      children: 'alert primary button',
-      backgroundColor: COLORS.errorEnabled,
-    }
+    props.backgroundColor = COLORS.errorEnabled
     const { getByText } = render(props)
     const button = getByText('alert primary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.errorEnabled}`)

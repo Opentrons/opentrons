@@ -15,10 +15,14 @@ const render = (props: React.ComponentProps<typeof SecondaryButton>) => {
 
 describe('SecondaryButton', () => {
   let props: React.ComponentProps<typeof SecondaryButton>
-  it('renders primary button with text', () => {
+
+  beforeEach(() => {
     props = {
       children: 'secondary button',
     }
+  })
+
+  it('renders primary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('secondary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.transparent}`)
@@ -36,10 +40,7 @@ describe('SecondaryButton', () => {
   })
 
   it('renders secondary button with text and disabled', () => {
-    props = {
-      children: 'secondary button',
-      disabled: true,
-    }
+    props.disabled = true
     const { getByText } = render(props)
     const button = getByText('secondary button')
     expect(button).toBeDisabled()
@@ -47,9 +48,6 @@ describe('SecondaryButton', () => {
   })
 
   it('applies the correct states to the button - hover', () => {
-    props = {
-      children: 'secondary button',
-    }
     const { getByText } = render(props)
     const button = getByText('secondary button')
     expect(button).toHaveStyleRule('opacity', '70%', {
@@ -61,9 +59,6 @@ describe('SecondaryButton', () => {
   })
 
   it('applies the correct states to the button - focus-visible', () => {
-    props = {
-      children: 'secondary button',
-    }
     const { getByText } = render(props)
     const button = getByText('secondary button')
     expect(button).toHaveStyleRule(
@@ -76,10 +71,7 @@ describe('SecondaryButton', () => {
   })
 
   it('renders secondary button with text and different background color', () => {
-    props = {
-      children: 'secondary button',
-      color: COLORS.errorEnabled,
-    }
+    props.color = COLORS.errorEnabled
     const { getByText } = render(props)
     const button = getByText('secondary button')
     expect(button).toHaveStyle(`color: ${COLORS.errorEnabled}`)

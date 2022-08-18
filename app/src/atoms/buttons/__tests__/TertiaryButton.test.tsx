@@ -15,10 +15,13 @@ const render = (props: React.ComponentProps<typeof TertiaryButton>) => {
 
 describe('TertiaryButton', () => {
   let props: React.ComponentProps<typeof TertiaryButton>
-  it('renders tertiary button with text', () => {
+
+  beforeEach(() => {
     props = {
       children: 'tertiary button',
     }
+  })
+  it('renders tertiary button with text', () => {
     const { getByText } = render(props)
     const button = getByText('tertiary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.blueEnabled}`)
@@ -39,10 +42,7 @@ describe('TertiaryButton', () => {
   })
 
   it('renders tertiary button with text and disabled', () => {
-    props = {
-      children: 'tertiary button',
-      disabled: true,
-    }
+    props.disabled = true
     const { getByText } = render(props)
     const button = getByText('tertiary button')
     expect(button).toBeDisabled()
@@ -51,9 +51,6 @@ describe('TertiaryButton', () => {
   })
 
   it('applies the correct states to the button - hover', () => {
-    props = {
-      children: 'tertiary button',
-    }
     const { getByText } = render(props)
     const button = getByText('tertiary button')
     expect(button).toHaveStyleRule('background-color', `${COLORS.blueHover}`, {
@@ -65,9 +62,6 @@ describe('TertiaryButton', () => {
   })
 
   it('applies the correct states to the button - active', () => {
-    props = {
-      children: 'tertiary button',
-    }
     const { getByText } = render(props)
     const button = getByText('tertiary button')
     expect(button).toHaveStyleRule(
@@ -80,9 +74,6 @@ describe('TertiaryButton', () => {
   })
 
   it('applies the correct states to the button - focus-visible', () => {
-    props = {
-      children: 'tertiary button',
-    }
     const { getByText } = render(props)
     const button = getByText('tertiary button')
     expect(button).toHaveStyleRule(
@@ -95,10 +86,7 @@ describe('TertiaryButton', () => {
   })
 
   it('renders tertiary button with text and different background color', () => {
-    props = {
-      children: 'tertiary button',
-      backgroundColor: COLORS.errorEnabled,
-    }
+    props.backgroundColor = COLORS.errorEnabled
     const { getByText } = render(props)
     const button = getByText('tertiary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.errorEnabled}`)
