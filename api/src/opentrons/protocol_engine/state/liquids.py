@@ -5,6 +5,7 @@ from opentrons.protocol_engine.types import Liquid
 
 from .abstract_store import HasState, HandlesActions
 from ..actions import Action, AddLiquidAction
+from ..errors import LiquidDoesNotExistError
 
 
 @dataclass
@@ -50,6 +51,11 @@ class LiquidView(HasState[LiquidState]):
         """Get all protocol liquids."""
         return list(self._state.liquids_by_id.values())
 
-    def has(self, liquid_id: str) -> bool:
+    def has(self, liquid_id: str) -> str:
         """Check if liquid_id exists in liquids."""
-        return any(liquid.id == liquid_id for liquid in self.get_all())
+        has_liquid = liquid_id in self._state.liquids_by_id
+        if not has_liquid:
+            raise LiquidDoesNotExistError(
+                f"Supplied liquidId: {liquid_id} does not exist in the loaded liquids."
+            )
+        return liquid_id

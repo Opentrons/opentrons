@@ -34,6 +34,7 @@ from ..actions import (
 )
 from .abstract_store import HasState, HandlesActions
 
+
 _TRASH_LOCATION = DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH)
 
 
@@ -277,10 +278,17 @@ class LabwareView(HasState[LabwareState]):
                 wells.append(well_name)
         return wells
 
-    def labware_has_well(self, labware_id: str, well_name: str) -> bool:
+    def validate_labware_has_wells(
+        self, labware_id: str, wells: List[str]
+    ) -> List[str]:
         """Check if wells associated to a labware_id has well by name."""
-        wells = self.get_wells(labware_id)
-        return well_name in wells
+        labware_wells = self.get_definition(labware_id).wells
+        contains_wells = all(item in labware_wells for item in wells)
+        if not contains_wells:
+            raise errors.WellDoesNotExistError(
+                f"Some of the supplied wells do not match the labwareId: {labware_id}."
+            )
+        return wells
 
     def get_well_columns(self, labware_id: str) -> Dict[str, List[str]]:
         """Get well columns."""

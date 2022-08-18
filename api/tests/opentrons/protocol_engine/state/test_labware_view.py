@@ -245,11 +245,16 @@ def test_labware_has_well(falcon_tuberack_def: LabwareDefinition) -> None:
         definitions_by_uri={"some-tube-rack-uri": falcon_tuberack_def},
     )
 
-    result = subject.labware_has_well(labware_id="tube-rack-id", well_name="A1")
-    assert result is True
+    result = subject.validate_labware_has_wells(
+        labware_id="tube-rack-id", wells=["A1", "B1"]
+    )
+    assert result == ["A1", "B1"]
 
-    result = subject.labware_has_well(labware_id="tube-rack-id", well_name="AA")
-    assert result is False
+    with pytest.raises(errors.WellDoesNotExistError):
+        subject.validate_labware_has_wells(labware_id="tube-rack-id", wells=["AA"])
+
+    with pytest.raises(errors.LabwareNotLoadedError):
+        subject.validate_labware_has_wells(labware_id="no-id", wells=["A1"])
 
 
 def test_get_well_columns(falcon_tuberack_def: LabwareDefinition) -> None:

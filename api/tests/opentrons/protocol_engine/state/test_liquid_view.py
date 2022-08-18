@@ -3,6 +3,7 @@ import pytest
 
 from opentrons.protocol_engine.state.liquids import LiquidState, LiquidView
 from opentrons.protocol_engine import Liquid
+from opentrons.protocol_engine.errors import LiquidDoesNotExistError
 
 
 @pytest.fixture
@@ -28,6 +29,7 @@ def test_get_all(subject: LiquidView) -> None:
 
 def test_has_liquid(subject: LiquidView) -> None:
     """Should return true if an item exists in the liquids list."""
-    assert subject.has("water-id") is True
+    assert subject.has("water-id") == "water-id"
 
-    assert subject.has("no-id") is False
+    with pytest.raises(LiquidDoesNotExistError):
+        subject.has("no-id")
