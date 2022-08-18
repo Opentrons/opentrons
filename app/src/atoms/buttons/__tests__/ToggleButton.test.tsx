@@ -1,96 +1,55 @@
 import * as React from 'react'
+import { fireEvent } from '@testing-library/react'
 import {
   renderWithProviders,
   COLORS,
   SPACING,
   TYPOGRAPHY,
   BORDERS,
+  SIZE_2,
 } from '@opentrons/components'
 
-import { PrimaryButton } from '..'
+import { ToggleButton } from '..'
 
-const render = (props: React.ComponentProps<typeof PrimaryButton>) => {
-  return renderWithProviders(<PrimaryButton {...props} />)[0]
+const mockOnClick = jest.fn()
+
+const render = (props: React.ComponentProps<typeof ToggleButton>) => {
+  return renderWithProviders(<ToggleButton {...props} />)[0]
 }
 
-describe('PrimaryButton', () => {
-  let props: React.ComponentProps<typeof PrimaryButton>
-  it('renders primary button with text', () => {
+describe('ToggleButton', () => {
+  let props: React.ComponentProps<typeof ToggleButton>
+
+  beforeEach(() => {
     props = {
-      children: 'primary button',
+      label: 'toggle button',
+      id: 'mock-toggle-button',
+      toggledOn: true,
+      disabled: false,
+      onClick: mockOnClick,
     }
-    const { getByText } = render(props)
-    const button = getByText('primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.blueEnabled}`)
-    expect(button).toHaveStyle(
-      `padding: ${SPACING.spacing3} ${SPACING.spacing4}`
-    )
-    expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeP}`)
-    expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
-    expect(button).toHaveStyle(`line-height: ${TYPOGRAPHY.lineHeight20}`)
-    expect(button).toHaveStyle(`border-radius: ${BORDERS.radiusSoftCorners}`)
-    expect(button).toHaveStyle(
-      `text-transform: ${TYPOGRAPHY.textTransformNone}`
-    )
-    expect(button).toHaveStyle(`box-shadow: none`)
-    expect(button).toHaveStyle(`color: ${COLORS.white}`)
   })
 
-  it('renders primary button with text and disabled', () => {
-    props = {
-      children: 'primary button',
-      disabled: true,
-    }
-    const { getByText } = render(props)
-    const button = getByText('primary button')
-    expect(button).toBeDisabled()
-    expect(button).toHaveStyle(`background-color: ${COLORS.darkGreyDisabled}`)
-    expect(button).toHaveStyle(`color: ${COLORS.errorDisabled}`)
+  it('renders toggle button - on', () => {
+    const { getByLabelText } = render(props)
+    const button = getByLabelText('toggle button')
+    expect(button).toHaveStyle(`color: ${COLORS.blueEnabled}`)
+    expect(button).toHaveStyle(`height: ${SIZE_2}`)
+    expect(button).toHaveStyle(`width: ${SIZE_2}`)
+    expect(button).toHaveAttribute('aria-checked', 'true')
   })
 
-  it('applies the correct states to the button - focus', () => {
-    props = {
-      children: 'primary button',
-    }
-    const { getByText } = render(props)
-    const button = getByText('primary button')
-    expect(button).toHaveStyleRule('background-color', `${COLORS.blueHover}`, {
-      modifier: ':focus',
-    })
-  })
-
-  it('applies the correct states to the button - hover', () => {
-    props = {
-      children: 'primary button',
-    }
-    const { getByText } = render(props)
-    const button = getByText('primary button')
-    expect(button).toHaveStyleRule('background-color', `${COLORS.blueHover}`, {
+  it('applies the correct states to the toggle on- hover', () => {
+    const { getByLabelText } = render(props)
+    const button = getByLabelText('toggle button')
+    expect(button).toHaveStyleRule('color', `${COLORS.blueHover}`, {
       modifier: ':hover',
     })
   })
 
-  it('applies the correct states to the button - active', () => {
-    props = {
-      children: 'primary button',
-    }
-    const { getByText } = render(props)
-    const button = getByText('primary button')
-    expect(button).toHaveStyleRule(
-      'background-color',
-      `${COLORS.bluePressed}`,
-      {
-        modifier: ':active',
-      }
-    )
-  })
-
-  it('applies the correct states to the button - focus-visible', () => {
-    props = {
-      children: 'primary button',
-    }
-    const { getByText } = render(props)
-    const button = getByText('primary button')
+  it('applies the correct states to the toggle on- focus-visible', () => {
+    const { getByLabelText } = render(props)
+    const button = getByLabelText('toggle button')
     expect(button).toHaveStyleRule(
       'box-shadow',
       `0 0 0 3px ${COLORS.warningEnabled}`,
@@ -100,14 +59,69 @@ describe('PrimaryButton', () => {
     )
   })
 
-  it('renders primary button with text and different background color', () => {
-    props = {
-      children: 'primary button',
-      backgroundColor: COLORS.errorEnabled,
-    }
-    const { getByText } = render(props)
-    const button = getByText('primary button')
-    expect(button).toHaveStyle(`background-color: ${COLORS.errorEnabled}`)
-    expect(button).toHaveStyle(`color: ${COLORS.white}`)
+  it('applies the correct states to the toggle on- disabled', () => {
+    props.disabled = true
+    const { getByLabelText } = render(props)
+    const button = getByLabelText('toggle button')
+    expect(button).toHaveStyleRule('color', `${COLORS.darkGreyDisabled}`, {
+      modifier: ':disabled',
+    })
+  })
+
+  it('calls mock function when clicking the toggle button - on', () => {
+    const { getByLabelText } = render(props)
+    const button = getByLabelText('toggle button')
+    fireEvent.click(button)
+    expect(props.onClick).toHaveBeenCalled()
+  })
+
+  it('renders toggle button - off', () => {
+    props.toggledOn = false
+    const { getByLabelText } = render(props)
+    const button = getByLabelText('toggle button')
+    expect(button).toHaveStyle(`color: ${COLORS.darkGreyEnabled}`)
+    expect(button).toHaveStyle(`height: ${SIZE_2}`)
+    expect(button).toHaveStyle(`width: ${SIZE_2}`)
+    expect(button).toHaveAttribute('aria-checked', 'false')
+  })
+
+  it('applies the correct states to the toggle off- hover', () => {
+    props.toggledOn = false
+    const { getByLabelText } = render(props)
+    const button = getByLabelText('toggle button')
+    expect(button).toHaveStyleRule('color', `${COLORS.darkGreyHover}`, {
+      modifier: ':hover',
+    })
+  })
+
+  it('applies the correct states to the toggle off- focus-visible', () => {
+    props.toggledOn = false
+    const { getByLabelText } = render(props)
+    const button = getByLabelText('toggle button')
+    expect(button).toHaveStyleRule(
+      'box-shadow',
+      `0 0 0 3px ${COLORS.warningEnabled}`,
+      {
+        modifier: ':focus-visible',
+      }
+    )
+  })
+
+  it('applies the correct states to the toggle off- disabled', () => {
+    props.toggledOn = false
+    props.disabled = true
+    const { getByLabelText } = render(props)
+    const button = getByLabelText('toggle button')
+    expect(button).toHaveStyleRule('color', `${COLORS.darkGreyDisabled}`, {
+      modifier: ':disabled',
+    })
+  })
+
+  it('calls mock function when clicking the toggle button - off', () => {
+    props.toggledOn = false
+    const { getByLabelText } = render(props)
+    const button = getByLabelText('toggle button')
+    fireEvent.click(button)
+    expect(props.onClick).toHaveBeenCalled()
   })
 })
