@@ -37,7 +37,7 @@ describe('TertiaryButton', () => {
     expect(button).toHaveStyle('white-space: nowrap')
     expect(button).toHaveStyle(`color: ${COLORS.fundamentalsBackground}`)
   })
-  /*
+
   it('renders tertiary button with text and disabled', () => {
     props = {
       children: 'tertiary button',
@@ -50,17 +50,6 @@ describe('TertiaryButton', () => {
     expect(button).toHaveStyle(`color: ${COLORS.errorDisabled}`)
   })
 
-  it('applies the correct states to the button - focus', () => {
-    props = {
-      children: 'tertiary button',
-    }
-    const { getByText } = render(props)
-    const button = getByText('tertiary button')
-    expect(button).toHaveStyleRule('background-color', `${COLORS.blueHover}`, {
-      modifier: ':focus',
-    })
-  })
-
   it('applies the correct states to the button - hover', () => {
     props = {
       children: 'tertiary button',
@@ -68,6 +57,9 @@ describe('TertiaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('tertiary button')
     expect(button).toHaveStyleRule('background-color', `${COLORS.blueHover}`, {
+      modifier: ':hover',
+    })
+    expect(button).toHaveStyleRule('box-shadow', 'none', {
       modifier: ':hover',
     })
   })
@@ -110,7 +102,6 @@ describe('TertiaryButton', () => {
     const { getByText } = render(props)
     const button = getByText('tertiary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.errorEnabled}`)
-    expect(button).toHaveStyle(`color: ${COLORS.white}`)
+    expect(button).toHaveStyle(`color: ${COLORS.fundamentalsBackground}`)
   })
-  */
 })
