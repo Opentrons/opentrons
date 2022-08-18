@@ -401,8 +401,8 @@ def _make_json_protocol(
             displayName="Source Plate", definitionId="example/plate/1"
         )
     },
-    liquids: Dict[str, protocol_schema_v6.LiquidCreate] = {
-        "liquid-id-555": protocol_schema_v6.LiquidCreate(
+    liquids: Dict[str, protocol_schema_v6.Liquid] = {
+        "liquid-id-555": protocol_schema_v6.Liquid(
             displayName="water", description="water description"
         )
     },

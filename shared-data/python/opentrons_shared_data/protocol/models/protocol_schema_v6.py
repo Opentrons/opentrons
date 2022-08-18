@@ -108,7 +108,7 @@ class WellDefinition(BaseModel):
     xDimension: Optional[float]
 
 
-class LiquidCreate(BaseModel):
+class Liquid(BaseModel):
     displayName: str
     description: str
     displayColor: Optional[str]
@@ -159,7 +159,7 @@ class ProtocolSchemaV6(BaseModel):
     labwareDefinitions: Dict[str, LabwareDefinition]
     commands: List[Command]
     modules: Optional[Dict[str, Module]]
-    liquids: Optional[Dict[str, LiquidCreate]]
+    liquids: Optional[Dict[str, Liquid]]
     commandAnnotations: Optional[List[CommandAnnotation]]
     designerApplication: Optional[DesignerApplication]
 
