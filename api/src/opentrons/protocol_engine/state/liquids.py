@@ -27,9 +27,9 @@ class LiquidStore(HasState[LiquidState], HandlesActions):
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
         if isinstance(action, AddLiquidAction):
-            self.add_liquid(action)
+            self._add_liquid(action)
 
-    def add_liquid(self, action: AddLiquidAction) -> None:
+    def _add_liquid(self, action: AddLiquidAction) -> None:
         """Add liquid to protocol liquids."""
         self._state.liquids_by_id[action.liquid.id] = action.liquid
 
