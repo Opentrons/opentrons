@@ -3,13 +3,21 @@ import * as React from 'react'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
-  Box,
+  ModalPage,
   SpinnerModalPage,
   useConditionalConfirm,
-  SPACING,
+  DISPLAY_FLEX,
+  DIRECTION_COLUMN,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  SPACING_3,
+  C_TRANSPARENT,
+  ALIGN_FLEX_START,
+  C_WHITE,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
+
 import {
   Introduction,
   DeckSetup,
@@ -20,18 +28,15 @@ import {
   MeasureNozzle,
   MeasureTip,
   INTENT_TIP_LENGTH_IN_PROTOCOL,
-} from '../../organisms/DeprecatedCalibrationPanels'
-import { ModalShell } from '../../molecules/Modal'
-import { WizardHeader } from '../../molecules/WizardHeader'
-import { Portal } from '../../App/portal'
+} from '../DeprecatedCalibrationPanels'
 
-import type { Mount } from '@opentrons/components'
+import type { StyleProps, Mount } from '@opentrons/components'
 import type {
   SessionCommandParams,
   CalibrationLabware,
   CalibrationSessionStep,
 } from '../../redux/sessions/types'
-import type { CalibrationPanelProps } from '../../organisms/DeprecatedCalibrationPanels/types'
+import type { CalibrationPanelProps } from '../DeprecatedCalibrationPanels/types'
 import type { CalibrateTipLengthParentProps } from './types'
 
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
@@ -39,6 +44,30 @@ export { ConfirmRecalibrationModal } from './ConfirmRecalibrationModal'
 
 const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Tip length calibration'
 const EXIT = 'exit'
+
+const darkContentsStyleProps = {
+  display: DISPLAY_FLEX,
+  flexDirection: DIRECTION_COLUMN,
+  alignItems: ALIGN_CENTER,
+  padding: SPACING_3,
+  backgroundColor: C_TRANSPARENT,
+  height: '100%',
+}
+const contentsStyleProps = {
+  display: DISPLAY_FLEX,
+  backgroundColor: C_WHITE,
+  flexDirection: DIRECTION_COLUMN,
+  justifyContent: JUSTIFY_CENTER,
+  alignItems: ALIGN_FLEX_START,
+  padding: SPACING_3,
+  maxWidth: '48rem',
+  minHeight: '14rem',
+}
+
+const terminalContentsStyleProps = {
+  ...contentsStyleProps,
+  paddingX: '1.5rem',
+}
 
 const PANEL_BY_STEP: Partial<
   Record<CalibrationSessionStep, React.ComponentType<CalibrationPanelProps>>
@@ -51,8 +80,22 @@ const PANEL_BY_STEP: Partial<
   measuringTipOffset: MeasureTip,
   calibrationComplete: CompleteConfirmation,
 }
+const PANEL_STYLE_PROPS_BY_STEP: Partial<
+  Record<CalibrationSessionStep, StyleProps>
+> = {
+  [Sessions.TIP_LENGTH_STEP_SESSION_STARTED]: terminalContentsStyleProps,
+  [Sessions.TIP_LENGTH_STEP_LABWARE_LOADED]: darkContentsStyleProps,
+  [Sessions.TIP_LENGTH_STEP_PREPARING_PIPETTE]: contentsStyleProps,
+  [Sessions.TIP_LENGTH_STEP_INSPECTING_TIP]: contentsStyleProps,
+  [Sessions.TIP_LENGTH_STEP_MEASURING_NOZZLE_OFFSET]: contentsStyleProps,
+  [Sessions.TIP_LENGTH_STEP_MEASURING_TIP_OFFSET]: contentsStyleProps,
+  [Sessions.TIP_LENGTH_STEP_CALIBRATION_COMPLETE]: terminalContentsStyleProps,
+}
 
-export function CalibrateTipLength(
+/**
+ * @deprecated
+ */
+export function DeprecatedCalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): JSX.Element | null {
   const { session, robotName, showSpinner, dispatchRequests, isJogging } = props
@@ -116,37 +159,29 @@ export function CalibrateTipLength(
   // @ts-expect-error(sa, 2021-05-26): cannot index undefined, leaving to avoid src code change
   const Panel = PANEL_BY_STEP[currentStep]
   if (Panel == null) return null
-  return (
-    <Portal level="top">
-      <ModalShell
-        width="47rem"
-        header={
-          <WizardHeader
-            title={TIP_LENGTH_CALIBRATION_SUBTITLE}
-            currentStep={1}
-            totalSteps={5}
-            onExit={confirmExit}
-          />
-        }
+  return Panel != null ? (
+    <>
+      <ModalPage
+        titleBar={titleBarProps}
+        // @ts-expect-error(sa, 2021-05-26): cannot index undefined, leaving to avoid src code change
+        innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
       >
-        <Box padding={SPACING.spacing6}>
-          <Panel
-            sendCommands={sendCommands}
-            cleanUpAndExit={cleanUpAndExit}
-            isMulti={isMulti}
-            mount={instrument?.mount.toLowerCase() as Mount}
-            tipRack={tipRack}
-            calBlock={calBlock}
-            currentStep={currentStep}
-            sessionType={session.sessionType}
-            intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
-          />
-        </Box>
-      </ModalShell>
+        <Panel
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
+          isMulti={isMulti}
+          mount={instrument?.mount.toLowerCase() as Mount}
+          tipRack={tipRack}
+          calBlock={calBlock}
+          currentStep={currentStep}
+          sessionType={session.sessionType}
+          intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
+        />
+      </ModalPage>
       {showConfirmExit && (
         // @ts-expect-error TODO: ConfirmExitModal expects sessionType
         <ConfirmExitModal exit={confirmExit} back={cancelExit} />
       )}
-    </Portal>
-  )
+    </>
+  ) : null
 }

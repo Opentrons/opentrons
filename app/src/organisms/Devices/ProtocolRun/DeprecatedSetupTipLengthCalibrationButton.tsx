@@ -21,12 +21,12 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { Portal } from '../../../App/portal'
 import { TertiaryButton } from '../../../atoms/buttons'
-import { CalibratePipetteOffset } from '../../CalibratePipetteOffset'
+import { DeprecatedCalibratePipetteOffset } from '../../DeprecatedCalibratePipetteOffset'
 import {
-  CalibrateTipLength,
+  DeprecatedCalibrateTipLength,
   ConfirmRecalibrationModal,
-} from '../../CalibrateTipLength'
-import { AskForCalibrationBlockModal } from '../../CalibrateTipLength/AskForCalibrationBlockModal'
+} from '../../DeprecatedCalibrateTipLength'
+import { AskForCalibrationBlockModal } from '../../DeprecatedCalibrateTipLength/AskForCalibrationBlockModal'
 import { INTENT_TIP_LENGTH_IN_PROTOCOL } from '../../CalibrationPanels'
 import {
   tipLengthCalibrationStarted,
@@ -64,7 +64,10 @@ const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
 
-export function SetupTipLengthCalibrationButton({
+/**
+ * @deprecated
+ */
+export function DeprecatedSetupTipLengthCalibrationButton({
   robotName,
   runId,
   hasCalibrated,
@@ -289,7 +292,7 @@ export function SetupTipLengthCalibrationButton({
           />
         ) : null}
         {isExtendedPipOffset ? (
-          <CalibratePipetteOffset
+          <DeprecatedCalibratePipetteOffset
             session={extendedPipetteCalibrationSession}
             robotName={robotName}
             showSpinner={showSpinner}
@@ -298,7 +301,7 @@ export function SetupTipLengthCalibrationButton({
             intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
           />
         ) : (
-          <CalibrateTipLength
+          <DeprecatedCalibrateTipLength
             session={tipLengthCalibrationSession}
             robotName={robotName}
             showSpinner={showSpinner}

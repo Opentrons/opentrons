@@ -29,6 +29,7 @@ import { Banner } from '../../../atoms/Banner'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
 import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
+import { DeprecatedCalibrateDeck } from '../../../organisms/DeprecatedCalibrateDeck'
 import { formatLastModified } from '../../../organisms/DeprecatedCalibrationPanels/utils'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { CheckCalibration } from '../../../organisms/CheckCalibration'
@@ -41,6 +42,8 @@ import * as Config from '../../../redux/config'
 import * as Sessions from '../../../redux/sessions'
 import * as Calibration from '../../../redux/calibration'
 import * as Pipettes from '../../../redux/pipettes'
+import { fetchAllSessions } from '../../../redux/sessions'
+import { useFeatureFlag } from '../../../redux/config'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
@@ -52,6 +55,7 @@ import {
   useRunStartedOrLegacySessionInProgress,
   useRunStatuses,
 } from '../hooks'
+import { DeprecatedCheckCalibration } from '../../DeprecatedCheckCalibration'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 
@@ -66,7 +70,6 @@ import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,
 } from '../../../redux/pipettes/types'
-import { fetchAllSessions } from '../../../redux/sessions'
 
 const CALS_FETCH_MS = 5000
 
@@ -117,6 +120,7 @@ export function RobotSettingsCalibration({
     'shared',
   ])
   const doTrackEvent = useTrackEvent()
+  const enableCalibrationWizards = useFeatureFlag('enableCalibrationWizards')
   const trackedRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
@@ -507,13 +511,24 @@ export function RobotSettingsCalibration({
   return (
     <>
       <Portal level="top">
-        <CalibrateDeck
-          session={deckCalibrationSession}
-          robotName={robotName}
-          dispatchRequests={dispatchRequests}
-          showSpinner={isPending}
-          isJogging={isJogging}
-        />
+        {enableCalibrationWizards ? (
+          <CalibrateDeck
+            session={deckCalibrationSession}
+            robotName={robotName}
+            dispatchRequests={dispatchRequests}
+            showSpinner={isPending}
+            isJogging={isJogging}
+          />
+        ) : (
+          <DeprecatedCalibrateDeck
+            session={deckCalibrationSession}
+            robotName={robotName}
+            dispatchRequests={dispatchRequests}
+            showSpinner={isPending}
+            isJogging={isJogging}
+          />
+        )}
+
         {showCalBlockModal ? (
           <AskForCalibrationBlockModal
             onResponse={handleHealthCheck}
@@ -534,13 +549,24 @@ export function RobotSettingsCalibration({
             }}
           />
         ) : null}
-        <CheckCalibration
-          session={checkHealthSession}
-          robotName={robotName}
-          dispatchRequests={dispatchRequests}
-          showSpinner={isPending}
-          isJogging={isJogging}
-        />
+
+        {enableCalibrationWizards ? (
+          <CheckCalibration
+            session={checkHealthSession}
+            robotName={robotName}
+            dispatchRequests={dispatchRequests}
+            showSpinner={isPending}
+            isJogging={isJogging}
+          />
+        ) : (
+          <DeprecatedCheckCalibration
+            session={checkHealthSession}
+            robotName={robotName}
+            dispatchRequests={dispatchRequests}
+            showSpinner={isPending}
+            isJogging={isJogging}
+          />
+        )}
         {createStatus === RobotApi.FAILURE && (
           <AlertModal
             alertOverlay

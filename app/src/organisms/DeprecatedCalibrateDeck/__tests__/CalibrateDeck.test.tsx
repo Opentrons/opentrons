@@ -7,70 +7,74 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 
 import * as Sessions from '../../../redux/sessions'
-import { mockTipLengthCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
+import { mockDeckCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
 
-import { CalibrateTipLength } from '../index'
+import { DeprecatedCalibrateDeck } from '../index'
 import {
   Introduction,
   DeckSetup,
   TipPickUp,
   TipConfirmation,
+  SaveZPoint,
+  SaveXYPoint,
   CompleteConfirmation,
-  MeasureNozzle,
-  MeasureTip,
-} from '../../../organisms/DeprecatedCalibrationPanels'
+} from '../../DeprecatedCalibrationPanels'
 
-import type { TipLengthCalibrationStep } from '../../../redux/sessions/types'
-import type { ReactWrapper } from 'enzyme'
+import type { ReactWrapper, HTMLAttributes } from 'enzyme'
+import type { DeckCalibrationStep } from '../../../redux/sessions/types'
+import type { DispatchRequestsType } from '../../../redux/robot-api'
+import type { Dispatch } from '../../../redux/types'
+import type { CalibrationPanelProps } from '../../DeprecatedCalibrationPanels/types'
 
 jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 jest.mock('../../../redux/config')
 
-interface CalibrateTipLengthSpec {
-  component: React.ComponentType<any>
-  currentStep: TipLengthCalibrationStep
+interface DeprecatedCalibrateDeckSpec {
+  component: (props: CalibrationPanelProps) => JSX.Element
+  currentStep: DeckCalibrationStep
 }
 
 const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
   typeof getDeckDefinitions
 >
 
-type Wrapper = ReactWrapper<React.ComponentProps<typeof CalibrateTipLength>>
-
-describe('CalibrateTipLength', () => {
+describe('DeprecatedCalibrateDeck', () => {
   let mockStore: any
   let render: (
-    props?: Partial<React.ComponentProps<typeof CalibrateTipLength>>
-  ) => Wrapper
-  let dispatch: jest.MockedFunction<() => {}>
-  let dispatchRequests: jest.MockedFunction<() => {}>
-  let mockTipLengthSession: Sessions.TipLengthCalibrationSession = {
+    props?: Partial<React.ComponentProps<typeof DeprecatedCalibrateDeck>>
+  ) => ReactWrapper<React.ComponentProps<typeof DeprecatedCalibrateDeck>>
+  let dispatch: Dispatch
+  let dispatchRequests: DispatchRequestsType
+  let mockDeckCalSession: Sessions.DeckCalibrationSession = {
     id: 'fake_session_id',
-    ...mockTipLengthCalibrationSessionAttributes,
+    ...mockDeckCalibrationSessionAttributes,
   }
 
-  const getExitButton = (wrapper: Wrapper) =>
-    wrapper.find('button[aria-label="Exit"]')
+  const getExitButton = (
+    wrapper: ReactWrapper<React.ComponentProps<typeof DeprecatedCalibrateDeck>>
+  ): ReactWrapper<HTMLAttributes> => wrapper.find('button[aria-label="Exit"]')
 
   const POSSIBLE_CHILDREN = [
     Introduction,
     DeckSetup,
-    MeasureNozzle,
     TipPickUp,
     TipConfirmation,
-    MeasureTip,
+    SaveZPoint,
+    SaveXYPoint,
     CompleteConfirmation,
   ]
 
-  const SPECS: CalibrateTipLengthSpec[] = [
+  const SPECS: DeprecatedCalibrateDeckSpec[] = [
     { component: Introduction, currentStep: 'sessionStarted' },
     { component: DeckSetup, currentStep: 'labwareLoaded' },
-    { component: MeasureNozzle, currentStep: 'measuringNozzleOffset' },
     { component: TipPickUp, currentStep: 'preparingPipette' },
     { component: TipConfirmation, currentStep: 'inspectingTip' },
-    { component: MeasureTip, currentStep: 'measuringTipOffset' },
+    { component: SaveZPoint, currentStep: 'joggingToDeck' },
+    { component: SaveXYPoint, currentStep: 'savingPointOne' },
+    { component: SaveXYPoint, currentStep: 'savingPointTwo' },
+    { component: SaveXYPoint, currentStep: 'savingPointThree' },
     { component: CompleteConfirmation, currentStep: 'calibrationComplete' },
   ]
 
@@ -86,19 +90,19 @@ describe('CalibrateTipLength', () => {
     }
     when(mockGetDeckDefinitions).calledWith().mockReturnValue({})
 
-    mockTipLengthSession = {
+    mockDeckCalSession = {
       id: 'fake_session_id',
-      ...mockTipLengthCalibrationSessionAttributes,
+      ...mockDeckCalibrationSessionAttributes,
     }
 
     render = (props = {}) => {
       const {
         showSpinner = false,
         isJogging = false,
-        session = mockTipLengthSession,
+        session = mockDeckCalSession,
       } = props
       return mount(
-        <CalibrateTipLength
+        <DeprecatedCalibrateDeck
           robotName="robot-name"
           session={session}
           dispatchRequests={dispatchRequests}
@@ -119,10 +123,10 @@ describe('CalibrateTipLength', () => {
 
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      mockTipLengthSession = {
-        ...mockTipLengthSession,
+      mockDeckCalSession = {
+        ...mockDeckCalSession,
         details: {
-          ...mockTipLengthSession.details,
+          ...mockDeckCalSession.details,
           currentStep: spec.currentStep,
         },
       }
@@ -142,7 +146,7 @@ describe('CalibrateTipLength', () => {
     const wrapper = render()
 
     expect(wrapper.find('ConfirmExitModal').exists()).toBe(false)
-    act(() =>
+    act((): void =>
       getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
     )
     wrapper.update()
@@ -158,14 +162,13 @@ describe('CalibrateTipLength', () => {
     const wrapper = render({ showSpinner: true })
     expect(wrapper.find('SpinnerModalPage').exists()).toBe(true)
   })
-
   it('does dispatch jog requests when not isJogging', () => {
     const session = {
       id: 'fake_session_id',
-      ...mockTipLengthCalibrationSessionAttributes,
+      ...mockDeckCalibrationSessionAttributes,
       details: {
-        ...mockTipLengthCalibrationSessionAttributes.details,
-        currentStep: Sessions.TIP_LENGTH_STEP_PREPARING_PIPETTE,
+        ...mockDeckCalibrationSessionAttributes.details,
+        currentStep: Sessions.DECK_STEP_PREPARING_PIPETTE,
       },
     }
     const wrapper = render({ isJogging: false, session })
@@ -183,10 +186,10 @@ describe('CalibrateTipLength', () => {
   it('does not dispatch jog requests when isJogging', () => {
     const session = {
       id: 'fake_session_id',
-      ...mockTipLengthCalibrationSessionAttributes,
+      ...mockDeckCalibrationSessionAttributes,
       details: {
-        ...mockTipLengthCalibrationSessionAttributes.details,
-        currentStep: Sessions.TIP_LENGTH_STEP_PREPARING_PIPETTE,
+        ...mockDeckCalibrationSessionAttributes.details,
+        currentStep: Sessions.DECK_STEP_PREPARING_PIPETTE,
       },
     }
     const wrapper = render({ isJogging: true, session })

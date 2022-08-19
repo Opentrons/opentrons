@@ -12,7 +12,7 @@ import { AskForCalibrationBlockModal } from '../../../../organisms/CalibrateTipL
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { getHasCalibrationBlock } from '../../../../redux/config'
 import { useDeckCalibrationData, useRunHasStarted } from '../../hooks'
-import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
+import { DeprecatedSetupTipLengthCalibrationButton } from '../DeprecatedSetupTipLengthCalibrationButton'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
@@ -57,10 +57,10 @@ describe('SetupTipLengthCalibrationButton', () => {
     tipRackDefinition = fixture_tiprack_300_ul as LabwareDefinition2,
     isExtendedPipOffset = false,
   }: Partial<
-    React.ComponentProps<typeof SetupTipLengthCalibrationButton>
+    React.ComponentProps<typeof DeprecatedSetupTipLengthCalibrationButton>
   > = {}) => {
     return renderWithProviders(
-      <SetupTipLengthCalibrationButton
+      <DeprecatedSetupTipLengthCalibrationButton
         {...{
           mount,
           disabled,

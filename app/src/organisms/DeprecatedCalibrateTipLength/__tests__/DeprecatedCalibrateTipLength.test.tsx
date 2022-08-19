@@ -9,7 +9,7 @@ import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/
 import * as Sessions from '../../../redux/sessions'
 import { mockTipLengthCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
 
-import { CalibrateTipLength } from '../index'
+import { DeprecatedCalibrateTipLength } from '../index'
 import {
   Introduction,
   DeckSetup,
@@ -18,7 +18,7 @@ import {
   CompleteConfirmation,
   MeasureNozzle,
   MeasureTip,
-} from '../../../organisms/DeprecatedCalibrationPanels'
+} from '../../DeprecatedCalibrationPanels'
 
 import type { TipLengthCalibrationStep } from '../../../redux/sessions/types'
 import type { ReactWrapper } from 'enzyme'
@@ -28,7 +28,7 @@ jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
 jest.mock('../../../redux/config')
 
-interface CalibrateTipLengthSpec {
+interface DeprecatedCalibrateTipLengthSpec {
   component: React.ComponentType<any>
   currentStep: TipLengthCalibrationStep
 }
@@ -37,12 +37,14 @@ const mockGetDeckDefinitions = getDeckDefinitions as jest.MockedFunction<
   typeof getDeckDefinitions
 >
 
-type Wrapper = ReactWrapper<React.ComponentProps<typeof CalibrateTipLength>>
+type Wrapper = ReactWrapper<
+  React.ComponentProps<typeof DeprecatedCalibrateTipLength>
+>
 
-describe('CalibrateTipLength', () => {
+describe('DeprecatedCalibrateTipLength', () => {
   let mockStore: any
   let render: (
-    props?: Partial<React.ComponentProps<typeof CalibrateTipLength>>
+    props?: Partial<React.ComponentProps<typeof DeprecatedCalibrateTipLength>>
   ) => Wrapper
   let dispatch: jest.MockedFunction<() => {}>
   let dispatchRequests: jest.MockedFunction<() => {}>
@@ -64,7 +66,7 @@ describe('CalibrateTipLength', () => {
     CompleteConfirmation,
   ]
 
-  const SPECS: CalibrateTipLengthSpec[] = [
+  const SPECS: DeprecatedCalibrateTipLengthSpec[] = [
     { component: Introduction, currentStep: 'sessionStarted' },
     { component: DeckSetup, currentStep: 'labwareLoaded' },
     { component: MeasureNozzle, currentStep: 'measuringNozzleOffset' },
@@ -98,7 +100,7 @@ describe('CalibrateTipLength', () => {
         session = mockTipLengthSession,
       } = props
       return mount(
-        <CalibrateTipLength
+        <DeprecatedCalibrateTipLength
           robotName="robot-name"
           session={session}
           dispatchRequests={dispatchRequests}
