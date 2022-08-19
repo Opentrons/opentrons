@@ -25,6 +25,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { Mount } from '../../redux/pipettes/types'
 import type { Direction } from './types'
+
 interface Props {
   robotName: string
   mount: Mount
