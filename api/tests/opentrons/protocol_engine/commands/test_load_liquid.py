@@ -7,11 +7,6 @@ from opentrons.protocol_engine.commands import (
     LoadLiquidImplementation,
     LoadLiquidParams,
 )
-from opentrons.protocol_engine.errors import (
-    LiquidDoesNotExistError,
-    LabwareNotLoadedError,
-    WellDoesNotExistError,
-)
 from opentrons.protocol_engine.state import StateView
 
 
@@ -31,10 +26,14 @@ async def test_load_liquid_implementation(
     decoy: Decoy, subject: LoadLiquidImplementation, mock_state_view: StateView
 ) -> None:
     """Test LoadLiquid command execution."""
-    decoy.when(mock_state_view.liquid.validate_has_liquid("liquid-id")).then_return("liquid-id")
+    decoy.when(mock_state_view.liquid.validate_has_liquid("liquid-id")).then_return(
+        "liquid-id"
+    )
 
     decoy.when(
-        mock_state_view.labware.validate_labware_has_wells("labware-id", iter({"A1": None, "B2": None}))
+        mock_state_view.labware.validate_labware_has_wells(
+            "labware-id", iter({"A1": None, "B2": None})
+        )
     ).then_return({"A1": None, "B2": None})
 
     data = LoadLiquidParams(
