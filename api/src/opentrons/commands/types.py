@@ -356,9 +356,7 @@ class HomeCommand(TypedDict):
     payload: HomeCommandPayload
 
 
-class AspirateDispenseCommandPayload(
-    TextOnlyPayload, SingleInstrumentPayload
-):
+class AspirateDispenseCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     location: Location
     volume: float
     rate: float
@@ -413,9 +411,7 @@ class TransferCommand(TypedDict):
     payload: TransferCommandPayload
 
 
-class MixCommandPayload(
-    TextOnlyPayload, SingleInstrumentPayload
-):
+class MixCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     location: Union[None, Location, Well]
     volume: float
     repetitions: int
@@ -426,9 +422,7 @@ class MixCommand(TypedDict):
     payload: MixCommandPayload
 
 
-class BlowOutCommandPayload(
-    TextOnlyPayload, SingleInstrumentPayload
-):
+class BlowOutCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     location: Optional[Location]
 
 
@@ -464,9 +458,7 @@ class ReturnTipCommand(TypedDict):
     payload: ReturnTipCommandPayload
 
 
-class PickUpTipCommandPayload(
-    TextOnlyPayload, SingleInstrumentPayload
-):
+class PickUpTipCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     location: Well
 
 
@@ -475,9 +467,7 @@ class PickUpTipCommand(TypedDict):
     payload: PickUpTipCommandPayload
 
 
-class DropTipCommandPayload(
-    TextOnlyPayload, SingleInstrumentPayload
-):
+class DropTipCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     location: Location
 
 
@@ -491,9 +481,7 @@ class MoveToCommand(TypedDict):
     payload: MoveToCommandPayload
 
 
-class MoveToCommandPayload(
-    TextOnlyPayload, SingleInstrumentPayload
-):
+class MoveToCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     location: Location
 
 

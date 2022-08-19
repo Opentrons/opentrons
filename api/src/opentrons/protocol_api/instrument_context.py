@@ -459,10 +459,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         with publisher.publish_context(
             broker=self.broker,
-            command=cmds.blow_out(
-                instrument=self,
-                location=checked_loc
-            ),
+            command=cmds.blow_out(instrument=self, location=checked_loc),
         ):
             self._implementation.blow_out()
 
@@ -1264,10 +1261,7 @@ class InstrumentContext(publisher.CommandPublisher):
         if publish:
             publish_ctx = publisher.publish_context(
                 broker=self.broker,
-                command=cmds.move_to(
-                    instrument=self,
-                    location=location
-                ),
+                command=cmds.move_to(instrument=self, location=location),
             )
         with publish_ctx:
             self._implementation.move_to(

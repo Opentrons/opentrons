@@ -233,7 +233,8 @@ def drop_tip(
 
 
 def move_to(
-    instrument: InstrumentContext, location: Location,
+    instrument: InstrumentContext,
+    location: Location,
 ) -> command_types.MoveToCommand:
     location_text = stringify_location(location)
     text = "Moving to {location}".format(location=location_text)
