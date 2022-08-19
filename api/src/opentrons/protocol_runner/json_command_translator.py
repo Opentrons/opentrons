@@ -9,7 +9,7 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     PipetteName,
 )
-from opentrons.protocol_engine.errors import LabwareNotLoadedError
+from opentrons.protocol_reader import ProtocolFilesInvalidError
 from opentrons.types import MountType
 
 
@@ -29,7 +29,7 @@ def _translate_labware_command(
     try:
         definition_id = protocol.labware[labware_id].definitionId
     except KeyError:
-        raise LabwareNotLoadedError(f"Given labware: {labware_id} was not loaded.")
+        raise ProtocolFilesInvalidError(f"Missing loaded labware id: {labware_id}. Invalid protocol.")
     labware_command = pe_commands.LoadLabwareCreate(
         params=pe_commands.LoadLabwareParams(
             labwareId=command.params.labwareId,
