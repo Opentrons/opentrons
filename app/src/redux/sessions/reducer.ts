@@ -1,11 +1,9 @@
 import omit from 'lodash/omit'
 
-import { DISCONNECT } from '../robot'
 import * as Constants from './constants'
 
-import type { Action } from '../types'
-
 import type { Reducer } from 'redux'
+import type { Action } from '../types'
 import type { SessionState, PerRobotSessionState } from './types'
 
 const INITIAL_STATE: SessionState = {}
@@ -82,10 +80,6 @@ export const sessionReducer: Reducer<SessionState, Action> = (
       } else {
         return state
       }
-    }
-
-    case DISCONNECT: {
-      return INITIAL_STATE
     }
   }
 

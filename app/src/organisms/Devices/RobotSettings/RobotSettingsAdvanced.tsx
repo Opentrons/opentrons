@@ -73,10 +73,10 @@ export function RobotSettingsAdvanced({
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)
   )
-  const connected = robot?.connected != null && robot.connected
+  const reachable = robot?.status !== UNREACHABLE
 
-  const [isRobotConnected, setIsRobotConnected] = React.useState<boolean>(
-    connected
+  const [isRobotReachable, setIsRobotReachable] = React.useState<boolean>(
+    reachable
   )
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
   const findSettings = (id: string): RobotSettingsField | undefined =>
@@ -94,12 +94,12 @@ export function RobotSettingsAdvanced({
   }
 
   const updateResetStatus = (
-    isConnected: boolean,
+    isReachable: boolean,
     options?: ResetConfigRequest
   ): void => {
     if (options != null) setResetOptions(options)
     setShowFactoryResetModal(true)
-    setIsRobotConnected(isConnected ?? false)
+    setIsRobotReachable(isReachable ?? false)
   }
 
   const updateDownloadLogsStatus = (isDownloading: boolean): void =>
@@ -155,7 +155,7 @@ export function RobotSettingsAdvanced({
           <Portal level="top">
             <FactoryResetModal
               closeModal={() => setShowFactoryResetModal(false)}
-              isRobotConnected={isRobotConnected}
+              isRobotReachable={isRobotReachable}
               robotName={robotName}
               resetOptions={resetOptions}
             />

@@ -46,8 +46,8 @@ import {
   CALIBRATE_PIPETTE,
 } from './constants'
 
+import type { Mount } from '@opentrons/components'
 import type { State, Dispatch } from '../../redux/types'
-import type { Mount } from '../../redux/robot/types'
 import type { WizardStep } from './types'
 
 interface Props {
