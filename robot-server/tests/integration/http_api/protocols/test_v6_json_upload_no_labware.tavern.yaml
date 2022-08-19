@@ -9,7 +9,7 @@ stages:
       url: '{host:s}:{port:d}/protocols'
       method: POST
       files:
-        files: '../shared-data/protocol/fixtures/6/simpleV6_no_labware.json'
+        files: '../shared-data/protocol/fixtures/6/v6_no_labware.json'
     response:
       strict:
         - json:off
