@@ -1265,7 +1265,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 broker=self.broker,
                 command=cmds.move_to(
                     instrument=self,
-                    location=location or self._ctx.location_cache,  # type: ignore[arg-type]
+                    location=location
                 ),
             )
         with publish_ctx:

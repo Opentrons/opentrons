@@ -78,7 +78,7 @@ class TextOnlyPayload(TypedDict):
 
 
 class SingleLocationPayload(TypedDict):
-    location: Union[Location, Well]
+    location: Location
 
 
 class MultiLocationPayload(TypedDict):
@@ -364,7 +364,7 @@ class HomeCommand(TypedDict):
     payload: HomeCommandPayload
 
 
-class SimpleLHCommandPayload(
+class AspirateDispenseCommandPayload(
     TextOnlyPayload, SingleLocationPayload, SingleInstrumentPayload
 ):
     volume: float
@@ -373,12 +373,12 @@ class SimpleLHCommandPayload(
 
 class AspirateCommand(TypedDict):
     name: Literal["command.ASPIRATE"]
-    payload: SimpleLHCommandPayload
+    payload: AspirateDispenseCommandPayload
 
 
 class DispenseCommand(TypedDict):
     name: Literal["command.DISPENSE"]
-    payload: SimpleLHCommandPayload
+    payload: AspirateDispenseCommandPayload
 
 
 class ConsolidateCommandPayload(
@@ -582,7 +582,7 @@ CommandPayload = Union[
     TransferCommandPayload,
     DistributeCommandPayload,
     ConsolidateCommandPayload,
-    SimpleLHCommandPayload,
+    AspirateDispenseCommandPayload,
     HomeCommandPayload,
     ThermocyclerExecuteProfileCommandPayload,
     ThermocyclerSetBlockTempCommandPayload,

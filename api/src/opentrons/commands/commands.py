@@ -21,7 +21,7 @@ def home(mount: str) -> command_types.HomeCommand:
 def aspirate(
     instrument: InstrumentContext,
     volume: float,
-    location: Union[Well, Location],
+    location: Location,
     rate: float,
 ) -> command_types.AspirateCommand:
     location_text = stringify_location(location)
@@ -44,7 +44,7 @@ def aspirate(
 def dispense(
     instrument: InstrumentContext,
     volume: float,
-    location: Union[Well, Location],
+    location: Location,
     rate: float,
 ) -> command_types.DispenseCommand:
     location_text = stringify_location(location)
@@ -236,7 +236,7 @@ def drop_tip(
 
 
 def move_to(
-    instrument: InstrumentContext, location: Union[Location, Well]
+    instrument: InstrumentContext, location: Location,
 ) -> command_types.MoveToCommand:
     location_text = stringify_location(location)
     text = "Moving to {location}".format(location=location_text)
