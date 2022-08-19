@@ -1,4 +1,4 @@
-test_name: Upload, analyze, delete basic_transfer_standalone protocol.
+test_name: Upload a malformed json v6 protocol.
 
 marks:
   - usefixtures:
