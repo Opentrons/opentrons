@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -12,7 +11,7 @@ import {
   DIRECTION_ROW,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
-import { WizardHeader } from '../../atoms/WizardHeader'
+import { WizardHeader } from '../../molecules/WizardHeader'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 import { CheckPipettesButton } from './CheckPipettesButton'
@@ -168,11 +167,7 @@ export function Instructions(props: Props): JSX.Element {
         {stepPage === 0 ? (
           continueButton
         ) : (
-          <CheckPipettesButton
-            robotName={robotName}
-            onDone={confirm}
-            hidden={!actualPipette && !wantedPipette}
-          >
+          <CheckPipettesButton robotName={robotName} onDone={confirm}>
             {actualPipette ? t('confirm_detachment') : t('confirm_attachment')}
           </CheckPipettesButton>
         )}

@@ -1,17 +1,12 @@
 import * as React from 'react'
-
+import screwdriverSrc from '../../assets/images/change-pip/screwdriver.svg'
+import styles from './styles.css'
 import type {
   PipetteChannels,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../redux/robot'
-import type { Direction } from './types'
-
-import screwdriverSrc from '../../assets/images/change-pip/screwdriver.svg'
-import styles from './styles.css'
-
-type Diagram = 'screws' | 'tab'
-
+import type { Mount } from '@opentrons/components'
+import type { Direction, Diagram } from './types'
 interface DiagramProps {
   direction: Direction
   mount: Mount
@@ -24,7 +19,9 @@ interface Props extends DiagramProps {
   step: 'one' | 'two'
   children: React.ReactNode
 }
-
+/**
+ * @deprecated use InstructionStep instead
+ */
 export function getDiagramsSrc(props: DiagramProps): string {
   const { channels, displayCategory, direction, mount, diagram } = props
   const channelsKey = channels === 8 ? 'multi' : 'single'
@@ -33,7 +30,6 @@ export function getDiagramsSrc(props: DiagramProps): string {
     ? require(`../../assets/images/change-pip/${direction}-${mount}-${channelsKey}-GEN2-${diagram}@3x.png`)
     : require(`../../assets/images/change-pip/${direction}-${mount}-${channelsKey}-${diagram}@3x.png`)
 }
-
 /**
  * @deprecated use InstructionStep instead
  */
