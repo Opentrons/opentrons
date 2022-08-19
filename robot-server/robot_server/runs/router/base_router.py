@@ -175,7 +175,6 @@ async def create_run(
             status.HTTP_422_UNPROCESSABLE_ENTITY
         )
 
-
     log.info(f'Created protocol run "{run_id}" from protocol "{protocol_id}".')
 
     return await PydanticResponse.create(

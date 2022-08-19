@@ -219,7 +219,8 @@ async def test_create_run_conflict(
 async def test_create_run_invalid_protocol(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
-    mock_run_auto_deleter: RunAutoDeleter) -> None:
+    mock_run_auto_deleter: RunAutoDeleter,
+) -> None:
     """Should raise a ProtocolFilesInvalid error."""
     created_at = datetime(year=2021, month=1, day=1)
 
@@ -230,9 +231,7 @@ async def test_create_run_invalid_protocol(
             labware_offsets=[],
             protocol=None,
         )
-    ).then_raise(
-        ProtocolFilesInvalidError
-    )
+    ).then_raise(ProtocolFilesInvalidError("oh oh"))
 
     with pytest.raises(ApiError) as exc_info:
         await create_run(
@@ -245,7 +244,6 @@ async def test_create_run_invalid_protocol(
 
     assert exc_info.value.status_code == 422
     assert exc_info.value.content["errors"][0]["id"] == "ProtocolFilesInvalid"
-
 
 
 async def test_get_run_data_from_url(
