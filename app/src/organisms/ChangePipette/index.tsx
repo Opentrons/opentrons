@@ -154,17 +154,15 @@ export function ChangePipette(props: Props): JSX.Element | null {
 
   if (
     movementStatus !== null &&
+    //  when FF is removed, change this logic so the modal only appears when movement status is MOVING
     (movementStatus === HOMING || movementStatus === MOVING)
   ) {
-    return enableChangePipetteWizard ? (
+    return enableChangePipetteWizard && movementStatus === MOVING ? (
       <ModalShell height="28.12rem" width="47rem">
         <InProgressModal
           title={t('attach_pipette')}
-          mount={mount}
           currentStep={1}
           totalSteps={5}
-          movementStatus={movementStatus}
-          isPipetteHoming={homePipStatus === PENDING}
         />
       </ModalShell>
     ) : (

@@ -1,7 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { HOMING, MOVING } from '../../redux/robot-controls'
-import { RIGHT, LEFT } from '../../redux/pipettes'
 import { StyledText } from '../../atoms/text'
 import { WizardHeader } from '../../atoms/WizardHeader'
 import {
@@ -12,35 +10,16 @@ import {
   Icon,
   SPACING,
 } from '@opentrons/components'
-import type { MovementStatus } from '../../redux/robot-controls/types'
-import type { Mount } from '../../redux/pipettes/types'
 
 interface Props {
   title: string
-  mount: Mount
-  movementStatus: MovementStatus
-  isPipetteHoming: boolean
   currentStep: number
   totalSteps: number
 }
 
 export function InProgressModal(props: Props): JSX.Element {
-  const {
-    title,
-    mount,
-    movementStatus,
-    isPipetteHoming,
-    totalSteps,
-    currentStep,
-  } = props
+  const { title, totalSteps, currentStep } = props
   const { t } = useTranslation('change_pipette')
-
-  let location: string = 'up'
-  if (movementStatus === MOVING && mount === RIGHT) {
-    location = t(`to_front_left`)
-  } else if (movementStatus === MOVING && mount === LEFT) {
-    location = t('to_front_right')
-  }
 
   return (
     <>
@@ -57,7 +36,7 @@ export function InProgressModal(props: Props): JSX.Element {
       >
         <Icon
           name="ot-spinner"
-          size="82px"
+          size="5.1rem"
           color={COLORS.darkGreyEnabled}
           aria-label="spinner"
           spin
@@ -69,17 +48,6 @@ export function InProgressModal(props: Props): JSX.Element {
         >
           {t('moving_gantry')}
         </StyledText>
-        {/* extra protection for error movement status  */}
-        {movementStatus !== 'moveError' && movementStatus !== 'homeError' ? (
-          <StyledText as="p">
-            {movementStatus === HOMING && !isPipetteHoming
-              ? t('homing')
-              : t('pipette_movement', {
-                  mount: mount[0].toUpperCase() + mount.slice(1),
-                  location: location,
-                })}
-          </StyledText>
-        ) : null}
       </Flex>
     </>
   )
