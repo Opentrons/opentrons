@@ -435,19 +435,20 @@ class InstrumentContext(publisher.CommandPublisher):
                     "Blow_out being performed on a tiprack. "
                     "Please re-check your code"
                 )
-            loc = location.top()
-            self.move_to(loc, publish=False)
+            checked_loc = location.top()
+            self.move_to(checked_loc, publish=False)
         elif isinstance(location, types.Location):
-            loc = location
-            self.move_to(loc, publish=False)
+            checked_loc = location
+            self.move_to(checked_loc, publish=False)
         elif location is not None:
             raise TypeError(
                 "location should be a Well or Location, but it is {}".format(location)
             )
         elif self._ctx.location_cache:
-            # if location cache exists, pipette blows out immediately at
+            checked_loc = self._ctx.location_cache
+            # if no explicit location given but location cache exists,
+            # pipette blows out immediately at
             # current location, no movement is needed
-            pass
         else:
             raise RuntimeError(
                 "If blow out is called without an explicit location, another"
@@ -460,7 +461,7 @@ class InstrumentContext(publisher.CommandPublisher):
             broker=self.broker,
             command=cmds.blow_out(
                 instrument=self,
-                location=location or self._ctx.location_cache,  # type: ignore[arg-type]
+                location=checked_loc
             ),
         ):
             self._implementation.blow_out()

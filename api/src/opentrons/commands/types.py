@@ -77,20 +77,12 @@ class TextOnlyPayload(TypedDict):
     text: str
 
 
-class SingleLocationPayload(TypedDict):
-    location: Location
-
-
 class MultiLocationPayload(TypedDict):
     locations: Sequence[Union[Location, Well]]
 
 
 class OptionalMultiLocationPayload(TypedDict):
     locations: Optional[Sequence[Union[Location, Well]]]
-
-
-class OptionalSingleLocationPayload(TypedDict):
-    location: Union[Location, Well, None]
 
 
 class SingleInstrumentPayload(TypedDict):
@@ -365,8 +357,9 @@ class HomeCommand(TypedDict):
 
 
 class AspirateDispenseCommandPayload(
-    TextOnlyPayload, SingleLocationPayload, SingleInstrumentPayload
+    TextOnlyPayload, SingleInstrumentPayload
 ):
+    location: Location
     volume: float
     rate: float
 
@@ -421,8 +414,9 @@ class TransferCommand(TypedDict):
 
 
 class MixCommandPayload(
-    TextOnlyPayload, OptionalSingleLocationPayload, SingleInstrumentPayload
+    TextOnlyPayload, SingleInstrumentPayload
 ):
+    location: Union[None, Location, Well]
     volume: float
     repetitions: int
 
@@ -433,9 +427,9 @@ class MixCommand(TypedDict):
 
 
 class BlowOutCommandPayload(
-    TextOnlyPayload, OptionalSingleLocationPayload, SingleInstrumentPayload
+    TextOnlyPayload, SingleInstrumentPayload
 ):
-    pass
+    location: Optional[Location]
 
 
 class BlowOutCommand(TypedDict):
@@ -471,21 +465,20 @@ class ReturnTipCommand(TypedDict):
 
 
 class PickUpTipCommandPayload(
-    TextOnlyPayload, SingleLocationPayload, SingleInstrumentPayload
+    TextOnlyPayload, SingleInstrumentPayload
 ):
-    pass
+    location: Well
 
 
 class PickUpTipCommand(TypedDict):
     name: Literal["command.PICK_UP_TIP"]
     payload: PickUpTipCommandPayload
-    pass
 
 
 class DropTipCommandPayload(
-    TextOnlyPayload, SingleLocationPayload, SingleInstrumentPayload
+    TextOnlyPayload, SingleInstrumentPayload
 ):
-    pass
+    location: Location
 
 
 class DropTipCommand(TypedDict):
@@ -499,9 +492,9 @@ class MoveToCommand(TypedDict):
 
 
 class MoveToCommandPayload(
-    TextOnlyPayload, SingleLocationPayload, SingleInstrumentPayload
+    TextOnlyPayload, SingleInstrumentPayload
 ):
-    pass
+    location: Location
 
 
 Command = Union[

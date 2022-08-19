@@ -180,13 +180,10 @@ def mix(
 
 
 def blow_out(
-    instrument: InstrumentContext, location: Union[Well, Location]
+    instrument: InstrumentContext, location: Location
 ) -> command_types.BlowOutCommand:
     location_text = stringify_location(location)
-    text = "Blowing out"
-
-    if location is not None:
-        text += " at {location}".format(location=location_text)
+    text = f"Blowing out at {location_text}"
 
     return {
         "name": command_types.BLOW_OUT,
