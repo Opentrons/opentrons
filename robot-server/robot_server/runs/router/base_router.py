@@ -30,6 +30,9 @@ from robot_server.protocols import (
     ProtocolNotFoundError,
     get_protocol_store,
 )
+from robot_server.protocols.router import ProtocolFilesInvalid
+
+from opentrons.protocol_reader import ProtocolFilesInvalidError
 
 from ..run_store import RunNotFoundError
 from ..run_auto_deleter import RunAutoDeleter
@@ -167,6 +170,11 @@ async def create_run(
         raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+    except ProtocolFilesInvalidError as e:
+        raise ProtocolFilesInvalid(detail=str(e)).as_error(
+            status.HTTP_422_UNPROCESSABLE_ENTITY
+        )
+
 
     log.info(f'Created protocol run "{run_id}" from protocol "{protocol_id}".')
 

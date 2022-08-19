@@ -22,7 +22,6 @@ from robot_server.protocols import (
     ProtocolResource,
     ProtocolNotFoundError,
 )
-
 from robot_server.runs.run_auto_deleter import RunAutoDeleter
 
 from robot_server.runs.run_models import Run, RunCreate, RunUpdate
@@ -38,6 +37,8 @@ from robot_server.runs.router.base_router import (
     remove_run,
     update_run,
 )
+
+from opentrons.protocol_reader import ProtocolFilesInvalidError
 
 
 @pytest.fixture
@@ -213,6 +214,38 @@ async def test_create_run_conflict(
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunAlreadyActive"
+
+
+async def test_create_run_invalid_protocol(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+    mock_run_auto_deleter: RunAutoDeleter) -> None:
+    """Should raise a ProtocolFilesInvalid error."""
+    created_at = datetime(year=2021, month=1, day=1)
+
+    decoy.when(
+        await mock_run_data_manager.create(
+            run_id="run-id",
+            created_at=created_at,
+            labware_offsets=[],
+            protocol=None,
+        )
+    ).then_raise(
+        ProtocolFilesInvalidError
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await create_run(
+            run_id="run-id",
+            created_at=created_at,
+            request_body=None,
+            run_data_manager=mock_run_data_manager,
+            run_auto_deleter=mock_run_auto_deleter,
+        )
+
+    assert exc_info.value.status_code == 422
+    assert exc_info.value.content["errors"][0]["id"] == "ProtocolFilesInvalid"
+
 
 
 async def test_get_run_data_from_url(
