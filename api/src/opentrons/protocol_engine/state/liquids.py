@@ -51,7 +51,7 @@ class LiquidView(HasState[LiquidState]):
         """Get all protocol liquids."""
         return list(self._state.liquids_by_id.values())
 
-    def has(self, liquid_id: str) -> str:
+    def validate_has_liquid(self, liquid_id: str) -> str:
         """Check if liquid_id exists in liquids."""
         has_liquid = liquid_id in self._state.liquids_by_id
         if not has_liquid:

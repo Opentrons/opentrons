@@ -31,11 +31,11 @@ async def test_load_liquid_implementation(
     decoy: Decoy, subject: LoadLiquidImplementation, mock_state_view: StateView
 ) -> None:
     """Test LoadLiquid command execution."""
-    decoy.when(mock_state_view.liquid.has("liquid-id")).then_return("liquid-id")
+    decoy.when(mock_state_view.liquid.validate_has_liquid("liquid-id")).then_return("liquid-id")
 
     decoy.when(
-        mock_state_view.labware.validate_labware_has_wells("labware-id", ["A1", "B2"])
-    ).then_return(["A1", "B2"])
+        mock_state_view.labware.validate_labware_has_wells("labware-id", iter({"A1": None, "B2": None}))
+    ).then_return({"A1": None, "B2": None})
 
     data = LoadLiquidParams(
         labwareId="labware-id",
@@ -45,61 +45,3 @@ async def test_load_liquid_implementation(
     result = await subject.execute(data)
 
     assert result == LoadLiquidResult()
-
-
-async def test_load_liquid_liquid_not_found(
-    decoy: Decoy, subject: LoadLiquidImplementation, mock_state_view: StateView
-) -> None:
-    """Should raise an error that liquid not found."""
-    decoy.when(mock_state_view.liquid.has("liquid-not-found")).then_raise(
-        LiquidDoesNotExistError()
-    )
-
-    data = LoadLiquidParams(
-        labwareId="labware-id",
-        liquidId="liquid-not-found",
-        volumeByWell={"A1": 30, "B2": 100},
-    )
-    with pytest.raises(LiquidDoesNotExistError):
-        await subject.execute(data)
-
-
-async def test_load_liquid_labware_not_found(
-    decoy: Decoy, subject: LoadLiquidImplementation, mock_state_view: StateView
-) -> None:
-    """Should raise an error that liquid not found."""
-    decoy.when(mock_state_view.liquid.has("liquid-id")).then_return("liquid-id")
-
-    decoy.when(
-        mock_state_view.labware.validate_labware_has_wells(
-            "labware-not-found", ["A1", "B2"]
-        )
-    ).then_raise(LabwareNotLoadedError())
-
-    data = LoadLiquidParams(
-        labwareId="labware-not-found",
-        liquidId="liquid-id",
-        volumeByWell={"A1": 30, "B2": 100},
-    )
-    with pytest.raises(LabwareNotLoadedError):
-        await subject.execute(data)
-
-
-async def test_load_liquid_well_not_found(
-    decoy: Decoy, subject: LoadLiquidImplementation, mock_state_view: StateView
-) -> None:
-    """Should raise an error that liquid not found."""
-    decoy.when(
-        mock_state_view.labware.validate_labware_has_wells("labware-id", ["C1", "B2"])
-    ).then_raise(WellDoesNotExistError())
-
-    decoy.when(mock_state_view.liquid.has("liquid-id")).then_return("liquid-id")
-
-    data = LoadLiquidParams(
-        labwareId="labware-id",
-        liquidId="liquid-id",
-        volumeByWell={"C1": 30, "B2": 100},
-    )
-
-    with pytest.raises(WellDoesNotExistError):
-        await subject.execute(data)

@@ -29,7 +29,7 @@ def test_get_all(subject: LiquidView) -> None:
 
 def test_has_liquid(subject: LiquidView) -> None:
     """Should return true if an item exists in the liquids list."""
-    assert subject.has("water-id") == "water-id"
+    assert subject.validate_has_liquid("water-id") == "water-id"
 
     with pytest.raises(LiquidDoesNotExistError):
-        subject.has("no-id")
+        subject.validate_has_liquid("no-id")
