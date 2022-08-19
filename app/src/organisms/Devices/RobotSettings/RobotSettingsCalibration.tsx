@@ -66,6 +66,7 @@ import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,
 } from '../../../redux/pipettes/types'
+import { fetchAllSessions } from '../../../redux/sessions'
 
 const CALS_FETCH_MS = 5000
 
@@ -145,6 +146,9 @@ export function RobotSettingsCalibration({
   })
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
   const dispatch = useDispatch<Dispatch>()
+  React.useEffect(() => {
+    dispatch(fetchAllSessions(robotName))
+  }, [])
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {

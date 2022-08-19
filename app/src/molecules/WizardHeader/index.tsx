@@ -10,8 +10,8 @@ import {
   COLORS,
   SPACING,
 } from '@opentrons/components'
-import { StyledText } from '../text'
-import { StepMeter } from '../StepMeter'
+import { StyledText } from '../../atoms/text'
+import { StepMeter } from '../../atoms/StepMeter'
 
 interface WizardHeaderProps {
   totalSteps: number
@@ -45,7 +45,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           ) : null}
         </Flex>
 
-        <Btn onClick={onExit}>
+        <Btn onClick={onExit} aria-label="Exit">
           <StyledText
             css={TYPOGRAPHY.pSemiBold}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
