@@ -38,6 +38,7 @@ import { RequestInProgressModal } from './RequestInProgressModal'
 import { LevelPipette } from './LevelPipette'
 import { DeprecatedLevelPipette } from './DeprecatedLevelPipette'
 import { ClearDeckAlertModal } from './ClearDeckModal/ClearDeckAlertModal'
+import { InProgressModal } from './InProgressModal'
 
 import {
   ATTACH,
@@ -51,7 +52,6 @@ import {
 import type { Mount } from '@opentrons/components'
 import type { State, Dispatch } from '../../redux/types'
 import type { WizardStep } from './types'
-import { InProgressModal } from './InProgressModal'
 
 interface Props {
   robotName: string
