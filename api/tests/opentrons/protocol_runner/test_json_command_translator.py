@@ -414,15 +414,21 @@ def test_load_command(
     assert output == [expected_output]
 
 
-def test_load_labware_not_found(
-        subject: JsonCommandTranslator
-) -> None:
+def test_load_labware_not_found(subject: JsonCommandTranslator) -> None:
     """Should raise an exception that labware is not found."""
     with pytest.raises(ProtocolFilesInvalidError):
-         subject.translate(_make_json_protocol(commands=[protocol_schema_v6.Command(
-                commandType="loadLabware",
-                params=protocol_schema_v6.Params(
-                    labwareId="no-labware",
-                    location=protocol_schema_v6.Location(moduleId="temperatureModuleId"),
-                ),
-            )]))
+        subject.translate(
+            _make_json_protocol(
+                commands=[
+                    protocol_schema_v6.Command(
+                        commandType="loadLabware",
+                        params=protocol_schema_v6.Params(
+                            labwareId="no-labware",
+                            location=protocol_schema_v6.Location(
+                                moduleId="temperatureModuleId"
+                            ),
+                        ),
+                    )
+                ]
+            )
+        )
