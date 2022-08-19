@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyledText } from '../../atoms/text'
-import { WizardHeader } from '../../atoms/WizardHeader'
+import { WizardHeader } from '../../molecules/WizardHeader'
 import {
   ALIGN_CENTER,
   COLORS,
