@@ -349,9 +349,57 @@ class LegacyCommandMapper:
         location = command["payload"]["location"]
         volume = command["payload"]["volume"]
         flow_rate = command["payload"]["rate"]
-        #   TODO:(jr, 15.08.2022): aspirate and dispense commands with no specified labware
-        #   get filtered into custom. Refactor this in followup legacy command mapping
-        if isinstance(location, Location) and location.labware.is_empty:
+        if isinstance(location, Location) and location.labware.is_empty is False:
+            if location.labware.is_well:
+                well = location.labware.as_well()
+            slot = DeckSlotName(location.labware.first_parent())
+            parent_module_id = self._module_id_by_slot.get(slot)
+            labware_id = (
+                self._labware_id_by_module_id[parent_module_id]
+                if parent_module_id is not None
+                else self._labware_id_by_slot[slot]
+            )
+            mount = MountType(pipette.mount)
+            well_name = well.well_name
+            pipette_id = self._pipette_id_by_mount[mount]
+
+            if command["name"] == legacy_command_types.ASPIRATE:
+                if flow_rate == 1.0:
+                    flow_rate = command["payload"]["rate"] * pipette.flow_rate.aspirate
+                return pe_commands.Aspirate.construct(
+                    id=command_id,
+                    key=command_id,
+                    status=pe_commands.CommandStatus.RUNNING,
+                    createdAt=now,
+                    startedAt=now,
+                    params=pe_commands.AspirateParams.construct(
+                        pipetteId=pipette_id,
+                        labwareId=labware_id,
+                        wellName=well_name,
+                        volume=volume,
+                        flowRate=flow_rate,
+                    ),
+                )
+            else:
+                if flow_rate == 1.0:
+                    flow_rate = command["payload"]["rate"] * pipette.flow_rate.dispense
+                return pe_commands.Dispense.construct(
+                    id=command_id,
+                    key=command_id,
+                    status=pe_commands.CommandStatus.RUNNING,
+                    createdAt=now,
+                    startedAt=now,
+                    params=pe_commands.DispenseParams.construct(
+                        pipetteId=pipette_id,
+                        labwareId=labware_id,
+                        wellName=well_name,
+                        volume=volume,
+                        flowRate=flow_rate,
+                    ),
+                )
+        else:
+            # TODO:(jr, 15.08.2022): aspirate and dispense commands with no specified labware
+            # get filtered into custom. Refactor this in followup legacy command mapping
             return pe_commands.Custom.construct(
                 id=command_id,
                 key=command_id,
@@ -361,52 +409,6 @@ class LegacyCommandMapper:
                 params=LegacyCommandParams.construct(
                     legacyCommandType=command["name"],
                     legacyCommandText=command["payload"]["text"],
-                ),
-            )
-        if isinstance(location, LegacyWell):
-            well = location
-        elif isinstance(location, Location):
-            if location.labware.is_well:
-                well = location.labware.as_well()
-            slot = DeckSlotName(location.labware.first_parent())
-        parent_module_id = self._module_id_by_slot.get(slot)
-        labware_id = (
-            self._labware_id_by_module_id[parent_module_id]
-            if parent_module_id is not None
-            else self._labware_id_by_slot[slot]
-        )
-        mount = MountType(pipette.mount)
-        well_name = well.well_name
-        pipette_id = self._pipette_id_by_mount[mount]
-
-        if command["name"] == legacy_command_types.ASPIRATE:
-            return pe_commands.Aspirate.construct(
-                id=command_id,
-                key=command_id,
-                status=pe_commands.CommandStatus.RUNNING,
-                createdAt=now,
-                startedAt=now,
-                params=pe_commands.AspirateParams.construct(
-                    pipetteId=pipette_id,
-                    labwareId=labware_id,
-                    wellName=well_name,
-                    volume=volume,
-                    flowRate=flow_rate,
-                ),
-            )
-        else:
-            return pe_commands.Dispense.construct(
-                id=command_id,
-                key=command_id,
-                status=pe_commands.CommandStatus.RUNNING,
-                createdAt=now,
-                startedAt=now,
-                params=pe_commands.DispenseParams.construct(
-                    pipetteId=pipette_id,
-                    labwareId=labware_id,
-                    wellName=well_name,
-                    volume=volume,
-                    flowRate=flow_rate,
                 ),
             )
 
