@@ -46,9 +46,9 @@ async def test_suppresses_undefined(
                     NodeId.host,
                     message_definitions.PushToolsDetectedNotification(
                         payload=payloads.ToolsDetectedNotificationPayload(
-                            z_motor=ToolField(ToolType.undefined_tool.value),
-                            a_motor=ToolField(ToolType.undefined_tool.value),
-                            gripper=ToolField(ToolType.undefined_tool.value),
+                            z_motor=ToolField(ToolType.nothing_attached.value),
+                            a_motor=ToolField(ToolType.nothing_attached.value),
+                            gripper=ToolField(ToolType.nothing_attached.value),
                         )
                     ),
                     NodeId.head,

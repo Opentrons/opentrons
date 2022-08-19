@@ -47,7 +47,7 @@ def subject(
                 gripper=ToolField(ToolType.gripper.value),
             ),
             ToolDetectionResult(
-                left=ToolType.undefined_tool,
+                left=ToolType.tool_error,
                 right=ToolType.pipette,
                 gripper=ToolType.gripper,
             ),

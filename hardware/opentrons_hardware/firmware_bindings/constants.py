@@ -155,11 +155,10 @@ class ErrorCode(int, Enum):
 class ToolType(int, Enum):
     """Tool types detected on Head."""
 
-    undefined_tool = 0x00
-    pipette = 0x01
-    gripper = 0x02
-    nothing_attached = 0x03
-    tool_error = 0x04
+    pipette = 0x00
+    gripper = 0x01
+    nothing_attached = 0x02
+    tool_error = 0x03
 
 
 @unique
