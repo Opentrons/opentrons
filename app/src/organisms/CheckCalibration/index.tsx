@@ -10,7 +10,6 @@ import {
 
 import * as Sessions from '../../redux/sessions'
 import {
-  Introduction,
   DeckSetup,
   TipPickUp,
   TipConfirmation,
@@ -20,6 +19,9 @@ import {
   MeasureNozzle,
   MeasureTip,
 } from '../../organisms/DeprecatedCalibrationPanels'
+import {
+  Introduction,
+} from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'

@@ -1,41 +1,37 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import {
   Box,
   Flex,
   Link,
-  PrimaryBtn,
-  Text,
   ALIGN_CENTER,
-  ALIGN_FLEX_START,
   BORDER_SOLID_MEDIUM,
   C_MED_DARK_GRAY,
   C_NEAR_WHITE,
   DIRECTION_COLUMN,
   DISPLAY_INLINE,
   FLEX_MIN_CONTENT,
-  FONT_HEADER_DARK,
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  POSITION_RELATIVE,
+  SPACING,
   SPACING_1,
   SPACING_2,
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
-  SecondaryBtn,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
+import { StyledText } from '../../atoms/text'
+import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { labwareImages } from './labwareImages'
 import { NeedHelpLink } from './NeedHelpLink'
 import { ChooseTipRack } from './ChooseTipRack'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { SessionType } from '../../redux/sessions/types'
-import type { CalibrationPanelProps, Intent } from './types'
+
 import {
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
   INTENT_TIP_LENGTH_IN_PROTOCOL,
@@ -43,6 +39,11 @@ import {
   INTENT_RECALIBRATE_PIPETTE_OFFSET,
   TRASH_BIN_LOAD_NAME,
 } from './constants'
+
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { SessionType } from '../../redux/sessions/types'
+import type { CalibrationPanelProps, Intent } from './types'
+import { Divider } from '../../atoms/structure'
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 
@@ -76,7 +77,6 @@ const TIP_LENGTH_INVALIDATES_PIPETTE_OFFSET =
 const CHOOSE_TIP_RACK_BUTTON_TEXT = 'Use a different tip rack'
 const START = 'start'
 const PIP_AND_TIP_CAL_HEADER = 'tip length and pipette offset calibration'
-const LABWARE_REQS = 'You will need:'
 const NOTE_HEADER = 'Please note:'
 const IT_IS = "It's"
 const EXTREMELY = 'extremely'
@@ -114,17 +114,22 @@ const bodyContentFromFragments = (
         .map((fragments, index) => (
           <React.Fragment key={index}>
             {fragments.preFragment && (
-              <Text display={DISPLAY_INLINE}>
+              <StyledText display={DISPLAY_INLINE}>
                 {`${fragments.preFragment} `}
-              </Text>
+              </StyledText>
             )}
             {fragments.boldFragment && (
-              <Text display={DISPLAY_INLINE} fontWeight={FONT_WEIGHT_SEMIBOLD}>
+              <StyledText
+                display={DISPLAY_INLINE}
+                fontWeight={FONT_WEIGHT_SEMIBOLD}
+              >
                 {`${fragments.boldFragment} `}
-              </Text>
+              </StyledText>
             )}
             {fragments.postFragment && (
-              <Text display={DISPLAY_INLINE}>{fragments.postFragment}</Text>
+              <StyledText display={DISPLAY_INLINE}>
+                {fragments.postFragment}
+              </StyledText>
             )}
           </React.Fragment>
         ))
@@ -400,6 +405,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
     instruments,
     supportedCommands,
   } = props
+  const { t } = useTranslation('robot_calibration')
 
   const [showChooseTipRack, setShowChooseTipRack] = React.useState(false)
   const [
@@ -454,43 +460,30 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       defaultTipracks={props.defaultTipracks}
     />
   ) : (
-    <>
-      <Flex
-        key="intro"
-        marginY={SPACING_2}
-        flexDirection={DIRECTION_COLUMN}
-        alignItems={ALIGN_FLEX_START}
-        position={POSITION_RELATIVE}
-        fontSize={TYPOGRAPHY.fontSizeH3}
-      >
-        <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Text
-            css={FONT_HEADER_DARK}
-            marginBottom={SPACING_3}
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
-          >
-            {headerText}
-          </Text>
-          <NeedHelpLink />
-        </Flex>
-        {invalidationText && (
-          <Text marginBottom={SPACING_3}>{invalidationText}</Text>
-        )}
-        <Box marginBottom={SPACING_3}>
-          {bodyContentFromFragments(bodyContentFragments)}
-        </Box>
-        {outcomeText && <Text marginBottom={SPACING_3}>{outcomeText}</Text>}
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex>
         <Flex
-          marginX="20%"
-          marginBottom={SPACING_2}
+          width="100%"
           flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_CENTER}
-          minHeight="18.75rem"
-          maxHeight="25rem"
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <Text fontWeight={FONT_WEIGHT_SEMIBOLD} marginBottom={SPACING_3}>
-            {LABWARE_REQS}
-          </Text>
+          <IntroHeader
+            sessionType={sessionType}
+            isExtendedPipOffset={isExtendedPipOffset}
+            intent={intent}
+          />
+          {invalidationText && (
+            <StyledText as="p">{invalidationText}</StyledText>
+          )}
+          <StyledText as="p">
+            {bodyContentFromFragments(bodyContentFragments)}
+          </StyledText>
+          {outcomeText && <StyledText as="p">{outcomeText}</StyledText>}
+        </Flex>
+
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <StyledText as="h3">{t('you_will_need')}</StyledText>
+          <Divider />
           {uniqueTipRacks.size > 1 ? (
             instruments?.map(instr => {
               return (
@@ -498,7 +491,6 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
                   key={instr.tipRackUri}
                   loadName={instr.tipRackLoadName}
                   displayName={instr.tipRackDisplay}
-                  linkToMeasurements={instr.tipRackLoadName in labwareImages}
                 />
               )
             })
@@ -506,26 +498,18 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
             <RequiredLabwareCard
               loadName={chosenTipRack.parameters.loadName}
               displayName={chosenTipRack.metadata.displayName}
-              linkToMeasurements={
-                chosenTipRack.parameters.loadName in labwareImages
-              }
             />
           ) : (
             <RequiredLabwareCard
               loadName={tipRack.loadName}
               displayName={getLabwareDisplayName(tipRack.definition)}
-              linkToMeasurements={isKnownTiprack}
             />
           )}
           {calBlock ? (
-            <>
-              <Box width={SPACING_2} />
-              <RequiredLabwareCard
-                loadName={calBlock.loadName}
-                displayName={getLabwareDisplayName(calBlock.definition)}
-                linkToMeasurements={false}
-              />
-            </>
+            <RequiredLabwareCard
+              loadName={calBlock.loadName}
+              displayName={getLabwareDisplayName(calBlock.definition)}
+            />
           ) : (
             (sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK ||
               sessionType === Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION ||
@@ -533,114 +517,110 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
               <RequiredLabwareCard
                 loadName={TRASH_BIN_LOAD_NAME}
                 displayName={TRASH_BIN}
-                linkToMeasurements={false}
               />
             )
           )}
           <Box fontSize={FONT_SIZE_BODY_1} marginTop={SPACING_2}>
-            <Text
-              display={DISPLAY_INLINE}
-              fontWeight={FONT_WEIGHT_SEMIBOLD}
-              textTransform={TEXT_TRANSFORM_UPPERCASE}
-            >
-              {NOTE_HEADER}
-            </Text>
-            &nbsp;
-            {bodyContentFromFragments([noteBody])}
+            <StyledText as="label">
+              {`${NOTE_HEADER} ${noteBody.preFragment ?? ''} ${
+                noteBody.boldFragment ?? ''
+              } ${noteBody.postFragment}`}
+            </StyledText>
           </Box>
         </Flex>
       </Flex>
       <Flex
         width="100%"
-        justifyContent={JUSTIFY_CENTER}
-        paddingX={chooseTipRackButtonText ? '0' : '5rem'}
+        marginTop={SPACING.spacing6}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        {chooseTipRackButtonText && (
-          <SecondaryBtn
-            data-test="chooseTipRackButton"
-            onClick={() => setShowChooseTipRack(true)}
-            width="48%"
-            marginRight="1rem"
-          >
-            {chooseTipRackButtonText}
-          </SecondaryBtn>
-        )}
-        <PrimaryBtn data-test="continueButton" onClick={proceed} flex="1">
-          {continueButtonText}
-        </PrimaryBtn>
+        <NeedHelpLink />
+        <Flex>
+          {chooseTipRackButtonText && (
+            <SecondaryButton onClick={() => setShowChooseTipRack(true)}>
+              {chooseTipRackButtonText}
+            </SecondaryButton>
+          )}
+          <PrimaryButton onClick={proceed}>{continueButtonText}</PrimaryButton>
+        </Flex>
       </Flex>
-    </>
+    </Flex>
   )
 }
 
 interface RequiredLabwareCardProps {
   loadName: string
   displayName: string
-  linkToMeasurements?: boolean
 }
 
-const linkStyles = css`
-  &:hover {
-    background-color: ${C_NEAR_WHITE};
-  }
-`
-
 function RequiredLabwareCard(props: RequiredLabwareCardProps): JSX.Element {
-  const { loadName, displayName, linkToMeasurements } = props
+  const { loadName, displayName } = props
   const imageSrc =
     loadName in labwareImages
       ? labwareImages[loadName as keyof typeof labwareImages]
       : labwareImages.generic_custom_tiprack
 
   return (
-    <Flex
-      width="100%"
-      height="30%"
-      border={BORDER_SOLID_MEDIUM}
-      paddingX={SPACING_3}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      alignItems={ALIGN_CENTER}
-      marginBottom={SPACING_2}
-    >
+    <>
       <Flex
-        paddingY={SPACING_2}
-        height="6rem"
-        flex="0 1 30%"
-        justifyContent={JUSTIFY_CENTER}
+        width="100%"
+        height="30%"
+        padding={SPACING.spacing3}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >
-        <img
-          css={css`
-            max-width: 100%;
-            max-height: 100%;
-            flex: 0 1 5rem;
-            display: block;
-          `}
-          src={imageSrc}
-        />
+        <Flex
+          height="6rem"
+          flex="0 1 30%"
+          justifyContent={JUSTIFY_CENTER}
+          alignItems={ALIGN_CENTER}
+          marginRight={SPACING.spacing4}
+        >
+          <img
+            css={css`
+              max-width: 100%;
+              max-height: 100%;
+              flex: 0 1 5rem;
+              display: block;
+            `}
+            src={imageSrc}
+          />
+        </Flex>
+        <StyledText flex="0 1 70%" as="p">
+          {displayName}
+        </StyledText>
       </Flex>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        paddingLeft={SPACING_3}
-        flex="0 1 70%"
-      >
-        <Text fontSize={TYPOGRAPHY.fontSizeH3}>{displayName}</Text>
-        {linkToMeasurements && (
-          <Link
-            external
-            flex={FLEX_MIN_CONTENT}
-            paddingY={SPACING_1}
-            width="9.25rem"
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
-            fontSize={TYPOGRAPHY.fontSizeH3}
-            color={C_MED_DARK_GRAY}
-            css={linkStyles}
-            href={`${LABWARE_LIBRARY_PAGE_PATH}/${loadName}`}
-          >
-            {VIEW_TIPRACK_MEASUREMENTS}
-          </Link>
-        )}
-      </Flex>
-    </Flex>
+      <Divider />
+    </>
   )
+}
+
+interface IntroHeaderProps {
+  sessionType: SessionType
+  isExtendedPipOffset?: boolean | null
+  intent?: Intent
+}
+function IntroHeader(props: IntroHeaderProps): JSX.Element {
+  const { sessionType, isExtendedPipOffset, intent } = props
+  const { t } = useTranslation('robot_calibration')
+  let headerText = null
+  switch (sessionType) {
+    case Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK:
+      headerText = t('calibration_health_check')
+      break
+    case Sessions.SESSION_TYPE_DECK_CALIBRATION:
+      headerText = t('deck_calibration')
+      break
+    case Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION:
+      if (isExtendedPipOffset && intent != null) {
+        headerText = t('tip_length_and_pipette_offset_calibration')
+      } else {
+        headerText = t('pipette_offset_calibration')
+      }
+      break
+    case Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION:
+      headerText = t('tip_length_calibration')
+      break
+  }
+  return <StyledText as="h3">{headerText}</StyledText>
 }

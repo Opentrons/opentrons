@@ -1,6 +1,8 @@
 {
   "attached_pipettes": "attached pipette calibrations",
   "calibrate_deck": "calibrate deck",
+  "calibration_health_check": "Calibration Health Check",
+  "deck_calibration": "Deck Calibration",
   "deck_calibration_description": "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots.",
   "deck_calibration_error_occurred": "An error occurred while trying to start deck calibration",
   "deck_calibration_failure": "Failed to start deck calibration",
@@ -17,17 +19,21 @@
   "manage_pipettes": "manage pipettes",
   "no_pipette": "No pipette attached",
   "no_tip_length": "Calibrate your pipette to see saved tip length",
+  "pipette_offset_calibration": "Pipette Offset Calibration",
   "pipette_offset_description": "Calibrate the position for the the default tip and pipette combination.",
   "pipette_offset_title": "pipette offset calibration",
   "recalibrate_warning_body": "Performing a deck calibration will clear all of your pipette offset and tip length calibrations. You will need to recalibrate your pipette offset and tip length after completing a deck calibration.",
   "recalibrate_warning_heading": "Are you sure you want to recalibrate your deck?",
   "serial_number": "Serial number",
   "tip_length": "tip length calibration",
+  "tip_length_and_pipette_offset_calibration": "Tip Length and Pipette Offset Calibration",
+  "tip_length_calibration": "Tip Length Calibration",
   "title": "robot calibration",
   "unknown_custom_tiprack": "unknown custom tip rack",
   "jump_size": "jump size",
   "direction_controls": "direction controls",
   "tiny": "Tiny",
   "small": "Small",
-  "large": "Large"
+  "large": "Large",
+  "you_will_need": "You will need:"
 }
