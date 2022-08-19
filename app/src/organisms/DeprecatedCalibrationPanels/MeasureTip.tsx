@@ -23,8 +23,7 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-import { DeprecatedJogControls } from '../../molecules/DeprecatedJogControls'
-import { VERTICAL_PLANE } from '../../molecules/JogControls'
+import { JogControls, VERTICAL_PLANE } from '../../molecules/JogControls'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
 
@@ -90,6 +89,9 @@ const SAVE_NOZZLE_Z_AXIS = 'Save the tip length'
 const CHECK_NOZZLE_Z_AXIS = 'Check the tip length'
 const SLOT = 'slot'
 
+/**
+ * @deprecated
+ */
 export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
   const {
     sendCommands,
@@ -209,7 +211,7 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
             </Box>
           </Flex>
         </Box>
-        <DeprecatedJogControls
+        <JogControls
           jog={jog}
           stepSizes={[0.1, 1]}
           planes={[VERTICAL_PLANE]}

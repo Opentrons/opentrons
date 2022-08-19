@@ -26,7 +26,7 @@ import {
 
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
-import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/CalibrationPanels'
+import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/DeprecatedCalibrationPanels'
 import { useFeatureFlag } from '../../redux/config'
 import { ModalShell } from '../../molecules/Modal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'

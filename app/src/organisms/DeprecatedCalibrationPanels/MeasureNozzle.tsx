@@ -1,3 +1,4 @@
+/* eslint-disable no-return-assign */
 import * as React from 'react'
 import { css } from 'styled-components'
 import {
@@ -22,27 +23,26 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { JogControls, VERTICAL_PLANE } from '../../molecules/JogControls'
 import * as Sessions from '../../redux/sessions'
-import { DeprecatedJogControls } from '../../molecules/DeprecatedJogControls'
-import { VERTICAL_PLANE } from '../../molecules/JogControls'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
 
 import { NeedHelpLink } from './NeedHelpLink'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from './utils'
-import leftMultiBlockAssetTLC from '../../assets/videos/tip-length-cal/Left_Multi_CalBlock_WITH_TIP_(330x260)REV1.webm'
-import leftMultiTrashAsset from '../../assets/videos/tip-length-cal/Left_Multi_Trash_WITH_TIP_(330x260)REV1.webm'
-import leftSingleBlockAssetTLC from '../../assets/videos/tip-length-cal/Left_Single_CalBlock_WITH_TIP_(330x260)REV1.webm'
-import leftSingleTrashAsset from '../../assets/videos/tip-length-cal/Left_Single_Trash_WITH_TIP_(330x260)REV1.webm'
-import rightMultiBlockAssetTLC from '../../assets/videos/tip-length-cal/Right_Multi_CalBlock_WITH_TIP_(330x260)REV1.webm'
-import rightMultiTrashAsset from '../../assets/videos/tip-length-cal/Right_Multi_Trash_WITH_TIP_(330x260)REV1.webm'
-import rightSingleBlockAssetTLC from '../../assets/videos/tip-length-cal/Right_Single_CalBlock_WITH_TIP_(330x260)REV1.webm'
-import rightSingleTrashAsset from '../../assets/videos/tip-length-cal/Right_Single_Trash_WITH_TIP_(330x260)REV1.webm'
-import leftMultiBlockAssetHealth from '../../assets/videos/health-check/Left_Multi_CalBlock_WITH_TIP_(330x260)REV2.webm'
-import rightMultiBlockAssetHealth from '../../assets/videos/health-check/Right_Multi_CalBlock_WITH_TIP_(330x260)REV2.webm'
-import leftSingleBlockAssetHealth from '../../assets/videos/health-check/Left_Single_CalBlock_WITH_TIP_(330x260)REV2.webm'
-import rightSingleBlockAssetHealth from '../../assets/videos/health-check/Right_Single_CalBlock_WITH_TIP_(330x260)REV2.webm'
+import leftMultiBlockAssetTLC from '../../assets/videos/tip-length-cal/Left_Multi_CalBlock_NO_TIP_(330x260)REV1.webm'
+import leftMultiTrashAsset from '../../assets/videos/tip-length-cal/Left_Multi_Trash_NO_TIP_(330x260)REV1.webm'
+import leftSingleBlockAssetTLC from '../../assets/videos/tip-length-cal/Left_Single_CalBlock_NO_TIP_(330x260)REV1.webm'
+import leftSingleTrashAsset from '../../assets/videos/tip-length-cal/Left_Single_Trash_NO_TIP_(330x260)REV1.webm'
+import rightMultiBlockAssetTLC from '../../assets/videos/tip-length-cal/Right_Multi_CalBlock_NO_TIP_(330x260)REV1.webm'
+import rightMultiTrashAsset from '../../assets/videos/tip-length-cal/Right_Multi_Trash_NO_TIP_(330x260)REV1.webm'
+import rightSingleBlockAssetTLC from '../../assets/videos/tip-length-cal/Right_Single_CalBlock_NO_TIP_(330x260)REV1.webm'
+import rightSingleTrashAsset from '../../assets/videos/tip-length-cal/Right_Single_Trash_NO_TIP_(330x260)REV1.webm'
+import leftMultiBlockAssetHealth from '../../assets/videos/health-check/Left_Multi_CalBlock_NO_TIP_(330x260)REV2.webm'
+import rightMultiBlockAssetHealth from '../../assets/videos/health-check/Right_Multi_CalBlock_NO_TIP_(330x260)REV2.webm'
+import leftSingleBlockAssetHealth from '../../assets/videos/health-check/Left_Single_CalBlock_NO_TIP_(330x260)REV2.webm'
+import rightSingleBlockAssetHealth from '../../assets/videos/health-check/Right_Single_CalBlock_NO_TIP_(330x260)REV2.webm'
 
 const assetMapTrash = {
   left: {
@@ -78,27 +78,23 @@ const assetMapBlock = {
   },
 }
 
-const HEADER = 'Save the tip length'
-const HEALTH_CHECK_HEADER = 'Check the tip length'
-const JOG_UNTIL = 'Jog the robot until the tip is'
+const HEADER = 'Save the nozzle z-axis'
+const HEALTH_CHECK_HEADER = 'Check the nozzle z-axis'
+const JOG_UNTIL = 'Jog the robot until the nozzle is'
 const BARELY_TOUCHING = 'barely touching (less than 0.1 mm)'
 const THE = 'the'
 const BLOCK = 'block in'
 const FLAT_SURFACE = 'flat surface'
 const OF_THE_TRASH_BIN = 'of the trash bin'
-const SAVE_NOZZLE_Z_AXIS = 'Save the tip length'
-const CHECK_NOZZLE_Z_AXIS = 'Check the tip length'
+const SAVE_NOZZLE_Z_AXIS = 'Save nozzle z-axis and move to pick up tip'
+const CHECK_NOZZLE_Z_AXIS = 'Check nozzle z-axis and move to pick up tip'
 const SLOT = 'slot'
 
-export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
-  const {
-    sendCommands,
-    calBlock,
-    isMulti,
-    mount,
-    shouldPerformTipLength,
-    sessionType,
-  } = props
+/**
+ * @deprecated
+ */
+export function MeasureNozzle(props: CalibrationPanelProps): JSX.Element {
+  const { sendCommands, calBlock, mount, isMulti, sessionType } = props
 
   const referencePointStr = calBlock ? (
     BLOCK
@@ -133,20 +129,12 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
     })
   }
 
-  const isExtendedPipOffset =
-    sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
-    shouldPerformTipLength
   const isHealthCheck =
     sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
 
   const proceed = (): void => {
     isHealthCheck
-      ? sendCommands(
-          { command: Sessions.checkCommands.COMPARE_POINT },
-          { command: Sessions.sharedCalCommands.MOVE_TO_DECK }
-        )
-      : isExtendedPipOffset
-      ? sendCommands({ command: Sessions.sharedCalCommands.SAVE_OFFSET })
+      ? sendCommands({ command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK })
       : sendCommands(
           { command: Sessions.sharedCalCommands.SAVE_OFFSET },
           { command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK }
@@ -154,7 +142,7 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
   }
 
   const [confirmLink, confirmModal] = useConfirmCrashRecovery({
-    requiresNewTip: true,
+    requiresNewTip: false,
     ...props,
   })
 
@@ -209,7 +197,7 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
             </Box>
           </Flex>
         </Box>
-        <DeprecatedJogControls
+        <JogControls
           jog={jog}
           stepSizes={[0.1, 1]}
           planes={[VERTICAL_PLANE]}
@@ -217,7 +205,7 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
           marginBottom={SPACING.spacing5}
         />
         <Flex width="100%" justifyContent={JUSTIFY_CENTER} marginY={SPACING_3}>
-          <PrimaryBtn title="saveTipLengthButton" onClick={proceed} flex="1">
+          <PrimaryBtn onClick={proceed} flex="1">
             {isHealthCheck ? CHECK_NOZZLE_Z_AXIS : SAVE_NOZZLE_Z_AXIS}
           </PrimaryBtn>
         </Flex>

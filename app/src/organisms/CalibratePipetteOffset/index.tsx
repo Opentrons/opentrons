@@ -31,7 +31,7 @@ import {
   ConfirmExitModal,
   MeasureNozzle,
   MeasureTip,
-} from '../../organisms/CalibrationPanels'
+} from '../../organisms/DeprecatedCalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
@@ -43,7 +43,7 @@ import type {
   SessionCommandParams,
 } from '../../redux/sessions/types'
 import type { CalibratePipetteOffsetParentProps } from './types'
-import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
+import type { CalibrationPanelProps } from '../../organisms/DeprecatedCalibrationPanels/types'
 
 const PIPETTE_OFFSET_CALIBRATION_SUBTITLE = 'Pipette offset calibration'
 const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Tip length calibration'

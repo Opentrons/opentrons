@@ -21,9 +21,9 @@ import {
 import { useDispatch } from 'react-redux'
 
 import styles from './styles.css'
-import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
+import { labwareImages } from '../../organisms/DeprecatedCalibrationPanels/labwareImages'
 import { setUseTrashSurfaceForTipCal } from '../../redux/calibration'
-import { NeedHelpLink } from '../../organisms/CalibrationPanels/NeedHelpLink'
+import { NeedHelpLink } from '../../organisms/DeprecatedCalibrationPanels/NeedHelpLink'
 
 import type { Dispatch } from '../../redux/types'
 

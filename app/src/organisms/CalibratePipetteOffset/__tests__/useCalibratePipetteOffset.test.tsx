@@ -8,7 +8,7 @@ import * as Sessions from '../../../redux/sessions'
 import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
 
 import { useCalibratePipetteOffset } from '../useCalibratePipetteOffset'
-import { INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL } from '../../../organisms/CalibrationPanels'
+import { INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL } from '../../../organisms/DeprecatedCalibrationPanels'
 import { pipetteOffsetCalibrationStarted } from '../../../redux/analytics'
 
 import type { Invoker } from '../useCalibratePipetteOffset'

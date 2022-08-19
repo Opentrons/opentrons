@@ -19,7 +19,7 @@ import {
   TipConfirmation,
   SaveXYPoint,
   SaveZPoint,
-} from '../../../organisms/CalibrationPanels'
+} from '../../../organisms/DeprecatedCalibrationPanels'
 
 import type { ReactWrapper } from 'enzyme'
 import type { Dispatch } from '../../../redux/types'

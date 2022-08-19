@@ -19,7 +19,7 @@ import {
   CompleteConfirmation,
   MeasureNozzle,
   MeasureTip,
-} from '../../../organisms/CalibrationPanels'
+} from '../../../organisms/DeprecatedCalibrationPanels'
 
 import type { TipLengthCalibrationStep } from '../../../redux/sessions/types'
 import type { ReactWrapper } from 'enzyme'

@@ -19,13 +19,13 @@ import {
   SaveZPoint,
   SaveXYPoint,
   CompleteConfirmation,
-} from '../../CalibrationPanels'
+} from '../../DeprecatedCalibrationPanels'
 
 import type { ReactWrapper, HTMLAttributes } from 'enzyme'
 import type { DeckCalibrationStep } from '../../../redux/sessions/types'
 import type { DispatchRequestsType } from '../../../redux/robot-api'
 import type { Dispatch } from '../../../redux/types'
-import type { CalibrationPanelProps } from '../../CalibrationPanels/types'
+import type { CalibrationPanelProps } from '../../DeprecatedCalibrationPanels/types'
 
 jest.mock('@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions')
 jest.mock('../../../redux/sessions/selectors')

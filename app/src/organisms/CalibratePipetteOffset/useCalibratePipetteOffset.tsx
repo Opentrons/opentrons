@@ -14,11 +14,11 @@ import type {
   PipetteOffsetCalibrationSessionParams,
 } from '../../redux/sessions/types'
 import type { RequestState } from '../../redux/robot-api/types'
-import type { PipetteOffsetIntent } from '../../organisms/CalibrationPanels/types'
+import type { PipetteOffsetIntent } from '../../organisms/DeprecatedCalibrationPanels/types'
 
 import { Portal } from '../../App/portal'
 import { CalibratePipetteOffset } from '.'
-import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/CalibrationPanels'
+import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/DeprecatedCalibrationPanels'
 import { pipetteOffsetCalibrationStarted } from '../../redux/analytics'
 
 // pipette calibration commands for which the full page spinner should not appear

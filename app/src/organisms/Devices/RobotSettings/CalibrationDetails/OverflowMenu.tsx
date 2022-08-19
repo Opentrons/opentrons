@@ -22,7 +22,7 @@ import { Portal } from '../../../../App/portal'
 import {
   INTENT_RECALIBRATE_PIPETTE_OFFSET,
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
-} from '../../../CalibrationPanels'
+} from '../../../DeprecatedCalibrationPanels'
 import * as Config from '../../../../redux/config'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../redux/calibration'

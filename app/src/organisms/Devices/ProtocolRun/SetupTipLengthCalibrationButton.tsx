@@ -27,7 +27,7 @@ import {
   ConfirmRecalibrationModal,
 } from '../../../organisms/CalibrateTipLength'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
-import { INTENT_TIP_LENGTH_IN_PROTOCOL } from '../../../organisms/CalibrationPanels'
+import { INTENT_TIP_LENGTH_IN_PROTOCOL } from '../../../organisms/DeprecatedCalibrationPanels'
 import {
   tipLengthCalibrationStarted,
   pipetteOffsetCalibrationStarted,

@@ -31,7 +31,7 @@ import {
   MeasureNozzle,
   MeasureTip,
   INTENT_TIP_LENGTH_IN_PROTOCOL,
-} from '../../organisms/CalibrationPanels'
+} from '../../organisms/DeprecatedCalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
@@ -42,7 +42,7 @@ import type {
   CalibrationLabware,
   CalibrationSessionStep,
 } from '../../redux/sessions/types'
-import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
+import type { CalibrationPanelProps } from '../../organisms/DeprecatedCalibrationPanels/types'
 import type { CalibrateTipLengthParentProps } from './types'
 
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'

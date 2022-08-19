@@ -30,7 +30,7 @@ import {
   CompleteConfirmation,
   ConfirmExitModal,
   INTENT_DECK_CALIBRATION,
-} from '../../organisms/CalibrationPanels'
+} from '../../organisms/DeprecatedCalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
@@ -41,7 +41,7 @@ import type {
   CalibrationSessionStep,
   SessionCommandParams,
 } from '../../redux/sessions/types'
-import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
+import type { CalibrationPanelProps } from '../../organisms/DeprecatedCalibrationPanels/types'
 import type { CalibrateDeckParentProps } from './types'
 
 const DECK_CALIBRATION_SUBTITLE = 'Deck calibration'

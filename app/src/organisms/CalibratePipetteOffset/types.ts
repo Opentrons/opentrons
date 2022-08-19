@@ -3,7 +3,7 @@ import type {
   PipetteOffsetCalibrationSession,
   CalibrationLabware,
 } from '../../redux/sessions/types'
-import type { PipetteOffsetIntent } from '../../organisms/CalibrationPanels/types'
+import type { PipetteOffsetIntent } from '../../organisms/DeprecatedCalibrationPanels/types'
 
 import type { PipetteOffsetCalibrationStep } from '../../redux/sessions/pipette-offset-calibration/types'
 import { DispatchRequestsType } from '../../redux/robot-api'
