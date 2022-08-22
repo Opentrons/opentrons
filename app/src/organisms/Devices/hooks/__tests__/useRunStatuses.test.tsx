@@ -1,6 +1,7 @@
 import {
   RUN_STATUS_FAILED,
   RUN_STATUS_IDLE,
+  RUN_STATUS_PAUSED,
   RUN_STATUS_RUNNING,
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
@@ -29,8 +30,10 @@ describe(' useRunStatuses ', () => {
   })
 
   it('returns everything as false when run status is null', () => {
+    mockUseRunStatus.mockReturnValue(null)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: false,
       isRunIdle: false,
@@ -41,6 +44,7 @@ describe(' useRunStatuses ', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_SUCCEEDED)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
+      isRunRunning: false,
       isRunStill: true,
       isRunTerminal: true,
       isRunIdle: false,
@@ -51,6 +55,7 @@ describe(' useRunStatuses ', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_STOPPED)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
+      isRunRunning: false,
       isRunStill: true,
       isRunTerminal: true,
       isRunIdle: false,
@@ -61,6 +66,7 @@ describe(' useRunStatuses ', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_FAILED)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
+      isRunRunning: false,
       isRunStill: true,
       isRunTerminal: true,
       isRunIdle: false,
@@ -71,9 +77,32 @@ describe(' useRunStatuses ', () => {
     mockUseRunStatus.mockReturnValue(RUN_STATUS_IDLE)
     const result = useRunStatuses()
     expect(result).toStrictEqual({
+      isRunRunning: false,
       isRunStill: true,
       isRunTerminal: false,
       isRunIdle: true,
+    })
+  })
+
+  it('returns true isRunRunning when status is running', () => {
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
+    const result = useRunStatuses()
+    expect(result).toStrictEqual({
+      isRunRunning: true,
+      isRunStill: false,
+      isRunTerminal: false,
+      isRunIdle: false,
+    })
+  })
+
+  it('returns true isRunRunning when status is paused', () => {
+    mockUseRunStatus.mockReturnValue(RUN_STATUS_PAUSED)
+    const result = useRunStatuses()
+    expect(result).toStrictEqual({
+      isRunRunning: true,
+      isRunStill: false,
+      isRunTerminal: false,
+      isRunIdle: false,
     })
   })
 })

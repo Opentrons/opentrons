@@ -2,10 +2,10 @@ import * as React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { StepMeter } from '../../StepMeter'
+import { StepMeter } from '../../../atoms/StepMeter'
 import { WizardHeader } from '..'
 
-jest.mock('../../StepMeter')
+jest.mock('../../../atoms/StepMeter')
 
 const mockStepMeter = StepMeter as jest.MockedFunction<typeof StepMeter>
 
@@ -34,7 +34,7 @@ describe('WizardHeader', () => {
   it('renders correct information with step count visible and pressing on button calls props', () => {
     const { getByText, getByRole } = render(props)
     getByText('Tip Length Calibrations')
-    const exit = getByRole('button', { name: 'exit' })
+    const exit = getByRole('button', { name: 'Exit' })
     fireEvent.click(exit)
     expect(props.onExit).toHaveBeenCalled()
     getByText('step meter')
@@ -49,7 +49,7 @@ describe('WizardHeader', () => {
 
     const { getByText, getByRole } = render(props)
     getByText('Tip Length Calibrations')
-    getByRole('button', { name: 'exit' })
+    getByRole('button', { name: 'Exit' })
     expect(screen.queryByText('Step: 0 / 5')).not.toBeInTheDocument()
   })
 })

@@ -28,7 +28,7 @@ def _handle_detection_result(
         try:
             return ToolType(i)
         except ValueError:
-            return ToolType.undefined_tool
+            return ToolType.tool_error
 
     return ToolDetectionResult(
         left=_check_tool(response.payload.z_motor.value),
@@ -139,10 +139,7 @@ class OneshotToolDetector:
             should_respond: Set[NodeId] = set()
 
             def _should_query(attach_response: ToolType) -> bool:
-                return attach_response not in (
-                    ToolType.undefined_tool,
-                    ToolType.nothing_attached,
-                )
+                return attach_response != ToolType.nothing_attached
 
             if _should_query(attached.left):
                 should_respond.add(NodeId.pipette_left)

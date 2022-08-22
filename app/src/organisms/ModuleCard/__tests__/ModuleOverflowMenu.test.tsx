@@ -168,6 +168,7 @@ describe('ModuleOverflowMenu', () => {
     mockUseModuleIdFromRun.mockReturnValue({ moduleIdFromRun: 'magdeck_id' })
     mockUseIsLegacySessionsInProgress.mockReturnValue(false)
     mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: true,
       isRunTerminal: false,
       isRunIdle: false,
@@ -408,6 +409,7 @@ describe('ModuleOverflowMenu', () => {
   it('should disable module control buttons when the robot is busy and run status not null', () => {
     mockUseIsLegacySessionsInProgress.mockReturnValue(true)
     mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: false,
       isRunIdle: true,

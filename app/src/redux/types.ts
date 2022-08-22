@@ -12,8 +12,7 @@ import type {
 } from './robot-controls/types'
 import type { BuildrootState, BuildrootAction } from './buildroot/types'
 import type { PipettesState, PipettesAction } from './pipettes/types'
-import type { ModulesState, ModulesAction } from './modules/types'
-import type { RobotState, Action as RobotAction } from './robot'
+import type { ModulesAction } from './modules/types'
 import type { ShellState, ShellAction } from './shell/types'
 import type { ConfigState, ConfigAction } from './config/types'
 import type { DiscoveryState, DiscoveryAction } from './discovery/types'
@@ -45,14 +44,12 @@ import type { SessionState, SessionsAction } from './sessions/types'
 import type { AnalyticsTriggerAction } from './analytics/types'
 
 export interface State {
-  readonly robot: RobotState
   readonly robotApi: RobotApiState
   readonly robotAdmin: RobotAdminState
   readonly robotControls: RobotControlsState
   readonly robotSettings: RobotSettingsState
   readonly buildroot: BuildrootState
   readonly pipettes: PipettesState
-  readonly modules: ModulesState
   readonly config: ConfigState
   readonly discovery: DiscoveryState
   readonly networking: NetworkingState
@@ -68,7 +65,6 @@ export interface State {
 }
 
 export type Action =
-  | RobotAction
   | RobotApiAction
   | RobotAdminAction
   | RobotControlsAction

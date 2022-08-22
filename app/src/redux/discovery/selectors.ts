@@ -1,8 +1,8 @@
 import isIp from 'is-ip'
 import concat from 'lodash/concat'
-import find from 'lodash/find'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
+import find from 'lodash/find'
 import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
 import semver from 'semver'
 
@@ -22,10 +22,6 @@ import {
   ROBOT_MODEL_OT3,
 } from './constants'
 
-// TODO(mc, 2018-10-10): fix circular dependency with RPC API client
-// that requires us to bypass the robot entry point here
-import { getConnectedRobotName } from '../robot/selectors'
-
 import type { State } from '../types'
 import {
   DiscoveredRobot,
@@ -41,7 +37,6 @@ type GetReachableRobots = (state: State) => ReachableRobot[]
 type GetUnreachableRobots = (state: State) => UnreachableRobot[]
 type GetAllRobots = (state: State) => DiscoveredRobot[]
 type GetViewableRobots = (state: State) => ViewableRobot[]
-type GetConnectedRobot = (state: State) => Robot | null
 type GetLocalRobot = (state: State) => DiscoveredRobot | null
 
 // from https://github.com/reduxjs/reselect#customize-equalitycheck-for-defaultmemoize
@@ -89,8 +84,7 @@ export const getDiscoveredRobots: (
   state: State
 ) => DiscoveredRobot[] = createSelector(
   state => state.discovery.robotsByName,
-  getConnectedRobotName,
-  (robotsMap, connectedRobotName) => {
+  robotsMap => {
     return Object.keys(robotsMap).map((robotName: string) => {
       const robot = robotsMap[robotName]
       const { addresses, ...robotState } = robot
@@ -104,7 +98,6 @@ export const getDiscoveredRobots: (
       const baseRobot = {
         ...robotState,
         displayName: makeDisplayName(robotName),
-        connected: robotName === connectedRobotName,
         local: ip !== null ? isLocal(ip) : null,
         seen: addr?.seen === true,
         robotModel: makeRobotModel(
@@ -178,11 +171,6 @@ export const getViewableRobots: GetViewableRobots = createSelector(
   getConnectableRobots,
   getReachableRobots,
   (cr: ViewableRobot[], rr: ViewableRobot[]) => concat<ViewableRobot>(cr, rr)
-)
-
-export const getConnectedRobot: GetConnectedRobot = createSelector(
-  getConnectableRobots,
-  robots => find(robots, 'connected') ?? null
 )
 
 export const getLocalRobot: GetLocalRobot = createSelector(

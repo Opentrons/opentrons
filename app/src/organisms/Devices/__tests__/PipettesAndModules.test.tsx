@@ -47,6 +47,7 @@ describe('PipettesAndModules', () => {
   beforeEach(() => {
     mockUseCurrentRunId.mockReturnValue(null)
     mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunIdle: false,
       isRunStill: true,
       isRunTerminal: false,

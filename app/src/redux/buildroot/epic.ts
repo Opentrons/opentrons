@@ -5,7 +5,6 @@ import { of, interval, concat, EMPTY } from 'rxjs'
 import {
   filter,
   map,
-  mapTo,
   switchMap,
   mergeMap,
   takeUntil,
@@ -29,8 +28,6 @@ import {
   RESTART_TIMED_OUT_STATUS,
   restartRobotSuccess,
 } from '../robot-admin'
-
-import { disconnect } from '../robot'
 
 import {
   getBuildrootTargetVersion,
@@ -424,10 +421,6 @@ export const removeMigratedRobotsEpic: Epic = (_, state$) => {
   )
 }
 
-export const disconnectRpcOnStartEpic: Epic = action$ => {
-  return action$.pipe(ofType(BR_START_UPDATE), mapTo(disconnect()))
-}
-
 export const buildrootEpic = combineEpics<Epic>(
   startUpdateEpic,
   retryAfterPremigrationEpic,
@@ -438,6 +431,5 @@ export const buildrootEpic = combineEpics<Epic>(
   commitUpdateEpic,
   restartAfterCommitEpic,
   finishAfterRestartEpic,
-  removeMigratedRobotsEpic,
-  disconnectRpcOnStartEpic
+  removeMigratedRobotsEpic
 )

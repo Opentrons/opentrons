@@ -4,11 +4,12 @@ import type {
   PipetteChannels,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../redux/robot'
-import type { Direction } from './types'
 
 import screwdriverSrc from '../../assets/images/change-pip/screwdriver.svg'
 import styles from './styles.css'
+
+import type { Mount } from '@opentrons/components'
+import type { Direction } from './types'
 
 type Diagram = 'screws' | 'tab'
 
