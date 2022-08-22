@@ -34,8 +34,8 @@ describe('validate v7 protocol fixtures under JSON schema', () => {
         console.log(JSON.stringify(validationErrors, null, 4))
       }
 
-      expect(valid).toBe(true)
       expect(validationErrors).toBe(null)
+      expect(valid).toBe(true)
     })
   })
 })
