@@ -128,4 +128,4 @@ export const OT2_STANDARD_DECKID: 'ot2_standard' = 'ot2_standard'
 
 export const SINGLE_CHANNEL: 'Single-Channel' = 'Single-Channel'
 export const EIGHT_CHANNEL: '8-Channel' = '8-Channel'
-export const NINTY_SIX_CHANNEL: '96-Channel' = '96-Channel'
+export const NINETY_SIX_CHANNEL: '96-Channel' = '96-Channel'
