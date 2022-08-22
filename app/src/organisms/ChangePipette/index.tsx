@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { getPipetteNameSpecs, shouldLevel } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
 
 import {
   useDispatchApiRequests,
@@ -26,12 +27,15 @@ import {
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/CalibrationPanels'
-import { ClearDeckAlertModal } from './ClearDeckAlertModal'
+import { useFeatureFlag } from '../../redux/config'
+import { ModalShell } from '../../molecules/Modal'
+import { ClearDeckModal } from './ClearDeckModal/index'
 import { ExitAlertModal } from './ExitAlertModal'
 import { Instructions } from './Instructions'
 import { ConfirmPipette } from './ConfirmPipette'
 import { RequestInProgressModal } from './RequestInProgressModal'
 import { LevelPipette } from './LevelPipette'
+import { ClearDeckAlertModal } from './ClearDeckModal/ClearDeckAlertModal'
 
 import {
   ATTACH,
@@ -42,8 +46,8 @@ import {
   CALIBRATE_PIPETTE,
 } from './constants'
 
+import type { Mount } from '@opentrons/components'
 import type { State, Dispatch } from '../../redux/types'
-import type { Mount } from '../../redux/robot/types'
 import type { WizardStep } from './types'
 
 interface Props {
@@ -61,6 +65,8 @@ const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
 
 export function ChangePipette(props: Props): JSX.Element | null {
   const { robotName, mount, closeModal } = props
+  const { t } = useTranslation('change_pipette')
+  const enableChangePipetteWizard = useFeatureFlag('enableChangePipetteWizard')
   const dispatch = useDispatch<Dispatch>()
   const finalRequestId = React.useRef<string | null | undefined>(null)
   const [dispatchApiRequests] = useDispatchApiRequests(dispatchedAction => {
@@ -157,7 +163,27 @@ export function ChangePipette(props: Props): JSX.Element | null {
   }
 
   if (wizardStep === CLEAR_DECK) {
-    return (
+    return enableChangePipetteWizard ? (
+      <ModalShell height="28.12rem">
+        <ClearDeckModal
+          totalSteps={5}
+          currentStep={1}
+          title={
+            actualPipette?.displayName != null
+              ? t('detach_pipette', {
+                  pipette: actualPipette.displayName,
+                  mount: mount[0].toUpperCase() + mount.slice(1),
+                })
+              : t('attach_pipette')
+          }
+          onCancelClick={closeModal}
+          onContinueClick={() => {
+            dispatch(move(robotName, CHANGE_PIPETTE, mount, true))
+            setWizardStep(INSTRUCTIONS)
+          }}
+        />
+      </ModalShell>
+    ) : (
       <ClearDeckAlertModal
         cancelText={CANCEL}
         continueText={MOVE_PIPETTE_TO_FRONT}

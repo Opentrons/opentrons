@@ -3,7 +3,6 @@ import { createSessionEpic } from './createSessionEpic'
 import { ensureSessionEpic } from './ensureSessionEpic'
 import { fetchSessionEpic } from './fetchSessionEpic'
 import { fetchAllSessionsEpic } from './fetchAllSessionsEpic'
-import { fetchAllSessionsOnConnectEpic } from './fetchAllSessionsOnConnectEpic'
 import { createSessionCommandEpic } from './createSessionCommandEpic'
 import { deleteSessionEpic } from './deleteSessionEpic'
 
@@ -14,7 +13,6 @@ export const sessionsEpic: Epic = combineEpics<Epic>(
   ensureSessionEpic,
   fetchSessionEpic,
   fetchAllSessionsEpic,
-  fetchAllSessionsOnConnectEpic,
   createSessionCommandEpic,
   deleteSessionEpic
 )

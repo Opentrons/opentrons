@@ -1,7 +1,11 @@
 // discovery selectors tests
 import {
-  mockHealthResponse,
-  mockServerHealthResponse,
+  mockLegacyHealthResponse,
+  mockLegacyServerHealthResponse,
+  mockOT2HealthResponse,
+  mockOT2ServerHealthResponse,
+  mockOT3HealthResponse,
+  mockOT3ServerHealthResponse,
   mockHealthErrorStringResponse,
   mockHealthFetchErrorResponse,
 } from '@opentrons/discovery-client/src/__fixtures__'
@@ -13,6 +17,8 @@ import {
   CONNECTABLE,
   REACHABLE,
   UNREACHABLE,
+  ROBOT_MODEL_OT2,
+  ROBOT_MODEL_OT3,
 } from '../constants'
 
 import * as discovery from '../selectors'
@@ -20,12 +26,11 @@ import * as discovery from '../selectors'
 import type { State } from '../../types'
 
 const MOCK_STATE: State = {
-  robot: { connection: { connectedTo: 'bar' } },
   discovery: {
     robotsByName: {
       foo: {
         name: 'foo',
-        health: mockHealthResponse,
+        health: mockLegacyHealthResponse,
         serverHealth: null,
         addresses: [
           {
@@ -36,13 +41,14 @@ const MOCK_STATE: State = {
             serverHealthStatus: HEALTH_STATUS_NOT_OK,
             healthError: null,
             serverHealthError: mockHealthErrorStringResponse,
+            advertisedModel: null,
           },
         ],
       },
       bar: {
         name: 'bar',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
         addresses: [
           {
             ip: '10.0.0.2',
@@ -52,13 +58,14 @@ const MOCK_STATE: State = {
             serverHealthStatus: HEALTH_STATUS_OK,
             healthError: null,
             serverHealthError: null,
+            advertisedModel: null,
           },
         ],
       },
       baz: {
         name: 'baz',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockOT2HealthResponse,
+        serverHealth: mockOT2ServerHealthResponse,
         addresses: [
           {
             ip: '10.0.0.3',
@@ -68,13 +75,14 @@ const MOCK_STATE: State = {
             serverHealthStatus: HEALTH_STATUS_OK,
             healthError: mockHealthErrorStringResponse,
             serverHealthError: null,
+            advertisedModel: ROBOT_MODEL_OT2,
           },
         ],
       },
       qux: {
         name: 'qux',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockOT3HealthResponse,
+        serverHealth: mockOT3ServerHealthResponse,
         addresses: [
           {
             ip: '10.0.0.4',
@@ -84,13 +92,14 @@ const MOCK_STATE: State = {
             serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
             healthError: mockHealthFetchErrorResponse,
             serverHealthError: mockHealthFetchErrorResponse,
+            advertisedModel: ROBOT_MODEL_OT3,
           },
         ],
       },
       fizz: {
         name: 'fizz',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockOT2HealthResponse,
+        serverHealth: mockOT2ServerHealthResponse,
         addresses: [
           {
             ip: '10.0.0.5',
@@ -100,102 +109,124 @@ const MOCK_STATE: State = {
             serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
             healthError: mockHealthFetchErrorResponse,
             serverHealthError: mockHealthFetchErrorResponse,
+            advertisedModel: ROBOT_MODEL_OT2,
           },
         ],
       },
       buzz: {
         name: 'buzz',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockOT2HealthResponse,
+        serverHealth: mockOT2ServerHealthResponse,
         addresses: [],
+        advertisedModel: ROBOT_MODEL_OT2,
+      },
+      fizzbuzz: {
+        name: 'fizzbuzz',
+        health: mockOT3HealthResponse,
+        serverHealth: mockOT3ServerHealthResponse,
+        addresses: [
+          {
+            ip: '10.0.0.2',
+            port: 31950,
+            seen: true,
+            healthStatus: HEALTH_STATUS_OK,
+            serverHealthStatus: HEALTH_STATUS_OK,
+            healthError: null,
+            serverHealthError: null,
+            advertisedModel: ROBOT_MODEL_OT3,
+          },
+        ],
       },
     },
   },
 } as any
 
 // foo is connectable because health is defined and healthStatus of primary
-// address is "ok"
+// address is "ok". These are all saying it's an OT-2, so it's an OT-2
 const EXPECTED_FOO = {
   name: 'foo',
   displayName: 'foo',
   status: CONNECTABLE,
-  connected: false,
   local: false,
   seen: true,
-  health: mockHealthResponse,
+  health: mockLegacyHealthResponse,
   serverHealth: null,
   healthStatus: HEALTH_STATUS_OK,
   serverHealthStatus: HEALTH_STATUS_NOT_OK,
   ip: '10.0.0.1',
   port: 31950,
+  robotModel: ROBOT_MODEL_OT2,
 }
 
 // bar is connectable because health is defined and healthStatus of primary
-// address is "ok", and bar is connected because of connectedTo state
+// address is "ok"
 const EXPECTED_BAR = {
   name: 'bar',
   displayName: 'bar',
   status: CONNECTABLE,
-  connected: true,
   local: false,
   seen: true,
-  health: mockHealthResponse,
-  serverHealth: mockServerHealthResponse,
+  health: mockLegacyHealthResponse,
+  serverHealth: mockLegacyServerHealthResponse,
   healthStatus: HEALTH_STATUS_OK,
   serverHealthStatus: HEALTH_STATUS_OK,
   ip: '10.0.0.2',
   port: 31950,
+  robotModel: ROBOT_MODEL_OT2,
 }
 
 // baz is reachable because healthStatus is "notOk", which means it responded
-// with an error code
+// with an error code. The cached health values still indicate that it's an
+// OT-2.
 const EXPECTED_BAZ = {
   name: 'baz',
   displayName: 'baz',
   status: REACHABLE,
-  connected: false,
   local: false,
   seen: true,
-  health: mockHealthResponse,
-  serverHealth: mockServerHealthResponse,
+  health: mockOT2HealthResponse,
+  serverHealth: mockOT2ServerHealthResponse,
   healthStatus: HEALTH_STATUS_NOT_OK,
   serverHealthStatus: HEALTH_STATUS_OK,
   ip: '10.0.0.3',
   port: 31950,
+  robotModel: ROBOT_MODEL_OT2,
 }
 
 // qux is reachable because it was recently seen, even though primary IP is
-// not currently responding in any way
+// not currently responding in any way. Cached health responses have no model
+// data, but the MDNS data says it's an OT-3.
 const EXPECTED_QUX = {
   name: 'qux',
   displayName: 'qux',
   status: REACHABLE,
-  connected: false,
   local: false,
   seen: true,
-  health: mockHealthResponse,
-  serverHealth: mockServerHealthResponse,
+  health: mockOT3HealthResponse,
+  serverHealth: mockOT3ServerHealthResponse,
   healthStatus: HEALTH_STATUS_UNREACHABLE,
   serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
   ip: '10.0.0.4',
   port: 31950,
+  robotModel: ROBOT_MODEL_OT3,
 }
 
 // fizz is unreachable because IP is unreachable and we haven't seen any of
-// this robot's IP addresses recently
+// this robot's IP addresses recently. Cached health responses indicate it's
+// an OT-2.
 const EXPECTED_FIZZ = {
   name: 'fizz',
   displayName: 'fizz',
   status: UNREACHABLE,
-  connected: false,
   local: false,
   seen: false,
-  health: mockHealthResponse,
-  serverHealth: mockServerHealthResponse,
+  health: mockOT2HealthResponse,
+  serverHealth: mockOT2ServerHealthResponse,
   healthStatus: HEALTH_STATUS_UNREACHABLE,
   serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
   ip: '10.0.0.5',
   port: 31950,
+  robotModel: ROBOT_MODEL_OT2,
 }
 
 // buzz is unreachable because we don't have any IP addresses for it
@@ -203,15 +234,32 @@ const EXPECTED_BUZZ = {
   name: 'buzz',
   displayName: 'buzz',
   status: UNREACHABLE,
-  connected: false,
   local: null,
   seen: false,
-  health: mockHealthResponse,
-  serverHealth: mockServerHealthResponse,
+  health: mockOT2HealthResponse,
+  serverHealth: mockOT2ServerHealthResponse,
   healthStatus: null,
   serverHealthStatus: null,
   ip: null,
   port: null,
+  advertisedModel: ROBOT_MODEL_OT2,
+  robotModel: ROBOT_MODEL_OT2,
+}
+
+// fizzbuzz is as foo and therefore connectable, but is an OT-3
+const EXPECTED_FIZZBUZZ = {
+  name: 'fizzbuzz',
+  displayName: 'fizzbuzz',
+  status: CONNECTABLE,
+  local: false,
+  seen: true,
+  health: mockOT3HealthResponse,
+  serverHealth: mockOT3ServerHealthResponse,
+  healthStatus: HEALTH_STATUS_OK,
+  serverHealthStatus: HEALTH_STATUS_OK,
+  ip: '10.0.0.2',
+  port: 31950,
+  robotModel: ROBOT_MODEL_OT3,
 }
 
 describe('discovery selectors', () => {
@@ -246,13 +294,14 @@ describe('discovery selectors', () => {
         EXPECTED_QUX,
         EXPECTED_FIZZ,
         EXPECTED_BUZZ,
+        EXPECTED_FIZZBUZZ,
       ],
     },
     {
       name: 'getConnectableRobots grabs robots with connectable status',
       selector: discovery.getConnectableRobots,
       state: MOCK_STATE,
-      expected: [EXPECTED_FOO, EXPECTED_BAR],
+      expected: [EXPECTED_FOO, EXPECTED_BAR, EXPECTED_FIZZBUZZ],
     },
     {
       name: 'getReachableRobots grabs robots with reachable status',
@@ -274,8 +323,8 @@ describe('discovery selectors', () => {
           robotsByName: {
             'opentrons-foo': {
               name: 'opentrons-foo',
-              health: mockHealthResponse,
-              serverHealth: mockServerHealthResponse,
+              health: mockOT2HealthResponse,
+              serverHealth: mockOT2ServerHealthResponse,
               addresses: [],
             },
           },
@@ -295,8 +344,8 @@ describe('discovery selectors', () => {
           robotsByName: {
             'opentrons-foo': {
               name: 'opentrons-foo',
-              health: mockHealthResponse,
-              serverHealth: mockServerHealthResponse,
+              health: mockLegacyHealthResponse,
+              serverHealth: mockLegacyServerHealthResponse,
               addresses: [
                 {
                   ip: 'fd00:0:cafe:fefe::1',
@@ -306,6 +355,7 @@ describe('discovery selectors', () => {
                   serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
                   healthError: null,
                   serverHealthError: mockHealthFetchErrorResponse,
+                  advertisedModel: null,
                 },
               ],
             },
@@ -325,19 +375,13 @@ describe('discovery selectors', () => {
       name: 'getViewableRobots returns connectable and reachable robots',
       selector: discovery.getViewableRobots,
       state: MOCK_STATE,
-      expected: [EXPECTED_FOO, EXPECTED_BAR, EXPECTED_BAZ, EXPECTED_QUX],
-    },
-    {
-      name: 'getConnectedRobot returns connected robot if connectable',
-      selector: discovery.getConnectedRobot,
-      state: MOCK_STATE,
-      expected: EXPECTED_BAR,
-    },
-    {
-      name: 'getConnectedRobot returns null if not connectable',
-      selector: discovery.getConnectedRobot,
-      state: { ...MOCK_STATE, robot: { connection: { connectedTo: 'fizz' } } },
-      expected: null,
+      expected: [
+        EXPECTED_FOO,
+        EXPECTED_BAR,
+        EXPECTED_FIZZBUZZ,
+        EXPECTED_BAZ,
+        EXPECTED_QUX,
+      ],
     },
     {
       name: 'getRobotApiVersion returns health.apiServerVersion',
@@ -510,6 +554,34 @@ describe('discovery selectors', () => {
       state: MOCK_STATE,
       args: ['baz'],
       expected: EXPECTED_BAZ.health.api_version,
+    },
+    {
+      name: 'getRobotType returns type of a connectable OT-3',
+      selector: discovery.getRobotModelByName,
+      state: MOCK_STATE,
+      args: ['fizzbuzz'],
+      expected: 'OT-3',
+    },
+    {
+      name: 'getRobotType returns type of a connectable OT-2',
+      selector: discovery.getRobotModelByName,
+      state: MOCK_STATE,
+      args: ['foo'],
+      expected: 'OT-2',
+    },
+    {
+      name: 'getRobotType returns OT-2 for a reachable but cached robot',
+      selector: discovery.getRobotModelByName,
+      state: MOCK_STATE,
+      args: ['baz'],
+      expected: 'OT-2',
+    },
+    {
+      name: 'getRobotType returns OT-2 by default for an unreachable robot',
+      selector: discovery.getRobotModelByName,
+      state: MOCK_STATE,
+      args: ['qux'],
+      expected: 'OT-3',
     },
   ]
 

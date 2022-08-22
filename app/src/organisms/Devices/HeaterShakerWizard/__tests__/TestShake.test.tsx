@@ -138,6 +138,7 @@ describe('TestShake', () => {
       isLatchClosed: true,
     } as any)
     mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: false,
       isRunIdle: false,
@@ -364,6 +365,7 @@ describe('TestShake', () => {
   //  next test is sending module commands when run is terminal and through module controls
   it('entering an input for shake speed and clicking start should close the latch and begin shaking when run is terminal', async () => {
     mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,

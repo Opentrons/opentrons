@@ -25,11 +25,11 @@ import {
 } from '../../../CalibrationPanels'
 import * as Config from '../../../../redux/config'
 import { useTrackEvent } from '../../../../redux/analytics'
-import { getIsRunning } from '../../../../redux/robot/selectors'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../redux/calibration'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
+  useRunStatuses,
   useTipLengthCalibrations,
 } from '../../hooks'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
@@ -88,7 +88,7 @@ export function OverflowMenu({
     calBlockModalState,
     setCalBlockModalState,
   ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
-  const isRunning = useSelector(getIsRunning)
+  const { isRunRunning: isRunning } = useRunStatuses()
 
   interface StartWizardOptions {
     keepTipLength: boolean

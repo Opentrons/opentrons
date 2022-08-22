@@ -23,10 +23,6 @@ class VolumeMixin(BaseModel):
         gt=0,
     )
 
-    # todo(mm, 2021-03-26): This class or one of its subclasses should have a
-    # field for liquid flow rate in microliters per second.
-    # See Opentrons/opentrons#4837 for terminology concerns.
-
 
 class FlowRateMixin(BaseModel):
     """Mixin for command requests that take a flow rate."""

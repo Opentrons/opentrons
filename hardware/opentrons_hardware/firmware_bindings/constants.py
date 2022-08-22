@@ -155,13 +155,10 @@ class ErrorCode(int, Enum):
 class ToolType(int, Enum):
     """Tool types detected on Head."""
 
-    undefined_tool = 0x00
-    pipette_96_chan = 0x01
-    pipette_384_chan = 0x02
-    pipette_single_chan = 0x03
-    pipette_multi_chan = 0x04
-    gripper = 0x05
-    nothing_attached = 0x06
+    pipette = 0x00
+    gripper = 0x01
+    nothing_attached = 0x02
+    tool_error = 0x03
 
 
 @unique
@@ -170,10 +167,11 @@ class SensorType(int, Enum):
 
     tip = 0x00
     capacitive = 0x01
-    humidity = 0x02
-    temperature = 0x03
-    pressure = 0x04
-    pressure_temperature = 0x05
+    environment = 0x02
+    pressure = 0x03
+    pressure_temperature = 0x04
+    humidity = 0x05
+    temperature = 0x06
 
 
 @unique

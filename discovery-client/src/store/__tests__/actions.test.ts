@@ -44,11 +44,17 @@ describe('discovery client action creators', () => {
       name: 'opentrons-dev',
       ip: '127.0.0.1',
       port: 31950,
+      robotModel: null,
     })
 
     expect(action).toEqual({
       type: 'mdns:SERVICE_FOUND',
-      payload: { name: 'opentrons-dev', ip: '127.0.0.1', port: 31950 },
+      payload: {
+        name: 'opentrons-dev',
+        ip: '127.0.0.1',
+        port: 31950,
+        robotModel: null,
+      },
     })
   })
 

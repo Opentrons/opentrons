@@ -10,6 +10,8 @@ export interface MdnsBrowserService {
   ip: string
   /** The port the service is using */
   port: number
+  /** If present, the machine type from the TXT record linked with the service */
+  robotModel: string | null
 }
 
 /**

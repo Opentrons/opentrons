@@ -5,6 +5,12 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
+import {
+  mockOT2HealthResponse,
+  mockOT2ServerHealthResponse,
+  mockOT3HealthResponse,
+  mockOT3ServerHealthResponse,
+} from '@opentrons/discovery-client/src/__fixtures__'
 
 import { i18n } from '../../../i18n'
 import { mockFetchModulesSuccessActionPayloadModules } from '../../../redux/modules/__fixtures__'
@@ -14,6 +20,12 @@ import {
 } from '../../../redux/pipettes/__fixtures__'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getRobotModelByName } from '../../../redux/discovery'
+import {
+  HEALTH_STATUS_OK,
+  ROBOT_MODEL_OT2,
+  ROBOT_MODEL_OT3,
+} from '../../../redux/discovery/constants'
 import {
   useAttachedModules,
   useAttachedPipettes,
@@ -26,8 +38,10 @@ import { UpdateRobotBanner } from '../../UpdateRobotBanner'
 import { RobotCard } from '../RobotCard'
 
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { State } from '../../../redux/types'
 
 jest.mock('../../../redux/buildroot/selectors')
+jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../../ProtocolUpload/hooks')
@@ -36,6 +50,47 @@ jest.mock('../../UpdateRobotBanner')
 jest.mock('../../ChooseProtocolSlideout')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
+const MOCK_STATE: State = {
+  discovery: {
+    robot: { connection: { connectedTo: null } },
+    robotsByName: {
+      'opentrons-robot-name': {
+        name: 'opentrons-robot-name',
+        health: mockOT2HealthResponse,
+        serverHealth: mockOT2ServerHealthResponse,
+        addresses: [
+          {
+            ip: '10.0.0.3',
+            port: 31950,
+            seen: true,
+            healthStatus: HEALTH_STATUS_OK,
+            serverHealthStatus: HEALTH_STATUS_OK,
+            healthError: null,
+            serverHealthError: null,
+            advertisedModel: ROBOT_MODEL_OT2,
+          },
+        ],
+      },
+      buzz: {
+        name: 'buzz',
+        health: mockOT3HealthResponse,
+        serverHealth: mockOT3ServerHealthResponse,
+        addresses: [
+          {
+            ip: '10.0.0.4',
+            port: 31950,
+            seen: true,
+            healthStatus: HEALTH_STATUS_OK,
+            serverHealthStatus: HEALTH_STATUS_OK,
+            healthError: null,
+            serverHealthError: null,
+            advertisedModel: ROBOT_MODEL_OT3,
+          },
+        ],
+      },
+    },
+  },
+} as any
 
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
@@ -61,6 +116,9 @@ const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
 const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof getBuildrootUpdateDisplayInfo
 >
+const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
+  typeof getRobotModelByName
+>
 
 const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
 const PROTOCOL_DETAILS = {
@@ -69,19 +127,23 @@ const PROTOCOL_DETAILS = {
   protocolKey: 'fakeProtocolKey',
 }
 
-const render = () => {
+const render = (props: React.ComponentProps<typeof RobotCard>) => {
   return renderWithProviders(
     <MemoryRouter>
-      <RobotCard robot={mockConnectableRobot} />
+      <RobotCard {...props} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
+      initialState: MOCK_STATE,
     }
   )
 }
 
 describe('RobotCard', () => {
+  let props: React.ComponentProps<typeof RobotCard>
+
   beforeEach(() => {
+    props = { robot: mockConnectableRobot }
     mockUseAttachedModules.mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
@@ -109,6 +171,9 @@ describe('RobotCard', () => {
         protocolData: {} as ProtocolAnalysisFile<{}>,
         protocolKey: null,
       })
+    when(mockGetRobotModelByName)
+      .calledWith(MOCK_STATE, mockConnectableRobot.name)
+      .mockReturnValue('OT-2')
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -116,19 +181,19 @@ describe('RobotCard', () => {
   })
 
   it('renders an OT image', () => {
-    const [{ getByRole }] = render()
+    const [{ getByRole }] = render(props)
     const image = getByRole('img')
 
     expect(image.getAttribute('src')).toEqual(OT2_PNG_FILE_NAME)
   })
 
   it('renders a UpdateRobotBanner component', () => {
-    const [{ getByText }] = render()
+    const [{ getByText }] = render(props)
     getByText('Mock UpdateRobotBanner')
   })
 
   it('renders the type of pipettes attached to left and right mounts', () => {
-    const [{ getByText }] = render()
+    const [{ getByText }] = render(props)
 
     getByText('Left Mount')
     getByText('Left Pipette')
@@ -137,19 +202,29 @@ describe('RobotCard', () => {
   })
 
   it('renders a modules section', () => {
-    const [{ getByText }] = render()
+    const [{ getByText }] = render(props)
 
     getByText('Modules')
   })
 
-  it('renders the type of robot and robot name', () => {
-    const [{ getByText }] = render()
+  it('renders the model of robot and robot name - OT-2', () => {
+    const [{ getByText }] = render(props)
     getByText('OT-2')
     getByText(mockConnectableRobot.name)
   })
 
+  it('renders the model of robot and robot name - OT-3', () => {
+    props = { robot: { ...mockConnectableRobot, name: 'buzz' } }
+    when(mockGetRobotModelByName)
+      .calledWith(MOCK_STATE, 'buzz')
+      .mockReturnValue('OT-3')
+    const [{ getByText }] = render(props)
+    getByText('OT-3')
+    getByText('buzz')
+  })
+
   it('does not render a running protocol banner when a protocol is not running', () => {
-    const [{ queryByText }] = render()
+    const [{ queryByText }] = render(props)
 
     expect(queryByText('Testosaur;')).toBeFalsy()
     expect(queryByText('Go to Run')).toBeFalsy()
@@ -164,7 +239,7 @@ describe('RobotCard', () => {
       .calledWith('1')
       .mockReturnValue(PROTOCOL_DETAILS)
 
-    const [{ getByRole, getByText }] = render()
+    const [{ getByRole, getByText }] = render(props)
 
     getByText('Testosaur; Running')
 

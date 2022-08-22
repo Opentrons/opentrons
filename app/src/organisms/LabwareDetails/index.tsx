@@ -17,9 +17,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   SIZE_1,
+  useHoverTooltip,
+  TOOLTIP_TOP_START,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
+import { Tooltip } from '../../atoms/Tooltip'
 import { getWellLabel } from './helpers/labels'
 import { getUniqueWellProperties } from './helpers/labwareInference'
 import { WellCount } from './WellCount'
@@ -43,6 +46,18 @@ const CLOSE_ICON_STYLE = css`
     background: ${COLORS.lightGreyHover};
   }
 `
+
+const COPY_ICON_STYLE = css`
+  transform: translateY(${SPACING.spacing2});
+  &:hover {
+    color: ${COLORS.blueEnabled};
+  }
+  &:active,
+  &:focus {
+    color: ${COLORS.darkBlackEnabled};
+  }
+`
+
 export interface LabwareDetailsProps {
   onClose: () => void
   labware: LabwareDefAndDate
@@ -62,6 +77,22 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const irregular = wellGroups.length > 1
   const isMultiRow = ordering.some(row => row.length > 1)
   const isCustomDefinition = definition.namespace !== 'opentrons'
+  const [showToolTip, setShowToolTip] = React.useState<boolean>(false)
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_TOP_START,
+  })
+
+  const handleCopy = async (): Promise<void> => {
+    await navigator.clipboard.writeText(apiName)
+    setShowToolTip(true)
+  }
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setShowToolTip(false), 2000)
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [showToolTip])
 
   const slideoutHeader = (
     <Flex
@@ -77,7 +108,11 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         <StyledText css={TYPOGRAPHY.h2SemiBold}>
           {props.labware.definition.metadata.displayName}
         </StyledText>
-        <Link onClick={props.onClose} role="button">
+        <Link
+          onClick={props.onClose}
+          role="button"
+          data-testid="labwareDetails_slideout_close_button"
+        >
           <Icon name="close" height={SPACING.spacing5} css={CLOSE_ICON_STYLE} />
         </Link>
       </Flex>
@@ -127,17 +162,22 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         backgroundColor={COLORS.fundamentalsBackground}
         padding={SPACING.spacing4}
         marginBottom={SPACING.spacing5}
-        overflowWrap="break-word"
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
-        <Link
-          css={TYPOGRAPHY.pRegular}
-          onClick={() => navigator.clipboard.writeText(apiName)}
-          role="button"
-        >
-          <Flex alignItems={ALIGN_CENTER} overflowWrap="anywhere">
-            {apiName} <Icon height={SIZE_1} name="copy-text" />
+        <Link css={TYPOGRAPHY.pRegular} onClick={handleCopy} role="button">
+          <Flex overflowWrap="anywhere">
+            <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black}>
+              {apiName}
+              <span {...targetProps}>
+                <Icon size={SIZE_1} name="copy-text" css={COPY_ICON_STYLE} />
+              </span>
+            </Box>
           </Flex>
+          {showToolTip && (
+            <Tooltip width="3.25rem" tooltipProps={tooltipProps}>
+              {t('copied')}
+            </Tooltip>
+          )}
         </Link>
       </Box>
       <Box border={BORDERS.lineBorder}>

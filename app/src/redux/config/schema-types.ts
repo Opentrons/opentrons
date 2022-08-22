@@ -9,7 +9,9 @@ export type DiscoveryCandidates = string[]
 export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'enableBundleUpload'
+  | 'enableChangePipetteWizard'
   | 'enableLiquidSetup'
+  | 'enableCalibrationWizards'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
@@ -139,4 +141,9 @@ export interface ConfigV8 extends Omit<ConfigV7, 'version'> {
   version: 8
 }
 
-export type Config = ConfigV8
+export interface ConfigV9 extends Omit<ConfigV8, 'version'> {
+  version: 9
+  isOnDevice: boolean
+}
+
+export type Config = ConfigV9

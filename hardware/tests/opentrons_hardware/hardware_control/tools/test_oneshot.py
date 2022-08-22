@@ -9,7 +9,7 @@ from mock import AsyncMock, call
 from opentrons_hardware.firmware_bindings.messages.fields import (
     ToolField,
     PipetteNameField,
-    SerialField,
+    SerialDataCodeField,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt16Field
 from opentrons_hardware.hardware_control.tools import detector, types
@@ -46,9 +46,9 @@ async def test_suppresses_undefined(
                     NodeId.host,
                     message_definitions.PushToolsDetectedNotification(
                         payload=payloads.ToolsDetectedNotificationPayload(
-                            z_motor=ToolField(ToolType.undefined_tool.value),
-                            a_motor=ToolField(ToolType.undefined_tool.value),
-                            gripper=ToolField(ToolType.undefined_tool.value),
+                            z_motor=ToolField(ToolType.nothing_attached.value),
+                            a_motor=ToolField(ToolType.nothing_attached.value),
+                            gripper=ToolField(ToolType.nothing_attached.value),
                         )
                     ),
                     NodeId.head,
@@ -132,7 +132,7 @@ async def test_sends_only_required_followups(
                     message_definitions.PushToolsDetectedNotification(
                         payload=payloads.ToolsDetectedNotificationPayload(
                             z_motor=ToolField(ToolType.nothing_attached.value),
-                            a_motor=ToolField(ToolType.pipette_multi_chan.value),
+                            a_motor=ToolField(ToolType.pipette.value),
                             gripper=ToolField(ToolType.nothing_attached.value),
                         )
                     ),
@@ -148,7 +148,7 @@ async def test_sends_only_required_followups(
             payload = payloads.PipetteInfoResponsePayload(
                 name=PipetteNameField(PipetteName.p1000_single.value),
                 model=UInt16Field(2),
-                serial=SerialField(b"20220809A022"),
+                serial=SerialDataCodeField(b"20220809A022"),
             )
             return [
                 (
@@ -198,8 +198,8 @@ async def test_sends_all_required_followups(
                     NodeId.host,
                     message_definitions.PushToolsDetectedNotification(
                         payload=payloads.ToolsDetectedNotificationPayload(
-                            z_motor=ToolField(ToolType.pipette_single_chan.value),
-                            a_motor=ToolField(ToolType.pipette_multi_chan.value),
+                            z_motor=ToolField(ToolType.pipette.value),
+                            a_motor=ToolField(ToolType.pipette.value),
                             gripper=ToolField(ToolType.gripper.value),
                         )
                     ),
@@ -219,7 +219,7 @@ async def test_sends_all_required_followups(
                         payload=payloads.PipetteInfoResponsePayload(
                             name=PipetteNameField(PipetteName.p1000_single.value),
                             model=UInt16Field(2),
-                            serial=SerialField(b"20220809A022"),
+                            serial=SerialDataCodeField(b"20220809A022"),
                         )
                     ),
                     NodeId.pipette_left,
@@ -230,7 +230,7 @@ async def test_sends_all_required_followups(
                         payload=payloads.PipetteInfoResponsePayload(
                             name=PipetteNameField(PipetteName.p1000_multi.value),
                             model=UInt16Field(4),
-                            serial=SerialField(b"20231005A220"),
+                            serial=SerialDataCodeField(b"20231005A220"),
                         )
                     ),
                     NodeId.pipette_right,
@@ -240,7 +240,7 @@ async def test_sends_all_required_followups(
                     message_definitions.GripperInfoResponse(
                         payload=payloads.GripperInfoResponsePayload(
                             model=UInt16Field(1),
-                            serial=SerialField(b"20220531A01"),
+                            serial=SerialDataCodeField(b"20220531A01"),
                         )
                     ),
                     NodeId.gripper,
@@ -291,7 +291,7 @@ async def test_handles_bad_serials(
                     NodeId.host,
                     message_definitions.PushToolsDetectedNotification(
                         payload=payloads.ToolsDetectedNotificationPayload(
-                            z_motor=ToolField(ToolType.pipette_single_chan.value),
+                            z_motor=ToolField(ToolType.pipette.value),
                             a_motor=ToolField(ToolType.nothing_attached.value),
                             gripper=ToolField(ToolType.nothing_attached.value),
                         )
@@ -308,7 +308,7 @@ async def test_handles_bad_serials(
             payload = payloads.PipetteInfoResponsePayload(
                 name=PipetteNameField(PipetteName.p1000_multi.value),
                 model=UInt16Field(4),
-                serial=SerialField(
+                serial=SerialDataCodeField(
                     b"\x00\x01\x02\x03\x04\0x05\x06\x07\x08\x09\x0a\x0b"
                 ),
             )
@@ -350,7 +350,7 @@ async def test_no_instrument_info_response(
                     message_definitions.PushToolsDetectedNotification(
                         payload=payloads.ToolsDetectedNotificationPayload(
                             z_motor=ToolField(ToolType.nothing_attached.value),
-                            a_motor=ToolField(ToolType.pipette_single_chan.value),
+                            a_motor=ToolField(ToolType.pipette.value),
                             gripper=ToolField(ToolType.nothing_attached.value),
                         )
                     ),
