@@ -23,7 +23,7 @@ runs:
         pip install pipenv==2021.5.29
     - shell: bash
       if: ${{ inputs.python-version != 'false' }}
-      run: 'make -C ${{ inputs.project }} setup OT_VIRTUALENV_VERSION==${{ inputs.python-version }} OT_PYTHON=$(which python${{ inputs.python-version }})'
+      run: 'make -C ${{ inputs.project }} setup OT_VIRTUALENV_VERSION=${{ inputs.python-version }} OT_PYTHON=$(which python${{ inputs.python-version }})'
     - shell: bash
       if: ${{ inputs.python-version == 'false' }}
       run: 'make -C ${{ inputs.project }} setup OT_PYTHON=$(which python)'
