@@ -19,8 +19,6 @@ const initialFlags: Flags = {
   PRERELEASE_MODE: process.env.OT_PD_PRERELEASE_MODE === '1' || false,
   OT_PD_DISABLE_MODULE_RESTRICTIONS:
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
-  OT_PD_ENABLE_HEATER_SHAKER:
-    process.env.OT_PD_ENABLE_HEATER_SHAKER === '1' || false,
   OT_PD_ENABLE_LIQUID_COLOR_ENHANCEMENTS:
     process.env.OT_PD_ENABLE_LIQUID_COLOR_ENHANCEMENTS === '1' || false,
 }

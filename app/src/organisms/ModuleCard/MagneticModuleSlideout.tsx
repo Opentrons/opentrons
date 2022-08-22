@@ -188,7 +188,7 @@ export const MagneticModuleSlideout = (
         {t('height_ranges', { gen: info.version })}
       </StyledText>
       <Flex
-        backgroundColor={COLORS.background}
+        backgroundColor={COLORS.fundamentalsBackground}
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -235,7 +235,7 @@ export const MagneticModuleSlideout = (
         <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          color={COLORS.darkGrey}
+          color={COLORS.darkGreyEnabled}
           paddingBottom={SPACING.spacing3}
         >
           {t('set_engage_height')}

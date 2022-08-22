@@ -16,12 +16,12 @@ export const DEPRECATED_FLAGS = [
   'BATCH_EDIT_ENABLED',
   'OT_PD_ENABLE_BATCH_EDIT_MIX',
   'OT_PD_ENABLE_SCHEMA_V6',
+  'OT_PD_ENABLE_HEATER_SHAKER',
 ]
 // union of feature flag string constant IDs
 export type FlagTypes =
   | 'PRERELEASE_MODE'
   | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
-  | 'OT_PD_ENABLE_HEATER_SHAKER'
   | 'OT_PD_ENABLE_LIQUID_COLOR_ENHANCEMENTS'
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = [

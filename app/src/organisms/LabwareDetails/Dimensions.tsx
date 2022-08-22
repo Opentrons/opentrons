@@ -37,7 +37,11 @@ export function Dimensions(props: DimensionsProps): JSX.Element {
     <Box marginBottom={SPACING.spacing4}>
       <ExpandingTitle label={t('footprint')} diagram={diagram} />
       {dimensions.map(d => (
-        <LabeledValue key={d.value} label={d.label} value={d.value} />
+        <LabeledValue
+          key={`${d.label}_${d.value}`}
+          label={d.label}
+          value={d.value}
+        />
       ))}
     </Box>
   )

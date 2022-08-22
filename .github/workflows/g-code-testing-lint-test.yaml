@@ -9,6 +9,8 @@ on:
     paths:
       - 'Makefile'
       - 'g-code-testing/**'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
       - '.github/workflows/g-code-testing-lint-test.yaml'
       - '.github/actions/python/**'
     branches:
@@ -19,6 +21,10 @@ on:
     paths:
       - 'Makefile'
       - 'g-code-testing/**'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
+      - '.github/workflows/g-code-testing-lint-test.yaml'
+      - '.github/actions/python/**'
   workflow_dispatch:
 
 defaults:

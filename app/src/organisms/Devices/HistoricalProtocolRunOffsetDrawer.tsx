@@ -58,7 +58,7 @@ export function HistoricalProtocolRunOffsetDrawer(
   if (uniqueLabwareOffsets == null || uniqueLabwareOffsets.length === 0) {
     return (
       <Box
-        backgroundColor={COLORS.medGrey}
+        backgroundColor={COLORS.medGreyEnabled}
         width="100%"
         paddingY={SPACING.spacing4}
         paddingX={SPACING.spacing7}
@@ -82,7 +82,7 @@ export function HistoricalProtocolRunOffsetDrawer(
 
   return (
     <Box
-      backgroundColor={COLORS.medGrey}
+      backgroundColor={COLORS.medGreyEnabled}
       width="100%"
       padding={SPACING.spacing3}
     >

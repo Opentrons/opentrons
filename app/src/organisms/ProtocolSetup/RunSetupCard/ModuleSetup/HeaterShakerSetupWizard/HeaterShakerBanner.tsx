@@ -32,7 +32,7 @@ export function HeaterShakerBanner(
                 attachedModule={module.attachedModuleMatch}
               />
             )}
-          {index > 0 && <Divider color={COLORS.medGrey} />}
+          {index > 0 && <Divider color={COLORS.medGreyEnabled} />}
           <BannerItem
             title={t('module_in_slot', {
               moduleName: module.moduleDef.displayName,

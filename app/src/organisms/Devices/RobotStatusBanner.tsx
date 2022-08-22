@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
@@ -18,8 +19,10 @@ import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import { useProtocolDetailsForRun } from './hooks'
+import { getRobotModelByName } from '../../redux/discovery'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
+import type { State } from '../../redux/types'
 
 type RobotStatusBannerProps = Pick<DiscoveredRobot, 'name' | 'local'>
 
@@ -30,6 +33,9 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus()
   const { displayName } = useProtocolDetailsForRun(currentRunId)
+  const robotModel = useSelector((state: State) =>
+    getRobotModelByName(state, name)
+  )
 
   const runningProtocolBanner: JSX.Element | null =
     currentRunId != null ? (
@@ -54,8 +60,6 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-      {/* robot_model can be seen in the health response, but only for "connectable" robots.
-    Probably best to leave as "OT-2" for now */}
       <Flex flexDirection={DIRECTION_COLUMN}>
         <StyledText
           as="h6"
@@ -63,7 +67,7 @@ export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
           paddingBottom={SPACING.spacing1}
           id={`RobotStatusBanner_${name}_robotModel`}
         >
-          OT-2
+          {robotModel}
         </StyledText>
         <Flex alignItems={ALIGN_CENTER} paddingBottom={SPACING.spacing4}>
           <Flex alignItems={ALIGN_CENTER}>

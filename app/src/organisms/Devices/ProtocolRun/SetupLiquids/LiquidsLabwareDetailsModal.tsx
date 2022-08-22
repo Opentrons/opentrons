@@ -19,7 +19,7 @@ import {
   useProtocolDetailsForRun,
   useLabwareRenderInfoForRunById,
 } from '../../../Devices/hooks'
-import { ModalShell, ModalHeader } from '../../../../atoms/Modal'
+import { Modal } from '../../../../molecules/Modal'
 import { StyledText } from '../../../../atoms/text'
 import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 import { LiquidDetailCard } from './LiquidDetailCard'
@@ -76,23 +76,25 @@ export const LiquidsLabwareDetailsModal = (
     }
   `
   return (
-    <ModalShell
-      onOutsideClick={closeModal}
+    <Modal
+      onClose={closeModal}
+      closeOnOutsideClick
+      title={labwareName}
+      childrenPadding={0}
       width="45rem"
-      marginLeft="7.125rem"
-      header={<ModalHeader onClose={closeModal} title={labwareName} />}
     >
       <Box
         paddingX={SPACING.spacing4}
         paddingTop={SPACING.spacing4}
-        backgroundColor={COLORS.lightGrey}
+        backgroundColor={COLORS.fundamentalsBackground}
+        height="28.125rem"
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            css={HIDE_SCROLLBAR}
             maxHeight="27.125rem"
             overflowY="auto"
+            css={HIDE_SCROLLBAR}
             minWidth="10.313rem"
             gridGap={SPACING.spacing3}
           >
@@ -142,7 +144,7 @@ export const LiquidsLabwareDetailsModal = (
                 <StyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkBlack}
+                  color={COLORS.darkBlackEnabled}
                 >
                   {slotName}
                 </StyledText>
@@ -161,7 +163,7 @@ export const LiquidsLabwareDetailsModal = (
                 <StyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkBlack}
+                  color={COLORS.darkBlackEnabled}
                 >
                   {labwareName}
                 </StyledText>
@@ -184,6 +186,6 @@ export const LiquidsLabwareDetailsModal = (
           </Flex>
         </Flex>
       </Box>
-    </ModalShell>
+    </Modal>
   )
 }

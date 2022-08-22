@@ -54,7 +54,7 @@ export function SetupCalibrationItem({
   ) : null
   return (
     <Flex
-      backgroundColor={COLORS.lightGrey}
+      backgroundColor={COLORS.fundamentalsBackground}
       borderRadius={BORDERS.radiusSoftCorners}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -66,7 +66,11 @@ export function SetupCalibrationItem({
           {!runHasStarted ? (
             <Icon
               size={SIZE_1}
-              color={calibratedDate != null ? COLORS.success : COLORS.warning}
+              color={
+                calibratedDate != null
+                  ? COLORS.successEnabled
+                  : COLORS.warningEnabled
+              }
               marginRight={SPACING.spacing4}
               name={calibratedDate != null ? 'ot-check' : 'alert-circle'}
             />
@@ -83,7 +87,7 @@ export function SetupCalibrationItem({
               </StyledText>
             )}
             {title != null && (
-              <StyledText as="p" color={COLORS.darkBlack} id={id}>
+              <StyledText as="p" color={COLORS.darkBlackEnabled} id={id}>
                 {title}
               </StyledText>
             )}

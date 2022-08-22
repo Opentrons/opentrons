@@ -12,6 +12,8 @@ import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
 import { ProtocolRunDetails } from '../../pages/Devices/ProtocolRunDetails'
 import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
+import { getIsOnDevice } from '../../redux/config'
+import { getLocalRobot } from '../../redux/discovery'
 import { Alerts } from '../../organisms/Alerts'
 import { App } from '../'
 
@@ -26,36 +28,35 @@ jest.mock('../../organisms/Alerts')
 jest.mock('../../pages/Labware/helpers/getAllDefs')
 jest.mock('../../pages/AppSettings/GeneralSettings')
 jest.mock('../../redux/config')
+jest.mock('../../redux/discovery')
 jest.mock('../hooks')
 
 const mockDeviceDetails = DeviceDetails as jest.MockedFunction<
   typeof DeviceDetails
 >
-mockDeviceDetails.mockReturnValue(<div>Mock DeviceDetails</div>)
 const mockDevicesLanding = DevicesLanding as jest.MockedFunction<
   typeof DevicesLanding
 >
-mockDevicesLanding.mockReturnValue(<div>Mock DevicesLanding</div>)
 const mockProtocolsLanding = ProtocolsLanding as jest.MockedFunction<
   typeof ProtocolsLanding
 >
-mockProtocolsLanding.mockReturnValue(<div>Mock ProtocolsLanding</div>)
 const mockProtocolRunDetails = ProtocolRunDetails as jest.MockedFunction<
   typeof ProtocolRunDetails
 >
-mockProtocolRunDetails.mockReturnValue(<div>Mock ProtocolRunDetails</div>)
 const mockRobotSettings = RobotSettings as jest.MockedFunction<
   typeof RobotSettings
 >
-mockRobotSettings.mockReturnValue(<div>Mock RobotSettings</div>)
 const mockAlerts = Alerts as jest.MockedFunction<typeof Alerts>
-mockAlerts.mockReturnValue(<div>Mock Alerts</div>)
 const mockAppSettings = GeneralSettings as jest.MockedFunction<
   typeof GeneralSettings
 >
-mockAppSettings.mockReturnValue(<div>Mock AppSettings</div>)
 const mockBreadcrumbs = Breadcrumbs as jest.MockedFunction<typeof Breadcrumbs>
-mockBreadcrumbs.mockReturnValue(<div>Mock Breadcrumbs</div>)
+const mockGetIsOnDevice = getIsOnDevice as jest.MockedFunction<
+  typeof getIsOnDevice
+>
+const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
+  typeof getLocalRobot
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -67,6 +68,21 @@ const render = (path = '/') => {
 }
 
 describe('App', () => {
+  beforeEach(() => {
+    mockDeviceDetails.mockReturnValue(<div>Mock DeviceDetails</div>)
+    mockDevicesLanding.mockReturnValue(<div>Mock DevicesLanding</div>)
+    mockProtocolsLanding.mockReturnValue(<div>Mock ProtocolsLanding</div>)
+    mockProtocolRunDetails.mockReturnValue(<div>Mock ProtocolRunDetails</div>)
+    mockRobotSettings.mockReturnValue(<div>Mock RobotSettings</div>)
+    mockAlerts.mockReturnValue(<div>Mock Alerts</div>)
+    mockAppSettings.mockReturnValue(<div>Mock AppSettings</div>)
+    mockBreadcrumbs.mockReturnValue(<div>Mock Breadcrumbs</div>)
+    mockGetIsOnDevice.mockReturnValue(false)
+    mockGetLocalRobot.mockReturnValue(null)
+  })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
   it('renders a Breadcrumbs component', () => {
     const [{ getByText }] = render('/devices')
     getByText('Mock Breadcrumbs')
@@ -77,9 +93,15 @@ describe('App', () => {
     getByText('Mock AppSettings')
   })
 
-  it('renders a DevicesLanding component from /robots', () => {
+  it('renders a DevicesLanding component from /devices', () => {
     const [{ getByText }] = render('/devices')
     getByText('Mock DevicesLanding')
+  })
+
+  it('does not render a DevicesLanding component from /devices in single device mode', () => {
+    mockGetIsOnDevice.mockReturnValue(true)
+    const [{ queryByText }] = render('/devices')
+    expect(queryByText('Mock DevicesLanding')).toBeNull()
   })
 
   it('renders a DeviceDetails component from /robots/:robotName', () => {

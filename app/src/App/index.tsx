@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { Switch, Route, Redirect } from 'react-router-dom'
 import { hot } from 'react-hot-loader/root'
 
@@ -23,80 +24,81 @@ import { ProtocolsLanding } from '../pages/Protocols/ProtocolsLanding'
 import { ProtocolDetails } from '../pages/Protocols/ProtocolDetails'
 import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
+import { getIsOnDevice } from '../redux/config'
+import { getLocalRobot } from '../redux/discovery'
+import { useSoftwareUpdatePoll } from './hooks'
 import { Navbar } from './Navbar'
 import { PortalRoot as ModalPortalRoot, TopPortalRoot } from './portal'
 
 import type { RouteProps } from './types'
-import { useSoftwareUpdatePoll } from './hooks'
-
-export const routes: RouteProps[] = [
-  {
-    Component: ProtocolsLanding,
-    exact: true,
-    name: 'Protocols',
-    navLinkTo: '/protocols',
-    path: '/protocols',
-  },
-  {
-    Component: ProtocolDetails,
-    exact: true,
-    name: 'Protocol Details',
-    path: '/protocols/:protocolKey',
-  },
-  {
-    Component: () => <div>deck setup</div>,
-    name: 'Deck Setup',
-    path: '/protocols/:protocolKey/deck-setup',
-  },
-  {
-    Component: Labware,
-    name: 'Labware',
-    navLinkTo: '/labware',
-    // labwareId param is for details slideout
-    path: '/labware/:labwareId?',
-  },
-  {
-    Component: DevicesLanding,
-    exact: true,
-    name: 'Devices',
-    navLinkTo: '/devices',
-    path: '/devices',
-  },
-  {
-    Component: DeviceDetails,
-    exact: true,
-    name: 'Device Details',
-    path: '/devices/:robotName',
-  },
-  {
-    Component: RobotSettings,
-    exact: true,
-    name: 'Robot Settings',
-    path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
-  },
-  {
-    Component: () => <div>protocol runs landing</div>,
-    exact: true,
-    name: 'Protocol Runs',
-    path: '/devices/:robotName/protocol-runs',
-  },
-  {
-    Component: ProtocolRunDetails,
-    name: 'Run Details',
-    path: '/devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab?',
-  },
-  {
-    Component: AppSettings,
-    exact: true,
-    name: 'App Settings',
-    path: '/app-settings/:appSettingsTab?',
-  },
-]
 
 const stopEvent = (event: React.MouseEvent): void => event.preventDefault()
 
 export const AppComponent = (): JSX.Element => {
   useSoftwareUpdatePoll()
+
+  const isOnDevice = useSelector(getIsOnDevice)
+  const localRobot = useSelector(getLocalRobot)
+
+  const allRoutes: RouteProps[] = [
+    {
+      Component: ProtocolsLanding,
+      exact: true,
+      name: 'Protocols',
+      navLinkTo: '/protocols',
+      path: '/protocols',
+    },
+    {
+      Component: ProtocolDetails,
+      exact: true,
+      name: 'Protocol Details',
+      path: '/protocols/:protocolKey',
+    },
+    {
+      Component: Labware,
+      name: 'Labware',
+      navLinkTo: '/labware',
+      path: '/labware',
+    },
+    {
+      Component: DevicesLanding,
+      exact: true,
+      name: 'Devices',
+      navLinkTo: !isOnDevice ? '/devices' : undefined,
+      path: '/devices',
+    },
+    {
+      Component: DeviceDetails,
+      exact: true,
+      name: 'Device',
+      navLinkTo: isOnDevice
+        ? // placeholder robot name, for empty localhost discovery cache
+          `/devices/${localRobot?.name ?? 'localhost-robot-name'}`
+        : undefined,
+      path: '/devices/:robotName',
+    },
+    {
+      Component: RobotSettings,
+      exact: true,
+      name: 'Robot Settings',
+      path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
+    },
+    {
+      Component: ProtocolRunDetails,
+      name: 'Run Details',
+      path: '/devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab?',
+    },
+    {
+      Component: AppSettings,
+      exact: true,
+      name: 'App Settings',
+      path: '/app-settings/:appSettingsTab?',
+    },
+  ]
+
+  const isOnDeviceRoutes = allRoutes.filter(route => route.path !== '/devices')
+
+  const routes = isOnDevice ? isOnDeviceRoutes : allRoutes
 
   return (
     <>
@@ -121,7 +123,7 @@ export const AppComponent = (): JSX.Element => {
                     position={POSITION_RELATIVE}
                     width="100%"
                     height="100%"
-                    backgroundColor={COLORS.background}
+                    backgroundColor={COLORS.fundamentalsBackground}
                     overflow={OVERFLOW_SCROLL}
                   >
                     <ModalPortalRoot />

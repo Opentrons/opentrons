@@ -12,7 +12,7 @@ import {
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { useAttachedModules } from '../hooks'
-import { Modal } from '../../../atoms/Modal'
+import { Modal } from '../../../molecules/Modal'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { StyledText } from '../../../atoms/text'
 import { HeaterShakerModule } from '../../../redux/modules/types'
@@ -49,7 +49,7 @@ export const HeaterShakerIsRunningModal = (
         name="alert-circle"
         marginX={SPACING.spacing3}
         size={SPACING.spacingM}
-        color={COLORS.warning}
+        color={COLORS.warningEnabled}
         data-testid="HeaterShakerIsRunning_warning_icon"
       />
       {t('heater_shaker_is_shaking')}

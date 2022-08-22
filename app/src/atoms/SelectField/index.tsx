@@ -45,7 +45,7 @@ export interface SelectFieldProps {
 const CAPTION_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   &.error {
-    color: ${COLORS.error};
+    color: ${COLORS.errorEnabled};
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   }
 `

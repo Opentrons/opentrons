@@ -10,13 +10,13 @@ import {
   C_NEAR_WHITE,
   C_DARK_GRAY,
   TEXT_ALIGN_CENTER,
-  FONT_SIZE_CAPTION,
   Text,
   C_DISABLED,
   Icon,
   SPACING,
   COLOR_SUCCESS,
   C_SELECTED_DARK,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import type { Section } from './types'
 interface Props {
@@ -39,7 +39,7 @@ export function SectionList(props: Props): JSX.Element {
 
   return (
     <Box
-      fontSize={FONT_SIZE_CAPTION}
+      fontSize={TYPOGRAPHY.fontSizeCaption}
       padding={SPACING.spacing3}
       width="14rem"
       boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"

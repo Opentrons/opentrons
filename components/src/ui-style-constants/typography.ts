@@ -114,7 +114,7 @@ export const linkPSemiBold = css`
   font-size: ${fontSizeP};
   font-weight: ${fontWeightSemiBold};
   line-height: ${lineHeight20};
-  color: ${COLORS.blue};
+  color: ${COLORS.blueEnabled};
 
   &:hover {
     opacity: 70%;
@@ -127,6 +127,6 @@ export const darkLinkLabelSemiBold = css`
   line-height: ${lineHeight20};
   color: ${COLORS.darkGreyEnabled};
   &:hover {
-    color: ${COLORS.darkBlack};
+    color: ${COLORS.darkBlackEnabled};
   }
 `

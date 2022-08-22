@@ -88,7 +88,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             ) : (
               <Flex alignItems={ALIGN_CENTER} marginTop={SPACING.spacing2}>
                 <Icon
-                  color={COLORS.blue}
+                  color={COLORS.blueEnabled}
                   name="check-decagram"
                   height=".7rem"
                 />
@@ -111,9 +111,10 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             >
               {t('api_name')}
             </StyledText>
-            <StyledText as="p">
-              <Box overflowWrap="anywhere">{apiName}</Box>
-            </StyledText>
+
+            <Box overflowWrap="anywhere">
+              <StyledText as="p">{apiName}</StyledText>
+            </Box>
           </Box>
         </Flex>
       </Box>

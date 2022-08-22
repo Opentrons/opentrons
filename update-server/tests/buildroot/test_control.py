@@ -31,4 +31,5 @@ async def test_health(
             "restart": "/server/restart",
         },
         "serialNumber": "unknown",
+        "robotModel": "OT-2 Standard",
     }

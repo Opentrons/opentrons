@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Box, Flex, JUSTIFY_FLEX_END, SPACING } from '@opentrons/components'
 
-import { Modal } from '../../atoms/Modal'
+import { Modal } from '../../molecules/Modal'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'

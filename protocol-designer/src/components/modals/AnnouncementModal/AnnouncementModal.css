@@ -2,6 +2,7 @@
 
 .announcement_modal {
   border-radius: 0;
+  position: fixed;
 }
 
 .modal_contents {
