@@ -43,9 +43,9 @@ class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidR
 
     async def execute(self, params: LoadLiquidParams) -> LoadLiquidResult:
         """Load data necessary for a liquid."""
-        self._state_view.liquid.validate_has_liquid(params.liquidId)
+        self._state_view.liquid.validate_liquid_id(params.liquidId)
 
-        self._state_view.labware.validate_labware_has_wells(
+        self._state_view.labware.validate_labware_not_tiprack_has_wells(
             labware_id=params.labwareId, wells=iter(params.volumeByWell)
         )
 

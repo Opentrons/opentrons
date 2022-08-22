@@ -278,15 +278,20 @@ class LabwareView(HasState[LabwareState]):
                 wells.append(well_name)
         return wells
 
-    def validate_labware_has_wells(
+    def validate_labware_allowed_liquid(
         self, labware_id: str, wells: Iterable[str]
     ) -> Iterable[str]:
-        """Check if wells associated to a labware_id has well by name."""
-        labware_wells = self.get_definition(labware_id).wells
+        """Check if wells associated to a labware_id has well by name and that labware is not tiprack."""
+        labware_definition = self.get_definition(labware_id)
+        labware_wells = labware_definition.wells
         contains_wells = all(item in labware_wells for item in wells)
         if not contains_wells:
             raise errors.WellDoesNotExistError(
                 f"Some of the supplied wells do not match the labwareId: {labware_id}."
+            )
+        if labware_definition.parameters.isTiprack:
+            raise errors.LabwareIsTipRackError(
+                f"Given labware: {labware_id} is a tiprack. Can not load liquid."
             )
         return wells
 

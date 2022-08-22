@@ -26,12 +26,12 @@ async def test_load_liquid_implementation(
     decoy: Decoy, subject: LoadLiquidImplementation, mock_state_view: StateView
 ) -> None:
     """Test LoadLiquid command execution."""
-    decoy.when(mock_state_view.liquid.validate_has_liquid("liquid-id")).then_return(
+    decoy.when(mock_state_view.liquid.validate_liquid_id("liquid-id")).then_return(
         "liquid-id"
     )
 
     decoy.when(
-        mock_state_view.labware.validate_labware_has_wells(
+        mock_state_view.labware.validate_labware_not_tiprack_has_wells(
             "labware-id", iter({"A1": None, "B2": None})
         )
     ).then_return({"A1": None, "B2": None})
