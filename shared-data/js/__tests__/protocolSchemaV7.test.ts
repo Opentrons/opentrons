@@ -7,7 +7,7 @@ import omit from 'lodash/omit'
 
 import protocolSchema from '../../protocol/schemas/7-draft.json'
 import labwareV2Schema from '../../labware/schemas/2.json'
-import simpleV6Fixture from '../../protocol/fixtures/7/simpleV7.json'
+import simpleV7Fixture from '../../protocol/fixtures/7/simpleV7.json'
 
 const fixturesGlobPath = path.join(
   __dirname,
@@ -17,7 +17,7 @@ const fixturesGlobPath = path.join(
 const protocolFixtures = glob.sync(fixturesGlobPath)
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 
-// v6 protocol schema contains reference to v2 labware schema, so give AJV access to it
+// v7 protocol schema contains reference to v2 labware schema, so give AJV access to it
 ajv.addSchema(labwareV2Schema)
 
 const validateProtocol = ajv.compile(protocolSchema)
@@ -41,21 +41,21 @@ describe('validate v7 protocol fixtures under JSON schema', () => {
 })
 
 describe('ensure bad protocol data fails validation', () => {
-  it('$otSharedSchema is required to be "#/protocol/schemas/6"', () => {
-    expect(validateProtocol(omit(simpleV6Fixture, '$otSharedSchema'))).toBe(
+  it('$otSharedSchema is required to be "#/protocol/schemas/7-draft"', () => {
+    expect(validateProtocol(omit(simpleV7Fixture, '$otSharedSchema'))).toBe(
       false
     )
     expect(
       validateProtocol({
-        ...simpleV6Fixture,
+        ...simpleV7Fixture,
         $otSharedSchema: '#/protocol/schemas/3',
       })
     ).toBe(false)
   })
 
-  it('schemaVersion is required to be 6', () => {
-    expect(validateProtocol(omit(simpleV6Fixture, 'schemaVersion'))).toBe(false)
-    expect(validateProtocol({ ...simpleV6Fixture, schemaVersion: 3 })).toBe(
+  it('schemaVersion is required to be 7', () => {
+    expect(validateProtocol(omit(simpleV7Fixture, 'schemaVersion'))).toBe(false)
+    expect(validateProtocol({ ...simpleV7Fixture, schemaVersion: 3 })).toBe(
       false
     )
   })
@@ -74,9 +74,9 @@ describe('ensure bad protocol data fails validation', () => {
     Object.entries(badPipettes).forEach(([pipetteId, pipette]) => {
       expect(
         validateProtocol({
-          ...simpleV6Fixture,
+          ...simpleV7Fixture,
           pipettes: {
-            ...simpleV6Fixture.pipettes,
+            ...simpleV7Fixture.pipettes,
             [pipetteId]: pipette,
           },
         })
@@ -97,9 +97,9 @@ describe('ensure bad protocol data fails validation', () => {
     Object.entries(badLabware).forEach(([labwareId, labware]) => {
       expect(
         validateProtocol({
-          ...simpleV6Fixture,
+          ...simpleV7Fixture,
           labware: {
-            ...simpleV6Fixture.labware,
+            ...simpleV7Fixture.labware,
             [labwareId]: labware,
           },
         })
@@ -120,9 +120,9 @@ describe('ensure bad protocol data fails validation', () => {
     Object.entries(badModules).forEach(([moduleId, module]) => {
       expect(
         validateProtocol({
-          ...simpleV6Fixture,
+          ...simpleV7Fixture,
           modules: {
-            ...simpleV6Fixture.modules,
+            ...simpleV7Fixture.modules,
             [moduleId]: module,
           },
         })
