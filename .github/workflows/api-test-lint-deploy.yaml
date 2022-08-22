@@ -51,10 +51,6 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.7'
-
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
@@ -86,9 +82,6 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: ${{ matrix.python }}
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:
@@ -128,9 +121,6 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.7'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:
