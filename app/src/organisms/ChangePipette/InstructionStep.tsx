@@ -37,8 +37,8 @@ export function InstructionStep(props: Props): JSX.Element {
       <Box marginRight={SPACING.spacingXXL}>{children}</Box>
       <img
         src={display}
-        height={diagram === 'tab' ? '100%' : '270rem'}
-        width="275rem"
+        height={diagram === 'tab' ? '100%' : '270px'}
+        width="275px"
         alt={`${direction}-${mount}-${channelsKey}-${displayCategory}-${diagram}`}
       />
     </Flex>
