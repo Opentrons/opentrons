@@ -129,13 +129,13 @@ class InstrumentContext(publisher.CommandPublisher):
     def default_speed(self, speed: float) -> None:
         self._implementation.set_default_speed(speed)
 
-    @requires_version(2, 0)
+    @requires_version(2, 0)  # noqa: C901
     def aspirate(
         self,
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, labware.Well]] = None,
         rate: float = 1.0,
-    ) -> InstrumentContext:  # noqa: C901
+    ) -> InstrumentContext:
         """
         Aspirate a given volume of liquid from the specified location, using
         this pipette.
@@ -997,7 +997,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self.transfer(volume, source, dest, **kwargs)
 
-    @publisher.publish(command=cmds.transfer)
+    @publisher.publish(command=cmds.transfer)  # noqa: C901
     @requires_version(2, 0)
     def transfer(
         self,
@@ -1006,7 +1006,7 @@ class InstrumentContext(publisher.CommandPublisher):
         dest: AdvancedLiquidHandling,
         trash: bool = True,
         **kwargs: Any,
-    ) -> InstrumentContext:  # noqa: C901
+    ) -> InstrumentContext:
         # source: Union[Well, List[Well], List[List[Well]]],
         # dest: Union[Well, List[Well], List[List[Well]]],
         # TODO: Reach consensus on kwargs

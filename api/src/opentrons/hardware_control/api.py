@@ -150,14 +150,14 @@ class API(
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
-    @classmethod
+    @classmethod  # noqa: C901
     async def build_hardware_controller(
         cls,
         config: Union[RobotConfig, OT3Config, None] = None,
         port: Optional[str] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         firmware: Optional[Tuple[pathlib.Path, str]] = None,
-    ) -> "API":  # noqa: C901
+    ) -> "API":
         """Build a hardware controller that will actually talk to hardware.
 
         This method should not be used outside of a real robot, and on a
