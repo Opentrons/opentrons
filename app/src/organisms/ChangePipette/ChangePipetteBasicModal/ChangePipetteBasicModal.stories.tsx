@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { COLORS, Flex } from '@opentrons/components'
+import { COLORS, Flex, DIRECTION_COLUMN } from '@opentrons/components'
 import { PrimaryButton } from '../../../atoms/buttons'
 import { WizardHeader } from '../../../molecules/WizardHeader'
 import { ModalShell } from '../../../molecules/Modal'
@@ -13,11 +13,11 @@ export default {
   component: ChangePipetteBasicModal,
 } as Meta
 
-const Template: Story<
+const WithWizardHeaderTemplate: Story<
   React.ComponentProps<typeof ChangePipetteBasicModal>
 > = args => (
   <ModalShell width="47rem">
-    <Flex flexDirection="column">
+    <Flex flexDirection={DIRECTION_COLUMN}>
       <WizardHeader
         currentStep={4}
         totalSteps={7}
@@ -28,6 +28,19 @@ const Template: Story<
     </Flex>
   </ModalShell>
 )
+export const WithWizardHeader = WithWizardHeaderTemplate.bind({})
+WithWizardHeader.args = {
+  iconColor: COLORS.errorEnabled,
+  header: 'Pipette still detected',
+  subHeader: 'Are you sure you want to exit before detaching your pipette?',
+  isSuccess: false,
+  children: <PrimaryButton>{'Exit'}</PrimaryButton>,
+}
+
+const Template: Story<
+  React.ComponentProps<typeof ChangePipetteBasicModal>
+> = args => <ChangePipetteBasicModal {...args} />
+
 export const Primary = Template.bind({})
 Primary.args = {
   iconColor: COLORS.errorEnabled,
