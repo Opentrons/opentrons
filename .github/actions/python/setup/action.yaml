@@ -21,20 +21,9 @@ runs:
       run: |
         npm install --global shx@0.3.3
         pip install pipenv==2021.5.29
-        which python
-        which node
-        which pip
-        python -m pipenv --version
-        python -m pip --version
-        python3 -m pipenv --version
-        python3 -m pip --version
-        python3.7 -m pipenv --version
-        python3.7 -m pip --version
-        python3.10 -m pipenv --version
-        python3.10 -m pip --version
     - shell: bash
       if: ${{ inputs.python-version != 'false' }}
-      run: 'make -C ${{ inputs.project }} setup OT_VIRTUALENV_VERSION==${{ inputs.python-version }} OT_PYTHON==python${{ inputs.python-version }}'
+      run: 'make -C ${{ inputs.project }} setup OT_VIRTUALENV_VERSION==${{ inputs.python-version }} OT_PYTHON==$(which python${{ inputs.python-version }})'
     - shell: bash
       if: ${{ inputs.python-version == 'false' }}
-      run: 'make -C ${{ inputs.project }} setup OT_PYTHON==python3'
+      run: 'make -C ${{ inputs.project }} setup OT_PYTHON==$(which python)'
