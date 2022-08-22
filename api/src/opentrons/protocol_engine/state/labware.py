@@ -278,7 +278,7 @@ class LabwareView(HasState[LabwareState]):
                 wells.append(well_name)
         return wells
 
-    def validate_labware_allowed_liquid(
+    def validate_liquid_allowed_in_labware(
         self, labware_id: str, wells: Iterable[str]
     ) -> Iterable[str]:
         """Check if wells associated to a labware_id has well by name and that labware is not tiprack."""

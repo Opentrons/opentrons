@@ -31,7 +31,7 @@ async def test_load_liquid_implementation(
     )
 
     decoy.when(
-        mock_state_view.labware.validate_labware_not_tiprack_has_wells(
+        mock_state_view.labware.validate_liquid_allowed_in_labware(
             "labware-id", iter({"A1": None, "B2": None})
         )
     ).then_return({"A1": None, "B2": None})

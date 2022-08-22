@@ -45,7 +45,7 @@ class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidR
         """Load data necessary for a liquid."""
         self._state_view.liquid.validate_liquid_id(params.liquidId)
 
-        self._state_view.labware.validate_labware_not_tiprack_has_wells(
+        self._state_view.labware.validate_liquid_allowed_in_labware(
             labware_id=params.labwareId, wells=iter(params.volumeByWell)
         )
 
