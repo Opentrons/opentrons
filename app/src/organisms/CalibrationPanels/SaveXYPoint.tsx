@@ -25,11 +25,8 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-import {
-  JogControls,
-  HORIZONTAL_PLANE,
-  VERTICAL_PLANE,
-} from '../../molecules/JogControls'
+import { HORIZONTAL_PLANE, VERTICAL_PLANE } from '../../molecules/JogControls'
+import { DeprecatedJogControls } from '../../molecules/DeprecatedJogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { NeedHelpLink } from './NeedHelpLink'
@@ -300,7 +297,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element {
           <source src={demoAsset} />
         </video>
       </Flex>
-      <JogControls
+      <DeprecatedJogControls
         jog={jog}
         stepSizes={[0.1, 1]}
         planes={
