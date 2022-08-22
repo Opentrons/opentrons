@@ -1,16 +1,19 @@
 import sys
-sys.path.append('/opt/opentrons-robot-server')
 
-from opentrons.hardware_control.thread_manager import ThreadManager
-from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.types import OT3Axis, OT3Mount
-from opentrons.types import Point
-from opentrons_shared_data.deck import load as load_deck_def
+sys.path.append("/opt/opentrons-robot-server")
+
+from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
+from opentrons.hardware_control.ot3api import OT3API  # noqa: E402
+from opentrons.hardware_control.types import OT3Axis, OT3Mount  # noqa: E402
+from opentrons.hardware_control.protocols import HardwareControlAPI  # noqa: E402
+from opentrons.types import Point  # noqa: E402
+from opentrons_shared_data.deck import load as load_deck_def  # noqa: E402
+
 
 VERSION = 0.0
 MOUNT = OT3Mount.GRIPPER
 
-deck_def = load_deck_def("ot3_standard")
+deck_def = load_deck_def("ot3_standard", version=3)
 
 # Origin slot
 FROM_SLOT = 8
@@ -34,19 +37,20 @@ RETURN_TO_ORIGIN = False
 REPEAT = 0
 
 
-def get_slot_center_in_deck_coord(index: int):
-    corner = Point(*deck_def['locations']['orderedSlots'][index]['position'])
-    return Point(corner.x + 128.0/2, corner.y + 86.0/2, corner.z)   
+def get_slot_center_in_deck_coord(index: int) -> Point:
+    corner = Point(*deck_def["locations"]["orderedSlots"][index]["position"])
+    return Point(corner.x + 128.0 / 2, corner.y + 86.0 / 2, corner.z)
 
 
-def build_api():
+def build_api() -> ThreadManager[HardwareControlAPI]:
     api = ThreadManager(OT3API.build_hardware_controller)
     api.managed_thread_ready_blocking()
-    return api.sync
+    return api
 
 
 if __name__ == "__main__":
-    api = build_api()
+    hc_api = build_api()
+    api = hc_api.sync
     print("Homing...")
     api.home()
     homed_pos = api.gantry_position(MOUNT)
@@ -56,7 +60,7 @@ if __name__ == "__main__":
 
     for i in range(REPEAT + 1):
         print(f"Round: {i} / {REPEAT}")
-        print(f"=========================")
+        print("=========================")
         api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
         api.move_to(MOUNT, from_slot_loc._replace(z=GRIP_HEIGHT))
 
@@ -79,7 +83,7 @@ if __name__ == "__main__":
 
             print("Gripping...")
             api.grip(GRIP_FORCE)
-            
+
             api.home([OT3Axis.Z_G])
             api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
             api.move_to(MOUNT, from_slot_loc._replace(z=GRIP_HEIGHT))
