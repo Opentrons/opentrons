@@ -28,7 +28,7 @@ from opentrons.protocol_engine import (
     ModuleModel,
     ModuleLocation,
 )
-from opentrons.protocol_reader import ProtocolFilesInvalidError
+from opentrons.protocol_runner.json_command_translator import CommandTranslatorError
 
 VALID_TEST_PARAMS = [
     (
@@ -416,7 +416,7 @@ def test_load_command(
 
 def test_load_labware_not_found(subject: JsonCommandTranslator) -> None:
     """Should raise an exception that labware is not found."""
-    with pytest.raises(ProtocolFilesInvalidError):
+    with pytest.raises(CommandTranslatorError):
         subject.translate(
             _make_json_protocol(
                 commands=[
