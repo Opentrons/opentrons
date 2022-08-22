@@ -34,7 +34,7 @@ const StyledInput = styled.input`
   margin: ${SPACING.spacing2} 0;
   background-color: ${COLORS.white};
   border-radius: ${SPACING.spacing2};
-  border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGrey};
+  border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled};
   height: ${SIZE_2};
   font-size: ${TYPOGRAPHY.fontSizeP};
 
@@ -44,7 +44,7 @@ const StyledInput = styled.input`
   }
 
   &:hover {
-    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.blue};
+    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.blueEnabled};
   }
 
   &:focus-visible {
@@ -52,7 +52,8 @@ const StyledInput = styled.input`
   }
 
   &:disabled {
-    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.greyDisabled};
+    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
+      ${COLORS.darkGreyDisabled};
   }
 `
 
@@ -80,7 +81,7 @@ export function ManualIpHostnameForm({
       const ip = values.ip.trim()
       const inputForm = document.getElementById('ip')
       if (inputForm != null)
-        inputForm.style.border = `1px solid ${COLORS.medGrey}`
+        inputForm.style.border = `1px solid ${COLORS.medGreyEnabled}`
       addManualIpAndHostname(ip)
       resetForm()
       setMostRecentAddition(ip)
@@ -92,7 +93,7 @@ export function ManualIpHostnameForm({
         errors.ip = t('add_ip_error')
         const inputForm = document.getElementById('ip')
         if (inputForm != null)
-          inputForm.style.border = `1px solid ${COLORS.error}`
+          inputForm.style.border = `1px solid ${COLORS.errorEnabled}`
       }
       return errors
     },
@@ -128,7 +129,7 @@ export function ManualIpHostnameForm({
         <StyledText
           as="label"
           marginTop={SPACING.spacing2}
-          color={COLORS.error}
+          color={COLORS.errorEnabled}
         >
           {formik.errors.ip}
         </StyledText>

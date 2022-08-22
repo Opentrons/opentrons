@@ -10,7 +10,7 @@ import {
   SPACING,
   Link,
 } from '@opentrons/components'
-import { Modal } from '../../../atoms/Modal'
+import { Modal } from '../../../molecules/Modal'
 import { StyledText } from '../../../atoms/text'
 import { PrimaryButton } from '../../../atoms/buttons'
 
@@ -48,14 +48,14 @@ export function DeckCalibrationConfirmModal({
             onClick={cancel}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             marginRight={SPACING.spacing5}
-            color={COLORS.blue}
+            color={COLORS.blueEnabled}
             css={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('shared:cancel')}
           </Link>
           <PrimaryButton
-            backgroundColor={COLORS.error}
+            backgroundColor={COLORS.errorEnabled}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             css={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}

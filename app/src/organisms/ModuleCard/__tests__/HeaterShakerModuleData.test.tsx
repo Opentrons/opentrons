@@ -39,7 +39,7 @@ describe('HeaterShakerModuleData', () => {
   it('renders an idle status', () => {
     const { getByText } = render(props)
     expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.medGrey'
+      'backgroundColor: COLORS.medGreyEnabled'
     )
   })
 
@@ -79,7 +79,7 @@ describe('HeaterShakerModuleData', () => {
     }
     const { getByText } = render(props)
     expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.blue'
+      'backgroundColor: COLORS.blueEnabled'
     )
   })
 
@@ -101,7 +101,7 @@ describe('HeaterShakerModuleData', () => {
     getByText('Target: 200 rpm')
     getByText('Current: 200 rpm')
     expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.blue'
+      'backgroundColor: COLORS.blueEnabled'
     )
   })
 
@@ -123,7 +123,7 @@ describe('HeaterShakerModuleData', () => {
     getByText('Target: N/A')
     getByText('Current: 0 rpm')
     expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.medGrey'
+      'backgroundColor: COLORS.medGreyEnabled'
     )
   })
 
@@ -145,7 +145,7 @@ describe('HeaterShakerModuleData', () => {
     getByText('Target: 200 rpm')
     getByText('Current: 200 rpm')
     expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.warningBg'
+      'backgroundColor: COLORS.warningBackground'
     )
   })
 
@@ -167,7 +167,7 @@ describe('HeaterShakerModuleData', () => {
     getByText('Target: N/A')
     getByText('Current: 0 rpm')
     expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.medGrey'
+      'backgroundColor: COLORS.medGreyEnabled'
     )
   })
 
@@ -187,7 +187,7 @@ describe('HeaterShakerModuleData', () => {
     }
     const { getByText } = render(props)
     expect(getByText('Mock StatusLabel')).toHaveStyle(
-      'backgroundColor: COLORS.blue'
+      'backgroundColor: COLORS.blueEnabled'
     )
   })
 

@@ -36,7 +36,6 @@ import { useTrackEvent } from '../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
 import { getDeckCalibrationSession } from '../../../redux/sessions/deck-calibration/selectors'
 import { CONNECTABLE } from '../../../redux/discovery'
-import { selectors as robotSelectors } from '../../../redux/robot'
 import * as RobotApi from '../../../redux/robot-api'
 import * as Config from '../../../redux/config'
 import * as Sessions from '../../../redux/sessions'
@@ -48,10 +47,10 @@ import {
   useRobot,
   useTipLengthCalibrations,
   useDeckCalibrationStatus,
-  useIsRobotBusy,
   useAttachedPipettes,
   useAttachedPipetteCalibrations,
   useRunStartedOrLegacySessionInProgress,
+  useRunStatuses,
 } from '../hooks'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
@@ -67,6 +66,7 @@ import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,
 } from '../../../redux/pipettes/types'
+import { fetchAllSessions } from '../../../redux/sessions'
 
 const CALS_FETCH_MS = 5000
 
@@ -138,7 +138,6 @@ export function RobotSettingsCalibration({
   ] = React.useState<string>('')
   const [showCalBlockModal, setShowCalBlockModal] = React.useState(false)
   const isRunStartedOrLegacySessionInProgress = useRunStartedOrLegacySessionInProgress()
-  const isBusy = useIsRobotBusy()
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
@@ -147,6 +146,9 @@ export function RobotSettingsCalibration({
   })
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
   const dispatch = useDispatch<Dispatch>()
+  React.useEffect(() => {
+    dispatch(fetchAllSessions(robotName))
+  }, [])
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -185,7 +187,7 @@ export function RobotSettingsCalibration({
   const attachedPipettes = useAttachedPipettes()
   const attachedPipetteCalibrations = useAttachedPipetteCalibrations(robotName)
 
-  const isRunning = useSelector(robotSelectors.getIsRunning)
+  const { isRunRunning: isRunning } = useRunStatuses()
 
   const pipetteCalPresent = attachedPipetteCalPresent(
     attachedPipettes,
@@ -250,7 +252,7 @@ export function RobotSettingsCalibration({
     pipettePresent
 
   const calCheckButtonDisabled = healthCheckIsPossible
-    ? Boolean(buttonDisabledReason) || isPending
+    ? Boolean(buttonDisabledReason) || isPending || isRunning
     : true
 
   const onClickSaveAs: React.MouseEventHandler = e => {
@@ -314,29 +316,22 @@ export function RobotSettingsCalibration({
   const handleHealthCheck = (
     hasBlockModalResponse: boolean | null = null
   ): void => {
-    if (isBusy) {
-      updateRobotStatus(true)
+    if (hasBlockModalResponse === null && configHasCalibrationBlock === null) {
+      setShowCalBlockModal(true)
     } else {
-      if (
-        hasBlockModalResponse === null &&
-        configHasCalibrationBlock === null
-      ) {
-        setShowCalBlockModal(true)
-      } else {
-        setShowCalBlockModal(false)
-        dispatchRequests(
-          Sessions.ensureSession(
-            robotName,
-            Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
-            {
-              tipRacks: [],
-              hasCalibrationBlock: Boolean(
-                configHasCalibrationBlock ?? hasBlockModalResponse
-              ),
-            }
-          )
+      setShowCalBlockModal(false)
+      dispatchRequests(
+        Sessions.ensureSession(
+          robotName,
+          Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+          {
+            tipRacks: [],
+            hasCalibrationBlock: Boolean(
+              configHasCalibrationBlock ?? hasBlockModalResponse
+            ),
+          }
         )
-      }
+      )
     }
   }
 
@@ -469,7 +464,7 @@ export function RobotSettingsCalibration({
             </StyledText>
             <Link
               role="button"
-              color={COLORS.darkBlack}
+              color={COLORS.darkBlackEnabled}
               css={TYPOGRAPHY.pRegular}
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               onClick={() => handleClickDeckCalibration()}

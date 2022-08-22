@@ -167,7 +167,7 @@ export function RenameRobotSlideout({
           {t('characters_max')}
         </StyledText>
         {formik.errors.newRobotName && (
-          <StyledText as="label" color={COLORS.error}>
+          <StyledText as="label" color={COLORS.errorEnabled}>
             {formik.errors.newRobotName}
           </StyledText>
         )}

@@ -57,23 +57,23 @@ const WRAPPER_STYLE_BY_STATUS: {
 } = {
   queued: {
     border: 'none',
-    backgroundColor: COLORS.background,
-    color: COLORS.darkBlack,
+    backgroundColor: COLORS.fundamentalsBackground,
+    color: COLORS.darkBlackEnabled,
   },
   running: {
-    border: `1px solid ${COLORS.blue}`,
+    border: `1px solid ${COLORS.blueEnabled}`,
     backgroundColor: COLORS.lightBlue,
-    color: COLORS.darkBlack,
+    color: COLORS.darkBlackEnabled,
   },
   succeeded: {
     border: 'none',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.fundamentalsBackground,
     color: COLORS.darkGreyEnabled,
   },
   failed: {
-    border: `1px solid ${COLORS.error}`,
-    backgroundColor: COLORS.errorBg,
-    color: COLORS.darkBlack,
+    border: `1px solid ${COLORS.errorEnabled}`,
+    backgroundColor: COLORS.errorBackground,
+    color: COLORS.darkBlackEnabled,
   },
 }
 

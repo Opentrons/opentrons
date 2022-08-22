@@ -175,7 +175,7 @@ export function ChooseProtocolSlideout(
                     <Icon
                       name="alert-circle"
                       size="1.25rem"
-                      color={COLORS.error}
+                      color={COLORS.errorEnabled}
                     />
                   </>
                 ) : null}
@@ -223,7 +223,11 @@ export function ChooseProtocolSlideout(
           padding={SPACING.spacing4}
           css={BORDERS.cardOutlineBorder}
         >
-          <Icon size="1.25rem" name="alert-circle" color={COLORS.medGrey} />
+          <Icon
+            size="1.25rem"
+            name="alert-circle"
+            color={COLORS.medGreyEnabled}
+          />
           <StyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}

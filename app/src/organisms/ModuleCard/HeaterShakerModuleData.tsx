@@ -36,27 +36,27 @@ export const HeaterShakerModuleData = (
     status: SpeedStatus | TemperatureStatus
   ): { backgroundColor: string; iconColor: string; textColor: string } => {
     const StatusLabelProps = {
-      backgroundColor: COLORS.medGrey,
-      iconColor: COLORS.darkGrey,
+      backgroundColor: COLORS.medGreyEnabled,
+      iconColor: COLORS.darkGreyEnabled,
       textColor: COLORS.bluePressed,
       pulse: false,
     }
 
     switch (status) {
       case 'idle': {
-        StatusLabelProps.backgroundColor = COLORS.medGrey
-        StatusLabelProps.iconColor = COLORS.darkGrey
-        StatusLabelProps.textColor = COLORS.darkBlack
+        StatusLabelProps.backgroundColor = COLORS.medGreyEnabled
+        StatusLabelProps.iconColor = COLORS.darkGreyEnabled
+        StatusLabelProps.textColor = COLORS.darkBlackEnabled
         break
       }
       case 'holding at target': {
         StatusLabelProps.backgroundColor = COLORS.medBlue
-        StatusLabelProps.iconColor = COLORS.blue
+        StatusLabelProps.iconColor = COLORS.blueEnabled
         break
       }
       case 'error': {
-        StatusLabelProps.backgroundColor = COLORS.warningBg
-        StatusLabelProps.iconColor = COLORS.warning
+        StatusLabelProps.backgroundColor = COLORS.warningBackground
+        StatusLabelProps.iconColor = COLORS.warningEnabled
         StatusLabelProps.textColor = COLORS.warningText
         break
       }
@@ -64,7 +64,7 @@ export const HeaterShakerModuleData = (
       case 'cooling':
       case 'slowing down':
       case 'speeding up': {
-        StatusLabelProps.backgroundColor = COLORS.blue + '1A'
+        StatusLabelProps.backgroundColor = COLORS.blueEnabled + '1A'
         StatusLabelProps.pulse = true
         break
       }

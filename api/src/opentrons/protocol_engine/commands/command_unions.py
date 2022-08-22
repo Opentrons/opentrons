@@ -38,6 +38,14 @@ from .dispense import (
     DispenseCommandType,
 )
 
+from .dispense_in_place import (
+    DispenseInPlace,
+    DispenseInPlaceParams,
+    DispenseInPlaceCreate,
+    DispenseInPlaceResult,
+    DispenseInPlaceCommandType,
+)
+
 from .drop_tip import (
     DropTip,
     DropTipParams,
@@ -154,6 +162,7 @@ Command = Union[
     Aspirate,
     Custom,
     Dispense,
+    DispenseInPlace,
     BlowOut,
     DropTip,
     Home,
@@ -196,6 +205,7 @@ CommandParams = Union[
     AspirateParams,
     CustomParams,
     DispenseParams,
+    DispenseInPlaceParams,
     BlowOutParams,
     DropTipParams,
     HomeParams,
@@ -239,6 +249,7 @@ CommandType = Union[
     AspirateCommandType,
     CustomCommandType,
     DispenseCommandType,
+    DispenseInPlaceCommandType,
     BlowOutCommandType,
     DropTipCommandType,
     HomeCommandType,
@@ -280,6 +291,7 @@ CommandType = Union[
 CommandCreate = Union[
     AspirateCreate,
     DispenseCreate,
+    DispenseInPlaceCreate,
     BlowOutCreate,
     DropTipCreate,
     HomeCreate,
@@ -322,6 +334,7 @@ CommandResult = Union[
     AspirateResult,
     CustomResult,
     DispenseResult,
+    DispenseInPlaceResult,
     BlowOutResult,
     DropTipResult,
     HomeResult,

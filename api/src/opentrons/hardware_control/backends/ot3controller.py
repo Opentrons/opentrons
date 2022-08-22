@@ -68,6 +68,8 @@ from opentrons.hardware_control.types import (
     OT3AxisMap,
     CurrentConfig,
     OT3SubSystem,
+    InvalidPipetteName,
+    InvalidPipetteModel,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -363,6 +365,59 @@ class OT3Controller:
         runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
 
+    @staticmethod
+    def _synthesize_model_name(name: FirmwarePipetteName, model: str) -> "PipetteModel":
+        return cast("PipetteModel", f"{name.name}_v{model}")
+
+    @staticmethod
+    def _build_attached_pip(
+        attached: ohc_tool_types.PipetteInformation, mount: OT3Mount
+    ) -> AttachedPipette:
+        if attached.name == FirmwarePipetteName.unknown:
+            raise InvalidPipetteName(name=attached.name_int, mount=mount)
+        try:
+            return {
+                "config": pipette_config.load(
+                    OT3Controller._synthesize_model_name(attached.name, attached.model)
+                ),
+                "id": attached.serial,
+            }
+        except KeyError:
+            raise InvalidPipetteModel(
+                name=attached.name.name, model=attached.model, mount=mount
+            )
+
+    @staticmethod
+    def _build_attached_gripper(
+        attached: ohc_tool_types.GripperInformation,
+    ) -> AttachedGripper:
+        model = gripper_config.info_num_to_model(attached.model)
+        serial = attached.serial
+        return {
+            "config": gripper_config.load(model, serial),
+            "id": serial,
+        }
+
+    @staticmethod
+    def _generate_attached_instrs(
+        attached: ohc_tool_types.ToolSummary,
+    ) -> Iterator[Tuple[OT3Mount, OT3AttachedInstruments]]:
+        if attached.left:
+            yield (
+                OT3Mount.LEFT,
+                OT3Controller._build_attached_pip(attached.left, OT3Mount.LEFT),
+            )
+        if attached.right:
+            yield (
+                OT3Mount.RIGHT,
+                OT3Controller._build_attached_pip(attached.right, OT3Mount.RIGHT),
+            )
+        if attached.gripper:
+            yield (
+                OT3Mount.GRIPPER,
+                OT3Controller._build_attached_gripper(attached.gripper),
+            )
+
     async def get_attached_instruments(
         self, expected: Dict[OT3Mount, PipetteName]
     ) -> Dict[OT3Mount, OT3AttachedInstruments]:
@@ -377,42 +432,7 @@ class OT3Controller:
         await self._probe_core()
         attached = await self._tool_detector.detect()
 
-        def _synthesize_model_name(
-            name: FirmwarePipetteName, model: int
-        ) -> "PipetteModel":
-            return cast("PipetteModel", name.name + "_v3." + str(model))
-
-        def _build_attached_pip(
-            attached: ohc_tool_types.PipetteInformation,
-        ) -> AttachedPipette:
-            return {
-                "config": pipette_config.load(
-                    _synthesize_model_name(attached.name, attached.model)
-                ),
-                "id": attached.serial,
-            }
-
-        def _build_attached_gripper(
-            attached: ohc_tool_types.GripperInformation,
-        ) -> AttachedGripper:
-            model = gripper_config.info_num_to_model(attached.model)
-            serial = attached.serial
-            return {
-                "config": gripper_config.load(model, serial),
-                "id": serial,
-            }
-
-        def _generate_attached_instrs(
-            attached: ohc_tool_types.ToolSummary,
-        ) -> Iterator[Tuple[OT3Mount, OT3AttachedInstruments]]:
-            if attached.left:
-                yield (OT3Mount.LEFT, _build_attached_pip(attached.left))
-            if attached.right:
-                yield (OT3Mount.RIGHT, _build_attached_pip(attached.right))
-            if attached.gripper:
-                yield (OT3Mount.GRIPPER, _build_attached_gripper(attached.gripper))
-
-        current_tools = dict(_generate_attached_instrs(attached))
+        current_tools = dict(OT3Controller._generate_attached_instrs(attached))
         self._present_nodes -= set(
             axis_to_node(OT3Axis.of_main_tool_actuator(mount)) for mount in OT3Mount
         )

@@ -423,7 +423,7 @@ export function ProtocolRunHeader({
   const protocolRunningContent: JSX.Element | null =
     runStatus != null ? (
       <Box
-        backgroundColor={COLORS.lightGrey}
+        backgroundColor={COLORS.fundamentalsBackground}
         display="grid"
         gridTemplateColumns="4fr 6fr 4fr"
         padding={SPACING.spacing3}
@@ -466,7 +466,7 @@ export function ProtocolRunHeader({
               style={{
                 color: `${COLORS.errorText}`,
                 backgroundColor: 'none',
-                borderColor: `${COLORS.error}`,
+                borderColor: `${COLORS.errorEnabled}`,
               }}
               padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
               onClick={handleCancelClick}
@@ -514,7 +514,7 @@ export function ProtocolRunHeader({
         {protocolKey != null ? (
           <Link to={`/protocols/${protocolKey}`}>
             <StyledText
-              color={COLORS.blue}
+              color={COLORS.blueEnabled}
               css={TYPOGRAPHY.h2SemiBold}
               id="ProtocolRunHeader_protocolName"
             >
@@ -571,14 +571,14 @@ export function ProtocolRunHeader({
             {runStatus === RUN_STATUS_RUNNING ? (
               <Icon
                 name="circle"
-                color={COLORS.blue}
+                color={COLORS.blueEnabled}
                 size={SPACING.spacing2}
                 marginRight={SPACING.spacing2}
                 data-testid="running_circle"
               >
                 <animate
                   attributeName="fill"
-                  values={`${COLORS.blue}; transparent`}
+                  values={`${COLORS.blueEnabled}; transparent`}
                   dur="1s"
                   calcMode="discrete"
                   repeatCount="indefinite"

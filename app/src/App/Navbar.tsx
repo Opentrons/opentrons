@@ -30,14 +30,14 @@ const SALESFORCE_HELP_LINK = 'https://support.opentrons.com/s/'
 const NavbarLink = styled(NavLink)`
   color: ${COLORS.white};
   align-self: ${ALIGN_STRETCH};
-  background-color: ${COLORS.darkBlack};
+  background-color: ${COLORS.darkBlackEnabled};
 
   &:hover {
     background-color: ${COLORS.darkBlackHover};
   }
 
   &:focus-visible {
-    box-shadow: inset 0 0 0 3px ${COLORS.warning};
+    box-shadow: inset 0 0 0 3px ${COLORS.fundamentalsFocus};
     outline: none;
     background-color: ${COLORS.darkGreyHover};
   }
@@ -48,25 +48,25 @@ const NavbarLink = styled(NavLink)`
   }
 
   &:active {
-    background-color: ${COLORS.darkBlackPressed};
+    background-color: ${COLORS.darkBlackEnabled};
   }
 
   &.active {
     background-color: ${COLORS.darkBlackSelected};
   }
   &.active:has(svg) {
-    background-color: ${COLORS.darkBlack};
+    background-color: ${COLORS.darkBlackEnabled};
   }
 `
 const NavIconLink = styled(NavLink)`
   &.active > svg {
-    color: ${COLORS.medGrey};
+    color: ${COLORS.medGreyEnabled};
     background-color: ${COLORS.darkBlackSelected};
   }
 `
 const IconLink = styled(Link)`
   &.active > svg {
-    color: ${COLORS.medGrey};
+    color: ${COLORS.medGreyEnabled};
     background-color: ${COLORS.darkBlackSelected};
   }
 `
@@ -76,7 +76,7 @@ const NavbarIcon = styled(Icon)`
   height: ${SIZE_2};
   padding: 0.375rem;
   border-radius: 50%;
-  color: ${COLORS.medGrey};
+  color: ${COLORS.medGreyEnabled};
   background-color: ${COLORS.transparent};
 
   &:hover {
@@ -84,18 +84,18 @@ const NavbarIcon = styled(Icon)`
   }
 
   &:focus-visible {
-    box-shadow: inset 0 0 0 3px ${COLORS.warning};
+    box-shadow: inset 0 0 0 3px ${COLORS.fundamentalsFocus};
     outline: none;
     background-color: ${COLORS.darkGreyHover};
   }
 
   &:active {
-    color: ${COLORS.medGrey};
-    background-color: ${COLORS.darkBlackPressed};
+    color: ${COLORS.medGreyEnabled};
+    background-color: ${COLORS.darkBlackEnabled};
   }
 
   &.active {
-    color: ${COLORS.medGrey};
+    color: ${COLORS.medGreyEnabled};
     background-color: ${COLORS.darkBlackSelected};
   }
 `
@@ -111,7 +111,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
   )
   return (
     <Flex
-      backgroundColor={COLORS.darkBlack}
+      backgroundColor={COLORS.darkBlackEnabled}
       css={TYPOGRAPHY.h3Regular}
       flexDirection={DIRECTION_COLUMN}
       flex={FLEX_NONE}

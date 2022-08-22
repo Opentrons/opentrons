@@ -108,7 +108,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
       <Flex
         marginTop={SPACING.spacing3}
         marginBottom={SPACING.spacing4}
-        backgroundColor={COLORS.background}
+        backgroundColor={COLORS.fundamentalsBackground}
         paddingTop={SPACING.spacing4}
         paddingLeft={SPACING.spacing4}
         flexDirection={DIRECTION_ROW}

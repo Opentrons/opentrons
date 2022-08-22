@@ -16,6 +16,7 @@ from .command_fixtures import (
     create_load_pipette_command,
     create_aspirate_command,
     create_dispense_command,
+    create_dispense_in_place_command,
     create_pick_up_tip_command,
     create_drop_tip_command,
     create_move_to_well_command,
@@ -106,7 +107,20 @@ def test_handles_blow_out(subject: PipetteStore) -> None:
     )
 
 
-def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
+@pytest.mark.parametrize(
+    "dispense_command",
+    [
+        create_dispense_command(pipette_id="pipette-id", volume=21, flow_rate=1.23),
+        create_dispense_in_place_command(
+            pipette_id="pipette-id",
+            volume=21,
+            flow_rate=1.23,
+        ),
+    ],
+)
+def test_pipette_volume_subtracts_dispense(
+    subject: PipetteStore, dispense_command: cmd.Command
+) -> None:
     """It should subtract volume from pipette after a dispense."""
     load_command = create_load_pipette_command(
         pipette_id="pipette-id",
@@ -116,11 +130,6 @@ def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
     aspirate_command = create_aspirate_command(
         pipette_id="pipette-id",
         volume=42,
-        flow_rate=1.23,
-    )
-    dispense_command = create_dispense_command(
-        pipette_id="pipette-id",
-        volume=21,
         flow_rate=1.23,
     )
 

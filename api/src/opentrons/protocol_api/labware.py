@@ -16,14 +16,15 @@ from typing import Any, AnyStr, List, Dict, Optional, Union, Tuple, TYPE_CHECKIN
 
 
 from opentrons.protocols.api_support.util import requires_version
-from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols import labware as labware_module
-from opentrons.protocols.context.well import WellImplementation
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck_item import DeckItem
+
+from .core.labware import AbstractLabware
+from .core.well import WellImplementation
 
 if TYPE_CHECKING:
     from opentrons.protocols.geometry.module_geometry import (  # noqa: F401

@@ -10,17 +10,18 @@ export interface TooltipProps {
   children: React.ReactNode
   tooltipProps: UseTooltipResultTooltipProps & { visible: boolean }
   key?: string
+  width?: string
 }
 
 export function Tooltip(props: TooltipProps): JSX.Element {
-  const { children, tooltipProps } = props
+  const { children, tooltipProps, width } = props
 
   return (
     <SharedTooltip
       {...tooltipProps}
-      backgroundColor={COLORS.darkBlack}
+      backgroundColor={COLORS.darkBlackEnabled}
       fontSize={TYPOGRAPHY.fontSizeCaption}
-      width="8.75rem"
+      width={width != null ? width : '8.75rem'}
     >
       {children}
     </SharedTooltip>

@@ -12,7 +12,7 @@ import opentrons.protocol_api as papi
 import opentrons.protocols.api_support as papi_support
 import opentrons.protocols.geometry as papi_geometry
 
-from opentrons.protocols.context.protocol_api.protocol_context import (
+from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
 from opentrons.protocol_api.module_contexts import (
