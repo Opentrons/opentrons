@@ -26,5 +26,8 @@
   "title": "robot calibration",
   "unknown_custom_tiprack": "unknown custom tip rack",
   "jump_size": "jump size",
-  "direction_controls": "direction controls"
+  "direction_controls": "direction controls",
+  "tiny": "Tiny",
+  "small": "Small",
+  "large": "Large"
 }

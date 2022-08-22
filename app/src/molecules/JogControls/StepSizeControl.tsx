@@ -54,9 +54,9 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   `
 
   const STEP_SIZE_LABELS: { [stepSize: number]: string } = {
-    0.1: 'Tiny',
-    1: 'Small',
-    10: 'Large',
+    0.1: t('tiny'),
+    1: t('small'),
+    10: t('large'),
   }
 
   const STEP_SIZE_BUTTON_STYLING = css`
