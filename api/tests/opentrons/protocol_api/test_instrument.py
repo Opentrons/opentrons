@@ -3,7 +3,7 @@ import pytest
 from unittest import mock
 import opentrons.protocol_api as papi
 from opentrons.protocols.advanced_control import transfers
-from opentrons.protocol_api._core.protocol_api.protocol_context import (
+from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
 from opentrons.types import Mount

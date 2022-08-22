@@ -11,7 +11,7 @@ import jsonschema  # type: ignore
 
 from opentrons.protocols.api_support.util import ModifiedList
 from opentrons.calibration_storage import helpers, modify
-from opentrons.protocol_api._core.labware import AbstractLabware
+from opentrons.protocol_api.core.labware import AbstractLabware
 from opentrons.types import Point
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from opentrons.protocols.geometry.deck_item import DeckItem

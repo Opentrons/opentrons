@@ -6,13 +6,13 @@ from typing import Any
 
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api.instrument_context import InstrumentContext
-from opentrons.protocol_api._core.instrument import AbstractInstrument
+from opentrons.protocol_api.core.instrument import AbstractInstrument
 from opentrons.types import Location, Point
 from opentrons.broker import Broker
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api.labware import Well, Labware
-from opentrons.protocol_api._core.well import WellImplementation
-from opentrons.protocol_api._core.labware import AbstractLabware
+from opentrons.protocol_api.core.well import WellImplementation
+from opentrons.protocol_api.core.labware import AbstractLabware
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols.api_support import instrument
 from opentrons.commands import publisher

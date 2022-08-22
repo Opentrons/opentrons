@@ -45,8 +45,8 @@ from opentrons.hardware_control import (
 )
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api._core.protocol_api.labware import LabwareImplementation
-from opentrons.protocol_api._core.protocol_api.protocol_context import (
+from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
+from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
 from opentrons.types import Location, Point

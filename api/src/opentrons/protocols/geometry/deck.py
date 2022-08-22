@@ -66,7 +66,7 @@ class Deck(UserDict):
             # TODO(mc, 2022-06-15): this loads the fixed trash as an instance of
             # `opentrons.protocol_api.labware.Labware`
             # However, all other labware will be added to the `Deck` as instances of
-            # `opentrons.protocol_api._core.labware.AbstractLabware`
+            # `opentrons.protocol_api.core.labware.AbstractLabware`
             # And modules will be added as instances of
             # `opentrons.protocols.geometry.module_geometry.ModuleGeometry`
             # This mix of public and private interfaces as members of a public

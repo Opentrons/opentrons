@@ -1,9 +1,9 @@
 """Test instrument context simulation."""
 import pytest
-from opentrons.protocol_api._core.protocol import AbstractProtocol
+from opentrons.protocol_api.core.protocol import AbstractProtocol
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
-from opentrons.protocol_api._core.labware import AbstractLabware
+from opentrons.protocol_api.core.labware import AbstractLabware
 from opentrons import types
 
 

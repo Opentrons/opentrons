@@ -24,7 +24,7 @@ from g_code_parsing.g_code_program.g_code_program import (
     GCodeProgram,
 )
 from g_code_parsing.g_code_watcher import GCodeWatcher
-from opentrons.protocol_api._core.protocol_api.protocol_context import (
+from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
 from g_code_parsing.utils import get_configuration_dir

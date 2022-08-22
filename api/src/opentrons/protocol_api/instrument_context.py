@@ -24,7 +24,7 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
-from ._core.instrument import AbstractInstrument
+from .core.instrument import AbstractInstrument
 from .module_contexts import ThermocyclerContext, HeaterShakerContext
 from . import labware
 

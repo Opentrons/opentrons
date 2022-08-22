@@ -23,8 +23,8 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck_item import DeckItem
 
-from ._core.labware import AbstractLabware
-from ._core.well import WellImplementation
+from .core.labware import AbstractLabware
+from .core.well import WellImplementation
 
 if TYPE_CHECKING:
     from opentrons.protocols.geometry.module_geometry import (  # noqa: F401
