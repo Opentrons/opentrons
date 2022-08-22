@@ -24,7 +24,10 @@ def _translate_labware_command(
     labware_id = command.params.labwareId
     # v6 data model supports all commands and therefor most props are optional.
     # load labware command must contain labware_id and definition_id.
-    assert (labware_id is not None, "Given labware id can not be None.")
+    if labware_id is None:
+        raise CommandTranslatorError(
+            f"Given labware_id for command {command.commandType} can not be None."
+        )
     try:
         definition_id = protocol.labware[labware_id].definitionId
     except KeyError as e:
@@ -56,8 +59,14 @@ def _translate_module_command(
     modules = protocol.modules
     # v6 data model supports all commands and therefor most props are optional.
     # load module command must contain module_id. modules cannot be None.
-    assert (module_id is not None, "Given module id can not be None.")
-    assert (modules is not None, "Given modules can not be None.")
+    if module_id is None:
+        raise CommandTranslatorError(
+            f"Given module_id for command {command.commandType} can not be None."
+        )
+    if modules is None:
+        raise CommandTranslatorError(
+            f"Given modules for command {command.commandType} can not be None."
+        )
     translated_obj = pe_commands.LoadModuleCreate(
         params=pe_commands.LoadModuleParams(
             model=ModuleModel(modules[module_id].model),
@@ -75,7 +84,10 @@ def _translate_pipette_command(
     pipette_id = command.params.pipetteId
     # v6 data model supports all commands and therefor most props are optional.
     # load pipette command must contain pipette_id.
-    assert (pipette_id is not None, "Given pipette id can not be None.")
+    if pipette_id is None:
+        raise CommandTranslatorError(
+            f"Given pipette_id for command {command.commandType} can not be None."
+        )
     translated_obj = pe_commands.LoadPipetteCreate(
         params=pe_commands.LoadPipetteParams(
             pipetteName=PipetteName(protocol.pipettes[pipette_id].name),
