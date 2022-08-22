@@ -1,6 +1,5 @@
 """ Test the functions and classes in the protocol context """
 
-import asyncio
 import json
 from unittest import mock
 from typing import Any, Dict
@@ -12,9 +11,6 @@ import opentrons.protocol_api as papi
 import opentrons.protocols.api_support as papi_support
 import opentrons.protocols.geometry as papi_geometry
 
-from opentrons.protocol_api.core.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
-)
 from opentrons.protocol_api.module_contexts import (
     ThermocyclerContext,
     HeaterShakerContext,
@@ -98,7 +94,7 @@ async def test_motion(ctx, hardware):
     ) == pytest.approx(old_pos)
 
 
-async def test_max_speeds(ctx, monkeypatch, hardware):
+def test_max_speeds(ctx, monkeypatch, hardware):
     ctx.home()
     with mock.patch.object(ctx._implementation.get_hardware(), "move_to") as mock_move:
         instr = ctx.load_instrument("p10_single", Mount.RIGHT)
@@ -163,7 +159,7 @@ async def test_location_cache(ctx, monkeypatch, get_labware_def, hardware):
     assert test_args[0].labware.as_well() == lw.wells()[0]  # type: ignore[index]
 
 
-async def test_location_cache_two_pipettes(ctx, get_labware_def, hardware):
+def test_location_cache_two_pipettes(ctx, get_labware_def, hardware):
     """It should be invalidated when next movement is a different pipette
     than the cached location."""
     ctx.home()
@@ -185,9 +181,7 @@ async def test_location_cache_two_pipettes(ctx, get_labware_def, hardware):
         assert m.call_args[0][1] == right_loc
 
 
-async def test_location_cache_two_pipettes_fails_pre_2_10(
-    ctx, get_labware_def, hardware
-):
+def test_location_cache_two_pipettes_fails_pre_2_10(ctx, get_labware_def, hardware):
     """It should reuse location cache even if cached location was set by
     move of a different pipette."""
     ctx.home()
@@ -209,7 +203,7 @@ async def test_location_cache_two_pipettes_fails_pre_2_10(
         assert m.call_args[0][1] == right_loc
 
 
-async def test_move_uses_arc(ctx, monkeypatch, get_labware_def, hardware):
+def test_move_uses_arc(ctx, monkeypatch, get_labware_def, hardware):
     ctx.home()
     right = ctx.load_instrument("p10_single", Mount.RIGHT)
     lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
@@ -286,17 +280,11 @@ def test_pick_up_without_prep_after(ctx, get_labware_def):
     instr.drop_tip(tiprack["A2"].top())
 
 
-async def test_pick_up_tip_old_version(hardware, get_labware_def):
+def test_pick_up_tip_old_version(hardware, get_labware_def):
     # API version 2.12, a pick-up tip would not prepare-for-aspirate
     api_version = APIVersion(2, 12)
-    ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(
-            api_version=api_version,
-            sync_hardware=hardware.sync,
-        ),
-        loop=asyncio.get_running_loop(),
-        api_version=api_version,
-    )
+    ctx = papi.create_protocol_context(api_version=api_version, hardware_api=hardware)
+
     ctx.home()
     tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
     lw = ctx.load_labware("corning_96_wellplate_360ul_flat", 2)
@@ -322,18 +310,11 @@ async def test_pick_up_tip_old_version(hardware, get_labware_def):
         instr.pick_up_tip(tiprack["A2"].top(), prep_after=True)
 
 
-async def test_return_tip_old_version(hardware, get_labware_def):
+def test_return_tip_old_version(hardware, get_labware_def):
     # API version 2.2, a returned tip would be picked up by the
     # next pick up tip call
     api_version = APIVersion(2, 1)
-    ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(
-            api_version=api_version,
-            sync_hardware=hardware.sync,
-        ),
-        loop=asyncio.get_running_loop(),
-        api_version=api_version,
-    )
+    ctx = papi.create_protocol_context(api_version=api_version, hardware_api=hardware)
     ctx.home()
     tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 1)
     mount = Mount.LEFT
@@ -685,16 +666,9 @@ def test_mix(ctx, monkeypatch):
     assert mix_steps == expected_mix_steps
 
 
-async def test_touch_tip_default_args(monkeypatch, hardware):
+def test_touch_tip_default_args(monkeypatch, hardware):
     api_version = APIVersion(2, 3)
-    ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(
-            api_version=api_version,
-            sync_hardware=hardware.sync,
-        ),
-        loop=asyncio.get_running_loop(),
-        api_version=api_version,
-    )
+    ctx = papi.create_protocol_context(api_version=api_version, hardware_api=hardware)
     ctx.home()
     lw = ctx.load_labware("opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap", 1)
     tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 3)
@@ -985,7 +959,7 @@ def test_loaded_modules(ctx, monkeypatch):
     assert ctx.loaded_modules[4] == temp2
 
 
-async def test_order_of_module_load():
+def test_order_of_module_load():
     import opentrons.hardware_control as hardware_control
     import opentrons.protocol_api as protocol_api
 
@@ -999,9 +973,9 @@ async def test_order_of_module_load():
     hw_temp1 = attached_modules[0]
     hw_temp2 = attached_modules[2]
 
-    ctx1 = protocol_api.ProtocolContext(
-        implementation=ProtocolContextImplementation(sync_hardware=fake_hardware),
-        loop=asyncio.get_running_loop(),
+    ctx1 = protocol_api.create_protocol_context(
+        api_version=papi.MAX_SUPPORTED_VERSION,
+        hardware_api=fake_hardware,
     )
 
     temp1 = ctx1.load_module("tempdeck", 4)
@@ -1016,9 +990,9 @@ async def test_order_of_module_load():
     # Test that the order remains the same for the
     # hardware modules regardless of the slot it
     # was loaded into
-    ctx2 = protocol_api.ProtocolContext(
-        implementation=ProtocolContextImplementation(sync_hardware=fake_hardware),
-        loop=asyncio.get_running_loop(),
+    ctx2 = protocol_api.create_protocol_context(
+        api_version=papi.MAX_SUPPORTED_VERSION,
+        hardware_api=fake_hardware,
     )
 
     ctx2.load_module("thermocycler")
@@ -1077,15 +1051,14 @@ def test_tip_length_for_load_caldata(ctx):
     delete.clear_tip_length_calibration()
 
 
-async def test_bundled_labware(get_labware_fixture, hardware):
+def test_bundled_labware(get_labware_fixture, hardware):
     fixture_96_plate = get_labware_fixture("fixture_96_plate")
     bundled_labware = {"fixture/fixture_96_plate/1": fixture_96_plate}
 
-    ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(
-            sync_hardware=hardware.sync, bundled_labware=bundled_labware
-        ),
-        loop=asyncio.get_running_loop(),
+    ctx = papi.create_protocol_context(
+        api_version=papi.MAX_SUPPORTED_VERSION,
+        hardware_api=hardware,
+        bundled_labware=bundled_labware,
     )
 
     lw1 = ctx.load_labware("fixture_96_plate", 3, namespace="fixture")
@@ -1093,16 +1066,15 @@ async def test_bundled_labware(get_labware_fixture, hardware):
     assert ctx.loaded_labwares[3]._implementation.get_definition() == fixture_96_plate
 
 
-async def test_bundled_labware_missing(get_labware_fixture, hardware):
+def test_bundled_labware_missing(get_labware_fixture, hardware):
     bundled_labware: Dict[str, Any] = {}
     with pytest.raises(
         RuntimeError, match="No labware found in bundle with load name fixture_96_plate"
     ):
-        ctx = papi.ProtocolContext(
-            implementation=ProtocolContextImplementation(
-                bundled_labware=bundled_labware, sync_hardware=hardware.sync
-            ),
-            loop=asyncio.get_running_loop(),
+        ctx = papi.create_protocol_context(
+            api_version=papi.MAX_SUPPORTED_VERSION,
+            hardware_api=hardware,
+            bundled_labware=bundled_labware,
         )
         ctx.load_labware("fixture_96_plate", 3, namespace="fixture")
 
@@ -1111,36 +1083,33 @@ async def test_bundled_labware_missing(get_labware_fixture, hardware):
     with pytest.raises(
         RuntimeError, match="No labware found in bundle with load name fixture_96_plate"
     ):
-        ctx = papi.ProtocolContext(
-            implementation=ProtocolContextImplementation(
-                bundled_labware={},
-                extra_labware=bundled_labware,
-                sync_hardware=hardware.sync,
-            ),
-            loop=asyncio.get_running_loop(),
+        ctx = papi.create_protocol_context(
+            api_version=papi.MAX_SUPPORTED_VERSION,
+            hardware_api=hardware,
+            bundled_labware={},
+            extra_labware=bundled_labware,
         )
         ctx.load_labware("fixture_96_plate", 3, namespace="fixture")
 
 
-async def test_bundled_data(hardware):
+def test_bundled_data(hardware):
     bundled_data = {"foo": b"1,2,3"}
-    ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(
-            bundled_data=bundled_data, sync_hardware=hardware.sync
-        ),
-        loop=asyncio.get_running_loop(),
+    ctx = papi.create_protocol_context(
+        api_version=papi.MAX_SUPPORTED_VERSION,
+        hardware_api=hardware,
+        bundled_data=bundled_data,
     )
+
     assert ctx.bundled_data == bundled_data
 
 
-async def test_extra_labware(get_labware_fixture, hardware):
+def test_extra_labware(get_labware_fixture, hardware):
     fixture_96_plate = get_labware_fixture("fixture_96_plate")
     bundled_labware = {"fixture/fixture_96_plate/1": fixture_96_plate}
-    ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(
-            extra_labware=bundled_labware, sync_hardware=hardware.sync
-        ),
-        loop=asyncio.get_running_loop(),
+    ctx = papi.create_protocol_context(
+        api_version=papi.MAX_SUPPORTED_VERSION,
+        hardware_api=hardware,
+        extra_labware=bundled_labware,
     )
 
     ls1 = ctx.load_labware("fixture_96_plate", 3, namespace="fixture")
@@ -1148,55 +1117,45 @@ async def test_extra_labware(get_labware_fixture, hardware):
     assert ctx.loaded_labwares[3]._implementation.get_definition() == fixture_96_plate
 
 
-async def test_api_version_checking(hardware):
+def test_api_version_checking(hardware):
     minor_over = APIVersion(
         papi.MAX_SUPPORTED_VERSION.major,
         papi.MAX_SUPPORTED_VERSION.minor + 1,
     )
     with pytest.raises(RuntimeError):
-        papi.ProtocolContext(
-            api_version=minor_over,
-            implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
-        )
+        papi.create_protocol_context(api_version=minor_over, hardware_api=hardware)
 
     major_over = APIVersion(
         papi.MAX_SUPPORTED_VERSION.major + 1,
         papi.MAX_SUPPORTED_VERSION.minor,
     )
     with pytest.raises(RuntimeError):
-        papi.ProtocolContext(
-            api_version=major_over,
-            implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
-        )
+        papi.create_protocol_context(api_version=major_over, hardware_api=hardware)
 
 
-async def test_api_per_call_checking(monkeypatch, hardware):
-    implementation = ProtocolContextImplementation(sync_hardware=hardware.sync)
-
-    ctx = papi.ProtocolContext(
-        implementation=implementation, api_version=APIVersion(1, 9)
+def test_api_per_call_checking(monkeypatch, hardware):
+    ctx = papi.create_protocol_context(
+        api_version=APIVersion(1, 9),
+        hardware_api=hardware,
     )
+
     assert ctx.deck  # 1.9 < 2.0, but api version 1 is excepted from checking
-    monkeypatch.setattr(
-        papi.protocol_context, "MAX_SUPPORTED_VERSION", APIVersion(2, 1)
-    )
-    ctx = papi.ProtocolContext(
-        implementation=implementation, api_version=APIVersion(2, 1)
+
+    ctx = papi.create_protocol_context(
+        api_version=APIVersion(2, 1),
+        hardware_api=hardware,
     )
     # versions > 2.0 are ok
     assert ctx.deck
     # set_rail_lights() was added in 2.5
-    ctx = papi.ProtocolContext(
-        implementation=implementation, api_version=APIVersion(2, 1)
-    )
     with pytest.raises(papi_support.util.APIVersionError):
         ctx.set_rail_lights(on=True)
 
 
 def test_home_plunger(monkeypatch, hardware):
-    ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
+    ctx = papi.create_protocol_context(
         api_version=APIVersion(2, 0),
+        hardware_api=hardware,
     )
     ctx.home()
     instr = ctx.load_instrument("p1000_single", "left")
