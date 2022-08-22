@@ -14,7 +14,7 @@ export interface LabeledValueProps {
   value: number | string
 }
 
-export function LabeledValue(props: LabeledValueProps): JSX.Element {
+export function LabeledValue({ label, value }: LabeledValueProps): JSX.Element {
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
@@ -23,9 +23,9 @@ export function LabeledValue(props: LabeledValueProps): JSX.Element {
       paddingY={SPACING.spacing3}
     >
       <StyledText as="h6" color={COLORS.darkGreyEnabled}>
-        {props.label}
+        {label}
       </StyledText>
-      <StyledText as="p">{props.value}</StyledText>
+      <StyledText as="p">{value}</StyledText>
     </Flex>
   )
 }

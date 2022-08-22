@@ -1,11 +1,9 @@
 import path from 'path'
-import startCase from 'lodash/startCase'
 import uniq from 'lodash/uniq'
 import { createSelector } from 'reselect'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
-import { fileIsJson } from './protocol-data'
 import { createLogger } from '../../logger'
 import * as PipetteConstants from '../pipettes/constants'
 
@@ -193,39 +191,6 @@ export const getProtocolCreatorApp: (
     version: displayData.appVersion,
   }
 })
-
-export const getProtocolApiVersion = (state: State): string | null => {
-  // TODO(mc, 2019-11-26): did not import due to circular dependency
-  // protocol API level should probably be part of protocol state
-  const level = state.robot.session.apiLevel
-
-  return level != null ? level.join('.') : null
-}
-
-const METHOD_OT_API = 'Python Protocol API'
-const METHOD_UNKNOWN = 'Unknown Application'
-
-export const getProtocolMethod: (
-  state: State
-) => string | null = createSelector(
-  getProtocolFile,
-  getProtocolContents,
-  getProtocolData,
-  getProtocolCreatorApp,
-  getProtocolApiVersion,
-  (file, contents, data, app, apiVersion) => {
-    const isJson = file && fileIsJson(file)
-    const jsonAppName = app.name
-      ? startCase(app.name.replace(/^opentrons\//, ''))
-      : METHOD_UNKNOWN
-    const jsonAppVersion = app.version ? ` v${app.version}` : ''
-    const readableJsonName = isJson ? `${jsonAppName}${jsonAppVersion}` : null
-
-    if (!file || !contents) return null
-    if (readableJsonName) return readableJsonName
-    return `${METHOD_OT_API}${apiVersion !== null ? ` v${apiVersion}` : ''}`
-  }
-)
 
 export const getProtocolPipetteTipRacks: (
   state: State
