@@ -93,23 +93,12 @@ class OptionalSingleLocationPayload(TypedDict):
     location: Union[Location, Well, None]
 
 
-HasLocationPayload = Union[
-    SingleLocationPayload,
-    MultiLocationPayload,
-    OptionalSingleLocationPayload,
-    OptionalMultiLocationPayload,
-]
-
-
 class SingleInstrumentPayload(TypedDict):
     instrument: InstrumentContext
 
 
 class MultiInstrumentPayload(TypedDict):
     instruments: Sequence[InstrumentContext]
-
-
-HasInstrumentPayload = Union[SingleInstrumentPayload, MultiInstrumentPayload]
 
 
 class CommentCommandPayload(TextOnlyPayload):
