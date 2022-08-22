@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
 import {
@@ -17,14 +18,18 @@ import { useRobot, useSyncRobotClock } from '../../../organisms/Devices/hooks'
 import { PipettesAndModules } from '../../../organisms/Devices/PipettesAndModules'
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
+import { getScanning } from '../../../redux/discovery'
 
 import type { NavRouteParams } from '../../../App/types'
 
 export function DeviceDetails(): JSX.Element | null {
   const { robotName } = useParams<NavRouteParams>()
   const robot = useRobot(robotName)
+  const isScanning = useSelector(getScanning)
 
   useSyncRobotClock(robotName)
+
+  if (robot == null && isScanning) return null
 
   return robot != null ? (
     <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
@@ -59,7 +64,9 @@ export function DeviceDetails(): JSX.Element | null {
     /* eslint-disable */
     <div style={{ fontFamily: 'courier', marginLeft: '8px' }}>
       <br />
+      <div>
       Can't find robot!
+      </div>
       <br />
       <br />
       MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMWX0KNMMMMMMMMMMMMMMMMMMMMMMMMM
