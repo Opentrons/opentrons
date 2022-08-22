@@ -1,5 +1,5 @@
 #!/bin/sh
-# Wrapper script to run the hardware control repl with correct
+# Wrapper script to run the hardware control ot3gripper with correct
 # environment variables. Should be installed to path; run with
 # ot3gripper
 orig=$(pwd)
