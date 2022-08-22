@@ -126,6 +126,52 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
   },
 }
 
+const DIRECTION_CONTROL_LAYOUT = css`
+  display: flex;
+
+  @media (max-width: 750px) {
+    flex-direction: column;
+  }
+`
+
+export const PRIMARY_BUTTON_STYLING = css`
+  @media (max-width: 750px) {
+    flex-direction: row;
+  }
+
+  button {
+    background-color: ${COLORS.white};
+
+    &:hover {
+      background-color: ${COLORS.white};
+      color: ${COLORS.black};
+      box-shadow: 0 0 0;
+      border: 1px ${COLORS.lightGreyHover} solid;
+    }
+
+    &:active {
+      background-color: ${COLORS.white};
+      color: ${COLORS.blueEnabled};
+      border: 1px ${COLORS.blueEnabled} solid;
+    }
+
+    &:disabled {
+      background-color: inherit;
+      color: ${COLORS.errorDisabled};
+    }
+  }
+`
+
+export const ACTIVE_STYLE = css`
+  background-color: ${COLORS.white};
+  color: ${COLORS.blueEnabled};
+  border: 1px ${COLORS.blueEnabled} solid;
+`
+
+export const DEFAULT_STYLE = css`
+  background-color: ${COLORS.white};
+`
+
 interface DirectionControlProps {
   planes: Plane[]
   jog: Jog
@@ -141,40 +187,6 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
   )
   const { t } = useTranslation(['robot_calibration'])
 
-  const DIRECTION_BUTTON_STYLING = css`
-    button {
-      background-color: white;
-
-      &:hover {
-        background-color: ${COLORS.white};
-        color: ${COLORS.black};
-        box-shadow: 0 0 0;
-        border: 1px ${COLORS.lightGreyHover} solid;
-      }
-
-      &:active {
-        background-color: ${COLORS.white};
-        color: ${COLORS.blueEnabled};
-        border: 1px ${COLORS.blueEnabled} solid;
-      }
-
-      &:disabled {
-        background-color: inherit;
-        color: ${COLORS.errorDisabled};
-      }
-    }
-  `
-
-  const ACTIVE_STYLE = css`
-    background-color: ${COLORS.white};
-    color: ${COLORS.blueEnabled};
-    border: 1px ${COLORS.blueEnabled} solid;
-  `
-
-  const DEFAULT_STYLE = css`
-    background-color: ${COLORS.white};
-  `
-
   const handlePlane = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setCurrentPlane(event.currentTarget.value as Plane)
     event.currentTarget.blur()
@@ -182,11 +194,11 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
 
   return (
     <ControlContainer title={t('direction_controls')}>
-      <Flex flexDirection={DIRECTION_ROW}>
+      <Flex flexDirection={DIRECTION_ROW} css={DIRECTION_CONTROL_LAYOUT}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          css={DIRECTION_BUTTON_STYLING}
+          css={PRIMARY_BUTTON_STYLING}
         >
           {planes.map((plane: Plane) => {
             const { title, subtitle } = CONTROLS_CONTENTS_BY_PLANE[plane]
@@ -195,8 +207,8 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                 <PrimaryButton
                   title={plane}
                   css={currentPlane === plane ? ACTIVE_STYLE : DEFAULT_STYLE}
-                  minWidth="157px"
-                  height="58px"
+                  minWidth="9.81rem"
+                  height="3.62rem"
                   backgroundColor={COLORS.white}
                   color={COLORS.black}
                   marginRight={SPACING.spacing4}
@@ -263,8 +275,14 @@ export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
   const controls = CONTROLS_CONTENTS_BY_PLANE[plane].controls
 
   const ARROW_BUTTON_STYLING = css`
+    @media (max-width: 750px) {
+      margin-top: 50px;
+      margin-bottom: 50px;
+      margin-left: auto;
+    }
+
     button {
-      background-color: white;
+      background-color: ${COLORS.white};
 
       &:hover {
         background-color: ${COLORS.white};
@@ -276,7 +294,7 @@ export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
       &:active {
         background-color: ${COLORS.white};
         color: ${COLORS.darkGreyPressed};
-        border: 1px #16212d40 solid;
+        border: 1px ${COLORS.lightGreyHover} solid;
       }
 
       &:focus {

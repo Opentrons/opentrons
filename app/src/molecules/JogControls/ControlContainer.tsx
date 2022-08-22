@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   BORDERS,
+  Box,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -16,25 +17,28 @@ interface ControlContainerProps {
 
 export const ControlContainer = (props: ControlContainerProps): JSX.Element => {
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
-      <StyledText
-        textTransform={TYPOGRAPHY.textTransformUppercase}
-        color={COLORS.darkGreyEnabled}
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-        fontSize={TYPOGRAPHY.fontSizeH6}
-        marginY={SPACING.spacing3}
-      >
-        {props.title}
-      </StyledText>
-      <Flex
-        backgroundColor={COLORS.fundamentalsBackground}
-        borderRadius={BORDERS.radiusSoftCorners}
-        padding={SPACING.spacing4}
-        width="365px"
-        height="156px"
-      >
-        {props.children}
+    <Box flex="50%" margin={SPACING.spacing2}>
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <StyledText
+          textTransform={TYPOGRAPHY.textTransformUppercase}
+          color={COLORS.darkGreyEnabled}
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          fontSize={TYPOGRAPHY.fontSizeH6}
+          marginY={SPACING.spacing3}
+        >
+          {props.title}
+        </StyledText>
+        <Flex
+          backgroundColor={COLORS.fundamentalsBackground}
+          borderRadius={BORDERS.radiusSoftCorners}
+          padding={SPACING.spacing4}
+          margin={SPACING.spacing1}
+          width="100%"
+          height="9.75rem"
+        >
+          {props.children}
+        </Flex>
       </Flex>
-    </Flex>
+    </Box>
   )
 }

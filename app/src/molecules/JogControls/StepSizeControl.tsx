@@ -1,4 +1,3 @@
-// jog controls component
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -11,6 +10,7 @@ import {
   Flex,
   DIRECTION_ROW,
   TEXT_TRANSFORM_CAPITALIZE,
+  Box,
 } from '@opentrons/components'
 import { ControlContainer } from './ControlContainer'
 
@@ -60,8 +60,17 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   }
 
   const STEP_SIZE_BUTTON_STYLING = css`
+    display: grid;
+    grid-auto-flow: column;
+    gap: 1rem;
+
+    @media (max-width: 750px) {
+      grid-template-columns: none;
+      grid-template-rows: repeat(3, minmax(auto, 50%));
+    }
+
     button {
-      background-color: white;
+      background-color: ${COLORS.white};
 
       &:hover {
         background-color: ${COLORS.white};
@@ -109,7 +118,6 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
             <Icon name="jump-size" width="1.2rem" css={JUMP_SIZE_ICON_STYLE} />
             <StyledText
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
-              color={COLORS.black}
               css={TYPOGRAPHY.pSemiBold}
               marginLeft={SPACING.spacing3}
             >
@@ -122,11 +130,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
           >
             {STEP_SIZE_SUBTITLE}
           </StyledText>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            marginY={SPACING.spacing4}
-            css={STEP_SIZE_BUTTON_STYLING}
-          >
+          <Box marginY={SPACING.spacing4} css={STEP_SIZE_BUTTON_STYLING}>
             {stepSizes.map((stepSize: StepSize, index) => {
               return (
                 <PrimaryButton
@@ -134,8 +138,8 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
                   css={
                     currentStepSize === stepSize ? ACTIVE_STYLE : DEFAULT_STYLE
                   }
-                  minWidth="5.979rem"
                   height="3.125rem"
+                  width="100%"
                   backgroundColor={COLORS.white}
                   color={COLORS.black}
                   marginRight={SPACING.spacing4}
@@ -150,7 +154,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
                 </PrimaryButton>
               )
             })}
-          </Flex>
+          </Box>
         </Flex>
       </HandleKeypress>
     </ControlContainer>
