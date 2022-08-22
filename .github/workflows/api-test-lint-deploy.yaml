@@ -45,13 +45,13 @@ jobs:
   lint:
     name: 'opentrons package linting'
     timeout-minutes: 10
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - uses: 'actions/setup-python@v2'
+      - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.7'
 
@@ -66,7 +66,7 @@ jobs:
     needs: [lint]
     strategy:
       matrix:
-        os: ['windows-2019', 'ubuntu-18.04', 'macos-latest']
+        os: ['windows-2019', 'ubuntu-22.04', 'macos-latest']
         # TODO(mc, 2022-02-24): expand this matrix to 3.8 and 3.9,
         # preferably in a nightly cronjob on edge or something
         python: ['3.7', '3.10']
@@ -82,15 +82,15 @@ jobs:
             with-ot-hardware: 'true'
     runs-on: '${{ matrix.os }}'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - uses: 'actions/setup-python@v2'
+      - uses: 'actions/setup-python@v4'
         with:
           python-version: ${{ matrix.python }}
       - name: 'set complex environment variables'
-        uses: actions/github-script@v3.1
+        uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
@@ -121,18 +121,18 @@ jobs:
   deploy:
     name: 'deploy opentrons package'
     needs: [test]
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     if: github.event_name == 'push'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - uses: 'actions/setup-python@v2'
+      - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.7'
       - name: 'set complex environment variables'
-        uses: actions/github-script@v3.1
+        uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
