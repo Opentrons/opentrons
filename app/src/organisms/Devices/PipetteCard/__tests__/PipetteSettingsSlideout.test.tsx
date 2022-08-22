@@ -1,27 +1,41 @@
 import * as React from 'react'
-import { resetAllWhenMocks } from 'jest-when'
-import { renderWithProviders } from '@opentrons/components'
+import { resetAllWhenMocks, when } from 'jest-when'
+import { waitFor } from '@testing-library/dom'
 import { fireEvent } from '@testing-library/react'
+import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import * as RobotApi from '../../../../redux/robot-api'
-import { ConfigurePipette } from '../../../ConfigurePipette'
+import {
+  getAttachedPipetteSettingsFieldsById,
+  updatePipetteSettings,
+} from '../../../../redux/pipettes'
+import { getConfig } from '../../../../redux/config'
 import { PipetteSettingsSlideout } from '../PipetteSettingsSlideout'
 
-import { mockLeftSpecs } from '../../../../redux/pipettes/__fixtures__'
+import {
+  mockLeftSpecs,
+  mockPipetteSettingsFieldsMap,
+} from '../../../../redux/pipettes/__fixtures__'
 
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
+import type { UpdatePipetteSettingsAction } from '../../../../redux/pipettes/types'
 
-jest.mock('../../../ConfigurePipette')
 jest.mock('../../../../redux/robot-api')
+jest.mock('../../../../redux/config')
+jest.mock('../../../../redux/pipettes')
 
-const mockConfigurePipette = ConfigurePipette as jest.MockedFunction<
-  typeof ConfigurePipette
->
+const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 const mockUseDispatchApiRequest = RobotApi.useDispatchApiRequest as jest.MockedFunction<
   typeof RobotApi.useDispatchApiRequest
 >
 const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
   typeof RobotApi.getRequestById
+>
+const mockGetAttachedPipetteSettingsFieldsById = getAttachedPipetteSettingsFieldsById as jest.MockedFunction<
+  typeof getAttachedPipetteSettingsFieldsById
+>
+const mockUpdatePipetteSettings = updatePipetteSettings as jest.MockedFunction<
+  typeof updatePipetteSettings
 >
 
 const render = (
@@ -32,7 +46,7 @@ const render = (
   })[0]
 }
 
-const mockRobotName = 'mock robotName'
+const mockRobotName = 'mockRobotName'
 
 describe('PipetteSettingsSlideout', () => {
   let dispatchApiRequest: DispatchApiRequestType
@@ -56,24 +70,65 @@ describe('PipetteSettingsSlideout', () => {
         status: 200,
       },
     })
+    mockGetConfig.mockReturnValue({} as any)
+    mockGetAttachedPipetteSettingsFieldsById.mockReturnValue(
+      mockPipetteSettingsFieldsMap
+    )
     dispatchApiRequest = jest.fn()
-    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, ['id']])
-    mockConfigurePipette.mockReturnValue(<div>mock configure pipette</div>)
+    when(mockUseDispatchApiRequest)
+      .calledWith()
+      .mockReturnValue([dispatchApiRequest, ['id']])
   })
   afterEach(() => {
     jest.resetAllMocks()
-  })
-  afterEach(() => {
     resetAllWhenMocks()
   })
 
-  it('renders correct text', () => {
-    const { getByText, getByRole } = render(props)
+  it('renders correct heading and number of text boxes', () => {
+    const { getByRole, getAllByRole } = render(props)
 
-    getByText('Left Pipette Settings')
-    getByText('mock configure pipette')
+    getByRole('heading', { name: 'Left Pipette Settings' })
+    const inputs = getAllByRole('textbox')
+    expect(inputs.length).toBe(9)
+  })
+
+  it('renders close button that calls props.onCloseClick when clicked', () => {
+    const { getByRole } = render(props)
+
     const button = getByRole('button', { name: /exit/i })
     fireEvent.click(button)
     expect(props.onCloseClick).toHaveBeenCalled()
+  })
+
+  it('renders confirm button and calls dispatchApiRequest with updatePipetteSettings action object when clicked', async () => {
+    const { getByRole } = render(props)
+    const button = getByRole('button', { name: 'Confirm' })
+
+    when(mockUpdatePipetteSettings)
+      .calledWith(
+        mockRobotName,
+        props.pipetteId,
+        expect.objectContaining({
+          blowout: 2,
+          bottom: 3,
+          dropTip: 1,
+          dropTipCurrent: null,
+          dropTipSpeed: null,
+          pickUpCurrent: null,
+          pickUpDistance: null,
+          plungerCurrent: null,
+          top: 4,
+        })
+      )
+      .mockReturnValue({
+        type: 'pipettes:UPDATE_PIPETTE_SETTINGS',
+      } as UpdatePipetteSettingsAction)
+
+    fireEvent.click(button)
+    await waitFor(() => {
+      expect(dispatchApiRequest).toHaveBeenCalledWith({
+        type: 'pipettes:UPDATE_PIPETTE_SETTINGS',
+      })
+    })
   })
 })

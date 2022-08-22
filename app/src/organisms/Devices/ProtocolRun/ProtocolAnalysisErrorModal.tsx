@@ -10,7 +10,7 @@ import {
 
 import { Portal } from '../../../App/portal'
 import { StyledText } from '../../../atoms/text'
-import { Modal } from '../../../atoms/Modal'
+import { Modal } from '../../../molecules/Modal'
 import { PrimaryButton } from '../../../atoms/buttons'
 
 import type { AnalysisError } from '@opentrons/shared-data'

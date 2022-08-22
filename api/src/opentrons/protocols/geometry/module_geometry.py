@@ -14,7 +14,7 @@ from typing import Mapping, Optional, Union, TYPE_CHECKING
 import numpy as np
 import jsonschema  # type: ignore[import]
 
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
+from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 
 from opentrons_shared_data import module
 from opentrons_shared_data.labware.dev_types import LabwareUri

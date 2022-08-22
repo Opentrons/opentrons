@@ -3,8 +3,6 @@
 // out because RPC-based analytics events were not replaced with
 // the switch to the HTTP APIs. Commented out code left to aid with
 // analytics replacement.
-import { createLogger } from '../../logger'
-import { getConnectedRobot } from '../discovery'
 import * as CustomLabware from '../custom-labware'
 import * as SystemInfo from '../system-info'
 import * as brActions from '../buildroot/constants'
@@ -15,8 +13,6 @@ import { sharedCalCommands } from '../sessions/common-calibration/constants'
 import * as RobotAdmin from '../robot-admin'
 
 import {
-  getProtocolAnalyticsData,
-  getRobotAnalyticsData,
   getBuildrootAnalyticsData,
   getAnalyticsPipetteCalibrationData,
   getAnalyticsTipLengthCalibrationData,
@@ -30,8 +26,6 @@ import type { State, Action } from '../types'
 import type { AnalyticsEvent } from './types'
 import type { Mount } from '../pipettes/types'
 
-const log = createLogger(__filename)
-
 const EVENT_APP_UPDATE_DISMISSED = 'appUpdateDismissed'
 
 export function makeEvent(
@@ -39,35 +33,35 @@ export function makeEvent(
   state: State
 ): Promise<AnalyticsEvent | null> {
   switch (action.type) {
-    case 'robot:CONNECT': {
-      const robot = getConnectedRobot(state)
+    // case 'robot:CONNECT': {
+    //   const robot = getConnectedRobot(state)
 
-      if (!robot) {
-        log.warn('No robot found for connect response')
-        return Promise.resolve(null)
-      }
+    //   if (!robot) {
+    //     log.warn('No robot found for connect response')
+    //     return Promise.resolve(null)
+    //   }
 
-      const data = getRobotAnalyticsData(state)
+    //   const data = getRobotAnalyticsData(state)
 
-      return Promise.resolve({
-        name: 'robotConnect',
-        properties: {
-          ...data,
-          method: robot.local ? 'usb' : 'wifi',
-          success: true,
-        },
-      })
-    }
+    //   return Promise.resolve({
+    //     name: 'robotConnect',
+    //     properties: {
+    //       ...data,
+    //       method: robot.local ? 'usb' : 'wifi',
+    //       success: true,
+    //     },
+    //   })
+    // }
 
-    case 'protocol:LOAD': {
-      return getProtocolAnalyticsData(state).then(data => ({
-        name: 'protocolUploadRequest',
-        properties: {
-          ...getRobotAnalyticsData(state),
-          ...data,
-        },
-      }))
-    }
+    // case 'protocol:LOAD': {
+    //   return getProtocolAnalyticsData(state).then(data => ({
+    //     name: 'protocolUploadRequest',
+    //     properties: {
+    //       ...getRobotAnalyticsData(state),
+    //       ...data,
+    //     },
+    //   }))
+    // }
 
     // case 'robot:SESSION_RESPONSE':
     // case 'robot:SESSION_ERROR': {

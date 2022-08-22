@@ -17,6 +17,7 @@ export interface HealthResponse {
   protocol_api_version?: [number, number]
   minimum_protocol_api_version?: [number, number]
   maximum_protocol_api_version?: [number, number]
+  robot_model?: string
 }
 
 export type Capability =
@@ -39,6 +40,7 @@ export interface ServerHealthResponse {
   systemVersion: string
   capabilities?: CapabilityMap
   bootId?: string
+  robotModel?: string
 }
 
 export interface HealthErrorResponse {

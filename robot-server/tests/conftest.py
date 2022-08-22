@@ -23,7 +23,7 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons import config
 from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
+from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.calibration_storage import delete, modify, helpers
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Mount
@@ -264,13 +264,13 @@ def session_manager(hardware: HardwareControlAPI) -> SessionManager:
 
 
 @pytest.fixture
-def set_enable_http_protocol_sessions(
+def set_disable_fast_analysis(
     request_session: requests.Session,
 ) -> Iterator[None]:
     """For integration tests that need to set then clear the
     enableHttpProtocolSessions feature flag"""
     url = "http://localhost:31950/settings"
-    data = {"id": "enableHttpProtocolSessions", "value": True}
+    data = {"id": "disableFastProtocolUpload", "value": True}
     request_session.post(url, json=data)
     yield None
     data["value"] = None

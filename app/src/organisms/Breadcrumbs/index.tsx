@@ -1,5 +1,7 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { useLocation } from 'react-router'
 import { Link, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -21,9 +23,8 @@ import {
   useRunCreatedAtTimestamp,
 } from '../../organisms/Devices/hooks'
 import { getProtocolDisplayName } from '../../organisms/ProtocolsLanding/utils'
+import { getIsOnDevice } from '../../redux/config'
 import { getStoredProtocol } from '../../redux/protocol-storage'
-import { usePathCrumbs } from './hooks'
-import { getLinkPath } from './utils'
 
 import type { NavRouteParams } from '../../App/types'
 import type { State } from '../../redux/types'
@@ -34,31 +35,6 @@ interface CrumbNameProps {
 }
 
 function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
-  const { protocolKey, runId } = useParams<NavRouteParams>()
-
-  const runCreatedAtTimestamp = useRunCreatedAtTimestamp(runId)
-
-  const storedProtocol = useSelector((state: State) =>
-    getStoredProtocol(state, protocolKey)
-  )
-  const protocolDisplayName =
-    storedProtocol != null
-      ? getProtocolDisplayName(
-          storedProtocol.protocolKey,
-          storedProtocol.srcFileNames,
-          storedProtocol.mostRecentAnalysis
-        )
-      : protocolKey
-
-  /**
-   * To display breadcrumb segments as param-based data rather than the params themselves,
-   * we can index the desired display names by the params pulled from the matched route
-   */
-  const crumbDisplayNameByParam: { [k: string]: string } = {
-    [protocolKey]: protocolDisplayName,
-    [runId]: runCreatedAtTimestamp,
-  }
-
   return (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -69,7 +45,7 @@ function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
         textTransform={TYPOGRAPHY.textTransformNone}
         css={TYPOGRAPHY.labelRegular}
       >
-        {crumbDisplayNameByParam[crumbName] ?? crumbName}
+        {crumbName}
       </Box>
       {!isLastCrumb ? (
         <Icon name="caret-right" width="0.25rem" height="0.3125rem" />
@@ -90,40 +66,93 @@ const CrumbLinkInactive = styled(Flex)`
   }
 `
 
+function BreadcrumbsComponent(): JSX.Element | null {
+  const { t } = useTranslation('top_navigation')
+  const isOnDevice = useSelector(getIsOnDevice)
+
+  const { protocolKey, robotName, runId } = useParams<NavRouteParams>()
+
+  const runCreatedAtTimestamp = useRunCreatedAtTimestamp(runId)
+
+  const storedProtocol = useSelector((state: State) =>
+    getStoredProtocol(state, protocolKey)
+  )
+  const protocolDisplayName =
+    storedProtocol != null
+      ? getProtocolDisplayName(
+          storedProtocol.protocolKey,
+          storedProtocol.srcFileNames,
+          storedProtocol.mostRecentAnalysis
+        )
+      : protocolKey
+
+  // determines whether a crumb is displayed for a path, and the displayed name
+  const crumbNameByPath: { [index: string]: string | null } = {
+    '/devices': !isOnDevice ? t('devices') : null,
+    [`/devices/${robotName}`]: robotName,
+    [`/devices/${robotName}/robot-settings`]: t('robot_settings'),
+    [`/devices/${robotName}/protocol-runs/${runId}`]: runCreatedAtTimestamp,
+
+    '/protocols': t('protocols'),
+    [`/protocols/${protocolKey}`]: protocolDisplayName,
+  }
+
+  // create an array of crumbs based on the pathname and defined names by path
+  const { pathname } = useLocation()
+  const pathArray = pathname.split('/')
+
+  const pathCrumbs = pathArray.flatMap((_, i) => {
+    const linkPath = pathArray.slice(0, i + 1).join('/')
+    const crumbName = crumbNameByPath[linkPath]
+
+    // filter out null or undefined crumb names
+    return crumbName != null
+      ? [
+          {
+            linkPath,
+            crumbName,
+          },
+        ]
+      : []
+  })
+
+  return pathCrumbs.length > 1 ? (
+    <Flex
+      alignItems={ALIGN_FLEX_START}
+      backgroundColor={COLORS.white}
+      borderBottom={`1px solid ${COLORS.medGreyEnabled}`}
+      css={TYPOGRAPHY.labelRegular}
+      flexDirection={DIRECTION_ROW}
+      padding={`${SPACING.spacing2} 0 ${SPACING.spacing2} ${SPACING.spacing3}`}
+    >
+      {pathCrumbs.map((crumb, i) => {
+        const isLastCrumb = i === pathCrumbs.length - 1
+
+        return (
+          <Flex key={crumb.linkPath} paddingRight={SPACING.spacing2}>
+            <CrumbLink
+              as={!isLastCrumb ? CrumbLink : CrumbLinkInactive}
+              to={crumb.linkPath}
+            >
+              <CrumbName
+                crumbName={crumb.crumbName}
+                isLastCrumb={isLastCrumb}
+              />
+            </CrumbLink>
+          </Flex>
+        )
+      })}
+    </Flex>
+  ) : null
+}
+
 export function Breadcrumbs(): JSX.Element | null {
   const { robotName } = useParams<NavRouteParams>()
   const robot = useRobot(robotName)
-  const pathCrumbs = usePathCrumbs()
 
-  return pathCrumbs.length > 1 ? (
+  return (
     <ApiHostProvider hostname={robot?.ip ?? null}>
-      <Flex
-        alignItems={ALIGN_FLEX_START}
-        backgroundColor={COLORS.white}
-        borderBottom={`1px solid ${COLORS.medGreyEnabled}`}
-        css={TYPOGRAPHY.labelRegular}
-        flexDirection={DIRECTION_ROW}
-        padding={`${SPACING.spacing2} 0 ${SPACING.spacing2} ${SPACING.spacing3}`}
-      >
-        {pathCrumbs.map((crumb, i) => {
-          const linkPath = getLinkPath(pathCrumbs, i)
-          const isLastCrumb = i === pathCrumbs.length - 1
-
-          return (
-            <Flex key={crumb.pathSegment} paddingRight={SPACING.spacing2}>
-              <CrumbLink
-                as={!isLastCrumb ? CrumbLink : CrumbLinkInactive}
-                to={linkPath}
-              >
-                <CrumbName
-                  crumbName={crumb.crumbName}
-                  isLastCrumb={isLastCrumb}
-                />
-              </CrumbLink>
-            </Flex>
-          )
-        })}
-      </Flex>
+      <BreadcrumbsComponent />
     </ApiHostProvider>
-  ) : null
+  )
 }
