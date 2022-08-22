@@ -1,5 +1,4 @@
 import os
-import sys
 import asyncio
 import time
 from multiprocessing import Process
