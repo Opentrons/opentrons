@@ -2,5 +2,17 @@
   "attach_pipette": "Attach a pipette",
   "detach_pipette": "Detach {{pipette}} from {{mount}} Mount",
   "remove_labware_before_start": "<h1>Before you begin</h1><block>Before starting, remove all labware from the deck and all tips from pipettes. The gantry will move to the front of the robot.</block>",
-  "get_started": "Get started"
+  "get_started": "Get started",
+  "loosen_the_screws": "<h1>Loosen the screws</h1><block>Using a 2.5 mm screwdriver, loosen the three screws on the back of the pipette that is currently attached.</block>",
+  "remove_pipette": "<h1>Remove the pipette</h1><block>Hold onto the pipette so it does not fall. Disconnect the pipette from the robot by pulling the white connector tab.</block>",
+  "confirm_detachment": "Confirm detachment",
+  "continue": "Continue",
+  "go_back": "Go back",
+  "confirm_attachment": "Confirm attachment",
+  "choose_pipette": "Choose a pipette to attach",
+  "insert_screws": "<h1>Insert screws</h1><block>Using a 2.5 mm screwdriver, insert the the three screws on the back of the pipette.</block>",
+  "attach_the_pipette": "<h1>Attach the pipette</h1><block>Push in the white connector tab until you feel it plug into the pipette.</block>",
+  "tighten_screws_single": "Starting with screw #1, tighten the screws with a clockwise motion.",
+  "tighten_screws_multi": "<block>Starting with screw #1, <strong>loosely</strong> tighten the screws with a clockwise motion. You will tighten them fully in a later step.</block>",
+  "attach_pipette_type": "Attach a {{pipetteName}} Pipette"
 }
