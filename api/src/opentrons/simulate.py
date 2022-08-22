@@ -35,7 +35,7 @@ import opentrons.broker
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons import protocol_api
 from opentrons.commands import types as command_types
-from opentrons.protocols.context.protocol_api.protocol_context import (
+from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
 from opentrons.protocols import parse, bundle

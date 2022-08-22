@@ -1,4 +1,4 @@
-"""Context simulation.
+"""Legacy protocol simulation core.
 
 One way of simulating a Protocol API v2 protocol (e.g. to detect equipment requirements)
 is to simulate at the level of the hardware API. However, this is slow.

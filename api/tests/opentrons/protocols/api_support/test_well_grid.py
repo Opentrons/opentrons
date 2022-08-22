@@ -2,7 +2,7 @@ from typing import List
 
 import pytest
 from opentrons.protocols.api_support.well_grid import WellGrid
-from opentrons.protocols.context.well import WellImplementation
+from opentrons.protocol_api.core.well import WellImplementation
 
 NONE: list = []
 ONE_VAL = ["A1"]

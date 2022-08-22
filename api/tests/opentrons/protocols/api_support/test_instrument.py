@@ -8,7 +8,7 @@ from opentrons.protocols.api_support.instrument import (
     validate_can_dispense,
 )
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.context.well import WellImplementation
+from opentrons.protocol_api.core.well import WellImplementation
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Point
 

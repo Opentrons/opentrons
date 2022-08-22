@@ -8,9 +8,9 @@ from opentrons.types import Mount
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.context.protocol import AbstractProtocol
+from opentrons.protocol_api.core.protocol import AbstractProtocol
 
-from opentrons.protocols.context.protocol_api.instrument_context import (
+from opentrons.protocol_api.core.protocol_api.instrument_context import (
     InstrumentContextImplementation,
 )
 

@@ -2,7 +2,7 @@
 import asyncio
 import pytest
 import opentrons.protocol_api as papi
-from opentrons.protocols.context.protocol_api.protocol_context import (
+from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
 from opentrons.types import Mount, TransferTipPolicy

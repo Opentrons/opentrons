@@ -1,13 +1,11 @@
 import logging
 
 from opentrons import types
-from opentrons.protocols.context.instrument import AbstractInstrument
-from opentrons.protocols.context.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
-)
-from opentrons.protocols.context.simulator.instrument_context import (
-    InstrumentContextSimulation,
-)
+
+from ..instrument import AbstractInstrument
+from ..protocol_api.protocol_context import ProtocolContextImplementation
+
+from .instrument_context import InstrumentContextSimulation
 
 
 logger = logging.getLogger(__name__)

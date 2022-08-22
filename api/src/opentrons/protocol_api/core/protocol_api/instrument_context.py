@@ -13,9 +13,10 @@ from opentrons.protocols.api_support.util import (
     PlungerSpeeds,
 )
 from opentrons.protocols.geometry import planning
-from opentrons.protocols.context.instrument import AbstractInstrument
-from opentrons.protocols.context.protocol import AbstractProtocol
-from opentrons.protocols.context.well import WellImplementation
+
+from ..instrument import AbstractInstrument
+from ..protocol import AbstractProtocol
+from ..well import WellImplementation
 
 
 class InstrumentContextImplementation(AbstractInstrument):
@@ -230,9 +231,13 @@ class InstrumentContextImplementation(AbstractInstrument):
     def get_pipette(self) -> PipetteDict:
         """Get the hardware pipette dictionary."""
         sync_hw_api = self._protocol_interface.get_hardware()
-        pipette = sync_hw_api.get_attached_instrument(self._mount)
+        pipette: Optional[PipetteDict] = sync_hw_api.get_attached_instrument(
+            self._mount
+        )
+
         if pipette is None:
             raise types.PipetteNotAttachedError()
+
         return pipette
 
     def get_channels(self) -> int:

@@ -8,15 +8,16 @@ from typing import Dict, Optional
 
 from opentrons import types
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
+from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
-from opentrons.protocols.context.instrument import AbstractInstrument
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
-from opentrons.protocols.context.labware import AbstractLabware
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
+from .instrument import AbstractInstrument
+from .labware import AbstractLabware
 
 InstrumentDict = Dict[types.Mount, Optional[AbstractInstrument]]
 
@@ -27,7 +28,7 @@ class LoadModuleResult:
 
     type: ModuleType
     geometry: ModuleGeometry
-    module: SynchronousAdapter
+    module: SynchronousAdapter[AbstractModule]
 
 
 class AbstractProtocol(ABC):
