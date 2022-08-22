@@ -24,16 +24,12 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
-from opentrons.protocols.context.instrument import AbstractInstrument
-from opentrons.protocol_api.module_contexts import (
-    ThermocyclerContext,
-    HeaterShakerContext,
-)
-
+from .core.instrument import AbstractInstrument
+from .module_contexts import ThermocyclerContext, HeaterShakerContext
 from . import labware
 
 if TYPE_CHECKING:
-    from opentrons.protocol_api import ProtocolContext
+    from .protocol_context import ProtocolContext
 
 AdvancedLiquidHandling = Union[
     labware.Well,

@@ -3,12 +3,14 @@ from typing import List, Dict, Optional
 from opentrons.calibration_storage import helpers
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.api_support.tip_tracker import TipTracker
-from opentrons.protocols.context.well import WellImplementation
+
 from opentrons.protocols.api_support.well_grid import WellGrid
 from opentrons.types import Point, Location
 from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
+
+from ..labware import AbstractLabware
+from ..well import WellImplementation
 
 
 class LabwareImplementation(AbstractLabware):
@@ -104,7 +106,7 @@ class LabwareImplementation(AbstractLabware):
     def get_tip_length(self) -> float:
         return self._parameters["tipLength"]
 
-    def set_tip_length(self, length: float):
+    def set_tip_length(self, length: float) -> None:
         self._parameters["tipLength"] = length
 
     def reset_tips(self) -> None:
@@ -128,7 +130,7 @@ class LabwareImplementation(AbstractLabware):
         return self._geometry
 
     @property
-    def highest_z(self):
+    def highest_z(self) -> float:
         return self._geometry.z_dimension + self._calibrated_offset.z
 
     @property

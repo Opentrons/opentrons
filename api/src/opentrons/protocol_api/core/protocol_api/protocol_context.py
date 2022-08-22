@@ -9,22 +9,18 @@ from opentrons.hardware_control.types import DoorState, PauseType
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
-from opentrons.protocols.context.protocol_api.instrument_context import (
-    InstrumentContextImplementation,
-)
-from opentrons.protocols.context.instrument import AbstractInstrument
-from opentrons.protocols.context.labware import AbstractLabware
-from opentrons.protocols.context.protocol import (
-    AbstractProtocol,
-    InstrumentDict,
-    LoadModuleResult,
-)
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.labware import load_from_definition, get_labware_definition
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
+from ..instrument import AbstractInstrument
+from ..labware import AbstractLabware
+from ..protocol import AbstractProtocol, InstrumentDict, LoadModuleResult
+
+from .instrument_context import InstrumentContextImplementation
 
 
 logger = logging.getLogger(__name__)
@@ -35,9 +31,9 @@ class ProtocolContextImplementation(AbstractProtocol):
         self,
         sync_hardware: SyncHardwareAPI,
         api_version: Optional[APIVersion] = None,
-        bundled_labware: Dict[str, LabwareDefinition] = None,
-        bundled_data: Dict[str, bytes] = None,
-        extra_labware: Dict[str, LabwareDefinition] = None,
+        bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
+        bundled_data: Optional[Dict[str, bytes]] = None,
+        extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContextImplementation`.
 
@@ -99,7 +95,7 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def is_simulating(self) -> bool:
         """Returns true if hardware is being simulated."""
-        return self._sync_hardware.is_simulator
+        return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
 
     def load_labware_from_definition(
         self,
@@ -258,11 +254,11 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def get_rail_lights_on(self) -> bool:
         """Get the rail light state."""
-        return self._sync_hardware.get_lights()["rails"]
+        return self._sync_hardware.get_lights()["rails"]  # type: ignore[no-any-return]
 
     def door_closed(self) -> bool:
         """Check if door is closed."""
-        return DoorState.CLOSED == self._sync_hardware.door_state
+        return DoorState.CLOSED == self._sync_hardware.door_state  # type: ignore[no-any-return]
 
     def get_last_location(
         self,

@@ -9,9 +9,10 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds, Clearances
 from opentrons.protocols.geometry import planning
-from opentrons.protocols.context.instrument import AbstractInstrument
-from opentrons.protocols.context.protocol import AbstractProtocol
-from opentrons.protocols.context.well import WellImplementation
+
+from ..instrument import AbstractInstrument
+from ..protocol import AbstractProtocol
+from ..well import WellImplementation
 
 
 class InstrumentContextSimulation(AbstractInstrument):
