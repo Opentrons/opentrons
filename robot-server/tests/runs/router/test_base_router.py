@@ -38,7 +38,7 @@ from robot_server.runs.router.base_router import (
     update_run,
 )
 
-from opentrons.protocol_reader import ProtocolFilesInvalidError
+from opentrons.protocol_runner.json_command_translator import CommandTranslatorError
 
 
 @pytest.fixture
@@ -221,7 +221,7 @@ async def test_create_run_invalid_protocol(
     mock_run_data_manager: RunDataManager,
     mock_run_auto_deleter: RunAutoDeleter,
 ) -> None:
-    """Should raise a ProtocolFilesInvalid error."""
+    """Should raise a CommandTranslatorError error."""
     created_at = datetime(year=2021, month=1, day=1)
 
     decoy.when(
@@ -231,7 +231,7 @@ async def test_create_run_invalid_protocol(
             labware_offsets=[],
             protocol=None,
         )
-    ).then_raise(ProtocolFilesInvalidError("oh oh"))
+    ).then_raise(CommandTranslatorError())
 
     with pytest.raises(ApiError) as exc_info:
         await create_run(
