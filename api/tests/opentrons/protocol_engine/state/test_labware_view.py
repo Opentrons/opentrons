@@ -247,17 +247,17 @@ def test_labware_has_well(falcon_tuberack_def: LabwareDefinition) -> None:
     )
 
     result = subject.validate_liquid_allowed_in_labware(
-        labware_id="tube-rack-id", wells=["A1", "B1"]
+        labware_id="tube-rack-id", wells={"A1": 30, "B1": 100}
     )
     assert result == ["A1", "B1"]
 
     with pytest.raises(errors.WellDoesNotExistError):
         subject.validate_liquid_allowed_in_labware(
-            labware_id="tube-rack-id", wells=["AA"]
+            labware_id="tube-rack-id", wells={"AA": 30}
         )
 
     with pytest.raises(errors.LabwareNotLoadedError):
-        subject.validate_liquid_allowed_in_labware(labware_id="no-id", wells=["A1"])
+        subject.validate_liquid_allowed_in_labware(labware_id="no-id", wells={"A1": 30})
 
 
 def test_get_well_columns(falcon_tuberack_def: LabwareDefinition) -> None:

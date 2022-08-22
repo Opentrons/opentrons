@@ -46,7 +46,7 @@ class LoadLiquidImplementation(AbstractCommandImpl[LoadLiquidParams, LoadLiquidR
         self._state_view.liquid.validate_liquid_id(params.liquidId)
 
         self._state_view.labware.validate_liquid_allowed_in_labware(
-            labware_id=params.labwareId, wells=iter(params.volumeByWell)
+            labware_id=params.labwareId, wells=params.volumeByWell
         )
 
         return LoadLiquidResult()

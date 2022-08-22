@@ -32,9 +32,9 @@ async def test_load_liquid_implementation(
 
     decoy.when(
         mock_state_view.labware.validate_liquid_allowed_in_labware(
-            "labware-id", iter({"A1": None, "B2": None})
+            "labware-id", {"A1": 30.0, "B2": 100.0}
         )
-    ).then_return({"A1": None, "B2": None})
+    ).then_return(["A1", "B2"])
 
     data = LoadLiquidParams(
         labwareId="labware-id",
