@@ -16,7 +16,7 @@ from opentrons.protocol_runner import create_simulating_runner
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleModel,
-    ModuleDefinition,
+    ModuleLocation,
 )
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.types import PipetteName
@@ -70,7 +70,7 @@ LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
         pipette_left.aspirate(
             volume=40,
             rate=130,
-            location=well_plate_1["A1"],
+            location=module_plate_1["A1"],
         )
         pipette_left.dispense(
             volume=35,
@@ -83,7 +83,7 @@ LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
         )
         pipette_left.dispense(
             volume=35,
-            location=well_plate_1.wells_by_name()["B1"],
+            location=module_plate_1.wells_by_name()["B1"],
         )
         pipette_left.blow_out(
             location=well_plate_1.wells_by_name()["B1"].top(),
@@ -91,7 +91,7 @@ LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
         pipette_left.aspirate(50)
         pipette_left.dispense(50)
         pipette_left.blow_out(
-            location=well_plate_1["B1"].top(),
+            location=module_plate_1["B1"].top(),
         )
         pipette_left.aspirate()
         pipette_left.dispense()
@@ -129,7 +129,9 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
 
     tiprack_1_result_captor = matchers.Captor()
     tiprack_2_result_captor = matchers.Captor()
+    module_1_result_captor = matchers.Captor()
     well_plate_1_result_captor = matchers.Captor()
+    module_plate_1_result_captor = matchers.Captor()
     pipette_left_result_captor = matchers.Captor()
     pipette_right_result_captor = matchers.Captor()
 
@@ -165,6 +167,20 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         ),
         result=tiprack_2_result_captor,
     )
+    assert commands_result[2] == commands.LoadModule.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.LoadModuleParams(
+            model=ModuleModel.TEMPERATURE_MODULE_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+            moduleId="module-0",
+        ),
+        result=module_1_result_captor,
+    )
     assert commands_result[3] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
         key=matchers.IsA(str),
@@ -179,6 +195,21 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
             version=1,
         ),
         result=well_plate_1_result_captor,
+    )
+    assert commands_result[4] == commands.LoadLabware.construct(
+        id=matchers.IsA(str),
+        key=matchers.IsA(str),
+        status=commands.CommandStatus.SUCCEEDED,
+        createdAt=matchers.IsA(datetime),
+        startedAt=matchers.IsA(datetime),
+        completedAt=matchers.IsA(datetime),
+        params=commands.LoadLabwareParams(
+            location=ModuleLocation(moduleId="module-0"),
+            loadName="opentrons_96_aluminumblock_nest_wellplate_100ul",
+            namespace="opentrons",
+            version=1,
+        ),
+        result=module_plate_1_result_captor,
     )
 
     assert commands_result[5] == commands.LoadPipette.construct(
@@ -212,6 +243,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
     tiprack_1_id = tiprack_1_result_captor.value["labwareId"]
     tiprack_2_id = tiprack_2_result_captor.value["labwareId"]
     well_plate_1_id = well_plate_1_result_captor.value["labwareId"]
+    module_plate_1_id = module_plate_1_result_captor.value["labwareId"]
     pipette_left_id = pipette_left_result_captor.value["pipetteId"]
     pipette_right_id = pipette_right_result_captor.value["pipetteId"]
 
@@ -282,7 +314,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         completedAt=matchers.IsA(datetime),
         params=commands.AspirateParams(
             pipetteId=pipette_left_id,
-            labwareId=well_plate_1_id,
+            labwareId=module_plate_1_id,
             wellName="A1",
             volume=40,
             flowRate=130,
@@ -330,7 +362,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         completedAt=matchers.IsA(datetime),
         params=commands.DispenseParams(
             pipetteId=pipette_left_id,
-            labwareId=well_plate_1_id,
+            labwareId=module_plate_1_id,
             wellName="B1",
             volume=35,
             flowRate=300,
@@ -393,7 +425,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         completedAt=matchers.IsA(datetime),
         params=commands.BlowOutParams(
             pipetteId=pipette_left_id,
-            labwareId=well_plate_1_id,
+            labwareId=module_plate_1_id,
             wellName="B1",
             flowRate=1000.0,
         ),
@@ -408,7 +440,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         completedAt=matchers.IsA(datetime),
         params=commands.AspirateParams(
             pipetteId=pipette_left_id,
-            labwareId=well_plate_1_id,
+            labwareId=module_plate_1_id,
             wellName="B1",
             volume=300,
             flowRate=150,
@@ -424,7 +456,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         completedAt=matchers.IsA(datetime),
         params=commands.DispenseParams(
             pipetteId=pipette_left_id,
-            labwareId=well_plate_1_id,
+            labwareId=module_plate_1_id,
             wellName="B1",
             volume=300,
             flowRate=300,
@@ -440,7 +472,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         completedAt=matchers.IsA(datetime),
         params=commands.BlowOutParams(
             pipetteId=pipette_left_id,
-            labwareId=well_plate_1_id,
+            labwareId=module_plate_1_id,
             wellName="B1",
             flowRate=1000.0,
         ),
