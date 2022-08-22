@@ -1,5 +1,5 @@
 {
-  "$id": "opentronsProtocolSchemaV6",
+  "$id": "opentronsProtocolSchemaV7",
   "$schema": "http://json-schema.org/draft-07/schema#",
 
   "definitions": {
@@ -104,12 +104,12 @@
   "properties": {
     "$otSharedSchema": {
       "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension.",
-      "enum": ["#/protocol/schemas/6"]
+      "enum": ["#/protocol/schemas/7-draft"]
     },
 
     "schemaVersion": {
       "description": "Schema version of a protocol is a single integer",
-      "enum": [6]
+      "enum": [7]
     },
 
     "metadata": {
