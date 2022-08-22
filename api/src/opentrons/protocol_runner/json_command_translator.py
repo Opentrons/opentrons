@@ -31,7 +31,7 @@ def _translate_labware_command(
     except KeyError:
         raise ProtocolFilesInvalidError(
             f"Missing loaded labware id: {labware_id}. Invalid protocol."
-        )
+        ) from e
     labware_command = pe_commands.LoadLabwareCreate(
         params=pe_commands.LoadLabwareParams(
             labwareId=command.params.labwareId,
