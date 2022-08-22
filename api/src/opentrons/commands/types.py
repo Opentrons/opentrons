@@ -77,20 +77,12 @@ class TextOnlyPayload(TypedDict):
     text: str
 
 
-class SingleLocationPayload(TypedDict):
-    location: Union[Location, Well]
-
-
 class MultiLocationPayload(TypedDict):
     locations: Sequence[Union[Location, Well]]
 
 
 class OptionalMultiLocationPayload(TypedDict):
     locations: Optional[Sequence[Union[Location, Well]]]
-
-
-class OptionalSingleLocationPayload(TypedDict):
-    location: Union[Location, Well, None]
 
 
 class SingleInstrumentPayload(TypedDict):
@@ -364,21 +356,20 @@ class HomeCommand(TypedDict):
     payload: HomeCommandPayload
 
 
-class SimpleLHCommandPayload(
-    TextOnlyPayload, SingleLocationPayload, SingleInstrumentPayload
-):
+class AspirateDispenseCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    location: Location
     volume: float
     rate: float
 
 
 class AspirateCommand(TypedDict):
     name: Literal["command.ASPIRATE"]
-    payload: SimpleLHCommandPayload
+    payload: AspirateDispenseCommandPayload
 
 
 class DispenseCommand(TypedDict):
     name: Literal["command.DISPENSE"]
-    payload: SimpleLHCommandPayload
+    payload: AspirateDispenseCommandPayload
 
 
 class ConsolidateCommandPayload(
@@ -420,9 +411,8 @@ class TransferCommand(TypedDict):
     payload: TransferCommandPayload
 
 
-class MixCommandPayload(
-    TextOnlyPayload, OptionalSingleLocationPayload, SingleInstrumentPayload
-):
+class MixCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    location: Union[None, Location, Well]
     volume: float
     repetitions: int
 
@@ -432,10 +422,8 @@ class MixCommand(TypedDict):
     payload: MixCommandPayload
 
 
-class BlowOutCommandPayload(
-    TextOnlyPayload, OptionalSingleLocationPayload, SingleInstrumentPayload
-):
-    pass
+class BlowOutCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    location: Optional[Location]
 
 
 class BlowOutCommand(TypedDict):
@@ -470,22 +458,17 @@ class ReturnTipCommand(TypedDict):
     payload: ReturnTipCommandPayload
 
 
-class PickUpTipCommandPayload(
-    TextOnlyPayload, SingleLocationPayload, SingleInstrumentPayload
-):
-    pass
+class PickUpTipCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    location: Well
 
 
 class PickUpTipCommand(TypedDict):
     name: Literal["command.PICK_UP_TIP"]
     payload: PickUpTipCommandPayload
-    pass
 
 
-class DropTipCommandPayload(
-    TextOnlyPayload, SingleLocationPayload, SingleInstrumentPayload
-):
-    pass
+class DropTipCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    location: Location
 
 
 class DropTipCommand(TypedDict):
@@ -498,10 +481,8 @@ class MoveToCommand(TypedDict):
     payload: MoveToCommandPayload
 
 
-class MoveToCommandPayload(
-    TextOnlyPayload, SingleLocationPayload, SingleInstrumentPayload
-):
-    pass
+class MoveToCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    location: Location
 
 
 Command = Union[
@@ -582,7 +563,7 @@ CommandPayload = Union[
     TransferCommandPayload,
     DistributeCommandPayload,
     ConsolidateCommandPayload,
-    SimpleLHCommandPayload,
+    AspirateDispenseCommandPayload,
     HomeCommandPayload,
     ThermocyclerExecuteProfileCommandPayload,
     ThermocyclerSetBlockTempCommandPayload,
