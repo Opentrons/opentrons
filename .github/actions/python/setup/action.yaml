@@ -22,8 +22,8 @@ runs:
         npm install --global shx@0.3.3
         pip install pipenv==2021.5.29
     - shell: bash
-      if: ${{ inputs.python-version != "NOT_SPECIFIED" }}
+      if: ${{ inputs.python-version != 'NOT_SPECIFIED' }}
       run: 'make -C ${{ inputs.project }} setup OT_VIRTUALENV_VERSION==${{ inputs.python-version }}'
     - shell: bash
-      if: ${{ inputs.python-version == "NOT_SPECIFIED" }}
+      if: ${{ inputs.python-version == 'NOT_SPECIFIED' }}
       run: 'make -C ${{ inputs.project }} setup'
