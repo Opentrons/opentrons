@@ -13,7 +13,7 @@ import { WizardHeader } from '../WizardHeader'
 
 interface Props {
   iconColor: string
-  children: JSX.Element
+  children: React.ReactNode
   header: string
   subHeader: string
   isSuccess: boolean
