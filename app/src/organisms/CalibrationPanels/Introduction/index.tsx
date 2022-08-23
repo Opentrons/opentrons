@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import {
   Flex,
@@ -9,28 +9,21 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '../../../redux/sessions'
-import { StyledText } from '../../../atoms/text'
-import { Banner } from '../../../atoms/Banner'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { NeedHelpLink } from '../NeedHelpLink'
 import { ChooseTipRack } from '../ChooseTipRack'
 
 import {
-  INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
   INTENT_TIP_LENGTH_IN_PROTOCOL,
-  INTENT_CALIBRATE_PIPETTE_OFFSET,
-  INTENT_RECALIBRATE_PIPETTE_OFFSET,
   TRASH_BIN_LOAD_NAME,
 } from '../constants'
 import { WizardRequiredLabwareList } from '../../../molecules/WizardRequiredLabwareList'
+import { Header } from './Header'
+import { Body } from './Body'
+import { InvalidationWarning } from './InvalidationWarning'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { SessionType } from '../../../redux/sessions/types'
-import type { CalibrationPanelProps, Intent } from '../types'
-import {
-  SESSION_TYPE_DECK_CALIBRATION,
-  SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
-} from '../../../redux/sessions'
+import type { CalibrationPanelProps } from '../types'
 
 const TRASH_BIN = 'Removable black plastic trash bin'
 
@@ -54,7 +47,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
   ] = React.useState<LabwareDefinition2 | null>(null)
 
   const handleChosenTipRack = (value: LabwareDefinition2 | null): void => {
-    value && setChosenTipRack(value)
+    value != null && setChosenTipRack(value)
   }
   const isExtendedPipOffset: boolean | null | undefined =
     sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
@@ -84,7 +77,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       },
     ]
   }
-  if (calBlock) {
+  if (calBlock != null) {
     equipmentList = [
       ...equipmentList,
       {
@@ -95,7 +88,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
   } else if (
     sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK ||
     sessionType === Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION ||
-    isExtendedPipOffset
+    isExtendedPipOffset === true
   ) {
     equipmentList = [
       ...equipmentList,
@@ -108,8 +101,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
 
   const proceed = (): void => {
     if (
-      supportedCommands &&
-      supportedCommands.includes(Sessions.sharedCalCommands.LOAD_LABWARE)
+      supportedCommands?.includes(Sessions.sharedCalCommands.LOAD_LABWARE) ?? false
     ) {
       sendCommands({
         command: Sessions.sharedCalCommands.LOAD_LABWARE,
@@ -139,7 +131,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <IntroHeader
+          <Header
             sessionType={sessionType}
             isExtendedPipOffset={isExtendedPipOffset}
             intent={intent}
@@ -147,9 +139,9 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
 
           {sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
           isExtendedPipOffset === true ? (
-            <InvalidationStatement intent={intent} />
+            <InvalidationWarning intent={intent} />
           ) : null}
-          <IntroBody
+          <Body
             sessionType={sessionType}
             isExtendedPipOffset={isExtendedPipOffset}
           />
@@ -170,9 +162,9 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       >
         <NeedHelpLink />
         <Flex>
-          {sessionType === SESSION_TYPE_DECK_CALIBRATION ||
-          (sessionType === SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
-            isExtendedPipOffset &&
+          {sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION ||
+          (sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
+            isExtendedPipOffset === true &&
             intent !== INTENT_TIP_LENGTH_IN_PROTOCOL) ? (
             <SecondaryButton onClick={() => setShowChooseTipRack(true)}>
               {t('change_tip_rack')}
@@ -183,109 +175,4 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       </Flex>
     </Flex>
   )
-}
-
-interface IntroHeaderProps {
-  sessionType: SessionType
-  isExtendedPipOffset?: boolean | null
-  intent?: Intent
-}
-function IntroHeader(props: IntroHeaderProps): JSX.Element {
-  const { sessionType, isExtendedPipOffset, intent } = props
-  const { t } = useTranslation('robot_calibration')
-  let headerText = null
-  switch (sessionType) {
-    case Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK:
-      headerText = t('calibration_health_check')
-      break
-    case Sessions.SESSION_TYPE_DECK_CALIBRATION:
-      headerText = t('deck_calibration')
-      break
-    case Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION:
-      if (isExtendedPipOffset && intent != null) {
-        headerText = t('tip_length_and_pipette_offset_calibration')
-      } else {
-        headerText = t('pipette_offset_calibration')
-      }
-      break
-    case Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION:
-      headerText = t('tip_length_calibration')
-      break
-  }
-  return <StyledText as="h3">{headerText}</StyledText>
-}
-
-interface IntroBodyProps {
-  sessionType: SessionType
-  isExtendedPipOffset?: boolean | null
-}
-function IntroBody(props: IntroBodyProps): JSX.Element | null {
-  const { sessionType, isExtendedPipOffset } = props
-  const { t } = useTranslation('robot_calibration')
-  switch (sessionType) {
-    case Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK:
-      return (
-        <Trans
-          t={t}
-          i18nKey="calibration_health_check_intro_body"
-          components={{ block: <StyledText as="p" /> }}
-        />
-      )
-    case Sessions.SESSION_TYPE_DECK_CALIBRATION:
-      return <StyledText as="p">{t('deck_calibration_intro_body')}</StyledText>
-    case Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION:
-      return isExtendedPipOffset ? (
-        <>
-          <StyledText as="p">
-            {t('tip_length_calibration_intro_body')}
-          </StyledText>
-          <StyledText as="p">
-            {t('pipette_offset_calibration_intro_body')}
-          </StyledText>
-        </>
-      ) : (
-        <StyledText as="p">
-          {t('pipette_offset_calibration_intro_body')}
-        </StyledText>
-      )
-    case Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION:
-      return (
-        <StyledText as="p">{t('tip_length_calibration_intro_body')}</StyledText>
-      )
-    default:
-      // this case should never be reached
-      console.warn(
-        'Introduction Calibration Panel received invalid session type'
-      )
-      return null
-  }
-}
-
-interface InvalidationStatementProps {
-  intent?: Intent
-}
-function InvalidationStatement(
-  props: InvalidationStatementProps
-): JSX.Element | null {
-  const { intent } = props
-  const { t } = useTranslation('robot_calibration')
-  if (
-    intent === INTENT_TIP_LENGTH_IN_PROTOCOL ||
-    intent === INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL
-  ) {
-    return (
-      <Banner type="warning">
-        {t('tip_length_invalidates_pipette_offset')}
-      </Banner>
-    )
-  } else if (
-    intent === INTENT_CALIBRATE_PIPETTE_OFFSET ||
-    intent === INTENT_RECALIBRATE_PIPETTE_OFFSET
-  ) {
-    return (
-      <Banner type="warning">{t('pipette_offset_requires_tip_length')}</Banner>
-    )
-  } else {
-    return null
-  }
 }
