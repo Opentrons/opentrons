@@ -2,6 +2,7 @@ import asyncio
 import mock
 
 import pytest
+from decoy import Decoy
 
 try:
     import aionotify
@@ -10,7 +11,7 @@ except (OSError, ModuleNotFoundError):
 
 import typeguard
 
-from opentrons import types
+from opentrons import types, config
 from opentrons.hardware_control import API
 from opentrons.hardware_control.types import Axis, OT3Mount
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -171,7 +172,7 @@ async def test_cache_instruments_hc(
     monkeypatch,
     dummy_instruments,
     hardware_controller_lockfile,
-    running_on_pi,
+    is_robot,
     cntrlr_mock_connect,
 ):
     hw_api_cntrlr = await API.build_hardware_controller(loop=asyncio.get_running_loop())
@@ -345,7 +346,9 @@ async def test_aspirate_new(dummy_instruments):
     assert pos[Axis.B] == new_plunger_pos
 
 
-async def test_aspirate_old(dummy_instruments, old_aspiration):
+async def test_aspirate_old(decoy: Decoy, mock_feature_flags: None, dummy_instruments):
+    decoy.when(config.feature_flags.use_old_aspiration_functions()).then_return(True)
+
     hw_api = await API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=asyncio.get_running_loop()
     )
