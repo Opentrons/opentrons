@@ -2,17 +2,10 @@
 import * as React from 'react'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import {
-  Box,
-  SpinnerModalPage,
-  useConditionalConfirm,
-  SPACING,
-} from '@opentrons/components'
+import { SpinnerModalPage, useConditionalConfirm } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
 import {
-  DeckSetup,
-  Introduction,
   TipPickUp,
   TipConfirmation,
   SaveZPoint,
@@ -21,6 +14,7 @@ import {
   ConfirmExitModal,
   INTENT_DECK_CALIBRATION,
 } from '../../organisms/DeprecatedCalibrationPanels'
+import { Introduction, DeckSetup } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
@@ -126,20 +120,18 @@ export function CalibrateDeck(
           />
         }
       >
-        <Box padding={SPACING.spacing6}>
-          <Panel
-            sendCommands={sendCommands}
-            cleanUpAndExit={cleanUpAndExit}
-            tipRack={tipRack}
-            isMulti={isMulti}
-            mount={instrument?.mount.toLowerCase() as Mount}
-            currentStep={currentStep}
-            sessionType={session.sessionType}
-            intent={INTENT_DECK_CALIBRATION}
-            supportedCommands={supportedCommands}
-            defaultTipracks={instrument?.defaultTipracks}
-          />
-        </Box>
+        <Panel
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
+          tipRack={tipRack}
+          isMulti={isMulti}
+          mount={instrument?.mount.toLowerCase() as Mount}
+          currentStep={currentStep}
+          sessionType={session.sessionType}
+          intent={INTENT_DECK_CALIBRATION}
+          supportedCommands={supportedCommands}
+          defaultTipracks={instrument?.defaultTipracks}
+        />
       </ModalShell>
       {showConfirmExit && (
         // @ts-expect-error TODO: ConfirmExitModal expects sessionType

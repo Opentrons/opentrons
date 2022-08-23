@@ -6,10 +6,12 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 
 import * as Sessions from '../../../redux/sessions'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
+import { StyledText } from '../../../atoms/text'
 import { NeedHelpLink } from '../NeedHelpLink'
 import { ChooseTipRack } from '../ChooseTipRack'
 
@@ -18,7 +20,6 @@ import {
   TRASH_BIN_LOAD_NAME,
 } from '../constants'
 import { WizardRequiredLabwareList } from '../../../molecules/WizardRequiredLabwareList'
-import { Header } from './Header'
 import { Body } from './Body'
 import { InvalidationWarning } from './InvalidationWarning'
 
@@ -101,7 +102,8 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
 
   const proceed = (): void => {
     if (
-      supportedCommands?.includes(Sessions.sharedCalCommands.LOAD_LABWARE) ?? false
+      supportedCommands?.includes(Sessions.sharedCalCommands.LOAD_LABWARE) ??
+      false
     ) {
       sendCommands({
         command: Sessions.sharedCalCommands.LOAD_LABWARE,
@@ -124,19 +126,15 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       defaultTipracks={props.defaultTipracks}
     />
   ) : (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      padding={SPACING.spacing6}
+      minHeight="25rem"
+    >
       <Flex>
-        <Flex
-          width="100%"
-          flexDirection={DIRECTION_COLUMN}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-        >
-          <Header
-            sessionType={sessionType}
-            isExtendedPipOffset={isExtendedPipOffset}
-            intent={intent}
-          />
-
+        <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
+          <StyledText as="h1" marginBottom={SPACING.spacing4}>{t('before_you_begin')}</StyledText>
           {sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
           isExtendedPipOffset === true ? (
             <InvalidationWarning intent={intent} />
@@ -146,27 +144,33 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
             isExtendedPipOffset={isExtendedPipOffset}
           />
         </Flex>
-        <WizardRequiredLabwareList
-          equipmentList={equipmentList}
-          footer={
-            sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
-              ? t('this_is_the_tip_used_in_pipette_offset_cal')
-              : t('important_to_use_listed_equipment')
-          }
-        />
+        <Flex flex="1">
+          <WizardRequiredLabwareList
+            equipmentList={equipmentList}
+            footer={
+              sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
+                ? t('this_is_the_tip_used_in_pipette_offset_cal')
+                : t('important_to_use_listed_equipment')
+            }
+          />
+        </Flex>
       </Flex>
       <Flex
         width="100%"
         marginTop={SPACING.spacing6}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
       >
         <NeedHelpLink />
-        <Flex>
+        <Flex alignItems={ALIGN_CENTER}>
           {sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION ||
           (sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
             isExtendedPipOffset === true &&
             intent !== INTENT_TIP_LENGTH_IN_PROTOCOL) ? (
-            <SecondaryButton onClick={() => setShowChooseTipRack(true)}>
+            <SecondaryButton
+              onClick={() => setShowChooseTipRack(true)}
+              marginRight={SPACING.spacing4}
+            >
               {t('change_tip_rack')}
             </SecondaryButton>
           ) : null}

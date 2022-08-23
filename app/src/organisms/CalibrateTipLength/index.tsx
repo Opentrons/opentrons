@@ -11,8 +11,6 @@ import {
 
 import * as Sessions from '../../redux/sessions'
 import {
-  Introduction,
-  DeckSetup,
   TipPickUp,
   TipConfirmation,
   CompleteConfirmation,
@@ -21,6 +19,7 @@ import {
   MeasureTip,
   INTENT_TIP_LENGTH_IN_PROTOCOL,
 } from '../../organisms/DeprecatedCalibrationPanels'
+import { Introduction, DeckSetup } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
@@ -129,19 +128,17 @@ export function CalibrateTipLength(
           />
         }
       >
-        <Box padding={SPACING.spacing6}>
-          <Panel
-            sendCommands={sendCommands}
-            cleanUpAndExit={cleanUpAndExit}
-            isMulti={isMulti}
-            mount={instrument?.mount.toLowerCase() as Mount}
-            tipRack={tipRack}
-            calBlock={calBlock}
-            currentStep={currentStep}
-            sessionType={session.sessionType}
-            intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
-          />
-        </Box>
+        <Panel
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
+          isMulti={isMulti}
+          mount={instrument?.mount.toLowerCase() as Mount}
+          tipRack={tipRack}
+          calBlock={calBlock}
+          currentStep={currentStep}
+          sessionType={session.sessionType}
+          intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
+        />
       </ModalShell>
       {showConfirmExit && (
         // @ts-expect-error TODO: ConfirmExitModal expects sessionType

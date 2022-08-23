@@ -10,7 +10,6 @@ import {
 
 import * as Sessions from '../../redux/sessions'
 import {
-  DeckSetup,
   TipPickUp,
   TipConfirmation,
   SaveZPoint,
@@ -19,9 +18,7 @@ import {
   MeasureNozzle,
   MeasureTip,
 } from '../../organisms/DeprecatedCalibrationPanels'
-import {
-  Introduction,
-} from '../../organisms/CalibrationPanels'
+import { Introduction, DeckSetup } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
@@ -151,22 +148,20 @@ export function CheckCalibration(
           />
         }
       >
-        <Box padding={SPACING.spacing6}>
-          <Panel
-            sendCommands={sendCommands}
-            cleanUpAndExit={cleanUpAndExit}
-            tipRack={activeTipRack}
-            calBlock={calBlock}
-            isMulti={isMulti}
-            mount={activePipette?.mount.toLowerCase() as Mount}
-            currentStep={currentStep}
-            sessionType={session.sessionType}
-            checkBothPipettes={checkBothPipettes}
-            instruments={instruments}
-            comparisonsByPipette={comparisonsByPipette}
-            activePipette={activePipette}
-          />
-        </Box>
+        <Panel
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
+          tipRack={activeTipRack}
+          calBlock={calBlock}
+          isMulti={isMulti}
+          mount={activePipette?.mount.toLowerCase() as Mount}
+          currentStep={currentStep}
+          sessionType={session.sessionType}
+          checkBothPipettes={checkBothPipettes}
+          instruments={instruments}
+          comparisonsByPipette={comparisonsByPipette}
+          activePipette={activePipette}
+        />
       </ModalShell>
       {showConfirmExit && (
         <ConfirmExitModal

@@ -8,6 +8,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
+  COLORS
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -28,12 +29,9 @@ export function WizardRequiredLabwareList(props: WizardRequiredLabwareListProps)
       <StyledText as="h3">{t('you_will_need')}</StyledText>
       <Divider />
       {equipmentList.map(requiredLabwareProps => (
-        <React.Fragment key={requiredLabwareProps.loadName}>
-          <RequiredLabwareCard {...requiredLabwareProps} />
-          <Divider />
-        </React.Fragment>
+        <RequiredLabwareCard key={requiredLabwareProps.loadName} {...requiredLabwareProps} />
       ))}
-      <StyledText marginTop={SPACING.spacing3} as="label">
+      <StyledText marginTop={SPACING.spacing3} as="label" color={COLORS.darkGreyEnabled}>
         {footer}
       </StyledText>
     </Flex>
@@ -56,8 +54,6 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps): JSX.Element {
     <>
       <Flex
         width="100%"
-        height="30%"
-        padding={SPACING.spacing3}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >

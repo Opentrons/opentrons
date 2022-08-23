@@ -11,8 +11,6 @@ import {
 
 import * as Sessions from '../../redux/sessions'
 import {
-  Introduction,
-  DeckSetup,
   TipPickUp,
   TipConfirmation,
   SaveZPoint,
@@ -22,6 +20,7 @@ import {
   MeasureNozzle,
   MeasureTip,
 } from '../../organisms/DeprecatedCalibrationPanels'
+import { Introduction, DeckSetup } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
@@ -146,23 +145,21 @@ export function CalibratePipetteOffset(
           />
         }
       >
-        <Box padding={SPACING.spacing6}>
-          <Panel
-            sendCommands={sendCommands}
-            cleanUpAndExit={cleanUpAndExit}
-            tipRack={tipRack}
-            isMulti={isMulti}
-            mount={instrument?.mount.toLowerCase() as Mount}
-            calBlock={calBlock}
-            currentStep={currentStep}
-            sessionType={session.sessionType}
-            shouldPerformTipLength={shouldPerformTipLength}
-            intent={intent}
-            robotName={robotName}
-            supportedCommands={supportedCommands}
-            defaultTipracks={instrument?.defaultTipracks}
-          />
-        </Box>
+        <Panel
+          sendCommands={sendCommands}
+          cleanUpAndExit={cleanUpAndExit}
+          tipRack={tipRack}
+          isMulti={isMulti}
+          mount={instrument?.mount.toLowerCase() as Mount}
+          calBlock={calBlock}
+          currentStep={currentStep}
+          sessionType={session.sessionType}
+          shouldPerformTipLength={shouldPerformTipLength}
+          intent={intent}
+          robotName={robotName}
+          supportedCommands={supportedCommands}
+          defaultTipracks={instrument?.defaultTipracks}
+        />
       </ModalShell>
       {showConfirmExit && (
         <ConfirmExitModal
