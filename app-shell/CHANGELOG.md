@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.2...v6.1.0-alpha.3) (2022-08-19)
+
+
+
+## [6.0.1](https://github.com/Opentrons/opentrons/compare/v6.0.1-alpha.1...v6.0.1) (2022-08-09)
+
+
+
+## [6.0.1-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.1...v6.0.1-alpha.1) (2022-08-08)
+
+
+
+## [6.0.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.0.1-alpha.0) (2022-08-02)
+
+
+### Bug Fixes
+
+* **app, app-shell:** fix python override path select on windows ([#11257](https://github.com/Opentrons/opentrons/issues/11257)) ([0da8f98](https://github.com/Opentrons/opentrons/commit/0da8f983b9b3483b30f5b84dc821865996c6fa50))
+
+
+
+
+
 # [6.1.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.1...v6.1.0-alpha.2) (2022-08-10)
 
 **Note:** Version bump only for package @opentrons/app-shell

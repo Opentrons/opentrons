@@ -22,6 +22,7 @@ Welcome to the v6.1.0 release of the OT-2 software! This release adds support fo
 
 - Improved tip pickup and drop behavior.
 - Fixed issues when running Thermocycler profiles.
+- Fixed a bug that prevented pipetting to arbitrary deck coordinates.
 
 ## Known Issues
 

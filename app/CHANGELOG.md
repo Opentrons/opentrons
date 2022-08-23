@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.2...v6.1.0-alpha.3) (2022-08-19)
+
+
+### Bug Fixes
+
+* **app:** confirm attachment modal logic refactor ([#11362](https://github.com/Opentrons/opentrons/issues/11362)) ([4fafb10](https://github.com/Opentrons/opentrons/commit/4fafb10b670dd463a1582d3a1d163a7af04afadd))
+* **app:** disabled input values when H-S is shaking ([#11357](https://github.com/Opentrons/opentrons/issues/11357)) ([f579517](https://github.com/Opentrons/opentrons/commit/f57951796a946788945e6b4904e559f52733e142))
+* **app:** H-S test shake input value no longer accepts decimals ([#11344](https://github.com/Opentrons/opentrons/issues/11344)) ([1a98822](https://github.com/Opentrons/opentrons/commit/1a98822ca881401b9a4f4e3f75c9bbfa98625be0))
+* **app:** hS fix tooltip text position in overflow menu button ([#11363](https://github.com/Opentrons/opentrons/issues/11363)) ([499fc90](https://github.com/Opentrons/opentrons/commit/499fc9051dc8d02ab2865b7f99de870fc6d2e97a))
+* **app:** return valid custom labware when sorting ([#11369](https://github.com/Opentrons/opentrons/issues/11369)) ([9d6cc14](https://github.com/Opentrons/opentrons/commit/9d6cc142f4190988d94cf021a0b291ca613ae29e))
+* **app:** robotSettings Calibrations tab section title text-align bug ([#11314](https://github.com/Opentrons/opentrons/issues/11314)) ([be5f65e](https://github.com/Opentrons/opentrons/commit/be5f65e3c533f08b48bcfef5a6ee901d75096453))
+* **app:** show H-S wizard when module is powered off ([#11358](https://github.com/Opentrons/opentrons/issues/11358)) ([dfd6bb5](https://github.com/Opentrons/opentrons/commit/dfd6bb57e80515ad8fb24e33f2d25bb749d20d9b))
+
+
+
+## [6.0.1-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.1...v6.0.1-alpha.1) (2022-08-08)
+
+
+### Bug Fixes
+
+* **app:** connect pipette settings form's submit button ([#11288](https://github.com/Opentrons/opentrons/issues/11288)) ([14228ac](https://github.com/Opentrons/opentrons/commit/14228ac5540d61c31f3dcf18543d9e3630bced51))
+
+
+
+## [6.0.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.0.1-alpha.0) (2022-08-02)
+
+
+### Bug Fixes
+
+* **app, app-shell:** fix python override path select on windows ([#11257](https://github.com/Opentrons/opentrons/issues/11257)) ([0da8f98](https://github.com/Opentrons/opentrons/commit/0da8f983b9b3483b30f5b84dc821865996c6fa50))
+
+
+
+
+
 # [6.1.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.1...v6.1.0-alpha.2) (2022-08-10)
 
 **Note:** Version bump only for package @opentrons/app

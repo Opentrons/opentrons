@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/robot-server",
-  "version": "6.1.0-alpha.2",
+  "version": "6.1.0-alpha.3",
   "description": "HTTP server for Opentrons robots",
   "repository": {
     "type": "git",
