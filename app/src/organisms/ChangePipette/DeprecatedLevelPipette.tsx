@@ -87,7 +87,9 @@ function LevelingVideo(props: {
     </div>
   )
 }
-
+/**
+ * @deprecated use LevelPipette instead
+ */
 export function DeprecatedLevelPipette(props: Props): JSX.Element {
   const {
     title,

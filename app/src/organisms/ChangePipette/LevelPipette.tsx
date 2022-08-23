@@ -25,9 +25,9 @@ interface LevelPipetteProps {
   mount: Mount
   wantedPipette: PipetteNameSpecs | null
   pipetteModelName: string
-  back: () => unknown
-  exit: () => unknown
-  confirm: () => unknown
+  back: () => void
+  exit: () => void
+  confirm: () => void
   currentStep: number
   totalSteps: number
 }
@@ -96,13 +96,7 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
               i18nKey={'level_the_pipette'}
               components={{
                 bold: <strong />,
-                h1: (
-                  <StyledText
-                    as="h1"
-                    marginBottom={SPACING.spacing4}
-                    color={COLORS.darkBlackEnabled}
-                  />
-                ),
+                h1: <StyledText as="h1" marginBottom={SPACING.spacing4} />,
                 block: (
                   <StyledText
                     css={css`
