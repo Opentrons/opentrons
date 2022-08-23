@@ -97,5 +97,9 @@
   "improperly_fastened_description": "An improperly fastened Heater-Shaker module can shake itself out of a deck slot.",
   "module_in_slot": "{{moduleName}} in Slot {{slotName}}",
   "close_latch": "Close latch",
-  "open_latch": "Open latch"
+  "open_latch": "Open latch",
+  "module_error": "Module error",
+  "heater_shaker_error": "Heater-Shaker module error",
+  "view_details": "View error details",
+  "module_error_contact_support": "Try power-cycling the module. If the error persists, please contact support."
 }

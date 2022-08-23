@@ -20,6 +20,7 @@ import { HeaterShakerModuleData } from '../HeaterShakerModuleData'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
+import { HeaterShakerError } from '../HeaterShakerError'
 import { ModuleCard } from '..'
 import {
   mockMagneticModule,
@@ -34,6 +35,7 @@ import type {
   MagneticModule,
 } from '../../../redux/modules/types'
 
+jest.mock('../HeaterShakerError')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../MagneticModuleData')
 jest.mock('../TemperatureModuleData')
@@ -90,6 +92,9 @@ const mockFirmwareUpdateFailedModal = FirmwareUpdateFailedModal as jest.MockedFu
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
+const mockHeaterShakerError = HeaterShakerError as jest.MockedFunction<
+  typeof HeaterShakerError
+>
 const mockToast = Toast as jest.MockedFunction<typeof Toast>
 const mockMagneticModuleHub = {
   id: 'magdeck_id',
@@ -129,6 +134,28 @@ const mockHotHeaterShaker = {
   usbPort: { path: '/dev/ot_module_heatershaker0', hub: null, port: 1 },
 } as HeaterShakerModule
 
+const mockErrorHeaterShaker = {
+  id: 'heatershaker_id',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: false,
+  data: {
+    labwareLatchStatus: 'idle_open',
+    speedStatus: 'idle',
+    temperatureStatus: 'heating',
+    currentSpeed: null,
+    currentTemperature: 50,
+    targetSpeed: null,
+    targetTemperature: 60,
+    errorDetails: 'errorDetails',
+    status: 'error',
+  },
+  usbPort: { path: '/dev/ot_module_heatershaker0', hub: null, port: 1 },
+} as HeaterShakerModule
+
 const render = (props: React.ComponentProps<typeof ModuleCard>) => {
   return renderWithProviders(<ModuleCard {...props} />, {
     i18nInstance: i18n,
@@ -140,6 +167,7 @@ describe('ModuleCard', () => {
 
   beforeEach(() => {
     dispatchApiRequest = jest.fn()
+    mockHeaterShakerError.mockReturnValue(<div>mock heater shaker error</div>)
     mockUseCurrentRunId.mockReturnValue(null)
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, ['id']])
     mockMagneticModuleData.mockReturnValue(<div>Mock Magnetic Module Data</div>)
@@ -354,5 +382,21 @@ describe('ModuleCard', () => {
     })
     expect(getByText('Updating firmware...')).toBeVisible()
     expect(getByLabelText('ot-spinner')).toBeVisible()
+  })
+
+  it('renders information for a heater shaker module with an error', () => {
+    mockGetIsHeaterShakerAttached.mockReturnValue(true)
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'heatershaker_id',
+    })
+    const { getByText } = render({
+      module: mockErrorHeaterShaker,
+      robotName: mockRobot.name,
+      isLoadedInRun: false,
+    })
+
+    getByText('Heater-Shaker Module GEN1')
+    getByText('Mock Heater Shaker Module Data')
+    getByText('mock heater shaker error')
   })
 })
