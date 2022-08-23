@@ -10,6 +10,7 @@ import {
 
 import * as Sessions from '../../../redux/sessions'
 import { StyledText } from '../../../atoms/text'
+import { Banner } from '../../../atoms/Banner'
 import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { NeedHelpLink } from '../NeedHelpLink'
 import { ChooseTipRack } from '../ChooseTipRack'
@@ -31,96 +32,7 @@ import {
   SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
 } from '../../../redux/sessions'
 
-const HEALTH_CHECK_INTRO_FRAGMENT =
-  'Calibration Health Check diagnoses calibration problems with tip length, pipette offset and the robot deck.'
-const HEALTH_CHECK_PROMPT_FRAGMENT =
-  'If the check data and stored data is outside of the acceptable threshold, you will be prompted to recalibrate tip length(s), pipette offset(s) or the robot deck.'
-
-
-const PIP_OFFSET_REQUIRES_TIP_LENGTH =
-  'You don’t have a tip length saved with this pipette yet. You will need to calibrate tip length before calibrating your pipette offset.'
-
-const TIP_LENGTH_INVALIDATES_PIPETTE_OFFSET =
-  'This tip was used to calibrate this pipette’s offset. Recalibrating this tip’s length will invalidate this pipette’s offset. If you recalibrate this tip length, you will need to recalibrate this pipette offset afterwards.'
-
 const TRASH_BIN = 'Removable black plastic trash bin'
-
-interface PanelContents {
-  invalidationText: string | null
-  outcomeText: string | null
-}
-
-const contentsByParams = (
-  sessionType: SessionType,
-  isExtendedPipOffset?: boolean | null,
-  intent?: Intent
-): PanelContents => {
-  switch (sessionType) {
-    case Sessions.SESSION_TYPE_DECK_CALIBRATION:
-      return {
-        invalidationText: null,
-        outcomeText: null,
-      }
-    case Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION:
-      return {
-        invalidationText: null,
-        outcomeText: null,
-      }
-    case Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION:
-      if (isExtendedPipOffset) {
-        switch (intent) {
-          case INTENT_TIP_LENGTH_IN_PROTOCOL:
-            return {
-              invalidationText: TIP_LENGTH_INVALIDATES_PIPETTE_OFFSET,
-              outcomeText: null,
-            }
-          case INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL:
-            return {
-              invalidationText: TIP_LENGTH_INVALIDATES_PIPETTE_OFFSET,
-              outcomeText: null,
-            }
-          case INTENT_CALIBRATE_PIPETTE_OFFSET:
-            return {
-              invalidationText: PIP_OFFSET_REQUIRES_TIP_LENGTH,
-              outcomeText: null,
-            }
-          case INTENT_RECALIBRATE_PIPETTE_OFFSET:
-            return {
-              invalidationText: PIP_OFFSET_REQUIRES_TIP_LENGTH,
-              outcomeText: null,
-            }
-          default:
-            return {
-              invalidationText: null,
-              outcomeText: null,
-            }
-        }
-      } else {
-        switch (intent) {
-          case INTENT_RECALIBRATE_PIPETTE_OFFSET:
-            return {
-              invalidationText: null,
-              outcomeText: null,
-            }
-          default:
-            return {
-              invalidationText: null,
-              outcomeText: null,
-            }
-        }
-      }
-    case Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK:
-      return {
-        invalidationText: HEALTH_CHECK_INTRO_FRAGMENT,
-        outcomeText: HEALTH_CHECK_PROMPT_FRAGMENT,
-      }
-    default:
-      return {
-        invalidationText: 'This panel is shown in error',
-        outcomeText: null,
-      }
-  }
-}
 
 export function Introduction(props: CalibrationPanelProps): JSX.Element {
   const {
@@ -208,12 +120,6 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
     }
   }
 
-  const { invalidationText, outcomeText } = contentsByParams(
-    sessionType,
-    isExtendedPipOffset,
-    intent
-  )
-
   return showChooseTipRack ? (
     <ChooseTipRack
       tipRack={props.tipRack}
@@ -238,14 +144,15 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
             isExtendedPipOffset={isExtendedPipOffset}
             intent={intent}
           />
-          {invalidationText && (
-            <StyledText as="p">{invalidationText}</StyledText>
-          )}
+
+          {sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
+          isExtendedPipOffset === true ? (
+            <InvalidationStatement intent={intent} />
+          ) : null}
           <IntroBody
             sessionType={sessionType}
             isExtendedPipOffset={isExtendedPipOffset}
           />
-          {outcomeText && <StyledText as="p">{outcomeText}</StyledText>}
         </Flex>
         <WizardRequiredLabwareList
           equipmentList={equipmentList}
@@ -351,5 +258,34 @@ function IntroBody(props: IntroBodyProps): JSX.Element | null {
         'Introduction Calibration Panel received invalid session type'
       )
       return null
+  }
+}
+
+interface InvalidationStatementProps {
+  intent?: Intent
+}
+function InvalidationStatement(
+  props: InvalidationStatementProps
+): JSX.Element | null {
+  const { intent } = props
+  const { t } = useTranslation('robot_calibration')
+  if (
+    intent === INTENT_TIP_LENGTH_IN_PROTOCOL ||
+    intent === INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL
+  ) {
+    return (
+      <Banner type="warning">
+        {t('tip_length_invalidates_pipette_offset')}
+      </Banner>
+    )
+  } else if (
+    intent === INTENT_CALIBRATE_PIPETTE_OFFSET ||
+    intent === INTENT_RECALIBRATE_PIPETTE_OFFSET
+  ) {
+    return (
+      <Banner type="warning">{t('pipette_offset_requires_tip_length')}</Banner>
+    )
+  } else {
+    return null
   }
 }
