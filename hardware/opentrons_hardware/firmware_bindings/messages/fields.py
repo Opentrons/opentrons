@@ -144,7 +144,7 @@ class SerialDataCodeField(utils.BinaryFieldBase[bytes]):
     model number, and the name.
     """
 
-    NUM_BYTES = 12
+    NUM_BYTES = 16
     FORMAT = f"{NUM_BYTES}s"
 
     @classmethod

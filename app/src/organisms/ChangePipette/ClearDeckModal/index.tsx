@@ -6,7 +6,7 @@ import {
   SPACING,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
-import { WizardHeader } from '../../../atoms/WizardHeader'
+import { WizardHeader } from '../../../molecules/WizardHeader'
 import { StyledText } from '../../../atoms/text'
 import { PrimaryButton } from '../../../atoms/buttons'
 
@@ -38,7 +38,7 @@ export function ClearDeckModal(props: ClearDeckModalProps): JSX.Element {
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        marginBottom="13.5rem"
+        marginBottom="12.25rem"
         paddingX={SPACING.spacing6}
         paddingTop={SPACING.spacing6}
       >

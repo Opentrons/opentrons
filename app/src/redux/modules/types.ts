@@ -5,7 +5,6 @@ import type {
   MagneticModuleModel,
   HeaterShakerModuleModel,
 } from '@opentrons/shared-data'
-import type { Slot } from '../robot/api-types'
 
 import {
   TEMPERATURE_MODULE_TYPE,
@@ -23,6 +22,19 @@ export type CommonModuleInfo = Omit<
   ApiTypes.ApiBaseModule,
   'model' | 'displayName' | 'moduleModel'
 >
+
+export type Slot =
+  | '1'
+  | '2'
+  | '3'
+  | '4'
+  | '5'
+  | '6'
+  | '7'
+  | '8'
+  | '9'
+  | '10'
+  | '11'
 
 export interface TemperatureModule extends CommonModuleInfo {
   moduleType: typeof TEMPERATURE_MODULE_TYPE
@@ -60,62 +72,7 @@ export interface MatchedModule {
   module: AttachedModule
 }
 
-// fetch modules
-
-export interface FetchModulesAction {
-  type: 'modules:FETCH_MODULES'
-  payload: { robotName: string }
-  meta: RobotApiRequestMeta | {}
-}
-
-export interface FetchModulesSuccessAction {
-  type: 'modules:FETCH_MODULES_SUCCESS'
-  payload: { robotName: string; modules: AttachedModule[] }
-  meta: RobotApiRequestMeta
-}
-
-export interface FetchModulesFailureAction {
-  type: 'modules:FETCH_MODULES_FAILURE'
-  payload: { robotName: string; error: {} }
-  meta: RobotApiRequestMeta
-}
-
-// fetch module data
-
-export interface SendModuleCommandAction {
-  type: 'modules:SEND_MODULE_COMMAND'
-  payload: {
-    robotName: string
-    moduleId: string
-    command: ApiTypes.ModuleCommand
-    args: unknown[]
-  }
-  meta: RobotApiRequestMeta | {}
-}
-
-export interface SendModuleCommandSuccessAction {
-  type: 'modules:SEND_MODULE_COMMAND_SUCCESS'
-  payload: {
-    robotName: string
-    moduleId: string
-    command: ApiTypes.ModuleCommand
-    returnValue: unknown
-  }
-  meta: RobotApiRequestMeta
-}
-
-export interface SendModuleCommandFailureAction {
-  type: 'modules:SEND_MODULE_COMMAND_FAILURE'
-  payload: {
-    robotName: string
-    moduleId: string
-    command: ApiTypes.ModuleCommand
-    error: {}
-  }
-  meta: RobotApiRequestMeta
-}
-
-// fetch modules
+// update modules
 
 export interface UpdateModuleAction {
   type: 'modules:UPDATE_MODULE'
@@ -146,12 +103,6 @@ export interface UpdateModuleFailureAction {
 // action union
 
 export type ModulesAction =
-  | FetchModulesAction
-  | FetchModulesSuccessAction
-  | FetchModulesFailureAction
-  | SendModuleCommandAction
-  | SendModuleCommandSuccessAction
-  | SendModuleCommandFailureAction
   | UpdateModuleAction
   | UpdateModuleSuccessAction
   | UpdateModuleFailureAction

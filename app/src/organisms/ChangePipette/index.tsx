@@ -29,9 +29,10 @@ import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibra
 import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/CalibrationPanels'
 import { useFeatureFlag } from '../../redux/config'
 import { ModalShell } from '../../molecules/Modal'
+import { Instructions } from './Instructions'
 import { ClearDeckModal } from './ClearDeckModal/index'
 import { ExitAlertModal } from './ExitAlertModal'
-import { Instructions } from './Instructions'
+import { DeprecatedInstructions } from './DeprecatedInstructions'
 import { ConfirmPipette } from './ConfirmPipette'
 import { RequestInProgressModal } from './RequestInProgressModal'
 import { LevelPipette } from './LevelPipette'
@@ -46,8 +47,8 @@ import {
   CALIBRATE_PIPETTE,
 } from './constants'
 
+import type { Mount } from '@opentrons/components'
 import type { State, Dispatch } from '../../redux/types'
-import type { Mount } from '../../redux/robot/types'
 import type { WizardStep } from './types'
 
 interface Props {
@@ -164,7 +165,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
 
   if (wizardStep === CLEAR_DECK) {
     return enableChangePipetteWizard ? (
-      <ModalShell height="28.12rem">
+      <ModalShell height="28.12rem" width="47rem">
         <ClearDeckModal
           totalSteps={5}
           currentStep={1}
@@ -217,15 +218,39 @@ export function ChangePipette(props: Props): JSX.Element | null {
             exit={homePipAndExit}
           />
         )}
-        <Instructions
-          {...{
-            ...basePropsWithPipettes,
-            direction,
-            setWantedName,
-            confirm: () => setWizardStep(CONFIRM),
-            exit: () => setConfirmExit(true),
-          }}
-        />
+        {enableChangePipetteWizard ? (
+          <ModalShell height="28.12rem" width="47rem">
+            <Instructions
+              {...{
+                ...basePropsWithPipettes,
+                direction,
+                setWantedName,
+                confirm: () => setWizardStep(CONFIRM),
+                back: () => setWizardStep(CLEAR_DECK),
+                exit: () => setConfirmExit(true),
+                currentStep: 5,
+                totalSteps: 8,
+                title:
+                  actualPipette?.displayName != null
+                    ? t('detach_pipette', {
+                        pipette: actualPipette.displayName,
+                        mount: mount[0].toUpperCase() + mount.slice(1),
+                      })
+                    : t('attach_pipette'),
+              }}
+            />
+          </ModalShell>
+        ) : (
+          <DeprecatedInstructions
+            {...{
+              ...basePropsWithPipettes,
+              direction,
+              setWantedName,
+              confirm: () => setWizardStep(CONFIRM),
+              exit: () => setConfirmExit(true),
+            }}
+          />
+        )}
       </>
     )
   }

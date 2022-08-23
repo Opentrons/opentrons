@@ -49,12 +49,6 @@ describe('protocolReducer', () => {
         data: {},
       } as any,
     },
-    {
-      name: 'handles robot:DISCONNECT by clearing state',
-      action: { type: 'robot:DISCONNECT' },
-      initialState: { file: { name: 'proto.py' }, contents: 'foo', data: {} },
-      expectedState: { file: null, contents: null, data: null },
-    },
   ]
 
   SPECS.forEach(spec => {

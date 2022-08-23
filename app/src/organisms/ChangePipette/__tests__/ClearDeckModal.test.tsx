@@ -27,7 +27,7 @@ describe('ClearDeckModal', () => {
     getByText(
       'Before starting, remove all labware from the deck and all tips from pipettes. The gantry will move to the front of the robot.'
     )
-    const exit = getByRole('button', { name: 'exit' })
+    const exit = getByRole('button', { name: 'Exit' })
     fireEvent.click(exit)
     expect(props.onCancelClick).toHaveBeenCalled()
     const cont = getByRole('button', { name: 'Get started' })
@@ -46,7 +46,7 @@ describe('ClearDeckModal', () => {
     getByText(
       'Before starting, remove all labware from the deck and all tips from pipettes. The gantry will move to the front of the robot.'
     )
-    const exit = getByRole('button', { name: 'exit' })
+    const exit = getByRole('button', { name: 'Exit' })
     fireEvent.click(exit)
     expect(props.onCancelClick).toHaveBeenCalled()
     const cont = getByRole('button', { name: 'Get started' })

@@ -11,7 +11,7 @@ from opentrons_shared_data.labware.dev_types import (
 )
 
 if TYPE_CHECKING:
-    from opentrons.protocols.context.labware import AbstractLabware
+    from opentrons.protocol_api.core.labware import AbstractLabware
 
 
 class WellGeometry:

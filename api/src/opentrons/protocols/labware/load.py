@@ -2,8 +2,8 @@ import logging
 from typing import Dict
 
 from opentrons.protocols.labware.definition import get_labware_definition
-from opentrons.protocols.context.labware import AbstractLabware
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
+from opentrons.protocol_api.core.labware import AbstractLabware
+from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.types import Location
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
