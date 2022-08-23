@@ -1,70 +1,35 @@
 import * as React from 'react'
-import cx from 'classnames'
+import { Trans, useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import {
-  Icon,
-  ModalPage,
-  PrimaryBtn,
-  SecondaryBtn,
-  SPACING_2,
+  ALIGN_FLEX_END,
+  Btn,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import styles from './styles.css'
 
-import type {
-  PipetteNameSpecs,
-  PipetteModelSpecs,
-  PipetteDisplayCategory,
-} from '@opentrons/shared-data'
+import { WizardHeader } from '../../molecules/WizardHeader'
+import { StyledText } from '../../atoms/text'
+import { PrimaryButton } from '../../atoms/buttons'
 
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { Mount } from '../../redux/pipettes/types'
-import type { PipetteOffsetCalibration } from '../../redux/calibration/types'
 
-// TODO: i18n
-const EXIT_BUTTON_MESSAGE = 'confirm pipette is leveled'
-const EXIT_WITHOUT_CAL = 'exit without calibrating'
-const CONTINUE_TO_PIP_OFFSET = 'continue to pipette offset calibration'
-const LEVEL_MESSAGE = (displayName: string): string =>
-  `Next, level the ${displayName}`
-const CONNECTED_MESSAGE = (displayName: string): string =>
-  `${displayName} connected`
-
-interface Props {
-  robotName: string
+interface LevelPipetteProps {
   mount: Mount
-  title: string
-  subtitle: string
   wantedPipette: PipetteNameSpecs | null
-  actualPipette: PipetteModelSpecs | null
-  actualPipetteOffset: PipetteOffsetCalibration | null
-  displayName: string
-  displayCategory: PipetteDisplayCategory | null
   pipetteModelName: string
   back: () => unknown
   exit: () => unknown
-  startPipetteOffsetCalibration: () => void
-}
-
-function Status(props: { displayName: string }): JSX.Element {
-  const iconName = 'check-circle'
-  const iconClass = cx(styles.confirm_icon, {
-    [styles.success]: true,
-    [styles.failure]: false,
-  })
-
-  return (
-    <div className={styles.leveling_title}>
-      <Icon name={iconName} className={iconClass} />
-      {CONNECTED_MESSAGE(props.displayName)}
-    </div>
-  )
-}
-
-function LevelingInstruction(props: { displayName: string }): JSX.Element {
-  return (
-    <div className={styles.leveling_instruction}>
-      {LEVEL_MESSAGE(props.displayName)}
-    </div>
-  )
+  confirm: () => unknown
+  currentStep: number
+  totalSteps: number
 }
 
 function LevelingVideo(props: {
@@ -73,58 +38,104 @@ function LevelingVideo(props: {
 }): JSX.Element {
   const { pipetteName, mount } = props
   return (
-    <div className={styles.leveling_video_wrapper}>
-      <video
-        className={styles.leveling_video}
-        autoPlay={true}
-        loop={true}
-        controls={true}
-      >
-        <source
-          src={require(`../../assets/videos/pip-leveling/${pipetteName}-${mount}.webm`)}
-        />
-      </video>
-    </div>
+    <video
+      css={css`
+        width: 100%;
+        max-height: 15rem;
+        margin-top: ${SPACING.spacing4};
+        margin-left: ${SPACING.spacing4};
+      `}
+      autoPlay={true}
+      loop={true}
+      controls={true}
+    >
+      <source
+        src={require(`../../assets/videos/pip-leveling/${pipetteName}-${mount}.webm`)}
+      />
+    </video>
   )
 }
 
-export function LevelPipette(props: Props): JSX.Element {
+export function LevelPipette(props: LevelPipetteProps): JSX.Element {
   const {
-    title,
-    subtitle,
-    pipetteModelName,
-    displayName,
-    actualPipetteOffset,
     mount,
+    pipetteModelName,
+    wantedPipette,
     back,
     exit,
-    startPipetteOffsetCalibration,
+    confirm,
+    currentStep,
+    totalSteps,
   } = props
 
+  const { t } = useTranslation('change_pipette')
+  console.log(pipetteModelName, wantedPipette)
   return (
-    <ModalPage
-      titleBar={{
-        title: title,
-        subtitle: subtitle,
-        back: { onClick: back, disabled: false },
-      }}
-      contentsClassName={styles.leveling_modal}
-    >
-      <Status displayName={displayName} />
-      <LevelingInstruction displayName={displayName} />
-      <LevelingVideo pipetteName={pipetteModelName} mount={mount} />
-      {!actualPipetteOffset && (
-        <PrimaryBtn
-          marginBottom={SPACING_2}
-          width="100%"
-          onClick={startPipetteOffsetCalibration}
+    <>
+      <WizardHeader
+        currentStep={currentStep}
+        totalSteps={totalSteps}
+        onExit={exit}
+        title={t('attach_pipette_type', {
+          pipetteName: wantedPipette?.displayName,
+        })}
+      />
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        paddingX={SPACING.spacing6}
+        paddingTop={SPACING.spacing6}
+        height="100%"
+      >
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          {CONTINUE_TO_PIP_OFFSET}
-        </PrimaryBtn>
-      )}
-      <SecondaryBtn marginBottom={SPACING_2} width="100%" onClick={exit}>
-        {actualPipetteOffset ? EXIT_BUTTON_MESSAGE : EXIT_WITHOUT_CAL}
-      </SecondaryBtn>
-    </ModalPage>
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <Trans
+              t={t}
+              i18nKey={'level_the_pipette'}
+              components={{
+                bold: <strong />,
+                h1: (
+                  <StyledText
+                    as="h1"
+                    marginBottom={SPACING.spacing4}
+                    color={COLORS.darkBlackEnabled}
+                  />
+                ),
+                block: (
+                  <StyledText
+                    css={css`
+                      display: list-item;
+                    `}
+                    marginLeft={SPACING.spacing6}
+                    as="p"
+                  />
+                ),
+              }}
+            />
+          </Flex>
+          <LevelingVideo pipetteName={pipetteModelName} mount={mount} />
+        </Flex>
+      </Flex>
+      <Flex
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        marginBottom={SPACING.spacing6}
+        marginX={SPACING.spacing6}
+        alignSelf={ALIGN_FLEX_END}
+        marginTop={SPACING.spacing6}
+      >
+        <Btn onClick={back}>
+          <StyledText
+            css={TYPOGRAPHY.pSemiBold}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            color={COLORS.darkGreyEnabled}
+          >
+            {t('go_back')}
+          </StyledText>
+        </Btn>
+        <PrimaryButton onClick={confirm}>{t('confirm_level')}</PrimaryButton>
+      </Flex>
+    </>
   )
 }
