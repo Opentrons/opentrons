@@ -42,6 +42,7 @@ stages:
               location: !anydict
           labwareOffsets: []
           protocolId: '{protocol_id}'
+          liquids: []
       save:
         json:
           original_run_data: data
@@ -215,6 +216,7 @@ stages:
           id: '{run_id}'
           createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
           startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          liquids: []
           completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
           errors: []
           pipettes: []

@@ -1,4 +1,4 @@
-"""Tests for the JSON JsonCommandTranslator interface."""
+"""Tests for the JSON JsonTranslator interface."""
 import pytest
 from typing import Dict, List
 
@@ -16,7 +16,7 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.protocol.models import protocol_schema_v6
 from opentrons.types import DeckSlotName, MountType
-from opentrons.protocol_runner.json_command_translator import JsonCommandTranslator
+from opentrons.protocol_runner.json_translator import JsonTranslator
 from opentrons.protocol_engine import (
     commands as pe_commands,
     DeckPoint,
@@ -27,6 +27,7 @@ from opentrons.protocol_engine import (
     WellOffset,
     ModuleModel,
     ModuleLocation,
+    Liquid,
 )
 
 VALID_TEST_PARAMS = [
@@ -325,13 +326,32 @@ VALID_TEST_PARAMS = [
             ),
         ),
     ),
+    (
+        protocol_schema_v6.Command(
+            commandType="loadLiquid",
+            key=None,
+            params=protocol_schema_v6.Params(
+                labwareId="labware-id-def456",
+                liquidId="liquid-id-555",
+                volumeByWell={"A1": 32, "B2": 50},
+            ),
+        ),
+        pe_commands.LoadLiquidCreate(
+            key=None,
+            params=pe_commands.LoadLiquidParams(
+                labwareId="labware-id-def456",
+                liquidId="liquid-id-555",
+                volumeByWell={"A1": 32, "B2": 50},
+            ),
+        ),
+    ),
 ]
 
 
 @pytest.fixture
-def subject() -> JsonCommandTranslator:
-    """Get a JsonCommandTranslator test subject."""
-    return JsonCommandTranslator()
+def subject() -> JsonTranslator:
+    """Get a JsonTranslator test subject."""
+    return JsonTranslator()
 
 
 def _load_labware_definition_data() -> LabwareDefinition:
@@ -381,6 +401,11 @@ def _make_json_protocol(
             displayName="Source Plate", definitionId="example/plate/1"
         )
     },
+    liquids: Dict[str, protocol_schema_v6.Liquid] = {
+        "liquid-id-555": protocol_schema_v6.Liquid(
+            displayName="water", description="water description"
+        )
+    },
     commands: List[protocol_schema_v6.Command] = [],
     modules: Dict[str, protocol_schema_v6.Module] = {
         "magneticModuleId": protocol_schema_v6.Module(model="magneticModuleV2")
@@ -398,16 +423,29 @@ def _make_json_protocol(
         labwareDefinitions=labware_definitions,
         labware=labware,
         commands=commands,
+        liquids=liquids,
         modules=modules,
     )
 
 
 @pytest.mark.parametrize("test_input, expected_output", VALID_TEST_PARAMS)
 def test_load_command(
-    subject: JsonCommandTranslator,
+    subject: JsonTranslator,
     test_input: protocol_schema_v6.Command,
     expected_output: pe_commands.CommandCreate,
 ) -> None:
     """Test translating v6 commands to protocol engine commands."""
-    output = subject.translate(_make_json_protocol(commands=[test_input]))
+    output = subject.translate_commands(_make_json_protocol(commands=[test_input]))
     assert output == [expected_output]
+
+
+def test_load_liquid(
+    subject: JsonTranslator,
+) -> None:
+    """Test translating v6 commands to protocol engine commands."""
+    protocol = _make_json_protocol()
+    result = subject.translate_liquids(protocol)
+
+    assert result == [
+        Liquid(id="liquid-id-555", displayName="water", description="water description")
+    ]
