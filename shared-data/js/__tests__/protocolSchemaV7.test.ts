@@ -1,28 +1,28 @@
-/** Ensure that protocol schema v4 definition itself functions as intended,
- *  and that all v4 protocol fixtures will validate */
+/** Ensure that protocol schema v7 definition itself functions as intended,
+ *  and that all v7 protocol fixtures will validate */
 import Ajv from 'ajv'
 import path from 'path'
 import glob from 'glob'
 import omit from 'lodash/omit'
 
-import protocolSchema from '../../protocol/schemas/4.json'
+import protocolSchema from '../../protocol/schemas/7-draft.json'
 import labwareV2Schema from '../../labware/schemas/2.json'
-import simpleV4Fixture from '../../protocol/fixtures/4/simpleV4.json'
+import simpleV7Fixture from '../../protocol/fixtures/7/simpleV7.json'
 
 const fixturesGlobPath = path.join(
   __dirname,
-  '../../protocol/fixtures/4/**/*.json'
+  '../../protocol/fixtures/7/**/*.json'
 )
 
 const protocolFixtures = glob.sync(fixturesGlobPath)
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 
-// v4 protocol schema contains reference to v2 labware schema, so give AJV access to it
+// v7 protocol schema contains reference to v2 labware schema, so give AJV access to it
 ajv.addSchema(labwareV2Schema)
 
 const validateProtocol = ajv.compile(protocolSchema)
 
-describe('validate v4 protocol fixtures under JSON schema', () => {
+describe('validate v7 protocol fixtures under JSON schema', () => {
   protocolFixtures.forEach(protocolPath => {
     it(path.basename(protocolPath), () => {
       const protocol = require(protocolPath)
@@ -41,21 +41,21 @@ describe('validate v4 protocol fixtures under JSON schema', () => {
 })
 
 describe('ensure bad protocol data fails validation', () => {
-  it('$otSharedSchema is required to be "#/protocol/schemas/4"', () => {
-    expect(validateProtocol(omit(simpleV4Fixture, '$otSharedSchema'))).toBe(
+  it('$otSharedSchema is required to be "#/protocol/schemas/7-draft"', () => {
+    expect(validateProtocol(omit(simpleV7Fixture, '$otSharedSchema'))).toBe(
       false
     )
     expect(
       validateProtocol({
-        ...simpleV4Fixture,
-        $otSharedSchema: '#/protocol/schemas/5',
+        ...simpleV7Fixture,
+        $otSharedSchema: '#/protocol/schemas/3',
       })
     ).toBe(false)
   })
 
-  it('schemaVersion is required to be 4', () => {
-    expect(validateProtocol(omit(simpleV4Fixture, 'schemaVersion'))).toBe(false)
-    expect(validateProtocol({ ...simpleV4Fixture, schemaVersion: 3 })).toBe(
+  it('schemaVersion is required to be 7', () => {
+    expect(validateProtocol(omit(simpleV7Fixture, 'schemaVersion'))).toBe(false)
+    expect(validateProtocol({ ...simpleV7Fixture, schemaVersion: 3 })).toBe(
       false
     )
   })
@@ -64,8 +64,6 @@ describe('ensure bad protocol data fails validation', () => {
     const badPipettes = {
       missingKeys: {},
       missingName: { mount: 'left' },
-      missingMount: { name: 'pipetteName' },
-      badMount: { mount: 'blah', name: 'pipetteName' },
       hasAdditionalProperties: {
         mount: 'left',
         name: 'pipetteName',
@@ -76,9 +74,9 @@ describe('ensure bad protocol data fails validation', () => {
     Object.entries(badPipettes).forEach(([pipetteId, pipette]) => {
       expect(
         validateProtocol({
-          ...simpleV4Fixture,
+          ...simpleV7Fixture,
           pipettes: {
-            ...simpleV4Fixture.pipettes,
+            ...simpleV7Fixture.pipettes,
             [pipetteId]: pipette,
           },
         })
@@ -88,8 +86,7 @@ describe('ensure bad protocol data fails validation', () => {
 
   it('reject bad values in "labware" objects', () => {
     const badLabware = {
-      noSlot: { definitionId: 'defId' },
-      noDefId: { slot: '1' },
+      noDefId: { displayName: 'myLabware' },
       hasAdditionalProperties: {
         slot: '1',
         definitionId: 'defId',
@@ -100,9 +97,9 @@ describe('ensure bad protocol data fails validation', () => {
     Object.entries(badLabware).forEach(([labwareId, labware]) => {
       expect(
         validateProtocol({
-          ...simpleV4Fixture,
+          ...simpleV7Fixture,
           labware: {
-            ...simpleV4Fixture.labware,
+            ...simpleV7Fixture.labware,
             [labwareId]: labware,
           },
         })
@@ -112,12 +109,10 @@ describe('ensure bad protocol data fails validation', () => {
 
   it('reject bad values in "modules" objects', () => {
     const badModules = {
-      badModuleType: { slot: '1', moduleType: 'fake' },
-      noSlot: { moduleType: 'thermocycler' },
-      noModuleType: { slot: '1' },
+      noModel: { moduleType: 'thermocycler' },
       hasAdditionalProperties: {
+        model: 'thermocycler',
         slot: '1',
-        moduleType: 'thermocycler',
         blah: 'blah',
       },
     }
@@ -125,9 +120,9 @@ describe('ensure bad protocol data fails validation', () => {
     Object.entries(badModules).forEach(([moduleId, module]) => {
       expect(
         validateProtocol({
-          ...simpleV4Fixture,
+          ...simpleV7Fixture,
           modules: {
-            ...simpleV4Fixture.modules,
+            ...simpleV7Fixture.modules,
             [moduleId]: module,
           },
         })
