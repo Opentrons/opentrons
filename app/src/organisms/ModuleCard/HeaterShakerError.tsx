@@ -37,14 +37,14 @@ export function HeaterShakerError(props: HeaterShakerErrorProps): JSX.Element {
       marginRight={SPACING.spacing5}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        {t('heater_shaker:module_error')}
+        {t('module_error')}
         <Btn
           textAlign={ALIGN_START}
           fontSize={TYPOGRAPHY.fontSizeP}
           textDecoration={TYPOGRAPHY.textDecorationUnderline}
           onClick={() => setShowErrorDetails(true)}
         >
-          {t('heater_shaker:view_details')}
+          {t('view_details')}
         </Btn>
       </Flex>
       {showErrorDetails ? (
