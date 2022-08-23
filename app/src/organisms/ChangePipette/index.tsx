@@ -29,6 +29,7 @@ import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibra
 import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/CalibrationPanels'
 import { useFeatureFlag } from '../../redux/config'
 import { ModalShell } from '../../molecules/Modal'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { Instructions } from './Instructions'
 import { ClearDeckModal } from './ClearDeckModal/index'
 import { ExitAlertModal } from './ExitAlertModal'
@@ -38,7 +39,6 @@ import { RequestInProgressModal } from './RequestInProgressModal'
 import { LevelPipette } from './LevelPipette'
 import { DeprecatedLevelPipette } from './DeprecatedLevelPipette'
 import { ClearDeckAlertModal } from './ClearDeckModal/ClearDeckAlertModal'
-import { InProgressModal } from './InProgressModal'
 
 import {
   ATTACH,
@@ -49,9 +49,10 @@ import {
   CALIBRATE_PIPETTE,
 } from './constants'
 
-import type { Mount } from '@opentrons/components'
+import { Mount, SPACING } from '@opentrons/components'
 import type { State, Dispatch } from '../../redux/types'
 import type { WizardStep } from './types'
+import { StyledText } from '../../atoms/text'
 
 interface Props {
   robotName: string
@@ -160,10 +161,18 @@ export function ChangePipette(props: Props): JSX.Element | null {
     return enableChangePipetteWizard && movementStatus === MOVING ? (
       <ModalShell height="28.12rem" width="47rem">
         <InProgressModal
-          title={t('attach_pipette')}
+          wizardHeaderTitle={t('attach_pipette')}
           currentStep={1}
           totalSteps={5}
-        />
+        >
+          <StyledText
+            as="h1"
+            marginTop={SPACING.spacing5}
+            marginBottom={SPACING.spacing3}
+          >
+            {t('moving_gantry')}
+          </StyledText>
+        </InProgressModal>
       </ModalShell>
     ) : (
       <RequestInProgressModal
