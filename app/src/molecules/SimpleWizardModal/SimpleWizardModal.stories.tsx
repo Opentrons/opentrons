@@ -1,9 +1,7 @@
 import * as React from 'react'
-import { COLORS, Flex, DIRECTION_COLUMN } from '@opentrons/components'
+import { COLORS } from '@opentrons/components'
 import { TEMPERATURE_MODULE_V1 } from '@opentrons/shared-data'
 import { PrimaryButton } from '../../atoms/buttons'
-import { WizardHeader } from '../WizardHeader'
-import { ModalShell } from '../Modal'
 import { SimpleWizardModal } from './index'
 
 import type { Story, Meta } from '@storybook/react'
