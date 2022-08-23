@@ -21,7 +21,6 @@ import {
 import {
   getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_V1,
   HS_TOO_HOT_TEMP,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -60,7 +59,7 @@ import { HeaterShakerModuleData } from './HeaterShakerModuleData'
 import { HeaterShakerSlideout } from './HeaterShakerSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
-import { HeaterShakerError } from './HeaterShakerError'
+import { ErrorInfo } from './ErrorInfo'
 
 import magneticModule from '../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../assets/images/temp_deck_gen_2_transparent.svg'
@@ -275,6 +274,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             flex="100%"
             paddingLeft={SPACING.spacing3}
           >
+            <ErrorInfo attachedModule={module} />
             {showSuccessToast && (
               <Toast
                 message={t('firmware_update_installation_successful')}
@@ -333,11 +333,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   />
                 </Banner>
               </Flex>
-            ) : null}
-            {module.moduleModel === HEATERSHAKER_MODULE_V1 &&
-            module.data.status === 'error' &&
-            module.data.errorDetails != null ? (
-              <HeaterShakerError errorDetails={module.data.errorDetails} />
             ) : null}
             {isPending ? (
               <Flex
