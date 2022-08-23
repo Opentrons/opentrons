@@ -25,9 +25,10 @@ PipetteName = Union[
     Literal["p300_multi_gen2"],
     Literal["p1000_single"],
     Literal["p1000_single_gen2"],
-    Literal["p300_single_gen3"],
     Literal["p1000_single_gen3"],
-    Literal["p20_single_gen3"],
+    Literal["p50_single_gen3"],
+    Literal["p1000_multi_gen3"],
+    Literal["p50_multi_gen3"],
 ]
 
 # Generic NewType for models because we get new ones frequently and theres
