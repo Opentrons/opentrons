@@ -284,7 +284,7 @@ class LabwareView(HasState[LabwareState]):
         """Check if wells associated to a labware_id has well by name and that labware is not tiprack."""
         labware_definition = self.get_definition(labware_id)
         labware_wells = labware_definition.wells
-        contains_wells = all(item in labware_wells for item in iter(wells))
+        contains_wells = all(well_name in labware_wells for well_name in iter(wells))
         if not contains_wells:
             raise errors.WellDoesNotExistError(
                 f"Some of the supplied wells do not match the labwareId: {labware_id}."
