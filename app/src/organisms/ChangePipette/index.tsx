@@ -36,6 +36,7 @@ import { DeprecatedInstructions } from './DeprecatedInstructions'
 import { ConfirmPipette } from './ConfirmPipette'
 import { RequestInProgressModal } from './RequestInProgressModal'
 import { LevelPipette } from './LevelPipette'
+import { DeprecatedLevelPipette } from './DeprecatedLevelPipette'
 import { ClearDeckAlertModal } from './ClearDeckModal/ClearDeckAlertModal'
 
 import {
@@ -272,8 +273,20 @@ export function ChangePipette(props: Props): JSX.Element | null {
     }
 
     if (success && wantedPipette && shouldLevel(wantedPipette)) {
-      return (
-        <LevelPipette
+      return enableChangePipetteWizard ? (
+        <ModalShell height="28.12rem" width="47rem">
+          <LevelPipette
+            {...basePropsWithPipettes}
+            pipetteModelName={actualPipette ? actualPipette.name : ''}
+            exit={() => setConfirmExit(true)}
+            confirm={homePipAndExit}
+            back={() => setWizardStep(CLEAR_DECK)}
+            currentStep={6}
+            totalSteps={8}
+          />
+        </ModalShell>
+      ) : (
+        <DeprecatedLevelPipette
           {...{
             pipetteModelName: actualPipette ? actualPipette.name : '',
             ...basePropsWithPipettes,
