@@ -91,7 +91,7 @@ class Run(ResourceModel):
         description="Labware that has been loaded into the run.",
     )
     liquids: List[Liquid] = Field(
-        default_factory=list,
+        ...,
         description="Liquids loaded to the run.",
     )
     labwareOffsets: List[LabwareOffset] = Field(

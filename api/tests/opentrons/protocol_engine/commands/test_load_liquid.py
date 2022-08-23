@@ -26,16 +26,6 @@ async def test_load_liquid_implementation(
     decoy: Decoy, subject: LoadLiquidImplementation, mock_state_view: StateView
 ) -> None:
     """Test LoadLiquid command execution."""
-    decoy.when(mock_state_view.liquid.validate_liquid_id("liquid-id")).then_return(
-        "liquid-id"
-    )
-
-    decoy.when(
-        mock_state_view.labware.validate_liquid_allowed_in_labware(
-            "labware-id", {"A1": 30.0, "B2": 100.0}
-        )
-    ).then_return(["A1", "B2"])
-
     data = LoadLiquidParams(
         labwareId="labware-id",
         liquidId="liquid-id",
@@ -44,3 +34,11 @@ async def test_load_liquid_implementation(
     result = await subject.execute(data)
 
     assert result == LoadLiquidResult()
+
+    decoy.verify(mock_state_view.liquid.validate_liquid_id("liquid-id"))
+
+    decoy.verify(
+        mock_state_view.labware.validate_liquid_allowed_in_labware(
+            "labware-id", {"A1": 30.0, "B2": 100.0}
+        )
+    )
