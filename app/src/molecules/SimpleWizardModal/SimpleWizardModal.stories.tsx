@@ -1,20 +1,20 @@
 import * as React from 'react'
 import { COLORS, Flex, DIRECTION_COLUMN } from '@opentrons/components'
-import { PrimaryButton } from '../../../atoms/buttons'
-import { WizardHeader } from '../../../molecules/WizardHeader'
-import { ModalShell } from '../../../molecules/Modal'
-
-import { ChangePipetteBasicModal } from './index'
+import { TEMPERATURE_MODULE_V1 } from '@opentrons/shared-data'
+import { PrimaryButton } from '../../atoms/buttons'
+import { WizardHeader } from '../WizardHeader'
+import { ModalShell } from '../Modal'
+import { SimpleWizardModal } from './index'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Organisms/ChangePipette/ChangePipetteBasicModal',
-  component: ChangePipetteBasicModal,
+  title: 'App/Molecules/SimpleWizardModal',
+  component: SimpleWizardModal,
 } as Meta
 
 const WithWizardHeaderTemplate: Story<
-  React.ComponentProps<typeof ChangePipetteBasicModal>
+  React.ComponentProps<typeof SimpleWizardModal>
 > = args => (
   <ModalShell width="47rem">
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -24,7 +24,7 @@ const WithWizardHeaderTemplate: Story<
         title="Attach a pipette"
         onExit={() => console.log('exit')}
       />
-      <ChangePipetteBasicModal {...args} />
+      <SimpleWizardModal {...args} />
     </Flex>
   </ModalShell>
 )
@@ -38,14 +38,23 @@ WithWizardHeader.args = {
 }
 
 const Template: Story<
-  React.ComponentProps<typeof ChangePipetteBasicModal>
-> = args => <ChangePipetteBasicModal {...args} />
+  React.ComponentProps<typeof SimpleWizardModal>
+> = args => <SimpleWizardModal {...args} />
 
-export const Primary = Template.bind({})
-Primary.args = {
+export const AlertIcon = Template.bind({})
+AlertIcon.args = {
   iconColor: COLORS.errorEnabled,
   header: 'Pipette still detected',
   subHeader: 'Are you sure you want to exit before detaching your pipette?',
   isSuccess: false,
+  children: <PrimaryButton>{'Exit'}</PrimaryButton>,
+}
+
+export const SuccessIcon = Template.bind({})
+SuccessIcon.args = {
+  iconColor: COLORS.errorEnabled,
+  header: 'Pipette still detected',
+  subHeader: 'Are you sure you want to exit before detaching your pipette?',
+  isSuccess: TEMPERATURE_MODULE_V1,
   children: <PrimaryButton>{'Exit'}</PrimaryButton>,
 }

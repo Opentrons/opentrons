@@ -7,7 +7,7 @@ import {
   JUSTIFY_FLEX_END,
   SPACING,
 } from '@opentrons/components'
-import { StyledText } from '../../../atoms/text'
+import { StyledText } from '../../atoms/text'
 
 interface Props {
   iconColor: string
@@ -17,7 +17,7 @@ interface Props {
   isSuccess: boolean
 }
 
-export function ChangePipetteBasicModal(props: Props): JSX.Element {
+export function SimpleWizardModal(props: Props): JSX.Element {
   const { iconColor, children, header, subHeader, isSuccess } = props
 
   return (

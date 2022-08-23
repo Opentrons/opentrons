@@ -1,14 +1,12 @@
 import * as React from 'react'
 import { COLORS, renderWithProviders } from '@opentrons/components'
-import { ChangePipetteBasicModal } from '..'
+import { SimpleWizardModal } from '..'
 
-const render = (
-  props: React.ComponentProps<typeof ChangePipetteBasicModal>
-) => {
-  return renderWithProviders(<ChangePipetteBasicModal {...props} />)[0]
+const render = (props: React.ComponentProps<typeof SimpleWizardModal>) => {
+  return renderWithProviders(<SimpleWizardModal {...props} />)[0]
 }
-describe(' ChangePipetteBasicModal', () => {
-  let props: React.ComponentProps<typeof ChangePipetteBasicModal>
+describe('SimpleWizardModal', () => {
+  let props: React.ComponentProps<typeof SimpleWizardModal>
   beforeEach(() => {
     props = {
       iconColor: COLORS.errorText,
