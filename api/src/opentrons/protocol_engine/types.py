@@ -346,6 +346,15 @@ class LoadedLabware(BaseModel):
     )
 
 
+class Liquid(BaseModel):
+    """Payload required to create a liquid."""
+
+    id: str
+    displayName: str
+    description: str
+    displayColor: Optional[str]
+
+
 class SpeedRange(NamedTuple):
     """Minimum and maximum allowed speeds for a shaking module."""
 
