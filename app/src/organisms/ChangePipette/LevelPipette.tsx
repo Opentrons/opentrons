@@ -69,7 +69,7 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
   } = props
 
   const { t } = useTranslation('change_pipette')
-  console.log(pipetteModelName, wantedPipette)
+
   return (
     <>
       <WizardHeader
