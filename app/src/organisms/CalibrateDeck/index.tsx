@@ -6,7 +6,6 @@ import { SpinnerModalPage, useConditionalConfirm } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
 import {
-  TipPickUp,
   TipConfirmation,
   SaveZPoint,
   SaveXYPoint,
@@ -14,7 +13,7 @@ import {
   ConfirmExitModal,
   INTENT_DECK_CALIBRATION,
 } from '../../organisms/DeprecatedCalibrationPanels'
-import { Introduction, DeckSetup } from '../../organisms/CalibrationPanels'
+import { Introduction, DeckSetup, TipPickUp } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'

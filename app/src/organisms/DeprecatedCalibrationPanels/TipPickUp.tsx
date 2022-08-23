@@ -25,9 +25,9 @@ import {
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import * as Sessions from '../../redux/sessions'
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { Axis, Sign, StepSize } from '../../molecules/DeprecatedJogControls/types'
 import { getLatestLabwareDef } from '../../assets/labware/getLabware'
-import { JogControls } from '../../molecules/JogControls'
+import { DeprecatedJogControls } from '../../molecules/DeprecatedJogControls'
 import type { CalibrationPanelProps } from './types'
 import { formatJogVector } from './utils'
 
@@ -159,7 +159,7 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
             </Box>
           </Flex>
         </Box>
-        <JogControls jog={jog} marginBottom={SPACING.spacing5} />
+        <DeprecatedJogControls jog={jog} marginBottom={SPACING.spacing5} />
         <Flex width="100%" justifyContent={JUSTIFY_CENTER}>
           <PrimaryBtn onClick={pickUpTip} flex="1" marginX={SPACING_5}>
             {TIP_PICK_UP_BUTTON_TEXT}

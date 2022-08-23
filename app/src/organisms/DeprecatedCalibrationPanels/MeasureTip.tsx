@@ -23,8 +23,8 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-import { JogControls, VERTICAL_PLANE } from '../../molecules/JogControls'
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import { DeprecatedJogControls, VERTICAL_PLANE } from '../../molecules/DeprecatedJogControls'
+import type { Axis, Sign, StepSize } from '../../molecules/DeprecatedJogControls/types'
 import type { CalibrationPanelProps } from './types'
 
 import { NeedHelpLink } from './NeedHelpLink'
@@ -211,7 +211,7 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
             </Box>
           </Flex>
         </Box>
-        <JogControls
+        <DeprecatedJogControls
           jog={jog}
           stepSizes={[0.1, 1]}
           planes={[VERTICAL_PLANE]}

@@ -27,7 +27,7 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 import * as Sessions from '../../redux/sessions'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import { getLatestLabwareDef } from '../../assets/labware/getLabware'
-import { DeprecatedJogControls } from '../../molecules/DeprecatedJogControls'
+import { JogControls } from '../../molecules/JogControls'
 import type { CalibrationPanelProps } from './types'
 import { formatJogVector } from './utils'
 
@@ -92,7 +92,12 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
   })
 
   return (
-    <>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      padding={SPACING.spacing6}
+      minHeight="25rem"
+    >
       <Flex
         marginTop={SPACING_2}
         flexDirection={DIRECTION_COLUMN}
@@ -155,7 +160,7 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
             </Box>
           </Flex>
         </Box>
-        <DeprecatedJogControls jog={jog} marginBottom={SPACING.spacing5} />
+        <JogControls jog={jog} marginBottom={SPACING.spacing5} />
         <Flex width="100%" justifyContent={JUSTIFY_CENTER}>
           <PrimaryBtn onClick={pickUpTip} flex="1" marginX={SPACING_5}>
             {TIP_PICK_UP_BUTTON_TEXT}
@@ -166,6 +171,6 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
         </Box>
       </Flex>
       {confirmModal}
-    </>
+    </Flex>
   )
 }

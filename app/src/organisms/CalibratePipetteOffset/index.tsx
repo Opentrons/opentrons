@@ -11,7 +11,6 @@ import {
 
 import * as Sessions from '../../redux/sessions'
 import {
-  TipPickUp,
   TipConfirmation,
   SaveZPoint,
   SaveXYPoint,
@@ -20,7 +19,11 @@ import {
   MeasureNozzle,
   MeasureTip,
 } from '../../organisms/DeprecatedCalibrationPanels'
-import { Introduction, DeckSetup } from '../../organisms/CalibrationPanels'
+import {
+  Introduction,
+  DeckSetup,
+  TipPickUp,
+} from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'

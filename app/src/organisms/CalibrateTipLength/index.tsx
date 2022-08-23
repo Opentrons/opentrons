@@ -11,7 +11,6 @@ import {
 
 import * as Sessions from '../../redux/sessions'
 import {
-  TipPickUp,
   TipConfirmation,
   CompleteConfirmation,
   ConfirmExitModal,
@@ -19,7 +18,7 @@ import {
   MeasureTip,
   INTENT_TIP_LENGTH_IN_PROTOCOL,
 } from '../../organisms/DeprecatedCalibrationPanels'
-import { Introduction, DeckSetup } from '../../organisms/CalibrationPanels'
+import { Introduction, DeckSetup, TipPickUp } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'

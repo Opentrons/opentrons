@@ -26,10 +26,10 @@ import {
 
 import * as Sessions from '../../redux/sessions'
 import {
-  JogControls,
+  DeprecatedJogControls,
   HORIZONTAL_PLANE,
   VERTICAL_PLANE,
-} from '../../molecules/JogControls'
+} from '../../molecules/DeprecatedJogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { NeedHelpLink } from './NeedHelpLink'
@@ -47,7 +47,7 @@ import slot7LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_7_LE
 import slot7RightMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_7_RIGHT_MULTI_X-Y.webm'
 import slot7RightSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_7_RIGHT_SINGLE_X-Y.webm'
 
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { Axis, Sign, StepSize } from '../../molecules/DeprecatedJogControls/types'
 import type { CalibrationPanelProps } from './types'
 import type {
   SessionType,
@@ -303,7 +303,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element {
           <source src={demoAsset} />
         </video>
       </Flex>
-      <JogControls
+      <DeprecatedJogControls
         jog={jog}
         stepSizes={[0.1, 1]}
         planes={
