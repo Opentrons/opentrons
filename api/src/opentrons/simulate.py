@@ -25,7 +25,7 @@ import opentrons
 from opentrons.hardware_control import (
     API as HardwareAPI,
     ThreadManager,
-    SyncHardwareAPI,
+    ThreadManagedHardware,
 )
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
@@ -35,9 +35,7 @@ import opentrons.broker
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons import protocol_api
 from opentrons.commands import types as command_types
-from opentrons.protocol_api.core.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
-)
+
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import PythonProtocol, BundleContents
 from opentrons.protocols.api_support.types import APIVersion
@@ -136,7 +134,7 @@ def get_protocol_api(
     bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
     bundled_data: Optional[Dict[str, bytes]] = None,
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
-    hardware_simulator: Optional[SyncHardwareAPI] = None,
+    hardware_simulator: Optional[ThreadManagedHardware] = None,
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a ``protocol_api.ProtocolContext``
@@ -193,8 +191,8 @@ def get_protocol_api(
     ):
         extra_labware = labware_from_paths([str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
 
-    checked_hardware = (
-        hardware_simulator or ThreadManager(HardwareAPI.build_hardware_simulator).sync
+    checked_hardware = hardware_simulator or ThreadManager(
+        HardwareAPI.build_hardware_simulator
     )
 
     return _build_protocol_context(
@@ -208,7 +206,7 @@ def get_protocol_api(
 
 def _build_protocol_context(
     version: APIVersion,
-    hardware_simulator: SyncHardwareAPI,
+    hardware_simulator: ThreadManagedHardware,
     bundled_labware: Optional[Dict[str, LabwareDefinition]],
     bundled_data: Optional[Dict[str, bytes]],
     extra_labware: Optional[Dict[str, LabwareDefinition]],
@@ -217,15 +215,13 @@ def _build_protocol_context(
     version specification for use with
     :py:meth:`.protocol_api.execute.run_protocol`
     """
-    ctx_impl = ProtocolContextImplementation(
+    context = protocol_api.create_protocol_context(
+        api_version=version,
+        hardware_api=hardware_simulator,
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
-        api_version=version,
         extra_labware=extra_labware,
-        sync_hardware=hardware_simulator,
-    )
-    context = protocol_api.contexts.ProtocolContext(
-        implementation=ctx_impl, api_version=version
+        use_simulating_core=True,
     )
     context.home()
     return context
@@ -349,7 +345,7 @@ def simulate(
         hardware_simulator = ThreadManager(
             load_simulator,
             pathlib.Path(hardware_simulator_file_path),
-        ).sync
+        )
 
     protocol = parse.parse(
         contents, file_name, extra_labware=extra_labware, extra_data=extra_data
