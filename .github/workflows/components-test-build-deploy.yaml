@@ -33,16 +33,16 @@ jobs:
   js-unit-test:
     name: 'components unit tests'
     timeout-minutes: 30
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
@@ -59,25 +59,25 @@ jobs:
         run: |
           yarn jest --coverage=true --ci=true --collectCoverageFrom="components/src/**/*.(js|ts|tsx)" components/src
       - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           files: ./coverage/lcov.info
           flags: components
 
   build-components:
     name: 'build components artifact'
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     if: github.event_name != 'pull_request'
     needs: ['js-unit-test']
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
@@ -93,29 +93,29 @@ jobs:
       - name: 'build components'
         run: make -C components
       - name: 'upload github artifact'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: 'components-artifact'
           path: storybook-static
   deploy-components:
     name: 'deploy components artifact to S3'
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     needs: ['js-unit-test', 'build-components']
     if: github.event_name != 'pull_request'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v3.1
+        uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: 'download components build'
-        uses: 'actions/download-artifact@v2'
+        uses: 'actions/download-artifact@v3'
         with:
           name: components-artifact
           path: ./dist

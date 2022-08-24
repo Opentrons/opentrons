@@ -47,16 +47,16 @@ jobs:
   lint-test:
     name: 'robot server package linting and tests'
     timeout-minutes: 20
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     strategy:
       matrix:
         with-ot-hardware: ['true', 'false']
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - uses: 'actions/setup-python@v2'
+      - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.7'
 
@@ -73,7 +73,7 @@ jobs:
       - name: Ensure assets build
         run: make -C robot-server sdist wheel
       - name: Upload coverage report
-        uses: 'codecov/codecov-action@v2'
+        uses: 'codecov/codecov-action@v3'
         with:
           files: ./robot-server/coverage.xml
           flags: robot-server

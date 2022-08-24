@@ -38,13 +38,13 @@ jobs:
   python-lint:
     name: 'shared-data package python lint'
     timeout-minutes: 10
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - uses: 'actions/setup-python@v2'
+      - uses: 'actions/setup-python@v3'
         with:
           python-version: '3.7'
 
@@ -60,7 +60,7 @@ jobs:
     needs: [python-lint]
     strategy:
       matrix:
-        os: ['windows-2019', 'ubuntu-18.04', 'macos-latest']
+        os: ['windows-2019', 'ubuntu-22.04', 'macos-latest']
         # TODO(mc, 2022-02-24): expand this matrix to 3.8 and 3.9,
         # preferably in a nightly cronjob on edge or something
         python: ['3.7', '3.10']
@@ -69,14 +69,14 @@ jobs:
             python: '3.10'
     runs-on: '${{ matrix.os }}'
     steps:
-      - uses: 'actions/checkout@v2'
+      - uses: 'actions/checkout@v3'
       - name: 'install udev for usb-detection'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - uses: 'actions/setup-node@v1'
         with:
           node-version: '14'
-      - uses: 'actions/setup-python@v2'
+      - uses: 'actions/setup-python@v4'
         with:
           python-version: ${{ matrix.python }}
       - uses: './.github/actions/python/setup'
@@ -84,7 +84,7 @@ jobs:
           project: 'shared-data/python'
           python-version: ${{ matrix.python }}
       - name: 'set complex environment variables'
-        uses: actions/github-script@v3.1
+        uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
@@ -94,24 +94,24 @@ jobs:
       - name: Ensure assets build
         run: make -C shared-data/python sdist wheel
       - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           files: ./shared-data/python/coverage.xml
           flags: shared-data
 
   js-test:
     name: 'shared-data JS tests'
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     timeout-minutes: 30
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
       - name: 'install udev'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
@@ -128,7 +128,7 @@ jobs:
         run: |
           yarn jest --coverage=true --ci=true --collectCoverageFrom="shared-data/js/**/*.(js|ts|tsx)" shared-data/js
       - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           files: ./coverage/lcov.info
           flags: shared-data
@@ -136,23 +136,23 @@ jobs:
   python-deploy:
     name: 'shared-data package deploy'
     needs: [python-test]
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     if: github.event_name == 'push'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
-      - uses: 'actions/setup-python@v2'
+      - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.7'
       - uses: './.github/actions/python/setup'
         with:
           project: 'shared-data/python'
       - name: 'set complex environment variables'
-        uses: actions/github-script@v3.1
+        uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
