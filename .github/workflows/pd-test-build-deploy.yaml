@@ -37,11 +37,11 @@ env:
 jobs:
   js-unit-test:
     name: 'protocol designer unit tests'
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     timeout-minutes: 30
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
       - name: 'install udev for usb-detection'
@@ -64,7 +64,7 @@ jobs:
         run: |
           yarn jest --coverage=true --ci=true --collectCoverageFrom="protocol-designer/src/**/*.(js|ts|tsx)" protocol-designer/src
       - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           files: ./coverage/lcov.info
           flags: protocol-designer
@@ -75,18 +75,18 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        os: ['ubuntu-18.04']
+        os: ['ubuntu-22.04']
     runs-on: '${{ matrix.os }}'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
       - name: 'install udev for usb-detection'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
@@ -104,17 +104,17 @@ jobs:
   build-pd:
     name: 'build protocol designer artifact'
     needs: ['js-unit-test']
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     if: github.event_name != 'pull_request'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
@@ -134,31 +134,31 @@ jobs:
         run: |
           make -C protocol-designer
       - name: 'upload github artifact'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: 'pd-artifact'
           path: protocol-designer/dist
   deploy-pd:
     name: 'deploy PD artifact to S3'
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     needs: ['js-unit-test', 'build-pd']
     if: github.event_name != 'pull_request'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v3.1
+        uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: 'download PD build'
-        uses: 'actions/download-artifact@v2'
+        uses: 'actions/download-artifact@v3'
         with:
           name: pd-artifact
           path: ./dist
