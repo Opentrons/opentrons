@@ -1,9 +1,7 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { Flex, POSITION_RELATIVE, useHoverTooltip } from '@opentrons/components'
+import { Flex, POSITION_RELATIVE } from '@opentrons/components'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
 import { useRunStatuses, useIsLegacySessionInProgress } from '../Devices/hooks'
 import { useModuleOverflowMenu } from './hooks'
@@ -25,7 +23,6 @@ interface ModuleOverflowMenuProps {
 export const ModuleOverflowMenu = (
   props: ModuleOverflowMenuProps
 ): JSX.Element | null => {
-  const { t } = useTranslation(['heater_shaker'])
   const {
     module,
     runId,
@@ -35,7 +32,6 @@ export const ModuleOverflowMenu = (
     handleWizardClick,
     isLoadedInRun,
   } = props
-  const [targetProps, tooltipProps] = useHoverTooltip()
   const { menuOverflowItemsByModuleType } = useModuleOverflowMenu(
     module,
     runId,
@@ -65,22 +61,16 @@ export const ModuleOverflowMenu = (
           ] as MenuItemsByModuleType[ModuleType]).map(
             (item: any, index: number) => {
               return (
-                <React.Fragment key={`${index}_${module.moduleType}`}>
+                <React.Fragment key={`${index}_${module.moduleModel}`}>
                   <MenuItem
                     key={`${index}_${module.moduleModel}`}
                     onClick={() => item.onClick(item.isSecondary)}
                     data-testid={`module_setting_${module.moduleModel}`}
-                    disabled={item.disabledReason || isDisabled}
+                    disabled={isDisabled}
                     whiteSpace="nowrap"
-                    {...targetProps}
                   >
                     {item.setSetting}
                   </MenuItem>
-                  {item.disabledReason && (
-                    <Tooltip tooltipProps={tooltipProps}>
-                      {t('cannot_shake')}
-                    </Tooltip>
-                  )}
                   {item.menuButtons}
                 </React.Fragment>
               )
