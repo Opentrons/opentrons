@@ -32,12 +32,10 @@ interface Control {
   bearing: Bearing
   keyName: string
   shiftKey: boolean
-  gridRow: number
-  gridColumn: number
+  column: number
   iconName: IconName
   axis: Axis
   sign: Sign
-  margin?: string
 }
 interface ControlsContents {
   controls: Control[]
@@ -52,23 +50,19 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
         keyName: 'ArrowUp',
         shiftKey: true,
         bearing: 'up',
-        gridRow: 1,
-        gridColumn: 2,
-        margin: '0 0 1rem 1rem',
         iconName: 'ot-arrow-up',
         axis: 'z',
         sign: 1,
+        column: 1,
       },
       {
         keyName: 'ArrowDown',
         shiftKey: true,
         bearing: 'down',
-        gridRow: 2,
-        gridColumn: 2,
-        margin: '1rem 0 0 1rem',
         iconName: 'ot-arrow-down',
         axis: 'z',
         sign: -1,
+        column: 1,
       },
     ],
     title: 'Z-axis',
@@ -80,45 +74,37 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
         keyName: 'ArrowLeft',
         shiftKey: false,
         bearing: 'left',
-        gridRow: 2,
-        gridColumn: 1,
-        margin: '0 1rem 2rem 0',
         iconName: 'ot-arrow-left',
         axis: 'x',
         sign: -1,
+        column: 0,
       },
       {
         keyName: 'ArrowRight',
         shiftKey: false,
         bearing: 'right',
-        gridRow: 2,
-        gridColumn: 3,
-        margin: '0 0 2rem 2rem',
         iconName: 'ot-arrow-right',
         axis: 'x',
         sign: 1,
+        column: 2,
       },
       {
         keyName: 'ArrowUp',
         shiftKey: false,
         bearing: 'back',
-        gridRow: 1,
-        gridColumn: 2,
-        margin: '0 0 1rem 1rem',
         iconName: 'ot-arrow-up',
         axis: 'y',
         sign: 1,
+        column: 1,
       },
       {
         keyName: 'ArrowDown',
         shiftKey: false,
         bearing: 'forward',
-        gridRow: 2,
-        gridColumn: 2,
-        margin: '1rem 0 0 1rem',
         iconName: 'ot-arrow-down',
         axis: 'y',
         sign: -1,
+        column: 1,
       },
     ],
     title: 'X- and Y-axis',
@@ -281,68 +267,56 @@ export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
       margin-left: auto;
     }
 
-    button {
+    color: ${COLORS.darkGreyEnabled};
+    background-color: ${COLORS.white};
+
+    &:hover {
       background-color: ${COLORS.white};
+      color: ${COLORS.darkGreyHover};
+      box-shadow: 0 0 0;
+      border: 1px ${COLORS.lightGreyHover} solid;
+    }
 
-      &:hover {
-        background-color: ${COLORS.white};
-        color: ${COLORS.darkGreyHover};
-        box-shadow: 0 0 0;
-        border: 1px ${COLORS.lightGreyHover} solid;
-      }
+    &:active {
+      background-color: ${COLORS.white};
+      color: ${COLORS.darkGreyPressed};
+      border: 1px ${COLORS.lightGreyHover} solid;
+    }
 
-      &:active {
-        background-color: ${COLORS.white};
-        color: ${COLORS.darkGreyPressed};
-        border: 1px ${COLORS.lightGreyHover} solid;
-      }
+    &:focus {
+      background-color: ${COLORS.white};
+    }
 
-      &:focus {
-        background-color: ${COLORS.white};
-      }
-
-      &:disabled {
-        background-color: inherit;
-        color: ${COLORS.darkGreyDisabled};
-      }
+    &:disabled {
+      background-color: inherit;
+      color: ${COLORS.darkGreyDisabled};
     }
   `
 
   return (
-    <Box
-      css={ARROW_BUTTON_STYLING}
-      display="grid"
-      gridGap={SPACING.spacing1}
-      gridTemplateRows="repeat(2, [row] 2rem)"
-      gridTemplateColumns="repeat(3, [col] 2rem)"
-      margin={SIZE_AUTO}
-      paddingLeft={SPACING.spacing3}
-    >
-      {controls.map(
-        ({ bearing, gridRow, gridColumn, margin, iconName, axis, sign }) => (
-          <PrimaryButton
-            key={bearing}
-            backgroundColor={COLORS.white}
-            color={COLORS.darkGreyEnabled}
-            border={BORDERS.lineBorder}
-            title={bearing}
-            width={'2.75rem'}
-            height={'2.75rem'}
-            alignSelf={ALIGN_CENTER}
-            padding={0}
-            onClick={() => jog(axis, sign, stepSize)}
-            {...{ gridRow, gridColumn, margin }}
-          >
-            <Flex
-              alignItems={ALIGN_CENTER}
-              justifyContent={JUSTIFY_CENTER}
-              width="100%"
-            >
-              <Icon size="1.5rem" name={iconName} />
-            </Flex>
-          </PrimaryButton>
-        )
-      )}
-    </Box>
+    <Flex alignItems={ALIGN_CENTER}>
+      {[...Array(3).keys()].map(col => (
+        <Flex key={col} flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER} marginRight={col > 3 ? SPACING.spacing2 : 0}>
+          {controls
+            .filter(({ column }) => column === col)
+            .map(({ bearing, iconName, axis, sign }, index) => (
+              <PrimaryButton
+                key={bearing}
+                css={ARROW_BUTTON_STYLING}
+                title={bearing}
+                width="2.75rem"
+                height="2.75rem"
+                onClick={() => jog(axis, sign, stepSize)}
+                display="flex"
+                alignItems={ALIGN_CENTER}
+                justifyContent={JUSTIFY_CENTER}
+                marginBottom={index > 1 ? SPACING.spacing2 : 0}
+              >
+                <Icon size="1.125rem" name={iconName} />
+              </PrimaryButton>
+            ))}
+        </Flex>
+      ))}
+    </Flex>
   )
 }
