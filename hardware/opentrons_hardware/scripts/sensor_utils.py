@@ -98,9 +98,9 @@ async def handle_pressure_sensor(
         )
         csv = CSVFormatter.build(metadata, list(metadata.to_dict().keys()))
     end_time = start_time + timedelta(minutes=command.minutes)
+    messenger = CanMessenger(driver=driver)
+    messenger.start()
     while datetime.now() < end_time:
-        messenger = CanMessenger(driver=driver)
-        messenger.start()
         data = await s_driver.read(messenger, pressure, offset=False, timeout=10)
         curr_time = datetime.now().strftime(hms)
         if isinstance(data, SensorDataType):
@@ -115,6 +115,7 @@ async def handle_pressure_sensor(
     log.info(text_end_time)
     if csv:
         csv.write(text_end_time)
+    await messenger.stop()
 
 
 async def handle_capacitive_sensor(
@@ -159,6 +160,7 @@ async def handle_capacitive_sensor(
     log.info(text_end_time)
     if csv:
         csv.write(text_end_time)
+    await messenger.stop()
 
 
 async def handle_environment_sensor(
@@ -206,3 +208,4 @@ async def handle_environment_sensor(
     log.info(text_end_time)
     if csv:
         csv.write(text_end_time)
+    await messenger.stop()
