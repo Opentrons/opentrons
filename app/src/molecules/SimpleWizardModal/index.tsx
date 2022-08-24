@@ -50,7 +50,7 @@ export function SimpleWizardModal(props: Props): JSX.Element {
             alignItems={ALIGN_CENTER}
             flexDirection={DIRECTION_COLUMN}
             height="100%"
-            marginTop="6.8rem"
+            marginTop="5.8rem"
             marginBottom="5.68rem"
           >
             <Icon

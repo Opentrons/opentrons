@@ -60,17 +60,15 @@ export function ExitModal(props: Props): JSX.Element {
         currentStep={currentStep}
         totalSteps={totalSteps}
       >
-        <>
-          <SecondaryButton onClick={back} marginRight={SPACING.spacing2}>
-            {t('go_back')}
-          </SecondaryButton>
-          <AlertPrimaryButton
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            onClick={exit}
-          >
-            {t('shared:exit')}
-          </AlertPrimaryButton>
-        </>
+        <SecondaryButton onClick={back} marginRight={SPACING.spacing2}>
+          {t('go_back')}
+        </SecondaryButton>
+        <AlertPrimaryButton
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          onClick={exit}
+        >
+          {t('shared:exit')}
+        </AlertPrimaryButton>
       </SimpleWizardModal>
     </Portal>
   )
