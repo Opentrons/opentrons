@@ -1,74 +1,44 @@
-from __future__ import annotations
+"""Abstract interface for Well core implementations."""
 
-import re
+from abc import ABC, abstractmethod
 
 from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 
-class WellImplementation:
+class AbstractWellCore(ABC):
+    """Well core interface."""
 
-    pattern = re.compile(WELL_NAME_PATTERN, re.X)
-
-    def __init__(
-        self, well_geometry: WellGeometry, display_name: str, has_tip: bool, name: str
-    ):
-        """
-        Construct a well
-
-        :param well_geometry: The well's geometry
-        :param display_name: a string that identifies a well. Used primarily
-            for debug and test purposes. Should be unique and human-readable--
-            something like "Tip C3 of Opentrons 300ul Tiprack on Slot 5" or
-            "Well D1 of Biorad 96 PCR Plate on Magnetic Module in Slot 1".
-            This is created by the caller and passed in, so here it is just
-            saved and made available.
-        :param has_tip: whether a tip is present
-        :param name: The well name (ie. A1, B4, C2, etc.)
-        """
-        self._display_name = display_name
-        self._has_tip = has_tip
-        self._name = name
-
-        match = WellImplementation.pattern.match(name)
-        assert match, (
-            f"could not match '{name}' using "
-            f"pattern '{WellImplementation.pattern.pattern}'"
-        )
-        self._row_name = match.group(1)
-        self._column_name = match.group(2)
-        self._geometry = well_geometry
-
+    @abstractmethod
     def has_tip(self) -> bool:
-        return self._has_tip
+        """Whether the well contains a tip."""
+        ...
 
+    @abstractmethod
     def set_has_tip(self, value: bool) -> None:
-        self._has_tip = value
+        """Set the well as containing or not containing a tip."""
+        ...
 
+    @abstractmethod
     def get_display_name(self) -> str:
-        return self._display_name
+        """Get the well's full display name."""
+        ...
 
+    @abstractmethod
     def get_name(self) -> str:
-        """The name of the well (ie A1, A2,... B3,...C10"""
-        return self._name
+        """Get the name of the well (e.g. "A1")."""
+        ...
 
+    @abstractmethod
     def get_column_name(self) -> str:
-        """The column portion of the well name"""
-        return self._column_name
+        """Get the column portion of the well name (e.g. "A")."""
+        ...
 
+    @abstractmethod
     def get_row_name(self) -> str:
-        """The row portion of the well name"""
-        return self._row_name
+        """Get the row portion of the well name (e.g. "1")."""
+        ...
 
+    @abstractmethod
     def get_geometry(self) -> WellGeometry:
-        return self._geometry
-
-    def __repr__(self) -> str:
-        return self.get_display_name()
-
-    def __eq__(self, other: object) -> bool:
-        """Assume that if name is the same then it's the same well"""
-        return (
-            isinstance(other, WellImplementation)
-            and self.get_name() == other.get_name()
-        )
+        """Get the well's geometry information interface."""
+        ...

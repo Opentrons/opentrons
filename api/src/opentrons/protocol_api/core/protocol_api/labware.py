@@ -10,33 +10,27 @@ from opentrons.types import Point, Location
 from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
 
 from ..labware import AbstractLabware
-from ..well import WellImplementation
+from ..well import AbstractWellCore
+from .well import WellImplementation
 
 
 class LabwareImplementation(AbstractLabware):
+    """Labware implementation core based on legacy PAPIv2 behavior.
+
+    Args:
+        definition: The labware definition, as a dict.
+        parent: The location of the labware's origin point.
+            A labware's origin is its front and left most corner.
+            Usually a slot or a module location.
+        label: Optional display label.
+    """
+
     def __init__(
         self,
         definition: LabwareDefinition,
         parent: Location,
         label: Optional[str] = None,
-    ):
-        """
-        Construct an implementation of a labware object.
-
-        :param definition: A dict representing all required data for a labware,
-                           including metadata such as the display name of the
-                           labware, a definition of the order to iterate over
-                           wells, the shape of wells (shape, physical
-                           dimensions, etc), and so on. The correct shape of
-                           this definition is handled by the "labware-designer"
-                           project in the Opentrons/opentrons repo.
-        :param parent: A :py:class:`.Location` representing the location where
-                       the front and left most point of the outside of the
-                       labware is (often the front-left corner of a slot on the
-                       deck).
-        :param label: An optional label to use instead of the displayName
-                      from the definition's metadata element
-        """
+    ) -> None:
         self._label: Optional[str] = None
         if label:
             dn = self._label = label
@@ -54,7 +48,7 @@ class LabwareImplementation(AbstractLabware):
         self._geometry = LabwareGeometry(definition, parent)
         # flatten list of list of well names.
         self._ordering = [well for col in definition["ordering"] for well in col]
-        self._wells: List[WellImplementation] = []
+        self._wells: List[AbstractWellCore] = []
         self._well_name_grid = WellGrid(wells=self._wells)
         self._tip_tracker = TipTracker(columns=self._well_name_grid.get_columns())
 
@@ -120,10 +114,10 @@ class LabwareImplementation(AbstractLabware):
     def get_well_grid(self) -> WellGrid:
         return self._well_name_grid
 
-    def get_wells(self) -> List[WellImplementation]:
+    def get_wells(self) -> List[AbstractWellCore]:
         return self._wells
 
-    def get_wells_by_name(self) -> Dict[str, WellImplementation]:
+    def get_wells_by_name(self) -> Dict[str, AbstractWellCore]:
         return {well.get_name(): well for well in self._wells}
 
     def get_geometry(self) -> LabwareGeometry:
@@ -141,7 +135,7 @@ class LabwareImplementation(AbstractLabware):
     def load_name(self) -> str:
         return self._parameters["loadName"]
 
-    def _build_wells(self) -> List[WellImplementation]:
+    def _build_wells(self) -> List[AbstractWellCore]:
         return [
             WellImplementation(
                 well_geometry=WellGeometry(

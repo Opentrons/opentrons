@@ -12,7 +12,7 @@ from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
 from ..protocol import AbstractProtocol
-from ..well import WellImplementation
+from ..well import AbstractWellCore
 
 
 class InstrumentContextSimulation(AbstractInstrument):
@@ -73,13 +73,13 @@ class InstrumentContextSimulation(AbstractInstrument):
         )
 
     def touch_tip(
-        self, location: WellImplementation, radius: float, v_offset: float, speed: float
+        self, location: AbstractWellCore, radius: float, v_offset: float, speed: float
     ) -> None:
         pass
 
     def pick_up_tip(
         self,
-        well: WellImplementation,
+        well: AbstractWellCore,
         tip_length: float,
         presses: typing.Optional[int],
         increment: typing.Optional[float],

@@ -9,7 +9,7 @@ from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, FlowRates
 
-from .well import WellImplementation
+from .well import AbstractWellCore
 
 
 class AbstractInstrument(ABC):
@@ -35,14 +35,14 @@ class AbstractInstrument(ABC):
 
     @abstractmethod
     def touch_tip(
-        self, location: WellImplementation, radius: float, v_offset: float, speed: float
+        self, location: AbstractWellCore, radius: float, v_offset: float, speed: float
     ) -> None:
         ...
 
     @abstractmethod
     def pick_up_tip(
         self,
-        well: WellImplementation,
+        well: AbstractWellCore,
         tip_length: float,
         presses: typing.Optional[int],
         increment: typing.Optional[float],

@@ -16,7 +16,7 @@ from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
 from ..protocol import AbstractProtocol
-from ..well import WellImplementation
+from ..well import AbstractWellCore
 
 
 class InstrumentContextImplementation(AbstractInstrument):
@@ -75,7 +75,7 @@ class InstrumentContextImplementation(AbstractInstrument):
         self._protocol_interface.get_hardware().blow_out(self._mount)
 
     def touch_tip(
-        self, location: WellImplementation, radius: float, v_offset: float, speed: float
+        self, location: AbstractWellCore, radius: float, v_offset: float, speed: float
     ) -> None:
         """
         Touch the pipette tip to the sides of a well, with the intent of
@@ -100,7 +100,7 @@ class InstrumentContextImplementation(AbstractInstrument):
 
     def pick_up_tip(
         self,
-        well: WellImplementation,
+        well: AbstractWellCore,
         tip_length: float,
         presses: Optional[int],
         increment: Optional[float],

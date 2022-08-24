@@ -1,4 +1,5 @@
 """ProtocolContext factory."""
+import asyncio
 from typing import Dict, Optional, Union
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -10,6 +11,7 @@ from opentrons.hardware_control import (
     SynchronousAdapter,
 )
 from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_engine.clients import SyncClient, ChildThreadTransport
 from opentrons.protocols.api_support.types import APIVersion
 
 from .protocol_context import ProtocolContext
@@ -22,6 +24,7 @@ from .core.labware_offset_provider import (
 from .core.protocol import AbstractProtocol
 from .core.protocol_api.protocol_context import ProtocolContextImplementation
 from .core.simulator.protocol_context import ProtocolContextSimulation
+from .core.engine import ProtocolCore
 
 
 def create_protocol_context(
@@ -29,6 +32,7 @@ def create_protocol_context(
     *,
     hardware_api: Union[HardwareControlAPI, ThreadManager[HardwareControlAPI]],
     protocol_engine: Optional[ProtocolEngine] = None,
+    protocol_engine_loop: Optional[asyncio.AbstractEventLoop] = None,
     use_simulating_core: bool = False,
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
@@ -42,6 +46,8 @@ def create_protocol_context(
         protocol_engine: A ProtocolEngine to use for labware offsets
             and core protocol logic. If omitted, labware offsets will
             all be (0, 0, 0) and ProtocolEngine-based core will not work.
+        protocol_engine_loop: An event loop running in the thread where
+            ProtocolEngine mutations must occur.
         use_simulating_core: For pre-ProtocolEngine API versions,
             use a simulating protocol core that will skip _most_ calls
             to the `hardware_api`.
@@ -69,11 +75,21 @@ def create_protocol_context(
     else:
         labware_offset_provider = NullLabwareOffsetProvider()
 
+    # TODO(mc, 2022-8-22): replace with API version check
     if feature_flags.enable_protocol_engine_papi_core():
-        # TODO(mc, 2022-8-22): replace with API version check
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        # TODO(mc, 2022-8-22): replace assertion with strict typing
+        assert (
+            protocol_engine is not None and protocol_engine_loop is not None
+        ), "ProtocolEngine PAPI core is enabled, but no ProtocolEngine given."
+
+        engine_client_transport = ChildThreadTransport(
+            engine=protocol_engine, loop=protocol_engine_loop
+        )
+        engine_client = SyncClient(transport=engine_client_transport)
+        core = ProtocolCore(engine_client=engine_client)
+
+    # TODO(mc, 2022-8-22): remove `disable_fast_protocol_upload`
     elif use_simulating_core and not feature_flags.disable_fast_protocol_upload():
-        # TODO(mc, 2022-8-22): remove `disable_fast_protocol_upload`
         core = ProtocolContextSimulation(
             sync_hardware=sync_hardware,
             api_version=api_version,
@@ -81,6 +97,7 @@ def create_protocol_context(
             bundled_data=bundled_data,
             extra_labware=extra_labware,
         )
+
     else:
         core = ProtocolContextImplementation(
             sync_hardware=sync_hardware,
