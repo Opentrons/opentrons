@@ -37,6 +37,10 @@ on:
       - 'scripts/**/*'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
 env:
   CI: true
   OT_APP_DEPLOY_BUCKET: opentrons-app
