@@ -37,7 +37,7 @@ export function SimpleWizardModal(props: Props): JSX.Element {
   } = props
 
   return (
-    <ModalShell width="47rem">
+    <ModalShell width="47rem" height="28.12rem">
       <Flex flexDirection={DIRECTION_COLUMN}>
         <WizardHeader
           currentStep={currentStep}
