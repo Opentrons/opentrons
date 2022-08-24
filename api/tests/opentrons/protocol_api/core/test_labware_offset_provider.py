@@ -7,34 +7,42 @@ import pytest
 from decoy import Decoy
 
 from opentrons.types import DeckSlotName, Point
+from opentrons.hardware_control.modules.types import TemperatureModuleModel
 from opentrons.protocol_engine import (
+    ProtocolEngine,
     LabwareOffset,
     LabwareOffsetVector,
     LabwareOffsetLocation,
     ModuleModel,
 )
 from opentrons.protocol_engine.state import LabwareView
-from opentrons.protocol_runner.legacy_labware_offset_provider import (
-    LegacyLabwareOffsetProvider,
-    LegacyProvidedLabwareOffset,
+
+from opentrons.protocol_api.core.labware_offset_provider import (
+    LabwareOffsetProvider,
+    ProvidedLabwareOffset,
 )
-from opentrons.protocol_runner.legacy_wrappers import LegacyTemperatureModuleModel
 
 
 @pytest.fixture
-def labware_view(decoy: Decoy) -> LabwareView:
+def protocol_engine(decoy: Decoy) -> ProtocolEngine:
+    """Return a mock ProtocolEngine."""
+    return decoy.mock(cls=ProtocolEngine)
+
+
+@pytest.fixture
+def labware_view(protocol_engine: ProtocolEngine) -> LabwareView:
     """Return a mock LabwareView."""
-    return decoy.mock(cls=LabwareView)
+    return protocol_engine.state_view.labware
 
 
 @pytest.fixture
-def subject(labware_view: LabwareView) -> LegacyLabwareOffsetProvider:
-    """Return a LegacyLabwareOffsetProvider depending on the mocked LabwareView."""
-    return LegacyLabwareOffsetProvider(labware_view=labware_view)
+def subject(protocol_engine: ProtocolEngine) -> LabwareOffsetProvider:
+    """Return a LabwareOffsetProvider depending on the mocked LabwareView."""
+    return LabwareOffsetProvider(engine=protocol_engine)
 
 
 def test_find_something(
-    subject: LegacyLabwareOffsetProvider, labware_view: LabwareView, decoy: Decoy
+    subject: LabwareOffsetProvider, labware_view: LabwareView, decoy: Decoy
 ) -> None:
     """It should pass along simplified labware offset info from Protocol Engine."""
     decoy.when(
@@ -59,18 +67,18 @@ def test_find_something(
 
     result = subject.find(
         labware_definition_uri="some_namespace/some_load_name/123",
-        requested_module_model=LegacyTemperatureModuleModel.TEMPERATURE_V1,
+        requested_module_model=TemperatureModuleModel.TEMPERATURE_V1,
         deck_slot=DeckSlotName.SLOT_1,
     )
 
-    assert result == LegacyProvidedLabwareOffset(
+    assert result == ProvidedLabwareOffset(
         delta=Point(x=1, y=2, z=3),
         offset_id="labware-offset-id",
     )
 
 
 def test_find_nothing(
-    subject: LegacyLabwareOffsetProvider, labware_view: LabwareView, decoy: Decoy
+    subject: LabwareOffsetProvider, labware_view: LabwareView, decoy: Decoy
 ) -> None:
     """It should return a zero offset when Protocol Engine has no offset to provide."""
     decoy_call_rehearsal = labware_view.find_applicable_labware_offset(
@@ -85,10 +93,8 @@ def test_find_nothing(
 
     result = subject.find(
         labware_definition_uri="some_namespace/some_load_name/123",
-        requested_module_model=LegacyTemperatureModuleModel.TEMPERATURE_V1,
+        requested_module_model=TemperatureModuleModel.TEMPERATURE_V1,
         deck_slot=DeckSlotName.SLOT_1,
     )
 
-    assert result == LegacyProvidedLabwareOffset(
-        delta=Point(x=0, y=0, z=0), offset_id=None
-    )
+    assert result == ProvidedLabwareOffset(delta=Point(x=0, y=0, z=0), offset_id=None)

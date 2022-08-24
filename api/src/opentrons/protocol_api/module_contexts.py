@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import logging
 from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, cast
 
@@ -277,10 +276,8 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
         geometry: ModuleGeometry,
         requested_as: ModuleModel,
         at_version: APIVersion,
-        loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._module = hw_module
-        self._loop = loop
         super().__init__(ctx, geometry, requested_as, at_version)
 
     @publish(command=cmds.tempdeck_set_temp)
@@ -364,10 +361,8 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         geometry: ModuleGeometry,
         requested_as: ModuleModel,
         at_version: APIVersion,
-        loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._module = hw_module
-        self._loop = loop
         super().__init__(ctx, geometry, requested_as, at_version)
 
     @publish(command=cmds.magdeck_calibrate)
@@ -531,10 +526,8 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         geometry: ThermocyclerGeometry,
         requested_as: ModuleModel,
         at_version: APIVersion,
-        loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._module = hw_module
-        self._loop = loop
         super().__init__(ctx, geometry, requested_as, at_version)
 
     def _prepare_for_lid_move(self) -> None:
@@ -805,10 +798,8 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         geometry: HeaterShakerGeometry,
         requested_as: ModuleModel,
         at_version: APIVersion,
-        loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._module = hw_module
-        self._loop = loop
         super().__init__(ctx, geometry, requested_as, at_version)
 
     @property  # type: ignore[misc]

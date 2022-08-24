@@ -2,7 +2,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 
-from opentrons.hardware_control.modules import ModuleModel
+from opentrons.hardware_control.modules import ModuleModel as HardwareModuleModel
+from opentrons.protocol_engine import ProtocolEngine, LabwareOffsetLocation, ModuleModel
 from opentrons.types import DeckSlotName, Point
 
 
@@ -27,7 +28,7 @@ class AbstractLabwareOffsetProvider(ABC):
     def find(
         self,
         labware_definition_uri: str,
-        requested_module_model: Optional[ModuleModel],
+        requested_module_model: Optional[HardwareModuleModel],
         deck_slot: DeckSlotName,
     ) -> ProvidedLabwareOffset:
         """Return the offset that should apply to a newly loaded labware.
@@ -55,7 +56,47 @@ class NullLabwareOffsetProvider(AbstractLabwareOffsetProvider):
     def find(
         self,
         labware_definition_uri: str,
-        requested_module_model: Optional[ModuleModel],
+        requested_module_model: Optional[HardwareModuleModel],
         deck_slot: DeckSlotName,
     ) -> ProvidedLabwareOffset:
         return ProvidedLabwareOffset(delta=Point(0, 0, 0), offset_id=None)
+
+
+class LabwareOffsetProvider(AbstractLabwareOffsetProvider):
+    """Provides a `ProtocolEngine`'s labware offsets."""
+
+    def __init__(self, engine: ProtocolEngine) -> None:
+        """Initialize an offset provider with access to ProtocolEngine state."""
+        self._labware_view = engine.state_view.labware
+
+    def find(
+        self,
+        labware_definition_uri: str,
+        requested_module_model: Optional[HardwareModuleModel],
+        deck_slot: DeckSlotName,
+    ) -> ProvidedLabwareOffset:
+        """Look up an offset in ProtocolEngine state and return it, if one exists.
+
+        See the parent class for param details.
+        """
+        offset = self._labware_view.find_applicable_labware_offset(
+            definition_uri=labware_definition_uri,
+            location=LabwareOffsetLocation(
+                slotName=deck_slot,
+                moduleModel=(
+                    None
+                    if requested_module_model is None
+                    else ModuleModel(requested_module_model.value)
+                ),
+            ),
+        )
+        if offset is None:
+            return ProvidedLabwareOffset(
+                delta=Point(x=0, y=0, z=0),
+                offset_id=None,
+            )
+        else:
+            return ProvidedLabwareOffset(
+                delta=Point(x=offset.vector.x, y=offset.vector.y, z=offset.vector.z),
+                offset_id=offset.id,
+            )
