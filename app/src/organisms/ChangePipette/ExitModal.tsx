@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { COLORS, SPACING } from '@opentrons/components'
+import {
+  COLORS,
+  SPACING,
+  TEXT_TRANSFORM_CAPITALIZE,
+} from '@opentrons/components'
 import { Portal } from '../../App/portal'
 import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { SimpleWizardModal } from '../../molecules/SimpleWizardModal'
@@ -60,7 +64,10 @@ export function ExitModal(props: Props): JSX.Element {
           <SecondaryButton onClick={back} marginRight={SPACING.spacing2}>
             {t('go_back')}
           </SecondaryButton>
-          <AlertPrimaryButton onClick={exit}>
+          <AlertPrimaryButton
+            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            onClick={exit}
+          >
             {t('shared:exit')}
           </AlertPrimaryButton>
         </>
