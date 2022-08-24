@@ -31,11 +31,6 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
   const [showErrorDetails, setShowErrorDetails] = React.useState(false)
 
-  const handleHideDetails: React.MouseEventHandler = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    setShowErrorDetails(false)
-  }
   let isError: boolean = false
   //  extend this logic when we know how to tell when Mag/Temp modules are in error state
   if (
@@ -62,24 +57,25 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         {t('module_error')}
-        <Btn
-          textAlign={ALIGN_START}
-          fontSize={TYPOGRAPHY.fontSizeP}
-          onClick={() => setShowErrorDetails(true)}
-          aria-label="view_error_details"
-        >
-          <Flex flexDirection={DIRECTION_ROW}>
-            <StyledText as="p" marginRight={SPACING.spacing2}>
-              {t('view')}
-            </StyledText>
+
+        <Flex flexDirection={DIRECTION_ROW}>
+          <StyledText as="p" marginRight={SPACING.spacing2}>
+            {t('view')}
+          </StyledText>
+          <Btn
+            textAlign={ALIGN_START}
+            fontSize={TYPOGRAPHY.fontSizeP}
+            onClick={() => setShowErrorDetails(true)}
+            aria-label="view_error_details"
+          >
             <StyledText
               as="p"
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
             >
               {t('error_details')}
             </StyledText>
-          </Flex>
-        </Btn>
+          </Btn>
+        </Flex>
       </Flex>
       {showErrorDetails ? (
         <Portal level="top">
@@ -88,7 +84,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
             title={t('module_name_error', {
               moduleName: getModuleDisplayName(attachedModule.moduleModel),
             })}
-            onClose={handleHideDetails}
+            onClose={() => setShowErrorDetails(false)}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
               {errorDetails != null ? (
@@ -100,7 +96,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
             </Flex>
             <Flex justifyContent={JUSTIFY_FLEX_END}>
               <PrimaryButton
-                onClick={handleHideDetails}
+                onClick={() => setShowErrorDetails(false)}
                 textTransform={TYPOGRAPHY.textTransformCapitalize}
                 marginTop={SPACING.spacing4}
               >
