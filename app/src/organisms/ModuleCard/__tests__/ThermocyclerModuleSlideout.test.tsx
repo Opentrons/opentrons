@@ -45,6 +45,7 @@ describe('ThermocyclerModuleSlideout', () => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,
@@ -176,6 +177,7 @@ describe('ThermocyclerModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for the TC Block when there is a runId', () => {
     mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: false,
       isRunIdle: true,
@@ -210,6 +212,7 @@ describe('ThermocyclerModuleSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for the TC Lid when there is a runId', () => {
     mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: false,
       isRunIdle: true,

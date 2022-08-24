@@ -13,7 +13,7 @@ from .pipetting_common import (
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
-    from ..execution import PipettingHandler
+    from ..execution import MovementHandler, PipettingHandler
 
 
 DispenseCommandType = Literal["dispense"]
@@ -34,16 +34,22 @@ class DispenseResult(BaseLiquidHandlingResult):
 class DispenseImplementation(AbstractCommandImpl[DispenseParams, DispenseResult]):
     """Dispense command implementation."""
 
-    def __init__(self, pipetting: PipettingHandler, **kwargs: object) -> None:
+    def __init__(
+        self, movement: MovementHandler, pipetting: PipettingHandler, **kwargs: object
+    ) -> None:
+        self._movement = movement
         self._pipetting = pipetting
 
     async def execute(self, params: DispenseParams) -> DispenseResult:
         """Move to and dispense to the requested well."""
-        volume = await self._pipetting.dispense(
+        await self._movement.move_to_well(
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
+        )
+        volume = await self._pipetting.dispense_in_place(
+            pipette_id=params.pipetteId,
             volume=params.volume,
             flow_rate=params.flowRate,
         )

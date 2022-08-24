@@ -13,7 +13,6 @@ export interface RouteProps {
   name: string
   /**
    * the path for navigation linking, for example to push to a default tab
-   * some of these links are temp (and params hardcoded) until final nav and breadcrumbs implemented
    */
   navLinkTo?: string
   path: string

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { getPipetteNameSpecs, shouldLevel } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
 
 import {
   useDispatchApiRequests,
@@ -26,12 +27,20 @@ import {
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/CalibrationPanels'
-import { ClearDeckAlertModal } from './ClearDeckAlertModal'
-import { ExitAlertModal } from './ExitAlertModal'
+import { useFeatureFlag } from '../../redux/config'
+import { ModalShell } from '../../molecules/Modal'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { StyledText } from '../../atoms/text'
+import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'
+import { ClearDeckModal } from './ClearDeckModal/index'
+import { ExitAlertModal } from './ExitAlertModal'
+import { DeprecatedInstructions } from './DeprecatedInstructions'
 import { ConfirmPipette } from './ConfirmPipette'
 import { RequestInProgressModal } from './RequestInProgressModal'
 import { LevelPipette } from './LevelPipette'
+import { DeprecatedLevelPipette } from './DeprecatedLevelPipette'
+import { ClearDeckAlertModal } from './ClearDeckModal/ClearDeckAlertModal'
 
 import {
   ATTACH,
@@ -42,8 +51,8 @@ import {
   CALIBRATE_PIPETTE,
 } from './constants'
 
+import { Mount, SPACING } from '@opentrons/components'
 import type { State, Dispatch } from '../../redux/types'
-import type { Mount } from '../../redux/robot/types'
 import type { WizardStep } from './types'
 
 interface Props {
@@ -61,6 +70,8 @@ const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
 
 export function ChangePipette(props: Props): JSX.Element | null {
   const { robotName, mount, closeModal } = props
+  const { t } = useTranslation('change_pipette')
+  const enableChangePipetteWizard = useFeatureFlag('enableChangePipetteWizard')
   const dispatch = useDispatch<Dispatch>()
   const finalRequestId = React.useRef<string | null | undefined>(null)
   const [dispatchApiRequests] = useDispatchApiRequests(dispatchedAction => {
@@ -145,9 +156,26 @@ export function ChangePipette(props: Props): JSX.Element | null {
 
   if (
     movementStatus !== null &&
+    //  when FF is removed, change this logic so the modal only appears when movement status is MOVING
     (movementStatus === HOMING || movementStatus === MOVING)
   ) {
-    return (
+    return enableChangePipetteWizard && movementStatus === MOVING ? (
+      <ModalShell height="28.12rem" width="47rem">
+        <InProgressModal
+          wizardHeaderTitle={t('attach_pipette')}
+          currentStep={1}
+          totalSteps={5}
+        >
+          <StyledText
+            as="h1"
+            marginTop={SPACING.spacing5}
+            marginBottom={SPACING.spacing3}
+          >
+            {t('moving_gantry')}
+          </StyledText>
+        </InProgressModal>
+      </ModalShell>
+    ) : (
       <RequestInProgressModal
         {...baseProps}
         movementStatus={movementStatus}
@@ -157,7 +185,27 @@ export function ChangePipette(props: Props): JSX.Element | null {
   }
 
   if (wizardStep === CLEAR_DECK) {
-    return (
+    return enableChangePipetteWizard ? (
+      <ModalShell height="28.12rem" width="47rem">
+        <ClearDeckModal
+          totalSteps={5}
+          currentStep={0}
+          title={
+            actualPipette?.displayName != null
+              ? t('detach_pipette', {
+                  pipette: actualPipette.displayName,
+                  mount: mount[0].toUpperCase() + mount.slice(1),
+                })
+              : t('attach_pipette')
+          }
+          onCancelClick={closeModal}
+          onContinueClick={() => {
+            dispatch(move(robotName, CHANGE_PIPETTE, mount, true))
+            setWizardStep(INSTRUCTIONS)
+          }}
+        />
+      </ModalShell>
+    ) : (
       <ClearDeckAlertModal
         cancelText={CANCEL}
         continueText={MOVE_PIPETTE_TO_FRONT}
@@ -185,21 +233,58 @@ export function ChangePipette(props: Props): JSX.Element | null {
 
     return (
       <>
-        {confirmExit && (
-          <ExitAlertModal
-            back={() => setConfirmExit(false)}
-            exit={homePipAndExit}
+        {confirmExit &&
+          (enableChangePipetteWizard ? (
+            <ExitModal
+              back={() => setConfirmExit(false)}
+              exit={homePipAndExit}
+              direction={direction}
+              currentStep={5}
+              totalSteps={8}
+              mount={mount}
+              displayName={
+                actualPipette?.displayName || wantedPipette?.displayName
+              }
+            />
+          ) : (
+            <ExitAlertModal
+              back={() => setConfirmExit(false)}
+              exit={homePipAndExit}
+            />
+          ))}
+        {enableChangePipetteWizard ? (
+          <ModalShell height="28.12rem" width="47rem">
+            <Instructions
+              {...{
+                ...basePropsWithPipettes,
+                direction,
+                setWantedName,
+                confirm: () => setWizardStep(CONFIRM),
+                back: () => setWizardStep(CLEAR_DECK),
+                exit: () => setConfirmExit(true),
+                currentStep: 5,
+                totalSteps: 8,
+                title:
+                  actualPipette?.displayName != null
+                    ? t('detach_pipette', {
+                        pipette: actualPipette.displayName,
+                        mount: mount[0].toUpperCase() + mount.slice(1),
+                      })
+                    : t('attach_pipette'),
+              }}
+            />
+          </ModalShell>
+        ) : (
+          <DeprecatedInstructions
+            {...{
+              ...basePropsWithPipettes,
+              direction,
+              setWantedName,
+              confirm: () => setWizardStep(CONFIRM),
+              exit: () => setConfirmExit(true),
+            }}
           />
         )}
-        <Instructions
-          {...{
-            ...basePropsWithPipettes,
-            direction,
-            setWantedName,
-            confirm: () => setWizardStep(CONFIRM),
-            exit: () => setConfirmExit(true),
-          }}
-        />
       </>
     )
   }
@@ -221,8 +306,20 @@ export function ChangePipette(props: Props): JSX.Element | null {
     }
 
     if (success && wantedPipette && shouldLevel(wantedPipette)) {
-      return (
-        <LevelPipette
+      return enableChangePipetteWizard ? (
+        <ModalShell height="28.12rem" width="47rem">
+          <LevelPipette
+            {...basePropsWithPipettes}
+            pipetteModelName={actualPipette ? actualPipette.name : ''}
+            exit={() => setConfirmExit(true)}
+            confirm={homePipAndExit}
+            back={() => setWizardStep(CLEAR_DECK)}
+            currentStep={6}
+            totalSteps={8}
+          />
+        </ModalShell>
+      ) : (
+        <DeprecatedLevelPipette
           {...{
             pipetteModelName: actualPipette ? actualPipette.name : '',
             ...basePropsWithPipettes,

@@ -64,7 +64,7 @@ const RoundNavLink = styled(NavLink)`
     border-top: ${BORDERS.lineBorder};
     border-left: ${BORDERS.lineBorder};
     border-right: ${BORDERS.lineBorder};
-    color: ${COLORS.blue};
+    color: ${COLORS.blueEnabled};
 
     &:hover {
       color: ${COLORS.blueHover};
@@ -188,7 +188,7 @@ export function ProtocolRunDetails(): JSX.Element | null {
           </Flex>
           <Box
             backgroundColor={COLORS.white}
-            border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGrey}`}
+            border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
             // remove left upper corner border radius when first tab is active
             borderRadius={`${
               protocolRunDetailsTab === 'setup'

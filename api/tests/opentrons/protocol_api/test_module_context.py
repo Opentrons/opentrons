@@ -25,9 +25,7 @@ from opentrons.protocol_api.module_contexts import (
     CannotPerformModuleAction,
     HeaterShakerContext,
 )
-from opentrons.protocols.context.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
-)
+
 from opentrons.protocols.geometry.module_geometry import (
     PipetteMovementRestrictedByHeaterShakerError,
 )
@@ -50,10 +48,8 @@ def mock_pipette_location() -> mock.MagicMock:
     return mock.MagicMock(return_value=Location(point=Point(1, 2, 3), labware=None))
 
 
-# Async because ProtocolContext.__init__() needs an event loop,
-# so this fixture needs to run in an event loop.
 @pytest.fixture
-async def ctx_with_tempdeck(
+def ctx_with_tempdeck(
     mock_hardware: mock.MagicMock, mock_module_controller: mock.MagicMock
 ) -> ProtocolContext:
     """Context fixture with a mock temp deck."""
@@ -68,15 +64,15 @@ async def ctx_with_tempdeck(
         return []
 
     mock_hardware.find_modules.side_effect = find_modules
-    return ProtocolContext(
-        implementation=ProtocolContextImplementation(sync_hardware=mock_hardware),
+
+    return papi.create_protocol_context(
+        api_version=papi.MAX_SUPPORTED_VERSION,
+        hardware_api=mock_hardware,
     )
 
 
-# Async because ProtocolContext.__init__() needs an event loop,
-# so this fixture needs to run in an event loop.
 @pytest.fixture
-async def ctx_with_magdeck(
+def ctx_with_magdeck(
     mock_hardware: mock.AsyncMock, mock_module_controller: mock.MagicMock
 ) -> ProtocolContext:
     """Context fixture with a mock mag deck."""
@@ -91,15 +87,15 @@ async def ctx_with_magdeck(
         return []
 
     mock_hardware.find_modules.side_effect = find_modules
-    return ProtocolContext(
-        implementation=ProtocolContextImplementation(sync_hardware=mock_hardware),
+
+    return papi.create_protocol_context(
+        api_version=papi.MAX_SUPPORTED_VERSION,
+        hardware_api=mock_hardware,
     )
 
 
-# Async because ProtocolContext.__init__() needs an event loop,
-# so this fixture needs to run in an event loop.
 @pytest.fixture
-async def ctx_with_thermocycler(
+def ctx_with_thermocycler(
     mock_hardware: mock.AsyncMock, mock_module_controller: mock.MagicMock
 ) -> ProtocolContext:
     """Context fixture with a mock thermocycler."""
@@ -114,13 +110,15 @@ async def ctx_with_thermocycler(
         return []
 
     mock_hardware.find_modules.side_effect = find_modules
-    return ProtocolContext(
-        implementation=ProtocolContextImplementation(sync_hardware=mock_hardware),
+
+    return papi.create_protocol_context(
+        api_version=papi.MAX_SUPPORTED_VERSION,
+        hardware_api=mock_hardware,
     )
 
 
 @pytest.fixture
-async def ctx_with_heater_shaker(
+def ctx_with_heater_shaker(
     mock_hardware: mock.AsyncMock,
     mock_module_controller: mock.MagicMock,
     mock_pipette_location: mock.MagicMock,
@@ -137,8 +135,9 @@ async def ctx_with_heater_shaker(
         return []
 
     mock_hardware.find_modules.side_effect = find_modules
-    ctx = ProtocolContext(
-        implementation=ProtocolContextImplementation(sync_hardware=mock_hardware),
+    ctx = papi.create_protocol_context(
+        api_version=papi.MAX_SUPPORTED_VERSION,
+        hardware_api=mock_hardware,
     )
     ctx.location_cache = mock_pipette_location
     return ctx

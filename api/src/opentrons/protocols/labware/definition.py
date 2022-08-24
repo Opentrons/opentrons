@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import json
 import os
@@ -5,13 +7,12 @@ import shutil
 from dataclasses import dataclass
 
 from pathlib import Path
-from typing import Any, AnyStr, List, Dict, Union
+from typing import TYPE_CHECKING, Any, AnyStr, List, Dict, Union
 
 import jsonschema  # type: ignore
 
 from opentrons.protocols.api_support.util import ModifiedList
 from opentrons.calibration_storage import helpers, modify
-from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.types import Point
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from opentrons.protocols.geometry.deck_item import DeckItem
@@ -22,6 +23,10 @@ from opentrons.protocols.api_support.constants import (
     USER_DEFS_PATH,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
+
+if TYPE_CHECKING:
+    from opentrons.protocol_api.core.labware import AbstractLabware
 
 
 MODULE_LOG = logging.getLogger(__name__)

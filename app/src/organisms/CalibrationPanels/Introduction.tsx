@@ -17,7 +17,6 @@ import {
   FLEX_MIN_CONTENT,
   FONT_HEADER_DARK,
   FONT_SIZE_BODY_1,
-  FONT_SIZE_BODY_2,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
@@ -27,6 +26,7 @@ import {
   SPACING_3,
   TEXT_TRANSFORM_UPPERCASE,
   SecondaryBtn,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
@@ -461,7 +461,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_FLEX_START}
         position={POSITION_RELATIVE}
-        fontSize={FONT_SIZE_BODY_2}
+        fontSize={TYPOGRAPHY.fontSizeH3}
       >
         <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Text
@@ -624,7 +624,7 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps): JSX.Element {
         paddingLeft={SPACING_3}
         flex="0 1 70%"
       >
-        <Text fontSize={FONT_SIZE_BODY_2}>{displayName}</Text>
+        <Text fontSize={TYPOGRAPHY.fontSizeH3}>{displayName}</Text>
         {linkToMeasurements && (
           <Link
             external
@@ -632,7 +632,7 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps): JSX.Element {
             paddingY={SPACING_1}
             width="9.25rem"
             textTransform={TEXT_TRANSFORM_UPPERCASE}
-            fontSize={FONT_SIZE_BODY_2}
+            fontSize={TYPOGRAPHY.fontSizeH3}
             color={C_MED_DARK_GRAY}
             css={linkStyles}
             href={`${LABWARE_LIBRARY_PAGE_PATH}/${loadName}`}

@@ -38,6 +38,14 @@ from .dispense import (
     DispenseCommandType,
 )
 
+from .dispense_in_place import (
+    DispenseInPlace,
+    DispenseInPlaceParams,
+    DispenseInPlaceCreate,
+    DispenseInPlaceResult,
+    DispenseInPlaceCommandType,
+)
+
 from .drop_tip import (
     DropTip,
     DropTipParams,
@@ -60,6 +68,14 @@ from .load_labware import (
     LoadLabwareCreate,
     LoadLabwareResult,
     LoadLabwareCommandType,
+)
+
+from .load_liquid import (
+    LoadLiquid,
+    LoadLiquidParams,
+    LoadLiquidCreate,
+    LoadLiquidResult,
+    LoadLiquidCommandType,
 )
 
 from .load_module import (
@@ -154,10 +170,12 @@ Command = Union[
     Aspirate,
     Custom,
     Dispense,
+    DispenseInPlace,
     BlowOut,
     DropTip,
     Home,
     LoadLabware,
+    LoadLiquid,
     LoadModule,
     LoadPipette,
     MoveRelative,
@@ -196,10 +214,12 @@ CommandParams = Union[
     AspirateParams,
     CustomParams,
     DispenseParams,
+    DispenseInPlaceParams,
     BlowOutParams,
     DropTipParams,
     HomeParams,
     LoadLabwareParams,
+    LoadLiquidParams,
     LoadModuleParams,
     LoadPipetteParams,
     MoveRelativeParams,
@@ -239,10 +259,12 @@ CommandType = Union[
     AspirateCommandType,
     CustomCommandType,
     DispenseCommandType,
+    DispenseInPlaceCommandType,
     BlowOutCommandType,
     DropTipCommandType,
     HomeCommandType,
     LoadLabwareCommandType,
+    LoadLiquidCommandType,
     LoadModuleCommandType,
     LoadPipetteCommandType,
     MoveRelativeCommandType,
@@ -280,10 +302,12 @@ CommandType = Union[
 CommandCreate = Union[
     AspirateCreate,
     DispenseCreate,
+    DispenseInPlaceCreate,
     BlowOutCreate,
     DropTipCreate,
     HomeCreate,
     LoadLabwareCreate,
+    LoadLiquidCreate,
     LoadModuleCreate,
     LoadPipetteCreate,
     MoveRelativeCreate,
@@ -322,10 +346,12 @@ CommandResult = Union[
     AspirateResult,
     CustomResult,
     DispenseResult,
+    DispenseInPlaceResult,
     BlowOutResult,
     DropTipResult,
     HomeResult,
     LoadLabwareResult,
+    LoadLiquidResult,
     LoadModuleResult,
     LoadPipetteResult,
     MoveRelativeResult,

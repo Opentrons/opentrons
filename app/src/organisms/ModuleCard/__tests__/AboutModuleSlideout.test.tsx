@@ -7,7 +7,6 @@ import {
   RUN_STATUS_FINISHING,
 } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
-import { getConnectedRobotName } from '../../../redux/robot/selectors'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import {
   mockMagneticModule,
@@ -18,12 +17,8 @@ import {
 } from '../../../redux/modules/__fixtures__'
 import { AboutModuleSlideout } from '../AboutModuleSlideout'
 
-jest.mock('../../../redux/robot/selectors')
 jest.mock('../../RunTimeControl/hooks')
 
-const mockGetConnectedRobotName = getConnectedRobotName as jest.MockedFunction<
-  typeof getConnectedRobotName
->
 const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
   typeof useCurrentRunStatus
 >
@@ -43,7 +38,6 @@ describe('AboutModuleSlideout', () => {
       onCloseClick: jest.fn(),
       firmwareUpdateClick: jest.fn(),
     }
-    mockGetConnectedRobotName.mockReturnValue('Mock Robot Name')
     mockUseCurrentRunStatus.mockReturnValue(RUN_STATUS_IDLE)
   })
   afterEach(() => {

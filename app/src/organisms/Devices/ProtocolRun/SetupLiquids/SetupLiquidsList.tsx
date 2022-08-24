@@ -109,7 +109,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       css={LIQUID_CARD_STYLE}
       padding={SPACING.spacing4}
       onClick={() => setOpenItem(!openItem)}
-      backgroundColor={openItem ? COLORS.lightGrey : COLORS.white}
+      backgroundColor={openItem ? COLORS.fundamentalsBackground : COLORS.white}
       data-testid="LiquidsListItem_Row"
     >
       <LiquidsListItemDetails
@@ -263,7 +263,7 @@ export const LiquidsListItemDetails = (
         </StyledText>
       </Flex>
       <Flex
-        backgroundColor={COLORS.darkBlack + '1A'}
+        backgroundColor={COLORS.darkBlackEnabled + '1A'}
         borderRadius={BORDERS.radiusSoftCorners}
         height="max-content"
         paddingY={SPACING.spacing2}

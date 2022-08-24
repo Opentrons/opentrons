@@ -8,6 +8,8 @@ on:
     paths:
       - 'update-server/**/*'
       - 'Makefile'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
       - '.github/workflows/update-server-lint-test.yaml'
       - '.github/actions/python/**'
     branches: # ignore any release-related thing (handled elsewhere)
@@ -19,9 +21,15 @@ on:
     paths:
       - 'update-server/**/*'
       - 'Makefile'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
       - '.github/workflows/update-server-lint-test.yaml'
       - '.github/actions/python/**'
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
 
 defaults:
   run:
@@ -31,13 +39,13 @@ jobs:
   lint:
     name: 'update server linting'
     timeout-minutes: 10
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - uses: 'actions/setup-python@v2'
+      - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.7'
 
@@ -50,13 +58,13 @@ jobs:
     name: 'update server package tests'
     timeout-minutes: 10
     needs: [lint]
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - uses: 'actions/setup-python@v2'
+      - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.7'
       - uses: './.github/actions/python/setup'
@@ -64,7 +72,7 @@ jobs:
           project: 'update-server'
       - name: Test
         run: make -C update-server test
-      - uses: 'codecov/codecov-action@v2'
+      - uses: 'codecov/codecov-action@v3'
         with:
           files: ./update-server/coverage.xml
           flags: update-server

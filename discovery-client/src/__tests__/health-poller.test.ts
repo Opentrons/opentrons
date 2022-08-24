@@ -187,10 +187,10 @@ describe('health poller', () => {
 
   it('should map successful fetch responses to onPollResult', () => {
     stubFetchOnce('http://127.0.0.1:31950/health')(
-      makeMockJsonResponse(Fixtures.mockHealthResponse)
+      makeMockJsonResponse(Fixtures.mockLegacyHealthResponse)
     )
     stubFetchOnce('http://127.0.0.1:31950/server/update/health')(
-      makeMockJsonResponse(Fixtures.mockServerHealthResponse)
+      makeMockJsonResponse(Fixtures.mockLegacyServerHealthResponse)
     )
 
     poller.start({ list: [HOST_1], interval: 1000 })
@@ -201,8 +201,8 @@ describe('health poller', () => {
       expect(onPollResult).toHaveBeenCalledWith({
         ip: '127.0.0.1',
         port: 31950,
-        health: Fixtures.mockHealthResponse,
-        serverHealth: Fixtures.mockServerHealthResponse,
+        health: Fixtures.mockLegacyHealthResponse,
+        serverHealth: Fixtures.mockLegacyServerHealthResponse,
         healthError: null,
         serverHealthError: null,
       })
@@ -214,7 +214,7 @@ describe('health poller', () => {
       makeMockJsonResponse({ message: 'some error' }, false, 400)
     )
     stubFetchOnce('http://127.0.0.1:31950/server/update/health')(
-      makeMockJsonResponse(Fixtures.mockServerHealthResponse)
+      makeMockJsonResponse(Fixtures.mockOT3ServerHealthResponse)
     )
 
     poller.start({ list: [HOST_1], interval: 1000 })
@@ -225,7 +225,7 @@ describe('health poller', () => {
         ip: '127.0.0.1',
         port: 31950,
         health: null,
-        serverHealth: Fixtures.mockServerHealthResponse,
+        serverHealth: Fixtures.mockOT3ServerHealthResponse,
         healthError: { status: 400, body: { message: 'some error' } },
         serverHealthError: null,
       })

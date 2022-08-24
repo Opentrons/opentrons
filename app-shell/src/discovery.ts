@@ -71,6 +71,7 @@ const migrateLegacyServices = (
               serverHealthStatus: null,
               healthError: null,
               serverHealthError: null,
+              advertisedModel: null,
             },
           ]
         : []

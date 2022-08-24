@@ -43,12 +43,14 @@ from opentrons.hardware_control import (
     ThreadManager,
     ThreadManagedHardware,
 )
-from opentrons.protocol_api import ProtocolContext
-from opentrons.protocol_api.labware import Labware
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
-from opentrons.protocols.context.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
+from opentrons.protocol_api import (
+    MAX_SUPPORTED_VERSION,
+    ProtocolContext,
+    Labware,
+    create_protocol_context,
 )
+from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
+
 from opentrons.types import Location, Point
 
 
@@ -287,15 +289,10 @@ async def hardware(
             )
 
 
-# Async because ProtocolContext.__init__() needs an event loop,
-# so this fixture needs to run in an event loop.
 @pytest.fixture()
-async def ctx(
-    hardware: ThreadManagedHardware,
-) -> AsyncGenerator[ProtocolContext, None]:
-    c = ProtocolContext(
-        implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
-        loop=asyncio.get_running_loop(),
+def ctx(hardware: ThreadManagedHardware) -> Generator[ProtocolContext, None, None]:
+    c = create_protocol_context(
+        api_version=MAX_SUPPORTED_VERSION, hardware_api=hardware
     )
     yield c
     # Manually clean up all the modules.

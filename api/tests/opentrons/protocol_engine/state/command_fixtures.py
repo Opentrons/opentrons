@@ -210,6 +210,29 @@ def create_dispense_command(
     )
 
 
+def create_dispense_in_place_command(
+    pipette_id: str,
+    volume: float,
+    flow_rate: float,
+) -> cmd.DispenseInPlace:
+    """Get a completed DispenseInPlace command."""
+    params = cmd.DispenseInPlaceParams(
+        pipetteId=pipette_id,
+        volume=volume,
+        flowRate=flow_rate,
+    )
+    result = cmd.DispenseInPlaceResult(volume=volume)
+
+    return cmd.DispenseInPlace(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
 def create_pick_up_tip_command(
     pipette_id: str,
     labware_id: str = "labware-id",

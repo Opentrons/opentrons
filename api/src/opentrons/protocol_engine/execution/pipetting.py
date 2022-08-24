@@ -226,26 +226,16 @@ class PipettingHandler:
 
         return volume
 
-    async def dispense(
+    async def dispense_in_place(
         self,
         pipette_id: str,
-        labware_id: str,
-        well_name: str,
-        well_location: WellLocation,
         volume: float,
         flow_rate: float,
     ) -> float:
-        """Dispense liquid to a well."""
+        """Dispense liquid without moving the pipette."""
         hw_pipette = self._state_store.pipettes.get_hardware_pipette(
             pipette_id=pipette_id,
             attached_pipettes=self._hardware_api.attached_instruments,
-        )
-
-        await self._movement_handler.move_to_well(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
-            well_location=well_location,
         )
 
         with self.set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):

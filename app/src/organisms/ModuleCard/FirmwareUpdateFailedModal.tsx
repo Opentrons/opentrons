@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { Modal } from '../../atoms/Modal'
+import { Modal } from '../../molecules/Modal'
 
 import type { AttachedModule } from '../../redux/modules/types'
 
@@ -32,7 +32,7 @@ export const FirmwareUpdateFailedModal = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Icon
         width={SPACING.spacingM}
-        color={COLORS.error}
+        color={COLORS.errorEnabled}
         name="information"
         aria-label="information"
       />

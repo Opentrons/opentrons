@@ -1,5 +1,7 @@
 """ Constants to avoid circular deps """
 
+from typing_extensions import Final
+
 APP_VARIABLE_PREFIX = "com.opentrons.otupdate.buildroot."
 #: Prefix for variables in the aiohttp.web.Application dictlike
 
@@ -19,3 +21,6 @@ DEVICE_BOOT_ID_NAME = APP_VARIABLE_PREFIX + "boot_id"
 #:
 #: This ID only changes when the whole OT-2 operating system reboots.
 #: It doesn't change if some internal process merely crashes and restarts.
+
+MODEL_OT2: Final[str] = "OT-2 Standard"
+MODEL_OT3: Final[str] = "OT-3 Standard"

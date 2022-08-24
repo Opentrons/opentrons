@@ -12,7 +12,7 @@ interface MiniCardProps extends StyleProps {
 }
 const unselectedOptionStyles = css`
   background-color: ${COLORS.white};
-  border: 1px solid ${COLORS.medGrey};
+  border: 1px solid ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3};
   margin-bottom: ${SPACING.spacing3};
@@ -25,23 +25,23 @@ const unselectedOptionStyles = css`
 `
 const selectedOptionStyles = css`
   ${unselectedOptionStyles}
-  border: 1px solid ${COLORS.blue};
+  border: 1px solid ${COLORS.blueEnabled};
   background-color: ${COLORS.lightBlue};
 
   &:hover {
-    border: 1px solid ${COLORS.blue};
+    border: 1px solid ${COLORS.blueEnabled};
     background-color: ${COLORS.lightBlue};
   }
 `
 
 const errorOptionStyles = css`
   ${selectedOptionStyles}
-  border: 1px solid ${COLORS.error};
-  background-color: ${COLORS.errorBg};
+  border: 1px solid ${COLORS.errorEnabled};
+  background-color: ${COLORS.errorBackground};
 
   &:hover {
-    border: 1px solid ${COLORS.error};
-    background-color: ${COLORS.errorBg};
+    border: 1px solid ${COLORS.errorEnabled};
+    background-color: ${COLORS.errorBackground};
   }
 `
 

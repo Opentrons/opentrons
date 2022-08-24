@@ -10,6 +10,7 @@ from opentrons.protocol_engine import (
     ErrorOccurrence,
     LoadedLabware,
     LoadedPipette,
+    Liquid,
 )
 
 
@@ -97,6 +98,10 @@ class CompletedAnalysis(BaseModel):
     errors: List[ErrorOccurrence] = Field(
         ...,
         description="Any errors the protocol run produced",
+    )
+    liquids: List[Liquid] = Field(
+        default_factory=list,
+        description="Liquids used by the protocol",
     )
 
 

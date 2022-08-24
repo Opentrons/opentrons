@@ -92,7 +92,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   return (
     <Flex
       backgroundColor={COLORS.white}
-      border={`1px solid ${COLORS.medGrey}`}
+      border={`1px solid ${COLORS.medGreyEnabled}`}
       borderRadius="4px"
       flexDirection={DIRECTION_ROW}
       marginBottom={SPACING.spacing2}
@@ -166,7 +166,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           {
             missing: <Icon name="ot-spinner" spin size={SIZE_4} />,
             loading: <Icon name="ot-spinner" spin size={SIZE_4} />,
-            error: <Box size="6rem" backgroundColor={COLORS.medGrey} />,
+            error: <Box size="6rem" backgroundColor={COLORS.medGreyEnabled} />,
             complete: (
               <DeckThumbnail commands={mostRecentAnalysis?.commands ?? []} />
             ),

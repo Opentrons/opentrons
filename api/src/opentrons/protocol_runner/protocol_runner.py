@@ -1,7 +1,7 @@
 """Protocol run control and management."""
-from typing import List, NamedTuple, Optional, cast
+from typing import List, NamedTuple, Optional
 
-from opentrons.hardware_control import HardwareControlAPI, ThreadManagedHardware
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_reader import (
     ProtocolSource,
     PythonProtocolConfig,
@@ -11,12 +11,11 @@ from opentrons.protocol_engine import ProtocolEngine, StateSummary, Command
 
 from .task_queue import TaskQueue
 from .json_file_reader import JsonFileReader
-from .json_command_translator import JsonCommandTranslator
+from .json_translator import JsonTranslator
 from .python_file_reader import PythonFileReader
 from .python_context_creator import PythonContextCreator
 from .python_executor import PythonExecutor
 from .legacy_context_plugin import LegacyContextPlugin
-from .legacy_labware_offset_provider import LegacyLabwareOffsetProvider
 from .legacy_wrappers import (
     LEGACY_PYTHON_API_VERSION_CUTOFF,
     LEGACY_JSON_SCHEMA_VERSION_CUTOFF,
@@ -53,7 +52,7 @@ class ProtocolRunner:
         hardware_api: HardwareControlAPI,
         task_queue: Optional[TaskQueue] = None,
         json_file_reader: Optional[JsonFileReader] = None,
-        json_command_translator: Optional[JsonCommandTranslator] = None,
+        json_translator: Optional[JsonTranslator] = None,
         python_file_reader: Optional[PythonFileReader] = None,
         python_context_creator: Optional[PythonContextCreator] = None,
         python_executor: Optional[PythonExecutor] = None,
@@ -65,20 +64,14 @@ class ProtocolRunner:
         self._protocol_engine = protocol_engine
         self._hardware_api = hardware_api
         self._json_file_reader = json_file_reader or JsonFileReader()
-        self._json_command_translator = (
-            json_command_translator or JsonCommandTranslator()
-        )
+        self._json_translator = json_translator or JsonTranslator()
         self._python_file_reader = python_file_reader or PythonFileReader()
         self._python_context_creator = python_context_creator or PythonContextCreator()
         self._python_executor = python_executor or PythonExecutor()
         self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
         self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
-            # TODO(mc, 2022-02-05): handle this cast more gracefully, probably in
-            # a more specific runner implementation as mentioned in TODO below
-            sync_hardware_api=cast(ThreadManagedHardware, hardware_api).sync,
-            labware_offset_provider=LegacyLabwareOffsetProvider(
-                labware_view=protocol_engine.state_view.labware,
-            ),
+            hardware_api=hardware_api,
+            protocol_engine=protocol_engine,
         )
         self._legacy_executor = legacy_executor or LegacyExecutor()
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
@@ -158,7 +151,10 @@ class ProtocolRunner:
 
     def _load_json(self, protocol_source: ProtocolSource) -> None:
         protocol = self._json_file_reader.read(protocol_source)
-        commands = self._json_command_translator.translate(protocol)
+        commands = self._json_translator.translate_commands(protocol)
+        liquids = self._json_translator.translate_liquids(protocol)
+        for liquid in liquids:
+            self._protocol_engine.add_liquid(liquid=liquid)
         for command in commands:
             self._protocol_engine.add_command(request=command)
         self._task_queue.set_run_func(func=self._protocol_engine.wait_until_complete)

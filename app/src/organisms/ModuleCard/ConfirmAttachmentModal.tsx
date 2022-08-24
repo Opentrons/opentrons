@@ -13,7 +13,7 @@ import {
   ALIGN_CENTER,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
-import { Modal } from '../../atoms/Modal'
+import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
 import { Dispatch } from '../../redux/types'
 import { UpdateConfigValueAction } from '../../redux/config/types'

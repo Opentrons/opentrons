@@ -14,7 +14,7 @@ import {
 
 import RobotCalHelpImage from '../../../../assets/images/robot_calibration_help.png'
 import { Portal } from '../../../../App/portal'
-import { Modal } from '../../../../atoms/Modal'
+import { Modal } from '../../../../molecules/Modal'
 import { StyledText } from '../../../../atoms/text'
 import { PrimaryButton } from '../../../../atoms/buttons'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'

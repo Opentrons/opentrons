@@ -9,7 +9,6 @@ import {
   ALIGN_FLEX_START,
   BORDER_SOLID_LIGHT,
   DIRECTION_COLUMN,
-  FONT_SIZE_BODY_2,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   POSITION_RELATIVE,
@@ -21,13 +20,14 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   FONT_HEADER_DARK,
   SPACING_5,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import * as Sessions from '../../redux/sessions'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import { getLatestLabwareDef } from '../../assets/labware/getLabware'
-import { JogControls } from '../../molecules/JogControls'
+import { DeprecatedJogControls } from '../../molecules/DeprecatedJogControls'
 import type { CalibrationPanelProps } from './types'
 import { formatJogVector } from './utils'
 
@@ -126,11 +126,11 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
             alignItems={ALIGN_CENTER}
             textAlign={TEXT_ALIGN_CENTER}
           >
-            <Text fontSize={FONT_SIZE_BODY_2} paddingX={SPACING_2}>
+            <Text fontSize={TYPOGRAPHY.fontSizeH3} paddingX={SPACING_2}>
               {jogUntilAbove}
             </Text>
             <Text
-              fontSize={FONT_SIZE_BODY_2}
+              fontSize={TYPOGRAPHY.fontSizeH3}
               marginBottom={SPACING_3}
               paddingX={SPACING_2}
             >
@@ -155,7 +155,7 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
             </Box>
           </Flex>
         </Box>
-        <JogControls jog={jog} marginBottom={SPACING.spacing5} />
+        <DeprecatedJogControls jog={jog} marginBottom={SPACING.spacing5} />
         <Flex width="100%" justifyContent={JUSTIFY_CENTER}>
           <PrimaryBtn onClick={pickUpTip} flex="1" marginX={SPACING_5}>
             {TIP_PICK_UP_BUTTON_TEXT}

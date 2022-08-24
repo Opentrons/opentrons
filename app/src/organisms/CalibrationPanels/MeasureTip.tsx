@@ -11,7 +11,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   BORDER_SOLID_LIGHT,
   DIRECTION_COLUMN,
-  FONT_SIZE_BODY_2,
   POSITION_RELATIVE,
   TEXT_TRANSFORM_UPPERCASE,
   FONT_WEIGHT_SEMIBOLD,
@@ -20,10 +19,12 @@ import {
   SPACING_2,
   SPACING_3,
   SPACING_4,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-import { JogControls, VERTICAL_PLANE } from '../../molecules/JogControls'
+import { DeprecatedJogControls } from '../../molecules/DeprecatedJogControls'
+import { VERTICAL_PLANE } from '../../molecules/JogControls'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { CalibrationPanelProps } from '../CalibrationPanels/types'
 
@@ -184,7 +185,7 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
           width="100%"
         >
           <Flex alignItems={ALIGN_CENTER} width="100%">
-            <Text width="49%" fontSize={FONT_SIZE_BODY_2}>
+            <Text width="49%" fontSize={TYPOGRAPHY.fontSizeH3}>
               {JOG_UNTIL}
               <Text as="strong">{` ${BARELY_TOUCHING} `}</Text>
               {`${THE} `}
@@ -208,7 +209,7 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
             </Box>
           </Flex>
         </Box>
-        <JogControls
+        <DeprecatedJogControls
           jog={jog}
           stepSizes={[0.1, 1]}
           planes={[VERTICAL_PLANE]}

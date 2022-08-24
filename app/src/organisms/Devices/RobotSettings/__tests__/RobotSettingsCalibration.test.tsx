@@ -7,9 +7,9 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
 import { useTrackEvent } from '../../../../redux/analytics'
-import * as RobotSelectors from '../../../../redux/robot/selectors'
 import * as Calibration from '../../../../redux/calibration'
 import * as Pipettes from '../../../../redux/pipettes'
+import * as RobotApi from '../../../../redux/robot-api'
 import {
   mockDeckCalData,
   mockWarningDeckCalData,
@@ -18,8 +18,6 @@ import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
-  // mockPipetteOffsetCalibration4,
-  // mockPipetteOffsetCalibration5,
 } from '../../../../redux/calibration/pipette-offset/__fixtures__'
 import {
   mockTipLengthCalibration1,
@@ -37,9 +35,9 @@ import {
   useRobot,
   useTipLengthCalibrations,
   useAttachedPipettes,
-  useIsRobotBusy,
   useDeckCalibrationStatus,
   useRunStartedOrLegacySessionInProgress,
+  useRunStatuses,
 } from '../../hooks'
 
 import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
@@ -59,7 +57,6 @@ jest.mock('../../../../redux/pipettes')
 jest.mock('../../../../redux/pipettes/selectors')
 jest.mock('../../../../redux/calibration/tip-length/selectors')
 jest.mock('../../../../redux/calibration/pipette-offset/selectors')
-jest.mock('../../../../redux/robot/selectors')
 jest.mock('../../../../redux/sessions/selectors')
 jest.mock('../../../../redux/robot-api/selectors')
 jest.mock('../../../../redux/custom-labware/selectors')
@@ -95,9 +92,6 @@ const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunc
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
-const mockGetIsRunning = RobotSelectors.getIsRunning as jest.MockedFunction<
-  typeof RobotSelectors.getIsRunning
->
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
 >
@@ -106,9 +100,6 @@ const mockPipetteOffsetCalibrationItems = PipetteOffsetCalibrationItems as jest.
 >
 const mockTipLengthCalibrationItems = TipLengthCalibrationItems as jest.MockedFunction<
   typeof TipLengthCalibrationItems
->
-const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
-  typeof useIsRobotBusy
 >
 const mockUseDeckCalibrationStatus = useDeckCalibrationStatus as jest.MockedFunction<
   typeof useDeckCalibrationStatus
@@ -122,6 +113,19 @@ const mockGetAttachedPipetteCalibrations = Pipettes.getAttachedPipetteCalibratio
 const mockUseRunStartedOrLegacySessionInProgress = useRunStartedOrLegacySessionInProgress as jest.MockedFunction<
   typeof useRunStartedOrLegacySessionInProgress
 >
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
+  typeof useRunStatuses
+>
+const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
+  typeof RobotApi.getRequestById
+>
+
+const RUN_STATUSES = {
+  isRunRunning: false,
+  isRunStill: false,
+  isRunTerminal: false,
+  isRunIdle: false,
+}
 
 let mockTrackEvent: jest.Mock
 const mockUpdateRobotStatus = jest.fn()
@@ -180,7 +184,8 @@ describe('RobotSettingsCalibration', () => {
       <div>TipLengthCalibrationItems</div>
     )
     mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
-    mockUseIsRobotBusy.mockReturnValue(false)
+    mockUseRunStatuses.mockReturnValue(RUN_STATUSES)
+    mockGetRequestById.mockReturnValue(null)
   })
 
   afterEach(() => {
@@ -299,7 +304,7 @@ describe('RobotSettingsCalibration', () => {
     getByRole('button', { name: 'Calibrate now' })
   })
 
-  it('should call update robot status if a robot is busy - deck cal', () => {
+  it('deck cal button should be disabled if a protocol is running - deck cal', () => {
     mockUseDeckCalibrationStatus.mockReturnValue(
       Calibration.DECK_CAL_STATUS_IDENTITY
     )
@@ -308,12 +313,13 @@ describe('RobotSettingsCalibration', () => {
       isDeckCalibrated: true,
     })
     mockUseRunStartedOrLegacySessionInProgress.mockReturnValue(true)
-    mockGetIsRunning.mockReturnValue(false)
-    mockUseIsRobotBusy.mockReturnValue(true)
+    mockUseRunStatuses.mockReturnValue({
+      ...RUN_STATUSES,
+      isRunRunning: true,
+    })
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Calibrate deck' })
-    fireEvent.click(button)
-    expect(mockUpdateRobotStatus).toHaveBeenCalled()
+    expect(button).toBeDisabled()
   })
 
   it('renders the warning banner when deck calibration is not good', () => {
@@ -335,7 +341,10 @@ describe('RobotSettingsCalibration', () => {
   })
 
   it('recalibration button is disabled when a robot is running', () => {
-    mockGetIsRunning.mockReturnValue(true)
+    mockUseRunStatuses.mockReturnValue({
+      ...RUN_STATUSES,
+      isRunRunning: true,
+    })
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Calibrate deck' })
     expect(button).toBeDisabled()
@@ -360,7 +369,10 @@ describe('RobotSettingsCalibration', () => {
   })
 
   it('calibration button is disabled when a robot is running', () => {
-    mockGetIsRunning.mockReturnValue(true)
+    mockUseRunStatuses.mockReturnValue({
+      ...RUN_STATUSES,
+      isRunRunning: true,
+    })
     mockUseDeckCalibrationData.mockReturnValue({
       deckCalibrationData: null,
       isDeckCalibrated: false,
@@ -408,7 +420,13 @@ describe('RobotSettingsCalibration', () => {
   })
 
   it('Health check button is disabled when a robot is running', () => {
-    mockGetIsRunning.mockReturnValue(true)
+    mockGetRequestById.mockReturnValue({
+      status: RobotApi.PENDING,
+    })
+    mockUseRunStatuses.mockReturnValue({
+      ...RUN_STATUSES,
+      isRunRunning: true,
+    })
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Check health' })
     expect(button).toBeDisabled()
@@ -433,16 +451,17 @@ describe('RobotSettingsCalibration', () => {
     })
   })
 
-  it('should call update robot status if a robot is busy - health check', () => {
+  it('health check button should be disabled if there is a running protocol', () => {
     mockGetAttachedPipettes.mockReturnValue(mockAttachedPipettes)
     mockGetAttachedPipetteCalibrations.mockReturnValue(
       mockAttachedPipetteCalibrations
     )
-    mockGetIsRunning.mockReturnValue(false)
-    mockUseIsRobotBusy.mockReturnValue(true)
+    mockUseRunStatuses.mockReturnValue({
+      ...RUN_STATUSES,
+      isRunRunning: true,
+    })
     const [{ getByRole }] = render()
     const button = getByRole('button', { name: 'Check health' })
-    fireEvent.click(button)
-    expect(mockUpdateRobotStatus).toHaveBeenCalled()
+    expect(button).toBeDisabled()
   })
 })

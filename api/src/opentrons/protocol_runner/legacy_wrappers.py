@@ -8,7 +8,7 @@ from opentrons_shared_data.labware.dev_types import (
 
 from opentrons.calibration_storage.helpers import uri_from_details
 
-from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.types import (
     ModuleModel as LegacyModuleModel,
     TemperatureModuleModel as LegacyTemperatureModuleModel,
@@ -17,26 +17,23 @@ from opentrons.hardware_control.modules.types import (
     HeaterShakerModuleModel as LegacyHeaterShakerModuleModel,
 )
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.context.protocol_api.protocol_context import (
-    ProtocolContextImplementation as LegacyProtocolContextImplementation,
-)
-from opentrons.protocols.context.simulator.protocol_context import (
-    ProtocolContextSimulation as LegacyProtocolContextSimulation,
-)
+from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_reader import ProtocolSource
 
 from opentrons.protocol_api import (
     ProtocolContext as LegacyProtocolContext,
     InstrumentContext as LegacyPipetteContext,
+    ModuleContext as LegacyModuleContext,
+    Labware as LegacyLabware,
+    Well as LegacyWell,
+    create_protocol_context,
 )
-from opentrons.protocol_api.labware import Labware as LegacyLabware, Well as LegacyWell
 from opentrons.protocol_api.load_info import (
     LoadInfo as LegacyLoadInfo,
     InstrumentLoadInfo as LegacyInstrumentLoadInfo,
     LabwareLoadInfo as LegacyLabwareLoadInfo,
     ModuleLoadInfo as LegacyModuleLoadInfo,
 )
-from opentrons.protocol_api.contexts import ModuleContext as LegacyModuleContext
-
 
 from opentrons.protocols.parse import parse
 from opentrons.protocols.execution.execute import run_protocol
@@ -45,10 +42,6 @@ from opentrons.protocols.types import (
     JsonProtocol as LegacyJsonProtocol,
     PythonProtocol as LegacyPythonProtocol,
 )
-
-from opentrons.protocol_reader import ProtocolSource
-from .legacy_labware_offset_provider import LegacyLabwareOffsetProvider
-
 
 # The earliest Python Protocol API version ("apiLevel") where the protocol's simulation
 # and execution will be handled by Protocol Engine, rather than the legacy machinery.
@@ -69,7 +62,7 @@ class LegacyFileReader:
 
     @staticmethod
     def read(protocol_source: ProtocolSource) -> LegacyProtocol:
-        """Read a PAPIv2 protocol into a datastructure."""
+        """Read a PAPIv2 protocol into a data structure."""
         protocol_file_path = protocol_source.main_file
         protocol_contents = protocol_file_path.read_text(encoding="utf-8")
 
@@ -90,42 +83,38 @@ class LegacyFileReader:
 class LegacyContextCreator:
     """Interface to construct Protocol API v2 contexts."""
 
-    _ContextImplementation = LegacyProtocolContextImplementation
+    _USE_SIMULATING_CORE = False
 
     def __init__(
         self,
-        sync_hardware_api: SyncHardwareAPI,
-        labware_offset_provider: LegacyLabwareOffsetProvider,
+        hardware_api: HardwareControlAPI,
+        protocol_engine: ProtocolEngine,
     ) -> None:
         """Prepare the LegacyContextCreator.
 
         Args:
-            sync_hardware_api: The interface to the hardware API that the created
-                Protocol API v2 contexts will use. Regardless of
-                ``use_simulating_implementation``, this can either be a real hardware
-                API to actually control the robot, or a simulating hardware API.
-            labware_offset_provider: Interface for the context to load labware offsets.
+            hardware_api: The hardware control interface.
+                Will be wrapped in a `SynchronousAdapter`.
+                May be real hardware or a simulator.
+            protocol_engine: Interface for the context to load labware offsets.
         """
-        self._sync_hardware_api = sync_hardware_api
-        self._labware_offset_provider = labware_offset_provider
+        self._hardware_api = hardware_api
+        self._protocol_engine = protocol_engine
 
     def create(self, protocol: LegacyProtocol) -> LegacyProtocolContext:
         """Create a Protocol API v2 context."""
-        api_version = protocol.api_level
         extra_labware = (
             protocol.extra_labware
             if isinstance(protocol, LegacyPythonProtocol)
             else None
         )
 
-        return LegacyProtocolContext(
-            api_version=api_version,
-            labware_offset_provider=self._labware_offset_provider,
-            implementation=self._ContextImplementation(
-                sync_hardware=self._sync_hardware_api,
-                api_version=api_version,
-                extra_labware=extra_labware,
-            ),
+        return create_protocol_context(
+            api_version=protocol.api_level,
+            hardware_api=self._hardware_api,
+            protocol_engine=self._protocol_engine,
+            extra_labware=extra_labware,
+            use_simulating_core=self._USE_SIMULATING_CORE,
         )
 
 
@@ -136,7 +125,7 @@ class LegacySimulatingContextCreator(LegacyContextCreator):
     See `opentrons.protocols.context.simulator`.
     """
 
-    _ContextImplementation = LegacyProtocolContextSimulation
+    _USE_SIMULATING_CORE = True
 
 
 class LegacyExecutor:
@@ -150,6 +139,7 @@ class LegacyExecutor:
 
 __all__ = [
     # Re-exports of user-facing Python Protocol APIv2 stuff:
+    # TODO(mc, 2022-08-22): remove, no longer "legacy", so re-exports unnecessary
     "LegacyProtocolContext",
     "LegacyLabware",
     "LegacyWell",

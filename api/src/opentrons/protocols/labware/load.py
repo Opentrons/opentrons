@@ -1,11 +1,14 @@
+from __future__ import annotations
+
 import logging
-from typing import Dict
+from typing import TYPE_CHECKING, Dict
 
 from opentrons.protocols.labware.definition import get_labware_definition
-from opentrons.protocols.context.labware import AbstractLabware
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
 from opentrons.types import Location
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
+if TYPE_CHECKING:
+    from opentrons.protocol_api.core.labware import AbstractLabware
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -31,6 +34,10 @@ def load_from_definition(
     :param str label: An optional label that will override the labware's
                       display name from its definition
     """
+    # TODO(mc, 2022-08-24): this module creates import cycles; delete
+    # consolidate labware loading into opentrons.protocol_api
+    from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
+
     return LabwareImplementation(definition=definition, parent=parent, label=label)
 
 

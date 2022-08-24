@@ -1,6 +1,7 @@
 """Tests for the sensor drivers."""
 import pytest
 import mock
+from typing import Union, List
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 from unittest.mock import patch
@@ -8,7 +9,6 @@ from mock.mock import AsyncMock
 
 from tests.conftest import MockCanMessageNotifier
 
-from opentrons_hardware.sensors import fdc1004, hdc2080, mmr920C04, sensor_abc
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 from opentrons_hardware.firmware_bindings.constants import SensorType, SensorId, NodeId
 from opentrons_hardware.drivers.can_bus.can_messenger import (
@@ -47,40 +47,47 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorIdField,
     SensorOutputBindingField,
 )
-from opentrons_hardware.sensors.utils import SensorDataType
+from opentrons_hardware.sensors.types import SensorDataType, EnvironmentSensorDataType
+from opentrons_hardware.sensors.sensor_types import (
+    CapacitiveSensor,
+    PressureSensor,
+    EnvironmentSensor,
+    BaseSensorType,
+    ThresholdSensorType,
+)
+from opentrons_hardware.sensors.sensor_driver import SensorDriver
 from opentrons_hardware.firmware_bindings.constants import SensorOutputBinding
 
 
 @pytest.fixture
-def pressure_sensor() -> mmr920C04.PressureSensor:
+def pressure_sensor() -> PressureSensor:
     """Fixture for pressure sensor driver."""
-    return mmr920C04.PressureSensor()
+    return PressureSensor.build(SensorId.S0, NodeId.pipette_left)
 
 
 @pytest.fixture
-def capacitive_sensor() -> fdc1004.CapacitiveSensor:
+def capacitive_sensor() -> CapacitiveSensor:
     """Fixture for capacitive sensor driver."""
-    return fdc1004.CapacitiveSensor()
+    return CapacitiveSensor.build(SensorId.S0, NodeId.pipette_left)
 
 
 @pytest.fixture
-def temperature_sensor() -> hdc2080.EnvironmentSensor:
-    """Fixture for temperature sensor driver."""
-    return hdc2080.EnvironmentSensor(SensorType.temperature)
-
-
-@pytest.fixture
-def humidity_sensor() -> hdc2080.EnvironmentSensor:
+def environment_sensor() -> EnvironmentSensor:
     """Fixture for humidity sensor driver."""
-    return hdc2080.EnvironmentSensor(SensorType.humidity)
+    return EnvironmentSensor.build(SensorId.S0, NodeId.pipette_left)
+
+
+@pytest.fixture
+def sensor_driver() -> SensorDriver:
+    """Fixture for humidity sensor driver."""
+    return SensorDriver()
 
 
 @pytest.mark.parametrize(
-    argnames=["sensor", "node", "message"],
+    argnames=["sensor_type", "message"],
     argvalues=[
         [
             lazy_fixture("pressure_sensor"),
-            NodeId.pipette_left,
             BaselineSensorRequest(
                 payload=BaselineSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.pressure),
@@ -91,7 +98,6 @@ def humidity_sensor() -> hdc2080.EnvironmentSensor:
         ],
         [
             lazy_fixture("capacitive_sensor"),
-            NodeId.pipette_left,
             BaselineSensorRequest(
                 payload=BaselineSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.capacitive),
@@ -103,23 +109,27 @@ def humidity_sensor() -> hdc2080.EnvironmentSensor:
     ],
 )
 async def test_polling(
-    sensor: sensor_abc.AbstractAdvancedSensor, node: NodeId, message: MessageDefinition
+    sensor_driver: SensorDriver, sensor_type: BaseSensorType, message: MessageDefinition
 ) -> None:
     """Test that a polling function sends the expected message."""
     messenger = mock.AsyncMock(spec=CanMessenger)
-    await sensor.get_baseline(messenger, node, 10, 10)
-    messenger.send.assert_called_once_with(node_id=node, message=message)
+    await sensor_driver.get_baseline(messenger, sensor_type, 10, 10)
+    messenger.send.assert_called_once_with(
+        node_id=sensor_type.sensor.node_id, message=message
+    )
 
 
 @pytest.mark.parametrize(
-    argnames=["sensor"],
+    argnames=["sensor_type"],
     argvalues=[
         [lazy_fixture("pressure_sensor")],
         [lazy_fixture("capacitive_sensor")],
+        [lazy_fixture("environment_sensor")],
     ],
 )
 async def test_receive_data_polling(
-    sensor: sensor_abc.AbstractAdvancedSensor,
+    sensor_driver: SensorDriver,
+    sensor_type: BaseSensorType,
     mock_messenger: mock.AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
 ) -> None:
@@ -127,76 +137,103 @@ async def test_receive_data_polling(
 
     def responder(node_id: NodeId, message: MessageDefinition) -> None:
         """Message responder."""
-        can_message_notifier.notify(
-            ReadFromSensorResponse(
-                payload=ReadFromSensorResponsePayload(
-                    sensor_data=Int32Field(256),
-                    sensor_id=SensorIdField(SensorId.S0),
-                    sensor=SensorTypeField(sensor._sensor_type),
-                )
-            ),
-            ArbitrationId(
-                parts=ArbitrationIdParts(
-                    message_id=ReadFromSensorResponse.message_id,
-                    node_id=NodeId.host,
-                    function_code=0,
-                    originating_node_id=node_id,
-                )
-            ),
-        )
+        if sensor_type.sensor.sensor_type == SensorType.environment:
+            can_message_notifier.notify(
+                ReadFromSensorResponse(
+                    payload=ReadFromSensorResponsePayload(
+                        sensor_data=Int32Field(256),
+                        sensor_id=SensorIdField(SensorId.S0),
+                        sensor=SensorTypeField(SensorType.humidity),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=ReadFromSensorResponse.message_id,
+                        node_id=NodeId.host,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
+            can_message_notifier.notify(
+                ReadFromSensorResponse(
+                    payload=ReadFromSensorResponsePayload(
+                        sensor_data=Int32Field(256),
+                        sensor_id=SensorIdField(SensorId.S0),
+                        sensor=SensorTypeField(SensorType.temperature),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=ReadFromSensorResponse.message_id,
+                        node_id=NodeId.host,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
+        else:
+            can_message_notifier.notify(
+                ReadFromSensorResponse(
+                    payload=ReadFromSensorResponsePayload(
+                        sensor_data=Int32Field(256),
+                        sensor_id=SensorIdField(SensorId.S0),
+                        sensor=SensorTypeField(sensor_type.sensor.sensor_type),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=ReadFromSensorResponse.message_id,
+                        node_id=NodeId.host,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
 
     mock_messenger.send.side_effect = responder
-    return_data = await sensor.get_baseline(mock_messenger, NodeId.pipette_left, 10, 10)
-    assert return_data == SensorDataType.build([0x0, 0x1, 0x0])
+    return_data = await sensor_driver.get_baseline(mock_messenger, sensor_type, 10, 10)
+    if isinstance(return_data, EnvironmentSensorDataType):
+        expected_list = [
+            SensorDataType.build([0x0, 0x1, 0x0], SensorTypeField(0x05)),
+            SensorDataType.build([0x0, 0x1, 0x0], SensorTypeField(0x06)),
+        ]
+        assert return_data == EnvironmentSensorDataType.build(expected_list)
+    else:
+        assert return_data == SensorDataType.build(
+            [0x0, 0x1, 0x0], SensorTypeField(sensor_type.sensor.sensor_type)
+        )
 
 
 @pytest.mark.parametrize(
-    argnames=["sensor", "node", "message"],
+    argnames=["sensor_type", "message"],
     argvalues=[
         [
             lazy_fixture("pressure_sensor"),
-            NodeId.pipette_left,
             WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.pressure),
                     sensor_id=SensorIdField(SensorId.S0),
-                    data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
+                    data=UInt32Field(
+                        SensorDataType.build(
+                            [0x2, 0x2, 0x0, 0x0], SensorTypeField(SensorType.pressure)
+                        ).to_int
+                    ),
                     reg_address=UInt8Field(0x0),
                 )
             ),
         ],
         [
             lazy_fixture("capacitive_sensor"),
-            NodeId.pipette_left,
             WriteToSensorRequest(
                 payload=WriteToSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.capacitive),
                     sensor_id=SensorIdField(SensorId.S0),
-                    data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
-                    reg_address=UInt8Field(0x0),
-                )
-            ),
-        ],
-        [
-            lazy_fixture("temperature_sensor"),
-            NodeId.pipette_left,
-            WriteToSensorRequest(
-                payload=WriteToSensorRequestPayload(
-                    sensor=SensorTypeField(SensorType.temperature),
-                    sensor_id=SensorIdField(SensorId.S0),
-                    data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
-                    reg_address=UInt8Field(0x0),
-                )
-            ),
-        ],
-        [
-            lazy_fixture("humidity_sensor"),
-            NodeId.pipette_left,
-            WriteToSensorRequest(
-                payload=WriteToSensorRequestPayload(
-                    sensor=SensorTypeField(SensorType.humidity),
-                    sensor_id=SensorIdField(SensorId.S0),
-                    data=UInt32Field(SensorDataType.build([0x2, 0x2, 0x0, 0x0]).to_int),
+                    data=UInt32Field(
+                        SensorDataType.build(
+                            [0x2, 0x2, 0x0, 0x0], SensorTypeField(SensorType.capacitive)
+                        ).to_int
+                    ),
                     reg_address=UInt8Field(0x0),
                 )
             ),
@@ -204,21 +241,26 @@ async def test_receive_data_polling(
     ],
 )
 async def test_write(
-    sensor: sensor_abc.AbstractAdvancedSensor, node: NodeId, message: MessageDefinition
+    sensor_driver: SensorDriver,
+    sensor_type: ThresholdSensorType,
+    message: MessageDefinition,
 ) -> None:
     """Check that writing sensor data is successful."""
-    data = SensorDataType.build([0x2, 0x2, 0x0, 0x0])
+    data = SensorDataType.build(
+        [0x2, 0x2, 0x0, 0x0], SensorTypeField(sensor_type.sensor.sensor_type)
+    )
     messenger = mock.AsyncMock(spec=CanMessenger)
-    await sensor.write(messenger, NodeId.pipette_left, data)
-    messenger.send.assert_called_once_with(node_id=node, message=message)
+    await sensor_driver.write(messenger, sensor_type, data)
+    messenger.send.assert_called_once_with(
+        node_id=sensor_type.sensor.node_id, message=message
+    )
 
 
 @pytest.mark.parametrize(
-    argnames=["sensor", "node", "message"],
+    argnames=["sensor_type", "message"],
     argvalues=[
         [
             lazy_fixture("pressure_sensor"),
-            NodeId.pipette_left,
             ReadFromSensorRequest(
                 payload=ReadFromSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.pressure),
@@ -229,7 +271,6 @@ async def test_write(
         ],
         [
             lazy_fixture("capacitive_sensor"),
-            NodeId.pipette_left,
             ReadFromSensorRequest(
                 payload=ReadFromSensorRequestPayload(
                     sensor=SensorTypeField(SensorType.capacitive),
@@ -239,22 +280,10 @@ async def test_write(
             ),
         ],
         [
-            lazy_fixture("temperature_sensor"),
-            NodeId.pipette_left,
+            lazy_fixture("environment_sensor"),
             ReadFromSensorRequest(
                 payload=ReadFromSensorRequestPayload(
-                    sensor=SensorTypeField(SensorType.temperature),
-                    sensor_id=SensorIdField(SensorId.S0),
-                    offset_reading=UInt8Field(False),
-                )
-            ),
-        ],
-        [
-            lazy_fixture("humidity_sensor"),
-            NodeId.pipette_left,
-            ReadFromSensorRequest(
-                payload=ReadFromSensorRequestPayload(
-                    sensor=SensorTypeField(SensorType.humidity),
+                    sensor=SensorTypeField(SensorType.environment),
                     sensor_id=SensorIdField(SensorId.S0),
                     offset_reading=UInt8Field(False),
                 )
@@ -263,25 +292,27 @@ async def test_write(
     ],
 )
 async def test_read(
-    sensor: sensor_abc.AbstractAdvancedSensor, node: NodeId, message: MessageDefinition
+    sensor_driver: SensorDriver, sensor_type: BaseSensorType, message: MessageDefinition
 ) -> None:
     """Test that a read function sends the expected message."""
     messenger = mock.AsyncMock(spec=CanMessenger)
-    await sensor.read(messenger, node, False)
-    messenger.send.assert_called_once_with(node_id=node, message=message)
+    await sensor_driver.read(messenger, sensor_type, False)
+    messenger.send.assert_called_once_with(
+        node_id=sensor_type.sensor.node_id, message=message
+    )
 
 
 @pytest.mark.parametrize(
-    argnames=["sensor"],
+    argnames=["sensor_type"],
     argvalues=[
         [lazy_fixture("pressure_sensor")],
         [lazy_fixture("capacitive_sensor")],
-        [lazy_fixture("temperature_sensor")],
-        [lazy_fixture("humidity_sensor")],
+        [lazy_fixture("environment_sensor")],
     ],
 )
 async def test_receive_data_read(
-    sensor: sensor_abc.AbstractAdvancedSensor,
+    sensor_driver: SensorDriver,
+    sensor_type: BaseSensorType,
     mock_messenger: mock.AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
 ) -> None:
@@ -289,35 +320,85 @@ async def test_receive_data_read(
 
     def responder(node_id: NodeId, message: MessageDefinition) -> None:
         """Message responder."""
-        can_message_notifier.notify(
-            ReadFromSensorResponse(
-                payload=ReadFromSensorResponsePayload(
-                    sensor_data=Int32Field(256),
-                    sensor_id=SensorIdField(SensorId.S0),
-                    sensor=SensorTypeField(sensor._sensor_type),
-                )
-            ),
-            ArbitrationId(
-                parts=ArbitrationIdParts(
-                    message_id=ReadFromSensorResponse.message_id,
-                    node_id=NodeId.host,
-                    function_code=0,
-                    originating_node_id=node_id,
-                )
-            ),
-        )
+        if sensor_type.sensor.sensor_type == SensorType.environment:
+            # humidity reading
+            can_message_notifier.notify(
+                ReadFromSensorResponse(
+                    payload=ReadFromSensorResponsePayload(
+                        sensor_data=Int32Field(256),
+                        sensor_id=SensorIdField(SensorId.S0),
+                        sensor=SensorTypeField(SensorType.humidity),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=ReadFromSensorResponse.message_id,
+                        node_id=NodeId.host,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
+            # temperature reading
+            can_message_notifier.notify(
+                ReadFromSensorResponse(
+                    payload=ReadFromSensorResponsePayload(
+                        sensor_data=Int32Field(50),
+                        sensor_id=SensorIdField(SensorId.S0),
+                        sensor=SensorTypeField(SensorType.temperature),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=ReadFromSensorResponse.message_id,
+                        node_id=NodeId.host,
+                        function_code=0,
+                        originating_node_id=NodeId.pipette_left,
+                    )
+                ),
+            )
+        else:
+            can_message_notifier.notify(
+                ReadFromSensorResponse(
+                    payload=ReadFromSensorResponsePayload(
+                        sensor_data=Int32Field(256),
+                        sensor_id=SensorIdField(SensorId.S0),
+                        sensor=SensorTypeField(sensor_type.sensor.sensor_type),
+                    )
+                ),
+                ArbitrationId(
+                    parts=ArbitrationIdParts(
+                        message_id=ReadFromSensorResponse.message_id,
+                        node_id=NodeId.host,
+                        function_code=0,
+                        originating_node_id=node_id,
+                    )
+                ),
+            )
 
     mock_messenger.send.side_effect = responder
-    return_data = await sensor.read(mock_messenger, NodeId.pipette_left, False, 10)
-    assert return_data == SensorDataType.build([0x0, 0x1, 0x0])
+    return_data = await sensor_driver.read(mock_messenger, sensor_type, False, 10)
+    if sensor_type.sensor.sensor_type == SensorType.environment:
+        expected_list = [
+            SensorDataType.build(Int32Field(256), SensorTypeField(SensorType.humidity)),
+            SensorDataType.build(
+                Int32Field(50), SensorTypeField(SensorType.temperature)
+            ),
+        ]
+        assert return_data == EnvironmentSensorDataType.build(expected_list)
+    else:
+        assert return_data == SensorDataType.build(
+            [0x0, 0x1, 0x0], SensorTypeField(sensor_type.sensor.sensor_type)
+        )
 
 
 @pytest.mark.parametrize(
-    argnames=["sensor"],
+    argnames=["sensor_type"],
     argvalues=[[lazy_fixture("pressure_sensor")], [lazy_fixture("capacitive_sensor")]],
 )
 async def test_threshold(
-    sensor: sensor_abc.AbstractAdvancedSensor,
+    sensor_driver: SensorDriver,
+    sensor_type: ThresholdSensorType,
     mock_messenger: mock.AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
 ) -> None:
@@ -330,7 +411,7 @@ async def test_threshold(
                 SensorThresholdResponse(
                     payload=SensorThresholdResponsePayload(
                         threshold=message.payload.threshold,
-                        sensor=SensorTypeField(sensor._sensor_type),
+                        sensor=SensorTypeField(sensor_type.sensor.sensor_type),
                         sensor_id=SensorIdField(SensorId.S0),
                         mode=message.payload.mode,
                     )
@@ -345,26 +426,30 @@ async def test_threshold(
                 ),
             )
 
-    threshold = SensorDataType.build([0x0, 0x5])
+    threshold = SensorDataType.build(
+        [0x0, 0x5], SensorTypeField(sensor_type.sensor.sensor_type)
+    )
     mock_messenger.send.side_effect = responder
-    return_data = await sensor.send_zero_threshold(
-        mock_messenger, NodeId.pipette_left, threshold, 10
+    sensor_type.zero_threshold = threshold.to_float()
+    return_data = await sensor_driver.send_zero_threshold(
+        mock_messenger, sensor_type, 10
     )
     assert return_data == threshold
 
 
 @pytest.mark.parametrize(
-    argnames=["node_id", "timeout", "sensor"],
+    argnames=["timeout", "sensor_type"],
     argvalues=[
-        [NodeId.pipette_left, 1, lazy_fixture("pressure_sensor")],
-        [NodeId.pipette_left, 5, lazy_fixture("capacitive_sensor")],
+        [1, lazy_fixture("pressure_sensor")],
+        [5, lazy_fixture("capacitive_sensor")],
+        [5, lazy_fixture("environment_sensor")],
     ],
 )
 async def test_bind_to_sync(
     mock_messenger: mock.AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
-    sensor: sensor_abc.AbstractAdvancedSensor,
-    node_id: NodeId,
+    sensor_driver: SensorDriver,
+    sensor_type: BaseSensorType,
     timeout: int,
 ) -> None:
     """Test for bind_to_sync.
@@ -372,26 +457,26 @@ async def test_bind_to_sync(
     Tests that bind_to_sync does in fact
     send out a BindSensorOutputRequest.
     """
-    async with sensor.bind_output(
+    async with sensor_driver.bind_output(
         mock_messenger,
-        node_id,
+        sensor_type,
         SensorOutputBinding.sync,
     ):
         mock_messenger.send.assert_called_with(
-            node_id=node_id,
+            node_id=sensor_type.sensor.node_id,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
-                    sensor=SensorTypeField(sensor._sensor_type),
+                    sensor=SensorTypeField(sensor_type.sensor.sensor_type),
                     sensor_id=SensorIdField(SensorId.S0),
                     binding=SensorOutputBindingField(SensorOutputBinding.sync),
                 )
             ),
         )
     mock_messenger.send.assert_called_with(
-        node_id=node_id,
+        node_id=sensor_type.sensor.node_id,
         message=BindSensorOutputRequest(
             payload=BindSensorOutputRequestPayload(
-                sensor=SensorTypeField(sensor._sensor_type),
+                sensor=SensorTypeField(sensor_type.sensor.sensor_type),
                 sensor_id=SensorIdField(SensorId.S0),
                 binding=SensorOutputBindingField(SensorOutputBinding.none),
             )
@@ -400,17 +485,18 @@ async def test_bind_to_sync(
 
 
 @pytest.mark.parametrize(
-    argnames=["sensor", "node_id", "timeout"],
+    argnames=["sensor_type", "timeout"],
     argvalues=[
-        [lazy_fixture("capacitive_sensor"), NodeId.pipette_right, 10],
-        [lazy_fixture("pressure_sensor"), NodeId.pipette_left, 2],
+        [lazy_fixture("capacitive_sensor"), 10],
+        [lazy_fixture("pressure_sensor"), 2],
+        [lazy_fixture("environment_sensor"), 2],
     ],
 )
 async def test_get_baseline(
     mock_messenger: mock.AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
-    sensor: sensor_abc.AbstractAdvancedSensor,
-    node_id: NodeId,
+    sensor_driver: SensorDriver,
+    sensor_type: BaseSensorType,
     timeout: int,
 ) -> None:
     """Test for get_baseline.
@@ -423,58 +509,134 @@ async def test_get_baseline(
     def responder(node_id: NodeId, message: MessageDefinition) -> None:
         """Message responder."""
         if isinstance(message, BaselineSensorRequest):
-            can_message_notifier.notify(
-                ReadFromSensorResponse(
-                    payload=ReadFromSensorResponsePayload(
-                        sensor=SensorTypeField(sensor._sensor_type),
-                        sensor_id=SensorIdField(SensorId.S0),
-                        sensor_data=Int32Field(50),
-                    )
-                ),
-                ArbitrationId(
-                    parts=ArbitrationIdParts(
-                        message_id=ReadFromSensorResponse.message_id,
-                        node_id=node_id,
-                        function_code=0,
-                        originating_node_id=node_id,
-                    )
-                ),
-            )
+            if sensor_type.sensor.sensor_type == SensorType.environment:
+                can_message_notifier.notify(
+                    ReadFromSensorResponse(
+                        payload=ReadFromSensorResponsePayload(
+                            sensor_data=Int32Field(50),
+                            sensor_id=SensorIdField(SensorId.S0),
+                            sensor=SensorTypeField(SensorType.humidity),
+                        )
+                    ),
+                    ArbitrationId(
+                        parts=ArbitrationIdParts(
+                            message_id=ReadFromSensorResponse.message_id,
+                            node_id=NodeId.host,
+                            function_code=0,
+                            originating_node_id=node_id,
+                        )
+                    ),
+                )
+                can_message_notifier.notify(
+                    ReadFromSensorResponse(
+                        payload=ReadFromSensorResponsePayload(
+                            sensor_data=Int32Field(50),
+                            sensor_id=SensorIdField(SensorId.S0),
+                            sensor=SensorTypeField(SensorType.temperature),
+                        )
+                    ),
+                    ArbitrationId(
+                        parts=ArbitrationIdParts(
+                            message_id=ReadFromSensorResponse.message_id,
+                            node_id=NodeId.host,
+                            function_code=0,
+                            originating_node_id=node_id,
+                        )
+                    ),
+                )
+            else:
+                can_message_notifier.notify(
+                    ReadFromSensorResponse(
+                        payload=ReadFromSensorResponsePayload(
+                            sensor=SensorTypeField(sensor_type.sensor.sensor_type),
+                            sensor_id=SensorIdField(SensorId.S0),
+                            sensor_data=Int32Field(50),
+                        )
+                    ),
+                    ArbitrationId(
+                        parts=ArbitrationIdParts(
+                            message_id=ReadFromSensorResponse.message_id,
+                            node_id=node_id,
+                            function_code=0,
+                            originating_node_id=node_id,
+                        )
+                    ),
+                )
 
     mock_messenger.send.side_effect = responder
-    baseline = await sensor.get_baseline(mock_messenger, node_id, 100, timeout)
-    assert baseline == SensorDataType.build(Int32Field(50))
+    baseline = await sensor_driver.get_baseline(
+        mock_messenger, sensor_type, 100, timeout
+    )
+    if sensor_type.sensor.sensor_type == SensorType.environment:
+        expected_list = [
+            SensorDataType.build(Int32Field(50), SensorTypeField(SensorType.humidity)),
+            SensorDataType.build(
+                Int32Field(50), SensorTypeField(SensorType.temperature)
+            ),
+        ]
+        assert baseline == EnvironmentSensorDataType.build(expected_list)
+    else:
+        baseline = await sensor_driver.get_baseline(
+            mock_messenger, sensor_type, 100, timeout
+        )
+        assert baseline == SensorDataType.build(
+            Int32Field(50), SensorTypeField(sensor_type.sensor.sensor_type)
+        )
 
 
 @pytest.mark.parametrize(
-    argnames=["sensor", "node_id", "timeout"],
+    argnames=["sensor_type", "timeout", "data_points"],
     argvalues=[
-        [lazy_fixture("capacitive_sensor"), NodeId.pipette_left, 2],
-        [lazy_fixture("pressure_sensor"), NodeId.pipette_right, 3],
+        [
+            lazy_fixture("capacitive_sensor"),
+            2,
+            [SensorDataType.build(50, SensorTypeField(SensorType.capacitive))],
+        ],
+        [
+            lazy_fixture("pressure_sensor"),
+            3,
+            [SensorDataType.build(50, SensorTypeField(SensorType.pressure))],
+        ],
+        [
+            lazy_fixture("environment_sensor"),
+            3,
+            [
+                SensorDataType.build(50, SensorTypeField(SensorType.humidity)),
+                SensorDataType.build(50, SensorTypeField(SensorType.temperature)),
+            ],
+        ],
     ],
 )
 async def test_debug_poll(
     mock_messenger: mock.AsyncMock,
-    sensor: sensor_abc.AbstractAdvancedSensor,
-    node_id: NodeId,
+    sensor_driver: SensorDriver,
+    sensor_type: BaseSensorType,
     timeout: int,
+    data_points: List[SensorDataType],
 ) -> None:
     """Test for debug poll."""
-    async with sensor.bind_output(mock_messenger, node_id, SensorOutputBinding.report):
-        for i in range(2):
-            with patch.object(
-                sensor._scheduler,
-                "_wait_for_response",
-                new=AsyncMock(return_value=SensorDataType.build(50)),
-            ):
+    async with sensor_driver.bind_output(
+        mock_messenger, sensor_type, SensorOutputBinding.report
+    ):
+        with patch.object(
+            sensor_driver._scheduler,
+            "_multi_wait_for_response",
+            new=AsyncMock(return_value=data_points),
+        ):
 
-                data = await sensor.get_report(node_id, mock_messenger, timeout)
-                assert data == SensorDataType.build(Int32Field(50))
+            data = await sensor_driver.get_report(sensor_type, mock_messenger, timeout)
+            if isinstance(data, EnvironmentSensorDataType):
+                expected_result: Union[
+                    EnvironmentSensorDataType, SensorDataType
+                ] = EnvironmentSensorDataType.build(data_points)
+            else:
+                expected_result = data_points[0]
+            assert data == expected_result
     mock_messenger.send.assert_called_with(
-        node_id=node_id,
+        node_id=sensor_type.sensor.node_id,
         message=BindSensorOutputRequest(
             payload=BindSensorOutputRequestPayload(
-                sensor=SensorTypeField(sensor._sensor_type),
+                sensor=SensorTypeField(sensor_type.sensor.sensor_type),
                 sensor_id=SensorIdField(SensorId.S0),
                 binding=SensorOutputBindingField(SensorOutputBinding.none),
             )
@@ -483,19 +645,18 @@ async def test_debug_poll(
 
 
 @pytest.mark.parametrize(
-    argnames=["sensor", "node_id", "timeout"],
+    argnames=["sensor_type", "timeout"],
     argvalues=[
-        [lazy_fixture("capacitive_sensor"), NodeId.pipette_left, 2],
-        [lazy_fixture("pressure_sensor"), NodeId.pipette_right, 3],
-        [lazy_fixture("temperature_sensor"), NodeId.pipette_left, 2],
-        [lazy_fixture("humidity_sensor"), NodeId.pipette_right, 2],
+        [lazy_fixture("capacitive_sensor"), 2],
+        [lazy_fixture("pressure_sensor"), 3],
+        [lazy_fixture("environment_sensor"), 2],
     ],
 )
 async def test_peripheral_status(
     mock_messenger: mock.AsyncMock,
     can_message_notifier: MockCanMessageNotifier,
-    sensor: sensor_abc.AbstractAdvancedSensor,
-    node_id: NodeId,
+    sensor_driver: SensorDriver,
+    sensor_type: BaseSensorType,
     timeout: int,
 ) -> None:
     """Test for getting peripheral device status."""
@@ -506,7 +667,7 @@ async def test_peripheral_status(
             can_message_notifier.notify(
                 PeripheralStatusResponse(
                     payload=PeripheralStatusResponsePayload(
-                        sensor=SensorTypeField(sensor._sensor_type),
+                        sensor=SensorTypeField(sensor_type.sensor.sensor_type),
                         sensor_id=SensorIdField(SensorId.S0),
                         status=UInt8Field(0x1),
                     )
@@ -522,5 +683,5 @@ async def test_peripheral_status(
             )
 
     mock_messenger.send.side_effect = responder
-    status = await sensor.get_device_status(mock_messenger, node_id, timeout)
+    status = await sensor_driver.get_device_status(mock_messenger, sensor_type, timeout)
     assert status

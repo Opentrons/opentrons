@@ -1,7 +1,7 @@
 from itertools import dropwhile, takewhile
 from typing import Optional, Sequence
 
-from opentrons.protocols.context.well import WellImplementation
+from opentrons.protocol_api.core.well import WellImplementation
 
 
 Wells = Sequence[WellImplementation]

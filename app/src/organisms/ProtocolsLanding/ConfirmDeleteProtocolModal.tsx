@@ -10,7 +10,7 @@ import {
   Link,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { Modal } from '../../atoms/Modal'
+import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
 import { AlertPrimaryButton } from '../../atoms/buttons'
 
@@ -44,7 +44,7 @@ export function ConfirmDeleteProtocolModal(
             {t('shared:cancel')}
           </Link>
           <AlertPrimaryButton
-            backgroundColor={COLORS.error}
+            backgroundColor={COLORS.errorEnabled}
             onClick={props.handleClickDelete}
           >
             {t('yes_delete_this_protocol')}
