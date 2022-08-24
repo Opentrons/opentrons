@@ -442,10 +442,9 @@ class HeaterShaker(mod_abc.AbstractModule):
 
     async def prep_for_update(self) -> str:
         await self._poller.stop_and_wait()
-        async with update.protect_dfu_transition():
-            await self._driver.enter_programming_mode()
-            dfu_info = await update.find_dfu_device(pid=DFU_PID)
-            return dfu_info
+        await self._driver.enter_programming_mode()
+        dfu_info = await update.find_dfu_device(pid=DFU_PID)
+        return dfu_info
 
 
 @dataclass

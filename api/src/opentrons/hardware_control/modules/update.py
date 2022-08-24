@@ -29,18 +29,19 @@ async def update_firmware(
 
     raises an UpdateError with the reason for the failure.
     """
-    flash_port_or_dfu_serial = await module.prep_for_update()
-    kwargs: Dict[str, Any] = {
-        "stdout": asyncio.subprocess.PIPE,
-        "stderr": asyncio.subprocess.PIPE,
-        "loop": loop,
-    }
-    successful, res = await module.bootloader()(
-        flash_port_or_dfu_serial, str(firmware_file), kwargs
-    )
-    if not successful:
-        log.info(f"Bootloader reponse: {res}")
-        raise UpdateError(res)
+    async with protect_dfu_transition():
+        flash_port_or_dfu_serial = await module.prep_for_update()
+        kwargs: Dict[str, Any] = {
+            "stdout": asyncio.subprocess.PIPE,
+            "stderr": asyncio.subprocess.PIPE,
+            "loop": loop,
+        }
+        successful, res = await module.bootloader()(
+            flash_port_or_dfu_serial, str(firmware_file), kwargs
+        )
+        if not successful:
+            log.info(f"Bootloader reponse: {res}")
+            raise UpdateError(res)
 
 
 async def find_bootloader_port() -> str:
