@@ -284,10 +284,27 @@ async def test_sends_all_required_followups(
     ]
 
 
+@pytest.mark.parametrize(
+    "bad_serial,parsed_serial",
+    [
+        (
+            # if it's decodable, it's decoded
+            b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c",
+            "\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c",
+        ),
+        (
+            # if it has a 0, that ends the serial
+            b"asbasdb\x00abasc",
+            "asbasdb",
+        ),
+    ],
+)
 async def test_handles_bad_serials(
     subject: detector.OneshotToolDetector,
     mock_messenger: AsyncMock,
     message_send_loopback: CanLoopback,
+    bad_serial: bytes,
+    parsed_serial: str,
 ) -> None:
     """It should accept serial values that cannot be decoded."""
 
@@ -317,9 +334,7 @@ async def test_handles_bad_serials(
             payload = payloads.PipetteInfoResponsePayload(
                 name=PipetteNameField(100),
                 model=UInt16Field(31),
-                serial=SerialDataCodeField(
-                    b"\x00\x01\x02\x03\x04\0x05\x06\x07\x08\x09\x0a\x0b"
-                ),
+                serial=SerialDataCodeField(bad_serial),
             )
             return [
                 (
@@ -336,10 +351,7 @@ async def test_handles_bad_serials(
     tools = await subject.detect()
 
     assert tools.left == types.PipetteInformation(
-        name=PipetteName.unknown,
-        name_int=100,
-        model="3.1",
-        serial="\x00\x01\x02\x03\x04\0x05\x06\x07\x08\x09\x0a\x0b",
+        name=PipetteName.unknown, name_int=100, model="3.1", serial=parsed_serial
     )
 
 
