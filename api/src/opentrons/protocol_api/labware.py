@@ -267,7 +267,7 @@ class Labware(DeckItem):
                 f"version or update your robot."
             )
         self._api_version = api_level
-        self._implementation = implementation
+        self._implementation: AbstractLabware[AbstractWellCore] = implementation
 
     @property
     def separate_calibration(self) -> bool:
