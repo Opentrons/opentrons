@@ -48,75 +48,62 @@ defaults:
 jobs:
   lint:
     name: 'opentrons package linting'
-    timeout-minutes: 10
+    timeout-minutes: 20
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
+      - uses: './.github/actions/python/setup-all-environments'
+        id: 'setup'
+      - uses: './.github/actions/python/lint'
         with:
-          node-version: '16'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.7'
-
-      - uses: './.github/actions/python/setup'
-        with:
-          project: 'api'
-      - name: Lint with opentrons_hardware
-        run: make -C api lint
+          setup-outcome: ${{ steps.setup.outcome }}
+          project: api
   test:
-    name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
+    name: 'opentrons package tests on ${{ matrix.os }}'
     timeout-minutes: 30
     needs: [lint]
     strategy:
       matrix:
-        os: ['windows-2019', 'ubuntu-22.04', 'macos-latest']
-        # TODO(mc, 2022-02-24): expand this matrix to 3.8 and 3.9,
-        # preferably in a nightly cronjob on edge or something
-        python: ['3.7', '3.10']
-        with-ot-hardware: ['true', 'false']
-        exclude:
-          - os: 'windows-2019'
-            with-ot-hardware: 'true'
-          - os: 'macos-latest'
-            with-ot-hardware: 'true'
-          - os: 'macos-latest'
-            python: '3.10'
-          - python: '3.10'
-            with-ot-hardware: 'true'
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
+      - name: setup python environment Windows
+        if: matrix.os == 'windows-2022'
+        uses: './.github/actions/python/setup-single-environment'
         with:
-          node-version: '16'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: ${{ matrix.python }}
+          environment: 'app'
+          python-version: '3.10'
+      - name: setup python environments NOT Windows
+        if: matrix.os != 'windows-2022'
+        uses: './.github/actions/python/setup-all-environments'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - uses: './.github/actions/python/setup'
-        with:
-          project: 'api'
-          python-version: ${{ matrix.python }}
-      - if: ${{ matrix.with-ot-hardware == 'false' }}
-        name: Remove OT-3 hardware package
-        run: make -C api setup-ot2
-        env:
-          OT_VIRTUALENV_VERSION: ${{ matrix.python }}
-      - if: ${{ matrix.with-ot-hardware == 'false' }}
-        name: Test without opentrons_hardware
-        run: make -C api test-ot2
-      - if: ${{ matrix.with-ot-hardware == 'true' }}
-        name: Test with opentrons_hardware
-        run: make -C api test-cov
+      - name: Test OT-2
+        if: matrix.os != 'windows-2022'
+        run: make -C api test-cov-ot2
+      - name: Test OT-3
+        if: matrix.os != 'windows-2022'
+        run: make -C api test-cov-ot3
+      - name: Test app
+        run: make -C api test-cov-app
       - name: Ensure assets build
+        if: matrix.os != 'windows-2022'
         run: make -C api sdist wheel
+      - name: pip install opentrons and use CLI
+        working-directory: api
+        run: |
+          python -m pip install .
+          opentrons_execute --help
+          opentrons_simulate --help
+          opentrons_simulate ./docs/v2/example_protocols/dilution_tutorial.py -e -o nothing
+          python -m opentrons.cli --help
       - name: Upload coverage report
+        if: matrix.os != 'windows-2022'
         uses: 'codecov/codecov-action@v3'
         with:
           files: ./api/coverage.xml
@@ -129,21 +116,13 @@ jobs:
     if: github.event_name == 'push'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '16'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.7'
+      - uses: './.github/actions/python/setup-all-environments'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - uses: './.github/actions/python/setup'
-        with:
-          project: 'api'
       # creds and repository configuration for deploying python wheels
       - if: ${{ !env.OT_TAG }}
         name: 'upload to test pypi'

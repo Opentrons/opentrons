@@ -24,13 +24,12 @@ br_ssh_opts ?= $(default_ssh_opts)
 
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@echo This target is deprecated; run make -C environments setup instead
 
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
-	$(python) -m otupdate --log-level debug --port $(port)
+	$(call python,dev) -m otupdate --log-level debug --port $(port)
 
 .PHONY: clean
 clean:
@@ -43,33 +42,31 @@ clean:
 		'**/__pycache__' \
 		'**/*.pyc'
 
-.PHONY: teardown
-teardown:
-	$(pipenv) --rm
-
 .PHONY: test
 test:
-	$(python) -m pytest $(test_opts) $(tests)
+	$(call pytest,ot-2) $(test_opts) $(tests)
+	$(call pytest,ot-3/update-server) $(test_opts) $(tests)
 
 .PHONY: lint
 lint:
-	$(python) -m mypy otupdate tests
-	$(python) -m black --check ./otupdate ./tests
-	$(python) -m flake8 otupdate tests
+	$(call python,ot-2) -m mypy otupdate tests
+	$(call python,ot-3/update-server) -m mypy otupdate tests
+	$(call python,dev) -m black --check ./otupdate ./tests
+	$(call python,dev) -m flake8 otupdate tests
 
 .PHONY: format
 format:
-	$(python) -m black otupdate tests
+	$(call python,dev) -m black otupdate tests
 
 .PHONY: wheel
 wheel: clean
-	$(python) setup.py bdist_wheel
+	$(call python,ot-2) setup.py bdist_wheel
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 .PHONY: sdist
 sdist: clean
-	$(python) setup.py sdist
+	$(call python,ot-3/update-server) setup.py sdist
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 

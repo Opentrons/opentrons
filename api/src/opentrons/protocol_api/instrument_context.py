@@ -122,7 +122,7 @@ class InstrumentContext(publisher.CommandPublisher):
         self._implementation.set_default_speed(speed)
 
     @requires_version(2, 0)
-    def aspirate(
+    def aspirate(  # noqa: C901 max-complexity: 10
         self,
         volume: Optional[float] = None,
         location: Optional[Union[types.Location, labware.Well]] = None,
@@ -1005,9 +1005,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self.transfer(volume, source, dest, **kwargs)
 
-    @publisher.publish(command=cmds.transfer)  # noqa: C901
+    @publisher.publish(command=cmds.transfer)
     @requires_version(2, 0)
-    def transfer(
+    def transfer(  # noqa: C901 max-complexity: 13
         self,
         volume: Union[float, Sequence[float]],
         source: AdvancedLiquidHandling,

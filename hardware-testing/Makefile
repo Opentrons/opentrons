@@ -31,17 +31,20 @@ ot_sources := $(ot_py_sources)
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 
+# overwrite pipenv from python.mk as this folder does not directly use environments
+pipenv := PIPENV_PIPFILE=./Pipfile $(pipenv_call)
+
 .PHONY: all
 all: clean wheel
 
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) sync --dev
 	$(pipenv) run pip freeze
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	$(pipenv) --rm || true
 
 .PHONY: clean
 clean:
@@ -190,3 +193,6 @@ sync-fw-ot3:
 
 .PHONY: sync-ot3
 sync-ot3: sync-sw-ot3 sync-fw-ot3
+
+update:
+	$(pipenv) update --dev

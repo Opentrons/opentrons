@@ -1,0 +1,29 @@
+name: 'Lint Tools'
+description: 'Run all linting tools.'
+inputs:
+  setup-outcome:
+    description: 'The outcome of the setup step.'
+    required: true
+  project:
+    description: 'Which project (by subdirectory) to lint?'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      name: black-check
+      if: always() && inputs.setup-outcome == 'success'
+      run: make -C ${{ inputs.project }} black-check
+    - shell: bash
+      name: flake8
+      if: always() && inputs.setup-outcome == 'success'
+      run: make -C ${{ inputs.project }} flake8
+    - shell: bash
+      name: mypy-ot2
+      if: always() && inputs.setup-outcome == 'success'
+      run: make -C ${{ inputs.project }} mypy-ot2
+    - shell: bash
+      name: mypy-ot3
+      if: always() && inputs.setup-outcome == 'success'
+      run: make -C ${{ inputs.project }} mypy-ot3

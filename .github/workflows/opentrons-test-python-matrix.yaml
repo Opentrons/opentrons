@@ -1,0 +1,55 @@
+# validate Python opentrons and opentrons_shared_data
+# test, build, and pip install on each backward supported version of Python and platform
+# additionally smoke test cli tools of the opentrons package
+# this will default run against edge because it is the default branch of the repository
+# due to the long runtime and runner usage, run as a cron instead of on push/PR trigger
+# trigger with dispatch to run against a different branch
+
+name: 'opentrons backward test matrix'
+
+on:
+  push:
+    branches:
+      - 'add-environment-specs' # remove me before merge
+  schedule:
+    # 8:44 UTC each day
+    - cron: '44 8 * * *'
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
+        python: ['3.7', '3.8', '3.9', '3.10']
+    runs-on: '${{ matrix.os }}'
+    steps:
+      - uses: 'actions/checkout@v3'
+      - uses: './.github/actions/python/setup-single-environment'
+        with:
+          python-version: '${{ matrix.python }}'
+          environment: app
+      - name: 'set complex environment variables'
+        uses: actions/github-script@v6.1.1
+        with:
+          script: |
+            const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+      - name: Test opentrons on app environment
+        run: make -C api test-app
+      - name: python -m pip install opentrons and use CLI
+        working-directory: api
+        run: |
+          python -m pip install .
+          opentrons_execute --help
+          opentrons_simulate --help
+          opentrons_simulate ./docs/v2/example_protocols/dilution_tutorial.py -e -o nothing
+          opentrons_simulate ../robot-server/tests/integration/protocols/simple_v6.json -e -o nothing
+          python -m opentrons.cli --help

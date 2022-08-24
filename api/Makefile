@@ -9,13 +9,13 @@ SHX := npx shx
 firmware = $(wildcard smoothie/*.hex)
 
 # python and pipenv config
-sphinx_build := $(pipenv) run sphinx-build -W --keep-going
+sphinx_build := $(call pipenv,app) run sphinx-build -W --keep-going
 # todo(mm, 2021-10-04):
 # 1. Resolve all Sphinx warnings.
 # 2. Convert all recipes to use $(sphinx_build).
 # 3. Delete $(sphinx_build_allow_warnings).
 # github.com/Opentrons/opentrons/issues/6135
-sphinx_build_allow_warnings := $(pipenv) run sphinx-build
+sphinx_build_allow_warnings := $(call pipenv,app) run sphinx-build
 
 
 # Find the version of the wheel from package.json using a helper script. We
@@ -62,7 +62,7 @@ ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
-clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'src/**/.mypy_cache'
+clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml Pipfile.lock '*.egg-info' '**/__pycache__' '**/*.pyc' 'src/**/.mypy_cache'
 
 plot_type ?=
 
@@ -71,26 +71,15 @@ all: clean sdist wheel
 
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
-
-.PHONY: setup-ot2
-setup-ot2:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip uninstall -y opentrons_hardware
-	$(pipenv) run pip freeze
+	@echo "Command is be deprecated. Use make -C environments setup instead."
 
 .PHONY: clean
 clean: docs-clean
 	$(clean_cmd)
 
-.PHONY: teardown
-teardown:
-	$(pipenv) --rm
-
 $(wheel_file): setup.py $(ot_sources)
 	$(clean_cmd)
-	$(python) setup.py $(wheel_opts) bdist_wheel
+	$(call python,dev) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -98,33 +87,72 @@ wheel: $(wheel_file)
 
 $(sdist_file): setup.py $(ot_sources)
 	$(clean_cmd)
-	$(python) setup.py sdist
+	$(call python,dev) setup.py sdist
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 sdist: $(sdist_file)
 
 .PHONY: test
-test:
-	$(pytest) $(tests) $(test_opts)
+test: test-ot2 test-ot3
 
 .PHONY: test-cov
-test-cov:
-	$(pytest) $(tests) $(test_opts) $(cov_opts)
+test-cov: test-cov-ot2 test-cov-ot3
+
+.PHONY: test-cov-ot3
+test-cov-ot3:
+	$(call pytest,ot-3/robot-server) $(tests) $(test_opts) $(cov_opts)
+
+.PHONY: test-cov-ot2
+test-cov-ot2:
+	$(call pytest,ot-2) $(tests) -m 'not ot3_only' $(test_opts) --ot2-only --ignore-glob="**/*ot3*" $(cov_opts)
+
+.PHONY: test-cov-dev
+test-cov-dev:
+	$(call pytest,dev) $(tests) $(test_opts) $(cov_opts)
+
+.PHONY: test-dev
+test-dev:
+	$(call pytest,dev) $(tests) $(test_opts)
 
 .PHONY: test-ot2
 test-ot2:
-	$(pytest) -m 'not ot3_only' $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
+	$(call pytest,ot-2) $(tests) -m 'not ot3_only' $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
+
+.PHONY: test-ot3
+test-ot3:
+	$(call pytest,ot-3/robot-server) $(tests) $(test_opts)
+
+.PHONY: test-app
+test-app:
+	$(call pytest,app) $(tests) -m 'not ot3_only' $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
+
+.PHONY: test-cov-app
+test-cov-app:
+	$(call pytest,app) $(tests) -m 'not ot3_only' $(test_opts) --ot2-only --ignore-glob="**/*ot3*" $(cov_opts)
+
+.PHONY: black-check
+black-check:
+	$(call python,dev) -m black --check src tests setup.py
+
+.PHONY: flake8
+flake8:
+	$(call python,dev) -m flake8 src tests setup.py
+
+.PHONY: mypy-ot2
+mypy-ot2:
+	$(call python,ot-2) -m mypy --python-version 3.7 src --exclude=.*ot3.*
+
+.PHONY: mypy-ot3
+mypy-ot3:
+	$(call python,ot-3/robot-server) -m mypy --python-version 3.8 src tests
 
 .PHONY: lint
-lint:
-	$(python) -m mypy src tests
-	$(python) -m black --check src tests setup.py
-	$(python) -m flake8 src tests setup.py
+lint: black-check flake8 mypy-ot2 mypy-ot3
 
 .PHONY: format
 format:
-	$(python) -m black src tests setup.py
+	$(call python,dev) -m black src tests setup.py
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build_allow_warnings) -b html -d docs/build/doctrees -n $< $@
@@ -164,9 +192,20 @@ dev:
 	echo "Command will be deprecated. Use \"make -C robot-server dev\""
 	$(MAKE) -C ../robot-server dev
 
+.PHONY: local-shell-dev
+local-shell-dev:
+	$(call pipenv,dev) shell
+
+.PHONY: local-shell-ot2
+local-shell-ot2:
+	$(call pipenv,ot-2) shell
+
+.PHONY: local-shell-ot3
+local-shell-ot3:
+	$(call pipenv,ot-3/robot-server) shell
+
 .PHONY: local-shell
-local-shell:
-	$(pipenv) shell
+local-shell: local-shell-dev
 
 .PHONY: push-no-restart
 push-no-restart: wheel
@@ -188,18 +227,41 @@ push-no-restart-ot3: $(sdist_file)
 push-ot3: push-no-restart-ot3
 	$(call restart-server,$(host),,$(ssh_opts),"opentrons-robot-server")
 
+.PHONY: simulate-app
+simulate-app:
+	-$(call python,app) -m opentrons.simulate -l $(sim_log_level) $(simfile)
+
+.PHONY: simulate-ot2
+simulate-ot2:
+	-$(call python,ot-2) -m opentrons.simulate -l $(sim_log_level) $(simfile)
+
+.PHONY: simulate-ot3
+simulate-ot3:
+	-$(call python,ot-3/robot-server) -m opentrons.simulate -l $(sim_log_level) $(simfile)
+
+.PHONY: simulate-dev
+simulate-dev:
+	-$(call python,dev) -m opentrons.simulate -l $(sim_log_level) $(simfile)
+
 .PHONY: simulate
-simulate:
-	-$(python) -m opentrons.simulate -l $(sim_log_level) $(simfile)
+simulate: simulate-dev
 
 # Launch the emulator application.
 .PHONY: emulator
-emulator:
+emulator: emulator-ot2
 	-$(python) -m opentrons.hardware_control.emulation.app
+
+.PHONY: emulator-ot2
+emulator-ot2:
+	-$(call python,ot-2) -m opentrons.hardware_control.emulation.app
+
+.PHONY: emulator-ot3
+emulator-ot3:
+	-$(call python,ot-3/robot-server) -m opentrons.hardware_control.emulation.app
 
 .PHONY: deploy
 deploy: wheel
-	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file))
+	$(call python_upload_package,dev,$(twine_auth_args),$(twine_repository_url),$(wheel_file))
 
 # User must currently specify host, e.g.: `make term host=169.254.202.176`
 .PHONY: term
@@ -208,4 +270,4 @@ term:
 
 .PHONY: plot-session
 plot-session:
-	$(python) util/plot_session.py $(plot_type) $(plot_type).pdf
+	$(call python,dev) util/plot_session.py $(plot_type) $(plot_type).pdf

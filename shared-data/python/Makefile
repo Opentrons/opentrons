@@ -20,11 +20,6 @@ PATH := $(shell cd ../.. && yarn bin):$(PATH)
 # documentation
 BUILD_NUMBER ?=
 
-# this may be set as an environment variable to select the version of
-# python to run if pyenv is not available. it should always be set to
-# point to a python3.6.
-OT_PYTHON ?= python
-
 BUILD_DIR := dist
 
 
@@ -46,25 +41,15 @@ json_sources = $(deck_sources) $(labware_sources) $(module_sources) $(pipette_so
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 twine_repository_url ?= $(pypi_test_upload_url)
 
-clean_cmd = $(SHX) rm -rf build $(BUILD_DIR) .coverage coverage.xml '*.egg-info' ' **/__pycache__' '**/*.pyc' 'opentrons_shared_data/**/.mypy_cache'
+clean_cmd = $(SHX) rm -rf build $(BUILD_DIR) .coverage coverage.xml Pipfile.lock '*.egg-info' ' **/__pycache__' '**/*.pyc' 'opentrons_shared_data/**/.mypy_cache'
 
 .PHONY: all
 all: clean sdist wheel
 
-.PHONY: setup
-setup: setup-py
 
 .PHONY: setup-py
 setup-py:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
-
-.PHONY: teardown
-teardown: teardown-py
-
-.PHONY: teardown-py
-teardown-py:
-	$(pipenv) --rm
+	@echo This target is deprecated run make -C environments setup instead
 
 
 .PHONY: clean
@@ -82,25 +67,37 @@ sdist: $(sdist_file)
 
 $(wheel_file): setup.py $(py_sources) $(json_sources)
 	$(SHX) mkdir -p build
-	$(python) setup.py $(wheel_opts) bdist_wheel
+	$(call python,ot-2) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) ls $(BUILD_DIR)
 
 
 $(sdist_file): setup.py $(py_sources) $(json_sources)
 	$(SHX) mkdir -p build
-	$(python) setup.py sdist
+	$(call python,ot-3/robot-server) setup.py sdist
 	$(SHX) ls $(BUILD_DIR)
 
+.PHONY: black-check
+black-check:
+	$(call python,dev) -m black --check opentrons_shared_data tests setup.py
+
+.PHONY: flake8
+flake8:
+	$(call python,dev) -m flake8 opentrons_shared_data tests setup.py
+
+.PHONY: mypy-ot2
+mypy-ot2:
+	$(call python,ot-2) -m mypy opentrons_shared_data tests
+
+.PHONY: mypy-ot3
+mypy-ot3:
+	$(call python,ot-3/robot-server) -m mypy opentrons_shared_data tests
 
 .PHONY: lint
-lint: $(py_sources)
-	$(python) -m mypy opentrons_shared_data tests
-	$(python) -m black --check opentrons_shared_data tests setup.py
-	$(python) -m flake8 opentrons_shared_data tests setup.py
+lint: black-check flake8 mypy-ot2 mypy-ot3
 
 .PHONY: format
 format:
-	$(python) -m black opentrons_shared_data tests setup.py
+	$(call python,dev) -m black opentrons_shared_data tests setup.py
 
 .PHONY: push-no-restart
 push-no-restart: $(wheel_file)
@@ -124,4 +121,9 @@ deploy: wheel
 
 .PHONY: test
 test:
-	$(python) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
+	$(call pytest,ot-2) --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
+	$(call pytest,ot-3/robot-server) --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
+
+.PHONY: test-app
+test-app:
+	$(call pytest,app) --cov=opentrons_shared_data --cov-report xml:coverage.xml tests

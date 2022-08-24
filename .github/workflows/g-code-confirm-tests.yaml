@@ -1,4 +1,4 @@
-name: "G-Code-Confirm"
+name: 'G-Code-Confirm'
 
 on:
   # Run on any change to the api directory
@@ -31,29 +31,16 @@ jobs:
   confirm-g-code:
     strategy:
       matrix:
-        command: [
-          '2-modules',
-          'swift-smoke',
-          'swift-turbo',
-          'omega',
-          'fast'
-        ]
+        command: ['2-modules', 'swift-smoke', 'swift-turbo', 'omega', 'fast']
     name: 'Confirm G-Code (${{ matrix.command }})'
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '12'
-      - uses: 'actions/setup-python@v3'
-        with:
-          python-version: '3.7'
       - uses: './.github/actions/python/setup'
         with:
           project: 'g-code-testing'
-
-      - name: "Verify no missing comparison files"
+          python-version: '3.10'
+      - name: 'Verify no missing comparison files'
         run: make -C g-code-testing check-for-missing-comparison-files
-
       - name: 'Run & Compare to comparison files'
         run: make -C g-code-testing test-g-code-${{ matrix.command }}

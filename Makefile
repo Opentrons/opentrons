@@ -4,21 +4,27 @@
 # make OT_PYTHON available
 include ./scripts/python.mk
 
-API_DIR := api
 APP_SHELL_DIR := app-shell
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
-G_CODE_TESTING_DIR := g-code-testing
 LABWARE_LIBRARY_DIR := labware-library
-NOTIFY_SERVER_DIR := notify-server
 PROTOCOL_DESIGNER_DIR := protocol-designer
+
 SHARED_DATA_DIR := shared-data
+
+API_DIR := api
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
 HARDWARE_DIR := hardware
 USB_BRIDGE_DIR := usb-bridge
+G_CODE_TESTING_DIR := g-code-testing
+HARDWARE_TESTING_DIR := hardware-testing
+NOTIFY_SERVER_DIR := notify-server
+ENVIRONMENTS := environments
 
-PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(USB_BRIDGE_DIR)
+PYTHON_SETUP_DIRS := $(ENVIRONMENTS) $(G_CODE_TESTING_DIR) $(HARDWARE_TESTING_DIR)
+PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python $(HARDWARE_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_TESTING_DIR) $(USB_BRIDGE_DIR)
+PYTHON_TEARDOWN_DIRS := $(PYTHON_SETUP_DIRS)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -32,7 +38,7 @@ cover ?= true
 updateSnapshot ?= false
 quiet ?= false
 
-FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml)" "**/*.@(ts|tsx|js|json|md|yml)"
+FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|md|yml|yaml)" "**/*.@(ts|tsx|js|json|md|yml|yaml)"
 
 ifeq ($(watch), true)
 	cover := false
@@ -43,6 +49,8 @@ endif
 usb_host=$(shell yarn run -s discovery find -i 169.254)
 
 # install all project dependencies
+# may be run with -j
+# setup-py requires setup-js be run first due to use of yarn installed tools like shx
 .PHONY: setup
 setup: setup-js setup-py
 
@@ -54,16 +62,18 @@ setup-js:
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
-PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
-
-.PHONY: setup-py
-setup-py:
+.PHONY: install-pipenv
+install-pipenv:
 	$(OT_PYTHON) -m pip install pipenv==2021.5.29
-	$(MAKE) $(PYTHON_SETUP_TARGETS)
 
+PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_SETUP_DIRS))
 
 %-py-setup:
 	$(MAKE) -C $* setup
+
+.PHONY: setup-py
+setup-py:
+	$(MAKE) $(PYTHON_SETUP_TARGETS)
 
 # uninstall all project dependencies
 # tear down JS after Python, because Python cleanup depends on JS dep shx
@@ -76,12 +86,14 @@ teardown:
 teardown-js: clean-js
 	yarn shx rm -rf "**/node_modules"
 
-PYTHON_TEARDOWN_TARGETS := $(addsuffix -py-teardown, $(PYTHON_DIRS))
-
 .PHONY: teardown-py
-teardown-py: $(PYTHON_TEARDOWN_TARGETS)
+teardown-py:
+	$(MAKE) $(PYTHON_TEARDOWN_TARGETS)
+	$(MAKE) $(PYTHON_CLEAN_TARGETS)
 
-%-py-teardown: %-py-clean
+PYTHON_TEARDOWN_TARGETS := $(addsuffix -py-teardown, $(PYTHON_TEARDOWN_DIRS))
+
+%-py-teardown:
 	$(MAKE) -C $* teardown
 
 # clean all project output
@@ -171,9 +183,8 @@ test-e2e:
 
 .PHONY: test-py-windows
 test-py-windows:
-	$(MAKE) -C $(HARDWARE_DIR) test
-	$(MAKE) -C $(API_DIR) test
-	$(MAKE) -C $(SHARED_DATA_DIR) test-py
+	$(MAKE) -C $(API_DIR) test-app
+	$(MAKE) -C $(SHARED_DATA_DIR)/python test-app
 
 .PHONY: test-py
 test-py: test-py-windows
@@ -181,6 +192,8 @@ test-py: test-py-windows
 	$(MAKE) -C $(ROBOT_SERVER_DIR) test
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) test
 	$(MAKE) -C $(G_CODE_TESTING_DIR) test
+	$(MAKE) -C $(HARDWARE_DIR) test
+	$(MAKE) -C $(HARDWARE_TESTING_DIR) test
 
 .PHONY: test-js
 test-js:

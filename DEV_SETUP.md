@@ -12,8 +12,19 @@ You will need the following tools installed to develop on the Opentrons platform
 - git
 - curl
 - ssh
-- Python v3.7
 - Node.js v16
+- pyenv (see below) with a recent interpreter of your choice, like 3.10
+  - Python v3.7, v3.8, v3.10
+
+### pyenv
+
+In the past, we recommended pyenv on macos and linux because it made it convenient to install the specific version of python used by our stack. However, we now support so many environments, with different versions of python, that we rely on pyenv internally - and its integration with pipenv - to manage the different interpreters we require. You should now install it on all platforms.
+
+On linux and OSX, use [pyenv][pyenv] (the link has install instructions). On Windows, use [pyenv-win][pyenv-win] which similarly has instructions on installation in the link.
+
+Note: if your system python is 3.10 or 3.8, make sure that you use pyenv to install an interpreter at that minor version with a higher bugfix version than the system; otherwise pipenv will use the wrong one, which will break native code dependencies.
+
+For instance, if your system provides 3.10.6, make sure you use pyenv to install 3.10.7 or higher.
 
 ### macOS
 
@@ -21,7 +32,7 @@ On macOS, we rely on:
 
 - [Homebrew][brew] to install general dependencies, like `git`
 - [Node Version Switcher][nvs] to install and manage Node.js
-- [pyenv][] to install and manage Python
+- [pyenv][pyenv] to install and manage Python
 
 The setup below is compatible with both Intel and ARM (e.g. M1) machines. It assumes you are using the system default shell of `zsh`.
 
@@ -61,11 +72,7 @@ If you haven't used `git` before, **be sure to complete [first-time Git setup][]
 
 #### 1. Install Node.js
 
-Our recommended installation instructions for Node.js differ between `x86_64` (Intel) and `ARM` (M1) Macs.
-
-##### x86-64 Mac (Intel) & ARM Mac(M1)
-
-On x86, we recommend [nvs][] to install Node.js because it works well and is compatible with macOS, Windows, and Linux.
+We recommend [nvs][] to install Node.js because it works well and is compatible with macOS, Windows, and Linux.
 
 1. Go to [https://github.com/jasongin/nvs][nvs]
 2. Follow the instructions for "Mac, Linux" setup
@@ -82,7 +89,7 @@ Close and re-open your terminal to confirm `nvs` is installed.
 nvs --version
 ```
 
-Now we can use nvs to install Node.js v14 and switch on `auto` mode, which will make sure Node.js v14 is used any time we're in the `opentrons` project directory.
+Now we can use nvs to install Node.js v16 and switch on `auto` mode, which will make sure Node.js v16 is used any time we're in the `opentrons` project directory.
 
 ```shell
 nvs add 16
@@ -122,12 +129,6 @@ Close and re-open your terminal to verify that `pyenv` is installed
 pyenv --version
 ```
 
-Now, install the required version of Python. Use the latest available version of `3.7.x`, which is `3.7.13` at the time of writing.
-
-```shell
-pyenv install 3.7.13
-```
-
 If your `pyenv` command isn't working, confirm that your shell is set up properly. If you print out the contents of `~/.zprofile` and `~/.zshrc`, you should see something similar to the following:
 
 ```shell
@@ -146,7 +147,15 @@ eval "$(pyenv init -)"
 # ...
 ```
 
-#### 3. Install `jpeg` if on ARM Mac (M1)
+##### Python installation with pyenv
+
+Before you can install python, you'll need to install its build dependencies explicitly. If you're getting errors during environment setup about SSH not working, it's because you built an interpreter without SSH support accidentally because openssh headers weren't installed and python's configuration detected this. Python's build dependencies are:
+
+- [here for Mac](https://devguide.python.org/getting-started/setup-building/#macos-and-os-x)
+
+- [here for Linux](https://devguide.python.org/getting-started/setup-building/#linux)
+
+Install `jpeg` if on ARM Mac (M1)
 
 `/hardware` depends on the Python library Pillow. On ARM Macs, `pip` will build Pillow from source, which requires [jpeg](https://formulae.brew.sh/formula/jpeg) to be installed.
 
@@ -154,32 +163,81 @@ eval "$(pyenv init -)"
 brew install jpeg
 ```
 
+Install the required versions of Python. Use the latest available version of `3.7.x`, `3.8.x`, and `3.10.x`
+
+> At the time of writing
+
+```shell
+pyenv install 3.7.15
+pyenv install 3.8.15
+pyenv install 3.10.8
+pyenv global 3.10.8 3.8.15 3.7.8
+pyenv versions
+```
+
+Python 3.7, 3.8, and 3.10 are available with this pyenv global configuration. Because 3.10.8 is first when you set the configuration, `python` will use that version. Pyenv provides `python3.7`, `python3.8`, and `python3.10` to call minor versions.
+
+With both versions of Python available through pyenv on your system, pipenv will point to the right version given a projects Pipfile.
+
 ### Windows
 
 **This section is a work in progress**
 
 On Windows, we rely on:
 
-- [scoop][] to install general dependencies and Python
+- [scoop][] to install general dependencies
 - [Node Version Switcher][nvs] to install and manage Node.js
+- For the Python side, native Windows development is not supported for most environments.
+  - [environments/app](/environments/app) is supported for Windows opentrons and shared-data package testing
+  - [environments/dev](/environments/dev) may work on Windows but is not guaranteed
+  - **If you must develop on Windows use Windows Subsystem for Linux (WSL)**
+    - [VS Code provides great tools!](https://code.visualstudio.com/docs/remote/wsl)
+      - Follow the instructions and then see the [Linux section](#linux)
 
 #### 0. Install `scoop` and general dependencies
 
 #### 1. Install `nvs` and Node.js
 
-#### 2. Install Python
+#### TODO any instructions for Node side development
 
 ### Linux
 
 **This section is a work in progress**
 
-Linux setup is broadly similar to macOS setup, but it will depend heavily on your exact distribution of Linux and your preferred workflows. For this example, we will assume an Ubuntu variant using Bash. If your setup is different, consult the documentation of your distribution and the tools listed below.
+This setup will depend heavily on your exact distribution of Linux and your preferred workflows. For this example, we will provide instructions for an Ubuntu and Fedora variant using Bash. If your setup is different, consult the documentation of your distribution and the tools listed below.
 
 #### 0. Install general dependencies
 
+This list is not exhaustive but on Ubuntu 22.04 these were needed `libudev-dev` `libsystemd-dev` in addition to many packages installed by default.
+
+```shell
+sudo apt install libudev-dev libsystemd-dev -y
+```
+
 #### 1. Install `nvs` and Node.js
 
+You can follow the [nvs][nvs] instructions to install nvs on your system:
+
+```shell
+export NVS_HOME="$HOME/.nvs"
+git clone https://github.com/jasongin/nvs "$NVS_HOME"
+. "$NVS_HOME/nvs.sh" install
+```
+
 #### 2. Install `pyenv` and Python
+
+You can follow the [pyenv][pyenv] "basic github checkout" instructions to install pyenv on your system:
+
+```shell
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+```
+
+Also add the above to whatever combination of `~/.profile`, `~/.bash_profile`, etc you like best depending on your ssh workflows.
+
+##### [Python installation with pyenv](#python-installation-with-pyenv)
 
 ## Repository Setup
 
@@ -193,18 +251,16 @@ cd ./opentrons
 Once you are inside the repository for the first time, you should do two things:
 
 1. Confirm that `nvs` selected the proper version of Node.js to use
-2. Tell `pyenv` to use Python 3.7
 
 ```shell
-# confirm Node v14
+# confirm Node v16
 node --version
 
-# set Python version, and confirm
-pyenv local 3.7.13
-python --version
+# confirm pyenv has 3.7, 3.8, and 3.10 with a star by them
+pyenv versions
 ```
 
-Once you've confirmed you're running the correct versions of Node.js and Python, you must install [yarn][] to manage JavaScript dependencies.
+Once you've confirmed you're running the correct versions of Node.js and have Python ready, you must install [yarn][] to manage JavaScript dependencies.
 
 ```shell
 npm install --global yarn@1
@@ -213,8 +269,10 @@ npm install --global yarn@1
 Finally, you need to download and install all of our various development dependencies. **This step will take several minutes** the first time you run it!
 
 ```shell
-make setup
+make setup -j
 ```
+
+If you experience issues, run `make setup` without the `-j` to see the errors clearly.
 
 Once `make setup` completes, you're ready to start developing! Check out our general [contributing guide][] for more information. If you ever need to remove (or recreate) the steps run in `make setup`, you can use `make teardown` to remove the installed dependencies.
 

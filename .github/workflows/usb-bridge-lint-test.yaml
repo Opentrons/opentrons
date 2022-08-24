@@ -42,16 +42,10 @@ jobs:
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '16'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.7'
-
       - uses: './.github/actions/python/setup'
         with:
-          project: 'usb-bridge'
+          project: usb-bridge
+          python-version: '3.10'
       - name: Lint
         run: make -C usb-bridge lint
   test:
@@ -61,15 +55,10 @@ jobs:
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '16'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.7'
       - uses: './.github/actions/python/setup'
         with:
-          project: 'usb-bridge'
+          project: usb-bridge
+          python-version: '3.10'
       - name: Test
         run: make -C usb-bridge test
       - uses: 'codecov/codecov-action@v3'

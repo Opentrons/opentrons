@@ -1,5 +1,5 @@
 """Pub sub integration tests."""
-from asyncio import Task, sleep
+from asyncio import Task
 from typing import AsyncGenerator, Tuple
 
 import pytest
@@ -55,17 +55,9 @@ async def test_two_pub_two_sub_two_topics(
     event: Event,
 ) -> None:
     """Test that two publishers reaches two subscribers of different topics."""
-    # TODO AL 2020-10-29: Super hacky sleep to wait for server task to get
-    #  started.
-    #  This test freezes in CI only. My theory is that there is a race
-    #  condition. The server is not ready in time to get the first events.
-    await sleep(0.1)
-
     pub1, pub2 = two_publishers
-
     await pub1.send("topic1", event)
     await pub2.send("topic2", event)
-
     e = await subscriber_first_topic.next_event()
     assert e.topic == "topic1"
     assert e.event == event

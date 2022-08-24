@@ -46,44 +46,22 @@ clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__p
 #
 # "--lifespan on" ensures errors in startup and shutdown handlers won't be hidden.
 # See github.com/encode/starlette/issues/1138, fixed in Starlette v0.16.0?
-#
-# todo(mm, 2021-07-08): Figure out how to run the server with Python development
-# mode enabled, to expose more errors and warnings.
-#   * Using a Makefile target-specific variable to set PYTHONDEVMODE=1
-#     doesn't work because it applies the variable to the whole `pipenv run`
-#     command, and we only want our inner server process running under dev mode,
-#     not the outer pipenv process.
-#   * Adding PYTHONDEVMODE=1 to the .env file specified by
-#     OT_ROBOT_SERVER_DOT_ENV_PATH doesn't work because that's read too late.
-#   * Doing `pipenv run env PYTHONDEVMODE=1 uvicorn ...` works, except it's
-#     probably POSIX-only.
-run_dev ?= uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --lifespan on --reload
+run_dev ?= env PYTHONDEVMODE=1 uvicorn "robot_server:app" --host localhost --port 31950 --ws wsproto --lifespan on --reload
 
 .PHONY: all
 all: clean sdist wheel
 
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
-
-.PHONY: setup-ot2
-setup-ot2:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip uninstall -y opentrons_hardware
-	$(pipenv) run pip freeze
+	@echo This command is deprecated; run make -C environments setup instead
 
 .PHONY: clean
 clean:
 	$(clean_cmd)
 
-.PHONY: teardown
-teardown:
-	$(pipenv) --rm
-
 $(wheel_file): setup.py $(ot_sources)
 	$(clean_cmd)
-	$(python) setup.py $(wheel_opts) bdist_wheel
+	$(call python,ot-2) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -91,50 +69,79 @@ wheel: $(wheel_file)
 
 $(sdist_file): setup.py $(ot_sources)
 	$(clean_cmd)
-	$(python) setup.py sdist
+	$(call python,ot-3/robot-server) setup.py sdist
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 sdist: $(sdist_file)
 
 .PHONY: test
-test:
-	$(pytest) $(tests) $(test_opts)
+test: test-ot2 test-ot3
+
+.PHONY: test-ot2
+test-ot2:
+	$(call pytest,ot-2) $(tests) $(test_opts)
+
+.PHONY: test-ot3
+test-ot3:
+	$(call pytest,ot-3/robot-server) $(tests) $(test_opts)
+
+.PHONY: test-dev
+test-dev:
+	$(call pytest,dev) $(tests) $(test_opts)
+
+.PHONY: test-cov-dev
+test-cov-dev:
+	$(call pytest,dev) $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-cov
 test-cov:
-	$(pytest) $(tests) $(test_opts) $(cov_opts)
+	$(call pytest,ot-2) $(tests) $(test_opts) $(cov_opts)
+	$(call pytest,ot-3/robot-server) $(tests) $(test_opts) $(cov_opts)
+
+.PHONY: black-check
+black-check:
+	$(call python,dev) -m black --check .
+
+.PHONY: flake8
+flake8:
+	$(call python,dev) -m flake8 $(SRC_PATH) $(tests) setup.py
+
+.PHONY: mypy-ot2
+mypy-ot2:
+	$(call python,ot-2) -m mypy $(SRC_PATH) $(tests)
+
+.PHONY: mypy-ot3
+mypy-ot3:
+	$(call python,ot-3/robot-server) -m mypy $(SRC_PATH) $(tests)
 
 .PHONY: lint
-lint:
-	$(python) -m mypy $(SRC_PATH) $(tests)
-	$(python) -m black --check .
-	$(python) -m flake8 $(SRC_PATH) $(tests) setup.py
+lint: black-check flake8 mypy-ot2 mypy-ot3
 
 .PHONY: format
 format:
-	$(python) -m black .
+	$(call python,dev) -m black .
 
 .PHONY: dev
 dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env
 dev:
-	$(pipenv) run $(run_dev)
+	$(call pipenv,ot-2) run $(run_dev)
 
 .PHONY: dev-with-emulator
 dev-with-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator.env
 dev-with-emulator:
-	$(pipenv) run $(run_dev)
+	$(call pipenv,ot-2) run $(run_dev)
 
 
 .PHONY: dev-with-ot3-emulator
 dev-with-ot3-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator_ot3.env
 dev-with-ot3-emulator:
-	$(pipenv) run $(run_dev)
+	$(call pipenv,ot-3/robot-server) run $(run_dev)
 
 
 .PHONY: local-shell
 local-shell:
-	$(pipenv) shell
+	$(call pipenv,dev) shell
 
 .PHONY: push
 push: wheel
@@ -188,4 +195,4 @@ term:
 docs: settings_schema.json
 
 settings_schema.json: robot_server/settings.py
-	$(python) -m scripts.settings_schema $@
+	$(call python,dev) -m scripts.settings_schema $@

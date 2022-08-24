@@ -48,7 +48,9 @@ async def test_dispense_implementation(
             well_name="A3",
             well_location=well_location,
         )
-    ).then_do(_rehearse_dispense)
+    ).then_do(
+        _rehearse_dispense
+    )  # type: ignore[arg-type]
 
     result = await subject.execute(data)
 

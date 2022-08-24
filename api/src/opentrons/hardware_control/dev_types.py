@@ -1,11 +1,17 @@
 from __future__ import annotations
+import sys
 
 # this file defines types that require dev dependencies
 # and are only relevant for static typechecking. this file should only
 # be imported if typing.TYPE_CHECKING is True
 from typing import Optional, Dict, List, Union
 
-from typing_extensions import TypedDict, Literal
+if sys.version_info >= (3, 8):
+    from typing import TypedDict
+else:
+    from typing_extensions import TypedDict
+
+from typing_extensions import Literal
 
 from opentrons_shared_data.pipette.dev_types import (
     PipetteModel,

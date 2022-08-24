@@ -36,40 +36,15 @@ defaults:
     shell: bash
 
 jobs:
-  lint:
-    name: 'update server linting'
-    timeout-minutes: 10
+  lint-test:
+    name: 'update server linting and testing'
+    timeout-minutes: 20
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '16'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.7'
-
-      - uses: './.github/actions/python/setup'
-        with:
-          project: 'update-server'
+      - uses: './.github/actions/python/setup-all-environments'
       - name: Lint
         run: make -C update-server lint
-  test:
-    name: 'update server package tests'
-    timeout-minutes: 10
-    needs: [lint]
-    runs-on: 'ubuntu-22.04'
-    steps:
-      - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '16'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.7'
-      - uses: './.github/actions/python/setup'
-        with:
-          project: 'update-server'
       - name: Test
         run: make -C update-server test
       - uses: 'codecov/codecov-action@v3'

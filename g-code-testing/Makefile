@@ -19,9 +19,12 @@ tests_to_typecheck := \
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 
+# overwrite pipenv from python.mk as this folder does not directly use environments
+pipenv := PIPENV_PIPFILE=./Pipfile $(pipenv_call)
+
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) sync --dev
 	$(pipenv) run pip freeze
 
 .PHONY: clean
@@ -30,7 +33,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	$(pipenv) --rm || true
 
 .PHONY: test
 test:
@@ -94,3 +97,6 @@ update-g-code-configuration-comparison:
 .PHONY: check-for-missing-comparison-files
 check-for-missing-comparison-files:
 	$(pipenv) run python cli.py check-for-missing-comparison-files --error_on_missing_configuration_files
+
+update:
+	$(pipenv) update --dev

@@ -24,6 +24,9 @@ br_ssh_key ?= $(default_ssh_key)
 # Other SSH args for buildroot robots
 br_ssh_opts ?= $(default_ssh_opts)
 
+# overwrite pipenv from python.mk as this folder does not directly use environments
+pipenv := PIPENV_PIPFILE=./Pipfile $(pipenv_call)
+
 .PHONY: setup
 setup:
 	$(pipenv) sync $(pipenv_opts)
@@ -68,3 +71,6 @@ sdist: clean
 push-ot3: sdist
 	$(call push-python-sdist,$(host),,$(br_ssh_opts),dist/$(sdist_file),/opt/ot3usb,ot3usb)
 	# todo (fs, 2022-09-15): add a restart when appropriate
+
+update:
+	$(pipenv) update --dev

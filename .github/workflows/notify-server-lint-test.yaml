@@ -47,18 +47,12 @@ jobs:
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
+      - uses: './.github/actions/python/setup-all-environments'
+        id: 'setup'
+      - uses: './.github/actions/python/lint'
         with:
-          node-version: '16'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.7'
-
-      - uses: './.github/actions/python/setup'
-        with:
-          project: 'notify-server'
-      - name: Lint
-        run: make -C notify-server lint
+          setup-outcome: ${{ steps.setup.outcome }}
+          project: notify-server
       - name: Test
         run: make -C notify-server test-cov
       - name: 'Upload coverage report'

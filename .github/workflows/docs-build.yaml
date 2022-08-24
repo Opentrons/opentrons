@@ -41,15 +41,7 @@ jobs:
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '16'
-      - uses: 'actions/setup-python@v3'
-        with:
-          python-version: '3.7'
-      - uses: './.github/actions/python/setup'
-        with:
-          project: 'api'
+      - uses: './.github/actions/python/setup-all-environments'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:

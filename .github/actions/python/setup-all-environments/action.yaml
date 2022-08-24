@@ -1,0 +1,61 @@
+name: 'Setup All Environments'
+description: |
+  "Set up all the environments for python projects."
+  "Cache pipenv virtual environments but still always run make setup which runs pipenv sync."
+
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      run: |
+        if [[ "${OSTYPE}" =~ "linux" ]]; then
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libsystemd-dev
+        fi
+    - uses: 'actions/setup-node@v3'
+      with:
+        node-version: '16'
+    - shell: bash
+      run: |
+        npm install --global shx@0.3.3
+    - uses: 'actions/setup-python@v4'
+      with:
+        python-version: '3.7'
+        cache: 'pipenv'
+        cache-dependency-path: |
+          **/setup.*
+          **/Pipfile.*
+    - shell: bash
+      name: install pipenv on 3.7
+      run: make install-pipenv
+    - shell: bash
+      working-directory: environments
+      name: setup ot2
+      run: make -C ot-2 setup
+    - uses: 'actions/setup-python@v4'
+      with:
+        python-version: '3.8'
+        cache: 'pipenv'
+        cache-dependency-path: |
+          **/setup.*
+          **/Pipfile.*
+    - shell: bash
+      name: install pipenv on 3.8
+      run: make install-pipenv
+    - shell: bash
+      working-directory: environments
+      name: setup ot3
+      run: make -C ot-3 setup -j
+    - uses: 'actions/setup-python@v4'
+      with:
+        python-version: '3.10'
+        cache: 'pipenv'
+        cache-dependency-path: |
+          **/setup.*
+          **/Pipfile.*
+    - shell: bash
+      name: install pipenv on 3.10
+      run: make install-pipenv
+    - shell: bash
+      name: setup the environments
+      run: make setup-py PYTHON_SETUP_DIRS="environments/dev environments/app" -j

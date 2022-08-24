@@ -1,13 +1,15 @@
 name: 'Python Setup'
-description: 'Set up the environment to handle a monorepo python project'
+description: |
+  "Set up the environment to handle a monorepo python project"
+  "Cache pipenv virtual environments but still always run make setup which runs pipenv sync."
 inputs:
   project:
-    description: 'Which project (by subdirectory) to set up'
-    required: true
+    description: 'Which project (by subdirectory) to set up?'
+    required: true # now only viable for g-code-testing, hardware-testing, usb-bridge
   python-version:
-    description: "What Python version to use to create the project's virtual environment"
-    required: false
-    default: "false"
+    description: "The version of Python to map to 'python' on path."
+    required: true
+
 runs:
   using: 'composite'
   steps:
@@ -17,16 +19,22 @@ runs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libsystemd-dev
         fi
-    - name: Set the OT_PYTHON env variable
-      shell: bash
-      run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
-    - name: If provided set the OT_VIRTUALENV_VERSION env variable
-      shell : bash
-      if: ${{ inputs.python-version != 'false' }}
-      run: echo "OT_VIRTUALENV_VERSION=${{ inputs.python-version }}" >> $GITHUB_ENV
+    - uses: 'actions/setup-node@v3'
+      with:
+        node-version: '16'
     - shell: bash
       run: |
         npm install --global shx@0.3.3
-        $OT_PYTHON -m pip install pipenv==2021.5.29
+    - uses: 'actions/setup-python@v4'
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: 'pipenv'
+        cache-dependency-path: |
+          **/setup.*
+          **/Pipfile.*
+    - name: install pipenv
+      shell: bash
+      run: make install-pipenv
     - shell: bash
+      name: setup project ${{ inputs.project }}
       run: 'make -C ${{ inputs.project }} setup'
