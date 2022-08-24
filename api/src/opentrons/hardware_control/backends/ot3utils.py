@@ -5,6 +5,7 @@ from opentrons.hardware_control.types import (
     OT3Axis,
     OT3AxisKind,
     OT3AxisMap,
+    OT3AxisKindMap,
     CurrentConfig,
     OT3SubSystem,
     OT3Mount,
@@ -44,6 +45,8 @@ GRIPPER_JAW_HOME_DC: float = 100
 # to NodeId that are interpreted at import time because then the robot
 # server tests fail when importing hardware controller. This is obviously
 # terrible and needs to be fixed.
+
+AxisMapPayload = TypeVar("AxisMapPayload")
 
 
 def axis_nodes() -> List["NodeId"]:
@@ -185,6 +188,16 @@ def get_system_constraints(
     return constraints
 
 
+def axis_kind_to_axis_map(
+    axis_kind_map: OT3AxisKindMap[AxisMapPayload],
+) -> OT3AxisMap[AxisMapPayload]:
+    new_map = {}
+    for axis_kind in axis_kind_map.keys():
+        for axis in OT3Axis.of_kind(axis_kind):
+            new_map[axis] = axis_kind_map[axis_kind]
+    return new_map
+
+
 def _convert_to_node_id_dict(
     axis_pos: Coordinates[OT3Axis, CoordinateValue],
 ) -> NodeIdMotionValues:
@@ -259,9 +272,6 @@ def create_gripper_jaw_home_group() -> MoveGroup:
     )
     move_group: MoveGroup = [step]
     return move_group
-
-
-AxisMapPayload = TypeVar("AxisMapPayload")
 
 
 def axis_convert(

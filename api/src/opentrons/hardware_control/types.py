@@ -277,6 +277,7 @@ class OT3SubSystem(enum.Enum):
 BCAxes = Union[Axis, OT3Axis]
 AxisMapValue = TypeVar("AxisMapValue")
 OT3AxisMap = Dict[OT3Axis, AxisMapValue]
+OT3AxisKindMap = Dict[OT3AxisKind, AxisMapValue]
 
 
 @dataclass

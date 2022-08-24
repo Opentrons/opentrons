@@ -28,7 +28,7 @@ from opentrons.config.types import (
     GantryLoad,
     CapacitivePassSettings,
 )
-from .backends.ot3utils import get_system_constraints
+from .backends.ot3utils import get_system_constraints, axis_kind_to_axis_map
 from opentrons_hardware.hardware_control.motion_planning import (
     MoveManager,
     MoveTarget,
@@ -62,6 +62,7 @@ from .types import (
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
+    OT3AxisKindMap,
     OT3SubSystem,
     GripperJawState,
     GripperNotAttachedError,
@@ -207,6 +208,24 @@ class OT3API(
             get_system_constraints(self._config.motion_settings, gantry_load)
         )
         await self._backend.update_to_default_current_settings(gantry_load)
+
+    def override_axis_acceleration(self, acc: OT3AxisKindMap[float]) -> None:
+        """Temporarily override default gantry load acceleration for OT3AxisKind.
+
+        This method may be used when an instrument is transferring labware with
+        a liquid that would require a change in acceleration. This
+        should be called before a _move() command.
+
+        Note: custom constraints will not be saved to the robot settings file.
+        """
+        accelerataions = axis_kind_to_axis_map(acc)
+        self._move_manager.override_accelerations(accelerataions)
+
+    def use_default_system_constraints(self) -> None:
+        """Use motion constraints found in robot settings."""
+        self._move_manager.update_constraints(
+            get_system_constraints(self._config.motion_settings, self._gantry_load)
+        )
 
     def _update_door_state(self, door_state: DoorState) -> None:
         mod_log.info(f"Updating the window switch status: {door_state}")
@@ -835,9 +854,6 @@ class OT3API(
 
         # TODO: (2022-02-10) Use actual max speed for MoveTarget
         checked_speed = speed or 500
-        self._move_manager.update_constraints(
-            get_system_constraints(self._config.motion_settings, self._gantry_load)
-        )
         move_target = MoveTarget.build(position=machine_pos, max_speed=checked_speed)
         origin = await self._backend.update_position()
         try:
