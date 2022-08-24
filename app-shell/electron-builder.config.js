@@ -11,14 +11,15 @@ module.exports = {
   electronVersion: '13.1.8',
   files: [
     '**/*',
+    'build/br-premigration-wheels',
+    '!Makefile',
+    '!python',
+    NO_USB_DETECTION ? '!node_modules/usb-detection' : '',
     {
       from: '../app/dist',
       to: './ui',
       filter: ['**/*'],
     },
-    'build/br-premigration-wheels',
-    '!Makefile',
-    '!python',
   ],
   extraResources: USE_PYTHON ? ['python'] : [],
   /* eslint-disable no-template-curly-in-string */
@@ -44,7 +45,6 @@ module.exports = {
     target: ['AppImage'],
     executableName: 'opentrons',
     category: 'Science',
-    files: NO_USB_DETECTION ? ['!node_modules/usb-detection'] : [],
   },
   publish:
     OT_APP_DEPLOY_BUCKET && OT_APP_DEPLOY_FOLDER
