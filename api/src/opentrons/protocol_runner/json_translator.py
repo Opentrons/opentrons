@@ -9,6 +9,7 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
     PipetteName,
 )
+from opentrons.protocol_engine import Liquid
 from opentrons.types import MountType
 
 
@@ -106,25 +107,30 @@ def _translate_simple_command(
     return translated_obj
 
 
-class JsonCommandTranslator:
-    """Class that translates commands from PD/JSON to ProtocolEngine."""
+class JsonTranslator:
+    """Class that translates commands/liquids from PD/JSON to ProtocolEngine."""
 
-    def translate(
+    def translate_liquids(self, protocol: ProtocolSchemaV6) -> List[Liquid]:
+        """Takes json protocol v6 and translates liquids->protocol engine liquids."""
+        protocol_liquids = protocol.liquids or {}
+
+        return [
+            Liquid(
+                id=liquid_id,
+                displayName=liquid.displayName,
+                description=liquid.description,
+                displayColor=liquid.displayColor,
+            )
+            for liquid_id, liquid in protocol_liquids.items()
+        ]
+
+    def translate_commands(
         self,
         protocol: ProtocolSchemaV6,
     ) -> List[pe_commands.CommandCreate]:
         """Takes json protocol v6 and translates commands->protocol engine commands."""
         commands_list: List[pe_commands.CommandCreate] = []
-        exclude_commands = [
-            "loadLiquid",
-            "moveToSlot",
-        ]
-        commands_to_parse = [
-            command
-            for command in protocol.commands
-            if command.commandType not in exclude_commands
-        ]
-        for command in commands_to_parse:
+        for command in protocol.commands:
             if command.commandType == "loadPipette":
                 translated_obj = _translate_pipette_command(protocol, command)
             elif command.commandType == "loadModule":

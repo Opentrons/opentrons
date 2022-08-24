@@ -1,8 +1,6 @@
 """ProtocolEngine shared test fixtures."""
 import pytest
-from typing import AsyncGenerator
 
-from opentrons import config
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
@@ -13,14 +11,6 @@ from opentrons.protocols.api_support.constants import (
     SHORT_TRASH_DECK,
 )
 from opentrons.protocol_engine.types import ModuleDefinition
-
-
-@pytest.fixture(scope="function")
-async def short_trash_flag() -> AsyncGenerator[None, None]:
-    """Feature flag simulator for short fixed trash."""
-    await config.advanced_settings.set_adv_setting("shortFixedTrash", True)
-    yield
-    await config.advanced_settings.set_adv_setting("shortFixedTrash", False)
 
 
 @pytest.fixture(scope="session")

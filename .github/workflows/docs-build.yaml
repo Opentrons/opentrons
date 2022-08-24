@@ -28,6 +28,9 @@ on:
       - '.github/workflows/utils.js'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
 
 defaults:
   run:
@@ -36,20 +39,20 @@ defaults:
 jobs:
   build:
     name: opentrons documentation build
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - uses: 'actions/setup-python@v2'
+      - uses: 'actions/setup-python@v3'
         with:
           python-version: '3.7'
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
       - name: 'set complex environment variables'
-        uses: actions/github-script@v3.1
+        uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)

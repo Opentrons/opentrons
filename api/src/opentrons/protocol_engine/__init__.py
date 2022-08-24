@@ -39,6 +39,7 @@ from .types import (
     WellOffset,
     ModuleModel,
     ModuleDefinition,
+    Liquid,
 )
 
 
@@ -83,6 +84,7 @@ __all__ = [
     "WellOffset",
     "ModuleModel",
     "ModuleDefinition",
+    "Liquid",
     # plugins
     "AbstractPlugin",
 ]

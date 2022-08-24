@@ -8,7 +8,7 @@ from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
 from .resources import ModelUtils, ModuleDataProvider
 from .commands import Command, CommandCreate
-from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel
+from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel, Liquid
 from .execution import (
     QueueWorker,
     create_queue_worker,
@@ -28,6 +28,7 @@ from .actions import (
     QueueCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
+    AddLiquidAction,
     AddModuleAction,
     HardwareStoppedAction,
 )
@@ -277,6 +278,10 @@ class ProtocolEngine:
             AddLabwareDefinitionAction(definition=definition)
         )
         return self._state_store.labware.get_uri_from_definition(definition)
+
+    def add_liquid(self, liquid: Liquid) -> None:
+        """Add a liquid to the state for subsequent liquid loads."""
+        self._action_dispatcher.dispatch(AddLiquidAction(liquid=liquid))
 
     async def use_attached_modules(
         self,

@@ -1,6 +1,6 @@
 import logging
 from typing import Dict, List, TYPE_CHECKING, Union
-from opentrons.protocol_api.contexts import (
+from opentrons.protocol_api import (
     ProtocolContext,
     MagneticModuleContext,
     TemperatureModuleContext,

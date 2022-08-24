@@ -22,7 +22,9 @@ interface Props {
   movementStatus: MovementStatus
   isPipetteHoming: boolean
 }
-
+/**
+ * @deprecated Use {@link InProgressModal}
+ */
 export function RequestInProgressModal(props: Props): JSX.Element {
   const { title, subtitle, mount, movementStatus, isPipetteHoming } = props
   let message = `${mount === RIGHT ? RIGHT_PIP : LEFT_PIP} ${CARRIAGE_MOVING}`

@@ -4,6 +4,7 @@ from typing import Any, AsyncGenerator, Dict, Generator, Sequence, cast
 from unittest.mock import patch
 
 import pytest
+from decoy import Decoy
 from numpy import isclose
 
 from opentrons.config import CONFIG, pipette_config, feature_flags as ff
@@ -43,11 +44,12 @@ def check_sequences_close(
     ],
 )
 def test_versioned_aspiration(
+    decoy: Decoy,
     pipette_model: PipetteModel,
-    monkeypatch: pytest.MonkeyPatch,
+    mock_feature_flags: None,
 ) -> None:
+    decoy.when(ff.use_old_aspiration_functions()).then_return(True)
 
-    monkeypatch.setattr(ff, "use_old_aspiration_functions", lambda: True)
     was = pipette_config.load(pipette_model)
     check_sequences_close(
         was.ul_per_mm["aspirate"],
@@ -58,7 +60,8 @@ def test_versioned_aspiration(
         defs["config"][pipette_model]["ulPerMm"][0]["dispense"],
     )
 
-    monkeypatch.setattr(ff, "use_old_aspiration_functions", lambda: False)
+    decoy.when(ff.use_old_aspiration_functions()).then_return(False)
+
     now = pipette_config.load(pipette_model)
     check_sequences_close(
         now.ul_per_mm["aspirate"],
