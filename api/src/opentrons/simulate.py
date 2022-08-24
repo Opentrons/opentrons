@@ -221,6 +221,7 @@ def _build_protocol_context(
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
         extra_labware=extra_labware,
+        use_simulating_core=True,
     )
     context.home()
     return context
