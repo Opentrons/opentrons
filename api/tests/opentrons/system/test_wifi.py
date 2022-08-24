@@ -1,12 +1,24 @@
 import os
 import tempfile
 import random
+from pathlib import Path
 
 import pytest
+
+from opentrons import config
 from opentrons.system import wifi
 
 
-def test_check_eap_config(wifi_keys_tempdir):
+@pytest.fixture()
+def wifi_keys_tempdir(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:
+    wifi_keys_dir = tmp_path / "wifi_keys"
+    wifi_keys_dir.mkdir()
+    monkeypatch.setitem(config.CONFIG, "wifi_keys_dir", wifi_keys_dir)
+
+    return wifi_keys_dir
+
+
+def test_check_eap_config(wifi_keys_tempdir: Path):
     wifi_key_id = "88188cafcf"
     os.mkdir(os.path.join(wifi_keys_tempdir, wifi_key_id))
     with open(os.path.join(wifi_keys_tempdir, wifi_key_id, "test.pem"), "w") as f:
