@@ -12,6 +12,7 @@ from opentrons.protocol_api import ProtocolContext, labware
 from opentrons.protocol_api.instrument_context import InstrumentContext
 from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocol_api.core.instrument import AbstractInstrument
+from opentrons.protocol_api.core.well import AbstractWellCore
 
 
 @pytest.fixture(autouse=True)
@@ -65,7 +66,9 @@ def mock_protocol_context(decoy: Decoy) -> ProtocolContext:
 
 
 @pytest.fixture
-def mock_instrument_implementation(decoy: Decoy) -> AbstractInstrument:
+def mock_instrument_implementation(
+    decoy: Decoy,
+) -> AbstractInstrument[AbstractWellCore]:
     return decoy.mock(cls=AbstractInstrument)
 
 
@@ -76,7 +79,7 @@ def mock_labware(decoy: Decoy) -> Labware:
 
 @pytest.fixture
 def subject(
-    mock_instrument_implementation: AbstractInstrument,
+    mock_instrument_implementation: AbstractInstrument[AbstractWellCore],
     mock_protocol_context: ProtocolContext,
 ) -> InstrumentContext:
 
@@ -93,7 +96,7 @@ def subject(
 def test_pick_up_from_exact_well_location(
     decoy: Decoy,
     subject: InstrumentContext,
-    mock_instrument_implementation: AbstractInstrument,
+    mock_instrument_implementation: AbstractInstrument[AbstractWellCore],
 ) -> None:
     """Should pick up tip from supplied exact Well Location."""
     mock_well = decoy.mock(cls=Well)
@@ -116,7 +119,7 @@ def test_pick_up_from_exact_well_location(
 def test_pick_up_from_exact_labware_location(
     decoy: Decoy,
     subject: InstrumentContext,
-    mock_instrument_implementation: AbstractInstrument,
+    mock_instrument_implementation: AbstractInstrument[AbstractWellCore],
     mock_labware: Labware,
 ) -> None:
     """Should pick up tip from supplied exact labware Location."""
@@ -146,7 +149,7 @@ def test_pick_up_from_exact_labware_location(
 def test_pick_up_from_manipulated_location(
     decoy: Decoy,
     subject: InstrumentContext,
-    mock_instrument_implementation: AbstractInstrument,
+    mock_instrument_implementation: AbstractInstrument[AbstractWellCore],
 ) -> None:
     """Should pick up tip from move result of types.Location."""
 
@@ -170,7 +173,7 @@ def test_pick_up_from_manipulated_location(
 def test_pick_up_from_well(
     decoy: Decoy,
     subject: InstrumentContext,
-    mock_instrument_implementation: AbstractInstrument,
+    mock_instrument_implementation: AbstractInstrument[AbstractWellCore],
     mock_labware: Labware,
 ) -> None:
     """Should pick up tip from supplied well location top."""
@@ -200,7 +203,7 @@ def test_pick_up_from_well(
 def test_pick_up_from_no_location(
     decoy: Decoy,
     subject: InstrumentContext,
-    mock_instrument_implementation: AbstractInstrument,
+    mock_instrument_implementation: AbstractInstrument[AbstractWellCore],
     mock_labware: Labware,
 ) -> None:
     """Should pick up tip from next_available_tip.top()."""

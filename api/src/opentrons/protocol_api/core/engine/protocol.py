@@ -12,15 +12,15 @@ from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 from ..protocol import AbstractProtocol, LoadModuleResult
-from ..labware import AbstractLabware
-from ..instrument import AbstractInstrument
+from .labware import LabwareCore
+from .instrument import InstrumentCore
 
 
 # TODO(mc, 2022-08-24): many of these methods are likely unnecessary
-# in a ProtocolEngine-world. As we develop this core, we should remove
+# in a ProtocolEngine world. As we develop this core, we should remove
 # and consolidate logic as we need to across all cores rather than
 # necessarily try to support every one of these behaviors in the engine.
-class ProtocolCore(AbstractProtocol):
+class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
     """Protocol API core using a ProtocolEngine.
 
     Args:
@@ -69,7 +69,7 @@ class ProtocolCore(AbstractProtocol):
         labware_def: LabwareDefinition,
         location: DeckLocation,
         label: Optional[str],
-    ) -> AbstractLabware:
+    ) -> LabwareCore:
         """Load a labware using its definition dictionary."""
         raise NotImplementedError("ProtocolEngine PAPI core not implemented")
 
@@ -80,7 +80,7 @@ class ProtocolCore(AbstractProtocol):
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
-    ) -> AbstractLabware:
+    ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
         raise NotImplementedError("ProtocolEngine PAPI core not implemented")
 
@@ -99,11 +99,11 @@ class ProtocolCore(AbstractProtocol):
 
     def load_instrument(
         self, instrument_name: str, mount: Mount, replace: bool
-    ) -> AbstractInstrument:
+    ) -> InstrumentCore:
         """Load an instrument into the protocol."""
         raise NotImplementedError("ProtocolEngine PAPI core not implemented")
 
-    def get_loaded_instruments(self) -> Dict[Mount, Optional[AbstractInstrument]]:
+    def get_loaded_instruments(self) -> Dict[Mount, Optional[InstrumentCore]]:
         """Get all loaded instruments by mount."""
         raise NotImplementedError("ProtocolEngine PAPI core not implemented")
 

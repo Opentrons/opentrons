@@ -1,6 +1,6 @@
 """ProtocolContext factory."""
 import asyncio
-from typing import Dict, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -63,7 +63,7 @@ def create_protocol_context(
     """
     sync_hardware: SynchronousAdapter[HardwareControlAPI]
     labware_offset_provider: AbstractLabwareOffsetProvider
-    core: AbstractProtocol
+    core: AbstractProtocol[Any, Any]
 
     if isinstance(hardware_api, ThreadManager):
         sync_hardware = hardware_api.sync

@@ -1,4 +1,5 @@
-from typing import Optional
+from __future__ import annotations
+from typing import TYPE_CHECKING, Optional
 
 from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
@@ -15,15 +16,17 @@ from opentrons.protocols.api_support.util import (
 from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
-from ..protocol import AbstractProtocol
-from ..well import AbstractWellCore
+from .well import WellImplementation
+
+if TYPE_CHECKING:
+    from .protocol_context import ProtocolContextImplementation
 
 
-class InstrumentContextImplementation(AbstractInstrument):
+class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
     """Implementation of the InstrumentContext interface."""
 
     _api_version: APIVersion
-    _protocol_interface: AbstractProtocol
+    _protocol_interface: ProtocolContextImplementation
     _mount: types.Mount
     _instrument_name: str
     _default_speed: float
@@ -33,7 +36,7 @@ class InstrumentContextImplementation(AbstractInstrument):
 
     def __init__(
         self,
-        protocol_interface: AbstractProtocol,
+        protocol_interface: ProtocolContextImplementation,
         mount: types.Mount,
         instrument_name: str,
         default_speed: float,
@@ -75,7 +78,7 @@ class InstrumentContextImplementation(AbstractInstrument):
         self._protocol_interface.get_hardware().blow_out(self._mount)
 
     def touch_tip(
-        self, location: AbstractWellCore, radius: float, v_offset: float, speed: float
+        self, location: WellImplementation, radius: float, v_offset: float, speed: float
     ) -> None:
         """
         Touch the pipette tip to the sides of a well, with the intent of
@@ -100,7 +103,7 @@ class InstrumentContextImplementation(AbstractInstrument):
 
     def pick_up_tip(
         self,
-        well: AbstractWellCore,
+        well: WellImplementation,
         tip_length: float,
         presses: Optional[int],
         increment: Optional[float],

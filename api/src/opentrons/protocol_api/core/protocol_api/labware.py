@@ -10,11 +10,10 @@ from opentrons.types import Point, Location
 from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
 
 from ..labware import AbstractLabware
-from ..well import AbstractWellCore
 from .well import WellImplementation
 
 
-class LabwareImplementation(AbstractLabware):
+class LabwareImplementation(AbstractLabware[WellImplementation]):
     """Labware implementation core based on legacy PAPIv2 behavior.
 
     Args:
@@ -48,7 +47,7 @@ class LabwareImplementation(AbstractLabware):
         self._geometry = LabwareGeometry(definition, parent)
         # flatten list of list of well names.
         self._ordering = [well for col in definition["ordering"] for well in col]
-        self._wells: List[AbstractWellCore] = []
+        self._wells: List[WellImplementation] = []
         self._well_name_grid = WellGrid(wells=self._wells)
         self._tip_tracker = TipTracker(columns=self._well_name_grid.get_columns())
 
@@ -114,10 +113,10 @@ class LabwareImplementation(AbstractLabware):
     def get_well_grid(self) -> WellGrid:
         return self._well_name_grid
 
-    def get_wells(self) -> List[AbstractWellCore]:
+    def get_wells(self) -> List[WellImplementation]:
         return self._wells
 
-    def get_wells_by_name(self) -> Dict[str, AbstractWellCore]:
+    def get_wells_by_name(self) -> Dict[str, WellImplementation]:
         return {well.get_name(): well for well in self._wells}
 
     def get_geometry(self) -> LabwareGeometry:
@@ -135,7 +134,7 @@ class LabwareImplementation(AbstractLabware):
     def load_name(self) -> str:
         return self._parameters["loadName"]
 
-    def _build_wells(self) -> List[AbstractWellCore]:
+    def _build_wells(self) -> List[WellImplementation]:
         return [
             WellImplementation(
                 well_geometry=WellGeometry(

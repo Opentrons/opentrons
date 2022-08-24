@@ -245,7 +245,9 @@ class Labware(DeckItem):
     """
 
     def __init__(
-        self, implementation: AbstractLabware, api_level: Optional[APIVersion] = None
+        self,
+        implementation: AbstractLabware[Any],
+        api_level: Optional[APIVersion] = None,
     ) -> None:
         """
         :param implementation: The class that implements the public interface

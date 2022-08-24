@@ -1,6 +1,7 @@
 """Abstract interface for Well core implementations."""
 
 from abc import ABC, abstractmethod
+from typing import TypeVar
 
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 
@@ -42,3 +43,6 @@ class AbstractWellCore(ABC):
     def get_geometry(self) -> WellGeometry:
         """Get the well's geometry information interface."""
         ...
+
+
+WellCoreType = TypeVar("WellCoreType", bound=AbstractWellCore)
