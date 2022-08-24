@@ -82,7 +82,7 @@ class OneshotToolDetector:
     @staticmethod
     def _decode_or_default(orig: bytes) -> str:
         try:
-            return orig.decode()
+            return orig.decode(errors="replace").split("\x00")[0]
         except UnicodeDecodeError:
             return repr(orig)
 
