@@ -22,7 +22,7 @@ export function ProtocolsEmptyState(): JSX.Element | null {
       transform="translateY(25%)"
     >
       <StyledText role="complementary" as="h1">
-        {t('import_a_file')}
+        {'testing the build'}
       </StyledText>
       <UploadInput />
       <EmptyStateLinks title={t('no_protocol_yet')} />

@@ -9,6 +9,7 @@ import {
   TYPOGRAPHY,
   SPACING,
   COLORS,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import {
@@ -23,6 +24,7 @@ import { StyledText } from '../../../../../atoms/text'
 import { PrimaryButton } from '../../../../../atoms/buttons'
 import { InputField } from '../../../../../atoms/InputField'
 import { Banner } from '../../../../../atoms/Banner'
+import { SoftwareKeyboard } from '../../../../../atoms/SoftwareKeyboard'
 
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../../../../redux/types'
@@ -52,6 +54,8 @@ export function RenameRobotSlideout({
   const [previousRobotName, setPreviousRobotName] = React.useState<string>(
     robotName
   )
+  const [showKeyBoard, setShowKeyBoard] = React.useState<boolean>(false)
+  const keyboardRef = React.useRef(null)
   const trackEvent = useTrackEvent()
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
@@ -125,53 +129,74 @@ export function RenameRobotSlideout({
     formik.handleSubmit()
   }
 
+  const handleKeyboardInput = (e: string): void => {
+    formik.setValues({ newRobotName: e }, true)
+  }
+
   return (
-    <Slideout
-      title={t('rename_robot_title')}
-      onCloseClick={onCloseClick}
-      isExpanded={isExpanded}
-      footer={
-        <PrimaryButton
-          onClick={handleSubmitRobotRename}
-          disabled={!(formik.isValid && formik.dirty)}
+    <>
+      {showKeyBoard && (
+        <Flex
+          position={POSITION_ABSOLUTE}
+          left="0"
+          bottom="15%"
+          zIndex="10"
           width="100%"
         >
-          {t('rename_robot')}
-        </PrimaryButton>
-      }
-    >
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <Banner type="informing" marginBottom={SPACING.spacing4}>
-          {t('rename_robot_prefer_usb_connection')}
-        </Banner>
-        <StyledText as="p" marginBottom={SPACING.spacing4}>
-          {t('rename_robot_input_limitation_detail')}
-        </StyledText>
-        <StyledText
-          as="label"
-          css={TYPOGRAPHY.labelSemiBold}
-          marginBottom={SPACING.spacing3}
-        >
-          {t('robot_name')}
-        </StyledText>
-        <InputField
-          data-testid="rename-robot_input"
-          id="newRobotName"
-          name="newRobotName"
-          type="text"
-          onChange={formik.handleChange}
-          value={formik.values.newRobotName}
-          error={formik.errors.newRobotName && ' '}
-        />
-        <StyledText as="label" color={COLORS.darkGreyEnabled}>
-          {t('characters_max')}
-        </StyledText>
-        {formik.errors.newRobotName && (
-          <StyledText as="label" color={COLORS.errorEnabled}>
-            {formik.errors.newRobotName}
+          <SoftwareKeyboard
+            onChange={handleKeyboardInput}
+            keyboardRef={keyboardRef}
+          />
+        </Flex>
+      )}
+      <Slideout
+        title={t('rename_robot_title')}
+        onCloseClick={onCloseClick}
+        isExpanded={isExpanded}
+        footer={
+          <PrimaryButton
+            onClick={handleSubmitRobotRename}
+            disabled={!(formik.isValid && formik.dirty)}
+            width="100%"
+          >
+            {t('rename_robot')}
+          </PrimaryButton>
+        }
+      >
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <Banner type="informing" marginBottom={SPACING.spacing4}>
+            {t('rename_robot_prefer_usb_connection')}
+          </Banner>
+          <StyledText as="p" marginBottom={SPACING.spacing4}>
+            {t('rename_robot_input_limitation_detail')}
           </StyledText>
-        )}
-      </Flex>
-    </Slideout>
+          <StyledText
+            as="label"
+            css={TYPOGRAPHY.labelSemiBold}
+            marginBottom={SPACING.spacing3}
+          >
+            {t('robot_name')}
+          </StyledText>
+          <InputField
+            data-testid="rename-robot_input"
+            id="newRobotName"
+            name="newRobotName"
+            type="text"
+            onChange={formik.handleChange}
+            value={formik.values.newRobotName}
+            error={formik.errors.newRobotName && ' '}
+            onFocus={() => setShowKeyBoard(true)}
+          />
+          <StyledText as="label" color={COLORS.darkGreyEnabled}>
+            {t('characters_max')}
+          </StyledText>
+          {formik.errors.newRobotName && (
+            <StyledText as="label" color={COLORS.errorEnabled}>
+              {formik.errors.newRobotName}
+            </StyledText>
+          )}
+        </Flex>
+      </Slideout>
+    </>
   )
 }
