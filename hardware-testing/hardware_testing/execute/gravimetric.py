@@ -140,6 +140,8 @@ def run(
 
 @dataclass
 class TimestampedGravRecording:
+    """Timestamped Grav Recording."""
+
     before: GravimetricRecording
     pre_aspirate: GravimetricRecording
     aspirate: GravimetricRecording
@@ -151,29 +153,39 @@ class TimestampedGravRecording:
 
 @dataclass
 class BeforeAfterGravRecordings:
+    """Before After Grav Recordings."""
+
     before: GravimetricRecording
     after: GravimetricRecording
 
 
-def _split_recording_from_timestamps(recording: GravimetricRecording,
-                                     timestamps: List[SampleTimestamps]) -> List[TimestampedGravRecording]:
+def _split_recording_from_timestamps(
+    recording: GravimetricRecording, timestamps: List[SampleTimestamps]
+) -> List[TimestampedGravRecording]:
     def _get_rec_slice(start: float, end: float) -> GravimetricRecording:
         duration = min(end - start, recording.end_time - start)
-        return recording.get_time_slice(start=start,
-                                        duration=duration,
-                                        stable=False,
-                                        timeout=duration)
+        return recording.get_time_slice(
+            start=start, duration=duration, stable=False, timeout=duration
+        )
+
     split_recs = list()
     for i, t in enumerate(timestamps):
-        if i == 0:
-            before_start = recording.start_time
-            post_dispense_end = timestamps[i + 1].pre_aspirate.time
-        elif i == len(timestamps) - 1:
-            before_start = timestamps[i - 1].post_dispense.time
-            post_dispense_end = recording.end_time
+        prev_t = timestamps[i - 1] if i > 0 else None
+        next_t = timestamps[i + 1] if i < len(timestamps) - 1 else None
+        if prev_t and prev_t.post_dispense:
+            before_start = prev_t.post_dispense.time
         else:
-            before_start = timestamps[i - 1].post_dispense.time
-            post_dispense_end = timestamps[i + 1].pre_aspirate.time
+            before_start = recording.start_time
+        if next_t and next_t.pre_aspirate:
+            post_dispense_end = next_t.pre_aspirate.time
+        else:
+            post_dispense_end = recording.end_time
+        assert t.pre_aspirate
+        assert t.aspirate
+        assert t.post_aspirate
+        assert t.pre_dispense
+        assert t.dispense
+        assert t.post_dispense
         s = TimestampedGravRecording(
             before=_get_rec_slice(before_start, t.pre_aspirate.time),
             pre_aspirate=_get_rec_slice(t.pre_aspirate.time, t.aspirate.time),
@@ -181,36 +193,49 @@ def _split_recording_from_timestamps(recording: GravimetricRecording,
             post_aspirate=_get_rec_slice(t.post_aspirate.time, t.pre_dispense.time),
             pre_dispense=_get_rec_slice(t.pre_dispense.time, t.dispense.time),
             dispense=_get_rec_slice(t.dispense.time, t.post_dispense.time),
-            post_dispense=_get_rec_slice(t.post_dispense.time, post_dispense_end)
+            post_dispense=_get_rec_slice(t.post_dispense.time, post_dispense_end),
         )
         split_recs.append(s)
     return split_recs
 
 
-def _isolate_before_after_recordings(recordings: List[TimestampedGravRecording]) -> List[BeforeAfterGravRecordings]:
+def _isolate_before_after_recordings(
+    recordings: List[TimestampedGravRecording],
+) -> List[BeforeAfterGravRecordings]:
     before_after_recordings = list()
     for s in recordings:
         b = s.post_aspirate
         a = s.post_dispense
         b_start = b.start_time + SCALE_SECONDS_TO_SETTLE
         a_start = a.start_time + SCALE_SECONDS_TO_SETTLE
-        before_after_recordings.append(BeforeAfterGravRecordings(
-            before=b.get_time_slice(start=b_start, duration=GRAV_STABLE_DURATION,
-                                    stable=True, timeout=GRAV_STABLE_TIMEOUT),
-            after=a.get_time_slice(start=a_start, duration=GRAV_STABLE_DURATION,
-                                   stable=True, timeout=GRAV_STABLE_TIMEOUT)
-        ))
+        before_after_recordings.append(
+            BeforeAfterGravRecordings(
+                before=b.get_time_slice(
+                    start=b_start,
+                    duration=GRAV_STABLE_DURATION,
+                    stable=True,
+                    timeout=GRAV_STABLE_TIMEOUT,
+                ),
+                after=a.get_time_slice(
+                    start=a_start,
+                    duration=GRAV_STABLE_DURATION,
+                    stable=True,
+                    timeout=GRAV_STABLE_TIMEOUT,
+                ),
+            )
+        )
     return before_after_recordings
 
 
-def _analyze_recording_and_timestamps(ctx: ProtocolContext,
-                                      recording: GravimetricRecording,
-                                      timestamps: List[SampleTimestamps]) -> None:
+def _analyze_recording_and_timestamps(
+    ctx: ProtocolContext,
+    recording: GravimetricRecording,
+    timestamps: List[SampleTimestamps],
+) -> None:
     recorded_slices = _split_recording_from_timestamps(recording, timestamps)
     before_after_recordings = _isolate_before_after_recordings(recorded_slices)
     dispense_volumes = [
-        r.after.average - r.before.average
-        for r in before_after_recordings
+        r.after.average - r.before.average for r in before_after_recordings
     ]
     assert len(dispense_volumes)
     dispense_avg = sum(dispense_volumes) / len(dispense_volumes)
@@ -225,6 +250,6 @@ def _analyze_recording_and_timestamps(ctx: ProtocolContext,
 
 def analyze(ctx: ProtocolContext, items: ExecuteGravItems) -> None:
     """Analyze."""
-    _analyze_recording_and_timestamps(ctx,
-                                      items.recorder.recording,
-                                      items.liquid_pipette.get_timestamps())
+    _analyze_recording_and_timestamps(
+        ctx, items.recorder.recording, items.liquid_pipette.get_timestamps()
+    )

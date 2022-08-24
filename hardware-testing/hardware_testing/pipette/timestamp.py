@@ -122,23 +122,27 @@ def get_empty_sample_timestamp(tag: str = "") -> SampleTimestamps:
 
 def load_pipette_timestamps(file_path: str) -> List[SampleTimestamps]:
     """Load pipette timestamps."""
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         stamp_csv_lines = f.readlines()
     assert stamp_csv_lines[0].strip() == SampleTimestamps.csv_header().strip()
 
     def _stamp(line: List[str], tag: str) -> Timestamp:
         return Timestamp(tag, float(line[csv_header.index(tag)]))
 
-    csv_header = [c for c in SampleTimestamps.csv_header().split(',') if c]
-    tag_idx = csv_header.index('tag')
+    csv_header = [c for c in SampleTimestamps.csv_header().split(",") if c]
+    tag_idx = csv_header.index("tag")
     samples = list()
     for _l in stamp_csv_lines[1:]:
-        _line = [v for v in _l.split(',') if v]
-        samples.append(SampleTimestamps(tag=_line[tag_idx],
-                                        pre_aspirate=_stamp(_line, 'pre-aspirate'),
-                                        aspirate=_stamp(_line, 'aspirate'),
-                                        post_aspirate=_stamp(_line, 'post-aspirate'),
-                                        pre_dispense=_stamp(_line, 'pre-dispense'),
-                                        dispense=_stamp(_line, 'dispense'),
-                                        post_dispense=_stamp(_line, 'post-dispense')))
+        _line = [v for v in _l.split(",") if v]
+        samples.append(
+            SampleTimestamps(
+                tag=_line[tag_idx],
+                pre_aspirate=_stamp(_line, "pre-aspirate"),
+                aspirate=_stamp(_line, "aspirate"),
+                post_aspirate=_stamp(_line, "post-aspirate"),
+                pre_dispense=_stamp(_line, "pre-dispense"),
+                dispense=_stamp(_line, "dispense"),
+                post_dispense=_stamp(_line, "post-dispense"),
+            )
+        )
     return samples

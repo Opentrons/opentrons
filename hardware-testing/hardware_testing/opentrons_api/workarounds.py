@@ -1,5 +1,4 @@
 """Opentrons API Workarounds."""
-import asyncio
 from datetime import datetime
 from typing import Tuple, List, Dict
 import json
@@ -7,7 +6,6 @@ from urllib.request import Request, urlopen
 import platform
 
 from opentrons.config import robot_configs
-from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
@@ -75,12 +73,7 @@ def http_get_all_labware_offsets(ctx: ProtocolContext) -> List[dict]:
     runs_json = json.loads(runs_response_data)
 
     protocols_list = runs_json["data"]
-    return [
-        offset
-        for p in protocols_list
-        for offset in p["labwareOffsets"]
-
-    ]
+    return [offset for p in protocols_list for offset in p["labwareOffsets"]]
 
 
 def get_latest_offset_for_labware(
@@ -90,11 +83,11 @@ def get_latest_offset_for_labware(
     lw_uri = str(labware.uri)
     lw_slot = str(labware.parent)
 
-    def _is_offset_present(_o) -> bool:
+    def _is_offset_present(_o: dict) -> bool:
         _v = _o["vector"]
         return _v["x"] != 0 or _v["y"] != 0 or _v["z"] != 0
 
-    def _offset_applies_to_labware(_o) -> bool:
+    def _offset_applies_to_labware(_o: dict) -> bool:
         if _o["definitionUri"] != lw_uri:
             return False
         if _o["location"]["slotName"] != lw_slot:
@@ -102,9 +95,7 @@ def get_latest_offset_for_labware(
         return _is_offset_present(_o)
 
     lw_offsets = [
-        offset
-        for offset in labware_offsets
-        if _offset_applies_to_labware(offset)
+        offset for offset in labware_offsets if _offset_applies_to_labware(offset)
     ]
 
     if not lw_offsets:
@@ -119,18 +110,22 @@ def get_latest_offset_for_labware(
 
 
 def get_hw_api(ctx: ProtocolContext) -> SyncHardwareAPI:
+    """Get HW API."""
     return ctx._implementation.get_hardware()
 
 
-def store_robot_acceleration(x: float = DEFAULT_ACCELERATION_X,
-                             y: float = DEFAULT_ACCELERATION_Y,
-                             z: float = DEFAULT_ACCELERATION_Z,
-                             a: float = DEFAULT_ACCELERATION_A,
-                             b: float = DEFAULT_ACCELERATION_B,
-                             c: float = DEFAULT_ACCELERATION_C) -> None:
+def store_robot_acceleration(
+    x: float = DEFAULT_ACCELERATION_X,
+    y: float = DEFAULT_ACCELERATION_Y,
+    z: float = DEFAULT_ACCELERATION_Z,
+    a: float = DEFAULT_ACCELERATION_A,
+    b: float = DEFAULT_ACCELERATION_B,
+    c: float = DEFAULT_ACCELERATION_C,
+) -> None:
+    """Store Robot Acceleration."""
     # TODO: figure out way to immediately set in smoothie
     cfg = robot_configs.load_ot2()
-    settings = {'x': x, 'y': y, 'z': z, 'a': a, 'b': b, 'c': c}
+    settings = {"x": x, "y": y, "z": z, "a": a, "b": b, "c": c}
     for ax, val in settings.items():
         cfg.acceleration[ax.upper()] = val
     robot_configs.save_robot_settings(cfg)
