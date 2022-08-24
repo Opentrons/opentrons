@@ -8,7 +8,7 @@ const render = (props: React.ComponentProps<typeof StyledText>) => {
 
 describe('StyledText', () => {
   let props: React.ComponentProps<typeof StyledText>
-  // testing styles (font size, font weight, and ling height)
+  // testing styles (font size, font weight, and line height)
   it('should render h1 default style', () => {
     props = {
       as: 'h1',
