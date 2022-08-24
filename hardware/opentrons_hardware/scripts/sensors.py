@@ -83,7 +83,7 @@ def prompt_str_input(prompt_name: str, get_user_input: GetInputFunc) -> str:
         raise InvalidInput(str(e))
 
 
-def prompt_float_input(prompt_name: str, get_user_input: GetInputFunc) -> int:
+def prompt_float_input(prompt_name: str, get_user_input: GetInputFunc) -> float:
     """Prompt a float input.
 
     Args:
@@ -111,12 +111,7 @@ def prompt_bool_input(prompt_name: str, get_user_input: GetInputFunc) -> bool:
         The choice.
 
     """
-    answer_map = {
-        'yes': 1,
-        'no': 0,
-        'y': 1,
-        'n': 0
-    }
+    answer_map = {"yes": 1, "no": 0, "y": 1, "n": 0}
     try:
         answer = str(get_user_input(f"{prompt_name} Type in yes or no:"))
         return bool(answer_map[answer])

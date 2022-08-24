@@ -22,7 +22,7 @@ class SensorRun:
     sensor_type: SensorType
     serial_number: str
     auto_zero: bool
-    minutes: int
+    minutes: float
     mount: str
 
 
@@ -32,7 +32,7 @@ class CSVMetaData:
 
     serial: str
     sensor: str
-    repeats: int
+    minutes: float
     auto_zero: bool
     start_time: str
 
