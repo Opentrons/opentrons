@@ -35,13 +35,13 @@ jobs:
           'fast'
         ]
     name: 'Confirm G-Code (${{ matrix.command }})'
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '12'
-      - uses: 'actions/setup-python@v2'
+      - uses: 'actions/setup-python@v3'
         with:
           python-version: '3.7'
       - uses: './.github/actions/python/setup'
