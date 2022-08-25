@@ -209,17 +209,17 @@ class OT3API(
         )
         await self._backend.update_to_default_current_settings(gantry_load)
 
-    def override_axis_acceleration(self, acc: OT3AxisKindMap[float]) -> None:
+    def override_axis_acceleration(self, axis_kind_acc: OT3AxisKindMap[float]) -> None:
         """Temporarily override default gantry load acceleration for OT3AxisKind.
 
         This method may be used when an instrument is transferring labware with
         a liquid that would require a change in acceleration. This
         should be called before a _move() command.
 
-        Note: custom constraints will not be saved to the robot settings file.
+        Note: temporary constraints will not be saved to the robot settings file.
         """
-        accelerataions = axis_kind_to_axis_map(acc)
-        self._move_manager.override_accelerations(accelerataions)
+        axis_accelerations = axis_kind_to_axis_map(axis_kind_acc)
+        self._move_manager.override_accelerations(axis_accelerations)
 
     def use_default_system_constraints(self) -> None:
         """Use motion constraints found in robot settings."""
