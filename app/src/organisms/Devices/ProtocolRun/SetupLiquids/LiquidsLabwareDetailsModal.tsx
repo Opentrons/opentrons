@@ -27,6 +27,7 @@ import {
   getLiquidsByIdForLabware,
   getWellFillFromLabwareId,
   getWellGroupForLiquidId,
+  getDisabledWellGroupForLiquidId,
 } from './utils'
 
 interface LiquidsLabwareDetailsModalProps {
@@ -51,6 +52,7 @@ export const LiquidsLabwareDetailsModal = (
     liquids,
     labwareByLiquidId
   )
+  console.log(wellFill)
   const labwareInfo = getLiquidsByIdForLabware(labwareId, labwareByLiquidId)
   const { slotName, labwareName } = getSlotLabwareName(labwareId, commands)
   const loadLabwareCommand = commands
@@ -63,7 +65,6 @@ export const LiquidsLabwareDetailsModal = (
   const [selectedValue, setSelectedValue] = React.useState<typeof liquidId>(
     liquidId ?? filteredLiquidsInLoadOrder[0].liquidId
   )
-
   const scrollToCurrentItem = (): void => {
     currentLiquidRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -75,6 +76,9 @@ export const LiquidsLabwareDetailsModal = (
       display: none;
     }
   `
+  const liquidIds = filteredLiquidsInLoadOrder.map(liquid => liquid.liquidId)
+  const disabledLiquidIds = liquidIds.filter(id => id !== selectedValue)
+
   return (
     <Modal
       onClose={closeModal}
@@ -102,7 +106,6 @@ export const LiquidsLabwareDetailsModal = (
               const labwareInfoEntry = Object.entries(labwareInfo).find(
                 entry => entry[0] === liquid.liquidId
               )
-
               return (
                 labwareInfoEntry != null && (
                   <Flex
@@ -180,6 +183,10 @@ export const LiquidsLabwareDetailsModal = (
                       ? getWellGroupForLiquidId(labwareInfo, selectedValue)
                       : {}
                   }
+                  disabledWells={getDisabledWellGroupForLiquidId(
+                    labwareInfo,
+                    disabledLiquidIds
+                  )}
                 />
               </svg>
             </Flex>

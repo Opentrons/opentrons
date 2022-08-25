@@ -31,13 +31,15 @@ export interface LabwareRenderProps {
   /** option to show well labels inside or outside of labware outline */
   wellLabelOption?: WellLabelOption
   /** wells to highlight */
-  highlightedWells?: WellGroup | null | undefined
-  missingTips?: WellGroup | null | undefined
+  highlightedWells?: WellGroup | null
+  /** wells to disabled */
+  disabledWells?: WellGroup[]
+  missingTips?: WellGroup | null
   /** color to render well labels */
   wellLabelColor?: string
   /** option to highlight well labels with specified color */
   highlightedWellLabels?: HighlightedWellLabels
-  selectedWells?: WellGroup | null | undefined
+  selectedWells?: WellGroup | null
   /** CSS color to fill specified wells */
   wellFill?: WellFill
   /** CSS color to stroke specified wells */
@@ -78,17 +80,27 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
           strokeByWell={props.wellStroke}
         />
       )}
+      {props.wellFill && (
+        <FilledWells
+          definition={props.definition}
+          fillByWell={props.wellFill}
+        />
+      )}
+      {props.disabledWells != null
+        ? props.disabledWells.map((well, index) => (
+            <StyledWells
+              key={index}
+              className={styles.disabled_well}
+              definition={props.definition}
+              wells={well}
+            />
+          ))
+        : null}
       {props.highlightedWells && (
         <StyledWells
           className={styles.highlighted_well}
           definition={props.definition}
           wells={props.highlightedWells}
-        />
-      )}
-      {props.wellFill && (
-        <FilledWells
-          definition={props.definition}
-          fillByWell={props.wellFill}
         />
       )}
       {props.selectedWells && (
