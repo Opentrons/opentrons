@@ -2,16 +2,10 @@
 import * as React from 'react'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import {
-  Box,
-  SpinnerModalPage,
-  useConditionalConfirm,
-  SPACING,
-} from '@opentrons/components'
+import { SpinnerModalPage, useConditionalConfirm } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
 import {
-  TipConfirmation,
   SaveZPoint,
   SaveXYPoint,
   CompleteConfirmation,
@@ -23,6 +17,7 @@ import {
   Introduction,
   DeckSetup,
   TipPickUp,
+  TipConfirmation,
 } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'

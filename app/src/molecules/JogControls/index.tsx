@@ -1,10 +1,12 @@
 // jog controls component
 import * as React from 'react'
-
+import { css } from 'styled-components'
 import {
   Flex,
   ALIGN_STRETCH,
+  ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  SPACING,
 } from '@opentrons/components'
 
 import { DirectionControl } from './DirectionControl'
@@ -17,7 +19,6 @@ import {
 
 import type { Jog, Plane, StepSize } from './types'
 import type { StyleProps } from '@opentrons/components'
-import { css } from 'styled-components'
 
 export type { Jog }
 export interface JogControlsProps extends StyleProps {
@@ -43,34 +44,42 @@ export function JogControls(props: JogControlsProps): JSX.Element {
     stepSizes[0]
   )
 
-  const CONTAINER_LAYOUT = css`
-    @media screen and (max-width: 750px) {
-      *:nth-child(1) {
-        flex: 1 1 30%;
-      }
-
-      *:nth-child(2) {
-        flex: 1 1 70%;
-      }
-    }
-  `
-
   return (
     <Flex
-      css={CONTAINER_LAYOUT}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignSelf={ALIGN_STRETCH}
+      gridGap={SPACING.spacing3}
       {...styleProps}
     >
-      <StepSizeControl
-        {...{ currentStepSize, setCurrentStepSize, stepSizes }}
-      />
-      <DirectionControl
-        planes={planes}
-        jog={jog}
-        stepSize={currentStepSize}
-        buttonColor={directionControlButtonColor}
-      />
+      <Flex
+        alignItems={ALIGN_CENTER}
+        css={css`
+          flex: 1;
+          @media screen and (max-width: 750px) {
+            flex: 3;
+          }
+        `}
+      >
+        <StepSizeControl
+          {...{ currentStepSize, setCurrentStepSize, stepSizes }}
+        />
+      </Flex>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        css={css`
+          flex: 1;
+          @media screen and (max-width: 750px) {
+            flex: 7;
+          }
+        `}
+      >
+        <DirectionControl
+          planes={planes}
+          jog={jog}
+          stepSize={currentStepSize}
+          buttonColor={directionControlButtonColor}
+        />
+      </Flex>
       {auxiliaryControl}
     </Flex>
   )

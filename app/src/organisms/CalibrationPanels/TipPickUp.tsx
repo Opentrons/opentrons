@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
-  Text,
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
@@ -12,11 +11,9 @@ import {
   ALIGN_STRETCH,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import * as Sessions from '../../redux/sessions'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
-import { getLatestLabwareDef } from '../../assets/labware/getLabware'
 import { StyledText } from '../../atoms/text'
 import { JogControls } from '../../molecules/JogControls'
 import type { CalibrationPanelProps } from './types'
@@ -28,8 +25,6 @@ import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import multiDemoAsset from '../../assets/videos/tip-pick-up/A1_Multi_Channel_REV1.webm'
 import singleDemoAsset from '../../assets/videos/tip-pick-up/A1_Single_Channel_REV1.webm'
 import { PrimaryButton } from '../../atoms/buttons'
-
-const TIP_PICK_UP_BUTTON_TEXT = 'Pick up tip'
 
 const ASSET_MAP = {
   multi: multiDemoAsset,

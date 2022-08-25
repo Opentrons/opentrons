@@ -16,6 +16,7 @@
   "deck_calibration_redo": "recalibrate deck",
   "deck_calibration_spinner": "Deck calibration is {{ongoing_action}}",
   "definition": "Your OT-2 moves pipettes around in 3D space based on its calibration. <a>Learn more</a> about how calibration works on the OT-2.",
+  "did_pipette_pick_up_tip": "Did pipette pick up tip successfully?",
   "download_calibration": "Download your calibration data",
   "get_started": "Get started",
   "health_check_button": "check health",
