@@ -13,7 +13,7 @@ import { WizardHeader } from '../WizardHeader'
 
 interface Props {
   iconColor: string
-  children: JSX.Element
+  children: React.ReactNode
   header: string
   subHeader: string
   isSuccess: boolean
@@ -37,7 +37,7 @@ export function SimpleWizardModal(props: Props): JSX.Element {
   } = props
 
   return (
-    <ModalShell width="47rem">
+    <ModalShell width="47rem" height="28.12rem">
       <Flex flexDirection={DIRECTION_COLUMN}>
         <WizardHeader
           currentStep={currentStep}
@@ -50,7 +50,7 @@ export function SimpleWizardModal(props: Props): JSX.Element {
             alignItems={ALIGN_CENTER}
             flexDirection={DIRECTION_COLUMN}
             height="100%"
-            marginTop="6.8rem"
+            marginTop="5.8rem"
             marginBottom="5.68rem"
           >
             <Icon

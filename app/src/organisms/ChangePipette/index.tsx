@@ -30,6 +30,8 @@ import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/CalibrationPane
 import { useFeatureFlag } from '../../redux/config'
 import { ModalShell } from '../../molecules/Modal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
+import { StyledText } from '../../atoms/text'
+import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'
 import { ClearDeckModal } from './ClearDeckModal/index'
 import { ExitAlertModal } from './ExitAlertModal'
@@ -233,12 +235,25 @@ export function ChangePipette(props: Props): JSX.Element | null {
 
     return (
       <>
-        {confirmExit && (
-          <ExitAlertModal
-            back={() => setConfirmExit(false)}
-            exit={homePipAndExit}
-          />
-        )}
+        {confirmExit &&
+          (enableChangePipetteWizard ? (
+            <ExitModal
+              back={() => setConfirmExit(false)}
+              exit={homePipAndExit}
+              direction={direction}
+              currentStep={5}
+              totalSteps={8}
+              mount={mount}
+              displayName={
+                actualPipette?.displayName || wantedPipette?.displayName
+              }
+            />
+          ) : (
+            <ExitAlertModal
+              back={() => setConfirmExit(false)}
+              exit={homePipAndExit}
+            />
+          ))}
         {enableChangePipetteWizard ? (
           <ModalShell height="28.12rem" width="47rem">
             <Instructions

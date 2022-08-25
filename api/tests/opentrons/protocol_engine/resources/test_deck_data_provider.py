@@ -2,6 +2,7 @@
 import pytest
 from decoy import Decoy
 
+from opentrons.config import feature_flags
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName
@@ -36,11 +37,14 @@ async def test_get_deck_definition(
 
 
 async def test_get_deck_definition_short_trash(
+    decoy: Decoy,
     short_trash_deck_def: DeckDefinitionV3,
     subject: DeckDataProvider,
-    short_trash_flag: None,
+    mock_feature_flags: None,
 ) -> None:
     """It should be able to load the short-trash deck definition."""
+    decoy.when(feature_flags.short_fixed_trash()).then_return(True)
+
     result = await subject.get_deck_definition()
     assert result == short_trash_deck_def
 
