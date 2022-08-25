@@ -7,7 +7,7 @@
 
 .disabled_well {
   stroke: var(--c-light-grey-hover);
-  fill: color-mod(var(--c-light-grey-hover) alpha(40%));
+  fill: color-mod(var(--c-lightest-gray) alpha(70%));
 }
 
 .selected_well {

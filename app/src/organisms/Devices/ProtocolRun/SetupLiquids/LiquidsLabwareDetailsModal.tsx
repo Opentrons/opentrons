@@ -52,7 +52,6 @@ export const LiquidsLabwareDetailsModal = (
     liquids,
     labwareByLiquidId
   )
-  console.log(wellFill)
   const labwareInfo = getLiquidsByIdForLabware(labwareId, labwareByLiquidId)
   const { slotName, labwareName } = getSlotLabwareName(labwareId, commands)
   const loadLabwareCommand = commands
