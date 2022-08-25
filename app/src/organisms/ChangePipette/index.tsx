@@ -41,6 +41,7 @@ import { DeprecatedConfirmPipette } from './DeprecatedConfirmPipette'
 import { RequestInProgressModal } from './RequestInProgressModal'
 import { DeprecatedLevelPipette } from './DeprecatedLevelPipette'
 import { ClearDeckAlertModal } from './ClearDeckModal/ClearDeckAlertModal'
+import { Mount, SPACING } from '@opentrons/components'
 
 import {
   ATTACH,
@@ -50,9 +51,6 @@ import {
   CONFIRM,
   CALIBRATE_PIPETTE,
 } from './constants'
-
-import { StyledText } from '../../atoms/text'
-import { Mount, SPACING } from '@opentrons/components'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { WizardStep } from './types'
