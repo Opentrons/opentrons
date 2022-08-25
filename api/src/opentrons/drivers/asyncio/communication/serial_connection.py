@@ -26,6 +26,8 @@ class SerialConnection:
         error_keyword: Optional[str] = None,
         alarm_keyword: Optional[str] = None,
         reset_buffer_before_write: bool = False,
+        handle_async: bool = False,
+        gcode_ack: Optional[str] = None,
     ) -> SerialConnection:
         """
         Create a connection.
@@ -65,6 +67,8 @@ class SerialConnection:
             retry_wait_time_seconds=retry_wait_time_seconds,
             error_keyword=error_keyword or "error",
             alarm_keyword=alarm_keyword or "alarm",
+            handle_async=handle_async,
+            gcode_ack=gcode_ack or "gcode_response",
         )
 
     def __init__(
@@ -76,6 +80,8 @@ class SerialConnection:
         retry_wait_time_seconds: float,
         error_keyword: str,
         alarm_keyword: str,
+        handle_async: bool,
+        gcode_ack: str,
     ) -> None:
         """
         Constructor
@@ -99,6 +105,8 @@ class SerialConnection:
         self._send_data_lock = asyncio.Lock()
         self._error_keyword = error_keyword.lower()
         self._alarm_keyword = alarm_keyword.lower()
+        self._handle_async = handle_async
+        self._gcode_ack = gcode_ack.lower()
 
     async def send_command(
         self, command: CommandBuilder, retries: int = 0, timeout: Optional[float] = None
@@ -150,7 +158,10 @@ class SerialConnection:
         async with self._send_data_lock, self._serial.timeout_override(
             "timeout", timeout
         ):
-            return await self._send_data(data=data, retries=retries)
+            if (self._handle_async):
+                return await self._send_data_async(data=data, retries=retries)
+            else:
+                return await self._send_data(data=data, retries=retries)
 
     async def _send_data(self, data: str, retries: int = 0) -> str:
         """
@@ -177,6 +188,49 @@ class SerialConnection:
                 self._ack in response
                 or self._error_keyword.encode() in response.lower()
             ):
+                # Remove ack from response
+                response = response.replace(self._ack, b"")
+                str_response = self.process_raw_response(
+                    command=data, response=response.decode()
+                )
+                self.raise_on_error(response=str_response)
+                return str_response
+
+            log.info(f"{self.name}: retry number {retry}/{retries}")
+
+            await self.on_retry()
+
+        raise NoResponse(port=self._port, command=data)
+
+    async def _send_data_async(self, data: str, retries: int = 0) -> str:
+        """
+        Send data and return the response.
+
+        Args:
+            data: The data to send.
+            retries: number of times to retry in case of timeout
+
+        Returns: The command response
+
+        Raises: SerialException
+        """
+        data_encode = data.encode()
+
+        for retry in range(retries + 1):
+            log.debug(f"{self.name}: Write -> {data_encode!r}")
+            await self._serial.write(data=data_encode)
+
+            response = await self._serial.read_until(match=self._ack)
+            log.debug(f"{self.name}: Read <- {response!r}")
+
+            while (self._error_keyword.encode() in response.lower() and self._gcode_ack.encode() not in response.lower()):
+                #check for multiple a priori async errors
+                response = await self._serial.read_until(match=self._ack)
+                log.debug(f"{self.name}: Read <- {response!r}")
+
+            if (self._gcode_ack.encode() in response.lower()):
+                response = response.replace(self._gcode_ack, b"")
+            if (self._ack in response):
                 # Remove ack from response
                 response = response.replace(self._ack, b"")
                 str_response = self.process_raw_response(

@@ -30,6 +30,7 @@ DEFAULT_HS_TIMEOUT = 40
 HS_COMMAND_TERMINATOR = "\n"
 HS_ACK = "OK" + HS_COMMAND_TERMINATOR
 HS_ERROR_KEYWORD = "err"
+HS_GCODE_ACK = "gcode response"
 DEFAULT_COMMAND_RETRIES = 0
 
 
@@ -54,6 +55,8 @@ class HeaterShakerDriver(AbstractHeaterShakerDriver):
             ack=HS_ACK,
             loop=loop,
             error_keyword=HS_ERROR_KEYWORD,
+            handle_async=True,
+            gcode_ack=HS_GCODE_ACK,
         )
         return cls(connection=connection)
 
