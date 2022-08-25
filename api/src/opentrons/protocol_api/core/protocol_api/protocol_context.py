@@ -186,16 +186,9 @@ class ProtocolContextImplementation(
         )
 
     def load_instrument(
-        self, instrument_name: str, mount: Mount, replace: bool
+        self, instrument_name: str, mount: Mount
     ) -> InstrumentContextImplementation:
         """Load an instrument."""
-        instr = self._instruments[mount]
-        if instr and not replace:
-            raise RuntimeError(
-                f"Instrument already present in {mount.name.lower()} "
-                f"mount: {instr.get_instrument_name()}"
-            )
-
         attached = {
             att_mount: instr.get("name", None)
             for att_mount, instr in self._sync_hardware.attached_instruments.items()

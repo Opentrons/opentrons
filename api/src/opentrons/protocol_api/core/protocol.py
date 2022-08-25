@@ -89,9 +89,7 @@ class AbstractProtocol(ABC, Generic[InstrumentCoreType, LabwareCoreType]):
         ...
 
     @abstractmethod
-    def load_instrument(
-        self, instrument_name: str, mount: Mount, replace: bool
-    ) -> InstrumentCoreType:
+    def load_instrument(self, instrument_name: str, mount: Mount) -> InstrumentCoreType:
         ...
 
     @abstractmethod

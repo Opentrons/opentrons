@@ -28,13 +28,6 @@ def subject(request: pytest.FixtureRequest) -> AbstractProtocol:
     return request.param  # type: ignore[attr-defined, no-any-return]
 
 
-def test_load_instrument_fails_when_present(subject: AbstractProtocol) -> None:
-    """It should fail if already present."""
-    subject.load_instrument("p300_single_gen2", types.Mount.RIGHT, replace=False)
-    with pytest.raises(RuntimeError):
-        subject.load_instrument("p300_single_gen2", types.Mount.RIGHT, replace=False)
-
-
 def test_replacing_instrument_tip_state(
     subject: AbstractProtocol, labware: AbstractLabware
 ) -> None:
@@ -47,8 +40,8 @@ def test_replacing_instrument_tip_state(
     # The solution is to reuse InstrumentContextSimulation instances when the user is
     # replacing the same pipette at the same mount.
     subject.home()
-    pip1 = subject.load_instrument("p300_single_gen2", types.Mount.RIGHT, replace=False)
-    pip2 = subject.load_instrument("p300_single_gen2", types.Mount.RIGHT, replace=True)
+    pip1 = subject.load_instrument("p300_single_gen2", types.Mount.RIGHT)
+    pip2 = subject.load_instrument("p300_single_gen2", types.Mount.RIGHT)
 
     pip1.pick_up_tip(
         well=labware.get_wells()[0],

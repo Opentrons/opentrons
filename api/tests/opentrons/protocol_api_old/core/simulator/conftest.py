@@ -36,9 +36,7 @@ def instrument_context(
     protocol_context: ProtocolContextImplementation,
 ) -> InstrumentContextImplementation:
     """Instrument context backed by hardware simulator."""
-    return protocol_context.load_instrument(
-        "p300_single_gen2", types.Mount.RIGHT, replace=False
-    )
+    return protocol_context.load_instrument("p300_single_gen2", types.Mount.RIGHT)
 
 
 @pytest.fixture
@@ -46,9 +44,7 @@ def second_instrument_context(
     protocol_context: ProtocolContextImplementation,
 ) -> InstrumentContextImplementation:
     """Instrument context backed by hardware simulator."""
-    return protocol_context.load_instrument(
-        "p300_single_gen2", types.Mount.LEFT, replace=False
-    )
+    return protocol_context.load_instrument("p300_single_gen2", types.Mount.LEFT)
 
 
 @pytest.fixture
