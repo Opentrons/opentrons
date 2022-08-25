@@ -62,8 +62,7 @@ export function getFilteredDefinitions(filters: FilterParams): LabwareList {
   return getAllDefinitions().filter(
     def =>
       testCategory(filters.category, def) &&
-      testManufacturer(filters.manufacturer, def) &&
-      testOT3Definition(def)
+      testManufacturer(filters.manufacturer, def)
   )
 }
 
@@ -88,10 +87,4 @@ export function testCategory(
     category === FILTER_OFF ||
     category === definition.metadata.displayCategory
   )
-}
-
-// TODO(lc 8-24-2022) This is a temporary function
-// to filter out the new ot3 tiprack definitions
-export function testOT3Definition(definition: LabwareDefinition): boolean {
-  return !definition.metadata.displayName.includes('OT-3')
 }
