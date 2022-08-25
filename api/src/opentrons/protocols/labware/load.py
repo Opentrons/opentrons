@@ -8,7 +8,7 @@ from opentrons.types import Location
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 if TYPE_CHECKING:
-    from opentrons.protocol_api.core.labware import AbstractLabware
+    from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ def load_from_definition(
     definition: LabwareDefinition,
     parent: Location,
     label: str = None,
-) -> AbstractLabware:
+) -> LabwareImplementation:
     """
     Return a labware object constructed from a provided labware definition dict
 
@@ -49,7 +49,7 @@ def load(
     version: int = 1,
     bundled_defs: Dict[str, LabwareDefinition] = None,
     extra_defs: Dict[str, LabwareDefinition] = None,
-) -> AbstractLabware:
+) -> LabwareImplementation:
     """
     Return a labware object constructed from a labware definition dict looked
     up by name (definition must have been previously stored locally on the

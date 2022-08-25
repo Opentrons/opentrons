@@ -9,7 +9,7 @@ from opentrons.protocol_api import labware, MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
-from opentrons.protocol_api.core.well import WellImplementation
+from opentrons.protocol_api.core.protocol_api.well import WellImplementation
 from opentrons.protocols.labware.definition import _get_parent_identifier
 
 from opentrons_shared_data import load_shared_data

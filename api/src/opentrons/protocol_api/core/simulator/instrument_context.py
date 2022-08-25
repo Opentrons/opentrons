@@ -1,4 +1,6 @@
-import typing
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional
 
 from opentrons import types
 from opentrons.hardware_control import NoTipAttachedError, TipAttachedError
@@ -11,21 +13,23 @@ from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds, Clear
 from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
-from ..protocol import AbstractProtocol
-from ..well import WellImplementation
+from ..protocol_api.well import WellImplementation
+
+if TYPE_CHECKING:
+    from .protocol_context import ProtocolContextSimulation
 
 
-class InstrumentContextSimulation(AbstractInstrument):
+class InstrumentContextSimulation(AbstractInstrument[WellImplementation]):
     """A simulation of an instrument context."""
 
     def __init__(
         self,
-        protocol_interface: AbstractProtocol,
+        protocol_interface: ProtocolContextSimulation,
         pipette_dict: PipetteDict,
         mount: types.Mount,
         instrument_name: str,
         default_speed: float = 400.0,
-        api_version: typing.Optional[APIVersion] = None,
+        api_version: Optional[APIVersion] = None,
     ):
         """Constructor."""
         self._protocol_interface = protocol_interface
@@ -81,8 +85,8 @@ class InstrumentContextSimulation(AbstractInstrument):
         self,
         well: WellImplementation,
         tip_length: float,
-        presses: typing.Optional[int],
-        increment: typing.Optional[float],
+        presses: Optional[int],
+        increment: Optional[float],
         prep_after: bool,
     ) -> None:
         geometry = well.get_geometry()
@@ -113,8 +117,8 @@ class InstrumentContextSimulation(AbstractInstrument):
         self,
         location: types.Location,
         force_direct: bool,
-        minimum_z_height: typing.Optional[float],
-        speed: typing.Optional[float],
+        minimum_z_height: Optional[float],
+        speed: Optional[float],
     ) -> None:
         """Simulation of only the motion planning portion of move_to."""
         last_location = self._protocol_interface.get_last_location()
@@ -188,9 +192,9 @@ class InstrumentContextSimulation(AbstractInstrument):
 
     def set_flow_rate(
         self,
-        aspirate: typing.Optional[float] = None,
-        dispense: typing.Optional[float] = None,
-        blow_out: typing.Optional[float] = None,
+        aspirate: Optional[float] = None,
+        dispense: Optional[float] = None,
+        blow_out: Optional[float] = None,
     ) -> None:
         self._protocol_interface.get_hardware().set_flow_rate(
             mount=self._mount,
@@ -202,9 +206,9 @@ class InstrumentContextSimulation(AbstractInstrument):
 
     def set_pipette_speed(
         self,
-        aspirate: typing.Optional[float] = None,
-        dispense: typing.Optional[float] = None,
-        blow_out: typing.Optional[float] = None,
+        aspirate: Optional[float] = None,
+        dispense: Optional[float] = None,
+        blow_out: Optional[float] = None,
     ) -> None:
         self._protocol_interface.get_hardware().set_pipette_speed(
             mount=self._mount,
