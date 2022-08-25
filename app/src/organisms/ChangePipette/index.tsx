@@ -35,8 +35,8 @@ import { ClearDeckModal } from './ClearDeckModal/index'
 import { ExitAlertModal } from './ExitAlertModal'
 import { DeprecatedInstructions } from './DeprecatedInstructions'
 import { ConfirmPipette } from './ConfirmPipette'
+import { DeprecatedConfirmPipette } from './DeprecatedConfirmPipette'
 import { RequestInProgressModal } from './RequestInProgressModal'
-import { LevelPipette } from './LevelPipette'
 import { DeprecatedLevelPipette } from './DeprecatedLevelPipette'
 import { ClearDeckAlertModal } from './ClearDeckModal/ClearDeckAlertModal'
 
@@ -49,10 +49,11 @@ import {
   CALIBRATE_PIPETTE,
 } from './constants'
 
+import { StyledText } from '../../atoms/text'
 import { Mount, SPACING } from '@opentrons/components'
+
 import type { State, Dispatch } from '../../redux/types'
 import type { WizardStep } from './types'
-import { StyledText } from '../../atoms/text'
 
 interface Props {
   robotName: string
@@ -290,21 +291,13 @@ export function ChangePipette(props: Props): JSX.Element | null {
       dispatchApiRequests(home(robotName, ROBOT))
       startPipetteOffsetWizard()
     }
-
-    if (success && wantedPipette && shouldLevel(wantedPipette)) {
-      return enableChangePipetteWizard ? (
-        <ModalShell height="28.12rem" width="47rem">
-          <LevelPipette
-            {...basePropsWithPipettes}
-            pipetteModelName={actualPipette ? actualPipette.name : ''}
-            exit={() => setConfirmExit(true)}
-            confirm={homePipAndExit}
-            back={() => setWizardStep(CLEAR_DECK)}
-            currentStep={6}
-            totalSteps={8}
-          />
-        </ModalShell>
-      ) : (
+    if (
+      !enableChangePipetteWizard &&
+      success &&
+      wantedPipette &&
+      shouldLevel(wantedPipette)
+    ) {
+      return (
         <DeprecatedLevelPipette
           {...{
             pipetteModelName: actualPipette ? actualPipette.name : '',
@@ -317,8 +310,30 @@ export function ChangePipette(props: Props): JSX.Element | null {
         />
       )
     } else {
-      return (
+      return enableChangePipetteWizard ? (
         <ConfirmPipette
+          {...{
+            ...basePropsWithPipettes,
+            title:
+              actualPipette?.displayName != null
+                ? t('detach_pipette', {
+                    pipette: actualPipette.displayName,
+                    mount: mount[0].toUpperCase() + mount.slice(1),
+                  })
+                : t('attach_pipette'),
+            success,
+            attachedWrong,
+            tryAgain: () => {
+              setWantedName(null)
+              setWizardStep(INSTRUCTIONS)
+            },
+            exit: homePipAndExit,
+            actualPipetteOffset: actualPipetteOffset,
+            startPipetteOffsetCalibration: launchPOC,
+          }}
+        />
+      ) : (
+        <DeprecatedConfirmPipette
           {...{
             ...basePropsWithPipettes,
             success,
