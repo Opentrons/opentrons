@@ -2,7 +2,7 @@
 
 Information about our pipettes is split into 2 different files.
 
-## Name Level: `shared-data/pipette/definitions/pipetteNameSpecs.json`
+## Name Level: `shared-data/pipette/definitions/1/pipetteNameSpecs.json`
 
 A pipette name is what is communicated with customers, what is listed in the store, etc. Name-level information does not vary across pipettes with the same "name", it includes: min and max volume, display name, number of channels, and default aspirate/dispense flow rates.
 
@@ -10,7 +10,7 @@ The "name" is all that is communicated to the average user about a pipette. Both
 
 `"p10_single"` is an example of a name.
 
-## Model Level: `shared-data/pipette/definitions/pipetteModelSpecs.json`
+## Model Level: `shared-data/pipette/definitions/1/pipetteModelSpecs.json`
 
 A "model" is synonymous with a part number. Our models / part numbers look like `"p10_single_v1.3"`. Although the name is a substring of the model string, it isn't a good idea to infer name by parsing it out of the model.
 
