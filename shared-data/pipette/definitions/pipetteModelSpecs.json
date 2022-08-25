@@ -5609,7 +5609,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -22.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -5729,7 +5729,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -22.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -5779,7 +5779,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["pickupTipShake"],
+      "quirks": [],
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
     },
@@ -5849,7 +5849,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -22.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -5948,7 +5948,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["pickupTipShake"],
+      "quirks": [],
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
     },
@@ -6018,7 +6018,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -22.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -6118,7 +6118,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["pickupTipShake"],
+      "quirks": [],
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
     },
@@ -6188,7 +6188,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -16.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -6238,7 +6238,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["pickupTipShake"],
+      "quirks": [],
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
     },
@@ -6308,7 +6308,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -16.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -6358,7 +6358,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["pickupTipShake"],
+      "quirks": [],
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
     },
@@ -6428,7 +6428,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -16.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -6527,7 +6527,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["pickupTipShake"],
+      "quirks": [],
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
     },
@@ -6597,7 +6597,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -16.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -6696,7 +6696,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["pickupTipShake"],
+      "quirks": [],
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
     }
