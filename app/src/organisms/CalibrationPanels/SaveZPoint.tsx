@@ -28,7 +28,7 @@ import * as Sessions from '../../redux/sessions'
 import type { SessionType } from '../../redux/sessions/types'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
-import { DeprecatedJogControls } from '../../molecules/DeprecatedJogControls'
+import { JogControls } from '../../molecules/JogControls'
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from '../../molecules/JogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
@@ -206,7 +206,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
           <source src={demoAsset} />
         </video>
       </Flex>
-      <DeprecatedJogControls
+      <JogControls
         jog={jog}
         stepSizes={[0.1, 1]}
         planes={

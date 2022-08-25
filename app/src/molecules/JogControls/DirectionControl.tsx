@@ -137,8 +137,8 @@ const PLANE_BUTTONS_STYLE = css`
 
 const DEFAULT_BUTTON_STYLE = css`
   display: flex;
-  justify-content: ${JUSTIFY_CENTER}
-  align-items: ${ALIGN_CENTER}
+  justify-content: ${JUSTIFY_CENTER};
+  align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.white};
   color: ${COLORS.black};
 
@@ -212,10 +212,7 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                   width="1.2rem"
                   marginRight={SPACING.spacing3}
                 />
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  alignItems={ALIGN_FLEX_START}
-                >
+                <Flex flexDirection={DIRECTION_COLUMN}>
                   {title}
                   <StyledText
                     color={COLORS.darkGreyEnabled}
@@ -254,6 +251,7 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
 const ARROW_GRID_STYLES = css`
   display: grid;
   max-width: 8.75rem;
+  grid-template-columns: repeat(6, 1fr);
   grid-template-areas:
     '.         .         .         .         .          .         '
     '.         .         ArrowUp   ArrowUp   .          .         '

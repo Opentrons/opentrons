@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
@@ -59,14 +59,18 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
       padding={SPACING.spacing6}
       minHeight="32rem"
     >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignSelf={ALIGN_STRETCH}>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing3}>
         <Flex flexDirection={DIRECTION_COLUMN} flex="1">
           <StyledText as="h1" marginBottom={SPACING.spacing4}>
             {t('position_pipette_over_tip')}
           </StyledText>
-          <StyledText as="p">{t('tip_pick_up_instructions')}</StyledText>
+          <Trans
+            t={t}
+            i18nKey="tip_pick_up_instructions"
+            components={{ block: <StyledText as="p" marginBottom={SPACING.spacing3} /> }}
+          />
         </Flex>
-        <Box marginLeft={SPACING_3}>
+        <Box flex="1">
           <video
             key={demoAsset}
             css={css`
@@ -82,14 +86,14 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
         </Box>
       </Flex>
       <JogControls jog={jog} />
-      <Box alignSelf={ALIGN_FLEX_END}>
-        {confirmLink}
-      </Box>
-      <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN} marginTop={SPACING.spacing4}>
+      <Box alignSelf={ALIGN_FLEX_END}>{confirmLink}</Box>
+      <Flex
+        width="100%"
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        marginTop={SPACING.spacing4}
+      >
         <NeedHelpLink />
-        <PrimaryButton onClick={pickUpTip}>
-          {t('pick_up_tip')}
-        </PrimaryButton>
+        <PrimaryButton onClick={pickUpTip}>{t('pick_up_tip')}</PrimaryButton>
       </Flex>
       {confirmModal}
     </Flex>
