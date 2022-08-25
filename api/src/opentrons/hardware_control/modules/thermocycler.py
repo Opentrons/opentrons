@@ -579,7 +579,10 @@ class Thermocycler(mod_abc.AbstractModule):
         await self._driver.enter_programming_mode()
 
         if self.model() == V2_MODULE_STRING:
-            new_port = await update.find_dfu_device(pid=DFU_PID)
+            # TC2 has three unique "devices" over DFU
+            new_port = await update.find_dfu_device(
+                pid=DFU_PID, expected_device_count=3
+            )
         else:
             new_port = await update.find_bootloader_port()
 

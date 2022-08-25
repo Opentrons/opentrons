@@ -62,7 +62,7 @@ async def find_bootloader_port() -> str:
     raise Exception("No ot_module bootloaders found in /dev. Try again")
 
 
-async def find_dfu_device(pid: str) -> str:
+async def find_dfu_device(pid: str, expected_device_count: int) -> str:
     """Find the dfu device and return its serial number (separate from module serial)"""
     retries = 5
     log.info(f"Searching for a dfu device with PID {pid}")
@@ -93,9 +93,10 @@ async def find_dfu_device(pid: str) -> str:
                 log.info(f"Found device with PID {pid}")
                 devices_found += 1
                 serial = line[(line.find("serial=") + 7) :]
-        if devices_found == 2:
+        if devices_found == expected_device_count:
+            # Heater-Shaker has 2 unique endpoints, Thermocycler has 3
             return serial
-        elif devices_found > 2:
+        elif devices_found > expected_device_count:
             raise OSError("Multiple new bootloader devices" "found on mode switch")
 
     raise RuntimeError(

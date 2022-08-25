@@ -366,16 +366,25 @@ async def test_module_update_integration(
     )
     monkeypatch.setattr(modules.update, "upload_via_dfu", upload_via_dfu_mock)
 
-    async def mock_find_dfu_device(pid: str):
-        return "df11"
+    async def mock_find_dfu_device_hs(pid: str, expected_device_count: int):
+        if expected_device_count == 2:
+            return "df11"
+        return "none"
 
-    monkeypatch.setattr(modules.update, "find_dfu_device", mock_find_dfu_device)
+    monkeypatch.setattr(modules.update, "find_dfu_device", mock_find_dfu_device_hs)
 
     await modules.update_firmware(mod_heatershaker, "fake_fw_file_path", loop)
     upload_via_dfu_mock.assert_called_once_with(
         "df11", "fake_fw_file_path", bootloader_kwargs
     )
     upload_via_dfu_mock.reset_mock()
+
+    async def mock_find_dfu_device_tc2(pid: str, expected_device_count: int):
+        if expected_device_count == 3:
+            return "df11"
+        return "none"
+
+    monkeypatch.setattr(modules.update, "find_dfu_device", mock_find_dfu_device_tc2)
 
     await modules.update_firmware(mod_thermocycler_gen2, "fake_fw_file_path", loop)
     upload_via_dfu_mock.assert_called_once_with(
