@@ -1,7 +1,7 @@
 """Tests for move util functions."""
 import pytest
 import numpy as np
-from typing import Iterator, List
+from typing import Iterator, List, Union
 from hypothesis import given, strategies as st, assume
 
 from opentrons_hardware.hardware_control.motion_planning.move_manager import MoveManager
@@ -540,7 +540,7 @@ def test_triangle_matching() -> None:
 
 def test_system_constraint_acceleration_override() -> None:
     """Only specified axis accelerations should be modified."""
-    new_accs: ConstraintAxisMap[int] = {
+    new_accs: ConstraintAxisMap[str, Union[int, float]] = {
         "X": 1,
         "Y": 2,
         "A": 3,

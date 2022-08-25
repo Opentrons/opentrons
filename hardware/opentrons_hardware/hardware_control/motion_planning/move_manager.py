@@ -1,6 +1,8 @@
 """Move manager."""
 import logging
+import numpy as np
 from typing import Dict, List, Tuple, Generic
+
 from opentrons_hardware.hardware_control.motion_planning import move_utils
 from opentrons_hardware.hardware_control.motion_planning.types import (
     Coordinates,
@@ -29,7 +31,7 @@ class MoveManager(Generic[AxisKey]):
     def override_accelerations(self, acc_dict: Dict[AxisKey, CoordinateValue]) -> None:
         """Update max acceleration constraint for specified axes."""
         for axis, val in acc_dict.items():
-            self._constraints[axis].max_acceleration = val
+            self._constraints[axis].max_acceleration = np.float64(val)
 
     def update_constraints(self, constraints: SystemConstraints[AxisKey]) -> None:
         """Update all system constraints when instruments are changed."""

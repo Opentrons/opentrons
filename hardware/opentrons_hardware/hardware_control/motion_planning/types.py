@@ -228,9 +228,6 @@ class AxisConstraints:
             ),
         )
 
-    def __setattr__(self, name: str, value: CoordinateValue) -> None:
-        object.__setattr__(self, name, np.float64(value))
-
 
 SystemConstraints = Dict[AxisKey, AxisConstraints]
 ConstraintAxisMap = Dict[AxisKey, CoordinateValue]
