@@ -141,28 +141,34 @@ CONFIG_ELEMENTS = (
         "API V1 Labware Database",
         Path("opentrons.db"),
         ConfigElementType.FILE,
-        "The SQLite database where labware definitions and offsets" " are stored",
+        (
+            "A SQLite database where labware definitions and offsets were stored."
+            " No longer used as of v4."
+        ),
     ),
     ConfigElement(
         "labware_calibration_offsets_dir_v2",
         "API V2 Calibration Offsets Directory",
         Path("labware") / "v2" / "offsets",
         ConfigElementType.DIR,
-        "The location where APIV2 labware calibration is stored",
+        ("A location where labware offsets were stored." " No longer used as of v5."),
     ),
     ConfigElement(
         "labware_user_definitions_dir_v2",
         "API V2 Custom Labware Directory",
         Path("labware") / "v2" / "custom_definitions",
         ConfigElementType.DIR,
-        "The location where APIV2 labware definitions are stored",
+        (
+            "A location where custom labware definitions may be stored."
+            " Usage not recommended."
+        ),
     ),
     ConfigElement(
         "feature_flags_file",
         "Feature Flags",
         Path("feature_flags.json"),
         ConfigElementType.FILE,
-        "The file storing the feature flags accessible via " "Opentrons app",
+        "The file storing the advanced feature flags.",
     ),
     ConfigElement(
         "robot_settings_file",

@@ -104,7 +104,3 @@ def reset_pipette_offset() -> None:
 def reset_tip_length_calibrations() -> None:
     delete.clear_tip_length_calibration()
     delete.clear_pipette_offset_calibrations()
-
-
-def reset_labware_calibration() -> None:
-    delete.clear_calibrations()
