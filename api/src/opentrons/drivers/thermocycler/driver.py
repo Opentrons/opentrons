@@ -332,7 +332,5 @@ class ThermocyclerDriverV2(ThermocyclerDriver):
             gcode=GCODE.ENTER_PROGRAMMING
         )
         # The timeout is overwritten because no response should ever come
-        await self._connection.send_command(
-            command=c, retries=DEFAULT_COMMAND_RETRIES, timeout=1
-        )
+        await self._connection.send_dfu_command(command=c)
         await self._connection.close()
