@@ -7,7 +7,6 @@ import asyncio
 import re
 from typing import Any, List, Tuple
 
-from opentrons.config.feature_flags import enable_ot3_hardware_controller
 from opentrons.drivers.serial_communication import get_ports_by_name
 from opentrons.hardware_control import (
     API as HardwareAPI,
@@ -104,7 +103,7 @@ def _get_motor_control_serial_port() -> Any:
 
 def should_use_ot3() -> bool:
     """Return true if ot3 hardware controller should be used."""
-    if enable_ot3_hardware_controller():
+    if ff.enable_ot3_hardware_controller():
         try:
             from opentrons_hardware.drivers.can_bus import CanDriver  # noqa: F401
 
