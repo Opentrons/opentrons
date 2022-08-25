@@ -1,6 +1,6 @@
 """Move manager."""
 import logging
-from typing import List, Tuple, Generic
+from typing import Dict, List, Tuple, Generic
 from opentrons_hardware.hardware_control.motion_planning import move_utils
 from opentrons_hardware.hardware_control.motion_planning.types import (
     Coordinates,
@@ -26,8 +26,13 @@ class MoveManager(Generic[AxisKey]):
         self._constraints = constraints
         self._blend_log: List[List[Move[AxisKey]]] = []
 
+    def override_accelerations(self, acc_dict: Dict[AxisKey, CoordinateValue]) -> None:
+        """Update max acceleration constraint for specified axes."""
+        for axis, val in acc_dict.items():
+            self._constraints[axis].max_acceleration = val
+
     def update_constraints(self, constraints: SystemConstraints[AxisKey]) -> None:
-        """Update system constraints when instruments are changed."""
+        """Update all system constraints when instruments are changed."""
         self._constraints = constraints
 
     def _clear_blend_log(self) -> None:

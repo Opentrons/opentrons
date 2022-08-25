@@ -19,6 +19,7 @@ from opentrons_hardware.hardware_control.motion_planning.types import (
     Move,
     MoveTarget,
     SystemConstraints,
+    ConstraintAxisMap,
     is_unit_vector,
 )
 
@@ -535,3 +536,25 @@ def test_triangle_matching() -> None:
     assert active_move.blocks[0].distance + active_move.blocks[
         2
     ].distance == pytest.approx(active_move.distance)
+
+
+def test_system_constraint_acceleration_override() -> None:
+    """Only specified axis accelerations should be modified."""
+    new_accs: ConstraintAxisMap[int] = {
+        "X": 1,
+        "Y": 2,
+        "A": 3,
+    }
+
+    acc_results = CONSTRAINTS
+    acc_results["X"].max_acceleration = np.float64(1)
+    acc_results["Y"].max_acceleration = np.float64(2)
+    acc_results["A"].max_acceleration = np.float64(3)
+
+    manager = MoveManager(CONSTRAINTS)
+    # before acc override
+    assert manager._constraints == CONSTRAINTS
+
+    manager.override_accelerations(new_accs)
+    # after acc override
+    assert manager._constraints == acc_results
