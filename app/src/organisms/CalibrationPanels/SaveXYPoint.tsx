@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
+import { Trans, useTranslation } from 'react-i18next'
 import {
   Box,
   PrimaryBtn,
@@ -7,6 +8,7 @@ import {
   Flex,
   Text,
   DIRECTION_ROW,
+  DIRECTION_COLUMN,
   SPACING,
   SPACING_3,
   SPACING_5,
@@ -22,11 +24,14 @@ import {
   TEXT_ALIGN_CENTER,
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from '../../molecules/JogControls'
-import { DeprecatedJogControls } from '../../molecules/DeprecatedJogControls'
+import { JogControls } from '../../molecules/JogControls'
+import { StyledText } from '../../atoms/text'
+import { PrimaryButton } from '../../atoms/buttons'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { NeedHelpLink } from './NeedHelpLink'
@@ -164,6 +169,7 @@ const contentsBySessionTypeByCurrentStep: {
 }
 
 export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element {
+  const { t } = useTranslation('robot_calibration')
   const {
     isMulti,
     mount,
@@ -255,75 +261,63 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element {
   )
 
   return (
-    <>
-      <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Text
-          fontSize={FONT_SIZE_HEADER}
-          fontWeight={FONT_WEIGHT_SEMIBOLD}
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-        >
-          {isHealthCheck ? CHECK_POINT_XY_HEADER : SAVE_XY_POINT_HEADER}
-          {` ${SLOT} ${slotNumber || ''}`}
-        </Text>
-        <NeedHelpLink />
-      </Flex>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      padding={SPACING.spacing6}
+      minHeight="32rem"
+    >
       <Flex
-        flexDirection={DIRECTION_ROW}
-        padding={SPACING_3}
-        border={BORDER_SOLID_LIGHT}
-        marginTop={SPACING_3}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignSelf={ALIGN_STRETCH}
+        gridGap={SPACING.spacing3}
       >
-        <Text fontSize={TYPOGRAPHY.fontSizeH3} alignSelf={JUSTIFY_CENTER}>
-          {JOG_UNTIL}
-          <b>{` ${PRECISELY_CENTERED} `}</b>
-          {ABOVE_THE_CROSS}
-          <b>{` ${SLOT} ${slotNumber || ''}`}.</b>
-          <br />
-          <br />
-          {THEN}
-          <b>{` '${continueButtonText}' `}</b>
-          {isHealthCheck ? TO_CHECK : `${TO_SAVE} ${SLOT} ${slotNumber}`}.
-        </Text>
-        <video
-          key={String(demoAsset)}
-          css={css`
-            max-width: 100%;
-            max-height: 15rem;
-          `}
-          autoPlay={true}
-          loop={true}
-          controls={false}
-        >
-          <source src={demoAsset} />
-        </video>
+        <Flex flexDirection={DIRECTION_COLUMN} flex="1">
+          <StyledText as="h1" marginBottom={SPACING.spacing4}>
+            {t('calibrate_xy_axes')}
+          </StyledText>
+          <Trans
+            t={t}
+            i18nKey="jog_pipette_to_touch_cross"
+            components={{
+              block: <StyledText as="p" marginBottom={SPACING.spacing3} />,
+            }}
+          />
+        </Flex>
+        <Box flex="1">
+          <video
+            key={String(demoAsset)}
+            css={css`
+              max-width: 100%;
+              max-height: 15rem;
+            `}
+            autoPlay={true}
+            loop={true}
+            controls={false}
+          >
+            <source src={demoAsset} />
+          </video>
+        </Box>
       </Flex>
-      <DeprecatedJogControls
+      <JogControls
         jog={jog}
         stepSizes={[0.1, 1]}
-        planes={
-          allowVertical
-            ? [HORIZONTAL_PLANE, VERTICAL_PLANE]
-            : [HORIZONTAL_PLANE]
-        }
-        auxiliaryControl={allowVertical ? null : allowVerticalPrompt}
-        marginBottom={SPACING.spacing5}
+        initialPlane={VERTICAL_PLANE}
       />
+      <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing2}>
+        {confirmLink}
+      </Box>
       <Flex
         width="100%"
-        justifyContent={JUSTIFY_CENTER}
-        marginBottom={SPACING_3}
+        marginTop={SPACING.spacing4}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <PrimaryBtn
-          title="save"
-          onClick={savePoint}
-          flex="1"
-          marginX={SPACING_5}
-        >
+        <NeedHelpLink />
+        <PrimaryButton onClick={savePoint}>
           {continueButtonText}
-        </PrimaryBtn>
+        </PrimaryButton>
       </Flex>
-      <Box width="100%">{confirmLink}</Box>
       {confirmModal}
-    </>
+    </Flex>
   )
 }

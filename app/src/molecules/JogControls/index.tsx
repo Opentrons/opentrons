@@ -27,6 +27,7 @@ export interface JogControlsProps extends StyleProps {
   stepSizes?: StepSize[]
   auxiliaryControl?: React.ReactNode | null
   directionControlButtonColor?: string
+  initialPlane?: Plane
 }
 
 export { HORIZONTAL_PLANE, VERTICAL_PLANE }
@@ -38,6 +39,7 @@ export function JogControls(props: JogControlsProps): JSX.Element {
     stepSizes = DEFAULT_STEP_SIZES,
     planes = [HORIZONTAL_PLANE, VERTICAL_PLANE],
     auxiliaryControl = null,
+    initialPlane = HORIZONTAL_PLANE,
     ...styleProps
   } = props
   const [currentStepSize, setCurrentStepSize] = React.useState<number>(
@@ -78,6 +80,7 @@ export function JogControls(props: JogControlsProps): JSX.Element {
           jog={jog}
           stepSize={currentStepSize}
           buttonColor={directionControlButtonColor}
+          initialPlane={initialPlane}
         />
       </Flex>
       {auxiliaryControl}

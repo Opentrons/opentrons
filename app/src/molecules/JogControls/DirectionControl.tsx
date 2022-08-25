@@ -171,14 +171,14 @@ interface DirectionControlProps {
   planes: Plane[]
   jog: Jog
   stepSize: number
-  defaultPlane?: Plane
+  initialPlane?: Plane
   buttonColor?: string
 }
 
 export function DirectionControl(props: DirectionControlProps): JSX.Element {
-  const { planes, jog, stepSize, defaultPlane } = props
+  const { planes, jog, stepSize, initialPlane } = props
   const [currentPlane, setCurrentPlane] = React.useState<Plane>(
-    defaultPlane ?? planes[0]
+    initialPlane ?? planes[0]
   )
   const { t } = useTranslation(['robot_calibration'])
 

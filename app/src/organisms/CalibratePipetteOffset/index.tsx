@@ -6,8 +6,6 @@ import { SpinnerModalPage, useConditionalConfirm } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
 import {
-  SaveZPoint,
-  SaveXYPoint,
   CompleteConfirmation,
   ConfirmExitModal,
   MeasureNozzle,
@@ -18,6 +16,8 @@ import {
   DeckSetup,
   TipPickUp,
   TipConfirmation,
+  SaveZPoint,
+  SaveXYPoint,
 } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
