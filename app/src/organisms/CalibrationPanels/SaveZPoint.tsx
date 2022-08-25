@@ -55,22 +55,16 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
     })
   }
 
-  const continueCommands = (): (() => void) => {
-    if (sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK) {
-      return (): void => {
-        sendCommands(
+  const proceed = () => {
+    sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
+      ? sendCommands(
           { command: Sessions.checkCommands.COMPARE_POINT },
           { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
         )
-      }
-    } else {
-      return (): void => {
-        sendCommands(
+      : sendCommands(
           { command: Sessions.sharedCalCommands.SAVE_OFFSET },
           { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
         )
-      }
-    }
   }
 
   const [confirmLink, confirmModal] = useConfirmCrashRecovery({
@@ -122,14 +116,16 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
         stepSizes={[0.1, 1]}
         initialPlane={VERTICAL_PLANE}
       />
-      <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing2}>{confirmLink}</Box>
+      <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing2}>
+        {confirmLink}
+      </Box>
       <Flex
         width="100%"
         marginTop={SPACING.spacing4}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <NeedHelpLink />
-        <PrimaryButton onClick={continueCommands()}>
+        <PrimaryButton onClick={proceed()}>
           {t('confirm_placement')}
         </PrimaryButton>
       </Flex>
