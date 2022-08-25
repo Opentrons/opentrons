@@ -35,6 +35,8 @@ from opentrons.protocols.geometry.module_geometry import (
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
+from .core.instrument import AbstractInstrument
+from .core.well import AbstractWellCore
 from .core.labware import AbstractLabware
 from .core.protocol import AbstractProtocol
 from .core.labware_offset_provider import AbstractLabwareOffsetProvider
@@ -93,7 +95,9 @@ class ProtocolContext(CommandPublisher):
     def __init__(
         self,
         api_version: APIVersion,
-        implementation: AbstractProtocol,
+        implementation: AbstractProtocol[
+            AbstractInstrument[AbstractWellCore], AbstractLabware[AbstractWellCore]
+        ],
         labware_offset_provider: AbstractLabwareOffsetProvider,
         broker: Optional[Broker] = None,
     ) -> None:

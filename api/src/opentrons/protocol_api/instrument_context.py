@@ -25,6 +25,7 @@ from opentrons.protocols.api_support.util import (
 )
 
 from .core.instrument import AbstractInstrument
+from .core.well import AbstractWellCore
 from .module_contexts import ThermocyclerContext, HeaterShakerContext
 from . import labware
 
@@ -61,7 +62,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     def __init__(
         self,
-        implementation: AbstractInstrument,
+        implementation: AbstractInstrument[AbstractWellCore],
         ctx: ProtocolContext,
         broker: Broker,
         at_version: APIVersion,

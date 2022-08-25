@@ -1,11 +1,12 @@
 import pytest
 from opentrons import types
 from opentrons.hardware_control import ThreadManagedHardware
-from opentrons.protocol_api.core.instrument import AbstractInstrument
-from opentrons.protocol_api.core.labware import AbstractLabware
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
+)
+from opentrons.protocol_api.core.protocol_api.instrument_context import (
+    InstrumentContextImplementation,
 )
 from opentrons.protocol_api.core.simulator.instrument_context import (
     InstrumentContextSimulation,
@@ -33,7 +34,7 @@ def simulating_protocol_context(
 @pytest.fixture
 def instrument_context(
     protocol_context: ProtocolContextImplementation,
-) -> AbstractInstrument:
+) -> InstrumentContextImplementation:
     """Instrument context backed by hardware simulator."""
     return protocol_context.load_instrument(
         "p300_single_gen2", types.Mount.RIGHT, replace=False
@@ -43,7 +44,7 @@ def instrument_context(
 @pytest.fixture
 def second_instrument_context(
     protocol_context: ProtocolContextImplementation,
-) -> AbstractInstrument:
+) -> InstrumentContextImplementation:
     """Instrument context backed by hardware simulator."""
     return protocol_context.load_instrument(
         "p300_single_gen2", types.Mount.LEFT, replace=False
@@ -52,12 +53,12 @@ def second_instrument_context(
 
 @pytest.fixture
 def simulating_instrument_context(
-    protocol_context: ProtocolContextImplementation,
-    instrument_context: AbstractInstrument,
-) -> AbstractInstrument:
+    simulating_protocol_context: ProtocolContextSimulation,
+    instrument_context: InstrumentContextImplementation,
+) -> InstrumentContextSimulation:
     """A simulating instrument context."""
     return InstrumentContextSimulation(
-        protocol_interface=protocol_context,
+        protocol_interface=simulating_protocol_context,
         pipette_dict=instrument_context.get_pipette(),
         mount=types.Mount.RIGHT,
         instrument_name="p300_single_gen2",
@@ -66,12 +67,12 @@ def simulating_instrument_context(
 
 @pytest.fixture
 def second_simulating_instrument_context(
-    protocol_context: ProtocolContextImplementation,
-    second_instrument_context: AbstractInstrument,
-) -> AbstractInstrument:
+    simulating_protocol_context: ProtocolContextSimulation,
+    second_instrument_context: InstrumentContextImplementation,
+) -> InstrumentContextSimulation:
     """A simulating instrument context."""
     return InstrumentContextSimulation(
-        protocol_interface=protocol_context,
+        protocol_interface=simulating_protocol_context,
         pipette_dict=second_instrument_context.get_pipette(),
         mount=types.Mount.LEFT,
         instrument_name="p300_single_gen2",
@@ -79,7 +80,7 @@ def second_simulating_instrument_context(
 
 
 @pytest.fixture
-def labware(minimal_labware_def: LabwareDefinition) -> AbstractLabware:
+def labware(minimal_labware_def: LabwareDefinition) -> LabwareImplementation:
     """Labware fixture."""
     return LabwareImplementation(
         definition=minimal_labware_def,
@@ -88,7 +89,7 @@ def labware(minimal_labware_def: LabwareDefinition) -> AbstractLabware:
 
 
 @pytest.fixture
-def second_labware(minimal_labware_def: LabwareDefinition) -> AbstractLabware:
+def second_labware(minimal_labware_def: LabwareDefinition) -> LabwareImplementation:
     """Labware fixture."""
     return LabwareImplementation(
         definition=minimal_labware_def,
