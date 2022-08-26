@@ -132,7 +132,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       padding={SPACING.spacing6}
       minHeight="25rem"
     >
-      <Flex>
+      <Flex gridGap={SPACING.spacing3}>
         <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
           <StyledText as="h1" marginBottom={SPACING.spacing4}>{t('before_you_begin')}</StyledText>
           {sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&

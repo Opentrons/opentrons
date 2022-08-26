@@ -8,8 +8,6 @@ import * as Sessions from '../../redux/sessions'
 import {
   CompleteConfirmation,
   ConfirmExitModal,
-  MeasureNozzle,
-  MeasureTip,
   INTENT_TIP_LENGTH_IN_PROTOCOL,
 } from '../../organisms/DeprecatedCalibrationPanels'
 import {
@@ -17,6 +15,8 @@ import {
   DeckSetup,
   TipPickUp,
   TipConfirmation,
+  MeasureNozzle,
+  MeasureTip,
 } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'

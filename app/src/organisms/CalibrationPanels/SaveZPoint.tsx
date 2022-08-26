@@ -55,7 +55,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
     })
   }
 
-  const proceed = () => {
+  const proceed: React.MouseEventHandler<HTMLButtonElement> = _event => {
     sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
       ? sendCommands(
           { command: Sessions.checkCommands.COMPARE_POINT },
@@ -86,7 +86,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
       >
         <Flex flexDirection={DIRECTION_COLUMN} flex="1">
           <StyledText as="h1" marginBottom={SPACING.spacing4}>
-            {t('calibrate_z_axis')}
+            {t('calibrate_z_axis_on_slot')}
           </StyledText>
           <Trans
             t={t}
@@ -125,7 +125,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <NeedHelpLink />
-        <PrimaryButton onClick={proceed()}>
+        <PrimaryButton onClick={proceed}>
           {t('confirm_placement')}
         </PrimaryButton>
       </Flex>

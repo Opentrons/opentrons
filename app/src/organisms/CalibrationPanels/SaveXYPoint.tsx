@@ -141,7 +141,9 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
 
   const demoAsset = React.useMemo(
     () =>
-      slotNumber != null ?? assetMap[slotNumber][mount][isMulti ? 'multi' : 'single']
+      slotNumber != null
+        ? assetMap[slotNumber][mount][isMulti ? 'multi' : 'single']
+        : undefined,
     [slotNumber, mount, isMulti]
   )
 
@@ -172,7 +174,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
     if (isHealthCheck) {
       if (
         currentStep === Sessions.CHECK_STEP_COMPARING_POINT_ONE &&
-        checkBothPipettes &&
+        checkBothPipettes === true &&
         activePipette?.rank === Sessions.CHECK_PIPETTE_RANK_FIRST
       ) {
         sendCommands(
