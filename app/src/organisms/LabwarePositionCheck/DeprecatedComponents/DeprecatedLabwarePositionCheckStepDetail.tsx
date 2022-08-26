@@ -30,10 +30,12 @@ import {
 } from '@opentrons/shared-data'
 import {
   HORIZONTAL_PLANE,
-  JogControls,
-  JogControlsProps,
   VERTICAL_PLANE,
 } from '../../../molecules/JogControls'
+import {
+  DeprecatedJogControls,
+  DeprecatedJogControlsProps,
+} from '../../../molecules/DeprecatedJogControls'
 import { OffsetVector } from '../../../molecules/OffsetVector'
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
 import { DeprecatedStepDetailText } from './DeprecatedStepDetailText'
@@ -120,7 +122,11 @@ export const DeprecatedLabwarePositionCheckStepDetail = (
     {}
   )
 
-  const handleJog: JogControlsProps['jog'] = (axis, direction, step) => {
+  const handleJog: DeprecatedJogControlsProps['jog'] = (
+    axis,
+    direction,
+    step
+  ) => {
     const onSuccess = (position: Coordinates | null): void => {
       setLivePositionDeckCoords(position)
     }
@@ -221,14 +227,13 @@ export const DeprecatedLabwarePositionCheckStepDetail = (
           </Flex>
         </Flex>
         {showJogControls ? (
-          <JogControls
+          <DeprecatedJogControls
             marginTop={SPACING.spacing3}
             jog={handleJog}
             stepSizes={[0.1, 1, 10]}
             planes={[HORIZONTAL_PLANE, VERTICAL_PLANE]}
             width="100%"
             directionControlButtonColor={COLORS.blueEnabled}
-            isLPC={true}
           />
         ) : null}
       </Flex>
