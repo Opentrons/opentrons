@@ -227,6 +227,20 @@ stages:
                 completedAt: !anystr
               - id: !anystr
                 createdAt: !anystr
+                commandType: loadLiquid
+                key: !anystr
+                status: succeeded
+                params:
+                  liquidId: "waterId"
+                  labwareId: "sourcePlateId"
+                  volumeByWell:
+                    A1: 100
+                    B1: 100
+                result: { }
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
                 commandType: home
                 key: !anystr
                 status: succeeded
@@ -501,3 +515,8 @@ stages:
                 startedAt: !anystr
                 completedAt: !anystr
             errors: []
+            liquids:
+              - id: waterId
+                displayName: Water
+                description: Liquid H2O
+                displayColor: '#7332a8'

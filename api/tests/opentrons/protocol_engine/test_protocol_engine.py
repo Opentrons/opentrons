@@ -21,6 +21,7 @@ from opentrons.protocol_engine.types import (
     LabwareUri,
     ModuleDefinition,
     ModuleModel,
+    Liquid,
 )
 from opentrons.protocol_engine.execution import (
     QueueWorker,
@@ -35,6 +36,7 @@ from opentrons.protocol_engine.actions import (
     ActionDispatcher,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
+    AddLiquidAction,
     AddModuleAction,
     PlayAction,
     PauseAction,
@@ -597,6 +599,28 @@ def test_add_labware_definition(
     result = subject.add_labware_definition(well_plate_def)
 
     assert result == "some/definition/uri"
+
+
+def test_add_liquid(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    state_store: StateStore,
+    subject: ProtocolEngine,
+) -> None:
+    """It should dispatch an AddLiquidAction action."""
+    subject.add_liquid(
+        liquid=Liquid(id="water-id", displayName="water", description="water desc"),
+    )
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            AddLiquidAction(
+                liquid=Liquid(
+                    id="water-id", displayName="water", description="water desc"
+                ),
+            )
+        )
+    )
 
 
 async def test_use_attached_temp_and_mag_modules(

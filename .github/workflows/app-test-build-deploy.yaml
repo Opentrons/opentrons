@@ -37,6 +37,10 @@ on:
       - 'scripts/**/*'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
 env:
   CI: true
   OT_APP_DEPLOY_BUCKET: opentrons-app
@@ -46,25 +50,25 @@ jobs:
   js-unit-test:
     # unit tests for js frontend projects (e.g. not app-shell or discovery-client) do not need
     # to run cross-platform
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     name: 'opentrons app frontend unit tests'
     timeout-minutes: 30
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
       - name: 'install udev'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v3.1
+        uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: 'cache yarn cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ${{ github.workspace }}/.npm-cache/_prebuild
@@ -79,7 +83,7 @@ jobs:
         run: |
           yarn jest --coverage=true --ci=true --collectCoverageFrom="app/src/**/*.(js|ts|tsx)" app/src components/src shared-data/js
       - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           files: ./coverage/lcov.info
           flags: app
@@ -89,16 +93,16 @@ jobs:
     # to run cross-platform just like builds, might as well do them in the same job
     strategy:
       matrix:
-        os: ['windows-2019', 'ubuntu-18.04', 'macos-latest']
+        os: ['windows-2019', 'ubuntu-22.04', 'macos-latest']
     name: 'opentrons app backend unit tests and build'
     needs: ['js-unit-test']
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
       - name: 'install libudev'
@@ -106,13 +110,13 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v3.1
+        uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: 'cache yarn cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ${{ github.workspace }}/.npm-cache/_prebuild
@@ -127,7 +131,7 @@ jobs:
         run: |
           yarn jest --coverage=true --ci=true --collectCoverageFrom="(app-shell|discovery-client)/src/**/*.(js|ts|tsx)" app-shell/src discovery-client/src
       - name: 'Upload coverage report'
-        uses: 'codecov/codecov-action@v2'
+        uses: 'codecov/codecov-action@v3'
         with:
           files: ./coverage/lcov.info
           flags: app
@@ -151,19 +155,19 @@ jobs:
 
       - if: github.event_name != 'pull_request'
         name: 'upload github artifact'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: 'opentrons-${{ matrix.os }}'
           path: app-shell/dist/publish
 
   deploy-app:
     name: 'Deploy built app artifacts to S3'
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     needs: ['js-unit-test', 'build-app-test-backend']
     if: github.event_name != 'pull_request'
     steps:
       - name: 'download run app builds'
-        uses: 'actions/download-artifact@v2'
+        uses: 'actions/download-artifact@v3'
         with:
           path: .
       - name: 'deploy builds to s3'

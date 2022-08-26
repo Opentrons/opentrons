@@ -38,7 +38,7 @@ export function ClearDeckModal(props: ClearDeckModalProps): JSX.Element {
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        marginBottom="13.5rem"
+        marginBottom="12.25rem"
         paddingX={SPACING.spacing6}
         paddingTop={SPACING.spacing6}
       >

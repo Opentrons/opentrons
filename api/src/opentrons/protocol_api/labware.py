@@ -16,14 +16,15 @@ from typing import Any, AnyStr, List, Dict, Optional, Union, Tuple, TYPE_CHECKIN
 
 
 from opentrons.protocols.api_support.util import requires_version
-from opentrons.protocols.context.labware import AbstractLabware
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocols import labware as labware_module
-from opentrons.protocols.context.well import WellImplementation
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck_item import DeckItem
+
+from .core.labware import AbstractLabware
+from .core.well import AbstractWellCore
 
 if TYPE_CHECKING:
     from opentrons.protocols.geometry.module_geometry import (  # noqa: F401
@@ -56,7 +57,7 @@ class Well:
 
     def __init__(
         self,
-        well_implementation: WellImplementation,
+        well_implementation: AbstractWellCore,
         api_level: Optional[APIVersion] = None,
     ):
         """
@@ -244,7 +245,9 @@ class Labware(DeckItem):
     """
 
     def __init__(
-        self, implementation: AbstractLabware, api_level: Optional[APIVersion] = None
+        self,
+        implementation: AbstractLabware[Any],
+        api_level: Optional[APIVersion] = None,
     ) -> None:
         """
         :param implementation: The class that implements the public interface
@@ -264,7 +267,7 @@ class Labware(DeckItem):
                 f"version or update your robot."
             )
         self._api_version = api_level
-        self._implementation = implementation
+        self._implementation: AbstractLabware[AbstractWellCore] = implementation
 
     @property
     def separate_calibration(self) -> bool:
@@ -683,7 +686,7 @@ class Labware(DeckItem):
         if self._is_tiprack:
             self._implementation.reset_tips()
 
-    def _well_from_impl(self, well: WellImplementation) -> Well:
+    def _well_from_impl(self, well: AbstractWellCore) -> Well:
         return Well(well_implementation=well, api_level=self._api_version)
 
 

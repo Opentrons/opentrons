@@ -2,7 +2,7 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { Icon, PrimaryBtn, ModalPage, SPACING_2 } from '@opentrons/components'
-import { getDiagramsSrc } from './InstructionStep'
+import { getDiagramsSrc } from './DeprecatedInstructionStep'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import styles from './styles.css'
 

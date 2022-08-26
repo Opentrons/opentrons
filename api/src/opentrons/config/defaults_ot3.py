@@ -61,27 +61,27 @@ DEFAULT_Z_RETRACT_DISTANCE: Final = 2
 
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     none={
-        OT3AxisKind.X: 40,
-        OT3AxisKind.Y: 40,
+        OT3AxisKind.X: 90,
+        OT3AxisKind.Y: 90,
         OT3AxisKind.Z: 20,
         OT3AxisKind.P: 100,
         OT3AxisKind.Z_G: 20,
     },
     high_throughput={
-        OT3AxisKind.X: 40,
-        OT3AxisKind.Y: 40,
+        OT3AxisKind.X: 90,
+        OT3AxisKind.Y: 90,
         OT3AxisKind.Z: 20,
         OT3AxisKind.P: 100,
     },
     low_throughput={
-        OT3AxisKind.X: 40,
-        OT3AxisKind.Y: 40,
+        OT3AxisKind.X: 90,
+        OT3AxisKind.Y: 90,
         OT3AxisKind.Z: 20,
         OT3AxisKind.P: 100,
     },
     two_low_throughput={
-        OT3AxisKind.X: 40,
-        OT3AxisKind.Y: 40,
+        OT3AxisKind.X: 90,
+        OT3AxisKind.Y: 90,
     },
     gripper={
         OT3AxisKind.Z: 100,
@@ -90,27 +90,27 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     none={
-        OT3AxisKind.X: 100,
-        OT3AxisKind.Y: 100,
+        OT3AxisKind.X: 130,
+        OT3AxisKind.Y: 130,
         OT3AxisKind.Z: 100,
         OT3AxisKind.P: 100,
         OT3AxisKind.Z_G: 100,
     },
     high_throughput={
-        OT3AxisKind.X: 100,
-        OT3AxisKind.Y: 100,
+        OT3AxisKind.X: 130,
+        OT3AxisKind.Y: 130,
         OT3AxisKind.Z: 100,
         OT3AxisKind.P: 100,
     },
     low_throughput={
-        OT3AxisKind.X: 100,
-        OT3AxisKind.Y: 100,
+        OT3AxisKind.X: 130,
+        OT3AxisKind.Y: 130,
         OT3AxisKind.Z: 100,
         OT3AxisKind.P: 100,
     },
     two_low_throughput={
-        OT3AxisKind.X: 100,
-        OT3AxisKind.Y: 100,
+        OT3AxisKind.X: 130,
+        OT3AxisKind.Y: 130,
     },
     gripper={
         OT3AxisKind.Z: 100,
@@ -121,27 +121,27 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
     ByGantryLoad[Dict[OT3AxisKind, float]]
 ] = ByGantryLoad(
     none={
-        OT3AxisKind.X: 40,
-        OT3AxisKind.Y: 40,
+        OT3AxisKind.X: 90,
+        OT3AxisKind.Y: 90,
         OT3AxisKind.Z: 40,
         OT3AxisKind.Z_G: 10,
         OT3AxisKind.P: 10,
     },
     high_throughput={
-        OT3AxisKind.X: 40,
-        OT3AxisKind.Y: 40,
+        OT3AxisKind.X: 90,
+        OT3AxisKind.Y: 90,
         OT3AxisKind.Z: 40,
         OT3AxisKind.P: 10,
     },
     low_throughput={
-        OT3AxisKind.X: 40,
-        OT3AxisKind.Y: 40,
+        OT3AxisKind.X: 90,
+        OT3AxisKind.Y: 90,
         OT3AxisKind.Z: 40,
         OT3AxisKind.P: 10,
     },
     two_low_throughput={
-        OT3AxisKind.X: 40,
-        OT3AxisKind.Y: 40,
+        OT3AxisKind.X: 90,
+        OT3AxisKind.Y: 90,
     },
     gripper={
         OT3AxisKind.Z: 40,
