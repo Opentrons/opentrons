@@ -69,12 +69,12 @@ LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
         pipette_left.pick_up_tip()
         pipette_left.aspirate(
             volume=40,
-            rate=130,
+            rate=1.0,
             location=module_plate_1["A1"],
         )
         pipette_left.dispense(
             volume=35,
-            rate=130,
+            rate=1.2,
             location=well_plate_1["B1"],
         )
         pipette_left.aspirate(
@@ -97,9 +97,11 @@ LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
         pipette_left.dispense()
         pipette_left.blow_out()
         pipette_left.move_to(Location(point=Point(100, 100, 10),labware=None))
+        pipette_left.aspirate()
         pipette_left.blow_out()
         pipette_left.aspirate(50, well_plate_1["D1"].bottom().move(point=Point(100, 10, 0)))
         pipette_left.dispense(50, well_plate_1["F1"].top().move(point=Point(10, 10, 0)))
+        pipette_left.aspirate(50, Location(point=Point(100, 100, 10), labware=None))
         pipette_left.drop_tip(
             location=tip_rack_1.wells_by_name()["A1"]
         )
@@ -135,7 +137,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
     pipette_left_result_captor = matchers.Captor()
     pipette_right_result_captor = matchers.Captor()
 
-    assert len(commands_result) == 27
+    assert len(commands_result) == 29
 
     assert commands_result[0] == commands.LoadLabware.construct(
         id=matchers.IsA(str),
@@ -317,7 +319,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
             labwareId=module_plate_1_id,
             wellName="A1",
             volume=40,
-            flowRate=130,
+            flowRate=150,
         ),
         result=commands.AspirateResult(volume=40),
     )
@@ -333,7 +335,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
             labwareId=well_plate_1_id,
             wellName="B1",
             volume=35,
-            flowRate=130,
+            flowRate=360,
         ),
         result=commands.DispenseResult(volume=35),
     )

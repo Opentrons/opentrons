@@ -348,10 +348,8 @@ class LegacyCommandMapper:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         volume = command["payload"]["volume"]
-        flow_rate = command["payload"]["rate"]
-        if isinstance(location, Location) and location.labware.is_empty is False:
-            if location.labware.is_well:
-                well = location.labware.as_well()
+        if isinstance(location, Location) and location.labware.is_well:
+            well = location.labware.as_well()
             slot = DeckSlotName(location.labware.first_parent())
             parent_module_id = self._module_id_by_slot.get(slot)
             labware_id = (
@@ -364,8 +362,7 @@ class LegacyCommandMapper:
             pipette_id = self._pipette_id_by_mount[mount]
 
             if command["name"] == legacy_command_types.ASPIRATE:
-                if flow_rate == 1.0:
-                    flow_rate = command["payload"]["rate"] * pipette.flow_rate.aspirate
+                flow_rate = command["payload"]["rate"] * pipette.flow_rate.aspirate
                 return pe_commands.Aspirate.construct(
                     id=command_id,
                     key=command_id,
@@ -381,8 +378,7 @@ class LegacyCommandMapper:
                     ),
                 )
             else:
-                if flow_rate == 1.0:
-                    flow_rate = command["payload"]["rate"] * pipette.flow_rate.dispense
+                flow_rate = command["payload"]["rate"] * pipette.flow_rate.dispense
                 return pe_commands.Dispense.construct(
                     id=command_id,
                     key=command_id,
