@@ -239,6 +239,27 @@ def test_get_wells(falcon_tuberack_def: LabwareDefinition) -> None:
     assert result == expected_wells
 
 
+def test_labware_has_well(falcon_tuberack_def: LabwareDefinition) -> None:
+    """It should return a list of wells from definition."""
+    subject = get_labware_view(
+        labware_by_id={"tube-rack-id": tube_rack},
+        definitions_by_uri={"some-tube-rack-uri": falcon_tuberack_def},
+    )
+
+    result = subject.validate_liquid_allowed_in_labware(
+        labware_id="tube-rack-id", wells={"A1": 30, "B1": 100}
+    )
+    assert result == ["A1", "B1"]
+
+    with pytest.raises(errors.WellDoesNotExistError):
+        subject.validate_liquid_allowed_in_labware(
+            labware_id="tube-rack-id", wells={"AA": 30}
+        )
+
+    with pytest.raises(errors.LabwareNotLoadedError):
+        subject.validate_liquid_allowed_in_labware(labware_id="no-id", wells={"A1": 30})
+
+
 def test_get_well_columns(falcon_tuberack_def: LabwareDefinition) -> None:
     """It should return wells as dict of list of columns."""
     subject = get_labware_view(

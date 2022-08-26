@@ -1,7 +1,7 @@
 """The interface that implements InstrumentContext."""
 
-from abc import abstractmethod
-from typing import List, Dict, Optional
+from abc import ABC, abstractmethod
+from typing import Any, Generic, Dict, List, Optional, TypeVar
 
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.labware_geometry import AbstractLabwareGeometry
@@ -10,11 +10,11 @@ from opentrons.protocols.api_support.well_grid import WellGrid
 from opentrons.types import Point
 from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
 
-from .well import WellImplementation
+from .well import WellCoreType
 
 
-class AbstractLabware(DeckItem):
-    """Abstract base class of Labware Implementations"""
+class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
+    """Labware implementation core interface."""
 
     @abstractmethod
     def get_uri(self) -> str:
@@ -81,13 +81,16 @@ class AbstractLabware(DeckItem):
         ...
 
     @abstractmethod
-    def get_wells(self) -> List[WellImplementation]:
+    def get_wells(self) -> List[WellCoreType]:
         ...
 
     @abstractmethod
-    def get_wells_by_name(self) -> Dict[str, WellImplementation]:
+    def get_wells_by_name(self) -> Dict[str, WellCoreType]:
         ...
 
     @abstractmethod
     def get_geometry(self) -> AbstractLabwareGeometry:
         ...
+
+
+LabwareCoreType = TypeVar("LabwareCoreType", bound=AbstractLabware[Any])

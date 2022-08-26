@@ -2,7 +2,7 @@ import logging
 from typing import Dict, List, Optional, Set
 from collections import OrderedDict
 
-from opentrons import types
+from opentrons.types import Mount, Location, DeckLocation
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel
 from opentrons.hardware_control.types import DoorState, PauseType
@@ -16,17 +16,18 @@ from opentrons.protocols.labware import load_from_definition, get_labware_defini
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from ..instrument import AbstractInstrument
-from ..labware import AbstractLabware
-from ..protocol import AbstractProtocol, InstrumentDict, LoadModuleResult
+from ..protocol import AbstractProtocol, LoadModuleResult
 
+from .labware import LabwareImplementation
 from .instrument_context import InstrumentContextImplementation
 
 
 logger = logging.getLogger(__name__)
 
 
-class ProtocolContextImplementation(AbstractProtocol):
+class ProtocolContextImplementation(
+    AbstractProtocol[InstrumentContextImplementation, LabwareImplementation]
+):
     def __init__(
         self,
         sync_hardware: SyncHardwareAPI,
@@ -59,14 +60,16 @@ class ProtocolContextImplementation(AbstractProtocol):
         self._sync_hardware = sync_hardware
         self._api_version = api_version or MAX_SUPPORTED_VERSION
         self._deck_layout = Deck()
-        self._instruments: InstrumentDict = {mount: None for mount in types.Mount}
+        self._instruments: Dict[Mount, Optional[InstrumentContextImplementation]] = {
+            mount: None for mount in Mount
+        }
         self._modules: List[LoadModuleResult] = []
         self._bundled_labware = bundled_labware
         self._extra_labware = extra_labware or {}
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
         self._default_max_speeds = AxisMaxSpeeds()
-        self._last_location: Optional[types.Location] = None
-        self._last_mount: Optional[types.Mount] = None
+        self._last_location: Optional[Location] = None
+        self._last_mount: Optional[Mount] = None
         self._loaded_modules: Set["AbstractModule"] = set()
 
     def get_bundled_data(self) -> Dict[str, bytes]:
@@ -76,7 +79,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         return self._bundled_data
 
     def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefinition]]:
-        """Bundled labware defintion."""
+        """Bundled labware definition."""
         # TODO AL 20201110 - This should be removed along with the bundling
         #  feature as we move to HTTP based protocol execution.
         return self._bundled_labware
@@ -100,9 +103,9 @@ class ProtocolContextImplementation(AbstractProtocol):
     def load_labware_from_definition(
         self,
         labware_def: LabwareDefinition,
-        location: types.DeckLocation,
+        location: DeckLocation,
         label: Optional[str],
-    ) -> AbstractLabware:
+    ) -> LabwareImplementation:
         """Load a labware from definition"""
         parent = self.get_deck().position_for(location)
         labware_obj = load_from_definition(labware_def, parent, label)
@@ -112,11 +115,11 @@ class ProtocolContextImplementation(AbstractProtocol):
     def load_labware(
         self,
         load_name: str,
-        location: types.DeckLocation,
+        location: DeckLocation,
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
-    ) -> AbstractLabware:
+    ) -> LabwareImplementation:
         """Load a labware."""
         labware_def = get_labware_definition(
             load_name,
@@ -130,7 +133,7 @@ class ProtocolContextImplementation(AbstractProtocol):
     def load_module(
         self,
         model: ModuleModel,
-        location: Optional[types.DeckLocation],
+        location: Optional[DeckLocation],
         configuration: Optional[str],
     ) -> Optional[LoadModuleResult]:
         """Load a module."""
@@ -183,8 +186,8 @@ class ProtocolContextImplementation(AbstractProtocol):
         )
 
     def load_instrument(
-        self, instrument_name: str, mount: types.Mount, replace: bool
-    ) -> AbstractInstrument:
+        self, instrument_name: str, mount: Mount, replace: bool
+    ) -> InstrumentContextImplementation:
         """Load an instrument."""
         instr = self._instruments[mount]
         if instr and not replace:
@@ -212,7 +215,9 @@ class ProtocolContextImplementation(AbstractProtocol):
         logger.info("Instrument {} loaded".format(new_instr))
         return new_instr
 
-    def get_loaded_instruments(self) -> InstrumentDict:
+    def get_loaded_instruments(
+        self,
+    ) -> Dict[Mount, Optional[InstrumentContextImplementation]]:
         """Get a mapping of mount to instrument."""
         return self._instruments
 
@@ -262,8 +267,8 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def get_last_location(
         self,
-        mount: Optional[types.Mount] = None,
-    ) -> Optional[types.Location]:
+        mount: Optional[Mount] = None,
+    ) -> Optional[Location]:
         """Get the most recent moved to location."""
         if mount is None or mount == self._last_mount:
             return self._last_location
@@ -272,8 +277,8 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def set_last_location(
         self,
-        location: Optional[types.Location],
-        mount: Optional[types.Mount] = None,
+        location: Optional[Location],
+        mount: Optional[Mount] = None,
     ) -> None:
         """Set the most recent moved to location."""
         self._last_location = location

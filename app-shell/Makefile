@@ -1,5 +1,7 @@
 # opentrons app desktop shell makefile
 
+include ../scripts/push.mk
+
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
@@ -20,6 +22,9 @@ noop := cd .
 dist_files := "dist/**/Opentrons-v*"
 update_files := "dist/@(alpha|beta|latest)*.@(yml|json)"
 publish_dir := dist/publish
+
+# Other SSH args for buildroot robots
+ssh_opts ?= $(default_ssh_opts)
 
 # TODO(mc, 2018-03-27): move all this to some sort of envfile
 # build id suffix to add to artifacts
@@ -112,6 +117,17 @@ dist-win: package-deps
 	$(builder) --win --x64
 	$(MAKE) _dist-collect-artifacts
 
+.PHONY: dist-ot3
+dist-ot3: package-deps
+	NO_PYTHON=true NO_USB_DETECTION=true $(builder) --linux --arm64 --dir
+	cd dist/linux-arm64-unpacked && rm libEGL.so libGLESv2.so libvulkan.so.1
+
+.PHONY: push-ot3
+push-ot3: dist-ot3  
+	ssh $(ssh_opts) root@$(host) "systemctl stop opentrons-robot-app && rm -rf /opt/opentrons-app && mkdir -p /opt/opentrons-app"
+	scp -r $(ssh_opts) ./dist/linux-arm64-unpacked/* root@$(host):/opt/opentrons-app
+	ssh $(ssh_opts) root@$(host) "systemctl start opentrons-robot-app"
+
 # Aliases matching github actions OS names for easier calling in
 # workflows
 .PHONY: dist-macos-latest
@@ -120,8 +136,8 @@ dist-macos-latest: dist-osx
 .PHONY: dist-ubuntu-latest
 dist-ubuntu-latest: dist-linux
 
-.PHONY: dist-ubuntu-18.04
-dist-ubuntu-18.04: dist-linux
+.PHONY: dist-ubuntu-22.04
+dist-ubuntu-22.04: dist-linux
 
 .PHONY: dist-windows-2019
 dist-windows-2019: dist-win

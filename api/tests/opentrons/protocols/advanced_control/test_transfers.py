@@ -1,13 +1,11 @@
 """ Test the Transfer class and its functions """
-import asyncio
 import pytest
-import opentrons.protocol_api as papi
-from opentrons.protocol_api.core.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
-)
+
 from opentrons.types import Mount, TransferTipPolicy
 from opentrons.protocols.advanced_control import transfers as tx
 from opentrons.protocols.api_support.types import APIVersion
+
+import opentrons.protocol_api as papi
 
 
 @pytest.fixture
@@ -1046,14 +1044,14 @@ def test_oversized_transfer(_instr_labware):
     assert xfer_plan_list == exp1
 
 
-async def test_multichannel_transfer_old_version(hardware):
+def test_multichannel_transfer_old_version(hardware):
     # for API version below 2.2, multichannel pipette can only
     # reach row A of 384-well plates
-    ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
-        loop=asyncio.get_running_loop(),
+    ctx = papi.create_protocol_context(
         api_version=APIVersion(2, 1),
+        hardware_api=hardware,
     )
+
     lw1 = ctx.load_labware("biorad_96_wellplate_200ul_pcr", 1)
     lw2 = ctx.load_labware("corning_384_wellplate_112ul_flat", 2)
     tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 3)
@@ -1108,15 +1106,12 @@ async def test_multichannel_transfer_old_version(hardware):
             xfer_plan_list.append(step)
 
 
-async def test_multichannel_transfer_locs(hardware):
-    api_version = APIVersion(2, 2)
-    ctx = papi.ProtocolContext(
-        implementation=ProtocolContextImplementation(
-            api_version=api_version, sync_hardware=hardware.sync
-        ),
-        loop=asyncio.get_running_loop(),
-        api_version=api_version,
+def test_multichannel_transfer_locs(hardware):
+    ctx = papi.create_protocol_context(
+        api_version=APIVersion(2, 2),
+        hardware_api=hardware,
     )
+
     lw1 = ctx.load_labware("biorad_96_wellplate_200ul_pcr", 1)
     lw2 = ctx.load_labware("corning_384_wellplate_112ul_flat", 2)
     tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 3)

@@ -156,7 +156,7 @@ async def test_baseline_poll_environment(
     )
     await can_messenger.send(node_id=NodeId.pipette_left, message=poll_sensor)
 
-    for response_idx in range(5):
+    for response_idx in range(10):
         try:
             response, arbitration_id = await asyncio.wait_for(
                 can_messenger_queue.read(), 1

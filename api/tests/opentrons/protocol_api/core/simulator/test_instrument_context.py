@@ -6,8 +6,15 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 from opentrons.hardware_control import NoTipAttachedError
 from opentrons.hardware_control.types import TipAttachedError
-from opentrons.protocol_api.core.labware import AbstractLabware
-from opentrons.protocol_api.core.instrument import AbstractInstrument
+from opentrons.protocol_api.core.labware import AbstractLabware as BaseAbstractLabware
+from opentrons.protocol_api.core.well import AbstractWellCore
+from opentrons.protocol_api.core.instrument import (
+    AbstractInstrument as BaseAbstractInstrument,
+)
+
+
+AbstractInstrument = BaseAbstractInstrument[AbstractWellCore]
+AbstractLabware = BaseAbstractLabware[AbstractWellCore]
 
 
 @pytest.fixture(
