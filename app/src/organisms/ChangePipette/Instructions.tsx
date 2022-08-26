@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+import { shouldLevel } from '@opentrons/shared-data'
 import {
   Flex,
   DIRECTION_COLUMN,
@@ -11,12 +12,14 @@ import {
   DIRECTION_ROW,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
+import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import { InstructionStep } from './InstructionStep'
 import { PipetteSelection } from './PipetteSelection'
+import { LevelPipette } from './LevelPipette'
 
 import type {
   PipetteNameSpecs,
@@ -168,11 +171,34 @@ export function Instructions(props: Props): JSX.Element {
         {stepPage === 0 ? (
           continueButton
         ) : (
-          <CheckPipettesButton robotName={robotName} onDone={confirm}>
+          <CheckPipettesButton
+            robotName={robotName}
+            onDone={
+              wantedPipette != null &&
+              actualPipette != null &&
+              shouldLevel(wantedPipette)
+                ? () => setStepPage(2)
+                : confirm
+            }
+          >
             {actualPipette ? t('confirm_detachment') : t('confirm_attachment')}
           </CheckPipettesButton>
         )}
       </Flex>
+      {stepPage === 2 && (
+        <ModalShell height="28.12rem" width="47rem">
+          <LevelPipette
+            mount={mount}
+            wantedPipette={wantedPipette}
+            pipetteModelName={actualPipette ? actualPipette.name : ''}
+            exit={exit}
+            confirm={confirm}
+            back={back}
+            currentStep={currentStep}
+            totalSteps={totalSteps}
+          />
+        </ModalShell>
+      )}
     </>
   )
 }
