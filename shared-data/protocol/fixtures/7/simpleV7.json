@@ -1494,6 +1494,14 @@
         "pipetteId": "pipetteId",
         "positionId": "positionId"
       }
+    },
+    {
+      "commandType": "moveLabware",
+      "id": "22abc123",
+      "params": {
+        "labwareId": "sourcePlateId",
+        "newLocation": { "slotName": "4" }
+      }
     }
   ],
   "commandAnnotations": [

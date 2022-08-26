@@ -456,6 +456,27 @@
           },
 
           {
+            "description": "[PROVISIONAL AND EXPERIMENTAL] Move Labware: Move a loaded labware from one place to another.",
+            "type": "object",
+            "required": ["commandType", "params"],
+            "properties": {
+              "key": { "type": "string" },
+              "commandType": { "enum": ["moveLabware"] },
+              "params": {
+                "required": ["labwareId", "newLocation"],
+                "labwareId": {
+                  "type": "string",
+                  "description": "The ID of the labware to move. Must be a key from the top-level `labware` object."
+                },
+                "newLocation": {
+                  "$ref": "#/definitions/labwareLocation",
+                  "description": "Where to move the labware."
+                }
+              }
+            }
+          },
+
+          {
             "description": "Move Relative",
             "type": "object",
             "required": ["commandType", "params"],
