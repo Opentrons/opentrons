@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   CELSIUS,
@@ -18,11 +19,14 @@ import {
   Flex,
   SPACING,
   TYPOGRAPHY,
+  POSITION_ABSOLUTE,
 } from '@opentrons/components'
+import { getIsOnDevice } from '../../redux/config'
 import { Slideout } from '../../atoms/Slideout'
 import { InputField } from '../../atoms/InputField'
 import { StyledText } from '../../atoms/text'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { Numpad } from '../../atoms/SoftwareKeyboard'
 import { useRunStatuses } from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
@@ -54,6 +58,8 @@ export const ThermocyclerModuleSlideout = (
   } = props
   const { t } = useTranslation('device_details')
   const [tempValue, setTempValue] = React.useState<number | null>(null)
+  const [showNumpad, setShowNumpad] = React.useState<boolean>(false)
+  const keyboardRef = React.useRef(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { createCommand } = useCreateCommandMutation()
   const { isRunIdle, isRunTerminal } = useRunStatuses()
@@ -61,6 +67,7 @@ export const ThermocyclerModuleSlideout = (
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
+  const isOnDevice = useSelector(getIsOnDevice)
 
   let errorMessage
   if (isSecondaryTemp) {
@@ -126,64 +133,83 @@ export const ThermocyclerModuleSlideout = (
   }
 
   return (
-    <Slideout
-      title={t('tc_set_temperature', { part: modulePart, name: moduleName })}
-      onCloseClick={handleCloseSlideout}
-      isExpanded={isExpanded}
-      footer={
-        <SubmitPrimaryButton
-          form="ThermocyclerModuleSlideout_submitValue"
-          value={t('confirm')}
-          onClick={handleSubmitTemp}
-          disabled={tempValue === null || errorMessage !== null}
-          data-testid={`ThermocyclerSlideout_btn_${module.serialNumber}`}
-        />
-      }
-    >
-      <StyledText
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-        fontSize={TYPOGRAPHY.fontSizeP}
-        paddingTop={SPACING.spacing2}
-        data-testid={`ThermocyclerSlideout_text_${module.serialNumber}`}
-      >
-        {t('tc_set_temperature_body', {
-          part: modulePart,
-          min: tempRanges.min,
-          max: tempRanges.max,
-        })}
-      </StyledText>
-      <Flex
-        marginTop={SPACING.spacing4}
-        flexDirection={DIRECTION_COLUMN}
-        data-testid={`ThermocyclerSlideout_input_field_${module.serialNumber}`}
+    <>
+      {showNumpad && isOnDevice && (
+        <Flex
+          position={POSITION_ABSOLUTE}
+          left="6%"
+          bottom="5%"
+          zIndex="10"
+          width="31.25rem"
+        >
+          <Numpad
+            onChange={e => e != null && setTempValue(Number(e))}
+            keyboardRef={keyboardRef}
+          />
+        </Flex>
+      )}
+      <Slideout
+        title={t('tc_set_temperature', { part: modulePart, name: moduleName })}
+        onCloseClick={handleCloseSlideout}
+        isExpanded={isExpanded}
+        footer={
+          <SubmitPrimaryButton
+            form="ThermocyclerModuleSlideout_submitValue"
+            value={t('confirm')}
+            onClick={handleSubmitTemp}
+            disabled={tempValue === null || errorMessage !== null}
+            data-testid={`ThermocyclerSlideout_btn_${module.serialNumber}`}
+          />
+        }
       >
         <StyledText
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          fontSize={TYPOGRAPHY.fontSizeH6}
-          color={COLORS.darkGreyEnabled}
-          paddingBottom={SPACING.spacing3}
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          fontSize={TYPOGRAPHY.fontSizeP}
+          paddingTop={SPACING.spacing2}
+          data-testid={`ThermocyclerSlideout_text_${module.serialNumber}`}
         >
-          {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}
+          {t('tc_set_temperature_body', {
+            part: modulePart,
+            min: tempRanges.min,
+            max: tempRanges.max,
+          })}
         </StyledText>
-        <form id="ThermocyclerModuleSlideout_submitValue">
-          <InputField
-            data-testid={`${module.moduleModel}_${isSecondaryTemp}`}
-            id={`${module.moduleModel}_${isSecondaryTemp}`}
-            units={CELSIUS}
-            value={tempValue != null ? Math.round(tempValue) : null}
-            autoFocus
-            onChange={e => setTempValue(e.target.valueAsNumber)}
-            type="number"
-            caption={t('module_status_range', {
-              min: tempRanges.min,
-              max: tempRanges.max,
-              unit: CELSIUS,
-            })}
-            error={errorMessage}
-          />
-        </form>
-      </Flex>
-    </Slideout>
+        <Flex
+          marginTop={SPACING.spacing4}
+          flexDirection={DIRECTION_COLUMN}
+          data-testid={`ThermocyclerSlideout_input_field_${module.serialNumber}`}
+        >
+          <StyledText
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            fontSize={TYPOGRAPHY.fontSizeH6}
+            color={COLORS.darkGreyEnabled}
+            paddingBottom={SPACING.spacing3}
+          >
+            {t(
+              isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature'
+            )}
+          </StyledText>
+          <form id="ThermocyclerModuleSlideout_submitValue">
+            <InputField
+              data-testid={`${module.moduleModel}_${isSecondaryTemp}`}
+              id={`${module.moduleModel}_${isSecondaryTemp}`}
+              units={CELSIUS}
+              value={tempValue != null ? Math.round(tempValue) : null}
+              autoFocus
+              onChange={e => setTempValue(e.target.valueAsNumber)}
+              type="number"
+              caption={t('module_status_range', {
+                min: tempRanges.min,
+                max: tempRanges.max,
+                unit: CELSIUS,
+              })}
+              error={errorMessage}
+              onFocus={() => setShowNumpad(true)}
+            />
+          </form>
+        </Flex>
+      </Slideout>
+    </>
   )
 }
 

@@ -444,6 +444,7 @@ interface ModuleSlideoutProps {
   onCloseClick: () => unknown
 }
 
+// ToDo add numpad
 const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
   const {
     module,

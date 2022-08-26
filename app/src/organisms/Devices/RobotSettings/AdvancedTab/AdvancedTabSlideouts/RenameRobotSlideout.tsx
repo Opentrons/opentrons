@@ -19,12 +19,13 @@ import {
   getUnreachableRobots,
 } from '../../../../../redux/discovery'
 import { useTrackEvent } from '../../../../../redux/analytics'
+import { getIsOnDevice } from '../../../../../redux/config'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
 import { PrimaryButton } from '../../../../../atoms/buttons'
 import { InputField } from '../../../../../atoms/InputField'
 import { Banner } from '../../../../../atoms/Banner'
-import { SoftwareKeyboard } from '../../../../../atoms/SoftwareKeyboard'
+import { DefaultKeyboard } from '../../../../../atoms/SoftwareKeyboard'
 
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../../../../redux/types'
@@ -55,6 +56,7 @@ export function RenameRobotSlideout({
     robotName
   )
   const [showKeyBoard, setShowKeyBoard] = React.useState<boolean>(false)
+  const isOnDevice = useSelector(getIsOnDevice)
   const keyboardRef = React.useRef(null)
   const trackEvent = useTrackEvent()
   const history = useHistory()
@@ -135,7 +137,7 @@ export function RenameRobotSlideout({
 
   return (
     <>
-      {showKeyBoard && (
+      {showKeyBoard && isOnDevice && (
         <Flex
           position={POSITION_ABSOLUTE}
           left="0"
@@ -143,7 +145,7 @@ export function RenameRobotSlideout({
           zIndex="10"
           width="100%"
         >
-          <SoftwareKeyboard
+          <DefaultKeyboard
             onChange={handleKeyboardInput}
             keyboardRef={keyboardRef}
           />

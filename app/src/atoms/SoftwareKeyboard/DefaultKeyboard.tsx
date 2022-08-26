@@ -1,15 +1,15 @@
 import * as React from 'react'
 import Keyboard from 'react-simple-keyboard'
 
-interface SoftwareKeyboardProps {
-  onChange: (e: React.ChangeEvent<string>) => void
+interface DefaultKeyboardProps {
+  onChange: (input: string) => void
   keyboardRef: React.MutableRefObject<any>
 }
 
-export function SoftwareKeyboard({
+export function DefaultKeyboard({
   onChange,
   keyboardRef,
-}: SoftwareKeyboardProps): JSX.Element {
+}: DefaultKeyboardProps): JSX.Element {
   const [layoutName, setLayoutName] = React.useState<string>('default')
   const onKeyPress = (button: string): void => {
     if (button === '{shift}' || button === '{lock}') {
@@ -23,6 +23,8 @@ export function SoftwareKeyboard({
       onChange={onChange}
       onKeyPress={onKeyPress}
       layoutName={layoutName}
+      autoUseTouchEvents={true}
+      useButtonTag={true} // this is for testing purpose each key renders as a button
     />
   )
 }
