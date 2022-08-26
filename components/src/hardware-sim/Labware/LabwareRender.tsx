@@ -32,7 +32,7 @@ export interface LabwareRenderProps {
   wellLabelOption?: WellLabelOption
   /** wells to highlight */
   highlightedWells?: WellGroup | null
-  /** wells to disabled */
+  /** option for none highlighted wells to be disabled */
   disabledWells?: WellGroup[]
   missingTips?: WellGroup | null
   /** color to render well labels */
