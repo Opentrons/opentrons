@@ -75,7 +75,7 @@ export function CustomLabwareOverflowMenu(
   const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    setShowOverflowMenu(!showOverflowMenu)
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
   const handleClickLabwareCreator: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()

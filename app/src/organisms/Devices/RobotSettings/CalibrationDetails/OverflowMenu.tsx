@@ -156,7 +156,7 @@ export function OverflowMenu({
         })
       }
     }
-    setShowOverflowMenu(!showOverflowMenu)
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
 
   const handleDownload = (
@@ -180,7 +180,7 @@ export function OverflowMenu({
         `opentrons-${robotName}-tip-length-calibration.json`
       )
     }
-    setShowOverflowMenu(!showOverflowMenu)
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
 
   // TODO 5/6/2021 kj: This is scoped out from 6.0
@@ -192,7 +192,7 @@ export function OverflowMenu({
   //   // params pipet_id and mount
   //   // endpoint calibration/tip_length
   //   // params tiprack_hash and pipette_id
-  //   setShowOverflowMenu(!showOverflowMenu)
+  //   setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   // }
 
   return (
