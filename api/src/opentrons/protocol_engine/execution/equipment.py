@@ -149,6 +149,18 @@ class EquipmentHandler:
             offsetId=(None if offset is None else offset.id),
         )
 
+    # TODO: What belongs here and what belongs in LabwareView?
+    # TODO: Can we deduplicate this more with the loadLabware codepath?
+    # TODO: Can LabwareLocation and LabwareOffsetLocation have better names
+    #       to emphasize their differences?
+    def get_offset_id_from_labware_location(
+        self, labware_id: str, new_labware_location: LabwareLocation
+    ) -> str:
+        definition_uri = self._state_store.labware.get_definition_uri(
+            labware_id=labware_id
+        )
+        raise NotImplementedError()
+
     async def load_pipette(
         self,
         pipette_name: PipetteName,

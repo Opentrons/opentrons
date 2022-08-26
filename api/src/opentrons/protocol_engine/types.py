@@ -338,8 +338,8 @@ class LoadedLabware(BaseModel):
     offsetId: Optional[str] = Field(
         None,
         description=(
-            "An ID referencing the offset applied to this labware placement,"
-            " decided at load time."
+            "An ID referencing the labware offset"
+            " that applies to this labware placement."
             " Null or undefined means no offset was provided for this load,"
             " so the default of (0, 0, 0) will be used."
         ),

@@ -62,12 +62,16 @@ class LoadLabwareResult(BaseModel):
         description="The full definition data for this labware.",
     )
     offsetId: Optional[str] = Field(
-        None,
+        None,  # TODO: What happens if we make this "..."?
         description=(
-            "An ID referencing the offset applied to this labware placement,"
-            " decided at load time."
-            " Null or undefined means no offset was provided for this load,"
+            "An ID referencing the labware offset that will apply"
+            " to the newly-placed labware."
+            "\n\n"
+            "Null or undefined means no offset applies,"
             " so the default of (0, 0, 0) will be used."
+            "\n\n"
+            "This offset will be in effect until the labware is moved"
+            " with a `moveLabware` command."
         ),
     )
 
