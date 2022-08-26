@@ -86,6 +86,29 @@
           "description": "X, Y, Z offset from the specified origin with respect to well"
         }
       }
+    },
+
+    "labwareLocation": {
+      "oneOf": [
+        {
+          "required": ["slotName"],
+          "properties": {
+            "slotName": {
+              "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations",
+              "type": "string"
+            }
+          }
+        },
+        {
+          "required": ["moduleId"],
+          "properties": {
+            "moduleId": {
+              "description": "Unique identifier of destination module. Must be a key from the top level 'modules' object.",
+              "type": "string"
+            }
+          }
+        }
+      ]
     }
   },
 
@@ -1071,31 +1094,12 @@
                     "description": "Unique identifier of labware to load. Must be a key from the top-level `labware` object."
                   },
                   "location": {
-                    "description": "Physical destination location to load labware into (e.g. '1' || 'someModuleId')",
-                    "oneOf": [
-                      {
-                        "required": ["slotName"],
-                        "properties": {
-                          "slotName": {
-                            "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations",
-                            "type": "string"
-                          }
-                        }
-                      },
-                      {
-                        "required": ["moduleId"],
-                        "properties": {
-                          "moduleId": {
-                            "description": "Unique identifier of destination module. Must be a key from the top level 'modules' object.",
-                            "type": "string"
-                          }
-                        }
-                      }
-                    ],
-                    "displayName": {
-                      "type": "string",
-                      "description": "Optional user-defined nickname for this labware instance within the protocol"
-                    }
+                    "$ref": "#/definitions/labwareLocation",
+                    "description": "Physical destination location to load labware into."
+                  },
+                  "displayName": {
+                    "type": "string",
+                    "description": "Optional user-defined nickname for this labware instance within the protocol"
                   }
                 }
               }
