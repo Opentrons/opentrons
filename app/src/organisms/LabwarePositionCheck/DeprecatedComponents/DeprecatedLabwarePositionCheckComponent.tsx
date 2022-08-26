@@ -8,16 +8,16 @@ import {
   Text,
   useConditionalConfirm,
 } from '@opentrons/components'
-import { Portal } from '../../App/portal'
-import { useTrackEvent } from '../../redux/analytics'
-import { useRestartRun } from '../ProtocolUpload/hooks'
-import { useLabwarePositionCheck } from './hooks'
-import { IntroScreen } from './IntroScreen'
-import { GenericStepScreen } from './GenericStepScreen'
-import { SummaryScreen } from './SummaryScreen'
-import { RobotMotionLoadingModal } from './RobotMotionLoadingModal'
-import { ConfirmPickUpTipModal } from './ConfirmPickUpTipModal'
-import { ExitPreventionModal } from './ExitPreventionModal'
+import { Portal } from '../../../App/portal'
+import { useTrackEvent } from '../../../redux/analytics'
+import { useRestartRun } from '../../ProtocolUpload/hooks'
+import { useLabwarePositionCheck } from '../hooks'
+import { DeprecatedIntroScreen } from './DeprecatedIntroScreen'
+import { DeprecatedGenericStepScreen } from './DeprecatedGenericStepScreen'
+import { DeprecatedSummaryScreen } from './DeprecatedSummaryScreen'
+import { DeprecatedRobotMotionLoadingModal } from './DeprecatedRobotMotionLoadingModal'
+import { DeprecatedConfirmPickUpTipModal } from './DeprecatedConfirmPickUpTipModal'
+import { DeprecatedExitPreventionModal } from './DeprecatedExitPreventionModal'
 import styles from './styles.css'
 
 interface LabwarePositionCheckModalProps {
@@ -138,12 +138,12 @@ export const DeprecatedLabwarePositionCheckComponent = (
           },
         }}
       >
-        <RobotMotionLoadingModal title={titleText} />
+        <DeprecatedRobotMotionLoadingModal title={titleText} />
       </ModalPage>
     )
   } else if (showConfirmation) {
     modalContent = (
-      <ExitPreventionModal
+      <DeprecatedExitPreventionModal
         onGoBack={cancelExitLPC}
         onConfirmExit={confirmExitLPC}
       />
@@ -161,7 +161,7 @@ export const DeprecatedLabwarePositionCheckComponent = (
           },
         }}
       >
-        <ConfirmPickUpTipModal
+        <DeprecatedConfirmPickUpTipModal
           confirmText={ctaText}
           onConfirm={proceed}
           onDeny={onUnsuccessfulPickUpTip}
@@ -183,7 +183,7 @@ export const DeprecatedLabwarePositionCheckComponent = (
           },
         }}
       >
-        <SummaryScreen
+        <DeprecatedSummaryScreen
           savePositionCommandData={savePositionCommandData}
           onCloseClick={props.onCloseClick}
         />
@@ -202,7 +202,7 @@ export const DeprecatedLabwarePositionCheckComponent = (
           },
         }}
       >
-        <GenericStepScreen
+        <DeprecatedGenericStepScreen
           selectedStep={currentStep}
           ctaText={ctaText}
           proceed={proceed}
@@ -226,7 +226,7 @@ export const DeprecatedLabwarePositionCheckComponent = (
           },
         }}
       >
-        <IntroScreen beginLPC={beginLPC} />
+        <DeprecatedIntroScreen beginLPC={beginLPC} />
       </ModalPage>
     )
   }

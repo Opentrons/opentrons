@@ -5,7 +5,7 @@ import { Portal } from '../../App/portal'
 import { useLogger } from '../../logger'
 import { useFeatureFlag } from '../../redux/config'
 import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
-import { DeprecatedLabwarePositionCheckComponent } from './DeprecatedLabwarePositionCheckComponent'
+import { DeprecatedLabwarePositionCheckComponent } from './DeprecatedComponents/DeprecatedLabwarePositionCheckComponent'
 
 interface LabwarePositionCheckModalProps {
   onCloseClick: () => unknown
