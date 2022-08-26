@@ -28,8 +28,8 @@ export interface ConfirmPipetteProps {
   actualPipetteOffset: PipetteOffsetCalibration | null
   displayName: string
   displayCategory: PipetteDisplayCategory | null
-  tryAgain: () => unknown
-  exit: () => unknown
+  tryAgain: () => void
+  exit: () => void
   startPipetteOffsetCalibration: () => void
   currentStep: number
   totalSteps: number

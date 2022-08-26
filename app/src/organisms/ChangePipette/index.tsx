@@ -41,7 +41,7 @@ import { DeprecatedConfirmPipette } from './DeprecatedConfirmPipette'
 import { RequestInProgressModal } from './RequestInProgressModal'
 import { DeprecatedLevelPipette } from './DeprecatedLevelPipette'
 import { ClearDeckAlertModal } from './ClearDeckModal/ClearDeckAlertModal'
-import { Mount, SPACING } from '@opentrons/components'
+import { SPACING } from '@opentrons/components'
 
 import {
   ATTACH,
@@ -53,12 +53,13 @@ import {
 } from './constants'
 
 import type { State, Dispatch } from '../../redux/types'
+import type { Mount } from '../../redux/pipettes/types'
 import type { WizardStep } from './types'
 
 interface Props {
   robotName: string
   mount: Mount
-  closeModal: () => unknown
+  closeModal: () => void
 }
 
 // TODO(mc, 2019-12-18): i18n
