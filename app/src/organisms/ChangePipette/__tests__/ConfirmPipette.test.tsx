@@ -81,7 +81,6 @@ describe('ConfirmPipette', () => {
     props = {
       robotName: 'otie',
       mount: LEFT,
-      title: 'Detach a P10 Single-Channel Pipette',
       success: true,
       attachedWrong: false,
       wantedPipette: null,
@@ -92,10 +91,12 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       startPipetteOffsetCalibration: jest.fn(),
+      currentStep: 5,
+      totalSteps: 8,
     }
 
     const { getByText, getAllByRole } = render(props)
-    getByText('Detach a P10 Single-Channel Pipette')
+    getByText('Detach Pipette from Left Mount')
     getByText('Successfully detached pipette!')
     const btns = getAllByRole('button', { name: 'Exit' })
     btns.forEach(btn => {
@@ -108,7 +109,6 @@ describe('ConfirmPipette', () => {
     props = {
       robotName: 'otie',
       mount: LEFT,
-      title: 'Detach a P10 Single-Channel Pipette',
       success: false,
       attachedWrong: false,
       wantedPipette: null,
@@ -119,10 +119,12 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       startPipetteOffsetCalibration: jest.fn(),
+      currentStep: 5,
+      totalSteps: 8,
     }
 
     const { getByText, getByRole } = render(props)
-    getByText('Detach a P10 Single-Channel Pipette')
+    getByText('Detach Pipette from Left Mount')
     getByText('Pipette still detected')
     getByText(
       'Check again to ensure that pipette is unplugged and entirely detached from the robot.'
@@ -141,7 +143,6 @@ describe('ConfirmPipette', () => {
     props = {
       robotName: 'otie',
       mount: LEFT,
-      title: 'Attach a pipette',
       success: false,
       attachedWrong: true,
       wantedPipette: MOCK_WANTED_PIPETTE,
@@ -152,10 +153,12 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       startPipetteOffsetCalibration: jest.fn(),
+      currentStep: 5,
+      totalSteps: 8,
     }
 
     const { getByText, getByRole } = render(props)
-    getByText('Attach a pipette')
+    getByText('Attach a P300 8-Channel GEN2 Pipette')
     getByText('Incorrect pipette attached')
     getByText(
       'The attached does not match the P300 8-Channel GEN2 you had originally selected.'
@@ -177,7 +180,6 @@ describe('ConfirmPipette', () => {
     props = {
       robotName: 'otie',
       mount: LEFT,
-      title: 'Attach a pipette',
       success: false,
       attachedWrong: false,
       wantedPipette: MOCK_WANTED_PIPETTE,
@@ -188,10 +190,12 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       startPipetteOffsetCalibration: jest.fn(),
+      currentStep: 5,
+      totalSteps: 8,
     }
 
     const { getByText, getByRole } = render(props)
-    getByText('Attach a pipette')
+    getByText('Attach a P300 8-Channel GEN2 Pipette')
     getByText('Unable to detect P300 8-Channel GEN2')
     getByText(
       'Make sure to press the white connector tab in as far as you can, and that you feel it connect with the pipette.'
@@ -210,7 +214,6 @@ describe('ConfirmPipette', () => {
     props = {
       robotName: 'otie',
       mount: LEFT,
-      title: 'Attach a pipette',
       success: true,
       attachedWrong: false,
       wantedPipette: MOCK_ACTUAL_PIPETTE,
@@ -221,10 +224,12 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       startPipetteOffsetCalibration: jest.fn(),
+      currentStep: 5,
+      totalSteps: 8,
     }
 
     const { getByText, getAllByRole } = render(props)
-    getByText('Attach a pipette')
+    getByText('Attach a P10 Single-Channel Pipette')
     getByText('Pipette attached!')
     getByText('P10 Single-Channel is now ready to use.')
 
@@ -239,7 +244,6 @@ describe('ConfirmPipette', () => {
     props = {
       robotName: 'otie',
       mount: LEFT,
-      title: 'Attach a pipette',
       success: true,
       attachedWrong: false,
       wantedPipette: MOCK_ACTUAL_PIPETTE,
@@ -250,10 +254,12 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       startPipetteOffsetCalibration: jest.fn(),
+      currentStep: 5,
+      totalSteps: 8,
     }
 
     const { getByText, getAllByRole, getByRole } = render(props)
-    getByText('Attach a pipette')
+    getByText('Attach a P10 Single-Channel Pipette')
     getByText('Pipette attached!')
     getByText('P10 Single-Channel is now ready to use.')
 

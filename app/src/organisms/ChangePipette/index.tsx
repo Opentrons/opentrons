@@ -327,13 +327,6 @@ export function ChangePipette(props: Props): JSX.Element | null {
         <ConfirmPipette
           {...{
             ...basePropsWithPipettes,
-            title:
-              actualPipette?.displayName != null
-                ? t('detach_pipette', {
-                    pipette: actualPipette.displayName,
-                    mount: mount[0].toUpperCase() + mount.slice(1),
-                  })
-                : t('attach_pipette'),
             success,
             attachedWrong,
             tryAgain: () => {
@@ -343,6 +336,8 @@ export function ChangePipette(props: Props): JSX.Element | null {
             exit: homePipAndExit,
             actualPipetteOffset: actualPipetteOffset,
             startPipetteOffsetCalibration: launchPOC,
+            currentStep: 5,
+            totalSteps: 8,
           }}
         />
       ) : (

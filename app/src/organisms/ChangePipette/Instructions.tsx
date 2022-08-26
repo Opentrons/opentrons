@@ -12,13 +12,13 @@ import {
   DIRECTION_ROW,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
+import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import { InstructionStep } from './InstructionStep'
 import { PipetteSelection } from './PipetteSelection'
-import { ModalShell } from '../../molecules/Modal'
 import { LevelPipette } from './LevelPipette'
 
 import type {
@@ -174,7 +174,9 @@ export function Instructions(props: Props): JSX.Element {
           <CheckPipettesButton
             robotName={robotName}
             onDone={
-              wantedPipette != null && shouldLevel(wantedPipette)
+              wantedPipette != null &&
+              actualPipette != null &&
+              shouldLevel(wantedPipette)
                 ? () => setStepPage(2)
                 : confirm
             }
@@ -192,8 +194,8 @@ export function Instructions(props: Props): JSX.Element {
             exit={exit}
             confirm={confirm}
             back={back}
-            currentStep={6}
-            totalSteps={8}
+            currentStep={currentStep}
+            totalSteps={totalSteps}
           />
         </ModalShell>
       )}

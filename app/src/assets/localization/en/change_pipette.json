@@ -27,7 +27,7 @@
   "are_you_sure_exit": "Are you sure you want to exit before {{direction}} your pipette?",
   "attaching": "attaching",
   "detaching": "detaching",
-  "attach_name_pipette": "Attach a {{pipette}} pipette",
+  "attach_name_pipette": "Attach a {{pipette}} Pipette",
   "detach": "Detach pipette",
   "pipette_attached": "Pipette attached!",
   "pipette_is_ready_to_use": "{{pipette}} is now ready to use.",
@@ -44,5 +44,6 @@
   "leave_attached": "Leave attached",
   "calibrate_pipette_offset": "Calibrate pipette offset",
   "try_again": "Try again",
-  "detatch_try_again": "Detach and try again"
+  "detatch_try_again": "Detach and try again",
+  "detatch_pipette_from_mount": "Detach Pipette from {{mount}} Mount"
 }

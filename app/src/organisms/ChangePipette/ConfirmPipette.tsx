@@ -7,6 +7,8 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { CheckPipettesButton } from './CheckPipettesButton'
+import { SimpleWizardModal } from '../../molecules/SimpleWizardModal'
+import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 
 import type {
   PipetteNameSpecs,
@@ -15,13 +17,10 @@ import type {
 } from '@opentrons/shared-data'
 import type { Mount } from '../../redux/pipettes/types'
 import type { PipetteOffsetCalibration } from '../../redux/calibration/types'
-import { SimpleWizardModal } from '../../molecules/SimpleWizardModal'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 
 export interface ConfirmPipetteProps {
   robotName: string
   mount: Mount
-  title: string
   success: boolean
   attachedWrong: boolean
   wantedPipette: PipetteNameSpecs | null
@@ -32,10 +31,20 @@ export interface ConfirmPipetteProps {
   tryAgain: () => unknown
   exit: () => unknown
   startPipetteOffsetCalibration: () => void
+  currentStep: number
+  totalSteps: number
 }
 
 export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
-  const { title, success, exit } = props
+  const {
+    wantedPipette,
+    actualPipette,
+    success,
+    exit,
+    currentStep,
+    totalSteps,
+    mount,
+  } = props
   const { t } = useTranslation('change_pipette')
 
   const getPipetteStatusDetails = (
@@ -75,6 +84,16 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
 
   const { header, subHeader } = getPipetteStatusDetails({ ...props })
 
+  let title
+
+  if ((!wantedPipette && !actualPipette) || (!wantedPipette && actualPipette)) {
+    title = t('detatch_pipette_from_mount', {
+      mount: mount[0].toUpperCase() + mount.slice(1),
+    })
+  } else {
+    title = t('attach_name_pipette', { pipette: wantedPipette?.displayName })
+  }
+
   return (
     <SimpleWizardModal
       iconColor={success ? COLORS.successEnabled : COLORS.errorEnabled}
@@ -83,8 +102,8 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
       isSuccess={success}
       onExit={exit}
       title={title}
-      currentStep={5}
-      totalSteps={8}
+      currentStep={currentStep}
+      totalSteps={totalSteps}
     >
       <>
         {!success && <TryAgainButton {...props} />}
@@ -156,7 +175,9 @@ function SuccessAndExitButtons(props: ConfirmPipetteProps): JSX.Element {
           {t('calibrate_pipette_offset')}
         </SecondaryButton>
       )}
-      <PrimaryButton onClick={exit}>{t('shared:exit')}</PrimaryButton>
+      <PrimaryButton textTransform={TEXT_TRANSFORM_CAPITALIZE} onClick={exit}>
+        {t('shared:exit')}
+      </PrimaryButton>
     </>
   )
 }
