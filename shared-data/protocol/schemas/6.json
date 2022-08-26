@@ -1068,7 +1068,7 @@
                 "properties": {
                   "labwareId": {
                     "type": "string",
-                    "description": "Unique identifier of labware to load"
+                    "description": "Unique identifier of labware to load. Must be a key from the top-level `labware` object."
                   },
                   "location": {
                     "description": "Physical destination location to load labware into (e.g. '1' || 'someModuleId')",
@@ -1087,15 +1087,6 @@
                         "properties": {
                           "moduleId": {
                             "description": "Unique identifier of destination module. Must be a key from the top level 'modules' object.",
-                            "type": "string"
-                          }
-                        }
-                      },
-                      {
-                        "required": ["labwareId"],
-                        "properties": {
-                          "labwareId": {
-                            "description": "Unique identifier of destination labware. Must be a key from the top level 'labware' object.",
                             "type": "string"
                           }
                         }
