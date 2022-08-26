@@ -139,9 +139,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 well_name=command.params.wellName,
             )
 
-        # These commands leave the pipette in a place that we can't associate
-        # with a logical well location. Clear current_well to reflect the fact
-        # that it's now unknown.
+        # These commands leave the pipette in a place that we can't logically associate
+        # with a well. Clear current_well to reflect the fact that it's now unknown.
         #
         # TODO(mc, 2021-11-12): Wipe out current_well on movement failures, too.
         elif isinstance(
@@ -170,6 +169,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         # A moveLabware command may have moved the labware that contains the current
         # well out from under the pipette. Clear the current well to reflect the
         # fact that the pipette is no longer over any labware.
+        #
+        # This is necessary for safe motion planning when the next movement is to the
+        # same labware (now in a new place).
         elif isinstance(command.result, MoveLabwareResult):
             moved_labware_id = command.params.labwareId
             if (
