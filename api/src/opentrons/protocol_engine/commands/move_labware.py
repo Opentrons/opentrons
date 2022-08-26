@@ -18,14 +18,8 @@ MoveLabwareCommandType = Literal["moveLabware"]
 class MoveLabwareParams(BaseModel):
     """Input parameters for a ``moveLabware`` command."""
 
-    labwareId: str = Field(
-        ...,
-        description="The ID of the labware to move."
-    )
-    newLocation: LabwareLocation = Field(
-        ...,
-        description="Where to move the labware."
-    )
+    labwareId: str = Field(..., description="The ID of the labware to move.")
+    newLocation: LabwareLocation = Field(..., description="Where to move the labware.")
 
 
 class MoveLabwareResult(BaseModel):
@@ -42,7 +36,7 @@ class MoveLabwareResult(BaseModel):
             "\n\n"
             "This offset will be in effect until the labware is moved"
             " with another `moveLabware` command."
-        )
+        ),
     )
 
 
