@@ -1,12 +1,9 @@
 import * as React from 'react'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { SpinnerModalPage, useConditionalConfirm } from '@opentrons/components'
+import { useConditionalConfirm } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-import {
-  ConfirmExitModal,
-} from '../../organisms/DeprecatedCalibrationPanels'
 import {
   Introduction,
   DeckSetup,
@@ -16,6 +13,8 @@ import {
   SaveXYPoint,
   MeasureNozzle,
   MeasureTip,
+  LoadingState,
+  ConfirmExitModal,
 } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -33,10 +32,7 @@ import type {
 import type { CalibrationPanelProps } from '../../organisms/DeprecatedCalibrationPanels/types'
 import type { CalibrationCheckParentProps } from './types'
 
-import styles from './styles.css'
-
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Calibration health check'
-const EXIT = 'exit'
 
 const PANEL_BY_STEP: {
   [step in RobotCalibrationCheckStep]?: React.ComponentType<CalibrationPanelProps>
@@ -115,24 +111,10 @@ export function CheckCalibration(
     return null
   }
 
-  const titleBarProps = {
-    title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
-    back: {
-      onClick: confirmExit,
-      title: EXIT,
-      children: EXIT,
-      ...(currentStep === Sessions.CHECK_STEP_RESULTS_SUMMARY
-        ? { className: styles.suppress_exit_button }
-        : {}),
-    },
-  }
-
-  if (showSpinner) {
-    return <SpinnerModalPage titleBar={titleBarProps} />
-  }
-
-  const Panel = currentStep in PANEL_BY_STEP ? PANEL_BY_STEP[currentStep] : null
-  if (Panel == null) return null
+  const Panel =
+    currentStep != null && currentStep in PANEL_BY_STEP
+      ? PANEL_BY_STEP[currentStep]
+      : null
   return (
     <Portal level="top">
       <ModalShell
@@ -146,28 +128,31 @@ export function CheckCalibration(
           />
         }
       >
-        <Panel
-          sendCommands={sendCommands}
-          cleanUpAndExit={cleanUpAndExit}
-          tipRack={activeTipRack}
-          calBlock={calBlock}
-          isMulti={isMulti}
-          mount={activePipette?.mount.toLowerCase() as Mount}
-          currentStep={currentStep}
-          sessionType={session.sessionType}
-          checkBothPipettes={checkBothPipettes}
-          instruments={instruments}
-          comparisonsByPipette={comparisonsByPipette}
-          activePipette={activePipette}
-        />
+        {showSpinner || currentStep == null || Panel == null ? (
+          <LoadingState />
+        ) : showConfirmExit ? (
+          <ConfirmExitModal
+            exit={confirmExit}
+            back={cancelExit}
+            sessionType={session.sessionType}
+          />
+        ) : (
+          <Panel
+            sendCommands={sendCommands}
+            cleanUpAndExit={cleanUpAndExit}
+            tipRack={activeTipRack}
+            calBlock={calBlock}
+            isMulti={isMulti}
+            mount={activePipette?.mount.toLowerCase() as Mount}
+            currentStep={currentStep}
+            sessionType={session.sessionType}
+            checkBothPipettes={checkBothPipettes}
+            instruments={instruments}
+            comparisonsByPipette={comparisonsByPipette}
+            activePipette={activePipette}
+          />
+        )}
       </ModalShell>
-      {showConfirmExit && (
-        <ConfirmExitModal
-          exit={confirmExit}
-          back={cancelExit}
-          sessionType={session.sessionType}
-        />
-      )}
     </Portal>
   )
 }

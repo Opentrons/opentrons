@@ -1,13 +1,13 @@
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { SpinnerModalPage, useConditionalConfirm } from '@opentrons/components'
+import { useConditionalConfirm } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
 import {
   CompleteConfirmation,
-  ConfirmExitModal,
   INTENT_TIP_LENGTH_IN_PROTOCOL,
 } from '../../organisms/DeprecatedCalibrationPanels'
 import {
@@ -17,6 +17,8 @@ import {
   TipConfirmation,
   MeasureNozzle,
   MeasureTip,
+  ConfirmExit,
+  LoadingState,
 } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -34,9 +36,6 @@ import type { CalibrateTipLengthParentProps } from './types'
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
 export { ConfirmRecalibrationModal } from './ConfirmRecalibrationModal'
 
-const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Tip length calibration'
-const EXIT = 'exit'
-
 const PANEL_BY_STEP: Partial<
   Record<CalibrationSessionStep, React.ComponentType<CalibrationPanelProps>>
 > = {
@@ -52,26 +51,27 @@ const PANEL_BY_STEP: Partial<
 export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): JSX.Element | null {
+  const { t } = useTranslation('robot_calibration')
   const { session, robotName, showSpinner, dispatchRequests, isJogging } = props
-  const { currentStep, instrument, labware } = session?.details || {}
+  const { currentStep, instrument, labware } = session?.details ?? {}
 
   const isMulti = React.useMemo(() => {
-    const spec = instrument && getPipetteModelSpecs(instrument.model)
-    return spec ? spec.channels > 1 : false
+    const spec =
+      instrument != null ? getPipetteModelSpecs(instrument.model) : null
+    return spec != null ? spec.channels > 1 : false
   }, [instrument])
 
   const tipRack: CalibrationLabware | null =
-    (labware && labware.find(l => l.isTiprack)) ?? null
-  const calBlock: CalibrationLabware | null = labware
-    ? labware.find(l => !l.isTiprack) ?? null
-    : null
+    labware != null ? labware.find(l => l.isTiprack) ?? null : null
+  const calBlock: CalibrationLabware | null =
+    labware != null ? labware.find(l => !l.isTiprack) ?? null : null
 
   function sendCommands(...commands: SessionCommandParams[]): void {
-    if (session?.id && !isJogging) {
+    if (session?.id != null && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
           command: c.command,
-          data: c.data || {},
+          data: c.data ?? {},
         })
       )
       dispatchRequests(...sessionCommandActions)
@@ -79,7 +79,7 @@ export function CalibrateTipLength(
   }
 
   function cleanUpAndExit(): void {
-    if (session?.id) {
+    if (session?.id != null) {
       dispatchRequests(
         Sessions.createSessionCommand(robotName, session.id, {
           command: Sessions.sharedCalCommands.EXIT,
@@ -98,50 +98,54 @@ export function CalibrateTipLength(
     cleanUpAndExit()
   }, true)
 
-  if (!session || !tipRack) {
+  if (session == null || tipRack == null) {
     return null
   }
 
-  const titleBarProps = {
-    title: TIP_LENGTH_CALIBRATION_SUBTITLE,
-    back: { onClick: confirmExit, title: EXIT, children: EXIT },
-  }
-
-  if (showSpinner) {
-    return <SpinnerModalPage titleBar={titleBarProps} />
-  }
-  // @ts-expect-error(sa, 2021-05-26): cannot index undefined, leaving to avoid src code change
-  const Panel = PANEL_BY_STEP[currentStep]
-  if (Panel == null) return null
+  const Panel =
+    currentStep != null && currentStep in PANEL_BY_STEP
+      ? PANEL_BY_STEP[currentStep]
+      : null
   return (
     <Portal level="top">
       <ModalShell
         width="47rem"
         header={
           <WizardHeader
-            title={TIP_LENGTH_CALIBRATION_SUBTITLE}
+            title={t('tip_length_calibration')}
             currentStep={1}
             totalSteps={5}
             onExit={confirmExit}
           />
         }
       >
-        <Panel
-          sendCommands={sendCommands}
-          cleanUpAndExit={cleanUpAndExit}
-          isMulti={isMulti}
-          mount={instrument?.mount.toLowerCase() as Mount}
-          tipRack={tipRack}
-          calBlock={calBlock}
-          currentStep={currentStep}
-          sessionType={session.sessionType}
-          intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
-        />
+        {showSpinner || currentStep == null || Panel == null ? (
+          <LoadingState />
+        ) : showConfirmExit ? (
+          <ConfirmExit
+            exit={confirmExit}
+            back={cancelExit}
+            heading={t('progress_will_be_lost', {
+              sessionType: t('tip_length_calibration'),
+            })}
+            body={t('confirm_exit_before_completion', {
+              sessionType: t('tip_length_calibration'),
+            })}
+          />
+        ) : (
+          <Panel
+            sendCommands={sendCommands}
+            cleanUpAndExit={cleanUpAndExit}
+            isMulti={isMulti}
+            mount={instrument?.mount.toLowerCase() as Mount}
+            tipRack={tipRack}
+            calBlock={calBlock}
+            currentStep={currentStep}
+            sessionType={session.sessionType}
+            intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
+          />
+        )}
       </ModalShell>
-      {showConfirmExit && (
-        // @ts-expect-error TODO: ConfirmExitModal expects sessionType
-        <ConfirmExitModal exit={confirmExit} back={cancelExit} />
-      )}
     </Portal>
   )
 }
