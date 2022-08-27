@@ -1,10 +1,11 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, Sequence
-from opentrons.protocols.context.well import WellImplementation
+
+from opentrons.protocol_api.core.well import AbstractWellCore
 
 
-Wells = Sequence[WellImplementation]
+Wells = Sequence[AbstractWellCore]
 HeaderToWells = Dict[str, Wells]
 WellsByDimension = Sequence[Wells]
 
@@ -21,7 +22,7 @@ class WellGrid:
     def __init__(self, wells: Wells):
         """
         Construct well grid from a collection of well objects ordered as they
-         appear in ordering` field of Labware Defnition
+         appear in ordering` field of Labware Definition
         """
         self._grid = self._create_row_column(wells)
         self._row_headers = sorted(self._grid.rows.keys())

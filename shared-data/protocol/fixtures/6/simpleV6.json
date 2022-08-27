@@ -1391,18 +1391,6 @@
       }
     },
     {
-      "commandType": "moveToSlot",
-      "id": "14abc123",
-      "params": {
-        "pipetteId": "pipetteId",
-        "slotName": "5",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": { "x": 1, "y": 2, "z": 3 }
-        }
-      }
-    },
-    {
       "commandType": "moveToWell",
       "id": "15abc123",
       "params": {

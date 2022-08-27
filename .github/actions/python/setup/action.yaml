@@ -7,6 +7,7 @@ inputs:
   python-version:
     description: "What Python version to use to create the project's virtual environment"
     required: false
+    default: "false"
 runs:
   using: 'composite'
   steps:
@@ -16,9 +17,16 @@ runs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libsystemd-dev
         fi
+    - name: Set the OT_PYTHON env variable
+      shell: bash
+      run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
+    - name: If provided set the OT_VIRTUALENV_VERSION env variable
+      shell : bash
+      if: ${{ inputs.python-version != 'false' }}
+      run: echo "OT_VIRTUALENV_VERSION=${{ inputs.python-version }}" >> $GITHUB_ENV
     - shell: bash
       run: |
         npm install --global shx@0.3.3
-        pip install pipenv==2021.5.29
+        $OT_PYTHON -m pip install pipenv==2021.5.29
     - shell: bash
-      run: 'make -C ${{ inputs.project }} setup OT_VIRTUALENV_VERSION=${{ inputs.python-version }}'
+      run: 'make -C ${{ inputs.project }} setup'

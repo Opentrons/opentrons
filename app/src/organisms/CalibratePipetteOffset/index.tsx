@@ -4,12 +4,14 @@ import * as React from 'react'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   ModalPage,
+  Box,
   SpinnerModalPage,
   useConditionalConfirm,
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
+  SPACING,
   SPACING_3,
   C_TRANSPARENT,
   ALIGN_FLEX_START,
@@ -17,6 +19,7 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
+import { useFeatureFlag } from '../../redux/config'
 import {
   Introduction,
   DeckSetup,
@@ -29,6 +32,9 @@ import {
   MeasureNozzle,
   MeasureTip,
 } from '../../organisms/CalibrationPanels'
+import { ModalShell } from '../../molecules/Modal'
+import { WizardHeader } from '../../molecules/WizardHeader'
+import { Portal } from '../../App/portal'
 
 import type { StyleProps, Mount } from '@opentrons/components'
 import type {
@@ -108,6 +114,8 @@ export function CalibratePipetteOffset(
   const { currentStep, instrument, labware, supportedCommands } =
     session?.details || {}
 
+  const enableCalibrationWizards = useFeatureFlag('enableCalibrationWizards')
+
   const {
     showConfirmation: showConfirmExit,
     confirm: confirmExit,
@@ -168,7 +176,51 @@ export function CalibratePipetteOffset(
 
   // @ts-expect-error TODO protect against currentStep === undefined
   const Panel = PANEL_BY_STEP[currentStep]
-  return Panel ? (
+  if (Panel == null) return null
+  return enableCalibrationWizards ? (
+    <Portal level="top">
+      <ModalShell
+        width="47rem"
+        header={
+          <WizardHeader
+            title={
+              shouldPerformTipLength
+                ? TIP_LENGTH_CALIBRATION_SUBTITLE
+                : PIPETTE_OFFSET_CALIBRATION_SUBTITLE
+            }
+            currentStep={1}
+            totalSteps={5}
+            onExit={confirmExit}
+          />
+        }
+      >
+        <Box padding={SPACING.spacing6}>
+          <Panel
+            sendCommands={sendCommands}
+            cleanUpAndExit={cleanUpAndExit}
+            tipRack={tipRack}
+            isMulti={isMulti}
+            mount={instrument?.mount.toLowerCase() as Mount}
+            calBlock={calBlock}
+            currentStep={currentStep}
+            sessionType={session.sessionType}
+            shouldPerformTipLength={shouldPerformTipLength}
+            intent={intent}
+            robotName={robotName}
+            supportedCommands={supportedCommands}
+            defaultTipracks={instrument?.defaultTipracks}
+          />
+        </Box>
+      </ModalShell>
+      {showConfirmExit && (
+        <ConfirmExitModal
+          exit={confirmExit}
+          back={cancelExit}
+          sessionType={session.sessionType}
+        />
+      )}
+    </Portal>
+  ) : (
     <>
       <ModalPage
         titleBar={titleBarProps}
@@ -200,5 +252,5 @@ export function CalibratePipetteOffset(
         />
       )}
     </>
-  ) : null
+  )
 }

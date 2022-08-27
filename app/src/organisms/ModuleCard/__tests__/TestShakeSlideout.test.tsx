@@ -147,6 +147,7 @@ describe('TestShakeSlideout', () => {
     })
     mockGetIsHeaterShakerAttached.mockReturnValue(true)
     mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: false,
       isRunIdle: false,
@@ -272,6 +273,7 @@ describe('TestShakeSlideout', () => {
   })
   it('entering an input for shake speed and clicking start should begin shaking when there is a runId and run is idle', async () => {
     mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: false,
       isRunIdle: true,
@@ -317,6 +319,7 @@ describe('TestShakeSlideout', () => {
   //  next test is sending module commands when run is terminal and through module controls
   it('entering an input for shake speed and clicking start should begin shaking when there is a runId and run is terminal', async () => {
     mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,
@@ -360,6 +363,7 @@ describe('TestShakeSlideout', () => {
   //  next test is sending module commands when run is terminal and through device details module cards
   it('entering an input for shake speed and clicking start should begin shaking when there is a runId, through device details, and run is terminal', async () => {
     mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,

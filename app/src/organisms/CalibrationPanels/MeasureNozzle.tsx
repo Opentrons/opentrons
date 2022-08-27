@@ -23,7 +23,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { JogControls, VERTICAL_PLANE } from '../../molecules/JogControls'
+import { DeprecatedJogControls } from '../../molecules/DeprecatedJogControls'
+import { VERTICAL_PLANE } from '../../molecules/JogControls'
 import * as Sessions from '../../redux/sessions'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
@@ -194,7 +195,7 @@ export function MeasureNozzle(props: CalibrationPanelProps): JSX.Element {
             </Box>
           </Flex>
         </Box>
-        <JogControls
+        <DeprecatedJogControls
           jog={jog}
           stepSizes={[0.1, 1]}
           planes={[VERTICAL_PLANE]}

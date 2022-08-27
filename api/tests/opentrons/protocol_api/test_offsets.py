@@ -16,7 +16,7 @@ from opentrons.calibration_storage import (
     types as cs_types,
 )
 from opentrons.protocol_api import labware
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
+from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.protocols.labware.definition import _get_labware_path
 from opentrons.types import Point, Location
 from opentrons.util.helpers import utc_now

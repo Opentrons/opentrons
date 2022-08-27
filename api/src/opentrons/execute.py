@@ -16,9 +16,7 @@ from opentrons import protocol_api, __version__
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution import execute as execute_apiv2
-from opentrons.protocols.context.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
-)
+
 from opentrons.commands import types as command_types
 from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import ApiDeprecationError
@@ -105,18 +103,15 @@ def get_protocol_api(
     ):
         extra_labware = labware_from_paths([str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
 
-    context_imp = ProtocolContextImplementation(
-        sync_hardware=_THREAD_MANAGED_HW.sync,
+    context = protocol_api.create_protocol_context(
+        api_version=checked_version,
+        hardware_api=_THREAD_MANAGED_HW,
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
         extra_labware=extra_labware,
-        api_version=checked_version,
     )
 
-    context = protocol_api.ProtocolContext(
-        implementation=context_imp, api_version=checked_version
-    )
-    context_imp.get_hardware().cache_instruments()
+    _THREAD_MANAGED_HW.sync.cache_instruments()
     return context
 
 
@@ -211,7 +206,7 @@ def execute(
     Run the protocol itself.
 
     This is a one-stop function to run a protocol, whether python or json,
-    no matter the api verson, from external (i.e. not bound up in other
+    no matter the api version, from external (i.e. not bound up in other
     internal server infrastructure) sources.
 
     To run an opentrons protocol from other places, pass in a file like
