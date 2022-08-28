@@ -19,7 +19,7 @@ import {
   getUnreachableRobots,
 } from '../../../../../redux/discovery'
 import { useTrackEvent } from '../../../../../redux/analytics'
-import { getIsOnDevice } from '../../../../../redux/config'
+// import { getIsOnDevice } from '../../../../../redux/config'
 import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
 import { PrimaryButton } from '../../../../../atoms/buttons'
@@ -56,7 +56,7 @@ export function RenameRobotSlideout({
     robotName
   )
   const [showKeyBoard, setShowKeyBoard] = React.useState<boolean>(false)
-  const isOnDevice = useSelector(getIsOnDevice)
+  // const isOnDevice = useSelector(getIsOnDevice) // kj 08/26/2022 currently OT-3 returns false
   const keyboardRef = React.useRef(null)
   const trackEvent = useTrackEvent()
   const history = useHistory()
@@ -137,8 +137,8 @@ export function RenameRobotSlideout({
 
   return (
     <>
-      {showKeyBoard && isOnDevice && (
-        <Flex
+      {showKeyBoard && (
+        /* isOnDevice && currently OT-3 returns false */ <Flex
           position={POSITION_ABSOLUTE}
           left="0"
           bottom="15%"

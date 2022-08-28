@@ -11,9 +11,9 @@ export function Numpad({ onChange, keyboardRef }: NumpadProps): JSX.Element {
     layout: {
       default: ['7 8 9', '4 5 6', '1 2 3', '0 . {backspace}'],
     },
-    display: {
-      '{backspace}': '⌫',
-    },
+    // display: {
+    //   '{backspace}': 'backspace',
+    // },
   }
   // kj 08/25/2022 keep this useState for the future design request
   // onKeypress is also the same
