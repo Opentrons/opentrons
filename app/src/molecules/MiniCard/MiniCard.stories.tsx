@@ -9,6 +9,7 @@ import {
 } from '@opentrons/components'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { MiniCard } from './'
+import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
 
 import type { Story, Meta } from '@storybook/react'
@@ -19,7 +20,11 @@ export default {
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof MiniCard>> = args => (
-  <MiniCard {...args} />
+  <Slideout title="MiniCard" onCloseClick={() => {}} isExpanded={true}>
+    <MiniCard {...args} />
+    <MiniCard {...args} isSelected={false} />
+    <MiniCard {...args} isSelected={false} />
+  </Slideout>
 )
 
 const Children = (
