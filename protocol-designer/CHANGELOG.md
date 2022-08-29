@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.2...v6.1.0-beta.0) (2022-08-29)
+
+
+### Bug Fixes
+
+* **protocol-designer:** truncate labware type name ([#11364](https://github.com/Opentrons/opentrons/issues/11364)) ([e8211c4](https://github.com/Opentrons/opentrons/commit/e8211c4183d3c7021938dc2bc08ca16c6eee45a7))
+
+
+
+## [6.0.1-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.1...v6.0.1-alpha.1) (2022-08-08)
+
+
+
+## [6.0.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.0.1-alpha.0) (2022-08-02)
+
+
+
+
+
 # [6.1.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.2...v6.1.0-alpha.3) (2022-08-19)
 
 
