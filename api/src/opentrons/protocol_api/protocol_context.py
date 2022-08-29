@@ -581,10 +581,11 @@ class ProtocolContext(CommandPublisher):
                 f" {existing_instrument.name}"
             )
 
-        logger.info(f"Loading {instrument_name} on {checked_mount.name.lower()} mount")
+        checked_instrument_name = validation.ensure_pipette_name(instrument_name)
+        logger.info(f"Loading {checked_instrument_name} on {checked_mount.name.lower()} mount")
 
         instrument_core = self._implementation.load_instrument(
-            instrument_name=instrument_name,
+            instrument_name=checked_instrument_name,
             mount=checked_mount,
         )
 
@@ -602,7 +603,7 @@ class ProtocolContext(CommandPublisher):
         # TODO(mc, 2022-08-25): move equipment broker to legacy core
         self.equipment_broker.publish(
             InstrumentLoadInfo(
-                instrument_load_name=instrument_name,
+                instrument_load_name=checked_instrument_name,
                 mount=checked_mount,
             )
         )

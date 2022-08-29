@@ -40,8 +40,8 @@ def test_replacing_instrument_tip_state(
     # The solution is to reuse InstrumentContextSimulation instances when the user is
     # replacing the same pipette at the same mount.
     subject.home()
-    pip1 = subject.load_instrument("p300_single_gen2", types.Mount.RIGHT)
-    pip2 = subject.load_instrument("p300_single_gen2", types.Mount.RIGHT)
+    pip1 = subject.load_instrument(types.PipetteName.P300_SINGLE_GEN2, types.Mount.RIGHT)
+    pip2 = subject.load_instrument(types.PipetteName.P300_SINGLE_GEN2, types.Mount.RIGHT)
 
     pip1.pick_up_tip(
         well=labware.get_wells()[0],

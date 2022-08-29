@@ -2,7 +2,7 @@ import logging
 from typing import Dict, List, Optional, Set
 from collections import OrderedDict
 
-from opentrons.types import Mount, Location, DeckLocation
+from opentrons.types import Mount, Location, DeckLocation, PipetteName
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel
 from opentrons.hardware_control.types import DoorState, PauseType
@@ -186,7 +186,7 @@ class ProtocolContextImplementation(
         )
 
     def load_instrument(
-        self, instrument_name: str, mount: Mount
+        self, instrument_name: PipetteName, mount: Mount
     ) -> InstrumentContextImplementation:
         """Load an instrument."""
         attached = {
@@ -194,14 +194,14 @@ class ProtocolContextImplementation(
             for att_mount, instr in self._sync_hardware.attached_instruments.items()
             if instr
         }
-        attached[mount] = instrument_name
+        attached[mount] = instrument_name.value
         self._sync_hardware.cache_instruments(attached)
         # If the cache call didn’t raise, the instrument is attached
         new_instr = InstrumentContextImplementation(
             api_version=self._api_version,
             protocol_interface=self,
             mount=mount,
-            instrument_name=instrument_name,
+            instrument_name=instrument_name.value,
             default_speed=400.0,
         )
         self._instruments[mount] = new_instr
