@@ -31,10 +31,9 @@ export function useDeckCalibrationData(
   )
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
 
-  const isDeckCalibrated = !(
+  const isDeckCalibrated =
     deckCalibrationStatus != null &&
-    deckCalibrationStatus !== DECK_CAL_STATUS_OK
-  )
+    deckCalibrationStatus === DECK_CAL_STATUS_OK
 
   React.useEffect(() => {
     if (robotName != null) {
