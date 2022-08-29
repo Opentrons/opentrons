@@ -12,6 +12,7 @@ export type DevInternalFlag =
   | 'enableChangePipetteWizard'
   | 'enableLiquidSetup'
   | 'enableCalibrationWizards'
+  | 'enableManualDeckStateModification'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 
