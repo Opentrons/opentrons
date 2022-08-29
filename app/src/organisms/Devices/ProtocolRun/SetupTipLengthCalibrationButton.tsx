@@ -288,24 +288,13 @@ export function SetupTipLengthCalibrationButton({
             }}
           />
         ) : null}
-        {isExtendedPipOffset ? (
-          <CalibratePipetteOffset
-            session={extendedPipetteCalibrationSession}
-            robotName={robotName}
-            showSpinner={showSpinner}
-            dispatchRequests={dispatchRequests}
-            isJogging={isJogging}
-            intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
-          />
-        ) : (
-          <CalibrateTipLength
-            session={tipLengthCalibrationSession}
-            robotName={robotName}
-            showSpinner={showSpinner}
-            dispatchRequests={dispatchRequests}
-            isJogging={isJogging}
-          />
-        )}
+        <CalibrateTipLength
+          session={tipLengthCalibrationSession}
+          robotName={robotName}
+          showSpinner={showSpinner}
+          dispatchRequests={dispatchRequests}
+          isJogging={isJogging}
+        />
       </Portal>
     </>
   )

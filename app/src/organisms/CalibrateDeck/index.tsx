@@ -16,7 +16,6 @@ import {
   ConfirmExit,
   LoadingState,
   CompleteConfirmation,
-  INTENT_DECK_CALIBRATION,
 } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -136,7 +135,6 @@ export function CalibrateDeck(
             mount={instrument?.mount.toLowerCase() as Mount}
             currentStep={currentStep}
             sessionType={session.sessionType}
-            intent={INTENT_DECK_CALIBRATION}
             supportedCommands={supportedCommands}
             defaultTipracks={instrument?.defaultTipracks}
           />

@@ -57,7 +57,6 @@ export function CalibratePipetteOffset(
     dispatchRequests,
     showSpinner,
     isJogging,
-    intent,
   } = props
   const { currentStep, instrument, labware, supportedCommands } =
     session?.details ?? {}
@@ -149,7 +148,6 @@ export function CalibratePipetteOffset(
             calBlock={calBlock}
             currentStep={currentStep}
             sessionType={session.sessionType}
-            intent={intent}
             robotName={robotName}
             supportedCommands={supportedCommands}
             defaultTipracks={instrument?.defaultTipracks}

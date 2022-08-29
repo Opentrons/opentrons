@@ -17,7 +17,6 @@ import {
   ConfirmExit,
   LoadingState,
   CompleteConfirmation,
-  INTENT_TIP_LENGTH_IN_PROTOCOL
 } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -144,7 +143,6 @@ export function CalibrateTipLength(
             calBlock={calBlock}
             currentStep={currentStep}
             sessionType={session.sessionType}
-            intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
           />
         )}
       </ModalShell>

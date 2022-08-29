@@ -38,18 +38,10 @@ const moveCommandBySessionType: {
     Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT,
 }
 export function TipConfirmation(props: CalibrationPanelProps): JSX.Element {
-  const { sendCommands, sessionType, shouldPerformTipLength } = props
+  const { sendCommands, sessionType } = props
   const { t } = useTranslation(['robot_calibration', 'shared'])
 
-  const isExtendedPipOffset =
-    sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
-    shouldPerformTipLength
-
-  const lookupType = isExtendedPipOffset
-    ? Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
-    : sessionType
-
-  const moveCommandString = moveCommandBySessionType[lookupType]
+  const moveCommandString = moveCommandBySessionType[sessionType]
 
   const invalidateTip = (): void => {
     sendCommands({ command: Sessions.sharedCalCommands.INVALIDATE_TIP })

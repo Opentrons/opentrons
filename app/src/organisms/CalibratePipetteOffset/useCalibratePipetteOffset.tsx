@@ -179,10 +179,7 @@ export function useCalibratePipetteOffset(
       {startingSession ? (
         <SpinnerModalPage
           titleBar={{
-            title:
-              intent === INTENT_CALIBRATE_PIPETTE_OFFSET
-                ? PIPETTE_OFFSET_TITLE
-                : TIP_LENGTH_TITLE,
+            title: PIPETTE_OFFSET_TITLE,
             back: {
               disabled: true,
               title: EXIT,
@@ -197,7 +194,6 @@ export function useCalibratePipetteOffset(
           showSpinner={startingSession || showSpinner}
           dispatchRequests={dispatchRequests}
           isJogging={isJogging}
-          intent={intent}
         />
       )}
     </Portal>

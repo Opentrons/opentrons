@@ -9,7 +9,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   DIRECTION_COLUMN,
   SPACING,
-  Mount
+  Mount,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
@@ -80,7 +80,6 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
     calBlock,
     isMulti,
     mount,
-    shouldPerformTipLength,
     sessionType,
   } = props
 
@@ -101,9 +100,6 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
     })
   }
 
-  const isExtendedPipOffset =
-    sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
-    shouldPerformTipLength
   const isHealthCheck =
     sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
 
@@ -113,8 +109,6 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
           { command: Sessions.checkCommands.COMPARE_POINT },
           { command: Sessions.sharedCalCommands.MOVE_TO_DECK }
         )
-      : isExtendedPipOffset
-      ? sendCommands({ command: Sessions.sharedCalCommands.SAVE_OFFSET })
       : sendCommands(
           { command: Sessions.sharedCalCommands.SAVE_OFFSET },
           { command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK }

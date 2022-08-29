@@ -7,10 +7,9 @@ import type { SessionType } from '../../../redux/sessions/types'
 
 interface BodyProps {
   sessionType: SessionType
-  isExtendedPipOffset?: boolean | null
 }
 export function Body(props: BodyProps): JSX.Element | null {
-  const { sessionType, isExtendedPipOffset } = props
+  const { sessionType } = props
   const { t } = useTranslation('robot_calibration')
   switch (sessionType) {
     case Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK:
@@ -24,16 +23,7 @@ export function Body(props: BodyProps): JSX.Element | null {
     case Sessions.SESSION_TYPE_DECK_CALIBRATION:
       return <StyledText as="p">{t('deck_calibration_intro_body')}</StyledText>
     case Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION:
-      return isExtendedPipOffset === true ? (
-        <>
-          <StyledText as="p">
-            {t('tip_length_calibration_intro_body')}
-          </StyledText>
-          <StyledText as="p">
-            {t('pipette_offset_calibration_intro_body')}
-          </StyledText>
-        </>
-      ) : (
+      return (
         <StyledText as="p">
           {t('pipette_offset_calibration_intro_body')}
         </StyledText>
@@ -50,4 +40,3 @@ export function Body(props: BodyProps): JSX.Element | null {
       return null
   }
 }
-

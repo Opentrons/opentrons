@@ -15,13 +15,9 @@ import { StyledText } from '../../../atoms/text'
 import { NeedHelpLink } from '../NeedHelpLink'
 import { ChooseTipRack } from '../ChooseTipRack'
 
-import {
-  INTENT_TIP_LENGTH_IN_PROTOCOL,
-  TRASH_BIN_LOAD_NAME,
-} from '../constants'
+import { TRASH_BIN_LOAD_NAME } from '../constants'
 import { WizardRequiredLabwareList } from '../../../molecules/WizardRequiredLabwareList'
 import { Body } from './Body'
-import { InvalidationWarning } from './InvalidationWarning'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { CalibrationPanelProps } from '../types'
@@ -34,8 +30,6 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
     calBlock,
     sendCommands,
     sessionType,
-    shouldPerformTipLength,
-    intent,
     instruments,
     supportedCommands,
   } = props
@@ -50,9 +44,6 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
   const handleChosenTipRack = (value: LabwareDefinition2 | null): void => {
     value != null && setChosenTipRack(value)
   }
-  const isExtendedPipOffset: boolean | null | undefined =
-    sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
-    shouldPerformTipLength
   const uniqueTipRacks = new Set(
     instruments?.map(instr => instr.tipRackLoadName)
   )
@@ -88,8 +79,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
     ]
   } else if (
     sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK ||
-    sessionType === Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION ||
-    isExtendedPipOffset === true
+    sessionType === Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
   ) {
     equipmentList = [
       ...equipmentList,
@@ -133,16 +123,17 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       minHeight="25rem"
     >
       <Flex gridGap={SPACING.spacing3}>
-        <Flex flex="1" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
-          <StyledText as="h1" marginBottom={SPACING.spacing4}>{t('before_you_begin')}</StyledText>
-          {sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
-          isExtendedPipOffset === true ? (
-            <InvalidationWarning intent={intent} />
-          ) : null}
-          <Body
-            sessionType={sessionType}
-            isExtendedPipOffset={isExtendedPipOffset}
-          />
+        <Flex
+          flex="1"
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing3}
+        >
+          <StyledText as="h1" marginBottom={SPACING.spacing4}>
+            {t('before_you_begin')}
+          </StyledText>
+
+          {/* TODO(bc, 2022-08-29): update InvalidationWarning logic once calibration dashboard is in place {false ? <InvalidationWarning /> : null} */}
+          <Body sessionType={sessionType} />
         </Flex>
         <Flex flex="1">
           <WizardRequiredLabwareList
@@ -163,13 +154,8 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       >
         <NeedHelpLink />
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
-          {sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION ||
-          (sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
-            isExtendedPipOffset === true &&
-            intent !== INTENT_TIP_LENGTH_IN_PROTOCOL) ? (
-            <SecondaryButton
-              onClick={() => setShowChooseTipRack(true)}
-            >
+          {sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION ? (
+            <SecondaryButton onClick={() => setShowChooseTipRack(true)}>
               {t('change_tip_rack')}
             </SecondaryButton>
           ) : null}
