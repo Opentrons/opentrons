@@ -223,7 +223,7 @@ class SerialConnection:
             response = await self._serial.read_until(match=self._ack)
             log.debug(f"{self.name}: Read <- {response!r}")
 
-            while (self._error_keyword.encode() in response.lower() and self._gcode_ack.encode() not in response.lower()):
+            while self._gcode_ack.encode() not in response.lower():
                 #check for multiple a priori async errors
                 response = await self._serial.read_until(match=self._ack)
                 log.debug(f"{self.name}: Read <- {response!r}")
