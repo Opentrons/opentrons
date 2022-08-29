@@ -8,6 +8,7 @@
   "calibrate_z_axis_on_trash": "Calibrate z-axis on trash bin",
   "calibrate_tip_on_block": "Calibrate tip on block",
   "calibrate_tip_on_trash": "Calibrate tip on trash bin",
+  "calibration_block_description": "<block>This block is a specially made tool that fits perfectly on your deck and helps with calibration. If you do not have a Calibration Block, please <supportLink>contact us</supportLink> so we can send you one.</block><block>While you wait for the block to arrive,  you can use the flat surface on the trash bin of your robot instead.</block>",
   "calibration_health_check": "Calibration Health Check",
   "calibration_health_check_intro_body": "<block>Calibration Health Check diagnoses problems with Deck, Tip Length, and Pipette Offset Calibration.</block><block>You will move the pipettes to various positions, which will be compared against your existing calibration data.</block><block>If there is a large difference, you will be prompted to redo some or all of your calibrations.</block>",
   "change_tip_rack": "Change tip rack",
@@ -29,6 +30,7 @@
   "definition": "Your OT-2 moves pipettes around in 3D space based on its calibration. <a>Learn more</a> about how calibration works on the OT-2.",
   "did_pipette_pick_up_tip": "Did pipette pick up tip successfully?",
   "download_calibration": "Download your calibration data",
+  "do_you_have_a_cal_block": "Do you have a Calibration Block?",
   "get_started": "Get started",
   "health_check_button": "check health",
   "health_check_description": "Check the health of the current calibration settings.",
@@ -68,10 +70,13 @@
   "this_is_the_tip_used_in_pipette_offset_cal": "Please note: You must use the same tips you used in Pipette Offset Calibration, which are listed above.",
   "to_check": "To check the {{mount}} pipette:",
   "unknown_custom_tiprack": "unknown custom tip rack",
+  "use_trash_bin": "Use trash bin",
+  "use_calibration_block": "Use Calibration Block",
   "jump_size": "jump size",
   "direction_controls": "direction controls",
   "tiny": "Tiny",
   "small": "Small",
   "large": "Large",
-  "you_will_need": "You will need:"
+  "you_will_need": "You will need:",
+  "you_can_remove_cal_block": "You can remove the Calibration Block from the deck now."
 }

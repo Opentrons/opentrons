@@ -6,7 +6,6 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { useConditionalConfirm } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-import { CompleteConfirmation } from '../../organisms/DeprecatedCalibrationPanels'
 import {
   Introduction,
   DeckSetup,
@@ -18,6 +17,7 @@ import {
   MeasureTip,
   ConfirmExit,
   LoadingState,
+  CompleteConfirmation,
 } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -30,10 +30,7 @@ import type {
   SessionCommandParams,
 } from '../../redux/sessions/types'
 import type { CalibratePipetteOffsetParentProps } from './types'
-import type { CalibrationPanelProps } from '../../organisms/DeprecatedCalibrationPanels/types'
-
-const PIPETTE_OFFSET_CALIBRATION_SUBTITLE = 'Pipette offset calibration'
-const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Tip length calibration'
+import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 
 const PANEL_BY_STEP: Partial<
   Record<CalibrationSessionStep, React.ComponentType<CalibrationPanelProps>>
@@ -46,8 +43,8 @@ const PANEL_BY_STEP: Partial<
   [Sessions.PIP_OFFSET_STEP_INSPECTING_TIP]: TipConfirmation,
   [Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK]: SaveZPoint,
   [Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE]: SaveXYPoint,
-  [Sessions.PIP_OFFSET_STEP_TIP_LENGTH_COMPLETE]: CompleteConfirmation,
-  [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
+  [Sessions.PIP_OFFSET_STEP_TIP_LENGTH_COMPLETE]: PipetteOffsetCalibrationComplete,
+  [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: PipetteOffsetCalibrationComplete,
 }
 
 export function CalibratePipetteOffset(
@@ -111,7 +108,6 @@ export function CalibratePipetteOffset(
   if (session == null || tipRack == null) {
     return null
   }
-  const shouldPerformTipLength = session.details.shouldPerformTipLength
 
   const Panel =
     currentStep != null && currentStep in PANEL_BY_STEP
@@ -123,11 +119,7 @@ export function CalibratePipetteOffset(
         width="47rem"
         header={
           <WizardHeader
-            title={
-              shouldPerformTipLength
-                ? t('tip_length_calibration')
-                : t('pipette_offset_calibration')
-            }
+            title={t('pipette_offset_calibration')}
             currentStep={1}
             totalSteps={5}
             onExit={confirmExit}
@@ -157,7 +149,6 @@ export function CalibratePipetteOffset(
             calBlock={calBlock}
             currentStep={currentStep}
             sessionType={session.sessionType}
-            shouldPerformTipLength={shouldPerformTipLength}
             intent={intent}
             robotName={robotName}
             supportedCommands={supportedCommands}
@@ -166,5 +157,21 @@ export function CalibratePipetteOffset(
         )}
       </ModalShell>
     </Portal>
+  )
+}
+
+function PipetteOffsetCalibrationComplete(
+  props: CalibrationPanelProps
+): JSX.Element {
+  const { t } = useTranslation('robot_calibration')
+  const { cleanUpAndExit } = props
+
+  return (
+    <CompleteConfirmation
+      {...{
+        proceed: cleanUpAndExit,
+        flowName: t('pipette_offset_calibration'),
+      }}
+    />
   )
 }

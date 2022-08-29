@@ -14,10 +14,10 @@ import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
 
 interface WizardHeaderProps {
-  totalSteps: number
-  currentStep: number | null
   title: string
   onExit?: () => void
+  totalSteps?: number
+  currentStep?: number | null
 }
 
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
@@ -35,7 +35,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           <StyledText css={TYPOGRAPHY.pSemiBold} marginRight={SPACING.spacing3}>
             {title}
           </StyledText>
-          {currentStep != null && currentStep > 0 ? (
+          {currentStep != null && totalSteps != null && currentStep > 0 ? (
             <StyledText
               css={TYPOGRAPHY.pSemiBold}
               color={COLORS.darkGreyEnabled}
@@ -56,7 +56,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           </Btn>
         ) : null}
       </Flex>
-      <StepMeter totalSteps={totalSteps} currentStep={currentStep} />
+      <StepMeter totalSteps={totalSteps ?? 0} currentStep={currentStep ?? 0} />
     </Box>
   )
 }

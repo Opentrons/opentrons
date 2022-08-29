@@ -133,7 +133,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       minHeight="25rem"
     >
       <Flex gridGap={SPACING.spacing3}>
-        <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
+        <Flex flex="1" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
           <StyledText as="h1" marginBottom={SPACING.spacing4}>{t('before_you_begin')}</StyledText>
           {sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
           isExtendedPipOffset === true ? (
@@ -162,14 +162,13 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
         alignItems={ALIGN_CENTER}
       >
         <NeedHelpLink />
-        <Flex alignItems={ALIGN_CENTER}>
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
           {sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION ||
           (sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION &&
             isExtendedPipOffset === true &&
             intent !== INTENT_TIP_LENGTH_IN_PROTOCOL) ? (
             <SecondaryButton
               onClick={() => setShowChooseTipRack(true)}
-              marginRight={SPACING.spacing4}
             >
               {t('change_tip_rack')}
             </SecondaryButton>

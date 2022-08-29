@@ -8,19 +8,21 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  COLORS
+  COLORS,
+  JUSTIFY_SPACE_AROUND,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
 
-
 interface WizardRequiredLabwareListProps {
   equipmentList: Array<React.ComponentProps<typeof RequiredLabwareCard>>
   footer: string
 }
-export function WizardRequiredLabwareList(props: WizardRequiredLabwareListProps): JSX.Element {
+export function WizardRequiredLabwareList(
+  props: WizardRequiredLabwareListProps
+): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   const { equipmentList, footer } = props
 
@@ -29,9 +31,16 @@ export function WizardRequiredLabwareList(props: WizardRequiredLabwareListProps)
       <StyledText as="h3">{t('you_will_need')}</StyledText>
       <Divider />
       {equipmentList.map(requiredLabwareProps => (
-        <RequiredLabwareCard key={requiredLabwareProps.loadName} {...requiredLabwareProps} />
+        <RequiredLabwareCard
+          key={requiredLabwareProps.loadName}
+          {...requiredLabwareProps}
+        />
       ))}
-      <StyledText marginTop={SPACING.spacing3} as="label" color={COLORS.darkGreyEnabled}>
+      <StyledText
+        marginTop={SPACING.spacing3}
+        as="label"
+        color={COLORS.darkGreyEnabled}
+      >
         {footer}
       </StyledText>
     </Flex>
@@ -41,10 +50,11 @@ export function WizardRequiredLabwareList(props: WizardRequiredLabwareListProps)
 interface RequiredLabwareCardProps {
   loadName: string
   displayName: string
+  subtitle?: string
 }
 
 function RequiredLabwareCard(props: RequiredLabwareCardProps): JSX.Element {
-  const { loadName, displayName } = props
+  const { loadName, displayName, subtitle } = props
   const imageSrc =
     loadName in labwareImages
       ? labwareImages[loadName as keyof typeof labwareImages]
@@ -74,9 +84,18 @@ function RequiredLabwareCard(props: RequiredLabwareCardProps): JSX.Element {
             src={imageSrc}
           />
         </Flex>
-        <StyledText flex="0 1 70%" as="p">
-          {displayName}
-        </StyledText>
+        <Flex
+          flex="0 1 70%"
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_SPACE_AROUND}
+        >
+          <StyledText as="p">{displayName}</StyledText>
+          {subtitle != null ? (
+            <StyledText as="p" color={COLORS.darkGreyEnabled}>
+              {subtitle}
+            </StyledText>
+          ) : null}
+        </Flex>
       </Flex>
       <Divider />
     </>

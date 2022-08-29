@@ -1,15 +1,12 @@
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { useConditionalConfirm } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-import {
-  CompleteConfirmation,
-  INTENT_TIP_LENGTH_IN_PROTOCOL,
-} from '../../organisms/DeprecatedCalibrationPanels'
 import {
   Introduction,
   DeckSetup,
@@ -19,10 +16,15 @@ import {
   MeasureTip,
   ConfirmExit,
   LoadingState,
+  CompleteConfirmation,
+  INTENT_TIP_LENGTH_IN_PROTOCOL
 } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
+
+import slotOneRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
+import slotThreeRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
 
 import type { Mount } from '@opentrons/components'
 import type {
@@ -30,7 +32,7 @@ import type {
   CalibrationLabware,
   CalibrationSessionStep,
 } from '../../redux/sessions/types'
-import type { CalibrationPanelProps } from '../../organisms/DeprecatedCalibrationPanels/types'
+import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { CalibrateTipLengthParentProps } from './types'
 
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
@@ -45,7 +47,7 @@ const PANEL_BY_STEP: Partial<
   preparingPipette: TipPickUp,
   inspectingTip: TipConfirmation,
   measuringTipOffset: MeasureTip,
-  calibrationComplete: CompleteConfirmation,
+  calibrationComplete: TipLengthCalibrationComplete,
 }
 
 export function CalibrateTipLength(
@@ -147,5 +149,46 @@ export function CalibrateTipLength(
         )}
       </ModalShell>
     </Portal>
+  )
+}
+
+const blockRemovalAssetBySlot: {
+  [slot in CalibrationLabware['slot']]: string
+} = {
+  '1': slotOneRemoveBlockAsset,
+  '3': slotThreeRemoveBlockAsset,
+}
+
+function TipLengthCalibrationComplete(
+  props: CalibrationPanelProps
+): JSX.Element {
+  const { t } = useTranslation('robot_calibration')
+  const { calBlock, cleanUpAndExit } = props
+
+  const visualAid =
+    calBlock != null ? (
+      <video
+        key={blockRemovalAssetBySlot[calBlock.slot]}
+        css={css`
+          max-width: 100%;
+          max-height: 15rem;
+        `}
+        autoPlay={true}
+        loop={true}
+        controls={false}
+      >
+        <source src={blockRemovalAssetBySlot[calBlock.slot]} />
+      </video>
+    ) : null
+
+  return (
+    <CompleteConfirmation
+      {...{
+        proceed: cleanUpAndExit,
+        flowName: t('tip_length_calibration'),
+        body: t('you_can_remove_cal_block'),
+        visualAid,
+      }}
+    />
   )
 }

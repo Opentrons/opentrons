@@ -11,7 +11,7 @@ import {
 import uniq from 'lodash/uniq'
 
 import * as Sessions from '../../redux/sessions'
-import type { CalibrationPanelProps } from '../../organisms/DeprecatedCalibrationPanels/types'
+import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { SessionCommandString } from '../../redux/sessions/types'
 
 const CONFIRM_RETURN_BODY = 'Return tip and '

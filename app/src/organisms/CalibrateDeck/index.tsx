@@ -7,10 +7,6 @@ import { useConditionalConfirm } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
 import {
-  CompleteConfirmation,
-  INTENT_DECK_CALIBRATION,
-} from '../../organisms/DeprecatedCalibrationPanels'
-import {
   Introduction,
   DeckSetup,
   TipPickUp,
@@ -19,6 +15,8 @@ import {
   SaveXYPoint,
   ConfirmExit,
   LoadingState,
+  CompleteConfirmation,
+  INTENT_DECK_CALIBRATION,
 } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -30,7 +28,7 @@ import type {
   CalibrationSessionStep,
   SessionCommandParams,
 } from '../../redux/sessions/types'
-import type { CalibrationPanelProps } from '../../organisms/DeprecatedCalibrationPanels/types'
+import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { CalibrateDeckParentProps } from './types'
 
 const PANEL_BY_STEP: Partial<
@@ -44,7 +42,7 @@ const PANEL_BY_STEP: Partial<
   [Sessions.DECK_STEP_SAVING_POINT_ONE]: SaveXYPoint,
   [Sessions.DECK_STEP_SAVING_POINT_TWO]: SaveXYPoint,
   [Sessions.DECK_STEP_SAVING_POINT_THREE]: SaveXYPoint,
-  [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
+  [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: DeckCalibrationComplete,
 }
 
 export function CalibrateDeck(
@@ -145,5 +143,19 @@ export function CalibrateDeck(
         )}
       </ModalShell>
     </Portal>
+  )
+}
+
+function DeckCalibrationComplete(props: CalibrationPanelProps): JSX.Element {
+  const { t } = useTranslation('robot_calibration')
+  const { cleanUpAndExit } = props
+
+  return (
+    <CompleteConfirmation
+      {...{
+        proceed: cleanUpAndExit,
+        flowName: t('deck_calibration'),
+      }}
+    />
   )
 }

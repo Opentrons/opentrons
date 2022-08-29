@@ -2,6 +2,7 @@ import * as React from 'react'
 import {
   Icon,
   Flex,
+  COLORS,
   SIZE_4,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
@@ -23,7 +24,7 @@ export function LoadingState(props: LoadingStateProps): JSX.Element {
       alignItems={ALIGN_CENTER}
       minHeight="32rem"
     >
-      <Icon name="ot-spinner" spin size={SIZE_4} />
+      <Icon name="ot-spinner" spin size={SIZE_4} color={COLORS.darkGreyEnabled} />
       {header != null ? <StyledText as="h1">{header}</StyledText> : null}
       {body != null ? <StyledText as="p">{body}</StyledText> : null}
     </Flex>

@@ -39,7 +39,7 @@ import { PIPETTE_MOUNTS, LEFT, RIGHT } from '../../redux/pipettes'
 import { saveAs } from 'file-saver'
 
 import type { Mount } from '../../redux/pipettes/types'
-import type { CalibrationPanelProps } from '../../organisms/DeprecatedCalibrationPanels/types'
+import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import {
   CHECK_STATUS_OUTSIDE_THRESHOLD,
   CHECK_STATUS_IN_THRESHOLD,

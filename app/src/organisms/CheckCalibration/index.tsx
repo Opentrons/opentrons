@@ -29,7 +29,7 @@ import type {
   SessionCommandParams,
 } from '../../redux/sessions/types'
 
-import type { CalibrationPanelProps } from '../../organisms/DeprecatedCalibrationPanels/types'
+import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { CalibrationCheckParentProps } from './types'
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Calibration health check'

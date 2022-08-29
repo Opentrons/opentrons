@@ -247,11 +247,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
           </video>
         </Box>
       </Flex>
-      <JogControls
-        jog={jog}
-        stepSizes={[0.1, 1]}
-        initialPlane={VERTICAL_PLANE}
-      />
+      <JogControls jog={jog} stepSizes={[0.1, 1]} />
       <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing2}>
         {confirmLink}
       </Box>
