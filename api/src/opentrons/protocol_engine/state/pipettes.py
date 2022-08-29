@@ -170,8 +170,8 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         # well out from under the pipette. Clear the current well to reflect the
         # fact that the pipette is no longer over any labware.
         #
-        # This is necessary for safe motion planning when the next movement is to the
-        # same labware (now in a new place).
+        # This is necessary for safe motion planning in case the next movement
+        # goes to the same labware (now in a new place).
         elif isinstance(command.result, MoveLabwareResult):
             moved_labware_id = command.params.labwareId
             if (
