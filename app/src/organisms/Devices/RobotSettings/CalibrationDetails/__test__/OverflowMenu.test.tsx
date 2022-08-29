@@ -10,7 +10,6 @@ import { useCalibratePipetteOffset } from '../../../../CalibratePipetteOffset/us
 import { useDeckCalibrationData, useIsRobotBusy } from '../../../hooks'
 
 import { OverflowMenu } from '../OverflowMenu'
-import { PipetteMount } from '@opentrons/shared-data'
 
 const render = (
   props: React.ComponentProps<typeof OverflowMenu>
