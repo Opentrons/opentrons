@@ -451,9 +451,7 @@ def test_move_labware_clears_current_well_if_belonged_to_moved_labware(
     subject.handle_action(UpdateCommandAction(command=load_pipette_command))
     subject.handle_action(UpdateCommandAction(command=move_to_well_command))
 
-    subject.handle_action(
-        UpdateCommandAction(command=move_labware_command)
-    )
+    subject.handle_action(UpdateCommandAction(command=move_labware_command))
     assert subject.state.current_well == expected_current_well
 
 
