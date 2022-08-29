@@ -151,7 +151,7 @@ CONFIG_ELEMENTS = (
         "API V2 Calibration Offsets Directory",
         Path("labware") / "v2" / "offsets",
         ConfigElementType.DIR,
-        ("A location where labware offsets were stored." " No longer used as of v5."),
+        "A location where labware offsets were stored. No longer used as of v5.",
     ),
     ConfigElement(
         "labware_user_definitions_dir_v2",
