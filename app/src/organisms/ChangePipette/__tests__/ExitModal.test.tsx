@@ -55,7 +55,7 @@ describe('CExitModal', () => {
       displayName: 'P10 Single-Channel GEN1',
     }
     const { getByText } = render(props)
-    getByText('Attach a P10 Single-Channel GEN1 pipette')
+    getByText('Attach a P10 Single-Channel GEN1 Pipette')
   })
 
   it('renders the correct wizardHeader text for detach when pipette is attached', () => {

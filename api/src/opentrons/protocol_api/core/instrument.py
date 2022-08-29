@@ -3,16 +3,16 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-import typing
+from typing import Any, Generic, Optional, TypeVar
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import Clearances, PlungerSpeeds, FlowRates
 
-from .well import WellImplementation
+from .well import WellCoreType
 
 
-class AbstractInstrument(ABC):
+class AbstractInstrument(ABC, Generic[WellCoreType]):
     @abstractmethod
     def get_default_speed(self) -> float:
         ...
@@ -35,17 +35,17 @@ class AbstractInstrument(ABC):
 
     @abstractmethod
     def touch_tip(
-        self, location: WellImplementation, radius: float, v_offset: float, speed: float
+        self, location: WellCoreType, radius: float, v_offset: float, speed: float
     ) -> None:
         ...
 
     @abstractmethod
     def pick_up_tip(
         self,
-        well: WellImplementation,
+        well: WellCoreType,
         tip_length: float,
-        presses: typing.Optional[int],
-        increment: typing.Optional[float],
+        presses: Optional[int],
+        increment: Optional[float],
         prep_after: bool,
     ) -> None:
         ...
@@ -67,8 +67,8 @@ class AbstractInstrument(ABC):
         self,
         location: types.Location,
         force_direct: bool,
-        minimum_z_height: typing.Optional[float],
-        speed: typing.Optional[float],
+        minimum_z_height: Optional[float],
+        speed: Optional[float],
     ) -> None:
         ...
 
@@ -143,17 +143,20 @@ class AbstractInstrument(ABC):
     @abstractmethod
     def set_flow_rate(
         self,
-        aspirate: typing.Optional[float] = None,
-        dispense: typing.Optional[float] = None,
-        blow_out: typing.Optional[float] = None,
+        aspirate: Optional[float] = None,
+        dispense: Optional[float] = None,
+        blow_out: Optional[float] = None,
     ) -> None:
         ...
 
     @abstractmethod
     def set_pipette_speed(
         self,
-        aspirate: typing.Optional[float] = None,
-        dispense: typing.Optional[float] = None,
-        blow_out: typing.Optional[float] = None,
+        aspirate: Optional[float] = None,
+        dispense: Optional[float] = None,
+        blow_out: Optional[float] = None,
     ) -> None:
         ...
+
+
+InstrumentCoreType = TypeVar("InstrumentCoreType", bound=AbstractInstrument[Any])

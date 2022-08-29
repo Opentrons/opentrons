@@ -37,10 +37,11 @@ import { ClearDeckModal } from './ClearDeckModal/index'
 import { ExitAlertModal } from './ExitAlertModal'
 import { DeprecatedInstructions } from './DeprecatedInstructions'
 import { ConfirmPipette } from './ConfirmPipette'
+import { DeprecatedConfirmPipette } from './DeprecatedConfirmPipette'
 import { RequestInProgressModal } from './RequestInProgressModal'
-import { LevelPipette } from './LevelPipette'
 import { DeprecatedLevelPipette } from './DeprecatedLevelPipette'
 import { ClearDeckAlertModal } from './ClearDeckModal/ClearDeckAlertModal'
+import { SPACING } from '@opentrons/components'
 
 import {
   ATTACH,
@@ -51,14 +52,14 @@ import {
   CALIBRATE_PIPETTE,
 } from './constants'
 
-import { Mount, SPACING } from '@opentrons/components'
 import type { State, Dispatch } from '../../redux/types'
+import type { Mount } from '../../redux/pipettes/types'
 import type { WizardStep } from './types'
 
 interface Props {
   robotName: string
   mount: Mount
-  closeModal: () => unknown
+  closeModal: () => void
 }
 
 // TODO(mc, 2019-12-18): i18n
@@ -304,21 +305,13 @@ export function ChangePipette(props: Props): JSX.Element | null {
       dispatchApiRequests(home(robotName, ROBOT))
       startPipetteOffsetWizard()
     }
-
-    if (success && wantedPipette && shouldLevel(wantedPipette)) {
-      return enableChangePipetteWizard ? (
-        <ModalShell height="28.12rem" width="47rem">
-          <LevelPipette
-            {...basePropsWithPipettes}
-            pipetteModelName={actualPipette ? actualPipette.name : ''}
-            exit={() => setConfirmExit(true)}
-            confirm={homePipAndExit}
-            back={() => setWizardStep(CLEAR_DECK)}
-            currentStep={6}
-            totalSteps={8}
-          />
-        </ModalShell>
-      ) : (
+    if (
+      !enableChangePipetteWizard &&
+      success &&
+      wantedPipette &&
+      shouldLevel(wantedPipette)
+    ) {
+      return (
         <DeprecatedLevelPipette
           {...{
             pipetteModelName: actualPipette ? actualPipette.name : '',
@@ -331,8 +324,25 @@ export function ChangePipette(props: Props): JSX.Element | null {
         />
       )
     } else {
-      return (
+      return enableChangePipetteWizard ? (
         <ConfirmPipette
+          {...{
+            ...basePropsWithPipettes,
+            success,
+            attachedWrong,
+            tryAgain: () => {
+              setWantedName(null)
+              setWizardStep(INSTRUCTIONS)
+            },
+            exit: homePipAndExit,
+            actualPipetteOffset: actualPipetteOffset,
+            startPipetteOffsetCalibration: launchPOC,
+            currentStep: 5,
+            totalSteps: 8,
+          }}
+        />
+      ) : (
+        <DeprecatedConfirmPipette
           {...{
             ...basePropsWithPipettes,
             success,

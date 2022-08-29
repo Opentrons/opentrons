@@ -1,9 +1,11 @@
 import logging
+from typing import Dict, Optional
 
-from opentrons import types
+from opentrons.types import Mount
 
-from ..instrument import AbstractInstrument
+from ..protocol import AbstractProtocol
 from ..protocol_api.protocol_context import ProtocolContextImplementation
+from ..protocol_api.labware import LabwareImplementation
 
 from .instrument_context import InstrumentContextSimulation
 
@@ -11,10 +13,15 @@ from .instrument_context import InstrumentContextSimulation
 logger = logging.getLogger(__name__)
 
 
-class ProtocolContextSimulation(ProtocolContextImplementation):
-    def load_instrument(
-        self, instrument_name: str, mount: types.Mount, replace: bool
-    ) -> AbstractInstrument:
+class ProtocolContextSimulation(
+    ProtocolContextImplementation,
+    AbstractProtocol[InstrumentContextSimulation, LabwareImplementation],
+):
+    _instruments: Dict[Mount, Optional[InstrumentContextSimulation]]  # type: ignore[assignment]
+
+    def load_instrument(  # type: ignore[override]
+        self, instrument_name: str, mount: Mount, replace: bool
+    ) -> InstrumentContextSimulation:
         """Create a simulating instrument context."""
         instr = self._instruments[mount]
         if instr:

@@ -1,12 +1,17 @@
 @import '../..';
 
 .highlighted_well {
-  stroke: var(--c-highlight);
-  fill: color-mod(var(--c-highlight) alpha(20%));
+  stroke: var(--c-blue-enabled);
+  fill: color-mod(var(--c-blue-enabled) alpha(20%));
+}
+
+.disabled_well {
+  stroke: var(--c-light-grey-hover);
+  fill: color-mod(var(--c-lightest-gray) alpha(80%));
 }
 
 .selected_well {
-  stroke: var(--c-highlight);
+  stroke: var(--c-blue-enabled);
   fill: transparent;
 }
 

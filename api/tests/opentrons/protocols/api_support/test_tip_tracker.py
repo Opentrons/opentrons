@@ -2,7 +2,7 @@ from typing import List
 
 import pytest
 from opentrons.protocols.api_support.tip_tracker import TipTracker
-from opentrons.protocol_api.core.well import WellImplementation
+from opentrons.protocol_api.core.protocol_api.well import WellImplementation
 from opentrons.protocols.api_support.well_grid import WellGrid
 
 

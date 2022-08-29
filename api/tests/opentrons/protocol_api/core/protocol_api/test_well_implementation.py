@@ -1,5 +1,6 @@
 import pytest
-from opentrons.protocol_api.core.well import WellImplementation
+
+from opentrons.protocol_api.core.protocol_api.well import WellImplementation
 
 
 @pytest.mark.parametrize(

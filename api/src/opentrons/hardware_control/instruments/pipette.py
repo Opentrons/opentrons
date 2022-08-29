@@ -6,7 +6,7 @@ import functools
 """
 from dataclasses import asdict, replace
 import logging
-from typing import Any, Dict, Optional, Set, Tuple, Union, TYPE_CHECKING
+from typing import Any, Dict, Optional, Set, Tuple, Union
 
 from opentrons_shared_data.pipette import name_config as pipette_name_config
 
@@ -24,19 +24,21 @@ from opentrons.hardware_control.types import (
 )
 
 
-if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import (
-        UlPerMmAction,
-        PipetteName,
-        PipetteModel,
-    )
-    from opentrons.hardware_control.dev_types import InstrumentHardwareConfigs
+from opentrons_shared_data.pipette.dev_types import (
+    UlPerMmAction,
+    PipetteName,
+    PipetteModel,
+)
+from opentrons.hardware_control.dev_types import InstrumentHardwareConfigs
+from typing_extensions import Final
 
 
 RECONFIG_KEYS = {"quirks"}
 
 
 mod_log = logging.getLogger(__name__)
+
+INTERNOZZLE_SPACING_MM: Final[float] = 9
 
 
 class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
@@ -167,10 +169,18 @@ class Pipette(AbstractInstrument[pipette_config.PipetteConfig]):
             cp_type = CriticalPoint.TIP
             tip_length = self.current_tip_length
         if cp_override == CriticalPoint.XY_CENTER:
-            mod_offset_xy = [0, 0, offsets[2]]
+            mod_offset_xy = [
+                offsets[0],
+                offsets[1] - (INTERNOZZLE_SPACING_MM * (self._config.channels - 1) / 2),
+                offsets[2],
+            ]
             cp_type = CriticalPoint.XY_CENTER
         elif cp_override == CriticalPoint.FRONT_NOZZLE:
-            mod_offset_xy = [0, -offsets[1], offsets[2]]
+            mod_offset_xy = [
+                0,
+                (offsets[1] - INTERNOZZLE_SPACING_MM * (self._config.channels - 1)),
+                offsets[2],
+            ]
             cp_type = CriticalPoint.FRONT_NOZZLE
         else:
             mod_offset_xy = list(offsets)

@@ -1,6 +1,8 @@
 """Wrappers for the legacy, Protocol API v2 execution pipeline."""
-from anyio import to_thread
+import asyncio
 from typing import cast
+
+from anyio import to_thread
 
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LegacyLabwareDefinition,
@@ -113,6 +115,7 @@ class LegacyContextCreator:
             api_version=protocol.api_level,
             hardware_api=self._hardware_api,
             protocol_engine=self._protocol_engine,
+            protocol_engine_loop=asyncio.get_running_loop(),
             extra_labware=extra_labware,
             use_simulating_core=self._USE_SIMULATING_CORE,
         )
