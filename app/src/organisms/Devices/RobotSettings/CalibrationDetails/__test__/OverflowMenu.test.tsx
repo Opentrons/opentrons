@@ -117,7 +117,7 @@ describe('OverflowMenu', () => {
     getByText('Download calibration data')
   })
 
-  it('should disable calibrate menu item when mount in undefined', () => {
+  it('should disable calibrate menu item when mount is undefined', () => {
     props = {
       ...props,
       mount: undefined,

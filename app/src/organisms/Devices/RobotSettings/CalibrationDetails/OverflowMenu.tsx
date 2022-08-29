@@ -51,7 +51,7 @@ type CalBlockModalState =
 interface OverflowMenuProps {
   calType: 'pipetteOffset' | 'tipLength'
   robotName: string
-  mount?: Mount
+  mount: Mount
   serialNumber: string | null
   updateRobotStatus: (isRobotBusy: boolean) => void
 }
