@@ -62,16 +62,16 @@ class LoadLabwareResult(BaseModel):
         description="The full definition data for this labware.",
     )
     offsetId: Optional[str] = Field(
-        None,  # TODO: What happens if we make this "..."?
+        # Default `None` instead of `...` so this field shows up as non-required in
+        # OpenAPI. The server is allowed to omit it or make it null.
+        None,
         description=(
             "An ID referencing the labware offset that will apply"
             " to the newly-placed labware."
-            "\n\n"
-            "Null or undefined means no offset applies,"
+            " This offset will be in effect until the labware is moved"
+            " with a `moveLabware`x command."
+            " Null or undefined means no offset applies,"
             " so the default of (0, 0, 0) will be used."
-            "\n\n"
-            "This offset will be in effect until the labware is moved"
-            " with a `moveLabware` command."
         ),
     )
 
