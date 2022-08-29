@@ -43,6 +43,17 @@ const PANEL_BY_STEP: Partial<
   [Sessions.DECK_STEP_SAVING_POINT_THREE]: SaveXYPoint,
   [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: DeckCalibrationComplete,
 }
+const STEPS_IN_ORDER: CalibrationSessionStep[] = [
+  Sessions.DECK_STEP_SESSION_STARTED,
+  Sessions.DECK_STEP_LABWARE_LOADED,
+  Sessions.DECK_STEP_PREPARING_PIPETTE,
+  Sessions.DECK_STEP_INSPECTING_TIP,
+  Sessions.DECK_STEP_JOGGING_TO_DECK,
+  Sessions.DECK_STEP_SAVING_POINT_ONE,
+  Sessions.DECK_STEP_SAVING_POINT_TWO,
+  Sessions.DECK_STEP_SAVING_POINT_THREE,
+  Sessions.DECK_STEP_CALIBRATION_COMPLETE,
+]
 
 export function CalibrateDeck(
   props: CalibrateDeckParentProps
@@ -107,8 +118,8 @@ export function CalibrateDeck(
         header={
           <WizardHeader
             title={t('deck_calibration')}
-            currentStep={1}
-            totalSteps={5}
+            currentStep={STEPS_IN_ORDER.findIndex(step => step === currentStep) ?? 0}
+            totalSteps={STEPS_IN_ORDER.length - 1}
             onExit={confirmExit}
           />
         }

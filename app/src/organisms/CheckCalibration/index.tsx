@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { useConditionalConfirm } from '@opentrons/components'
@@ -14,7 +15,7 @@ import {
   MeasureNozzle,
   MeasureTip,
   LoadingState,
-  ConfirmExitModal,
+  ConfirmExit,
 } from '../../organisms/CalibrationPanels'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
@@ -25,12 +26,14 @@ import { ResultsSummary } from './ResultsSummary'
 import type { Mount } from '@opentrons/components'
 import type {
   CalibrationLabware,
+  RobotCalibrationCheckPipetteRank,
   RobotCalibrationCheckStep,
   SessionCommandParams,
 } from '../../redux/sessions/types'
 
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { CalibrationCheckParentProps } from './types'
+import { CHECK_PIPETTE_RANK_FIRST } from '../../redux/sessions'
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Calibration health check'
 
@@ -51,9 +54,50 @@ const PANEL_BY_STEP: {
   [Sessions.CHECK_STEP_RESULTS_SUMMARY]: ResultsSummary,
 }
 
+const STEPS_IN_ORDER_ONE_PIPETTE: RobotCalibrationCheckStep[] = [
+  Sessions.CHECK_STEP_SESSION_STARTED,
+  Sessions.CHECK_STEP_LABWARE_LOADED,
+  Sessions.CHECK_STEP_COMPARING_NOZZLE,
+  Sessions.CHECK_STEP_PREPARING_PIPETTE,
+  Sessions.CHECK_STEP_INSPECTING_TIP,
+  Sessions.CHECK_STEP_COMPARING_TIP,
+  Sessions.CHECK_STEP_COMPARING_HEIGHT,
+  Sessions.CHECK_STEP_COMPARING_POINT_ONE,
+  Sessions.CHECK_STEP_COMPARING_POINT_TWO,
+  Sessions.CHECK_STEP_COMPARING_POINT_THREE,
+  Sessions.CHECK_STEP_RETURNING_TIP,
+  Sessions.CHECK_STEP_RESULTS_SUMMARY,
+]
+const STEPS_IN_ORDER_SECOND_PIPETTE: RobotCalibrationCheckStep[] = [
+  Sessions.CHECK_STEP_LABWARE_LOADED,
+  Sessions.CHECK_STEP_COMPARING_NOZZLE,
+  Sessions.CHECK_STEP_PREPARING_PIPETTE,
+  Sessions.CHECK_STEP_INSPECTING_TIP,
+  Sessions.CHECK_STEP_COMPARING_TIP,
+  Sessions.CHECK_STEP_COMPARING_HEIGHT,
+  Sessions.CHECK_STEP_COMPARING_POINT_ONE,
+  Sessions.CHECK_STEP_COMPARING_POINT_TWO,
+  Sessions.CHECK_STEP_COMPARING_POINT_THREE,
+  Sessions.CHECK_STEP_RETURNING_TIP,
+  Sessions.CHECK_STEP_RESULTS_SUMMARY,
+]
+function getStepIndexCheckingBothPipettes(
+  currentStep: RobotCalibrationCheckStep | null,
+  rank: RobotCalibrationCheckPipetteRank | null
+): number {
+  if (currentStep == null || rank == null) return 0
+  return (
+    (rank === CHECK_PIPETTE_RANK_FIRST
+      ? STEPS_IN_ORDER_ONE_PIPETTE.findIndex(step => step === currentStep)
+      : STEPS_IN_ORDER_SECOND_PIPETTE.findIndex(step => step === currentStep) +
+        7) ?? 0
+  )
+}
+
 export function CheckCalibration(
   props: CalibrationCheckParentProps
 ): JSX.Element | null {
+  const { t } = useTranslation('robot_calibration')
   const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
   const {
     currentStep,
@@ -106,6 +150,12 @@ export function CheckCalibration(
   }
 
   const checkBothPipettes = instruments?.length === 2
+  const stepIndex = checkBothPipettes
+    ? getStepIndexCheckingBothPipettes(
+        currentStep ?? null,
+        activePipette?.rank ?? null
+      )
+    : STEPS_IN_ORDER_ONE_PIPETTE.findIndex(step => step === currentStep) ?? 0
 
   if (!session || !activeTipRack) {
     return null
@@ -122,8 +172,12 @@ export function CheckCalibration(
         header={
           <WizardHeader
             title={ROBOT_CALIBRATION_CHECK_SUBTITLE}
-            currentStep={1}
-            totalSteps={5}
+            currentStep={stepIndex}
+            totalSteps={
+              checkBothPipettes
+                ? STEPS_IN_ORDER_SECOND_PIPETTE.length - 1 + 7
+                : STEPS_IN_ORDER_ONE_PIPETTE.length - 1
+            }
             onExit={confirmExit}
           />
         }
@@ -131,10 +185,15 @@ export function CheckCalibration(
         {showSpinner || currentStep == null || Panel == null ? (
           <LoadingState />
         ) : showConfirmExit ? (
-          <ConfirmExitModal
+          <ConfirmExit
             exit={confirmExit}
             back={cancelExit}
-            sessionType={session.sessionType}
+            heading={t('progress_will_be_lost', {
+              sessionType: t('calibration_health_check'),
+            })}
+            body={t('confirm_exit_before_completion', {
+              sessionType: t('calibration_health_check'),
+            })}
           />
         ) : (
           <Panel

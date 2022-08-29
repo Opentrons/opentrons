@@ -48,6 +48,15 @@ const PANEL_BY_STEP: Partial<
   measuringTipOffset: MeasureTip,
   calibrationComplete: TipLengthCalibrationComplete,
 }
+const STEPS_IN_ORDER: CalibrationSessionStep[] = [
+  Sessions.TIP_LENGTH_STEP_SESSION_STARTED,
+  Sessions.TIP_LENGTH_STEP_LABWARE_LOADED,
+  Sessions.TIP_LENGTH_STEP_MEASURING_NOZZLE_OFFSET,
+  Sessions.TIP_LENGTH_STEP_PREPARING_PIPETTE,
+  Sessions.TIP_LENGTH_STEP_INSPECTING_TIP,
+  Sessions.TIP_LENGTH_STEP_MEASURING_TIP_OFFSET,
+  Sessions.TIP_LENGTH_STEP_CALIBRATION_COMPLETE,
+]
 
 export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
@@ -114,8 +123,8 @@ export function CalibrateTipLength(
         header={
           <WizardHeader
             title={t('tip_length_calibration')}
-            currentStep={1}
-            totalSteps={5}
+            currentStep={STEPS_IN_ORDER.findIndex(step => step === currentStep) ?? 0}
+            totalSteps={STEPS_IN_ORDER.length - 1}
             onExit={confirmExit}
           />
         }

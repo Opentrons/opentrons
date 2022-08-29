@@ -13,8 +13,6 @@ import {
   TipConfirmation,
   SaveZPoint,
   SaveXYPoint,
-  MeasureNozzle,
-  MeasureTip,
   ConfirmExit,
   LoadingState,
   CompleteConfirmation,
@@ -37,8 +35,6 @@ const PANEL_BY_STEP: Partial<
 > = {
   [Sessions.PIP_OFFSET_STEP_SESSION_STARTED]: Introduction,
   [Sessions.PIP_OFFSET_STEP_LABWARE_LOADED]: DeckSetup,
-  [Sessions.PIP_OFFSET_STEP_MEASURING_NOZZLE_OFFSET]: MeasureNozzle,
-  [Sessions.PIP_OFFSET_STEP_MEASURING_TIP_OFFSET]: MeasureTip,
   [Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE]: TipPickUp,
   [Sessions.PIP_OFFSET_STEP_INSPECTING_TIP]: TipConfirmation,
   [Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK]: SaveZPoint,
@@ -46,18 +42,21 @@ const PANEL_BY_STEP: Partial<
   [Sessions.PIP_OFFSET_STEP_TIP_LENGTH_COMPLETE]: PipetteOffsetCalibrationComplete,
   [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: PipetteOffsetCalibrationComplete,
 }
+const STEPS_IN_ORDER: CalibrationSessionStep[] = [
+  Sessions.PIP_OFFSET_STEP_SESSION_STARTED,
+  Sessions.PIP_OFFSET_STEP_LABWARE_LOADED,
+  Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE,
+  Sessions.PIP_OFFSET_STEP_INSPECTING_TIP,
+  Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK,
+  Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE,
+  Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE,
+]
 
 export function CalibratePipetteOffset(
   props: CalibratePipetteOffsetParentProps
 ): JSX.Element | null {
   const { t } = useTranslation('robot_calibration')
-  const {
-    session,
-    robotName,
-    dispatchRequests,
-    showSpinner,
-    isJogging,
-  } = props
+  const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
   const { currentStep, instrument, labware, supportedCommands } =
     session?.details ?? {}
 
@@ -119,8 +118,8 @@ export function CalibratePipetteOffset(
         header={
           <WizardHeader
             title={t('pipette_offset_calibration')}
-            currentStep={1}
-            totalSteps={5}
+            currentStep={STEPS_IN_ORDER.findIndex(step => step === currentStep) ?? 0}
+            totalSteps={STEPS_IN_ORDER.length - 1}
             onExit={confirmExit}
           />
         }
