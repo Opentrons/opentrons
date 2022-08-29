@@ -25,6 +25,7 @@ class MoveLabwareParams(BaseModel):
 class MoveLabwareResult(BaseModel):
     """The output of a successful ``moveLabware`` command."""
 
+    # TODO: Should this be named newOffsetId for consistency with newLocation?
     offsetId: Optional[str] = Field(
         ...,
         description=(
