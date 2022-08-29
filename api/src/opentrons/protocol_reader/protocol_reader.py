@@ -7,6 +7,7 @@ from .file_reader_writer import FileReaderWriter, FileReadError
 from .role_analyzer import RoleAnalyzer, RoleAnalysisFile, RoleAnalysisError
 from .config_analyzer import ConfigAnalyzer, ConfigAnalysisError
 from .protocol_source import ProtocolSource, ProtocolSourceFile
+from ..protocol_reader.file_reader_writer import BufferedFile
 
 
 class ProtocolFilesInvalidError(ValueError):
@@ -129,3 +130,8 @@ class ProtocolReader:
             metadata=config_analysis.metadata,
             labware_definitions=role_analysis.labware_definitions,
         )
+
+    @staticmethod
+    def validate_protocol(files: Sequence[BufferedFile]):
+        """Analyze and validate a set of input files."""
+        pass
