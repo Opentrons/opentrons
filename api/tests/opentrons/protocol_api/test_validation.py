@@ -23,8 +23,8 @@ def test_ensure_mount(input_value: Union[str, Mount], expected: Mount) -> None:
     assert result == expected
 
 
-def test_ensure_invalid() -> None:
-    """It should properly map strings and mounts."""
+def test_ensure_input_invalid() -> None:
+    """It should raise if given invalid mount input."""
     with pytest.raises(ValueError, match="must be 'left' or 'right'"):
         subject.ensure_mount("oh no")
 

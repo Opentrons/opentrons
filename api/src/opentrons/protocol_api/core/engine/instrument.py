@@ -13,7 +13,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     """Instrument API core using a ProtocolEngine.
 
     Args:
-        id: ProtocolEngine ID of the loaded instrument.
+        pipette_id: ProtocolEngine ID of the loaded instrument.
     """
 
     def __init__(self, pipette_id: str) -> None:
