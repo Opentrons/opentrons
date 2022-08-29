@@ -10,6 +10,7 @@ import { useCalibratePipetteOffset } from '../../../../CalibratePipetteOffset/us
 import { useDeckCalibrationData, useIsRobotBusy } from '../../../hooks'
 
 import { OverflowMenu } from '../OverflowMenu'
+import { PipetteMount } from '@opentrons/shared-data'
 
 const render = (
   props: React.ComponentProps<typeof OverflowMenu>
@@ -120,7 +121,7 @@ describe('OverflowMenu', () => {
   it('should disable calibrate menu item when mount is undefined', () => {
     props = {
       ...props,
-      mount: undefined,
+      mount: undefined as any,
     }
     const [{ getByRole }] = render(props)
     const button = getByRole('button', {
