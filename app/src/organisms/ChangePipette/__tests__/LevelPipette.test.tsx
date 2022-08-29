@@ -59,19 +59,14 @@ describe('LevelPipette', () => {
   beforeEach(() => {
     props = {
       mount: LEFT,
-      wantedPipette: MOCK_WANTED_PIPETTE,
       pipetteModelName: MOCK_WANTED_PIPETTE.name,
       back: jest.fn(),
-      exit: jest.fn(),
       confirm: jest.fn(),
-      currentStep: 6,
-      totalSteps: 8,
     }
   })
 
   it('renders title and description', () => {
     const { getByText } = render(props)
-    getByText('Attach a P300 8-Channel GEN2 Pipette')
     getByText(nestedTextMatcher('Level the pipette'))
     getByText(
       nestedTextMatcher(
@@ -99,12 +94,9 @@ describe('LevelPipette', () => {
   it('the CTAs should be clickable', () => {
     const { getByRole } = render(props)
     const goBack = getByRole('button', { name: 'Go back' })
-    const exit = getByRole('button', { name: 'Exit' })
     const cont = getByRole('button', { name: 'Confirm level' })
     fireEvent.click(goBack)
     expect(props.back).toHaveBeenCalled()
-    fireEvent.click(exit)
-    expect(props.exit).toHaveBeenCalled()
     fireEvent.click(cont)
     expect(props.confirm).toHaveBeenCalled()
   })

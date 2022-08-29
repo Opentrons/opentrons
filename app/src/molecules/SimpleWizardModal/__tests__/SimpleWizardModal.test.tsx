@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import { COLORS, renderWithProviders } from '@opentrons/components'
 import { SimpleWizardModal } from '..'
 
@@ -14,10 +13,6 @@ describe('SimpleWizardModal', () => {
       children: <div>children</div>,
       header: 'header',
       subHeader: 'subheader',
-      onExit: jest.fn(),
-      title: 'title',
-      currentStep: 5,
-      totalSteps: 7,
       isSuccess: false,
     }
   })
@@ -26,10 +21,6 @@ describe('SimpleWizardModal', () => {
     getByText('header')
     getByText('subheader')
     getByLabelText('ot-alert')
-    getByText('title')
-    const exitBtn = getByLabelText('Exit')
-    fireEvent.click(exitBtn)
-    expect(props.onExit).toHaveBeenCalled()
   })
 
   it('renders the correct information when it is success', () => {
@@ -41,9 +32,5 @@ describe('SimpleWizardModal', () => {
     getByText('header')
     getByText('subheader')
     getByLabelText('ot-check')
-    getByText('title')
-    const exitBtn = getByLabelText('Exit')
-    fireEvent.click(exitBtn)
-    expect(props.onExit).toHaveBeenCalled()
   })
 })

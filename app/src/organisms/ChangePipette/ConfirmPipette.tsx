@@ -15,12 +15,10 @@ import type {
   PipetteModelSpecs,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../redux/pipettes/types'
 import type { PipetteOffsetCalibration } from '../../redux/calibration/types'
 
 export interface ConfirmPipetteProps {
   robotName: string
-  mount: Mount
   success: boolean
   attachedWrong: boolean
   wantedPipette: PipetteNameSpecs | null
@@ -31,20 +29,10 @@ export interface ConfirmPipetteProps {
   tryAgain: () => void
   exit: () => void
   startPipetteOffsetCalibration: () => void
-  currentStep: number
-  totalSteps: number
 }
 
 export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
-  const {
-    wantedPipette,
-    actualPipette,
-    success,
-    exit,
-    currentStep,
-    totalSteps,
-    mount,
-  } = props
+  const { success } = props
   const { t } = useTranslation('change_pipette')
 
   const getPipetteStatusDetails = (
@@ -84,26 +72,12 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
 
   const { header, subHeader } = getPipetteStatusDetails({ ...props })
 
-  let title
-
-  if ((!wantedPipette && !actualPipette) || (!wantedPipette && actualPipette)) {
-    title = t('detatch_pipette_from_mount', {
-      mount: mount[0].toUpperCase() + mount.slice(1),
-    })
-  } else {
-    title = t('attach_name_pipette', { pipette: wantedPipette?.displayName })
-  }
-
   return (
     <SimpleWizardModal
       iconColor={success ? COLORS.successEnabled : COLORS.errorEnabled}
       header={header}
       subHeader={subHeader}
       isSuccess={success}
-      onExit={exit}
-      title={title}
-      currentStep={currentStep}
-      totalSteps={totalSteps}
     >
       <>
         {!success && <TryAgainButton {...props} />}

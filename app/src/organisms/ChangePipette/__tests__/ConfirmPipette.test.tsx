@@ -3,11 +3,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { ConfirmPipette } from '../ConfirmPipette'
-import {
-  LEFT,
-  PipetteModelSpecs,
-  PipetteNameSpecs,
-} from '@opentrons/shared-data'
+import { PipetteModelSpecs, PipetteNameSpecs } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
 import { PipetteOffsetCalibration } from '../../../redux/calibration/types'
 import { CheckPipettesButton } from '../CheckPipettesButton'
@@ -80,7 +76,6 @@ describe('ConfirmPipette', () => {
   it('Should detach a pipette successfully', () => {
     props = {
       robotName: 'otie',
-      mount: LEFT,
       success: true,
       attachedWrong: false,
       wantedPipette: null,
@@ -91,24 +86,18 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       startPipetteOffsetCalibration: jest.fn(),
-      currentStep: 5,
-      totalSteps: 8,
     }
 
-    const { getByText, getAllByRole } = render(props)
-    getByText('Detach Pipette from Left Mount')
+    const { getByText, getByRole } = render(props)
     getByText('Successfully detached pipette!')
-    const btns = getAllByRole('button', { name: 'Exit' })
-    btns.forEach(btn => {
-      fireEvent.click(btn)
-      expect(props.exit).toBeCalled()
-    })
+    const btn = getByRole('button', { name: 'exit' })
+    fireEvent.click(btn)
+    expect(props.exit).toHaveBeenCalled()
   })
 
   it('Should detect a pipette if still attached when detaching', () => {
     props = {
       robotName: 'otie',
-      mount: LEFT,
       success: false,
       attachedWrong: false,
       wantedPipette: null,
@@ -119,12 +108,9 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       startPipetteOffsetCalibration: jest.fn(),
-      currentStep: 5,
-      totalSteps: 8,
     }
 
     const { getByText, getByRole } = render(props)
-    getByText('Detach Pipette from Left Mount')
     getByText('Pipette still detected')
     getByText(
       'Check again to ensure that pipette is unplugged and entirely detached from the robot.'
@@ -142,7 +128,6 @@ describe('ConfirmPipette', () => {
   it('Should show incorrect pipette attached when the actual pipette is different', () => {
     props = {
       robotName: 'otie',
-      mount: LEFT,
       success: false,
       attachedWrong: true,
       wantedPipette: MOCK_WANTED_PIPETTE,
@@ -153,12 +138,9 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       startPipetteOffsetCalibration: jest.fn(),
-      currentStep: 5,
-      totalSteps: 8,
     }
 
     const { getByText, getByRole } = render(props)
-    getByText('Attach a P300 8-Channel GEN2 Pipette')
     getByText('Incorrect pipette attached')
     getByText(
       'The attached does not match the P300 8-Channel GEN2 you had originally selected.'
@@ -179,7 +161,6 @@ describe('ConfirmPipette', () => {
     mockCheckPipettesButton.mockReturnValue(<div>mock re-check connection</div>)
     props = {
       robotName: 'otie',
-      mount: LEFT,
       success: false,
       attachedWrong: false,
       wantedPipette: MOCK_WANTED_PIPETTE,
@@ -190,12 +171,9 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       startPipetteOffsetCalibration: jest.fn(),
-      currentStep: 5,
-      totalSteps: 8,
     }
 
     const { getByText, getByRole } = render(props)
-    getByText('Attach a P300 8-Channel GEN2 Pipette')
     getByText('Unable to detect P300 8-Channel GEN2')
     getByText(
       'Make sure to press the white connector tab in as far as you can, and that you feel it connect with the pipette.'
@@ -213,7 +191,6 @@ describe('ConfirmPipette', () => {
   it('Should attach a pipette successfully', () => {
     props = {
       robotName: 'otie',
-      mount: LEFT,
       success: true,
       attachedWrong: false,
       wantedPipette: MOCK_ACTUAL_PIPETTE,
@@ -224,26 +201,19 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       startPipetteOffsetCalibration: jest.fn(),
-      currentStep: 5,
-      totalSteps: 8,
     }
 
-    const { getByText, getAllByRole } = render(props)
-    getByText('Attach a P10 Single-Channel Pipette')
+    const { getByText, getByRole } = render(props)
     getByText('Pipette attached!')
     getByText('P10 Single-Channel is now ready to use.')
-
-    const exitBtns = getAllByRole('button', { name: 'Exit' })
-    exitBtns.forEach(btn => {
-      fireEvent.click(btn)
-      expect(props.exit).toBeCalled()
-    })
+    const btn = getByRole('button', { name: 'exit' })
+    fireEvent.click(btn)
+    expect(props.exit).toHaveBeenCalled()
   })
 
   it('Should attach a pipette successfully when there is no POC data', () => {
     props = {
       robotName: 'otie',
-      mount: LEFT,
       success: true,
       attachedWrong: false,
       wantedPipette: MOCK_ACTUAL_PIPETTE,
@@ -254,20 +224,14 @@ describe('ConfirmPipette', () => {
       tryAgain: jest.fn(),
       exit: jest.fn(),
       startPipetteOffsetCalibration: jest.fn(),
-      currentStep: 5,
-      totalSteps: 8,
     }
 
-    const { getByText, getAllByRole, getByRole } = render(props)
-    getByText('Attach a P10 Single-Channel Pipette')
+    const { getByText, getByRole } = render(props)
     getByText('Pipette attached!')
     getByText('P10 Single-Channel is now ready to use.')
-
-    const exitBtns = getAllByRole('button', { name: 'Exit' })
-    exitBtns.forEach(btn => {
-      fireEvent.click(btn)
-      expect(props.exit).toBeCalled()
-    })
+    const btn = getByRole('button', { name: 'exit' })
+    fireEvent.click(btn)
+    expect(props.exit).toHaveBeenCalled()
 
     const pocBtn = getByRole('button', { name: 'Calibrate pipette offset' })
     fireEvent.click(pocBtn)
