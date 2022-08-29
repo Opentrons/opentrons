@@ -1,163 +1,75 @@
----
-test_name: GET Labware Calibrations, No Calibrations
+test_name: Labware calibration endpoints
 marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Labware Calibrations GET request returns an empty list
+  - name: GET /labware/calibrations returns 410
     request:
       url: '{host:s}:{port:d}/labware/calibrations'
       method: GET
+    response:
+      status_code: 410
+      json:
+        errors:
+          - id: 'LabwareCalibrationEndpointsRemoved'
+            title: 'Labware Calibration Endpoints Removed'
+            detail: 'Use the `/runs` endpoints to manage labware offsets.'
+  - name: GET /labware/calibrations/:id returns 410
+    request:
+      url: '{host:s}:{port:d}/labware/calibrations/some-id'
+      method: GET
+    response:
+      status_code: 410
+      json:
+        errors:
+          - id: 'LabwareCalibrationEndpointsRemoved'
+            title: 'Labware Calibration Endpoints Removed'
+            detail: 'Use the `/runs` endpoints to manage labware offsets.'
+  - name: DELETE /labware/calibrations/:id returns 410
+    request:
+      url: '{host:s}:{port:d}/labware/calibrations/some-id'
+      method: DELETE
+    response:
+      status_code: 410
+      json:
+        errors:
+          - id: 'LabwareCalibrationEndpointsRemoved'
+            title: 'Labware Calibration Endpoints Removed'
+            detail: 'Use the `/runs` endpoints to manage labware offsets.'
+  - name: GET /labware/calibrations returns empty list on version <= 3
+    request:
+      url: '{host:s}:{port:d}/labware/calibrations'
+      method: GET
+      headers:
+        Opentrons-Version: '3'
     response:
       status_code: 200
       json:
         links: null
         data: []
----
-test_name: GET Labware Calibrations, All Calibrations
-marks:
-  - usefixtures:
-      - run_server
-      - set_up_index_file_temporary_directory
-stages:
-  - name: GET request returns all calibrations from fixture
+  - name: GET /labware/calibrations/:id returns 404 on version <=3
     request:
-      url: '{host:s}:{port:d}/labware/calibrations'
+      url: '{host:s}:{port:d}/labware/calibrations/some-id'
       method: GET
+      headers:
+        Opentrons-Version: '3'
     response:
-      status_code: 200
+      status_code: 404
       json:
-        links: null
-        data:
-          - calibrationData: !anydict
-            loadName: !anystr
-            parent: !anystr
-            namespace: 'opentrons'
-            version: 1
-            definitionHash: !anystr
-            id: !anystr
-          - calibrationData: !anydict
-            loadName: !anystr
-            parent: !anystr
-            namespace: 'opentrons'
-            version: 1
-            definitionHash: !anystr
-            id: !anystr
-          - calibrationData: !anydict
-            loadName: !anystr
-            parent: !anystr
-            namespace: 'opentrons'
-            version: 1
-            definitionHash: !anystr
-            id: !anystr
-          - calibrationData: !anydict
-            loadName: !anystr
-            parent: !anystr
-            namespace: 'opentrons'
-            version: 1
-            definitionHash: !anystr
-            id: !anystr
-          - calibrationData: !anydict
-            loadName: !anystr
-            parent: !anystr
-            namespace: 'opentrons'
-            version: 1
-            definitionHash: !anystr
-            id: !anystr
----
-test_name: GET Labware Calibrations, Filter LoadName
-marks:
-  - usefixtures:
-      - run_server
-      - set_up_index_file_temporary_directory
-stages:
-  - name: GET request returns the calibration for deep well plate
+        errors:
+          - id: 'UncategorizedError'
+            title: 'Resource Not Found'
+            detail: "Resource type 'calibration' with id 'some-id' was not found"
+  - name: DELETE /labware/calibrations/:id returns 404 on version <=3
     request:
-      url: '{host:s}:{port:d}/labware/calibrations'
-      method: GET
-      params:
-        loadName: 'nest_96_wellplate_2ml_deep'
+      url: '{host:s}:{port:d}/labware/calibrations/some-id'
+      method: DELETE
+      headers:
+        Opentrons-Version: '3'
     response:
-      status_code: 200
+      status_code: 404
       json:
-        links: null
-        data:
-          - calibrationData: !anydict
-            loadName: 'nest_96_wellplate_2ml_deep'
-            parent: !anystr
-            namespace: 'opentrons'
-            version: 1
-            definitionHash: !anystr
-            id: !anystr
----
-test_name: GET Labware Calibrations, Filter Version & namespace
-marks:
-  - usefixtures:
-      - run_server
-      - set_up_index_file_temporary_directory
-stages:
-  - name: Labware Calibrations GET request returns an empty list
-    request:
-      url: '{host:s}:{port:d}/labware/calibrations'
-      method: GET
-      params:
-        version: 1
-        namespace: 'opentrons'
-    response:
-      status_code: 200
-      json:
-        links: null
-        data:
-          - calibrationData: !anydict
-            loadName: !anystr
-            parent: !anystr
-            namespace: 'opentrons'
-            version: 1
-            definitionHash: !anystr
-            id: !anystr
-          - calibrationData: !anydict
-            loadName: !anystr
-            parent: !anystr
-            namespace: 'opentrons'
-            version: 1
-            definitionHash: !anystr
-            id: !anystr
-          - calibrationData: !anydict
-            loadName: !anystr
-            parent: !anystr
-            namespace: 'opentrons'
-            version: 1
-            definitionHash: !anystr
-            id: !anystr
-          - calibrationData: !anydict
-            loadName: !anystr
-            parent: !anystr
-            namespace: 'opentrons'
-            version: 1
-            definitionHash: !anystr
-            id: !anystr
-          - calibrationData: !anydict
-            loadName: !anystr
-            parent: !anystr
-            namespace: 'opentrons'
-            version: 1
-            definitionHash: !anystr
-            id: !anystr
----
-test_name: GET Labware Calibrations, Version Does Not Exist
-marks:
-  - usefixtures:
-      - run_server
-      - set_up_index_file_temporary_directory
-stages:
-  - name: Labware Calibrations GET request returns an empty list
-    request:
-      url: '{host:s}:{port:d}/labware/calibrations'
-      method: GET
-      params:
-        version: 2
-    response:
-      status_code: 200
-      json:
-        links: null
-        data: []
+        errors:
+          - id: 'UncategorizedError'
+            title: 'Resource Not Found'
+            detail: "Resource type 'calibration' with id 'some-id' was not found"
