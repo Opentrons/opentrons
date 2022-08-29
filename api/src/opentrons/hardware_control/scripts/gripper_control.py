@@ -10,35 +10,55 @@ from opentrons.types import Point  # noqa: E402
 from opentrons_shared_data.deck import load as load_deck_def  # noqa: E402
 
 
-VERSION = 0.0
+VERSION = 1.0
 MOUNT = OT3Mount.GRIPPER
-
 deck_def = load_deck_def("ot3_standard", version=3)
-
-# Origin slot
-FROM_SLOT = 8
-# Destination slot
-TO_SLOT = 3
-
-# Grip force in newton
-GRIP_FORCE = 20
-
-# Z height in mm from the deck for gripping and safe-traveling
-GRIP_HEIGHT = 25.0
-TRAVEL_HEIGHT = 70.0
-
 # Offset of the center of the gripper jaw to the desired location
 GRIPPER_OFFSET = Point(0.0, 2.65, 0.0)
 
-# If set to true, gripper will move labware back to the origin slot
-RETURN_TO_ORIGIN = False
 
-# Number of times the entire flow is to be repeated
-REPEAT = 0
+class InvalidInput(Exception):
+    """Invalid input exception."""
+
+    pass
 
 
-def get_slot_center_in_deck_coord(index: int) -> Point:
-    corner = Point(*deck_def["locations"]["orderedSlots"][index]["position"])
+def prompt_int_input(prompt_name: str) -> int:
+    """Prompt to choose a member of the enum.
+
+    Args:
+        output_func: Function to output text to user.
+        get_user_input: Function to get user input.
+        enum_type: an enum type
+
+    Returns:
+        The choice.
+
+    """
+    try:
+        return int(input(f"{prompt_name}: "))
+    except (ValueError, IndexError) as e:
+        raise InvalidInput(e)
+
+
+def prompt_float_input(prompt_name: str) -> float:
+    """Prompt for a float."""
+    try:
+        return float(input(f"{prompt_name}: "))
+    except (ValueError, IndexError) as e:
+        raise InvalidInput(e)
+
+
+def prompt_bool_input(prompt_name: str) -> float:
+    """Prompt for a bool."""
+    try:
+        return {"true": True, "false": False}[input(f"{prompt_name}: ").lower()]
+    except (ValueError, IndexError) as e:
+        raise InvalidInput(e)
+
+
+def get_slot_center_in_deck_coord(slot_id: int) -> Point:
+    corner = Point(*deck_def["locations"]["orderedSlots"][slot_id - 1]["position"])
     return Point(corner.x + 128.0 / 2, corner.y + 86.0 / 2, corner.z)
 
 
@@ -49,49 +69,59 @@ def build_api() -> ThreadManager[HardwareControlAPI]:
 
 
 if __name__ == "__main__":
+    from_slot = prompt_int_input("Origin slot (1-12)")
+    to_slot = prompt_int_input("Destination slot (1-12)")
+    grip_force = prompt_float_input("Force in Newton to grip the labware (rec: 20 N)")
+    grip_height = prompt_float_input(
+        "Z-Height from the deck in mm to grip labware (rec: 25 mm)"
+    )
+    return_to_origin = prompt_bool_input(
+        "Do you want the gripper to return the plate to the origin slot? True or False"
+    )
+    repeats = prompt_int_input(
+        "How many times do you want this script to repeat? Type 0 if you only want to run the script once"
+    )
+
     hc_api = build_api()
     api = hc_api.sync
-    print("Homing...")
     api.home()
     homed_pos = api.gantry_position(MOUNT)
 
-    from_slot_loc = get_slot_center_in_deck_coord(FROM_SLOT) + GRIPPER_OFFSET
-    to_slot_loc = get_slot_center_in_deck_coord(TO_SLOT) + GRIPPER_OFFSET
+    from_slot_loc = get_slot_center_in_deck_coord(from_slot) + GRIPPER_OFFSET
+    to_slot_loc = get_slot_center_in_deck_coord(to_slot) + GRIPPER_OFFSET
 
-    for i in range(REPEAT + 1):
-        print(f"Round: {i} / {REPEAT}")
-        print("=========================")
+    for i in range(repeats + 1):
         api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
-        api.move_to(MOUNT, from_slot_loc._replace(z=GRIP_HEIGHT))
+        api.move_to(MOUNT, from_slot_loc._replace(z=grip_height))
 
-        print("Gripping...")
-        api.grip(GRIP_FORCE)
+        api.grip(grip_force)
+        api.delay(1)
 
-        api.home([OT3Axis.Z_G])
+        api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
         api.move_to(MOUNT, to_slot_loc._replace(z=homed_pos.z))
-        api.move_to(MOUNT, to_slot_loc._replace(z=GRIP_HEIGHT))
+        api.move_to(MOUNT, to_slot_loc._replace(z=grip_height))
 
-        print("Releasing...")
         api.ungrip()
+        api.delay(1)
 
         # Return to safe height
         api.move_to(MOUNT, to_slot_loc._replace(z=homed_pos.z))
 
-        if RETURN_TO_ORIGIN:
-            api.delay(0.5)
-            api.move_to(MOUNT, to_slot_loc._replace(z=GRIP_HEIGHT))
+        if return_to_origin:
 
-            print("Gripping...")
-            api.grip(GRIP_FORCE)
+            api.move_to(MOUNT, to_slot_loc._replace(z=grip_height))
 
-            api.home([OT3Axis.Z_G])
+            api.grip(grip_force)
+            api.delay(1.0)
+
+            api.move_to(MOUNT, to_slot_loc._replace(z=homed_pos.z))
             api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
-            api.move_to(MOUNT, from_slot_loc._replace(z=GRIP_HEIGHT))
+            api.move_to(MOUNT, from_slot_loc._replace(z=grip_height))
 
-            print("Releasing...")
             api.ungrip()
+            api.delay(1.0)
 
             # Return to safe height
-            api.move_to(MOUNT, to_slot_loc._replace(z=homed_pos.z))
+            api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
 
         api.home()
