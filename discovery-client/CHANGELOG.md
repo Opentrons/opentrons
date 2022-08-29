@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [6.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.2...v6.1.0-beta.0) (2022-08-29)
+# [6.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.3...v6.1.0-beta.0) (2022-08-29)
 
 
 
