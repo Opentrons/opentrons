@@ -63,7 +63,18 @@ async def find_bootloader_port() -> str:
 
 
 async def find_dfu_device(pid: str, expected_device_count: int) -> str:
-    """Find the dfu device and return its serial number (separate from module serial)"""
+    """
+    Find the dfu device and return its serial number (separate from module serial).
+
+    Args:
+        - pid: The USB Product ID of the device
+        - expected_device_count: The expected number of "devices" for dfu-util
+        to find for this PID. This is necessary because most STM32 MCU's
+        will enumerate with multiple DFU devices, representing the
+        separate programmable memory regions on the device. If more than
+        this many devices are found, it is assumed that either the wrong
+        module is in DFU mode *or* multiple modules are in DFU mode.
+    """
     retries = 5
     log.info(f"Searching for a dfu device with PID {pid}")
     while retries != 0:

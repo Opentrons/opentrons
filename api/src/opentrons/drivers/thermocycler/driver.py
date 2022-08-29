@@ -331,6 +331,6 @@ class ThermocyclerDriverV2(ThermocyclerDriver):
         c = CommandBuilder(terminator=TC_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.ENTER_PROGRAMMING
         )
-        # The timeout is overwritten because no response should ever come
+        # No response expected, USB connection should terminate after this
         await self._connection.send_dfu_command(command=c)
         await self._connection.close()
