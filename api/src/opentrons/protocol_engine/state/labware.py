@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Optional, Sequence, Any, Mapping
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
@@ -277,6 +277,23 @@ class LabwareView(HasState[LabwareState]):
             for well_name in col:
                 wells.append(well_name)
         return wells
+
+    def validate_liquid_allowed_in_labware(
+        self, labware_id: str, wells: Mapping[str, Any]
+    ) -> List[str]:
+        """Check if wells associated to a labware_id has well by name and that labware is not tiprack."""
+        labware_definition = self.get_definition(labware_id)
+        labware_wells = labware_definition.wells
+        contains_wells = all(well_name in labware_wells for well_name in iter(wells))
+        if labware_definition.parameters.isTiprack:
+            raise errors.LabwareIsTipRackError(
+                f"Given labware: {labware_id} is a tiprack. Can not load liquid."
+            )
+        if not contains_wells:
+            raise errors.WellDoesNotExistError(
+                f"Some of the supplied wells do not match the labwareId: {labware_id}."
+            )
+        return list(wells)
 
     def get_well_columns(self, labware_id: str) -> Dict[str, List[str]]:
         """Get well columns."""

@@ -10,33 +10,26 @@ from opentrons.types import Point, Location
 from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
 
 from ..labware import AbstractLabware
-from ..well import WellImplementation
+from .well import WellImplementation
 
 
-class LabwareImplementation(AbstractLabware):
+class LabwareImplementation(AbstractLabware[WellImplementation]):
+    """Labware implementation core based on legacy PAPIv2 behavior.
+
+    Args:
+        definition: The labware definition, as a dict.
+        parent: The location of the labware's origin point.
+            A labware's origin is its front and left most corner.
+            Usually a slot or a module location.
+        label: Optional display label.
+    """
+
     def __init__(
         self,
         definition: LabwareDefinition,
         parent: Location,
         label: Optional[str] = None,
-    ):
-        """
-        Construct an implementation of a labware object.
-
-        :param definition: A dict representing all required data for a labware,
-                           including metadata such as the display name of the
-                           labware, a definition of the order to iterate over
-                           wells, the shape of wells (shape, physical
-                           dimensions, etc), and so on. The correct shape of
-                           this definition is handled by the "labware-designer"
-                           project in the Opentrons/opentrons repo.
-        :param parent: A :py:class:`.Location` representing the location where
-                       the front and left most point of the outside of the
-                       labware is (often the front-left corner of a slot on the
-                       deck).
-        :param label: An optional label to use instead of the displayName
-                      from the definition's metadata element
-        """
+    ) -> None:
         self._label: Optional[str] = None
         if label:
             dn = self._label = label

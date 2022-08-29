@@ -8,6 +8,7 @@ transform from labware symbolic points (such as "well a1 of an opentrons
 tiprack") to points in deck coordinates.
 """
 from __future__ import annotations
+
 import logging
 
 from pathlib import Path
@@ -24,7 +25,7 @@ from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck_item import DeckItem
 
 from .core.labware import AbstractLabware
-from .core.well import WellImplementation
+from .core.well import AbstractWellCore
 
 if TYPE_CHECKING:
     from opentrons.protocols.geometry.module_geometry import (  # noqa: F401
@@ -57,7 +58,7 @@ class Well:
 
     def __init__(
         self,
-        well_implementation: WellImplementation,
+        well_implementation: AbstractWellCore,
         api_level: Optional[APIVersion] = None,
     ):
         """
@@ -245,7 +246,9 @@ class Labware(DeckItem):
     """
 
     def __init__(
-        self, implementation: AbstractLabware, api_level: Optional[APIVersion] = None
+        self,
+        implementation: AbstractLabware[Any],
+        api_level: Optional[APIVersion] = None,
     ) -> None:
         """
         :param implementation: The class that implements the public interface
@@ -265,7 +268,7 @@ class Labware(DeckItem):
                 f"version or update your robot."
             )
         self._api_version = api_level
-        self._implementation = implementation
+        self._implementation: AbstractLabware[AbstractWellCore] = implementation
 
     @property
     def separate_calibration(self) -> bool:
@@ -684,7 +687,7 @@ class Labware(DeckItem):
         if self._is_tiprack:
             self._implementation.reset_tips()
 
-    def _well_from_impl(self, well: WellImplementation) -> Well:
+    def _well_from_impl(self, well: AbstractWellCore) -> Well:
         return Well(well_implementation=well, api_level=self._api_version)
 
 
@@ -851,18 +854,14 @@ def load_from_definition(
     )
 
 
-def save_calibration(labware: "Labware", delta: Point) -> None:
-    labware_module.save_calibration(labware._implementation, delta)
-
-
 def load(
     load_name: str,
     parent: Location,
     label: Optional[str] = None,
     namespace: Optional[str] = None,
     version: int = 1,
-    bundled_defs: Optional[Dict[str, "LabwareDefinition"]] = None,
-    extra_defs: Optional[Dict[str, "LabwareDefinition"]] = None,
+    bundled_defs: Optional[Dict[str, LabwareDefinition]] = None,
+    extra_defs: Optional[Dict[str, LabwareDefinition]] = None,
     api_level: Optional[APIVersion] = None,
 ) -> Labware:
     """

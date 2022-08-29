@@ -14,6 +14,7 @@ from opentrons.protocol_engine import (
     ErrorOccurrence,
     LoadedPipette,
     LoadedLabware,
+    Liquid,
 )
 
 from robot_server.persistence import analysis_table, sqlite_rowid
@@ -26,7 +27,6 @@ from .analysis_models import (
     AnalysisResult,
     AnalysisStatus,
 )
-
 
 _log = getLogger(__name__)
 
@@ -110,6 +110,7 @@ class AnalysisStore:
         labware: List[LoadedLabware],
         pipettes: List[LoadedPipette],
         errors: List[ErrorOccurrence],
+        liquids: List[Liquid],
     ) -> None:
         """Promote a pending analysis to completed, adding details of its results.
 
@@ -121,6 +122,7 @@ class AnalysisStore:
             pipettes: See `CompletedAnalysis.pipettes`.
             errors: See `CompletedAnalysis.errors`. Also used to infer whether
                 the completed analysis result is `OK` or `NOT_OK`.
+            liquids: See `CompletedAnalysis.liquids
         """
         protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
 
@@ -141,6 +143,7 @@ class AnalysisStore:
             labware=labware,
             pipettes=pipettes,
             errors=errors,
+            liquids=liquids,
         )
         completed_analysis_resource = _CompletedAnalysisResource(
             id=completed_analysis.id,

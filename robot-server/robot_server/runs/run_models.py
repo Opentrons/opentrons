@@ -15,6 +15,7 @@ from opentrons.protocol_engine import (
     LoadedModule,
     LabwareOffset,
     LabwareOffsetCreate,
+    Liquid,
 )
 from robot_server.service.json_api import ResourceModel
 from .action_models import RunAction
@@ -88,6 +89,10 @@ class Run(ResourceModel):
     labware: List[LoadedLabware] = Field(
         ...,
         description="Labware that has been loaded into the run.",
+    )
+    liquids: List[Liquid] = Field(
+        ...,
+        description="Liquids loaded to the run.",
     )
     labwareOffsets: List[LabwareOffset] = Field(
         ...,

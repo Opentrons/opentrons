@@ -1,6 +1,7 @@
 from __future__ import annotations
-import asyncio
+
 import logging
+from collections import OrderedDict
 from typing import (
     TYPE_CHECKING,
     Callable,
@@ -13,7 +14,6 @@ from typing import (
     Union,
     cast,
 )
-from collections import OrderedDict
 
 from opentrons import types
 from opentrons.broker import Broker
@@ -35,8 +35,11 @@ from opentrons.protocols.geometry.module_geometry import (
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
+from .core.instrument import AbstractInstrument
+from .core.well import AbstractWellCore
 from .core.labware import AbstractLabware
 from .core.protocol import AbstractProtocol
+from .core.labware_offset_provider import AbstractLabwareOffsetProvider
 
 from .instrument_context import InstrumentContext
 from .labware import Labware
@@ -46,10 +49,7 @@ from .module_contexts import (
     ThermocyclerContext,
     HeaterShakerContext,
 )
-from .labware_offset_provider import (
-    AbstractLabwareOffsetProvider,
-    NullLabwareOffsetProvider,
-)
+
 from .load_info import LoadInfo, LabwareLoadInfo, ModuleLoadInfo, InstrumentLoadInfo
 
 if TYPE_CHECKING:
@@ -94,39 +94,35 @@ class ProtocolContext(CommandPublisher):
 
     def __init__(
         self,
-        implementation: AbstractProtocol,
-        labware_offset_provider: Optional[AbstractLabwareOffsetProvider] = None,
-        loop: Optional[asyncio.AbstractEventLoop] = None,
+        api_version: APIVersion,
+        implementation: AbstractProtocol[
+            AbstractInstrument[AbstractWellCore], AbstractLabware[AbstractWellCore]
+        ],
+        labware_offset_provider: AbstractLabwareOffsetProvider,
         broker: Optional[Broker] = None,
-        api_version: Optional[APIVersion] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContext`.
 
+        :param api_version: The API version to use.
+        :param implementation: The protocol implementation core.
         :param labware_offset_provider: Where this protocol context and its child
                                         module contexts will get labware offsets from.
-        :param loop: An event loop to use. If not specified, this ctor will
-                     (eventually) call :py:meth:`asyncio.get_event_loop`.
         :param broker: An optional command broker to link to. If not
                       specified, a dummy one is used.
-        :param api_version: The API version to use. If this is ``None``, uses
-                            the max supported version.
         """
         super().__init__(broker)
 
+        self._api_version = api_version
         self._implementation = implementation
+        self._labware_offset_provider = labware_offset_provider
 
-        self._labware_offset_provider = (
-            labware_offset_provider or NullLabwareOffsetProvider()
-        )
-
-        self._api_version = api_version or MAX_SUPPORTED_VERSION
         if self._api_version > MAX_SUPPORTED_VERSION:
             raise RuntimeError(
                 f"API version {self._api_version} is not supported by this "
                 f"robot software. Please either reduce your requested API "
                 f"version or update your robot."
             )
-        self._loop = loop or asyncio.get_event_loop()
+
         self._instruments: Dict[types.Mount, Optional[InstrumentContext]] = {
             mount: None for mount in types.Mount
         }
@@ -499,7 +495,6 @@ class ProtocolContext(CommandPublisher):
             geometry=load_result.geometry,
             at_version=self.api_version,
             requested_as=requested_model,
-            loop=self._loop,
         )
         self._modules.append(module_context)
 

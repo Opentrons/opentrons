@@ -29,7 +29,7 @@ import logging  # noqa: E402
 
 from opentrons.types import Mount, Point  # noqa: E402
 from opentrons.hardware_control.types import Axis, CriticalPoint  # noqa: E402
-from opentrons.config.feature_flags import enable_ot3_hardware_controller  # noqa: E402
+from opentrons.config import feature_flags as ff  # noqa: E402
 from opentrons.hardware_control.types import OT3Axis, OT3Mount  # noqa: E402
 from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     calibrate_mount,
@@ -41,7 +41,7 @@ from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
 from opentrons.hardware_control.protocols import HardwareControlAPI  # noqa: E402
 from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
 
-if enable_ot3_hardware_controller():
+if ff.enable_ot3_hardware_controller():
     from opentrons.hardware_control.ot3api import OT3API
 
     HCApi: Union[Type[OT3API], Type["API"]] = OT3API

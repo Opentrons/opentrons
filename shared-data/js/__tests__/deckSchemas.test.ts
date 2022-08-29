@@ -1,4 +1,4 @@
-/** Ensure that protocol schema v4 definition itself is functions as intended,
+/** Ensure that the deck schema itself functions as intended,
  *  and that all v4 protocol fixtures will validate */
 import Ajv from 'ajv'
 import path from 'path'

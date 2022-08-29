@@ -35,6 +35,8 @@
   --c-error: #d12929;
   --c-error-light: #ffc0c0;
   --c-success: #60b120;
+  --c-blue-enabled: #006cfa;
+  --c-light-grey-hover: #c6c6c6;
 
   /* Misc */
   --c-selection-overlay: color-mod(var(--c-highlight) alpha(0.3));

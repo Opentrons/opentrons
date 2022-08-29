@@ -1,4 +1,4 @@
-/** Ensure that protocol schema v5 definition itself is functions as intended,
+/** Ensure that protocol schema v5 definition itself functions as intended,
  *  and that all v5 protocol fixtures will validate */
 import Ajv from 'ajv'
 import path from 'path'
@@ -34,8 +34,8 @@ describe('validate v5 protocol fixtures under JSON schema', () => {
         console.log(JSON.stringify(validationErrors, null, 4))
       }
 
-      expect(valid).toBe(true)
       expect(validationErrors).toBe(null)
+      expect(valid).toBe(true)
     })
   })
 })

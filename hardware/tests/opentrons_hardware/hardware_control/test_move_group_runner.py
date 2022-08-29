@@ -6,7 +6,9 @@ from mock import AsyncMock, call, MagicMock
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons_hardware.drivers.can_bus.can_messenger import MessageListenerCallback
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    MessageListenerCallback,
+)
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddLinearMoveRequest,
     HomeRequest,
@@ -329,7 +331,7 @@ async def test_move() -> None:
     """It should register to listen for messages."""
     subject = MoveGroupRunner(move_groups=[])
     mock_can_messenger = MagicMock()
-    await subject._move(mock_can_messenger)
+    await subject._move(mock_can_messenger, 0)
     mock_can_messenger.add_listener.assert_called_once()
     mock_can_messenger.remove_listener.assert_called_once()
 
@@ -338,11 +340,15 @@ class MockSendMoveCompleter:
     """Side effect mock of CanMessenger.send that immediately completes moves."""
 
     def __init__(
-        self, move_groups: MoveGroups, listener: MessageListenerCallback
+        self,
+        move_groups: MoveGroups,
+        listener: MessageListenerCallback,
+        start_at_index: int = 0,
     ) -> None:
         """Constructor."""
         self._move_groups = move_groups
         self._listener = listener
+        self._start_at_index = start_at_index
 
     @property
     def groups(self) -> MoveGroups:
@@ -359,7 +365,7 @@ class MockSendMoveCompleter:
             # Iterate through each move in each sequence and send a move
             # completed for it.
             for seq_id, moves in enumerate(
-                self._move_groups[message.payload.group_id.value]
+                self._move_groups[message.payload.group_id.value - self._start_at_index]
             ):
                 for node, move in moves.items():
                     assert isinstance(move, MoveGroupSingleAxisStep)
@@ -601,3 +607,28 @@ async def test_handles_unknown_group_ids(
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     # this should not throw
     await subject.run(can_messenger=mock_can_messenger)
+
+
+async def test_groups_from_nonzero_index(
+    mock_can_messenger: AsyncMock, move_group_single: MoveGroups
+) -> None:
+    """Callers can specify a non-zero starting group."""
+    subject = MoveScheduler(move_group_single, 1)
+    mock_sender = MockSendMoveCompleter(move_group_single, subject, 1)
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    # this should not throw
+    await subject.run(can_messenger=mock_can_messenger)
+    mock_can_messenger.send.assert_has_calls(
+        calls=[
+            call(
+                node_id=NodeId.broadcast,
+                message=md.ExecuteMoveGroupRequest(
+                    payload=ExecuteMoveGroupRequestPayload(
+                        group_id=UInt8Field(1),
+                        cancel_trigger=UInt8Field(0),
+                        start_trigger=UInt8Field(0),
+                    )
+                ),
+            )
+        ]
+    )
