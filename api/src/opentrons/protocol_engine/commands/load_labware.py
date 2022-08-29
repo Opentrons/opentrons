@@ -69,7 +69,7 @@ class LoadLabwareResult(BaseModel):
             "An ID referencing the labware offset that will apply"
             " to the newly-placed labware."
             " This offset will be in effect until the labware is moved"
-            " with a `moveLabware`x command."
+            " with a `moveLabware` command."
             " Null or undefined means no offset applies,"
             " so the default of (0, 0, 0) will be used."
         ),
