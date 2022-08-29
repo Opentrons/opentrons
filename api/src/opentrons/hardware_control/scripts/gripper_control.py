@@ -1,4 +1,8 @@
 import sys
+import datetime
+
+from logging.config import dictConfig
+from typing import Dict
 
 sys.path.append("/opt/opentrons-robot-server")
 
@@ -68,6 +72,32 @@ def build_api() -> ThreadManager[HardwareControlAPI]:
     return api
 
 
+def print_current_state(
+    api: ThreadManager[HardwareControlAPI],
+    cycle_index: int,
+    slot: int,
+):
+    """
+    1. timestamp
+    2. current cycle
+    3. current slot
+    4. gripper position (X, Y, Z_G)
+    5. gripper state: open/closed
+    6. encoder position (X, Y, G)
+    """
+    gripper = api.sync._gripper_handler.get_gripper()
+
+    pos = api.sync.current_position_ot3(OT3Mount.GRIPPER)
+    gripper_loc = (pos[OT3Axis.X], pos[OT3Axis.Y], pos[OT3Axis.Z_G])
+
+    enc_pos = api.sync._encoder_current_position
+    enc_loc = (enc_pos[OT3Axis.X], enc_pos[OT3Axis.Y], enc_pos[OT3Axis.G])
+    print(
+        f"{datetime.datetime.now()}, {cycle_index}, {slot}, "
+        f"{gripper_loc}, {gripper.state}, {enc_loc}\n"
+    )
+
+
 if __name__ == "__main__":
     from_slot = prompt_int_input("Origin slot (1-12)")
     to_slot = prompt_int_input("Destination slot (1-12)")
@@ -90,38 +120,47 @@ if __name__ == "__main__":
     from_slot_loc = get_slot_center_in_deck_coord(from_slot) + GRIPPER_OFFSET
     to_slot_loc = get_slot_center_in_deck_coord(to_slot) + GRIPPER_OFFSET
 
-    for i in range(repeats + 1):
+    for cycle in range(repeats + 1):
         api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
+        print_current_state(hc_api, cycle, from_slot)
         api.move_to(MOUNT, from_slot_loc._replace(z=grip_height))
 
         api.grip(grip_force)
+        print_current_state(hc_api, cycle, from_slot)
         api.delay(1)
 
         api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
         api.move_to(MOUNT, to_slot_loc._replace(z=homed_pos.z))
         api.move_to(MOUNT, to_slot_loc._replace(z=grip_height))
+        print_current_state(hc_api, cycle, from_slot)
 
         api.ungrip()
+        print_current_state(hc_api, cycle, from_slot)
         api.delay(1)
 
         # Return to safe height
         api.move_to(MOUNT, to_slot_loc._replace(z=homed_pos.z))
+        print_current_state(hc_api, cycle, from_slot)
 
         if return_to_origin:
 
             api.move_to(MOUNT, to_slot_loc._replace(z=grip_height))
 
             api.grip(grip_force)
+            print_current_state(hc_api, cycle, from_slot)
             api.delay(1.0)
 
             api.move_to(MOUNT, to_slot_loc._replace(z=homed_pos.z))
             api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
             api.move_to(MOUNT, from_slot_loc._replace(z=grip_height))
+            print_current_state(hc_api, cycle, from_slot)
 
             api.ungrip()
+            print_current_state(hc_api, cycle, from_slot)
             api.delay(1.0)
 
             # Return to safe height
             api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
+            print_current_state(hc_api, cycle, from_slot)
 
-        api.home()
+    api.home()
