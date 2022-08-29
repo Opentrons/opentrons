@@ -20,6 +20,7 @@ from opentrons.protocol_engine import (
     types as pe_types,
     StateSummary,
     CommandSlice,
+    Liquid,
 )
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import EngineStatus
@@ -86,6 +87,8 @@ def state_summary() -> StateSummary:
         mount=MountType.LEFT,
     )
 
+    liquids = [Liquid(id="some-id", displayName="water", description="water desc")]
+
     return StateSummary(
         errors=[analysis_error],
         labware=[analysis_labware],
@@ -95,6 +98,7 @@ def state_summary() -> StateSummary:
         # TODO (tz 22-4-19): added the field to class. make sure what to initialize
         labwareOffsets=[],
         status=EngineStatus.IDLE,
+        liquids=liquids,
     )
 
 

@@ -70,7 +70,6 @@ export const aquamarine = '#9dffd8'
 export const orangePeel = '#ff9900'
 export const skyBlue = '#50d5ff'
 export const popPink = '#ff80f5'
-export const richBlue = '#0380fb'
 export const springGreen = '#7eff42'
 export const tartRed = '#ff4f4f'
 export const whaleGrey = '#9395a0'
@@ -82,7 +81,6 @@ export const liquidColors = [
   orangePeel,
   skyBlue,
   popPink,
-  richBlue,
   springGreen,
   tartRed,
   whaleGrey,

@@ -32,6 +32,8 @@ PipetteSelect.args = {
     'p20_single_gen3',
     'p300_single_gen3',
     'p1000_single_gen3',
+    'p1000_multi_gen3',
+    'p50_multi_gen3',
   ],
   enableNoneOption: true,
 }

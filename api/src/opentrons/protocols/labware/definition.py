@@ -1,18 +1,17 @@
+from __future__ import annotations
+
 import logging
 import json
 import os
-import shutil
 from dataclasses import dataclass
 
 from pathlib import Path
-from typing import Any, AnyStr, List, Dict, Union
+from typing import TYPE_CHECKING, Any, AnyStr, List, Dict, Union
 
 import jsonschema  # type: ignore
 
 from opentrons.protocols.api_support.util import ModifiedList
-from opentrons.calibration_storage import helpers, modify
-from opentrons.protocols.context.labware import AbstractLabware
-from opentrons.types import Point
+from opentrons.calibration_storage import helpers
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.api_support.constants import (
@@ -22,6 +21,10 @@ from opentrons.protocols.api_support.constants import (
     USER_DEFS_PATH,
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
+
+if TYPE_CHECKING:
+    from opentrons.protocol_api.core.labware import AbstractLabware
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -43,7 +46,7 @@ def get_labware_definition(
         If unspecified, will search 'opentrons' then 'custom_beta'
     :param int version: The version of the labware definition. If unspecified,
         will use version 1.
-    :param bundled_defs: A bundle of labware definitions to exlusively use for
+    :param bundled_defs: A bundle of labware definitions to exclusively use for
         finding labware definitions, if specified
     :param extra_defs: An extra set of definitions (in addition to the system
         definitions) in which to search
@@ -155,24 +158,6 @@ def verify_definition(
     # we can type ignore this because if it passes the jsonschema it has
     # the correct structure
     return to_return  # type: ignore
-
-
-def delete_all_custom_labware() -> None:
-    """Delete all custom labware"""
-    if USER_DEFS_PATH.is_dir():
-        shutil.rmtree(USER_DEFS_PATH)
-
-
-def save_calibration(labware: AbstractLabware, delta: Point) -> None:
-    """Save a calibration"""
-    index_info = IndexFileInformation.from_labware(labware)
-    modify.save_labware_calibration(
-        labware_path=index_info.path,
-        definition=index_info.definition,
-        delta=delta,
-        parent=index_info.parent,
-    )
-    labware.set_calibration(delta=delta)
 
 
 def _get_labware_definition_from_bundle(

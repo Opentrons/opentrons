@@ -420,6 +420,7 @@ async def test_get_protocol_analyses(
         pipettes=[],
         commands=[],
         errors=[],
+        liquids=[],
     )
 
     decoy.when(protocol_store.has("protocol-id")).then_return(True)

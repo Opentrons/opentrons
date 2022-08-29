@@ -26,7 +26,6 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
   const StepMeterContainer = css`
     position: ${POSITION_RELATIVE};
     height: ${SPACING.spacing2};
-    margin-bottom: ${SPACING.spacing4};
     background-color: ${COLORS.medGreyEnabled};
   `
   const StepMeterBar = css`

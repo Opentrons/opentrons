@@ -14,6 +14,7 @@ from ..commands import (
     LoadPipetteResult,
     AspirateResult,
     DispenseResult,
+    DispenseInPlaceResult,
     MoveToCoordinatesResult,
     MoveToWellResult,
     PickUpTipResult,
@@ -127,7 +128,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
             self._state.aspirated_volume_by_id[pipette_id] = next_volume
 
-        elif isinstance(command.result, DispenseResult):
+        elif isinstance(command.result, (DispenseResult, DispenseInPlaceResult)):
             pipette_id = command.params.pipetteId
             previous_volume = self._state.aspirated_volume_by_id[pipette_id]
             next_volume = max(0.0, previous_volume - command.result.volume)

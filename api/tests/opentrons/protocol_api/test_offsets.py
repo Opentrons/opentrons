@@ -2,10 +2,8 @@ import json
 import os
 
 import pytest
-import datetime
-from opentrons import config
-from unittest.mock import Mock
 
+from opentrons import config
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons.calibration_storage import (
     modify,
@@ -16,8 +14,7 @@ from opentrons.calibration_storage import (
     types as cs_types,
 )
 from opentrons.protocol_api import labware
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
-from opentrons.protocols.labware.definition import _get_labware_path
+from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.types import Point, Location
 from opentrons.util.helpers import utc_now
 
@@ -61,12 +58,6 @@ minimalLabwareDef = {
 }
 
 
-def path(calibration_name):
-    return config.get_opentrons_path(
-        "labware_calibration_offsets_dir_v2"
-    ) / "{}.json".format(calibration_name)
-
-
 def tlc_path(pip_id):
     return config.get_tip_length_cal_path() / "{}.json".format(pip_id)
 
@@ -80,20 +71,7 @@ def mock_hash_labware(labware_def):
 
 
 @pytest.fixture
-def clear_calibration(monkeypatch):
-    try:
-        os.remove(path({MOCK_HASH}))
-    except FileNotFoundError:
-        pass
-    yield
-    try:
-        os.remove(path(MOCK_HASH))
-    except FileNotFoundError:
-        pass
-
-
-@pytest.fixture
-def clear_custom_tiprack_dir(monkeypatch):
+def clear_custom_tiprack_dir():
     try:
         os.remove(custom_tiprack_path(URI))
     except FileNotFoundError:
@@ -106,7 +84,7 @@ def clear_custom_tiprack_dir(monkeypatch):
 
 
 @pytest.fixture
-def clear_tlc_calibration(monkeypatch):
+def clear_tlc_calibration():
     try:
         os.remove(tlc_path(PIPETTE_ID))
     except FileNotFoundError:
@@ -116,23 +94,6 @@ def clear_tlc_calibration(monkeypatch):
         os.remove(tlc_path("index"))
     except FileNotFoundError:
         pass
-
-
-def test_save_labware_calibration(monkeypatch, clear_calibration):
-    # Test the save calibration file
-    assert not os.path.exists(path(MOCK_HASH))
-
-    impl = LabwareImplementation(minimalLabwareDef, Location(Point(0, 0, 0), "deck"))  # type: ignore[arg-type]
-    impl.set_calibration = Mock()  # type: ignore[assignment]
-
-    monkeypatch.setattr(helpers, "hash_labware_def", mock_hash_labware)
-
-    test_labware = labware.Labware(impl)
-
-    point = Point(1, 1, 1)
-    labware.save_calibration(test_labware, point)
-    assert os.path.exists(path(MOCK_HASH))
-    impl.set_calibration.assert_called_once_with(delta=point)
 
 
 def test_json_datetime_encoder():
@@ -244,65 +205,6 @@ def test_clear_tip_length_calibration_data(monkeypatch):
     assert len([f for f in os.listdir(calpath) if f.endswith(".json")]) == 0
 
 
-def test_schema_shape(monkeypatch, clear_calibration):
-    fake_time = utc_now()
-    time_string = fake_time.isoformat()
-    from_iso = datetime.datetime.fromisoformat(time_string)
-
-    class fake_datetime:
-        @classmethod
-        def fromisoformat(cls, obj):
-            return from_iso
-
-        @classmethod
-        def isoformat(cls):
-            return time_string
-
-    mock = Mock(spec=fake_datetime)
-    mock.__class__ = datetime.datetime  # type: ignore[assignment]
-
-    test_labware = labware.Labware(
-        LabwareImplementation(minimalLabwareDef, Location(Point(0, 0, 0), "deck"))  # type: ignore[arg-type]
-    )
-
-    monkeypatch.setattr(helpers, "hash_labware_def", mock_hash_labware)
-
-    expected = {"default": {"offset": [1, 1, 1], "lastModified": fake_time}}
-
-    def fake_helper_data(path, delta):
-        return expected
-
-    monkeypatch.setattr(modify, "_helper_offset_data_format", fake_helper_data)
-
-    labware.save_calibration(test_labware, Point(1, 1, 1))
-    with open(path(MOCK_HASH)) as f:
-        result = json.load(f, cls=ed.DateTimeDecoder)
-    assert result == expected
-
-
-def test_load_calibration(monkeypatch, clear_calibration):
-
-    monkeypatch.setattr(helpers, "hash_labware_def", mock_hash_labware)
-
-    test_labware = labware.Labware(
-        LabwareImplementation(minimalLabwareDef, Location(Point(0, 0, 0), "deck"))  # type: ignore[arg-type]
-    )
-
-    test_offset = Point(1, 1, 1)
-
-    labware.save_calibration(test_labware, test_offset)
-
-    # Set without saving to show that load will update with previously saved
-    # data
-    test_labware.set_calibration(Point(0, 0, 0))
-    test_labware.tip_length = 46.8
-    lookup_path = _get_labware_path(test_labware._implementation)
-    calibration_point = get.get_labware_calibration(
-        lookup_path, test_labware._implementation.get_definition()
-    )
-    assert calibration_point == test_offset
-
-
 def test_wells_rebuilt_with_offset():
     test_labware = labware.Labware(
         implementation=LabwareImplementation(
@@ -312,28 +214,14 @@ def test_wells_rebuilt_with_offset():
     old_wells = test_labware.wells()
     assert test_labware._implementation.get_geometry().offset == Point(10, 10, 5)
     assert test_labware._implementation.get_calibrated_offset() == Point(10, 10, 5)
-    labware.save_calibration(test_labware, Point(2, 2, 2))
+    test_labware.set_offset(x=2, y=2, z=2)
     new_wells = test_labware.wells()
     assert old_wells[0] != new_wells[0]
     assert test_labware._implementation.get_geometry().offset == Point(10, 10, 5)
     assert test_labware._implementation.get_calibrated_offset() == Point(12, 12, 7)
 
 
-def test_clear_calibrations():
-    calpath = config.get_opentrons_path("labware_calibration_offsets_dir_v2")
-    with open(calpath / "1.json", "w") as offset_file:
-        test_offset = {
-            "default": {"offset": [1, 2, 3], "lastModified": 1},
-            "tipLength": 1.2,
-        }
-        json.dump(test_offset, offset_file)
-
-    assert len(os.listdir(calpath)) > 0
-    delete.clear_calibrations()
-    assert len(os.listdir(calpath)) == 0
-
-
-def testhash_labware_def():
+def test_hash_labware_def():
     def1a = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1 / 3]}
     def1aa = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1 / 3]}
     def1b = {"metadata": {"a": "blah"}, "importantStuff": [1.1, 0.00003, 1 / 3]}

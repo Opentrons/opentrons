@@ -1,4 +1,4 @@
-""" opentrons.calibration_storage.get: functions for grabing calibration
+""" opentrons.calibration_storage.get: functions for grabbing calibration
 
 This module has functions that you can import to load robot or
 labware calibration from its designated file location.
@@ -10,86 +10,16 @@ import typing
 from typing_extensions import Literal
 
 from opentrons import config
-from opentrons.types import Point, Mount
+from opentrons.types import Mount
 
-from . import types as local_types, file_operators as io, helpers, migration, modify
+from . import types as local_types, file_operators as io, helpers
 
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from opentrons_shared_data.pipette.dev_types import LabwareUri
-    from .dev_types import CalibrationIndexDict, CalibrationDict
 
 
 log = logging.getLogger(__name__)
-
-
-def _format_calibration_type(
-    data: "CalibrationDict",
-) -> local_types.LabwareCalibrationTypes:
-    offset = local_types.OffsetData(
-        value=data["default"]["offset"], last_modified=data["default"]["lastModified"]
-    )
-    # TODO(6/16): Tip calibration no longer exists in
-    # the labware calibraiton file. We should
-    # have a follow-up PR to grab tip lengths
-    # based on the loaded pips + labware
-    return local_types.LabwareCalibrationTypes(
-        offset=offset, tip_length=local_types.TipLengthData()
-    )
-
-
-def _format_parent(data: "CalibrationIndexDict") -> local_types.ParentOptions:
-    # Since the slot is not saved and the data in the index is actually
-    # the labware hash to aid lookup, we erase it here.
-    options = local_types.ParentOptions(slot="")
-    if data["module"]:
-        options.module = data["module"]["parent"]
-    return options
-
-
-def get_all_calibrations() -> typing.List[local_types.CalibrationInformation]:
-    """
-    A helper function that will list all of the given calibrations
-    in a succinct way.
-
-    :return: A list of dictionary objects representing all of the
-    labware calibration files found on the robot.
-    """
-    all_calibrations: typing.List[local_types.CalibrationInformation] = []
-    offset_path = config.get_opentrons_path("labware_calibration_offsets_dir_v2")
-    index_path = offset_path / "index.json"
-    if not index_path.exists():
-        return all_calibrations
-
-    migration.check_index_version(index_path)
-    index_file = io.read_cal_file(str(index_path))
-    calibration_index = index_file.get("data", {})
-    for key, data in calibration_index.items():
-        cal_path = offset_path / f"{key}.json"
-        if cal_path.exists():
-            try:
-                cal_blob = io.read_cal_file(str(cal_path))
-            except json.JSONDecodeError:
-                log.error(
-                    f"Skipping corrupt calibration file (bad JSON): {str(cal_path)}"
-                )
-                continue
-            calibration = _format_calibration_type(cal_blob)  # type: ignore
-            try:
-                all_calibrations.append(
-                    local_types.CalibrationInformation(
-                        calibration=calibration,
-                        parent=_format_parent(data),
-                        labware_id=key,
-                        uri=data["uri"],
-                    )
-                )
-            except (KeyError, ValueError):
-                log.exception(
-                    f"Skipping corrupt calibration file (bad data) {str(cal_path)}"
-                )
-                continue
-    return all_calibrations
 
 
 def _get_tip_length_data(
@@ -114,32 +44,6 @@ def _get_tip_length_data(
             f"calibrated for this pipette: {pip_id} and cannot"
             "be loaded"
         )
-
-
-# TODO(mc, 2022-01-12): no longer used; remove
-def get_labware_calibration(
-    lookup_path: local_types.StrPath,
-    definition: "LabwareDefinition",
-    parent: str = "",
-    slot: str = "",
-) -> Point:
-    """
-    Find the delta of a given labware, if it exists.
-
-    :param lookup_path: short path to the labware calibration
-    :return: A point which represents the delta from well A1 origin of
-    a labware
-    """
-    offset_path = config.get_opentrons_path("labware_calibration_offsets_dir_v2")
-    offset = Point(0, 0, 0)
-    labware_path = offset_path / lookup_path
-    if labware_path.exists():
-        modify.add_existing_labware_to_index_file(definition, parent, slot)
-        migration.check_index_version(offset_path / "index.json")
-        calibration_data = io.read_cal_file(str(labware_path))
-        offset_array = calibration_data["default"]["offset"]
-        offset = Point(x=offset_array[0], y=offset_array[1], z=offset_array[2])
-    return offset
 
 
 def load_tip_length_calibration(

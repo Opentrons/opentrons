@@ -34,7 +34,7 @@ interface OverflowMenuProps {
 
 export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
   const { protocolKey, protocolType } = props
-  const { t } = useTranslation(['protocol_details', 'protocol_list'])
+  const { t } = useTranslation(['protocol_details', 'protocol_list', 'shared'])
   const {
     menuOverlay,
     handleOverflowClick,
@@ -50,11 +50,13 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
+    e.stopPropagation()
     dispatch(viewProtocolSourceFolder(protocolKey))
     setShowOverflowMenu(!showOverflowMenu)
   }
   const handleClickReanalyze: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
+    e.stopPropagation()
     dispatch(analyzeProtocol(protocolKey))
     setShowOverflowMenu(!showOverflowMenu)
   }
@@ -95,7 +97,7 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
             onClick={handleClickReanalyze}
             data-testid="ProtocolDetailsOverflowMenu_reanalyze"
           >
-            {t('reanalyze')}
+            {t('shared:reanalyze')}
           </MenuItem>
           <MenuItem
             onClick={handleClickDelete}

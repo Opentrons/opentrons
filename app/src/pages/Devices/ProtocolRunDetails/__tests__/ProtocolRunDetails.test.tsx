@@ -95,6 +95,7 @@ describe('ProtocolRunDetails', () => {
   beforeEach(() => {
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: true,
       isRunTerminal: false,
       isRunIdle: true,
@@ -219,6 +220,7 @@ describe('ProtocolRunDetails', () => {
   it('disables module controls tab when the run current but not idle', () => {
     mockUseCurrentRunId.mockReturnValue(RUN_ID)
     mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: false,
       isRunIdle: false,

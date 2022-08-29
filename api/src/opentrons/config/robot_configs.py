@@ -6,8 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Union, Optional, cast
 from typing_extensions import Literal
 
-from . import CONFIG, defaults_ot3, defaults_ot2, gripper_config
-from .feature_flags import enable_ot3_hardware_controller
+from . import CONFIG, defaults_ot3, defaults_ot2, gripper_config, feature_flags as ff
 from opentrons.hardware_control.types import BoardRevision
 from .types import CurrentDict, RobotConfig, AxisDict, OT3Config
 
@@ -33,7 +32,7 @@ def build_config(robot_settings: Dict[str, Any]) -> Union[RobotConfig, OT3Config
     object.
     """
     default_robot_model: Union[Literal["OT-3 Standard"], Literal["OT-2 Standard"]] = (
-        "OT-3 Standard" if enable_ot3_hardware_controller() else "OT-2 Standard"
+        "OT-3 Standard" if ff.enable_ot3_hardware_controller() else "OT-2 Standard"
     )
     robot_model = robot_settings.get("model", default_robot_model)
     if robot_model == "OT-3 Standard":
@@ -166,14 +165,14 @@ def _save_config_data(data: str, filename: Union[str, Path]) -> None:
 
 
 def default_deck_calibration() -> List[List[float]]:
-    if enable_ot3_hardware_controller():
+    if ff.enable_ot3_hardware_controller():
         return defaults_ot3.DEFAULT_DECK_TRANSFORM
     else:
         return defaults_ot2.DEFAULT_DECK_CALIBRATION_V2
 
 
 def default_pipette_offset() -> List[float]:
-    if enable_ot3_hardware_controller():
+    if ff.enable_ot3_hardware_controller():
         return defaults_ot3.DEFAULT_PIPETTE_OFFSET
     else:
         return defaults_ot2.DEFAULT_PIPETTE_OFFSET

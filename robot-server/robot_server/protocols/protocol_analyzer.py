@@ -38,4 +38,5 @@ class ProtocolAnalyzer:
             labware=result.state_summary.labware,
             pipettes=result.state_summary.pipettes,
             errors=result.state_summary.errors,
+            liquids=result.state_summary.liquids,
         )

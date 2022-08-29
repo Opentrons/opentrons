@@ -5,3 +5,5 @@ export type WizardStep =
   | 'instructions'
   | 'confirm'
   | 'calibratePipette'
+
+export type Diagram = 'screws' | 'tab'
