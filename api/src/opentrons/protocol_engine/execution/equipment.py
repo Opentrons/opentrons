@@ -131,10 +131,15 @@ class EquipmentHandler:
             module_model = None
         else:
             module_id = location.moduleId
-            module_model = self._state_store.modules.get_model(module_id)
-            module_location = self._state_store.modules.get_location(module_id)
+            module_model = self._state_store.modules.get_model(module_id=module_id)
+            module_location = self._state_store.modules.get_location(
+                module_id=module_id
+            )
             slot_name = module_location.slotName
 
+        # TODO: It almost seems like find_applicable_labware_offset should be in
+        # a separate LabwareOffsetView so it can do its own resolution of
+        # input location (module ID) to offset location (weird slotName+model combo).
         offset = self._state_store.labware.find_applicable_labware_offset(
             definition_uri=definition_uri,
             location=LabwareOffsetLocation(
@@ -150,16 +155,42 @@ class EquipmentHandler:
         )
 
     # TODO: What belongs here and what belongs in LabwareView?
+    #       This is basically LabwareView.find_applicable_labware_offset()
+    #       except with some parameter munging. Can we avoid that munging and
+    #       remove one of these layers?
     # TODO: Can we deduplicate this more with the loadLabware codepath?
     # TODO: Can LabwareLocation and LabwareOffsetLocation have better names
     #       to emphasize their differences?
-    def get_offset_id_from_labware_location(
-        self, labware_id: str, new_labware_location: LabwareLocation
-    ) -> str:
-        definition_uri = self._state_store.labware.get_definition_uri(
-            labware_id=labware_id
+    def select_offset_for_after_move(
+        self, labware_id: str, new_location: LabwareLocation
+    ) -> Optional[str]:
+        """Pick what offset to use for a labware if the labware is moved."""
+        current_labware = self._state_store.labware.get(labware_id=labware_id)
+
+        definition_uri = current_labware.definitionUri
+
+        if isinstance(new_location, DeckSlotLocation):
+            new_slot_name = new_location.slotName
+            new_module_model = None
+        else:
+            new_module_id = new_location.moduleId
+            new_module_model = self._state_store.modules.get_model(
+                module_id=new_module_id
+            )
+            new_module_location = self._state_store.modules.get_location(
+                module_id=new_module_id
+            )
+            new_slot_name = new_module_location.slotName
+
+        new_offset = self._state_store.labware.find_applicable_labware_offset(
+            definition_uri=definition_uri,
+            location=LabwareOffsetLocation(
+                slotName=new_slot_name,
+                moduleModel=new_module_model,
+            ),
         )
-        raise NotImplementedError()
+
+        return None if new_offset is None else new_offset.id
 
     async def load_pipette(
         self,
