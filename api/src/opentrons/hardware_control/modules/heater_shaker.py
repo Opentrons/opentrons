@@ -117,6 +117,10 @@ class HeaterShaker(mod_abc.AbstractModule):
         """Used for picking up serial port symlinks"""
         return "heatershaker"
 
+    def firmware_prefix(self) -> str:
+        """The prefix used for looking up firmware"""
+        return "heater-shaker"
+
     @staticmethod
     def _model_from_revision(revision: Optional[str]) -> str:
         """Defines the revision -> model mapping"""
@@ -444,7 +448,10 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self._poller.stop_and_wait()
         async with update.protect_dfu_transition():
             await self._driver.enter_programming_mode()
-            dfu_info = await update.find_dfu_device(pid=DFU_PID)
+            # Heater-Shaker has two unique DFU devices
+            dfu_info = await update.find_dfu_device(
+                pid=DFU_PID, expected_device_count=2
+            )
             return dfu_info
 
 
