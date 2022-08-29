@@ -10,11 +10,11 @@ from opentrons.types import (
     MountType as Mount,
     Mount as DeprecatedMount,
     Point,
+    PipetteName,
 )
 
 from opentrons.protocol_engine import (
     DeckSlotLocation,
-    PipetteName,
     ModuleLocation,
     ModuleModel,
 )

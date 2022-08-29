@@ -1,7 +1,8 @@
 """Synchronous ProtocolEngine client module."""
 from typing import cast, Optional
 
-from opentrons.types import MountType
+from opentrons.types import MountType, PipetteName
+
 
 from .. import commands
 from ..state import StateView
@@ -9,7 +10,6 @@ from ..types import (
     DeckSlotLocation,
     LabwareLocation,
     ModuleModel,
-    PipetteName,
     WellLocation,
 )
 from .transports import AbstractSyncTransport

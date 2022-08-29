@@ -2,8 +2,8 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.types import Mount, MountType
-from opentrons.protocol_engine import PipetteName, commands
+from opentrons.types import Mount, MountType, PipetteName
+from opentrons.protocol_engine import commands
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 
 from opentrons.protocol_api.core.engine import ProtocolCore, InstrumentCore

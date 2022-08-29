@@ -4,9 +4,8 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from opentrons.types import MountType
+from opentrons.types import MountType, PipetteName
 
-from ..types import PipetteName
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:

@@ -7,10 +7,9 @@ from opentrons.protocol_engine import (
     LabwareLocation,
     ModuleModel,
     DeckSlotLocation,
-    PipetteName,
 )
 from opentrons.protocol_engine import Liquid
-from opentrons.types import MountType
+from opentrons.types import MountType, PipetteName
 
 
 class CommandTranslatorError(Exception):

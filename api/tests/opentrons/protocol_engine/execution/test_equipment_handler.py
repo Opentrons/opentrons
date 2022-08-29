@@ -6,7 +6,7 @@ from typing import Any, cast
 
 from opentrons.calibration_storage.helpers import uri_from_details
 
-from opentrons.types import Mount as HwMount, MountType, DeckSlotName
+from opentrons.types import Mount as HwMount, MountType, DeckSlotName, PipetteName
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     TempDeck,
@@ -20,7 +20,6 @@ from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
-    PipetteName,
     LoadedPipette,
     LabwareOffset,
     LabwareOffsetVector,

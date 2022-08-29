@@ -15,13 +15,12 @@ from opentrons_shared_data.labware.labware_definition import (
     WellDefinition,
 )
 from opentrons_shared_data.protocol.models import protocol_schema_v6
-from opentrons.types import DeckSlotName, MountType
+from opentrons.types import DeckSlotName, MountType, PipetteName
 from opentrons.protocol_runner.json_translator import JsonTranslator
 from opentrons.protocol_engine import (
     commands as pe_commands,
     DeckPoint,
     DeckSlotLocation,
-    PipetteName,
     WellLocation,
     WellOrigin,
     WellOffset,

@@ -4,7 +4,7 @@ from typing import Optional, overload
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import MountType
+from opentrons.types import MountType, PipetteName
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     AbstractModule,
@@ -28,7 +28,6 @@ from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
 from ..state import StateStore, HardwareModule
 from ..types import (
     LabwareLocation,
-    PipetteName,
     DeckSlotLocation,
     LabwareOffsetLocation,
     ModuleModel,

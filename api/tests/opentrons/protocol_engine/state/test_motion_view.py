@@ -4,7 +4,7 @@ from decoy import Decoy
 from dataclasses import dataclass, field
 from typing import Optional, Sequence, Tuple
 
-from opentrons.types import Point, MountType, DeckSlotName
+from opentrons.types import Point, MountType, DeckSlotName, PipetteName
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons import motion_planning
 
@@ -13,7 +13,6 @@ from opentrons.protocol_engine.types import (
     WellLocation,
     WellOrigin,
     WellOffset,
-    PipetteName,
     LoadedPipette,
     DeckSlotLocation,
 )

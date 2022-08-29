@@ -8,7 +8,6 @@ from opentrons.commands.types import CommentMessage, PauseMessage, CommandMessag
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
-    PipetteName,
     ModuleModel,
     ModuleDefinition,
     commands as pe_commands,
@@ -28,7 +27,7 @@ from opentrons.protocol_runner.legacy_wrappers import (
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
-from opentrons.types import DeckSlotName, Mount, MountType
+from opentrons.types import DeckSlotName, Mount, MountType, PipetteName
 
 
 @pytest.fixture

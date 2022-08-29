@@ -4,7 +4,7 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from opentrons.types import MountType, DeckSlotName, Location
+from opentrons.types import MountType, DeckSlotName, Location, PipetteName
 from opentrons.commands import types as legacy_command_types
 from opentrons.protocol_engine import (
     ProtocolEngineError,
@@ -343,7 +343,7 @@ class LegacyCommandMapper:
             startedAt=now,
             completedAt=now,
             params=pe_commands.LoadPipetteParams.construct(
-                pipetteName=pe_types.PipetteName(
+                pipetteName=PipetteName(
                     instrument_load_info.instrument_load_name
                 ),
                 mount=mount,

@@ -2,10 +2,10 @@
 import pytest
 from typing import cast, Dict, List, Optional
 
-from opentrons.types import MountType, Mount as HwMount
+from opentrons.types import PipetteName, MountType, Mount as HwMount
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import PipetteName, LoadedPipette
+from opentrons.protocol_engine.types import LoadedPipette
 from opentrons.protocol_engine.state.pipettes import (
     PipetteState,
     PipetteView,

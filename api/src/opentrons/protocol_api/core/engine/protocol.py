@@ -3,14 +3,13 @@ from typing import Dict, Optional
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.types import Mount, MountType, Location, DeckLocation
+from opentrons.types import Mount, MountType, Location, DeckLocation, PipetteName
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 
-from opentrons.protocol_engine import PipetteName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 from ..protocol import AbstractProtocol, LoadModuleResult

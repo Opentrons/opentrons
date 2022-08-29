@@ -2,11 +2,11 @@
 from decoy import Decoy
 
 from opentrons.hardware_control import CriticalPoint, HardwareControlAPI
-from opentrons.types import Mount, MountType, Point
+from opentrons.types import Mount, MountType, Point, PipetteName
 from opentrons.motion_planning import Waypoint
 from opentrons.protocol_engine.execution import MovementHandler
 from opentrons.protocol_engine.state import StateView
-from opentrons.protocol_engine.types import DeckPoint, LoadedPipette, PipetteName
+from opentrons.protocol_engine.types import DeckPoint, LoadedPipette
 
 from opentrons.protocol_engine.commands.move_to_coordinates import (
     MoveToCoordinatesParams,
