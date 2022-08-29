@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.3...v6.1.0-beta.0) (2022-08-29)
+
+**Note:** Version bump only for package opentrons
+
+
 # [6.1.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.2...v6.1.0-alpha.3) (2022-08-19)
 
 
@@ -16,19 +21,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Features
 
 * **papi-v2:** home both pipettes at once before specific h/s actions ([#11330](https://github.com/Opentrons/opentrons/issues/11330)) ([3c12e94](https://github.com/Opentrons/opentrons/commit/3c12e94ee0d6d17ecc66127651fb6d7d6ea8816d))
-
-
-
-## [6.0.1-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.1...v6.0.1-alpha.1) (2022-08-08)
-
-
-
-## [6.0.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.0.1-alpha.0) (2022-08-02)
-
-
-### Bug Fixes
-
-* **api:** ensure correct sync hardware API is used for analysis ([#11227](https://github.com/Opentrons/opentrons/issues/11227)) ([503dc95](https://github.com/Opentrons/opentrons/commit/503dc957e2d2bd9906db7770be0a09295a141eaa))
 
 
 

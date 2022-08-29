@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.3...v6.1.0-beta.0) (2022-08-29)
+
+
+**Note:** Version bump only for package @opentrons/app
+
+
 # [6.1.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.2...v6.1.0-alpha.3) (2022-08-19)
 
 
@@ -15,25 +21,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **app:** return valid custom labware when sorting ([#11369](https://github.com/Opentrons/opentrons/issues/11369)) ([9d6cc14](https://github.com/Opentrons/opentrons/commit/9d6cc142f4190988d94cf021a0b291ca613ae29e))
 * **app:** robotSettings Calibrations tab section title text-align bug ([#11314](https://github.com/Opentrons/opentrons/issues/11314)) ([be5f65e](https://github.com/Opentrons/opentrons/commit/be5f65e3c533f08b48bcfef5a6ee901d75096453))
 * **app:** show H-S wizard when module is powered off ([#11358](https://github.com/Opentrons/opentrons/issues/11358)) ([dfd6bb5](https://github.com/Opentrons/opentrons/commit/dfd6bb57e80515ad8fb24e33f2d25bb749d20d9b))
-
-
-
-## [6.0.1-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.1...v6.0.1-alpha.1) (2022-08-08)
-
-
-### Bug Fixes
-
-* **app:** connect pipette settings form's submit button ([#11288](https://github.com/Opentrons/opentrons/issues/11288)) ([14228ac](https://github.com/Opentrons/opentrons/commit/14228ac5540d61c31f3dcf18543d9e3630bced51))
-
-
-
-## [6.0.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.0.1-alpha.0) (2022-08-02)
-
-
-### Bug Fixes
-
-* **app, app-shell:** fix python override path select on windows ([#11257](https://github.com/Opentrons/opentrons/issues/11257)) ([0da8f98](https://github.com/Opentrons/opentrons/commit/0da8f983b9b3483b30f5b84dc821865996c6fa50))
-
 
 
 
