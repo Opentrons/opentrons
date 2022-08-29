@@ -51,7 +51,7 @@ type CalBlockModalState =
 interface OverflowMenuProps {
   calType: 'pipetteOffset' | 'tipLength'
   robotName: string
-  mount: Mount
+  mount?: Mount
   serialNumber: string | null
   updateRobotStatus: (isRobotBusy: boolean) => void
 }
@@ -224,7 +224,10 @@ export function OverflowMenu({
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          <MenuItem onClick={e => handleCalibration(calType, e)}>
+          <MenuItem
+            onClick={e => handleCalibration(calType, e)}
+            disabled={mount == null}
+          >
             {calType === 'pipetteOffset'
               ? applicablePipetteOffsetCal != null
                 ? t('recalibrate_pipette')
