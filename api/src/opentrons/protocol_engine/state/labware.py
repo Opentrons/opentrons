@@ -403,6 +403,9 @@ class LabwareView(HasState[LabwareState]):
         """Get all labware offsets, in the order they were added."""
         return list(self._state.labware_offsets_by_id.values())
 
+    # TODO: Make this slightly more ergonomic for the caller by
+    # only returning the optional str ID, at the cost of baking redundant lookups
+    # into the API?
     def find_applicable_labware_offset(
         self,
         definition_uri: str,
