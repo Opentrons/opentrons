@@ -6,10 +6,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 # [6.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.3...v6.1.0-beta.0) (2022-08-29)
 
 
-### Bug Fixes
-
-* **protocol-designer:** truncate labware type name ([#11364](https://github.com/Opentrons/opentrons/issues/11364)) ([e8211c4](https://github.com/Opentrons/opentrons/commit/e8211c4183d3c7021938dc2bc08ca16c6eee45a7))
-
+**Note:** Version bump only for package protocol-designer
 
 
 

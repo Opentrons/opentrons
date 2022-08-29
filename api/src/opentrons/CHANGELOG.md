@@ -5,19 +5,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 # [6.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.3...v6.1.0-beta.0) (2022-08-29)
 
-
-### Bug Fixes
-
-* **api:** allow aspirate/dispense at arbitrary locations ([#11352](https://github.com/Opentrons/opentrons/issues/11352)) ([d9107d2](https://github.com/Opentrons/opentrons/commit/d9107d25cb366f49454a6e35a90205ab354d8acf)), closes [#11302](https://github.com/Opentrons/opentrons/issues/11302)
-* **api:** make hs wait until idle on deactivate shake ([#11342](https://github.com/Opentrons/opentrons/issues/11342)) ([a78b6fb](https://github.com/Opentrons/opentrons/commit/a78b6fbdf607549a0313fccaae18681646f11207))
-* **papi-v2:** do not raise h/s movement flagger for point-only destinations ([#11335](https://github.com/Opentrons/opentrons/issues/11335)) ([aeb8c46](https://github.com/Opentrons/opentrons/commit/aeb8c46c33903aaab31ab129a84cf69ec51067cc))
-
-
-### Features
-
-* **papi-v2:** home both pipettes at once before specific h/s actions ([#11330](https://github.com/Opentrons/opentrons/issues/11330)) ([3c12e94](https://github.com/Opentrons/opentrons/commit/3c12e94ee0d6d17ecc66127651fb6d7d6ea8816d))
-
-
+**Note:** Version bump only for package opentrons
 
 
 # [6.1.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.2...v6.1.0-alpha.3) (2022-08-19)
