@@ -1,6 +1,6 @@
 """Read relevant protocol information from a set of files."""
 from pathlib import Path
-from typing import List, Optional, Sequence, Union
+from typing import List, Optional, Sequence, Union, Dict
 
 from .input_file import AbstractInputFile
 from .file_reader_writer import FileReaderWriter, FileReadError
@@ -137,8 +137,11 @@ class ProtocolReader:
     def validate_json_protocol(protocol: Union[ProtocolSchemaV5, ProtocolSchemaV6]) -> None:
         """Validate protocol mapping constraints."""
         labware_ids = protocol.labware.keys()
-        print(labware_ids)
-        load_labware_commands = filter(lambda command: command.commandType == "loadLabwre", protocol.commands)
-        print(load_labware_commands)
-        if protocol.labware.keys() not in load_labware_commands:
-            raise Exception()
+        # liquid_ids = protocol.liquids.keys()
+        # pipette_ids = protocol.pipettes.keys()
+        # module_ids = protocol.modules.keys()
+        loaded_obejects: Dict[str, List[str]] = {"loadLabware": labware_ids}
+        for command_type in loaded_obejects:
+            print(command_type)
+            if loaded_obejects[command_type] not in filter(lambda command: command.commandType == command_type, protocol.commands):
+                raise ProtocolFilesInvalidError(f"missing {command_type} id in parent data model.")
