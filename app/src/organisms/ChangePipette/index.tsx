@@ -55,6 +55,7 @@ import {
 import type { State, Dispatch } from '../../redux/types'
 import type { Mount } from '../../redux/pipettes/types'
 import type { WizardStep } from './types'
+import { RequestState } from '../../redux/robot-api/types'
 
 interface Props {
   robotName: string
@@ -68,6 +69,8 @@ const MOVE_PIPETTE_TO_FRONT = 'Move pipette to front'
 const CANCEL = 'Cancel'
 const MOUNT = 'mount'
 const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
+
+const TOTAL_STEPS = 3
 
 export function ChangePipette(props: Props): JSX.Element | null {
   const { robotName, mount, closeModal } = props
@@ -104,7 +107,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     return getMovementStatus(state, robotName)
   })
 
-  const homePipStatus = useSelector((state: State) => {
+  const homePipStatus = useSelector<State, RequestState | null>(state => {
     return finalRequestId.current
       ? getRequestById(state, finalRequestId.current)
       : null
@@ -162,15 +165,21 @@ export function ChangePipette(props: Props): JSX.Element | null {
     displayCategory:
       actualPipette?.displayCategory || wantedPipette?.displayCategory || null,
   }
-  const totalSteps = 3
   const [instructionStepPage, instructionSetStepPage] = React.useState<number>(
     0
   )
   const eightChannel = wantedPipette != null && wantedPipette.channels === 8
   const direction = actualPipette ? DETACH : ATTACH
+  const exitModal = (
+    <ExitModal
+      back={() => setConfirmExit(false)}
+      exit={homePipAndExit}
+      direction={direction}
+    />
+  )
 
   //  this is the logic for the Instructions page that renders 3 pages within the component
-  let instructionsCurrentStep: number = totalSteps
+  let instructionsCurrentStep: number = TOTAL_STEPS
   if (wizardStep === INSTRUCTIONS) {
     if (instructionStepPage === 0) {
       instructionsCurrentStep = 1
@@ -247,11 +256,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
         : attachWizardHeader
 
     contents = confirmExit ? (
-      <ExitModal
-        back={() => setConfirmExit(false)}
-        exit={homePipAndExit}
-        direction={direction}
-      />
+      exitModal
     ) : (
       <Instructions
         {...{
@@ -262,7 +267,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
           back: () => setWizardStep(CLEAR_DECK),
           stepPage: instructionStepPage,
           setStepPage: instructionSetStepPage,
-          totalSteps: eightChannel ? 4 : totalSteps,
+          totalSteps: eightChannel ? 4 : TOTAL_STEPS,
           title:
             actualPipette?.displayName != null
               ? t('detach_pipette', {
@@ -287,7 +292,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
       dispatchApiRequests(home(robotName, ROBOT))
       startPipetteOffsetWizard()
     }
-    currentStep = success ? (eightChannel ? 4 : totalSteps) : totalSteps - 1
+    currentStep = success ? (eightChannel ? 4 : TOTAL_STEPS) : TOTAL_STEPS - 1
     exitWizardHeader = success ? homePipAndExit : () => setConfirmExit(true)
 
     wizardTitle =
@@ -301,11 +306,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
           })
 
     contents = confirmExit ? (
-      <ExitModal
-        back={() => setConfirmExit(false)}
-        exit={homePipAndExit}
-        direction={direction}
-      />
+      exitModal
     ) : (
       <ConfirmPipette
         {...{
@@ -339,7 +340,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     return (
       <ModalShell height="28.12rem" width="47rem">
         <WizardHeader
-          totalSteps={eightChannel ? 4 : totalSteps}
+          totalSteps={eightChannel ? 4 : TOTAL_STEPS}
           currentStep={currentStep}
           title={wizardTitle}
           onExit={exitWizardHeader}
