@@ -299,12 +299,13 @@ async def test_read_files_no_copy(
     )
 
 
-def test_validate_protocol(decoy: Decoy, subject: ProtocolReader) -> None:
+def test_validate_json_protocol(decoy: Decoy, subject: ProtocolReader) -> None:
     """Should raise an exception when a protocol is invalid."""
     labware = {
         "labware-id-1": protocol_schema_v6.Labware(definitionId="definition-1"),
         "labware-id-2": protocol_schema_v6.Labware(definitionId="definition-2"),
     }
+    pipettes = {"pipette-id-1": protocol_schema_v6.Pipette(name="pipette-1")}
     commands = [
         protocol_schema_v6.Command(
             commandType="loadLabware",
@@ -316,7 +317,7 @@ def test_validate_protocol(decoy: Decoy, subject: ProtocolReader) -> None:
         ),
     ]
     protocol = protocol_schema_v6.ProtocolSchemaV6.construct(  # type: ignore[call-arg]
-        labware=labware, commands=commands
+        labware=labware, commands=commands, pipettes=pipettes
     )
 
     subject.validate_json_protocol(protocol)

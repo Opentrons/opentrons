@@ -137,12 +137,14 @@ class ProtocolReader:
     @staticmethod
     def validate_json_protocol(
         protocol: Union[ProtocolSchemaV6],  # Union[ProtocolSchemaV5, ProtocolSchemaV6]
-    ) -> None:
+    ) -> Union[ProtocolSchemaV6]:
         """Validate protocol mapping constraints."""
         labware_ids = protocol.labware.keys()
-        # liquid_ids = protocol.liquids.keys()
-        # pipette_ids = protocol.pipettes.keys()
-        # module_ids = protocol.modules.keys()
+        pipette_ids = protocol.pipettes.keys()
+        if protocol.liquids:
+            liquid_ids = protocol.liquids.keys()
+        if protocol.modules:
+            module_ids = protocol.modules.keys()
         # loaded_objects: Dict[str, List[str]] = {"loadLabware": labware_ids}
         if isinstance(protocol, ProtocolSchemaV6):
             filtered_labware = list(
@@ -150,6 +152,12 @@ class ProtocolReader:
                 for command in protocol.commands
                 if command.commandType == "loadLabware"
                 and command.params.labwareId not in labware_ids
+            )
+            filtered_pipettes = list(
+                command
+                for command in protocol.commands
+                if command.commandType == "loadPipette"
+                and command.params.pipetteId not in pipette_ids
             )
         # else:
         #     filtered_labware = list(
@@ -160,5 +168,11 @@ class ProtocolReader:
         #     )
         if filtered_labware:
             raise ProtocolFilesInvalidError(
-                "missing loadLabware id in parent data model."
+                "missing loadLabware id in referencing parent data model."
             )
+        elif filtered_pipettes:
+            raise ProtocolFilesInvalidError(
+                "missing loadPipette id in referencing parent data model."
+            )
+
+        return protocol
