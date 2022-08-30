@@ -305,7 +305,7 @@ def test_validate_json_protocol(decoy: Decoy, subject: ProtocolReader) -> None:
         "labware-id-1": protocol_schema_v6.Labware(definitionId="definition-1"),
         "labware-id-2": protocol_schema_v6.Labware(definitionId="definition-2"),
     }
-    pipettes = {"pipette-id-1": protocol_schema_v6.Pipette(name="pipette-1")}
+    pipettes = {"pipetteId": protocol_schema_v6.Pipette(name="pipette-1")}
     commands = [
         protocol_schema_v6.Command(
             commandType="loadLabware",
@@ -313,11 +313,11 @@ def test_validate_json_protocol(decoy: Decoy, subject: ProtocolReader) -> None:
         ),
         protocol_schema_v6.Command(
             commandType="loadPipette",
-            params=protocol_schema_v6.Params(pipetteId="pipette-id-3"),
+            params=protocol_schema_v6.Params(pipetteId="pipetteId"),
         ),
     ]
     protocol = protocol_schema_v6.ProtocolSchemaV6.construct(  # type: ignore[call-arg]
         labware=labware, commands=commands, pipettes=pipettes
     )
 
-    subject.validate_json_protocol(protocol)
+    subject._validate_json_protocol(protocol)

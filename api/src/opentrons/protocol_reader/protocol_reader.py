@@ -56,6 +56,8 @@ class ProtocolReader:
         try:
             buffered_files = await self._file_reader_writer.read(files)
             role_analysis = self._role_analyzer.analyze(buffered_files)
+            if isinstance(role_analysis.main_file.data, ProtocolSchemaV6):
+                self._validate_json_protocol(role_analysis.main_file.data)
             config_analysis = self._config_analyzer.analyze(role_analysis.main_file)
         except (FileReadError, RoleAnalysisError, ConfigAnalysisError) as e:
             raise ProtocolFilesInvalidError(str(e)) from e
@@ -133,40 +135,40 @@ class ProtocolReader:
         )
 
     @staticmethod
-    def validate_json_protocol(protocol: ProtocolSchemaV6) -> ProtocolSchemaV6:
-        """Validate protocol mapping constraints."""
-        if (
+    def _validate_json_protocol(protocol: ProtocolSchemaV6) -> ProtocolSchemaV6:
+        """Validate json v6 protocol mapping constraints."""
+        if not list(
             command
             for command in protocol.commands
             if command.params.pipetteId
-            and command.params.pipetteId not in set(protocol.pipettes.keys())
+            and command.params.pipetteId in set(protocol.pipettes.keys())
         ):
             raise ProtocolFilesInvalidError(
                 "missing loadPipette id in referencing parent data model."
             )
-        elif (
+        elif not list(
             command
             for command in protocol.commands
             if command.params.labwareId
-            and command.params.labwareId not in set(protocol.labware.keys())
+            and command.params.labwareId in set(protocol.labware.keys())
         ):
             raise ProtocolFilesInvalidError(
                 "missing loadLabware id in referencing parent data model."
             )
-        elif protocol.liquids and (
+        elif protocol.liquids and not list(
             command
             for command in protocol.commands
             if command.params.liquidId
-            and command.params.liquidId not in set(protocol.liquids.keys())
+            and command.params.liquidId in set(protocol.liquids.keys())
         ):
             raise ProtocolFilesInvalidError(
                 "missing loadLiquid id in referencing parent data model."
             )
-        elif protocol.modules and (
+        elif protocol.modules and not list(
             command
             for command in protocol.commands
             if command.params.moduleId
-            and command.params.moduleId not in set(protocol.modules.keys())
+            and command.params.moduleId in set(protocol.modules.keys())
         ):
             raise ProtocolFilesInvalidError(
                 "missing loadLiquid id in referencing parent data model."
