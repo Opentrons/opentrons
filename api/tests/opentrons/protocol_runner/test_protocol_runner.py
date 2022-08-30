@@ -376,8 +376,6 @@ def test_load_legacy_python_with_pe_papi_core(
     decoy: Decoy,
     legacy_file_reader: LegacyFileReader,
     legacy_context_creator: LegacyContextCreator,
-    legacy_executor: LegacyExecutor,
-    task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
     mock_feature_flags: None,
     subject: ProtocolRunner,
