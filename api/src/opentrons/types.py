@@ -191,7 +191,7 @@ class PipetteName(str, enum.Enum):
     P300_MULTI_GEN2 = "p300_multi_gen2"
     P1000_SINGLE = "p1000_single"
     P1000_SINGLE_GEN2 = "p1000_single_gen2"
-    P300_SINGLE_GEN3 = "p300_single_gen3"
+    P50_SINGLE_GEN3 = "p50_single_gen3"
     P1000_SINGLE_GEN3 = "p1000_single_gen3"
     P1000_MULTI_GEN3 = "p1000_multi_gen3"
     P50_MULTI_GEN3 = "p50_multi_gen3"
