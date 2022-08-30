@@ -1,14 +1,12 @@
 """Read relevant protocol information from a set of files."""
 from pathlib import Path
-from typing import List, Optional, Sequence, Union
+from typing import List, Optional, Sequence
 
 from .input_file import AbstractInputFile
 from .file_reader_writer import FileReaderWriter, FileReadError
 from .role_analyzer import RoleAnalyzer, RoleAnalysisFile, RoleAnalysisError
 from .config_analyzer import ConfigAnalyzer, ConfigAnalysisError
 from .protocol_source import ProtocolSource, ProtocolSourceFile
-
-from opentrons.protocols.models import JsonProtocol as ProtocolSchemaV5
 
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6
 
@@ -135,44 +133,42 @@ class ProtocolReader:
         )
 
     @staticmethod
-    def validate_json_protocol(
-        protocol: Union[ProtocolSchemaV6],  # Union[ProtocolSchemaV5, ProtocolSchemaV6]
-    ) -> Union[ProtocolSchemaV6]:
+    def validate_json_protocol(protocol: ProtocolSchemaV6) -> ProtocolSchemaV6:
         """Validate protocol mapping constraints."""
-        labware_ids = protocol.labware.keys()
-        pipette_ids = protocol.pipettes.keys()
-        if protocol.liquids:
-            liquid_ids = protocol.liquids.keys()
-        if protocol.modules:
-            module_ids = protocol.modules.keys()
-        # loaded_objects: Dict[str, List[str]] = {"loadLabware": labware_ids}
-        if isinstance(protocol, ProtocolSchemaV6):
-            filtered_labware = list(
-                command
-                for command in protocol.commands
-                if command.commandType == "loadLabware"
-                and command.params.labwareId not in labware_ids
-            )
-            filtered_pipettes = list(
-                command
-                for command in protocol.commands
-                if command.commandType == "loadPipette"
-                and command.params.pipetteId not in pipette_ids
-            )
-        # else:
-        #     filtered_labware = list(
-        #         command
-        #         for command in protocol.commands
-        #         if command.command is "loadLabware"
-        #         and command.params.labware not in labware_ids
-        #     )
-        if filtered_labware:
-            raise ProtocolFilesInvalidError(
-                "missing loadLabware id in referencing parent data model."
-            )
-        elif filtered_pipettes:
+        if (
+            command
+            for command in protocol.commands
+            if command.params.pipetteId
+            and command.params.pipetteId not in set(protocol.pipettes.keys())
+        ):
             raise ProtocolFilesInvalidError(
                 "missing loadPipette id in referencing parent data model."
             )
-
+        elif (
+            command
+            for command in protocol.commands
+            if command.params.labwareId
+            and command.params.labwareId not in set(protocol.labware.keys())
+        ):
+            raise ProtocolFilesInvalidError(
+                "missing loadLabware id in referencing parent data model."
+            )
+        elif protocol.liquids and (
+            command
+            for command in protocol.commands
+            if command.params.liquidId
+            and command.params.liquidId not in set(protocol.liquids.keys())
+        ):
+            raise ProtocolFilesInvalidError(
+                "missing loadLiquid id in referencing parent data model."
+            )
+        elif protocol.modules and (
+            command
+            for command in protocol.commands
+            if command.params.moduleId
+            and command.params.moduleId not in set(protocol.modules.keys())
+        ):
+            raise ProtocolFilesInvalidError(
+                "missing loadLiquid id in referencing parent data model."
+            )
         return protocol
