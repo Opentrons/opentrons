@@ -4,7 +4,7 @@ import io
 from dataclasses import dataclass
 from decoy import Decoy, matchers
 from pathlib import Path
-from typing import IO, Optional
+from typing import IO, Optional, List
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.models import LabwareDefinition
@@ -299,11 +299,33 @@ async def test_read_files_no_copy(
     )
 
 
-async def test_json_protocol_error(decoy: Decoy, tmp_path: Path,
+@pytest.mark.parametrize(
+    "input_commands, expected_error_name",
+    [
+        (
+            [
+                protocol_schema_v6.Command(
+                    commandType="loadLabware",
+                    params=protocol_schema_v6.Params(labwareId="labware-id-3"),
+                ),
+                protocol_schema_v6.Command(
+                    commandType="loadPipette",
+                    params=protocol_schema_v6.Params(pipetteId="pipetteId"),
+                ),
+            ],
+            "loadLabware",
+        )
+    ],
+)
+async def test_json_protocol_error(
+    decoy: Decoy,
+    tmp_path: Path,
     file_reader_writer: FileReaderWriter,
     role_analyzer: RoleAnalyzer,
     config_analyzer: ConfigAnalyzer,
     subject: ProtocolReader,
+    input_commands: List[protocol_schema_v6.Command],
+    expected_error_name: str,
 ) -> None:
     """It should catch config analysis errors."""
     labware = {
@@ -311,18 +333,8 @@ async def test_json_protocol_error(decoy: Decoy, tmp_path: Path,
         "labware-id-2": protocol_schema_v6.Labware(definitionId="definition-2"),
     }
     pipettes = {"pipetteId": protocol_schema_v6.Pipette(name="pipette-1")}
-    commands = [
-        protocol_schema_v6.Command(
-            commandType="loadLabware",
-            params=protocol_schema_v6.Params(labwareId="labware-id-3"),
-        ),
-        protocol_schema_v6.Command(
-            commandType="loadPipette",
-            params=protocol_schema_v6.Params(pipetteId="pipetteId"),
-        ),
-    ]
     protocol = protocol_schema_v6.ProtocolSchemaV6.construct(  # type: ignore[call-arg]
-        labware=labware, commands=commands, pipettes=pipettes
+        labware=labware, commands=input_commands, pipettes=pipettes
     )
     input_file = InputFile(
         filename="protocol.py",
@@ -335,10 +347,7 @@ async def test_json_protocol_error(decoy: Decoy, tmp_path: Path,
         path=None,
     )
     main_file = MainFile(
-        name="protocol.py",
-        contents=b"# hello world",
-        path=None,
-        data=protocol
+        name="protocol.py", contents=b"# hello world", path=None, data=protocol
     )
     analyzed_roles = RoleAnalysis(
         main_file=main_file,
@@ -349,5 +358,8 @@ async def test_json_protocol_error(decoy: Decoy, tmp_path: Path,
     decoy.when(await file_reader_writer.read([input_file])).then_return([buffered_file])
     decoy.when(role_analyzer.analyze([buffered_file])).then_return(analyzed_roles)
 
-    with pytest.raises(ProtocolFilesInvalidError, match="missing loadLabware id in referencing parent data model."):
+    with pytest.raises(
+        ProtocolFilesInvalidError,
+        match=f"missing {expected_error_name} id in referencing parent data model.",
+    ):
         await subject.read_and_save(directory=tmp_path, files=[input_file])
