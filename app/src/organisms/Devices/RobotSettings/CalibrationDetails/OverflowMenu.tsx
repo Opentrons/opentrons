@@ -224,16 +224,15 @@ export function OverflowMenu({
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          <MenuItem
-            onClick={e => handleCalibration(calType, e)}
-            disabled={mount == null}
-          >
-            {calType === 'pipetteOffset'
-              ? applicablePipetteOffsetCal != null
-                ? t('recalibrate_pipette')
-                : t('calibrate_pipette')
-              : t('recalibrate_tip_and_pipette')}
-          </MenuItem>
+          {mount != null && (
+            <MenuItem onClick={e => handleCalibration(calType, e)}>
+              {calType === 'pipetteOffset'
+                ? applicablePipetteOffsetCal != null
+                  ? t('recalibrate_pipette')
+                  : t('calibrate_pipette')
+                : t('recalibrate_tip_and_pipette')}
+            </MenuItem>
+          )}
           <MenuItem onClick={e => handleDownload(calType, e)}>
             {t('download_calibration_data')}
           </MenuItem>

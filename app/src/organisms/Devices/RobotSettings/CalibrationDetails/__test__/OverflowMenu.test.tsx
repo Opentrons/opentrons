@@ -117,18 +117,18 @@ describe('OverflowMenu', () => {
     getByText('Download calibration data')
   })
 
-  it('should disable calibrate menu item when mount is undefined', () => {
+  it('should not render calibrate menu item when mount is undefined', () => {
     props = {
       ...props,
       mount: undefined as any,
     }
-    const [{ getByRole }] = render(props)
+    const [{ getByRole, queryByRole }] = render(props)
     const button = getByRole('button', {
       name: 'CalibrationOverflowMenu_button',
     })
     fireEvent.click(button)
-    const menuItem = getByRole('button', { name: 'Calibrate Pipette Offset' })
-    expect(menuItem).toBeDisabled()
+    const menuItem = queryByRole('button', { name: 'Calibrate Pipette Offset' })
+    expect(menuItem).not.toBeInTheDocument()
   })
 
   it('call a function when clicking download tip length calibrations data', async () => {
