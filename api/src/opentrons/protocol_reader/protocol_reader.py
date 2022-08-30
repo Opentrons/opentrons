@@ -12,6 +12,7 @@ from opentrons.protocols.models import JsonProtocol as ProtocolSchemaV5
 
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6
 
+
 class ProtocolFilesInvalidError(ValueError):
     """An error raised if the input files cannot be read to a protocol."""
 
@@ -134,7 +135,9 @@ class ProtocolReader:
         )
 
     @staticmethod
-    def validate_json_protocol(protocol: Union[ProtocolSchemaV5, ProtocolSchemaV6]) -> None:
+    def validate_json_protocol(
+        protocol: Union[ProtocolSchemaV5, ProtocolSchemaV6]
+    ) -> None:
         """Validate protocol mapping constraints."""
         labware_ids = protocol.labware.keys()
         # liquid_ids = protocol.liquids.keys()
@@ -142,6 +145,15 @@ class ProtocolReader:
         # module_ids = protocol.modules.keys()
         loaded_obejects: Dict[str, List[str]] = {"loadLabware": labware_ids}
         for command_type in loaded_obejects:
-            print(command_type)
-            if loaded_obejects[command_type] not in filter(lambda command: command.commandType == command_type, protocol.commands):
-                raise ProtocolFilesInvalidError(f"missing {command_type} id in parent data model.")
+            print(
+                filter(
+                    lambda command: command.commandType == command_type,
+                    protocol.commands,
+                )
+            )
+            if loaded_obejects[command_type] not in filter(
+                lambda command: command.commandType == command_type, protocol.commands
+            ):
+                raise ProtocolFilesInvalidError(
+                    f"missing {command_type} id in parent data model."
+                )
