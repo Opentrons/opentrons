@@ -20,6 +20,7 @@ import { HeaterShakerModuleData } from '../HeaterShakerModuleData'
 import { ModuleOverflowMenu } from '../ModuleOverflowMenu'
 import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
+import { ErrorInfo } from '../ErrorInfo'
 import { ModuleCard } from '..'
 import {
   mockMagneticModule,
@@ -34,6 +35,7 @@ import type {
   MagneticModule,
 } from '../../../redux/modules/types'
 
+jest.mock('../ErrorInfo')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../MagneticModuleData')
 jest.mock('../TemperatureModuleData')
@@ -90,6 +92,7 @@ const mockFirmwareUpdateFailedModal = FirmwareUpdateFailedModal as jest.MockedFu
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
+const mockErrorInfo = ErrorInfo as jest.MockedFunction<typeof ErrorInfo>
 const mockToast = Toast as jest.MockedFunction<typeof Toast>
 const mockMagneticModuleHub = {
   id: 'magdeck_id',
@@ -140,6 +143,7 @@ describe('ModuleCard', () => {
 
   beforeEach(() => {
     dispatchApiRequest = jest.fn()
+    mockErrorInfo.mockReturnValue(null)
     mockUseCurrentRunId.mockReturnValue(null)
     mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, ['id']])
     mockMagneticModuleData.mockReturnValue(<div>Mock Magnetic Module Data</div>)
@@ -354,5 +358,22 @@ describe('ModuleCard', () => {
     })
     expect(getByText('Updating firmware...')).toBeVisible()
     expect(getByLabelText('ot-spinner')).toBeVisible()
+  })
+
+  it('renders information for a heater shaker module with an error', () => {
+    mockErrorInfo.mockReturnValue(<div>mock heater shaker error</div>)
+    mockGetIsHeaterShakerAttached.mockReturnValue(true)
+    mockUseModuleIdFromRun.mockReturnValue({
+      moduleIdFromRun: 'heatershaker_id',
+    })
+    const { getByText } = render({
+      module: mockHeaterShaker,
+      robotName: mockRobot.name,
+      isLoadedInRun: false,
+    })
+
+    getByText('Heater-Shaker Module GEN1')
+    getByText('Mock Heater Shaker Module Data')
+    getByText('mock heater shaker error')
   })
 })
