@@ -299,8 +299,13 @@ async def test_read_files_no_copy(
     )
 
 
-def test_validate_json_protocol(decoy: Decoy, subject: ProtocolReader) -> None:
-    """Should raise an exception when a protocol is invalid."""
+async def test_json_protocol_error(decoy: Decoy, tmp_path: Path,
+    file_reader_writer: FileReaderWriter,
+    role_analyzer: RoleAnalyzer,
+    config_analyzer: ConfigAnalyzer,
+    subject: ProtocolReader,
+) -> None:
+    """It should catch config analysis errors."""
     labware = {
         "labware-id-1": protocol_schema_v6.Labware(definitionId="definition-1"),
         "labware-id-2": protocol_schema_v6.Labware(definitionId="definition-2"),
@@ -319,5 +324,30 @@ def test_validate_json_protocol(decoy: Decoy, subject: ProtocolReader) -> None:
     protocol = protocol_schema_v6.ProtocolSchemaV6.construct(  # type: ignore[call-arg]
         labware=labware, commands=commands, pipettes=pipettes
     )
+    input_file = InputFile(
+        filename="protocol.py",
+        file=io.BytesIO(b"# hello world"),
+    )
+    buffered_file = BufferedFile(
+        name="protocol.py",
+        contents=b"# hello world",
+        data=None,
+        path=None,
+    )
+    main_file = MainFile(
+        name="protocol.py",
+        contents=b"# hello world",
+        path=None,
+        data=protocol
+    )
+    analyzed_roles = RoleAnalysis(
+        main_file=main_file,
+        labware_files=[],
+        labware_definitions=[],
+    )
 
-    subject._validate_json_protocol(protocol)
+    decoy.when(await file_reader_writer.read([input_file])).then_return([buffered_file])
+    decoy.when(role_analyzer.analyze([buffered_file])).then_return(analyzed_roles)
+
+    with pytest.raises(ProtocolFilesInvalidError, match="missing loadLabware id in referencing parent data model."):
+        await subject.read_and_save(directory=tmp_path, files=[input_file])
