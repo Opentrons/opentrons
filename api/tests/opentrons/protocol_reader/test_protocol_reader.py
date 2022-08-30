@@ -310,10 +310,40 @@ async def test_read_files_no_copy(
                 ),
                 protocol_schema_v6.Command(
                     commandType="loadPipette",
-                    params=protocol_schema_v6.Params(pipetteId="pipetteId"),
+                    params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
                 ),
             ],
             "loadLabware",
+        ),
+        (
+                [
+                    protocol_schema_v6.Command(
+                        commandType="loadLabware",
+                        params=protocol_schema_v6.Params(labwareId="labware-id-1"),
+                    ),
+                    protocol_schema_v6.Command(
+                        commandType="loadPipette",
+                        params=protocol_schema_v6.Params(pipetteId="pipette-id-3"),
+                    ),
+                ],
+                "loadPipette",
+        ),
+        (
+                [
+                    protocol_schema_v6.Command(
+                        commandType="loadLabware",
+                        params=protocol_schema_v6.Params(labwareId="labware-id-1"),
+                    ),
+                    protocol_schema_v6.Command(
+                        commandType="loadPipette",
+                        params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
+                    ),
+                    protocol_schema_v6.Command(
+                        commandType="loadLiquid",
+                        params=protocol_schema_v6.Params(liquidId="liquid-id-3"),
+                    ),
+                ],
+                "loadLiquid",
         )
     ],
 )
@@ -332,7 +362,7 @@ async def test_json_protocol_error(
         "labware-id-1": protocol_schema_v6.Labware(definitionId="definition-1"),
         "labware-id-2": protocol_schema_v6.Labware(definitionId="definition-2"),
     }
-    pipettes = {"pipetteId": protocol_schema_v6.Pipette(name="pipette-1")}
+    pipettes = {"pipette-id-1": protocol_schema_v6.Pipette(name="pipette-1")}
     protocol = protocol_schema_v6.ProtocolSchemaV6.construct(  # type: ignore[call-arg]
         labware=labware, commands=input_commands, pipettes=pipettes
     )
