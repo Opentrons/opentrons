@@ -17,6 +17,7 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
     ProtocolFilesInvalidError,
 )
+from opentrons.protocol_reader.role_analyzer import MainFile
 
 from opentrons.protocol_reader.input_file import AbstractInputFile
 from opentrons.protocol_reader.file_reader_writer import (
@@ -300,12 +301,12 @@ async def test_read_files_no_copy(
 
 
 def test_validate_protocol(decoy: Decoy, subject: ProtocolReader) -> None:
-    """Should raise an exception when a prostocol is invalid."""
-    buffered_file = BufferedFile(
-        name="protocol.json",
-        contents=b"labware validation",
-        data=[protocol_schema_v6.ProtocolSchemaV6.construct()],
-        path=Path("/dev/null/protocol.json"),
-    )
+    """Should raise an exception when a protocol is invalid."""
+    labware = {"labware-id-1": protocol_schema_v6.Labware(definitionId="definition-1"),
+               "labware-id-2": protocol_schema_v6.Labware(definitionId="definition-2")}
+    commands = [protocol_schema_v6.Command(commandType="loadLabware",
+                                           params=protocol_schema_v6.Params(labwareId="labware-id-3"))]
+    protocol = protocol_schema_v6.ProtocolSchemaV6.construct(
+        labware=labware, commands=commands)
 
-    subject.validate_protocol(buffered_file)
+    subject.validate_json_protocol(protocol)

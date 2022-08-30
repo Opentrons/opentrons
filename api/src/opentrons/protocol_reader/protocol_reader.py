@@ -1,14 +1,16 @@
 """Read relevant protocol information from a set of files."""
 from pathlib import Path
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, Union
 
 from .input_file import AbstractInputFile
 from .file_reader_writer import FileReaderWriter, FileReadError
-from .role_analyzer import RoleAnalyzer, RoleAnalysisFile, RoleAnalysisError
+from .role_analyzer import RoleAnalyzer, RoleAnalysisFile, RoleAnalysisError, MainFile
 from .config_analyzer import ConfigAnalyzer, ConfigAnalysisError
 from .protocol_source import ProtocolSource, ProtocolSourceFile
-from ..protocol_reader.file_reader_writer import BufferedFile
 
+from opentrons.protocols.models import JsonProtocol as ProtocolSchemaV5
+
+from opentrons_shared_data.protocol.models import ProtocolSchemaV6
 
 class ProtocolFilesInvalidError(ValueError):
     """An error raised if the input files cannot be read to a protocol."""
@@ -132,6 +134,11 @@ class ProtocolReader:
         )
 
     @staticmethod
-    def validate_protocol(files: Sequence[BufferedFile]):
-        """Analyze and validate a set of input files."""
-        pass
+    def validate_json_protocol(protocol: Union[ProtocolSchemaV5, ProtocolSchemaV6]) -> None:
+        """Validate protocol mapping constraints."""
+        labware_ids = protocol.labware.keys()
+        print(labware_ids)
+        load_labware_commands = filter(lambda command: command.commandType == "loadLabwre", protocol.commands)
+        print(load_labware_commands)
+        if protocol.labware.keys() not in load_labware_commands:
+            raise Exception()
