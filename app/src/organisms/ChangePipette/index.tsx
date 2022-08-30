@@ -111,9 +111,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
   })?.status
 
   React.useEffect(() => {
-    if (homePipStatus === SUCCESS) {
-      closeModal()
-    }
+    if (homePipStatus === SUCCESS) closeModal()
   }, [homePipStatus, closeModal])
 
   const homePipAndExit = React.useCallback(
@@ -221,8 +219,9 @@ export function ChangePipette(props: Props): JSX.Element | null {
       direction === ATTACH && wantedPipette === null
     const attachWizardHeader = noPipetteSelectedAttach
       ? t('attach_pipette')
-      : t('attach_pipette_type', {
-          pipetteName: wantedPipette?.displayName,
+      : //  TODO refactor this, feels like a more eloquant alternative
+        t('attach_pipette_type', {
+          pipetteName: wantedPipette != null ? wantedPipette.displayName : '',
         })
 
     const noPipetteDetach =
@@ -291,19 +290,16 @@ export function ChangePipette(props: Props): JSX.Element | null {
     currentStep = success ? (eightChannel ? 4 : totalSteps) : totalSteps - 1
     exitWizardHeader = success ? homePipAndExit : () => setConfirmExit(true)
 
-    let title
-    if (
-      (!wantedPipette && !actualPipette) ||
-      (!wantedPipette && actualPipette)
-    ) {
-      title = t('detatch_pipette_from_mount', {
-        mount: mount[0].toUpperCase() + mount.slice(1),
-      })
-    } else {
-      title = t('attach_name_pipette', { pipette: wantedPipette?.displayName })
-    }
+    wizardTitle =
+      (wantedPipette == null && actualPipette == null) ||
+      (wantedPipette == null && actualPipette)
+        ? t('detatch_pipette_from_mount', {
+            mount: mount[0].toUpperCase() + mount.slice(1),
+          })
+        : t('attach_name_pipette', {
+            pipette: wantedPipette != null ? wantedPipette.displayName : '',
+          })
 
-    wizardTitle = title
     contents = confirmExit ? (
       <ExitModal
         back={() => setConfirmExit(false)}
