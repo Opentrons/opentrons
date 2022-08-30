@@ -305,7 +305,8 @@ def test_validate_protocol(decoy: Decoy, subject: ProtocolReader) -> None:
     labware = {"labware-id-1": protocol_schema_v6.Labware(definitionId="definition-1"),
                "labware-id-2": protocol_schema_v6.Labware(definitionId="definition-2")}
     commands = [protocol_schema_v6.Command(commandType="loadLabware",
-                                           params=protocol_schema_v6.Params(labwareId="labware-id-3"))]
+                                           params=protocol_schema_v6.Params(labwareId="labware-id-3")), protocol_schema_v6.Command(commandType="loadPipette",
+                                           params=protocol_schema_v6.Params(pipetteId="pipette-id-3"))]
     protocol = protocol_schema_v6.ProtocolSchemaV6.construct(
         labware=labware, commands=commands)
 
