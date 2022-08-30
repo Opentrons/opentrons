@@ -23,9 +23,16 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { DeprecatedJogControls, VERTICAL_PLANE } from '../../molecules/DeprecatedJogControls'
+import {
+  DeprecatedJogControls,
+  VERTICAL_PLANE,
+} from '../../molecules/DeprecatedJogControls'
 import * as Sessions from '../../redux/sessions'
-import type { Axis, Sign, StepSize } from '../../molecules/DeprecatedJogControls/types'
+import type {
+  Axis,
+  Sign,
+  StepSize,
+} from '../../molecules/DeprecatedJogControls/types'
 import type { CalibrationPanelProps } from './types'
 
 import { NeedHelpLink } from './NeedHelpLink'

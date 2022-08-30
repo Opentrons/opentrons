@@ -7,7 +7,6 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  SPACING_3,
   ALIGN_STRETCH,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
@@ -59,7 +58,11 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
       padding={SPACING.spacing6}
       minHeight="32rem"
     >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignSelf={ALIGN_STRETCH} gridGap={SPACING.spacing3}>
+      <Flex
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignSelf={ALIGN_STRETCH}
+        gridGap={SPACING.spacing3}
+      >
         <Flex flexDirection={DIRECTION_COLUMN} flex="1">
           <StyledText as="h1" marginBottom={SPACING.spacing4}>
             {t('position_pipette_over_tip')}
@@ -67,7 +70,9 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
           <Trans
             t={t}
             i18nKey="tip_pick_up_instructions"
-            components={{ block: <StyledText as="p" marginBottom={SPACING.spacing3} /> }}
+            components={{
+              block: <StyledText as="p" marginBottom={SPACING.spacing3} />,
+            }}
           />
         </Flex>
         <Box flex="1">

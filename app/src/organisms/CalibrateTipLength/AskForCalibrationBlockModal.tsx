@@ -75,7 +75,11 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
                 components={{
                   block: <StyledText as="p" marginBottom={SPACING.spacing3} />,
                   supportLink: (
-                    <Link external href={BLOCK_REQUEST_URL} color={COLORS.blueEnabled}/>
+                    <Link
+                      external
+                      href={BLOCK_REQUEST_URL}
+                      color={COLORS.blueEnabled}
+                    />
                   ),
                 }}
               />

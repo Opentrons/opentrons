@@ -26,7 +26,11 @@ import {
 
 import * as Sessions from '../../redux/sessions'
 import type { SessionType } from '../../redux/sessions/types'
-import type { Axis, Sign, StepSize } from '../../molecules/DeprecatedJogControls/types'
+import type {
+  Axis,
+  Sign,
+  StepSize,
+} from '../../molecules/DeprecatedJogControls/types'
 import type { CalibrationPanelProps } from './types'
 import {
   DeprecatedJogControls,

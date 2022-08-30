@@ -47,7 +47,11 @@ import slot7LeftSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_7_LE
 import slot7RightMultiDemoAsset from '../../assets/videos/cal-movement/SLOT_7_RIGHT_MULTI_X-Y.webm'
 import slot7RightSingleDemoAsset from '../../assets/videos/cal-movement/SLOT_7_RIGHT_SINGLE_X-Y.webm'
 
-import type { Axis, Sign, StepSize } from '../../molecules/DeprecatedJogControls/types'
+import type {
+  Axis,
+  Sign,
+  StepSize,
+} from '../../molecules/DeprecatedJogControls/types'
 import type { CalibrationPanelProps } from './types'
 import type {
   SessionType,

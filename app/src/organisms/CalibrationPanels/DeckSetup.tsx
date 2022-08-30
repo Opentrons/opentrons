@@ -28,13 +28,7 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
 
   const { t } = useTranslation('robot_calibration')
 
-  const {
-    tipRack,
-    calBlock,
-    sendCommands,
-    sessionType,
-    activePipette,
-  } = props
+  const { tipRack, calBlock, sendCommands, sessionType, activePipette } = props
 
   const isHealthCheck =
     sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK

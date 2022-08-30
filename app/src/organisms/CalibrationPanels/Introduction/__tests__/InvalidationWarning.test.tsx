@@ -14,6 +14,8 @@ const render = () => {
 describe('InvalidationWarning', () => {
   it('renders correct text', () => {
     const { getByText } = render()
-    getByText("This tip was used to calibrate this pipette’s offset. Recalibrating this tip’s length will invalidate this pipette’s offset. If you recalibrate this tip length, you will need to recalibrate this pipette offset afterwards.You don’t have a tip length saved with this pipette yet. You will need to calibrate tip length before calibrating your pipette offset.")
+    getByText(
+      'This tip was used to calibrate this pipette’s offset. Recalibrating this tip’s length will invalidate this pipette’s offset. If you recalibrate this tip length, you will need to recalibrate this pipette offset afterwards.You don’t have a tip length saved with this pipette yet. You will need to calibrate tip length before calibrating your pipette offset.'
+    )
   })
 })

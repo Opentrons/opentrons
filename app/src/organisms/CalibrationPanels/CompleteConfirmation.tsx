@@ -61,7 +61,12 @@ export function CompleteConfirmation(
         marginTop={SPACING.spacing6}
         justifyContent={JUSTIFY_FLEX_END}
       >
-        <PrimaryButton onClick={proceed} textTransform={TYPOGRAPHY.textTransformCapitalize}>{t('exit')}</PrimaryButton>
+        <PrimaryButton
+          onClick={proceed}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
+        >
+          {t('exit')}
+        </PrimaryButton>
       </Flex>
     </Flex>
   )

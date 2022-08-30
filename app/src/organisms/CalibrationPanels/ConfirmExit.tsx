@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import {
   Icon,
   Flex,
-  SIZE_4,
   SPACING,
   JUSTIFY_CENTER,
   ALIGN_CENTER,

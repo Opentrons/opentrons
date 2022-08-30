@@ -123,7 +123,9 @@ export function CalibrateTipLength(
         header={
           <WizardHeader
             title={t('tip_length_calibration')}
-            currentStep={STEPS_IN_ORDER.findIndex(step => step === currentStep) ?? 0}
+            currentStep={
+              STEPS_IN_ORDER.findIndex(step => step === currentStep) ?? 0
+            }
             totalSteps={STEPS_IN_ORDER.length - 1}
             onExit={confirmExit}
           />

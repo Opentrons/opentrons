@@ -5,7 +5,6 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 

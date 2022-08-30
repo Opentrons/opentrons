@@ -18,7 +18,6 @@ import {
   SaveZPoint,
   SaveXYPoint,
   CompleteConfirmation,
-  INTENT_CALIBRATE_PIPETTE_OFFSET,
 } from '../../../organisms/DeprecatedCalibrationPanels'
 
 import type { PipetteOffsetCalibrationStep } from '../../../redux/sessions/types'

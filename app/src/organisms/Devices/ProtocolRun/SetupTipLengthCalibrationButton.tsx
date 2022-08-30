@@ -21,21 +21,15 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 
 import { Portal } from '../../../App/portal'
 import { TertiaryButton } from '../../../atoms/buttons'
-import { CalibratePipetteOffset } from '../../CalibratePipetteOffset'
 import {
   CalibrateTipLength,
   ConfirmRecalibrationModal,
 } from '../../CalibrateTipLength'
 import { AskForCalibrationBlockModal } from '../../CalibrateTipLength/AskForCalibrationBlockModal'
-import { INTENT_TIP_LENGTH_IN_PROTOCOL } from '../../CalibrationPanels'
-import {
-  tipLengthCalibrationStarted,
-  pipetteOffsetCalibrationStarted,
-} from '../../../redux/analytics'
+import { tipLengthCalibrationStarted } from '../../../redux/analytics'
 import { getHasCalibrationBlock } from '../../../redux/config'
 import * as RobotApi from '../../../redux/robot-api'
 import * as Sessions from '../../../redux/sessions'
-import { getPipetteOffsetCalibrationSession } from '../../../redux/sessions/pipette-offset-calibration/selectors'
 import { getTipLengthCalibrationSession } from '../../../redux/sessions/tip-length-calibration/selectors'
 import { useDeckCalibrationData, useRunHasStarted } from '../hooks'
 
@@ -44,7 +38,6 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { RequestState } from '../../../redux/robot-api/types'
 import type {
   SessionCommandString,
-  PipetteOffsetCalibrationSession,
   TipLengthCalibrationSession,
 } from '../../../redux/sessions/types'
 import type { State } from '../../../redux/types'
@@ -85,28 +78,16 @@ export function SetupTipLengthCalibrationButton({
     ? Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
     : Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION
 
-  const dispatchAnalyticsEvent = isExtendedPipOffset
-    ? (calBlock: boolean): void => {
-        dispatch(
-          pipetteOffsetCalibrationStarted(
-            INTENT_TIP_LENGTH_IN_PROTOCOL,
-            mount,
-            calBlock,
-            true,
-            getLabwareDefURI(tipRackDefinition)
-          )
-        )
-      }
-    : (calBlock: boolean): void => {
-        dispatch(
-          tipLengthCalibrationStarted(
-            INTENT_TIP_LENGTH_IN_PROTOCOL,
-            mount,
-            calBlock,
-            getLabwareDefURI(tipRackDefinition)
-          )
-        )
-      }
+  const dispatchAnalyticsEvent = (calBlock: boolean): void => {
+    dispatch(
+      tipLengthCalibrationStarted(
+        'tip-length-no-protocol', // TODO: remove intent param entirely once calibration wizards ff is removed
+        mount,
+        calBlock,
+        getLabwareDefURI(tipRackDefinition)
+      )
+    )
+  }
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -138,11 +119,6 @@ export function SetupTipLengthCalibrationButton({
   const tipLengthCalibrationSession: TipLengthCalibrationSession | null = useSelector(
     (state: State) => {
       return getTipLengthCalibrationSession(state, robotName)
-    }
-  )
-  const extendedPipetteCalibrationSession: PipetteOffsetCalibrationSession | null = useSelector(
-    (state: State) => {
-      return getPipetteOffsetCalibrationSession(state, robotName)
     }
   )
 

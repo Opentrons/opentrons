@@ -75,13 +75,7 @@ const assetMapBlock: {
 
 export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
-  const {
-    sendCommands,
-    calBlock,
-    isMulti,
-    mount,
-    sessionType,
-  } = props
+  const { sendCommands, calBlock, isMulti, mount, sessionType } = props
 
   const demoAsset = React.useMemo(
     () =>

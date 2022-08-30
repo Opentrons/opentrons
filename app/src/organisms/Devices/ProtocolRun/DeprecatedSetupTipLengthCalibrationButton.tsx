@@ -27,7 +27,7 @@ import {
   ConfirmRecalibrationModal,
 } from '../../DeprecatedCalibrateTipLength'
 import { AskForCalibrationBlockModal } from '../../DeprecatedCalibrateTipLength/AskForCalibrationBlockModal'
-import { INTENT_TIP_LENGTH_IN_PROTOCOL } from '../../CalibrationPanels'
+import { INTENT_TIP_LENGTH_IN_PROTOCOL } from '../../DeprecatedCalibrationPanels'
 import {
   tipLengthCalibrationStarted,
   pipetteOffsetCalibrationStarted,

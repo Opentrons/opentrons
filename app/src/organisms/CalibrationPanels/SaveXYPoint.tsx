@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-import { JogControls, VERTICAL_PLANE } from '../../molecules/JogControls'
+import { JogControls } from '../../molecules/JogControls'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 import { formatJogVector } from './utils'
