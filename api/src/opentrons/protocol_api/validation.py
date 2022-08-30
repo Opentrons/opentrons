@@ -27,6 +27,7 @@ def ensure_mount(mount: Union[str, Mount]) -> Mount:
 
 
 def ensure_pipette_name(pipette_name: str) -> PipetteName:
+    """Ensure that an input value represents a valid pipette name."""
     try:
         return PipetteName(pipette_name)
     except ValueError:
