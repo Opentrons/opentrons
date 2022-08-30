@@ -56,6 +56,7 @@ class ProtocolReader:
         try:
             buffered_files = await self._file_reader_writer.read(files)
             role_analysis = self._role_analyzer.analyze(buffered_files)
+            # TODO (tz, 8-30-22): check protocol version against max supported version
             if isinstance(role_analysis.main_file.data, ProtocolSchemaV6):
                 self._validate_json_protocol(role_analysis.main_file.data)
             config_analysis = self._config_analyzer.analyze(role_analysis.main_file)
