@@ -17,7 +17,6 @@ from opentrons.protocol_reader import (
     PythonProtocolConfig,
     ProtocolFilesInvalidError,
 )
-from opentrons.protocol_reader.role_analyzer import MainFile
 
 from opentrons.protocol_reader.input_file import AbstractInputFile
 from opentrons.protocol_reader.file_reader_writer import (

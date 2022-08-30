@@ -1,10 +1,10 @@
 """Read relevant protocol information from a set of files."""
 from pathlib import Path
-from typing import List, Optional, Sequence, Union, Dict
+from typing import List, Optional, Sequence, Union
 
 from .input_file import AbstractInputFile
 from .file_reader_writer import FileReaderWriter, FileReadError
-from .role_analyzer import RoleAnalyzer, RoleAnalysisFile, RoleAnalysisError, MainFile
+from .role_analyzer import RoleAnalyzer, RoleAnalysisFile, RoleAnalysisError
 from .config_analyzer import ConfigAnalyzer, ConfigAnalysisError
 from .protocol_source import ProtocolSource, ProtocolSourceFile
 
@@ -136,24 +136,29 @@ class ProtocolReader:
 
     @staticmethod
     def validate_json_protocol(
-        protocol: Union[ProtocolSchemaV5, ProtocolSchemaV6]
+        protocol: Union[ProtocolSchemaV6],  # Union[ProtocolSchemaV5, ProtocolSchemaV6]
     ) -> None:
         """Validate protocol mapping constraints."""
         labware_ids = protocol.labware.keys()
         # liquid_ids = protocol.liquids.keys()
         # pipette_ids = protocol.pipettes.keys()
         # module_ids = protocol.modules.keys()
-        loaded_obejects: Dict[str, List[str]] = {"loadLabware": labware_ids}
-        for command_type in loaded_obejects:
-            print(
-                filter(
-                    lambda command: command.commandType == command_type,
-                    protocol.commands,
-                )
+        # loaded_objects: Dict[str, List[str]] = {"loadLabware": labware_ids}
+        if isinstance(protocol, ProtocolSchemaV6):
+            filtered_labware = list(
+                command
+                for command in protocol.commands
+                if command.commandType == "loadLabware"
+                and command.params.labwareId not in labware_ids
             )
-            if loaded_obejects[command_type] not in filter(
-                lambda command: command.commandType == command_type, protocol.commands
-            ):
-                raise ProtocolFilesInvalidError(
-                    f"missing {command_type} id in parent data model."
-                )
+        # else:
+        #     filtered_labware = list(
+        #         command
+        #         for command in protocol.commands
+        #         if command.command is "loadLabware"
+        #         and command.params.labware not in labware_ids
+        #     )
+        if filtered_labware:
+            raise ProtocolFilesInvalidError(
+                "missing loadLabware id in parent data model."
+            )
