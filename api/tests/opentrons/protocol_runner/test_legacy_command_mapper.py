@@ -27,7 +27,8 @@ from opentrons.protocol_runner.legacy_wrappers import (
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
-from opentrons.types import DeckSlotName, Mount, MountType, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import DeckSlotName, Mount, MountType
 
 
 @pytest.fixture

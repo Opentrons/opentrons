@@ -4,7 +4,8 @@ from typing import Optional, overload
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import MountType, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import MountType
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     AbstractModule,
@@ -175,11 +176,8 @@ class EquipmentHandler:
         # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
         # behavior of protocol_context.load_instrument, and is used here as a
         # pipette existence check
-        # TODO(mc, 2021-04-16): reconcile PipetteName enum with PipetteName union
         try:
-            await self._hardware_api.cache_instruments(
-                cache_request  # type: ignore[arg-type]
-            )
+            await self._hardware_api.cache_instruments(cache_request)
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e
 

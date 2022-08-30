@@ -14,7 +14,8 @@ from datetime import datetime
 from decoy import matchers
 from pathlib import Path
 
-from opentrons.types import MountType, DeckSlotName, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import MountType, DeckSlotName
 
 from opentrons.protocol_engine import (
     DeckSlotLocation,

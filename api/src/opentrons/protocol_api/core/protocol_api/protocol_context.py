@@ -2,7 +2,8 @@ import logging
 from typing import Dict, List, Optional, Set
 from collections import OrderedDict
 
-from opentrons.types import Mount, Location, DeckLocation, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import Mount, Location, DeckLocation
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel
 from opentrons.hardware_control.types import DoorState, PauseType

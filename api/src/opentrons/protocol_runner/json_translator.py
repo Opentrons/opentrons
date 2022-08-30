@@ -9,7 +9,8 @@ from opentrons.protocol_engine import (
     DeckSlotLocation,
 )
 from opentrons.protocol_engine import Liquid
-from opentrons.types import MountType, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import MountType
 
 
 class CommandTranslatorError(Exception):

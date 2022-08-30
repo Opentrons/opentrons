@@ -1,6 +1,7 @@
 from typing import Union
 
-from opentrons.types import Mount, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import Mount
 
 
 def ensure_mount(mount: Union[str, Mount]) -> Mount:

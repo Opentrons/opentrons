@@ -1,7 +1,8 @@
 """Test load pipette commands."""
 from decoy import Decoy
 
-from opentrons.types import MountType, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import MountType
 from opentrons.protocol_engine.execution import LoadedPipetteData, EquipmentHandler
 
 from opentrons.protocol_engine.commands.load_pipette import (

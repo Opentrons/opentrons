@@ -6,7 +6,8 @@ from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from typing import Dict, Generic, Optional
 
-from opentrons.types import Mount, Location, DeckLocation, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import Mount, Location, DeckLocation
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import ModuleModel, ModuleType

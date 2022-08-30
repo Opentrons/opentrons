@@ -3,7 +3,8 @@ from typing import Dict, Optional
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.types import Mount, MountType, Location, DeckLocation, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import Mount, MountType, Location, DeckLocation
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.protocols.api_support.util import AxisMaxSpeeds

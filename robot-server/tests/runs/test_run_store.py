@@ -5,6 +5,8 @@ from typing import List, Optional, Type
 import pytest
 from sqlalchemy.engine import Engine
 
+from opentrons_shared_data.pipette.dev_types import PipetteName
+
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
 from robot_server.runs.run_store import (
     RunStore,
@@ -21,9 +23,9 @@ from opentrons.protocol_engine import (
     StateSummary,
     CommandSlice,
     Liquid,
+    EngineStatus,
 )
 from opentrons.types import MountType, DeckSlotName
-from opentrons.protocol_engine import EngineStatus
 
 
 @pytest.fixture
@@ -83,7 +85,7 @@ def state_summary() -> StateSummary:
 
     analysis_pipette = pe_types.LoadedPipette(
         id="pipette-id",
-        pipetteName=pe_types.PipetteName.P300_SINGLE,
+        pipetteName=PipetteName.P300_SINGLE,
         mount=MountType.LEFT,
     )
 

@@ -12,7 +12,8 @@ import pytest
 from decoy import Decoy
 
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import DeckSlotName, MountType, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import DeckSlotLocation, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
 from opentrons.protocol_engine.types import (

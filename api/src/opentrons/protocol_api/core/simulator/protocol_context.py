@@ -1,7 +1,8 @@
 import logging
 from typing import Dict, Optional
 
-from opentrons.types import Mount, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import Mount
 
 from ..protocol import AbstractProtocol
 from ..protocol_api.protocol_context import ProtocolContextImplementation

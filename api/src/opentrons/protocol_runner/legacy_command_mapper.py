@@ -4,7 +4,8 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from opentrons.types import MountType, DeckSlotName, Location, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import MountType, DeckSlotName, Location
 from opentrons.commands import types as legacy_command_types
 from opentrons.protocol_engine import (
     ProtocolEngineError,

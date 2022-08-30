@@ -174,29 +174,6 @@ class MountType(str, enum.Enum):
         return Mount.LEFT if self is MountType.LEFT else Mount.RIGHT
 
 
-# TODO(mc, 2021-04-16): reconcile with opentrons_shared_data
-# shared-data/python/opentrons_shared_data/pipette/dev_types.py
-class PipetteName(str, enum.Enum):
-    """Pipette load name values."""
-
-    P10_SINGLE = "p10_single"
-    P10_MULTI = "p10_multi"
-    P20_SINGLE_GEN2 = "p20_single_gen2"
-    P20_MULTI_GEN2 = "p20_multi_gen2"
-    P50_SINGLE = "p50_single"
-    P50_MULTI = "p50_multi"
-    P50_SINGLE_GEN3 = "p50_single_gen3"
-    P50_MULTI_GEN3 = "p50_multi_gen3"
-    P300_SINGLE = "p300_single"
-    P300_MULTI = "p300_multi"
-    P300_SINGLE_GEN2 = "p300_single_gen2"
-    P300_MULTI_GEN2 = "p300_multi_gen2"
-    P1000_SINGLE = "p1000_single"
-    P1000_SINGLE_GEN2 = "p1000_single_gen2"
-    P1000_SINGLE_GEN3 = "p1000_single_gen3"
-    P1000_MULTI_GEN3 = "p1000_multi_gen3"
-
-
 # TODO(mc, 2020-11-09): this makes sense in shared-data or other common
 # model library
 # https://github.com/Opentrons/opentrons/pull/6943#discussion_r519029833

@@ -9,7 +9,7 @@ from typing_extensions import TypedDict, Literal
 
 from opentrons_shared_data.pipette.dev_types import (
     PipetteModel,
-    PipetteName,
+    PipetteNameLiteral,
     ChannelCount,
 )
 from opentrons_shared_data.gripper.dev_types import (
@@ -59,9 +59,9 @@ class InstrumentDict(TypedDict):
 
 
 class PipetteDict(InstrumentDict):
-    name: PipetteName
+    name: PipetteNameLiteral
     model: PipetteModel
-    back_compat_names: List[PipetteName]
+    back_compat_names: List[PipetteNameLiteral]
     pipette_id: str
     min_volume: float
     max_volume: float

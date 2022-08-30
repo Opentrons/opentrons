@@ -4,7 +4,8 @@ import inspect
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.types import Mount, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import Mount
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,

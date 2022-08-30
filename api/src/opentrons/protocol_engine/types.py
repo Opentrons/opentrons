@@ -7,7 +7,8 @@ from pydantic import BaseModel, Field
 from typing import Optional, Union, List, Dict, Any, NamedTuple
 from typing_extensions import Literal, TypeGuard
 
-from opentrons.types import MountType, DeckSlotName, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.modules import ModuleType as ModuleType
 
 # convenience re-export of LabwareUri type

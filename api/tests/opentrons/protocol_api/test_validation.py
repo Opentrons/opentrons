@@ -3,7 +3,8 @@ from typing import Union
 
 import pytest
 
-from opentrons.types import Mount, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import Mount
 from opentrons.protocol_api import validation as subject
 
 
@@ -39,5 +40,6 @@ def test_ensure_pipette_name() -> None:
 
 
 def test_ensure_pipette_input_invalid() -> None:
+    """It should raise a ValueError if given an invalid name."""
     with pytest.raises(ValueError, match="must be given valid pipette name"):
         subject.ensure_pipette_name("oh-no")

@@ -2,7 +2,8 @@
 import pytest
 from datetime import datetime
 
-from opentrons.types import MountType, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import MountType
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.types import DeckPoint, LoadedPipette
 from opentrons.protocol_engine.actions import UpdateCommandAction

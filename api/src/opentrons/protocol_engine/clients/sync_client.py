@@ -1,7 +1,8 @@
 """Synchronous ProtocolEngine client module."""
 from typing import cast, Optional
 
-from opentrons.types import MountType, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import MountType
 
 
 from .. import commands

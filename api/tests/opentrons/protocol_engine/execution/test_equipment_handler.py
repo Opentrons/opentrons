@@ -6,7 +6,8 @@ from typing import Any, cast
 
 from opentrons.calibration_storage.helpers import uri_from_details
 
-from opentrons.types import Mount as HwMount, MountType, DeckSlotName, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import Mount as HwMount, MountType, DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     TempDeck,
@@ -333,9 +334,7 @@ async def test_load_pipette(
 
     assert result == LoadedPipetteData(pipette_id="unique-id")
     decoy.verify(
-        await hardware_api.cache_instruments(
-            {HwMount.LEFT: PipetteName.P300_SINGLE}  # type: ignore[dict-item]
-        )
+        await hardware_api.cache_instruments({HwMount.LEFT: PipetteName.P300_SINGLE})
     )
 
 
@@ -378,8 +377,8 @@ async def test_load_pipette_checks_existence_with_already_loaded(
     decoy.verify(
         await hardware_api.cache_instruments(
             {
-                HwMount.LEFT: PipetteName.P300_SINGLE,  # type: ignore[dict-item]
-                HwMount.RIGHT: PipetteName.P300_MULTI_GEN2,  # type: ignore[dict-item]
+                HwMount.LEFT: PipetteName.P300_SINGLE,
+                HwMount.RIGHT: PipetteName.P300_MULTI_GEN2,
             }
         )
     )
@@ -395,9 +394,7 @@ async def test_load_pipette_raises_if_pipette_not_attached(
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
     decoy.when(
-        await hardware_api.cache_instruments(
-            {HwMount.LEFT: PipetteName.P300_SINGLE}  # type: ignore[dict-item]
-        )
+        await hardware_api.cache_instruments({HwMount.LEFT: PipetteName.P300_SINGLE})
     ).then_raise(
         RuntimeError(
             "mount LEFT: instrument p300_single was requested, "

@@ -5,7 +5,8 @@ from datetime import datetime
 from typing import NamedTuple, Type
 
 from opentrons.ordered_set import OrderedSet
-from opentrons.types import MountType, DeckSlotName, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.types import DoorState
 
 from opentrons.protocol_engine import commands, errors

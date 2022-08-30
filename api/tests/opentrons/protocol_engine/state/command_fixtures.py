@@ -3,7 +3,8 @@ from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional, cast
 
-from opentrons.types import MountType, PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons.types import MountType
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import ErrorOccurrence, commands as cmd
 from opentrons.protocol_engine.types import (
