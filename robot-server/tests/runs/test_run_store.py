@@ -5,7 +5,7 @@ from typing import List, Optional, Type
 import pytest
 from sqlalchemy.engine import Engine
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
 from robot_server.runs.run_store import (
@@ -85,7 +85,7 @@ def state_summary() -> StateSummary:
 
     analysis_pipette = pe_types.LoadedPipette(
         id="pipette-id",
-        pipetteName=PipetteName.P300_SINGLE,
+        pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 

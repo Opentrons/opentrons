@@ -15,7 +15,7 @@ from opentrons_shared_data.labware.labware_definition import (
     WellDefinition,
 )
 from opentrons_shared_data.protocol.models import protocol_schema_v6
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_runner.json_translator import JsonTranslator
 from opentrons.protocol_engine import (
@@ -165,7 +165,7 @@ VALID_TEST_PARAMS = [
         pe_commands.LoadPipetteCreate(
             params=pe_commands.LoadPipetteParams(
                 pipetteId="pipetteId",
-                pipetteName=PipetteName("p10_single"),
+                pipetteName=PipetteNameType.P10_SINGLE,
                 mount=MountType("left"),
             )
         ),

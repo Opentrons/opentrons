@@ -1,7 +1,7 @@
 """Synchronous ProtocolEngine client module."""
 from typing import cast, Optional
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType
 
 
@@ -50,7 +50,7 @@ class SyncClient:
 
     def load_pipette(
         self,
-        pipette_name: PipetteName,
+        pipette_name: PipetteNameType,
         mount: MountType,
     ) -> commands.LoadPipetteResult:
         """Execute a LoadPipette command and return the result."""

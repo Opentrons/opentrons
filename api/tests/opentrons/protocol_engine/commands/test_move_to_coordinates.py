@@ -2,7 +2,7 @@
 from decoy import Decoy
 
 from opentrons.hardware_control import CriticalPoint, HardwareControlAPI
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount, MountType, Point
 from opentrons.motion_planning import Waypoint
 from opentrons.protocol_engine.execution import MovementHandler
@@ -59,7 +59,7 @@ async def test_move_to_coordinates_implementation(
         LoadedPipette(
             mount=mount_type,
             id="loaded-pipette-id-should-not-matter",
-            pipetteName=PipetteName.P10_SINGLE,  # Shouldn't matter.
+            pipetteName=PipetteNameType.P10_SINGLE,  # Shouldn't matter.
         )
     )
 

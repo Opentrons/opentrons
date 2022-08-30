@@ -14,9 +14,9 @@ from datetime import datetime
 from decoy import matchers
 from pathlib import Path
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
-from opentrons.types import MountType, DeckSlotName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
+from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     LoadedLabware,
@@ -56,7 +56,7 @@ async def test_runner_with_python(
 
     expected_pipette = LoadedPipette.construct(
         id=pipette_id_captor,
-        pipetteName=PipetteName.P300_SINGLE,
+        pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
@@ -116,7 +116,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
 
     expected_pipette = LoadedPipette(
         id="pipette-id",
-        pipetteName=PipetteName.P300_SINGLE,
+        pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
@@ -172,7 +172,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
 
     expected_pipette = LoadedPipette.construct(
         id=pipette_id_captor,
-        pipetteName=PipetteName.P300_SINGLE,
+        pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
@@ -227,7 +227,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
 
     expected_pipette = LoadedPipette.construct(
         id=pipette_id_captor,
-        pipetteName=PipetteName.P300_SINGLE,
+        pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 

@@ -4,7 +4,7 @@ import inspect
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
@@ -72,12 +72,12 @@ def test_load_instrument(
     decoy.when(validation.ensure_mount("shadowfax")).then_return(Mount.LEFT)
 
     decoy.when(validation.ensure_pipette_name("gandalf")).then_return(
-        PipetteName.P300_SINGLE
+        PipetteNameType.P300_SINGLE
     )
 
     decoy.when(
         mock_core.load_instrument(
-            instrument_name=PipetteName.P300_SINGLE,
+            instrument_name=PipetteNameType.P300_SINGLE,
             mount=Mount.LEFT,
         )
     ).then_return(mock_instrument_core)
@@ -102,11 +102,11 @@ def test_load_instrument_replace(
 
     decoy.when(validation.ensure_mount(matchers.IsA(Mount))).then_return(Mount.RIGHT)
     decoy.when(validation.ensure_pipette_name(matchers.IsA(str))).then_return(
-        PipetteName.P300_SINGLE
+        PipetteNameType.P300_SINGLE
     )
     decoy.when(
         mock_core.load_instrument(
-            instrument_name=matchers.IsA(PipetteName),
+            instrument_name=matchers.IsA(PipetteNameType),
             mount=matchers.IsA(Mount),
         )
     ).then_return(mock_instrument_core)

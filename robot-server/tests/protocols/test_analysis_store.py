@@ -7,7 +7,7 @@ from typing import List, NamedTuple
 
 from sqlalchemy.engine import Engine as SQLEngine
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import (
@@ -177,7 +177,7 @@ async def test_add_analysis_equipment(
 
     pipette = pe_types.LoadedPipette(
         id="pipette-id",
-        pipetteName=PipetteName.P300_SINGLE,
+        pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 

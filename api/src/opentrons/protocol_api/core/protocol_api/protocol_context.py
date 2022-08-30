@@ -2,7 +2,7 @@ import logging
 from typing import Dict, List, Optional, Set
 from collections import OrderedDict
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount, Location, DeckLocation
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel
@@ -187,7 +187,7 @@ class ProtocolContextImplementation(
         )
 
     def load_instrument(
-        self, instrument_name: PipetteName, mount: Mount
+        self, instrument_name: PipetteNameType, mount: Mount
     ) -> InstrumentContextImplementation:
         """Load an instrument."""
         attached = {

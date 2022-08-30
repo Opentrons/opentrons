@@ -2,7 +2,7 @@
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.types import Mount
 from opentrons.protocol_api.core.protocol import (
@@ -42,8 +42,8 @@ def test_replacing_instrument_tip_state(
     # The solution is to reuse InstrumentContextSimulation instances when the user is
     # replacing the same pipette at the same mount.
     subject.home()
-    pip1 = subject.load_instrument(PipetteName.P300_SINGLE_GEN2, Mount.RIGHT)
-    pip2 = subject.load_instrument(PipetteName.P300_SINGLE_GEN2, Mount.RIGHT)
+    pip1 = subject.load_instrument(PipetteNameType.P300_SINGLE_GEN2, Mount.RIGHT)
+    pip2 = subject.load_instrument(PipetteNameType.P300_SINGLE_GEN2, Mount.RIGHT)
 
     pip1.pick_up_tip(
         well=labware.get_wells()[0],

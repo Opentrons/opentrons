@@ -12,7 +12,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons.protocols.models import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import DeckSlotLocation, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
@@ -120,7 +120,7 @@ def test_load_pipette(
     """It should execute a load pipette command and return its result."""
     request = commands.LoadPipetteCreate(
         params=commands.LoadPipetteParams(
-            pipetteName=PipetteName.P300_SINGLE,
+            pipetteName=PipetteNameType.P300_SINGLE,
             mount=MountType.RIGHT,
         )
     )
@@ -130,7 +130,7 @@ def test_load_pipette(
     decoy.when(transport.execute_command(request=request)).then_return(expected_result)
 
     result = subject.load_pipette(
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.RIGHT,
     )
 

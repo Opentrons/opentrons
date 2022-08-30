@@ -2,7 +2,8 @@
 import pytest
 from datetime import datetime
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 from opentrons.types import MountType
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.types import DeckPoint, LoadedPipette
@@ -47,7 +48,7 @@ def test_handles_load_pipette(subject: PipetteStore) -> None:
     """It should add the pipette data to the state."""
     command = create_load_pipette_command(
         pipette_id="pipette-id",
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
@@ -57,7 +58,7 @@ def test_handles_load_pipette(subject: PipetteStore) -> None:
 
     assert result.pipettes_by_id["pipette-id"] == LoadedPipette(
         id="pipette-id",
-        pipetteName=PipetteName.P300_SINGLE,
+        pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
     assert result.aspirated_volume_by_id["pipette-id"] == 0
@@ -67,7 +68,7 @@ def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
     """It should add volume to pipette after an aspirate."""
     load_command = create_load_pipette_command(
         pipette_id="pipette-id",
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
     aspirate_command = create_aspirate_command(
@@ -125,7 +126,7 @@ def test_pipette_volume_subtracts_dispense(
     """It should subtract volume from pipette after a dispense."""
     load_command = create_load_pipette_command(
         pipette_id="pipette-id",
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
     aspirate_command = create_aspirate_command(
@@ -239,7 +240,7 @@ def test_movement_commands_update_current_well(
     """It should save the last used pipette, labware, and well for movement commands."""
     load_pipette_command = create_load_pipette_command(
         pipette_id=command.params.pipetteId,  # type: ignore[arg-type, union-attr]
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
@@ -316,7 +317,7 @@ def test_movement_commands_without_well_clear_current_well(
     """Commands that make the current well unknown should clear the current well."""
     load_pipette_command = create_load_pipette_command(
         pipette_id="pipette-id",
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
     move_command = create_move_to_well_command(
@@ -364,7 +365,7 @@ def test_heater_shaker_command_without_movement(
     """Heater Shaker commands that dont't move pipettes shouldn't clear current_well."""
     load_pipette_command = create_load_pipette_command(
         pipette_id="pipette-id",
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
     move_command = create_move_to_well_command(
@@ -389,7 +390,7 @@ def test_tip_commands_update_has_tip(subject: PipetteStore) -> None:
     pipette_id = "pipette-id"
     load_pipette_command = create_load_pipette_command(
         pipette_id=pipette_id,
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 

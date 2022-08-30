@@ -3,7 +3,7 @@ from typing import Dict, Optional
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount, MountType, Location, DeckLocation
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
@@ -100,7 +100,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
         raise NotImplementedError("ProtocolEngine PAPI core not implemented")
 
     def load_instrument(
-        self, instrument_name: PipetteName, mount: Mount
+        self, instrument_name: PipetteNameType, mount: Mount
     ) -> InstrumentCore:
         """Load an instrument into the protocol.
 

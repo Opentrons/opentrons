@@ -17,7 +17,7 @@ from opentrons.protocol_api.core.simulator.protocol_context import (
 )
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 
 @pytest.fixture
@@ -40,7 +40,7 @@ def instrument_context(
 ) -> InstrumentContextImplementation:
     """Instrument context backed by hardware simulator."""
     return protocol_context.load_instrument(
-        PipetteName.P300_SINGLE_GEN2, types.Mount.RIGHT
+        PipetteNameType.P300_SINGLE_GEN2, types.Mount.RIGHT
     )
 
 
@@ -50,7 +50,7 @@ def second_instrument_context(
 ) -> InstrumentContextImplementation:
     """Instrument context backed by hardware simulator."""
     return protocol_context.load_instrument(
-        PipetteName.P300_SINGLE_GEN2, types.Mount.LEFT
+        PipetteNameType.P300_SINGLE_GEN2, types.Mount.LEFT
     )
 
 

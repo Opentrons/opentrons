@@ -3,7 +3,7 @@ from typing import Union
 
 import pytest
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount
 from opentrons.protocol_api import validation as subject
 
@@ -34,9 +34,9 @@ def test_ensure_mount_input_invalid() -> None:
 
 
 def test_ensure_pipette_name() -> None:
-    """It should properly map strings and PipetteName enums."""
+    """It should properly map strings and PipetteNameType enums."""
     result = subject.ensure_pipette_name("p300_single")
-    assert result == PipetteName.P300_SINGLE
+    assert result == PipetteNameType.P300_SINGLE
 
 
 def test_ensure_pipette_input_invalid() -> None:

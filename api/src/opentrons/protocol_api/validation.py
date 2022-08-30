@@ -1,6 +1,6 @@
 from typing import Union
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount
 
 
@@ -26,10 +26,10 @@ def ensure_mount(mount: Union[str, Mount]) -> Mount:
     )
 
 
-def ensure_pipette_name(pipette_name: str) -> PipetteName:
+def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
     """Ensure that an input value represents a valid pipette name."""
     try:
-        return PipetteName(pipette_name)
+        return PipetteNameType(pipette_name)
     except ValueError:
         raise ValueError(
             f"Cannot resolve {pipette_name} to pipette, must be given valid pipette name."

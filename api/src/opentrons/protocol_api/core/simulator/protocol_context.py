@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, Optional
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount
 
 from ..protocol import AbstractProtocol
@@ -21,7 +21,7 @@ class ProtocolContextSimulation(
     _instruments: Dict[Mount, Optional[InstrumentContextSimulation]]  # type: ignore[assignment]
 
     def load_instrument(  # type: ignore[override]
-        self, instrument_name: PipetteName, mount: Mount
+        self, instrument_name: PipetteNameType, mount: Mount
     ) -> InstrumentContextSimulation:
         """Create a simulating instrument context."""
         existing_instrument = self._instruments[mount]

@@ -2,7 +2,7 @@
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount, MountType
 from opentrons.protocol_engine import commands
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
@@ -30,12 +30,12 @@ def test_load_instrument(
     """It should issue a LoadPipette command."""
     decoy.when(
         mock_engine_client.load_pipette(
-            pipette_name=PipetteName.P300_SINGLE, mount=MountType.LEFT
+            pipette_name=PipetteNameType.P300_SINGLE, mount=MountType.LEFT
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="cool-pipette"))
 
     result = subject.load_instrument(
-        instrument_name=PipetteName.P300_SINGLE, mount=Mount.LEFT
+        instrument_name=PipetteNameType.P300_SINGLE, mount=Mount.LEFT
     )
 
     assert isinstance(result, InstrumentCore)

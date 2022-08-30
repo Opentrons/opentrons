@@ -13,8 +13,30 @@ from typing_extensions import Literal, TypedDict
 LabwareUri = NewType("LabwareUri", str)
 
 
-class PipetteName(str, Enum):
+PipetteName = Literal[
+    "p10_single",
+    "p10_multi",
+    "p20_single_gen2",
+    "p20_multi_gen2",
+    "p50_single",
+    "p50_multi",
+    "p50_single_gen3",
+    "p50_multi_gen3",
+    "p300_single",
+    "p300_multi",
+    "p300_single_gen2",
+    "p300_multi_gen2",
+    "p1000_single",
+    "p1000_single_gen2",
+    "p1000_single_gen3",
+    "p1000_multi_gen3",
+]
+
+
+class PipetteNameType(str, Enum):
     """Pipette load name values."""
+
+    value: PipetteName
 
     P10_SINGLE = "p10_single"
     P10_MULTI = "p10_multi"
@@ -34,48 +56,28 @@ class PipetteName(str, Enum):
     P1000_MULTI_GEN3 = "p1000_multi_gen3"
 
 
-# TODO(mc, 2022-08-30): stop using this type and remove
-PipetteNameLiteral = Literal[
-    "p10_single",
-    "p10_multi",
-    "p20_single_gen2",
-    "p20_multi_gen2",
-    "p50_single",
-    "p50_multi",
-    "p50_single_gen3",
-    "p50_multi_gen3",
-    "p300_single",
-    "p300_multi",
-    "p300_single_gen2",
-    "p300_multi_gen2",
-    "p1000_single",
-    "p1000_single_gen2",
-    "p1000_single_gen3",
-    "p1000_multi_gen3",
-]
-
 # Generic NewType for models because we get new ones frequently and theres
 # a huge number of them
 PipetteModel = NewType("PipetteModel", str)
 
-DisplayCategory = Union[Literal["GEN1"], Literal["GEN2"]]
+DisplayCategory = Literal["GEN1", "GEN2"]
 
 # todo(mm, 2022-03-18):
 # The JSON schema defines this as any string, not as an enum of string literals.
 # Check if it's safe to simplify this to just str.
-ConfigUnit = Union[
-    Literal["mm"],
-    Literal["amps"],
-    Literal["mm/sec"],
-    Literal["mm/s"],  # todo(mm, 2022-03-18): Standardize specs to mm/sec or mm/s.
-    Literal["presses"],
+ConfigUnit = Literal[
+    "mm",
+    "amps",
+    "mm/sec",
+    "mm/s",  # todo(mm, 2022-03-18): Standardize specs to mm/sec or mm/s.
+    "presses",
 ]
 
 Quirk = NewType("Quirk", str)
 
-ChannelCount = Union[Literal[1], Literal[8]]
+ChannelCount = Literal[1, 8]
 
-UlPerMmAction = Union[Literal["aspirate"], Literal["dispense"]]
+UlPerMmAction = Literal["aspirate", "dispense"]
 
 
 class PipetteConfigElement(TypedDict):
