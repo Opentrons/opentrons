@@ -27,7 +27,7 @@ class SerialConnection:
         alarm_keyword: Optional[str] = None,
         reset_buffer_before_write: bool = False,
         handle_async: bool = False,
-        gcode_ack: Optional[str] = None,
+        async_error_ack: Optional[str] = None,
     ) -> SerialConnection:
         """
         Create a connection.
@@ -68,7 +68,7 @@ class SerialConnection:
             error_keyword=error_keyword or "error",
             alarm_keyword=alarm_keyword or "alarm",
             handle_async=handle_async,
-            gcode_ack=gcode_ack or "gcode_response",
+            async_error_ack=async_error_ack or "async",
         )
 
     def __init__(
@@ -81,7 +81,7 @@ class SerialConnection:
         error_keyword: str,
         alarm_keyword: str,
         handle_async: bool,
-        gcode_ack: str,
+        async_error_ack: str,
     ) -> None:
         """
         Constructor
@@ -106,7 +106,7 @@ class SerialConnection:
         self._error_keyword = error_keyword.lower()
         self._alarm_keyword = alarm_keyword.lower()
         self._handle_async = handle_async
-        self._gcode_ack = gcode_ack.lower()
+        self._async_error_ack = async_error_ack.lower()
 
     async def send_command(
         self, command: CommandBuilder, retries: int = 0, timeout: Optional[float] = None
@@ -223,13 +223,11 @@ class SerialConnection:
             response = await self._serial.read_until(match=self._ack)
             log.debug(f"{self.name}: Read <- {response!r}")
 
-            while self._gcode_ack.encode() not in response.lower():
+            while self._async_error_ack.encode() in response.lower():
                 #check for multiple a priori async errors
                 response = await self._serial.read_until(match=self._ack)
                 log.debug(f"{self.name}: Read <- {response!r}")
 
-            if (self._gcode_ack.encode() in response.lower()):
-                response = response.replace(self._gcode_ack, b"")
             if (self._ack in response):
                 # Remove ack from response
                 response = response.replace(self._ack, b"")
