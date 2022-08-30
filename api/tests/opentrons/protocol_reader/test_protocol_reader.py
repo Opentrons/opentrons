@@ -69,9 +69,9 @@ def config_analyzer(decoy: Decoy) -> ConfigAnalyzer:
 
 @pytest.fixture
 def subject(
-        file_reader_writer: FileReaderWriter,
-        role_analyzer: RoleAnalyzer,
-        config_analyzer: ConfigAnalyzer,
+    file_reader_writer: FileReaderWriter,
+    role_analyzer: RoleAnalyzer,
+    config_analyzer: ConfigAnalyzer,
 ) -> ProtocolReader:
     """Create a ProtocolReader test subject."""
     return ProtocolReader(
@@ -82,12 +82,12 @@ def subject(
 
 
 async def test_read_files(
-        decoy: Decoy,
-        tmp_path: Path,
-        file_reader_writer: FileReaderWriter,
-        role_analyzer: RoleAnalyzer,
-        config_analyzer: ConfigAnalyzer,
-        subject: ProtocolReader,
+    decoy: Decoy,
+    tmp_path: Path,
+    file_reader_writer: FileReaderWriter,
+    role_analyzer: RoleAnalyzer,
+    config_analyzer: ConfigAnalyzer,
+    subject: ProtocolReader,
 ) -> None:
     """It should read a single file protocol source."""
     input_file = InputFile(
@@ -152,10 +152,10 @@ async def test_read_files(
 
 
 async def test_read_error(
-        decoy: Decoy,
-        tmp_path: Path,
-        file_reader_writer: FileReaderWriter,
-        subject: ProtocolReader,
+    decoy: Decoy,
+    tmp_path: Path,
+    file_reader_writer: FileReaderWriter,
+    subject: ProtocolReader,
 ) -> None:
     """It should catch read/parse errors."""
     input_file = InputFile(
@@ -172,11 +172,11 @@ async def test_read_error(
 
 
 async def test_role_error(
-        decoy: Decoy,
-        tmp_path: Path,
-        file_reader_writer: FileReaderWriter,
-        role_analyzer: RoleAnalyzer,
-        subject: ProtocolReader,
+    decoy: Decoy,
+    tmp_path: Path,
+    file_reader_writer: FileReaderWriter,
+    role_analyzer: RoleAnalyzer,
+    subject: ProtocolReader,
 ) -> None:
     """It should catch role analysis errors."""
     input_file = InputFile(
@@ -200,12 +200,12 @@ async def test_role_error(
 
 
 async def test_config_error(
-        decoy: Decoy,
-        tmp_path: Path,
-        file_reader_writer: FileReaderWriter,
-        role_analyzer: RoleAnalyzer,
-        config_analyzer: ConfigAnalyzer,
-        subject: ProtocolReader,
+    decoy: Decoy,
+    tmp_path: Path,
+    file_reader_writer: FileReaderWriter,
+    role_analyzer: RoleAnalyzer,
+    config_analyzer: ConfigAnalyzer,
+    subject: ProtocolReader,
 ) -> None:
     """It should catch config analysis errors."""
     input_file = InputFile(
@@ -241,12 +241,12 @@ async def test_config_error(
 
 @pytest.mark.parametrize("directory", [None, Path("/some/dir")])
 async def test_read_files_no_copy(
-        decoy: Decoy,
-        directory: Optional[Path],
-        file_reader_writer: FileReaderWriter,
-        role_analyzer: RoleAnalyzer,
-        config_analyzer: ConfigAnalyzer,
-        subject: ProtocolReader,
+    decoy: Decoy,
+    directory: Optional[Path],
+    file_reader_writer: FileReaderWriter,
+    role_analyzer: RoleAnalyzer,
+    config_analyzer: ConfigAnalyzer,
+    subject: ProtocolReader,
 ) -> None:
     """It should read a single file protocol source without copying elsewhere."""
     input_file = Path("/dev/null/protocol.py")
@@ -302,12 +302,22 @@ async def test_read_files_no_copy(
 
 def test_validate_protocol(decoy: Decoy, subject: ProtocolReader) -> None:
     """Should raise an exception when a protocol is invalid."""
-    labware = {"labware-id-1": protocol_schema_v6.Labware(definitionId="definition-1"),
-               "labware-id-2": protocol_schema_v6.Labware(definitionId="definition-2")}
-    commands = [protocol_schema_v6.Command(commandType="loadLabware",
-                                           params=protocol_schema_v6.Params(labwareId="labware-id-3")), protocol_schema_v6.Command(commandType="loadPipette",
-                                           params=protocol_schema_v6.Params(pipetteId="pipette-id-3"))]
-    protocol = protocol_schema_v6.ProtocolSchemaV6.construct(
-        labware=labware, commands=commands)
+    labware = {
+        "labware-id-1": protocol_schema_v6.Labware(definitionId="definition-1"),
+        "labware-id-2": protocol_schema_v6.Labware(definitionId="definition-2"),
+    }
+    commands = [
+        protocol_schema_v6.Command(
+            commandType="loadLabware",
+            params=protocol_schema_v6.Params(labwareId="labware-id-3"),
+        ),
+        protocol_schema_v6.Command(
+            commandType="loadPipette",
+            params=protocol_schema_v6.Params(pipetteId="pipette-id-3"),
+        ),
+    ]
+    protocol = protocol_schema_v6.ProtocolSchemaV6.construct(  # type: ignore[call-arg]
+        labware=labware, commands=commands
+    )
 
     subject.validate_json_protocol(protocol)
