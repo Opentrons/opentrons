@@ -24,8 +24,11 @@ def ensure_mount(mount: Union[str, Mount]) -> Mount:
         f" instead, {mount} was given."
     )
 
+
 def ensure_pipette_name(pipette_name: str) -> PipetteName:
     try:
         return PipetteName(pipette_name)
     except ValueError:
-        raise ValueError(f"Cannot resolve {pipette_name} to pipette, must be given valid pipette name.")
+        raise ValueError(
+            f"Cannot resolve {pipette_name} to pipette, must be given valid pipette name."
+        )

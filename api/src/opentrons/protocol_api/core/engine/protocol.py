@@ -98,7 +98,9 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
         """Get all loaded modules by deck slot number."""
         raise NotImplementedError("ProtocolEngine PAPI core not implemented")
 
-    def load_instrument(self, instrument_name: PipetteName, mount: Mount) -> InstrumentCore:
+    def load_instrument(
+        self, instrument_name: PipetteName, mount: Mount
+    ) -> InstrumentCore:
         """Load an instrument into the protocol.
 
         Args:

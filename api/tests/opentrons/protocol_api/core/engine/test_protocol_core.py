@@ -33,7 +33,9 @@ def test_load_instrument(
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="cool-pipette"))
 
-    result = subject.load_instrument(instrument_name=PipetteName.P300_SINGLE, mount=Mount.LEFT)
+    result = subject.load_instrument(
+        instrument_name=PipetteName.P300_SINGLE, mount=Mount.LEFT
+    )
 
     assert isinstance(result, InstrumentCore)
     assert result.pipette_id == "cool-pipette"

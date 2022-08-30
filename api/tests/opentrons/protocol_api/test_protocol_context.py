@@ -70,7 +70,9 @@ def test_load_instrument(
 
     decoy.when(validation.ensure_mount("shadowfax")).then_return(Mount.LEFT)
 
-    decoy.when(validation.ensure_pipette_name("gandalf")).then_return(PipetteName.P300_SINGLE)
+    decoy.when(validation.ensure_pipette_name("gandalf")).then_return(
+        PipetteName.P300_SINGLE
+    )
 
     decoy.when(
         mock_core.load_instrument(
@@ -98,7 +100,9 @@ def test_load_instrument_replace(
     mock_instrument_core = decoy.mock(cls=AbstractInstrument)
 
     decoy.when(validation.ensure_mount(matchers.IsA(Mount))).then_return(Mount.RIGHT)
-    decoy.when(validation.ensure_pipette_name(matchers.IsA(str))).then_return(PipetteName.P300_SINGLE)
+    decoy.when(validation.ensure_pipette_name(matchers.IsA(str))).then_return(
+        PipetteName.P300_SINGLE
+    )
     decoy.when(
         mock_core.load_instrument(
             instrument_name=matchers.IsA(PipetteName),

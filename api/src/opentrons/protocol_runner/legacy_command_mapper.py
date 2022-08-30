@@ -343,9 +343,7 @@ class LegacyCommandMapper:
             startedAt=now,
             completedAt=now,
             params=pe_commands.LoadPipetteParams.construct(
-                pipetteName=PipetteName(
-                    instrument_load_info.instrument_load_name
-                ),
+                pipetteName=PipetteName(instrument_load_info.instrument_load_name),
                 mount=mount,
             ),
             result=pe_commands.LoadPipetteResult.construct(pipetteId=pipette_id),
