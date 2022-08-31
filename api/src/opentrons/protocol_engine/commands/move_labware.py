@@ -25,7 +25,6 @@ class MoveLabwareParams(BaseModel):
 class MoveLabwareResult(BaseModel):
     """The output of a successful ``moveLabware`` command."""
 
-    # TODO: Should this be named newOffsetId for consistency with newLocation?
     offsetId: Optional[str] = Field(
         # Default `None` instead of `...` so this field shows up as non-required in
         # OpenAPI. The server is allowed to omit it or make it null.
