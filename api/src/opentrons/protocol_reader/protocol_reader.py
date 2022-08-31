@@ -138,40 +138,22 @@ class ProtocolReader:
     @staticmethod
     def _validate_json_protocol(protocol: ProtocolSchemaV6) -> ProtocolSchemaV6:
         """Validate json v6 protocol mapping constraints."""
-        if list(
-            command
-            for command in protocol.commands
-            if command.params.pipetteId
-            and command.params.pipetteId not in set(protocol.pipettes.keys())
-        ):
-            raise ProtocolFilesInvalidError(
-                "missing loadPipette id in referencing parent data model."
-            )
-        elif list(
-            command
-            for command in protocol.commands
-            if command.params.labwareId
-            and command.params.labwareId not in set(protocol.labware.keys())
-        ):
-            raise ProtocolFilesInvalidError(
-                "missing loadLabware id in referencing parent data model."
-            )
-        elif list(
-            command
-            for command in protocol.commands
-            if command.params.liquidId
-            and command.params.liquidId not in set(protocol.liquids.keys() if protocol.liquids else [])
-        ):
-            raise ProtocolFilesInvalidError(
-                "missing loadLiquid id in referencing parent data model."
-            )
-        elif list(
-            command
-            for command in protocol.commands
-            if command.params.moduleId
-            and command.params.moduleId not in set(protocol.modules.keys() if protocol.modules else [])
-        ):
-            raise ProtocolFilesInvalidError(
-                "missing loadModule id in referencing parent data model."
-            )
+        validate_id_lists = {
+            "pipetteId": set(protocol.pipettes.keys()),
+            "labwareId": set(protocol.labware.keys()),
+            "moduleId": set(protocol.modules.keys() if protocol.modules else []),
+            "liquidId": set(protocol.liquids.keys() if protocol.liquids else []),
+        }
+
+        for prop_name in validate_id_lists:
+            if list(
+                command
+                for command in protocol.commands
+                if getattr(command.params, prop_name)
+                and getattr(command.params, prop_name)
+                not in set(validate_id_lists[prop_name])
+            ):
+                raise ProtocolFilesInvalidError(
+                    f"missing {prop_name} in referencing parent data model."
+                )
         return protocol

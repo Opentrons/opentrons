@@ -313,7 +313,7 @@ async def test_read_files_no_copy(
                     params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
                 ),
             ],
-            "loadLabware",
+            "labwareId",
         ),
         (
             [
@@ -326,7 +326,7 @@ async def test_read_files_no_copy(
                     params=protocol_schema_v6.Params(pipetteId="pipette-id-3"),
                 ),
             ],
-            "loadPipette",
+            "pipetteId",
         ),
         (
             [
@@ -343,7 +343,7 @@ async def test_read_files_no_copy(
                     params=protocol_schema_v6.Params(liquidId="liquid-id-3"),
                 ),
             ],
-            "loadLiquid",
+            "liquidId",
         ),
         (
             [
@@ -360,7 +360,7 @@ async def test_read_files_no_copy(
                     params=protocol_schema_v6.Params(moduleId="module-id-3"),
                 ),
             ],
-            "loadModule",
+            "moduleId",
         ),
     ],
 )
@@ -412,6 +412,6 @@ async def test_json_protocol_error(
 
     with pytest.raises(
         ProtocolFilesInvalidError,
-        match=f"missing {expected_error_name} id in referencing parent data model.",
+        match=f"missing {expected_error_name} in referencing parent data model.",
     ):
         await subject.read_and_save(directory=tmp_path, files=[input_file])
