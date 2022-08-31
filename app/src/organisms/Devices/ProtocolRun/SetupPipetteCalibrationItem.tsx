@@ -171,6 +171,7 @@ export function SetupPipetteCalibrationItem({
         title={pipetteInfo.pipetteSpecs?.displayName}
         id={`PipetteCalibration_${mount}MountTitle`}
         runId={runId}
+        robotName={robotName}
       />
       {PipetteOffsetCalibrationWizard}
       {showCalBlockModal && (

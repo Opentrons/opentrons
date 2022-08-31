@@ -16,12 +16,13 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { useRunHasStarted } from '../hooks'
+import { useIsOT3, useRunHasStarted } from '../hooks'
 import { formatTimestamp } from '../utils'
 
 interface SetupCalibrationItemProps {
   calibratedDate: string | null
   runId: string
+  robotName: string
   label?: string
   title?: string
   subText?: string
@@ -37,10 +38,12 @@ export function SetupCalibrationItem({
   button,
   id,
   runId,
+  robotName,
 }: SetupCalibrationItemProps): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
 
   const runHasStarted = useRunHasStarted(runId)
+  const isOT3 = useIsOT3(robotName)
 
   const calibratedText =
     calibratedDate != null
@@ -67,12 +70,16 @@ export function SetupCalibrationItem({
             <Icon
               size={SIZE_1}
               color={
-                calibratedDate != null
+                // temporarily present valid pipette calibration for OT-3
+                isOT3 || calibratedDate != null
                   ? COLORS.successEnabled
                   : COLORS.warningEnabled
               }
               marginRight={SPACING.spacing4}
-              name={calibratedDate != null ? 'ot-check' : 'alert-circle'}
+              // temporarily present valid pipette calibration for OT-3
+              name={
+                isOT3 || calibratedDate != null ? 'ot-check' : 'alert-circle'
+              }
             />
           ) : null}
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
@@ -91,9 +98,12 @@ export function SetupCalibrationItem({
                 {title}
               </StyledText>
             )}
-            <StyledText as="label" color={COLORS.darkGreyEnabled}>
-              {calibrationDataNotAvailableText ?? subText ?? calibratedText}
-            </StyledText>
+            {/* temporarily omit pipette calibration date text for OT-3 */}
+            {!isOT3 ? (
+              <StyledText as="label" color={COLORS.darkGreyEnabled}>
+                {calibrationDataNotAvailableText ?? subText ?? calibratedText}
+              </StyledText>
+            ) : null}
           </Flex>
         </Flex>
       </Flex>

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { saveAs } from 'file-saver'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, waitFor } from '@testing-library/react'
 
@@ -31,6 +32,7 @@ import {
 import { mockAttachedPipette } from '../../../../redux/pipettes/__fixtures__'
 import {
   useDeckCalibrationData,
+  useIsOT3,
   usePipetteOffsetCalibrations,
   useRobot,
   useTipLengthCalibrations,
@@ -119,6 +121,7 @@ const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
 const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
   typeof RobotApi.getRequestById
 >
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 
 const RUN_STATUSES = {
   isRunRunning: false,
@@ -186,10 +189,12 @@ describe('RobotSettingsCalibration', () => {
     mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
     mockUseRunStatuses.mockReturnValue(RUN_STATUSES)
     mockGetRequestById.mockReturnValue(null)
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(false)
   })
 
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('renders a title and description - About Calibration', () => {
@@ -256,7 +261,7 @@ describe('RobotSettingsCalibration', () => {
   //   getByText('Pipette Offset calibration recommended')
   // })
 
-  it('renders a title and description - Tip Length Calibrations', () => {
+  it('renders a title and description - Tip Length Calibrations for OT-2', () => {
     const [{ getByText }] = render()
     getByText('Tip Length Calibrations')
     getByText(
@@ -265,13 +270,24 @@ describe('RobotSettingsCalibration', () => {
     getByText('PipetteOffsetCalibrationItems')
   })
 
+  it('does not render a title and description - Tip Length Calibrations for OT-3', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ queryByText }] = render()
+    expect(queryByText('Tip Length Calibrations')).toBeNull()
+    expect(
+      queryByText(
+        'Tip length calibration measures the distance between the bottom of the tip and the pipette’s nozzle. You can recalibrate a tip length if the pipette associated with it is currently attached to this robot. If you recalibrate a tip length, you will be prompted to recalibrate that pipette’s offset calibration.'
+      )
+    ).toBeNull()
+  })
+
   it('renders Not calibrated yet when no tip length calibrations data', () => {
     mockUseTipLengthCalibrations.mockReturnValue(null)
     const [{ getByText }] = render()
     getByText('Not calibrated yet')
   })
 
-  it('renders a title description and button - Deck Calibration', () => {
+  it('renders a title description and button - Deck Calibration for OT-2', () => {
     const [{ getByText, getByRole }] = render()
     getByText('Deck Calibration')
     getByText(
@@ -279,6 +295,19 @@ describe('RobotSettingsCalibration', () => {
     )
     getByRole('button', { name: 'Calibrate deck' })
     getByText('Last calibrated: September 15, 2021 00:00')
+  })
+
+  it('does not render a title description and button - Deck Calibration for OT-3', () => {
+    when(mockUseIsOT3).calledWith('otie').mockReturnValue(true)
+    const [{ queryByText, queryByRole }] = render()
+    expect(queryByText('Deck Calibration')).toBeNull()
+    expect(
+      queryByText(
+        'Deck calibration measures the deck position relative to the gantry. This calibration is the foundation for tip length and pipette offset calibrations. Calibrate your deck during new robot setup. Redo deck calibration if you relocate your robot.'
+      )
+    ).toBeNull()
+    expect(queryByRole('button', { name: 'Calibrate deck' })).toBeNull()
+    expect(queryByText('Last calibrated: September 15, 2021 00:00')).toBeNull()
   })
 
   it('renders calibrate deck button when deck is not calibrated', () => {

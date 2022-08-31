@@ -51,6 +51,7 @@ import {
   useAttachedPipetteCalibrations,
   useRunStartedOrLegacySessionInProgress,
   useRunStatuses,
+  useIsOT3,
 } from '../hooks'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
@@ -141,10 +142,8 @@ export function RobotSettingsCalibration({
 
   const robot = useRobot(robotName)
   const notConnectable = robot?.status !== CONNECTABLE
-  const deckCalStatus = useSelector((state: State) => {
-    return Calibration.getDeckCalibrationStatus(state, robotName)
-  })
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
+  const isOT3 = useIsOT3(robotName)
   const dispatch = useDispatch<Dispatch>()
   React.useEffect(() => {
     dispatch(fetchAllSessions(robotName))
@@ -247,7 +246,7 @@ export function RobotSettingsCalibration({
       Calibration.DECK_CAL_STATUS_SINGULARITY,
       Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
       Calibration.DECK_CAL_STATUS_IDENTITY,
-    ] as Array<typeof deckCalStatus>).includes(deckCalStatus) &&
+    ] as Array<typeof deckCalibrationStatus>).includes(deckCalibrationStatus) &&
     pipetteCalPresent &&
     pipettePresent
 
@@ -274,7 +273,8 @@ export function RobotSettingsCalibration({
   }
 
   const deckCalibrationButtonText =
-    deckCalStatus && deckCalStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
+    deckCalibrationStatus &&
+    deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_IDENTITY
       ? t('recalibrate_deck')
       : t('calibrate_deck')
 
@@ -594,30 +594,40 @@ export function RobotSettingsCalibration({
           </TertiaryButton>
         </Flex>
       </Box>
-      <Line />
-      {/* DeckCalibration Section */}
-      {deckCalibrationBanner}
-      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box marginRight={SPACING.spacing6}>
-            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
-              {t('deck_calibration_title')}
-            </Box>
-            <StyledText as="p" marginBottom={SPACING.spacing3}>
-              {t('deck_calibration_description')}
-            </StyledText>
-            <StyledText as="label" color={COLORS.darkGreyEnabled}>
-              {deckLastModified()}
-            </StyledText>
+      {!isOT3 ? (
+        <>
+          <Line />
+          {/* DeckCalibration Section */}
+          {deckCalibrationBanner}
+          <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
+            <Flex
+              alignItems={ALIGN_CENTER}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+            >
+              <Box marginRight={SPACING.spacing6}>
+                <Box
+                  css={TYPOGRAPHY.h3SemiBold}
+                  marginBottom={SPACING.spacing3}
+                >
+                  {t('deck_calibration_title')}
+                </Box>
+                <StyledText as="p" marginBottom={SPACING.spacing3}>
+                  {t('deck_calibration_description')}
+                </StyledText>
+                <StyledText as="label" color={COLORS.darkGreyEnabled}>
+                  {deckLastModified()}
+                </StyledText>
+              </Box>
+              <TertiaryButton
+                onClick={() => handleClickDeckCalibration()}
+                disabled={disabledOrBusyReason != null}
+              >
+                {deckCalibrationButtonText}
+              </TertiaryButton>
+            </Flex>
           </Box>
-          <TertiaryButton
-            onClick={() => handleClickDeckCalibration()}
-            disabled={disabledOrBusyReason != null}
-          >
-            {deckCalibrationButtonText}
-          </TertiaryButton>
-        </Flex>
-      </Box>
+        </>
+      ) : null}
       <Line
         marginBottom={
           showPipetteOffsetCalibrationBanner ? SPACING.spacing4 : null
@@ -654,31 +664,38 @@ export function RobotSettingsCalibration({
           )}
         </Flex>
       </Box>
-      <Line />
-      {/* Tip Length Calibration Section */}
-      <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
-          <Box marginRight={SPACING.spacing6}>
-            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
-              {t('tip_length_calibrations_title')}
-            </Box>
-            <StyledText as="p" marginBottom={SPACING.spacing4}>
-              {t('tip_length_calibrations_description')}
-            </StyledText>
+      {!isOT3 ? (
+        <>
+          <Line />
+          {/* Tip Length Calibration Section */}
+          <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
+            <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
+              <Box marginRight={SPACING.spacing6}>
+                <Box
+                  css={TYPOGRAPHY.h3SemiBold}
+                  marginBottom={SPACING.spacing3}
+                >
+                  {t('tip_length_calibrations_title')}
+                </Box>
+                <StyledText as="p" marginBottom={SPACING.spacing4}>
+                  {t('tip_length_calibrations_description')}
+                </StyledText>
+              </Box>
+              {tipLengthCalibrations != null &&
+              tipLengthCalibrations.length !== 0 ? (
+                <TipLengthCalibrationItems
+                  robotName={robotName}
+                  formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
+                  formattedTipLengthCalibrations={formatTipLengthCalibrations()}
+                  updateRobotStatus={updateRobotStatus}
+                />
+              ) : (
+                <StyledText as="label">{t('not_calibrated')}</StyledText>
+              )}
+            </Flex>
           </Box>
-          {tipLengthCalibrations != null &&
-          tipLengthCalibrations.length !== 0 ? (
-            <TipLengthCalibrationItems
-              robotName={robotName}
-              formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
-              formattedTipLengthCalibrations={formatTipLengthCalibrations()}
-              updateRobotStatus={updateRobotStatus}
-            />
-          ) : (
-            <StyledText as="label">{t('not_calibrated')}</StyledText>
-          )}
-        </Flex>
-      </Box>
+        </>
+      ) : null}
       <Line />
       {/* Calibration Health Check Section */}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing2}>
