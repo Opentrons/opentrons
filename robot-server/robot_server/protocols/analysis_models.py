@@ -95,7 +95,7 @@ class CompletedAnalysis(BaseModel):
             "If a piece of labware moves between locations as part of the protocol,"
             " its *final* location will be reported in this list,"
             " not its *initial* location."
-        )
+        ),
     )
     # TODO(mm, 2022-08-31): We're missing modules here, but there is a modules field
     # in run results. Add modules here, for consistency?
