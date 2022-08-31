@@ -29,7 +29,7 @@ CLASSIFIERS = [
     'Intended Audience :: Science/Research',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.10',
     'Topic :: Scientific/Engineering',
 ]
 KEYWORDS = ["robots", "automation", "lab"]
@@ -37,7 +37,7 @@ DESCRIPTION = (
     "A server to update software and firmware on Opentrons robots")
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
-    'aiohttp==3.4.4',
+    'aiohttp==3.8.1',
 ]
 
 
@@ -52,7 +52,7 @@ def read(*parts):
 
 if __name__ == "__main__":
     setup(
-        python_requires='>=3.6',
+        python_requires='>=3.10',
         name=DISTNAME,
         description=DESCRIPTION,
         license=LICENSE,
