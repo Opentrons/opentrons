@@ -312,7 +312,7 @@ class AsyncResponseSerialConnection(SerialConnection):
                            (default: alarm)
             reset_buffer_before_write: whether to reset the read buffer before
               every write
-            async_error_ack: optional string that will indicate an asynchronous 
+            async_error_ack: optional string that will indicate an asynchronous
                              error when detected (default: async)
 
         Returns: AsyncResponseSerialConnection
@@ -360,7 +360,7 @@ class AsyncResponseSerialConnection(SerialConnection):
                            exception when detected
             alarm_keyword: string that will cause an AlarmResponse
                            exception when detected
-            async_error_ack: string that will indicate an asynchronous 
+            async_error_ack: string that will indicate an asynchronous
                              error when detected
         """
         super().__init__(
@@ -438,7 +438,7 @@ class AsyncResponseSerialConnection(SerialConnection):
             log.debug(f"{self._name}: Write -> {data_encode!r}")
             await self._serial.write(data=data_encode)
 
-            response: List[str] = []
+            response: List[bytes] = []
             response.append(await self._serial.read_until(match=self._ack))
             log.debug(f"{self._name}: Read <- {response[-1]!r}")
 
@@ -455,11 +455,11 @@ class AsyncResponseSerialConnection(SerialConnection):
                 )
                 self.raise_on_error(response=str_response)
 
-            if self._ack in response:
+            if self._ack in response[-1]:
                 # Remove ack from response
-                response = response.replace(self._ack, b"")
+                ackless_response = response[-1].replace(self._ack, b"")
                 str_response = self.process_raw_response(
-                    command=data, response=response.decode()
+                    command=data, response=ackless_response.decode()
                 )
                 self.raise_on_error(response=str_response)
                 return str_response
