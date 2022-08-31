@@ -1064,11 +1064,12 @@
                 "enum": ["loadLabware"]
               },
               "params": {
+                "description": "Input parameters to the `loadLabware` command. NOTE: Unlike most commands, `loadLabware` commands issued over HTTP have different parameters than ones in JSON protocols. This schema describes JSON protocols.",
                 "required": ["labwareId", "location"],
                 "properties": {
                   "labwareId": {
                     "type": "string",
-                    "description": "Unique identifier of labware to load"
+                    "description": "Unique identifier of labware to load. Must be a key from the top-level `labware` object."
                   },
                   "location": {
                     "description": "Physical destination location to load labware into (e.g. '1' || 'someModuleId')",
@@ -1090,21 +1091,8 @@
                             "type": "string"
                           }
                         }
-                      },
-                      {
-                        "required": ["labwareId"],
-                        "properties": {
-                          "labwareId": {
-                            "description": "Unique identifier of destination labware. Must be a key from the top level 'labware' object.",
-                            "type": "string"
-                          }
-                        }
                       }
-                    ],
-                    "displayName": {
-                      "type": "string",
-                      "description": "Optional user-defined nickname for this labware instance within the protocol"
-                    }
+                    ]
                   }
                 }
               }
