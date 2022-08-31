@@ -1,4 +1,4 @@
-from .serial_connection import SerialConnection
+from .serial_connection import SerialConnection, AsyncResponseSerialConnection
 from opentrons.drivers.asyncio.communication.errors import (
     SerialException,
     NoResponse,
@@ -9,6 +9,7 @@ from .async_serial import AsyncSerial
 
 __all__ = [
     "SerialConnection",
+    "AsyncResponseSerialConnection",
     "AsyncSerial",
     "SerialException",
     "NoResponse",
