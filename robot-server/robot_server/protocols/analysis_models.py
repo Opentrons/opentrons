@@ -97,6 +97,8 @@ class CompletedAnalysis(BaseModel):
             " not its *initial* location."
         )
     )
+    # TODO(mm, 2022-08-31): We're missing modules here, but there is a modules field
+    # in run results. Add modules here, for consistency?
     commands: List[Command] = Field(
         ...,
         description="The protocol commands the run is expected to produce",
