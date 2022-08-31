@@ -165,41 +165,6 @@ class EquipmentHandler:
 
         return offset_id
 
-    def _find_applicable_labware_offset_id(
-        self, labware_definition_uri: str, labware_location: LabwareLocation
-    ) -> Optional[str]:
-        """Figure out what offset would apply to a labware in the given location.
-
-        Raises:
-            ModuleNotLoadedError: If `labware_location` references a module ID
-                that doesn't point to a valid loaded module.
-
-        Returns:
-            The ID of the labware offset that will apply,
-            or None if no labware offset will apply.
-        """
-        if isinstance(labware_location, DeckSlotLocation):
-            slot_name = labware_location.slotName
-            module_model = None
-        else:
-            module_id = labware_location.moduleId
-            # Allow ModuleNotLoadedError to propagate.
-            module_model = self._state_store.modules.get_model(module_id=module_id)
-            module_location = self._state_store.modules.get_location(
-                module_id=module_id
-            )
-            slot_name = module_location.slotName
-
-        offset = self._state_store.labware.find_applicable_labware_offset(
-            definition_uri=labware_definition_uri,
-            location=LabwareOffsetLocation(
-                slotName=slot_name,
-                moduleModel=module_model,
-            ),
-        )
-
-        return None if offset is None else offset.id
-
     async def load_pipette(
         self,
         pipette_name: PipetteName,
@@ -340,3 +305,38 @@ class EquipmentHandler:
             f'No module attached with serial number "{serial_number}"'
             f' for module ID "{module_id}".'
         )
+
+    def _find_applicable_labware_offset_id(
+        self, labware_definition_uri: str, labware_location: LabwareLocation
+    ) -> Optional[str]:
+        """Figure out what offset would apply to a labware in the given location.
+
+        Raises:
+            ModuleNotLoadedError: If `labware_location` references a module ID
+                that doesn't point to a valid loaded module.
+
+        Returns:
+            The ID of the labware offset that will apply,
+            or None if no labware offset will apply.
+        """
+        if isinstance(labware_location, DeckSlotLocation):
+            slot_name = labware_location.slotName
+            module_model = None
+        else:
+            module_id = labware_location.moduleId
+            # Allow ModuleNotLoadedError to propagate.
+            module_model = self._state_store.modules.get_model(module_id=module_id)
+            module_location = self._state_store.modules.get_location(
+                module_id=module_id
+            )
+            slot_name = module_location.slotName
+
+        offset = self._state_store.labware.find_applicable_labware_offset(
+            definition_uri=labware_definition_uri,
+            location=LabwareOffsetLocation(
+                slotName=slot_name,
+                moduleModel=module_model,
+            ),
+        )
+
+        return None if offset is None else offset.id
