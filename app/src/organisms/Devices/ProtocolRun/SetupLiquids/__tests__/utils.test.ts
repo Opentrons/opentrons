@@ -5,6 +5,7 @@ import {
   getLiquidsByIdForLabware,
   getWellGroupForLiquidId,
   getWellRangeForLiquidLabwarePair,
+  getDisabledWellGroupForLiquidId,
 } from '../utils'
 import type { LabwareByLiquidId, Liquid } from '@opentrons/api-client'
 
@@ -260,6 +261,41 @@ describe('getWellGroupForLiquidId', () => {
     }
     expect(
       getWellGroupForLiquidId(MOCK_LABWARE_BY_LIQUID_ID_FOR_LABWARE, '7')
+    ).toEqual(expected)
+  })
+})
+
+describe('getDisabledWellGroupForLiquidId', () => {
+  it('returns wellgroup object for the specified liquidId', () => {
+    const expectedSeven = {
+      A1: null,
+      A2: null,
+      B1: null,
+      B2: null,
+      C1: null,
+      C2: null,
+      D1: null,
+      D2: null,
+    }
+
+    const expectedNineteen = {
+      A5: null,
+      A6: null,
+      B5: null,
+      B6: null,
+      C5: null,
+      C6: null,
+      D5: null,
+      D6: null,
+    }
+
+    const expected = [expectedSeven, expectedNineteen]
+
+    expect(
+      getDisabledWellGroupForLiquidId(MOCK_LABWARE_BY_LIQUID_ID_FOR_LABWARE, [
+        '7',
+        '19',
+      ])
     ).toEqual(expected)
   })
 })

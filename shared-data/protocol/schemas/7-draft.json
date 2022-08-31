@@ -1117,10 +1117,6 @@
                   "location": {
                     "$ref": "#/definitions/labwareLocation",
                     "description": "Physical destination location to load labware into."
-                  },
-                  "displayName": {
-                    "type": "string",
-                    "description": "Optional user-defined nickname for this labware instance within the protocol"
                   }
                 }
               }

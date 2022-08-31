@@ -8,16 +8,19 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import {
   fetchCalibrationStatus,
   getDeckCalibrationData,
+  DECK_CAL_STATUS_OK,
+  DECK_CAL_STATUS_IDENTITY,
 } from '../../../../redux/calibration'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { useDispatchApiRequest } from '../../../../redux/robot-api'
 
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 
-import { useDeckCalibrationData } from '..'
+import { useDeckCalibrationData, useDeckCalibrationStatus } from '..'
 
 jest.mock('../../../../redux/calibration')
 jest.mock('../../../../redux/robot-api')
+jest.mock('../useDeckCalibrationStatus')
 
 const mockFetchCalibrationStatus = fetchCalibrationStatus as jest.MockedFunction<
   typeof fetchCalibrationStatus
@@ -27,6 +30,9 @@ const mockGetDeckCalibrationData = getDeckCalibrationData as jest.MockedFunction
 >
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
+>
+const mockUseDeckCalibrationStatus = useDeckCalibrationStatus as jest.MockedFunction<
+  typeof useDeckCalibrationStatus
 >
 
 const store: Store<any> = createStore(jest.fn(), {})
@@ -56,6 +62,10 @@ describe('useDeckCalibrationData hook', () => {
       .calledWith(undefined as any, null)
       .mockReturnValue(null)
 
+    when(mockUseDeckCalibrationStatus)
+      .calledWith(null)
+      .mockReturnValue(DECK_CAL_STATUS_IDENTITY)
+
     const { result } = renderHook(() => useDeckCalibrationData(null), {
       wrapper,
     })
@@ -71,6 +81,10 @@ describe('useDeckCalibrationData hook', () => {
     when(mockGetDeckCalibrationData)
       .calledWith(undefined as any, 'otie')
       .mockReturnValue(mockDeckCalData)
+
+    when(mockUseDeckCalibrationStatus)
+      .calledWith('otie')
+      .mockReturnValue(DECK_CAL_STATUS_OK)
 
     const { result } = renderHook(() => useDeckCalibrationData('otie'), {
       wrapper,

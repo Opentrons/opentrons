@@ -8,6 +8,7 @@ export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'enableChangePipetteWizard',
   'enableLiquidSetup',
   'enableCalibrationWizards',
+  'enableManualDeckStateModification',
 ]
 
 // action type constants

@@ -87,11 +87,6 @@ def ot_config_tempdir(tmp_path: pathlib.Path) -> Generator[pathlib.Path, None, N
 
 
 @pytest.fixture()
-def labware_offset_tempdir(ot_config_tempdir: pathlib.Path) -> pathlib.Path:
-    return config.get_opentrons_path("labware_calibration_offsets_dir_v2")
-
-
-@pytest.fixture()
 def is_robot(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(config, "IS_ROBOT", True)
 

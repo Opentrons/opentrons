@@ -9,7 +9,6 @@ import {
   SPACING,
   COLORS,
   TYPOGRAPHY,
-  OVERLAY_BLACK_80,
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
@@ -19,10 +18,10 @@ import {
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
+import { OffsetVector } from '../../../molecules/OffsetVector'
+import { useLabwareOffsetForLabware } from '../../LabwarePositionCheck/hooks/useLabwareOffsetForLabware'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import { useLabwareOffsetForLabware } from '../../LabwarePositionCheck/hooks/useLabwareOffsetForLabware'
-import { OffsetVector } from '../../../molecules/OffsetVector'
 interface LabwareInfoProps {
   displayName: string | null
   definitionDisplayName: string
@@ -47,7 +46,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
 
   return (
     <Box
-      backgroundColor={hover ? COLORS.blueEnabled : OVERLAY_BLACK_80}
+      backgroundColor={hover ? COLORS.blueEnabled : '#000000B3'}
       borderRadius="0 0 0.4rem 0.4rem"
       fontSize={TYPOGRAPHY.fontSizeCaption}
       padding={SPACING.spacing2}
