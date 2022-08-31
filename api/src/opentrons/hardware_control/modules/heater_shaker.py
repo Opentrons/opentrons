@@ -160,7 +160,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         Returns:
             The status
         """
-        DELTA: Final = 100
+        DELTA: Final = 40
         status = SpeedStatus.IDLE
         if speed.target is not None:
             diff = speed.target - speed.current

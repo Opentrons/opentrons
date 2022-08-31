@@ -32,6 +32,11 @@ except (OSError, ModuleNotFoundError):
 from opentrons_shared_data.protocol.dev_types import JsonProtocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
+from opentrons_shared_data.deck.dev_types import RobotModel, DeckDefinitionV3
+from opentrons_shared_data.deck import (
+    load as load_deck,
+    DEFAULT_DECK_DEFINITION_VERSION,
+)
 
 from opentrons import config
 from opentrons import hardware_control as hc
@@ -203,30 +208,51 @@ async def ot3_hardware(
         yield hw
 
 
-@pytest.fixture(
-    # these have to be lambdas because pytest calls them when providing the param
-    # value and we want to use the function's identity
-    params=[lambda: _build_ot2_hw, lambda: _build_ot3_hw],
-    ids=["ot2", "ot3"],
-)
+@pytest.fixture(params=["OT-2 Standard", "OT-3 Standard"])
+async def robot_model(
+    request: pytest.FixtureRequest,
+    decoy: Decoy,
+    mock_feature_flags: None,
+    virtual_smoothie_env: None,
+) -> AsyncGenerator[RobotModel, None]:
+    which_machine = cast(RobotModel, request.param)  # type: ignore[attr-defined]
+    if request.node.get_closest_marker("ot2_only") and which_machine == "OT-3 Standard":
+        pytest.skip("test requests only ot-2")
+    if request.node.get_closest_marker("ot3_only") and which_machine == "OT-2 Standard":
+        pytest.skip("test requests only ot-3")
+    if which_machine == "OT-3 Standard" and request.config.getoption("--ot2-only"):
+        pytest.skip("testing only ot2")
+
+    decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(
+        which_machine == "OT-3 Standard"
+    )
+
+    yield which_machine
+
+
+@pytest.fixture
+def deck_definition(robot_model: RobotModel) -> DeckDefinitionV3:
+    if robot_model == "OT-3 Standard":
+        return load_deck("ot3_standard", DEFAULT_DECK_DEFINITION_VERSION)
+    else:
+        return load_deck("ot2_standard", DEFAULT_DECK_DEFINITION_VERSION)
+
+
+@pytest.fixture()
 async def hardware(
     request: pytest.FixtureRequest,
     decoy: Decoy,
     mock_feature_flags: None,
     virtual_smoothie_env: None,
+    robot_model: RobotModel,
 ) -> AsyncGenerator[ThreadManagedHardware, None]:
-    hw_builder = request.param()  # type: ignore[attr-defined]
-
-    if request.node.get_closest_marker("ot2_only") and hw_builder == _build_ot3_hw:
-        pytest.skip()
-    if request.node.get_closest_marker("ot3_only") and hw_builder == _build_ot2_hw:
-        pytest.skip()
-    if hw_builder == _build_ot3_hw and request.config.getoption("--ot2-only"):
-        pytest.skip("testing only ot2")
+    hw_builder = {"OT-2 Standard": _build_ot2_hw, "OT-3 Standard": _build_ot3_hw}[
+        robot_model
+    ]
 
     async for hw in hw_builder():
         decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(
-            hw_builder == _build_ot3_hw
+            robot_model == "OT-3 Standard"
         )
 
         yield hw
