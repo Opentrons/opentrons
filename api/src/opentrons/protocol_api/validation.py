@@ -12,12 +12,12 @@ def ensure_mount(mount: Union[str, Mount]) -> Mount:
     if isinstance(mount, str):
         try:
             return Mount[mount.upper()]
-        except KeyError:
+        except KeyError as e:
             # TODO(mc, 2022-08-25): create specific exception type
             raise ValueError(
                 "If mount is specified as a string, it must be 'left' or 'right';"
                 f" instead, {mount} was given."
-            )
+            ) from e
 
     # TODO(mc, 2022-08-25): create specific exception type
     raise TypeError(
@@ -30,7 +30,7 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
     """Ensure that an input value represents a valid pipette name."""
     try:
         return PipetteNameType(pipette_name)
-    except ValueError:
+    except ValueError as e:
         raise ValueError(
             f"Cannot resolve {pipette_name} to pipette, must be given valid pipette name."
-        )
+        ) from e

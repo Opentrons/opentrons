@@ -559,9 +559,9 @@ class ProtocolContext(CommandPublisher):
                                     the version.
         :param mount: The mount in which this instrument should be attached.
                       This can either be an instance of the enum type
-                      :py:class:`.Mount` or one of the strings `'left'`
+                      :py:class:`.types.Mount` or one of the strings `'left'`
                       and `'right'`.
-        :type mount: Mount or str
+        :type mount: types.Mount or str
         :param tip_racks: A list of tip racks from which to pick tips if
                           :py:meth:`.InstrumentContext.pick_up_tip` is called
                           without arguments.
