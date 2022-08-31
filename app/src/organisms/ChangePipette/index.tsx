@@ -36,6 +36,7 @@ import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'
 import { ClearDeckModal } from './ClearDeckModal/index'
 import { ConfirmPipette } from './ConfirmPipette'
+//  remove lines 40 - 46 when removing FF
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 import { ExitAlertModal } from './ExitAlertModal'
 import { DeprecatedInstructions } from './DeprecatedInstructions'
