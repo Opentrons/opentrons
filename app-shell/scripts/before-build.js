@@ -14,25 +14,25 @@ const PYTHON_BY_PLATFORM = {
   darwin: {
     x64: {
       url:
-        'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-apple-darwin-install_only.tar.gz',
+        'https://github.com/indygreg/python-build-standalone/releases/download/20220502/cpython-3.10.4+20220502-x86_64-apple-darwin-install_only.tar.gz',
       sha256:
-        'ec2e90b6a589db7ef9f74358b1436558167629f9e4d725c8150496f9cb08a9d4',
+        'f2711eaffff3477826a401d09a013c6802f11c04c63ab3686aa72664f1216a05',
     },
   },
   linux: {
     x64: {
       url:
-        'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-unknown-linux-gnu-install_only.tar.gz',
+        'https://github.com/indygreg/python-build-standalone/releases/download/20220502/cpython-3.10.4+20220502-x86_64-unknown-linux-gnu-install_only.tar.gz',
       sha256:
-        'b9989411bed71ba4867538c991f20b55f549dd9131905733f0df9f3fde81ad1d',
+        'f6f871e53a7b1469c13f9bd7920ad98c4589e549acad8e5a1e14760fff3dd5c9',
     },
   },
   win32: {
     x64: {
       url:
-        'https://github.com/indygreg/python-build-standalone/releases/download/20220318/cpython-3.10.3+20220318-x86_64-pc-windows-msvc-shared-install_only.tar.gz',
+        'https://github.com/indygreg/python-build-standalone/releases/download/20220502/cpython-3.10.4+20220502-x86_64-pc-windows-msvc-shared-install_only.tar.gz',
       sha256:
-        'ba593370742ed8a7bc70ce563dd6a53e30ece1f6881e3888d334c1b485b0d9d0',
+        'bee24a3a5c83325215521d261d73a5207ab7060ef3481f76f69b4366744eb81d',
     },
   },
 }
