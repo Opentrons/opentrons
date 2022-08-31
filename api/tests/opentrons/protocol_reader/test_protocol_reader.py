@@ -344,6 +344,23 @@ async def test_read_files_no_copy(
                     ),
                 ],
                 "loadLiquid",
+        ),
+        (
+                [
+                    protocol_schema_v6.Command(
+                        commandType="loadLabware",
+                        params=protocol_schema_v6.Params(labwareId="labware-id-1"),
+                    ),
+                    protocol_schema_v6.Command(
+                        commandType="loadPipette",
+                        params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
+                    ),
+                    protocol_schema_v6.Command(
+                        commandType="loadModule",
+                        params=protocol_schema_v6.Params(moduleId="module-id-3"),
+                    ),
+                ],
+                "loadModule",
         )
     ],
 )
@@ -363,8 +380,9 @@ async def test_json_protocol_error(
         "labware-id-2": protocol_schema_v6.Labware(definitionId="definition-2"),
     }
     pipettes = {"pipette-id-1": protocol_schema_v6.Pipette(name="pipette-1")}
+    liquids = {"liquid-id-1": protocol_schema_v6.Liquid(displayName="liquid-1", description="liquid desc")}
     protocol = protocol_schema_v6.ProtocolSchemaV6.construct(  # type: ignore[call-arg]
-        labware=labware, commands=input_commands, pipettes=pipettes
+        labware=labware, commands=input_commands, pipettes=pipettes, liquids=liquids
     )
     input_file = InputFile(
         filename="protocol.py",
