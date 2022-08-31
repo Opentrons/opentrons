@@ -337,8 +337,7 @@ class LoadedLabware(BaseModel):
     loadName: str
     definitionUri: str
     location: LabwareLocation = Field(
-        ...,
-        description="The labware's current location."
+        ..., description="The labware's current location."
     )
     offsetId: Optional[str] = Field(
         None,

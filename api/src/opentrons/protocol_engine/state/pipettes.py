@@ -1,7 +1,7 @@
 """Basic pipette data state and store."""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict, List, Mapping, Optional, Union
+from typing import Dict, List, Mapping, Optional
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount

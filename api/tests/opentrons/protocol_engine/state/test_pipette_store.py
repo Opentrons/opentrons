@@ -435,7 +435,7 @@ def test_move_labware_clears_current_well_if_belonged_to_moved_labware(
     move_labware_command: cmd.MoveLabware,
     expected_current_well: Optional[CurrentWell],
 ) -> None:
-    """moveLabware commands should sometimes clear the current well.
+    """`moveLabware` commands should sometimes clear the current well.
 
     * When the current well belongs to the labware that was moved,
       it should be cleared.
