@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [requires]
-python_version = "3.7"
+python_version = "3.10"
 
 [dev-packages]
 robot-server = { editable = true, path = "." }
@@ -47,11 +47,8 @@ typing-extensions = ">=4.0.0,<5"
 uvicorn = "==0.14.0"
 wsproto = "==1.0.0"
 systemd-python = { version = "==234", sys_platform = "== 'linux'" }
-idna = "==3.2"
+idna = "==3.3"
 click = "==8.0.1"
-# TODO(mc, 2022-04-04): this dep is newer than the OT-2 for dev environment reasons
-# remove this TODO when Opentrons/buildroot has updated to newer numpy
-# https://github.com/Opentrons/buildroot/pull/148
 numpy = "==1.21.2"
 zipp = "==3.5.0"
 opentrons-hardware = { editable = true, path = "./../hardware" }
