@@ -18,5 +18,5 @@ stages:
         errors:
           - id: ProtocolFilesInvalid
             title: Protocol File(s) Invalid
-            detail: "missing loadLabware id in referencing parent data model."
+            detail: "missing labwareId in referencing parent data model."
 
