@@ -50,13 +50,7 @@ class MoveLabwareImplementation(
 
     async def execute(self, params: MoveLabwareParams) -> MoveLabwareResult:
         """Move a loaded labware to a new location."""
-        # TODO:
-        # 1. Check that the given labware ID actually exists.
-        # 2. Check that the new location is valid
-        #    (if it's a module ID, that module needs to exist.)
-        # 3. Check that the location is unoccupied? (Probably defer this for now.)
-        # 4. Grab a new labware offset, somehow?
-        new_offset_id = self._equipment.select_offset_for_after_move(
+        new_offset_id = self._equipment.move_labware(
             labware_id=params.labwareId,
             new_location=params.newLocation,
         )

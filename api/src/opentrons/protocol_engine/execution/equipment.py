@@ -97,11 +97,15 @@ class EquipmentHandler:
 
         Args:
             load_name: The labware's load name.
-            namespace: The namespace.
-            version: Version
+            namespace: The labware's namespace.
+            version: The labware's version.
             location: The deck location at which labware is placed.
             labware_id: An optional identifier to assign the labware. If None, an
                 identifier will be generated.
+
+        Raises:
+            ModuleNotLoadedError: If `new_location` references a module ID
+                that doesn't point to a valid loaded module.
 
         Returns:
             A LoadedLabwareData object.
@@ -126,71 +130,75 @@ class EquipmentHandler:
                 version=version,
             )
 
-        if isinstance(location, DeckSlotLocation):
-            slot_name = location.slotName
+        # Allow propagation of ModuleNotLoadedError.
+        offset_id = self._find_applicable_labware_offset_id(
+            labware_definition_uri=definition_uri,
+            labware_location=location,
+        )
+
+        return LoadedLabwareData(
+            labware_id=labware_id, definition=definition, offsetId=offset_id
+        )
+
+    def move_labware(
+        self, labware_id: str, new_location: LabwareLocation
+    ) -> Optional[str]:
+        """Gather required info to move a loaded labware from one lcation to another.
+
+        Raises:
+            LabwareNotLoadedError: If `labware_id` doesn't point to a valid
+                loaded labware.
+            ModuleNotLoadedError: If `new_location` references a module ID
+                that doesn't point to a valid loaded module.
+
+        Returns:
+            The ID of the labware's new labware offset.
+        """
+        # Allow propagation of LabwareNotLoadedError.
+        current_labware = self._state_store.labware.get(labware_id=labware_id)
+        definition_uri = current_labware.definitionUri
+
+        # Allow propagation of ModuleNotLoadedError.
+        offset_id = self._find_applicable_labware_offset_id(
+            labware_definition_uri=definition_uri, labware_location=new_location
+        )
+
+        return offset_id
+
+    def _find_applicable_labware_offset_id(
+        self, labware_definition_uri: str, labware_location: LabwareLocation
+    ) -> Optional[str]:
+        """Figure out what offset would apply to a labware in the given location.
+
+        Raises:
+            ModuleNotLoadedError: If `labware_location` references a module ID
+                that doesn't point to a valid loaded module.
+
+        Returns:
+            The ID of the labware offset that will apply,
+            or None if no labware offset will apply.
+        """
+        if isinstance(labware_location, DeckSlotLocation):
+            slot_name = labware_location.slotName
             module_model = None
         else:
-            module_id = location.moduleId
+            module_id = labware_location.moduleId
+            # Allow ModuleNotLoadedError to propagate.
             module_model = self._state_store.modules.get_model(module_id=module_id)
             module_location = self._state_store.modules.get_location(
                 module_id=module_id
             )
             slot_name = module_location.slotName
 
-        # TODO: It almost seems like find_applicable_labware_offset should be in
-        # a separate LabwareOffsetView so it can do its own resolution of
-        # input location (module ID) to offset location (weird slotName+model combo).
         offset = self._state_store.labware.find_applicable_labware_offset(
-            definition_uri=definition_uri,
+            definition_uri=labware_definition_uri,
             location=LabwareOffsetLocation(
                 slotName=slot_name,
                 moduleModel=module_model,
             ),
         )
 
-        return LoadedLabwareData(
-            labware_id=labware_id,
-            definition=definition,
-            offsetId=(None if offset is None else offset.id),
-        )
-
-    # TODO: What belongs here and what belongs in LabwareView?
-    #       This is basically LabwareView.find_applicable_labware_offset()
-    #       except with some parameter munging. Can we avoid that munging and
-    #       remove one of these layers?
-    # TODO: Can we deduplicate this more with the loadLabware codepath?
-    # TODO: Can LabwareLocation and LabwareOffsetLocation have better names
-    #       to emphasize their differences?
-    def select_offset_for_after_move(
-        self, labware_id: str, new_location: LabwareLocation
-    ) -> Optional[str]:
-        """Pick what offset to use for a labware if the labware is moved."""
-        current_labware = self._state_store.labware.get(labware_id=labware_id)
-
-        definition_uri = current_labware.definitionUri
-
-        if isinstance(new_location, DeckSlotLocation):
-            new_slot_name = new_location.slotName
-            new_module_model = None
-        else:
-            new_module_id = new_location.moduleId
-            new_module_model = self._state_store.modules.get_model(
-                module_id=new_module_id
-            )
-            new_module_location = self._state_store.modules.get_location(
-                module_id=new_module_id
-            )
-            new_slot_name = new_module_location.slotName
-
-        new_offset = self._state_store.labware.find_applicable_labware_offset(
-            definition_uri=definition_uri,
-            location=LabwareOffsetLocation(
-                slotName=new_slot_name,
-                moduleModel=new_module_model,
-            ),
-        )
-
-        return None if new_offset is None else new_offset.id
+        return None if offset is None else offset.id
 
     async def load_pipette(
         self,
