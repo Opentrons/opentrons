@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Optional
+from typing import Optional, List
 
 from opentrons.drivers.command_builder import CommandBuilder
 
@@ -293,6 +293,30 @@ class AsyncResponseSerialConnection(SerialConnection):
         reset_buffer_before_write: bool = False,
         async_error_ack: Optional[str] = None,
     ) -> AsyncResponseSerialConnection:
+        """
+        Create a connection.
+
+        Args:
+            port: url or port to connect to
+            baud_rate: baud rate
+            timeout: timeout in seconds
+            ack: the command response ack
+            name: the connection name
+            retry_wait_time_seconds: how long to wait between retries.
+            loop: optional event loop.
+            error_keyword: optional string that will cause an
+                           ErrorResponse exception when detected
+                           (default: error)
+            alarm_keyword: optional string that will cause an
+                           AlarmResponse exception when detected
+                           (default: alarm)
+            reset_buffer_before_write: whether to reset the read buffer before
+              every write
+            async_error_ack: optional string that will indicate an asynchronous 
+                             error when detected (default: async)
+
+        Returns: AsyncResponseSerialConnection
+        """
         serial = await super()._build_serial(
             port=port,
             baud_rate=baud_rate,
@@ -323,6 +347,22 @@ class AsyncResponseSerialConnection(SerialConnection):
         alarm_keyword: str,
         async_error_ack: str,
     ) -> None:
+        """
+        Constructor
+
+        Args:
+            serial: AsyncSerial object
+            port: url or port to connect to
+            ack: the command response ack
+            name: the connection name
+            retry_wait_time_seconds: how long to wait between retries.
+            error_keyword: string that will cause an ErrorResponse
+                           exception when detected
+            alarm_keyword: string that will cause an AlarmResponse
+                           exception when detected
+            async_error_ack: string that will indicate an asynchronous 
+                             error when detected
+        """
         super().__init__(
             serial=serial,
             port=port,
@@ -398,13 +438,22 @@ class AsyncResponseSerialConnection(SerialConnection):
             log.debug(f"{self._name}: Write -> {data_encode!r}")
             await self._serial.write(data=data_encode)
 
-            response = await self._serial.read_until(match=self._ack)
-            log.debug(f"{self._name}: Read <- {response!r}")
+            response: List[str] = []
+            response.append(await self._serial.read_until(match=self._ack))
+            log.debug(f"{self._name}: Read <- {response[-1]!r}")
 
-            while self._async_error_ack.encode() in response.lower():
+            while self._async_error_ack.encode() in response[-1].lower():
                 # check for multiple a priori async errors
-                response = await self._serial.read_until(match=self._ack)
-                log.debug(f"{self._name}: Read <- {response!r}")
+                response.append(await self._serial.read_until(match=self._ack))
+                log.debug(f"{self._name}: Read <- {response[-1]!r}")
+
+            if any(self._async_error_ack.encode() in r for r in response):
+                # Remove ack from response
+                ackless_response = r.replace(self._ack, b"")
+                str_response = self.process_raw_response(
+                    command=data, response=ackless_response.decode()
+                )
+                self.raise_on_error(response=str_response)
 
             if self._ack in response:
                 # Remove ack from response
