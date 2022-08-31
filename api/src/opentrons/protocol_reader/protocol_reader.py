@@ -138,40 +138,40 @@ class ProtocolReader:
     @staticmethod
     def _validate_json_protocol(protocol: ProtocolSchemaV6) -> ProtocolSchemaV6:
         """Validate json v6 protocol mapping constraints."""
-        if not list(
+        if list(
             command
             for command in protocol.commands
             if command.params.pipetteId
-            and command.params.pipetteId in set(protocol.pipettes.keys())
+            and command.params.pipetteId not in set(protocol.pipettes.keys())
         ):
             raise ProtocolFilesInvalidError(
                 "missing loadPipette id in referencing parent data model."
             )
-        elif not list(
+        elif list(
             command
             for command in protocol.commands
             if command.params.labwareId
-            and command.params.labwareId in set(protocol.labware.keys())
+            and command.params.labwareId not in set(protocol.labware.keys())
         ):
             raise ProtocolFilesInvalidError(
                 "missing loadLabware id in referencing parent data model."
             )
-        elif protocol.liquids and not list(
+        elif list(
             command
             for command in protocol.commands
             if command.params.liquidId
-            and command.params.liquidId in set(protocol.liquids.keys())
+            and command.params.liquidId not in set(protocol.liquids.keys() if protocol.liquids else [])
         ):
             raise ProtocolFilesInvalidError(
                 "missing loadLiquid id in referencing parent data model."
             )
-        elif protocol.modules and not list(
+        elif list(
             command
             for command in protocol.commands
             if command.params.moduleId
-            and command.params.moduleId in set(protocol.modules.keys())
+            and command.params.moduleId not in set(protocol.modules.keys() if protocol.modules else [])
         ):
             raise ProtocolFilesInvalidError(
-                "missing loadLiquid id in referencing parent data model."
+                "missing loadModule id in referencing parent data model."
             )
         return protocol
