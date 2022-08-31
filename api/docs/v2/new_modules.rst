@@ -745,7 +745,7 @@ As with setting targets, deactivating the heater and shaker are done separately,
 Using Multiple Modules of the Same Type
 ***************************************
 
-It's possible to use multiples of most module types within a single protocol. The exception is the Thermocycler Module, which due to its size only has one supported deck location. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and OT-2 robot server. 
+It's possible to use multiples of most module types within a single protocol. The exception is the Thermocycler Module, which only has one supported deck location due to its size. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and OT-2 robot server. 
 
 In order to send commands to the correct module on the deck, you need to load the modules in your protocol in a specific order. Whenever you call :py:meth:`.load_module` for a particular module type, the OT-2 will initialize the matching module attached to the lowest-numbered USB port. Deck slot numbers play no role in the ordering of modules; you could load a Temperature Module in slot 4 first, followed by another one in slot 3:
 
