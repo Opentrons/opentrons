@@ -2,10 +2,12 @@
 import pytest
 from typing import cast, Dict, List, Optional
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 from opentrons.types import MountType, Mount as HwMount
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import PipetteName, LoadedPipette
+from opentrons.protocol_engine.types import LoadedPipette
 from opentrons.protocol_engine.state.pipettes import (
     PipetteState,
     PipetteView,
@@ -67,7 +69,7 @@ def test_get_pipette_data() -> None:
     """It should get pipette data by ID and mount from the state."""
     pipette_data = LoadedPipette(
         id="pipette-id",
-        pipetteName=PipetteName.P300_SINGLE,
+        pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
@@ -93,12 +95,12 @@ def test_get_hardware_pipette() -> None:
             "left-id": LoadedPipette(
                 id="left-id",
                 mount=MountType.LEFT,
-                pipetteName=PipetteName.P300_SINGLE,
+                pipetteName=PipetteNameType.P300_SINGLE,
             ),
             "right-id": LoadedPipette(
                 id="right-id",
                 mount=MountType.RIGHT,
-                pipetteName=PipetteName.P300_MULTI,
+                pipetteName=PipetteNameType.P300_MULTI,
             ),
         }
     )
@@ -137,7 +139,7 @@ def test_get_hardware_pipette_with_back_compat() -> None:
             "pipette-id": LoadedPipette(
                 id="pipette-id",
                 mount=MountType.LEFT,
-                pipetteName=PipetteName.P300_SINGLE,
+                pipetteName=PipetteNameType.P300_SINGLE,
             ),
         }
     )
@@ -167,7 +169,7 @@ def test_get_hardware_pipette_raises_with_name_mismatch() -> None:
             "pipette-id": LoadedPipette(
                 id="pipette-id",
                 mount=MountType.LEFT,
-                pipetteName=PipetteName.P10_SINGLE,
+                pipetteName=PipetteNameType.P10_SINGLE,
             ),
         }
     )
@@ -203,7 +205,7 @@ def test_pipette_is_ready_to_aspirate_if_has_volume() -> None:
             "pipette-id": LoadedPipette(
                 id="pipette-id",
                 mount=MountType.LEFT,
-                pipetteName=PipetteName.P300_SINGLE,
+                pipetteName=PipetteNameType.P300_SINGLE,
             ),
         },
         aspirated_volume_by_id={"pipette-id": 42},
@@ -225,7 +227,7 @@ def test_pipette_is_ready_to_aspirate_if_no_volume_and_hc_says_ready() -> None:
             "pipette-id": LoadedPipette(
                 id="pipette-id",
                 mount=MountType.LEFT,
-                pipetteName=PipetteName.P300_SINGLE,
+                pipetteName=PipetteNameType.P300_SINGLE,
             ),
         },
         aspirated_volume_by_id={"pipette-id": 0},
@@ -248,7 +250,7 @@ def test_pipette_not_ready_to_aspirate() -> None:
             "pipette-id": LoadedPipette(
                 id="pipette-id",
                 mount=MountType.LEFT,
-                pipetteName=PipetteName.P300_SINGLE,
+                pipetteName=PipetteNameType.P300_SINGLE,
             ),
         },
         aspirated_volume_by_id={"pipette-id": 0},

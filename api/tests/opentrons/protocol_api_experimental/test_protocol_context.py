@@ -5,6 +5,7 @@ from decoy import Decoy
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.labware import dev_types as labware_dict_types
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import commands as pe_commands
@@ -17,7 +18,6 @@ from opentrons.protocol_api_experimental.types import (
     DeprecatedMount,
     ModuleModel,
     Mount,
-    PipetteName,
 )
 
 from opentrons.protocol_api_experimental import (
@@ -84,7 +84,7 @@ def test_load_pipette(
     """It should be able to load a pipette into the protocol."""
     decoy.when(
         engine_client.load_pipette(
-            pipette_name=PipetteName.P300_SINGLE,
+            pipette_name=PipetteNameType.P300_SINGLE,
             mount=Mount.LEFT,
         )
     ).then_return(pe_commands.LoadPipetteResult(pipetteId="pipette-id"))
@@ -105,14 +105,14 @@ def test_load_instrument(
     """It should be able to load a pipette with legacy load_instrument method."""
     decoy.when(
         engine_client.load_pipette(
-            pipette_name=PipetteName.P300_MULTI,
+            pipette_name=PipetteNameType.P300_MULTI,
             mount=Mount.LEFT,
         )
     ).then_return(pe_commands.LoadPipetteResult(pipetteId="left-pipette-id"))
 
     decoy.when(
         engine_client.load_pipette(
-            pipette_name=PipetteName.P300_SINGLE,
+            pipette_name=PipetteNameType.P300_SINGLE,
             mount=Mount.RIGHT,
         )
     ).then_return(pe_commands.LoadPipetteResult(pipetteId="right-pipette-id"))
