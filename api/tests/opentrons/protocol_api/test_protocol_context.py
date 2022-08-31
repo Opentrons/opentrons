@@ -10,6 +10,7 @@ from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
     InstrumentContext,
+    Labware,
     validation,
 )
 
@@ -122,3 +123,34 @@ def test_load_instrument_replace(
 
     with pytest.raises(RuntimeError, match="Instrument already present"):
         subject.load_instrument(instrument_name="ada", mount=Mount.RIGHT)
+
+
+def test_load_labware(
+    decoy: Decoy, mock_core: AbstractProtocol, subject: ProtocolContext
+) -> None:
+    """It should create a labware using its execution core."""
+    mock_labware_core = decoy.mock(cls=AbstractLabware)
+
+    decoy.when(
+        mock_core.load_labware(
+            load_name="some_labware",
+            location=5,
+            label="some_display_name",
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_labware_core)
+
+    decoy.when(mock_labware_core.get_name()).then_return("Display Name")
+    decoy.when(mock_labware_core.get_uri()).then_return("you/are/eye")
+
+    result = subject.load_labware(
+        load_name="some_labware",
+        location=5,
+        label="some_display_name",
+        namespace="some_namespace",
+        version=1337,
+    )
+
+    assert isinstance(result, Labware)
+    assert result.name == "Display Name"
