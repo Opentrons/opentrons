@@ -14,6 +14,23 @@ log = logging.getLogger(__name__)
 
 class SerialConnection:
     @classmethod
+    async def _build_serial(
+        cls,
+        port: str,
+        baud_rate: int,
+        timeout: float,
+        loop: Optional[asyncio.AbstractEventLoop],
+        reset_buffer_before_write: bool,
+    ) -> AsyncSerial:
+        return await AsyncSerial.create(
+            port=port,
+            baud_rate=baud_rate,
+            timeout=timeout,
+            loop=loop,
+            reset_buffer_before_write=reset_buffer_before_write,
+        )
+
+    @classmethod
     async def create(
         cls,
         port: str,
@@ -49,7 +66,7 @@ class SerialConnection:
 
         Returns: SerialConnection
         """
-        serial = await AsyncSerial.create(
+        serial = await cls._build_serial(
             port=port,
             baud_rate=baud_rate,
             timeout=timeout,
@@ -211,6 +228,10 @@ class SerialConnection:
     def name(self) -> str:
         return self._name
 
+    @property
+    def send_data_lock(self) -> asyncio.Lock:
+        return self._send_data_lock
+
     def raise_on_error(self, response: str) -> None:
         """
         Raise an error if the response contains an error
@@ -255,11 +276,6 @@ class SerialConnection:
         """
         return response.strip()
 
-    def get_send_data_lock(self, serial_connection: SerialConnection) -> asyncio.Lock:
-        return serial_connection._send_data_lock
-    
-    def get_serial(self) -> AsyncSerial:
-        return self._serial
 
 class AsyncResponseSerialConnection(SerialConnection):
     @classmethod
@@ -277,46 +293,52 @@ class AsyncResponseSerialConnection(SerialConnection):
         reset_buffer_before_write: bool = False,
         async_error_ack: Optional[str] = None,
     ) -> AsyncResponseSerialConnection:
-        return cls(
+        serial = await super()._build_serial(
             port=port,
             baud_rate=baud_rate,
             timeout=timeout,
-            ack=ack,
-            name=name,
-            retry_wait_time_seconds=retry_wait_time_seconds,
             loop=loop,
-            error_keyword=error_keyword,
-            alarm_keyword=alarm_keyword,
             reset_buffer_before_write=reset_buffer_before_write,
+        )
+        name = name or port
+        return cls(
+            serial=serial,
+            port=port,
+            name=name,
+            ack=ack,
+            retry_wait_time_seconds=retry_wait_time_seconds,
+            error_keyword=error_keyword or "error",
+            alarm_keyword=alarm_keyword or "alarm",
             async_error_ack=async_error_ack or "async",
         )
 
     def __init__(
         self,
+        serial: AsyncSerial,
         port: str,
-        baud_rate: int,
-        timeout: float,
+        name: str,
         ack: str,
-        name: Optional[str],
         retry_wait_time_seconds: float,
-        loop: Optional[asyncio.AbstractEventLoop],
-        error_keyword: Optional[str],
-        alarm_keyword: Optional[str],
-        reset_buffer_before_write: bool,
+        error_keyword: str,
+        alarm_keyword: str,
         async_error_ack: str,
     ) -> None:
-        self._serial_connection = super().create(
-            port,
-            baud_rate,
-            timeout,
-            ack,
-            name,
-            retry_wait_time_seconds,
-            loop,
-            error_keyword,
-            alarm_keyword,
-            reset_buffer_before_write,
+        super().__init__(
+            serial=serial,
+            port=port,
+            name=name,
+            ack=ack,
+            retry_wait_time_seconds=retry_wait_time_seconds,
+            error_keyword=error_keyword,
+            alarm_keyword=alarm_keyword,
         )
+        self._serial = serial
+        self._port = port
+        self._name = name
+        self._ack = ack.encode()
+        self._retry_wait_time_seconds = retry_wait_time_seconds
+        self._error_keyword = error_keyword.lower()
+        self._alarm_keyword = alarm_keyword.lower()
         self._async_error_ack = async_error_ack.lower()
 
     async def send_command(
@@ -353,11 +375,11 @@ class AsyncResponseSerialConnection(SerialConnection):
 
         Raises: SerialException
         """
-        async with self.get_send_data_lock(self._serial_connection), self._serial_connection.get_serial().timeout_override(
+        async with super().send_data_lock, self._serial.timeout_override(
             "timeout", timeout
         ):
             return await self._send_data(data=data, retries=retries)
-        
+
     async def _send_data(self, data: str, retries: int = 0) -> str:
         """
         Send data and return the response.
@@ -373,16 +395,16 @@ class AsyncResponseSerialConnection(SerialConnection):
         data_encode = data.encode()
 
         for retry in range(retries + 1):
-            log.debug(f"{self._serial_connection.name}: Write -> {data_encode!r}")
-            await self._serial_connection._serial.write(data=data_encode)
+            log.debug(f"{self._name}: Write -> {data_encode!r}")
+            await self._serial.write(data=data_encode)
 
             response = await self._serial.read_until(match=self._ack)
-            log.debug(f"{self.name}: Read <- {response!r}")
+            log.debug(f"{self._name}: Read <- {response!r}")
 
             while self._async_error_ack.encode() in response.lower():
                 # check for multiple a priori async errors
                 response = await self._serial.read_until(match=self._ack)
-                log.debug(f"{self.name}: Read <- {response!r}")
+                log.debug(f"{self._name}: Read <- {response!r}")
 
             if self._ack in response:
                 # Remove ack from response
@@ -393,7 +415,7 @@ class AsyncResponseSerialConnection(SerialConnection):
                 self.raise_on_error(response=str_response)
                 return str_response
 
-            log.info(f"{self.name}: retry number {retry}/{retries}")
+            log.info(f"{self._name}: retry number {retry}/{retries}")
 
             await self.on_retry()
 
