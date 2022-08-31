@@ -404,6 +404,8 @@ def test_heater_shaker_command_without_movement(
                 ),
                 result=cmd.MoveLabwareResult(offsetId=None),
             ),
+            # Current well NOT cleared,
+            # because MoveLabware command had "non-matching-labware-id".
             CurrentWell(
                 pipette_id="pipette-id",
                 labware_id="matching-labware-id",
@@ -422,6 +424,8 @@ def test_heater_shaker_command_without_movement(
                 ),
                 result=cmd.MoveLabwareResult(offsetId=None),
             ),
+            # Current well IS cleared,
+            # because MoveLabware command had "matching-labware-id".
             None,
         ),
     ),
