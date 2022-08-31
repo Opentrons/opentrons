@@ -447,13 +447,14 @@ class AsyncResponseSerialConnection(SerialConnection):
                 response.append(await self._serial.read_until(match=self._ack))
                 log.debug(f"{self._name}: Read <- {response[-1]!r}")
 
-            if any(self._async_error_ack.encode() in r for r in response):
-                # Remove ack from response
-                ackless_response = r.replace(self._ack, b"")
-                str_response = self.process_raw_response(
-                    command=data, response=ackless_response.decode()
-                )
-                self.raise_on_error(response=str_response)
+            for r in response:
+                if self._async_error_ack.encode() in r:
+                    # Remove ack from response
+                    ackless_response = r.replace(self._ack, b"")
+                    str_response = self.process_raw_response(
+                        command=data, response=ackless_response.decode()
+                    )
+                    self.raise_on_error(response=str_response)
 
             if self._ack in response[-1]:
                 # Remove ack from response
