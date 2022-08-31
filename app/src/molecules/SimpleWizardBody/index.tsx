@@ -17,7 +17,7 @@ interface Props {
   isSuccess: boolean
 }
 
-export function SimpleWizardModal(props: Props): JSX.Element {
+export function SimpleWizardBody(props: Props): JSX.Element {
   const { iconColor, children, header, subHeader, isSuccess } = props
 
   return (

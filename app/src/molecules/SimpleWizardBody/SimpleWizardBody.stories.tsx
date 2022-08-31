@@ -3,21 +3,19 @@ import { COLORS } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 import { ModalShell } from '../Modal'
 import { WizardHeader } from '../WizardHeader'
-import { SimpleWizardModal } from './index'
+import { SimpleWizardBody } from './index'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Molecules/SimpleWizardModal',
-  component: SimpleWizardModal,
+  title: 'App/Molecules/SimpleWizardBody',
+  component: SimpleWizardBody,
 } as Meta
 
-const Template: Story<
-  React.ComponentProps<typeof SimpleWizardModal>
-> = args => (
+const Template: Story<React.ComponentProps<typeof SimpleWizardBody>> = args => (
   <ModalShell>
     <WizardHeader currentStep={3} totalSteps={4} title="Attach a pipette" />
-    <SimpleWizardModal {...args} />
+    <SimpleWizardBody {...args} />
   </ModalShell>
 )
 

@@ -6,7 +6,7 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
-import { SimpleWizardModal } from '../../molecules/SimpleWizardModal'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 
 import type { Direction } from './types'
 
@@ -22,7 +22,7 @@ export function ExitModal(props: Props): JSX.Element {
   const flow = direction === 'attach' ? t('attaching') : t('detaching')
 
   return (
-    <SimpleWizardModal
+    <SimpleWizardBody
       iconColor={COLORS.warningEnabled}
       header={t('progress_will_be_lost')}
       subHeader={t('are_you_sure_exit', { direction: flow })}
@@ -37,6 +37,6 @@ export function ExitModal(props: Props): JSX.Element {
       >
         {t('shared:exit')}
       </AlertPrimaryButton>
-    </SimpleWizardModal>
+    </SimpleWizardBody>
   )
 }

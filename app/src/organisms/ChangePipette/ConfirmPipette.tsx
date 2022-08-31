@@ -7,7 +7,7 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { CheckPipettesButton } from './CheckPipettesButton'
-import { SimpleWizardModal } from '../../molecules/SimpleWizardModal'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 
 import type {
@@ -73,7 +73,7 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
   const { header, subHeader } = getPipetteStatusDetails({ ...props })
 
   return (
-    <SimpleWizardModal
+    <SimpleWizardBody
       iconColor={success ? COLORS.successEnabled : COLORS.errorEnabled}
       header={header}
       subHeader={subHeader}
@@ -83,7 +83,7 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
         {!success && <TryAgainButton {...props} />}
         {success && <SuccessAndExitButtons {...props} />}
       </>
-    </SimpleWizardModal>
+    </SimpleWizardBody>
   )
 }
 
