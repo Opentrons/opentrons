@@ -47,9 +47,7 @@ interface Props {
   titleBarTitle: string
   closePrompt: () => void
 }
-/**
- * @deprecated use the new modal when it is created
- */
+
 export function AskForCalibrationBlockModal(props: Props): JSX.Element {
   const [rememberPreference, setRememberPreference] = React.useState<boolean>(
     false

@@ -25,6 +25,16 @@ import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 import type { DispatchApiRequestType } from '../../../redux/robot-api'
 
+const mockPush = jest.fn()
+
+jest.mock('react-router-dom', () => {
+  const reactRouterDom = jest.requireActual('react-router-dom')
+  return {
+    ...reactRouterDom,
+    useHistory: () => ({ push: mockPush } as any),
+  }
+})
+
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
   return {

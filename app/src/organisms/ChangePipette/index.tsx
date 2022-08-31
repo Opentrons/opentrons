@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 import { getPipetteNameSpecs, shouldLevel } from '@opentrons/shared-data'
 import { useTranslation } from 'react-i18next'
 import { SPACING } from '@opentrons/components'
@@ -31,13 +32,13 @@ import { WizardHeader } from '../../molecules/WizardHeader'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { StyledText } from '../../atoms/text'
 import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'
 import { ClearDeckModal } from './ClearDeckModal/index'
+import { ConfirmPipette } from './ConfirmPipette'
+import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 import { ExitAlertModal } from './ExitAlertModal'
 import { DeprecatedInstructions } from './DeprecatedInstructions'
-import { ConfirmPipette } from './ConfirmPipette'
 import { DeprecatedConfirmPipette } from './DeprecatedConfirmPipette'
 import { RequestInProgressModal } from './RequestInProgressModal'
 import { DeprecatedLevelPipette } from './DeprecatedLevelPipette'
@@ -50,12 +51,13 @@ import {
   INSTRUCTIONS,
   CONFIRM,
   CALIBRATE_PIPETTE,
+  SINGLE_CHANNEL_STEPS,
+  EIGHT_CHANNEL_STEPS,
 } from './constants'
 
 import type { State, Dispatch } from '../../redux/types'
 import type { Mount } from '../../redux/pipettes/types'
 import type { WizardStep } from './types'
-import { RequestState } from '../../redux/robot-api/types'
 
 interface Props {
   robotName: string
@@ -70,11 +72,10 @@ const CANCEL = 'Cancel'
 const MOUNT = 'mount'
 const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
 
-const TOTAL_STEPS = 3
-
 export function ChangePipette(props: Props): JSX.Element | null {
   const { robotName, mount, closeModal } = props
   const { t } = useTranslation('change_pipette')
+  const history = useHistory()
   const enableChangePipetteWizard = useFeatureFlag('enableChangePipetteWizard')
   const dispatch = useDispatch<Dispatch>()
   const finalRequestId = React.useRef<string | null | undefined>(null)
@@ -107,7 +108,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     return getMovementStatus(state, robotName)
   })
 
-  const homePipStatus = useSelector<State, RequestState | null>(state => {
+  const homePipStatus = useSelector((state: State) => {
     return finalRequestId.current
       ? getRequestById(state, finalRequestId.current)
       : null
@@ -168,7 +169,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
   const [instructionStepPage, instructionSetStepPage] = React.useState<number>(
     0
   )
-  const eightChannel = wantedPipette != null && wantedPipette.channels === 8
+  const eightChannel = wantedPipette?.channels === 8
   const direction = actualPipette ? DETACH : ATTACH
   const exitModal = (
     <ExitModal
@@ -179,7 +180,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
   )
 
   //  this is the logic for the Instructions page that renders 3 pages within the component
-  let instructionsCurrentStep: number = TOTAL_STEPS
+  let instructionsCurrentStep: number = SINGLE_CHANNEL_STEPS
   if (wizardStep === INSTRUCTIONS) {
     if (instructionStepPage === 0) {
       instructionsCurrentStep = 1
@@ -201,7 +202,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
   let currentStep: number = 0
   let contents: JSX.Element | null = null
 
-  if (movementStatus !== null && movementStatus === MOVING) {
+  if (movementStatus === MOVING) {
     contents = (
       <InProgressModal>
         <StyledText
@@ -228,9 +229,8 @@ export function ChangePipette(props: Props): JSX.Element | null {
       direction === ATTACH && wantedPipette === null
     const attachWizardHeader = noPipetteSelectedAttach
       ? t('attach_pipette')
-      : //  TODO refactor this, feels like a more eloquant alternative
-        t('attach_pipette_type', {
-          pipetteName: wantedPipette != null ? wantedPipette.displayName : '',
+      : t('attach_pipette_type', {
+          pipetteName: wantedPipette?.displayName ?? '',
         })
 
     const noPipetteDetach =
@@ -238,22 +238,24 @@ export function ChangePipette(props: Props): JSX.Element | null {
     const detachWizardHeader = noPipetteDetach
       ? t('detach')
       : t('detach_pipette', {
-          pipette:
-            actualPipette?.displayName || wantedPipette?.displayName || '',
+          pipette: actualPipette?.displayName ?? wantedPipette?.displayName,
           mount: mount[0].toUpperCase() + mount.slice(1),
         })
 
+    let title
+    if (instructionStepPage === 2) {
+      title = t('attach_pipette_type', {
+        pipetteName: wantedPipette?.displayName ?? '',
+      })
+    } else if (actualPipette?.displayName != null) {
+      title = detachWizardHeader
+    } else {
+      title = attachWizardHeader
+    }
+
     exitWizardHeader = confirmExit ? closeModal : () => setConfirmExit(true)
     currentStep = instructionsCurrentStep
-    wizardTitle =
-      //  for some reason when the pipette is leveling, the direction is detach BUT should be attach
-      instructionStepPage === 2
-        ? t('attach_pipette_type', {
-            pipetteName: wantedPipette?.displayName,
-          })
-        : actualPipette?.displayName != null
-        ? detachWizardHeader
-        : attachWizardHeader
+    wizardTitle = title
 
     contents = confirmExit ? (
       exitModal
@@ -267,7 +269,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
           back: () => setWizardStep(CLEAR_DECK),
           stepPage: instructionStepPage,
           setStepPage: instructionSetStepPage,
-          totalSteps: eightChannel ? 4 : TOTAL_STEPS,
+          totalSteps: eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS,
           title:
             actualPipette?.displayName != null
               ? t('detach_pipette', {
@@ -285,14 +287,21 @@ export function ChangePipette(props: Props): JSX.Element | null {
       // or if the names of wanted and attached match
       actualPipette?.name === wantedPipette?.name
 
-    const attachedWrong = Boolean(!success && wantedPipette && actualPipette)
+    const attachedIncorrectPipette = Boolean(
+      !success && wantedPipette && actualPipette
+    )
 
-    const launchPOC = (): void => {
-      setWizardStep(CALIBRATE_PIPETTE)
+    const toCalDashboard = (): void => {
       dispatchApiRequests(home(robotName, ROBOT))
-      startPipetteOffsetWizard()
+      closeModal()
+      history.push(`/devices/${robotName}/robot-settings/calibration`)
     }
-    currentStep = success ? (eightChannel ? 4 : TOTAL_STEPS) : TOTAL_STEPS - 1
+
+    currentStep = success
+      ? eightChannel
+        ? EIGHT_CHANNEL_STEPS
+        : SINGLE_CHANNEL_STEPS
+      : SINGLE_CHANNEL_STEPS - 1
     exitWizardHeader = success ? homePipAndExit : () => setConfirmExit(true)
 
     wizardTitle =
@@ -312,27 +321,16 @@ export function ChangePipette(props: Props): JSX.Element | null {
         {...{
           ...basePropsWithPipettes,
           success,
-          attachedWrong,
+          attachedWrong: attachedIncorrectPipette,
           tryAgain: () => {
             setWantedName(null)
             setWizardStep(INSTRUCTIONS)
           },
           exit: homePipAndExit,
           actualPipetteOffset: actualPipetteOffset,
-          startPipetteOffsetCalibration: launchPOC,
+          toCalibrationDashboard: toCalDashboard,
         }}
       />
-    )
-  } else if (wizardStep === CALIBRATE_PIPETTE) {
-    contents = showCalBlockModal ? (
-      //  TODO(Jr, 29.08.22): update this modal with the new calibration block modal found in the POC flow when it is created
-      <AskForCalibrationBlockModal
-        titleBarTitle={PIPETTE_OFFSET_CALIBRATION}
-        onResponse={startPipetteOffsetWizard}
-        closePrompt={homePipAndExit}
-      />
-    ) : (
-      PipetteOffsetCalibrationWizard
     )
   }
 
@@ -340,7 +338,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     return (
       <ModalShell height="28.12rem" width="47rem">
         <WizardHeader
-          totalSteps={eightChannel ? 4 : TOTAL_STEPS}
+          totalSteps={eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS}
           currentStep={currentStep}
           title={wizardTitle}
           onExit={exitWizardHeader}

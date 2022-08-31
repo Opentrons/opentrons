@@ -85,7 +85,7 @@ describe('ConfirmPipette', () => {
       displayCategory: 'GEN1',
       tryAgain: jest.fn(),
       exit: jest.fn(),
-      startPipetteOffsetCalibration: jest.fn(),
+      toCalibrationDashboard: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -107,7 +107,7 @@ describe('ConfirmPipette', () => {
       displayCategory: 'GEN1',
       tryAgain: jest.fn(),
       exit: jest.fn(),
-      startPipetteOffsetCalibration: jest.fn(),
+      toCalibrationDashboard: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -137,7 +137,7 @@ describe('ConfirmPipette', () => {
       displayCategory: null,
       tryAgain: jest.fn(),
       exit: jest.fn(),
-      startPipetteOffsetCalibration: jest.fn(),
+      toCalibrationDashboard: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -170,7 +170,7 @@ describe('ConfirmPipette', () => {
       displayCategory: null,
       tryAgain: jest.fn(),
       exit: jest.fn(),
-      startPipetteOffsetCalibration: jest.fn(),
+      toCalibrationDashboard: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -200,7 +200,7 @@ describe('ConfirmPipette', () => {
       displayCategory: null,
       tryAgain: jest.fn(),
       exit: jest.fn(),
-      startPipetteOffsetCalibration: jest.fn(),
+      toCalibrationDashboard: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -223,7 +223,7 @@ describe('ConfirmPipette', () => {
       displayCategory: null,
       tryAgain: jest.fn(),
       exit: jest.fn(),
-      startPipetteOffsetCalibration: jest.fn(),
+      toCalibrationDashboard: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -235,6 +235,6 @@ describe('ConfirmPipette', () => {
 
     const pocBtn = getByRole('button', { name: 'Calibrate pipette offset' })
     fireEvent.click(pocBtn)
-    expect(props.startPipetteOffsetCalibration).toBeCalled()
+    expect(props.toCalibrationDashboard).toBeCalled()
   })
 })

@@ -28,7 +28,7 @@ export interface ConfirmPipetteProps {
   displayCategory: PipetteDisplayCategory | null
   tryAgain: () => void
   exit: () => void
-  startPipetteOffsetCalibration: () => void
+  toCalibrationDashboard: () => void
 }
 
 export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
@@ -135,7 +135,7 @@ function SuccessAndExitButtons(props: ConfirmPipetteProps): JSX.Element {
     actualPipette,
     actualPipetteOffset,
     exit,
-    startPipetteOffsetCalibration,
+    toCalibrationDashboard,
     success,
   } = props
   const { t } = useTranslation('change_pipette')
@@ -144,7 +144,7 @@ function SuccessAndExitButtons(props: ConfirmPipetteProps): JSX.Element {
       {success && actualPipette && !actualPipetteOffset && (
         <SecondaryButton
           marginRight={SPACING.spacing3}
-          onClick={startPipetteOffsetCalibration}
+          onClick={toCalibrationDashboard}
         >
           {t('calibrate_pipette_offset')}
         </SecondaryButton>
