@@ -148,3 +148,7 @@ storybook-static/
 # api client type caches
 api-client/lib
 react-api-client/lib
+
+# ignore Pipefile.lock when targetting multiple python versions
+api/Pipfile.lock
+shared-data/python/Pipfile.lock

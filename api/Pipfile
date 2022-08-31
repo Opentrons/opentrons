@@ -4,9 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [dev-packages]
-# atomicwrites and colorama are pytest dependencies on windows,
-# spec'd here to force lockfile inclusion
-# https://github.com/pypa/pipenv/issues/4408#issuecomment-668324177
 atomicwrites = { version = "==1.4.0", sys_platform = "== 'win32'" }
 colorama = { version = "==0.4.4", sys_platform = "== 'win32'" }
 coverage = "==5.1"
@@ -35,7 +32,7 @@ types-setuptools = "==57.0.2"
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
 opentrons = { editable = true, path = "." }
 opentrons-hardware = { editable = true, path = "./../hardware" }
-# specify typing-extensions explicitly to force lockfile inclusion on Python >= 3.8
-typing-extensions = ">=4.0.0,<5"
+typing-extensions = ">=4.1.1,<5"
 # TODO(mc, 2022-03-31): upgrade sphinx, remove this subdep pin
 jinja2 = ">=2.3,<3.1"
+importlib-metadata = { version = "==4.12.0", python_version = "< '3.10'" }

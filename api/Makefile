@@ -62,7 +62,7 @@ ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
-clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'src/**/.mypy_cache'
+clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml Pipfile.lock '*.egg-info' '**/__pycache__' '**/*.pyc' 'src/**/.mypy_cache'
 
 plot_type ?=
 
@@ -71,12 +71,12 @@ all: clean sdist wheel
 
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) install $(pipenv_opts)
 	$(pipenv) run pip freeze
 
 .PHONY: setup-ot2
 setup-ot2:
-	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) install $(pipenv_opts)
 	$(pipenv) run pip uninstall -y opentrons_hardware
 	$(pipenv) run pip freeze
 
@@ -87,6 +87,7 @@ clean: docs-clean
 .PHONY: teardown
 teardown:
 	$(pipenv) --rm
+	$(SHX) rm -f Pipfile.lock
 
 $(wheel_file): setup.py $(ot_sources)
 	$(clean_cmd)

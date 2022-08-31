@@ -1,0 +1,81 @@
+# validate Python opentrons and opentrons_shared_data 
+# test, build, and pip install on each backward supported version of Python and platform
+# additionally smoke test cli tools of the opentrons package
+# this will default run against edge because it is the default branch of the repository
+# due to the long runtime and runner usage, run as a cron instead of on push/PR trigger
+# trigger with dispatch to run against a different branch
+
+name: 'opentrons and opentrons_shared_data backward test matrix'
+
+on:
+  push:
+    branches:
+      - "wip-update-buildroot-2022.02.4" # remove me before merge
+  schedule:
+    # 8:44 UTC each day
+    - cron:  '44 8 * * *'
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['windows-2019', 'ubuntu-22.04', 'macos-latest']
+        python: ['3.7','3.8','3.9']
+        # TODO(@y3rsh, 2022-09-02): Enable ot3 once ot3 running on python 3.10
+        # only ot2
+        with-ot-hardware: ['false']
+    runs-on: '${{ matrix.os }}'
+    steps:
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '14'
+      - uses: 'actions/setup-python@v4'
+        with:
+          python-version: ${{ matrix.python }}
+      - name: 'set complex environment variables'
+        uses: actions/github-script@v6.1.1
+        with:
+          script: |
+            const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'api'
+          python-version: ${{ matrix.python }}
+      - name: Remove OT-3 hardware package
+        run: make -C api setup-ot2
+      - if: ${{ matrix.with-ot-hardware == 'false' }}
+        name: Test opentrons without opentrons_hardware
+        run: make -C api test-ot2
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        name: Test opentrons with opentrons_hardware
+        run: make -C api test-cov
+      - name: Ensure opentrons assets build
+        run: make -C api sdist wheel
+      - name: pip install opentrons and use CLI
+        run: |
+          $OT_PYTHON -m pip install --find-links=./api/dist opentrons
+          opentrons_execute --help
+          opentrons_simulate --help
+          opentrons_simulate ./api/docs/v2/example_protocols/dilution_tutorial.py -e -o nothing
+          $OT_PYTHON -m opentrons.cli --help
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'shared-data/python'
+          python-version: ${{ matrix.python }}
+      - name: Test opentrons_shared_data
+        run: make -C shared-data/python test
+      - name: Ensure opentrons_shared_data assets build
+        run: make -C shared-data/python shared-data/python sdist wheel
+      - name: pip install opentrons_shared_data
+        run: |
+          $OT_PYTHON -m pip install --find-links=./shared-data/python/dist opentrons_shared_data

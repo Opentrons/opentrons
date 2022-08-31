@@ -23,7 +23,12 @@ runs:
     - name: If provided set the OT_VIRTUALENV_VERSION env variable
       shell : bash
       if: ${{ inputs.python-version != 'false' }}
-      run: echo "OT_VIRTUALENV_VERSION=${{ inputs.python-version }}" >> $GITHUB_ENV
+      # get only major and minor value
+      # needed for python version like 3.11.0-rc.1
+      run: |
+        major=$(echo ${{ inputs.python-version }} | cut -d. -f1)
+        minor=$(echo ${{ inputs.python-version }} | cut -d. -f2)
+        echo "OT_VIRTUALENV_VERSION=$major.$minor" >> $GITHUB_ENV
     - shell: bash
       run: |
         npm install --global shx@0.3.3
