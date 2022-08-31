@@ -21,6 +21,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
     PipetteName,
+    LoadedLabware,
     LoadedPipette,
     LabwareOffset,
     LabwareOffsetVector,
@@ -315,6 +316,102 @@ async def test_load_labware_on_module(
         definition=minimal_labware_def,
         offsetId="labware-offset-id",
     )
+
+
+def test_move_labware_to_deck(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: EquipmentHandler,
+) -> None:
+    """It should find a new offset by resolving the new location."""
+    decoy.when(state_store.labware.get(labware_id="input-labware-id")).then_return(
+        LoadedLabware(
+            id="input-labware-id",
+            loadName="load-name",
+            definitionUri="opentrons-test/load-name/1",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            offsetId=None,
+        )
+    )
+
+    decoy.when(
+        state_store.labware.find_applicable_labware_offset(
+            definition_uri="opentrons-test/load-name/1",
+            location=LabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_3,
+                moduleModel=None,
+            ),
+        )
+    ).then_return(
+        LabwareOffset(
+            id="labware-offset-id",
+            createdAt=datetime(year=2021, month=1, day=2),
+            definitionUri="opentrons-test/load-name/1",
+            location=LabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_3,
+                moduleModel=None,
+            ),
+            vector=LabwareOffsetVector(x=1, y=2, z=3),
+        )
+    )
+
+    result = subject.move_labware(
+        labware_id="input-labware-id",
+        new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+    )
+
+    assert result == "labware-offset-id"
+
+
+def test_move_labware_to_module(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: EquipmentHandler,
+) -> None:
+    """It should find a new offset by resolving the new location."""
+    decoy.when(state_store.labware.get(labware_id="input-labware-id")).then_return(
+        LoadedLabware(
+            id="input-labware-id",
+            loadName="load-name",
+            definitionUri="opentrons-test/load-name/1",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            offsetId=None,
+        )
+    )
+    decoy.when(state_store.modules.get_model("input-module-id")).then_return(
+        ModuleModel.THERMOCYCLER_MODULE_V1
+    )
+    decoy.when(state_store.modules.get_location("input-module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+    )
+
+    decoy.when(
+        state_store.labware.find_applicable_labware_offset(
+            definition_uri="opentrons-test/load-name/1",
+            location=LabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_3,
+                moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1,
+            ),
+        )
+    ).then_return(
+        LabwareOffset(
+            id="labware-offset-id",
+            createdAt=datetime(year=2021, month=1, day=2),
+            definitionUri="opentrons-test/load-name/1",
+            location=LabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_3,
+                moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1,
+            ),
+            vector=LabwareOffsetVector(x=1, y=2, z=3),
+        )
+    )
+
+    result = subject.move_labware(
+        labware_id="input-labware-id",
+        new_location=ModuleLocation(moduleId="input-module-id"),
+    )
+
+    assert result == "labware-offset-id"
 
 
 async def test_load_pipette(
