@@ -92,6 +92,8 @@ async def status(request: web.Request, session: UpdateSession) -> web.Response:
 
 
 async def _save_file(part: BodyPartReader, path: str) -> None:
+    if part.name is None:
+        raise Exception("part.name is none")
     # making sure directory exists first
     Path(path).mkdir(parents=True, exist_ok=True)
     with open(os.path.join(path, part.name), "wb") as write:
@@ -202,6 +204,8 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
             },
             status=500,
         )
+    if part.name is None:
+        raise Exception("part.name is none and that cannot be")
 
     _begin_validation(
         session,

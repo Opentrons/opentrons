@@ -60,6 +60,7 @@ jobs:
         uses: './.github/actions/python/setup'
         with:
           project: 'hardware'
+          python-version: '3.7'
 
       # TODO(amit, 2022-03-08): Enable once ot3 emulation is ready
       #      - name: Setup SocketCan

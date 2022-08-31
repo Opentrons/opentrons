@@ -47,10 +47,11 @@ jobs:
           node-version: '12'
       - uses: 'actions/setup-python@v3'
         with:
-          python-version: '3.7'
+          python-version: '3.10'
       - uses: './.github/actions/python/setup'
         with:
           project: 'g-code-testing'
+          python-version: '3.10'
 
       - name: "Verify no missing comparison files"
         run: make -C g-code-testing check-for-missing-comparison-files

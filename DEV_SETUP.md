@@ -261,3 +261,5 @@ Once `make setup` completes, you're ready to start developing! Check out our gen
 [yarn]: https://classic.yarnpkg.com/
 [pipenv]: https://github.com/pypa/pipenv
 [contributing guide]: ./CONTRIBUTING.md
+
+## VSCode Dev container

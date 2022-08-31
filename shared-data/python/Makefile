@@ -46,7 +46,7 @@ json_sources = $(deck_sources) $(labware_sources) $(module_sources) $(pipette_so
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 twine_repository_url ?= $(pypi_test_upload_url)
 
-clean_cmd = $(SHX) rm -rf build $(BUILD_DIR) .coverage coverage.xml '*.egg-info' ' **/__pycache__' '**/*.pyc' 'opentrons_shared_data/**/.mypy_cache'
+clean_cmd = $(SHX) rm -rf build $(BUILD_DIR) .coverage coverage.xml Pipfile.lock '*.egg-info' ' **/__pycache__' '**/*.pyc' 'opentrons_shared_data/**/.mypy_cache'
 
 .PHONY: all
 all: clean sdist wheel
@@ -56,7 +56,7 @@ setup: setup-py
 
 .PHONY: setup-py
 setup-py:
-	$(pipenv) sync $(pipenv_opts)
+	$(pipenv) install $(pipenv_opts)
 	$(pipenv) run pip freeze
 
 .PHONY: teardown
@@ -65,7 +65,7 @@ teardown: teardown-py
 .PHONY: teardown-py
 teardown-py:
 	$(pipenv) --rm
-
+	$(SHX) rm -f Pipfile.lock
 
 .PHONY: clean
 clean:

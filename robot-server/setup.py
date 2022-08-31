@@ -43,22 +43,22 @@ CLASSIFIERS = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = "A server providing access to the Opentrons API"
 PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
+    f"notify-server=={VERSION}",
     f"opentrons=={VERSION}",
     f"opentrons-shared-data=={VERSION}",
-    f"notify-server=={VERSION}",
     "anyio==3.3.0",
     "fastapi==0.68.1",
     "python-dotenv==0.19.0",
     "python-multipart==0.0.5",
     "pydantic==1.8.2",
-    "typing-extensions>=4.0.0,<5",
+    "typing-extensions==4.1.1",
     "uvicorn==0.14.0",
     "wsproto==1.0.0",
     "systemd-python==234; sys_platform=='linux'",
@@ -78,7 +78,7 @@ def read(*parts):
 
 if __name__ == "__main__":
     setup(
-        python_requires=">=3.7",
+        python_requires=">=3.10",
         name=DISTNAME,
         description=DESCRIPTION,
         license=LICENSE,
