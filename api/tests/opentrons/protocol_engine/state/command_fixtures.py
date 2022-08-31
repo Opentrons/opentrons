@@ -3,11 +3,11 @@ from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional, cast
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import ErrorOccurrence, commands as cmd
 from opentrons.protocol_engine.types import (
-    PipetteName,
     WellLocation,
     LabwareLocation,
 )
@@ -135,7 +135,7 @@ def create_load_labware_command(
 
 def create_load_pipette_command(
     pipette_id: str,
-    pipette_name: PipetteName,
+    pipette_name: PipetteNameType,
     mount: MountType,
 ) -> cmd.LoadPipette:
     """Get a completed LoadPipette command."""

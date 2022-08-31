@@ -1,16 +1,18 @@
 """Translation of JSON protocol commands into ProtocolEngine commands."""
 from typing import cast, List
 from pydantic import parse_obj_as
+
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.protocol.models import ProtocolSchemaV6, protocol_schema_v6
+
+from opentrons.types import MountType
 from opentrons.protocol_engine import (
     commands as pe_commands,
     LabwareLocation,
     ModuleModel,
     DeckSlotLocation,
-    PipetteName,
+    Liquid,
 )
-from opentrons.protocol_engine import Liquid
-from opentrons.types import MountType
 
 
 class CommandTranslatorError(Exception):
@@ -75,7 +77,7 @@ def _translate_pipette_command(
     assert pipette_id is not None
     translated_obj = pe_commands.LoadPipetteCreate(
         params=pe_commands.LoadPipetteParams(
-            pipetteName=PipetteName(protocol.pipettes[pipette_id].name),
+            pipetteName=PipetteNameType(protocol.pipettes[pipette_id].name),
             mount=MountType(command.params.mount),
             pipetteId=command.params.pipetteId,
         ),
