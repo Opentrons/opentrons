@@ -123,7 +123,6 @@ export function Select(props: SelectComponentProps): JSX.Element {
       color: COLORS.darkBlackEnabled,
       fontSize: TYPOGRAPHY.fontSizeP,
       marginTop: '0.2rem',
-
     }),
     singleValue: (styles: CSSObjectWithLabel) => ({
       ...styles,
