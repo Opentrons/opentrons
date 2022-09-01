@@ -89,6 +89,7 @@ const mockInProgress = InProgressModal as jest.MockedFunction<
 const mockConfirmPipette = ConfirmPipette as jest.MockedFunction<
   typeof ConfirmPipette
 >
+
 const mockExitModal = ExitModal as jest.MockedFunction<typeof ExitModal>
 
 const render = (props: React.ComponentProps<typeof ChangePipette>) => {
@@ -181,7 +182,6 @@ describe('ChangePipette', () => {
     //  Exit modal page
     getByText('mock exit modal')
     getByText('Attach a pipette')
-    getByText('Step 1 / 3')
     exit = getByLabelText('Exit')
     fireEvent.click(exit)
     expect(props.closeModal).toHaveBeenCalled()
