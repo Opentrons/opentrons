@@ -104,7 +104,7 @@ class EquipmentHandler:
                 identifier will be generated.
 
         Raises:
-            ModuleNotLoadedError: If `new_location` references a module ID
+            ModuleNotLoadedError: If `location` references a module ID
                 that doesn't point to a valid loaded module.
 
         Returns:
