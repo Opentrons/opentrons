@@ -238,7 +238,6 @@ class LabwareView(HasState[LabwareState]):
                 f"Labware definition for matching {uri} not found."
             ) from e
 
-    # OK
     def get_location(self, labware_id: str) -> LabwareLocation:
         """Get labware location by the labware's unique identifier."""
         return self.get(labware_id).location
@@ -376,7 +375,6 @@ class LabwareView(HasState[LabwareState]):
         """
         raise NotImplementedError()
 
-    # Will need to update
     def get_labware_offset_vector(self, labware_id: str) -> LabwareOffsetVector:
         """Get the labware's calibration offset."""
         offset_id = self.get(labware_id=labware_id).offsetId
