@@ -73,7 +73,7 @@ class MoveGroupSingleGripperStep:
 
     duration_sec: np.float64
     pwm_duty_cycle: np.float32
-    encoder_position_um: np.int32
+    jaw_width_um: np.int32
     pwm_frequency: np.float32 = np.float32(320000)
     stop_condition: MoveStopCondition = MoveStopCondition.gripper_force
     move_type: MoveType = MoveType.grip
@@ -178,7 +178,7 @@ def create_tip_action_step(
 def create_gripper_jaw_step(
     duration: np.float64,
     duty_cycle: np.float32,
-    encoder_position_um: np.int32,
+    jaw_width_um: np.int32 = np.int32(0),
     frequency: np.float32 = np.float32(320000),
     stop_condition: MoveStopCondition = MoveStopCondition.gripper_force,
     move_type: MoveType = MoveType.grip,
@@ -191,6 +191,6 @@ def create_gripper_jaw_step(
         pwm_duty_cycle=duty_cycle,
         stop_condition=stop_condition,
         move_type=move_type,
-        encoder_position_um=encoder_position_um,
+        jaw_width_um=jaw_width_um,
     )
     return step

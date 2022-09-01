@@ -210,7 +210,7 @@ class MoveGroupRunner:
                 int(step.duration_sec * brushed_motor_interrupts_per_sec)
             ),
             duty_cycle=UInt32Field(int(step.pwm_duty_cycle)),
-            encoder_position_um=Int32Field(int(step.encoder_position_um)),
+            jaw_width_um=Int32Field(int(step.jaw_width_um)),
         )
         if step.move_type == MoveType.home:
             return GripperHomeRequest(payload=payload)

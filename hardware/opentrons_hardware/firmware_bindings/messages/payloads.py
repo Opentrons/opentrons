@@ -415,7 +415,7 @@ class GripperMoveRequestPayload(AddToMoveGroupRequestPayload):
     """A request to move gripper."""
 
     duty_cycle: utils.UInt32Field
-    encoder_position_um: utils.Int32Field
+    jaw_width_um: utils.Int32Field
 
 
 @dataclass
