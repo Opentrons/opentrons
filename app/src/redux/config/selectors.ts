@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect'
-import type { DropdownOption } from '@opentrons/components'
 import type { State } from '../types'
 import type { Config, FeatureFlags, UpdateChannel } from './types'
+import type { SelectOption } from '../../atoms/SelectField/Select'
 
 export const getConfig = (state: State): Config | null => state.config
 
@@ -42,17 +42,22 @@ export const getPathToPythonOverride: (
 )
 
 const UPDATE_CHANNEL_OPTS = [
-  { name: 'Stable', value: 'latest' as UpdateChannel },
-  { name: 'Beta', value: 'beta' as UpdateChannel },
+  { label: 'Stable', value: 'latest' as UpdateChannel },
+  { label: 'Beta', value: 'beta' as UpdateChannel },
 ]
 
 const UPDATE_CHANNEL_OPTS_WITH_ALPHA = [
   ...UPDATE_CHANNEL_OPTS,
-  { name: 'Alpha', value: 'alpha' as UpdateChannel },
+  { label: 'Alpha', value: 'alpha' as UpdateChannel },
 ]
 
-export const getUpdateChannelOptions = (state: State): DropdownOption[] => {
+export const getUpdateChannelOptions = (state: State): SelectOption[] => {
   return state.config?.devtools || state.config?.update.channel === 'alpha'
     ? UPDATE_CHANNEL_OPTS_WITH_ALPHA
     : UPDATE_CHANNEL_OPTS
 }
+
+export const getIsOnDevice: (state: State) => boolean = createSelector(
+  getConfig,
+  config => config?.isOnDevice ?? false
+)

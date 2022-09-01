@@ -7,7 +7,6 @@ import {
 } from '@opentrons/react-api-client'
 import {
   Flex,
-  Text,
   TYPOGRAPHY,
   SPACING,
   COLORS,
@@ -23,6 +22,7 @@ import {
 } from '@opentrons/components'
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import {
+  CreateCommand,
   getModuleDisplayName,
   HS_RPM_MAX,
   HS_RPM_MIN,
@@ -34,6 +34,7 @@ import { PrimaryButton, TertiaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
 import { InputField } from '../../atoms/InputField'
 import { Tooltip } from '../../atoms/Tooltip'
+import { StyledText } from '../../atoms/text'
 import { HeaterShakerWizard } from '../Devices/HeaterShakerWizard'
 import { useRunStatuses } from '../Devices/hooks'
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
@@ -44,6 +45,7 @@ import type { HeaterShakerModule, LatchStatus } from '../../redux/modules/types'
 import type {
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
+  HeaterShakerCloseLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 
 interface TestShakeSlideoutProps {
@@ -72,51 +74,63 @@ export const TestShakeSlideout = (
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'left',
   })
-  const { toggleLatch, isLatchClosed } = useLatchControls(module, currentRunId)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
   const configHasHeaterShakerAttached = useSelector(getIsHeaterShakerAttached)
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [showWizard, setShowWizard] = React.useState<boolean>(false)
   const isShaking = module.data.speedStatus !== 'idle'
+  const moduleId = isRunIdle ? moduleIdFromRun : module.id
 
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
     commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
-      moduleId: isRunIdle ? moduleIdFromRun : module.id,
+      moduleId,
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
+    },
+  }
+
+  const closeLatchCommand: HeaterShakerCloseLatchCreateCommand = {
+    commandType: 'heaterShaker/closeLabwareLatch',
+    params: {
+      moduleId,
     },
   }
 
   const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
     commandType: 'heaterShaker/deactivateShaker',
     params: {
-      moduleId: isRunIdle ? moduleIdFromRun : module.id,
+      moduleId,
     },
   }
 
-  const handleShakeCommand = (): void => {
-    if (isRunIdle && currentRunId != null && isLoadedInRun) {
-      createCommand({
-        runId: currentRunId,
-        command: isShaking ? stopShakeCommand : setShakeCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${
-            stopShakeCommand.commandType ?? setShakeCommand.commandType
-          }: ${e.message}`
-        )
-      })
-    } else if (isRunTerminal || currentRunId == null) {
-      createLiveCommand({
-        command: isShaking ? stopShakeCommand : setShakeCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${
-            stopShakeCommand.commandType ?? setShakeCommand.commandType
-          }: ${e.message}`
-        )
-      })
+  const sendCommands = async (): Promise<void> => {
+    const commands: CreateCommand[] = isShaking
+      ? [stopShakeCommand]
+      : [closeLatchCommand, setShakeCommand]
+
+    for (const command of commands) {
+      // await each promise to make sure the server receives requests in the right order
+      if (isRunIdle && currentRunId != null && isLoadedInRun) {
+        await createCommand({
+          runId: currentRunId,
+          command,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${command.commandType}: ${e.message}`
+          )
+        })
+      } else if (isRunTerminal || currentRunId == null) {
+        await createLiveCommand({
+          command,
+        }).catch((e: Error) => {
+          console.error(
+            `error setting module status with command type ${command.commandType}: ${e.message}`
+          )
+        })
+      }
     }
+
     setShakeValue(null)
   }
 
@@ -124,7 +138,7 @@ export const TestShakeSlideout = (
     confirm: confirmAttachment,
     showConfirmation: showConfirmationModal,
     cancel: cancelExit,
-  } = useConditionalConfirm(handleShakeCommand, !configHasHeaterShakerAttached)
+  } = useConditionalConfirm(sendCommands, !configHasHeaterShakerAttached)
 
   const errorMessage =
     shakeValue != null &&
@@ -169,19 +183,19 @@ export const TestShakeSlideout = (
           <ConfirmAttachmentModal
             onCloseClick={cancelExit}
             isProceedToRunModal={false}
-            onConfirmClick={handleShakeCommand}
+            onConfirmClick={sendCommands}
           />
         </Portal>
       )}
       <Flex
         borderRadius={SPACING.spacingS}
         marginBottom={SPACING.spacing3}
-        backgroundColor={COLORS.background}
+        backgroundColor={COLORS.fundamentalsBackground}
         paddingY={SPACING.spacing4}
         paddingLeft={SPACING.spacing2}
         paddingRight={SPACING.spacing4}
         flexDirection={DIRECTION_ROW}
-        data-testid={'test_shake_slideout_banner_info'}
+        data-testid="test_shake_slideout_banner_info"
       >
         <Flex color={COLORS.darkGreyEnabled}>
           <Icon
@@ -192,9 +206,9 @@ export const TestShakeSlideout = (
           />
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} fontSize={TYPOGRAPHY.fontSizeP}>
-          <Text fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {t('heater_shaker:test_shake_slideout_banner_info')}
-          </Text>
+          </StyledText>
         </Flex>
       </Flex>
       <Flex
@@ -209,63 +223,48 @@ export const TestShakeSlideout = (
           alignItems={ALIGN_CENTER}
         >
           <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing3}>
-            <Text
+            <StyledText
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.darkBlack}
             >
               {t('labware_latch')}
-            </Text>
-            <Text
+            </StyledText>
+            <StyledText
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
-              color={COLORS.darkBlack}
               marginTop={SPACING.spacing3}
-              data-testid={`TestShake_Slideout_latch_status`}
+              data-testid="TestShake_Slideout_latch_status"
             >
               {getLatchStatus(module.data.labwareLatchStatus)}
-            </Text>
+            </StyledText>
           </Flex>
-          {isShaking ? (
-            <TertiaryButton
-              marginTop={SPACING.spacing2}
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              fontSize={TYPOGRAPHY.fontSizeCaption}
-              marginLeft={SIZE_AUTO}
-              onClick={toggleLatch}
-              disabled={isShaking}
-              {...targetProps}
-            >
-              {!isLatchClosed ? t('close_latch') : t('open_latch')}
-            </TertiaryButton>
-          ) : (
-            <TertiaryButton
-              marginTop={SPACING.spacing2}
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              fontSize={TYPOGRAPHY.fontSizeCaption}
-              marginLeft={SIZE_AUTO}
-              onClick={toggleLatch}
-              disabled={isShaking}
-            >
-              {!isLatchClosed ? t('close_latch') : t('open_latch')}
-            </TertiaryButton>
-          )}
+          <TertiaryButton
+            marginTop={SPACING.spacing2}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            fontSize={TYPOGRAPHY.fontSizeCaption}
+            marginLeft={SIZE_AUTO}
+            onClick={toggleLatch}
+            disabled={isShaking}
+            {...(isShaking && targetProps)}
+          >
+            {!isLatchClosed ? t('close_latch') : t('open_latch')}
+          </TertiaryButton>
+
           {isShaking ? (
             <Tooltip tooltipProps={tooltipProps}>
               {t('cannot_open_latch')}
             </Tooltip>
           ) : null}
         </Flex>
-        <Divider color={COLORS.medGrey} />
-        <Text
+        <Divider color={COLORS.medGreyEnabled} />
+        <StyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkBlack}
           marginTop={SPACING.spacing4}
         >
           {t('shake_speed')}
-        </Text>
+        </StyledText>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -273,7 +272,7 @@ export const TestShakeSlideout = (
             paddingRight={SPACING.spacing4}
           >
             <InputField
-              data-testid={`TestShakeSlideout_shake_input`}
+              data-testid="TestShakeSlideout_shake_input"
               units={RPM}
               value={shakeValue}
               onChange={e => setShakeValue(e.target.value)}
@@ -284,46 +283,43 @@ export const TestShakeSlideout = (
               })}
               error={errorMessage}
             />
-            <Text
+            <StyledText
               color={COLORS.darkGreyEnabled}
               fontSize={TYPOGRAPHY.fontSizeCaption}
-            ></Text>
+            ></StyledText>
           </Flex>
-          {!isLatchClosed || (shakeValue === null && !isShaking) ? (
-            <TertiaryButton
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              marginLeft={SIZE_AUTO}
-              marginTop={SPACING.spacing3}
-              onClick={confirmAttachment}
-              disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
-              {...targetProps}
-            >
-              {isShaking ? t('shared:stop') : t('shared:start')}
-            </TertiaryButton>
-          ) : (
-            <TertiaryButton
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              marginLeft={SIZE_AUTO}
-              marginTop={SPACING.spacing3}
-              onClick={confirmAttachment}
-              disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
-            >
-              {isShaking ? t('shared:stop') : t('shared:start')}
-            </TertiaryButton>
-          )}
+          <TertiaryButton
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            marginLeft={SIZE_AUTO}
+            marginTop={SPACING.spacing3}
+            onClick={confirmAttachment}
+            disabled={
+              !isLatchClosed ||
+              (shakeValue === null && !isShaking) ||
+              errorMessage != null
+            }
+            {...((!isLatchClosed || (shakeValue === null && !isShaking)) &&
+              targetProps)}
+          >
+            {isShaking ? t('shared:stop') : t('shared:start')}
+          </TertiaryButton>
+
           {!isLatchClosed ? (
             <Tooltip tooltipProps={tooltipProps}>{t('cannot_shake')}</Tooltip>
           ) : null}
         </Flex>
       </Flex>
       {showWizard && (
-        <HeaterShakerWizard onCloseClick={() => setShowWizard(false)} />
+        <HeaterShakerWizard
+          onCloseClick={() => setShowWizard(false)}
+          attachedModule={module}
+        />
       )}
       <Link
         role="button"
         marginTop={SPACING.spacing2}
         css={TYPOGRAPHY.linkPSemiBold}
-        id={'HeaterShaker_Attachment_Instructions'}
+        id="HeaterShaker_Attachment_Instructions"
         onClick={() => setShowWizard(true)}
       >
         {t('show_attachment_instructions')}

@@ -1,4 +1,3 @@
-from typing_extensions import Final
 from opentrons.hardware_control.emulation.settings import (
     Settings, SmoothieSettings, PipetteSettings
 )
@@ -10,7 +9,3 @@ HTTP_SETTINGS = Settings(
         right=PipetteSettings(model="p300_single_v2.1", id="P20SV202020070101")
     )
 )
-
-
-DIRECTORY: Final = "http"
-"""Base of files in s3"""

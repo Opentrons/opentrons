@@ -1,29 +1,24 @@
 import * as React from 'react'
-import cx from 'classnames'
+import { useTranslation } from 'react-i18next'
 
-import { Icon, PrimaryBtn, ModalPage, SPACING_2 } from '@opentrons/components'
-import { getDiagramsSrc } from './InstructionStep'
+import {
+  COLORS,
+  SPACING,
+  TEXT_TRANSFORM_CAPITALIZE,
+} from '@opentrons/components'
 import { CheckPipettesButton } from './CheckPipettesButton'
-import styles from './styles.css'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
 
 import type {
   PipetteNameSpecs,
   PipetteModelSpecs,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../redux/pipettes/types'
 import type { PipetteOffsetCalibration } from '../../redux/calibration/types'
 
-const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
-const EXIT_BUTTON_MESSAGE_WRONG = 'keep pipette and exit setup'
-const EXIT_WITHOUT_CAL = 'exit without calibrating'
-const CONTINUE_TO_PIP_OFFSET = 'continue to pipette offset calibration'
-
-export interface Props {
+export interface ConfirmPipetteProps {
   robotName: string
-  mount: Mount
-  title: string
-  subtitle: string
   success: boolean
   attachedWrong: boolean
   wantedPipette: PipetteNameSpecs | null
@@ -31,192 +26,132 @@ export interface Props {
   actualPipetteOffset: PipetteOffsetCalibration | null
   displayName: string
   displayCategory: PipetteDisplayCategory | null
-  tryAgain: () => unknown
-  back: () => unknown
-  exit: () => unknown
-  startPipetteOffsetCalibration: () => void
+  tryAgain: () => void
+  exit: () => void
+  toCalibrationDashboard: () => void
 }
 
-export function ConfirmPipette(props: Props): JSX.Element {
-  const {
-    title,
-    subtitle,
-    success,
-    attachedWrong,
-    actualPipette,
-    actualPipetteOffset,
-    back,
-  } = props
+export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
+  const { success } = props
+  const { t } = useTranslation('change_pipette')
 
-  return (
-    <ModalPage
-      titleBar={{
-        title: title,
-        subtitle: subtitle,
-        back: { onClick: back, disabled: success || attachedWrong },
-      }}
-    >
-      <Status {...props} />
-      <StatusDetails {...props} />
-      {!success && <TryAgainButton {...props} />}
-      {success && !actualPipette && <AttachAnotherButton {...props} />}
-      {success && actualPipette && !actualPipetteOffset && (
-        <CalibratePipetteOffsetButton {...props} />
-      )}
-      <ExitButton {...props} />
-    </ModalPage>
-  )
-}
+  const getPipetteStatusDetails = (
+    props: ConfirmPipetteProps
+  ): { header: string; subHeader: string } => {
+    const { displayName, wantedPipette, attachedWrong, success } = props
+    let header
+    let subHeader
 
-function Status(props: Props): JSX.Element {
-  const { displayName, wantedPipette, attachedWrong, success } = props
-  const iconName = success ? 'check-circle' : 'close-circle'
-  const iconClass = cx(styles.confirm_icon, {
-    [styles.success]: success,
-    [styles.failure]: !success,
-  })
+    if (wantedPipette && success) {
+      header = t('pipette_attached')
+      subHeader = t('pipette_is_ready_to_use', {
+        pipette: wantedPipette.displayName,
+      })
+    } else if (wantedPipette) {
+      header = attachedWrong
+        ? t('incorrect_pipette_attached')
+        : t('unable_to_detect_pipette', {
+            pipette: wantedPipette.displayName ?? 'pipette',
+          })
 
-  let message
+      subHeader = attachedWrong
+        ? t('attached_pipette_does_not_match', {
+            name: displayName,
+            pipette: wantedPipette.displayName,
+          })
+        : t('press_white_connector')
+    } else {
+      header = success
+        ? t('successfully_detached_pipette')
+        : t('pipette_still_detected')
+      subHeader = success ? '' : t('check_pipette_is_unplugged')
+    }
 
-  if (wantedPipette && success) {
-    message = `${wantedPipette.displayName} successfully attached.`
-  } else if (wantedPipette) {
-    message = attachedWrong
-      ? `Incorrect pipette attached (${displayName})`
-      : `Unable to detect ${wantedPipette.displayName || ''}.`
-  } else {
-    message = success ? 'Pipette is detached' : 'Pipette is not detached'
+    return { header, subHeader }
   }
 
+  const { header, subHeader } = getPipetteStatusDetails({ ...props })
+
   return (
-    <div className={styles.confirm_status}>
-      <Icon name={iconName} className={iconClass} />
-      {message}
-    </div>
+    <SimpleWizardBody
+      iconColor={success ? COLORS.successEnabled : COLORS.errorEnabled}
+      header={header}
+      subHeader={subHeader}
+      isSuccess={success}
+    >
+      <>
+        {!success && <TryAgainButton {...props} />}
+        {success && <SuccessAndExitButtons {...props} />}
+      </>
+    </SimpleWizardBody>
   )
 }
 
-function StatusDetails(props: Props): JSX.Element | null {
+function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
   const {
-    mount,
-    displayCategory,
-    success,
+    actualPipette,
     attachedWrong,
     wantedPipette,
-    actualPipette,
-  } = props
-
-  if (!success) {
-    if (wantedPipette && attachedWrong) {
-      return (
-        <p className={styles.confirm_failure_instructions}>
-          The attached pipette does not match the {wantedPipette.displayName}{' '}
-          pipette you had originally selected.
-        </p>
-      )
-    }
-
-    if (wantedPipette) {
-      return (
-        <div>
-          <img
-            className={styles.confirm_diagram}
-            src={getDiagramsSrc({
-              mount,
-              displayCategory,
-              channels: wantedPipette.channels,
-              diagram: 'tab',
-              direction: 'attach',
-            })}
-          />
-          <p className={styles.confirm_failure_instructions}>
-            Check again to ensure that white connector tab is plugged into
-            pipette.
-          </p>
-        </div>
-      )
-    }
-
-    if (actualPipette) {
-      return (
-        <p className={styles.confirm_failure_instructions}>
-          Check again to ensure that pipette is unplugged and entirely detached
-          from robot.
-        </p>
-      )
-    }
-  }
-
-  return null
-}
-
-function AttachAnotherButton(props: Props): JSX.Element {
-  return (
-    <PrimaryBtn marginBottom={SPACING_2} width="100%" onClick={props.back}>
-      attach another pipette
-    </PrimaryBtn>
-  )
-}
-
-function CalibratePipetteOffsetButton(props: Props): JSX.Element {
-  return (
-    <PrimaryBtn
-      marginBottom={SPACING_2}
-      width="100%"
-      onClick={props.startPipetteOffsetCalibration}
-    >
-      {CONTINUE_TO_PIP_OFFSET}
-    </PrimaryBtn>
-  )
-}
-
-function TryAgainButton(props: Props): JSX.Element {
-  const {
     robotName,
-    attachedWrong,
-    wantedPipette,
-    actualPipette,
     tryAgain,
+    exit,
   } = props
-
+  const { t } = useTranslation('change_pipette')
   if (wantedPipette && attachedWrong) {
     return (
-      <PrimaryBtn marginBottom={SPACING_2} width="100%" onClick={tryAgain}>
-        detach and try again
-      </PrimaryBtn>
+      <>
+        <SecondaryButton marginRight={SPACING.spacing3} onClick={exit}>
+          {t('use_attached_pipette')}
+        </SecondaryButton>
+        <PrimaryButton onClick={tryAgain}>
+          {t('detatch_try_again')}
+        </PrimaryButton>
+      </>
+    )
+  } else if (!actualPipette) {
+    return (
+      <>
+        <SecondaryButton marginRight={SPACING.spacing3} onClick={exit}>
+          {t('cancel_attachment')}
+        </SecondaryButton>
+        <CheckPipettesButton robotName={robotName}>
+          {t('recheck_connection')}
+        </CheckPipettesButton>
+      </>
     )
   }
-
   return (
-    <CheckPipettesButton
-      className={styles.confirm_button}
-      robotName={robotName}
-    >
-      {actualPipette
-        ? 'confirm pipette is detached'
-        : 'have robot check connection again'}
-    </CheckPipettesButton>
+    <>
+      <SecondaryButton marginRight={SPACING.spacing3} onClick={exit}>
+        {t('leave_attached')}
+      </SecondaryButton>
+      <PrimaryButton onClick={tryAgain}>{t('try_again')}</PrimaryButton>
+    </>
   )
 }
 
-const exitButtonMessage: (props: Props) => string = props => {
-  const { attachedWrong, actualPipette, actualPipetteOffset, success } = props
-  if (success && actualPipette && !Boolean(actualPipetteOffset)) {
-    return EXIT_WITHOUT_CAL
-  }
-  if (attachedWrong) {
-    return EXIT_BUTTON_MESSAGE_WRONG
-  }
-  return EXIT_BUTTON_MESSAGE
-}
-
-function ExitButton(props: Props): JSX.Element {
-  const { exit } = props
-  const buttonText = exitButtonMessage(props)
-
+function SuccessAndExitButtons(props: ConfirmPipetteProps): JSX.Element {
+  const {
+    actualPipette,
+    actualPipetteOffset,
+    exit,
+    toCalibrationDashboard,
+    success,
+  } = props
+  const { t } = useTranslation('change_pipette')
   return (
-    <PrimaryBtn marginBottom={SPACING_2} width="100%" onClick={exit}>
-      {buttonText}
-    </PrimaryBtn>
+    <>
+      {success && actualPipette && !actualPipetteOffset && (
+        <SecondaryButton
+          marginRight={SPACING.spacing3}
+          onClick={toCalibrationDashboard}
+        >
+          {t('calibrate_pipette_offset')}
+        </SecondaryButton>
+      )}
+      <PrimaryButton textTransform={TEXT_TRANSFORM_CAPITALIZE} onClick={exit}>
+        {t('shared:exit')}
+      </PrimaryButton>
+    </>
   )
 }

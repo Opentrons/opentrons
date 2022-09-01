@@ -47,6 +47,10 @@ class LabwareNotLoadedError(ProtocolEngineError):
     """An error raised when referencing a labware that has not been loaded."""
 
 
+class LiquidDoesNotExistError(ProtocolEngineError):
+    """An error raised when referencing a liquid that has not been loaded."""
+
+
 class LabwareDefinitionDoesNotExistError(ProtocolEngineError):
     """An error raised when referencing a labware definition that does not exist."""
 
@@ -162,12 +166,4 @@ class CannotPerformModuleAction(ProtocolEngineError):
 
 
 class ProtocolCommandFailedError(ProtocolEngineError):
-    """An error raised if a fatal command execution error has occurred.
-
-    Args:
-        command_id: The ID of the command that failed.
-    """
-
-    def __init__(self, command_id: str) -> None:
-        super().__init__(f"Command {command_id} failed to execute")
-        self.command_id = command_id
+    """An error raised if a fatal command execution error has occurred."""

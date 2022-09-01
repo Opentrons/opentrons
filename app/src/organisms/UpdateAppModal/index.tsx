@@ -10,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   FONT_SIZE_BODY_1,
-  FONT_SIZE_BODY_2,
   FONT_SIZE_HEADER,
   FONT_STYLE_ITALIC,
   FONT_WEIGHT_REGULAR,
@@ -29,6 +28,7 @@ import {
   Icon,
   SecondaryBtn,
   Text,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import {
@@ -95,7 +95,7 @@ const SPINNER = (
   <BaseModal
     color={C_WHITE}
     backgroundColor={C_TRANSPARENT}
-    fontSize={FONT_SIZE_BODY_2}
+    fontSize={TYPOGRAPHY.fontSizeH3}
     fontStyle={FONT_STYLE_ITALIC}
   >
     <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
@@ -159,7 +159,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
     <BaseModal
       overlayColor="#737373e6"
       maxWidth="38rem"
-      fontSize={FONT_SIZE_BODY_2}
+      fontSize={TYPOGRAPHY.fontSizeH3}
       header={
         <Text
           as="h2"

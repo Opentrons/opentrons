@@ -27,7 +27,7 @@ export const UnMatchedModuleWarning = (
     <Flex
       marginTop={SPACING.spacing4}
       flexDirection={DIRECTION_COLUMN}
-      backgroundColor={COLORS.background}
+      backgroundColor={COLORS.fundamentalsBackground}
       padding={SPACING.spacing5}
     >
       <Flex
@@ -43,11 +43,7 @@ export const UnMatchedModuleWarning = (
             paddingBottom={SPACING.spacingSM}
             aria-label="information_icon"
           />
-          <StyledText
-            as="p"
-            data-testid={`UnMatchedModuleWarning_title`}
-            color={COLORS.darkBlack}
-          >
+          <StyledText as="p" data-testid="UnMatchedModuleWarning_title">
             {t('module_mismatch_title')}
           </StyledText>
         </Flex>
@@ -59,7 +55,7 @@ export const UnMatchedModuleWarning = (
         marginRight={SPACING.spacing4}
         color={COLORS.darkGrey}
         width="100%"
-        data-testid={`UnMatchedModuleWarning_body`}
+        data-testid="UnMatchedModuleWarning_body"
       >
         {t('module_mismatch_body')}
       </StyledText>

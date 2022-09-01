@@ -10,7 +10,6 @@ import {
   NewPrimaryBtn,
   Text,
   C_MED_DARK_GRAY,
-  FONT_SIZE_BODY_2,
   FONT_WEIGHT_REGULAR,
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
@@ -19,6 +18,7 @@ import {
   SPACING_3,
   SPACING_4,
   SPACING_5,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
 import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.svg'
@@ -43,13 +43,13 @@ export const SecureLabwareModal = (
       <Modal className={styles.modal} contentsClassName={styles.modal_contents}>
         <Box>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-            <Text as={'h3'} marginBottom={SPACING_3}>
+            <Text as="h3" marginBottom={SPACING_3}>
               {t(`secure_labware_modal_title`, {
                 name: moduleName,
               })}
             </Text>
             <Btn size={SIZE_2} onClick={props.onCloseClick}>
-              <Icon name={'close'} color={C_MED_DARK_GRAY}></Icon>
+              <Icon name="close" color={C_MED_DARK_GRAY}></Icon>
             </Btn>
           </Flex>
 
@@ -61,7 +61,7 @@ export const SecureLabwareModal = (
                 components={{
                   block: (
                     <Text
-                      fontSize={FONT_SIZE_BODY_2}
+                      fontSize={TYPOGRAPHY.fontSizeH3}
                       fontWeight={FONT_WEIGHT_REGULAR}
                       marginBottom={SPACING_3}
                     />
@@ -72,10 +72,10 @@ export const SecureLabwareModal = (
                 <img src={secureMagModBracketImage} />
               </Flex>
               <Flex justifyContent={JUSTIFY_CENTER}>
-                <Text fontSize={FONT_SIZE_BODY_2} marginX={SPACING_4}>
+                <Text fontSize={TYPOGRAPHY.fontSizeH3} marginX={SPACING_4}>
                   {t('magnetic_module_standard_plate_text')}
                 </Text>
-                <Text fontSize={FONT_SIZE_BODY_2} marginX={SPACING_4}>
+                <Text fontSize={TYPOGRAPHY.fontSizeH3} marginX={SPACING_4}>
                   {t('magnetic_module_deep_well_plate_text')}
                 </Text>
               </Flex>
@@ -84,7 +84,7 @@ export const SecureLabwareModal = (
           {props.type === 'thermocyclerModuleType' && (
             <Box>
               <Text
-                fontSize={FONT_SIZE_BODY_2}
+                fontSize={TYPOGRAPHY.fontSizeH3}
                 fontWeight={FONT_WEIGHT_REGULAR}
                 marginBottom={SPACING_3}
               >

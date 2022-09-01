@@ -1278,8 +1278,7 @@
         "labwareId": "destPlateId",
         "location": {
           "moduleId": "magneticModuleId"
-        },
-        "displayName": "Sample Collection Plate"
+        }
       }
     },
     {
@@ -1387,18 +1386,6 @@
         "wellLocation": {
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 12 }
-        }
-      }
-    },
-    {
-      "commandType": "moveToSlot",
-      "id": "14abc123",
-      "params": {
-        "pipetteId": "pipetteId",
-        "slotName": "5",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": { "x": 1, "y": 2, "z": 3 }
         }
       }
     },

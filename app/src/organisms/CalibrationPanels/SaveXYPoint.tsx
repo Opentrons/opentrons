@@ -6,7 +6,6 @@ import {
   Btn,
   Flex,
   Text,
-  FONT_SIZE_BODY_2,
   DIRECTION_ROW,
   SPACING,
   SPACING_3,
@@ -22,14 +21,12 @@ import {
   TEXT_DECORATION_UNDERLINE,
   TEXT_ALIGN_CENTER,
   TEXT_TRANSFORM_UPPERCASE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-import {
-  JogControls,
-  HORIZONTAL_PLANE,
-  VERTICAL_PLANE,
-} from '../../molecules/JogControls'
+import { HORIZONTAL_PLANE, VERTICAL_PLANE } from '../../molecules/JogControls'
+import { DeprecatedJogControls } from '../../molecules/DeprecatedJogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { NeedHelpLink } from './NeedHelpLink'
@@ -276,7 +273,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element {
         border={BORDER_SOLID_LIGHT}
         marginTop={SPACING_3}
       >
-        <Text fontSize={FONT_SIZE_BODY_2} alignSelf={JUSTIFY_CENTER}>
+        <Text fontSize={TYPOGRAPHY.fontSizeH3} alignSelf={JUSTIFY_CENTER}>
           {JOG_UNTIL}
           <b>{` ${PRECISELY_CENTERED} `}</b>
           {ABOVE_THE_CROSS}
@@ -300,7 +297,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element {
           <source src={demoAsset} />
         </video>
       </Flex>
-      <JogControls
+      <DeprecatedJogControls
         jog={jog}
         stepSizes={[0.1, 1]}
         planes={

@@ -5,7 +5,7 @@ import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { Tooltip } from '../../atoms/Tooltip'
 import { useCurrentRunId } from '../ProtocolUpload/hooks'
-import { useRunStatuses } from '../Devices/hooks'
+import { useRunStatuses, useIsLegacySessionInProgress } from '../Devices/hooks'
 import { useModuleOverflowMenu } from './hooks'
 
 import type { AttachedModule } from '../../redux/modules/types'
@@ -46,11 +46,8 @@ export const ModuleOverflowMenu = (
     isLoadedInRun
   )
   const currentRunId = useCurrentRunId()
-  const {
-    isRunTerminal,
-    isLegacySessionInProgress,
-    isRunStill,
-  } = useRunStatuses()
+  const { isRunTerminal, isRunStill } = useRunStatuses()
+  const isLegacySessionInProgress = useIsLegacySessionInProgress()
 
   let isDisabled: boolean = false
   if (runId != null && isLoadedInRun) {
@@ -81,7 +78,7 @@ export const ModuleOverflowMenu = (
                     </MenuItem>
                     {item.disabledReason && (
                       <Tooltip tooltipProps={tooltipProps}>
-                        {t('cannot_shake', { ns: 'heater_shaker' })}
+                        {t('heater_shaker:cannot_shake')}
                       </Tooltip>
                     )}
                     {item.menuButtons}

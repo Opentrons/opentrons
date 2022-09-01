@@ -1,5 +1,4 @@
 """Test one-shot tool detector."""
-import asyncio
 from opentrons_hardware.firmware_bindings.constants import ToolType, PipetteName
 from opentrons_hardware.firmware_bindings.messages import (
     MessageDefinition,
@@ -10,7 +9,7 @@ from mock import AsyncMock, call
 from opentrons_hardware.firmware_bindings.messages.fields import (
     ToolField,
     PipetteNameField,
-    SerialField,
+    SerialDataCodeField,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt16Field
 from opentrons_hardware.hardware_control.tools import detector, types
@@ -47,9 +46,9 @@ async def test_suppresses_undefined(
                     NodeId.host,
                     message_definitions.PushToolsDetectedNotification(
                         payload=payloads.ToolsDetectedNotificationPayload(
-                            z_motor=ToolField(ToolType.undefined_tool.value),
-                            a_motor=ToolField(ToolType.undefined_tool.value),
-                            gripper=ToolField(ToolType.undefined_tool.value),
+                            z_motor=ToolField(ToolType.nothing_attached.value),
+                            a_motor=ToolField(ToolType.nothing_attached.value),
+                            gripper=ToolField(ToolType.nothing_attached.value),
                         )
                     ),
                     NodeId.head,
@@ -133,7 +132,7 @@ async def test_sends_only_required_followups(
                     message_definitions.PushToolsDetectedNotification(
                         payload=payloads.ToolsDetectedNotificationPayload(
                             z_motor=ToolField(ToolType.nothing_attached.value),
-                            a_motor=ToolField(ToolType.pipette_multi_chan.value),
+                            a_motor=ToolField(ToolType.pipette.value),
                             gripper=ToolField(ToolType.nothing_attached.value),
                         )
                     ),
@@ -149,7 +148,7 @@ async def test_sends_only_required_followups(
             payload = payloads.PipetteInfoResponsePayload(
                 name=PipetteNameField(PipetteName.p1000_single.value),
                 model=UInt16Field(2),
-                serial=SerialField(b"20220809A022"),
+                serial=SerialDataCodeField(b"20220809A022"),
             )
             return [
                 (
@@ -167,7 +166,10 @@ async def test_sends_only_required_followups(
 
     assert tools.left is None
     assert tools.right == types.PipetteInformation(
-        name=PipetteName.p1000_single, model=2, serial="20220809A022"
+        name=PipetteName.p1000_single,
+        name_int=PipetteName.p1000_single.value,
+        model="0.2",
+        serial="20220809A022",
     )
     assert tools.gripper is None
 
@@ -199,8 +201,8 @@ async def test_sends_all_required_followups(
                     NodeId.host,
                     message_definitions.PushToolsDetectedNotification(
                         payload=payloads.ToolsDetectedNotificationPayload(
-                            z_motor=ToolField(ToolType.pipette_single_chan.value),
-                            a_motor=ToolField(ToolType.pipette_multi_chan.value),
+                            z_motor=ToolField(ToolType.pipette.value),
+                            a_motor=ToolField(ToolType.pipette.value),
                             gripper=ToolField(ToolType.gripper.value),
                         )
                     ),
@@ -220,7 +222,7 @@ async def test_sends_all_required_followups(
                         payload=payloads.PipetteInfoResponsePayload(
                             name=PipetteNameField(PipetteName.p1000_single.value),
                             model=UInt16Field(2),
-                            serial=SerialField(b"20220809A022"),
+                            serial=SerialDataCodeField(b"20220809A022"),
                         )
                     ),
                     NodeId.pipette_left,
@@ -230,8 +232,8 @@ async def test_sends_all_required_followups(
                     message_definitions.PipetteInfoResponse(
                         payload=payloads.PipetteInfoResponsePayload(
                             name=PipetteNameField(PipetteName.p1000_multi.value),
-                            model=UInt16Field(4),
-                            serial=SerialField(b"20231005A220"),
+                            model=UInt16Field(34),
+                            serial=SerialDataCodeField(b"20231005A220"),
                         )
                     ),
                     NodeId.pipette_right,
@@ -241,7 +243,7 @@ async def test_sends_all_required_followups(
                     message_definitions.GripperInfoResponse(
                         payload=payloads.GripperInfoResponsePayload(
                             model=UInt16Field(1),
-                            serial=SerialField(b"20220531A01"),
+                            serial=SerialDataCodeField(b"20220531A01"),
                         )
                     ),
                     NodeId.gripper,
@@ -255,10 +257,16 @@ async def test_sends_all_required_followups(
     tools = await subject.detect()
 
     assert tools.left == types.PipetteInformation(
-        name=PipetteName.p1000_single, model=2, serial="20220809A022"
+        name=PipetteName.p1000_single,
+        name_int=PipetteName.p1000_single.value,
+        model="0.2",
+        serial="20220809A022",
     )
     assert tools.right == types.PipetteInformation(
-        name=PipetteName.p1000_multi, model=4, serial="20231005A220"
+        name=PipetteName.p1000_multi,
+        name_int=PipetteName.p1000_multi.value,
+        model="3.4",
+        serial="20231005A220",
     )
     assert tools.gripper == types.GripperInformation(model=1, serial="20220531A01")
 
@@ -276,10 +284,27 @@ async def test_sends_all_required_followups(
     ]
 
 
+@pytest.mark.parametrize(
+    "bad_serial,parsed_serial",
+    [
+        (
+            # if it's decodable, it's decoded
+            b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c",
+            "\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c",
+        ),
+        (
+            # if it has a 0, that ends the serial
+            b"asbasdb\x00abasc",
+            "asbasdb",
+        ),
+    ],
+)
 async def test_handles_bad_serials(
     subject: detector.OneshotToolDetector,
     mock_messenger: AsyncMock,
     message_send_loopback: CanLoopback,
+    bad_serial: bytes,
+    parsed_serial: str,
 ) -> None:
     """It should accept serial values that cannot be decoded."""
 
@@ -292,7 +317,7 @@ async def test_handles_bad_serials(
                     NodeId.host,
                     message_definitions.PushToolsDetectedNotification(
                         payload=payloads.ToolsDetectedNotificationPayload(
-                            z_motor=ToolField(ToolType.pipette_single_chan.value),
+                            z_motor=ToolField(ToolType.pipette.value),
                             a_motor=ToolField(ToolType.nothing_attached.value),
                             gripper=ToolField(ToolType.nothing_attached.value),
                         )
@@ -307,11 +332,9 @@ async def test_handles_bad_serials(
     ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
         if isinstance(message, message_definitions.InstrumentInfoRequest):
             payload = payloads.PipetteInfoResponsePayload(
-                name=PipetteNameField(PipetteName.p1000_multi.value),
-                model=UInt16Field(4),
-                serial=SerialField(
-                    b"\x00\x01\x02\x03\x04\0x05\x06\x07\x08\x09\x0a\x0b"
-                ),
+                name=PipetteNameField(100),
+                model=UInt16Field(31),
+                serial=SerialDataCodeField(bad_serial),
             )
             return [
                 (
@@ -328,18 +351,16 @@ async def test_handles_bad_serials(
     tools = await subject.detect()
 
     assert tools.left == types.PipetteInformation(
-        name=PipetteName.p1000_multi,
-        model=4,
-        serial="\x00\x01\x02\x03\x04\0x05\x06\x07\x08\x09\x0a\x0b",
+        name=PipetteName.unknown, name_int=100, model="3.1", serial=parsed_serial
     )
 
 
-async def test_timeout(
+async def test_no_instrument_info_response(
     subject: detector.OneshotToolDetector,
     mock_messenger: AsyncMock,
     message_send_loopback: CanLoopback,
 ) -> None:
-    """It should accept serial values that cannot be decoded."""
+    """It should not crash when a tool does not respond."""
 
     def attached_tool_responder(
         node_id: NodeId, message: MessageDefinition
@@ -351,7 +372,7 @@ async def test_timeout(
                     message_definitions.PushToolsDetectedNotification(
                         payload=payloads.ToolsDetectedNotificationPayload(
                             z_motor=ToolField(ToolType.nothing_attached.value),
-                            a_motor=ToolField(ToolType.pipette_single_chan.value),
+                            a_motor=ToolField(ToolType.pipette.value),
                             gripper=ToolField(ToolType.nothing_attached.value),
                         )
                     ),
@@ -362,5 +383,7 @@ async def test_timeout(
 
     message_send_loopback.add_responder(attached_tool_responder)
 
-    with pytest.raises(asyncio.TimeoutError):
-        await subject.detect(timeout_sec=0.1)
+    responses = await subject.detect(timeout_sec=0.1)
+    assert responses.left is None
+    assert responses.right is None
+    assert responses.gripper is None

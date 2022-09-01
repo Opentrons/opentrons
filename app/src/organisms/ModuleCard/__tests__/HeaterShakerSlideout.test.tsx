@@ -43,7 +43,7 @@ describe('HeaterShakerSlideout', () => {
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: false,
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,
@@ -128,7 +128,7 @@ describe('HeaterShakerSlideout', () => {
 
   it('renders the button and it is not clickable until there is something in form field for set temp when there is a runId', () => {
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: false,
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: false,
       isRunIdle: true,

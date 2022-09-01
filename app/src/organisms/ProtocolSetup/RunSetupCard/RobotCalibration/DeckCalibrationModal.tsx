@@ -14,7 +14,7 @@ import {
 
 import RobotCalHelpImage from '../../../../assets/images/robot_calibration_help.png'
 import { Portal } from '../../../../App/portal'
-import { Modal } from '../../../../atoms/Modal'
+import { Modal } from '../../../../molecules/Modal'
 import { StyledText } from '../../../../atoms/text'
 import { PrimaryButton } from '../../../../atoms/buttons'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
@@ -43,7 +43,7 @@ export function DeckCalibrationModal({
           </StyledText>
           <ExternalLink
             href={ROBOT_CAL_HELP_ARTICLE}
-            id={'RobotCalModal_helpArticleLink'}
+            id="RobotCalModal_helpArticleLink"
           >
             {t('learn_more_about_robot_cal_link')}
           </ExternalLink>
@@ -95,7 +95,10 @@ export function DeckCalibrationModal({
               t('pipette_offset_cal_description_bullet_3'),
             ]}
           />
-          <Divider marginTop="2.5rem" marginBottom={SPACING.spacing4} />
+          <Divider
+            marginTop={SPACING.spacingXXL}
+            marginBottom={SPACING.spacing4}
+          />
           <PrimaryButton
             onClick={onCloseClick}
             alignSelf={ALIGN_FLEX_END}

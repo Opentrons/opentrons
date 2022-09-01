@@ -2,7 +2,13 @@ import Mdns from 'mdns-js'
 import { when } from 'jest-when'
 import { isEqual } from 'lodash'
 
-import { mockBaseBrowser, mockBrowserService } from '../__fixtures__'
+import {
+  mockBaseBrowser,
+  mockBrowserService,
+  mockBrowserServiceWithRobotModel,
+  mockBrowserServiceWithSurpriseTXT,
+  mockBrowserServiceWithoutTXT,
+} from '../__fixtures__'
 import * as Ifaces from '../interfaces'
 import { repeatCall as mockRepeatCall } from '../repeat-call'
 import { createMdnsBrowser } from '..'
@@ -194,6 +200,52 @@ describe('mdns browser', () => {
       name: 'opentrons-dev',
       ip: '192.168.1.42',
       port: 31950,
+      robotModel: null,
+    })
+  })
+
+  it('forwards robot model when specified', () => {
+    const browser = createMdnsBrowser({ onService, ports: [31950] })
+
+    browser.start()
+    mockBaseBrowser.emit('ready')
+    mockBaseBrowser.emit('update', mockBrowserServiceWithRobotModel)
+
+    expect(onService).toHaveBeenCalledWith({
+      name: 'opentrons-dev',
+      ip: '192.168.1.42',
+      port: 31950,
+      robotModel: 'OT-2 Standard',
+    })
+  })
+
+  it('handles totally missing txt records', () => {
+    const browser = createMdnsBrowser({ onService, ports: [31950] })
+
+    browser.start()
+    mockBaseBrowser.emit('ready')
+    mockBaseBrowser.emit('update', mockBrowserServiceWithoutTXT)
+
+    expect(onService).toHaveBeenCalledWith({
+      name: 'opentrons-dev',
+      ip: '192.168.1.42',
+      port: 31950,
+      robotModel: null,
+    })
+  })
+
+  it('handles unexpected txt records', () => {
+    const browser = createMdnsBrowser({ onService, ports: [31950] })
+
+    browser.start()
+    mockBaseBrowser.emit('ready')
+    mockBaseBrowser.emit('update', mockBrowserServiceWithSurpriseTXT)
+
+    expect(onService).toHaveBeenCalledWith({
+      name: 'opentrons-dev',
+      ip: '192.168.1.42',
+      port: 31950,
+      robotModel: 'OT-3 Standard',
     })
   })
 
@@ -242,6 +294,7 @@ describe('mdns browser', () => {
       name: 'opentrons-dev',
       ip: '192.168.1.42',
       port: 31950,
+      robotModel: null,
     })
   })
 
@@ -258,6 +311,7 @@ describe('mdns browser', () => {
       name: 'opentrons-dev',
       ip: '192.168.1.42',
       port: 12345,
+      robotModel: null,
     })
   })
 })

@@ -1,8 +1,8 @@
 import isIp from 'is-ip'
 import concat from 'lodash/concat'
-import find from 'lodash/find'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
+import find from 'lodash/find'
 import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
 import semver from 'semver'
 
@@ -16,11 +16,11 @@ import {
   CONNECTABLE,
   REACHABLE,
   UNREACHABLE,
+  RE_ROBOT_MODEL_OT3,
+  RE_ROBOT_MODEL_OT2,
+  ROBOT_MODEL_OT2,
+  ROBOT_MODEL_OT3,
 } from './constants'
-
-// TODO(mc, 2018-10-10): fix circular dependency with RPC API client
-// that requires us to bypass the robot entry point here
-import { getConnectedRobotName } from '../robot/selectors'
 
 import type { State } from '../types'
 import {
@@ -29,6 +29,7 @@ import {
   ReachableRobot,
   UnreachableRobot,
   ViewableRobot,
+  RobotModel,
 } from './types'
 
 type GetConnectableRobots = (state: State) => Robot[]
@@ -36,7 +37,7 @@ type GetReachableRobots = (state: State) => ReachableRobot[]
 type GetUnreachableRobots = (state: State) => UnreachableRobot[]
 type GetAllRobots = (state: State) => DiscoveredRobot[]
 type GetViewableRobots = (state: State) => ViewableRobot[]
-type GetConnectedRobot = (state: State) => Robot | null
+type GetLocalRobot = (state: State) => DiscoveredRobot | null
 
 // from https://github.com/reduxjs/reselect#customize-equalitycheck-for-defaultmemoize
 const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)
@@ -54,6 +55,27 @@ const isLocal = (ip: string): boolean => {
 
 const ipToHostname = (ip: string): string => (isIp.v6(ip) ? `[${ip}]` : ip)
 
+const makeRobotModel = (
+  healthModel: string | null,
+  serverHealthModel: string | null,
+  advertisedModel: string | null
+): RobotModel => {
+  return (
+    [healthModel, serverHealthModel, advertisedModel].reduce(
+      (
+        bestModel: RobotModel | null,
+        modelEntry: string | null
+      ): RobotModel | null => {
+        if (bestModel || !modelEntry) return bestModel
+        if (RE_ROBOT_MODEL_OT3.test(modelEntry)) return ROBOT_MODEL_OT3
+        if (RE_ROBOT_MODEL_OT2.test(modelEntry)) return ROBOT_MODEL_OT2
+        return null
+      },
+      null
+    ) ?? ROBOT_MODEL_OT2
+  )
+}
+
 export function getScanning(state: State): boolean {
   return state.discovery.scanning
 }
@@ -62,13 +84,13 @@ export const getDiscoveredRobots: (
   state: State
 ) => DiscoveredRobot[] = createSelector(
   state => state.discovery.robotsByName,
-  getConnectedRobotName,
-  (robotsMap, connectedRobotName) => {
+  robotsMap => {
     return Object.keys(robotsMap).map((robotName: string) => {
       const robot = robotsMap[robotName]
       const { addresses, ...robotState } = robot
-      const { health } = robotState
+      const { health, serverHealth } = robotState
       const addr = head(addresses)
+      const advertisedModel = addr?.advertisedModel ?? null
       const ip = addr?.ip ? ipToHostname(addr.ip) : null
       const port = addr?.port ?? null
       const healthStatus = addr?.healthStatus ?? null
@@ -76,9 +98,13 @@ export const getDiscoveredRobots: (
       const baseRobot = {
         ...robotState,
         displayName: makeDisplayName(robotName),
-        connected: robotName === connectedRobotName,
         local: ip !== null ? isLocal(ip) : null,
         seen: addr?.seen === true,
+        robotModel: makeRobotModel(
+          health?.robot_model ?? null,
+          serverHealth?.robotModel ?? null,
+          advertisedModel ?? null
+        ),
       }
 
       if (ip !== null && port !== null && healthStatus && serverHealthStatus) {
@@ -147,9 +173,9 @@ export const getViewableRobots: GetViewableRobots = createSelector(
   (cr: ViewableRobot[], rr: ViewableRobot[]) => concat<ViewableRobot>(cr, rr)
 )
 
-export const getConnectedRobot: GetConnectedRobot = createSelector(
-  getConnectableRobots,
-  robots => find(robots, 'connected') ?? null
+export const getLocalRobot: GetLocalRobot = createSelector(
+  getAllRobots,
+  robots => find(robots, { ip: 'localhost' }) ?? null
 )
 
 export const getRobotByName = (
@@ -207,4 +233,16 @@ export const getRobotApiVersionByName = (
 ): string | null => {
   const robot = getRobotByName(state, robotName)
   return robot ? getRobotApiVersion(robot) : null
+}
+
+export const getRobotModel = (robot: DiscoveredRobot): RobotModel => {
+  return robot.robotModel
+}
+
+export const getRobotModelByName = (
+  state: State,
+  robotName: string
+): string | null => {
+  const robot = getRobotByName(state, robotName)
+  return robot != null ? getRobotModel(robot)?.split(/\s/)[0] : null
 }

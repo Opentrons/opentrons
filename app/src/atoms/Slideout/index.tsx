@@ -68,10 +68,10 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: #16212d26;
+    background: ${COLORS.lightGreyEnabled};
   }
   &:active {
-    background: #16212d40;
+    background: ${COLORS.lightGreyHover};
   }
 `
 
@@ -108,7 +108,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
         right="0"
         top="0"
         backgroundColor={COLORS.white}
-        boxShadow={'0px 3px 6px rgba(0, 0, 0, 0.23)'}
+        boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
         height="100%"
       >
         <Flex
@@ -137,7 +137,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
               </StyledText>
               <Flex alignItems={ALIGN_CENTER}>
                 <Btn
-                  size={'1.5rem'}
+                  size="1.5rem"
                   onClick={onCloseClick}
                   aria-label="exit"
                   data-testid={`Slideout_icon_close_${
@@ -149,11 +149,9 @@ export const Slideout = (props: Props): JSX.Element | null => {
               </Flex>
             </Flex>
           ) : (
-            <React.Fragment css={{ 'overflow-wrap': 'break-word' }}>
-              {title}
-            </React.Fragment>
+            <>{title}</>
           )}
-          <Divider marginY={0} color={COLORS.medGrey} />
+          <Divider marginY={0} color={COLORS.medGreyEnabled} />
           <Box
             padding={SPACING.spacing4}
             flex="1 1 auto"

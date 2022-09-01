@@ -10,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   SPACING,
   FONT_WEIGHT_REGULAR,
-  FONT_SIZE_CAPTION,
   useInterval,
   TYPOGRAPHY,
   COLORS,
@@ -146,10 +145,10 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
 
   return (
     <Flex
-      backgroundColor={COLORS.background}
+      backgroundColor={COLORS.fundamentalsBackground}
       borderRadius={BORDERS.radiusSoftCorners}
       marginBottom={SPACING.spacing3}
-      width={'100%'}
+      width="100%"
       data-testid={`PipetteCard_${pipetteName}`}
     >
       {showChangePipette && (
@@ -271,7 +270,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.darkGrey}
               fontWeight={FONT_WEIGHT_REGULAR}
-              fontSize={FONT_SIZE_CAPTION}
+              fontSize={TYPOGRAPHY.fontSizeCaption}
               paddingBottom={SPACING.spacing2}
               data-testid={`PipetteCard_mount_${pipetteName}`}
             >

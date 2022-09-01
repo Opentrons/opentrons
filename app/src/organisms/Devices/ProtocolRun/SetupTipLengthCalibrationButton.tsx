@@ -205,7 +205,7 @@ export function SetupTipLengthCalibrationButton({
   const recalibrateLink = disableRecalibrate ? (
     <>
       <Box
-        color={COLORS.disabled}
+        color={COLORS.errorDisabled}
         css={TYPOGRAPHY.labelSemiBold}
         {...targetProps}
       >
@@ -226,7 +226,7 @@ export function SetupTipLengthCalibrationButton({
       role="link"
       onClick={() => confirm(null)}
       css={TYPOGRAPHY.labelSemiBold}
-      id={'TipRackCalibration_recalibrateTipRackLink'}
+      id="TipRackCalibration_recalibrateTipRackLink"
     >
       {t('recalibrate')}
     </Link>
@@ -241,7 +241,7 @@ export function SetupTipLengthCalibrationButton({
           <>
             <TertiaryButton
               onClick={() => handleStart(null)}
-              id={'TipRackCalibration_calibrateTipRackButton'}
+              id="TipRackCalibration_calibrateTipRackButton"
               disabled={disabled || !isDeckCalibrated}
               {...targetProps}
             >

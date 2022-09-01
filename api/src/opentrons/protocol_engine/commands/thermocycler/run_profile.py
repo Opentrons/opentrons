@@ -19,7 +19,7 @@ class RunProfileStepParams(BaseModel):
     """Input parameters for an individual Thermocycler profile step."""
 
     celsius: float = Field(..., description="Target temperature in °C.")
-    holdSeconds: int = Field(
+    holdSeconds: float = Field(
         ..., description="Time to hold target temperature at in seconds."
     )
 

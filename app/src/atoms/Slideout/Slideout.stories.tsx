@@ -1,13 +1,7 @@
 import * as React from 'react'
-import {
-  Text,
-  TYPOGRAPHY,
-  PrimaryBtn,
-  FONT_WEIGHT_REGULAR,
-  COLORS,
-  SPACING,
-} from '@opentrons/components'
+import { TYPOGRAPHY, PrimaryBtn, COLORS, SPACING } from '@opentrons/components'
 import { Slideout } from './index'
+import { StyledText } from '../text'
 
 import type { Story, Meta } from '@storybook/react'
 
@@ -23,22 +17,25 @@ const Template: Story<React.ComponentProps<typeof Slideout>> = args => (
 
 const Children = (
   <React.Fragment>
-    <Text
-      fontWeight={600}
+    <StyledText
+      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       fontSize={TYPOGRAPHY.fontSizeP}
       paddingTop={SPACING.spacing2}
     >
       {'this is where the slideout body goes'}
-    </Text>
+    </StyledText>
 
     <PrimaryBtn
-      backgroundColor={COLORS.blue}
-      marginTop={'28rem'}
+      backgroundColor={COLORS.blueEnabled}
+      marginTop="28rem"
       textTransform={TYPOGRAPHY.textTransformNone}
     >
-      <Text fontWeight={FONT_WEIGHT_REGULAR} fontSize="0.6875rem">
+      <StyledText
+        fontWeight={TYPOGRAPHY.fontWeightRegular}
+        fontSize={TYPOGRAPHY.fontSizeP}
+      >
         {'btn text'}
-      </Text>
+      </StyledText>
     </PrimaryBtn>
   </React.Fragment>
 )

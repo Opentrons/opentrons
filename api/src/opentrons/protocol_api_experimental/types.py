@@ -2,6 +2,8 @@
 from __future__ import annotations
 from enum import Enum
 
+
+from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons_shared_data.labware.dev_types import LabwareParameters
 
 from opentrons.types import (
@@ -14,7 +16,6 @@ from opentrons.types import (
 
 from opentrons.protocol_engine import (
     DeckSlotLocation,
-    PipetteName,
     ModuleLocation,
     ModuleModel,
 )

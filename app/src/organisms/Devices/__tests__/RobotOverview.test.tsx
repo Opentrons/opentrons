@@ -51,7 +51,7 @@ const mockRobotOverviewOverflowMenu = RobotOverviewOverflowMenu as jest.MockedFu
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
 >
-const mockUseRunStatues = useRunStatuses as jest.MockedFunction<
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
 const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
@@ -77,8 +77,8 @@ describe('RobotOverview', () => {
 
   beforeEach(() => {
     dispatchApiRequest = jest.fn()
-    mockUseRunStatues.mockReturnValue({
-      isLegacySessionInProgress: false,
+    mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,
@@ -164,8 +164,8 @@ describe('RobotOverview', () => {
 
   it('renders run a protocol button as disabled when run is not terminal and run id is not null', () => {
     mockUseCurrentRunId.mockReturnValue('id')
-    mockUseRunStatues.mockReturnValue({
-      isLegacySessionInProgress: false,
+    mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: false,
       isRunIdle: false,
@@ -189,8 +189,8 @@ describe('RobotOverview', () => {
 
   it('renders run a protocol button as not disabled when run id is null but run status is not terminal', () => {
     mockUseCurrentRunId.mockReturnValue(null)
-    mockUseRunStatues.mockReturnValue({
-      isLegacySessionInProgress: false,
+    mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,

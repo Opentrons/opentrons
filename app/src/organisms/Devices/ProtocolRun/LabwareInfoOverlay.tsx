@@ -9,21 +9,19 @@ import {
   SPACING,
   COLORS,
   TYPOGRAPHY,
-  OVERLAY_BLACK_80,
   DISPLAY_FLEX,
   DIRECTION_COLUMN,
   JUSTIFY_FLEX_END,
-  FONT_SIZE_CAPTION,
   Icon,
   DIRECTION_ROW,
   ALIGN_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
+import { OffsetVector } from '../../../molecules/OffsetVector'
+import { useLabwareOffsetForLabware } from '../../LabwarePositionCheck/hooks/useLabwareOffsetForLabware'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import { useLabwareOffsetForLabware } from '../../LabwarePositionCheck/hooks/useLabwareOffsetForLabware'
-import { OffsetVector } from '../../../molecules/OffsetVector'
 interface LabwareInfoProps {
   displayName: string | null
   definitionDisplayName: string
@@ -48,9 +46,9 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
 
   return (
     <Box
-      backgroundColor={hover ? COLORS.blue : OVERLAY_BLACK_80}
-      borderRadius={`0 0 0.4rem 0.4rem`}
-      fontSize={FONT_SIZE_CAPTION}
+      backgroundColor={hover ? COLORS.blueEnabled : '#000000B3'}
+      borderRadius="0 0 0.4rem 0.4rem"
+      fontSize={TYPOGRAPHY.fontSizeCaption}
       padding={SPACING.spacing2}
       color={COLORS.white}
       id={`LabwareInfoOverlay_slot_${labwareId}_offsetBox`}
@@ -70,12 +68,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
           {displayName ?? definitionDisplayName}
         </StyledText>
         {props.labwareHasLiquid && (
-          <Icon
-            name="water"
-            color={COLORS.white}
-            width={'0'}
-            minWidth={'1rem'}
-          />
+          <Icon name="water" color={COLORS.white} width="0" minWidth="1rem" />
         )}
       </Flex>
       {vector != null && (
@@ -84,7 +77,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
             as="h6"
             lineHeight={TYPOGRAPHY.fontSizeCaption}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            textTransform={'uppercase'}
+            textTransform="uppercase"
           >
             {t('offset_data')}
           </StyledText>

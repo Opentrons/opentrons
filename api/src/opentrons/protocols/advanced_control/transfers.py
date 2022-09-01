@@ -18,7 +18,7 @@ from opentrons import types
 from opentrons.protocols.api_support.types import APIVersion
 
 if TYPE_CHECKING:
-    from opentrons.protocol_api.contexts import InstrumentContext
+    from opentrons.protocol_api import InstrumentContext
     from opentrons.protocols.execution.dev_types import Dictable
 
 

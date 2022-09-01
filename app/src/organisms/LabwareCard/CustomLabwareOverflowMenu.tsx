@@ -24,7 +24,7 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { AlertPrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
-import { Modal } from '../../atoms/Modal'
+import { Modal } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import {
   deleteCustomLabwareFile,
@@ -105,8 +105,8 @@ export function CustomLabwareOverflowMenu(
         <Flex
           ref={overflowMenuRef}
           zIndex={10}
-          borderRadius={'4px 4px 0px 0px'}
-          boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+          borderRadius="4px 4px 0px 0px"
+          boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
           top={SPACING.spacing6}

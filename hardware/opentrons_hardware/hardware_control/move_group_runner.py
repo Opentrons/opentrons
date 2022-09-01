@@ -107,7 +107,7 @@ class MoveGroupRunner:
             return {}
         if not self._is_prepped:
             raise RuntimeError("A group must be prepped before it can be executed.")
-        move_completion_data = await self._move(can_messenger)
+        move_completion_data = await self._move(can_messenger, self._start_at_index)
         return self._accumulate_move_completions(move_completion_data)
 
     async def run(self, can_messenger: CanMessenger) -> NodeDict[Tuple[float, float]]:
@@ -146,7 +146,7 @@ class MoveGroupRunner:
                         completion.payload.seq_id.value,
                     ),
                     float(completion.payload.current_position_um.value) / 1000.0,
-                    float(completion.payload.encoder_position.value) / 1000.0,
+                    float(completion.payload.encoder_position_um.value) / 1000.0,
                 )
             )
         # for each node, pull the position from the completion with the largest
@@ -272,9 +272,11 @@ class MoveGroupRunner:
         )
         return TipActionRequest(payload=tip_action_payload)
 
-    async def _move(self, can_messenger: CanMessenger) -> _Completions:
+    async def _move(
+        self, can_messenger: CanMessenger, start_at_index: int
+    ) -> _Completions:
         """Run all the move groups."""
-        scheduler = MoveScheduler(self._move_groups)
+        scheduler = MoveScheduler(self._move_groups, start_at_index)
         try:
             can_messenger.add_listener(scheduler)
             completions = await scheduler.run(can_messenger)
@@ -286,12 +288,13 @@ class MoveGroupRunner:
 class MoveScheduler:
     """A message listener that manages the sending of execute move group messages."""
 
-    def __init__(self, move_groups: MoveGroups) -> None:
+    def __init__(self, move_groups: MoveGroups, start_at_index: int = 0) -> None:
         """Constructor."""
         # For each move group create a set identifying the node and seq id.
         self._moves: List[Set[Tuple[int, int]]] = []
         self._durations: List[float] = []
         self._stop_condition: List[MoveStopCondition] = []
+        self._start_at_index = start_at_index
         for move_group in move_groups:
             move_set = set()
             duration = 0.0
@@ -311,44 +314,55 @@ class MoveScheduler:
         self, message: _AcceptableMoves, arbitration_id: ArbitrationId
     ) -> None:
         seq_id = message.payload.seq_id.value
-        group_id = message.payload.group_id.value
+        group_id = message.payload.group_id.value - self._start_at_index
         node_id = arbitration_id.parts.originating_node_id
-        log.info(
-            f"Received completion for {node_id} group {group_id} seq {seq_id}"
-            ", which "
-            f"{'is' if (node_id, seq_id) in self._moves[group_id] else 'isn''t'}"
-            " in group"
-        )
         try:
+            in_group = (node_id, seq_id) in self._moves[group_id]
             self._moves[group_id].remove((node_id, seq_id))
             self._completion_queue.put_nowait((arbitration_id, message))
+            log.info(
+                f"Received completion for {node_id} group {group_id} seq {seq_id}"
+                f", which {'is' if in_group else 'isn''t'} in group"
+            )
         except KeyError:
             log.warning(
                 f"Got a move ack for ({node_id}, {seq_id}) which is not in this "
                 "group; may have leaked from an earlier timed-out group"
             )
+        except IndexError:
+            # If we have two move groups running at once, we need to handle
+            # moves from a group we don't own
+            return
 
         if not self._moves[group_id]:
-            log.info(f"Move group {group_id} has completed.")
+            log.info(f"Move group {group_id+self._start_at_index} has completed.")
             self._event.set()
 
     def _handle_move_completed(self, message: MoveCompleted) -> None:
-        group_id = message.payload.group_id.value
+        group_id = message.payload.group_id.value - self._start_at_index
         ack_id = message.payload.ack_id.value
-        if self._stop_condition[
-            group_id
-        ] == MoveStopCondition.limit_switch and ack_id != UInt8Field(2):
-            if ack_id == UInt8Field(1):
-                condition = "Homing timed out."
-                log.warning(f"Homing failed. Condition: {condition}")
-                raise MoveConditionNotMet()
+        try:
+            if self._stop_condition[
+                group_id
+            ] == MoveStopCondition.limit_switch and ack_id != UInt8Field(2):
+                if ack_id == UInt8Field(1):
+                    condition = "Homing timed out."
+                    log.warning(f"Homing failed. Condition: {condition}")
+                    raise MoveConditionNotMet()
+        except IndexError:
+            # If we have two move group runners running at once, they each
+            # pick up groups they don't care about, and need to not fail.
+            pass
 
     def _handle_tip_action(self, message: TipActionResponse) -> None:
-        group_id = message.payload.group_id.value
+        group_id = message.payload.group_id.value - self._start_at_index
         ack_id = message.payload.ack_id.value
-        limit_switch = bool(
-            self._stop_condition[group_id] == MoveStopCondition.limit_switch
-        )
+        try:
+            limit_switch = bool(
+                self._stop_condition[group_id] == MoveStopCondition.limit_switch
+            )
+        except IndexError:
+            return
         success = message.payload.success.value
         # TODO need to add tip action type to the response message.
         if limit_switch and limit_switch != ack_id and not success:
@@ -373,7 +387,9 @@ class MoveScheduler:
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
-        for group_id in range(len(self._moves)):
+        for group_id in range(
+            self._start_at_index, self._start_at_index + len(self._moves)
+        ):
             self._event.clear()
 
             log.info(f"Executing move group {group_id}.")
@@ -397,7 +413,8 @@ class MoveScheduler:
                 # for short move durations we can see the timeout expiring before
                 # the execute even gets sent.
                 await asyncio.wait_for(
-                    self._event.wait(), max(1.0, self._durations[group_id] * 1.1)
+                    self._event.wait(),
+                    max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
                 )
             except asyncio.TimeoutError:
                 log.warning("Move set timed out")

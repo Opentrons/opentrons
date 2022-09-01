@@ -94,6 +94,10 @@ class MagDeck(mod_abc.AbstractModule):
         """Get the module name."""
         return "magdeck"
 
+    def firmware_prefix(self) -> str:
+        """The prefix used for looking up firmware"""
+        return "magnetic-module"
+
     def model(self) -> str:
         """Get the model."""
         return self._model_from_revision(self._device_info.get("model"))

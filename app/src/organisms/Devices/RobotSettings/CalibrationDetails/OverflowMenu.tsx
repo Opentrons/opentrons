@@ -28,8 +28,8 @@ import { useTrackEvent } from '../../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../redux/calibration'
 import {
   useDeckCalibrationData,
-  useIsRobotBusy,
   usePipetteOffsetCalibrations,
+  useRunStatuses,
   useTipLengthCalibrations,
 } from '../../hooks'
 import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
@@ -63,7 +63,7 @@ export function OverflowMenu({
   serialNumber,
   updateRobotStatus,
 }: OverflowMenuProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'shared'])
   const doTrackEvent = useTrackEvent()
   const {
     menuOverlay,
@@ -88,7 +88,7 @@ export function OverflowMenu({
     calBlockModalState,
     setCalBlockModalState,
   ] = React.useState<CalBlockModalState>(CAL_BLOCK_MODAL_CLOSED)
-  const isBusy = useIsRobotBusy()
+  const { isRunRunning: isRunning } = useRunStatuses()
 
   interface StartWizardOptions {
     keepTipLength: boolean
@@ -136,9 +136,7 @@ export function OverflowMenu({
     e: React.MouseEvent
   ): void => {
     e.preventDefault()
-    if (isBusy) {
-      updateRobotStatus(true)
-    } else {
+    if (!isRunning) {
       if (calType === 'pipetteOffset') {
         if (applicablePipetteOffsetCal != null) {
           // recalibrate pipette offset
@@ -183,6 +181,17 @@ export function OverflowMenu({
     setShowOverflowMenu(!showOverflowMenu)
   }
 
+  let disabledReason = null
+  if (isRunning) {
+    disabledReason = t('shared:disabled_protocol_is_running')
+  }
+
+  React.useEffect(() => {
+    if (isRunning) {
+      updateRobotStatus(true)
+    }
+  }, [isRunning, updateRobotStatus])
+
   // TODO 5/6/2021 kj: This is scoped out from 6.0
   // const handleDeleteCalibrationData = (
   //   calType: 'pipetteOffset' | 'tipLength'
@@ -214,17 +223,20 @@ export function OverflowMenu({
       {showOverflowMenu ? (
         <Flex
           ref={calsOverflowWrapperRef}
-          width={calType === 'pipetteOffset' ? '11.5rem' : '17.25rem'}
+          whiteSpace="nowrap"
           zIndex={10}
-          borderRadius={'4px 4px 0px 0px'}
-          boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+          borderRadius="4px 4px 0px 0px"
+          boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
           top="2.3rem"
           right={0}
           flexDirection={DIRECTION_COLUMN}
         >
-          <MenuItem onClick={e => handleCalibration(calType, e)}>
+          <MenuItem
+            onClick={e => handleCalibration(calType, e)}
+            disabled={disabledReason !== null}
+          >
             {calType === 'pipetteOffset'
               ? applicablePipetteOffsetCal != null
                 ? t('recalibrate_pipette')

@@ -8,17 +8,17 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   StyleProps,
+  COLORS,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
-// Note hex codes will be replaced when PR-10664 is merged into release-6.0.0
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: #16212d26;
+    background: ${COLORS.lightGreyEnabled};
   }
   &:active {
-    background: #16212d40;
+    background: ${COLORS.lightGreyHover};
   }
 `
 
@@ -52,7 +52,7 @@ export function CollapsibleSection(
           }
         >
           <Icon
-            size={'1.5rem'}
+            size="1.5rem"
             name={isExpanded ? 'minus' : 'plus'}
             css={ACCORDION_STYLE}
           />

@@ -25,11 +25,11 @@ import {
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { useProtocolDetailsForRun } from '../../../Devices/hooks'
 import { StyledText } from '../../../../atoms/text'
+import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 import {
   getTotalVolumePerLiquidId,
   getTotalVolumePerLiquidLabwarePair,
-  getSlotLabwareName,
 } from './utils'
 
 import type { LabwareByLiquidId } from '@opentrons/api-client'
@@ -51,9 +51,9 @@ export function SetupLiquidsList(props: SetupLiquidsListProps): JSX.Element {
     <Flex
       css={HIDE_SCROLLBAR}
       flexDirection={DIRECTION_COLUMN}
-      maxHeight={'31.25rem'}
-      overflowY={'auto'}
-      data-testid={'SetupLiquidsList_ListView'}
+      maxHeight="31.25rem"
+      overflowY="auto"
+      data-testid="SetupLiquidsList_ListView"
       gridGap={SPACING.spacing3}
     >
       {liquidsInLoadOrder?.map(liquid => (
@@ -109,8 +109,8 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
       css={LIQUID_CARD_STYLE}
       padding={SPACING.spacing4}
       onClick={() => setOpenItem(!openItem)}
-      backgroundColor={openItem ? COLORS.lightGrey : COLORS.white}
-      data-testid={'LiquidsListItem_Row'}
+      backgroundColor={openItem ? COLORS.fundamentalsBackground : COLORS.white}
+      data-testid="LiquidsListItem_Row"
     >
       <LiquidsListItemDetails
         liquidId={liquidId}
@@ -170,7 +170,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
               <Box
                 css={LIQUID_CARD_ITEM_STYLE}
                 key={index}
-                borderRadius={'4px'}
+                borderRadius="4px"
                 marginBottom={SPACING.spacing3}
                 padding={SPACING.spacing4}
                 backgroundColor={COLORS.white}
@@ -198,7 +198,7 @@ export function LiquidsListItem(props: LiquidsListItemProps): JSX.Element {
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightRegular}
                     minWidth="4.25rem"
-                    marginLeft="auto"
+                    marginLeft={SPACING.spacingAuto}
                   >
                     {getTotalVolumePerLiquidLabwarePair(
                       liquidId,
@@ -239,8 +239,8 @@ export const LiquidsListItemDetails = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Flex
         css={BORDERS.cardOutlineBorder}
-        padding={'0.75rem'}
-        height={'max-content'}
+        padding="0.75rem"
+        height="max-content"
         backgroundColor={COLORS.white}
       >
         <Icon name="circle" color={displayColor} size={SIZE_1} />
@@ -263,9 +263,9 @@ export const LiquidsListItemDetails = (
         </StyledText>
       </Flex>
       <Flex
-        backgroundColor={COLORS.darkBlack + '1A'}
+        backgroundColor={COLORS.darkBlackEnabled + '1A'}
         borderRadius={BORDERS.radiusSoftCorners}
-        height={'max-content'}
+        height="max-content"
         paddingY={SPACING.spacing2}
         paddingX={SPACING.spacing3}
         alignSelf={ALIGN_CENTER}

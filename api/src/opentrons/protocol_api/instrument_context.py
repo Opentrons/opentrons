@@ -10,25 +10,27 @@ from opentrons.commands import commands as cmds
 
 from opentrons.commands import publisher
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
+from opentrons.protocols.advanced_control import transfers
+
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support import instrument
 from opentrons.protocols.api_support.labware_like import LabwareLike
-from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.protocol_api.module_contexts import ThermocyclerContext
 from opentrons.protocols.api_support.util import (
     FlowRates,
     PlungerSpeeds,
     Clearances,
     clamp_value,
     requires_version,
+    APIVersionError,
 )
-from opentrons.protocols.context.instrument import AbstractInstrument
-from opentrons.protocols.api_support.types import APIVersion
 
+from .core.instrument import AbstractInstrument
+from .core.well import AbstractWellCore
+from .module_contexts import ThermocyclerContext, HeaterShakerContext
 from . import labware
-from opentrons.protocols.advanced_control import transfers
 
 if TYPE_CHECKING:
-    from opentrons.protocol_api import ProtocolContext
+    from .protocol_context import ProtocolContext
 
 AdvancedLiquidHandling = Union[
     labware.Well,
@@ -60,7 +62,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     def __init__(
         self,
-        implementation: AbstractInstrument,
+        implementation: AbstractInstrument[AbstractWellCore],
         ctx: ProtocolContext,
         broker: Broker,
         at_version: APIVersion,
@@ -430,19 +432,20 @@ class InstrumentContext(publisher.CommandPublisher):
                     "Blow_out being performed on a tiprack. "
                     "Please re-check your code"
                 )
-            loc = location.top()
-            self.move_to(loc, publish=False)
+            checked_loc = location.top()
+            self.move_to(checked_loc, publish=False)
         elif isinstance(location, types.Location):
-            loc = location
-            self.move_to(loc, publish=False)
+            checked_loc = location
+            self.move_to(checked_loc, publish=False)
         elif location is not None:
             raise TypeError(
                 "location should be a Well or Location, but it is {}".format(location)
             )
         elif self._ctx.location_cache:
-            # if location cache exists, pipette blows out immediately at
+            checked_loc = self._ctx.location_cache
+            # if no explicit location given but location cache exists,
+            # pipette blows out immediately at
             # current location, no movement is needed
-            pass
         else:
             raise RuntimeError(
                 "If blow out is called without an explicit location, another"
@@ -453,10 +456,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         with publisher.publish_context(
             broker=self.broker,
-            command=cmds.blow_out(
-                instrument=self,
-                location=location or self._ctx.location_cache,  # type: ignore[arg-type]
-            ),
+            command=cmds.blow_out(instrument=self, location=checked_loc),
         ):
             self._implementation.blow_out()
 
@@ -1250,16 +1250,15 @@ class InstrumentContext(publisher.CommandPublisher):
         for mod in self._ctx._modules:
             if isinstance(mod, ThermocyclerContext):
                 mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
+            if isinstance(mod, HeaterShakerContext):
+                mod.flag_unsafe_move(to_loc=location, is_multichannel=self.channels > 1)
 
         publish_ctx = nullcontext()
 
         if publish:
             publish_ctx = publisher.publish_context(
                 broker=self.broker,
-                command=cmds.move_to(
-                    instrument=self,
-                    location=location or self._ctx.location_cache,  # type: ignore[arg-type]
-                ),
+                command=cmds.move_to(instrument=self, location=location),
             )
         with publish_ctx:
             self._implementation.move_to(

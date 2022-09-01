@@ -1,9 +1,6 @@
 import React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import {
-  useCreateCommandMutation,
-  useCreateLiveCommandMutation,
-} from '@opentrons/react-api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
@@ -14,11 +11,15 @@ import {
   Icon,
   SIZE_AUTO,
   SPACING,
-  Text,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-import { RPM, HS_RPM_MAX, HS_RPM_MIN } from '@opentrons/shared-data'
+import {
+  RPM,
+  HS_RPM_MAX,
+  HS_RPM_MIN,
+  CreateCommand,
+} from '@opentrons/shared-data'
 import { TertiaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
 import { StyledText } from '../../../atoms/text'
@@ -26,14 +27,13 @@ import { Divider } from '../../../atoms/structure'
 import { InputField } from '../../../atoms/InputField'
 import { Collapsible } from '../../ModuleCard/Collapsible'
 import { useLatchControls } from '../../ModuleCard/hooks'
-import { useModuleIdFromRun } from '../../ModuleCard/useModuleIdFromRun'
-import { useRunStatuses } from '../hooks'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type {
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
+  HeaterShakerCloseLatchCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
 import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
@@ -41,26 +41,29 @@ interface TestShakeProps {
   module: HeaterShakerModule
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>
   moduleFromProtocol?: ProtocolModuleInfo
-  currentRunId?: string
 }
 
 export function TestShake(props: TestShakeProps): JSX.Element {
-  const { module, setCurrentPage, moduleFromProtocol, currentRunId } = props
+  const { module, setCurrentPage, moduleFromProtocol } = props
   const { t } = useTranslation(['heater_shaker', 'device_details'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { createCommand } = useCreateCommandMutation()
   const [isExpanded, setExpanded] = React.useState(false)
-  const { isRunIdle, isRunTerminal } = useRunStatuses()
   const [shakeValue, setShakeValue] = React.useState<string | null>(null)
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const { toggleLatch, isLatchClosed } = useLatchControls(module, currentRunId)
-  const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
+  const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const isShaking = module.data.speedStatus !== 'idle'
+
+  const closeLatchCommand: HeaterShakerCloseLatchCreateCommand = {
+    commandType: 'heaterShaker/closeLabwareLatch',
+    params: {
+      moduleId: module.id,
+    },
+  }
 
   const setShakeCommand: HeaterShakerSetAndWaitForShakeSpeedCreateCommand = {
     commandType: 'heaterShaker/setAndWaitForShakeSpeed',
     params: {
-      moduleId: isRunIdle ? moduleIdFromRun : module.id,
+      moduleId: module.id,
       rpm: shakeValue !== null ? parseInt(shakeValue) : 0,
     },
   }
@@ -68,33 +71,26 @@ export function TestShake(props: TestShakeProps): JSX.Element {
   const stopShakeCommand: HeaterShakerDeactivateShakerCreateCommand = {
     commandType: 'heaterShaker/deactivateShaker',
     params: {
-      moduleId: isRunIdle ? moduleIdFromRun : module.id,
+      moduleId: module.id,
     },
   }
 
-  const handleShakeCommand = (): void => {
-    if (isRunIdle && currentRunId != null) {
-      createCommand({
-        runId: currentRunId,
-        command: isShaking ? stopShakeCommand : setShakeCommand,
+  const sendCommands = async (): Promise<void> => {
+    const commands: CreateCommand[] = isShaking
+      ? [stopShakeCommand]
+      : [closeLatchCommand, setShakeCommand]
+
+    for (const command of commands) {
+      // await each promise to make sure the server receives requests in the right order
+      await createLiveCommand({
+        command,
       }).catch((e: Error) => {
         console.error(
-          `error setting module status with command type ${
-            stopShakeCommand.commandType ?? setShakeCommand.commandType
-          }: ${e.message}`
-        )
-      })
-    } else if (isRunTerminal || currentRunId == null) {
-      createLiveCommand({
-        command: isShaking ? stopShakeCommand : setShakeCommand,
-      }).catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${
-            stopShakeCommand.commandType ?? setShakeCommand.commandType
-          }: ${e.message}`
+          `error setting module status with command type ${command.commandType}: ${e.message}`
         )
       })
     }
+
     setShakeValue(null)
   }
 
@@ -112,11 +108,11 @@ export function TestShake(props: TestShakeProps): JSX.Element {
       <Flex
         marginTop={SPACING.spacing3}
         marginBottom={SPACING.spacing4}
-        backgroundColor={COLORS.background}
+        backgroundColor={COLORS.fundamentalsBackground}
         paddingTop={SPACING.spacing4}
         paddingLeft={SPACING.spacing4}
         flexDirection={DIRECTION_ROW}
-        data-testid={'test_shake_banner_info'}
+        data-testid="test_shake_banner_info"
       >
         <Flex
           size={SPACING.spacing6}
@@ -131,7 +127,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           fontSize={TYPOGRAPHY.fontSizeP}
           paddingBottom={SPACING.spacing4}
         >
-          <Text fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
             <Trans
               t={t}
               i18nKey={
@@ -145,14 +141,14 @@ export function TestShake(props: TestShakeProps): JSX.Element {
               components={{
                 bold: <strong />,
                 block: (
-                  <Text
+                  <StyledText
                     fontSize={TYPOGRAPHY.fontSizeH2}
                     marginBottom={SPACING.spacing5}
                   />
                 ),
               }}
             />
-          </Text>
+          </StyledText>
         </Flex>
       </Flex>
       <Flex
@@ -183,7 +179,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
               {t('set_shake_speed')}
             </StyledText>
             <InputField
-              data-testid={`TestShake_shake_input`}
+              data-testid="TestShake_shake_input"
               units={RPM}
               value={shakeValue}
               onChange={e => setShakeValue(e.target.value)}
@@ -199,8 +195,12 @@ export function TestShake(props: TestShakeProps): JSX.Element {
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
             marginTop={SPACING.spacing4}
-            onClick={handleShakeCommand}
-            disabled={!isLatchClosed || (shakeValue === null && !isShaking)}
+            onClick={sendCommands}
+            disabled={
+              !isLatchClosed ||
+              (shakeValue === null && !isShaking) ||
+              errorMessage != null
+            }
             {...targetProps}
           >
             {isShaking ? t('stop_shaking') : t('start_shaking')}
@@ -221,9 +221,7 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           alignItems={ALIGN_FLEX_START}
           marginY={SPACING.spacing6}
         >
-          <StyledText width="22rem">
-            {t('troubleshoot_step1_description')}
-          </StyledText>
+          <StyledText width="22rem">{t('troubleshoot_step_1')}</StyledText>
           <TertiaryButton
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
@@ -233,15 +231,13 @@ export function TestShake(props: TestShakeProps): JSX.Element {
           </TertiaryButton>
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
-          <StyledText width="22rem">
-            {t('troubleshoot_step2_description')}
-          </StyledText>
+          <StyledText width="22rem">{t('troubleshoot_step_3')}</StyledText>
           <TertiaryButton
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
-            onClick={() => setCurrentPage(3)}
+            onClick={() => setCurrentPage(4)}
           >
-            {t('go_to_step_2')}
+            {t('go_to_step_3')}
           </TertiaryButton>
         </Flex>
       </Collapsible>

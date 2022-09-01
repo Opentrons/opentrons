@@ -23,11 +23,9 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons import config
 from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
-from opentrons.calibration_storage import delete, modify, helpers
+from opentrons.calibration_storage import modify, helpers
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Mount
-from opentrons.protocols.geometry.deck import Deck
 
 from robot_server import app
 from robot_server.hardware import get_hardware
@@ -203,24 +201,6 @@ def attach_pipettes(server_temp_directory: str) -> Iterator[None]:
 
 
 @pytest.fixture
-def set_up_index_file_temporary_directory(server_temp_directory: str) -> None:
-    delete.clear_calibrations()
-    deck = Deck()
-    labware_list = [
-        "nest_96_wellplate_2ml_deep",
-        "corning_384_wellplate_112ul_flat",
-        "geb_96_tiprack_1000ul",
-        "nest_12_reservoir_15ml",
-        "opentrons_96_tiprack_10ul",
-    ]
-    for idx, name in enumerate(labware_list):
-        parent = deck.position_for(idx + 1)
-        definition = labware.get_labware_definition(name)
-        lw = labware.Labware(implementation=LabwareImplementation(definition, parent))
-        labware.save_calibration(lw, Point(0, 0, 0))
-
-
-@pytest.fixture
 def set_up_pipette_offset_temp_directory(server_temp_directory: str) -> None:
     attached_pip_list = ["123", "321"]
     mount_list = [Mount.LEFT, Mount.RIGHT]
@@ -264,13 +244,13 @@ def session_manager(hardware: HardwareControlAPI) -> SessionManager:
 
 
 @pytest.fixture
-def set_enable_http_protocol_sessions(
+def set_disable_fast_analysis(
     request_session: requests.Session,
 ) -> Iterator[None]:
     """For integration tests that need to set then clear the
     enableHttpProtocolSessions feature flag"""
     url = "http://localhost:31950/settings"
-    data = {"id": "enableHttpProtocolSessions", "value": True}
+    data = {"id": "disableFastProtocolUpload", "value": True}
     request_session.post(url, json=data)
     yield None
     data["value"] = None

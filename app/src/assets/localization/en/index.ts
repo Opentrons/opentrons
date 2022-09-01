@@ -1,5 +1,7 @@
 import shared from './shared.json'
 import app_settings from './app_settings.json'
+import change_pipette from './change_pipette.json'
+import commands_run_log from './commands_run_log.json'
 import device_details from './device_details.json'
 import device_settings from './device_settings.json'
 import devices_landing from './devices_landing.json'
@@ -25,6 +27,8 @@ import top_navigation from './top_navigation.json'
 export const en = {
   shared,
   app_settings,
+  change_pipette,
+  commands_run_log,
   device_details,
   device_settings,
   devices_landing,

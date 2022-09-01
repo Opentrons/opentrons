@@ -14,10 +14,10 @@ import {
 import { ToggleBtn, ToggleBtnProps } from '../ToggleBtn'
 
 export const TertiaryButton = styled(NewPrimaryBtn)`
-  background-color: ${COLORS.blue};
+  background-color: ${COLORS.blueEnabled};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${COLORS.background};
+  color: ${COLORS.fundamentalsBackground};
   overflow: no-wrap;
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
@@ -36,12 +36,12 @@ export const TertiaryButton = styled(NewPrimaryBtn)`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
   }
 
   &:disabled {
-    background-color: ${COLORS.greyDisabled};
-    color: ${COLORS.disabled};
+    background-color: ${COLORS.darkGreyDisabled};
+    color: ${COLORS.errorDisabled};
   }
 `
 
@@ -49,7 +49,7 @@ export const SecondaryTertiaryButton = styled(NewSecondaryBtn)`
   background-color: ${COLORS.white};
   border-radius: ${BORDERS.radiusRoundEdge};
   box-shadow: none;
-  color: ${COLORS.blue};
+  color: ${COLORS.blueEnabled};
   overflow: no-wrap;
   padding: 0.375rem 0.75rem;
   text-transform: ${TYPOGRAPHY.textTransformNone};
@@ -61,7 +61,7 @@ export const SecondaryTertiaryButton = styled(NewSecondaryBtn)`
     box-shadow: 0 0 0;
   }
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
   }
 
   &:disabled {
@@ -70,7 +70,7 @@ export const SecondaryTertiaryButton = styled(NewSecondaryBtn)`
 `
 
 export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
-  background-color: ${COLORS.error};
+  background-color: ${COLORS.errorEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
@@ -85,7 +85,7 @@ export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
 `
 
 export const PrimaryButton = styled(NewPrimaryBtn)`
-  background-color: ${COLORS.blue};
+  background-color: ${COLORS.blueEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   box-shadow: none;
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
@@ -102,7 +102,7 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
   }
 
   &:active {
@@ -110,13 +110,13 @@ export const PrimaryButton = styled(NewPrimaryBtn)`
   }
 
   &:disabled {
-    background-color: ${COLORS.greyDisabled};
-    color: ${COLORS.disabled};
+    background-color: ${COLORS.darkGreyDisabled};
+    color: ${COLORS.errorDisabled};
   }
 `
 
 export const SecondaryButton = styled(NewSecondaryBtn)`
-  color: ${COLORS.blue};
+  color: ${COLORS.blueEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing3} ${SPACING.spacing4};
   text-transform: ${TYPOGRAPHY.textTransformNone};
@@ -132,7 +132,7 @@ export const SecondaryButton = styled(NewSecondaryBtn)`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
   }
 
   &:disabled {
@@ -148,27 +148,27 @@ const TOGGLE_DISABLED_STYLES = css`
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
   }
 
   &:disabled {
-    color: ${COLORS.greyDisabled};
+    color: ${COLORS.darkGreyDisabled};
   }
 `
 
 const TOGGLE_ENABLED_STYLES = css`
-  color: ${COLORS.blue};
+  color: ${COLORS.blueEnabled};
 
   &:hover {
     color: ${COLORS.blueHover};
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+    box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
   }
 
   &:disabled {
-    color: ${COLORS.greyDisabled};
+    color: ${COLORS.darkGreyDisabled};
   }
 `
 
@@ -192,7 +192,7 @@ export const SubmitPrimaryButton = (
   props: SubmitPrimaryButtonProps
 ): JSX.Element => {
   const SUBMIT_INPUT_STYLE = css`
-    background-color: ${COLORS.blue};
+    background-color: ${COLORS.blueEnabled};
     border-radius: ${BORDERS.radiusSoftCorners};
     padding: ${SPACING.spacing3} ${SPACING.spacing4};
     color: ${COLORS.white};
@@ -204,7 +204,7 @@ export const SubmitPrimaryButton = (
     ${styleProps}
 
     &:focus-visible {
-      box-shadow: 0 0 0 3px ${COLORS.warning};
+      box-shadow: 0 0 0 3px ${COLORS.warningEnabled};
     }
 
     &:hover {
@@ -217,8 +217,8 @@ export const SubmitPrimaryButton = (
     }
 
     &:disabled {
-      background-color: ${COLORS.greyDisabled};
-      color: ${COLORS.disabled};
+      background-color: ${COLORS.darkGreyDisabled};
+      color: ${COLORS.successDisabled};
     }
   `
   return <input {...props} css={SUBMIT_INPUT_STYLE} type="submit" />

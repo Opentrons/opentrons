@@ -4,7 +4,6 @@ import {
   CommandCreator,
   CurriedCommandCreator,
   HeaterShakerArgs,
-  HeaterShakerModuleState,
 } from '../../types'
 import { getModuleState } from '../../robotStateSelectors'
 import { delay } from '../atomic/delay'
@@ -21,12 +20,14 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const heaterShakerState = getModuleState(
-    prevRobotState,
-    args.module
-  ) as HeaterShakerModuleState
+  if (args.module == null) {
+    return {
+      errors: [errorCreators.missingModuleError()],
+    }
+  }
+  const heaterShakerState = getModuleState(prevRobotState, args.module)
 
-  if (heaterShakerState === null) {
+  if (heaterShakerState == null) {
     return {
       errors: [errorCreators.missingModuleError()],
     }

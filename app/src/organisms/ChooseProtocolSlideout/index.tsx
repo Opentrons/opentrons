@@ -20,7 +20,6 @@ import {
   DISPLAY_BLOCK,
   Icon,
   COLORS,
-  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
 import { useLogger } from '../../logger'
@@ -147,7 +146,7 @@ export function ChooseProtocolSlideout(
               >
                 <Box display="grid" gridTemplateColumns="1fr 3fr">
                   <Box
-                    marginY="auto"
+                    marginY={SPACING.spacingAuto}
                     backgroundColor={isSelected ? COLORS.white : 'inherit'}
                     marginRight={SPACING.spacing4}
                     height="4.25rem"
@@ -176,7 +175,7 @@ export function ChooseProtocolSlideout(
                     <Icon
                       name="alert-circle"
                       size="1.25rem"
-                      color={COLORS.error}
+                      color={COLORS.errorEnabled}
                     />
                   </>
                 ) : null}
@@ -224,7 +223,11 @@ export function ChooseProtocolSlideout(
           padding={SPACING.spacing4}
           css={BORDERS.cardOutlineBorder}
         >
-          <Icon size="1.25rem" name="alert-circle" color={COLORS.medGrey} />
+          <Icon
+            size="1.25rem"
+            name="alert-circle"
+            color={COLORS.medGreyEnabled}
+          />
           <StyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -236,7 +239,7 @@ export function ChooseProtocolSlideout(
           <StyledText
             as="p"
             marginTop={SPACING.spacing3}
-            textAlign={TEXT_ALIGN_CENTER}
+            textAlign={TYPOGRAPHY.textAlignCenter}
           >
             <Trans
               t={t}

@@ -42,7 +42,7 @@ const OUTER_STYLE = css`
 const INNER_STYLE_VALUE = css`
   width: ${SPACING.spacingM};
   min-width: ${SPACING.spacingM};
-  color: ${COLORS.blue};
+  color: ${COLORS.blueEnabled};
   display: flex;
   border-radius: ${SPACING.spacingXXS};
   justify-content: center;
@@ -58,10 +58,10 @@ const INNER_STYLE_VALUE = css`
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
   }
   &:disabled {
-    color: ${COLORS.disabled};
+    color: ${COLORS.bluePressed};
   }
 `
 
@@ -84,17 +84,17 @@ const INNER_STYLE_NO_VALUE = css`
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px ${COLORS.warning};
+    box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
   }
   &:disabled {
-    color: ${COLORS.disabled};
+    color: ${COLORS.darkGreyPressed};
   }
 `
 
 const LABEL_TEXT_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSizeP};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  color: ${COLORS.darkBlack};
+  color: ${COLORS.darkBlackEnabled};
   flex: 0 0 auto;
   padding: ${SPACING.spacing3} ${SPACING.spacing3};
 
@@ -109,7 +109,7 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
   return (
     <label css={OUTER_STYLE}>
       {props.isIndeterminate ? (
-        <Icon name={'minus-box'} width="100%" css={INNER_STYLE_VALUE} />
+        <Icon name="minus-box" width="100%" css={INNER_STYLE_VALUE} />
       ) : (
         <Icon
           css={props.value ? INNER_STYLE_VALUE : INNER_STYLE_NO_VALUE}

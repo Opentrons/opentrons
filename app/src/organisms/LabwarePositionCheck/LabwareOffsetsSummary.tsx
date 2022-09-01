@@ -8,14 +8,12 @@ import {
   C_NEAR_WHITE,
   DIRECTION_COLUMN,
   Flex,
-  FONT_SIZE_BODY_2,
   FONT_WEIGHT_SEMIBOLD,
   Icon,
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
   COLORS,
-  Text,
   SIZE_3,
 } from '@opentrons/components'
 import { OffsetVector } from '../../molecules/OffsetVector'
@@ -32,13 +30,13 @@ const OffsetTable = styled('table')`
 `
 const OffsetTableHeader = styled('th')`
   text-transform: ${TYPOGRAPHY.textTransformUppercase};
-  color: ${COLORS.disabled};
+  color: ${COLORS.darkBlackEnabled};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   font-size: ${TYPOGRAPHY.fontSizeCaption};
   padding: ${SPACING.spacing2};
 `
 const OffsetTableRow = styled('tr')`
-  background-color: ${COLORS.background};
+  background-color: ${COLORS.fundamentalsBackground};
 `
 
 const OffsetTableDatum = styled('td')`
@@ -58,19 +56,19 @@ const OffsetDataLoader = (): JSX.Element | null => {
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
     >
-      <Text
-        as={'h3'}
+      <StyledText
+        as="h3"
         color={C_DARK_GRAY}
         marginTop={SPACING.spacing6}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
-        fontSize={FONT_SIZE_BODY_2}
+        fontSize={TYPOGRAPHY.fontSizeH3}
         textTransform={TYPOGRAPHY.textTransformUppercase}
       >
         {t('loading_labware_offsets')}
-      </Text>
+      </StyledText>
       <Icon
         name="ot-spinner"
-        id={`LabwareOffsetsSummary_loadingSpinner`}
+        id="LabwareOffsetsSummary_loadingSpinner"
         width={SIZE_3}
         marginTop={SPACING.spacing6}
         marginBottom={SPACING.spacing6}
@@ -128,14 +126,14 @@ export const LabwareOffsetsSummary = (
   const { t } = useTranslation('labware_position_check')
   return (
     <Flex
-      flex={'auto'}
+      flex="auto"
       padding={SPACING.spacing4}
       boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
       borderRadius="4px"
       backgroundColor={C_NEAR_WHITE}
       flexDirection={DIRECTION_COLUMN}
     >
-      <StyledText as={'h5'} marginBottom={SPACING.spacing3}>
+      <StyledText as="h5" marginBottom={SPACING.spacing3}>
         {t('labware_offsets_summary_title')}
       </StyledText>
       {offsetData.length === 0 ? (

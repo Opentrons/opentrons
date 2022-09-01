@@ -28,10 +28,10 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: #16212d26;
+    background: ${COLORS.lightGreyEnabled};
   }
   &:active {
-    background: #16212d40;
+    background: ${COLORS.lightGreyHover};
   }
 `
 interface IpHostnameItemProps {
@@ -82,8 +82,10 @@ export function ManualIpHostnameItem({
         <IpItem>
           <StyledText
             as="p"
-            data-testid={`ip-hostname`}
-            color={discovered ? COLORS.darkBlack : COLORS.successDisabled}
+            data-testid="ip-hostname"
+            color={
+              discovered ? COLORS.darkBlackEnabled : COLORS.successDisabled
+            }
           >
             {candidate}
           </StyledText>
@@ -99,7 +101,7 @@ export function ManualIpHostnameItem({
         </StyledText>
         <Btn
           size={TYPOGRAPHY.lineHeight20}
-          color={COLORS.darkBlack}
+          color={COLORS.darkBlackEnabled}
           onClick={remove}
           marginLeft={SPACING.spacing4}
           data-testid="close-button"

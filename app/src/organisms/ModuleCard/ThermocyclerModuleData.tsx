@@ -6,7 +6,6 @@ import {
   Text,
   TYPOGRAPHY,
   SPACING_2,
-  FONT_SIZE_CAPTION,
   FONT_WEIGHT_REGULAR,
   DIRECTION_COLUMN,
   COLORS,
@@ -34,22 +33,22 @@ export const ThermocyclerModuleData = (
     status: string | null
   ): { backgroundColor: string; iconColor: string; textColor: string } => {
     const StatusLabelProps = {
-      backgroundColor: COLORS.medGrey,
-      iconColor: COLORS.darkGrey,
+      backgroundColor: COLORS.medGreyEnabled,
+      iconColor: COLORS.darkGreyEnabled,
       textColor: COLORS.bluePressed,
       pulse: false,
     }
 
     switch (status) {
       case 'idle': {
-        StatusLabelProps.backgroundColor = COLORS.medGrey
-        StatusLabelProps.iconColor = COLORS.darkGrey
-        StatusLabelProps.textColor = COLORS.darkBlack
+        StatusLabelProps.backgroundColor = COLORS.medGreyEnabled
+        StatusLabelProps.iconColor = COLORS.darkGreyEnabled
+        StatusLabelProps.textColor = COLORS.darkBlackEnabled
         break
       }
       case 'holding at target': {
         StatusLabelProps.backgroundColor = COLORS.medBlue
-        StatusLabelProps.iconColor = COLORS.blue
+        StatusLabelProps.iconColor = COLORS.blueEnabled
         break
       }
       case 'cooling':
@@ -59,8 +58,8 @@ export const ThermocyclerModuleData = (
         break
       }
       case 'error': {
-        StatusLabelProps.backgroundColor = COLORS.warningBg
-        StatusLabelProps.iconColor = COLORS.warning
+        StatusLabelProps.backgroundColor = COLORS.warningBackground
+        StatusLabelProps.iconColor = COLORS.warningEnabled
         StatusLabelProps.textColor = COLORS.warningText
       }
     }
@@ -71,14 +70,14 @@ export const ThermocyclerModuleData = (
     <Flex flexWrap={WRAP} gridGap={`${SPACING.spacing1} ${SPACING.spacing6}`}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`thermocycler_module_data_lid`}
+        data-testid="thermocycler_module_data_lid"
         gridColumn="1/4"
       >
         <Text
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
           fontWeight={FONT_WEIGHT_REGULAR}
-          fontSize={FONT_SIZE_CAPTION}
+          fontSize={TYPOGRAPHY.fontSizeCaption}
           marginTop={SPACING_2}
           marginBottom={SPACING.spacing2}
         >
@@ -86,27 +85,27 @@ export const ThermocyclerModuleData = (
         </Text>
         <Text
           title="lid_target_temp"
-          fontSize={FONT_SIZE_CAPTION}
+          fontSize={TYPOGRAPHY.fontSizeCaption}
           marginBottom={SPACING.spacing1}
         >
           {t(lidTarget == null ? 'na_temp' : 'target_temp', {
             temp: lidTarget,
           })}
         </Text>
-        <Text title="lid_temp" fontSize={FONT_SIZE_CAPTION}>
+        <Text title="lid_temp" fontSize={TYPOGRAPHY.fontSizeCaption}>
           {t('current_temp', { temp: lidTemp })}
         </Text>
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        data-testid={`thermocycler_module_data_block`}
+        data-testid="thermocycler_module_data_block"
         gridColumn="5/8"
       >
         <Text
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
           fontWeight={FONT_WEIGHT_REGULAR}
-          fontSize={FONT_SIZE_CAPTION}
+          fontSize={TYPOGRAPHY.fontSizeCaption}
           marginTop={SPACING_2}
         >
           {t('tc_block')}
@@ -114,14 +113,14 @@ export const ThermocyclerModuleData = (
         <StatusLabel status={status} {...getStatusLabelProps(status)} />
         <Text
           title="tc_target_temp"
-          fontSize={FONT_SIZE_CAPTION}
+          fontSize={TYPOGRAPHY.fontSizeCaption}
           marginBottom={SPACING.spacing1}
         >
           {t(targetTemp == null ? 'na_temp' : 'target_temp', {
             temp: targetTemp,
           })}
         </Text>
-        <Text title="tc_current_temp" fontSize={FONT_SIZE_CAPTION}>
+        <Text title="tc_current_temp" fontSize={TYPOGRAPHY.fontSizeCaption}>
           {t('current_temp', { temp: currentTemp })}
         </Text>
       </Flex>

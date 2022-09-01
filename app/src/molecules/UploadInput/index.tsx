@@ -23,7 +23,7 @@ const DROP_ZONE_STYLES = css`
   align-items: ${ALIGN_CENTER};
   width: 100%;
   padding: ${SPACING.spacing6};
-  border: 2px dashed ${COLORS.medGrey};
+  border: 2px dashed ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   text-align: center;
   background-color: ${COLORS.white};
@@ -31,12 +31,12 @@ const DROP_ZONE_STYLES = css`
   &:hover,
   &:focus-within {
     background-color: ${COLORS.lightBlue};
-    border: 2px dashed ${COLORS.blue};
+    border: 2px dashed ${COLORS.blueEnabled};
   }
 `
 const DRAG_OVER_STYLES = css`
   background-color: ${COLORS.lightBlue};
-  border: 2px dashed ${COLORS.blue};
+  border: 2px dashed ${COLORS.blueEnabled};
 `
 
 const INPUT_STYLES = css`
@@ -113,7 +113,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       </StyledText>
       <PrimaryButton
         onClick={handleClick}
-        id={'UploadInput_protocolUploadButton'}
+        id="UploadInput_protocolUploadButton"
       >
         {t('choose_protocol_file')}
       </PrimaryButton>

@@ -4,7 +4,7 @@ import {
 } from '@opentrons/shared-data'
 import { heaterShaker } from '../commandCreators'
 import { getModuleState } from '../robotStateSelectors'
-import { getSuccessResult } from '../fixtures/commandFixtures'
+import { getErrorResult, getSuccessResult } from '../fixtures/commandFixtures'
 
 import type { InvariantContext, RobotState, HeaterShakerArgs } from '../types'
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
@@ -58,6 +58,18 @@ describe('heaterShaker compound command creator', () => {
   })
   afterEach(() => {
     jest.restoreAllMocks()
+  })
+  it('should return an error when there is no module id', () => {
+    heaterShakerArgs = {
+      ...heaterShakerArgs,
+      module: null,
+    }
+    const result = heaterShaker(heaterShakerArgs, invariantContext, robotState)
+
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'MISSING_MODULE',
+    })
   })
   it('should delay and deactivate the heater shaker when a user specificies a timer', () => {
     heaterShakerArgs = {

@@ -16,7 +16,6 @@ from .sensor_utils import (
     handle_capacitive_sensor,
     handle_environment_sensor,
     handle_pressure_sensor,
-    read_temp_from_pressure_sensor,
 )
 
 GetInputFunc = Callable[[str], str]
@@ -68,12 +67,11 @@ def prompt_sensor_type(
 
 
 def prompt_str_input(prompt_name: str, get_user_input: GetInputFunc) -> str:
-    """Prompt to choose a member of the enum.
+    """Prompt to type in a particular string.
 
     Args:
         output_func: Function to output text to user.
         get_user_input: Function to get user input.
-        enum_type: an enum type
 
     Returns:
         The choice.
@@ -85,20 +83,38 @@ def prompt_str_input(prompt_name: str, get_user_input: GetInputFunc) -> str:
         raise InvalidInput(str(e))
 
 
-def prompt_int_input(prompt_name: str, get_user_input: GetInputFunc) -> int:
-    """Prompt to choose a member of the enum.
+def prompt_float_input(prompt_name: str, get_user_input: GetInputFunc) -> float:
+    """Prompt a float input.
 
     Args:
         output_func: Function to output text to user.
         get_user_input: Function to get user input.
-        enum_type: an enum type
 
     Returns:
         The choice.
 
     """
     try:
-        return int(get_user_input(f"{prompt_name}:"))
+        return float(get_user_input(f"{prompt_name}:"))
+    except (ValueError, IndexError) as e:
+        raise InvalidInput(str(e))
+
+
+def prompt_bool_input(prompt_name: str, get_user_input: GetInputFunc) -> bool:
+    """Prompt user for a yes or no answer.
+
+    Args:
+        output_func: Function to output text to user.
+        get_user_input: Function to get user input.
+
+    Returns:
+        The choice.
+
+    """
+    answer_map = {"yes": 1, "no": 0, "y": 1, "n": 0}
+    try:
+        answer = str(get_user_input(f"{prompt_name} Type in yes or no:"))
+        return bool(answer_map[answer])
     except (ValueError, IndexError) as e:
         raise InvalidInput(str(e))
 
@@ -112,9 +128,9 @@ def prompt_message(
         'pipette mounts:"left" or "right", gripper mount: "gripper"', get_user_input
     )
     serial_number = prompt_str_input("instrument serial number", get_user_input)
-    auto_zero = prompt_int_input("auto zero", get_user_input)
-    minutes = prompt_int_input("script run time in minutes", get_user_input)
-    output_to_csv = bool(prompt_int_input("output to csv?", get_user_input))
+    auto_zero = prompt_bool_input("auto zero?", get_user_input)
+    minutes = prompt_float_input("script run time in minutes", get_user_input)
+    output_to_csv = prompt_bool_input("output to csv?", get_user_input)
 
     sensor_run = SensorRun(sensor_type, serial_number, bool(auto_zero), minutes, mount)
     return sensor_run, output_to_csv
@@ -136,8 +152,6 @@ async def send_sensor_command(
         await handle_pressure_sensor(command, driver, node, csv, log)
     elif command.sensor_type == SensorType.capacitive:
         await handle_capacitive_sensor(command, driver, node, csv, log)
-    elif command.sensor_type == SensorType.pressure_temperature:
-        await read_temp_from_pressure_sensor(command, driver, node, csv, log)
     else:
         await handle_environment_sensor(command, driver, node, csv, log)
 

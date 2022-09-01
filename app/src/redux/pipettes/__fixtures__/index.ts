@@ -1,12 +1,12 @@
 // mock HTTP responses for pipettes endpoints
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import type { PipetteSettings } from '../types'
+import type { PipetteSettings, PipetteSettingsFieldsMap } from '../types'
 import type {
   RobotApiResponse,
   RobotApiResponseMeta,
 } from '../../robot-api/types'
 import { mockTipRackDefinition } from '../../custom-labware/__fixtures__'
-import { PipetteInfo } from '../../../organisms/ProtocolSetup/RunSetupCard/hooks/useCurrentRunPipetteInfoByMount'
+import type { PipetteInfo } from '../../../organisms/Devices/hooks'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
@@ -69,6 +69,113 @@ export const mockFetchPipettesFailure: RobotApiResponse = {
 export const mockPipetteSettings: PipetteSettings = {
   info: { name: 'p300_single_gen2', model: 'p300_single_v2.0' },
   fields: { fieldId: { value: 42, default: 42 } },
+}
+
+export const mockPipetteSettingsFieldsMap: PipetteSettingsFieldsMap = {
+  top: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 10,
+    default: 0,
+    value: 4,
+  },
+  bottom: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 10,
+    default: 0,
+    value: 3,
+  },
+  blowout: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 10,
+    default: 0,
+    value: 2,
+  },
+  dropTip: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 10,
+    default: 0,
+    value: 1,
+  },
+  pickUpCurrent: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  pickUpDistance: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  pickUpIncrement: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  pickUpPresses: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  pickUpSpeed: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  plungerCurrent: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  dropTipCurrent: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  dropTipSpeed: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  tipLength: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
 }
 
 export const mockFetchPipetteSettingsSuccessMeta: RobotApiResponseMeta = {

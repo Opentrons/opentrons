@@ -205,12 +205,18 @@ export function ProtocolRunHeader({
   const [showIsShakingModal, setShowIsShakingModal] = React.useState<boolean>(
     false
   )
-  const heaterShaker = attachedModules.find(
+  const activeHeaterShaker = attachedModules.find(
     (module): module is HeaterShakerModule =>
-      module.moduleType === HEATERSHAKER_MODULE_TYPE
+      module.moduleType === HEATERSHAKER_MODULE_TYPE &&
+      module?.data != null &&
+      module.data.speedStatus !== 'idle'
   )
-  const isShaking =
-    heaterShaker?.data != null && heaterShaker.data.speedStatus !== 'idle'
+  const isShaking = attachedModules
+    .filter(
+      (module): module is HeaterShakerModule =>
+        module.moduleType === HEATERSHAKER_MODULE_TYPE
+    )
+    .some(module => module?.data != null && module.data.speedStatus !== 'idle')
 
   const handleProceedToRunClick = (): void => {
     trackEvent({ name: 'proceedToRun', properties: {} })
@@ -240,15 +246,20 @@ export function ProtocolRunHeader({
     }
   }, [analysisErrors])
 
+  const isIdle = runStatus === RUN_STATUS_IDLE
+
   const handlePlayButtonClick = (): void => {
-    if (isShaking) {
+    if (isShaking && isHeaterShakerInProtocol) {
       setShowIsShakingModal(true)
-    } else if (isHeaterShakerInProtocol && !isShaking) {
+    } else if (
+      isHeaterShakerInProtocol &&
+      !isShaking &&
+      (isIdle || runStatus === RUN_STATUS_STOPPED)
+    ) {
       confirmAttachment()
     } else {
       play()
 
-      const isIdle = runStatus === RUN_STATUS_IDLE
       const eventProperties =
         isIdle && robotAnalyticsData != null ? robotAnalyticsData : {}
       const eventName = isIdle ? 'runStart' : 'runResume'
@@ -412,7 +423,7 @@ export function ProtocolRunHeader({
   const protocolRunningContent: JSX.Element | null =
     runStatus != null ? (
       <Box
-        backgroundColor={COLORS.lightGrey}
+        backgroundColor={COLORS.fundamentalsBackground}
         display="grid"
         gridTemplateColumns="4fr 6fr 4fr"
         padding={SPACING.spacing3}
@@ -455,7 +466,7 @@ export function ProtocolRunHeader({
               style={{
                 color: `${COLORS.errorText}`,
                 backgroundColor: 'none',
-                borderColor: `${COLORS.error}`,
+                borderColor: `${COLORS.errorEnabled}`,
               }}
               padding={`${SPACING.spacingSM} ${SPACING.spacing4}`}
               onClick={handleCancelClick}
@@ -503,7 +514,7 @@ export function ProtocolRunHeader({
         {protocolKey != null ? (
           <Link to={`/protocols/${protocolKey}`}>
             <StyledText
-              color={COLORS.blue}
+              color={COLORS.blueEnabled}
               css={TYPOGRAPHY.h2SemiBold}
               id="ProtocolRunHeader_protocolName"
             >
@@ -560,14 +571,14 @@ export function ProtocolRunHeader({
             {runStatus === RUN_STATUS_RUNNING ? (
               <Icon
                 name="circle"
-                color={COLORS.blue}
+                color={COLORS.blueEnabled}
                 size={SPACING.spacing2}
                 marginRight={SPACING.spacing2}
                 data-testid="running_circle"
               >
                 <animate
                   attributeName="fill"
-                  values={`${COLORS.blue}; transparent`}
+                  values={`${COLORS.blueEnabled}; transparent`}
                   dur="1s"
                   calcMode="discrete"
                   repeatCount="indefinite"
@@ -599,13 +610,16 @@ export function ProtocolRunHeader({
             completedAt={completedAt}
           />
         </Box>
-        {showIsShakingModal && heaterShaker != null && (
-          <HeaterShakerIsRunningModal
-            closeModal={() => setShowIsShakingModal(false)}
-            module={heaterShaker}
-            startRun={play}
-          />
-        )}
+        {showIsShakingModal &&
+          activeHeaterShaker != null &&
+          isHeaterShakerInProtocol &&
+          runId != null && (
+            <HeaterShakerIsRunningModal
+              closeModal={() => setShowIsShakingModal(false)}
+              module={activeHeaterShaker}
+              startRun={play}
+            />
+          )}
         <Box marginLeft={SPACING_AUTO}>
           <PrimaryButton
             justifyContent={JUSTIFY_CENTER}

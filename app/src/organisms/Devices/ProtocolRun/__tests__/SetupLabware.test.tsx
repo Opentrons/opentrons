@@ -56,7 +56,6 @@ jest.mock('@opentrons/shared-data', () => {
   }
 })
 jest.mock('../../../ProtocolSetup/hooks')
-jest.mock('../../../ProtocolSetup/LabwareOffsetSuccessToast')
 jest.mock('../../../LabwarePositionCheck')
 jest.mock('../ModuleExtraAttention')
 jest.mock('../LabwareInfoOverlay')
@@ -516,7 +515,6 @@ describe('LabwareSetup', () => {
               attachedModuleMatch: null,
             },
           },
-          runId: RUN_ID,
         })
       )
       .mockReturnValue(

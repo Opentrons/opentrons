@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import path from 'path'
 import { useSelector, useDispatch } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -9,7 +8,6 @@ import {
   Box,
   Link,
   Icon,
-  DropdownField,
   RadioGroup,
   SPACING_AUTO,
   ALIGN_CENTER,
@@ -25,6 +23,7 @@ import {
 } from '@opentrons/components'
 
 import * as Config from '../../redux/config'
+import * as ProtocolAnalysis from '../../redux/protocol-analysis'
 import * as Calibration from '../../redux/calibration'
 import * as CustomLabware from '../../redux/custom-labware'
 import {
@@ -32,8 +31,10 @@ import {
   getReachableRobots,
   getUnreachableRobots,
 } from '../../redux/discovery'
-import { Modal } from '../../atoms/Modal'
+import { Modal } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
+import { SelectOption } from '../../atoms/SelectField/Select'
+import { SelectField } from '../../atoms/SelectField'
 import { Toast } from '../../atoms/Toast'
 import { useTrackEvent } from '../../redux/analytics'
 import {
@@ -51,17 +52,11 @@ import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 
 import type { Dispatch, State } from '../../redux/types'
-import type { DropdownOption } from '@opentrons/components'
 
 const ALWAYS_BLOCK: 'always-block' = 'always-block'
 const ALWAYS_TRASH: 'always-trash' = 'always-trash'
 const ALWAYS_PROMPT: 'always-prompt' = 'always-prompt'
 const REALTEK_URL = 'https://www.realtek.com/en/'
-
-const INPUT_STYLES = css`
-  position: fixed;
-  clip: rect(1px 1px 1px 1px);
-`
 
 type BlockSelection =
   | typeof ALWAYS_BLOCK
@@ -70,14 +65,13 @@ type BlockSelection =
 
 export function AdvancedSettings(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared'])
-  const pythonDirectoryFileInput = React.useRef<HTMLInputElement>(null)
   const useTrashSurfaceForTipCal = useSelector((state: State) =>
     Config.getUseTrashSurfaceForTipCal(state)
   )
   const trackEvent = useTrackEvent()
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
   const channel = useSelector(Config.getUpdateChannel)
-  const channelOptions: DropdownOption[] = useSelector(
+  const channelOptions: SelectOption[] = useSelector(
     Config.getUpdateChannelOptions
   )
   const labwarePath = useSelector(CustomLabware.getCustomLabwareDirectory)
@@ -155,36 +149,36 @@ export function AdvancedSettings(): JSX.Element {
       )
     )
 
-  //  TODO(jr, 5/6/22): find another way to get webkitdirectory to work in the input DOM https://github.com/facebook/react/issues/3468
-  React.useEffect(() => {
-    if (pythonDirectoryFileInput.current !== null) {
-      pythonDirectoryFileInput.current.setAttribute('directory', 'true')
-      pythonDirectoryFileInput.current.setAttribute('webkitdirectory', 'true')
-    }
-  }, [pythonDirectoryFileInput])
-
   const handleClickPythonDirectoryChange: React.MouseEventHandler<HTMLButtonElement> = _event => {
-    pythonDirectoryFileInput.current?.click()
+    dispatch(ProtocolAnalysis.changePythonPathOverrideConfig())
     trackEvent({
       name: 'changePathToPythonDirectory',
       properties: {},
     })
   }
 
-  const setPythonInterpreterDirectory: React.ChangeEventHandler<HTMLInputElement> = event => {
-    const { files = [] } = event.target ?? {}
-    const dirName =
-      files?.[0]?.path != null ? path.dirname(files?.[0]?.path) : null
-    dispatch(Config.updateConfigValue('python.pathToPythonOverride', dirName))
-    event.target.value = ''
-  }
-
   const toggleDevtools = (): unknown => dispatch(Config.toggleDevtools())
-  const handleChannel: React.ChangeEventHandler<HTMLSelectElement> = event =>
-    dispatch(Config.updateConfigValue('update.channel', event.target.value))
+  const handleChannel = (_: string, value: string): void => {
+    dispatch(Config.updateConfigValue('update.channel', value))
+  }
   const displayUnavailRobots = useSelector((state: State) => {
     return Config.getConfig(state)?.discovery.disableCache ?? false
   })
+
+  const formatOptionLabel: React.ComponentProps<
+    typeof SelectField
+  >['formatOptionLabel'] = (option, index): JSX.Element => {
+    const { label, value } = option
+    return (
+      <StyledText
+        as="p"
+        textTransform={TYPOGRAPHY.textTransformCapitalize}
+        id={index}
+      >
+        {value === 'latest' ? label : value}
+      </StyledText>
+    )
+  }
 
   return (
     <>
@@ -197,14 +191,14 @@ export function AdvancedSettings(): JSX.Element {
           {showSuccessToast && (
             <Toast
               message={t('successfully_deleted_unavail_robots')}
-              type={'success'}
+              type="success"
               onClose={() => setShowSuccessToast(false)}
             />
           )}
           {showErrorToast && (
             <Toast
               message={t('no_unavail_robots_to_clear')}
-              type={'error'}
+              type="error"
               onClose={() => setShowErrorToast(false)}
             />
           )}
@@ -223,20 +217,19 @@ export function AdvancedSettings(): JSX.Element {
                 >
                   <Flex
                     paddingRight={SPACING.spacing2}
-                    data-testid={`AdvancedSettings_ConfirmClear_Cancel
-                    `}
+                    data-testid="AdvancedSettings_ConfirmClear_Cancel"
                   >
                     <Btn
                       onClick={cancelExit}
                       textTransform={TYPOGRAPHY.textTransformCapitalize}
-                      color={COLORS.blue}
+                      color={COLORS.blueEnabled}
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                       marginRight={SPACING.spacing6}
                     >
                       {t('shared:cancel')}
                     </Btn>
                   </Flex>
-                  <Flex data-testid={`AdvancedSettings_ConfirmClear_Proceed`}>
+                  <Flex data-testid="AdvancedSettings_ConfirmClear_Proceed">
                     <AlertPrimaryButton onClick={confirmDeleteUnavailRobots}>
                       {t('clear_confirm')}
                     </AlertPrimaryButton>
@@ -257,14 +250,16 @@ export function AdvancedSettings(): JSX.Element {
               {t('update_description')}
             </StyledText>
           </Box>
-          <Box width="10rem">
-            <DropdownField
-              options={channelOptions}
-              onChange={handleChannel}
-              value={channel}
-              id={`AdvancedSettings_${channel}`}
-            />
-          </Box>
+          <SelectField
+            name={'__UpdateChannel__'}
+            options={channelOptions}
+            onValueChange={handleChannel}
+            value={channel}
+            placeholder={channel}
+            formatOptionLabel={formatOptionLabel}
+            isSearchable={false}
+            width="10rem"
+          />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -291,7 +286,7 @@ export function AdvancedSettings(): JSX.Element {
               <Link
                 role="button"
                 css={TYPOGRAPHY.pRegular}
-                color={COLORS.darkBlack}
+                color={COLORS.darkBlackEnabled}
                 onClick={() =>
                   dispatch(CustomLabware.openCustomLabwareDirectory())
                 }
@@ -406,14 +401,14 @@ export function AdvancedSettings(): JSX.Element {
             {driverOutdated && (
               <Banner type="warning" marginTop={SPACING.spacing4}>
                 <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-                  <StyledText as="p" color={COLORS.darkBlack}>
+                  <StyledText as="p" color={COLORS.darkBlackEnabled}>
                     {t('usb_to_ethernet_adapter_toast_message')}
                   </StyledText>
                   <Link
                     external
                     href={REALTEK_URL}
                     css={TYPOGRAPHY.pRegular}
-                    color={COLORS.darkBlack}
+                    color={COLORS.darkBlackEnabled}
                     textDecoration={TYPOGRAPHY.textDecorationUnderline}
                     id="AdvancedSettings_realtekLink"
                   >
@@ -554,9 +549,9 @@ export function AdvancedSettings(): JSX.Element {
               <Link
                 role="button"
                 css={TYPOGRAPHY.pRegular}
-                color={COLORS.darkBlack}
+                color={COLORS.darkBlackEnabled}
                 onClick={() =>
-                  dispatch(Config.openPythonInterpreterDirectory())
+                  dispatch(ProtocolAnalysis.openPythonInterpreterDirectory())
                 }
                 id="AdvancedSettings_sourceFolderLinkPython"
               >
@@ -590,14 +585,6 @@ export function AdvancedSettings(): JSX.Element {
               {t('add_override_path')}
             </TertiaryButton>
           )}
-          <input
-            id="AdvancedSetting_pythonPathDirectoryInput"
-            data-testid="AdvancedSetting_pythonPathDirectoryInput"
-            type="file"
-            css={INPUT_STYLES}
-            ref={pythonDirectoryFileInput}
-            onChange={setPythonInterpreterDirectory}
-          />
         </Flex>
         <Divider marginY={SPACING.spacing5} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>

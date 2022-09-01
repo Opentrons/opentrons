@@ -1,17 +1,17 @@
 import os
-import sys
 import asyncio
 import time
 from multiprocessing import Process
 from typing import Generator, Callable, Iterator
 from collections import namedtuple
 
+from opentrons import APIVersion
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.emulation.types import ModuleType
 from opentrons.protocols.parse import parse
 from opentrons.protocols.execution import execute
 from contextlib import contextmanager
-from opentrons.protocol_api import ProtocolContext
+from opentrons.protocol_api import create_protocol_context
 from opentrons.config.robot_configs import build_config
 from opentrons.hardware_control.emulation.module_server.helpers import (
     wait_emulators,
@@ -23,9 +23,6 @@ from g_code_parsing.g_code_program.g_code_program import (
     GCodeProgram,
 )
 from g_code_parsing.g_code_watcher import GCodeWatcher
-from opentrons.protocols.context.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
-)
 from g_code_parsing.utils import get_configuration_dir
 
 Protocol = namedtuple("Protocol", ["text", "filename", "filelike"])
@@ -49,16 +46,6 @@ class GCodeEngine:
 
     def __init__(self, emulator_settings: Settings) -> None:
         self._config = emulator_settings
-
-    @staticmethod
-    def _get_loop() -> asyncio.AbstractEventLoop:
-        """Create an event loop"""
-        if sys.platform == "win32":
-            _loop = asyncio.ProactorEventLoop()
-        else:
-            _loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(_loop)
-        return asyncio.get_event_loop()
 
     @contextmanager
     def _emulate(self) -> Iterator[ThreadManager]:
@@ -122,19 +109,20 @@ class GCodeEngine:
         return Protocol(text=text, filename=file_path, filelike=file)
 
     @contextmanager
-    def run_protocol(self, path: str) -> Generator:
+    def run_protocol(self, path: str, version: APIVersion) -> Generator:
         """
         Runs passed protocol file and collects all G-Code I/O from it.
         Will cleanup emulation after execution
         :param path: Path to file
+        :param version: API version to use
         :return: GCodeProgram with all the parsed data
         """
         file_path = os.path.join(get_configuration_dir(), path)
-        with self._emulate() as h:
+        with self._emulate() as hardware:
             protocol = self._get_protocol(file_path)
-            context = ProtocolContext(
-                implementation=ProtocolContextImplementation(sync_hardware=h.sync),
-                loop=self._get_loop(),
+            context = create_protocol_context(
+                api_version=version,
+                hardware_api=hardware,
             )
             parsed_protocol = parse(protocol.text, protocol.filename)
             with GCodeWatcher(emulator_settings=self._config) as watcher:

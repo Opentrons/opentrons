@@ -79,7 +79,7 @@ export function SetupRobotCalibration({
           })
         }}
         {...targetProps}
-        id={'RobotCalStep_proceedButton'}
+        id="RobotCalStep_proceedButton"
       >
         {t(nextStepButtonKey)}
       </PrimaryButton>

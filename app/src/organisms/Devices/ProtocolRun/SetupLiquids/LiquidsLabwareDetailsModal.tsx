@@ -19,14 +19,15 @@ import {
   useProtocolDetailsForRun,
   useLabwareRenderInfoForRunById,
 } from '../../../Devices/hooks'
-import { Modal } from '../../../../atoms/Modal'
+import { Modal } from '../../../../molecules/Modal'
 import { StyledText } from '../../../../atoms/text'
+import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 import { LiquidDetailCard } from './LiquidDetailCard'
 import {
-  getSlotLabwareName,
   getLiquidsByIdForLabware,
   getWellFillFromLabwareId,
   getWellGroupForLiquidId,
+  getDisabledWellGroupForLiquidId,
 } from './utils'
 
 interface LiquidsLabwareDetailsModalProps {
@@ -63,7 +64,6 @@ export const LiquidsLabwareDetailsModal = (
   const [selectedValue, setSelectedValue] = React.useState<typeof liquidId>(
     liquidId ?? filteredLiquidsInLoadOrder[0].liquidId
   )
-
   const scrollToCurrentItem = (): void => {
     currentLiquidRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -75,29 +75,36 @@ export const LiquidsLabwareDetailsModal = (
       display: none;
     }
   `
+  const liquidIds = filteredLiquidsInLoadOrder.map(liquid => liquid.liquidId)
+  const disabledLiquidIds = liquidIds.filter(id => id !== selectedValue)
+
   return (
     <Modal
       onClose={closeModal}
-      title={labwareName}
       closeOnOutsideClick
-      marginX={SPACING.spacing5}
+      title={labwareName}
+      childrenPadding={0}
       width="45rem"
     >
-      <Box>
+      <Box
+        paddingX={SPACING.spacing4}
+        paddingTop={SPACING.spacing4}
+        backgroundColor={COLORS.fundamentalsBackground}
+        height="28.125rem"
+      >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
+            maxHeight="27.125rem"
+            overflowY="auto"
             css={HIDE_SCROLLBAR}
-            maxHeight={'27.125rem'}
-            overflowY={'auto'}
-            minWidth={'10.313rem'}
+            minWidth="10.313rem"
             gridGap={SPACING.spacing3}
           >
             {filteredLiquidsInLoadOrder.map((liquid, index) => {
               const labwareInfoEntry = Object.entries(labwareInfo).find(
                 entry => entry[0] === liquid.liquidId
               )
-
               return (
                 labwareInfoEntry != null && (
                   <Flex
@@ -139,7 +146,7 @@ export const LiquidsLabwareDetailsModal = (
                 <StyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkBlack}
+                  color={COLORS.darkBlackEnabled}
                 >
                   {slotName}
                 </StyledText>
@@ -158,7 +165,7 @@ export const LiquidsLabwareDetailsModal = (
                 <StyledText
                   as="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
-                  color={COLORS.darkBlack}
+                  color={COLORS.darkBlackEnabled}
                 >
                   {labwareName}
                 </StyledText>
@@ -175,6 +182,10 @@ export const LiquidsLabwareDetailsModal = (
                       ? getWellGroupForLiquidId(labwareInfo, selectedValue)
                       : {}
                   }
+                  disabledWells={getDisabledWellGroupForLiquidId(
+                    labwareInfo,
+                    disabledLiquidIds
+                  )}
                 />
               </svg>
             </Flex>

@@ -6,7 +6,9 @@ from mock import AsyncMock, call, MagicMock
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons_hardware.drivers.can_bus.can_messenger import MessageListenerCallback
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    MessageListenerCallback,
+)
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddLinearMoveRequest,
     HomeRequest,
@@ -329,7 +331,7 @@ async def test_move() -> None:
     """It should register to listen for messages."""
     subject = MoveGroupRunner(move_groups=[])
     mock_can_messenger = MagicMock()
-    await subject._move(mock_can_messenger)
+    await subject._move(mock_can_messenger, 0)
     mock_can_messenger.add_listener.assert_called_once()
     mock_can_messenger.remove_listener.assert_called_once()
 
@@ -338,11 +340,20 @@ class MockSendMoveCompleter:
     """Side effect mock of CanMessenger.send that immediately completes moves."""
 
     def __init__(
-        self, move_groups: MoveGroups, listener: MessageListenerCallback
+        self,
+        move_groups: MoveGroups,
+        listener: MessageListenerCallback,
+        start_at_index: int = 0,
     ) -> None:
         """Constructor."""
         self._move_groups = move_groups
         self._listener = listener
+        self._start_at_index = start_at_index
+
+    @property
+    def groups(self) -> MoveGroups:
+        """Retrieve the groups, for instance from a child class."""
+        return self._move_groups
 
     async def mock_send(
         self,
@@ -354,7 +365,7 @@ class MockSendMoveCompleter:
             # Iterate through each move in each sequence and send a move
             # completed for it.
             for seq_id, moves in enumerate(
-                self._move_groups[message.payload.group_id.value]
+                self._move_groups[message.payload.group_id.value - self._start_at_index]
             ):
                 for node, move in moves.items():
                     assert isinstance(move, MoveGroupSingleAxisStep)
@@ -362,7 +373,7 @@ class MockSendMoveCompleter:
                         group_id=message.payload.group_id,
                         seq_id=UInt8Field(seq_id),
                         current_position_um=UInt32Field(int(move.distance_mm * 1000)),
-                        encoder_position=Int32Field(int(move.distance_mm * 4000)),
+                        encoder_position_um=Int32Field(int(move.distance_mm * 4000)),
                         ack_id=UInt8Field(1),
                     )
                     arbitration_id = ArbitrationId(
@@ -467,7 +478,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(10000),
-                            encoder_position=Int32Field(10000 * 4),
+                            encoder_position_um=Int32Field(10000 * 4),
                         )
                     ),
                 ),
@@ -479,7 +490,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(1),
                             current_position_um=UInt32Field(20000),
-                            encoder_position=Int32Field(10000 * 4),
+                            encoder_position_um=Int32Field(10000 * 4),
                         )
                     ),
                 ),
@@ -491,7 +502,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(1),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(30000),
-                            encoder_position=Int32Field(10000 * 4),
+                            encoder_position_um=Int32Field(10000 * 4),
                         )
                     ),
                 ),
@@ -509,7 +520,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(10000),
-                            encoder_position=Int32Field(10000 * 4),
+                            encoder_position_um=Int32Field(10000 * 4),
                         )
                     ),
                 ),
@@ -521,7 +532,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(2),
                             seq_id=UInt8Field(1),
                             current_position_um=UInt32Field(20000),
-                            encoder_position=Int32Field(10000 * 4),
+                            encoder_position_um=Int32Field(10000 * 4),
                         )
                     ),
                 ),
@@ -533,7 +544,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                             group_id=UInt8Field(1),
                             seq_id=UInt8Field(2),
                             current_position_um=UInt32Field(30000),
-                            encoder_position=Int32Field(10000 * 4),
+                            encoder_position_um=Int32Field(10000 * 4),
                         )
                     ),
                 ),
@@ -562,3 +573,62 @@ async def test_empty_groups(
     mg = MoveGroupRunner(empty_group)
     await mg.run(mock_can_messenger)
     mock_can_messenger.send.assert_not_called()
+
+
+class MockSendMoveCompleterWithUnknown(MockSendMoveCompleter):
+    """Completes moves, injecting an unknown group ID."""
+
+    async def mock_send(self, node_id: NodeId, message: MessageDefinition) -> None:
+        """Overrides the send method of the messenger."""
+        if isinstance(message, md.ExecuteMoveGroupRequest):
+            groups = super().groups
+            bad_id = len(groups)
+            payload = MoveCompletedPayload(
+                group_id=UInt8Field(bad_id),
+                seq_id=UInt8Field(0),
+                current_position_um=UInt32Field(0),
+                encoder_position_um=Int32Field(0),
+                ack_id=UInt8Field(1),
+            )
+            sender = next(iter(groups[0][0].keys()))
+            arbitration_id = ArbitrationId(
+                parts=ArbitrationIdParts(originating_node_id=sender)
+            )
+            self._listener(md.MoveCompleted(payload=payload), arbitration_id)
+        await super().mock_send(node_id, message)
+
+
+async def test_handles_unknown_group_ids(
+    mock_can_messenger: AsyncMock, move_group_single: MoveGroups
+) -> None:
+    """Acks with unknown group ids should not cause crashes."""
+    subject = MoveScheduler(move_group_single)
+    mock_sender = MockSendMoveCompleterWithUnknown(move_group_single, subject)
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    # this should not throw
+    await subject.run(can_messenger=mock_can_messenger)
+
+
+async def test_groups_from_nonzero_index(
+    mock_can_messenger: AsyncMock, move_group_single: MoveGroups
+) -> None:
+    """Callers can specify a non-zero starting group."""
+    subject = MoveScheduler(move_group_single, 1)
+    mock_sender = MockSendMoveCompleter(move_group_single, subject, 1)
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    # this should not throw
+    await subject.run(can_messenger=mock_can_messenger)
+    mock_can_messenger.send.assert_has_calls(
+        calls=[
+            call(
+                node_id=NodeId.broadcast,
+                message=md.ExecuteMoveGroupRequest(
+                    payload=ExecuteMoveGroupRequestPayload(
+                        group_id=UInt8Field(1),
+                        cancel_trigger=UInt8Field(0),
+                        start_trigger=UInt8Field(0),
+                    )
+                ),
+            )
+        ]
+    )

@@ -835,7 +835,7 @@
           },
 
           {
-            "description": "Thermocycler Run Profile: Begin running the specified profile steps on the Thermocycler. This command is non-blocking, it does not delay protocol execution outside of thermocycler steps. No more thermocycler commands should be given until a 'thermocycler/awaitProfileComplete' command is executed.",
+            "description": "Thermocycler Run Profile: Run the specified profile steps on the Thermocycler. This command is blocking, it delays protocol execution outside of thermocycler steps.",
             "type": "object",
             "required": ["commandType", "params"],
             "properties": {
@@ -870,19 +870,6 @@
                     "type": "number"
                   }
                 }
-              }
-            }
-          },
-
-          {
-            "description": "Thermocycler Await Profile Complete: Delay protocol execution until profile execution is complete.",
-            "type": "object",
-            "required": ["commandType", "params"],
-            "properties": {
-              "key": { "type": "string" },
-              "commandType": { "enum": ["thermocycler/awaitProfileComplete"] },
-              "params": {
-                "$ref": "#/definitions/moduleOnlyParams"
               }
             }
           },
@@ -1077,11 +1064,12 @@
                 "enum": ["loadLabware"]
               },
               "params": {
+                "description": "Input parameters to the `loadLabware` command. NOTE: Unlike most commands, `loadLabware` commands issued over HTTP have different parameters than ones in JSON protocols. This schema describes JSON protocols.",
                 "required": ["labwareId", "location"],
                 "properties": {
                   "labwareId": {
                     "type": "string",
-                    "description": "Unique identifier of labware to load"
+                    "description": "Unique identifier of labware to load. Must be a key from the top-level `labware` object."
                   },
                   "location": {
                     "description": "Physical destination location to load labware into (e.g. '1' || 'someModuleId')",
@@ -1103,21 +1091,8 @@
                             "type": "string"
                           }
                         }
-                      },
-                      {
-                        "required": ["labwareId"],
-                        "properties": {
-                          "labwareId": {
-                            "description": "Unique identifier of destination labware. Must be a key from the top level 'labware' object.",
-                            "type": "string"
-                          }
-                        }
                       }
-                    ],
-                    "displayName": {
-                      "type": "string",
-                      "description": "Optional user-defined nickname for this labware instance within the protocol"
-                    }
+                    ]
                   }
                 }
               }

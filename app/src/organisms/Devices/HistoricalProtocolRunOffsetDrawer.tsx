@@ -58,7 +58,7 @@ export function HistoricalProtocolRunOffsetDrawer(
   if (uniqueLabwareOffsets == null || uniqueLabwareOffsets.length === 0) {
     return (
       <Box
-        backgroundColor={COLORS.medGrey}
+        backgroundColor={COLORS.medGreyEnabled}
         width="100%"
         paddingY={SPACING.spacing4}
         paddingX={SPACING.spacing7}
@@ -82,7 +82,7 @@ export function HistoricalProtocolRunOffsetDrawer(
 
   return (
     <Box
-      backgroundColor={COLORS.medGrey}
+      backgroundColor={COLORS.medGreyEnabled}
       width="100%"
       padding={SPACING.spacing3}
     >
@@ -111,7 +111,7 @@ export function HistoricalProtocolRunOffsetDrawer(
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
-          datatest-id={`RecentProtocolRun_OffsetDrawer_locationTitle`}
+          datatest-id="RecentProtocolRun_OffsetDrawer_locationTitle"
         >
           {t('location')}
         </StyledText>
@@ -120,7 +120,7 @@ export function HistoricalProtocolRunOffsetDrawer(
           width="33%"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
-          datatest-id={`RecentProtocolRun_OffsetDrawer_labwareTitle`}
+          datatest-id="RecentProtocolRun_OffsetDrawer_labwareTitle"
         >
           {t('labware')}
         </StyledText>
@@ -129,7 +129,7 @@ export function HistoricalProtocolRunOffsetDrawer(
           width="40%"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
-          datatest-id={`RecentProtocolRun_OffsetDrawer_labwareOffsetDataTitle`}
+          datatest-id="RecentProtocolRun_OffsetDrawer_labwareOffsetDataTitle"
         >
           {t('labware_offset_data')}
         </StyledText>

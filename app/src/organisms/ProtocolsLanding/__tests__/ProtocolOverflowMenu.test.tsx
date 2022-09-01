@@ -6,6 +6,7 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import {
+  analyzeProtocol,
   removeProtocol,
   viewProtocolSourceFolder,
 } from '../../../redux/protocol-storage'
@@ -18,6 +19,9 @@ jest.mock('../../../redux/protocol-storage')
 const PROTOCOL_KEY = 'mock-protocol-key'
 const mockHandleRunProtocol = jest.fn()
 
+const mockAnalyzeProtocol = analyzeProtocol as jest.MockedFunction<
+  typeof analyzeProtocol
+>
 const mockViewProtocolSourceFolder = viewProtocolSourceFolder as jest.MockedFunction<
   typeof viewProtocolSourceFolder
 >
@@ -68,6 +72,15 @@ describe('ProtocolOverflowMenu', () => {
     const runButton = getByText('Run')
     fireEvent.click(runButton)
     expect(mockHandleRunProtocol).toHaveBeenCalled()
+  })
+
+  it('should call reanalyze protocol when clicking run button', () => {
+    const [{ getByTestId, getByText }] = render()
+    const button = getByTestId('ProtocolOverflowMenu_overflowBtn')
+    fireEvent.click(button)
+    const reanalyzeButton = getByText('Reanalyze')
+    fireEvent.click(reanalyzeButton)
+    expect(mockAnalyzeProtocol).toHaveBeenCalled()
   })
 
   it('should call folder open function when clicking show in folder', () => {

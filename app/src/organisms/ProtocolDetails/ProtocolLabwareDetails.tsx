@@ -62,7 +62,7 @@ export const ProtocolLabwareDetails = (
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing3}
-          data-testid={'ProtocolLabwareDetails_labware_name'}
+          data-testid="ProtocolLabwareDetails_labware_name"
           width="66%"
         >
           {t('labware_name')}
@@ -70,7 +70,7 @@ export const ProtocolLabwareDetails = (
         <StyledText
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          data-testid={'ProtocolLabwareDetails_quantity'}
+          data-testid="ProtocolLabwareDetails_quantity"
         >
           {t('quantity')}
         </StyledText>
@@ -119,7 +119,7 @@ export const ProtocolLabwareDetailItem = (
         >
           {namespace === 'opentrons' ? (
             <Icon
-              color={COLORS.blue}
+              color={COLORS.blueEnabled}
               name="check-decagram"
               height="0.75rem"
               minHeight="0.75rem"
@@ -170,7 +170,7 @@ export const LabwareDetailOverflowMenu = (
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
       marginRight={SPACING.spacing3}
-      marginLeft="auto"
+      marginLeft={SPACING.spacingAuto}
     >
       <Flex>
         <OverflowBtn onClick={handleOverflowClick} />
@@ -179,8 +179,8 @@ export const LabwareDetailOverflowMenu = (
         <Flex
           width="11rem"
           zIndex={10}
-          borderRadius={'4px 4px 0px 0px'}
-          boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+          borderRadius="4px 4px 0px 0px"
+          boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
           top="2.3rem"

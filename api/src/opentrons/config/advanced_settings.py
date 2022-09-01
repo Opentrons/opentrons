@@ -169,7 +169,7 @@ settings = [
     ),
     SettingDefinition(
         _id="enableOT3HardwareController",
-        title="Enable experimental OT3 hardware controller",
+        title="Enable experimental OT-3 hardware controller",
         description=(
             "Do not enable. This is an Opentrons-internal setting to test "
             "new hardware."
@@ -177,12 +177,12 @@ settings = [
         restart_required=True,
     ),
     SettingDefinition(
-        _id="enableHeaterShakerPAPI",
-        title="Enable Heater-Shaker Python API support",
+        _id="enableProtocolEnginePAPICore",
+        title="Enable experimental execution core for Python protocols",
         description=(
-            "Do not enable. This is an Opentrons internal setting to test a new module."
+            "This is an Opentrons-internal setting to test new execution logic."
+            " Do not enable."
         ),
-        restart_required=False,
     ),
 ]
 
@@ -460,6 +460,26 @@ def _migrate14to15(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate15to16(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 16 of the feature flags file.
+
+    - Removes deprecated enableHeaterShakerPAPI option
+    """
+    removals = ["enableHeaterShakerPAPI"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
+def _migrate16to17(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 17 of the advanced settings file.
+
+    - Adds enableProtocolEnginePAPICore option
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableProtocolEnginePAPICore"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -476,6 +496,8 @@ _MIGRATIONS = [
     _migrate12to13,
     _migrate13to14,
     _migrate14to15,
+    _migrate15to16,
+    _migrate16to17,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

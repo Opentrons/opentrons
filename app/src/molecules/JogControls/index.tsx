@@ -1,7 +1,11 @@
 // jog controls component
 import * as React from 'react'
 
-import { Flex, JUSTIFY_CENTER, ALIGN_STRETCH } from '@opentrons/components'
+import {
+  Flex,
+  ALIGN_STRETCH,
+  JUSTIFY_SPACE_BETWEEN,
+} from '@opentrons/components'
 
 import { DirectionControl } from './DirectionControl'
 import { StepSizeControl } from './StepSizeControl'
@@ -13,6 +17,7 @@ import {
 
 import type { Jog, Plane, StepSize } from './types'
 import type { StyleProps } from '@opentrons/components'
+import { css } from 'styled-components'
 
 export type { Jog }
 export interface JogControlsProps extends StyleProps {
@@ -21,8 +26,6 @@ export interface JogControlsProps extends StyleProps {
   stepSizes?: StepSize[]
   auxiliaryControl?: React.ReactNode | null
   directionControlButtonColor?: string
-  //  TODO: remove this prop after all primary buttons are changed to blue in the next gen app work
-  isLPC?: boolean
 }
 
 export { HORIZONTAL_PLANE, VERTICAL_PLANE }
@@ -30,7 +33,6 @@ export { HORIZONTAL_PLANE, VERTICAL_PLANE }
 export function JogControls(props: JogControlsProps): JSX.Element {
   const {
     jog,
-    isLPC,
     directionControlButtonColor,
     stepSizes = DEFAULT_STEP_SIZES,
     planes = [HORIZONTAL_PLANE, VERTICAL_PLANE],
@@ -40,24 +42,35 @@ export function JogControls(props: JogControlsProps): JSX.Element {
   const [currentStepSize, setCurrentStepSize] = React.useState<number>(
     stepSizes[0]
   )
+
+  const CONTAINER_LAYOUT = css`
+    @media screen and (max-width: 750px) {
+      *:nth-child(1) {
+        flex: 1 1 30%;
+      }
+
+      *:nth-child(2) {
+        flex: 1 1 70%;
+      }
+    }
+  `
+
   return (
     <Flex
-      justifyContent={JUSTIFY_CENTER}
+      css={CONTAINER_LAYOUT}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignSelf={ALIGN_STRETCH}
       {...styleProps}
     >
       <StepSizeControl
-        {...{ currentStepSize, setCurrentStepSize, stepSizes, isLPC }}
+        {...{ currentStepSize, setCurrentStepSize, stepSizes }}
       />
-      {planes.map(plane => (
-        <DirectionControl
-          key={plane}
-          plane={plane}
-          jog={jog}
-          stepSize={currentStepSize}
-          buttonColor={directionControlButtonColor}
-        />
-      ))}
+      <DirectionControl
+        planes={planes}
+        jog={jog}
+        stepSize={currentStepSize}
+        buttonColor={directionControlButtonColor}
+      />
       {auxiliaryControl}
     </Flex>
   )

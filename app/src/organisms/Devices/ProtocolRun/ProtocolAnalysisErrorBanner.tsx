@@ -14,7 +14,7 @@ import {
 import { Portal } from '../../../App/portal'
 import { Banner } from '../../../atoms/Banner'
 import { PrimaryButton } from '../../../atoms/buttons'
-import { Modal } from '../../../atoms/Modal'
+import { Modal } from '../../../molecules/Modal'
 import { StyledText } from '../../../atoms/text'
 
 import type { AnalysisError } from '@opentrons/shared-data'

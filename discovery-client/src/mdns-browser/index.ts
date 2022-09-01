@@ -19,6 +19,17 @@ export type { MdnsBrowser, MdnsBrowserOptions, MdnsBrowserService }
 const IFACE_POLL_INTERVAL_MS = 5000
 const QUERY_INTERVAL_MS = [4000, 8000, 16000, 32000, 64000, 128000]
 
+const RE_ROBOT_MODEL = /robotModel=(?<robotModel>.*)/
+
+const robotModelFromTxt = (records: string[] | undefined): string | null => {
+  records = records ?? []
+
+  const model = records
+    .map((e: string) => e.match(RE_ROBOT_MODEL)?.groups?.robotModel)
+    .find(maybeModel => maybeModel != null)
+
+  return model ?? null
+}
 /**
  * Create a mDNS browser wrapper can be started and stopped and calls
  * `onService` when the underlying browser receives an advertisement
@@ -58,7 +69,7 @@ export function createMdnsBrowser(options: MdnsBrowserOptions): MdnsBrowser {
         })
       })
       .on('update', (service: BaseBrowserService) => {
-        const { fullname, addresses, port } = service
+        const { fullname, addresses, port, txt } = service
         const ip = addresses.find(address => net.isIPv4(address))
 
         if (
@@ -68,7 +79,8 @@ export function createMdnsBrowser(options: MdnsBrowserOptions): MdnsBrowser {
           ports.includes(port)
         ) {
           const name = fullname.replace(/\._http\._tcp.local$/, '')
-          onService({ name, ip, port })
+          const robotModel = robotModelFromTxt(txt)
+          onService({ name, ip, port, robotModel })
         } else {
           log('silly', 'Ignoring mDNS service', { service })
         }

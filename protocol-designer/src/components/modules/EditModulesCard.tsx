@@ -29,10 +29,6 @@ export interface Props {
 export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModuleModal } = props
 
-  const enableHeaterShaker = useSelector(
-    featureFlagSelectors.getEnabledHeaterShaker
-  )
-
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
@@ -70,11 +66,7 @@ export function EditModulesCard(props: Props): JSX.Element {
 
   const warningsEnabled = !moduleRestrictionsDisabled
 
-  const SUPPORTED_MODULE_TYPES_FILTERED = enableHeaterShaker
-    ? SUPPORTED_MODULE_TYPES
-    : SUPPORTED_MODULE_TYPES.filter(
-        moduleType => moduleType !== 'heaterShakerModuleType'
-      )
+  const SUPPORTED_MODULE_TYPES_FILTERED = SUPPORTED_MODULE_TYPES
 
   return (
     <Card title="Modules">

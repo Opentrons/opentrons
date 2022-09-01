@@ -9,6 +9,10 @@ OT_PYTHON ?= python
 # https://pipenv.pypa.io/en/latest/basics/#specifying-versions-of-python
 OT_VIRTUALENV_VERSION ?= 3.7
 
+# Use legacy editable installs to avoid breaking mypy type-checking
+# when using newer versions of setuptools
+export SETUPTOOLS_ENABLE_FEATURES := legacy-editable
+
 pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
 pipenv := $(pipenv_envvars) $(OT_PYTHON) -m pipenv
 python := $(pipenv) run python

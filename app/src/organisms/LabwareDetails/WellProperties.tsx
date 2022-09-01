@@ -40,8 +40,9 @@ export function WellProperties(props: WellPropertiesProps): JSX.Element {
   const { t } = useTranslation('labware_details')
   const { wellProperties, wellLabel, displayVolumeUnits: units } = props
 
-  const { totalLiquidVolume: vol, metadata } = wellProperties
-  const { wellBottomShape } = metadata
+  const { totalLiquidVolume: vol, metadata } =
+    (wellProperties != null && wellProperties) || {}
+  const { wellBottomShape } = (metadata != null && metadata) || {}
   const wellBottomValue = wellBottomShape != null ? t(wellBottomShape) : null
 
   return (

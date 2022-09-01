@@ -48,7 +48,7 @@ from opentrons.hardware_control.types import (
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
-from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons_shared_data.gripper.dev_types import GripperModel
 from opentrons.hardware_control.dev_types import (
     InstrumentHardwareConfigs,
@@ -58,14 +58,8 @@ from opentrons.hardware_control.dev_types import (
     AttachedGripper,
     OT3AttachedInstruments,
 )
-from opentrons_hardware.drivers.gpio import OT3GPIO
 
 log = logging.getLogger(__name__)
-
-
-_FIXED_PIPETTE_ID: str = "P1KSV3120211118A01"
-_FIXED_PIPETTE_NAME: PipetteName = "p1000_single_gen3"
-_FIXED_PIPETTE_MODEL: PipetteModel = cast("PipetteModel", "p1000_single_v3.0")
 
 
 class OT3Simulator:
@@ -115,7 +109,6 @@ class OT3Simulator:
         """
         self._configuration = config
         self._loop = loop
-        self._gpio_dev = OT3GPIO()
         self._strict_attached = bool(strict_attached_instruments)
         self._stubbed_attached_modules = attached_modules
 
@@ -155,11 +148,6 @@ class OT3Simulator:
         self._encoder_position = self._get_home_position()
         self._present_nodes: Set[NodeId] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
-
-    @property
-    def gpio_chardev(self) -> OT3GPIO:
-        """Get the GPIO device."""
-        return self._gpio_dev
 
     @property
     def board_revision(self) -> BoardRevision:

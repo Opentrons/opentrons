@@ -1146,6 +1146,7 @@ def test_thermocycler_get_target_temperatures(
         substate_by_module_id={
             "module-id": ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
+                is_lid_open=False,
                 target_block_temperature=14,
                 target_lid_temperature=28,
             )
@@ -1171,6 +1172,7 @@ def test_thermocycler_get_target_temperatures_no_target(
         substate_by_module_id={
             "module-id": ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
+                is_lid_open=False,
                 target_block_temperature=None,
                 target_lid_temperature=None,
             )
@@ -1199,6 +1201,7 @@ def module_view_with_thermocycler(thermocycler_v1_def: ModuleDefinition) -> Modu
                 module_id=ThermocyclerModuleId("module-id"),
                 target_block_temperature=None,
                 target_lid_temperature=None,
+                is_lid_open=False,
             )
         },
     )

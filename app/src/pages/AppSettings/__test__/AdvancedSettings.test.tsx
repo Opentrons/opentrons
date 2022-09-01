@@ -18,6 +18,7 @@ import {
 import { useTrackEvent } from '../../../redux/analytics'
 import * as CustomLabware from '../../../redux/custom-labware'
 import * as Config from '../../../redux/config'
+import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
 import * as SystemInfo from '../../../redux/system-info'
 import * as Fixtures from '../../../redux/system-info/__fixtures__'
 
@@ -27,6 +28,7 @@ jest.mock('../../../redux/config')
 jest.mock('../../../redux/calibration')
 jest.mock('../../../redux/custom-labware')
 jest.mock('../../../redux/discovery')
+jest.mock('../../../redux/protocol-analysis')
 jest.mock('../../../redux/system-info')
 jest.mock('@opentrons/components/src/hooks')
 jest.mock('../../../redux/analytics')
@@ -78,8 +80,8 @@ const mockGetPathToPythonOverride = Config.getPathToPythonOverride as jest.Mocke
   typeof Config.getPathToPythonOverride
 >
 
-const mockOpenPythonInterpreterDirectory = Config.openPythonInterpreterDirectory as jest.MockedFunction<
-  typeof Config.openPythonInterpreterDirectory
+const mockOpenPythonInterpreterDirectory = ProtocolAnalysis.openPythonInterpreterDirectory as jest.MockedFunction<
+  typeof ProtocolAnalysis.openPythonInterpreterDirectory
 >
 
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
@@ -97,11 +99,11 @@ describe('AdvancedSettings', () => {
     getCustomLabwarePath.mockReturnValue('')
     getChannelOptions.mockReturnValue([
       {
-        name: 'Stable',
+        label: 'Stable',
         value: 'latest',
       },
-      { name: 'Beta', value: 'beta' },
-      { name: 'Alpha', value: 'alpha' },
+      { label: 'Beta', value: 'beta' },
+      { label: 'Alpha', value: 'alpha' },
     ])
     mockGetU2EAdapterDevice.mockReturnValue(Fixtures.mockWindowsRealtekDevice)
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
@@ -126,14 +128,12 @@ describe('AdvancedSettings', () => {
     getByText('Clear Unavailable Robots')
     getByText('Enable Developer Tools')
   })
-  it('renders the update channel section', () => {
+  it('renders the update channel combobox and section', () => {
     const [{ getByText, getByRole }] = render()
     getByText(
       'Stable receives the latest stable releases. Beta allows you to try out new features before they have completed testing and launch in the Stable channel.'
     )
-    getByRole('option', { name: 'Stable' })
-    getByRole('option', { name: 'Beta' })
-    getByRole('option', { name: 'Alpha' })
+    getByRole('combobox', { name: '' })
   })
   it('renders the custom labware section with source folder selected', () => {
     getCustomLabwarePath.mockReturnValue('/mock/custom-labware-path')
@@ -277,7 +277,7 @@ describe('AdvancedSettings', () => {
 
   it('renders the path to python override text and button with no default path', () => {
     mockGetPathToPythonOverride.mockReturnValue(null)
-    const [{ getByText, getByRole, getByTestId }] = render()
+    const [{ getByText, getByRole }] = render()
     getByText('Override Path to Python')
     getByText(
       'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
@@ -285,10 +285,7 @@ describe('AdvancedSettings', () => {
     getByText('override path')
     getByText('No path specified')
     const button = getByRole('button', { name: 'Add override path' })
-    const input = getByTestId('AdvancedSetting_pythonPathDirectoryInput')
-    input.click = jest.fn()
     fireEvent.click(button)
-    expect(input.click).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: 'changePathToPythonDirectory',
       properties: {},

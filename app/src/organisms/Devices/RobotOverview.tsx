@@ -121,7 +121,7 @@ export function RobotOverview({
                 height=".875rem"
                 width="1.375rem"
                 marginRight={SPACING.spacing3}
-                id={`RobotOverview_lightsToggle`}
+                id="RobotOverview_lightsToggle"
               />
               <StyledText as="p">{t('lights')}</StyledText>
             </Flex>

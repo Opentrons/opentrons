@@ -173,7 +173,9 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
       ? dropWhile(
           runCommands,
           runCommandSummary =>
-            new Date(runCommandSummary.createdAt) <= runStartDateTime
+            new Date(
+              runCommandSummary.startedAt ?? runCommandSummary.createdAt
+            ) <= runStartDateTime
         )
       : []
 
@@ -376,7 +378,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
   const jumpToCurrentStepButton = (
     <PrimaryButton
       position={POSITION_FIXED}
-      bottom="2.5rem" // 40px
+      bottom={SPACING.spacingXXL}
       left={`calc(calc(100% + ${NAV_BAR_WIDTH})/2)`} // add width of half of nav bar to center within run tab
       transform="translate(-50%)"
       borderRadius={SPACING.spacing6}
@@ -459,7 +461,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
           ? runErrors.map(({ detail, errorType }, index) => (
               <StyledText
                 key={index}
-                color={COLORS.error}
+                color={COLORS.errorEnabled}
                 marginBottom={SPACING.spacing3}
               >{`${errorType}: ${detail}`}</StyledText>
             ))
@@ -515,7 +517,7 @@ export function RunLog({ robotName, runId }: RunLogProps): JSX.Element | null {
               </StyledText>
             ) : (
               <Flex justifyContent={JUSTIFY_CENTER} padding={SPACING.spacing3}>
-                <StyledText as="p" color={COLORS.darkBlack}>
+                <StyledText as="p" color={COLORS.darkBlackEnabled}>
                   {t('run_has_diverged_from_predicted')}
                 </StyledText>
               </Flex>
@@ -550,7 +552,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       padding={`0.75rem ${SPACING.spacing3}`}
-      backgroundColor={COLORS.lightGrey}
+      backgroundColor={COLORS.fundamentalsBackground}
       width="100%"
       alignSelf={ALIGN_STRETCH}
       alignItems={ALIGN_STRETCH}
@@ -561,7 +563,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
             textTransform={TYPOGRAPHY.textTransformUppercase}
             color={COLORS.darkGreyEnabled}
             css={TYPOGRAPHY.h6SemiBold}
-            id={`RunDetails_ProtocolSetupTitle`}
+            id="RunDetails_ProtocolSetupTitle"
           >
             {t('protocol_setup')}
           </StyledText>
@@ -573,7 +575,7 @@ function ProtocolSetupItem(props: ProtocolSetupItemProps): JSX.Element {
         </Flex>
       </Btn>
       <Flex
-        id={`RunDetails_ProtocolSetup_CommandList`}
+        id="RunDetails_ProtocolSetup_CommandList"
         flexDirection={DIRECTION_COLUMN}
       >
         {showProtocolSetupInfo

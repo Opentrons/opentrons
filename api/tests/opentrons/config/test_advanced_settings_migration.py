@@ -7,7 +7,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 15
+    return 17
 
 
 @pytest.fixture
@@ -21,7 +21,7 @@ def default_file_settings() -> Dict[str, Any]:
         "enableDoorSafetySwitch": None,
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
-        "enableHeaterShakerPAPI": None,
+        "enableProtocolEnginePAPICore": None,
     }
 
 
@@ -205,6 +205,26 @@ def v15_config(v14_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v16_config(v15_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v15_config.copy()
+    r.pop("enableHeaterShakerPAPI")
+    r.update({"_version": 16})
+    return r
+
+
+@pytest.fixture
+def v17_config(v16_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v16_config.copy()
+    r.update(
+        {
+            "_version": 17,
+            "enableProtocolEnginePAPICore": True,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -225,6 +245,8 @@ def v15_config(v14_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v13_config"),
         lazy_fixture("v14_config"),
         lazy_fixture("v15_config"),
+        lazy_fixture("v16_config"),
+        lazy_fixture("v17_config"),
     ],
 )
 def old_settings(request: pytest.FixtureRequest) -> Dict[str, Any]:
@@ -305,5 +327,5 @@ def test_ensures_config() -> None:
         "enableDoorSafetySwitch": None,
         "disableFastProtocolUpload": None,
         "enableOT3HardwareController": None,
-        "enableHeaterShakerPAPI": None,
+        "enableProtocolEnginePAPICore": None,
     }

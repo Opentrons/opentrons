@@ -42,27 +42,27 @@ const BANNER_PROPS_BY_TYPE: Record<
 > = {
   success: {
     icon: { name: 'check-circle' },
-    backgroundColor: COLORS.successBg,
-    color: COLORS.success,
+    backgroundColor: COLORS.successBackground,
+    color: COLORS.successEnabled,
   },
   error: {
     icon: { name: 'alert-circle' },
-    backgroundColor: COLORS.errorBg,
-    color: COLORS.error,
+    backgroundColor: COLORS.errorBackground,
+    color: COLORS.errorEnabled,
   },
   warning: {
     icon: { name: 'alert-circle' },
-    backgroundColor: COLORS.warningBg,
-    color: COLORS.warning,
+    backgroundColor: COLORS.warningBackground,
+    color: COLORS.warningEnabled,
   },
   updating: {
     icon: { name: 'ot-spinner' },
-    backgroundColor: COLORS.greyDisabled,
+    backgroundColor: COLORS.darkGreyDisabled,
     color: COLORS.darkGreyEnabled,
   },
   informing: {
     icon: { name: 'information' },
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.fundamentalsBackground,
     color: COLORS.darkGreyEnabled,
   },
 }
@@ -74,6 +74,7 @@ export function Banner(props: BannerProps): JSX.Element {
     icon,
     children,
     isCloseActionLoading,
+    padding,
     ...styleProps
   } = props
   const bannerProps = BANNER_PROPS_BY_TYPE[type]
@@ -95,7 +96,7 @@ export function Banner(props: BannerProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      padding={SPACING.spacing3}
+      padding={padding ?? SPACING.spacing3}
       onClick={e => e.stopPropagation()}
       data-testid={`Banner_${type}`}
       {...styleProps}
@@ -119,7 +120,7 @@ export function Banner(props: BannerProps): JSX.Element {
         </Btn>
       )}
       {isCloseActionLoading && (
-        <Icon name="ot-spinner" size={SIZE_1} aria-label={`ot-spinner`} spin />
+        <Icon name="ot-spinner" size={SIZE_1} aria-label="ot-spinner" spin />
       )}
     </Flex>
   )

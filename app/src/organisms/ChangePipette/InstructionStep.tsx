@@ -1,18 +1,14 @@
 import * as React from 'react'
-
+import { Box, Flex, JUSTIFY_SPACE_EVENLY, SPACING } from '@opentrons/components'
 import type {
   PipetteChannels,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../redux/robot'
-import type { Direction } from './types'
+import type { Mount } from '@opentrons/components'
+import type { Diagram, Direction } from './types'
 
-import screwdriverSrc from '../../assets/images/change-pip/screwdriver.svg'
-import styles from './styles.css'
-
-type Diagram = 'screws' | 'tab'
-
-interface DiagramProps {
+interface Props {
+  children: React.ReactNode
   direction: Direction
   mount: Mount
   channels: PipetteChannels
@@ -20,31 +16,31 @@ interface DiagramProps {
   displayCategory: PipetteDisplayCategory | null
 }
 
-interface Props extends DiagramProps {
-  step: 'one' | 'two'
-  children: React.ReactNode
-}
-
-export function getDiagramsSrc(props: DiagramProps): string {
-  const { channels, displayCategory, direction, mount, diagram } = props
+export function InstructionStep(props: Props): JSX.Element {
+  const {
+    children,
+    channels,
+    diagram,
+    displayCategory,
+    mount,
+    direction,
+  } = props
   const channelsKey = channels === 8 ? 'multi' : 'single'
 
-  return displayCategory === 'GEN2'
-    ? require(`../../assets/images/change-pip/${direction}-${mount}-${channelsKey}-GEN2-${diagram}@3x.png`)
-    : require(`../../assets/images/change-pip/${direction}-${mount}-${channelsKey}-${diagram}@3x.png`)
-}
-
-export function InstructionStep(props: Props): JSX.Element {
-  const { step, children, ...diagramProps } = props
+  const display =
+    displayCategory === 'GEN2'
+      ? require(`../../assets/images/change-pip/${direction}-${mount}-${channelsKey}-GEN2-${diagram}@3x.png`)
+      : require(`../../assets/images/change-pip/${direction}-${mount}-${channelsKey}-${diagram}@3x.png`)
 
   return (
-    <fieldset className={styles.step}>
-      <legend className={styles.step_legend}>Step {step}</legend>
-      <div>{children}</div>
-      {props.diagram === 'screws' && (
-        <img src={screwdriverSrc} className={styles.screwdriver} />
-      )}
-      <img src={getDiagramsSrc(diagramProps)} className={styles.diagram} />
-    </fieldset>
+    <Flex justifyContent={JUSTIFY_SPACE_EVENLY}>
+      <Box marginRight={SPACING.spacingXXL}>{children}</Box>
+      <img
+        src={display}
+        height={diagram === 'tab' ? '100%' : '270px'}
+        width="275px"
+        alt={`${direction}-${mount}-${channelsKey}-${displayCategory}-${diagram}`}
+      />
+    </Flex>
   )
 }

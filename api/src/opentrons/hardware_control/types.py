@@ -102,14 +102,19 @@ class OT3AxisKind(enum.Enum):
     Y = 1
     #: Gantry Y axis
     Z = 2
-    #: Z axis (of the left and right and gripper mounts)
+    #: Z axis (of the left and right)
     P = 3
     #: Plunger axis (of the left and right pipettes)
-    OTHER = 4
+    Z_G = 4
+    #: Gripper Z axis
+    OTHER = 5
     #: The internal axes of high throughput pipettes, for instance
 
     def __str__(self) -> str:
         return self.name
+
+    def is_z_axis(self) -> bool:
+        return self in [OT3AxisKind.Z, OT3AxisKind.Z_G]
 
 
 class OT3Axis(enum.Enum):
@@ -199,7 +204,7 @@ class OT3Axis(enum.Enum):
             cls.Y: OT3AxisKind.Y,
             cls.Z_L: OT3AxisKind.Z,
             cls.Z_R: OT3AxisKind.Z,
-            cls.Z_G: OT3AxisKind.Z,
+            cls.Z_G: OT3AxisKind.Z_G,
             cls.Q: OT3AxisKind.OTHER,
             cls.G: OT3AxisKind.OTHER,
         }
@@ -211,7 +216,8 @@ class OT3Axis(enum.Enum):
             OT3AxisKind.P: [cls.P_R, cls.P_L],
             OT3AxisKind.X: [cls.X],
             OT3AxisKind.Y: [cls.Y],
-            OT3AxisKind.Z: [cls.Z_G, cls.Z_L, cls.Z_R],
+            OT3AxisKind.Z: [cls.Z_L, cls.Z_R],
+            OT3AxisKind.Z_G: [cls.Z_G],
             OT3AxisKind.OTHER: [cls.Q, cls.G],
         }
         return kind_map[kind]
@@ -231,7 +237,7 @@ class OT3Axis(enum.Enum):
         return self.name
 
     def of_point(self, point: top_types.Point) -> float:
-        if OT3Axis.to_kind(self) == OT3AxisKind.Z:
+        if OT3Axis.to_kind(self).is_z_axis():
             return point.z
         elif self == OT3Axis.X:
             return point.x
@@ -241,7 +247,7 @@ class OT3Axis(enum.Enum):
             raise KeyError(self)
 
     def set_in_point(self, point: top_types.Point, position: float) -> top_types.Point:
-        if OT3Axis.to_kind(self) == OT3AxisKind.Z:
+        if OT3Axis.to_kind(self).is_z_axis():
             return point._replace(z=position)
         elif self == OT3Axis.X:
             return point._replace(x=position)
@@ -491,3 +497,32 @@ class GripperNotAttachedError(Exception):
     """An error raised if a gripper is accessed that is not attached"""
 
     pass
+
+
+class InvalidPipetteName(KeyError):
+    """Raised for an invalid pipette."""
+
+    def __init__(self, name: int, mount: OT3Mount) -> None:
+        self.name = name
+        self.mount = mount
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: name={self.name} mount={self.mount}>"
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}: Pipette name key {self.name} on mount {self.mount.name} is not valid"
+
+
+class InvalidPipetteModel(KeyError):
+    """Raised for a pipette with an unknown model."""
+
+    def __init__(self, name: str, model: str, mount: OT3Mount) -> None:
+        self.name = name
+        self.model = model
+        self.mount = mount
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: name={self.name}, model={self.model}, mount={self.mount}>"
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}: {self.name} on {self.mount.name} has an unknown model {self.model}"

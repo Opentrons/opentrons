@@ -10,18 +10,17 @@ import {
   HS_TEMP_MIN,
   HS_TEMP_MAX,
 } from '@opentrons/shared-data'
-import { Slideout } from '../../atoms/Slideout'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  FONT_WEIGHT_REGULAR,
   SPACING,
-  Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { Slideout } from '../../atoms/Slideout'
 import { InputField } from '../../atoms/InputField'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
 import { useRunStatuses } from '../Devices/hooks'
 import { useModuleIdFromRun } from './useModuleIdFromRun'
 
@@ -52,18 +51,8 @@ export const HeaterShakerSlideout = (
   const { isRunIdle, isRunTerminal } = useRunStatuses()
   const { createCommand } = useCreateCommandMutation()
   const moduleName = getModuleDisplayName(module.moduleModel)
-  const { moduleIdFromRun } = useModuleIdFromRun(
-    module,
-    currentRunId != null ? currentRunId : null
-  )
+  const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
   const modulePart = t('temperature')
-
-  let moduleId: string
-  if (isRunIdle && currentRunId != null && isLoadedInRun) {
-    moduleId = moduleIdFromRun
-  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
-    moduleId = module.id
-  }
 
   const sendSetTemperatureOrShakeCommand: React.MouseEventHandler<HTMLInputElement> = e => {
     e.preventDefault()
@@ -73,7 +62,7 @@ export const HeaterShakerSlideout = (
       const setTempCommand: HeaterShakerStartSetTargetTemperatureCreateCommand = {
         commandType: 'heaterShaker/setTargetTemperature',
         params: {
-          moduleId: moduleId,
+          moduleId: isRunIdle ? moduleIdFromRun : module.id,
           celsius: hsValue,
         },
       }
@@ -85,10 +74,7 @@ export const HeaterShakerSlideout = (
             )
           }
         )
-      } else if (
-        (currentRunId != null && isRunTerminal) ||
-        currentRunId == null
-      ) {
+      } else if (isRunTerminal || currentRunId == null) {
         createLiveCommand({
           command: setTempCommand,
         }).catch((e: Error) => {
@@ -135,27 +121,27 @@ export const HeaterShakerSlideout = (
           />
         }
       >
-        <Text
-          fontWeight={FONT_WEIGHT_REGULAR}
+        <StyledText
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
           fontSize={TYPOGRAPHY.fontSizeP}
           paddingTop={SPACING.spacing2}
           data-testid={`HeaterShakerSlideout_title_${module.serialNumber}`}
         >
           {t('set_target_temp_of_hs')}
-        </Text>
+        </StyledText>
         <Flex
           marginTop={SPACING.spacing4}
           flexDirection={DIRECTION_COLUMN}
           data-testid={`HeaterShakerSlideout_input_field_${module.serialNumber}`}
         >
-          <Text
+          <StyledText
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             fontSize={TYPOGRAPHY.fontSizeH6}
             color={COLORS.darkGrey}
             marginBottom={SPACING.spacing3}
           >
             {t('set_block_temp')}
-          </Text>
+          </StyledText>
           <form id="HeaterShakerSlideout_submitValue">
             <InputField
               data-testid={`${module.moduleModel}_setTemp`}

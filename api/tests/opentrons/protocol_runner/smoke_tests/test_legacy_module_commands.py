@@ -52,7 +52,6 @@ def modules_legacy_python_protocol_file(tmp_path: Path) -> Path:
 
 async def test_runner_with_modules_in_legacy_python(
     modules_legacy_python_protocol_file: Path,
-    enable_heater_shaker_python_api: None,
 ) -> None:
     """It should map legacy module commands."""
     protocol_reader = ProtocolReader()

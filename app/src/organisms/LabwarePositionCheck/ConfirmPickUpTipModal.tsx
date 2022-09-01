@@ -28,7 +28,7 @@ export const ConfirmPickUpTipModal = (props: Props): JSX.Element => {
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Text
-        as={'h4'}
+        as="h4"
         textTransform={TYPOGRAPHY.textTransformUppercase}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
         marginBottom={SPACING_3}
@@ -44,20 +44,20 @@ export const ConfirmPickUpTipModal = (props: Props): JSX.Element => {
         <Flex paddingRight={SPACING_3}>
           <NewSecondaryBtn
             onClick={props.onDeny}
-            width={'auto'}
+            width="auto"
             backgroundColor={C_WHITE}
             color={C_BLUE}
-            id={'ConfirmPickUpTipModal_Deny'}
+            id="ConfirmPickUpTipModal_Deny"
           >
             {t('confirm_pick_up_tip_modal_try_again_text')}
           </NewSecondaryBtn>
         </Flex>
         <NewPrimaryBtn
           onClick={props.onConfirm}
-          width={'auto'}
+          width="auto"
           backgroundColor={C_BLUE}
           color={C_WHITE}
-          id={'ConfirmPickUpTipModal_Deny'}
+          id="ConfirmPickUpTipModal_Deny"
         >
           {props.confirmText}
         </NewPrimaryBtn>

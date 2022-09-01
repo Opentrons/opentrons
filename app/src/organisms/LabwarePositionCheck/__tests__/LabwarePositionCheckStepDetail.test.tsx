@@ -20,7 +20,7 @@ import {
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 import { i18n } from '../../../i18n'
-import { JogControls } from '../../../molecules/JogControls'
+import { DeprecatedJogControls } from '../../../molecules/DeprecatedJogControls'
 import { OffsetVector } from '../../../molecules/OffsetVector'
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
 import { LabwarePositionCheckStepDetail } from '../LabwarePositionCheckStepDetail'
@@ -45,7 +45,7 @@ jest.mock('@opentrons/shared-data', () => {
   }
 })
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../molecules/JogControls')
+jest.mock('../../../molecules/DeprecatedJogControls')
 jest.mock('../../Devices/hooks')
 jest.mock('../hooks/useLabwareOffsetForLabware')
 jest.mock('../StepDetailText')
@@ -82,7 +82,9 @@ const mockPipetteRender = PipetteRender as jest.MockedFunction<
 const mockOffsetVector = OffsetVector as jest.MockedFunction<
   typeof OffsetVector
 >
-const mockJogControls = JogControls as jest.MockedFunction<typeof JogControls>
+const mockJogControls = DeprecatedJogControls as jest.MockedFunction<
+  typeof DeprecatedJogControls
+>
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'

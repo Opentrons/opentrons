@@ -29,7 +29,7 @@ export function Banner(props: BannerProps): JSX.Element | null {
     <Flex
       marginTop={SPACING.spacing4}
       flexDirection={DIRECTION_COLUMN}
-      backgroundColor={COLORS.background}
+      backgroundColor={COLORS.fundamentalsBackground}
       padding={SPACING.spacing5}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >
@@ -85,7 +85,7 @@ export const BannerItem = (props: BannerItemProps): JSX.Element => {
         </StyledText>
       </Flex>
       <TertiaryButton
-        data-testid={`banner_open_wizard_btn`}
+        data-testid="banner_open_wizard_btn"
         onClick={() => onClick()}
       >
         {btnText}

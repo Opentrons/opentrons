@@ -153,16 +153,16 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     <Flex
       width="11.625rem"
       zIndex={10}
-      borderRadius={'4px 4px 0px 0px'}
-      boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+      borderRadius="4px 4px 0px 0px"
+      boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}
-      top={'2.3rem'}
+      top="2.3rem"
       right={0}
       flexDirection={DIRECTION_COLUMN}
     >
       <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-log`}>
-        <MenuItem data-testid={`RecentProtocolRun_OverflowMenu_viewRunRecord`}>
+        <MenuItem data-testid="RecentProtocolRun_OverflowMenu_viewRunRecord">
           {t('view_run_record')}
         </MenuItem>
       </NavLink>
@@ -170,7 +170,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         {...targetProps}
         onClick={handleResetClick}
         disabled={robotIsBusy || isRobotOnWrongVersionOfSoftware}
-        data-testid={`RecentProtocolRun_OverflowMenu_rerunNow`}
+        data-testid="RecentProtocolRun_OverflowMenu_rerunNow"
       >
         {t('rerun_now')}
       </MenuItem>
@@ -180,7 +180,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
         </Tooltip>
       )}
       <MenuItem
-        data-testid={`RecentProtocolRun_OverflowMenu_downloadRunLog`}
+        data-testid="RecentProtocolRun_OverflowMenu_downloadRunLog"
         onClick={onDownloadClick}
       >
         {t('download_run_log')}
@@ -188,7 +188,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       <Divider marginY="0" />
       <MenuItem
         onClick={handleDeleteClick}
-        data-testid={`RecentProtocolRun_OverflowMenu_deleteRun`}
+        data-testid="RecentProtocolRun_OverflowMenu_deleteRun"
       >
         {t('delete_run')}
       </MenuItem>

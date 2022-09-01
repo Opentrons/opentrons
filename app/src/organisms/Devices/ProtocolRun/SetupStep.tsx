@@ -44,10 +44,10 @@ const COLLAPSED_STYLE = css`
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: ${COLORS.lightGreyHover};
+    background: ${COLORS.lightGreyEnabled};
   }
   &:active {
-    background: #16212d40;
+    background: ${COLORS.lightGreyHover};
   }
 `
 export function SetupStep({
@@ -84,7 +84,7 @@ export function SetupStep({
                 {label}
               </StyledText>
               <StyledText
-                color={COLORS.darkBlack}
+                color={COLORS.darkBlackEnabled}
                 css={TYPOGRAPHY.h3SemiBold}
                 marginBottom={SPACING.spacing2}
                 id={`CollapsibleStep_${title}`}
@@ -93,7 +93,7 @@ export function SetupStep({
               </StyledText>
               <StyledText
                 as="p"
-                color={COLORS.darkBlack}
+                color={COLORS.darkBlackEnabled}
                 id={`CollapsibleStep_${description}`}
               >
                 {description}
@@ -106,21 +106,21 @@ export function SetupStep({
                     size={SIZE_1}
                     color={
                       calibrationStatusComplete
-                        ? COLORS.success
-                        : COLORS.warning
+                        ? COLORS.successEnabled
+                        : COLORS.warningEnabled
                     }
                     marginRight={SPACING.spacing3}
                     name={
                       calibrationStatusComplete ? 'ot-check' : 'alert-circle'
                     }
-                    id={'RunSetupCard_calibrationIcon'}
+                    id="RunSetupCard_calibrationIcon"
                   />
                   <StyledText
                     color={COLORS.black}
                     css={TYPOGRAPHY.pSemiBold}
                     marginRight={SPACING.spacing4}
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
-                    id={'RunSetupCard_calibrationText'}
+                    id="RunSetupCard_calibrationText"
                   >
                     {calibrationStatusComplete
                       ? t('calibration_ready')
@@ -129,7 +129,7 @@ export function SetupStep({
                 </Flex>
               ) : null}
               <Icon
-                color={COLORS.darkBlack}
+                color={COLORS.darkBlackEnabled}
                 size="1.5rem"
                 css={ACCORDION_STYLE}
                 name={expanded ? 'minus' : 'plus'}

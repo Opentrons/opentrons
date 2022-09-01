@@ -17,6 +17,7 @@ from .fields import (
     SensorOutputBindingField,
     EepromDataField,
     SerialField,
+    SerialDataCodeField,
     SensorThresholdModeField,
     PipetteTipActionTypeField,
 )
@@ -77,7 +78,7 @@ class EEPromReadPayload(utils.BinarySerializable):
     """Eeprom read request payload ."""
 
     address: utils.UInt16Field
-    data_length: utils.UInt8Field
+    data_length: utils.UInt16Field
 
 
 @dataclass
@@ -147,7 +148,7 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 
     seq_id: utils.UInt8Field
     current_position_um: utils.UInt32Field
-    encoder_position: utils.Int32Field
+    encoder_position_um: utils.Int32Field
     ack_id: utils.UInt8Field
 
 
@@ -384,7 +385,7 @@ class PipetteInfoResponsePayload(utils.BinarySerializable):
 
     name: PipetteNameField
     model: utils.UInt16Field
-    serial: SerialField
+    serial: SerialDataCodeField
 
 
 @dataclass
@@ -406,7 +407,7 @@ class GripperInfoResponsePayload(utils.BinarySerializable):
     """A response carrying data about an attached gripper."""
 
     model: utils.UInt16Field
-    serial: SerialField
+    serial: SerialDataCodeField
 
 
 @dataclass

@@ -4,8 +4,8 @@ import contextMenu from 'electron-context-menu'
 
 import { createUi } from './ui'
 import { initializeMenu } from './menu'
-import { initializePython } from './protocol-analysis'
 import { createLogger } from './log'
+import { registerProtocolAnalysis } from './protocol-analysis'
 import { registerDiscovery } from './discovery'
 import { registerLabware } from './labware'
 import { registerRobotLogs } from './robot-logs'
@@ -13,13 +13,7 @@ import { registerUpdate } from './update'
 import { registerBuildrootUpdate } from './buildroot'
 import { registerSystemInfo } from './system-info'
 import { registerProtocolStorage } from './protocol-storage'
-import {
-  getConfig,
-  getStore,
-  getOverrides,
-  registerConfig,
-  registerPythonPath,
-} from './config'
+import { getConfig, getStore, getOverrides, registerConfig } from './config'
 
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
@@ -65,18 +59,15 @@ function startUp(): void {
 
   mainWindow.once('closed', () => (mainWindow = null))
 
-  // TODO kj: remove {} once https://github.com/sindresorhus/electron-context-menu/issues/153 is solved
-  // After upgrading electron-context-menu to after 0.16.0 remove lookUpSelection() and add searchWithGoogle()
   contextMenu({
-    menu: actions => [
-      actions.copy({}),
-      actions.lookUpSelection({}),
-      actions.inspect(),
-    ],
+    menu: actions => {
+      return config.devtools
+        ? [actions.copy({}), actions.searchWithGoogle({}), actions.inspect()]
+        : [actions.copy({}), actions.searchWithGoogle({})]
+    },
   })
 
   initializeMenu()
-  initializePython()
 
   // wire modules to UI dispatches
   const dispatch: Dispatch = action => {
@@ -90,11 +81,11 @@ function startUp(): void {
   const actionHandlers: Dispatch[] = [
     registerConfig(dispatch),
     registerDiscovery(dispatch),
+    registerProtocolAnalysis(dispatch, mainWindow),
     registerRobotLogs(dispatch, mainWindow),
     registerUpdate(dispatch),
     registerBuildrootUpdate(dispatch),
     registerLabware(dispatch, mainWindow),
-    registerPythonPath(),
     registerSystemInfo(dispatch),
     registerProtocolStorage(dispatch),
   ]

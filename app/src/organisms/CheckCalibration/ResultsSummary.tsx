@@ -19,7 +19,6 @@ import {
   COLOR_WARNING,
   OVERLAY_LIGHT_GRAY_50,
   FONT_HEADER_DARK,
-  FONT_SIZE_BODY_2,
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_SEMIBOLD,
   JUSTIFY_CENTER,
@@ -30,6 +29,7 @@ import {
   FONT_STYLE_ITALIC,
   DIRECTION_COLUMN,
   DISPLAY_INLINE_BLOCK,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
@@ -189,7 +189,7 @@ export function ResultsSummary(
           marginBottom={SPACING_2}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
           fontWeight={FONT_WEIGHT_SEMIBOLD}
-          fontSize={FONT_SIZE_BODY_2}
+          fontSize={TYPOGRAPHY.fontSizeH3}
         >
           {DECK_CALIBRATION_HEADER}
         </Text>
@@ -200,7 +200,7 @@ export function ResultsSummary(
           <Box key={m} width="48%" title={`${m}-mount-container`}>
             <Text
               textTransform={TEXT_TRANSFORM_UPPERCASE}
-              fontSize={FONT_SIZE_BODY_2}
+              fontSize={TYPOGRAPHY.fontSizeH3}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
               marginBottom={SPACING_2}
             >
@@ -243,7 +243,7 @@ export function ResultsSummary(
           color={C_BLUE}
           onClick={handleDownloadButtonClick}
           marginBottom={SPACING_5}
-          fontSize={FONT_SIZE_BODY_2}
+          fontSize={TYPOGRAPHY.fontSizeH3}
           title="download-results-button"
         >
           {DOWNLOAD_SUMMARY}
@@ -282,7 +282,7 @@ function RenderResult(props: RenderResultProps): JSX.Element | null {
           color={isGoodCal ? COLOR_SUCCESS : COLOR_WARNING}
           marginRight="0.75rem"
         />
-        <Text fontSize={FONT_SIZE_BODY_2}>
+        <Text fontSize={TYPOGRAPHY.fontSizeH3}>
           {isGoodCal ? GOOD_CALIBRATION : BAD_CALIBRATION}
         </Text>
       </Flex>
@@ -304,7 +304,7 @@ function PipetteResult(props: PipetteResultProps): JSX.Element {
     <Flex paddingY={SPACING_1} flexDirection={DIRECTION_COLUMN} height="100%">
       <Box>
         <Text
-          fontSize={FONT_SIZE_BODY_2}
+          fontSize={TYPOGRAPHY.fontSizeH3}
           fontWeight={FONT_WEIGHT_SEMIBOLD}
           marginBottom={SPACING_1}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
@@ -320,7 +320,7 @@ function PipetteResult(props: PipetteResultProps): JSX.Element {
       </Box>
       <Box marginTop={SPACING_4}>
         <Text
-          fontSize={FONT_SIZE_BODY_2}
+          fontSize={TYPOGRAPHY.fontSizeH3}
           fontWeight={FONT_WEIGHT_SEMIBOLD}
           marginBottom={SPACING_1}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
@@ -352,7 +352,7 @@ function WarningText(props: {
   ].reduce((sum, item) => sum + (item === true ? 1 : 0), 0)
   return badCount > 0 ? (
     <>
-      <Box marginTop={SPACING_3} fontSize={FONT_SIZE_BODY_2}>
+      <Box marginTop={SPACING_3} fontSize={TYPOGRAPHY.fontSizeH3}>
         <Text display={DISPLAY_INLINE_BLOCK}>
           {`${FOUND}`}
           &nbsp;

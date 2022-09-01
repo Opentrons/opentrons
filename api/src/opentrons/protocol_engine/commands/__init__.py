@@ -57,6 +57,14 @@ from .dispense import (
     DispenseCommandType,
 )
 
+from .dispense_in_place import (
+    DispenseInPlace,
+    DispenseInPlaceParams,
+    DispenseInPlaceCreate,
+    DispenseInPlaceResult,
+    DispenseInPlaceCommandType,
+)
+
 from .drop_tip import (
     DropTip,
     DropTipParams,
@@ -79,6 +87,15 @@ from .load_labware import (
     LoadLabwareCreate,
     LoadLabwareResult,
     LoadLabwareCommandType,
+)
+
+from .load_liquid import (
+    LoadLiquid,
+    LoadLiquidParams,
+    LoadLiquidResult,
+    LoadLiquidCreate,
+    LoadLiquidCommandType,
+    LoadLiquidImplementation,
 )
 
 from .load_module import (
@@ -207,6 +224,12 @@ __all__ = [
     "DispenseParams",
     "DispenseResult",
     "DispenseCommandType",
+    # dispense in place command models
+    "DispenseInPlace",
+    "DispenseInPlaceCreate",
+    "DispenseInPlaceParams",
+    "DispenseInPlaceResult",
+    "DispenseInPlaceCommandType",
     # drop tip command models
     "DropTip",
     "DropTipCreate",
@@ -297,6 +320,13 @@ __all__ = [
     "BlowOutImplementation",
     "BlowOutParams",
     "BlowOut",
+    # load liquid command models
+    "LoadLiquid",
+    "LoadLiquidCreate",
+    "LoadLiquidImplementation",
+    "LoadLiquidParams",
+    "LoadLiquidResult",
+    "LoadLiquidCommandType",
     # module command bundles
     "heater_shaker",
     "magnetic_module",

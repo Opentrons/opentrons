@@ -5,11 +5,12 @@ from datetime import datetime
 from typing import NamedTuple, Type
 
 from opentrons.ordered_set import OrderedSet
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.types import DoorState
 
 from opentrons.protocol_engine import commands, errors
-from opentrons.protocol_engine.types import DeckSlotLocation, PipetteName, WellLocation
+from opentrons.protocol_engine.types import DeckSlotLocation, WellLocation
 from opentrons.protocol_engine.state import Config
 from opentrons.protocol_engine.state.commands import (
     CommandState,
@@ -142,7 +143,7 @@ class QueueCommandSpec(NamedTuple):
             command_request=commands.LoadPipetteCreate(
                 params=commands.LoadPipetteParams(
                     mount=MountType.LEFT,
-                    pipetteName=PipetteName.P300_SINGLE,
+                    pipetteName=PipetteNameType.P300_SINGLE,
                 ),
                 key="command-key",
             ),

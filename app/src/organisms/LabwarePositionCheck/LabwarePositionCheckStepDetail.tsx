@@ -14,12 +14,12 @@ import {
   DIRECTION_COLUMN,
   Box,
   JUSTIFY_SPACE_BETWEEN,
-  FONT_SIZE_BODY_2,
   Link,
   ALIGN_START,
   BORDERS,
   ALIGN_CENTER,
   JUSTIFY_SPACE_AROUND,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   getIsTiprack,
@@ -28,12 +28,11 @@ import {
   getVectorSum,
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
+import { HORIZONTAL_PLANE, VERTICAL_PLANE } from '../../molecules/JogControls'
 import {
-  HORIZONTAL_PLANE,
-  JogControls,
-  JogControlsProps,
-  VERTICAL_PLANE,
-} from '../../molecules/JogControls'
+  DeprecatedJogControls,
+  DeprecatedJogControlsProps,
+} from '../../molecules/DeprecatedJogControls'
 import { OffsetVector } from '../../molecules/OffsetVector'
 import { useProtocolDetailsForRun } from '../Devices/hooks'
 import { StepDetailText } from './StepDetailText'
@@ -91,7 +90,9 @@ export const LabwarePositionCheckStepDetail = (
     (
       command: LabwarePositionCheckCreateCommand
     ): command is LabwarePositionCheckMovementCommand =>
-      command.commandType !== 'thermocycler/openLid'
+      command.commandType !== 'thermocycler/openLid' &&
+      command.commandType !== 'heaterShaker/deactivateShaker' &&
+      command.commandType !== 'heaterShaker/closeLabwareLatch'
   )
   const command = stepMovementCommands[0]
 
@@ -108,12 +109,16 @@ export const LabwarePositionCheckStepDetail = (
   const wellStroke: WellStroke = wellsToHighlight.reduce(
     (acc, wellName) => ({
       ...acc,
-      [wellName]: COLORS.blue,
+      [wellName]: COLORS.blueEnabled,
     }),
     {}
   )
 
-  const handleJog: JogControlsProps['jog'] = (axis, direction, step) => {
+  const handleJog: DeprecatedJogControlsProps['jog'] = (
+    axis,
+    direction,
+    step
+  ) => {
     const onSuccess = (position: Coordinates | null): void => {
       setLivePositionDeckCoords(position)
     }
@@ -131,11 +136,11 @@ export const LabwarePositionCheckStepDetail = (
 
   return (
     <Flex
-      padding={'0.75rem'}
+      padding="0.75rem"
       justifyContent={JUSTIFY_CENTER}
       boxShadow="1px 1px 1px rgba(0, 0, 0, 0.25)"
       borderRadius="4px"
-      backgroundColor={COLORS.background}
+      backgroundColor={COLORS.fundamentalsBackground}
       flexDirection={DIRECTION_COLUMN}
       width="106%"
     >
@@ -157,8 +162,8 @@ export const LabwarePositionCheckStepDetail = (
                 wellStroke={wellStroke}
                 wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
                 highlightedWellLabels={{ wells: wellsToHighlight }}
-                labwareStroke={COLORS.medGrey}
-                wellLabelColor={COLORS.medGrey}
+                labwareStroke={COLORS.medGreyEnabled}
+                wellLabelColor={COLORS.medGreyEnabled}
               />
               <PipetteRender
                 labwareDef={labwareDef}
@@ -186,7 +191,7 @@ export const LabwarePositionCheckStepDetail = (
       >
         <Flex justifyContent={JUSTIFY_SPACE_AROUND} alignItems={ALIGN_CENTER}>
           <Flex
-            backgroundColor={COLORS.background}
+            backgroundColor={COLORS.fundamentalsBackground}
             flexDirection={DIRECTION_COLUMN}
             borderRadius={BORDERS.radiusSoftCorners}
             padding={SPACING.spacing3}
@@ -203,10 +208,10 @@ export const LabwarePositionCheckStepDetail = (
             {!showJogControls ? (
               <Link
                 role="button"
-                fontSize={FONT_SIZE_BODY_2}
-                color={COLORS.blue}
+                fontSize={TYPOGRAPHY.fontSizeH3}
+                color={COLORS.blueEnabled}
                 onClick={() => setShowJogControls(true)}
-                id={`LabwarePositionCheckStepDetail_reveal_jog_controls`}
+                id="LabwarePositionCheckStepDetail_reveal_jog_controls"
               >
                 {t('reveal_jog_controls')}
               </Link>
@@ -214,14 +219,13 @@ export const LabwarePositionCheckStepDetail = (
           </Flex>
         </Flex>
         {showJogControls ? (
-          <JogControls
+          <DeprecatedJogControls
             marginTop={SPACING.spacing3}
             jog={handleJog}
             stepSizes={[0.1, 1, 10]}
             planes={[HORIZONTAL_PLANE, VERTICAL_PLANE]}
             width="100%"
-            directionControlButtonColor={COLORS.blue}
-            isLPC={true}
+            directionControlButtonColor={COLORS.blueEnabled}
           />
         ) : null}
       </Flex>

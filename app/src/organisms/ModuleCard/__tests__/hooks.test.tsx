@@ -15,11 +15,11 @@ import heaterShakerCommands from '@opentrons/shared-data/protocol/fixtures/6/hea
 import { getProtocolModulesInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import {
+  useIsLegacySessionInProgress,
   useIsRobotBusy,
   useProtocolDetailsForRun,
   useRunStatuses,
 } from '../../Devices/hooks'
-
 import {
   useLatchControls,
   useModuleOverflowMenu,
@@ -67,6 +67,9 @@ const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
 >
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
+>
+const mockUseIsLegacySessionsInProgress = useIsLegacySessionInProgress as jest.MockedFunction<
+  typeof useIsLegacySessionInProgress
 >
 
 const mockCloseLatchHeaterShaker = {
@@ -198,15 +201,14 @@ const mockTCLidHeating = {
 describe('useLatchControls', () => {
   const store: Store<any> = createStore(jest.fn(), {})
   let mockCreateLiveCommand = jest.fn()
-  let mockCreateCommand = jest.fn()
 
   beforeEach(() => {
     store.dispatch = jest.fn()
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: true,
-      isRunStill: true,
+      isRunRunning: false,
+      isRunStill: false,
       isRunIdle: false,
       isRunTerminal: false,
     })
@@ -214,11 +216,6 @@ describe('useLatchControls', () => {
       createLiveCommand: mockCreateLiveCommand,
     } as any)
     mockUseIsRobotBusy.mockReturnValue(false)
-    mockCreateCommand = jest.fn()
-    mockCreateCommand.mockResolvedValue(null)
-    mockUseCreateCommandMutation.mockReturnValue({
-      createCommand: mockCreateCommand,
-    } as any)
   })
 
   afterEach(() => {
@@ -250,7 +247,7 @@ describe('useLatchControls', () => {
       },
     })
   })
-  it('should return if latch is close and handle latch function to open latch', () => {
+  it('should return if latch is closed and handle latch function opens latch', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
@@ -286,8 +283,9 @@ describe('useModuleOverflowMenu', () => {
     store.dispatch = jest.fn()
     mockCreateLiveCommand = jest.fn()
     mockCreateLiveCommand.mockResolvedValue(null)
+    mockUseIsLegacySessionsInProgress.mockReturnValue(true)
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: true,
+      isRunRunning: false,
       isRunStill: true,
       isRunTerminal: false,
       isRunIdle: false,
