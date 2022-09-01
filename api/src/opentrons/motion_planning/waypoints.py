@@ -45,10 +45,9 @@ def get_waypoints(
     # This function is used by v6+ JSON protocols and v3+
     # Python API protocols, but not v2 Python API protocols.
     #
-    # Flipping `use_experimental_waypoint_planning` to True to make PAPIv2 use this too
-    # causes three test failures at the time of this writing.
-    # Eventually, those may be resolved and this may take over for
-    # opentrons.hardware_control.util.plan_arc, which PAPIv2 currently uses.
+    # To experiment with using this module in PAPIv2,
+    # flip the default of `use_experimental_waypoint_planning` to True
+    # in opentrons.protocols.geometry.planning.plan_moves
     dest_waypoint = Waypoint(dest, dest_cp)
     waypoints: List[Waypoint] = []
 
@@ -89,11 +88,15 @@ def get_waypoints(
     )
 
     # set the actual travel z according to:
-    # use the max of min_travel_z with clearance, origin height, or dest height
-    # if any of those exceed max_travel_z, just use max_travel_z
+    # use the max of min_travel_z with clearance or dest height
+    # if either of those exceed max_travel_z, just use max_travel_z
     # if max_travel_z does not provide enough clearance, check above would
     # raise an ArcOutOfBoundsError
-    travel_z = min(max_travel_z, max(min_travel_z + travel_z_margin, origin.z, dest.z))
+    # if origin.z is higher than the selected travel z, travel at origin z instead
+    travel_z = max(
+        min(max_travel_z, max(min_travel_z + travel_z_margin, dest.z)),
+        origin.z,
+    )
 
     # if origin.z isn't the travel height: add waypoint to move to origin.z
     if travel_z > origin.z:
