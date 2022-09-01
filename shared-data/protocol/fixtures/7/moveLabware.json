@@ -1253,7 +1253,7 @@
       "commandType": "moveToWell",
       "params": {
         "pipetteId": "pipetteId",
-        "labwareId": "destPlateId",
+        "labwareId": "wellPlateId",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
@@ -1265,7 +1265,7 @@
       "commandType": "moveToWell",
       "params": {
         "pipetteId": "pipetteId",
-        "labwareId": "destPlateId",
+        "labwareId": "wellPlateId",
         "wellName": "B3",
         "wellLocation": {
           "origin": "bottom",
@@ -1284,7 +1284,7 @@
       "commandType": "moveToWell",
       "params": {
         "pipetteId": "pipetteId",
-        "labwareId": "destPlateId",
+        "labwareId": "wellPlateId",
         "wellName": "A1",
         "wellLocation": {
           "origin": "bottom",
@@ -1296,7 +1296,7 @@
       "commandType": "moveToWell",
       "params": {
         "pipetteId": "pipetteId",
-        "labwareId": "destPlateId",
+        "labwareId": "wellPlateId",
         "wellName": "B3",
         "wellLocation": {
           "origin": "bottom",
