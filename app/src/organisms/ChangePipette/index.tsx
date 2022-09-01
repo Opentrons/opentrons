@@ -172,7 +172,8 @@ export function ChangePipette(props: Props): JSX.Element | null {
   )
   const eightChannel = wantedPipette?.channels === 8
   const direction = actualPipette ? DETACH : ATTACH
-  const isSelectPipetteStep = direction === ATTACH && wantedName === null
+  const isSelectPipetteStep =
+    direction === ATTACH && wantedName === null && wizardStep === INSTRUCTIONS
 
   const exitModal = (
     <ExitModal

@@ -122,6 +122,8 @@ export function Select(props: SelectComponentProps): JSX.Element {
       marginLeft: SPACING.spacingSS,
       color: COLORS.darkBlackEnabled,
       fontSize: TYPOGRAPHY.fontSizeP,
+      marginTop: '0.2rem',
+
     }),
     singleValue: (styles: CSSObjectWithLabel) => ({
       ...styles,
