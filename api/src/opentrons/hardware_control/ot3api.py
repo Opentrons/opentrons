@@ -989,7 +989,7 @@ class OT3API(
     async def _grip(self, duty_cycle: float) -> None:
         """Move the gripper jaw inward to close."""
         try:
-            await self._backend.gripper_move_jaw(duty_cycle=duty_cycle)
+            await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
         except Exception:
             self._log.exception("Gripper grip failed")
             raise
@@ -1003,6 +1003,15 @@ class OT3API(
             self._log.exception("Gripper home failed")
             raise
 
+    @ExecutionManagerProvider.wait_for_running
+    async def _jaw_width(self, jaw_width_um: int) -> None:
+        """Move the gripper jaw to a specific width."""
+        try:
+            await self._backend.gripper_move_jaw(jaw_width_um=jaw_width_um)
+        except Exception:
+            self._log.exception("Gripper set width failed")
+            raise
+
     async def grip(self, force_newtons: float) -> None:
         self._gripper_handler.check_ready_for_grip()
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(force_newtons)
@@ -1014,6 +1023,10 @@ class OT3API(
         self._gripper_handler.check_ready_for_jaw_move()
         await self._ungrip()
         self._gripper_handler.set_jaw_state(GripperJawState.HOMED_READY)
+
+    async def jaw_width(self, jaw_width_um: int) -> None:
+        self._gripper_handler.check_ready_for_jaw_move()
+        await self._jaw_width(jaw_width_um)
 
     # Pipette action API
     async def prepare_for_aspirate(

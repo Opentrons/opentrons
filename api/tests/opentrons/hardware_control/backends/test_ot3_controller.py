@@ -400,7 +400,7 @@ async def test_gripper_home_jaw(controller: OT3Controller, mock_move_group_run):
         for move_group in move_group_runner._move_groups:
             assert move_group  # don't pass in empty groups
             assert len(move_group) == 1
-        # onlly homing the gripper jaw
+        # only homing the gripper jaw
         assert list(move_group[0].keys()) == [NodeId.gripper_g]
         step = move_group[0][NodeId.gripper_g]
         assert step.stop_condition == MoveStopCondition.limit_switch
@@ -408,16 +408,29 @@ async def test_gripper_home_jaw(controller: OT3Controller, mock_move_group_run):
 
 
 async def test_gripper_grip(controller: OT3Controller, mock_move_group_run):
-    await controller.gripper_move_jaw(duty_cycle=50)
+    await controller.gripper_grip_jaw(duty_cycle=50)
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
             assert move_group  # don't pass in empty groups
             assert len(move_group) == 1
-        # onlly homing the gripper jaw
+        # only gripping the gripper jaw
         assert list(move_group[0].keys()) == [NodeId.gripper_g]
         step = move_group[0][NodeId.gripper_g]
         assert step.stop_condition == MoveStopCondition.none
+        assert step.move_type == MoveType.grip
+
+async def test_gripper_jaw_width(controller: OT3Controller, mock_move_group_run):
+    await controller.gripper_move_jaw(jaw_width_um=80000)
+    for call in mock_move_group_run.call_args_list:
+        move_group_runner = call[0][0]
+        for move_group in move_group_runner._move_groups:
+            assert move_group  # don't pass in empty groups
+            assert len(move_group) == 1
+        # only moving the gripper jaw
+        assert list(move_group[0].keys()) == [NodeId.gripper_g]
+        step = move_group[0][NodeId.gripper_g]
+        assert step.stop_condition == MoveStopCondition.encoder_position
         assert step.move_type == MoveType.linear
 
 

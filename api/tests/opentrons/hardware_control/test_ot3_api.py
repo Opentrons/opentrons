@@ -90,6 +90,18 @@ def mock_ungrip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
     ) as mock_move:
         yield mock_move
 
+@pytest.fixture
+def mock_set_jaw_width(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "_jaw_width",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj._jaw_width,
+            wraps=ot3_hardware.managed_obj._jaw_width,
+        ),
+    ) as mock_move:
+        yield mock_move
+
 
 @pytest.fixture
 async def mock_backend_move(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
@@ -396,6 +408,9 @@ async def test_gripper_action(
 
     await ot3_hardware.ungrip()
     mock_ungrip.assert_called_once()
+
+    await ot3_hardware.jaw_width(80000)
+    mock_set_jaw_width.assert_called_once()
 
 
 async def test_gripper_move_fails_with_no_gripper(
