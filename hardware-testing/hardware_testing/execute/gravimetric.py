@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from statistics import stdev
 from pathlib import Path
 from typing import List
+from typing_extensions import Final
 
 from opentrons.protocol_api import ProtocolContext
 
@@ -23,11 +24,11 @@ from hardware_testing.pipette.liquid_class import PipetteLiquidClass
 from hardware_testing.pipette.timestamp import SampleTimestamps
 
 
-LIQUID_CLASS_LOOKUP = {300: liquid.defaults.DEFAULT_LIQUID_CLASS_OT2_P300_SINGLE}
-SCALE_SECONDS_TO_SETTLE = 15
-GRAV_STABLE_DURATION = 10
-GRAV_STABLE_TIMEOUT = GRAV_STABLE_DURATION + 5
-DELAY_SECONDS_AFTER_ASPIRATE = SCALE_SECONDS_TO_SETTLE + GRAV_STABLE_TIMEOUT
+LIQUID_CLASS_LOOKUP: Final = {300: liquid.defaults.DEFAULT_LIQUID_CLASS_OT2_P300_SINGLE}
+SCALE_SECONDS_TO_SETTLE: Final = 15
+GRAV_STABLE_DURATION: Final = 10
+GRAV_STABLE_TIMEOUT: Final = GRAV_STABLE_DURATION + 5
+DELAY_SECONDS_AFTER_ASPIRATE: Final = SCALE_SECONDS_TO_SETTLE + GRAV_STABLE_TIMEOUT
 
 
 @dataclass
@@ -56,12 +57,8 @@ def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> ExecuteGravItems:
     run_id, start_time = create_run_id_and_start_time()
     # LABWARE
     # NOTE: labware must be fully initialized before the liquid tracker
-    _layout = LayoutLabware.build(
-        ctx,
-        DEFAULT_SLOTS_GRAV,
-        tip_volume=cfg.pipette_volume,
-        definitions_dir=cfg.labware_dir,
-    )
+    _layout = LayoutLabware(ctx=ctx, slots=DEFAULT_SLOTS_GRAV, tip_volume=cfg.pipette_volume)
+    _layout.load(definitions_dir=cfg.labware_dir)
     overwrite_default_labware_positions(ctx, layout=_layout)
     # LIQUID-LEVEL TRACKING
     _liq_track = LiquidTracker()
