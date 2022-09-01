@@ -13,23 +13,16 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { WizardHeader } from '../../molecules/WizardHeader'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { Mount } from '../../redux/pipettes/types'
 
 interface LevelPipetteProps {
   mount: Mount
-  wantedPipette: PipetteNameSpecs | null
   pipetteModelName: string
   back: () => void
-  exit: () => void
   confirm: () => void
-  currentStep: number
-  totalSteps: number
 }
 
 function LevelingVideo(props: {
@@ -57,29 +50,12 @@ function LevelingVideo(props: {
 }
 
 export function LevelPipette(props: LevelPipetteProps): JSX.Element {
-  const {
-    mount,
-    pipetteModelName,
-    wantedPipette,
-    back,
-    exit,
-    confirm,
-    currentStep,
-    totalSteps,
-  } = props
+  const { mount, pipetteModelName, back, confirm } = props
 
   const { t } = useTranslation('change_pipette')
 
   return (
     <>
-      <WizardHeader
-        currentStep={currentStep}
-        totalSteps={totalSteps}
-        onExit={exit}
-        title={t('attach_pipette_type', {
-          pipetteName: wantedPipette?.displayName,
-        })}
-      />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         paddingX={SPACING.spacing6}

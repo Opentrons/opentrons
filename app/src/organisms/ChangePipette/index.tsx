@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 import { getPipetteNameSpecs, shouldLevel } from '@opentrons/shared-data'
 import { useTranslation } from 'react-i18next'
-
+import { SPACING } from '@opentrons/components'
 import {
   useDispatchApiRequests,
   getRequestById,
@@ -24,24 +25,25 @@ import {
   HOME,
 } from '../../redux/robot-controls'
 
-import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/CalibrationPanels'
 import { useFeatureFlag } from '../../redux/config'
 import { ModalShell } from '../../molecules/Modal'
+import { WizardHeader } from '../../molecules/WizardHeader'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { StyledText } from '../../atoms/text'
+import { useCalibratePipetteOffset } from '../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'
 import { ClearDeckModal } from './ClearDeckModal/index'
+import { ConfirmPipette } from './ConfirmPipette'
+//  remove lines 40 - 46 when removing FF
+import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 import { ExitAlertModal } from './ExitAlertModal'
 import { DeprecatedInstructions } from './DeprecatedInstructions'
-import { ConfirmPipette } from './ConfirmPipette'
 import { DeprecatedConfirmPipette } from './DeprecatedConfirmPipette'
 import { RequestInProgressModal } from './RequestInProgressModal'
 import { DeprecatedLevelPipette } from './DeprecatedLevelPipette'
 import { ClearDeckAlertModal } from './ClearDeckModal/ClearDeckAlertModal'
-import { SPACING } from '@opentrons/components'
 
 import {
   ATTACH,
@@ -50,6 +52,8 @@ import {
   INSTRUCTIONS,
   CONFIRM,
   CALIBRATE_PIPETTE,
+  SINGLE_CHANNEL_STEPS,
+  EIGHT_CHANNEL_STEPS,
 } from './constants'
 
 import type { State, Dispatch } from '../../redux/types'
@@ -72,6 +76,7 @@ const PIPETTE_OFFSET_CALIBRATION = 'pipette offset calibration'
 export function ChangePipette(props: Props): JSX.Element | null {
   const { robotName, mount, closeModal } = props
   const { t } = useTranslation('change_pipette')
+  const history = useHistory()
   const enableChangePipetteWizard = useFeatureFlag('enableChangePipetteWizard')
   const dispatch = useDispatch<Dispatch>()
   const finalRequestId = React.useRef<string | null | undefined>(null)
@@ -111,9 +116,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
   })?.status
 
   React.useEffect(() => {
-    if (homePipStatus === SUCCESS) {
-      closeModal()
-    }
+    if (homePipStatus === SUCCESS) closeModal()
   }, [homePipStatus, closeModal])
 
   const homePipAndExit = React.useCallback(
@@ -155,70 +158,6 @@ export function ChangePipette(props: Props): JSX.Element | null {
     mount,
   }
 
-  if (
-    movementStatus !== null &&
-    //  when FF is removed, change this logic so the modal only appears when movement status is MOVING
-    (movementStatus === HOMING || movementStatus === MOVING)
-  ) {
-    return enableChangePipetteWizard && movementStatus === MOVING ? (
-      <ModalShell height="28.12rem" width="47rem">
-        <InProgressModal
-          wizardHeaderTitle={t('attach_pipette')}
-          currentStep={1}
-          totalSteps={5}
-        >
-          <StyledText
-            as="h1"
-            marginTop={SPACING.spacing5}
-            marginBottom={SPACING.spacing3}
-          >
-            {t('moving_gantry')}
-          </StyledText>
-        </InProgressModal>
-      </ModalShell>
-    ) : (
-      <RequestInProgressModal
-        {...baseProps}
-        movementStatus={movementStatus}
-        isPipetteHoming={homePipStatus === PENDING}
-      />
-    )
-  }
-
-  if (wizardStep === CLEAR_DECK) {
-    return enableChangePipetteWizard ? (
-      <ModalShell height="28.12rem" width="47rem">
-        <ClearDeckModal
-          totalSteps={5}
-          currentStep={0}
-          title={
-            actualPipette?.displayName != null
-              ? t('detach_pipette', {
-                  pipette: actualPipette.displayName,
-                  mount: mount[0].toUpperCase() + mount.slice(1),
-                })
-              : t('attach_pipette')
-          }
-          onCancelClick={closeModal}
-          onContinueClick={() => {
-            dispatch(move(robotName, CHANGE_PIPETTE, mount, true))
-            setWizardStep(INSTRUCTIONS)
-          }}
-        />
-      </ModalShell>
-    ) : (
-      <ClearDeckAlertModal
-        cancelText={CANCEL}
-        continueText={MOVE_PIPETTE_TO_FRONT}
-        onCancelClick={closeModal}
-        onContinueClick={() => {
-          dispatch(move(robotName, CHANGE_PIPETTE, mount, true))
-          setWizardStep(INSTRUCTIONS)
-        }}
-      />
-    )
-  }
-
   const basePropsWithPipettes = {
     ...baseProps,
     robotName,
@@ -228,54 +167,226 @@ export function ChangePipette(props: Props): JSX.Element | null {
     displayCategory:
       actualPipette?.displayCategory || wantedPipette?.displayCategory || null,
   }
+  const [instructionStepPage, instructionSetStepPage] = React.useState<number>(
+    0
+  )
+  const eightChannel = wantedPipette?.channels === 8
+  const direction = actualPipette ? DETACH : ATTACH
+  const exitModal = (
+    <ExitModal
+      back={() => setConfirmExit(false)}
+      exit={homePipAndExit}
+      direction={direction}
+    />
+  )
 
+  //  this is the logic for the Instructions page that renders 3 pages within the component
+  let instructionsCurrentStep: number = SINGLE_CHANNEL_STEPS
   if (wizardStep === INSTRUCTIONS) {
-    const direction = actualPipette ? DETACH : ATTACH
+    if (instructionStepPage === 0) {
+      instructionsCurrentStep = 1
+    } else if (instructionStepPage === 1) {
+      instructionsCurrentStep = 2
+    } else if (instructionStepPage === 2) {
+      instructionsCurrentStep = 3
+    }
+  }
 
+  let exitWizardHeader
+  let wizardTitle: string =
+    actualPipette?.displayName != null
+      ? t('detach_pipette', {
+          pipette: actualPipette.displayName,
+          mount: mount[0].toUpperCase() + mount.slice(1),
+        })
+      : t('attach_pipette')
+  let currentStep: number = 0
+  let contents: JSX.Element | null = null
+
+  if (movementStatus === MOVING) {
+    contents = (
+      <InProgressModal>
+        <StyledText
+          as="h1"
+          marginTop={SPACING.spacing5}
+          marginBottom={SPACING.spacing3}
+        >
+          {t('moving_gantry')}
+        </StyledText>
+      </InProgressModal>
+    )
+  } else if (wizardStep === CLEAR_DECK) {
+    exitWizardHeader = closeModal
+    contents = (
+      <ClearDeckModal
+        onContinueClick={() => {
+          dispatch(move(robotName, CHANGE_PIPETTE, mount, true))
+          setWizardStep(INSTRUCTIONS)
+        }}
+      />
+    )
+  } else if (wizardStep === INSTRUCTIONS) {
+    const noPipetteSelectedAttach =
+      direction === ATTACH && wantedPipette === null
+    const attachWizardHeader = noPipetteSelectedAttach
+      ? t('attach_pipette')
+      : t('attach_pipette_type', {
+          pipetteName: wantedPipette?.displayName ?? '',
+        })
+
+    const noPipetteDetach =
+      direction === DETACH && actualPipette === null && wantedPipette === null
+    const detachWizardHeader = noPipetteDetach
+      ? t('detach')
+      : t('detach_pipette', {
+          pipette: actualPipette?.displayName ?? wantedPipette?.displayName,
+          mount: mount[0].toUpperCase() + mount.slice(1),
+        })
+
+    let title
+    if (instructionStepPage === 2) {
+      title = t('attach_pipette_type', {
+        pipetteName: wantedPipette?.displayName ?? '',
+      })
+    } else if (actualPipette?.displayName != null) {
+      title = detachWizardHeader
+    } else {
+      title = attachWizardHeader
+    }
+
+    exitWizardHeader = confirmExit ? closeModal : () => setConfirmExit(true)
+    currentStep = instructionsCurrentStep
+    wizardTitle = title
+
+    contents = confirmExit ? (
+      exitModal
+    ) : (
+      <Instructions
+        {...{
+          ...basePropsWithPipettes,
+          direction,
+          setWantedName,
+          confirm: () => setWizardStep(CONFIRM),
+          back: () => setWizardStep(CLEAR_DECK),
+          stepPage: instructionStepPage,
+          setStepPage: instructionSetStepPage,
+          totalSteps: eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS,
+          title:
+            actualPipette?.displayName != null
+              ? t('detach_pipette', {
+                  pipette: actualPipette.displayName,
+                  mount: mount[0].toUpperCase() + mount.slice(1),
+                })
+              : t('attach_pipette'),
+        }}
+      />
+    )
+  } else if (wizardStep === CONFIRM) {
+    const success =
+      // success if we were trying to detach and nothing's attached
+      (!actualPipette && !wantedPipette) ||
+      // or if the names of wanted and attached match
+      actualPipette?.name === wantedPipette?.name
+
+    const attachedIncorrectPipette = Boolean(
+      !success && wantedPipette && actualPipette
+    )
+
+    const toCalDashboard = (): void => {
+      dispatchApiRequests(home(robotName, ROBOT))
+      closeModal()
+      history.push(`/devices/${robotName}/robot-settings/calibration`)
+    }
+
+    currentStep = success
+      ? eightChannel
+        ? EIGHT_CHANNEL_STEPS
+        : SINGLE_CHANNEL_STEPS
+      : SINGLE_CHANNEL_STEPS - 1
+    exitWizardHeader = success ? homePipAndExit : () => setConfirmExit(true)
+
+    wizardTitle =
+      (wantedPipette == null && actualPipette == null) ||
+      (wantedPipette == null && actualPipette)
+        ? t('detatch_pipette_from_mount', {
+            mount: mount[0].toUpperCase() + mount.slice(1),
+          })
+        : t('attach_name_pipette', {
+            pipette: wantedPipette != null ? wantedPipette.displayName : '',
+          })
+
+    contents = confirmExit ? (
+      exitModal
+    ) : (
+      <ConfirmPipette
+        {...{
+          ...basePropsWithPipettes,
+          success,
+          attachedWrong: attachedIncorrectPipette,
+          tryAgain: () => {
+            setWantedName(null)
+            setWizardStep(INSTRUCTIONS)
+          },
+          exit: homePipAndExit,
+          actualPipetteOffset: actualPipetteOffset,
+          toCalibrationDashboard: toCalDashboard,
+        }}
+      />
+    )
+  }
+
+  if (enableChangePipetteWizard) {
     return (
-      <>
-        {confirmExit &&
-          (enableChangePipetteWizard ? (
-            <ExitModal
-              back={() => setConfirmExit(false)}
-              exit={homePipAndExit}
-              direction={direction}
-              currentStep={5}
-              totalSteps={8}
-              mount={mount}
-              displayName={
-                actualPipette?.displayName || wantedPipette?.displayName
-              }
-            />
-          ) : (
+      <ModalShell height="28.12rem" width="47rem">
+        <WizardHeader
+          totalSteps={eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS}
+          currentStep={currentStep}
+          title={wizardTitle}
+          onExit={exitWizardHeader}
+        />
+        {contents}
+      </ModalShell>
+    )
+  } else {
+    //  TODO(Jr, 29.08.22): this whole else can be removed when we remove the FF
+    if (
+      movementStatus !== null &&
+      (movementStatus === HOMING || movementStatus === MOVING)
+    ) {
+      return (
+        <RequestInProgressModal
+          {...baseProps}
+          movementStatus={movementStatus}
+          isPipetteHoming={homePipStatus === PENDING}
+        />
+      )
+    }
+    if (wizardStep === CLEAR_DECK) {
+      return (
+        <ClearDeckAlertModal
+          cancelText={CANCEL}
+          continueText={MOVE_PIPETTE_TO_FRONT}
+          onCancelClick={closeModal}
+          onContinueClick={() => {
+            dispatch(move(robotName, CHANGE_PIPETTE, mount, true))
+            setWizardStep(INSTRUCTIONS)
+          }}
+        />
+      )
+    }
+
+    if (wizardStep === INSTRUCTIONS) {
+      const direction = actualPipette ? DETACH : ATTACH
+
+      return (
+        <>
+          {confirmExit && (
             <ExitAlertModal
               back={() => setConfirmExit(false)}
               exit={homePipAndExit}
             />
-          ))}
-        {enableChangePipetteWizard ? (
-          <ModalShell height="28.12rem" width="47rem">
-            <Instructions
-              {...{
-                ...basePropsWithPipettes,
-                direction,
-                setWantedName,
-                confirm: () => setWizardStep(CONFIRM),
-                back: () => setWizardStep(CLEAR_DECK),
-                exit: () => setConfirmExit(true),
-                currentStep: 5,
-                totalSteps: 8,
-                title:
-                  actualPipette?.displayName != null
-                    ? t('detach_pipette', {
-                        pipette: actualPipette.displayName,
-                        mount: mount[0].toUpperCase() + mount.slice(1),
-                      })
-                    : t('attach_pipette'),
-              }}
-            />
-          </ModalShell>
-        ) : (
+          )}
+          (
           <DeprecatedInstructions
             {...{
               ...basePropsWithPipettes,
@@ -285,94 +396,77 @@ export function ChangePipette(props: Props): JSX.Element | null {
               exit: () => setConfirmExit(true),
             }}
           />
-        )}
-      </>
-    )
-  }
-
-  if (wizardStep === CONFIRM) {
-    const success =
-      // success if we were trying to detach and nothing's attached
-      (!actualPipette && !wantedPipette) ||
-      // or if the names of wanted and attached match
-      actualPipette?.name === wantedPipette?.name
-
-    const attachedWrong = Boolean(!success && wantedPipette && actualPipette)
-
-    const launchPOC = (): void => {
-      // home before cal flow to account for skips when attaching pipette
-      setWizardStep(CALIBRATE_PIPETTE)
-      dispatchApiRequests(home(robotName, ROBOT))
-      startPipetteOffsetWizard()
-    }
-    if (
-      !enableChangePipetteWizard &&
-      success &&
-      wantedPipette &&
-      shouldLevel(wantedPipette)
-    ) {
-      return (
-        <DeprecatedLevelPipette
-          {...{
-            pipetteModelName: actualPipette ? actualPipette.name : '',
-            ...basePropsWithPipettes,
-            back: () => setWizardStep(INSTRUCTIONS),
-            exit: homePipAndExit,
-            actualPipetteOffset: actualPipetteOffset,
-            startPipetteOffsetCalibration: launchPOC,
-          }}
-        />
+          )
+        </>
       )
-    } else {
-      return enableChangePipetteWizard ? (
-        <ConfirmPipette
-          {...{
-            ...basePropsWithPipettes,
-            success,
-            attachedWrong,
-            tryAgain: () => {
-              setWantedName(null)
-              setWizardStep(INSTRUCTIONS)
-            },
-            exit: homePipAndExit,
-            actualPipetteOffset: actualPipetteOffset,
-            startPipetteOffsetCalibration: launchPOC,
-            currentStep: 5,
-            totalSteps: 8,
-          }}
+    }
+
+    if (wizardStep === CONFIRM) {
+      const success =
+        // success if we were trying to detach and nothing's attached
+        (!actualPipette && !wantedPipette) ||
+        // or if the names of wanted and attached match
+        actualPipette?.name === wantedPipette?.name
+
+      const attachedWrong = Boolean(!success && wantedPipette && actualPipette)
+
+      const launchPOC = (): void => {
+        // home before cal flow to account for skips when attaching pipette
+        setWizardStep(CALIBRATE_PIPETTE)
+        dispatchApiRequests(home(robotName, ROBOT))
+        startPipetteOffsetWizard()
+      }
+      if (
+        !enableChangePipetteWizard &&
+        success &&
+        wantedPipette &&
+        shouldLevel(wantedPipette)
+      ) {
+        return (
+          <DeprecatedLevelPipette
+            {...{
+              pipetteModelName: actualPipette ? actualPipette.name : '',
+              ...basePropsWithPipettes,
+              back: () => setWizardStep(INSTRUCTIONS),
+              exit: homePipAndExit,
+              actualPipetteOffset: actualPipetteOffset,
+              startPipetteOffsetCalibration: launchPOC,
+            }}
+          />
+        )
+      } else {
+        return (
+          <DeprecatedConfirmPipette
+            {...{
+              ...basePropsWithPipettes,
+              success,
+              attachedWrong,
+              tryAgain: () => {
+                setWantedName(null)
+                setWizardStep(INSTRUCTIONS)
+              },
+              back: () => setWizardStep(INSTRUCTIONS),
+              exit: homePipAndExit,
+              actualPipetteOffset: actualPipetteOffset,
+              startPipetteOffsetCalibration: launchPOC,
+            }}
+          />
+        )
+      }
+    }
+
+    if (wizardStep === CALIBRATE_PIPETTE) {
+      return showCalBlockModal ? (
+        <AskForCalibrationBlockModal
+          titleBarTitle={PIPETTE_OFFSET_CALIBRATION}
+          onResponse={startPipetteOffsetWizard}
+          closePrompt={homePipAndExit}
         />
       ) : (
-        <DeprecatedConfirmPipette
-          {...{
-            ...basePropsWithPipettes,
-            success,
-            attachedWrong,
-            tryAgain: () => {
-              setWantedName(null)
-              setWizardStep(INSTRUCTIONS)
-            },
-            back: () => setWizardStep(INSTRUCTIONS),
-            exit: homePipAndExit,
-            actualPipetteOffset: actualPipetteOffset,
-            startPipetteOffsetCalibration: launchPOC,
-          }}
-        />
+        PipetteOffsetCalibrationWizard
       )
     }
   }
-
-  if (wizardStep === CALIBRATE_PIPETTE) {
-    return showCalBlockModal ? (
-      <AskForCalibrationBlockModal
-        titleBarTitle={PIPETTE_OFFSET_CALIBRATION}
-        onResponse={startPipetteOffsetWizard}
-        closePrompt={homePipAndExit}
-      />
-    ) : (
-      PipetteOffsetCalibrationWizard
-    )
-  }
-
   // this will never be reached
   return null
 }
