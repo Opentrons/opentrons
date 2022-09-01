@@ -31,3 +31,10 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
     for command_object_dict in protocol_fixture["commands"]:
         command_object_dict.pop("result", None)
         command_object_dict.pop("id", None)
+
+
+def test_schema_validators() -> None:
+    """Should raise an error the keys do not match."""
+    def_data = load_shared_data("/Users/tamarzanzouri/Desktop/Protocols/simpleV6_fail.json")
+    with pytest.raises(Exception):
+        def_model = ProtocolSchemaV6.parse_raw(def_data)

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Any, List, Optional, Dict
 from typing_extensions import Literal
 from enum import Enum
@@ -166,3 +166,16 @@ class ProtocolSchemaV6(BaseModel):
     class Config:
         # added for constructing the class with field name instead of alias
         allow_population_by_field_name = True
+
+    @validator("commands", always=True)
+    def validate_date(cls, value, values):
+        print(value[1])
+        print(values["labware"])
+        if (
+                command
+                for command in value
+                if command.params.labwareId
+                   and command.params.labwareId not in set(values["labware"].keys())
+        ):
+            raise Exception("tamar test")
+        return values["some_list"][0]
