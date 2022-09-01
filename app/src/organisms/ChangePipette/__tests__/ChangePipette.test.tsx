@@ -174,7 +174,6 @@ describe('ChangePipette', () => {
 
     //  Instructions page
     getByText('Attach a pipette')
-    getByText('Step: 1 / 3')
     getByText('mock pipette selection')
     exit = getByLabelText('Exit')
     fireEvent.click(exit)
@@ -182,7 +181,7 @@ describe('ChangePipette', () => {
     //  Exit modal page
     getByText('mock exit modal')
     getByText('Attach a pipette')
-    getByText('Step: 1 / 3')
+    getByText('Step 1 / 3')
     exit = getByLabelText('Exit')
     fireEvent.click(exit)
     expect(props.closeModal).toHaveBeenCalled()
@@ -212,7 +211,6 @@ describe('ChangePipette', () => {
 
     //  Instructions page
     getByText('Attach a pipette')
-    getByText('Step: 1 / 3')
 
     //  attach the pipette
     act(() => {
@@ -253,7 +251,7 @@ describe('ChangePipette', () => {
 
     //  Instructions page 1
     getByText('Detach P300 Single GEN2 from Left Mount')
-    getByText('Step: 1 / 3')
+    getByText('Step 1 / 3')
     getByText('Loosen the screws')
     getByText(
       'Using a 2.5 mm screwdriver, loosen the three screws on the back of the pipette that is currently attached.'
@@ -263,7 +261,7 @@ describe('ChangePipette', () => {
 
     //  Instructions page 2
     getByText('Detach P300 Single GEN2 from Left Mount')
-    getByText('Step: 2 / 3')
+    getByText('Step 2 / 3')
     getByText('Remove the pipette')
     getByText(
       'Hold onto the pipette so it does not fall. Disconnect the pipette from the robot by pulling the white connector tab.'
@@ -274,7 +272,7 @@ describe('ChangePipette', () => {
 
     //  Exit modal page
     getByText('Detach P300 Single GEN2 from Left Mount')
-    getByText('Step: 2 / 3')
+    getByText('Step 2 / 3')
     getByText('mock exit modal')
     const exitModal = getByLabelText('Exit')
     fireEvent.click(exitModal)

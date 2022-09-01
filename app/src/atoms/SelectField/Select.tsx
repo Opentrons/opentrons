@@ -127,6 +127,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       ...styles,
       marginRight: '0.75rem',
       marginLeft: SPACING.spacing2,
+      marginTop: '0.2rem',
     }),
     valueContainer: NO_STYLE_FN,
   }

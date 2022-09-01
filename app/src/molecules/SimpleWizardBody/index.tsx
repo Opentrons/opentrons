@@ -6,6 +6,7 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
@@ -26,17 +27,17 @@ export function SimpleWizardBody(props: Props): JSX.Element {
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         height="100%"
-        marginTop="5.8rem"
-        marginBottom="5.68rem"
+        marginBottom="6.3125rem"
+        marginTop="6.75rem"
       >
         <Icon
           name={isSuccess ? 'ot-check' : 'ot-alert'}
-          size="4rem"
+          size="2.5rem"
           color={iconColor}
           aria-label={isSuccess ? 'ot-check' : 'ot-alert'}
         />
         <StyledText
-          as="h1"
+          css={TYPOGRAPHY.h1Default}
           marginTop={SPACING.spacing5}
           marginBottom={SPACING.spacing3}
         >

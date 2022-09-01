@@ -72,7 +72,12 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
               i18nKey={'level_the_pipette'}
               components={{
                 bold: <strong />,
-                h1: <StyledText as="h1" marginBottom={SPACING.spacing4} />,
+                h1: (
+                  <StyledText
+                    css={TYPOGRAPHY.h1Default}
+                    marginBottom={SPACING.spacing4}
+                  />
+                ),
                 block: (
                   <StyledText
                     css={css`

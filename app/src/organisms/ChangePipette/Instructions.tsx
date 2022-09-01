@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import { shouldLevel } from '@opentrons/shared-data'
 import {
@@ -40,6 +41,16 @@ interface Props {
   stepPage: number
   setStepPage: React.Dispatch<React.SetStateAction<number>>
 }
+
+const GO_BACK_BUTTON_STYLE = css`
+  ${TYPOGRAPHY.pSemiBold};
+  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
+  color: ${COLORS.darkGreyEnabled};
+
+  &:hover {
+    opacity: 70%;
+  }
+`
 
 export function Instructions(props: Props): JSX.Element {
   const {
@@ -104,7 +115,10 @@ export function Instructions(props: Props): JSX.Element {
                     i18nKey={stepPage === 0 ? stepOne : stepTwo}
                     components={{
                       h1: (
-                        <StyledText as="h1" marginBottom={SPACING.spacing4} />
+                        <StyledText
+                          css={TYPOGRAPHY.h1Default}
+                          marginBottom={SPACING.spacing4}
+                        />
                       ),
                       block: <StyledText as="p" />,
                     }}
@@ -139,24 +153,19 @@ export function Instructions(props: Props): JSX.Element {
             marginX={SPACING.spacing6}
             alignSelf={ALIGN_FLEX_END}
             //  spacing changes to keep buttons at same height across pages
-            marginTop={stepPage === 0 ? SPACING.spacingSS : '8rem'}
+            marginTop={stepPage === 0 ? SPACING.spacing5 : '9.25rem'}
           >
             <Btn
               onClick={stepPage === 0 ? back : () => setStepPage(stepPage - 1)}
             >
-              <StyledText
-                css={TYPOGRAPHY.pSemiBold}
-                textTransform={TYPOGRAPHY.textTransformCapitalize}
-                color={COLORS.darkGreyEnabled}
-              >
-                {t('go_back')}
-              </StyledText>
+              <StyledText css={GO_BACK_BUTTON_STYLE}>{t('go_back')}</StyledText>
             </Btn>
             {stepPage === 0 ? (
               continueButton
             ) : (
               <CheckPipettesButton
                 robotName={robotName}
+                actualPipette={actualPipette ?? undefined}
                 onDone={
                   wantedPipette != null &&
                   actualPipette != null &&
@@ -164,11 +173,7 @@ export function Instructions(props: Props): JSX.Element {
                     ? () => setStepPage(2)
                     : confirm
                 }
-              >
-                {actualPipette
-                  ? t('confirm_detachment')
-                  : t('confirm_attachment')}
-              </CheckPipettesButton>
+              />
             )}
           </Flex>
         </>

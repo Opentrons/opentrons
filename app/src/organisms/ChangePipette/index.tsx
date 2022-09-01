@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { getPipetteNameSpecs, shouldLevel } from '@opentrons/shared-data'
 import { useTranslation } from 'react-i18next'
-import { SPACING } from '@opentrons/components'
+import { SPACING, TYPOGRAPHY } from '@opentrons/components'
 import {
   useDispatchApiRequests,
   getRequestById,
@@ -172,6 +172,8 @@ export function ChangePipette(props: Props): JSX.Element | null {
   )
   const eightChannel = wantedPipette?.channels === 8
   const direction = actualPipette ? DETACH : ATTACH
+  const isSelectPipetteStep = direction === ATTACH && wantedName === null
+
   const exitModal = (
     <ExitModal
       back={() => setConfirmExit(false)}
@@ -192,6 +194,12 @@ export function ChangePipette(props: Props): JSX.Element | null {
     }
   }
 
+  const success =
+    // success if we were trying to detach and nothing's attached
+    (!actualPipette && !wantedPipette) ||
+    // or if the names of wanted and attached match
+    actualPipette?.name === wantedPipette?.name
+
   let exitWizardHeader
   let wizardTitle: string =
     actualPipette?.displayName != null
@@ -207,7 +215,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     contents = (
       <InProgressModal>
         <StyledText
-          as="h1"
+          css={TYPOGRAPHY.h1Default}
           marginTop={SPACING.spacing5}
           marginBottom={SPACING.spacing3}
         >
@@ -282,12 +290,6 @@ export function ChangePipette(props: Props): JSX.Element | null {
       />
     )
   } else if (wizardStep === CONFIRM) {
-    const success =
-      // success if we were trying to detach and nothing's attached
-      (!actualPipette && !wantedPipette) ||
-      // or if the names of wanted and attached match
-      actualPipette?.name === wantedPipette?.name
-
     const attachedIncorrectPipette = Boolean(
       !success && wantedPipette && actualPipette
     )
@@ -337,10 +339,11 @@ export function ChangePipette(props: Props): JSX.Element | null {
 
   if (enableChangePipetteWizard) {
     return (
-      <ModalShell height="28.12rem" width="47rem">
+      <ModalShell width="42.375rem">
         <WizardHeader
           totalSteps={eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS}
-          currentStep={currentStep}
+          currentStep={isSelectPipetteStep ? 0 : currentStep}
+          isErrorState={!success && wizardStep === CONFIRM}
           title={wizardTitle}
           onExit={exitWizardHeader}
         />

@@ -6,6 +6,8 @@
   "loosen_the_screws": "<h1>Loosen the screws</h1><block>Using a 2.5 mm screwdriver, loosen the three screws on the back of the pipette that is currently attached.</block>",
   "remove_pipette": "<h1>Remove the pipette</h1><block>Hold onto the pipette so it does not fall. Disconnect the pipette from the robot by pulling the white connector tab.</block>",
   "confirm_detachment": "Confirm detachment",
+  "confirming_detachment": "Confirming detachment",
+  "confirming_attachment": "COnfirming attachmend",
   "continue": "Continue",
   "go_back": "Go back",
   "confirm_attachment": "Confirm attachment",
