@@ -37,8 +37,13 @@ class LayoutSlots:
 class LayoutLabware:
     """Layout Labware."""
 
-    def __init__(self, ctx: protocol_api.ProtocolContext, slots: LayoutSlots,
-                 tip_volume: int, multi_tip_volume: int = DEFAULT_MULTI_TIP_VOLUME) -> None:
+    def __init__(
+        self,
+        ctx: protocol_api.ProtocolContext,
+        slots: LayoutSlots,
+        tip_volume: int,
+        multi_tip_volume: int = DEFAULT_MULTI_TIP_VOLUME,
+    ) -> None:
         """Layout Labware."""
         self.slots = slots
         self._ctx = ctx
@@ -49,7 +54,8 @@ class LayoutLabware:
         """Load."""
         if self.slots.tiprack:
             self._ctx.load_labware(
-                f"opentrons_96_tiprack_{self._tip_volume}ul", location=self.slots.tiprack
+                f"opentrons_96_tiprack_{self._tip_volume}ul",
+                location=self.slots.tiprack,
             )
         if self.slots.tiprack_multi:
             self._ctx.load_labware(
@@ -69,7 +75,9 @@ class LayoutLabware:
                 )
             elif definitions_dir:
                 vial_def = load_radwag_vial_definition(directory=definitions_dir)
-                self._ctx.load_labware_from_definition(vial_def, location=self.slots.vial)
+                self._ctx.load_labware_from_definition(
+                    vial_def, location=self.slots.vial
+                )
             else:
                 raise RuntimeError("Unable to load custom labware definition")
 

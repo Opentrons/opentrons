@@ -279,6 +279,10 @@ class GravimetricRecorder:
 
     def activate(self) -> None:
         """Activate."""
+        # Some Radwag settings cannot be controlled remotely.
+        # Listed below are the things the must be done using the touchscreen:
+        #   1) Set profile to USER
+        #   2) Set screensaver to NONE
         self._scale.connect()
         self._scale.initialize()
         self._scale.tare(0.0)

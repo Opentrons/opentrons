@@ -57,7 +57,9 @@ def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> ExecuteGravItems:
     run_id, start_time = create_run_id_and_start_time()
     # LABWARE
     # NOTE: labware must be fully initialized before the liquid tracker
-    _layout = LayoutLabware(ctx=ctx, slots=DEFAULT_SLOTS_GRAV, tip_volume=cfg.pipette_volume)
+    _layout = LayoutLabware(
+        ctx=ctx, slots=DEFAULT_SLOTS_GRAV, tip_volume=cfg.pipette_volume
+    )
     _layout.load(definitions_dir=cfg.labware_dir)
     overwrite_default_labware_positions(ctx, layout=_layout)
     # LIQUID-LEVEL TRACKING
@@ -82,6 +84,10 @@ def setup(ctx: ProtocolContext, cfg: ExecuteGravConfig) -> ExecuteGravItems:
     )
     _liq_pip.set_liquid_class(liquid.defaults.DEFAULT_LIQUID_CLASS_OT2_P300_SINGLE)
     # SCALE RECORDER
+    # Some Radwag settings cannot be controlled remotely.
+    # Listed below are the things the must be done using the touchscreen:
+    #   1) Set profile to USER
+    #   2) Set screensaver to NONE
     _recorder = GravimetricRecorder(
         ctx,
         GravimetricRecorderConfig(

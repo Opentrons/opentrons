@@ -16,6 +16,10 @@ CALIBRATE_SCALE = False
 
 
 def _run(protocol: ProtocolContext) -> None:
+    # Some Radwag settings cannot be controlled remotely.
+    # Listed below are the things the must be done using the touchscreen:
+    #   1) Set profile to USER
+    #   2) Set screensaver to NONE
     _rec = GravimetricRecorder(
         protocol,
         GravimetricRecorderConfig(

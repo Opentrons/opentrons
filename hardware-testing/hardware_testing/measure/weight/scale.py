@@ -1,12 +1,12 @@
 """Scale."""
 from dataclasses import dataclass
 from time import time
+from typing import Union
 
 from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.drivers import (
     find_port,
-    RadwagScaleBase,
     RadwagScale,
     SimRadwagScale,
 )
@@ -51,7 +51,9 @@ class ScaleReading:
 class Scale:
     """Scale Class."""
 
-    def __init__(self, ctx: ProtocolContext, scale: RadwagScaleBase) -> None:
+    def __init__(
+        self, ctx: ProtocolContext, scale: Union[SimRadwagScale, RadwagScale]
+    ) -> None:
         """Scale Class."""
         self._ctx = ctx
         self._scale = scale
@@ -60,10 +62,9 @@ class Scale:
     def build(cls, ctx: ProtocolContext) -> "Scale":
         """Build."""
         if ctx.is_simulating():
-            _scale = SimRadwagScale()
+            return Scale(ctx, scale=SimRadwagScale())
         else:
-            _scale = RadwagScale.create(cls.find_port())  # type: ignore[assignment]
-        return Scale(ctx, scale=_scale)
+            return Scale(ctx, scale=RadwagScale.create(cls.find_port()))
 
     @classmethod
     def find_port(cls) -> str:
