@@ -213,7 +213,7 @@ def plan_moves(
     force_direct: bool = False,
     minimum_lw_z_margin: float = None,
     minimum_z_height: float = None,
-    use_experimental_waypoint_planning: bool = False,
+    use_experimental_waypoint_planning: bool = True,
 ) -> List[Tuple[types.Point, Optional[CriticalPoint]]]:
     """Plan moves between one :py:class:`.Location` and another.
 

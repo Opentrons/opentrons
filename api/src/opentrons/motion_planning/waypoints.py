@@ -92,7 +92,7 @@ def get_waypoints(
     # if either of those exceed max_travel_z, just use max_travel_z
     # if max_travel_z does not provide enough clearance, check above would
     # raise an ArcOutOfBoundsError
-    # if origin.z is higher than the selected travel z, travel at origin z instead
+    # if origin.z is higher than the selected travel z, travel at origin.z instead
     travel_z = max(
         min(max_travel_z, max(min_travel_z + travel_z_margin, dest.z)),
         origin.z,
