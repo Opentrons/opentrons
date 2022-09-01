@@ -18,7 +18,7 @@ from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
     # TODO(mc, 2022-09-01): re-consider pickle usage in robot-server.
     # This re-export of PipetteName prevents pickle breakage
     # https://opentrons.atlassian.net/browse/RSS-94
-    # PipetteNameType as PipetteName,
+    PipetteNameType as PipetteName,
 )
 
 
