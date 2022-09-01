@@ -163,17 +163,15 @@ export function SetupPipetteCalibrationItem({
   }
 
   // temporarily present valid pipette calibration for OT-3
-  const ot3TempCalibratedDate = isOT3
+  const attachedCalibratedDate = isOT3
     ? 'OT-3 temporary calibrated date placeholder'
-    : null
-
-  const attachedCalibratedDate = attached ? pipetteInfo.pipetteCalDate : null
+    : pipetteInfo.pipetteCalDate
 
   return (
     <>
       <SetupCalibrationItem
         button={button}
-        calibratedDate={attachedCalibratedDate ?? ot3TempCalibratedDate}
+        calibratedDate={attached ? attachedCalibratedDate : null}
         subText={subText}
         label={t(`devices_landing:${mount}_mount`)}
         title={pipetteInfo.pipetteSpecs?.displayName}
