@@ -5,7 +5,7 @@ import pytest
 from decoy import Decoy, matchers
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import Mount
+from opentrons.types import Mount, Point, DeckSlotName
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
@@ -24,6 +24,7 @@ from opentrons.protocol_api.core.labware import AbstractLabware as BaseAbstractL
 from opentrons.protocol_api.core.well import AbstractWellCore
 from opentrons.protocol_api.core.labware_offset_provider import (
     AbstractLabwareOffsetProvider,
+    ProvidedLabwareOffset,
 )
 
 AbstractInstrument = BaseAbstractInstrument[AbstractWellCore]
@@ -126,7 +127,10 @@ def test_load_instrument_replace(
 
 
 def test_load_labware(
-    decoy: Decoy, mock_core: AbstractProtocol, subject: ProtocolContext
+    decoy: Decoy,
+    mock_labware_offset_provider: AbstractLabwareOffsetProvider,
+    mock_core: AbstractProtocol,
+    subject: ProtocolContext,
 ) -> None:
     """It should create a labware using its execution core."""
     mock_labware_core = decoy.mock(cls=AbstractLabware)
@@ -142,7 +146,15 @@ def test_load_labware(
     ).then_return(mock_labware_core)
 
     decoy.when(mock_labware_core.get_name()).then_return("Display Name")
-    decoy.when(mock_labware_core.get_uri()).then_return("you/are/eye")
+    decoy.when(mock_labware_core.get_uri()).then_return("you/are/1337")
+
+    decoy.when(
+        mock_labware_offset_provider.find(
+            labware_definition_uri="you/are/1337",
+            requested_module_model=None,
+            deck_slot=DeckSlotName.SLOT_5,
+        )
+    ).then_return(ProvidedLabwareOffset(delta=Point(0, 0, 0), offset_id=None))
 
     result = subject.load_labware(
         load_name="some_labware",

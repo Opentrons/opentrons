@@ -7,6 +7,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount, MountType, Location, DeckLocation, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
+from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
@@ -87,7 +88,12 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
         """Load a labware using its identifying parameters."""
         deck_slot = DeckSlotLocation(slotName=DeckSlotName.from_primitive(location))
         load_result = self._engine_client.load_labware(
-            load_name=load_name, location=deck_slot, namespace=namespace, version=version, display_name=label)
+            load_name=load_name,
+            location=deck_slot,
+            namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
+            version=version or 1,
+            display_name=label,
+        )
         return LabwareCore(labware_id=load_result.labwareId)
 
     def load_module(

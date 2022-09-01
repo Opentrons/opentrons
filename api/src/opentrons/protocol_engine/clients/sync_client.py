@@ -34,7 +34,7 @@ class SyncClient:
         load_name: str,
         namespace: str,
         version: int,
-        display_name: Optional[str],
+        display_name: Optional[str] = None,
     ) -> commands.LoadLabwareResult:
         """Execute a LoadLabware command and return the result."""
         request = commands.LoadLabwareCreate(

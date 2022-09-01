@@ -51,7 +51,7 @@ def test_load_labware(
             namespace="opentrons",
             version=1,
             labwareId=None,
-            displayName="some_display_name"
+            displayName="some_display_name",
         )
     )
 
@@ -70,7 +70,7 @@ def test_load_labware(
         load_name="some_labware",
         namespace="opentrons",
         version=1,
-        display_name="some_display_name"
+        display_name="some_display_name",
     )
 
     assert result == expected_result

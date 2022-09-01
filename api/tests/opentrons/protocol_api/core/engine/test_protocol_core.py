@@ -3,14 +3,16 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.labware.dev_types import (
+    LabwareDefinition as LabwareDefinitionDict,
+)
 
-from opentrons.types import Mount, MountType
+from opentrons.types import Mount, MountType, DeckSlotName
 from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine import commands
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine.types import DeckSlotLocation, DeckSlotName
+from opentrons.protocol_engine.types import DeckSlotLocation
 
 from opentrons.protocol_api.core.engine import ProtocolCore, InstrumentCore, LabwareCore
 
@@ -49,7 +51,7 @@ def test_load_instrument(
 
 def test_load_labware(
     decoy: Decoy,
-    minimal_labware_def: LabwareDefinition,
+    minimal_labware_def: LabwareDefinitionDict,
     mock_engine_client: EngineClient,
     subject: ProtocolCore,
 ) -> None:
