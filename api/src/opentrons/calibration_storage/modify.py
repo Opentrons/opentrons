@@ -12,17 +12,14 @@ from opentrons.types import Mount, Point
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.util.helpers import utc_now
 
-from . import file_operators as io, types as local_types, helpers
+from . import (
+    file_operators as io,
+    types as local_types,
+    helpers,
+    cache as calibration_cache,
+)
 
 if typing.TYPE_CHECKING:
-    from .dev_types import (
-        TipLengthCalibration,
-        PipTipLengthCalibration,
-        DeckCalibrationData,
-        PipetteCalibrationData,
-        CalibrationStatusDict,
-        GripperCalibrationData,
-    )
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
@@ -75,21 +72,6 @@ def _save_custom_tiprack_definition(
     io.save_to_file(custom_tr_def_path, definition)
 
 
-def _append_to_index_tip_length_file(pip_id: str, lw_hash: str) -> None:
-    index_file = config.get_tip_length_cal_path() / "index.json"
-    try:
-        index_data = io.read_cal_file(str(index_file))
-    except FileNotFoundError:
-        index_data = {}
-
-    if lw_hash not in index_data:
-        index_data[lw_hash] = [pip_id]
-    elif pip_id not in index_data[lw_hash]:
-        index_data[lw_hash].append(pip_id)
-
-    io.save_to_file(index_file, index_data)
-
-
 def save_tip_length_calibration(
     pip_id: str, tip_length_cal: "PipTipLengthCalibration"
 ) -> None:
@@ -104,17 +86,12 @@ def save_tip_length_calibration(
     tip_length_dir_path.mkdir(parents=True, exist_ok=True)
     pip_tip_length_path = tip_length_dir_path / f"{pip_id}.json"
 
-    for lw_hash in tip_length_cal.keys():
-        _append_to_index_tip_length_file(pip_id, lw_hash)
+    all_tip_lengths = calibration_cache.tip_lengths_for_pipette(pip_id)
 
-    try:
-        tip_length_data = io.read_cal_file(str(pip_tip_length_path))
-    except FileNotFoundError:
-        tip_length_data = {}
+    all_tip_lengths.update(tip_length_cal)
 
-    tip_length_data.update(tip_length_cal)
-
-    io.save_to_file(pip_tip_length_path, tip_length_data)
+    io.save_to_file(pip_tip_length_path, all_tip_lengths)
+    calibration_cache._tip_length_calibrations.cache_clear()
 
 
 def save_robot_deck_attitude(
@@ -144,22 +121,7 @@ def save_robot_deck_attitude(
         "status": status_dict,
     }
     io.save_to_file(gantry_path, gantry_dict)
-
-
-def _add_to_pipette_offset_index_file(pip_id: str, mount: Mount) -> None:
-    index_file = config.get_opentrons_path("pipette_calibration_dir") / "index.json"
-    try:
-        index_data = index_data = io.read_cal_file(str(index_file))
-    except FileNotFoundError:
-        index_data = {}
-
-    mount_key = mount.name.lower()
-    if mount_key not in index_data:
-        index_data[mount_key] = [pip_id]
-    elif pip_id not in index_data[mount_key]:
-        index_data[mount_key].append(pip_id)
-
-    io.save_to_file(index_file, index_data)
+    calibration_cache._deck_calibration.cache_clear()
 
 
 def save_pipette_calibration(
@@ -172,10 +134,7 @@ def save_pipette_calibration(
 ) -> None:
     pip_dir = config.get_opentrons_path("pipette_calibration_dir") / mount.name.lower()
     pip_dir.mkdir(parents=True, exist_ok=True)
-    if cal_status:
-        status = cal_status
-    else:
-        status = local_types.CalibrationStatus()
+    status = cal_status or local_types.CalibrationStatus()
     status_dict: "CalibrationStatusDict" = helpers.convert_to_dict(  # type: ignore[assignment]
         status
     )
@@ -189,7 +148,7 @@ def save_pipette_calibration(
         "status": status_dict,
     }
     io.save_to_file(offset_path, offset_dict)
-    _add_to_pipette_offset_index_file(pip_id, mount)
+    calibration_cache._pipette_offset_calibrations.cache_clear()
 
 
 def save_gripper_calibration(
@@ -215,6 +174,7 @@ def save_gripper_calibration(
         "status": status_dict,
     }
     io.save_to_file(gripper_path, offset_dict)
+    calibration_cache._gripper_offset_calibrations.cache_clear()
 
 
 @typing.overload

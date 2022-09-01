@@ -10,8 +10,7 @@ from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 StrPath = typing.Union[str, PathLike]
 AttitudeMatrix = typing.List[typing.List[float]]
-PipetteOffset = typing.List[float]
-GripperCalOffset = typing.List[float]
+InstrumentCalOffset = typing.List[float]
 
 
 class SourceType(str, Enum):
@@ -70,7 +69,7 @@ class PipetteOffsetByPipetteMount:
     Class to store pipette offset without pipette and mount info
     """
 
-    offset: PipetteOffset
+    offset: InstrumentCalOffset
     source: SourceType
     status: CalibrationStatus
     tiprack: typing.Optional[str] = None
@@ -86,7 +85,7 @@ class PipetteOffsetCalibration:
 
     pipette: str
     mount: str
-    offset: PipetteOffset
+    offset: InstrumentCalOffset
     tiprack: str
     uri: str
     last_modified: datetime
@@ -100,7 +99,7 @@ class GripperCalibrationOffset:
     Class to store gripper offset calibration with gripper info
     """
 
-    offset: GripperCalOffset
+    offset: InstrumentCalOffset
     source: SourceType
     status: CalibrationStatus
     last_modified: typing.Optional[datetime] = None
