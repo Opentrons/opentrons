@@ -18,8 +18,8 @@ from serial.serialutil import SerialException  # type: ignore[import]
 
 log = logging.getLogger(__name__)
 
-USB_VID = 1027
-USB_PID = 24577
+USB_VID = 0x0403
+USB_PID = 0x6001
 
 
 addrs = {

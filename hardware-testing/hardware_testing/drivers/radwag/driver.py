@@ -23,7 +23,7 @@ class RadwagScaleBase(ABC):
         """Radwag scale VID:PID."""
         # TODO: check and handle the vid:pid of other scales
         # vid:pid for Radwag's "AS 82/220.X2 PLUS" USB2 (usb-b) port
-        return 1155, 41389
+        return 0x0483, 0xA1AD
 
     @abstractmethod
     def connect(self) -> None:
