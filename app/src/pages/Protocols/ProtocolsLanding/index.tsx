@@ -18,9 +18,20 @@ export function ProtocolsLanding(): JSX.Element {
     dispatch(fetchProtocols())
   }, [dispatch])
 
-  return storedProtocols.length > 0 ? (
-    <ProtocolList storedProtocols={storedProtocols} />
-  ) : (
-    <ProtocolsEmptyState />
+  return (
+    <>
+      <iframe
+        src="https://codesandbox.io/embed/interact-js-test-components-d5vxxu?fontsize=14&hidenavigation=1&theme=dark&view=preview"
+        width="600"
+        height="600"
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+      />
+      {storedProtocols.length > 0 ? (
+        <ProtocolList storedProtocols={storedProtocols} />
+      ) : (
+        <ProtocolsEmptyState />
+      )}
+    </>
   )
 }
