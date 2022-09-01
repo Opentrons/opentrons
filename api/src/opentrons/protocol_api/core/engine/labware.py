@@ -1,6 +1,7 @@
 """ProtocolEngine-based Labware core implementations."""
 from typing import List, Dict, Optional
 
+from opentrons.calibration_storage import helpers
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.protocols.api_support.well_grid import WellGrid
@@ -18,8 +19,9 @@ class LabwareCore(AbstractLabware[WellCore]):
         labware_id: ProtocolEngine ID of the loaded labware.
     """
 
-    def __init__(self, labware_id: str) -> None:
+    def __init__(self, labware_id: str, definition: LabwareDefinition) -> None:
         self._labware_id = labware_id
+        self._definition = definition
 
     @property
     def labware_id(self) -> str:
@@ -39,13 +41,14 @@ class LabwareCore(AbstractLabware[WellCore]):
         raise NotImplementedError("LabwareCore not implemented")
 
     def get_uri(self) -> str:
-        raise NotImplementedError("LabwareCore not implemented")
+        return helpers.uri_from_definition(self._definition)
 
     def get_display_name(self) -> str:
         raise NotImplementedError("LabwareCore not implemented")
 
     def get_label(self) -> Optional[str]:
-        raise NotImplementedError("LabwareCore not implemented")
+        # TODO(jbl 2022-09-01) implement real get_label
+        return "no-op"
 
     def get_name(self) -> str:
         raise NotImplementedError("LabwareCore not implemented")
@@ -54,7 +57,7 @@ class LabwareCore(AbstractLabware[WellCore]):
         raise NotImplementedError("LabwareCore not implemented")
 
     def get_definition(self) -> LabwareDefinition:
-        raise NotImplementedError("LabwareCore not implemented")
+        return self._definition
 
     def get_parameters(self) -> LabwareParameters:
         raise NotImplementedError("LabwareCore not implemented")
@@ -63,7 +66,8 @@ class LabwareCore(AbstractLabware[WellCore]):
         raise NotImplementedError("LabwareCore not implemented")
 
     def set_calibration(self, delta: Point) -> None:
-        raise NotImplementedError("LabwareCore not implemented")
+        # TODO(jbl 2022-09-01) implement set calibration
+        pass
 
     def get_calibrated_offset(self) -> Point:
         raise NotImplementedError("LabwareCore not implemented")
