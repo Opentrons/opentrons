@@ -440,7 +440,7 @@ def test_move_labware_clears_current_well_if_belonged_to_moved_labware(
     """
     load_pipette_command = create_load_pipette_command(
         pipette_id="pipette-id",
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
     move_to_well_command = create_move_to_well_command(
