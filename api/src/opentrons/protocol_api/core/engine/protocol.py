@@ -3,12 +3,14 @@ from typing import Dict, Optional
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.types import Mount, Location, DeckLocation
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons.types import Mount, MountType, Location, DeckLocation
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
+
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 from ..protocol import AbstractProtocol, LoadModuleResult
@@ -98,10 +100,21 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
         raise NotImplementedError("ProtocolEngine PAPI core not implemented")
 
     def load_instrument(
-        self, instrument_name: str, mount: Mount, replace: bool
+        self, instrument_name: PipetteNameType, mount: Mount
     ) -> InstrumentCore:
-        """Load an instrument into the protocol."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        """Load an instrument into the protocol.
+
+        Args:
+            instrument_name: Load name of the instrument.
+            mount: Mount the instrument is attached to.
+
+        Returns:
+            An instrument core configured to use the requested instrument.
+        """
+        engine_mount = MountType[mount.name]
+        load_result = self._engine_client.load_pipette(instrument_name, engine_mount)
+
+        return InstrumentCore(pipette_id=load_result.pipetteId)
 
     def get_loaded_instruments(self) -> Dict[Mount, Optional[InstrumentCore]]:
         """Get all loaded instruments by mount."""
