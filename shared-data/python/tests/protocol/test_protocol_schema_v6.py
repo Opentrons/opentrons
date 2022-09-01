@@ -36,5 +36,5 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
 def test_schema_validators() -> None:
     """Should raise an error the keys do not match."""
     def_data = load_shared_data("/Users/tamarzanzouri/Desktop/Protocols/simpleV6_fail.json")
-    with pytest.raises(Exception):
+    with pytest.raises(Exception, match="missing loadLabware id in referencing parent data model."):
         def_model = ProtocolSchemaV6.parse_raw(def_data)

@@ -169,13 +169,12 @@ class ProtocolSchemaV6(BaseModel):
 
     @validator("commands", always=True)
     def validate_date(cls, value, values):
-        print(value[1])
-        print(values["labware"])
-        if (
-                command
-                for command in value
-                if command.params.labwareId
-                   and command.params.labwareId not in set(values["labware"].keys())
-        ):
-            raise Exception("tamar test")
-        return values["some_list"][0]
+        for command in value:
+            if command.params.pipetteId and command.params.pipetteId not in set(values["pipettes"].keys()):
+                raise Exception("missing loadPipette id in referencing parent data model.")
+            elif command.params.labwareId and command.params.labwareId not in set(values["labware"].keys()):
+                raise Exception("missing loadLabware id in referencing parent data model.")
+            elif command.params.moduleId and "modules" in values and command.params.moduleId not in set(values["modules"].keys()):
+                raise Exception("missing loadPipette id in referencing parent data model.")
+            elif command.params.liquidId and "liquids" in values and command.params.liquidId not in set(values["liquids"].keys()):
+                raise Exception("missing loadLiquid id in referencing parent data model.")
