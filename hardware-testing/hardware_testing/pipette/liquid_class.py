@@ -4,6 +4,7 @@ from typing import Optional, Callable, List
 
 from opentrons.protocol_api import ProtocolContext, InstrumentContext
 from opentrons.protocol_api.labware import Well, Labware
+from opentrons.protocols.api_support.types import APIVersion
 
 from hardware_testing.data import (
     create_file_name,
@@ -21,6 +22,8 @@ from hardware_testing.opentrons_api.helpers import get_pipette_unique_name
 from .timestamp import Timestamp, SampleTimestamps, get_empty_sample_timestamp
 
 LABWARE_BOTTOM_CLEARANCE = 1.5  # FIXME: not sure who should own this
+
+API_VERSION_WITH_PREP_ASPIRATE_FIX = APIVersion(2, 13)
 
 
 @dataclass
@@ -155,7 +158,10 @@ class LiquidSettingsRunner:
 
     def _run_approach(self) -> None:
         self._cfg.pipette.move_to(self._cfg.well.top())
-        if self._cfg.aspirate:
+        if (
+            self._cfg.aspirate
+            and self._ctx.api_version < API_VERSION_WITH_PREP_ASPIRATE_FIX
+        ):
             force_prepare_for_aspirate(self._cfg.pipette)
 
     def _run_gather_air_gaps(self) -> None:
