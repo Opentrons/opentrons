@@ -745,32 +745,27 @@ As with setting targets, deactivating the heater and shaker are done separately,
 Using Multiple Modules of the Same Type
 ***************************************
 
-To use this feature, you must be running software version 4.3 or higher. Currently, you can only use multiple Magnetic Modules or multiple Temperature Modules.
-You won’t be able to load multiple Thermocycler Modules.
+It's possible to use multiples of most module types within a single protocol. The exception is the Thermocycler Module, which only has one supported deck location due to its size. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and OT-2 robot server. 
 
-The following diagram shows the mapping of two Temperature Modules on the robot.
-
-.. image:: ../img/modules/multiples_of_a_module.png
-
-
-In a protocol, the diagram would map to your modules as found below.
-
+In order to send commands to the correct module on the deck, you need to load the modules in your protocol in a specific order. Whenever you call :py:meth:`.load_module` for a particular module type, the OT-2 will initialize the matching module attached to the lowest-numbered USB port. Deck slot numbers play no role in the ordering of modules; you could load a Temperature Module in slot 4 first, followed by another one in slot 3:
 
 .. code-block:: python
-    :substitutions:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        # Load Temperature Module 1 in deck slot 1 on port 1 of the robot.
-        temperature_module_1 = protocol.load_module('temperature module gen2', 1)
+        # Load Temperature Module 1 in deck slot 4 on USB port 1
+        temperature_module_1 = protocol.load_module('temperature module gen2', 4)
 
-        # Load Temperature Module 2 in deck slot 3 on port 2 of the robot.
+        # Load Temperature Module 2 in deck slot 3 on USB port 2
         temperature_module_2 = protocol.load_module('temperature module gen2', 3)
+        
+For this code to work as expected, ``temperature_module_1`` should be plugged into a lower-numbered USB port than ``temperature_module_2``. Assuming there are no other modules used in this protocol, it's simplest to use ports 1 and 2, like this:
 
-Referencing the diagram, you should make sure that Temperature Module 1 in slot 1 is plugged into port 1 of the robot and Temperature Module 1 in slot 3 is plugged into port 2 of the robot.
-If for whatever reason you want to plug Temperature Module 2 into a port to the left of Temperature Module 1, you should switch the modules physically on your robot.
+.. image:: ../img/modules/multiples_of_a_module.svg
 
-For detailed information, please refer to `Using Multiple Modules of the Same Type <https://support.opentrons.com/en/articles/5167312-using-modules-of-the-same-type-on-the-ot-2>`_ in our help center.
+Before running your protocol, it's a good idea to use the module controls in the Opentrons App to check that commands are being sent where you expect.
+
+For additional information, including using modules with USB hubs, see our `support article on Using Multiple Modules of the Same Type <https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2>`_.
