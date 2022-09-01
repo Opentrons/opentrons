@@ -44,19 +44,15 @@ class CalibrationPosition:
 class Deck(UserDict):
     def __init__(self) -> None:
         super().__init__()
-        row_offset = 90.5
-        col_offset = 132.5
-        for idx in range(1, 13):
-            self.data[idx] = None
-        self._positions = {
-            idx + 1: types.Point((idx % 3) * col_offset, idx // 3 * row_offset, 0)
-            for idx in range(12)
-        }
-        self._highest_z = 0.0
         # TODO(mc, 2022-06-17): move deck type selection
         # (and maybe deck definition loading) out of this constructor
         # to decouple from config (and environment) reading / loading
         self._definition = load_deck(deck_type(), DEFAULT_DECK_DEFINITION_VERSION)
+        self._positions = {}
+        for slot in self._definition["locations"]["orderedSlots"]:
+            self.data[int(slot["id"])] = None
+            self._positions[int(slot["id"])] = types.Point(*slot["position"])
+        self._highest_z = 0.0
         self._load_fixtures()
         self._thermocycler_present = False
 

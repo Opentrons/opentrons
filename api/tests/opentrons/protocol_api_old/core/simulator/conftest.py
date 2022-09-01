@@ -1,4 +1,5 @@
 import pytest
+
 from opentrons import types
 from opentrons.hardware_control import ThreadManagedHardware
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
@@ -14,7 +15,9 @@ from opentrons.protocol_api.core.simulator.instrument_context import (
 from opentrons.protocol_api.core.simulator.protocol_context import (
     ProtocolContextSimulation,
 )
+
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 
 @pytest.fixture
@@ -37,7 +40,7 @@ def instrument_context(
 ) -> InstrumentContextImplementation:
     """Instrument context backed by hardware simulator."""
     return protocol_context.load_instrument(
-        "p300_single_gen2", types.Mount.RIGHT, replace=False
+        PipetteNameType.P300_SINGLE_GEN2, types.Mount.RIGHT
     )
 
 
@@ -47,7 +50,7 @@ def second_instrument_context(
 ) -> InstrumentContextImplementation:
     """Instrument context backed by hardware simulator."""
     return protocol_context.load_instrument(
-        "p300_single_gen2", types.Mount.LEFT, replace=False
+        PipetteNameType.P300_SINGLE_GEN2, types.Mount.LEFT
     )
 
 

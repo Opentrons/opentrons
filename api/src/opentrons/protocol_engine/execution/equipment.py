@@ -4,6 +4,7 @@ from typing import Optional, overload
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
@@ -28,7 +29,6 @@ from ..resources import LabwareDataProvider, ModuleDataProvider, ModelUtils
 from ..state import StateStore, HardwareModule
 from ..types import (
     LabwareLocation,
-    PipetteName,
     DeckSlotLocation,
     LabwareOffsetLocation,
     ModuleModel,
@@ -167,7 +167,7 @@ class EquipmentHandler:
 
     async def load_pipette(
         self,
-        pipette_name: PipetteName,
+        pipette_name: PipetteNameType,
         mount: MountType,
         pipette_id: Optional[str],
     ) -> LoadedPipetteData:
@@ -185,18 +185,15 @@ class EquipmentHandler:
         other_mount = mount.other_mount()
         other_pipette = self._state_store.pipettes.get_by_mount(other_mount)
 
-        cache_request = {mount.to_hw_mount(): pipette_name}
+        cache_request = {mount.to_hw_mount(): pipette_name.value}
         if other_pipette is not None:
-            cache_request[other_mount.to_hw_mount()] = other_pipette.pipetteName
+            cache_request[other_mount.to_hw_mount()] = other_pipette.pipetteName.value
 
         # TODO(mc, 2020-10-18): calling `cache_instruments` mirrors the
         # behavior of protocol_context.load_instrument, and is used here as a
         # pipette existence check
-        # TODO(mc, 2021-04-16): reconcile PipetteName enum with PipetteName union
         try:
-            await self._hardware_api.cache_instruments(
-                cache_request  # type: ignore[arg-type]
-            )
+            await self._hardware_api.cache_instruments(cache_request)
         except RuntimeError as e:
             raise FailedToLoadPipetteError(str(e)) from e
 

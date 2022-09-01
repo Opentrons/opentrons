@@ -70,7 +70,7 @@ export function CheckPipettesButton(
   )
 
   return enableChangePipetteWizard ? (
-    <PrimaryButton onClick={handleClick}>
+    <PrimaryButton onClick={handleClick} aria-label="Confirm">
       <Flex
         flexDirection={DIRECTION_ROW}
         color={COLORS.white}
