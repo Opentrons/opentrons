@@ -22,6 +22,18 @@ import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../protocol'
 import type { PipetteName } from './pipettes'
 
+export type RobotName = 'OT-2 Standard' | 'OT-3 Standard'
+
+export type RobotId = 'ot-2' | 'ot-3'
+
+export interface RobotDefinition {
+  friendlyName: string
+  robotName: RobotName
+  robotId: RobotId
+  otId: string
+  models: string[]
+}
+
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
 export interface WellDefinition {
   diameter?: number

@@ -1,0 +1,7 @@
+{
+  "friendlyName": "OT-2",
+  "robotName": "OT-2 Standard",
+  "robotId": "ot-2",
+  "otId": "db8f4c1b-87c0-4c81-b804-7fc23ab320a8",
+  "models": ["OT-2 Standard", "OT-2 Refresh"]
+}
