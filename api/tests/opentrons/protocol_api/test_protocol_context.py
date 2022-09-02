@@ -6,9 +6,7 @@ import pytest
 from decoy import Decoy, matchers
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.labware.dev_types import (
-    LabwareDefinition as LabwareDefinitionDict,
-)
+from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
 from opentrons.types import Mount, Point, DeckSlotName
 from opentrons.equipment_broker import EquipmentBroker
@@ -155,7 +153,7 @@ def test_load_labware(
     """It should create a labware using its execution core."""
     mock_labware_core = decoy.mock(cls=AbstractLabware)
     labware_load_params = LabwareLoadParams("you", "are", 1337)
-    labware_definition_dict = cast(LabwareDefinitionDict, {"labwareDef": True})
+    labware_definition_dict = cast(LabwareDefDict, {"labwareDef": True})
     labware_offset = ProvidedLabwareOffset(delta=Point(1, 2, 3), offset_id="offset-123")
 
     decoy.when(validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_5)

@@ -618,7 +618,7 @@ def test_find_applicable_labware_offset() -> None:
 
 
 def test_get_display_name() -> None:
-    """It should get a labware's user-specified load name."""
+    """It should get a labware's user-specified display name."""
     subject = get_labware_view(
         labware_by_id={
             "plate_with_display_name": plate,
