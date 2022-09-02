@@ -46,56 +46,57 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
                     commandType="loadPipette",
                     params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
                 ),
-            ],
+            ]
         ),
-        # (
-        #     [
-        #         protocol_schema_v6.Command(
-        #             commandType="loadLabware",
-        #             params=protocol_schema_v6.Params(labwareId="labware-id-1"),
-        #         ),
-        #         protocol_schema_v6.Command(
-        #             commandType="loadPipette",
-        #             params=protocol_schema_v6.Params(pipetteId="pipette-id-3"),
-        #         ),
-        #     ],
-        # ),
-        # (
-        #     [
-        #         protocol_schema_v6.Command(
-        #             commandType="loadLabware",
-        #             params=protocol_schema_v6.Params(labwareId="labware-id-1"),
-        #         ),
-        #         protocol_schema_v6.Command(
-        #             commandType="loadPipette",
-        #             params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
-        #         ),
-        #         protocol_schema_v6.Command(
-        #             commandType="loadLiquid",
-        #             params=protocol_schema_v6.Params(liquidId="liquid-id-3"),
-        #         ),
-        #     ],
-        # ),
-        # (
-        #     [
-        #         protocol_schema_v6.Command(
-        #             commandType="loadLabware",
-        #             params=protocol_schema_v6.Params(labwareId="labware-id-1"),
-        #         ),
-        #         protocol_schema_v6.Command(
-        #             commandType="loadPipette",
-        #             params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
-        #         ),
-        #         protocol_schema_v6.Command(
-        #             commandType="loadModule",
-        #             params=protocol_schema_v6.Params(moduleId="module-id-3"),
-        #         ),
-        #     ],
-        # ),
+        (
+            [
+                protocol_schema_v6.Command(
+                    commandType="loadLabware",
+                    params=protocol_schema_v6.Params(labwareId="labware-id-1"),
+                ),
+                protocol_schema_v6.Command(
+                    commandType="loadPipette",
+                    params=protocol_schema_v6.Params(pipetteId="pipette-id-3"),
+                ),
+            ]
+        ),
+        (
+            [
+                protocol_schema_v6.Command(
+                    commandType="loadLabware",
+                    params=protocol_schema_v6.Params(labwareId="labware-id-1"),
+                ),
+                protocol_schema_v6.Command(
+                    commandType="loadPipette",
+                    params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
+                ),
+                protocol_schema_v6.Command(
+                    commandType="loadLiquid",
+                    params=protocol_schema_v6.Params(liquidId="liquid-id-3"),
+                ),
+            ]
+        ),
+        (
+            [
+                protocol_schema_v6.Command(
+                    commandType="loadLabware",
+                    params=protocol_schema_v6.Params(labwareId="labware-id-1"),
+                ),
+                protocol_schema_v6.Command(
+                    commandType="loadPipette",
+                    params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
+                ),
+                protocol_schema_v6.Command(
+                    commandType="loadModule",
+                    params=protocol_schema_v6.Params(moduleId="module-id-3"),
+                ),
+            ]
+        ),
     ],
 )
 def test_schema_validators(input_commands: List[protocol_schema_v6.Command]) -> None:
     """Should raise an error the keys do not match."""
+    print(input_commands)
     labware = {
         "labware-id-1": protocol_schema_v6.Labware(definitionId="definition-1"),
         "labware-id-2": protocol_schema_v6.Labware(definitionId="definition-2"),
@@ -106,6 +107,7 @@ def test_schema_validators(input_commands: List[protocol_schema_v6.Command]) -> 
             displayName="liquid-1", description="liquid desc"
         )
     }
+    modules = {"module-id-1": protocol_schema_v6.Module(model="model-1")}
     with pytest.raises(
         ValueError, match="missing loadLabware id in referencing parent data model."
     ):
@@ -115,8 +117,9 @@ def test_schema_validators(input_commands: List[protocol_schema_v6.Command]) -> 
             metadata={},
             robot=protocol_schema_v6.Robot(model="", deckId=""),
             labware=labware,
-            labwareDefinitions={},
-            commands=input_commands,
             pipettes=pipettes,
             liquids=liquids,
+            modules=modules,
+            labwareDefinitions={},
+            commands=input_commands,
         )

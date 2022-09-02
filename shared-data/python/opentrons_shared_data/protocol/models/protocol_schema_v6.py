@@ -169,10 +169,7 @@ class ProtocolSchemaV6(BaseModel):
 
     @validator("commands", always=True)
     def validate_date(cls, value: List[Command], values: Dict[str, Any]) -> None:
-        print(value)
         for command in value:
-            print(command)
-            print("input command")
             if (
                 command.params.pipetteId
                 and "pipettes" in values
@@ -192,6 +189,7 @@ class ProtocolSchemaV6(BaseModel):
             elif (
                 command.params.moduleId
                 and "modules" in values
+                and values["modules"]
                 and command.params.moduleId not in set(values["modules"].keys())
             ):
                 raise ValueError(
@@ -200,6 +198,7 @@ class ProtocolSchemaV6(BaseModel):
             elif (
                 command.params.liquidId
                 and "liquids" in values
+                and values["liquids"]
                 and command.params.liquidId not in set(values["liquids"].keys())
             ):
                 raise ValueError(
