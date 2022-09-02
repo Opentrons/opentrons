@@ -18,7 +18,7 @@ export function InProgressModal(props: Props): JSX.Element {
     <Flex
       alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_COLUMN}
-      marginY="8.25rem"
+      marginY="8rem"
     >
       <Icon
         name="ot-spinner"

@@ -27,8 +27,8 @@ export function SimpleWizardBody(props: Props): JSX.Element {
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         height="100%"
-        marginBottom="6.3125rem"
-        marginTop="6.75rem"
+        marginBottom="5.6875rem"
+        marginTop="6.8125rem"
       >
         <Icon
           name={isSuccess ? 'ot-check' : 'ot-alert'}
@@ -43,7 +43,14 @@ export function SimpleWizardBody(props: Props): JSX.Element {
         >
           {header}
         </StyledText>
-        <StyledText as="p">{subHeader}</StyledText>
+        <StyledText
+          as="p"
+          marginX={SPACING.spacing6}
+          textAlign={ALIGN_CENTER}
+          height="1.75rem"
+        >
+          {subHeader}
+        </StyledText>
       </Flex>
       <Flex
         paddingX={SPACING.spacing6}

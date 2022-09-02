@@ -92,7 +92,7 @@ export function Instructions(props: Props): JSX.Element {
           paddingTop={SPACING.spacing6}
           marginBottom="12.9rem"
         >
-          {direction === 'attach' ? (
+          {direction === 'attach' && wantedPipette === null ? (
             <PipetteSelection onPipetteChange={setWantedName} />
           ) : null}
         </Flex>
@@ -123,6 +123,7 @@ export function Instructions(props: Props): JSX.Element {
                       block: <StyledText as="p" />,
                     }}
                   />
+
                   {direction === 'attach' && stepPage === 0 ? (
                     channels === 8 ? (
                       <Flex flexDirection={DIRECTION_ROW}>
@@ -130,7 +131,13 @@ export function Instructions(props: Props): JSX.Element {
                           t={t}
                           i18nKey="tighten_screws_multi"
                           components={{
-                            strong: <strong />,
+                            strong: (
+                              <strong
+                                style={{
+                                  fontWeight: TYPOGRAPHY.fontWeightSemiBold,
+                                }}
+                              />
+                            ),
                             block: (
                               <StyledText as="p" marginTop={SPACING.spacing4} />
                             ),
@@ -182,7 +189,7 @@ export function Instructions(props: Props): JSX.Element {
           mount={mount}
           pipetteModelName={actualPipette ? actualPipette.name : ''}
           confirm={confirm}
-          back={back}
+          back={() => setStepPage(1)}
         />
       )}
     </>

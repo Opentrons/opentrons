@@ -92,4 +92,16 @@ describe('CheckPipettesButton', () => {
     fireEvent.click(btn)
     expect(dispatchApiRequest).toBeCalledWith(mockFetchPipettes('otie'))
   })
+
+  it('renders the confirm detachment btn with ff and with children and clicking on it calls fetchPipettes', () => {
+    props = {
+      ...props,
+      actualPipette: MOCK_ACTUAL_PIPETTE,
+    }
+    const { getByLabelText, getByText } = render(props)
+    const btn = getByLabelText('Confirm')
+    getByText('btn text')
+    fireEvent.click(btn)
+    expect(dispatchApiRequest).toBeCalledWith(mockFetchPipettes('otie'))
+  })
 })

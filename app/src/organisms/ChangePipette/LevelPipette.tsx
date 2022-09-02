@@ -66,12 +66,18 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <Flex flexDirection={DIRECTION_COLUMN}>
+          <Flex flexDirection={DIRECTION_COLUMN} marginRight="0.2rem">
             <Trans
               t={t}
               i18nKey={'level_the_pipette'}
               components={{
-                bold: <strong />,
+                bold: (
+                  <strong
+                    style={{
+                      fontWeight: TYPOGRAPHY.fontWeightSemiBold,
+                    }}
+                  />
+                ),
                 h1: (
                   <StyledText
                     css={TYPOGRAPHY.h1Default}

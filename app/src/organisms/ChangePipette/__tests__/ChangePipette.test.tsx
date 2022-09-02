@@ -182,9 +182,6 @@ describe('ChangePipette', () => {
     //  Exit modal page
     getByText('mock exit modal')
     getByText('Attach a pipette')
-    exit = getByLabelText('Exit')
-    fireEvent.click(exit)
-    expect(props.closeModal).toHaveBeenCalled()
   })
 
   it('the go back button functions as expected', () => {
@@ -274,9 +271,6 @@ describe('ChangePipette', () => {
     getByText('Detach P300 Single GEN2 from Left Mount')
     getByText('Step 2 / 3')
     getByText('mock exit modal')
-    const exitModal = getByLabelText('Exit')
-    fireEvent.click(exitModal)
-    expect(props.closeModal).toHaveBeenCalled()
   })
 
   it('renders the wizard pages for detaching a single channel pipette and goes through the whole flow', () => {

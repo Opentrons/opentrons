@@ -89,7 +89,9 @@ export function CheckPipettesButton(
         color={COLORS.white}
         alignItems={ALIGN_CENTER}
       >
-        {isPending ? (
+        {children != null ? (
+          children
+        ) : isPending ? (
           <>
             <Icon
               name="ot-spinner"

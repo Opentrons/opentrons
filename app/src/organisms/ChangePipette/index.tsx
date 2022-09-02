@@ -263,7 +263,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
       title = attachWizardHeader
     }
 
-    exitWizardHeader = confirmExit ? closeModal : () => setConfirmExit(true)
+    exitWizardHeader = confirmExit ? undefined : () => setConfirmExit(true)
     currentStep = instructionsCurrentStep
     wizardTitle = title
 
@@ -306,7 +306,8 @@ export function ChangePipette(props: Props): JSX.Element | null {
         ? EIGHT_CHANNEL_STEPS
         : SINGLE_CHANNEL_STEPS
       : SINGLE_CHANNEL_STEPS - 1
-    exitWizardHeader = success ? homePipAndExit : () => setConfirmExit(true)
+    exitWizardHeader =
+      success || confirmExit ? undefined : () => setConfirmExit(true)
 
     wizardTitle =
       (wantedPipette == null && actualPipette == null) ||
