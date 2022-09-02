@@ -1,8 +1,8 @@
 import json
 import pytest
-from typing import Any, Dict
+from typing import Any, Dict, List
 from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.protocol.models import ProtocolSchemaV6
+from opentrons_shared_data.protocol.models import protocol_schema_v6
 
 from . import list_fixtures
 
@@ -10,7 +10,7 @@ from . import list_fixtures
 @pytest.mark.parametrize("defpath", list_fixtures(6))
 def test_v6_types(defpath):
     def_data = load_shared_data(defpath)
-    def_model = ProtocolSchemaV6.parse_raw(def_data)
+    def_model = protocol_schema_v6.ProtocolSchemaV6.parse_raw(def_data)
     def_dict_from_model = def_model.dict(
         exclude_unset=True,
         # 'schemaVersion' in python is '$schemaVersion' in JSON
@@ -31,3 +31,95 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
     for command_object_dict in protocol_fixture["commands"]:
         command_object_dict.pop("result", None)
         command_object_dict.pop("id", None)
+
+
+@pytest.mark.parametrize(
+    "input_commands",
+    [
+        (
+            [
+                protocol_schema_v6.Command(
+                    commandType="loadLabware",
+                    params=protocol_schema_v6.Params(labwareId="labware-id-3"),
+                ),
+                protocol_schema_v6.Command(
+                    commandType="loadPipette",
+                    params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
+                ),
+            ]
+        ),
+        (
+            [
+                protocol_schema_v6.Command(
+                    commandType="loadLabware",
+                    params=protocol_schema_v6.Params(labwareId="labware-id-1"),
+                ),
+                protocol_schema_v6.Command(
+                    commandType="loadPipette",
+                    params=protocol_schema_v6.Params(pipetteId="pipette-id-3"),
+                ),
+            ]
+        ),
+        (
+            [
+                protocol_schema_v6.Command(
+                    commandType="loadLabware",
+                    params=protocol_schema_v6.Params(labwareId="labware-id-1"),
+                ),
+                protocol_schema_v6.Command(
+                    commandType="loadPipette",
+                    params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
+                ),
+                protocol_schema_v6.Command(
+                    commandType="loadLiquid",
+                    params=protocol_schema_v6.Params(liquidId="liquid-id-3"),
+                ),
+            ]
+        ),
+        (
+            [
+                protocol_schema_v6.Command(
+                    commandType="loadLabware",
+                    params=protocol_schema_v6.Params(labwareId="labware-id-1"),
+                ),
+                protocol_schema_v6.Command(
+                    commandType="loadPipette",
+                    params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
+                ),
+                protocol_schema_v6.Command(
+                    commandType="loadModule",
+                    params=protocol_schema_v6.Params(moduleId="module-id-3"),
+                ),
+            ]
+        ),
+    ],
+)
+def test_schema_validators(input_commands: List[protocol_schema_v6.Command]) -> None:
+    """Should raise an error the keys do not match."""
+    print(input_commands)
+    labware = {
+        "labware-id-1": protocol_schema_v6.Labware(definitionId="definition-1"),
+        "labware-id-2": protocol_schema_v6.Labware(definitionId="definition-2"),
+    }
+    pipettes = {"pipette-id-1": protocol_schema_v6.Pipette(name="pipette-1")}
+    liquids = {
+        "liquid-id-1": protocol_schema_v6.Liquid(
+            displayName="liquid-1", description="liquid desc"
+        )
+    }
+    modules = {"module-id-1": protocol_schema_v6.Module(model="model-1")}
+    with pytest.raises(
+        ValueError, match="missing loadLabware id in referencing parent data model."
+    ):
+        protocol_schema_v6.ProtocolSchemaV6(
+            otSharedSchema="#/protocol/schemas/6",
+            schemaVersion=6,
+            metadata={},
+            robot=protocol_schema_v6.Robot(model="", deckId=""),
+            labware=labware,
+            pipettes=pipettes,
+            liquids=liquids,
+            modules=modules,
+            labwareDefinitions={},
+            commands=input_commands,
+        )
