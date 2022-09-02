@@ -133,7 +133,7 @@ class LiquidContent:
     def set_volume(self, volume: float) -> None:
         """Set volume."""
         if not 0 <= volume <= self._calc_type.max_volume():
-            raise ValueError(f'Volume out of range: {volume}')
+            raise ValueError(f"Volume out of range: {volume}")
         self._volume = volume
 
     def get_volume(self) -> float:
@@ -156,13 +156,17 @@ class LiquidContent:
     ) -> None:
         """Update volume."""
         if after_aspirate and after_dispense:
-            raise ValueError('Both \"after_aspirate=\" and \"after_dispense=\" cannot be set')
+            raise ValueError(
+                'Both "after_aspirate=" and "after_dispense=" cannot be set'
+            )
         if after_aspirate is not None:
             new_vol = self.get_volume() - after_aspirate
         elif after_dispense is not None:
             new_vol = self.get_volume() + after_dispense
         else:
-            raise ValueError('Either \"after_aspirate=\" or \"after_dispense=\" must be positive integers')
+            raise ValueError(
+                'Either "after_aspirate=" or "after_dispense=" must be positive integers'
+            )
         self.set_volume(new_vol)
 
     def set_volume_from_height(self, liquid_height: float) -> None:
@@ -211,7 +215,7 @@ class LiquidTracker:
         #       accurate, give .init_liquid_height() a lookup table
         self.reset()
         for lw in protocol.loaded_labwares.values():
-            if lw.is_tiprack or 'trash' in lw.name.lower():
+            if lw.is_tiprack or "trash" in lw.name.lower():
                 continue
             for w in lw.wells():
                 self.init_well_liquid_height(w)

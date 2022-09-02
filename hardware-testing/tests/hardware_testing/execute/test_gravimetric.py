@@ -14,8 +14,8 @@ PIP_FILE_NAME = (
     "ot2-p300-single-channel-gravimetric_run-"
     "220727152927_PipetteLiquidClass-P3HSV212021030505.csv"
 )
-GRAV_PATH = Path(__file__).parent / 'example_data' / GRAV_FILE_NAME
-PIP_PATH = Path(__file__).parent / 'example_data' / PIP_FILE_NAME
+GRAV_PATH = Path(__file__).parent / "example_data" / GRAV_FILE_NAME
+PIP_PATH = Path(__file__).parent / "example_data" / PIP_FILE_NAME
 
 
 def test_analyze_recording_and_timestamps():

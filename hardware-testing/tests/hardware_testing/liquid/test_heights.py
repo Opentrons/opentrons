@@ -8,23 +8,27 @@ from hardware_testing.liquid.height import LiquidTracker
 from hardware_testing.opentrons_api.helpers import get_api_context
 from hardware_testing.labware.definitions import load_radwag_vial_definition
 
-CUSTOM_LABWARE_DEFINITION_DIR = Path(__file__).parent.parent.parent.parent \
-                                / 'protocols' / 'definitions'
+CUSTOM_LABWARE_DEFINITION_DIR = (
+    Path(__file__).parent.parent.parent.parent / "protocols" / "definitions"
+)
 
 
 def _create_context() -> ProtocolContext:
-    return get_api_context(api_level='2.13',
-                           is_simulating=False,
-                           connect_to_smoothie=False)
+    return get_api_context(
+        api_level="2.13", is_simulating=False, connect_to_smoothie=False
+    )
 
 
 def _load_labware(ctx: ProtocolContext) -> Tuple[Labware, Labware, Labware, Labware]:
-    tiprack = ctx.load_labware(load_name='opentrons_96_tiprack_300uL', location='8')
-    trough = ctx.load_labware(load_name='nest_12_reservoir_15ml', location='5')
-    plate = ctx.load_labware(load_name='corning_96_wellplate_360ul_flat', location='2')
+    tiprack = ctx.load_labware(load_name="opentrons_96_tiprack_300uL", location="8")
+    trough = ctx.load_labware(load_name="nest_12_reservoir_15ml", location="5")
+    plate = ctx.load_labware(load_name="corning_96_wellplate_360ul_flat", location="2")
     vial = ctx.load_labware_from_definition(
-        labware_def=load_radwag_vial_definition(directory=CUSTOM_LABWARE_DEFINITION_DIR),
-        location='6')
+        labware_def=load_radwag_vial_definition(
+            directory=CUSTOM_LABWARE_DEFINITION_DIR
+        ),
+        location="6",
+    )
     return tiprack, trough, plate, vial
 
 
@@ -49,11 +53,11 @@ def test_volume_changes() -> None:
     # initialize liquid tracker
     tracker = LiquidTracker()
     tracker.initialize_from_deck(ctx)
-    well = plate['A1']
+    well = plate["A1"]
 
     # set starting volume
     assert tracker.get_volume(well) == 0
-    tracker.set_start_volume(plate['A1'], 100)
+    tracker.set_start_volume(plate["A1"], 100)
     assert tracker.get_volume(well) == 100
 
     # use arguments appropriately
@@ -96,7 +100,7 @@ def test_liquid_height() -> None:
     tracker = LiquidTracker()
     tracker.initialize_from_deck(ctx)
 
-    well = plate['A1']  # a cyclinder
+    well = plate["A1"]  # a cyclinder
 
     # set height, get volumes
     tracker.set_start_volume_from_liquid_height(well, liquid_height=0)
@@ -115,7 +119,7 @@ def test_liquid_height() -> None:
     assert round(tracker.get_volume(well), 2) == 0
     assert round(tracker.get_liquid_height(well), 2) == 0
 
-    well = trough['A1']  # a cube
+    well = trough["A1"]  # a cube
 
     # set height, get volumes
     tracker.set_start_volume_from_liquid_height(well, liquid_height=0)
@@ -144,7 +148,7 @@ def test_lookup_table() -> None:
     # initialize liquid tracker
     tracker = LiquidTracker()
     tracker.initialize_from_deck(ctx)
-    well = plate['A1']
+    well = plate["A1"]
 
     # create a fake lookup table for this well
     tracker.init_well_liquid_height(well, lookup_table=[(0, 0), (10, 10)])
@@ -174,45 +178,51 @@ def test_before_and_after_heights() -> None:
     #       the Corning plate assumes a perfect cylinder without a lookup table
     tiprack, trough, plate, _ = _load_labware(ctx)
     # load a pipette
-    single = ctx.load_instrument('p300_single_gen2', mount='left', tip_racks=[tiprack])
-    multi = ctx.load_instrument('p300_multi_gen2', mount='right', tip_racks=[tiprack])
+    single = ctx.load_instrument("p300_single_gen2", mount="left", tip_racks=[tiprack])
+    multi = ctx.load_instrument("p300_multi_gen2", mount="right", tip_racks=[tiprack])
     # initialize liquid tracker
     tracker = LiquidTracker()
     tracker.initialize_from_deck(ctx)
 
     # create a fake lookup tables
-    tracker.init_well_liquid_height(plate['A1'], lookup_table=[(0, 0), (10, 10)])
-    tracker.init_well_liquid_height(trough['A1'], lookup_table=[(0, 0), (10, 10)])
-    tracker.set_start_volume_from_liquid_height(plate['A1'], liquid_height=5)
-    tracker.set_start_volume_from_liquid_height(trough['A1'], liquid_height=5)
+    tracker.init_well_liquid_height(plate["A1"], lookup_table=[(0, 0), (10, 10)])
+    tracker.init_well_liquid_height(trough["A1"], lookup_table=[(0, 0), (10, 10)])
+    tracker.set_start_volume_from_liquid_height(plate["A1"], liquid_height=5)
+    tracker.set_start_volume_from_liquid_height(trough["A1"], liquid_height=5)
 
     # single-channel pipetting
     before, after = tracker.get_before_and_after_heights(
-        pipette=single, well=plate['A1'], aspirate=1)
+        pipette=single, well=plate["A1"], aspirate=1
+    )
     assert before == 5
     assert after == 4
     before, after = tracker.get_before_and_after_heights(
-        pipette=single, well=plate['A1'], dispense=1)
+        pipette=single, well=plate["A1"], dispense=1
+    )
     assert before == 5
     assert after == 6
 
     # multi-channel pipetting
     before, after = tracker.get_before_and_after_heights(
-        pipette=multi, well=plate['A1'], aspirate=0.1)
+        pipette=multi, well=plate["A1"], aspirate=0.1
+    )
     assert before == 5
     assert after == 4.9
     before, after = tracker.get_before_and_after_heights(
-        pipette=multi, well=plate['A1'], dispense=0.1)
+        pipette=multi, well=plate["A1"], dispense=0.1
+    )
     assert before == 5
     assert after == 5.1
 
     # multi-channel pipetting in a trough
     before, after = tracker.get_before_and_after_heights(
-        pipette=multi, well=trough['A1'], aspirate=0.1)
+        pipette=multi, well=trough["A1"], aspirate=0.1
+    )
     assert before == 5
     assert after == 4.2
     before, after = tracker.get_before_and_after_heights(
-        pipette=multi, well=trough['A1'], dispense=0.1)
+        pipette=multi, well=trough["A1"], dispense=0.1
+    )
     assert before == 5
     assert after == 5.8
 
@@ -224,8 +234,8 @@ def test_update_affected_wells() -> None:
     #       the Corning plate assumes a perfect cylinder without a lookup table
     tiprack, trough, plate, _ = _load_labware(ctx)
     # load a pipette
-    single = ctx.load_instrument('p300_single_gen2', mount='left', tip_racks=[tiprack])
-    multi = ctx.load_instrument('p300_multi_gen2', mount='right', tip_racks=[tiprack])
+    single = ctx.load_instrument("p300_single_gen2", mount="left", tip_racks=[tiprack])
+    multi = ctx.load_instrument("p300_multi_gen2", mount="right", tip_racks=[tiprack])
     # initialize liquid tracker
     tracker = LiquidTracker()
     tracker.initialize_from_deck(ctx)
@@ -237,20 +247,20 @@ def test_update_affected_wells() -> None:
         assert tracker.get_volume(well) == 5
 
     # plate
-    tracker.update_affected_wells(pipette=single, well=plate['A1'], dispense=1)
-    assert tracker.get_volume(plate['A1']) == 6
-    tracker.update_affected_wells(pipette=multi, well=plate['A2'], dispense=1)
-    assert tracker.get_volume(plate['A2']) == 6
-    assert tracker.get_volume(plate['B2']) == 6
-    assert tracker.get_volume(plate['C2']) == 6
-    assert tracker.get_volume(plate['D2']) == 6
-    assert tracker.get_volume(plate['E2']) == 6
-    assert tracker.get_volume(plate['F2']) == 6
-    assert tracker.get_volume(plate['G2']) == 6
-    assert tracker.get_volume(plate['H2']) == 6
+    tracker.update_affected_wells(pipette=single, well=plate["A1"], dispense=1)
+    assert tracker.get_volume(plate["A1"]) == 6
+    tracker.update_affected_wells(pipette=multi, well=plate["A2"], dispense=1)
+    assert tracker.get_volume(plate["A2"]) == 6
+    assert tracker.get_volume(plate["B2"]) == 6
+    assert tracker.get_volume(plate["C2"]) == 6
+    assert tracker.get_volume(plate["D2"]) == 6
+    assert tracker.get_volume(plate["E2"]) == 6
+    assert tracker.get_volume(plate["F2"]) == 6
+    assert tracker.get_volume(plate["G2"]) == 6
+    assert tracker.get_volume(plate["H2"]) == 6
 
     # trough
-    tracker.update_affected_wells(pipette=single, well=trough['A1'], dispense=1)
-    assert tracker.get_volume(trough['A1']) == 6
-    tracker.update_affected_wells(pipette=multi, well=trough['A2'], dispense=0.1)
-    assert tracker.get_volume(trough['A2']) == 5.8
+    tracker.update_affected_wells(pipette=single, well=trough["A1"], dispense=1)
+    assert tracker.get_volume(trough["A1"]) == 6
+    tracker.update_affected_wells(pipette=multi, well=trough["A2"], dispense=0.1)
+    assert tracker.get_volume(trough["A2"]) == 5.8
