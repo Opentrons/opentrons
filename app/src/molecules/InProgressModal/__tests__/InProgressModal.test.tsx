@@ -10,29 +10,18 @@ const render = (props: React.ComponentProps<typeof InProgressModal>) => {
 }
 describe('InProgressModal', () => {
   let props: React.ComponentProps<typeof InProgressModal>
-  beforeEach(() => {
-    props = {
-      wizardHeaderTitle: 'Attach a pipette',
-      currentStep: 1,
-      totalSteps: 6,
-    }
-  })
+
   it('renders the correct text with no child', () => {
-    const { getByText, getByLabelText } = render(props)
-    getByText('Attach a pipette')
-    getByText('Step: 1 / 6')
+    const { getByLabelText } = render(props)
     getByLabelText('spinner')
   })
 
   it('renders the correct text with child', () => {
     props = {
-      ...props,
       children: <div>Moving gantry...</div>,
     }
     const { getByText, getByLabelText } = render(props)
-    getByText('Attach a pipette')
     getByText('Moving gantry...')
-    getByText('Step: 1 / 6')
     getByLabelText('spinner')
   })
 })

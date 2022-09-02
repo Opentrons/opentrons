@@ -2,6 +2,9 @@
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
+from opentrons.types import Mount
 from opentrons.protocol_api.core.protocol import (
     AbstractProtocol as BaseAbstractProtocol,
 )
@@ -10,7 +13,6 @@ from opentrons.protocol_api.core.instrument import (
     AbstractInstrument as BaseAbstractInstrument,
 )
 from opentrons.protocol_api.core.well import AbstractWellCore
-from opentrons import types
 
 
 AbstractInstrument = BaseAbstractInstrument[AbstractWellCore]
@@ -28,13 +30,6 @@ def subject(request: pytest.FixtureRequest) -> AbstractProtocol:
     return request.param  # type: ignore[attr-defined, no-any-return]
 
 
-def test_load_instrument_fails_when_present(subject: AbstractProtocol) -> None:
-    """It should fail if already present."""
-    subject.load_instrument("p300_single_gen2", types.Mount.RIGHT, replace=False)
-    with pytest.raises(RuntimeError):
-        subject.load_instrument("p300_single_gen2", types.Mount.RIGHT, replace=False)
-
-
 def test_replacing_instrument_tip_state(
     subject: AbstractProtocol, labware: AbstractLabware
 ) -> None:
@@ -47,8 +42,8 @@ def test_replacing_instrument_tip_state(
     # The solution is to reuse InstrumentContextSimulation instances when the user is
     # replacing the same pipette at the same mount.
     subject.home()
-    pip1 = subject.load_instrument("p300_single_gen2", types.Mount.RIGHT, replace=False)
-    pip2 = subject.load_instrument("p300_single_gen2", types.Mount.RIGHT, replace=True)
+    pip1 = subject.load_instrument(PipetteNameType.P300_SINGLE_GEN2, Mount.RIGHT)
+    pip2 = subject.load_instrument(PipetteNameType.P300_SINGLE_GEN2, Mount.RIGHT)
 
     pip1.pick_up_tip(
         well=labware.get_wells()[0],

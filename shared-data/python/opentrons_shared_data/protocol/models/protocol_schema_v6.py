@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Any, List, Optional, Dict
 from typing_extensions import Literal
 from enum import Enum
@@ -156,13 +156,51 @@ class ProtocolSchemaV6(BaseModel):
     robot: Robot
     pipettes: Dict[str, Pipette]
     labware: Dict[str, Labware]
-    labwareDefinitions: Dict[str, LabwareDefinition]
-    commands: List[Command]
     modules: Optional[Dict[str, Module]]
     liquids: Optional[Dict[str, Liquid]]
+    labwareDefinitions: Dict[str, LabwareDefinition]
+    commands: List[Command]
     commandAnnotations: Optional[List[CommandAnnotation]]
     designerApplication: Optional[DesignerApplication]
 
     class Config:
         # added for constructing the class with field name instead of alias
         allow_population_by_field_name = True
+
+    @validator("commands", always=True)
+    def validate_date(cls, value: List[Command], values: Dict[str, Any]) -> None:
+        for command in value:
+            if (
+                command.params.pipetteId
+                and "pipettes" in values
+                and command.params.pipetteId not in set(values["pipettes"].keys())
+            ):
+                raise ValueError(
+                    "missing loadPipette id in referencing parent data model."
+                )
+            elif (
+                command.params.labwareId
+                and "labware" in values
+                and command.params.labwareId not in set(values["labware"].keys())
+            ):
+                raise ValueError(
+                    "missing loadLabware id in referencing parent data model."
+                )
+            elif (
+                command.params.moduleId
+                and "modules" in values
+                and values["modules"]
+                and command.params.moduleId not in set(values["modules"].keys())
+            ):
+                raise ValueError(
+                    "missing loadPipette id in referencing parent data model."
+                )
+            elif (
+                command.params.liquidId
+                and "liquids" in values
+                and values["liquids"]
+                and command.params.liquidId not in set(values["liquids"].keys())
+            ):
+                raise ValueError(
+                    "missing loadLiquid id in referencing parent data model."
+                )

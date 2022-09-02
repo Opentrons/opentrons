@@ -1,6 +1,7 @@
 """Protocol run control and management."""
 from typing import List, NamedTuple, Optional
 
+from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_reader import (
     ProtocolSource,
@@ -175,12 +176,13 @@ class ProtocolRunner:
         protocol = self._legacy_file_reader.read(protocol_source)
         context = self._legacy_context_creator.create(protocol)
 
-        self._protocol_engine.add_plugin(
-            LegacyContextPlugin(
-                hardware_api=self._hardware_api,
-                protocol_context=context,
+        if not feature_flags.enable_protocol_engine_papi_core():
+            self._protocol_engine.add_plugin(
+                LegacyContextPlugin(
+                    hardware_api=self._hardware_api,
+                    protocol_context=context,
+                )
             )
-        )
 
         self._task_queue.set_run_func(
             func=self._legacy_executor.execute,
