@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import logging
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict
 
 from opentrons_shared_data.gripper import load_definition
 from opentrons_shared_data.gripper.dev_types import (
@@ -32,6 +32,7 @@ class GripperConfig:
     pin_one_offset_from_base: Offset
     pin_two_offset_from_base: Offset
     quirks: List[str]
+    jaw_sizes_um: Dict[str, int]
 
 
 def _verify_value(
@@ -70,6 +71,7 @@ def load(
         pin_one_offset_from_base=_get_offset(gripper_def.pin_one_offset_from_base),
         pin_two_offset_from_base=_get_offset(gripper_def.pin_two_offset_from_base),
         quirks=gripper_def.quirks,
+        jaw_sizes_um=gripper_def.jaw_sizes_um,
     )
 
 

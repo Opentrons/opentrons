@@ -243,9 +243,9 @@ class OT3Simulator:
 
     async def gripper_move_jaw(
         self,
-        jaw_width_um: int,
+        encoder_position_um: int,
     ) -> None:
-        _ = create_gripper_jaw_move_group(jaw_width_um)
+        _ = create_gripper_jaw_move_group(encoder_position_um)
 
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]

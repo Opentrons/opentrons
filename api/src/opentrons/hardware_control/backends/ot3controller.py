@@ -368,9 +368,9 @@ class OT3Controller:
 
     async def gripper_move_jaw(
         self,
-        jaw_width_um: int,
+        encoder_position_um: int,
     ) -> None:
-        move_group = create_gripper_jaw_move_group(jaw_width_um)
+        move_group = create_gripper_jaw_move_group(encoder_position_um)
         runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
 

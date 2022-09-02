@@ -92,6 +92,7 @@ class GripperDefinitionV1:
     pin_one_offset_from_base: GripperOffset
     pin_two_offset_from_base: GripperOffset
     quirks: List[str]
+    jaw_sizes_um: Dict[str, int]
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "GripperDefinitionV1":
@@ -117,6 +118,7 @@ class GripperDefinitionV1:
                 pin_one_offset_from_base=GripperOffset(**data["pinOneOffsetFromBase"]),
                 pin_two_offset_from_base=GripperOffset(**data["pinTwoOffsetFromBase"]),
                 quirks=data["quirks"],
+                jaw_sizes_um=data["jawSizes_um"],
             )
         except (KeyError) as e:
             raise InvalidGripperDefinition(e)

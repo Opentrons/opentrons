@@ -90,6 +90,7 @@ def mock_ungrip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
     ) as mock_move:
         yield mock_move
 
+
 @pytest.fixture
 def mock_set_jaw_width(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
     with patch.object(
@@ -377,6 +378,7 @@ async def test_gripper_action(
     ot3_hardware: ThreadManager[OT3API],
     mock_grip: AsyncMock,
     mock_ungrip: AsyncMock,
+    mock_set_jaw_width: AsyncMock,
 ) -> None:
     with pytest.raises(
         GripperNotAttachedError, match="Cannot perform action without gripper attached"
