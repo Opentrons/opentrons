@@ -3,17 +3,14 @@ from __future__ import annotations
 import logging
 import json
 import os
-from dataclasses import dataclass
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, AnyStr, List, Dict, Union
+from typing import Any, AnyStr, List, Dict, Optional, Union
 
 import jsonschema  # type: ignore
 
 from opentrons.protocols.api_support.util import ModifiedList
-from opentrons.calibration_storage import helpers
 from opentrons_shared_data import load_shared_data, get_shared_data_root
-from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.api_support.constants import (
     OPENTRONS_NAMESPACE,
     CUSTOM_NAMESPACE,
@@ -23,19 +20,15 @@ from opentrons.protocols.api_support.constants import (
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
-if TYPE_CHECKING:
-    from opentrons.protocol_api.core.labware import AbstractLabware
-
-
 MODULE_LOG = logging.getLogger(__name__)
 
 
 def get_labware_definition(
     load_name: str,
-    namespace: str = None,
-    version: int = None,
-    bundled_defs: Dict[str, LabwareDefinition] = None,
-    extra_defs: Dict[str, LabwareDefinition] = None,
+    namespace: Optional[str] = None,
+    version: Optional[int] = None,
+    bundled_defs: Optional[Dict[str, LabwareDefinition]] = None,
+    extra_defs: Optional[Dict[str, LabwareDefinition]] = None,
 ) -> LabwareDefinition:
     """
     Look up and return a definition by load_name + namespace + version and
@@ -94,7 +87,7 @@ def get_all_labware_definitions() -> List[str]:
 
 
 def save_definition(
-    labware_def: LabwareDefinition, force: bool = False, location: Path = None
+    labware_def: LabwareDefinition, force: bool = False, location: Optional[Path] = None
 ) -> None:
     """
     Save a labware definition
@@ -163,8 +156,8 @@ def verify_definition(
 def _get_labware_definition_from_bundle(
     bundled_labware: Dict[str, LabwareDefinition],
     load_name: str,
-    namespace: str = None,
-    version: int = None,
+    namespace: Optional[str] = None,
+    version: Optional[int] = None,
 ) -> LabwareDefinition:
     """
     Look up and return a bundled definition by ``load_name`` + ``namespace``
@@ -207,7 +200,7 @@ def _get_labware_definition_from_bundle(
 
 
 def _get_standard_labware_definition(
-    load_name: str, namespace: str = None, version: int = None
+    load_name: str, namespace: Optional[str] = None, version: Optional[int] = None
 ) -> LabwareDefinition:
 
     if version is None:
@@ -255,53 +248,8 @@ def _get_standard_labware_definition(
     return labware_def
 
 
-def _get_parent_identifier(labware: AbstractLabware) -> str:
-    """
-    Helper function to return whether a labware is on top of a
-    module or not.
-    """
-    parent = labware.get_geometry().parent.labware.object
-    # TODO (lc, 07-14-2020): Once we implement calibrations per slot,
-    # this function should either return a slot using `first_parent` or
-    # the module it is attached to.
-    if isinstance(parent, DeckItem) and parent.separate_calibration:
-        # treat a given labware on a given module type as same
-        return parent.load_name
-    else:
-        return ""  # treat all slots as same
-
-
-def get_labware_hash(labware: AbstractLabware) -> str:
-    return helpers.hash_labware_def(labware.get_definition())
-
-
-def get_labware_hash_with_parent(labware: AbstractLabware) -> str:
-    return helpers.hash_labware_def(labware.get_definition()) + _get_parent_identifier(
-        labware
-    )
-
-
-def _get_labware_path(labware: AbstractLabware) -> str:
-    return f"{get_labware_hash_with_parent(labware)}.json"
-
-
-@dataclass(frozen=True)
-class IndexFileInformation:
-    definition: LabwareDefinition
-    parent: str
-    path: str
-
-    @classmethod
-    def from_labware(cls, labware: AbstractLabware) -> "IndexFileInformation":
-        return IndexFileInformation(
-            definition=labware.get_definition(),
-            path=_get_labware_path(labware),
-            parent=_get_parent_identifier(labware),
-        )
-
-
 def _get_path_to_labware(
-    load_name: str, namespace: str, version: int, base_path: Path = None
+    load_name: str, namespace: str, version: int, base_path: Optional[Path] = None
 ) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is stored in shared data

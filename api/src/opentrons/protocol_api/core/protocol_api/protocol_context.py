@@ -13,7 +13,7 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.labware import load_from_definition, get_labware_definition
+from opentrons.protocols.labware import get_labware_definition
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -133,9 +133,13 @@ class ProtocolContextImplementation(
             bundled_defs=self._bundled_labware,
             extra_defs=self._extra_labware,
         )
-        labware_obj = load_from_definition(labware_def, parent, label)
-        self._deck_layout[location] = labware_obj
-        return labware_obj
+        labware_core = LabwareImplementation(
+            definition=labware_def,
+            parent=parent,
+            label=label,
+        )
+        self._deck_layout[location] = labware_core
+        return labware_core
 
     def load_module(
         self,
