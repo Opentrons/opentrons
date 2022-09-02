@@ -5,7 +5,7 @@ import struct
 
 from opentrons_hardware.instruments.serial_utils import ensure_serial_length
 
-SERIAL_RE = re.compile("^(?:GRV)(?P<model>[0-9]{2,2})(?P<code>.{,12})$")
+SERIAL_RE = re.compile("^(?:GRPV)(?P<model>[0-9]{2,2})(?P<code>.{,12})$")
 
 SERIAL_FORMAT_MSG = (
     "Serial numbers must have the format GRVMMXXXXXX... where"
