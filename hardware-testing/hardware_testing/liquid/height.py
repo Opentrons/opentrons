@@ -95,7 +95,11 @@ class CalcTypeLookup(CalcType):
     def height_from_volume(self, volume: float) -> float:
         """Calculate the liquid height given a volume."""
         assert 0 <= volume <= self.max_volume(), f"Volume {volume} is out of range"
-        for i, (lv, lh) in enumerate(self.lookup[1:]):
+        if volume == 0:
+            return 0
+        for i, (lv, lh) in enumerate(self.lookup):
+            if i == 0:
+                continue
             plv, plh = self.lookup[i - 1]
             if plv <= volume <= lv:
                 v_perc = (volume - plv) / (lv - plv)
@@ -105,11 +109,15 @@ class CalcTypeLookup(CalcType):
     def volume_from_height(self, height: float) -> float:
         """Calculate the liquid volume given a height."""
         assert 0 <= height <= self.depth, f"Height {height} is out of range"
-        for i, (lv, lh) in enumerate(self.lookup[1:]):
-            plv, plh = self.lookup[i - 1]
-            if plh < height < lh:
-                h_perc = (height - plh) / (lh - plv)
-                return plv + ((lv - plv) * h_perc)
+        if height == 0:
+            return 0
+        for i, (v, h) in enumerate(self.lookup):
+            if i == 0:
+                continue
+            pv, ph = self.lookup[i - 1]
+            if ph <= height <= h:
+                h_perc = (height - ph) / (h - pv)
+                return pv + ((v - pv) * h_perc)
         raise ValueError(f"Unable to find height ({height}) in lookup table")
 
 
@@ -124,6 +132,8 @@ class LiquidContent:
 
     def set_volume(self, volume: float) -> None:
         """Set volume."""
+        if not 0 <= volume <= self._calc_type.max_volume():
+            raise ValueError(f'Volume out of range: {volume}')
         self._volume = volume
 
     def get_volume(self) -> float:
@@ -145,17 +155,19 @@ class LiquidContent:
         after_dispense: Optional[float] = None,
     ) -> None:
         """Update volume."""
+        if after_aspirate and after_dispense:
+            raise ValueError('Both \"after_aspirate=\" and \"after_dispense=\" cannot be set')
         if after_aspirate is not None:
-            self.set_volume(self.get_volume() - after_aspirate)
+            new_vol = self.get_volume() - after_aspirate
         elif after_dispense is not None:
-            self.set_volume(self.get_volume() + after_dispense)
+            new_vol = self.get_volume() + after_dispense
+        else:
+            raise ValueError('Either \"after_aspirate=\" or \"after_dispense=\" must be positive integers')
+        self.set_volume(new_vol)
 
     def set_volume_from_height(self, liquid_height: float) -> None:
         """Set volume from height."""
-        max_vol = self._calc_type.max_volume()
         vol = self._calc_type.volume_from_height(liquid_height)
-        assert vol >= 0, f"{vol} uL is less than 0 uL"
-        assert vol <= max_vol, f"{vol} uL is greater than {max_vol} uL"
         self.set_volume(vol)
 
     def get_height(
@@ -199,12 +211,14 @@ class LiquidTracker:
         #       accurate, give .init_liquid_height() a lookup table
         self.reset()
         for lw in protocol.loaded_labwares.values():
+            if lw.is_tiprack or 'trash' in lw.name.lower():
+                continue
             for w in lw.wells():
                 self.init_well_liquid_height(w)
 
     def reset(self) -> None:
         """Reset."""
-        for key in self._items:
+        for key in list(self._items.keys()):
             del self._items[key]
 
     def print_setup_instructions(
@@ -248,13 +262,6 @@ class LiquidTracker:
     def set_start_volume(self, well: Well, volume: float) -> None:
         """Set start volume."""
         self._items[well].set_volume(volume)
-
-    def add_start_volume(
-        self, well: Well, volume: float, name: Optional[str] = None
-    ) -> None:
-        """Add start volume."""
-        self.update_well_volume(well, after_dispense=volume)
-        self._items[well].set_name(name)
 
     def set_start_volume_from_liquid_height(
         self, well: Well, liquid_height: float, name: Optional[str] = None
