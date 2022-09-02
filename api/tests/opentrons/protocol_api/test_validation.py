@@ -1,10 +1,10 @@
 """Tests for Protocol API input validation."""
-from typing import Union
+from typing import List, Union
 
 import pytest
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import Mount
+from opentrons.types import Mount, DeckSlotName
 from opentrons.protocol_api import validation as subject
 
 
@@ -43,3 +43,30 @@ def test_ensure_pipette_input_invalid() -> None:
     """It should raise a ValueError if given an invalid name."""
     with pytest.raises(ValueError, match="must be given valid pipette name"):
         subject.ensure_pipette_name("oh-no")
+
+
+@pytest.mark.parametrize(
+    ["input_value", "expected"],
+    [
+        ("1", DeckSlotName.SLOT_1),
+        (1, DeckSlotName.SLOT_1),
+        (12, DeckSlotName.FIXED_TRASH),
+        ("12", DeckSlotName.FIXED_TRASH),
+    ],
+)
+def test_ensure_deck_slot(input_value: Union[str, int], expected: DeckSlotName) -> None:
+    """It should map strings and ints to DeckSlotName values"""
+    result = subject.ensure_deck_slot(input_value)
+    assert result == expected
+
+
+def test_ensure_deck_slot_invalid() -> None:
+    """It should raise a ValueError if given an invalid name."""
+    input_values: List[Union[str, int]] = ["0", 0, "13", 13]
+
+    for input_value in input_values:
+        with pytest.raises(ValueError, match="not a valid deck slot"):
+            subject.ensure_deck_slot(input_value)
+
+    with pytest.raises(TypeError, match="must be a string or integer"):
+        subject.ensure_deck_slot(1.23)  # type: ignore[arg-type]

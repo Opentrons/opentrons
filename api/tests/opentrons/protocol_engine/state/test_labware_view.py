@@ -28,6 +28,7 @@ plate = LoadedLabware(
     location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-plate-uri",
     offsetId=None,
+    displayName="Fancy Plate Name",
 )
 
 reservoir = LoadedLabware(
@@ -614,3 +615,16 @@ def test_find_applicable_labware_offset() -> None:
         )
         is None
     )
+
+
+def test_get_display_name() -> None:
+    """It should get a labware's user-specified load name"""
+    subject = get_labware_view(
+        labware_by_id={
+            "plate_with_display_name": plate,
+            "reservoir_without_display_name": reservoir,
+        },
+    )
+
+    assert subject.get_display_name("plate_with_display_name") == "Fancy Plate Name"
+    assert subject.get_display_name("reservoir_without_display_name") is None

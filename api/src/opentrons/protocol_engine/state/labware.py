@@ -139,6 +139,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 loadName=command.result.definition.parameters.loadName,
                 definitionUri=definition_uri,
                 offsetId=command.result.offsetId,
+                displayName=command.params.displayName,
             )
 
             self._state.definitions_by_uri[definition_uri] = command.result.definition
@@ -194,6 +195,10 @@ class LabwareView(HasState[LabwareState]):
         return self.get_definition_by_uri(
             LabwareUri(self.get(labware_id).definitionUri)
         )
+
+    def get_display_name(self, labware_id: str) -> Optional[str]:
+        """Get the labware's user-specified display name, if set."""
+        return self.get(labware_id).displayName
 
     def get_deck_definition(self) -> DeckDefinitionV3:
         """Get the current deck definition."""

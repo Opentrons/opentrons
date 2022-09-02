@@ -1,14 +1,18 @@
 """ProtocolEngine-based Labware core implementations."""
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, cast
 
-from opentrons.calibration_storage import helpers
+from opentrons_shared_data.labware.dev_types import (
+    LabwareParameters,
+    LabwareDefinition as LabwareDefinitionDict,
+)
+
+from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.protocols.api_support.well_grid import WellGrid
 from opentrons.types import Point
-from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
 
-from ..labware import AbstractLabware
+from ..labware import AbstractLabware, LabwareLoadParams
 from .well import WellCore
 
 
@@ -19,9 +23,13 @@ class LabwareCore(AbstractLabware[WellCore]):
         labware_id: ProtocolEngine ID of the loaded labware.
     """
 
-    def __init__(self, labware_id: str, definition: LabwareDefinition) -> None:
+    def __init__(self, labware_id: str, engine_client: ProtocolEngineClient) -> None:
         self._labware_id = labware_id
-        self._definition = definition
+        self._engine_client = engine_client
+
+        labware_state = engine_client.state.labware
+        self._definition = labware_state.get_definition(labware_id)
+        self._user_display_name = labware_state.get_display_name(labware_id)
 
     @property
     def labware_id(self) -> str:
@@ -41,14 +49,22 @@ class LabwareCore(AbstractLabware[WellCore]):
         raise NotImplementedError("LabwareCore not implemented")
 
     def get_uri(self) -> str:
-        return helpers.uri_from_definition(self._definition)
-
-    def get_display_name(self) -> str:
         raise NotImplementedError("LabwareCore not implemented")
 
-    def get_label(self) -> Optional[str]:
-        # TODO(jbl 2022-09-01) implement real get_label
-        return "no-op"
+    def get_load_params(self) -> LabwareLoadParams:
+        return LabwareLoadParams(
+            namespace=self._definition.namespace,
+            load_name=self._definition.parameters.loadName,
+            version=self._definition.version,
+        )
+
+    def get_display_name(self) -> str:
+        """Get a display name for the labware, falling back to the definition."""
+        raise NotImplementedError("LabwareCore not implemented")
+
+    def get_user_display_name(self) -> Optional[str]:
+        """Get the user-specified display name of the labware, if set."""
+        return self._user_display_name
 
     def get_name(self) -> str:
         raise NotImplementedError("LabwareCore not implemented")
@@ -56,8 +72,9 @@ class LabwareCore(AbstractLabware[WellCore]):
     def set_name(self, new_name: str) -> None:
         raise NotImplementedError("LabwareCore not implemented")
 
-    def get_definition(self) -> LabwareDefinition:
-        return self._definition
+    def get_definition(self) -> LabwareDefinitionDict:
+        """Get the labware's definition as a plain dictionary."""
+        return cast(LabwareDefinitionDict, self._definition.dict(exclude_none=True))
 
     def get_parameters(self) -> LabwareParameters:
         raise NotImplementedError("LabwareCore not implemented")
@@ -66,7 +83,7 @@ class LabwareCore(AbstractLabware[WellCore]):
         raise NotImplementedError("LabwareCore not implemented")
 
     def set_calibration(self, delta: Point) -> None:
-        # TODO(jbl 2022-09-01) implement set calibration
+        # TODO(jbl 2022-09-01): implement set calibration through the engine
         pass
 
     def get_calibrated_offset(self) -> Point:

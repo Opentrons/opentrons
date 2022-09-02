@@ -1,5 +1,5 @@
 """ProtocolEngine-based Protocol API core implementation."""
-from typing import Dict, Optional, cast
+from typing import Dict, Optional
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -96,9 +96,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
         )
         return LabwareCore(
             labware_id=load_result.labwareId,
-            definition=cast(
-                LabwareDefinition, load_result.definition.dict(exclude_none=True)
-            ),
+            engine_client=self._engine_client,
         )
 
     def load_module(
