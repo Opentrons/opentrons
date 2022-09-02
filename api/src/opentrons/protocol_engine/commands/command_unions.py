@@ -94,6 +94,14 @@ from .load_pipette import (
     LoadPipetteCommandType,
 )
 
+from .move_labware import (
+    MoveLabware,
+    MoveLabwareParams,
+    MoveLabwareCreate,
+    MoveLabwareResult,
+    MoveLabwareCommandType,
+)
+
 from .move_relative import (
     MoveRelative,
     MoveRelativeParams,
@@ -178,6 +186,7 @@ Command = Union[
     LoadLiquid,
     LoadModule,
     LoadPipette,
+    MoveLabware,
     MoveRelative,
     MoveToCoordinates,
     MoveToWell,
@@ -222,6 +231,7 @@ CommandParams = Union[
     LoadLiquidParams,
     LoadModuleParams,
     LoadPipetteParams,
+    MoveLabwareParams,
     MoveRelativeParams,
     MoveToCoordinatesParams,
     MoveToWellParams,
@@ -267,6 +277,7 @@ CommandType = Union[
     LoadLiquidCommandType,
     LoadModuleCommandType,
     LoadPipetteCommandType,
+    MoveLabwareCommandType,
     MoveRelativeCommandType,
     MoveToCoordinatesCommandType,
     MoveToWellCommandType,
@@ -310,6 +321,7 @@ CommandCreate = Union[
     LoadLiquidCreate,
     LoadModuleCreate,
     LoadPipetteCreate,
+    MoveLabwareCreate,
     MoveRelativeCreate,
     MoveToCoordinatesCreate,
     MoveToWellCreate,
@@ -354,6 +366,7 @@ CommandResult = Union[
     LoadLiquidResult,
     LoadModuleResult,
     LoadPipetteResult,
+    MoveLabwareResult,
     MoveRelativeResult,
     MoveToCoordinatesResult,
     MoveToWellResult,
