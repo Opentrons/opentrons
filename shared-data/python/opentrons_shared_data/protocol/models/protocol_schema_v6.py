@@ -168,13 +168,33 @@ class ProtocolSchemaV6(BaseModel):
         allow_population_by_field_name = True
 
     @validator("commands", always=True)
-    def validate_date(cls, value, values):
+    def validate_date(cls, value: List[Command], values: Dict[str, Any]) -> None:
         for command in value:
-            if command.params.pipetteId and command.params.pipetteId not in set(values["pipettes"].keys()):
-                raise Exception("missing loadPipette id in referencing parent data model.")
-            elif command.params.labwareId and command.params.labwareId not in set(values["labware"].keys()):
-                raise Exception("missing loadLabware id in referencing parent data model.")
-            elif command.params.moduleId and "modules" in values and command.params.moduleId not in set(values["modules"].keys()):
-                raise Exception("missing loadPipette id in referencing parent data model.")
-            elif command.params.liquidId and "liquids" in values and command.params.liquidId not in set(values["liquids"].keys()):
-                raise Exception("missing loadLiquid id in referencing parent data model.")
+            if command.params.pipetteId and command.params.pipetteId not in set(
+                values["pipettes"].keys()
+            ):
+                raise Exception(
+                    "missing loadPipette id in referencing parent data model."
+                )
+            elif command.params.labwareId and command.params.labwareId not in set(
+                values["labware"].keys()
+            ):
+                raise Exception(
+                    "missing loadLabware id in referencing parent data model."
+                )
+            elif (
+                command.params.moduleId
+                and "modules" in values
+                and command.params.moduleId not in set(values["modules"].keys())
+            ):
+                raise Exception(
+                    "missing loadPipette id in referencing parent data model."
+                )
+            elif (
+                command.params.liquidId
+                and "liquids" in values
+                and command.params.liquidId not in set(values["liquids"].keys())
+            ):
+                raise Exception(
+                    "missing loadLiquid id in referencing parent data model."
+                )
