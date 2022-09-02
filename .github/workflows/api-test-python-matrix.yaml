@@ -2,8 +2,6 @@ name: 'API test python matrix'
 
 on:
   push:
-    paths:
-      - '*'
     branches:
       - 'update-buildroot-2022.02.4'
   workflow_dispatch:
