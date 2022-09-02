@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Provisions pipette EEPROMs.
+"""Provisions gripper EEPROMs.
 
 This can be used either on a production line or locally.
 
 A log of what has been flashed to pipettes can be found at
-provision_pipette.log.
+provision_gripper.log.
 """
 
 import asyncio
@@ -21,64 +21,52 @@ from opentrons_hardware.firmware_bindings.messages import (
     payloads,
     fields,
 )
-from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-from opentrons_hardware.instruments.pipettes import serials
+from opentrons_hardware.instruments.gripper import serials
 
 
 async def run(
     args: argparse.Namespace, base_log: logging.Logger, trace_log: logging.Logger
 ) -> None:
     """Script entrypoint."""
-    which_pipette = {"left": NodeId.pipette_left, "right": NodeId.pipette_right}[
-        args.which
-    ]
     async with build.driver(build_settings(args)) as driver, CanMessenger(
         driver
     ) as messenger:
-        await flash_serials(messenger, which_pipette, base_log, trace_log)
+        await flash_serials(messenger, base_log, trace_log)
 
 
 async def flash_serials(
     messenger: CanMessenger,
-    which_pipette: NodeId,
     base_log: logging.Logger,
     trace_log: logging.Logger,
 ) -> None:
     """Flash serials in a loop."""
     while True:
-        should_quit = await get_and_update_serial_once(
-            messenger, which_pipette, base_log, trace_log
-        )
+        should_quit = await get_and_update_serial_once(messenger, base_log, trace_log)
         if should_quit:
             return
 
 
-async def get_serial(
-    prompt: str, base_log: logging.Logger
-) -> Tuple[PipetteName, int, bytes]:
+async def get_serial(prompt: str, base_log: logging.Logger) -> Tuple[int, bytes]:
     """Get a serial number that is correct and parseable."""
     loop = asyncio.get_running_loop()
     while True:
         serial = await loop.run_in_executor(None, lambda: input(prompt))
         try:
-            name, model, data = serials.info_from_serial_string(serial)
+            model, data = serials.gripper_info_from_serial_string(serial)
         except Exception as e:
             base_log.exception("invalid serial")
             if isinstance(Exception, KeyboardInterrupt):
                 raise
             print(str(e))
         else:
-            base_log.info(
-                f"parsed name {name} model {model} datecode {data!r} from {serial}"
-            )
-            return name, model, data
+            base_log.info(f"parsed model {model} datecode {data!r} from {serial}")
+            return model, data
 
 
 async def update_serial_and_confirm(
     messenger: CanMessenger,
-    which_pipette: NodeId,
-    name: PipetteName,
     model: int,
     data: bytes,
     base_log: logging.Logger,
@@ -88,7 +76,7 @@ async def update_serial_and_confirm(
 ) -> None:
     """Update and verify the update of serial data."""
     for attempt in range(attempts):
-        serial_bytes = serials.serial_val_from_parts(name, model, data)
+        serial_bytes = serials.gripper_serial_val_from_parts(model, data)
         base_log.debug(
             f"beginning set and confirm attempt {attempt} with bytes {serial_bytes!r}"
         )
@@ -97,10 +85,12 @@ async def update_serial_and_confirm(
                 serial=fields.SerialField(serial_bytes)
             )
         )
-        await messenger.send(which_pipette, set_message)
+        await messenger.send(NodeId.gripper, set_message)
 
         base_log.debug(f"Sent set-serial: {set_message}")
-        await messenger.send(which_pipette, message_definitions.InstrumentInfoRequest())
+        await messenger.send(
+            NodeId.gripper, message_definitions.InstrumentInfoRequest()
+        )
         target = datetime.datetime.now() + datetime.timedelta(seconds=attempt_timeout_s)
         try:
             while True:
@@ -110,13 +100,11 @@ async def update_serial_and_confirm(
                     )
                     if (
                         isinstance(message, message_definitions.PipetteInfoResponse)
-                        and arb.parts.originating_node_id == which_pipette
+                        and arb.parts.originating_node_id == NodeId.gripper
                     ):
-                        if (
-                            message.payload.name == fields.PipetteNameField(name.value)
-                            and message.payload.model == UInt16Field(model)
-                            and message.payload.serial == fields.SerialField(data)
-                        ):
+                        if message.payload.model == UInt16Field(
+                            model
+                        ) and message.payload.serial == fields.SerialField(data):
                             base_log.info(f"serial confirmed on attempt {attempt}")
                             return
                         else:
@@ -131,22 +119,17 @@ async def update_serial_and_confirm(
 
 async def get_and_update_serial_once(
     messenger: CanMessenger,
-    which_pipette: NodeId,
     base_log: logging.Logger,
     trace_log: logging.Logger,
 ) -> None:
     """Read and update a single serial."""
-    name, model, data = await get_serial(
-        f'Enter serial for pipette on {which_pipette.name.split("_")[-1]}: ', base_log
-    )
+    model, data = await get_serial("Enter serial for gripper: ", base_log)
     try:
-        await update_serial_and_confirm(
-            messenger, which_pipette, name, model, data, base_log, trace_log
-        )
-        trace_log.info(f"SUCCESS,{name.name},{model},{data!r}")
+        await update_serial_and_confirm(messenger, model, data, base_log, trace_log)
+        trace_log.info(f"SUCCESS,{model},{data!r}")
     except Exception:
         base_log.exception("Update failed")
-        trace_log.info(f"FAILURE,{name.name},{model},{data!r}")
+        trace_log.info(f"FAILURE,{model},{data!r}")
         raise
 
 
@@ -164,7 +147,7 @@ def log_config(log_level: int) -> Tuple[logging.Logger, logging.Logger]:
                 "main_log_handler": {
                     "class": "logging.handlers.RotatingFileHandler",
                     "formatter": "basic",
-                    "filename": "provision_pipette_debug.log",
+                    "filename": "provision_gripper_debug.log",
                     "maxBytes": 5000000,
                     "level": log_level,
                     "backupCount": 3,
@@ -177,7 +160,7 @@ def log_config(log_level: int) -> Tuple[logging.Logger, logging.Logger]:
                 "trace_log_handler": {
                     "class": "logging.handlers.RotatingFileHandler",
                     "formatter": "basic",
-                    "filename": "provision_pipette.log",
+                    "filename": "provision_gripper.log",
                     "maxBytes": 5000000,
                     "level": logging.INFO,
                     "backupCount": 3,
@@ -211,7 +194,7 @@ def main() -> None:
         help=(
             "Developer logging level. At DEBUG or below, logs are written "
             "to console; at INFO or above, logs are only written to "
-            "provision_pipettes_debug.log"
+            "provision_gripper_debug.log"
         ),
         type=str,
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
@@ -221,13 +204,6 @@ def main() -> None:
         "--once",
         action="store_true",
         help="Run just once and quit instead of staying in a loop",
-    )
-    parser.add_argument(
-        "-w",
-        "--which",
-        type=str,
-        choices=["left", "right"],
-        help="Which pipette to flash",
     )
     add_can_args(parser)
 

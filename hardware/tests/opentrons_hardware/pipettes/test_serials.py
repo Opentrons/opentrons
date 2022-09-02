@@ -1,6 +1,7 @@
 """Test serial setting."""
 import pytest
-from opentrons_hardware.pipettes import serials
+from opentrons_hardware.instruments.serial_utils import model_versionstring_from_int
+from opentrons_hardware.instruments.pipettes import serials
 from opentrons_hardware.firmware_bindings.constants import PipetteName
 
 
@@ -104,4 +105,4 @@ def test_serial_val_from_parts(name: PipetteName, model: int, data: bytes) -> No
 )
 def test_versionstring_from_int(model: int, versionstr: str) -> None:
     """Test versionstring."""
-    assert serials.model_versionstring_from_int(model) == versionstr
+    assert model_versionstring_from_int(model) == versionstr
