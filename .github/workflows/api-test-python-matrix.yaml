@@ -1,7 +1,4 @@
-# This workflow runs tests and lint on pull requests that touch the api/
-# project or its CI configuration.
-
-name: 'API test/lint/deploy'
+name: 'API test python matrix'
 
 on:
   push:
