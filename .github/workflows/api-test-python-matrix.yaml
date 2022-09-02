@@ -1,0 +1,68 @@
+# This workflow runs tests and lint on pull requests that touch the api/
+# project or its CI configuration.
+
+name: 'API test/lint/deploy'
+
+on:
+  push:
+    paths:
+      - '*'
+    branches:
+      - 'update-buildroot-2022.02.4'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        os: ['windows-2019', 'ubuntu-22.04', 'macos-latest']
+        python: ['3.7','3.8','3.9','3.10','3.11']
+        # TODO(@y3rsh, 2022-09-02): Enable ot3 once ot3 running on python 3.10
+        # only ot2
+        with-ot-hardware: ['false']
+    runs-on: '${{ matrix.os }}'
+    steps:
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '14'
+      - uses: 'actions/setup-python@v4'
+        with:
+          python-version: ${{ matrix.python }}
+      - name: 'set complex environment variables'
+        uses: actions/github-script@v6.1.1
+        with:
+          script: |
+            const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'api'
+          python-version: ${{ matrix.python }}
+      - name: Remove OT-3 hardware package
+        run: make -C api setup-ot2
+        env:
+          OT_VIRTUALENV_VERSION: ${{ matrix.python }}
+      - if: ${{ matrix.with-ot-hardware == 'false' }}
+        name: Test without opentrons_hardware
+        run: make -C api test-ot2
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        name: Test with opentrons_hardware
+        run: make -C api test-cov
+      - name: Ensure assets build
+        run: make -C api sdist wheel
+      - name: Upload coverage report
+        uses: 'codecov/codecov-action@v3'
+        with:
+          files: ./api/coverage.xml
+          flags: api
