@@ -55,7 +55,7 @@ def test_ensure_pipette_input_invalid() -> None:
     ],
 )
 def test_ensure_deck_slot(input_value: Union[str, int], expected: DeckSlotName) -> None:
-    """It should map strings and ints to DeckSlotName values"""
+    """It should map strings and ints to DeckSlotName values."""
     result = subject.ensure_deck_slot(input_value)
     assert result == expected
 

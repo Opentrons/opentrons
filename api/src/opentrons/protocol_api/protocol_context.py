@@ -281,9 +281,10 @@ class ProtocolContext(CommandPublisher):
         """
         # todo(mm, 2021-11-22): The duplication between here and load_labware()
         # is getting bad.
+        deck_slot = validation.ensure_deck_slot(location)
 
         labware_core = self._implementation.load_labware_from_definition(
-            labware_def=labware_def, location=location, label=label
+            labware_def=labware_def, location=deck_slot, label=label
         )
 
         labware_load_params = labware_core.get_load_params()
@@ -291,7 +292,7 @@ class ProtocolContext(CommandPublisher):
         provided_labware_offset = self._labware_offset_provider.find(
             load_params=labware_load_params,
             requested_module_model=None,
-            deck_slot=DeckSlotName.from_primitive(location),
+            deck_slot=deck_slot,
         )
 
         labware_core.set_calibration(provided_labware_offset.delta)
@@ -306,7 +307,7 @@ class ProtocolContext(CommandPublisher):
                 labware_namespace=labware_load_params.namespace,
                 labware_load_name=labware_load_params.load_name,
                 labware_version=labware_load_params.version,
-                deck_slot=DeckSlotName.from_primitive(location),
+                deck_slot=deck_slot,
                 on_module=False,
                 offset_id=provided_labware_offset.offset_id,
                 labware_display_name=labware_core.get_user_display_name(),
@@ -366,7 +367,6 @@ class ProtocolContext(CommandPublisher):
             deck_slot=deck_slot,
             requested_module_model=None,
         )
-
         labware_core.set_calibration(labware_offset.delta)
 
         # TODO(mc, 2022-09-02): add API version

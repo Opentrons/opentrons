@@ -80,7 +80,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
     def load_labware(
         self,
         load_name: str,
-        location: DeckLocation,
+        location: DeckSlotName,
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],

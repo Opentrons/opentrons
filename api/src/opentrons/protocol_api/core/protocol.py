@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Dict, Generic, Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import Mount, Location, DeckLocation
+from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
@@ -60,7 +60,7 @@ class AbstractProtocol(ABC, Generic[InstrumentCoreType, LabwareCoreType]):
     def load_labware_from_definition(
         self,
         labware_def: LabwareDefinition,
-        location: DeckLocation,
+        location: DeckSlotName,
         label: Optional[str],
     ) -> LabwareCoreType:
         ...
@@ -69,7 +69,7 @@ class AbstractProtocol(ABC, Generic[InstrumentCoreType, LabwareCoreType]):
     def load_labware(
         self,
         load_name: str,
-        location: DeckLocation,
+        location: DeckSlotName,
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
