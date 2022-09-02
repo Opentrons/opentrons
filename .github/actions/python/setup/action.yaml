@@ -24,6 +24,7 @@ runs:
       shell : bash
       if: ${{ inputs.python-version != 'false' }}
       # get only major and minor value
+      # needed for python version like 3.11.0-rc.1
       run: |
         major=$(echo ${{ inputs.python-version }} | cut -d. -f1)
         minor=$(echo ${{ inputs.python-version }} | cut -d. -f2)
