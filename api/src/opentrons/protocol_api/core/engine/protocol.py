@@ -71,7 +71,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
     def load_labware_from_definition(
         self,
         labware_def: LabwareDefinition,
-        location: DeckLocation,
+        location: DeckSlotName,
         label: Optional[str],
     ) -> LabwareCore:
         """Load a labware using its definition dictionary."""
@@ -86,10 +86,9 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
         version: Optional[int],
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
-        deck_slot = DeckSlotLocation(slotName=DeckSlotName.from_primitive(location))
         load_result = self._engine_client.load_labware(
             load_name=load_name,
-            location=deck_slot,
+            location=DeckSlotLocation(slotName=location),
             namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
             version=version or 1,
             display_name=label,

@@ -64,6 +64,7 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
 
     @abstractmethod
     def get_parameters(self) -> LabwareParametersDict:
+        """Get the labware's definition's `parameters` field as a plain dictionary."""
         ...
 
     @abstractmethod
