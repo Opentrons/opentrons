@@ -156,10 +156,10 @@ class ProtocolSchemaV6(BaseModel):
     robot: Robot
     pipettes: Dict[str, Pipette]
     labware: Dict[str, Labware]
-    labwareDefinitions: Dict[str, LabwareDefinition]
-    commands: List[Command]
     modules: Optional[Dict[str, Module]]
     liquids: Optional[Dict[str, Liquid]]
+    labwareDefinitions: Dict[str, LabwareDefinition]
+    commands: List[Command]
     commandAnnotations: Optional[List[CommandAnnotation]]
     designerApplication: Optional[DesignerApplication]
 
@@ -169,17 +169,24 @@ class ProtocolSchemaV6(BaseModel):
 
     @validator("commands", always=True)
     def validate_date(cls, value: List[Command], values: Dict[str, Any]) -> None:
+        print(value)
         for command in value:
-            if command.params.pipetteId and command.params.pipetteId not in set(
-                values["pipettes"].keys()
+            print(command)
+            print("input command")
+            if (
+                command.params.pipetteId
+                and "pipettes" in values
+                and command.params.pipetteId not in set(values["pipettes"].keys())
             ):
-                raise Exception(
+                raise ValueError(
                     "missing loadPipette id in referencing parent data model."
                 )
-            elif command.params.labwareId and command.params.labwareId not in set(
-                values["labware"].keys()
+            elif (
+                command.params.labwareId
+                and "labware" in values
+                and command.params.labwareId not in set(values["labware"].keys())
             ):
-                raise Exception(
+                raise ValueError(
                     "missing loadLabware id in referencing parent data model."
                 )
             elif (
@@ -187,7 +194,7 @@ class ProtocolSchemaV6(BaseModel):
                 and "modules" in values
                 and command.params.moduleId not in set(values["modules"].keys())
             ):
-                raise Exception(
+                raise ValueError(
                     "missing loadPipette id in referencing parent data model."
                 )
             elif (
@@ -195,6 +202,6 @@ class ProtocolSchemaV6(BaseModel):
                 and "liquids" in values
                 and command.params.liquidId not in set(values["liquids"].keys())
             ):
-                raise Exception(
+                raise ValueError(
                     "missing loadLiquid id in referencing parent data model."
                 )
