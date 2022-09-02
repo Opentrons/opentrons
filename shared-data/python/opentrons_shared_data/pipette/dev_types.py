@@ -9,8 +9,9 @@ from typing import Dict, List, NewType, Union
 
 from typing_extensions import Literal, TypedDict
 
-# TODO(mc, 2022-06-16): move to labware.dev_types
-LabwareUri = NewType("LabwareUri", str)
+# TODO(mc, 2022-06-16): remove type alias when able
+# and when certain removal will not break any pickling
+from ..labware.dev_types import LabwareUri as LabwareUri  # noqa: F401
 
 
 PipetteName = Literal[

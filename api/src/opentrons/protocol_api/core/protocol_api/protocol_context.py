@@ -18,6 +18,7 @@ from opentrons.protocols.labware import load_from_definition, get_labware_defini
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from ..protocol import AbstractProtocol, LoadModuleResult
+from ..labware import LabwareLoadParams
 
 from .labware import LabwareImplementation
 from .instrument_context import InstrumentContextImplementation
@@ -101,17 +102,19 @@ class ProtocolContextImplementation(
         """Returns true if hardware is being simulated."""
         return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
 
-    def load_labware_from_definition(
+    def add_labware_definition(
         self,
-        labware_def: LabwareDefinition,
-        location: DeckSlotName,
-        label: Optional[str],
-    ) -> LabwareImplementation:
-        """Load a labware from definition"""
-        parent = self.get_deck().position_for(location.value)
-        labware_obj = load_from_definition(labware_def, parent, label)
-        self._deck_layout[location] = labware_obj
-        return labware_obj
+        definition: LabwareDefinition,
+    ) -> LabwareLoadParams:
+        """Add a labware defintion to the set of loadable definitions."""
+        load_params = LabwareLoadParams(
+            namespace=definition["namespace"],
+            load_name=definition["parameters"]["loadName"],
+            version=definition["version"],
+        )
+        self._extra_labware = self._extra_labware.copy()
+        self._extra_labware[load_params.as_uri()] = definition
+        return load_params
 
     def load_labware(
         self,
@@ -121,7 +124,8 @@ class ProtocolContextImplementation(
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareImplementation:
-        """Load a labware."""
+        """Load a labware using its identifying parameters."""
+        parent = self.get_deck().position_for(location.value)
         labware_def = get_labware_definition(
             load_name,
             namespace,
@@ -129,7 +133,9 @@ class ProtocolContextImplementation(
             bundled_defs=self._bundled_labware,
             extra_defs=self._extra_labware,
         )
-        return self.load_labware_from_definition(labware_def, location, label)
+        labware_obj = load_from_definition(labware_def, parent, label)
+        self._deck_layout[location] = labware_obj
+        return labware_obj
 
     def load_module(
         self,
