@@ -23,7 +23,11 @@ runs:
     - name: If provided set the OT_VIRTUALENV_VERSION env variable
       shell : bash
       if: ${{ inputs.python-version != 'false' }}
-      run: echo "OT_VIRTUALENV_VERSION=${{ inputs.python-version }}" >> $GITHUB_ENV
+      # beta and rc versions of python have appendage of -
+      # cut it off
+      run: |
+        version=$(echo ${{ inputs.python-version }} | cut -d- -f1)
+        echo "OT_VIRTUALENV_VERSION=$version" >> $GITHUB_ENV
     - shell: bash
       run: |
         npm install --global shx@0.3.3

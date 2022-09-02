@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['windows-2019', 'ubuntu-22.04', 'macos-latest']
+        os: ['windows-2019', 'ubuntu-22.04' ] # , 'macos-latest'] don't chew up mac runner just yet
         python: ['3.7','3.8','3.9','3.10','3.11.0-rc.1']
         # TODO(@y3rsh, 2022-09-02): Enable ot3 once ot3 running on python 3.10
         # only ot2
