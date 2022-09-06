@@ -9,10 +9,8 @@ from datetime import datetime
 from decoy import matchers
 from pathlib import Path
 
-from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import (
     commands,
-    PipetteName,
     DeckSlotLocation,
     ModuleModel,
     ModuleLocation,
@@ -20,6 +18,8 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
 from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
+from opentrons.types import MountType, DeckSlotName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
 LEGACY_COMMANDS_PROTOCOL = textwrap.dedent(
     """
@@ -222,7 +222,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=commands.LoadPipetteParams(
-            pipetteName=PipetteName.P300_SINGLE, mount=MountType.LEFT
+            pipetteName=PipetteNameType.P300_SINGLE, mount=MountType.LEFT
         ),
         result=pipette_left_result_captor,
     )
@@ -235,7 +235,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=commands.LoadPipetteParams(
-            pipetteName=PipetteName.P300_MULTI, mount=MountType.RIGHT
+            pipetteName=PipetteNameType.P300_MULTI, mount=MountType.RIGHT
         ),
         result=pipette_right_result_captor,
     )
