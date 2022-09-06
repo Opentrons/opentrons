@@ -170,22 +170,18 @@ class ProtocolSchemaV6(BaseModel):
     @validator("commands", always=True)
     def validate_date(cls, value: List[Command], values: Dict[str, Any]) -> None:
         for command in value:
-            if (
-                command.params.pipetteId
-                and "pipettes" in values
-                and command.params.pipetteId not in set(values["pipettes"].keys())
-            ):
-                raise ValueError(
-                    "missing loadPipette id in referencing parent data model."
-                )
-            elif (
-                command.params.labwareId
-                and "labware" in values
-                and command.params.labwareId not in set(values["labware"].keys())
-            ):
-                raise ValueError(
-                    "missing loadLabware id in referencing parent data model."
-                )
+            if command.params.pipetteId and "pipettes" in values:
+                missing_ids = command.params.labwareId not in set(values["pipettes"].keys())
+                payload = ", ".join(f"{item}" for item in missing_ids)
+                if command.params.pipetteId and missing_ids:
+                    raise ValueError(
+                        f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {payload} in referencing object.")
+            elif command.params.labwareId and "labware" in values:
+                missing_ids = set([command.params.labwareId]).difference(set(values["labware"].keys()))
+                payload = ", ".join(f"{item}" for item in missing_ids)
+                if command.params.labwareId and missing_ids:
+                    raise ValueError(
+                        f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {payload} in referencing object.")
             elif (
                 command.params.moduleId
                 and "modules" in values

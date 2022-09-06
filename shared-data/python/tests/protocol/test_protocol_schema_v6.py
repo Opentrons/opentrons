@@ -50,56 +50,56 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
             "labware-id-3",
             "loadLabware"
         ),
-        (
-            [
-                protocol_schema_v6.Command(
-                    commandType="loadLabware",
-                    params=protocol_schema_v6.Params(labwareId="labware-id-1"),
-                ),
-                protocol_schema_v6.Command(
-                    commandType="loadPipette",
-                    params=protocol_schema_v6.Params(pipetteId="pipette-id-3"),
-                ),
-            ],
-            "pipette-id-3",
-            "loadPipette"
-        ),
-        (
-            [
-                protocol_schema_v6.Command(
-                    commandType="loadLabware",
-                    params=protocol_schema_v6.Params(labwareId="labware-id-1"),
-                ),
-                protocol_schema_v6.Command(
-                    commandType="loadPipette",
-                    params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
-                ),
-                protocol_schema_v6.Command(
-                    commandType="loadLiquid",
-                    params=protocol_schema_v6.Params(liquidId="liquid-id-3"),
-                ),
-            ],
-            "liquid-id-3",
-            "loadLiquid"
-        ),
-        (
-            [
-                protocol_schema_v6.Command(
-                    commandType="loadLabware",
-                    params=protocol_schema_v6.Params(labwareId="labware-id-1"),
-                ),
-                protocol_schema_v6.Command(
-                    commandType="loadPipette",
-                    params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
-                ),
-                protocol_schema_v6.Command(
-                    commandType="loadModule",
-                    params=protocol_schema_v6.Params(moduleId="module-id-3"),
-                ),
-            ],
-            "module-id-3",
-            "loadModule"
-        ),
+        # (
+        #     [
+        #         protocol_schema_v6.Command(
+        #             commandType="loadLabware",
+        #             params=protocol_schema_v6.Params(labwareId="labware-id-1"),
+        #         ),
+        #         protocol_schema_v6.Command(
+        #             commandType="loadPipette",
+        #             params=protocol_schema_v6.Params(pipetteId="pipette-id-3"),
+        #         ),
+        #     ],
+        #     "pipette-id-3",
+        #     "loadPipette"
+        # ),
+        # (
+        #     [
+        #         protocol_schema_v6.Command(
+        #             commandType="loadLabware",
+        #             params=protocol_schema_v6.Params(labwareId="labware-id-1"),
+        #         ),
+        #         protocol_schema_v6.Command(
+        #             commandType="loadPipette",
+        #             params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
+        #         ),
+        #         protocol_schema_v6.Command(
+        #             commandType="loadLiquid",
+        #             params=protocol_schema_v6.Params(liquidId="liquid-id-3"),
+        #         ),
+        #     ],
+        #     "liquid-id-3",
+        #     "loadLiquid"
+        # ),
+        # (
+        #     [
+        #         protocol_schema_v6.Command(
+        #             commandType="loadLabware",
+        #             params=protocol_schema_v6.Params(labwareId="labware-id-1"),
+        #         ),
+        #         protocol_schema_v6.Command(
+        #             commandType="loadPipette",
+        #             params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
+        #         ),
+        #         protocol_schema_v6.Command(
+        #             commandType="loadModule",
+        #             params=protocol_schema_v6.Params(moduleId="module-id-3"),
+        #         ),
+        #     ],
+        #     "module-id-3",
+        #     "loadModule"
+        # ),
     ],
 )
 def test_schema_validators(input_commands: List[protocol_schema_v6.Command], missing_id: str, load_command: str) -> None:
