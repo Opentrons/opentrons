@@ -46,8 +46,8 @@ def _get_offset(def_offset: GripperOffset) -> Offset:
     return (def_offset.x, def_offset.y, def_offset.z)
 
 
-def info_num_to_model(num: int) -> GripperModel:
-    model_map = {0: GripperModel.V1, 1: GripperModel.V1}
+def info_num_to_model(num: str) -> GripperModel:
+    model_map = {"0": GripperModel.V1, "1": GripperModel.V1}
     return model_map[num]
 
 

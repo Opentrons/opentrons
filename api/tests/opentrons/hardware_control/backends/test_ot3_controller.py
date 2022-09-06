@@ -280,7 +280,7 @@ async def test_probing(
                     serial="hello",
                 ),
                 right=None,
-                gripper=GripperInformation(model=0, serial="fake_serial"),
+                gripper=GripperInformation(model="0", serial="fake_serial"),
             ),
             "hello",
             "p1000_single_gen3",
