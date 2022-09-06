@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Flex, DIRECTION_ROW, COLORS, SPACING } from '@opentrons/components'
+import { Flex, DIRECTION_ROW, SPACING } from '@opentrons/components'
 import {
   PrimaryButton,
   SecondaryButton,
@@ -22,9 +22,6 @@ const PrimaryButtonTemplate: Story<
   return (
     <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
       <PrimaryButton>{children}</PrimaryButton>
-      <PrimaryButton backgroundColor={COLORS.errorEnabled}>
-        {children}
-      </PrimaryButton>
     </Flex>
   )
 }
@@ -41,7 +38,6 @@ const SecondaryButtonTemplate: Story<
   return (
     <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
       <SecondaryButton>{children}</SecondaryButton>
-      <SecondaryButton color={COLORS.errorEnabled}>{children}</SecondaryButton>
     </Flex>
   )
 }
@@ -58,9 +54,6 @@ const TertiaryButtonTemplate: Story<
   return (
     <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
       <TertiaryButton>{children}</TertiaryButton>
-      <TertiaryButton backgroundColor={COLORS.errorEnabled}>
-        {children}
-      </TertiaryButton>
     </Flex>
   )
 }
@@ -77,9 +70,6 @@ const SecondaryTertiaryButtonTemplate: Story<
   return (
     <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
       <SecondaryTertiaryButton>{children}</SecondaryTertiaryButton>
-      <SecondaryTertiaryButton color={COLORS.errorEnabled}>
-        {children}
-      </SecondaryTertiaryButton>
     </Flex>
   )
 }

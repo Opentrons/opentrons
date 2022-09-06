@@ -7,7 +7,7 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-import { SecondaryButton } from '..'
+import { SecondaryButton } from '../'
 
 const render = (props: React.ComponentProps<typeof SecondaryButton>) => {
   return renderWithProviders(<SecondaryButton {...props} />)[0]
@@ -27,7 +27,7 @@ describe('SecondaryButton', () => {
     const button = getByText('secondary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.transparent}`)
     expect(button).toHaveStyle(
-      `padding: ${SPACING.spacing3} ${SPACING.spacing4}`
+      `padding: ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4}`
     )
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeP}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)

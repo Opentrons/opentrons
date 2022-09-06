@@ -32,7 +32,7 @@ describe('SecondaryTertiaryButton', () => {
     expect(button).toHaveStyle('box-shadow: none')
     expect(button).toHaveStyle(`color: ${COLORS.blueEnabled}`)
     expect(button).toHaveStyle(
-      `padding: ${SPACING.spacing3} ${SPACING.spacing4}`
+      `padding: ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4}`
     )
     expect(button).toHaveStyle(
       `text-transform: ${TYPOGRAPHY.textTransformNone}`

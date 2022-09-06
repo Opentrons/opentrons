@@ -26,7 +26,7 @@ describe('TertiaryButton', () => {
     const button = getByText('tertiary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.blueEnabled}`)
     expect(button).toHaveStyle(
-      `padding: ${SPACING.spacing3} ${SPACING.spacing4}`
+      `padding: ${SPACING.spacing3} ${SPACING.spacing4} ${SPACING.spacing3} ${SPACING.spacing4}`
     )
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeLabel}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
