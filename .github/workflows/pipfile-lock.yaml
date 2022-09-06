@@ -3,16 +3,17 @@ name: 'Create PR on macos-12 for Pipfile.lock'
 on:
   push:
     branches:
-      - 'update-buildroot-2022.02.4' # remove before merge
       - '!edge'
       - '!release'
     paths:
+    - '.github/workflows/pipfile-lock.yaml'
     - '**setup.py'
     - '**Pipfile.*'
   pull_request:
     paths:
-    - '**/setup.py'
-    - '**/Pipfile.*'
+    - '.github/workflows/pipfile-lock.yaml'
+    - '**setup.py'
+    - '**Pipfile.*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
