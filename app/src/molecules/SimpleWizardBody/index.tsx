@@ -45,7 +45,7 @@ export function SimpleWizardBody(props: Props): JSX.Element {
         </StyledText>
         <StyledText
           as="p"
-          marginX={SPACING.spacing6}
+          marginX="6.25rem"
           textAlign={ALIGN_CENTER}
           height="1.75rem"
         >

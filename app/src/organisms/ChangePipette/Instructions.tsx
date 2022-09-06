@@ -90,9 +90,11 @@ export function Instructions(props: Props): JSX.Element {
         <Flex
           paddingX={SPACING.spacing6}
           paddingTop={SPACING.spacing6}
-          marginBottom="12.9rem"
+          marginBottom="12.8rem"
         >
-          {direction === 'attach' && wantedPipette === null ? (
+          {direction === 'attach' &&
+          stepPage === 0 &&
+          wantedPipette === null ? (
             <PipetteSelection onPipetteChange={setWantedName} />
           ) : null}
         </Flex>
@@ -160,7 +162,7 @@ export function Instructions(props: Props): JSX.Element {
             marginX={SPACING.spacing6}
             alignSelf={ALIGN_FLEX_END}
             //  spacing changes to keep buttons at same height across pages
-            marginTop={stepPage === 0 ? SPACING.spacing5 : '9.25rem'}
+            marginTop={stepPage === 0 ? SPACING.spacing6 : '5.9rem'}
           >
             <Btn
               onClick={stepPage === 0 ? back : () => setStepPage(stepPage - 1)}
