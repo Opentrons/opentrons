@@ -8,8 +8,6 @@ from .role_analyzer import RoleAnalyzer, RoleAnalysisFile, RoleAnalysisError
 from .config_analyzer import ConfigAnalyzer, ConfigAnalysisError
 from .protocol_source import ProtocolSource, ProtocolSourceFile
 
-from opentrons_shared_data.protocol.models import ProtocolSchemaV6
-
 
 class ProtocolFilesInvalidError(ValueError):
     """An error raised if the input files cannot be read to a protocol."""
@@ -56,9 +54,6 @@ class ProtocolReader:
         try:
             buffered_files = await self._file_reader_writer.read(files)
             role_analysis = self._role_analyzer.analyze(buffered_files)
-            # TODO (tz, 8-30-22): check protocol version against max supported version
-            if isinstance(role_analysis.main_file.data, ProtocolSchemaV6):
-                self._validate_json_protocol(role_analysis.main_file.data)
             config_analysis = self._config_analyzer.analyze(role_analysis.main_file)
         except (FileReadError, RoleAnalysisError, ConfigAnalysisError) as e:
             raise ProtocolFilesInvalidError(str(e)) from e
@@ -134,26 +129,3 @@ class ProtocolReader:
             metadata=config_analysis.metadata,
             labware_definitions=role_analysis.labware_definitions,
         )
-
-    @staticmethod
-    def _validate_json_protocol(protocol: ProtocolSchemaV6) -> ProtocolSchemaV6:
-        """Validate json v6 protocol mapping constraints."""
-        validate_id_lists = {
-            "pipetteId": set(protocol.pipettes.keys()),
-            "labwareId": set(protocol.labware.keys()),
-            "moduleId": set(protocol.modules.keys() if protocol.modules else []),
-            "liquidId": set(protocol.liquids.keys() if protocol.liquids else []),
-        }
-
-        for prop_name in validate_id_lists:
-            if list(
-                command
-                for command in protocol.commands
-                if getattr(command.params, prop_name)
-                and getattr(command.params, prop_name)
-                not in set(validate_id_lists[prop_name])
-            ):
-                raise ProtocolFilesInvalidError(
-                    f"missing {prop_name} in referencing parent data model."
-                )
-        return protocol
