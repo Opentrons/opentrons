@@ -21,7 +21,7 @@ from ..module_control import AttachedModulesControl
 
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteName
+    from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
     from ..dev_types import (
         AttachedPipette,
         AttachedInstruments,
@@ -207,6 +207,20 @@ class Simulator:
             self._engaged_axes[ax] = True
         return self._position
 
+    @staticmethod
+    def _load_and_check_compat(
+        mount: types.Mount, model: PipetteModel, pipette_id: Optional[str]
+    ) -> AttachedPipette:
+        loaded_config = load(model, pipette_id)
+        if loaded_config.compatible_robot != "OT-2 Standard":
+            raise RuntimeError(
+                f"mount {mount.name}: {model} is not compatible with an OT-2"
+            )
+        return {
+            "config": loaded_config,
+            "id": pipette_id,
+        }
+
     def _attached_to_mount(
         self, mount: types.Mount, expected_instr: Optional[PipetteName]
     ) -> AttachedPipette:
@@ -225,32 +239,30 @@ class Simulator:
         ):
             if self._strict_attached:
                 raise RuntimeError(
-                    "mount {}: expected instrument {} but got {}".format(
-                        mount.name, expected_instr, found_model
-                    )
+                    f"mount {mount.name}: expected instrument {expected_instr} but got {found_model}"
                 )
             else:
-                return {
-                    "config": load(dummy_model_for_name(expected_instr)),
-                    "id": None,
-                }
+                loaded_config = load(dummy_model_for_name(expected_instr))
+                if loaded_config.compatible_robot != "OT-2 Standard":
+                    raise RuntimeError(
+                        f"mount {mount.name}: {expected_instr} cannot be used on an OT-2"
+                    )
+                return self._load_and_check_compat(
+                    mount, dummy_model_for_name(expected_instr), None
+                )
         elif found_model and expected_instr:
             # Instrument detected matches instrument expected (note:
             # "instrument detected" means passed as an argument to the
             # constructor of this class)
-            return {
-                "config": load(found_model, init_instr["id"]),
-                "id": init_instr["id"],
-            }
+            return self._load_and_check_compat(mount, found_model, init_instr["id"])
         elif found_model:
             # Instrument detected and no expected instrument specified
-            return {
-                "config": load(found_model, init_instr["id"]),
-                "id": init_instr["id"],
-            }
+            return self._load_and_check_compat(mount, found_model, init_instr["id"])
         elif expected_instr:
             # Expected instrument specified and no instrument detected
-            return {"config": load(dummy_model_for_name(expected_instr)), "id": None}
+            return self._load_and_check_compat(
+                mount, dummy_model_for_name(expected_instr), None
+            )
         else:
             # No instrument detected or expected
             return {"config": None, "id": None}

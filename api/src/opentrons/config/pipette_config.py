@@ -17,6 +17,8 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteFusedSpec,
     LabwareUri,
 )
+from opentrons_shared_data.robot.dev_types import RobotName
+from opentrons_shared_data.robot import load_from_uri
 
 log = logging.getLogger(__name__)
 
@@ -60,6 +62,7 @@ class PipetteConfig:
     default_dispense_flow_rates: Dict[str, float]
     model: PipetteModel
     default_tipracks: List[LabwareUri]
+    compatible_robot: RobotName
 
 
 # Notes:
@@ -215,6 +218,7 @@ def load(
         ),
         model=pipette_model,
         default_tipracks=cfg["defaultTipracks"],
+        compatible_robot=load_from_uri(cfg["compatibleWithRobot"])["robotName"],
     )
 
     return res

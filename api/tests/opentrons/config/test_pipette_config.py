@@ -12,6 +12,8 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.dev_types import PipetteSpec
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette.dev_types import PipetteModel
+from opentrons_shared_data.robot.dev_types import RobotName
+
 
 defs = json.loads(load_shared_data("pipette/definitions/pipetteModelSpecs.json"))
 
@@ -359,3 +361,14 @@ async def test_incorrect_modify_pipette_settings(
             pipette_id=attached_pipettes["left"]["id"],  # type: ignore[arg-type]
             fields=out_of_range,
         )
+
+
+@pytest.mark.parametrize(
+    "pipette_model,robot_name",
+    [
+        (PipetteModel(c), "OT-3 Standard" if "v3" in c else "OT-2 Standard")
+        for c in pipette_config.config_models
+    ],
+)
+def test_compatible_robots(pipette_model: PipetteModel, robot_name: RobotName) -> None:
+    assert pipette_config.load(pipette_model).compatible_robot == robot_name

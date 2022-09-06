@@ -26,6 +26,13 @@ from opentrons.calibration_storage import get, modify, delete, types as cs_types
 
 import pytest
 
+@pytest.fixture
+def pipette_name_provider(robot_model: RobotName) -> Callable[[PipetteName], PipetteName]:
+    if robot_model == 'OT-2 Standard':
+        return lambda pipette_name: pipette_name
+    else:
+        return lambda pipette_name: pipette_name + '_gen3'
+
 
 def set_version_added(attr, mp, version):
     """helper to mock versionadded for an attr

@@ -48,7 +48,7 @@ from opentrons.hardware_control.types import (
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
-from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
 from opentrons_shared_data.gripper.dev_types import GripperModel
 from opentrons.hardware_control.dev_types import (
     InstrumentHardwareConfigs,
@@ -240,6 +240,20 @@ class OT3Simulator:
         """Move gripper outward."""
         _ = create_gripper_jaw_home_group()
 
+    @staticmethod
+    def _load_and_check_compat(
+        mount: OT3Mount, model: PipetteModel, pipette_id: Optional[str]
+    ) -> AttachedPipette:
+        loaded_config = pipette_config.load(model, pipette_id)
+        if loaded_config.compatible_robot != "OT-3 Standard":
+            raise RuntimeError(
+                f"mount {mount.name}: {model} is not compatible with an OT-3"
+            )
+        return {
+            "config": loaded_config,
+            "id": pipette_id,
+        }
+
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]
     ) -> OT3AttachedInstruments:
@@ -287,30 +301,22 @@ class OT3Simulator:
                     )
                 )
             else:
-                return {
-                    "config": pipette_config.load(dummy_model_for_name(expected_instr)),
-                    "id": None,
-                }
+                return self._load_and_check_compat(
+                    mount, dummy_model_for_name(expected_instr), None
+                )
         elif found_model and expected_instr:
             # Instrument detected matches instrument expected (note:
             # "instrument detected" means passed as an argument to the
             # constructor of this class)
-            return {
-                "config": pipette_config.load(found_model, init_instr["id"]),
-                "id": init_instr["id"],
-            }
+            return self._load_and_check_compat(mount, found_model, init_instr["id"])
         elif found_model:
             # Instrument detected and no expected instrument specified
-            return {
-                "config": pipette_config.load(found_model, init_instr["id"]),
-                "id": init_instr["id"],
-            }
+            return self._load_and_check_compat(mount, found_model, init_instr["id"])
         elif expected_instr:
             # Expected instrument specified and no instrument detected
-            return {
-                "config": pipette_config.load(dummy_model_for_name(expected_instr)),
-                "id": None,
-            }
+            return self._load_and_check_compat(
+                mount, dummy_model_for_name(expected_instr), None
+            )
         else:
             # No instrument detected or expected
             return {"config": None, "id": None}
