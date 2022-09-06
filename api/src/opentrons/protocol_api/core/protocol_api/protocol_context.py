@@ -5,7 +5,7 @@ from collections import OrderedDict
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
+from opentrons.types import Mount, Location, DeckSlotName
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel
@@ -23,13 +23,16 @@ from ..labware import LabwareLoadParams
 from .instrument_context import InstrumentContextImplementation
 from .labware_offset_provider import AbstractLabwareOffsetProvider
 from .labware import LabwareImplementation
+from .legacy_module_core import LegacyModuleCore
 from .load_info import LoadInfo, InstrumentLoadInfo, LabwareLoadInfo, ModuleLoadInfo
 
 logger = logging.getLogger(__name__)
 
 
 class ProtocolContextImplementation(
-    AbstractProtocol[InstrumentContextImplementation, LabwareImplementation]
+    AbstractProtocol[
+        InstrumentContextImplementation, LabwareImplementation, LegacyModuleCore
+    ]
 ):
     def __init__(
         self,
@@ -185,13 +188,13 @@ class ProtocolContextImplementation(
     def load_module(
         self,
         model: ModuleModel,
-        location: Optional[DeckLocation],
+        deck_slot: DeckSlotName,
         configuration: Optional[str],
     ) -> Optional[LoadModuleResult]:
         """Load a module."""
         resolved_type = module_geometry.resolve_module_type(model)
         resolved_location = self._deck_layout.resolve_module_location(
-            resolved_type, location
+            resolved_type, deck_slot.value
         )
 
         # Try to find in the hardware instance

@@ -27,15 +27,13 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
 )
-from opentrons.protocols.geometry.module_geometry import (
-    ModuleGeometry,
-    resolve_module_model,
-)
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .core.instrument import AbstractInstrument
 from .core.labware import AbstractLabware
+from .core.module import AbstractModuleCore
 from .core.protocol import AbstractProtocol
 from .core.well import AbstractWellCore
 
@@ -66,7 +64,8 @@ ModuleTypes = Union[
 
 InstrumentCore = AbstractInstrument[AbstractWellCore]
 LabwareCore = AbstractLabware[AbstractWellCore]
-ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore]
+ModuleCore = AbstractModuleCore[LabwareCore]
+ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
 
 
 class HardwareManager(NamedTuple):
@@ -413,9 +412,13 @@ class ProtocolContext(CommandPublisher):
                 "using thermocycler parameters only available in 2.4"
             )
 
-        requested_model = resolve_module_model(module_name)
+        requested_model = validation.ensure_module_model(module_name)
+        deck_slot = validation.ensure_module_deck_slot(
+            location=location, model=requested_model
+        )
+
         load_result = self._implementation.load_module(
-            model=requested_model, location=location, configuration=configuration
+            model=requested_model, deck_slot=deck_slot, configuration=configuration
         )
 
         if not load_result:

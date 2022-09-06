@@ -20,13 +20,14 @@ from ..protocol import AbstractProtocol, LoadModuleResult
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore
+from .module_core import ModuleCore
 
 
 # TODO(mc, 2022-08-24): many of these methods are likely unnecessary
 # in a ProtocolEngine world. As we develop this core, we should remove
 # and consolidate logic as we need to across all cores rather than
 # necessarily try to support every one of these behaviors in the engine.
-class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
+class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     """Protocol API core using a ProtocolEngine.
 
     Args:

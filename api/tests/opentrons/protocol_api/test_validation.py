@@ -1,10 +1,17 @@
 """Tests for Protocol API input validation."""
-from typing import List, Union
+from typing import Any, List, Union, Type
 
 import pytest
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount, DeckSlotName
+from opentrons.hardware_control.modules.types import (
+    ModuleModel,
+    MagneticModuleModel,
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
+    HeaterShakerModuleModel,
+)
 from opentrons.protocol_api import validation as subject
 
 
@@ -70,3 +77,82 @@ def test_ensure_deck_slot_invalid() -> None:
 
     with pytest.raises(TypeError, match="must be a string or integer"):
         subject.ensure_deck_slot(1.23)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    ("load_name", "expected_model"),
+    [
+        ("magdeck", MagneticModuleModel.MAGNETIC_V1),
+        ("MaGdEcK", MagneticModuleModel.MAGNETIC_V1),
+        ("magnetic module", MagneticModuleModel.MAGNETIC_V1),
+        ("magneticModuleV1", MagneticModuleModel.MAGNETIC_V1),
+        ("magnetic module gen2", MagneticModuleModel.MAGNETIC_V2),
+        ("magneticModuleV2", MagneticModuleModel.MAGNETIC_V2),
+        ("tempdeck", TemperatureModuleModel.TEMPERATURE_V1),
+        ("tEmpDeCk", TemperatureModuleModel.TEMPERATURE_V1),
+        ("temperatureModuleV1", TemperatureModuleModel.TEMPERATURE_V1),
+        ("temperature module", TemperatureModuleModel.TEMPERATURE_V1),
+        ("temperature module gen2", TemperatureModuleModel.TEMPERATURE_V2),
+        ("temperatureModuleV2", TemperatureModuleModel.TEMPERATURE_V2),
+        ("thermocycler", ThermocyclerModuleModel.THERMOCYCLER_V1),
+        ("ThErMoCyClEr", ThermocyclerModuleModel.THERMOCYCLER_V1),
+        ("thermocycler module", ThermocyclerModuleModel.THERMOCYCLER_V1),
+        ("thermocyclerModuleV1", ThermocyclerModuleModel.THERMOCYCLER_V1),
+        ("thermocycler module gen2", ThermocyclerModuleModel.THERMOCYCLER_V2),
+        ("thermocyclerModuleV2", ThermocyclerModuleModel.THERMOCYCLER_V2),
+        ("heaterShakerModuleV1", HeaterShakerModuleModel.HEATER_SHAKER_V1),
+    ],
+)
+def test_ensure_module_model(load_name: str, expected_model: ModuleModel) -> None:
+    """It should map an module load name to a specific model."""
+    result = subject.ensure_module_model(load_name)
+    assert result == expected_model
+
+
+def test_ensure_module_model_invalid() -> None:
+    """It should reject invalid module load names."""
+    with pytest.raises(ValueError, match="not a valid module load name"):
+        subject.ensure_module_model("spline reticulator")
+
+    with pytest.raises(TypeError, match="must be a string"):
+        subject.ensure_module_model(42)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    ("location", "model", "expected_slot"),
+    [
+        (1, MagneticModuleModel.MAGNETIC_V1, DeckSlotName.SLOT_1),
+        ("3", MagneticModuleModel.MAGNETIC_V1, DeckSlotName.SLOT_3),
+        (7, ThermocyclerModuleModel.THERMOCYCLER_V1, DeckSlotName.SLOT_7),
+        ("7", ThermocyclerModuleModel.THERMOCYCLER_V2, DeckSlotName.SLOT_7),
+        (None, ThermocyclerModuleModel.THERMOCYCLER_V1, DeckSlotName.SLOT_7),
+        (None, ThermocyclerModuleModel.THERMOCYCLER_V2, DeckSlotName.SLOT_7),
+    ],
+)
+def test_ensure_module_deck_slot(
+    location: Union[int, str, None],
+    model: ModuleModel,
+    expected_slot: DeckSlotName,
+) -> None:
+    """It should map an optional int/str location to a deck slot for a module."""
+    result = subject.ensure_module_deck_slot(location, model)
+    assert result == expected_slot
+
+
+@pytest.mark.parametrize(
+    ("location", "model", "expected_error_type", "expected_message"),
+    [
+        (None, TemperatureModuleModel.TEMPERATURE_V1, ValueError, "Location required"),
+        (8, ThermocyclerModuleModel.THERMOCYCLER_V1, ValueError, "slot 7"),
+        ({}, MagneticModuleModel.MAGNETIC_V1, TypeError, "string or integer"),
+    ],
+)
+def test_ensure_module_deck_slot_invalid(
+    location: Any,
+    model: ModuleModel,
+    expected_error_type: Type[Exception],
+    expected_message: str,
+) -> None:
+    """It should reject semantically invalid deck slots."""
+    with pytest.raises(expected_error_type, match=expected_message):
+        subject.ensure_module_deck_slot(location, model)
