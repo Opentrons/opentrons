@@ -1039,6 +1039,7 @@ class OT3API(
     async def jaw_width(self, jaw_width_um: int) -> None:
         self._gripper_handler.check_ready_for_jaw_move()
         await self._jaw_width(jaw_width_um)
+        self._gripper_handler.set_jaw_state(GripperJawState.HOLDING_CLOSED)
 
     # Pipette action API
     async def prepare_for_aspirate(
