@@ -2,9 +2,9 @@ name: 'Create PR on macos-12 for Pipfile.lock'
 
 on:
   push:
-    branches:
-      - '!edge'
-      - '!release'
+    branches-ignore:
+      - 'edge'
+      - 'release'
     paths:
     - '.github/workflows/pipfile-lock.yaml'
     - '**setup.py'
