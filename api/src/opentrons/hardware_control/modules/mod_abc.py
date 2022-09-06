@@ -73,13 +73,7 @@ class AbstractModule(abc.ABC):
         """Get absolute path to bundled version of module fw if available."""
         if not IS_ROBOT:
             return None
-        name_to_fw_file_prefix = {
-            "tempdeck": "temperature-module",
-            "magdeck": "magnetic-module",
-            "heatershaker": "heater-shaker",
-        }
-        name = self.name()
-        file_prefix = name_to_fw_file_prefix.get(name, name)
+        file_prefix = self.firmware_prefix()
 
         MODULE_FW_RE = re.compile(f"^{file_prefix}@v(.*)[.](hex|bin)$")
         for fw_resource in ROBOT_FIRMWARE_DIR.iterdir():  # type: ignore
@@ -169,7 +163,12 @@ class AbstractModule(abc.ABC):
     @classmethod
     @abc.abstractmethod
     def name(cls) -> str:
-        """A shortname used for looking up firmware, among other things"""
+        """A shortname used for matching usb ports, among other things"""
+        pass
+
+    @abc.abstractmethod
+    def firmware_prefix(self) -> str:
+        """The prefix used for looking up firmware"""
         pass
 
     @abc.abstractmethod

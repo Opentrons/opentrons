@@ -5,6 +5,8 @@ from typing import List, Optional, Type
 import pytest
 from sqlalchemy.engine import Engine
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
 from robot_server.runs.run_store import (
     RunStore,
@@ -20,9 +22,10 @@ from opentrons.protocol_engine import (
     types as pe_types,
     StateSummary,
     CommandSlice,
+    Liquid,
+    EngineStatus,
 )
 from opentrons.types import MountType, DeckSlotName
-from opentrons.protocol_engine import EngineStatus
 
 
 @pytest.fixture
@@ -82,9 +85,11 @@ def state_summary() -> StateSummary:
 
     analysis_pipette = pe_types.LoadedPipette(
         id="pipette-id",
-        pipetteName=pe_types.PipetteName.P300_SINGLE,
+        pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
+
+    liquids = [Liquid(id="some-id", displayName="water", description="water desc")]
 
     return StateSummary(
         errors=[analysis_error],
@@ -95,6 +100,7 @@ def state_summary() -> StateSummary:
         # TODO (tz 22-4-19): added the field to class. make sure what to initialize
         labwareOffsets=[],
         status=EngineStatus.IDLE,
+        liquids=liquids,
     )
 
 

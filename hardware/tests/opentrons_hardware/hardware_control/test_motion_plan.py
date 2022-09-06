@@ -27,6 +27,7 @@ def generate_axis_constraint(draw: st.DrawFn) -> AxisConstraints:
         max_acceleration=acc,
         max_speed_discont=speed_dist,
         max_direction_change_speed_discont=dir_change_dist,
+        max_speed=500,
     )
 
 

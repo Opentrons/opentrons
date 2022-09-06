@@ -1,7 +1,7 @@
 """Tests for move util functions."""
 import pytest
 import numpy as np
-from typing import Iterator, List
+from typing import Iterator, List, Union
 from hypothesis import given, strategies as st, assume
 
 from opentrons_hardware.hardware_control.motion_planning.move_manager import MoveManager
@@ -12,6 +12,7 @@ from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     all_blended,
     get_unit_vector,
     FLOAT_THRESHOLD,
+    limit_max_speed,
 )
 from opentrons_hardware.hardware_control.motion_planning.types import (
     AxisConstraints,
@@ -20,6 +21,7 @@ from opentrons_hardware.hardware_control.motion_planning.types import (
     MoveTarget,
     SystemConstraints,
     is_unit_vector,
+    Coordinates,
 )
 
 AXES = ["X", "Y", "Z", "A"]
@@ -30,31 +32,37 @@ CONSTRAINTS: SystemConstraints[str] = {
         max_acceleration=np.float64(10),
         max_speed_discont=np.float64(15),
         max_direction_change_speed_discont=np.float64(500),
+        max_speed=np.float64(500),
     ),
     "Y": AxisConstraints.build(
         max_acceleration=np.float64(10),
         max_speed_discont=np.float64(15),
         max_direction_change_speed_discont=np.float64(500),
+        max_speed=np.float64(500),
     ),
     "Z": AxisConstraints.build(
         max_acceleration=np.float64(100),
         max_speed_discont=np.float64(100),
         max_direction_change_speed_discont=np.float64(500),
+        max_speed=np.float64(500),
     ),
     "A": AxisConstraints.build(
         max_acceleration=np.float64(100),
         max_speed_discont=np.float64(100),
         max_direction_change_speed_discont=np.float64(500),
+        max_speed=np.float64(500),
     ),
     "B": AxisConstraints.build(
         max_acceleration=np.float64(100),
         max_speed_discont=np.float64(100),
         max_direction_change_speed_discont=np.float64(500),
+        max_speed=np.float64(500),
     ),
     "C": AxisConstraints.build(
         max_acceleration=np.float64(100),
         max_speed_discont=np.float64(100),
         max_direction_change_speed_discont=np.float64(500),
+        max_speed=np.float64(500),
     ),
 }
 
@@ -116,6 +124,73 @@ SIMPLE_BACKWARD_MOVE = Move.build(
 )
 
 DUMMY_MOVE = Move.build_dummy(["X", "Y", "Z", "A"])
+LIMIT_MAX_CONSTRAINTS: SystemConstraints[str] = {
+    "X": AxisConstraints.build(
+        max_acceleration=10,
+        max_speed_discont=15,
+        max_direction_change_speed_discont=500,
+        max_speed=10,
+    ),
+    "Y": AxisConstraints.build(
+        max_acceleration=10,
+        max_speed_discont=15,
+        max_direction_change_speed_discont=500,
+        max_speed=500,
+    ),
+}
+
+
+def uv_for_angle(angle: Union[float, np.float64]) -> Coordinates[str, np.float64]:
+    """Calculate a 2d unit vector given an angle."""
+    return {"X": np.cos(angle), "Y": np.sin(angle)}
+
+
+@pytest.mark.parametrize(
+    "unit_vector,linear_speed,limited_speed",
+    [
+        # untouched
+        (uv_for_angle(0), 10, 10),
+        (uv_for_angle(0), 9, 9),
+        (uv_for_angle(np.pi), 9, 9),
+        (uv_for_angle(np.pi / 2), 500, 500),
+        (uv_for_angle(np.pi / 2), 499, 499),
+        (uv_for_angle(-np.pi / 2), 499, 499),
+        (
+            uv_for_angle(np.pi / 4),
+            10.0 / (np.sqrt(2) / 2),
+            10.0 / (np.sqrt(2) / 2),
+        ),
+        (uv_for_angle(-np.pi / 4), 10.0 / (np.sqrt(2) / 2), 10.0 / (np.sqrt(2) / 2)),
+        (
+            uv_for_angle(3 * np.pi / 4),
+            10.0 / (np.sqrt(2) / 2),
+            10.0 / (np.sqrt(2) / 2),
+        ),
+        (
+            uv_for_angle(-3 * np.pi / 4),
+            10.0 / (np.sqrt(2) / 2),
+            10.0 / (np.sqrt(2) / 2),
+        ),
+        (uv_for_angle(np.pi / 2 - 0.01), 498, 498),
+        (uv_for_angle(-np.pi / 2 + 0.01), 498, 498),
+        # limited by x
+        (uv_for_angle(0), 100, 10),
+        (uv_for_angle(np.pi), 100, 10),
+        (uv_for_angle(np.pi / 4), 20.14, 10.0 / (np.sqrt(2) / 2.0)),
+        # limited by y
+        (uv_for_angle(np.pi / 2), 1000, 500),
+        (uv_for_angle(-np.pi / 2), 1000, 500),
+        # limited by both
+        (uv_for_angle(np.pi / 2 - 0.01), 1100, 500.025),
+    ],
+)
+def test_limit_max_speed(
+    unit_vector: Coordinates[str, np.float64], linear_speed: float, limited_speed: float
+) -> None:
+    """It should limit a move's linear speed to match constraints."""
+    assert limit_max_speed(
+        unit_vector, np.float64(linear_speed), LIMIT_MAX_CONSTRAINTS
+    ) == pytest.approx(np.float64(limited_speed))
 
 
 def test_convert_targets_to_moves() -> None:
@@ -128,7 +203,7 @@ def test_convert_targets_to_moves() -> None:
                 "Z": np.float64(0),
                 "A": np.float64(0),
             },
-            np.float64(1),
+            np.float64(1000),
         ),
         MoveTarget.build(
             {
@@ -168,21 +243,21 @@ def test_convert_targets_to_moves() -> None:
                 "A": np.float64(0),
             },
             distance=np.float64(10),
-            max_speed=np.float64(1),
+            max_speed=np.float64(500),
             blocks=(
                 Block(
                     distance=np.float64(10 / 3),
-                    initial_speed=np.float64(1),
+                    initial_speed=np.float64(np.float64(500)),
                     acceleration=np.float64(0),
                 ),
                 Block(
                     distance=np.float64(10 / 3),
-                    initial_speed=np.float64(1),
+                    initial_speed=np.float64(np.float64(500)),
                     acceleration=np.float64(0),
                 ),
                 Block(
                     distance=np.float64(10 / 3),
-                    initial_speed=np.float64(1),
+                    initial_speed=np.float64(np.float64(500)),
                     acceleration=np.float64(0),
                 ),
             ),
@@ -280,6 +355,7 @@ def test_convert_targets_to_moves() -> None:
                     "A": np.float64(0),
                 },
                 targets,
+                CONSTRAINTS,
             )
         )
         == expected
@@ -487,16 +563,19 @@ def test_triangle_matching() -> None:
             max_acceleration=np.float64(100),
             max_speed_discont=np.float64(40),
             max_direction_change_speed_discont=np.float64(20),
+            max_speed=np.float64(500),
         ),
         "Y": AxisConstraints.build(
             max_acceleration=np.float64(100),
             max_speed_discont=np.float64(40),
             max_direction_change_speed_discont=np.float64(20),
+            max_speed=np.float64(500),
         ),
         "Z": AxisConstraints.build(
             max_acceleration=np.float64(100),
             max_speed_discont=np.float64(40),
             max_direction_change_speed_discont=np.float64(20),
+            max_speed=np.float64(500),
         ),
     }
     manager = MoveManager(problematic_constraints)

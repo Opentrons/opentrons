@@ -107,7 +107,7 @@ class MoveGroupRunner:
             return {}
         if not self._is_prepped:
             raise RuntimeError("A group must be prepped before it can be executed.")
-        move_completion_data = await self._move(can_messenger)
+        move_completion_data = await self._move(can_messenger, self._start_at_index)
         return self._accumulate_move_completions(move_completion_data)
 
     async def run(self, can_messenger: CanMessenger) -> NodeDict[Tuple[float, float]]:
@@ -272,9 +272,11 @@ class MoveGroupRunner:
         )
         return TipActionRequest(payload=tip_action_payload)
 
-    async def _move(self, can_messenger: CanMessenger) -> _Completions:
+    async def _move(
+        self, can_messenger: CanMessenger, start_at_index: int
+    ) -> _Completions:
         """Run all the move groups."""
-        scheduler = MoveScheduler(self._move_groups)
+        scheduler = MoveScheduler(self._move_groups, start_at_index)
         try:
             can_messenger.add_listener(scheduler)
             completions = await scheduler.run(can_messenger)
@@ -286,12 +288,13 @@ class MoveGroupRunner:
 class MoveScheduler:
     """A message listener that manages the sending of execute move group messages."""
 
-    def __init__(self, move_groups: MoveGroups) -> None:
+    def __init__(self, move_groups: MoveGroups, start_at_index: int = 0) -> None:
         """Constructor."""
         # For each move group create a set identifying the node and seq id.
         self._moves: List[Set[Tuple[int, int]]] = []
         self._durations: List[float] = []
         self._stop_condition: List[MoveStopCondition] = []
+        self._start_at_index = start_at_index
         for move_group in move_groups:
             move_set = set()
             duration = 0.0
@@ -311,7 +314,7 @@ class MoveScheduler:
         self, message: _AcceptableMoves, arbitration_id: ArbitrationId
     ) -> None:
         seq_id = message.payload.seq_id.value
-        group_id = message.payload.group_id.value
+        group_id = message.payload.group_id.value - self._start_at_index
         node_id = arbitration_id.parts.originating_node_id
         try:
             in_group = (node_id, seq_id) in self._moves[group_id]
@@ -332,11 +335,11 @@ class MoveScheduler:
             return
 
         if not self._moves[group_id]:
-            log.info(f"Move group {group_id} has completed.")
+            log.info(f"Move group {group_id+self._start_at_index} has completed.")
             self._event.set()
 
     def _handle_move_completed(self, message: MoveCompleted) -> None:
-        group_id = message.payload.group_id.value
+        group_id = message.payload.group_id.value - self._start_at_index
         ack_id = message.payload.ack_id.value
         try:
             if self._stop_condition[
@@ -352,7 +355,7 @@ class MoveScheduler:
             pass
 
     def _handle_tip_action(self, message: TipActionResponse) -> None:
-        group_id = message.payload.group_id.value
+        group_id = message.payload.group_id.value - self._start_at_index
         ack_id = message.payload.ack_id.value
         try:
             limit_switch = bool(
@@ -384,7 +387,9 @@ class MoveScheduler:
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
-        for group_id in range(len(self._moves)):
+        for group_id in range(
+            self._start_at_index, self._start_at_index + len(self._moves)
+        ):
             self._event.clear()
 
             log.info(f"Executing move group {group_id}.")
@@ -408,7 +413,8 @@ class MoveScheduler:
                 # for short move durations we can see the timeout expiring before
                 # the execute even gets sent.
                 await asyncio.wait_for(
-                    self._event.wait(), max(1.0, self._durations[group_id] * 1.1)
+                    self._event.wait(),
+                    max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
                 )
             except asyncio.TimeoutError:
                 log.warning("Move set timed out")

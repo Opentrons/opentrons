@@ -44,19 +44,15 @@ class CalibrationPosition:
 class Deck(UserDict):
     def __init__(self) -> None:
         super().__init__()
-        row_offset = 90.5
-        col_offset = 132.5
-        for idx in range(1, 13):
-            self.data[idx] = None
-        self._positions = {
-            idx + 1: types.Point((idx % 3) * col_offset, idx // 3 * row_offset, 0)
-            for idx in range(12)
-        }
-        self._highest_z = 0.0
         # TODO(mc, 2022-06-17): move deck type selection
         # (and maybe deck definition loading) out of this constructor
         # to decouple from config (and environment) reading / loading
         self._definition = load_deck(deck_type(), DEFAULT_DECK_DEFINITION_VERSION)
+        self._positions = {}
+        for slot in self._definition["locations"]["orderedSlots"]:
+            self.data[int(slot["id"])] = None
+            self._positions[int(slot["id"])] = types.Point(*slot["position"])
+        self._highest_z = 0.0
         self._load_fixtures()
         self._thermocycler_present = False
 
@@ -66,7 +62,7 @@ class Deck(UserDict):
             # TODO(mc, 2022-06-15): this loads the fixed trash as an instance of
             # `opentrons.protocol_api.labware.Labware`
             # However, all other labware will be added to the `Deck` as instances of
-            # `opentrons.protocols.context.labware.AbstractLabware`
+            # `opentrons.protocol_api.core.labware.AbstractLabware`
             # And modules will be added as instances of
             # `opentrons.protocols.geometry.module_geometry.ModuleGeometry`
             # This mix of public and private interfaces as members of a public

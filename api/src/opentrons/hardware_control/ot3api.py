@@ -999,6 +999,7 @@ class OT3API(
         self._gripper_handler.check_ready_for_grip()
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(force_newtons)
         await self._grip(duty_cycle=dc)
+        self._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
 
     async def ungrip(self) -> None:
         # get default grip force for release if not provided

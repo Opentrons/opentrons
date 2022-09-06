@@ -4,54 +4,81 @@ require typing_extensions.
 
 This module should only be imported if typing.TYPE_CHECKING is True.
 """
+from enum import Enum
 from typing import Dict, List, NewType, Union
 
 from typing_extensions import Literal, TypedDict
 
-# TODO(mc, 2022-06-16): move to labware.dev_types
-LabwareUri = NewType("LabwareUri", str)
+# TODO(mc, 2022-06-16): remove type alias when able
+# and when certain removal will not break any pickling
+from ..labware.dev_types import LabwareUri as LabwareUri
 
-# Explicit listing of pipette names because we don't frequently get new ones
-PipetteName = Union[
-    Literal["p10_single"],
-    Literal["p10_multi"],
-    Literal["p20_single_gen2"],
-    Literal["p20_multi_gen2"],
-    Literal["p50_single"],
-    Literal["p50_multi"],
-    Literal["p300_single"],
-    Literal["p300_multi"],
-    Literal["p300_single_gen2"],
-    Literal["p300_multi_gen2"],
-    Literal["p1000_single"],
-    Literal["p1000_single_gen2"],
-    Literal["p300_single_gen3"],
-    Literal["p1000_single_gen3"],
-    Literal["p20_single_gen3"],
+
+PipetteName = Literal[
+    "p10_single",
+    "p10_multi",
+    "p20_single_gen2",
+    "p20_multi_gen2",
+    "p50_single",
+    "p50_multi",
+    "p50_single_gen3",
+    "p50_multi_gen3",
+    "p300_single",
+    "p300_multi",
+    "p300_single_gen2",
+    "p300_multi_gen2",
+    "p1000_single",
+    "p1000_single_gen2",
+    "p1000_single_gen3",
+    "p1000_multi_gen3",
 ]
+
+
+class PipetteNameType(str, Enum):
+    """Pipette load name values."""
+
+    value: PipetteName
+
+    P10_SINGLE = "p10_single"
+    P10_MULTI = "p10_multi"
+    P20_SINGLE_GEN2 = "p20_single_gen2"
+    P20_MULTI_GEN2 = "p20_multi_gen2"
+    P50_SINGLE = "p50_single"
+    P50_MULTI = "p50_multi"
+    P50_SINGLE_GEN3 = "p50_single_gen3"
+    P50_MULTI_GEN3 = "p50_multi_gen3"
+    P300_SINGLE = "p300_single"
+    P300_MULTI = "p300_multi"
+    P300_SINGLE_GEN2 = "p300_single_gen2"
+    P300_MULTI_GEN2 = "p300_multi_gen2"
+    P1000_SINGLE = "p1000_single"
+    P1000_SINGLE_GEN2 = "p1000_single_gen2"
+    P1000_SINGLE_GEN3 = "p1000_single_gen3"
+    P1000_MULTI_GEN3 = "p1000_multi_gen3"
+
 
 # Generic NewType for models because we get new ones frequently and theres
 # a huge number of them
 PipetteModel = NewType("PipetteModel", str)
 
-DisplayCategory = Union[Literal["GEN1"], Literal["GEN2"]]
+DisplayCategory = Literal["GEN1", "GEN2"]
 
 # todo(mm, 2022-03-18):
 # The JSON schema defines this as any string, not as an enum of string literals.
 # Check if it's safe to simplify this to just str.
-ConfigUnit = Union[
-    Literal["mm"],
-    Literal["amps"],
-    Literal["mm/sec"],
-    Literal["mm/s"],  # todo(mm, 2022-03-18): Standardize specs to mm/sec or mm/s.
-    Literal["presses"],
+ConfigUnit = Literal[
+    "mm",
+    "amps",
+    "mm/sec",
+    "mm/s",  # todo(mm, 2022-03-18): Standardize specs to mm/sec or mm/s.
+    "presses",
 ]
 
 Quirk = NewType("Quirk", str)
 
-ChannelCount = Union[Literal[1], Literal[8]]
+ChannelCount = Literal[1, 8]
 
-UlPerMmAction = Union[Literal["aspirate"], Literal["dispense"]]
+UlPerMmAction = Literal["aspirate", "dispense"]
 
 
 class PipetteConfigElement(TypedDict):

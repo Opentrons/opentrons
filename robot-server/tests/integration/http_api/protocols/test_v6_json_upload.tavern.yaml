@@ -88,21 +88,25 @@ stages:
               - id: fixedTrash
                 loadName: opentrons_1_trash_1100ml_fixed
                 definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+                displayName: Trash
                 location:
                   slotName: '12'
               - id: sourcePlateId
                 loadName: foo_8_plate_33ul
                 definitionUri: example/foo_8_plate_33ul/1
+                displayName: Source Plate
                 location:
                   moduleId: temperatureModuleId
               - id: destPlateId
                 loadName: foo_8_plate_33ul
                 definitionUri: example/foo_8_plate_33ul/1
+                displayName: Sample Collection Plate
                 location:
                   moduleId: magneticModuleId
               - id: tipRackId
                 loadName: opentrons_96_tiprack_10ul
                 definitionUri: opentrons/opentrons_96_tiprack_10ul/1
+                displayName: Opentrons 96 Tip Rack 10 µL
                 location:
                   slotName: '8'
             commands:
@@ -223,6 +227,20 @@ stages:
                 result:
                   labwareId: fixedTrash
                   definition: !anydict
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
+                commandType: loadLiquid
+                key: !anystr
+                status: succeeded
+                params:
+                  liquidId: 'waterId'
+                  labwareId: 'sourcePlateId'
+                  volumeByWell:
+                    A1: 100
+                    B1: 100
+                result: {}
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -501,3 +519,8 @@ stages:
                 startedAt: !anystr
                 completedAt: !anystr
             errors: []
+            liquids:
+              - id: waterId
+                displayName: Water
+                description: Liquid H2O
+                displayColor: '#7332a8'

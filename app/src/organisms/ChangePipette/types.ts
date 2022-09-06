@@ -5,3 +5,6 @@ export type WizardStep =
   | 'instructions'
   | 'confirm'
   | 'calibratePipette'
+//  TODO(JR, 08.31.22): remove `calibratePipette` from WizardStep when we remove FF
+
+export type Diagram = 'screws' | 'tab'

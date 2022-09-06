@@ -1,13 +1,11 @@
 # Uncomment to enable logging during tests
-# import logging
-# from logging.config import dictConfig
 from __future__ import annotations
 import asyncio
+import inspect
 import io
 import json
 import os
 import pathlib
-import tempfile
 import zipfile
 from typing import (
     TYPE_CHECKING,
@@ -24,6 +22,7 @@ from typing import (
 from typing_extensions import TypedDict
 
 import pytest
+from decoy import Decoy
 
 try:
     import aionotify  # type: ignore[import]
@@ -33,6 +32,11 @@ except (OSError, ModuleNotFoundError):
 from opentrons_shared_data.protocol.dev_types import JsonProtocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
+from opentrons_shared_data.deck.dev_types import RobotModel, DeckDefinitionV3
+from opentrons_shared_data.deck import (
+    load as load_deck,
+    DEFAULT_DECK_DEFINITION_VERSION,
+)
 
 from opentrons import config
 from opentrons import hardware_control as hc
@@ -43,12 +47,14 @@ from opentrons.hardware_control import (
     ThreadManager,
     ThreadManagedHardware,
 )
-from opentrons.protocol_api import ProtocolContext
-from opentrons.protocol_api.labware import Labware
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
-from opentrons.protocols.context.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
+from opentrons.protocol_api import (
+    MAX_SUPPORTED_VERSION,
+    ProtocolContext,
+    Labware,
+    create_protocol_context,
 )
+from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
+
 from opentrons.types import Location, Point
 
 
@@ -86,72 +92,29 @@ def ot_config_tempdir(tmp_path: pathlib.Path) -> Generator[pathlib.Path, None, N
 
 
 @pytest.fixture()
-def labware_offset_tempdir(ot_config_tempdir: pathlib.Path) -> pathlib.Path:
-    return config.get_opentrons_path("labware_calibration_offsets_dir_v2")
-
-
-@pytest.fixture(autouse=True)
-def clear_feature_flags() -> Generator[None, None, None]:
-    ff_file = config.CONFIG["feature_flags_file"]
-    if os.path.exists(ff_file):
-        os.remove(ff_file)
-    yield
-    if os.path.exists(ff_file):
-        os.remove(ff_file)
-
-
-@pytest.fixture()
-def wifi_keys_tempdir() -> Generator[str, None, None]:
-    old_wifi_keys = config.CONFIG["wifi_keys_dir"]
-    with tempfile.TemporaryDirectory() as td:
-        config.CONFIG["wifi_keys_dir"] = pathlib.Path(td)
-        yield td
-        config.CONFIG["wifi_keys_dir"] = old_wifi_keys
-
-
-@pytest.fixture()
-def is_robot(monkeypatch: pytest.MonkeyPatch) -> Generator[None, None, None]:
+def is_robot(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(config, "IS_ROBOT", True)
-    yield
-    monkeypatch.setattr(config, "IS_ROBOT", False)
 
 
-# -------feature flag fixtures-------------
-@pytest.fixture()
-async def short_trash_flag() -> AsyncGenerator[None, None]:
-    await config.advanced_settings.set_adv_setting("shortFixedTrash", True)
-    yield
-    await config.advanced_settings.set_adv_setting("shortFixedTrash", False)
+@pytest.fixture
+def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    for name, func in inspect.getmembers(config.feature_flags, inspect.isfunction):
+        mock_get_ff = decoy.mock(func=func)
+        decoy.when(mock_get_ff()).then_return(False)
+        monkeypatch.setattr(config.feature_flags, name, mock_get_ff)
 
 
-@pytest.fixture()
-async def old_aspiration() -> AsyncGenerator[None, None]:
-    await config.advanced_settings.set_adv_setting("useOldAspirationFunctions", True)
-    yield
-    await config.advanced_settings.set_adv_setting("useOldAspirationFunctions", False)
-
-
-@pytest.fixture()
-async def enable_door_safety_switch() -> AsyncGenerator[None, None]:
-    await config.advanced_settings.set_adv_setting("enableDoorSafetySwitch", True)
-    yield
-    await config.advanced_settings.set_adv_setting("enableDoorSafetySwitch", False)
-
-
-@pytest.fixture()
+@pytest.fixture
 async def enable_ot3_hardware_controller(
     request: pytest.FixtureRequest,
-) -> AsyncGenerator[None, None]:
+    decoy: Decoy,
+    mock_feature_flags: None,
+) -> None:
     # this is from the command line parameters added in root conftest
     if request.config.getoption("--ot2-only"):
         pytest.skip("testing only ot2")
 
-    await config.advanced_settings.set_adv_setting("enableOT3HardwareController", True)
-    yield
-    await config.advanced_settings.set_adv_setting("enableOT3HardwareController", False)
-
-
-# -----end feature flag fixtures-----------
+    decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(True)
 
 
 @pytest.fixture()
@@ -174,19 +137,17 @@ def protocol(protocol_file: str) -> Generator[Protocol, None, None]:
 
 
 @pytest.fixture()
-def virtual_smoothie_env(
-    monkeypatch: pytest.MonkeyPatch,
-) -> Generator[None, None, None]:
+def virtual_smoothie_env(monkeypatch: pytest.MonkeyPatch) -> None:
     # TODO (ben 20180426): move this to the .env file
     monkeypatch.setenv("ENABLE_VIRTUAL_SMOOTHIE", "true")
-    yield
-    monkeypatch.setenv("ENABLE_VIRTUAL_SMOOTHIE", "false")
 
 
 @pytest.fixture(params=["ot2", "ot3"])
 async def machine_variant_ffs(
     request: pytest.FixtureRequest,
-) -> AsyncGenerator[None, None]:
+    decoy: Decoy,
+    mock_feature_flags: None,
+) -> None:
     device_param = request.param  # type: ignore[attr-defined]
 
     if request.node.get_closest_marker("ot3_only") and device_param == "ot2":
@@ -194,16 +155,8 @@ async def machine_variant_ffs(
     if request.node.get_closest_marker("ot2_only") and device_param == "ot3":
         pytest.skip()
 
-    old = config.advanced_settings.get_adv_setting("enableOT3HardwareController")
-    assert old
-    old_value = old.value
-
-    await config.advanced_settings.set_adv_setting(
-        "enableOT3HardwareController", device_param == "ot3"
-    )
-    yield
-    await config.advanced_settings.set_adv_setting(
-        "enableOT3HardwareController", old_value
+    decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(
+        device_param == "ot3"
     )
 
 
@@ -255,47 +208,60 @@ async def ot3_hardware(
         yield hw
 
 
-@pytest.fixture(
-    # these have to be lambdas because pytest calls them when providing the param
-    # value and we want to use the function's identity
-    params=[lambda: _build_ot2_hw, lambda: _build_ot3_hw],
-    ids=["ot2", "ot3"],
-)
-async def hardware(
+@pytest.fixture(params=["OT-2 Standard", "OT-3 Standard"])
+async def robot_model(
     request: pytest.FixtureRequest,
+    decoy: Decoy,
+    mock_feature_flags: None,
     virtual_smoothie_env: None,
-) -> AsyncGenerator[ThreadManagedHardware, None]:
-    hw_builder = request.param()  # type: ignore[attr-defined]
-
-    if request.node.get_closest_marker("ot2_only") and hw_builder == _build_ot3_hw:
-        pytest.skip()
-    if request.node.get_closest_marker("ot3_only") and hw_builder == _build_ot2_hw:
-        pytest.skip()
-    if hw_builder == _build_ot3_hw and request.config.getoption("--ot2-only"):
+) -> AsyncGenerator[RobotModel, None]:
+    which_machine = cast(RobotModel, request.param)  # type: ignore[attr-defined]
+    if request.node.get_closest_marker("ot2_only") and which_machine == "OT-3 Standard":
+        pytest.skip("test requests only ot-2")
+    if request.node.get_closest_marker("ot3_only") and which_machine == "OT-2 Standard":
+        pytest.skip("test requests only ot-3")
+    if which_machine == "OT-3 Standard" and request.config.getoption("--ot2-only"):
         pytest.skip("testing only ot2")
 
-    async for hw in hw_builder():
-        if hw_builder == _build_ot3_hw:
-            await config.advanced_settings.set_adv_setting(
-                "enableOT3HardwareController", True
-            )
-        try:
-            yield hw
-        finally:
-            await config.advanced_settings.set_adv_setting(
-                "enableOT3HardwareController", False
-            )
+    decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(
+        which_machine == "OT-3 Standard"
+    )
+
+    yield which_machine
 
 
-# Async because ProtocolContext.__init__() needs an event loop,
-# so this fixture needs to run in an event loop.
+@pytest.fixture
+def deck_definition(robot_model: RobotModel) -> DeckDefinitionV3:
+    if robot_model == "OT-3 Standard":
+        return load_deck("ot3_standard", DEFAULT_DECK_DEFINITION_VERSION)
+    else:
+        return load_deck("ot2_standard", DEFAULT_DECK_DEFINITION_VERSION)
+
+
 @pytest.fixture()
-async def ctx(
-    hardware: ThreadManagedHardware,
-) -> AsyncGenerator[ProtocolContext, None]:
-    c = ProtocolContext(
-        implementation=ProtocolContextImplementation(sync_hardware=hardware.sync),
-        loop=asyncio.get_running_loop(),
+async def hardware(
+    request: pytest.FixtureRequest,
+    decoy: Decoy,
+    mock_feature_flags: None,
+    virtual_smoothie_env: None,
+    robot_model: RobotModel,
+) -> AsyncGenerator[ThreadManagedHardware, None]:
+    hw_builder = {"OT-2 Standard": _build_ot2_hw, "OT-3 Standard": _build_ot3_hw}[
+        robot_model
+    ]
+
+    async for hw in hw_builder():
+        decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(
+            robot_model == "OT-3 Standard"
+        )
+
+        yield hw
+
+
+@pytest.fixture()
+def ctx(hardware: ThreadManagedHardware) -> Generator[ProtocolContext, None, None]:
+    c = create_protocol_context(
+        api_version=MAX_SUPPORTED_VERSION, hardware_api=hardware
     )
     yield c
     # Manually clean up all the modules.
@@ -305,12 +271,12 @@ async def ctx(
 
 @pytest.fixture()
 async def smoothie(
+    virtual_smoothie_env: None,
     monkeypatch: pytest.MonkeyPatch,
 ) -> AsyncGenerator[SmoothieDriverType, None]:
     from opentrons.drivers.smoothie_drivers import SmoothieDriver
     from opentrons.config import robot_configs
 
-    monkeypatch.setenv("ENABLE_VIRTUAL_SMOOTHIE", "true")
     driver = SmoothieDriver(
         robot_configs.load_ot2(), SimulatingGPIOCharDev("simulated")
     )
@@ -321,26 +287,19 @@ async def smoothie(
     except AttributeError:
         # if the test disconnected
         pass
-    monkeypatch.setenv("ENABLE_VIRTUAL_SMOOTHIE", "false")
 
 
-@pytest.fixture()
-def hardware_controller_lockfile() -> Generator[str, None, None]:
-    old_lockfile = config.CONFIG["hardware_controller_lockfile"]
-    with tempfile.TemporaryDirectory() as td:
-        config.CONFIG["hardware_controller_lockfile"] = (
-            pathlib.Path(td) / "hardware.lock"
-        )
-        yield td
-        config.CONFIG["hardware_controller_lockfile"] = old_lockfile
+@pytest.fixture
+def hardware_controller_lockfile(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: pathlib.Path
+) -> pathlib.Path:
+    lockfile_dir = tmp_path / "hardware_controller_lockfile"
+    lockfile_dir.mkdir()
+    lockfile = lockfile_dir / "hardware.lock"
 
+    monkeypatch.setitem(config.CONFIG, "hardware_controller_lockfile", lockfile)
 
-@pytest.fixture()
-def running_on_pi() -> Generator[None, None, None]:
-    oldpi = config.IS_ROBOT
-    config.IS_ROBOT = True
-    yield
-    config.IS_ROBOT = oldpi
+    return lockfile_dir
 
 
 @pytest.mark.skipif(

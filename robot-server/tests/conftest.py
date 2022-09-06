@@ -23,11 +23,9 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons import config
 from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
-from opentrons.calibration_storage import delete, modify, helpers
+from opentrons.calibration_storage import modify, helpers
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Mount
-from opentrons.protocols.geometry.deck import Deck
 
 from robot_server import app
 from robot_server.hardware import get_hardware
@@ -200,24 +198,6 @@ def attach_pipettes(server_temp_directory: str) -> Iterator[None]:
         json.dump(pipette, pipette_file)
     yield
     os.remove(pipette_file_path)
-
-
-@pytest.fixture
-def set_up_index_file_temporary_directory(server_temp_directory: str) -> None:
-    delete.clear_calibrations()
-    deck = Deck()
-    labware_list = [
-        "nest_96_wellplate_2ml_deep",
-        "corning_384_wellplate_112ul_flat",
-        "geb_96_tiprack_1000ul",
-        "nest_12_reservoir_15ml",
-        "opentrons_96_tiprack_10ul",
-    ]
-    for idx, name in enumerate(labware_list):
-        parent = deck.position_for(idx + 1)
-        definition = labware.get_labware_definition(name)
-        lw = labware.Labware(implementation=LabwareImplementation(definition, parent))
-        labware.save_calibration(lw, Point(0, 0, 0))
 
 
 @pytest.fixture

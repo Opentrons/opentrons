@@ -53,7 +53,7 @@ per-file-ignores =
     tests/opentrons/data/*:ANN,D
     tests/opentrons/drivers/*:ANN,D
     tests/opentrons/hardware_control/*:ANN,D
-    tests/opentrons/protocol_api/*:ANN,D
+    tests/opentrons/protocol_api_old/*:ANN,D
     tests/opentrons/protocols/*:ANN,D
     tests/opentrons/system/*:ANN,D
     tests/opentrons/tools/*:ANN,D

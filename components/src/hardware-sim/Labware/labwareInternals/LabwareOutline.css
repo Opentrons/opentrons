@@ -12,5 +12,4 @@
 
 .hover_outline {
   stroke: #006cfa;
-  filter: drop-shadow(0 0 3px rgba(0, 108, 250, 1));
 }

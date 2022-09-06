@@ -44,7 +44,7 @@ describe('RobotSettings FactoryResetModal', () => {
   it('should render title, description, and buttons', () => {
     const [{ getByText, getByRole }] = render({
       closeModal: mockCloseModal,
-      isRobotConnected: true,
+      isRobotReachable: true,
       robotName: ROBOT_NAME,
       resetOptions: mockResetOptions,
     })
@@ -61,7 +61,7 @@ describe('RobotSettings FactoryResetModal', () => {
     }
     const [{ getByRole }] = render({
       closeModal: mockCloseModal,
-      isRobotConnected: true,
+      isRobotReachable: true,
       robotName: ROBOT_NAME,
       resetOptions: clearMockResetOptions,
     })
@@ -77,7 +77,7 @@ describe('RobotSettings FactoryResetModal', () => {
   it('should close the modal when clicking the Cancel button', () => {
     const [{ getByRole }] = render({
       closeModal: mockCloseModal,
-      isRobotConnected: true,
+      isRobotReachable: true,
       robotName: ROBOT_NAME,
       resetOptions: mockResetOptions,
     })
@@ -89,7 +89,7 @@ describe('RobotSettings FactoryResetModal', () => {
   it('should close the modal when clicking the close icon button', () => {
     const [{ getByTestId }] = render({
       closeModal: mockCloseModal,
-      isRobotConnected: true,
+      isRobotReachable: true,
       robotName: ROBOT_NAME,
       resetOptions: mockResetOptions,
     })
@@ -104,7 +104,7 @@ describe('RobotSettings FactoryResetModal', () => {
   it('should render title, description, and button-UNREACHABLE', () => {
     const [{ getByText, getByRole }] = render({
       closeModal: mockCloseModal,
-      isRobotConnected: false,
+      isRobotReachable: false,
       robotName: ROBOT_NAME,
       resetOptions: {},
     })
@@ -118,7 +118,7 @@ describe('RobotSettings FactoryResetModal', () => {
   it('should close the modal when clicking the Close button-UNREACHABLE', () => {
     const [{ getByRole }] = render({
       closeModal: mockCloseModal,
-      isRobotConnected: false,
+      isRobotReachable: false,
       robotName: ROBOT_NAME,
       resetOptions: {},
     })
@@ -131,7 +131,7 @@ describe('RobotSettings FactoryResetModal', () => {
   it('should close the modal when clicking the close icon button-UNREACHABLE', () => {
     const [{ getByTestId }] = render({
       closeModal: mockCloseModal,
-      isRobotConnected: false,
+      isRobotReachable: false,
       robotName: ROBOT_NAME,
       resetOptions: {},
     })

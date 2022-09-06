@@ -28,6 +28,7 @@ plate = LoadedLabware(
     location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-plate-uri",
     offsetId=None,
+    displayName="Fancy Plate Name",
 )
 
 reservoir = LoadedLabware(
@@ -237,6 +238,27 @@ def test_get_wells(falcon_tuberack_def: LabwareDefinition) -> None:
     expected_wells = ["A1", "B1", "A2", "B2", "A3", "B3"]
     result = subject.get_wells(labware_id="tube-rack-id")
     assert result == expected_wells
+
+
+def test_labware_has_well(falcon_tuberack_def: LabwareDefinition) -> None:
+    """It should return a list of wells from definition."""
+    subject = get_labware_view(
+        labware_by_id={"tube-rack-id": tube_rack},
+        definitions_by_uri={"some-tube-rack-uri": falcon_tuberack_def},
+    )
+
+    result = subject.validate_liquid_allowed_in_labware(
+        labware_id="tube-rack-id", wells={"A1": 30, "B1": 100}
+    )
+    assert result == ["A1", "B1"]
+
+    with pytest.raises(errors.WellDoesNotExistError):
+        subject.validate_liquid_allowed_in_labware(
+            labware_id="tube-rack-id", wells={"AA": 30}
+        )
+
+    with pytest.raises(errors.LabwareNotLoadedError):
+        subject.validate_liquid_allowed_in_labware(labware_id="no-id", wells={"A1": 30})
 
 
 def test_get_well_columns(falcon_tuberack_def: LabwareDefinition) -> None:
@@ -593,3 +615,16 @@ def test_find_applicable_labware_offset() -> None:
         )
         is None
     )
+
+
+def test_get_display_name() -> None:
+    """It should get a labware's user-specified display name."""
+    subject = get_labware_view(
+        labware_by_id={
+            "plate_with_display_name": plate,
+            "reservoir_without_display_name": reservoir,
+        },
+    )
+
+    assert subject.get_display_name("plate_with_display_name") == "Fancy Plate Name"
+    assert subject.get_display_name("reservoir_without_display_name") is None

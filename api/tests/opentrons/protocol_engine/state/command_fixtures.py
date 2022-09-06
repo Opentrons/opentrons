@@ -3,11 +3,11 @@ from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional, cast
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine import ErrorOccurrence, commands as cmd
 from opentrons.protocol_engine.types import (
-    PipetteName,
     WellLocation,
     LabwareLocation,
 )
@@ -109,6 +109,7 @@ def create_load_labware_command(
     location: LabwareLocation,
     definition: LabwareDefinition,
     offset_id: Optional[str],
+    display_name: Optional[str],
 ) -> cmd.LoadLabware:
     """Create a completed LoadLabware command."""
     params = cmd.LoadLabwareParams(
@@ -117,10 +118,13 @@ def create_load_labware_command(
         version=definition.version,
         location=location,
         labwareId=None,
+        displayName=display_name,
     )
 
     result = cmd.LoadLabwareResult(
-        labwareId=labware_id, definition=definition, offsetId=offset_id
+        labwareId=labware_id,
+        definition=definition,
+        offsetId=offset_id,
     )
 
     return cmd.LoadLabware(
@@ -135,7 +139,7 @@ def create_load_labware_command(
 
 def create_load_pipette_command(
     pipette_id: str,
-    pipette_name: PipetteName,
+    pipette_name: PipetteNameType,
     mount: MountType,
 ) -> cmd.LoadPipette:
     """Get a completed LoadPipette command."""
@@ -201,6 +205,29 @@ def create_dispense_command(
     result = cmd.DispenseResult(volume=volume)
 
     return cmd.Dispense(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_dispense_in_place_command(
+    pipette_id: str,
+    volume: float,
+    flow_rate: float,
+) -> cmd.DispenseInPlace:
+    """Get a completed DispenseInPlace command."""
+    params = cmd.DispenseInPlaceParams(
+        pipetteId=pipette_id,
+        volume=volume,
+        flowRate=flow_rate,
+    )
+    result = cmd.DispenseInPlaceResult(volume=volume)
+
+    return cmd.DispenseInPlace(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,

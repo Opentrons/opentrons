@@ -169,12 +169,20 @@ settings = [
     ),
     SettingDefinition(
         _id="enableOT3HardwareController",
-        title="Enable experimental OT3 hardware controller",
+        title="Enable experimental OT-3 hardware controller",
         description=(
             "Do not enable. This is an Opentrons-internal setting to test "
             "new hardware."
         ),
         restart_required=True,
+    ),
+    SettingDefinition(
+        _id="enableProtocolEnginePAPICore",
+        title="Enable experimental execution core for Python protocols",
+        description=(
+            "This is an Opentrons-internal setting to test new execution logic."
+            " Do not enable."
+        ),
     ),
 ]
 
@@ -462,6 +470,16 @@ def _migrate15to16(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate16to17(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 17 of the advanced settings file.
+
+    - Adds enableProtocolEnginePAPICore option
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableProtocolEnginePAPICore"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -479,6 +497,7 @@ _MIGRATIONS = [
     _migrate13to14,
     _migrate14to15,
     _migrate15to16,
+    _migrate16to17,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

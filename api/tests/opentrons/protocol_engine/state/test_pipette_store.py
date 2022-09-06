@@ -1,10 +1,13 @@
 """Tests for pipette state changes in the protocol_engine state store."""
 import pytest
 from datetime import datetime
+from typing import Optional
 
-from opentrons.types import MountType
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
+from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.types import DeckPoint, LoadedPipette, PipetteName
+from opentrons.protocol_engine.types import DeckPoint, DeckSlotLocation, LoadedPipette
 from opentrons.protocol_engine.actions import UpdateCommandAction
 from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
@@ -16,6 +19,7 @@ from .command_fixtures import (
     create_load_pipette_command,
     create_aspirate_command,
     create_dispense_command,
+    create_dispense_in_place_command,
     create_pick_up_tip_command,
     create_drop_tip_command,
     create_move_to_well_command,
@@ -45,7 +49,7 @@ def test_handles_load_pipette(subject: PipetteStore) -> None:
     """It should add the pipette data to the state."""
     command = create_load_pipette_command(
         pipette_id="pipette-id",
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
@@ -55,7 +59,7 @@ def test_handles_load_pipette(subject: PipetteStore) -> None:
 
     assert result.pipettes_by_id["pipette-id"] == LoadedPipette(
         id="pipette-id",
-        pipetteName=PipetteName.P300_SINGLE,
+        pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
     assert result.aspirated_volume_by_id["pipette-id"] == 0
@@ -65,7 +69,7 @@ def test_pipette_volume_adds_aspirate(subject: PipetteStore) -> None:
     """It should add volume to pipette after an aspirate."""
     load_command = create_load_pipette_command(
         pipette_id="pipette-id",
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
     aspirate_command = create_aspirate_command(
@@ -106,21 +110,29 @@ def test_handles_blow_out(subject: PipetteStore) -> None:
     )
 
 
-def test_pipette_volume_subtracts_dispense(subject: PipetteStore) -> None:
+@pytest.mark.parametrize(
+    "dispense_command",
+    [
+        create_dispense_command(pipette_id="pipette-id", volume=21, flow_rate=1.23),
+        create_dispense_in_place_command(
+            pipette_id="pipette-id",
+            volume=21,
+            flow_rate=1.23,
+        ),
+    ],
+)
+def test_pipette_volume_subtracts_dispense(
+    subject: PipetteStore, dispense_command: cmd.Command
+) -> None:
     """It should subtract volume from pipette after a dispense."""
     load_command = create_load_pipette_command(
         pipette_id="pipette-id",
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
     aspirate_command = create_aspirate_command(
         pipette_id="pipette-id",
         volume=42,
-        flow_rate=1.23,
-    )
-    dispense_command = create_dispense_command(
-        pipette_id="pipette-id",
-        volume=21,
         flow_rate=1.23,
     )
 
@@ -229,7 +241,7 @@ def test_movement_commands_update_current_well(
     """It should save the last used pipette, labware, and well for movement commands."""
     load_pipette_command = create_load_pipette_command(
         pipette_id=command.params.pipetteId,  # type: ignore[arg-type, union-attr]
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
@@ -306,7 +318,7 @@ def test_movement_commands_without_well_clear_current_well(
     """Commands that make the current well unknown should clear the current well."""
     load_pipette_command = create_load_pipette_command(
         pipette_id="pipette-id",
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
     move_command = create_move_to_well_command(
@@ -351,10 +363,10 @@ def test_movement_commands_without_well_clear_current_well(
 def test_heater_shaker_command_without_movement(
     subject: PipetteStore, command: cmd.Command
 ) -> None:
-    """Heater Shaker commands that dont't move pipettes shouldn't clear current_well."""
+    """Heater Shaker commands that don't move pipettes shouldn't clear current_well."""
     load_pipette_command = create_load_pipette_command(
         pipette_id="pipette-id",
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
     move_command = create_move_to_well_command(
@@ -374,12 +386,82 @@ def test_heater_shaker_command_without_movement(
     )
 
 
+@pytest.mark.parametrize(
+    ("move_labware_command", "expected_current_well"),
+    (
+        (
+            cmd.MoveLabware(
+                id="move-labware-command-id",
+                key="move-labware-command-key",
+                status=cmd.CommandStatus.SUCCEEDED,
+                createdAt=datetime.now(),
+                params=cmd.MoveLabwareParams(
+                    labwareId="non-matching-labware-id",
+                    newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                ),
+                result=cmd.MoveLabwareResult(offsetId=None),
+            ),
+            # Current well NOT cleared,
+            # because MoveLabware command had "non-matching-labware-id".
+            CurrentWell(
+                pipette_id="pipette-id",
+                labware_id="matching-labware-id",
+                well_name="well-name",
+            ),
+        ),
+        (
+            cmd.MoveLabware(
+                id="move-labware-command-id",
+                key="move-labware-command-key",
+                status=cmd.CommandStatus.SUCCEEDED,
+                createdAt=datetime.now(),
+                params=cmd.MoveLabwareParams(
+                    labwareId="matching-labware-id",
+                    newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                ),
+                result=cmd.MoveLabwareResult(offsetId=None),
+            ),
+            # Current well IS cleared,
+            # because MoveLabware command had "matching-labware-id".
+            None,
+        ),
+    ),
+)
+def test_move_labware_clears_current_well_if_belonged_to_moved_labware(
+    subject: PipetteStore,
+    move_labware_command: cmd.MoveLabware,
+    expected_current_well: Optional[CurrentWell],
+) -> None:
+    """`moveLabware` commands should sometimes clear the current well.
+
+    * When the current well belongs to the labware that was moved,
+      it should be cleared.
+    * Otherwise, it should be left alone.
+    """
+    load_pipette_command = create_load_pipette_command(
+        pipette_id="pipette-id",
+        pipette_name=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+    move_to_well_command = create_move_to_well_command(
+        pipette_id="pipette-id",
+        labware_id="matching-labware-id",
+        well_name="well-name",
+    )
+
+    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+    subject.handle_action(UpdateCommandAction(command=move_to_well_command))
+
+    subject.handle_action(UpdateCommandAction(command=move_labware_command))
+    assert subject.state.current_well == expected_current_well
+
+
 def test_tip_commands_update_has_tip(subject: PipetteStore) -> None:
     """It should update has_tip after a successful pickUpTip command."""
     pipette_id = "pipette-id"
     load_pipette_command = create_load_pipette_command(
         pipette_id=pipette_id,
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 

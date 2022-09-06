@@ -14,7 +14,7 @@ from opentrons.hardware_control.modules import LiveData
 
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
-from ..types import LabwareOffsetCreate, ModuleDefinition
+from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
 
 
 @dataclass(frozen=True)
@@ -135,6 +135,13 @@ class AddLabwareDefinitionAction:
 
 
 @dataclass(frozen=True)
+class AddLiquidAction:
+    """Add a liquid, to apply to subsequent `LoadLiquid`s."""
+
+    liquid: Liquid
+
+
+@dataclass(frozen=True)
 class AddModuleAction:
     """Add an attached module directly to state without a location."""
 
@@ -157,4 +164,5 @@ Action = Union[
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddModuleAction,
+    AddLiquidAction,
 ]

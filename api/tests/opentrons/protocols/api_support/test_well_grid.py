@@ -2,9 +2,9 @@ from typing import List
 
 import pytest
 from opentrons.protocols.api_support.well_grid import WellGrid
-from opentrons.protocols.context.well import WellImplementation
+from opentrons.protocol_api.core.protocol_api.well import WellImplementation
 
-NONE: list = []
+NONE: List[str] = []
 ONE_VAL = ["A1"]
 NORMAL = [
     "A1",

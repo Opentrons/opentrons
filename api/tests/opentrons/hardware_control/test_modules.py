@@ -244,6 +244,32 @@ async def mod_thermocycler():
 
 
 @pytest.fixture
+async def mod_thermocycler_gen2():
+    from opentrons.hardware_control import modules
+
+    loop = asyncio.get_running_loop()
+
+    usb_port = USBPort(
+        name="",
+        hub=None,
+        port_number=0,
+        device_path="/dev/ot_module_sim_thermocycler0",
+    )
+
+    thermocycler = await modules.build(
+        port="/dev/ot_module_sim_thermocycler0",
+        usb_port=usb_port,
+        which="thermocycler",
+        simulating=True,
+        loop=loop,
+        execution_manager=ExecutionManager(),
+        sim_model="thermocyclerModuleV2",
+    )
+    yield thermocycler
+    await thermocycler.cleanup()
+
+
+@pytest.fixture
 async def mod_heatershaker():
     from opentrons.hardware_control import modules
 
@@ -269,7 +295,12 @@ async def mod_heatershaker():
 
 
 async def test_module_update_integration(
-    monkeypatch, mod_tempdeck, mod_magdeck, mod_thermocycler, mod_heatershaker
+    monkeypatch,
+    mod_tempdeck,
+    mod_magdeck,
+    mod_thermocycler,
+    mod_heatershaker,
+    mod_thermocycler_gen2,
 ):
     from opentrons.hardware_control import modules
 
@@ -335,15 +366,32 @@ async def test_module_update_integration(
     )
     monkeypatch.setattr(modules.update, "upload_via_dfu", upload_via_dfu_mock)
 
-    async def mock_find_dfu_device(pid: str):
-        return "df11"
+    async def mock_find_dfu_device_hs(pid: str, expected_device_count: int):
+        if expected_device_count == 2:
+            return "df11"
+        return "none"
 
-    monkeypatch.setattr(modules.update, "find_dfu_device", mock_find_dfu_device)
+    monkeypatch.setattr(modules.update, "find_dfu_device", mock_find_dfu_device_hs)
 
     await modules.update_firmware(mod_heatershaker, "fake_fw_file_path", loop)
     upload_via_dfu_mock.assert_called_once_with(
         "df11", "fake_fw_file_path", bootloader_kwargs
     )
+    upload_via_dfu_mock.reset_mock()
+
+    async def mock_find_dfu_device_tc2(pid: str, expected_device_count: int):
+        if expected_device_count == 3:
+            return "df11"
+        return "none"
+
+    monkeypatch.setattr(modules.update, "find_dfu_device", mock_find_dfu_device_tc2)
+
+    await modules.update_firmware(mod_thermocycler_gen2, "fake_fw_file_path", loop)
+    upload_via_dfu_mock.assert_called_once_with(
+        "df11", "fake_fw_file_path", bootloader_kwargs
+    )
+
+    mod_thermocycler_gen2
 
 
 async def test_get_bundled_fw(monkeypatch, tmpdir):
@@ -358,6 +406,9 @@ async def test_get_bundled_fw(monkeypatch, tmpdir):
     dummy_tc_file = Path(tmpdir) / "thermocycler@v0.1.2.bin"
     dummy_tc_file.write_text("hello")
 
+    dummy_hs_file = Path(tmpdir) / "heater-shaker@v2.10.2.bin"
+    dummy_hs_file.write_text("hello")
+
     dummy_bogus_file = Path(tmpdir) / "thermoshaker@v6.6.6.bin"
     dummy_bogus_file.write_text("hello")
 
@@ -366,7 +417,7 @@ async def test_get_bundled_fw(monkeypatch, tmpdir):
 
     from opentrons.hardware_control import API
 
-    mods = ["tempdeck", "magdeck", "thermocycler"]
+    mods = ["tempdeck", "magdeck", "thermocycler", "heatershaker"]
     api = await API.build_hardware_simulator(attached_modules=mods)
     await asyncio.sleep(0.05)
 
@@ -379,8 +430,32 @@ async def test_get_bundled_fw(monkeypatch, tmpdir):
     assert api.attached_modules[2].bundled_fw == BundledFirmware(
         version="0.1.2", path=dummy_tc_file
     )
+    assert api.attached_modules[3].bundled_fw == BundledFirmware(
+        version="2.10.2", path=dummy_hs_file
+    )
     for m in api.attached_modules:
         await m.cleanup()
+
+
+async def test_get_thermocycler_bundled_fw(
+    mod_thermocycler, mod_thermocycler_gen2, monkeypatch, tmpdir
+):
+    from opentrons.hardware_control import modules
+
+    dummy_tc_file = Path(tmpdir) / "thermocycler@v0.1.2.bin"
+    dummy_tc_file.write_text("hello")
+    dummy_tc2_file = Path(tmpdir) / "thermocycler-gen2@v1.9.9.bin"
+    dummy_tc2_file.write_text("hello")
+
+    monkeypatch.setattr(modules.mod_abc, "ROBOT_FIRMWARE_DIR", Path(tmpdir))
+    monkeypatch.setattr(modules.mod_abc, "IS_ROBOT", True)
+
+    assert mod_thermocycler.get_bundled_fw() == BundledFirmware(
+        version="0.1.2", path=dummy_tc_file
+    )
+    assert mod_thermocycler_gen2.get_bundled_fw() == BundledFirmware(
+        version="1.9.9", path=dummy_tc2_file
+    )
 
 
 @pytest.mark.parametrize(

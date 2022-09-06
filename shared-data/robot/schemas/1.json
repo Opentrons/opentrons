@@ -1,0 +1,30 @@
+{
+  "$id": "opentronsRobotSchemaV1",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "robotName": {
+      "type": "string",
+      "enum": ["OT-2 Standard", "OT-3 Standard"]
+    }
+  },
+  "description": "Describes an Opentrons liquid handling robot.",
+  "type": "object",
+  "required": ["displayName", "robotName", "models"],
+  "properties": {
+    "displayName": {
+      "description": "A user-facing friendly name for the machine.",
+      "type": "string"
+    },
+    "robotName": {
+      "description": "A machine-readable but still printable name for the machine.",
+      "type": "#/definitions/robotName"
+    },
+    "models": {
+      "description": "A list of robot models.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

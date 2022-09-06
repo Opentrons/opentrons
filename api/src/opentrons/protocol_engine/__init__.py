@@ -33,12 +33,12 @@ from .types import (
     LoadedLabware,
     LoadedModule,
     LoadedPipette,
-    PipetteName,
     WellLocation,
     WellOrigin,
     WellOffset,
     ModuleModel,
     ModuleDefinition,
+    Liquid,
 )
 
 
@@ -77,12 +77,12 @@ __all__ = [
     "LoadedLabware",
     "LoadedModule",
     "LoadedPipette",
-    "PipetteName",
     "WellLocation",
     "WellOrigin",
     "WellOffset",
     "ModuleModel",
     "ModuleDefinition",
+    "Liquid",
     # plugins
     "AbstractPlugin",
 ]

@@ -7,14 +7,14 @@ from typing import AsyncIterator, Set, Dict, Tuple, Union
 from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
 from opentrons_hardware.firmware_bindings.constants import ToolType, PipetteName
 from opentrons_hardware.firmware_bindings.messages import message_definitions
-from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings import NodeId, ArbitrationId
+from opentrons_hardware.instruments.serial_utils import model_versionstring_from_int
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from .types import (
     PipetteInformation,
     ToolSummary,
     GripperInformation,
 )
-
 from opentrons_hardware.hardware_control.tools.types import ToolDetectionResult
 
 log = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ def _handle_detection_result(
         try:
             return ToolType(i)
         except ValueError:
-            return ToolType.undefined_tool
+            return ToolType.tool_error
 
     return ToolDetectionResult(
         left=_check_tool(response.payload.z_motor.value),
@@ -80,6 +80,13 @@ class OneshotToolDetector:
         self._messenger = messenger
 
     @staticmethod
+    def _decode_or_default(orig: bytes) -> str:
+        try:
+            return orig.decode(errors="replace").split("\x00")[0]
+        except UnicodeDecodeError:
+            return repr(orig)
+
+    @staticmethod
     async def _await_responses(
         callback: WaitableCallback,
         for_nodes: Set[NodeId],
@@ -88,45 +95,66 @@ class OneshotToolDetector:
         """Wait for pipette or gripper information and send back through a queue."""
         seen: Set[NodeId] = set()
 
-        def _decode_or_default(orig: bytes) -> str:
-            try:
-                return orig.decode()
-            except UnicodeDecodeError:
-                return repr(orig)
-
         while not for_nodes.issubset(seen):
             async for response, arbitration_id in callback:
                 if isinstance(response, message_definitions.PipetteInfoResponse):
-                    node = NodeId(arbitration_id.parts.originating_node_id)
-                    seen.add(node)
-                    await response_queue.put(
-                        (
-                            node,
-                            PipetteInformation(
-                                name=PipetteName(response.payload.name.value),
-                                model=response.payload.model.value,
-                                serial=_decode_or_default(
-                                    response.payload.serial.value
-                                ),
-                            ),
-                        )
+                    node = await OneshotToolDetector._handle_pipette_info(
+                        response_queue, response, arbitration_id
                     )
+                    seen.add(node)
                     break
                 elif isinstance(response, message_definitions.GripperInfoResponse):
-                    node = NodeId(arbitration_id.parts.originating_node_id)
-                    seen.add(node)
-                    await response_queue.put(
-                        (
-                            node,
-                            GripperInformation(
-                                model=response.payload.model.value,
-                                serial=_decode_or_default(
-                                    response.payload.serial.value
-                                ),
-                            ),
-                        )
+                    node = await OneshotToolDetector._handle_gripper_info(
+                        response_queue, response, arbitration_id
                     )
+                    seen.add(node)
                     break
+
+    @staticmethod
+    async def _handle_gripper_info(
+        response_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation]]]",
+        response: message_definitions.GripperInfoResponse,
+        arbitration_id: ArbitrationId,
+    ) -> NodeId:
+        node = NodeId(arbitration_id.parts.originating_node_id)
+        await response_queue.put(
+            (
+                node,
+                GripperInformation(
+                    model=model_versionstring_from_int(response.payload.model.value),
+                    serial=OneshotToolDetector._decode_or_default(
+                        response.payload.serial.value
+                    ),
+                ),
+            )
+        )
+        return node
+
+    @staticmethod
+    async def _handle_pipette_info(
+        response_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation]]]",
+        response: message_definitions.PipetteInfoResponse,
+        arbitration_id: ArbitrationId,
+    ) -> NodeId:
+        node = NodeId(arbitration_id.parts.originating_node_id)
+        try:
+            name = PipetteName(response.payload.name.value)
+        except ValueError:
+            name = PipetteName.unknown
+        await response_queue.put(
+            (
+                node,
+                PipetteInformation(
+                    name=name,
+                    name_int=response.payload.name.value,
+                    model=model_versionstring_from_int(response.payload.model.value),
+                    serial=OneshotToolDetector._decode_or_default(
+                        response.payload.serial.value
+                    ),
+                ),
+            )
+        )
+        return node
 
     async def detect(self, timeout_sec: float = 1.0) -> ToolSummary:
         """Run once and detect tools."""
@@ -139,10 +167,7 @@ class OneshotToolDetector:
             should_respond: Set[NodeId] = set()
 
             def _should_query(attach_response: ToolType) -> bool:
-                return attach_response not in (
-                    ToolType.undefined_tool,
-                    ToolType.nothing_attached,
-                )
+                return attach_response != ToolType.nothing_attached
 
             if _should_query(attached.left):
                 should_respond.add(NodeId.pipette_left)

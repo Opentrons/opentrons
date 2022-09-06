@@ -36,7 +36,6 @@ import { useTrackEvent } from '../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
 import { getDeckCalibrationSession } from '../../../redux/sessions/deck-calibration/selectors'
 import { CONNECTABLE } from '../../../redux/discovery'
-import { selectors as robotSelectors } from '../../../redux/robot'
 import * as RobotApi from '../../../redux/robot-api'
 import * as Config from '../../../redux/config'
 import * as Sessions from '../../../redux/sessions'
@@ -51,6 +50,7 @@ import {
   useAttachedPipettes,
   useAttachedPipetteCalibrations,
   useRunStartedOrLegacySessionInProgress,
+  useRunStatuses,
 } from '../hooks'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
@@ -66,6 +66,7 @@ import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,
 } from '../../../redux/pipettes/types'
+import { fetchAllSessions } from '../../../redux/sessions'
 
 const CALS_FETCH_MS = 5000
 
@@ -145,6 +146,9 @@ export function RobotSettingsCalibration({
   })
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
   const dispatch = useDispatch<Dispatch>()
+  React.useEffect(() => {
+    dispatch(fetchAllSessions(robotName))
+  }, [])
 
   const [dispatchRequests] = RobotApi.useDispatchApiRequests(
     dispatchedAction => {
@@ -183,7 +187,7 @@ export function RobotSettingsCalibration({
   const attachedPipettes = useAttachedPipettes()
   const attachedPipetteCalibrations = useAttachedPipetteCalibrations(robotName)
 
-  const isRunning = useSelector(robotSelectors.getIsRunning)
+  const { isRunRunning: isRunning } = useRunStatuses()
 
   const pipetteCalPresent = attachedPipetteCalPresent(
     attachedPipettes,
@@ -424,7 +428,7 @@ export function RobotSettingsCalibration({
 
   const checkDeckCalibrationStatus = (): 'error' | 'warning' | null => {
     if (
-      deckCalibrationStatus &&
+      deckCalibrationStatus != null &&
       deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_OK
     ) {
       return 'error'

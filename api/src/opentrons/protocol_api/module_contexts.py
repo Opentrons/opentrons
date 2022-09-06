@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import logging
 from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, cast
 
@@ -12,19 +11,21 @@ from opentrons.hardware_control.types import Axis
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import requires_version
 
+from opentrons.protocols.geometry.module_geometry import (
+    ModuleGeometry,
+    ThermocyclerGeometry,
+    HeaterShakerGeometry,
+)
+
+from . import validation
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,
     validate_heater_shaker_speed,
 )
 from .labware import Labware, load, load_from_definition
 from .load_info import LabwareLoadInfo
-from opentrons.protocols.geometry.module_geometry import (
-    ModuleGeometry,
-    ThermocyclerGeometry,
-    HeaterShakerGeometry,
-)
-from opentrons.protocols.api_support.util import requires_version
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
@@ -96,34 +97,35 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
                         :py:meth:`load_labware`.
         :returns: The properly-linked labware object
         """
+        # TODO(mc, 2022-09-02): move to module_core
         mod_labware = self._geometry.add_labware(labware)
-        labware_namespace, labware_load_name, labware_version = labware.uri.split("/")
-        module_loc = self._geometry.parent
 
-        assert isinstance(module_loc, (int, str)), "Unexpected labware object parent"
-        deck_slot = types.DeckSlotName.from_primitive(module_loc)
+        labware_core = mod_labware._implementation
+        deck_slot = validation.ensure_deck_slot(self._geometry.parent)  # type: ignore[arg-type]
+        load_params = labware_core.get_load_params()
 
         provided_offset = self._ctx._labware_offset_provider.find(
-            labware_definition_uri=labware.uri,
+            load_params=load_params,
             requested_module_model=self.requested_as,
             deck_slot=deck_slot,
         )
 
-        labware.set_calibration(provided_offset.delta)
+        labware_core.set_calibration(provided_offset.delta)
         self._ctx._implementation.get_deck().recalculate_high_z()
 
         self._ctx.equipment_broker.publish(
             LabwareLoadInfo(
-                labware_definition=labware._implementation.get_definition(),
-                labware_namespace=labware_namespace,
-                labware_load_name=labware_load_name,
-                labware_version=int(labware_version),
+                labware_definition=labware_core.get_definition(),
+                labware_namespace=load_params.namespace,
+                labware_load_name=load_params.load_name,
+                labware_version=load_params.version,
                 deck_slot=deck_slot,
                 on_module=True,
                 offset_id=provided_offset.offset_id,
-                labware_display_name=labware._implementation.get_label(),
+                labware_display_name=labware_core.get_user_display_name(),
             )
         )
+
         return mod_labware
 
     @requires_version(2, 0)
@@ -277,10 +279,8 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
         geometry: ModuleGeometry,
         requested_as: ModuleModel,
         at_version: APIVersion,
-        loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._module = hw_module
-        self._loop = loop
         super().__init__(ctx, geometry, requested_as, at_version)
 
     @publish(command=cmds.tempdeck_set_temp)
@@ -364,10 +364,8 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         geometry: ModuleGeometry,
         requested_as: ModuleModel,
         at_version: APIVersion,
-        loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._module = hw_module
-        self._loop = loop
         super().__init__(ctx, geometry, requested_as, at_version)
 
     @publish(command=cmds.magdeck_calibrate)
@@ -531,10 +529,8 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         geometry: ThermocyclerGeometry,
         requested_as: ModuleModel,
         at_version: APIVersion,
-        loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._module = hw_module
-        self._loop = loop
         super().__init__(ctx, geometry, requested_as, at_version)
 
     def _prepare_for_lid_move(self) -> None:
@@ -805,10 +801,8 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         geometry: HeaterShakerGeometry,
         requested_as: ModuleModel,
         at_version: APIVersion,
-        loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._module = hw_module
-        self._loop = loop
         super().__init__(ctx, geometry, requested_as, at_version)
 
     @property  # type: ignore[misc]

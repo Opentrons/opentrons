@@ -7,7 +7,7 @@ from opentrons_shared_data.pipette import name_for_model
 
 
 @pytest.mark.parametrize(
-    "pipette_model", ["p1000_single_v3.0", "p300_single_v3.0", "p20_single_v3.0"]
+    "pipette_model", ["p1000_single_v3.0", "p1000_single_v3.1", "p50_multi_v3.1"]
 )
 async def test_transforms_roundtrip(pipette_model):
     attached = {
@@ -30,7 +30,7 @@ async def test_transforms_roundtrip(pipette_model):
 
 
 @pytest.mark.parametrize(
-    "pipette_model", ["p1000_single_v3.0", "p300_single_v3.0", "p20_single_v3.0"]
+    "pipette_model", ["p1000_single_v3.0", "p50_single_v3.1", "p1000_multi_v3.1"]
 )
 async def test_transform_values(pipette_model):
     attached = {

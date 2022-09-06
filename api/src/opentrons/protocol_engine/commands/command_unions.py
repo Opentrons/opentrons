@@ -38,6 +38,14 @@ from .dispense import (
     DispenseCommandType,
 )
 
+from .dispense_in_place import (
+    DispenseInPlace,
+    DispenseInPlaceParams,
+    DispenseInPlaceCreate,
+    DispenseInPlaceResult,
+    DispenseInPlaceCommandType,
+)
+
 from .drop_tip import (
     DropTip,
     DropTipParams,
@@ -62,6 +70,14 @@ from .load_labware import (
     LoadLabwareCommandType,
 )
 
+from .load_liquid import (
+    LoadLiquid,
+    LoadLiquidParams,
+    LoadLiquidCreate,
+    LoadLiquidResult,
+    LoadLiquidCommandType,
+)
+
 from .load_module import (
     LoadModule,
     LoadModuleParams,
@@ -76,6 +92,14 @@ from .load_pipette import (
     LoadPipetteCreate,
     LoadPipetteResult,
     LoadPipetteCommandType,
+)
+
+from .move_labware import (
+    MoveLabware,
+    MoveLabwareParams,
+    MoveLabwareCreate,
+    MoveLabwareResult,
+    MoveLabwareCommandType,
 )
 
 from .move_relative import (
@@ -154,12 +178,15 @@ Command = Union[
     Aspirate,
     Custom,
     Dispense,
+    DispenseInPlace,
     BlowOut,
     DropTip,
     Home,
     LoadLabware,
+    LoadLiquid,
     LoadModule,
     LoadPipette,
+    MoveLabware,
     MoveRelative,
     MoveToCoordinates,
     MoveToWell,
@@ -196,12 +223,15 @@ CommandParams = Union[
     AspirateParams,
     CustomParams,
     DispenseParams,
+    DispenseInPlaceParams,
     BlowOutParams,
     DropTipParams,
     HomeParams,
     LoadLabwareParams,
+    LoadLiquidParams,
     LoadModuleParams,
     LoadPipetteParams,
+    MoveLabwareParams,
     MoveRelativeParams,
     MoveToCoordinatesParams,
     MoveToWellParams,
@@ -239,12 +269,15 @@ CommandType = Union[
     AspirateCommandType,
     CustomCommandType,
     DispenseCommandType,
+    DispenseInPlaceCommandType,
     BlowOutCommandType,
     DropTipCommandType,
     HomeCommandType,
     LoadLabwareCommandType,
+    LoadLiquidCommandType,
     LoadModuleCommandType,
     LoadPipetteCommandType,
+    MoveLabwareCommandType,
     MoveRelativeCommandType,
     MoveToCoordinatesCommandType,
     MoveToWellCommandType,
@@ -280,12 +313,15 @@ CommandType = Union[
 CommandCreate = Union[
     AspirateCreate,
     DispenseCreate,
+    DispenseInPlaceCreate,
     BlowOutCreate,
     DropTipCreate,
     HomeCreate,
     LoadLabwareCreate,
+    LoadLiquidCreate,
     LoadModuleCreate,
     LoadPipetteCreate,
+    MoveLabwareCreate,
     MoveRelativeCreate,
     MoveToCoordinatesCreate,
     MoveToWellCreate,
@@ -322,12 +358,15 @@ CommandResult = Union[
     AspirateResult,
     CustomResult,
     DispenseResult,
+    DispenseInPlaceResult,
     BlowOutResult,
     DropTipResult,
     HomeResult,
     LoadLabwareResult,
+    LoadLiquidResult,
     LoadModuleResult,
     LoadPipetteResult,
+    MoveLabwareResult,
     MoveRelativeResult,
     MoveToCoordinatesResult,
     MoveToWellResult,
