@@ -32,7 +32,8 @@
       "opentrons/opentrons_96_tiprack_10ul/1",
       "opentrons/opentrons_96_filtertiprack_10ul/1",
       "opentrons/geb_96_tiprack_10ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot2.json"
   },
   "p10_multi": {
     "displayName": "P10 8-Channel GEN1",
@@ -67,7 +68,8 @@
       "opentrons/opentrons_96_tiprack_10ul/1",
       "opentrons/opentrons_96_filtertiprack_10ul/1",
       "opentrons/geb_96_tiprack_10ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot2.json"
   },
   "p20_single_gen2": {
     "displayName": "P20 Single-Channel GEN2",
@@ -113,7 +115,8 @@
       "opentrons/opentrons_96_tiprack_10ul/1",
       "opentrons/opentrons_96_filtertiprack_10ul/1",
       "opentrons/geb_96_tiprack_10ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot2.json"
   },
   "p20_multi_gen2": {
     "displayName": "P20 8-Channel GEN2",
@@ -156,7 +159,8 @@
       "opentrons/opentrons_96_tiprack_10ul/1",
       "opentrons/opentrons_96_filtertiprack_10ul/1",
       "opentrons/geb_96_tiprack_10ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot2.json"
   },
   "p50_single": {
     "displayName": "P50 Single-Channel GEN1",
@@ -190,7 +194,8 @@
     "defaultTipracks": [
       "opentrons/opentrons_96_tiprack_300ul/1",
       "opentrons/opentrons_96_filtertiprack_200ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot2.json"
   },
   "p50_multi": {
     "displayName": "P50 8-Channel GEN1",
@@ -224,7 +229,8 @@
     "defaultTipracks": [
       "opentrons/opentrons_96_tiprack_300ul/1",
       "opentrons/opentrons_96_filtertiprack_200ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot2.json"
   },
   "p300_single": {
     "displayName": "P300 Single-Channel GEN1",
@@ -258,7 +264,8 @@
     "defaultTipracks": [
       "opentrons/opentrons_96_tiprack_300ul/1",
       "opentrons/opentrons_96_filtertiprack_200ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot2.json"
   },
   "p300_single_gen2": {
     "displayName": "P300 Single-Channel GEN2",
@@ -301,7 +308,8 @@
     "defaultTipracks": [
       "opentrons/opentrons_96_tiprack_300ul/1",
       "opentrons/opentrons_96_filtertiprack_200ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot2.json"
   },
   "p300_multi_gen2": {
     "displayName": "P300 8-Channel GEN2",
@@ -341,7 +349,8 @@
     "defaultTipracks": [
       "opentrons/opentrons_96_tiprack_300ul/1",
       "opentrons/opentrons_96_filtertiprack_200ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot2.json"
   },
   "p300_multi": {
     "displayName": "P300 8-Channel GEN1",
@@ -375,7 +384,8 @@
     "defaultTipracks": [
       "opentrons/opentrons_96_tiprack_300ul/1",
       "opentrons/opentrons_96_filtertiprack_200ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot2.json"
   },
   "p1000_single": {
     "displayName": "P1000 Single-Channel GEN1",
@@ -410,7 +420,8 @@
       "opentrons/opentrons_96_tiprack_1000ul/1",
       "opentrons/opentrons_96_filtertiprack_1000ul/1",
       "opentrons/geb_96_tiprack_1000ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot2.json"
   },
   "p1000_single_gen2": {
     "displayName": "P1000 Single-Channel GEN2",
@@ -454,11 +465,12 @@
       "opentrons/opentrons_96_tiprack_1000ul/1",
       "opentrons/opentrons_96_filtertiprack_1000ul/1",
       "opentrons/geb_96_tiprack_1000ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot2.json"
   },
   "p50_single_gen3": {
     "displayName": "P50 Single-Channel GEN3",
-    "displayCategory": "GEN2",
+    "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
       "value": 7.85,
       "min": 3,
@@ -494,11 +506,12 @@
     "defaultTipracks": [
       "opentrons/opentrons_96_tiprack_300ul/1",
       "opentrons/opentrons_96_filtertiprack_200ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot3.json"
   },
   "p1000_single_gen3": {
     "displayName": "P1000 Single-Channel GEN3",
-    "displayCategory": "GEN2",
+    "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
       "value": 137.35,
       "min": 3,
@@ -538,11 +551,12 @@
       "opentrons/opentrons_96_tiprack_1000ul/1",
       "opentrons/opentrons_96_filtertiprack_1000ul/1",
       "opentrons/geb_96_tiprack_1000ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot3.json"
   },
   "p1000_multi_gen3": {
     "displayName": "P1000 8-Channel GEN3",
-    "displayCategory": "GEN2",
+    "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
       "value": 137.35,
       "min": 3,
@@ -580,11 +594,12 @@
       "opentrons/opentrons_96_tiprack_1000ul/1",
       "opentrons/opentrons_96_filtertiprack_1000ul/1",
       "opentrons/geb_96_tiprack_1000ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot3.json"
   },
   "p50_multi_gen3": {
     "displayName": "P50 8-Channel GEN3",
-    "displayCategory": "GEN2",
+    "displayCategory": "GEN3",
     "defaultAspirateFlowRate": {
       "value": 7.85,
       "min": 3,
@@ -620,6 +635,7 @@
     "defaultTipracks": [
       "opentrons/opentrons_96_tiprack_300ul/1",
       "opentrons/opentrons_96_filtertiprack_200ul/1"
-    ]
+    ],
+    "compatibleWithRobot": "/robot/definitions/1/ot3.json"
   }
 }
