@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Set
 from collections import OrderedDict
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import Mount, Location, DeckLocation
+from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel
 from opentrons.hardware_control.types import DoorState, PauseType
@@ -104,11 +104,11 @@ class ProtocolContextImplementation(
     def load_labware_from_definition(
         self,
         labware_def: LabwareDefinition,
-        location: DeckLocation,
+        location: DeckSlotName,
         label: Optional[str],
     ) -> LabwareImplementation:
         """Load a labware from definition"""
-        parent = self.get_deck().position_for(location)
+        parent = self.get_deck().position_for(location.value)
         labware_obj = load_from_definition(labware_def, parent, label)
         self._deck_layout[location] = labware_obj
         return labware_obj
@@ -116,7 +116,7 @@ class ProtocolContextImplementation(
     def load_labware(
         self,
         load_name: str,
-        location: DeckLocation,
+        location: DeckSlotName,
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],

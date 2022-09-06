@@ -125,6 +125,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
         definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
+        displayName="Opentrons 96 Tip Rack 300 µL",
         # fixme(mm, 2021-11-11): We should smoke-test that the engine picks up labware
         # offsets, but it's unclear to me what the best way of doing that is, since
         # we don't have access to the engine here to add offsets to it.
@@ -236,6 +237,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
         definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
+        displayName="Opentrons 96 Tip Rack 300 µL",
         # fixme(mm, 2021-11-11): When legacy running supports labware offsets, check
         # for that here.
         offsetId=None,

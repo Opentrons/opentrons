@@ -1,7 +1,7 @@
 from typing import Union
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import Mount
+from opentrons.types import Mount, DeckSlotName
 
 
 def ensure_mount(mount: Union[str, Mount]) -> Mount:
@@ -34,3 +34,14 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
         raise ValueError(
             f"Cannot resolve {pipette_name} to pipette, must be given valid pipette name."
         ) from e
+
+
+def ensure_deck_slot(deck_slot: Union[int, str]) -> DeckSlotName:
+    """Ensure that a primitive value matches a named deck slot."""
+    if not isinstance(deck_slot, (int, str)):
+        raise TypeError(f"Deck slot must be a string or integer, but got {deck_slot}")
+
+    try:
+        return DeckSlotName(str(deck_slot))
+    except ValueError as e:
+        raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
