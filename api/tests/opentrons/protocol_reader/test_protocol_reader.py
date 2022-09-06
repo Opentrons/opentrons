@@ -4,7 +4,7 @@ import io
 from dataclasses import dataclass
 from decoy import Decoy, matchers
 from pathlib import Path
-from typing import IO, Optional, List
+from typing import IO, Optional
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.models import LabwareDefinition
@@ -36,8 +36,6 @@ from opentrons.protocol_reader.config_analyzer import (
     ConfigAnalysis,
     ConfigAnalysisError,
 )
-
-from opentrons_shared_data.protocol.models import protocol_schema_v6
 
 
 @dataclass(frozen=True)
@@ -297,121 +295,3 @@ async def test_read_files_no_copy(
         ),
         times=0,
     )
-
-
-@pytest.mark.parametrize(
-    "input_commands, expected_error_name",
-    [
-        (
-            [
-                protocol_schema_v6.Command(
-                    commandType="loadLabware",
-                    params=protocol_schema_v6.Params(labwareId="labware-id-3"),
-                ),
-                protocol_schema_v6.Command(
-                    commandType="loadPipette",
-                    params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
-                ),
-            ],
-            "labwareId",
-        ),
-        (
-            [
-                protocol_schema_v6.Command(
-                    commandType="loadLabware",
-                    params=protocol_schema_v6.Params(labwareId="labware-id-1"),
-                ),
-                protocol_schema_v6.Command(
-                    commandType="loadPipette",
-                    params=protocol_schema_v6.Params(pipetteId="pipette-id-3"),
-                ),
-            ],
-            "pipetteId",
-        ),
-        (
-            [
-                protocol_schema_v6.Command(
-                    commandType="loadLabware",
-                    params=protocol_schema_v6.Params(labwareId="labware-id-1"),
-                ),
-                protocol_schema_v6.Command(
-                    commandType="loadPipette",
-                    params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
-                ),
-                protocol_schema_v6.Command(
-                    commandType="loadLiquid",
-                    params=protocol_schema_v6.Params(liquidId="liquid-id-3"),
-                ),
-            ],
-            "liquidId",
-        ),
-        (
-            [
-                protocol_schema_v6.Command(
-                    commandType="loadLabware",
-                    params=protocol_schema_v6.Params(labwareId="labware-id-1"),
-                ),
-                protocol_schema_v6.Command(
-                    commandType="loadPipette",
-                    params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
-                ),
-                protocol_schema_v6.Command(
-                    commandType="loadModule",
-                    params=protocol_schema_v6.Params(moduleId="module-id-3"),
-                ),
-            ],
-            "moduleId",
-        ),
-    ],
-)
-async def test_json_protocol_error(
-    decoy: Decoy,
-    tmp_path: Path,
-    file_reader_writer: FileReaderWriter,
-    role_analyzer: RoleAnalyzer,
-    config_analyzer: ConfigAnalyzer,
-    subject: ProtocolReader,
-    input_commands: List[protocol_schema_v6.Command],
-    expected_error_name: str,
-) -> None:
-    """It should catch config analysis errors."""
-    labware = {
-        "labware-id-1": protocol_schema_v6.Labware(definitionId="definition-1"),
-        "labware-id-2": protocol_schema_v6.Labware(definitionId="definition-2"),
-    }
-    pipettes = {"pipette-id-1": protocol_schema_v6.Pipette(name="pipette-1")}
-    liquids = {
-        "liquid-id-1": protocol_schema_v6.Liquid(
-            displayName="liquid-1", description="liquid desc"
-        )
-    }
-    protocol = protocol_schema_v6.ProtocolSchemaV6.construct(  # type: ignore[call-arg]
-        labware=labware, commands=input_commands, pipettes=pipettes, liquids=liquids
-    )
-    input_file = InputFile(
-        filename="protocol.py",
-        file=io.BytesIO(b"# hello world"),
-    )
-    buffered_file = BufferedFile(
-        name="protocol.py",
-        contents=b"# hello world",
-        data=None,
-        path=None,
-    )
-    main_file = MainFile(
-        name="protocol.py", contents=b"# hello world", path=None, data=protocol
-    )
-    analyzed_roles = RoleAnalysis(
-        main_file=main_file,
-        labware_files=[],
-        labware_definitions=[],
-    )
-
-    decoy.when(await file_reader_writer.read([input_file])).then_return([buffered_file])
-    decoy.when(role_analyzer.analyze([buffered_file])).then_return(analyzed_roles)
-
-    with pytest.raises(
-        ProtocolFilesInvalidError,
-        match=f"missing {expected_error_name} in referencing parent data model.",
-    ):
-        await subject.read_and_save(directory=tmp_path, files=[input_file])
