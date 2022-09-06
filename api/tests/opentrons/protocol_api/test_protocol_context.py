@@ -168,9 +168,10 @@ def test_load_labware(
         )
     ).then_return(mock_labware_core)
 
-    decoy.when(mock_labware_core.load_name).then_return(labware_load_params.load_name)
-    decoy.when(mock_labware_core.get_user_display_name()).then_return("Display Label")
-    decoy.when(mock_labware_core.get_name()).then_return("Display Name")
+    decoy.when(mock_labware_core.get_user_display_name()).then_return(
+        "Some Display Name"
+    )
+    decoy.when(mock_labware_core.get_name()).then_return("Full Name")
     decoy.when(mock_labware_core.get_load_params()).then_return(labware_load_params)
     decoy.when(mock_labware_core.get_definition()).then_return(labware_definition_dict)
 
@@ -191,7 +192,7 @@ def test_load_labware(
     )
 
     assert isinstance(result, Labware)
-    assert result.name == "Display Name"
+    assert result.name == "Full Name"
 
     decoy.verify(
         # TODO(mc, 2022-09-02): labware offset provider to legacy core
@@ -206,7 +207,56 @@ def test_load_labware(
                 deck_slot=DeckSlotName.SLOT_5,
                 on_module=False,
                 offset_id="offset-123",
-                labware_display_name="Display Label",
+                labware_display_name="Some Display Name",
             )
         ),
     )
+
+
+def test_load_labware_from_definition(
+    decoy: Decoy,
+    mock_labware_offset_provider: AbstractLabwareOffsetProvider,
+    mock_equipment_broker: EquipmentBroker[LoadInfo],
+    mock_core: AbstractProtocol,
+    subject: ProtocolContext,
+) -> None:
+    """It should be able to load a labware from a definition dictionary."""
+    mock_labware_core = decoy.mock(cls=AbstractLabware)
+
+    labware_definition_dict = cast(LabwareDefDict, {"labwareDef": True})
+    labware_load_params = LabwareLoadParams("you", "are", 1337)
+    labware_offset = ProvidedLabwareOffset(delta=Point(1, 2, 3), offset_id="offset-123")
+
+    decoy.when(validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_1)
+    decoy.when(mock_core.add_labware_definition(labware_definition_dict)).then_return(
+        labware_load_params
+    )
+    decoy.when(mock_labware_core.get_load_params()).then_return(labware_load_params)
+    decoy.when(mock_labware_core.get_name()).then_return("Full Name")
+
+    decoy.when(
+        mock_core.load_labware(
+            namespace="you",
+            load_name="are",
+            version=1337,
+            location=DeckSlotName.SLOT_1,
+            label="Some Display Name",
+        )
+    ).then_return(mock_labware_core)
+
+    decoy.when(
+        mock_labware_offset_provider.find(
+            load_params=labware_load_params,
+            requested_module_model=None,
+            deck_slot=DeckSlotName.SLOT_1,
+        )
+    ).then_return(labware_offset)
+
+    result = subject.load_labware_from_definition(
+        labware_def=labware_definition_dict,
+        location=42,
+        label="Some Display Name",
+    )
+
+    assert isinstance(result, Labware)
+    assert result.name == "Full Name"

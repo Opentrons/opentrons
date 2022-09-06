@@ -1,17 +1,20 @@
 """The interface that implements InstrumentContext."""
+from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import Any, Generic, Dict, List, NamedTuple, Optional, TypeVar
+
+from opentrons_shared_data.labware.dev_types import (
+    LabwareUri,
+    LabwareParameters as LabwareParametersDict,
+    LabwareDefinition as LabwareDefinitionDict,
+)
 
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols.geometry.labware_geometry import AbstractLabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 from opentrons.protocols.api_support.well_grid import WellGrid
 from opentrons.types import Point
-from opentrons_shared_data.labware.dev_types import (
-    LabwareParameters as LabwareParametersDict,
-    LabwareDefinition as LabwareDefinitionDict,
-)
 
 from .well import WellCoreType
 
@@ -23,9 +26,14 @@ class LabwareLoadParams(NamedTuple):
     load_name: str
     version: int
 
-    def as_uri(self) -> str:
+    def as_uri(self) -> LabwareUri:
         """Get the labware's definition URI from the load parameters."""
-        return f"{self.namespace}/{self.load_name}/{self.version}"
+        return LabwareUri(f"{self.namespace}/{self.load_name}/{self.version}")
+
+    @classmethod
+    def from_uri(cls, uri: LabwareUri) -> LabwareLoadParams:
+        namespace, load_name, version_str = uri.split("/")
+        return cls(namespace, load_name, int(version_str))
 
 
 class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):

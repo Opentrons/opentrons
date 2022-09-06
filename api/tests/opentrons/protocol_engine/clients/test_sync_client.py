@@ -11,8 +11,10 @@ the subject's methods in a synchronous context in a child thread to ensure:
 import pytest
 from decoy import Decoy
 
-from opentrons.protocols.models import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import DeckSlotLocation, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
@@ -35,6 +37,27 @@ def transport(decoy: Decoy) -> AbstractSyncTransport:
 def subject(transport: AbstractSyncTransport) -> SyncClient:
     """Get a SyncProtocolEngine test subject."""
     return SyncClient(transport=transport)
+
+
+def test_add_labware_definition(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should add a labware definition."""
+    labware_definition = LabwareDefinition.construct(namespace="hello")  # type: ignore[call-arg]
+    expected_labware_uri = LabwareUri("hello/world/123")
+
+    decoy.when(
+        transport.call_method(
+            "add_labware_definition",
+            definition=labware_definition,
+        )
+    ).then_return(expected_labware_uri)
+
+    result = subject.add_labware_definition(labware_definition)
+
+    assert result == expected_labware_uri
 
 
 def test_load_labware(

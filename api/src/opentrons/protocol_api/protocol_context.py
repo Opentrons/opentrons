@@ -279,42 +279,15 @@ class ProtocolContext(CommandPublisher):
                           as in the run log and the calibration view in the
                           Opentrons app.
         """
-        # todo(mm, 2021-11-22): The duplication between here and load_labware()
-        # is getting bad.
-        deck_slot = validation.ensure_deck_slot(location)
+        load_params = self._implementation.add_labware_definition(labware_def)
 
-        labware_core = self._implementation.load_labware_from_definition(
-            labware_def=labware_def, location=deck_slot, label=label
+        return self.load_labware(
+            load_name=load_params.load_name,
+            namespace=load_params.namespace,
+            version=load_params.version,
+            location=location,
+            label=label,
         )
-
-        labware_load_params = labware_core.get_load_params()
-
-        provided_labware_offset = self._labware_offset_provider.find(
-            load_params=labware_load_params,
-            requested_module_model=None,
-            deck_slot=deck_slot,
-        )
-
-        labware_core.set_calibration(provided_labware_offset.delta)
-
-        # TODO(mc, 2022-09-02): add API version
-        # https://opentrons.atlassian.net/browse/RSS-97
-        result = Labware(implementation=labware_core)
-
-        self.equipment_broker.publish(
-            LabwareLoadInfo(
-                labware_definition=labware_core.get_definition(),
-                labware_namespace=labware_load_params.namespace,
-                labware_load_name=labware_load_params.load_name,
-                labware_version=labware_load_params.version,
-                deck_slot=deck_slot,
-                on_module=False,
-                offset_id=provided_labware_offset.offset_id,
-                labware_display_name=labware_core.get_user_display_name(),
-            )
-        )
-
-        return result
 
     @requires_version(2, 0)
     def load_labware(

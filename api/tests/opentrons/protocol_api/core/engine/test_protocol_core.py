@@ -3,6 +3,10 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware.dev_types import (
+    LabwareDefinition as LabwareDefDict,
+    LabwareUri,
+)
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.types import Mount, MountType, DeckSlotName
@@ -10,6 +14,7 @@ from opentrons.protocol_engine import commands
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import DeckSlotLocation
 
+from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.engine import ProtocolCore, InstrumentCore, LabwareCore
 
 
@@ -77,3 +82,21 @@ def test_load_labware(
 
     assert isinstance(result, LabwareCore)
     assert result.labware_id == "abc123"
+
+
+def test_add_labware_definition(
+    decoy: Decoy,
+    minimal_labware_def: LabwareDefDict,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should add a laware definition to the engine."""
+    decoy.when(
+        mock_engine_client.add_labware_definition(
+            definition=LabwareDefinition.parse_obj(minimal_labware_def)
+        )
+    ).then_return(LabwareUri("hello/world/123"))
+
+    result = subject.add_labware_definition(minimal_labware_def)
+
+    assert result == LabwareLoadParams("hello", "world", 123)

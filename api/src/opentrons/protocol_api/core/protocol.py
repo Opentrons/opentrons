@@ -18,7 +18,7 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from .instrument import InstrumentCoreType
-from .labware import LabwareCoreType
+from .labware import LabwareCoreType, LabwareLoadParams
 
 
 @dataclass(frozen=True)
@@ -57,12 +57,11 @@ class AbstractProtocol(ABC, Generic[InstrumentCoreType, LabwareCoreType]):
         ...
 
     @abstractmethod
-    def load_labware_from_definition(
+    def add_labware_definition(
         self,
-        labware_def: LabwareDefinition,
-        location: DeckSlotName,
-        label: Optional[str],
-    ) -> LabwareCoreType:
+        definition: LabwareDefinition,
+    ) -> LabwareLoadParams:
+        """Add a labware defintion to the set of loadable definitions."""
         ...
 
     @abstractmethod
@@ -74,6 +73,7 @@ class AbstractProtocol(ABC, Generic[InstrumentCoreType, LabwareCoreType]):
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCoreType:
+        """Load a labware using its identifying parameters."""
         ...
 
     @abstractmethod
