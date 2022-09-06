@@ -34,7 +34,7 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
 
 
 @pytest.mark.parametrize(
-    "input_commands",
+    "input_commands, missing_id, load_command",
     [
         (
             [
@@ -46,7 +46,9 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
                     commandType="loadPipette",
                     params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
                 ),
-            ]
+            ],
+            "labware-id-3",
+            "loadLabware"
         ),
         (
             [
@@ -58,7 +60,9 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
                     commandType="loadPipette",
                     params=protocol_schema_v6.Params(pipetteId="pipette-id-3"),
                 ),
-            ]
+            ],
+            "pipette-id-3",
+            "loadPipette"
         ),
         (
             [
@@ -74,7 +78,9 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
                     commandType="loadLiquid",
                     params=protocol_schema_v6.Params(liquidId="liquid-id-3"),
                 ),
-            ]
+            ],
+            "liquid-id-3",
+            "loadLiquid"
         ),
         (
             [
@@ -90,11 +96,13 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
                     commandType="loadModule",
                     params=protocol_schema_v6.Params(moduleId="module-id-3"),
                 ),
-            ]
+            ],
+            "module-id-3",
+            "loadModule"
         ),
     ],
 )
-def test_schema_validators(input_commands: List[protocol_schema_v6.Command]) -> None:
+def test_schema_validators(input_commands: List[protocol_schema_v6.Command], missing_id: str, load_command: str) -> None:
     """Should raise an error the keys do not match."""
     print(input_commands)
     labware = {
@@ -109,7 +117,7 @@ def test_schema_validators(input_commands: List[protocol_schema_v6.Command]) -> 
     }
     modules = {"module-id-1": protocol_schema_v6.Module(model="model-1")}
     with pytest.raises(
-        ValueError, match="missing loadLabware id in referencing parent data model."
+        ValueError, match=f"There seems to be a problem with the uploaded json protocol. {load_command} is missing {missing_id} in referencing object."
     ):
         protocol_schema_v6.ProtocolSchemaV6(
             otSharedSchema="#/protocol/schemas/6",
