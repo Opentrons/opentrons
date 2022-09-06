@@ -17,6 +17,8 @@ def test_v6_types(defpath):
         by_alias=True,
     )
     expected_def_dict = json.loads(def_data)
+    print(def_dict_from_model["commands"])
+    print(f"file name {defpath}")
     delete_unexpected_results(expected_def_dict)
     assert def_dict_from_model == expected_def_dict
 
@@ -48,7 +50,7 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
                 ),
             ],
             "labware-id-3",
-            "loadLabware"
+            "loadLabware",
         ),
         (
             [
@@ -62,7 +64,7 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
                 ),
             ],
             "pipette-id-3",
-            "loadPipette"
+            "loadPipette",
         ),
         (
             [
@@ -80,7 +82,7 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
                 ),
             ],
             "liquid-id-3",
-            "loadLiquid"
+            "loadLiquid",
         ),
         (
             [
@@ -98,11 +100,13 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
                 ),
             ],
             "module-id-3",
-            "loadModule"
+            "loadModule",
         ),
     ],
 )
-def test_schema_validators(input_commands: List[protocol_schema_v6.Command], missing_id: str, load_command: str) -> None:
+def test_schema_validators(
+    input_commands: List[protocol_schema_v6.Command], missing_id: str, load_command: str
+) -> None:
     """Should raise an error the keys do not match."""
     print(input_commands)
     labware = {
@@ -117,7 +121,8 @@ def test_schema_validators(input_commands: List[protocol_schema_v6.Command], mis
     }
     modules = {"module-id-1": protocol_schema_v6.Module(model="model-1")}
     with pytest.raises(
-        ValueError, match=f"There seems to be a problem with the uploaded json protocol. {load_command} is missing {missing_id} in referencing object."
+        ValueError,
+        match=f"There seems to be a problem with the uploaded json protocol. {load_command} is missing {missing_id} in referencing object.",
     ):
         protocol_schema_v6.ProtocolSchemaV6(
             otSharedSchema="#/protocol/schemas/6",
