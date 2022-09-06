@@ -10,7 +10,13 @@ from decoy import matchers
 from pathlib import Path
 
 from opentrons.types import MountType, DeckSlotName
-from opentrons.protocol_engine import commands, types as pe_types
+from opentrons.protocol_engine import (
+    commands,
+    PipetteName,
+    DeckSlotLocation,
+    ModuleModel,
+    ModuleLocation,
+)
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import create_simulating_runner
 from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
@@ -141,7 +147,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=commands.LoadLabwareParams(
-            location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             loadName="opentrons_96_tiprack_300ul",
             namespace="opentrons",
             version=1,
@@ -156,7 +162,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=commands.LoadLabwareParams(
-            location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
             loadName="opentrons_96_tiprack_300ul",
             namespace="opentrons",
             version=1,
@@ -171,8 +177,8 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=commands.LoadModuleParams(
-            model=pe_types.ModuleModel.TEMPERATURE_MODULE_V1,
-            location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+            model=ModuleModel.TEMPERATURE_MODULE_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
             moduleId="module-0",
         ),
         result=module_1_result_captor,
@@ -185,7 +191,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=commands.LoadLabwareParams(
-            location=pe_types.DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             loadName="opentrons_96_aluminumblock_nest_wellplate_100ul",
             namespace="opentrons",
             version=1,
@@ -200,7 +206,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=commands.LoadLabwareParams(
-            location=pe_types.ModuleLocation(moduleId="module-0"),
+            location=ModuleLocation(moduleId="module-0"),
             loadName="opentrons_96_aluminumblock_nest_wellplate_100ul",
             namespace="opentrons",
             version=1,
@@ -216,7 +222,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=commands.LoadPipetteParams(
-            pipetteName=pe_types.PipetteName.P300_SINGLE, mount=MountType.LEFT
+            pipetteName=PipetteName.P300_SINGLE, mount=MountType.LEFT
         ),
         result=pipette_left_result_captor,
     )
@@ -229,7 +235,7 @@ async def test_legacy_commands(legacy_commands_protocol_file: Path) -> None:
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=commands.LoadPipetteParams(
-            pipetteName=pe_types.PipetteName.P300_MULTI, mount=MountType.RIGHT
+            pipetteName=PipetteName.P300_MULTI, mount=MountType.RIGHT
         ),
         result=pipette_right_result_captor,
     )
