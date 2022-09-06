@@ -171,32 +171,26 @@ class ProtocolSchemaV6(BaseModel):
     def validate_date(cls, value: List[Command], values: Dict[str, Any]) -> None:
         for command in value:
             if command.params.pipetteId and "pipettes" in values:
-                missing_ids = command.params.labwareId not in set(values["pipettes"].keys())
+                missing_ids = set([command.params.pipetteId]).difference(set(values["pipettes"].keys()))
                 payload = ", ".join(f"{item}" for item in missing_ids)
-                if command.params.pipetteId and missing_ids:
+                if missing_ids:
                     raise ValueError(
                         f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {payload} in referencing object.")
             elif command.params.labwareId and "labware" in values:
                 missing_ids = set([command.params.labwareId]).difference(set(values["labware"].keys()))
                 payload = ", ".join(f"{item}" for item in missing_ids)
-                if command.params.labwareId and missing_ids:
+                if missing_ids:
                     raise ValueError(
                         f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {payload} in referencing object.")
-            elif (
-                command.params.moduleId
-                and "modules" in values
-                and values["modules"]
-                and command.params.moduleId not in set(values["modules"].keys())
-            ):
-                raise ValueError(
-                    "missing loadPipette id in referencing parent data model."
-                )
-            elif (
-                command.params.liquidId
-                and "liquids" in values
-                and values["liquids"]
-                and command.params.liquidId not in set(values["liquids"].keys())
-            ):
-                raise ValueError(
-                    "missing loadLiquid id in referencing parent data model."
-                )
+            elif command.params.moduleId and "modules" in values and values["modules"]:
+                missing_ids = set([command.params.moduleId]).difference(set(values["modules"].keys()))
+                payload = ", ".join(f"{item}" for item in missing_ids)
+                if missing_ids:
+                    raise ValueError(
+                        f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {payload} in referencing object.")
+            elif command.params.liquidId and "liquids" in values and values["liquids"]:
+                missing_ids = set([command.params.liquidId]).difference(set(values["liquids"].keys()))
+                payload = ", ".join(f"{item}" for item in missing_ids)
+                if missing_ids:
+                    raise ValueError(
+                        f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {payload} in referencing object.")
