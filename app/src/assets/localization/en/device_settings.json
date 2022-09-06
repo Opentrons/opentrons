@@ -134,5 +134,6 @@
   "view_opentrons_release_notes": "View full Opentrons release notes",
   "remind_me_later": "Remind me later",
   "update_robot_now": "Update robot now",
-  "reinstall": "reinstall"
+  "reinstall": "reinstall",
+  "protocol_run_history_description": "Resetting run history will also clear Labware Offset data."
 }
