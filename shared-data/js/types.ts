@@ -24,13 +24,9 @@ import type { PipetteName } from './pipettes'
 
 export type RobotName = 'OT-2 Standard' | 'OT-3 Standard'
 
-export type RobotId = 'ot-2' | 'ot-3'
-
 export interface RobotDefinition {
-  friendlyName: string
+  displayName: string
   robotName: RobotName
-  robotId: RobotId
-  otId: string
   models: string[]
 }
 

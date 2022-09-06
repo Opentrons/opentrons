@@ -8,14 +8,10 @@ RobotSchema = NewType("RobotSchema", Dict[str, Any])
 
 RobotName = Literal["OT-2 Standard", "OT-3 Standard"]
 
-RobotId = Literal["ot-2", "ot-3"]
-
 
 class RobotDefinition(TypedDict):
     """A python version of the robot definition type."""
 
-    otId: str
-    friendlyName: str
+    displayName: str
     robotName: RobotName
-    robotId: RobotId
     models: List[str]
