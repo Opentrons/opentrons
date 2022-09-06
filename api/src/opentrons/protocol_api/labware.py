@@ -8,6 +8,7 @@ transform from labware symbolic points (such as "well a1 of an opentrons
 tiprack") to points in deck coordinates.
 """
 from __future__ import annotations
+
 import logging
 
 from pathlib import Path
@@ -853,18 +854,14 @@ def load_from_definition(
     )
 
 
-def save_calibration(labware: "Labware", delta: Point) -> None:
-    labware_module.save_calibration(labware._implementation, delta)
-
-
 def load(
     load_name: str,
     parent: Location,
     label: Optional[str] = None,
     namespace: Optional[str] = None,
     version: int = 1,
-    bundled_defs: Optional[Dict[str, "LabwareDefinition"]] = None,
-    extra_defs: Optional[Dict[str, "LabwareDefinition"]] = None,
+    bundled_defs: Optional[Dict[str, LabwareDefinition]] = None,
+    extra_defs: Optional[Dict[str, LabwareDefinition]] = None,
     api_level: Optional[APIVersion] = None,
 ) -> Labware:
     """

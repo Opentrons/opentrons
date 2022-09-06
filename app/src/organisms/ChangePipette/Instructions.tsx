@@ -12,8 +12,6 @@ import {
   DIRECTION_ROW,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
-import { ModalShell } from '../../molecules/Modal'
-import { WizardHeader } from '../../molecules/WizardHeader'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 import { CheckPipettesButton } from './CheckPipettesButton'
@@ -37,11 +35,10 @@ interface Props {
   displayCategory: PipetteDisplayCategory | null
   direction: Direction
   setWantedName: (name: string | null) => void
-  confirm: () => void
-  exit: () => void
   back: () => void
-  currentStep: number
-  totalSteps: number
+  confirm: () => void
+  stepPage: number
+  setStepPage: React.Dispatch<React.SetStateAction<number>>
 }
 
 export function Instructions(props: Props): JSX.Element {
@@ -52,15 +49,13 @@ export function Instructions(props: Props): JSX.Element {
     actualPipette,
     setWantedName,
     direction,
-    confirm,
-    exit,
     back,
-    currentStep,
-    totalSteps,
     mount,
+    stepPage,
+    setStepPage,
+    confirm,
   } = props
   const { t } = useTranslation('change_pipette')
-  const [stepPage, setStepPage] = React.useState<number>(0)
 
   const channels = actualPipette
     ? actualPipette.channels
@@ -78,126 +73,112 @@ export function Instructions(props: Props): JSX.Element {
     </PrimaryButton>
   )
 
-  const attachWizardHeader = noPipetteSelected
-    ? t('attach_pipette')
-    : t('attach_pipette_type', {
-        pipetteName: wantedPipette?.displayName,
-      })
-
   return (
     <>
-      <WizardHeader
-        currentStep={stepPage === 0 ? currentStep : currentStep + 1}
-        totalSteps={totalSteps}
-        onExit={exit}
-        title={
-          actualPipette?.displayName != null
-            ? t('detach_pipette', {
-                pipette: actualPipette.displayName,
-                mount: mount[0].toUpperCase() + mount.slice(1),
-              })
-            : attachWizardHeader
-        }
-      />
       {!actualPipette && !wantedPipette && (
         <Flex
           paddingX={SPACING.spacing6}
           paddingTop={SPACING.spacing6}
           marginBottom="12.9rem"
         >
-          <PipetteSelection onPipetteChange={setWantedName} />
+          {direction === 'attach' ? (
+            <PipetteSelection onPipetteChange={setWantedName} />
+          ) : null}
         </Flex>
       )}
-      {(actualPipette || wantedPipette) && (
-        <Flex
-          paddingX={SPACING.spacing6}
-          paddingTop={SPACING.spacing6}
-          height="100%"
-        >
-          <InstructionStep
-            diagram={stepPage === 0 ? 'screws' : 'tab'}
-            {...{ direction, mount, channels, displayCategory }}
-          >
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <Trans
-                t={t}
-                i18nKey={stepPage === 0 ? stepOne : stepTwo}
-                components={{
-                  h1: <StyledText as="h1" marginBottom={SPACING.spacing4} />,
-                  block: <StyledText as="p" />,
-                }}
-              />
-              {direction === 'attach' && stepPage === 0 ? (
-                channels === 8 ? (
-                  <Flex flexDirection={DIRECTION_ROW}>
-                    <Trans
-                      t={t}
-                      i18nKey="tighten_screws_multi"
-                      components={{
-                        strong: <strong />,
-                        block: (
-                          <StyledText as="p" marginTop={SPACING.spacing4} />
-                        ),
-                      }}
-                    />
-                  </Flex>
-                ) : (
-                  <StyledText marginTop={SPACING.spacing4} as="p">
-                    {t('tighten_screws_single')}
-                  </StyledText>
-                )
-              ) : null}
+      {stepPage < 2 ? (
+        <>
+          {(actualPipette || wantedPipette) && (
+            <Flex
+              paddingX={SPACING.spacing6}
+              paddingTop={SPACING.spacing6}
+              height="100%"
+            >
+              <InstructionStep
+                diagram={stepPage === 0 ? 'screws' : 'tab'}
+                {...{ direction, mount, channels, displayCategory }}
+              >
+                <Flex flexDirection={DIRECTION_COLUMN}>
+                  <Trans
+                    t={t}
+                    i18nKey={stepPage === 0 ? stepOne : stepTwo}
+                    components={{
+                      h1: (
+                        <StyledText as="h1" marginBottom={SPACING.spacing4} />
+                      ),
+                      block: <StyledText as="p" />,
+                    }}
+                  />
+                  {direction === 'attach' && stepPage === 0 ? (
+                    channels === 8 ? (
+                      <Flex flexDirection={DIRECTION_ROW}>
+                        <Trans
+                          t={t}
+                          i18nKey="tighten_screws_multi"
+                          components={{
+                            strong: <strong />,
+                            block: (
+                              <StyledText as="p" marginTop={SPACING.spacing4} />
+                            ),
+                          }}
+                        />
+                      </Flex>
+                    ) : (
+                      <StyledText marginTop={SPACING.spacing4} as="p">
+                        {t('tighten_screws_single')}
+                      </StyledText>
+                    )
+                  ) : null}
+                </Flex>
+              </InstructionStep>
             </Flex>
-          </InstructionStep>
-        </Flex>
-      )}
-      <Flex
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginBottom={SPACING.spacing6}
-        marginX={SPACING.spacing6}
-        alignSelf={ALIGN_FLEX_END}
-        //  spacing changes to keep buttons at same height across pages
-        marginTop={stepPage === 0 ? SPACING.spacingSS : '8rem'}
-      >
-        <Btn onClick={stepPage === 0 ? back : () => setStepPage(0)}>
-          <StyledText
-            css={TYPOGRAPHY.pSemiBold}
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-            color={COLORS.darkGreyEnabled}
+          )}
+          <Flex
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            marginBottom={SPACING.spacing6}
+            marginX={SPACING.spacing6}
+            alignSelf={ALIGN_FLEX_END}
+            //  spacing changes to keep buttons at same height across pages
+            marginTop={stepPage === 0 ? SPACING.spacingSS : '8rem'}
           >
-            {t('go_back')}
-          </StyledText>
-        </Btn>
-        {stepPage === 0 ? (
-          continueButton
-        ) : (
-          <CheckPipettesButton
-            robotName={robotName}
-            onDone={
-              wantedPipette != null &&
-              actualPipette != null &&
-              shouldLevel(wantedPipette)
-                ? () => setStepPage(2)
-                : confirm
-            }
-          >
-            {actualPipette ? t('confirm_detachment') : t('confirm_attachment')}
-          </CheckPipettesButton>
-        )}
-      </Flex>
-      {stepPage === 2 && (
-        <ModalShell height="28.12rem" width="47rem">
-          <LevelPipette
-            mount={mount}
-            wantedPipette={wantedPipette}
-            pipetteModelName={actualPipette ? actualPipette.name : ''}
-            exit={exit}
-            confirm={confirm}
-            back={back}
-            currentStep={currentStep}
-            totalSteps={totalSteps}
-          />
-        </ModalShell>
+            <Btn
+              onClick={stepPage === 0 ? back : () => setStepPage(stepPage - 1)}
+            >
+              <StyledText
+                css={TYPOGRAPHY.pSemiBold}
+                textTransform={TYPOGRAPHY.textTransformCapitalize}
+                color={COLORS.darkGreyEnabled}
+              >
+                {t('go_back')}
+              </StyledText>
+            </Btn>
+            {stepPage === 0 ? (
+              continueButton
+            ) : (
+              <CheckPipettesButton
+                robotName={robotName}
+                onDone={
+                  wantedPipette != null &&
+                  actualPipette != null &&
+                  shouldLevel(wantedPipette)
+                    ? () => setStepPage(2)
+                    : confirm
+                }
+              >
+                {actualPipette
+                  ? t('confirm_detachment')
+                  : t('confirm_attachment')}
+              </CheckPipettesButton>
+            )}
+          </Flex>
+        </>
+      ) : (
+        <LevelPipette
+          mount={mount}
+          pipetteModelName={actualPipette ? actualPipette.name : ''}
+          confirm={confirm}
+          back={back}
+        />
       )}
     </>
   )
