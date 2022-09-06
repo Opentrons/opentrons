@@ -57,11 +57,11 @@ jobs:
         run: make -C api sdist wheel
       - name: pip install and use CLI tools
         run: |
-          pip install --find-links=./api/dist opentrons
+          $OT_PYTHON -m pip install --find-links=./api/dist opentrons
           opentrons_execute --help
-          opentrons.cli --help
           opentrons_simulate --help
           opentrons_simulate ./api/docs/v2/example_protocols/dilution_tutorial.py -e -o nothing
+          $OT_PYTHON -m opentrons.cli --help
       - name: Upload coverage report
         uses: 'codecov/codecov-action@v3'
         with:
