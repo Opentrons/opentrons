@@ -26,9 +26,9 @@ class LabwareLoadParams(NamedTuple):
     load_name: str
     version: int
 
-    def as_uri(self) -> str:
+    def as_uri(self) -> LabwareUri:
         """Get the labware's definition URI from the load parameters."""
-        return f"{self.namespace}/{self.load_name}/{self.version}"
+        return LabwareUri(f"{self.namespace}/{self.load_name}/{self.version}")
 
     @classmethod
     def from_uri(cls, uri: LabwareUri) -> LabwareLoadParams:
