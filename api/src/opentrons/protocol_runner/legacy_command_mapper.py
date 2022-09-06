@@ -282,9 +282,7 @@ class LegacyCommandMapper:
     ) -> pe_commands.Command:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
-        if isinstance(location, LegacyWell):
-            well = location
-        elif location.labware.is_well:
+        if location.labware.is_well:
             well = location.labware.as_well()
         mount = MountType(pipette.mount)
         #   the following type checking suppression assumes the tiprack is not loaded on top of a module
@@ -315,8 +313,6 @@ class LegacyCommandMapper:
         location = command["payload"]["location"]
         if isinstance(location, LegacyWell):
             well = location
-        elif location.labware.is_well:
-            well = location.labware.as_well()
         mount = MountType(pipette.mount)
         #   the following type checking suppression assumes the tiprack is not loaded on top of a module
         slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
