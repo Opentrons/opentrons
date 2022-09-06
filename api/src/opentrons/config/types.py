@@ -3,6 +3,7 @@ from dataclasses import dataclass, asdict, fields
 from typing import Dict, Tuple, TypeVar, Generic, List, cast
 from typing_extensions import TypedDict, Literal
 from opentrons.hardware_control.types import OT3AxisKind
+from opentrons_shared_data.robot.dev_types import RobotModel
 
 
 class AxisDict(TypedDict):
@@ -60,7 +61,7 @@ Offset = Tuple[float, float, float]
 
 @dataclass
 class RobotConfig:
-    model: Literal["OT-2 Standard"]
+    model: RobotModel
     name: str
     version: int
     gantry_steps_per_mm: Dict[str, float]

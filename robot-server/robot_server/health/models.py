@@ -1,7 +1,7 @@
 """HTTP request and response models for /health endpoints."""
 import typing
 from pydantic import BaseModel, Field
-from opentrons_shared_data.deck.dev_types import RobotModel
+from opentrons_shared_data.robot.dev_types import RobotName
 
 
 class HealthLinks(BaseModel):
@@ -38,7 +38,7 @@ class Health(BaseModel):
         "mDNS advertisement domain name, but this can get out "
         "of sync. Mostly useful for user-facing titles.",
     )
-    robot_model: RobotModel = Field(
+    robot_model: RobotName = Field(
         ...,
         description="Which model of Opentrons robot this is",
     )
