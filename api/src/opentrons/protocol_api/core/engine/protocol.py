@@ -1,9 +1,10 @@
 """ProtocolEngine-based Protocol API core implementation."""
 from typing import Dict, Optional
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
-
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 from opentrons.types import Mount, MountType, Location, DeckLocation, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
@@ -16,6 +17,7 @@ from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 from ..protocol import AbstractProtocol, LoadModuleResult
+from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore
 
@@ -42,14 +44,14 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
         """
         raise NotImplementedError("ProtocolEngine PAPI core not implemented")
 
-    def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefinition]]:
+    def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
         """Get a map of labware names to definition dicts.
 
         Deprecated method used for past experiment with ZIP protocols.
         """
         raise NotImplementedError("ProtocolEngine PAPI core not implemented")
 
-    def get_extra_labware(self) -> Optional[Dict[str, LabwareDefinition]]:
+    def get_extra_labware(self) -> Optional[Dict[str, LabwareDefDict]]:
         """Get a map of extra labware names to definition dicts.
 
         Used to assist load custom labware definitions.
@@ -68,14 +70,15 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
         """Get whether the protocol is being analyzed or actually run."""
         raise NotImplementedError("ProtocolEngine PAPI core not implemented")
 
-    def load_labware_from_definition(
+    def add_labware_definition(
         self,
-        labware_def: LabwareDefinition,
-        location: DeckSlotName,
-        label: Optional[str],
-    ) -> LabwareCore:
-        """Load a labware using its definition dictionary."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        definition: LabwareDefDict,
+    ) -> LabwareLoadParams:
+        """Add a labware definition to the set of loadable definitions."""
+        uri = self._engine_client.add_labware_definition(
+            LabwareDefinition.parse_obj(definition)
+        )
+        return LabwareLoadParams.from_uri(uri)
 
     def load_labware(
         self,
