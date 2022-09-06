@@ -94,6 +94,28 @@ export function getWellGroupForLiquidId(
   }, {})
 }
 
+export function getDisabledWellGroupForLiquidId(
+  labwareByLiquidId: LabwareByLiquidId,
+  liquidIds: string[]
+): WellGroup[] {
+  const wellGroups = liquidIds.map(liquidId => {
+    const labwareInfo = labwareByLiquidId[liquidId]
+    return labwareInfo.reduce((allWells, { volumeByWell }) => {
+      const someWells = Object.entries(volumeByWell).reduce(
+        (someWells, [wellName]) => {
+          return {
+            ...someWells,
+            [wellName]: null,
+          }
+        },
+        {}
+      )
+      return { ...allWells, ...someWells }
+    }, {})
+  })
+  return wellGroups
+}
+
 export function getWellRangeForLiquidLabwarePair(
   volumeByWell: { [well: string]: number },
   labwareWellOrdering: string[][]

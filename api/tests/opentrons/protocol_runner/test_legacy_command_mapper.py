@@ -8,7 +8,6 @@ from opentrons.commands.types import CommentMessage, PauseMessage, CommandMessag
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
-    PipetteName,
     ModuleModel,
     ModuleDefinition,
     commands as pe_commands,
@@ -28,6 +27,7 @@ from opentrons.protocol_runner.legacy_wrappers import (
 )
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import DeckSlotName, Mount, MountType
 
 
@@ -285,7 +285,7 @@ def test_map_instrument_load() -> None:
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=pe_commands.LoadPipetteParams.construct(
-            pipetteName=PipetteName.P1000_SINGLE_GEN2, mount=MountType.LEFT
+            pipetteName=PipetteNameType.P1000_SINGLE_GEN2, mount=MountType.LEFT
         ),
         result=pe_commands.LoadPipetteResult.construct(pipetteId=matchers.IsA(str)),
     )

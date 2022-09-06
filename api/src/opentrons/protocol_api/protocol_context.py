@@ -15,7 +15,7 @@ from typing import (
     cast,
 )
 
-from opentrons import types
+from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
 from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
@@ -41,6 +41,7 @@ from .core.labware import AbstractLabware
 from .core.protocol import AbstractProtocol
 from .core.labware_offset_provider import AbstractLabwareOffsetProvider
 
+from . import validation
 from .instrument_context import InstrumentContext
 from .labware import Labware
 from .module_contexts import (
@@ -123,8 +124,8 @@ class ProtocolContext(CommandPublisher):
                 f"version or update your robot."
             )
 
-        self._instruments: Dict[types.Mount, Optional[InstrumentContext]] = {
-            mount: None for mount in types.Mount
+        self._instruments: Dict[Mount, Optional[InstrumentContext]] = {
+            mount: None for mount in Mount
         }
         self._modules: List[ModuleTypes] = []
 
@@ -261,7 +262,7 @@ class ProtocolContext(CommandPublisher):
     def load_labware_from_definition(
         self,
         labware_def: "LabwareDefinition",
-        location: types.DeckLocation,
+        location: DeckLocation,
         label: Optional[str] = None,
     ) -> Labware:
         """Specify the presence of a piece of labware on the OT2 deck.
@@ -291,7 +292,7 @@ class ProtocolContext(CommandPublisher):
         provided_labware_offset = self._labware_offset_provider.find(
             labware_definition_uri=result.uri,
             requested_module_model=None,
-            deck_slot=types.DeckSlotName.from_primitive(location),
+            deck_slot=DeckSlotName.from_primitive(location),
         )
 
         result.set_calibration(delta=provided_labware_offset.delta)
@@ -302,7 +303,7 @@ class ProtocolContext(CommandPublisher):
                 labware_namespace=result_namespace,
                 labware_load_name=result_load_name,
                 labware_version=int(result_version),
-                deck_slot=types.DeckSlotName.from_primitive(location),
+                deck_slot=DeckSlotName.from_primitive(location),
                 on_module=False,
                 offset_id=provided_labware_offset.offset_id,
                 labware_display_name=implementation.get_label(),
@@ -315,7 +316,7 @@ class ProtocolContext(CommandPublisher):
     def load_labware(
         self,
         load_name: str,
-        location: types.DeckLocation,
+        location: DeckLocation,
         label: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[int] = None,
@@ -359,7 +360,7 @@ class ProtocolContext(CommandPublisher):
         provided_labware_offset = self._labware_offset_provider.find(
             labware_definition_uri=result.uri,
             requested_module_model=None,
-            deck_slot=types.DeckSlotName.from_primitive(location),
+            deck_slot=DeckSlotName.from_primitive(location),
         )
 
         result.set_calibration(delta=provided_labware_offset.delta)
@@ -370,7 +371,7 @@ class ProtocolContext(CommandPublisher):
                 labware_namespace=result_namespace,
                 labware_load_name=result_load_name,
                 labware_version=int(result_version),
-                deck_slot=types.DeckSlotName.from_primitive(location),
+                deck_slot=DeckSlotName.from_primitive(location),
                 on_module=False,
                 offset_id=provided_labware_offset.offset_id,
                 labware_display_name=implementation.get_label(),
@@ -383,7 +384,7 @@ class ProtocolContext(CommandPublisher):
     def load_labware_by_name(
         self,
         load_name: str,
-        location: types.DeckLocation,
+        location: DeckLocation,
         label: Optional[str] = None,
         namespace: Optional[str] = None,
         version: int = 1,
@@ -432,7 +433,7 @@ class ProtocolContext(CommandPublisher):
     def load_module(
         self,
         module_name: str,
-        location: Optional[types.DeckLocation] = None,
+        location: Optional[DeckLocation] = None,
         configuration: Optional[str] = None,
     ) -> ModuleTypes:
         """Load a module onto the deck given its name.
@@ -501,7 +502,7 @@ class ProtocolContext(CommandPublisher):
         # ===== Protocol Engine stuff ====
         module_loc = load_result.geometry.parent
         assert isinstance(module_loc, (int, str)), "Unexpected labware object parent"
-        deck_slot = types.DeckSlotName.from_primitive(module_loc)
+        deck_slot = DeckSlotName.from_primitive(module_loc)
         module_serial = load_result.module.device_info["serial"]
 
         self.equipment_broker.publish(
@@ -542,7 +543,7 @@ class ProtocolContext(CommandPublisher):
     def load_instrument(
         self,
         instrument_name: str,
-        mount: Union[types.Mount, str],
+        mount: Union[Mount, str],
         tip_racks: Optional[List[Labware]] = None,
         replace: bool = False,
     ) -> InstrumentContext:
@@ -569,49 +570,48 @@ class ProtocolContext(CommandPublisher):
                              `mount` (if such an instrument exists) should be
                              replaced by `instrument_name`.
         """
-        if isinstance(mount, str):
-            try:
-                checked_mount = types.Mount[mount.upper()]
-            except KeyError:
-                raise ValueError(
-                    "If mount is specified as a string, it should be either"
-                    "'left' or 'right' (ignoring capitalization, which the"
-                    " system strips), not {}".format(mount)
-                )
-        elif isinstance(mount, types.Mount):
-            checked_mount = mount
-        else:
-            raise TypeError(
-                "mount should be either an instance of opentrons.types.Mount"
-                " or a string, but is {}.".format(mount)
+
+        checked_mount = validation.ensure_mount(mount)
+        checked_instrument_name = validation.ensure_pipette_name(instrument_name)
+
+        existing_instrument = self._instruments[checked_mount]
+
+        if existing_instrument is not None and not replace:
+            # TODO(mc, 2022-08-25): create specific exception type
+            raise RuntimeError(
+                f"Instrument already present on {checked_mount.name.lower()}:"
+                f" {existing_instrument.name}"
             )
+
         logger.info(
-            "Trying to load {} on {} mount".format(
-                instrument_name, checked_mount.name.lower()
-            )
+            f"Loading {checked_instrument_name} on {checked_mount.name.lower()} mount"
         )
 
-        impl = self._implementation.load_instrument(
-            instrument_name=instrument_name, mount=checked_mount, replace=replace
+        instrument_core = self._implementation.load_instrument(
+            instrument_name=checked_instrument_name,
+            mount=checked_mount,
         )
 
-        new_instr = InstrumentContext(
+        instrument = InstrumentContext(
             ctx=self,
-            broker=self.broker,
-            implementation=impl,
-            at_version=self.api_version,
+            broker=self._broker,
+            implementation=instrument_core,
+            at_version=self._api_version,
+            # TODO(mc, 2022-08-25): test instrument tip racks
             tip_racks=tip_racks,
         )
-        self._instruments[checked_mount] = new_instr
 
+        self._instruments[checked_mount] = instrument
+
+        # TODO(mc, 2022-08-25): move equipment broker to legacy core
         self.equipment_broker.publish(
             InstrumentLoadInfo(
-                instrument_load_name=instrument_name,
+                instrument_load_name=checked_instrument_name,
                 mount=checked_mount,
             )
         )
 
-        return new_instr
+        return instrument
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -704,12 +704,12 @@ class ProtocolContext(CommandPublisher):
         self._implementation.home()
 
     @property
-    def location_cache(self) -> Optional[types.Location]:
+    def location_cache(self) -> Optional[Location]:
         """The cache used by the robot to determine where it last was."""
         return self._implementation.get_last_location()
 
     @location_cache.setter
-    def location_cache(self, loc: Optional[types.Location]) -> None:
+    def location_cache(self, loc: Optional[Location]) -> None:
         self._implementation.set_last_location(loc)
 
     @property  # type: ignore

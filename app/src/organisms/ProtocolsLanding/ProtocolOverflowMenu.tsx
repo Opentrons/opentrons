@@ -9,7 +9,6 @@ import {
   DIRECTION_COLUMN,
   POSITION_RELATIVE,
   ALIGN_FLEX_END,
-  SIZE_4,
   useConditionalConfirm,
 } from '@opentrons/components'
 
@@ -18,6 +17,7 @@ import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { Portal } from '../../App/portal'
 import {
+  analyzeProtocol,
   removeProtocol,
   viewProtocolSourceFolder,
 } from '../../redux/protocol-storage'
@@ -35,7 +35,7 @@ export function ProtocolOverflowMenu(
   props: ProtocolOverflowMenuProps
 ): JSX.Element {
   const { protocolKey, handleRunProtocol } = props
-  const { t } = useTranslation('protocol_list')
+  const { t } = useTranslation(['protocol_list', 'shared'])
   const {
     menuOverlay,
     handleOverflowClick,
@@ -65,6 +65,12 @@ export function ProtocolOverflowMenu(
     handleRunProtocol()
     setShowOverflowMenu(!showOverflowMenu)
   }
+  const handleClickReanalyze: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    dispatch(analyzeProtocol(protocolKey))
+    setShowOverflowMenu(!showOverflowMenu)
+  }
   const handleClickDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
@@ -84,7 +90,7 @@ export function ProtocolOverflowMenu(
       />
       {showOverflowMenu ? (
         <Flex
-          width={SIZE_4}
+          whiteSpace="nowrap"
           zIndex={10}
           borderRadius="4px 4px 0px 0px"
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
@@ -99,6 +105,12 @@ export function ProtocolOverflowMenu(
             data-testid="ProtocolOverflowMenu_run"
           >
             {t('run')}
+          </MenuItem>
+          <MenuItem
+            onClick={handleClickReanalyze}
+            data-testid="ProtocolOverflowMenu_reanalyze"
+          >
+            {t('shared:reanalyze')}
           </MenuItem>
           <MenuItem
             onClick={handleClickShowInFolder}

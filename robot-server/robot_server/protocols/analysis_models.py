@@ -89,8 +89,16 @@ class CompletedAnalysis(BaseModel):
     )
     labware: List[LoadedLabware] = Field(
         ...,
-        description="Labware used by the protocol",
+        description=(
+            "Labware used by the protocol."
+            "\n\n"
+            "If a piece of labware moves between locations as part of the protocol,"
+            " its *final* location will be reported in this list,"
+            " not its *initial* location."
+        ),
     )
+    # TODO(mm, 2022-08-31): We're missing modules here, but there is a modules field
+    # in run results. Add modules here, for consistency?
     commands: List[Command] = Field(
         ...,
         description="The protocol commands the run is expected to produce",

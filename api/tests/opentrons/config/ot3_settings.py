@@ -55,7 +55,7 @@ ot3_dummy_settings = {
                 "Z": 2,
                 "P": 1,
             },
-            "gripper": {"Z": 2.8},
+            "gripper": {"Z": 2.8, "Z_G": 5},
         },
         "max_speed_discontinuity": {
             "none": {

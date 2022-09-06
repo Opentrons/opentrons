@@ -234,8 +234,6 @@ async def test_enter_bootloader(
         gcode="dfu"
     )
 
-    connection.send_command.assert_called_once_with(
-        command=expected, retries=3, timeout=1
-    )
+    connection.send_dfu_command.assert_called_once_with(command=expected)
 
     assert connection.close.called
