@@ -2,13 +2,13 @@ name: 'Create PR on macos-12 for Pipfile.lock'
 
 on:
   push:
+    branches:
+      - 'update-buildroot-2022.02.4' # remove before merge
+      - '!edge'
+      - '!release'
     paths:
     - '**setup.py'
     - '**Pipfile.*'
-    branches:
-      - '!edge'
-      - '!release'
-      - 'update-buildroot-2022.02.4' # remove before merge
   pull_request:
     paths:
     - '**/setup.py'
