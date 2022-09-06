@@ -13,6 +13,14 @@ class SharedDataMissingError(IOError):
     pass
 
 
+class InvalidOpentronsDataURI(IOError):
+    pass
+
+
+class WrongDataKindError(IOError):
+    pass
+
+
 @lru_cache(maxsize=1)
 def get_shared_data_root() -> Path:
     """
@@ -55,3 +63,38 @@ def load_shared_data(path: typing.Union[str, Path]) -> bytes:
     """
     with open(get_shared_data_root() / path, "rb") as f:
         return f.read()
+
+
+def load_shared_data_from_uri(
+    uri: typing.Union[str, Path], data_kind_filter: typing.Optional[str] = None
+) -> bytes:
+    """
+    Load file by an opentrons data URI, a URI parsed as if root was
+    the directory returned by get_shared_data_root()
+
+    If data_kind_filter is provided, it should be the name of one of the
+    data kinds (i.e. labware,robot,deck). If the URI specifies a data kind
+    other than the filter, an exception is raised.
+    """
+    uri_path = Path(uri)
+    root = get_shared_data_root()
+    if not uri_path.is_absolute():
+        raise InvalidOpentronsDataURI()
+    try:
+        relative = uri_path.relative_to("/")
+    except ValueError:
+        raise InvalidOpentronsDataURI()
+    resolved = (root / relative).resolve()
+    # TODO: Whenever we guarantee a python version above 3.9, we can use
+    # path.is_relative_to() -> bool
+    try:
+        parts = resolved.relative_to(root).parts
+    except ValueError:
+        raise InvalidOpentronsDataURI()
+    if data_kind_filter and parts[0] != data_kind_filter:
+        raise WrongDataKindError()
+    try:
+        with open(resolved, "rb") as f:
+            return f.read()
+    except FileNotFoundError:
+        raise InvalidOpentronsDataURI()

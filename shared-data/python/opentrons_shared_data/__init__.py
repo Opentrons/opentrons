@@ -7,7 +7,7 @@ the main opentrons package
 import os
 import json
 
-from .load import get_shared_data_root, load_shared_data
+from .load import get_shared_data_root, load_shared_data, load_shared_data_from_uri
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -18,5 +18,9 @@ try:
 except (FileNotFoundError, OSError):
     __version__ = "unknown"
 
-
-__all__ = ["__version__", "get_shared_data_root", "load_shared_data"]
+__all__ = [
+    "__version__",
+    "get_shared_data_root",
+    "load_shared_data",
+    "load_shared_data_from_uri",
+]
