@@ -109,6 +109,7 @@ def create_load_labware_command(
     location: LabwareLocation,
     definition: LabwareDefinition,
     offset_id: Optional[str],
+    display_name: Optional[str],
 ) -> cmd.LoadLabware:
     """Create a completed LoadLabware command."""
     params = cmd.LoadLabwareParams(
@@ -117,10 +118,13 @@ def create_load_labware_command(
         version=definition.version,
         location=location,
         labwareId=None,
+        displayName=display_name,
     )
 
     result = cmd.LoadLabwareResult(
-        labwareId=labware_id, definition=definition, offsetId=offset_id
+        labwareId=labware_id,
+        definition=definition,
+        offsetId=offset_id,
     )
 
     return cmd.LoadLabware(

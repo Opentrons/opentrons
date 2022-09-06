@@ -4,13 +4,15 @@ from typing import Dict, Optional
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import Mount, MountType, Location, DeckLocation
+from opentrons.types import Mount, MountType, Location, DeckLocation, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
+from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 
+from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
 from ..protocol import AbstractProtocol, LoadModuleResult
@@ -69,7 +71,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
     def load_labware_from_definition(
         self,
         labware_def: LabwareDefinition,
-        location: DeckLocation,
+        location: DeckSlotName,
         label: Optional[str],
     ) -> LabwareCore:
         """Load a labware using its definition dictionary."""
@@ -78,13 +80,23 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
     def load_labware(
         self,
         load_name: str,
-        location: DeckLocation,
+        location: DeckSlotName,
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
+        load_result = self._engine_client.load_labware(
+            load_name=load_name,
+            location=DeckSlotLocation(slotName=location),
+            namespace=namespace if namespace is not None else OPENTRONS_NAMESPACE,
+            version=version or 1,
+            display_name=label,
+        )
+        return LabwareCore(
+            labware_id=load_result.labwareId,
+            engine_client=self._engine_client,
+        )
 
     def load_module(
         self,

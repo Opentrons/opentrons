@@ -101,6 +101,7 @@ class ProtocolContext(CommandPublisher):
         ],
         labware_offset_provider: AbstractLabwareOffsetProvider,
         broker: Optional[Broker] = None,
+        equipment_broker: Optional[EquipmentBroker[LoadInfo]] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContext`.
 
@@ -116,6 +117,7 @@ class ProtocolContext(CommandPublisher):
         self._api_version = api_version
         self._implementation = implementation
         self._labware_offset_provider = labware_offset_provider
+        self._equipment_broker = equipment_broker or EquipmentBroker()
 
         if self._api_version > MAX_SUPPORTED_VERSION:
             raise RuntimeError(
@@ -132,8 +134,6 @@ class ProtocolContext(CommandPublisher):
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
-
-        self._equipment_broker = EquipmentBroker[LoadInfo]()
 
     @property
     def equipment_broker(self) -> EquipmentBroker[LoadInfo]:
@@ -281,32 +281,36 @@ class ProtocolContext(CommandPublisher):
         """
         # todo(mm, 2021-11-22): The duplication between here and load_labware()
         # is getting bad.
+        deck_slot = validation.ensure_deck_slot(location)
 
-        implementation = self._implementation.load_labware_from_definition(
-            labware_def=labware_def, location=location, label=label
+        labware_core = self._implementation.load_labware_from_definition(
+            labware_def=labware_def, location=deck_slot, label=label
         )
-        result = Labware(implementation=implementation)
 
-        result_namespace, result_load_name, result_version = result.uri.split("/")
+        labware_load_params = labware_core.get_load_params()
 
         provided_labware_offset = self._labware_offset_provider.find(
-            labware_definition_uri=result.uri,
+            load_params=labware_load_params,
             requested_module_model=None,
-            deck_slot=DeckSlotName.from_primitive(location),
+            deck_slot=deck_slot,
         )
 
-        result.set_calibration(delta=provided_labware_offset.delta)
+        labware_core.set_calibration(provided_labware_offset.delta)
+
+        # TODO(mc, 2022-09-02): add API version
+        # https://opentrons.atlassian.net/browse/RSS-97
+        result = Labware(implementation=labware_core)
 
         self.equipment_broker.publish(
             LabwareLoadInfo(
-                labware_definition=result._implementation.get_definition(),
-                labware_namespace=result_namespace,
-                labware_load_name=result_load_name,
-                labware_version=int(result_version),
-                deck_slot=DeckSlotName.from_primitive(location),
+                labware_definition=labware_core.get_definition(),
+                labware_namespace=labware_load_params.namespace,
+                labware_load_name=labware_load_params.load_name,
+                labware_version=labware_load_params.version,
+                deck_slot=deck_slot,
                 on_module=False,
                 offset_id=provided_labware_offset.offset_id,
-                labware_display_name=implementation.get_label(),
+                labware_display_name=labware_core.get_user_display_name(),
             )
         )
 
@@ -345,36 +349,41 @@ class ProtocolContext(CommandPublisher):
         """
         # todo(mm, 2021-11-22): The duplication between here and
         # load_labware_from_definition() is getting bad.
+        deck_slot = validation.ensure_deck_slot(location)
 
-        implementation = self._implementation.load_labware(
+        labware_core = self._implementation.load_labware(
             load_name=load_name,
-            location=location,
+            location=deck_slot,
             label=label,
             namespace=namespace,
             version=version,
         )
-        result = Labware(implementation=implementation)
 
-        result_namespace, result_load_name, result_version = result.uri.split("/")
+        labware_load_params = labware_core.get_load_params()
 
-        provided_labware_offset = self._labware_offset_provider.find(
-            labware_definition_uri=result.uri,
+        # TODO(mc, 2022-09-02): move labware offset provider to legacy core
+        labware_offset = self._labware_offset_provider.find(
+            load_params=labware_load_params,
+            deck_slot=deck_slot,
             requested_module_model=None,
-            deck_slot=DeckSlotName.from_primitive(location),
         )
+        labware_core.set_calibration(labware_offset.delta)
 
-        result.set_calibration(delta=provided_labware_offset.delta)
+        # TODO(mc, 2022-09-02): add API version
+        # https://opentrons.atlassian.net/browse/RSS-97
+        result = Labware(implementation=labware_core)
 
+        # TODO(mc, 2022-09-02): move equipment broker to legacy core
         self.equipment_broker.publish(
             LabwareLoadInfo(
-                labware_definition=result._implementation.get_definition(),
-                labware_namespace=result_namespace,
-                labware_load_name=result_load_name,
-                labware_version=int(result_version),
-                deck_slot=DeckSlotName.from_primitive(location),
+                labware_definition=labware_core.get_definition(),
+                labware_namespace=labware_load_params.namespace,
+                labware_load_name=labware_load_params.load_name,
+                labware_version=labware_load_params.version,
+                deck_slot=deck_slot,
                 on_module=False,
-                offset_id=provided_labware_offset.offset_id,
-                labware_display_name=implementation.get_label(),
+                offset_id=labware_offset.offset_id,
+                labware_display_name=labware_core.get_user_display_name(),
             )
         )
 

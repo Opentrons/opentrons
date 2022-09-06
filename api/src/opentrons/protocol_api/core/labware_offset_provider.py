@@ -6,6 +6,8 @@ from opentrons.hardware_control.modules import ModuleModel as HardwareModuleMode
 from opentrons.protocol_engine import ProtocolEngine, LabwareOffsetLocation, ModuleModel
 from opentrons.types import DeckSlotName, Point
 
+from .labware import LabwareLoadParams
+
 
 @dataclass
 class ProvidedLabwareOffset:
@@ -27,7 +29,7 @@ class AbstractLabwareOffsetProvider(ABC):
     @abstractmethod
     def find(
         self,
-        labware_definition_uri: str,
+        load_params: LabwareLoadParams,
         requested_module_model: Optional[HardwareModuleModel],
         deck_slot: DeckSlotName,
     ) -> ProvidedLabwareOffset:
@@ -55,7 +57,7 @@ class NullLabwareOffsetProvider(AbstractLabwareOffsetProvider):
 
     def find(
         self,
-        labware_definition_uri: str,
+        load_params: LabwareLoadParams,
         requested_module_model: Optional[HardwareModuleModel],
         deck_slot: DeckSlotName,
     ) -> ProvidedLabwareOffset:
@@ -71,7 +73,7 @@ class LabwareOffsetProvider(AbstractLabwareOffsetProvider):
 
     def find(
         self,
-        labware_definition_uri: str,
+        load_params: LabwareLoadParams,
         requested_module_model: Optional[HardwareModuleModel],
         deck_slot: DeckSlotName,
     ) -> ProvidedLabwareOffset:
@@ -80,7 +82,7 @@ class LabwareOffsetProvider(AbstractLabwareOffsetProvider):
         See the parent class for param details.
         """
         offset = self._labware_view.find_applicable_labware_offset(
-            definition_uri=labware_definition_uri,
+            definition_uri=load_params.as_uri(),
             location=LabwareOffsetLocation(
                 slotName=deck_slot,
                 moduleModel=(

@@ -329,6 +329,10 @@ class LoadedLabware(BaseModel):
             " so the default of (0, 0, 0) will be used."
         ),
     )
+    displayName: Optional[str] = Field(
+        None,
+        description="A user-specified display name for this labware, if provided.",
+    )
 
 
 class Liquid(BaseModel):

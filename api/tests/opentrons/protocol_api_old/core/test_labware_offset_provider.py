@@ -17,6 +17,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.state import LabwareView
 
+from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.labware_offset_provider import (
     LabwareOffsetProvider,
     ProvidedLabwareOffset,
@@ -66,7 +67,7 @@ def test_find_something(
     )
 
     result = subject.find(
-        labware_definition_uri="some_namespace/some_load_name/123",
+        load_params=LabwareLoadParams("some_namespace", "some_load_name", 123),
         requested_module_model=TemperatureModuleModel.TEMPERATURE_V1,
         deck_slot=DeckSlotName.SLOT_1,
     )
@@ -92,7 +93,7 @@ def test_find_nothing(
     decoy.when(decoy_call_rehearsal).then_return(None)
 
     result = subject.find(
-        labware_definition_uri="some_namespace/some_load_name/123",
+        load_params=LabwareLoadParams("some_namespace", "some_load_name", 123),
         requested_module_model=TemperatureModuleModel.TEMPERATURE_V1,
         deck_slot=DeckSlotName.SLOT_1,
     )
