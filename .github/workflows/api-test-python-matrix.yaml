@@ -55,6 +55,13 @@ jobs:
         run: make -C api test-cov
       - name: Ensure assets build
         run: make -C api sdist wheel
+      - name: pip install and use CLI tools
+        run: |
+          pip install --find-links=./api/dist opentrons
+          opentrons_execute --help
+          opentrons.cli --help
+          opentrons_simulate --help
+          opentrons_simulate ./api/docs/v2/example_protocols/dilution_tutorial.py -e -o nothing
       - name: Upload coverage report
         uses: 'codecov/codecov-action@v3'
         with:
