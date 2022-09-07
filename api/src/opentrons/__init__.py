@@ -13,7 +13,7 @@ from opentrons.config import (feature_flags as ff, name,
 from opentrons.util import logging_config
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
-
+# just testing this for now
 version = sys.version_info[0:2]
 if version < (3, 7):
     raise RuntimeError(
