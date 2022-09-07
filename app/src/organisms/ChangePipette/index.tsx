@@ -109,7 +109,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
       : null
   )
   const [
-    useWrongWantedPipette,
+    wrongWantedPipette,
     setWrongWantedPipette,
   ] = React.useState<PipetteNameSpecs | null>(wantedPipette)
   const [confirmPipetteLevel, setConfirmPipetteLevel] = React.useState<boolean>(
@@ -318,12 +318,12 @@ export function ChangePipette(props: Props): JSX.Element | null {
 
     let wizardCurrentStep: number = 0
     //  if success and wrong pipette is attached that does not have the level pipette screen
-    if (success || (useWrongWantedPipette != null && confirmPipetteLevel)) {
+    if (success || (wrongWantedPipette != null && confirmPipetteLevel)) {
       wizardCurrentStep = eightChannel
         ? EIGHT_CHANNEL_STEPS
         : SINGLE_CHANNEL_STEPS
       //  if attached wrong pipette and has level pipette screen
-    } else if (useWrongWantedPipette != null && !confirmPipetteLevel) {
+    } else if (wrongWantedPipette != null && !confirmPipetteLevel) {
       wizardCurrentStep = EIGHT_CHANNEL_STEPS - 1
       //  if in error state
     } else {
@@ -341,8 +341,8 @@ export function ChangePipette(props: Props): JSX.Element | null {
           })
         : t('attach_name_pipette', {
             pipette:
-              useWrongWantedPipette != null
-                ? useWrongWantedPipette.displayName
+              wrongWantedPipette != null
+                ? wrongWantedPipette.displayName
                 : wantedPipette?.displayName,
           })
 
@@ -358,7 +358,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
             setWantedName(null)
             setWizardStep(INSTRUCTIONS)
           },
-          useWrongWantedPipette: useWrongWantedPipette,
+          wrongWantedPipette: wrongWantedPipette,
           setWrongWantedPipette: setWrongWantedPipette,
           setConfirmPipetteLevel: setConfirmPipetteLevel,
           confirmPipetteLevel: confirmPipetteLevel,

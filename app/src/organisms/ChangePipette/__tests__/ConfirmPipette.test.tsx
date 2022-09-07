@@ -98,7 +98,7 @@ describe('ConfirmPipette', () => {
       toCalibrationDashboard: jest.fn(),
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
-      useWrongWantedPipette: null,
+      wrongWantedPipette: null,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
     }
@@ -125,7 +125,7 @@ describe('ConfirmPipette', () => {
       toCalibrationDashboard: jest.fn(),
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
-      useWrongWantedPipette: null,
+      wrongWantedPipette: null,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
     }
@@ -160,7 +160,7 @@ describe('ConfirmPipette', () => {
       toCalibrationDashboard: jest.fn(),
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
-      useWrongWantedPipette: null,
+      wrongWantedPipette: null,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
     }
@@ -195,7 +195,7 @@ describe('ConfirmPipette', () => {
       toCalibrationDashboard: jest.fn(),
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
-      useWrongWantedPipette: MOCK_ACTUAL_PIPETTE,
+      wrongWantedPipette: MOCK_ACTUAL_PIPETTE,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
     }
@@ -227,7 +227,7 @@ describe('ConfirmPipette', () => {
       toCalibrationDashboard: jest.fn(),
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
-      useWrongWantedPipette: null,
+      wrongWantedPipette: null,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
     }
@@ -262,7 +262,7 @@ describe('ConfirmPipette', () => {
       toCalibrationDashboard: jest.fn(),
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
-      useWrongWantedPipette: MOCK_WANTED_PIPETTE,
+      wrongWantedPipette: MOCK_WANTED_PIPETTE,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
     }
@@ -292,7 +292,7 @@ describe('ConfirmPipette', () => {
       toCalibrationDashboard: jest.fn(),
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
-      useWrongWantedPipette: MOCK_WANTED_PIPETTE,
+      wrongWantedPipette: MOCK_WANTED_PIPETTE,
       confirmPipetteLevel: true,
       setConfirmPipetteLevel: jest.fn(),
     }
@@ -324,7 +324,7 @@ describe('ConfirmPipette', () => {
       toCalibrationDashboard: jest.fn(),
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
-      useWrongWantedPipette: null,
+      wrongWantedPipette: null,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
     }
@@ -359,7 +359,7 @@ describe('ConfirmPipette', () => {
       toCalibrationDashboard: jest.fn(),
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
-      useWrongWantedPipette: null,
+      wrongWantedPipette: null,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
     }
@@ -387,7 +387,7 @@ describe('ConfirmPipette', () => {
       toCalibrationDashboard: jest.fn(),
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
-      useWrongWantedPipette: null,
+      wrongWantedPipette: null,
       confirmPipetteLevel: false,
       setConfirmPipetteLevel: jest.fn(),
     }

@@ -29,7 +29,7 @@ export interface ConfirmPipetteProps {
   displayName: string
   displayCategory: PipetteDisplayCategory | null
   mount: Mount
-  useWrongWantedPipette: PipetteNameSpecs | null
+  wrongWantedPipette: PipetteNameSpecs | null
   setWrongWantedPipette: React.Dispatch<
     React.SetStateAction<PipetteNameSpecs | null>
   >
@@ -45,7 +45,7 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
     success,
     mount,
     tryAgain,
-    useWrongWantedPipette,
+    wrongWantedPipette,
     actualPipette,
     setConfirmPipetteLevel,
     confirmPipetteLevel,
@@ -65,10 +65,10 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
     let header
     let subHeader
 
-    if ((wantedPipette && success) || useWrongWantedPipette) {
+    if ((wantedPipette && success) || wrongWantedPipette) {
       header = t('pipette_attached')
       subHeader = t('pipette_is_ready_to_use', {
-        pipette: useWrongWantedPipette
+        pipette: wrongWantedPipette
           ? actualPipette?.displayName
           : wantedPipette?.displayName,
       })
@@ -98,7 +98,7 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
   const { header, subHeader } = getPipetteStatusDetails({ ...props })
 
   return !confirmPipetteLevel &&
-    useWrongWantedPipette &&
+    wrongWantedPipette &&
     actualPipette != null &&
     actualPipette.channels === 8 ? (
     <LevelPipette
@@ -110,7 +110,7 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
   ) : (
     <SimpleWizardBody
       iconColor={
-        success || useWrongWantedPipette || confirmPipetteLevel
+        success || wrongWantedPipette || confirmPipetteLevel
           ? COLORS.successEnabled
           : COLORS.errorEnabled
       }
@@ -119,10 +119,10 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
       isSuccess={success}
     >
       <>
-        {!success && !useWrongWantedPipette && !confirmPipetteLevel && (
+        {!success && !wrongWantedPipette && !confirmPipetteLevel && (
           <TryAgainButton {...props} />
         )}
-        {success || useWrongWantedPipette || confirmPipetteLevel ? (
+        {success || wrongWantedPipette || confirmPipetteLevel ? (
           <SuccessAndExitButtons
             {...props}
             confirmPipetteLevel={confirmPipetteLevel}
@@ -142,11 +142,11 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
     tryAgain,
     exit,
     setWrongWantedPipette,
-    useWrongWantedPipette,
+    wrongWantedPipette,
   } = props
   const { t } = useTranslation('change_pipette')
 
-  if (wantedPipette && attachedWrong && !useWrongWantedPipette) {
+  if (wantedPipette && attachedWrong && !wrongWantedPipette) {
     return (
       <>
         <SecondaryButton
@@ -189,13 +189,13 @@ function SuccessAndExitButtons(props: ConfirmPipetteProps): JSX.Element {
     exit,
     toCalibrationDashboard,
     success,
-    useWrongWantedPipette,
+    wrongWantedPipette,
     confirmPipetteLevel,
   } = props
   const { t } = useTranslation('change_pipette')
   return (
     <>
-      {useWrongWantedPipette ||
+      {wrongWantedPipette ||
       (success && actualPipette && !actualPipetteOffset) ||
       confirmPipetteLevel ? (
         <SecondaryButton
