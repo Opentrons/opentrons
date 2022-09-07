@@ -72,11 +72,9 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
               t={t}
               i18nKey={'level_the_pipette'}
               components={{
-                bold: (
+                strong: (
                   <strong
-                    style={{
-                      fontWeight: TYPOGRAPHY.fontWeightSemiBold,
-                    }}
+                    style={{ fontWeight: TYPOGRAPHY.fontWeightSemiBold }}
                   />
                 ),
                 h1: (
