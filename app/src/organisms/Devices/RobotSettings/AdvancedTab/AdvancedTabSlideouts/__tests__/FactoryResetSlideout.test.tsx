@@ -65,7 +65,7 @@ describe('RobotSettings FactoryResetSlideout', () => {
     getByText('Factory Reset')
     getByText('Select the robot data to clear.')
     getByText('Factory resets cannot be undone')
-    getByText('Robot calibration data')
+    getByText('Robot Calibration Data')
     getByText(
       'Resetting Deck and/or Tip Length Calibration data will also clear Pipette Offset Calibration data.'
     )

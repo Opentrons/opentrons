@@ -113,7 +113,7 @@
   "factory_reset_slideout_title": "Factory Reset",
   "factory_reset_slideout_description": "Select the robot data to clear.",
   "factory_resets_cannot_be_undone": "Factory resets cannot be undone",
-  "robot_calibration_data": "Robot calibration data",
+  "robot_calibration_data": "Robot Calibration Data",
   "calibration_description": "Resetting Deck and/or Tip Length Calibration data will also clear Pipette Offset Calibration data.",
   "protocol_run_history": "Protocol Run History",
   "boot_scripts": "Boot Scripts",
