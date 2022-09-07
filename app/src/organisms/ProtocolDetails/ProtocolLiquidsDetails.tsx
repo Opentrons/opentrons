@@ -28,12 +28,12 @@ export const ProtocolLiquidsDetails = (): JSX.Element => {
         return (
           <>
             <Flex
-              key={liquid.liquidId}
+              key={liquid.id}
               flexDirection={DIRECTION_COLUMN}
               marginY={SPACING.spacing4}
             >
               <LiquidsListItemDetails
-                liquidId={liquid.liquidId}
+                liquidId={liquid.id}
                 displayColor={liquid.displayColor}
                 displayName={liquid.displayName}
                 description={liquid.description}

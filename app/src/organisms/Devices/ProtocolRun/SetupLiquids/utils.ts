@@ -14,9 +14,7 @@ export function getWellFillFromLabwareId(
     labwareArray.forEach(labware => {
       if (labware.labwareId === labwareId) {
         const liquidId = liquidIds[index]
-        const liquid = liquidsInLoadOrder.find(
-          liquid => liquid.liquidId === liquidId
-        )
+        const liquid = liquidsInLoadOrder.find(liquid => liquid.id === liquidId)
         const wellFill: {
           [well: string]: string
         } = {}

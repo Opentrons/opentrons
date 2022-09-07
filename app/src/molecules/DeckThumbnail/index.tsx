@@ -16,12 +16,14 @@ import {
   parseInitialLoadedModulesBySlot,
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
+  Liquid,
 } from '@opentrons/api-client'
 import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
 import type { DeckSlot, RunTimeCommand } from '@opentrons/shared-data'
 
 interface DeckThumbnailProps {
   commands: RunTimeCommand[]
+  liquids?: Liquid[]
   showLiquids?: boolean
 }
 const deckSetupLayerBlocklist = [
@@ -45,7 +47,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
     commands
   )
   const liquidsInLoadOrder = parseLiquidsInLoadOrder()
-  const labwareByLiquidId = parseLabwareInfoByLiquidId()
+  const labwareByLiquidId = parseLabwareInfoByLiquidId(commands)
 
   return (
     // PR #10488 changed size

@@ -48,6 +48,7 @@ export interface ProtocolFile<DesignerApplicationData = {}> {
     [liquidId: string]: {
       displayName: string
       description: string
+      displayColor?: string
     }
   }
   commands: CreateCommand[]
