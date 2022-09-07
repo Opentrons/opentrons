@@ -10,7 +10,6 @@ import {
   DIRECTION_ROW,
   POSITION_RELATIVE,
   POSITION_ABSOLUTE,
-  SIZE_1,
 } from '@opentrons/components'
 
 import type {
@@ -83,17 +82,20 @@ export function Select(props: SelectComponentProps): JSX.Element {
       ...styles,
       backgroundColor: COLORS.white,
       width: props.width != null ? props.width : 'auto',
-      boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.2)',
+      boxShadowcha: '0px 1px 3px rgba(0, 0, 0, 0.2)',
       borderRadius: '4px 4px 0px 0px',
       marginTop: SPACING.spacing2,
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
     menuList: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      maxHeight: '38vh',
+      maxHeight: '55vh',
       overflowY: 'scroll',
     }),
-    menuPortal: NO_STYLE_FN,
+    menuPortal: (styles: CSSObjectWithLabel) => ({
+      ...styles,
+      zIndex: 10,
+    }),
     multiValue: NO_STYLE_FN,
     multiValueLabel: NO_STYLE_FN,
     multiValueRemove: NO_STYLE_FN,
@@ -122,11 +124,13 @@ export function Select(props: SelectComponentProps): JSX.Element {
       marginLeft: SPACING.spacingSS,
       color: COLORS.darkBlackEnabled,
       fontSize: TYPOGRAPHY.fontSizeP,
+      marginTop: '0.2rem',
     }),
     singleValue: (styles: CSSObjectWithLabel) => ({
       ...styles,
       marginRight: '0.75rem',
       marginLeft: SPACING.spacing2,
+      marginTop: '0.2rem',
     }),
     valueContainer: NO_STYLE_FN,
   }
@@ -147,18 +151,15 @@ function DropdownIndicator(
     <components.DropdownIndicator {...props}>
       <Box
         position={POSITION_ABSOLUTE}
-        top="0.75rem"
-        right={SPACING.spacing2}
+        top="0.55rem"
+        right={SPACING.spacing3}
         width={SPACING.spacingM}
       >
-        <Icon
-          name={
-            Boolean(props.selectProps.menuIsOpen)
-              ? 'chevron-up'
-              : 'chevron-down'
-          }
-          height={SIZE_1}
-        />
+        {Boolean(props.selectProps.menuIsOpen) ? (
+          <Icon transform="rotate(180deg)" name="menu-down" height="1.25rem" />
+        ) : (
+          <Icon name="menu-down" height="1.25rem" />
+        )}
       </Box>
     </components.DropdownIndicator>
   )

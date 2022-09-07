@@ -34,13 +34,21 @@ export function InstructionStep(props: Props): JSX.Element {
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_EVENLY}>
-      <Box marginRight={SPACING.spacingXXL}>{children}</Box>
-      <img
-        src={display}
-        height={diagram === 'tab' ? '100%' : '270px'}
-        width="275px"
-        alt={`${direction}-${mount}-${channelsKey}-${displayCategory}-${diagram}`}
-      />
+      <Box marginRight={SPACING.spacingXXL} width="18.6875rem">
+        {children}
+      </Box>
+      <Box
+        marginTop={diagram === 'tab' ? '4.1875rem' : '0.75rem'}
+        marginLeft={diagram === 'tab' ? '1.5625rem' : SPACING.spacingXXL}
+        marginRight={SPACING.spacing6}
+      >
+        <img
+          src={display}
+          height={diagram === 'tab' ? '100%' : '245px'}
+          width={diagram === 'tab' ? '240px' : '200px'}
+          alt={`${direction}-${mount}-${channelsKey}-${displayCategory}-${diagram}`}
+        />
+      </Box>
     </Flex>
   )
 }
