@@ -1,6 +1,7 @@
 // generic react hooks that don't fit cleanly anywhere else
 
 export * from './useConditionalConfirm'
+export * from './useDrag'
 export * from './useInterval'
 export * from './useMountEffect'
 export * from './usePrevious'
