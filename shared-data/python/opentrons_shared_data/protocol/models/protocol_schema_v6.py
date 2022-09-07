@@ -167,48 +167,53 @@ class ProtocolSchemaV6(BaseModel):
         # added for constructing the class with field name instead of alias
         allow_population_by_field_name = True
 
-    @validator("commands", always=True)  # noqa: C901
-    def validate_commands(
+    @validator("commands")
+    def _validate_commands(
         cls,
         value: List[Command],
         values: Dict[str, Any],
     ) -> List[Command]:
+        pipette_ids = set(values["pipettes"].keys()) if "pipettes" in values else set()
+        labware_ids = set(values["labware"].keys()) if "labware" in values else set()
+        module_ids = (
+            set(values["modules"].keys())
+            if "modules" in values and values["modules"]
+            else set()
+        )
+        liquid_ids = (
+            set(values["liquids"].keys())
+            if "liquids" in values and values["liquids"]
+            else set()
+        )
+
         for command in value:
-            if command.params.pipetteId and "pipettes" in values:
-                missing_ids = set([command.params.pipetteId]).difference(
-                    set(values["pipettes"].keys())
+            if (
+                command.params.pipetteId is not None
+                and command.params.pipetteId not in pipette_ids
+            ):
+                raise ValueError(
+                    f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {command.params.pipetteId} in referencing object."
                 )
-                payload = ", ".join(f"{item}" for item in missing_ids)
-                if missing_ids:
-                    raise ValueError(
-                        f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {payload} in referencing object."
-                    )
-            elif command.params.labwareId and "labware" in values:
-                missing_ids = set([command.params.labwareId]).difference(
-                    set(values["labware"].keys())
+            if (
+                command.params.labwareId is not None
+                and command.params.labwareId not in labware_ids
+            ):
+                raise ValueError(
+                    f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {command.params.labwareId} in referencing object."
                 )
-                payload = ", ".join(f"{item}" for item in missing_ids)
-                if missing_ids:
-                    raise ValueError(
-                        f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {payload} in referencing object."
-                    )
-            elif command.params.moduleId and "modules" in values and values["modules"]:
-                missing_ids = set([command.params.moduleId]).difference(
-                    set(values["modules"].keys())
+            if (
+                command.params.moduleId is not None
+                and command.params.moduleId not in module_ids
+            ):
+                raise ValueError(
+                    f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {command.params.moduleId} in referencing object."
                 )
-                payload = ", ".join(f"{item}" for item in missing_ids)
-                if missing_ids:
-                    raise ValueError(
-                        f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {payload} in referencing object."
-                    )
-            elif command.params.liquidId and "liquids" in values and values["liquids"]:
-                missing_ids = set([command.params.liquidId]).difference(
-                    set(values["liquids"].keys())
+            if (
+                command.params.liquidId is not None
+                and command.params.liquidId not in liquid_ids
+            ):
+                raise ValueError(
+                    f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {command.params.liquidId} in referencing object."
                 )
-                payload = ", ".join(f"{item}" for item in missing_ids)
-                if missing_ids:
-                    raise ValueError(
-                        f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {payload} in referencing object."
-                    )
 
         return value
