@@ -40,10 +40,6 @@ export interface ConfirmPipetteProps {
   toCalibrationDashboard: () => void
 }
 
-export interface SuccessAndExitProps extends ConfirmPipetteProps {
-  confirmPipetteLevel: boolean
-}
-
 export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
   const {
     success,
@@ -186,7 +182,7 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
   )
 }
 
-function SuccessAndExitButtons(props: SuccessAndExitProps): JSX.Element {
+function SuccessAndExitButtons(props: ConfirmPipetteProps): JSX.Element {
   const {
     actualPipette,
     actualPipetteOffset,

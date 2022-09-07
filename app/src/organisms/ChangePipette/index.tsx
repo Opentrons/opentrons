@@ -207,7 +207,6 @@ export function ChangePipette(props: Props): JSX.Element | null {
       instructionsCurrentStep = 3
     }
   }
-  console.log(instructionsCurrentStep)
 
   const success =
     // success if we were trying to detach and nothing's attached
