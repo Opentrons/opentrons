@@ -48,7 +48,7 @@ def test_get_mixed_case_labware_def() -> None:
 def test_load_label(ctx: papi.ProtocolContext) -> None:
     labware = ctx.load_labware(labware_name, "1", "my cool labware")
     assert "my cool labware" in str(labware)
-    assert labware._implementation.get_label() == "my cool labware"
+    assert labware._implementation.get_user_display_name() == "my cool labware"
 
 
 def test_deprecated_load(ctx: papi.ProtocolContext) -> None:

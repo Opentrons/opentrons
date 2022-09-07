@@ -1,11 +1,15 @@
 """Tests for am ChildThreadTransport."""
-
-import pytest
+import threading
 from asyncio import get_running_loop
 from datetime import datetime
-from decoy import Decoy
 from functools import partial
+from typing import Any
 
+import pytest
+from decoy import Decoy
+
+from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands
 from opentrons.protocol_engine.errors import ErrorOccurrence, ProtocolEngineError
@@ -91,3 +95,31 @@ async def test_execute_command_failure(
 
     with pytest.raises(ProtocolEngineError, match="Things are not looking good"):
         await get_running_loop().run_in_executor(None, task)
+
+
+async def test_call_method(
+    decoy: Decoy,
+    engine: ProtocolEngine,
+    subject: ChildThreadTransport,
+) -> None:
+    """It should call a synchronous method in a thread-safe manner."""
+    labware_def = LabwareDefinition.construct(namespace="hello")  # type: ignore[call-arg]
+    labware_uri = LabwareUri("hello/world/123")
+    calling_thread_id = None
+
+    def _record_calling_thread(*args: Any, **kwargs: Any) -> LabwareUri:
+        nonlocal calling_thread_id
+        calling_thread_id = threading.current_thread().ident
+        return labware_uri
+
+    decoy.when(engine.add_labware_definition(labware_def)).then_do(
+        _record_calling_thread
+    )
+
+    _act = partial(
+        subject.call_method, "add_labware_definition", definition=labware_def
+    )
+
+    result = await get_running_loop().run_in_executor(None, _act)
+    assert result == labware_uri
+    assert calling_thread_id == threading.current_thread().ident

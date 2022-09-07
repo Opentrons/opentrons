@@ -1,12 +1,13 @@
 """Tests for pipette state changes in the protocol_engine state store."""
 import pytest
 from datetime import datetime
+from typing import Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import MountType
+from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.types import DeckPoint, LoadedPipette
+from opentrons.protocol_engine.types import DeckPoint, DeckSlotLocation, LoadedPipette
 from opentrons.protocol_engine.actions import UpdateCommandAction
 from opentrons.protocol_engine.state.pipettes import (
     PipetteStore,
@@ -362,7 +363,7 @@ def test_movement_commands_without_well_clear_current_well(
 def test_heater_shaker_command_without_movement(
     subject: PipetteStore, command: cmd.Command
 ) -> None:
-    """Heater Shaker commands that dont't move pipettes shouldn't clear current_well."""
+    """Heater Shaker commands that don't move pipettes shouldn't clear current_well."""
     load_pipette_command = create_load_pipette_command(
         pipette_id="pipette-id",
         pipette_name=PipetteNameType.P300_SINGLE,
@@ -383,6 +384,76 @@ def test_heater_shaker_command_without_movement(
         labware_id="labware-id",
         well_name="well-name",
     )
+
+
+@pytest.mark.parametrize(
+    ("move_labware_command", "expected_current_well"),
+    (
+        (
+            cmd.MoveLabware(
+                id="move-labware-command-id",
+                key="move-labware-command-key",
+                status=cmd.CommandStatus.SUCCEEDED,
+                createdAt=datetime.now(),
+                params=cmd.MoveLabwareParams(
+                    labwareId="non-matching-labware-id",
+                    newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                ),
+                result=cmd.MoveLabwareResult(offsetId=None),
+            ),
+            # Current well NOT cleared,
+            # because MoveLabware command had "non-matching-labware-id".
+            CurrentWell(
+                pipette_id="pipette-id",
+                labware_id="matching-labware-id",
+                well_name="well-name",
+            ),
+        ),
+        (
+            cmd.MoveLabware(
+                id="move-labware-command-id",
+                key="move-labware-command-key",
+                status=cmd.CommandStatus.SUCCEEDED,
+                createdAt=datetime.now(),
+                params=cmd.MoveLabwareParams(
+                    labwareId="matching-labware-id",
+                    newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                ),
+                result=cmd.MoveLabwareResult(offsetId=None),
+            ),
+            # Current well IS cleared,
+            # because MoveLabware command had "matching-labware-id".
+            None,
+        ),
+    ),
+)
+def test_move_labware_clears_current_well_if_belonged_to_moved_labware(
+    subject: PipetteStore,
+    move_labware_command: cmd.MoveLabware,
+    expected_current_well: Optional[CurrentWell],
+) -> None:
+    """`moveLabware` commands should sometimes clear the current well.
+
+    * When the current well belongs to the labware that was moved,
+      it should be cleared.
+    * Otherwise, it should be left alone.
+    """
+    load_pipette_command = create_load_pipette_command(
+        pipette_id="pipette-id",
+        pipette_name=PipetteNameType.P300_SINGLE,
+        mount=MountType.LEFT,
+    )
+    move_to_well_command = create_move_to_well_command(
+        pipette_id="pipette-id",
+        labware_id="matching-labware-id",
+        well_name="well-name",
+    )
+
+    subject.handle_action(UpdateCommandAction(command=load_pipette_command))
+    subject.handle_action(UpdateCommandAction(command=move_to_well_command))
+
+    subject.handle_action(UpdateCommandAction(command=move_labware_command))
+    assert subject.state.current_well == expected_current_well
 
 
 def test_tip_commands_update_has_tip(subject: PipetteStore) -> None:

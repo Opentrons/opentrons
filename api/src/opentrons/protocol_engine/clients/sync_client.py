@@ -2,8 +2,10 @@
 from typing import cast, Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import MountType
+from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
+from opentrons.types import MountType
 
 from .. import commands
 from ..state import StateView
@@ -28,12 +30,20 @@ class SyncClient:
         """Get a view of the engine's state."""
         return self._transport.state
 
+    def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
+        """Add a labware definition to the engine."""
+        return self._transport.call_method(
+            "add_labware_definition",
+            definition=definition,
+        )
+
     def load_labware(
         self,
         location: LabwareLocation,
         load_name: str,
         namespace: str,
         version: int,
+        display_name: Optional[str] = None,
     ) -> commands.LoadLabwareResult:
         """Execute a LoadLabware command and return the result."""
         request = commands.LoadLabwareCreate(
@@ -42,6 +52,7 @@ class SyncClient:
                 loadName=load_name,
                 namespace=namespace,
                 version=version,
+                displayName=display_name,
             )
         )
         result = self._transport.execute_command(request=request)

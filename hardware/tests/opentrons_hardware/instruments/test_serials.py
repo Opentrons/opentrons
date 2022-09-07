@@ -1,6 +1,8 @@
 """Test serial setting."""
 import pytest
-from opentrons_hardware.pipettes import serials
+from opentrons_hardware.instruments.serial_utils import model_versionstring_from_int
+from opentrons_hardware.instruments.pipettes import serials as pip_serials
+from opentrons_hardware.instruments.gripper import serials as grip_serials
 from opentrons_hardware.firmware_bindings.constants import PipetteName
 
 
@@ -39,11 +41,11 @@ from opentrons_hardware.firmware_bindings.constants import PipetteName
         ),
     ],
 )
-def test_scan_valid_serials(
+def test_scan_valid_pipette_serials(
     scanned_val: str, name: PipetteName, model: int, serial: bytes
 ) -> None:
-    """Various known-good serials."""
-    parsed_name, parsed_model, parsed_serial = serials.info_from_serial_string(
+    """Various known-good serials for pipettes."""
+    parsed_name, parsed_model, parsed_serial = pip_serials.info_from_serial_string(
         scanned_val
     )
     assert parsed_name == name
@@ -55,7 +57,7 @@ def test_scan_valid_serials(
 def test_pipette_name_validity(scannedval: str) -> None:
     """Pipette name lookup matching."""
     with pytest.raises(ValueError, match="The pipette name part.*"):
-        serials.info_from_serial_string(scannedval)
+        pip_serials.info_from_serial_string(scannedval)
 
 
 @pytest.mark.parametrize(
@@ -69,10 +71,10 @@ def test_pipette_name_validity(scannedval: str) -> None:
         "P1KSV0102022022123123123",
     ],
 )
-def test_serial_validity(scannedval: str) -> None:
+def test_pipette_serial_validity(scannedval: str) -> None:
     """Various regex failures."""
     with pytest.raises(ValueError, match="The serial number.*"):
-        serials.info_from_serial_string(scannedval)
+        pip_serials.info_from_serial_string(scannedval)
 
 
 @pytest.mark.parametrize("name", [name for name in PipetteName])
@@ -85,9 +87,73 @@ def test_serial_validity(scannedval: str) -> None:
         b"hello  \x00\x00\x00\x00",
     ],
 )
-def test_serial_val_from_parts(name: PipetteName, model: int, data: bytes) -> None:
+def test_pipette_serial_val_from_parts(
+    name: PipetteName, model: int, data: bytes
+) -> None:
     """Make sure that valid inputs don't cause exceptions."""
-    serials.serial_val_from_parts(name, model, data)
+    pip_serials.serial_val_from_parts(name, model, data)
+
+
+@pytest.mark.parametrize(
+    "scanned_val,model,serial",
+    [
+        (
+            "GRPV0102022022",
+            1,
+            b"02022022\x00\x00\x00\x00\x00\x00\x00\x00",
+        ),
+        (
+            "GRPV3120211129A08",
+            31,
+            b"20211129A08\x00\x00\x00\x00\x00",
+        ),
+        (
+            "GRPV29",
+            29,
+            b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+        ),
+    ],
+)
+def test_scan_valid_gripper_serials(
+    scanned_val: str, model: int, serial: bytes
+) -> None:
+    """Various known-good serials for gripper."""
+    parsed_model, parsed_serial = grip_serials.gripper_info_from_serial_string(
+        scanned_val
+    )
+    assert parsed_model == model
+    assert parsed_serial == serial
+
+
+@pytest.mark.parametrize(
+    "scannedval",
+    [
+        "",
+        "G",
+        "GR",
+        "GRVVV",
+        "GRV0A",
+        "GRVV0102022022123123123",
+    ],
+)
+def test_gripper_serial_validity(scannedval: str) -> None:
+    """Various regex failures for gripper."""
+    with pytest.raises(ValueError, match="The serial number.*"):
+        grip_serials.gripper_info_from_serial_string(scannedval)
+
+
+@pytest.mark.parametrize("model", [0, 1, 10, 0xFF])
+@pytest.mark.parametrize(
+    "data",
+    [
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+        b"\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00",
+        b"hello  \x00\x00\x00\x00",
+    ],
+)
+def test_gripper_serial_val_from_parts(model: int, data: bytes) -> None:
+    """Make sure that valid inputs don't cause exceptions for gripper."""
+    grip_serials.gripper_serial_val_from_parts(model, data)
 
 
 @pytest.mark.parametrize(
@@ -104,4 +170,4 @@ def test_serial_val_from_parts(name: PipetteName, model: int, data: bytes) -> No
 )
 def test_versionstring_from_int(model: int, versionstr: str) -> None:
     """Test versionstring."""
-    assert serials.model_versionstring_from_int(model) == versionstr
+    assert model_versionstring_from_int(model) == versionstr

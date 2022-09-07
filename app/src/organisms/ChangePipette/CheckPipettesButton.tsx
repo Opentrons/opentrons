@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import {
   useDispatchApiRequests,
   getRequestById,
@@ -8,32 +9,44 @@ import {
 } from '../../redux/robot-api'
 import { useFeatureFlag } from '../../redux/config'
 import { fetchPipettes, FETCH_PIPETTES } from '../../redux/pipettes'
+import { StyledText } from '../../atoms/text'
 import {
   PrimaryButton as DeprecatedPrimaryButton,
   Icon,
   DIRECTION_ROW,
-  SPACING,
   Flex,
   COLORS,
   ALIGN_CENTER,
+  SPACING,
 } from '@opentrons/components'
 import { PrimaryButton } from '../../atoms/buttons'
 
 import type { State } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
 
 export interface CheckPipetteButtonProps {
   robotName: string
-  children: React.ReactNode
+  children?: React.ReactNode
   className?: string
   hidden?: boolean
+  actualPipette?: PipetteModelSpecs
   onDone?: () => void
 }
 
 export function CheckPipettesButton(
   props: CheckPipetteButtonProps
 ): JSX.Element | null {
-  const { robotName, onDone, children, className, hidden = false } = props
+  const {
+    robotName,
+    onDone,
+    children,
+    className,
+    actualPipette,
+    hidden = false,
+  } = props
+  const { t } = useTranslation('change_pipette')
+
   const enableChangePipetteWizard = useFeatureFlag('enableChangePipetteWizard')
   const fetchPipettesRequestId = React.useRef<string | null>(null)
   const [dispatch] = useDispatchApiRequests(dispatchedAction => {
@@ -53,7 +66,7 @@ export function CheckPipettesButton(
       ? getRequestById(state, fetchPipettesRequestId.current)
       : null
   )?.status
-  const pending = requestStatus === PENDING
+  const isPending = requestStatus === PENDING
 
   React.useEffect(() => {
     if (requestStatus === SUCCESS && onDone) onDone()
@@ -62,10 +75,10 @@ export function CheckPipettesButton(
   const displayButton = hidden ? null : (
     <DeprecatedPrimaryButton
       onClick={handleClick}
-      disabled={pending}
+      disabled={isPending}
       className={className}
     >
-      {pending ? <Icon name="ot-spinner" height="1rem" spin /> : children}
+      {isPending ? <Icon name="ot-spinner" height="1rem" spin /> : children}
     </DeprecatedPrimaryButton>
   )
 
@@ -76,15 +89,27 @@ export function CheckPipettesButton(
         color={COLORS.white}
         alignItems={ALIGN_CENTER}
       >
-        {pending ? (
-          <Icon
-            name="ot-spinner"
-            height="1rem"
-            spin
-            marginRight={SPACING.spacing2}
-          />
-        ) : null}
-        {children}
+        {children != null ? (
+          children
+        ) : isPending ? (
+          <>
+            <Icon
+              name="ot-spinner"
+              height="1rem"
+              spin
+              marginRight={SPACING.spacing3}
+            />
+            <StyledText>
+              {actualPipette
+                ? t('confirming_detachment')
+                : t('confirming_attachment')}
+            </StyledText>
+          </>
+        ) : actualPipette ? (
+          t('confirm_detachment')
+        ) : (
+          t('confirm_attachment')
+        )}
       </Flex>
     </PrimaryButton>
   ) : (
