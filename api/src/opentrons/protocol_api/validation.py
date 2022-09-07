@@ -104,17 +104,13 @@ def ensure_module_deck_slot(
 ) -> DeckSlotName:
     """Ensure that a requested module load location is correct."""
     if location is not None:
-        checked_location = ensure_deck_slot(location)
+        deck_slot = ensure_deck_slot(location)
+    elif isinstance(model, ThermocyclerModuleModel):
+        deck_slot = DeckSlotName.SLOT_7
+    else:
+        raise ValueError(f"Location required for {model.value}")
 
-    if location is None:
-        if not isinstance(model, ThermocyclerModuleModel):
-            raise ValueError(f"Location required for {model.value}")
-        checked_location = DeckSlotName.SLOT_7
-
-    if (
-        isinstance(model, ThermocyclerModuleModel)
-        and checked_location != DeckSlotName.SLOT_7
-    ):
+    if isinstance(model, ThermocyclerModuleModel) and deck_slot != DeckSlotName.SLOT_7:
         raise ValueError(f"{model.value} must be placed in slot 7")
 
-    return checked_location
+    return deck_slot
