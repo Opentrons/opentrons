@@ -1,7 +1,11 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
-import { getPipetteNameSpecs, shouldLevel } from '@opentrons/shared-data'
+import {
+  getPipetteNameSpecs,
+  PipetteNameSpecs,
+  shouldLevel,
+} from '@opentrons/shared-data'
 import { useTranslation } from 'react-i18next'
 import { SPACING, TYPOGRAPHY } from '@opentrons/components'
 import {
@@ -79,14 +83,6 @@ export function ChangePipette(props: Props): JSX.Element | null {
   const history = useHistory()
   const enableChangePipetteWizard = useFeatureFlag('enableChangePipetteWizard')
   const dispatch = useDispatch<Dispatch>()
-  // const [
-  //   useWrongPipetteOneChannel,
-  //   setUseWrongPipetteOneChannel,
-  // ] = React.useState<boolean>(false)
-  // const [
-  //   useWrongPipetteEightChannel,
-  //   setUseWrongPipetteEightChannel,
-  // ] = React.useState<boolean>(false)
   const finalRequestId = React.useRef<string | null | undefined>(null)
   const [dispatchApiRequests] = useDispatchApiRequests(dispatchedAction => {
     if (
@@ -112,6 +108,10 @@ export function ChangePipette(props: Props): JSX.Element | null {
       ? getCalibrationForPipette(state, robotName, attachedPipette.id, mount)
       : null
   )
+  const [
+    useWrongWantedPipette,
+    setWrongWantedPipette,
+  ] = React.useState<PipetteNameSpecs | null>(wantedPipette)
 
   const movementStatus = useSelector((state: State) => {
     return getMovementStatus(state, robotName)
@@ -178,16 +178,8 @@ export function ChangePipette(props: Props): JSX.Element | null {
   const [instructionStepPage, instructionSetStepPage] = React.useState<number>(
     0
   )
-  // let pipetteChannels: number = 1
-  // if (useWrongPipetteEightChannel) {
-  //   pipetteChannels = 8
-  // } else if (useWrongPipetteOneChannel) {
-  //   pipetteChannels = 1
-  // } else if (wantedPipette != null) {
-  //   wantedPipette.channels = 8
-  // }
 
-  const eightChannel = wantedPipette?.channels === 8
+  const eightChannel = actualPipette?.channels === 8
 
   const direction = actualPipette ? DETACH : ATTACH
   const isSelectPipetteStep =
@@ -219,9 +211,16 @@ export function ChangePipette(props: Props): JSX.Element | null {
     // or if the names of wanted and attached match
     actualPipette?.name === wantedPipette?.name
 
+  const attachedIncorrectPipette = Boolean(
+    !success && wantedPipette && actualPipette
+  )
+
+  const noPipetteDetach =
+    direction === DETACH && actualPipette === null && wantedPipette === null
+
   let exitWizardHeader
   let wizardTitle: string =
-    actualPipette?.displayName != null
+    actualPipette?.displayName != null && wantedPipette === null
       ? t('detach_pipette', {
           pipette: actualPipette.displayName,
           mount: mount[0].toUpperCase() + mount.slice(1),
@@ -261,8 +260,6 @@ export function ChangePipette(props: Props): JSX.Element | null {
           pipetteName: wantedPipette?.displayName ?? '',
         })
 
-    const noPipetteDetach =
-      direction === DETACH && actualPipette === null && wantedPipette === null
     const detachWizardHeader = noPipetteDetach
       ? t('detach')
       : t('detach_pipette', {
@@ -291,6 +288,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
       <Instructions
         {...{
           ...basePropsWithPipettes,
+          attachedWrong: attachedIncorrectPipette,
           direction,
           setWantedName,
           confirm: () => setWizardStep(CONFIRM),
@@ -309,10 +307,6 @@ export function ChangePipette(props: Props): JSX.Element | null {
       />
     )
   } else if (wizardStep === CONFIRM) {
-    const attachedIncorrectPipette = Boolean(
-      !success && wantedPipette && actualPipette
-    )
-
     const toCalDashboard = (): void => {
       dispatchApiRequests(home(robotName, ROBOT))
       closeModal()
@@ -320,7 +314,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     }
 
     let wizardCurrentStep: number = 0
-    if (success) {
+    if (success || useWrongWantedPipette != null) {
       wizardCurrentStep = eightChannel
         ? EIGHT_CHANNEL_STEPS
         : SINGLE_CHANNEL_STEPS
@@ -333,13 +327,12 @@ export function ChangePipette(props: Props): JSX.Element | null {
       success || confirmExit ? undefined : () => setConfirmExit(true)
 
     wizardTitle =
-      (wantedPipette == null && actualPipette == null) ||
-      (wantedPipette == null && actualPipette)
+      wantedPipette == null && actualPipette == null
         ? t('detatch_pipette_from_mount', {
             mount: mount[0].toUpperCase() + mount.slice(1),
           })
         : t('attach_name_pipette', {
-            pipette: wantedPipette != null ? wantedPipette.displayName : '',
+            pipette: wantedPipette?.displayName,
           })
 
     contents = confirmExit ? (
@@ -354,10 +347,8 @@ export function ChangePipette(props: Props): JSX.Element | null {
             setWantedName(null)
             setWizardStep(INSTRUCTIONS)
           },
-          // useWrongPipetteOneChannel: useWrongPipetteOneChannel,
-          // setUseWrongPipetteOneChannel: setUseWrongPipetteOneChannel,
-          // useWrongPipetteEightChannel: useWrongPipetteEightChannel,
-          // setUseWrongPipetteEightChannel: setUseWrongPipetteEightChannel,
+          useWrongWantedPipette: useWrongWantedPipette,
+          setWrongWantedPipette: setWrongWantedPipette,
           exit: homePipAndExit,
           actualPipetteOffset: actualPipetteOffset,
           toCalibrationDashboard: toCalDashboard,

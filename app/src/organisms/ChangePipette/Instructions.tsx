@@ -40,6 +40,7 @@ interface Props {
   confirm: () => void
   stepPage: number
   setStepPage: React.Dispatch<React.SetStateAction<number>>
+  attachedWrong: boolean
 }
 
 const GO_BACK_BUTTON_STYLE = css`
@@ -65,6 +66,7 @@ export function Instructions(props: Props): JSX.Element {
     stepPage,
     setStepPage,
     confirm,
+    attachedWrong,
   } = props
   const { t } = useTranslation('change_pipette')
 
@@ -177,7 +179,8 @@ export function Instructions(props: Props): JSX.Element {
                 onDone={
                   wantedPipette != null &&
                   actualPipette != null &&
-                  shouldLevel(wantedPipette)
+                  shouldLevel(wantedPipette) &&
+                  !attachedWrong
                     ? () => setStepPage(2)
                     : confirm
                 }
