@@ -112,6 +112,9 @@ export function ChangePipette(props: Props): JSX.Element | null {
     useWrongWantedPipette,
     setWrongWantedPipette,
   ] = React.useState<PipetteNameSpecs | null>(wantedPipette)
+  const [confirmPipetteLevel, setConfirmPipetteLevel] = React.useState<boolean>(
+    false
+  )
 
   const movementStatus = useSelector((state: State) => {
     return getMovementStatus(state, robotName)
@@ -179,7 +182,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     0
   )
 
-  const eightChannel = actualPipette?.channels === 8
+  const eightChannel = wantedPipette?.channels === 8
 
   const direction = actualPipette ? DETACH : ATTACH
   const isSelectPipetteStep =
@@ -204,6 +207,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
       instructionsCurrentStep = 3
     }
   }
+  console.log(instructionsCurrentStep)
 
   const success =
     // success if we were trying to detach and nothing's attached
@@ -314,10 +318,15 @@ export function ChangePipette(props: Props): JSX.Element | null {
     }
 
     let wizardCurrentStep: number = 0
-    if (success || useWrongWantedPipette != null) {
+    //  if success and wrong pipette is attached that does not have the level pipette screen
+    if (success || (useWrongWantedPipette != null && confirmPipetteLevel)) {
       wizardCurrentStep = eightChannel
         ? EIGHT_CHANNEL_STEPS
         : SINGLE_CHANNEL_STEPS
+      //  if attached wrong pipette and has level pipette screen
+    } else if (useWrongWantedPipette != null && !confirmPipetteLevel) {
+      wizardCurrentStep = EIGHT_CHANNEL_STEPS - 1
+      //  if in error state
     } else {
       wizardCurrentStep = SINGLE_CHANNEL_STEPS - 1
     }
@@ -332,7 +341,10 @@ export function ChangePipette(props: Props): JSX.Element | null {
             mount: mount[0].toUpperCase() + mount.slice(1),
           })
         : t('attach_name_pipette', {
-            pipette: wantedPipette?.displayName,
+            pipette:
+              useWrongWantedPipette != null
+                ? useWrongWantedPipette.displayName
+                : wantedPipette?.displayName,
           })
 
     contents = confirmExit ? (
@@ -349,6 +361,8 @@ export function ChangePipette(props: Props): JSX.Element | null {
           },
           useWrongWantedPipette: useWrongWantedPipette,
           setWrongWantedPipette: setWrongWantedPipette,
+          setConfirmPipetteLevel: setConfirmPipetteLevel,
+          confirmPipetteLevel: confirmPipetteLevel,
           exit: homePipAndExit,
           actualPipetteOffset: actualPipetteOffset,
           toCalibrationDashboard: toCalDashboard,

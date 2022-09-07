@@ -99,6 +99,8 @@ describe('ConfirmPipette', () => {
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
       useWrongWantedPipette: null,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -124,6 +126,8 @@ describe('ConfirmPipette', () => {
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
       useWrongWantedPipette: null,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -157,6 +161,8 @@ describe('ConfirmPipette', () => {
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
       useWrongWantedPipette: null,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -190,6 +196,8 @@ describe('ConfirmPipette', () => {
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
       useWrongWantedPipette: MOCK_ACTUAL_PIPETTE,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -220,6 +228,8 @@ describe('ConfirmPipette', () => {
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
       useWrongWantedPipette: null,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -237,7 +247,7 @@ describe('ConfirmPipette', () => {
     expect(props.setWrongWantedPipette).toHaveBeenCalled()
   })
 
-  it('Should show pipette leveling modal and success modal when incorrect pipette attached for 8 channel but user accepts it', () => {
+  it('Should show pipette leveling modal when incorrect pipette attached for 8 channel but user accepts it', () => {
     props = {
       robotName: 'otie',
       success: false,
@@ -253,6 +263,8 @@ describe('ConfirmPipette', () => {
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
       useWrongWantedPipette: MOCK_WANTED_PIPETTE,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -262,12 +274,35 @@ describe('ConfirmPipette', () => {
     expect(props.tryAgain).toHaveBeenCalled()
     const continueBtn = getByRole('button', { name: 'Confirm level' })
     fireEvent.click(continueBtn)
+    expect(props.setConfirmPipetteLevel).toHaveBeenCalled()
+  })
+
+  it('renders the success modal when the confirmPipetteLevel is true when attaching an incorrect 8 channel pipette', () => {
+    props = {
+      robotName: 'otie',
+      success: false,
+      attachedWrong: true,
+      wantedPipette: MOCK_WANTED_PIPETTE,
+      actualPipette: MOCK_WANTED_PIPETTE as PipetteModelSpecs,
+      actualPipetteOffset: {} as PipetteOffsetCalibration,
+      displayName: '',
+      displayCategory: null,
+      tryAgain: jest.fn(),
+      exit: jest.fn(),
+      toCalibrationDashboard: jest.fn(),
+      mount: LEFT,
+      setWrongWantedPipette: jest.fn(),
+      useWrongWantedPipette: MOCK_WANTED_PIPETTE,
+      confirmPipetteLevel: true,
+      setConfirmPipetteLevel: jest.fn(),
+    }
+
+    const { getByText, getByRole } = render(props)
     getByText('Pipette attached!')
     getByText('P300 8-Channel GEN2 is now ready to use.')
     const btn = getByRole('button', { name: 'exit' })
     fireEvent.click(btn)
     expect(props.exit).toHaveBeenCalled()
-
     const pocBtn = getByRole('button', { name: 'Calibrate pipette offset' })
     fireEvent.click(pocBtn)
     expect(props.toCalibrationDashboard).toBeCalled()
@@ -290,6 +325,8 @@ describe('ConfirmPipette', () => {
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
       useWrongWantedPipette: null,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -323,6 +360,8 @@ describe('ConfirmPipette', () => {
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
       useWrongWantedPipette: null,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)
@@ -349,6 +388,8 @@ describe('ConfirmPipette', () => {
       mount: LEFT,
       setWrongWantedPipette: jest.fn(),
       useWrongWantedPipette: null,
+      confirmPipetteLevel: false,
+      setConfirmPipetteLevel: jest.fn(),
     }
 
     const { getByText, getByRole } = render(props)

@@ -33,6 +33,8 @@ export interface ConfirmPipetteProps {
   setWrongWantedPipette: React.Dispatch<
     React.SetStateAction<PipetteNameSpecs | null>
   >
+  confirmPipetteLevel: boolean
+  setConfirmPipetteLevel: React.Dispatch<React.SetStateAction<boolean>>
   tryAgain: () => void
   exit: () => void
   toCalibrationDashboard: () => void
@@ -49,11 +51,10 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
     tryAgain,
     useWrongWantedPipette,
     actualPipette,
+    setConfirmPipetteLevel,
+    confirmPipetteLevel,
   } = props
   const { t } = useTranslation('change_pipette')
-  const [confirmPipetteLevel, setConfirmPipetteLevel] = React.useState<boolean>(
-    false
-  )
 
   const getPipetteStatusDetails = (
     props: ConfirmPipetteProps
