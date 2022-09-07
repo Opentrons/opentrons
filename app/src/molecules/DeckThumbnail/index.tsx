@@ -2,12 +2,13 @@ import * as React from 'react'
 import map from 'lodash/map'
 
 import { RobotWorkSpace, Module, LabwareRender } from '@opentrons/components'
-import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { useFeatureFlag } from '../../redux/config'
 
 import {
   inferModuleOrientationFromXCoordinate,
   getModuleDef2,
+  getDeckDefFromLoadedLabware,
+  getRobotTypeFromLoadedLabware,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
@@ -18,10 +19,11 @@ import {
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
 import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
-import type { DeckSlot, Liquid, RunTimeCommand } from '@opentrons/shared-data'
+import type { DeckSlot, Liquid, LoadedLabware, RunTimeCommand } from '@opentrons/shared-data'
 
 interface DeckThumbnailProps {
-  commands: RunTimeCommand[]
+  commands: RunTimeCommand[],
+  labware: LoadedLabware[],
   liquids?: Liquid[]
 }
 const deckSetupLayerBlocklist = [
@@ -35,8 +37,9 @@ const deckSetupLayerBlocklist = [
 ]
 
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
-  const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
-  const { commands, liquids } = props
+  const { commands, liquids, labware } = props
+  const robotType = getRobotTypeFromLoadedLabware(labware)
+  const deckDef = getDeckDefFromLoadedLabware(robotType)
   const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
   const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
 
@@ -74,7 +77,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               : null
           const labwareInModule =
             moduleInSlot &&
-            moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
+              moduleInSlot.result.moduleId in initialLoadedLabwareByModuleId
               ? initialLoadedLabwareByModuleId[moduleInSlot.result.moduleId]
               : null
           let labwareId = labwareInSlot ? labwareInSlot.result.labwareId : null
@@ -84,39 +87,39 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
           const wellFill =
             labwareId && liquids != null && liquidSetupEnabled
               ? getWellFillFromLabwareId(
-                  labwareId,
-                  liquidsInLoadOrder,
-                  labwareByLiquidId
-                )
+                labwareId,
+                liquidsInLoadOrder,
+                labwareByLiquidId
+              )
               : null
           return (
             <React.Fragment key={slotId}>
               {/* TODO(jr, 9/28/22): revert this logic to only moduleInSlot != null when we remove the enableThermocyclerGen2 FF */}
               {(moduleInSlot != null && enableThermocyclerGen2) ||
-              (moduleInSlot != null &&
-                !enableThermocyclerGen2 &&
-                moduleInSlot.params.model !== 'thermocyclerModuleV2') ? (
-                <Module
-                  x={slot.position[0]}
-                  y={slot.position[1]}
-                  orientation={inferModuleOrientationFromXCoordinate(
-                    slot.position[0]
-                  )}
-                  def={getModuleDef2(moduleInSlot.params.model)}
-                  innerProps={
-                    moduleInSlot.params.model === THERMOCYCLER_MODULE_V1
-                      ? { lidMotorState: 'open' }
-                      : {}
-                  }
-                >
-                  {labwareInModule != null ? (
-                    <LabwareRender
-                      definition={labwareInModule.result.definition}
-                      wellFill={wellFill ?? undefined}
-                    />
-                  ) : null}
-                </Module>
-              ) : null}
+                (moduleInSlot != null &&
+                  !enableThermocyclerGen2 &&
+                  moduleInSlot.params.model !== 'thermocyclerModuleV2') ? (
+                  <Module
+                    x={slot.position[0]}
+                    y={slot.position[1]}
+                    orientation={inferModuleOrientationFromXCoordinate(
+                      slot.position[0]
+                    )}
+                    def={getModuleDef2(moduleInSlot.params.model)}
+                    innerProps={
+                      moduleInSlot.params.model === THERMOCYCLER_MODULE_V1
+                        ? { lidMotorState: 'open' }
+                        : {}
+                    }
+                  >
+                    {labwareInModule != null ? (
+                      <LabwareRender
+                        definition={labwareInModule.result.definition}
+                        wellFill={wellFill ?? undefined}
+                      />
+                    ) : null}
+                  </Module>
+                ) : null}
               {labwareInSlot != null ? (
                 <g
                   transform={`translate(${slot.position[0]},${slot.position[1]})`}

@@ -3,7 +3,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { simpleAnalysisFileFixture } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 import { DeckThumbnail } from '../'
-import { RunTimeCommand } from '@opentrons/shared-data'
+import { LoadedLabware, RunTimeCommand } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -22,6 +22,7 @@ jest.mock('@opentrons/components', () => {
 jest.mock('../../../redux/config')
 
 const commands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
+const labware: LoadedLabware[] = simpleAnalysisFileFixture.labware as any
 
 const render = (props: React.ComponentProps<typeof DeckThumbnail>) => {
   return renderWithProviders(<DeckThumbnail {...props} />, {
@@ -31,7 +32,7 @@ const render = (props: React.ComponentProps<typeof DeckThumbnail>) => {
 
 describe('DeckThumbnail', () => {
   it('renders loaded equipment from protocol analysis file', () => {
-    const { queryByText } = render({ commands })
+    const { queryByText } = render({ commands, labware })
     expect(queryByText('mock Module (0,0) magneticModuleV2')).not.toBeFalsy()
     expect(
       queryByText('mock Module (265,0) temperatureModuleV2')
@@ -48,4 +49,5 @@ describe('DeckThumbnail', () => {
       queryByText('mock LabwareRender nest_96_wellplate_100ul_pcr_full_skirt')
     ).not.toBeFalsy()
   })
+  it('renders an ot-2 deckmap when the protocol is an ot-2 protocol', () => {})
 })
