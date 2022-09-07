@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+from shutil import rmtree
 
 from pathlib import Path
 from typing import List
@@ -69,6 +70,7 @@ class SDistWithData(sdist.sdist):
             os.path.join(base_dir, "package.json"),
         )
         super().make_release_tree(base_dir, files)
+        rmtree(Path(base_dir)/"tests")
 
 
 class BuildWithData(build_py.build_py):

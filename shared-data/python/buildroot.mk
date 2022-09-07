@@ -27,6 +27,12 @@ endef
 
 ot_sd_name := python-opentrons-shared-data
 
+define PYTHON_OPENTRONS_SHARED_DATA_REMOVE_FIXTURES
+    find $(TARGET_DIR)/usr/lib/python*/site-packages/opentrons_shared_data/\
+        -name fixtures -prune -exec rm -rf {} \;
+endef
+PYTHON_OPENTRONS_SHARED_DATA_POST_INSTALL_TARGET_HOOKS += PYTHON_OPENTRONS_SHARED_DATA_REMOVE_TESTS
+
 # Calling inner-python-package directly instead of using python-package macro
 # because our directory layout doesn’t conform to buildroot’s expectation of
 # having the directory name be the package name
