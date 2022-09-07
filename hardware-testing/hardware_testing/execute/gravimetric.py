@@ -253,6 +253,10 @@ def _analyze_recording_and_timestamps(
 
 def analyze(ctx: ProtocolContext, items: ExecuteGravItems) -> None:
     """Analyze."""
+    # FIXME: this totally breaks when simulating
+    if ctx.is_simulating():
+        ctx.comment("FIXME: skipping analysis during simulation")
+        return
     _analyze_recording_and_timestamps(
         ctx, items.recorder.recording, items.liquid_pipette.get_timestamps()
     )

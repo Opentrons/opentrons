@@ -242,7 +242,10 @@ class LiquidTracker:
                 f"\t{tracker.name}   -> {int(tracker.get_volume())} uL -> {well.display_name}"
             )
         if user_confirm:
-            ctx.pause("press ENTER when ready...")
+            if ctx.is_simulating():
+                ctx.comment("press ENTER when ready...")
+            else:
+                ctx.pause("press ENTER when ready...")
 
     def init_well_liquid_height(
         self, well: Well, lookup_table: Optional[list] = None

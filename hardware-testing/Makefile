@@ -71,6 +71,10 @@ test:
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
+.PHONY: test-integration
+test-integration:
+	$(python) protocols/ot2_p300_single_channel_gravimetric.py --simulate
+
 .PHONY: lint
 lint:
 	$(python) -m mypy hardware_testing tests protocols scripts
