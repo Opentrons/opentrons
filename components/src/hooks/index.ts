@@ -2,6 +2,7 @@
 
 export * from './useConditionalConfirm'
 export * from './useInterval'
+export * from './useLongPress'
 export * from './useMountEffect'
 export * from './usePrevious'
 export * from './useTimeout'
