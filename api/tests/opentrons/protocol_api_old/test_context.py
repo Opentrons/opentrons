@@ -2,10 +2,10 @@
 
 import json
 from unittest import mock
-from typing import Any, Dict
+from typing import Any, Dict, Callable
 
 from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.pipette.dev_types import LabwareUri
+from opentrons_shared_data.pipette.dev_types import LabwareUri, PipetteName
 
 import opentrons.protocol_api as papi
 import opentrons.protocols.api_support as papi_support
@@ -24,14 +24,19 @@ from opentrons.config.pipette_config import config_names
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.calibration_storage import get, modify, delete, types as cs_types
 
+from opentrons_shared_data.robot.dev_types import RobotName
+
 import pytest
 
+
 @pytest.fixture
-def pipette_name_provider(robot_model: RobotName) -> Callable[[PipetteName], PipetteName]:
-    if robot_model == 'OT-2 Standard':
+def pipette_name_provider(
+    robot_model: RobotName,
+) -> Callable[[PipetteName], PipetteName]:
+    if robot_model == "OT-2 Standard":
         return lambda pipette_name: pipette_name
     else:
-        return lambda pipette_name: pipette_name + '_gen3'
+        return lambda pipette_name: cast(PipetteName, pipette_name + "_gen3")
 
 
 def set_version_added(attr, mp, version):

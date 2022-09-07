@@ -32,7 +32,8 @@ except (OSError, ModuleNotFoundError):
 from opentrons_shared_data.protocol.dev_types import JsonProtocol
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
-from opentrons_shared_data.deck.dev_types import RobotModel, DeckDefinitionV3
+from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
+from opentrons_shared_data.robot.dev_types import RobotName
 from opentrons_shared_data.deck import (
     load as load_deck,
     DEFAULT_DECK_DEFINITION_VERSION,
@@ -214,8 +215,8 @@ async def robot_model(
     decoy: Decoy,
     mock_feature_flags: None,
     virtual_smoothie_env: None,
-) -> AsyncGenerator[RobotModel, None]:
-    which_machine = cast(RobotModel, request.param)  # type: ignore[attr-defined]
+) -> AsyncGenerator[RobotName, None]:
+    which_machine = cast(RobotName, request.param)  # type: ignore[attr-defined]
     if request.node.get_closest_marker("ot2_only") and which_machine == "OT-3 Standard":
         pytest.skip("test requests only ot-2")
     if request.node.get_closest_marker("ot3_only") and which_machine == "OT-2 Standard":
@@ -231,7 +232,7 @@ async def robot_model(
 
 
 @pytest.fixture
-def deck_definition(robot_model: RobotModel) -> DeckDefinitionV3:
+def deck_definition(robot_model: RobotName) -> DeckDefinitionV3:
     if robot_model == "OT-3 Standard":
         return load_deck("ot3_standard", DEFAULT_DECK_DEFINITION_VERSION)
     else:
@@ -244,7 +245,7 @@ async def hardware(
     decoy: Decoy,
     mock_feature_flags: None,
     virtual_smoothie_env: None,
-    robot_model: RobotModel,
+    robot_model: RobotName,
 ) -> AsyncGenerator[ThreadManagedHardware, None]:
     hw_builder = {"OT-2 Standard": _build_ot2_hw, "OT-3 Standard": _build_ot3_hw}[
         robot_model
