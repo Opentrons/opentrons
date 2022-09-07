@@ -9,6 +9,7 @@ import {
 import { CheckPipettesButton } from './CheckPipettesButton'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
+import { LevelPipette } from './LevelPipette'
 
 import type {
   PipetteNameSpecs,
@@ -16,6 +17,7 @@ import type {
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
 import type { PipetteOffsetCalibration } from '../../redux/calibration/types'
+import type { Mount } from '../../redux/pipettes/types'
 
 export interface ConfirmPipetteProps {
   robotName: string
@@ -26,14 +28,34 @@ export interface ConfirmPipetteProps {
   actualPipetteOffset: PipetteOffsetCalibration | null
   displayName: string
   displayCategory: PipetteDisplayCategory | null
+  mount: Mount
   tryAgain: () => void
   exit: () => void
   toCalibrationDashboard: () => void
 }
 
+export interface ButtonProps extends ConfirmPipetteProps {
+  useWrongPipetteOneChannel: boolean
+  setUseWrongPipetteOneChannel: React.Dispatch<React.SetStateAction<boolean>>
+  useWrongPipetteEightChannel: boolean
+  setUseWrongPipetteEightChannel: React.Dispatch<React.SetStateAction<boolean>>
+  confirmPipetteLevel: boolean
+}
+
 export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
-  const { success } = props
+  const { success, mount, actualPipette, tryAgain } = props
   const { t } = useTranslation('change_pipette')
+  const [
+    useWrongPipetteOneChannel,
+    setUseWrongPipetteOneChannel,
+  ] = React.useState<boolean>(false)
+  const [
+    useWrongPipetteEightChannel,
+    setUseWrongPipetteEightChannel,
+  ] = React.useState<boolean>(false)
+  const [confirmPipetteLevel, setConfirmPipetteLevel] = React.useState<boolean>(
+    false
+  )
 
   const getPipetteStatusDetails = (
     props: ConfirmPipetteProps
@@ -42,10 +64,16 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
     let header
     let subHeader
 
-    if (wantedPipette && success) {
+    if (
+      (wantedPipette && success) ||
+      ((useWrongPipetteOneChannel || confirmPipetteLevel) && actualPipette)
+    ) {
       header = t('pipette_attached')
       subHeader = t('pipette_is_ready_to_use', {
-        pipette: wantedPipette.displayName,
+        pipette:
+          useWrongPipetteOneChannel || confirmPipetteLevel
+            ? actualPipette?.displayName
+            : wantedPipette?.displayName,
       })
     } else if (wantedPipette) {
       header = attachedWrong
@@ -72,22 +100,53 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
 
   const { header, subHeader } = getPipetteStatusDetails({ ...props })
 
-  return (
+  return useWrongPipetteEightChannel &&
+    actualPipette != null &&
+    !confirmPipetteLevel ? (
+    <LevelPipette
+      mount={mount}
+      pipetteModelName={actualPipette.name}
+      back={tryAgain}
+      confirm={() => setConfirmPipetteLevel(true)}
+    />
+  ) : (
     <SimpleWizardBody
-      iconColor={success ? COLORS.successEnabled : COLORS.errorEnabled}
+      iconColor={
+        success || useWrongPipetteOneChannel || confirmPipetteLevel
+          ? COLORS.successEnabled
+          : COLORS.errorEnabled
+      }
       header={header}
       subHeader={subHeader}
       isSuccess={success}
     >
       <>
-        {!success && <TryAgainButton {...props} />}
-        {success && <SuccessAndExitButtons {...props} />}
+        {!success && !useWrongPipetteOneChannel && !confirmPipetteLevel && (
+          <TryAgainButton
+            {...props}
+            useWrongPipetteOneChannel={useWrongPipetteOneChannel}
+            setUseWrongPipetteOneChannel={setUseWrongPipetteOneChannel}
+            useWrongPipetteEightChannel={useWrongPipetteEightChannel}
+            setUseWrongPipetteEightChannel={setUseWrongPipetteEightChannel}
+            confirmPipetteLevel={false}
+          />
+        )}
+        {success || useWrongPipetteOneChannel || confirmPipetteLevel ? (
+          <SuccessAndExitButtons
+            {...props}
+            useWrongPipetteOneChannel={useWrongPipetteOneChannel}
+            setUseWrongPipetteOneChannel={setUseWrongPipetteOneChannel}
+            useWrongPipetteEightChannel={useWrongPipetteEightChannel}
+            setUseWrongPipetteEightChannel={setUseWrongPipetteEightChannel}
+            confirmPipetteLevel={confirmPipetteLevel}
+          />
+        ) : null}
       </>
     </SimpleWizardBody>
   )
 }
 
-function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
+function TryAgainButton(props: ButtonProps): JSX.Element {
   const {
     actualPipette,
     attachedWrong,
@@ -95,12 +154,32 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
     robotName,
     tryAgain,
     exit,
+    setUseWrongPipetteOneChannel,
+    setUseWrongPipetteEightChannel,
+    useWrongPipetteEightChannel,
+    useWrongPipetteOneChannel,
   } = props
   const { t } = useTranslation('change_pipette')
-  if (wantedPipette && attachedWrong) {
+
+  const handleUseAttached = (): void => {
+    if (actualPipette?.channels === 8) {
+      setUseWrongPipetteEightChannel(true)
+    } else {
+      setUseWrongPipetteOneChannel(true)
+    }
+  }
+  if (
+    wantedPipette &&
+    attachedWrong &&
+    !useWrongPipetteOneChannel &&
+    !useWrongPipetteEightChannel
+  ) {
     return (
       <>
-        <SecondaryButton marginRight={SPACING.spacing3} onClick={exit}>
+        <SecondaryButton
+          marginRight={SPACING.spacing3}
+          onClick={handleUseAttached}
+        >
           {t('use_attached_pipette')}
         </SecondaryButton>
         <PrimaryButton onClick={tryAgain}>
@@ -130,25 +209,29 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
   )
 }
 
-function SuccessAndExitButtons(props: ConfirmPipetteProps): JSX.Element {
+function SuccessAndExitButtons(props: ButtonProps): JSX.Element {
   const {
     actualPipette,
     actualPipetteOffset,
     exit,
     toCalibrationDashboard,
     success,
+    useWrongPipetteOneChannel,
+    confirmPipetteLevel,
   } = props
   const { t } = useTranslation('change_pipette')
   return (
     <>
-      {success && actualPipette && !actualPipetteOffset && (
+      {useWrongPipetteOneChannel ||
+      (success && actualPipette && !actualPipetteOffset) ||
+      confirmPipetteLevel ? (
         <SecondaryButton
           marginRight={SPACING.spacing3}
           onClick={toCalibrationDashboard}
         >
           {t('calibrate_pipette_offset')}
         </SecondaryButton>
-      )}
+      ) : null}
       <PrimaryButton textTransform={TEXT_TRANSFORM_CAPITALIZE} onClick={exit}>
         {t('shared:exit')}
       </PrimaryButton>

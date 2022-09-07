@@ -79,6 +79,14 @@ export function ChangePipette(props: Props): JSX.Element | null {
   const history = useHistory()
   const enableChangePipetteWizard = useFeatureFlag('enableChangePipetteWizard')
   const dispatch = useDispatch<Dispatch>()
+  // const [
+  //   useWrongPipetteOneChannel,
+  //   setUseWrongPipetteOneChannel,
+  // ] = React.useState<boolean>(false)
+  // const [
+  //   useWrongPipetteEightChannel,
+  //   setUseWrongPipetteEightChannel,
+  // ] = React.useState<boolean>(false)
   const finalRequestId = React.useRef<string | null | undefined>(null)
   const [dispatchApiRequests] = useDispatchApiRequests(dispatchedAction => {
     if (
@@ -170,7 +178,17 @@ export function ChangePipette(props: Props): JSX.Element | null {
   const [instructionStepPage, instructionSetStepPage] = React.useState<number>(
     0
   )
+  // let pipetteChannels: number = 1
+  // if (useWrongPipetteEightChannel) {
+  //   pipetteChannels = 8
+  // } else if (useWrongPipetteOneChannel) {
+  //   pipetteChannels = 1
+  // } else if (wantedPipette != null) {
+  //   wantedPipette.channels = 8
+  // }
+
   const eightChannel = wantedPipette?.channels === 8
+
   const direction = actualPipette ? DETACH : ATTACH
   const isSelectPipetteStep =
     direction === ATTACH && wantedName === null && wizardStep === INSTRUCTIONS
@@ -301,11 +319,16 @@ export function ChangePipette(props: Props): JSX.Element | null {
       history.push(`/devices/${robotName}/robot-settings/calibration`)
     }
 
-    currentStep = success
-      ? eightChannel
+    let wizardCurrentStep: number = 0
+    if (success) {
+      wizardCurrentStep = eightChannel
         ? EIGHT_CHANNEL_STEPS
         : SINGLE_CHANNEL_STEPS
-      : SINGLE_CHANNEL_STEPS - 1
+    } else {
+      wizardCurrentStep = SINGLE_CHANNEL_STEPS - 1
+    }
+
+    currentStep = wizardCurrentStep
     exitWizardHeader =
       success || confirmExit ? undefined : () => setConfirmExit(true)
 
@@ -331,6 +354,10 @@ export function ChangePipette(props: Props): JSX.Element | null {
             setWantedName(null)
             setWizardStep(INSTRUCTIONS)
           },
+          // useWrongPipetteOneChannel: useWrongPipetteOneChannel,
+          // setUseWrongPipetteOneChannel: setUseWrongPipetteOneChannel,
+          // useWrongPipetteEightChannel: useWrongPipetteEightChannel,
+          // setUseWrongPipetteEightChannel: setUseWrongPipetteEightChannel,
           exit: homePipAndExit,
           actualPipetteOffset: actualPipetteOffset,
           toCalibrationDashboard: toCalDashboard,
