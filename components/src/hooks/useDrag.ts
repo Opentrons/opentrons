@@ -27,10 +27,10 @@ export interface UseDragResult {
 export const useDrag = (
   position: ElementPosition
 ): UseDragResult => {
-  const [elementPosition, setElementPosition] = useState<ElementPosition>(position);
-  const [isEnabled, setIsEnabled] = useState<boolean>(true);
-  const interactiveRef = useRef(null);
-  let { x, y, width, height } = elementPosition;
+  const [elementPosition, setElementPosition] = useState<ElementPosition>(position)
+  const [isEnabled, setIsEnabled] = useState<boolean>(true)
+  const interactiveRef = useRef(null)
+  let { x, y, width, height } = elementPosition
 
   const enable = ():void => {
     if(interactiveRef?.current != null ) {
@@ -48,26 +48,26 @@ export const useDrag = (
           height,
           x,
           y
-        });
-      });
+        })
+      })
     }
-  };
+  }
 
   const disable = ():void => {
     if(interactiveRef?.current != null ) {
-      interact((interactiveRef.current as unknown) as HTMLElement).unset();
+      interact((interactiveRef.current as unknown) as HTMLElement).unset()
     }
-  };
+  }
 
   useEffect(() => {
     if (isEnabled) {
-      enable();
+      enable()
     } else {
-      disable();
+      disable()
     }
-    return disable;
+    return disable
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEnabled]);
+  }, [isEnabled])
 
   return {
     ref: interactiveRef,
