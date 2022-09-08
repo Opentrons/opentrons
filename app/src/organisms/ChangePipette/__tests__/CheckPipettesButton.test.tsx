@@ -48,8 +48,8 @@ describe('CheckPipettesButton', () => {
   })
   it('renders the button with ff and clicking on it calls fetchPipettes', () => {
     mockFeatureFlag.mockReturnValue(true)
-    const { getByRole } = render(props)
-    const btn = getByRole('button', { name: 'btn text' })
+    const { getByLabelText } = render(props)
+    const btn = getByLabelText('Confirm')
     fireEvent.click(btn)
     expect(mockFetchPipettes).toHaveBeenCalled()
   })

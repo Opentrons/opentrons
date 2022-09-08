@@ -4,6 +4,7 @@ from decoy import Decoy
 from dataclasses import dataclass, field
 from typing import Optional, Sequence, Tuple
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Point, MountType, DeckSlotName
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons import motion_planning
@@ -13,7 +14,6 @@ from opentrons.protocol_engine.types import (
     WellLocation,
     WellOrigin,
     WellOffset,
-    PipetteName,
     LoadedPipette,
     DeckSlotLocation,
 )
@@ -67,7 +67,7 @@ def test_get_pipette_location_with_no_current_location(
         LoadedPipette(
             id="pipette-id",
             mount=MountType.LEFT,
-            pipetteName=PipetteName.P300_SINGLE,
+            pipetteName=PipetteNameType.P300_SINGLE,
         )
     )
 
@@ -91,7 +91,7 @@ def test_get_pipette_location_with_current_location_with_quirks(
         LoadedPipette(
             id="pipette-id",
             mount=MountType.RIGHT,
-            pipetteName=PipetteName.P300_SINGLE,
+            pipetteName=PipetteNameType.P300_SINGLE,
         )
     )
 
@@ -129,7 +129,7 @@ def test_get_pipette_location_with_current_location_different_pipette(
         LoadedPipette(
             id="pipette-id",
             mount=MountType.LEFT,
-            pipetteName=PipetteName.P300_SINGLE,
+            pipetteName=PipetteNameType.P300_SINGLE,
         )
     )
 
@@ -165,7 +165,7 @@ def test_get_pipette_location_override_current_location(
         LoadedPipette(
             id="pipette-id",
             mount=MountType.RIGHT,
-            pipetteName=PipetteName.P300_SINGLE,
+            pipetteName=PipetteNameType.P300_SINGLE,
         )
     )
 

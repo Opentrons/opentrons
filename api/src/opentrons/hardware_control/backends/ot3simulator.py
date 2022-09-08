@@ -48,7 +48,7 @@ from opentrons.hardware_control.types import (
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
-from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons_shared_data.gripper.dev_types import GripperModel
 from opentrons.hardware_control.dev_types import (
     InstrumentHardwareConfigs,
@@ -60,11 +60,6 @@ from opentrons.hardware_control.dev_types import (
 )
 
 log = logging.getLogger(__name__)
-
-
-_FIXED_PIPETTE_ID: str = "P1KSV3120211118A01"
-_FIXED_PIPETTE_NAME: PipetteName = "p1000_single_gen3"
-_FIXED_PIPETTE_MODEL: PipetteModel = cast("PipetteModel", "p1000_single_v3.0")
 
 
 class OT3Simulator:

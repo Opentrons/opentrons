@@ -1,6 +1,5 @@
 import json
-from pathlib import Path
-from typing import Dict, List
+from typing import Dict
 
 import pytest
 from decoy import Decoy
@@ -15,13 +14,12 @@ from opentrons.protocols.labware.definition import _get_parent_identifier
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.labware.dev_types import WellDefinition
 
-from opentrons.calibration_storage import helpers, get, delete, file_operators
+from opentrons.calibration_storage import helpers
 from opentrons.types import Point, Location
 from opentrons.hardware_control.modules.types import ModuleType, MagneticModuleModel
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api.core.labware import AbstractLabware
-from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 
 test_data: Dict[str, WellDefinition] = {
@@ -45,24 +43,6 @@ test_data: Dict[str, WellDefinition] = {
         "z": 22,
     },
 }
-
-
-@pytest.fixture
-def set_up_index_file(labware_offset_tempdir: Path) -> List[str]:
-    deck = Deck()
-    labware_list = [
-        "nest_96_wellplate_2ml_deep",
-        "corning_384_wellplate_112ul_flat",
-        "geb_96_tiprack_1000ul",
-        "nest_12_reservoir_15ml",
-    ]
-    for idx, name in enumerate(labware_list):
-        parent = deck.position_for(idx + 1)
-        definition = labware.get_labware_definition(name)
-        lw = labware.Labware(implementation=LabwareImplementation(definition, parent))
-        labware.save_calibration(lw, Point(0, 0, 0))
-
-    return labware_list
 
 
 def test_well_init() -> None:
@@ -611,67 +591,6 @@ def test_uris():
         )
     )
     assert lw.uri == uri
-
-
-@pytest.mark.parametrize(
-    "labware_name",
-    [
-        "nest_96_wellplate_2ml_deep",
-        "corning_384_wellplate_112ul_flat",
-        "geb_96_tiprack_1000ul",
-        "nest_12_reservoir_15ml",
-    ],
-)
-def test_add_index_file(labware_name, labware_offset_tempdir) -> None:
-    deck = Deck()
-    parent = deck.position_for(1)
-    definition = labware.get_labware_definition(labware_name)
-    lw = labware.Labware(implementation=LabwareImplementation(definition, parent))
-    labware_hash = helpers.hash_labware_def(definition)
-    labware.save_calibration(lw, Point(0, 0, 0))
-
-    lw_uri = helpers.uri_from_definition(definition)
-
-    str_parent = _get_parent_identifier(lw._implementation)
-    slot = "1"
-    if str_parent:
-        mod_dict = {str_parent: f"{slot}-{str_parent}"}
-    else:
-        mod_dict = {}
-    full_id = f"{labware_hash}{str_parent}"
-    blob = {"uri": f"{lw_uri}", "slot": full_id, "module": mod_dict}
-
-    lw_path = labware_offset_tempdir / "index.json"
-    info = file_operators.read_cal_file(lw_path)
-    assert info["data"][full_id] == blob
-
-
-def test_delete_one_calibration(set_up_index_file) -> None:
-    lw_to_delete = "nest_96_wellplate_2ml_deep"
-    all_cals = get.get_all_calibrations()
-    id_saved = ""
-
-    def get_load_names(all_cals):
-        nonlocal id_saved
-        load_names = []
-        for cal in all_cals:
-            uri = cal.uri
-            dets = helpers.details_from_uri(uri)
-            if dets.load_name == lw_to_delete:
-                id_saved = cal.labware_id
-            load_names.append(dets.load_name)
-        return load_names
-
-    load_names = get_load_names(all_cals)
-
-    assert lw_to_delete in load_names
-
-    delete.delete_offset_file(id_saved)  # type: ignore[arg-type]
-
-    all_cals = get.get_all_calibrations()
-    load_names = get_load_names(all_cals)
-
-    assert lw_to_delete not in load_names
 
 
 def test_get_parent_identifier():

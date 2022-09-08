@@ -2,6 +2,7 @@ import logging
 from typing import Dict, List, Optional, Set
 from collections import OrderedDict
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount, Location, DeckLocation
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel
@@ -186,29 +187,22 @@ class ProtocolContextImplementation(
         )
 
     def load_instrument(
-        self, instrument_name: str, mount: Mount, replace: bool
+        self, instrument_name: PipetteNameType, mount: Mount
     ) -> InstrumentContextImplementation:
         """Load an instrument."""
-        instr = self._instruments[mount]
-        if instr and not replace:
-            raise RuntimeError(
-                f"Instrument already present in {mount.name.lower()} "
-                f"mount: {instr.get_instrument_name()}"
-            )
-
         attached = {
             att_mount: instr.get("name", None)
             for att_mount, instr in self._sync_hardware.attached_instruments.items()
             if instr
         }
-        attached[mount] = instrument_name
+        attached[mount] = instrument_name.value
         self._sync_hardware.cache_instruments(attached)
         # If the cache call didn’t raise, the instrument is attached
         new_instr = InstrumentContextImplementation(
             api_version=self._api_version,
             protocol_interface=self,
             mount=mount,
-            instrument_name=instrument_name,
+            instrument_name=instrument_name.value,
             default_speed=400.0,
         )
         self._instruments[mount] = new_instr

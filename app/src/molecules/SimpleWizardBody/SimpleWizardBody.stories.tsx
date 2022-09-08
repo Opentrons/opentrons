@@ -1,19 +1,23 @@
 import * as React from 'react'
 import { COLORS } from '@opentrons/components'
-import { TEMPERATURE_MODULE_V1 } from '@opentrons/shared-data'
 import { PrimaryButton } from '../../atoms/buttons'
-import { SimpleWizardModal } from './index'
+import { ModalShell } from '../Modal'
+import { WizardHeader } from '../WizardHeader'
+import { SimpleWizardBody } from './index'
 
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Molecules/SimpleWizardModal',
-  component: SimpleWizardModal,
+  title: 'App/Molecules/SimpleWizardBody',
+  component: SimpleWizardBody,
 } as Meta
 
-const Template: Story<
-  React.ComponentProps<typeof SimpleWizardModal>
-> = args => <SimpleWizardModal {...args} />
+const Template: Story<React.ComponentProps<typeof SimpleWizardBody>> = args => (
+  <ModalShell>
+    <WizardHeader currentStep={3} totalSteps={4} title="Attach a pipette" />
+    <SimpleWizardBody {...args} />
+  </ModalShell>
+)
 
 export const AlertIcon = Template.bind({})
 AlertIcon.args = {
@@ -22,10 +26,6 @@ AlertIcon.args = {
   subHeader: 'Are you sure you want to exit before detaching your pipette?',
   isSuccess: false,
   children: <PrimaryButton>{'Exit'}</PrimaryButton>,
-  onExit: () => console.log('exit'),
-  title: 'Attach a pipette',
-  currentStep: 5,
-  totalSteps: 6,
 }
 
 export const SuccessIcon = Template.bind({})
@@ -33,10 +33,6 @@ SuccessIcon.args = {
   iconColor: COLORS.successEnabled,
   header: 'Pipette still detected',
   subHeader: 'Are you sure you want to exit before detaching your pipette?',
-  isSuccess: TEMPERATURE_MODULE_V1,
+  isSuccess: true,
   children: <PrimaryButton>{'Exit'}</PrimaryButton>,
-  onExit: () => console.log('exit'),
-  title: 'Attach a pipette',
-  currentStep: 5,
-  totalSteps: 6,
 }

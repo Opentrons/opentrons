@@ -6,55 +6,10 @@ file system.
 # add tests before making any additional changes
 from pathlib import Path
 
-from . import types as local_types, file_operators as io
+from . import file_operators as io
 
 from opentrons import config
 from opentrons.types import Mount
-
-
-def clear_calibrations() -> None:
-    """
-    Delete all calibration files for labware. This includes deleting tip-length
-    data for tipracks.
-    """
-    calibration_path = config.get_opentrons_path("labware_calibration_offsets_dir_v2")
-    try:
-        targets = [f for f in calibration_path.iterdir() if f.suffix == ".json"]
-        for target in targets:
-            target.unlink()
-    except FileNotFoundError:
-        pass
-
-
-def _remove_offset_from_index(calibration_id: local_types.CalibrationID) -> None:
-    """
-    Helper function to remove an individual offset file.
-
-    :param calibration_id: labware hash
-    :raises FileNotFoundError: If index file does not exist or
-    the specified id is not in the index file.
-    """
-    offset_path = config.get_opentrons_path("labware_calibration_offsets_dir_v2")
-    index_path = offset_path / "index.json"
-    blob = io.read_cal_file(str(index_path))
-
-    del blob["data"][calibration_id]
-    io.save_to_file(index_path, blob)
-
-
-def delete_offset_file(calibration_id: local_types.CalibrationID) -> None:
-    """
-    Given a labware's hash, delete the file and remove it from the index file.
-
-    :param calibration_id: labware hash
-    """
-    offset_path = config.get_opentrons_path("labware_calibration_offsets_dir_v2")
-    offset = offset_path / f"{calibration_id}.json"
-    try:
-        _remove_offset_from_index(calibration_id)
-        offset.unlink()
-    except FileNotFoundError:
-        pass
 
 
 def _remove_tip_length_from_index(tiprack: str, pipette: str) -> None:
