@@ -1,11 +1,13 @@
 import * as React from 'react'
+import capitalize from 'lodash/capitalize'
+
 import {
   Flex,
   Icon,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -15,18 +17,28 @@ interface StatusLabelProps {
   backgroundColor: string
   iconColor: string
   textColor?: string
+  fontWeight?: number
   pulse?: boolean
 }
 
 export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
-  const { status, backgroundColor, iconColor, textColor, pulse } = props
+  const {
+    status,
+    backgroundColor,
+    iconColor,
+    textColor,
+    fontWeight,
+    pulse,
+  } = props
 
   return (
-    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+    <Flex>
       <Flex
         backgroundColor={backgroundColor}
-        borderRadius={SPACING.spacing2}
-        padding="0.2rem"
+        borderRadius={BORDERS.radiusSoftCorners}
+        gridGap={SPACING.spacing2}
+        paddingX="0.375rem"
+        paddingY={SPACING.spacing1}
         alignItems={ALIGN_CENTER}
         marginTop={SPACING.spacing2}
         marginBottom={SPACING.spacing2}
@@ -36,7 +48,6 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
           name="circle"
           color={iconColor}
           size={SPACING.spacing2}
-          marginX={SPACING.spacing2}
           data-testid="status_circle"
         >
           {pulse != null && pulse ? (
@@ -51,12 +62,11 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
           ) : null}
         </Icon>
         <StyledText
-          fontSize={TYPOGRAPHY.fontSizeCaption}
+          fontSize={TYPOGRAPHY.fontSizeLabel}
+          fontWeight={fontWeight ?? TYPOGRAPHY.fontWeightRegular}
           color={textColor ?? COLORS.bluePressed}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          marginRight={SPACING.spacing2}
         >
-          {status}
+          {capitalize(status)}
         </StyledText>
       </Flex>
     </Flex>

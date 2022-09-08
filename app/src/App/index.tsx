@@ -16,6 +16,7 @@ import {
 import { GlobalStyle } from '../atoms/GlobalStyle'
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
+import { CalibrationDashboard } from '../pages/Devices/CalibrationDashboard'
 import { DeviceDetails } from '../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../pages/Devices/DevicesLanding'
 import { ProtocolRunDetails } from '../pages/Devices/ProtocolRunDetails'
@@ -132,6 +133,11 @@ export const AppComponent = (): JSX.Element => {
                 </Route>
               )
             })}
+            <Route
+              exact
+              path="/devices/:robotName/robot-settings/calibration/dashboard"
+              component={CalibrationDashboard}
+            />
             <Redirect exact from="/" to="/protocols" />
           </Switch>
           <Alerts />
