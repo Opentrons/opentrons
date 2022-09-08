@@ -11,10 +11,12 @@ from tests.integration.protocol_files import get_py_protocol, get_json_protocol
 
 
 async def test_upload_protocols_and_reset_persistence_dir() -> None:
-    """Test protocol and analysis persistence.
+    """Test resetting runs history.
 
-    Uploaded protocols and their completed analyses should remain constant across
-    server restarts.
+    Immediately after resetting runs history, existing resources should remain
+    available over HTTP.
+
+    But after restarting the server, those resources should be gone.
     """
     port = "15555"
     async with RobotClient.make(
