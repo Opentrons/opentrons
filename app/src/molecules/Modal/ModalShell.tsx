@@ -40,7 +40,6 @@ const MODAL_STYLE = {
 } as const
 
 const FULL_PAGE_STYLE = {
-  backgroundColor: COLORS.white,
   overflowY: OVERFLOW_AUTO,
   height: '100%',
   width: '100%',
@@ -111,7 +110,10 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
       <Flex {...BASE_STYLE} zIndex={zIndex}>
         <Box
           {...(fullPage ? FULL_PAGE_STYLE : MODAL_STYLE)}
-          {...(fullPage ? {} : styleProps)}
+          // apply background color style prop only to full page - omitting width, margin, etc
+          {...(fullPage
+            ? { backgroundColor: styleProps.backgroundColor ?? COLORS.white }
+            : styleProps)}
           onClick={e => {
             e.stopPropagation()
           }}
