@@ -199,13 +199,20 @@ async def upload_via_dfu(
 ) -> Tuple[bool, str]:
     """Run firmware upload command for DFU.
 
+    Unlike other firmware upload methods, this one doesn't take a `port` argument since
+    the module isn't recognized as a cdc device in dfu mode and hence doesn't get
+    a port. The firmware upload utility, dfu-util, looks for the specific module
+    by searching for available dfu devices. Since we check beforehand that only one
+    dfu device is available during the upload process, this check is sufficient for us.
+
+    In the future, if we want to make sure that the dfu device available is in fact
+    the one we seek, then we can ask dfu-util to check for available dfu devices with
+    a specific serial number (unrelated to Opentrons' module serial numbers).
+    Hence, this method takes a `dfu_serial` argument instead.
+
     Returns tuple of success boolean and message from bootloader
     """
     log.info("Starting firmware upload via dfu util")
-
-    # We don't specify a port since the dfu device doesn't get one &
-    # dfu-util doesn't need it either so I've replaced the 'port' arg with an arg to
-    # fetch dfu device serial. I haven't used it in the below command though.
     dfu_args = [
         "dfu-util",
         "-a 0",
