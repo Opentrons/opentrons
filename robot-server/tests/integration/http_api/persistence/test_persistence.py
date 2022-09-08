@@ -10,10 +10,7 @@ from tests.integration.robot_client import RobotClient
 from tests.integration.protocol_files import get_py_protocol, get_json_protocol
 
 
-@pytest.mark.parametrize("protocol", [(get_py_protocol), (get_json_protocol)])
-async def test_upload_protocols_and_reset_persistence_dir(
-    protocol: Callable[[str], IO[bytes]]
-) -> None:
+async def test_upload_protocols_and_reset_persistence_dir() -> None:
     """Test protocol and analysis persistence.
 
     Uploaded protocols and their completed analyses should remain constant across
@@ -32,13 +29,11 @@ async def test_upload_protocols_and_reset_persistence_dir(
                 await robot_client.wait_until_alive()
             ), "Dev Robot never became available."
 
-            # Must not be so high that the server runs out of room and starts
-            # auto-deleting old protocols.
-            protocols_to_create = 15
+            with get_py_protocol(secrets.token_urlsafe(16)) as file:
+                await robot_client.post_protocol([Path(file.name)])
 
-            for _ in range(protocols_to_create):
-                with protocol(secrets.token_urlsafe(16)) as file:
-                    await robot_client.post_protocol([Path(file.name)])
+            with get_json_protocol(secrets.token_urlsafe(16)) as file:
+                await robot_client.post_protocol([Path(file.name)])
 
             await robot_client.post_setting_reset_options({"runsHistory": True})
 
