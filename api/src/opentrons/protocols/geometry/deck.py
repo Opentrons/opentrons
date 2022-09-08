@@ -53,8 +53,9 @@ class Deck(UserDict):
             self.data[int(slot["id"])] = None
             self._positions[int(slot["id"])] = types.Point(*slot["position"])
         self._highest_z = 0.0
-        self._load_fixtures()
         self._thermocycler_present = False
+        self._load_fixtures()
+        self.recalculate_high_z()
 
     def _load_fixtures(self):
         for f in self._definition["locations"]["fixtures"]:
@@ -125,7 +126,7 @@ class Deck(UserDict):
         )
 
         self.data[slot_key_int] = val
-        self._highest_z = max(val.highest_z, self._highest_z)
+        self.recalculate_high_z()
         self._thermocycler_present = any(
             isinstance(item, ThermocyclerGeometry) for item in self.data.values()
         )

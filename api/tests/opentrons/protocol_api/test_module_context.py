@@ -7,6 +7,7 @@ from decoy import Decoy, matchers
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
 from opentrons.broker import Broker
+from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, ModuleContext, Labware
 from opentrons.protocol_api.core.labware import LabwareLoadParams
 
@@ -20,9 +21,17 @@ def mock_core(decoy: Decoy) -> ModuleCore:
 
 
 @pytest.fixture
-def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
+def mock_deck(decoy: Decoy) -> Deck:
     """Get a mock protocol implementation core."""
-    return decoy.mock(cls=ProtocolCore)
+    return decoy.mock(cls=Deck)
+
+
+@pytest.fixture
+def mock_protocol_core(decoy: Decoy, mock_deck: Deck) -> ProtocolCore:
+    """Get a mock protocol implementation core."""
+    mock_core = decoy.mock(cls=ProtocolCore)
+    decoy.when(mock_core.get_deck()).then_return(mock_deck)
+    return mock_core
 
 
 @pytest.fixture
@@ -58,6 +67,7 @@ def test_load_labware(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
     mock_core: ModuleCore,
+    mock_deck: Deck,
     subject: ModuleContext[Any],
 ) -> None:
     """It should load labware by load parameters."""
@@ -88,6 +98,7 @@ def test_load_labware(
     )
 
     assert result is mock_labware
+    decoy.verify(mock_deck.recalculate_high_z(), times=1)
 
 
 def test_load_labware_from_definition(
