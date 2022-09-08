@@ -151,9 +151,13 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
         # TODO(mc, 2022-09-02): add API version
         # https://opentrons.atlassian.net/browse/RSS-97
-        labware = Labware(implementation=labware_core)
+        labware = self._core.geometry.add_labware(Labware(implementation=labware_core))
 
-        return self._core.geometry.add_labware(labware)
+        # TODO(mc, 2022-09-08): move this into legacy PAPIv2 implementation
+        # by reworking the `Deck` and/or `ModuleGeometry` interface
+        self._protocol_core.get_deck().recalculate_high_z()
+
+        return labware
 
     @requires_version(2, 0)
     def load_labware_from_definition(
