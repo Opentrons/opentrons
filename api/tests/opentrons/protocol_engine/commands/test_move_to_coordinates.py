@@ -33,7 +33,6 @@ async def test_move_to_coordinates_implementation(
     """
     subject = MoveToCoordinatesImplementation(
         state_view=state_view,
-        hardware_api=hardware_api,
         movement=movement,
     )
 
@@ -85,17 +84,12 @@ async def test_move_to_coordinates_implementation(
 
     result = await subject.execute(params=params)
 
-    decoy.verify(
-        await hardware_api.move_to(
-            mount=mount,
-            abs_position=planned_waypoint_1.position,
-            critical_point=planned_waypoint_1.critical_point,
-        ),
-        await hardware_api.move_to(
-            mount=mount,
-            abs_position=planned_waypoint_2.position,
-            critical_point=planned_waypoint_2.critical_point,
-        ),
-    )
-
     assert result == MoveToCoordinatesResult()
+    decoy.verify(
+        await movement.move_to_coordinates(
+            pipette_id="pipette-id",
+            deck_coordinates=DeckPoint(x=1.11, y=2.22, z=3.33),
+            direct=True,
+            additional_min_travel_z=1234,
+        )
+    )
