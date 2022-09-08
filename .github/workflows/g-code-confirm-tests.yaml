@@ -51,6 +51,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'g-code-testing'
+          python-version: '3.7'
 
       - name: "Verify no missing comparison files"
         run: make -C g-code-testing check-for-missing-comparison-files

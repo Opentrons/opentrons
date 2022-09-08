@@ -51,6 +51,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'g-code-testing'
+          python-version: '3.7'
       - name: Lint
         run: make -C g-code-testing lint
       - name: Test
