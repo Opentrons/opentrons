@@ -8,10 +8,16 @@ from typing import Optional
 
 
 class DevServer:
-    def __init__(self, port: str = "31950") -> None:
+    def __init__(
+        self, port: str = "31950", persistence_directory: Optional[str] = None
+    ) -> None:
         """Initialize a dev server."""
         self.server_temp_directory: str = tempfile.mkdtemp()
-        self.persistence_directory: str = tempfile.mkdtemp()
+        self.persistence_directory: str = (
+            persistence_directory
+            if persistence_directory is not None
+            else tempfile.mkdtemp()
+        )
         self.port: str = port
 
     def __enter__(self) -> DevServer:
