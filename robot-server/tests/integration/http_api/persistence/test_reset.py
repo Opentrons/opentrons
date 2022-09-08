@@ -57,8 +57,9 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
                 await robot_client.wait_until_alive()
             ), "Dev Robot never became available."
 
+            # Now that we've reset and restarted, the protocols should be gone.
+            # TODO(mm, 2022-09-08): We should also test that *runs* are cleared.
             result = await robot_client.get_protocols()
-
             assert result.json()["data"] == []
             assert os.listdir(f"{server.persistence_directory}/protocols/") == []
 
