@@ -85,6 +85,12 @@ export const AppComponent = (): JSX.Element => {
       path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
     },
     {
+      Component: CalibrationDashboard,
+      exact: true,
+      name: 'Calibration Dashboard',
+      path: '/devices/:robotName/robot-settings/calibration/dashboard',
+    },
+    {
       Component: ProtocolRunDetails,
       name: 'Run Details',
       path: '/devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab?',
@@ -133,11 +139,6 @@ export const AppComponent = (): JSX.Element => {
                 </Route>
               )
             })}
-            <Route
-              exact
-              path="/devices/:robotName/robot-settings/calibration/dashboard"
-              component={CalibrationDashboard}
-            />
             <Redirect exact from="/" to="/protocols" />
           </Switch>
           <Alerts />
