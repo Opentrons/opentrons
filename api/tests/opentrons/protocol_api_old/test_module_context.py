@@ -501,7 +501,7 @@ def test_thermocycler_flag_unsafe_move(ctx_with_thermocycler, mock_module_contro
     mod = ctx_with_thermocycler.load_module("thermocycler", configuration="semi")
     labware_name = "nest_96_wellplate_100ul_pcr_full_skirt"
     tc_labware = mod.load_labware(labware_name)
-    
+
     with_tc_labware = Location(None, tc_labware)  # type: ignore[arg-type]
     without_tc_labware = Location(None, None)  # type: ignore[arg-type]
 
