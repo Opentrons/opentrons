@@ -1,13 +1,10 @@
 """Test move-to-coordinates commands."""
 from decoy import Decoy
 
-from opentrons.hardware_control import CriticalPoint, HardwareControlAPI
-from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import Mount, MountType, Point
-from opentrons.motion_planning import Waypoint
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.execution import MovementHandler
 from opentrons.protocol_engine.state import StateView
-from opentrons.protocol_engine.types import DeckPoint, LoadedPipette
+from opentrons.protocol_engine.types import DeckPoint
 
 from opentrons.protocol_engine.commands.move_to_coordinates import (
     MoveToCoordinatesParams,
@@ -42,45 +39,6 @@ async def test_move_to_coordinates_implementation(
         minimumZHeight=1234,
         forceDirect=True,
     )
-
-    mount_type = MountType.RIGHT
-    mount = Mount.RIGHT
-
-    current_position = Point(4.44, 5.55, 6.66)
-    max_height = 5678
-
-    planned_waypoint_1 = Waypoint(position=Point(3, 1, 4), critical_point=None)
-    planned_waypoint_2 = Waypoint(
-        position=Point(1, 5, 9), critical_point=CriticalPoint.XY_CENTER
-    )
-
-    decoy.when(state_view.pipettes.get(params.pipetteId)).then_return(
-        LoadedPipette(
-            mount=mount_type,
-            id="loaded-pipette-id-should-not-matter",
-            pipetteName=PipetteNameType.P10_SINGLE,  # Shouldn't matter.
-        )
-    )
-
-    decoy.when(
-        await hardware_api.gantry_position(mount=mount, critical_point=None)
-    ).then_return(current_position)
-
-    decoy.when(
-        hardware_api.get_instrument_max_height(mount=mount, critical_point=None)
-    ).then_return(max_height)
-
-    decoy.when(
-        state_view.motion.get_movement_waypoints_to_coords(
-            origin=current_position,
-            dest=Point(
-                params.coordinates.x, params.coordinates.y, params.coordinates.z
-            ),
-            max_travel_z=max_height,
-            direct=params.forceDirect,
-            additional_min_travel_z=params.minimumZHeight,
-        )
-    ).then_return([planned_waypoint_1, planned_waypoint_2])
 
     result = await subject.execute(params=params)
 
