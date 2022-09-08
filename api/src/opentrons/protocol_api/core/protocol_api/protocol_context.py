@@ -1,6 +1,5 @@
 import logging
-from typing import Dict, List, Optional, Set
-from collections import OrderedDict
+from typing import Dict, Optional, Set, Union
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -17,7 +16,7 @@ from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocols import labware as labware_definition
 
-from ..protocol import AbstractProtocol, LoadModuleResult
+from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 
 from .instrument_context import InstrumentContextImplementation
@@ -75,7 +74,6 @@ class ProtocolContextImplementation(
         self._instruments: Dict[Mount, Optional[InstrumentContextImplementation]] = {
             mount: None for mount in Mount
         }
-        self._modules: List[LoadModuleResult] = []
         self._bundled_labware = bundled_labware
         self._extra_labware = extra_labware or {}
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
@@ -141,13 +139,22 @@ class ProtocolContextImplementation(
     def load_labware(
         self,
         load_name: str,
-        location: DeckSlotName,
+        location: Union[DeckSlotName, LegacyModuleCore],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareImplementation:
         """Load a labware using its identifying parameters."""
-        parent = self.get_deck().position_for(location.value)
+        deck_slot = (
+            location if isinstance(location, DeckSlotName) else location.get_deck_slot()
+        )
+
+        parent = (
+            self.get_deck().position_for(location.value)
+            if isinstance(location, DeckSlotName)
+            else location.geometry.location
+        )
+
         labware_def = labware_definition.get_labware_definition(
             load_name,
             namespace,
@@ -163,12 +170,17 @@ class ProtocolContextImplementation(
         labware_load_params = labware_core.get_load_params()
         labware_offset = self._labware_offset_provider.find(
             load_params=labware_load_params,
-            deck_slot=location,
-            requested_module_model=None,
+            deck_slot=deck_slot,
+            requested_module_model=(
+                location.get_requested_model()
+                if isinstance(location, LegacyModuleCore)
+                else None
+            ),
         )
         labware_core.set_calibration(labware_offset.delta)
 
-        self._deck_layout[location] = labware_core
+        if isinstance(location, DeckSlotName):
+            self._deck_layout[location.value] = labware_core
 
         self._equipment_broker.publish(
             LabwareLoadInfo(
@@ -176,8 +188,8 @@ class ProtocolContextImplementation(
                 labware_namespace=labware_load_params.namespace,
                 labware_load_name=labware_load_params.load_name,
                 labware_version=labware_load_params.version,
-                deck_slot=location,
-                on_module=False,
+                deck_slot=deck_slot,
+                on_module=isinstance(location, LegacyModuleCore),
                 offset_id=labware_offset.offset_id,
                 labware_display_name=labware_core.get_user_display_name(),
             )
@@ -190,7 +202,7 @@ class ProtocolContextImplementation(
         model: ModuleModel,
         deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
-    ) -> Optional[LoadModuleResult]:
+    ) -> LegacyModuleCore:
         """Load a module."""
         resolved_type = module_geometry.resolve_module_type(model)
         resolved_location = self._deck_layout.resolve_module_location(
@@ -216,7 +228,7 @@ class ProtocolContextImplementation(
             hc_mod_instance = SynchronousAdapter(simulating_module)
 
         if not hc_mod_instance:
-            return None
+            raise RuntimeError(f"Could not find specified module: {model.value}")
 
         # Load geometry to match the hardware module that we found connected.
         geometry = module_geometry.load_module(
@@ -226,30 +238,25 @@ class ProtocolContextImplementation(
             configuration=configuration,
         )
 
-        result = LoadModuleResult(
-            type=resolved_type, geometry=geometry, module=hc_mod_instance
+        module_core = LegacyModuleCore(
+            sync_module_hardware=hc_mod_instance,
+            requested_model=model,
+            geometry=geometry,
         )
 
-        self._modules.append(result)
         self._deck_layout[resolved_location] = geometry
 
         self.equipment_broker.publish(
             ModuleLoadInfo(
                 requested_model=model,
-                loaded_model=geometry.model,
-                deck_slot=DeckSlotName.from_primitive(resolved_location),
+                loaded_model=module_core.get_model(),
+                module_serial=module_core.get_serial_number(),
+                deck_slot=deck_slot,
                 configuration=configuration,
-                module_serial=hc_mod_instance.device_info["serial"],
             )
         )
 
-        return result
-
-    def get_loaded_modules(self) -> Dict[int, LoadModuleResult]:
-        """Get a mapping of deck location to loaded module."""
-        return OrderedDict(
-            {int(str(module.geometry.parent)): module for module in self._modules}
-        )
+        return module_core
 
     def load_instrument(
         self, instrument_name: PipetteNameType, mount: Mount

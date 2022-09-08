@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import logging
-from collections import OrderedDict
 from typing import (
-    TYPE_CHECKING,
     Callable,
     Dict,
     Iterator,
@@ -11,14 +9,17 @@ from typing import (
     NamedTuple,
     Optional,
     Tuple,
+    Type,
     Union,
     cast,
 )
 
-from opentrons.types import Mount, Location, DeckLocation
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
+from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
 from opentrons.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
-from opentrons.hardware_control.modules.types import ModuleType
+from opentrons.hardware_control.modules import ModuleType
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
@@ -47,9 +48,6 @@ from .module_contexts import (
     HeaterShakerContext,
 )
 
-
-if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 logger = logging.getLogger(__name__)
 
@@ -124,7 +122,7 @@ class ProtocolContext(CommandPublisher):
         self._instruments: Dict[Mount, Optional[InstrumentContext]] = {
             mount: None for mount in Mount
         }
-        self._modules: List[ModuleTypes] = []
+        self._modules: Dict[DeckSlotName, ModuleTypes] = {}
 
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
@@ -412,30 +410,21 @@ class ProtocolContext(CommandPublisher):
 
         requested_model = validation.ensure_module_model(module_name)
         deck_slot = None if location is None else validation.ensure_deck_slot(location)
-        load_result = self._implementation.load_module(
+
+        module_core = self._implementation.load_module(
             model=requested_model,
             deck_slot=deck_slot,
             configuration=configuration,
         )
 
-        if not load_result:
-            raise RuntimeError(f"Could not find specified module: {module_name}")
-
-        mod_class = {
-            ModuleType.MAGNETIC: MagneticModuleContext,
-            ModuleType.TEMPERATURE: TemperatureModuleContext,
-            ModuleType.THERMOCYCLER: ThermocyclerContext,
-            ModuleType.HEATER_SHAKER: HeaterShakerContext,
-        }[load_result.type]
-
-        module_context: ModuleTypes = mod_class(
-            ctx=self,
-            hw_module=load_result.module,
-            geometry=load_result.geometry,
-            at_version=self.api_version,
-            requested_as=requested_model,
+        module_context = _create_module_context(
+            core=module_core,
+            protocol_core=self._implementation,
+            broker=self._broker,
+            api_version=self._api_version,
         )
-        self._modules.append(module_context)
+
+        self._modules[deck_slot] = module_context
 
         return module_context
 
@@ -455,12 +444,9 @@ class ProtocolContext(CommandPublisher):
                                            contexts. The elements may not be
                                            ordered by slot number.
         """
-
-        def _modules() -> Iterator[Tuple[int, ModuleTypes]]:
-            for module in self._modules:
-                yield int(str(module.geometry.parent)), module
-
-        return OrderedDict(_modules())
+        return {
+            int(deck_slot.value): module for deck_slot, module in self._modules.items()
+        }
 
     @requires_version(2, 0)
     def load_instrument(
@@ -686,3 +672,26 @@ class ProtocolContext(CommandPublisher):
     def door_closed(self) -> bool:
         """Returns True if the robot door is closed"""
         return self._implementation.door_closed()
+
+
+def _create_module_context(
+    core: ModuleCore,
+    protocol_core: ProtocolCore,
+    api_version: APIVersion,
+    broker: Broker,
+) -> ModuleTypes:
+    # TODO(mc, 2022-09-07): create distinct module cores
+    module_constructors: Dict[ModuleType, Type[ModuleTypes]] = {
+        ModuleType.MAGNETIC: MagneticModuleContext,
+        ModuleType.TEMPERATURE: TemperatureModuleContext,
+        ModuleType.THERMOCYCLER: ThermocyclerContext,
+        ModuleType.HEATER_SHAKER: HeaterShakerContext,
+    }
+    module_cls = module_constructors[core.get_type()]
+
+    return module_cls(
+        core=core,
+        protocol_core=protocol_core,
+        api_version=api_version,
+        broker=broker,
+    )

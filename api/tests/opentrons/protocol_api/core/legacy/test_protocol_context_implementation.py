@@ -12,6 +12,7 @@ from opentrons.types import DeckSlotName, Location, Mount, Point
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.modules.types import TemperatureModuleModel
 from opentrons.protocols import labware as mock_labware
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
@@ -29,6 +30,7 @@ from opentrons.protocol_api.core.protocol_api.instrument_context import (
     InstrumentContextImplementation,
 )
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
+from opentrons.protocol_api.core.protocol_api.legacy_module_core import LegacyModuleCore
 from opentrons.protocol_api.core.protocol_api.protocol_context import (
     ProtocolContextImplementation,
 )
@@ -198,6 +200,91 @@ def test_load_labware(
                 labware_version=42,
                 deck_slot=DeckSlotName.SLOT_5,
                 on_module=False,
+                offset_id="offset-789",
+                labware_display_name="cool label",
+            )
+        ),
+        times=1,
+    )
+
+
+def test_load_labware_on_module(
+    decoy: Decoy,
+    mock_deck: Deck,
+    mock_labware_offset_provider: AbstractLabwareOffsetProvider,
+    mock_equipment_broker: EquipmentBroker[LoadInfo],
+    subject: ProtocolContextImplementation,
+) -> None:
+    """It should load a labware core."""
+    mock_module_core = decoy.mock(cls=LegacyModuleCore)
+
+    labware_definition_dict = cast(
+        LabwareDefDict,
+        {
+            "namespace": "super cool namespace",
+            "parameters": {"loadName": "super cool load name"},
+            "version": 42,
+            "wells": {},
+            "ordering": [],
+            "dimensions": {"xDimension": 0, "yDimension": 0, "zDimension": 0},
+            "cornerOffsetFromSlot": {"x": 4, "y": 5, "z": 6},
+        },
+    )
+
+    decoy.when(
+        mock_labware.get_labware_definition(
+            load_name="cool load name",
+            namespace="cool namespace",
+            version=1337,
+            bundled_defs=None,
+            extra_defs={},
+        )
+    ).then_return(labware_definition_dict)
+
+    decoy.when(mock_module_core.get_requested_model()).then_return(
+        TemperatureModuleModel.TEMPERATURE_V1
+    )
+    decoy.when(mock_module_core.get_deck_slot()).then_return(DeckSlotName.SLOT_5)
+    decoy.when(mock_module_core.geometry.location).then_return(
+        Location(Point(1, 2, 3), mock_module_core.geometry)
+    )
+
+    decoy.when(
+        mock_labware_offset_provider.find(
+            load_params=LabwareLoadParams(
+                namespace="super cool namespace",
+                load_name="super cool load name",
+                version=42,
+            ),
+            requested_module_model=TemperatureModuleModel.TEMPERATURE_V1,
+            deck_slot=DeckSlotName.SLOT_5,
+        )
+    ).then_return(ProvidedLabwareOffset(delta=Point(7, 8, 9), offset_id="offset-789"))
+
+    result = subject.load_labware(
+        load_name="cool load name",
+        location=mock_module_core,
+        label="cool label",
+        namespace="cool namespace",
+        version=1337,
+    )
+
+    assert isinstance(result, LabwareImplementation)
+    assert result.get_calibrated_offset() == Point(
+        x=(1 + 4 + 7),
+        y=(2 + 5 + 8),
+        z=(3 + 6 + 9),
+    )
+
+    decoy.verify(
+        mock_equipment_broker.publish(
+            LabwareLoadInfo(
+                labware_definition=labware_definition_dict,
+                labware_namespace="super cool namespace",
+                labware_load_name="super cool load name",
+                labware_version=42,
+                deck_slot=DeckSlotName.SLOT_5,
+                on_module=True,
                 offset_id="offset-789",
                 labware_display_name="cool label",
             )
