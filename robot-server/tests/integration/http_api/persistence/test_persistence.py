@@ -39,7 +39,11 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
 
             result = await robot_client.get_protocols()
 
-            assert result.json()["data"]
+            assert len(result.json()["data"]) == 2
+
+            # TODO(mm, 2022-09-08): This can erroneously pass if something other than
+            # our software creates a file in this directory, like if macOS creates
+            # .DS_Store.
             assert os.listdir(f"{server.persistence_directory}/protocols/")
 
             server.stop()
