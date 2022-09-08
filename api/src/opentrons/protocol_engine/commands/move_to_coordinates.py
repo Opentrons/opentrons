@@ -19,8 +19,6 @@ MoveToCoordinatesCommandType = Literal["moveToCoordinates"]
 class MoveToCoordinatesParams(PipetteIdMixin):
     """Payload required to move a pipette to coordinates."""
 
-    # pass
-
     coordinates: DeckPoint = Field(
         ...,
         description="X, Y and Z coordinates in mm from deck's origin location (left-front-bottom corner of work space)",
