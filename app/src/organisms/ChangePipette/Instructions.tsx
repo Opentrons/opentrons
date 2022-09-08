@@ -105,7 +105,7 @@ export function Instructions(props: Props): JSX.Element {
             <Flex
               paddingX={SPACING.spacing6}
               paddingTop={SPACING.spacing6}
-              height="100%"
+              height="14.5rem"
             >
               <InstructionStep
                 diagram={stepPage === 0 ? 'screws' : 'tab'}
@@ -161,8 +161,7 @@ export function Instructions(props: Props): JSX.Element {
             marginBottom={SPACING.spacing6}
             marginX={SPACING.spacing6}
             alignSelf={ALIGN_FLEX_END}
-            //  spacing changes to keep buttons at same height across pages
-            marginTop={stepPage === 0 ? SPACING.spacing6 : '5.9rem'}
+            marginTop="5.9rem"
           >
             <Btn
               onClick={stepPage === 0 ? back : () => setStepPage(stepPage - 1)}
