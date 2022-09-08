@@ -19,7 +19,7 @@ on:
     - '**Pipfile.*'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.sha }}
   cancel-in-progress: true
 
 defaults:
@@ -62,6 +62,9 @@ jobs:
       - name: Install robot-server
         working-directory: robot-server
         run: pipenv install -d
+      - name: Install g-code-testing
+        working-directory: g-code-testing
+        run: pipenv install -d
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v4
@@ -71,6 +74,7 @@ jobs:
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: false
           branch: pipfile-lock-${{ github.ref_name }}
+          base: ${{ github.ref_name }}
           delete-branch: true
           title: Update Pipfile.lock on branch ${{ github.ref_name }}
           body: |
