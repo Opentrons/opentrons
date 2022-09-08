@@ -1,8 +1,6 @@
 import os
 
-import pytest
 import secrets
-from typing import Callable, IO
 from pathlib import Path
 
 from tests.integration.dev_server import DevServer
