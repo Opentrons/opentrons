@@ -16,13 +16,14 @@ from opentrons.protocols.api_support.types import APIVersion
 
 from .protocol_context import ProtocolContext
 
-from .core.labware_offset_provider import (
+
+from .core.protocol import AbstractProtocol
+from .core.protocol_api.protocol_context import ProtocolContextImplementation
+from .core.protocol_api.labware_offset_provider import (
     AbstractLabwareOffsetProvider,
     LabwareOffsetProvider,
     NullLabwareOffsetProvider,
 )
-from .core.protocol import AbstractProtocol
-from .core.protocol_api.protocol_context import ProtocolContextImplementation
 from .core.simulator.protocol_context import ProtocolContextSimulation
 from .core.engine import ProtocolCore
 
@@ -92,6 +93,7 @@ def create_protocol_context(
     elif use_simulating_core and not feature_flags.disable_fast_protocol_upload():
         core = ProtocolContextSimulation(
             sync_hardware=sync_hardware,
+            labware_offset_provider=labware_offset_provider,
             api_version=api_version,
             bundled_labware=bundled_labware,
             bundled_data=bundled_data,
@@ -101,14 +103,11 @@ def create_protocol_context(
     else:
         core = ProtocolContextImplementation(
             sync_hardware=sync_hardware,
+            labware_offset_provider=labware_offset_provider,
             api_version=api_version,
             bundled_labware=bundled_labware,
             bundled_data=bundled_data,
             extra_labware=extra_labware,
         )
 
-    return ProtocolContext(
-        api_version=api_version,
-        labware_offset_provider=labware_offset_provider,
-        implementation=core,
-    )
+    return ProtocolContext(api_version=api_version, implementation=core)

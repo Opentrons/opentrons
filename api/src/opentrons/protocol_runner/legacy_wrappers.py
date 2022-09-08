@@ -30,7 +30,7 @@ from opentrons.protocol_api import (
     Well as LegacyWell,
     create_protocol_context,
 )
-from opentrons.protocol_api.load_info import (
+from opentrons.protocol_api.core.protocol_api.load_info import (
     LoadInfo as LegacyLoadInfo,
     InstrumentLoadInfo as LegacyInstrumentLoadInfo,
     LabwareLoadInfo as LegacyLabwareLoadInfo,
