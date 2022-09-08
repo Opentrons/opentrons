@@ -18,12 +18,11 @@ export function InProgressModal(props: Props): JSX.Element {
     <Flex
       alignItems={ALIGN_CENTER}
       flexDirection={DIRECTION_COLUMN}
-      height="100%"
-      transform="translateY(75%)"
+      marginY="8rem"
     >
       <Icon
         name="ot-spinner"
-        size="5.1rem"
+        size="5.125rem"
         color={COLORS.darkGreyEnabled}
         aria-label="spinner"
         spin

@@ -33,8 +33,8 @@ function LevelingVideo(props: {
   return (
     <video
       css={css`
-        width: 100%;
-        max-height: 15rem;
+        width: 275px;
+        max-height: 270px;
         margin-top: ${SPACING.spacing4};
         margin-left: ${SPACING.spacing4};
       `}
@@ -65,14 +65,24 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
+          marginBottom="40px"
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <Trans
               t={t}
               i18nKey={'level_the_pipette'}
               components={{
-                bold: <strong />,
-                h1: <StyledText as="h1" marginBottom={SPACING.spacing4} />,
+                strong: (
+                  <strong
+                    style={{ fontWeight: TYPOGRAPHY.fontWeightSemiBold }}
+                  />
+                ),
+                h1: (
+                  <StyledText
+                    css={TYPOGRAPHY.h1Default}
+                    marginBottom={SPACING.spacing4}
+                  />
+                ),
                 block: (
                   <StyledText
                     css={css`

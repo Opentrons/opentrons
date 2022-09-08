@@ -18,3 +18,18 @@ Primary.args = {
   currentStep: 2,
   title: 'Tip Length Calibration',
 }
+
+export const CurrentStepZero = Template.bind({})
+CurrentStepZero.args = {
+  totalSteps: 5,
+  currentStep: 0,
+  title: 'Tip Length Calibration',
+}
+
+export const ErrorState = Template.bind({})
+ErrorState.args = {
+  totalSteps: 5,
+  currentStep: 1,
+  isErrorState: true,
+  title: 'Tip Length Calibration',
+}

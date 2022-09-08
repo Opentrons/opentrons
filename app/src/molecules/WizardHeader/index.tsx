@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
   Box,
   Btn,
@@ -17,12 +18,33 @@ interface WizardHeaderProps {
   totalSteps: number
   currentStep: number | null
   title: string
+  isErrorState?: boolean
   onExit?: () => void
 }
 
+const EXIT_BUTTON_STYLE = css`
+  ${TYPOGRAPHY.pSemiBold};
+  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
+  color: ${COLORS.darkGreyEnabled};
+
+  &:hover {
+    opacity: 70%;
+  }
+`
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
-  const { totalSteps, currentStep, title, onExit } = props
+  const { totalSteps, currentStep, title, isErrorState, onExit } = props
   const { t } = useTranslation('shared')
+
+  let stepCounter: JSX.Element | null = null
+  if (isErrorState) {
+    stepCounter = null
+  } else if (currentStep != null && currentStep > 0) {
+    stepCounter = (
+      <StyledText css={TYPOGRAPHY.pSemiBold} color={COLORS.darkGreyEnabled}>
+        {t('step', { current: currentStep, max: totalSteps })}
+      </StyledText>
+    )
+  }
 
   return (
     <Box backgroundColor={COLORS.white}>
@@ -35,24 +57,11 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           <StyledText css={TYPOGRAPHY.pSemiBold} marginRight={SPACING.spacing3}>
             {title}
           </StyledText>
-          {currentStep != null && currentStep > 0 ? (
-            <StyledText
-              css={TYPOGRAPHY.pSemiBold}
-              color={COLORS.darkGreyEnabled}
-            >
-              {t('step', { current: currentStep, max: totalSteps })}
-            </StyledText>
-          ) : null}
+          {stepCounter}
         </Flex>
         {onExit != null ? (
           <Btn onClick={onExit} aria-label="Exit">
-            <StyledText
-              css={TYPOGRAPHY.pSemiBold}
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              color={COLORS.darkGreyEnabled}
-            >
-              {t('exit')}
-            </StyledText>
+            <StyledText css={EXIT_BUTTON_STYLE}>{t('exit')}</StyledText>
           </Btn>
         ) : null}
       </Flex>
