@@ -331,7 +331,7 @@ class AsyncResponseSerialConnection(SerialConnection):
             name=name,
             ack=ack,
             retry_wait_time_seconds=retry_wait_time_seconds,
-            error_keyword=error_keyword or "error",
+            error_keyword=error_keyword or "err",
             alarm_keyword=alarm_keyword or "alarm",
             async_error_ack=async_error_ack or "async",
         )
