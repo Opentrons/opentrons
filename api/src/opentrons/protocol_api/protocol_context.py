@@ -15,9 +15,8 @@ from typing import (
     cast,
 )
 
-from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
+from opentrons.types import Mount, Location, DeckLocation
 from opentrons.broker import Broker
-from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
@@ -39,8 +38,6 @@ from .core.instrument import AbstractInstrument
 from .core.labware import AbstractLabware
 from .core.protocol import AbstractProtocol
 from .core.well import AbstractWellCore
-from .core.protocol_api.protocol_context import ProtocolContextImplementation
-from .core.protocol_api.load_info import LoadInfo, ModuleLoadInfo
 
 from . import validation
 from .instrument_context import InstrumentContext
@@ -133,26 +130,6 @@ class ProtocolContext(CommandPublisher):
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
-
-    # TODO(mc, 2022-09-07): refactor ProtocolRunner so this property
-    # does not need to exist on ProtocolContext
-    @property
-    def equipment_broker(self) -> EquipmentBroker[LoadInfo]:
-        """For internal Opentrons use only.
-
-        :meta private:
-
-        Subscribers to this broker will be notified with information about every
-        successful labware load, instrument load, or module load.
-
-        Only :py:obj:`ProtocolContext` is allowed to publish to this broker.
-        Calling code may only subscribe or unsubscribe.
-        """
-        assert isinstance(
-            self._implementation, ProtocolContextImplementation
-        ), f"Equipment broker not available for core type {type(self._implementation)}"
-
-        return self._implementation.equipment_broker  # type: ignore[attr-defined, no-any-return]
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -460,21 +437,6 @@ class ProtocolContext(CommandPublisher):
         )
         self._modules.append(module_context)
 
-        # ===== Protocol Engine stuff ====
-        module_loc = load_result.geometry.parent
-        assert isinstance(module_loc, (int, str)), "Unexpected labware object parent"
-        deck_slot = DeckSlotName.from_primitive(module_loc)
-        module_serial = load_result.module.device_info["serial"]
-
-        self.equipment_broker.publish(
-            ModuleLoadInfo(
-                requested_model=requested_model,
-                loaded_model=load_result.geometry.model,
-                deck_slot=deck_slot,
-                configuration=configuration,
-                module_serial=module_serial,
-            )
-        )
         return module_context
 
     @property  # type: ignore

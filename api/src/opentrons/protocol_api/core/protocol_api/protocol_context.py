@@ -23,7 +23,7 @@ from ..labware import LabwareLoadParams
 from .instrument_context import InstrumentContextImplementation
 from .labware_offset_provider import AbstractLabwareOffsetProvider
 from .labware import LabwareImplementation
-from .load_info import LoadInfo, LabwareLoadInfo, InstrumentLoadInfo
+from .load_info import LoadInfo, InstrumentLoadInfo, LabwareLoadInfo, ModuleLoadInfo
 
 logger = logging.getLogger(__name__)
 
@@ -83,14 +83,12 @@ class ProtocolContextImplementation(
 
     @property
     def equipment_broker(self) -> EquipmentBroker[LoadInfo]:
-        """For internal Opentrons use only.
-
-        :meta private:
+        """A message broker to to publish equipment load events.
 
         Subscribers to this broker will be notified with information about every
         successful labware load, instrument load, or module load.
 
-        Only :py:obj:`ProtocolContext` is allowed to publish to this broker.
+        Only this interface is allowed to publish to this broker.
         Calling code may only subscribe or unsubscribe.
         """
         return self._equipment_broker
@@ -231,6 +229,17 @@ class ProtocolContextImplementation(
 
         self._modules.append(result)
         self._deck_layout[resolved_location] = geometry
+
+        self.equipment_broker.publish(
+            ModuleLoadInfo(
+                requested_model=model,
+                loaded_model=geometry.model,
+                deck_slot=DeckSlotName.from_primitive(resolved_location),
+                configuration=configuration,
+                module_serial=hc_mod_instance.device_info["serial"],
+            )
+        )
+
         return result
 
     def get_loaded_modules(self) -> Dict[int, LoadModuleResult]:

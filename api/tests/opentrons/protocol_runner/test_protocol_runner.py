@@ -7,6 +7,8 @@ from typing import List, cast
 from opentrons_shared_data.protocol.dev_types import (
     JsonProtocol as LegacyJsonProtocolDict,
 )
+from opentrons.broker import Broker
+from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.config import feature_flags
 from opentrons.protocols.api_support.types import APIVersion
@@ -353,9 +355,13 @@ def test_load_legacy_python(
     decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
         legacy_protocol
     )
-    decoy.when(legacy_context_creator.create(legacy_protocol)).then_return(
-        legacy_context
-    )
+    decoy.when(
+        legacy_context_creator.create(
+            protocol=legacy_protocol,
+            broker=matchers.IsA(Broker),
+            equipment_broker=matchers.IsA(EquipmentBroker),
+        )
+    ).then_return(legacy_context)
 
     subject.load(legacy_protocol_source)
 
@@ -409,9 +415,11 @@ def test_load_legacy_python_with_pe_papi_core(
     decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
         legacy_protocol
     )
-    decoy.when(legacy_context_creator.create(legacy_protocol)).then_return(
-        legacy_context
-    )
+    decoy.when(
+        legacy_context_creator.create(
+            protocol=legacy_protocol, broker=None, equipment_broker=None
+        )
+    ).then_return(legacy_context)
 
     subject.load(legacy_protocol_source)
 
@@ -453,9 +461,13 @@ def test_load_legacy_json(
     decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
         legacy_protocol
     )
-    decoy.when(legacy_context_creator.create(legacy_protocol)).then_return(
-        legacy_context
-    )
+    decoy.when(
+        legacy_context_creator.create(
+            legacy_protocol,
+            broker=matchers.IsA(Broker),
+            equipment_broker=matchers.IsA(EquipmentBroker),
+        )
+    ).then_return(legacy_context)
 
     subject.load(legacy_protocol_source)
 

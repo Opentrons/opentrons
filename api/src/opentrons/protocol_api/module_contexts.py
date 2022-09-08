@@ -113,7 +113,8 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         labware_core.set_calibration(provided_offset.delta)
         self._ctx._implementation.get_deck().recalculate_high_z()
 
-        self._ctx.equipment_broker.publish(
+        # TODO(mc, 2022-09-07): move into module or protocol core
+        self._ctx._implementation.equipment_broker.publish(  # type: ignore[attr-defined]
             LabwareLoadInfo(
                 labware_definition=labware_core.get_definition(),
                 labware_namespace=load_params.namespace,
