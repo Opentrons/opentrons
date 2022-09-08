@@ -176,12 +176,12 @@ async def test_on_retry(mock_serial_port: AsyncMock, subject: SerialKind) -> Non
     mock_serial_port.open.assert_called_once()
 
 
-async def test_send_data_async_error_response(
+async def test_send_data_with_async_error_before(
     mock_serial_port: AsyncMock,
     subject_raise_on_error_patched: AsyncResponseSerialConnection,
     ack: str,
 ) -> None:
-    """It should return response without the ack and stripped."""
+    """It should return response without the ack and stripped. It should also handle the async error."""
     error_response = "async ERR106:main motor:speedsensor failed"
     serial_error_response = f" {error_response}  {ack}"
     encoded_error_response = serial_error_response.encode()
@@ -205,6 +205,38 @@ async def test_send_data_async_error_response(
     subject_raise_on_error_patched.raise_on_error.assert_has_calls(  # type: ignore[attr-defined]
         calls=[
             call(response=error_response),
+            call(response=successful_response),
+        ]
+    )
+
+
+async def test_send_data_with_async_error_after(
+    mock_serial_port: AsyncMock,
+    subject_raise_on_error_patched: AsyncResponseSerialConnection,
+    ack: str,
+) -> None:
+    """It should return response without the ack and stripped. It should not handle the async error."""
+    error_response = "async ERR106:main motor:speedsensor failed"
+    serial_error_response = f" {error_response}  {ack}"
+    encoded_error_response = serial_error_response.encode()
+    successful_response = "G28"
+    serial_successful_response = f" {successful_response}  {ack}"
+    encoded_successful_response = serial_successful_response.encode()
+    mock_serial_port.read_until.side_effect = [
+        encoded_successful_response,
+        encoded_error_response,
+    ]
+
+    response = await subject_raise_on_error_patched._send_data(data="G28")
+
+    assert response == successful_response
+    mock_serial_port.read_until.assert_has_calls(
+        calls=[
+            call(match=ack.encode()),
+        ]
+    )
+    subject_raise_on_error_patched.raise_on_error.assert_has_calls(  # type: ignore[attr-defined]
+        calls=[
             call(response=successful_response),
         ]
     )
