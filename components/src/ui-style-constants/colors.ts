@@ -60,6 +60,7 @@ export const errorDisabled = '#8f8f8f'
 
 // others
 export const transparent = 'transparent'
+export const opacity12HexCode = '1f' // 12% opacity
 export const opacity35HexCode = '59' // 35% opacity
 export const backgroundOverlay = `${darkBlackEnabled}${opacity35HexCode}`
 

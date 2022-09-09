@@ -31,6 +31,7 @@ import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupC
 import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
 import { formatLastModified } from '../../../organisms/CalibrationPanels/utils'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
+import { CalibrationStatusCard } from '../../../organisms/CalibrationStatusCard'
 import { CheckCalibration } from '../../../organisms/CheckCalibration'
 import { useTrackEvent } from '../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
@@ -146,6 +147,10 @@ export function RobotSettingsCalibration({
   })
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
   const dispatch = useDispatch<Dispatch>()
+  const enableCalibrationWizards = Config.useFeatureFlag(
+    'enableCalibrationWizards'
+  )
+
   React.useEffect(() => {
     dispatch(fetchAllSessions(robotName))
   }, [])
@@ -566,35 +571,50 @@ export function RobotSettingsCalibration({
           </AlertModal>
         )}
       </Portal>
-      {/* Calibration Data Download Section */}
-      <Box paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box marginRight={SPACING.spacing6}>
-            <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
-              {t('about_calibration_title')}
-            </Box>
-            <StyledText as="p" marginBottom={SPACING.spacing3}>
-              {t('about_calibration_description')}
-            </StyledText>
-            {showDeckCalibrationModal ? (
-              <DeckCalibrationModal
-                onCloseClick={() => setShowDeckCalibrationModal(false)}
-              />
-            ) : null}
-            <Link
-              role="button"
-              css={TYPOGRAPHY.linkPSemiBold}
-              onClick={() => setShowDeckCalibrationModal(true)}
+      {showDeckCalibrationModal ? (
+        <DeckCalibrationModal
+          onCloseClick={() => setShowDeckCalibrationModal(false)}
+        />
+      ) : null}
+      {enableCalibrationWizards ? (
+        <CalibrationStatusCard
+          robotName={robotName}
+          setShowDeckCalibrationModal={setShowDeckCalibrationModal}
+        />
+      ) : (
+        <>
+          {/* Calibration Data Download Section */}
+          <Box paddingBottom={SPACING.spacing5}>
+            <Flex
+              alignItems={ALIGN_CENTER}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
             >
-              {t('see_how_robot_calibration_works')}
-            </Link>
+              <Box marginRight={SPACING.spacing6}>
+                <Box
+                  css={TYPOGRAPHY.h3SemiBold}
+                  marginBottom={SPACING.spacing3}
+                >
+                  {t('about_calibration_title')}
+                </Box>
+                <StyledText as="p" marginBottom={SPACING.spacing3}>
+                  {t('about_calibration_description')}
+                </StyledText>
+                <Link
+                  role="button"
+                  css={TYPOGRAPHY.linkPSemiBold}
+                  onClick={() => setShowDeckCalibrationModal(true)}
+                >
+                  {t('robot_calibration:see_how_robot_calibration_works')}
+                </Link>
+              </Box>
+              <TertiaryButton onClick={onClickSaveAs}>
+                {t('download_calibration_data')}
+              </TertiaryButton>
+            </Flex>
           </Box>
-          <TertiaryButton onClick={onClickSaveAs}>
-            {t('download_calibration_data')}
-          </TertiaryButton>
-        </Flex>
-      </Box>
-      <Line />
+          <Line />
+        </>
+      )}
       {/* DeckCalibration Section */}
       {deckCalibrationBanner}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
@@ -604,18 +624,23 @@ export function RobotSettingsCalibration({
               {t('deck_calibration_title')}
             </Box>
             <StyledText as="p" marginBottom={SPACING.spacing3}>
-              {t('deck_calibration_description')}
+              {/* TODO(bh, 2022-09-07): remove legacy description when calibration wizard feature flag removed */}
+              {enableCalibrationWizards
+                ? t('deck_calibration_description')
+                : t('deck_calibration_description_legacy')}
             </StyledText>
             <StyledText as="label" color={COLORS.darkGreyEnabled}>
               {deckLastModified()}
             </StyledText>
           </Box>
-          <TertiaryButton
-            onClick={() => handleClickDeckCalibration()}
-            disabled={disabledOrBusyReason != null}
-          >
-            {deckCalibrationButtonText}
-          </TertiaryButton>
+          {enableCalibrationWizards ? null : (
+            <TertiaryButton
+              onClick={() => handleClickDeckCalibration()}
+              disabled={disabledOrBusyReason != null}
+            >
+              {deckCalibrationButtonText}
+            </TertiaryButton>
+          )}
         </Flex>
       </Box>
       <Line
@@ -634,13 +659,16 @@ export function RobotSettingsCalibration({
         </Banner>
       )}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN}>
           <Box marginRight={SPACING.spacing6}>
             <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
               {t('pipette_offset_calibrations_title')}
             </Box>
             <StyledText as="p" marginBottom={SPACING.spacing4}>
-              {t('pipette_offset_calibrations_description')}
+              {/* TODO(bh, 2022-09-07): remove legacy description when calibration wizard feature flag removed */}
+              {enableCalibrationWizards
+                ? t('pipette_offset_calibrations_description')
+                : t('pipette_offset_calibrations_description_legacy')}
             </StyledText>
           </Box>
           {pipetteOffsetCalibrations != null ? (
@@ -657,13 +685,16 @@ export function RobotSettingsCalibration({
       <Line />
       {/* Tip Length Calibration Section */}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing5}>
-        <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN}>
           <Box marginRight={SPACING.spacing6}>
             <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
               {t('tip_length_calibrations_title')}
             </Box>
             <StyledText as="p" marginBottom={SPACING.spacing4}>
-              {t('tip_length_calibrations_description')}
+              {/* TODO(bh, 2022-09-07): remove legacy description when calibration wizard feature flag removed */}
+              {enableCalibrationWizards
+                ? t('tip_length_calibrations_description')
+                : t('tip_length_calibrations_description_legacy')}
             </StyledText>
           </Box>
           {tipLengthCalibrations != null &&
@@ -680,6 +711,7 @@ export function RobotSettingsCalibration({
         </Flex>
       </Box>
       <Line />
+      {/* TODO(bh, 2022-09-07): remove when calibration wizard feature flag removed */}
       {/* Calibration Health Check Section */}
       <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing2}>
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
