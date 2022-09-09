@@ -219,7 +219,9 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
       >
         <Flex flexDirection={DIRECTION_COLUMN} flex="1">
           <StyledText as="h1" marginBottom={SPACING.spacing4}>
-            {t('calibrate_xy_axes', { slotName: slotNumber })}
+            {t(isHealthCheck ? 'check_xy_axes' : 'calibrate_xy_axes', {
+              slotName: slotNumber,
+            })}
           </StyledText>
           <StyledText as="p">
             {t('jog_pipette_to_touch_cross', { slotName: slotNumber })}

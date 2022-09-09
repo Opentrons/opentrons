@@ -8,7 +8,6 @@ import * as Sessions from '../../../redux/sessions'
 import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
 
 import { useCalibratePipetteOffset } from '../useCalibratePipetteOffset'
-import { INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL } from '../../../organisms/DeprecatedCalibrationPanels'
 import { pipetteOffsetCalibrationStarted } from '../../../redux/analytics'
 
 import type { Invoker } from '../useCalibratePipetteOffset'
@@ -118,43 +117,6 @@ describe('useCalibratePipetteOffset hook', () => {
       ),
       meta: { requestId: expect.any(String) },
     })
-  })
-
-  it('accepts intent in start callback', () => {
-    const { wrapper } = mountWithStore(<TestUseCalibratePipetteOffset />, {
-      initialState: { robotApi: {}, sessions: {} },
-    })
-    expect(typeof startCalibration).toBe('function')
-    expect(CalWizardComponent).toBe(null)
-    const seshId = 'fake-session-id'
-    const mockPipOffsetCalSession = {
-      id: seshId,
-      ...mockPipetteOffsetCalibrationSessionAttributes,
-      details: {
-        ...mockPipetteOffsetCalibrationSessionAttributes.details,
-        currentStep: Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE,
-      },
-    }
-    mockGetRobotSessionOfType.mockReturnValue(mockPipOffsetCalSession)
-    mockGetRequestById.mockReturnValue({
-      status: RobotApi.SUCCESS,
-      response: {
-        method: 'POST',
-        ok: true,
-        path: '/',
-        status: 200,
-      },
-    })
-    act(() =>
-      startCalibration({
-        withIntent: INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
-      })
-    )
-    wrapper.setProps({})
-    expect(CalWizardComponent).not.toBe(null)
-    expect(wrapper.find('CalibratePipetteOffset').prop('intent')).toEqual(
-      INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL
-    )
   })
 
   it('wizard should appear after create request succeeds with session and close on closeWizard', () => {

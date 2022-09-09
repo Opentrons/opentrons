@@ -14,6 +14,7 @@
   "change_tip_rack": "Change tip rack",
   "check_tip_on_block": "Check tip on block",
   "check_tip_on_trash": "Check tip on trash bin",
+  "check_xy_axes": "Check x- and y-axis in slot {{slotName}}",
   "check_z_axis_on_block": "Check z-axis on block",
   "check_z_axis_on_trash": "Check z-axis on trash bin",
   "clear_other_slots": "Clear all other deck slots",
