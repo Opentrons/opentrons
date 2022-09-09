@@ -6,8 +6,8 @@ from tests.integration.dev_server import DevServer
 from tests.integration.robot_client import RobotClient
 
 
-# TODO: Will cwd be correct here? This seems wrong if this test file was run
-# from non-root.
+# FIXME(mm, 2022-09-09): This assumes the current working directory is
+# the root project directory. See Jira RSS-104.
 _OLDER_PERSISTENCE_DIR = Path(
     "tests/integration/persistence_directory_snapshots/v6.0.1"
 )
