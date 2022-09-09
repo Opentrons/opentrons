@@ -22,6 +22,8 @@ import type { Mount } from '../../redux/pipettes/types'
 export interface ConfirmPipetteProps {
   robotName: string
   success: boolean
+  //  attachedWrong is referring to when a user attaches a pipette that is different
+  //  from wantedPipette
   attachedWrong: boolean
   wantedPipette: PipetteNameSpecs | null
   actualPipette: PipetteModelSpecs | null
@@ -29,6 +31,8 @@ export interface ConfirmPipetteProps {
   displayName: string
   displayCategory: PipetteDisplayCategory | null
   mount: Mount
+  //  wrongWantedPipette is referring to if the user attaches a pipette that is different
+  //  from wantedPipette and they want to use it anyway
   wrongWantedPipette: PipetteNameSpecs | null
   setWrongWantedPipette: React.Dispatch<
     React.SetStateAction<PipetteNameSpecs | null>

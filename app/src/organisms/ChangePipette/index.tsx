@@ -317,12 +317,12 @@ export function ChangePipette(props: Props): JSX.Element | null {
     }
 
     let wizardCurrentStep: number = 0
-    //  if success and wrong pipette is attached that does not have the level pipette screen
+    //  if success is true OR the wrong pipette was attached and wanted and it is not on the LevelPipette screen
     if (success || (wrongWantedPipette != null && confirmPipetteLevel)) {
       wizardCurrentStep = eightChannel
         ? EIGHT_CHANNEL_STEPS
         : SINGLE_CHANNEL_STEPS
-      //  if attached wrong pipette and has level pipette screen
+      //  if wrong pipette is attached and wanted and is an 8 channel on the LevelPipette screen
     } else if (wrongWantedPipette != null && !confirmPipetteLevel) {
       wizardCurrentStep = EIGHT_CHANNEL_STEPS - 1
       //  if in error state
