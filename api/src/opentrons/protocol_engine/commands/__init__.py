@@ -343,10 +343,11 @@ __all__ = [
     "LoadLiquidParams",
     "LoadLiquidResult",
     "LoadLiquidCommandType",
-    # module command bundles
+    # hardware module command bundles
     "heater_shaker",
     "magnetic_module",
     "temperature_module",
     "thermocycler",
+    # calibration module command bundles
     "calibration"
 ]
