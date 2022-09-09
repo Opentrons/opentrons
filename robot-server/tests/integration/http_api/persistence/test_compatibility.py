@@ -68,3 +68,15 @@ async def test_runs_available_from_older_persistence_dir(
 
     for run_id in all_run_ids:
         await robot_client.get_run(run_id=run_id)
+
+        all_command_summaries = (
+            await robot_client.get_run_commands(
+                run_id=run_id,
+                page_length=999999,  # Big enough to include all commands.
+            )
+        ).json()
+        assert len(all_command_summaries["data"]) > 0
+
+        # Ideally, we would also fetch full commands via
+        # `GET /runs/{run_id}/commands/{command_id}`.
+        # We skip it for performance. On my machine, it would take ~7 seconds.
