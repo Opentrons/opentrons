@@ -1,25 +1,23 @@
 # will only create a PR if there is a diff
+# will aggregate commits if you were to ||
+# not || because it would use too many mac runners
+# this job may also not be necessary because arm mac locking is proving identical to intel
+# so we could say always lock on a mac
 # TODO(@y3rsh, 2022-09-07):
 # Add in hardware
+# Add in hardware testing
 name: 'Create PR on macos-12 for Pipfile.lock'
 
 on:
-  push:
-    branches-ignore:
-      - 'edge'
-      - 'release'
-    paths:
-    - '.github/workflows/pipfile-lock.yaml'
-    - '**setup.py'
-    - '**Pipfile.*'
   pull_request:
     paths:
     - '.github/workflows/pipfile-lock.yaml'
     - '**setup.py'
     - '**Pipfile.*'
+  workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.sha }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 defaults:
@@ -27,9 +25,9 @@ defaults:
     shell: bash
 
 jobs:
-  test:
+  test:  # this could be || but it would use a mac runner for every folder
     name: 'If there are Pipfile.lock changes make a PR'
-    timeout-minutes: 35
+    timeout-minutes: 40
     runs-on: 'macos-12'
     steps:
       - uses: 'actions/checkout@v3'
@@ -69,14 +67,14 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v4
         with:
-          commit-message: Update Pipfile.lock on branch ${{ github.ref_name }}
+          commit-message: Update Pipfile.lock on branch ${{ github.head_ref || github.ref_name }}
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: false
-          branch: pipfile-lock-${{ github.ref_name }}
-          base: ${{ github.ref_name }}
+          branch: pipfile-lock-${{ github.head_ref || github.ref_name }}
+          base: ${{ github.head_ref || github.ref_name }}
           delete-branch: true
-          title: Update Pipfile.lock on branch ${{ github.ref_name }}
+          title: Update Pipfile.lock on branch ${{ github.head_ref || github.ref_name }}
           body: |
             Update all Pipfile.lock if needed
             - Pipfile.lock only updated on mac-12 GitHub runner
