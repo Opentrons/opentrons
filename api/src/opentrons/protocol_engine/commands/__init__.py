@@ -349,5 +349,5 @@ __all__ = [
     "temperature_module",
     "thermocycler",
     # calibration module command bundles
-    "calibration"
+    "calibration",
 ]

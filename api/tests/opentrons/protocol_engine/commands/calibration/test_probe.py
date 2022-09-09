@@ -16,9 +16,7 @@ async def test_begin_probe_implementation(
     hardware_api: HardwareControlAPI,
 ) -> None:
     """Test BeginProbe command execution."""
-    subject = BeginProbeImplementation(
-        hardware_api=hardware_api
-    )
+    subject = BeginProbeImplementation(hardware_api=hardware_api)
 
     data = BeginProbeParams(
         mount=Mount.LEFT,
@@ -26,6 +24,6 @@ async def test_begin_probe_implementation(
 
     result = await subject.execute(data)
 
-    assert result == BeginProbeResult()
+    assert result == BeginProbeResult(offsets=[])
 
-    #TODO (tz, 8-9-22): verify call to harware_api.probe()
+    # TODO (tz, 8-9-22): verify call to harware_api.probe()

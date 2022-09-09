@@ -1,11 +1,16 @@
 """Blow-out command request, result, and implementation models."""
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type
+from typing import Optional, Type, List
 from typing_extensions import Literal
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from opentrons.types import Mount
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
+from ..command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    ErrorOccurrence,
+)
 
 from opentrons.hardware_control import HardwareControlAPI
 
@@ -15,13 +20,18 @@ BeginProbeCommandType = Literal["beginprobe"]
 
 class BeginProbeParams(BaseModel):
     """Payload required to begin-probe."""
-    mount: Mount
+
+    # Should this be OT3Mount?
+    mount: Mount = Field(..., description="Instrument mount to calibrate.")
 
 
 class BeginProbeResult(BaseModel):
     """Result data from the execution of a begin-probe command."""
 
-    pass
+    offsets: List[float] = Field(..., description="Instrument calibration offsets.")
+    errors: Optional[List[ErrorOccurrence]] = Field(
+        default_factory=None, description="Instrument calibration offsets."
+    )
 
 
 class BeginProbeImplementation(AbstractCommandImpl[BeginProbeParams, BeginProbeResult]):
@@ -38,7 +48,7 @@ class BeginProbeImplementation(AbstractCommandImpl[BeginProbeParams, BeginProbeR
         """Execute begin-probe command."""
         # result = await self._hardware_api.probe(mount=params.mount)
 
-        return BeginProbeResult()
+        return BeginProbeResult(offsets=[])
 
 
 class BeginProbe(BaseCommand[BeginProbeParams, BeginProbeResult]):
