@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import AsyncGenerator, Generator
 
 import pytest
 
@@ -16,29 +17,29 @@ _EXPECTED_PROTOCOL_COUNT = 4
 _EXPECTED_RUN_COUNT = 5
 
 
-# Module scope for performance. We rely on these tests being read-only.
+# Module-scope to avoid the overhead of restarting the server between test functions.
+# This relies on the test functions only reading, never writing.
 @pytest.fixture(scope="module")
-async def robot_client() -> RobotClient:
+def dev_server() -> Generator[DevServer, None, None]:
     port = "15555"
+    with DevServer(
+        port=port,
+        persistence_directory=_OLDER_PERSISTENCE_DIR,
+    ) as server:
+        server.start()
+        yield server
+
+
+@pytest.fixture
+async def robot_client(dev_server: DevServer) -> AsyncGenerator[RobotClient, None]:
+    """Return a client to talk to a server that's using an old persistence dir."""
     async with RobotClient.make(
-        host="http://localhost", port=port, version="*"
+        host="http://localhost", port=dev_server.port, version="*"
     ) as robot_client:
         assert (
-            await robot_client.wait_until_dead()
-        ), "Dev Robot is running and must not be."
-
-        with DevServer(
-            port=port,
-            persistence_directory=_OLDER_PERSISTENCE_DIR,
-        ) as server:
-            server.start()
-            assert (
-                await robot_client.wait_until_alive()
-            ), "Dev Robot never became available."
-
-            yield robot_client
-
-        assert await robot_client.wait_until_dead(), "Dev Robot did not stop."
+            await robot_client.wait_until_alive()
+        ), "Dev Robot never became available."
+        yield robot_client
 
 
 async def test_protocols_and_analyses_available_from_older_persistence_dir(
