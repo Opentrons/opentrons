@@ -18,6 +18,8 @@ from . import magnetic_module
 from . import temperature_module
 from . import thermocycler
 
+from . import calibration
+
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -346,4 +348,5 @@ __all__ = [
     "magnetic_module",
     "temperature_module",
     "thermocycler",
+    "calibration"
 ]
