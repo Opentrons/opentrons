@@ -18,6 +18,7 @@ interface StatusLabelProps {
   iconColor: string
   textColor?: string
   fontWeight?: number
+  iconSize?: string
   pulse?: boolean
 }
 
@@ -28,6 +29,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
     iconColor,
     textColor,
     fontWeight,
+    iconSize,
     pulse,
   } = props
 
@@ -47,7 +49,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
         <Icon
           name="circle"
           color={iconColor}
-          size={SPACING.spacing2}
+          size={iconSize ?? '0.25rem'}
           data-testid="status_circle"
         >
           {pulse != null && pulse ? (

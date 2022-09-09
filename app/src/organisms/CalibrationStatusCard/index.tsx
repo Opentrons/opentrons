@@ -56,6 +56,7 @@ export function CalibrationStatusCard({
             iconColor={COLORS.errorEnabled}
             textColor={COLORS.darkBlackEnabled}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            iconSize="0.313rem"
           />
         </Flex>
         <StyledText as="p">{t('calibration_status_description')}</StyledText>
