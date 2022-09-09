@@ -27,6 +27,9 @@ describe('CalibrationStatusCard', () => {
     const [{ getByText }] = render(props)
 
     getByText('Calibration Status')
+    getByText(
+      `For accurate and precise movement, calibrate the robot's deck, pipette offsets, and tip lengths.`
+    )
   })
 
   it('renders a status label', () => {
