@@ -59,7 +59,9 @@ class DevServer:
             env={
                 "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev.env",
                 "OT_API_CONFIG_DIR": self.server_temp_directory,
-                "OT_ROBOT_SERVER_persistence_directory": str(self.persistence_directory),
+                "OT_ROBOT_SERVER_persistence_directory": str(
+                    self.persistence_directory
+                ),
             },
             stdin=subprocess.DEVNULL,
             # The server will log to its stdout or stderr.

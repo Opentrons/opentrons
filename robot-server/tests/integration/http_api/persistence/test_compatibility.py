@@ -9,9 +9,7 @@ from tests.integration.robot_client import RobotClient
 
 # FIXME(mm, 2022-09-09): This assumes the current working directory is
 # the root project directory. See Jira RSS-104.
-_OLDER_PERSISTENCE_DIR = Path(
-    "tests/integration/persistence_directory_snapshots/v6.0.1"
-)
+_OLDER_PERSISTENCE_DIR = Path("tests/integration/persistence_snapshots/v6.0.1")
 
 _EXPECTED_PROTOCOL_COUNT = 4
 _EXPECTED_RUN_COUNT = 5
