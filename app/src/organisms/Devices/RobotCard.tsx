@@ -159,7 +159,6 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
   const attachedModules = useAttachedModules()
-  console.log(attachedModules)
   return attachedModules.length > 0 ? (
     <Box
       display="grid"
