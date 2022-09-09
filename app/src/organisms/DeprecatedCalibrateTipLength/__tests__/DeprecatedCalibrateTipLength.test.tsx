@@ -54,7 +54,7 @@ describe('DeprecatedCalibrateTipLength', () => {
   }
 
   const getExitButton = (wrapper: Wrapper) =>
-    wrapper.find('button[aria-label="Exit"]')
+    wrapper.find('button[title="exit"]')
 
   const POSSIBLE_CHILDREN = [
     Introduction,

@@ -52,7 +52,7 @@ describe('DeprecatedCheckCalibration', () => {
     wrapper: ReactWrapper<
       React.ComponentProps<typeof DeprecatedCheckCalibration>
     >
-  ) => wrapper.find('button[aria-label="Exit"]')
+  ) => wrapper.find('button[title="exit"]')
 
   const POSSIBLE_CHILDREN = [
     Introduction,

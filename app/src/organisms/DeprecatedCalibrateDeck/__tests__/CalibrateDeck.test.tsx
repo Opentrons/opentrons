@@ -54,7 +54,7 @@ describe('DeprecatedCalibrateDeck', () => {
 
   const getExitButton = (
     wrapper: ReactWrapper<React.ComponentProps<typeof DeprecatedCalibrateDeck>>
-  ): ReactWrapper<HTMLAttributes> => wrapper.find('button[aria-label="Exit"]')
+  ): ReactWrapper<HTMLAttributes> => wrapper.find('button[title="exit"]')
 
   const POSSIBLE_CHILDREN = [
     Introduction,
