@@ -47,22 +47,22 @@ jobs:
         run: pip install pipenv==2021.5.29
       - name: Install shared-data
         working-directory: shared-data/python
-        run: pipenv install -d
+        run: pipenv lock -d -v
       - name: Install api
         working-directory: api
-        run: pipenv install -d
+        run: pipenv lock -d -v
       - name: Install notify-server
         working-directory: notify-server
-        run: pipenv install -d
+        run: pipenv lock -d -v
       - name: Install update-server
         working-directory: update-server
-        run: pipenv install -d
+        run: pipenv lock -d -v
       - name: Install robot-server
         working-directory: robot-server
-        run: pipenv install -d
+        run: pipenv lock -d -v
       - name: Install g-code-testing
         working-directory: g-code-testing
-        run: pipenv install -d
+        run: pipenv lock -d -v
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v4

@@ -56,7 +56,7 @@ RUN mkdir -p /$USERNAME/.vscode-server/extensions \
         /$USERNAME/.cache \
         /$USERNAME/.local \
         /$USERNAME/commandhistory \
-    && chown -R $USERNAME \
+    && chown -R $USERNAME:$USERNAME \
         /$USERNAME/.vscode-server \
         /$USERNAME/.cache \
         /$USERNAME/.local \

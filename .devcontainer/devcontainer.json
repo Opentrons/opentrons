@@ -17,7 +17,8 @@
     ],
     "settings": {
         "python.linting.enabled": true,
-        "python.formatting.provider": "black"
+        "python.formatting.provider": "black",
+        "python.terminal.activateEnvironment": false
     },
     "extensions": [
         "ms-python.python",
@@ -44,5 +45,6 @@
         },
         "docker-from-docker": "20.10",
         "git": "2.37.1"
-    }
+    },
+    "appPort": [ 31950, 12345, 12346, 15555, 15556, "8989-9999", 40152 ]
 }
