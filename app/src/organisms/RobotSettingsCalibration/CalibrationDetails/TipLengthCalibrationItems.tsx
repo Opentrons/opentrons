@@ -11,18 +11,17 @@ import {
   COLORS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../../atoms/text'
+import { StyledText } from '../../../atoms/text'
 import { OverflowMenu } from './OverflowMenu'
-import { formatLastCalibrated } from './utils'
-import { getDisplayNameForTipRack } from '../utils'
-import { getCustomLabwareDefinitions } from '../../../../redux/custom-labware'
-import { useAttachedPipettes } from '../../hooks'
+import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
+import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
+import { useAttachedPipettes } from '../../../organisms/Devices/hooks'
 
 import type {
   FormattedPipetteOffsetCalibration,
   FormattedTipLengthCalibration,
-} from '../RobotSettingsCalibration'
-import type { State } from '../../../../redux/types'
+} from '../../../organisms/RobotSettingsCalibration'
+import type { State } from '../../../redux/types'
 
 const StyledTable = styled.table`
   width: 100%;

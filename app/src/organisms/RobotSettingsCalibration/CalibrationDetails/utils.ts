@@ -1,3 +1,5 @@
+import { format } from 'date-fns'
+
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { findLabwareDefWithCustom } from '../../../assets/labware/findLabware'
 
@@ -19,4 +21,10 @@ export function getDisplayNameForTipRack(
   return definition
     ? getLabwareDisplayName(definition)
     : `${UNKNOWN_CUSTOM_LABWARE}`
+}
+
+export const formatLastCalibrated = (lastModified: string): string => {
+  return typeof lastModified === 'string'
+    ? format(new Date(lastModified), 'M/d/yyyy HH:mm:ss')
+    : 'Unknown'
 }

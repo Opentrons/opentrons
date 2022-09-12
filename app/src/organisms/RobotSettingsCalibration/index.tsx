@@ -21,27 +21,27 @@ import {
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 
-import { Portal } from '../../../App/portal'
-import { TertiaryButton } from '../../../atoms/buttons'
-import { Line } from '../../../atoms/structure'
-import { StyledText } from '../../../atoms/text'
-import { Banner } from '../../../atoms/Banner'
-import { Tooltip } from '../../../atoms/Tooltip'
-import { HowCalibrationWorksModal } from '../../../organisms/HowCalibrationWorksModal'
-import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
-import { formatLastModified } from '../../../organisms/CalibrationPanels/utils'
-import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
-import { CalibrationStatusCard } from '../../../organisms/CalibrationStatusCard'
-import { CheckCalibration } from '../../../organisms/CheckCalibration'
-import { useTrackEvent } from '../../../redux/analytics'
-import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
-import { getDeckCalibrationSession } from '../../../redux/sessions/deck-calibration/selectors'
-import { CONNECTABLE } from '../../../redux/discovery'
-import * as RobotApi from '../../../redux/robot-api'
-import * as Config from '../../../redux/config'
-import * as Sessions from '../../../redux/sessions'
-import * as Calibration from '../../../redux/calibration'
-import * as Pipettes from '../../../redux/pipettes'
+import { Portal } from '../../App/portal'
+import { TertiaryButton } from '../../atoms/buttons'
+import { Line } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import { Banner } from '../../atoms/Banner'
+import { Tooltip } from '../../atoms/Tooltip'
+import { HowCalibrationWorksModal } from '../../organisms/HowCalibrationWorksModal'
+import { CalibrateDeck } from '../../organisms/CalibrateDeck'
+import { formatLastModified } from '../../organisms/CalibrationPanels/utils'
+import { AskForCalibrationBlockModal } from '../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
+import { CalibrationStatusCard } from '../../organisms/CalibrationStatusCard'
+import { CheckCalibration } from '../../organisms/CheckCalibration'
+import { useTrackEvent } from '../../redux/analytics'
+import { EVENT_CALIBRATION_DOWNLOADED } from '../../redux/calibration'
+import { getDeckCalibrationSession } from '../../redux/sessions/deck-calibration/selectors'
+import { CONNECTABLE } from '../../redux/discovery'
+import * as RobotApi from '../../redux/robot-api'
+import * as Config from '../../redux/config'
+import * as Sessions from '../../redux/sessions'
+import * as Calibration from '../../redux/calibration'
+import * as Pipettes from '../../redux/pipettes'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
@@ -53,22 +53,22 @@ import {
   useRunStartedOrLegacySessionInProgress,
   useRunStatuses,
   useIsOT3,
-} from '../hooks'
+} from '../../organisms/Devices/hooks'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 
-import type { State, Dispatch } from '../../../redux/types'
-import type { RequestState } from '../../../redux/robot-api/types'
+import type { State, Dispatch } from '../../redux/types'
+import type { RequestState } from '../../redux/robot-api/types'
 import type {
   SessionCommandString,
   DeckCalibrationSession,
-} from '../../../redux/sessions/types'
-import type { DeckCalibrationInfo } from '../../../redux/calibration/types'
+} from '../../redux/sessions/types'
+import type { DeckCalibrationInfo } from '../../redux/calibration/types'
 import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,
-} from '../../../redux/pipettes/types'
-import { fetchAllSessions } from '../../../redux/sessions'
+} from '../../redux/pipettes/types'
+import { fetchAllSessions } from '../../redux/sessions'
 
 const CALS_FETCH_MS = 5000
 

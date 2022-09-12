@@ -6,32 +6,32 @@ import { fireEvent, waitFor } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '../../../../i18n'
-import { CalibrationStatusCard } from '../../../../organisms/CalibrationStatusCard'
-import { useTrackEvent } from '../../../../redux/analytics'
-import * as Calibration from '../../../../redux/calibration'
-import { useFeatureFlag } from '../../../../redux/config'
-import * as Pipettes from '../../../../redux/pipettes'
-import * as RobotApi from '../../../../redux/robot-api'
+import { i18n } from '../../../i18n'
+import { CalibrationStatusCard } from '../../../organisms/CalibrationStatusCard'
+import { useTrackEvent } from '../../../redux/analytics'
+import * as Calibration from '../../../redux/calibration'
+import { useFeatureFlag } from '../../../redux/config'
+import * as Pipettes from '../../../redux/pipettes'
+import * as RobotApi from '../../../redux/robot-api'
 import {
   mockDeckCalData,
   mockWarningDeckCalData,
-} from '../../../../redux/calibration/__fixtures__'
+} from '../../../redux/calibration/__fixtures__'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
-} from '../../../../redux/calibration/pipette-offset/__fixtures__'
+} from '../../../redux/calibration/pipette-offset/__fixtures__'
 import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
   mockTipLengthCalibration3,
-} from '../../../../redux/calibration/tip-length/__fixtures__'
+} from '../../../redux/calibration/tip-length/__fixtures__'
 import {
   mockConnectableRobot,
   mockUnreachableRobot,
-} from '../../../../redux/discovery/__fixtures__'
-import { mockAttachedPipette } from '../../../../redux/pipettes/__fixtures__'
+} from '../../../redux/discovery/__fixtures__'
+import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
 import {
   useDeckCalibrationData,
   useIsOT3,
@@ -42,33 +42,33 @@ import {
   useDeckCalibrationStatus,
   useRunStartedOrLegacySessionInProgress,
   useRunStatuses,
-} from '../../hooks'
+} from '../../../organisms/Devices/hooks'
 
-import { RobotSettingsCalibration } from '../RobotSettingsCalibration'
+import { RobotSettingsCalibration } from '..'
 import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffsetCalibrationItems'
 import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibrationItems'
 
 import type {
   AttachedPipettesByMount,
   PipetteCalibrationsByMount,
-} from '../../../../redux/pipettes/types'
+} from '../../../redux/pipettes/types'
 
 jest.mock('file-saver')
-jest.mock('../../../../organisms/CalibrationStatusCard')
-jest.mock('../../../../redux/analytics')
-jest.mock('../../../../redux/config')
-jest.mock('../../../../redux/calibration/selectors')
-jest.mock('../../../../redux/pipettes')
-jest.mock('../../../../redux/pipettes/selectors')
-jest.mock('../../../../redux/calibration/tip-length/selectors')
-jest.mock('../../../../redux/calibration/pipette-offset/selectors')
-jest.mock('../../../../redux/sessions/selectors')
-jest.mock('../../../../redux/robot-api/selectors')
-jest.mock('../../../../redux/custom-labware/selectors')
-jest.mock('../../hooks')
+jest.mock('../../../organisms/CalibrationStatusCard')
+jest.mock('../../../redux/analytics')
+jest.mock('../../../redux/config')
+jest.mock('../../../redux/calibration/selectors')
+jest.mock('../../../redux/pipettes')
+jest.mock('../../../redux/pipettes/selectors')
+jest.mock('../../../redux/calibration/tip-length/selectors')
+jest.mock('../../../redux/calibration/pipette-offset/selectors')
+jest.mock('../../../redux/sessions/selectors')
+jest.mock('../../../redux/robot-api/selectors')
+jest.mock('../../../redux/custom-labware/selectors')
+jest.mock('../../../organisms/Devices/hooks')
 jest.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
 jest.mock('../CalibrationDetails/TipLengthCalibrationItems')
-jest.mock('../../../ProtocolUpload/hooks')
+jest.mock('../../../organisms/ProtocolUpload/hooks')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
