@@ -25,7 +25,7 @@ from .module_validation_and_errors import (
     validate_heater_shaker_speed,
 )
 from .labware import Labware, load, load_from_definition
-from .load_info import LabwareLoadInfo
+from .core.protocol_api.load_info import LabwareLoadInfo
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
@@ -104,7 +104,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         deck_slot = validation.ensure_deck_slot(self._geometry.parent)  # type: ignore[arg-type]
         load_params = labware_core.get_load_params()
 
-        provided_offset = self._ctx._labware_offset_provider.find(
+        provided_offset = self._ctx._implementation._labware_offset_provider.find(  # type: ignore[attr-defined]
             load_params=load_params,
             requested_module_model=self.requested_as,
             deck_slot=deck_slot,
@@ -113,7 +113,8 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         labware_core.set_calibration(provided_offset.delta)
         self._ctx._implementation.get_deck().recalculate_high_z()
 
-        self._ctx.equipment_broker.publish(
+        # TODO(mc, 2022-09-07): move into module or protocol core
+        self._ctx._implementation.equipment_broker.publish(  # type: ignore[attr-defined]
             LabwareLoadInfo(
                 labware_definition=labware_core.get_definition(),
                 labware_namespace=load_params.namespace,
