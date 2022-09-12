@@ -17,8 +17,6 @@ def test_v6_types(defpath):
         by_alias=True,
     )
     expected_def_dict = json.loads(def_data)
-    print(def_dict_from_model["commands"])
-    print(f"file name {defpath}")
     delete_unexpected_results(expected_def_dict)
     assert def_dict_from_model == expected_def_dict
 
