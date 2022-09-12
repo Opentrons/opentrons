@@ -17,14 +17,8 @@ from opentrons.protocol_reader import (
     ProtocolFilesInvalidError,
 )
 from opentrons.protocol_runner import create_simulating_runner
-from opentrons.protocol_engine import (
-    Command,
-    ErrorOccurrence,
-    LoadedLabware,
-    LoadedPipette,
-    LoadedModule,
-    Liquid,
-)
+from opentrons.protocol_engine import Command, ErrorOccurrence
+
 
 
 @click.command()
