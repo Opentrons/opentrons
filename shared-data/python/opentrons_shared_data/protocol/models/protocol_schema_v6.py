@@ -202,21 +202,27 @@ class ProtocolSchemaV6(BaseModel):
                 and command.params.labwareId not in labware_ids
             ):
                 raise ValueError(
-                    f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {command.params.labwareId} in referencing object."
+                    f"{command.commandType} command at index {index}"
+                    f" references ID {command.params.pipetteId},"
+                    f" which doesn't exist."
                 )
             if (
                 command.params.moduleId is not None
                 and command.params.moduleId not in module_ids
             ):
                 raise ValueError(
-                    f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {command.params.moduleId} in referencing object."
+                    f"{command.commandType} command at index {index}"
+                    f" references ID {command.params.pipetteId},"
+                    f" which doesn't exist."
                 )
             if (
                 command.params.liquidId is not None
                 and command.params.liquidId not in liquid_ids
             ):
                 raise ValueError(
-                    f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {command.params.liquidId} in referencing object."
+                    f"{command.commandType} command at index {index}"
+                    f" references ID {command.params.pipetteId},"
+                    f" which doesn't exist."
                 )
 
         return value
