@@ -3,11 +3,11 @@
 types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
-from typing import Dict, List, Union
+from typing import Dict, List, NewType, Union
 from typing_extensions import Literal, TypedDict
 
-# TODO(mc, 2022-06-16): move here, shouldn't be in pipettes
-from ..pipette.dev_types import LabwareUri as LabwareUri  # noqa: F401
+
+LabwareUri = NewType("LabwareUri", str)
 
 LabwareDisplayCategory = Union[
     Literal["tipRack"],

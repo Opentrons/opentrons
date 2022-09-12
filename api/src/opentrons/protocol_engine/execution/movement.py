@@ -223,3 +223,49 @@ class MovementHandler:
             hardware_axes = [MOTOR_AXIS_TO_HARDWARE_AXIS[a] for a in axes]
 
         await self._hardware_api.home(axes=hardware_axes)
+
+    async def move_to_coordinates(
+        self,
+        pipette_id: str,
+        deck_coordinates: DeckPoint,
+        direct: bool,
+        additional_min_travel_z: Optional[float],
+    ) -> None:
+        """Move pipette to a given deck coordinate."""
+        pipette_location = self._state_store.motion.get_pipette_location(
+            pipette_id=pipette_id,
+        )
+        hw_mount = pipette_location.mount.to_hw_mount()
+
+        origin = await self._hardware_api.gantry_position(
+            mount=hw_mount,
+            # critical_point=None to get the current position of whatever tip is
+            # currently attached (if any).
+            critical_point=None,
+        )
+
+        max_travel_z = self._hardware_api.get_instrument_max_height(
+            mount=hw_mount,
+            # critical_point=None to get the maximum z-coordinate
+            # given whatever tip is currently attached (if any).
+            critical_point=None,
+        )
+
+        # calculate the movement's waypoints
+        waypoints = self._state_store.motion.get_movement_waypoints_to_coords(
+            origin=origin,
+            dest=Point(
+                x=deck_coordinates.x, y=deck_coordinates.y, z=deck_coordinates.z
+            ),
+            max_travel_z=max_travel_z,
+            direct=direct,
+            additional_min_travel_z=additional_min_travel_z,
+        )
+
+        # move through the waypoints
+        for waypoint in waypoints:
+            await self._hardware_api.move_to(
+                mount=hw_mount,
+                abs_position=waypoint.position,
+                critical_point=waypoint.critical_point,
+            )

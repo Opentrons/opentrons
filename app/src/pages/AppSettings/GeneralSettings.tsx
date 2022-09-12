@@ -73,9 +73,7 @@ export function GeneralSettings(): JSX.Element {
     const ignored = getAlertIsPermanentlyIgnored(s, ALERT_APP_UPDATE_AVAILABLE)
     return ignored !== null ? !ignored : null
   })
-  const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(
-    updateAlertEnabled ? updateAvailable : false
-  )
+  const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(false)
   const handleToggle = (): void => {
     if (updateAlertEnabled !== null) {
       dispatch(

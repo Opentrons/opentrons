@@ -268,7 +268,7 @@ async def test_sends_all_required_followups(
         model="3.4",
         serial="20231005A220",
     )
-    assert tools.gripper == types.GripperInformation(model=1, serial="20220531A01")
+    assert tools.gripper == types.GripperInformation(model="0.1", serial="20220531A01")
 
     assert mock_messenger.send.mock_calls == [
         call(

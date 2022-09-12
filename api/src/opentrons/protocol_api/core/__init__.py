@@ -15,7 +15,7 @@ Nothing defined in `opentrons.protocol_api.core` may be considered public.
 # )
 
 # __all__ = [
-#     # "AbstractProtocol",
+#     "AbstractProtocol",
 #     "AbstractLabwareOffsetProvider",
 #     "LabwareOffsetProvider",
 #     "NullLabwareOffsetProvider",

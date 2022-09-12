@@ -38,6 +38,6 @@
   "a_software_update_is_available": "A software update is available for this robot. Update to run protocols.",
   "robot_is_busy_no_protocol_run_allowed": "This robot is busy and can’t run this protocol right now. <robotLink>Go to Robot</robotLink>",
   "reanalyze": "Reanalyze",
-  "step": "Step: {{current}} / {{max}}",
+  "step": "Step {{current}} / {{max}}",
   "none": "None"
 }
