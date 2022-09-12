@@ -50,11 +50,13 @@ async def test_protocols_and_analyses_available_from_older_persistence_dir(
 
     for protocol_id in all_protocol_ids:
         protocol = (await robot_client.get_protocol(protocol_id=protocol_id)).json()
-        analysis_id = protocol["data"]["analysisSummaries"][-1]["id"]
 
-        await robot_client.get_analysis(
-            protocol_id=protocol_id, analysis_id=analysis_id
-        )
+        analysis_ids = [s["id"] for s in protocol["data"]["analysisSummaries"]]
+        assert len(analysis_ids) >= 1
+        for analysis_id in analysis_ids:
+            await robot_client.get_analysis(
+                protocol_id=protocol_id, analysis_id=analysis_id
+            )
 
 
 async def test_runs_available_from_older_persistence_dir(
