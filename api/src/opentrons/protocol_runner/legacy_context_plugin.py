@@ -5,12 +5,12 @@ from asyncio import create_task, Task
 from contextlib import ExitStack
 from typing import Optional
 
+from opentrons.broker import Broker
+from opentrons.equipment_broker import EquipmentBroker
 from opentrons.commands.types import CommandMessage as LegacyCommand
-from opentrons.hardware_control import HardwareControlAPI
-
 from opentrons.protocol_engine import AbstractPlugin, actions as pe_actions
 
-from .legacy_wrappers import LegacyProtocolContext, LegacyLoadInfo
+from .legacy_wrappers import LegacyLoadInfo
 from .legacy_command_mapper import LegacyCommandMapper
 from .thread_async_queue import ThreadAsyncQueue
 
@@ -36,13 +36,13 @@ class LegacyContextPlugin(AbstractPlugin):
 
     def __init__(
         self,
-        hardware_api: HardwareControlAPI,
-        protocol_context: LegacyProtocolContext,
+        broker: Broker,
+        equipment_broker: EquipmentBroker[LegacyLoadInfo],
         legacy_command_mapper: Optional[LegacyCommandMapper] = None,
     ) -> None:
         """Initialize the plugin with its dependencies."""
-        self._hardware_api = hardware_api
-        self._protocol_context = protocol_context
+        self._broker = broker
+        self._equipment_broker = equipment_broker
         self._legacy_command_mapper = legacy_command_mapper or LegacyCommandMapper()
 
         # We use a non-blocking queue to communicate activity
@@ -67,20 +67,18 @@ class LegacyContextPlugin(AbstractPlugin):
           of the APIv2 protocol's activity.
         * Kick off a background task to inform Protocol Engine of that activity.
         """
-        context = self._protocol_context
-
         # Subscribe to activity on the APIv2 context,
         # and arrange to unsubscribe when this plugin is torn down.
         # Use an exit stack so if any part of this setup fails,
         # we clean up the parts that succeeded in reverse order.
         with ExitStack() as exit_stack:
-            command_broker_unsubscribe = context.broker.subscribe(
+            command_broker_unsubscribe = self._broker.subscribe(
                 topic="command",
                 handler=self._handle_legacy_command,
             )
             exit_stack.callback(command_broker_unsubscribe)
 
-            equipment_broker_unsubscribe = context.equipment_broker.subscribe(
+            equipment_broker_unsubscribe = self._equipment_broker.subscribe(
                 callback=self._handle_equipment_loaded
             )
             exit_stack.callback(equipment_broker_unsubscribe)

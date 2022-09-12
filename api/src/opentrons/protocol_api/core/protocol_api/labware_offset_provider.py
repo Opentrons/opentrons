@@ -6,7 +6,7 @@ from opentrons.hardware_control.modules import ModuleModel as HardwareModuleMode
 from opentrons.protocol_engine import ProtocolEngine, LabwareOffsetLocation, ModuleModel
 from opentrons.types import DeckSlotName, Point
 
-from .labware import LabwareLoadParams
+from ..labware import LabwareLoadParams
 
 
 @dataclass

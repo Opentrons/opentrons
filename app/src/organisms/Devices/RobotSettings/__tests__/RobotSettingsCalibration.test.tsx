@@ -6,8 +6,10 @@ import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
+import { CalibrationStatusCard } from '../../../../organisms/CalibrationStatusCard'
 import { useTrackEvent } from '../../../../redux/analytics'
 import * as Calibration from '../../../../redux/calibration'
+import { useFeatureFlag } from '../../../../redux/config'
 import * as Pipettes from '../../../../redux/pipettes'
 import * as RobotApi from '../../../../redux/robot-api'
 import {
@@ -50,6 +52,7 @@ import type {
 } from '../../../../redux/pipettes/types'
 
 jest.mock('file-saver')
+jest.mock('../../../../organisms/CalibrationStatusCard')
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/calibration/selectors')
@@ -119,6 +122,12 @@ const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
 const mockGetRequestById = RobotApi.getRequestById as jest.MockedFunction<
   typeof RobotApi.getRequestById
 >
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
+const mockCalibrationStatusCard = CalibrationStatusCard as jest.MockedFunction<
+  typeof CalibrationStatusCard
+>
 
 const RUN_STATUSES = {
   isRunRunning: false,
@@ -186,6 +195,10 @@ describe('RobotSettingsCalibration', () => {
     mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
     mockUseRunStatuses.mockReturnValue(RUN_STATUSES)
     mockGetRequestById.mockReturnValue(null)
+    mockUseFeatureFlag.mockReturnValue(false)
+    mockCalibrationStatusCard.mockReturnValue(
+      <div>Mock CalibrationStatusCard</div>
+    )
   })
 
   afterEach(() => {
@@ -209,6 +222,12 @@ describe('RobotSettingsCalibration', () => {
       name: 'calibrationDataDownloaded',
       properties: {},
     })
+  })
+
+  it('renders a Calibration Status component', () => {
+    mockUseFeatureFlag.mockReturnValue(true)
+    const [{ getByText }] = render()
+    getByText('Mock CalibrationStatusCard')
   })
 
   it('renders a title and description - Pipette Offset Calibrations', () => {

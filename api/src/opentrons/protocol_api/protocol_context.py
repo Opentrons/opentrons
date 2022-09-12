@@ -15,9 +15,8 @@ from typing import (
     cast,
 )
 
-from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
+from opentrons.types import Mount, Location, DeckLocation
 from opentrons.broker import Broker
-from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
@@ -36,10 +35,9 @@ from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .core.instrument import AbstractInstrument
-from .core.well import AbstractWellCore
 from .core.labware import AbstractLabware
 from .core.protocol import AbstractProtocol
-from .core.labware_offset_provider import AbstractLabwareOffsetProvider
+from .core.well import AbstractWellCore
 
 from . import validation
 from .instrument_context import InstrumentContext
@@ -51,7 +49,6 @@ from .module_contexts import (
     HeaterShakerContext,
 )
 
-from .load_info import LoadInfo, LabwareLoadInfo, ModuleLoadInfo, InstrumentLoadInfo
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
@@ -65,6 +62,11 @@ ModuleTypes = Union[
     ThermocyclerContext,
     HeaterShakerContext,
 ]
+
+
+InstrumentCore = AbstractInstrument[AbstractWellCore]
+LabwareCore = AbstractLabware[AbstractWellCore]
+ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore]
 
 
 class HardwareManager(NamedTuple):
@@ -96,12 +98,8 @@ class ProtocolContext(CommandPublisher):
     def __init__(
         self,
         api_version: APIVersion,
-        implementation: AbstractProtocol[
-            AbstractInstrument[AbstractWellCore], AbstractLabware[AbstractWellCore]
-        ],
-        labware_offset_provider: AbstractLabwareOffsetProvider,
+        implementation: ProtocolCore,
         broker: Optional[Broker] = None,
-        equipment_broker: Optional[EquipmentBroker[LoadInfo]] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContext`.
 
@@ -116,8 +114,6 @@ class ProtocolContext(CommandPublisher):
 
         self._api_version = api_version
         self._implementation = implementation
-        self._labware_offset_provider = labware_offset_provider
-        self._equipment_broker = equipment_broker or EquipmentBroker()
 
         if self._api_version > MAX_SUPPORTED_VERSION:
             raise RuntimeError(
@@ -134,20 +130,6 @@ class ProtocolContext(CommandPublisher):
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
-
-    @property
-    def equipment_broker(self) -> EquipmentBroker[LoadInfo]:
-        """For internal Opentrons use only.
-
-        :meta private:
-
-        Subscribers to this broker will be notified with information about every
-        successful labware load, instrument load, or module load.
-
-        Only :py:obj:`ProtocolContext` is allowed to publish to this broker.
-        Calling code may only subscribe or unsubscribe.
-        """
-        return self._equipment_broker
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -332,35 +314,9 @@ class ProtocolContext(CommandPublisher):
             version=version,
         )
 
-        labware_load_params = labware_core.get_load_params()
-
-        # TODO(mc, 2022-09-02): move labware offset provider to legacy core
-        labware_offset = self._labware_offset_provider.find(
-            load_params=labware_load_params,
-            deck_slot=deck_slot,
-            requested_module_model=None,
-        )
-        labware_core.set_calibration(labware_offset.delta)
-
         # TODO(mc, 2022-09-02): add API version
         # https://opentrons.atlassian.net/browse/RSS-97
-        result = Labware(implementation=labware_core)
-
-        # TODO(mc, 2022-09-02): move equipment broker to legacy core
-        self.equipment_broker.publish(
-            LabwareLoadInfo(
-                labware_definition=labware_core.get_definition(),
-                labware_namespace=labware_load_params.namespace,
-                labware_load_name=labware_load_params.load_name,
-                labware_version=labware_load_params.version,
-                deck_slot=deck_slot,
-                on_module=False,
-                offset_id=labware_offset.offset_id,
-                labware_display_name=labware_core.get_user_display_name(),
-            )
-        )
-
-        return result
+        return Labware(implementation=labware_core)
 
     @requires_version(2, 0)
     def load_labware_by_name(
@@ -481,21 +437,6 @@ class ProtocolContext(CommandPublisher):
         )
         self._modules.append(module_context)
 
-        # ===== Protocol Engine stuff ====
-        module_loc = load_result.geometry.parent
-        assert isinstance(module_loc, (int, str)), "Unexpected labware object parent"
-        deck_slot = DeckSlotName.from_primitive(module_loc)
-        module_serial = load_result.module.device_info["serial"]
-
-        self.equipment_broker.publish(
-            ModuleLoadInfo(
-                requested_model=requested_model,
-                loaded_model=load_result.geometry.model,
-                deck_slot=deck_slot,
-                configuration=configuration,
-                module_serial=module_serial,
-            )
-        )
         return module_context
 
     @property  # type: ignore
@@ -584,14 +525,6 @@ class ProtocolContext(CommandPublisher):
         )
 
         self._instruments[checked_mount] = instrument
-
-        # TODO(mc, 2022-08-25): move equipment broker to legacy core
-        self.equipment_broker.publish(
-            InstrumentLoadInfo(
-                instrument_load_name=checked_instrument_name,
-                mount=checked_mount,
-            )
-        )
 
         return instrument
 

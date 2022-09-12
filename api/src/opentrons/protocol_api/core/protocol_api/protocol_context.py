@@ -2,27 +2,28 @@ import logging
 from typing import Dict, List, Optional, Set
 from collections import OrderedDict
 
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
+from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel
 from opentrons.hardware_control.types import DoorState, PauseType
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.labware import get_labware_definition
-
-from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons.protocols import labware as labware_definition
 
 from ..protocol import AbstractProtocol, LoadModuleResult
 from ..labware import LabwareLoadParams
 
-from .labware import LabwareImplementation
 from .instrument_context import InstrumentContextImplementation
-
+from .labware_offset_provider import AbstractLabwareOffsetProvider
+from .labware import LabwareImplementation
+from .load_info import LoadInfo, InstrumentLoadInfo, LabwareLoadInfo, ModuleLoadInfo
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,10 @@ class ProtocolContextImplementation(
     def __init__(
         self,
         sync_hardware: SyncHardwareAPI,
-        api_version: Optional[APIVersion] = None,
+        api_version: APIVersion,
+        labware_offset_provider: AbstractLabwareOffsetProvider,
+        equipment_broker: Optional[EquipmentBroker[LoadInfo]] = None,
+        deck_layout: Optional[Deck] = None,
         bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
         bundled_data: Optional[Dict[str, bytes]] = None,
         extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
@@ -60,8 +64,11 @@ class ProtocolContextImplementation(
                               provide custom labware definitions.
         """
         self._sync_hardware = sync_hardware
-        self._api_version = api_version or MAX_SUPPORTED_VERSION
-        self._deck_layout = Deck()
+        self._api_version = api_version
+        self._labware_offset_provider = labware_offset_provider
+        self._equipment_broker = equipment_broker or EquipmentBroker()
+        self._deck_layout = Deck() if deck_layout is None else deck_layout
+
         self._instruments: Dict[Mount, Optional[InstrumentContextImplementation]] = {
             mount: None for mount in Mount
         }
@@ -73,6 +80,18 @@ class ProtocolContextImplementation(
         self._last_location: Optional[Location] = None
         self._last_mount: Optional[Mount] = None
         self._loaded_modules: Set["AbstractModule"] = set()
+
+    @property
+    def equipment_broker(self) -> EquipmentBroker[LoadInfo]:
+        """A message broker to to publish equipment load events.
+
+        Subscribers to this broker will be notified with information about every
+        successful labware load, instrument load, or module load.
+
+        Only this interface is allowed to publish to this broker.
+        Calling code may only subscribe or unsubscribe.
+        """
+        return self._equipment_broker
 
     def get_bundled_data(self) -> Dict[str, bytes]:
         """Extra bundled data."""
@@ -126,7 +145,7 @@ class ProtocolContextImplementation(
     ) -> LabwareImplementation:
         """Load a labware using its identifying parameters."""
         parent = self.get_deck().position_for(location.value)
-        labware_def = get_labware_definition(
+        labware_def = labware_definition.get_labware_definition(
             load_name,
             namespace,
             version,
@@ -138,7 +157,29 @@ class ProtocolContextImplementation(
             parent=parent,
             label=label,
         )
+        labware_load_params = labware_core.get_load_params()
+        labware_offset = self._labware_offset_provider.find(
+            load_params=labware_load_params,
+            deck_slot=location,
+            requested_module_model=None,
+        )
+        labware_core.set_calibration(labware_offset.delta)
+
         self._deck_layout[location] = labware_core
+
+        self._equipment_broker.publish(
+            LabwareLoadInfo(
+                labware_definition=labware_core.get_definition(),
+                labware_namespace=labware_load_params.namespace,
+                labware_load_name=labware_load_params.load_name,
+                labware_version=labware_load_params.version,
+                deck_slot=location,
+                on_module=False,
+                offset_id=labware_offset.offset_id,
+                labware_display_name=labware_core.get_user_display_name(),
+            )
+        )
+
         return labware_core
 
     def load_module(
@@ -188,6 +229,17 @@ class ProtocolContextImplementation(
 
         self._modules.append(result)
         self._deck_layout[resolved_location] = geometry
+
+        self.equipment_broker.publish(
+            ModuleLoadInfo(
+                requested_model=model,
+                loaded_model=geometry.model,
+                deck_slot=DeckSlotName.from_primitive(resolved_location),
+                configuration=configuration,
+                module_serial=hc_mod_instance.device_info["serial"],
+            )
+        )
+
         return result
 
     def get_loaded_modules(self) -> Dict[int, LoadModuleResult]:
@@ -217,6 +269,14 @@ class ProtocolContextImplementation(
         )
         self._instruments[mount] = new_instr
         logger.info("Instrument {} loaded".format(new_instr))
+
+        self._equipment_broker.publish(
+            InstrumentLoadInfo(
+                instrument_load_name=instrument_name.value,
+                mount=mount,
+            )
+        )
+
         return new_instr
 
     def get_loaded_instruments(

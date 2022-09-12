@@ -6,6 +6,7 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../i18n'
 import { Breadcrumbs } from '../../organisms/Breadcrumbs'
+import { CalibrationDashboard } from '../../pages/Devices/CalibrationDashboard'
 import { DeviceDetails } from '../../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../../pages/Devices/DevicesLanding'
 import { ProtocolsLanding } from '../../pages/Protocols/ProtocolsLanding'
@@ -19,6 +20,7 @@ import { App } from '../'
 
 jest.mock('../../organisms/Breadcrumbs')
 jest.mock('../../organisms/Devices/hooks')
+jest.mock('../../pages/Devices/CalibrationDashboard')
 jest.mock('../../pages/Devices/DeviceDetails')
 jest.mock('../../pages/Devices/DevicesLanding')
 jest.mock('../../pages/Protocols/ProtocolsLanding')
@@ -31,6 +33,9 @@ jest.mock('../../redux/config')
 jest.mock('../../redux/discovery')
 jest.mock('../hooks')
 
+const mockCalibrationDashboard = CalibrationDashboard as jest.MockedFunction<
+  typeof CalibrationDashboard
+>
 const mockDeviceDetails = DeviceDetails as jest.MockedFunction<
   typeof DeviceDetails
 >
@@ -69,6 +74,9 @@ const render = (path = '/') => {
 
 describe('App', () => {
   beforeEach(() => {
+    mockCalibrationDashboard.mockReturnValue(
+      <div>Mock CalibrationDashboard</div>
+    )
     mockDeviceDetails.mockReturnValue(<div>Mock DeviceDetails</div>)
     mockDevicesLanding.mockReturnValue(<div>Mock DevicesLanding</div>)
     mockProtocolsLanding.mockReturnValue(<div>Mock ProtocolsLanding</div>)
@@ -104,14 +112,21 @@ describe('App', () => {
     expect(queryByText('Mock DevicesLanding')).toBeNull()
   })
 
-  it('renders a DeviceDetails component from /robots/:robotName', () => {
+  it('renders a DeviceDetails component from /devices/:robotName', () => {
     const [{ getByText }] = render('/devices/otie')
     getByText('Mock DeviceDetails')
   })
 
-  it('renders a RobotSettings component from /robots/:robotName/robot-settings/:robotSettingsTab', () => {
+  it('renders a RobotSettings component from /devices/:robotName/robot-settings/:robotSettingsTab', () => {
     const [{ getByText }] = render('/devices/otie/robot-settings/calibration')
     getByText('Mock RobotSettings')
+  })
+
+  it('renders a CalibrationDashboard component from /devices/:robotName/robot-settings/calibration/dashboard', () => {
+    const [{ getByText }] = render(
+      '/devices/otie/robot-settings/calibration/dashboard'
+    )
+    getByText('Mock CalibrationDashboard')
   })
 
   it('renders a ProtocolsLanding component from /protocols', () => {
@@ -119,7 +134,7 @@ describe('App', () => {
     getByText('Mock ProtocolsLanding')
   })
 
-  it('renders a ProtocolRunDetails component from /robots/:robotName/protocol-runs/:runId/:protocolRunDetailsTab', () => {
+  it('renders a ProtocolRunDetails component from /devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab', () => {
     const [{ getByText }] = render(
       '/devices/otie/protocol-runs/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/setup'
     )
