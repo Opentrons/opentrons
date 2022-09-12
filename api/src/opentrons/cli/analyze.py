@@ -92,10 +92,6 @@ async def _analyze(
             metadata=protocol_source.metadata,
             commands=analysis.commands,
             errors=analysis.state_summary.errors,
-            labware=analysis.state_summary.labware,
-            pipettes=analysis.state_summary.pipettes,
-            modules=analysis.state_summary.modules,
-            liquids=analysis.state_summary.liquids,
         )
 
         await json_output.write_text(
@@ -138,8 +134,4 @@ class AnalyzeResults(BaseModel):
     config: Union[JsonConfig, PythonConfig]
     metadata: Dict[str, Any]
     commands: List[Command]
-    labware: List[LoadedLabware]
-    pipettes: List[LoadedPipette]
-    modules: List[LoadedModule]
-    liquids: List[Liquid]
     errors: List[ErrorOccurrence]
