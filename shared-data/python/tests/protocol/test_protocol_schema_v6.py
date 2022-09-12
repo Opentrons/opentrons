@@ -34,7 +34,7 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
 
 
 @pytest.mark.parametrize(
-    "input_commands, missing_id, load_command",
+    "input_command, missing_id, load_command",
     [
         (
             protocol_schema_v6.Command(
@@ -71,7 +71,7 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
     ],
 )
 def test_schema_validators(
-    input_commands: protocol_schema_v6.Command, missing_id: str, load_command: str
+    input_command: protocol_schema_v6.Command, missing_id: str, load_command: str
 ) -> None:
     """Should raise an error the keys do not match."""
     labware = {
@@ -99,5 +99,5 @@ def test_schema_validators(
             liquids=liquids,
             modules=modules,
             labwareDefinitions={},
-            commands=[input_commands],
+            commands=[input_command],
         )
