@@ -25,7 +25,7 @@ def _list_fixtures(version: int) -> List[Path]:
 
 @pytest.mark.parametrize("defpath", _list_fixtures(5))
 def test_analyze(defpath: Path) -> None:
-    """Should return with no errors and a none empty output."""
+    """Should return with no errors and a non-empty output."""
     runner = CliRunner()
     result = runner.invoke(
         analyze, [str(defpath.resolve()), "--json-output", "/dev/stdout"]
