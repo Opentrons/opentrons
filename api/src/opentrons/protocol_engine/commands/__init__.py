@@ -114,6 +114,14 @@ from .load_pipette import (
     LoadPipetteCommandType,
 )
 
+from .move_labware import (
+    MoveLabware,
+    MoveLabwareParams,
+    MoveLabwareCreate,
+    MoveLabwareResult,
+    MoveLabwareCommandType,
+)
+
 from .move_relative import (
     MoveRelative,
     MoveRelativeParams,
@@ -260,6 +268,12 @@ __all__ = [
     "LoadPipetteParams",
     "LoadPipetteResult",
     "LoadPipetteCommandType",
+    # move labware command models
+    "MoveLabware",
+    "MoveLabwareCreate",
+    "MoveLabwareParams",
+    "MoveLabwareResult",
+    "MoveLabwareCommandType",
     # move relative command models
     "MoveRelative",
     "MoveRelativeParams",

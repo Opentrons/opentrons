@@ -77,8 +77,11 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     <Select
       isSearchable={false}
       options={groupedOptions}
+      menuPortalTarget={document.body}
+      styles={{ menuPortal: base => ({ ...base, zIndex: 10 }) }}
       value={value}
       defaultValue={defaultValue}
+      width="14rem"
       tabIndex={tabIndex}
       onChange={(
         option: SingleValue<SelectOption> | MultiValue<SelectOption>,

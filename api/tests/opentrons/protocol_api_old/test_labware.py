@@ -9,18 +9,15 @@ from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.protocol_api.core.protocol_api.well import WellImplementation
-from opentrons.protocols.labware.definition import _get_parent_identifier
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.labware.dev_types import WellDefinition
 
 from opentrons.calibration_storage import helpers
 from opentrons.types import Point, Location
-from opentrons.hardware_control.modules.types import ModuleType, MagneticModuleModel
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api.core.labware import AbstractLabware
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 
 test_data: Dict[str, WellDefinition] = {
     "circular_well_json": {
@@ -591,36 +588,6 @@ def test_uris():
         )
     )
     assert lw.uri == uri
-
-
-def test_get_parent_identifier():
-    labware_name = "corning_96_wellplate_360ul_flat"
-    labware_def = labware.get_labware_definition(labware_name)
-    lw = labware.Labware(
-        implementation=LabwareImplementation(
-            labware_def, Location(Point(0, 0, 0), "Test Slot")
-        )
-    )
-    # slots have no parent identifier
-    assert _get_parent_identifier(lw._implementation) == ""
-    # modules do
-    mmg = ModuleGeometry(
-        "my magdeck",
-        MagneticModuleModel.MAGNETIC_V1,
-        ModuleType.MAGNETIC,
-        Point(0, 0, 0),
-        10,
-        10,
-        Location(Point(1, 2, 3), "3"),
-        APIVersion(2, 4),
-    )
-    lw = labware.Labware(
-        implementation=LabwareImplementation(labware_def, mmg.location)
-    )
-    assert (
-        _get_parent_identifier(lw._implementation)
-        == MagneticModuleModel.MAGNETIC_V1.value
-    )
 
 
 def test_labware_hash_func_same_implementation(minimal_labware_def) -> None:

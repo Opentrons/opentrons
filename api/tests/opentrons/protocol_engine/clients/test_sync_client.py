@@ -11,8 +11,10 @@ the subject's methods in a synchronous context in a child thread to ensure:
 import pytest
 from decoy import Decoy
 
-from opentrons.protocols.models import LabwareDefinition
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import DeckSlotLocation, commands
 from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
@@ -37,47 +39,64 @@ def subject(transport: AbstractSyncTransport) -> SyncClient:
     return SyncClient(transport=transport)
 
 
-@pytest.fixture
-def stubbed_load_labware_result(
+def test_add_labware_definition(
+    decoy: Decoy,
+    transport: AbstractSyncTransport,
+    subject: SyncClient,
+) -> None:
+    """It should add a labware definition."""
+    labware_definition = LabwareDefinition.construct(namespace="hello")  # type: ignore[call-arg]
+    expected_labware_uri = LabwareUri("hello/world/123")
+
+    decoy.when(
+        transport.call_method(
+            "add_labware_definition",
+            definition=labware_definition,
+        )
+    ).then_return(expected_labware_uri)
+
+    result = subject.add_labware_definition(labware_definition)
+
+    assert result == expected_labware_uri
+
+
+def test_load_labware(
     decoy: Decoy,
     transport: AbstractSyncTransport,
     tip_rack_def: LabwareDefinition,
-) -> commands.LoadLabwareResult:
-    """Set up the protocol engine with default stubbed response for load labware."""
-    request = commands.LoadLabwareCreate(
+    subject: SyncClient,
+) -> None:
+    """It should execute a load labware command."""
+    expected_request = commands.LoadLabwareCreate(
         params=commands.LoadLabwareParams(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
             loadName="some_labware",
             namespace="opentrons",
             version=1,
             labwareId=None,
+            displayName="some_display_name",
         )
     )
 
-    result = commands.LoadLabwareResult(
+    expected_result = commands.LoadLabwareResult(
         labwareId="abc123",
         definition=tip_rack_def,
         offsetId=None,
     )
 
-    decoy.when(transport.execute_command(request=request)).then_return(result)
+    decoy.when(transport.execute_command(request=expected_request)).then_return(
+        expected_result
+    )
 
-    return result
-
-
-def test_load_labware(
-    stubbed_load_labware_result: commands.LoadLabwareResult,
-    subject: SyncClient,
-) -> None:
-    """It should execute a load labware command."""
     result = subject.load_labware(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
         load_name="some_labware",
         namespace="opentrons",
         version=1,
+        display_name="some_display_name",
     )
 
-    assert result == stubbed_load_labware_result
+    assert result == expected_result
 
 
 def test_load_module(

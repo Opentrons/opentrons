@@ -11,21 +11,29 @@ from __future__ import annotations
 
 import logging
 
-from pathlib import Path
 from itertools import dropwhile
-from typing import Any, AnyStr, List, Dict, Optional, Union, Tuple, TYPE_CHECKING
+from typing import Any, List, Dict, Optional, Union, Tuple, TYPE_CHECKING
 
-
-from opentrons.protocols.api_support.util import requires_version
-from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols import labware as labware_module
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import requires_version
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.geometry.deck_item import DeckItem
+from opentrons.protocols.geometry.well_geometry import WellGeometry
+
+# TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
+# remove when their usage is no longer needed
+from opentrons.protocols.labware import (  # noqa: F401
+    get_labware_definition as get_labware_definition,
+    get_all_labware_definitions as get_all_labware_definitions,
+    verify_definition as verify_definition,
+    save_definition as save_definition,
+)
 
 from .core.labware import AbstractLabware
 from .core.well import AbstractWellCore
+
+from .core.protocol_api.labware import LabwareImplementation
 
 if TYPE_CHECKING:
     from opentrons.protocols.geometry.module_geometry import (  # noqa: F401
@@ -691,77 +699,6 @@ class Labware(DeckItem):
         return Well(well_implementation=well, api_level=self._api_version)
 
 
-def save_definition(
-    labware_def: "LabwareDefinition",
-    force: bool = False,
-    location: Optional[Path] = None,
-) -> None:
-    """
-    Save a labware definition
-
-    :param labware_def: A deserialized JSON labware definition
-    :param bool force: If true, overwrite an existing definition if found.
-        Cannot overwrite Opentrons definitions.
-    :param location: The path of the labware definition.
-    """
-    labware_module.save_definition(
-        labware_def=labware_def, force=force, location=location
-    )
-
-
-def verify_definition(
-    contents: Union[AnyStr, "LabwareDefinition", Dict[str, Any]]
-) -> "LabwareDefinition":
-    """Verify that an input string is a labware definition and return it.
-
-    If the definition is invalid, an exception is raised; otherwise parse the
-    json and return the valid definition.
-
-    :raises json.JSONDecodeError: If the definition is not valid json
-    :raises: ``jsonschema.ValidationError`` -- if the definition is not valid.
-    :returns: The parsed definition
-    """
-    return labware_module.verify_definition(contents=contents)
-
-
-def get_labware_definition(
-    load_name: str,
-    namespace: Optional[str] = None,
-    version: Optional[int] = None,
-    bundled_defs: Optional[Dict[str, "LabwareDefinition"]] = None,
-    extra_defs: Optional[Dict[str, "LabwareDefinition"]] = None,
-) -> "LabwareDefinition":
-    """
-    Look up and return a definition by load_name + namespace + version and
-        return it or raise an exception
-
-    :param str load_name: corresponds to 'loadName' key in definition
-    :param str namespace: The namespace the labware definition belongs to.
-        If unspecified, will search 'opentrons' then 'custom_beta'
-    :param int version: The version of the labware definition. If unspecified,
-        will use version 1.
-    :param bundled_defs: A bundle of labware definitions to exclusively use for
-        finding labware definitions, if specified
-    :param extra_defs: An extra set of definitions (in addition to the system
-        definitions) in which to search
-    """
-    return labware_module.get_labware_definition(
-        load_name=load_name,
-        namespace=namespace,
-        version=version,
-        bundled_defs=bundled_defs,
-        extra_defs=extra_defs,
-    )
-
-
-def get_all_labware_definitions() -> List[str]:
-    """
-    Return a list of standard and custom labware definitions with load_name +
-        name_space + version existing on the robot
-    """
-    return labware_module.get_all_labware_definitions()
-
-
 def split_tipracks(tip_racks: List[Labware]) -> Tuple[Labware, List[Labware]]:
     try:
         rest = tip_racks[1:]
@@ -813,14 +750,6 @@ def next_available_tip(
         )
 
 
-def get_labware_hash(labware: "Labware") -> str:
-    return labware_module.get_labware_hash(labware._implementation)
-
-
-def get_labware_hash_with_parent(labware: "Labware") -> str:
-    return labware_module.get_labware_hash_with_parent(labware._implementation)
-
-
 def load_from_definition(
     definition: "LabwareDefinition",
     parent: Location,
@@ -847,8 +776,10 @@ def load_from_definition(
                       defaults to ``MAX_SUPPORTED_VERSION``.
     """
     return Labware(
-        implementation=labware_module.load_from_definition(
-            definition=definition, parent=parent, label=label
+        implementation=LabwareImplementation(
+            definition=definition,
+            parent=parent,
+            label=label,
         ),
         api_level=api_level,
     )
@@ -891,16 +822,12 @@ def load(
                       conform to this level. If not specified,
                       defaults to ``MAX_SUPPORTED_VERSION``.
     """
-
-    return Labware(
-        implementation=labware_module.load(
-            load_name=load_name,
-            parent=parent,
-            label=label,
-            namespace=namespace,
-            version=version,
-            bundled_defs=bundled_defs,
-            extra_defs=extra_defs,
-        ),
-        api_level=api_level,
+    definition = get_labware_definition(
+        load_name,
+        namespace,
+        version,
+        bundled_defs=bundled_defs,
+        extra_defs=extra_defs,
     )
+
+    return load_from_definition(definition, parent, label, api_level)
