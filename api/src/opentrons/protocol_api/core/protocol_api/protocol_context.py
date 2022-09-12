@@ -188,13 +188,13 @@ class ProtocolContextImplementation(
     def load_module(
         self,
         model: ModuleModel,
-        deck_slot: DeckSlotName,
+        deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
     ) -> Optional[LoadModuleResult]:
         """Load a module."""
         resolved_type = module_geometry.resolve_module_type(model)
         resolved_location = self._deck_layout.resolve_module_location(
-            resolved_type, deck_slot.value
+            resolved_type, deck_slot
         )
 
         # Try to find in the hardware instance

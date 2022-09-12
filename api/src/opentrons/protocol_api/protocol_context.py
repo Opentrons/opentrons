@@ -301,8 +301,6 @@ class ProtocolContext(CommandPublisher):
         :param int version: The version of the labware definition. If
             unspecified, will use version 1.
         """
-        # todo(mm, 2021-11-22): The duplication between here and
-        # load_labware_from_definition() is getting bad.
         deck_slot = validation.ensure_deck_slot(location)
 
         labware_core = self._implementation.load_labware(
@@ -413,12 +411,11 @@ class ProtocolContext(CommandPublisher):
             )
 
         requested_model = validation.ensure_module_model(module_name)
-        deck_slot = validation.ensure_module_deck_slot(
-            location=location, model=requested_model
-        )
-
+        deck_slot = None if location is None else validation.ensure_deck_slot(location)
         load_result = self._implementation.load_module(
-            model=requested_model, deck_slot=deck_slot, configuration=configuration
+            model=requested_model,
+            deck_slot=deck_slot,
+            configuration=configuration,
         )
 
         if not load_result:

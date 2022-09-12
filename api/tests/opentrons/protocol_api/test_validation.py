@@ -1,5 +1,5 @@
 """Tests for Protocol API input validation."""
-from typing import Any, List, Union, Type
+from typing import List, Union
 
 import pytest
 
@@ -116,43 +116,3 @@ def test_ensure_module_model_invalid() -> None:
 
     with pytest.raises(TypeError, match="must be a string"):
         subject.ensure_module_model(42)  # type: ignore[arg-type]
-
-
-@pytest.mark.parametrize(
-    ("location", "model", "expected_slot"),
-    [
-        (1, MagneticModuleModel.MAGNETIC_V1, DeckSlotName.SLOT_1),
-        ("3", MagneticModuleModel.MAGNETIC_V1, DeckSlotName.SLOT_3),
-        (7, ThermocyclerModuleModel.THERMOCYCLER_V1, DeckSlotName.SLOT_7),
-        ("7", ThermocyclerModuleModel.THERMOCYCLER_V2, DeckSlotName.SLOT_7),
-        (None, ThermocyclerModuleModel.THERMOCYCLER_V1, DeckSlotName.SLOT_7),
-        (None, ThermocyclerModuleModel.THERMOCYCLER_V2, DeckSlotName.SLOT_7),
-    ],
-)
-def test_ensure_module_deck_slot(
-    location: Union[int, str, None],
-    model: ModuleModel,
-    expected_slot: DeckSlotName,
-) -> None:
-    """It should map an optional int/str location to a deck slot for a module."""
-    result = subject.ensure_module_deck_slot(location, model)
-    assert result == expected_slot
-
-
-@pytest.mark.parametrize(
-    ("location", "model", "expected_error_type", "expected_message"),
-    [
-        (None, TemperatureModuleModel.TEMPERATURE_V1, ValueError, "Location required"),
-        (8, ThermocyclerModuleModel.THERMOCYCLER_V1, ValueError, "slot 7"),
-        ({}, MagneticModuleModel.MAGNETIC_V1, TypeError, "string or integer"),
-    ],
-)
-def test_ensure_module_deck_slot_invalid(
-    location: Any,
-    model: ModuleModel,
-    expected_error_type: Type[Exception],
-    expected_message: str,
-) -> None:
-    """It should reject semantically invalid deck slots."""
-    with pytest.raises(expected_error_type, match=expected_message):
-        subject.ensure_module_deck_slot(location, model)

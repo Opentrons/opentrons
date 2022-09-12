@@ -215,7 +215,7 @@ class Deck(UserDict):
             if module_type.value in compatible_modules:
                 return location
             else:
-                raise AssertionError(
+                raise ValueError(
                     f"A {dn_from_type[module_type]} cannot be loaded"
                     f" into slot {location}"
                 )
@@ -232,7 +232,7 @@ class Deck(UserDict):
                     "A {dn_from_type[module_type]} cannot be used with this deck"
                 )
             else:
-                raise AssertionError(
+                raise ValueError(
                     f"{dn_from_type[module_type]}s do not have default"
                     " location, you must specify a slot"
                 )

@@ -83,7 +83,7 @@ class AbstractProtocol(
     def load_module(
         self,
         model: ModuleModel,
-        deck_slot: DeckSlotName,
+        deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
     ) -> Optional[LoadModuleResult]:
         ...

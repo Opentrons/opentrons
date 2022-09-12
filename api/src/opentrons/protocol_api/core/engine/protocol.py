@@ -5,7 +5,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import Mount, MountType, Location, DeckLocation, DeckSlotName
+from opentrons.types import Mount, MountType, Location, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
@@ -105,7 +105,7 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def load_module(
         self,
         model: ModuleModel,
-        location: Optional[DeckLocation],
+        location: Optional[DeckSlotName],
         configuration: Optional[str],
     ) -> Optional[LoadModuleResult]:
         """Load a module into the protocol."""

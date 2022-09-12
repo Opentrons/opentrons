@@ -191,11 +191,7 @@ def test_load_module(
     decoy.when(validation.ensure_module_model("spline reticulator")).then_return(
         TemperatureModuleModel.TEMPERATURE_V1
     )
-    decoy.when(
-        validation.ensure_module_deck_slot(
-            location=42, model=TemperatureModuleModel.TEMPERATURE_V1
-        )
-    ).then_return(DeckSlotName.SLOT_3)
+    decoy.when(validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_3)
 
     decoy.when(
         mock_core.load_module(
