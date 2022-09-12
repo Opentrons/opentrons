@@ -27,7 +27,7 @@ import { Line } from '../../../atoms/structure'
 import { StyledText } from '../../../atoms/text'
 import { Banner } from '../../../atoms/Banner'
 import { Tooltip } from '../../../atoms/Tooltip'
-import { DeckCalibrationModal } from '../../../organisms/ProtocolSetup/RunSetupCard/RobotCalibration/DeckCalibrationModal'
+import { HowCalibrationWorksModal } from '../../../organisms/HowCalibrationWorksModal'
 import { CalibrateDeck } from '../../../organisms/CalibrateDeck'
 import { formatLastModified } from '../../../organisms/CalibrationPanels/utils'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
@@ -127,8 +127,8 @@ export function RobotSettingsCalibration({
   })
 
   const [
-    showDeckCalibrationModal,
-    setShowDeckCalibrationModal,
+    showHowCalibrationWorksModal,
+    setShowHowCalibrationWorksModal,
   ] = React.useState(false)
   const [
     showPipetteOffsetCalibrationBanner,
@@ -571,15 +571,15 @@ export function RobotSettingsCalibration({
           </AlertModal>
         )}
       </Portal>
-      {showDeckCalibrationModal ? (
-        <DeckCalibrationModal
-          onCloseClick={() => setShowDeckCalibrationModal(false)}
+      {showHowCalibrationWorksModal ? (
+        <HowCalibrationWorksModal
+          onCloseClick={() => setShowHowCalibrationWorksModal(false)}
         />
       ) : null}
       {enableCalibrationWizards ? (
         <CalibrationStatusCard
           robotName={robotName}
-          setShowDeckCalibrationModal={setShowDeckCalibrationModal}
+          setShowHowCalibrationWorksModal={setShowHowCalibrationWorksModal}
         />
       ) : (
         <>
@@ -602,7 +602,7 @@ export function RobotSettingsCalibration({
                 <Link
                   role="button"
                   css={TYPOGRAPHY.linkPSemiBold}
-                  onClick={() => setShowDeckCalibrationModal(true)}
+                  onClick={() => setShowHowCalibrationWorksModal(true)}
                 >
                   {t('robot_calibration:see_how_robot_calibration_works')}
                 </Link>

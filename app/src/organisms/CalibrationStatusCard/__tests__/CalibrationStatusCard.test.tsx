@@ -20,7 +20,7 @@ const render = (props: React.ComponentProps<typeof CalibrationStatusCard>) => {
 describe('CalibrationStatusCard', () => {
   const props: React.ComponentProps<typeof CalibrationStatusCard> = {
     robotName: 'otie',
-    setShowDeckCalibrationModal: showDeckCalibrationModal => {},
+    setShowHowCalibrationWorksModal: showHowCalibrationWorksModal => {},
   }
 
   it('renders a calibration status title and description', () => {
