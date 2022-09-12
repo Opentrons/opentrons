@@ -43,7 +43,7 @@ const MOCK_STATE: State = {
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/protocols/protocolKeyStub">
+      <Route path="/protocols/:protocolKey">
         <ProtocolDetails />
       </Route>
       <Route path="/protocols">
@@ -80,7 +80,7 @@ describe('ProtocolDetails', () => {
   })
 
   it('should render protocol details', () => {
-    const { getByText } = render()
+    const { getByText } = render('/protocols/protocolKeyStub')
     getByText('mock protocol details')
   })
 
