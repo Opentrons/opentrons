@@ -1,18 +1,18 @@
 """Calibration Module protocol commands."""
 
 from .probe import (
-    BeginProbeParams,
-    BeginProbeResult,
-    BeginProbeCreate,
-    BeginProbeCommandType,
-    BeginProbe,
+    ProbeParams,
+    ProbeResult,
+    ProbeCreate,
+    ProbeCommandType,
+    Probe,
 )
 
 __all__ = [
-    # calibration/beginProb
-    "BeginProbe",
-    "BeginProbeCreate",
-    "BeginProbeParams",
-    "BeginProbeResult",
-    "BeginProbeCommandType",
+    # calibration/probe
+    "Probe",
+    "ProbeCreate",
+    "ProbeParams",
+    "ProbeResult",
+    "ProbeCommandType",
 ]

@@ -15,18 +15,18 @@ from ..command import (
 from opentrons.hardware_control import HardwareControlAPI
 
 
-BeginProbeCommandType = Literal["beginprobe"]
+ProbeCommandType = Literal["probe"]
 
 
-class BeginProbeParams(BaseModel):
-    """Payload required to begin-probe."""
+class ProbeParams(BaseModel):
+    """Payload required to probe."""
 
     # Should this be OT3Mount?
     mount: Mount = Field(..., description="Instrument mount to calibrate.")
 
 
-class BeginProbeResult(BaseModel):
-    """Result data from the execution of a begin-probe command."""
+class ProbeResult(BaseModel):
+    """Result data from the execution of a probe command."""
 
     offsets: List[float] = Field(..., description="Instrument calibration offsets.")
     errors: Optional[List[ErrorOccurrence]] = Field(
@@ -34,8 +34,8 @@ class BeginProbeResult(BaseModel):
     )
 
 
-class BeginProbeImplementation(AbstractCommandImpl[BeginProbeParams, BeginProbeResult]):
-    """BeginProbe command implementation."""
+class ProbeImplementation(AbstractCommandImpl[ProbeParams, ProbeResult]):
+    """Probe command implementation."""
 
     def __init__(
         self,
@@ -44,27 +44,27 @@ class BeginProbeImplementation(AbstractCommandImpl[BeginProbeParams, BeginProbeR
     ) -> None:
         self._hardware_api = hardware_api
 
-    async def execute(self, params: BeginProbeParams) -> BeginProbeResult:
-        """Execute begin-probe command."""
+    async def execute(self, params: ProbeParams) -> ProbeResult:
+        """Execute probe command."""
         # result = await self._hardware_api.probe(mount=params.mount)
 
-        return BeginProbeResult(offsets=[])
+        return ProbeResult(offsets=[])
 
 
-class BeginProbe(BaseCommand[BeginProbeParams, BeginProbeResult]):
-    """Begin-probe command model."""
+class Probe(BaseCommand[ProbeParams, ProbeResult]):
+    """Probe command model."""
 
-    commandType: BeginProbeCommandType = "beginprobe"
-    params: BeginProbeParams
-    result: Optional[BeginProbeResult]
+    commandType: ProbeCommandType = "probe"
+    params: ProbeParams
+    result: Optional[ProbeResult]
 
-    _ImplementationCls: Type[BeginProbeImplementation] = BeginProbeImplementation
+    _ImplementationCls: Type[ProbeImplementation] = ProbeImplementation
 
 
-class BeginProbeCreate(BaseCommandCreate[BeginProbeParams]):
-    """Create begin-probe command request model."""
+class ProbeCreate(BaseCommandCreate[ProbeParams]):
+    """Create probe command request model."""
 
-    commandType: BeginProbeCommandType = "beginprobe"
-    params: BeginProbeParams
+    commandType: ProbeCommandType = "probe"
+    params: ProbeParams
 
-    _CommandCls: Type[BeginProbe] = BeginProbe
+    _CommandCls: Type[Probe] = Probe
