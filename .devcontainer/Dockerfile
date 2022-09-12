@@ -61,3 +61,6 @@ RUN mkdir -p /$USERNAME/.vscode-server/extensions \
         /$USERNAME/.cache \
         /$USERNAME/.local \
         /$USERNAME/commandhistory
+
+# install the version of pipenv we use
+RUN pip install -U pipenv==2021.5.29

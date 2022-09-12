@@ -35,7 +35,7 @@
         "yzhang.markdown-all-in-one",
         "eamodio.gitlens"
     ],
-    "postCreateCommand": "pip install -U pipenv==2021.5.29 && git config codespaces-theme.hide-status 1",
+    "postCreateCommand": "cp /etc/hosts /etc/hosts2 && sed -i 's/localhost ip6-localhost ip6-loopback/ip6-localhost ip6-loopback/g' /etc/hosts2 && cat /etc/hosts2 >| /etc/hosts && git config codespaces-theme.hide-status 1",
     "features": {
         "common": {
             "installZsh": false,

@@ -263,3 +263,20 @@ Once `make setup` completes, you're ready to start developing! Check out our gen
 [contributing guide]: ./CONTRIBUTING.md
 
 ## VSCode Dev container
+
+### Dev container caveats
+
+You must have docker installed.
+If on Windows, due to the way the volume of the source code gets mounted in the container, filesystem read is slow.  This causes things like `git status` in the container to be slow.
+It is best to have 2 VSCode windows open, one locally and one against the dev container.
+Do editing and git work locally while executing code running commands in the VSCode terminal.
+
+### Python Based projects
+Cross platform development environments are challenging.
+Local development on mac intel and arm machines work well and are consistent with the move to Python 3.10
+
+
+
+### JS Based projects
+
+#### TODO
