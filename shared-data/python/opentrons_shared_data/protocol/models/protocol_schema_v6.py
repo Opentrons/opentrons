@@ -193,7 +193,9 @@ class ProtocolSchemaV6(BaseModel):
                 and command.params.pipetteId not in pipette_ids
             ):
                 raise ValueError(
-                    f"There seems to be a problem with the uploaded json protocol. {command.commandType} is missing {command.params.pipetteId} in referencing object."
+                    f"{command.commandType} command at index {index}"
+                    f" references ID {command.params.pipetteId},"
+                    f" which doesn't exist."
                 )
             if (
                 command.params.labwareId is not None
