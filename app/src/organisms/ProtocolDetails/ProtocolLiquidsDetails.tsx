@@ -8,9 +8,19 @@ import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
 import { LiquidsListItemDetails } from '../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList'
 
-export const ProtocolLiquidsDetails = (): JSX.Element => {
-  const liquidsInLoadOrder = parseLiquidsInLoadOrder()
-  const labwareByLiquidId = parseLabwareInfoByLiquidId()
+import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
+
+interface ProtocolLiquidsDetailsProps {
+  commands: RunTimeCommand[]
+  liquids: Liquid[]
+}
+
+export const ProtocolLiquidsDetails = (
+  props: ProtocolLiquidsDetailsProps
+): JSX.Element => {
+  const { commands, liquids } = props
+  const liquidsInLoadOrder = parseLiquidsInLoadOrder(liquids, commands)
+  const labwareByLiquidId = parseLabwareInfoByLiquidId(commands)
   const HIDE_SCROLLBAR = css`
     ::-webkit-scrollbar {
       display: none;

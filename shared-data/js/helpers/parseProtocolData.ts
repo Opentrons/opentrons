@@ -10,6 +10,7 @@ import type { ErrorObject } from 'ajv'
 import type {
   JsonProtocolFile,
   ProtocolAnalysisFile,
+  ProtocolAnalysisOutput,
   ProtocolFileV1,
 } from '../../protocol'
 
@@ -133,7 +134,7 @@ export function protocolHasModules(
 }
 
 export function protocolHasLiquids(
-  protocol: ProtocolAnalysisFile<{}>
+  protocol: ProtocolAnalysisFile<{}> | ProtocolAnalysisOutput
 ): boolean {
   return 'liquids' in protocol && Object.entries(protocol.liquids).length > 0
 }

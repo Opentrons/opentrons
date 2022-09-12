@@ -16,15 +16,13 @@ import {
   parseInitialLoadedModulesBySlot,
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
-  Liquid,
 } from '@opentrons/api-client'
 import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
-import type { DeckSlot, RunTimeCommand } from '@opentrons/shared-data'
+import type { DeckSlot, Liquid, RunTimeCommand } from '@opentrons/shared-data'
 
 interface DeckThumbnailProps {
   commands: RunTimeCommand[]
   liquids?: Liquid[]
-  showLiquids?: boolean
 }
 const deckSetupLayerBlocklist = [
   'calibrationMarkings',
@@ -38,7 +36,7 @@ const deckSetupLayerBlocklist = [
 
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
-  const { commands, showLiquids } = props
+  const { commands, liquids } = props
   const liquidSetupEnabled = useFeatureFlag('enableLiquidSetup')
 
   const initialLoadedLabwareBySlot = parseInitialLoadedLabwareBySlot(commands)
@@ -46,7 +44,10 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const initialLoadedLabwareByModuleId = parseInitialLoadedLabwareByModuleId(
     commands
   )
-  const liquidsInLoadOrder = parseLiquidsInLoadOrder()
+  const liquidsInLoadOrder = parseLiquidsInLoadOrder(
+    liquids != null ? liquids : {},
+    commands
+  )
   const labwareByLiquidId = parseLabwareInfoByLiquidId(commands)
 
   return (
@@ -80,7 +81,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
             ? labwareInModule.result.labwareId
             : labwareId
           const wellFill =
-            labwareId && showLiquids && liquidSetupEnabled
+            labwareId && liquids != null && liquidSetupEnabled
               ? getWellFillFromLabwareId(
                   labwareId,
                   liquidsInLoadOrder,

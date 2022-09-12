@@ -83,6 +83,7 @@ export interface ProtocolAnalysisOutput {
   config: JsonConfig | PythonConfig
   metadata: { [key: string]: any }
   commands: RunTimeCommand[]
+  liquids: Liquid[]
   errors: AnalysisError[]
 }
 
@@ -97,6 +98,13 @@ export interface JsonConfig {
 export interface PythonConfig {
   protocolType: 'python'
   apiVersion: [major: number, minor: number]
+}
+
+export interface Liquid {
+  id: string
+  displayName: string
+  description: string
+  displayColor: string
 }
 
 interface AnalysisError {

@@ -50,7 +50,11 @@ import {
 
 import type { State } from '../../redux/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
-import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
+import {
+  JsonConfig,
+  protocolHasLiquids,
+  PythonConfig,
+} from '@opentrons/shared-data'
 
 const defaultTabStyle = css`
   ${TYPOGRAPHY.pSemiBold}
@@ -301,7 +305,20 @@ export function ProtocolDetails(
         )
 
       case 'liquids':
-        return <ProtocolLiquidsDetails />
+        return (
+          <ProtocolLiquidsDetails
+            commands={
+              mostRecentAnalysis?.commands != null
+                ? mostRecentAnalysis?.commands
+                : []
+            }
+            liquids={
+              mostRecentAnalysis?.liquids != null
+                ? mostRecentAnalysis?.liquids
+                : []
+            }
+          />
+        )
     }
   }
 
@@ -484,7 +501,11 @@ export function ProtocolDetails(
                 complete: (
                   <DeckThumbnail
                     commands={mostRecentAnalysis?.commands ?? []}
-                    showLiquids
+                    liquids={
+                      mostRecentAnalysis?.liquids != null
+                        ? mostRecentAnalysis?.liquids
+                        : []
+                    }
                   />
                 ),
               }[analysisStatus]
@@ -517,17 +538,21 @@ export function ProtocolDetails(
                 {t('labware')}
               </StyledText>
             </RoundTab>
-            {liquidSetupEnabled && (
-              <RoundTab
-                data-testid="ProtocolDetails_liquids"
-                isCurrent={currentTab === 'liquids'}
-                onClick={() => setCurrentTab('liquids')}
-              >
-                <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
-                  {t('liquids')}
-                </StyledText>
-              </RoundTab>
-            )}
+            {liquidSetupEnabled &&
+              mostRecentAnalysis != null &&
+              protocolHasLiquids(mostRecentAnalysis) && (
+                <RoundTab
+                  data-testid="ProtocolDetails_liquids"
+                  isCurrent={currentTab === 'liquids'}
+                  onClick={() => setCurrentTab('liquids')}
+                >
+                  <StyledText
+                    textTransform={TYPOGRAPHY.textTransformCapitalize}
+                  >
+                    {t('liquids')}
+                  </StyledText>
+                </RoundTab>
+              )}
           </Flex>
           <Box
             backgroundColor={COLORS.white}

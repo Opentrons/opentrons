@@ -46,7 +46,10 @@ export const LiquidsLabwareDetailsModal = (
   const labwareRenderInfo = useLabwareRenderInfoForRunById(runId)[labwareId]
   const protocolData = useProtocolDetailsForRun(runId).protocolData
   const commands = protocolData?.commands ?? []
-  const liquids = parseLiquidsInLoadOrder(protocolData?.liquids, commands)
+  const liquids = parseLiquidsInLoadOrder(
+    protocolData?.liquids != null ? protocolData?.liquids : {},
+    commands
+  )
   const labwareByLiquidId = parseLabwareInfoByLiquidId(commands)
   const wellFill = getWellFillFromLabwareId(
     labwareId,

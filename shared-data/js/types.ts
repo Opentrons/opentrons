@@ -399,7 +399,7 @@ export interface LoadedLabware {
 }
 
 export interface LoadedLiquid {
-  liquidId: string
+  id: string
   displayName: string
   description: string
   displayColor: string

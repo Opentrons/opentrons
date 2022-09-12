@@ -5,6 +5,7 @@ import {
   LabwareDefinition2,
   ModuleModel,
   PipetteName,
+  Liquid,
 } from '@opentrons/shared-data'
 import { COLORS } from '@opentrons/components/src/ui-style-constants'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
@@ -247,53 +248,28 @@ export function parseInitialLoadedModulesBySlot(
   )
 }
 
-// TODO(sh, 2022-09-07): remove mock once ProtocolAnalysisOutput is updated
-const MOCK_LIQUIDS_LOAD_ORDER = [
-  {
-    id: '7',
-    displayName: 'liquid 2',
-    description: 'water',
-    displayColor: '#00d781',
-  },
-  {
-    id: '123',
-    displayName: 'liquid 1',
-    description: 'saline',
-    displayColor: '#0076ff',
-  },
-  {
-    id: '19',
-    displayName: 'liquid 3',
-    description: 'reagent',
-    displayColor: '#ff4888',
-  },
-  {
-    id: '4',
-    displayName: 'liquid 4',
-    description: 'saliva',
-    displayColor: '#B925FF',
-  },
-]
-
-export interface Liquid {
-  id: string
-  displayName: string
-  description: string
-  displayColor: string
+export interface LoadedLiquidsById {
+  [liquidId: string]: {
+    displayName: string
+    description: string
+    displayColor?: string
+  }
 }
 
 export function parseLiquidsInLoadOrder(
-  liquids: Liquid[] = [],
-  commands: RunTimeCommand[] = []
+  liquids: LoadedLiquidsById | Liquid[],
+  commands: RunTimeCommand[]
 ): Liquid[] {
-  if (liquids.length === 0) {
-    return MOCK_LIQUIDS_LOAD_ORDER
-  }
   const loadLiquidCommands = commands.filter(
     (command): command is LoadLiquidRunTimeCommand =>
       command.commandType === 'loadLiquid'
   )
-  const loadedLiquids = liquids.map((liquid, index) => {
+  const transformedLiquids = Array.isArray(liquids)
+    ? liquids
+    : Object.keys(liquids).map(key => {
+        return { id: key, ...liquids[key] }
+      })
+  const loadedLiquids = transformedLiquids.map((liquid, index) => {
     return {
       ...liquid,
       displayColor:
@@ -302,22 +278,17 @@ export function parseLiquidsInLoadOrder(
     }
   })
 
-  if (loadLiquidCommands.length !== 0) {
-    return reduce<LoadLiquidRunTimeCommand, Liquid[]>(
-      loadLiquidCommands,
-      (acc, command) => {
-        const liquid = loadedLiquids.find(
-          liquid => liquid.id === command.params.liquidId
-        )
-        if (liquid != null && !acc.some(item => item === liquid))
-          acc.push(liquid)
-        return acc
-      },
-      []
-    )
-  } else {
-    return MOCK_LIQUIDS_LOAD_ORDER
-  }
+  return reduce<LoadLiquidRunTimeCommand, Liquid[]>(
+    loadLiquidCommands,
+    (acc, command) => {
+      const liquid = loadedLiquids.find(
+        liquid => liquid.id === command.params.liquidId
+      )
+      if (liquid != null && !acc.some(item => item === liquid)) acc.push(liquid)
+      return acc
+    },
+    []
+  )
 }
 
 interface LabwareLiquidInfo {
@@ -329,76 +300,8 @@ export interface LabwareByLiquidId {
   [liquidId: string]: LabwareLiquidInfo[]
 }
 
-// TODO(sh, 2022-09-07): remove mock once ProtocolAnalysisOutput is updated
-const MOCK_LABWARE_LIQUID_INFO: LabwareByLiquidId = {
-  '123': [
-    {
-      labwareId:
-        '5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1',
-      volumeByWell: { A1: 1000 },
-    },
-  ],
-  '7': [
-    {
-      labwareId:
-        '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
-      volumeByWell: {
-        A1: 100,
-        B1: 100,
-        C1: 100,
-        D1: 100,
-        A2: 100,
-        B2: 100,
-        C2: 100,
-        D2: 100,
-      },
-    },
-    {
-      labwareId: '53d3b350-a9c0-11eb-bce6-9f1d5b9c1a1b',
-      volumeByWell: {
-        A1: 50,
-        B1: 50,
-        C1: 50,
-        D1: 50,
-      },
-    },
-  ],
-  '4': [
-    {
-      labwareId:
-        '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
-      volumeByWell: {
-        A3: 100,
-        B3: 100,
-        C3: 100,
-        D3: 100,
-        A4: 100,
-        B4: 100,
-        C4: 100,
-        D4: 100,
-      },
-    },
-  ],
-  '19': [
-    {
-      labwareId:
-        '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
-      volumeByWell: {
-        A5: 100,
-        B5: 100,
-        C5: 100,
-        D5: 100,
-        A6: 100,
-        B6: 100,
-        C6: 100,
-        D6: 100,
-      },
-    },
-  ],
-}
-
 export function parseLabwareInfoByLiquidId(
-  commands: RunTimeCommand[] = []
+  commands: RunTimeCommand[]
 ): LabwareByLiquidId {
   const loadLiquidCommands =
     commands.length !== 0
@@ -408,21 +311,17 @@ export function parseLabwareInfoByLiquidId(
         )
       : []
 
-  if (loadLiquidCommands.length !== 0) {
-    return reduce<LoadLiquidRunTimeCommand, LabwareByLiquidId>(
-      loadLiquidCommands,
-      (acc, command) => {
-        if (!(command.params.liquidId in acc)) {
-          acc[command.params.liquidId] = []
-        }
-        const labwareId = command.params.labwareId
-        const volumeByWell = command.params.volumeByWell
-        acc[command.params.liquidId].push({ labwareId, volumeByWell })
-        return acc
-      },
-      {}
-    )
-  } else {
-    return MOCK_LABWARE_LIQUID_INFO
-  }
+  return reduce<LoadLiquidRunTimeCommand, LabwareByLiquidId>(
+    loadLiquidCommands,
+    (acc, command) => {
+      if (!(command.params.liquidId in acc)) {
+        acc[command.params.liquidId] = []
+      }
+      const labwareId = command.params.labwareId
+      const volumeByWell = command.params.volumeByWell
+      acc[command.params.liquidId].push({ labwareId, volumeByWell })
+      return acc
+    },
+    {}
+  )
 }

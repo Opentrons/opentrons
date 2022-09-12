@@ -98,12 +98,30 @@ export const schemaV6Adapter = (
         }
       }, {})
 
+    const liquids: {
+      [liquidId: string]: {
+        displayName: string
+        description: string
+        displayColor?: string
+      }
+    } = protocolAnalysis.liquids.reduce((acc, liquid) => {
+      return {
+        ...acc,
+        [liquid.id]: {
+          displayName: liquid.displayName,
+          description: liquid.description,
+          displayColor: liquid.displayColor,
+        },
+      }
+    }, {})
+
     // @ts-expect-error this is a v6 like object that does not quite match the v6 spec at the moment
     return {
       ...protocolAnalysis,
       pipettes,
       labware,
       modules,
+      liquids,
       labwareDefinitions,
       commands: protocolAnalysis.commands,
     }

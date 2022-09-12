@@ -21,13 +21,13 @@ import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 
 const MOCK_LIQUIDS_IN_LOAD_ORDER = [
   {
-    liquidId: '0',
+    id: '0',
     displayName: 'mock liquid 1',
     description: 'mock sample',
     displayColor: '#ff4888',
   },
   {
-    liquidId: '1',
+    id: '1',
     displayName: 'mock liquid 2',
     description: 'another mock sample',
     displayColor: '#ff8999',

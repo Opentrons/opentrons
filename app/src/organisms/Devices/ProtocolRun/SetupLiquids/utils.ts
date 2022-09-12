@@ -1,5 +1,7 @@
-import type { LabwareByLiquidId, Liquid } from '@opentrons/api-client'
 import { WellGroup } from '@opentrons/components'
+
+import type { LabwareByLiquidId } from '@opentrons/api-client'
+import type { Liquid } from '@opentrons/shared-data'
 
 export function getWellFillFromLabwareId(
   labwareId: string,
