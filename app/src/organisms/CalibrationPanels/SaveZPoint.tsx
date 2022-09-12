@@ -75,12 +75,16 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
   })
 
   let title = t('calibrate_z_axis_on_slot')
+  let bodyTranlsationKey = 'jog_pipette_to_touch_slot'
   if (isHealthCheck) {
     title =
+      calBlock != null ? t('check_z_axis_on_block') : t('check_z_axis_on_trash')
+    bodyTranlsationKey =
       calBlock != null
-        ? t('check_z_axis_on_block')
-        : t('check_z_axis_on_trash')
+        ? 'jog_pipette_to_touch_block'
+        : 'jog_pipette_to_touch_trash'
   }
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -99,7 +103,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
           </StyledText>
           <Trans
             t={t}
-            i18nKey="jog_pipette_to_touch_slot"
+            i18nKey={bodyTranlsationKey}
             components={{
               block: <StyledText as="p" marginBottom={SPACING.spacing3} />,
             }}
@@ -115,6 +119,9 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
             autoPlay={true}
             loop={true}
             controls={false}
+            aria-label={`${mount} ${
+              isMulti ? 'multi' : 'single'
+            } channel pipette moving to slot 5`}
           >
             <source src={demoAsset} />
           </video>
