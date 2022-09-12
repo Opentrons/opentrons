@@ -1,9 +1,5 @@
 import * as React from 'react'
 
-import { ModuleIcon } from './index'
-import { StyledText } from '../../atoms/text'
-
-import type { Story, Meta } from '@storybook/react'
 import {
   Flex,
   SPACING,
@@ -11,6 +7,10 @@ import {
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 
+import { ModuleIcon } from './index'
+import { StyledText } from '../../atoms/text'
+
+import type { Story, Meta } from '@storybook/react'
 import type { AttachedModule } from '../../redux/modules/types'
 
 export default {
