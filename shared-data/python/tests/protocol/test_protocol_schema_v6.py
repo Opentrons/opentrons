@@ -108,7 +108,6 @@ def test_schema_validators(
     input_commands: List[protocol_schema_v6.Command], missing_id: str, load_command: str
 ) -> None:
     """Should raise an error the keys do not match."""
-    print(input_commands)
     labware = {
         "labware-id-1": protocol_schema_v6.Labware(definitionId="definition-1"),
         "labware-id-2": protocol_schema_v6.Labware(definitionId="definition-2"),
