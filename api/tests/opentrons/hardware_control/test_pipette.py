@@ -146,3 +146,18 @@ def test_flow_rate_setting():
     assert pip.dispense_flow_rate == 3
     assert pip.blow_out_flow_rate == 4
     assert pip.config is config
+
+
+@pytest.mark.parametrize("config_model", pipette_config.config_models)
+def test_xy_center(config_model):
+    loaded = pipette_config.load(config_model)
+    pip = pipette.Pipette(loaded, PIP_CAL, "testId")
+    if loaded.channels == 8:
+        cp_y_offset = 9 * 3.5
+    else:
+        cp_y_offset = 0
+    assert pip.critical_point(types.CriticalPoint.XY_CENTER) == Point(
+        loaded.nozzle_offset[0],
+        loaded.nozzle_offset[1] - cp_y_offset,
+        loaded.nozzle_offset[2],
+    )

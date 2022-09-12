@@ -2,7 +2,8 @@ import logging
 from typing import Dict, List, Optional, Set
 from collections import OrderedDict
 
-from opentrons import types
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
 from opentrons.hardware_control.modules import AbstractModule, ModuleModel
 from opentrons.hardware_control.types import DoorState, PauseType
@@ -12,21 +13,23 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.labware import load_from_definition, get_labware_definition
+from opentrons.protocols.labware import get_labware_definition
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from ..instrument import AbstractInstrument
-from ..labware import AbstractLabware
-from ..protocol import AbstractProtocol, InstrumentDict, LoadModuleResult
+from ..protocol import AbstractProtocol, LoadModuleResult
+from ..labware import LabwareLoadParams
 
+from .labware import LabwareImplementation
 from .instrument_context import InstrumentContextImplementation
 
 
 logger = logging.getLogger(__name__)
 
 
-class ProtocolContextImplementation(AbstractProtocol):
+class ProtocolContextImplementation(
+    AbstractProtocol[InstrumentContextImplementation, LabwareImplementation]
+):
     def __init__(
         self,
         sync_hardware: SyncHardwareAPI,
@@ -59,14 +62,16 @@ class ProtocolContextImplementation(AbstractProtocol):
         self._sync_hardware = sync_hardware
         self._api_version = api_version or MAX_SUPPORTED_VERSION
         self._deck_layout = Deck()
-        self._instruments: InstrumentDict = {mount: None for mount in types.Mount}
+        self._instruments: Dict[Mount, Optional[InstrumentContextImplementation]] = {
+            mount: None for mount in Mount
+        }
         self._modules: List[LoadModuleResult] = []
         self._bundled_labware = bundled_labware
         self._extra_labware = extra_labware or {}
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
         self._default_max_speeds = AxisMaxSpeeds()
-        self._last_location: Optional[types.Location] = None
-        self._last_mount: Optional[types.Mount] = None
+        self._last_location: Optional[Location] = None
+        self._last_mount: Optional[Mount] = None
         self._loaded_modules: Set["AbstractModule"] = set()
 
     def get_bundled_data(self) -> Dict[str, bytes]:
@@ -76,7 +81,7 @@ class ProtocolContextImplementation(AbstractProtocol):
         return self._bundled_data
 
     def get_bundled_labware(self) -> Optional[Dict[str, LabwareDefinition]]:
-        """Bundled labware defintion."""
+        """Bundled labware definition."""
         # TODO AL 20201110 - This should be removed along with the bundling
         #  feature as we move to HTTP based protocol execution.
         return self._bundled_labware
@@ -97,27 +102,30 @@ class ProtocolContextImplementation(AbstractProtocol):
         """Returns true if hardware is being simulated."""
         return self._sync_hardware.is_simulator  # type: ignore[no-any-return]
 
-    def load_labware_from_definition(
+    def add_labware_definition(
         self,
-        labware_def: LabwareDefinition,
-        location: types.DeckLocation,
-        label: Optional[str],
-    ) -> AbstractLabware:
-        """Load a labware from definition"""
-        parent = self.get_deck().position_for(location)
-        labware_obj = load_from_definition(labware_def, parent, label)
-        self._deck_layout[location] = labware_obj
-        return labware_obj
+        definition: LabwareDefinition,
+    ) -> LabwareLoadParams:
+        """Add a labware defintion to the set of loadable definitions."""
+        load_params = LabwareLoadParams(
+            namespace=definition["namespace"],
+            load_name=definition["parameters"]["loadName"],
+            version=definition["version"],
+        )
+        self._extra_labware = self._extra_labware.copy()
+        self._extra_labware[load_params.as_uri()] = definition
+        return load_params
 
     def load_labware(
         self,
         load_name: str,
-        location: types.DeckLocation,
+        location: DeckSlotName,
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
-    ) -> AbstractLabware:
-        """Load a labware."""
+    ) -> LabwareImplementation:
+        """Load a labware using its identifying parameters."""
+        parent = self.get_deck().position_for(location.value)
         labware_def = get_labware_definition(
             load_name,
             namespace,
@@ -125,12 +133,18 @@ class ProtocolContextImplementation(AbstractProtocol):
             bundled_defs=self._bundled_labware,
             extra_defs=self._extra_labware,
         )
-        return self.load_labware_from_definition(labware_def, location, label)
+        labware_core = LabwareImplementation(
+            definition=labware_def,
+            parent=parent,
+            label=label,
+        )
+        self._deck_layout[location] = labware_core
+        return labware_core
 
     def load_module(
         self,
         model: ModuleModel,
-        location: Optional[types.DeckLocation],
+        location: Optional[DeckLocation],
         configuration: Optional[str],
     ) -> Optional[LoadModuleResult]:
         """Load a module."""
@@ -183,36 +197,31 @@ class ProtocolContextImplementation(AbstractProtocol):
         )
 
     def load_instrument(
-        self, instrument_name: str, mount: types.Mount, replace: bool
-    ) -> AbstractInstrument:
+        self, instrument_name: PipetteNameType, mount: Mount
+    ) -> InstrumentContextImplementation:
         """Load an instrument."""
-        instr = self._instruments[mount]
-        if instr and not replace:
-            raise RuntimeError(
-                f"Instrument already present in {mount.name.lower()} "
-                f"mount: {instr.get_instrument_name()}"
-            )
-
         attached = {
             att_mount: instr.get("name", None)
             for att_mount, instr in self._sync_hardware.attached_instruments.items()
             if instr
         }
-        attached[mount] = instrument_name
+        attached[mount] = instrument_name.value
         self._sync_hardware.cache_instruments(attached)
         # If the cache call didn’t raise, the instrument is attached
         new_instr = InstrumentContextImplementation(
             api_version=self._api_version,
             protocol_interface=self,
             mount=mount,
-            instrument_name=instrument_name,
+            instrument_name=instrument_name.value,
             default_speed=400.0,
         )
         self._instruments[mount] = new_instr
         logger.info("Instrument {} loaded".format(new_instr))
         return new_instr
 
-    def get_loaded_instruments(self) -> InstrumentDict:
+    def get_loaded_instruments(
+        self,
+    ) -> Dict[Mount, Optional[InstrumentContextImplementation]]:
         """Get a mapping of mount to instrument."""
         return self._instruments
 
@@ -262,8 +271,8 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def get_last_location(
         self,
-        mount: Optional[types.Mount] = None,
-    ) -> Optional[types.Location]:
+        mount: Optional[Mount] = None,
+    ) -> Optional[Location]:
         """Get the most recent moved to location."""
         if mount is None or mount == self._last_mount:
             return self._last_location
@@ -272,8 +281,8 @@ class ProtocolContextImplementation(AbstractProtocol):
 
     def set_last_location(
         self,
-        location: Optional[types.Location],
-        mount: Optional[types.Mount] = None,
+        location: Optional[Location],
+        mount: Optional[Mount] = None,
     ) -> None:
         """Set the most recent moved to location."""
         self._last_location = location

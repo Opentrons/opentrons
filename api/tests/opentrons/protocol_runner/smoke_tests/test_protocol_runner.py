@@ -14,8 +14,9 @@ from datetime import datetime
 from decoy import matchers
 from pathlib import Path
 
-from opentrons.types import MountType, DeckSlotName
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
+from opentrons.types import MountType, DeckSlotName
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     LoadedLabware,
@@ -23,7 +24,6 @@ from opentrons.protocol_engine import (
     LoadedPipette,
     ModuleDefinition,
     ModuleModel,
-    PipetteName,
     commands,
 )
 from opentrons.protocol_reader import ProtocolReader
@@ -56,7 +56,7 @@ async def test_runner_with_python(
 
     expected_pipette = LoadedPipette.construct(
         id=pipette_id_captor,
-        pipetteName=PipetteName.P300_SINGLE,
+        pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
@@ -116,7 +116,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
 
     expected_pipette = LoadedPipette(
         id="pipette-id",
-        pipetteName=PipetteName.P300_SINGLE,
+        pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
@@ -125,6 +125,7 @@ async def test_runner_with_json(json_protocol_file: Path) -> None:
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
         definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
+        displayName="Opentrons 96 Tip Rack 300 µL",
         # fixme(mm, 2021-11-11): We should smoke-test that the engine picks up labware
         # offsets, but it's unclear to me what the best way of doing that is, since
         # we don't have access to the engine here to add offsets to it.
@@ -172,7 +173,7 @@ async def test_runner_with_legacy_python(legacy_python_protocol_file: Path) -> N
 
     expected_pipette = LoadedPipette.construct(
         id=pipette_id_captor,
-        pipetteName=PipetteName.P300_SINGLE,
+        pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
@@ -227,7 +228,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
 
     expected_pipette = LoadedPipette.construct(
         id=pipette_id_captor,
-        pipetteName=PipetteName.P300_SINGLE,
+        pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
 
@@ -236,6 +237,7 @@ async def test_runner_with_legacy_json(legacy_json_protocol_file: Path) -> None:
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
         loadName="opentrons_96_tiprack_300ul",
         definitionUri="opentrons/opentrons_96_tiprack_300ul/1",
+        displayName="Opentrons 96 Tip Rack 300 µL",
         # fixme(mm, 2021-11-11): When legacy running supports labware offsets, check
         # for that here.
         offsetId=None,

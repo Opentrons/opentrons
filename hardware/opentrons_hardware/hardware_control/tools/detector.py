@@ -8,7 +8,7 @@ from opentrons_hardware.drivers.can_bus.can_messenger import WaitableCallback
 from opentrons_hardware.firmware_bindings.constants import ToolType, PipetteName
 from opentrons_hardware.firmware_bindings.messages import message_definitions
 from opentrons_hardware.firmware_bindings import NodeId, ArbitrationId
-from opentrons_hardware.pipettes.serials import model_versionstring_from_int
+from opentrons_hardware.instruments.serial_utils import model_versionstring_from_int
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from .types import (
     PipetteInformation,
@@ -82,7 +82,7 @@ class OneshotToolDetector:
     @staticmethod
     def _decode_or_default(orig: bytes) -> str:
         try:
-            return orig.decode()
+            return orig.decode(errors="replace").split("\x00")[0]
         except UnicodeDecodeError:
             return repr(orig)
 
@@ -121,7 +121,7 @@ class OneshotToolDetector:
             (
                 node,
                 GripperInformation(
-                    model=response.payload.model.value,
+                    model=model_versionstring_from_int(response.payload.model.value),
                     serial=OneshotToolDetector._decode_or_default(
                         response.payload.serial.value
                     ),

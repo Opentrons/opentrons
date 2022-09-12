@@ -5,16 +5,14 @@ This module has functions that you can import to save robot or
 labware calibration to its designated file location.
 """
 import typing
-from pathlib import Path
-
 from dataclasses import asdict
+
 from opentrons import config
 from opentrons.types import Mount, Point
-
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.util.helpers import utc_now
 
-from . import file_operators as io, types as local_types, helpers, migration
+from . import file_operators as io, types as local_types, helpers
 
 if typing.TYPE_CHECKING:
     from .dev_types import (
@@ -26,78 +24,6 @@ if typing.TYPE_CHECKING:
         GripperCalibrationData,
     )
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
-
-
-def _add_to_index_offset_file(parent: str, slot: str, uri: str, lw_hash: str) -> None:
-    """
-    A helper method to create or add to an index file so that calibration
-    files can be looked up by their hash to reveal the labware uri and
-    parent information of a given file.
-
-    :param parent: A labware object
-    :param slot
-    :param lw_hash: The labware hash of the calibration
-    """
-    offset = config.get_opentrons_path("labware_calibration_offsets_dir_v2")
-    index_file = offset / "index.json"
-    if index_file.exists():
-        migration.check_index_version(index_file)
-        blob = io.read_cal_file(str(index_file))
-    else:
-        blob = {}
-
-    full_id = f"{lw_hash}{parent}"
-    try:
-        blob["data"][full_id]
-    except KeyError:
-        if parent:
-            mod_dict = {"parent": parent, "fullParent": f"{slot}-{parent}"}
-        else:
-            mod_dict = {}
-        new_index_data = {"uri": f"{uri}", "slot": full_id, "module": mod_dict}
-        if blob.get("data"):
-            blob["data"][full_id] = new_index_data
-        else:
-            blob["data"] = {full_id: new_index_data}
-        blob["version"] = migration.MAX_VERSION
-        io.save_to_file(index_file, blob)
-
-
-def add_existing_labware_to_index_file(
-    definition: "LabwareDefinition", parent: str = "", slot: str = ""
-) -> None:
-    labware_hash = helpers.hash_labware_def(definition)
-    uri = helpers.uri_from_definition(definition)
-    _add_to_index_offset_file(parent, slot, uri, labware_hash)
-
-
-def save_labware_calibration(
-    labware_path: local_types.StrPath,
-    definition: "LabwareDefinition",
-    delta: Point,
-    slot: str = "",
-    parent: str = "",
-) -> None:
-    """
-    Function to be used whenever an updated delta is found for the first well
-    of a given labware. If an offset file does not exist, create the file
-    using labware id as the filename. If the file does exist, load it and
-    modify the delta and the lastModified fields under the "default" key.
-
-    :param labware_path: name of labware offset path
-    :param definition: full definition of the labware
-    :param delta: point you are saving
-    :param slot: slot the labware calibration is associated with
-    [not yet implemented so it will currently only be an empty string]
-    :param parent: parent of the labware, either a slot or a module.
-    """
-    offset_path = config.get_opentrons_path("labware_calibration_offsets_dir_v2")
-    labware_offset_path = offset_path / labware_path
-    labware_hash = helpers.hash_labware_def(definition)
-    uri = helpers.uri_from_definition(definition)
-    _add_to_index_offset_file(parent, slot, uri, labware_hash)
-    calibration_data = _helper_offset_data_format(str(labware_offset_path), delta)
-    io.save_to_file(labware_offset_path, calibration_data)
 
 
 def create_tip_length_data(
@@ -147,24 +73,6 @@ def _save_custom_tiprack_definition(
 
     custom_tr_def_path = custom_namespace_dir / f"{version}.json"
     io.save_to_file(custom_tr_def_path, definition)
-
-
-def _helper_offset_data_format(
-    filepath: str,
-    delta: Point,
-) -> typing.Dict[str, typing.Any]:
-    if not Path(filepath).is_file():
-        calibration_data = {
-            "default": {
-                "offset": [delta.x, delta.y, delta.z],
-                "lastModified": utc_now(),
-            }
-        }
-    else:
-        calibration_data = io.read_cal_file(filepath)
-        calibration_data["default"]["offset"] = [delta.x, delta.y, delta.z]
-        calibration_data["default"]["lastModified"] = utc_now()
-    return calibration_data
 
 
 def _append_to_index_tip_length_file(pip_id: str, lw_hash: str) -> None:

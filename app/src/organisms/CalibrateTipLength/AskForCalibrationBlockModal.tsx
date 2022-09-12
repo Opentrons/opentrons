@@ -32,6 +32,7 @@ interface Props {
   titleBarTitle: string
   closePrompt: () => void
 }
+
 export function AskForCalibrationBlockModal(props: Props): JSX.Element {
   const { t } = useTranslation(['robot_calibration', 'shared'])
   const [rememberPreference, setRememberPreference] = React.useState<boolean>(

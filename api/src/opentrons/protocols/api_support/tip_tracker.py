@@ -1,10 +1,10 @@
 from itertools import dropwhile, takewhile
 from typing import Optional, Sequence
 
-from opentrons.protocol_api.core.well import WellImplementation
+from opentrons.protocol_api.core.well import AbstractWellCore
 
 
-Wells = Sequence[WellImplementation]
+Wells = Sequence[AbstractWellCore]
 WellColumns = Sequence[Wells]
 
 
@@ -13,8 +13,8 @@ class TipTracker:
         self._columns = columns
 
     def next_tip(
-        self, num_tips: int = 1, starting_tip: Optional[WellImplementation] = None
-    ) -> Optional[WellImplementation]:
+        self, num_tips: int = 1, starting_tip: Optional[AbstractWellCore] = None
+    ) -> Optional[AbstractWellCore]:
         """
         Find the next valid well for pick-up.
 
@@ -54,7 +54,7 @@ class TipTracker:
 
         try:
             first_long_enough = long_enough[0]
-            result: Optional[WellImplementation] = first_long_enough[0]
+            result: Optional[AbstractWellCore] = first_long_enough[0]
         except IndexError:
             result = None
 
@@ -62,7 +62,7 @@ class TipTracker:
 
     def use_tips(
         self,
-        start_well: WellImplementation,
+        start_well: AbstractWellCore,
         num_channels: int = 1,
         fail_if_full: bool = False,
     ):
@@ -114,7 +114,7 @@ class TipTracker:
         for well in target_wells:
             well.set_has_tip(False)
 
-    def previous_tip(self, num_tips: int = 1) -> Optional[WellImplementation]:
+    def previous_tip(self, num_tips: int = 1) -> Optional[AbstractWellCore]:
         """
         Find the best well to drop a tip in.
 
@@ -142,7 +142,7 @@ class TipTracker:
         except IndexError:
             return None
 
-    def return_tips(self, start_well: WellImplementation, num_channels: int = 1):
+    def return_tips(self, start_well: AbstractWellCore, num_channels: int = 1):
         """
         Re-adds tips to the tip tracker
 

@@ -8,7 +8,7 @@ from opentrons_shared_data.protocol.dev_types import (
     JsonProtocol as LegacyJsonProtocolDict,
 )
 from opentrons.hardware_control import API as HardwareAPI
-
+from opentrons.config import feature_flags
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.protocol.models.protocol_schema_v6 import ProtocolSchemaV6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -368,6 +368,54 @@ def test_load_legacy_python(
             context=legacy_context,
         ),
     )
+
+
+# TODO(mc, 2022-08-30): remove enableProtocolEnginePAPICore FF
+# to promote feature to production
+def test_load_legacy_python_with_pe_papi_core(
+    decoy: Decoy,
+    legacy_file_reader: LegacyFileReader,
+    legacy_context_creator: LegacyContextCreator,
+    protocol_engine: ProtocolEngine,
+    mock_feature_flags: None,
+    subject: ProtocolRunner,
+) -> None:
+    """It should load a legacy context-based Python protocol."""
+    legacy_protocol_source = ProtocolSource(
+        directory=Path("/dev/null"),
+        main_file=Path("/dev/null/abc.py"),
+        files=[],
+        metadata={},
+        config=PythonProtocolConfig(api_version=APIVersion(2, 11)),
+        labware_definitions=[],
+    )
+
+    legacy_protocol = LegacyPythonProtocol(
+        text="",
+        contents="",
+        filename="protocol.py",
+        api_level=APIVersion(2, 11),
+        metadata={"foo": "bar"},
+        bundled_labware=None,
+        bundled_data=None,
+        bundled_python=None,
+        extra_labware=None,
+    )
+
+    legacy_context = decoy.mock(cls=LegacyProtocolContext)
+
+    decoy.when(feature_flags.enable_protocol_engine_papi_core()).then_return(True)
+
+    decoy.when(legacy_file_reader.read(legacy_protocol_source)).then_return(
+        legacy_protocol
+    )
+    decoy.when(legacy_context_creator.create(legacy_protocol)).then_return(
+        legacy_context
+    )
+
+    subject.load(legacy_protocol_source)
+
+    decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
 
 
 def test_load_legacy_json(

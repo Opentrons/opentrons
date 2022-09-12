@@ -34,10 +34,10 @@ export const StepMeter = (props: StepMeterProps): JSX.Element => {
     height: 100%;
     background-color: ${COLORS.blueEnabled};
     width: ${percentComplete};
-    webkit-transition: width 1s ease-in-out;
-    moz-transition: width 1s ease-in-out;
-    o-transition: width 1s ease-in-out;
-    transition: width 1s ease-in-out;
+    webkit-transition: width 0.5s ease-in-out;
+    moz-transition: width 0.5s ease-in-out;
+    o-transition: width 0.5s ease-in-out;
+    transition: width 0.5s ease-in-out;
   `
 
   return (

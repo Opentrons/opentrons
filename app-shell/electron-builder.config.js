@@ -4,20 +4,22 @@ const path = require('path')
 const { OT_APP_DEPLOY_BUCKET, OT_APP_DEPLOY_FOLDER } = process.env
 const DEV_MODE = process.env.NODE_ENV !== 'production'
 const USE_PYTHON = process.env.NO_PYTHON !== 'true'
+const NO_USB_DETECTION = process.env.NO_USB_DETECTION === 'true'
 
 module.exports = {
   appId: 'com.opentrons.app',
   electronVersion: '13.1.8',
   files: [
     '**/*',
+    'build/br-premigration-wheels',
+    '!Makefile',
+    '!python',
+    NO_USB_DETECTION ? '!node_modules/usb-detection' : '',
     {
       from: '../app/dist',
       to: './ui',
       filter: ['**/*'],
     },
-    'build/br-premigration-wheels',
-    '!Makefile',
-    '!python',
   ],
   extraResources: USE_PYTHON ? ['python'] : [],
   /* eslint-disable no-template-curly-in-string */

@@ -1278,8 +1278,7 @@
         "labwareId": "destPlateId",
         "location": {
           "moduleId": "magneticModuleId"
-        },
-        "displayName": "Sample Collection Plate"
+        }
       }
     },
     {

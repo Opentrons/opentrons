@@ -9,7 +9,7 @@ import styles from './styles.css'
 const HEADING = 'Before continuing, please remove:'
 
 /**
- * @deprecated Use CheckDeckModalProps
+ * @deprecated Use {@link ClearDeckModalProps}
  */
 interface ClearDeckAlertModalProps {
   onContinueClick?: () => unknown
@@ -22,7 +22,7 @@ interface ClearDeckAlertModalProps {
 }
 
 /**
- * @deprecated Use {@link CheckDeckModal}
+ * @deprecated Use {@link ClearDeckModal}
  */
 export function ClearDeckAlertModal(
   props: ClearDeckAlertModalProps

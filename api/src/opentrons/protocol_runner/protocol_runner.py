@@ -1,6 +1,7 @@
 """Protocol run control and management."""
 from typing import List, NamedTuple, Optional
 
+from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_reader import (
     ProtocolSource,
@@ -16,7 +17,6 @@ from .python_file_reader import PythonFileReader
 from .python_context_creator import PythonContextCreator
 from .python_executor import PythonExecutor
 from .legacy_context_plugin import LegacyContextPlugin
-from .legacy_labware_offset_provider import LegacyLabwareOffsetProvider
 from .legacy_wrappers import (
     LEGACY_PYTHON_API_VERSION_CUTOFF,
     LEGACY_JSON_SCHEMA_VERSION_CUTOFF,
@@ -72,9 +72,7 @@ class ProtocolRunner:
         self._legacy_file_reader = legacy_file_reader or LegacyFileReader()
         self._legacy_context_creator = legacy_context_creator or LegacyContextCreator(
             hardware_api=hardware_api,
-            labware_offset_provider=LegacyLabwareOffsetProvider(
-                labware_view=protocol_engine.state_view.labware,
-            ),
+            protocol_engine=protocol_engine,
         )
         self._legacy_executor = legacy_executor or LegacyExecutor()
         # TODO(mc, 2022-01-11): replace task queue with specific implementations
@@ -178,12 +176,13 @@ class ProtocolRunner:
         protocol = self._legacy_file_reader.read(protocol_source)
         context = self._legacy_context_creator.create(protocol)
 
-        self._protocol_engine.add_plugin(
-            LegacyContextPlugin(
-                hardware_api=self._hardware_api,
-                protocol_context=context,
+        if not feature_flags.enable_protocol_engine_papi_core():
+            self._protocol_engine.add_plugin(
+                LegacyContextPlugin(
+                    hardware_api=self._hardware_api,
+                    protocol_context=context,
+                )
             )
-        )
 
         self._task_queue.set_run_func(
             func=self._legacy_executor.execute,
