@@ -203,7 +203,7 @@ class ProtocolSchemaV6(BaseModel):
             ):
                 raise ValueError(
                     f"{command.commandType} command at index {index}"
-                    f" references ID {command.params.pipetteId},"
+                    f" references ID {command.params.labwareId},"
                     f" which doesn't exist."
                 )
             if (
@@ -212,7 +212,7 @@ class ProtocolSchemaV6(BaseModel):
             ):
                 raise ValueError(
                     f"{command.commandType} command at index {index}"
-                    f" references ID {command.params.pipetteId},"
+                    f" references ID {command.params.moduleId},"
                     f" which doesn't exist."
                 )
             if (
@@ -221,7 +221,7 @@ class ProtocolSchemaV6(BaseModel):
             ):
                 raise ValueError(
                     f"{command.commandType} command at index {index}"
-                    f" references ID {command.params.pipetteId},"
+                    f" references ID {command.params.liquidId},"
                     f" which doesn't exist."
                 )
 

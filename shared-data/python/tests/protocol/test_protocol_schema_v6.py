@@ -41,21 +41,13 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
                 protocol_schema_v6.Command(
                     commandType="loadLabware",
                     params=protocol_schema_v6.Params(labwareId="labware-id-3"),
-                ),
-                protocol_schema_v6.Command(
-                    commandType="loadPipette",
-                    params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
-                ),
+                )
             ],
             "labware-id-3",
             "loadLabware",
         ),
         (
             [
-                protocol_schema_v6.Command(
-                    commandType="loadLabware",
-                    params=protocol_schema_v6.Params(labwareId="labware-id-1"),
-                ),
                 protocol_schema_v6.Command(
                     commandType="loadPipette",
                     params=protocol_schema_v6.Params(pipetteId="pipette-id-3"),
@@ -67,14 +59,6 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
         (
             [
                 protocol_schema_v6.Command(
-                    commandType="loadLabware",
-                    params=protocol_schema_v6.Params(labwareId="labware-id-1"),
-                ),
-                protocol_schema_v6.Command(
-                    commandType="loadPipette",
-                    params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
-                ),
-                protocol_schema_v6.Command(
                     commandType="loadLiquid",
                     params=protocol_schema_v6.Params(liquidId="liquid-id-3"),
                 ),
@@ -84,14 +68,6 @@ def delete_unexpected_results(protocol_fixture: Dict[str, Any]) -> None:
         ),
         (
             [
-                protocol_schema_v6.Command(
-                    commandType="loadLabware",
-                    params=protocol_schema_v6.Params(labwareId="labware-id-1"),
-                ),
-                protocol_schema_v6.Command(
-                    commandType="loadPipette",
-                    params=protocol_schema_v6.Params(pipetteId="pipette-id-1"),
-                ),
                 protocol_schema_v6.Command(
                     commandType="loadModule",
                     params=protocol_schema_v6.Params(moduleId="module-id-3"),
@@ -119,7 +95,7 @@ def test_schema_validators(
     modules = {"module-id-1": protocol_schema_v6.Module(model="model-1")}
     with pytest.raises(
         ValueError,
-        match=f"There seems to be a problem with the uploaded json protocol. {load_command} is missing {missing_id} in referencing object.",
+        match=f"{load_command} command at index 0 references ID {missing_id}, which doesn't exist.",
     ):
         protocol_schema_v6.ProtocolSchemaV6(
             otSharedSchema="#/protocol/schemas/6",
