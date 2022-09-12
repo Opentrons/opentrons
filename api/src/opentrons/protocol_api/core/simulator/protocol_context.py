@@ -7,9 +7,9 @@ from opentrons.types import Mount
 from ..protocol import AbstractProtocol
 from ..protocol_api.protocol_context import ProtocolContextImplementation
 from ..protocol_api.labware import LabwareImplementation
+from ..protocol_api.load_info import InstrumentLoadInfo
 
 from .instrument_context import InstrumentContextSimulation
-
 
 logger = logging.getLogger(__name__)
 
@@ -50,5 +50,13 @@ class ProtocolContextSimulation(
             api_version=self._api_version,
         )
         self._instruments[mount] = new_instr
+
         logger.info(f"Instrument {new_instr} loaded")
+        self._equipment_broker.publish(
+            InstrumentLoadInfo(
+                instrument_load_name=instrument_name.value,
+                mount=mount,
+            )
+        )
+
         return new_instr

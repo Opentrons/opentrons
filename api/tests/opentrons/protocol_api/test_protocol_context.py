@@ -8,8 +8,7 @@ from decoy import Decoy, matchers
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
-from opentrons.types import Mount, Point, DeckSlotName
-from opentrons.equipment_broker import EquipmentBroker
+from opentrons.types import Mount, DeckSlotName
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ProtocolContext,
@@ -17,28 +16,9 @@ from opentrons.protocol_api import (
     Labware,
     validation,
 )
+from opentrons.protocol_api.core.labware import LabwareLoadParams
 
-from opentrons.protocol_api.load_info import LoadInfo, LabwareLoadInfo
-
-from opentrons.protocol_api.core.protocol import (
-    AbstractProtocol as BaseAbstractProtocol,
-)
-from opentrons.protocol_api.core.instrument import (
-    AbstractInstrument as BaseAbstractInstrument,
-)
-from opentrons.protocol_api.core.labware import (
-    AbstractLabware as BaseAbstractLabware,
-    LabwareLoadParams,
-)
-from opentrons.protocol_api.core.well import AbstractWellCore
-from opentrons.protocol_api.core.labware_offset_provider import (
-    AbstractLabwareOffsetProvider,
-    ProvidedLabwareOffset,
-)
-
-AbstractInstrument = BaseAbstractInstrument[AbstractWellCore]
-AbstractLabware = BaseAbstractLabware[AbstractWellCore]
-AbstractProtocol = BaseAbstractProtocol[AbstractInstrument, AbstractLabware]
+from .types import InstrumentCore, LabwareCore, ProtocolCore
 
 
 @pytest.fixture(autouse=True)
@@ -48,45 +28,27 @@ def _mock_validation_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> No
 
 
 @pytest.fixture
-def mock_core(decoy: Decoy) -> AbstractProtocol:
+def mock_core(decoy: Decoy) -> ProtocolCore:
     """Get a mock implementation core."""
-    return decoy.mock(cls=AbstractProtocol)
+    return decoy.mock(cls=ProtocolCore)
 
 
 @pytest.fixture
-def mock_labware_offset_provider(decoy: Decoy) -> AbstractLabwareOffsetProvider:
-    """Get a mock offset provider core."""
-    return decoy.mock(cls=AbstractLabwareOffsetProvider)
-
-
-@pytest.fixture
-def mock_equipment_broker(decoy: Decoy) -> EquipmentBroker[LoadInfo]:
-    """Get a mock equipment broker."""
-    return decoy.mock(cls=EquipmentBroker)
-
-
-@pytest.fixture
-def subject(
-    mock_core: AbstractProtocol,
-    mock_labware_offset_provider: AbstractLabwareOffsetProvider,
-    mock_equipment_broker: EquipmentBroker[LoadInfo],
-) -> ProtocolContext:
+def subject(mock_core: ProtocolCore) -> ProtocolContext:
     """Get a ProtocolContext test subject with its dependencies mocked out."""
     return ProtocolContext(
         api_version=MAX_SUPPORTED_VERSION,
         implementation=mock_core,
-        labware_offset_provider=mock_labware_offset_provider,
-        equipment_broker=mock_equipment_broker,
     )
 
 
 def test_load_instrument(
     decoy: Decoy,
-    mock_core: AbstractProtocol,
+    mock_core: ProtocolCore,
     subject: ProtocolContext,
 ) -> None:
     """It should create a instrument using its execution core."""
-    mock_instrument_core = decoy.mock(cls=AbstractInstrument)
+    mock_instrument_core = decoy.mock(cls=InstrumentCore)
 
     decoy.when(validation.ensure_mount("shadowfax")).then_return(Mount.LEFT)
 
@@ -114,10 +76,10 @@ def test_load_instrument(
 
 
 def test_load_instrument_replace(
-    decoy: Decoy, mock_core: AbstractProtocol, subject: ProtocolContext
+    decoy: Decoy, mock_core: ProtocolCore, subject: ProtocolContext
 ) -> None:
     """It should allow/disallow pipette replacement."""
-    mock_instrument_core = decoy.mock(cls=AbstractInstrument)
+    mock_instrument_core = decoy.mock(cls=InstrumentCore)
 
     decoy.when(validation.ensure_mount(matchers.IsA(Mount))).then_return(Mount.RIGHT)
     decoy.when(validation.ensure_pipette_name(matchers.IsA(str))).then_return(
@@ -145,16 +107,11 @@ def test_load_instrument_replace(
 
 def test_load_labware(
     decoy: Decoy,
-    mock_labware_offset_provider: AbstractLabwareOffsetProvider,
-    mock_equipment_broker: EquipmentBroker[LoadInfo],
-    mock_core: AbstractProtocol,
+    mock_core: ProtocolCore,
     subject: ProtocolContext,
 ) -> None:
     """It should create a labware using its execution core."""
-    mock_labware_core = decoy.mock(cls=AbstractLabware)
-    labware_load_params = LabwareLoadParams("you", "are", 1337)
-    labware_definition_dict = cast(LabwareDefDict, {"labwareDef": True})
-    labware_offset = ProvidedLabwareOffset(delta=Point(1, 2, 3), offset_id="offset-123")
+    mock_labware_core = decoy.mock(cls=LabwareCore)
 
     decoy.when(validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_5)
 
@@ -168,20 +125,7 @@ def test_load_labware(
         )
     ).then_return(mock_labware_core)
 
-    decoy.when(mock_labware_core.get_user_display_name()).then_return(
-        "Some Display Name"
-    )
     decoy.when(mock_labware_core.get_name()).then_return("Full Name")
-    decoy.when(mock_labware_core.get_load_params()).then_return(labware_load_params)
-    decoy.when(mock_labware_core.get_definition()).then_return(labware_definition_dict)
-
-    decoy.when(
-        mock_labware_offset_provider.find(
-            load_params=labware_load_params,
-            requested_module_model=None,
-            deck_slot=DeckSlotName.SLOT_5,
-        )
-    ).then_return(labware_offset)
 
     result = subject.load_labware(
         load_name="some_labware",
@@ -194,44 +138,23 @@ def test_load_labware(
     assert isinstance(result, Labware)
     assert result.name == "Full Name"
 
-    decoy.verify(
-        # TODO(mc, 2022-09-02): labware offset provider to legacy core
-        mock_labware_core.set_calibration(labware_offset.delta),
-        # TODO(mc, 2022-09-02): move equipment broker to legacy core
-        mock_equipment_broker.publish(
-            LabwareLoadInfo(
-                labware_definition=labware_definition_dict,
-                labware_namespace=labware_load_params.namespace,
-                labware_load_name=labware_load_params.load_name,
-                labware_version=labware_load_params.version,
-                deck_slot=DeckSlotName.SLOT_5,
-                on_module=False,
-                offset_id="offset-123",
-                labware_display_name="Some Display Name",
-            )
-        ),
-    )
-
 
 def test_load_labware_from_definition(
     decoy: Decoy,
-    mock_labware_offset_provider: AbstractLabwareOffsetProvider,
-    mock_equipment_broker: EquipmentBroker[LoadInfo],
-    mock_core: AbstractProtocol,
+    mock_core: ProtocolCore,
     subject: ProtocolContext,
 ) -> None:
     """It should be able to load a labware from a definition dictionary."""
-    mock_labware_core = decoy.mock(cls=AbstractLabware)
+    mock_labware_core = decoy.mock(cls=LabwareCore)
 
     labware_definition_dict = cast(LabwareDefDict, {"labwareDef": True})
     labware_load_params = LabwareLoadParams("you", "are", 1337)
-    labware_offset = ProvidedLabwareOffset(delta=Point(1, 2, 3), offset_id="offset-123")
 
     decoy.when(validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_1)
     decoy.when(mock_core.add_labware_definition(labware_definition_dict)).then_return(
         labware_load_params
     )
-    decoy.when(mock_labware_core.get_load_params()).then_return(labware_load_params)
+
     decoy.when(mock_labware_core.get_name()).then_return("Full Name")
 
     decoy.when(
@@ -243,14 +166,6 @@ def test_load_labware_from_definition(
             label="Some Display Name",
         )
     ).then_return(mock_labware_core)
-
-    decoy.when(
-        mock_labware_offset_provider.find(
-            load_params=labware_load_params,
-            requested_module_model=None,
-            deck_slot=DeckSlotName.SLOT_1,
-        )
-    ).then_return(labware_offset)
 
     result = subject.load_labware_from_definition(
         labware_def=labware_definition_dict,
