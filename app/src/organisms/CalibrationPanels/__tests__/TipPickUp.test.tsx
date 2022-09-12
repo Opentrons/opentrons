@@ -53,6 +53,7 @@ describe('TipPickUp', () => {
       data: { vector: [0, -0.1, 0] },
     })
   })
+
   it('clicking pick up tip sends pick up tip command', () => {
     const { getByRole } = render()[0]
     getByRole('button', { name: 'Pick up tip' }).click()
