@@ -20,7 +20,6 @@ from opentrons.protocol_runner import create_simulating_runner
 from opentrons.protocol_engine import Command, ErrorOccurrence
 
 
-
 @click.command()
 @click.argument(
     "files",
