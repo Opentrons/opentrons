@@ -159,6 +159,7 @@ class ProtocolSchemaV6(BaseModel):
     modules: Optional[Dict[str, Module]]
     liquids: Optional[Dict[str, Liquid]]
     labwareDefinitions: Dict[str, LabwareDefinition]
+    # commands must be after pipettes, labware, etc. for its @validator to work.
     commands: List[Command]
     commandAnnotations: Optional[List[CommandAnnotation]]
     designerApplication: Optional[DesignerApplication]
