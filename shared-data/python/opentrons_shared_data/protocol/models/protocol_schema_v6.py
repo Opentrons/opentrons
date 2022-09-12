@@ -187,7 +187,7 @@ class ProtocolSchemaV6(BaseModel):
             else set()
         )
 
-        for command in value:
+        for index, command in enumerate(value):
             if (
                 command.params.pipetteId is not None
                 and command.params.pipetteId not in pipette_ids
