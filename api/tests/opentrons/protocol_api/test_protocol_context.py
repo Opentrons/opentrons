@@ -205,6 +205,40 @@ def test_load_module(
         TemperatureModuleModel.TEMPERATURE_V2
     )
     decoy.when(mock_module_core.get_serial_number()).then_return("cap'n crunch")
+    decoy.when(mock_module_core.get_deck_slot()).then_return(DeckSlotName.SLOT_3)
+
+    result = subject.load_module(module_name="spline reticulator", location=42)
+
+    assert isinstance(result, ModuleContext)
+    assert subject.loaded_modules[3] is result
+
+
+def test_load_module_default_location(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    subject: ProtocolContext,
+) -> None:
+    """It should load a module without specifying a location explicitely."""
+    mock_module_core = decoy.mock(cls=ModuleCore)
+
+    decoy.when(validation.ensure_module_model("spline reticulator")).then_return(
+        TemperatureModuleModel.TEMPERATURE_V1
+    )
+
+    decoy.when(
+        mock_core.load_module(
+            model=TemperatureModuleModel.TEMPERATURE_V1,
+            deck_slot=None,
+            configuration=None,
+        )
+    ).then_return(mock_module_core)
+
+    decoy.when(mock_module_core.get_type()).then_return(ModuleType.TEMPERATURE)
+    decoy.when(mock_module_core.get_model()).then_return(
+        TemperatureModuleModel.TEMPERATURE_V2
+    )
+    decoy.when(mock_module_core.get_serial_number()).then_return("cap'n crunch")
+    decoy.when(mock_module_core.get_deck_slot()).then_return(DeckSlotName.SLOT_3)
 
     result = subject.load_module(module_name="spline reticulator", location=42)
 

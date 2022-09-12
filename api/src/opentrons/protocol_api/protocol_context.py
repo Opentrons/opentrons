@@ -424,7 +424,7 @@ class ProtocolContext(CommandPublisher):
             api_version=self._api_version,
         )
 
-        self._modules[deck_slot] = module_context
+        self._modules[module_core.get_deck_slot()] = module_context
 
         return module_context
 

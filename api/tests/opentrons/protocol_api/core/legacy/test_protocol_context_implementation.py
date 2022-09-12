@@ -210,7 +210,6 @@ def test_load_labware(
 
 def test_load_labware_on_module(
     decoy: Decoy,
-    mock_deck: Deck,
     mock_labware_offset_provider: AbstractLabwareOffsetProvider,
     mock_equipment_broker: EquipmentBroker[LoadInfo],
     subject: ProtocolContextImplementation,
