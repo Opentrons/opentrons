@@ -11,12 +11,12 @@ from contextlib import asynccontextmanager
 
 log = logging.getLogger(__name__)
 
-_dfu_transition_lock = ThreadedAsyncLock()
+_update_transition_lock = ThreadedAsyncLock()
 
 
 @asynccontextmanager
-async def protect_dfu_transition() -> AsyncGenerator[None, None]:
-    async with _dfu_transition_lock.lock():
+async def protect_update_transition() -> AsyncGenerator[None, None]:
+    async with _update_transition_lock.lock():
         yield
 
 
@@ -29,18 +29,19 @@ async def update_firmware(
 
     raises an UpdateError with the reason for the failure.
     """
-    flash_port_or_dfu_serial = await module.prep_for_update()
-    kwargs: Dict[str, Any] = {
-        "stdout": asyncio.subprocess.PIPE,
-        "stderr": asyncio.subprocess.PIPE,
-        "loop": loop,
-    }
-    successful, res = await module.bootloader()(
-        flash_port_or_dfu_serial, str(firmware_file), kwargs
-    )
-    if not successful:
-        log.info(f"Bootloader reponse: {res}")
-        raise UpdateError(res)
+    async with protect_update_transition():
+        flash_port_or_dfu_serial = await module.prep_for_update()
+        kwargs: Dict[str, Any] = {
+            "stdout": asyncio.subprocess.PIPE,
+            "stderr": asyncio.subprocess.PIPE,
+            "loop": loop,
+        }
+        successful, res = await module.bootloader()(
+            flash_port_or_dfu_serial, str(firmware_file), kwargs
+        )
+        if not successful:
+            log.info(f"Bootloader reponse: {res}")
+            raise UpdateError(res)
 
 
 async def find_bootloader_port() -> str:
