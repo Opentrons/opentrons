@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.1.0-beta.0...v6.1.0-alpha.4) (2022-09-13)
+
+
+### Bug Fixes
+
+* **api:** ensure pipette cannot move down from origin to travel height ([#11426](https://github.com/Opentrons/opentrons/issues/11426)) ([c0905f6](https://github.com/Opentrons/opentrons/commit/c0905f6b932a91b1779b826a0a7c5c0dedfa6584))
+* **app:** fix pipette settings when allPipetteConfig FF is on ([#11397](https://github.com/Opentrons/opentrons/issues/11397)) ([685cb0b](https://github.com/Opentrons/opentrons/commit/685cb0bf40eed546e639f1ac98b52165afe39d55))
+* **app:** unattached pipette calibration bugfix ([#11412](https://github.com/Opentrons/opentrons/issues/11412)) ([59c1cff](https://github.com/Opentrons/opentrons/commit/59c1cffff871b17c0a7c1813e79823913146a0e7))
+* **app:** update factoryreset options description ([#11433](https://github.com/Opentrons/opentrons/issues/11433)) ([db4d918](https://github.com/Opentrons/opentrons/commit/db4d9182957dd86511be944c403afa155f2a2f54))
+* **heater-shaker:** fix async error handling ([#11400](https://github.com/Opentrons/opentrons/issues/11400)) ([c67e8e3](https://github.com/Opentrons/opentrons/commit/c67e8e39a5e4cee24d2a86c808280430dcfaa12b))
+* **heater-shaker:** updated dfu locking mechanism ([#11395](https://github.com/Opentrons/opentrons/issues/11395)) ([86f674f](https://github.com/Opentrons/opentrons/commit/86f674fbb085e9ce6d3e354123144778a907f918))
+
+### Features
+
+* **app:** add error banner + modal if H-S or TC is in error ([#11382](https://github.com/Opentrons/opentrons/issues/11382)) ([09fbba3](https://github.com/Opentrons/opentrons/commit/09fbba393645809e8742985732ba398fc3af34e3))
+* **api:** reduce target speed delta from 100rpm to 40rpm ([#11413](https://github.com/Opentrons/opentrons/issues/11413)) ([d1f9619](https://github.com/Opentrons/opentrons/commit/d1f961998686e2ff1a2ab6be1065635dbc52034c))
+
+
+
+
 # [6.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.3...v6.1.0-beta.0) (2022-08-29)
 
 **Note:** Version bump only for package opentrons

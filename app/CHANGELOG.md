@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.1.0-beta.0...v6.1.0-alpha.4) (2022-09-13)
+
+
+### Bug Fixes
+
+* **app:** fix pipette settings when allPipetteConfig FF is on ([#11397](https://github.com/Opentrons/opentrons/issues/11397)) ([685cb0b](https://github.com/Opentrons/opentrons/commit/685cb0bf40eed546e639f1ac98b52165afe39d55))
+* **app:** unattached pipette calibration bugfix ([#11412](https://github.com/Opentrons/opentrons/issues/11412)) ([59c1cff](https://github.com/Opentrons/opentrons/commit/59c1cffff871b17c0a7c1813e79823913146a0e7))
+* **app:** update factoryreset options description ([#11433](https://github.com/Opentrons/opentrons/issues/11433)) ([db4d918](https://github.com/Opentrons/opentrons/commit/db4d9182957dd86511be944c403afa155f2a2f54))
+
+
+### Features
+
+* **app:** add error banner + modal if H-S or TC is in error ([#11382](https://github.com/Opentrons/opentrons/issues/11382)) ([09fbba3](https://github.com/Opentrons/opentrons/commit/09fbba393645809e8742985732ba398fc3af34e3))
+
+
+
+
+
 # [6.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.3...v6.1.0-beta.0) (2022-08-29)
 
 
