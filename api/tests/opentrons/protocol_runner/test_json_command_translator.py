@@ -387,7 +387,7 @@ def _make_json_protocol(
     }
 ) -> protocol_schema_v6.ProtocolSchemaV6:
     """Return a minimal JsonProtocol with the given elements, to use as test input."""
-    return protocol_schema_v6.ProtocolSchemaV6(
+    return protocol_schema_v6.ProtocolSchemaV6.construct(
         # schemaVersion is arbitrary. Currently (2021-06-28), JsonProtocol.parse_obj()
         # isn't smart enough to validate differently depending on this field.
         otSharedSchema="#/protocol/schemas/6",
