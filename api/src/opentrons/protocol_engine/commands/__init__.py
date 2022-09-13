@@ -17,6 +17,7 @@ from . import heater_shaker
 from . import magnetic_module
 from . import temperature_module
 from . import thermocycler
+from . import calibration
 
 from . import calibration
 
@@ -203,6 +204,7 @@ from .blow_out import (
     BlowOutImplementation,
     BlowOut,
 )
+
 
 __all__ = [
     # command type unions
