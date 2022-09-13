@@ -6,6 +6,7 @@ from . import heater_shaker
 from . import magnetic_module
 from . import temperature_module
 from . import thermocycler
+from . import calibration
 
 from . import calibration
 
@@ -198,6 +199,7 @@ Command = Union[
     SavePosition,
     SetRailLights,
     TouchTip,
+    calibration.CalibrationSetUpPosition,
     heater_shaker.WaitForTemperature,
     heater_shaker.SetTargetTemperature,
     heater_shaker.DeactivateHeater,
@@ -245,6 +247,7 @@ CommandParams = Union[
     SavePositionParams,
     SetRailLightsParams,
     TouchTipParams,
+    calibration.CalibrationSetUpPositionParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -293,6 +296,7 @@ CommandType = Union[
     SavePositionCommandType,
     SetRailLightsCommandType,
     TouchTipCommandType,
+    calibration.CalibrationSetUpPositionCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -339,6 +343,7 @@ CommandCreate = Union[
     SavePositionCreate,
     SetRailLightsCreate,
     TouchTipCreate,
+    calibration.CalibrationSetUpPositionCreate,
     heater_shaker.WaitForTemperatureCreate,
     heater_shaker.SetTargetTemperatureCreate,
     heater_shaker.DeactivateHeaterCreate,
@@ -386,6 +391,7 @@ CommandResult = Union[
     SavePositionResult,
     SetRailLightsResult,
     TouchTipResult,
+    calibration.CalibrationSetUpPositionResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,

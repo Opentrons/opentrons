@@ -19,8 +19,6 @@ from . import temperature_module
 from . import thermocycler
 from . import calibration
 
-from . import calibration
-
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
