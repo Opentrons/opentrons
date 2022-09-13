@@ -11,7 +11,7 @@ interface NavTabProps {
 }
 
 const StyledNavLink = styled(NavLink)<
-  React.ComponentProps<typeof NavLink> & { disabled: boolean }
+  React.ComponentProps<typeof NavLink> /* & { disabled: boolean } */
 >`
   padding: 0 ${SPACING.spacing2} ${SPACING.spacing3};
   ${TYPOGRAPHY.labelSemiBold}
@@ -29,7 +29,12 @@ export function NavTab({
   disabled = false,
 }: NavTabProps): JSX.Element {
   return (
-    <StyledNavLink to={to} replace disabled={disabled}>
+    <StyledNavLink
+      to={to}
+      replace
+      // disabled={disabled}
+      style={{ pointerEvents: disabled ? 'none' : 'auto' }}
+    >
       {tabName}
     </StyledNavLink>
   )
