@@ -18,7 +18,6 @@ interface WizardHeaderProps {
   totalSteps: number
   currentStep: number | null
   title: string
-  isErrorState?: boolean
   onExit?: () => void
 }
 
@@ -32,19 +31,8 @@ const EXIT_BUTTON_STYLE = css`
   }
 `
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
-  const { totalSteps, currentStep, title, isErrorState, onExit } = props
+  const { totalSteps, currentStep, title, onExit } = props
   const { t } = useTranslation('shared')
-
-  let stepCounter: JSX.Element | null = null
-  if (isErrorState) {
-    stepCounter = null
-  } else if (currentStep != null && currentStep > 0) {
-    stepCounter = (
-      <StyledText css={TYPOGRAPHY.pSemiBold} color={COLORS.darkGreyEnabled}>
-        {t('step', { current: currentStep, max: totalSteps })}
-      </StyledText>
-    )
-  }
 
   return (
     <Box backgroundColor={COLORS.white}>

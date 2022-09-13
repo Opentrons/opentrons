@@ -151,9 +151,6 @@ export function RobotSettingsCalibration({
   })
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
   const dispatch = useDispatch<Dispatch>()
-  const enableCalibrationWizards = Config.useFeatureFlag(
-    'enableCalibrationWizards'
-  )
 
   React.useEffect(() => {
     dispatch(fetchAllSessions(robotName))
