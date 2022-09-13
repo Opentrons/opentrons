@@ -375,7 +375,7 @@ def _make_json_protocol(
     },
     labware_definitions: Dict[str, LabwareDefinition] = {
         "example/plate/1": _load_labware_definition_data(),
-        "example/trash/1": _load_labware_definition_data()
+        "example/trash/1": _load_labware_definition_data(),
     },
     labware: Dict[str, protocol_schema_v6.Labware] = {
         "labware-id-1": protocol_schema_v6.Labware(
@@ -388,7 +388,7 @@ def _make_json_protocol(
     commands: List[protocol_schema_v6.Command] = [],
     modules: Dict[str, protocol_schema_v6.Module] = {
         "module-id-1": protocol_schema_v6.Module(model="magneticModuleV2"),
-        "module-id-2": protocol_schema_v6.Module(model="thermocyclerModuleV2")
+        "module-id-2": protocol_schema_v6.Module(model="thermocyclerModuleV2"),
     }
 ) -> protocol_schema_v6.ProtocolSchemaV6:
     """Return a minimal JsonProtocol with the given elements, to use as test input."""
