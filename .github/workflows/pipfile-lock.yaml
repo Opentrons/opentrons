@@ -3,7 +3,7 @@
 # will only create a PR if there is a diff
 # TODO(@y3rsh, 2022-09-12):
 # Add in hardware and hardware testing
-name: 'Create PR on macos-12 for Pipfile.lock'
+name: 'pipenv lock on Ubuntu'
 
 on:
   pull_request:
@@ -53,6 +53,10 @@ jobs:
             buildComplexEnvVars(core, context)
       - name: Install pipenv
         run: pip install pipenv==2021.5.29
+      - name: Install libsystemd-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libsystemd-dev
       - name: Install ${{ matrix.folder }}
         working-directory: ${{ matrix.folder }}
         run: pipenv lock -d -v
