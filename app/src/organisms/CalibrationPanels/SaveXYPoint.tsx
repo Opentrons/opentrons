@@ -244,6 +244,9 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
             autoPlay={true}
             loop={true}
             controls={false}
+            aria-label={`${mount} ${
+              isMulti ? 'multi' : 'single'
+            } channel pipette moving to slot ${slotNumber}`}
           >
             <source src={demoAsset} />
           </video>

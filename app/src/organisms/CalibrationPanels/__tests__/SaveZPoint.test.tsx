@@ -1,5 +1,5 @@
-import { renderWithProviders } from '@opentrons/components'
 import * as React from 'react'
+import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 
 import { mockDeckCalTipRack, mockTipLengthCalBlock } from '../../../redux/sessions/__fixtures__'
