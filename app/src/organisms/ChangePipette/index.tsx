@@ -344,8 +344,14 @@ export function ChangePipette(props: Props): JSX.Element | null {
       <ModalShell width="42.375rem">
         <WizardHeader
           totalSteps={eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS}
-          currentStep={isSelectPipetteStep ? 0 : currentStep}
-          isErrorState={!success && wizardStep === CONFIRM}
+          currentStep={
+            // TODO (BC, 2022-09-13): the logic that calculates the current step is very complex, reduce it to a util for clarity and testing
+            !success && wizardStep === CONFIRM
+              ? null
+              : isSelectPipetteStep
+              ? 0
+              : currentStep
+          }
           title={wizardTitle}
           onExit={exitWizardHeader}
         />
