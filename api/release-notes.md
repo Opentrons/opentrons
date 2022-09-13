@@ -13,17 +13,16 @@ Welcome to the v6.1.0 beta release of the OT-2 software! This release adds suppo
 ## New Features
 
 - Heater-Shaker support
-  - The OT-2 can run JSON and Python protocols that control the Heater-Shaker Module.
-  - Implements restrictions on module and labware placement around the Heater-Shaker.
-  - When possible, the OT-2 will automatically move its pipettes or the Heater-Shaker's labware latch to shake safely and avoid crashes.
-  - The OT-2 can update the firmware on an attached Heater-Shaker.
+  - The OT-2 can run JSON and Python protocols that control the Heater-Shaker Module
+  - Implements restrictions on module and labware placement around the Heater-Shaker
+  - When possible, the OT-2 will automatically move its pipettes or the Heater-Shaker's labware latch to shake safely and avoid crashes
+  - The OT-2 can update the firmware on an attached Heater-Shaker
 
 ## Bug Fixes
 
-- Improved tip pickup and drop behavior.
-- Fixed issues when running Thermocycler profiles.
-- Fixed a bug that prevented pipetting to arbitrary deck coordinates.
-- Fixed a bug that prevented changing pipette settings when the allPipetteConfig feature-flag is ON
+- Improved tip pickup and drop behavior
+- Fixed issues when running Thermocycler profiles
+- Fixed a bug that prevented pipetting to arbitrary deck coordinates
 
 
 ## Known Issues
