@@ -22,8 +22,8 @@ Welcome to the v6.1.0 beta release of the Opentrons App! This release focuses on
 
 - Improvements to the run log, including properly listing labware that is on top of a module.
 - Interface fixes and improvements.
-- Fixed a behavior where starting tip-length calibration for not-attached pipette silently failed
-- Fixed factory reset options' description
+- Tip Length Calibration no longer silently fails when the chosen pipette is not attached
+- Clarified what data is deleted when performing a factory reset of protocol run history
 
 ## Known Issues
 
