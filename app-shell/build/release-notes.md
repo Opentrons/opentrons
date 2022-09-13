@@ -26,7 +26,6 @@ Welcome to the v6.1.0 beta release of the Opentrons App! This release focuses on
 - Clarified what data is deleted when performing a factory reset of protocol run history
 - Fixed a bug that prevented changing pipette settings when the 'All Pipette Config' feature flag is on
 
-
 ## Known Issues
 
 This beta is a work in progress! We'll be addressing issues in upcoming releases of 6.1.0.
