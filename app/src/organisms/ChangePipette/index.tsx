@@ -32,7 +32,7 @@ import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { StyledText } from '../../atoms/text'
-import { useCalibratePipetteOffset } from '../DeprecatedCalibratePipetteOffset/useCalibratePipetteOffset'
+import { useDeprecatedCalibratePipetteOffset } from '../DeprecatedCalibratePipetteOffset/useDeprecatedCalibratePipetteOffset'
 import { ExitModal } from './ExitModal'
 import { Instructions } from './Instructions'
 import { ClearDeckModal } from './ClearDeckModal/index'
@@ -127,7 +127,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
   const [
     startPipetteOffsetCalibration,
     PipetteOffsetCalibrationWizard,
-  ] = useCalibratePipetteOffset(robotName, { mount }, closeModal)
+  ] = useDeprecatedCalibratePipetteOffset(robotName, { mount }, closeModal)
 
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
   const [showCalBlockModal, setShowCalBlockModal] = React.useState<boolean>(

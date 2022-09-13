@@ -15,10 +15,10 @@ import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
 
 interface WizardHeaderProps {
-  totalSteps: number
-  currentStep: number | null
   title: string
   onExit?: () => void
+  totalSteps?: number
+  currentStep?: number | null
 }
 
 const EXIT_BUTTON_STYLE = css`
