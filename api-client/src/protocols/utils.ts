@@ -256,6 +256,9 @@ export interface LoadedLiquidsById {
   }
 }
 
+// TODO(sh, 2022-09-12): This util currently accepts liquids in two different shapes, one that adheres to the V6 schema
+// and the other in array form coming from ProtocolAnalysisOutput. This should be reconciled to use a single type so
+// conversion of the shape is not needed in the util and the type is consistent across the board.
 export function parseLiquidsInLoadOrder(
   liquids: LoadedLiquidsById | Liquid[],
   commands: RunTimeCommand[]
