@@ -101,6 +101,8 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
 
   const { header, subHeader } = getPipetteStatusDetails({ ...props })
 
+  const isWrongWantedPipette = wrongWantedPipette != null
+
   return !confirmPipetteLevel &&
     wrongWantedPipette &&
     actualPipette != null &&
@@ -120,7 +122,7 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
       }
       header={header}
       subHeader={subHeader}
-      isSuccess={success}
+      isSuccess={success || isWrongWantedPipette || confirmPipetteLevel}
     >
       <>
         {!success && !wrongWantedPipette && !confirmPipetteLevel && (
@@ -194,14 +196,12 @@ function SuccessAndExitButtons(props: ConfirmPipetteProps): JSX.Element {
     toCalibrationDashboard,
     success,
     wrongWantedPipette,
-    confirmPipetteLevel,
   } = props
   const { t } = useTranslation('change_pipette')
   return (
     <>
-      {wrongWantedPipette ||
-      (success && actualPipette && !actualPipetteOffset) ||
-      confirmPipetteLevel ? (
+      {!actualPipetteOffset &&
+      (wrongWantedPipette || (success && actualPipette)) ? (
         <SecondaryButton
           marginRight={SPACING.spacing3}
           onClick={toCalibrationDashboard}

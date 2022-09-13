@@ -191,7 +191,11 @@ export function ChangePipette(props: Props): JSX.Element | null {
   const exitModal = (
     <ExitModal
       back={() => setConfirmExit(false)}
-      exit={homePipAndExit}
+      exit={
+        movementStatus !== HOMING && movementStatus !== MOVING
+          ? homePipAndExit
+          : () => console.log('Gantry is moving')
+      }
       direction={direction}
     />
   )

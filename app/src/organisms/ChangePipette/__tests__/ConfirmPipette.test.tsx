@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { LEFT } from '@opentrons/shared-data'
 import { mockPipetteInfo } from '../../../redux/pipettes/__fixtures__'
@@ -206,10 +206,9 @@ describe('ConfirmPipette', () => {
     const btn = getByRole('button', { name: 'exit' })
     fireEvent.click(btn)
     expect(props.exit).toHaveBeenCalled()
-
-    const pocBtn = getByRole('button', { name: 'Calibrate pipette offset' })
-    fireEvent.click(pocBtn)
-    expect(props.toCalibrationDashboard).toBeCalled()
+    expect(
+      screen.queryByRole('button', { name: 'Calibrate pipette offset' })
+    ).not.toBeInTheDocument()
   })
 
   it('renders incorrect pipette attached for eight channel when the actual pipette is different', () => {
@@ -277,14 +276,14 @@ describe('ConfirmPipette', () => {
     expect(props.setConfirmPipetteLevel).toHaveBeenCalled()
   })
 
-  it('renders the success modal when the confirmPipetteLevel is true when attaching an incorrect 8 channel pipette', () => {
+  it('renders the success modal when the confirmPipetteLevel is true when attaching an incorrect 8 channel pipette with no pipetteoffset data', () => {
     props = {
       robotName: 'otie',
       success: false,
       attachedWrong: true,
       wantedPipette: MOCK_WANTED_PIPETTE,
       actualPipette: MOCK_WANTED_PIPETTE as PipetteModelSpecs,
-      actualPipetteOffset: {} as PipetteOffsetCalibration,
+      actualPipetteOffset: null,
       displayName: '',
       displayCategory: null,
       tryAgain: jest.fn(),
