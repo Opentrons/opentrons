@@ -6,7 +6,9 @@ import { i18n } from '../../../../i18n'
 import { Introduction } from '../'
 import { mockCalibrationCheckLabware } from '../../../../redux/sessions/__fixtures__'
 
-const render = (props: Partial<React.ComponentProps<typeof Introduction>> = {}) => {
+const render = (
+  props: Partial<React.ComponentProps<typeof Introduction>> = {}
+) => {
   return renderWithProviders(
     <Introduction
       sendCommands={jest.fn()}

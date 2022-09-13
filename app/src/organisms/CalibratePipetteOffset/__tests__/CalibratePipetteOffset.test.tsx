@@ -36,10 +36,19 @@ describe('CalibratePipetteOffset', () => {
     { heading: 'Before you begin', currentStep: 'sessionStarted' },
     { heading: 'Prepare the space', currentStep: 'labwareLoaded' },
     { heading: 'Position pipette over A1', currentStep: 'preparingPipette' },
-    { heading: 'Did pipette pick up tip successfully?', currentStep: 'inspectingTip' },
+    {
+      heading: 'Did pipette pick up tip successfully?',
+      currentStep: 'inspectingTip',
+    },
     { heading: 'Calibrate z-axis in slot 5', currentStep: 'joggingToDeck' },
-    { heading: 'Calibrate x- and y-axis in slot 1', currentStep: 'savingPointOne' },
-    { heading: 'Pipette Offset Calibration complete!', currentStep: 'calibrationComplete' },
+    {
+      heading: 'Calibrate x- and y-axis in slot 1',
+      currentStep: 'savingPointOne',
+    },
+    {
+      heading: 'Pipette Offset Calibration complete!',
+      currentStep: 'calibrationComplete',
+    },
   ]
 
   beforeEach(() => {
@@ -78,7 +87,7 @@ describe('CalibratePipetteOffset', () => {
 
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      const {getByRole, queryByRole} = render({
+      const { getByRole, queryByRole } = render({
         session: {
           ...mockPipOffsetCalSession,
           details: {
@@ -88,22 +97,32 @@ describe('CalibratePipetteOffset', () => {
         },
       })[0]
 
-      SPECS.forEach(({currentStep, heading}) => {
+      SPECS.forEach(({ currentStep, heading }) => {
         if (currentStep === spec.currentStep) {
-          expect(getByRole('heading', {name: spec.heading})).toBeInTheDocument()
+          expect(
+            getByRole('heading', { name: spec.heading })
+          ).toBeInTheDocument()
         } else {
-          expect(queryByRole('heading', {name: heading})).toBeNull()
+          expect(queryByRole('heading', { name: heading })).toBeNull()
         }
       })
     })
   })
 
   it('renders confirm exit on exit click', () => {
-    const {getByRole, queryByRole} = render()[0]
+    const { getByRole, queryByRole } = render()[0]
 
-    expect(queryByRole('heading', {name: 'Pipette Offset Calibration progress will be lost'})).toBeNull()
-    getByRole('button', {name: 'Exit'}).click()
-    expect(getByRole('heading', {name: 'Pipette Offset Calibration progress will be lost'})).toBeInTheDocument()
+    expect(
+      queryByRole('heading', {
+        name: 'Pipette Offset Calibration progress will be lost',
+      })
+    ).toBeNull()
+    getByRole('button', { name: 'Exit' }).click()
+    expect(
+      getByRole('heading', {
+        name: 'Pipette Offset Calibration progress will be lost',
+      })
+    ).toBeInTheDocument()
   })
 
   it('does not render contents when showSpinner is true', () => {
@@ -112,12 +131,12 @@ describe('CalibratePipetteOffset', () => {
       session: {
         ...mockPipOffsetCalSession,
         details: {
-            ...mockPipOffsetCalSession.details,
-            currentStep: 'sessionStarted',
-        }
-      }
+          ...mockPipOffsetCalSession.details,
+          currentStep: 'sessionStarted',
+        },
+      },
     })[0]
-    expect(queryByRole('heading', {name: 'Before you begin'})).toBeNull()
+    expect(queryByRole('heading', { name: 'Before you begin' })).toBeNull()
   })
 
   it('does dispatch jog requests when not isJogging', () => {
@@ -129,8 +148,8 @@ describe('CalibratePipetteOffset', () => {
         currentStep: Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE,
       },
     }
-    const {getByRole} = render({ isJogging: false, session })[0]
-    getByRole('button', {name: "forward"}).click()
+    const { getByRole } = render({ isJogging: false, session })[0]
+    getByRole('button', { name: 'forward' }).click()
     expect(dispatchRequests).toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,
@@ -148,8 +167,8 @@ describe('CalibratePipetteOffset', () => {
         currentStep: Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE,
       },
     }
-    const {getByRole} = render({ isJogging: true, session })[0]
-    getByRole('button', {name: "forward"}).click()
+    const { getByRole } = render({ isJogging: true, session })[0]
+    getByRole('button', { name: 'forward' }).click()
     expect(dispatchRequests).not.toHaveBeenCalledWith(
       Sessions.createSessionCommand('robot-name', session.id, {
         command: Sessions.sharedCalCommands.JOG,

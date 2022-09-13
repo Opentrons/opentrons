@@ -54,7 +54,10 @@ describe('CheckCalibration', () => {
       heading: 'Check x- and y-axis in slot 7',
       currentStep: 'comparingPointThree',
     },
-    { heading: 'Return tip and continue to next pipette', currentStep: 'returningTip' },
+    {
+      heading: 'Return tip and continue to next pipette',
+      currentStep: 'returningTip',
+    },
     {
       heading: 'calibration health check results',
       currentStep: 'resultsSummary',

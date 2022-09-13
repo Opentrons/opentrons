@@ -14,10 +14,7 @@ describe('ConfirmExit', () => {
 
   beforeEach(() => {
     render = (props = {}) => {
-      const {
-        heading,
-        body,
-      } = props
+      const { heading, body } = props
       return renderWithProviders(
         <ConfirmExit
           exit={mockExit}

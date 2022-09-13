@@ -38,7 +38,10 @@ describe('CalibrateTipLength', () => {
   const SPECS: CalibrateTipLengthSpec[] = [
     { heading: 'Before you begin', currentStep: 'sessionStarted' },
     { heading: 'Prepare the space', currentStep: 'labwareLoaded' },
-    { heading: 'Calibrate z-axis on block', currentStep: 'measuringNozzleOffset' },
+    {
+      heading: 'Calibrate z-axis on block',
+      currentStep: 'measuringNozzleOffset',
+    },
     { heading: 'Position pipette over A1', currentStep: 'preparingPipette' },
     {
       heading: 'Did pipette pick up tip successfully?',
@@ -50,9 +53,6 @@ describe('CalibrateTipLength', () => {
       currentStep: 'calibrationComplete',
     },
   ]
-
-
-
 
   beforeEach(() => {
     dispatchRequests = jest.fn()
@@ -69,7 +69,9 @@ describe('CalibrateTipLength', () => {
         isJogging = false,
         session = mockTipLengthSession,
       } = props
-      return renderWithProviders<React.ComponentType<typeof CalibrateTipLength>>(
+      return renderWithProviders<
+        React.ComponentType<typeof CalibrateTipLength>
+      >(
         <CalibrateTipLength
           robotName="robot-name"
           session={session}
