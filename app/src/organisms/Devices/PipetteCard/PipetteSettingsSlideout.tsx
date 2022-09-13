@@ -2,14 +2,13 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import last from 'lodash/last'
 import { useDispatch, useSelector } from 'react-redux'
-import { Flex, useInterval, POSITION_ABSOLUTE } from '@opentrons/components'
+import { Flex, useInterval } from '@opentrons/components'
 import { PipetteModelSpecs } from '@opentrons/shared-data'
 import {
   fetchPipetteSettings,
   updatePipetteSettings,
 } from '../../../redux/pipettes'
 import { Slideout } from '../../../atoms/Slideout'
-import { Numpad } from '../../../atoms/SoftwareKeyboard'
 import {
   getRequestById,
   PENDING,
@@ -49,11 +48,6 @@ export const PipetteSettingsSlideout = (
     latestRequestId != null ? getRequestById(state, latestRequestId) : null
   )
   const FORM_ID = `configurePipetteForm_${pipetteId}`
-  const keyboardRef = React.useRef(null)
-
-  const handleChange = (): void => {
-    console.log('numpad rendered')
-  }
 
   useInterval(
     () => {
@@ -64,40 +58,27 @@ export const PipetteSettingsSlideout = (
   )
 
   return (
-    <>
-      {true && (
-        <Flex
-          position={POSITION_ABSOLUTE}
-          left="5%"
-          bottom="10%"
-          zIndex="10"
-          width="31.25rem"
-        >
-          <Numpad onChange={handleChange} keyboardRef={keyboardRef} />
-        </Flex>
-      )}
-      <Slideout
-        title={t('pipette_settings', { pipetteName: pipetteName })}
-        onCloseClick={onCloseClick}
-        isExpanded={isExpanded}
-        footer={
-          <ConfigFormSubmitButton
-            disabled={updateRequest?.status === PENDING}
-            formId={FORM_ID}
-          />
-        }
-      >
-        <Flex data-testid={`PipetteSettingsSlideout_${robotName}_${pipetteId}`}>
-          <ConfigurePipette
-            closeModal={onCloseClick}
-            pipetteId={pipetteId}
-            updateRequest={updateRequest}
-            updateSettings={updateSettings}
-            robotName={robotName}
-            formId={FORM_ID}
-          />
-        </Flex>
-      </Slideout>
-    </>
+    <Slideout
+      title={t('pipette_settings', { pipetteName: pipetteName })}
+      onCloseClick={onCloseClick}
+      isExpanded={isExpanded}
+      footer={
+        <ConfigFormSubmitButton
+          disabled={updateRequest?.status === PENDING}
+          formId={FORM_ID}
+        />
+      }
+    >
+      <Flex data-testid={`PipetteSettingsSlideout_${robotName}_${pipetteId}`}>
+        <ConfigurePipette
+          closeModal={onCloseClick}
+          pipetteId={pipetteId}
+          updateRequest={updateRequest}
+          updateSettings={updateSettings}
+          robotName={robotName}
+          formId={FORM_ID}
+        />
+      </Flex>
+    </Slideout>
   )
 }
