@@ -129,7 +129,9 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore]):
         engine_mount = MountType[mount.name]
         load_result = self._engine_client.load_pipette(instrument_name, engine_mount)
 
-        return InstrumentCore(pipette_id=load_result.pipetteId)
+        return InstrumentCore(
+            pipette_id=load_result.pipetteId, engine_client=self._engine_client
+        )
 
     def get_loaded_instruments(self) -> Dict[Mount, Optional[InstrumentCore]]:
         """Get all loaded instruments by mount."""

@@ -213,6 +213,25 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
         return cast(commands.TouchTipResult, result)
 
+    def move_to_well(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        well_location: WellLocation,
+    ) -> commands.MoveToWellResult:
+        """Execute a ``MoveToWell`` command and return the result."""
+        request = commands.MoveToWellCreate(
+            params=commands.MoveToWellParams(
+                pipetteId=pipette_id,
+                labwareId=labware_id,
+                wellName=well_name,
+                wellLocation=well_location,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+        return cast(commands.MoveToWellResult, result)
+
     def wait_for_resume(self, message: Optional[str]) -> commands.WaitForResumeResult:
         """Execute a `WaitForResume` command and return the result."""
         request = commands.WaitForResumeCreate(
