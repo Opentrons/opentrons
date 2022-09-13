@@ -23,10 +23,7 @@ import {
   useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
 } from '../hooks'
-import {
-  ProtocolAnalysisFile,
-  protocolHasLiquids,
-} from '@opentrons/shared-data'
+import { protocolHasLiquids } from '@opentrons/shared-data'
 
 import { SetupLabware } from './SetupLabware'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
@@ -82,7 +79,7 @@ export function ProtocolRunSetup({
     const showLiquidSetup =
       liquidSetupEnabled &&
       protocolData != null &&
-      protocolHasLiquids(protocolData as ProtocolAnalysisFile)
+      protocolHasLiquids(protocolData)
 
     if (showModuleSetup && showLiquidSetup) {
       nextStepKeysInOrder = [
