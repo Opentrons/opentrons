@@ -6,27 +6,28 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 6.1.0-beta.0
+# OT-2 Software Changes in 6.1.0-alpha.4
 
-Welcome to the v6.1.0 beta release of the OT-2 software! This release adds support for the Opentrons Heater-Shaker Module.
+Welcome to the v6.1.0 alpha release of the OT-2 software! This release adds support for the Opentrons Heater-Shaker Module.
 
 ## New Features
 
 - Heater-Shaker support
-  - The OT-2 can run JSON and Python protocols that control the Heater-Shaker Module.
-  - Implements restrictions on module and labware placement around the Heater-Shaker.
-  - When possible, the OT-2 will automatically move its pipettes or the Heater-Shaker's labware latch to shake safely and avoid crashes.
-  - The OT-2 can update the firmware on an attached Heater-Shaker.
+  - The OT-2 can run JSON and Python protocols that control the Heater-Shaker Module
+  - Implements restrictions on module and labware placement around the Heater-Shaker
+  - When possible, the OT-2 will automatically move its pipettes or the Heater-Shaker's labware latch to shake safely and avoid crashes
+  - The OT-2 can update the firmware on an attached Heater-Shaker
 
 ## Bug Fixes
 
-- Improved tip pickup and drop behavior.
-- Fixed issues when running Thermocycler profiles.
-- Fixed a bug that prevented pipetting to arbitrary deck coordinates.
+- Improved tip pickup and drop behavior
+- Fixed issues when running Thermocycler profiles
+- Fixed a bug that prevented pipetting to arbitrary deck coordinates
+
 
 ## Known Issues
 
-This beta is a work in progress! We'll be addressing issues in upcoming releases of 6.1.0.
+This alpha is a work in progress! We'll be addressing issues in upcoming releases of 6.1.0.
 
 ---
 
