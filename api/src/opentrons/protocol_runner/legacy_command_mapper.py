@@ -283,8 +283,8 @@ class LegacyCommandMapper:
     ) -> pe_commands.Command:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
-        if location.labware.is_well:
-            well = location.labware.as_well()
+        assert location.labware.is_well
+        well = location.labware.as_well()
         mount = MountType(pipette.mount)
         #   the following type checking suppression assumes the tiprack is not loaded on top of a module
         slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
@@ -312,8 +312,8 @@ class LegacyCommandMapper:
     ) -> pe_commands.Command:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
-        if isinstance(location, LegacyWell):
-            well = location
+        assert isinstance(location, LegacyWell)
+        well = location
         mount = MountType(pipette.mount)
         #   the following type checking suppression assumes the tiprack is not loaded on top of a module
         slot = DeckSlotName.from_primitive(well.parent.parent)  # type: ignore[arg-type]
@@ -345,6 +345,8 @@ class LegacyCommandMapper:
         pipette: LegacyPipetteContext = command["payload"]["instrument"]
         location = command["payload"]["location"]
         volume = command["payload"]["volume"]
+        # TODO:(jr, 15.08.2022): aspirate and dispense commands with no specified labware
+        # get filtered into custom. Refactor this in followup legacy command mapping
         if isinstance(location, Location) and location.labware.is_well:
             well = location.labware.as_well()
             slot = DeckSlotName(location.labware.first_parent())
@@ -391,8 +393,6 @@ class LegacyCommandMapper:
                     ),
                 )
         else:
-            # TODO:(jr, 15.08.2022): aspirate and dispense commands with no specified labware
-            # get filtered into custom. Refactor this in followup legacy command mapping
             return pe_commands.Custom.construct(
                 id=command_id,
                 key=command_id,
@@ -416,9 +416,8 @@ class LegacyCommandMapper:
         flow_rate = pipette.flow_rate.blow_out
         #   TODO:(jr, 15.08.2022): blow_out commands with no specified labware get filtered
         #   into custom. Remove location.labware.is_empty is False when refactor is complete
-        if isinstance(location, Location) and location.labware.is_empty is False:
-            if location.labware.is_well:
-                well = location.labware.as_well()
+        if isinstance(location, Location) and location.labware.is_well:
+            well = location.labware.as_well()
             slot = DeckSlotName(location.labware.first_parent())
             parent_module_id = self._module_id_by_slot.get(slot)
             labware_id = (
