@@ -159,11 +159,11 @@ VALID_TEST_PARAMS = [
     (
         protocol_schema_v6.Command(
             commandType="loadPipette",
-            params=protocol_schema_v6.Params(pipetteId="pipetteId", mount="left"),
+            params=protocol_schema_v6.Params(pipetteId="pipette-id-abc123", mount="left"),
         ),
         pe_commands.LoadPipetteCreate(
             params=pe_commands.LoadPipetteParams(
-                pipetteId="pipetteId",
+                pipetteId="pipette-id-abc123",
                 pipetteName=PipetteName("p10_single"),
                 mount=MountType("left"),
             )
@@ -371,7 +371,7 @@ def _load_labware_definition_data() -> LabwareDefinition:
 def _make_json_protocol(
     *,
     pipettes: Dict[str, protocol_schema_v6.Pipette] = {
-        "pipetteId": protocol_schema_v6.Pipette(name="p10_single")
+        "pipette-id-abc123": protocol_schema_v6.Pipette(name="p10_single"),
     },
     labware_definitions: Dict[str, LabwareDefinition] = {
         "example/plate/1": _load_labware_definition_data()
@@ -379,15 +379,19 @@ def _make_json_protocol(
     labware: Dict[str, protocol_schema_v6.Labware] = {
         "sourcePlateId": protocol_schema_v6.Labware(
             displayName="Source Plate", definitionId="example/plate/1"
-        )
+        ),
+        "labware-id-def456": protocol_schema_v6.Labware(
+            displayName="Trash", definitionId="example/trash/1"
+        ),
     },
     commands: List[protocol_schema_v6.Command] = [],
     modules: Dict[str, protocol_schema_v6.Module] = {
-        "magneticModuleId": protocol_schema_v6.Module(model="magneticModuleV2")
+        "magneticModuleId": protocol_schema_v6.Module(model="magneticModuleV2"),
+        "module-id-abc123": protocol_schema_v6.Module(model="thermocyclerModuleV2")
     }
 ) -> protocol_schema_v6.ProtocolSchemaV6:
     """Return a minimal JsonProtocol with the given elements, to use as test input."""
-    return protocol_schema_v6.ProtocolSchemaV6.construct(
+    return protocol_schema_v6.ProtocolSchemaV6(
         # schemaVersion is arbitrary. Currently (2021-06-28), JsonProtocol.parse_obj()
         # isn't smart enough to validate differently depending on this field.
         otSharedSchema="#/protocol/schemas/6",
