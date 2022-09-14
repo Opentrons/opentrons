@@ -74,7 +74,6 @@ class Block:
 
         self.final_speed = _final_speed()
         self.time = _time()
-        print(self.time, self.final_speed, self.initial_speed, self.acceleration, self.distance)
 
 
 @dataclasses.dataclass
