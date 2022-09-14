@@ -16,21 +16,19 @@ export default {
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof NavTab>> = args => (
-  <>
-    <Flex
-      alignItems={ALIGN_START}
-      flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacingM}
-    >
-      <MemoryRouter>
-        <NavTab to="/general" tabName="General" />
-        <NavTab to="/privacy" tabName="Privacy" />
-        <NavTab to="/advanced" tabName="Advanced" />
-        <NavTab to="/feature-flags" tabName="Feature flags" />
-      </MemoryRouter>
-    </Flex>
-  </>
+  <Flex
+    marginTop={SPACING.spacing4}
+    alignItems={ALIGN_START}
+    flexDirection={DIRECTION_ROW}
+    gridGap={SPACING.spacingM}
+  >
+    <MemoryRouter initialEntries={['/general']}>
+      <NavTab to="/general" tabName="General" />
+      <NavTab to="/privacy" tabName="Privacy" />
+      <NavTab to="/advanced" tabName="Advanced" />
+      <NavTab to="/feature-flags" tabName="Feature flags" />
+    </MemoryRouter>
+  </Flex>
 )
 
-export const Primary = Template.bind({})
-Primary.args = {}
+export const AppSettings = Template.bind({})
