@@ -66,11 +66,7 @@ export function AppSettings(): JSX.Element {
           >
             <NavTab to="/app-settings/general" tabName={t('general')} />
             <NavTab to="/app-settings/privacy" tabName={t('privacy')} />
-            <NavTab
-              to="/app-settings/advanced"
-              tabName={t('advanced')}
-              disabled={true}
-            />
+            <NavTab to="/app-settings/advanced" tabName={t('advanced')} />
             {devToolsOn && (
               <NavTab
                 to="/app-settings/feature-flags"
