@@ -56,7 +56,9 @@ class Block:
 
         def _final_speed() -> np.float64:
             """Get final speed of the block."""
-            speed_squared = self.initial_speed**2 + self.acceleration * self.distance * 2
+            speed_squared = (
+                self.initial_speed**2 + self.acceleration * self.distance * 2
+            )
             # NOTE (AS, 2022-09-14): calculated value occasionally rounds to a negative,
             #                        like -1E-11, which should really just be zero
             if speed_squared < 0:
