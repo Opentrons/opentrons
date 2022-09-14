@@ -8,7 +8,7 @@ import {
   TYPOGRAPHY,
   BORDERS,
 } from '@opentrons/components'
-import { NavTab } from '../'
+import { NavTab } from '..'
 
 const render = (props: React.ComponentProps<typeof NavTab>) => {
   return renderWithProviders(

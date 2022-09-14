@@ -8,12 +8,9 @@ interface NavTabProps {
   to: string
   tabName: string
   disabled?: boolean
-  as?: React.ElementType
 }
 
-const StyledNavLink = styled(NavLink)<
-  React.ComponentProps<typeof NavLink> /* & { disabled: boolean } */
->`
+const StyledNavLink = styled(NavLink)<React.ComponentProps<typeof NavLink>>`
   padding: 0 ${SPACING.spacing2} ${SPACING.spacing3};
   ${TYPOGRAPHY.labelSemiBold}
   color: ${COLORS.darkGreyEnabled};
@@ -26,24 +23,17 @@ const StyledNavLink = styled(NavLink)<
 const DisabledNavLink = styled.span`
   padding: 0 ${SPACING.spacing2} ${SPACING.spacing3};
   ${TYPOGRAPHY.labelSemiBold}
-  color: ${COLORS.darkGreyEnabled};
+  color: ${COLORS.errorDisabled};
 `
 
 export function NavTab({
   to,
   tabName,
   disabled = false,
-  as: DisabledLink = DisabledNavLink,
 }: NavTabProps): JSX.Element {
   return (
-    <>
-      {disabled ? (
-        <DisabledLink>{tabName}</DisabledLink>
-      ) : (
-        <StyledNavLink to={to} replace>
-          {tabName}
-        </StyledNavLink>
-      )}
-    </>
+    <StyledNavLink as={disabled ? DisabledNavLink : undefined} to={to} replace>
+      {tabName}
+    </StyledNavLink>
   )
 }
