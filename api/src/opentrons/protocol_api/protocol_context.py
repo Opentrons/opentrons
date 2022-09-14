@@ -675,7 +675,7 @@ class ProtocolContext(CommandPublisher):
 
 
 def _create_module_context(
-    core: ModuleCore,
+    module_core: ModuleCore,
     protocol_core: ProtocolCore,
     api_version: APIVersion,
     broker: Broker,
@@ -687,10 +687,10 @@ def _create_module_context(
         ModuleType.THERMOCYCLER: ThermocyclerContext,
         ModuleType.HEATER_SHAKER: HeaterShakerContext,
     }
-    module_cls = module_constructors[core.get_type()]
+    module_cls = module_constructors[module_core.get_type()]
 
     return module_cls(
-        core=core,
+        core=module_core,
         protocol_core=protocol_core,
         api_version=api_version,
         broker=broker,

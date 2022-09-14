@@ -53,9 +53,8 @@ class Deck(UserDict):
             self.data[int(slot["id"])] = None
             self._positions[int(slot["id"])] = types.Point(*slot["position"])
         self._highest_z = 0.0
-        self._thermocycler_present = False
         self._load_fixtures()
-        self.recalculate_high_z()
+        self._thermocycler_present = False
 
     def _load_fixtures(self):
         for f in self._definition["locations"]["fixtures"]:
