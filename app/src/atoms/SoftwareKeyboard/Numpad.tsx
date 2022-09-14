@@ -3,7 +3,7 @@ import Keyboard from 'react-simple-keyboard'
 
 interface NumpadProps {
   onChange: (input: string) => void
-  keyboardRef: React.MutableRefObject<any>
+  keyboardRef: React.MutableRefObject<null>
 }
 
 export function Numpad({ onChange, keyboardRef }: NumpadProps): JSX.Element {
@@ -11,15 +11,7 @@ export function Numpad({ onChange, keyboardRef }: NumpadProps): JSX.Element {
     layout: {
       default: ['7 8 9', '4 5 6', '1 2 3', '0 . {backspace}'],
     },
-    // display: {
-    //   '{backspace}': 'backspace',
-    // },
   }
-  // kj 08/25/2022 keep this useState for the future design request
-  // onKeypress is also the same
-  const [layoutName, setLayoutName] = React.useState<string>('default')
-  //   const onKeyPress = (button: string): void => {}
-
   return (
     /*
      *  autoUseTouchEvents: for OT-3 on-device app
@@ -29,7 +21,7 @@ export function Numpad({ onChange, keyboardRef }: NumpadProps): JSX.Element {
       keyboardRef={r => (keyboardRef.current = r)}
       onChange={onChange}
       // onKeyPress={onKeyPress}
-      layoutName={layoutName}
+      layoutName="default"
       autoUseTouchEvents={true}
       useButtonTag={true}
       {...keyboardNumpad}

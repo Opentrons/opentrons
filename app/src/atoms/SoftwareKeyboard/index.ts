@@ -1,2 +1,2 @@
-export { DefaultKeyboard } from './DefaultKeyboard'
+export { NormalKeyboard } from './NormalKeyboard'
 export { Numpad } from './Numpad'

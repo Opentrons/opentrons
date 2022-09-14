@@ -1,15 +1,15 @@
 import * as React from 'react'
 import Keyboard from 'react-simple-keyboard'
 
-interface DefaultKeyboardProps {
+interface NormalKeyboardProps {
   onChange: (input: string) => void
   keyboardRef: React.MutableRefObject<any>
 }
 
-export function DefaultKeyboard({
+export function NormalKeyboard({
   onChange,
   keyboardRef,
-}: DefaultKeyboardProps): JSX.Element {
+}: NormalKeyboardProps): JSX.Element {
   const [layoutName, setLayoutName] = React.useState<string>('default')
   const onKeyPress = (button: string): void => {
     if (button === '{shift}' || button === '{lock}') {
