@@ -60,7 +60,7 @@ describe('NavTab', () => {
     )
     expect(tab).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeLabel}`)
     expect(tab).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)
-    expect(tab).toHaveStyle(`color: ${COLORS.darkGreyEnabled}`)
+    expect(tab).toHaveStyle(`color: ${COLORS.errorDisabled}`)
   })
 
   it('renders navtab when pass to / as to', () => {
