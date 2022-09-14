@@ -1,18 +1,18 @@
 """Calibration Module protocol commands."""
 
-from .probe import (
-    ProbeParams,
-    ProbeResult,
-    ProbeCreate,
-    ProbeCommandType,
-    Probe,
+from .calibrate_robot import (
+    CalibrateRobotParams,
+    CalibrateRobotResult,
+    CalibrateRobotCreate,
+    CalibrateRobotCommandType,
+    CalibrateRobot,
 )
 
 __all__ = [
-    # calibration/probe
-    "Probe",
-    "ProbeCreate",
-    "ProbeParams",
-    "ProbeResult",
-    "ProbeCommandType",
+    # calibration/calibrateRobot
+    "CalibrateRobot",
+    "CalibrateRobotCreate",
+    "CalibrateRobotParams",
+    "CalibrateRobotResult",
+    "CalibrateRobotCommandType",
 ]

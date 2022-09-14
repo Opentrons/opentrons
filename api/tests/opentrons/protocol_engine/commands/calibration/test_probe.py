@@ -1,10 +1,10 @@
 """Test begin-probe command."""
 from decoy import Decoy
 
-from opentrons.protocol_engine.commands.calibration.probe import (
-    ProbeResult,
-    ProbeImplementation,
-    ProbeParams,
+from opentrons.protocol_engine.commands.calibration.calibrate_robot import (
+    CalibrateRobotResult,
+    CalibrateRobotImplementation,
+    CalibrateRobotParams,
 )
 
 from opentrons.types import Mount
@@ -16,14 +16,14 @@ async def test_probe_implementation(
     hardware_api: HardwareControlAPI,
 ) -> None:
     """Test Probe command execution."""
-    subject = ProbeImplementation(hardware_api=hardware_api)
+    subject = CalibrateRobotImplementation(hardware_api=hardware_api)
 
-    data = ProbeParams(
+    data = CalibrateRobotParams(
         mount=Mount.LEFT,
     )
 
     result = await subject.execute(data)
 
-    assert result == ProbeResult(offsets=[])
+    assert result == CalibrateRobotResult(offsets=[])
 
     # TODO (tz, 8-9-22): verify call to harware_api.probe()
