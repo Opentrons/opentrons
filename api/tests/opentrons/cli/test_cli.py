@@ -20,7 +20,7 @@ def _list_fixtures(version: int) -> List[Path]:
 
 @pytest.mark.parametrize("defpath", _list_fixtures(6))
 def test_analyze(defpath: Path, tmp_path: Path) -> None:
-    """Should return with no errors and a none empty output."""
+    """Should return with no errors and a non empty output."""
     analysis_output_path = tmp_path / "analysis_output.json"
 
     runner = CliRunner()
