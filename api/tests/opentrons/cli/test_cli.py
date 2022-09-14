@@ -11,18 +11,11 @@ from opentrons.cli.analyze import analyze
 
 
 def _list_fixtures(version: int) -> List[Path]:
-    base = (
-        Path(__file__).parent
-        / ".."
-        / ".."
-        / ".."
-        / ".."
-        / "shared-data"
-        / "protocol"
-        / "fixtures"
-        / f"{version}"
+    return list(
+        Path(__file__).parent.glob(
+            f"../../../../shared-data/protocol/fixtures/{version}/*.json"
+        )
     )
-    return list(base.iterdir())
 
 
 @pytest.mark.parametrize("defpath", _list_fixtures(6))
