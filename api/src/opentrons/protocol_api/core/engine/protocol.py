@@ -1,5 +1,5 @@
 """ProtocolEngine-based Protocol API core implementation."""
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
@@ -16,7 +16,7 @@ from opentrons.protocols.geometry.deck_item import DeckItem
 from opentrons.protocol_engine import DeckSlotLocation
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 
-from ..protocol import AbstractProtocol, LoadModuleResult
+from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
 from .labware import LabwareCore
 from .instrument import InstrumentCore
@@ -84,12 +84,15 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
     def load_labware(
         self,
         load_name: str,
-        location: DeckSlotName,
+        location: Union[DeckSlotName, ModuleCore],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
+        if isinstance(location, ModuleCore):
+            raise NotImplementedError("Load labware on module not yet implemented")
+
         load_result = self._engine_client.load_labware(
             load_name=load_name,
             location=DeckSlotLocation(slotName=location),
@@ -107,12 +110,8 @@ class ProtocolCore(AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]):
         model: ModuleModel,
         location: Optional[DeckSlotName],
         configuration: Optional[str],
-    ) -> Optional[LoadModuleResult]:
+    ) -> ModuleCore:
         """Load a module into the protocol."""
-        raise NotImplementedError("ProtocolEngine PAPI core not implemented")
-
-    def get_loaded_modules(self) -> Dict[int, LoadModuleResult]:
-        """Get all loaded modules by deck slot number."""
         raise NotImplementedError("ProtocolEngine PAPI core not implemented")
 
     def load_instrument(

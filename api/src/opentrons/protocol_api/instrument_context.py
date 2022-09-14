@@ -1251,7 +1251,7 @@ class InstrumentContext(publisher.CommandPublisher):
         if not from_loc:
             from_loc = types.Location(types.Point(0, 0, 0), LabwareLike(None))
 
-        for mod in self._ctx._modules:
+        for mod in self._ctx._modules.values():
             if isinstance(mod, ThermocyclerContext):
                 mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
             elif isinstance(mod, HeaterShakerContext):

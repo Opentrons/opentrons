@@ -125,7 +125,7 @@ class Deck(UserDict):
         )
 
         self.data[slot_key_int] = val
-        self._highest_z = max(val.highest_z, self._highest_z)
+        self.recalculate_high_z()
         self._thermocycler_present = any(
             isinstance(item, ThermocyclerGeometry) for item in self.data.values()
         )
