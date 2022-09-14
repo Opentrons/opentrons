@@ -7,6 +7,7 @@ from .labware import LabwareCore
 
 
 def resolve_move_to_well_args(location: Location) -> Tuple[str, str, WellLocation]:
+    """Resolve labware id, well name and protocol engine WellLocation from Location object."""
     labware, well = location.labware.get_parent_labware_and_well()
     if labware is None or well is None:
         raise TypeError()
