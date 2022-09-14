@@ -1,5 +1,11 @@
 import * as React from 'react'
-import { Flex, COLORS } from '@opentrons/components'
+import { MemoryRouter } from 'react-router'
+import {
+  Flex,
+  ALIGN_START,
+  DIRECTION_ROW,
+  SPACING,
+} from '@opentrons/components'
 import { NavTab } from './'
 
 import type { Story, Meta } from '@storybook/react'
@@ -10,13 +16,21 @@ export default {
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof NavTab>> = args => (
-  <Flex backgroundColor={COLORS.fundamentalsBackground}>
-    <NavTab {...args} />
-  </Flex>
+  <>
+    <Flex
+      alignItems={ALIGN_START}
+      flexDirection={DIRECTION_ROW}
+      gridGap={SPACING.spacingM}
+    >
+      <MemoryRouter>
+        <NavTab to="/general" tabName="General" />
+        <NavTab to="/privacy" tabName="Privacy" />
+        <NavTab to="/advanced" tabName="Advanced" />
+        <NavTab to="/feature-flags" tabName="Feature flags" />
+      </MemoryRouter>
+    </Flex>
+  </>
 )
 
 export const Primary = Template.bind({})
-Primary.args = {
-  href: 'https://www.opentrons.com',
-  children: 'Open the link',
-}
+Primary.args = {}
