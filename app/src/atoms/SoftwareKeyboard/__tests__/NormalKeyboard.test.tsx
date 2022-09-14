@@ -91,7 +91,72 @@ describe('SoftwareKeyboard', () => {
     const { getByRole, getAllByRole } = render(props)
     const shiftKey = getAllByRole('button', { name: 'shift' })[0]
     fireEvent.click(shiftKey)
+
+    // first row
+    getByRole('button', { name: '~' })
+    getByRole('button', { name: '!' })
+    // Note the fifth row also has @
+    const atButtons = getAllByRole('button', { name: '@' })
+    expect(atButtons.length).toBe(2)
+    getByRole('button', { name: '#' })
+    getByRole('button', { name: '$' })
+    getByRole('button', { name: '%' })
+    getByRole('button', { name: '^' })
+    getByRole('button', { name: '&' })
+    getByRole('button', { name: '*' })
+    getByRole('button', { name: '(' })
+    getByRole('button', { name: ')' })
+    getByRole('button', { name: '_' })
+    getByRole('button', { name: '+' })
+    getByRole('button', { name: 'backspace' })
+
+    // second row
+    getByRole('button', { name: 'tab' })
+    getByRole('button', { name: 'Q' })
+    getByRole('button', { name: 'W' })
+    getByRole('button', { name: 'E' })
+    getByRole('button', { name: 'R' })
+    getByRole('button', { name: 'T' })
+    getByRole('button', { name: 'Y' })
+    getByRole('button', { name: 'U' })
+    getByRole('button', { name: 'I' })
+    getByRole('button', { name: 'O' })
+    getByRole('button', { name: 'P' })
+    getByRole('button', { name: '{' })
+    getByRole('button', { name: '}' })
+    getByRole('button', { name: '|' })
+
+    // third row
+    getByRole('button', { name: 'caps' })
     getByRole('button', { name: 'A' })
+    getByRole('button', { name: 'S' })
+    getByRole('button', { name: 'D' })
+    getByRole('button', { name: 'F' })
+    getByRole('button', { name: 'G' })
+    getByRole('button', { name: 'H' })
+    getByRole('button', { name: 'J' })
+    getByRole('button', { name: 'K' })
+    getByRole('button', { name: 'L' })
+    getByRole('button', { name: ':' })
+    getByRole('button', { name: '"' })
+    getByRole('button', { name: ':' })
+    getByRole('button', { name: '< enter' })
+
+    // fourth row
+    getByRole('button', { name: 'Z' })
+    getByRole('button', { name: 'X' })
+    getByRole('button', { name: 'C' })
+    getByRole('button', { name: 'V' })
+    getByRole('button', { name: 'B' })
+    getByRole('button', { name: 'N' })
+    getByRole('button', { name: 'M' })
+    getByRole('button', { name: '<' })
+    getByRole('button', { name: '>' })
+    getByRole('button', { name: '?' })
+    const shiftButtons = getAllByRole('button', { name: 'shift' })
+    expect(shiftButtons.length).toBe(2)
+
+    // Note: kj fifth row is the same
   })
 
   it('should call mock function when clicking a key', () => {
