@@ -4,8 +4,11 @@ import asyncio
 import pytest
 
 from opentrons_hardware.firmware_bindings.messages.fields import SerialField
-from opentrons_hardware.pipettes.serials import (
+from opentrons_hardware.instruments.pipettes.serials import (
     serial_val_from_parts,
+)
+from opentrons_hardware.instruments.gripper.serials import (
+    gripper_serial_val_from_parts,
 )
 
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
@@ -31,28 +34,36 @@ def filter_func(arb: ArbitrationId) -> bool:
     )
 
 
+@pytest.mark.parametrize(
+    "model,datecode",
+    [
+        (31, b"2020190802A02"),
+        (500, b""),
+        (0, b"asdasdasdasdasda"),
+        (0xFFFF, b"\xff" * 16),
+    ],
+)
 @pytest.mark.requires_emulator
 @pytest.mark.can_filter_func.with_args(filter_func)
 async def test_set_serial_gripper(
     can_messenger: CanMessenger,
     can_messenger_queue: WaitableCallback,
+    model: int,
+    datecode: bytes,
 ) -> None:
     """It should write a serial number and read it back."""
     node_id = NodeId.gripper
-    sns_datacodes = [b"202019072430", b"1234567890\x00\x00"]
-    sns = [b"GP" + sns_datacodes[0], b"GP" + sns_datacodes[1]]
-    for i in range(len(sns)):
-        s = SerialNumberPayload(serial=SerialField(sns[i]))
+    gripper_serial = gripper_serial_val_from_parts(model, datecode)
+    s = SerialNumberPayload(serial=SerialField(gripper_serial))
 
-        await can_messenger.send(node_id=node_id, message=SetSerialNumber(payload=s))
-        await can_messenger.send(node_id=node_id, message=InstrumentInfoRequest())
-        response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
+    await can_messenger.send(node_id=node_id, message=SetSerialNumber(payload=s))
+    await can_messenger.send(node_id=node_id, message=InstrumentInfoRequest())
+    response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
 
-        assert arbitration_id.parts.originating_node_id == node_id
-        assert isinstance(response, GripperInfoResponse)
-        assert (
-            response.payload.serial.value[: len(sns_datacodes[i])] == sns_datacodes[i]
-        )
+    assert arbitration_id.parts.originating_node_id == node_id
+    assert isinstance(response, GripperInfoResponse)
+    assert response.payload.model.value == model
+    assert response.payload.serial.value[: len(datecode)] == datecode
 
 
 @pytest.mark.parametrize(

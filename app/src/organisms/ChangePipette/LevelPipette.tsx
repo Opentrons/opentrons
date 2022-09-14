@@ -13,23 +13,16 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-
-import { WizardHeader } from '../../molecules/WizardHeader'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { Mount } from '../../redux/pipettes/types'
 
 interface LevelPipetteProps {
   mount: Mount
-  wantedPipette: PipetteNameSpecs | null
   pipetteModelName: string
   back: () => void
-  exit: () => void
   confirm: () => void
-  currentStep: number
-  totalSteps: number
 }
 
 function LevelingVideo(props: {
@@ -40,8 +33,8 @@ function LevelingVideo(props: {
   return (
     <video
       css={css`
-        width: 100%;
-        max-height: 15rem;
+        width: 275px;
+        max-height: 270px;
         margin-top: ${SPACING.spacing4};
         margin-left: ${SPACING.spacing4};
       `}
@@ -57,29 +50,12 @@ function LevelingVideo(props: {
 }
 
 export function LevelPipette(props: LevelPipetteProps): JSX.Element {
-  const {
-    mount,
-    pipetteModelName,
-    wantedPipette,
-    back,
-    exit,
-    confirm,
-    currentStep,
-    totalSteps,
-  } = props
+  const { mount, pipetteModelName, back, confirm } = props
 
   const { t } = useTranslation('change_pipette')
 
   return (
     <>
-      <WizardHeader
-        currentStep={currentStep}
-        totalSteps={totalSteps}
-        onExit={exit}
-        title={t('attach_pipette_type', {
-          pipetteName: wantedPipette?.displayName,
-        })}
-      />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         paddingX={SPACING.spacing6}
@@ -89,14 +65,24 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
+          marginBottom={SPACING.spacingXXL}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <Trans
               t={t}
               i18nKey={'level_the_pipette'}
               components={{
-                bold: <strong />,
-                h1: <StyledText as="h1" marginBottom={SPACING.spacing4} />,
+                strong: (
+                  <strong
+                    style={{ fontWeight: TYPOGRAPHY.fontWeightSemiBold }}
+                  />
+                ),
+                h1: (
+                  <StyledText
+                    css={TYPOGRAPHY.h1Default}
+                    marginBottom={SPACING.spacing4}
+                  />
+                ),
                 block: (
                   <StyledText
                     css={css`

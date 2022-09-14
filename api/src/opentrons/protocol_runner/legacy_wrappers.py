@@ -1,13 +1,16 @@
 """Wrappers for the legacy, Protocol API v2 execution pipeline."""
+import asyncio
+from typing import Optional, cast
+
 from anyio import to_thread
-from typing import cast
 
 from opentrons_shared_data.labware.dev_types import (
     LabwareDefinition as LegacyLabwareDefinition,
 )
 
+from opentrons.broker import Broker
+from opentrons.equipment_broker import EquipmentBroker
 from opentrons.calibration_storage.helpers import uri_from_details
-
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.types import (
     ModuleModel as LegacyModuleModel,
@@ -28,7 +31,7 @@ from opentrons.protocol_api import (
     Well as LegacyWell,
     create_protocol_context,
 )
-from opentrons.protocol_api.load_info import (
+from opentrons.protocol_api.core.protocol_api.load_info import (
     LoadInfo as LegacyLoadInfo,
     InstrumentLoadInfo as LegacyInstrumentLoadInfo,
     LabwareLoadInfo as LegacyLabwareLoadInfo,
@@ -101,7 +104,12 @@ class LegacyContextCreator:
         self._hardware_api = hardware_api
         self._protocol_engine = protocol_engine
 
-    def create(self, protocol: LegacyProtocol) -> LegacyProtocolContext:
+    def create(
+        self,
+        protocol: LegacyProtocol,
+        broker: Optional[Broker],
+        equipment_broker: Optional[EquipmentBroker[LegacyLoadInfo]],
+    ) -> LegacyProtocolContext:
         """Create a Protocol API v2 context."""
         extra_labware = (
             protocol.extra_labware
@@ -113,6 +121,9 @@ class LegacyContextCreator:
             api_version=protocol.api_level,
             hardware_api=self._hardware_api,
             protocol_engine=self._protocol_engine,
+            protocol_engine_loop=asyncio.get_running_loop(),
+            broker=broker,
+            equipment_broker=equipment_broker,
             extra_labware=extra_labware,
             use_simulating_core=self._USE_SIMULATING_CORE,
         )

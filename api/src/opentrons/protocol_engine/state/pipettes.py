@@ -1,7 +1,7 @@
 """Basic pipette data state and store."""
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict, List, Mapping, Optional, Union
+from typing import Dict, List, Mapping, Optional
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
@@ -15,6 +15,7 @@ from ..commands import (
     AspirateResult,
     DispenseResult,
     DispenseInPlaceResult,
+    MoveLabwareResult,
     MoveToCoordinatesResult,
     MoveToWellResult,
     PickUpTipResult,
@@ -76,40 +77,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._handle_command(action.command)
 
     def _handle_command(self, command: Command) -> None:
-        if isinstance(
-            command.result,
-            (
-                MoveToWellResult,
-                PickUpTipResult,
-                DropTipResult,
-                AspirateResult,
-                DispenseResult,
-                BlowOutResult,
-                TouchTipResult,
-            ),
-        ):
-            self._state.current_well = CurrentWell(
-                pipette_id=command.params.pipetteId,
-                labware_id=command.params.labwareId,
-                well_name=command.params.wellName,
-            )
-
-        # TODO(mc, 2021-11-12): wipe out current_well on movement failures, too
-        elif isinstance(
-            command.result,
-            (
-                HomeResult,
-                MoveToCoordinatesResult,
-                thermocycler.OpenLidResult,
-                thermocycler.CloseLidResult,
-                heater_shaker.SetAndWaitForShakeSpeedResult,
-                heater_shaker.OpenLabwareLatchResult,
-            ),
-        ):
-            # A command left the pipette in a place that we can't associate
-            # with a logical well location. Set the current well to None
-            # to reflect the fact that it's now unknown.
-            self._handle_current_well_clearing_commands(command_result=command.result)
+        self._update_current_well(command)
 
         if isinstance(command.result, LoadPipetteResult):
             pipette_id = command.result.pipetteId
@@ -150,31 +118,67 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = 0
 
-    def _handle_current_well_clearing_commands(
-        self,
-        command_result: Union[
-            HomeResult,
-            MoveToCoordinatesResult,
-            thermocycler.OpenLidResult,
-            thermocycler.CloseLidResult,
-            heater_shaker.SetAndWaitForShakeSpeedResult,
-            heater_shaker.OpenLabwareLatchResult,
-        ],
-    ) -> None:
-        if (
-            not isinstance(
-                command_result,
-                (
-                    heater_shaker.SetAndWaitForShakeSpeedResult,
-                    heater_shaker.OpenLabwareLatchResult,
-                ),
-            )
-            or command_result.pipetteRetracted
+    def _update_current_well(self, command: Command) -> None:
+        # These commands leave the pipette in a new well.
+        # Update current_well to reflect that.
+        if isinstance(
+            command.result,
+            (
+                MoveToWellResult,
+                PickUpTipResult,
+                DropTipResult,
+                AspirateResult,
+                DispenseResult,
+                BlowOutResult,
+                TouchTipResult,
+            ),
         ):
-            # Clear current_well for all above commands except h/s commands.
-            # For h/s commands, clear current_well only if pipettes were moved before
-            # command execution for safety.
+            self._state.current_well = CurrentWell(
+                pipette_id=command.params.pipetteId,
+                labware_id=command.params.labwareId,
+                well_name=command.params.wellName,
+            )
+
+        # These commands leave the pipette in a place that we can't logically associate
+        # with a well. Clear current_well to reflect the fact that it's now unknown.
+        #
+        # TODO(mc, 2021-11-12): Wipe out current_well on movement failures, too.
+        elif isinstance(
+            command.result,
+            (
+                HomeResult,
+                MoveToCoordinatesResult,
+                thermocycler.OpenLidResult,
+                thermocycler.CloseLidResult,
+            ),
+        ):
             self._state.current_well = None
+
+        # Heater-Shaker commands may have left the pipette in a place that we can't
+        # associate with a logical location, depending on their result.
+        elif isinstance(
+            command.result,
+            (
+                heater_shaker.SetAndWaitForShakeSpeedResult,
+                heater_shaker.OpenLabwareLatchResult,
+            ),
+        ):
+            if command.result.pipetteRetracted:
+                self._state.current_well = None
+
+        # A moveLabware command may have moved the labware that contains the current
+        # well out from under the pipette. Clear the current well to reflect the
+        # fact that the pipette is no longer over any labware.
+        #
+        # This is necessary for safe motion planning in case the next movement
+        # goes to the same labware (now in a new place).
+        elif isinstance(command.result, MoveLabwareResult):
+            moved_labware_id = command.params.labwareId
+            if (
+                self._state.current_well is not None
+                and self._state.current_well.labware_id == moved_labware_id
+            ):
+                self._state.current_well = None
 
 
 class PipetteView(HasState[PipetteState]):

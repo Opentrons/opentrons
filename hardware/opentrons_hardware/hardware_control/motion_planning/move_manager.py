@@ -40,7 +40,9 @@ class MoveManager(Generic[AxisKey]):
         target_list: List[MoveTarget[AxisKey]],
     ) -> List[Move[AxisKey]]:
         """Create a list of moves from the target list for blending."""
-        initial_moves = list(move_utils.targets_to_moves(origin, target_list))
+        initial_moves = list(
+            move_utils.targets_to_moves(origin, target_list, self._constraints)
+        )
         return self._add_dummy_start_end_to_moves(initial_moves)
 
     def _add_dummy_start_end_to_moves(

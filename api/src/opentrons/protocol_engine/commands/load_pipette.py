@@ -4,9 +4,9 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType
 
-from ..types import PipetteName
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -19,7 +19,7 @@ LoadPipetteCommandType = Literal["loadPipette"]
 class LoadPipetteParams(BaseModel):
     """Payload needed to load a pipette on to a mount."""
 
-    pipetteName: PipetteName = Field(
+    pipetteName: PipetteNameType = Field(
         ...,
         description="The load name of the pipette to be required.",
     )

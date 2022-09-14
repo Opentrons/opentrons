@@ -3,6 +3,8 @@
 from typing import List, Optional, Sequence, Union, overload
 from typing_extensions import Literal
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.hardware_control.modules.types import ModuleType
 
@@ -22,7 +24,6 @@ from .types import (
     Mount,
     ModuleModel,
     ModuleName,
-    PipetteName,
 )
 
 from . import errors
@@ -41,12 +42,12 @@ class ProtocolContext:
 
     def load_pipette(  # noqa: D102
         self,
-        pipette_name: Union[PipetteName, str],
+        pipette_name: Union[PipetteNameType, str],
         mount: Union[Mount, str],
         tip_racks: Sequence[Labware] = (),
         replace: bool = False,
     ) -> PipetteContext:
-        if pipette_name not in list(PipetteName):
+        if pipette_name not in list(PipetteNameType):
             raise errors.InvalidPipetteNameError(pipette_name)
 
         if mount not in list(Mount):
@@ -61,7 +62,7 @@ class ProtocolContext:
             raise NotImplementedError()
 
         result = self._engine_client.load_pipette(
-            pipette_name=PipetteName(pipette_name),
+            pipette_name=PipetteNameType(pipette_name),
             mount=Mount(mount),
         )
 

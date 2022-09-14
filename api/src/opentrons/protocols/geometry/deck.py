@@ -44,19 +44,15 @@ class CalibrationPosition:
 class Deck(UserDict):
     def __init__(self) -> None:
         super().__init__()
-        row_offset = 90.5
-        col_offset = 132.5
-        for idx in range(1, 13):
-            self.data[idx] = None
-        self._positions = {
-            idx + 1: types.Point((idx % 3) * col_offset, idx // 3 * row_offset, 0)
-            for idx in range(12)
-        }
-        self._highest_z = 0.0
         # TODO(mc, 2022-06-17): move deck type selection
         # (and maybe deck definition loading) out of this constructor
         # to decouple from config (and environment) reading / loading
         self._definition = load_deck(deck_type(), DEFAULT_DECK_DEFINITION_VERSION)
+        self._positions = {}
+        for slot in self._definition["locations"]["orderedSlots"]:
+            self.data[int(slot["id"])] = None
+            self._positions[int(slot["id"])] = types.Point(*slot["position"])
+        self._highest_z = 0.0
         self._load_fixtures()
         self._thermocycler_present = False
 
@@ -129,7 +125,7 @@ class Deck(UserDict):
         )
 
         self.data[slot_key_int] = val
-        self._highest_z = max(val.highest_z, self._highest_z)
+        self.recalculate_high_z()
         self._thermocycler_present = any(
             isinstance(item, ThermocyclerGeometry) for item in self.data.values()
         )
@@ -219,7 +215,7 @@ class Deck(UserDict):
             if module_type.value in compatible_modules:
                 return location
             else:
-                raise AssertionError(
+                raise ValueError(
                     f"A {dn_from_type[module_type]} cannot be loaded"
                     f" into slot {location}"
                 )
@@ -236,7 +232,7 @@ class Deck(UserDict):
                     "A {dn_from_type[module_type]} cannot be used with this deck"
                 )
             else:
-                raise AssertionError(
+                raise ValueError(
                     f"{dn_from_type[module_type]}s do not have default"
                     " location, you must specify a slot"
                 )

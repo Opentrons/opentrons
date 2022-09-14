@@ -7,12 +7,18 @@ from pydantic import BaseModel, Field
 from typing import Optional, Union, List, Dict, Any, NamedTuple
 from typing_extensions import Literal, TypeGuard
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.modules import ModuleType as ModuleType
 
-# convenience re-export of LabwareUri type
+
 from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
+    # convenience re-export of LabwareUri type
     LabwareUri as LabwareUri,
+    # TODO(mc, 2022-09-01): re-consider pickle usage in robot-server.
+    # This re-export of PipetteName prevents pickle breakage
+    # https://opentrons.atlassian.net/browse/RSS-94
+    PipetteNameType as PipetteName,
 )
 
 
@@ -88,34 +94,11 @@ class DeckPoint(BaseModel):
     z: float
 
 
-# TODO(mc, 2021-04-16): reconcile with opentrons_shared_data
-# shared-data/python/opentrons_shared_data/pipette/dev_types.py
-class PipetteName(str, Enum):
-    """Pipette load name values."""
-
-    P10_SINGLE = "p10_single"
-    P10_MULTI = "p10_multi"
-    P20_SINGLE_GEN2 = "p20_single_gen2"
-    P20_MULTI_GEN2 = "p20_multi_gen2"
-    P50_SINGLE = "p50_single"
-    P50_MULTI = "p50_multi"
-    P300_SINGLE = "p300_single"
-    P300_MULTI = "p300_multi"
-    P300_SINGLE_GEN2 = "p300_single_gen2"
-    P300_MULTI_GEN2 = "p300_multi_gen2"
-    P1000_SINGLE = "p1000_single"
-    P1000_SINGLE_GEN2 = "p1000_single_gen2"
-    P300_SINGLE_GEN3 = "p300_single_gen3"
-    P1000_SINGLE_GEN3 = "p1000_single_gen3"
-    P1000_MULTI_GEN3 = "p1000_multi_gen3"
-    P50_MULTI_GEN3 = "p50_multi_gen3"
-
-
 class LoadedPipette(BaseModel):
     """A pipette that has been loaded."""
 
     id: str
-    pipetteName: PipetteName
+    pipetteName: PipetteNameType
     mount: MountType
 
 
@@ -181,7 +164,7 @@ class ModuleModel(str, Enum):
     def is_thermocycler_module_model(
         cls, model: ModuleModel
     ) -> TypeGuard[ThermocyclerModuleModel]:
-        """Whether a given model is a Thermocyler Module."""
+        """Whether a given model is a Thermocycler Module."""
         return model in [cls.THERMOCYCLER_MODULE_V1, cls.THERMOCYCLER_MODULE_V2]
 
     @classmethod
@@ -336,15 +319,21 @@ class LoadedLabware(BaseModel):
     id: str
     loadName: str
     definitionUri: str
-    location: LabwareLocation
+    location: LabwareLocation = Field(
+        ..., description="The labware's current location."
+    )
     offsetId: Optional[str] = Field(
         None,
         description=(
-            "An ID referencing the offset applied to this labware placement,"
-            " decided at load time."
+            "An ID referencing the labware offset"
+            " that applies to this labware placement."
             " Null or undefined means no offset was provided for this load,"
             " so the default of (0, 0, 0) will be used."
         ),
+    )
+    displayName: Optional[str] = Field(
+        None,
+        description="A user-specified display name for this labware, if provided.",
     )
 
 

@@ -90,9 +90,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
-  const moduleOverflowWrapperRef = useOnClickOutside({
+  const moduleOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
-  }) as React.RefObject<HTMLDivElement>
+  })
   const [showSlideout, setShowSlideout] = React.useState(false)
   const [hasSecondary, setHasSecondary] = React.useState(false)
   const [showSuccessToast, setShowSuccessToast] = React.useState(false)

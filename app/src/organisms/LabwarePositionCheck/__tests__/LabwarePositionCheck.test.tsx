@@ -5,41 +5,43 @@ import { fireEvent } from '@testing-library/dom'
 import { i18n } from '../../../i18n'
 import { useTrackEvent } from '../../../redux/analytics'
 import { LabwarePositionCheck } from '../index'
-import { GenericStepScreen } from '../GenericStepScreen'
-import { IntroScreen } from '../IntroScreen'
-import { SummaryScreen } from '../SummaryScreen'
-import { RobotMotionLoadingModal } from '../RobotMotionLoadingModal'
-import { ConfirmPickUpTipModal } from '../ConfirmPickUpTipModal'
-import { ExitPreventionModal } from '../ExitPreventionModal'
+import { DeprecatedGenericStepScreen } from '../DeprecatedComponents/DeprecatedGenericStepScreen'
+import { DeprecatedIntroScreen } from '../DeprecatedComponents/DeprecatedIntroScreen'
+import { DeprecatedSummaryScreen } from '../DeprecatedComponents/DeprecatedSummaryScreen'
+import { DeprecatedRobotMotionLoadingModal } from '../DeprecatedComponents/DeprecatedRobotMotionLoadingModal'
+import { DeprecatedConfirmPickUpTipModal } from '../DeprecatedComponents/DeprecatedConfirmPickUpTipModal'
+import { DeprecatedExitPreventionModal } from '../DeprecatedComponents/DeprecatedExitPreventionModal'
 import { useSteps, useLabwarePositionCheck } from '../hooks'
 import { useRestartRun } from '../../ProtocolUpload/hooks'
 import type { LabwarePositionCheckStep } from '../types'
 
 jest.mock('../../../redux/analytics')
-jest.mock('../GenericStepScreen')
-jest.mock('../IntroScreen')
-jest.mock('../SummaryScreen')
-jest.mock('../RobotMotionLoadingModal')
-jest.mock('../ConfirmPickUpTipModal')
-jest.mock('../ExitPreventionModal')
+jest.mock('../DeprecatedComponents/DeprecatedGenericStepScreen')
+jest.mock('../DeprecatedComponents/DeprecatedIntroScreen')
+jest.mock('../DeprecatedComponents/DeprecatedSummaryScreen')
+jest.mock('../DeprecatedComponents/DeprecatedRobotMotionLoadingModal')
+jest.mock('../DeprecatedComponents/DeprecatedConfirmPickUpTipModal')
+jest.mock('../DeprecatedComponents/DeprecatedExitPreventionModal')
 jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../hooks')
 
-const mockGenericStepScreen = GenericStepScreen as jest.MockedFunction<
-  typeof GenericStepScreen
+const mockGenericStepScreen = DeprecatedGenericStepScreen as jest.MockedFunction<
+  typeof DeprecatedGenericStepScreen
 >
-const mockIntroScreen = IntroScreen as jest.MockedFunction<typeof IntroScreen>
-const mockSummaryScreen = SummaryScreen as jest.MockedFunction<
-  typeof SummaryScreen
+const mockIntroScreen = DeprecatedIntroScreen as jest.MockedFunction<
+  typeof DeprecatedIntroScreen
 >
-const mockRobotMotionLoadingModal = RobotMotionLoadingModal as jest.MockedFunction<
-  typeof RobotMotionLoadingModal
+const mockSummaryScreen = DeprecatedSummaryScreen as jest.MockedFunction<
+  typeof DeprecatedSummaryScreen
 >
-const mockConfirmPickUpTipModal = ConfirmPickUpTipModal as jest.MockedFunction<
-  typeof ConfirmPickUpTipModal
+const mockRobotMotionLoadingModal = DeprecatedRobotMotionLoadingModal as jest.MockedFunction<
+  typeof DeprecatedRobotMotionLoadingModal
 >
-const mockExitPreventionModal = ExitPreventionModal as jest.MockedFunction<
-  typeof ExitPreventionModal
+const mockConfirmPickUpTipModal = DeprecatedConfirmPickUpTipModal as jest.MockedFunction<
+  typeof DeprecatedConfirmPickUpTipModal
+>
+const mockExitPreventionModal = DeprecatedExitPreventionModal as jest.MockedFunction<
+  typeof DeprecatedExitPreventionModal
 >
 const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
 const mockUseRestartRun = useRestartRun as jest.MockedFunction<

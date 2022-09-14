@@ -34,7 +34,7 @@ interface OverflowMenuProps {
 
 export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
   const { protocolKey, protocolType } = props
-  const { t } = useTranslation(['protocol_details', 'protocol_list'])
+  const { t } = useTranslation(['protocol_details', 'protocol_list', 'shared'])
   const {
     menuOverlay,
     handleOverflowClick,
@@ -50,20 +50,22 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
 
   const handleClickShowInFolder: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
+    e.stopPropagation()
     dispatch(viewProtocolSourceFolder(protocolKey))
-    setShowOverflowMenu(!showOverflowMenu)
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
   const handleClickReanalyze: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
+    e.stopPropagation()
     dispatch(analyzeProtocol(protocolKey))
-    setShowOverflowMenu(!showOverflowMenu)
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
 
   const handleClickDelete: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
     confirmDeleteProtocol()
-    setShowOverflowMenu(!showOverflowMenu)
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
 
   return (
@@ -75,7 +77,7 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
       />
       {showOverflowMenu ? (
         <Flex
-          width="12rem"
+          whiteSpace="nowrap"
           zIndex={10}
           borderRadius="4px 4px 0px 0px"
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
@@ -95,7 +97,7 @@ export function OverflowMenu(props: OverflowMenuProps): JSX.Element {
             onClick={handleClickReanalyze}
             data-testid="ProtocolDetailsOverflowMenu_reanalyze"
           >
-            {t('reanalyze')}
+            {t('shared:reanalyze')}
           </MenuItem>
           <MenuItem
             onClick={handleClickDelete}

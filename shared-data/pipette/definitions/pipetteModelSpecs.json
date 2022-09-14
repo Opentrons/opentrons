@@ -5609,7 +5609,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -22.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -5647,10 +5647,9 @@
         "type": "float"
       },
       "tipOverlap": {
-        "default": 9.7,
-        "opentrons/opentrons_96_tiprack_1000ul/1": 11.5,
-        "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5,
-        "opentrons/geb_96_tiprack_1000ul/1": 9.5
+        "default": 10.5,
+        "opentrons/opentrons_ot3_96_tiprack_1000ul/1": 10.5,
+        "opentrons/opentrons_ot3_96_tiprack_200ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -5729,7 +5728,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -22.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -5767,10 +5766,9 @@
         "type": "float"
       },
       "tipOverlap": {
-        "default": 9.7,
-        "opentrons/opentrons_96_tiprack_1000ul/1": 11.5,
-        "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5,
-        "opentrons/geb_96_tiprack_1000ul/1": 9.5
+        "default": 10.5,
+        "opentrons/opentrons_ot3_96_tiprack_1000ul/1": 10.5,
+        "opentrons/opentrons_ot3_96_tiprack_200ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -5779,7 +5777,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["pickupTipShake"],
+      "quirks": [],
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
     },
@@ -5849,7 +5847,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -22.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -5936,10 +5934,8 @@
         "type": "float"
       },
       "tipOverlap": {
-        "default": 9.7,
-        "opentrons/opentrons_96_tiprack_1000ul/1": 11.5,
-        "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5,
-        "opentrons/geb_96_tiprack_1000ul/1": 9.5
+        "default": 10.5,
+        "opentrons/opentrons_96_tiprack_50ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -5948,7 +5944,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["pickupTipShake"],
+      "quirks": [],
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
     },
@@ -6018,7 +6014,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -22.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -6106,10 +6102,8 @@
         "type": "float"
       },
       "tipOverlap": {
-        "default": 9.7,
-        "opentrons/opentrons_96_tiprack_1000ul/1": 11.5,
-        "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5,
-        "opentrons/geb_96_tiprack_1000ul/1": 9.5
+        "default": 10.5,
+        "opentrons/opentrons_96_tiprack_50ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -6118,7 +6112,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["pickupTipShake"],
+      "quirks": [],
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
     },
@@ -6154,7 +6148,7 @@
         "type": "float"
       },
       "pickUpCurrent": {
-        "value": 1.4,
+        "value": 1.0,
         "min": 0.05,
         "max": 2.0,
         "units": "amps",
@@ -6188,7 +6182,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -16.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -6226,10 +6220,9 @@
         "type": "float"
       },
       "tipOverlap": {
-        "default": 9.7,
-        "opentrons/opentrons_96_tiprack_1000ul/1": 11.5,
-        "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5,
-        "opentrons/geb_96_tiprack_1000ul/1": 9.5
+        "default": 10.5,
+        "opentrons/opentrons_ot3_96_tiprack_1000ul/1": 10.5,
+        "opentrons/opentrons_ot3_96_tiprack_200ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -6238,7 +6231,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["pickupTipShake"],
+      "quirks": [],
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
     },
@@ -6274,7 +6267,7 @@
         "type": "float"
       },
       "pickUpCurrent": {
-        "value": 1.4,
+        "value": 1.0,
         "min": 0.05,
         "max": 2.0,
         "units": "amps",
@@ -6308,7 +6301,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -16.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -6346,10 +6339,9 @@
         "type": "float"
       },
       "tipOverlap": {
-        "default": 9.7,
-        "opentrons/opentrons_96_tiprack_1000ul/1": 11.5,
-        "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5,
-        "opentrons/geb_96_tiprack_1000ul/1": 9.5
+        "default": 10.5,
+        "opentrons/opentrons_ot3_96_tiprack_1000ul/1": 10.5,
+        "opentrons/opentrons_ot3_96_tiprack_200ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -6358,7 +6350,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["pickupTipShake"],
+      "quirks": [],
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
     },
@@ -6394,7 +6386,7 @@
         "type": "float"
       },
       "pickUpCurrent": {
-        "value": 1.4,
+        "value": 1.0,
         "min": 0.05,
         "max": 2.0,
         "units": "amps",
@@ -6428,7 +6420,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -16.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -6515,10 +6507,8 @@
         "type": "float"
       },
       "tipOverlap": {
-        "default": 9.7,
-        "opentrons/opentrons_96_tiprack_1000ul/1": 11.5,
-        "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5,
-        "opentrons/geb_96_tiprack_1000ul/1": 9.5
+        "default": 10.5,
+        "opentrons/opentrons_96_tiprack_50ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -6527,7 +6517,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["pickupTipShake"],
+      "quirks": [],
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
     },
@@ -6563,7 +6553,7 @@
         "type": "float"
       },
       "pickUpCurrent": {
-        "value": 1.4,
+        "value": 1.0,
         "min": 0.05,
         "max": 2.0,
         "units": "amps",
@@ -6597,7 +6587,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "nozzleOffset": [0.5, -22.0, -259.15],
+      "nozzleOffset": [-0.5, -16.0, -259.15],
       "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
@@ -6684,10 +6674,8 @@
         "type": "float"
       },
       "tipOverlap": {
-        "default": 9.7,
-        "opentrons/opentrons_96_tiprack_1000ul/1": 11.5,
-        "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5,
-        "opentrons/geb_96_tiprack_1000ul/1": 9.5
+        "default": 10.5,
+        "opentrons/opentrons_96_tiprack_50ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -6696,7 +6684,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["pickupTipShake"],
+      "quirks": [],
       "returnTipHeight": 0.83,
       "idleCurrent": 0.3
     }

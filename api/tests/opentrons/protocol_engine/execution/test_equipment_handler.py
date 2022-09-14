@@ -4,8 +4,9 @@ from datetime import datetime
 from decoy import Decoy, matchers
 from typing import Any, cast
 
-from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
+from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.types import Mount as HwMount, MountType, DeckSlotName
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
@@ -20,7 +21,7 @@ from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
-    PipetteName,
+    LoadedLabware,
     LoadedPipette,
     LabwareOffset,
     LabwareOffsetVector,
@@ -317,6 +318,102 @@ async def test_load_labware_on_module(
     )
 
 
+def test_move_labware_to_deck(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: EquipmentHandler,
+) -> None:
+    """It should find a new offset by resolving the new location."""
+    decoy.when(state_store.labware.get(labware_id="input-labware-id")).then_return(
+        LoadedLabware(
+            id="input-labware-id",
+            loadName="load-name",
+            definitionUri="opentrons-test/load-name/1",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            offsetId=None,
+        )
+    )
+
+    decoy.when(
+        state_store.labware.find_applicable_labware_offset(
+            definition_uri="opentrons-test/load-name/1",
+            location=LabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_3,
+                moduleModel=None,
+            ),
+        )
+    ).then_return(
+        LabwareOffset(
+            id="labware-offset-id",
+            createdAt=datetime(year=2021, month=1, day=2),
+            definitionUri="opentrons-test/load-name/1",
+            location=LabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_3,
+                moduleModel=None,
+            ),
+            vector=LabwareOffsetVector(x=1, y=2, z=3),
+        )
+    )
+
+    result = subject.move_labware(
+        labware_id="input-labware-id",
+        new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+    )
+
+    assert result == "labware-offset-id"
+
+
+def test_move_labware_to_module(
+    decoy: Decoy,
+    state_store: StateStore,
+    subject: EquipmentHandler,
+) -> None:
+    """It should find a new offset by resolving the new location."""
+    decoy.when(state_store.labware.get(labware_id="input-labware-id")).then_return(
+        LoadedLabware(
+            id="input-labware-id",
+            loadName="load-name",
+            definitionUri="opentrons-test/load-name/1",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            offsetId=None,
+        )
+    )
+    decoy.when(state_store.modules.get_model("input-module-id")).then_return(
+        ModuleModel.THERMOCYCLER_MODULE_V1
+    )
+    decoy.when(state_store.modules.get_location("input-module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+    )
+
+    decoy.when(
+        state_store.labware.find_applicable_labware_offset(
+            definition_uri="opentrons-test/load-name/1",
+            location=LabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_3,
+                moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1,
+            ),
+        )
+    ).then_return(
+        LabwareOffset(
+            id="labware-offset-id",
+            createdAt=datetime(year=2021, month=1, day=2),
+            definitionUri="opentrons-test/load-name/1",
+            location=LabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_3,
+                moduleModel=ModuleModel.THERMOCYCLER_MODULE_V1,
+            ),
+            vector=LabwareOffsetVector(x=1, y=2, z=3),
+        )
+    )
+
+    result = subject.move_labware(
+        labware_id="input-labware-id",
+        new_location=ModuleLocation(moduleId="input-module-id"),
+    )
+
+    assert result == "labware-offset-id"
+
+
 async def test_load_pipette(
     decoy: Decoy,
     model_utils: ModelUtils,
@@ -327,7 +424,7 @@ async def test_load_pipette(
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
     result = await subject.load_pipette(
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
         pipette_id=None,
     )
@@ -335,7 +432,7 @@ async def test_load_pipette(
     assert result == LoadedPipetteData(pipette_id="unique-id")
     decoy.verify(
         await hardware_api.cache_instruments(
-            {HwMount.LEFT: PipetteName.P300_SINGLE}  # type: ignore[dict-item]
+            {HwMount.LEFT: PipetteNameType.P300_SINGLE.value}
         )
     )
 
@@ -343,7 +440,7 @@ async def test_load_pipette(
 async def test_load_pipette_uses_provided_id(subject: EquipmentHandler) -> None:
     """It should use the provided ID rather than generating an ID for the pipette."""
     result = await subject.load_pipette(
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
         pipette_id="my-pipette-id",
     )
@@ -365,12 +462,12 @@ async def test_load_pipette_checks_existence_with_already_loaded(
         LoadedPipette(
             id="pipette-id",
             mount=MountType.RIGHT,
-            pipetteName=PipetteName.P300_MULTI_GEN2,
+            pipetteName=PipetteNameType.P300_MULTI_GEN2,
         )
     )
 
     result = await subject.load_pipette(
-        pipette_name=PipetteName.P300_SINGLE,
+        pipette_name=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
         pipette_id=None,
     )
@@ -379,8 +476,8 @@ async def test_load_pipette_checks_existence_with_already_loaded(
     decoy.verify(
         await hardware_api.cache_instruments(
             {
-                HwMount.LEFT: PipetteName.P300_SINGLE,  # type: ignore[dict-item]
-                HwMount.RIGHT: PipetteName.P300_MULTI_GEN2,  # type: ignore[dict-item]
+                HwMount.LEFT: PipetteNameType.P300_SINGLE.value,
+                HwMount.RIGHT: PipetteNameType.P300_MULTI_GEN2.value,
             }
         )
     )
@@ -397,7 +494,7 @@ async def test_load_pipette_raises_if_pipette_not_attached(
 
     decoy.when(
         await hardware_api.cache_instruments(
-            {HwMount.LEFT: PipetteName.P300_SINGLE}  # type: ignore[dict-item]
+            {HwMount.LEFT: PipetteNameType.P300_SINGLE.value}
         )
     ).then_raise(
         RuntimeError(
@@ -410,7 +507,7 @@ async def test_load_pipette_raises_if_pipette_not_attached(
         errors.FailedToLoadPipetteError, match=".+p300_single was requested"
     ):
         await subject.load_pipette(
-            pipette_name=PipetteName.P300_SINGLE,
+            pipette_name=PipetteNameType.P300_SINGLE,
             mount=MountType.LEFT,
             pipette_id=None,
         )

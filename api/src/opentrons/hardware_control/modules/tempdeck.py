@@ -108,6 +108,10 @@ class TempDeck(mod_abc.AbstractModule):
     def name(cls) -> str:
         return "tempdeck"
 
+    def firmware_prefix(self) -> str:
+        """The prefix used for looking up firmware"""
+        return "temperature-module"
+
     def model(self) -> str:
         return self._model_from_revision(self._device_info.get("model"))
 

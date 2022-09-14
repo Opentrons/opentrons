@@ -86,6 +86,29 @@
           "description": "X, Y, Z offset from the specified origin with respect to well"
         }
       }
+    },
+
+    "labwareLocation": {
+      "oneOf": [
+        {
+          "required": ["slotName"],
+          "properties": {
+            "slotName": {
+              "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations",
+              "type": "string"
+            }
+          }
+        },
+        {
+          "required": ["moduleId"],
+          "properties": {
+            "moduleId": {
+              "description": "Unique identifier of destination module. Must be a key from the top level 'modules' object.",
+              "type": "string"
+            }
+          }
+        }
+      ]
     }
   },
 
@@ -427,6 +450,27 @@
                     "type": "boolean",
                     "default": false
                   }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "[PROVISIONAL AND EXPERIMENTAL] Move Labware: Move a loaded labware from one place to another.",
+            "type": "object",
+            "required": ["commandType", "params"],
+            "properties": {
+              "key": { "type": "string" },
+              "commandType": { "enum": ["moveLabware"] },
+              "params": {
+                "required": ["labwareId", "newLocation"],
+                "labwareId": {
+                  "type": "string",
+                  "description": "The ID of the labware to move. Must be a key from the top-level `labware` object."
+                },
+                "newLocation": {
+                  "$ref": "#/definitions/labwareLocation",
+                  "description": "Where to move the labware."
                 }
               }
             }
@@ -1068,43 +1112,11 @@
                 "properties": {
                   "labwareId": {
                     "type": "string",
-                    "description": "Unique identifier of labware to load"
+                    "description": "Unique identifier of labware to load. Must be a key from the top-level `labware` object."
                   },
                   "location": {
-                    "description": "Physical destination location to load labware into (e.g. '1' || 'someModuleId')",
-                    "oneOf": [
-                      {
-                        "required": ["slotName"],
-                        "properties": {
-                          "slotName": {
-                            "description": "Unique string identifier that corresponds to a slot in the referenced deck definition's locations",
-                            "type": "string"
-                          }
-                        }
-                      },
-                      {
-                        "required": ["moduleId"],
-                        "properties": {
-                          "moduleId": {
-                            "description": "Unique identifier of destination module. Must be a key from the top level 'modules' object.",
-                            "type": "string"
-                          }
-                        }
-                      },
-                      {
-                        "required": ["labwareId"],
-                        "properties": {
-                          "labwareId": {
-                            "description": "Unique identifier of destination labware. Must be a key from the top level 'labware' object.",
-                            "type": "string"
-                          }
-                        }
-                      }
-                    ],
-                    "displayName": {
-                      "type": "string",
-                      "description": "Optional user-defined nickname for this labware instance within the protocol"
-                    }
+                    "$ref": "#/definitions/labwareLocation",
+                    "description": "Physical destination location to load labware into."
                   }
                 }
               }

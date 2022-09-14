@@ -25,6 +25,7 @@ from opentrons.protocols.api_support.util import (
 )
 
 from .core.instrument import AbstractInstrument
+from .core.well import AbstractWellCore
 from .module_contexts import ThermocyclerContext, HeaterShakerContext
 from . import labware
 
@@ -61,7 +62,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     def __init__(
         self,
-        implementation: AbstractInstrument,
+        implementation: AbstractInstrument[AbstractWellCore],
         ctx: ProtocolContext,
         broker: Broker,
         at_version: APIVersion,
@@ -1246,7 +1247,7 @@ class InstrumentContext(publisher.CommandPublisher):
         if not from_loc:
             from_loc = types.Location(types.Point(0, 0, 0), LabwareLike(None))
 
-        for mod in self._ctx._modules:
+        for mod in self._ctx._modules.values():
             if isinstance(mod, ThermocyclerContext):
                 mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
             if isinstance(mod, HeaterShakerContext):

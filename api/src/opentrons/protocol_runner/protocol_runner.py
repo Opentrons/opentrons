@@ -1,6 +1,9 @@
 """Protocol run control and management."""
 from typing import List, NamedTuple, Optional
 
+from opentrons.broker import Broker
+from opentrons.equipment_broker import EquipmentBroker
+from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_reader import (
     ProtocolSource,
@@ -22,6 +25,7 @@ from .legacy_wrappers import (
     LegacyFileReader,
     LegacyContextCreator,
     LegacyExecutor,
+    LegacyLoadInfo,
 )
 
 
@@ -173,13 +177,21 @@ class ProtocolRunner:
         protocol_source: ProtocolSource,
     ) -> None:
         protocol = self._legacy_file_reader.read(protocol_source)
-        context = self._legacy_context_creator.create(protocol)
+        broker = None
+        equipment_broker = None
 
-        self._protocol_engine.add_plugin(
-            LegacyContextPlugin(
-                hardware_api=self._hardware_api,
-                protocol_context=context,
+        if not feature_flags.enable_protocol_engine_papi_core():
+            broker = Broker()
+            equipment_broker = EquipmentBroker[LegacyLoadInfo]()
+
+            self._protocol_engine.add_plugin(
+                LegacyContextPlugin(broker=broker, equipment_broker=equipment_broker)
             )
+
+        context = self._legacy_context_creator.create(
+            protocol=protocol,
+            broker=broker,
+            equipment_broker=equipment_broker,
         )
 
         self._task_queue.set_run_func(

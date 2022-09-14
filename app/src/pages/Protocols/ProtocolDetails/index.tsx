@@ -21,7 +21,7 @@ export function ProtocolDetails(): JSX.Element {
 
   React.useEffect(() => {
     dispatch(fetchProtocols())
-  }, [])
+  }, [dispatch])
 
   return storedProtocol != null ? (
     <ProtocolDetailsContents {...storedProtocol} />

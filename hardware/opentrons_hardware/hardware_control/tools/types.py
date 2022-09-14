@@ -18,7 +18,7 @@ class ToolDetectionResult:
 class GripperInformation:
     """Model the information you can retrieve from a gripper."""
 
-    model: int
+    model: str
     serial: str
 
 

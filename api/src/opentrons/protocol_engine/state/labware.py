@@ -16,7 +16,7 @@ from opentrons.calibration_storage.helpers import uri_from_details
 
 from .. import errors
 from ..resources import DeckFixedLabware
-from ..commands import Command, LoadLabwareResult
+from ..commands import Command, LoadLabwareResult, MoveLabwareResult
 from ..types import (
     DeckSlotLocation,
     Dimensions,
@@ -75,7 +75,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             for fixed_labware in deck_fixed_labware
         }
         labware_by_id = {
-            fixed_labware.labware_id: LoadedLabware(
+            fixed_labware.labware_id: LoadedLabware.construct(
                 id=fixed_labware.labware_id,
                 location=fixed_labware.location,
                 loadName=fixed_labware.definition.parameters.loadName,
@@ -102,7 +102,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             self._handle_command(action.command)
 
         elif isinstance(action, AddLabwareOffsetAction):
-            labware_offset = LabwareOffset(
+            labware_offset = LabwareOffset.construct(
                 id=action.labware_offset_id,
                 createdAt=action.created_at,
                 definitionUri=action.request.definitionUri,
@@ -133,15 +133,24 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 version=command.result.definition.version,
             )
 
-            self._state.labware_by_id[labware_id] = LoadedLabware(
+            self._state.labware_by_id[labware_id] = LoadedLabware.construct(
                 id=labware_id,
                 location=command.params.location,
                 loadName=command.result.definition.parameters.loadName,
                 definitionUri=definition_uri,
                 offsetId=command.result.offsetId,
+                displayName=command.params.displayName,
             )
 
             self._state.definitions_by_uri[definition_uri] = command.result.definition
+
+        elif isinstance(command.result, MoveLabwareResult):
+            labware_id = command.params.labwareId
+            new_location = command.params.newLocation
+            new_offset_id = command.result.offsetId
+
+            self._state.labware_by_id[labware_id].offsetId = new_offset_id
+            self._state.labware_by_id[labware_id].location = new_location
 
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:
         """Add a new labware offset to state.
@@ -186,6 +195,10 @@ class LabwareView(HasState[LabwareState]):
         return self.get_definition_by_uri(
             LabwareUri(self.get(labware_id).definitionUri)
         )
+
+    def get_display_name(self, labware_id: str) -> Optional[str]:
+        """Get the labware's user-specified display name, if set."""
+        return self.get(labware_id).displayName
 
     def get_deck_definition(self) -> DeckDefinitionV3:
         """Get the current deck definition."""
@@ -393,6 +406,9 @@ class LabwareView(HasState[LabwareState]):
         """Get all labware offsets, in the order they were added."""
         return list(self._state.labware_offsets_by_id.values())
 
+    # TODO: Make this slightly more ergonomic for the caller by
+    # only returning the optional str ID, at the cost of baking redundant lookups
+    # into the API?
     def find_applicable_labware_offset(
         self,
         definition_uri: str,

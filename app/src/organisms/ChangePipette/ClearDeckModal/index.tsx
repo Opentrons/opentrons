@@ -5,48 +5,37 @@ import {
   Flex,
   SPACING,
   JUSTIFY_FLEX_END,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-import { WizardHeader } from '../../../molecules/WizardHeader'
 import { StyledText } from '../../../atoms/text'
 import { PrimaryButton } from '../../../atoms/buttons'
 
 export interface ClearDeckModalProps {
-  onContinueClick: () => unknown
-  onCancelClick: () => unknown
-  totalSteps: number
-  currentStep: number
-  title: string
+  onContinueClick: () => void
 }
 
 export function ClearDeckModal(props: ClearDeckModalProps): JSX.Element {
-  const {
-    onContinueClick,
-    onCancelClick,
-    totalSteps,
-    currentStep,
-    title,
-  } = props
+  const { onContinueClick } = props
   const { t } = useTranslation('change_pipette')
 
   return (
     <>
-      <WizardHeader
-        totalSteps={totalSteps}
-        currentStep={currentStep}
-        title={title}
-        onExit={onCancelClick}
-      />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        marginBottom="12.25rem"
         paddingX={SPACING.spacing6}
         paddingTop={SPACING.spacing6}
+        marginBottom="13.375rem"
       >
         <Trans
           t={t}
           i18nKey="remove_labware_before_start"
           components={{
-            h1: <StyledText as="h1" marginBottom={SPACING.spacing4} />,
+            h1: (
+              <StyledText
+                css={TYPOGRAPHY.h1Default}
+                marginBottom={SPACING.spacing4}
+              />
+            ),
             block: <StyledText as="p" />,
           }}
         />

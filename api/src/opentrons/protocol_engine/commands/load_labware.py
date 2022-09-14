@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
-from opentrons.protocols.models import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from ..types import LabwareLocation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
@@ -62,11 +62,15 @@ class LoadLabwareResult(BaseModel):
         description="The full definition data for this labware.",
     )
     offsetId: Optional[str] = Field(
+        # Default `None` instead of `...` so this field shows up as non-required in
+        # OpenAPI. The server is allowed to omit it or make it null.
         None,
         description=(
-            "An ID referencing the offset applied to this labware placement,"
-            " decided at load time."
-            " Null or undefined means no offset was provided for this load,"
+            "An ID referencing the labware offset that will apply"
+            " to the newly-placed labware."
+            " This offset will be in effect until the labware is moved"
+            " with a `moveLabware` command."
+            " Null or undefined means no offset applies,"
             " so the default of (0, 0, 0) will be used."
         ),
     )

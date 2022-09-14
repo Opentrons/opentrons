@@ -211,6 +211,7 @@ class AxisConstraints:
     max_acceleration: np.float64
     max_speed_discont: np.float64
     max_direction_change_speed_discont: np.float64
+    max_speed: np.float64
 
     @classmethod
     def build(
@@ -218,6 +219,7 @@ class AxisConstraints:
         max_acceleration: CoordinateValue,
         max_speed_discont: CoordinateValue,
         max_direction_change_speed_discont: CoordinateValue,
+        max_speed: CoordinateValue,
     ) -> AxisConstraints:
         """Build AxisConstraints."""
         return cls(
@@ -226,6 +228,7 @@ class AxisConstraints:
             max_direction_change_speed_discont=np.float64(
                 max_direction_change_speed_discont
             ),
+            max_speed=np.float64(max_speed),
         )
 
 
