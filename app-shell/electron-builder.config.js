@@ -45,7 +45,6 @@ module.exports = {
     target: ['AppImage'],
     executableName: 'opentrons',
     category: 'Science',
-    files: NO_USB_DETECTION ? ['!node_modules/usb-detection'] : [],
   },
   publish:
     OT_APP_DEPLOY_BUCKET && OT_APP_DEPLOY_FOLDER
