@@ -56,12 +56,12 @@ class Block:
 
         def _final_speed() -> np.float64:
             """Get final speed of the block."""
-            return cast(
-                np.float64,
-                np.sqrt(
-                    self.initial_speed**2 + self.acceleration * self.distance * 2
-                ),
-            )
+            speed_squared = self.initial_speed**2 + self.acceleration * self.distance * 2
+            # NOTE (AS, 2022-09-14): calculated value occasionally rounds to a negative,
+            #                        like -1E-11, which should really just be zero
+            if speed_squared < 0:
+                return np.float64(0.0)
+            return cast(np.float64, np.sqrt(speed_squared))
 
         def _time() -> np.float64:
             """Get the time it takes for the block to complete its motion."""
@@ -74,6 +74,7 @@ class Block:
 
         self.final_speed = _final_speed()
         self.time = _time()
+        print(self.time, self.final_speed, self.initial_speed, self.acceleration, self.distance)
 
 
 @dataclasses.dataclass
