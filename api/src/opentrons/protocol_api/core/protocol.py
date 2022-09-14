@@ -3,32 +3,20 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from dataclasses import dataclass
-from typing import Dict, Generic, Optional
+from typing import Dict, Generic, Optional, Union
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount, Location, DeckSlotName
-from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
-from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
-
-
-@dataclass(frozen=True)
-class LoadModuleResult:
-    """The result of load_module"""
-
-    type: ModuleType
-    geometry: ModuleGeometry
-    module: SynchronousAdapter[AbstractModule]
 
 
 class AbstractProtocol(
@@ -71,7 +59,7 @@ class AbstractProtocol(
     def load_labware(
         self,
         load_name: str,
-        location: DeckSlotName,
+        location: Union[DeckSlotName, ModuleCoreType],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
@@ -85,11 +73,7 @@ class AbstractProtocol(
         model: ModuleModel,
         deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
-    ) -> Optional[LoadModuleResult]:
-        ...
-
-    @abstractmethod
-    def get_loaded_modules(self) -> Dict[int, LoadModuleResult]:
+    ) -> ModuleCoreType:
         ...
 
     @abstractmethod
