@@ -418,7 +418,7 @@ class ProtocolContext(CommandPublisher):
         )
 
         module_context = _create_module_context(
-            core=module_core,
+            module_core=module_core,
             protocol_core=self._implementation,
             broker=self._broker,
             api_version=self._api_version,
