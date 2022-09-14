@@ -95,7 +95,7 @@ describe('SoftwareKeyboard', () => {
     // first row
     getByRole('button', { name: '~' })
     getByRole('button', { name: '!' })
-    // Note the fifth row also has @
+    // Note: kj the fifth row also has @
     const atButtons = getAllByRole('button', { name: '@' })
     expect(atButtons.length).toBe(2)
     getByRole('button', { name: '#' })

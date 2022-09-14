@@ -20,7 +20,6 @@ export function Numpad({ onChange, keyboardRef }: NumpadProps): JSX.Element {
     <Keyboard
       keyboardRef={r => (keyboardRef.current = r)}
       onChange={onChange}
-      // onKeyPress={onKeyPress}
       layoutName="default"
       autoUseTouchEvents={true}
       useButtonTag={true}
