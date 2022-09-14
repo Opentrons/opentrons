@@ -1,8 +1,6 @@
 import os
 
-import pytest
 import secrets
-from typing import Callable, IO
 from pathlib import Path
 
 from tests.integration.dev_server import DevServer
@@ -10,14 +8,13 @@ from tests.integration.robot_client import RobotClient
 from tests.integration.protocol_files import get_py_protocol, get_json_protocol
 
 
-@pytest.mark.parametrize("protocol", [(get_py_protocol), (get_json_protocol)])
-async def test_upload_protocols_and_reset_persistence_dir(
-    protocol: Callable[[str], IO[bytes]]
-) -> None:
-    """Test protocol and analysis persistence.
+async def test_upload_protocols_and_reset_persistence_dir() -> None:
+    """Test resetting runs history.
 
-    Uploaded protocols and their completed analyses should remain constant across
-    server restarts.
+    Immediately after resetting runs history, existing resources should remain
+    available over HTTP.
+
+    But after restarting the server, those resources should be gone.
     """
     port = "15555"
     async with RobotClient.make(
@@ -32,19 +29,21 @@ async def test_upload_protocols_and_reset_persistence_dir(
                 await robot_client.wait_until_alive()
             ), "Dev Robot never became available."
 
-            # Must not be so high that the server runs out of room and starts
-            # auto-deleting old protocols.
-            protocols_to_create = 15
+            with get_py_protocol(secrets.token_urlsafe(16)) as file:
+                await robot_client.post_protocol([Path(file.name)])
 
-            for _ in range(protocols_to_create):
-                with protocol(secrets.token_urlsafe(16)) as file:
-                    await robot_client.post_protocol([Path(file.name)])
+            with get_json_protocol(secrets.token_urlsafe(16)) as file:
+                await robot_client.post_protocol([Path(file.name)])
 
             await robot_client.post_setting_reset_options({"runsHistory": True})
 
             result = await robot_client.get_protocols()
 
-            assert result.json()["data"]
+            assert len(result.json()["data"]) == 2
+
+            # TODO(mm, 2022-09-08): This can erroneously pass if something other than
+            # our software creates a file in this directory, like if macOS creates
+            # .DS_Store.
             assert os.listdir(f"{server.persistence_directory}/protocols/")
 
             server.stop()
@@ -56,8 +55,9 @@ async def test_upload_protocols_and_reset_persistence_dir(
                 await robot_client.wait_until_alive()
             ), "Dev Robot never became available."
 
+            # Now that we've reset and restarted, the protocols should be gone.
+            # TODO(mm, 2022-09-08): We should also test that *runs* are cleared.
             result = await robot_client.get_protocols()
-
             assert result.json()["data"] == []
             assert os.listdir(f"{server.persistence_directory}/protocols/") == []
 

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { act } from '@testing-library/react-hooks'
 import { fireEvent } from '@testing-library/react'
 import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
@@ -208,15 +207,6 @@ describe('ChangePipette', () => {
 
     //  Instructions page
     getByText('Attach a pipette')
-
-    //  attach the pipette
-    act(() => {
-      when(mockGetPipetteNameSpecs)
-        .calledWith('p300_single_gen2')
-        .mockReturnValue(mockP300PipetteNameSpecs)
-    })
-
-    //  TODO(jr, 08/30/22): extend this test for attaching a pipette so you can go through the remainder of the flow
   })
 
   it('renders the wizard pages for detaching a single channel pipette and exits on the 2nd page rendering exit modal', () => {
@@ -290,16 +280,6 @@ describe('ChangePipette', () => {
     fireEvent.click(cont)
 
     //  Instructions page 2
-    //  disconnect the attached pipette
-    act(() => {
-      mockGetAttachedPipettes.mockReturnValue({
-        left: null,
-        right: null,
-      })
-    })
-    const confirm = getByLabelText('Confirm')
-    fireEvent.click(confirm)
-
-    //  TODO(jr, 08/30/22): extend this test to test for the final confirm pipette page, need to remove attach pieptte
+    getByLabelText('Confirm')
   })
 })

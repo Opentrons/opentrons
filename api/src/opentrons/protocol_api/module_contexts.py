@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import logging
-from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar, cast
+from typing import Generic, List, Optional, TypeVar, cast
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons import types
+from opentrons.broker import Broker
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
-from opentrons.hardware_control import modules
+from opentrons.hardware_control import SynchronousAdapter, modules
 from opentrons.hardware_control.modules import ModuleModel, types as module_types
 from opentrons.hardware_control.types import Axis
 from opentrons.commands import module_commands as cmds
@@ -19,17 +22,18 @@ from opentrons.protocols.geometry.module_geometry import (
     HeaterShakerGeometry,
 )
 
-from . import validation
+from .core.protocol import AbstractProtocol
+from .core.instrument import AbstractInstrument
+from .core.labware import AbstractLabware
+from .core.module import AbstractModuleCore
+from .core.well import AbstractWellCore
+
 from .module_validation_and_errors import (
     validate_heater_shaker_temperature,
     validate_heater_shaker_speed,
 )
-from .labware import Labware, load, load_from_definition
-from .core.protocol_api.load_info import LabwareLoadInfo
+from .labware import Labware
 
-if TYPE_CHECKING:
-    from .protocol_context import ProtocolContext
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 ENGAGE_HEIGHT_UNIT_CNV = 2
 MAGDECK_HALF_MM_LABWARE = [
@@ -40,9 +44,14 @@ MAGDECK_HALF_MM_LABWARE = [
     "usascientific_96_wellplate_2.4ml_deep",
 ]
 
-MODULE_LOG = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 GeometryType = TypeVar("GeometryType", bound=ModuleGeometry)
+
+InstrumentCore = AbstractInstrument[AbstractWellCore]
+LabwareCore = AbstractLabware[AbstractWellCore]
+ModuleCore = AbstractModuleCore[LabwareCore]
+ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
 
 
 class NoTargetTemperatureSetError(RuntimeError):
@@ -54,38 +63,30 @@ class CannotPerformModuleAction(RuntimeError):
 
 
 class ModuleContext(CommandPublisher, Generic[GeometryType]):
-    """An object representing a connected module.
+    """A connected module in the protocol.
 
     .. versionadded:: 2.0
     """
 
     def __init__(
         self,
-        ctx: ProtocolContext,
-        geometry: GeometryType,
-        requested_as: ModuleModel,
-        at_version: APIVersion,
+        core: ModuleCore,
+        protocol_core: ProtocolCore,
+        api_version: APIVersion,
+        broker: Broker,
     ) -> None:
-        """Build the ModuleContext.
-
-        This usually should not be instantiated directly; instead, modules
-        should be loaded using :py:meth:`ProtocolContext.load_module`.
-
-        :param ctx: The parent context for the module
-        :param geometry: The :py:class:`.ModuleGeometry` for the module
-        :param requested_as: See :py:obj:`requested_as`.
-        """
-        super().__init__(ctx.broker)
-        self._geometry = geometry
-        self._ctx = ctx
-        self._requested_as = requested_as
-        self._api_version = at_version
+        super().__init__(broker=broker)
+        self._core = core
+        self._protocol_core = protocol_core
+        self._api_version = api_version
+        self._labware: Optional[Labware] = None
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         return self._api_version
 
+    # TODO(mc, 2022-09-08): Remove this method
     @requires_version(2, 0)
     def load_labware_object(self, labware: Labware) -> Labware:
         """Specify the presence of a piece of labware on the module.
@@ -96,40 +97,19 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
                         onto the module in one step, see
                         :py:meth:`load_labware`.
         :returns: The properly-linked labware object
+
+        ..deprecated: 2.14
         """
-        # TODO(mc, 2022-09-02): move to module_core
-        mod_labware = self._geometry.add_labware(labware)
-
-        labware_core = mod_labware._implementation
-        deck_slot = validation.ensure_deck_slot(self._geometry.parent)  # type: ignore[arg-type]
-        load_params = labware_core.get_load_params()
-
-        provided_offset = self._ctx._implementation._labware_offset_provider.find(  # type: ignore[attr-defined]
-            load_params=load_params,
-            requested_module_model=self.requested_as,
-            deck_slot=deck_slot,
+        _log.warning(
+            "`module.load_labware_object` is an internal, deprecated method."
+            " Use `module.load_labware` or `load_labware_by_definition` instead."
         )
+        assert (
+            labware.parent == self.geometry
+        ), "Labware is not configured with this module as its parent"
 
-        labware_core.set_calibration(provided_offset.delta)
-        self._ctx._implementation.get_deck().recalculate_high_z()
+        return self._core.geometry.add_labware(labware)
 
-        # TODO(mc, 2022-09-07): move into module or protocol core
-        self._ctx._implementation.equipment_broker.publish(  # type: ignore[attr-defined]
-            LabwareLoadInfo(
-                labware_definition=labware_core.get_definition(),
-                labware_namespace=load_params.namespace,
-                labware_load_name=load_params.load_name,
-                labware_version=load_params.version,
-                deck_slot=deck_slot,
-                on_module=True,
-                offset_id=provided_offset.offset_id,
-                labware_display_name=labware_core.get_user_display_name(),
-            )
-        )
-
-        return mod_labware
-
-    @requires_version(2, 0)
     def load_labware(
         self,
         name: str,
@@ -137,37 +117,47 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         namespace: Optional[str] = None,
         version: int = 1,
     ) -> Labware:
-        """Specify the presence of a piece of labware on the module.
+        """Load a labware onto the module by its load parameters.
 
         :param name: The name of the labware object.
-        :param str label: An optional special name to give the labware. If
-            specified, this is the name the labware will appear as in the run
-            log and the calibration view in the Opentrons app.
+        :param str label: An optional display name to give the labware.
+            If specified, this is the name the labware will use in the run log
+            and the calibration view in the Opentrons App.
         :param str namespace: The namespace the labware definition belongs to.
             If unspecified, will search 'opentrons' then 'custom_beta'
-        :param int version: The version of the labware definition. If
-            unspecified, will use version 1.
+        :param int version: The version of the labware definition.
+            If unspecified, will use version 1.
 
         :returns: The initialized and loaded labware object.
 
         .. versionadded:: 2.1
             The *label,* *namespace,* and *version* parameters.
         """
-        if self.api_version < APIVersion(2, 1) and (label or namespace or version):
-            MODULE_LOG.warning(
+        if self._api_version < APIVersion(2, 1) and (
+            label is not None or namespace is not None or version != 1
+        ):
+            _log.warning(
                 f"You have specified API {self.api_version}, but you "
                 "are trying to utilize new load_labware parameters in 2.1"
             )
-        lw = load(
-            name,
-            self._geometry.location,
-            label,
-            namespace,
-            version,
-            bundled_defs=self._ctx._implementation.get_bundled_labware(),
-            extra_defs=self._ctx._implementation.get_extra_labware(),
+
+        labware_core = self._protocol_core.load_labware(
+            load_name=name,
+            label=label,
+            namespace=namespace,
+            version=version,
+            location=self._core,
         )
-        return self.load_labware_object(lw)
+
+        # TODO(mc, 2022-09-02): add API version
+        # https://opentrons.atlassian.net/browse/RSS-97
+        labware = self._core.geometry.add_labware(Labware(implementation=labware_core))
+
+        # TODO(mc, 2022-09-08): move this into legacy PAPIv2 implementation
+        # by reworking the `Deck` and/or `ModuleGeometry` interface
+        self._protocol_core.get_deck().recalculate_high_z()
+
+        return labware
 
     @requires_version(2, 0)
     def load_labware_from_definition(
@@ -184,8 +174,14 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
                           Opentrons app.
         :returns: The initialized and loaded labware object.
         """
-        lw = load_from_definition(definition, self._geometry.location, label)
-        return self.load_labware_object(lw)
+        load_params = self._protocol_core.add_labware_definition(definition)
+
+        return self.load_labware(
+            name=load_params.load_name,
+            namespace=load_params.namespace,
+            version=load_params.version,
+            label=label,
+        )
 
     @requires_version(2, 1)
     def load_labware_by_name(
@@ -199,26 +195,25 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
         .. deprecated:: 2.0
             Use :py:meth:`load_labware` instead.
         """
-        MODULE_LOG.warning(
-            "load_labware_by_name is deprecated. Use load_labware instead."
+        _log.warning("load_labware_by_name is deprecated. Use load_labware instead.")
+        return self.load_labware(
+            name=name, label=label, namespace=namespace, version=version
         )
-        return self.load_labware(name, label, namespace, version)
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def labware(self) -> Optional[Labware]:
         """The labware (if any) present on this module."""
-        return self._geometry.labware
+        return self._core.geometry.labware
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
-    # TODO (spp, 2022-07-27): Check if it is better to use GeometryType as the returnType
-    def geometry(self) -> ModuleGeometry:
+    def geometry(self) -> GeometryType:
         """The object representing the module as an item on the deck
 
         :returns: ModuleGeometry
         """
-        return self._geometry
+        return cast(GeometryType, self._core.geometry)
 
     @property
     def requested_as(self) -> ModuleModel:
@@ -231,11 +226,16 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
 
         :meta private:
         """
-        return self._requested_as
+        return self._core.get_requested_model()
+
+    # TODO(mc, 2022-09-08): remove this property
+    @property
+    def _module(self) -> SynchronousAdapter[modules.AbstractModule]:
+        return self._core._sync_module_hardware  # type: ignore[attr-defined, no-any-return]
 
     def __repr__(self) -> str:
         return "{} at {} lw {}".format(
-            self.__class__.__name__, self._geometry, self.labware
+            self.__class__.__name__, self.geometry, self.labware
         )
 
 
@@ -271,18 +271,9 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
 
     """
 
-    def __init__(
-        self,
-        ctx: ProtocolContext,
-        # TODO(mc, 2022-02-05): this type annotation is misleading;
-        # a SynchronousAdapter wrapper is actually passed in
-        hw_module: modules.tempdeck.TempDeck,
-        geometry: ModuleGeometry,
-        requested_as: ModuleModel,
-        at_version: APIVersion,
-    ) -> None:
-        self._module = hw_module
-        super().__init__(ctx, geometry, requested_as, at_version)
+    # TODO(mc, 2022-02-05): this type annotation is misleading;
+    # a SynchronousAdapter wrapper is actually passed in
+    _module: modules.tempdeck.TempDeck  # type: ignore[assignment]
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
@@ -356,18 +347,9 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
 
     """
 
-    def __init__(
-        self,
-        ctx: ProtocolContext,
-        # TODO(mc, 2022-02-05): this type annotation is misleading;
-        # a SynchronousAdapter wrapper is actually passed in
-        hw_module: modules.magdeck.MagDeck,
-        geometry: ModuleGeometry,
-        requested_as: ModuleModel,
-        at_version: APIVersion,
-    ) -> None:
-        self._module = hw_module
-        super().__init__(ctx, geometry, requested_as, at_version)
+    # TODO(mc, 2022-02-05): this type annotation is misleading;
+    # a SynchronousAdapter wrapper is actually passed in
+    _module: modules.magdeck.MagDeck  # type: ignore[assignment]
 
     @publish(command=cmds.magdeck_calibrate)
     @requires_version(2, 0)
@@ -385,7 +367,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         Load labware onto a Magnetic Module, checking if it is compatible
         """
         if labware.magdeck_engage_height is None:
-            MODULE_LOG.warning(
+            _log.warning(
                 "This labware ({}) is not explicitly compatible with the"
                 " Magnetic Module. You will have to specify a height when"
                 " calling engage()."
@@ -451,9 +433,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         # we will silently ignore it instead of raising APIVersionError.
         # Leaving this unfixed because we haven't thought through
         # how to do backwards-compatible fixes to our version checking itself.
-        elif height_from_base is not None and self._ctx._api_version >= APIVersion(
-            2, 2
-        ):
+        elif height_from_base is not None and self._api_version >= APIVersion(2, 2):
             dist = (
                 height_from_base
                 + modules.magdeck.OFFSET_TO_LABWARE_BOTTOM[self._module.model()]
@@ -488,7 +468,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
 
         engage_height = self.labware.magdeck_engage_height
 
-        is_api_breakpoint = self._ctx._api_version >= APIVersion(2, 3)
+        is_api_breakpoint = self._api_version >= APIVersion(2, 3)
         is_v1_module = self._module.model() == "magneticModuleV1"
         engage_height_is_in_half_mm = self.labware.load_name in MAGDECK_HALF_MM_LABWARE
 
@@ -521,67 +501,67 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     .. versionadded:: 2.0
     """
 
-    def __init__(
-        self,
-        ctx: ProtocolContext,
-        # TODO(mc, 2022-02-05): this type annotation is misleading;
-        # a SynchronousAdapter wrapper is actually passed in
-        hw_module: modules.thermocycler.Thermocycler,
-        geometry: ThermocyclerGeometry,
-        requested_as: ModuleModel,
-        at_version: APIVersion,
-    ) -> None:
-        self._module = hw_module
-        super().__init__(ctx, geometry, requested_as, at_version)
+    # TODO(mc, 2022-02-05): this type annotation is misleading;
+    # a SynchronousAdapter wrapper is actually passed in
+    _module: modules.thermocycler.Thermocycler  # type: ignore[assignment]
+
+    def _get_fixed_trash(self) -> Labware:
+        trash = self._protocol_core.get_fixed_trash()
+
+        if isinstance(trash, AbstractLabware):
+            trash = Labware(implementation=trash)
+
+        return cast(Labware, trash)
 
     def _prepare_for_lid_move(self) -> None:
         loaded_instruments = [
             instr
-            for mount, instr in self._ctx._instruments.items()
+            for mount, instr in self._protocol_core.get_loaded_instruments().items()
             if instr is not None
         ]
         try:
-            instr = loaded_instruments[0]
+            instr_impl = loaded_instruments[0]
         except IndexError:
-            MODULE_LOG.warning(
+            _log.warning(
                 "Cannot assure a safe gantry position to avoid colliding"
                 " with the lid of the Thermocycler Module."
             )
         else:
-            ctx_impl = self._ctx._implementation
-            instr_impl = instr._implementation
+            ctx_impl = self._protocol_core
             hardware = ctx_impl.get_hardware()
-
             hardware.retract(instr_impl.get_mount())
             high_point = hardware.current_position(instr_impl.get_mount())
-            trash_top = self._ctx.fixed_trash.wells()[0].top()
+            trash_top = self._get_fixed_trash().wells()[0].top()
             safe_point = trash_top.point._replace(
                 z=high_point[Axis.by_mount(instr_impl.get_mount())]
             )
-            instr.move_to(types.Location(safe_point, None), force_direct=True)
+            instr_impl.move_to(
+                types.Location(safe_point, None),
+                force_direct=True,
+                minimum_z_height=None,
+                speed=None,
+            )
 
     def flag_unsafe_move(
         self, to_loc: types.Location, from_loc: types.Location
     ) -> None:
-        cast(ThermocyclerGeometry, self.geometry).flag_unsafe_move(
-            to_loc, from_loc, self.lid_position
-        )
+        self.geometry.flag_unsafe_move(to_loc, from_loc, self.lid_position)
 
     @publish(command=cmds.thermocycler_open)
     @requires_version(2, 0)
     def open_lid(self) -> str:
         """Opens the lid"""
         self._prepare_for_lid_move()
-        self._geometry.lid_status = self._module.open()  # type: ignore[assignment]
-        return self._geometry.lid_status
+        self.geometry.lid_status = self._module.open()  # type: ignore[assignment]
+        return self.geometry.lid_status
 
     @publish(command=cmds.thermocycler_close)
     @requires_version(2, 0)
     def close_lid(self) -> str:
         """Closes the lid"""
         self._prepare_for_lid_move()
-        self._geometry.lid_status = self._module.close()  # type: ignore[assignment]
-        return self._geometry.lid_status
+        self.geometry.lid_status = self._module.close()  # type: ignore[assignment]
+        return self.geometry.lid_status
 
     @publish(command=cmds.thermocycler_set_block_temp)
     @requires_version(2, 0)
@@ -793,18 +773,9 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
     .. versionadded:: 2.13
     """
 
-    def __init__(
-        self,
-        ctx: ProtocolContext,
-        # TODO(mc, 2022-02-05): this type annotation is misleading;
-        # a SynchronousAdapter wrapper is actually passed in
-        hw_module: modules.heater_shaker.HeaterShaker,
-        geometry: HeaterShakerGeometry,
-        requested_as: ModuleModel,
-        at_version: APIVersion,
-    ) -> None:
-        self._module = hw_module
-        super().__init__(ctx, geometry, requested_as, at_version)
+    # TODO(mc, 2022-02-05): this type annotation is misleading;
+    # a SynchronousAdapter wrapper is actually passed in
+    _module: modules.heater_shaker.HeaterShaker  # type: ignore[assignment]
 
     @property  # type: ignore[misc]
     @requires_version(2, 13)
@@ -1014,7 +985,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
                 "Cannot determine pipette movement safety."
             )
 
-        cast(HeaterShakerGeometry, self.geometry).flag_unsafe_move(
+        self.geometry.flag_unsafe_move(
             to_slot=int(destination_slot),
             is_tiprack=is_tiprack,
             is_using_multichannel=is_multichannel,
@@ -1027,26 +998,25 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         Before shaking, retracts pipettes if they're parked over a slot
         adjacent to the heater-shaker.
         """
-
-        if cast(HeaterShakerGeometry, self.geometry).is_pipette_blocking_shake_movement(
-            pipette_location=self._ctx.location_cache
+        protocol_core = self._protocol_core
+        if self.geometry.is_pipette_blocking_shake_movement(
+            pipette_location=protocol_core.get_last_location()
         ):
-            ctx_implementation = self._ctx._implementation
-            hardware = ctx_implementation.get_hardware()
+            hardware = protocol_core.get_hardware()
             for mount in types.Mount:
                 hardware.retract(mount=mount)
-            self._ctx.location_cache = None
+            protocol_core.set_last_location(None)
 
     def _prepare_for_latch_open(self) -> None:
         """
         Before opening latch, retracts pipettes if they're parked over a slot
         east/ west of the heater-shaker.
         """
-        if cast(HeaterShakerGeometry, self.geometry).is_pipette_blocking_latch_movement(
-            pipette_location=self._ctx.location_cache
+        protocol_core = self._protocol_core
+        if self.geometry.is_pipette_blocking_latch_movement(
+            pipette_location=protocol_core.get_last_location()
         ):
-            ctx_implementation = self._ctx._implementation
-            hardware = ctx_implementation.get_hardware()
+            hardware = protocol_core.get_hardware()
             for mount in types.Mount:
                 hardware.retract(mount=mount)
-            self._ctx.location_cache = None
+            protocol_core.set_last_location(None)

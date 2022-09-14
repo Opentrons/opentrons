@@ -2,6 +2,7 @@ ignore:
   - '**/node_modules'
   - 'protocol-library-kludge'
   - 'webpack-config'
+  - 'hardware-testing'
   - '**/*.md'
   - '**/*.yaml'
   - '**/Makefile'

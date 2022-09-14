@@ -71,37 +71,66 @@ test:
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
+.PHONY: test-integration
+test-integration:
+	$(python) protocols/ot2_p300_single_channel_gravimetric.py --simulate
+
 .PHONY: lint
 lint:
-	$(python) -m mypy hardware_testing tests protocols
-	$(python) -m black --check hardware_testing tests protocols setup.py
-	$(python) -m flake8 hardware_testing tests protocols setup.py
+	$(python) -m mypy hardware_testing tests protocols scripts
+	$(python) -m black --check hardware_testing tests protocols scripts setup.py
+	$(python) -m flake8 hardware_testing tests protocols scripts setup.py
 
 .PHONY: format
 format:
-	$(python) -m black hardware_testing tests protocols setup.py
+	$(python) -m black hardware_testing tests protocols scripts setup.py
+
+define move-plot-webpage
+ssh -i $(2) $(3) root@$(1) \
+"function cleanup () { mount -o remount,ro / ; } ;\
+mount -o remount,rw / &&\
+mv /data/plot/index.html /usr/lib/python3.7/site-packages/hardware_testing/tools/plot &&\
+mv /data/plot/index.js /usr/lib/python3.7/site-packages/hardware_testing/tools/plot &&\
+cleanup || cleanup"
+endef
+
+.PHONY: push-plot-webpage
+push-plot-webpage:
+	scp -r hardware_testing/tools/plot root@$(host):/data
+	$(call move-plot-webpage,$(host),$(br_ssh_key),$(ssh_opts))
+
+.PHONY: restart
+restart:
+	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: push-no-restart
 push-no-restart:
 	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
 
 .PHONY: push
-push: push-no-restart
-	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"opentrons-robot-server")
+push: push-no-restart restart
 
+.PHONY: restart-ot3
+restart-ot3:
+	$(call restart-server,$(host),,$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
 push-no-restart-ot3: sdist Pipfile.lock
 	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"hardware_testing")
 
-.PHONY: push
-push-ot3: push-no-restart
-	$(call restart-server,$(host),,$(ssh_opts),"opentrons-robot-server")
+.PHONY: push-ot3
+push-ot3: push-no-restart-ot3 restart-ot3
 
-.PHONE: push-protocols
+.PHONY: push-protocols
 push-protocols:
 	scp -r protocols root@$(host):/data/user_storage/opentrons_data
+
+.PHONY: push-all
+push-all: clean wheel push-no-restart push-plot-webpage push-protocols
 
 .PHONY: term
 term:
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
+
+.PHONY: push-all-and-term
+push-all-and-term: push-all term
