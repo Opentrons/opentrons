@@ -5,6 +5,13 @@ import pytest
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import Mount, DeckSlotName
+from opentrons.hardware_control.modules.types import (
+    ModuleModel,
+    MagneticModuleModel,
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
+    HeaterShakerModuleModel,
+)
 from opentrons.protocol_api import validation as subject
 
 
@@ -70,3 +77,42 @@ def test_ensure_deck_slot_invalid() -> None:
 
     with pytest.raises(TypeError, match="must be a string or integer"):
         subject.ensure_deck_slot(1.23)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    ("load_name", "expected_model"),
+    [
+        ("magdeck", MagneticModuleModel.MAGNETIC_V1),
+        ("MaGdEcK", MagneticModuleModel.MAGNETIC_V1),
+        ("magnetic module", MagneticModuleModel.MAGNETIC_V1),
+        ("magneticModuleV1", MagneticModuleModel.MAGNETIC_V1),
+        ("magnetic module gen2", MagneticModuleModel.MAGNETIC_V2),
+        ("magneticModuleV2", MagneticModuleModel.MAGNETIC_V2),
+        ("tempdeck", TemperatureModuleModel.TEMPERATURE_V1),
+        ("tEmpDeCk", TemperatureModuleModel.TEMPERATURE_V1),
+        ("temperatureModuleV1", TemperatureModuleModel.TEMPERATURE_V1),
+        ("temperature module", TemperatureModuleModel.TEMPERATURE_V1),
+        ("temperature module gen2", TemperatureModuleModel.TEMPERATURE_V2),
+        ("temperatureModuleV2", TemperatureModuleModel.TEMPERATURE_V2),
+        ("thermocycler", ThermocyclerModuleModel.THERMOCYCLER_V1),
+        ("ThErMoCyClEr", ThermocyclerModuleModel.THERMOCYCLER_V1),
+        ("thermocycler module", ThermocyclerModuleModel.THERMOCYCLER_V1),
+        ("thermocyclerModuleV1", ThermocyclerModuleModel.THERMOCYCLER_V1),
+        ("thermocycler module gen2", ThermocyclerModuleModel.THERMOCYCLER_V2),
+        ("thermocyclerModuleV2", ThermocyclerModuleModel.THERMOCYCLER_V2),
+        ("heaterShakerModuleV1", HeaterShakerModuleModel.HEATER_SHAKER_V1),
+    ],
+)
+def test_ensure_module_model(load_name: str, expected_model: ModuleModel) -> None:
+    """It should map an module load name to a specific model."""
+    result = subject.ensure_module_model(load_name)
+    assert result == expected_model
+
+
+def test_ensure_module_model_invalid() -> None:
+    """It should reject invalid module load names."""
+    with pytest.raises(ValueError, match="not a valid module load name"):
+        subject.ensure_module_model("spline reticulator")
+
+    with pytest.raises(TypeError, match="must be a string"):
+        subject.ensure_module_model(42)  # type: ignore[arg-type]

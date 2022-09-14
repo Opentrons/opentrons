@@ -161,13 +161,13 @@ def test_load_module_default_slot(ctx_with_thermocycler):
 
 def test_no_slot_module_error(ctx_with_magdeck):
     ctx_with_magdeck.home()
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         assert ctx_with_magdeck.load_module("magdeck")
 
 
 def test_invalid_slot_module_error(ctx_with_thermocycler):
     ctx_with_thermocycler.home()
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         assert ctx_with_thermocycler.load_module("thermocycler", 1)
 
 
