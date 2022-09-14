@@ -15,7 +15,7 @@ import {
   SUCCESS,
   useDispatchApiRequests,
 } from '../../../redux/robot-api'
-import { useCalibratePipetteOffset } from '../../CalibratePipetteOffset/useCalibratePipetteOffset'
+import { useDeprecatedCalibratePipetteOffset } from '../../DeprecatedCalibratePipetteOffset/useDeprecatedCalibratePipetteOffset'
 import { PipetteSelection } from '../PipetteSelection'
 import { ExitModal } from '../ExitModal'
 import { ConfirmPipette } from '../ConfirmPipette'
@@ -46,7 +46,9 @@ jest.mock('../../../redux/config')
 jest.mock('../../../redux/pipettes')
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/calibration')
-jest.mock('../../CalibratePipetteOffset/useCalibratePipetteOffset')
+jest.mock(
+  '../../DeprecatedCalibratePipetteOffset/useDeprecatedCalibratePipetteOffset'
+)
 jest.mock('../../../redux/robot-api')
 jest.mock('../PipetteSelection')
 jest.mock('../ExitModal')
@@ -68,8 +70,8 @@ const mockGetMovementStatus = getMovementStatus as jest.MockedFunction<
 const mockGetCalibrationForPipette = getCalibrationForPipette as jest.MockedFunction<
   typeof getCalibrationForPipette
 >
-const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFunction<
-  typeof useCalibratePipetteOffset
+const mockUseDeprecatedCalibratePipetteOffset = useDeprecatedCalibratePipetteOffset as jest.MockedFunction<
+  typeof useDeprecatedCalibratePipetteOffset
 >
 const mockGetHasCalibrationBlock = getHasCalibrationBlock as jest.MockedFunction<
   typeof getHasCalibrationBlock
@@ -136,7 +138,10 @@ describe('ChangePipette', () => {
     mockGetMovementStatus.mockReturnValue(null)
     mockGetPipetteNameSpecs.mockReturnValue(null)
 
-    when(mockUseCalibratePipetteOffset).mockReturnValue([startWizard, null])
+    when(mockUseDeprecatedCalibratePipetteOffset).mockReturnValue([
+      startWizard,
+      null,
+    ])
     when(mockUseDispatchApiRequests).mockReturnValue([
       dispatchApiRequest,
       ['id'],

@@ -155,9 +155,9 @@ describe('useDeprecatedCalibratePipetteOffset hook', () => {
     )
     wrapper.setProps({})
     expect(CalWizardComponent).not.toBe(null)
-    expect(wrapper.find('CalibratePipetteOffset').prop('intent')).toEqual(
-      INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL
-    )
+    expect(
+      wrapper.find('DeprecatedCalibratePipetteOffset').prop('intent')
+    ).toEqual(INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL)
   })
 
   it('wizard should appear after create request succeeds with session and close on closeWizard', () => {
