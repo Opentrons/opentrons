@@ -44,10 +44,10 @@ print(tracker.get_liquid_height(plate["A1"]))                       # ~8.1 mm
 
 Some simple definitions for liquid class parameters. These parameters are simply a way to organizing pipetting configurations, with variables that define:
 
- - volumes
- - speeds
- - delay times
- - distances/depths
- - etc.
+- volumes
+- speeds
+- delay times
+- distances/depths
+- etc.
 
 The parameter defaults defined here are used by `hardware_testing.execute` and `hardware_testing.pipette` to run the correct pipetting techiniques for a given liquid+pipette combination under test.

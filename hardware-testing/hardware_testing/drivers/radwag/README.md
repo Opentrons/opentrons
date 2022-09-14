@@ -5,8 +5,9 @@ Connect to a Radwag scale, configure its settings, and read weights.
 Some Radwag settings cannot be controlled remotely.
 
 Listed below are the things the must be done using the touchscreen:
- 1) Set profile to USER
- 2) Set screensaver to NONE
+
+1.  Set profile to USER
+2.  Set screensaver to NONE
 
 ## Usage
 

@@ -8,17 +8,17 @@ Manages the recording, saving, and loading of timestamps generated during a prot
 
 These timestamps signify noteworthy moments during a protocol run, for example:
 
- - When the pipette started aspirating
- - When the pipette finished aspirating
- - When the pipette was moving over the labware
- - When the scale settling time began
+- When the pipette started aspirating
+- When the pipette finished aspirating
+- When the pipette was moving over the labware
+- When the scale settling time began
 
 The intention is that these timestamps could then be combined with timestamps from the [scale recording](../measure/README.md), to align mass recordings to the appropriate pipetting action or test process.
 
 ## liquid_class
 
- - `LiquidSettingsRunner`
- - `PipetteLiquidClass`
+- `LiquidSettingsRunner`
+- `PipetteLiquidClass`
 
 ```python
 from hardware_testing import data

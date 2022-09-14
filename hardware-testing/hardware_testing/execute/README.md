@@ -4,10 +4,10 @@ Implementation details for individual productions tests.
 
 The idea here is that the top-level protocol should be as small as possible, so details can be put in `execute` like:
 
- - Number of cycles/samples
- - Volumes to be tested
- - Speed/depth parameters
- - Pass/fail criteria
+- Number of cycles/samples
+- Volumes to be tested
+- Speed/depth parameters
+- Pass/fail criteria
 
 ## gravimetric
 
