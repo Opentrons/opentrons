@@ -70,7 +70,7 @@ def create_protocol_context(
     """
     sync_hardware: SynchronousAdapter[HardwareControlAPI]
     labware_offset_provider: AbstractLabwareOffsetProvider
-    core: AbstractProtocol[Any, Any]
+    core: AbstractProtocol[Any, Any, Any]
 
     if isinstance(hardware_api, ThreadManager):
         sync_hardware = hardware_api.sync
