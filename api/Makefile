@@ -107,25 +107,27 @@ sdist: $(sdist_file)
 
 .PHONY: test
 test:
-	$(pytest) $(tests) $(test_opts)
+	$(call run,ot-3/robot-server) py.test $(tests) $(test_opts)
 
 .PHONY: test-cov
 test-cov:
-	$(pytest) $(tests) $(test_opts) $(cov_opts)
+	$(call run,ot-3/robot-server) py.test $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-ot2
 test-ot2:
-	$(pytest) $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
+	$(call run,ot-2) $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
 
 .PHONY: lint
 lint:
-	$(python) -m mypy src tests
-	$(python) -m black --check src tests setup.py
-	$(python) -m flake8 src tests setup.py
+	$(call run,dev) python -m black --check src tests setup.py
+	$(call run,dev) python -m flake8 src tests setup.py
+	$(call run,ot-3/robot-server) python -m mypy src tests
+	$(call run,ot-2) python -m mypy src --exclude=.*ot3.*
+	$(call run,app) python -m mypy src tests
 
 .PHONY: format
 format:
-	$(python) -m black src tests setup.py
+	$(call run,dev) python -m black src tests setup.py
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build_allow_warnings) -b html -d docs/build/doctrees -n $< $@
