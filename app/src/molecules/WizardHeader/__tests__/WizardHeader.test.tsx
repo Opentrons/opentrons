@@ -56,8 +56,7 @@ describe('WizardHeader', () => {
   it('renders correct information with no step count visible due to error state', () => {
     props = {
       ...props,
-      currentStep: 1,
-      isErrorState: true,
+      currentStep: null,
     }
 
     const { getByText, getByRole } = render(props)

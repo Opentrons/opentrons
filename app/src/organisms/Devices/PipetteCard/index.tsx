@@ -35,7 +35,7 @@ import { useCalibratePipetteOffset } from '../../CalibratePipetteOffset/useCalib
 import {
   INTENT_CALIBRATE_PIPETTE_OFFSET,
   INTENT_RECALIBRATE_PIPETTE_OFFSET,
-} from '../../CalibrationPanels'
+} from '../../DeprecatedCalibrationPanels'
 import { AskForCalibrationBlockModal } from '../../CalibrateTipLength'
 import { useDeckCalibrationData, usePipetteOffsetCalibration } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'

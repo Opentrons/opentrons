@@ -2,7 +2,6 @@ import * as React from 'react'
 import {
   Flex,
   PrimaryBtn,
-  Text,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
@@ -11,6 +10,7 @@ import {
 import uniq from 'lodash/uniq'
 
 import * as Sessions from '../../redux/sessions'
+import { StyledText } from '../../atoms/text'
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { SessionCommandString } from '../../redux/sessions/types'
 
@@ -60,10 +60,10 @@ export function ReturnTip(props: CalibrationPanelProps): JSX.Element {
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
     >
-      <Text marginBottom={SPACING_3}>
+      <StyledText as="h1" marginBottom={SPACING_3}>
         {`${CONFIRM_RETURN_BODY}
         ${onFinalPipette ? EXIT_PROGRAM : CONTINUE_TO_NEXT}`}
-      </Text>
+      </StyledText>
       <PrimaryBtn
         title="confirmReturnTip"
         marginTop={SPACING_3}

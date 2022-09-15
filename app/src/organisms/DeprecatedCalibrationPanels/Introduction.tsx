@@ -389,6 +389,9 @@ const contentsByParams = (
   }
 }
 
+/**
+ * @deprecated
+ */
 export function Introduction(props: CalibrationPanelProps): JSX.Element {
   const {
     tipRack,
