@@ -14,5 +14,5 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption(
         "--ot2-only",
         action="store_true",
-        help="only run OT2 based tests",
+        help="only run tests compatible with OT2",
     )
