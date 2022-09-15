@@ -1,5 +1,6 @@
 """Home command payload, result, and implementation models."""
 from __future__ import annotations
+from enum import Enum
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Type
 from typing_extensions import Literal
@@ -17,20 +18,24 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import MovementHandler
 
 
-StartCalibrationCommandType = Literal["CalibrationSetUpPosition"]
+CalibrationSetUpPositionCommandType = Literal["CalibrationSetUpPosition"]
+
+
+class CalibrationPositions(DeckSlotName, Enum):
+    start_calibration = DeckSlotName.SLOT_5,
+    probe_interaction = DeckSlotName.SLOT_8,
 
 
 class CalibrationSetUpPositionParams(PipetteIdMixin):
-    slot_name: DeckSlotName = Field(
-        DeckSlotName.SLOT_5,
+    slot_name: CalibrationPositions = Field(
+        CalibrationPositions.start_calibration,
         description="Slot location to move to before starting calibration.",
     )
 
 
 class CalibrationSetUpPositionResult(BaseModel):
     """Result data containing the position of the axes."""
-
-    result: DeckPoint
+    pass
 
 
 class CalibrationSetUpPositionImplementation(
@@ -57,22 +62,21 @@ class CalibrationSetUpPositionImplementation(
             direct=True,
             additional_min_travel_z=0,
         )
-        return StartCalibrationResult(result=slot_center_deck)
+        return CalibrationSetUpPositionResult()
 
 
 class CalibrationSetUpPosition(BaseCommand[CalibrationSetUpPositionParams, CalibrationSetUpPositionResult]):
     """Calibration set up position command model."""
 
-    commandType: StartCalibrationCommandType = "startCalibration"
+    commandType: CalibrationSetUpPositionCommandType = "CalibrationSetUpPosition"
     params: CalibrationSetUpPositionParams
-    result: CalibrationSetUpPositionResult
 
-    _Implementation: Type[
+    _ImplementationCls: Type[
         CalibrationSetUpPositionImplementation
     ] = CalibrationSetUpPositionImplementation
 
 
-class CalibrationSetUpPositionCreate(BaseCommandCreate[StartCalibrationParams]):
+class CalibrationSetUpPositionCreate(BaseCommandCreate[CalibrationSetUpPositionParams]):
     """Calibration set up position command creation request model."""
 
     commandType: CalibrationSetUpPositionCommandType = "CalibrationSetUpPosition"
