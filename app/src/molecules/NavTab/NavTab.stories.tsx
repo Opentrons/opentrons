@@ -11,7 +11,7 @@ import { NavTab } from './'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/Atoms/NavTab',
+  title: 'App/Molecules/NavTab',
   component: NavTab,
 } as Meta
 
