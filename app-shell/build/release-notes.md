@@ -19,13 +19,14 @@ Welcome to the v6.1.0 beta release of the Opentrons App! This release focuses on
   - Analyze, upload, and run protocols that include the Heater-Shaker
   - View the status of a Heater-Shaker connected to an OT-2 and control its heater, shaker, and labware latch
   - Update the Heater-Shaker's firmware from the module card
+- Module cards now show if a Heater-Shaker or Thermocycler has an error
 
 ## Bug Fixes
 
 - Improvements to the run log, including properly listing labware that is on top of a module
 - Tip Length Calibration no longer silently fails when the chosen pipette is not attached
 - Clarified what data is deleted when performing a factory reset of protocol run history
-- Fixed a bug that prevented changing pipette settings when the 'All Pipette Config' feature flag is on
+- Fixed a bug that prevented changing pipette settings when the All Pipette Config feature flag is on
 - Interface fixes and improvements
 
 ---
