@@ -15,4 +15,11 @@ __all__ = [
     "CalibratePipetteParams",
     "CalibratePipetteResult",
     "CalibratePipetteCommandType",
+    # calibration/moveToLocation
+    "MoveToLocationParams",
+    "MoveToLocationResult",
+    "MoveToLocationImplementation",
+    "MoveToLocation",
+    "MoveToLocationCreate",
+    "MoveToLocationCommandType",
 ]
