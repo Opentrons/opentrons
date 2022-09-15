@@ -65,18 +65,19 @@ export const ThermocyclerModuleSlideout = (
   let errorMessage
   if (isSecondaryTemp) {
     errorMessage =
-      tempValue && (tempValue < TEMP_LID_MIN || tempValue > TEMP_LID_MAX)
+      tempValue != null &&
+      (tempValue < TEMP_LID_MIN || tempValue > TEMP_LID_MAX)
         ? t('input_out_of_range')
         : null
   } else {
     errorMessage =
-      tempValue && (tempValue < TEMP_MIN || tempValue > TEMP_BLOCK_MAX)
+      tempValue != null && (tempValue < TEMP_MIN || tempValue > TEMP_BLOCK_MAX)
         ? t('input_out_of_range')
         : null
   }
 
   const handleSubmitTemp = (): void => {
-    if (tempValue) {
+    if (tempValue != null) {
       const saveLidCommand: TCSetTargetLidTemperatureCreateCommand = {
         commandType: 'thermocycler/setTargetLidTemperature',
         params: {
@@ -92,7 +93,7 @@ export const ThermocyclerModuleSlideout = (
           //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
         },
       }
-      if (isRunIdle && currentRunId && isLoadedInRun) {
+      if (isRunIdle && currentRunId != null && isLoadedInRun) {
         createCommand({
           runId: currentRunId,
           command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
@@ -169,7 +170,7 @@ export const ThermocyclerModuleSlideout = (
             data-testid={`${module.moduleModel}_${isSecondaryTemp}`}
             id={`${module.moduleModel}_${isSecondaryTemp}`}
             units={CELSIUS}
-            value={tempValue ? Math.round(tempValue) : null}
+            value={tempValue != null ? Math.round(tempValue) : null}
             autoFocus
             onChange={e => setTempValue(e.target.valueAsNumber)}
             type="number"
