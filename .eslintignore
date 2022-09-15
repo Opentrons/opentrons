@@ -12,7 +12,6 @@ discovery-client/lib/**
 **/lib/**/*.json
 
 # prettier
-.devcontainer/devcontainer.json
 **/package.json
 **/CHANGELOG.md
 lerna.json
