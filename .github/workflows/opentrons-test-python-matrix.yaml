@@ -75,7 +75,7 @@ jobs:
       - name: Test opentrons_shared_data
         run: make -C shared-data/python test
       - name: Ensure opentrons_shared_data assets build
-        run: make -C shared-data/python shared-data/python sdist wheel
+        run: make -C shared-data/python sdist wheel
       - name: pip install opentrons_shared_data
         run: |
           $OT_PYTHON -m pip install --find-links=./shared-data/python/dist opentrons_shared_data
