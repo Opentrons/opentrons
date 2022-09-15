@@ -59,25 +59,24 @@ export const ThermocyclerModuleSlideout = (
   const { isRunIdle, isRunTerminal } = useRunStatuses()
   const { moduleIdFromRun } = useModuleIdFromRun(module, currentRunId ?? null)
   const moduleName = getModuleDisplayName(module.moduleModel)
-  const modulePart = isSecondaryTemp != null ? 'Lid' : 'Block'
+  const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
 
   let errorMessage
-  if (isSecondaryTemp != null) {
+  if (isSecondaryTemp) {
     errorMessage =
-      tempValue != null &&
-      (tempValue < TEMP_LID_MIN || tempValue > TEMP_LID_MAX)
+      tempValue && (tempValue < TEMP_LID_MIN || tempValue > TEMP_LID_MAX)
         ? t('input_out_of_range')
         : null
   } else {
     errorMessage =
-      tempValue != null && (tempValue < TEMP_MIN || tempValue > TEMP_BLOCK_MAX)
+      tempValue && (tempValue < TEMP_MIN || tempValue > TEMP_BLOCK_MAX)
         ? t('input_out_of_range')
         : null
   }
 
   const handleSubmitTemp = (): void => {
-    if (tempValue != null) {
+    if (tempValue) {
       const saveLidCommand: TCSetTargetLidTemperatureCreateCommand = {
         commandType: 'thermocycler/setTargetLidTemperature',
         params: {
@@ -93,10 +92,10 @@ export const ThermocyclerModuleSlideout = (
           //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
         },
       }
-      if (isRunIdle && currentRunId != null && isLoadedInRun) {
+      if (isRunIdle && currentRunId && isLoadedInRun) {
         createCommand({
           runId: currentRunId,
-          command: isSecondaryTemp != null ? saveLidCommand : saveBlockCommand,
+          command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
         }).catch((e: Error) => {
           console.error(
             `error setting module status with command type ${
@@ -106,7 +105,7 @@ export const ThermocyclerModuleSlideout = (
         })
       } else if (isRunTerminal || currentRunId == null) {
         createLiveCommand({
-          command: isSecondaryTemp != null ? saveLidCommand : saveBlockCommand,
+          command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
         }).catch((e: Error) => {
           console.error(
             `error setting module status with command type ${
@@ -163,18 +162,14 @@ export const ThermocyclerModuleSlideout = (
           color={COLORS.darkGreyEnabled}
           paddingBottom={SPACING.spacing3}
         >
-          {t(
-            isSecondaryTemp != null
-              ? 'set_lid_temperature'
-              : 'set_block_temperature'
-          )}
+          {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}
         </StyledText>
         <form id="ThermocyclerModuleSlideout_submitValue">
           <InputField
             data-testid={`${module.moduleModel}_${isSecondaryTemp}`}
             id={`${module.moduleModel}_${isSecondaryTemp}`}
             units={CELSIUS}
-            value={tempValue != null ? Math.round(tempValue) : null}
+            value={tempValue ? Math.round(tempValue) : null}
             autoFocus
             onChange={e => setTempValue(e.target.valueAsNumber)}
             type="number"
