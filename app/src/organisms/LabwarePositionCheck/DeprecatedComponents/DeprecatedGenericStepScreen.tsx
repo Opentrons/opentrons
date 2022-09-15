@@ -15,7 +15,7 @@ import { DeprecatedLabwarePositionCheckStepDetail } from './DeprecatedLabwarePos
 import { DeprecatedSectionList } from './DeprecatedSectionList'
 import { useIntroInfo, useLabwareIdsBySection, useSteps } from '../hooks'
 import { DeprecatedDeckMap } from './DeprecatedDeckMap'
-import type { Jog } from '../../../molecules/JogControls'
+import type { Jog } from '../../../molecules/DeprecatedJogControls'
 import type { LabwarePositionCheckStep, SavePositionCommandData } from './types'
 
 interface GenericStepScreenProps {

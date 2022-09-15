@@ -13,7 +13,11 @@ import {
   Mount,
 } from '@opentrons/components'
 
-import { JogControls } from '../../molecules/JogControls'
+import {
+  JogControls,
+  SMALL_STEP_SIZE_MM,
+  MEDIUM_STEP_SIZE_MM,
+} from '../../molecules/JogControls'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 import * as Sessions from '../../redux/sessions'
@@ -158,7 +162,10 @@ export function MeasureNozzle(props: CalibrationPanelProps): JSX.Element {
           </video>
         </Box>
       </Flex>
-      <JogControls jog={jog} stepSizes={[0.1, 1]} />
+      <JogControls
+        jog={jog}
+        stepSizes={[SMALL_STEP_SIZE_MM, MEDIUM_STEP_SIZE_MM]}
+      />
       <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing2}>
         {confirmLink}
       </Box>

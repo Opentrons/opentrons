@@ -14,6 +14,9 @@ import { StepSizeControl } from './StepSizeControl'
 import {
   HORIZONTAL_PLANE,
   VERTICAL_PLANE,
+  SMALL_STEP_SIZE_MM,
+  MEDIUM_STEP_SIZE_MM,
+  LARGE_STEP_SIZE_MM,
   DEFAULT_STEP_SIZES,
 } from './constants'
 
@@ -30,7 +33,13 @@ export interface JogControlsProps extends StyleProps {
   initialPlane?: Plane
 }
 
-export { HORIZONTAL_PLANE, VERTICAL_PLANE }
+export {
+  HORIZONTAL_PLANE,
+  VERTICAL_PLANE,
+  SMALL_STEP_SIZE_MM,
+  MEDIUM_STEP_SIZE_MM,
+  LARGE_STEP_SIZE_MM,
+}
 
 export function JogControls(props: JogControlsProps): JSX.Element {
   const {
@@ -42,7 +51,7 @@ export function JogControls(props: JogControlsProps): JSX.Element {
     initialPlane = HORIZONTAL_PLANE,
     ...styleProps
   } = props
-  const [currentStepSize, setCurrentStepSize] = React.useState<number>(
+  const [currentStepSize, setCurrentStepSize] = React.useState<StepSize>(
     stepSizes[0]
   )
 

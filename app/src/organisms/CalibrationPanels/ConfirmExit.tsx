@@ -12,7 +12,7 @@ import {
   COLORS,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
+import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
 
 import { NeedHelpLink } from './NeedHelpLink'
 
@@ -61,12 +61,12 @@ export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
         <NeedHelpLink />
         <Flex gridGap={SPACING.spacing3}>
           <SecondaryButton onClick={back}>{t('go_back')}</SecondaryButton>
-          <PrimaryButton
+          <AlertPrimaryButton
             onClick={exit}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {t('exit')}
-          </PrimaryButton>
+          </AlertPrimaryButton>
         </Flex>
       </Flex>
     </Flex>

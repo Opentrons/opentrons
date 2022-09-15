@@ -27,7 +27,7 @@ import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 
 import type { IconName } from '@opentrons/components'
 import type { CSSProperties } from 'styled-components'
-import type { Jog, Plane, Sign, Bearing, Axis } from './types'
+import type { Jog, Plane, Sign, Bearing, Axis, StepSize } from './types'
 
 interface Control {
   bearing: Bearing
@@ -170,7 +170,7 @@ const ACTIVE_BUTTON_STYLE = css`
 interface DirectionControlProps {
   planes: Plane[]
   jog: Jog
-  stepSize: number
+  stepSize: StepSize
   initialPlane?: Plane
   buttonColor?: string
 }
@@ -317,7 +317,7 @@ const BUTTON_ALIGN_BY_KEY_NAME: {
 interface ArrowKeysProps {
   plane: Plane
   jog: Jog
-  stepSize: number
+  stepSize: StepSize
 }
 
 export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {

@@ -13,7 +13,11 @@ import {
 } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-import { JogControls } from '../../molecules/JogControls'
+import {
+  JogControls,
+  MEDIUM_STEP_SIZE_MM,
+  SMALL_STEP_SIZE_MM,
+} from '../../molecules/JogControls'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
@@ -157,7 +161,10 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
           </video>
         </Box>
       </Flex>
-      <JogControls jog={jog} stepSizes={[0.1, 1]} />
+      <JogControls
+        jog={jog}
+        stepSizes={[SMALL_STEP_SIZE_MM, MEDIUM_STEP_SIZE_MM]}
+      />
       <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing2}>
         {confirmLink}
       </Box>

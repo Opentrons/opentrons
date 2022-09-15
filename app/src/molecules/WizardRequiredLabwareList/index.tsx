@@ -10,6 +10,7 @@ import {
   SPACING,
   COLORS,
   JUSTIFY_SPACE_AROUND,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -28,7 +29,9 @@ export function WizardRequiredLabwareList(
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <StyledText as="h3">{t('you_will_need')}</StyledText>
+      <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        {t('you_will_need')}
+      </StyledText>
       <Divider />
       {equipmentList.map(requiredLabwareProps => (
         <RequiredLabwareCard

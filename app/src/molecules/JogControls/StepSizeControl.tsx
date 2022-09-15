@@ -45,7 +45,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   const handleStepSelect = (
     event: React.MouseEvent<HTMLButtonElement>
   ): void => {
-    setCurrentStepSize(Number(event.currentTarget.value))
+    setCurrentStepSize(Number(event.currentTarget.value) as StepSize)
     event.currentTarget.blur()
   }
 

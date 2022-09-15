@@ -14,7 +14,12 @@ import {
 import * as Sessions from '../../redux/sessions'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
-import { JogControls, VERTICAL_PLANE } from '../../molecules/JogControls'
+import {
+  JogControls,
+  MEDIUM_STEP_SIZE_MM,
+  SMALL_STEP_SIZE_MM,
+  VERTICAL_PLANE,
+} from '../../molecules/JogControls'
 import { formatJogVector } from './utils'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { NeedHelpLink } from './NeedHelpLink'
@@ -129,7 +134,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
       </Flex>
       <JogControls
         jog={jog}
-        stepSizes={[0.1, 1]}
+        stepSizes={[SMALL_STEP_SIZE_MM, MEDIUM_STEP_SIZE_MM]}
         initialPlane={VERTICAL_PLANE}
       />
       <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing2}>

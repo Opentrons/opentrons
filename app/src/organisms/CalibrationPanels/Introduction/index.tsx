@@ -122,7 +122,7 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
       padding={SPACING.spacing6}
       minHeight="25rem"
     >
-      <Flex gridGap={SPACING.spacing3}>
+      <Flex gridGap={SPACING.spacingXXL}>
         <Flex
           flex="1"
           flexDirection={DIRECTION_COLUMN}

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { Trans, useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
@@ -11,8 +11,13 @@ import {
   ALIGN_FLEX_END,
 } from '@opentrons/components'
 
+import { useLogger } from '../../logger'
 import * as Sessions from '../../redux/sessions'
-import { JogControls } from '../../molecules/JogControls'
+import {
+  JogControls,
+  MEDIUM_STEP_SIZE_MM,
+  SMALL_STEP_SIZE_MM,
+} from '../../molecules/JogControls'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
 import { formatJogVector } from './utils'
@@ -41,7 +46,6 @@ import type {
   CalibrationLabware,
 } from '../../redux/sessions/types'
 import type { Mount } from '@opentrons/components'
-import { useLogger } from '../../logger'
 
 const assetMap: Record<
   CalibrationLabware['slot'],
@@ -226,13 +230,6 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
           <StyledText as="p">
             {t('jog_pipette_to_touch_cross', { slotName: slotNumber })}
           </StyledText>
-          <Trans
-            t={t}
-            i18nKey=""
-            components={{
-              block: <StyledText as="p" marginBottom={SPACING.spacing3} />,
-            }}
-          />
         </Flex>
         <Box flex="1">
           <video
@@ -252,7 +249,10 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
           </video>
         </Box>
       </Flex>
-      <JogControls jog={jog} stepSizes={[0.1, 1]} />
+      <JogControls
+        jog={jog}
+        stepSizes={[SMALL_STEP_SIZE_MM, MEDIUM_STEP_SIZE_MM]}
+      />
       <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing2}>
         {confirmLink}
       </Box>
