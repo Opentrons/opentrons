@@ -10,7 +10,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 Welcome to the v6.1.0 beta release of the Opentrons App! This release focuses on adding support for the [Opentrons Heater-Shaker Module](https://shop.opentrons.com/heater-shaker-module/).
 
-<p align="center">![Isometric view of the Opentrons Heater-Shaker Module GEN1](../../app/src/assets/images/modules/heaterShakerModuleV1@3x.png)</p>
+<p align="center"><img alt="Isometric view of the Opentrons Heater-Shaker Module GEN1" src="../../app/src/assets/images/modules/heaterShakerModuleV1@3x.png" /></p>
 
 ## New Features
 
