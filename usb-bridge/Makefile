@@ -18,7 +18,6 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # specified test
 tests ?= tests
 test_opts ?=
-wheel_file = $(call python_get_wheelname,ot3usb)
 sdist_file = $(call python_get_sdistname,ot3usb)
 # Host key location for buildroot robot
 br_ssh_key ?= $(default_ssh_key)
@@ -59,12 +58,6 @@ lint:
 format:
 	$(python) -m black ot3usb tests
 
-.PHONY: wheel
-wheel: clean
-	$(python) setup.py bdist_wheel
-	$(SHX) rm -rf build
-	$(SHX) ls dist
-
 .PHONY: sdist
 sdist: clean
 	$(python) setup.py sdist
@@ -74,3 +67,4 @@ sdist: clean
 .PHONY: push-ot3
 push-ot3: sdist
 	$(call push-python-sdist,$(host),,$(br_ssh_opts),dist/$(sdist_file),/opt/ot3usb,ot3usb)
+	# todo (fs, 2022-09-15): add a restart when appropriate
