@@ -58,6 +58,7 @@ PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
 .PHONY: setup-py
 setup-py:
 	$(OT_PYTHON) -m pip install pipenv==2021.5.29
+	$(MAKE) -C environments setup
 	$(MAKE) $(PYTHON_SETUP_TARGETS)
 
 

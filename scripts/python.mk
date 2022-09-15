@@ -13,14 +13,19 @@ OT_VIRTUALENV_VERSION ?= 3.10
 # when using newer versions of setuptools
 export SETUPTOOLS_ENABLE_FEATURES := legacy-editable
 
-pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
+pipenv_envvars := SETUPTOOLS_ENABLE_FEATURES=legacy-editable $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
 pipenv := $(pipenv_envvars) $(OT_PYTHON) -m pipenv
 python := $(pipenv) run python
 pip := $(pipenv) run pip
 pytest := $(pipenv) run py.test
+_firstpath := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+_possibilities := $(realpath $(_firstpath)/..) $(realpath $(_firstpath)/../..) $(_firstpath)
+monorepo_root := $(firstword $(filter %/opentrons, $(_possibilities)))
 
-pipenv_opts := --dev $(and $(OT_VIRTUALENV_VERSION),--python $(OT_VIRTUALENV_VERSION))
-wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),,-q)
+# Run some command inside a specific environment. Resolves to an invocation
+# of pipenv run in that environment, so you can use it in a makefile like
+# $(run environment-path) pytest
+run = PIPENV_PIPFILE=$(monorepo_root)/environments/$(1)/Pipfile $(pipenv) run
 
 poetry := poetry
 poetry_run := $(poetry) run
@@ -34,7 +39,7 @@ pypi_test_upload_url := https://test.pypi.org/legacy/
 # parameter 2: an extra version tag string
 # parameter 3: override python_build_utils.py path (default: ../scripts/python_build_utils.py)
 define python_package_version
-$(shell $(python) $(if $(3),$(3),../scripts/python_build_utils.py) $(1) normalize_version $(if $(2),-e $(2)))
+$(shell python $(if $(3),$(3),../scripts/python_build_utils.py) $(1) normalize_version $(if $(2),-e $(2)))
 endef
 
 # This is the poetry version of python_get_wheelname. Arguments are identical.
