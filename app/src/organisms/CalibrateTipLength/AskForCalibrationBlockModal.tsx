@@ -8,7 +8,7 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  COLORS,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useDispatch } from 'react-redux'
 
@@ -79,7 +79,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
                     <Link
                       external
                       href={BLOCK_REQUEST_URL}
-                      color={COLORS.blueEnabled}
+                      css={TYPOGRAPHY.linkPSemiBold}
                     />
                   ),
                 }}
