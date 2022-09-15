@@ -6,9 +6,11 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 6.1.0-alpha.4
+# Opentrons App Changes in 6.1.0-beta.1
 
-Welcome to the v6.1.0 alpha release of the Opentrons App! This release focuses on adding support for the Opentrons Heater-Shaker Module.
+Welcome to the v6.1.0 beta release of the Opentrons App! This release focuses on adding support for the [Opentrons Heater-Shaker Module](https://shop.opentrons.com/heater-shaker-module/).
+
+<p align="center">![Isometric view of the Opentrons Heater-Shaker Module GEN1](../../app/src/assets/images/modules/heaterShakerModuleV1@3x.png)</p>
 
 ## New Features
 
@@ -21,14 +23,10 @@ Welcome to the v6.1.0 alpha release of the Opentrons App! This release focuses o
 ## Bug Fixes
 
 - Improvements to the run log, including properly listing labware that is on top of a module
-- Interface fixes and improvements
 - Tip Length Calibration no longer silently fails when the chosen pipette is not attached
 - Clarified what data is deleted when performing a factory reset of protocol run history
 - Fixed a bug that prevented changing pipette settings when the 'All Pipette Config' feature flag is on
-
-## Known Issues
-
-This alpha is a work in progress! We'll be addressing issues in upcoming releases of 6.1.0.
+- Interface fixes and improvements
 
 ---
 
