@@ -55,7 +55,7 @@ jobs:
       - name: Lint
         run: make -C usb-bridge lint
   test:
-    name: 'usb-server package tests'
+    name: 'usb-bridge package tests'
     timeout-minutes: 10
     needs: [lint]
     runs-on: 'ubuntu-22.04'
