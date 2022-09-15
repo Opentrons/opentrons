@@ -25,8 +25,8 @@ export function useOffsetCandidatesForCurrentRun(): OffsetCandidate[] {
           }))
           ?.sort(
             (a, b) =>
-              new Date(a.offset.createdAt).getTime() -
-              new Date(b.offset.createdAt).getTime()
+              new Date(b.offset.createdAt).getTime() -
+              new Date(a.offset.createdAt).getTime()
           ) ?? []
     )
     .flat()
