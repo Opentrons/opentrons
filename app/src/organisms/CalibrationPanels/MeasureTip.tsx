@@ -20,12 +20,10 @@ import {
 } from '../../molecules/JogControls'
 import { StyledText } from '../../atoms/text'
 import { PrimaryButton } from '../../atoms/buttons'
-import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
-import type { CalibrationPanelProps } from './types'
-
 import { NeedHelpLink } from './NeedHelpLink'
 import { useConfirmCrashRecovery } from './useConfirmCrashRecovery'
 import { formatJogVector } from './utils'
+
 import leftMultiBlockAssetTLC from '../../assets/videos/tip-length-cal/Left_Multi_CalBlock_WITH_TIP_(330x260)REV1.webm'
 import leftMultiTrashAsset from '../../assets/videos/tip-length-cal/Left_Multi_Trash_WITH_TIP_(330x260)REV1.webm'
 import leftSingleBlockAssetTLC from '../../assets/videos/tip-length-cal/Left_Single_CalBlock_WITH_TIP_(330x260)REV1.webm'
@@ -38,6 +36,9 @@ import leftMultiBlockAssetHealth from '../../assets/videos/health-check/Left_Mul
 import rightMultiBlockAssetHealth from '../../assets/videos/health-check/Right_Multi_CalBlock_WITH_TIP_(330x260)REV2.webm'
 import leftSingleBlockAssetHealth from '../../assets/videos/health-check/Left_Single_CalBlock_WITH_TIP_(330x260)REV2.webm'
 import rightSingleBlockAssetHealth from '../../assets/videos/health-check/Right_Single_CalBlock_WITH_TIP_(330x260)REV2.webm'
+
+import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
+import type { CalibrationPanelProps } from './types'
 
 const assetMapTrash = {
   left: {

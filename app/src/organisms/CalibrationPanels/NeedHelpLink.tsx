@@ -31,8 +31,8 @@ export function NeedHelpLink(props: NeedHelpLinkProps): JSX.Element {
       <Link
         external
         fontSize={TYPOGRAPHY.fontSizeP}
+        css={TYPOGRAPHY.darkLinkLabelSemiBold}
         href={href}
-        color={COLORS.darkGreyEnabled}
       >
         {t('need_help')}
       </Link>
