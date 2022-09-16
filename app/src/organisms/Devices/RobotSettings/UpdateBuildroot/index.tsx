@@ -44,7 +44,7 @@ export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {
   // clears buildroot state if session finished when initially mounted
   React.useEffect(() => {
     if (step === 'finished') {
-      console.log('clearing buildroot session')
+      console.log('clearing buildroot session in first useeffect')
       dispatch(clearBuildrootSession())
     }
   }, [dispatch, step])

@@ -146,6 +146,7 @@ export const startUpdateEpic: Epic = (action$, state$) =>
       }
 
       // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost
+      console.log('creating session')
       return createSession(host, sessionPath)
     })
   )
@@ -282,6 +283,7 @@ export const uploadFileEpic: Epic = (_, state$) => {
       const pathPrefix: string = session?.pathPrefix as any
       const token: string = session?.token as any
       const systemFile = session?.userFileInfo?.systemFile || null
+      console.log('uploading buildroot file')
 
       return uploadBuildrootFile(
         // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost
