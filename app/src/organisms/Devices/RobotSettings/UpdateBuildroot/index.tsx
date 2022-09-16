@@ -32,6 +32,7 @@ export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {
   )
   const dispatch = useDispatch<Dispatch>()
   const { step, error } = session || { step: null, error: null }
+  console.log('step: ', step)
 
   // set update seen on component mount
   React.useEffect(() => {
@@ -43,6 +44,7 @@ export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {
   // clears buildroot state if session finished when initially mounted
   React.useEffect(() => {
     if (step === 'finished') {
+      console.log('clearing buildroot session')
       dispatch(clearBuildrootSession())
     }
   }, [dispatch, step])
@@ -51,6 +53,7 @@ export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {
   React.useEffect(() => {
     if (step === 'finished' || error !== null) {
       return () => {
+        console.log('clearing buildroot session')
         dispatch(clearBuildrootSession())
       }
     }
@@ -69,8 +72,10 @@ export function UpdateBuildroot(props: UpdateBuildrootProps): JSX.Element {
   )
 
   const robotSystemType = getRobotSystemType(robot)
+  console.log('session: ', session)
 
   if (session) {
+    console.log('session present, rendering install modal')
     return (
       <InstallModal
         robot={robot}
