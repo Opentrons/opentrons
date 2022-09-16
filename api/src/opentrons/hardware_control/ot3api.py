@@ -17,7 +17,6 @@ from typing import (
     Set,
     Any,
     TypeVar,
-    Generic,
 )
 
 from opentrons_shared_data.pipette import name_config
@@ -106,8 +105,6 @@ from opentrons_hardware.hardware_control.motion_planning.move_utils import (
 
 mod_log = logging.getLogger(__name__)
 
-_HardwareControlAPI = TypeVar("_HardwareControlAPI", bound=HardwareControlAPI)
-
 
 class OT3API(
     ExecutionManagerProvider,
@@ -116,7 +113,7 @@ class OT3API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    Generic[_HardwareControlAPI],
+    HardwareControlAPI,
 ):
     """This API is the primary interface to the hardware controller.
 
