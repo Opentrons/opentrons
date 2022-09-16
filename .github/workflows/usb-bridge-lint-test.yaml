@@ -1,0 +1,78 @@
+# This workflow runs tests and lint on non-release branches pushed that alter
+# the usb-bridge subpackage
+
+name: 'USB-Bridge test/lint'
+
+on:
+  push:
+    paths:
+      - 'usb-bridge/**/*'
+      - 'Makefile'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
+      - '.github/workflows/usb-bridge-lint-test.yaml'
+      - '.github/actions/python/**'
+    branches: # ignore any release-related thing (handled elsewhere)
+      - 'edge'
+    tags-ignore:
+      - '*'
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+    paths:
+      - 'usb-bridge/**/*'
+      - 'Makefile'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
+      - '.github/workflows/usb-bridge-lint-test.yaml'
+      - '.github/actions/python/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    name: 'usb-bridge linting'
+    timeout-minutes: 10
+    runs-on: 'ubuntu-22.04'
+    steps:
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '14'
+      - uses: 'actions/setup-python@v4'
+        with:
+          python-version: '3.7'
+
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'usb-bridge'
+      - name: Lint
+        run: make -C usb-bridge lint
+  test:
+    name: 'usb-bridge package tests'
+    timeout-minutes: 10
+    needs: [lint]
+    runs-on: 'ubuntu-22.04'
+    steps:
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '14'
+      - uses: 'actions/setup-python@v4'
+        with:
+          python-version: '3.7'
+      - uses: './.github/actions/python/setup'
+        with:
+          project: 'usb-bridge'
+      - name: Test
+        run: make -C usb-bridge test
+      - uses: 'codecov/codecov-action@v3'
+        with:
+          files: ./usb-bridge/coverage.xml
+          flags: usb-bridge
