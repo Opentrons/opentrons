@@ -3,29 +3,20 @@
 # necessary select this Python to create its virtual environments.
 OT_PYTHON ?= python
 
-# This environment variable can be used to tell pipenv which
-# Python version to use for a project's virtual environment.
-# Defaults to Python 3.10, which is the version that runs on the OT-2.
-# https://pipenv.pypa.io/en/latest/basics/#specifying-versions-of-python
-OT_VIRTUALENV_VERSION ?= 3.10
+_firstpath := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+_possibilities := $(realpath $(_firstpath)/..) $(realpath $(_firstpath)/../..) $(_firstpath)
+monorepo_root := $(firstword $(filter %/opentrons, $(_possibilities)))
 
 # Use legacy editable installs to avoid breaking mypy type-checking
 # when using newer versions of setuptools
 export SETUPTOOLS_ENABLE_FEATURES := legacy-editable
 
 pipenv_envvars := SETUPTOOLS_ENABLE_FEATURES=legacy-editable $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
-pipenv := $(pipenv_envvars) $(OT_PYTHON) -m pipenv
-python := $(pipenv) run python
-pip := $(pipenv) run pip
-pytest := $(pipenv) run py.test
-_firstpath := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
-_possibilities := $(realpath $(_firstpath)/..) $(realpath $(_firstpath)/../..) $(_firstpath)
-monorepo_root := $(firstword $(filter %/opentrons, $(_possibilities)))
-
-# Run some command inside a specific environment. Resolves to an invocation
-# of pipenv run in that environment, so you can use it in a makefile like
-# $(run environment-path) pytest
-run = PIPENV_PIPFILE=$(monorepo_root)/environments/$(1)/Pipfile $(pipenv) run
+pipenv_call := $(pipenv_envvars) $(OT_PYTHON) -m pipenv
+pipenv = PIPENV_PIPFILE=$(monorepo_root)/environments/$(1)/Pipfile $(pipenv_call)
+python = $(call pipenv,$(1)) run python
+pip = $(call pipenv,$(1)) run pip
+pytest = $(call pipenv,$(1)) run py.test
 
 poetry := poetry
 poetry_run := $(poetry) run
@@ -68,9 +59,10 @@ $(2)-$(call python_package_version,$(1),$(3),$(4)).tar.gz
 endef
 
 # upload a package to a repository
-# parameter 1: auth arguments for twine
-# parameter 2: repository url
-# parameter 3: the wheel file to upload
+# parameter 1: environment
+# parameter 2: auth arguments for twine
+# parameter 3: repository url
+# parameter 4: the wheel file to upload
 define python_upload_package
-$(python) -m twine upload --repository-url $(2) $(1) $(3)
+$(call python,$(1)) -m twine upload --repository-url $(3) $(2) $(4)
 endef
