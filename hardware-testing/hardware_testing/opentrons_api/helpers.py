@@ -3,8 +3,8 @@ from types import MethodType
 from typing import Any, List
 
 from opentrons import protocol_api, execute, simulate
-from opentrons.hardware_control.thread_manager import ThreadManagerException
 from opentrons.protocol_api.labware import Well
+from opentrons.hardware_control.thread_manager import ThreadManagerException
 
 from .workarounds import is_running_in_app, store_robot_acceleration
 
