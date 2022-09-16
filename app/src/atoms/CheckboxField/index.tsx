@@ -1,6 +1,14 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { Icon, COLORS, Box, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import {
+  Icon,
+  COLORS,
+  Box,
+  SPACING,
+  TYPOGRAPHY,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+} from '@opentrons/components'
 
 export interface CheckboxFieldProps {
   /** change handler */
@@ -35,7 +43,7 @@ const OUTER_STYLE = css`
   @apply --font-form-default;
 
   display: flex;
-  align-items: center;
+  align-items: ${ALIGN_CENTER};
   line-height: 1;
 `
 
@@ -45,8 +53,8 @@ const INNER_STYLE_VALUE = css`
   color: ${COLORS.blueEnabled};
   display: flex;
   border-radius: ${SPACING.spacingXXS};
-  justify-content: center;
-  align-items: center;
+  justify-content: ${JUSTIFY_CENTER};
+  align-items: ${ALIGN_CENTER};
 
   &:hover {
     cursor: pointer;
@@ -71,8 +79,8 @@ const INNER_STYLE_NO_VALUE = css`
   color: ${COLORS.darkGreyEnabled};
   display: flex;
   border-radius: ${SPACING.spacingXXS};
-  justify-content: center;
-  align-items: center;
+  justify-content: ${JUSTIFY_CENTER};
+  align-items: ${ALIGN_CENTER};
 
   &:hover {
     cursor: pointer;
@@ -104,32 +112,47 @@ const LABEL_TEXT_STYLE = css`
 `
 
 export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
-  const indeterminate = props.isIndeterminate ? 'true' : undefined
+  const {
+    onChange,
+    value,
+    name,
+    label,
+    disabled,
+    tabIndex = 0,
+    isIndeterminate,
+  } = props
+  const indeterminate = isIndeterminate ?? false ? 'true' : undefined
 
   return (
-    <label css={OUTER_STYLE}>
-      {props.isIndeterminate ? (
-        <Icon name="minus-box" width="100%" css={INNER_STYLE_VALUE} />
+    <label css={OUTER_STYLE} data-testid="CheckboxField_label">
+      {isIndeterminate ?? false ? (
+        <Icon
+          name="minus-box"
+          width="100%"
+          css={INNER_STYLE_VALUE}
+          data-testid="CheckboxField_icon_minus-box"
+        />
       ) : (
         <Icon
-          css={props.value ? INNER_STYLE_VALUE : INNER_STYLE_NO_VALUE}
-          name={props.value ? 'ot-checkbox' : 'checkbox-blank-outline'}
+          css={value ?? false ? INNER_STYLE_VALUE : INNER_STYLE_NO_VALUE}
+          name={value ?? false ? 'ot-checkbox' : 'checkbox-blank-outline'}
           width="100%"
+          data-testid="CheckboxField_icon"
         />
       )}
       <input
         css={INPUT_STYLE}
         type="checkbox"
-        name={props.name}
-        checked={props.value || false}
-        disabled={props.disabled}
-        onChange={props.onChange}
-        tabIndex={0}
+        name={name}
+        checked={(value ?? false) || false}
+        disabled={disabled}
+        onChange={onChange}
+        tabIndex={tabIndex}
         /* @ts-expect-error */
         indeterminate={indeterminate}
       />
-      <Box css={LABEL_TEXT_STYLE} tabIndex={0}>
-        {props.label}
+      <Box css={LABEL_TEXT_STYLE} tabIndex={tabIndex}>
+        {label}
       </Box>
     </label>
   )
