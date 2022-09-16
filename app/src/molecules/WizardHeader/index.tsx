@@ -15,11 +15,10 @@ import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
 
 interface WizardHeaderProps {
-  totalSteps: number
-  currentStep: number | null
   title: string
-  isErrorState?: boolean
   onExit?: () => void
+  totalSteps?: number
+  currentStep?: number | null
 }
 
 const EXIT_BUTTON_STYLE = css`
@@ -32,19 +31,8 @@ const EXIT_BUTTON_STYLE = css`
   }
 `
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
-  const { totalSteps, currentStep, title, isErrorState, onExit } = props
+  const { totalSteps, currentStep, title, onExit } = props
   const { t } = useTranslation('shared')
-
-  let stepCounter: JSX.Element | null = null
-  if (isErrorState) {
-    stepCounter = null
-  } else if (currentStep != null && currentStep > 0) {
-    stepCounter = (
-      <StyledText css={TYPOGRAPHY.pSemiBold} color={COLORS.darkGreyEnabled}>
-        {t('step', { current: currentStep, max: totalSteps })}
-      </StyledText>
-    )
-  }
 
   return (
     <Box backgroundColor={COLORS.white}>
@@ -57,7 +45,14 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           <StyledText css={TYPOGRAPHY.pSemiBold} marginRight={SPACING.spacing3}>
             {title}
           </StyledText>
-          {stepCounter}
+          {currentStep != null && totalSteps != null && currentStep > 0 ? (
+            <StyledText
+              css={TYPOGRAPHY.pSemiBold}
+              color={COLORS.darkGreyEnabled}
+            >
+              {t('step', { current: currentStep, max: totalSteps })}
+            </StyledText>
+          ) : null}
         </Flex>
         {onExit != null ? (
           <Btn onClick={onExit} aria-label="Exit">
@@ -65,7 +60,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           </Btn>
         ) : null}
       </Flex>
-      <StepMeter totalSteps={totalSteps} currentStep={currentStep} />
+      <StepMeter totalSteps={totalSteps ?? 0} currentStep={currentStep ?? 0} />
     </Box>
   )
 }

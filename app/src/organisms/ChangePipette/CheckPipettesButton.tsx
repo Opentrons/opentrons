@@ -82,6 +82,40 @@ export function CheckPipettesButton(
     </DeprecatedPrimaryButton>
   )
 
+  const icon = (
+    <Icon name="ot-spinner" height="1rem" spin marginRight={SPACING.spacing3} />
+  )
+
+  let body
+  if (children != null && !isPending) {
+    body = children
+  } else if (children != null && isPending) {
+    body = (
+      <>
+        {icon}
+        {children}
+      </>
+    )
+  } else if (children == null && isPending) {
+    body = (
+      <>
+        <Icon
+          name="ot-spinner"
+          height="1rem"
+          spin
+          marginRight={SPACING.spacing3}
+        />
+        <StyledText>
+          {actualPipette
+            ? t('confirming_detachment')
+            : t('confirming_attachment')}
+        </StyledText>
+      </>
+    )
+  } else if (children == null && !isPending) {
+    body = actualPipette ? t('confirm_detachment') : t('confirm_attachment')
+  }
+
   return enableChangePipetteWizard ? (
     <PrimaryButton onClick={handleClick} aria-label="Confirm">
       <Flex
@@ -89,27 +123,7 @@ export function CheckPipettesButton(
         color={COLORS.white}
         alignItems={ALIGN_CENTER}
       >
-        {children != null ? (
-          children
-        ) : isPending ? (
-          <>
-            <Icon
-              name="ot-spinner"
-              height="1rem"
-              spin
-              marginRight={SPACING.spacing3}
-            />
-            <StyledText>
-              {actualPipette
-                ? t('confirming_detachment')
-                : t('confirming_attachment')}
-            </StyledText>
-          </>
-        ) : actualPipette ? (
-          t('confirm_detachment')
-        ) : (
-          t('confirm_attachment')
-        )}
+        {body}
       </Flex>
     </PrimaryButton>
   ) : (

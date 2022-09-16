@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
+import { renderWithProviders } from '@opentrons/components'
+import { i18n } from '../../../i18n'
 import {
   mockTipLengthCalBlock,
   mockTipLengthTipRack,
@@ -9,36 +9,18 @@ import * as Sessions from '../../../redux/sessions'
 
 import { MeasureNozzle } from '../MeasureNozzle'
 
-import type { ReactWrapper } from 'enzyme'
-import type { Mount } from '../../../redux/pipettes/types'
-import { VectorTuple } from '../../../redux/sessions/types'
-
 describe('MeasureNozzle', () => {
   let render: (
-    props?: Partial<
-      React.ComponentProps<typeof MeasureNozzle> & { pipMount: Mount }
-    >
-  ) => ReactWrapper<React.ComponentProps<typeof MeasureNozzle>>
+    props?: Partial<React.ComponentProps<typeof MeasureNozzle>>
+  ) => ReturnType<typeof renderWithProviders>
 
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
-  const getContinueButton = (
-    wrapper: ReactWrapper<React.ComponentProps<typeof MeasureNozzle>>
-  ) =>
-    wrapper
-      .find('button[children="Save nozzle z-axis and move to pick up tip"]')
-      .find('button')
-
-  const getJogButton = (
-    wrapper: ReactWrapper<React.ComponentProps<typeof MeasureNozzle>>,
-    direction: string
-  ) => wrapper.find(`button[title="${direction}"]`).find('button')
-
   beforeEach(() => {
     render = (props = {}) => {
       const {
-        pipMount = 'left',
+        mount = 'left',
         isMulti = false,
         tipRack = mockTipLengthTipRack,
         calBlock = mockTipLengthCalBlock,
@@ -47,17 +29,18 @@ describe('MeasureNozzle', () => {
         currentStep = Sessions.TIP_LENGTH_STEP_MEASURING_NOZZLE_OFFSET,
         sessionType = Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
       } = props
-      return mount(
+      return renderWithProviders(
         <MeasureNozzle
           isMulti={isMulti}
-          mount={pipMount}
+          mount={mount}
           tipRack={tipRack}
           calBlock={calBlock}
           sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
           currentStep={currentStep}
           sessionType={sessionType}
-        />
+        />,
+        { i18nInstance: i18n }
       )
     }
   })
@@ -66,63 +49,57 @@ describe('MeasureNozzle', () => {
     jest.resetAllMocks()
   })
 
-  it('renders the confirm crash link', () => {
-    const wrapper = render()
-    expect(wrapper.find('a[children="Start over"]').exists()).toBe(true)
-  })
-
-  it('renders need help link', () => {
-    const wrapper = render()
-    expect(wrapper.find('NeedHelpLink').exists()).toBe(true)
-  })
-
   it('renders the confirm crash modal when invoked', () => {
-    const wrapper = render()
-    wrapper.find('a[children="Start over"]').invoke('onClick')?.(
-      {} as React.MouseEvent
-    )
-    wrapper.update()
-    expect(wrapper.find('ConfirmCrashRecoveryModal').exists()).toBe(true)
-  })
-
-  it('allows jogging in z axis', () => {
-    const wrapper = render()
-
-    const jogDirections: Array<'up' | 'down'> = ['up', 'down']
-    const jogParamsByDirection: { [dir in 'up' | 'down']: VectorTuple } = {
-      up: [0, 0, 0.1],
-      down: [0, 0, -0.1],
-    }
-    jogDirections.forEach(direction => {
-      act(() =>
-        getJogButton(wrapper, direction).invoke('onClick')?.(
-          {} as React.MouseEvent
-        )
+    const { getByText, queryByText } = render()[0]
+    expect(
+      queryByText(
+        "Starting over will cancel your calibration progress. It's important to use an undamaged tip while you calibrate your robot."
       )
-      wrapper.update()
+    ).toBeNull()
+    const crashLink = getByText('Start over')
+    crashLink.click()
+    getByText(
+      "Starting over will cancel your calibration progress. It's important to use an undamaged tip while you calibrate your robot."
+    )
+  })
 
-      expect(mockSendCommands).toHaveBeenCalledWith({
-        command: Sessions.sharedCalCommands.JOG,
-        data: { vector: jogParamsByDirection[direction] },
-      })
-    })
+  it('renders the need help link', () => {
+    const { getByRole } = render()[0]
+    getByRole('link', { name: 'Need help?' })
+  })
 
-    const unavailableJogDirections = ['left', 'right', 'back', 'forward']
-    unavailableJogDirections.forEach(direction => {
-      expect(getJogButton(wrapper, direction)).toEqual({})
+  it('jogging sends command', () => {
+    const { getByRole } = render()[0]
+    getByRole('button', { name: 'forward' }).click()
+
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.JOG,
+      data: { vector: [0, -0.1, 0] },
     })
   })
-  it('clicking continue proceeds to next step', () => {
-    const wrapper = render()
 
-    act(() =>
-      getContinueButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
-    )
-    wrapper.update()
-
+  it('clicking proceed sends save offset and move to tip rack commands for tip length cal', () => {
+    const { getByRole } = render({
+      sessionType: Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+    })[0]
+    getByRole('button', { name: 'Confirm placement' }).click()
     expect(mockSendCommands).toHaveBeenCalledWith(
-      { command: Sessions.sharedCalCommands.SAVE_OFFSET },
-      { command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK }
+      {
+        command: Sessions.sharedCalCommands.SAVE_OFFSET,
+      },
+      {
+        command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
+      }
     )
+  })
+
+  it('clicking proceed sends only move to tip rack commands for cal health check', () => {
+    const { getByRole } = render({
+      sessionType: Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+    })[0]
+    getByRole('button', { name: 'Confirm placement' }).click()
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK,
+    })
   })
 })

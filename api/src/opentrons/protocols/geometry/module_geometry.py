@@ -331,6 +331,7 @@ class ThermocyclerGeometry(ModuleGeometry):
     ):
         to_lw, to_well = to_loc.labware.get_parent_labware_and_well()
         from_lw, from_well = from_loc.labware.get_parent_labware_and_well()
+
         if (
             self.labware is not None
             and (self.labware == to_lw or self.labware == from_lw)

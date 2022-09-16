@@ -54,7 +54,7 @@ import type {
   Jog,
   Sign,
   StepSize,
-} from '../../../molecules/JogControls/types'
+} from '../../../molecules/DeprecatedJogControls/types'
 import type {
   LabwarePositionCheckCreateCommand,
   LabwarePositionCheckMovementCommand,

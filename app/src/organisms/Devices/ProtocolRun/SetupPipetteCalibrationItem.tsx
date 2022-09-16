@@ -22,7 +22,7 @@ import {
 
 import { Portal } from '../../../App/portal'
 import { TertiaryButton } from '../../../atoms/buttons'
-import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../../organisms/CalibrationPanels'
+import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../../organisms/DeprecatedCalibrationPanels'
 import { useCalibratePipetteOffset } from '../../../organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
 import { AskForCalibrationBlockModal } from '../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { getHasCalibrationBlock } from '../../../redux/config'

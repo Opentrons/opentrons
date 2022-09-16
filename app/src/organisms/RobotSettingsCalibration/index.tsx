@@ -13,8 +13,10 @@ import { Portal } from '../../App/portal'
 import { Line } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 import { CalibrateDeck } from '../../organisms/CalibrateDeck'
+import { DeprecatedCalibrateDeck } from '../../organisms/DeprecatedCalibrateDeck'
 import { CalibrationStatusCard } from '../../organisms/CalibrationStatusCard'
 import { CheckCalibration } from '../../organisms/CheckCalibration'
+import { DeprecatedCheckCalibration } from '../../organisms/DeprecatedCheckCalibration'
 import {
   usePipetteOffsetCalibrations,
   useRobot,
@@ -282,13 +284,23 @@ export function RobotSettingsCalibration({
   return (
     <>
       <Portal level="top">
-        <CalibrateDeck
-          session={deckCalibrationSession}
-          robotName={robotName}
-          dispatchRequests={dispatchRequests}
-          showSpinner={isPending}
-          isJogging={isJogging}
-        />
+        {enableCalibrationWizards ? (
+          <CalibrateDeck
+            session={deckCalibrationSession}
+            robotName={robotName}
+            dispatchRequests={dispatchRequests}
+            showSpinner={isPending}
+            isJogging={isJogging}
+          />
+        ) : (
+          <DeprecatedCalibrateDeck
+            session={deckCalibrationSession}
+            robotName={robotName}
+            dispatchRequests={dispatchRequests}
+            showSpinner={isPending}
+            isJogging={isJogging}
+          />
+        )}
 
         {createStatus === RobotApi.PENDING ? (
           <SpinnerModalPage
@@ -302,13 +314,23 @@ export function RobotSettingsCalibration({
             }}
           />
         ) : null}
-        <CheckCalibration
-          session={checkHealthSession}
-          robotName={robotName}
-          dispatchRequests={dispatchRequests}
-          showSpinner={isPending}
-          isJogging={isJogging}
-        />
+        {enableCalibrationWizards ? (
+          <CheckCalibration
+            session={checkHealthSession}
+            robotName={robotName}
+            dispatchRequests={dispatchRequests}
+            showSpinner={isPending}
+            isJogging={isJogging}
+          />
+        ) : (
+          <DeprecatedCheckCalibration
+            session={checkHealthSession}
+            robotName={robotName}
+            dispatchRequests={dispatchRequests}
+            showSpinner={isPending}
+            isJogging={isJogging}
+          />
+        )}
         {createStatus === RobotApi.FAILURE && (
           <AlertModal
             alertOverlay

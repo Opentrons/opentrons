@@ -4,21 +4,31 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
+import { useFeatureFlag } from '../../../../redux/config'
 import { mockTipRackDefinition } from '../../../../redux/custom-labware/__fixtures__'
 import { useRunPipetteInfoByMount } from '../../hooks'
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
+import { DeprecatedSetupTipLengthCalibrationButton } from '../DeprecatedSetupTipLengthCalibrationButton'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 
 import type { PipetteInfo } from '../../hooks'
 
+jest.mock('../../../../redux/config')
 jest.mock('../../hooks')
 jest.mock('../SetupTipLengthCalibrationButton')
+jest.mock('../DeprecatedSetupTipLengthCalibrationButton')
 
 const mockUseRunPipetteInfoByMount = useRunPipetteInfoByMount as jest.MockedFunction<
   typeof useRunPipetteInfoByMount
 >
 const mockSetupTipLengthCalibrationButton = SetupTipLengthCalibrationButton as jest.MockedFunction<
   typeof SetupTipLengthCalibrationButton
+>
+const mockDeprecatedSetupTipLengthCalibrationButton = DeprecatedSetupTipLengthCalibrationButton as jest.MockedFunction<
+  typeof DeprecatedSetupTipLengthCalibrationButton
+>
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
 >
 
 const ROBOT_NAME = 'otie'
@@ -59,6 +69,12 @@ describe('SetupTipLengthCalibration', () => {
     when(mockSetupTipLengthCalibrationButton).mockReturnValue(
       <div>Mock SetupTipLengthCalibrationButton</div>
     )
+    when(mockDeprecatedSetupTipLengthCalibrationButton).mockReturnValue(
+      <div>Mock DeprecatedSetupTipLengthCalibrationButton</div>
+    )
+    when(mockUseFeatureFlag)
+      .calledWith('enableCalibrationWizards')
+      .mockReturnValue(false)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -73,7 +89,9 @@ describe('SetupTipLengthCalibration', () => {
 
     expect(getAllByText('pipette 1')).toHaveLength(1)
     expect(getAllByText('Mock TipRack Definition')).toHaveLength(1)
-    expect(getAllByText('Mock SetupTipLengthCalibrationButton')).toHaveLength(1)
+    expect(
+      getAllByText('Mock DeprecatedSetupTipLengthCalibrationButton')
+    ).toHaveLength(1)
     expect(
       getAllByText('Attach pipette to see tip length calibration information')
     ).toHaveLength(1)
@@ -90,11 +108,26 @@ describe('SetupTipLengthCalibration', () => {
 
     expect(getAllByText('pipette 1')).toHaveLength(2)
     expect(getAllByText('Mock TipRack Definition')).toHaveLength(2)
-    expect(getAllByText('Mock SetupTipLengthCalibrationButton')).toHaveLength(2)
+    expect(
+      getAllByText('Mock DeprecatedSetupTipLengthCalibrationButton')
+    ).toHaveLength(2)
     expect(
       getAllByText('Attach pipette to see tip length calibration information')
     ).toHaveLength(2)
     expect(queryByText('Last calibrated:')).toBeFalsy()
+  })
+  it('renders new tip length button when enableCalibrationWizards feature flag is set', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableCalibrationWizards')
+      .mockReturnValue(true)
+    const { getByText, queryByText } = render()
+
+    expect(
+      getByText('Mock SetupTipLengthCalibrationButton')
+    ).toBeInTheDocument()
+    expect(
+      queryByText('Mock DeprecatedSetupTipLengthCalibrationButton')
+    ).toBeNull()
   })
   it('renders last calibrated date when available', () => {
     when(mockUseRunPipetteInfoByMount)

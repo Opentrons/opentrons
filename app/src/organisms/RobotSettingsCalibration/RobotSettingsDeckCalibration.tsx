@@ -16,7 +16,7 @@ import {
 import { Banner } from '../../atoms/Banner'
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { formatLastModified } from '../../organisms/CalibrationPanels/utils'
+import { formatLastModified } from '../../organisms/DeprecatedCalibrationPanels/utils'
 import {
   useDeckCalibrationData,
   useRobot,

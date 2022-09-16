@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import logging
-from collections import OrderedDict
 from typing import (
-    TYPE_CHECKING,
     Callable,
     Dict,
     Iterator,
@@ -11,15 +9,17 @@ from typing import (
     NamedTuple,
     Optional,
     Tuple,
+    Type,
     Union,
     cast,
 )
 
+from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
 from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
 from opentrons.broker import Broker
-from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
-from opentrons.hardware_control.modules.types import ModuleType
+from opentrons.hardware_control.modules import ModuleType
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support.types import APIVersion
@@ -28,18 +28,15 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
 )
-from opentrons.protocols.geometry.module_geometry import (
-    ModuleGeometry,
-    resolve_module_model,
-)
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .core.instrument import AbstractInstrument
-from .core.well import AbstractWellCore
 from .core.labware import AbstractLabware
+from .core.module import AbstractModuleCore
 from .core.protocol import AbstractProtocol
-from .core.labware_offset_provider import AbstractLabwareOffsetProvider
+from .core.well import AbstractWellCore
 
 from . import validation
 from .instrument_context import InstrumentContext
@@ -51,10 +48,6 @@ from .module_contexts import (
     HeaterShakerContext,
 )
 
-from .load_info import LoadInfo, LabwareLoadInfo, ModuleLoadInfo, InstrumentLoadInfo
-
-if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +58,12 @@ ModuleTypes = Union[
     ThermocyclerContext,
     HeaterShakerContext,
 ]
+
+
+InstrumentCore = AbstractInstrument[AbstractWellCore]
+LabwareCore = AbstractLabware[AbstractWellCore]
+ModuleCore = AbstractModuleCore[LabwareCore]
+ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
 
 
 class HardwareManager(NamedTuple):
@@ -96,12 +95,8 @@ class ProtocolContext(CommandPublisher):
     def __init__(
         self,
         api_version: APIVersion,
-        implementation: AbstractProtocol[
-            AbstractInstrument[AbstractWellCore], AbstractLabware[AbstractWellCore]
-        ],
-        labware_offset_provider: AbstractLabwareOffsetProvider,
+        implementation: ProtocolCore,
         broker: Optional[Broker] = None,
-        equipment_broker: Optional[EquipmentBroker[LoadInfo]] = None,
     ) -> None:
         """Build a :py:class:`.ProtocolContext`.
 
@@ -116,8 +111,6 @@ class ProtocolContext(CommandPublisher):
 
         self._api_version = api_version
         self._implementation = implementation
-        self._labware_offset_provider = labware_offset_provider
-        self._equipment_broker = equipment_broker or EquipmentBroker()
 
         if self._api_version > MAX_SUPPORTED_VERSION:
             raise RuntimeError(
@@ -129,25 +122,11 @@ class ProtocolContext(CommandPublisher):
         self._instruments: Dict[Mount, Optional[InstrumentContext]] = {
             mount: None for mount in Mount
         }
-        self._modules: List[ModuleTypes] = []
+        self._modules: Dict[DeckSlotName, ModuleTypes] = {}
 
         self._commands: List[str] = []
         self._unsubscribe_commands: Optional[Callable[[], None]] = None
         self.clear_commands()
-
-    @property
-    def equipment_broker(self) -> EquipmentBroker[LoadInfo]:
-        """For internal Opentrons use only.
-
-        :meta private:
-
-        Subscribers to this broker will be notified with information about every
-        successful labware load, instrument load, or module load.
-
-        Only :py:obj:`ProtocolContext` is allowed to publish to this broker.
-        Calling code may only subscribe or unsubscribe.
-        """
-        return self._equipment_broker
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -320,8 +299,6 @@ class ProtocolContext(CommandPublisher):
         :param int version: The version of the labware definition. If
             unspecified, will use version 1.
         """
-        # todo(mm, 2021-11-22): The duplication between here and
-        # load_labware_from_definition() is getting bad.
         deck_slot = validation.ensure_deck_slot(location)
 
         labware_core = self._implementation.load_labware(
@@ -332,35 +309,9 @@ class ProtocolContext(CommandPublisher):
             version=version,
         )
 
-        labware_load_params = labware_core.get_load_params()
-
-        # TODO(mc, 2022-09-02): move labware offset provider to legacy core
-        labware_offset = self._labware_offset_provider.find(
-            load_params=labware_load_params,
-            deck_slot=deck_slot,
-            requested_module_model=None,
-        )
-        labware_core.set_calibration(labware_offset.delta)
-
         # TODO(mc, 2022-09-02): add API version
         # https://opentrons.atlassian.net/browse/RSS-97
-        result = Labware(implementation=labware_core)
-
-        # TODO(mc, 2022-09-02): move equipment broker to legacy core
-        self.equipment_broker.publish(
-            LabwareLoadInfo(
-                labware_definition=labware_core.get_definition(),
-                labware_namespace=labware_load_params.namespace,
-                labware_load_name=labware_load_params.load_name,
-                labware_version=labware_load_params.version,
-                deck_slot=deck_slot,
-                on_module=False,
-                offset_id=labware_offset.offset_id,
-                labware_display_name=labware_core.get_user_display_name(),
-            )
-        )
-
-        return result
+        return Labware(implementation=labware_core)
 
     @requires_version(2, 0)
     def load_labware_by_name(
@@ -457,45 +408,24 @@ class ProtocolContext(CommandPublisher):
                 "using thermocycler parameters only available in 2.4"
             )
 
-        requested_model = resolve_module_model(module_name)
-        load_result = self._implementation.load_module(
-            model=requested_model, location=location, configuration=configuration
+        requested_model = validation.ensure_module_model(module_name)
+        deck_slot = None if location is None else validation.ensure_deck_slot(location)
+
+        module_core = self._implementation.load_module(
+            model=requested_model,
+            deck_slot=deck_slot,
+            configuration=configuration,
         )
 
-        if not load_result:
-            raise RuntimeError(f"Could not find specified module: {module_name}")
-
-        mod_class = {
-            ModuleType.MAGNETIC: MagneticModuleContext,
-            ModuleType.TEMPERATURE: TemperatureModuleContext,
-            ModuleType.THERMOCYCLER: ThermocyclerContext,
-            ModuleType.HEATER_SHAKER: HeaterShakerContext,
-        }[load_result.type]
-
-        module_context: ModuleTypes = mod_class(
-            ctx=self,
-            hw_module=load_result.module,
-            geometry=load_result.geometry,
-            at_version=self.api_version,
-            requested_as=requested_model,
+        module_context = _create_module_context(
+            module_core=module_core,
+            protocol_core=self._implementation,
+            broker=self._broker,
+            api_version=self._api_version,
         )
-        self._modules.append(module_context)
 
-        # ===== Protocol Engine stuff ====
-        module_loc = load_result.geometry.parent
-        assert isinstance(module_loc, (int, str)), "Unexpected labware object parent"
-        deck_slot = DeckSlotName.from_primitive(module_loc)
-        module_serial = load_result.module.device_info["serial"]
+        self._modules[module_core.get_deck_slot()] = module_context
 
-        self.equipment_broker.publish(
-            ModuleLoadInfo(
-                requested_model=requested_model,
-                loaded_model=load_result.geometry.model,
-                deck_slot=deck_slot,
-                configuration=configuration,
-                module_serial=module_serial,
-            )
-        )
         return module_context
 
     @property  # type: ignore
@@ -514,12 +444,9 @@ class ProtocolContext(CommandPublisher):
                                            contexts. The elements may not be
                                            ordered by slot number.
         """
-
-        def _modules() -> Iterator[Tuple[int, ModuleTypes]]:
-            for module in self._modules:
-                yield int(str(module.geometry.parent)), module
-
-        return OrderedDict(_modules())
+        return {
+            int(deck_slot.value): module for deck_slot, module in self._modules.items()
+        }
 
     @requires_version(2, 0)
     def load_instrument(
@@ -584,14 +511,6 @@ class ProtocolContext(CommandPublisher):
         )
 
         self._instruments[checked_mount] = instrument
-
-        # TODO(mc, 2022-08-25): move equipment broker to legacy core
-        self.equipment_broker.publish(
-            InstrumentLoadInfo(
-                instrument_load_name=checked_instrument_name,
-                mount=checked_mount,
-            )
-        )
 
         return instrument
 
@@ -753,3 +672,26 @@ class ProtocolContext(CommandPublisher):
     def door_closed(self) -> bool:
         """Returns True if the robot door is closed"""
         return self._implementation.door_closed()
+
+
+def _create_module_context(
+    module_core: ModuleCore,
+    protocol_core: ProtocolCore,
+    api_version: APIVersion,
+    broker: Broker,
+) -> ModuleTypes:
+    # TODO(mc, 2022-09-07): create distinct module cores
+    module_constructors: Dict[ModuleType, Type[ModuleTypes]] = {
+        ModuleType.MAGNETIC: MagneticModuleContext,
+        ModuleType.TEMPERATURE: TemperatureModuleContext,
+        ModuleType.THERMOCYCLER: ThermocyclerContext,
+        ModuleType.HEATER_SHAKER: HeaterShakerContext,
+    }
+    module_cls = module_constructors[module_core.get_type()]
+
+    return module_cls(
+        core=module_core,
+        protocol_core=protocol_core,
+        api_version=api_version,
+        broker=broker,
+    )
