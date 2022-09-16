@@ -22,7 +22,7 @@ import { useProtocolDetailsForRun } from './hooks'
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 
 type RobotStatusBannerProps = Pick<DiscoveredRobot, 'name' | 'local'> & {
-  robotModel: string
+  robotModel: string | null
 }
 
 export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
