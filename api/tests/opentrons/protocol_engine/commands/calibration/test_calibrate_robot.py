@@ -1,5 +1,6 @@
 """Test calibrate-robot command."""
 import inspect
+from typing import cast
 
 import pytest
 from decoy import Decoy
@@ -14,8 +15,8 @@ from opentrons.hardware_control import (
     HardwareControlAPI,
     ot3_calibration as calibration,
 )
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import OT3Mount
-from opentrons.types import Point
 
 
 @pytest.fixture(autouse=True)
@@ -36,11 +37,13 @@ async def test_calibrate_robot_implementation(
     )
 
     decoy.when(
-        await calibration.find_deck_position(hcapi=hardware_api, mount=params.mount)
+        await calibration.find_deck_position(
+            hcapi=cast(OT3API, hardware_api), mount=params.mount
+        )
     ).then_return(5.0)
     decoy.when(
         await calibration.find_slot_center_binary(
-            hcapi=hardware_api, mount=params.mount, deck_height=5.0
+            hcapi=cast(OT3API, hardware_api), mount=params.mount, deck_height=5.0
         )
     ).then_return((3, 4))
 
