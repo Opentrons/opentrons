@@ -94,6 +94,7 @@ const INNER_STYLE_NO_VALUE = css`
   &:focus {
     box-shadow: 0 0 0 3px ${COLORS.fundamentalsFocus};
   }
+
   &:disabled {
     color: ${COLORS.darkGreyPressed};
   }

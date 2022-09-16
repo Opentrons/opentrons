@@ -35,7 +35,7 @@ describe('CheckboxField', () => {
 
   it('renders label with correct style', () => {
     const { debug, getByTestId, getByRole, getByText } = render(props)
-    const checkBoxLabel = getByTestId('CheckboxField_label')
+    // const checkBoxLabel = getByTestId('CheckboxField_label')
     const checkBoxInput = getByRole('checkbox', {
       name: 'checkMockCheckboxField',
     })
@@ -45,6 +45,7 @@ describe('CheckboxField', () => {
 
     // expect(findByTestId('CheckboxField_icon_minus-box')).not.toBeInTheDocument()
 
+    // INNER_STYLE_NO_VALUE
     expect(checkBoxIcon).toHaveStyle(`width: ${SPACING.spacingM}`)
     expect(checkBoxIcon).toHaveStyle(`min-width: ${SPACING.spacingM}`)
     expect(checkBoxIcon).toHaveStyle(`color: ${COLORS.darkGreyEnabled}`)
@@ -52,16 +53,34 @@ describe('CheckboxField', () => {
     expect(checkBoxIcon).toHaveStyle(`border-radius: ${SPACING.spacingXXS}`)
     expect(checkBoxIcon).toHaveStyle(`justify-content: ${JUSTIFY_CENTER}`)
     expect(checkBoxIcon).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
-    // getByLabelText('ot-checkbox')
+    expect(checkBoxIcon).toHaveStyleRule('cursor', 'pointer', {
+      modifier: ':hover',
+    })
+    expect(checkBoxIcon).toHaveStyleRule('color', `${COLORS.darkGreyHover}`, {
+      modifier: ':hover',
+    })
+    expect(checkBoxIcon).toHaveStyleRule('color', `${COLORS.darkGreyPressed}`, {
+      modifier: ':active',
+    })
+    expect(checkBoxIcon).toHaveStyleRule(
+      'box-shadow',
+      `0 0 0 3px ${COLORS.fundamentalsFocus}`,
+      { modifier: ':focus' }
+    )
+    expect(checkBoxIcon).toHaveStyleRule('color', `${COLORS.darkGreyPressed}`, {
+      modifier: ':disabled',
+    })
 
-    // label OUTER_STYLE
+    // OUTER_STYLE
     // expect(checkBoxLabel).toHaveStyle('@apply --font-form-default')
     // expect(checkBoxLabel).toHaveStyle('font-size: 0.75rem')
     // expect(checkBoxLabel).toHaveStyle('font-weight: 400')
+    // console.log(checkBoxLabel.style)
     // expect(checkBoxLabel).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
     // expect(checkBoxLabel).toHaveStyle('display: flex')
     // expect(checkBoxLabel).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
-    expect(checkBoxLabel).toHaveStyle('line-height: 1')
+    // expect(checkBoxLabel).toHaveStyle('line-height: 1')
+    // expect(checkBoxLabel).toBeInTheDocument()
 
     // input INPUT_STYLE
     expect(checkBoxInput).toHaveStyle(`position: absolute`)
@@ -81,17 +100,13 @@ describe('CheckboxField', () => {
     )
     expect(checkBoxFieldBox).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
     expect(checkBoxFieldBox).toHaveStyle(`flex: 0 0 auto`)
-
     expect(checkBoxFieldBox).toHaveStyle(
       `padding: ${SPACING.spacing3} ${SPACING.spacing3}`
     )
+    expect(checkBoxFieldBox).toHaveStyleRule('padding', '0', {
+      modifier: ':empty',
+    })
     expect(checkBoxFieldBox).toHaveAttribute('tabindex', '0')
-
-    // console.log(checkBoxInput)
-
-    // icon part
-    // expect(checkBox).toHaveStyle(``)
-    // expect(checkBox).toHaveStyle(``)
   })
 
   it('render icon with correct style - value true', () => {
