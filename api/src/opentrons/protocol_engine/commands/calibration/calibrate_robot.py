@@ -1,6 +1,6 @@
 """Blow-out command request, result, and implementation models."""
 from __future__ import annotations
-from typing import Optional, Type, List, TypeVar
+from typing import Optional, Type, List, cast
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
@@ -16,8 +16,6 @@ from opentrons.hardware_control import ot3_calibration as calibration
 from opentrons.hardware_control.types import OT3Mount
 from opentrons.hardware_control.ot3api import OT3API
 
-
-_OT3API = TypeVar("OT3API", bound=HardwareControlAPI)
 
 CalibrateRobotCommandType = Literal["calibrateRobot"]
 
@@ -51,10 +49,12 @@ class CalibrateRobotImplementation(
     async def execute(self, params: CalibrateRobotParams) -> CalibrateRobotResult:
         """Execute calibrate-robot command."""
         deck_z = await calibration.find_deck_position(
-            hcapi=OT3API(self._hardware_api), mount=params.mount
+            hcapi=cast(OT3API, self._hardware_api), mount=params.mount
         )
         await calibration.find_slot_center_binary(
-            hcapi=OT3API(self._hardware_api), mount=params.mount, deck_height=deck_z
+            hcapi=cast(OT3API, self._hardware_api),
+            mount=params.mount,
+            deck_height=deck_z,
         )
         return CalibrateRobotResult()
 
