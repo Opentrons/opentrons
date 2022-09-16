@@ -44,6 +44,10 @@ class CalibrateRobotImplementation(
         hardware_api: HardwareControlAPI,
         **kwargs: object,
     ) -> None:
+        print(isinstance(hardware_api, OT3API))
+        if not isinstance(hardware_api, OT3API):
+            raise ValueError("This command is supported by OT3 Only.")
+
         self._hardware_api = hardware_api
 
     async def execute(self, params: CalibrateRobotParams) -> CalibrateRobotResult:

@@ -27,23 +27,21 @@ def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
 
 async def test_calibrate_robot_implementation(
     decoy: Decoy,
-    hardware_api: HardwareControlAPI,
+    ot3_api: OT3API,
 ) -> None:
     """Test Probe command execution."""
-    subject = CalibrateRobotImplementation(hardware_api=hardware_api)
+    subject = CalibrateRobotImplementation(hardware_api=OT3API)
 
     params = CalibrateRobotParams(
         mount=OT3Mount.LEFT,
     )
 
     decoy.when(
-        await calibration.find_deck_position(
-            hcapi=cast(OT3API, hardware_api), mount=params.mount
-        )
+        await calibration.find_deck_position(hcapi=ot3_api, mount=params.mount)
     ).then_return(5.0)
     decoy.when(
         await calibration.find_slot_center_binary(
-            hcapi=cast(OT3API, hardware_api), mount=params.mount, deck_height=5.0
+            hcapi=ot3_api, mount=params.mount, deck_height=5.0
         )
     ).then_return((3, 4))
 
