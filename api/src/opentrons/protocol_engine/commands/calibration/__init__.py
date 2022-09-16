@@ -8,6 +8,14 @@ from .calibrate_pipette import (
     CalibratePipette,
 )
 
+from .move_to_location import (
+    MoveToLocation,
+    MoveToLocationCreate,
+    MoveToLocationParams,
+    MoveToLocationResult,
+    MoveToLocationCommandType,
+)
+
 __all__ = [
     # calibration/calibratePipette
     "CalibratePipette",

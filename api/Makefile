@@ -118,7 +118,8 @@ test-ot2:
 
 .PHONY: lint
 lint:
-	$(python) -m mypy src tests
+	$(python) -m mypy src
+	$(python) -m mypy -p tests
 	$(python) -m black --check src tests setup.py
 	$(python) -m flake8 src tests setup.py
 
