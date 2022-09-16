@@ -7,6 +7,8 @@ import { i18n } from '../../../i18n'
 
 const robotName = 'fakeRobotName'
 const robotModel = 'OT-2'
+const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
+const OT3_PNG_FILE_NAME = 'OT3.png'
 describe('AvailableRobotOption', () => {
   it('renders slideout if showSlideout true', () => {
     const { queryByText } = render(
@@ -67,6 +69,36 @@ describe('AvailableRobotOption', () => {
     )
     fireEvent.click(container)
     expect(handleClick).toHaveBeenCalled()
+  })
+  it('renders OT-2 image when the robot model is OT-2', () => {
+    const { getByRole } = render(
+      <AvailableRobotOption
+        robotName={robotName}
+        robotModel={robotModel}
+        local={false}
+        onClick={jest.fn()}
+        isSelected={false}
+        isError={false}
+        isOnDifferentSoftwareVersion={false}
+      />
+    )
+    const image = getByRole('img')
+    expect(image.getAttribute('src')).toEqual(OT2_PNG_FILE_NAME)
+  })
+  it('renders OT-3 image when the robot model is OT-3', () => {
+    const { getByRole } = render(
+      <AvailableRobotOption
+        robotName={robotName}
+        robotModel="OT-3"
+        local={false}
+        onClick={jest.fn()}
+        isSelected={false}
+        isError={false}
+        isOnDifferentSoftwareVersion={false}
+      />
+    )
+    const image = getByRole('img')
+    expect(image.getAttribute('src')).toEqual(OT3_PNG_FILE_NAME)
   })
   it('renders link to device details if software version is out of sync with app and is selected', () => {
     const handleClick = jest.fn()

@@ -16,6 +16,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
+import OT3_PNG from '../../assets/images/OT3.png'
 
 interface AvailableRobotOptionProps {
   robotName: string
@@ -48,7 +49,7 @@ export function AvailableRobotOption(
         isError={(isError || isOnDifferentSoftwareVersion) && isSelected}
       >
         <img
-          src={OT2_PNG}
+          src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
           css={css`
             width: 4rem;
             height: 3.5625rem;

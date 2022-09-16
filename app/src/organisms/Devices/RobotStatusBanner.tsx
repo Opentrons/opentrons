@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
@@ -19,23 +18,20 @@ import { StyledText } from '../../atoms/text'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import { useProtocolDetailsForRun } from './hooks'
-import { getRobotModelByName } from '../../redux/discovery'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
-import type { State } from '../../redux/types'
 
-type RobotStatusBannerProps = Pick<DiscoveredRobot, 'name' | 'local'>
+type RobotStatusBannerProps = Pick<DiscoveredRobot, 'name' | 'local'> & {
+  robotModel: string
+}
 
 export function RobotStatusBanner(props: RobotStatusBannerProps): JSX.Element {
-  const { name, local } = props
+  const { name, local, robotModel } = props
   const { t } = useTranslation(['devices_landing', 'run_details'])
 
   const currentRunId = useCurrentRunId()
   const currentRunStatus = useCurrentRunStatus()
   const { displayName } = useProtocolDetailsForRun(currentRunId)
-  const robotModel = useSelector((state: State) =>
-    getRobotModelByName(state, name)
-  )
 
   const runningProtocolBanner: JSX.Element | null =
     currentRunId != null ? (
