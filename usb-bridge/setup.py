@@ -29,6 +29,7 @@ CLASSIFIERS = [
     'Intended Audience :: Science/Research',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.10',
     'Topic :: Scientific/Engineering',
 ]
@@ -73,7 +74,7 @@ if __name__ == "__main__":
         include_package_data=True,
         project_urls={
             "opentrons.com": "https://www.opentrons.com",
-            "Source Code On Github": "https://github.com/Opentrons/opentrons/tree/edge/api",
+            "Source Code On Github": "https://github.com/Opentrons/opentrons/tree/edge/usb-bridge",
             "Documentation": "https://docs.opentrons.com",
         },
     )
