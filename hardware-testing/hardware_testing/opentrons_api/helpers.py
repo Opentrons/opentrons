@@ -16,6 +16,8 @@ from opentrons.hardware_control.types import OT3Axis
 
 from .workarounds import is_running_in_app, store_robot_acceleration
 
+HWApiOT3: Union[Type[OT3API], Type[OT2API]] = OT3API
+
 
 def _add_fake_simulate(
     ctx: protocol_api.ProtocolContext, is_simulating: bool
@@ -94,6 +96,17 @@ def get_pipette_unique_name(pipette: protocol_api.InstrumentContext) -> str:
 def stop_server_ot3() -> None:
     """Stop opentrons-robot-server on the OT3."""
     run(["systemctl", "stop", "opentrons-robot-server"])
+
+
+def build_ot3_hardware_api(is_simulating: Optional[bool] = False) -> ThreadManager[HardwareControlAPI]:
+    config = robot_configs.load_ot3()
+    if is_simulating:
+        hw_api = ThreadManager(HWApiOT3.build_hardware_simulator, config=config)
+    else:
+        stop_server_ot3()
+        hw_api = ThreadManager(HWApiOT3.build_hardware_controller, config=config)
+    hw_api.managed_thread_ready_blocking()
+    return hw_api
 
 
 def set_gantry_per_axis_setting_ot3(

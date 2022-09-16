@@ -1,19 +1,14 @@
 """OT3 Move Test."""
 import argparse
 import asyncio
-from typing import Union, Type
-
-from opentrons.config import robot_configs
 from opentrons.config.types import GantryLoad
 from opentrons.types import Point
 from opentrons.hardware_control.protocols import HardwareControlAPI
 from opentrons.hardware_control.thread_manager import ThreadManager
-from opentrons.hardware_control.api import API as OT2API
-from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import OT3Mount, OT3Axis
 
 from hardware_testing.opentrons_api.helpers import (
-    stop_server_ot3,
+    build_ot3_hardware_api,
     update_axis_motion_settings_ot3,
     update_axis_current_settings_ot3,
     home_ot3,
@@ -21,14 +16,6 @@ from hardware_testing.opentrons_api.helpers import (
 
 MOUNT = OT3Mount.LEFT
 LOAD = GantryLoad.NONE
-
-
-def _get_input_ignoring_empty(msg: str) -> str:
-    res = input(msg)
-    if not res:
-        return _get_input_ignoring_empty(msg)
-    else:
-        return res
 
 
 async def _set_default_motion_settings(api: ThreadManager[HardwareControlAPI]) -> None:
@@ -82,18 +69,9 @@ async def _main(api: ThreadManager[HardwareControlAPI]) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser("OT3 Test Template")
+    parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     args = parser.parse_args()
-
-    HWApi: Union[Type[OT3API], Type[OT2API]] = OT3API
-    config = robot_configs.load_ot3()
-    if args.simulate:
-        hw_api = ThreadManager(HWApi.build_hardware_simulator, config=config)
-    else:
-        stop_server_ot3()
-        hw_api = ThreadManager(HWApi.build_hardware_controller, config=config)
-
-    hw_api.managed_thread_ready_blocking()
+    hw_api = build_ot3_hardware_api(is_simulating=args.simulate)
     asyncio.run(_main(hw_api))
     hw_api.clean_up()

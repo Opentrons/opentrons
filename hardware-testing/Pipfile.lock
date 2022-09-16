@@ -123,6 +123,10 @@
             "editable": true,
             "path": "./../api"
         },
+        "opentrons-hardware": {
+            "editable": true,
+            "path": "./../api"
+        },
         "opentrons-shared-data": {
             "editable": true,
             "path": "./../shared-data/python"
