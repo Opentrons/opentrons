@@ -46,7 +46,6 @@ export function createSession(
   host: RobotHost,
   sessionPath: string
 ): BuildrootAction {
-  console.log('in create session action creator')
   return { type: Constants.BR_CREATE_SESSION, payload: { host, sessionPath } }
 }
 

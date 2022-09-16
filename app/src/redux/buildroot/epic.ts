@@ -146,7 +146,6 @@ export const startUpdateEpic: Epic = (action$, state$) =>
       }
 
       // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost
-      console.log('creating session')
       return createSession(host, sessionPath)
     })
   )
@@ -228,7 +227,6 @@ export const statusPollEpic: Epic = (action$, state$) => {
             state$.pipe(
               filter(state => {
                 const session = getBuildrootSession(state)
-                console.log('SERSSION', session?.stage, session?.error, session)
                 return (
                   session?.stage === READY_FOR_RESTART ||
                   // @ts-expect-error TODO: `session?.error === true` always returns false, remove it?
@@ -284,7 +282,6 @@ export const uploadFileEpic: Epic = (_, state$) => {
       const pathPrefix: string = session?.pathPrefix as any
       const token: string = session?.token as any
       const systemFile = session?.userFileInfo?.systemFile || null
-      console.log('uploading buildroot file')
 
       return uploadBuildrootFile(
         // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost

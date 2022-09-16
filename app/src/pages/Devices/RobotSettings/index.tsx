@@ -29,7 +29,6 @@ import { RobotSettingsNetworking } from '../../../organisms/Devices/RobotSetting
 import { ReachableBanner } from '../../../organisms/Devices/ReachableBanner'
 
 import type { NavRouteParams, RobotSettingsTab } from '../../../App/types'
-import { NIL } from 'uuid'
 
 export function RobotSettings(): JSX.Element | null {
   const { t } = useTranslation('device_settings')
@@ -72,8 +71,8 @@ export function RobotSettings(): JSX.Element | null {
   if (
     (robot == null ||
       robot?.status === UNREACHABLE ||
-      (robot?.status === REACHABLE && robot?.serverHealthStatus !== 'ok'))
-    && buildrootUpdateSession == null
+      (robot?.status === REACHABLE && robot?.serverHealthStatus !== 'ok')) &&
+    buildrootUpdateSession == null
   ) {
     return <Redirect to={`/devices/${robotName}`} />
   }

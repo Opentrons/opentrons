@@ -24,8 +24,6 @@ export function InstallModal(props: InstallModalProps): JSX.Element {
     buttons.push({ children: 'close', onClick: close })
   }
 
-  console.log('robotSystemType', robotSystemType)
-
   let heading: string
   // let heading: string = ''
   if (robotSystemType === 'balena') {
