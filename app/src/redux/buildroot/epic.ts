@@ -228,6 +228,7 @@ export const statusPollEpic: Epic = (action$, state$) => {
             state$.pipe(
               filter(state => {
                 const session = getBuildrootSession(state)
+                console.log('SERSSION', session?.stage, session?.error, session)
                 return (
                   session?.stage === READY_FOR_RESTART ||
                   // @ts-expect-error TODO: `session?.error === true` always returns false, remove it?
