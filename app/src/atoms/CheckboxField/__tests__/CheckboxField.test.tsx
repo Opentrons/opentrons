@@ -34,16 +34,12 @@ describe('CheckboxField', () => {
   })
 
   it('renders label with correct style', () => {
-    const { debug, getByTestId, getByRole, getByText } = render(props)
-    // const checkBoxLabel = getByTestId('CheckboxField_label')
+    const { getByTestId, getByRole, getByText } = render(props)
     const checkBoxInput = getByRole('checkbox', {
       name: 'checkMockCheckboxField',
     })
     const checkBoxFieldBox = getByText('checkMockCheckboxField')
     const checkBoxIcon = getByTestId('CheckboxField_icon')
-    debug()
-
-    // expect(findByTestId('CheckboxField_icon_minus-box')).not.toBeInTheDocument()
 
     // INNER_STYLE_NO_VALUE
     expect(checkBoxIcon).toHaveStyle(`width: ${SPACING.spacingM}`)
@@ -71,18 +67,17 @@ describe('CheckboxField', () => {
       modifier: ':disabled',
     })
 
-    // OUTER_STYLE
+    // TODO: kj 09/15/2022 This part will be update later OUTER_STYLE
+    // const checkBoxLabel = getByTestId('CheckboxField_label')
     // expect(checkBoxLabel).toHaveStyle('@apply --font-form-default')
     // expect(checkBoxLabel).toHaveStyle('font-size: 0.75rem')
     // expect(checkBoxLabel).toHaveStyle('font-weight: 400')
-    // console.log(checkBoxLabel.style)
     // expect(checkBoxLabel).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
     // expect(checkBoxLabel).toHaveStyle('display: flex')
     // expect(checkBoxLabel).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
     // expect(checkBoxLabel).toHaveStyle('line-height: 1')
-    // expect(checkBoxLabel).toBeInTheDocument()
 
-    // input INPUT_STYLE
+    // INPUT_STYLE
     expect(checkBoxInput).toHaveStyle(`position: absolute`)
     expect(checkBoxInput).toHaveStyle(`overflow: hidden`)
     expect(checkBoxInput).toHaveStyle(`clip: rect(0 0 0 0)`)
@@ -177,6 +172,3 @@ describe('CheckboxField', () => {
     expect(props.onChange).toHaveBeenCalled()
   })
 })
-
-// q1 label OUT_STYLE
-// q2 icon name
