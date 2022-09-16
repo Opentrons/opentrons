@@ -35,7 +35,7 @@ describe('CheckboxField', () => {
 
   it('renders label with correct style', () => {
     const { debug, getByTestId, getByRole, getByText } = render(props)
-    // const checkBoxLabel = getByTestId('CheckboxField_label')
+    const checkBoxLabel = getByTestId('CheckboxField_label')
     const checkBoxInput = getByRole('checkbox', {
       name: 'checkMockCheckboxField',
     })
@@ -61,7 +61,7 @@ describe('CheckboxField', () => {
     // expect(checkBoxLabel).toHaveStyle(`color: ${COLORS.darkBlackEnabled}`)
     // expect(checkBoxLabel).toHaveStyle('display: flex')
     // expect(checkBoxLabel).toHaveStyle(`align-items: ${ALIGN_CENTER}`)
-    // expect(checkBoxLabel).toHaveStyle('line-height: 1')
+    expect(checkBoxLabel).toHaveStyle('line-height: 1')
 
     // input INPUT_STYLE
     expect(checkBoxInput).toHaveStyle(`position: absolute`)
