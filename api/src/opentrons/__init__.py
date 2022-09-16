@@ -106,10 +106,11 @@ def should_use_ot3() -> bool:
     """Return true if ot3 hardware controller should be used."""
     if enable_ot3_hardware_controller():
         try:
-            from opentrons_hardware.drivers.can_bus import CanDriver  # noqa: F401
+            from .hardware_control import ot3api
 
+            _ = ot3api
             return True
-        except ModuleNotFoundError:
+        except (ModuleNotFoundError, ImportError):
             log.exception("Cannot use OT3 Hardware controller.")
     return False
 

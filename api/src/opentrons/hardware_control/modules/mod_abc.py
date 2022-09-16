@@ -95,7 +95,8 @@ class AbstractModule(abc.ABC):
         if self.device_info and self._bundled_fw:
             device_version = parse_version(self.device_info["version"])
             available_version = parse_version(self._bundled_fw.version)
-            return cast(bool, available_version > device_version)
+            # type ignore is from https://github.com/python/typeshed/issues/5093
+            return cast(bool, available_version > device_version)  # type: ignore[operator]
         return False
 
     async def wait_for_is_running(self) -> None:

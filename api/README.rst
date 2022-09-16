@@ -22,7 +22,7 @@ This document is about the structure and purpose of the source code. For informa
 
 The Opentrons library has two purposes:
 
-1. **Control an Opentrons OT-2 robot.**  The API server uses the Opentrons library when controlling a robot. We boot up a server for the robot’s HTTP endpoints, and a server for its WebSockets-based RPC system for control during protocols. We are configured by files in the robot’s filesystem in ``/data``.
+1. **Control an Opentrons robot.**  The API server uses the Opentrons library when controlling a robot. We boot up a server for the robot’s HTTP endpoints, and a server for its WebSockets-based RPC system for control during protocols. We are configured by files in the robot’s filesystem in ``/data``.
 
 2. **Simulate protocols on users’ computers.** When simulating a protocol on a user’s computer, we use the entry point in `opentrons.simulate <https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/simulate.py>`_. We set up simulators for the protocol, but do not run any kind of web servers. We are configured by files in the user’s home directory (for more information see configuration_).
 
@@ -30,7 +30,7 @@ The Opentrons library has two purposes:
 Setting Up For Development
 --------------------------
 
-First, read the `top-level contributing guide section on setup <https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#environment-and-repository>`_. As that document states, once you have installed the prerequisites you can simply run ``make setup`` in this subdirectory. If you want to make the environment as it will be on an OT-2 specifically, run ``make setup-ot2``
+First, read the `top-level contributing guide section on setup <https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#environment-and-repository>`_. As that document states, once you have installed the prerequisites you should run ``make -C environments setup`` from the root of this repo.
 
 The only additional prerequisite concerns building documentation. If you want to build the PDF version of the documentation, you will need an installation of `LaTeX <https://www.latex-project.org/get/>`_ that includes the ``pdflatex`` tool. Note that if you don’t install this, everything will still work - you just won’t get the PDF documentation.
 
