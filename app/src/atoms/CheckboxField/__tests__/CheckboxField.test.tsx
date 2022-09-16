@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent, getByTestId } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
 import {
   renderWithProviders,
   SPACING,
