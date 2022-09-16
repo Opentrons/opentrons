@@ -12,18 +12,18 @@ from opentrons.protocol_engine.commands.command import (
 )
 from opentrons.protocol_engine.types import DeckPoint
 from opentrons.types import DeckSlotName
-from opentrons.protocol_engine.state.state import StateView
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import MovementHandler
-
+    from opentrons.protocol_engine.state.state import StateView
+    from opentrons.protocol_engine.state.labware import LabwareView
 
 CalibrationSetUpPositionCommandType = Literal["CalibrationSetUpPosition"]
 
 
 class CalibrationPositions(DeckSlotName, Enum):
-    start_calibration = DeckSlotName.SLOT_5,
-    probe_interaction = DeckSlotName.SLOT_8,
+    start_calibration = (DeckSlotName.SLOT_5,)
+    probe_interaction = (DeckSlotName.SLOT_2,)
 
 
 class CalibrationSetUpPositionParams(PipetteIdMixin):
@@ -35,6 +35,7 @@ class CalibrationSetUpPositionParams(PipetteIdMixin):
 
 class CalibrationSetUpPositionResult(BaseModel):
     """Result data containing the position of the axes."""
+
     pass
 
 
@@ -42,19 +43,29 @@ class CalibrationSetUpPositionImplementation(
     AbstractCommandImpl[CalibrationSetUpPositionParams, CalibrationSetUpPositionResult]
 ):
     """Calibration set up position command implementation."""
+
     def __init__(
         self, movement: MovementHandler, state_view: StateView, **kwargs: object
     ) -> None:
         self._movement = movement
         self._state_view = state_view
 
-    async def execute(self, params: CalibrationSetUpPositionParams) -> CalibrationSetUpPositionResult:
+    async def execute(
+        self, params: CalibrationSetUpPositionParams
+    ) -> CalibrationSetUpPositionResult:
         """Move the requested pipette to a given deck slot."""
 
+        print("state_view =", self._state_view)
+        print("labware =", self._state_view.labware)
+        print("function =", self._state_view.labware.get_slot_center_position)
+        print("slot name =", params.slot_name)
         slot_center = self._state_view.labware.get_slot_center_position(
-            params.slot_name
+            DeckSlotName.SLOT_5
         )
+        print("slot center =", slot_center)
         slot_center_deck = DeckPoint(x=slot_center.x, y=slot_center.y, z=slot_center.z)
+        print("slot center deck =", slot_center_deck)
+        breakpoint()
         # should additional_min_travel_z be 0 ?
         await self._movement.move_to_coordinates(
             pipette_id=params.pipetteId,
@@ -65,7 +76,9 @@ class CalibrationSetUpPositionImplementation(
         return CalibrationSetUpPositionResult()
 
 
-class CalibrationSetUpPosition(BaseCommand[CalibrationSetUpPositionParams, CalibrationSetUpPositionResult]):
+class CalibrationSetUpPosition(
+    BaseCommand[CalibrationSetUpPositionParams, CalibrationSetUpPositionResult]
+):
     """Calibration set up position command model."""
 
     commandType: CalibrationSetUpPositionCommandType = "CalibrationSetUpPosition"
