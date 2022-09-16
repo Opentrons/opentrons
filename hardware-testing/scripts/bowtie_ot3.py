@@ -2,13 +2,13 @@
 import argparse
 import asyncio
 
-from hardware_testing.opentrons_api.types import (
-    GantryLoad, OT3Mount, OT3Axis, Point
-)
+from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis, Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
-    ThreadManagedHardwareAPI, build_ot3_hardware_api,
-    GantryLoadSettings, set_gantry_load_per_axis_settings_ot3,
-    home_ot3
+    ThreadManagedHardwareAPI,
+    build_ot3_hardware_api,
+    GantryLoadSettings,
+    set_gantry_load_per_axis_settings_ot3,
+    home_ot3,
 )
 
 MOUNT = OT3Mount.LEFT
@@ -24,46 +24,52 @@ SETTINGS = {
         max_start_stop_speed=0,
         max_change_dir_speed=0,
         hold_current=0.1,
-        run_current=1.4),
+        run_current=1.4,
+    ),
     OT3Axis.Y: GantryLoadSettings(
         max_speed=SPEED_XY,
         acceleration=2000,
         max_start_stop_speed=0,
         max_change_dir_speed=0,
         hold_current=0.1,
-        run_current=1.4),
+        run_current=1.4,
+    ),
     OT3Axis.Z_L: GantryLoadSettings(
         max_speed=SPEED_Z,
         acceleration=1500,
         max_start_stop_speed=0,
         max_change_dir_speed=0,
         hold_current=0.1,
-        run_current=1.4),
+        run_current=1.4,
+    ),
     OT3Axis.Z_R: GantryLoadSettings(
         max_speed=SPEED_Z,
         acceleration=1500,
         max_start_stop_speed=0,
         max_change_dir_speed=0,
         hold_current=0.1,
-        run_current=1.4),
+        run_current=1.4,
+    ),
 }
 
 
 async def _bowtie_ot3(api: ThreadManagedHardwareAPI, cycles: int = 1) -> None:
-    await api.move_rel(mount=MOUNT, delta=Point(x=0, y=-20, z=0))
-    await api.move_rel(mount=MOUNT, delta=Point(x=-5, y=0, z=0))
+    await api.move_rel(mount=MOUNT, delta=Point(y=-20))
+    await api.move_rel(mount=MOUNT, delta=Point(x=-5))
     step_x = 440
     step_y = 370
     step_z = 200
     for _ in range(cycles):
-        await api.move_rel(mount=MOUNT, delta=Point(x=-step_x, y=0, z=0), speed=SPEED_XY)
-        await api.move_rel(mount=MOUNT, delta=Point(x=0, y=0, z=-step_z), speed=SPEED_Z)
-        await api.move_rel(mount=MOUNT, delta=Point(x=step_x, y=-step_y, z=0), speed=SPEED_XY)
-        await api.move_rel(mount=MOUNT, delta=Point(x=0, y=0, z=step_z), speed=SPEED_Z)
-        await api.move_rel(mount=MOUNT, delta=Point(x=-step_x, y=0, z=0), speed=SPEED_XY)
-        await api.move_rel(mount=MOUNT, delta=Point(x=0, y=0, z=-step_z), speed=SPEED_Z)
-        await api.move_rel(mount=MOUNT, delta=Point(x=step_x, y=step_y, z=0), speed=SPEED_XY)
-        await api.move_rel(mount=MOUNT, delta=Point(x=0, y=0, z=step_z), speed=SPEED_Z)
+        await api.move_rel(mount=MOUNT, delta=Point(x=-step_x), speed=SPEED_XY)
+        await api.move_rel(mount=MOUNT, delta=Point(z=-step_z), speed=SPEED_Z)
+        await api.move_rel(
+            mount=MOUNT, delta=Point(x=step_x, y=-step_y), speed=SPEED_XY
+        )
+        await api.move_rel(mount=MOUNT, delta=Point(z=step_z), speed=SPEED_Z)
+        await api.move_rel(mount=MOUNT, delta=Point(x=-step_x), speed=SPEED_XY)
+        await api.move_rel(mount=MOUNT, delta=Point(z=-step_z), speed=SPEED_Z)
+        await api.move_rel(mount=MOUNT, delta=Point(x=step_x, y=step_y), speed=SPEED_XY)
+        await api.move_rel(mount=MOUNT, delta=Point(z=step_z), speed=SPEED_Z)
 
 
 async def _main(api: ThreadManagedHardwareAPI) -> None:

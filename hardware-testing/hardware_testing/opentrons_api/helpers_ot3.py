@@ -21,7 +21,10 @@ def stop_server_ot3() -> None:
     run(["systemctl", "stop", "opentrons-robot-server"])
 
 
-def build_ot3_hardware_api(is_simulating: Optional[bool] = False) -> ThreadManagedHardwareAPI:
+def build_ot3_hardware_api(
+    is_simulating: Optional[bool] = False,
+) -> ThreadManagedHardwareAPI:
+    """Built an OT3 Hardware API instance."""
     config = load_ot3_config()
     if is_simulating:
         hw_api = ThreadManager(HWApiOT3.build_hardware_simulator, config=config)
@@ -62,12 +65,16 @@ def set_gantry_load_per_axis_current_settings_ot3(
     if hold_current is not None:
         set_gantry_per_axis_setting_ot3(
             settings=api.config.current_settings.hold_current,
-            axis=axis, load=load, value=hold_current,
+            axis=axis,
+            load=load,
+            value=hold_current,
         )
     if run_current is not None:
         set_gantry_per_axis_setting_ot3(
             settings=api.config.current_settings.run_current,
-            axis=axis, load=load, value=run_current,
+            axis=axis,
+            load=load,
+            value=run_current,
         )
 
 
@@ -86,52 +93,66 @@ def set_gantry_load_per_axis_motion_settings_ot3(
     if default_max_speed is not None:
         set_gantry_per_axis_setting_ot3(
             settings=api.config.motion_settings.default_max_speed,
-            axis=axis, load=load, value=default_max_speed,
+            axis=axis,
+            load=load,
+            value=default_max_speed,
         )
     if acceleration is not None:
         set_gantry_per_axis_setting_ot3(
             settings=api.config.motion_settings.acceleration,
-            axis=axis, load=load, value=acceleration,
+            axis=axis,
+            load=load,
+            value=acceleration,
         )
     if max_speed_discontinuity is not None:
         set_gantry_per_axis_setting_ot3(
             settings=api.config.motion_settings.max_speed_discontinuity,
-            axis=axis, load=load, value=max_speed_discontinuity,
+            axis=axis,
+            load=load,
+            value=max_speed_discontinuity,
         )
     if direction_change_speed_discontinuity is not None:
         set_gantry_per_axis_setting_ot3(
             settings=api.config.motion_settings.direction_change_speed_discontinuity,
-            axis=axis, load=load, value=direction_change_speed_discontinuity,
+            axis=axis,
+            load=load,
+            value=direction_change_speed_discontinuity,
         )
 
 
 @dataclass
 class GantryLoadSettings:
-    max_speed: float                # mm/sec
-    acceleration: float             # mm/sec**2
-    max_start_stop_speed: float     # mm/sec
-    max_change_dir_speed: float     # mm/sec
-    hold_current: float             # amps
-    run_current: float              # amps
+    """Gantry Load Settings."""
+
+    max_speed: float  # mm/sec
+    acceleration: float  # mm/sec**2
+    max_start_stop_speed: float  # mm/sec
+    max_change_dir_speed: float  # mm/sec
+    hold_current: float  # amps
+    run_current: float  # amps
 
 
 def set_gantry_load_per_axis_settings_ot3(
-    api: ThreadManagedHardwareAPI, settings: Dict[OT3Axis,GantryLoadSettings],
-        load: Optional[GantryLoad] = None
+    api: ThreadManagedHardwareAPI,
+    settings: Dict[OT3Axis, GantryLoadSettings],
+    load: Optional[GantryLoad] = None,
 ) -> None:
+    """Set motion/current settings, per-axis, per-gantry-load."""
     if load is None:
         load = api.gantry_load
     for ax, stg in settings.items():
         set_gantry_load_per_axis_motion_settings_ot3(
-            api, ax, load,
+            api,
+            ax,
+            load,
             default_max_speed=stg.max_speed,
             acceleration=stg.acceleration,
             max_speed_discontinuity=stg.max_start_stop_speed,
-            direction_change_speed_discontinuity=stg.max_change_dir_speed)
+            direction_change_speed_discontinuity=stg.max_change_dir_speed,
+        )
         set_gantry_load_per_axis_current_settings_ot3(
-            api, ax, load,
-            hold_current=stg.hold_current,
-            run_current=stg.run_current)
+            api, ax, load, hold_current=stg.hold_current, run_current=stg.run_current
+        )
 
 
 async def home_ot3(
@@ -158,7 +179,11 @@ async def home_ot3(
         for ax in _all_axes
     }
     for ax, val in homing_speeds.items():
-        set_gantry_load_per_axis_motion_settings_ot3(api, ax, max_speed_discontinuity=val)
+        set_gantry_load_per_axis_motion_settings_ot3(
+            api, ax, max_speed_discontinuity=val
+        )
     await api.home(axes=axes)
     for ax, val in cached_discontinuities.items():
-        set_gantry_load_per_axis_motion_settings_ot3(api, ax, max_speed_discontinuity=val)
+        set_gantry_load_per_axis_motion_settings_ot3(
+            api, ax, max_speed_discontinuity=val
+        )
