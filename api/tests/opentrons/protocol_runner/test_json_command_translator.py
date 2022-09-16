@@ -35,8 +35,8 @@ VALID_TEST_PARAMS = [
             commandType="aspirate",
             key=None,
             params=protocol_schema_v6.Params(
-                pipetteId="pipette-id-1",
-                labwareId="labware-id-2",
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
                 volume=1.23,
                 # todo (Max and Tamar 3/17/22):needs to be added to the aspirate command
                 #  https://github.com/Opentrons/opentrons/issues/8204
@@ -52,8 +52,8 @@ VALID_TEST_PARAMS = [
             key=None,
             params=pe_commands.AspirateParams(
                 # todo: id
-                pipetteId="pipette-id-1",
-                labwareId="labware-id-2",
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
@@ -69,8 +69,8 @@ VALID_TEST_PARAMS = [
             commandType="dispense",
             key="dispense-key",
             params=protocol_schema_v6.Params(
-                pipetteId="pipette-id-1",
-                labwareId="labware-id-2",
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
@@ -83,8 +83,8 @@ VALID_TEST_PARAMS = [
         pe_commands.DispenseCreate(
             key="dispense-key",
             params=pe_commands.DispenseParams(
-                pipetteId="pipette-id-1",
-                labwareId="labware-id-2",
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
@@ -99,15 +99,15 @@ VALID_TEST_PARAMS = [
         protocol_schema_v6.Command(
             commandType="dropTip",
             params=protocol_schema_v6.Params(
-                pipetteId="pipette-id-1",
-                labwareId="labware-id-2",
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
                 wellName="A1",
             ),
         ),
         pe_commands.DropTipCreate(
             params=pe_commands.DropTipParams(
-                pipetteId="pipette-id-1",
-                labwareId="labware-id-2",
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
                 wellName="A1",
                 wellLocation=WellLocation(),
             )
@@ -117,15 +117,15 @@ VALID_TEST_PARAMS = [
         protocol_schema_v6.Command(
             commandType="pickUpTip",
             params=protocol_schema_v6.Params(
-                pipetteId="pipette-id-1",
-                labwareId="labware-id-2",
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
                 wellName="A1",
             ),
         ),
         pe_commands.PickUpTipCreate(
             params=pe_commands.PickUpTipParams(
-                pipetteId="pipette-id-1",
-                labwareId="labware-id-2",
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
                 wellName="A1",
                 wellLocation=WellLocation(),
             )
@@ -135,8 +135,8 @@ VALID_TEST_PARAMS = [
         protocol_schema_v6.Command(
             commandType="touchTip",
             params=protocol_schema_v6.Params(
-                pipetteId="pipette-id-1",
-                labwareId="labware-id-2",
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
                 wellName="A1",
                 wellLocation=protocol_schema_v6.WellLocation(
                     origin="bottom",
@@ -146,8 +146,8 @@ VALID_TEST_PARAMS = [
         ),
         pe_commands.TouchTipCreate(
             params=pe_commands.TouchTipParams(
-                pipetteId="pipette-id-1",
-                labwareId="labware-id-2",
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
                 wellName="A1",
                 wellLocation=WellLocation(
                     origin=WellOrigin.BOTTOM,
@@ -159,11 +159,11 @@ VALID_TEST_PARAMS = [
     (
         protocol_schema_v6.Command(
             commandType="loadPipette",
-            params=protocol_schema_v6.Params(pipetteId="pipette-id-1", mount="left"),
+            params=protocol_schema_v6.Params(pipetteId="pipetteId", mount="left"),
         ),
         pe_commands.LoadPipetteCreate(
             params=pe_commands.LoadPipetteParams(
-                pipetteId="pipette-id-1",
+                pipetteId="pipetteId",
                 pipetteName=PipetteName("p10_single"),
                 mount=MountType("left"),
             )
@@ -173,14 +173,14 @@ VALID_TEST_PARAMS = [
         protocol_schema_v6.Command(
             commandType="loadModule",
             params=protocol_schema_v6.Params(
-                moduleId="module-id-1",
+                moduleId="magneticModuleId",
                 location=protocol_schema_v6.Location(slotName="3"),
             ),
         ),
         pe_commands.LoadModuleCreate(
             params=pe_commands.LoadModuleParams(
                 model=ModuleModel("magneticModuleV2"),
-                moduleId="module-id-1",
+                moduleId="magneticModuleId",
                 location=DeckSlotLocation(slotName=(DeckSlotName("3"))),
             )
         ),
@@ -189,15 +189,15 @@ VALID_TEST_PARAMS = [
         protocol_schema_v6.Command(
             commandType="loadLabware",
             params=protocol_schema_v6.Params(
-                labwareId="labware-id-2",
+                labwareId="sourcePlateId",
                 location=protocol_schema_v6.Location(moduleId="temperatureModuleId"),
             ),
         ),
         pe_commands.LoadLabwareCreate(
             params=pe_commands.LoadLabwareParams(
                 loadName="foo_8_plate_33ul",
-                displayName="Trash",
-                labwareId="labware-id-2",
+                displayName="Source Plate",
+                labwareId="sourcePlateId",
                 location=ModuleLocation(moduleId="temperatureModuleId"),
                 version=1,
                 namespace="example",
@@ -208,8 +208,8 @@ VALID_TEST_PARAMS = [
         protocol_schema_v6.Command(
             commandType="blowout",
             params=protocol_schema_v6.Params(
-                pipetteId="pipette-id-1",
-                labwareId="labware-id-2",
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
                 wellName="A1",
                 wellLocation=protocol_schema_v6.WellLocation(
                     origin="bottom",
@@ -220,8 +220,8 @@ VALID_TEST_PARAMS = [
         ),
         pe_commands.BlowOutCreate(
             params=pe_commands.BlowOutParams(
-                pipetteId="pipette-id-1",
-                labwareId="labware-id-2",
+                pipetteId="pipette-id-abc123",
+                labwareId="labware-id-def456",
                 wellName="A1",
                 wellLocation=WellLocation(
                     origin=WellOrigin.BOTTOM,
@@ -277,7 +277,7 @@ VALID_TEST_PARAMS = [
         protocol_schema_v6.Command(
             commandType="moveToCoordinates",
             params=protocol_schema_v6.Params(
-                pipetteId="pipette-id-1",
+                pipetteId="pipette-id-abc123",
                 coordinates=protocol_schema_v6.OffsetVector(x=1.1, y=2.2, z=3.3),
                 minimumZHeight=123.4,
                 forceDirect=True,
@@ -285,7 +285,7 @@ VALID_TEST_PARAMS = [
         ),
         pe_commands.MoveToCoordinatesCreate(
             params=pe_commands.MoveToCoordinatesParams(
-                pipetteId="pipette-id-1",
+                pipetteId="pipette-id-abc123",
                 coordinates=DeckPoint(x=1.1, y=2.2, z=3.3),
                 minimumZHeight=123.4,
                 forceDirect=True,
@@ -296,7 +296,7 @@ VALID_TEST_PARAMS = [
         protocol_schema_v6.Command(
             commandType="thermocycler/runProfile",
             params=protocol_schema_v6.Params(
-                moduleId="module-id-2",
+                moduleId="module-id-abc123",
                 blockMaxVolumeUl=1.11,
                 profile=[
                     protocol_schema_v6.ProfileStep(
@@ -312,7 +312,7 @@ VALID_TEST_PARAMS = [
         ),
         pe_commands.thermocycler.RunProfileCreate(
             params=pe_commands.thermocycler.RunProfileParams(
-                moduleId="module-id-2",
+                moduleId="module-id-abc123",
                 blockMaxVolumeUl=1.11,
                 profile=[
                     pe_commands.thermocycler.RunProfileStepParams(
@@ -371,24 +371,19 @@ def _load_labware_definition_data() -> LabwareDefinition:
 def _make_json_protocol(
     *,
     pipettes: Dict[str, protocol_schema_v6.Pipette] = {
-        "pipette-id-1": protocol_schema_v6.Pipette(name="p10_single"),
+        "pipetteId": protocol_schema_v6.Pipette(name="p10_single")
     },
     labware_definitions: Dict[str, LabwareDefinition] = {
-        "example/plate/1": _load_labware_definition_data(),
-        "example/trash/1": _load_labware_definition_data(),
+        "example/plate/1": _load_labware_definition_data()
     },
     labware: Dict[str, protocol_schema_v6.Labware] = {
-        "labware-id-1": protocol_schema_v6.Labware(
+        "sourcePlateId": protocol_schema_v6.Labware(
             displayName="Source Plate", definitionId="example/plate/1"
-        ),
-        "labware-id-2": protocol_schema_v6.Labware(
-            displayName="Trash", definitionId="example/trash/1"
-        ),
+        )
     },
     commands: List[protocol_schema_v6.Command] = [],
     modules: Dict[str, protocol_schema_v6.Module] = {
-        "module-id-1": protocol_schema_v6.Module(model="magneticModuleV2"),
-        "module-id-2": protocol_schema_v6.Module(model="thermocyclerModuleV2"),
+        "magneticModuleId": protocol_schema_v6.Module(model="magneticModuleV2")
     }
 ) -> protocol_schema_v6.ProtocolSchemaV6:
     """Return a minimal JsonProtocol with the given elements, to use as test input."""
