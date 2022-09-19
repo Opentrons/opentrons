@@ -55,8 +55,9 @@ setup-js:
 
 .PHONY: setup-py
 setup-py:
-	$(OT_PYTHON) -m pip install pipenv==2022.9.4
+	$(OT_PYTHON) -m pip install pipenv==2021.5.29
 	$(MAKE) -C environments setup
+
 
 %-py-setup:
 	$(MAKE) -C $* setup
