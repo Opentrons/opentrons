@@ -167,3 +167,7 @@ class CannotPerformModuleAction(ProtocolEngineError):
 
 class ProtocolCommandFailedError(ProtocolEngineError):
     """An error raised if a fatal command execution error has occurred."""
+
+
+class HardwareNotSupported(ProtocolEngineError):
+    """An error raised when executing a command on the wrong hardware."""
