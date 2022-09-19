@@ -51,21 +51,11 @@ clean_cmd = $(SHX) rm -rf build $(BUILD_DIR) .coverage coverage.xml Pipfile.lock
 .PHONY: all
 all: clean sdist wheel
 
-.PHONY: setup
-setup: setup-py
 
 .PHONY: setup-py
 setup-py:
-	$(pipenv) install $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@echo This target is deprecated run make -C environments setup instead
 
-.PHONY: teardown
-teardown: teardown-py
-
-.PHONY: teardown-py
-teardown-py:
-	$(pipenv) --rm
-	$(SHX) rm -f Pipfile.lock
 
 .PHONY: clean
 clean:

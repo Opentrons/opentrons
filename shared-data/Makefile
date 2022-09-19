@@ -12,7 +12,7 @@ BUILD_DIR := build
 all: clean dist
 
 .PHONY: setup
-setup: setup-py setup-js
+setup: setup-js
 
 .PHONY: dist
 dist: dist-js dist-py
@@ -36,10 +36,6 @@ clean-js:
 
 # Python targets
 
-.PHONY: setup-py
-setup-py:
-	$(MAKE) -C python setup-py
-
 .PHONY: dist-py
 dist-py:
 	$(MAKE) -C python sdist wheel
@@ -47,10 +43,6 @@ dist-py:
 .PHONY: clean-py
 clean-py:
 	$(MAKE) -C python clean
-
-.PHONY: teardown-py
-teardown-py:
-	$(MAKE) -C python teardown
 
 .PHONY: lint-py
 lint-py:
