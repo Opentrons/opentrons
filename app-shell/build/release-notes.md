@@ -21,12 +21,15 @@ Welcome to the v6.1.0 alpha release of the Opentrons App! This release focuses o
   - Update the Heater-Shaker's firmware from the module card
 - Module cards now show if a Heater-Shaker or Thermocycler has an error
 
-## Bug Fixes
+## Improved Features
 
 - Improvements to the run log, including properly listing labware that is on top of a module
+- Clarifies what data is deleted when performing a factory reset of protocol run history
+
+## Bug Fixes
+
 - Labware Position Check now suggests the most recent Labware Offset data
 - Tip Length Calibration no longer silently fails when the chosen pipette is not attached
-- Clarifies what data is deleted when performing a factory reset of protocol run history
 - Stops the update modal from staying onscreen indefinitely after a robot software update has finished
 - Fixes a bug that prevented changing pipette settings when the All Pipette Config feature flag is on
 - Interface fixes and improvements
@@ -62,7 +65,7 @@ The 6.0.1 hotfix release fixes two issues:
 - The app's "Override Path to Python" advanced setting now works properly on Windows
 - It's once again possible to save changes made to pipette settings
 
-## Improved features
+## Improved Features
 
 - Labware Position Check
   - When re-running a protocol, the app will now automatically recommend stored Labware Offset data (from the last 20 runs on that robot) that applies to the same labware and deck slot.
