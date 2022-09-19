@@ -8,15 +8,8 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-* **api:** Disallow uploading a protocol with non matching references ([#11457](https://github.com/Opentrons/opentrons/issues/11457)) ([5f29ebe](https://github.com/Opentrons/opentrons/commit/5f29ebe649f364faf470222d5758dfdddc62ed1a))
 * **app:** do not initiate new buildroot session after successful update ([#11476](https://github.com/Opentrons/opentrons/issues/11476)) ([aada770](https://github.com/Opentrons/opentrons/commit/aada770cf0fab16e5c260d6504de18b8d5d2dc4e))
 * **app:** order labware offset reapply candidates newest to oldest ([#11467](https://github.com/Opentrons/opentrons/issues/11467)) ([cb4d8ef](https://github.com/Opentrons/opentrons/commit/cb4d8ef6f8a02c6ba9fe71477abd5639a3f8a357))
-
-
-### Reverts
-
-* Revert "fix(api): Disallow uploading a protocol with non matching references (#11457)" (#11475) ([02d39a0](https://github.com/Opentrons/opentrons/commit/02d39a0a8774e528da7a7ffadaabe9f45805c33e)), closes [#11457](https://github.com/Opentrons/opentrons/issues/11457) [#11475](https://github.com/Opentrons/opentrons/issues/11475)
-
 
 
 
