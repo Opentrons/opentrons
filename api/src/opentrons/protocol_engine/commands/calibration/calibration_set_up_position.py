@@ -16,17 +16,20 @@ from opentrons.types import DeckSlotName
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import MovementHandler
     from opentrons.protocol_engine.state.state import StateView
-    from opentrons.protocol_engine.state.labware import LabwareView
 
 CalibrationSetUpPositionCommandType = Literal["CalibrationSetUpPosition"]
 
 
 class CalibrationPositions(DeckSlotName, Enum):
-    start_calibration = (DeckSlotName.SLOT_5,)
-    probe_interaction = (DeckSlotName.SLOT_2,)
+    """Deck slot to move to."""
+
+    start_calibration = DeckSlotName.SLOT_5
+    probe_interaction = DeckSlotName.SLOT_2
 
 
 class CalibrationSetUpPositionParams(PipetteIdMixin):
+    """Calibration set up position command parameters."""
+
     slot_name: CalibrationPositions = Field(
         CalibrationPositions.start_calibration,
         description="Slot location to move to before starting calibration.",
@@ -34,7 +37,7 @@ class CalibrationSetUpPositionParams(PipetteIdMixin):
 
 
 class CalibrationSetUpPositionResult(BaseModel):
-    """Result data containing the position of the axes."""
+    """Result data."""
 
     pass
 
@@ -54,19 +57,10 @@ class CalibrationSetUpPositionImplementation(
         self, params: CalibrationSetUpPositionParams
     ) -> CalibrationSetUpPositionResult:
         """Move the requested pipette to a given deck slot."""
-
-        print("state_view =", self._state_view)
-        print("labware =", self._state_view.labware)
-        print("function =", self._state_view.labware.get_slot_center_position)
-        print("slot name =", params.slot_name)
         slot_center = self._state_view.labware.get_slot_center_position(
-            DeckSlotName.SLOT_5
+            params.slot_name
         )
-        print("slot center =", slot_center)
         slot_center_deck = DeckPoint(x=slot_center.x, y=slot_center.y, z=slot_center.z)
-        print("slot center deck =", slot_center_deck)
-        breakpoint()
-        # should additional_min_travel_z be 0 ?
         await self._movement.move_to_coordinates(
             pipette_id=params.pipetteId,
             deck_coordinates=slot_center_deck,
