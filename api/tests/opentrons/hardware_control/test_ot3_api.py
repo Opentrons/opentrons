@@ -10,7 +10,7 @@ from opentrons.hardware_control.dev_types import (
     InstrumentDict,
     AttachedGripper,
 )
-from opentrons.hardware_control.instruments.gripper_handler import (
+from opentrons.hardware_control.instruments.ot3.gripper_handler import (
     GripError,
 )
 from opentrons.hardware_control.types import (
