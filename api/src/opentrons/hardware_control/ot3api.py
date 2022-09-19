@@ -1006,7 +1006,7 @@ class OT3API(
     @ExecutionManagerProvider.wait_for_running
     async def _hold_jaw_width(self, jaw_width_mm: int) -> None:
         """Move the gripper jaw to a specific width."""
-        jaw_width_um = jaw_width_mm * 1000;
+        jaw_width_um = jaw_width_mm * 1000
         try:
             if (
                 jaw_width_um < self._gripper_handler.gripper.config.jaw_sizes_um["min"]
