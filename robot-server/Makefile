@@ -72,7 +72,7 @@ clean:
 
 $(wheel_file): setup.py $(ot_sources)
 	$(clean_cmd)
-	$(python) setup.py $(wheel_opts) bdist_wheel
+	$(call python,ot-2) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -80,7 +80,7 @@ wheel: $(wheel_file)
 
 $(sdist_file): setup.py $(ot_sources)
 	$(clean_cmd)
-	$(python) setup.py sdist
+	$(call python,ot-3/robot-server) setup.py sdist
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -88,42 +88,46 @@ sdist: $(sdist_file)
 
 .PHONY: test
 test:
-	$(pytest) $(tests) $(test_opts)
+	$(call pytest,ot-2) $(tests) $(test_opts)
+	$(call pytest,ot-3/robot-server) $(tests) $(test_opts)
+
 
 .PHONY: test-cov
 test-cov:
-	$(pytest) $(tests) $(test_opts) $(cov_opts)
+	$(call pytest,ot-2) $(tests) $(test_opts) $(cov_opts)
+	$(call pytest,ot-3/robot-server) $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: lint
 lint:
-	$(python) -m mypy $(SRC_PATH) $(tests)
-	$(python) -m black --check .
-	$(python) -m flake8 $(SRC_PATH) $(tests) setup.py
+	$(call python,ot-2) -m mypy $(SRC_PATH) $(tests)
+	$(call python,ot-3/robot-server) -m mypy $(SRC_PATH) $(tests)
+	$(call python,dev) -m black --check .
+	$(call python,dev) -m flake8 $(SRC_PATH) $(tests) setup.py
 
 .PHONY: format
 format:
-	$(python) -m black .
+	$(call python,dev) -m black .
 
 .PHONY: dev
 dev: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env
 dev:
-	$(pipenv) run $(run_dev)
+	$(call pipenv,ot-2) run $(run_dev)
 
 .PHONY: dev-with-emulator
 dev-with-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator.env
 dev-with-emulator:
-	$(pipenv) run $(run_dev)
+	$(call pipenv,ot-2) run $(run_dev)
 
 
 .PHONY: dev-with-ot3-emulator
 dev-with-ot3-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator_ot3.env
 dev-with-ot3-emulator:
-	$(pipenv) run $(run_dev)
+	$(call pipenv,ot-3/robot-server) run $(run_dev)
 
 
 .PHONY: local-shell
 local-shell:
-	$(pipenv) shell
+	$(call pipenv,dev) shell
 
 .PHONY: push
 push: wheel
@@ -177,4 +181,4 @@ term:
 docs: settings_schema.json
 
 settings_schema.json: robot_server/settings.py
-	$(python) -m scripts.settings_schema $@
+	$(call python,dev) -m scripts.settings_schema $@
