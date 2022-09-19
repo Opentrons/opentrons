@@ -59,14 +59,14 @@ clean:
 	$(clean_cmd)
 
 dist/opentrons_hardware-%-py2.py3-none-any.whl: setup.py $(ot_sources)
-	$(python) setup.py $(wheel_opts) bdist_wheel
+	$(call python,ot-3/robot-server) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 wheel: $(wheel_file)
 
 $(sdist_file): setup.py $(ot_sources)
-	$(python) setup.py sdist
+	$(call python,ot-3/robot-server) setup.py sdist
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -75,15 +75,15 @@ sdist: $(sdist_file)
 
 .PHONY: test
 test:
-	$(pytest) -m 'not requires_emulator' $(tests) $(test_opts)
+	$(call pytest,ot-3/robot-server) -m 'not requires_emulator' $(tests) $(test_opts)
 
 .PHONY: test-cov
 test-cov:
-	$(pytest) -m 'not requires_emulator' $(tests) $(test_opts) $(cov_opts)
+	$(call pytest,ot-3/robot-server) -m 'not requires_emulator' $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-with-emulator
 test-with-emulator:
-	$(pytest) $(tests) $(test_opts)
+	$(call pytest,dev) $(tests) $(test_opts)
 
 
 .PHONY: test-with-opentrons-sock-emulator
@@ -92,13 +92,13 @@ test-with-opentrons-sock-emulator: test-with-emulator
 
 .PHONY: lint
 lint:
-	$(python) -m mypy opentrons_hardware tests
-	$(python) -m black --check opentrons_hardware tests setup.py
-	$(python) -m flake8 opentrons_hardware tests setup.py
+	$(call python,ot-3/robot-server) -m mypy opentrons_hardware tests
+	$(call python,dev) -m black --check opentrons_hardware tests setup.py
+	$(call python,dev) -m flake8 opentrons_hardware tests setup.py
 
 .PHONY: format
 format:
-	$(python) -m black opentrons_hardware tests setup.py
+	$(call python,dev) -m black opentrons_hardware tests setup.py
 
 # launch hardware controller in dev mode
 .PHONY: dev
