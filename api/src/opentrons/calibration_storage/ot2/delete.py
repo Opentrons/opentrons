@@ -7,7 +7,7 @@ file system.
 from pathlib import Path
 import os
 
-from . import file_operators as io
+from .. import file_operators as io
 
 from opentrons import config
 from opentrons.types import Mount
@@ -50,7 +50,7 @@ def delete_tip_length_calibration(tiprack: str, pipette_id: str) -> None:
             io.save_to_file(tip_length_path, tip_lengths_for_pipette)
         else:
             tip_length_path.unlink()
-        calibration_cache._tip_length_calibrations().cache_clear()
+        calibration_cache._tip_length_calibrations.cache_clear()
 
 
 def clear_tip_length_calibration() -> None:
@@ -62,7 +62,7 @@ def clear_tip_length_calibration() -> None:
         _remove_json_files_in_directories(offset_dir)
     except FileNotFoundError:
         pass
-    calibration_cache._tip_length_calibrations().cache_clear()
+    calibration_cache._tip_length_calibrations.cache_clear()
 
 
 def delete_pipette_offset_file(pipette: str, mount: Mount) -> None:
@@ -75,7 +75,7 @@ def delete_pipette_offset_file(pipette: str, mount: Mount) -> None:
     offset_dir = config.get_opentrons_path("pipette_calibration_dir")
     offset_path = offset_dir / mount.name.lower() / f"{pipette}.json"
     _delete_file(offset_path)
-    calibration_cache._pipette_offset_calibrations().cache_clear()
+    calibration_cache._pipette_offset_calibrations.cache_clear()
 
 
 def clear_pipette_offset_calibrations() -> None:
@@ -99,27 +99,4 @@ def delete_robot_deck_attitude() -> None:
     # we should eventually clean them up, too, because they can really crowd /data/
     _delete_file(legacy_deck_calibration_file)
     _delete_file(gantry_path)
-    calibration_cache._deck_calibration().cache_clear()
-
-
-def delete_gripper_calibration_file(gripper: str) -> None:
-    """
-    Delete gripper calibration offset file based on gripper serial number
-
-    :param gripper: gripper serial number
-    """
-    offset_path = (
-        config.get_opentrons_path("gripper_calibration_dir") / f"{gripper}.json"
-    )
-    _delete_file(offset_path)
-    calibration_cache._gripper_calibrations().cache_clear()
-
-
-def clear_gripper_calibration_offsets() -> None:
-    """
-    Delete all gripper calibration data files.
-    """
-
-    offset_dir = config.get_opentrons_path("gripper_calibration_dir")
-    _remove_json_files_in_directories(offset_dir)
-    calibration_cache._gripper_calibrations().cache_clear()
+    calibration_cache._deck_calibration.cache_clear()

@@ -12,16 +12,19 @@ from typing_extensions import Literal
 from opentrons import config
 from opentrons.types import Mount
 
-from . import (
+from . import cache as calibration_cache
+
+from .. import (
     types as local_types,
     file_operators as io,
     helpers,
-    cache as calibration_cache,
 )
 
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
     from opentrons_shared_data.pipette.dev_types import LabwareUri
+
+from .schemas import v1
 
 
 log = logging.getLogger(__name__)
@@ -29,7 +32,7 @@ log = logging.getLogger(__name__)
 
 def load_tip_length_calibration(
     pip_id: str, definition: "LabwareDefinition"
-) -> local_types.TipLengthCalibration:
+) -> v1.TipLengthCalibration:
     """
     Function used to grab the current tip length associated
     with a particular tiprack.
@@ -38,12 +41,22 @@ def load_tip_length_calibration(
     :param definition: full definition of the tiprack
     """
     labware_hash = helpers.hash_labware_def(definition)
-    labware_uri = helpers.uri_from_definition(definition)
     load_name = definition["parameters"]["loadName"]
-    return calibration_cache.tip_length_data(pip_id, labware_hash)
+    # We should eventually use the pydantic model directly for the http endpoints that
+    # return calibration data
+    tip_length_schema = calibration_cache.tip_length_data(pip_id, labware_hash, load_name)
+    return v1.TipLengthCalibration(
+        tip_length=tip_length_schema.tipLength,
+        source=tip_length_schema.source,
+        status=tip_length_schema.status,
+        pipette=tip_length_schema.pipette,
+        tiprack=tip_length_schema.tiprack,
+        last_modified=tip_length_schema.lastModified,
+        uri=tip_length_schema.uri,
+        )
 
 
-def get_all_tip_length_calibrations() -> typing.List[local_types.TipLengthCalibration]:
+def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthCalibration]:
     """
     A helper function that will list all of the tip length calibrations.
 
@@ -53,47 +66,18 @@ def get_all_tip_length_calibrations() -> typing.List[local_types.TipLengthCalibr
     return calibration_cache._tip_length_calibrations()
 
 
-def _get_calibration_source(
-    data: typing.Dict[str, typing.Any]
-) -> local_types.SourceType:
-    if "source" not in data.keys():
-        return local_types.SourceType.unknown
-    else:
-        return local_types.SourceType[data["source"]]
-
-
-def _get_calibration_status(
-    data: typing.Dict[str, typing.Any]
-) -> local_types.CalibrationStatus:
-    if "status" not in data.keys():
-        return local_types.CalibrationStatus()
-    else:
-        return local_types.CalibrationStatus(**data["status"])
-
-
-def _get_tip_rack_uri(
-    data: typing.Dict[str, typing.Any]
-) -> typing.Union["LabwareUri", Literal[""]]:
-    if "uri" not in data.keys():
-        # We cannot reverse look-up a labware definition using a hash
-        # so we must return an empty string if no uri is found.
-        return ""
-    else:
-        return typing.cast("LabwareUri", data["uri"])
-
-
-def get_robot_deck_attitude() -> typing.Optional[local_types.DeckCalibration]:
+def get_robot_deck_attitude() -> typing.Optional[v1.DeckCalibrationSchema]:
     return calibration_cache._deck_calibration()
 
 
 def get_pipette_offset(
     pip_id: str, mount: Mount
-) -> typing.Optional[local_types.PipetteOffsetByPipetteMount]:
+) -> typing.Optional[v1.InstrumentOffsetSchema]:
     return calibration_cache.pipette_offset_data(pip_id, mount)
 
 
 def get_all_pipette_offset_calibrations() -> typing.List[
-    local_types.PipetteOffsetCalibration
+    v1.InstrumentOffsetSchema
 ]:
     """
     A helper function that will list all of the pipette offset
@@ -125,27 +109,3 @@ def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinitio
             "pipette offset with this tiprack before performing calibration "
             "health check."
         )
-
-
-def get_gripper_calibration_offset(
-    gripper_id: str,
-) -> typing.Optional[local_types.GripperCalibrationOffset]:
-    gripper_dir = config.get_opentrons_path("gripper_calibration_dir")
-    offset_path = gripper_dir / f"{gripper_id}.json"
-    if offset_path.exists():
-        try:
-            data = io.read_cal_file(offset_path)
-        except json.JSONDecodeError:
-            log.error(
-                f"Skipping corrupt calibration file (bad json): {str(offset_path)}"
-            )
-            return None
-        assert "offset" in data.keys(), "Not valid gripper calibration data"
-        return local_types.GripperCalibrationOffset(
-            offset=data["offset"],
-            source=_get_calibration_source(data),
-            last_modified=data["last_modified"],
-            status=_get_calibration_status(data),
-        )
-    else:
-        return None
