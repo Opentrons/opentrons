@@ -17,10 +17,12 @@ const render = (props: React.ComponentProps<typeof CalibrationStatusCard>) => {
   )
 }
 
+const mockSetShowHowCalibrationWorksModal = jest.fn()
+
 describe('CalibrationStatusCard', () => {
   const props: React.ComponentProps<typeof CalibrationStatusCard> = {
     robotName: 'otie',
-    setShowHowCalibrationWorksModal: showHowCalibrationWorksModal => {},
+    setShowHowCalibrationWorksModal: mockSetShowHowCalibrationWorksModal,
   }
 
   it('renders a calibration status title and description', () => {
@@ -39,7 +41,8 @@ describe('CalibrationStatusCard', () => {
 
   it('renders a "See how robot calibration works button"', () => {
     const [{ getByRole }] = render(props)
-    getByRole('button', { name: 'See how robot calibration works' })
+    getByRole('button', { name: 'See how robot calibration works' }).click()
+    expect(mockSetShowHowCalibrationWorksModal).toBeCalled()
   })
 
   it('renders a link to launch the calibration dashboard', () => {
