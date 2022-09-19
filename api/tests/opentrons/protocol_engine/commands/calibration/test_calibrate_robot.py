@@ -9,12 +9,11 @@ from opentrons.protocol_engine.commands.calibration.calibrate_robot import (
     CalibrateRobotImplementation,
     CalibrateRobotParams,
 )
+from opentrons.protocol_engine.errors.exceptions import HardwareNotSupported
 
-from opentrons.hardware_control import (
-    HardwareControlAPI,
-    ot3_calibration as calibration,
-)
+from opentrons.hardware_control import ot3_calibration as calibration
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.api import API
 from opentrons.hardware_control.types import OT3Mount
 from opentrons.types import Point
 
@@ -25,9 +24,7 @@ def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
         monkeypatch.setattr(calibration, name, decoy.mock(func=func))
 
 
-async def test_calibrate_robot_implementation(
-    decoy: Decoy, hardware_api: HardwareControlAPI, ot3_api: OT3API
-) -> None:
+async def test_calibrate_robot_implementation(decoy: Decoy, ot3_api: OT3API) -> None:
     """Test Calibration command execution."""
     subject = CalibrateRobotImplementation(hardware_api=ot3_api)
 
@@ -42,3 +39,17 @@ async def test_calibrate_robot_implementation(
     result = await subject.execute(params)
 
     assert result == CalibrateRobotResult(pipetteOffset=Point(x=3, y=4, z=6))
+
+
+async def test_calibrate_robot_implementation_wrong_hardware(
+    decoy: Decoy, ot2_api: API
+) -> None:
+    """Should raise an unsupported hardware error."""
+    subject = CalibrateRobotImplementation(hardware_api=ot2_api)
+
+    params = CalibrateRobotParams(
+        mount=OT3Mount.LEFT,
+    )
+
+    with pytest.raises(HardwareNotSupported):
+        result = await subject.execute(params)

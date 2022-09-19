@@ -4,6 +4,7 @@ from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.api import API
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
     MovementHandler,
@@ -30,6 +31,12 @@ def hardware_api(decoy: Decoy) -> HardwareControlAPI:
 def ot3_api(decoy: Decoy) -> OT3API:
     """Get a mocked out OT3API."""
     return decoy.mock(cls=OT3API)
+
+
+@pytest.fixture
+def ot2_api(decoy: Decoy) -> API:
+    """Get a mocked out OT3API."""
+    return decoy.mock(cls=API)
 
 
 @pytest.fixture
