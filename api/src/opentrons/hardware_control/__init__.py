@@ -9,7 +9,7 @@ or axis)  to a deck-absolute point (not a Smoothie-coordinate point).
 This module is not for use outside the opentrons api module. Higher-level
 functions are available elsewhere.
 """
-
+from opentrons.config import feature_flags
 from .adapters import SynchronousAdapter
 from .api import API
 from .pause_manager import PauseManager
@@ -26,7 +26,9 @@ from .thread_manager import ThreadManager
 from .execution_manager import ExecutionManager
 from .threaded_async_lock import ThreadedAsyncLock, ThreadedAsyncForbidden
 from .protocols import HardwareControlAPI
-from .instruments import AbstractInstrument, Pipette, Gripper
+from .instruments import AbstractInstrument, Pipette
+
+
 
 ThreadManagedHardware = ThreadManager[HardwareControlAPI]
 SyncHardwareAPI = SynchronousAdapter[HardwareControlAPI]
@@ -37,7 +39,6 @@ __all__ = [
     "Controller",
     "Simulator",
     "Pipette",
-    "Gripper",
     "PauseManager",
     "SynchronousAdapter",
     "HardwareControlAPI",
@@ -54,3 +55,10 @@ __all__ = [
     "ThreadManagedHardware",
     "SyncHardwareAPI",
 ]
+
+if feature_flags.enable_ot3_hardware_controller():
+	from .instruments import Gripper
+	__all__.append("Gripper")
+
+
+

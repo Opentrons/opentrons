@@ -1,7 +1,7 @@
 from typing import Optional
 
 from opentrons.types import Point
-from opentrons.hardware_control.robot_calibration import load_gripper_calibration_offset
+from .instrument_calibration import load_gripper_calibration_offset
 from opentrons.hardware_control.dev_types import GripperDict
 from opentrons.hardware_control.types import (
     CriticalPoint,
