@@ -1,34 +1,51 @@
 import asyncio
 import logging
-from typing import Optional
+from typing import Dict, Optional, Type
 
 from opentrons.drivers.rpi_drivers.types import USBPort
 
-# NOTE: Must import all modules so they actually create the subclasses
-from . import update, tempdeck, magdeck, thermocycler, types  # noqa: F401
-from .mod_abc import AbstractModule
 from ..execution_manager import ExecutionManager
+
+from .types import ModuleType
+from .mod_abc import AbstractModule
+from .tempdeck import TempDeck
+from .magdeck import MagDeck
+from .thermocycler import Thermocycler
+from .heater_shaker import HeaterShaker
 
 
 log = logging.getLogger(__name__)
 
-# TODO (lc 05-12-2021) This is pretty gross. We should think
+
+# TODO (lc 05-12-2021) This is pretty gross. We should think                                        |
 # of a better way to do this.
-MODULE_HW_BY_NAME = {cls.name(): cls for cls in AbstractModule.__subclasses__()}
+MODULE_TYPE_BY_NAME = {
+    MagDeck.name(): MagDeck.MODULE_TYPE,
+    TempDeck.name(): TempDeck.MODULE_TYPE,
+    Thermocycler.name(): Thermocycler.MODULE_TYPE,
+    HeaterShaker.name(): HeaterShaker.MODULE_TYPE,
+}
+
+_MODULE_CLS_BY_TYPE: Dict[ModuleType, Type[AbstractModule]] = {
+    MagDeck.MODULE_TYPE: MagDeck,
+    TempDeck.MODULE_TYPE: TempDeck,
+    Thermocycler.MODULE_TYPE: Thermocycler,
+    HeaterShaker.MODULE_TYPE: HeaterShaker,
+}
 
 
 async def build(
     port: str,
-    which: str,
+    type: ModuleType,
     simulating: bool,
     usb_port: USBPort,
     loop: asyncio.AbstractEventLoop,
     execution_manager: ExecutionManager,
     sim_model: Optional[str] = None,
 ) -> AbstractModule:
-    return await MODULE_HW_BY_NAME[which].build(
-        port,
-        usb_port,
+    return await _MODULE_CLS_BY_TYPE[type].build(
+        port=port,
+        usb_port=usb_port,
         simulating=simulating,
         loop=loop,
         execution_manager=execution_manager,

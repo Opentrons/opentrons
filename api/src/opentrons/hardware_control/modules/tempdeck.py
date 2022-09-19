@@ -22,10 +22,9 @@ SIM_TEMP_POLL_INTERVAL_SECS = TEMP_POLL_INTERVAL_SECS / 20.0
 
 
 class TempDeck(mod_abc.AbstractModule):
-    """
-    Under development. API subject to change without a version bump
-    """
+    """Hardware control interface for an attached Temperature Module."""
 
+    MODULE_TYPE = types.ModuleType.TEMPERATURE
     FIRST_GEN2_REVISION = 20
 
     @classmethod
