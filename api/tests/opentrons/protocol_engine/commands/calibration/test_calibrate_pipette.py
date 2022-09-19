@@ -1,13 +1,13 @@
-"""Test calibrate-robot command."""
+"""Test calibrate-pipette command."""
 import inspect
 
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_engine.commands.calibration.calibrate_robot import (
-    CalibrateRobotResult,
-    CalibrateRobotImplementation,
-    CalibrateRobotParams,
+from opentrons.protocol_engine.commands.calibration.calibrate_pipette import (
+    CalibratePipetteResult,
+    CalibratePipetteImplementation,
+    CalibratePipetteParams,
 )
 from opentrons.protocol_engine.errors.exceptions import HardwareNotSupported
 
@@ -26,9 +26,9 @@ def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
 
 async def test_calibrate_robot_implementation(decoy: Decoy, ot3_api: OT3API) -> None:
     """Test Calibration command execution."""
-    subject = CalibrateRobotImplementation(hardware_api=ot3_api)
+    subject = CalibratePipetteImplementation(hardware_api=ot3_api)
 
-    params = CalibrateRobotParams(
+    params = CalibratePipetteParams(
         mount=OT3Mount.LEFT,
     )
 
@@ -38,16 +38,16 @@ async def test_calibrate_robot_implementation(decoy: Decoy, ot3_api: OT3API) -> 
 
     result = await subject.execute(params)
 
-    assert result == CalibrateRobotResult(pipetteOffset=Point(x=3, y=4, z=6))
+    assert result == CalibratePipetteResult(pipetteOffset=Point(x=3, y=4, z=6))
 
 
 async def test_calibrate_robot_implementation_wrong_hardware(
     decoy: Decoy, ot2_api: API
 ) -> None:
     """Should raise an unsupported hardware error."""
-    subject = CalibrateRobotImplementation(hardware_api=ot2_api)
+    subject = CalibratePipetteImplementation(hardware_api=ot2_api)
 
-    params = CalibrateRobotParams(
+    params = CalibratePipetteParams(
         mount=OT3Mount.LEFT,
     )
 
