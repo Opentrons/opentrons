@@ -1,4 +1,6 @@
 """Test calibrate-robot command."""
+import typing
+
 import inspect
 
 import pytest
@@ -26,10 +28,9 @@ def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
 
 
 async def test_calibrate_robot_implementation(
-    decoy: Decoy,
-    hardware_api: HardwareControlAPI,
+    decoy: Decoy, hardware_api: HardwareControlAPI, ot3_api: OT3API
 ) -> None:
-    """Test Probe command execution."""
+    """Test Calibration command execution."""
     subject = CalibrateRobotImplementation(hardware_api=hardware_api)
 
     params = CalibrateRobotParams(
@@ -37,7 +38,9 @@ async def test_calibrate_robot_implementation(
     )
 
     decoy.when(
-        await calibration.calibrate_mount(hcapi=hardware_api, mount=params.mount)
+        await calibration.calibrate_mount(
+            hcapi=typing.cast(HardwareControlAPI, ot3_api), mount=params.mount
+        )
     ).then_return(Point(x=3, y=4, z=6))
 
     result = await subject.execute(params)
