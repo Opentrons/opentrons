@@ -2,9 +2,11 @@ import numpy as np
 
 from opentrons import config
 from opentrons.calibration_storage import file_operators as io
+#TODO figure out import stuffs here
+from opentrons.calibration_storage.ot2 import modify, cache as calibration_cache
 from opentrons.hardware_control import robot_calibration
 from opentrons.util.helpers import utc_now
-from opentrons.types import Mount
+from opentrons.types import Mount, Point
 
 
 def test_migrate_affine_xy_to_attitude():
@@ -54,6 +56,7 @@ def test_load_calibration(ot_config_tempdir):
         "last_modified": utc_now(),
         "tiprack": "hash",
     }
+    calibration_cache._deck_calibration.cache_clear()
     io.save_to_file(pathway, data)
     obj = robot_calibration.load_attitude_matrix()
     transform = [[1, 0, 1], [0, 1, -0.5], [0, 0, 1]]
@@ -70,6 +73,7 @@ def test_load_malformed_calibration(ot_config_tempdir):
         "tiprack": "hash",
         "statu": [1, 2, 3],
     }
+    calibration_cache._deck_calibration.cache_clear()
     io.save_to_file(pathway, data)
     obj = robot_calibration.load_attitude_matrix()
     assert np.allclose(obj.attitude, [[1, 0, 0], [0, 1, 0], [0, 0, 1]])
@@ -85,22 +89,16 @@ def test_load_json(ot_config_tempdir):
 def test_load_pipette_offset(ot_config_tempdir):
     pip_id = "fakePip"
     mount = Mount.LEFT
-    pip_dir = config.get_opentrons_path("pipette_calibration_dir") / "left"
-    pip_dir.mkdir(parents=True, exist_ok=True)
-    pathway = pip_dir / "fakePip.json"
-    data = {
-        "offset": [1, 2, 3],
-        "tiprack": "hash",
-        "uri": "opentrons/opentrons_96_tiprack_10ul/1",
-        "last_modified": utc_now(),
-    }
-    io.save_to_file(pathway, data)
+    offset = Point(1, 2, 3)
+
+    modify.save_pipette_calibration(offset, pip_id, mount, "hash", "opentrons/opentrons_96_tiprack_10ul/1")
     obj = robot_calibration.load_pipette_offset(pip_id, mount)
-    offset = [1, 2, 3]
+
     assert np.allclose(obj.offset, offset)
 
 
 def test_load_bad_pipette_offset(ot_config_tempdir):
+    calibration_cache._pipette_offset_calibrations.cache_clear()
     path = config.get_opentrons_path("pipette_calibration_dir") / "left"
     path.mkdir(parents=True, exist_ok=True)
     calpath = path / "fakePip.json"
