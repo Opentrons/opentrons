@@ -3,7 +3,7 @@ from mock import MagicMock, call
 from typing import List, Tuple
 from opentrons.calibration_storage import types as cal_types
 from opentrons.types import Mount, Point
-from opentrons.hardware_control.instruments import pipette
+from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.config import robot_configs
 from opentrons.config.pipette_config import load
 from opentrons.protocol_api import labware

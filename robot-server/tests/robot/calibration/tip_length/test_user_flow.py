@@ -4,7 +4,7 @@ from mock import ANY, patch, call
 from typing import List, Tuple, Dict, Any
 from opentrons import config
 from opentrons.types import Mount, Point
-from opentrons.hardware_control.instruments import pipette
+from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.config.pipette_config import load
 from opentrons.calibration_storage import types as cal_types
