@@ -36,6 +36,7 @@ typeguard = "~=2.13"
 robot-server = { editable = true, path = "../../robot-server" }
 opentrons = { editable = true, path = "../../api" }
 opentrons-shared-data = { editable = true, path = "../../shared-data/python" }
+notify-server = { editable = true, path = "../../notify-server" }
 anyio = "==3.3.0"
 fastapi = "==0.68.1"
 python-dotenv = "==0.19.0"
