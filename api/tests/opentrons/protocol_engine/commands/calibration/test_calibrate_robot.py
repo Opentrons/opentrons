@@ -1,6 +1,4 @@
 """Test calibrate-robot command."""
-import typing
-
 import inspect
 
 import pytest
@@ -31,16 +29,14 @@ async def test_calibrate_robot_implementation(
     decoy: Decoy, hardware_api: HardwareControlAPI, ot3_api: OT3API
 ) -> None:
     """Test Calibration command execution."""
-    subject = CalibrateRobotImplementation(hardware_api=hardware_api)
+    subject = CalibrateRobotImplementation(hardware_api=ot3_api)
 
     params = CalibrateRobotParams(
         mount=OT3Mount.LEFT,
     )
 
     decoy.when(
-        await calibration.calibrate_mount(
-            hcapi=typing.cast(HardwareControlAPI, ot3_api), mount=params.mount
-        )
+        await calibration.calibrate_mount(hcapi=ot3_api, mount=params.mount)
     ).then_return(Point(x=3, y=4, z=6))
 
     result = await subject.execute(params)

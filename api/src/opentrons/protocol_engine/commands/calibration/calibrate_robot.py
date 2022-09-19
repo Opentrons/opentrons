@@ -1,9 +1,7 @@
-"""Blow-out command request, result, and implementation models."""
+"""Calibrate-robot command for OT3 hardware. request, result, and implementation models."""
 from __future__ import annotations
 
-import typing
-
-from typing import Optional, Type, List, cast
+from typing import Optional, Type, List
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
@@ -51,17 +49,15 @@ class CalibrateRobotImplementation(
         hardware_api: HardwareControlAPI,
         **kwargs: object,
     ) -> None:
-        print(type(hardware_api))
-        if not isinstance(hardware_api, OT3API):
-            raise ValueError("This command is supported by OT3 Only.")
-
         self._hardware_api = hardware_api
 
     async def execute(self, params: CalibrateRobotParams) -> CalibrateRobotResult:
         """Execute calibrate-robot command."""
-        ot3_api = typing.cast(OT3API, self._hardware_api)
+        if not isinstance(self._hardware_api, OT3API):
+            raise ValueError("This command is supported by OT3 Only.")
+        # ot3_api = typing.cast(OT3API, self._hardware_api)
         pipette_offset = await calibration.calibrate_mount(
-            hcapi=ot3_api, mount=params.mount
+            hcapi=self._hardware_api, mount=params.mount
         )
 
         return CalibrateRobotResult(pipetteOffset=pipette_offset)
