@@ -6,7 +6,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 6.1.0-alpha.4
+# Opentrons App Changes in 6.1.0-alpha.5
 
 Welcome to the v6.1.0 alpha release of the Opentrons App! This release focuses on adding support for the Opentrons Heater-Shaker Module.
 
@@ -17,6 +17,7 @@ Welcome to the v6.1.0 alpha release of the Opentrons App! This release focuses o
   - Analyze, upload, and run protocols that include the Heater-Shaker
   - View the status of a Heater-Shaker connected to an OT-2 and control its heater, shaker, and labware latch
   - Update the Heater-Shaker's firmware from the module card
+- Module cards now show if a Heater-Shaker or Thermocycler has an error
 
 ## Bug Fixes
 
@@ -61,7 +62,7 @@ The 6.0.1 hotfix release fixes two issues:
 - The app's "Override Path to Python" advanced setting now works properly on Windows
 - It's once again possible to save changes made to pipette settings
 
-## Improved features
+## Improved Features
 
 - Labware Position Check
   - When re-running a protocol, the app will now automatically recommend stored Labware Offset data (from the last 20 runs on that robot) that applies to the same labware and deck slot.

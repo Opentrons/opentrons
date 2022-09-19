@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.4...v6.1.0-alpha.5) (2022-09-19)
+
+
+### Bug Fixes
+
+* **api:** Disallow uploading a protocol with non matching references ([#11457](https://github.com/Opentrons/opentrons/issues/11457)) ([5f29ebe](https://github.com/Opentrons/opentrons/commit/5f29ebe649f364faf470222d5758dfdddc62ed1a))
+
+
+### Reverts
+
+* Revert "fix(api): Disallow uploading a protocol with non matching references (#11457)" (#11475) ([02d39a0](https://github.com/Opentrons/opentrons/commit/02d39a0a8774e528da7a7ffadaabe9f45805c33e)), closes [#11457](https://github.com/Opentrons/opentrons/issues/11457) [#11475](https://github.com/Opentrons/opentrons/issues/11475)
+
+
+
+
+
 # [6.1.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.1.0-beta.0...v6.1.0-alpha.4) (2022-09-13)
 
 **Note:** Version bump only for package @opentrons/shared-data

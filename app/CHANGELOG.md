@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.4...v6.1.0-alpha.5) (2022-09-19)
+
+
+### Bug Fixes
+
+* **app:** do not initiate new buildroot session after successful update ([#11476](https://github.com/Opentrons/opentrons/issues/11476)) ([aada770](https://github.com/Opentrons/opentrons/commit/aada770cf0fab16e5c260d6504de18b8d5d2dc4e))
+* **app:** order labware offset reapply candidates newest to oldest ([#11467](https://github.com/Opentrons/opentrons/issues/11467)) ([cb4d8ef](https://github.com/Opentrons/opentrons/commit/cb4d8ef6f8a02c6ba9fe71477abd5639a3f8a357))
+
+
+
+
+
 # [6.1.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.1.0-beta.0...v6.1.0-alpha.4) (2022-09-13)
 
 
