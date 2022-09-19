@@ -72,25 +72,26 @@ sdist: $(sdist_file)
 
 $(wheel_file): setup.py $(py_sources) $(json_sources)
 	$(SHX) mkdir -p build
-	$(python) setup.py $(wheel_opts) bdist_wheel
+	$(call python,ot-2) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) ls $(BUILD_DIR)
 
 
 $(sdist_file): setup.py $(py_sources) $(json_sources)
 	$(SHX) mkdir -p build
-	$(python) setup.py sdist
+	$(call python,ot-3/robot-server) setup.py sdist
 	$(SHX) ls $(BUILD_DIR)
 
 
 .PHONY: lint
 lint: $(py_sources)
-	$(python) -m mypy opentrons_shared_data tests
-	$(python) -m black --check opentrons_shared_data tests setup.py
-	$(python) -m flake8 opentrons_shared_data tests setup.py
+	$(call python,ot-3/robot-server) -m mypy opentrons_shared_data tests
+	$(call python,ot-2) -m mypy opentrons_shared_data tests
+	$(call python,dev) -m black --check opentrons_shared_data tests setup.py
+	$(call python,dev) -m flake8 opentrons_shared_data tests setup.py
 
 .PHONY: format
 format:
-	$(python) -m black opentrons_shared_data tests setup.py
+	$(call python,dev) -m black opentrons_shared_data tests setup.py
 
 .PHONY: push-no-restart
 push-no-restart: $(wheel_file)
@@ -114,4 +115,5 @@ deploy: wheel
 
 .PHONY: test
 test:
-	$(python) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
+	$(call pytest,ot-2) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
+	$(call pytest,ot-3/robot-server) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
