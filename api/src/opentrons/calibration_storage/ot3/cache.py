@@ -2,15 +2,13 @@ from functools import lru_cache
 import os
 import json
 from functools import lru_cache
+from pydantic import ValidationError
 
 from opentrons import config, types
 
-from . import file_operators as io
+from .. import file_operators as io, types as local_types
 
-if config.feature_flags.enable_ot3_hardware_controller():
-    from .schemas.ot3 import v1, defaults
-else:
-    from .schemas.ot2 import v1, defaults
+from .schemas import v1, defaults
 
 
 @lru_cache(maxsize=None)
@@ -18,7 +16,6 @@ def _tip_length_calibrations():
     tip_length_dir = config.get_tip_length_cal_path()
     tip_length_calibrations = {}
     for file in os.scandir(tip_length_dir):
-        breakpoint()
         if file.name == "index.json":
             continue
         if file.is_file() and ".json" in file.name:
@@ -26,9 +23,12 @@ def _tip_length_calibrations():
             tip_length_calibrations[pipette_id] = {}
             all_tip_lengths_for_pipette = io.read_cal_file(file.path)
             for tiprack, data in all_tip_lengths_for_pipette.items():
-                tip_length_calibrations[pipette_id][tiprack] = v1.TipLengthSchema(
-                    **data
-                )
+                try:
+                    tip_length_calibrations[pipette_id][tiprack] = v1.TipLengthSchema(
+                        **data
+                    )
+                except (json.JSONDecodeError, ValidationError):
+                    pass
     return tip_length_calibrations
 
 
@@ -37,16 +37,11 @@ def _deck_calibration() -> v1.DeckCalibrationSchema:
     deck_calibration_dir = config.get_opentrons_path("robot_calibration_dir")
     for file in os.scandir(deck_calibration_dir):
         if file.name == "deck_calibration.json":
-            return v1.DeckCalibrationSchema(**io.read_cal_file(file.path))
-    # local_types.DeckCalibration(
-    #             attitude=data["attitude"],
-    #             source=_get_calibration_source(data),
-    #             pipette_calibrated_with=data["pipette_calibrated_with"],
-    #             tiprack=data["tiprack"],
-    #             last_modified=data["last_modified"],
-    #             status=_get_calibration_status(data),
-    #         )
-    return defaults.deck_calibration
+            try:
+                return v1.DeckCalibrationSchema(**io.read_cal_file(file.path))
+            except (json.JSONDecodeError, ValidationError):
+                pass
+    return {}
 
 
 @lru_cache(maxsize=None)
@@ -55,12 +50,19 @@ def _pipette_offset_calibrations():
     pipette_calibration_dict = {}
     for mount in types.MountType:
         pipette_calibration_dict[mount] = {}
-        for file in os.scandir(pipette_calibration_dir / mount.value):
+        mount_dir = pipette_calibration_dir / mount.value
+        if not mount_dir.exists():
+            continue
+        for file in os.scandir(mount_dir):
             if file.is_file() and ".json" in file.name:
                 pipette_id = file.name.split(".json")[0]
-                pipette_calibration_dict[pipette_id] = v1.InstrumentOffsetSchema(
-                    **io.read_cal_file(file.path)
-                )
+                try:
+                    pipette_calibration_dict[mount][pipette_id] = v1.InstrumentOffsetSchema(
+                        **io.read_cal_file(file.path)
+                    )
+                except (json.JSONDecodeError, ValidationError):
+                    pass
+
     return pipette_calibration_dict
 
 
@@ -72,40 +74,34 @@ def _gripper_offset_calibrations():
     for file in os.scandir(gripper_calibration_dir):
         if file.is_file() and ".json" in file.name:
             gripper_id = file.name.split(".json")[0]
-            gripper_calibration_dict[gripper_id] = v1.InstrumentOffsetSchema(
-                **io.read_cal_file(file.path)
-            )
+            try:
+                gripper_calibration_dict[gripper_id] = v1.InstrumentOffsetSchema(
+                    **io.read_cal_file(file.path)
+                )
+            except (json.JSONDecodeError, ValidationError):
+                pass
     return gripper_calibration_dict
 
 
-def tip_length_data(pipette_id: str, labware_hash: str):
+def tip_length_data(pipette_id: str, labware_hash: str, labware_load_name: str):
+    """
+    Grab tip length data from cache based on pipette id and labware hash.
+    """
     try:
         return _tip_length_calibrations()[pipette_id][labware_hash]
     except KeyError:
-        # raise local_types.TipLengthCalNotFound(
-        #     f"Tip length of {labware_load_name} has not been "
-        #     f"calibrated for this pipette: {pip_id} and cannot"
-        #     "be loaded"
-        # )
-        # all_calibrations.append(
-        # 	local_types.TipLengthCalibration(
-        # 		tip_length=info["tipLength"],
-        # 		pipette=pip,
-        # 		tiprack=tiprack,
-        # 		last_modified=info["lastModified"],
-        # 		source=_get_calibration_source(info),
-        # 		status=_get_calibration_status(info),
-        # 		uri=_get_tip_rack_uri(info),
-        # 	)
-        return None
+        raise local_types.TipLengthCalNotFound(
+            f"Tip length of {labware_load_name} has not been "
+            f"calibrated for this pipette: {pipette_id} and cannot"
+            "be loaded"
+        )
 
 
 def tip_lengths_for_pipette(pipette_id: str):
     try:
-        
         return _tip_length_calibrations()[pipette_id]
     except KeyError:
-        return None
+        return {}
 
 
 def pipette_offset_data(pipette_id: str, mount: types.Mount):
@@ -117,7 +113,7 @@ def pipette_offset_data(pipette_id: str, mount: types.Mount):
     try:
         return _pipette_offset_calibrations()[mount_type][pipette_id]
     except KeyError:
-        return None
+        return {}
 
 
 def gripper_calibration(gripper_id: str):

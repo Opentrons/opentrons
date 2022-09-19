@@ -8,6 +8,7 @@ the v1 API.
 import json
 import datetime
 import typing
+from pydantic import BaseModel
 
 from .types import StrPath
 from .encoder_decoder import DateTimeEncoder, DateTimeDecoder
@@ -52,7 +53,7 @@ def read_cal_file(
 
 def save_to_file(
     filepath: StrPath,
-    data: typing.Mapping[str, typing.Any],
+    data: BaseModel,
     encoder: EncoderType = DateTimeEncoder,
 ) -> None:
     """
@@ -64,4 +65,5 @@ def save_to_file(
     The default encoder is the date time encoder.
     """
     with open(filepath, "w") as f:
-        json.dump(data, f, cls=encoder)
+        f.write(data.json())
+        # json.dump(data.json(), f, cls=encoder)
