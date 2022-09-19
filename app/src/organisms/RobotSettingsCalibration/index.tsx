@@ -379,6 +379,7 @@ export function RobotSettingsCalibration({
       {!isOT3 ? (
         <RobotSettingsDeckCalibration
           buttonDisabledReason={buttonDisabledReason}
+          dispatchRequests={dispatchRequests}
           robotName={robotName}
           updateRobotStatus={updateRobotStatus}
         />
@@ -406,7 +407,6 @@ export function RobotSettingsCalibration({
         </>
       ) : null}
       <Line />
-      {/* TODO(bh, 2022-09-07): possibly remove when calibration wizard feature flag removed */}
       <CalibrationHealthCheck
         buttonDisabledReason={buttonDisabledReason}
         dispatchRequests={dispatchRequests}

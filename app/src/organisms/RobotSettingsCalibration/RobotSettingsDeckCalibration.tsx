@@ -31,21 +31,19 @@ import * as Sessions from '../../redux/sessions'
 
 import type { DeckCalibrationInfo } from '../../redux/calibration/types'
 import type { RequestState } from '../../redux/robot-api/types'
-import type { SessionCommandString } from '../../redux/sessions/types'
+import type { DispatchRequestsType } from '../../redux/robot-api'
 import type { State } from '../../redux/types'
 
 interface RobotSettingsDeckCalibrationProps {
   buttonDisabledReason: string | null
+  dispatchRequests: DispatchRequestsType
   robotName: string
   updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
-const spinnerCommandBlockList: SessionCommandString[] = [
-  Sessions.sharedCalCommands.JOG,
-]
-
 export function RobotSettingsDeckCalibration({
   buttonDisabledReason,
+  dispatchRequests,
   robotName,
   updateRobotStatus,
 }: RobotSettingsDeckCalibrationProps): JSX.Element {
@@ -56,7 +54,6 @@ export function RobotSettingsDeckCalibration({
   ])
   const trackedRequestId = React.useRef<string | null>(null)
   const createRequestId = React.useRef<string | null>(null)
-  const jogRequestId = React.useRef<string | null>(null)
 
   const isRunStartedOrLegacySessionInProgress = useRunStartedOrLegacySessionInProgress()
 
@@ -64,36 +61,6 @@ export function RobotSettingsDeckCalibration({
   const deckCalibrationStatus = useDeckCalibrationStatus(robotName)
   const enableCalibrationWizards = Config.useFeatureFlag(
     'enableCalibrationWizards'
-  )
-
-  const [dispatchRequests] = RobotApi.useDispatchApiRequests(
-    dispatchedAction => {
-      if (dispatchedAction.type === Sessions.ENSURE_SESSION) {
-        createRequestId.current =
-          'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
-            : null
-      } else if (
-        dispatchedAction.type === Sessions.CREATE_SESSION_COMMAND &&
-        dispatchedAction.payload.command.command ===
-          Sessions.sharedCalCommands.JOG
-      ) {
-        jogRequestId.current =
-          'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
-            : null
-      } else if (
-        dispatchedAction.type !== Sessions.CREATE_SESSION_COMMAND ||
-        !spinnerCommandBlockList.includes(
-          dispatchedAction.payload.command.command
-        )
-      ) {
-        trackedRequestId.current =
-          'meta' in dispatchedAction && 'requestId' in dispatchedAction.meta
-            ? dispatchedAction.meta.requestId ?? null
-            : null
-      }
-    }
   )
 
   // wait for robot request to resolve instead of using name directly from params
@@ -139,15 +106,13 @@ export function RobotSettingsDeckCalibration({
       })
     : buttonDisabledReason
 
-  const deckLastModified = (): string => {
-    const deckCalData = deckCalibrationData.deckCalibrationData as DeckCalibrationInfo
-    const calibratedDate = deckCalData?.lastModified ?? null
-    return Boolean(calibratedDate)
-      ? t('last_calibrated', {
-          date: formatLastModified(calibratedDate),
-        })
-      : t('not_calibrated')
-  }
+  const deckCalData = deckCalibrationData.deckCalibrationData as DeckCalibrationInfo
+  const calibratedDate = deckCalData?.lastModified ?? null
+  const deckLastModified = Boolean(calibratedDate)
+    ? t('last_calibrated', {
+        date: formatLastModified(calibratedDate),
+      })
+    : t('not_calibrated')
 
   const handleClickDeckCalibration = (): void => {
     if (isRunStartedOrLegacySessionInProgress) {
@@ -157,24 +122,19 @@ export function RobotSettingsDeckCalibration({
     }
   }
 
-  const checkDeckCalibrationStatus = (): 'error' | 'warning' | null => {
-    if (
-      deckCalibrationStatus != null &&
-      deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_OK
-    ) {
-      return 'error'
-    } else if (
-      !Array.isArray(deckCalibrationData.deckCalibrationData) &&
-      deckCalibrationData?.deckCalibrationData?.status != null &&
-      deckCalibrationData?.deckCalibrationData?.status.markedBad
-    ) {
-      return 'warning'
-    } else {
-      return null
-    }
+  let currentDeckStatus: 'error' | 'warning' | null = null
+  if (
+    deckCalibrationStatus != null &&
+    deckCalibrationStatus !== Calibration.DECK_CAL_STATUS_OK
+  ) {
+    currentDeckStatus = 'error'
+  } else if (
+    !Array.isArray(deckCalibrationData.deckCalibrationData) &&
+    deckCalibrationData?.deckCalibrationData?.status != null &&
+    deckCalibrationData?.deckCalibrationData?.status.markedBad
+  ) {
+    currentDeckStatus = 'warning'
   }
-
-  const currentDeckStatus = checkDeckCalibrationStatus()
 
   const deckCalibrationBanner = !pipettePresent
     ? currentDeckStatus === 'error' && (
@@ -230,12 +190,12 @@ export function RobotSettingsDeckCalibration({
                 : t('deck_calibration_description_legacy')}
             </StyledText>
             <StyledText as="label" color={COLORS.darkGreyEnabled}>
-              {deckLastModified()}
+              {deckLastModified}
             </StyledText>
           </Box>
           {enableCalibrationWizards ? null : (
             <TertiaryButton
-              onClick={() => handleClickDeckCalibration()}
+              onClick={handleClickDeckCalibration}
               disabled={disabledOrBusyReason != null}
             >
               {deckCalibrationButtonText}
