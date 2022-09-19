@@ -4,10 +4,10 @@ include ../../scripts/python.mk
 .DEFAULT_TARGET: setup
 
 setup:
-	$(pipenv) sync --dev
+	$(call pipenv,dev) sync --dev
 
 teardown:
-	-$(pipenv) --rm
+	-$(call pipenv,dev) --rm
 
 update:
-	$(pipenv) update --dev
+	$(call pipenv,dev) update --dev

@@ -4,10 +4,10 @@ include ../../../scripts/python.mk
 .DEFAULT_TARGET: setup
 
 setup:
-	$(pipenv) sync --dev
+	$(call pipenv,ot-3/robot-server) sync --dev
 
 teardown:
-	-$(pipenv) --rm
+	-$(call pipenv,ot-3/robot-server) --rm
 
 update:
-	$(pipenv) update --dev
+	$(call pipenv,ot-3/robot-server) update --dev
