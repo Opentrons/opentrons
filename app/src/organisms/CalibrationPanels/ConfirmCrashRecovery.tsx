@@ -51,14 +51,14 @@ export function ConfirmCrashRecovery(
           role="button"
           css={TYPOGRAPHY.darkLinkH4SemiBold}
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
-          onClick={back}>
+          onClick={back}
+        >
           {t('shared:resume')}
-        </Link >
+        </Link>
         <AlertPrimaryButton onClick={confirm}>
           {t('start_over')}
         </AlertPrimaryButton>
       </Flex>
     </Flex>
-
   )
 }

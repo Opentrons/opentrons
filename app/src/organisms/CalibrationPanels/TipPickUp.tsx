@@ -46,57 +46,61 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
       },
     })
   }
-  const [confirmLink, crashRecoveryConfirmation] = useConfirmCrashRecovery(props)
+  const [confirmLink, crashRecoveryConfirmation] = useConfirmCrashRecovery(
+    props
+  )
 
-  return crashRecoveryConfirmation ??  (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
-      minHeight="32rem"
-    >
+  return (
+    crashRecoveryConfirmation ?? (
       <Flex
+        flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignSelf={ALIGN_STRETCH}
-        gridGap={SPACING.spacing3}
+        padding={SPACING.spacing6}
+        minHeight="32rem"
       >
-        <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-          <StyledText as="h1" marginBottom={SPACING.spacing4}>
-            {t('position_pipette_over_tip')}
-          </StyledText>
-          <Trans
-            t={t}
-            i18nKey="tip_pick_up_instructions"
-            components={{
-              block: <StyledText as="p" marginBottom={SPACING.spacing3} />,
-            }}
-          />
+        <Flex
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignSelf={ALIGN_STRETCH}
+          gridGap={SPACING.spacing3}
+        >
+          <Flex flexDirection={DIRECTION_COLUMN} flex="1">
+            <StyledText as="h1" marginBottom={SPACING.spacing4}>
+              {t('position_pipette_over_tip')}
+            </StyledText>
+            <Trans
+              t={t}
+              i18nKey="tip_pick_up_instructions"
+              components={{
+                block: <StyledText as="p" marginBottom={SPACING.spacing3} />,
+              }}
+            />
+          </Flex>
+          <Box flex="1">
+            <video
+              key={demoAsset}
+              css={css`
+                max-width: 100%;
+                max-height: 15rem;
+              `}
+              autoPlay={true}
+              loop={true}
+              controls={false}
+            >
+              <source src={demoAsset} />
+            </video>
+          </Box>
         </Flex>
-        <Box flex="1">
-          <video
-            key={demoAsset}
-            css={css`
-              max-width: 100%;
-              max-height: 15rem;
-            `}
-            autoPlay={true}
-            loop={true}
-            controls={false}
-          >
-            <source src={demoAsset} />
-          </video>
-        </Box>
+        <JogControls jog={jog} />
+        <Box alignSelf={ALIGN_FLEX_END}>{confirmLink}</Box>
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          marginTop={SPACING.spacing4}
+        >
+          <NeedHelpLink />
+          <PrimaryButton onClick={pickUpTip}>{t('pick_up_tip')}</PrimaryButton>
+        </Flex>
       </Flex>
-      <JogControls jog={jog} />
-      <Box alignSelf={ALIGN_FLEX_END}>{confirmLink}</Box>
-      <Flex
-        width="100%"
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginTop={SPACING.spacing4}
-      >
-        <NeedHelpLink />
-        <PrimaryButton onClick={pickUpTip}>{t('pick_up_tip')}</PrimaryButton>
-      </Flex>
-    </Flex>
+    )
   )
 }

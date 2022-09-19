@@ -1,100 +1,100 @@
 import * as React from 'react'
-import { mount } from 'enzyme'
+import { act, renderHook } from '@testing-library/react-hooks'
+import { I18nextProvider } from 'react-i18next'
+import { LEFT, renderWithProviders } from '@opentrons/components'
 
+import { i18n } from '../../../i18n'
 import { useConfirmCrashRecovery } from '../useConfirmCrashRecovery'
-import type { Props } from '../useConfirmCrashRecovery'
-import type { CalibrationLabware } from '../../../redux/sessions/types'
-import type {
-  LabwareDefinition2,
-  LabwareMetadata,
-} from '@opentrons/shared-data'
-import type { ReactWrapper, HTMLAttributes } from 'enzyme'
+import { mockCalibrationCheckLabware } from '../../../redux/sessions/__fixtures__'
+import {
+  DECK_STEP_JOGGING_TO_DECK,
+  SESSION_TYPE_DECK_CALIBRATION,
+  sharedCalCommands,
+} from '../../../redux/sessions'
+
+import type { CalibrationPanelProps } from '../types'
 
 describe('useConfirmCrashRecovery', () => {
-  let render: (props?: Partial<Props>) => ReactWrapper<Props>
+  let wrapper: React.FunctionComponent<{}>
   const mockSendCommands = jest.fn()
-  const mockTipRack: Partial<CalibrationLabware> = {
-    slot: '4',
-    definition: {
-      metadata: {
-        displayName: 'my tiprack',
-      } as LabwareMetadata,
-    } as LabwareDefinition2,
+  const mockProps = {
+    cleanUpAndExit: jest.fn(),
+    tipRack: mockCalibrationCheckLabware,
+    isMulti: false,
+    mount: LEFT,
+    currentStep: DECK_STEP_JOGGING_TO_DECK,
+    sessionType: SESSION_TYPE_DECK_CALIBRATION,
   }
 
-  const getStarterLink = (
-    wrapper: ReactWrapper<Props>
-  ): ReactWrapper<HTMLAttributes> => wrapper.find('a')
-  const getModal = (wrapper: ReactWrapper<Props>): ReactWrapper =>
-    wrapper.find('ConfirmCrashRecoveryModal')
-  const getExitButton = (
-    wrapper: ReactWrapper<Props>
-  ): ReactWrapper<HTMLAttributes> =>
-    wrapper.find('OutlineButton[children="cancel"]')
-  const getRestartButton = (
-    wrapper: ReactWrapper<Props>
-  ): ReactWrapper<HTMLAttributes> => wrapper.find('OutlineButton').at(1)
-
-  const TestUseConfirmCrashRecovery = (props: Partial<Props>): JSX.Element => {
-    const {
-      requiresNewTip = false,
-      sendCommands = mockSendCommands,
-      tipRack = mockTipRack,
-    } = props
-    const [starterText, maybeModal] = useConfirmCrashRecovery({
-      ...props,
-      sendCommands: sendCommands,
-      tipRack: tipRack as CalibrationLabware,
-    } as any)
-    return (
-      <>
-        {starterText}
-        {maybeModal}
-      </>
-    )
-  }
   beforeEach(() => {
-    render = (props: Partial<Props> = {}) => {
-      return mount(<TestUseConfirmCrashRecovery {...props} />)
-    }
+    wrapper = ({ children }) => (
+      <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+    )
   })
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  it('renders the starter link text', () => {
-    const wrapper = render()
-    expect(getStarterLink(wrapper).exists()).toBe(true)
+  it('renders the link text', () => {
+    const { result } = renderHook<
+      CalibrationPanelProps,
+      [link: JSX.Element, confirmation: JSX.Element | null]
+    >(
+      () =>
+        useConfirmCrashRecovery({
+          ...mockProps,
+          sendCommands: mockSendCommands,
+        }),
+      { wrapper }
+    )
+    const [link, confirmation] = result.current
+    expect(link).not.toBeNull()
+    expect(confirmation).toBeNull()
+
+    const { getByText, getByRole } = renderWithProviders(link, {
+      i18nInstance: i18n,
+    })[0]
+    getByText('Jog too far or bend a tip?')
+    getByRole('button', { name: 'Start over' })
   })
 
   it('renders the modal with the right props when you click the link', () => {
-    const wrapper = render()
-    getStarterLink(wrapper).invoke('onClick')?.({} as React.MouseEvent)
-    wrapper.update()
-    expect(getModal(wrapper).exists()).toBe(true)
-    expect(getModal(wrapper).prop('requiresNewTip')).toBe(false)
-    expect(getModal(wrapper).prop('tipRackSlot')).toEqual('4')
-    expect(getModal(wrapper).prop('tipRackDisplayName')).toEqual('my tiprack')
-  })
+    const { result } = renderHook<
+      CalibrationPanelProps,
+      [link: JSX.Element, confirmation: JSX.Element | null]
+    >(
+      () =>
+        useConfirmCrashRecovery({
+          ...mockProps,
+          sendCommands: mockSendCommands,
+        }),
+      { wrapper }
+    )
 
-  it('invokes invalidate_last_action when you click confirm', () => {
-    const wrapper = render()
-    getStarterLink(wrapper).invoke('onClick')?.({} as React.MouseEvent)
-    wrapper.update()
-    getRestartButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
-    wrapper.update()
+    // render returned confirmation if not null, otherwise render the link
+    const { getByRole, rerender } = renderWithProviders(
+      <div>{result.current[1] ?? result.current[0]}</div>,
+      { i18nInstance: i18n }
+    )[0]
+    // click the link to launch the modal
+    act(() => getByRole('button', { name: 'Start over' }).click())
+    // the confirmation should now not be null
+    expect(result.current[1]).not.toBeNull()
+    // the explicitly rerender to incorporate newly non-null confirmation
+    rerender(<div>{result.current[1] ?? result.current[0]}</div>)
+
+    // click the "back" link in the confirmation
+    const closeConfirmationButton = getByRole('button', { name: 'resume' })
+    act(() => closeConfirmationButton.click())
+    // the confirmation should now be null once more
+    expect(result.current[1]).toBeNull()
+
+    // open the confirmation again and click the proceed to start over button
+    act(() => getByRole('button', { name: 'Start over' }).click())
+    const startOverButton = getByRole('button', { name: 'Start over' })
+    startOverButton.click()
     expect(mockSendCommands).toHaveBeenCalledWith({
-      command: 'calibration.invalidateLastAction',
+      command: sharedCalCommands.INVALIDATE_LAST_ACTION,
     })
-  })
-
-  it('stops rendering the modal when you click cancel', () => {
-    const wrapper = render()
-    getStarterLink(wrapper).invoke('onClick')?.({} as React.MouseEvent)
-    wrapper.update()
-    expect(getModal(wrapper).exists()).toBe(true)
-    getExitButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
-    wrapper.update()
-    expect(getModal(wrapper).exists()).toBe(false)
   })
 })

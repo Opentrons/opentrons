@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import * as Sessions from '../../redux/sessions'
@@ -19,7 +18,7 @@ import { StyledText } from '../../atoms/text'
 
 export function useConfirmCrashRecovery(
   props: CalibrationPanelProps
-): [link: React.ReactNode, confirmation: React.ReactNode] {
+): [link: JSX.Element, confirmation: JSX.Element | null] {
   const { t } = useTranslation('robot_calibration')
   const { sendCommands } = props
   const [showModal, setShowModal] = React.useState(false)
@@ -28,11 +27,19 @@ export function useConfirmCrashRecovery(
     sendCommands({ command: Sessions.sharedCalCommands.INVALIDATE_LAST_ACTION })
   }
   return [
-    <Flex key="crash-recovery-link" justifyContent={JUSTIFY_CENTER} gridGap={SPACING.spacing2}>
-      <StyledText as="p" fontSize={FONT_SIZE_BODY_1}>{t('jog_too_far_or_bend_tip')}</StyledText>
+    <Flex
+      key="crash-recovery-link"
+      justifyContent={JUSTIFY_CENTER}
+      gridGap={SPACING.spacing2}
+    >
+      <StyledText as="p" fontSize={FONT_SIZE_BODY_1}>
+        {t('jog_too_far_or_bend_tip')}
+      </StyledText>
       <Link
+        role="button"
         onClick={() => setShowModal(true)}
-        css={TYPOGRAPHY.linkPSemiBold}>
+        css={TYPOGRAPHY.linkPSemiBold}
+      >
         {t('start_over')}
       </Link>
     </Flex>,
