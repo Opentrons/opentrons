@@ -11,6 +11,7 @@ from ..command import (
     BaseCommandCreate,
 )
 from ...errors import ErrorOccurrence
+from ...errors.exceptions import HardwareNotSupported
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control import ot3_calibration as calibration
@@ -53,14 +54,18 @@ class CalibrateRobotImplementation(
 
     async def execute(self, params: CalibrateRobotParams) -> CalibrateRobotResult:
         """Execute calibrate-robot command."""
-        if not isinstance(self._hardware_api, OT3API):
-            raise ValueError("This command is supported by OT3 Only.")
-        # ot3_api = typing.cast(OT3API, self._hardware_api)
+        self.ensure_ot3_hardware(self._hardware_api)
+
         pipette_offset = await calibration.calibrate_mount(
             hcapi=self._hardware_api, mount=params.mount
         )
 
         return CalibrateRobotResult(pipetteOffset=pipette_offset)
+
+    @staticmethod
+    def ensure_ot3_hardware(hardware_api: HardwareControlAPI):
+        if not isinstance(hardware_api, OT3API):
+            raise HardwareNotSupported("This command is supported by OT3 Only.")
 
 
 class CalibrateRobot(BaseCommand[CalibrateRobotParams, CalibrateRobotResult]):
