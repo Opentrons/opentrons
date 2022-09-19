@@ -1,18 +1,18 @@
 """Calibration Module protocol commands."""
 
-from .calibrate_robot import (
-    CalibrateRobotParams,
-    CalibrateRobotResult,
-    CalibrateRobotCreate,
-    CalibrateRobotCommandType,
-    CalibrateRobot,
+from .calibrate_pipette import (
+    CalibratePipetteParams,
+    CalibratePipetteResult,
+    CalibratePipetteCreate,
+    CalibratePipetteCommandType,
+    CalibratePipette,
 )
 
 __all__ = [
-    # calibration/calibrateRobot
-    "CalibrateRobot",
-    "CalibrateRobotCreate",
-    "CalibrateRobotParams",
-    "CalibrateRobotResult",
-    "CalibrateRobotCommandType",
+    # calibration/calibratePipette
+    "CalibratePipette",
+    "CalibratePipetteCreate",
+    "CalibratePipetteParams",
+    "CalibratePipetteResult",
+    "CalibratePipetteCommandType",
 ]
