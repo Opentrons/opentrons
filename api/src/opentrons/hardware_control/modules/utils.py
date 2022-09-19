@@ -17,7 +17,7 @@ from .heater_shaker import HeaterShaker
 log = logging.getLogger(__name__)
 
 
-# TODO (lc 05-12-2021) This is pretty gross. We should think                                        |
+# TODO (lc 05-12-2021) This is pretty gross. We should think
 # of a better way to do this.
 MODULE_TYPE_BY_NAME = {
     MagDeck.name(): MagDeck.MODULE_TYPE,
