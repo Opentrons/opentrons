@@ -14,6 +14,7 @@ from ...errors import ErrorOccurrence
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control import ot3_calibration as calibration
 from opentrons.hardware_control.types import OT3Mount
+from opentrons.types import Point
 from opentrons.hardware_control.ot3api import OT3API
 
 
@@ -29,6 +30,9 @@ class CalibrateRobotParams(BaseModel):
 class CalibrateRobotResult(BaseModel):
     """Result data from the execution of a calibrate-robot command."""
 
+    pipetteOffset: Point = Field(
+        ..., description="Pipette offset of calibrated pipette."
+    )
     errors: Optional[List[ErrorOccurrence]] = Field(
         default_factory=None, description="Errors raised from calibrate-robot command."
     )
@@ -44,23 +48,19 @@ class CalibrateRobotImplementation(
         hardware_api: HardwareControlAPI,
         **kwargs: object,
     ) -> None:
-        print(isinstance(hardware_api, OT3API))
-        if not isinstance(hardware_api, OT3API):
-            raise ValueError("This command is supported by OT3 Only.")
+        # print(isinstance(hardware_api, OT3API))
+        # if not isinstance(hardware_api, OT3API):
+        #     raise ValueError("This command is supported by OT3 Only.")
 
         self._hardware_api = hardware_api
 
     async def execute(self, params: CalibrateRobotParams) -> CalibrateRobotResult:
         """Execute calibrate-robot command."""
-        deck_z = await calibration.find_deck_position(
-            hcapi=cast(OT3API, self._hardware_api), mount=params.mount
+        pipette_offset = await calibration.calibrate_mount(
+            hcapi=self._hardware_api, mount=params.mount
         )
-        await calibration.find_slot_center_binary(
-            hcapi=cast(OT3API, self._hardware_api),
-            mount=params.mount,
-            deck_height=deck_z,
-        )
-        return CalibrateRobotResult()
+
+        return CalibrateRobotResult(pipetteOffset=pipette_offset)
 
 
 class CalibrateRobot(BaseCommand[CalibrateRobotParams, CalibrateRobotResult]):
