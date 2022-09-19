@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
@@ -15,12 +16,13 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
+import { getRobotModelByName } from '../../redux/discovery'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import OT3_PNG from '../../assets/images/OT3.png'
+import type { State } from '../../redux/types'
 
 interface AvailableRobotOptionProps {
   robotName: string
-  robotModel: string
   local: boolean | null
   onClick: () => void
   isSelected: boolean
@@ -33,7 +35,6 @@ export function AvailableRobotOption(
 ): JSX.Element {
   const {
     robotName,
-    robotModel,
     local,
     onClick,
     isSelected,
@@ -41,6 +42,9 @@ export function AvailableRobotOption(
     isOnDifferentSoftwareVersion,
   } = props
   const { t } = useTranslation('protocol_list')
+  const robotModel = useSelector((state: State) =>
+    getRobotModelByName(state, robotName)
+  )
   return (
     <>
       <MiniCard
