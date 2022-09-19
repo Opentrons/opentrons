@@ -1978,11 +1978,11 @@
       "commandType": "loadPipette",
       "id": "0abc2",
       "params": {
-        "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a",
+        "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45",
         "mount": "right"
       },
       "result": {
-        "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45a"
+        "pipetteId": "c235a5a0-0042-11ec-8258-f7ffdf5ad45"
       }
     },
     {
