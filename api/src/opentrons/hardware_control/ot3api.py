@@ -1004,8 +1004,9 @@ class OT3API(
             raise
 
     @ExecutionManagerProvider.wait_for_running
-    async def _jaw_width(self, jaw_width_um: int) -> None:
+    async def _hold_jaw_width(self, jaw_width_mm: int) -> None:
         """Move the gripper jaw to a specific width."""
+        jaw_width_um = jaw_width_mm * 1000;
         try:
             if (
                 jaw_width_um < self._gripper_handler.gripper.config.jaw_sizes_um["min"]
@@ -1036,9 +1037,9 @@ class OT3API(
         await self._ungrip()
         self._gripper_handler.set_jaw_state(GripperJawState.HOMED_READY)
 
-    async def jaw_width(self, jaw_width_um: int) -> None:
+    async def hold_jaw_width(self, jaw_width_mm: int) -> None:
         self._gripper_handler.check_ready_for_jaw_move()
-        await self._jaw_width(jaw_width_um)
+        await self._hold_jaw_width(jaw_width_mm)
         self._gripper_handler.set_jaw_state(GripperJawState.HOLDING_CLOSED)
 
     # Pipette action API
