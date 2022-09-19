@@ -1,12 +1,13 @@
 import logging
 import os
 import shutil
+import importlib
 from enum import Enum
 from pathlib import Path
 from typing import NamedTuple, Dict, Set
 
-from opentrons.config import IS_ROBOT
-from opentrons.calibration_storage import delete
+from opentrons.config import IS_ROBOT, feature_flags
+
 
 DATA_BOOT_D = Path("/data/boot.d")
 
@@ -91,16 +92,30 @@ def reset_boot_scripts() -> None:
     else:
         log.debug(f"Not on pi, not removing {DATA_BOOT_D}")
 
-
+# Importing the delete module, only when these methods are called to ensure
+# that the feature flag is correctly set. Since these functions are rarely called,
+# I think it's OK to have the imports live in the functions.
 def reset_deck_calibration() -> None:
+    if feature_flags.enable_ot3_hardware_controller():
+        delete = importlib.import_module('opentrons.calibration_storage.ot3.delete')
+    else:
+        delete = importlib.import_module('opentrons.calibration_storage.ot2.delete')
     delete.delete_robot_deck_attitude()
     delete.clear_pipette_offset_calibrations()
 
 
 def reset_pipette_offset() -> None:
+    if feature_flags.enable_ot3_hardware_controller():
+        delete = importlib.import_module('opentrons.calibration_storage.ot3.delete')
+    else:
+        delete = importlib.import_module('opentrons.calibration_storage.ot2.delete')
     delete.clear_pipette_offset_calibrations()
 
 
 def reset_tip_length_calibrations() -> None:
+    if feature_flags.enable_ot3_hardware_controller():
+        delete = importlib.import_module('opentrons.calibration_storage.ot3.delete')
+    else:
+        delete = importlib.import_module('opentrons.calibration_storage.ot2.delete')
     delete.clear_tip_length_calibration()
     delete.clear_pipette_offset_calibrations()
