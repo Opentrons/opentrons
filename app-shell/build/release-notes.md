@@ -26,6 +26,8 @@ Welcome to the v6.1.0 alpha release of the Opentrons App! This release focuses o
 - Tip Length Calibration no longer silently fails when the chosen pipette is not attached
 - Clarified what data is deleted when performing a factory reset of protocol run history
 - Fixed a bug that prevented changing pipette settings when the 'All Pipette Config' feature flag is on
+- Stops the update modal from staying onscreen indefinitely after a robot software update has finished
+- Labware Position Check now suggests the most recent Labware Offset data
 
 ## Known Issues
 
