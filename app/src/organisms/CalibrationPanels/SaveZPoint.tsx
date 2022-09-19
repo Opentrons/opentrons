@@ -65,19 +65,16 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
   const proceed: React.MouseEventHandler<HTMLButtonElement> = _event => {
     isHealthCheck
       ? sendCommands(
-          { command: Sessions.checkCommands.COMPARE_POINT },
-          { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
-        )
+        { command: Sessions.checkCommands.COMPARE_POINT },
+        { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
+      )
       : sendCommands(
-          { command: Sessions.sharedCalCommands.SAVE_OFFSET },
-          { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
-        )
+        { command: Sessions.sharedCalCommands.SAVE_OFFSET },
+        { command: Sessions.sharedCalCommands.MOVE_TO_POINT_ONE }
+      )
   }
 
-  const [confirmLink, confirmModal] = useConfirmCrashRecovery({
-    requiresNewTip: true,
-    ...props,
-  })
+  const [confirmLink, crashRecoveryConfirmation] = useConfirmCrashRecovery(props)
 
   let title = t('calibrate_z_axis_on_slot')
   let bodyTranlsationKey = 'jog_pipette_to_touch_slot'
@@ -90,7 +87,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
         : 'jog_pipette_to_touch_trash'
   }
 
-  return (
+  return crashRecoveryConfirmation ?? (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -124,9 +121,8 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
             autoPlay={true}
             loop={true}
             controls={false}
-            aria-label={`${mount} ${
-              isMulti ? 'multi' : 'single'
-            } channel pipette moving to slot 5`}
+            aria-label={`${mount} ${isMulti ? 'multi' : 'single'
+              } channel pipette moving to slot 5`}
           >
             <source src={demoAsset} />
           </video>
@@ -150,7 +146,6 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
           {t('confirm_placement')}
         </PrimaryButton>
       </Flex>
-      {confirmModal}
     </Flex>
   )
 }

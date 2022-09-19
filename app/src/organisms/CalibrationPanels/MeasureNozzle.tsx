@@ -111,10 +111,7 @@ export function MeasureNozzle(props: CalibrationPanelProps): JSX.Element {
         )
   }
 
-  const [confirmLink, confirmModal] = useConfirmCrashRecovery({
-    requiresNewTip: false,
-    ...props,
-  })
+  const [confirmLink, crashRecoveryConfirmation] = useConfirmCrashRecovery(props)
 
   let titleText =
     calBlock != null
@@ -125,7 +122,7 @@ export function MeasureNozzle(props: CalibrationPanelProps): JSX.Element {
       calBlock != null ? t('check_z_axis_on_block') : t('check_z_axis_on_trash')
   }
 
-  return (
+  return crashRecoveryConfirmation ?? (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -179,7 +176,6 @@ export function MeasureNozzle(props: CalibrationPanelProps): JSX.Element {
           {t('confirm_placement')}
         </PrimaryButton>
       </Flex>
-      {confirmModal}
     </Flex>
   )
 }

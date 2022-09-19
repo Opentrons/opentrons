@@ -43,7 +43,6 @@ describe('useConfirmCrashRecovery', () => {
     } = props
     const [starterText, maybeModal] = useConfirmCrashRecovery({
       ...props,
-      requiresNewTip: requiresNewTip,
       sendCommands: sendCommands,
       tipRack: tipRack as CalibrationLabware,
     } as any)

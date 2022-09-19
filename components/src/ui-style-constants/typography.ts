@@ -121,6 +121,15 @@ export const linkPSemiBold = css`
   }
 `
 
+export const darkLinkH4SemiBold = css`
+  font-size: ${fontSizeH4};
+  font-weight: ${fontWeightSemiBold};
+  line-height: ${lineHeight20};
+  color: ${COLORS.darkGreyEnabled};
+  &:hover {
+    color: ${COLORS.darkBlackEnabled};
+  }
+`
 export const darkLinkLabelSemiBold = css`
   font-size: ${fontSizeLabel};
   font-weight: ${fontWeightSemiBold};

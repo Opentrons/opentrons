@@ -105,19 +105,16 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
   const proceed = (): void => {
     isHealthCheck
       ? sendCommands(
-          { command: Sessions.checkCommands.COMPARE_POINT },
-          { command: Sessions.sharedCalCommands.MOVE_TO_DECK }
-        )
+        { command: Sessions.checkCommands.COMPARE_POINT },
+        { command: Sessions.sharedCalCommands.MOVE_TO_DECK }
+      )
       : sendCommands(
-          { command: Sessions.sharedCalCommands.SAVE_OFFSET },
-          { command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK }
-        )
+        { command: Sessions.sharedCalCommands.SAVE_OFFSET },
+        { command: Sessions.sharedCalCommands.MOVE_TO_TIP_RACK }
+      )
   }
 
-  const [confirmLink, confirmModal] = useConfirmCrashRecovery({
-    requiresNewTip: true,
-    ...props,
-  })
+  const [confirmLink, crashRecoveryConfirmation] = useConfirmCrashRecovery(props)
 
   let titleText =
     calBlock != null ? t('calibrate_tip_on_block') : t('calibrate_tip_on_trash')
@@ -125,7 +122,7 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
     titleText =
       calBlock != null ? t('check_tip_on_block') : t('check_tip_on_trash')
   }
-  return (
+  return crashRecoveryConfirmation ?? (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -179,7 +176,6 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
           {t('confirm_placement')}
         </PrimaryButton>
       </Flex>
-      {confirmModal}
     </Flex>
   )
 }

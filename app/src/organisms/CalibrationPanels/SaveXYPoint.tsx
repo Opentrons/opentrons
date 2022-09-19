@@ -151,10 +151,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
     [slotNumber, mount, isMulti]
   )
 
-  const [confirmLink, confirmModal] = useConfirmCrashRecovery({
-    requiresNewTip: true,
-    ...props,
-  })
+  const [confirmLink, crashRecoveryConfirmation] = useConfirmCrashRecovery(props)
 
   if (slotNumber == null) {
     logger.warn(
@@ -209,7 +206,7 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
     }
   }
 
-  return (
+  return crashRecoveryConfirmation ?? (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -266,7 +263,6 @@ export function SaveXYPoint(props: CalibrationPanelProps): JSX.Element | null {
           {t('confirm_placement')}
         </PrimaryButton>
       </Flex>
-      {confirmModal}
     </Flex>
   )
 }

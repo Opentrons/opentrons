@@ -46,12 +46,9 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
       },
     })
   }
-  const [confirmLink, confirmModal] = useConfirmCrashRecovery({
-    requiresNewTip: false,
-    ...props,
-  })
+  const [confirmLink, crashRecoveryConfirmation] = useConfirmCrashRecovery(props)
 
-  return (
+  return crashRecoveryConfirmation ??  (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -100,7 +97,6 @@ export function TipPickUp(props: CalibrationPanelProps): JSX.Element {
         <NeedHelpLink />
         <PrimaryButton onClick={pickUpTip}>{t('pick_up_tip')}</PrimaryButton>
       </Flex>
-      {confirmModal}
     </Flex>
   )
 }
