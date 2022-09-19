@@ -36,11 +36,11 @@ from opentrons_hardware.hardware_control.motion_planning import (
 
 
 from .util import use_or_initialize_loop, check_motion_bounds
-from .instruments.pipette import (
+from .instruments.ot2.pipette import (
     generate_hardware_configs_ot3,
     load_from_config_and_check_skip,
 )
-from .instruments.gripper import compare_gripper_config_and_check_skip
+from .instruments.ot3.gripper import compare_gripper_config_and_check_skip
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
 from .backends.ot3utils import get_system_constraints
@@ -67,17 +67,18 @@ from .types import (
     GripperNotAttachedError,
 )
 from . import modules
-from .robot_calibration import (
-    load_pipette_offset,
-    load_gripper_calibration_offset,
+from .robot_calibration_ot3 import (
     OT3Transforms,
     RobotCalibration,
     build_ot3_transforms,
 )
 
 from .protocols import HardwareControlAPI
-from .instruments.pipette_handler import OT3PipetteHandler, InstrumentsByMount
-from .instruments.gripper_handler import GripperHandler
+# TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
+# in a follow-up PR.
+from .instruments.ot2.pipette_handler import OT3PipetteHandler, InstrumentsByMount
+from .instruments.ot3.gripper_handler import GripperHandler
+from .instruments.ot3.instrument_calibration import load_pipette_offset, load_gripper_calibration_offset
 from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
