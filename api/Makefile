@@ -71,17 +71,11 @@ all: clean sdist wheel
 
 .PHONY: setup
 setup:
-	@echo "Command will be deprecated. Use make -C environments setup instead."
-	$(MAKE) -C ../environments setup
+	@echo "Command is be deprecated. Use make -C environments setup instead."
 
 .PHONY: clean
 clean: docs-clean
 	$(clean_cmd)
-
-.PHONY: teardown
-teardown:
-	@echo "Command will be deprecated. Use make -C environments setup instead."
-	$(MAKE) -C ../environments/teardown
 
 $(wheel_file): setup.py $(ot_sources)
 	$(clean_cmd)

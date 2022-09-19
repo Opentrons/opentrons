@@ -53,14 +53,10 @@ setup-js:
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
-PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
-
 .PHONY: setup-py
 setup-py:
-	$(OT_PYTHON) -m pip install pipenv==2021.5.29
+	$(OT_PYTHON) -m pip install pipenv==2022.9.4
 	$(MAKE) -C environments setup
-	$(MAKE) $(PYTHON_SETUP_TARGETS)
-
 
 %-py-setup:
 	$(MAKE) -C $* setup

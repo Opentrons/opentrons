@@ -64,22 +64,11 @@ all: clean sdist wheel
 
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
-
-.PHONY: setup-ot2
-setup-ot2:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip uninstall -y opentrons_hardware
-	$(pipenv) run pip freeze
+	@echo This command is deprecated; run make -C environments setup instead
 
 .PHONY: clean
 clean:
 	$(clean_cmd)
-
-.PHONY: teardown
-teardown:
-	$(pipenv) --rm
 
 $(wheel_file): setup.py $(ot_sources)
 	$(clean_cmd)

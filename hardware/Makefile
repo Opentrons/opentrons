@@ -52,12 +52,7 @@ all: clean wheel
 
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
-
-.PHONY: teardown
-teardown:
-	$(pipenv) --rm
+	@echo This target is deprecated; run make -C environments setup instead
 
 .PHONY: clean
 clean:

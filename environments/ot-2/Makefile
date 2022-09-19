@@ -3,11 +3,11 @@ include ../../scripts/python.mk
 .PHONY: setup, teardown
 .DEFAULT_TARGET: setup
 
-setup:
-	$(call pipenv,ot-2) sync --dev
+setup: teardown
+	$(call pipenv,ot-2) sync --dev --verbose
 
 teardown:
 	-$(call pipenv,ot-2) --rm
 
-update:
+update: teardown
 	$(call pipenv,ot-2) update --dev

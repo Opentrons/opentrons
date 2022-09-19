@@ -24,8 +24,7 @@ br_ssh_opts ?= $(default_ssh_opts)
 
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@echo This target is deprecated; run make -C environments setup instead
 
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
@@ -42,10 +41,6 @@ clean:
 		'*.egg-info' \
 		'**/__pycache__' \
 		'**/*.pyc'
-
-.PHONY: teardown
-teardown:
-	$(pipenv) --rm
 
 .PHONY: test
 test:
