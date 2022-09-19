@@ -30,11 +30,10 @@ class CalibratePipetteParams(BaseModel):
 class CalibratePipetteResult(BaseModel):
     """Result data from the execution of a calibrate-pipette command."""
 
-    pipetteOffset: Point = Field(
-        ..., description="Offset of calibrated pipette."
-    )
+    pipetteOffset: Point = Field(..., description="Offset of calibrated pipette.")
     errors: Optional[List[ErrorOccurrence]] = Field(
-        default_factory=None, description="Errors raised from calibrate-pipette command."
+        default_factory=None,
+        description="Errors raised from calibrate-pipette command.",
     )
 
 
