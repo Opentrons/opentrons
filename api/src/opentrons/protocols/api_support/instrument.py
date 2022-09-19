@@ -2,9 +2,9 @@ import logging
 from typing import Optional, Any
 
 from opentrons import types
-from opentrons.calibration_storage import get
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.instruments import instrument_calibration as instr_cal
 from opentrons.protocol_api.labware import Labware, Well
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.protocol.dev_types import (
@@ -57,9 +57,7 @@ def tip_length_for(pipette: PipetteDict, tiprack: Labware) -> float:
         return tip_length - tip_overlap
 
     try:
-        return get.load_tip_length_calibration(
-            pipette["pipette_id"], tiprack._implementation.get_definition()
-        ).tip_length
+        return instr_cal.load_tip_length_for_pipette(pipette["pipette_id"], tiprack._implementation.get_definition()).tip_length
     except TipLengthCalNotFound:
         return _build_length_from_overlap()
 
