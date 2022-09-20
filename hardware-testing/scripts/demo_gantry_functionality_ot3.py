@@ -1,4 +1,4 @@
-"""OT3 Bowtie Test."""
+"""Demo OT3 Gantry Functionality."""
 import argparse
 import asyncio
 
