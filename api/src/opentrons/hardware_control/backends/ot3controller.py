@@ -443,20 +443,20 @@ class OT3Controller:
 
     async def get_limit_switches(self) -> OT3AxisMap[bool]:
         """Get the state of the gantry's limit switches on each axis."""
-        nodes_with_limit_switches = [
-            OT3Axis.X,
-            OT3Axis.Y,  # gantry XY
+        axes_with_limit_switches = [
+            OT3Axis.X,  # gantry
+            OT3Axis.Y,
             OT3Axis.Z_L,
-            OT3Axis.Z_R,  # gantry Z
-            OT3Axis.Z_G,
-            OT3Axis.G,  # gripper
-            OT3Axis.P_L,
+            OT3Axis.Z_R,
+            OT3Axis.Z_G,  # gripper
+            OT3Axis.G,
+            OT3Axis.P_L,  # pipettes
             OT3Axis.P_R,
-            OT3Axis.Q,  # pipettes
+            OT3Axis.Q,
         ]
         switch_nodes = [
             axis_to_node(ax)
-            for ax in nodes_with_limit_switches
+            for ax in axes_with_limit_switches
             if self._axis_is_present(ax)
         ]
         assert switch_nodes, "No nodes available to read limit switch status from"
