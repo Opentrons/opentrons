@@ -38,6 +38,7 @@ async def get_limit_switches(
                 "got response from unexpected node id on network: "
                 f"0x{arbitration_id.parts.originating_node_id:x}"
             )
+            return
         if message.message_id != MessageId.limit_sw_response:
             log.warning(f"unexpected message id: 0x{message.message_id:x}")
             return
@@ -46,6 +47,7 @@ async def get_limit_switches(
         if len(responses) == len(nodes):
             event.set()
 
+    can_messenger.add_listener(listener)
     for node in nodes:
         await can_messenger.send(
             node_id=node,
