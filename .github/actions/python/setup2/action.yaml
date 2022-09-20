@@ -23,5 +23,5 @@ runs:
           **/Pipfile.*
     - shell: bash
       name: make setup-py
-      if: ! ${{ steps.python.outputs.cache-hit }}
+      if: steps.python.outputs.cache-hit == false
       run: make setup-py-faster
