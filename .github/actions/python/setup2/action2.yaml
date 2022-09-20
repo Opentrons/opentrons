@@ -1,0 +1,29 @@
+name: 'Python Setup'
+description: 'Set up the environment to handle a monorepo python project'
+
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      run: |
+        if [[ "${OSTYPE}" =~ "linux" ]]; then
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libsystemd-dev
+        fi
+    - shell: bash
+      run: |
+        npm install --global shx@0.3.3
+    - shell: bash
+      run: 'make -C ${{ inputs.project }} setup'
+    - uses: 'actions/setup-python@v4'
+      id: python
+      with:
+        python-version: '3.10' # this is what gets put on the path but other pythons are installed https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md#python
+        cache: 'pipenv'
+        cache-dependency-path: |
+            **/setup.py
+            **/Pipfile.*
+    - shell: bash
+      name: make setup-py
+      if: ! ${{ steps.python.outputs.cache-hit }}
+      run: make setup-py-faster
