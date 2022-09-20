@@ -56,7 +56,7 @@ async def test_calibration_set_up_position_implementation(
     ):
         result = await subject.execute(params=params)
 
-    assert result == MoveToLocationResult()
+    assert result == MoveToLocationResult(position=movement_coordinates)
 
     decoy.verify(
         await movement.move_to_coordinates(

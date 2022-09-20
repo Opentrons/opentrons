@@ -1,7 +1,7 @@
 """Calibration Move To Location command payload, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING, Type, Optional
 from typing_extensions import Literal
 from enum import Enum
 
@@ -15,7 +15,7 @@ from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.types import DeckPoint
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.execution import MovementHandler
+    from opentrons.protocol_engine.execution import MovementHandler, SavedPositionData
     from opentrons.protocol_engine.state.state import StateView
 
 MoveToLocationCommandType = Literal["MoveToLocation"]
@@ -39,9 +39,10 @@ class MoveToLocationParams(PipetteIdMixin):
 
 class MoveToLocationResult(BaseModel):
     """Result data from the execution of a CalibrationSetUpPosition command."""
-    position: DeckPoint
 
-    pass
+    position: SavedPositionData = Field(
+        ..., description="Deck Point position after the move command has been executed"
+    )
 
 
 class MoveToLocationImplementation(
@@ -71,7 +72,12 @@ class MoveToLocationImplementation(
             direct=True,
             additional_min_travel_z=None,
         )
-        return MoveToLocationResult(position=slot_center_deck)
+
+        new_position = await self._movement.save_position(
+            pipette_id=params.pipetteId, position_id="CalibrationPosition"
+        )
+
+        return MoveToLocationResult(position=new_position)
 
 
 class MoveToLocation(BaseCommand[MoveToLocationParams, MoveToLocationResult]):
@@ -79,6 +85,7 @@ class MoveToLocation(BaseCommand[MoveToLocationParams, MoveToLocationResult]):
 
     commandType: MoveToLocationCommandType = "MoveToLocation"
     params: MoveToLocationParams
+    result: Optional[MoveToLocationResult]
 
     _ImplementationCls: Type[
         MoveToLocationImplementation
