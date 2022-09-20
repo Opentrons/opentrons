@@ -7,11 +7,12 @@ from opentrons.protocol_engine.commands.calibration.move_to_location import (
     MoveToLocationParams,
     MoveToLocationImplementation,
     MoveToLocationResult,
+    CalibrationPositions,
 )
 from opentrons.protocol_engine.execution import MovementHandler
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.types import DeckPoint
-from opentrons.types import DeckSlotName, Point, CalibrationPositions
+from opentrons.types import DeckSlotName, Point
 
 
 probe_position = DeckPoint(x=4, y=5, z=6)
