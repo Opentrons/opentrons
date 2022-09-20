@@ -210,3 +210,10 @@ class TransferTipPolicy(enum.Enum):
 
 
 DeckLocation = Union[int, str]
+
+
+class CalibrationPositions(DeckSlotName, enum.Enum):
+    """Deck slot to move to."""
+
+    probe_position = DeckSlotName.SLOT_5
+    attach_or_detach = DeckSlotName.SLOT_2

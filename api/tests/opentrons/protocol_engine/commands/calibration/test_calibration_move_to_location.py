@@ -3,20 +3,19 @@ from decoy import Decoy
 import pytest
 import mock
 
-from opentrons.protocol_engine.commands.calibration.calibration_set_up_position import (
-    CalibrationPositions,
-    CalibrationSetUpPositionParams,
-    CalibrationSetUpPositionImplementation,
-    CalibrationSetUpPositionResult,
+from opentrons.protocol_engine.commands.calibration.move_to_location import (
+    MoveToLocationParams,
+    MoveToLocationImplementation,
+    MoveToLocationResult,
 )
 from opentrons.protocol_engine.execution import MovementHandler
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.types import DeckPoint
-from opentrons.types import DeckSlotName, Point
+from opentrons.types import DeckSlotName, Point, CalibrationPositions
 
 
-start_calibration = DeckPoint(x=4, y=5, z=6)
-probe_interation = DeckPoint(x=1, y=2, z=3)
+probe_position = DeckPoint(x=4, y=5, z=6)
+attach_or_detach = DeckPoint(x=1, y=2, z=3)
 
 
 def mock_deck_slot_center(slot_name: DeckSlotName) -> Point:
@@ -32,8 +31,8 @@ def mock_deck_slot_center(slot_name: DeckSlotName) -> Point:
 @pytest.mark.parametrize(
     argnames=["slot_name", "movement_coordinates"],
     argvalues=[
-        [CalibrationPositions.start_calibration, start_calibration],
-        [CalibrationPositions.probe_interaction, probe_interation],
+        [CalibrationPositions.probe_position, probe_position],
+        [CalibrationPositions.attach_or_detach, attach_or_detach],
     ],
 )
 async def test_calibration_set_up_position_implementation(
@@ -45,11 +44,9 @@ async def test_calibration_set_up_position_implementation(
 ) -> None:
     """Command should get a Point value for a given deck slot center and \
         call Movement.move_to_coordinates with the correct input."""
-    subject = CalibrationSetUpPositionImplementation(
-        state_view=state_view, movement=movement
-    )
+    subject = MoveToLocationImplementation(state_view=state_view, movement=movement)
 
-    params = CalibrationSetUpPositionParams(
+    params = MoveToLocationParams(
         pipetteId="pipette-id",
         slot_name=slot_name,
     )
@@ -58,7 +55,7 @@ async def test_calibration_set_up_position_implementation(
     ):
         result = await subject.execute(params=params)
 
-    assert result == CalibrationSetUpPositionResult()
+    assert result == MoveToLocationResult()
 
     decoy.verify(
         await movement.move_to_coordinates(

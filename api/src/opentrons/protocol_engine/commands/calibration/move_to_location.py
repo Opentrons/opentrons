@@ -1,9 +1,9 @@
-"""Home command payload, result, and implementation models."""
+"""Calibration Move To Location command payload, result, and implementation models."""
 from __future__ import annotations
-from enum import Enum
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Type
 from typing_extensions import Literal
+
 from opentrons.protocol_engine.commands.pipetting_common import PipetteIdMixin
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
@@ -11,39 +11,32 @@ from opentrons.protocol_engine.commands.command import (
     BaseCommandCreate,
 )
 from opentrons.protocol_engine.types import DeckPoint
-from opentrons.types import DeckSlotName
+from opentrons.types import CalibrationPositions
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import MovementHandler
     from opentrons.protocol_engine.state.state import StateView
 
-CalibrationSetUpPositionCommandType = Literal["CalibrationSetUpPosition"]
+MoveToLocationCommandType = Literal["MoveToLocation"]
 
 
-class CalibrationPositions(DeckSlotName, Enum):
-    """Deck slot to move to."""
-
-    start_calibration = DeckSlotName.SLOT_5
-    probe_interaction = DeckSlotName.SLOT_2
-
-
-class CalibrationSetUpPositionParams(PipetteIdMixin):
+class MoveToLocationParams(PipetteIdMixin):
     """Calibration set up position command parameters."""
 
     slot_name: CalibrationPositions = Field(
-        CalibrationPositions.start_calibration,
+        CalibrationPositions.probe_position,
         description="Slot location to move to before starting calibration.",
     )
 
 
-class CalibrationSetUpPositionResult(BaseModel):
-    """Result data."""
+class MoveToLocationResult(BaseModel):
+    """Result data from the execution of a CalibrationSetUpPosition command."""
 
     pass
 
 
-class CalibrationSetUpPositionImplementation(
-    AbstractCommandImpl[CalibrationSetUpPositionParams, CalibrationSetUpPositionResult]
+class MoveToLocationImplementation(
+    AbstractCommandImpl[MoveToLocationParams, MoveToLocationResult]
 ):
     """Calibration set up position command implementation."""
 
@@ -53,40 +46,40 @@ class CalibrationSetUpPositionImplementation(
         self._movement = movement
         self._state_view = state_view
 
-    async def execute(
-        self, params: CalibrationSetUpPositionParams
-    ) -> CalibrationSetUpPositionResult:
+    async def execute(self, params: MoveToLocationParams) -> MoveToLocationResult:
         """Move the requested pipette to a given deck slot."""
         slot_center = self._state_view.labware.get_slot_center_position(
             params.slot_name
         )
-        slot_center_deck = DeckPoint(x=slot_center.x, y=slot_center.y, z=slot_center.z)
+
+        # slot center deck has 3mm safety margin
+        slot_center_deck = DeckPoint(
+            x=slot_center.x, y=slot_center.y, z=slot_center.z + 3
+        )
         await self._movement.move_to_coordinates(
             pipette_id=params.pipetteId,
             deck_coordinates=slot_center_deck,
             direct=True,
             additional_min_travel_z=0,
         )
-        return CalibrationSetUpPositionResult()
+        return MoveToLocationResult()
 
 
-class CalibrationSetUpPosition(
-    BaseCommand[CalibrationSetUpPositionParams, CalibrationSetUpPositionResult]
-):
+class MoveToLocation(BaseCommand[MoveToLocationParams, MoveToLocationResult]):
     """Calibration set up position command model."""
 
-    commandType: CalibrationSetUpPositionCommandType = "CalibrationSetUpPosition"
-    params: CalibrationSetUpPositionParams
+    commandType: MoveToLocationCommandType = "MoveToLocation"
+    params: MoveToLocationParams
 
     _ImplementationCls: Type[
-        CalibrationSetUpPositionImplementation
-    ] = CalibrationSetUpPositionImplementation
+        MoveToLocationImplementation
+    ] = MoveToLocationImplementation
 
 
-class CalibrationSetUpPositionCreate(BaseCommandCreate[CalibrationSetUpPositionParams]):
+class MoveToLocationCreate(BaseCommandCreate[MoveToLocationParams]):
     """Calibration set up position command creation request model."""
 
-    commandType: CalibrationSetUpPositionCommandType = "CalibrationSetUpPosition"
-    params: CalibrationSetUpPositionParams
+    commandType: MoveToLocationCommandType = "MoveToLocation"
+    params: MoveToLocationParams
 
-    _CommandCls: Type[CalibrationSetUpPosition] = CalibrationSetUpPosition
+    _CommandCls: Type[MoveToLocation] = MoveToLocation
