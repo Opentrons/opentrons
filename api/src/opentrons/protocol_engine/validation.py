@@ -1,4 +1,6 @@
 """Validation file for protocol engine."""
+from __future__ import annotations
+
 from ..hardware_control.ot3api import OT3API
 from ..hardware_control.protocols import HardwareControlAPI
 from ..protocol_engine.errors.exceptions import HardwareNotSupported
