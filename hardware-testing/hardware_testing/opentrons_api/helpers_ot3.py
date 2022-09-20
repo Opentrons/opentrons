@@ -3,14 +3,14 @@ from dataclasses import dataclass
 from subprocess import run
 from typing import List, Optional, Dict, Union, Type
 
-from opentrons.config.robot_configs import load_ot3 as load_ot3_config
+from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
 from opentrons.hardware_control.api import API as OT2API
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.protocols import HardwareControlAPI
 from opentrons.hardware_control.thread_manager import ThreadManager
 
-from .types import GantryLoad, PerPipetteAxisSettings, OT3Axis
+from .types import GantryLoad, PerPipetteAxisSettings, OT3Axis, OT3Mount, Point
 
 HWApiOT3: Union[Type[OT3API], Type[OT2API]] = OT3API
 ThreadManagedHardwareAPI = ThreadManager[HardwareControlAPI]
@@ -22,10 +22,13 @@ def stop_server_ot3() -> None:
 
 
 def build_ot3_hardware_api(
-    is_simulating: Optional[bool] = False,
+    is_simulating: Optional[bool] = False, use_defaults: Optional[bool] = False
 ) -> ThreadManagedHardwareAPI:
     """Built an OT3 Hardware API instance."""
-    config = load_ot3_config()
+    if use_defaults:
+        config = build_config_ot3({})
+    else:
+        config = load_ot3_config()
     if is_simulating:
         hw_api = ThreadManager(HWApiOT3.build_hardware_simulator, config=config)
     else:
