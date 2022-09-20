@@ -14,7 +14,7 @@ runs:
       run: |
         npm install --global shx@0.3.3
     - uses: "actions/setup-python@v4"
-      id: python
+      id: python-setup
       with:
         python-version: "3.10" # this is what gets put on the path but other pythons are installed https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md#python
         cache: "pipenv"
@@ -23,5 +23,5 @@ runs:
           **/Pipfile.*
     - shell: bash
       name: make setup-py
-      if: steps.python.outputs.cache-hit == false
+      if: steps.python-setup.outputs.cache-hit == 'false'
       run: make setup-py-faster
