@@ -24,7 +24,8 @@ export interface VersionInfoModalProps {
   robot: ViewableRobot
   robotUpdateType: BuildrootUpdateType | null
   close: () => unknown
-  proceed: () => unknown
+  goToViewUpdate: () => unknown
+  installUpdate: () => unknown
 }
 
 const REINSTALL_HEADING = 'Robot is up to date'
@@ -32,7 +33,7 @@ const REINSTALL_MESSAGE =
   "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
 
 export function VersionInfoModal(props: VersionInfoModalProps): JSX.Element {
-  const { robot, robotUpdateType, close, proceed } = props
+  const { robot, robotUpdateType, close, installUpdate, goToViewUpdate } = props
   const [showUpdateAppModal, setShowUpdateAppModal] = React.useState(false)
   const availableAppUpdateVersion = useSelector(getAvailableShellUpdate)
   const robotVersion = getRobotApiVersion(robot)
@@ -58,7 +59,7 @@ export function VersionInfoModal(props: VersionInfoModalProps): JSX.Element {
   if (availableAppUpdateVersion !== null) {
     heading = `App Version ${availableAppUpdateVersion} Available`
     message = <UpdateAppMessage {...versionProps} />
-    secondaryMessage = <SkipAppUpdateMessage onClick={proceed} />
+    secondaryMessage = <SkipAppUpdateMessage onClick={installUpdate} />
     primaryButton = {
       ...primaryButton,
       children: 'View App Update',
@@ -74,7 +75,7 @@ export function VersionInfoModal(props: VersionInfoModalProps): JSX.Element {
     )
     primaryButton = {
       ...primaryButton,
-      onClick: proceed,
+      onClick: goToViewUpdate,
       children:
         robotUpdateType === 'upgrade' ? 'View Robot Update' : 'Downgrade Robot',
     }
@@ -83,7 +84,7 @@ export function VersionInfoModal(props: VersionInfoModalProps): JSX.Element {
     message = <p className={styles.reinstall_message}>{REINSTALL_MESSAGE}</p>
     primaryButton = {
       ...primaryButton,
-      onClick: proceed,
+      onClick: installUpdate,
       children: 'Reinstall',
     }
   }
