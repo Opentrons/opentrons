@@ -54,4 +54,4 @@ async def test_calibrate_pipette_implementation_wrong_hardware(
     )
 
     with pytest.raises(HardwareNotSupported):
-        result = await subject.execute(params)
+        await subject.execute(params)

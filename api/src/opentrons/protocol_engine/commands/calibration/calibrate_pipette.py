@@ -1,5 +1,5 @@
 """Calibrate-pipette command for OT3 hardware. request, result, and implementation models."""
-from typing import Optional, Type, List
+from typing import Optional, Type
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
@@ -8,7 +8,6 @@ from ..command import (
     BaseCommand,
     BaseCommandCreate,
 )
-from ...errors import ErrorOccurrence
 from ...validation import ensure_ot3_hardware
 
 from opentrons.hardware_control import HardwareControlAPI
@@ -49,7 +48,7 @@ class CalibratePipetteImplementation(
         ensure_ot3_hardware(self._hardware_api)
 
         pipette_offset = await calibration.calibrate_mount(
-            hcapi=self._hardware_api, mount=params.mount
+            hcapi=self._hardware_api, mount=params.mount  # type: ignore[arg-type]
         )
 
         return CalibratePipetteResult(pipetteOffset=pipette_offset)
