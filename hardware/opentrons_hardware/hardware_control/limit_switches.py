@@ -1,30 +1,25 @@
 """Utilities for reading the current status of the OT3 limit switches."""
 import asyncio
 import logging
-from typing import cast, Dict, List
+from typing import Dict, List, Callable
 
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import MessageId
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    ReadLimitSwitchRequest, ReadLimitSwitchResponse
+    ReadLimitSwitchRequest,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
-from .types import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId
 
 log = logging.getLogger(__name__)
 
 
-async def get_limit_switches(
-    can_messenger: CanMessenger,
-    nodes: List[NodeId]
-) -> Dict[NodeId, UInt8Field]:
-    """Get state of limit switches for each node."""
-    event = asyncio.Event()
-    responses: Dict[NodeId, UInt8Field] = dict()
-
-    def listener(message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
+def _create_listener(
+    nodes: List[NodeId], event: asyncio.Event, responses: Dict[NodeId, UInt8Field]
+) -> Callable[[MessageDefinition, ArbitrationId], None]:
+    def _listener(message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
         try:
             originator = NodeId(arbitration_id.parts.originating_node_id)
         except ValueError:
@@ -42,11 +37,20 @@ async def get_limit_switches(
         if message.message_id != MessageId.limit_sw_response:
             log.warning(f"unexpected message id: 0x{message.message_id:x}")
             return
-        response = cast(ReadLimitSwitchResponse, message)
-        responses[originator] = response.payload.switch_status
+        responses[originator] = message.payload.switch_status
         if len(responses) == len(nodes):
             event.set()
 
+    return _listener
+
+
+async def get_limit_switches(
+    can_messenger: CanMessenger, nodes: List[NodeId]
+) -> Dict[NodeId, UInt8Field]:
+    """Get state of limit switches for each node."""
+    event = asyncio.Event()
+    responses: Dict[NodeId, UInt8Field] = dict()
+    listener = _create_listener(nodes, event, responses)
     can_messenger.add_listener(listener)
     for node in nodes:
         await can_messenger.send(
@@ -56,9 +60,7 @@ async def get_limit_switches(
     try:
         await asyncio.wait_for(event.wait(), 1.0)
     except asyncio.TimeoutError:
-        log.error(
-            "limit switch request timed out before expected nodes responded"
-        )
+        log.error("limit switch request timed out before expected nodes responded")
     finally:
         can_messenger.remove_listener(listener)
     return responses
