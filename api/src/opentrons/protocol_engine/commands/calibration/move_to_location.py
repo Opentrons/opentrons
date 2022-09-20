@@ -15,7 +15,7 @@ from opentrons.protocol_engine.commands.command import (
 )
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.execution import MovementHandler
+    from opentrons.protocol_engine.execution import MovementHandler, SavedPositionData
     from opentrons.protocol_engine.state.state import StateView
 
 
@@ -49,10 +49,9 @@ class MoveToLocationParams(PipetteIdMixin):
 class MoveToLocationResult(BaseModel):
     """Result data from the execution of a CalibrationSetUpPosition command."""
 
-    position: DeckPoint = Field(
+    position: SavedPositionData = Field(
         ..., description="Deck Point position after the move command has been executed"
     )
-    positionId: str = Field(..., description="Deck Point position id")
 
 
 class MoveToLocationImplementation(
