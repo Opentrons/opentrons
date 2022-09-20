@@ -55,26 +55,15 @@ all: clean wheel
 
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
-
-.PHONY: setup-ot2
-setup-ot2:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip uninstall -y opentrons_hardware
-	$(pipenv) run pip freeze
+	@echo This target is deprecated. Use environments instead
 
 .PHONY: clean
 clean:
 	$(clean_cmd)
 
-.PHONY: teardown
-teardown:
-	$(pipenv) --rm
-
 $(wheel_file): setup.py $(ot_sources)
 	$(clean_cmd)
-	$(python) setup.py $(wheel_opts) bdist_wheel --universal
+	$(call python,ot-2) setup.py $(wheel_opts) bdist_wheel --universal
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -83,7 +72,7 @@ wheel: $(wheel_file)
 
 $(sdist_file): setup.py $(ot_sources)
 	$(clean_cmd)
-	$(python) setup.py sdist
+	$(call python,ot-3/robot-server) setup.py sdist
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -92,30 +81,33 @@ sdist: $(sdist_file)
 
 .PHONY: test
 test:
-	$(pytest) $(tests) $(test_opts)
+	$(call pytest,ot-3/robot-server) $(tests) $(test_opts)
+	$(call pytest,ot-2) $(tests) $(test_opts)
 
 .PHONY: test-cov
 test-cov:
-	$(pytest) $(tests) $(test_opts) $(cov_opts)
+	$(call pytest,ot-2) $(tests) $(test_opts) $(cov_opts)
+	$(call pytest,ot-3/robot-server) $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: lint
 lint: $(ot_py_sources)
-	$(python) -m mypy $(SRC_PATH) $(tests)
-	$(python) -m black --check notify_server tests setup.py
-	$(python) -m flake8 $(SRC_PATH) $(tests)
+	$(call python,ot-2) -m mypy $(SRC_PATH) $(tests)
+	$(call python,ot-3/robot-server) -m mypy $(SRC_PATH) $(tests)
+	$(call python,dev) -m black --check notify_server tests setup.py
+	$(call python,dev) -m flake8 $(SRC_PATH) $(tests)
 
 .PHONY: format
 format:
-	$(python) -m black notify_server tests setup.py
+	$(call python,dev) -m black notify_server tests setup.py
 
 .PHONY: dev
 dev: export OT_NOTIFY_SERVER_PRODUCTION := 0
 dev:
-	$(python) -m notify_server.main
+	$(call python,ot-2) -m notify_server.main
 
 .PHONY: local-shell
 local-shell:
-	$(python) shell
+	$(call python,dev) shell
 
 .PHONY: push
 push: wheel
