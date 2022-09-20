@@ -263,7 +263,7 @@ def create_gripper_jaw_home_group() -> MoveGroup:
     return move_group
 
 
-def create_gripper_jaw_move_group(encoder_position_um: int) -> MoveGroup:
+def create_gripper_jaw_hold_group(encoder_position_um: int) -> MoveGroup:
     step = create_gripper_jaw_step(
         duration=np.float64(GRIPPER_JAW_GRIP_TIME),
         duty_cycle=np.float32(0),

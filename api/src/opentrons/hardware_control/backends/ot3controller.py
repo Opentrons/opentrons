@@ -31,7 +31,7 @@ from .ot3utils import (
     sensor_node_for_mount,
     create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
-    create_gripper_jaw_move_group,
+    create_gripper_jaw_hold_group,
 )
 
 try:
@@ -366,11 +366,11 @@ class OT3Controller:
         runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
 
-    async def gripper_move_jaw(
+    async def gripper_hold_jaw(
         self,
         encoder_position_um: int,
     ) -> None:
-        move_group = create_gripper_jaw_move_group(encoder_position_um)
+        move_group = create_gripper_jaw_hold_group(encoder_position_um)
         runner = MoveGroupRunner(move_groups=[move_group])
         await runner.run(can_messenger=self._messenger)
 

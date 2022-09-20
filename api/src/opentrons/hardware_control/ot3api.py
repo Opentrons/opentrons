@@ -1014,7 +1014,7 @@ class OT3API(
                 > self._gripper_handler.gripper.config.jaw_sizes_um["max"]
             ):
                 raise ValueError("Setting gripper jaw width out of bounds")
-            await self._backend.gripper_move_jaw(
+            await self._backend.gripper_hold_jaw(
                 (
                     self._gripper_handler.gripper.config.jaw_sizes_um["max"]
                     - jaw_width_um

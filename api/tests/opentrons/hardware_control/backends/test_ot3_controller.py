@@ -423,7 +423,7 @@ async def test_gripper_grip(controller: OT3Controller, mock_move_group_run):
 
 async def test_gripper_jaw_width(controller: OT3Controller, mock_move_group_run):
     max_jaw_width = 134350
-    await controller.gripper_move_jaw(encoder_position_um=((max_jaw_width - 80000) / 2))
+    await controller.gripper_hold_jaw(encoder_position_um=((max_jaw_width - 80000) / 2))
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:

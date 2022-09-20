@@ -56,12 +56,14 @@ def prompt_int_input(prompt_name: str) -> int:
     except (ValueError, IndexError) as e:
         raise InvalidInput(e)
 
+
 def prompt_float_input(prompt_name: str) -> float:
     """Configure float intput."""
     try:
         return float(input(f"{prompt_name}: "))
     except ValueError as e:
         raise InvalidInput(e)
+
 
 def in_green(s: str) -> str:
     """Return string formatted in red."""

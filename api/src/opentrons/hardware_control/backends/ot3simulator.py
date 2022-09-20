@@ -26,7 +26,7 @@ from .ot3utils import (
     get_current_settings,
     node_to_axis,
     axis_to_node,
-    create_gripper_jaw_move_group,
+    create_gripper_jaw_hold_group,
     create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
 )
@@ -241,11 +241,11 @@ class OT3Simulator:
         """Move gripper outward."""
         _ = create_gripper_jaw_home_group()
 
-    async def gripper_move_jaw(
+    async def gripper_hold_jaw(
         self,
         encoder_position_um: int,
     ) -> None:
-        _ = create_gripper_jaw_move_group(encoder_position_um)
+        _ = create_gripper_jaw_hold_group(encoder_position_um)
 
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]
