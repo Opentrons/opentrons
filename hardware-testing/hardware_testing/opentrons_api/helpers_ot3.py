@@ -205,5 +205,5 @@ def get_endstop_position_ot3(api: ThreadManagedHardwareAPI, mount: OT3Mount) -> 
     return Point(
         x=api.config.carriage_offset[0] + mount_offset[0],
         y=api.config.carriage_offset[1] + mount_offset[1],
-        z=api.config.carriage_offset[2] + mount_offset[2]
+        z=api.config.carriage_offset[2] + mount_offset[2],
     )

@@ -9,7 +9,7 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     GantryLoadSettings,
     set_gantry_load_per_axis_settings_ot3,
     home_ot3,
-    get_endstop_position_ot3
+    get_endstop_position_ot3,
 )
 
 MOUNT = OT3Mount.LEFT
@@ -73,13 +73,15 @@ async def _find_home_switch(api: ThreadManagedHardwareAPI, axis: OT3Axis) -> Non
     # now move close, but don't touch
     await api.move_to(mount=MOUNT, abs_position=pos_not_touching)
     switches = await api.get_limit_switches()
-    assert switches[axis] is False, \
-        f"switch on axis {axis} is PRESSED when it should not be"
+    assert (
+        switches[axis] is False
+    ), f"switch on axis {axis} is PRESSED when it should not be"
     # finally, move so that we definitely are touching the switch
     await api.move_to(mount=MOUNT, abs_position=pos_touching)
     switches = await api.get_limit_switches()
-    assert switches[axis] is False, \
-        f"switch on axis {axis} is NOT pressed when it should be"
+    assert (
+        switches[axis] is False
+    ), f"switch on axis {axis} is NOT pressed when it should be"
 
 
 async def _main(api: ThreadManagedHardwareAPI) -> None:
