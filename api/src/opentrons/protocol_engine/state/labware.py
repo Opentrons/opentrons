@@ -230,7 +230,6 @@ class LabwareView(HasState[LabwareState]):
     def get_slot_center_position(self, slot: DeckSlotName) -> Point:
         """Get the (x, y, z) position of the center of the slot."""
         slot_def = self.get_slot_definition(slot)
-        print("slot def =", slot_def)
         position = slot_def["position"]
 
         return Point(
