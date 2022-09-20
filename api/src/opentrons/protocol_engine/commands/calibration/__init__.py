@@ -1,4 +1,4 @@
-"""Calibration Module protocol commands."""
+"""Calibration commands."""
 
 from .calibrate_pipette import (
     CalibratePipetteParams,
