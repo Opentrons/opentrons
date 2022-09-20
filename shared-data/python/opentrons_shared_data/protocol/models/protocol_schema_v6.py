@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Any, List, Optional, Dict
 from typing_extensions import Literal
 from enum import Enum
@@ -156,13 +156,73 @@ class ProtocolSchemaV6(BaseModel):
     robot: Robot
     pipettes: Dict[str, Pipette]
     labware: Dict[str, Labware]
-    labwareDefinitions: Dict[str, LabwareDefinition]
-    commands: List[Command]
     modules: Optional[Dict[str, Module]]
     liquids: Optional[Dict[str, Liquid]]
+    labwareDefinitions: Dict[str, LabwareDefinition]
+    # commands must be after pipettes, labware, etc. for its @validator to work.
+    commands: List[Command]
     commandAnnotations: Optional[List[CommandAnnotation]]
     designerApplication: Optional[DesignerApplication]
 
     class Config:
         # added for constructing the class with field name instead of alias
         allow_population_by_field_name = True
+
+    @validator("commands")
+    def _validate_commands(
+        cls,
+        value: List[Command],
+        values: Dict[str, Any],
+    ) -> List[Command]:
+        pipette_ids = set(values["pipettes"].keys()) if "pipettes" in values else set()
+        labware_ids = set(values["labware"].keys()) if "labware" in values else set()
+        module_ids = (
+            set(values["modules"].keys())
+            if "modules" in values and values["modules"]
+            else set()
+        )
+        liquid_ids = (
+            set(values["liquids"].keys())
+            if "liquids" in values and values["liquids"]
+            else set()
+        )
+
+        for index, command in enumerate(value):
+            if (
+                command.params.pipetteId is not None
+                and command.params.pipetteId not in pipette_ids
+            ):
+                raise ValueError(
+                    f"{command.commandType} command at index {index}"
+                    f" references ID {command.params.pipetteId},"
+                    f" which doesn't exist."
+                )
+            if (
+                command.params.labwareId is not None
+                and command.params.labwareId not in labware_ids
+            ):
+                raise ValueError(
+                    f"{command.commandType} command at index {index}"
+                    f" references ID {command.params.labwareId},"
+                    f" which doesn't exist."
+                )
+            if (
+                command.params.moduleId is not None
+                and command.params.moduleId not in module_ids
+            ):
+                raise ValueError(
+                    f"{command.commandType} command at index {index}"
+                    f" references ID {command.params.moduleId},"
+                    f" which doesn't exist."
+                )
+            if (
+                command.params.liquidId is not None
+                and command.params.liquidId not in liquid_ids
+            ):
+                raise ValueError(
+                    f"{command.commandType} command at index {index}"
+                    f" references ID {command.params.liquidId},"
+                    f" which doesn't exist."
+                )
+
+        return value
