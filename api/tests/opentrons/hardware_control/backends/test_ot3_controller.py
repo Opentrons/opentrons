@@ -423,11 +423,7 @@ async def test_gripper_grip(controller: OT3Controller, mock_move_group_run):
 
 async def test_get_limit_switches(controller: OT3Controller) -> None:
     assert controller._present_nodes == set()
-    fake_present_nodes = (
-        NodeId.gantry_x,
-        NodeId.gantry_y,
-    )
-
+    fake_present_nodes = {NodeId.gantry_x, NodeId.gantry_y}
     call_count = 0
     fake_response = {
         NodeId.gantry_x: UInt8Field(0),
@@ -448,6 +444,6 @@ async def test_get_limit_switches(controller: OT3Controller) -> None:
     ), patch.object(controller, "_present_nodes", fake_present_nodes):
         res = await controller.get_limit_switches()
         assert call_count == 1
-        assert passed_nodes == [NodeId.gantry_x, NodeId.gantry_y]
+        assert passed_nodes == {NodeId.gantry_x, NodeId.gantry_y}
         assert OT3Axis.X in res
         assert OT3Axis.Y in res

@@ -1,7 +1,7 @@
 """Utilities for reading the current status of the OT3 limit switches."""
 import asyncio
 import logging
-from typing import Dict, List, Callable
+from typing import Dict, Set, Callable
 
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings import ArbitrationId
@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 
 def _create_listener(
-    nodes: List[NodeId], event: asyncio.Event, responses: Dict[NodeId, UInt8Field]
+    nodes: Set[NodeId], event: asyncio.Event, responses: Dict[NodeId, UInt8Field]
 ) -> Callable[[MessageDefinition, ArbitrationId], None]:
     def _listener(message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
         try:
@@ -45,7 +45,7 @@ def _create_listener(
 
 
 async def get_limit_switches(
-    can_messenger: CanMessenger, nodes: List[NodeId]
+    can_messenger: CanMessenger, nodes: Set[NodeId]
 ) -> Dict[NodeId, UInt8Field]:
     """Get state of limit switches for each node."""
     event = asyncio.Event()

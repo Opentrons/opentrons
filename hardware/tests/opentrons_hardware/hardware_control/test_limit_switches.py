@@ -73,7 +73,7 @@ async def test_get_limit_switch_states(mock_can_messenger: AsyncMock) -> None:
     """Test that if the exact specified nodes exist, getting limit switch statuses works."""
     _ = MockStatusResponder(mock_can_messenger, [NodeId.gantry_x.value])
     switch_states = await asyncio.wait_for(
-        get_limit_switches(mock_can_messenger, [NodeId.gantry_x]), 2.0
+        get_limit_switches(mock_can_messenger, {NodeId.gantry_x}), 2.0
     )
     assert switch_states == {NodeId.gantry_x: utils.UInt8Field(0)}
 
@@ -97,7 +97,7 @@ async def test_completes_more_than_expected(mock_can_messenger: AsyncMock) -> No
         mock_can_messenger, [NodeId.gantry_y.value, NodeId.gantry_x.value]
     )
     switch_states = await asyncio.wait_for(
-        get_limit_switches(mock_can_messenger, [NodeId.gantry_x]), 2.0
+        get_limit_switches(mock_can_messenger, {NodeId.gantry_x}), 2.0
     )
     assert switch_states == {NodeId.gantry_x: utils.UInt8Field(0)}
 
@@ -107,7 +107,7 @@ async def test_handles_bad_node_ids(mock_can_messenger: AsyncMock) -> None:
     _ = MockStatusResponder(mock_can_messenger, [0x01, NodeId.gantry_x.value])
     # same deal with the timeout
     switch_states = await asyncio.wait_for(
-        get_limit_switches(mock_can_messenger, [NodeId.gantry_x]), 2.0
+        get_limit_switches(mock_can_messenger, {NodeId.gantry_x}), 2.0
     )
     # we should get everything we prepped the network with and ignore the bad values
     assert switch_states == {NodeId.gantry_x: utils.UInt8Field(0)}
