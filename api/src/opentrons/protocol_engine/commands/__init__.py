@@ -348,6 +348,6 @@ __all__ = [
     "magnetic_module",
     "temperature_module",
     "thermocycler",
-    # calibration module command bundles
+    # calibration command bundle
     "calibration",
 ]
