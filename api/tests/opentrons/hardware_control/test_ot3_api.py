@@ -411,6 +411,10 @@ async def test_gripper_action(
     await ot3_hardware.ungrip()
     mock_ungrip.assert_called_once()
 
+    with pytest.raises(ValueError, match="Setting gripper jaw width out of bounds"):
+        await ot3_hardware.hold_jaw_width(200)
+    mock_hold_jaw_width.reset_mock()
+
     await ot3_hardware.hold_jaw_width(80)
     mock_hold_jaw_width.assert_called_once()
 
