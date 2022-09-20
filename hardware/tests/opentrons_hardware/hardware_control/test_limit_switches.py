@@ -75,7 +75,7 @@ async def test_get_limit_switch_states(mock_can_messenger: AsyncMock) -> None:
     switch_states = await asyncio.wait_for(
         get_limit_switches(mock_can_messenger, {NodeId.gantry_x}), 2.0
     )
-    assert switch_states == {NodeId.gantry_x: utils.UInt8Field(0)}
+    assert switch_states == {NodeId.gantry_x: 0}
 
     # We should have sent a request
     mock_can_messenger.send.assert_called_once_with(
@@ -99,7 +99,7 @@ async def test_completes_more_than_expected(mock_can_messenger: AsyncMock) -> No
     switch_states = await asyncio.wait_for(
         get_limit_switches(mock_can_messenger, {NodeId.gantry_x}), 2.0
     )
-    assert switch_states == {NodeId.gantry_x: utils.UInt8Field(0)}
+    assert switch_states == {NodeId.gantry_x: 0}
 
 
 async def test_handles_bad_node_ids(mock_can_messenger: AsyncMock) -> None:
@@ -110,4 +110,4 @@ async def test_handles_bad_node_ids(mock_can_messenger: AsyncMock) -> None:
         get_limit_switches(mock_can_messenger, {NodeId.gantry_x}), 2.0
     )
     # we should get everything we prepped the network with and ignore the bad values
-    assert switch_states == {NodeId.gantry_x: utils.UInt8Field(0)}
+    assert switch_states == {NodeId.gantry_x: 0}

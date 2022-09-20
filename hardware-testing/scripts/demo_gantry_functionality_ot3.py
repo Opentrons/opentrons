@@ -64,17 +64,19 @@ def _create_relative_point(axis: OT3Axis, distance: float) -> Point:
     raise ValueError(f"Unexpected axis: {axis}")
 
 
-async def _safe_home(api: ThreadManagedHardwareAPI, offset: Point):
+async def _safe_home(api: ThreadManagedHardwareAPI, offset: Point) -> None:
     await home_ot3(api)
     await api.move_rel(mount=MOUNT, delta=Point(y=offset.y))
     await api.move_rel(mount=MOUNT, delta=Point(x=offset.x))
 
 
-async def _test_encoder(api: ThreadManagedHardwareAPI, axis: OT3Axis, distance: float = -10) -> None:
+async def _test_encoder(
+    api: ThreadManagedHardwareAPI, axis: OT3Axis, distance: float = -10
+) -> None:
     pos_start = await api.current_position(mount=MOUNT, refresh=True)
     enc_start = await api.encoder_current_position(mount=MOUNT, refresh=True)
     rel_pnt = _create_relative_point(axis, distance)
-    input('ready?')
+    input("ready?")
     await api.move_rel(mount=MOUNT, delta=rel_pnt)
     pos_end = await api.current_position_ot3(mount=MOUNT, refresh=True)
     enc_end = await api.encoder_current_position(mount=MOUNT, refresh=True)
@@ -82,8 +84,9 @@ async def _test_encoder(api: ThreadManagedHardwareAPI, axis: OT3Axis, distance: 
     print(f"Encoder:\n\tstart={enc_start}\n\tend={enc_end}")
 
 
-async def _test_limit_switch(api: ThreadManagedHardwareAPI, axis: OT3Axis, tolerance: float = 0.5) -> None:
-
+async def _test_limit_switch(
+    api: ThreadManagedHardwareAPI, axis: OT3Axis, tolerance: float = 0.5
+) -> None:
     def _points_before_after_switch(tolerance_delta: Point) -> Tuple[Point, Point]:
         endstop_pos = get_endstop_position_ot3(api, mount=MOUNT)
         pos_not_touching = endstop_pos - tolerance_delta
@@ -95,13 +98,15 @@ async def _test_limit_switch(api: ThreadManagedHardwareAPI, axis: OT3Axis, toler
     # now move close, but don't touch
     await api.move_to(mount=MOUNT, abs_position=poses[0])
     switches = await api.get_limit_switches()
-    assert switches[axis] is False, \
-        f"switch on axis {axis} is PRESSED when it should not be"
+    assert (
+        switches[axis] is False
+    ), f"switch on axis {axis} is PRESSED when it should not be"
     # finally, move so that we definitely are touching the switch
     await api.move_to(mount=MOUNT, abs_position=poses[1])
     switches = await api.get_limit_switches()
-    assert switches[axis] is True, \
-        f"switch on axis {axis} is NOT pressed when it should be"
+    assert (
+        switches[axis] is True
+    ), f"switch on axis {axis} is NOT pressed when it should be"
 
 
 async def _main(api: ThreadManagedHardwareAPI) -> None:
@@ -116,9 +121,9 @@ async def _main(api: ThreadManagedHardwareAPI) -> None:
     await _test_limit_switch(api, axis=OT3Axis.X)
 
     await api.disengage_axes([OT3Axis.X, OT3Axis.Y])
-    input('ENTER to re-engage')
+    input("ENTER to re-engage")
     await api.engage_axes([OT3Axis.X, OT3Axis.Y])
-    input('ENTER to home')
+    input("ENTER to home")
     await _safe_home(api, safe_home_offset)
 
 

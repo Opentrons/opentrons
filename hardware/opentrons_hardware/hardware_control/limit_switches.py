@@ -10,7 +10,6 @@ from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ReadLimitSwitchRequest,
 )
-from opentrons_hardware.firmware_bindings.utils import UInt8Field
 from opentrons_hardware.firmware_bindings.constants import NodeId
 
 log = logging.getLogger(__name__)
