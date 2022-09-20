@@ -1,7 +1,7 @@
 """Tests for the move scheduler."""
 import pytest
 from typing import List, Any, Tuple
-from numpy import float64
+from numpy import float64, float32, int32
 from mock import AsyncMock, call, MagicMock
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
@@ -26,6 +26,7 @@ from opentrons_hardware.hardware_control.constants import (
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
+    MoveGroupSingleGripperStep,
     MoveType,
     MoveStopCondition,
 )
@@ -85,6 +86,49 @@ def move_group_single() -> MoveGroups:
                 )
             }
         ]
+    ]
+
+
+@pytest.fixture
+def move_group_gripper_multiple() -> MoveGroups:
+    """Collection of gripper moves."""
+    return [
+        # Group 0 home
+        [
+            {
+                NodeId.gripper_g: MoveGroupSingleGripperStep(
+                    duration_sec=float64(1),
+                    pwm_duty_cycle=float32(50),
+                    encoder_position_um=int32(0),
+                    stop_condition=MoveStopCondition.limit_switch,
+                    move_type=MoveType.home,
+                ),
+            }
+        ],
+        # group 1 grip
+        [
+            {
+                NodeId.gripper_g: MoveGroupSingleGripperStep(
+                    duration_sec=float64(1),
+                    pwm_duty_cycle=float32(50),
+                    encoder_position_um=int32(0),
+                    stop_condition=MoveStopCondition.gripper_force,
+                    move_type=MoveType.grip,
+                ),
+            }
+        ],
+        # group 3 linear
+        [
+            {
+                NodeId.gripper_g: MoveGroupSingleGripperStep(
+                    duration_sec=float64(1),
+                    pwm_duty_cycle=float32(50),
+                    encoder_position_um=int32(80000),
+                    stop_condition=MoveStopCondition.encoder_position,
+                    move_type=MoveType.linear,
+                ),
+            }
+        ],
     ]
 
 
@@ -382,6 +426,52 @@ class MockSendMoveCompleter:
                     self._listener(md.MoveCompleted(payload=payload), arbitration_id)
 
 
+class MockGripperSendMoveCompleter:
+    """Side effect mock of CanMessenger.send that immediately completes moves."""
+
+    def __init__(
+        self,
+        move_groups: MoveGroups,
+        listener: MessageListenerCallback,
+        start_at_index: int = 0,
+    ) -> None:
+        """Constructor."""
+        self._move_groups = move_groups
+        self._listener = listener
+        self._start_at_index = start_at_index
+
+    @property
+    def groups(self) -> MoveGroups:
+        """Retrieve the groups, for instance from a child class."""
+        return self._move_groups
+
+    async def mock_send(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+    ) -> None:
+        """Mock send function."""
+        if isinstance(message, md.ExecuteMoveGroupRequest):
+            # Iterate through each move in each sequence and send a move
+            # completed for it.
+            for seq_id, moves in enumerate(
+                self._move_groups[message.payload.group_id.value - self._start_at_index]
+            ):
+                for node, move in moves.items():
+                    assert isinstance(move, MoveGroupSingleGripperStep)
+                    payload = MoveCompletedPayload(
+                        group_id=message.payload.group_id,
+                        seq_id=UInt8Field(seq_id),
+                        current_position_um=UInt32Field(int(0)),
+                        encoder_position_um=Int32Field(int(0)),
+                        ack_id=UInt8Field(1),
+                    )
+                    arbitration_id = ArbitrationId(
+                        parts=ArbitrationIdParts(originating_node_id=node)
+                    )
+                    self._listener(md.MoveCompleted(payload=payload), arbitration_id)
+
+
 async def test_single_move(
     mock_can_messenger: AsyncMock, move_group_single: MoveGroups
 ) -> None:
@@ -458,6 +548,52 @@ async def test_multi_group_move(
     assert position[2][1].payload.current_position_um.value == 25000
     assert position[3][1].payload.current_position_um.value == 12000
     assert position[4][1].payload.current_position_um.value == 12000
+
+
+async def test_multi_gripper_group_move(
+    mock_can_messenger: AsyncMock, move_group_gripper_multiple: MoveGroups
+) -> None:
+    """It should start next group once the prior has completed."""
+    subject = MoveScheduler(move_groups=move_group_gripper_multiple)
+    mock_sender = MockGripperSendMoveCompleter(move_group_gripper_multiple, subject)
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    position = await subject.run(can_messenger=mock_can_messenger)
+
+    mock_can_messenger.send.assert_has_calls(
+        calls=[
+            call(
+                node_id=NodeId.broadcast,
+                message=md.ExecuteMoveGroupRequest(
+                    payload=ExecuteMoveGroupRequestPayload(
+                        group_id=UInt8Field(0),
+                        cancel_trigger=UInt8Field(0),
+                        start_trigger=UInt8Field(0),
+                    )
+                ),
+            ),
+            call(
+                node_id=NodeId.broadcast,
+                message=md.ExecuteMoveGroupRequest(
+                    payload=ExecuteMoveGroupRequestPayload(
+                        group_id=UInt8Field(1),
+                        cancel_trigger=UInt8Field(0),
+                        start_trigger=UInt8Field(0),
+                    )
+                ),
+            ),
+            call(
+                node_id=NodeId.broadcast,
+                message=md.ExecuteMoveGroupRequest(
+                    payload=ExecuteMoveGroupRequestPayload(
+                        group_id=UInt8Field(2),
+                        cancel_trigger=UInt8Field(0),
+                        start_trigger=UInt8Field(0),
+                    )
+                ),
+            ),
+        ]
+    )
+    assert len(position) == 3
 
 
 def _build_arb(from_node: NodeId) -> ArbitrationId:
