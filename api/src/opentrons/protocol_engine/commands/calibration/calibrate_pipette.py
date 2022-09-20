@@ -16,7 +16,7 @@ from opentrons.hardware_control import ot3_calibration as calibration
 from opentrons.hardware_control.types import OT3Mount
 from opentrons.types import Point
 
-CalibratePipetteCommandType = Literal["calibratePipette"]
+CalibratePipetteCommandType = Literal["calibration/calibratePipette"]
 
 
 class CalibratePipetteParams(BaseModel):
@@ -29,10 +29,6 @@ class CalibratePipetteResult(BaseModel):
     """Result data from the execution of a calibrate-pipette command."""
 
     pipetteOffset: Point = Field(..., description="Offset of calibrated pipette.")
-    errors: Optional[List[ErrorOccurrence]] = Field(
-        default_factory=None,
-        description="Errors raised from calibrate-pipette command.",
-    )
 
 
 class CalibratePipetteImplementation(
@@ -61,7 +57,7 @@ class CalibratePipetteImplementation(
 class CalibratePipette(BaseCommand[CalibratePipetteParams, CalibratePipetteResult]):
     """Calibrate-pipette command model."""
 
-    commandType: CalibratePipetteCommandType = "calibratePipette"
+    commandType: CalibratePipetteCommandType = "calibration/calibratePipette"
     params: CalibratePipetteParams
     result: Optional[CalibratePipetteResult]
 
@@ -73,7 +69,7 @@ class CalibratePipette(BaseCommand[CalibratePipetteParams, CalibratePipetteResul
 class CalibratePipetteCreate(BaseCommandCreate[CalibratePipetteParams]):
     """Create calibrate-pipette command request model."""
 
-    commandType: CalibratePipetteCommandType = "calibratePipette"
+    commandType: CalibratePipetteCommandType = "calibration/calibratePipette"
     params: CalibratePipetteParams
 
     _CommandCls: Type[CalibratePipette] = CalibratePipette
