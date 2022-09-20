@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Optional, Union, List, Dict, Any, NamedTuple
 from typing_extensions import Literal, TypeGuard
 
@@ -337,13 +337,22 @@ class LoadedLabware(BaseModel):
     )
 
 
+class HexColor(BaseModel):
+    """Hex color representation."""
+    color: str
+
+    @validator('color')
+    def color_is_a_valid_hex(cls, v):
+        pass
+
+
 class Liquid(BaseModel):
     """Payload required to create a liquid."""
 
     id: str
     displayName: str
     description: str
-    displayColor: Optional[str]
+    displayColor: Optional[HexColor]
 
 
 class SpeedRange(NamedTuple):
