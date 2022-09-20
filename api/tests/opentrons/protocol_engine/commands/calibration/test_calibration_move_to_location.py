@@ -6,54 +6,19 @@ import mock
 from opentrons.protocol_engine.commands.calibration.move_to_location import (
     MoveToLocationParams,
     MoveToLocationImplementation,
-    MoveToLocationResult,
-<<<<<<< HEAD
     CalibrationPositions,
 )
 from opentrons.protocol_engine.execution import MovementHandler, SavedPositionData
 from opentrons.protocol_engine.state import StateView
-from opentrons.protocol_engine.types import DeckPoint
 from opentrons.types import DeckSlotName, Point
-
-
-probe_position = SavedPositionData(
-    positionId="probe_position", position=DeckPoint(x=4, y=5, z=6)
-)
-attach_or_detach = SavedPositionData(
-    positionId="attach_position", position=DeckPoint(x=1, y=2, z=3)
-)
-=======
-)
-from opentrons.protocol_engine.execution import MovementHandler
-from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.types import DeckPoint
-from opentrons.types import DeckSlotName, Point, CalibrationPositions
-
-
-probe_position = DeckPoint(x=4, y=5, z=6)
-attach_or_detach = DeckPoint(x=1, y=2, z=3)
->>>>>>> 95996d6e1 (still need to add result)
-
-
-def mock_deck_slot_center(slot_name: DeckSlotName) -> Point:
-    """Return a point value for each deck slot input."""
-    if slot_name == DeckSlotName.SLOT_2:
-        return Point(1, 2, 3)
-    elif slot_name == DeckSlotName.SLOT_5:
-        return Point(4, 5, 6)
-    else:
-        return Point(7, 8, 9)
 
 
 @pytest.mark.parametrize(
-<<<<<<< HEAD
-    argnames=["slot_name", "movement_result"],
-=======
-    argnames=["slot_name", "movement_coordinates"],
->>>>>>> 95996d6e1 (still need to add result)
+    argnames=["slot_name"],
     argvalues=[
-        [CalibrationPositions.probe_position, probe_position],
-        [CalibrationPositions.attach_or_detach, attach_or_detach],
+        [CalibrationPositions.probePosition],
+        [CalibrationPositions.attachOrDetach],
     ],
 )
 async def test_calibration_set_up_position_implementation(
@@ -61,44 +26,67 @@ async def test_calibration_set_up_position_implementation(
     state_view: StateView,
     movement: MovementHandler,
     slot_name: CalibrationPositions,
-<<<<<<< HEAD
-    movement_result: SavedPositionData,
-=======
-    movement_coordinates: DeckPoint,
->>>>>>> 95996d6e1 (still need to add result)
 ) -> None:
     """Command should get a Point value for a given deck slot center and \
         call Movement.move_to_coordinates with the correct input."""
-    subject = MoveToLocationImplementation(state_view=state_view, movement=movement)
+    probe_position = SavedPositionData(
+        positionId="probe_position", position=DeckPoint(x=4, y=5, z=3)
+    )
+    attach_or_detach = SavedPositionData(
+        positionId="attach_position",
+        position=DeckPoint(x=1, y=2, z=10),
+    )
+
+    def movement_coordinate(slot: CalibrationPositions) -> SavedPositionData:
+        if slot == CalibrationPositions.probePosition:
+            return probe_position
+        else:
+            return attach_or_detach
+
+    async def mock_save_position(
+        pipette_id: str,
+        position_id: str,
+    ) -> SavedPositionData:
+        """Return a SavedPositionData object."""
+        if position_id == "probe_position":
+            return probe_position
+        else:
+            return attach_or_detach
+
+    def mock_get_slot_center(slot_name: DeckSlotName) -> Point:
+        """Return a Point object to act as slot center position."""
+        if slot_name == DeckSlotName.SLOT_2:
+            return Point(x=1, y=2, z=10)
+        elif slot_name == DeckSlotName.SLOT_5:
+            return Point(x=4, y=5, z=6)
+        else:
+            return Point(x=7, y=8, z=9)
 
     params = MoveToLocationParams(
         pipetteId="pipette-id",
-        slot_name=slot_name,
+        deckSlot=slot_name,
     )
-<<<<<<< HEAD
+    with mock.patch.object(movement, "save_position", mock_save_position):
+        with mock.patch.object(
+            state_view.labware, "get_slot_center_position", mock_get_slot_center
+        ):
+            subject = MoveToLocationImplementation(
+                state_view=state_view, movement=movement
+            )
+            result = await subject.execute(params=params)
 
-=======
->>>>>>> 95996d6e1 (still need to add result)
-    with mock.patch.object(
-        state_view.labware, "get_slot_center_position", new=mock_deck_slot_center
-    ):
-        result = await subject.execute(params=params)
-
-<<<<<<< HEAD
-    assert result == MoveToLocationResult(position=movement_result)
-=======
-    assert result == MoveToLocationResult()
->>>>>>> 95996d6e1 (still need to add result)
+    assert result
+    movement_result = DeckPoint(
+        x=movement_coordinate(slot_name).position.x + slot_name.offset.x,
+        y=movement_coordinate(slot_name).position.y + slot_name.offset.y,
+        z=movement_coordinate(slot_name).position.z,
+    )
 
     decoy.verify(
         await movement.move_to_coordinates(
             pipette_id="pipette-id",
-<<<<<<< HEAD
-            deck_coordinates=movement_result.position,
-=======
-            deck_coordinates=movement_coordinates,
->>>>>>> 95996d6e1 (still need to add result)
+            deck_coordinates=movement_result,
             direct=True,
-            additional_min_travel_z=0,
+            additional_min_travel_z=None,
         )
     )

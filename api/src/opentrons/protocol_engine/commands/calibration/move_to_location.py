@@ -1,54 +1,47 @@
 """Calibration Move To Location command payload, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel, Field
-<<<<<<< HEAD
 from typing import TYPE_CHECKING, Type, Optional
 from typing_extensions import Literal
 from enum import Enum
-=======
-from typing import TYPE_CHECKING, Type
-from typing_extensions import Literal
->>>>>>> 95996d6e1 (still need to add result)
 
 from opentrons.protocol_engine.commands.pipetting_common import PipetteIdMixin
+from opentrons.protocol_engine.types import DeckPoint
+from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
 )
-<<<<<<< HEAD
-from opentrons.types import DeckSlotName
-from opentrons.protocol_engine.types import DeckPoint
-
-if TYPE_CHECKING:
-    from opentrons.protocol_engine.execution import MovementHandler, SavedPositionData
-=======
-from opentrons.protocol_engine.types import DeckPoint
-from opentrons.types import CalibrationPositions
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import MovementHandler
->>>>>>> 95996d6e1 (still need to add result)
     from opentrons.protocol_engine.state.state import StateView
 
-MoveToLocationCommandType = Literal["MoveToLocation"]
+
+MoveToLocationCommandType = Literal["calibration/moveToLocation"]
 
 
-<<<<<<< HEAD
-class CalibrationPositions(DeckSlotName, Enum):
+class CalibrationPositions(str, Enum):
     """Deck slot to move to."""
 
-    probe_position = DeckSlotName.SLOT_5
-    attach_or_detach = DeckSlotName.SLOT_2
+    probePosition = "probePosition"
+    attachOrDetach = "attachOrDetach"
+
+    @property
+    def offset(self) -> DeckPoint:
+        """Return offset values for the given position."""
+        if self.value == "probePosition":
+            return DeckPoint(x=10, y=0, z=3)
+        else:
+            return DeckPoint(x=0, y=0, z=0)
 
 
-=======
->>>>>>> 95996d6e1 (still need to add result)
 class MoveToLocationParams(PipetteIdMixin):
     """Calibration set up position command parameters."""
 
-    slot_name: CalibrationPositions = Field(
-        CalibrationPositions.probe_position,
+    deckSlot: CalibrationPositions = Field(
+        ...,
         description="Slot location to move to before starting calibration.",
     )
 
@@ -56,13 +49,10 @@ class MoveToLocationParams(PipetteIdMixin):
 class MoveToLocationResult(BaseModel):
     """Result data from the execution of a CalibrationSetUpPosition command."""
 
-<<<<<<< HEAD
-    position: SavedPositionData = Field(
+    position: DeckPoint = Field(
         ..., description="Deck Point position after the move command has been executed"
     )
-=======
-    pass
->>>>>>> 95996d6e1 (still need to add result)
+    positionId: str = Field(..., description="Deck Point position id")
 
 
 class MoveToLocationImplementation(
@@ -78,43 +68,46 @@ class MoveToLocationImplementation(
 
     async def execute(self, params: MoveToLocationParams) -> MoveToLocationResult:
         """Move the requested pipette to a given deck slot."""
-        slot_center = self._state_view.labware.get_slot_center_position(
-            params.slot_name
+        offset = params.deckSlot.offset
+        if params.deckSlot == CalibrationPositions.probePosition:
+            deck_center = self._state_view.labware.get_slot_center_position(
+                DeckSlotName.SLOT_5
+            )
+            z_position = offset.z
+        else:
+            deck_center = self._state_view.labware.get_slot_center_position(
+                DeckSlotName.SLOT_2
+            )
+            current_position = await self._movement.save_position(
+                pipette_id=params.pipetteId, position_id="slot 2"
+            )
+            z_position = current_position.position.z
+        destination = DeckPoint(
+            x=deck_center.x + offset.x, y=deck_center.y + offset.y, z=z_position
         )
 
-        # slot center deck has 3mm safety margin
-        slot_center_deck = DeckPoint(
-            x=slot_center.x, y=slot_center.y, z=slot_center.z + 3
-        )
         await self._movement.move_to_coordinates(
             pipette_id=params.pipetteId,
-            deck_coordinates=slot_center_deck,
+            deck_coordinates=destination,
             direct=True,
-<<<<<<< HEAD
             additional_min_travel_z=None,
         )
 
         new_position = await self._movement.save_position(
-            pipette_id=params.pipetteId, position_id="CalibrationPosition"
+            pipette_id=params.pipetteId, position_id=str(params.deckSlot.name)
         )
 
-        return MoveToLocationResult(position=new_position)
-=======
-            additional_min_travel_z=0,
+        return MoveToLocationResult(
+            position=new_position.position, positionId=new_position.positionId
         )
-        return MoveToLocationResult()
->>>>>>> 95996d6e1 (still need to add result)
 
 
 class MoveToLocation(BaseCommand[MoveToLocationParams, MoveToLocationResult]):
     """Calibration set up position command model."""
 
-    commandType: MoveToLocationCommandType = "MoveToLocation"
+    commandType: MoveToLocationCommandType = "calibration/moveToLocation"
     params: MoveToLocationParams
-<<<<<<< HEAD
     result: Optional[MoveToLocationResult]
-=======
->>>>>>> 95996d6e1 (still need to add result)
 
     _ImplementationCls: Type[
         MoveToLocationImplementation
@@ -124,7 +117,7 @@ class MoveToLocation(BaseCommand[MoveToLocationParams, MoveToLocationResult]):
 class MoveToLocationCreate(BaseCommandCreate[MoveToLocationParams]):
     """Calibration set up position command creation request model."""
 
-    commandType: MoveToLocationCommandType = "MoveToLocation"
+    commandType: MoveToLocationCommandType = "calibration/moveToLocation"
     params: MoveToLocationParams
 
     _CommandCls: Type[MoveToLocation] = MoveToLocation
