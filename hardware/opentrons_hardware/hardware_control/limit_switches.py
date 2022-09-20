@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 
 def _create_listener(
-    nodes: Set[NodeId], event: asyncio.Event, responses: Dict[NodeId, UInt8Field]
+    nodes: Set[NodeId], event: asyncio.Event, responses: Dict[NodeId, int]
 ) -> Callable[[MessageDefinition, ArbitrationId], None]:
     def _listener(message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
         try:
@@ -37,7 +37,7 @@ def _create_listener(
         if message.message_id != MessageId.limit_sw_response:
             log.warning(f"unexpected message id: 0x{message.message_id:x}")
             return
-        responses[originator] = message.payload.switch_status
+        responses[originator] = message.payload.switch_status.value
         if len(responses) == len(nodes):
             event.set()
 
@@ -46,10 +46,10 @@ def _create_listener(
 
 async def get_limit_switches(
     can_messenger: CanMessenger, nodes: Set[NodeId]
-) -> Dict[NodeId, UInt8Field]:
+) -> Dict[NodeId, int]:
     """Get state of limit switches for each node."""
     event = asyncio.Event()
-    responses: Dict[NodeId, UInt8Field] = dict()
+    responses: Dict[NodeId, int] = dict()
     listener = _create_listener(nodes, event, responses)
     can_messenger.add_listener(listener)
     for node in nodes:
