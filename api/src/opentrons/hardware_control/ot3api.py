@@ -1009,17 +1009,20 @@ class OT3API(
         jaw_width_um = jaw_width_mm * 1000
         try:
             if (
-                jaw_width_um < self._gripper_handler.gripper.config.jaw_sizes_um["min"]
+                jaw_width_um
+                < self._gripper_handler.get_gripper().config.jaw_sizes_um["min"]
                 or jaw_width_um
-                > self._gripper_handler.gripper.config.jaw_sizes_um["max"]
+                > self._gripper_handler.get_gripper().config.jaw_sizes_um["max"]
             ):
                 raise ValueError("Setting gripper jaw width out of bounds")
             await self._backend.gripper_hold_jaw(
-                (
-                    self._gripper_handler.gripper.config.jaw_sizes_um["max"]
-                    - jaw_width_um
+                int(
+                    (
+                        self._gripper_handler.get_gripper().config.jaw_sizes_um["max"]
+                        - jaw_width_um
+                    )
+                    / 2
                 )
-                / 2
             )
         except Exception:
             self._log.exception("Gripper set width failed")
