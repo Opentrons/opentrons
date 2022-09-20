@@ -1,5 +1,6 @@
 """Public protocol engine value types and models."""
 from __future__ import annotations
+import re
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
@@ -343,7 +344,10 @@ class HexColor(BaseModel):
 
     @validator('color')
     def color_is_a_valid_hex(cls, v):
-        pass
+        print(v)
+        match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', v)
+        if not match:
+            raise ValueError("Color is not a valid hex color.")
 
 
 class Liquid(BaseModel):
