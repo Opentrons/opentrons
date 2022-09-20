@@ -47,6 +47,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
     Coordinates,
 )
 
+from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
 from opentrons_hardware.hardware_control.network import probe
 from opentrons_hardware.hardware_control.current_settings import (
     set_run_current,
@@ -439,6 +440,26 @@ class OT3Controller:
         for mount in current_tools.keys():
             self._present_nodes.add(axis_to_node(OT3Axis.of_main_tool_actuator(mount)))
         return current_tools
+
+    async def get_limit_switches(self) -> OT3AxisMap[bool]:
+        """Get the state of the gantry's limit switches on each axis."""
+        nodes_with_limit_switches = [
+            OT3Axis.X, OT3Axis.Y,                   # gantry XY
+            OT3Axis.Z_L, OT3Axis.Z_R,               # gantry Z
+            OT3Axis.Z_G, OT3Axis.G,                 # gripper
+            OT3Axis.P_L, OT3Axis.P_R, OT3Axis.Q     # pipettes
+        ]
+        switch_nodes = [
+            axis_to_node(ax)
+            for ax in nodes_with_limit_switches
+            if self._axis_is_present(ax)
+        ]
+        assert switch_nodes, "No nodes available to read limit switch status from"
+        res = await get_limit_switches(self._messenger, switch_nodes)
+        return {
+            node_to_axis(node): bool(val)  # TODO: double check polarity is correct
+            for node, val in res.items()
+        }
 
     async def set_default_currents(self) -> None:
         """Set both run and hold currents from robot config to each node."""
