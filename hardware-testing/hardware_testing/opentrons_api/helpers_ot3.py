@@ -190,3 +190,20 @@ async def home_ot3(
         set_gantry_load_per_axis_motion_settings_ot3(
             api, ax, max_speed_discontinuity=val
         )
+
+
+def get_endstop_position_ot3(api: ThreadManagedHardwareAPI, mount: OT3Mount) -> Point:
+    """Get the endstop's position per mount."""
+    if mount == OT3Mount.LEFT:
+        mount_offset = api.config.left_mount_offset
+    elif mount == OT3Mount.RIGHT:
+        mount_offset = api.config.right_mount_offset
+    elif mount == OT3Mount.GRIPPER:
+        mount_offset = api.config.gripper_mount_offset
+    else:
+        raise ValueError(f"Unexpected mount type: {mount}")
+    return Point(
+        x=api.config.carriage_offset[0] + mount_offset[0],
+        y=api.config.carriage_offset[1] + mount_offset[1],
+        z=api.config.carriage_offset[2] + mount_offset[2]
+    )
