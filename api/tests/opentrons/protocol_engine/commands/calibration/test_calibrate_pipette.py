@@ -24,16 +24,18 @@ def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
         monkeypatch.setattr(calibration, name, decoy.mock(func=func))
 
 
-async def test_calibrate_pipette_implementation(decoy: Decoy, ot3_api: OT3API) -> None:
+async def test_calibrate_pipette_implementation(
+    decoy: Decoy, ot3_hardware_api: OT3API
+) -> None:
     """Test Calibration command execution."""
-    subject = CalibratePipetteImplementation(hardware_api=ot3_api)
+    subject = CalibratePipetteImplementation(hardware_api=ot3_hardware_api)
 
     params = CalibratePipetteParams(
         mount=OT3Mount.LEFT,
     )
 
     decoy.when(
-        await calibration.calibrate_mount(hcapi=ot3_api, mount=params.mount)
+        await calibration.calibrate_mount(hcapi=ot3_hardware_api, mount=params.mount)
     ).then_return(Point(x=3, y=4, z=6))
 
     result = await subject.execute(params)
@@ -42,10 +44,10 @@ async def test_calibrate_pipette_implementation(decoy: Decoy, ot3_api: OT3API) -
 
 
 async def test_calibrate_pipette_implementation_wrong_hardware(
-    decoy: Decoy, ot2_api: API
+    decoy: Decoy, ot2_hardware_api: API
 ) -> None:
     """Should raise an unsupported hardware error."""
-    subject = CalibratePipetteImplementation(hardware_api=ot2_api)
+    subject = CalibratePipetteImplementation(hardware_api=ot2_hardware_api)
 
     params = CalibratePipetteParams(
         mount=OT3Mount.LEFT,

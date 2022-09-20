@@ -45,6 +45,7 @@ class CalibratePipetteImplementation(
 
     async def execute(self, params: CalibratePipetteParams) -> CalibratePipetteResult:
         """Execute calibrate-pipette command."""
+        # TODO (tz, 20-9-22): Add a better solution to determine if a command can be executed on an OT-3/OT-2
         ensure_ot3_hardware(self._hardware_api)
 
         pipette_offset = await calibration.calibrate_mount(

@@ -28,13 +28,13 @@ def hardware_api(decoy: Decoy) -> HardwareControlAPI:
 
 
 @pytest.fixture
-def ot3_api(decoy: Decoy) -> OT3API:
+def ot3_hardware_api(decoy: Decoy) -> OT3API:
     """Get a mocked out OT3API."""
     return decoy.mock(cls=OT3API)
 
 
 @pytest.fixture
-def ot2_api(decoy: Decoy) -> API:
+def ot2_hardware_api(decoy: Decoy) -> API:
     """Get a mocked out OT3API."""
     return decoy.mock(cls=API)
 
