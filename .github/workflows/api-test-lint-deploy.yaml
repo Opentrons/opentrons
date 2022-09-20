@@ -55,13 +55,8 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.10'
-
-      - uses: './.github/actions/python/setup'
-        with:
-          project: 'api'
+      - name: setup python
+        uses: './.github/actions/python/setup2'
       - name: Lint with opentrons_hardware
         run: make -C api lint
   test:
@@ -72,14 +67,6 @@ jobs:
       matrix:
         os: ['windows-2019', 'ubuntu-22.04', 'macos-latest']
         python: ['3.10']
-        with-ot-hardware: ['true', 'false']
-        exclude:
-          - os: 'windows-2019'
-            with-ot-hardware: 'true'
-          - os: 'macos-latest'
-            with-ot-hardware: 'true'
-          - python: '3.10'
-            with-ot-hardware: 'true'
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v3'
@@ -95,23 +82,21 @@ jobs:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - uses: './.github/actions/python/setup'
-        with:
-          project: 'api'
-          python-version: ${{ matrix.python }}
-      - if: ${{ matrix.with-ot-hardware == 'false' }}
-        name: Remove OT-3 hardware package
-        run: make -C api setup-ot2
-        env:
-          OT_VIRTUALENV_VERSION: ${{ matrix.python }}
-      - if: ${{ matrix.with-ot-hardware == 'false' }}
-        name: Test without opentrons_hardware
+      - name: setup python
+        uses: './.github/actions/python/setup2'
+      - name: Test without opentrons_hardware
         run: make -C api test-ot2
-      - if: ${{ matrix.with-ot-hardware == 'true' }}
-        name: Test with opentrons_hardware
+      - name: Test with opentrons_hardware
         run: make -C api test-cov
       - name: Ensure assets build
         run: make -C api sdist wheel
+      - name: pip install opentrons and use CLI
+        run: |
+          python -m pip install --find-links=./api/dist opentrons
+          opentrons_execute --help
+          opentrons_simulate --help
+          opentrons_simulate ./api/docs/v2/example_protocols/dilution_tutorial.py -e -o nothing
+          python -m opentrons.cli --help
       - name: Upload coverage report
         uses: 'codecov/codecov-action@v3'
         with:
