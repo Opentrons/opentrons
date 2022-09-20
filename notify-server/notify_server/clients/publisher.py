@@ -35,6 +35,7 @@ class Publisher:
     def send_nowait(self, topic: str, event: Event) -> Future[Any]:
         """Publish an event to a topic without waiting for completion."""
         frames = to_frames(topic=topic, event=event)
+        print(f'frames is {frames}')
         return self._connection.send_multipart(frames)
 
     def close(self) -> None:

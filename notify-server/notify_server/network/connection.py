@@ -71,6 +71,7 @@ class Connection:
     def send_multipart(self, frames: List[bytes]) -> Future[Any]:
         """Send a multipart message."""
         # Type ignore is due to zmq not providing type annotation.
+        print("socket send here")
         return self._socket.send_multipart(frames)  # type: ignore
 
     def recv_multipart(self) -> Future[Any]:

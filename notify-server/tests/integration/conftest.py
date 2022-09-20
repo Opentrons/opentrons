@@ -36,7 +36,9 @@ async def server_fixture(integration_environment: None) -> AsyncGenerator[Task, 
     """Server fixture."""
     from notify_server.main import run
 
-    task = asyncio.create_task(run())
+    running_event = asyncio.Event()
+    task = asyncio.create_task(run(running_event))
+    await asyncio.wait_for(running_event.wait(), 12)
     yield task
     task.cancel()
     try:
