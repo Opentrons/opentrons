@@ -1,7 +1,6 @@
 """Pub sub integration tests."""
-from asyncio import Task, AbstractEventLoop
+from asyncio import Task
 from typing import AsyncGenerator, Tuple
-import sys
 
 import pytest
 
@@ -48,36 +47,25 @@ async def subscriber_first_topic(
     sub.close()
 
 
-if sys.version_info < (3,10):
-    @pytest.fixture
-    def loop():
-        pass
-
-
 async def test_two_pub_two_sub_two_topics(
     server_fixture: Task,
     two_publishers: Tuple[publisher.Publisher, publisher.Publisher],
     subscriber_all_topics: subscriber.Subscriber,
     subscriber_first_topic: subscriber.Subscriber,
     event: Event,
-    loop: AbstractEventLoop,
 ) -> None:
     """Test that two publishers reaches two subscribers of different topics."""
     pub1, pub2 = two_publishers
-    print("sending topics")
     await pub1.send("topic1", event)
     await pub2.send("topic2", event)
-    print("awaiting topic 1")
     e = await subscriber_first_topic.next_event()
     assert e.topic == "topic1"
     assert e.event == event
 
-    print('awaiting topic 1 2')
     e = await subscriber_all_topics.next_event()
     assert e.topic == "topic1"
     assert e.event == event
 
-    print('awaiting topic 2')
     e = await subscriber_all_topics.next_event()
     assert e.topic == "topic2"
     assert e.event == event
