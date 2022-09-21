@@ -1,6 +1,7 @@
 """Validation file for protocol engine."""
-from ..hardware_control.ot3api import OT3API
-from ..hardware_control.protocols import HardwareControlAPI
+from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.protocols import HardwareControlAPI
+
 from ..protocol_engine.errors.exceptions import HardwareNotSupported
 
 
