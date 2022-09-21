@@ -106,7 +106,7 @@ test-ot2:
 	$(call pytest,ot-2) $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
 
 .PHONY: test-app
-test-ot2:
+test-app:
 	$(call pytest,app) $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
 
 .PHONY: lint

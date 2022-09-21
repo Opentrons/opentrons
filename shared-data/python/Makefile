@@ -115,5 +115,5 @@ deploy: wheel
 
 .PHONY: test
 test:
-	$(call pytest,ot-2) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
-	$(call pytest,ot-3/robot-server) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
+	$(call pytest,ot-2) --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
+	$(call pytest,ot-3/robot-server) --cov=opentrons_shared_data --cov-report xml:coverage.xml tests

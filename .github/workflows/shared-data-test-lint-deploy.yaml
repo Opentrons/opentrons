@@ -49,7 +49,7 @@ jobs:
         with:
           node-version: '14'
       - name: setup python
-        uses: './.github/actions/python/setup-environments'
+        uses: './.github/actions/python/setup-all'
       - name: Lint
         run: make -C shared-data/python lint
 
@@ -76,7 +76,7 @@ jobs:
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: setup python
-        uses: './.github/actions/python/setup-environments'
+        uses: './.github/actions/python/setup-all'
       - name: Test
         run: make -C shared-data/python test
       - name: Ensure assets build
@@ -140,7 +140,7 @@ jobs:
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: setup python
-        uses: './.github/actions/python/setup-environments'
+        uses: './.github/actions/python/setup-all'
       # creds and repository configuration for deploying python wheels
       - if: ${{ !env.OT_TAG }}
         name: 'upload to test pypi'

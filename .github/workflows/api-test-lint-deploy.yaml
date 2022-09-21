@@ -56,7 +56,7 @@ jobs:
         with:
           node-version: '14'
       - name: setup python
-        uses: './.github/actions/python/setup-environments'
+        uses: './.github/actions/python/setup-all'
       - name: Lint
         run: make -C api lint
   test:
@@ -84,7 +84,7 @@ jobs:
         uses: './.github/actions/python/setup-app'
       - name: setup python not Windows
         if: matrix.os != 'windows-2019'
-        uses: './.github/actions/python/setup-environments'
+        uses: './.github/actions/python/setup-all'
       - name: Test without opentrons_hardware
         if: matrix.os != 'windows-2019'
         run: make -C api test-ot2
@@ -128,7 +128,7 @@ jobs:
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: setup python
-        uses: './.github/actions/python/setup-environments'
+        uses: './.github/actions/python/setup-all'
       # creds and repository configuration for deploying python wheels
       - if: ${{ !env.OT_TAG }}
         name: 'upload to test pypi'
