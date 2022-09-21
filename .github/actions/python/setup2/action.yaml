@@ -22,7 +22,7 @@ runs:
           **/setup.py
           **/Pipfile.*
     - shell: bash
-      if: steps.python38.outputs.cache-hit == 'false'
+      name: setup pipenv on 3.8
       run: pip install pipenv==2021.5.29
     - shell: bash
       if: steps.python38.outputs.cache-hit == 'false'
@@ -38,7 +38,7 @@ runs:
           **/setup.py
           **/Pipfile.*
     - shell: bash
-      if: steps.python310.outputs.cache-hit == 'false'
+      name: setup pipenv on 3.10
       run: pip install pipenv==2021.5.29
     - shell: bash
       if: steps.python310.outputs.cache-hit == 'false'
