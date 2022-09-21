@@ -51,6 +51,9 @@ async def test_calibration_set_up_position_implementation(
         pipetteId="pipette-id",
         slot_name=slot_name,
     )
+
+    # decoy.when(state_view.labware.get_slot_center_position()).then_do(mock_deck_slot_center)
+
     with mock.patch.object(
         state_view.labware, "get_slot_center_position", new=mock_deck_slot_center
     ):
