@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
@@ -13,7 +12,6 @@ import {
   TYPOGRAPHY,
   Box,
   COLORS,
-  Btn,
   Link,
 } from '@opentrons/components'
 import { usePipettesQuery } from '@opentrons/react-api-client'
