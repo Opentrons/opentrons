@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.5...v6.1.0-alpha.6) (2022-09-21)
+
+**Note:** Version bump only for package @opentrons/app-shell
+
+
+
+
+
 # [6.1.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.4...v6.1.0-alpha.5) (2022-09-19)
 
 **Note:** Version bump only for package @opentrons/app-shell
