@@ -58,11 +58,6 @@ setup-py:
 	$(OT_PYTHON) -m pip install pipenv==2021.5.29
 	$(MAKE) -C environments setup
 
-.PHONY: setup-py-faster
-setup-py-faster:
-	$(OT_PYTHON) -m pip install pipenv==2021.5.29
-	$(MAKE) -C environments setupfaster
-
 %-py-setup:
 	$(MAKE) -C $* setup
 

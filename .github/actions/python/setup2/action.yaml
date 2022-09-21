@@ -23,6 +23,9 @@ runs:
           **/Pipfile.*
     - shell: bash
       if: steps.python310.outputs.cache-hit == 'false'
+      run: pip install pipenv==2021.5.29
+    - shell: bash
+      if: steps.python310.outputs.cache-hit == 'false'
       working-directory: environments
       name: setup venv python 3.10
       run: |
@@ -38,6 +41,9 @@ runs:
         cache-dependency-path: |
           **/setup.py
           **/Pipfile.*
+    - shell: bash
+      if: steps.python38.outputs.cache-hit == 'false'
+      run: pip install pipenv==2021.5.29
     - shell: bash
       if: steps.python38.outputs.cache-hit == 'false'
       working-directory: environments
