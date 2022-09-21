@@ -85,5 +85,5 @@ def get_pipette_unique_name(pipette: protocol_api.InstrumentContext) -> str:
 
 
 def gantry_position_as_point(position: Dict[Axis, float]) -> Point:
-    """Helper to convert Dict[Axis, float] to a Point()"""
+    """Helper to convert Dict[Axis, float] to a Point()."""
     return Point(x=position[Axis.X], y=position[Axis.Y], z=position[Axis.Z])
