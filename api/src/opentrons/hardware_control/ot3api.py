@@ -915,6 +915,14 @@ class OT3API(
         axes = [OT3Axis.from_axis(ax) for ax in which]
         await self._backend.disengage_axes(axes)
 
+    async def engage_axes(self, which: Union[List[Axis], List[OT3Axis]]) -> None:
+        axes = [OT3Axis.from_axis(ax) for ax in which]
+        await self._backend.engage_axes(axes)
+
+    async def get_limit_switches(self) -> Dict[OT3Axis, bool]:
+        res = await self._backend.get_limit_switches()
+        return {ax: val for ax, val in res.items()}
+
     async def _fast_home(
         self, axes: Sequence[OT3Axis], margin: float
     ) -> OT3AxisMap[float]:

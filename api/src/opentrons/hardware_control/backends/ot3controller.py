@@ -47,6 +47,11 @@ from opentrons_hardware.hardware_control.motion_planning import (
     Coordinates,
 )
 
+from opentrons_hardware.hardware_control.motor_enable_disable import (
+    set_enable_motor,
+    set_disable_motor,
+)
+from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
 from opentrons_hardware.hardware_control.network import probe
 from opentrons_hardware.hardware_control.current_settings import (
     set_run_current,
@@ -440,6 +445,14 @@ class OT3Controller:
             self._present_nodes.add(axis_to_node(OT3Axis.of_main_tool_actuator(mount)))
         return current_tools
 
+    async def get_limit_switches(self) -> OT3AxisMap[bool]:
+        """Get the state of the gantry's limit switches on each axis."""
+        assert (
+            self._present_nodes
+        ), "No nodes available to read limit switch status from"
+        res = await get_limit_switches(self._messenger, self._present_nodes)
+        return {node_to_axis(node): bool(val) for node, val in res.items()}
+
     async def set_default_currents(self) -> None:
         """Set both run and hold currents from robot config to each node."""
         assert self._current_settings, "Invalid current settings"
@@ -566,7 +579,13 @@ class OT3Controller:
 
     async def disengage_axes(self, axes: List[OT3Axis]) -> None:
         """Disengage axes."""
-        return None
+        nodes = {axis_to_node(ax) for ax in axes}
+        await set_disable_motor(self._messenger, nodes)
+
+    async def engage_axes(self, axes: List[OT3Axis]) -> None:
+        """Engage axes."""
+        nodes = {axis_to_node(ax) for ax in axes}
+        await set_enable_motor(self._messenger, nodes)
 
     def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
         """Set the light states."""
