@@ -6,9 +6,11 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 6.1.0-alpha.5
+# Opentrons App Changes in 6.1.0-alpha.6
 
-Welcome to the v6.1.0 alpha release of the Opentrons App! This release focuses on adding support for the Opentrons Heater-Shaker Module.
+Welcome to the v6.1.0 alpha release of the Opentrons App! This release focuses on adding support for the [Opentrons Heater-Shaker Module](https://shop.opentrons.com/heater-shaker-module/).
+
+<p align="center"><img alt="Isometric view of the Opentrons Heater-Shaker Module GEN1" src="https://s3.us-east-2.amazonaws.com/images.opentrons.com/modules/heater-shaker/hs_with_pcr_adapter.png" width="300" /></p>
 
 ## New Features
 
@@ -19,19 +21,18 @@ Welcome to the v6.1.0 alpha release of the Opentrons App! This release focuses o
   - Update the Heater-Shaker's firmware from the module card
 - Module cards now show if a Heater-Shaker or Thermocycler has an error
 
-## Bug Fixes
+## Improved Features
 
 - Improvements to the run log, including properly listing labware that is on top of a module
-- Interface fixes and improvements
-- Tip Length Calibration no longer silently fails when the chosen pipette is not attached
-- Clarified what data is deleted when performing a factory reset of protocol run history
-- Fixed a bug that prevented changing pipette settings when the 'All Pipette Config' feature flag is on
-- Stops the update modal from staying onscreen indefinitely after a robot software update has finished
+- Clarifies what data is deleted when performing a factory reset of protocol run history
+
+## Bug Fixes
+
 - Labware Position Check now suggests the most recent Labware Offset data
-
-## Known Issues
-
-This alpha is a work in progress! We'll be addressing issues in upcoming releases of 6.1.0.
+- Tip Length Calibration no longer silently fails when the chosen pipette is not attached
+- Stops the update modal from staying onscreen indefinitely after a robot software update has finished
+- Fixes a bug that prevented changing pipette settings when the All Pipette Config feature flag is on
+- Interface fixes and improvements
 
 ---
 
