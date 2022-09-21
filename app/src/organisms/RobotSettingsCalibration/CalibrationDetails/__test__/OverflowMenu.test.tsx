@@ -4,10 +4,13 @@ import { saveAs } from 'file-saver'
 
 import { renderWithProviders, Mount } from '@opentrons/components'
 
-import { i18n } from '../../../../../i18n'
-import { mockDeckCalData } from '../../../../../redux/calibration/__fixtures__'
-import { useCalibratePipetteOffset } from '../../../../CalibratePipetteOffset/useCalibratePipetteOffset'
-import { useDeckCalibrationData, useRunStatuses } from '../../../hooks'
+import { i18n } from '../../../../i18n'
+import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
+import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
+import {
+  useDeckCalibrationData,
+  useRunStatuses,
+} from '../../../../organisms/Devices/hooks'
 
 import { OverflowMenu } from '../OverflowMenu'
 
@@ -25,13 +28,15 @@ const CAL_TYPE = 'pipetteOffset'
 const startCalibration = jest.fn()
 jest.mock('file-saver')
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../../../redux/config')
-jest.mock('../../../../../redux/sessions/selectors')
-jest.mock('../../../../../redux/discovery')
-jest.mock('../../../../../redux/robot-api/selectors')
-jest.mock('../../../../CalibratePipetteOffset/useCalibratePipetteOffset')
-jest.mock('../../../../ProtocolUpload/hooks')
-jest.mock('../../../hooks')
+jest.mock('../../../../redux/config')
+jest.mock('../../../../redux/sessions/selectors')
+jest.mock('../../../../redux/discovery')
+jest.mock('../../../../redux/robot-api/selectors')
+jest.mock(
+  '../../../../organisms/CalibratePipetteOffset/useCalibratePipetteOffset'
+)
+jest.mock('../../../../organisms/ProtocolUpload/hooks')
+jest.mock('../../../../organisms/Devices/hooks')
 
 const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFunction<
   typeof useCalibratePipetteOffset

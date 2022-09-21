@@ -22,12 +22,14 @@ import { StyledText } from '../../atoms/text'
 
 export interface CalibrationStatusCardProps {
   robotName: string
-  setShowDeckCalibrationModal: (showDeckCalibrationModal: boolean) => void
+  setShowHowCalibrationWorksModal: (
+    showHowCalibrationWorksModal: boolean
+  ) => void
 }
 
 export function CalibrationStatusCard({
   robotName,
-  setShowDeckCalibrationModal,
+  setShowHowCalibrationWorksModal,
 }: CalibrationStatusCardProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
 
@@ -63,7 +65,7 @@ export function CalibrationStatusCard({
         <Link
           role="button"
           css={TYPOGRAPHY.darkLinkLabelSemiBold}
-          onClick={() => setShowDeckCalibrationModal(true)}
+          onClick={() => setShowHowCalibrationWorksModal(true)}
         >
           {t('see_how_robot_calibration_works')}
         </Link>

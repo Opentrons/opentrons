@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { renderWithProviders, Mount } from '@opentrons/components'
-import { i18n } from '../../../../../i18n'
+import { i18n } from '../../../../i18n'
 
 import { TipLengthCalibrationItems } from '../TipLengthCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
 
-jest.mock('../../../../../redux/custom-labware/selectors')
-jest.mock('../../../../../redux/config')
-jest.mock('../../../../../redux/sessions/selectors')
-jest.mock('../../../../../redux/discovery')
-jest.mock('../../../../../assets/labware/findLabware')
-jest.mock('../../../hooks')
+jest.mock('../../../../redux/custom-labware/selectors')
+jest.mock('../../../../redux/config')
+jest.mock('../../../../redux/sessions/selectors')
+jest.mock('../../../../redux/discovery')
+jest.mock('../../../../assets/labware/findLabware')
+jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../OverflowMenu')
 
 const ROBOT_NAME = 'otie'

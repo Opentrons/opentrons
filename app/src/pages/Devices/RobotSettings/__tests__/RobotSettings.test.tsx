@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
-import { RobotSettingsCalibration } from '../../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
+import { RobotSettingsCalibration } from '../../../../organisms/RobotSettingsCalibration'
 import { RobotSettingsNetworking } from '../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsAdvanced } from '../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
 import { useRobot } from '../../../../organisms/Devices/hooks'
@@ -16,9 +16,7 @@ import {
   mockUnreachableRobot,
 } from '../../../../redux/discovery/__fixtures__'
 
-jest.mock(
-  '../../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
-)
+jest.mock('../../../../organisms/RobotSettingsCalibration')
 jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking')
 jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced')
 jest.mock('../../../../organisms/Devices/hooks')
