@@ -9,7 +9,6 @@ import {
   JUSTIFY_FLEX_END,
   TYPOGRAPHY,
   ALIGN_CENTER,
-  TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { useTranslation } from 'react-i18next'
 import { AlertPrimaryButton } from '../../atoms/buttons'
@@ -50,7 +49,7 @@ export function ConfirmCrashRecovery(
         <Link
           role="button"
           css={TYPOGRAPHY.darkLinkH4SemiBold}
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
           onClick={back}
         >
           {t('shared:resume')}
