@@ -6,7 +6,7 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 6.1.0-alpha.5
+# Opentrons App Changes in 6.1.0-alpha.6
 
 Welcome to the v6.1.0 alpha release of the Opentrons App! This release focuses on adding support for the [Opentrons Heater-Shaker Module](https://shop.opentrons.com/heater-shaker-module/).
 
