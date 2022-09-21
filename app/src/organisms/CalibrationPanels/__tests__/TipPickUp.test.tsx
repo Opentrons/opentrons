@@ -70,14 +70,10 @@ describe('TipPickUp', () => {
   it('renders the confirm crash modal when invoked', () => {
     const { getByText, queryByText } = render()[0]
     expect(
-      queryByText(
-        "Starting over will cancel your calibration progress. It's important to use an undamaged tip while you calibrate your robot."
-      )
+      queryByText('Starting over will cancel your calibration progress.')
     ).toBeNull()
     const crashLink = getByText('Start over')
     crashLink.click()
-    getByText(
-      "Starting over will cancel your calibration progress. It's important to use an undamaged tip while you calibrate your robot."
-    )
+    getByText('Starting over will cancel your calibration progress.')
   })
 })
