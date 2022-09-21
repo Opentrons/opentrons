@@ -1,4 +1,9 @@
-import { PipetteName } from '../../../js'
+import { 
+  LoadedPipette,
+  LoadedLabware,
+  LoadedModule,
+  Liquid,
+  PipetteName } from '../../../js'
 import type { CreateCommand, RunTimeCommand } from './command'
 import type { LabwareDefinition2, ModuleModel } from '../../../js/types'
 
@@ -82,7 +87,18 @@ export interface ProtocolAnalysisOutput {
   config: JsonConfig | PythonConfig
   metadata: { [key: string]: any }
   commands: RunTimeCommand[]
+  labware: LoadedLabware[]
+  pipette: LoadedPipette[]
+  modules: LoadedModule[]
+  liquids: Liquid[]
   errors: AnalysisError[]
+}
+
+interface LabwareEntity {
+  id: string
+  loadName: string
+  definitionUri: string
+  location?: string
 }
 
 interface AnalysisSourceFile {
