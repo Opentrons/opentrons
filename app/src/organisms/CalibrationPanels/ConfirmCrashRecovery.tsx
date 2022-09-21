@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   Flex,
@@ -10,7 +11,6 @@ import {
   TYPOGRAPHY,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
 import { AlertPrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 

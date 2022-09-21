@@ -1,20 +1,19 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import * as Sessions from '../../redux/sessions'
 import {
   Flex,
   Link,
   JUSTIFY_CENTER,
-  FONT_SIZE_BODY_1,
   TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
 
+import * as Sessions from '../../redux/sessions'
+import { StyledText } from '../../atoms/text'
 import { ConfirmCrashRecovery } from './ConfirmCrashRecovery'
 
 import type { CalibrationPanelProps } from './types'
-import { StyledText } from '../../atoms/text'
 
 export function useConfirmCrashRecovery(
   props: CalibrationPanelProps
@@ -32,9 +31,7 @@ export function useConfirmCrashRecovery(
       justifyContent={JUSTIFY_CENTER}
       gridGap={SPACING.spacing2}
     >
-      <StyledText as="p" fontSize={FONT_SIZE_BODY_1}>
-        {t('jog_too_far_or_bend_tip')}
-      </StyledText>
+      <StyledText as="p">{t('jog_too_far_or_bend_tip')}</StyledText>
       <Link
         role="button"
         onClick={() => setShowModal(true)}
