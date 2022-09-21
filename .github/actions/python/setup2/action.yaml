@@ -13,6 +13,33 @@ runs:
     - shell: bash
       run: |
         npm install --global shx@0.3.3
+    - uses: 'actions/setup-python@v4'
+      id: python310
+      with:
+        python-version: '3.10'
+        cache: "pipenv"
+        cache-dependency-path: |
+          **/setup.py
+          **/Pipfile.*
     - shell: bash
-      name: make setup-py
-      run: make setup-py-faster
+      if: steps.python310.outputs.cache-hit == 'false'
+      working-directory: environments
+      name: setup venv python 3.10
+      run: |
+        make -C ot-2 setup & \
+        make -C dev setup & \
+        make -C app setup & \
+        wait;
+    - uses: 'actions/setup-python@v4'
+      id: python38
+      with:
+        python-version: '3.8'
+        cache: "pipenv"
+        cache-dependency-path: |
+          **/setup.py
+          **/Pipfile.*
+    - shell: bash
+      if: steps.python38.outputs.cache-hit == 'false'
+      working-directory: environments
+      name: setup venv python 3.8
+      run: make -C ot-3 setup
