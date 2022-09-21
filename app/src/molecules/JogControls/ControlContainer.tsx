@@ -1,44 +1,43 @@
 import React from 'react'
+import { css } from 'styled-components'
 import {
   BORDERS,
-  Box,
   COLORS,
   DIRECTION_COLUMN,
+  JUSTIFY_CENTER,
   Flex,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
+import type { StyleProps } from '@opentrons/components'
 
-interface ControlContainerProps {
+interface ControlContainerProps extends StyleProps {
   title: string
   children: React.ReactNode
 }
 
+const CONTROL_CHILDREN_STYLES = css`
+  background-color: ${COLORS.fundamentalsBackground};
+  border-radius: ${BORDERS.radiusSoftCorners};
+  padding: ${SPACING.spacing4};
+  margin: ${SPACING.spacing1};
+  width: 100%;
+  height: 9.75rem;
+
+  @media screen and (max-width: 750px) {
+    height: 15.875rem;
+    justify-content: ${JUSTIFY_CENTER};
+  }
+`
+
 export const ControlContainer = (props: ControlContainerProps): JSX.Element => {
+  const { title, children } = props
   return (
-    <Box flex="50%" margin={SPACING.spacing2}>
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText
-          textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.darkGreyEnabled}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          fontSize={TYPOGRAPHY.fontSizeH6}
-          marginY={SPACING.spacing3}
-        >
-          {props.title}
-        </StyledText>
-        <Flex
-          backgroundColor={COLORS.fundamentalsBackground}
-          borderRadius={BORDERS.radiusSoftCorners}
-          padding={SPACING.spacing4}
-          margin={SPACING.spacing1}
-          width="100%"
-          height="9.75rem"
-        >
-          {props.children}
-        </Flex>
-      </Flex>
-    </Box>
+    <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
+      <StyledText as="h6" marginY={SPACING.spacing3}>
+        {title}
+      </StyledText>
+      <Flex css={CONTROL_CHILDREN_STYLES}>{children}</Flex>
+    </Flex>
   )
 }

@@ -160,13 +160,13 @@ def test_load_module_default_slot(ctx_with_thermocycler):
 
 def test_no_slot_module_error(ctx_with_magdeck):
     ctx_with_magdeck.home()
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         assert ctx_with_magdeck.load_module("magdeck")
 
 
 def test_invalid_slot_module_error(ctx_with_thermocycler):
     ctx_with_thermocycler.home()
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         assert ctx_with_thermocycler.load_module("thermocycler", 1)
 
 
@@ -222,7 +222,7 @@ def test_load_simulating_module(ctx, loadname, klass, model):
 
 def test_tempdeck(ctx_with_tempdeck, mock_module_controller):
     mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
-    assert ctx_with_tempdeck.deck[1] == mod._geometry
+    assert ctx_with_tempdeck.deck[1] == mod.geometry
 
 
 def test_tempdeck_target(ctx_with_tempdeck, mock_module_controller):
@@ -269,7 +269,7 @@ def test_tempdeck_status(ctx_with_tempdeck, mock_module_controller):
 
 def test_magdeck(ctx_with_magdeck, mock_module_controller):
     mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
-    assert ctx_with_magdeck.deck[1] == mod._geometry
+    assert ctx_with_magdeck.deck[1] == mod.geometry
 
 
 def test_magdeck_status(ctx_with_magdeck, mock_module_controller):
@@ -324,7 +324,7 @@ def test_magdeck_calibrate(ctx_with_magdeck, mock_module_controller):
 
 def test_thermocycler(ctx_with_thermocycler, mock_module_controller):
     mod = ctx_with_thermocycler.load_module("thermocycler")
-    assert ctx_with_thermocycler.deck[7] == mod._geometry
+    assert ctx_with_thermocycler.deck[7] == mod.geometry
 
 
 def test_thermocycler_lid_status(ctx_with_thermocycler, mock_module_controller):
@@ -343,8 +343,8 @@ def test_thermocycler_lid(ctx_with_thermocycler, mock_module_controller):
         cmd.lower() for cmd in ctx_with_thermocycler.commands()
     )
     mock_module_controller.open.assert_called_once()
-    assert mod._geometry.lid_status == "open"
-    assert mod._geometry.highest_z == 98.0
+    assert mod.geometry.lid_status == "open"
+    assert mod.geometry.highest_z == 98.0
 
     mock_module_controller.close.return_value = "closed"
     mod.close_lid()
@@ -352,8 +352,8 @@ def test_thermocycler_lid(ctx_with_thermocycler, mock_module_controller):
         cmd.lower() for cmd in ctx_with_thermocycler.commands()
     )
     mock_module_controller.close.assert_called_once()
-    assert mod._geometry.lid_status == "closed"
-    assert mod._geometry.highest_z == 98.0  # ignore 37.7mm lid for now
+    assert mod.geometry.lid_status == "closed"
+    assert mod.geometry.highest_z == 98.0  # ignore 37.7mm lid for now
 
 
 def test_thermocycler_set_lid_temperature(
@@ -483,7 +483,7 @@ def test_thermocycler_profile(ctx_with_thermocycler, mock_module_controller):
 def test_thermocycler_semi_plate_configuration(ctx):
     labware_name = "nest_96_wellplate_100ul_pcr_full_skirt"
     mod = ctx.load_module("thermocycler", configuration="semi")
-    assert mod._geometry.labware_offset == Point(-23.28, 82.56, 97.8)
+    assert mod.geometry.labware_offset == Point(-23.28, 82.56, 97.8)
 
     tc_labware = mod.load_labware(labware_name)
 
@@ -540,11 +540,11 @@ def test_heater_shaker_unsafe_move_flagger(
 
     labware = ctx_with_heater_shaker.load_labware(labware_name, 5)
 
-    mod._geometry.flag_unsafe_move = mock.MagicMock()  # type: ignore[assignment]
+    mod._core.geometry.flag_unsafe_move = mock.MagicMock()  # type: ignore[attr-defined]
 
     mod.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)
 
-    mod._geometry.flag_unsafe_move.assert_called_once_with(
+    mod._core.geometry.flag_unsafe_move.assert_called_once_with(  # type: ignore[attr-defined]
         to_slot=5,
         is_tiprack=is_tiprack,
         is_using_multichannel=False,
@@ -565,7 +565,7 @@ def test_hs_flag_unsafe_move_raises(
     labware = ctx_with_heater_shaker.load_labware("geb_96_tiprack_1000ul", 5)
 
     assert isinstance(mod, HeaterShakerContext)
-    mod._geometry.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[assignment]
+    mod._core.geometry.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined]
 
     with pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="uh oh"):
         mod.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)
@@ -724,7 +724,7 @@ def test_heater_shaker_set_and_wait_for_shake_speed(
         mock_validator.return_value = 10
         hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
         assert isinstance(hs_mod, HeaterShakerContext)
-        hs_mod.geometry.is_pipette_blocking_shake_movement = mock.MagicMock(  # type: ignore[attr-defined]
+        hs_mod._core.geometry.is_pipette_blocking_shake_movement = mock.MagicMock(  # type: ignore[attr-defined]
             return_value=True
         )
 
@@ -780,7 +780,7 @@ def test_heater_shaker_open_labware_latch(
     # Get subject
     hs_mod = ctx_with_heater_shaker.load_module("heaterShakerModuleV1", 1)
     assert isinstance(hs_mod, HeaterShakerContext)
-    hs_mod.geometry.is_pipette_blocking_latch_movement = mock.MagicMock(  # type: ignore[attr-defined]
+    hs_mod._core.geometry.is_pipette_blocking_latch_movement = mock.MagicMock(  # type: ignore[attr-defined]
         return_value=True
     )
 
@@ -866,7 +866,7 @@ def test_module_load_labware(ctx_with_tempdeck):
     )
     assert (
         lw._implementation.get_geometry().offset
-        == lw_offset + mod._geometry.location.point
+        == lw_offset + mod.geometry.location.point
     )
     assert lw.name == labware_name
 
@@ -898,7 +898,9 @@ def test_deprecated_module_load_labware_by_name(ctx_with_tempdeck):
     mod.load_labware_by_name(
         name="a module", namespace="ns", label="a label", version=2
     )
-    mod.load_labware.assert_called_once_with("a module", "a label", "ns", 2)
+    mod.load_labware.assert_called_once_with(
+        name="a module", label="a label", namespace="ns", version=2
+    )
 
 
 async def test_magdeck_gen1_labware_props(ctx):
@@ -923,7 +925,7 @@ async def test_magdeck_gen1_labware_props(ctx):
     mod.disengage()
     mod.engage(height=3)
     assert await mod._module._driver.get_plate_height() == 3
-    mod._geometry.reset_labware()
+    mod.geometry.reset_labware()
     labware_name = "corning_96_wellplate_360ul_flat"
     mod.load_labware(labware_name)
     with pytest.raises(ValueError):

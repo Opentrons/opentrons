@@ -14,7 +14,7 @@ export function useMenuHandleClickOutside(): MenuHandleClickOutside {
   const handleOverflowClick: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    setShowOverflowMenu(!showOverflowMenu)
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
 
   const handleClickOutside: React.MouseEventHandler<HTMLDivElement> = e => {

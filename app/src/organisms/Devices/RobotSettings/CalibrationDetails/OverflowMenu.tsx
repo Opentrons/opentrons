@@ -22,7 +22,7 @@ import { Portal } from '../../../../App/portal'
 import {
   INTENT_RECALIBRATE_PIPETTE_OFFSET,
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
-} from '../../../CalibrationPanels'
+} from '../../../DeprecatedCalibrationPanels'
 import * as Config from '../../../../redux/config'
 import { useTrackEvent } from '../../../../redux/analytics'
 import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../redux/calibration'
@@ -73,9 +73,9 @@ export function OverflowMenu({
   } = useMenuHandleClickOutside()
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
 
-  const calsOverflowWrapperRef = useOnClickOutside({
+  const calsOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
-  }) as React.RefObject<HTMLDivElement>
+  })
   const [
     startPipetteOffsetCalibration,
     PipetteOffsetCalibrationWizard,
@@ -154,7 +154,7 @@ export function OverflowMenu({
         })
       }
     }
-    setShowOverflowMenu(!showOverflowMenu)
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
 
   const handleDownload = (
@@ -178,7 +178,7 @@ export function OverflowMenu({
         `opentrons-${robotName}-tip-length-calibration.json`
       )
     }
-    setShowOverflowMenu(!showOverflowMenu)
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
 
   let disabledReason = null
@@ -201,7 +201,7 @@ export function OverflowMenu({
   //   // params pipet_id and mount
   //   // endpoint calibration/tip_length
   //   // params tiprack_hash and pipette_id
-  //   setShowOverflowMenu(!showOverflowMenu)
+  //   setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   // }
 
   return (

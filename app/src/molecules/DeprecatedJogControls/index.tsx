@@ -9,9 +9,9 @@ import {
   HORIZONTAL_PLANE,
   VERTICAL_PLANE,
   DEFAULT_STEP_SIZES,
-} from '../JogControls/constants'
+} from './constants'
 
-import type { Jog, Plane, StepSize } from '../JogControls/types'
+import type { Jog, Plane, StepSize } from './types'
 import type { StyleProps } from '@opentrons/components'
 
 export type { Jog }

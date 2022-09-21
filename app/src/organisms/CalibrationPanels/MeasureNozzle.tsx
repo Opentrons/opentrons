@@ -1,30 +1,25 @@
 /* eslint-disable no-return-assign */
 import * as React from 'react'
 import { css } from 'styled-components'
+import { useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
-  PrimaryBtn,
-  Text,
-  ALIGN_CENTER,
-  ALIGN_FLEX_START,
-  JUSTIFY_CENTER,
+  ALIGN_STRETCH,
+  ALIGN_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  BORDER_SOLID_LIGHT,
   DIRECTION_COLUMN,
-  POSITION_RELATIVE,
-  TEXT_TRANSFORM_UPPERCASE,
-  FONT_WEIGHT_SEMIBOLD,
-  FONT_SIZE_HEADER,
   SPACING,
-  SPACING_2,
-  SPACING_3,
-  SPACING_4,
-  TYPOGRAPHY,
+  Mount,
 } from '@opentrons/components'
 
-import { DeprecatedJogControls } from '../../molecules/DeprecatedJogControls'
-import { VERTICAL_PLANE } from '../../molecules/JogControls'
+import {
+  JogControls,
+  SMALL_STEP_SIZE_MM,
+  MEDIUM_STEP_SIZE_MM,
+} from '../../molecules/JogControls'
+import { StyledText } from '../../atoms/text'
+import { PrimaryButton } from '../../atoms/buttons'
 import * as Sessions from '../../redux/sessions'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { CalibrationPanelProps } from './types'
@@ -56,8 +51,12 @@ const assetMapTrash = {
   },
 }
 
-const assetMapBlock = {
-  tipLength: {
+const assetMapBlock: {
+  [sessionType in Sessions.SessionType]?: {
+    [mount in Mount]: { [channels in 'multi' | 'single']: string }
+  }
+} = {
+  [Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION]: {
     left: {
       multi: leftMultiBlockAssetTLC,
       single: leftSingleBlockAssetTLC,
@@ -67,7 +66,7 @@ const assetMapBlock = {
       single: rightSingleBlockAssetTLC,
     },
   },
-  healthCheck: {
+  [Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK]: {
     left: {
       multi: leftMultiBlockAssetHealth,
       single: leftSingleBlockAssetHealth,
@@ -79,42 +78,15 @@ const assetMapBlock = {
   },
 }
 
-const HEADER = 'Save the nozzle z-axis'
-const HEALTH_CHECK_HEADER = 'Check the nozzle z-axis'
-const JOG_UNTIL = 'Jog the robot until the nozzle is'
-const BARELY_TOUCHING = 'barely touching (less than 0.1 mm)'
-const THE = 'the'
-const BLOCK = 'block in'
-const FLAT_SURFACE = 'flat surface'
-const OF_THE_TRASH_BIN = 'of the trash bin'
-const SAVE_NOZZLE_Z_AXIS = 'Save nozzle z-axis and move to pick up tip'
-const CHECK_NOZZLE_Z_AXIS = 'Check nozzle z-axis and move to pick up tip'
-const SLOT = 'slot'
-
 export function MeasureNozzle(props: CalibrationPanelProps): JSX.Element {
+  const { t } = useTranslation('robot_calibration')
   const { sendCommands, calBlock, mount, isMulti, sessionType } = props
-
-  const referencePointStr = calBlock ? (
-    BLOCK
-  ) : (
-    <Text as="strong">{`${FLAT_SURFACE} `}</Text>
-  )
-  const referenceSlotStr = calBlock ? (
-    <Text as="strong">{` ${SLOT} ${calBlock.slot}`}</Text>
-  ) : (
-    OF_THE_TRASH_BIN
-  )
 
   const demoAsset = React.useMemo(
     () =>
-      mount &&
-      (calBlock
-        ? assetMapBlock[
-            sessionType === Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK
-              ? 'healthCheck'
-              : 'tipLength'
-          ][mount][isMulti ? 'multi' : 'single']
-        : assetMapTrash[mount][isMulti ? 'multi' : 'single']),
+      calBlock != null
+        ? assetMapBlock[sessionType]?.[mount]?.[isMulti ? 'multi' : 'single']
+        : assetMapTrash[mount]?.[isMulti ? 'multi' : 'single'],
     [mount, isMulti, calBlock, sessionType]
   )
 
@@ -144,72 +116,70 @@ export function MeasureNozzle(props: CalibrationPanelProps): JSX.Element {
     ...props,
   })
 
+  let titleText =
+    calBlock != null
+      ? t('calibrate_z_axis_on_block')
+      : t('calibrate_z_axis_on_trash')
+  if (isHealthCheck) {
+    titleText =
+      calBlock != null ? t('check_z_axis_on_block') : t('check_z_axis_on_trash')
+  }
+
   return (
-    <>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      padding={SPACING.spacing6}
+      minHeight="32rem"
+    >
       <Flex
-        marginY={SPACING_2}
-        flexDirection={DIRECTION_COLUMN}
-        alignItems={ALIGN_FLEX_START}
-        position={POSITION_RELATIVE}
-        width="100%"
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignSelf={ALIGN_STRETCH}
+        gridGap={SPACING.spacing3}
       >
-        <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Text
-            textTransform={TEXT_TRANSFORM_UPPERCASE}
-            fontWeight={FONT_WEIGHT_SEMIBOLD}
-            fontSize={FONT_SIZE_HEADER}
+        <Flex flexDirection={DIRECTION_COLUMN} flex="1">
+          <StyledText as="h1" marginBottom={SPACING.spacing4}>
+            {titleText}
+          </StyledText>
+          <StyledText as="p">
+            {calBlock != null
+              ? t('jog_nozzle_to_block', { slotName: calBlock.slot })
+              : t('jog_nozzle_to_trash')}
+          </StyledText>
+        </Flex>
+        <Box flex="1">
+          <video
+            key={demoAsset}
+            css={css`
+              max-width: 100%;
+              max-height: 15rem;
+            `}
+            autoPlay={true}
+            loop={true}
+            controls={false}
           >
-            {isHealthCheck ? HEALTH_CHECK_HEADER : HEADER}
-          </Text>
-          <NeedHelpLink />
-        </Flex>
-        <Box
-          paddingX={SPACING_3}
-          paddingY={SPACING_4}
-          border={BORDER_SOLID_LIGHT}
-          borderWidth="2px"
-          width="100%"
-        >
-          <Flex alignItems={ALIGN_CENTER} width="100%">
-            <Text width="49%" fontSize={TYPOGRAPHY.fontSizeH3}>
-              {JOG_UNTIL}
-              <Text as="strong">{` ${BARELY_TOUCHING} `}</Text>
-              {`${THE} `}
-              {referencePointStr}
-              {referenceSlotStr}
-              {`.`}
-            </Text>
-            <Box marginLeft={SPACING_3}>
-              <video
-                key={demoAsset}
-                css={css`
-                  max-width: 100%;
-                  max-height: 15rem;
-                `}
-                autoPlay={true}
-                loop={true}
-                controls={false}
-              >
-                <source src={demoAsset} />
-              </video>
-            </Box>
-          </Flex>
+            <source src={demoAsset} />
+          </video>
         </Box>
-        <DeprecatedJogControls
-          jog={jog}
-          stepSizes={[0.1, 1]}
-          planes={[VERTICAL_PLANE]}
-          width="100%"
-          marginBottom={SPACING.spacing5}
-        />
-        <Flex width="100%" justifyContent={JUSTIFY_CENTER} marginY={SPACING_3}>
-          <PrimaryBtn onClick={proceed} flex="1">
-            {isHealthCheck ? CHECK_NOZZLE_Z_AXIS : SAVE_NOZZLE_Z_AXIS}
-          </PrimaryBtn>
-        </Flex>
       </Flex>
-      <Box width="100%">{confirmLink}</Box>
+      <JogControls
+        jog={jog}
+        stepSizes={[SMALL_STEP_SIZE_MM, MEDIUM_STEP_SIZE_MM]}
+      />
+      <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing2}>
+        {confirmLink}
+      </Box>
+      <Flex
+        width="100%"
+        marginTop={SPACING.spacing4}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+      >
+        <NeedHelpLink />
+        <PrimaryButton onClick={proceed}>
+          {t('confirm_placement')}
+        </PrimaryButton>
+      </Flex>
       {confirmModal}
-    </>
+    </Flex>
   )
 }

@@ -35,7 +35,7 @@ import { useCalibratePipetteOffset } from '../../CalibratePipetteOffset/useCalib
 import {
   INTENT_CALIBRATE_PIPETTE_OFFSET,
   INTENT_RECALIBRATE_PIPETTE_OFFSET,
-} from '../../CalibrationPanels'
+} from '../../DeprecatedCalibrationPanels'
 import { AskForCalibrationBlockModal } from '../../CalibrateTipLength'
 import { useDeckCalibrationData, usePipetteOffsetCalibration } from '../hooks'
 import { PipetteOverflowMenu } from './PipetteOverflowMenu'
@@ -67,9 +67,9 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
   const dispatch = useDispatch<Dispatch>()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
   const pipetteName = pipetteInfo?.displayName
-  const pipetteOverflowWrapperRef = useOnClickOutside({
+  const pipetteOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => setShowOverflowMenu(false),
-  }) as React.RefObject<HTMLDivElement>
+  })
   const [showChangePipette, setChangePipette] = React.useState(false)
   const [showBanner, setShowBanner] = React.useState(true)
   const [showSlideout, setShowSlideout] = React.useState(false)
