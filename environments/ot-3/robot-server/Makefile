@@ -4,7 +4,7 @@ include ../../../scripts/python.mk
 .DEFAULT_TARGET: setup
 
 setup:
-	$(call pipenv,ot-3/robot-server) sync --dev --verbose
+	$(call pipenv,ot-3/robot-server) sync --dev
 
 teardown:
 	-$(call pipenv,ot-3/robot-server) --rm

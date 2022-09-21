@@ -4,7 +4,7 @@ include ../../scripts/python.mk
 .DEFAULT_TARGET: setup
 
 setup: teardown
-	$(call pipenv,ot-2) sync --dev --verbose
+	$(call pipenv,ot-2) sync --dev
 
 teardown:
 	-$(call pipenv,ot-2) --rm
