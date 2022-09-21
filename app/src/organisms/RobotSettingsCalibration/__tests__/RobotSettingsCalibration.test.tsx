@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
 
@@ -8,27 +7,18 @@ import { i18n } from '../../../i18n'
 import { CalibrationStatusCard } from '../../../organisms/CalibrationStatusCard'
 import { useFeatureFlag } from '../../../redux/config'
 import * as RobotApi from '../../../redux/robot-api'
-import { mockDeckCalData } from '../../../redux/calibration/__fixtures__'
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
   mockPipetteOffsetCalibration3,
 } from '../../../redux/calibration/pipette-offset/__fixtures__'
-import {
-  mockTipLengthCalibration1,
-  mockTipLengthCalibration2,
-  mockTipLengthCalibration3,
-} from '../../../redux/calibration/tip-length/__fixtures__'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { mockAttachedPipette } from '../../../redux/pipettes/__fixtures__'
 import {
-  useDeckCalibrationData,
   useIsOT3,
   usePipetteOffsetCalibrations,
   useRobot,
-  useTipLengthCalibrations,
   useAttachedPipettes,
-  useRunStartedOrLegacySessionInProgress,
   useRunStatuses,
 } from '../../../organisms/Devices/hooks'
 
@@ -38,25 +28,14 @@ import { RobotSettingsDeckCalibration } from '../RobotSettingsDeckCalibration'
 import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
 import { RobotSettingsCalibration } from '..'
-import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffsetCalibrationItems'
-import { TipLengthCalibrationItems } from '../CalibrationDetails/TipLengthCalibrationItems'
 
 import type { AttachedPipettesByMount } from '../../../redux/pipettes/types'
 
 jest.mock('../../../organisms/CalibrationStatusCard')
 jest.mock('../../../redux/config')
-jest.mock('../../../redux/calibration/selectors')
-jest.mock('../../../redux/pipettes')
-jest.mock('../../../redux/pipettes/selectors')
-jest.mock('../../../redux/calibration/tip-length/selectors')
-jest.mock('../../../redux/calibration/pipette-offset/selectors')
 jest.mock('../../../redux/sessions/selectors')
 jest.mock('../../../redux/robot-api/selectors')
-jest.mock('../../../redux/custom-labware/selectors')
 jest.mock('../../../organisms/Devices/hooks')
-jest.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
-jest.mock('../CalibrationDetails/TipLengthCalibrationItems')
-jest.mock('../../../organisms/ProtocolUpload/hooks')
 jest.mock('../CalibrationDataDownload')
 jest.mock('../CalibrationHealthCheck')
 jest.mock('../RobotSettingsDeckCalibration')
@@ -67,27 +46,12 @@ const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
   right: mockAttachedPipette,
 } as any
-const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
-  typeof useDeckCalibrationData
->
 const mockUsePipetteOffsetCalibrations = usePipetteOffsetCalibrations as jest.MockedFunction<
   typeof usePipetteOffsetCalibrations
 >
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
-const mockUseTipLengthCalibrations = useTipLengthCalibrations as jest.MockedFunction<
-  typeof useTipLengthCalibrations
->
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
->
-const mockPipetteOffsetCalibrationItems = PipetteOffsetCalibrationItems as jest.MockedFunction<
-  typeof PipetteOffsetCalibrationItems
->
-const mockTipLengthCalibrationItems = TipLengthCalibrationItems as jest.MockedFunction<
-  typeof TipLengthCalibrationItems
->
-const mockUseRunStartedOrLegacySessionInProgress = useRunStartedOrLegacySessionInProgress as jest.MockedFunction<
-  typeof useRunStartedOrLegacySessionInProgress
 >
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
@@ -129,12 +93,10 @@ const mockUpdateRobotStatus = jest.fn()
 
 const render = () => {
   return renderWithProviders(
-    <MemoryRouter>
-      <RobotSettingsCalibration
-        robotName="otie"
-        updateRobotStatus={mockUpdateRobotStatus}
-      />
-    </MemoryRouter>,
+    <RobotSettingsCalibration
+      robotName="otie"
+      updateRobotStatus={mockUpdateRobotStatus}
+    />,
     {
       i18nInstance: i18n,
     }
@@ -143,28 +105,12 @@ const render = () => {
 
 describe('RobotSettingsCalibration', () => {
   beforeEach(() => {
-    mockUseRunStartedOrLegacySessionInProgress.mockReturnValue(false)
-    mockUseDeckCalibrationData.mockReturnValue({
-      deckCalibrationData: mockDeckCalData,
-      isDeckCalibrated: true,
-    })
     mockUsePipetteOffsetCalibrations.mockReturnValue([
       mockPipetteOffsetCalibration1,
       mockPipetteOffsetCalibration2,
       mockPipetteOffsetCalibration3,
     ])
     mockUseRobot.mockReturnValue(mockConnectableRobot)
-    mockUseTipLengthCalibrations.mockReturnValue([
-      mockTipLengthCalibration1,
-      mockTipLengthCalibration2,
-      mockTipLengthCalibration3,
-    ])
-    mockPipetteOffsetCalibrationItems.mockReturnValue(
-      <div>PipetteOffsetCalibrationItems</div>
-    )
-    mockTipLengthCalibrationItems.mockReturnValue(
-      <div>TipLengthCalibrationItems</div>
-    )
     mockUseAttachedPipettes.mockReturnValue(mockAttachedPipettes)
     mockUseRunStatuses.mockReturnValue(RUN_STATUSES)
     mockGetRequestById.mockReturnValue(null)

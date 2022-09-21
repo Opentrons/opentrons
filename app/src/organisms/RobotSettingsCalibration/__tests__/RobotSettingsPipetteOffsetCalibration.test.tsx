@@ -33,9 +33,12 @@ const mockPipetteOffsetCalibrationItems = PipetteOffsetCalibrationItems as jest.
 const mockFormattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []
 const mockUpdateRobotStatus = jest.fn()
 
-const render = () => {
+const render = (
+  props?: Partial<
+    React.ComponentProps<typeof RobotSettingsPipetteOffsetCalibration>
+  >
+) => {
   return renderWithProviders(
-    // <MemoryRouter>
     <RobotSettingsPipetteOffsetCalibration
       formattedPipetteOffsetCalibrations={
         mockFormattedPipetteOffsetCalibrations
@@ -44,8 +47,8 @@ const render = () => {
       robotName="otie"
       showPipetteOffsetCalibrationBanner={false}
       updateRobotStatus={mockUpdateRobotStatus}
+      {...props}
     />,
-    // </MemoryRouter>,
     {
       i18nInstance: i18n,
     }
@@ -82,5 +85,21 @@ describe('RobotSettingsPipetteOffsetCalibration', () => {
     mockUsePipetteOffsetCalibrations.mockReturnValue(null)
     const [{ getByText }] = render()
     getByText('Not calibrated yet')
+  })
+
+  it('renders the error banner when error props provided', () => {
+    const [{ getByText }] = render({
+      showPipetteOffsetCalibrationBanner: true,
+      pipetteOffsetCalBannerType: 'error',
+    })
+    getByText('Pipette Offset calibration missing')
+  })
+
+  it('renders the warning banner when warning props provided', () => {
+    const [{ getByText }] = render({
+      showPipetteOffsetCalibrationBanner: true,
+      pipetteOffsetCalBannerType: 'warning',
+    })
+    getByText('Pipette Offset calibration recommended')
   })
 })
