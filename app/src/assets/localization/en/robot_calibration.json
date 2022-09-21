@@ -90,7 +90,7 @@
   "you_can_remove_cal_block": "You can remove the Calibration Block from the deck now.",
   "choose_a_tip_rack": "Choose a tip rack",
   "select_tip_rack": "select tip rack",
-  "choose_tip_rack": "<block>Choose what tip rack you’d like to use to calibrate your tip length.</block><block><strong>Want to use a tip rack that’s not listed here?</strong>Go to More > Custom Labware to add labware.</block>",
+  "choose_tip_rack": "<block>Choose what tip rack you’d like to use to calibrate your tip length.</block><block><strong>Want to use a tip rack that’s not listed here?</strong>Go to Labware > Import to add labware.</block>",
   "calibration_on_opentrons_tips_is_important": "It’s extremely important to perform this calibration using the Opentrons tips and tip racks specified above, as the robot determines accuracy based on the known measurements of these tips.",
   "opentrons_tip_racks_recommended": "Opentrons tip racks are highly recommended. Accuracy cannot be guaranteed with other tip racks.",
   "opentrons": "opentrons",

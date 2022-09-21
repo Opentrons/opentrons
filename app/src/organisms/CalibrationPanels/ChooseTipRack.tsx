@@ -14,6 +14,7 @@ import {
   Box,
   COLORS,
   Btn,
+  Link,
 } from '@opentrons/components'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { getLabwareDefURI } from '@opentrons/shared-data'
@@ -56,16 +57,6 @@ function formatOptionsFromLabwareDef(lw: LabwareDefinition2): SelectOption {
     label: lw.metadata.displayName,
   }
 }
-
-const CANCEL_BUTTON_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
-  color: ${COLORS.darkGreyEnabled};
-
-  &:hover {
-    opacity: 70%;
-  }
-`
 interface ChooseTipRackProps {
   tipRack: CalibrationLabware
   mount: Mount
@@ -258,11 +249,15 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
       >
         <NeedHelpLink />
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
-          <Btn onClick={() => closeModal()} marginRight={SPACING.spacing4}>
-            <StyledText css={CANCEL_BUTTON_STYLE}>
-              {t('shared:cancel')}
-            </StyledText>
-          </Btn>
+          <Link
+            role="button"
+            css={TYPOGRAPHY.darkLinkH4SemiBold}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            onClick={() => closeModal()}
+            marginRight={SPACING.spacing4}
+          >
+            {t('shared:cancel')}
+          </Link>
           <PrimaryButton onClick={handleUseTipRack}>
             {t('confirm_tip_rack')}
           </PrimaryButton>
