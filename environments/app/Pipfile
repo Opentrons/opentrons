@@ -6,6 +6,7 @@ name = "pypi"
 [dev-packages]
 atomicwrites = { version = "==1.4.0", sys_platform = "== 'win32'" }
 colorama = { version = "==0.4.4", sys_platform = "== 'win32'" }
+windows-curses = { version = "==2.3.0", sys_platform = "== 'win32'" }
 coverage = "==5.1"
 mypy = "==0.910"
 numpydoc = "==0.9.1"

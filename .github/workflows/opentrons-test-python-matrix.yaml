@@ -47,11 +47,11 @@ jobs:
           python-version: '${{ matrix.python }}'
       - name: Test opentrons on app environment
         run: make -C api test-app
-      - name: pip install opentrons and use CLI
+      - name: $OT_PYTHON -m pip install opentrons and use CLI
         working-directory: api
         run: |
-          pip install .
+          $OT_PYTHON -m pip install .
           opentrons_execute --help
           opentrons_simulate --help
           opentrons_simulate ./docs/v2/example_protocols/dilution_tutorial.py -e -o nothing
-          python -m opentrons.cli --help
+          $OT_PYTHON -m opentrons.cli --help

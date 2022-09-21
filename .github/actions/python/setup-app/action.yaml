@@ -27,9 +27,12 @@ runs:
           api/setup.*
           environments/app/Pipfile.*
           shared-data/python/setup.*
+    - name: Set the OT_PYTHON env variable
+      shell: bash
+      run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
     - shell: bash
       name: setup pipenv 
-      run: pip install pipenv==2021.5.29
+      run: $OT_PYTHON -m pip install pipenv==2021.5.29
     - shell: bash
       if: steps.python.outputs.cache-hit == 'false'
       working-directory: environments

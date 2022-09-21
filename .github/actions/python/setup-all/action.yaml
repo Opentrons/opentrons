@@ -21,9 +21,12 @@ runs:
         cache-dependency-path: |
           **/setup.*
           **/Pipfile.*
+    - name: Set the OT_PYTHON env variable
+      shell: bash
+      run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
     - shell: bash
       name: install pipenv on 3.8
-      run: pip install pipenv==2021.5.29
+      run: $OT_PYTHON -m pip install pipenv==2021.5.29
     - shell: bash
       if: steps.python38.outputs.cache-hit == 'false'
       working-directory: environments
@@ -37,9 +40,12 @@ runs:
         cache-dependency-path: |
           **/setup.py
           **/Pipfile.*
+    - name: Set the OT_PYTHON env variable
+      shell: bash
+      run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
     - shell: bash
       name: install pipenv on 3.10
-      run: pip install pipenv==2021.5.29
+      run: $OT_PYTHON -m pip install pipenv==2021.5.29
     - shell: bash
       if: steps.python310.outputs.cache-hit == 'false'
       working-directory: environments

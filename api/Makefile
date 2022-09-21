@@ -115,7 +115,6 @@ lint:
 	$(call python,dev) -m flake8 src tests setup.py
 	$(call python,ot-3/robot-server) -m mypy src tests
 	$(call python,ot-2) -m mypy src --exclude=.*ot3.*
-	$(call python,app) -m mypy src --exclude=.*ot3.*
 
 .PHONY: format
 format:
