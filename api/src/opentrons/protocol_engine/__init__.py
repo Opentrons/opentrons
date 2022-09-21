@@ -39,6 +39,7 @@ from .types import (
     ModuleModel,
     ModuleDefinition,
     Liquid,
+    HexColor
 )
 
 
@@ -83,6 +84,7 @@ __all__ = [
     "ModuleModel",
     "ModuleDefinition",
     "Liquid",
+    "HexColor",
     # plugins
     "AbstractPlugin",
 ]
