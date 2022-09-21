@@ -105,6 +105,10 @@ test-cov:
 test-ot2:
 	$(call pytest,ot-2) $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
 
+.PHONY: test-app
+test-ot2:
+	$(call pytest,app) $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
+
 .PHONY: lint
 lint:
 	$(call python,dev) -m black --check src tests setup.py

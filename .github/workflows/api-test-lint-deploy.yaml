@@ -81,14 +81,20 @@ jobs:
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: Test without opentrons_hardware
+        if: matrix.os != 'windows-2019'
         run: make -C api test-ot2
       - name: Test with opentrons_hardware
+        if: matrix.os != 'windows-2019'
         run: make -C api test-cov
+      - name: Test app
+        run: make -C api test-app
       - name: Ensure assets build
+        if: matrix.os != 'windows-2019'
         run: make -C api sdist wheel
       - name: pip install opentrons and use CLI
+        working-directory: api
         run: |
-          python -m pip install --find-links=./api/dist opentrons
+          python -m pip install .
           opentrons_execute --help
           opentrons_simulate --help
           opentrons_simulate ./api/docs/v2/example_protocols/dilution_tutorial.py -e -o nothing
