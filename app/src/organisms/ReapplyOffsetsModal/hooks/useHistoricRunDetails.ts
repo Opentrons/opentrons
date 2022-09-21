@@ -1,9 +1,9 @@
 import { useAllRunsQuery } from '@opentrons/react-api-client'
 
-import type { RunData } from '@opentrons/api-client'
+import type { HostConfig, RunData } from '@opentrons/api-client'
 
-export function useHistoricRunDetails(): RunData[] {
-  const { data: allHistoricRuns } = useAllRunsQuery()
+export function useHistoricRunDetails(hostOverride?: HostConfig | null): RunData[] {
+  const { data: allHistoricRuns } = useAllRunsQuery({}, hostOverride)
 
   return allHistoricRuns == null
     ? []

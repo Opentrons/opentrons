@@ -44,6 +44,7 @@ import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 import type { StyleProps } from '@opentrons/components'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
+import { ApplyHistoricOffsets } from './ApplyHistoricOffsets'
 
 interface ChooseRobotSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
@@ -155,6 +156,8 @@ export function ChooseRobotSlideout(
         protocol_name: protocolDisplayName,
       })}
       footer={
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <ApplyHistoricOffsets robotIp={selectedRobot?.ip ?? null} analysisOutput={mostRecentAnalysis} />
         <PrimaryButton
           onClick={handleProceed}
           width="100%"
@@ -170,6 +173,7 @@ export function ChooseRobotSlideout(
             t('shared:proceed_to_setup')
           )}
         </PrimaryButton>
+</Flex>
       }
       {...restProps}
     >
