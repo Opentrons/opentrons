@@ -14,15 +14,14 @@ import { StyledText } from '../../atoms/text'
 import {
   usePipetteOffsetCalibrations,
   useRobot,
-  useAttachedPipettes,
 } from '../../organisms/Devices/hooks'
 import * as Config from '../../redux/config'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 
-import type { Mount } from '@opentrons/components'
 import type { FormattedPipetteOffsetCalibration } from '.'
 
 interface RobotSettingsPipetteOffsetCalibrationProps {
+  formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
   pipetteOffsetCalBannerType: string
   robotName: string
   showPipetteOffsetCalibrationBanner: boolean
@@ -30,6 +29,7 @@ interface RobotSettingsPipetteOffsetCalibrationProps {
 }
 
 export function RobotSettingsPipetteOffsetCalibration({
+  formattedPipetteOffsetCalibrations,
   pipetteOffsetCalBannerType,
   robotName,
   showPipetteOffsetCalibrationBanner,
@@ -48,42 +48,6 @@ export function RobotSettingsPipetteOffsetCalibration({
 
   // wait for robot request to resolve instead of using name directly from params
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
-  const attachedPipettes = useAttachedPipettes()
-
-  const formatPipetteOffsetCalibrations = (): FormattedPipetteOffsetCalibration[] => {
-    const pippets = []
-    if (attachedPipettes != null) {
-      pippets.push({
-        modelName: attachedPipettes.left?.modelSpecs?.displayName,
-        serialNumber: attachedPipettes.left?.id,
-        mount: 'left' as Mount,
-        tiprack: pipetteOffsetCalibrations?.find(
-          p => p.pipette === attachedPipettes.left?.id
-        )?.tiprackUri,
-        lastCalibrated: pipetteOffsetCalibrations?.find(
-          p => p.pipette === attachedPipettes.left?.id
-        )?.lastModified,
-        markedBad: pipetteOffsetCalibrations?.find(
-          p => p.pipette === attachedPipettes.left?.id
-        )?.status.markedBad,
-      })
-      pippets.push({
-        modelName: attachedPipettes.right?.modelSpecs?.displayName,
-        serialNumber: attachedPipettes.right?.id,
-        mount: 'right' as Mount,
-        tiprack: pipetteOffsetCalibrations?.find(
-          p => p.pipette === attachedPipettes.right?.id
-        )?.tiprackUri,
-        lastCalibrated: pipetteOffsetCalibrations?.find(
-          p => p.pipette === attachedPipettes.right?.id
-        )?.lastModified,
-        markedBad: pipetteOffsetCalibrations?.find(
-          p => p.pipette === attachedPipettes.right?.id
-        )?.status.markedBad,
-      })
-    }
-    return pippets
-  }
 
   return (
     <>
@@ -112,7 +76,9 @@ export function RobotSettingsPipetteOffsetCalibration({
           {pipetteOffsetCalibrations != null ? (
             <PipetteOffsetCalibrationItems
               robotName={robotName}
-              formattedPipetteOffsetCalibrations={formatPipetteOffsetCalibrations()}
+              formattedPipetteOffsetCalibrations={
+                formattedPipetteOffsetCalibrations
+              }
               updateRobotStatus={updateRobotStatus}
             />
           ) : (

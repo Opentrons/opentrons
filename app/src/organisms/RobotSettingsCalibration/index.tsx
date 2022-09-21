@@ -193,39 +193,37 @@ export function RobotSettingsCalibration({
     return null
   })
 
-  const formatPipetteOffsetCalibrations = (): FormattedPipetteOffsetCalibration[] => {
-    const pippets = []
-    if (attachedPipettes != null) {
-      pippets.push({
-        modelName: attachedPipettes.left?.modelSpecs?.displayName,
-        serialNumber: attachedPipettes.left?.id,
-        mount: 'left' as Mount,
-        tiprack: pipetteOffsetCalibrations?.find(
-          p => p.pipette === attachedPipettes.left?.id
-        )?.tiprackUri,
-        lastCalibrated: pipetteOffsetCalibrations?.find(
-          p => p.pipette === attachedPipettes.left?.id
-        )?.lastModified,
-        markedBad: pipetteOffsetCalibrations?.find(
-          p => p.pipette === attachedPipettes.left?.id
-        )?.status.markedBad,
-      })
-      pippets.push({
-        modelName: attachedPipettes.right?.modelSpecs?.displayName,
-        serialNumber: attachedPipettes.right?.id,
-        mount: 'right' as Mount,
-        tiprack: pipetteOffsetCalibrations?.find(
-          p => p.pipette === attachedPipettes.right?.id
-        )?.tiprackUri,
-        lastCalibrated: pipetteOffsetCalibrations?.find(
-          p => p.pipette === attachedPipettes.right?.id
-        )?.lastModified,
-        markedBad: pipetteOffsetCalibrations?.find(
-          p => p.pipette === attachedPipettes.right?.id
-        )?.status.markedBad,
-      })
-    }
-    return pippets
+  const formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []
+
+  if (attachedPipettes != null) {
+    formattedPipetteOffsetCalibrations.push({
+      modelName: attachedPipettes.left?.modelSpecs?.displayName,
+      serialNumber: attachedPipettes.left?.id,
+      mount: 'left' as Mount,
+      tiprack: pipetteOffsetCalibrations?.find(
+        p => p.pipette === attachedPipettes.left?.id
+      )?.tiprackUri,
+      lastCalibrated: pipetteOffsetCalibrations?.find(
+        p => p.pipette === attachedPipettes.left?.id
+      )?.lastModified,
+      markedBad: pipetteOffsetCalibrations?.find(
+        p => p.pipette === attachedPipettes.left?.id
+      )?.status.markedBad,
+    })
+    formattedPipetteOffsetCalibrations.push({
+      modelName: attachedPipettes.right?.modelSpecs?.displayName,
+      serialNumber: attachedPipettes.right?.id,
+      mount: 'right' as Mount,
+      tiprack: pipetteOffsetCalibrations?.find(
+        p => p.pipette === attachedPipettes.right?.id
+      )?.tiprackUri,
+      lastCalibrated: pipetteOffsetCalibrations?.find(
+        p => p.pipette === attachedPipettes.right?.id
+      )?.lastModified,
+      markedBad: pipetteOffsetCalibrations?.find(
+        p => p.pipette === attachedPipettes.right?.id
+      )?.status.markedBad,
+    })
   }
 
   const checkPipetteCalibrationMissing = (): void => {
@@ -236,7 +234,7 @@ export function RobotSettingsCalibration({
         .map(mount => attachedPipettes[mount as Mount] != null)
         .filter(x => x).length
     const isPipettesNumberMatched =
-      numberOfAttached === formatPipetteOffsetCalibrations().length
+      numberOfAttached === formattedPipetteOffsetCalibrations.length
     if (
       pipetteOffsetCalibrations === null ||
       (Object.values(pipetteOffsetCalibrations).length <= 1 &&
@@ -392,6 +390,7 @@ export function RobotSettingsCalibration({
         />
       ) : null}
       <RobotSettingsPipetteOffsetCalibration
+        formattedPipetteOffsetCalibrations={formattedPipetteOffsetCalibrations}
         pipetteOffsetCalBannerType={pipetteOffsetCalBannerType}
         robotName={robotName}
         showPipetteOffsetCalibrationBanner={showPipetteOffsetCalibrationBanner}
@@ -401,6 +400,9 @@ export function RobotSettingsCalibration({
         <>
           <Line />
           <RobotSettingsTipLengthCalibration
+            formattedPipetteOffsetCalibrations={
+              formattedPipetteOffsetCalibrations
+            }
             robotName={robotName}
             updateRobotStatus={updateRobotStatus}
           />
