@@ -56,11 +56,11 @@ jobs:
         with:
           node-version: '14'
       - name: setup python
-        uses: './.github/actions/python/setup2'
-      - name: Lint with opentrons_hardware
+        uses: './.github/actions/python/setup-environments'
+      - name: Lint
         run: make -C api lint
   test:
-    name: 'opentrons package tests on ${{ matrix.os }}, python ${{ matrix.python }}'
+    name: 'opentrons package tests on ${{ matrix.os }}'
     timeout-minutes: 30
     needs: [lint]
     strategy:
@@ -72,14 +72,19 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - name: setup python
-        uses: './.github/actions/python/setup2'
+
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
+      - name: setup python Windows
+        if: matrix.os == 'windows-2019'
+        uses: './.github/actions/python/setup-app'
+      - name: setup python not Windows
+        if: matrix.os != 'windows-2019'
+        uses: './.github/actions/python/setup-environments'
       - name: Test without opentrons_hardware
         if: matrix.os != 'windows-2019'
         run: make -C api test-ot2
@@ -97,9 +102,10 @@ jobs:
           python -m pip install .
           opentrons_execute --help
           opentrons_simulate --help
-          opentrons_simulate ./api/docs/v2/example_protocols/dilution_tutorial.py -e -o nothing
+          opentrons_simulate ./docs/v2/example_protocols/dilution_tutorial.py -e -o nothing
           python -m opentrons.cli --help
       - name: Upload coverage report
+        if: matrix.os != 'windows-2019'
         uses: 'codecov/codecov-action@v3'
         with:
           files: ./api/coverage.xml
@@ -115,18 +121,14 @@ jobs:
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.10'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - uses: './.github/actions/python/setup'
-        with:
-          project: 'api'
+      - name: setup python
+        uses: './.github/actions/python/setup-environments'
       # creds and repository configuration for deploying python wheels
       - if: ${{ !env.OT_TAG }}
         name: 'upload to test pypi'

@@ -1,0 +1,37 @@
+name: "Setup App Python"
+description: "Set up the app Python environment for the given python."
+inputs:
+  python-version:
+    description: "What Python version?"
+    required: false
+    default: "3.10"
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        if [[ "${OSTYPE}" =~ "linux" ]]; then
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libsystemd-dev
+        fi
+    - shell: bash
+      run: |
+        npm install --global shx@0.3.3
+    - uses: 'actions/setup-python@v4'
+      id: python
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: "pipenv"
+        cache-dependency-path: |
+          api/setup.*
+          environments/app/Pipfile.*
+          shared-data/python/setup.*
+    - shell: bash
+      name: setup pipenv 
+      run: pip install pipenv==2021.5.29
+    - shell: bash
+      if: steps.python.outputs.cache-hit == 'false'
+      working-directory: environments
+      name: setup
+      run: make -C app setup

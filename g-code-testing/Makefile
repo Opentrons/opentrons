@@ -19,6 +19,9 @@ tests_to_typecheck := \
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 
+# overwrite pipenv from python.mk as this folder does not directly use environments
+pipenv := PIPENV_PIPFILE=./Pipfile $(pipenv_call)
+
 .PHONY: setup
 setup:
 	$(pipenv) sync $(pipenv_opts)
@@ -30,7 +33,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	$(pipenv) --rm || true
 
 .PHONY: test
 test:

@@ -4,20 +4,30 @@
 # make OT_PYTHON available
 include ./scripts/python.mk
 
-API_DIR := api
+# ts/js directories
 APP_SHELL_DIR := app-shell
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
-G_CODE_TESTING_DIR := g-code-testing
 LABWARE_LIBRARY_DIR := labware-library
 NOTIFY_SERVER_DIR := notify-server
 PROTOCOL_DESIGNER_DIR := protocol-designer
+
+# mixed
 SHARED_DATA_DIR := shared-data
+
+# python directories
+API_DIR := api
+
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
 HARDWARE_DIR := hardware
+G_CODE_TESTING_DIR := g-code-testing
+HARDWARE_TESTING_DIR := hardware-testing
+ENVIRONMENTS := environments
 
-PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR) $(HARDWARE_DIR)
+PYTHON_SETUP_DIRS := $(G_CODE_TESTING_DIR) $(HARDWARE_TESTING_DIR) $(ENVIRONMENTS)
+PYTHON_CLEAN_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python $(HARDWARE_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_TESTING_DIR)
+PYTHON_TEARDOWN_DIRS := $(PYTHON_SETUP_DIRS)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -53,13 +63,21 @@ setup-js:
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
-.PHONY: setup-py
-setup-py:
-	$(OT_PYTHON) -m pip install pipenv==2021.5.29
-	$(MAKE) -C environments setup
+# If pyenv is setup as expected, these resolve.
+.PHONY: install-pipenv
+install-pipenv:
+	python3.8 -m pip install pipenv==2021.5.29
+	python3.10 -m pip install pipenv==2021.5.29
+
+PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_SETUP_DIRS))
 
 %-py-setup:
 	$(MAKE) -C $* setup
+
+.PHONY: setup-py
+setup-py:
+	$(MAKE) install-pipenv
+	$(MAKE) $(PYTHON_SETUP_TARGETS)
 
 # uninstall all project dependencies
 # tear down JS after Python, because Python cleanup depends on JS dep shx
@@ -72,12 +90,15 @@ teardown:
 teardown-js: clean-js
 	yarn shx rm -rf "**/node_modules"
 
-PYTHON_TEARDOWN_TARGETS := $(addsuffix -py-teardown, $(PYTHON_DIRS))
-
 .PHONY: teardown-py
-teardown-py: $(PYTHON_TEARDOWN_TARGETS)
+teardown-py:
+	$(MAKE) install-pipenv
+	$(MAKE) $(PYTHON_TEARDOWN_TARGETS)
+	$(MAKE) $(PYTHON_CLEAN_TARGETS)
 
-%-py-teardown: %-py-clean
+PYTHON_TEARDOWN_TARGETS := $(addsuffix -py-teardown, $(PYTHON_TEARDOWN_DIRS))
+
+%-py-teardown:
 	$(MAKE) -C $* teardown
 
 # clean all project output
@@ -89,7 +110,7 @@ clean-js: clean-ts
 	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) clean
 	$(MAKE) -C $(COMPONENTS_DIR) clean
 
-PYTHON_CLEAN_TARGETS := $(addsuffix -py-clean, $(PYTHON_DIRS))
+PYTHON_CLEAN_TARGETS := $(addsuffix -py-clean, $(PYTHON_CLEAN_DIRS))
 
 .PHONY: clean-py
 clean-py: $(PYTHON_CLEAN_TARGETS)

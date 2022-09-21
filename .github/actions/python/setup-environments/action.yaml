@@ -1,5 +1,5 @@
-name: "Python Setup"
-description: "Set up the environment to handle a monorepo python project"
+name: "Setup All Environments"
+description: "Set up the environments to handle a monorepo python projects"
 
 runs:
   using: "composite"
@@ -19,10 +19,10 @@ runs:
         python-version: '3.8'
         cache: "pipenv"
         cache-dependency-path: |
-          **/setup.py
+          **/setup.*
           **/Pipfile.*
     - shell: bash
-      name: setup pipenv on 3.8
+      name: install pipenv on 3.8
       run: pip install pipenv==2021.5.29
     - shell: bash
       if: steps.python38.outputs.cache-hit == 'false'
@@ -38,14 +38,13 @@ runs:
           **/setup.py
           **/Pipfile.*
     - shell: bash
-      name: setup pipenv on 3.10
+      name: install pipenv on 3.10
       run: pip install pipenv==2021.5.29
     - shell: bash
       if: steps.python310.outputs.cache-hit == 'false'
       working-directory: environments
-      name: setup venv python 3.10
+      name: setup the environments
       run: |
-        make -C ot-2 setup & \
-        make -C dev setup & \
-        make -C app setup & \
-        wait;
+        make -C ot-2 setup
+        make -C dev setup
+        make -C app setup
