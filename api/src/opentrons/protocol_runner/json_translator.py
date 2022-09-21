@@ -12,6 +12,7 @@ from opentrons.protocol_engine import (
     ModuleModel,
     DeckSlotLocation,
     Liquid,
+    HexColor,
 )
 
 
@@ -121,7 +122,9 @@ class JsonTranslator:
                 id=liquid_id,
                 displayName=liquid.displayName,
                 description=liquid.description,
-                displayColor=liquid.displayColor,
+                displayColor=HexColor(color=liquid.displayColor)
+                if liquid.displayColor
+                else None,
             )
             for liquid_id, liquid in protocol_liquids.items()
         ]

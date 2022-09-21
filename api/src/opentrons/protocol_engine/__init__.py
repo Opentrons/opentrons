@@ -39,7 +39,7 @@ from .types import (
     ModuleModel,
     ModuleDefinition,
     Liquid,
-    HexColor
+    HexColor,
 )
 
 

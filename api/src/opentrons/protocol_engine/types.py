@@ -340,12 +340,12 @@ class LoadedLabware(BaseModel):
 
 class HexColor(BaseModel):
     """Hex color representation."""
+
     color: str
 
-    @validator('color')
-    def color_is_a_valid_hex(cls, v):
-        print(v)
-        match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', v)
+    @validator("color")
+    def _color_is_a_valid_hex(cls, v: str) -> None:
+        match = re.search(r"^#(?:[0-9a-fA-F]{3}){1,2}$", v)
         if not match:
             raise ValueError("Color is not a valid hex color.")
 

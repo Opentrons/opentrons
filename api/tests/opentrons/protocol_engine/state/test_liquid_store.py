@@ -1,8 +1,7 @@
 """Liquid state store tests."""
 import pytest
-from pydantic import ValidationError
 from opentrons.protocol_engine.state.liquids import LiquidStore
-from opentrons.protocol_engine import Liquid, HexColor
+from opentrons.protocol_engine import Liquid
 from opentrons.protocol_engine.actions.actions import AddLiquidAction
 
 
@@ -22,12 +21,3 @@ def test_handles_add_liquid(subject: LiquidStore) -> None:
     assert len(subject.state.liquids_by_id) == 1
 
     assert subject.state.liquids_by_id["water-id"] == expected_liquid
-
-
-def test_handles_add_liquid_invalid_hex(subject: LiquidStore) -> None:
-    """Should raise a validation error."""
-    expected_liquid = Liquid(
-        id="water-id", displayName="water", description="water-desc", displayColor=HexColor(color="#123456789")
-    )
-    with pytest.raises(ValidationError):
-        subject.handle_action(AddLiquidAction(liquid=expected_liquid))

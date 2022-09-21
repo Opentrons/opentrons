@@ -1,6 +1,7 @@
 """Tests for the JSON JsonTranslator interface."""
 import pytest
 from typing import Dict, List
+from pydantic import ValidationError
 
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
@@ -28,6 +29,7 @@ from opentrons.protocol_engine import (
     ModuleModel,
     ModuleLocation,
     Liquid,
+    HexColor,
 )
 
 VALID_TEST_PARAMS = [
@@ -454,3 +456,14 @@ def test_load_liquid(
     assert result == [
         Liquid(id="liquid-id-555", displayName="water", description="water description")
     ]
+
+
+def test_handles_add_liquid_invalid_hex(subject: JsonTranslator) -> None:
+    """Should raise a validation error."""
+    with pytest.raises(ValidationError):
+        Liquid(
+            id="water-id",
+            displayName="water",
+            description="water-desc",
+            displayColor=HexColor(color="#123456789"),
+        )
