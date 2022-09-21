@@ -48,7 +48,7 @@ defaults:
 jobs:
   lint:
     name: 'opentrons package linting'
-    timeout-minutes: 10
+    timeout-minutes: 20
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
@@ -66,24 +66,20 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2019', 'ubuntu-22.04', 'macos-latest']
-        python: ['3.10']
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v3'
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: ${{ matrix.python }}
+      - name: setup python
+        uses: './.github/actions/python/setup2'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - name: setup python
-        uses: './.github/actions/python/setup2'
       - name: Test without opentrons_hardware
         run: make -C api test-ot2
       - name: Test with opentrons_hardware
