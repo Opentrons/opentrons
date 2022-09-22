@@ -62,8 +62,8 @@ export function Banner(props: BannerProps): JSX.Element | null {
 interface BannerItemProps {
   title: string
   body: string
-  btnText: string
-  onClick: () => void
+  btnText?: string
+  onClick?: () => void
 }
 
 export const BannerItem = (props: BannerItemProps): JSX.Element => {
@@ -78,18 +78,20 @@ export const BannerItem = (props: BannerItemProps): JSX.Element => {
           as="p"
           marginTop={SPACING.spacing3}
           color={COLORS.darkGrey}
-          maxWidth={SIZE_6}
+          maxWidth={btnText != null ? SIZE_6 : '100%'}
           data-testid={`banner_subtitle_${title}`}
         >
           {body}
         </StyledText>
       </Flex>
-      <TertiaryButton
-        data-testid="banner_open_wizard_btn"
-        onClick={() => onClick()}
-      >
-        {btnText}
-      </TertiaryButton>
+      {btnText != null && onClick != null ? (
+        <TertiaryButton
+          data-testid="banner_open_wizard_btn"
+          onClick={() => onClick()}
+        >
+          {btnText}
+        </TertiaryButton>
+      ) : null}
     </Flex>
   )
 }

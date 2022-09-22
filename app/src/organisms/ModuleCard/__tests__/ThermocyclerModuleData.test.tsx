@@ -5,7 +5,12 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { StatusLabel } from '../../../atoms/StatusLabel'
 import { ThermocyclerModuleData } from '../ThermocyclerModuleData'
-import { mockThermocycler } from '../../../redux/modules/__fixtures__'
+import {
+  mockThermocycler,
+  mockThermocyclerGen2,
+} from '../../../redux/modules/__fixtures__'
+
+import type { ThermocyclerData } from '../../../redux/modules/api-types'
 
 jest.mock('../../../atoms/StatusLabel')
 
@@ -17,15 +22,41 @@ const render = (props: React.ComponentProps<typeof ThermocyclerModuleData>) => {
   })[0]
 }
 
+const mockDataBase = {
+  lidStatus: 'open',
+  lidTargetTemperature: null,
+  lidTemperature: null,
+  currentTemperature: null,
+  targetTemperature: null,
+  holdTime: null,
+  rampRate: null,
+  currentCycleIndex: null,
+  totalCycleCount: null,
+  currentStepIndex: null,
+  totalStepCount: null,
+}
+
+const mockDataHoldingAtTarget = {
+  ...mockDataBase,
+  status: 'holding at target',
+} as ThermocyclerData
+
+const mockDataCooling = {
+  ...mockDataBase,
+  status: 'cooling',
+} as ThermocyclerData
+
+const mockDataHeating = {
+  ...mockDataBase,
+  status: 'heating',
+} as ThermocyclerData
+
 describe('ThermocyclerModuleData', () => {
   let props: React.ComponentProps<typeof ThermocyclerModuleData>
   beforeEach(() => {
     props = {
-      status: mockThermocycler.data.status,
-      currentTemp: mockThermocycler.data.currentTemperature,
-      targetTemp: mockThermocycler.data.targetTemperature,
-      lidTemp: mockThermocycler.data.lidTemperature,
-      lidTarget: mockThermocycler.data.lidTargetTemperature,
+      moduleModel: mockThermocycler.moduleModel,
+      data: mockThermocycler.data,
     }
     mockStatusLabel.mockReturnValue(<div>Mock Thermocycler StatusLabel</div>)
   })
@@ -44,7 +75,7 @@ describe('ThermocyclerModuleData', () => {
   it('renders a holding at target status', () => {
     props = {
       ...props,
-      status: 'holding at target',
+      data: mockDataHoldingAtTarget,
     }
     const { getByText } = render(props)
 
@@ -56,7 +87,7 @@ describe('ThermocyclerModuleData', () => {
   it('renders a cooling status', () => {
     props = {
       ...props,
-      status: 'cooling',
+      data: mockDataCooling,
     }
     const { getByText } = render(props)
 
@@ -68,7 +99,7 @@ describe('ThermocyclerModuleData', () => {
   it('renders a heating status', () => {
     props = {
       ...props,
-      status: 'heating',
+      data: mockDataHeating,
     }
     const { getByText } = render(props)
 
@@ -80,7 +111,7 @@ describe('ThermocyclerModuleData', () => {
   it('renders an error status', () => {
     props = {
       ...props,
-      status: 'heating',
+      data: mockDataHeating,
     }
     const { getByText } = render(props)
 
@@ -89,7 +120,7 @@ describe('ThermocyclerModuleData', () => {
     )
   })
 
-  it('renders thermocycler lid temperature data', () => {
+  it('renders thermocycler gen 1 lid temperature data', () => {
     const { getByText, getByTitle } = render(props)
 
     getByText('Lid')
@@ -97,11 +128,20 @@ describe('ThermocyclerModuleData', () => {
     getByTitle('lid_temp')
   })
 
-  it('renders thermocycler block temperature data', () => {
+  it('renders thermocycler gen 1 block temperature data', () => {
     const { getByText, getByTitle } = render(props)
 
     getByText('Block')
     getByTitle('tc_target_temp')
     getByTitle('tc_current_temp')
+  })
+
+  it('renders a thermocycler gen 2 status labels', () => {
+    props = {
+      moduleModel: mockThermocyclerGen2.moduleModel,
+      data: mockThermocyclerGen2.data,
+    }
+    const { getAllByText } = render(props)
+    expect(getAllByText('Mock Thermocycler StatusLabel')).toHaveLength(2)
   })
 })

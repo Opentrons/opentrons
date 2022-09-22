@@ -6,6 +6,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   ModuleType,
   THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { COLORS } from '@opentrons/components'
 import { Divider } from '../../../atoms/structure/Divider'
@@ -144,9 +145,21 @@ const ModuleExtraAttentionItem = (
             moduleName: moduleInfo.moduleDef.displayName,
             slotName: moduleInfo.slotName,
           })}
-          body={t('protocol_setup:thermocycler_extra_attention')}
-          btnText={t('view_instructions')}
-          onClick={onClick}
+          body={t(
+            moduleInfo.moduleDef.model === THERMOCYCLER_MODULE_V1
+              ? 'protocol_setup:thermocycler_extra_attention_gen_1'
+              : 'protocol_setup:thermocycler_extra_attention_gen_2'
+          )}
+          btnText={
+            moduleInfo.moduleDef.model === THERMOCYCLER_MODULE_V1
+              ? t('view_instructions')
+              : undefined
+          }
+          onClick={
+            moduleInfo.moduleDef.model === THERMOCYCLER_MODULE_V1
+              ? onClick
+              : undefined
+          }
         />
       )
     default:

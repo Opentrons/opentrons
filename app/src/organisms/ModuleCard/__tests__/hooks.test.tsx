@@ -32,6 +32,7 @@ import {
   mockMagneticModuleGen2,
   mockTemperatureModuleGen2,
   mockThermocycler,
+  mockThermocyclerGen2,
 } from '../../../redux/modules/__fixtures__'
 
 import type { Store } from 'redux'
@@ -591,6 +592,42 @@ describe('useModuleOverflowMenu', () => {
         commandType: 'thermocycler/deactivateLid',
         params: {
           moduleId: mockTCLidHeating.id,
+        },
+      },
+    })
+  })
+
+  it('should render TC module gen 2 and create a close lid command', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <I18nextProvider i18n={i18n}>
+        <Provider store={store}>{children}</Provider>
+      </I18nextProvider>
+    )
+    const { result } = renderHook(
+      () =>
+        useModuleOverflowMenu(
+          mockThermocyclerGen2,
+          null,
+          jest.fn(),
+          jest.fn(),
+          jest.fn(),
+          jest.fn(),
+          false
+        ),
+      {
+        wrapper,
+      }
+    )
+    const { menuOverflowItemsByModuleType } = result.current
+    const tcMenu = menuOverflowItemsByModuleType.thermocyclerModuleType
+    console.log(tcMenu[1])
+    act(() => tcMenu[1].onClick(true))
+
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'thermocycler/closeLid',
+        params: {
+          moduleId: mockThermocyclerGen2.id,
         },
       },
     })

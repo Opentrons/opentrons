@@ -3,30 +3,29 @@ import { useTranslation } from 'react-i18next'
 import { StatusLabel } from '../../atoms/StatusLabel'
 import {
   Flex,
-  Text,
   TYPOGRAPHY,
-  SPACING_2,
   FONT_WEIGHT_REGULAR,
   DIRECTION_COLUMN,
   COLORS,
   SPACING,
   WRAP,
+  Box,
 } from '@opentrons/components'
+import { THERMOCYCLER_MODULE_V2 } from '@opentrons/shared-data'
+import { StyledText } from '../../atoms/text'
 
-import type { ThermocyclerStatus } from '../../redux/modules/api-types'
+import type { ThermocyclerData } from '../../redux/modules/api-types'
+import type { ThermocyclerModuleModel } from '@opentrons/shared-data'
 
 interface ThermocyclerModuleProps {
-  status: ThermocyclerStatus
-  currentTemp: number | null
-  targetTemp: number | null
-  lidTemp: number | null
-  lidTarget: number | null
+  moduleModel: ThermocyclerModuleModel
+  data: ThermocyclerData
 }
 
 export const ThermocyclerModuleData = (
   props: ThermocyclerModuleProps
 ): JSX.Element | null => {
-  const { status, currentTemp, targetTemp, lidTemp, lidTarget } = props
+  const { moduleModel, data } = props
   const { t } = useTranslation('device_details')
 
   const getStatusLabelProps = (
@@ -40,12 +39,14 @@ export const ThermocyclerModuleData = (
     }
 
     switch (status) {
+      case 'closed':
       case 'idle': {
         StatusLabelProps.backgroundColor = COLORS.medGreyEnabled
         StatusLabelProps.iconColor = COLORS.darkGreyEnabled
         StatusLabelProps.textColor = COLORS.darkBlackEnabled
         break
       }
+      case 'open':
       case 'holding at target': {
         StatusLabelProps.backgroundColor = COLORS.medBlue
         StatusLabelProps.iconColor = COLORS.blueEnabled
@@ -73,56 +74,78 @@ export const ThermocyclerModuleData = (
         data-testid="thermocycler_module_data_lid"
         gridColumn="1/4"
       >
-        <Text
+        <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
-          fontWeight={FONT_WEIGHT_REGULAR}
           fontSize={TYPOGRAPHY.fontSizeCaption}
-          marginTop={SPACING_2}
-          marginBottom={SPACING.spacing2}
+          marginTop={SPACING.spacing3}
+          marginBottom={
+            moduleModel === THERMOCYCLER_MODULE_V2 ? '0rem' : SPACING.spacing2
+          }
         >
           {t('tc_lid')}
-        </Text>
-        <Text
+        </StyledText>
+        {moduleModel === THERMOCYCLER_MODULE_V2 ? (
+          //  TODO(jr, 9/22/22): when the module endpoint includes lid temperature status, add the status label
+          // <Flex flexDirection={DIRECTION_ROW}>
+          <Box marginRight={SPACING.spacing2}>
+            <StatusLabel
+              status={data.lidStatus}
+              {...getStatusLabelProps(data.lidStatus)}
+            />
+          </Box>
+        ) : //  <StatusLabel
+        //     status={data.lidTemperatureStatus}
+        //     {...getStatusLabelProps(data.lidTemperatureStatus)}
+        //   />
+        // </Flex>
+        null}
+        <StyledText
           title="lid_target_temp"
           fontSize={TYPOGRAPHY.fontSizeCaption}
           marginBottom={SPACING.spacing1}
         >
-          {t(lidTarget == null ? 'na_temp' : 'target_temp', {
-            temp: lidTarget,
+          {t(data.lidTargetTemperature == null ? 'na_temp' : 'target_temp', {
+            temp: data.lidTargetTemperature,
           })}
-        </Text>
-        <Text title="lid_temp" fontSize={TYPOGRAPHY.fontSizeCaption}>
-          {t('current_temp', { temp: lidTemp })}
-        </Text>
+        </StyledText>
+        <StyledText title="lid_temp" fontSize={TYPOGRAPHY.fontSizeCaption}>
+          {t('current_temp', { temp: data.lidTemperature })}
+        </StyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         data-testid="thermocycler_module_data_block"
         gridColumn="5/8"
       >
-        <Text
+        <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
           fontWeight={FONT_WEIGHT_REGULAR}
           fontSize={TYPOGRAPHY.fontSizeCaption}
-          marginTop={SPACING_2}
+          marginTop={SPACING.spacing3}
         >
           {t('tc_block')}
-        </Text>
-        <StatusLabel status={status} {...getStatusLabelProps(status)} />
-        <Text
+        </StyledText>
+        <StatusLabel
+          status={data.status}
+          {...getStatusLabelProps(data.status)}
+        />
+        <StyledText
           title="tc_target_temp"
           fontSize={TYPOGRAPHY.fontSizeCaption}
           marginBottom={SPACING.spacing1}
         >
-          {t(targetTemp == null ? 'na_temp' : 'target_temp', {
-            temp: targetTemp,
+          {t(data.targetTemperature == null ? 'na_temp' : 'target_temp', {
+            temp: data.targetTemperature,
           })}
-        </Text>
-        <Text title="tc_current_temp" fontSize={TYPOGRAPHY.fontSizeCaption}>
-          {t('current_temp', { temp: currentTemp })}
-        </Text>
+        </StyledText>
+        <StyledText
+          title="tc_current_temp"
+          fontSize={TYPOGRAPHY.fontSizeCaption}
+        >
+          {t('current_temp', { temp: data.currentTemperature })}
+        </StyledText>
       </Flex>
     </Flex>
   )

@@ -7,6 +7,7 @@ import {
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockHeaterShaker,
+  mockThermocyclerGen2,
 } from '../../../redux/modules/__fixtures__'
 import {
   useRunStatuses,
@@ -162,6 +163,15 @@ const mockTCBlockHeating = {
   usbPort: { path: '/dev/ot_module_thermocycler0', port: 1 },
 } as any
 
+const mockThermocyclerGen2LidClosed = {
+  id: 'thermocycler_id2',
+  moduleModel: 'thermocyclerModuleV2',
+  moduleType: 'thermocyclerModuleType',
+  data: {
+    lidStatus: 'closed',
+  },
+} as any
+
 describe('ModuleOverflowMenu', () => {
   let props: React.ComponentProps<typeof ModuleOverflowMenu>
   beforeEach(() => {
@@ -309,7 +319,6 @@ describe('ModuleOverflowMenu', () => {
       name: 'Open Labware Latch',
     })
     expect(btn).not.toBeDisabled()
-    fireEvent.click(btn)
   })
 
   it('renders heater shaker labware latch button and when clicked, moves labware latch close', () => {
@@ -323,11 +332,9 @@ describe('ModuleOverflowMenu', () => {
     }
     const { getByRole } = render(props)
 
-    const btn = getByRole('button', {
+    getByRole('button', {
       name: 'Close Labware Latch',
     })
-
-    fireEvent.click(btn)
   })
 
   it('renders heater shaker overflow menu and deactivates heater when status changes', () => {
@@ -346,7 +353,6 @@ describe('ModuleOverflowMenu', () => {
       name: 'Deactivate heater',
     })
     expect(btn).not.toBeDisabled()
-    fireEvent.click(btn)
   })
 
   it('renders temperature module overflow menu and deactivates heat when status changes', () => {
@@ -365,7 +371,6 @@ describe('ModuleOverflowMenu', () => {
       name: 'Deactivate module',
     })
     expect(btn).not.toBeDisabled()
-    fireEvent.click(btn)
   })
 
   it('renders magnetic module overflow menu and disengages when status changes', () => {
@@ -384,7 +389,6 @@ describe('ModuleOverflowMenu', () => {
       name: 'Disengage module',
     })
     expect(btn).not.toBeDisabled()
-    fireEvent.click(btn)
   })
 
   it('renders thermocycler overflow menu and deactivates block when status changes', () => {
@@ -403,7 +407,6 @@ describe('ModuleOverflowMenu', () => {
       name: 'Deactivate block',
     })
     expect(btn).not.toBeDisabled()
-    fireEvent.click(btn)
   })
 
   it('should disable module control buttons when the robot is busy and run status not null', () => {
@@ -430,5 +433,57 @@ describe('ModuleOverflowMenu', () => {
       name: 'Deactivate block',
     })
     expect(btn).toBeDisabled()
+  })
+
+  it('renders the correct Thermocycler gen 2 menu', () => {
+    props = {
+      module: mockThermocyclerGen2,
+      handleSlideoutClick: jest.fn(),
+      handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
+      isLoadedInRun: false,
+    }
+    const { getByRole } = render(props)
+    const setLid = getByRole('button', {
+      name: 'Set lid temperature',
+    })
+    getByRole('button', {
+      name: 'Close lid',
+    })
+    const setBlock = getByRole('button', { name: 'Set block temperature' })
+    const about = getByRole('button', { name: 'About module' })
+    fireEvent.click(setLid)
+    expect(props.handleSlideoutClick).toHaveBeenCalled()
+    fireEvent.click(setBlock)
+    expect(props.handleSlideoutClick).toHaveBeenCalled()
+    fireEvent.click(about)
+    expect(props.handleAboutClick).toHaveBeenCalled()
+  })
+
+  it('renders the correct Thermocycler gen 2 menu with the lid closed', () => {
+    props = {
+      module: mockThermocyclerGen2LidClosed,
+      handleSlideoutClick: jest.fn(),
+      handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
+      isLoadedInRun: false,
+    }
+    const { getByRole } = render(props)
+    const setLid = getByRole('button', {
+      name: 'Set lid temperature',
+    })
+    getByRole('button', {
+      name: 'Open lid',
+    })
+    const setBlock = getByRole('button', { name: 'Deactivate block' })
+    const about = getByRole('button', { name: 'About module' })
+    fireEvent.click(setLid)
+    expect(props.handleSlideoutClick).toHaveBeenCalled()
+    fireEvent.click(setBlock)
+    expect(props.handleSlideoutClick).toHaveBeenCalled()
+    fireEvent.click(about)
+    expect(props.handleAboutClick).toHaveBeenCalled()
   })
 })
