@@ -53,7 +53,7 @@ def read_cal_file(
 
 def save_to_file(
     filepath: StrPath,
-    data: BaseModel,
+    data: typing.Union[BaseModel, typing.Dict],
     encoder: EncoderType = DateTimeEncoder,
 ) -> None:
     """
@@ -65,5 +65,7 @@ def save_to_file(
     The default encoder is the date time encoder.
     """
     with open(filepath, "w") as f:
-        f.write(data.json())
-        # json.dump(data.json(), f, cls=encoder)
+        if isinstance(data, BaseModel):
+            f.write(data.json())
+        else:
+            json.dump(data, f, cls=encoder)
