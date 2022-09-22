@@ -66,11 +66,11 @@ describe('Protocols with Modules', () => {
         cy.contains('Slot 7').should('exist')
       })
 
-      // Edit Thermocycler module (should not have slot option or other gen)
+      // Edit Thermocycler module (should not have slot option but have another gen)
       cy.get(editThermocycler).click()
       cy.get(editModuleModal).within(() => {
         cy.contains('Position').should('not.exist')
-        cy.get(moduleModelDropdown).contains('GEN2').should('not.exist')
+        cy.get(moduleModelDropdown).contains('GEN2').should('exist')
         cy.get('button').contains('cancel', { matchCase: false }).click()
       })
 
