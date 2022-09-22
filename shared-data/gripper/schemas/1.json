@@ -104,7 +104,7 @@
       "description": "Array of valid quirks for a given gripper",
       "items": { "type": "string" }
     },
-    "jawSizes_um": {
+    "jawSizes_mm": {
       "$ref": "#/definitions/configValue"
     }
   }

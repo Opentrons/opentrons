@@ -58,8 +58,8 @@
     "z": -95
   },
   "quirks": [],
-  "jawSizes_um": {
-    "max": 132450,
-    "min": 75750
+  "jawSizes_mm": {
+    "max": 132.45,
+    "min": 75.75
   }
 }
