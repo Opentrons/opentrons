@@ -3,7 +3,7 @@ import asyncio
 import logging
 from typing import NoReturn
 import time
-from . import cli
+import cli
 
 LOG = logging.getLogger(__name__)
 
