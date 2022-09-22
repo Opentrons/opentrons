@@ -14,7 +14,7 @@ from opentrons.protocol_engine.commands.validation import ensure_ot3_hardware
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control import ot3_calibration as calibration
 from opentrons.hardware_control.types import OT3Mount
-from opentrons.types import Point
+from opentrons.types import Point, MountType
 
 CalibratePipetteCommandType = Literal["calibration/calibratePipette"]
 
@@ -22,7 +22,7 @@ CalibratePipetteCommandType = Literal["calibration/calibratePipette"]
 class CalibratePipetteParams(BaseModel):
     """Payload required to calibrate-pipette."""
 
-    mount: OT3Mount = Field(..., description="Instrument mount to calibrate.")
+    mount: MountType = Field(..., description="Instrument mount to calibrate.")
 
 
 class CalibratePipetteResult(BaseModel):
@@ -49,7 +49,7 @@ class CalibratePipetteImplementation(
         ot3_api = ensure_ot3_hardware(self._hardware_api)
 
         pipette_offset = await calibration.calibrate_mount(
-            hcapi=ot3_api, mount=params.mount  # type: ignore[arg-type]
+            hcapi=ot3_api, mount=OT3Mount[MountType(params.mount).name]
         )
 
         return CalibratePipetteResult(pipetteOffset=pipette_offset)

@@ -31,11 +31,11 @@ async def test_calibrate_pipette_implementation(
     subject = CalibratePipetteImplementation(hardware_api=ot3_hardware_api)
 
     params = CalibratePipetteParams(
-        mount=OT3Mount.LEFT,
+        mount="left",
     )
 
     decoy.when(
-        await calibration.calibrate_mount(hcapi=ot3_hardware_api, mount=params.mount)
+        await calibration.calibrate_mount(hcapi=ot3_hardware_api, mount=OT3Mount.LEFT)
     ).then_return(Point(x=3, y=4, z=6))
 
     result = await subject.execute(params)
@@ -50,7 +50,7 @@ async def test_calibrate_pipette_implementation_wrong_hardware(
     subject = CalibratePipetteImplementation(hardware_api=ot2_hardware_api)
 
     params = CalibratePipetteParams(
-        mount=OT3Mount.LEFT,
+        mount="left",
     )
 
     with pytest.raises(HardwareNotSupported):
