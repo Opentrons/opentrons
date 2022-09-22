@@ -11,7 +11,7 @@ from opentrons.types import MountType
 def ensure_ot3_hardware(hardware_api: HardwareControlAPI) -> OT3API:
     """Validate that the HardwareControlAPI is of OT-3 instance."""
     if not isinstance(hardware_api, OT3API):
-        raise HardwareNotSupported("This command is supported by OT3 Only.")
+        raise HardwareNotSupported("This command is supported by OT-3 only.")
 
     return hardware_api
 
