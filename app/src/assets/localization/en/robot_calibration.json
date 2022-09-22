@@ -87,5 +87,12 @@
   "small": "Small",
   "large": "Large",
   "you_will_need": "You will need:",
-  "you_can_remove_cal_block": "You can remove the Calibration Block from the deck now."
+  "you_can_remove_cal_block": "You can remove the Calibration Block from the deck now.",
+  "calibration_complete": "Calibration complete",
+  "calibration_recommended": "Calibration recommended",
+  "good_calibration": "Good calibration",
+  "recalibration_recommended": "Recalibration recommended",
+  "calibration_health_check_results": "Calibration Health Check Results",
+  "download_details": "Download details JSON Calibration Check summary",
+  "finish": "Finish"
 }

@@ -44,7 +44,7 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
         alignItems={ALIGN_CENTER}
         marginTop={SPACING.spacing2}
         marginBottom={SPACING.spacing2}
-        data-testid={`status_label+${status}`}
+        data-testid={`status_label_${status}`}
       >
         <Icon
           name="circle"

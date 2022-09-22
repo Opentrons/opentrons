@@ -21,7 +21,7 @@ import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
 import { ReturnTip } from './ReturnTip'
-import { ResultsSummary } from './ResultsSummary'
+import { ResultsSummary } from './ResultsSummary/index'
 
 import type { Mount } from '@opentrons/components'
 import type {
