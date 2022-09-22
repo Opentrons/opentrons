@@ -465,5 +465,5 @@ def test_handles_add_liquid_invalid_hex(subject: JsonTranslator) -> None:
             id="water-id",
             displayName="water",
             description="water-desc",
-            displayColor=HexColor(color="#123456789"),
+            displayColor=HexColor(__root__="#123456789"),
         )
