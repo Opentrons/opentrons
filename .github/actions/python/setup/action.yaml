@@ -3,11 +3,11 @@ description: 'Set up the environment to handle a monorepo python project'
 inputs:
   project:
     description: 'Which project (by subdirectory) to set up'
-    required: true
+    required: true # now only viable for g-code-testing and hardware-testing
   python-version:
-    description: "What Python version to use to create the project's virtual environment"
-    required: false
-    default: "false"
+    description: "The version of Python to map to 'python' on path. Also sets OT_PYTHON with the full path to this version"
+    required: true
+
 runs:
   using: 'composite'
   steps:
@@ -17,21 +17,21 @@ runs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libsystemd-dev
         fi
-    - name: Set the OT_PYTHON env variable
-      shell: bash
-      run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
-    - name: If provided set the OT_VIRTUALENV_VERSION env variable
-      shell : bash
-      if: ${{ inputs.python-version != 'false' }}
-      # get only major and minor value
-      # needed for python version like 3.11.0-rc.1
-      run: |
-        major=$(echo ${{ inputs.python-version }} | cut -d. -f1)
-        minor=$(echo ${{ inputs.python-version }} | cut -d. -f2)
-        echo "OT_VIRTUALENV_VERSION=$major.$minor" >> $GITHUB_ENV
+    - uses: 'actions/setup-node@v3'
+      with:
+        node-version: '14'
     - shell: bash
       run: |
         npm install --global shx@0.3.3
-        $OT_PYTHON -m pip install pipenv==2021.5.29
+    - uses: 'actions/setup-python@v4'
+      with:
+        python-version: ${{ inputs.python-version }}
+    - name: Set the OT_PYTHON env variable
+      shell: bash
+      run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
+    - name: install pipenv==2021.5.29
+      shell: bash
+      run: $OT_PYTHON -m pip install pipenv==2021.5.29
     - shell: bash
+      name: setup project ${{ inputs.project }}
       run: 'make -C ${{ inputs.project }} setup'

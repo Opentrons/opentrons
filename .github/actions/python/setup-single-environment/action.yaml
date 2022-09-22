@@ -1,10 +1,12 @@
-name: "Setup App Python"
-description: "Set up the app Python environment for the given python."
+name: "Setup a single Python environment"
+description: "Set up an environment with a specific Python."
 inputs:
   python-version:
-    description: "What Python version?"
-    required: false
-    default: "3.10"
+    description: "Which Python version?"
+    required: true
+  project:
+    description: 'Which environment?'
+    required: true
 
 runs:
   using: "composite"
@@ -15,26 +17,21 @@ runs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libsystemd-dev
         fi
+    - uses: 'actions/setup-node@v3'
+      with:
+        node-version: '14'
     - shell: bash
-      run: |
-        npm install --global shx@0.3.3
+      run: npm install --global shx@0.3.3
     - uses: 'actions/setup-python@v4'
-      id: python
       with:
         python-version: ${{ inputs.python-version }}
-        cache: "pipenv"
-        cache-dependency-path: |
-          api/setup.*
-          environments/app/Pipfile.*
-          shared-data/python/setup.*
     - name: Set the OT_PYTHON env variable
       shell: bash
       run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
-    - shell: bash
-      name: setup pipenv 
+    - name: Install pipenv==2021.5.29
+      shell: bash
       run: $OT_PYTHON -m pip install pipenv==2021.5.29
     - shell: bash
-      if: steps.python.outputs.cache-hit == 'false'
       working-directory: environments
-      name: setup
-      run: make -C app setup
+      name: setup ${{ inputs.environment }}
+      run: make -C ${{ inputs.environment }} setup

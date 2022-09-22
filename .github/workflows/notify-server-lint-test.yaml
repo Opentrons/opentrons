@@ -43,15 +43,14 @@ defaults:
 jobs:
   lint-test:
     name: 'notify server package linting and tests'
-    timeout-minutes: 20
+    timeout-minutes: 30
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
       - uses: 'actions/setup-node@v3'
         with:
           node-version: '14'
-      - name: setup python environments
-        uses: './.github/actions/python/setup-all'
+      - uses: './.github/actions/python/setup-all-environments'
       - name: Lint
         run: make -C notify-server lint
       - name: Test

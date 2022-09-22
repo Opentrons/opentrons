@@ -1,5 +1,7 @@
 name: "Setup All Environments"
-description: "Set up the environments to handle a monorepo python projects"
+description: |
+    "Set up all the environments for python projects."
+    "Cache the pipenv virtual environments"
 
 runs:
   using: "composite"
@@ -10,6 +12,9 @@ runs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libsystemd-dev
         fi
+    - uses: 'actions/setup-node@v3'
+      with:
+        node-version: '14'
     - shell: bash
       run: |
         npm install --global shx@0.3.3
@@ -21,16 +26,14 @@ runs:
         cache-dependency-path: |
           **/setup.*
           **/Pipfile.*
-    - name: Set the OT_PYTHON env variable
-      shell: bash
-      run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
+          .github/actions/python/setup-all-environments/action.yaml
     - shell: bash
       name: install pipenv on 3.8
-      run: $OT_PYTHON -m pip install pipenv==2021.5.29
+      run: python pip install pipenv==2021.5.29
     - shell: bash
       if: steps.python38.outputs.cache-hit == 'false'
       working-directory: environments
-      name: setup venv python 3.8
+      name: setup ot3
       run: make -C ot-3 setup
     - uses: 'actions/setup-python@v4'
       id: python310
@@ -38,11 +41,9 @@ runs:
         python-version: '3.10'
         cache: "pipenv"
         cache-dependency-path: |
-          **/setup.py
+          **/setup.*
           **/Pipfile.*
-    - name: Set the OT_PYTHON env variable
-      shell: bash
-      run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
+          .github/actions/python/setup-all-environments/action.yaml
     - shell: bash
       name: install pipenv on 3.10
       run: $OT_PYTHON -m pip install pipenv==2021.5.29
@@ -50,7 +51,8 @@ runs:
       if: steps.python310.outputs.cache-hit == 'false'
       working-directory: environments
       name: setup the environments
-      run: |
-        make -C ot-2 setup
-        make -C dev setup
-        make -C app setup
+      run: | # is this actually faster ??? ~15min for the non-parallel
+        make -C ot-2 setup & \
+        make -C dev setup & \
+        make -C app setup & \
+        wait;

@@ -32,19 +32,16 @@ jobs:
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
+      - uses: './.github/actions/python/setup-single-environment'
         with:
-          node-version: '14'
+          python-version: '${{ matrix.python }}'
+          environment: app
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - name: setup python
-        uses: './.github/actions/python/setup-app'
-        with:
-          python-version: '${{ matrix.python }}'
       - name: Test opentrons on app environment
         run: make -C api test-app
       - name: $OT_PYTHON -m pip install opentrons and use CLI

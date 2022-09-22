@@ -52,11 +52,8 @@ jobs:
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '14'
       - name: setup python
-        uses: './.github/actions/python/setup-all'
+        uses: './.github/actions/python/setup-all-environments'
       - name: Lint
         run: make -C api lint
   test:
@@ -69,22 +66,21 @@ jobs:
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
+      - name: setup python environment Windows
+        if: matrix.os == 'windows-2019'
+        uses: './.github/actions/python/setup-single-environment'
         with:
-          node-version: '14'
-
+          environment: "app"
+          python-version: "3.10"
+      - name: setup python environments not Windows
+        if: matrix.os != 'windows-2019'
+        uses: './.github/actions/python/setup-all-environments' # already built above for lint so should cache hit and be fast
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - name: setup python Windows
-        if: matrix.os == 'windows-2019'
-        uses: './.github/actions/python/setup-app'
-      - name: setup python not Windows
-        if: matrix.os != 'windows-2019'
-        uses: './.github/actions/python/setup-all'
       - name: Test without opentrons_hardware
         if: matrix.os != 'windows-2019'
         run: make -C api test-ot2
@@ -99,11 +95,11 @@ jobs:
       - name: pip install opentrons and use CLI
         working-directory: api
         run: |
-          python -m pip install .
+          $OT_PYTHON -m pip install .
           opentrons_execute --help
           opentrons_simulate --help
           opentrons_simulate ./docs/v2/example_protocols/dilution_tutorial.py -e -o nothing
-          python -m opentrons.cli --help
+          $OT_PYTHON -m opentrons.cli --help
       - name: Upload coverage report
         if: matrix.os != 'windows-2019'
         uses: 'codecov/codecov-action@v3'
@@ -118,17 +114,13 @@ jobs:
     if: github.event_name == 'push'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '14'
+      - uses: './.github/actions/python/setup-all-environments'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - name: setup python
-        uses: './.github/actions/python/setup-all'
       # creds and repository configuration for deploying python wheels
       - if: ${{ !env.OT_TAG }}
         name: 'upload to test pypi'

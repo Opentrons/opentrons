@@ -40,27 +40,12 @@ defaults:
 jobs:
   lint-test:
     name: 'hardware package linting and tests'
-    timeout-minutes: 20
-    runs-on: 'ubuntu-20.04'
+    timeout-minutes: 30
+    runs-on: 'ubuntu-22.04'
     steps:
       - name: Checkout opentrons repo
         uses: 'actions/checkout@v3'
-
-      - name: Setup Node
-        uses: 'actions/setup-node@v3'
-        with:
-          node-version: '12'
-
-      - name: Setup Python
-        uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.7'
-
-      - name: Setup Hardware Project
-        uses: './.github/actions/python/setup'
-        with:
-          project: 'hardware'
-          python-version: '3.7'
+      - uses: './.github/actions/python/setup-all-environments'
 
       # TODO(amit, 2022-03-08): Enable once ot3 emulation is ready
       #      - name: Setup SocketCan

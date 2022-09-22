@@ -42,21 +42,10 @@ jobs:
       - name: Checkout opentrons repo
         uses: 'actions/checkout@v3'
 
-      - name: Setup Node
-        uses: 'actions/setup-node@v3'
+      - uses: './.github/actions/python/setup'
         with:
-          node-version: '12'
-
-      - name: Setup Python
-        uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.7'
-
-      - name: Setup Project
-        uses: './.github/actions/python/setup'
-        with:
-          project: 'hardware-testing'
-          python-version: '3.7'
+          project: hardware-testing
+          python-version: "3.7"
 
       - name: Lint
         run: make -C hardware-testing lint

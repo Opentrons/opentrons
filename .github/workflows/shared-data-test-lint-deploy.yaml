@@ -45,17 +45,13 @@ jobs:
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '14'
-      - name: setup python
-        uses: './.github/actions/python/setup-all'
+      - uses: './.github/actions/python/setup-all-environments'
       - name: Lint
         run: make -C shared-data/python lint
 
   python-test:
     name: 'shared-data package python ${{ matrix.python }}'
-    timeout-minutes: 20
+    timeout-minutes: 35
     needs: [python-lint]
     strategy:
       matrix:
@@ -66,17 +62,13 @@ jobs:
       - name: 'install udev for usb-detection'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
-      - uses: 'actions/setup-node@v1'
-        with:
-          node-version: '14'
+      - uses: './.github/actions/python/setup-all-environments'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - name: setup python
-        uses: './.github/actions/python/setup-all'
       - name: Test
         run: make -C shared-data/python test
       - name: Ensure assets build
@@ -128,9 +120,7 @@ jobs:
     if: github.event_name == 'push'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: 'actions/setup-node@v3'
-        with:
-          node-version: '14'
+      - uses: './.github/actions/python/setup-all-environments'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
@@ -139,8 +129,6 @@ jobs:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - name: setup python
-        uses: './.github/actions/python/setup-all'
       # creds and repository configuration for deploying python wheels
       - if: ${{ !env.OT_TAG }}
         name: 'upload to test pypi'
