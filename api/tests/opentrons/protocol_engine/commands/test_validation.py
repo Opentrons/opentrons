@@ -1,3 +1,4 @@
+"""Test file for command validations."""
 import pytest
 from decoy import Decoy
 
