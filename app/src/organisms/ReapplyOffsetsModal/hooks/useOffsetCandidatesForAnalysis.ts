@@ -1,11 +1,13 @@
 import isEqual from 'lodash/isEqual'
 import { useAllHistoricOffsets } from './useAllHistoricOffsets'
 import { getLabwareLocationCombos } from './getLabwareLocationCombos'
+import { getDefsByURI } from './getDefsByURI'
 
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import { getLabwareDisplayName, ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
 interface OffsetCandidate extends LabwareOffset {
   runCreatedAt: string
+  labwareDisplayName: string
 }
 export function useOffsetCandidatesForAnalysis(analysisOutput: ProtocolAnalysisOutput, robotIp: string): OffsetCandidate[] {
   const { commands, labware } = analysisOutput
@@ -13,7 +15,7 @@ export function useOffsetCandidatesForAnalysis(analysisOutput: ProtocolAnalysisO
 
   if (allHistoricOffsets.length === 0) return []
   const labwareLocationCombos = getLabwareLocationCombos(commands, labware)
-  console.table({labwareLocationCombos, allHistoricOffsets})
+  const defsByUri = getDefsByURI(commands)
 
   return labwareLocationCombos.reduce<OffsetCandidate[]>(
     (acc, { location, definitionUri }) => {
@@ -23,8 +25,10 @@ export function useOffsetCandidatesForAnalysis(analysisOutput: ProtocolAnalysisO
           isEqual(historicOffset.location, location) &&
           historicOffset.definitionUri === definitionUri
       )
+      const labwareDef = defsByUri[definitionUri]
+      const labwareDisplayName = getLabwareDisplayName(labwareDef)
 
-      return offsetMatch == null ? acc : [...acc, offsetMatch]
+      return offsetMatch == null ? acc : [...acc, {...offsetMatch, labwareDisplayName }]
     },
     []
   )

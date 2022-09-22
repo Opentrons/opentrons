@@ -10,7 +10,7 @@ export interface CheckboxFieldProps {
   /** name of field in form */
   name?: string
   /** label text for checkbox */
-  label?: string
+  label?: React.ReactNode 
   /** checkbox is disabled if value is true */
   disabled?: boolean
   /** html tabindex property */

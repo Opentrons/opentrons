@@ -38,13 +38,13 @@ import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
 import { StoredProtocolData } from '../../redux/protocol-storage'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
+import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { AvailableRobotOption } from './AvailableRobotOption'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 
 import type { StyleProps } from '@opentrons/components'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
-import { ApplyHistoricOffsets } from './ApplyHistoricOffsets'
 
 interface ChooseRobotSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
@@ -59,6 +59,7 @@ export function ChooseRobotSlideout(
   const dispatch = useDispatch<Dispatch>()
   const history = useHistory()
   const isScanning = useSelector((state: State) => getScanning(state))
+  const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState(true)
 
   const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
     storedProtocolData
@@ -157,23 +158,28 @@ export function ChooseRobotSlideout(
       })}
       footer={
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <ApplyHistoricOffsets robotIp={selectedRobot?.ip ?? null} analysisOutput={mostRecentAnalysis} />
-        <PrimaryButton
-          onClick={handleProceed}
-          width="100%"
-          disabled={
-            isCreatingRun ||
-            selectedRobot == null ||
-            isSelectedRobotOnWrongVersionOfSoftware
-          }
-        >
-          {isCreatingRun ? (
-            <Icon name="ot-spinner" spin size={SIZE_1} />
-          ) : (
-            t('shared:proceed_to_setup')
-          )}
-        </PrimaryButton>
-</Flex>
+          <ApplyHistoricOffsets
+            robotIp={selectedRobot?.ip ?? null}
+            analysisOutput={mostRecentAnalysis}
+            shouldApplyOffsets={shouldApplyOffsets}
+            setShouldApplyOffsets={setShouldApplyOffsets}
+          />
+          <PrimaryButton
+            onClick={handleProceed}
+            width="100%"
+            disabled={
+              isCreatingRun ||
+              selectedRobot == null ||
+              isSelectedRobotOnWrongVersionOfSoftware
+            }
+          >
+            {isCreatingRun ? (
+              <Icon name="ot-spinner" spin size={SIZE_1} />
+            ) : (
+              t('shared:proceed_to_setup')
+            )}
+          </PrimaryButton>
+        </Flex>
       }
       {...restProps}
     >
