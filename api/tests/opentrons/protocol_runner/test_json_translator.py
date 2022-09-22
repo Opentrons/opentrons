@@ -450,7 +450,7 @@ def test_load_liquid(
     """Test translating v6 commands to protocol engine commands."""
     protocol = _make_json_protocol()
     result = subject.translate_liquids(protocol)
-
+    print(result)
     assert result == [
         Liquid(id="liquid-id-555", displayName="water", description="water description")
     ]
