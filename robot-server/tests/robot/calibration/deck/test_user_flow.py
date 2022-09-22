@@ -1,6 +1,7 @@
 import pytest
 from mock import MagicMock, call
 from typing import List, Tuple
+from opentrons.calibration_storage.ot2 import schemas
 from opentrons.calibration_storage import types as cal_types
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.instruments.ot2 import pipette
@@ -20,7 +21,7 @@ from robot_server.robot.calibration.deck.constants import (
 )
 
 
-PIP_OFFSET = cal_types.PipetteOffsetByPipetteMount(
+PIP_OFFSET = schemas.v1.InstrumentOffsetSchema(
     offset=robot_configs.defaults_ot2.DEFAULT_PIPETTE_OFFSET,
     source=cal_types.SourceType.user,
     status=cal_types.CalibrationStatus(),

@@ -4,10 +4,9 @@ from typing import Optional
 
 from opentrons.calibration_storage import (
     types as cal_types,
-    get as get_cal,
     helpers,
-    delete,
 )
+from opentrons.calibration_storage.ot2 import get as get_cal, delete, schemas
 
 from robot_server.errors import ErrorBody
 from robot_server.service.tip_length import models as tl_models
@@ -19,15 +18,15 @@ router = APIRouter()
 
 
 def _format_calibration(
-    calibration: cal_types.TipLengthCalibration,
+    calibration: schemas.v1.TipLengthSchema,
 ) -> tl_models.TipLengthCalibration:
     status = cal_model.CalibrationStatus(**helpers.convert_to_dict(calibration.status))
     formatted_cal = tl_models.TipLengthCalibration(
         id=f"{calibration.tiprack}&{calibration.pipette}",
-        tipLength=calibration.tip_length,
+        tipLength=calibration.tipLength,
         tiprack=calibration.tiprack,
         pipette=calibration.pipette,
-        lastModified=calibration.last_modified,
+        lastModified=calibration.lastModified,
         source=calibration.source,
         status=status,
         uri=calibration.uri,

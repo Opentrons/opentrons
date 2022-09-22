@@ -12,7 +12,7 @@ from typing import (
     Union,
 )
 
-from opentrons.calibration_storage import get, delete
+from opentrons.calibration_storage.ot2 import get, delete
 from opentrons.calibration_storage.types import TipLengthCalNotFound
 from opentrons.calibration_storage import helpers
 from opentrons.hardware_control import robot_calibration as robot_cal

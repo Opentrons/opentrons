@@ -9,11 +9,10 @@ from typing import (
     Union,
     Tuple,
 )
-
-from opentrons.calibration_storage import get, modify, helpers, delete
+from opentrons.calibration_storage import helpers
+from opentrons.calibration_storage.ot2 import get, modify, delete, schemas
 from opentrons.calibration_storage.types import (
     TipLengthCalNotFound,
-    PipetteOffsetByPipetteMount,
 )
 from opentrons.hardware_control import (
     HardwareControlAPI,
@@ -311,7 +310,7 @@ class PipetteOffsetCalibrationUserFlow:
         except TipLengthCalNotFound:
             return None
 
-    def _get_stored_pipette_offset_cal(self) -> Optional[PipetteOffsetByPipetteMount]:
+    def _get_stored_pipette_offset_cal(self) -> Optional[schemas.v1.InstrumentOffsetSchema]:
         return get.get_pipette_offset(
             self._hw_pipette.pipette_id, self._mount  # type: ignore[arg-type]
         )
@@ -338,7 +337,7 @@ class PipetteOffsetCalibrationUserFlow:
     @staticmethod
     def _get_tr_lw(
         tip_rack_def: Optional[LabwareDefinition],
-        existing_calibration: Optional[PipetteOffsetByPipetteMount],
+        existing_calibration: Optional[schemas.v1.InstrumentOffsetSchema],
         volume: float,
         position: Location,
     ) -> Tuple[bool, labware.Labware]:
@@ -367,7 +366,7 @@ class PipetteOffsetCalibrationUserFlow:
     def _load_tip_rack(
         self,
         tip_rack_def: Optional[LabwareDefinition],
-        existing_calibration: Optional[PipetteOffsetByPipetteMount],
+        existing_calibration: Optional[schemas.v1.InstrumentOffsetSchema],
     ):
         """
         load onto the deck the default opentrons tip rack labware for this

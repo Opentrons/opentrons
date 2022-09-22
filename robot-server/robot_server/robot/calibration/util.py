@@ -8,7 +8,8 @@ from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
 from opentrons.protocols.geometry.deck import Deck
-from opentrons.calibration_storage import modify, helpers
+from opentrons.calibration_storage import helpers
+from opentrons.calibration_storage.ot2 import modify
 from opentrons.types import Point, Location
 
 from robot_server.service.errors import RobotServerError

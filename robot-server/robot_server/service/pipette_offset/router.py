@@ -5,10 +5,9 @@ from typing import Optional
 from opentrons import types as ot_types
 from opentrons.calibration_storage import (
     types as cal_types,
-    get as get_cal,
     helpers,
-    delete,
 )
+from opentrons.calibration_storage.ot2 import get as get_cal, delete, schemas
 
 from robot_server.errors import ErrorBody
 from robot_server.service.pipette_offset import models as pip_models
@@ -19,7 +18,7 @@ router = APIRouter()
 
 
 def _format_calibration(
-    calibration: cal_types.PipetteOffsetCalibration,
+    calibration: schemas.v1.PipetteOffsetCalibration,
 ) -> pip_models.PipetteOffsetCalibration:
     status = cal_model.CalibrationStatus(**helpers.convert_to_dict(calibration.status))
     formatted_cal = pip_models.PipetteOffsetCalibration(

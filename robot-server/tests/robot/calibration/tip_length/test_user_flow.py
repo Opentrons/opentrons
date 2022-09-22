@@ -7,6 +7,7 @@ from opentrons.types import Mount, Point
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.config.pipette_config import load
+from opentrons.calibration_storage.ot2 import schemas
 from opentrons.calibration_storage import types as cal_types
 
 from robot_server.service.errors import RobotServerError
@@ -15,7 +16,7 @@ from robot_server.robot.calibration.tip_length.user_flow import TipCalibrationUs
 
 stub_jog_data = {"vector": Point(1, 1, 1)}
 
-PIP_CAL = cal_types.PipetteOffsetByPipetteMount(
+PIP_CAL = schemas.v1.InstrumentOffsetSchema(
     offset=[0, 0, 0],
     source=cal_types.SourceType.user,
     status=cal_types.CalibrationStatus(),
