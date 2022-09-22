@@ -3,7 +3,12 @@
 
 import * as React from 'react'
 
-import { THERMOCYCLER_MODULE_V1, getModuleDef2 } from '@opentrons/shared-data'
+import {
+  THERMOCYCLER_MODULE_V1,
+  getModuleDef2,
+  THERMOCYCLER_MODULE_V2,
+  ModuleModel,
+} from '@opentrons/shared-data'
 
 import { RobotCoordsForeignDiv } from '../Deck'
 import { ModuleFromDef } from './ModuleFromDef'
@@ -12,11 +17,17 @@ import { C_MED_LIGHT_GRAY } from '../../styles'
 
 export interface ThermocyclerVizProps {
   lidMotorState: 'open' | 'closed' | 'unknown'
+  moduleModel: ModuleModel
 }
 
 export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
-  const { lidMotorState } = props
-  const def = getModuleDef2(THERMOCYCLER_MODULE_V1)
+  const { lidMotorState, moduleModel } = props
+  const def = getModuleDef2(
+    moduleModel === THERMOCYCLER_MODULE_V1
+      ? THERMOCYCLER_MODULE_V1
+      : THERMOCYCLER_MODULE_V2
+  )
+
   if (lidMotorState === 'unknown') {
     // just a rectangle if we don't know the state of the lid
     return (

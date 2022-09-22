@@ -129,6 +129,7 @@ export const Module = (props: Props): JSX.Element => {
           {moduleType === THERMOCYCLER_MODULE_TYPE ? (
             <Thermocycler
               {...(innerProps as React.ComponentProps<typeof Thermocycler>)}
+              moduleModel={def.model}
             />
           ) : (
             <ModuleFromDef
