@@ -19,7 +19,6 @@ from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 from opentrons_hardware.hardware_control.gripper_settings import (
     set_pwm_param,
     set_reference_voltage,
-    grip,
     home,
     move,
 )
@@ -31,7 +30,7 @@ from opentrons_hardware.hardware_control.constants import (
 GetInputFunc = Callable[[str], str]
 OutputFunc = Callable[[str], None]
 
-vref_list = [0.01, 0.05, 0.1, 0.2]  # in A
+# vref_list = [0.01, 0.05, 0.1, 0.2]  # in A
 
 
 class InvalidInput(Exception):
@@ -55,6 +54,14 @@ def prompt_int_input(prompt_name: str) -> int:
     try:
         return int(input(f"{prompt_name}: "))
     except (ValueError, IndexError) as e:
+        raise InvalidInput(e)
+
+
+def prompt_float_input(prompt_name: str) -> float:
+    """Configure float intput."""
+    try:
+        return float(input(f"{prompt_name}: "))
+    except ValueError as e:
         raise InvalidInput(e)
 
 
@@ -88,31 +95,30 @@ def output_details(i: int, duty_cycle: int, v_ref: float) -> None:
 async def run_test(messenger: CanMessenger) -> None:
     """Run the for test."""
     print("Gripper testing begins... \n")
-    pwm_duty = prompt_int_input("PWM duty cycle in % (int)")
-    lm_target = prompt_int_input("Linear move target in um % (int)")
 
+    pwm_duty = prompt_int_input("PWM duty cycle in % (int)")
+    vref = prompt_float_input("v ref (float)")
     """Setup gripper"""
     try:
         await set_pwm_param(messenger, pwm_duty)
+        await set_reference_voltage(messenger, vref)
+        input(in_green("Press Enter to home...\n"))
 
-        for i, v in enumerate(vref_list):
-            await set_reference_voltage(messenger, v)
-            output_details(i, pwm_duty, v)
+        await home(messenger, 0, 0, 0)
+        await execute_move(messenger)
 
-            input(in_green("Press Enter to grip...\n"))
-
-            await grip(messenger, 0, 0, 0, 0)
-            await execute_move(messenger)
-
-            input(in_green("Press Enter to release...\n"))
-
-            await home(messenger, 0, 0, 0)
-            await execute_move(messenger)
-
+        for i in range(3):
+            jaw_width = prompt_int_input(
+                "Please enter a jaw width between 75750 and 132450"
+            )
+            if jaw_width < 75750 or jaw_width > 132450:
+                raise ValueError("jaw width outside bounds")
             input(in_green("press enter to move...\n"))
-            await move(messenger, 0, 0, 0, lm_target)
+            encoder_target = int((132450 - jaw_width) / 2)
+            await move(messenger, 0, 0, 0, encoder_target)
             await execute_move(messenger)
-            input(in_green("HOLD\n"))
+
+        input(in_green("Press enter to finish hold\n"))
 
     except asyncio.CancelledError:
         pass

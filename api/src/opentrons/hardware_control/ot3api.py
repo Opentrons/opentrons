@@ -989,7 +989,7 @@ class OT3API(
     async def _grip(self, duty_cycle: float) -> None:
         """Move the gripper jaw inward to close."""
         try:
-            await self._backend.gripper_move_jaw(duty_cycle=duty_cycle)
+            await self._backend.gripper_grip_jaw(duty_cycle=duty_cycle)
         except Exception:
             self._log.exception("Gripper grip failed")
             raise
@@ -1003,6 +1003,31 @@ class OT3API(
             self._log.exception("Gripper home failed")
             raise
 
+    @ExecutionManagerProvider.wait_for_running
+    async def _hold_jaw_width(self, jaw_width_mm: float) -> None:
+        """Move the gripper jaw to a specific width."""
+        try:
+            if (
+                jaw_width_mm
+                < self._gripper_handler.get_gripper().config.jaw_sizes_mm["min"]
+                or jaw_width_mm
+                > self._gripper_handler.get_gripper().config.jaw_sizes_mm["max"]
+            ):
+                raise ValueError("Setting gripper jaw width out of bounds")
+            await self._backend.gripper_hold_jaw(
+                int(
+                    1000
+                    * (
+                        self._gripper_handler.get_gripper().config.jaw_sizes_mm["max"]
+                        - jaw_width_mm
+                    )
+                    / 2
+                )
+            )
+        except Exception:
+            self._log.exception("Gripper set width failed")
+            raise
+
     async def grip(self, force_newtons: float) -> None:
         self._gripper_handler.check_ready_for_grip()
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(force_newtons)
@@ -1014,6 +1039,11 @@ class OT3API(
         self._gripper_handler.check_ready_for_jaw_move()
         await self._ungrip()
         self._gripper_handler.set_jaw_state(GripperJawState.HOMED_READY)
+
+    async def hold_jaw_width(self, jaw_width_mm: int) -> None:
+        self._gripper_handler.check_ready_for_jaw_move()
+        await self._hold_jaw_width(jaw_width_mm)
+        self._gripper_handler.set_jaw_state(GripperJawState.HOLDING_CLOSED)
 
     # Pipette action API
     async def prepare_for_aspirate(
