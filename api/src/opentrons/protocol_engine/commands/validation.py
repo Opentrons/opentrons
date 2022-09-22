@@ -1,4 +1,4 @@
-"""Validation file for protocol engine commands."""
+"""Validation file for protocol engine commandsot."""
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.protocols import HardwareControlAPI
 

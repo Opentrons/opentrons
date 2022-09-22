@@ -9,9 +9,7 @@ from ..command import (
     BaseCommand,
     BaseCommandCreate,
 )
-from ..validation import (
-    ensure_ot3_hardware
-)
+from ..validation import ensure_ot3_hardware
 from ..ot3_translator import translate_mount_to_ot3_mount
 
 from opentrons.hardware_control import HardwareControlAPI
