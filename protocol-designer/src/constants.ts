@@ -14,6 +14,7 @@ import {
   DeckSlot as DeckDefSlot,
   ModuleType,
   ModuleModel,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { i18n } from './localization'
 import { DeckSlot, WellVolumes } from './types'
@@ -116,6 +117,10 @@ export const MODELS_FOR_MODULE_TYPE: Record<
       name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V1}`),
       // downcast required because the module models are now enums rather than strings
       value: THERMOCYCLER_MODULE_V1 as string,
+    },
+    {
+      name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V2}`),
+      value: THERMOCYCLER_MODULE_V2,
     },
   ],
   [HEATERSHAKER_MODULE_TYPE]: [
