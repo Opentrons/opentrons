@@ -17,7 +17,7 @@ def test_ensure_ot3_hardware(decoy: Decoy) -> None:
 
 
 def test_ensure_ot3_hardware_raises_error(decoy: Decoy) -> None:
-    """Should return a OT-3 hardware api."""
+    """Should raise a HardwareNotSupportedError exception."""
     ot_2_hardware_api = decoy.mock(cls=API)
     with pytest.raises(HardwareNotSupportedError):
         ensure_ot3_hardware(ot_2_hardware_api)
