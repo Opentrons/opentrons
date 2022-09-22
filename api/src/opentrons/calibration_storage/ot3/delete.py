@@ -85,12 +85,14 @@ def clear_pipette_offset_calibrations() -> None:
 
     offset_dir = config.get_opentrons_path("pipette_calibration_dir")
     _remove_json_files_in_directories(offset_dir)
+    calibration_cache._pipette_offset_calibrations.cache_clear()
 
 
 def delete_robot_deck_attitude() -> None:
     """
     Delete the robot deck attitude calibration.
     """
+    #TODO(lc 09-19-2022) finalize with hardware about whether this can truly be deleted.
     robot_dir = config.get_opentrons_path("robot_calibration_dir")
     gantry_path = robot_dir / "deck_calibration.json"
 

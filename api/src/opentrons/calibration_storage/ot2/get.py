@@ -32,7 +32,7 @@ log = logging.getLogger(__name__)
 
 def load_tip_length_calibration(
     pip_id: str, definition: "LabwareDefinition"
-) -> v1.TipLengthCalibration:
+) -> v1.TipLengthSchema:
     """
     Function used to grab the current tip length associated
     with a particular tiprack.
@@ -42,21 +42,10 @@ def load_tip_length_calibration(
     """
     labware_hash = helpers.hash_labware_def(definition)
     load_name = definition["parameters"]["loadName"]
-    # We should eventually use the pydantic model directly for the http endpoints that
-    # return calibration data
-    tip_length_schema = calibration_cache.tip_length_data(pip_id, labware_hash, load_name)
-    return v1.TipLengthCalibration(
-        tip_length=tip_length_schema.tipLength,
-        source=tip_length_schema.source,
-        status=tip_length_schema.status,
-        pipette=tip_length_schema.pipette,
-        tiprack=tip_length_schema.tiprack,
-        last_modified=tip_length_schema.lastModified,
-        uri=tip_length_schema.uri,
-        )
+    return calibration_cache.tip_length_data(pip_id, labware_hash, load_name)
 
 
-def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthCalibration]:
+def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthSchema]:
     """
     A helper function that will list all of the tip length calibrations.
 
@@ -76,9 +65,7 @@ def get_pipette_offset(
     return calibration_cache.pipette_offset_data(pip_id, mount)
 
 
-def get_all_pipette_offset_calibrations() -> typing.List[
-    v1.InstrumentOffsetSchema
-]:
+def get_all_pipette_offset_calibrations() -> typing.List[v1.PipetteOffsetCalibration]:
     """
     A helper function that will list all of the pipette offset
     calibrations.
@@ -86,7 +73,19 @@ def get_all_pipette_offset_calibrations() -> typing.List[
     :return: A list of dictionary objects representing all of the
     pipette offset calibration files found on the robot.
     """
-    return calibration_cache._pipette_offset_calibrations()
+    pipette_calibration_list = []
+    for mount, pipettes in calibration_cache._pipette_offset_calibrations().items():
+        for pipette, calibration in pipettes.items():
+            pipette_calibration_list.append(v1.PipetteOffsetCalibration(
+                pipette=pipette,
+                mount=mount,
+                offset=calibration.offset,
+                tiprack=calibration.tiprack,
+                uri=calibration.uri,
+                last_modified=calibration.last_modified,
+                source=calibration.source,
+                status=calibration.status))
+    return pipette_calibration_list
 
 
 def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinition":

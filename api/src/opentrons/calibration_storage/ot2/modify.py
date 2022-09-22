@@ -5,6 +5,7 @@ This module has functions that you can import to save robot or
 labware calibration to its designated file location.
 """
 import typing
+import json
 from dataclasses import asdict
 
 from opentrons import config
@@ -30,7 +31,7 @@ def create_tip_length_data(
     definition: "LabwareDefinition",
     length: float,
     cal_status: typing.Optional[local_types.CalibrationStatus] = None,
-) -> v1.TipLengthCalibration:
+) -> v1.TipLengthSchema:
     """
     Function to correctly format tip length data.
 
@@ -40,12 +41,13 @@ def create_tip_length_data(
     labware_hash = helpers.hash_labware_def(definition)
     labware_uri = helpers.uri_from_definition(definition)
 
-    tip_length_data = v1.TipLengthCalibration(
+    tip_length_data = v1.TipLengthSchema(
         tipLength=length,
         lastModified=utc_now(),
         source=local_types.SourceType.user,
-        status=cal_status or local_types.CalibrationStatus(),
-        uri=labware_uri)
+        status=cal_status or v1.CalibrationStatus(),
+        uri=labware_uri,
+    )
 
     if not definition.get("namespace") == OPENTRONS_NAMESPACE:
         _save_custom_tiprack_definition(labware_uri, definition)
@@ -68,7 +70,7 @@ def _save_custom_tiprack_definition(
 
 
 def save_tip_length_calibration(
-    pip_id: str, tip_length_cal: v1.TipLengthCalibration
+    pip_id: str, tip_length_cal: v1.TipLengthSchema
 ) -> None:
     """
     Function used to save tip length calibration to file.
@@ -85,7 +87,12 @@ def save_tip_length_calibration(
 
     all_tip_lengths.update(tip_length_cal)
 
-    io.save_to_file(pip_tip_length_path, all_tip_lengths)
+    # This is a workaround since pydantic doesn't have a nice way to
+    # add encoders when converting to a dict.
+    dict_of_tip_lengths = {}
+    for key, item in all_tip_lengths.items():
+        dict_of_tip_lengths[key] = json.loads(item.json())
+    io.save_to_file(pip_tip_length_path, dict_of_tip_lengths)
     calibration_cache._tip_length_calibrations.cache_clear()
 
 
@@ -106,7 +113,7 @@ def save_robot_deck_attitude(
         last_modified=utc_now(),
         tiprack=lw_hash,
         source=source or local_types.SourceType.user,
-        status=cal_status or v1.CalibrationStatus()
+        status=cal_status or v1.CalibrationStatus(),
     )
     # convert to schema + validate json conversion
     io.save_to_file(gantry_path, gantry_calibration)
@@ -132,7 +139,7 @@ def save_pipette_calibration(
         uri=tiprack_uri,
         last_modified=utc_now(),
         source=local_types.SourceType.user,
-        status=cal_status or v1.CalibrationStatus()
+        status=cal_status or v1.CalibrationStatus(),
     )
     io.save_to_file(offset_path, pipette_calibration)
     calibration_cache._pipette_offset_calibrations.cache_clear()
@@ -182,10 +189,7 @@ def save_pipette_calibration(
 #     return type(calibration)(**caldict, status=status)
 
 
-def mark_bad(
-    calibration,
-    source_marked_bad
-):
+def mark_bad(calibration, source_marked_bad):
     caldict = asdict(calibration)
     # remove current status key
     del caldict["status"]
