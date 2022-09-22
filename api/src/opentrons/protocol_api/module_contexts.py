@@ -25,7 +25,7 @@ from opentrons.protocols.geometry.module_geometry import (
 from .core.protocol import AbstractProtocol
 from .core.instrument import AbstractInstrument
 from .core.labware import AbstractLabware
-from .core.module import AbstractModuleCore
+from .core.module import AbstractModuleCore, AbstractTemperatureModuleCore
 from .core.well import AbstractWellCore
 
 from .module_validation_and_errors import (
@@ -271,60 +271,59 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
 
     """
 
-    # TODO(mc, 2022-02-05): this type annotation is misleading;
-    # a SynchronousAdapter wrapper is actually passed in
-    _module: modules.tempdeck.TempDeck  # type: ignore[assignment]
+    _core: AbstractTemperatureModuleCore[AbstractLabware[AbstractWellCore]]
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
     def set_temperature(self, celsius: float) -> None:
-        """Set the target temperature, in C.
+        """Set the target temperature, in °C, waiting for the target to be hit.
 
-        Must be between 4 and 95C based on Opentrons QA.
+        Must be between 4 and 95°C based on Opentrons QA.
 
         :param celsius: The target temperature, in C
         """
-        self._module.set_temperature(celsius)
+        self._core.set_target_temperature(celsius)
+        self._core.wait_for_temperature(celsius)
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 3)
     def start_set_temperature(self, celsius: float) -> None:
-        """Start setting the target temperature, in C.
+        """Set the target temperature, in °C, without waiting for the target to be hit.
 
-        Must be between 4 and 95C based on Opentrons QA.
+        Must be between 4 and 95°C based on Opentrons QA.
 
         :param celsius: The target temperature, in C
         """
-        self._module.start_set_temperature(celsius)
+        self._core.set_target_temperature(celsius)
 
     @publish(command=cmds.tempdeck_await_temp)
     @requires_version(2, 3)
     def await_temperature(self, celsius: float) -> None:
         """Wait until module reaches temperature, in C.
 
-        Must be between 4 and 95C based on Opentrons QA.
+        Must be between 4 and 95°C based on Opentrons QA.
 
-        :param celsius: The target temperature, in C
+        :param celsius: The target temperature, in °C
         """
-        self._module.await_temperature(celsius)
+        self._core.wait_for_temperature(celsius)
 
     @publish(command=cmds.tempdeck_deactivate)
     @requires_version(2, 0)
     def deactivate(self) -> None:
         """Stop heating (or cooling) and turn off the fan."""
-        self._module.deactivate()
+        self._core.deactivate()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def temperature(self) -> float:
-        """Current temperature in C"""
-        return self._module.temperature
+        """Current temperature in °C"""
+        return self._core.get_current_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def target(self) -> Optional[float]:
         """Current target temperature in C"""
-        return self._module.target
+        return self._core.get_target_temperature()
 
     @property  # type: ignore[misc]
     @requires_version(2, 3)
@@ -334,7 +333,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
         Returns 'holding at target', 'cooling', 'heating', or 'idle'
 
         """
-        return self._module.status
+        return self._core.get_status().value
 
 
 class MagneticModuleContext(ModuleContext[ModuleGeometry]):

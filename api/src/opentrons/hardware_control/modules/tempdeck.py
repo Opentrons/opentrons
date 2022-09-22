@@ -202,8 +202,8 @@ class TempDeck(mod_abc.AbstractModule):
         return self._listener.state.target
 
     @property
-    def status(self) -> str:
-        return self._get_status(self._listener.state).value
+    def status(self) -> TemperatureStatus:
+        return self._get_status(self._listener.state)
 
     @property
     def is_simulated(self) -> bool:
