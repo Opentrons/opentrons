@@ -48,7 +48,8 @@ def load_definition(version: SchemaV1, model_or_loadname: str) -> ModuleDefiniti
 
 @overload
 def load_definition(
-    version: SchemaV3, model_or_loadname: ModuleModel
+    version: SchemaV3,
+    model_or_loadname: Union[str, ModuleModel],
 ) -> ModuleDefinitionV3:
     ...
 

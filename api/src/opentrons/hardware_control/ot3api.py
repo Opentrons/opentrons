@@ -12,7 +12,6 @@ from typing import (
     Union,
     List,
     Optional,
-    Tuple,
     Sequence,
     Set,
     Any,
@@ -28,7 +27,7 @@ from opentrons.config.types import (
     GantryLoad,
     CapacitivePassSettings,
 )
-from .backends.ot3utils import get_system_constraints
+from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons_hardware.hardware_control.motion_planning import (
     MoveManager,
     MoveTarget,
@@ -44,6 +43,7 @@ from .instruments.pipette import (
 from .instruments.gripper import compare_gripper_config_and_check_skip
 from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
+from .backends.ot3utils import get_system_constraints
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -367,6 +367,22 @@ class OT3API(
     @property
     def attached_modules(self) -> List[modules.AbstractModule]:
         return self._backend.module_controls.available_modules
+
+    async def create_simulating_module(
+        self,
+        model: modules.types.ModuleModel,
+    ) -> modules.AbstractModule:
+        """Create a simulating module hardware interface."""
+        assert (
+            self.is_simulator
+        ), "Cannot build simulating module from non-simulating hardware control API"
+
+        return await self._backend.module_controls.build_module(
+            port="",
+            usb_port=USBPort(name="", port_number=0),
+            type=modules.ModuleType.from_model(model),
+            sim_model=model.value,
+        )
 
     async def update_firmware(
         self,
@@ -1248,16 +1264,6 @@ class OT3API(
             }
         )
         _remove()
-
-    async def find_modules(
-        self,
-        by_model: modules.types.ModuleModel,
-        resolved_type: modules.types.ModuleType,
-    ) -> Tuple[List[modules.AbstractModule], Optional[modules.AbstractModule]]:
-        modules_result = await self._backend.module_controls.parse_modules(
-            by_model, resolved_type
-        )
-        return modules_result
 
     async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""

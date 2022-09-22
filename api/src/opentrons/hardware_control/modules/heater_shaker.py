@@ -13,6 +13,7 @@ from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.poller import Reader, WaitableListener, Poller
 from opentrons.hardware_control.modules import mod_abc, update
 from opentrons.hardware_control.modules.types import (
+    ModuleType,
     TemperatureStatus,
     SpeedStatus,
     HeaterShakerStatus,
@@ -37,7 +38,9 @@ class HeaterShakerError(RuntimeError):
 
 
 class HeaterShaker(mod_abc.AbstractModule):
-    """Heater-Shaker module class"""
+    """Hardware control interface for an attached Heater-Shaker module."""
+
+    MODULE_TYPE = ModuleType.HEATER_SHAKER
 
     @classmethod
     async def build(
