@@ -4,7 +4,8 @@ from mock import call, MagicMock, patch
 import pytest
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.types import Mount, Point
-from opentrons.calibration_storage import get, modify, types as CSTypes
+from opentrons.calibration_storage.ot2 import get, modify, schemas
+from opentrons.calibration_storage import types as CSTypes
 from opentrons.config import robot_configs
 from opentrons.config.pipette_config import load
 
@@ -24,7 +25,7 @@ from robot_server.robot.calibration.constants import (
 )
 
 
-PIP_OFFSET = CSTypes.PipetteOffsetByPipetteMount(
+PIP_OFFSET = schemas.v1.InstrumentOffsetSchema(
     offset=robot_configs.defaults_ot2.DEFAULT_PIPETTE_OFFSET,
     source=CSTypes.SourceType.user,
     status=CSTypes.CalibrationStatus(),
@@ -114,7 +115,7 @@ async def test_switching_to_second_pipette(pipettes, target_mount, hardware):
 def build_mock_stored_pipette_offset(kind="normal"):
     if kind == "normal":
         return MagicMock(
-            return_value=CSTypes.PipetteOffsetByPipetteMount(
+            return_value=schemas.v1.InstrumentOffsetSchema(
                 offset=[0, 1, 2],
                 tiprack="tiprack-id",
                 uri="opentrons/opentrons_96_filtertiprack_200ul/1",
@@ -124,7 +125,7 @@ def build_mock_stored_pipette_offset(kind="normal"):
         )
     elif kind == "custom_tiprack":
         return MagicMock(
-            return_value=CSTypes.PipetteOffsetByPipetteMount(
+            return_value=schemas.v1.InstrumentOffsetSchema(
                 offset=[0, 1, 2],
                 tiprack="tiprack-id",
                 uri="custom/minimal_labware_def/1",

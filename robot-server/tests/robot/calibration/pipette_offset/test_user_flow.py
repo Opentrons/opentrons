@@ -4,6 +4,7 @@ import pytest
 from mock import MagicMock, call, patch
 from typing import List, Tuple, Dict, Any
 from opentrons import config
+from opentrons.calibration_storage.ot2 import schemas
 from opentrons.calibration_storage import helpers, types as CSTypes
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.instruments.ot2 import pipette
@@ -25,7 +26,7 @@ from robot_server.robot.calibration.pipette_offset.constants import (
 
 stub_jog_data = {"vector": Point(1, 1, 1)}
 
-PIP_CAL = CSTypes.PipetteOffsetByPipetteMount(
+PIP_CAL =schemas.v1.InstrumentOffsetSchema(
     offset=[0, 0, 0], source=CSTypes.SourceType.user, status=CSTypes.CalibrationStatus()
 )
 
@@ -48,7 +49,7 @@ pipette_map = {
 def build_mock_stored_pipette_offset(kind="normal"):
     if kind == "normal":
         return MagicMock(
-            return_value=CSTypes.PipetteOffsetByPipetteMount(
+            return_value=schemas.v1.InstrumentOffsetSchema(
                 offset=[0, 1, 2],
                 tiprack="tiprack-id",
                 uri="opentrons/opentrons_96_filtertiprack_200ul/1",

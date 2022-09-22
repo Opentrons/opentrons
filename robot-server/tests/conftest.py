@@ -23,7 +23,8 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from opentrons import config
 from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
-from opentrons.calibration_storage import modify, helpers
+from opentrons.calibration_storage import helpers
+from opentrons.calibration_storage.ot2 import modify
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Mount
 
