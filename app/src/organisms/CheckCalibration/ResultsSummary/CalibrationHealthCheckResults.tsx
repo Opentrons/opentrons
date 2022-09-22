@@ -32,7 +32,9 @@ export const CalibrationHealthCheckResults = ({
             : t('calibration_recommended')
         }
         backgroundColor={
-          isCalibrationCompleted ? `${COLORS.successEnabled}1A` : '#F2B53C33'
+          isCalibrationCompleted
+            ? COLORS.successBackgroundLight
+            : COLORS.warningBackgroundLight
         }
         iconColor={
           isCalibrationCompleted ? COLORS.successEnabled : COLORS.warningEnabled
