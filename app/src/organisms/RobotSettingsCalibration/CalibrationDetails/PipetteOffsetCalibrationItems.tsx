@@ -113,7 +113,7 @@ export function PipetteOffsetCalibrationItems({
                           <>
                             <Icon
                               name="alert-circle"
-                              backgroundColor={COLORS.warningBackground}
+                              backgroundColor={COLORS.warningBackgroundLight}
                               color={COLORS.warningEnabled}
                               size={SPACING.spacing4}
                             />
@@ -130,7 +130,7 @@ export function PipetteOffsetCalibrationItems({
                           <>
                             <Icon
                               name="alert-circle"
-                              backgroundColor={COLORS.errorBackground}
+                              backgroundColor={COLORS.errorBackgroundLight}
                               color={COLORS.errorEnabled}
                               size={SPACING.spacing4}
                             />

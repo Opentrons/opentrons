@@ -66,7 +66,9 @@ describe('MiniCard', () => {
     props.isSelected = true
     const { getByText } = render(props)
     const miniCard = getByText('mock mini card')
-    expect(miniCard).toHaveStyle(`background-color: ${COLORS.errorBackground}`)
+    expect(miniCard).toHaveStyle(
+      `background-color: ${COLORS.errorBackgroundLight}`
+    )
     expect(miniCard).toHaveStyle(`border: 1px solid ${COLORS.errorEnabled}`)
     expect(miniCard).toHaveStyle(`border-radius: ${BORDERS.radiusSoftCorners}`)
     expect(miniCard).toHaveStyle(`padding: ${SPACING.spacing3}`)
@@ -81,7 +83,7 @@ describe('MiniCard', () => {
     )
     expect(miniCard).toHaveStyleRule(
       'background-color',
-      `${COLORS.errorBackground}`,
+      `${COLORS.errorBackgroundLight}`,
       {
         modifier: ':hover',
       }
