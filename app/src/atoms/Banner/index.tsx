@@ -42,17 +42,17 @@ const BANNER_PROPS_BY_TYPE: Record<
 > = {
   success: {
     icon: { name: 'check-circle' },
-    backgroundColor: COLORS.successBackground,
+    backgroundColor: COLORS.successBackgroundLight,
     color: COLORS.successEnabled,
   },
   error: {
     icon: { name: 'alert-circle' },
-    backgroundColor: COLORS.errorBackground,
+    backgroundColor: COLORS.errorBackgroundLight,
     color: COLORS.errorEnabled,
   },
   warning: {
     icon: { name: 'alert-circle' },
-    backgroundColor: COLORS.warningBackground,
+    backgroundColor: COLORS.warningBackgroundLight,
     color: COLORS.warningEnabled,
   },
   updating: {

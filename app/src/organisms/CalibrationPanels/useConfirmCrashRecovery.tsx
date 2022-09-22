@@ -1,63 +1,52 @@
 import * as React from 'react'
-import { css } from 'styled-components'
+import { useTranslation } from 'react-i18next'
 
-import { getLabwareDisplayName } from '@opentrons/shared-data'
-
-import * as Sessions from '../../redux/sessions'
 import {
   Flex,
-  Text,
+  Link,
   JUSTIFY_CENTER,
-  FONT_SIZE_BODY_1,
-  C_BLUE,
+  TYPOGRAPHY,
+  SPACING,
 } from '@opentrons/components'
 
-import { ConfirmCrashRecoveryModal } from './ConfirmCrashRecoveryModal'
+import * as Sessions from '../../redux/sessions'
+import { StyledText } from '../../atoms/text'
+import { ConfirmCrashRecovery } from './ConfirmCrashRecovery'
 
 import type { CalibrationPanelProps } from './types'
 
-const CONDITION = 'Jog too far or bend a tip?'
-const START_OVER = 'Start over'
-
-export interface Props extends CalibrationPanelProps {
-  requiresNewTip: boolean
-}
-
 export function useConfirmCrashRecovery(
-  props: Props
-): [message: React.ReactNode, modal: React.ReactNode] {
-  const { sendCommands, tipRack, requiresNewTip } = props
+  props: CalibrationPanelProps
+): [link: JSX.Element, confirmation: JSX.Element | null] {
+  const { t } = useTranslation('robot_calibration')
+  const { sendCommands } = props
   const [showModal, setShowModal] = React.useState(false)
 
   const doStartOver = (): void => {
     sendCommands({ command: Sessions.sharedCalCommands.INVALIDATE_LAST_ACTION })
   }
   return [
-    <Flex key="crash-recovery-link" justifyContent={JUSTIFY_CENTER}>
-      <Text fontSize={FONT_SIZE_BODY_1}>{CONDITION}</Text>
-      &nbsp;
-      <Text
-        fontSize={FONT_SIZE_BODY_1}
-        color={C_BLUE}
-        as="a"
+    <Flex
+      key="crash-recovery-link"
+      justifyContent={JUSTIFY_CENTER}
+      gridGap={SPACING.spacing2}
+    >
+      <StyledText as="p">{t('jog_too_far_or_bend_tip')}</StyledText>
+      <Link
+        role="button"
         onClick={() => setShowModal(true)}
-        css={css`
-          cursor: pointer;
-        `}
+        css={TYPOGRAPHY.linkPSemiBold}
       >
-        {START_OVER}
-      </Text>
+        {t('start_over')}
+      </Link>
     </Flex>,
     showModal ? (
-      <ConfirmCrashRecoveryModal
+      <ConfirmCrashRecovery
         key="crash-recovery-modal"
         confirm={doStartOver}
         back={() => {
           setShowModal(false)
         }}
-        tipRackDisplayName={getLabwareDisplayName(tipRack.definition)}
-        tipRackSlot={tipRack.slot}
-        requiresNewTip={requiresNewTip}
       />
     ) : null,
   ]

@@ -331,6 +331,10 @@ class OT3Simulator:
             for mount in OT3Mount
         }
 
+    async def get_limit_switches(self) -> OT3AxisMap[bool]:
+        """Get the state of the gantry's limit switches on each axis."""
+        return {}
+
     async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the active current.
 
@@ -388,6 +392,10 @@ class OT3Simulator:
 
     async def disengage_axes(self, axes: List[OT3Axis]) -> None:
         """Disengage axes."""
+        return None
+
+    async def engage_axes(self, axes: List[OT3Axis]) -> None:
+        """Engage axes."""
         return None
 
     def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
