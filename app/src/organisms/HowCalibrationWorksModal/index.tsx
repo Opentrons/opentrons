@@ -3,32 +3,33 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  Flex,
   Box,
+  Flex,
   ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  SPACING,
   ALIGN_FLEX_END,
+  DIRECTION_COLUMN,
+  SPACING,
+  TEXT_TRANSFORM_CAPITALIZE,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
-import RobotCalHelpImage from '../../../../assets/images/robot_calibration_help.png'
-import { Portal } from '../../../../App/portal'
-import { Modal } from '../../../../molecules/Modal'
-import { StyledText } from '../../../../atoms/text'
-import { PrimaryButton } from '../../../../atoms/buttons'
-import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
-import { Divider } from '../../../../atoms/structure'
+import { Portal } from '../../App/portal'
+import RobotCalHelpImage from '../../assets/images/robot_calibration_help.png'
+import { PrimaryButton } from '../../atoms/buttons'
+import { ExternalLink } from '../../atoms/Link/ExternalLink'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import { Modal } from '../../molecules/Modal'
 
 const ROBOT_CAL_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
-interface DeckCalibrationModalProps {
+interface HowCalibrationWorksModalProps {
   onCloseClick: () => unknown
 }
 
-export function DeckCalibrationModal({
+export function HowCalibrationWorksModal({
   onCloseClick,
-}: DeckCalibrationModalProps): JSX.Element {
+}: HowCalibrationWorksModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'shared'])
   return (
     <Portal level="top">
@@ -44,6 +45,7 @@ export function DeckCalibrationModal({
           <ExternalLink
             href={ROBOT_CAL_HELP_ARTICLE}
             id="RobotCalModal_helpArticleLink"
+            textTransform={TEXT_TRANSFORM_CAPITALIZE}
           >
             {t('learn_more_about_robot_cal_link')}
           </ExternalLink>

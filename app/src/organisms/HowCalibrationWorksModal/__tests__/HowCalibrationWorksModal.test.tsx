@@ -1,24 +1,26 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../../../i18n'
-import { DeckCalibrationModal } from '../DeckCalibrationModal'
+import { i18n } from '../../../i18n'
+import { HowCalibrationWorksModal } from '..'
 
-const render = (props: React.ComponentProps<typeof DeckCalibrationModal>) => {
-  return renderWithProviders(<DeckCalibrationModal {...props} />, {
+const render = (
+  props: React.ComponentProps<typeof HowCalibrationWorksModal>
+) => {
+  return renderWithProviders(<HowCalibrationWorksModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('DeckCalibrationModal', () => {
-  let props: React.ComponentProps<typeof DeckCalibrationModal>
+describe('HowCalibrationWorksModal', () => {
+  let props: React.ComponentProps<typeof HowCalibrationWorksModal>
   beforeEach(() => {
     props = { onCloseClick: jest.fn() }
   })
 
   it('should render the correct header', () => {
     const { getByText } = render(props)
-    getByText('See How Robot Calibration Works')
+    getByText('How Robot Calibration Works')
   })
 
   it('should render the correct body', () => {

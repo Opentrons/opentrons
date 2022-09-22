@@ -108,7 +108,6 @@ export function Introduction(props: CalibrationPanelProps): JSX.Element {
     <ChooseTipRack
       tipRack={props.tipRack}
       mount={props.mount}
-      sessionType={props.sessionType}
       chosenTipRack={chosenTipRack}
       handleChosenTipRack={handleChosenTipRack}
       closeModal={() => setShowChooseTipRack(false)}

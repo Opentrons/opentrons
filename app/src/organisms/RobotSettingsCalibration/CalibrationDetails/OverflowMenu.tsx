@@ -15,26 +15,26 @@ import {
   useConditionalConfirm,
 } from '@opentrons/components'
 
-import { OverflowBtn } from '../../../../atoms/MenuList/OverflowBtn'
-import { MenuItem } from '../../../../atoms/MenuList/MenuItem'
-import { AskForCalibrationBlockModal } from '../../../CalibrateTipLength/AskForCalibrationBlockModal'
-import { Portal } from '../../../../App/portal'
+import { OverflowBtn } from '../../../atoms/MenuList/OverflowBtn'
+import { MenuItem } from '../../../atoms/MenuList/MenuItem'
+import { AskForCalibrationBlockModal } from '../../CalibrateTipLength/AskForCalibrationBlockModal'
+import { Portal } from '../../../App/portal'
 import {
   INTENT_RECALIBRATE_PIPETTE_OFFSET,
   INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
-} from '../../../DeprecatedCalibrationPanels'
-import * as Config from '../../../../redux/config'
-import { useTrackEvent } from '../../../../redux/analytics'
-import { EVENT_CALIBRATION_DOWNLOADED } from '../../../../redux/calibration'
+} from '../../DeprecatedCalibrationPanels'
+import * as Config from '../../../redux/config'
+import { useTrackEvent } from '../../../redux/analytics'
+import { EVENT_CALIBRATION_DOWNLOADED } from '../../../redux/calibration'
 import {
   useDeckCalibrationData,
   usePipetteOffsetCalibrations,
   useRunStatuses,
   useTipLengthCalibrations,
-} from '../../hooks'
-import { useCalibratePipetteOffset } from '../../../CalibratePipetteOffset/useCalibratePipetteOffset'
+} from '../../../organisms/Devices/hooks'
+import { useCalibratePipetteOffset } from '../../CalibratePipetteOffset/useCalibratePipetteOffset'
 import { DeckCalibrationConfirmModal } from '../DeckCalibrationConfirmModal'
-import { useMenuHandleClickOutside } from '../../../../atoms/MenuList/hooks'
+import { useMenuHandleClickOutside } from '../../../atoms/MenuList/hooks'
 
 const CAL_BLOCK_MODAL_CLOSED: 'cal_block_modal_closed' =
   'cal_block_modal_closed'

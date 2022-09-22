@@ -2,13 +2,13 @@ import * as React from 'react'
 
 import { renderWithProviders, Mount } from '@opentrons/components'
 
-import { i18n } from '../../../../../i18n'
-import { mockAttachedPipette } from '../../../../../redux/pipettes/__fixtures__'
-import { useAttachedPipettes } from '../../../hooks'
+import { i18n } from '../../../../i18n'
+import { mockAttachedPipette } from '../../../../redux/pipettes/__fixtures__'
+import { useAttachedPipettes } from '../../../../organisms/Devices/hooks'
 import { PipetteOffsetCalibrationItems } from '../PipetteOffsetCalibrationItems'
 import { OverflowMenu } from '../OverflowMenu'
 
-import type { AttachedPipettesByMount } from '../../../../../redux/pipettes/types'
+import type { AttachedPipettesByMount } from '../../../../redux/pipettes/types'
 
 const render = (
   props: React.ComponentProps<typeof PipetteOffsetCalibrationItems>
@@ -38,12 +38,12 @@ const mockPipetteOffsetCalibrations = [
   },
 ]
 
-jest.mock('../../../../../redux/custom-labware/selectors')
-jest.mock('../../../../../redux/config')
-jest.mock('../../../../../redux/sessions/selectors')
-jest.mock('../../../../../redux/discovery')
-jest.mock('../../../../../assets/labware/findLabware')
-jest.mock('../../../hooks')
+jest.mock('../../../../redux/custom-labware/selectors')
+jest.mock('../../../../redux/config')
+jest.mock('../../../../redux/sessions/selectors')
+jest.mock('../../../../redux/discovery')
+jest.mock('../../../../assets/labware/findLabware')
+jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../OverflowMenu')
 
 const mockAttachedPipettes: AttachedPipettesByMount = {
