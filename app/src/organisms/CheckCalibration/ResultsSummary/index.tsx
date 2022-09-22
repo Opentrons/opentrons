@@ -45,10 +45,6 @@ export function ResultsSummary(
     return null
   }
 
-  console.log('comparisonsByPipette', comparisonsByPipette)
-  console.log('instruments', instruments)
-  console.log('checkBothPipettes', checkBothPipettes)
-
   const handleDownloadButtonClick = (): void => {
     const now = new Date()
     const report = {
