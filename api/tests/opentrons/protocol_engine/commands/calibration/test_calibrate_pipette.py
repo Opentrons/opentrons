@@ -15,7 +15,7 @@ from opentrons.hardware_control import ot3_calibration as calibration
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.api import API
 from opentrons.hardware_control.types import OT3Mount
-from opentrons.types import Point
+from opentrons.types import Point, MountType
 
 
 @pytest.fixture(autouse=True)
@@ -31,7 +31,7 @@ async def test_calibrate_pipette_implementation(
     subject = CalibratePipetteImplementation(hardware_api=ot3_hardware_api)
 
     params = CalibratePipetteParams(
-        mount="left",
+        mount=MountType.LEFT,
     )
 
     decoy.when(
@@ -50,7 +50,7 @@ async def test_calibrate_pipette_implementation_wrong_hardware(
     subject = CalibratePipetteImplementation(hardware_api=ot2_hardware_api)
 
     params = CalibratePipetteParams(
-        mount="left",
+        mount=MountType.LEFT,
     )
 
     with pytest.raises(HardwareNotSupported):
