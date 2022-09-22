@@ -51,7 +51,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         ...
 
     @abstractmethod
-    def drop_tip(self, home_after: bool) -> None:
+    def drop_tip(self, location: types.Location, home_after: bool) -> None:
         ...
 
     @abstractmethod

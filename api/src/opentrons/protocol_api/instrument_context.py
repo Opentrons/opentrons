@@ -878,8 +878,7 @@ class InstrumentContext(publisher.CommandPublisher):
             broker=self.broker,
             command=cmds.drop_tip(instrument=self, location=target),
         ):
-            self.move_to(target, publish=False)
-            self._implementation.drop_tip(home_after=home_after)
+            self._implementation.drop_tip(location=target, home_after=home_after)
 
         if (
             self.api_version < APIVersion(2, 2)

@@ -119,8 +119,9 @@ class InstrumentContextImplementation(AbstractInstrument[WellImplementation]):
         hw.pick_up_tip(self._mount, tip_length, presses, increment, prep_after)
         hw.set_working_volume(self._mount, geometry.max_volume)
 
-    def drop_tip(self, home_after: bool) -> None:
+    def drop_tip(self, location: types.Location, home_after: bool) -> None:
         """Drop the tip."""
+        self.move_to(location, force_direct=False, minimum_z_height=None, speed=None)
         self._protocol_interface.get_hardware().drop_tip(
             self._mount, home_after=home_after
         )

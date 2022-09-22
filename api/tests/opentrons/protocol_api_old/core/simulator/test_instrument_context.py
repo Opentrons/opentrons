@@ -4,6 +4,7 @@ from typing import Callable
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
+from opentrons.types import Location, Point
 from opentrons.hardware_control import NoTipAttachedError
 from opentrons.hardware_control.types import TipAttachedError
 from opentrons.protocol_api.core.labware import AbstractLabware as BaseAbstractLabware
@@ -57,8 +58,9 @@ def test_dispense_no_tip(subject: AbstractInstrument) -> None:
 
 def test_drop_tip_no_tip(subject: AbstractInstrument) -> None:
     """It should raise an error if a tip is not attached."""
+    subject.home()
     with pytest.raises(NoTipAttachedError, match="Cannot perform DROPTIP"):
-        subject.drop_tip(home_after=False)
+        subject.drop_tip(Location(point=Point(), labware=None), home_after=False)
 
 
 def test_blow_out_no_tip(subject: AbstractInstrument) -> None:
@@ -103,7 +105,7 @@ def test_pick_up_tip_prep_after(
     )
     subject.aspirate(1, rate=1)
     subject.dispense(1, rate=1)
-    subject.drop_tip(home_after=True)
+    subject.drop_tip(Location(point=Point(), labware=None), home_after=True)
     # and again, without preparing for aspirate
     subject.pick_up_tip(
         well=labware.get_wells()[0],
@@ -114,7 +116,7 @@ def test_pick_up_tip_prep_after(
     )
     subject.aspirate(1, rate=1)
     subject.dispense(1, rate=1)
-    subject.drop_tip(home_after=True)
+    subject.drop_tip(Location(point=Point(), labware=None), home_after=True)
 
 
 def test_aspirate_too_much(
@@ -233,8 +235,10 @@ def test_pipette_dict_with_tip(
     )
 
     # Drop tip and compare again
-    instrument_context.drop_tip(home_after=False)
-    simulating_instrument_context.drop_tip(home_after=False)
+    instrument_context.drop_tip(Location(point=Point(), labware=None), home_after=False)
+    simulating_instrument_context.drop_tip(
+        Location(point=Point(), labware=None), home_after=False
+    )
 
     assert (
         instrument_context.get_pipette() == simulating_instrument_context.get_pipette()

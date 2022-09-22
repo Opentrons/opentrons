@@ -4,7 +4,7 @@ from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 
-from opentrons.types import Mount
+from opentrons.types import Mount, Location, Point
 from opentrons.protocol_api.core.protocol import (
     AbstractProtocol as BaseAbstractProtocol,
 )
@@ -55,7 +55,7 @@ def test_replacing_instrument_tip_state(
     assert pip1.has_tip() is True
     assert pip2.has_tip() is True
 
-    pip2.drop_tip(home_after=False)
+    pip2.drop_tip(Location(point=Point(), labware=None), home_after=False)
 
     assert pip1.has_tip() is False
     assert pip2.has_tip() is False

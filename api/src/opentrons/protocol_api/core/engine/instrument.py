@@ -58,7 +58,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     ) -> None:
         raise NotImplementedError("InstrumentCore not implemented")
 
-    def drop_tip(self, home_after: bool) -> None:
+    def drop_tip(self, location: Location, home_after: bool) -> None:
         raise NotImplementedError("InstrumentCore not implemented")
 
     def home(self) -> None:
