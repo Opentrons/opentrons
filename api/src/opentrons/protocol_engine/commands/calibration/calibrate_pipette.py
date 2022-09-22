@@ -9,10 +9,10 @@ from ..command import (
     BaseCommand,
     BaseCommandCreate,
 )
-from opentrons.protocol_engine.commands.validation import (
-    ensure_ot3_hardware,
-    translate_mount_to_ot3_mount,
+from ..validation import (
+    ensure_ot3_hardware
 )
+from ..ot3_translator import translate_mount_to_ot3_mount
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control import ot3_calibration as calibration

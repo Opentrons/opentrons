@@ -9,7 +9,7 @@ from opentrons.protocol_engine.commands.calibration.calibrate_pipette import (
     CalibratePipetteImplementation,
     CalibratePipetteParams,
 )
-from opentrons.protocol_engine.errors.exceptions import HardwareNotSupported
+from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedError
 
 from opentrons.hardware_control import ot3_calibration as calibration
 from opentrons.hardware_control.ot3api import OT3API
@@ -53,5 +53,5 @@ async def test_calibrate_pipette_implementation_wrong_hardware(
         mount=MountType.LEFT,
     )
 
-    with pytest.raises(HardwareNotSupported):
+    with pytest.raises(HardwareNotSupportedError):
         await subject.execute(params)
