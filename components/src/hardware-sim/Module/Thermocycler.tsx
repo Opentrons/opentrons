@@ -17,7 +17,6 @@ export interface ThermocyclerVizProps {
 export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
   const { lidMotorState } = props
   const def = getModuleDef2(THERMOCYCLER_MODULE_V1)
-
   if (lidMotorState === 'unknown') {
     // just a rectangle if we don't know the state of the lid
     return (
