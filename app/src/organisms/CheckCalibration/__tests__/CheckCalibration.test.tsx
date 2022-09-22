@@ -58,10 +58,10 @@ describe('CheckCalibration', () => {
       heading: 'Return tip and continue to next pipette',
       currentStep: 'returningTip',
     },
-    // {
-    //   heading: 'calibration health check results',
-    //   currentStep: 'resultsSummary',
-    // },
+    {
+      heading: 'calibration health check results',
+      currentStep: 'resultsSummary',
+    },
   ]
 
   beforeEach(() => {

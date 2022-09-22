@@ -28,7 +28,7 @@ describe('CalibrationHealthCheckResults', () => {
       `font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`
     )
     expect(getByTestId('status_label_Calibration complete')).toHaveStyle(
-      `background-color: ${COLORS.successEnabled}1A`
+      `background-color: ${COLORS.successBackgroundLight}`
     )
     expect(getByTestId('status_circle')).toHaveStyle(
       `color: ${COLORS.successEnabled}`
@@ -42,7 +42,7 @@ describe('CalibrationHealthCheckResults', () => {
     const { getByText, getByTestId } = render(props)
     getByText('Calibration recommended')
     expect(getByTestId('status_label_Calibration recommended')).toHaveStyle(
-      `background-color: #F2B53C33`
+      `background-color: ${COLORS.warningBackgroundLight}`
     )
     expect(getByTestId('status_circle')).toHaveStyle(
       `color: ${COLORS.warningEnabled}`
