@@ -69,10 +69,8 @@ class LabwareDataProvider:
     ) -> Optional[float]:
         try:
             return instr_cal.load_tip_length_for_pipette(
-                pipette_serial,
-                labware_definition
+                pipette_serial, labware_definition
             ).tip_length
-
 
         except TipLengthCalNotFound as e:
             log.debug("No calibrated tip length found for {pipette_serial}", exc_info=e)

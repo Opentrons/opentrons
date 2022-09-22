@@ -10,11 +10,13 @@ from opentrons_shared_data.gripper.dev_types import GripperModel
 fake_gripper_conf = gripper_config.load(GripperModel.V1)
 
 
-
 @pytest.mark.ot3_only
 @pytest.fixture
 def fake_offset():
-    from opentrons.hardware_control.instruments.ot3.instrument_calibration import load_gripper_calibration_offset
+    from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
+        load_gripper_calibration_offset,
+    )
+
     return load_gripper_calibration_offset("fakeid123")
 
 
@@ -55,16 +57,15 @@ def test_id_get_added_to_dict(fake_offset):
 def test_critical_point(
     override: Optional[CriticalPoint],
     result_accessor: Callable[[gripper.Gripper], Point],
-    fake_offset
+    fake_offset,
 ):
     gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     assert gripr.critical_point(override) == result_accessor(gripr)
 
+
 @pytest.mark.ot3_only
 def test_load_gripper_cal_offset(fake_offset):
-    gripr = gripper.Gripper(
-        fake_gripper_conf, fake_offset, "fakeid123"
-    )
+    gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     # if offset data do not exist, loaded values should match DEFAULT
     assert (
         gripr._calibration_offset.offset

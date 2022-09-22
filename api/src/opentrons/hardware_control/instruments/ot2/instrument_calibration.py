@@ -71,13 +71,28 @@ def load_pipette_offset(
     if pip_id:
         pip_offset_data = get.get_pipette_offset(pip_id, checked_mount)
         if pip_offset_data:
-            return PipetteOffsetByPipetteMount(**pip_offset_data.dict())
+            return PipetteOffsetByPipetteMount(
+                pipette=pip_id,
+                mount=mount,
+                offset=pip_offset_data.offset,
+                tiprack=pip_offset_data.tiprack,
+                last_modified=pip_offset_data.last_modified,
+                uri=pip_offset_data.uri)
     return pip_cal_obj
 
 
-def load_tip_length_for_pipette(pipette_id: str, tiprack: LabwareUri) -> TipLengthCalibration:
+def load_tip_length_for_pipette(
+    pipette_id: str, tiprack: LabwareUri
+) -> TipLengthCalibration:
     try:
         tip_length_data = get.load_tip_length_calibration(pipette_id, tiprack)
-        return TipLengthCalibration(**tip_length_data.dict())
+        return TipLengthCalibration(
+            tip_length=tip_length_data.tipLength,
+            source=tip_length_data.source,
+            status=tip_length_data.status,
+            pipette=pipette_id,
+            tiprack=tiprack,
+            last_modified=tip_length_data.lastModified,
+            uri=tip_length_data.uri)
     except types.TipLengthCalNotFound:
         raise types.TipLengthCalNotFound()

@@ -74,11 +74,15 @@ from .robot_calibration_ot3 import (
 )
 
 from .protocols import HardwareControlAPI
+
 # TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
 # in a follow-up PR.
 from .instruments.ot2.pipette_handler import OT3PipetteHandler, InstrumentsByMount
 from .instruments.ot3.gripper_handler import GripperHandler
-from .instruments.ot3.instrument_calibration import load_pipette_offset, load_gripper_calibration_offset
+from .instruments.ot3.instrument_calibration import (
+    load_pipette_offset,
+    load_gripper_calibration_offset,
+)
 from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,

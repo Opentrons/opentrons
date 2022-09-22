@@ -12,7 +12,7 @@ from opentrons.config.robot_configs import (
     default_deck_calibration,
 )
 from opentrons.calibration_storage import types
-from opentrons.calibration_storage.ot3 import modify, get
+from opentrons.calibration_storage.ot2 import modify, get
 from opentrons.util import linal
 
 from .util import DeckTransformState

@@ -2,9 +2,10 @@ import numpy as np
 
 from opentrons import config
 from opentrons.calibration_storage import file_operators as io
-#TODO figure out import stuffs here
+
 from opentrons.calibration_storage.ot2 import modify, cache as calibration_cache
 from opentrons.hardware_control import robot_calibration
+from opentrons.hardware_control.instruments.ot2 import instrument_calibration
 from opentrons.util.helpers import utc_now
 from opentrons.types import Mount, Point
 
@@ -38,7 +39,7 @@ def test_save_calibration(ot_config_tempdir):
         "last_modified": None,
         "tiprack": lw_hash,
         "source": "user",
-        "status": {"markedBad": False},
+        "status": {"markedBad": False, 'markedAt': None, 'source': None},
     }
     robot_calibration.save_attitude_matrix(e, a, pip_id, lw_hash)
     data = io.read_cal_file(pathway)
@@ -91,8 +92,10 @@ def test_load_pipette_offset(ot_config_tempdir):
     mount = Mount.LEFT
     offset = Point(1, 2, 3)
 
-    modify.save_pipette_calibration(offset, pip_id, mount, "hash", "opentrons/opentrons_96_tiprack_10ul/1")
-    obj = robot_calibration.load_pipette_offset(pip_id, mount)
+    modify.save_pipette_calibration(
+        offset, pip_id, mount, "hash", "opentrons/opentrons_96_tiprack_10ul/1"
+    )
+    obj = instrument_calibration.load_pipette_offset(pip_id, mount)
 
     assert np.allclose(obj.offset, offset)
 
@@ -103,5 +106,5 @@ def test_load_bad_pipette_offset(ot_config_tempdir):
     path.mkdir(parents=True, exist_ok=True)
     calpath = path / "fakePip.json"
     calpath.write_text("{")
-    obj = robot_calibration.load_pipette_offset("fakePip", Mount.LEFT)
+    obj = instrument_calibration.load_pipette_offset("fakePip", Mount.LEFT)
     assert obj.offset == [0, 0, 0]

@@ -14,6 +14,7 @@ from opentrons.calibration_storage.ot3 import get
 
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
+
 @dataclass
 class PipetteOffsetByPipetteMount:
     """
@@ -31,8 +32,8 @@ class GripperCalibrationOffset:
     """
     Class to store gripper offset calibration with gripper info
 
-	TODO(lc 09/15/2022) this can probably be combined with
-	pipette offset mount.
+        TODO(lc 09/15/2022) this can probably be combined with
+        pipette offset mount.
     """
 
     offset: types.InstrumentCalOffset
@@ -61,7 +62,7 @@ def load_pipette_offset(
         source=types.SourceType.default,
         status=types.CalibrationStatus(),
     )
-	# TODO this can be removed once we switch to using
+    # TODO this can be removed once we switch to using
     # ot3 pipette types in the ot3 hardware controller.
     if isinstance(mount, OT3Mount):
         checked_mount = mount.to_mount()
@@ -90,7 +91,9 @@ def load_gripper_calibration_offset(
     return grip_cal_obj
 
 
-def load_tip_length_for_pipette(pipette_id: str, tiprack: LabwareUri) -> TipLengthCalibration:
+def load_tip_length_for_pipette(
+    pipette_id: str, tiprack: LabwareUri
+) -> TipLengthCalibration:
     try:
         tip_length_data = get.load_tip_length_calibration(pipette_id, tiprack)
         return TipLengthCalibration(**tip_length_data.dict())

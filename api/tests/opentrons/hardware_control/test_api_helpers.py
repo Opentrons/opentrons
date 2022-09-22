@@ -5,7 +5,9 @@ from opentrons.calibration_storage.types import (
 )
 from opentrons.hardware_control.util import DeckTransformState
 from opentrons.hardware_control.robot_calibration import (
-    RobotCalibration, DeckCalibration)
+    RobotCalibration,
+    DeckCalibration,
+)
 
 
 @pytest.mark.ot2_only  # ot3 attitude is always correct
