@@ -280,6 +280,7 @@ export function useModuleOverflowMenu(
     <MenuItem
       key={`thermocycler_block_temp_command_btn_${module.moduleModel}`}
       onClick={sendBlockTempCommand}
+      disabled={isDisabled}
     >
       {thermoSetBlockTempText}
     </MenuItem>

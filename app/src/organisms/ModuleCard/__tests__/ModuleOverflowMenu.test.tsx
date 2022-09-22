@@ -486,4 +486,36 @@ describe('ModuleOverflowMenu', () => {
     fireEvent.click(about)
     expect(props.handleAboutClick).toHaveBeenCalled()
   })
+
+  it('renders the correct Thermocycler gen 2 menu with disabled buttons when run status is running', () => {
+    mockUseCurrentRunId.mockReturnValue('123')
+    mockUseRunStatuses.mockReturnValue({
+      isRunRunning: true,
+      isRunStill: false,
+      isRunTerminal: false,
+      isRunIdle: false,
+    })
+
+    props = {
+      module: mockThermocyclerGen2LidClosed,
+      handleSlideoutClick: jest.fn(),
+      handleAboutClick: jest.fn(),
+      handleTestShakeClick: jest.fn(),
+      handleWizardClick: jest.fn(),
+      isLoadedInRun: false,
+    }
+    const { getByRole } = render(props)
+    const setLid = getByRole('button', {
+      name: 'Set lid temperature',
+    })
+    const changeLid = getByRole('button', {
+      name: 'Open lid',
+    })
+    const setBlock = getByRole('button', { name: 'Deactivate block' })
+    const about = getByRole('button', { name: 'About module' })
+    expect(setLid).toBeDisabled()
+    expect(changeLid).toBeDisabled()
+    expect(setBlock).toBeDisabled()
+    expect(about).not.toBeDisabled()
+  })
 })
