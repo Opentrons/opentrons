@@ -1,12 +1,15 @@
 import logging
 import os
 import shutil
-import importlib
 from enum import Enum
 from pathlib import Path
 from typing import NamedTuple, Dict, Set
 
 from opentrons.config import IS_ROBOT, feature_flags
+# (lc 09-15-2022) Choosing to import both libraries rather than type
+# ignore an import_module command using importlib.
+from opentrons.calibration_storage.ot2 import delete as ot2_delete
+from opentrons.calibration_storage.ot3 import delete as ot3_delete
 
 
 DATA_BOOT_D = Path("/data/boot.d")
@@ -92,30 +95,29 @@ def reset_boot_scripts() -> None:
     else:
         log.debug(f"Not on pi, not removing {DATA_BOOT_D}")
 
-# Importing the delete module, only when these methods are called to ensure
-# that the feature flag is correctly set. Since these functions are rarely called,
-# I think it's OK to have the imports live in the functions.
+
+# (lc 09-15-2022) Choosing to import both ot2 and ot3 delete modules
+# rather than type ignore an import_module command using importlib.
 def reset_deck_calibration() -> None:
     if feature_flags.enable_ot3_hardware_controller():
-        delete = importlib.import_module('opentrons.calibration_storage.ot3.delete')
+        ot3_delete.delete_robot_deck_attitude()
+        ot3_delete.clear_pipette_offset_calibrations()
     else:
-        delete = importlib.import_module('opentrons.calibration_storage.ot2.delete')
-    delete.delete_robot_deck_attitude()
-    delete.clear_pipette_offset_calibrations()
+        ot2_delete.delete_robot_deck_attitude()
+        ot2_delete.clear_pipette_offset_calibrations()
 
 
 def reset_pipette_offset() -> None:
     if feature_flags.enable_ot3_hardware_controller():
-        delete = importlib.import_module('opentrons.calibration_storage.ot3.delete')
+        ot3_delete.clear_pipette_offset_calibrations()
     else:
-        delete = importlib.import_module('opentrons.calibration_storage.ot2.delete')
-    delete.clear_pipette_offset_calibrations()
+        ot2_delete.clear_pipette_offset_calibrations()
 
 
 def reset_tip_length_calibrations() -> None:
     if feature_flags.enable_ot3_hardware_controller():
-        delete = importlib.import_module('opentrons.calibration_storage.ot3.delete')
+        ot3_delete.clear_tip_length_calibration()
+        ot3_delete.clear_pipette_offset_calibrations()
     else:
-        delete = importlib.import_module('opentrons.calibration_storage.ot2.delete')
-    delete.clear_tip_length_calibration()
-    delete.clear_pipette_offset_calibrations()
+        ot2_delete.clear_tip_length_calibration()
+        ot2_delete.clear_pipette_offset_calibrations()

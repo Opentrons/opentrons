@@ -57,7 +57,9 @@ def tip_length_for(pipette: PipetteDict, tiprack: Labware) -> float:
         return tip_length - tip_overlap
 
     try:
-        return instr_cal.load_tip_length_for_pipette(pipette["pipette_id"], tiprack._implementation.get_definition()).tip_length
+        return instr_cal.load_tip_length_for_pipette(
+            pipette["pipette_id"], tiprack._implementation.get_definition()
+        ).tip_length
     except TipLengthCalNotFound:
         return _build_length_from_overlap()
 

@@ -96,9 +96,7 @@ def validate_attitude_deck_calibration(
 
 
 def save_attitude_matrix(
-    expected: linal.SolvePoints,
-    actual: linal.SolvePoints,
-    pipette_id: str
+    expected: linal.SolvePoints, actual: linal.SolvePoints, pipette_id: str
 ) -> None:
     attitude = linal.solve_attitude(expected, actual)
     modify.save_robot_deck_attitude(attitude, pipette_id)
@@ -107,8 +105,8 @@ def save_attitude_matrix(
 def load_attitude_matrix() -> DeckCalibration:
     calibration_data = get.get_robot_deck_attitude()
     if calibration_data:
-		# TODO is there a better way to convert a pydantic model
-		# to a dataclass?
+        # TODO is there a better way to convert a pydantic model
+        # to a dataclass?
         return DeckCalibration(**calibration_data.dict())
     else:
         # load default if deck calibration data do not exist

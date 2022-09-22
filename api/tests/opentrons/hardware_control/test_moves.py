@@ -19,7 +19,9 @@ from opentrons.hardware_control.types import (
     InvalidMoveError,
 )
 from opentrons.hardware_control.robot_calibration import (
-    RobotCalibration, DeckCalibration)
+    RobotCalibration,
+    DeckCalibration,
+)
 from opentrons.hardware_control.types import OT3Axis
 
 

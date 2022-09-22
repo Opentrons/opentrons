@@ -59,4 +59,3 @@ def test_wells_rebuilt_with_offset():
     assert old_wells[0] != new_wells[0]
     assert test_labware._implementation.get_geometry().offset == Point(10, 10, 5)
     assert test_labware._implementation.get_calibrated_offset() == Point(12, 12, 7)
-

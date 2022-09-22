@@ -29,7 +29,6 @@ from .protocols import HardwareControlAPI
 from .instruments import AbstractInstrument, Pipette
 
 
-
 ThreadManagedHardware = ThreadManager[HardwareControlAPI]
 SyncHardwareAPI = SynchronousAdapter[HardwareControlAPI]
 
@@ -57,8 +56,6 @@ __all__ = [
 ]
 
 if feature_flags.enable_ot3_hardware_controller():
-	from .instruments import Gripper
-	__all__.append("Gripper")
+    from .instruments import Gripper
 
-
-
+    __all__.append("Gripper")
