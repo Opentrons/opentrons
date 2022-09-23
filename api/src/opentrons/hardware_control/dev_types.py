@@ -1,9 +1,15 @@
 from __future__ import annotations
+import sys
 
 # this file defines types that require dev dependencies
 # and are only relevant for static typechecking. this file should only
 # be imported if typing.TYPE_CHECKING is True
-from typing import Optional, Dict, List, Union, TypedDict
+from typing import Optional, Dict, List, Union
+
+if sys.version_info >= (3, 8):
+    from typing import TypedDict
+else:
+    from typing_extensions import TypedDict
 
 from typing_extensions import Literal
 

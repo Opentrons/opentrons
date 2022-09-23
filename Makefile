@@ -17,7 +17,6 @@ SHARED_DATA_DIR := shared-data
 
 # python directories
 API_DIR := api
-
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
 HARDWARE_DIR := hardware

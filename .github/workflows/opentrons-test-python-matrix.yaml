@@ -5,7 +5,7 @@
 # due to the long runtime and runner usage, run as a cron instead of on push/PR trigger
 # trigger with dispatch to run against a different branch
 
-name: 'opentrons and opentrons_shared_data backward test matrix'
+name: 'opentrons backward test matrix'
 
 on:
   push:

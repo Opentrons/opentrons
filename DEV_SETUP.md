@@ -141,7 +141,7 @@ export PATH="/opt/homebrew/opt/node@14/bin:$PATH"
 # ...
 ```
 
-#### 2. Install `pyenv` and Python
+#### 2. Install `pyenv` Python build dependencies and Python
 
 1. Go to [https://github.com/pyenv/pyenv][pyenv]
 2. Follow the instructions for [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout)
@@ -160,12 +160,6 @@ Close and re-open your terminal to verify that `pyenv` is installed
 
 ```shell
 pyenv --version
-```
-
-Now, install the required version of Python. Use the latest available version of `3.10.x`, which is `3.10.7` at the time of writing.
-
-```shell
-pyenv install 3.10.7
 ```
 
 If your `pyenv` command isn't working, confirm that your shell is set up properly. If you print out the contents of `~/.zprofile` and `~/.zshrc`, you should see something similar to the following:
@@ -188,13 +182,29 @@ eval "$(pyenv init -)"
 
 Before you can install python, you'll need to install its build dependencies explicitly. If you're getting errors during environment setup about SSH not working, it's because you built an interpreter without SSH support accidentally because openssh headers weren't installed and python's configuration detected this. Python's build dependencies are [here](https://devguide.python.org/getting-started/setup-building/#macos-and-os-x).
 
-#### 3. Install `jpeg` if on ARM Mac (M1)
+Install `jpeg` if on ARM Mac (M1)
 
 `/hardware` depends on the Python library Pillow. On ARM Macs, `pip` will build Pillow from source, which requires [jpeg](https://formulae.brew.sh/formula/jpeg) to be installed.
 
 ```shell
 brew install jpeg
 ```
+
+Install the required versions of Python. Use the latest available version of `3.10.x` and `3.8.x`
+
+> At the time of writing this looks like the below
+
+```shell
+pyenv install 3.10.7
+pyenv install 3.8.14
+pyenv global 3.10.7 3.8.14
+pyenv versions
+```
+
+Both Python 3.8 and 3.10 are available to you.
+Call then with `python3.8` and `python3.10` on the command line.
+
+With both versions of Python available through pyenv on your system, Makefiles will point to the right version for a given make target.
 
 ### Windows
 
@@ -233,6 +243,7 @@ git clone https://github.com/jasongin/nvs "$NVS_HOME"
 #### 2. Install `pyenv` and Python
 
 You can follow the [pyenv][pyenv] "basic github checkout" instructions to install pyenv on your system:
+
 ```shell
 git clone https://github.com/pyenv/pyenv.git ~/.pyenv
 echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
@@ -243,7 +254,6 @@ echo 'eval "$(pyenv init -)"' >> ~/.bashrc
 Also add the above to whatever combination of `~/.profile`, `~/.bash_profile`, etc you like best depending on your ssh workflows.
 
 Before you can install python, you'll need to install its build dependencies explicitly. If you're getting errors during environment setup about SSH not working, it's because you built an interpreter without SSH support accidentally because openssh headers weren't installed and python's configuration detected this. Python's build dependencies are [here](https://devguide.python.org/getting-started/setup-building/#linux).
-
 
 ## Repository Setup
 
