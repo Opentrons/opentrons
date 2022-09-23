@@ -246,6 +246,7 @@ describe('ModuleOverflowMenu', () => {
     })
     fireEvent.click(buttonSettingBlock)
     expect(props.handleSlideoutClick).toHaveBeenCalled()
+    getByRole('button', { name: 'Close lid' })
   })
   it('renders the correct Heater Shaker module menu', () => {
     props = {
@@ -319,6 +320,7 @@ describe('ModuleOverflowMenu', () => {
       name: 'Open Labware Latch',
     })
     expect(btn).not.toBeDisabled()
+    fireEvent.click(btn)
   })
 
   it('renders heater shaker labware latch button and when clicked, moves labware latch close', () => {
@@ -332,9 +334,11 @@ describe('ModuleOverflowMenu', () => {
     }
     const { getByRole } = render(props)
 
-    getByRole('button', {
+    const btn = getByRole('button', {
       name: 'Close Labware Latch',
     })
+
+    fireEvent.click(btn)
   })
 
   it('renders heater shaker overflow menu and deactivates heater when status changes', () => {
@@ -353,6 +357,7 @@ describe('ModuleOverflowMenu', () => {
       name: 'Deactivate heater',
     })
     expect(btn).not.toBeDisabled()
+    fireEvent.click(btn)
   })
 
   it('renders temperature module overflow menu and deactivates heat when status changes', () => {
@@ -371,6 +376,7 @@ describe('ModuleOverflowMenu', () => {
       name: 'Deactivate module',
     })
     expect(btn).not.toBeDisabled()
+    fireEvent.click(btn)
   })
 
   it('renders magnetic module overflow menu and disengages when status changes', () => {
@@ -389,6 +395,7 @@ describe('ModuleOverflowMenu', () => {
       name: 'Disengage module',
     })
     expect(btn).not.toBeDisabled()
+    fireEvent.click(btn)
   })
 
   it('renders thermocycler overflow menu and deactivates block when status changes', () => {
@@ -407,6 +414,7 @@ describe('ModuleOverflowMenu', () => {
       name: 'Deactivate block',
     })
     expect(btn).not.toBeDisabled()
+    fireEvent.click(btn)
   })
 
   it('should disable module control buttons when the robot is busy and run status not null', () => {
@@ -433,6 +441,7 @@ describe('ModuleOverflowMenu', () => {
       name: 'Deactivate block',
     })
     expect(btn).toBeDisabled()
+    fireEvent.click(btn)
   })
 
   it('renders the correct Thermocycler gen 2 menu', () => {

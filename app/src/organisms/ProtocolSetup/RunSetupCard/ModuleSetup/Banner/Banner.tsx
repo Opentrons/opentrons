@@ -15,7 +15,6 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../../../atoms/text'
-import { TertiaryButton } from '../../../../../atoms/buttons'
 
 interface BannerProps {
   title: string
@@ -62,12 +61,11 @@ export function Banner(props: BannerProps): JSX.Element | null {
 interface BannerItemProps {
   title: string
   body: string
-  btnText?: string
-  onClick?: () => void
+  button: JSX.Element | null
 }
 
 export const BannerItem = (props: BannerItemProps): JSX.Element => {
-  const { title, body, btnText, onClick } = props
+  const { title, body, button } = props
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -78,20 +76,13 @@ export const BannerItem = (props: BannerItemProps): JSX.Element => {
           as="p"
           marginTop={SPACING.spacing3}
           color={COLORS.darkGrey}
-          maxWidth={btnText != null ? SIZE_6 : '100%'}
+          maxWidth={button != null ? SIZE_6 : '100%'}
           data-testid={`banner_subtitle_${title}`}
         >
           {body}
         </StyledText>
       </Flex>
-      {btnText != null && onClick != null ? (
-        <TertiaryButton
-          data-testid="banner_open_wizard_btn"
-          onClick={() => onClick()}
-        >
-          {btnText}
-        </TertiaryButton>
-      ) : null}
+      {button}
     </Flex>
   )
 }

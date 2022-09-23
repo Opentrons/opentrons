@@ -10,6 +10,7 @@ import {
 } from '@opentrons/shared-data'
 import { COLORS } from '@opentrons/components'
 import { Divider } from '../../../atoms/structure/Divider'
+import { TertiaryButton } from '../../../atoms/buttons'
 import {
   Banner,
   BannerItem,
@@ -90,8 +91,14 @@ const ModuleExtraAttentionItem = (
             slotName: moduleInfo.slotName,
           })}
           body={t('protocol_setup:magnetic_module_extra_attention')}
-          btnText={t('view_instructions')}
-          onClick={onClick}
+          button={
+            <TertiaryButton
+              data-testid="banner_open_wizard_btn"
+              onClick={onClick}
+            >
+              {t('view_instructions')}
+            </TertiaryButton>
+          }
         />
       )
     case HEATERSHAKER_MODULE_TYPE:
@@ -129,10 +136,16 @@ const ModuleExtraAttentionItem = (
               slotName: moduleInfo.slotName,
             })}
             body={t('protocol_setup:heater_shaker_extra_attention')}
-            btnText={
-              isLatchClosed ? t('open_labware_latch') : t('close_labware_latch')
+            button={
+              <TertiaryButton
+                data-testid="banner_open_wizard_btn"
+                onClick={toggleLatch}
+              >
+                {isLatchClosed
+                  ? t('open_labware_latch')
+                  : t('close_labware_latch')}
+              </TertiaryButton>
             }
-            onClick={toggleLatch}
           />
         )
       } else {
@@ -150,15 +163,15 @@ const ModuleExtraAttentionItem = (
               ? 'protocol_setup:thermocycler_extra_attention_gen_1'
               : 'protocol_setup:thermocycler_extra_attention_gen_2'
           )}
-          btnText={
-            moduleInfo.moduleDef.model === THERMOCYCLER_MODULE_V1
-              ? t('view_instructions')
-              : undefined
-          }
-          onClick={
-            moduleInfo.moduleDef.model === THERMOCYCLER_MODULE_V1
-              ? onClick
-              : undefined
+          button={
+            moduleInfo.moduleDef.model === THERMOCYCLER_MODULE_V1 ? (
+              <TertiaryButton
+                data-testid="banner_open_wizard_btn"
+                onClick={onClick}
+              >
+                {t('view_instructions')}
+              </TertiaryButton>
+            ) : null
           }
         />
       )

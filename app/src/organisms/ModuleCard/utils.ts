@@ -1,10 +1,10 @@
 import magneticModule from '../../assets/images/magnetic_module_gen_2_transparent.svg'
 import temperatureModule from '../../assets/images/temp_deck_gen_2_transparent.svg'
-import thermoModule from '../../assets/images/thermocycler_closed.svg'
+import thermoModuleGen1Closed from '../../assets/images/thermocycler_closed.svg'
+import thermoModuleGen1Opened from '../../assets/images/thermocycler_open_transparent.svg'
 import heaterShakerModule from '../../assets/images/heatershaker_module_transparent.svg'
 import thermoModuleGen2Closed from '../../assets/images/thermocycler_gen_2_closed.png'
 import thermoModuleGen2Opened from '../../assets/images/thermocycler_gen_2_opened.png'
-
 import type { AttachedModule } from '../../redux/modules/types'
 
 export function getModuleCardImage(attachedModule: AttachedModule): string {
@@ -19,7 +19,11 @@ export function getModuleCardImage(attachedModule: AttachedModule): string {
     case 'heaterShakerModuleV1':
       return heaterShakerModule
     case 'thermocyclerModuleV1':
-      return thermoModule
+      if (attachedModule.data.lidStatus === 'closed') {
+        return thermoModuleGen1Closed
+      } else {
+        return thermoModuleGen1Opened
+      }
     case 'thermocyclerModuleV2':
       if (attachedModule.data.lidStatus === 'closed') {
         return thermoModuleGen2Closed

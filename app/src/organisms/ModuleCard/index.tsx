@@ -141,7 +141,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     module.data.currentTemperature > TOO_HOT_TEMP
 
   const ThermoTooHot =
-    module.moduleModel === 'thermocyclerModuleV2' &&
+    module.moduleType === THERMOCYCLER_MODULE_TYPE &&
     ((module.data.currentTemperature != null &&
       module.data.currentTemperature > TOO_HOT_TEMP) ||
       (module.data.lidTemperature != null &&
@@ -174,12 +174,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
 
     case 'thermocyclerModuleType': {
-      moduleData = (
-        <ThermocyclerModuleData
-          moduleModel={module.moduleModel}
-          data={module.data}
-        />
-      )
+      moduleData = <ThermocyclerModuleData data={module.data} />
       break
     }
 

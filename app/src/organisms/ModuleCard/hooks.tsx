@@ -10,8 +10,6 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  THERMOCYCLER_MODULE_V1,
-  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
@@ -240,7 +238,7 @@ export function useModuleOverflowMenu(
 
   const lidCommand: TCOpenLidCreateCommand | TCCloseLidCreateCommand = {
     commandType:
-      module.moduleModel === THERMOCYCLER_MODULE_V2 &&
+      module.moduleType === THERMOCYCLER_MODULE_TYPE &&
       module.data.lidStatus === 'open'
         ? 'thermocycler/closeLid'
         : 'thermocycler/openLid',
@@ -259,19 +257,8 @@ export function useModuleOverflowMenu(
     })
   }
 
-  const thermoSetBlockTempText =
-    module.data.status !== 'idle'
-      ? t('overflow_menu_deactivate_block')
-      : t('overflow_menu_set_block_temp')
-
-  const thermocSetLidStatusText =
-    module.moduleModel === THERMOCYCLER_MODULE_V2 &&
-    module.data.lidStatus === 'open'
-      ? t('close_lid')
-      : t('open_lid')
-
   const sendBlockTempCommand =
-    module.moduleModel === THERMOCYCLER_MODULE_V1 &&
+    module.moduleType === THERMOCYCLER_MODULE_TYPE &&
     module.data.targetTemperature != null
       ? () => handleDeactivationCommand('thermocycler/deactivateBlock')
       : () => handleSlideoutClick(false)
@@ -282,7 +269,9 @@ export function useModuleOverflowMenu(
       onClick={sendBlockTempCommand}
       disabled={isDisabled}
     >
-      {thermoSetBlockTempText}
+      {module.data.status !== 'idle'
+        ? t('overflow_menu_deactivate_block')
+        : t('overflow_menu_set_block_temp')}
     </MenuItem>
   )
 
@@ -304,18 +293,13 @@ export function useModuleOverflowMenu(
       },
       {
         setSetting:
-          module.moduleModel === THERMOCYCLER_MODULE_V2
-            ? thermocSetLidStatusText
-            : thermoSetBlockTempText,
+          module.moduleType === THERMOCYCLER_MODULE_TYPE &&
+          module.data.lidStatus === 'open'
+            ? t('close_lid')
+            : t('open_lid'),
         isSecondary: false,
-        menuButtons:
-          module.moduleModel === THERMOCYCLER_MODULE_V2
-            ? [thermoSetBlockTempBtn, aboutModuleBtn]
-            : [aboutModuleBtn],
-        onClick:
-          module.moduleModel === THERMOCYCLER_MODULE_V2
-            ? controlTCLid
-            : sendBlockTempCommand,
+        menuButtons: [thermoSetBlockTempBtn, aboutModuleBtn],
+        onClick: controlTCLid,
       },
     ],
     temperatureModuleType: [

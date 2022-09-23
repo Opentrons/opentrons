@@ -11,21 +11,18 @@ import {
   WRAP,
   Box,
 } from '@opentrons/components'
-import { THERMOCYCLER_MODULE_V2 } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 
 import type { ThermocyclerData } from '../../redux/modules/api-types'
-import type { ThermocyclerModuleModel } from '@opentrons/shared-data'
 
 interface ThermocyclerModuleProps {
-  moduleModel: ThermocyclerModuleModel
   data: ThermocyclerData
 }
 
 export const ThermocyclerModuleData = (
   props: ThermocyclerModuleProps
 ): JSX.Element | null => {
-  const { moduleModel, data } = props
+  const { data } = props
   const { t } = useTranslation('device_details')
 
   const getStatusLabelProps = (
@@ -79,27 +76,26 @@ export const ThermocyclerModuleData = (
           color={COLORS.darkGreyEnabled}
           fontSize={TYPOGRAPHY.fontSizeCaption}
           marginTop={SPACING.spacing3}
-          marginBottom={
-            moduleModel === THERMOCYCLER_MODULE_V2 ? '0rem' : SPACING.spacing2
-          }
         >
           {t('tc_lid')}
         </StyledText>
-        {moduleModel === THERMOCYCLER_MODULE_V2 ? (
-          //  TODO(jr, 9/22/22): when the module endpoint includes lid temperature status, add the status label
-          // <Flex flexDirection={DIRECTION_ROW}>
-          <Box marginRight={SPACING.spacing2}>
-            <StatusLabel
-              status={data.lidStatus}
-              {...getStatusLabelProps(data.lidStatus)}
-            />
-          </Box>
-        ) : //  <StatusLabel
-        //     status={data.lidTemperatureStatus}
-        //     {...getStatusLabelProps(data.lidTemperatureStatus)}
-        //   />
-        // </Flex>
-        null}
+
+        {/* TODO(jr, 9/22/22): when the module endpoint includes lid temperature status, add the status label
+           <Flex flexDirection={DIRECTION_ROW}> */}
+        <Box marginRight={SPACING.spacing2}>
+          <StatusLabel
+            status={data.lidStatus}
+            {...getStatusLabelProps(data.lidStatus)}
+            key="StatusLabel_lidStatus"
+          />
+        </Box>
+        {/* <StatusLabel
+            status={data.lidTemperatureStatus}
+             {...getStatusLabelProps(data.lidTemperatureStatus)}
+             key="statusLabel_litTempStatus"
+           />
+         </Flex> */}
+
         <StyledText
           title="lid_target_temp"
           fontSize={TYPOGRAPHY.fontSizeCaption}
@@ -130,6 +126,7 @@ export const ThermocyclerModuleData = (
         <StatusLabel
           status={data.status}
           {...getStatusLabelProps(data.status)}
+          key="StatusLabel_blockStatus"
         />
         <StyledText
           title="tc_target_temp"
