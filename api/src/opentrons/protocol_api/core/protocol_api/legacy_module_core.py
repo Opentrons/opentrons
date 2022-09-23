@@ -2,16 +2,21 @@
 from typing import Optional, cast
 
 from opentrons.hardware_control import SynchronousAdapter
-from opentrons.hardware_control.modules import AbstractModule, TempDeck
+from opentrons.hardware_control.modules import AbstractModule, TempDeck, MagDeck
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
     TemperatureStatus,
+    MagneticStatus,
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
 
-from ..module import AbstractModuleCore, AbstractTemperatureModuleCore
+from ..module import (
+    AbstractModuleCore,
+    AbstractTemperatureModuleCore,
+    AbstractMagneticModuleCore,
+)
 from .labware import LabwareImplementation
 
 
@@ -93,6 +98,42 @@ class LegacyTemperatureModuleCore(
         return self._sync_module_hardware.status  # type: ignore[no-any-return]
 
 
+class LegacyMagneticModuleCore(
+    LegacyModuleCore, AbstractMagneticModuleCore[LabwareImplementation]
+):
+    """Core control interface for an attached Magnetic Module."""
+
+    _sync_module_hardware: SynchronousAdapter[MagDeck]
+
+    def engage(
+        self,
+        height_from_base: Optional[float] = None,
+        height_from_home: Optional[float] = None,
+        offset_from_labware_default: Optional[float] = None,
+    ) -> None:
+        """Raise the module's magnets.
+
+        Only one of `height_from_base`, `offset_from_labware_default`,
+        or `height_from_home` may be specified.
+        All distance units are specified in real millimeters.
+
+        Args:
+            height_from_base: Distance from labware base to raise the magnets.
+            height_from_base: Distance from motor home position to raise the magnets.
+            offset_from_labware_default: Offset from the default engage height
+                of the module's loaded labware to raise the magnets.
+        """
+        raise NotImplementedError("engage")
+
+    def disengage(self) -> None:
+        """Lower the magnets back into the module."""
+        self._sync_module_hardware.deactivate()
+
+    def get_status(self) -> MagneticStatus:
+        """Get the module's current magnet status."""
+        return self._sync_module_hardware.status  # type: ignore[no-any-return]
+
+
 def create_module_core(
     module_hardware_api: AbstractModule,
     requested_model: ModuleModel,
@@ -102,6 +143,8 @@ def create_module_core(
 
     if isinstance(module_hardware_api, TempDeck):
         core_cls = LegacyTemperatureModuleCore
+    elif isinstance(module_hardware_api, MagDeck):
+        core_cls = LegacyMagneticModuleCore
 
     return core_cls(
         sync_module_hardware=SynchronousAdapter(module_hardware_api),

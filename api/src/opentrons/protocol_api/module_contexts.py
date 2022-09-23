@@ -25,7 +25,11 @@ from opentrons.protocols.geometry.module_geometry import (
 from .core.protocol import AbstractProtocol
 from .core.instrument import AbstractInstrument
 from .core.labware import AbstractLabware
-from .core.module import AbstractModuleCore, AbstractTemperatureModuleCore
+from .core.module import (
+    AbstractModuleCore,
+    AbstractTemperatureModuleCore,
+    AbstractMagneticModuleCore,
+)
 from .core.well import AbstractWellCore
 
 from .module_validation_and_errors import (
@@ -343,6 +347,8 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
 
     """
 
+    _core: AbstractMagneticModuleCore[AbstractLabware[AbstractWellCore]]
+
     # TODO(mc, 2022-02-05): this type annotation is misleading;
     # a SynchronousAdapter wrapper is actually passed in
     _module: modules.magdeck.MagDeck  # type: ignore[assignment]
@@ -422,7 +428,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
             The *height_from_base* parameter.
         """
         if height is not None:
-            dist = height
+            self._core.engage(height_from_home=height)
 
         # This version check has a bug:
         # if the caller sets height_from_base in an API version that's too low,
@@ -430,25 +436,26 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         # Leaving this unfixed because we haven't thought through
         # how to do backwards-compatible fixes to our version checking itself.
         elif height_from_base is not None and self._api_version >= APIVersion(2, 2):
-            dist = (
-                height_from_base
-                + modules.magdeck.OFFSET_TO_LABWARE_BOTTOM[self._module.model()]
-            )
+            self._core.engage(height_from_base=height_from_base)
+            # TODO(mc, 2022-09-23): incorporate below logic into legacy mag module core
+            # dist = (
+            #     height_from_base
+            #     + modules.magdeck.OFFSET_TO_LABWARE_BOTTOM[self._module.model()]
+            # )
 
         elif self.labware and self.labware.magdeck_engage_height is not None:
-            dist = self._determine_lw_engage_height()
-            if offset:
-                dist += offset
+            self._core.engage(offset_from_labware_default=offset)
+            # TODO(mc, 2022-09-23): incorporate below logic into legacy mag module core
+            # dist = self._determine_lw_engage_height()
+            # if offset:
+            #     dist += offset
 
         else:
             raise ValueError(
-                "Currently loaded labware {} does not have a known engage "
-                "height; please specify explicitly with the height param".format(
-                    self.labware
-                )
+                f"Currently loaded labware {self.labware} does not have"
+                " a default engage height; specify engage height explicitly"
+                " using `height_from_base` or `height`"
             )
-
-        self._module.engage(dist)
 
     def _determine_lw_engage_height(self) -> float:
         """Return engage height based on Protocol API and module versions
@@ -479,13 +486,13 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     @requires_version(2, 0)
     def disengage(self) -> None:
         """Lower the magnets back into the Magnetic Module."""
-        self._module.deactivate()
+        self._core.disengage()
 
     @property  # type: ignore
     @requires_version(2, 0)
     def status(self) -> str:
         """The status of the module; either 'engaged' or 'disengaged'"""
-        return self._module.status
+        return self._core.get_status().value
 
 
 class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):

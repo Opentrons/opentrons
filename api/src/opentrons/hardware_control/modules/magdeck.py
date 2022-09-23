@@ -152,11 +152,11 @@ class MagDeck(mod_abc.AbstractModule):
         return self._device_info
 
     @property
-    def status(self) -> str:
+    def status(self) -> types.MagneticStatus:
         if self.current_height > 0:
-            return "engaged"
+            return types.MagneticStatus.ENGAGED
         else:
-            return "disengaged"
+            return types.MagneticStatus.DISENGAGED
 
     @property
     def engaged(self) -> bool:

@@ -6,6 +6,7 @@ from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
     TemperatureStatus,
+    MagneticStatus,
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
@@ -78,3 +79,35 @@ class AbstractTemperatureModuleCore(AbstractModuleCore[LabwareCoreType]):
     @abstractmethod
     def get_status(self) -> TemperatureStatus:
         """Get the module's current temperature status."""
+
+
+class AbstractMagneticModuleCore(AbstractModuleCore[LabwareCoreType]):
+    """Core control interface for an attached Magnetic Module."""
+
+    @abstractmethod
+    def engage(
+        self,
+        height_from_base: Optional[float] = None,
+        height_from_home: Optional[float] = None,
+        offset_from_labware_default: Optional[float] = None,
+    ) -> None:
+        """Raise the module's magnets.
+
+        Only one of `height_from_base`, `offset_from_labware_default`,
+        or `height_from_home` may be specified. All distance units are
+        specified in real millimeters.
+
+        Args:
+            height_from_base: Distance from labware base to raise the magnets.
+            height_from_base: Distance from motor home position to raise the magnets.
+            offset_from_labware_default: Offset from the default engage height
+                of the module's loaded labware to raise the magnet.
+        """
+
+    @abstractmethod
+    def disengage(self) -> None:
+        """Lower the magnets back into the module."""
+
+    @abstractmethod
+    def get_status(self) -> MagneticStatus:
+        """Get the module's current magnet status."""
