@@ -36,7 +36,10 @@ import {
   getAllModuleSlotsByType,
 } from '../../../modules/moduleData'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
-import { MODELS_FOR_MODULE_TYPE } from '../../../constants'
+import {
+  MODELS_FOR_MODULE_TYPE,
+  MODELS_FOR_MODULE_TYPE_NO_FF,
+} from '../../../constants'
 import { PDAlert } from '../../alerts/PDAlert'
 import { isModuleWithCollisionIssue } from '../../modules'
 import modalStyles from '../modal.css'
@@ -224,6 +227,9 @@ const EditModulesModalComponent = (
   const { moduleType, onCloseClick, supportedModuleSlot } = props
   const { values, errors, isValid } = useFormikContext<EditModulesFormValues>()
   const { selectedModel } = values
+  const enableThermocyclerGen2 = useSelector(
+    featureFlagSelectors.getEnabledThermocyclerGen2
+  )
 
   const disabledModuleRestriction = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
@@ -272,7 +278,11 @@ const EditModulesModalComponent = (
               <ModelDropdown
                 fieldName={'selectedModel'}
                 tabIndex={0}
-                options={MODELS_FOR_MODULE_TYPE[moduleType]}
+                options={
+                  enableThermocyclerGen2
+                    ? MODELS_FOR_MODULE_TYPE[moduleType]
+                    : MODELS_FOR_MODULE_TYPE_NO_FF[moduleType]
+                }
               />
             </FormGroup>
             {showSlotOption && (
