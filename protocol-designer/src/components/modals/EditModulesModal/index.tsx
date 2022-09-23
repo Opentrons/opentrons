@@ -18,6 +18,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   ModuleType,
   ModuleModel,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
@@ -78,6 +79,9 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     onCloseClick,
     moduleOnDeck,
   } = props
+  const enableThermocyclerGen2 = useSelector(
+    featureFlagSelectors.getEnabledThermocyclerGen2
+  )
   const supportedModuleSlot = SUPPORTED_MODULE_SLOTS[moduleType][0].value
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const dispatch = useDispatch()
@@ -105,7 +109,9 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
   const initialValues = moduleIsThermocycler
     ? {
         selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
-        selectedModel: moduleOnDeck?.model || null,
+        selectedModel: enableThermocyclerGen2
+          ? moduleOnDeck?.model || null
+          : THERMOCYCLER_MODULE_V1,
       }
     : {
         selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,

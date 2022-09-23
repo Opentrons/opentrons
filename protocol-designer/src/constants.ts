@@ -12,12 +12,11 @@ import {
   HEATERSHAKER_MODULE_V1,
   LabwareDefinition2,
   DeckSlot as DeckDefSlot,
-  ModuleModel,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { i18n } from './localization'
 import type { DeckSlot, WellVolumes } from './types'
-import type { ModuleType } from '@opentrons/shared-data'
+import type { ModuleType, ModuleModel } from '@opentrons/shared-data'
 
 export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
   mapValues(def.wells, well => well.totalLiquidVolume)
