@@ -40,13 +40,7 @@ from .labware import Labware
 
 
 ENGAGE_HEIGHT_UNIT_CNV = 2
-MAGDECK_HALF_MM_LABWARE = [
-    # Load names of labware whose definitions accidentally specify an engage height
-    # in units of half-millimeters, instead of millimeters.
-    "biorad_96_wellplate_200ul_pcr",
-    "nest_96_wellplate_100ul_pcr_full_skirt",
-    "usascientific_96_wellplate_2.4ml_deep",
-]
+
 
 _log = logging.getLogger(__name__)
 
@@ -102,7 +96,8 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
                         :py:meth:`load_labware`.
         :returns: The properly-linked labware object
 
-        ..deprecated: 2.14
+        .. deprecated:: 2.14
+            Use :py:meth:`load_labware` or :py:meth:`load_labware_by_definition`.
         """
         _log.warning(
             "`module.load_labware_object` is an internal, deprecated method."
@@ -152,6 +147,8 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):
             version=version,
             location=self._core,
         )
+
+        self._core.add_labware_core(labware_core)
 
         # TODO(mc, 2022-09-02): add API version
         # https://opentrons.atlassian.net/browse/RSS-97
@@ -344,37 +341,24 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     created through :py:meth:`.ProtocolContext.load_module`.
 
     .. versionadded:: 2.0
-
     """
 
     _core: AbstractMagneticModuleCore[AbstractLabware[AbstractWellCore]]
-
-    # TODO(mc, 2022-02-05): this type annotation is misleading;
-    # a SynchronousAdapter wrapper is actually passed in
-    _module: modules.magdeck.MagDeck  # type: ignore[assignment]
 
     @publish(command=cmds.magdeck_calibrate)
     @requires_version(2, 0)
     def calibrate(self) -> None:
         """Calibrate the Magnetic Module.
 
-        The calibration is used to establish the position of the labware on
-        top of the magnetic module.
+        .. deprecated:: 2.14
+            This method is unncessary; remove any usage.
         """
-        self._module.calibrate()
-
-    @requires_version(2, 0)
-    def load_labware_object(self, labware: Labware) -> Labware:
-        """
-        Load labware onto a Magnetic Module, checking if it is compatible
-        """
-        if labware.magdeck_engage_height is None:
-            _log.warning(
-                "This labware ({}) is not explicitly compatible with the"
-                " Magnetic Module. You will have to specify a height when"
-                " calling engage()."
-            )
-        return super().load_labware_object(labware)
+        _log.warning(
+            "`MagneticModuleContext.calibrate` doesn't do anything useful"
+            " and will no-op in Protocol API version 2.14 and higher."
+        )
+        if self._api_version < APIVersion(2, 14):
+            self._core._sync_module_hardware.calibrate()  # type: ignore[attr-defined]
 
     @publish(command=cmds.magdeck_engage)
     @requires_version(2, 0)
@@ -437,50 +421,12 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         # how to do backwards-compatible fixes to our version checking itself.
         elif height_from_base is not None and self._api_version >= APIVersion(2, 2):
             self._core.engage(height_from_base=height_from_base)
-            # TODO(mc, 2022-09-23): incorporate below logic into legacy mag module core
-            # dist = (
-            #     height_from_base
-            #     + modules.magdeck.OFFSET_TO_LABWARE_BOTTOM[self._module.model()]
-            # )
-
-        elif self.labware and self.labware.magdeck_engage_height is not None:
-            self._core.engage(offset_from_labware_default=offset)
-            # TODO(mc, 2022-09-23): incorporate below logic into legacy mag module core
-            # dist = self._determine_lw_engage_height()
-            # if offset:
-            #     dist += offset
 
         else:
-            raise ValueError(
-                f"Currently loaded labware {self.labware} does not have"
-                " a default engage height; specify engage height explicitly"
-                " using `height_from_base` or `height`"
+            self._core.engage_to_labware(
+                offset=offset or 0,
+                preserve_half_mm_labware=self._api_version < APIVersion(2, 3),
             )
-
-    def _determine_lw_engage_height(self) -> float:
-        """Return engage height based on Protocol API and module versions
-
-        For API Version 2.3 or later:
-           - Multiply non-standard labware engage heights by 2 for gen1 modules
-           - Divide standard labware engage heights by 2 for gen2 modules
-        If none of the above, return the labware engage heights as defined in
-        the labware definitions
-        """
-        assert self.labware
-        assert self.labware.magdeck_engage_height
-
-        engage_height = self.labware.magdeck_engage_height
-
-        is_api_breakpoint = self._api_version >= APIVersion(2, 3)
-        is_v1_module = self._module.model() == "magneticModuleV1"
-        engage_height_is_in_half_mm = self.labware.load_name in MAGDECK_HALF_MM_LABWARE
-
-        if is_api_breakpoint and is_v1_module and not engage_height_is_in_half_mm:
-            return engage_height * ENGAGE_HEIGHT_UNIT_CNV
-        elif is_api_breakpoint and not is_v1_module and engage_height_is_in_half_mm:
-            return engage_height / ENGAGE_HEIGHT_UNIT_CNV
-        else:
-            return engage_height
 
     @publish(command=cmds.magdeck_disengage)
     @requires_version(2, 0)

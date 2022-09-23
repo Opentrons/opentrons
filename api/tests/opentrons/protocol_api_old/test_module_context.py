@@ -188,13 +188,6 @@ def test_magdeck(ctx_with_magdeck, mock_module_controller):
     assert ctx_with_magdeck.deck[1] == mod.geometry
 
 
-def test_magdeck_engage_no_height_no_labware(ctx_with_magdeck, mock_module_controller):
-    """It should raise an error."""
-    mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
-    with pytest.raises(ValueError):
-        mod.engage()
-
-
 def test_magdeck_calibrate(ctx_with_magdeck, mock_module_controller):
     mod = ctx_with_magdeck.load_module("Magnetic Module", 1)
     mod.calibrate()
@@ -801,7 +794,6 @@ def test_deprecated_module_load_labware_by_name(ctx_with_tempdeck):
     )
 
 
-@pytest.mark.xfail(strict=True, raises=NotImplementedError)
 async def test_magdeck_gen1_labware_props(ctx):
     # TODO Ian 2019-05-29 load fixtures, not real defs
     labware_name = "biorad_96_wellplate_200ul_pcr"
@@ -842,7 +834,6 @@ async def test_magdeck_gen1_labware_props(ctx):
     )
 
 
-@pytest.mark.xfail(strict=True, raises=NotImplementedError)
 def test_magdeck_gen2_labware_props(ctx):
     mod = ctx.load_module("magnetic module gen2", 1)
     mod.engage(height=25)

@@ -1,4 +1,5 @@
 """Legacy Protocol API module implementation logic."""
+import logging
 from typing import Optional, cast
 
 from opentrons.hardware_control import SynchronousAdapter
@@ -8,6 +9,7 @@ from opentrons.hardware_control.modules.types import (
     ModuleType,
     TemperatureStatus,
     MagneticStatus,
+    MagneticModuleModel,
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.types import DeckSlotName
@@ -18,6 +20,9 @@ from ..module import (
     AbstractMagneticModuleCore,
 )
 from .labware import LabwareImplementation
+
+
+_log = logging.getLogger(__name__)
 
 
 class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
@@ -60,6 +65,10 @@ class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""
         return DeckSlotName.from_primitive(self._geometry.parent)  # type: ignore[arg-type]
+
+    def add_labware_core(self, labware_core: LabwareImplementation) -> None:
+        """Add a labware to the module."""
+        pass
 
 
 class LegacyTemperatureModuleCore(
@@ -109,21 +118,67 @@ class LegacyMagneticModuleCore(
         self,
         height_from_base: Optional[float] = None,
         height_from_home: Optional[float] = None,
-        offset_from_labware_default: Optional[float] = None,
     ) -> None:
         """Raise the module's magnets.
 
-        Only one of `height_from_base`, `offset_from_labware_default`,
-        or `height_from_home` may be specified.
+        Only one of `height_from_base` or `height_from_home` may be specified.
         All distance units are specified in real millimeters.
 
         Args:
             height_from_base: Distance from labware base to raise the magnets.
             height_from_base: Distance from motor home position to raise the magnets.
-            offset_from_labware_default: Offset from the default engage height
-                of the module's loaded labware to raise the magnets.
         """
-        raise NotImplementedError("engage")
+        # TODO(mc, 2022-09-23): use real millimeters instead of model-dependent mm
+        if height_from_base is not None:
+            self._sync_module_hardware.engage(height_from_base=height_from_base)
+        else:
+            assert height_from_home is not None, "Engage height must be specified"
+            self._sync_module_hardware.engage(height=height_from_home)
+
+    def engage_to_labware(
+        self,
+        offset: float = 0,
+        preserve_half_mm_labware: bool = False,
+    ) -> None:
+        """Raise the module's magnets its loaded labware.
+
+        All distance units are specified in real millimeters.
+
+        Args:
+            offset: Offset from the labware's default engage height.
+
+        Raises:
+            ValueError: Labware is not loaded or has no default engage height.
+        """
+        labware = self._geometry.labware
+
+        if labware is None:
+            raise ValueError(
+                "No labware loaded in Magnetic Module;"
+                " you must specify an engage height explicitly"
+                " using `height_from_base` or `height`"
+            )
+
+        engage_height = labware._implementation.get_default_magnet_engage_height(
+            preserve_half_mm_labware
+        )
+
+        if engage_height is None:
+            raise ValueError(
+                f"Currently loaded labware {labware} does not have"
+                " a default engage height; specify engage height explicitly"
+                " using `height_from_base` or `height`"
+            )
+
+        if (
+            self._geometry.model == MagneticModuleModel.MAGNETIC_V1
+            and not preserve_half_mm_labware
+        ):
+            engage_height *= 2
+
+        # TODO(mc, 2022-09-23): use real millimeters instead of model-dependent mm
+        # TODO(mc, 2022-09-23): use `height_from_base`
+        self._sync_module_hardware.engage(height=engage_height + offset)
 
     def disengage(self) -> None:
         """Lower the magnets back into the module."""
@@ -132,6 +187,15 @@ class LegacyMagneticModuleCore(
     def get_status(self) -> MagneticStatus:
         """Get the module's current magnet status."""
         return self._sync_module_hardware.status  # type: ignore[no-any-return]
+
+    def add_labware_core(self, labware_core: LabwareImplementation) -> None:
+        """Add a labware to the module."""
+        if labware_core.get_default_magnet_engage_height() is None:
+            name = labware_core.get_name()
+            _log.warning(
+                f"Labware {name} is not explicitly compatible with the Magnetic Module."
+                " You will have to specify a height explicitely when calling engage()."
+            )
 
 
 def create_module_core(

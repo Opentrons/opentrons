@@ -118,6 +118,7 @@ def test_engage_height_from_base(
     )
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
 def test_engage_offset_from_default(
     decoy: Decoy,
     mock_broker: Broker,
@@ -132,6 +133,20 @@ def test_engage_offset_from_default(
             "command",
             matchers.DictMatching({"$": "before", "name": "command.MAGDECK_ENGAGE"}),
         ),
-        mock_core.engage(offset_from_labware_default=42.0),
+        mock_core.engage_to_labware(offset=42.0, preserve_half_mm_labware=False),
         mock_broker.publish("command", matchers.DictMatching({"$": "after"})),
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 2)])
+def test_engage_offset_from_default_low_version(
+    decoy: Decoy,
+    mock_core: MagneticModuleCore,
+    subject: MagneticModuleContext,
+) -> None:
+    """It should engage if given a height from the base."""
+    subject.engage(offset=42.0)
+
+    decoy.verify(
+        mock_core.engage_to_labware(offset=42.0, preserve_half_mm_labware=True),
     )

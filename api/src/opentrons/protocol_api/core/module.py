@@ -45,6 +45,10 @@ class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
     def get_deck_slot(self) -> DeckSlotName:
         """Get the module's deck slot."""
 
+    @abstractmethod
+    def add_labware_core(self, labware_core: LabwareCoreType) -> None:
+        """Add a labware to the module."""
+
 
 ModuleCoreType = TypeVar("ModuleCoreType", bound=AbstractModuleCore[Any])
 
@@ -89,19 +93,33 @@ class AbstractMagneticModuleCore(AbstractModuleCore[LabwareCoreType]):
         self,
         height_from_base: Optional[float] = None,
         height_from_home: Optional[float] = None,
-        offset_from_labware_default: Optional[float] = None,
     ) -> None:
         """Raise the module's magnets.
 
-        Only one of `height_from_base`, `offset_from_labware_default`,
-        or `height_from_home` may be specified. All distance units are
-        specified in real millimeters.
+        Only one of `height_from_base` or `height_from_home` may be specified.
+        All distance units are specified in real millimeters.
 
         Args:
             height_from_base: Distance from labware base to raise the magnets.
             height_from_base: Distance from motor home position to raise the magnets.
-            offset_from_labware_default: Offset from the default engage height
-                of the module's loaded labware to raise the magnet.
+        """
+
+    @abstractmethod
+    def engage_to_labware(
+        self, offset: float = 0, preserve_half_mm_labware: bool = False
+    ) -> None:
+        """Raise the module's magnets its loaded labware.
+
+        All distance units are specified in real millimeters.
+
+        Args:
+            offset: Offset from the labware's default engage height.
+            preserve_half_mm_labware: For labware whose definitions
+                erroneously use half-mm for their defined default engage height,
+                use the value directly instead of converting it to real millimeters.
+
+        Raises:
+            Exception: Labware is not loaded or has no default engage height.
         """
 
     @abstractmethod

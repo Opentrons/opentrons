@@ -123,5 +123,17 @@ class AbstractLabware(DeckItem, ABC, Generic[WellCoreType]):
     def get_geometry(self) -> AbstractLabwareGeometry:
         ...
 
+    @abstractmethod
+    def get_default_magnet_engage_height(
+        self,
+        preserve_half_mm_labware: bool = False,
+    ) -> Optional[float]:
+        """Get the labware's default magnet engage height, if defined.
+
+        Value returned is in real mm's from the labware's base,
+        unless `preserve_half_mm_labware` is specified, in which case
+        some definitions will return half-millimeters.
+        """
+
 
 LabwareCoreType = TypeVar("LabwareCoreType", bound=AbstractLabware[Any])

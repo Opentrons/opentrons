@@ -114,13 +114,23 @@ class MagDeck(mod_abc.AbstractModule):
         await self._driver.probe_plate()
         # return if successful or not?
 
-    async def engage(self, height: float) -> None:
+    # TODO(mc, 2022-09-23): refactor this method to take real mm,
+    # hardware API should abstract away the idea of "short millimeters"
+    async def engage(
+        self,
+        height: Optional[float] = None,
+        height_from_base: Optional[float] = None,
+    ) -> None:
         """Move the magnet to a specific height, measured from home position.
 
         The units of position depend on the module model.
         For GEN1, it's half millimeters ("short millimeters").
         For GEN2, it's millimeters.
         """
+        if height is None:
+            assert height_from_base is not None, "An engage height must be specified"
+            height = height_from_base + OFFSET_TO_LABWARE_BOTTOM[self.model()]
+
         await self.wait_for_is_running()
         if not engage_height_is_in_range(self.model(), height):
             raise ValueError(
