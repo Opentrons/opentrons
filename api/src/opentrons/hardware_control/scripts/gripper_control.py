@@ -12,6 +12,12 @@ from opentrons.types import Point  # noqa: E402
 from opentrons_shared_data.deck import load as load_deck_def  # noqa: E402
 
 
+class InvalidInput(Exception):
+    """Invalid input exception."""
+
+    pass
+
+
 VERSION = 2.0
 MOUNT = OT3Mount.GRIPPER
 deck_def = load_deck_def("ot3_standard", version=3)
