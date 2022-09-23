@@ -12,10 +12,9 @@ from ..validation import ensure_ot3_hardware
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount
+from opentrons.hardware_control import ot3_calibration as calibration
+
 from opentrons.types import Point, MountType
-
-from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedError
-
 
 CalibratePipetteCommandType = Literal["calibration/calibratePipette"]
 
@@ -47,10 +46,10 @@ class CalibratePipetteImplementation(
     async def execute(self, params: CalibratePipetteParams) -> CalibratePipetteResult:
         """Execute calibrate-pipette command."""
         # TODO (tz, 20-9-22): Add a better solution to determine if a command can be executed on an OT-3/OT-2
-        try:
-            from opentrons.hardware_control import ot3_calibration as calibration
-        except ImportError:
-            raise HardwareNotSupportedError("This command is supported by OT-3 only.")
+        # try:
+        #     from opentrons.hardware_control import ot3_calibration as calibration
+        # except ImportError:
+        #     raise HardwareNotSupportedError("This command is supported by OT-3 only.")
 
         ot3_api = ensure_ot3_hardware(self._hardware_api)
         ot3_mount = OT3Mount.from_mount(params.mount)
