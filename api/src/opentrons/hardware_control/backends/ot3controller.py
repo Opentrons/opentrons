@@ -364,7 +364,10 @@ class OT3Controller:
     ) -> None:
         move_group = create_gripper_jaw_grip_group(duty_cycle, stop_condition)
         runner = MoveGroupRunner(move_groups=[move_group])
-        await runner.run(can_messenger=self._messenger)
+        positions = await runner.run(can_messenger=self._messenger)
+        for axis, point in positions.items():
+            self._position.update({axis: point[0]})
+            self._encoder_position.update({axis: point[1]})
 
     async def gripper_hold_jaw(
         self,
@@ -372,12 +375,18 @@ class OT3Controller:
     ) -> None:
         move_group = create_gripper_jaw_hold_group(encoder_position_um)
         runner = MoveGroupRunner(move_groups=[move_group])
-        await runner.run(can_messenger=self._messenger)
+        positions = await runner.run(can_messenger=self._messenger)
+        for axis, point in positions.items():
+            self._position.update({axis: point[0]})
+            self._encoder_position.update({axis: point[1]})
 
     async def gripper_home_jaw(self) -> None:
         move_group = create_gripper_jaw_home_group()
         runner = MoveGroupRunner(move_groups=[move_group])
-        await runner.run(can_messenger=self._messenger)
+        positions = await runner.run(can_messenger=self._messenger)
+        for axis, point in positions.items():
+            self._position.update({axis: point[0]})
+            self._encoder_position.update({axis: point[1]})
 
     @staticmethod
     def _synthesize_model_name(name: FirmwarePipetteName, model: str) -> "PipetteModel":
