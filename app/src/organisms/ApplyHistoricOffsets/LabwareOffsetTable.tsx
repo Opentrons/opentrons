@@ -1,20 +1,9 @@
 import * as React from 'react'
-import isEqual from 'lodash/isEqual'
-import { useTranslation } from 'react-i18next'
-import { getModuleDisplayName, IDENTITY_VECTOR } from '@opentrons/shared-data'
-import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
-import {
-  Flex,
-  SPACING,
-  TYPOGRAPHY,
-  COLORS,
-  JUSTIFY_FLEX_END,
-} from '@opentrons/components'
-import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal'
-import { StyledText } from '../../atoms/text'
-import { OffsetVector } from '../../molecules/OffsetVector'
 import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
+import { getModuleDisplayName } from '@opentrons/shared-data'
+import { SPACING, TYPOGRAPHY, COLORS } from '@opentrons/components'
+import { OffsetVector } from '../../molecules/OffsetVector'
 import { formatTimestamp } from '../Devices/utils'
 import type { OffsetCandidate } from '../ReapplyOffsetsModal/hooks'
 
@@ -40,7 +29,6 @@ const OffsetTableDatum = styled('td')`
   white-space: break-spaces;
   text-overflow: wrap;
 `
-
 
 interface LabwareOffsetTableProps {
   offsetCandidates: OffsetCandidate[]

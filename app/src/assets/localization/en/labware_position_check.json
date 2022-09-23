@@ -62,5 +62,6 @@
   "slot": "Slot {{slotName}}",
   "robot_has_offsets_from_previous_runs": "This robot has stored Labware Offset from previous protocol runs. You can still adjust all Labware Offsets through Labware Position Check.",
   "see_how_offsets_work": "See how labware offsets work",
-  "stored_offsets_for_this_protocol": "Stored Labware Offset data that applies to this protocol"
+  "stored_offsets_for_this_protocol": "Stored Labware Offset data that applies to this protocol",
+  "this_robot_has_no_stored_offsets_for_this_run": "This robot has no useable Labware Offset data for this run. You can still add new offsets within Labware Position Check."
 }

@@ -41,6 +41,7 @@ import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { AvailableRobotOption } from './AvailableRobotOption'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
+import { useOffsetCandidatesForAnalysis } from '../ReapplyOffsetsModal/hooks/useOffsetCandidatesForAnalysis'
 
 import type { StyleProps } from '@opentrons/components'
 import type { State, Dispatch } from '../../redux/types'
@@ -60,6 +61,12 @@ export function ChooseRobotSlideout(
   const history = useHistory()
   const isScanning = useSelector((state: State) => getScanning(state))
   const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState(true)
+  const {
+    protocolKey,
+    srcFileNames,
+    srcFiles,
+    mostRecentAnalysis,
+  } = storedProtocolData
 
   const { trackCreateProtocolRunEvent } = useTrackCreateProtocolRunEvent(
     storedProtocolData
@@ -76,6 +83,10 @@ export function ChooseRobotSlideout(
   )
   const [selectedRobot, setSelectedRobot] = React.useState<Robot | null>(
     healthyReachableRobots[0] ?? null
+  )
+  const offsetCandidates = useOffsetCandidatesForAnalysis(
+    mostRecentAnalysis,
+    selectedRobot?.ip ?? null
   )
   const {
     createRunFromProtocolSource,
@@ -103,7 +114,8 @@ export function ChooseRobotSlideout(
         })
       },
     },
-    selectedRobot != null ? { hostname: selectedRobot.ip } : null
+    selectedRobot != null ? { hostname: selectedRobot.ip } : null,
+    shouldApplyOffsets ? offsetCandidates.map(({vector, location, definitionUri}) => ({vector, location, definitionUri})) : []
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
@@ -123,12 +135,6 @@ export function ChooseRobotSlideout(
     })?.autoUpdateAction
   )
 
-  const {
-    protocolKey,
-    srcFileNames,
-    srcFiles,
-    mostRecentAnalysis,
-  } = storedProtocolData
   if (
     protocolKey == null ||
     srcFileNames == null ||
@@ -159,8 +165,7 @@ export function ChooseRobotSlideout(
       footer={
         <Flex flexDirection={DIRECTION_COLUMN}>
           <ApplyHistoricOffsets
-            robotIp={selectedRobot?.ip ?? null}
-            analysisOutput={mostRecentAnalysis}
+            offsetCandidates={offsetCandidates}
             shouldApplyOffsets={shouldApplyOffsets}
             setShouldApplyOffsets={setShouldApplyOffsets}
           />
