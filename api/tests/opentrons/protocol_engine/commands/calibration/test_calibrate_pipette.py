@@ -1,7 +1,4 @@
 """Test calibrate-pipette command."""
-from __future__ import annotations
-from typing import TYPE_CHECKING
-
 import inspect
 import pytest
 from decoy import Decoy
@@ -18,9 +15,8 @@ from opentrons.hardware_control.types import OT3Mount
 from opentrons.types import Point, MountType
 
 
-if TYPE_CHECKING:
-    from opentrons.hardware_control import ot3_calibration as calibration
-    from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control import ot3_calibration as calibration
+from opentrons.hardware_control.ot3api import OT3API
 
 
 @pytest.mark.ot3_only

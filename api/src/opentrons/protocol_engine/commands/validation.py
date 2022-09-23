@@ -12,6 +12,11 @@ if TYPE_CHECKING:
 
 def ensure_ot3_hardware(hardware_api: HardwareControlAPI) -> OT3API:
     """Validate that the HardwareControlAPI is of OT-3 instance."""
+    try:
+        from opentrons.hardware_control.ot3api import OT3API
+    except ImportError:
+        raise HardwareNotSupportedError("This command is supported by OT-3 only.")
+
     if not isinstance(hardware_api, OT3API):
         raise HardwareNotSupportedError("This command is supported by OT-3 only.")
 

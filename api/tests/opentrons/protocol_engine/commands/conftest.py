@@ -32,9 +32,15 @@ def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     return decoy.mock(cls=HardwareControlAPI)
 
 
+@pytest.mark.ot3_only
 @pytest.fixture
 def ot3_hardware_api(decoy: Decoy) -> OT3API:
     """Get a mocked out OT3API."""
+    try:
+        from opentrons.hardware_control.ot3api import OT3API
+    except ImportError:
+        pass
+
     return decoy.mock(cls=OT3API)
 
 
