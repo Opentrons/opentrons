@@ -44,11 +44,11 @@ jobs:
             buildComplexEnvVars(core, context)
       - name: Test opentrons on app environment
         run: make -C api test-app
-      - name: $OT_PYTHON -m pip install opentrons and use CLI
+      - name: python -m pip install opentrons and use CLI
         working-directory: api
         run: |
-          $OT_PYTHON -m pip install .
+          python -m pip install .
           opentrons_execute --help
           opentrons_simulate --help
           opentrons_simulate ./docs/v2/example_protocols/dilution_tutorial.py -e -o nothing
-          $OT_PYTHON -m opentrons.cli --help
+          python -m opentrons.cli --help

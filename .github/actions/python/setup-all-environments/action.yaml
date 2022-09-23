@@ -46,7 +46,7 @@ runs:
           .github/actions/python/setup-all-environments/action.yaml
     - shell: bash
       name: install pipenv on 3.10
-      run: $OT_PYTHON -m pip install pipenv==2021.5.29
+      run: python -m pip install pipenv==2021.5.29
     - shell: bash
       if: steps.python310.outputs.cache-hit == 'false'
       working-directory: environments

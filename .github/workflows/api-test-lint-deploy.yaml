@@ -95,11 +95,11 @@ jobs:
       - name: pip install opentrons and use CLI
         working-directory: api
         run: |
-          $OT_PYTHON -m pip install .
+          python -m pip install .
           opentrons_execute --help
           opentrons_simulate --help
           opentrons_simulate ./docs/v2/example_protocols/dilution_tutorial.py -e -o nothing
-          $OT_PYTHON -m opentrons.cli --help
+          python -m opentrons.cli --help
       - name: Upload coverage report
         if: matrix.os != 'windows-2019'
         uses: 'codecov/codecov-action@v3'
