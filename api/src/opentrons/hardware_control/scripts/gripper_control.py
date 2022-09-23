@@ -1,5 +1,6 @@
 import sys
 import datetime
+import enum
 
 sys.path.append("/opt/opentrons-robot-server")
 
@@ -11,17 +12,19 @@ from opentrons.types import Point  # noqa: E402
 from opentrons_shared_data.deck import load as load_deck_def  # noqa: E402
 
 
-VERSION = 1.0
+VERSION = 2.0
 MOUNT = OT3Mount.GRIPPER
 deck_def = load_deck_def("ot3_standard", version=3)
 # Offset of the center of the gripper jaw to the desired location
-GRIPPER_OFFSET = Point(0.0, 2.65, 0.0)
+GRIPPER_OFFSET = Point(0.0, 1.0, 0.0)
+AVAILABLE_SLOTS = [1, 3, 4, 9, 12]
 
 
-class InvalidInput(Exception):
-    """Invalid input exception."""
-
-    pass
+class GripperState(enum.Enum):
+    UNGRIPPING = enum.auto()
+    GRIPPING = enum.auto()
+    Z_HOMED = enum.auto()
+    Z_LOWERED = enum.auto()
 
 
 def prompt_int_input(prompt_name: str) -> int:
@@ -73,6 +76,7 @@ def print_current_state(
     api: ThreadManager[HardwareControlAPI],
     cycle_index: int,
     slot: int,
+    jaw_state: GripperState,
 ) -> None:
     """
     1. timestamp
@@ -80,7 +84,7 @@ def print_current_state(
     3. current slot
     4. gripper position (X, Y, Z_G)
     5. gripper state: open/closed
-    6. encoder position (X, Y, G)
+    6. encoder positions (X, Y, G)
     """
     gripper = api.sync._gripper_handler.get_gripper()
 
@@ -91,73 +95,72 @@ def print_current_state(
     enc_loc = (enc_pos[OT3Axis.X], enc_pos[OT3Axis.Y], enc_pos[OT3Axis.G])
     print(
         f"{datetime.datetime.now()}, {cycle_index}, {slot}, "
-        f"{gripper_loc}, {gripper.state}, {enc_loc}\n"
+        f"{gripper_loc}, {jaw_state}, {enc_loc}\n"
     )
 
 
 if __name__ == "__main__":
+    hc_api = build_api()
+
     from_slot = prompt_int_input("Origin slot (1-12)")
-    to_slot = prompt_int_input("Destination slot (1-12)")
+    assert (
+        from_slot in AVAILABLE_SLOTS
+    ), "Please specify one of these available slots: 1, 3, 4, 9, 12"
     grip_force = prompt_float_input("Force in Newton to grip the labware (rec: 20 N)")
     grip_height = prompt_float_input(
         "Z-height from the deck in mm to grip labware (rec: 25 mm)"
-    )
-    return_to_origin = prompt_bool_input(
-        "Do you want the gripper to return the plate to the origin slot? True or False"
     )
     repeats = prompt_int_input(
         "How many times do you want this script to repeat? Type 0 if you only want to run the script once"
     )
 
-    hc_api = build_api()
     api = hc_api.sync
     api.home()
     homed_pos = api.gantry_position(MOUNT)
 
     from_slot_loc = get_slot_center_in_deck_coord(from_slot) + GRIPPER_OFFSET
-    to_slot_loc = get_slot_center_in_deck_coord(to_slot) + GRIPPER_OFFSET
+
+    AVAILABLE_SLOTS.remove(from_slot)
 
     for cycle in range(repeats + 1):
-        # move to pick up position at origin slot
-        api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
-        api.move_to(MOUNT, from_slot_loc._replace(z=grip_height))
-        print_current_state(hc_api, cycle, from_slot)
+        for slot_index, to_slot in enumerate(AVAILABLE_SLOTS):
+            to_slot_loc = get_slot_center_in_deck_coord(to_slot) + GRIPPER_OFFSET
+            if cycle == 0 and slot_index == 0:
+                # move to pick up position at origin slot
+                api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
+                print_current_state(hc_api, cycle, from_slot, GripperState.Z_HOMED)
+                api.move_to(MOUNT, from_slot_loc._replace(z=grip_height))
+                print_current_state(hc_api, cycle, from_slot, GripperState.Z_LOWERED)
 
-        api.grip(grip_force)
-        api.delay(1)
-        print_current_state(hc_api, cycle, from_slot)
+            api.grip(grip_force)
+            api.delay(1)
+            print_current_state(hc_api, cycle, from_slot, GripperState.GRIPPING)
 
-        # move to drop off position at destination slot
-        api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
-        api.move_to(MOUNT, to_slot_loc._replace(z=homed_pos.z))
-        api.move_to(MOUNT, to_slot_loc._replace(z=grip_height))
-        print_current_state(hc_api, cycle, from_slot)
-
-        api.ungrip()
-        api.delay(1)
-        print_current_state(hc_api, cycle, from_slot)
-
-        api.move_to(MOUNT, to_slot_loc._replace(z=homed_pos.z))
-
-        if return_to_origin:
+            # move to drop off position at destination slot
+            api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
+            print_current_state(hc_api, cycle, from_slot, GripperState.Z_HOMED)
+            api.move_to(MOUNT, to_slot_loc._replace(z=homed_pos.z))
+            print_current_state(hc_api, cycle, to_slot, GripperState.Z_HOMED)
             api.move_to(MOUNT, to_slot_loc._replace(z=grip_height))
-            print_current_state(hc_api, cycle, from_slot)
+            print_current_state(hc_api, cycle, to_slot, GripperState.Z_LOWERED)
+
+            api.ungrip()
+            api.delay(1)
+            print_current_state(hc_api, cycle, to_slot, GripperState.UNGRIPPING)
 
             api.grip(grip_force)
             api.delay(1.0)
-            print_current_state(hc_api, cycle, from_slot)
+            print_current_state(hc_api, cycle, to_slot, GripperState.GRIPPING)
 
             api.move_to(MOUNT, to_slot_loc._replace(z=homed_pos.z))
+            print_current_state(hc_api, cycle, to_slot, GripperState.Z_HOMED)
             api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
+            print_current_state(hc_api, cycle, from_slot, GripperState.Z_HOMED)
             api.move_to(MOUNT, from_slot_loc._replace(z=grip_height))
-            print_current_state(hc_api, cycle, from_slot)
+            print_current_state(hc_api, cycle, from_slot, GripperState.Z_LOWERED)
 
             api.ungrip()
             api.delay(1.0)
-            print_current_state(hc_api, cycle, from_slot)
-
-            # Return to safe height
-            api.move_to(MOUNT, from_slot_loc._replace(z=homed_pos.z))
-            print_current_state(hc_api, cycle, from_slot)
+            print_current_state(hc_api, cycle, from_slot, GripperState.UNGRIPPING)
 
     api.home()
