@@ -18,6 +18,15 @@ const mockThermocyclerGen2ClosedLid = {
   },
 } as any
 
+const mockThermocyclerGen1ClosedLid = {
+  id: 'thermocycler_id',
+  moduleModel: 'thermocyclerModuleV1',
+  moduleType: 'thermocyclerModuleType',
+  data: {
+    lidStatus: 'closed',
+  },
+} as any
+
 describe('getModuleCardImage', () => {
   it('should render the correct image string when there is a magnetic module gen 2 attached', () => {
     const result = getModuleCardImage(mockMagneticModuleGen2)
@@ -39,8 +48,12 @@ describe('getModuleCardImage', () => {
     const result = getModuleCardImage(mockHeaterShaker)
     expect(result).toEqual('heatershaker_module_transparent.svg')
   })
-  it('should render the correct image string when there is a thermocycler gen 1 attached', () => {
+  it('should render the correct image string when there is a thermocycler gen 1 attached with opened lid', () => {
     const result = getModuleCardImage(mockThermocycler)
+    expect(result).toEqual('thermocycler_open_transparent.svg')
+  })
+  it('should render the correct image string when there is a thermocycler gen 1 attached with closed lid', () => {
+    const result = getModuleCardImage(mockThermocyclerGen1ClosedLid)
     expect(result).toEqual('thermocycler_closed.svg')
   })
   it('should render the correct image string when there is a thermocycler gen 2 with opened lid is attached', () => {
