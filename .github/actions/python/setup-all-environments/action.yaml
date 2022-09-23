@@ -51,7 +51,7 @@ runs:
       if: steps.python310.outputs.cache-hit == 'false'
       working-directory: environments
       name: setup the environments
-      run: | # is this actually faster ??? ~15min for the non-parallel
+      run: |
         make -C ot-2 setup & \
         make -C dev setup & \
         make -C app setup & \
