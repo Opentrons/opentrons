@@ -31,4 +31,8 @@ __all__ = [
     "MoveToLocationCommandType",
 ]
 
+<<<<<<< HEAD
 # param name and optional value
+=======
+# param name and optiona value
+>>>>>>> a7c25a130 (updated test)
