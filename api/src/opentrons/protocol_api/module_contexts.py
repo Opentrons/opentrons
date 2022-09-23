@@ -283,7 +283,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
         :param celsius: The target temperature, in C
         """
         self._core.set_target_temperature(celsius)
-        self._core.wait_for_temperature(celsius)
+        self._core.wait_for_target_temperature()
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 3)
@@ -305,7 +305,7 @@ class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
 
         :param celsius: The target temperature, in °C
         """
-        self._core.wait_for_temperature(celsius)
+        self._core.wait_for_target_temperature(celsius)
 
     @publish(command=cmds.tempdeck_deactivate)
     @requires_version(2, 0)

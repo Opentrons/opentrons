@@ -121,43 +121,30 @@ class TempDeck(mod_abc.AbstractModule):
         """Wait for the next poll to complete."""
         await self._listener.wait_next_poll()
 
-    async def set_temperature(self, celsius: float) -> None:
-        """
-        Set temperature in degree Celsius
-        Range: 4 to 95 degree Celsius (QA tested).
-        The internal temp range is -9 to 99 C, which is limited by the 2-digit
-        temperature display. Any input outside of this range will be clipped
-        to the nearest limit
-        """
-        await self.wait_for_is_running()
-        await self._driver.set_temperature(celsius=celsius)
-        await self.wait_next_poll()
-
-        async def _wait() -> None:
-            # Wait until we reach the target temperature.
-            while self.status != TemperatureStatus.HOLDING:
-                await self.wait_next_poll()
-
-        task = self._loop.create_task(_wait())
-        self.make_cancellable(task)
-        await task
-
     async def start_set_temperature(self, celsius: float) -> None:
-        """
-        Set temperature in degree Celsius
+        """Set the target temperature in degree Celsius.
+
         Range: 4 to 95 degree Celsius (QA tested).
+
         The internal temp range is -9 to 99 C, which is limited by the 2-digit
         temperature display. Any input outside of this range will be clipped
-        to the nearest limit
+        to the nearest limit.
         """
         await self.wait_for_is_running()
         await self._driver.set_temperature(celsius)
+        await self.wait_next_poll()
 
-    async def await_temperature(self, awaiting_temperature: float) -> None:
-        """
-        Await temperature in degree Celsius
+    async def await_temperature(self, awaiting_temperature: Optional[float]) -> None:
+        """Await a target temperature in degree Celsius.
+
         Polls temperature module's temperature until
-        the specified temperature is reached
+        the specified temperature is reached.
+
+        Args:
+            temperature: The temeprature to wait for.
+                If `None` (recommended), the module's target will be used.
+                Specifying any value other than the current target
+                may produce unpredictable behavior.
         """
         if self.is_simulated:
             return
@@ -166,7 +153,10 @@ class TempDeck(mod_abc.AbstractModule):
         await self.wait_next_poll()
 
         async def _await_temperature() -> None:
-            if self.status == TemperatureStatus.HEATING:
+            if awaiting_temperature is None:
+                while self.status != TemperatureStatus.HOLDING:
+                    await self.wait_next_poll()
+            elif self.status == TemperatureStatus.HEATING:
                 while self.temperature < awaiting_temperature:
                     await self.wait_next_poll()
             elif self.status == TemperatureStatus.COOLING:
@@ -181,6 +171,7 @@ class TempDeck(mod_abc.AbstractModule):
         """Stop heating/cooling and turn off the fan"""
         await self.wait_for_is_running()
         await self._driver.deactivate()
+        await self.wait_next_poll()
 
     @property
     def device_info(self) -> Mapping[str, str]:

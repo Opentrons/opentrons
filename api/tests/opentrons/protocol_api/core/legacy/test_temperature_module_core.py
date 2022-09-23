@@ -67,13 +67,13 @@ def test_set_target_temperature(
     decoy.verify(mock_sync_module_hardware.start_set_temperature(42.0), times=1)
 
 
-def test_wait_for_temperature(
+def test_wait_for_target_temperature(
     decoy: Decoy,
     mock_sync_module_hardware: SynchronousAdapter[TempDeck],
     subject: LegacyTemperatureModuleCore,
 ) -> None:
     """It should wait for the target to be reached with the hardware."""
-    subject.wait_for_temperature(42.0)
+    subject.wait_for_target_temperature(42.0)
 
     decoy.verify(mock_sync_module_hardware.await_temperature(42.0), times=1)
 

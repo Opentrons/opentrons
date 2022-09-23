@@ -5,6 +5,7 @@ from decoy import Decoy, matchers
 from opentrons.broker import Broker
 from opentrons.hardware_control.modules import TemperatureStatus
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, TemperatureModuleContext
 
 from .types import ProtocolCore, TemperatureModuleCore
@@ -71,7 +72,7 @@ def test_set_temperature(
             ),
         ),
         mock_core.set_target_temperature(42.0),
-        mock_core.wait_for_temperature(42.0),
+        mock_core.wait_for_target_temperature(),
         mock_broker.publish(
             "command",
             matchers.DictMatching({"$": "after"}),
@@ -79,6 +80,7 @@ def test_set_temperature(
     )
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
 def test_start_set_temperature(
     decoy: Decoy,
     mock_core: TemperatureModuleCore,
@@ -103,9 +105,28 @@ def test_start_set_temperature(
         mock_broker.publish("command", matchers.DictMatching({"$": "after"})),
     )
 
-    decoy.verify(mock_core.wait_for_temperature(matchers.Anything()), times=0)
+    decoy.verify(
+        mock_core.wait_for_target_temperature(), ignore_extra_args=True, times=0
+    )
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 2)])
+def test_start_set_temperature_api_version_low(
+    decoy: Decoy, mock_broker: Broker, subject: TemperatureModuleContext
+) -> None:
+    """It should reject if API version is lower than 2.3."""
+    with pytest.raises(APIVersionError) as exc_info:
+        subject.start_set_temperature(42.0)
+
+    decoy.verify(
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching({"$": "after", "error": exc_info.value}),
+        ),
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
 def test_await_temperature(
     decoy: Decoy,
     mock_core: TemperatureModuleCore,
@@ -126,8 +147,24 @@ def test_await_temperature(
                 }
             ),
         ),
-        mock_core.wait_for_temperature(42.0),
+        mock_core.wait_for_target_temperature(42.0),
         mock_broker.publish("command", matchers.DictMatching({"$": "after"})),
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 2)])
+def test_await_temperature_api_version_low(
+    decoy: Decoy, mock_broker: Broker, subject: TemperatureModuleContext
+) -> None:
+    """It should reject if API version is lower than 2.3."""
+    with pytest.raises(APIVersionError) as exc_info:
+        subject.await_temperature(42.0)
+
+    decoy.verify(
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching({"$": "after", "error": exc_info.value}),
+        ),
     )
 
 
@@ -174,6 +211,7 @@ def test_get_target_temperature(
     assert result == 42.0
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
 def test_get_status(
     decoy: Decoy, mock_core: TemperatureModuleCore, subject: TemperatureModuleContext
 ) -> None:
@@ -183,3 +221,10 @@ def test_get_status(
     result = subject.status
 
     assert result == "heating"
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 2)])
+def test_get_status_version_low(subject: TemperatureModuleContext) -> None:
+    """It should reject if API version is lower than 2.3."""
+    with pytest.raises(APIVersionError):
+        subject.status

@@ -68,7 +68,7 @@ class LegacyTemperatureModuleCore(
         """Set the temperature module's target temperature in °C."""
         self._sync_module_hardware.start_set_temperature(celsius)
 
-    def wait_for_temperature(self, celsius: float) -> None:
+    def wait_for_target_temperature(self, celsius: Optional[float] = None) -> None:
         """Wait until the module's target temperature is reached.
 
         Specifying a value for `celsius` that is different than
