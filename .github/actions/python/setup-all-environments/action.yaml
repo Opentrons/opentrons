@@ -1,7 +1,7 @@
 name: "Setup All Environments"
 description: |
     "Set up all the environments for python projects."
-    "Cache the pipenv virtual environments"
+    "Cache the pipenv virtual environments."
 
 runs:
   using: "composite"

@@ -4,27 +4,24 @@
 # make OT_PYTHON available
 include ./scripts/python.mk
 
-# ts/js directories
 APP_SHELL_DIR := app-shell
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
 LABWARE_LIBRARY_DIR := labware-library
-NOTIFY_SERVER_DIR := notify-server
 PROTOCOL_DESIGNER_DIR := protocol-designer
 
-# mixed
 SHARED_DATA_DIR := shared-data
 
-# python directories
 API_DIR := api
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
 HARDWARE_DIR := hardware
 G_CODE_TESTING_DIR := g-code-testing
 HARDWARE_TESTING_DIR := hardware-testing
+NOTIFY_SERVER_DIR := notify-server
 ENVIRONMENTS := environments
 
-PYTHON_SETUP_DIRS := $(G_CODE_TESTING_DIR) $(HARDWARE_TESTING_DIR) $(ENVIRONMENTS)
+PYTHON_SETUP_DIRS := $(ENVIRONMENTS) $(G_CODE_TESTING_DIR) $(HARDWARE_TESTING_DIR)
 PYTHON_CLEAN_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python $(HARDWARE_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_TESTING_DIR)
 PYTHON_TEARDOWN_DIRS := $(PYTHON_SETUP_DIRS)
 

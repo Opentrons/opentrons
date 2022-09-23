@@ -52,8 +52,7 @@ jobs:
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
-      - name: setup python
-        uses: './.github/actions/python/setup-all-environments'
+      - uses: './.github/actions/python/setup-all-environments'
       - name: Lint
         run: make -C api lint
   test:
@@ -72,9 +71,9 @@ jobs:
         with:
           environment: "app"
           python-version: "3.10"
-      - name: setup python environments not Windows
+      - name: setup python environments NOT Windows
         if: matrix.os != 'windows-2019'
-        uses: './.github/actions/python/setup-all-environments' # already built above for lint so should cache hit and be fast
+        uses: './.github/actions/python/setup-all-environments'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:

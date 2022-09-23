@@ -2,7 +2,7 @@ name: 'Python Setup'
 description: 'Set up the environment to handle a monorepo python project'
 inputs:
   project:
-    description: 'Which project (by subdirectory) to set up'
+    description: 'Which project (by subdirectory) to set up?'
     required: true # now only viable for g-code-testing and hardware-testing
   python-version:
     description: "The version of Python to map to 'python' on path."
