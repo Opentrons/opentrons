@@ -16,7 +16,6 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
-  THERMOCYCLER_MODULE_V1,
   ModuleType,
   ModuleModel,
 } from '@opentrons/shared-data'
@@ -106,7 +105,7 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
   const initialValues = moduleIsThermocycler
     ? {
         selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
-        selectedModel: THERMOCYCLER_MODULE_V1,
+        selectedModel: moduleOnDeck?.model || null,
       }
     : {
         selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,

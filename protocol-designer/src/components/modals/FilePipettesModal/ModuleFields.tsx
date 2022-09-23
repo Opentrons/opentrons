@@ -8,7 +8,7 @@ import {
   MODELS_FOR_MODULE_TYPE_NO_FF,
 } from '../../../constants'
 import { FormModulesByType } from '../../../step-forms'
-import { selectors } from '../../../feature-flags'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { ModuleDiagram } from '../../modules'
 import styles from './FilePipettesModal.css'
 import type { ModuleType } from '@opentrons/shared-data'
@@ -68,7 +68,7 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
   } = props
 
   const enableThermocyclerGen2 = useSelector(
-    selectors.getEnabledThermocyclerGen2
+    featureFlagSelectors.getEnabledThermocyclerGen2
   )
 
   // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
