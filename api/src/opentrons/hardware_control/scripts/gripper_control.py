@@ -17,6 +17,8 @@ class InvalidInput(Exception):
     """Invalid input exception."""
 
     pass
+
+
 VERSION = 2.0
 MOUNT = OT3Mount.GRIPPER
 deck_def = load_deck_def("ot3_standard", version=3)
