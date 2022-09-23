@@ -9,14 +9,18 @@ from opentrons.protocol_engine.commands.calibration.move_to_location import (
     MoveToLocationResult,
     CalibrationPositions,
 )
-from opentrons.protocol_engine.execution import MovementHandler
+from opentrons.protocol_engine.execution import MovementHandler, SavedPositionData
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.types import DeckPoint
 from opentrons.types import DeckSlotName, Point
 
 
-probe_position = DeckPoint(x=4, y=5, z=6)
-attach_or_detach = DeckPoint(x=1, y=2, z=3)
+probe_position = SavedPositionData(
+    positionId="probe_position", position=DeckPoint(x=4, y=5, z=6)
+)
+attach_or_detach = SavedPositionData(
+    positionId="attach_position", position=DeckPoint(x=1, y=2, z=3)
+)
 
 
 def mock_deck_slot_center(slot_name: DeckSlotName) -> Point:
@@ -30,7 +34,7 @@ def mock_deck_slot_center(slot_name: DeckSlotName) -> Point:
 
 
 @pytest.mark.parametrize(
-    argnames=["slot_name", "movement_coordinates"],
+    argnames=["slot_name", "movement_result"],
     argvalues=[
         [CalibrationPositions.probe_position, probe_position],
         [CalibrationPositions.attach_or_detach, attach_or_detach],
@@ -41,7 +45,7 @@ async def test_calibration_set_up_position_implementation(
     state_view: StateView,
     movement: MovementHandler,
     slot_name: CalibrationPositions,
-    movement_coordinates: DeckPoint,
+    movement_result: SavedPositionData,
 ) -> None:
     """Command should get a Point value for a given deck slot center and \
         call Movement.move_to_coordinates with the correct input."""
@@ -52,19 +56,17 @@ async def test_calibration_set_up_position_implementation(
         slot_name=slot_name,
     )
 
-    # decoy.when(state_view.labware.get_slot_center_position()).then_do(mock_deck_slot_center)
-
     with mock.patch.object(
         state_view.labware, "get_slot_center_position", new=mock_deck_slot_center
     ):
         result = await subject.execute(params=params)
 
-    assert result == MoveToLocationResult(position=movement_coordinates)
+    assert result == MoveToLocationResult(position=movement_result)
 
     decoy.verify(
         await movement.move_to_coordinates(
             pipette_id="pipette-id",
-            deck_coordinates=movement_coordinates,
+            deck_coordinates=movement_result.position,
             direct=True,
             additional_min_travel_z=0,
         )
