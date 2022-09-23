@@ -1,9 +1,11 @@
 """Fixtures for protocol engine command tests."""
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.api import API
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
@@ -13,6 +15,9 @@ from opentrons.protocol_engine.execution import (
     RailLightsHandler,
 )
 from opentrons.protocol_engine.state import StateView
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control.ot3api import OT3API
 
 
 @pytest.fixture

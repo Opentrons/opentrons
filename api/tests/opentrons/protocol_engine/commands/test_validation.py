@@ -1,12 +1,17 @@
 """Test file for command validations."""
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 import pytest
 from decoy import Decoy
 
 from opentrons.protocol_engine.commands.validation import ensure_ot3_hardware
 from opentrons.protocol_engine.errors.exceptions import HardwareNotSupportedError
 
-from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.api import API
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control.ot3api import OT3API
 
 
 def test_ensure_ot3_hardware(decoy: Decoy) -> None:
