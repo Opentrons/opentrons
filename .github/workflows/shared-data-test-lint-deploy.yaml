@@ -41,7 +41,7 @@ defaults:
 jobs:
   python-lint:
     name: 'shared-data package python lint'
-    timeout-minutes: 10
+    timeout-minutes: 20
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
