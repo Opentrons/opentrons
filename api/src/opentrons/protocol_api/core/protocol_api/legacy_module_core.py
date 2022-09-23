@@ -122,11 +122,10 @@ class LegacyMagneticModuleCore(
         """Raise the module's magnets.
 
         Only one of `height_from_base` or `height_from_home` may be specified.
-        All distance units are specified in real millimeters.
 
         Args:
             height_from_base: Distance from labware base to raise the magnets.
-            height_from_base: Distance from motor home position to raise the magnets.
+            height_from_home: Distance from motor home position to raise the magnets.
         """
         # TODO(mc, 2022-09-23): use real millimeters instead of model-dependent mm
         if height_from_base is not None:
@@ -140,9 +139,7 @@ class LegacyMagneticModuleCore(
         offset: float = 0,
         preserve_half_mm_labware: bool = False,
     ) -> None:
-        """Raise the module's magnets its loaded labware.
-
-        All distance units are specified in real millimeters.
+        """Raise the module's magnets up to its loaded labware.
 
         Args:
             offset: Offset from the labware's default engage height.

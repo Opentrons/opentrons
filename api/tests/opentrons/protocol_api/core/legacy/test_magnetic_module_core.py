@@ -21,7 +21,7 @@ def mock_geometry(decoy: Decoy) -> ModuleGeometry:
 
 @pytest.fixture
 def mock_sync_module_hardware(decoy: Decoy) -> SynchronousAdapter[MagDeck]:
-    """Get a mock module geometry."""
+    """Get a mock module hardware control interface."""
     return decoy.mock(name="SynchronousAdapater[AbstractModule]")  # type: ignore[no-any-return]
 
 

@@ -149,4 +149,5 @@ def test_engage_offset_from_default_low_version(
 
     decoy.verify(
         mock_core.engage_to_labware(offset=42.0, preserve_half_mm_labware=True),
+        times=1,
     )

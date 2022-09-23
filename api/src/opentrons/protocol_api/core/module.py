@@ -97,7 +97,6 @@ class AbstractMagneticModuleCore(AbstractModuleCore[LabwareCoreType]):
         """Raise the module's magnets.
 
         Only one of `height_from_base` or `height_from_home` may be specified.
-        All distance units are specified in real millimeters.
 
         Args:
             height_from_base: Distance from labware base to raise the magnets.
@@ -108,9 +107,7 @@ class AbstractMagneticModuleCore(AbstractModuleCore[LabwareCoreType]):
     def engage_to_labware(
         self, offset: float = 0, preserve_half_mm_labware: bool = False
     ) -> None:
-        """Raise the module's magnets its loaded labware.
-
-        All distance units are specified in real millimeters.
+        """Raise the module's magnets up to its loaded labware.
 
         Args:
             offset: Offset from the labware's default engage height.
