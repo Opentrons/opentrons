@@ -18,6 +18,7 @@ import {
 } from '@opentrons/shared-data'
 import { i18n } from './localization'
 import { DeckSlot, WellVolumes } from './types'
+
 export const getMaxVolumes = (def: LabwareDefinition2): WellVolumes =>
   mapValues(def.wells, well => well.totalLiquidVolume)
 
@@ -130,6 +131,52 @@ export const MODELS_FOR_MODULE_TYPE: Record<
     },
   ],
 }
+
+export const MODELS_FOR_MODULE_TYPE_NO_FF: Record<
+  ModuleType,
+  Array<{
+    name: string
+    value: string
+    disabled?: boolean
+  }>
+> = {
+  [MAGNETIC_MODULE_TYPE]: [
+    {
+      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V1}`),
+      // downcast required because the module models are now enums rather than strings
+      value: MAGNETIC_MODULE_V1 as string,
+    },
+    {
+      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V2}`),
+      value: MAGNETIC_MODULE_V2,
+    },
+  ],
+  [TEMPERATURE_MODULE_TYPE]: [
+    {
+      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V1}`),
+      // downcast required because the module models are now enums rather than strings
+      value: TEMPERATURE_MODULE_V1 as string,
+    },
+    {
+      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V2}`),
+      value: TEMPERATURE_MODULE_V2,
+    },
+  ],
+  [THERMOCYCLER_MODULE_TYPE]: [
+    {
+      name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V1}`),
+      // downcast required because the module models are now enums rather than strings
+      value: THERMOCYCLER_MODULE_V1 as string,
+    },
+  ],
+  [HEATERSHAKER_MODULE_TYPE]: [
+    {
+      name: i18n.t(`modules.model_display_name.${HEATERSHAKER_MODULE_V1}`),
+      value: HEATERSHAKER_MODULE_V1 as string,
+    },
+  ],
+}
+
 export const DEFAULT_MODEL_FOR_MODULE_TYPE: Record<ModuleType, ModuleModel> = {
   [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_V1,
   [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_V1,

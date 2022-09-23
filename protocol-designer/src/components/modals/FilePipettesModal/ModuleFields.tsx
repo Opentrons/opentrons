@@ -1,16 +1,17 @@
 import * as React from 'react'
 import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
+import { useSelector } from 'react-redux'
 import { i18n } from '../../../localization'
 import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
   MODELS_FOR_MODULE_TYPE,
+  MODELS_FOR_MODULE_TYPE_NO_FF,
 } from '../../../constants'
-import { ModuleDiagram } from '../../modules'
-
-import styles from './FilePipettesModal.css'
-
-import { ModuleType } from '@opentrons/shared-data'
 import { FormModulesByType } from '../../../step-forms'
+import { selectors } from '../../../feature-flags'
+import { ModuleDiagram } from '../../modules'
+import styles from './FilePipettesModal.css'
+import type { ModuleType } from '@opentrons/shared-data'
 
 export interface ModuleFieldsProps {
   // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
@@ -65,6 +66,11 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
     errors,
     touched,
   } = props
+
+  const enableThermocyclerGen2 = useSelector(
+    selectors.getEnabledThermocyclerGen2
+  )
+
   // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
   const modules: ModuleType[] = Object.keys(values)
   const handleOnDeckChange = (type: ModuleType) => (e: React.ChangeEvent) => {
@@ -88,7 +94,6 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
         const label = i18n.t(`modules.module_display_names.${moduleType}`)
         const defaultModel = DEFAULT_MODEL_FOR_MODULE_TYPE[moduleType]
         const selectedModel = values[moduleType].model
-
         return (
           <div className={styles.module_form_group} key={`${moduleType}`}>
             <CheckboxField
@@ -125,7 +130,11 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
                     }
                     tabIndex={i}
                     name={`${moduleTypeAccessor}.model`}
-                    options={MODELS_FOR_MODULE_TYPE[moduleType]}
+                    options={
+                      enableThermocyclerGen2
+                        ? MODELS_FOR_MODULE_TYPE[moduleType]
+                        : MODELS_FOR_MODULE_TYPE_NO_FF[moduleType]
+                    }
                     value={selectedModel}
                     onChange={onFieldChange}
                     onBlur={onBlur}
