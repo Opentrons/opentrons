@@ -29,7 +29,7 @@ runs:
           .github/actions/python/setup-all-environments/action.yaml
     - shell: bash
       name: install pipenv on 3.8
-      run: python pip install pipenv==2021.5.29
+      run: python -m pip install pipenv==2021.5.29
     - shell: bash
       if: steps.python38.outputs.cache-hit == 'false'
       working-directory: environments
