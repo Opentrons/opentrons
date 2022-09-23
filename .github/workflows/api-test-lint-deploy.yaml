@@ -81,10 +81,10 @@ jobs:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - name: Test without opentrons_hardware
+      - name: Test OT-2
         if: matrix.os != 'windows-2019'
         run: make -C api test-ot2
-      - name: Test with opentrons_hardware
+      - name: Test OT-3
         if: matrix.os != 'windows-2019'
         run: make -C api test-cov
       - name: Test app

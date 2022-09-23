@@ -112,3 +112,7 @@ deploy: wheel
 test:
 	$(call pytest,ot-2) --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
 	$(call pytest,ot-3/robot-server) --cov=opentrons_shared_data --cov-report xml:coverage.xml tests
+
+.PHONY: test-app
+test-app:
+	$(call pytest,app) --cov=opentrons_shared_data --cov-report xml:coverage.xml tests

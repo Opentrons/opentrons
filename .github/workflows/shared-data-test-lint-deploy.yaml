@@ -69,9 +69,14 @@ jobs:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - name: Test
+      - name: Test Not Windows
+        if: matrix.os != 'windows-2019'
         run: make -C shared-data/python test
+      - name: Test Windows
+        if: matrix.os == 'windows-2019'
+        run: make -C shared-data/python test-app
       - name: Ensure assets build
+        if: matrix.os != 'windows-2019'
         run: make -C shared-data/python sdist wheel
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
