@@ -37,7 +37,7 @@ defaults:
 
 jobs:
   lint-test:
-    name: 'update server linting'
+    name: 'update server linting and testing'
     timeout-minutes: 20
     runs-on: 'ubuntu-22.04'
     steps:
@@ -46,7 +46,7 @@ jobs:
       - name: Lint
         run: make -C update-server lint
       - name: Test
-        run: make -C update-server test-cov
+        run: make -C update-server test
       - uses: 'codecov/codecov-action@v3'
         with:
           files: ./update-server/coverage.xml
