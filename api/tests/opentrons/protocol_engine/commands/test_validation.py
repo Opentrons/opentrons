@@ -12,13 +12,14 @@ from opentrons.hardware_control.api import API
 def test_ensure_ot3_hardware(decoy: Decoy) -> None:
     """Should return a OT-3 hardware api."""
     try:
+        # TODO (tz, 9-23-22) Figure out a better way to run this test with OT-3 api only.
         from opentrons.hardware_control.ot3api import OT3API
+
+        ot_3_hardware_api = decoy.mock(cls=OT3API)
+        result = ensure_ot3_hardware(ot_3_hardware_api)
+        assert result == ot_3_hardware_api
     except ImportError:
         pass
-
-    ot_3_hardware_api = decoy.mock(cls=OT3API)
-    result = ensure_ot3_hardware(ot_3_hardware_api)
-    assert result == ot_3_hardware_api
 
 
 @pytest.mark.ot3_only

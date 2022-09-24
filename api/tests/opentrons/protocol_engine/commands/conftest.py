@@ -38,10 +38,11 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
     """Get a mocked out OT3API."""
     try:
         from opentrons.hardware_control.ot3api import OT3API
-    except ImportError:
-        pass
 
-    return decoy.mock(cls=OT3API)
+        return decoy.mock(cls=OT3API)
+    except ImportError:
+        # TODO (tz, 9-23-22) Figure out a better way to use this fixture with OT-3 api only.
+        return None  # type: ignore[return-value]
 
 
 @pytest.fixture
