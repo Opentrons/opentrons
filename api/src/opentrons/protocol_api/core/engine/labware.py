@@ -117,6 +117,6 @@ class LabwareCore(AbstractLabware[WellCore]):
         raise NotImplementedError("LabwareCore not implemented")
 
     def get_default_magnet_engage_height(
-        self, preserve_half_mm_labware: bool = False
+        self, preserve_half_mm: bool = False
     ) -> Optional[float]:
         raise NotImplementedError("LabwareCore not implemented")

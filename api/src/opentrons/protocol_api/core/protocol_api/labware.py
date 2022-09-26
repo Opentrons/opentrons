@@ -13,12 +13,12 @@ from ..labware import AbstractLabware, LabwareLoadParams
 from .well import WellImplementation
 
 
-# Load names of labware whose definitions accidentally specify an engage height
-# in units of half-millimeters, instead of millimeters.
+# URIs of labware whose definitions accidentally specify an engage height
+# in units of half-millimeters instead of millimeters.
 _MAGDECK_HALF_MM_LABWARE = {
-    "biorad_96_wellplate_200ul_pcr",
-    "nest_96_wellplate_100ul_pcr_full_skirt",
-    "usascientific_96_wellplate_2.4ml_deep",
+    "opentrons/biorad_96_wellplate_200ul_pcr/1",
+    "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
+    "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
 }
 
 
@@ -150,13 +150,15 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
     def load_name(self) -> str:
         return self._parameters["loadName"]
 
+    # TODO(mc, 2022-09-26): ensure "from the labware's base" is correct
+    # https://github.com/Opentrons/opentrons/issues/10830
     def get_default_magnet_engage_height(
-        self, preserve_half_mm_labware: bool = False
+        self, preserve_half_mm: bool = False
     ) -> Optional[float]:
         """Get the labware's default magnet engage height, if defined.
 
         Value returned is in real mm's from the labware's base,
-        unless `preserve_half_mm_labware` is used, in which case
+        unless `preserve_half_mm` is used, in which case
         some definitions will return half-millimeters.
         """
         is_compatible = self._parameters.get("isMagneticModuleCompatible", False)
@@ -165,8 +167,8 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
         if not is_compatible or default_engage_height is None:
             return None
 
-        if self.load_name in _MAGDECK_HALF_MM_LABWARE and not preserve_half_mm_labware:
-            return default_engage_height / 2
+        if self.get_uri() in _MAGDECK_HALF_MM_LABWARE and not preserve_half_mm:
+            return default_engage_height / 2.0
 
         return default_engage_height
 

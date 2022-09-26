@@ -105,13 +105,13 @@ class AbstractMagneticModuleCore(AbstractModuleCore[LabwareCoreType]):
 
     @abstractmethod
     def engage_to_labware(
-        self, offset: float = 0, preserve_half_mm_labware: bool = False
+        self, offset: float = 0, preserve_half_mm: bool = False
     ) -> None:
         """Raise the module's magnets up to its loaded labware.
 
         Args:
             offset: Offset from the labware's default engage height.
-            preserve_half_mm_labware: For labware whose definitions
+            preserve_half_mm: For labware whose definitions
                 erroneously use half-mm for their defined default engage height,
                 use the value directly instead of converting it to real millimeters.
 

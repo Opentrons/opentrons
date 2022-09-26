@@ -133,7 +133,7 @@ def test_engage_offset_from_default(
             "command",
             matchers.DictMatching({"$": "before", "name": "command.MAGDECK_ENGAGE"}),
         ),
-        mock_core.engage_to_labware(offset=42.0, preserve_half_mm_labware=False),
+        mock_core.engage_to_labware(offset=42.0, preserve_half_mm=False),
         mock_broker.publish("command", matchers.DictMatching({"$": "after"})),
     )
 
@@ -148,6 +148,6 @@ def test_engage_offset_from_default_low_version(
     subject.engage(offset=42.0)
 
     decoy.verify(
-        mock_core.engage_to_labware(offset=42.0, preserve_half_mm_labware=True),
+        mock_core.engage_to_labware(offset=42.0, preserve_half_mm=True),
         times=1,
     )

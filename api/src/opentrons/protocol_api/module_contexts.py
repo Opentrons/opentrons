@@ -425,7 +425,7 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
         else:
             self._core.engage_to_labware(
                 offset=offset or 0,
-                preserve_half_mm_labware=self._api_version < APIVersion(2, 3),
+                preserve_half_mm=self._api_version < APIVersion(2, 3),
             )
 
     @publish(command=cmds.magdeck_disengage)

@@ -137,12 +137,14 @@ class LegacyMagneticModuleCore(
     def engage_to_labware(
         self,
         offset: float = 0,
-        preserve_half_mm_labware: bool = False,
+        preserve_half_mm: bool = False,
     ) -> None:
         """Raise the module's magnets up to its loaded labware.
 
         Args:
             offset: Offset from the labware's default engage height.
+            preserve_half_mm: Preserve any values that may accidentally be in half-mm,
+                passing them directly onwards to the hardware control API.
 
         Raises:
             ValueError: Labware is not loaded or has no default engage height.
@@ -157,7 +159,7 @@ class LegacyMagneticModuleCore(
             )
 
         engage_height = labware._implementation.get_default_magnet_engage_height(
-            preserve_half_mm_labware
+            preserve_half_mm
         )
 
         if engage_height is None:
@@ -169,12 +171,13 @@ class LegacyMagneticModuleCore(
 
         if (
             self._geometry.model == MagneticModuleModel.MAGNETIC_V1
-            and not preserve_half_mm_labware
+            and not preserve_half_mm
         ):
             engage_height *= 2
 
         # TODO(mc, 2022-09-23): use real millimeters instead of model-dependent mm
-        # TODO(mc, 2022-09-23): use `height_from_base`
+        # TODO(mc, 2022-09-23): use `height_from_base` to match JSONv5
+        # https://github.com/Opentrons/opentrons/issues/10830
         self._sync_module_hardware.engage(height=engage_height + offset)
 
     def disengage(self) -> None:
