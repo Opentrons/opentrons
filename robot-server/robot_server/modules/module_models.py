@@ -74,10 +74,10 @@ class TemperatureModuleData(BaseModel):
 
     status: TemperatureStatus
     currentTemperature: float = Field(
-        ..., description="The module's current temperature, in degrees Celcius."
+        ..., description="The module's current temperature, in degrees Celsius."
     )
     targetTemperature: Optional[float] = Field(
-        ..., description="The module's target temperature, if set, in degrees Celcius."
+        ..., description="The module's target temperature, if set, in degrees Celsius."
     )
 
 
@@ -137,14 +137,14 @@ class ThermocyclerModuleData(BaseModel):
         ...,
         description=(
             "The current temperature of the thermocycler block, if known,"
-            " in degrees Celcius."
+            " in degrees Celsius."
         ),
     )
     targetTemperature: Optional[float] = Field(
         ...,
         description=(
             "The target temperature of the thermocycler block, if set,"
-            " in degrees Celcius."
+            " in degrees Celsius."
         ),
     )
     lidStatus: ThermocyclerLidStatus = Field(
@@ -156,11 +156,11 @@ class ThermocyclerModuleData(BaseModel):
     )
     lidTemperature: Optional[float] = Field(
         ...,
-        description="The current temperature of the lid, if known, in degrees Celcius.",
+        description="The current temperature of the lid, if known, in degrees Celsius.",
     )
     lidTargetTemperature: Optional[float] = Field(
         ...,
-        description="The target temperature of the lid, if set, in degrees Celcius.",
+        description="The target temperature of the lid, if set, in degrees Celsius.",
     )
     holdTime: Optional[float] = Field(
         ...,
@@ -248,11 +248,11 @@ class HeaterShakerModuleData(BaseModel):
     )
     currentTemperature: float = Field(
         ...,
-        description="Current temperature of the heater, in degrees Celcius.",
+        description="Current temperature of the heater, in degrees Celsius.",
     )
     targetTemperature: Optional[float] = Field(
         ...,
-        description="Target temperature of the heater, if set, in degrees Celcius.",
+        description="Target temperature of the heater, if set, in degrees Celsius.",
     )
     errorDetails: Optional[str] = Field(
         ...,
