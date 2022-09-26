@@ -1,11 +1,8 @@
 from starlette import status
 from fastapi import APIRouter
-from typing import Optional
+from typing import Optional, cast
 
-from opentrons.calibration_storage import (
-    types as cal_types,
-    helpers,
-)
+from opentrons.calibration_storage import types as cal_types
 from opentrons.calibration_storage.ot2 import get as get_cal, delete, schemas
 
 from robot_server.errors import ErrorBody
@@ -18,9 +15,15 @@ router = APIRouter()
 
 
 def _format_calibration(
-    calibration: schemas.v1.TipLengthSchema,
+    calibration: schemas.v1.TipLengthCalibration,
 ) -> tl_models.TipLengthCalibration:
-    status = cal_model.CalibrationStatus(**helpers.convert_to_dict(calibration.status))
+    # TODO (lc 09-20-2022) We should use the calibration
+    # status model in calibration storage.
+    status = cal_model.CalibrationStatus(
+        markedBad=calibration.status.markedBad,
+        source=calibration.status.source,
+        markedAt=calibration.status.markedAt,
+    )
     formatted_cal = tl_models.TipLengthCalibration(
         id=f"{calibration.tiprack}&{calibration.pipette}",
         tipLength=calibration.tipLength,
@@ -47,7 +50,7 @@ async def get_all_tip_length_calibrations(
     tiprack_uri: Optional[str] = None,
 ) -> tl_models.MultipleCalibrationsResponse:
     all_calibrations = get_cal.get_all_tip_length_calibrations()
-
+    print(all_calibrations)
     if not all_calibrations:
         return tl_models.MultipleCalibrationsResponse(
             data=[_format_calibration(cal) for cal in all_calibrations],
@@ -79,8 +82,11 @@ async def get_all_tip_length_calibrations(
 )
 async def delete_specific_tip_length_calibration(tiprack_hash: str, pipette_id: str):
     try:
-        delete.delete_tip_length_calibration(tiprack_hash, pipette_id)
-    except FileNotFoundError:
+        delete.delete_tip_length_calibration(
+            cast(cal_types.TiprackHash, tiprack_hash),
+            cast(cal_types.PipetteId, pipette_id),
+        )
+    except cal_types.TipLengthCalNotFound:
         raise RobotServerError(
             definition=CommonErrorDef.RESOURCE_NOT_FOUND,
             resource="TipLengthCalibration",

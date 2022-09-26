@@ -2,6 +2,7 @@ from typing import List, Tuple
 from mock import call, MagicMock, patch
 
 import pytest
+import datetime
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage.ot2 import get, modify, schemas
@@ -27,8 +28,10 @@ from robot_server.robot.calibration.constants import (
 
 PIP_OFFSET = schemas.v1.InstrumentOffsetSchema(
     offset=robot_configs.defaults_ot2.DEFAULT_PIPETTE_OFFSET,
+    tiprack="some_tiprack",
+    uri="custom/some_tiprack/1",
     source=CSTypes.SourceType.user,
-    status=CSTypes.CalibrationStatus(),
+    last_modified=datetime.datetime.now(),
 )
 
 
@@ -120,7 +123,7 @@ def build_mock_stored_pipette_offset(kind="normal"):
                 tiprack="tiprack-id",
                 uri="opentrons/opentrons_96_filtertiprack_200ul/1",
                 source=CSTypes.SourceType.user,
-                status=CSTypes.CalibrationStatus(markedBad=False),
+                last_modified=datetime.datetime.now(),
             )
         )
     elif kind == "custom_tiprack":
@@ -130,7 +133,7 @@ def build_mock_stored_pipette_offset(kind="normal"):
                 tiprack="tiprack-id",
                 uri="custom/minimal_labware_def/1",
                 source=CSTypes.SourceType.user,
-                status=CSTypes.CalibrationStatus(markedBad=False),
+                last_modified=datetime.datetime.now(),
             )
         )
     else:
@@ -139,24 +142,22 @@ def build_mock_stored_pipette_offset(kind="normal"):
 
 def build_mock_stored_tip_length(kind="normal"):
     if kind == "normal":
-        tip_length = CSTypes.TipLengthCalibration(
-            tip_length=30,
+        tip_length = schemas.v1.TipLengthCalibration(
+            tipLength=30,
             pipette="fake id",
             tiprack="fake_hash",
-            last_modified="some time",
+            lastModified=datetime.datetime.now(),
             source=CSTypes.SourceType.user,
-            status=CSTypes.CalibrationStatus(markedBad=False),
             uri="path/to_my_labware/1",
         )
         return MagicMock(return_value=tip_length)
     elif kind == "custom_tiprack":
-        tip_length = CSTypes.TipLengthCalibration(
-            tip_length=30,
+        tip_length = schemas.v1.TipLengthCalibration(
+            tipLength=30,
             pipette="fake id",
             tiprack="fake_hash",
-            last_modified="some time",
+            lastModified=datetime.datetime.now(),
             source=CSTypes.SourceType.user,
-            status=CSTypes.CalibrationStatus(markedBad=False),
             uri="custom/minimal_labware_def/1",
         )
         return MagicMock(return_value=tip_length)
@@ -168,19 +169,18 @@ def build_mock_deck_calibration(kind="normal"):
     if kind == "normal":
         attitude = [[1.0008, 0.0052, 0.0], [-0.1, 0.9, 0.0], [0.0, 0.0, 1.0]]
         return MagicMock(
-            return_value=CSTypes.DeckCalibration(
+            return_value=schemas.v1.DeckCalibrationSchema(
                 attitude=attitude,
                 source=CSTypes.SourceType.user,
-                last_modified="date",
-                status=CSTypes.CalibrationStatus(markedBad=False),
+                last_modified=datetime.datetime.now(),
             )
         )
     elif kind == "identity":
         return MagicMock(
-            return_value=CSTypes.DeckCalibration(
+            return_value=schemas.v1.DeckCalibrationSchema(
                 attitude=robot_configs.defaults_ot2.DEFAULT_DECK_CALIBRATION_V2,
                 source=CSTypes.SourceType.user,
-                status=CSTypes.CalibrationStatus(markedBad=False),
+                last_modified=None,
             )
         )
     else:
@@ -452,7 +452,7 @@ async def test_compare_points(mock_user_flow):
 
 async def test_mark_bad_calibration(mock_user_flow_bad_vectors):
     uf = mock_user_flow_bad_vectors
-    storage_path = "opentrons.calibration_storage.modify"
+    storage_path = "opentrons.calibration_storage.ot2.modify"
     with patch(f"{storage_path}.mark_bad") as m, patch(
         f"{storage_path}.create_tip_length_data"
     ), patch(f"{storage_path}.save_tip_length_calibration"), patch(
