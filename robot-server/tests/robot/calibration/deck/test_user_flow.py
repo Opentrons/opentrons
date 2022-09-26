@@ -1,4 +1,5 @@
 import pytest
+import datetime
 from mock import MagicMock, call
 from typing import List, Tuple
 from opentrons.calibration_storage.ot2 import schemas
@@ -23,8 +24,10 @@ from robot_server.robot.calibration.deck.constants import (
 
 PIP_OFFSET = schemas.v1.InstrumentOffsetSchema(
     offset=robot_configs.defaults_ot2.DEFAULT_PIPETTE_OFFSET,
+    tiprack="some_tiprack",
+    uri="custom/some_tiprack/1",
     source=cal_types.SourceType.user,
-    status=cal_types.CalibrationStatus(),
+    last_modified=datetime.datetime.now(),
 )
 
 

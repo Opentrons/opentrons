@@ -323,7 +323,7 @@ class CheckCalibrationUserFlow:
     def _get_current_calibrations(self):
         deck = get.get_robot_deck_attitude()
         pipette_offsets = {
-            m: get.get_pipette_offset(p.pipette_id, m)
+            m: get.get_pipette_offset(cast(cal_types.PipetteId, p.pipette_id), m)
             for m, p in self._filtered_hw_pips.items()
         }
         tip_lengths = {
@@ -337,7 +337,9 @@ class CheckCalibrationUserFlow:
     ) -> Optional[schemas.v1.TipLengthSchema]:
         if not pipette.pipette_id:
             return None
-        pip_offset = get.get_pipette_offset(pipette.pipette_id, mount)
+        pip_offset = get.get_pipette_offset(
+            cast(cal_types.PipetteId, pipette.pipette_id), mount
+        )
         if not pip_offset or not pip_offset.uri:
             return None
         details = helpers.details_from_uri(pip_offset.uri)
@@ -352,7 +354,9 @@ class CheckCalibrationUserFlow:
             tiprack_def = tiprack._implementation.get_definition()
         else:
             tiprack_def = get.get_custom_tiprack_definition_for_tlc(pip_offset.uri)
-        return get.load_tip_length_calibration(pipette.pipette_id, tiprack_def)
+        return get.load_tip_length_calibration(
+            cast(cal_types.PipetteId, pipette.pipette_id), tiprack_def
+        )
 
     def _check_valid_calibrations(self):
         deck = self._deck_calibration
@@ -686,7 +690,7 @@ class CheckCalibrationUserFlow:
             assert pipette_id, "Cannot update pipette offset calibraion"
             modify.save_pipette_calibration(
                 offset=Point(*pip_calibration.offset),
-                pip_id=pipette_id,
+                pip_id=cast(cal_types.PipetteId, pipette_id),
                 mount=active_mount,
                 tiprack_hash=pip_calibration.tiprack,
                 tiprack_uri=pip_calibration.uri,
@@ -707,7 +711,7 @@ class CheckCalibrationUserFlow:
             assert pipette_id, "Cannot update pipette offset calibraion"
             modify.save_pipette_calibration(
                 offset=Point(*calibration.offset),
-                pip_id=pipette_id,
+                pip_id=cast(cal_types.PipetteId, pipette_id),
                 mount=active_mount,
                 tiprack_hash=calibration.tiprack,
                 tiprack_uri=calibration.uri,
@@ -827,8 +831,9 @@ class CheckCalibrationUserFlow:
         assert self.active_tiprack
         try:
             return get.load_tip_length_calibration(
-                pip_id, self.active_tiprack._implementation.get_definition()
-            ).tip_length
+                cast(cal_types.PipetteId, pip_id),
+                self.active_tiprack._implementation.get_definition(),
+            ).tipLength
         except TipLengthCalNotFound:
             tip_overlap = self.hw_pipette.config.tip_overlap.get(
                 self.active_tiprack.uri, self.hw_pipette.config.tip_overlap["default"]

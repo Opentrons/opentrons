@@ -14,11 +14,7 @@ from opentrons.calibration_storage.ot2 import get, modify, delete, schemas
 from opentrons.calibration_storage.types import (
     TipLengthCalNotFound,
 )
-from opentrons.hardware_control import (
-    HardwareControlAPI,
-    CriticalPoint,
-    Pipette
-)
+from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
 from opentrons.hardware_control.instruments.ot2 import instrument_calibration
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry.deck import Deck
@@ -306,11 +302,13 @@ class PipetteOffsetCalibrationUserFlow:
             return get.load_tip_length_calibration(
                 self._hw_pipette.pipette_id,  # type: ignore[arg-type]
                 self._tip_rack._implementation.get_definition(),
-            ).tip_length
+            ).tipLength
         except TipLengthCalNotFound:
             return None
 
-    def _get_stored_pipette_offset_cal(self) -> Optional[schemas.v1.InstrumentOffsetSchema]:
+    def _get_stored_pipette_offset_cal(
+        self,
+    ) -> Optional[schemas.v1.InstrumentOffsetSchema]:
         return get.get_pipette_offset(
             self._hw_pipette.pipette_id, self._mount  # type: ignore[arg-type]
         )
@@ -463,7 +461,6 @@ class PipetteOffsetCalibrationUserFlow:
             assert self._nozzle_height_at_reference is not None
             # set critical point explicitly to nozzle
             noz_pt = await self.get_current_point(critical_point=CriticalPoint.NOZZLE)
-
             util.save_tip_length_calibration(
                 pipette_id=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
                 tip_length_offset=noz_pt.z - self._nozzle_height_at_reference,

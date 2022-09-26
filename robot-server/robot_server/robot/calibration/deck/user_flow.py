@@ -10,10 +10,11 @@ from typing import (
     Optional,
     Tuple,
     Union,
+    cast,
 )
 
 from opentrons.calibration_storage.ot2 import get, delete
-from opentrons.calibration_storage.types import TipLengthCalNotFound
+from opentrons.calibration_storage.types import TipLengthCalNotFound, PipetteId
 from opentrons.calibration_storage import helpers
 from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
@@ -341,8 +342,8 @@ class DeckCalibrationUserFlow:
         assert pip_id
         try:
             return get.load_tip_length_calibration(
-                pip_id, self._tip_rack._implementation.get_definition()
-            ).tip_length
+                cast(PipetteId, pip_id), self._tip_rack._implementation.get_definition()
+            ).tipLength
         except TipLengthCalNotFound:
             tip_overlap = self._hw_pipette.config.tip_overlap.get(self._tip_rack.uri, 0)
             tip_length = self._tip_rack.tip_length
