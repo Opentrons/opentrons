@@ -1,13 +1,13 @@
 // set of functions that parse details out of a protocol record and it's internals
 import reduce from 'lodash/reduce'
 
-import {
+import { COLORS } from '@opentrons/components/src/ui-style-constants'
+import type {
   LabwareDefinition2,
   ModuleModel,
   PipetteName,
-  Liquid,
+  LoadedLiquid,
 } from '@opentrons/shared-data'
-import { COLORS } from '@opentrons/components/src/ui-style-constants'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   LoadLabwareRunTimeCommand,
@@ -260,9 +260,9 @@ export interface LoadedLiquidsById {
 // and the other in array form coming from ProtocolAnalysisOutput. This should be reconciled to use a single type so
 // conversion of the shape is not needed in the util and the type is consistent across the board.
 export function parseLiquidsInLoadOrder(
-  liquids: LoadedLiquidsById | Liquid[],
+  liquids: LoadedLiquidsById | LoadedLiquid[],
   commands: RunTimeCommand[]
-): Liquid[] {
+): LoadedLiquid[] {
   const loadLiquidCommands = commands.filter(
     (command): command is LoadLiquidRunTimeCommand =>
       command.commandType === 'loadLiquid'
@@ -281,7 +281,7 @@ export function parseLiquidsInLoadOrder(
     }
   })
 
-  return reduce<LoadLiquidRunTimeCommand, Liquid[]>(
+  return reduce<LoadLiquidRunTimeCommand, LoadedLiquid[]>(
     loadLiquidCommands,
     (acc, command) => {
       const liquid = loadedLiquids.find(

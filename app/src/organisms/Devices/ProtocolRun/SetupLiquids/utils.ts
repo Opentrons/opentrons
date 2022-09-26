@@ -1,11 +1,11 @@
 import { WellGroup } from '@opentrons/components'
 
 import type { LabwareByLiquidId } from '@opentrons/api-client'
-import type { Liquid } from '@opentrons/shared-data'
+import type { LoadedLiquid } from '@opentrons/shared-data'
 
 export function getWellFillFromLabwareId(
   labwareId: string,
-  liquidsInLoadOrder: Liquid[],
+  liquidsInLoadOrder: LoadedLiquid[],
   labwareByLiquidId: LabwareByLiquidId
 ): { [well: string]: string } {
   let labwareWellFill: { [well: string]: string } = {}
