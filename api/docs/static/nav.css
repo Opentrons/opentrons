@@ -159,12 +159,11 @@ p.copyrite {
     color: white;
 }
 
-div#mc_embed_signup_scroll {
-    padding: 0;
-    color: black;
+div.hbspt-form {
+    color: #FFF;
 }
 
-div#mc_embed_signup_scroll input {
+div.hbspt-form input {
     max-width: 100%;
     width: 98%;
     height: 34px;
@@ -177,12 +176,12 @@ div#mc_embed_signup_scroll input {
 }
 
 @media only screen and (min-device-width: 769px) and (min-width: 769px) {
-    div#mc_embed_signup_scroll input {
+    div.hbspt-form input {
         max-width: 70%;
     }
 }
 
-div#mc_embed_signup_scroll input.subscribe {
+div.hs_submit input {
     color: black;
     padding: 6px 10px;
     font-size: 16px;
@@ -193,13 +192,12 @@ div#mc_embed_signup_scroll input.subscribe {
 }
 
 @media only screen and (min-device-width: 960px) and (min-width: 960px) {
-    div#mc_embed_signup_scroll input.subscribe {
-        margin-left: 5px;
+    div.hs_submit input {
         width: 20%;
     }
 }
 
-div#mc_embed_signup_scroll input.subscribe:hover {
+div.hs_submit input:hover {
     padding-top: 5px;
     cursor: pointer;
     color: black;
