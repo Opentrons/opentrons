@@ -560,6 +560,7 @@ class Thermocycler(mod_abc.AbstractModule):
                 "lid": self.lid_status,
                 "lidTarget": self.lid_target,
                 "lidTemp": self.lid_temp,
+                "lidTempStatus": self.lid_temp_status,
                 "currentTemp": self.temperature,
                 "targetTemp": self.target,
                 "holdTime": self.hold_time,
