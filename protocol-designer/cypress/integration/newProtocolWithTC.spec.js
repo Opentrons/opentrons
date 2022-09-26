@@ -66,10 +66,12 @@ describe('Protocols with Modules', () => {
         cy.contains('Slot 7').should('exist')
       })
 
-      // Edit Thermocycler module (should not have slot option or other gen)
+      // Edit Thermocycler module (should not have slot option and not have another gen)
+      //  TODO(jr, 9/23/22): remove line 75 and replace with line 74 when we remove the TC gen2 FF
       cy.get(editThermocycler).click()
       cy.get(editModuleModal).within(() => {
         cy.contains('Position').should('not.exist')
+        // cy.get(moduleModelDropdown).contains('GEN2').should('exist')
         cy.get(moduleModelDropdown).contains('GEN2').should('not.exist')
         cy.get('button').contains('cancel', { matchCase: false }).click()
       })
