@@ -126,19 +126,7 @@ mypy-ot3:
 	$(call python,ot-3/robot-server) -m mypy src tests
 
 .PHONY: lint
-lint:
-	$(MAKE) black-check
-	$(MAKE) flake8
-	$(MAKE) mypy-ot2
-	$(MAKE) mypy-ot3
-
-.PHONY: lint-fast
-lint-fast:
-	$(MAKE) black-check & \
-	$(MAKE) flake8 & \
-	$(MAKE) mypy-ot2 & \
-	$(MAKE) mypy-ot3 & \
-	wait;
+lint: black-check flake8 mypy-ot2 mypy-ot3
 
 .PHONY: format
 format:

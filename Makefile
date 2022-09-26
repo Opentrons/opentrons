@@ -59,11 +59,9 @@ setup-js:
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
-# If pyenv is setup as expected, these resolve.
 .PHONY: install-pipenv
 install-pipenv:
-	python3.8 -m pip install pipenv==2021.5.29
-	python3.10 -m pip install pipenv==2021.5.29
+	$(OT_PYTHON) -m pip install pipenv==2021.5.29
 
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_SETUP_DIRS))
 
@@ -72,7 +70,6 @@ PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_SETUP_DIRS))
 
 .PHONY: setup-py
 setup-py:
-	$(MAKE) install-pipenv
 	$(MAKE) $(PYTHON_SETUP_TARGETS)
 
 # uninstall all project dependencies
@@ -88,7 +85,6 @@ teardown-js: clean-js
 
 .PHONY: teardown-py
 teardown-py:
-	$(MAKE) install-pipenv
 	$(MAKE) $(PYTHON_TEARDOWN_TARGETS)
 	$(MAKE) $(PYTHON_CLEAN_TARGETS)
 
