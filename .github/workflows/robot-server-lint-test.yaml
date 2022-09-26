@@ -55,8 +55,19 @@ jobs:
     steps:
       - uses: 'actions/checkout@v3'
       - uses: './.github/actions/python/setup-all-environments'
-      - name: Lint
-        run: make -C robot-server lint
+        id: "setup"
+      - name: black-check
+        if: always() && steps.setup.outcome == 'success'
+        run: make -C api black-check
+      - name: flake8
+        if: always() && steps.setup.outcome == 'success'
+        run: make -C api Flake8
+      - name: mypy-ot2
+        if: always() && steps.setup.outcome == 'success'
+        run: make -C api mypy-ot2
+      - name: mypy-ot3
+        if: always() && steps.setup.outcome == 'success'
+        run: make -C api mypy-ot3
       - name: Test
         run: make -C robot-server test-cov
       - name: Ensure assets build

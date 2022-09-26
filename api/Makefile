@@ -109,12 +109,36 @@ test-ot2:
 test-app:
 	$(call pytest,app) $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
 
+.PHONY: black-check
+black-check:
+	$(call python,dev) -m black --check src tests setup.py
+
+.PHONY: flake8
+flake8:
+	$(call python,dev) -m flake8 src tests setup.py
+
+.PHONY: mypy-ot2
+mypy-ot2:
+	$(call python,ot-2) -m mypy src --exclude=.*ot3.*
+
+.PHONY: mypy-ot3
+mypy-ot3:
+	$(call python,ot-3/robot-server) -m mypy src tests
+
 .PHONY: lint
 lint:
-	$(call python,dev) -m black --check src tests setup.py
-	$(call python,dev) -m flake8 src tests setup.py
-	$(call python,ot-3/robot-server) -m mypy src tests
-	$(call python,ot-2) -m mypy src --exclude=.*ot3.*
+	$(MAKE) black-check
+	$(MAKE) flake8
+	$(MAKE) mypy-ot2
+	$(MAKE) mypy-ot3
+
+.PHONY: lint-fast
+lint-fast:
+	$(MAKE) black-check & \
+	$(MAKE) flake8 & \
+	$(MAKE) mypy-ot2 & \
+	$(MAKE) mypy-ot3 & \
+	wait;
 
 .PHONY: format
 format:

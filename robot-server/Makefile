@@ -91,18 +91,49 @@ test:
 	$(call pytest,ot-2) $(tests) $(test_opts)
 	$(call pytest,ot-3/robot-server) $(tests) $(test_opts)
 
+.PHONY: test-ot2
+test-ot2:
+	$(call pytest,ot-2) $(tests) $(test_opts)
+
+.PHONY: test-ot3
+test-ot3:
+	$(call pytest,ot-3/robot-server) $(tests) $(test_opts)
 
 .PHONY: test-cov
 test-cov:
 	$(call pytest,ot-2) $(tests) $(test_opts) $(cov_opts)
 	$(call pytest,ot-3/robot-server) $(tests) $(test_opts) $(cov_opts)
 
+.PHONY: black-check
+black-check:
+	$(call python,dev) -m black --check .
+
+.PHONY: flake8
+flake8:
+	$(call python,dev) -m flake8 $(SRC_PATH) $(tests) setup.py
+
+.PHONY: mypy-ot2
+mypy-ot2:
+	$(call python,ot-2) -m mypy $(SRC_PATH) $(tests)
+
+.PHONY: mypy-ot3
+mypy-ot3:
+	$(call python,ot-3/robot-server) -m mypy $(SRC_PATH) $(tests)
+
 .PHONY: lint
 lint:
-	$(call python,ot-2) -m mypy $(SRC_PATH) $(tests)
-	$(call python,ot-3/robot-server) -m mypy $(SRC_PATH) $(tests)
-	$(call python,dev) -m black --check .
-	$(call python,dev) -m flake8 $(SRC_PATH) $(tests) setup.py
+	$(MAKE) black-check
+	$(MAKE) flake8
+	$(MAKE) mypy-ot2
+	$(MAKE) mypy-ot3
+
+.PHONY: lint-fast
+lint-fast:
+	$(MAKE) black-check & \
+	$(MAKE) flake8 & \
+	$(MAKE) mypy-ot2 & \
+	$(MAKE) mypy-ot3 & \
+	wait;
 
 .PHONY: format
 format:
