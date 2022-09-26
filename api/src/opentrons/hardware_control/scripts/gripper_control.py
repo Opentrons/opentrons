@@ -92,8 +92,6 @@ def print_current_state(
     5. gripper state: open/closed
     6. encoder positions (X, Y, G)
     """
-    gripper = api.sync._gripper_handler.get_gripper()
-
     pos = api.sync.current_position_ot3(OT3Mount.GRIPPER)
     gripper_loc = (pos[OT3Axis.X], pos[OT3Axis.Y], pos[OT3Axis.Z_G])
 
