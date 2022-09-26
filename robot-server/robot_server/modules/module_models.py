@@ -151,7 +151,7 @@ class ThermocyclerModuleData(BaseModel):
         ...,
         description="The current lid status of the thermocycler.",
     )
-    lidTempStatus: TemperatureStatus = Field(
+    lidTemperatureStatus: TemperatureStatus = Field(
         ..., description="The current heating status of the lid."
     )
     lidTemperature: Optional[float] = Field(

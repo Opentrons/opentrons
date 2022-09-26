@@ -89,7 +89,7 @@ class ModuleDataMapper:
                 targetTemperature=cast(float, live_data["data"].get("targetTemp")),
                 currentTemperature=cast(float, live_data["data"].get("currentTemp")),
                 lidStatus=cast(ThermocyclerLidStatus, live_data["data"].get("lid")),
-                lidTempStatus=cast(
+                lidTemperatureStatus=cast(
                     TemperatureStatus, live_data["data"].get("lidTempStatus")
                 ),
                 lidTemperature=cast(float, live_data["data"].get("lidTemp")),
