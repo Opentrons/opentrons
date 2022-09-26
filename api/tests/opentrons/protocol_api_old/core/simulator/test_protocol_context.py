@@ -8,16 +8,16 @@ from opentrons.types import Mount
 from opentrons.protocol_api.core.protocol import (
     AbstractProtocol as BaseAbstractProtocol,
 )
-from opentrons.protocol_api.core.labware import AbstractLabware as BaseAbstractLabware
-from opentrons.protocol_api.core.instrument import (
-    AbstractInstrument as BaseAbstractInstrument,
-)
+from opentrons.protocol_api.core.labware import AbstractLabware
+from opentrons.protocol_api.core.instrument import AbstractInstrument
+from opentrons.protocol_api.core.module import AbstractModuleCore
 from opentrons.protocol_api.core.well import AbstractWellCore
 
 
-AbstractInstrument = BaseAbstractInstrument[AbstractWellCore]
-AbstractLabware = BaseAbstractLabware[AbstractWellCore]
-AbstractProtocol = BaseAbstractProtocol[AbstractInstrument, AbstractLabware]
+InstrumentCore = AbstractInstrument[AbstractWellCore]
+LabwareCore = AbstractLabware[AbstractWellCore]
+ModuleCore = AbstractModuleCore[LabwareCore]
+ProtocolCore = BaseAbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]
 
 
 @pytest.fixture(
@@ -26,12 +26,12 @@ AbstractProtocol = BaseAbstractProtocol[AbstractInstrument, AbstractLabware]
         lazy_fixture("simulating_protocol_context"),
     ]
 )
-def subject(request: pytest.FixtureRequest) -> AbstractProtocol:
+def subject(request: pytest.FixtureRequest) -> ProtocolCore:
     return request.param  # type: ignore[attr-defined, no-any-return]
 
 
 def test_replacing_instrument_tip_state(
-    subject: AbstractProtocol, labware: AbstractLabware
+    subject: ProtocolCore, labware: LabwareCore
 ) -> None:
     """It should refer to same state when replacing the same pipette."""
     # This test validates that bug https://github.com/Opentrons/opentrons/issues/8273

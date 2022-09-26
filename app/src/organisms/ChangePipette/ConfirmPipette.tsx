@@ -9,6 +9,7 @@ import {
 import { CheckPipettesButton } from './CheckPipettesButton'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { PrimaryButton, SecondaryButton } from '../../atoms/buttons'
+import { LevelPipette } from './LevelPipette'
 
 import type {
   PipetteNameSpecs,
@@ -16,36 +17,64 @@ import type {
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
 import type { PipetteOffsetCalibration } from '../../redux/calibration/types'
+import type { Mount } from '../../redux/pipettes/types'
 
 export interface ConfirmPipetteProps {
   robotName: string
   success: boolean
+  //  attachedWrong is referring to when a user attaches a pipette that is different
+  //  from wantedPipette
   attachedWrong: boolean
   wantedPipette: PipetteNameSpecs | null
   actualPipette: PipetteModelSpecs | null
   actualPipetteOffset: PipetteOffsetCalibration | null
   displayName: string
   displayCategory: PipetteDisplayCategory | null
+  mount: Mount
+  //  wrongWantedPipette is referring to if the user attaches a pipette that is different
+  //  from wantedPipette and they want to use it anyway
+  wrongWantedPipette: PipetteNameSpecs | null
+  setWrongWantedPipette: React.Dispatch<
+    React.SetStateAction<PipetteNameSpecs | null>
+  >
+  confirmPipetteLevel: boolean
+  setConfirmPipetteLevel: React.Dispatch<React.SetStateAction<boolean>>
   tryAgain: () => void
   exit: () => void
   toCalibrationDashboard: () => void
 }
 
 export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
-  const { success } = props
+  const {
+    success,
+    mount,
+    tryAgain,
+    wrongWantedPipette,
+    actualPipette,
+    setConfirmPipetteLevel,
+    confirmPipetteLevel,
+  } = props
   const { t } = useTranslation('change_pipette')
 
   const getPipetteStatusDetails = (
     props: ConfirmPipetteProps
   ): { header: string; subHeader: string } => {
-    const { displayName, wantedPipette, attachedWrong, success } = props
+    const {
+      displayName,
+      wantedPipette,
+      attachedWrong,
+      actualPipette,
+      success,
+    } = props
     let header
     let subHeader
 
-    if (wantedPipette && success) {
+    if ((wantedPipette && success) || wrongWantedPipette) {
       header = t('pipette_attached')
       subHeader = t('pipette_is_ready_to_use', {
-        pipette: wantedPipette.displayName,
+        pipette: wrongWantedPipette
+          ? actualPipette?.displayName
+          : wantedPipette?.displayName,
       })
     } else if (wantedPipette) {
       header = attachedWrong
@@ -72,16 +101,39 @@ export function ConfirmPipette(props: ConfirmPipetteProps): JSX.Element {
 
   const { header, subHeader } = getPipetteStatusDetails({ ...props })
 
-  return (
+  const isWrongWantedPipette = wrongWantedPipette != null
+
+  return !confirmPipetteLevel &&
+    wrongWantedPipette &&
+    actualPipette != null &&
+    actualPipette.channels === 8 ? (
+    <LevelPipette
+      mount={mount}
+      pipetteModelName={actualPipette.name}
+      back={tryAgain}
+      confirm={() => setConfirmPipetteLevel(true)}
+    />
+  ) : (
     <SimpleWizardBody
-      iconColor={success ? COLORS.successEnabled : COLORS.errorEnabled}
+      iconColor={
+        success || wrongWantedPipette || confirmPipetteLevel
+          ? COLORS.successEnabled
+          : COLORS.errorEnabled
+      }
       header={header}
       subHeader={subHeader}
-      isSuccess={success}
+      isSuccess={success || isWrongWantedPipette || confirmPipetteLevel}
     >
       <>
-        {!success && <TryAgainButton {...props} />}
-        {success && <SuccessAndExitButtons {...props} />}
+        {!success && !wrongWantedPipette && !confirmPipetteLevel && (
+          <TryAgainButton {...props} />
+        )}
+        {success || wrongWantedPipette || confirmPipetteLevel ? (
+          <SuccessAndExitButtons
+            {...props}
+            confirmPipetteLevel={confirmPipetteLevel}
+          />
+        ) : null}
       </>
     </SimpleWizardBody>
   )
@@ -95,12 +147,18 @@ function TryAgainButton(props: ConfirmPipetteProps): JSX.Element {
     robotName,
     tryAgain,
     exit,
+    setWrongWantedPipette,
+    wrongWantedPipette,
   } = props
   const { t } = useTranslation('change_pipette')
-  if (wantedPipette && attachedWrong) {
+
+  if (wantedPipette && attachedWrong && !wrongWantedPipette) {
     return (
       <>
-        <SecondaryButton marginRight={SPACING.spacing3} onClick={exit}>
+        <SecondaryButton
+          marginRight={SPACING.spacing3}
+          onClick={() => setWrongWantedPipette(actualPipette)}
+        >
           {t('use_attached_pipette')}
         </SecondaryButton>
         <PrimaryButton onClick={tryAgain}>
@@ -137,18 +195,20 @@ function SuccessAndExitButtons(props: ConfirmPipetteProps): JSX.Element {
     exit,
     toCalibrationDashboard,
     success,
+    wrongWantedPipette,
   } = props
   const { t } = useTranslation('change_pipette')
   return (
     <>
-      {success && actualPipette && !actualPipetteOffset && (
+      {!actualPipetteOffset &&
+      (wrongWantedPipette || (success && actualPipette)) ? (
         <SecondaryButton
           marginRight={SPACING.spacing3}
           onClick={toCalibrationDashboard}
         >
           {t('calibrate_pipette_offset')}
         </SecondaryButton>
-      )}
+      ) : null}
       <PrimaryButton textTransform={TEXT_TRANSFORM_CAPITALIZE} onClick={exit}>
         {t('shared:exit')}
       </PrimaryButton>

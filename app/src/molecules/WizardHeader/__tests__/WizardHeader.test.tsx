@@ -38,10 +38,10 @@ describe('WizardHeader', () => {
     fireEvent.click(exit)
     expect(props.onExit).toHaveBeenCalled()
     getByText('step meter')
-    getByText('Step: 1 / 5')
+    getByText('Step 1 / 5')
   })
 
-  it('renders correct information with no step count visible', () => {
+  it('renders correct information with no step count visible due to currentStep = 0', () => {
     props = {
       ...props,
       currentStep: 0,
@@ -50,6 +50,18 @@ describe('WizardHeader', () => {
     const { getByText, getByRole } = render(props)
     getByText('Tip Length Calibrations')
     getByRole('button', { name: 'Exit' })
-    expect(screen.queryByText('Step: 0 / 5')).not.toBeInTheDocument()
+    expect(screen.queryByText('Step 0 / 5')).not.toBeInTheDocument()
+  })
+
+  it('renders correct information with no step count visible due to error state', () => {
+    props = {
+      ...props,
+      currentStep: null,
+    }
+
+    const { getByText, getByRole } = render(props)
+    getByText('Tip Length Calibrations')
+    getByRole('button', { name: 'Exit' })
+    expect(screen.queryByText('Step 1 / 5')).not.toBeInTheDocument()
   })
 })

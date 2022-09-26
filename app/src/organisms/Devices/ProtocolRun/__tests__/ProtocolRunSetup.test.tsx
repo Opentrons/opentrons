@@ -11,11 +11,10 @@ import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simple
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
 import { i18n } from '../../../../i18n'
-import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { useFeatureFlag } from '../../../../redux/config'
 import {
-  useDeckCalibrationData,
+  useIsOT3,
   useProtocolDetailsForRun,
   useRobot,
   useRunCalibrationStatus,
@@ -44,9 +43,7 @@ jest.mock('../SetupLiquids')
 jest.mock('../../../../redux/config')
 jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
 
-const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
-  typeof useDeckCalibrationData
->
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
   typeof useProtocolDetailsForRun
 >
@@ -103,10 +100,7 @@ const render = () => {
 
 describe('ProtocolRunSetup', () => {
   beforeEach(() => {
-    when(mockUseDeckCalibrationData).calledWith(ROBOT_NAME).mockReturnValue({
-      deckCalibrationData: mockDeckCalData,
-      isDeckCalibrated: true,
-    })
+    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
     when(mockUseProtocolDetailsForRun)
       .calledWith(RUN_ID)
       .mockReturnValue({
@@ -190,12 +184,21 @@ describe('ProtocolRunSetup', () => {
   })
 
   describe('when no modules are in the protocol', () => {
-    it('renders robot calibration setup', () => {
+    it('renders robot calibration setup for OT-2', () => {
       const { getByText } = render()
 
       getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
+      const robotCalibrationSetup = getByText('Robot Calibration')
+      robotCalibrationSetup.click()
+      expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
+    })
+    it('renders robot calibration setup for OT-3', () => {
+      when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+      const { getByText } = render()
+
+      getByText('Review required pipettes for this protocol.')
       const robotCalibrationSetup = getByText('Robot Calibration')
       robotCalibrationSetup.click()
       expect(getByText('Mock SetupRobotCalibration')).toBeVisible()

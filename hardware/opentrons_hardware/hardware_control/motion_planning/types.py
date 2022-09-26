@@ -56,12 +56,18 @@ class Block:
 
         def _final_speed() -> np.float64:
             """Get final speed of the block."""
-            return cast(
-                np.float64,
-                np.sqrt(
-                    self.initial_speed**2 + self.acceleration * self.distance * 2
-                ),
+            speed_squared = (
+                self.initial_speed**2 + self.acceleration * self.distance * 2
             )
+            if speed_squared < 0:
+                # NOTE (AS, 2022-09-14): calculated value occasionally rounds to a negative,
+                #                        like -1E-11, which should really just be zero
+                log.warning(
+                    f"Block encountered negative value in final_speed ({speed_squared}). "
+                    f"Setting Block.final_speed to 0.0 instead."
+                )
+                return np.float64(0.0)
+            return cast(np.float64, np.sqrt(speed_squared))
 
         def _time() -> np.float64:
             """Get the time it takes for the block to complete its motion."""
@@ -211,6 +217,7 @@ class AxisConstraints:
     max_acceleration: np.float64
     max_speed_discont: np.float64
     max_direction_change_speed_discont: np.float64
+    max_speed: np.float64
 
     @classmethod
     def build(
@@ -218,6 +225,7 @@ class AxisConstraints:
         max_acceleration: CoordinateValue,
         max_speed_discont: CoordinateValue,
         max_direction_change_speed_discont: CoordinateValue,
+        max_speed: CoordinateValue,
     ) -> AxisConstraints:
         """Build AxisConstraints."""
         return cls(
@@ -226,6 +234,7 @@ class AxisConstraints:
             max_direction_change_speed_discont=np.float64(
                 max_direction_change_speed_discont
             ),
+            max_speed=np.float64(max_speed),
         )
 
 

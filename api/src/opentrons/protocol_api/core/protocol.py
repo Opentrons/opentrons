@@ -3,34 +3,25 @@
 from __future__ import annotations
 
 from abc import abstractmethod, ABC
-from dataclasses import dataclass
-from typing import Dict, Generic, Optional
+from typing import Dict, Generic, Optional, Union
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons.types import Mount, Location, DeckLocation
-from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
-from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+from opentrons.types import Mount, Location, DeckSlotName
+from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.hardware_control.modules.types import ModuleModel
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.protocols.geometry.deck_item import DeckItem
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from .instrument import InstrumentCoreType
-from .labware import LabwareCoreType
+from .labware import LabwareCoreType, LabwareLoadParams
+from .module import ModuleCoreType
 
 
-@dataclass(frozen=True)
-class LoadModuleResult:
-    """The result of load_module"""
-
-    type: ModuleType
-    geometry: ModuleGeometry
-    module: SynchronousAdapter[AbstractModule]
-
-
-class AbstractProtocol(ABC, Generic[InstrumentCoreType, LabwareCoreType]):
+class AbstractProtocol(
+    ABC, Generic[InstrumentCoreType, LabwareCoreType, ModuleCoreType]
+):
     @abstractmethod
     def get_bundled_data(self) -> Dict[str, bytes]:
         """Get a mapping of name to contents"""
@@ -57,36 +48,32 @@ class AbstractProtocol(ABC, Generic[InstrumentCoreType, LabwareCoreType]):
         ...
 
     @abstractmethod
-    def load_labware_from_definition(
+    def add_labware_definition(
         self,
-        labware_def: LabwareDefinition,
-        location: DeckLocation,
-        label: Optional[str],
-    ) -> LabwareCoreType:
+        definition: LabwareDefinition,
+    ) -> LabwareLoadParams:
+        """Add a labware defintion to the set of loadable definitions."""
         ...
 
     @abstractmethod
     def load_labware(
         self,
         load_name: str,
-        location: DeckLocation,
+        location: Union[DeckSlotName, ModuleCoreType],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCoreType:
+        """Load a labware using its identifying parameters."""
         ...
 
     @abstractmethod
     def load_module(
         self,
         model: ModuleModel,
-        location: Optional[DeckLocation],
+        deck_slot: Optional[DeckSlotName],
         configuration: Optional[str],
-    ) -> Optional[LoadModuleResult]:
-        ...
-
-    @abstractmethod
-    def get_loaded_modules(self) -> Dict[int, LoadModuleResult]:
+    ) -> ModuleCoreType:
         ...
 
     @abstractmethod

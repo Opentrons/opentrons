@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { act } from '@testing-library/react-hooks'
 import { fireEvent } from '@testing-library/react'
 import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
@@ -15,7 +14,7 @@ import {
   SUCCESS,
   useDispatchApiRequests,
 } from '../../../redux/robot-api'
-import { useCalibratePipetteOffset } from '../../CalibratePipetteOffset/useCalibratePipetteOffset'
+import { useDeprecatedCalibratePipetteOffset } from '../../DeprecatedCalibratePipetteOffset/useDeprecatedCalibratePipetteOffset'
 import { PipetteSelection } from '../PipetteSelection'
 import { ExitModal } from '../ExitModal'
 import { ConfirmPipette } from '../ConfirmPipette'
@@ -46,7 +45,9 @@ jest.mock('../../../redux/config')
 jest.mock('../../../redux/pipettes')
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/calibration')
-jest.mock('../../CalibratePipetteOffset/useCalibratePipetteOffset')
+jest.mock(
+  '../../DeprecatedCalibratePipetteOffset/useDeprecatedCalibratePipetteOffset'
+)
 jest.mock('../../../redux/robot-api')
 jest.mock('../PipetteSelection')
 jest.mock('../ExitModal')
@@ -68,8 +69,8 @@ const mockGetMovementStatus = getMovementStatus as jest.MockedFunction<
 const mockGetCalibrationForPipette = getCalibrationForPipette as jest.MockedFunction<
   typeof getCalibrationForPipette
 >
-const mockUseCalibratePipetteOffset = useCalibratePipetteOffset as jest.MockedFunction<
-  typeof useCalibratePipetteOffset
+const mockUseDeprecatedCalibratePipetteOffset = useDeprecatedCalibratePipetteOffset as jest.MockedFunction<
+  typeof useDeprecatedCalibratePipetteOffset
 >
 const mockGetHasCalibrationBlock = getHasCalibrationBlock as jest.MockedFunction<
   typeof getHasCalibrationBlock
@@ -89,6 +90,7 @@ const mockInProgress = InProgressModal as jest.MockedFunction<
 const mockConfirmPipette = ConfirmPipette as jest.MockedFunction<
   typeof ConfirmPipette
 >
+
 const mockExitModal = ExitModal as jest.MockedFunction<typeof ExitModal>
 
 const render = (props: React.ComponentProps<typeof ChangePipette>) => {
@@ -135,7 +137,10 @@ describe('ChangePipette', () => {
     mockGetMovementStatus.mockReturnValue(null)
     mockGetPipetteNameSpecs.mockReturnValue(null)
 
-    when(mockUseCalibratePipetteOffset).mockReturnValue([startWizard, null])
+    when(mockUseDeprecatedCalibratePipetteOffset).mockReturnValue([
+      startWizard,
+      null,
+    ])
     when(mockUseDispatchApiRequests).mockReturnValue([
       dispatchApiRequest,
       ['id'],
@@ -174,7 +179,6 @@ describe('ChangePipette', () => {
 
     //  Instructions page
     getByText('Attach a pipette')
-    getByText('Step: 1 / 3')
     getByText('mock pipette selection')
     exit = getByLabelText('Exit')
     fireEvent.click(exit)
@@ -182,10 +186,6 @@ describe('ChangePipette', () => {
     //  Exit modal page
     getByText('mock exit modal')
     getByText('Attach a pipette')
-    getByText('Step: 1 / 3')
-    exit = getByLabelText('Exit')
-    fireEvent.click(exit)
-    expect(props.closeModal).toHaveBeenCalled()
   })
 
   it('the go back button functions as expected', () => {
@@ -212,16 +212,6 @@ describe('ChangePipette', () => {
 
     //  Instructions page
     getByText('Attach a pipette')
-    getByText('Step: 1 / 3')
-
-    //  attach the pipette
-    act(() => {
-      when(mockGetPipetteNameSpecs)
-        .calledWith('p300_single_gen2')
-        .mockReturnValue(mockP300PipetteNameSpecs)
-    })
-
-    //  TODO(jr, 08/30/22): extend this test for attaching a pipette so you can go through the remainder of the flow
   })
 
   it('renders the wizard pages for detaching a single channel pipette and exits on the 2nd page rendering exit modal', () => {
@@ -253,7 +243,7 @@ describe('ChangePipette', () => {
 
     //  Instructions page 1
     getByText('Detach P300 Single GEN2 from Left Mount')
-    getByText('Step: 1 / 3')
+    getByText('Step 1 / 3')
     getByText('Loosen the screws')
     getByText(
       'Using a 2.5 mm screwdriver, loosen the three screws on the back of the pipette that is currently attached.'
@@ -263,7 +253,7 @@ describe('ChangePipette', () => {
 
     //  Instructions page 2
     getByText('Detach P300 Single GEN2 from Left Mount')
-    getByText('Step: 2 / 3')
+    getByText('Step 2 / 3')
     getByText('Remove the pipette')
     getByText(
       'Hold onto the pipette so it does not fall. Disconnect the pipette from the robot by pulling the white connector tab.'
@@ -274,11 +264,8 @@ describe('ChangePipette', () => {
 
     //  Exit modal page
     getByText('Detach P300 Single GEN2 from Left Mount')
-    getByText('Step: 2 / 3')
+    getByText('Step 2 / 3')
     getByText('mock exit modal')
-    const exitModal = getByLabelText('Exit')
-    fireEvent.click(exitModal)
-    expect(props.closeModal).toHaveBeenCalled()
   })
 
   it('renders the wizard pages for detaching a single channel pipette and goes through the whole flow', () => {
@@ -298,16 +285,6 @@ describe('ChangePipette', () => {
     fireEvent.click(cont)
 
     //  Instructions page 2
-    //  disconnect the attached pipette
-    act(() => {
-      mockGetAttachedPipettes.mockReturnValue({
-        left: null,
-        right: null,
-      })
-    })
-    const confirm = getByLabelText('Confirm')
-    fireEvent.click(confirm)
-
-    //  TODO(jr, 08/30/22): extend this test to test for the final confirm pipette page, need to remove attach pieptte
+    getByLabelText('Confirm')
   })
 })

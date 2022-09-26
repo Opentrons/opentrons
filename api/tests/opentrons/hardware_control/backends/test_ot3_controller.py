@@ -20,6 +20,7 @@ from opentrons.hardware_control.types import (
     InvalidPipetteName,
     InvalidPipetteModel,
 )
+from opentrons_hardware.firmware_bindings.utils import UInt8Field
 
 
 from opentrons_hardware.hardware_control.motion import (
@@ -280,7 +281,7 @@ async def test_probing(
                     serial="hello",
                 ),
                 right=None,
-                gripper=GripperInformation(model=0, serial="fake_serial"),
+                gripper=GripperInformation(model="0", serial="fake_serial"),
             ),
             "hello",
             "p1000_single_gen3",
@@ -399,7 +400,7 @@ async def test_gripper_home_jaw(controller: OT3Controller, mock_move_group_run):
         for move_group in move_group_runner._move_groups:
             assert move_group  # don't pass in empty groups
             assert len(move_group) == 1
-        # onlly homing the gripper jaw
+        # only homing the gripper jaw
         assert list(move_group[0].keys()) == [NodeId.gripper_g]
         step = move_group[0][NodeId.gripper_g]
         assert step.stop_condition == MoveStopCondition.limit_switch
@@ -407,14 +408,57 @@ async def test_gripper_home_jaw(controller: OT3Controller, mock_move_group_run):
 
 
 async def test_gripper_grip(controller: OT3Controller, mock_move_group_run):
-    await controller.gripper_move_jaw(duty_cycle=50)
+    await controller.gripper_grip_jaw(duty_cycle=50)
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
             assert move_group  # don't pass in empty groups
             assert len(move_group) == 1
-        # onlly homing the gripper jaw
+        # only gripping the gripper jaw
         assert list(move_group[0].keys()) == [NodeId.gripper_g]
         step = move_group[0][NodeId.gripper_g]
         assert step.stop_condition == MoveStopCondition.none
+        assert step.move_type == MoveType.grip
+
+
+async def test_gripper_jaw_width(controller: OT3Controller, mock_move_group_run):
+    max_jaw_width = 134350
+    await controller.gripper_hold_jaw(encoder_position_um=((max_jaw_width - 80000) / 2))
+    for call in mock_move_group_run.call_args_list:
+        move_group_runner = call[0][0]
+        for move_group in move_group_runner._move_groups:
+            assert move_group  # don't pass in empty groups
+            assert len(move_group) == 1
+        # only moving the gripper jaw
+        assert list(move_group[0].keys()) == [NodeId.gripper_g]
+        step = move_group[0][NodeId.gripper_g]
+        assert step.stop_condition == MoveStopCondition.encoder_position
         assert step.move_type == MoveType.linear
+
+
+async def test_get_limit_switches(controller: OT3Controller) -> None:
+    assert controller._present_nodes == set()
+    fake_present_nodes = {NodeId.gantry_x, NodeId.gantry_y}
+    call_count = 0
+    fake_response = {
+        NodeId.gantry_x: UInt8Field(0),
+        NodeId.gantry_y: UInt8Field(0),
+    }
+    passed_nodes = None
+
+    async def fake_gls(can_messenger, nodes):
+        nonlocal passed_nodes
+        nonlocal call_count
+        nonlocal fake_response
+        passed_nodes = nodes
+        call_count += 1
+        return fake_response
+
+    with patch(
+        "opentrons.hardware_control.backends.ot3controller.get_limit_switches", fake_gls
+    ), patch.object(controller, "_present_nodes", fake_present_nodes):
+        res = await controller.get_limit_switches()
+        assert call_count == 1
+        assert passed_nodes == {NodeId.gantry_x, NodeId.gantry_y}
+        assert OT3Axis.X in res
+        assert OT3Axis.Y in res

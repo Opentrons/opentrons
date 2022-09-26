@@ -1,11 +1,6 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 import { BORDERS, COLORS, Flex, SPACING } from '@opentrons/components'
-import {
-  blueEnabled,
-  fundamentalsBackground,
-  medGreyEnabled,
-} from '@opentrons/components/src/ui-style-constants/colors'
 import { PrimaryButton } from '../../atoms/buttons'
 
 const BUTTON_GROUP_STYLES = css`
@@ -28,13 +23,13 @@ const BUTTON_GROUP_STYLES = css`
     }
 
     &:hover {
-      background-color: ${fundamentalsBackground};
+      background-color: ${COLORS.fundamentalsBackground};
       color: ${COLORS.black};
       box-shadow: 0 0 0;
     }
 
     &.active {
-      background-color: ${blueEnabled};
+      background-color: ${COLORS.blueEnabled};
       color: ${COLORS.white};
     }
 
@@ -58,7 +53,7 @@ const BUTTON_GROUP_STYLES = css`
 const ACTIVE_STYLE = css`
   padding-left: ${SPACING.spacing3};
   padding-right: ${SPACING.spacing3};
-  background-color: ${blueEnabled};
+  background-color: ${COLORS.blueEnabled};
   color: ${COLORS.white};
   pointer-events: none;
 `
@@ -68,7 +63,7 @@ const DEFAULT_STYLE = css`
   padding-right: ${SPACING.spacing3};
   background-color: ${COLORS.white};
   color: ${COLORS.black};
-  border: 1px ${medGreyEnabled} solid;
+  border: 1px ${COLORS.medGreyEnabled} solid;
 `
 
 export const useToggleGroup = (

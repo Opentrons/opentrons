@@ -11,9 +11,14 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName
 from opentrons.hardware_control.modules import ModuleType as ModuleType
 
-# convenience re-export of LabwareUri type
+
 from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
+    # convenience re-export of LabwareUri type
     LabwareUri as LabwareUri,
+    # TODO(mc, 2022-09-01): re-consider pickle usage in robot-server.
+    # This re-export of PipetteName prevents pickle breakage
+    # https://opentrons.atlassian.net/browse/RSS-94
+    PipetteNameType as PipetteName,
 )
 
 
@@ -159,7 +164,7 @@ class ModuleModel(str, Enum):
     def is_thermocycler_module_model(
         cls, model: ModuleModel
     ) -> TypeGuard[ThermocyclerModuleModel]:
-        """Whether a given model is a Thermocyler Module."""
+        """Whether a given model is a Thermocycler Module."""
         return model in [cls.THERMOCYCLER_MODULE_V1, cls.THERMOCYCLER_MODULE_V2]
 
     @classmethod
@@ -314,15 +319,21 @@ class LoadedLabware(BaseModel):
     id: str
     loadName: str
     definitionUri: str
-    location: LabwareLocation
+    location: LabwareLocation = Field(
+        ..., description="The labware's current location."
+    )
     offsetId: Optional[str] = Field(
         None,
         description=(
-            "An ID referencing the offset applied to this labware placement,"
-            " decided at load time."
+            "An ID referencing the labware offset"
+            " that applies to this labware placement."
             " Null or undefined means no offset was provided for this load,"
             " so the default of (0, 0, 0) will be used."
         ),
+    )
+    displayName: Optional[str] = Field(
+        None,
+        description="A user-specified display name for this labware, if provided.",
     )
 
 

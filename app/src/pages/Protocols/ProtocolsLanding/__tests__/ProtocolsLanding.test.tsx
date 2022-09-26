@@ -32,7 +32,7 @@ describe('ProtocolsLanding', () => {
     const { getByText } = render()
     getByText('mock protocol list')
   })
-  it('renders the empt state component', () => {
+  it('renders the empty state component', () => {
     mockGetStoredProtocols.mockReturnValue([])
     mockProtocolsEmptyState.mockReturnValue(<div>mock empty state</div>)
     const { getByText } = render()

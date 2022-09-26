@@ -16,6 +16,7 @@ import {
 import { GlobalStyle } from '../atoms/GlobalStyle'
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
+import { CalibrationDashboard } from '../pages/Devices/CalibrationDashboard'
 import { DeviceDetails } from '../pages/Devices/DeviceDetails'
 import { DevicesLanding } from '../pages/Devices/DevicesLanding'
 import { ProtocolRunDetails } from '../pages/Devices/ProtocolRunDetails'
@@ -82,6 +83,12 @@ export const AppComponent = (): JSX.Element => {
       exact: true,
       name: 'Robot Settings',
       path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
+    },
+    {
+      Component: CalibrationDashboard,
+      exact: true,
+      name: 'Calibration Dashboard',
+      path: '/devices/:robotName/robot-settings/calibration/dashboard',
     },
     {
       Component: ProtocolRunDetails,

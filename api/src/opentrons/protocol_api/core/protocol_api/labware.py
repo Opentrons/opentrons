@@ -9,7 +9,7 @@ from opentrons.protocols.api_support.well_grid import WellGrid
 from opentrons.types import Point, Location
 from opentrons_shared_data.labware.dev_types import LabwareParameters, LabwareDefinition
 
-from ..labware import AbstractLabware
+from ..labware import AbstractLabware, LabwareLoadParams
 from .well import WellImplementation
 
 
@@ -58,10 +58,17 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
     def get_uri(self) -> str:
         return helpers.uri_from_definition(self._definition)
 
+    def get_load_params(self) -> LabwareLoadParams:
+        return LabwareLoadParams(
+            namespace=self._definition["namespace"],
+            load_name=self._definition["parameters"]["loadName"],
+            version=self._definition["version"],
+        )
+
     def get_display_name(self) -> str:
         return self._display_name
 
-    def get_label(self) -> Optional[str]:
+    def get_user_display_name(self) -> Optional[str]:
         return self._label
 
     def get_name(self) -> str:

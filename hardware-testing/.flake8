@@ -19,3 +19,9 @@ extend-ignore =
 docstring-convention = google
 
 noqa-require-code = true
+
+per-file-ignores =
+    tests/hardware_testing/drivers/*:ANN,D
+    tests/hardware_testing/drivers/radwag*:ANN,D
+    tests/hardware_testing/execute/*:ANN,D
+    tests/hardware_testing/liquid/*:ANN,D

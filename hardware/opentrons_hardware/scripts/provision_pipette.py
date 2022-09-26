@@ -23,7 +23,7 @@ from opentrons_hardware.firmware_bindings.messages import (
 )
 from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteName
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-from opentrons_hardware.pipettes import serials
+from opentrons_hardware.instruments.pipettes import serials
 
 
 async def run(

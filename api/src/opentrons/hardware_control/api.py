@@ -23,6 +23,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
+from opentrons.drivers.rpi_drivers.types import USBPort
 
 from .util import use_or_initialize_loop, check_motion_bounds
 from .instruments.pipette import (
@@ -1058,15 +1059,21 @@ class API(
         self._backend.set_active_current(spec.ending_current)
         _remove()
 
-    async def find_modules(
+    async def create_simulating_module(
         self,
-        by_model: modules.types.ModuleModel,
-        resolved_type: modules.types.ModuleType,
-    ) -> Tuple[List[modules.AbstractModule], Optional[modules.AbstractModule]]:
-        modules_result = await self._backend.module_controls.parse_modules(
-            by_model, resolved_type
+        model: modules.types.ModuleModel,
+    ) -> modules.AbstractModule:
+        """Get a simulating module hardware API interface for the given model."""
+        assert (
+            self.is_simulator
+        ), "Cannot build simulating module from non-simulating hardware control API"
+
+        return await self._backend.module_controls.build_module(
+            port="",
+            usb_port=USBPort(name="", port_number=0),
+            type=modules.ModuleType.from_model(model),
+            sim_model=model.value,
         )
-        return modules_result
 
     def get_instrument_max_height(
         self, mount: top_types.Mount, critical_point: Optional[CriticalPoint] = None

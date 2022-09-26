@@ -55,7 +55,7 @@ export const HeaterShakerModuleData = (
         break
       }
       case 'error': {
-        StatusLabelProps.backgroundColor = COLORS.warningBackground
+        StatusLabelProps.backgroundColor = COLORS.warningBackgroundLight
         StatusLabelProps.iconColor = COLORS.warningEnabled
         StatusLabelProps.textColor = COLORS.warningText
         break

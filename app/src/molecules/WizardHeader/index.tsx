@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 import {
   Box,
   Btn,
@@ -14,12 +15,21 @@ import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
 
 interface WizardHeaderProps {
-  totalSteps: number
-  currentStep: number | null
   title: string
   onExit?: () => void
+  totalSteps?: number
+  currentStep?: number | null
 }
 
+const EXIT_BUTTON_STYLE = css`
+  ${TYPOGRAPHY.pSemiBold};
+  text-transform: ${TYPOGRAPHY.textTransformCapitalize};
+  color: ${COLORS.darkGreyEnabled};
+
+  &:hover {
+    opacity: 70%;
+  }
+`
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
   const { totalSteps, currentStep, title, onExit } = props
   const { t } = useTranslation('shared')
@@ -35,7 +45,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           <StyledText css={TYPOGRAPHY.pSemiBold} marginRight={SPACING.spacing3}>
             {title}
           </StyledText>
-          {currentStep != null && currentStep > 0 ? (
+          {currentStep != null && totalSteps != null && currentStep > 0 ? (
             <StyledText
               css={TYPOGRAPHY.pSemiBold}
               color={COLORS.darkGreyEnabled}
@@ -46,17 +56,11 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
         </Flex>
         {onExit != null ? (
           <Btn onClick={onExit} aria-label="Exit">
-            <StyledText
-              css={TYPOGRAPHY.pSemiBold}
-              textTransform={TYPOGRAPHY.textTransformCapitalize}
-              color={COLORS.darkGreyEnabled}
-            >
-              {t('exit')}
-            </StyledText>
+            <StyledText css={EXIT_BUTTON_STYLE}>{t('exit')}</StyledText>
           </Btn>
         ) : null}
       </Flex>
-      <StepMeter totalSteps={totalSteps} currentStep={currentStep} />
+      <StepMeter totalSteps={totalSteps ?? 0} currentStep={currentStep ?? 0} />
     </Box>
   )
 }

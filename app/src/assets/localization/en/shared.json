@@ -13,6 +13,8 @@
   "ending": "ending",
   "error": "error",
   "exit": "exit",
+  "flow_complete": "{{flowName}} complete!",
+  "go_back": "Go back",
   "loading": "Loading...",
   "no_data": "no data",
   "not_used": "Not Used",
@@ -20,6 +22,7 @@
   "open": "open",
   "refresh": "refresh",
   "refresh_list": "Refresh list",
+  "resume": "resume",
   "start": "start",
   "starting": "starting",
   "stop": "stop",
@@ -38,6 +41,7 @@
   "a_software_update_is_available": "A software update is available for this robot. Update to run protocols.",
   "robot_is_busy_no_protocol_run_allowed": "This robot is busy and can’t run this protocol right now. <robotLink>Go to Robot</robotLink>",
   "reanalyze": "Reanalyze",
-  "step": "Step: {{current}} / {{max}}",
-  "none": "None"
+  "step": "Step {{current}} / {{max}}",
+  "none": "None",
+  "remember_my_selection_and_do_not_ask_again": "Remember my selection and don't ask again"
 }

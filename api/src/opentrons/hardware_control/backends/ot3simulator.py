@@ -26,7 +26,8 @@ from .ot3utils import (
     get_current_settings,
     node_to_axis,
     axis_to_node,
-    create_gripper_jaw_move_group,
+    create_gripper_jaw_hold_group,
+    create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
 )
 
@@ -228,17 +229,23 @@ class OT3Simulator:
         """
         return axis_convert(self._position, 0.0)
 
-    async def gripper_move_jaw(
+    async def gripper_grip_jaw(
         self,
         duty_cycle: float,
         stop_condition: MoveStopCondition = MoveStopCondition.none,
     ) -> None:
         """Move gripper inward."""
-        _ = create_gripper_jaw_move_group(duty_cycle, stop_condition)
+        _ = create_gripper_jaw_grip_group(duty_cycle, stop_condition)
 
     async def gripper_home_jaw(self) -> None:
         """Move gripper outward."""
         _ = create_gripper_jaw_home_group()
+
+    async def gripper_hold_jaw(
+        self,
+        encoder_position_um: int,
+    ) -> None:
+        _ = create_gripper_jaw_hold_group(encoder_position_um)
 
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]
@@ -331,6 +338,10 @@ class OT3Simulator:
             for mount in OT3Mount
         }
 
+    async def get_limit_switches(self) -> OT3AxisMap[bool]:
+        """Get the state of the gantry's limit switches on each axis."""
+        return {}
+
     async def set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """Set the active current.
 
@@ -388,6 +399,10 @@ class OT3Simulator:
 
     async def disengage_axes(self, axes: List[OT3Axis]) -> None:
         """Disengage axes."""
+        return None
+
+    async def engage_axes(self, axes: List[OT3Axis]) -> None:
+        """Engage axes."""
         return None
 
     def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
