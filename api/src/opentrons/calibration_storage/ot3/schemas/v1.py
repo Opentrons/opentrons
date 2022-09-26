@@ -4,10 +4,10 @@ import typing
 from typing_extensions import Literal
 from pydantic import BaseModel, Field, validator
 from datetime import datetime
-from dataclasses import dataclass
 
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
+from opentrons.types import Point
 from opentrons.calibration_storage import types
 
 
@@ -39,7 +39,6 @@ class TipLengthSchema(BaseModel):
             raise ValueError("Tip Length must be a positive number")
         return tipLength
 
-
     class Config:
         json_encoders = {datetime: lambda obj: obj.isoformat()}
         json_decoders = {datetime: lambda obj: datetime.fromisoformat(obj)}
@@ -69,9 +68,7 @@ class DeckCalibrationSchema(BaseModel):
 
 
 class InstrumentOffsetSchema(BaseModel):
-    offset: types.InstrumentCalOffset = Field(
-        ..., description="Instrument offset found from calibration."
-    )
+    offset: Point = Field(..., description="Instrument offset found from calibration.")
     lastModified: datetime = Field(
         ..., description="The last time this instrument was calibrated."
     )

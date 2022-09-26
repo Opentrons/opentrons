@@ -5,9 +5,9 @@ file system.
 # TODO(mc, 2022-06-08): this module has no unit tests
 # add tests before making any additional changes
 from pathlib import Path
-import os
 
 from .. import file_operators as io
+from ..types import TiprackHash, PipetteId, TipLengthCalNotFound
 
 from opentrons import config
 from opentrons.types import Mount
@@ -33,7 +33,7 @@ def _remove_json_files_in_directories(p: Path) -> None:
             _delete_file(item)
 
 
-def delete_tip_length_calibration(tiprack: str, pipette_id: str) -> None:
+def delete_tip_length_calibration(tiprack: TiprackHash, pipette_id: PipetteId) -> None:
     """
     Delete tip length calibration based on tiprack hash and
     pipette serial number
@@ -51,6 +51,13 @@ def delete_tip_length_calibration(tiprack: str, pipette_id: str) -> None:
         else:
             tip_length_path.unlink()
         calibration_cache._tip_length_calibrations.cache_clear()
+    else:
+        # TODO is this the error we want to throw?
+        raise TipLengthCalNotFound(
+            f"Tip length for hash {tiprack} has not been "
+            f"calibrated for this pipette: {pipette_id} and cannot"
+            "be loaded"
+        )
 
 
 def clear_tip_length_calibration() -> None:
@@ -65,7 +72,7 @@ def clear_tip_length_calibration() -> None:
     calibration_cache._tip_length_calibrations.cache_clear()
 
 
-def delete_pipette_offset_file(pipette: str, mount: Mount) -> None:
+def delete_pipette_offset_file(pipette: PipetteId, mount: Mount) -> None:
     """
     Delete pipette offset file based on mount and pipette serial number
 

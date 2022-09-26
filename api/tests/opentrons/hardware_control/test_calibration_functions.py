@@ -39,7 +39,7 @@ def test_save_calibration(ot_config_tempdir):
         "last_modified": None,
         "tiprack": lw_hash,
         "source": "user",
-        "status": {"markedBad": False, 'markedAt': None, 'source': None},
+        "status": {"markedBad": False, "markedAt": None, "source": None},
     }
     robot_calibration.save_attitude_matrix(e, a, pip_id, lw_hash)
     data = io.read_cal_file(pathway)
@@ -107,4 +107,4 @@ def test_load_bad_pipette_offset(ot_config_tempdir):
     calpath = path / "fakePip.json"
     calpath.write_text("{")
     obj = instrument_calibration.load_pipette_offset("fakePip", Mount.LEFT)
-    assert obj.offset == [0, 0, 0]
+    assert obj.offset == Point(0, 0, 0)

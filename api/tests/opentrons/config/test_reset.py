@@ -32,7 +32,9 @@ def mock_reset_tip_length_calibrations() -> Generator[MagicMock, None, None]:
 
 
 @pytest.fixture
-def mock_cal_storage_delete_ot3(enable_ot3_hardware_controller: Any) -> Generator[MagicMock, None, None]:
+def mock_cal_storage_delete_ot3(
+    enable_ot3_hardware_controller: Any,
+) -> Generator[MagicMock, None, None]:
     with patch("opentrons.config.reset.ot3_delete", autospec=True) as m:
         yield m
 

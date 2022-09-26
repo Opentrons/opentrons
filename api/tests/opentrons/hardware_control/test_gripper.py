@@ -67,7 +67,6 @@ def test_critical_point(
 def test_load_gripper_cal_offset(fake_offset):
     gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     # if offset data do not exist, loaded values should match DEFAULT
-    assert (
-        gripr._calibration_offset.offset
-        == gripper_config.DEFAULT_GRIPPER_CALIBRATION_OFFSET
+    assert gripr._calibration_offset.offset == Point(
+        *gripper_config.DEFAULT_GRIPPER_CALIBRATION_OFFSET
     )
