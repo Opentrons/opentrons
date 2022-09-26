@@ -46,8 +46,6 @@ def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthCalibration]:
     :return: A list of dictionary objects representing all of the
     tip length calibration files found on the robot.
     """
-    # TODO why they hell does this work
-    calibration_cache._tip_length_calibrations.cache_clear()
     return calibration_cache.all_tip_length_calibrations()
 
 
@@ -69,8 +67,6 @@ def get_all_pipette_offset_calibrations() -> typing.List[v1.PipetteOffsetCalibra
     :return: A list of dictionary objects representing all of the
     pipette offset calibration files found on the robot.
     """
-    # TODO why they hell does this work
-    calibration_cache._pipette_offset_calibrations.cache_clear()
     return calibration_cache.all_pipette_offset_calibrations()
 
 
