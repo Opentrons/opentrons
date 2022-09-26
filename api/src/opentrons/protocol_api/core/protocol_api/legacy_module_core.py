@@ -2,13 +2,14 @@
 import logging
 from typing import Optional, cast
 
-from opentrons.hardware_control import SynchronousAdapter
-from opentrons.hardware_control.modules import AbstractModule, TempDeck, MagDeck
+from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
+from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
     TemperatureStatus,
     MagneticStatus,
+    SpeedStatus,
     MagneticModuleModel,
 )
 from opentrons.protocols.geometry.module_geometry import ModuleGeometry
@@ -18,6 +19,7 @@ from ..module import (
     AbstractModuleCore,
     AbstractTemperatureModuleCore,
     AbstractMagneticModuleCore,
+    AbstractHeaterShakerCore,
 )
 from .labware import LabwareImplementation
 
@@ -30,7 +32,7 @@ class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
 
     def __init__(
         self,
-        sync_module_hardware: SynchronousAdapter[AbstractModule],
+        sync_module_hardware: SynchronousAdapter[hw_modules.AbstractModule],
         requested_model: ModuleModel,
         geometry: ModuleGeometry,
     ) -> None:
@@ -76,7 +78,7 @@ class LegacyTemperatureModuleCore(
 ):
     """Legacy core control implementation for an attached Temperature Module."""
 
-    _sync_module_hardware: SynchronousAdapter[TempDeck]
+    _sync_module_hardware: SynchronousAdapter[hw_modules.TempDeck]
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the Temperature Module's target temperature in °C."""
@@ -112,7 +114,7 @@ class LegacyMagneticModuleCore(
 ):
     """Core control interface for an attached Magnetic Module."""
 
-    _sync_module_hardware: SynchronousAdapter[MagDeck]
+    _sync_module_hardware: SynchronousAdapter[hw_modules.MagDeck]
 
     def engage(
         self,
@@ -201,17 +203,83 @@ class LegacyMagneticModuleCore(
             )
 
 
+class LegacyHeaterShakerCore(
+    LegacyModuleCore, AbstractHeaterShakerCore[LabwareImplementation]
+):
+    """Core control interface for an attached Heater-Shaker Module."""
+
+    _sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker]
+
+    def set_target_temperature(self, celsius: float) -> None:
+        """Set the labware plate's target temperature in °C."""
+        raise NotImplementedError("LegacyHeaterShakerCore.set_target_temperature")
+
+    def wait_for_target_temeprature(self) -> None:
+        """Wait for the labware plate's target temperature to be reached."""
+        raise NotImplementedError("LegacyHeaterShakerCore.wait_for_target_temeprature")
+
+    def set_and_wait_for_shake_speed(self, rpm: int) -> None:
+        """Set the shaker's target shake speed and wait for it to spin up."""
+        raise NotImplementedError("LegacyHeaterShakerCore.set_and_wait_for_shake_speed")
+
+    def open_labware_latch(self) -> None:
+        """Open the labware latch."""
+        raise NotImplementedError("LegacyHeaterShakerCore.open_labware_latch")
+
+    def close_labware_latch(self) -> None:
+        """Close the labware latch."""
+        raise NotImplementedError("LegacyHeaterShakerCore.close_labware_latch")
+
+    def deactivate_shaker(self) -> None:
+        """Stop shaking."""
+        raise NotImplementedError("LegacyHeaterShakerCore.deactivate_shaker")
+
+    def deactivate_heater(self) -> None:
+        """Stop heating."""
+        raise NotImplementedError("LegacyHeaterShakerCore.deactivate_heater")
+
+    def get_current_temperature(self) -> float:
+        """Get the labware plate's current temperature in °C."""
+        return self._sync_module_hardware.temperature  # type: ignore[no-any-return]
+
+    def get_target_temperature(self) -> Optional[float]:
+        """Get the labware plate's target temperature in °C, if set."""
+        return self._sync_module_hardware.target_temperature  # type: ignore[no-any-return]
+
+    def get_current_speed(self) -> int:
+        """Get the shaker's current speed in RPM."""
+        return self._sync_module_hardware.speed  # type: ignore[no-any-return]
+
+    def get_target_speed(self) -> Optional[int]:
+        """Get the shaker's target speed in RPM, if set."""
+        return self._sync_module_hardware.target_speed  # type: ignore[no-any-return]
+
+    def get_temperature_status(self) -> TemperatureStatus:
+        """Get the module's heater status."""
+        return self._sync_module_hardware.temperature_status  # type: ignore[no-any-return]
+
+    def get_speed_status(self) -> SpeedStatus:
+        """Get the module's heater status."""
+        return self._sync_module_hardware.speed_status  # type: ignore[no-any-return]
+
+    def get_labware_latch_status(self) -> HeaterShakerLabwareLatchStatus:
+        """Get the module's labware latch status."""
+        return self._sync_module_hardware.labware_latch_status  # type: ignore[no-any-return]
+
+
 def create_module_core(
-    module_hardware_api: AbstractModule,
+    module_hardware_api: hw_modules.AbstractModule,
     requested_model: ModuleModel,
     geometry: ModuleGeometry,
 ) -> LegacyModuleCore:
     core_cls = LegacyModuleCore
 
-    if isinstance(module_hardware_api, TempDeck):
+    if isinstance(module_hardware_api, hw_modules.TempDeck):
         core_cls = LegacyTemperatureModuleCore
-    elif isinstance(module_hardware_api, MagDeck):
+    elif isinstance(module_hardware_api, hw_modules.MagDeck):
         core_cls = LegacyMagneticModuleCore
+    elif isinstance(module_hardware_api, hw_modules.HeaterShaker):
+        core_cls = LegacyHeaterShakerCore
 
     return core_cls(
         sync_module_hardware=SynchronousAdapter(module_hardware_api),
