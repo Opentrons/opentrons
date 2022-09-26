@@ -1,7 +1,7 @@
 name: "Setup All Environments"
 description: |
     "Set up all the environments for python projects."
-    "Cache the pipenv virtual environments."
+    "Cache pip global cache directory to help speed up pipenv sync."
 
 runs:
   using: "composite"
@@ -22,16 +22,11 @@ runs:
       id: python38
       with:
         python-version: '3.8'
-        cache: "pipenv"
-        cache-dependency-path: |
-          **/setup.*
-          **/Pipfile.*
-          .github/actions/python/setup-all-environments/action.yaml
+        cache: "pip"
     - shell: bash
       name: install pipenv on 3.8
       run: python -m pip install pipenv==2021.5.29
     - shell: bash
-      if: steps.python38.outputs.cache-hit == 'false'
       working-directory: environments
       name: setup ot3
       run: make -C ot-3 setup
@@ -39,16 +34,11 @@ runs:
       id: python310
       with:
         python-version: '3.10'
-        cache: "pipenv"
-        cache-dependency-path: |
-          **/setup.*
-          **/Pipfile.*
-          .github/actions/python/setup-all-environments/action.yaml
+        cache: "pip"
     - shell: bash
       name: install pipenv on 3.10
       run: python -m pip install pipenv==2021.5.29
     - shell: bash
-      if: steps.python310.outputs.cache-hit == 'false'
       working-directory: environments
       name: setup the environments
       run: |
