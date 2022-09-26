@@ -62,31 +62,19 @@ export function ApplyHistoricOffsets(
             width="40rem"
             header={
               <ModalHeader
-                title={t('apply_stored_offset_data')}
+                title={t('stored_offset_data')}
                 onClose={() => setShowOffsetDataModal(false)}
               />
-            }
-          >
+            }>
             <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing6}>
               <StyledText as="p">
-                {offsetCandidates.length > 0
-                  ? t('robot_has_offsets_from_previous_runs')
-                  : t('this_robot_has_no_stored_offsets_for_this_run')}
+                {offsetCandidates.length > 0 ? t('robot_has_offsets_from_previous_runs') : t('robot_has_no_offsets_from_previous_runs')}
               </StyledText>
               <Link css={TYPOGRAPHY.linkPSemiBold} marginTop={SPACING.spacing3}>
                 {t('see_how_offsets_work')}
               </Link>
               {offsetCandidates.length > 0 ? (
-                <>
-                  <StyledText
-                    as="p"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    marginY={SPACING.spacing4}
-                  >
-                    {t('stored_offsets_for_this_protocol')}
-                  </StyledText>
-                  <LabwareOffsetTable offsetCandidates={offsetCandidates} />
-                </>
+                <LabwareOffsetTable offsetCandidates={offsetCandidates} />
               ) : null}
             </Flex>
           </ModalShell>
