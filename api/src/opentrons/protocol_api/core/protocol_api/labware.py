@@ -150,8 +150,8 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
     def load_name(self) -> str:
         return self._parameters["loadName"]
 
-    # TODO(mc, 2022-09-26): ensure "from the labware's base" is correct
-    # https://github.com/Opentrons/opentrons/issues/10830
+    # TODO(mc, 2022-09-26): codify "from labware's base" in defintion schema
+    # https://opentrons.atlassian.net/browse/RSS-110
     def get_default_magnet_engage_height(
         self, preserve_half_mm: bool = False
     ) -> Optional[float]:
@@ -168,6 +168,8 @@ class LabwareImplementation(AbstractLabware[WellImplementation]):
             return None
 
         if self.get_uri() in _MAGDECK_HALF_MM_LABWARE and not preserve_half_mm:
+            # TODO(mc, 2022-09-26): this value likely _also_ needs a few mm subtracted
+            # https://opentrons.atlassian.net/browse/RSS-111
             return default_engage_height / 2.0
 
         return default_engage_height

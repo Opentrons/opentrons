@@ -127,7 +127,8 @@ class LegacyMagneticModuleCore(
             height_from_base: Distance from labware base to raise the magnets.
             height_from_home: Distance from motor home position to raise the magnets.
         """
-        # TODO(mc, 2022-09-23): use real millimeters instead of model-dependent mm
+        # TODO(mc, 2022-09-23): update when HW API uses real millimeters
+        # https://opentrons.atlassian.net/browse/RET-1242
         if height_from_base is not None:
             self._sync_module_hardware.engage(height_from_base=height_from_base)
         else:
@@ -176,8 +177,9 @@ class LegacyMagneticModuleCore(
             engage_height *= 2
 
         # TODO(mc, 2022-09-23): use real millimeters instead of model-dependent mm
+        # https://opentrons.atlassian.net/browse/RET-1242
         # TODO(mc, 2022-09-23): use `height_from_base` to match JSONv5
-        # https://github.com/Opentrons/opentrons/issues/10830
+        # https://opentrons.atlassian.net/browse/RSS-110
         self._sync_module_hardware.engage(height=engage_height + offset)
 
     def disengage(self) -> None:
