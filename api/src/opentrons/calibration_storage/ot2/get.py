@@ -3,26 +3,20 @@
 This module has functions that you can import to load robot or
 labware calibration from its designated file location.
 """
-import itertools
 import logging
 import json
 import typing
-from typing_extensions import Literal
 
 from opentrons import config
 from opentrons.types import Mount
 
 from . import cache as calibration_cache
 
-from .. import (
-    types as local_types,
-    file_operators as io,
-    helpers,
-)
+from .. import helpers
+from ..types import PipetteId
 
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
-    from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from .schemas import v1
 
@@ -31,7 +25,7 @@ log = logging.getLogger(__name__)
 
 
 def load_tip_length_calibration(
-    pip_id: str, definition: "LabwareDefinition"
+    pip_id: PipetteId, definition: "LabwareDefinition"
 ) -> v1.TipLengthSchema:
     """
     Function used to grab the current tip length associated
@@ -45,14 +39,16 @@ def load_tip_length_calibration(
     return calibration_cache.tip_length_data(pip_id, labware_hash, load_name)
 
 
-def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthSchema]:
+def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthCalibration]:
     """
     A helper function that will list all of the tip length calibrations.
 
     :return: A list of dictionary objects representing all of the
     tip length calibration files found on the robot.
     """
-    return calibration_cache._tip_length_calibrations()
+    # TODO why they hell does this work
+    calibration_cache._tip_length_calibrations.cache_clear()
+    return calibration_cache.all_tip_length_calibrations()
 
 
 def get_robot_deck_attitude() -> typing.Optional[v1.DeckCalibrationSchema]:
@@ -60,7 +56,7 @@ def get_robot_deck_attitude() -> typing.Optional[v1.DeckCalibrationSchema]:
 
 
 def get_pipette_offset(
-    pip_id: str, mount: Mount
+    pip_id: PipetteId, mount: Mount
 ) -> typing.Optional[v1.InstrumentOffsetSchema]:
     return calibration_cache.pipette_offset_data(pip_id, mount)
 
@@ -73,19 +69,9 @@ def get_all_pipette_offset_calibrations() -> typing.List[v1.PipetteOffsetCalibra
     :return: A list of dictionary objects representing all of the
     pipette offset calibration files found on the robot.
     """
-    pipette_calibration_list = []
-    for mount, pipettes in calibration_cache._pipette_offset_calibrations().items():
-        for pipette, calibration in pipettes.items():
-            pipette_calibration_list.append(v1.PipetteOffsetCalibration(
-                pipette=pipette,
-                mount=mount,
-                offset=calibration.offset,
-                tiprack=calibration.tiprack,
-                uri=calibration.uri,
-                last_modified=calibration.last_modified,
-                source=calibration.source,
-                status=calibration.status))
-    return pipette_calibration_list
+    # TODO why they hell does this work
+    calibration_cache._pipette_offset_calibrations.cache_clear()
+    return calibration_cache.all_pipette_offset_calibrations()
 
 
 def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinition":

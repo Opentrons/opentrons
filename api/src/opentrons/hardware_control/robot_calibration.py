@@ -1,9 +1,9 @@
 from functools import lru_cache
 import logging
 import numpy as np
-from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Optional, Any, cast
+from dataclasses import dataclass
+from typing import Optional, List, Any, cast
 
 from opentrons import config
 
@@ -11,8 +11,10 @@ from opentrons.config.robot_configs import (
     get_legacy_gantry_calibration,
     default_deck_calibration,
 )
+from opentrons.config.types import OT3Config
 from opentrons.calibration_storage import types
 from opentrons.calibration_storage.ot2 import modify, get
+from opentrons.types import Point
 from opentrons.util import linal
 
 from .util import DeckTransformState
@@ -33,6 +35,28 @@ class DeckCalibration:
 @dataclass
 class RobotCalibration:
     deck_calibration: DeckCalibration
+
+
+@dataclass
+class OT3Transforms(RobotCalibration):
+    carriage_offset: Point
+    left_mount_offset: Point
+    right_mount_offset: Point
+    gripper_mount_offset: Point
+
+
+def build_ot3_transforms(config: OT3Config) -> OT3Transforms:
+    return OT3Transforms(
+        deck_calibration=DeckCalibration(
+            attitude=config.deck_transform,
+            source=types.SourceType.default,
+            status=types.CalibrationStatus(),
+        ),
+        carriage_offset=Point(*config.carriage_offset),
+        left_mount_offset=Point(*config.left_mount_offset),
+        right_mount_offset=Point(*config.right_mount_offset),
+        gripper_mount_offset=Point(*config.gripper_mount_offset),
+    )
 
 
 def build_temporary_identity_calibration() -> RobotCalibration:
@@ -132,7 +156,11 @@ def save_attitude_matrix(
     tiprack_hash: str,
 ) -> None:
     attitude = linal.solve_attitude(expected, actual)
-    modify.save_robot_deck_attitude(attitude, pipette_id, tiprack_hash)
+    modify.save_robot_deck_attitude(
+        attitude,
+        cast(types.PipetteId, pipette_id),
+        cast(types.TiprackHash, tiprack_hash),
+    )
 
 
 def load_attitude_matrix() -> DeckCalibration:

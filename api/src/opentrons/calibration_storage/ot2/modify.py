@@ -6,6 +6,7 @@ labware calibration to its designated file location.
 """
 import typing
 import json
+
 from dataclasses import asdict
 
 from opentrons import config
@@ -31,7 +32,7 @@ def create_tip_length_data(
     definition: "LabwareDefinition",
     length: float,
     cal_status: typing.Optional[local_types.CalibrationStatus] = None,
-) -> v1.TipLengthSchema:
+) -> typing.Dict[local_types.TiprackHash, v1.TipLengthSchema]:
     """
     Function to correctly format tip length data.
 
@@ -41,11 +42,15 @@ def create_tip_length_data(
     labware_hash = helpers.hash_labware_def(definition)
     labware_uri = helpers.uri_from_definition(definition)
 
+    if cal_status:
+        cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
+    else:
+        cal_status_model = v1.CalibrationStatus()
     tip_length_data = v1.TipLengthSchema(
         tipLength=length,
         lastModified=utc_now(),
         source=local_types.SourceType.user,
-        status=cal_status or v1.CalibrationStatus(),
+        status=cal_status_model,
         uri=labware_uri,
     )
 
@@ -70,7 +75,8 @@ def _save_custom_tiprack_definition(
 
 
 def save_tip_length_calibration(
-    pip_id: str, tip_length_cal: v1.TipLengthSchema
+    pip_id: local_types.PipetteId,
+    tip_length_cal: typing.Dict[local_types.TiprackHash, v1.TipLengthSchema],
 ) -> None:
     """
     Function used to save tip length calibration to file.
@@ -98,8 +104,8 @@ def save_tip_length_calibration(
 
 def save_robot_deck_attitude(
     transform: local_types.AttitudeMatrix,
-    pip_id: typing.Optional[str],
-    lw_hash: typing.Optional[str],
+    pip_id: typing.Optional[local_types.PipetteId],
+    lw_hash: typing.Optional[local_types.TiprackHash],
     source: typing.Optional[local_types.SourceType] = None,
     cal_status: typing.Optional[local_types.CalibrationStatus] = None,
 ) -> None:
@@ -107,13 +113,18 @@ def save_robot_deck_attitude(
     robot_dir.mkdir(parents=True, exist_ok=True)
     gantry_path = robot_dir / "deck_calibration.json"
 
+    if cal_status:
+        cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
+    else:
+        cal_status_model = v1.CalibrationStatus()
+
     gantry_calibration = v1.DeckCalibrationSchema(
         attitude=transform,
         pipette_calibrated_with=pip_id,
         last_modified=utc_now(),
         tiprack=lw_hash,
         source=source or local_types.SourceType.user,
-        status=cal_status or v1.CalibrationStatus(),
+        status=cal_status_model,
     )
     # convert to schema + validate json conversion
     io.save_to_file(gantry_path, gantry_calibration)
@@ -122,9 +133,9 @@ def save_robot_deck_attitude(
 
 def save_pipette_calibration(
     offset: Point,
-    pip_id: str,
+    pip_id: local_types.PipetteId,
     mount: Mount,
-    tiprack_hash: str,
+    tiprack_hash: local_types.TiprackHash,
     tiprack_uri: str,
     cal_status: typing.Optional[local_types.CalibrationStatus] = None,
 ) -> None:
@@ -133,67 +144,59 @@ def save_pipette_calibration(
 
     offset_path = pip_dir / f"{pip_id}.json"
 
+    if cal_status:
+        cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
+    else:
+        cal_status_model = v1.CalibrationStatus()
+
     pipette_calibration = v1.InstrumentOffsetSchema(
         offset=offset,
         tiprack=tiprack_hash,
         uri=tiprack_uri,
         last_modified=utc_now(),
         source=local_types.SourceType.user,
-        status=cal_status or v1.CalibrationStatus(),
+        status=cal_status_model,
     )
     io.save_to_file(offset_path, pipette_calibration)
     calibration_cache._pipette_offset_calibrations.cache_clear()
 
 
-# @typing.overload
-# def mark_bad(
-#     calibration: v1.DeckCalibration, source_marked_bad: local_types.SourceType
-# ) -> v1.DeckCalibration:
-#     ...
+@typing.overload
+def mark_bad(
+    calibration: v1.DeckCalibrationSchema, source_marked_bad: local_types.SourceType
+) -> v1.DeckCalibrationSchema:
+    ...
 
 
-# @typing.overload
-# def mark_bad(
-#     calibration: v1.PipetteOffsetCalibration,
-#     source_marked_bad: local_types.SourceType,
-# ) -> v1.PipetteOffsetCalibration:
-#     ...
+@typing.overload
+def mark_bad(
+    calibration: v1.PipetteOffsetCalibration,
+    source_marked_bad: local_types.SourceType,
+) -> v1.PipetteOffsetCalibration:
+    ...
 
 
-# @typing.overload
-# def mark_bad(
-#     calibration: v1.TipLengthCalibration,
-#     source_marked_bad: local_types.SourceType,
-# ) -> v1.TipLengthCalibration:
-#     ...
+@typing.overload
+def mark_bad(
+    calibration: v1.TipLengthCalibration,
+    source_marked_bad: local_types.SourceType,
+) -> v1.TipLengthCalibration:
+    ...
 
 
-# def mark_bad(
-#     calibration: typing.Union[
-#         v1.DeckCalibration,
-#         v1.PipetteOffsetCalibration,
-#         v1.TipLengthCalibration,
-#     ],
-#     source_marked_bad: local_types.SourceType,
-# ) -> typing.Union[
-#     v1.DeckCalibration,
-#     v1.PipetteOffsetCalibration,
-#     v1.TipLengthCalibration,
-# ]:
-#     caldict = asdict(calibration)
-#     # remove current status key
-#     del caldict["status"]
-#     status = local_types.CalibrationStatus(
-#         markedBad=True, source=source_marked_bad, markedAt=utc_now()
-#     )
-#     return type(calibration)(**caldict, status=status)
-
-
-def mark_bad(calibration, source_marked_bad):
-    caldict = asdict(calibration)
-    # remove current status key
-    del caldict["status"]
-    status = local_types.CalibrationStatus(
+def mark_bad(
+    calibration: typing.Union[
+        v1.DeckCalibrationSchema,
+        v1.PipetteOffsetCalibration,
+        v1.TipLengthCalibration,
+    ],
+    source_marked_bad: local_types.SourceType,
+) -> typing.Union[
+    v1.DeckCalibrationSchema,
+    v1.PipetteOffsetCalibration,
+    v1.TipLengthCalibration,
+]:
+    calibration.status = v1.CalibrationStatus(
         markedBad=True, source=source_marked_bad, markedAt=utc_now()
     )
-    return type(calibration)(**caldict, status=status)
+    return calibration

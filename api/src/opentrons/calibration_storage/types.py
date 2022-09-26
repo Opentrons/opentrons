@@ -5,12 +5,12 @@ from datetime import datetime
 from enum import Enum
 from os import PathLike
 
-from typing_extensions import Literal
-from opentrons_shared_data.pipette.dev_types import LabwareUri
-
 StrPath = typing.Union[str, PathLike]
 AttitudeMatrix = typing.List[typing.List[float]]
-InstrumentCalOffset = typing.List[float]
+
+TiprackHash = typing.NewType("TiprackHash", str)
+PipetteId = typing.NewType("PipetteId", str)
+GripperId = typing.NewType("GripperId", str)
 
 
 class SourceType(str, Enum):

@@ -7,6 +7,7 @@ from dataclasses import dataclass
 
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
+from opentrons.types import Point
 from opentrons.calibration_storage import types
 
 
@@ -36,9 +37,11 @@ class TipLengthSchema(BaseModel):
         ..., description="The tiprack URI associated with the tip length data."
     )
 
-    @validator("uri")
-    def uri_is_valid(cls, uri: LabwareUri):
-        return uri
+    @validator("tipLength")
+    def ensure_tip_length_positive(cls, tipLength: float) -> float:
+        if tipLength < 0.0:
+            raise ValueError("Tip Length must be a positive number")
+        return tipLength
 
     class Config:
         json_encoders = {datetime: lambda obj: obj.isoformat()}
@@ -50,7 +53,7 @@ class DeckCalibrationSchema(BaseModel):
         ..., description="Attitude matrix found from calibration."
     )
     last_modified: datetime = Field(
-        ..., description="The last time this deck was calibrated."
+        default=None, description="The last time this deck was calibrated."
     )
     source: types.SourceType = Field(
         default=types.SourceType.factory, description="The source of calibration."
@@ -66,16 +69,13 @@ class DeckCalibrationSchema(BaseModel):
         description="The status of the calibration data.",
     )
 
-
     class Config:
         json_encoders = {datetime: lambda obj: obj.isoformat()}
         json_decoders = {datetime: lambda obj: datetime.fromisoformat(obj)}
 
 
 class InstrumentOffsetSchema(BaseModel):
-    offset: types.InstrumentCalOffset = Field(
-        ..., description="Instrument offset found from calibration."
-    )
+    offset: Point = Field(..., description="Instrument offset found from calibration.")
     tiprack: str = Field(..., description="Tiprack used to calibrate this offset")
     uri: str = Field(
         ..., description="The URI of the labware used for instrument offset"
@@ -104,9 +104,7 @@ class PipetteOffsetCalibration(BaseModel):
     mount: str = Field(
         ..., description="The mount that this pipette was calibrated with."
     )
-    offset: types.InstrumentCalOffset = Field(
-        ..., description="Instrument offset found from calibration."
-    )
+    offset: Point = Field(..., description="Instrument offset found from calibration.")
     tiprack: str = Field(..., description="Tiprack used to calibrate this offset")
     uri: str = Field(
         ..., description="The URI of the labware used for instrument offset"
@@ -131,6 +129,10 @@ class PipetteOffsetCalibration(BaseModel):
 # so that we only need to use one data model schema. This model is a
 # temporary workaround to match with current behavior.
 class TipLengthCalibration(BaseModel):
+    pipette: str = Field(..., description="Pipette id associated with calibration.")
+    tiprack: str = Field(
+        ..., description="The tiprack hash associated with this tip length data."
+    )
     tipLength: float = Field(..., description="Tip length data found from calibration.")
     lastModified: datetime = Field(
         ..., description="The last time this tip length was calibrated."
@@ -146,9 +148,11 @@ class TipLengthCalibration(BaseModel):
         ..., description="The tiprack URI associated with the tip length data."
     )
 
-    @validator("uri")
-    def uri_is_valid(cls, uri: LabwareUri):
-        return uri
+    @validator("tipLength")
+    def ensure_tip_length_positive(cls, tipLength: float) -> float:
+        if tipLength < 0.0:
+            raise ValueError("Tip Length must be a positive number")
+        return tipLength
 
     class Config:
         json_encoders = {datetime: lambda obj: obj.isoformat()}

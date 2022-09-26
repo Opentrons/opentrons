@@ -53,7 +53,7 @@ def read_cal_file(
 
 def save_to_file(
     filepath: StrPath,
-    data: typing.Union[BaseModel, typing.Dict],
+    data: typing.Union[BaseModel, typing.Dict[str, typing.Any], typing.Any],
     encoder: EncoderType = DateTimeEncoder,
 ) -> None:
     """

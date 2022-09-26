@@ -8,6 +8,7 @@ from pathlib import Path
 import os
 
 from .. import file_operators as io
+from ..types import PipetteId, TiprackHash, GripperId
 
 from opentrons import config
 from opentrons.types import Mount
@@ -33,7 +34,7 @@ def _remove_json_files_in_directories(p: Path) -> None:
             _delete_file(item)
 
 
-def delete_tip_length_calibration(tiprack: str, pipette_id: str) -> None:
+def delete_tip_length_calibration(tiprack: TiprackHash, pipette_id: PipetteId) -> None:
     """
     Delete tip length calibration based on tiprack hash and
     pipette serial number
@@ -65,7 +66,7 @@ def clear_tip_length_calibration() -> None:
     calibration_cache._tip_length_calibrations.cache_clear()
 
 
-def delete_pipette_offset_file(pipette: str, mount: Mount) -> None:
+def delete_pipette_offset_file(pipette: PipetteId, mount: Mount) -> None:
     """
     Delete pipette offset file based on mount and pipette serial number
 
@@ -92,7 +93,7 @@ def delete_robot_deck_attitude() -> None:
     """
     Delete the robot deck attitude calibration.
     """
-    #TODO(lc 09-19-2022) finalize with hardware about whether this can truly be deleted.
+    # TODO(lc 09-19-2022) finalize with hardware about whether this can truly be deleted.
     robot_dir = config.get_opentrons_path("robot_calibration_dir")
     gantry_path = robot_dir / "deck_calibration.json"
 
@@ -100,7 +101,7 @@ def delete_robot_deck_attitude() -> None:
     calibration_cache._deck_calibration.cache_clear()
 
 
-def delete_gripper_calibration_file(gripper: str) -> None:
+def delete_gripper_calibration_file(gripper: GripperId) -> None:
     """
     Delete gripper calibration offset file based on gripper serial number
 

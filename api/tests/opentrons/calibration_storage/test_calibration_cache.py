@@ -5,19 +5,21 @@ import importlib
 
 from typing import Generator, no_type_check, Any, Tuple
 from types import ModuleType
-from opentrons.types import MountType
+from opentrons.types import MountType, Point
 from opentrons import config
 from opentrons.util.helpers import utc_now
 
 
 @no_type_check
 @pytest.fixture
-def _cache(request: pytest.FixtureRequest) -> Generator[Tuple[ModuleType, str], None, None]:
+def _cache(
+    request: pytest.FixtureRequest,
+) -> Generator[Tuple[ModuleType, str], None, None]:
     """
     Cache module fixture.
 
     Returns the correct module based on requested robot type and the requested
-	robot type.
+        robot type.
     """
     robot_type = request.param
     if robot_type == "ot3":
@@ -79,11 +81,11 @@ def test_cache_pipette_offsets(
     pip_dir = config.get_opentrons_path("pipette_calibration_dir")
     if robot_type == "ot3":
         pipette_data = schema.v1.InstrumentOffsetSchema(
-            offset=[1, 1, 1], lastModified=utc_now()
+            offset=Point(1, 1, 1), lastModified=utc_now()
         )
     else:
         pipette_data = schema.v1.InstrumentOffsetSchema(
-            offset=[1, 1, 1],
+            offset=Point(1, 1, 1),
             tiprack="hash",
             uri="urioflabware",
             last_modified=utc_now(),
@@ -164,7 +166,7 @@ def test_cache_deck_calibration(
     busting the cache works as expected.
     """
     cache, robot_type = _cache
-    assert cache._deck_calibration() == {}
+    assert cache._deck_calibration() == None
     if robot_type == "ot3":
         deck_cal = schema.v1.DeckCalibrationSchema(
             attitude=[[1, 0, 0], [0, 1, 0], [0, 0, 1]], lastModified=utc_now()
@@ -199,7 +201,7 @@ def test_cache_gripper_offsets(ot_config_tempdir: Any) -> None:
     gripper_dir = config.get_opentrons_path("gripper_calibration_dir")
 
     gripper_data = schema.v1.InstrumentOffsetSchema(
-        offset=[1, 1, 1], lastModified=utc_now()
+        offset=Point(1, 1, 1), lastModified=utc_now()
     )
 
     os.makedirs(gripper_dir, exist_ok=True)
