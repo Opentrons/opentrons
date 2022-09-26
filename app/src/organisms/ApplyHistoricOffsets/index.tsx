@@ -59,16 +59,19 @@ export function ApplyHistoricOffsets(
       {showOffsetDataModal ? (
         <Portal level="top">
           <ModalShell
-            width="40rem"
+            maxWidth="40rem"
             header={
               <ModalHeader
                 title={t('stored_offset_data')}
                 onClose={() => setShowOffsetDataModal(false)}
               />
-            }>
+            }
+          >
             <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing6}>
               <StyledText as="p">
-                {offsetCandidates.length > 0 ? t('robot_has_offsets_from_previous_runs') : t('robot_has_no_offsets_from_previous_runs')}
+                {offsetCandidates.length > 0
+                  ? t('robot_has_offsets_from_previous_runs')
+                  : t('robot_has_no_offsets_from_previous_runs')}
               </StyledText>
               <Link css={TYPOGRAPHY.linkPSemiBold} marginTop={SPACING.spacing3}>
                 {t('see_how_offsets_work')}

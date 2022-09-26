@@ -22,11 +22,17 @@ export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
 
 export const getLabwareDefURI = (def: LabwareDefinition2): string =>
-  constructLabwareDefURI(def.namespace, def.parameters.loadName, String(def.version))
+  constructLabwareDefURI(
+    def.namespace,
+    def.parameters.loadName,
+    String(def.version)
+  )
 
-export const constructLabwareDefURI = (namespace: string, loadName: string, version: string): string =>
-  `${namespace}/${loadName}/${version}`
-
+export const constructLabwareDefURI = (
+  namespace: string,
+  loadName: string,
+  version: string
+): string => `${namespace}/${loadName}/${version}`
 
 // Load names of "retired" labware
 // TODO(mc, 2019-12-3): how should this correspond to LABWAREV2_DO_NOT_LIST?

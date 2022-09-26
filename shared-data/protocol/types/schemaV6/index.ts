@@ -1,9 +1,10 @@
-import { 
+import {
   LoadedPipette,
   LoadedLabware,
   LoadedModule,
   Liquid,
-  PipetteName } from '../../../js'
+  PipetteName,
+} from '../../../js'
 import type { CreateCommand, RunTimeCommand } from './command'
 import type { LabwareDefinition2, ModuleModel } from '../../../js/types'
 
@@ -88,17 +89,10 @@ export interface ProtocolAnalysisOutput {
   metadata: { [key: string]: any }
   commands: RunTimeCommand[]
   labware: LoadedLabware[]
-  pipette: LoadedPipette[]
+  pipettes: LoadedPipette[]
   modules: LoadedModule[]
   liquids: Liquid[]
   errors: AnalysisError[]
-}
-
-interface LabwareEntity {
-  id: string
-  loadName: string
-  definitionUri: string
-  location?: string
 }
 
 interface AnalysisSourceFile {

@@ -9,7 +9,6 @@ import {
   TYPOGRAPHY,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
-  BORDERS,
   SIZE_1,
 } from '@opentrons/components'
 

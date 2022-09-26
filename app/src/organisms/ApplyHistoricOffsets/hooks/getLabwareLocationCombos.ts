@@ -1,6 +1,9 @@
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { ProtocolAnalysisOutput, LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  ProtocolAnalysisOutput,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 interface LabwareLocationCombo {
   location: LabwareLocation
@@ -9,7 +12,7 @@ interface LabwareLocationCombo {
 
 export function getLabwareLocationCombos(
   commands: RunTimeCommand[],
-  labware: ProtocolAnalysisOutput['labware'],
+  labware: ProtocolAnalysisOutput['labware']
 ): LabwareLocationCombo[] {
   return commands.reduce<LabwareLocationCombo[]>((acc, command) => {
     if (command.commandType === 'loadLabware') {
@@ -18,10 +21,18 @@ export function getLabwareLocationCombos(
     } else if (command.commandType === 'moveLabware') {
       const labwareEntity = labware.find(l => l.id === command.params.labwareId)
       if (labwareEntity == null) {
-        console.warn('moveLabware command specified a labwareId that could not be found in the labware entities')
+        console.warn(
+          'moveLabware command specified a labwareId that could not be found in the labware entities'
+        )
         return acc
       }
-      return [...acc, { location: command.params.newLocation, definitionUri: labwareEntity.definitionUri }]
+      return [
+        ...acc,
+        {
+          location: command.params.newLocation,
+          definitionUri: labwareEntity.definitionUri,
+        },
+      ]
     } else {
       return acc
     }

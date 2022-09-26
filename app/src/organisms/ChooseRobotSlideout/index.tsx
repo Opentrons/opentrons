@@ -41,7 +41,7 @@ import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { AvailableRobotOption } from './AvailableRobotOption'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
-import { useOffsetCandidatesForAnalysis } from '../ReapplyOffsetsModal/hooks/useOffsetCandidatesForAnalysis'
+import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 
 import type { StyleProps } from '@opentrons/components'
 import type { State, Dispatch } from '../../redux/types'
@@ -115,7 +115,13 @@ export function ChooseRobotSlideout(
       },
     },
     selectedRobot != null ? { hostname: selectedRobot.ip } : null,
-    shouldApplyOffsets ? offsetCandidates.map(({vector, location, definitionUri}) => ({vector, location, definitionUri})) : []
+    shouldApplyOffsets
+      ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
+          vector,
+          location,
+          definitionUri,
+        }))
+      : []
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })

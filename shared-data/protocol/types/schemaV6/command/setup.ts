@@ -99,7 +99,7 @@ interface MoveLabwareParams {
   newLocation: LabwareLocation
 }
 interface MoveLabwareResult {
-  offsetId: string 
+  offsetId: string
 }
 interface LoadModuleParams {
   moduleId: string
@@ -116,4 +116,3 @@ interface LoadLiquidParams {
 interface LoadLiquidResult {
   liquidId: string
 }
-

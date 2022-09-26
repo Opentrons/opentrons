@@ -406,11 +406,11 @@ export interface LoadedLabware {
   offsetId?: string
   displayName?: string
 }
-export interface LoadedModule{
+export interface LoadedModule {
   id: string
-  model: string 
+  model: string
   location: {
-    slotName: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+    slotName: string
   }
   serialNumber: string
 }
