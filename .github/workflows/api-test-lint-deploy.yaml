@@ -59,7 +59,7 @@ jobs:
         run: make -C api black-check
       - name: flake8
         if: always() && steps.setup.outcome == 'success'
-        run: make -C api Flake8
+        run: make -C api flake8
       - name: mypy-ot2
         if: always() && steps.setup.outcome == 'success'
         run: make -C api mypy-ot2
