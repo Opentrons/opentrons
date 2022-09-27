@@ -1,6 +1,5 @@
 """Tests for the usb_config module."""
 
-from email.policy import default
 import pytest
 import mock
 from pathlib import Path
@@ -8,11 +7,14 @@ import os
 
 from ot3usb.src import usb_config, default_config
 
+# Fake UDC handle to use in tests
+UDC_HANDLE_NAME = "usb123"
+
 
 @pytest.fixture
 def os_driver() -> mock.Mock:
     driver = mock.Mock(spec=usb_config.OSDriver)
-    driver.system.return_value = 0
+    driver.listdir.return_value = [UDC_HANDLE_NAME]
     driver.exists.return_value = True
     return driver
 
@@ -33,7 +35,6 @@ def test_serial_gadget_failure(
     os_driver: mock.Mock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    os_driver.system.return_value = -1
 
     # Mock out the _write_file function
     monkeypatch.setattr(subject, "_write_file", write_file_mock)
@@ -80,6 +81,7 @@ config_files = [
     ["strings/0x409/product", default_config.DEFAULT_PRODUCT],
     ["configs/c.1/strings/0x409/configuration", default_config.DEFAULT_CONFIGURATION],
     ["configs/c.1/MaxPower", str(default_config.DEFAULT_MAX_POWER)],
+    ["UDC", UDC_HANDLE_NAME],
 ]
 
 # List of directories that the gadget should generate

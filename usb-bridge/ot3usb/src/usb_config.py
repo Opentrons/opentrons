@@ -21,6 +21,7 @@ import logging
 import os
 import time
 import serial  # type: ignore[import]
+import typing
 
 LOG = logging.getLogger(__name__)
 
@@ -42,6 +43,9 @@ CONFIG_STRINGS_SUBFOLDER = CONFIG_SUBFOLDER + STRINGS_SUBFOLDER
 # Default subfolder to make an ACM serial port
 FUNCTION_SUBFOLDER = "functions/acm.usb0"
 
+# Folder holding all of the UDC handles (as filenames)
+UDC_HANDLE_FOLDER = "/sys/class/udc/"
+
 
 class OSDriver:
     """Class to abstract OS functions."""
@@ -52,9 +56,9 @@ class OSDriver:
         os.makedirs(name, exist_ok=exist_ok)
 
     @staticmethod
-    def system(command: str) -> int:
-        """Abstraction of os.system function."""
-        return os.system(command)
+    def listdir(path: str) -> typing.List[str]:
+        """Abstraction of os.listdir function."""
+        return os.listdir(path)
 
     @staticmethod
     def symlink(source: str, dest: str) -> None:
@@ -74,6 +78,8 @@ class OSDriver:
 
 @dataclass
 class SerialGadgetConfig:
+    """Dataclass to hold configuration options for a SerialGadget."""
+
     name: str
     vid: str
     pid: str
@@ -157,8 +163,6 @@ class SerialGadget:
         # Make and link function (ACM for serial transport)
         functionFolder = os.path.join(self._basename, FUNCTION_SUBFOLDER)
         self._driver.makedirs(functionFolder, exist_ok=True)
-        # Give some time for the function to be configured
-        self._driver.sleep(1)
         try:
             self._driver.symlink(
                 source=functionFolder,
@@ -167,11 +171,13 @@ class SerialGadget:
         except FileExistsError:
             LOG.info("symlink already exists")
         # Last step is to set up the UDC. This assumes there's only ONE UDC
-        self._driver.sleep(1)
         udc_path = os.path.join(self._basename, "UDC")
-        if self._driver.system(f"ls /sys/class/udc > {udc_path}") != os.EX_OK:
-            if not self._driver.exists(udc_path):
-                raise Exception("Failed to enumerate UDC")
+        udc_handles = self._driver.listdir(UDC_HANDLE_FOLDER)
+        if len(udc_handles) == 0:
+            raise Exception("Failed to find UDC handle. Check kernel configuration.")
+        self._write_file(udc_handles[0], udc_path)
+        if not self._driver.exists(udc_path):
+            raise Exception("Failed to enumerate UDC")
 
     def handle_exists(self) -> bool:
         """Check if the handle for this gadget exists."""
