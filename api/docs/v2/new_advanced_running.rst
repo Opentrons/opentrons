@@ -12,7 +12,7 @@ The OT-2 runs a Jupyter Notebook server that you can connect to with your web br
 
 You can access the OT-2’s Jupyter Notebook by following these steps:
 
-1. Open your Opentrons App and look for the IP address of your OT-2 on the information page.
+1. Open the Opentrons App and look for the IP address of your OT-2 on the information page.
 2. Type in ``(Your OT-2's IP Address):48888`` into any browser on your computer.
 
 Here, you can select a notebook and develop protocols that will be saved on the OT-2 itself. These protocols will only be on the OT-2 unless specifically downloaded to your computer using the ``File / Download As`` buttons in the notebook.
@@ -46,7 +46,7 @@ if you were prototyping a plotting or pandas script for later use.
     ``MustHomeError``.
 
 
-Running A Previously-Written Protocol
+Running A Previously Written Protocol
 +++++++++++++++++++++++++++++++++++++
 
 If you have a protocol that you have already written you can run it directly in Jupyter. Copy the protocol into a cell and execute it - this won't cause the OT-2 to move, it just makes the function available. Then, call the ``run`` function you just defined, and give it a :py:class:`.ProtocolContext`:
@@ -57,7 +57,7 @@ If you have a protocol that you have already written you can run it directly in 
     import opentrons.execute
     from opentrons import protocol_api
     def run(protocol: protocol_api.ProtocolContext):
-        # the contents of your protocol are here...
+        # the contents of your previously written protocol go here
 
     protocol = opentrons.execute.get_protocol_api('|apiLevel|')
     run(protocol)  # your protocol will now run
@@ -66,7 +66,18 @@ If you have a protocol that you have already written you can run it directly in 
 Custom Labware
 ++++++++++++++
 
-If you have custom labware definitions you want to use with Jupyter, make a new directory called "labware" in Jupyter and put the definitions there. These definitions will be available when you call ``load_labware``.
+If you have custom labware definitions you want to use with Jupyter, make a new directory called ``labware`` in Jupyter and put the definitions there. These definitions will be available when you call ``load_labware``.
+
+Using Modules
++++++++++++++
+
+If your protocol uses :ref:`new_modules`, you need to take additional steps to make sure that Jupyter Notebook doesn't send commands that conflict with the robot server. If you send commands to modules while the robot server is running, you will likely see errors in Jupyter Notebook and the module commands may not execute as expected.
+
+To disable the robot server, `connect to your robot via SSH <https://support.opentrons.com/s/article/Connecting-to-your-OT-2-with-SSH>`_ and run ``systemctl stop opentrons-robot-server``. Then you can run code from cells in your notebook as normal. When you are done using Jupyter Notebook, you should restart the robot server with ``systemctl start opentrons-robot-server``.
+
+.. note::
+
+    While the robot server is stopped, the robot will display as unavailable in the Opentrons App. If you need to control the robot or its attached modules through the app, you need to restart the robot server and wait for the robot to appear as available in the app.
 
 
 Command Line
