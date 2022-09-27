@@ -3,6 +3,7 @@
 import pytest
 import mock
 from pathlib import Path
+import os
 
 from ot3usb.src import usb_config
 
@@ -42,10 +43,19 @@ def subject(os_driver: mock.Mock) -> usb_config.SerialGadget:
     )
 
 
+def write_file_mock(contents: str, filename: str) -> bool:
+    return True
+
+
 def test_serial_gadget_failure(
-    subject: usb_config.SerialGadget, os_driver: mock.Mock
+    subject: usb_config.SerialGadget,
+    os_driver: mock.Mock,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     os_driver.system.return_value = -1
+
+    # Mock out the _write_file function
+    monkeypatch.setattr(subject, "_write_file", write_file_mock)
 
     # If the UDC seems to exist, shouldn't get an error
     subject.configure_and_activate()
@@ -57,9 +67,14 @@ def test_serial_gadget_failure(
 
 
 def test_serial_gadget_symlink_failure(
-    subject: usb_config.SerialGadget, os_driver: mock.Mock
+    subject: usb_config.SerialGadget,
+    os_driver: mock.Mock,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Symlink errors should only bubble up if the symlink doesn't exist"""
+
+    # Mock out the _write_file function
+    monkeypatch.setattr(subject, "_write_file", write_file_mock)
 
     # Do NOT raise an error with the correct exception
     os_driver.symlink.side_effect = FileExistsError("file exists")
@@ -75,44 +90,52 @@ BASE_DIR = usb_config.GADGET_BASE_PATH + "/" + DEFAULT_NAME + "/"
 
 # List of files that the usb gadget should write
 config_files = [
-    [BASE_DIR + "idVendor", DEFAULT_VID],
-    [BASE_DIR + "idProduct", DEFAULT_PID],
-    [BASE_DIR + "bcdDevice", DEFAULT_BCDEVICE],
-    [BASE_DIR + "bcdUSB", "0x0200"],
-    [BASE_DIR + "strings/0x409/serialnumber", DEFAULT_SERIAL],
-    [BASE_DIR + "strings/0x409/manufacturer", DEFAULT_MANUFACTURER],
-    [BASE_DIR + "strings/0x409/product", DEFAULT_PRODUCT],
-    [BASE_DIR + "configs/c.1/strings/0x409/configuration", DEFAULT_CONFIGURATION],
-    [BASE_DIR + "configs/c.1/MaxPower", DEFAULT_MAX_POWER],
+    ["idVendor", DEFAULT_VID],
+    ["idProduct", DEFAULT_PID],
+    ["bcdDevice", DEFAULT_BCDEVICE],
+    ["bcdUSB", "0x0200"],
+    ["strings/0x409/serialnumber", DEFAULT_SERIAL],
+    ["strings/0x409/manufacturer", DEFAULT_MANUFACTURER],
+    ["strings/0x409/product", DEFAULT_PRODUCT],
+    ["configs/c.1/strings/0x409/configuration", DEFAULT_CONFIGURATION],
+    ["configs/c.1/MaxPower", str(DEFAULT_MAX_POWER)],
 ]
 
 # List of directories that the gadget should generate
 config_dirs = [
-    BASE_DIR,
-    BASE_DIR + "strings/0x409",
-    BASE_DIR + "configs/c.1/",
-    BASE_DIR + "configs/c.1/strings/0x409",
-    BASE_DIR + "functions/acm.usb0",
+    "",
+    "strings/0x409",
+    "configs/c.1/",
+    "configs/c.1/strings/0x409",
+    "functions/acm.usb0",
 ]
 
 
 def test_serial_gadget_success(
-    subject: usb_config.SerialGadget, os_driver: mock.Mock
+    subject: usb_config.SerialGadget, os_driver: mock.Mock, tmpdir: Path
 ) -> None:
+    # Use the real `os.makedirs` method
+    os_driver.makedirs = usb_config.OSDriver.makedirs
+    # Not ideal to modify the subject, but we want to write the filetree
+    # in the temp directory
+    subject._basename = str(tmpdir)
+
     subject.configure_and_activate()
 
     # Check that all files are written
-    for file in config_files:
-        command = f"echo {file[1]} > {file[0]}"  # type: ignore[index]
-        os_driver.system.assert_any_call(command)
+    for f in config_files:
+        fullpath = os.path.join(tmpdir, f[0])
+        with open(fullpath, mode="r") as written:
+            assert written.read() == f[1]
 
     # Check that appropriate directories were built
     for folder in config_dirs:
-        os_driver.makedirs.assert_any_call(folder, exist_ok=True)
+        assert os.path.exists(os.path.join(tmpdir, folder))
 
     # Check that a symlink was set up
     os_driver.symlink.assert_called_with(
-        source=BASE_DIR + "functions/acm.usb0", dest=BASE_DIR + "configs/c.1/acm.usb0"
+        source=os.path.join(tmpdir, "functions/acm.usb0"),
+        dest=os.path.join(tmpdir, "configs/c.1/acm.usb0"),
     )
 
 

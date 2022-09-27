@@ -1,4 +1,20 @@
-"""Support for configuring USB through Linux ConfigFS."""
+"""Support for configuring USB through Linux ConfigFS.
+
+Linux provides the ConfigFS interface to enable USB gadget configuration
+using a configuration file tree. There are a few pieces of documentation
+provided by kernel.org:
+
+- https://www.kernel.org/doc/html/v5.9/usb/gadget_configfs.html
+- https://www.kernel.org/doc/html/v5.9/usb/gadget_serial.html
+- https://www.kernel.org/doc/Documentation/ABI/testing/configfs-usb-gadget
+
+This code requires that the Kernel is configured to support UDC hardware,
+and a few kernel modules must be running before this program:
+
+- dwc3 (or another USB module)
+- libcomposite (to provide the configuration filesystem)
+- g_serial (to provide /dev/ttyGS0 after configuration)
+"""
 
 import logging
 import os
@@ -12,6 +28,18 @@ GADGET_BASE_PATH = "/sys/kernel/config/usb_gadget"
 
 # Hex code for english
 ENGLISH_LANG_CODE = "0x409"
+
+# Default subfolder for english language strings
+STRINGS_SUBFOLDER = "strings/" + ENGLISH_LANG_CODE + "/"
+
+# Default subfolder name for the gadget config files
+CONFIG_SUBFOLDER = "configs/c.1/"
+
+# Default subfolder for configuration english language strings
+CONFIG_STRINGS_SUBFOLDER = CONFIG_SUBFOLDER + STRINGS_SUBFOLDER
+
+# Default subfolder to make an ACM serial port
+FUNCTION_SUBFOLDER = "functions/acm.usb0"
 
 
 class OSDriver:
@@ -110,9 +138,9 @@ class SerialGadget:
             `/sys/kernel/config/usb_gadget/<name>/abcd.txt`, pass
             in `abcd.txt`
         """
-        command = f"echo {contents} > {self._basename}{filename}"
-
-        return self._driver.system(command) == os.EX_OK
+        with open(os.path.join(self._basename, filename), mode="w") as f:
+            written = f.write(contents)
+        return written == len(contents)
 
     def configure_and_activate(self) -> None:
         """Configure this gadget. Throws exceptions on errors."""
@@ -126,38 +154,44 @@ class SerialGadget:
         # USB version always 2.0.0
         self._write_file("0x0200", "bcdUSB")
 
-        strings_folder = "strings/" + ENGLISH_LANG_CODE
-
         # Create english language folder
 
-        self._driver.makedirs(self._basename + strings_folder, exist_ok=True)
-        self._write_file(self._serial, strings_folder + "/serialnumber")
-        self._write_file(self._manufacturer, strings_folder + "/manufacturer")
-        self._write_file(self._product, strings_folder + "/product")
+        self._driver.makedirs(
+            os.path.join(self._basename, STRINGS_SUBFOLDER), exist_ok=True
+        )
+        self._write_file(self._serial, STRINGS_SUBFOLDER + "/serialnumber")
+        self._write_file(self._manufacturer, STRINGS_SUBFOLDER + "/manufacturer")
+        self._write_file(self._product, STRINGS_SUBFOLDER + "/product")
         # Write out the single config for this gadget
-        configFolder = "configs/c.1/"
-        self._driver.makedirs(self._basename + configFolder, exist_ok=True)
-        self._write_file(str(self._max_power), configFolder + "MaxPower")
+        self._driver.makedirs(
+            os.path.join(self._basename, CONFIG_SUBFOLDER), exist_ok=True
+        )
+        self._write_file(str(self._max_power), CONFIG_SUBFOLDER + "MaxPower")
 
         # Write out english config string
-        configStringsFolder = configFolder + "strings/" + ENGLISH_LANG_CODE
-        self._driver.makedirs(self._basename + configStringsFolder, exist_ok=True)
-        self._write_file(self._configuration, configStringsFolder + "/configuration")
+        self._driver.makedirs(
+            os.path.join(self._basename, CONFIG_STRINGS_SUBFOLDER), exist_ok=True
+        )
+        self._write_file(
+            self._configuration, CONFIG_STRINGS_SUBFOLDER + "/configuration"
+        )
         # Make and link function (ACM for serial transport)
-        functionFolder = self._basename + "functions/acm.usb0"
+        functionFolder = os.path.join(self._basename, FUNCTION_SUBFOLDER)
         self._driver.makedirs(functionFolder, exist_ok=True)
         # Give some time for the function to be configured
         self._driver.sleep(1)
         try:
             self._driver.symlink(
-                source=functionFolder, dest=self._basename + "configs/c.1/acm.usb0"
+                source=functionFolder,
+                dest=os.path.join(self._basename, "configs/c.1/acm.usb0"),
             )
         except FileExistsError:
             LOG.info("symlink already exists")
         # Last step is to set up the UDC. This assumes there's only ONE UDC
         self._driver.sleep(1)
-        if self._driver.system(f"ls /sys/class/udc > {self._basename}UDC") != os.EX_OK:
-            if not self._driver.exists(self._basename + "/UDC"):
+        udc_path = os.path.join(self._basename, "UDC")
+        if self._driver.system(f"ls /sys/class/udc > {udc_path}") != os.EX_OK:
+            if not self._driver.exists(udc_path):
                 raise Exception("Failed to enumerate UDC")
 
     def handle_exists(self) -> bool:
