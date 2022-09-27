@@ -334,3 +334,41 @@ def create_blow_out_command(
         params=params,
         result=result,
     )
+
+
+def create_move_labware_command(
+    new_location: LabwareLocation,
+    labware_id: str = "labware-id",
+    offset_id: Optional[str] = None,
+) -> cmd.MoveLabware:
+    """Get a completed MoveLabware command."""
+    params = cmd.MoveLabwareParams(
+        labwareId=labware_id,
+        newLocation=new_location,
+    )
+    result = cmd.MoveLabwareResult(offsetId=offset_id)
+
+    return cmd.MoveLabware(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime(year=2022, month=1, day=1),
+        params=params,
+        result=result,
+    )
+
+
+def create_move_labware_offdeck_command(
+    labware_id: str = "labware-id",
+) -> cmd.MoveLabwareOffDeck:
+    """Get a completed MoveLabwareOffDeck command."""
+    params = cmd.MoveLabwareOffDeckParams(labwareId=labware_id)
+    result = cmd.MoveLabwareOffDeckResult()
+    return cmd.MoveLabwareOffDeck(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime(year=2022, month=1, day=1),
+        params=params,
+        result=result,
+    )
