@@ -60,10 +60,10 @@ import { HeaterShakerSlideout } from './HeaterShakerSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 
-import magneticModule from '../../assets/images/magnetic_module_gen_2_transparent.svg'
-import temperatureModule from '../../assets/images/temp_deck_gen_2_transparent.svg'
-import thermoModule from '../../assets/images/thermocycler_closed.svg'
-import heaterShakerModule from '../../assets/images/heatershaker_module_transparent.svg'
+import magneticModule from '../../assets/images/magnetic_module_gen_2_transparent.png'
+import temperatureModule from '../../assets/images/temp_deck_gen_2_transparent.png'
+import thermoModule from '../../assets/images/thermocycler_closed.png'
+import heaterShakerModule from '../../assets/images/heater_shaker_module_transparent.png'
 
 import type {
   AttachedModule,

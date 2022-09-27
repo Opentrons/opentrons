@@ -17,9 +17,9 @@ import {
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import { StyledText } from '../../../atoms/text'
-import attachHeaterShakerModule from '../../../assets/images/heater_shaker_module_diagram.svg'
+import attachHeaterShakerModule from '../../../assets/images/heater_shaker_module_diagram.png'
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import screwdriverOrientedLeft from '../../../assets/images/screwdriver_oriented_left.svg'
+import screwdriverOrientedLeft from '../../../assets/images/screwdriver_oriented_left.png'
 import { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 interface AttachModuleProps {
   moduleFromProtocol?: ProtocolModuleInfo
