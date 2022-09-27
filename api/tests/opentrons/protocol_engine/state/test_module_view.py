@@ -525,7 +525,7 @@ def test_calculate_magnet_height(module_model: ModuleModel) -> None:
         (DeckSlotName.SLOT_2, DeckSlotName.SLOT_4, False),
     ],
 )
-def test_thermocycler_dodging(
+def test_thermocycler_dodging_by_slots(
     thermocycler_v1_def: ModuleDefinition,
     from_slot: DeckSlotName,
     to_slot: DeckSlotName,
@@ -548,6 +548,40 @@ def test_thermocycler_dodging(
 
     assert (
         subject.should_dodge_thermocycler(from_slot=from_slot, to_slot=to_slot)
+        is should_dodge
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["module_definition", "should_dodge"],
+    argvalues=[
+        (lazy_fixture("tempdeck_v1_def"), False),
+        (lazy_fixture("tempdeck_v2_def"), False),
+        (lazy_fixture("magdeck_v1_def"), False),
+        (lazy_fixture("magdeck_v2_def"), False),
+        (lazy_fixture("thermocycler_v1_def"), True),
+        (lazy_fixture("thermocycler_v2_def"), True),
+        (lazy_fixture("heater_shaker_v1_def"), False),
+    ],
+)
+def test_thermocycler_dodging_by_modules(
+    module_definition: ModuleDefinition,
+    should_dodge: bool,
+) -> None:
+    """It should specify if thermocycler dodging is needed if there is a thermocycler module."""
+    subject = make_module_view(
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        hardware_by_module_id={
+            "module-id": HardwareModule(
+                serial_number="serial-number",
+                definition=module_definition,
+            )
+        },
+    )
+    assert (
+        subject.should_dodge_thermocycler(
+            from_slot=DeckSlotName.SLOT_8, to_slot=DeckSlotName.SLOT_1
+        )
         is should_dodge
     )
 
