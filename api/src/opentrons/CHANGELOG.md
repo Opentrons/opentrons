@@ -3,104 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [6.1.0-beta.1](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.6...v6.1.0-beta.1) (2022-09-26)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [6.1.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.5...v6.1.0-alpha.6) (2022-09-21)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [6.1.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.4...v6.1.0-alpha.5) (2022-09-19)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [6.1.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v6.1.0-beta.0...v6.1.0-alpha.4) (2022-09-13)
-
-
-### Bug Fixes
-
-* **api:** ensure pipette cannot move down from origin to travel height ([#11426](https://github.com/Opentrons/opentrons/issues/11426)) ([c0905f6](https://github.com/Opentrons/opentrons/commit/c0905f6b932a91b1779b826a0a7c5c0dedfa6584))
-* **heater-shaker:** fix async error handling ([#11400](https://github.com/Opentrons/opentrons/issues/11400)) ([c67e8e3](https://github.com/Opentrons/opentrons/commit/c67e8e39a5e4cee24d2a86c808280430dcfaa12b))
-* **heater-shaker:** updated dfu locking mechanism ([#11395](https://github.com/Opentrons/opentrons/issues/11395)) ([86f674f](https://github.com/Opentrons/opentrons/commit/86f674fbb085e9ce6d3e354123144778a907f918))
-
-
-### Features
-
-* **api:** reduce target speed delta from 100rpm to 40rpm ([#11413](https://github.com/Opentrons/opentrons/issues/11413)) ([d1f9619](https://github.com/Opentrons/opentrons/commit/d1f961998686e2ff1a2ab6be1065635dbc52034c))
-
-
-
-
-
-# [6.1.0-beta.0](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.3...v6.1.0-beta.0) (2022-08-29)
-
-**Note:** Version bump only for package opentrons
-
-
-# [6.1.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.2...v6.1.0-alpha.3) (2022-08-19)
+# [6.1.0](https://github.com/Opentrons/opentrons/compare/v6.0.1...v6.1.0) (2022-09-27)
 
 
 ### Bug Fixes
 
 * **api:** allow aspirate/dispense at arbitrary locations ([#11352](https://github.com/Opentrons/opentrons/issues/11352)) ([d9107d2](https://github.com/Opentrons/opentrons/commit/d9107d25cb366f49454a6e35a90205ab354d8acf)), closes [#11302](https://github.com/Opentrons/opentrons/issues/11302)
-* **api:** make hs wait until idle on deactivate shake ([#11342](https://github.com/Opentrons/opentrons/issues/11342)) ([a78b6fb](https://github.com/Opentrons/opentrons/commit/a78b6fbdf607549a0313fccaae18681646f11207))
-* **papi-v2:** do not raise h/s movement flagger for point-only destinations ([#11335](https://github.com/Opentrons/opentrons/issues/11335)) ([aeb8c46](https://github.com/Opentrons/opentrons/commit/aeb8c46c33903aaab31ab129a84cf69ec51067cc))
-
-
-### Features
-
-* **papi-v2:** home both pipettes at once before specific h/s actions ([#11330](https://github.com/Opentrons/opentrons/issues/11330)) ([3c12e94](https://github.com/Opentrons/opentrons/commit/3c12e94ee0d6d17ecc66127651fb6d7d6ea8816d))
-
-
-
-
-
-# [6.1.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.1...v6.1.0-alpha.2) (2022-08-10)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [6.1.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v6.1.0-alpha.0...v6.1.0-alpha.1) (2022-08-05)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [6.1.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v6.0.0...v6.1.0-alpha.0) (2022-08-03)
-
-
-### Bug Fixes
-
 * **api:** be prepared for aspirate after pick-up-tip ([#10914](https://github.com/Opentrons/opentrons/issues/10914)) ([cf705bc](https://github.com/Opentrons/opentrons/commit/cf705bc8638b7e6d23272eb7b025512812131936))
 * **api:** do not acquire gpio in ot3simulator ([#11251](https://github.com/Opentrons/opentrons/issues/11251)) ([81f74a6](https://github.com/Opentrons/opentrons/commit/81f74a65026ea4c38d48a2e5327ad4bc9b1313b3))
 * **api:** Do not pause in the middle of a Thermocycler profile ([#10963](https://github.com/Opentrons/opentrons/issues/10963)) ([64ce32d](https://github.com/Opentrons/opentrons/commit/64ce32de887c9bee4a903e5e2a8538ab1e4e6b7b))
+* **api:** ensure pipette cannot move down from origin to travel height ([#11426](https://github.com/Opentrons/opentrons/issues/11426)) ([c0905f6](https://github.com/Opentrons/opentrons/commit/c0905f6b932a91b1779b826a0a7c5c0dedfa6584))
 * **api:** if needed, home both pipettes with InstrumentContext.home ([#11072](https://github.com/Opentrons/opentrons/issues/11072)) ([0115066](https://github.com/Opentrons/opentrons/commit/0115066c807eb93b256d936ccff1bda155e49968)), closes [#7499](https://github.com/Opentrons/opentrons/issues/7499)
 * **api:** inlcude command error details in top-level fatal error ([#11277](https://github.com/Opentrons/opentrons/issues/11277)) ([330eab3](https://github.com/Opentrons/opentrons/commit/330eab35813aefbfa678c86e74de9f9cbc724a17))
+* **api:** make hs wait until idle on deactivate shake ([#11342](https://github.com/Opentrons/opentrons/issues/11342)) ([a78b6fb](https://github.com/Opentrons/opentrons/commit/a78b6fbdf607549a0313fccaae18681646f11207))
 * **api:** move to safe plunger position after every drop-tip ([#10897](https://github.com/Opentrons/opentrons/issues/10897)) ([9bd9902](https://github.com/Opentrons/opentrons/commit/9bd99024603086b7402aad82acf6e86267d074da))
 * **api:** smoothie-driver backlash compensation allows all axes to move simultaneously ([#10923](https://github.com/Opentrons/opentrons/issues/10923)) ([d65147e](https://github.com/Opentrons/opentrons/commit/d65147ec8a68354227e26d1f714e1a4ddb138d43))
 * **api,shared-data:** Fix incorrect rejection of `thermocycler/runProfile` commands ([#11241](https://github.com/Opentrons/opentrons/issues/11241)) ([4366958](https://github.com/Opentrons/opentrons/commit/4366958c3025213115f9af00af5cd95b6cbbf32a))
 * **api,update-server:** Synchronize robot name more tightly between between api and update-server ([#11175](https://github.com/Opentrons/opentrons/issues/11175)) ([f3ac4d9](https://github.com/Opentrons/opentrons/commit/f3ac4d96d63bbd857ed8b8ee75c9a982b8fd0a38))
 * **engine:** pause hardware API when engine is paused ([#10882](https://github.com/Opentrons/opentrons/issues/10882)) ([78658f6](https://github.com/Opentrons/opentrons/commit/78658f60e58e90621e79a048105913175e7d9a57))
 * **engine:** thermocycler movement flagger in analysis ([#11261](https://github.com/Opentrons/opentrons/issues/11261)) ([2a460f1](https://github.com/Opentrons/opentrons/commit/2a460f119fb4f3fc64261427a6f4568a5f752542)), closes [#11235](https://github.com/Opentrons/opentrons/issues/11235)
+* **heater-shaker:** fix async error handling ([#11400](https://github.com/Opentrons/opentrons/issues/11400)) ([c67e8e3](https://github.com/Opentrons/opentrons/commit/c67e8e39a5e4cee24d2a86c808280430dcfaa12b))
+* **heater-shaker:** updated dfu locking mechanism ([#11395](https://github.com/Opentrons/opentrons/issues/11395)) ([86f674f](https://github.com/Opentrons/opentrons/commit/86f674fbb085e9ce6d3e354123144778a907f918))
 * **papi-v2:** allow pick_up_tip to pick up from exact location  ([#11038](https://github.com/Opentrons/opentrons/issues/11038)) ([72f6d4b](https://github.com/Opentrons/opentrons/commit/72f6d4be6d258f5b6db531a2278289f0827f3cd1))
+* **papi-v2:** do not raise h/s movement flagger for point-only destinations ([#11335](https://github.com/Opentrons/opentrons/issues/11335)) ([aeb8c46](https://github.com/Opentrons/opentrons/commit/aeb8c46c33903aaab31ab129a84cf69ec51067cc))
 * **PAPIv2:** allow presses=0 to hover over tip when calling pick_up_tip ([#11200](https://github.com/Opentrons/opentrons/issues/11200)) ([f3d3525](https://github.com/Opentrons/opentrons/commit/f3d3525bc374b7fb6222853c21b42fd3d3ca5f7b))
 
 
@@ -119,6 +44,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **engine:** thermocycler run profile ([#10921](https://github.com/Opentrons/opentrons/issues/10921)) ([8a70b53](https://github.com/Opentrons/opentrons/commit/8a70b53ed35d33951b130bb1299026f02cf81d7b))
 * **hardware:** convert encoder pulses to encoder position in mm ([#10288](https://github.com/Opentrons/opentrons/issues/10288)) ([69a1075](https://github.com/Opentrons/opentrons/commit/69a107547ca7cb2098d28e33606d755146854604))
 * **heater-shaker:** add firmware upload capability ([#10307](https://github.com/Opentrons/opentrons/issues/10307)) ([a77b08d](https://github.com/Opentrons/opentrons/commit/a77b08d85dea1b64e7cbe5d71251f21d8e444747))
+* **papi-v2:** home both pipettes at once before specific h/s actions ([#11330](https://github.com/Opentrons/opentrons/issues/11330)) ([3c12e94](https://github.com/Opentrons/opentrons/commit/3c12e94ee0d6d17ecc66127651fb6d7d6ea8816d))
 * **papiv2:** retract pipettes before shaking or opening latch ([#11268](https://github.com/Opentrons/opentrons/issues/11268)) ([f0913d7](https://github.com/Opentrons/opentrons/commit/f0913d7219ab41b55b3980a1262a884007223ad6)), closes [#11210](https://github.com/Opentrons/opentrons/issues/11210) [#11209](https://github.com/Opentrons/opentrons/issues/11209)
 
 
