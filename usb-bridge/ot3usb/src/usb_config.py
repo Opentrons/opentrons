@@ -16,6 +16,7 @@ and a few kernel modules must be running before this program:
 - g_serial (to provide /dev/ttyGS0 after configuration)
 """
 
+from dataclasses import dataclass
 import logging
 import os
 import time
@@ -71,61 +72,37 @@ class OSDriver:
         return os.path.exists(path)
 
 
+@dataclass
+class SerialGadgetConfig:
+    name: str
+    vid: str
+    pid: str
+    bcdDevice: str
+    serial_number: str
+    manufacturer: str
+    product_desc: str
+    configuration_desc: str
+    max_power: int
+
+
 class SerialGadget:
     """Class to encapsulate gadget configuration details."""
 
     # Default path of the TTY handle
     HANDLE = "/dev/ttyGS0"
 
-    def __init__(
-        self,
-        driver: OSDriver,
-        name: str,
-        vid: str,
-        pid: str,
-        bcdDevice: str,
-        serial: str,
-        manufacturer: str,
-        product: str,
-        configuration: str,
-        max_power: int,
-    ) -> None:
+    def __init__(self, driver: OSDriver, config: SerialGadgetConfig) -> None:
         """Initialize a SerialGadget.
 
         Args:
             driver: class to abstract OS operations for configuration
 
-            name: The name for this serial gadget
-
-            vid: Vendor ID (string format hex number)
-
-            pid: Product ID  (string format hex number)
-
-            bcdDevice: binary coded decimal device version, e.g.
-            0x0101 for v1.0.1
-
-            serial: Serial number for this device
-
-            manufacturer: Name of the manufacturer
-
-            product: English name of the product
-
-            configuration: Configuration string for the gadget
-
-            max_power: Maximum power for the gadget in milliamperes
+            config: SerialGadgetConfig containing configuration info
         """
         self._driver = driver
-        self._name = name
-        self._vid = vid
-        self._pid = pid
-        self._bcdDevice = bcdDevice
-        self._serial = serial
-        self._manufacturer = manufacturer
-        self._product = product
-        self._configuration = configuration
-        self._max_power = max_power
+        self._config = config
 
-        self._basename = f"{GADGET_BASE_PATH}/{self._name}/"
+        self._basename = os.path.join(GADGET_BASE_PATH, config.name)
 
     def _write_file(self, contents: str, filename: str) -> bool:
         """Write a file relative to the root of this gadget's config folder.
@@ -148,9 +125,9 @@ class SerialGadget:
         self._driver.makedirs(self._basename, exist_ok=True)
 
         # Write out basic info
-        self._write_file(self._vid, "idVendor")
-        self._write_file(self._pid, "idProduct")
-        self._write_file(self._bcdDevice, "bcdDevice")
+        self._write_file(self._config.vid, "idVendor")
+        self._write_file(self._config.pid, "idProduct")
+        self._write_file(self._config.bcdDevice, "bcdDevice")
         # USB version always 2.0.0
         self._write_file("0x0200", "bcdUSB")
 
@@ -159,21 +136,23 @@ class SerialGadget:
         self._driver.makedirs(
             os.path.join(self._basename, STRINGS_SUBFOLDER), exist_ok=True
         )
-        self._write_file(self._serial, STRINGS_SUBFOLDER + "/serialnumber")
-        self._write_file(self._manufacturer, STRINGS_SUBFOLDER + "/manufacturer")
-        self._write_file(self._product, STRINGS_SUBFOLDER + "/product")
+        self._write_file(
+            self._config.serial_number, STRINGS_SUBFOLDER + "/serialnumber"
+        )
+        self._write_file(self._config.manufacturer, STRINGS_SUBFOLDER + "/manufacturer")
+        self._write_file(self._config.product_desc, STRINGS_SUBFOLDER + "/product")
         # Write out the single config for this gadget
         self._driver.makedirs(
             os.path.join(self._basename, CONFIG_SUBFOLDER), exist_ok=True
         )
-        self._write_file(str(self._max_power), CONFIG_SUBFOLDER + "MaxPower")
+        self._write_file(str(self._config.max_power), CONFIG_SUBFOLDER + "MaxPower")
 
         # Write out english config string
         self._driver.makedirs(
             os.path.join(self._basename, CONFIG_STRINGS_SUBFOLDER), exist_ok=True
         )
         self._write_file(
-            self._configuration, CONFIG_STRINGS_SUBFOLDER + "/configuration"
+            self._config.configuration_desc, CONFIG_STRINGS_SUBFOLDER + "/configuration"
         )
         # Make and link function (ACM for serial transport)
         functionFolder = os.path.join(self._basename, FUNCTION_SUBFOLDER)

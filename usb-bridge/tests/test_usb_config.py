@@ -1,22 +1,12 @@
 """Tests for the usb_config module."""
 
+from email.policy import default
 import pytest
 import mock
 from pathlib import Path
 import os
 
-from ot3usb.src import usb_config
-
-# Constants for the tests
-DEFAULT_NAME = "gadget_test"
-DEFAULT_VID = "0x1234"
-DEFAULT_PID = "0xABCD"
-DEFAULT_BCDEVICE = "0x0010"
-DEFAULT_SERIAL = "01121997"
-DEFAULT_MANUFACTURER = "Opentrons"
-DEFAULT_PRODUCT = "OT3"
-DEFAULT_CONFIGURATION = "ACM Device"
-DEFAULT_MAX_POWER = 150
+from ot3usb.src import usb_config, default_config
 
 
 @pytest.fixture
@@ -30,16 +20,7 @@ def os_driver() -> mock.Mock:
 @pytest.fixture
 def subject(os_driver: mock.Mock) -> usb_config.SerialGadget:
     return usb_config.SerialGadget(
-        driver=os_driver,
-        name=DEFAULT_NAME,
-        vid=DEFAULT_VID,
-        pid=DEFAULT_PID,
-        bcdDevice=DEFAULT_BCDEVICE,
-        serial=DEFAULT_SERIAL,
-        manufacturer=DEFAULT_MANUFACTURER,
-        product=DEFAULT_PRODUCT,
-        configuration=DEFAULT_CONFIGURATION,
-        max_power=DEFAULT_MAX_POWER,
+        driver=os_driver, config=default_config.default_gadget
     )
 
 
@@ -86,28 +67,28 @@ def test_serial_gadget_symlink_failure(
         subject.configure_and_activate()
 
 
-BASE_DIR = usb_config.GADGET_BASE_PATH + "/" + DEFAULT_NAME + "/"
+BASE_DIR = usb_config.GADGET_BASE_PATH + "/" + default_config.DEFAULT_NAME + "/"
 
 # List of files that the usb gadget should write
 config_files = [
-    ["idVendor", DEFAULT_VID],
-    ["idProduct", DEFAULT_PID],
-    ["bcdDevice", DEFAULT_BCDEVICE],
+    ["idVendor", default_config.DEFAULT_VID],
+    ["idProduct", default_config.DEFAULT_PID],
+    ["bcdDevice", default_config.DEFAULT_BCDEVICE],
     ["bcdUSB", "0x0200"],
-    ["strings/0x409/serialnumber", DEFAULT_SERIAL],
-    ["strings/0x409/manufacturer", DEFAULT_MANUFACTURER],
-    ["strings/0x409/product", DEFAULT_PRODUCT],
-    ["configs/c.1/strings/0x409/configuration", DEFAULT_CONFIGURATION],
-    ["configs/c.1/MaxPower", str(DEFAULT_MAX_POWER)],
+    ["strings/0x409/serialnumber", default_config.DEFAULT_SERIAL],
+    ["strings/0x409/manufacturer", default_config.DEFAULT_MANUFACTURER],
+    ["strings/0x409/product", default_config.DEFAULT_PRODUCT],
+    ["configs/c.1/strings/0x409/configuration", default_config.DEFAULT_CONFIGURATION],
+    ["configs/c.1/MaxPower", str(default_config.DEFAULT_MAX_POWER)],
 ]
 
 # List of directories that the gadget should generate
 config_dirs = [
     "",
-    "strings/0x409",
+    "strings/0x409/",
     "configs/c.1/",
     "configs/c.1/strings/0x409",
-    "functions/acm.usb0",
+    "functions/acm.usb0/",
 ]
 
 
