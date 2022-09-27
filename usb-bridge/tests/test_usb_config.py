@@ -42,33 +42,38 @@ def subject(os_driver: mock.Mock) -> usb_config.SerialGadget:
     )
 
 
-def test_serial_gadget_failure(subject: usb_config.SerialGadget) -> None:
-    subject._driver.system.return_value = -1
+def test_serial_gadget_failure(
+    subject: usb_config.SerialGadget, os_driver: mock.Mock
+) -> None:
+    os_driver.system.return_value = -1
 
     # If the UDC seems to exist, shouldn't get an error
     subject.configure_and_activate()
 
     # If UDC seems to not exist AND we can't make it, expect exception
-    subject._driver.exists.return_value = False
+    os_driver.exists.return_value = False
     with pytest.raises(Exception):
         subject.configure_and_activate()
 
 
-def test_serial_gadget_symlink_failure(subject: usb_config.SerialGadget) -> None:
+def test_serial_gadget_symlink_failure(
+    subject: usb_config.SerialGadget, os_driver: mock.Mock
+) -> None:
     """Symlink errors should only bubble up if the symlink doesn't exist"""
 
     # Do NOT raise an error with the correct exception
-    subject._driver.symlink.side_effect = FileExistsError("file exists")
+    os_driver.symlink.side_effect = FileExistsError("file exists")
     subject.configure_and_activate()
 
     # Now, change the exception and expect it to bubble up
-    subject._driver.symlink.side_effect = OSError("other error")
+    os_driver.symlink.side_effect = OSError("other error")
     with pytest.raises(OSError):
         subject.configure_and_activate()
 
 
-# List of files that the usb gadget should write
 BASE_DIR = usb_config.GADGET_BASE_PATH + "/" + DEFAULT_NAME + "/"
+
+# List of files that the usb gadget should write
 config_files = [
     [BASE_DIR + "idVendor", DEFAULT_VID],
     [BASE_DIR + "idProduct", DEFAULT_PID],
@@ -91,28 +96,35 @@ config_dirs = [
 ]
 
 
-def test_serial_gadget_success(subject: usb_config.SerialGadget) -> None:
+def test_serial_gadget_success(
+    subject: usb_config.SerialGadget, os_driver: mock.Mock
+) -> None:
     subject.configure_and_activate()
 
     # Check that all files are written
     for file in config_files:
-        command = f"echo {file[1]} > {file[0]}"
-        subject._driver.system.assert_any_call(command)
+        command = f"echo {file[1]} > {file[0]}"  # type: ignore[index]
+        os_driver.system.assert_any_call(command)
 
     # Check that appropriate directories were built
     for folder in config_dirs:
-        subject._driver.makedirs.assert_any_call(folder, exist_ok=True)
+        os_driver.makedirs.assert_any_call(folder, exist_ok=True)
 
     # Check that a symlink was set up
-    subject._driver.symlink.assert_called_with(
+    os_driver.symlink.assert_called_with(
         source=BASE_DIR + "functions/acm.usb0", dest=BASE_DIR + "configs/c.1/acm.usb0"
     )
 
 
-def test_serial_handle(subject: usb_config.SerialGadget, monkeypatch, tmpdir) -> None:
+def test_serial_handle(
+    subject: usb_config.SerialGadget,
+    os_driver: mock.Mock,
+    monkeypatch: pytest.MonkeyPatch,
+    tmpdir: Path,
+) -> None:
     dummy_handle = Path(tmpdir) / "test"
     # Use the real `os.path.exists` method
-    subject._driver.exists = usb_config.OSDriver.exists
+    os_driver.exists = usb_config.OSDriver.exists
     monkeypatch.setattr("ot3usb.src.usb_config.SerialGadget.HANDLE", str(dummy_handle))
     assert not subject.handle_exists()
     dummy_handle.write_text("existence")
