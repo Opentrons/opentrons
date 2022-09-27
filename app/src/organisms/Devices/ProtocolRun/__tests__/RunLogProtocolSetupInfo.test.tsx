@@ -264,7 +264,7 @@ describe('RunLogProtocolSetupInfo', () => {
         },
       } as any)
     const { getByText } = render(props)
-    getByText('Load Thermocycler Module')
+    getByText('Load Thermocycler Module GEN1')
   })
   it('renders null if protocol data is null', () => {
     mockUseProtocolDetailsForRun.mockReturnValue({ protocolData: null } as any)

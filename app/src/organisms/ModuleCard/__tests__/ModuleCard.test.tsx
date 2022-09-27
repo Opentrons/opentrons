@@ -270,7 +270,7 @@ describe('ModuleCard', () => {
       isLoadedInRun: false,
     })
 
-    getByText('Thermocycler Module')
+    getByText('Thermocycler Module GEN1')
     getByText('Mock Thermocycler Module Data')
     getByText('usb port 1')
     getByAltText('thermocyclerModuleV1')
