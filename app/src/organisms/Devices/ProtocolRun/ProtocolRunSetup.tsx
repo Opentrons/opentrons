@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import size from 'lodash/size'
 
 import { parseAllRequiredModuleModels } from '@opentrons/api-client'
 import {
@@ -79,7 +80,8 @@ export function ProtocolRunSetup({
     const showLiquidSetup =
       liquidSetupEnabled &&
       protocolData != null &&
-      protocolHasLiquids(protocolData)
+      'liquids' in protocolData &&
+      size(protocolData.liquids) > 0
 
     if (showModuleSetup && showLiquidSetup) {
       nextStepKeysInOrder = [

@@ -54,7 +54,6 @@ interface ChooseRobotSlideoutProps extends StyleProps {
   showSlideout: boolean
 }
 
-
 export function ChooseRobotSlideoutComponent(
   props: ChooseRobotSlideoutProps
 ): JSX.Element | null {
@@ -119,9 +118,11 @@ export function ChooseRobotSlideoutComponent(
     },
     selectedRobot != null ? { hostname: selectedRobot.ip } : null,
     shouldApplyOffsets
-      ? offsetCandidates.map(({ vector, location, definitionUri }) => (
-        { vector, location, definitionUri }
-      ))
+      ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
+          vector,
+          location,
+          definitionUri,
+        }))
       : []
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
@@ -326,12 +327,11 @@ export function ChooseRobotSlideoutComponent(
   )
 }
 
-
 /**
  * @deprecated This component is slated for removal along with the
  * enableManualDeckStateMod feature flag. It's functionality is being
  * replaced by the above component which should be relabelled as the main export
- * `ChooseRobotSlideout` when the ff is removed 
+ * `ChooseRobotSlideout` when the ff is removed
  */
 export function DeprecatedChooseRobotSlideout(
   props: ChooseRobotSlideoutProps
@@ -587,7 +587,15 @@ export function DeprecatedChooseRobotSlideout(
   )
 }
 
-export function ChooseRobotSlideout(props: ChooseRobotSlideoutProps): JSX.Element {
-  const enableManualDeckStateMod = useFeatureFlag('enableManualDeckStateModification')
-  return enableManualDeckStateMod ? <ChooseRobotSlideoutComponent {...props} /> : <DeprecatedChooseRobotSlideout {...props} />
+export function ChooseRobotSlideout(
+  props: ChooseRobotSlideoutProps
+): JSX.Element | null {
+  const enableManualDeckStateMod = useFeatureFlag(
+    'enableManualDeckStateModification'
+  )
+  return enableManualDeckStateMod ? (
+    <ChooseRobotSlideoutComponent {...props} />
+  ) : (
+    <DeprecatedChooseRobotSlideout {...props} />
+  )
 }

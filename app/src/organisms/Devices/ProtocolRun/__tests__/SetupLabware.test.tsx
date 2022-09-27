@@ -27,7 +27,10 @@ import { ModuleExtraAttention } from '../ModuleExtraAttention'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
-import { getIsLabwareOffsetCodeSnippetsOn, useFeatureFlag } from '../../../../redux/config'
+import {
+  getIsLabwareOffsetCodeSnippetsOn,
+  useFeatureFlag,
+} from '../../../../redux/config'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
@@ -320,7 +323,9 @@ describe('LabwareSetup', () => {
     when(mockProceedToRunButton).mockReturnValue(
       <button>Mock ProceedToRunButton</button>
     )
-    when(mockUseFeatureFlag).calledWith('enableManualDeckStateModification').mockReturnValue(false)
+    when(mockUseFeatureFlag)
+      .calledWith('enableManualDeckStateModification')
+      .mockReturnValue(false)
   })
 
   afterEach(() => {

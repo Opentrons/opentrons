@@ -32,20 +32,38 @@ const SHARED_STYLE = css`
   z-index: 2;
   overflow-x: hidden;
   @keyframes slidein {
-    from { transform: translateX(100%); }
-    to { transform: translateX(0); }
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
   }
   @keyframes slideout {
-    from { transform: translateX(0); }
-    to { transform: translateX(100%); }
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
   }
   @keyframes overlayin {
-    from { opacity: 0; }
-    to { opacity: 0.35; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.35;
+    }
   }
   @keyframes overlayout {
-    from { opacity: 0.35; visibility: visible; }
-    to { opacity: 0; visibility: hidden; }
+    from {
+      opacity: 0.35;
+      visibility: visible;
+    }
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
   }
 `
 const EXPANDED_STYLE = css`
@@ -104,7 +122,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
     handleScroll()
   }, [slideOutRef])
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     hasBeenExpanded.current = true
     onCloseClick()
   }

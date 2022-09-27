@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { when } from 'jest-when'
 import { renderHook } from '@testing-library/react-hooks'
-import { useAllRunsQuery, useRunQuery } from '@opentrons/react-api-client'
+import { useAllRunsQuery } from '@opentrons/react-api-client'
 import { useHistoricRunDetails } from '../useHistoricRunDetails'
 import { mockRunningRun } from '../../../RunTimeControl/__fixtures__'
 import { mockSuccessQueryResults } from '../../../../__fixtures__'
@@ -13,7 +13,6 @@ jest.mock('@opentrons/react-api-client')
 const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
   typeof useAllRunsQuery
 >
-const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 
 const MOCK_RUN_LATER: RunData = {
   ...mockRunningRun,
@@ -62,8 +61,15 @@ describe('useHistoricRunDetails', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <div>{children}</div>
     )
-    const { result, waitFor } = renderHook(() => useHistoricRunDetails({ hostname: 'fakeIp' }), { wrapper })
+    const { result, waitFor } = renderHook(
+      () => useHistoricRunDetails({ hostname: 'fakeIp' }),
+      { wrapper }
+    )
     await waitFor(() => result.current != null)
-    expect(result.current).toEqual([MOCK_RUN_EARLIER, MOCK_RUN_EARLIER, MOCK_RUN_LATER])
+    expect(result.current).toEqual([
+      MOCK_RUN_EARLIER,
+      MOCK_RUN_EARLIER,
+      MOCK_RUN_LATER,
+    ])
   })
 })

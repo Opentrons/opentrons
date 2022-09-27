@@ -18,11 +18,7 @@ import {
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
 import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
-import type {
-  DeckSlot,
-  Liquid,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
+import type { DeckSlot, Liquid, RunTimeCommand } from '@opentrons/shared-data'
 
 interface DeckThumbnailProps {
   commands: RunTimeCommand[]

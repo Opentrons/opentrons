@@ -1,6 +1,6 @@
 /**
  * This component test can be removed along with the
- * enableManualDeckStateMod feature flag. It's coverage will be 
+ * enableManualDeckStateMod feature flag. It's coverage will be
  * replaced by the ChooseRobotSlideout.text.tsx file
  */
 
@@ -15,10 +15,7 @@ import {
   useProtocolDetailsForRun,
   useTrackCreateProtocolRunEvent,
 } from '../../Devices/hooks'
-import {
-  useCloseCurrentRun,
-  useCurrentRunId,
-} from '../../ProtocolUpload/hooks'
+import { useCloseCurrentRun, useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import {
   getConnectableRobots,
@@ -140,7 +137,9 @@ describe('ChooseRobotSlideout', () => {
     mockUseTrackCreateProtocolRunEvent.mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
-    when(mockUseFeatureFlag).calledWith('enableManualDeckStateModification').mockReturnValue(false)
+    when(mockUseFeatureFlag)
+      .calledWith('enableManualDeckStateModification')
+      .mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()

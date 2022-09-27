@@ -134,7 +134,9 @@ describe('ChooseRobotSlideout', () => {
     mockUseTrackCreateProtocolRunEvent.mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
-    when(mockUseFeatureFlag).calledWith('enableManualDeckStateModification').mockReturnValue(true)
+    when(mockUseFeatureFlag)
+      .calledWith('enableManualDeckStateModification')
+      .mockReturnValue(true)
   })
   afterEach(() => {
     jest.resetAllMocks()

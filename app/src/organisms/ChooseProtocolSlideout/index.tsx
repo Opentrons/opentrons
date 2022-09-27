@@ -67,9 +67,9 @@ export function ChooseProtocolSlideoutComponent(
   const srcFileObjects =
     selectedProtocol != null
       ? selectedProtocol.srcFiles.map((srcFileBuffer, index) => {
-        const srcFilePath = selectedProtocol.srcFileNames[index]
-        return new File([srcFileBuffer], path.basename(srcFilePath))
-      })
+          const srcFilePath = selectedProtocol.srcFileNames[index]
+          return new File([srcFileBuffer], path.basename(srcFilePath))
+        })
       : []
 
   const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState(true)
@@ -84,26 +84,29 @@ export function ChooseProtocolSlideoutComponent(
     isCreatingRun,
     reset: resetCreateRun,
     runCreationErrorCode,
-  } = useCreateRunFromProtocol({
-    onSuccess: ({ data: runData }) => {
-      trackCreateProtocolRunEvent({
-        name: 'createProtocolRecordResponse',
-        properties: { success: true },
-      })
-      history.push(`/devices/${name}/protocol-runs/${runData.id}`)
+  } = useCreateRunFromProtocol(
+    {
+      onSuccess: ({ data: runData }) => {
+        trackCreateProtocolRunEvent({
+          name: 'createProtocolRecordResponse',
+          properties: { success: true },
+        })
+        history.push(`/devices/${name}/protocol-runs/${runData.id}`)
+      },
+      onError: (error: Error) => {
+        trackCreateProtocolRunEvent({
+          name: 'createProtocolRecordResponse',
+          properties: { success: false, error: error.message },
+        })
+      },
     },
-    onError: (error: Error) => {
-      trackCreateProtocolRunEvent({
-        name: 'createProtocolRecordResponse',
-        properties: { success: false, error: error.message },
-      })
-    },
-  },
     { hostname: robot.ip },
     shouldApplyOffsets
-      ? offsetCandidates.map(({ vector, location, definitionUri }) => (
-        { vector, location, definitionUri }
-      ))
+      ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
+          vector,
+          location,
+          definitionUri,
+        }))
       : []
   )
 
@@ -282,7 +285,7 @@ export function ChooseProtocolSlideoutComponent(
  * @deprecated This component is slated for removal along with the
  * enableManualDeckStateMod feature flag. It's functionality is being
  * replaced by the above component which should be relabelled as the main export
- * `ChooseProtocolSlideout` when the ff is removed 
+ * `ChooseProtocolSlideout` when the ff is removed
  */
 export function DeprecatedChooseProtocolSlideout(
   props: ChooseProtocolSlideoutProps
@@ -307,9 +310,9 @@ export function DeprecatedChooseProtocolSlideout(
   const srcFileObjects =
     selectedProtocol != null
       ? selectedProtocol.srcFiles.map((srcFileBuffer, index) => {
-        const srcFilePath = selectedProtocol.srcFileNames[index]
-        return new File([srcFileBuffer], path.basename(srcFilePath))
-      })
+          const srcFilePath = selectedProtocol.srcFileNames[index]
+          return new File([srcFileBuffer], path.basename(srcFilePath))
+        })
       : []
 
   const {
@@ -500,7 +503,15 @@ export function DeprecatedChooseProtocolSlideout(
   )
 }
 
-export function ChooseProtocolSlideout(props: ChooseProtocolSlideoutProps): JSX.Element {
-  const enableManualDeckStateMod = useFeatureFlag('enableManualDeckStateModification')
-  return enableManualDeckStateMod ? <ChooseProtocolSlideoutComponent {...props} /> : <DeprecatedChooseProtocolSlideout {...props} />
+export function ChooseProtocolSlideout(
+  props: ChooseProtocolSlideoutProps
+): JSX.Element | null {
+  const enableManualDeckStateMod = useFeatureFlag(
+    'enableManualDeckStateModification'
+  )
+  return enableManualDeckStateMod ? (
+    <ChooseProtocolSlideoutComponent {...props} />
+  ) : (
+    <DeprecatedChooseProtocolSlideout {...props} />
+  )
 }
