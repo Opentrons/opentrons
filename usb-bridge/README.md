@@ -11,6 +11,7 @@ internal NGINX connection.
 
 Before launching the USB Bridge application, the correct drivers must be
 loaded to enable the USB UDC on the computer:
+
 - A USB Device controller, likely `dwc3`.
   - `dtoverlay=dwc3`
   - after boot, `modprobe dwc3`
