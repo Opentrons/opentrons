@@ -42,7 +42,7 @@ export function HeaterShakerBanner(
             body={t('improperly_fastened_description')}
             button={
               <TertiaryButton
-                data-testid="banner_open_wizard_btn"
+                data-testid="HeaterShakerBanner_Button"
                 onClick={() => setWizardId(module.moduleId)}
               >
                 {t('view_instructions')}

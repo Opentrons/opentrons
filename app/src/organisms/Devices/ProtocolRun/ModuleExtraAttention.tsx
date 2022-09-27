@@ -138,7 +138,7 @@ const ModuleExtraAttentionItem = (
             body={t('protocol_setup:heater_shaker_extra_attention')}
             button={
               <TertiaryButton
-                data-testid="banner_open_wizard_btn"
+                data-testid="ModuleExtraAttention_HeaterShakerButton"
                 onClick={toggleLatch}
               >
                 {isLatchClosed
@@ -166,7 +166,7 @@ const ModuleExtraAttentionItem = (
           button={
             moduleInfo.moduleDef.model === THERMOCYCLER_MODULE_V1 ? (
               <TertiaryButton
-                data-testid="banner_open_wizard_btn"
+                data-testid="ModuleExtraAttention_ThermocyclerGen1Button"
                 onClick={onClick}
               >
                 {t('view_instructions')}
