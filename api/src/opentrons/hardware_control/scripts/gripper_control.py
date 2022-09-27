@@ -159,7 +159,7 @@ if __name__ == "__main__":
     hc_api = build_api()
 
     from_slot = args.origin
-    grip_force = args.grip_froce
+    grip_force = args.grip_force
     grip_height = args.grip_height
     repeats = args.repeats
 
