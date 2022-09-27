@@ -6,9 +6,9 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# OT-2 Software Changes in 6.1.0-beta.1
+# OT-2 Software Changes in 6.1.0
 
-Welcome to the v6.1.0 beta release of the OT-2 software! This release adds support for the Opentrons Heater-Shaker Module.
+Welcome to the v6.1.0 release of the OT-2 software! This release adds support for the Opentrons Heater-Shaker Module.
 
 ## New Features
 

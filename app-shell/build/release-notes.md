@@ -6,9 +6,9 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 ---
 
-# Opentrons App Changes in 6.1.0-beta.1
+# Opentrons App Changes in 6.1.0
 
-Welcome to the v6.1.0 beta release of the Opentrons App! This release focuses on adding support for the [Opentrons Heater-Shaker Module](https://shop.opentrons.com/heater-shaker-module/).
+Welcome to the v6.1.0 release of the Opentrons App! This release focuses on adding support for the [Opentrons Heater-Shaker Module](https://shop.opentrons.com/heater-shaker-module/).
 
 ## New Features
 
@@ -17,20 +17,24 @@ Welcome to the v6.1.0 beta release of the Opentrons App! This release focuses on
   - Analyze, upload, and run protocols that include the Heater-Shaker
   - View the status of a Heater-Shaker connected to an OT-2 and control its heater, shaker, and labware latch
   - Update the Heater-Shaker's firmware from the module card
-- Module cards now show if a Heater-Shaker or Thermocycler has an error (new since beta.0)
+- Module cards now show if a Heater-Shaker or Thermocycler has an error
 
 ## Improved Features
 
 - Improvements to the run log, including properly listing labware that is on top of a module
-- Clarifies what data is deleted when performing a factory reset of protocol run history (new since beta.0)
+- Clarification of what data is deleted when performing a factory reset of protocol run history
 
 ## Bug Fixes
 
-- Labware Position Check now suggests the most recent Labware Offset data (new since beta.0)
+- Labware Position Check now suggests the most recent Labware Offset data
 - Tip Length Calibration no longer silently fails when the chosen pipette is not attached
-- Stops the update modal from staying onscreen indefinitely after a robot software update has finished (new since beta.0)
-- Fixes a bug that prevented changing pipette settings when the All Pipette Config feature flag is on (new since beta.0)
+- Stops the update modal from staying onscreen indefinitely after a robot software update has finished
+- Fixes a bug that prevented changing pipette settings when the All Pipette Config feature flag was on
 - Interface fixes and improvements
+
+## Known Issues
+
+- Running module commands from Jupyter notebook while the robot server is running will result in errors, and commands may not execute as expected. This issue will be addressed in an upcoming release. If you need to use modules in Jupyter notebook in v6.1.0, first `ssh` to your robot and stop the robot server with `systemctl stop opentrons-robot-server`.
 
 ---
 
