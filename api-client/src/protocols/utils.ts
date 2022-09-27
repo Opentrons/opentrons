@@ -6,7 +6,7 @@ import type {
   LabwareDefinition2,
   ModuleModel,
   PipetteName,
-  LoadedLiquid,
+  Liquid,
 } from '@opentrons/shared-data'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
@@ -248,7 +248,7 @@ export function parseInitialLoadedModulesBySlot(
   )
 }
 
-export interface LoadedLiquidsById {
+export interface LiquidsById {
   [liquidId: string]: {
     displayName: string
     description: string
@@ -260,9 +260,9 @@ export interface LoadedLiquidsById {
 // and the other in array form coming from ProtocolAnalysisOutput. This should be reconciled to use a single type so
 // conversion of the shape is not needed in the util and the type is consistent across the board.
 export function parseLiquidsInLoadOrder(
-  liquids: LoadedLiquidsById | LoadedLiquid[],
+  liquids: LiquidsById | Liquid[],
   commands: RunTimeCommand[]
-): LoadedLiquid[] {
+): Liquid[] {
   const loadLiquidCommands = commands.filter(
     (command): command is LoadLiquidRunTimeCommand =>
       command.commandType === 'loadLiquid'
@@ -281,7 +281,7 @@ export function parseLiquidsInLoadOrder(
     }
   })
 
-  return reduce<LoadLiquidRunTimeCommand, LoadedLiquid[]>(
+  return reduce<LoadLiquidRunTimeCommand, Liquid[]>(
     loadLiquidCommands,
     (acc, command) => {
       const liquid = loadedLiquids.find(

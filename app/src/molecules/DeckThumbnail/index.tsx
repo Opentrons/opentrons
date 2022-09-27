@@ -20,13 +20,13 @@ import {
 import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
 import type {
   DeckSlot,
-  LoadedLiquid,
+  Liquid,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 
 interface DeckThumbnailProps {
   commands: RunTimeCommand[]
-  liquids?: LoadedLiquid[]
+  liquids?: Liquid[]
 }
 const deckSetupLayerBlocklist = [
   'calibrationMarkings',

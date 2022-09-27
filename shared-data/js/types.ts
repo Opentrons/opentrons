@@ -421,12 +421,6 @@ export interface Liquid {
   displayColor?: string
 }
 
-export interface LoadedLiquid {
-  id: string
-  displayName: string
-  description: string
-  displayColor: string
-}
 export interface AnalysisError {
   id: string
   detail: string
@@ -440,7 +434,7 @@ export interface CompletedProtocolAnalysis {
   result: 'ok' | 'not-ok' | 'error'
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
-  liquids: LoadedLiquid[]
+  liquids: Liquid[]
   commands: RunTimeCommand[]
   errors: AnalysisError[]
 }
