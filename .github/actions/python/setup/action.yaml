@@ -1,5 +1,7 @@
 name: 'Python Setup'
-description: 'Set up the environment to handle a monorepo python project'
+description: |
+  "Set up the environment to handle a monorepo python project"
+  "Cache pipenv virtual environments but still always run make setup which runs pipenv sync."
 inputs:
   project:
     description: 'Which project (by subdirectory) to set up?'
@@ -26,6 +28,10 @@ runs:
     - uses: 'actions/setup-python@v4'
       with:
         python-version: ${{ inputs.python-version }}
+        cache: "pipenv"
+        cache-dependency-path: |
+          **/setup.*
+          **/Pipfile.*
     - name: install pipenv
       shell: bash
       run: make install-pipenv

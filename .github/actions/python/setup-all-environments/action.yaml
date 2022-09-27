@@ -1,7 +1,7 @@
 name: "Setup All Environments"
 description: |
     "Set up all the environments for python projects."
-    "Cache pip global cache directory to help speed up pipenv sync."
+    "Cache pipenv virtual environments but still always run make setup which runs pipenv sync."
 
 runs:
   using: "composite"

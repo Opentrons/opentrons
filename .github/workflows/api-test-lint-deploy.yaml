@@ -54,18 +54,9 @@ jobs:
       - uses: 'actions/checkout@v3'
       - uses: './.github/actions/python/setup-all-environments'
         id: "setup"
-      - name: black-check
-        if: always() && steps.setup.outcome == 'success'
-        run: make -C api black-check
-      - name: flake8
-        if: always() && steps.setup.outcome == 'success'
-        run: make -C api flake8
-      - name: mypy-ot2
-        if: always() && steps.setup.outcome == 'success'
-        run: make -C api mypy-ot2
-      - name: mypy-ot3
-        if: always() && steps.setup.outcome == 'success'
-        run: make -C api mypy-ot3
+      - uses: './.github/actions/python/lint'
+        with:
+          setup-outcome: ${{ steps.setup.outcome }}
   test:
     name: 'opentrons package tests on ${{ matrix.os }}'
     timeout-minutes: 30
