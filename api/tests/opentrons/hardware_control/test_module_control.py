@@ -7,7 +7,7 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.rpi_drivers.interfaces import USBDriverInterface
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import ModuleAtPort
+from opentrons.hardware_control.modules.types import ModuleAtPort, ModuleType
 from opentrons.hardware_control.module_control import AttachedModulesControl
 
 
@@ -63,7 +63,9 @@ async def test_register_modules(
     new_mods_at_ports = [ModuleAtPort(port="/dev/foo", name="bar")]
     actual_ports = [
         ModuleAtPort(
-            port="/dev/foo", name="bar", usb_port=USBPort(name="baz", port_number=0)
+            port="/dev/foo",
+            name="tempdeck",
+            usb_port=USBPort(name="baz", port_number=0),
         )
     ]
 
@@ -75,8 +77,7 @@ async def test_register_modules(
         await build_module(
             port="/dev/foo",
             usb_port=USBPort(name="baz", port_number=0),
-            model="bar",
-            loop=hardware_api.loop,
+            type=ModuleType.TEMPERATURE,
         )
     ).then_return(module)
 
@@ -108,10 +109,10 @@ async def test_register_modules_sort(
 
     new_mods_at_ports = [ModuleAtPort(port="/dev/foo", name="bar")]
     actual_ports = [
-        ModuleAtPort(port="/dev/a", name="module-1", usb_port=module_1.usb_port),
-        ModuleAtPort(port="/dev/b", name="module-2", usb_port=module_2.usb_port),
-        ModuleAtPort(port="/dev/c", name="module-3", usb_port=module_3.usb_port),
-        ModuleAtPort(port="/dev/d", name="module-4", usb_port=module_4.usb_port),
+        ModuleAtPort(port="/dev/a", name="magdeck", usb_port=module_1.usb_port),
+        ModuleAtPort(port="/dev/b", name="tempdeck", usb_port=module_2.usb_port),
+        ModuleAtPort(port="/dev/c", name="thermocycler", usb_port=module_3.usb_port),
+        ModuleAtPort(port="/dev/d", name="heatershaker", usb_port=module_4.usb_port),
     ]
 
     decoy.when(usb_bus.match_virtual_ports(new_mods_at_ports)).then_return(actual_ports)
@@ -121,8 +122,7 @@ async def test_register_modules_sort(
             await build_module(
                 usb_port=mod.usb_port,
                 port=matchers.Anything(),
-                model=matchers.Anything(),
-                loop=hardware_api.loop,
+                type=matchers.Anything(),
             )
         ).then_return(mod)
 

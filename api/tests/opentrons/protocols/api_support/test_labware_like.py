@@ -1,12 +1,13 @@
 from unittest.mock import MagicMock
 
 import pytest
+from opentrons.hardware_control.modules.types import TemperatureModuleModel
 from opentrons.protocol_api import labware
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.labware_like import LabwareLike, LabwareLikeType
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.deck import Deck
 from opentrons.types import Location
+
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
@@ -24,10 +25,12 @@ def trough(trough_definition):
 @pytest.fixture(scope="session")
 def module(trough):
     deck = Deck()
-    mod = module_geometry.load_module(
-        module_geometry.TemperatureModuleModel.TEMPERATURE_V2,
-        deck.position_for("6"),
-        MAX_SUPPORTED_VERSION,
+    mod = module_geometry.create_geometry(
+        definition=module_geometry.load_definition(
+            TemperatureModuleModel.TEMPERATURE_V2
+        ),
+        parent=deck.position_for("6"),
+        configuration=None,
     )
     return mod
 

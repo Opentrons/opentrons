@@ -19,5 +19,9 @@
   "OT_PD_ENABLE_LIQUID_COLOR_ENHANCEMENTS": {
     "title": "Enable liquid color enhancements",
     "description": "Allow users to enable liquid color picking"
+  },
+  "OT_PD_ENABLE_THERMOCYCLER_GEN_2": {
+    "title": "Enable Thermocycler GEN2 module",
+    "description": "Allow users to enable Thermocycler GEN2 module and steps in protocols"
   }
 }

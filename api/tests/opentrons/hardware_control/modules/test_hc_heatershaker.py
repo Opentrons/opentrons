@@ -26,7 +26,7 @@ async def simulating_module(usb_port):
     module = await modules.build(
         port=usb_port.device_path,
         usb_port=usb_port,
-        which="heatershaker",
+        type=modules.ModuleType.HEATER_SHAKER,
         simulating=True,
         loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),

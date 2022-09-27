@@ -58,7 +58,7 @@ export const ThermocyclerModuleData = (
         break
       }
       case 'error': {
-        StatusLabelProps.backgroundColor = COLORS.warningBackground
+        StatusLabelProps.backgroundColor = COLORS.warningBackgroundLight
         StatusLabelProps.iconColor = COLORS.warningEnabled
         StatusLabelProps.textColor = COLORS.warningText
       }

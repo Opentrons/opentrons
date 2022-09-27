@@ -87,7 +87,6 @@ export type MenuItemsByModuleType = {
   [moduleType in AttachedModule['moduleType']]: Array<{
     setSetting: string
     isSecondary: boolean
-    disabledReason: boolean
     menuButtons: JSX.Element[] | null
     onClick: (isSecondary: boolean) => void
   }>
@@ -244,7 +243,6 @@ export function useModuleOverflowMenu(
             ? t('overflow_menu_deactivate_lid')
             : t('overflow_menu_lid_temp'),
         isSecondary: true,
-        disabledReason: false,
         menuButtons: null,
         onClick:
           module.moduleType === THERMOCYCLER_MODULE_TYPE &&
@@ -259,7 +257,6 @@ export function useModuleOverflowMenu(
             ? t('overflow_menu_deactivate_block')
             : t('overflow_menu_set_block_temp'),
         isSecondary: false,
-        disabledReason: false,
         menuButtons: [aboutModuleBtn],
         onClick:
           module.moduleType === THERMOCYCLER_MODULE_TYPE &&
@@ -276,7 +273,6 @@ export function useModuleOverflowMenu(
             ? t('overflow_menu_deactivate_temp')
             : t('overflow_menu_mod_temp'),
         isSecondary: false,
-        disabledReason: false,
         menuButtons: [aboutModuleBtn],
         onClick:
           module.data.status !== 'idle'
@@ -292,7 +288,6 @@ export function useModuleOverflowMenu(
             ? t('overflow_menu_disengage')
             : t('overflow_menu_engage'),
         isSecondary: false,
-        disabledReason: false,
         menuButtons: [aboutModuleBtn],
         onClick:
           module.data.status !== 'disengaged'
@@ -308,7 +303,6 @@ export function useModuleOverflowMenu(
             ? t('heater_shaker:deactivate_heater')
             : t('heater_shaker:set_temperature'),
         isSecondary: false,
-        disabledReason: false,
         menuButtons: [
           labwareLatchBtn,
           aboutModuleBtn,

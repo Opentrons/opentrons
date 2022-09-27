@@ -371,26 +371,6 @@ def get_json_protocol_fixture() -> Callable[[str, str, bool], Union[str, JsonPro
     return _get_json_protocol_fixture
 
 
-@pytest.fixture()
-def get_module_fixture() -> Callable[[str], ModuleDefinitionV3]:
-    def _get_module_fixture(fixture_name: str) -> ModuleDefinitionV3:
-        with open(
-            pathlib.Path(__file__).parent
-            / ".."
-            / ".."
-            / ".."
-            / "shared-data"
-            / "module"
-            / "fixtures"
-            / "3"
-            / f"{fixture_name}.json",
-            "rb",
-        ) as f:
-            return cast(ModuleDefinitionV3, json.loads(f.read().decode("utf-8")))
-
-    return _get_module_fixture
-
-
 @pytest.fixture
 def get_bundle_fixture() -> Callable[[str], Bundle]:
     def get_std_labware(loadName: str, version: int = 1) -> LabwareDefinition:

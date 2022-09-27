@@ -49,6 +49,7 @@ async def test_with_thermocycler():
             "lid": "open",
             "lidTarget": None,
             "lidTemp": 23,
+            "lidTempStatus": "idle",
             "rampRate": None,
             "targetTemp": 3,
             "totalCycleCount": None,

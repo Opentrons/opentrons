@@ -133,11 +133,13 @@ export const RunLogProtocolSetupInfo = ({
         />
       )
   } else if (setupCommand.commandType === 'loadLiquid') {
-    const liquidInfo = parseLiquidsInLoadOrder()
+    const liquidInfo = parseLiquidsInLoadOrder(
+      protocolData.liquids,
+      protocolData.commands
+    )
     const { liquidId, labwareId } = setupCommand.params
-    const liquidDisplayName = liquidInfo.find(
-      liquid => liquid.liquidId === liquidId
-    )?.displayName
+    const liquidDisplayName = liquidInfo.find(liquid => liquid.id === liquidId)
+      ?.displayName
     setupCommandText = (
       <Trans
         t={t}

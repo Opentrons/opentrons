@@ -3,26 +3,18 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 
-import {
-  SPACING,
-  TYPOGRAPHY,
-  Mount,
-  BORDERS,
-  COLORS,
-} from '@opentrons/components'
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '@opentrons/components'
 
-import { StyledText } from '../../../../atoms/text'
+import { StyledText } from '../../../atoms/text'
+import { useAttachedPipettes } from '../../../organisms/Devices/hooks'
+import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
 import { OverflowMenu } from './OverflowMenu'
-import { formatLastCalibrated } from './utils'
-import { getDisplayNameForTipRack } from '../utils'
-import { getCustomLabwareDefinitions } from '../../../../redux/custom-labware'
-import { useAttachedPipettes } from '../../hooks'
+import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 
-import type {
-  FormattedPipetteOffsetCalibration,
-  FormattedTipLengthCalibration,
-} from '../RobotSettingsCalibration'
-import type { State } from '../../../../redux/types'
+import type { Mount } from '@opentrons/components'
+import type { State } from '../../../redux/types'
+import type { FormattedTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
+import type { FormattedPipetteOffsetCalibration } from '..'
 
 const StyledTable = styled.table`
   width: 100%;

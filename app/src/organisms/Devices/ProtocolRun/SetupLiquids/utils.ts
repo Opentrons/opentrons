@@ -1,9 +1,11 @@
-import type { LabwareByLiquidId, Liquid } from '@opentrons/api-client'
 import { WellGroup } from '@opentrons/components'
+
+import type { LabwareByLiquidId } from '@opentrons/api-client'
+import type { LoadedLiquid } from '@opentrons/shared-data'
 
 export function getWellFillFromLabwareId(
   labwareId: string,
-  liquidsInLoadOrder: Liquid[],
+  liquidsInLoadOrder: LoadedLiquid[],
   labwareByLiquidId: LabwareByLiquidId
 ): { [well: string]: string } {
   let labwareWellFill: { [well: string]: string } = {}
@@ -14,9 +16,7 @@ export function getWellFillFromLabwareId(
     labwareArray.forEach(labware => {
       if (labware.labwareId === labwareId) {
         const liquidId = liquidIds[index]
-        const liquid = liquidsInLoadOrder.find(
-          liquid => liquid.liquidId === liquidId
-        )
+        const liquid = liquidsInLoadOrder.find(liquid => liquid.id === liquidId)
         const wellFill: {
           [well: string]: string
         } = {}

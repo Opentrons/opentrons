@@ -38,7 +38,9 @@ def engage_height_is_in_range(model: str, height: float) -> bool:
 
 
 class MagDeck(mod_abc.AbstractModule):
+    """Hardware control interface for an attached Temperature Module."""
 
+    MODULE_TYPE = types.ModuleType.MAGNETIC
     FIRST_GEN2_REVISION = 20
 
     @classmethod
