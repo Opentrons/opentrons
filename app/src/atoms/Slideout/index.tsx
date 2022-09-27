@@ -28,40 +28,67 @@ interface Props {
   footer?: React.ReactNode
 }
 
-const EXPANDED_STYLE = css`
-  animation-duration: 300ms;
-  animation-name: slidein;
-  overflow-x: hidden;
-  width: 19.5rem;
-  max-width: 19.5rem;
-  visibility: visible;
+const SHARED_STYLE = css`
   z-index: 2;
-
+  overflow-x: hidden;
   @keyframes slidein {
     from {
-      width: 0;
+      transform: translateX(100%);
     }
     to {
-      width: 19.5rem;
+      transform: translateX(0);
+    }
+  }
+  @keyframes slideout {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+  @keyframes overlayin {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.35;
+    }
+  }
+  @keyframes overlayout {
+    from {
+      opacity: 0.35;
+      visibility: visible;
+    }
+    to {
+      opacity: 0;
+      visibility: hidden;
     }
   }
 `
+const EXPANDED_STYLE = css`
+  ${SHARED_STYLE}
+  animation: slidein 400ms forwards;
+`
 const COLLAPSED_STYLE = css`
-  animation-duration: 300ms;
-  animation-name: slideout;
-  animation-direction: alternate;
-  overflow: hidden;
-  max-width: 0rem;
-  visibility: hidden;
-
-  @keyframes slideout {
-    from {
-      width: 19.5rem;
-    }
-    to {
-      width: 0;
-    }
-  }
+  ${SHARED_STYLE}
+  animation: slideout 400ms forwards;
+`
+const INITIALLY_COLLAPSED_STYLE = css`
+  ${SHARED_STYLE}
+  animation: slideout 0ms forwards;
+`
+const OVERLAY_IN_STYLE = css`
+  ${SHARED_STYLE}
+  animation: overlayin 400ms forwards;
+`
+const OVERLAY_OUT_STYLE = css`
+  ${SHARED_STYLE}
+  animation: overlayout 400ms forwards;
+`
+const INITIALLY_OVERLAY_OUT_STYLE = css`
+  ${SHARED_STYLE}
+  animation: overlayout 0ms forwards;
 `
 
 const CLOSE_ICON_STYLE = css`
@@ -80,6 +107,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
   const slideOutRef = React.useRef<HTMLDivElement>(null)
   const [isReachedBottom, setIsReachedBottom] = React.useState<boolean>(false)
 
+  const hasBeenExpanded = React.useRef<boolean>(isExpanded ?? false)
   const handleScroll = (): void => {
     if (slideOutRef.current == null) return
     const { scrollTop, scrollHeight, clientHeight } = slideOutRef.current
@@ -94,16 +122,28 @@ export const Slideout = (props: Props): JSX.Element | null => {
     handleScroll()
   }, [slideOutRef])
 
+  const handleClose = () => {
+    hasBeenExpanded.current = true
+    onCloseClick()
+  }
+
+  const collapsedStyle = hasBeenExpanded.current
+    ? COLLAPSED_STYLE
+    : INITIALLY_COLLAPSED_STYLE
+  const overlayOutStyle = hasBeenExpanded.current
+    ? OVERLAY_OUT_STYLE
+    : INITIALLY_OVERLAY_OUT_STYLE
   return (
     <>
-      {isExpanded ?? false ? (
-        <Overlay
-          onClick={onCloseClick}
-          backgroundColor={COLORS.backgroundOverlay}
-        />
-      ) : null}
+      <Overlay
+        onClick={handleClose}
+        css={`
+          ${isExpanded ?? false ? OVERLAY_IN_STYLE : overlayOutStyle}
+        `}
+        backgroundColor={COLORS.darkBlackEnabled}
+      />
       <Box
-        css={isExpanded ?? false ? EXPANDED_STYLE : COLLAPSED_STYLE}
+        css={isExpanded ?? false ? EXPANDED_STYLE : collapsedStyle}
         position={POSITION_FIXED}
         right="0"
         top="0"
@@ -138,7 +178,7 @@ export const Slideout = (props: Props): JSX.Element | null => {
               <Flex alignItems={ALIGN_CENTER}>
                 <Btn
                   size="1.5rem"
-                  onClick={onCloseClick}
+                  onClick={handleClose}
                   aria-label="exit"
                   data-testid={`Slideout_icon_close_${
                     typeof title === 'string' ? title : ''

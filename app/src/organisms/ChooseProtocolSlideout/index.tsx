@@ -31,6 +31,8 @@ import { MiniCard } from '../../molecules/MiniCard'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { useCreateRunFromProtocol } from '../ChooseRobotSlideout/useCreateRunFromProtocol'
+import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
+import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 
 import type { Robot } from '../../redux/discovery/types'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
@@ -91,6 +93,12 @@ export function ChooseProtocolSlideout(
     },
   })
 
+  const [shouldApplyOffsets, setShouldApplyOffsets] = React.useState(true)
+  const offsetCandidates = useOffsetCandidatesForAnalysis(
+    selectedProtocol?.mostRecentAnalysis ?? null,
+    robot.ip
+  )
+
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
     if (selectedProtocol != null) {
       trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
@@ -110,6 +118,11 @@ export function ChooseProtocolSlideout(
       title={t('choose_protocol_to_run', { name })}
       footer={
         <ApiHostProvider hostname={robot.ip}>
+          <ApplyHistoricOffsets
+            offsetCandidates={offsetCandidates}
+            shouldApplyOffsets={shouldApplyOffsets}
+            setShouldApplyOffsets={setShouldApplyOffsets}
+          />
           <PrimaryButton
             onClick={handleProceed}
             disabled={isCreatingRun || selectedProtocol == null}

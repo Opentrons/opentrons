@@ -43,7 +43,10 @@ export interface LabwareRenderInfoById {
 }
 
 export const getLabwareRenderInfo = (
-  protocolData: ProtocolAnalysisFile<{}> | ProtocolAnalysisOutput | StoredProtocolAnalysis,
+  protocolData:
+    | ProtocolAnalysisFile<{}>
+    | ProtocolAnalysisOutput
+    | StoredProtocolAnalysis,
   deckDef: DeckDefinition
 ): LabwareRenderInfoById =>
   protocolData.commands

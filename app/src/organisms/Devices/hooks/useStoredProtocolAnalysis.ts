@@ -18,10 +18,10 @@ import type {
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
 
-
 // TODO(bc, 2022-09-26): StoredProtocolAnalysis can be wholesale replaced by ProtocolAnalysisOutput,
 // instead of just extending it, as soon as we remove the need for the schemaV6adapter
-export interface StoredProtocolAnalysis extends Omit<ProtocolAnalysisOutput, 'pipettes' | 'modules' | 'labware'> {
+export interface StoredProtocolAnalysis
+  extends Omit<ProtocolAnalysisOutput, 'pipettes' | 'modules' | 'labware'> {
   pipettes: PipetteNamesById
   modules: ModuleModelsById
   labware: LoadedLabwareById
@@ -46,12 +46,12 @@ export const parseProtocolAnalysisOutput = (
 
   return storedProtocolAnalysis != null
     ? {
-      ...storedProtocolAnalysis,
-      pipettes: pipettesNamesById,
-      modules: moduleModelsById,
-      labware: labwareById,
-      labwareDefinitions: labwareDefinitionsById,
-    }
+        ...storedProtocolAnalysis,
+        pipettes: pipettesNamesById,
+        modules: moduleModelsById,
+        labware: labwareById,
+        labwareDefinitions: labwareDefinitionsById,
+      }
     : null
 }
 

@@ -147,13 +147,11 @@ export function RobotOverview({
             </Tooltip>
           )}
           {robot.status === CONNECTABLE ? (
-            <Portal level="top">
-              <ChooseProtocolSlideout
-                robot={robot}
-                showSlideout={showChooseProtocolSlideout}
-                onCloseClick={() => setShowChooseProtocolSlideout(false)}
-              />
-            </Portal>
+            <ChooseProtocolSlideout
+              robot={robot}
+              showSlideout={showChooseProtocolSlideout}
+              onCloseClick={() => setShowChooseProtocolSlideout(false)}
+            />
           ) : null}
         </Flex>
       </Box>

@@ -34,25 +34,11 @@ const MOCK_RUN_EARLIER: RunData = {
 
 describe('useHistoricRunDetails', () => {
   when(mockUseAllRunsQuery)
-    .calledWith()
+    .calledWith({}, undefined)
     .mockReturnValue(
       mockSuccessQueryResults({
         data: [MOCK_RUN_LATER, MOCK_RUN_EARLIER],
         links: {},
-      })
-    )
-  when(mockUseRunQuery)
-    .calledWith(MOCK_RUN_LATER.id)
-    .mockReturnValue(
-      mockSuccessQueryResults({
-        data: MOCK_RUN_LATER,
-      })
-    )
-  when(mockUseRunQuery)
-    .calledWith(MOCK_RUN_EARLIER.id)
-    .mockReturnValue(
-      mockSuccessQueryResults({
-        data: MOCK_RUN_EARLIER,
       })
     )
 
@@ -63,5 +49,21 @@ describe('useHistoricRunDetails', () => {
     const { result, waitFor } = renderHook(useHistoricRunDetails, { wrapper })
     await waitFor(() => result.current != null)
     expect(result.current).toEqual([MOCK_RUN_EARLIER, MOCK_RUN_LATER])
+  })
+  it('returns historical run details with newest first to specific host', async () => {
+    when(mockUseAllRunsQuery)
+      .calledWith({}, { hostname: 'fakeIp' })
+      .mockReturnValue(
+        mockSuccessQueryResults({
+          data: [MOCK_RUN_LATER, MOCK_RUN_EARLIER, MOCK_RUN_EARLIER],
+          links: {},
+        })
+      )
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <div>{children}</div>
+    )
+    const { result, waitFor } = renderHook(() => useHistoricRunDetails({ hostname: 'fakeIp' }), { wrapper })
+    await waitFor(() => result.current != null)
+    expect(result.current).toEqual([MOCK_RUN_EARLIER, MOCK_RUN_EARLIER, MOCK_RUN_LATER])
   })
 })

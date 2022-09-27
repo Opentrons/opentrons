@@ -38,60 +38,60 @@ const mockStoredProtocolData = [
       commands: [],
       labware: [
         {
-          id: "labware-0",
-          loadName: "opentrons_1_trash_1100ml_fixed",
-          definitionUri: "opentrons/opentrons_1_trash_1100ml_fixed/1",
-          location: { slotName: "12" },
-          displayName: "Trash"
+          id: 'labware-0',
+          loadName: 'opentrons_1_trash_1100ml_fixed',
+          definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+          location: { slotName: '12' },
+          displayName: 'Trash',
         },
         {
-          id: "labware-1",
-          loadName: "opentrons_96_tiprack_1000ul",
-          definitionUri: "opentrons/opentrons_96_tiprack_1000ul/1",
-          location: { slotName: "1" },
-          displayName: "Opentrons 96 Tip Rack 1000 µL"
+          id: 'labware-1',
+          loadName: 'opentrons_96_tiprack_1000ul',
+          definitionUri: 'opentrons/opentrons_96_tiprack_1000ul/1',
+          location: { slotName: '1' },
+          displayName: 'Opentrons 96 Tip Rack 1000 µL',
         },
       ],
       pipettes: [
         {
-          id: "pipette-0",
-          pipetteName: "p1000_single_gen2",
-          mount: "left"
-        }
+          id: 'pipette-0',
+          pipetteName: 'p1000_single_gen2',
+          mount: 'left',
+        },
       ],
       modules: [
         {
-          id: "module-0",
-          model: "magneticModuleV2",
-          location: { slotName: "6" },
-          serialNumber: "dummySerialMD"
+          id: 'module-0',
+          model: 'magneticModuleV2',
+          location: { slotName: '6' },
+          serialNumber: 'dummySerialMD',
         },
         {
-          id: "module-1",
-          model: "temperatureModuleV2",
-          location: { slotName: "3" },
-          serialNumber: "dummySerialTD"
+          id: 'module-1',
+          model: 'temperatureModuleV2',
+          location: { slotName: '3' },
+          serialNumber: 'dummySerialTD',
         },
         {
-          id: "module-2",
-          model: "thermocyclerModuleV1",
-          location: { slotName: "7" },
-          serialNumber: "dummySerialTC"
-        }
+          id: 'module-2',
+          model: 'thermocyclerModuleV1',
+          location: { slotName: '7' },
+          serialNumber: 'dummySerialTC',
+        },
       ],
       liquids: [
         {
-          id: "0",
-          displayName: "Water",
-          description: "liquid H2O",
-          displayColor: "#50d5ff"
+          id: '0',
+          displayName: 'Water',
+          description: 'liquid H2O',
+          displayColor: '#50d5ff',
         },
         {
-          id: "1",
-          displayName: "Blood",
-          description: "human essence",
-          displayColor: "#ff4f4f"
-        }
+          id: '1',
+          displayName: 'Blood',
+          description: 'human essence',
+          displayColor: '#ff4f4f',
+        },
       ],
       errors: [],
     } as ProtocolAnalysisOutput,
@@ -123,60 +123,60 @@ const mockStoredProtocolData = [
       commands: [],
       labware: [
         {
-          id: "labware-0",
-          loadName: "opentrons_1_trash_1100ml_fixed",
-          definitionUri: "opentrons/opentrons_1_trash_1100ml_fixed/1",
-          location: { slotName: "12" },
-          displayName: "Trash"
+          id: 'labware-0',
+          loadName: 'opentrons_1_trash_1100ml_fixed',
+          definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+          location: { slotName: '12' },
+          displayName: 'Trash',
         },
         {
-          id: "labware-1",
-          loadName: "opentrons_96_tiprack_1000ul",
-          definitionUri: "opentrons/opentrons_96_tiprack_1000ul/1",
-          location: { slotName: "1" },
-          displayName: "Opentrons 96 Tip Rack 1000 µL"
+          id: 'labware-1',
+          loadName: 'opentrons_96_tiprack_1000ul',
+          definitionUri: 'opentrons/opentrons_96_tiprack_1000ul/1',
+          location: { slotName: '1' },
+          displayName: 'Opentrons 96 Tip Rack 1000 µL',
         },
       ],
       pipettes: [
         {
-          id: "pipette-0",
-          pipetteName: "p1000_single_gen2",
-          mount: "left"
-        }
+          id: 'pipette-0',
+          pipetteName: 'p1000_single_gen2',
+          mount: 'left',
+        },
       ],
       modules: [
         {
-          id: "module-0",
-          model: "magneticModuleV2",
-          location: { slotName: "6" },
-          serialNumber: "dummySerialMD"
+          id: 'module-0',
+          model: 'magneticModuleV2',
+          location: { slotName: '6' },
+          serialNumber: 'dummySerialMD',
         },
         {
-          id: "module-1",
-          model: "temperatureModuleV2",
-          location: { slotName: "3" },
-          serialNumber: "dummySerialTD"
+          id: 'module-1',
+          model: 'temperatureModuleV2',
+          location: { slotName: '3' },
+          serialNumber: 'dummySerialTD',
         },
         {
-          id: "module-2",
-          model: "thermocyclerModuleV1",
-          location: { slotName: "7" },
-          serialNumber: "dummySerialTC"
-        }
+          id: 'module-2',
+          model: 'thermocyclerModuleV1',
+          location: { slotName: '7' },
+          serialNumber: 'dummySerialTC',
+        },
       ],
       liquids: [
         {
-          id: "0",
-          displayName: "Water",
-          description: "liquid H2O",
-          displayColor: "#50d5ff"
+          id: '0',
+          displayName: 'Water',
+          description: 'liquid H2O',
+          displayColor: '#50d5ff',
         },
         {
-          id: "1",
-          displayName: "Blood",
-          description: "human essence",
-          displayColor: "#ff4f4f"
-        }
+          id: '1',
+          displayName: 'Blood',
+          description: 'human essence',
+          displayColor: '#ff4f4f',
+        },
       ],
       errors: [],
     } as ProtocolAnalysisOutput,
@@ -207,66 +207,66 @@ const mockStoredProtocolData = [
       commands: [],
       labware: [
         {
-          id: "labware-0",
-          loadName: "opentrons_1_trash_1100ml_fixed",
-          definitionUri: "opentrons/opentrons_1_trash_1100ml_fixed/1",
-          location: { slotName: "12" },
-          displayName: "Trash"
+          id: 'labware-0',
+          loadName: 'opentrons_1_trash_1100ml_fixed',
+          definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+          location: { slotName: '12' },
+          displayName: 'Trash',
         },
         {
-          id: "labware-1",
-          loadName: "opentrons_96_tiprack_1000ul",
-          definitionUri: "opentrons/opentrons_96_tiprack_1000ul/1",
-          location: { slotName: "1" },
-          displayName: "Opentrons 96 Tip Rack 1000 µL"
+          id: 'labware-1',
+          loadName: 'opentrons_96_tiprack_1000ul',
+          definitionUri: 'opentrons/opentrons_96_tiprack_1000ul/1',
+          location: { slotName: '1' },
+          displayName: 'Opentrons 96 Tip Rack 1000 µL',
         },
       ],
       pipettes: [
         {
-          id: "pipette-0",
-          pipetteName: "p1000_single_gen2",
-          mount: "left"
-        }
+          id: 'pipette-0',
+          pipetteName: 'p1000_single_gen2',
+          mount: 'left',
+        },
       ],
       modules: [
         {
-          "id": "module-0",
-          "model": "magneticModuleV2",
-          "location": {
-            "slotName": "6"
+          id: 'module-0',
+          model: 'magneticModuleV2',
+          location: {
+            slotName: '6',
           },
-          "serialNumber": "dummySerialMD"
+          serialNumber: 'dummySerialMD',
         },
         {
-          "id": "module-1",
-          "model": "temperatureModuleV2",
-          "location": {
-            "slotName": "3"
+          id: 'module-1',
+          model: 'temperatureModuleV2',
+          location: {
+            slotName: '3',
           },
-          "serialNumber": "dummySerialTD"
+          serialNumber: 'dummySerialTD',
         },
         {
-          "id": "module-2",
-          "model": "thermocyclerModuleV1",
-          "location": {
-            "slotName": "7"
+          id: 'module-2',
+          model: 'thermocyclerModuleV1',
+          location: {
+            slotName: '7',
           },
-          "serialNumber": "dummySerialTC"
-        }
+          serialNumber: 'dummySerialTC',
+        },
       ],
       liquids: [
         {
-          "id": "0",
-          "displayName": "Water",
-          "description": "liquid H2O",
-          "displayColor": "#50d5ff"
+          id: '0',
+          displayName: 'Water',
+          description: 'liquid H2O',
+          displayColor: '#50d5ff',
         },
         {
-          "id": "1",
-          "displayName": "Blood",
-          "description": "human essence",
-          "displayColor": "#ff4f4f"
-        }
+          id: '1',
+          displayName: 'Blood',
+          description: 'human essence',
+          displayColor: '#ff4f4f',
+        },
       ],
       errors: [],
     } as ProtocolAnalysisOutput,
