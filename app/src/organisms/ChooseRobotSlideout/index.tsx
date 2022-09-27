@@ -37,6 +37,7 @@ import { PrimaryButton } from '../../atoms/buttons'
 import { Slideout } from '../../atoms/Slideout'
 import { StyledText } from '../../atoms/text'
 import { StoredProtocolData } from '../../redux/protocol-storage'
+import { useFeatureFlag } from '../../redux/config'
 import { useTrackCreateProtocolRunEvent } from '../Devices/hooks'
 import { ApplyHistoricOffsets } from '../ApplyHistoricOffsets'
 import { AvailableRobotOption } from './AvailableRobotOption'
@@ -46,7 +47,6 @@ import { useOffsetCandidatesForAnalysis } from '../ApplyHistoricOffsets/hooks/us
 import type { StyleProps } from '@opentrons/components'
 import type { State, Dispatch } from '../../redux/types'
 import type { Robot } from '../../redux/discovery/types'
-import { useFeatureFlag } from '../../redux/config'
 
 interface ChooseRobotSlideoutProps extends StyleProps {
   storedProtocolData: StoredProtocolData
@@ -119,11 +119,9 @@ export function ChooseRobotSlideoutComponent(
     },
     selectedRobot != null ? { hostname: selectedRobot.ip } : null,
     shouldApplyOffsets
-      ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
-          vector,
-          location,
-          definitionUri,
-        }))
+      ? offsetCandidates.map(({ vector, location, definitionUri }) => (
+        { vector, location, definitionUri }
+      ))
       : []
   )
   const handleProceed: React.MouseEventHandler<HTMLButtonElement> = () => {
@@ -591,5 +589,5 @@ export function DeprecatedChooseRobotSlideout(
 
 export function ChooseRobotSlideout(props: ChooseRobotSlideoutProps): JSX.Element {
   const enableManualDeckStateMod = useFeatureFlag('enableManualDeckStateModification')
-  return enableManualDeckStateMod ? <ChooseRobotSlideout {...props} /> : <DeprecatedChooseRobotSlideout {...props} /> 
+  return enableManualDeckStateMod ? <ChooseRobotSlideoutComponent {...props} /> : <DeprecatedChooseRobotSlideout {...props} />
 }

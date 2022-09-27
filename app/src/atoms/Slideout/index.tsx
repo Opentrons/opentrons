@@ -32,47 +32,29 @@ const SHARED_STYLE = css`
   z-index: 2;
   overflow-x: hidden;
   @keyframes slidein {
-    from {
-      transform: translateX(100%);
-    }
-    to {
-      transform: translateX(0);
-    }
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
   }
   @keyframes slideout {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(100%);
-    }
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
   }
   @keyframes overlayin {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 0.35;
-    }
+    from { opacity: 0; }
+    to { opacity: 0.35; }
   }
   @keyframes overlayout {
-    from {
-      opacity: 0.35;
-      visibility: visible;
-    }
-    to {
-      opacity: 0;
-      visibility: hidden;
-    }
+    from { opacity: 0.35; visibility: visible; }
+    to { opacity: 0; visibility: hidden; }
   }
 `
 const EXPANDED_STYLE = css`
   ${SHARED_STYLE}
-  animation: slidein 400ms forwards;
+  animation: slidein 300ms forwards;
 `
 const COLLAPSED_STYLE = css`
   ${SHARED_STYLE}
-  animation: slideout 400ms forwards;
+  animation: slideout 300ms forwards;
 `
 const INITIALLY_COLLAPSED_STYLE = css`
   ${SHARED_STYLE}
@@ -80,11 +62,11 @@ const INITIALLY_COLLAPSED_STYLE = css`
 `
 const OVERLAY_IN_STYLE = css`
   ${SHARED_STYLE}
-  animation: overlayin 400ms forwards;
+  animation: overlayin 300ms forwards;
 `
 const OVERLAY_OUT_STYLE = css`
   ${SHARED_STYLE}
-  animation: overlayout 400ms forwards;
+  animation: overlayout 300ms forwards;
 `
 const INITIALLY_OVERLAY_OUT_STYLE = css`
   ${SHARED_STYLE}

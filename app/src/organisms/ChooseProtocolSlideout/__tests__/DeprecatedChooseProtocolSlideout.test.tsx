@@ -1,3 +1,9 @@
+/**
+ * This component test can be removed along with the
+ * enableManualDeckStateMod feature flag. It's coverage will be 
+ * replaced by the ChooseProtocolSlideout.text.tsx file
+ */
+
 import * as React from 'react'
 import { when } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
@@ -62,7 +68,7 @@ describe('ChooseProtocolSlideout', () => {
     mockUseTrackCreateProtocolRunEvent.mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
-    when(mockUseFeatureFlag).calledWith('enableManualDeckStateModification').mockReturnValue(true)
+    when(mockUseFeatureFlag).calledWith('enableManualDeckStateModification').mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()

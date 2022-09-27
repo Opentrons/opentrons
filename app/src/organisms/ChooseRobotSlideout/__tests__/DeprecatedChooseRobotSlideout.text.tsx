@@ -1,3 +1,9 @@
+/**
+ * This component test can be removed along with the
+ * enableManualDeckStateMod feature flag. It's coverage will be 
+ * replaced by the ChooseRobotSlideout.text.tsx file
+ */
+
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import { StaticRouter } from 'react-router-dom'
@@ -8,12 +14,12 @@ import { i18n } from '../../../i18n'
 import {
   useProtocolDetailsForRun,
   useTrackCreateProtocolRunEvent,
-} from '../../../organisms/Devices/hooks'
+} from '../../Devices/hooks'
 import {
   useCloseCurrentRun,
   useCurrentRunId,
-} from '../../../organisms/ProtocolUpload/hooks'
-import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
+} from '../../ProtocolUpload/hooks'
+import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -30,9 +36,9 @@ import {
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { useFeatureFlag } from '../../../redux/config'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
-import { ChooseRobotSlideout } from '../'
+import { ChooseRobotSlideout } from '..'
 
-import type { ProtocolDetails } from '../../../organisms/Devices/hooks'
+import type { ProtocolDetails } from '../../Devices/hooks'
 import type { State } from '../../../redux/types'
 
 jest.mock('../../../organisms/Devices/hooks')
@@ -134,7 +140,7 @@ describe('ChooseRobotSlideout', () => {
     mockUseTrackCreateProtocolRunEvent.mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
-    when(mockUseFeatureFlag).calledWith('enableManualDeckStateModification').mockReturnValue(true)
+    when(mockUseFeatureFlag).calledWith('enableManualDeckStateModification').mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()

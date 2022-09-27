@@ -27,7 +27,7 @@ import { ModuleExtraAttention } from '../ModuleExtraAttention'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { LabwareOffsetModal } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/LabwareOffsetModal'
 import { getModuleTypesThatRequireExtraAttention } from '../../../ProtocolSetup/RunSetupCard/LabwareSetup/utils/getModuleTypesThatRequireExtraAttention'
-import { getIsLabwareOffsetCodeSnippetsOn } from '../../../../redux/config'
+import { getIsLabwareOffsetCodeSnippetsOn, useFeatureFlag } from '../../../../redux/config'
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
@@ -68,6 +68,9 @@ jest.mock('../../../../redux/config')
 jest.mock('../../hooks')
 jest.mock('../ProceedToRunButton')
 
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
 const mockLabwareInfoOverlay = LabwareInfoOverlay as jest.MockedFunction<
   typeof LabwareInfoOverlay
 >
@@ -317,6 +320,7 @@ describe('LabwareSetup', () => {
     when(mockProceedToRunButton).mockReturnValue(
       <button>Mock ProceedToRunButton</button>
     )
+    when(mockUseFeatureFlag).calledWith('enableManualDeckStateModification').mockReturnValue(false)
   })
 
   afterEach(() => {

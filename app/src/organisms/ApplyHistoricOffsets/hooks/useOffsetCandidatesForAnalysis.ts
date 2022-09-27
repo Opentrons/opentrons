@@ -8,7 +8,7 @@ import {
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
 import type { LabwareOffset } from '@opentrons/api-client'
-interface OffsetCandidate extends LabwareOffset {
+export interface OffsetCandidate extends LabwareOffset {
   runCreatedAt: string
   labwareDisplayName: string
 }
