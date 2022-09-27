@@ -41,13 +41,16 @@ defaults:
 jobs:
   python-lint:
     name: 'shared-data package python lint'
-    timeout-minutes: 20
+    timeout-minutes: 25
     runs-on: 'ubuntu-22.04'
     steps:
       - uses: 'actions/checkout@v3'
       - uses: './.github/actions/python/setup-all-environments'
-      - name: Lint
-        run: make -C shared-data/python lint
+        id: "setup"
+      - uses: './.github/actions/python/lint'
+        with:
+          setup-outcome: ${{ steps.setup.outcome }}
+
 
   python-test:
     name: 'shared-data package python ${{ matrix.python }}'
@@ -62,7 +65,15 @@ jobs:
       - name: 'install udev for usb-detection'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
-      - uses: './.github/actions/python/setup-all-environments'
+      - name: setup python environment Windows
+        if: matrix.os == 'windows-2019'
+        uses: './.github/actions/python/setup-single-environment'
+        with:
+          environment: "app"
+          python-version: "3.10"
+      - name: setup python environments NOT Windows
+        if: matrix.os != 'windows-2019'
+        uses: './.github/actions/python/setup-all-environments'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:
@@ -125,9 +136,9 @@ jobs:
     if: github.event_name == 'push'
     steps:
       - uses: 'actions/checkout@v3'
-      - uses: './.github/actions/python/setup-all-environments'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
+      - uses: './.github/actions/python/setup-all-environments'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6.1.1
         with:

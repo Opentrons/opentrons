@@ -89,12 +89,25 @@ test-cov:
 	$(call pytest,ot-2) $(tests) $(test_opts) $(cov_opts)
 	$(call pytest,ot-3/robot-server) $(tests) $(test_opts) $(cov_opts)
 
-.PHONY: lint
-lint: $(ot_py_sources)
-	$(call python,ot-2) -m mypy $(SRC_PATH) $(tests)
-	$(call python,ot-3/robot-server) -m mypy $(SRC_PATH) $(tests)
+
+.PHONY: black-check
+black-check:
 	$(call python,dev) -m black --check notify_server tests setup.py
+
+.PHONY: flake8
+flake8:
 	$(call python,dev) -m flake8 $(SRC_PATH) $(tests)
+
+.PHONY: mypy-ot2
+mypy-ot2:
+	$(call python,ot-2) -m mypy $(SRC_PATH) $(tests)
+
+.PHONY: mypy-ot3
+mypy-ot3:
+	$(call python,ot-3/robot-server) -m mypy $(SRC_PATH) $(tests)
+
+.PHONY: lint
+lint: black-check flake8 mypy-ot2 mypy-ot3
 
 .PHONY: format
 format:

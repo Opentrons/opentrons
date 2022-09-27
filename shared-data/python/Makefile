@@ -76,13 +76,24 @@ $(sdist_file): setup.py $(py_sources) $(json_sources)
 	$(call python,ot-3/robot-server) setup.py sdist
 	$(SHX) ls $(BUILD_DIR)
 
+.PHONY: black-check
+black-check:
+	$(call python,dev) -m black --check opentrons_shared_data tests setup.py
+
+.PHONY: flake8
+flake8:
+	$(call python,dev) -m flake8 opentrons_shared_data tests setup.py
+
+.PHONY: mypy-ot2
+mypy-ot2:
+	$(call python,ot-2) -m mypy opentrons_shared_data tests
+
+.PHONY: mypy-ot3
+mypy-ot3:
+	$(call python,ot-3/robot-server) -m mypy opentrons_shared_data tests
 
 .PHONY: lint
-lint: $(py_sources)
-	$(call python,ot-3/robot-server) -m mypy opentrons_shared_data tests
-	$(call python,ot-2) -m mypy opentrons_shared_data tests
-	$(call python,dev) -m black --check opentrons_shared_data tests setup.py
-	$(call python,dev) -m flake8 opentrons_shared_data tests setup.py
+lint: black-check flake8 mypy-ot2 mypy-ot3
 
 .PHONY: format
 format:

@@ -19,7 +19,6 @@ runs:
       run: |
         npm install --global shx@0.3.3
     - uses: 'actions/setup-python@v4'
-      id: python38
       with:
         python-version: '3.8'
         cache: "pipenv"
@@ -34,7 +33,6 @@ runs:
       name: setup ot3
       run: make -C ot-3 setup
     - uses: 'actions/setup-python@v4'
-      id: python310
       with:
         python-version: '3.10'
         cache: "pipenv"

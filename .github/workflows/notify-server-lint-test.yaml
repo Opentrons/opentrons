@@ -51,8 +51,10 @@ jobs:
         with:
           node-version: '14'
       - uses: './.github/actions/python/setup-all-environments'
-      - name: Lint
-        run: make -C notify-server lint
+        id: "setup"
+      - uses: './.github/actions/python/lint'
+        with:
+          setup-outcome: ${{ steps.setup.outcome }}
       - name: Test
         run: make -C notify-server test-cov
       - name: 'Upload coverage report'

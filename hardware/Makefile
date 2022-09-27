@@ -90,11 +90,20 @@ test-with-emulator:
 test-with-opentrons-sock-emulator: export OT3_CAN_DRIVER_INTERFACE ?= opentrons_sock
 test-with-opentrons-sock-emulator: test-with-emulator
 
-.PHONY: lint
-lint:
-	$(call python,ot-3/robot-server) -m mypy opentrons_hardware tests
+.PHONY: black-check
+black-check:
 	$(call python,dev) -m black --check opentrons_hardware tests setup.py
+
+.PHONY: flake8
+flake8:
 	$(call python,dev) -m flake8 opentrons_hardware tests setup.py
+
+.PHONY: mypy-ot3
+mypy-ot3:
+	$(call python,ot-3/robot-server) -m mypy opentrons_hardware tests
+
+.PHONY: lint
+lint: black-check flake8 mypy-ot3
 
 .PHONY: format
 format:
