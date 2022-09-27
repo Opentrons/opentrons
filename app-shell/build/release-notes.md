@@ -34,13 +34,13 @@ Welcome to the v6.1.0 release of the Opentrons App! This release focuses on addi
 
 ---
 
-# Opentrons App Changes in 6.0.1
+## Opentrons App Changes in 6.0.1
 
 Welcome to the v6.0.1 release of the Opentrons App! This release focuses on a visual redesign of the app that offers more ways to manage protocols even when you're not connected to a robot.
 
 This release also includes updates to the robot operating system, so be sure to update any OT-2s before running protocols with this version of the app.
 
-## New Features
+### New Features
 
 - Updated design: A more polished and modern design, built around the new, always-accessible Protocols, Labware, and Devices sections.
 - Protocols section
@@ -56,14 +56,14 @@ This release also includes updates to the robot operating system, so be sure to 
   - Run a protocol directly from the robot details page.
   - Easily change a robot's name from the new robot settings page.
 
-## 6.0.0 to 6.0.1
+### 6.0.0 to 6.0.1
 
 The 6.0.1 hotfix release fixes two issues:
 
 - The app's "Override Path to Python" advanced setting now works properly on Windows
 - It's once again possible to save changes made to pipette settings
 
-## Improved Features
+### Improved Features
 
 - Labware Position Check
   - When re-running a protocol, the app will now automatically recommend stored Labware Offset data (from the last 20 runs on that robot) that applies to the same labware and deck slot.

@@ -10,7 +10,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 * **api:** allow aspirate/dispense at arbitrary locations ([#11352](https://github.com/Opentrons/opentrons/issues/11352)) ([d9107d2](https://github.com/Opentrons/opentrons/commit/d9107d25cb366f49454a6e35a90205ab354d8acf)), closes [#11302](https://github.com/Opentrons/opentrons/issues/11302)
 * **api:** be prepared for aspirate after pick-up-tip ([#10914](https://github.com/Opentrons/opentrons/issues/10914)) ([cf705bc](https://github.com/Opentrons/opentrons/commit/cf705bc8638b7e6d23272eb7b025512812131936))
-* **api:** Disallow uploading a protocol with non matching references ([#11457](https://github.com/Opentrons/opentrons/issues/11457)) ([5f29ebe](https://github.com/Opentrons/opentrons/commit/5f29ebe649f364faf470222d5758dfdddc62ed1a))
 * **api:** do not acquire gpio in ot3simulator ([#11251](https://github.com/Opentrons/opentrons/issues/11251)) ([81f74a6](https://github.com/Opentrons/opentrons/commit/81f74a65026ea4c38d48a2e5327ad4bc9b1313b3))
 * **api:** Do not pause in the middle of a Thermocycler profile ([#10963](https://github.com/Opentrons/opentrons/issues/10963)) ([64ce32d](https://github.com/Opentrons/opentrons/commit/64ce32de887c9bee4a903e5e2a8538ab1e4e6b7b))
 * **api:** ensure pipette cannot move down from origin to travel height ([#11426](https://github.com/Opentrons/opentrons/issues/11426)) ([c0905f6](https://github.com/Opentrons/opentrons/commit/c0905f6b932a91b1779b826a0a7c5c0dedfa6584))
@@ -101,11 +100,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Performance Improvements
 
 * **robot-server:** Minimize selected columns to speed up `GET /runs` ([#11002](https://github.com/Opentrons/opentrons/issues/11002)) ([4000e5b](https://github.com/Opentrons/opentrons/commit/4000e5bf543ea56260e441e47e561e97103fe435))
-
-
-### Reverts
-
-* Revert "fix(api): Disallow uploading a protocol with non matching references (#11457)" (#11475) ([02d39a0](https://github.com/Opentrons/opentrons/commit/02d39a0a8774e528da7a7ffadaabe9f45805c33e)), closes [#11457](https://github.com/Opentrons/opentrons/issues/11457) [#11475](https://github.com/Opentrons/opentrons/issues/11475)
 
 
 
