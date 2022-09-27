@@ -8,7 +8,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-* **api:** Disallow uploading a protocol with non matching references ([#11457](https://github.com/Opentrons/opentrons/issues/11457)) ([5f29ebe](https://github.com/Opentrons/opentrons/commit/5f29ebe649f364faf470222d5758dfdddc62ed1a))
 * **api,shared-data:** Fix incorrect rejection of `thermocycler/runProfile` commands ([#11241](https://github.com/Opentrons/opentrons/issues/11241)) ([4366958](https://github.com/Opentrons/opentrons/commit/4366958c3025213115f9af00af5cd95b6cbbf32a))
 * **app:** accept protocols with Thermocycler Gen2 ([#10850](https://github.com/Opentrons/opentrons/issues/10850)) ([02c7c79](https://github.com/Opentrons/opentrons/commit/02c7c79cf908616f8831bad77f7af461a5852edf))
 
@@ -20,11 +19,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **shared-data:** add Armadillo PCR plate and adapter definitions ([#11003](https://github.com/Opentrons/opentrons/issues/11003)) ([2519f8a](https://github.com/Opentrons/opentrons/commit/2519f8a50ac88f078c85ed42a1ba2c413f61968d))
 * **shared-data:** update Thermocycler Gen2 module definition ([#10951](https://github.com/Opentrons/opentrons/issues/10951)) ([9fa9f83](https://github.com/Opentrons/opentrons/commit/9fa9f8319965b9e7e21d68b8928915751d088614))
 * **step-generation, shared-data:** delete TC await profile complete command ([#11273](https://github.com/Opentrons/opentrons/issues/11273)) ([9654cf2](https://github.com/Opentrons/opentrons/commit/9654cf2c86f7908bf718053a5bbab222d6103a73)), closes [#11272](https://github.com/Opentrons/opentrons/issues/11272)
-
-
-### Reverts
-
-* Revert "fix(api): Disallow uploading a protocol with non matching references (#11457)" (#11475) ([02d39a0](https://github.com/Opentrons/opentrons/commit/02d39a0a8774e528da7a7ffadaabe9f45805c33e)), closes [#11457](https://github.com/Opentrons/opentrons/issues/11457) [#11475](https://github.com/Opentrons/opentrons/issues/11475)
 
 
 
