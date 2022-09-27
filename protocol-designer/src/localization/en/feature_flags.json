@@ -25,7 +25,7 @@
     "description": "Allow users to enable Thermocycler GEN2 module and steps in protocols"
   },
   "OT_PD_ENABLE_OT_3": {
-    "title": "Enabled OT-3 support",
+    "title": "Enable OT-3 support",
     "description": "Allow users to enable OT-3 support in protocol designer"
   }
 }
