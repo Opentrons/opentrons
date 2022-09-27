@@ -24,7 +24,7 @@ MOUNT = OT3Mount.GRIPPER
 deck_def = load_deck_def("ot3_standard", version=3)
 # Offset of the center of the gripper jaw to the desired location
 GRIPPER_OFFSET = Point(0.0, 1.0, 0.0)
-AVAILABLE_SLOTS = [1, 3, 4, 9, 12]
+AVAILABLE_SLOTS = [1, 3, 4, 9, 10, 12]
 
 
 class GripperState(enum.Enum):
@@ -152,19 +152,16 @@ def add_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Gripper control script.")
+    add_args(parser)
+    args = parser.parse_args()
+
     hc_api = build_api()
 
-    from_slot = prompt_int_input("Origin slot (1-12)")
-    assert (
-        from_slot in AVAILABLE_SLOTS
-    ), "Please specify one of these available slots: 1, 3, 4, 9, 12"
-    grip_force = prompt_float_input("Force in Newton to grip the labware (rec: 20 N)")
-    grip_height = prompt_float_input(
-        "Z-height from the deck in mm to grip labware (rec: 25 mm)"
-    )
-    repeats = prompt_int_input(
-        "How many times do you want this script to repeat? Type 0 if you only want to run the script once"
-    )
+    from_slot = args.origin
+    grip_force = args.grip_froce
+    grip_height = args.grip_height
+    repeats = args.repeats
 
     api = hc_api.sync
     api.home()
