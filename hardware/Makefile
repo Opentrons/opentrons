@@ -114,7 +114,6 @@ format:
 dev:
 	echo "Nothing here yet"
 
-
 .PHONY: push-no-restart
 push-no-restart: wheel
 	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))

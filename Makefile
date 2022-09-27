@@ -22,7 +22,7 @@ NOTIFY_SERVER_DIR := notify-server
 ENVIRONMENTS := environments
 
 PYTHON_SETUP_DIRS := $(ENVIRONMENTS) $(G_CODE_TESTING_DIR) $(HARDWARE_TESTING_DIR)
-PYTHON_CLEAN_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python $(HARDWARE_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_TESTING_DIR)
+PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python $(HARDWARE_DIR) $(G_CODE_TESTING_DIR) $(HARDWARE_TESTING_DIR)
 PYTHON_TEARDOWN_DIRS := $(PYTHON_SETUP_DIRS)
 
 # This may be set as an environment variable (and is by CI tasks that upload
@@ -102,7 +102,7 @@ clean-js: clean-ts
 	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) clean
 	$(MAKE) -C $(COMPONENTS_DIR) clean
 
-PYTHON_CLEAN_TARGETS := $(addsuffix -py-clean, $(PYTHON_CLEAN_DIRS))
+PYTHON_CLEAN_TARGETS := $(addsuffix -py-clean, $(PYTHON_DIRS))
 
 .PHONY: clean-py
 clean-py: $(PYTHON_CLEAN_TARGETS)
@@ -180,9 +180,8 @@ test-e2e:
 
 .PHONY: test-py-windows
 test-py-windows:
-	$(MAKE) -C $(HARDWARE_DIR) test
-	$(MAKE) -C $(API_DIR) test
-	$(MAKE) -C $(SHARED_DATA_DIR) test-py
+	$(MAKE) -C $(API_DIR) test-app
+	$(MAKE) -C $(SHARED_DATA_DIR)/python test-app
 
 .PHONY: test-py
 test-py: test-py-windows
@@ -190,6 +189,8 @@ test-py: test-py-windows
 	$(MAKE) -C $(ROBOT_SERVER_DIR) test
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) test
 	$(MAKE) -C $(G_CODE_TESTING_DIR) test
+	$(MAKE) -C $(HARDWARE_DIR) test
+	$(MAKE) -C $(HARDWARE_TESTING_DIR) test
 
 .PHONY: test-js
 test-js:

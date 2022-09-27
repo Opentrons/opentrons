@@ -53,7 +53,7 @@ jobs:
 
 
   python-test:
-    name: 'shared-data package python ${{ matrix.python }}'
+    name: 'shared-data package on ${{ matrix.os }}'
     timeout-minutes: 35
     needs: [python-lint]
     strategy:
