@@ -101,6 +101,7 @@ class MessageId(int, Enum):
     set_brushed_motor_pwm_request = 0x41
     gripper_grip_request = 0x42
     gripper_home_request = 0x43
+    add_brushed_linear_move_request = 0x44
 
     read_presence_sensing_voltage_request = 0x600
     read_presence_sensing_voltage_response = 0x601

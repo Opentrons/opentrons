@@ -1,19 +1,10 @@
 """Helpers for flagging unsafe movements to a Thermocycler Module."""
 
+from typing import Optional
 
-from typing import List, Optional
-
-from opentrons.hardware_control.modules.types import (
-    # Renamed to avoid conflicting with ..types.ModuleModel.
-    ModuleType as OpentronsModuleType,
-    ThermocyclerModuleModel as OpentronsThermocyclerModuleModel,
-)
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import (
-    AbstractModule as AbstractHardwareModule,
-    Thermocycler as HardwareThermocycler,
-)
+from opentrons.hardware_control.modules import Thermocycler as HardwareThermocycler
 
 from ..types import ModuleLocation
 from ..state import StateStore
@@ -155,22 +146,7 @@ class ThermocyclerMovementFlagger:
         Returns:
             The matching hardware Thermocycler, or None if none was found.
         """
-        available_modules, simulating_module = await self._hardware_api.find_modules(
-            # Using a placeholder model since it is only required for creating
-            # a simulating module, which we don't use here.
-            by_model=OpentronsThermocyclerModuleModel.THERMOCYCLER_V1,
-            # Hard-coding instead of using
-            # opentrons.protocols.geometry.module_geometry.resolve_module_type(),
-            # to avoid parsing a JSON definition every time a protocol moves to
-            # something inside a Thermocycler.
-            resolved_type=OpentronsModuleType.THERMOCYCLER,
-        )
-
-        modules_to_check: List[AbstractHardwareModule] = (
-            available_modules if simulating_module is None else [simulating_module]
-        )
-
-        for module in modules_to_check:
+        for module in self._hardware_api.attached_modules:
             # Different module types have different keys under .device_info.
             # Thermocyclers should always have .device_info["serial"].
             if (

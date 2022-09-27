@@ -13,15 +13,14 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../../atoms/text'
+import { StyledText } from '../../../atoms/text'
 import { OverflowMenu } from './OverflowMenu'
-import { formatLastCalibrated } from './utils'
-import { getDisplayNameForTipRack } from '../utils'
-import { getCustomLabwareDefinitions } from '../../../../redux/custom-labware'
-import { useAttachedPipettes } from '../../hooks'
+import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
+import { getCustomLabwareDefinitions } from '../../../redux/custom-labware'
+import { useAttachedPipettes } from '../../../organisms/Devices/hooks'
 
-import type { State } from '../../../../redux/types'
-import type { FormattedPipetteOffsetCalibration } from '../RobotSettingsCalibration'
+import type { State } from '../../../redux/types'
+import type { FormattedPipetteOffsetCalibration } from '..'
 
 const StyledTable = styled.table`
   width: 100%;
@@ -114,7 +113,7 @@ export function PipetteOffsetCalibrationItems({
                           <>
                             <Icon
                               name="alert-circle"
-                              backgroundColor={COLORS.warningBackground}
+                              backgroundColor={COLORS.warningBackgroundLight}
                               color={COLORS.warningEnabled}
                               size={SPACING.spacing4}
                             />
@@ -131,7 +130,7 @@ export function PipetteOffsetCalibrationItems({
                           <>
                             <Icon
                               name="alert-circle"
-                              backgroundColor={COLORS.errorBackground}
+                              backgroundColor={COLORS.errorBackgroundLight}
                               color={COLORS.errorEnabled}
                               size={SPACING.spacing4}
                             />

@@ -1,17 +1,22 @@
-import json
 from typing import Dict
 
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_api import labware, MAX_SUPPORTED_VERSION
+from opentrons_shared_data.labware.dev_types import WellDefinition
+
+from opentrons.hardware_control.modules.types import (
+    MagneticModuleModel,
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
+    HeaterShakerModuleModel,
+)
+
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, labware, validation
 from opentrons.protocols.geometry import module_geometry
 from opentrons.protocols.geometry.well_geometry import WellGeometry
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.protocol_api.core.protocol_api.well import WellImplementation
-
-from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.labware.dev_types import WellDefinition
 
 from opentrons.calibration_storage import helpers
 from opentrons.types import Point, Location
@@ -456,45 +461,25 @@ def test_return_tips(opentrons_96_tiprack_300ul) -> None:
     assert not tiprack.wells()[8].has_tip
 
 
-@pytest.mark.parametrize("v1_module_name", ["tempdeck", "magdeck", "thermocycler"])
-def test_module_load_v1(v1_module_name) -> None:
-    module_defs = json.loads(load_shared_data("module/definitions/1.json"))
-    model = module_geometry.resolve_module_model(v1_module_name)
-    mod = module_geometry.load_module(model, Location(Point(0, 0, 0), "test"))
-    mod_def = module_defs[v1_module_name]
-    offset = Point(
-        mod_def["labwareOffset"]["x"],
-        mod_def["labwareOffset"]["y"],
-        mod_def["labwareOffset"]["z"],
-    )
-    high_z = mod_def["dimensions"]["bareOverallHeight"]
-    assert mod.highest_z == high_z
-    assert mod.location.point == offset
-    mod = module_geometry.load_module(model, Location(Point(1, 2, 3), "test"))
-    assert mod.highest_z == high_z + 3
-    assert mod.location.point == (offset + Point(1, 2, 3))
-    mod2 = module_geometry.load_module_from_definition(
-        module_defs[v1_module_name],
-        Location(Point(3, 2, 1), "test2"),
-        module_geometry.ThermocyclerConfiguration.FULL,  # type: ignore[attr-defined]
-    )
-    assert mod2.highest_z == high_z + 1
-    assert mod2.location.point == (offset + Point(3, 2, 1))
-
-
 @pytest.mark.parametrize(
     "module_model",
-    list(module_geometry.MagneticModuleModel)  # type: ignore[attr-defined]
-    + list(module_geometry.TemperatureModuleModel)  # type: ignore[attr-defined]
-    + list(module_geometry.ThermocyclerModuleModel),  # type: ignore[attr-defined]
+    (
+        list(MagneticModuleModel)
+        + list(TemperatureModuleModel)
+        + list(ThermocyclerModuleModel)
+        + list(HeaterShakerModuleModel)
+    ),
 )
-def test_module_load_v2(module_model) -> None:
-    mod = module_geometry.load_module(module_model, Location(Point(0, 0, 0), "3"))
-    mod_def = module_geometry._load_module_definition(
-        MAX_SUPPORTED_VERSION, module_model
+def test_module_geometry_load(module_model) -> None:
+    definition = module_geometry.load_definition(module_model)
+    geometry = module_geometry.create_geometry(
+        definition=definition,
+        parent=Location(Point(0, 0, 0), "3"),
+        configuration=None,
     )
-    high_z = mod_def["dimensions"]["bareOverallHeight"]
-    assert mod.highest_z == high_z
+    high_z = definition["dimensions"]["bareOverallHeight"]
+
+    assert geometry.highest_z == high_z
 
 
 @pytest.mark.parametrize(
@@ -519,8 +504,13 @@ def test_module_load_v2(module_model) -> None:
 def test_module_load_labware(module_name) -> None:
     labware_name = "corning_96_wellplate_360ul_flat"
     labware_def = labware.get_labware_definition(labware_name)
-    model = module_geometry.resolve_module_model(module_name)
-    mod = module_geometry.load_module(model, Location(Point(0, 0, 0), "test"))
+    mod_model = validation.ensure_module_model(module_name)
+    mod_definition = module_geometry.load_definition(mod_model)
+    mod = module_geometry.create_geometry(
+        mod_definition,
+        Location(Point(0, 0, 0), "test"),
+        None,
+    )
     old_z = mod.highest_z
     lw = labware.load_from_definition(labware_def, mod.location)
     mod.add_labware(lw)

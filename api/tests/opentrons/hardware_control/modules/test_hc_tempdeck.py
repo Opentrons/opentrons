@@ -24,7 +24,7 @@ async def subject(usb_port: USBPort) -> modules.AbstractModule:
     temp = await modules.build(
         port="/dev/ot_module_sim_tempdeck0",
         usb_port=usb_port,
-        which="tempdeck",
+        type=modules.ModuleType.TEMPERATURE,
         simulating=True,
         loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),

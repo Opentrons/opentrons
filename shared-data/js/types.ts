@@ -405,6 +405,13 @@ export interface LoadedLabware {
     slotName: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
   }
 }
+
+export interface LoadedLiquid {
+  id: string
+  displayName: string
+  description: string
+  displayColor: string
+}
 export interface AnalysisError {
   id: string
   detail: string
@@ -418,6 +425,7 @@ export interface CompletedProtocolAnalysis {
   result: 'ok' | 'not-ok' | 'error'
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
+  liquids: LoadedLiquid[]
   commands: RunTimeCommand[]
   errors: AnalysisError[]
 }
