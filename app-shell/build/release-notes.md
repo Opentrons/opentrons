@@ -32,10 +32,6 @@ Welcome to the v6.1.0 release of the Opentrons App! This release focuses on addi
 - Fixes a bug that prevented changing pipette settings when the All Pipette Config feature flag was on
 - Interface fixes and improvements
 
-## Known Issues
-
-- Running module commands from Jupyter notebook while the robot server is running will result in errors, and commands may not execute as expected. This issue will be addressed in an upcoming release. If you need to use modules in Jupyter notebook in v6.1.0, first `ssh` to your robot and stop the robot server with `systemctl stop opentrons-robot-server`.
-
 ---
 
 # Opentrons App Changes in 6.0.1
