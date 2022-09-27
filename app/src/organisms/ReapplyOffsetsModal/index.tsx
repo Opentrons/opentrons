@@ -47,6 +47,11 @@ interface ReapplyOffsetsModalProps {
   runId: string
 }
 
+/**
+ * @deprecated This component is slated for removal along with the
+ * enableManualDeckStateMod feature flag. It's functionality is being
+ * replaced by ApplyHistoricOffsets 
+ */
 export function ReapplyOffsetsModal(
   props: ReapplyOffsetsModalProps
 ): JSX.Element | null {
