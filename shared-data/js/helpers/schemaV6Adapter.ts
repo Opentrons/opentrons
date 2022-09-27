@@ -104,7 +104,7 @@ export const schemaV6Adapter = (
         description: string
         displayColor?: string
       }
-    } = protocolAnalysis.liquids.reduce((acc, liquid) => {
+    } = (protocolAnalysis?.liquids ?? []).reduce((acc, liquid) => {
       return {
         ...acc,
         [liquid.id]: {
