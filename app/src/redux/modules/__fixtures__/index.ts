@@ -178,6 +178,7 @@ export const mockApiThermocyclerLegacy: ApiTypes.ApiThermocyclerModuleLegacy = {
   data: {
     lidStatus: 'open',
     lidTargetTemperature: null,
+    lidTemperatureStatus: 'idle',
     lidTemperature: null,
     currentTemperature: null,
     targetTemperature: null,
@@ -203,6 +204,7 @@ export const mockApiThermocycler: ApiTypes.ApiThermocyclerModule = {
   data: {
     lidStatus: 'open',
     lidTargetTemperature: null,
+    lidTemperatureStatus: 'idle',
     lidTemperature: null,
     currentTemperature: null,
     targetTemperature: null,
@@ -228,6 +230,7 @@ export const mockThermocycler: Types.ThermocyclerModule = {
   data: {
     lidStatus: 'open',
     lidTargetTemperature: null,
+    lidTemperatureStatus: 'idle',
     lidTemperature: null,
     currentTemperature: null,
     targetTemperature: null,
@@ -253,6 +256,7 @@ export const mockThermocyclerGen2: Types.ThermocyclerModule = {
   data: {
     lidStatus: 'open',
     lidTargetTemperature: null,
+    lidTemperatureStatus: 'idle',
     lidTemperature: null,
     currentTemperature: null,
     targetTemperature: null,

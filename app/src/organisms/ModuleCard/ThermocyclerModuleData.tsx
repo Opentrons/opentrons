@@ -10,6 +10,7 @@ import {
   SPACING,
   WRAP,
   Box,
+  DIRECTION_ROW,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
@@ -37,13 +38,13 @@ export const ThermocyclerModuleData = (
 
     switch (status) {
       case 'closed':
+      case 'open':
       case 'idle': {
         StatusLabelProps.backgroundColor = COLORS.medGreyEnabled
         StatusLabelProps.iconColor = COLORS.darkGreyEnabled
         StatusLabelProps.textColor = COLORS.darkBlackEnabled
         break
       }
-      case 'open':
       case 'holding at target': {
         StatusLabelProps.backgroundColor = COLORS.medBlue
         StatusLabelProps.iconColor = COLORS.blueEnabled
@@ -80,22 +81,22 @@ export const ThermocyclerModuleData = (
           {t('tc_lid')}
         </StyledText>
 
-        {/* TODO(jr, 9/22/22): when the module endpoint includes lid temperature status, add the status label
-           <Flex flexDirection={DIRECTION_ROW}> */}
-        <Box marginRight={SPACING.spacing2}>
+        <Flex flexDirection={DIRECTION_ROW}>
+          <Box marginRight={SPACING.spacing2}>
+            <StatusLabel
+              status={data.lidStatus}
+              {...getStatusLabelProps(data.lidStatus)}
+              key="lidStatus"
+              id="lidStatus"
+            />
+          </Box>
           <StatusLabel
-            status={data.lidStatus}
-            {...getStatusLabelProps(data.lidStatus)}
-            key="StatusLabel_lidStatus"
-          />
-        </Box>
-        {/* <StatusLabel
             status={data.lidTemperatureStatus}
-             {...getStatusLabelProps(data.lidTemperatureStatus)}
-             key="statusLabel_litTempStatus"
-           />
-         </Flex> */}
-
+            {...getStatusLabelProps(data.lidTemperatureStatus)}
+            key="lidTempStatus"
+            id="lidTempStatus"
+          />
+        </Flex>
         <StyledText
           title="lid_target_temp"
           fontSize={TYPOGRAPHY.fontSizeCaption}
@@ -126,7 +127,8 @@ export const ThermocyclerModuleData = (
         <StatusLabel
           status={data.status}
           {...getStatusLabelProps(data.status)}
-          key="StatusLabel_blockStatus"
+          key="blockStatus"
+          id="blockStatus"
         />
         <StyledText
           title="tc_target_temp"
