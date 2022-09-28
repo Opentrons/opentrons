@@ -122,16 +122,42 @@ def test_serial_gadget_success(
     )
 
 
+def test_get_serial_handle_path(
+    subject: usb_config.SerialGadget,
+    os_driver: mock.Mock,
+    monkeypatch: pytest.MonkeyPatch,
+    tmpdir: Path,
+) -> None:
+    # Set up mock filesystem
+    port_num_dir = os.path.join(str(tmpdir), usb_config.FUNCTION_SUBFOLDER)
+    os.makedirs(port_num_dir)
+    port_num_path = Path(tmpdir) / usb_config.FUNCTION_SUBFOLDER / "port_num"
+    subject._basename = str(tmpdir)
+
+    # Test failure (no port_num)
+    with pytest.raises(Exception):
+        subject._get_handle_path()
+    # Test success
+    port_num_path.write_text("0")
+    assert subject._get_handle_path() == "/dev/ttyGS0"
+
+
 def test_serial_handle(
     subject: usb_config.SerialGadget,
     os_driver: mock.Mock,
     monkeypatch: pytest.MonkeyPatch,
     tmpdir: Path,
 ) -> None:
+    # Need to set up a fake
     dummy_handle = Path(tmpdir) / "test"
     # Use the real `os.path.exists` method
     os_driver.exists = usb_config.OSDriver.exists
-    monkeypatch.setattr("ot3usb.src.usb_config.SerialGadget.HANDLE", str(dummy_handle))
+
+    def mocked_get_serial_handle_path() -> str:
+        return str(dummy_handle)
+
+    monkeypatch.setattr(subject, "_get_handle_path", mocked_get_serial_handle_path)
+
     assert not subject.handle_exists()
     dummy_handle.write_text("existence")
     assert subject.handle_exists()

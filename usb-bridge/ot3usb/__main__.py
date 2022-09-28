@@ -1,6 +1,7 @@
 """Entrypoint for the USB-TCP bridge application."""
 import asyncio
 import logging
+import time
 from typing import NoReturn
 from .src import cli, usb_config, default_config
 
@@ -28,6 +29,11 @@ async def main() -> NoReturn:
         LOG.error("Failed to configure UDC as USB gadget")
         LOG.error(f"Exception: {format(err)}")
         exit(-1)
+
+    # Spin for at least a second
+    timeout = time.time() + 2.0
+    while time.time() < timeout and not config.handle_exists():
+        time.sleep(0.1)
 
     if not config.handle_exists():
         LOG.error("Cannot find UDC serial handle")
