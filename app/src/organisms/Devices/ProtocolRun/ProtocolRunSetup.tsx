@@ -24,7 +24,6 @@ import {
   useProtocolAnalysisErrors,
   useStoredProtocolAnalysis,
 } from '../hooks'
-import { protocolHasLiquids } from '@opentrons/shared-data'
 
 import { SetupLabware } from './SetupLabware'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
