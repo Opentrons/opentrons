@@ -30,6 +30,7 @@ import {
   getRobotModelByName,
 } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
+import { useFeatureFlag } from '../../redux/config'
 import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
 import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
@@ -43,7 +44,6 @@ import { RobotOverflowMenu } from './RobotOverflowMenu'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { State } from '../../redux/types'
-import { useFeatureFlag } from '../../redux/config'
 
 const ROBOT_CARD_STYLE = css`
   border: 1px solid ${COLORS.medGreyEnabled};

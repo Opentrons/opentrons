@@ -9,10 +9,10 @@ export type DiscoveryCandidates = string[]
 export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'enableBundleUpload'
-  | 'enableCalibrationWizards'
   | 'enableChangePipetteWizard'
   | 'enableLiquidSetup'
   | 'enableManualDeckStateModification'
+  | 'enableCalibrationWizards'
   | 'enableThermocyclerGen2'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
