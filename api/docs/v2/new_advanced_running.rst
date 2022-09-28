@@ -40,15 +40,20 @@ All subsequent method calls will use the same :py:class:`.ProtocolContext`, unle
 Running a Previously Written Protocol
 +++++++++++++++++++++++++++++++++++++
 
-You can also use Jupyter to run a protocol that you have already written. To do so, copy the entire text of the protocol into a cell and run that cell. Since a typical protocol only `defines` the ``run`` function but doesn't `call` it, this won't immediately cause the OT-2 to move. To begin the run, instantiate a :py:class:`.ProtocolContext` and pass it to the ``run`` function you just defined:
+You can also use Jupyter to run a protocol that you have already written. To do so, first copy the entire text of the protocol into a cell and run that cell:
 
 .. code-block:: python
-    :substitutions:
 
     import opentrons.execute
     from opentrons import protocol_api
     def run(protocol: protocol_api.ProtocolContext):
         # the contents of your previously written protocol go here
+
+
+Since a typical protocol only `defines` the ``run`` function but doesn't `call` it, this won't immediately cause the OT-2 to move. To begin the run, instantiate a :py:class:`.ProtocolContext` and pass it to the ``run`` function you just defined:
+
+.. code-block:: python
+    :substitutions:
 
     protocol = opentrons.execute.get_protocol_api('|apiLevel|')
     run(protocol)  # your protocol will now run
