@@ -175,7 +175,16 @@ class SerialGadget:
         udc_handles = self._driver.listdir(UDC_HANDLE_FOLDER)
         if len(udc_handles) == 0:
             raise Exception("Failed to find UDC handle. Check kernel configuration.")
-        self._write_file(udc_handles[0], udc_path)
+        # Before writing the UDC handle, we write nothing to the UDC file
+        # to clear any configuration.
+        try: 
+            self._write_file('\n', 'UDC')
+        except Exception:
+            LOG.info('UDC was already uninitialized')
+        try:
+            self._write_file(udc_handles[0], 'UDC')
+        except Exception:
+            raise Exception("UDC is occupied by another driver!")
         if not self._driver.exists(udc_path):
             raise Exception("Failed to enumerate UDC")
 
