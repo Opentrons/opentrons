@@ -13,9 +13,8 @@ from typing import (
     cast,
 )
 
-from opentrons.calibration_storage.ot2 import get, delete
-from opentrons.calibration_storage.types import TipLengthCalNotFound, PipetteId
-from opentrons.calibration_storage import helpers
+from opentrons.calibration_storage import (
+    helpers, types as cal_types, ot2_deck_attitude, ot2_pipette_offset)
 from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
 from opentrons.hardware_control.instruments.ot2 import instrument_calibration
@@ -323,7 +322,7 @@ class DeckCalibrationUserFlow:
             if self._current_state == State.savingPointThree:
                 self._save_attitude_matrix()
                 # clear all pipette offset data
-                delete.clear_pipette_offset_calibrations()
+                ot2_pipette_offset.clear_pipette_offset_calibrations()
 
     def _save_attitude_matrix(self):
         e = tuplefy_cal_point_dicts(self._expected_points)
@@ -341,10 +340,10 @@ class DeckCalibrationUserFlow:
         pip_id = self._hw_pipette.pipette_id
         assert pip_id
         try:
-            return get.load_tip_length_calibration(
-                cast(PipetteId, pip_id), self._tip_rack._implementation.get_definition()
+            return ot2_deck_attitude.load_tip_length_calibration(
+                cast(cal_types.PipetteId, pip_id), self._tip_rack._implementation.get_definition()
             ).tipLength
-        except TipLengthCalNotFound:
+        except cal_types.TipLengthCalNotFound:
             tip_overlap = self._hw_pipette.config.tip_overlap.get(self._tip_rack.uri, 0)
             tip_length = self._tip_rack.tip_length
             return tip_length - tip_overlap

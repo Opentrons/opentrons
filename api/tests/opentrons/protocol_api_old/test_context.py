@@ -22,8 +22,7 @@ from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
 from opentrons.config.pipette_config import config_names, load as pip_load
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.calibration_storage import types as cs_types
-from opentrons.calibration_storage.ot2 import schemas, get
+from opentrons.calibration_storage import types as cs_types, ot2_schemas, ot2_tip_length
 from opentrons.util.helpers import utc_now
 
 import pytest
@@ -1020,14 +1019,14 @@ def test_tip_length_for_caldata(ctx, monkeypatch):
     instr = ctx.load_instrument("p20_single_gen2", "left")
     tiprack = ctx.load_labware("geb_96_tiprack_10ul", "1")
     mock_tip_length = mock.Mock()
-    mock_tip_length.return_value = schemas.v1.TipLengthSchema(
+    mock_tip_length.return_value = ot2_schemas.v1.TipLengthSchema(
         tipLength=2,
         lastModified=utc_now(),
         source=cs_types.SourceType.user,
-        status=schemas.v1.CalibrationStatus(markedBad=False),
+        status=ot2_schemas.v1.CalibrationStatus(markedBad=False),
         uri=LabwareUri("opentrons/geb_96_tiprack_10ul/1"),
     )
-    monkeypatch.setattr(get, "load_tip_length_calibration", mock_tip_length)
+    monkeypatch.setattr(ot2_tip_length, "load_tip_length_calibration", mock_tip_length)
     assert instr._tip_length_for(tiprack) == 2
     mock_tip_length.side_effect = cs_types.TipLengthCalNotFound
     assert instr._tip_length_for(tiprack) == (

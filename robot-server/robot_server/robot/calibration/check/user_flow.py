@@ -2,12 +2,9 @@ import logging
 from typing import List, Optional, Tuple, Awaitable, Callable, Dict, Any, cast
 from typing_extensions import Literal
 
-from opentrons.calibration_storage import helpers, types as cal_types
-from opentrons.calibration_storage.ot2 import get, modify, schemas
-from opentrons.calibration_storage.types import (
-    TipLengthCalNotFound,
-    SourceType,
-)
+from opentrons.calibration_storage import (
+    helpers, types as cal_types,
+    ot2_deck_attitude, ot2_tip_length, ot2_pipette_offset, ot2_schemas)
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import (
     HardwareControlAPI,
@@ -321,9 +318,9 @@ class CheckCalibrationUserFlow:
             return r_info, [r_info, l_info]
 
     def _get_current_calibrations(self):
-        deck = get.get_robot_deck_attitude()
+        deck = ot2_deck_attitude.get_robot_deck_attitude()
         pipette_offsets = {
-            m: get.get_pipette_offset(cast(cal_types.PipetteId, p.pipette_id), m)
+            m: ot2_pipette_offset.get_pipette_offset(cast(cal_types.PipetteId, p.pipette_id), m)
             for m, p in self._filtered_hw_pips.items()
         }
         tip_lengths = {
@@ -334,10 +331,10 @@ class CheckCalibrationUserFlow:
 
     def _get_tip_length_from_pipette(
         self, mount: Mount, pipette: Pipette
-    ) -> Optional[schemas.v1.TipLengthSchema]:
+    ) -> Optional[ot2_schemas.v1.TipLengthSchema]:
         if not pipette.pipette_id:
             return None
-        pip_offset = get.get_pipette_offset(
+        pip_offset = ot2_pipette_offset.get_pipette_offset(
             cast(cal_types.PipetteId, pipette.pipette_id), mount
         )
         if not pip_offset or not pip_offset.uri:
@@ -353,8 +350,8 @@ class CheckCalibrationUserFlow:
             )
             tiprack_def = tiprack._implementation.get_definition()
         else:
-            tiprack_def = get.get_custom_tiprack_definition_for_tlc(pip_offset.uri)
-        return get.load_tip_length_calibration(
+            tiprack_def = ot2_tip_length.get_custom_tiprack_definition_for_tlc(pip_offset.uri)
+        return ot2_tip_length.load_tip_length_calibration(
             cast(cal_types.PipetteId, pipette.pipette_id), tiprack_def
         )
 
@@ -404,13 +401,13 @@ class CheckCalibrationUserFlow:
         self,
         pipette: Optional[Pipette] = None,
         mount: Optional[Mount] = None,
-    ) -> schemas.v1.InstrumentOffsetSchema:
+    ) -> ot2_schemas.v1.InstrumentOffsetSchema:
         if not pipette or not mount:
-            pip_offset = get.get_pipette_offset(
+            pip_offset = ot2_pipette_offset.get_pipette_offset(
                 self.hw_pipette.pipette_id, self.mount  # type: ignore
             )
         else:
-            pip_offset = get.get_pipette_offset(
+            pip_offset = ot2_pipette_offset.get_pipette_offset(
                 pipette.pipette_id, mount  # type: ignore
             )
         assert pip_offset, "No Pipette Offset Found"
@@ -419,7 +416,7 @@ class CheckCalibrationUserFlow:
     @staticmethod
     def _get_tr_lw(
         tip_rack_def: Optional[LabwareDefinition],
-        existing_calibration: schemas.v1.InstrumentOffsetSchema,
+        existing_calibration: ot2_schemas.v1.InstrumentOffsetSchema,
         volume: float,
         position: Location,
     ) -> labware.Labware:
@@ -439,7 +436,7 @@ class CheckCalibrationUserFlow:
             try:
                 details = helpers.details_from_uri(existing_calibration.uri)
                 if not details.namespace == OPENTRONS_NAMESPACE:
-                    tiprack_def = get.get_custom_tiprack_definition_for_tlc(
+                    tiprack_def = ot2_tip_length.get_custom_tiprack_definition_for_tlc(
                         existing_calibration.uri
                     )
                     return labware.load_from_definition(
@@ -472,7 +469,7 @@ class CheckCalibrationUserFlow:
         return tr_lw
 
     def _get_tiprack_by_pipette_volume(
-        self, volume: float, existing_calibration: schemas.v1.InstrumentOffsetSchema
+        self, volume: float, existing_calibration: ot2_schemas.v1.InstrumentOffsetSchema
     ) -> labware.Labware:
         tip_rack_def = None
         if self._tip_racks:
@@ -671,12 +668,12 @@ class CheckCalibrationUserFlow:
                 self._tip_lengths[active_mount], SourceType.calibration_check
             )
             tip_definition = self.active_tiprack._implementation.get_definition()
-            tip_length_dict = modify.create_tip_length_data(
+            tip_length_dict = ot2_tip_length.create_tip_length_data(
                 definition=tip_definition,
                 length=calibration.tip_length,
                 cal_status=calibration.status,
             )
-            modify.save_tip_length_calibration(calibration.pipette, tip_length_dict)
+            ot2_tip_length.save_tip_length_calibration(calibration.pipette, tip_length_dict)
         elif self.current_state == State.comparingPointOne and pipette_state:
             # Here if we're on the second pipette, but the first slot we
             # should make sure we mark both pipette cal and deck cal as bad.
@@ -688,7 +685,7 @@ class CheckCalibrationUserFlow:
             )
             pipette_id = self.hw_pipette.pipette_id
             assert pipette_id, "Cannot update pipette offset calibraion"
-            modify.save_pipette_calibration(
+            ot2_pipette_offset.save_pipette_calibration(
                 offset=Point(*pip_calibration.offset),
                 pip_id=cast(cal_types.PipetteId, pipette_id),
                 mount=active_mount,
@@ -696,7 +693,7 @@ class CheckCalibrationUserFlow:
                 tiprack_uri=pip_calibration.uri,
                 cal_status=pip_calibration.status,
             )
-            modify.save_robot_deck_attitude(
+            ot2_pipette_offset.save_robot_deck_attitude(
                 transform=deck_calibration.attitude,
                 pip_id=deck_calibration.pipette_calibrated_with,
                 lw_hash=deck_calibration.tiprack,
@@ -709,7 +706,7 @@ class CheckCalibrationUserFlow:
             )
             pipette_id = self.hw_pipette.pipette_id
             assert pipette_id, "Cannot update pipette offset calibraion"
-            modify.save_pipette_calibration(
+            ot2_pipette_offset.save_pipette_calibration(
                 offset=Point(*calibration.offset),
                 pip_id=cast(cal_types.PipetteId, pipette_id),
                 mount=active_mount,
@@ -721,7 +718,7 @@ class CheckCalibrationUserFlow:
             calibration = modify.mark_bad(
                 self._deck_calibration, SourceType.calibration_check
             )
-            modify.save_robot_deck_attitude(
+            ot2_deck_attitude.save_robot_deck_attitude(
                 transform=calibration.attitude,
                 pip_id=calibration.pipette_calibrated_with,
                 lw_hash=calibration.tiprack,
@@ -830,7 +827,7 @@ class CheckCalibrationUserFlow:
         assert pip_id
         assert self.active_tiprack
         try:
-            return get.load_tip_length_calibration(
+            return ot2_tip_length.load_tip_length_calibration(
                 cast(cal_types.PipetteId, pip_id),
                 self.active_tiprack._implementation.get_definition(),
             ).tipLength

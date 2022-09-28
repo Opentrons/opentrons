@@ -9,8 +9,9 @@ from opentrons.config import IS_ROBOT, feature_flags
 
 # (lc 09-15-2022) Choosing to import both libraries rather than type
 # ignore an import_module command using importlib.
-from opentrons.calibration_storage.ot2 import delete as ot2_delete
-from opentrons.calibration_storage.ot3 import delete as ot3_delete
+from opentrons.calibration_storage import (
+    ot2_deck_attitude, ot2_tip_length, ot2_pipette_offset,
+    ot3_deck_attitude, ot3_tip_length, ot3_pipette_offset)
 
 
 DATA_BOOT_D = Path("/data/boot.d")
@@ -101,24 +102,24 @@ def reset_boot_scripts() -> None:
 # rather than type ignore an import_module command using importlib.
 def reset_deck_calibration() -> None:
     if feature_flags.enable_ot3_hardware_controller():
-        ot3_delete.delete_robot_deck_attitude()
-        ot3_delete.clear_pipette_offset_calibrations()
+        ot3_deck_attitude.delete_robot_deck_attitude()
+        ot3_pipette_offset.clear_pipette_offset_calibrations()
     else:
-        ot2_delete.delete_robot_deck_attitude()
-        ot2_delete.clear_pipette_offset_calibrations()
+        ot2_deck_attitude.delete_robot_deck_attitude()
+        ot2_pipette_offset.clear_pipette_offset_calibrations()
 
 
 def reset_pipette_offset() -> None:
     if feature_flags.enable_ot3_hardware_controller():
-        ot3_delete.clear_pipette_offset_calibrations()
+        ot3_pipette_offset.clear_pipette_offset_calibrations()
     else:
-        ot2_delete.clear_pipette_offset_calibrations()
+        ot2_pipette_offset.clear_pipette_offset_calibrations()
 
 
 def reset_tip_length_calibrations() -> None:
     if feature_flags.enable_ot3_hardware_controller():
-        ot3_delete.clear_tip_length_calibration()
-        ot3_delete.clear_pipette_offset_calibrations()
+        ot3_tip_length.clear_tip_length_calibration()
+        ot2_pipette_offset.clear_pipette_offset_calibrations()
     else:
-        ot2_delete.clear_tip_length_calibration()
-        ot2_delete.clear_pipette_offset_calibrations()
+        ot2_tip_length.clear_tip_length_calibration()
+        ot2_pipette_offset.clear_pipette_offset_calibrations()

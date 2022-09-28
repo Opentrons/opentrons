@@ -12,8 +12,7 @@ from opentrons.config.robot_configs import (
     default_deck_calibration,
 )
 from opentrons.config.types import OT3Config
-from opentrons.calibration_storage import types
-from opentrons.calibration_storage.ot2 import modify, get
+from opentrons.calibration_storage import types, ot2_deck_attitude
 from opentrons.types import Point
 from opentrons.util import linal
 
@@ -156,7 +155,7 @@ def save_attitude_matrix(
     tiprack_hash: str,
 ) -> None:
     attitude = linal.solve_attitude(expected, actual)
-    modify.save_robot_deck_attitude(
+    ot2_deck_attitude.save_robot_deck_attitude(
         attitude,
         cast(types.PipetteId, pipette_id),
         cast(types.TiprackHash, tiprack_hash),
@@ -164,7 +163,7 @@ def save_attitude_matrix(
 
 
 def load_attitude_matrix() -> DeckCalibration:
-    calibration_data = get.get_robot_deck_attitude()
+    calibration_data = ot2_deck_attitude.get_robot_deck_attitude()
     gantry_cal = get_legacy_gantry_calibration()
     if not calibration_data and gantry_cal:
         if validate_gantry_calibration(gantry_cal) == DeckTransformState.OK:
@@ -175,13 +174,13 @@ def load_attitude_matrix() -> DeckCalibration:
                 )
             )
             attitude = migrate_affine_xy_to_attitude(gantry_cal)
-            modify.save_robot_deck_attitude(
+            ot2_deck_attitude.save_robot_deck_attitude(
                 transform=attitude,
                 pip_id=None,
                 lw_hash=None,
                 source=types.SourceType.legacy,
             )
-            calibration_data = get.get_robot_deck_attitude()
+            calibration_data = ot2_deck_attitude.get_robot_deck_attitude()
 
     if calibration_data:
         return DeckCalibration(**calibration_data.dict())

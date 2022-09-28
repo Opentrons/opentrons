@@ -5,8 +5,7 @@ from datetime import datetime
 from opentrons.config.robot_configs import default_pipette_offset
 
 from opentrons.types import Mount, Point
-from opentrons.calibration_storage import types, helpers
-from opentrons.calibration_storage.ot2 import get
+from opentrons.calibration_storage import types, helpers, ot2_pipette_offset, ot2_tip_length
 from opentrons.hardware_control.types import OT3Mount
 
 
@@ -76,7 +75,7 @@ def load_pipette_offset(
     else:
         checked_mount = mount
     if pip_id:
-        pip_offset_data = get.get_pipette_offset(
+        pip_offset_data = ot2_pipette_offset.get_pipette_offset(
             typing.cast(types.PipetteId, pip_id), checked_mount
         )
         if pip_offset_data:
@@ -102,7 +101,7 @@ def load_tip_length_for_pipette(
 ) -> TipLengthCalibration:
     if isinstance(tiprack, LabwareDefinition):
         tiprack = typing.cast("TypeDictLabwareDef", tiprack.dict())
-    tip_length_data = get.load_tip_length_calibration(
+    tip_length_data = ot2_tip_length.load_tip_length_calibration(
         typing.cast(types.PipetteId, pipette_id), tiprack
     )
     # TODO (lc 09-26-2022) We shouldn't have to do a hash twice. We should figure out what

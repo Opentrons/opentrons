@@ -9,6 +9,7 @@ import json
 import datetime
 import typing
 from pydantic import BaseModel
+from pathlib import Path
 
 from .types import StrPath
 from .encoder_decoder import DateTimeEncoder, DateTimeDecoder
@@ -16,6 +17,25 @@ from .encoder_decoder import DateTimeEncoder, DateTimeDecoder
 
 DecoderType = typing.Type[json.JSONDecoder]
 EncoderType = typing.Type[json.JSONEncoder]
+
+
+
+# TODO(mc, 2022-06-07): replace with Path.unlink(missing_ok=True)
+# when we are on Python >= 3.8
+def _delete_file(path: Path) -> None:
+    try:
+        path.unlink()
+    except FileNotFoundError:
+        pass
+
+
+def _remove_json_files_in_directories(p: Path) -> None:
+    """Delete json file by the path"""
+    for item in p.iterdir():
+        if item.is_dir():
+            _remove_json_files_in_directories(item)
+        elif item.suffix == ".json":
+            _delete_file(item)
 
 
 def read_cal_file(

@@ -9,8 +9,8 @@ from typing import (
     Union,
     Tuple,
 )
-from opentrons.calibration_storage import helpers
-from opentrons.calibration_storage.ot2 import get, modify, delete, schemas
+from opentrons.calibration_storage import (
+    helpers, ot2_pipette_offset, ot2_tip_length, ot2_schemas)
 from opentrons.calibration_storage.types import (
     TipLengthCalNotFound,
 )
@@ -299,7 +299,7 @@ class PipetteOffsetCalibrationUserFlow:
 
     def _get_stored_tip_length_cal(self) -> Optional[float]:
         try:
-            return get.load_tip_length_calibration(
+            return ot2_tip_length.load_tip_length_calibration(
                 self._hw_pipette.pipette_id,  # type: ignore[arg-type]
                 self._tip_rack._implementation.get_definition(),
             ).tipLength
@@ -308,8 +308,8 @@ class PipetteOffsetCalibrationUserFlow:
 
     def _get_stored_pipette_offset_cal(
         self,
-    ) -> Optional[schemas.v1.InstrumentOffsetSchema]:
-        return get.get_pipette_offset(
+    ) -> Optional[ot2_schemas.v1.InstrumentOffsetSchema]:
+        return ot2_pipette_offset.get_pipette_offset(
             self._hw_pipette.pipette_id, self._mount  # type: ignore[arg-type]
         )
 
@@ -335,7 +335,7 @@ class PipetteOffsetCalibrationUserFlow:
     @staticmethod
     def _get_tr_lw(
         tip_rack_def: Optional[LabwareDefinition],
-        existing_calibration: Optional[schemas.v1.InstrumentOffsetSchema],
+        existing_calibration: Optional[ot2_schemas.v1.InstrumentOffsetSchema],
         volume: float,
         position: Location,
     ) -> Tuple[bool, labware.Labware]:
@@ -364,7 +364,7 @@ class PipetteOffsetCalibrationUserFlow:
     def _load_tip_rack(
         self,
         tip_rack_def: Optional[LabwareDefinition],
-        existing_calibration: Optional[schemas.v1.InstrumentOffsetSchema],
+        existing_calibration: Optional[ot2_schemas.v1.InstrumentOffsetSchema],
     ):
         """
         load onto the deck the default opentrons tip rack labware for this
@@ -440,7 +440,7 @@ class PipetteOffsetCalibrationUserFlow:
                 self._tip_rack._implementation.get_definition()
             )
             offset = self._cal_ref_point - cur_pt
-            modify.save_pipette_calibration(
+            ot2_pipette_offset.save_pipette_calibration(
                 offset=offset,
                 mount=self._mount,
                 pip_id=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
@@ -466,7 +466,7 @@ class PipetteOffsetCalibrationUserFlow:
                 tip_length_offset=noz_pt.z - self._nozzle_height_at_reference,
                 tip_rack=self._tip_rack,
             )
-            delete.delete_pipette_offset_file(
+            ot2_pipette_offset.delete_pipette_offset_file(
                 self._hw_pipette.pipette_id, self.mount  # type: ignore[arg-type]
             )
             new_tip_length = self._get_stored_tip_length_cal()
