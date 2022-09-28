@@ -209,6 +209,7 @@ div.hs_submit input {
 div.hs_submit input:hover {
     cursor: pointer;
     color: white;
+    background: #2e89ff;
 }
 
 div.hero {
