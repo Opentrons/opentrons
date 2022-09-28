@@ -2,11 +2,12 @@ test_name: Verify error upon GET of nonexistent protocol id.
 
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: GET nonexistent protocol id
     request:
-      url: '{host:s}:{port:d}/protocols/idontexist'
+      url: '{host:s}:{free_port:s}/protocols/idontexist'
       method: GET
     response:
       status_code: 404
@@ -21,11 +22,12 @@ test_name: Verify error upon DELETE of nonexistent protocol id.
 
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: DELETE nonexistent protocol id
     request:
-      url: '{host:s}:{port:d}/protocols/idontexist'
+      url: '{host:s}:{free_port:s}/protocols/idontexist'
       method: DELETE
     response:
       status_code: 404

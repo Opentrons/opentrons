@@ -4,11 +4,12 @@ strict:
   - json:on
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: Create the session
     request:
-      url: "{host:s}:{port:d}/sessions"
+      url: "{host:s}:{free_port:s}/sessions"
       method: POST
       json:
         data:
@@ -24,7 +25,7 @@ stages:
           session_id: data.id
   - name: Get the session
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
+      url: "{host:s}:{free_port:s}/sessions/{session_id}"
       method: GET
     response:
       status_code: 200
@@ -48,7 +49,7 @@ stages:
 
   - name: Load labware
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      url: "{host:s}:{free_port:s}/sessions/{session_id}/commands/execute"
       method: POST
       json:
         data:
@@ -72,7 +73,7 @@ stages:
 
   - name: Attempt conflicting command
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      url: "{host:s}:{free_port:s}/sessions/{session_id}/commands/execute"
       method: POST
       json:
         data:
@@ -83,14 +84,14 @@ stages:
 
   - name: Delete the session
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
+      url: "{host:s}:{free_port:s}/sessions/{session_id}"
       method: DELETE
     response:
       status_code: 200
 
   - name: There are no sessions
     request:
-      url: "{host:s}:{port:d}/sessions"
+      url: "{host:s}:{free_port:s}/sessions"
       method: GET
     response:
       status_code: 200

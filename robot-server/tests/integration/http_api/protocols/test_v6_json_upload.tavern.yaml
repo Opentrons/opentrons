@@ -2,11 +2,12 @@ test_name: Upload, analyze, delete basic_transfer_standalone protocol.
 
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: Upload simple v6 protocol
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{host:s}:{free_port:s}/protocols'
       method: POST
       files:
         files: '../shared-data/protocol/fixtures/6/simpleV6.json'
@@ -29,7 +30,7 @@ stages:
     max_retries: 20
     delay_after: 2
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{host:s}:{free_port:s}/protocols'
       method: GET
     response:
       strict:
@@ -43,7 +44,7 @@ stages:
                 status: completed
   - name: Get protocol by ID
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      url: '{host:s}:{free_port:s}/protocols/{protocol_id}'
       method: GET
     response:
       status_code: 200
@@ -68,7 +69,7 @@ stages:
               status: completed
   - name: Get protocol analysis by ID
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}/analyses'
+      url: '{host:s}:{free_port:s}/protocols/{protocol_id}/analyses'
       method: GET
     response:
       status_code: 200

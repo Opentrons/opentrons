@@ -2,12 +2,13 @@ test_name: home standalone command
 
 marks:
   - usefixtures:
+      - free_port
       - run_server
 
 stages:
   - name: Delete all runs # Ensure there is no active run
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{host:s}:{free_port:s}/runs'
       method: GET
     response:
       status_code: 200
@@ -18,7 +19,7 @@ stages:
             port: '{port:d}'
   - name: issue home Command params all
     request:
-      url: '{host:s}:{port:d}/commands'
+      url: '{host:s}:{free_port:s}/commands'
       method: POST
       params:
         waitUntilComplete: true
@@ -45,7 +46,7 @@ stages:
           command_id_all: data.id
   - name: issue home Command params empty
     request:
-      url: '{host:s}:{port:d}/commands'
+      url: '{host:s}:{free_port:s}/commands'
       method: POST
       params:
         waitUntilComplete: true
@@ -65,7 +66,7 @@ stages:
           command_id_empty: data.id
   - name: Get command by id
     request:
-      url: '{host:s}:{port:d}/commands/{command_id_empty}'
+      url: '{host:s}:{free_port:s}/commands/{command_id_empty}'
       method: GET
     response:
       strict:
@@ -77,7 +78,7 @@ stages:
           status: succeeded
   - name: Get commands
     request:
-      url: '{host:s}:{port:d}/commands'
+      url: '{host:s}:{free_port:s}/commands'
       method: GET
     response:
       strict:
@@ -89,7 +90,7 @@ stages:
             - id: '{command_id_empty}'
   - name: Create Empty Run
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{host:s}:{free_port:s}/runs'
       json:
         data: {}
       method: POST
@@ -107,7 +108,7 @@ stages:
           run_id: data.id
   - name: issue home Command
     request:
-      url: '{host:s}:{port:d}/commands'
+      url: '{host:s}:{free_port:s}/commands'
       method: POST
       params:
         waitUntilComplete: true

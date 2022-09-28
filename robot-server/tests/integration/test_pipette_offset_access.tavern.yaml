@@ -2,11 +2,12 @@
 test_name: GET Pipette Offset Calibration, No Calibrations
 marks:
   - usefixtures:
+    - free_port
     - run_server
 stages:
   - name: GET request returns an empty list
     request: &get_offsets
-      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      url: "{host:s}:{free_port:s}/calibration/pipette_offset"
       method: GET
     response: &no_offset_response
       status_code: 200
@@ -15,11 +16,12 @@ stages:
         data: []
 
 ---
-test_name: GET Pipette Offset Calibration, Wtih Calibrations
+test_name: GET Pipette Offset Calibration, With Calibrations
 marks: &cal_marks
   - usefixtures:
-    - run_server
     - set_up_pipette_offset_temp_directory
+    - free_port
+    - run_server
 stages:
   - name: GET request returns all calibrations from fixture
     request: *get_offsets
@@ -49,7 +51,7 @@ stages:
 
   - name: GET request returns filter with pipette id
     request:
-      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      url: "{host:s}:{free_port:s}/calibration/pipette_offset"
       method: GET
       params:
         pipette_id: '123'
@@ -70,7 +72,7 @@ stages:
 
   - name: GET request returns filter with mount
     request:
-      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      url: "{host:s}:{free_port:s}/calibration/pipette_offset"
       method: GET
       params:
         mount: 'left'
@@ -91,7 +93,7 @@ stages:
 
   - name: GET request returns filter with pipette AND mount
     request:
-      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      url: "{host:s}:{free_port:s}/calibration/pipette_offset"
       method: GET
       params:
         pipette_id: '123'
@@ -113,7 +115,7 @@ stages:
 
   - name: GET request returns filter with wrong pipette AND mount
     request:
-      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      url: "{host:s}:{free_port:s}/calibration/pipette_offset"
       method: GET
       params:
         pipette_id: '321'
@@ -126,7 +128,7 @@ marks: *cal_marks
 stages:
   - name: DELETE request with correct pipette AND mount
     request:
-      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      url: "{host:s}:{free_port:s}/calibration/pipette_offset"
       method: DELETE
       params:
         pipette_id: '321'
@@ -136,7 +138,7 @@ stages:
 
   - name: DELETE request with incorrect pipette AND MOUNT
     request:
-      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      url: "{host:s}:{free_port:s}/calibration/pipette_offset"
       method: DELETE
       params:
         pipette_id: '321'

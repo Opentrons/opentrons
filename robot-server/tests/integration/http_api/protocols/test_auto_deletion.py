@@ -11,8 +11,8 @@ _NUM_PROTOCOLS_TO_UPLOAD = 10
 _NUM_PROTOCOLS_TO_EXPECT = 5
 
 
-async def test_protocols_auto_delete() -> None:
-    port = "15555"
+async def test_protocols_auto_delete(free_port: str) -> None:
+    port = free_port
     async with RobotClient.make(
         host="http://localhost", port=port, version="*"
     ) as robot_client:

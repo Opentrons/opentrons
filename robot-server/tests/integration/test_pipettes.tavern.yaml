@@ -2,11 +2,12 @@
 test_name: Get pipettes
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: Get all the attached pipettes
     request:
-      url: "{host:s}:{port:d}/pipettes"
+      url: "{host:s}:{free_port:s}/pipettes"
       method: GET
     response:
       status_code: 200

@@ -2,13 +2,14 @@ import signal
 import subprocess
 import time
 import sys
-import tempfile
 import os
 import json
 import pathlib
 import requests
 import pytest
+import socket
 
+from contextlib import closing
 from datetime import datetime, timezone
 from fastapi import routing
 from mock import MagicMock
@@ -112,24 +113,41 @@ def api_client_no_errors(override_hardware: None) -> TestClient:
     return client
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def request_session() -> requests.Session:
     session = requests.Session()
     session.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
     return session
 
 
-@pytest.fixture(scope="session")
-def server_temp_directory() -> Iterator[str]:
-    new_dir = tempfile.mkdtemp()
+@pytest.fixture(scope="function")
+def server_temp_directory(tmp_path: Path) -> str:
+    new_dir: str = str(tmp_path.resolve())
     os.environ["OT_API_CONFIG_DIR"] = new_dir
     config.reload()
-    yield new_dir
+    return new_dir
 
 
-@pytest.fixture(scope="session")
+def _free_port() -> str:
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        s.bind(("localhost", 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return str(s.getsockname()[1])
+
+
+@pytest.fixture(scope="function")
+def free_port() -> str:
+    return _free_port()
+
+
+@pytest.fixture(scope="module")
+def free_port_module_scope() -> str:
+    return _free_port()
+
+
+@pytest.fixture(scope="function")
 def run_server(
-    request_session: requests.Session, server_temp_directory: str
+    request_session: requests.Session, server_temp_directory: str, free_port: str
 ) -> Iterator["subprocess.Popen[Any]"]:
     """Run the robot server in a background process."""
     # In order to collect coverage we run using `coverage`.
@@ -150,7 +168,7 @@ def run_server(
             "--host",
             "localhost",
             "--port",
-            "31950",
+            free_port,
         ],
         env={
             "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev.env",
@@ -167,14 +185,14 @@ def run_server(
 
         while True:
             try:
-                request_session.get("http://localhost:31950/health")
+                request_session.get(f"http://localhost:{free_port}/health")
             except ConnectionError:
                 pass
             else:
                 break
             time.sleep(0.5)
         request_session.post(
-            "http://localhost:31950/robot/home", json={"target": "robot"}
+            f"http://localhost:{free_port}/robot/home", json={"target": "robot"}
         )
         yield proc
         proc.send_signal(signal.SIGTERM)

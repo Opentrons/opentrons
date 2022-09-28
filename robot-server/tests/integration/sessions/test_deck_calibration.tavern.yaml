@@ -4,11 +4,12 @@ strict:
   - json:on
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: Create the session
     request:
-      url: "{host:s}:{port:d}/sessions"
+      url: "{host:s}:{free_port:s}/sessions"
       method: POST
       json:
         data:
@@ -21,7 +22,7 @@ stages:
 
   - name: Get the session
     request: &get_session
-      url: "{host:s}:{port:d}/sessions/{session_id}"
+      url: "{host:s}:{free_port:s}/sessions/{session_id}"
       method: GET
     response:
       status_code: 200
@@ -40,7 +41,7 @@ stages:
 
   - name: Load labware
     request: &post_command
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      url: "{host:s}:{free_port:s}/sessions/{session_id}/commands/execute"
       method: POST
       json:
         data:
@@ -200,7 +201,7 @@ stages:
 
   - name: Move to point one
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      url: "{host:s}:{free_port:s}/sessions/{session_id}/commands/execute"
       method: POST
       json:
         data:
@@ -222,7 +223,7 @@ stages:
 
   - name: Move to point two
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      url: "{host:s}:{free_port:s}/sessions/{session_id}/commands/execute"
       method: POST
       json:
         data:
@@ -244,7 +245,7 @@ stages:
 
   - name: Move to point three
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      url: "{host:s}:{free_port:s}/sessions/{session_id}/commands/execute"
       method: POST
       json:
         data:
@@ -266,7 +267,7 @@ stages:
 
   - name: Exit Session
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      url: "{host:s}:{free_port:s}/sessions/{session_id}/commands/execute"
       method: POST
       json:
         data:
@@ -288,14 +289,14 @@ stages:
 
   - name: Delete the session
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
+      url: "{host:s}:{free_port:s}/sessions/{session_id}"
       method: DELETE
     response:
       status_code: 200
 
   - name: There are no session
     request:
-        url: "{host:s}:{port:d}/sessions"
+        url: "{host:s}:{free_port:s}/sessions"
         method: GET
     response:
       status_code: 200

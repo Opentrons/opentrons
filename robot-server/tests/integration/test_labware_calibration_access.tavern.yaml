@@ -1,11 +1,12 @@
 test_name: Labware calibration endpoints
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: GET /labware/calibrations returns 410
     request:
-      url: '{host:s}:{port:d}/labware/calibrations'
+      url: '{host:s}:{free_port:s}/labware/calibrations'
       method: GET
     response:
       status_code: 410
@@ -16,7 +17,7 @@ stages:
             detail: 'Use the `/runs` endpoints to manage labware offsets.'
   - name: GET /labware/calibrations/:id returns 410
     request:
-      url: '{host:s}:{port:d}/labware/calibrations/some-id'
+      url: '{host:s}:{free_port:s}/labware/calibrations/some-id'
       method: GET
     response:
       status_code: 410
@@ -27,7 +28,7 @@ stages:
             detail: 'Use the `/runs` endpoints to manage labware offsets.'
   - name: DELETE /labware/calibrations/:id returns 410
     request:
-      url: '{host:s}:{port:d}/labware/calibrations/some-id'
+      url: '{host:s}:{free_port:s}/labware/calibrations/some-id'
       method: DELETE
     response:
       status_code: 410
@@ -38,7 +39,7 @@ stages:
             detail: 'Use the `/runs` endpoints to manage labware offsets.'
   - name: GET /labware/calibrations returns empty list on version <= 3
     request:
-      url: '{host:s}:{port:d}/labware/calibrations'
+      url: '{host:s}:{free_port:s}/labware/calibrations'
       method: GET
       headers:
         Opentrons-Version: '3'
@@ -49,7 +50,7 @@ stages:
         data: []
   - name: GET /labware/calibrations/:id returns 404 on version <=3
     request:
-      url: '{host:s}:{port:d}/labware/calibrations/some-id'
+      url: '{host:s}:{free_port:s}/labware/calibrations/some-id'
       method: GET
       headers:
         Opentrons-Version: '3'
@@ -62,7 +63,7 @@ stages:
             detail: "Resource type 'calibration' with id 'some-id' was not found"
   - name: DELETE /labware/calibrations/:id returns 404 on version <=3
     request:
-      url: '{host:s}:{port:d}/labware/calibrations/some-id'
+      url: '{host:s}:{free_port:s}/labware/calibrations/some-id'
       method: DELETE
       headers:
         Opentrons-Version: '3'

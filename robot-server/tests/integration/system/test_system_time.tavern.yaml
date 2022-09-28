@@ -2,11 +2,12 @@
 test_name: GET Time
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: System Time GET request returns time in correct format
     request:
-      url: "{host:s}:{port:d}/system/time"
+      url: "{host:s}:{free_port:s}/system/time"
       method: GET
     response:
       status_code: 200
@@ -23,11 +24,12 @@ stages:
 test_name: PUT Time
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: System Time PUT request without a time returns a missing field error
     request:
-      url: "{host:s}:{port:d}/system/time"
+      url: "{host:s}:{free_port:s}/system/time"
       method: PUT
       json:
         data:
@@ -43,7 +45,7 @@ stages:
               pointer: "/data/systemTime"
   - name: System Time PUT request on a dev server raises error
     request:
-      url: "{host:s}:{port:d}/system/time"
+      url: "{host:s}:{free_port:s}/system/time"
       method: PUT
       json:
         data:
