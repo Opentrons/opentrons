@@ -95,6 +95,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
               : null
           return (
             <React.Fragment key={slotId}>
+              {/* TODO(jr, 9/28/22): revert this logic to only moduleInSlot != null when we remove the enableThermocyclerGen2 FF */}
               {(moduleInSlot != null && enableThermocyclerGen2) ||
               (moduleInSlot != null &&
                 !enableThermocyclerGen2 &&

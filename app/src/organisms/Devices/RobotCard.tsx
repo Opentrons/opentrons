@@ -178,6 +178,7 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
       </StyledText>
       <Flex>
         {attachedModules.map((module, i) =>
+          //  TODO(jr, 9/28/22): remove this logic when we remove enableThermocyclerGen2 FF
           enableThermocyclerGen2 ||
           (!enableThermocyclerGen2 &&
             module.moduleModel !== 'thermocyclerModuleV2') ? (
