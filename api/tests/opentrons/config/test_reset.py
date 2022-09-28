@@ -1,8 +1,7 @@
-from typing import Generator, Any
-from unittest.mock import MagicMock, patch
-
 import pytest
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
+from typing import Generator
+from unittest.mock import MagicMock, patch
 
 from opentrons.config import reset
 
@@ -28,20 +27,6 @@ def mock_reset_deck_calibration() -> Generator[MagicMock, None, None]:
 @pytest.fixture
 def mock_reset_tip_length_calibrations() -> Generator[MagicMock, None, None]:
     with patch("opentrons.config.reset.reset_tip_length_calibrations") as m:
-        yield m
-
-
-@pytest.fixture
-def mock_cal_storage_delete_ot3(
-    enable_ot3_hardware_controller: Any,
-) -> Generator[MagicMock, None, None]:
-    with patch("opentrons.config.reset.ot3_delete", autospec=True) as m:
-        yield m
-
-
-@pytest.fixture
-def mock_cal_storage_delete_ot2() -> Generator[MagicMock, None, None]:
-    with patch("opentrons.config.reset.ot2_delete", autospec=True) as m:
         yield m
 
 
@@ -105,7 +90,7 @@ def test_tip_length_calibrations_reset(mock_cal_storage_delete: MagicMock) -> No
 
 
 @pytest.mark.parametrize(
-    argnames=["mock_cal_storage_delete"],
+    argnames=["mock_cal_storage_pipette_offset"],
     argvalues=[
         [lazy_fixture("mock_cal_storage_delete_ot3")],
         [lazy_fixture("mock_cal_storage_delete_ot2")],

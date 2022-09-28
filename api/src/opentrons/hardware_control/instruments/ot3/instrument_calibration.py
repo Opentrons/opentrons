@@ -1,5 +1,4 @@
 import typing
-from typing_extensions import Literal
 from dataclasses import dataclass
 from datetime import datetime
 from opentrons.config import feature_flags as ff
@@ -8,7 +7,11 @@ from opentrons.config.robot_configs import (
     default_gripper_calibration_offset,
 )
 from opentrons.types import Point
-from opentrons.calibration_storage import types as cal_top_types, ot3_pipette_offset, ot3_gripper_offset
+from opentrons.calibration_storage import (
+    types as cal_top_types,
+    ot3_pipette_offset,
+    ot3_gripper_offset,
+)
 from opentrons.hardware_control.types import OT3Mount
 
 

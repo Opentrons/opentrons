@@ -5,9 +5,8 @@ abstract away rough edges until we can improve those underlying interfaces.
 """
 import logging
 from anyio import to_thread
-from typing import Optional, cast
+from typing import Optional
 
-from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocols.labware import get_labware_definition
 

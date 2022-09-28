@@ -19,7 +19,6 @@ DecoderType = typing.Type[json.JSONDecoder]
 EncoderType = typing.Type[json.JSONEncoder]
 
 
-
 # TODO(mc, 2022-06-07): replace with Path.unlink(missing_ok=True)
 # when we are on Python >= 3.8
 def _delete_file(path: Path) -> None:

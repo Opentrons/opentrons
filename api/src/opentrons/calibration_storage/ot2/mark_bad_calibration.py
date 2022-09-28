@@ -7,7 +7,6 @@ from .. import types as local_types
 from .schemas import v1
 
 
-
 @typing.overload
 def mark_bad(
     calibration: v1.DeckCalibrationSchema, source_marked_bad: local_types.SourceType

@@ -5,6 +5,7 @@ from typing import no_type_check, Generator, Any, Tuple
 
 from opentrons.calibration_storage import types as cs_types
 
+
 @no_type_check
 @pytest.fixture
 def _deck(
@@ -28,20 +29,14 @@ def schema(
 ) -> Generator[ModuleType, None, None]:
     robot_type = request.param
     if robot_type == "ot3":
-        yield importlib.import_module(
-            "opentrons.calibration_storage.ot3.schemas"
-        )
+        yield importlib.import_module("opentrons.calibration_storage.ot3.schemas")
     else:
-        yield importlib.import_module(
-            "opentrons.calibration_storage.ot2.schemas"
-        )
+        yield importlib.import_module("opentrons.calibration_storage.ot2.schemas")
 
 
 @no_type_check
 @pytest.fixture
-def starting_calibration_data(
-    _deck: ModuleType, ot_config_tempdir: Any
-) -> None:
+def starting_calibration_data(_deck: ModuleType, ot_config_tempdir: Any) -> None:
     """
     Starting calibration data fixture.
 
@@ -63,9 +58,7 @@ def starting_calibration_data(
     argvalues=[["ot2"], ["ot3"]],
     indirect=True,
 )
-def test_save_deck_attitude(
-    ot_config_tempdir: Any, _deck: ModuleType
-) -> None:
+def test_save_deck_attitude(ot_config_tempdir: Any, _deck: ModuleType) -> None:
     """
     Test saving deck attitude calibrations.
     """
@@ -78,7 +71,6 @@ def test_save_deck_attitude(
             [[1, 0, 0], [0, 1, 0], [0, 0, 1]], "pip1", "mytiprack"
         )
     assert deck._deck_calibration() != {}
-
 
 
 @no_type_check

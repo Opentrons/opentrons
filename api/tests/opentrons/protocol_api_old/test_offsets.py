@@ -1,9 +1,3 @@
-import json
-import os
-
-import pytest
-
-from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons.protocol_api import labware
 from opentrons.protocol_api.core.protocol_api.labware import LabwareImplementation
 from opentrons.types import Point, Location

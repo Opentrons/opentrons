@@ -1,6 +1,3 @@
-import json
-import os
-
 import pytest
 import importlib
 from types import ModuleType
@@ -9,7 +6,6 @@ from typing import no_type_check, Generator, Any, Tuple
 from opentrons.types import Mount, Point, MountType
 from opentrons.calibration_storage import (
     types as cs_types,
-    helpers,
 )
 
 
@@ -36,20 +32,14 @@ def schema(
 ) -> Generator[ModuleType, None, None]:
     robot_type = request.param
     if robot_type == "ot3":
-        yield importlib.import_module(
-            "opentrons.calibration_storage.ot3.schemas"
-        )
+        yield importlib.import_module("opentrons.calibration_storage.ot3.schemas")
     else:
-        yield importlib.import_module(
-            "opentrons.calibration_storage.ot2.schemas"
-        )
+        yield importlib.import_module("opentrons.calibration_storage.ot2.schemas")
 
 
 @no_type_check
 @pytest.fixture
-def starting_calibration_data(
-    _pipette: ModuleType, ot_config_tempdir: Any
-) -> None:
+def starting_calibration_data(_pipette: ModuleType, ot_config_tempdir: Any) -> None:
     """
     Starting calibration data fixture.
 
@@ -115,9 +105,7 @@ def test_delete_specific_pipette_offset(
     argvalues=[["ot2"], ["ot3"]],
     indirect=True,
 )
-def test_save_pipette_calibration(
-    ot_config_tempdir: Any, _pipette: ModuleType
-) -> None:
+def test_save_pipette_calibration(ot_config_tempdir: Any, _pipette: ModuleType) -> None:
     """
     Test saving pipette calibrations.
     """
@@ -139,9 +127,9 @@ def test_save_pipette_calibration(
     assert pipette._pipette_offset_calibrations() != {}
     assert pipette._pipette_offset_calibrations()[MountType.LEFT] != {}
     assert pipette._pipette_offset_calibrations()[MountType.RIGHT] != {}
-    assert pipette._pipette_offset_calibrations()[MountType.LEFT]["pip1"].offset == Point(
-        1, 1, 1
-    )
+    assert pipette._pipette_offset_calibrations()[MountType.LEFT][
+        "pip1"
+    ].offset == Point(1, 1, 1)
     assert pipette._pipette_offset_calibrations()[MountType.RIGHT][
         "pip2"
     ].offset == Point(1, 1, 1)

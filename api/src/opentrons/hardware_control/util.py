@@ -2,12 +2,10 @@
 import asyncio
 import logging
 from enum import Enum
-from dataclasses import dataclass
 from typing import Dict, Any, Optional, List, Mapping, Tuple, TypeVar
 
 from .types import CriticalPoint, MotionChecks, OutOfBoundsMove
 from opentrons.types import Point
-from opentrons.calibration_storage import types
 
 mod_log = logging.getLogger(__name__)
 

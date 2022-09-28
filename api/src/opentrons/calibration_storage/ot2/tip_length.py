@@ -14,10 +14,16 @@ from opentrons.util.helpers import utc_now
 
 from .schemas import v1
 
+if typing.TYPE_CHECKING:
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-TipLengthCalibrations = typing.Dict[local_types.PipetteId, typing.Dict[local_types.TiprackHash, v1.TipLengthSchema]]
+
+TipLengthCalibrations = typing.Dict[
+    local_types.PipetteId, typing.Dict[local_types.TiprackHash, v1.TipLengthSchema]
+]
 
 # Tip Length Calibrations Look-Up
+
 
 def _tip_length_calibrations() -> TipLengthCalibrations:
     tip_length_dir = config.get_tip_length_cal_path()
@@ -47,10 +53,13 @@ def _tip_lengths_for_pipette(
     except KeyError:
         return {}
 
+
 # Delete Tip Length Calibration
 
 
-def delete_tip_length_calibration(tiprack: local_types.TiprackHash, pipette_id: local_types.PipetteId) -> None:
+def delete_tip_length_calibration(
+    tiprack: local_types.TiprackHash, pipette_id: local_types.PipetteId
+) -> None:
     """
     Delete tip length calibration based on tiprack hash and
     pipette serial number
@@ -85,7 +94,9 @@ def clear_tip_length_calibration() -> None:
     except FileNotFoundError:
         pass
 
+
 # Save Tip Length Calibration
+
 
 def create_tip_length_data(
     definition: "LabwareDefinition",
@@ -159,7 +170,9 @@ def save_tip_length_calibration(
         dict_of_tip_lengths[key] = json.loads(item.json())
     io.save_to_file(pip_tip_length_path, dict_of_tip_lengths)
 
+
 # Get Tip Length Calibration
+
 
 def load_tip_length_calibration(
     pip_id: local_types.PipetteId, definition: "LabwareDefinition"
@@ -227,4 +240,3 @@ def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinitio
             "pipette offset with this tiprack before performing calibration "
             "health check."
         )
-

@@ -20,7 +20,7 @@ from opentrons.hardware_control import API, NoTipAttachedError, ThreadManagedHar
 from opentrons.hardware_control.instruments import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.protocols.advanced_control import transfers as tf
-from opentrons.config.pipette_config import config_names, load as pip_load
+from opentrons.config.pipette_config import config_names
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.calibration_storage import types as cs_types, ot2_schemas, ot2_tip_length
 from opentrons.util.helpers import utc_now

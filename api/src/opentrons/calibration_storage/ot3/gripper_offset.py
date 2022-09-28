@@ -17,6 +17,7 @@ GripperCalibrations = Dict[local_types.GripperId, v1.InstrumentOffsetSchema]
 
 # Gripper Offset Calibrations Look-Up
 
+
 def _gripper_offset_calibrations() -> GripperCalibrations:
     gripper_calibration_dir = config.get_opentrons_path("gripper_calibration_dir")
     gripper_calibration_dict: GripperCalibrations = {}
@@ -32,7 +33,9 @@ def _gripper_offset_calibrations() -> GripperCalibrations:
                 pass
     return gripper_calibration_dict
 
+
 # Delete Gripper Offset Calibrations
+
 
 def delete_gripper_calibration_file(gripper: local_types.GripperId) -> None:
     """
@@ -54,7 +57,9 @@ def clear_gripper_calibration_offsets() -> None:
     offset_dir = config.get_opentrons_path("gripper_calibration_dir")
     io._remove_json_files_in_directories(offset_dir)
 
+
 # Save Gripper Offset Calibrations
+
 
 def save_gripper_calibration(
     offset: types.Point,
@@ -78,7 +83,9 @@ def save_gripper_calibration(
     )
     io.save_to_file(gripper_path, gripper_calibration)
 
+
 # Get Gripper Offset Calibrations
+
 
 def get_gripper_calibration_offset(
     gripper_id: local_types.GripperId,
@@ -92,4 +99,3 @@ def get_gripper_calibration_offset(
         return _gripper_offset_calibrations()[gripper_id]
     except KeyError:
         return None
-

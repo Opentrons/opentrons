@@ -3,7 +3,6 @@ import typing
 from typing_extensions import Literal
 from pydantic import BaseModel, Field, validator
 from datetime import datetime
-from dataclasses import dataclass
 
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 

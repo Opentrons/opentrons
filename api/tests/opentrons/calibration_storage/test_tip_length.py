@@ -1,12 +1,8 @@
-import json
-import os
-
 import pytest
 import importlib
 from types import ModuleType
 from typing import no_type_check, Generator, Any, Tuple
 
-from opentrons.types import Mount, Point
 from opentrons.calibration_storage import (
     types as cs_types,
     helpers,
@@ -72,20 +68,14 @@ def schema(
 ) -> Generator[ModuleType, None, None]:
     robot_type = request.param
     if robot_type == "ot3":
-        yield importlib.import_module(
-            "opentrons.calibration_storage.ot3.schemas"
-        )
+        yield importlib.import_module("opentrons.calibration_storage.ot3.schemas")
     else:
-        yield importlib.import_module(
-            "opentrons.calibration_storage.ot2.schemas"
-        )
+        yield importlib.import_module("opentrons.calibration_storage.ot2.schemas")
 
 
 @no_type_check
 @pytest.fixture
-def starting_calibration_data(
-    _tip_length, ot_config_tempdir: Any
-) -> None:
+def starting_calibration_data(_tip_length, ot_config_tempdir: Any) -> None:
     """
     Starting calibration data fixture.
 
@@ -119,9 +109,12 @@ def test_save_tip_length_calibration(
     tip_length.save_tip_length_calibration("pip1", tip_length1)
     tip_length.save_tip_length_calibration("pip2", tip_length2)
     assert tip_length._tip_length_calibrations() != {}
-    assert tip_length._tip_length_calibrations()["pip1"][tip_rack_hash].tipLength == 22.0
-    assert tip_length._tip_length_calibrations()["pip2"][tip_rack_hash].tipLength == 31.0
-
+    assert (
+        tip_length._tip_length_calibrations()["pip1"][tip_rack_hash].tipLength == 22.0
+    )
+    assert (
+        tip_length._tip_length_calibrations()["pip2"][tip_rack_hash].tipLength == 31.0
+    )
 
 
 @no_type_check
@@ -131,7 +124,9 @@ def test_save_tip_length_calibration(
     indirect=True,
 )
 def test_get_tip_length_calibration(
-    _tip_length: Tuple[ModuleType, str], starting_calibration_data: Any, schema: ModuleType
+    _tip_length: Tuple[ModuleType, str],
+    starting_calibration_data: Any,
+    schema: ModuleType,
 ) -> None:
     """
     Test ability to get a tip length calibration schema.
@@ -147,7 +142,6 @@ def test_get_tip_length_calibration(
 
     with pytest.raises(cs_types.TipLengthCalNotFound):
         tip_length.load_tip_length_calibration("nopipette", minimalLabwareDef)
-
 
 
 @no_type_check

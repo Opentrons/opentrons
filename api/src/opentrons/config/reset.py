@@ -10,8 +10,13 @@ from opentrons.config import IS_ROBOT, feature_flags
 # (lc 09-15-2022) Choosing to import both libraries rather than type
 # ignore an import_module command using importlib.
 from opentrons.calibration_storage import (
-    ot2_deck_attitude, ot2_tip_length, ot2_pipette_offset,
-    ot3_deck_attitude, ot3_tip_length, ot3_pipette_offset)
+    ot2_deck_attitude,
+    ot2_tip_length,
+    ot2_pipette_offset,
+    ot3_deck_attitude,
+    ot3_tip_length,
+    ot3_pipette_offset,
+)
 
 
 DATA_BOOT_D = Path("/data/boot.d")

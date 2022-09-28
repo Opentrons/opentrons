@@ -1,34 +1,25 @@
 import os
 import json
+import typing
 from pydantic import ValidationError
-from typing import Dict, List, Optional, cast
 from dataclasses import asdict
 
 from opentrons import config, types
 
-from .. import file_operators as io
+from .. import file_operators as io, types as local_types
 
 from .schemas import v1
 
-import typing
-
-from dataclasses import asdict
-
-from opentrons import config
 from opentrons.types import Mount, Point
-from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.util.helpers import utc_now
 
-from .. import (
-    file_operators as io,
-    types as local_types,
-)
-
-
-PipetteCalibrations = Dict[types.MountType, Dict[local_types.PipetteId, v1.InstrumentOffsetSchema]]
+PipetteCalibrations = typing.Dict[
+    types.MountType, typing.Dict[local_types.PipetteId, v1.InstrumentOffsetSchema]
+]
 
 
 # Pipette Offset Calibration Look-Up
+
 
 def _pipette_offset_calibrations() -> PipetteCalibrations:
     pipette_calibration_dir = config.get_opentrons_path("pipette_calibration_dir")
@@ -40,7 +31,9 @@ def _pipette_offset_calibrations() -> PipetteCalibrations:
             continue
         for file in os.scandir(mount_dir):
             if file.is_file() and ".json" in file.name:
-                pipette_id = cast(local_types.PipetteId, file.name.split(".json")[0])
+                pipette_id = typing.cast(
+                    local_types.PipetteId, file.name.split(".json")[0]
+                )
                 try:
                     pipette_calibration_dict[mount][
                         pipette_id
@@ -49,7 +42,9 @@ def _pipette_offset_calibrations() -> PipetteCalibrations:
                     pass
     return pipette_calibration_dict
 
+
 # Delete Pipette Offset Calibrations
+
 
 def delete_pipette_offset_file(pipette: local_types.PipetteId, mount: Mount) -> None:
     """
@@ -73,6 +68,7 @@ def clear_pipette_offset_calibrations() -> None:
 
 
 # Save Pipette Offset Calibrations
+
 
 def save_pipette_calibration(
     offset: Point,
@@ -104,6 +100,7 @@ def save_pipette_calibration(
 
 
 # Get Pipette Offset Calibrations
+
 
 def get_pipette_offset(
     pipette_id: local_types.PipetteId, mount: Mount
