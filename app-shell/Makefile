@@ -120,10 +120,10 @@ dist-win: package-deps
 .PHONY: dist-ot3
 dist-ot3: package-deps
 	NO_PYTHON=true NO_USB_DETECTION=true $(builder) --linux --arm64 --dir
-	cd dist/linux-arm64-unpacked && rm libEGL.so libGLESv2.so libvulkan.so.1
+	cd dist/linux-arm64-unpacked
 
 .PHONY: push-ot3
-push-ot3: dist-ot3  
+push-ot3: dist-ot3
 	ssh $(ssh_opts) root@$(host) "systemctl stop opentrons-robot-app && rm -rf /opt/opentrons-app && mkdir -p /opt/opentrons-app"
 	scp -r $(ssh_opts) ./dist/linux-arm64-unpacked/* root@$(host):/opt/opentrons-app
 	ssh $(ssh_opts) root@$(host) "systemctl start opentrons-robot-app"
