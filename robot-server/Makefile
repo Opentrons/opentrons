@@ -21,10 +21,10 @@ sdist_file = dist/$(call python_get_sdistname,robot-server,robot_server)
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
-# specified test
+# specified test 
 tests ?= tests
 cov_opts ?= --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
-test_opts ?= -n auto
+test_opts ?= -n auto --dist loadscope
 
 # Host key location for buildroot robot
 br_ssh_key ?= $(default_ssh_key)

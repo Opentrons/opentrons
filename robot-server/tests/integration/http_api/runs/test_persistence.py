@@ -21,17 +21,17 @@ class ClientServerFixture(NamedTuple):
 
 @pytest.fixture
 async def client_and_server(
-    free_port: str,
+    function_scope_free_port: str,
 ) -> AsyncGenerator[ClientServerFixture, None]:
     """Get a dev server and a client to that server."""
     async with RobotClient.make(
         host="http://localhost",
-        port=free_port,
+        port=function_scope_free_port,
         version="*",
     ) as client:
         assert await client.wait_until_dead(), "Server is running and must not be."
 
-        with DevServer(port=free_port) as server:
+        with DevServer(port=function_scope_free_port) as server:
             server.start()
             assert await client.wait_until_alive(), "Server never became available."
 

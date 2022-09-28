@@ -16,7 +16,7 @@ stages:
         - function: 'tests.integration.fixtures:delete_all_runs'
           extra_kwargs:
             host: '{host:s}'
-            port: '{port:d}'
+            port: '{free_port:s}'
   - name: Get tempModule id
     request:
       url: '{host:s}:{free_port:s}/modules'

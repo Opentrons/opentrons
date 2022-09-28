@@ -2,12 +2,12 @@ test_name: Upload, analyze, delete basic_transfer_standalone protocol.
 
 marks:
   - usefixtures:
-      - free_port
-      - run_server
+      - function_scope_free_port
+      - function_scope_run_server
 stages:
   - name: Upload basic_transfer_standalone protocol
     request:
-      url: '{host:s}:{free_port:s}/protocols'
+      url: '{host:s}:{function_scope_free_port:s}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_standalone.py'
@@ -37,7 +37,7 @@ stages:
     max_retries: 5
     delay_after: 1
     request:
-      url: '{host:s}:{free_port:s}/protocols/{protocol_id}/analyses'
+      url: '{host:s}:{function_scope_free_port:s}/protocols/{protocol_id}/analyses'
       method: GET
     response:
       strict:
@@ -50,13 +50,13 @@ stages:
             result: ok
   - name: Delete the protocol
     request:
-      url: '{host:s}:{free_port:s}/protocols/{protocol_id}'
+      url: '{host:s}:{function_scope_free_port:s}/protocols/{protocol_id}'
       method: DELETE
     response:
       status_code: 200
   - name: Get protocol with id to verify it is deleted
     request:
-      url: '{host:s}:{free_port:s}/protocols/{protocol_id}'
+      url: '{host:s}:{function_scope_free_port:s}/protocols/{protocol_id}'
       method: GET
     response:
       strict:
@@ -72,14 +72,14 @@ test_name: Upload, analyze and analyze using "slow analysis"
 
 marks:
   - usefixtures:
-      - free_port
-      - run_server
+      - function_scope_free_port
+      - function_scope_run_server
       - set_disable_fast_analysis
 
 stages:
   - name: Upload simple Python protocol
     request:
-      url: '{host:s}:{free_port:s}/protocols'
+      url: '{host:s}:{function_scope_free_port:s}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/simple.py'
@@ -94,7 +94,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{host:s}:{free_port:s}/protocols/{protocol_id}/analyses'
+      url: '{host:s}:{function_scope_free_port:s}/protocols/{protocol_id}/analyses'
       method: GET
     response:
       strict:
@@ -107,7 +107,7 @@ stages:
             result: ok
   - name: Delete the protocol
     request:
-      url: '{host:s}:{free_port:s}/protocols/{protocol_id}'
+      url: '{host:s}:{function_scope_free_port:s}/protocols/{protocol_id}'
       method: DELETE
     response:
       status_code: 200
