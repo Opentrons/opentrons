@@ -2,6 +2,7 @@ test_name: loadModule command failure
 
 marks:
   - usefixtures:
+      - free_port
       - run_server
   - parametrize:
       key: model
@@ -11,7 +12,7 @@ marks:
 stages:
   - name: Create Empty Run
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{host:s}:{free_port:s}/runs'
       json:
         data: {}
       method: POST
@@ -29,7 +30,7 @@ stages:
           run_id: data.id
   - name: Create loadModule Command
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{host:s}:{free_port:s}/runs/{run_id}/commands'
       method: POST
       params:
         waitUntilComplete: true

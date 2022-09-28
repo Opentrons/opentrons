@@ -2,12 +2,13 @@
 test_name: GET list of useful robot positions
 marks:
   - usefixtures:
+    - free_port
     - run_server
 stages:
   - name: Get robot positions
     request:
       method: GET
-      url: "{host:s}:{port:d}/robot/positions"
+      url: "{host:s}:{free_port:s}/robot/positions"
     response:
       status_code: 200
       json:
@@ -32,12 +33,13 @@ stages:
 test_name: POST Move Robot
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: GET the left pipette attached to the robot
     request:
       method: GET
-      url: "{host:s}:{port:d}/pipettes"
+      url: "{host:s}:{free_port:s}/pipettes"
     response:
       status_code: 200
       save:
@@ -46,7 +48,7 @@ stages:
   - name: POST Move the left pipette to a specific location
     request:
       method: POST
-      url: "{host:s}:{port:d}/robot/move"
+      url: "{host:s}:{free_port:s}/robot/move"
       json:
         target: pipette
         point:
@@ -63,12 +65,13 @@ stages:
 test_name: POST Robot Home
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: Home the Robot
     request:
       method: POST
-      url: "{host:s}:{port:d}/robot/home"
+      url: "{host:s}:{free_port:s}/robot/home"
       json:
         target: pipette
         mount: right
@@ -80,12 +83,13 @@ stages:
 test_name: Turn on the robot lights
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: POST Robot Lights
     request:
       method: POST
-      url: "{host:s}:{port:d}/robot/lights"
+      url: "{host:s}:{free_port:s}/robot/lights"
       json:
         "on": true # needed to escape "on" because it is a keyword
     response:
@@ -95,7 +99,7 @@ stages:
   - name: GET Robot lights status
     request:
       method: GET
-      url: "{host:s}:{port:d}/robot/lights"
+      url: "{host:s}:{free_port:s}/robot/lights"
     response:
       status_code: 200
       json:
@@ -104,12 +108,13 @@ stages:
 test_name: Turn off the robot lights
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: POST Robot Lights
     request:
       method: POST
-      url: "{host:s}:{port:d}/robot/lights"
+      url: "{host:s}:{free_port:s}/robot/lights"
       json:
         "on": false
     response:
@@ -119,7 +124,7 @@ stages:
   - name: GET Robot lights status
     request:
       method: GET
-      url: "{host:s}:{port:d}/robot/lights"
+      url: "{host:s}:{free_port:s}/robot/lights"
     response:
       status_code: 200
       json:

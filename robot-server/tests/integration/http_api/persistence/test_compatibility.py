@@ -18,8 +18,8 @@ _EXPECTED_RUN_COUNT = 5
 # Module-scope to avoid the overhead of restarting the server between test functions.
 # This relies on the test functions only reading, never writing.
 @pytest.fixture(scope="module")
-def dev_server() -> Generator[DevServer, None, None]:
-    port = "15555"
+def dev_server(module_scope_free_port: str) -> Generator[DevServer, None, None]:
+    port = module_scope_free_port
     with DevServer(
         port=port,
         persistence_directory=_OLDER_PERSISTENCE_DIR,

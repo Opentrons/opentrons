@@ -9,9 +9,7 @@ from typing import Optional
 
 
 class DevServer:
-    def __init__(
-        self, port: str = "31950", persistence_directory: Optional[Path] = None
-    ) -> None:
+    def __init__(self, port: str, persistence_directory: Optional[Path] = None) -> None:
         """Initialize a dev server."""
         self.server_temp_directory: str = tempfile.mkdtemp()
         self.persistence_directory: Path = (

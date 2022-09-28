@@ -2,12 +2,13 @@
 test_name: GET Settings
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: Settings GET request returns correct info
     request:
       method: GET
-      url: '{host:s}:{port:d}/settings'
+      url: '{host:s}:{free_port:s}/settings'
     response:
       status_code: 200
       json:
@@ -67,6 +68,7 @@ stages:
 test_name: POST Setting and value
 marks:
   - usefixtures:
+      - free_port
       - run_server
   - parametrize:
       key: id
@@ -86,7 +88,7 @@ stages:
   - name: Set each setting to acceptable values
     request:
       method: POST
-      url: '{host:s}:{port:d}/settings'
+      url: '{host:s}:{free_port:s}/settings'
       json:
         id: '{id}'
         value: '{value}'
@@ -103,6 +105,7 @@ stages:
 test_name: POST Settings with no values
 marks:
   - usefixtures:
+      - free_port
       - run_server
   - parametrize:
       key: id
@@ -117,7 +120,7 @@ stages:
   - name: Set each setting to acceptable values
     request:
       method: POST
-      url: '{host:s}:{port:d}/settings'
+      url: '{host:s}:{free_port:s}/settings'
       json:
         id: '{id}'
     response:
@@ -133,12 +136,13 @@ stages:
 test_name: POST With incorrect ID
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: Post with incorrect ID
     request:
       method: POST
-      url: '{host:s}:{port:d}/settings'
+      url: '{host:s}:{free_port:s}/settings'
       json:
         id: notARealID
         value: true

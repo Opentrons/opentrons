@@ -2,11 +2,12 @@
 test_name: Get calibration status
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: Get the status
     request:
-      url: "{host:s}:{port:d}/calibration/status"
+      url: "{host:s}:{free_port:s}/calibration/status"
       method: GET
     response:
       status_code: 200

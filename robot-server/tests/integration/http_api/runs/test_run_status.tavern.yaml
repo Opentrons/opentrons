@@ -2,12 +2,13 @@ test_name: Alter the value of run status and current
 
 marks:
   - usefixtures:
+      - free_port
       - run_server
 
 stages:
   - name: Create Empty Run 1
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{host:s}:{free_port:s}/runs'
       json:
         data: {}
       method: POST
@@ -25,7 +26,7 @@ stages:
           first_run_id: data.id
   - name: Patch the Run
     request:
-      url: '{host:s}:{port:d}/runs/{first_run_id}'
+      url: '{host:s}:{free_port:s}/runs/{first_run_id}'
       json:
         data: { 'current': false }
       method: PATCH
@@ -40,7 +41,7 @@ stages:
           current: false
   - name: Create Empty Run 2
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{host:s}:{free_port:s}/runs'
       json:
         data: {}
       method: POST
@@ -58,7 +59,7 @@ stages:
           second_run_id: data.id
   - name: Create Empty Run 3
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{host:s}:{free_port:s}/runs'
       json:
         data: {}
       method: POST
@@ -76,7 +77,7 @@ stages:
           third_run_id: data.id
   - name: Get run 2
     request:
-      url: '{host:s}:{port:d}/runs/{second_run_id}'
+      url: '{host:s}:{free_port:s}/runs/{second_run_id}'
       method: GET
     response:
       strict:
@@ -89,7 +90,7 @@ stages:
           current: false
   - name: Get run 3
     request:
-      url: '{host:s}:{port:d}/runs/{third_run_id}'
+      url: '{host:s}:{free_port:s}/runs/{third_run_id}'
       method: GET
     response:
       strict:
@@ -102,7 +103,7 @@ stages:
           current: true
   - name: Create Empty Run 4
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{host:s}:{free_port:s}/runs'
       json:
         data: {}
       method: POST
@@ -120,7 +121,7 @@ stages:
           fourth_run_id: data.id
   - name: Issue stop action to Run 4
     request:
-      url: '{host:s}:{port:d}/runs/{fourth_run_id}/actions'
+      url: '{host:s}:{free_port:s}/runs/{fourth_run_id}/actions'
       json:
         data:
           actionType: stop
@@ -129,7 +130,7 @@ stages:
       status_code: 201
   - name: Get run 4
     request:
-      url: '{host:s}:{port:d}/runs/{fourth_run_id}'
+      url: '{host:s}:{free_port:s}/runs/{fourth_run_id}'
       method: GET
     response:
       strict:

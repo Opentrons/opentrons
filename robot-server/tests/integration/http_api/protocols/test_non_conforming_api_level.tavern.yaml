@@ -2,11 +2,12 @@ test_name: Upload, analyze, and validate protocol analysis failure for api level
 
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: Upload a python protocol with non-conforming api level 
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{host:s}:{free_port:s}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/non_conforming_api_level.py'

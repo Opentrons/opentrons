@@ -2,11 +2,12 @@ test_name: Verify protocol key.
 
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: Upload basic_transfer_standalone protocol with key
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{host:s}:{free_port:s}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_standalone.py'
@@ -36,7 +37,7 @@ stages:
           key: protocol_key
   - name: Verify the key in GET /protocols
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{host:s}:{free_port:s}/protocols'
       method: GET
     response:
       strict:
@@ -49,7 +50,7 @@ stages:
 
   - name: Verify the key in GET /protocols/{protocol_id}
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      url: '{host:s}:{free_port:s}/protocols/{protocol_id}'
       method: GET
     response:
       strict:
@@ -65,11 +66,12 @@ test_name: Protocols may have a duplicate key.
 
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: Upload basic_transfer_standalone protocol with key
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{host:s}:{free_port:s}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_standalone.py'
@@ -96,7 +98,7 @@ stages:
           key: duplicate_key
   - name: Upload basic_transfer_standalone protocol with key
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{host:s}:{free_port:s}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_standalone.py'
@@ -123,7 +125,7 @@ stages:
           key: duplicate_key
   - name: Get protocols and validate id and key
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{host:s}:{free_port:s}/protocols'
       method: GET
     response:
       strict:

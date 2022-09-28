@@ -2,12 +2,13 @@ test_name: Make sure a non active run cannot be paused
 
 marks:
   - usefixtures:
+      - free_port
       - run_server
 
 stages:
   - name: Create Empty Run
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{host:s}:{free_port:s}/runs'
       json:
         data: {}
       method: POST
@@ -25,7 +26,7 @@ stages:
           run_id: data.id
   - name: Issue pause to a none active run
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      url: '{host:s}:{free_port:s}/runs/{run_id}/actions'
       json:
         data:
           actionType: pause

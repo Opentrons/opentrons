@@ -2,11 +2,12 @@
 test_name: Session Lifecycle
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: Create a session
     request:
-      url: '{host:s}:{port:d}/sessions'
+      url: '{host:s}:{free_port:s}/sessions'
       method: POST
       json:
         data:
@@ -19,21 +20,21 @@ stages:
 
   - name: Get the session
     request:
-      url: '{host:s}:{port:d}/sessions/{session_id}'
+      url: '{host:s}:{free_port:s}/sessions/{session_id}'
       method: GET
     response:
       status_code: 200
 
   - name: Delete the session
     request:
-      url: '{host:s}:{port:d}/sessions/{session_id}'
+      url: '{host:s}:{free_port:s}/sessions/{session_id}'
       method: DELETE
     response:
       status_code: 200
 
   - name: Fail to get the deleted session
     request:
-      url: '{host:s}:{port:d}/sessions/{session_id}'
+      url: '{host:s}:{free_port:s}/sessions/{session_id}'
       method: GET
     response:
       status_code: 404
@@ -42,11 +43,12 @@ stages:
 test_name: Multiple Session Lifecycle
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: Create a pipette offset calibration session
     request:
-      url: '{host:s}:{port:d}/sessions'
+      url: '{host:s}:{free_port:s}/sessions'
       method: POST
       json:
         data:
@@ -61,7 +63,7 @@ stages:
 
   - name: Create a deck cal session
     request:
-      url: '{host:s}:{port:d}/sessions'
+      url: '{host:s}:{free_port:s}/sessions'
       method: POST
       json:
         data:
@@ -74,7 +76,7 @@ stages:
 
   - name: Get all the sessions
     request:
-      url: '{host:s}:{port:d}/sessions'
+      url: '{host:s}:{free_port:s}/sessions'
       method: GET
     response:
       status_code: 200
@@ -94,7 +96,7 @@ stages:
 
   - name: Get just the deck cal sessions
     request:
-      url: '{host:s}:{port:d}/sessions?session_type=deckCalibration'
+      url: '{host:s}:{free_port:s}/sessions?session_type=deckCalibration'
       method: GET
     response:
       status_code: 200
@@ -109,21 +111,21 @@ stages:
 
   - name: Delete session 1
     request:
-      url: '{host:s}:{port:d}/sessions/{session_id_1}'
+      url: '{host:s}:{free_port:s}/sessions/{session_id_1}'
       method: DELETE
     response:
       status_code: 200
 
   - name: Delete session 2
     request:
-      url: '{host:s}:{port:d}/sessions/{session_id_2}'
+      url: '{host:s}:{free_port:s}/sessions/{session_id_2}'
       method: DELETE
     response:
       status_code: 200
 
   - name: Get all the sessions and there are none
     request:
-      url: '{host:s}:{port:d}/sessions'
+      url: '{host:s}:{free_port:s}/sessions'
       method: GET
     response:
       status_code: 200

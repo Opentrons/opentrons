@@ -8,8 +8,8 @@ _NUM_RUNS_TO_UPLOAD = 25
 _NUM_RUNS_TO_EXPECT = 20
 
 
-async def test_runs_auto_delete() -> None:
-    port = "15555"
+async def test_runs_auto_delete(function_scope_free_port: str) -> None:
+    port = function_scope_free_port
     async with RobotClient.make(
         host="http://localhost", port=port, version="*"
     ) as robot_client:

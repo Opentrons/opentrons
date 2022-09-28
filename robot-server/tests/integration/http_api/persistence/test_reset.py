@@ -8,7 +8,9 @@ from tests.integration.robot_client import RobotClient
 from tests.integration.protocol_files import get_py_protocol, get_json_protocol
 
 
-async def test_upload_protocols_and_reset_persistence_dir() -> None:
+async def test_upload_protocols_and_reset_persistence_dir(
+    function_scope_free_port: str,
+) -> None:
     """Test resetting runs history.
 
     Immediately after resetting runs history, existing resources should remain
@@ -16,7 +18,7 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
 
     But after restarting the server, those resources should be gone.
     """
-    port = "15555"
+    port = function_scope_free_port
     async with RobotClient.make(
         host="http://localhost", port=port, version="*"
     ) as robot_client:

@@ -32,9 +32,7 @@ def test_access_tip_length_calibration(api_client, set_up_tip_length_temp_direct
     assert resp.json()["data"] == []
 
 
-def test_delete_tip_length_calibration(
-    api_client, set_up_pipette_offset_temp_directory
-):
+def test_delete_tip_length_calibration(api_client, set_up_tip_length_temp_directory):
     resp = api_client.delete(
         f"/calibration/tip_length?pipette_id={FAKE_PIPETTE_ID}&"
         f"tiprack_hash={WRONG_LW_HASH}"

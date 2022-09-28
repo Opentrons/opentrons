@@ -2,11 +2,12 @@ test_name: Upload and run a PAPI v2 protocol that should fail.
 
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: Upload a protocol
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{host:s}:{free_port:s}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/runtime_error.py'
@@ -18,7 +19,7 @@ stages:
 
   - name: Create run from protocol
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{host:s}:{free_port:s}/runs'
       method: POST
       json:
         data:
@@ -31,7 +32,7 @@ stages:
 
   - name: Play the run
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      url: '{host:s}:{free_port:s}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -45,7 +46,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}'
+      url: '{host:s}:{free_port:s}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -62,7 +63,7 @@ stages:
 
   - name: Verify commands contain the expected results
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{host:s}:{free_port:s}/runs/{run_id}/commands'
       method: GET
     response:
       status_code: 200

@@ -2,11 +2,12 @@
 test_name: GET Health
 marks:
   - usefixtures:
+      - free_port
       - run_server
 stages:
   - name: Health GET request returns correct info
     request:
-      url: "{host:s}:{port:d}/health"
+      url: "{host:s}:{free_port:s}/health"
       method: GET
     response:
       status_code: 200

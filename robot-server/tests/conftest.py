@@ -2,14 +2,15 @@ import signal
 import subprocess
 import time
 import sys
-import tempfile
 import os
 import shutil
 import json
 import pathlib
 import requests
 import pytest
+import socket
 
+from contextlib import closing
 from datetime import datetime, timezone
 from fastapi import routing
 from mock import MagicMock
@@ -112,28 +113,63 @@ def api_client_no_errors(override_hardware: None) -> TestClient:
     return client
 
 
-@pytest.fixture(scope="session")
-def request_session() -> requests.Session:
+def _request_session() -> requests.Session:
     session = requests.Session()
     session.headers.update({API_VERSION_HEADER: LATEST_API_VERSION_HEADER_VALUE})
     return session
 
 
 @pytest.fixture(scope="session")
-def server_temp_directory() -> Iterator[str]:
-    new_dir = tempfile.mkdtemp()
+def request_session() -> requests.Session:
+    return _request_session()
+
+
+@pytest.fixture(scope="function")
+def function_scope_request_session() -> requests.Session:
+    return _request_session()
+
+
+@pytest.fixture(scope="function")
+def function_scope_server_temp_directory(tmp_path: Path) -> str:
+    new_dir: str = str(tmp_path.resolve())
     os.environ["OT_API_CONFIG_DIR"] = new_dir
     config.reload()
+    return new_dir
 
-    yield new_dir
-    shutil.rmtree(new_dir)
 
-    del os.environ["OT_API_CONFIG_DIR"]
+@pytest.fixture(scope="session")
+def server_temp_directory(tmp_path_factory: pytest.TempPathFactory) -> str:
+    new_dir: str = str(tmp_path_factory.mktemp("temp-robot").resolve())
+    os.environ["OT_API_CONFIG_DIR"] = new_dir
+    config.reload()
+    return new_dir
+
+
+def _free_port() -> str:
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
+        sock.bind(("localhost", 0))
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return str(sock.getsockname()[1])
+
+
+@pytest.fixture(scope="session")
+def free_port() -> str:
+    return _free_port()
+
+
+@pytest.fixture(scope="module")
+def module_scope_free_port() -> str:
+    return _free_port()
+
+
+@pytest.fixture(scope="function")
+def function_scope_free_port() -> str:
+    return _free_port()
 
 
 @pytest.fixture(scope="session")
 def run_server(
-    request_session: requests.Session, server_temp_directory: str
+    request_session: requests.Session, server_temp_directory: str, free_port: str
 ) -> Iterator["subprocess.Popen[Any]"]:
     """Run the robot server in a background process."""
     # In order to collect coverage we run using `coverage`.
@@ -154,7 +190,7 @@ def run_server(
             "--host",
             "localhost",
             "--port",
-            "31950",
+            free_port,
         ],
         env={
             "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev.env",
@@ -171,37 +207,96 @@ def run_server(
 
         while True:
             try:
-                request_session.get("http://localhost:31950/health")
+                request_session.get(f"http://localhost:{free_port}/health")
             except ConnectionError:
                 pass
             else:
                 break
             time.sleep(0.5)
         request_session.post(
-            "http://localhost:31950/robot/home", json={"target": "robot"}
+            f"http://localhost:{free_port}/robot/home", json={"target": "robot"}
         )
         yield proc
         proc.send_signal(signal.SIGTERM)
         proc.wait()
 
 
-@pytest.fixture
-def attach_pipettes(server_temp_directory: str) -> Iterator[None]:
+@pytest.fixture(scope="function")
+def function_scope_run_server(
+    function_scope_request_session: requests.Session,
+    function_scope_server_temp_directory: str,
+    function_scope_free_port: str,
+) -> Iterator["subprocess.Popen[Any]"]:
+    """Run the robot server in a background process."""
+    # In order to collect coverage we run using `coverage`.
+    # `-a` is to append to existing `.coverage` file.
+    # `--source` is the source code folder to collect coverage stats on.
+    with subprocess.Popen(
+        [
+            sys.executable,
+            "-m",
+            "coverage",
+            "run",
+            "-a",
+            "--source",
+            "robot_server",
+            "-m",
+            "uvicorn",
+            "robot_server:app",
+            "--host",
+            "localhost",
+            "--port",
+            function_scope_free_port,
+        ],
+        env={
+            "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev.env",
+            "OT_API_CONFIG_DIR": function_scope_server_temp_directory,
+        },
+        stdin=subprocess.DEVNULL,
+        # The server will log to its stdout or stderr.
+        # Let it inherit our stdout and stderr so pytest captures its logs.
+        stdout=None,
+        stderr=None,
+    ) as proc:
+        # Wait for a bit to get started by polling /hcpealth
+        from requests.exceptions import ConnectionError
+
+        while True:
+            try:
+                function_scope_request_session.get(
+                    f"http://localhost:{function_scope_free_port}/health"
+                )
+            except ConnectionError:
+                pass
+            else:
+                break
+            time.sleep(0.5)
+        function_scope_request_session.post(
+            f"http://localhost:{function_scope_free_port}/robot/home",
+            json={"target": "robot"},
+        )
+        yield proc
+        proc.send_signal(signal.SIGTERM)
+        proc.wait()
+
+
+@pytest.fixture(scope="function")
+def attach_pipettes(function_scope_server_temp_directory: str) -> None:
     import json
 
     pipette = {"dropTipShake": True, "model": "p300_multi_v1"}
 
-    pipette_dir_path = os.path.join(server_temp_directory, "pipettes")
+    pipette_dir_path = os.path.join(function_scope_server_temp_directory, "pipettes")
     pipette_file_path = os.path.join(pipette_dir_path, "testpipette01.json")
 
     with open(pipette_file_path, "w") as pipette_file:
         json.dump(pipette, pipette_file)
-    yield
-    os.remove(pipette_file_path)
 
 
-@pytest.fixture
-def set_up_pipette_offset_temp_directory(server_temp_directory: str) -> None:
+@pytest.fixture(scope="function")
+def set_up_pipette_offset_temp_directory(
+    function_scope_server_temp_directory: str,
+) -> None:
     attached_pip_list = ["123", "321"]
     mount_list = [Mount.LEFT, Mount.RIGHT]
     definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
@@ -216,8 +311,8 @@ def set_up_pipette_offset_temp_directory(server_temp_directory: str) -> None:
         )
 
 
-@pytest.fixture
-def set_up_tip_length_temp_directory(server_temp_directory: str) -> None:
+@pytest.fixture(scope="function")
+def set_up_tip_length_temp_directory(function_scope_server_temp_directory: str) -> None:
     attached_pip_list = ["123", "321"]
     tip_length_list = [30.5, 31.5]
     definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
@@ -229,8 +324,10 @@ def set_up_tip_length_temp_directory(server_temp_directory: str) -> None:
         modify.save_tip_length_calibration(pip, cal)
 
 
-@pytest.fixture
-def set_up_deck_calibration_temp_directory(server_temp_directory: str) -> None:
+@pytest.fixture(scope="function")
+def set_up_deck_calibration_temp_directory(
+    function_scope_server_temp_directory: str,
+) -> None:
     attitude = [[1.0008, 0.0052, 0.0], [-0.0, 0.992, 0.0], [0.0, 0.0, 1.0]]
     modify.save_robot_deck_attitude(attitude, "pip_1", "fakehash")
 
@@ -243,18 +340,18 @@ def session_manager(hardware: HardwareControlAPI) -> SessionManager:
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def set_disable_fast_analysis(
-    request_session: requests.Session,
+    function_scope_request_session: requests.Session, function_scope_free_port: str
 ) -> Iterator[None]:
     """For integration tests that need to set then clear the
     enableHttpProtocolSessions feature flag"""
-    url = "http://localhost:31950/settings"
+    url = f"http://localhost:{function_scope_free_port}/settings"
     data = {"id": "disableFastProtocolUpload", "value": True}
-    request_session.post(url, json=data)
+    function_scope_request_session.post(url, json=data)
     yield None
     data["value"] = None
-    request_session.post(url, json=data)
+    function_scope_request_session.post(url, json=data)
 
 
 @pytest.fixture

@@ -12,14 +12,14 @@ from tests.integration.protocol_files import get_py_protocol, get_json_protocol
 
 @pytest.mark.parametrize("protocol", [(get_py_protocol), (get_json_protocol)])
 async def test_protocols_and_analyses_persist(
-    protocol: Callable[[str], IO[bytes]]
+    protocol: Callable[[str], IO[bytes]], function_scope_free_port: str
 ) -> None:
     """Test protocol and analysis persistence.
 
     Uploaded protocols and their completed analyses should remain constant across
     server restarts.
     """
-    port = "15555"
+    port = function_scope_free_port
     async with RobotClient.make(
         host="http://localhost", port=port, version="*"
     ) as robot_client:
@@ -80,12 +80,12 @@ async def test_protocols_and_analyses_persist(
             server.stop()
 
 
-async def test_protocol_labware_files_persist() -> None:
+async def test_protocol_labware_files_persist(function_scope_free_port: str) -> None:
     """Upload a python protocol and 2 custom labware files.
 
     Test that labware files are persisted on server restart.
     """
-    port = "15556"
+    port = function_scope_free_port
     async with RobotClient.make(
         host="http://localhost", port=port, version="*"
     ) as robot_client:
