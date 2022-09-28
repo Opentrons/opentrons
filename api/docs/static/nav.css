@@ -172,7 +172,7 @@ div.hbspt-form input {
     border: none;
     font-size: 12px;
     vertical-align: bottom;
-    border-radius: 6px;
+    border-radius: 3px;
 }
 
 @media only screen and (min-device-width: 769px) and (min-width: 769px) {
@@ -182,13 +182,22 @@ div.hbspt-form input {
 }
 
 div.hs_submit input {
-    color: black;
-    padding: 6px 10px;
-    font-size: 16px;
-    width: 100%;
-    min-width: 100px;
+    align-items: center;
+    background-color: #006fff;
+    border-radius: 3px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    font-family: AkkoPro-Medium, sans-serif; 
+    font-size: 0.875rem;
     height: 34px;
-    background-color: #EEE;
+    justify-content: center;
+    letter-spacing: 1px;
+    line-height: 1em !important;
+    min-width: 100px;
+    padding: 1.125rem 1.75rem;
+    text-transform: uppercase;
+    width: 100%;
 }
 
 @media only screen and (min-device-width: 960px) and (min-width: 960px) {
@@ -198,9 +207,8 @@ div.hs_submit input {
 }
 
 div.hs_submit input:hover {
-    padding-top: 5px;
     cursor: pointer;
-    color: black;
+    color: white;
 }
 
 div.hero {
