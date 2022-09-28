@@ -4,4 +4,3 @@ description: Variables and other info used across tests
 
 variables:
   host: http://localhost
-  port: 31950

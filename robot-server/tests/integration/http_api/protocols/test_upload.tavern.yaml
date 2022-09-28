@@ -73,8 +73,8 @@ test_name: Upload, analyze and analyze using "slow analysis"
 marks:
   - usefixtures:
       - free_port
-      - set_disable_fast_analysis
       - run_server
+      - set_disable_fast_analysis
 
 stages:
   - name: Upload simple Python protocol

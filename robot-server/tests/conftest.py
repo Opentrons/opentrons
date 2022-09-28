@@ -260,11 +260,11 @@ def session_manager(hardware: HardwareControlAPI) -> SessionManager:
 
 @pytest.fixture
 def set_disable_fast_analysis(
-    request_session: requests.Session,
+    request_session: requests.Session, free_port: str
 ) -> Iterator[None]:
     """For integration tests that need to set then clear the
     enableHttpProtocolSessions feature flag"""
-    url = "http://localhost:31950/settings"
+    url = f"http://localhost:{free_port}/settings"
     data = {"id": "disableFastProtocolUpload", "value": True}
     request_session.post(url, json=data)
     yield None
