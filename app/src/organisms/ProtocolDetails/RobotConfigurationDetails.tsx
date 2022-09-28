@@ -40,7 +40,6 @@ export const RobotConfigurationDetails = (
     isLoading,
   } = props
   const { t } = useTranslation(['protocol_details', 'shared'])
-
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <RobotConfigurationDetailsItem

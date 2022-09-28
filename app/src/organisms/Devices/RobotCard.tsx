@@ -43,6 +43,7 @@ import { RobotOverflowMenu } from './RobotOverflowMenu'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { State } from '../../redux/types'
+import { useFeatureFlag } from '../../redux/config'
 
 const ROBOT_CARD_STYLE = css`
   border: 1px solid ${COLORS.medGreyEnabled};
@@ -159,6 +160,8 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
   const attachedModules = useAttachedModules()
+  const enableThermocyclerGen2 = useFeatureFlag('enableThermocyclerGen2')
+
   return attachedModules.length > 0 ? (
     <Box
       display="grid"
@@ -174,15 +177,19 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
         {t('modules')}
       </StyledText>
       <Flex>
-        {attachedModules.map((module, i) => (
-          <ModuleIcon
-            key={`${module.moduleModel}_${i}_${robotName}`}
-            tooltipText={t('this_robot_has_connected_and_power_on_module', {
-              moduleName: getModuleDisplayName(module.moduleModel),
-            })}
-            module={module}
-          />
-        ))}
+        {attachedModules.map((module, i) =>
+          enableThermocyclerGen2 ||
+          (!enableThermocyclerGen2 &&
+            module.moduleModel !== 'thermocyclerModuleV2') ? (
+            <ModuleIcon
+              key={`${module.moduleModel}_${i}_${robotName}`}
+              tooltipText={t('this_robot_has_connected_and_power_on_module', {
+                moduleName: getModuleDisplayName(module.moduleModel),
+              })}
+              module={module}
+            />
+          ) : null
+        )}
       </Flex>
     </Box>
   ) : (

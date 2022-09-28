@@ -5,10 +5,11 @@ export const CONFIG_VERSION_LATEST: 1 = 1
 export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'allPipetteConfig',
   'enableBundleUpload',
+  'enableCalibrationWizards',
   'enableChangePipetteWizard',
   'enableLiquidSetup',
-  'enableCalibrationWizards',
   'enableManualDeckStateModification',
+  'enableThermocyclerGen2',
 ]
 
 // action type constants
