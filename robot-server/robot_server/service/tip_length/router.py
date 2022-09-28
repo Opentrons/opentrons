@@ -2,7 +2,11 @@ from starlette import status
 from fastapi import APIRouter
 from typing import Optional, cast
 
-from opentrons.calibration_storage import types as cal_types, ot2_tip_length, ot2_schemas
+from opentrons.calibration_storage import (
+    types as cal_types,
+    ot2_tip_length,
+    ot2_schemas,
+)
 
 from robot_server.errors import ErrorBody
 from robot_server.service.tip_length import models as tl_models

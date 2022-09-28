@@ -14,7 +14,11 @@ from typing import (
 )
 
 from opentrons.calibration_storage import (
-    helpers, types as cal_types, ot2_deck_attitude, ot2_pipette_offset)
+    helpers,
+    types as cal_types,
+    ot2_deck_attitude,
+    ot2_pipette_offset,
+)
 from opentrons.hardware_control import robot_calibration as robot_cal
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
 from opentrons.hardware_control.instruments.ot2 import instrument_calibration
@@ -341,7 +345,8 @@ class DeckCalibrationUserFlow:
         assert pip_id
         try:
             return ot2_deck_attitude.load_tip_length_calibration(
-                cast(cal_types.PipetteId, pip_id), self._tip_rack._implementation.get_definition()
+                cast(cal_types.PipetteId, pip_id),
+                self._tip_rack._implementation.get_definition(),
             ).tipLength
         except cal_types.TipLengthCalNotFound:
             tip_overlap = self._hw_pipette.config.tip_overlap.get(self._tip_rack.uri, 0)

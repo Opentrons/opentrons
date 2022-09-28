@@ -3,8 +3,13 @@ from typing import List, Optional, Tuple, Awaitable, Callable, Dict, Any, cast
 from typing_extensions import Literal
 
 from opentrons.calibration_storage import (
-    helpers, types as cal_types,
-    ot2_deck_attitude, ot2_tip_length, ot2_pipette_offset, ot2_schemas)
+    helpers,
+    types as cal_types,
+    ot2_deck_attitude,
+    ot2_tip_length,
+    ot2_pipette_offset,
+    ot2_schemas,
+)
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import (
     HardwareControlAPI,
@@ -320,7 +325,9 @@ class CheckCalibrationUserFlow:
     def _get_current_calibrations(self):
         deck = ot2_deck_attitude.get_robot_deck_attitude()
         pipette_offsets = {
-            m: ot2_pipette_offset.get_pipette_offset(cast(cal_types.PipetteId, p.pipette_id), m)
+            m: ot2_pipette_offset.get_pipette_offset(
+                cast(cal_types.PipetteId, p.pipette_id), m
+            )
             for m, p in self._filtered_hw_pips.items()
         }
         tip_lengths = {
@@ -350,7 +357,9 @@ class CheckCalibrationUserFlow:
             )
             tiprack_def = tiprack._implementation.get_definition()
         else:
-            tiprack_def = ot2_tip_length.get_custom_tiprack_definition_for_tlc(pip_offset.uri)
+            tiprack_def = ot2_tip_length.get_custom_tiprack_definition_for_tlc(
+                pip_offset.uri
+            )
         return ot2_tip_length.load_tip_length_calibration(
             cast(cal_types.PipetteId, pipette.pipette_id), tiprack_def
         )
@@ -673,7 +682,9 @@ class CheckCalibrationUserFlow:
                 length=calibration.tip_length,
                 cal_status=calibration.status,
             )
-            ot2_tip_length.save_tip_length_calibration(calibration.pipette, tip_length_dict)
+            ot2_tip_length.save_tip_length_calibration(
+                calibration.pipette, tip_length_dict
+            )
         elif self.current_state == State.comparingPointOne and pipette_state:
             # Here if we're on the second pipette, but the first slot we
             # should make sure we mark both pipette cal and deck cal as bad.

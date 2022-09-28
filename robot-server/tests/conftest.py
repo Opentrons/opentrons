@@ -23,7 +23,12 @@ from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons import config
 from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
 from opentrons.calibration_storage import (
-    helpers, types as cal_types, ot2_pipette_offset, ot2_tip_length, ot2_deck_attitude)
+    helpers,
+    types as cal_types,
+    ot2_pipette_offset,
+    ot2_tip_length,
+    ot2_deck_attitude,
+)
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Mount
 
@@ -219,7 +224,9 @@ def set_up_tip_length_temp_directory(server_temp_directory: str) -> None:
     definition = labware.get_labware_definition("opentrons_96_filtertiprack_200ul")
     for pip, tip_len in zip(attached_pip_list, tip_length_list):
         cal_data = ot2_tip_length.create_tip_length_data(definition, tip_len)
-        ot2_tip_length.save_tip_length_calibration(cast(cal_types.PipetteId, pip), cal_data)
+        ot2_tip_length.save_tip_length_calibration(
+            cast(cal_types.PipetteId, pip), cal_data
+        )
 
 
 @pytest.fixture

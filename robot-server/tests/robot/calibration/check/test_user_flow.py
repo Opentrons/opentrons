@@ -6,7 +6,12 @@ import datetime
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage import (
-    types as CSTypes, ot2_deck_attitude, ot2_pipette_offset, ot2_tip_length, ot2_schemas)
+    types as CSTypes,
+    ot2_deck_attitude,
+    ot2_pipette_offset,
+    ot2_tip_length,
+    ot2_schemas,
+)
 from opentrons.config import robot_configs
 from opentrons.config.pipette_config import load
 
@@ -81,7 +86,9 @@ def test_user_flow_select_pipette(pipettes, target_mount, hardware):
     with patch.object(
         ot2_deck_attitude, "get_robot_deck_attitude", new=build_mock_deck_calibration()
     ), patch.object(
-        ot2_tip_length, "load_tip_length_calibration", new=build_mock_stored_tip_length()
+        ot2_tip_length,
+        "load_tip_length_calibration",
+        new=build_mock_stored_tip_length(),
     ), patch.object(
         ot2_pipette_offset, "get_pipette_offset", new=build_mock_stored_pipette_offset()
     ):
@@ -101,7 +108,9 @@ async def test_switching_to_second_pipette(pipettes, target_mount, hardware):
     with patch.object(
         ot2_deck_attitude, "get_robot_deck_attitude", new=build_mock_deck_calibration()
     ), patch.object(
-        ot2_tip_length, "load_tip_length_calibration", new=build_mock_stored_tip_length()
+        ot2_tip_length,
+        "load_tip_length_calibration",
+        new=build_mock_stored_tip_length(),
     ), patch.object(
         ot2_pipette_offset, "get_pipette_offset", new=build_mock_stored_pipette_offset()
     ):
@@ -192,7 +201,9 @@ def test_load_labware(mock_hw):
     with patch.object(
         ot2_deck_attitude, "get_robot_deck_attitude", new=build_mock_deck_calibration()
     ), patch.object(
-        ot2_tip_length, "load_tip_length_calibration", new=build_mock_stored_tip_length()
+        ot2_tip_length,
+        "load_tip_length_calibration",
+        new=build_mock_stored_tip_length(),
     ), patch.object(
         ot2_pipette_offset, "get_pipette_offset", new=build_mock_stored_pipette_offset()
     ):
@@ -235,11 +246,17 @@ def test_bad_calibration(mock_hw):
 
     with pytest.raises(RobotServerError):
         with patch.object(
-            ot2_deck_attitude, "get_robot_deck_attitude", new=build_mock_deck_calibration("identity")
+            ot2_deck_attitude,
+            "get_robot_deck_attitude",
+            new=build_mock_deck_calibration("identity"),
         ), patch.object(
-            ot2_tip_length, "load_tip_length_calibration", new=build_mock_stored_tip_length()
+            ot2_tip_length,
+            "load_tip_length_calibration",
+            new=build_mock_stored_tip_length(),
         ), patch.object(
-            ot2_pipette_offset, "get_pipette_offset", new=build_mock_stored_pipette_offset()
+            ot2_pipette_offset,
+            "get_pipette_offset",
+            new=build_mock_stored_pipette_offset(),
         ):
             CheckCalibrationUserFlow(hardware=mock_hw)
 
@@ -249,7 +266,9 @@ def mock_user_flow(mock_hw):
     with patch.object(
         ot2_deck_attitude, "get_robot_deck_attitude", new=build_mock_deck_calibration()
     ), patch.object(
-        ot2_tip_length, "load_tip_length_calibration", new=build_mock_stored_tip_length()
+        ot2_tip_length,
+        "load_tip_length_calibration",
+        new=build_mock_stored_tip_length(),
     ), patch.object(
         ot2_pipette_offset, "get_pipette_offset", new=build_mock_stored_pipette_offset()
     ):
@@ -267,7 +286,9 @@ def mock_user_flow_bad_vectors(mock_hw):
     with patch.object(
         ot2_deck_attitude, "get_robot_deck_attitude", new=build_mock_deck_calibration()
     ), patch.object(
-        ot2_tip_length, "load_tip_length_calibration", new=build_mock_stored_tip_length()
+        ot2_tip_length,
+        "load_tip_length_calibration",
+        new=build_mock_stored_tip_length(),
     ), patch.object(
         ot2_pipette_offset, "get_pipette_offset", new=build_mock_stored_pipette_offset()
     ):
