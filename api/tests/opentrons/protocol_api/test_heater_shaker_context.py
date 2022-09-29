@@ -7,7 +7,10 @@ from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control.modules import TemperatureStatus, SpeedStatus
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, HeaterShakerContext
-from opentrons.protocol_api.module_contexts import NoTargetTemperatureSetError, CannotPerformModuleAction
+from opentrons.protocol_api.module_contexts import (
+    NoTargetTemperatureSetError,
+    CannotPerformModuleAction,
+)
 
 from .types import ProtocolCore, HeaterShakerCore
 
@@ -120,7 +123,10 @@ def test_get_labware_latch_status(
 
 
 def test_set_target_temperature(
-    decoy: Decoy, mock_core: HeaterShakerCore, mock_broker: Broker, subject: HeaterShakerContext
+    decoy: Decoy,
+    mock_core: HeaterShakerCore,
+    mock_broker: Broker,
+    subject: HeaterShakerContext,
 ) -> None:
     """It should set the temperature via the core."""
     subject.set_target_temperature(42.0)
@@ -144,7 +150,10 @@ def test_set_target_temperature(
 
 
 def test_wait_for_temperature(
-    decoy: Decoy, mock_core: HeaterShakerCore, mock_broker: Broker, subject: HeaterShakerContext
+    decoy: Decoy,
+    mock_core: HeaterShakerCore,
+    mock_broker: Broker,
+    subject: HeaterShakerContext,
 ) -> None:
     """It should wait for temperature via the core."""
     decoy.when(mock_core.get_target_temperature()).then_return(42.0)
@@ -170,7 +179,10 @@ def test_wait_for_temperature(
 
 
 def test_wait_for_temperature_no_target(
-    decoy: Decoy, mock_core: HeaterShakerCore, mock_broker: Broker, subject: HeaterShakerContext
+    decoy: Decoy,
+    mock_core: HeaterShakerCore,
+    mock_broker: Broker,
+    subject: HeaterShakerContext,
 ) -> None:
     """It should raise a NoTargetTemperatureSetError."""
     with pytest.raises(NoTargetTemperatureSetError) as exc_info:
@@ -183,11 +195,15 @@ def test_wait_for_temperature_no_target(
         ),
     )
 
-# TODO set and wait for target temperature?
+
+# TODO set and wait for target temperature??
 
 
 def test_set_and_wait_for_shake_speed(
-    decoy: Decoy, mock_core: HeaterShakerCore, mock_broker: Broker, subject: HeaterShakerContext
+    decoy: Decoy,
+    mock_core: HeaterShakerCore,
+    mock_broker: Broker,
+    subject: HeaterShakerContext,
 ) -> None:
     """It should set and wait for shake speed via the core."""
     decoy.when(mock_core.get_labware_latch_status()).then_return(
@@ -215,7 +231,10 @@ def test_set_and_wait_for_shake_speed(
 
 
 def test_set_and_wait_for_shake_speed_latch_not_closed(
-    decoy: Decoy, mock_core: HeaterShakerCore, mock_broker: Broker, subject: HeaterShakerContext
+    decoy: Decoy,
+    mock_core: HeaterShakerCore,
+    mock_broker: Broker,
+    subject: HeaterShakerContext,
 ) -> None:
     """It should raise a CannotPerformModuleAction when latch is not closed."""
     decoy.when(mock_core.get_labware_latch_status()).then_return(
@@ -234,7 +253,10 @@ def test_set_and_wait_for_shake_speed_latch_not_closed(
 
 
 def test_open_labware_latch(
-    decoy: Decoy, mock_core: HeaterShakerCore, mock_broker: Broker, subject: HeaterShakerContext
+    decoy: Decoy,
+    mock_core: HeaterShakerCore,
+    mock_broker: Broker,
+    subject: HeaterShakerContext,
 ) -> None:
     """It should open the labware latch via the core."""
     decoy.when(mock_core.get_speed_status()).then_return(SpeedStatus.IDLE)
@@ -260,7 +282,10 @@ def test_open_labware_latch(
 
 
 def test_open_labware_latch_not_idle(
-    decoy: Decoy, mock_core: HeaterShakerCore, mock_broker: Broker, subject: HeaterShakerContext
+    decoy: Decoy,
+    mock_core: HeaterShakerCore,
+    mock_broker: Broker,
+    subject: HeaterShakerContext,
 ) -> None:
     """It should raise a CannotPerformModuleAction when heater-shaker is not idle."""
     decoy.when(mock_core.get_speed_status()).then_return(SpeedStatus.ACCELERATING)
@@ -277,7 +302,10 @@ def test_open_labware_latch_not_idle(
 
 
 def test_close_labware_latch(
-    decoy: Decoy, mock_core: HeaterShakerCore, mock_broker: Broker, subject: HeaterShakerContext
+    decoy: Decoy,
+    mock_core: HeaterShakerCore,
+    mock_broker: Broker,
+    subject: HeaterShakerContext,
 ) -> None:
     """It should close the labware latch via the core."""
     subject.close_labware_latch()
@@ -301,7 +329,10 @@ def test_close_labware_latch(
 
 
 def test_deactivate_shaker(
-    decoy: Decoy, mock_core: HeaterShakerCore, mock_broker: Broker, subject: HeaterShakerContext
+    decoy: Decoy,
+    mock_core: HeaterShakerCore,
+    mock_broker: Broker,
+    subject: HeaterShakerContext,
 ) -> None:
     """It should stop shaking via the core."""
     subject.deactivate_shaker()
@@ -325,7 +356,10 @@ def test_deactivate_shaker(
 
 
 def test_deactivate_heater(
-    decoy: Decoy, mock_core: HeaterShakerCore, mock_broker: Broker, subject: HeaterShakerContext
+    decoy: Decoy,
+    mock_core: HeaterShakerCore,
+    mock_broker: Broker,
+    subject: HeaterShakerContext,
 ) -> None:
     """It should stop heating via the core."""
     subject.deactivate_heater()
