@@ -35,7 +35,7 @@ Rather than writing a  ``run`` function and embedding commands within it, start 
 
 The first command you execute should always be :py:meth:`~opentrons.protocol_api.contexts.ProtocolContext.home`. If you try to execute other commands first, you will get a ``MustHomeError``. (When running protocols through the Opentrons App, the robot homes automatically.)
 
-All subsequent method calls will use the same :py:class:`.ProtocolContext`, unless you call :py:meth:`~opentrons.execute.get_protocol_api` again. If you do, the robot will update its cache of attached instruments and modules. Calling :py:meth:`~opentrons.execute.get_protocol_api` repeatedly will return an entirely new :py:class:`.ProtocolContext` each time, without loading any labware or instruments. This is a good way to reset the state of the system if you loaded something incorrectly or want to start from the beginning of your protocol logic.
+You should use the same :py:class:`.ProtocolContext` throughout your notebook, unless you need to start over from the beginning of your protocol logic. In that case, call :py:meth:`~opentrons.execute.get_protocol_api` again to get a new :py:class:`.ProtocolContext`.
 
 Running a Previously Written Protocol
 +++++++++++++++++++++++++++++++++++++
