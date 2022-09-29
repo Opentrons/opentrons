@@ -173,8 +173,8 @@
   },
   "robot": { "model": "OT-2 Standard", "deckId": "ot2_standard" },
   "pipettes": {
-    "c6f45030-92a5-11e9-ac62-1b173f839d9e": { "name": "p10_single" },
-    "c6f47740-92a5-11e9-ac62-1b173f839d9e": { "name": "p50_single" }
+    "c6f45030-92a5-11e9-ac62-1b173f839d9e": { "pipetteName": "p10_single" },
+    "c6f47740-92a5-11e9-ac62-1b173f839d9e": { "pipetteName": "p50_single" }
   },
   "labware": {
     "fixedTrash": {
