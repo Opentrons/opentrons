@@ -141,3 +141,80 @@ def test_get_labware_latch_status(
     )
     result = subject.get_labware_latch_status()
     assert result == HeaterShakerLabwareLatchStatus.OPENING
+
+
+def test_set_target_temperature(
+    decoy: Decoy,
+    mock_sync_module_hardware: SyncHeaterShakerHardware,
+    subject: LegacyHeaterShakerCore,
+) -> None:
+    """It should set the target temperature with the hardware."""
+    subject.set_target_temperature(42.0)
+
+    decoy.verify(mock_sync_module_hardware.start_set_temperature(42.0), times=1)
+
+
+def test_wait_for_target_temperature(
+    decoy: Decoy,
+    mock_sync_module_hardware: SyncHeaterShakerHardware,
+    subject: LegacyHeaterShakerCore,
+) -> None:
+    """It should wait for the target temperature with the hardware."""
+    subject.wait_for_target_temperature()
+
+    decoy.verify(mock_sync_module_hardware.await_temperature(), times=1)
+
+
+def test_set_and_wait_for_shake_speed(
+    decoy: Decoy,
+    mock_sync_module_hardware: SyncHeaterShakerHardware,
+    subject: LegacyHeaterShakerCore,
+) -> None:
+    """It should set and wait for the target speed with the hardware."""
+    subject.set_and_wait_for_shake_speed(1337)
+
+    decoy.verify(mock_sync_module_hardware.set_speed(rpm=1337), times=1)
+
+
+def test_open_labware_latch(
+    decoy: Decoy,
+    mock_sync_module_hardware: SyncHeaterShakerHardware,
+    subject: LegacyHeaterShakerCore,
+) -> None:
+    """It should open the labware latch with the hardware."""
+    subject.open_labware_latch()
+
+    decoy.verify(mock_sync_module_hardware.open_labware_latch(), times=1)
+
+
+def test_close_labware_latch(
+    decoy: Decoy,
+    mock_sync_module_hardware: SyncHeaterShakerHardware,
+    subject: LegacyHeaterShakerCore,
+) -> None:
+    """It should close the labware latch with the hardware."""
+    subject.close_labware_latch()
+
+    decoy.verify(mock_sync_module_hardware.close_labware_latch(), times=1)
+
+
+def test_deactivate_shaker(
+    decoy: Decoy,
+    mock_sync_module_hardware: SyncHeaterShakerHardware,
+    subject: LegacyHeaterShakerCore,
+) -> None:
+    """It should stop shaking with the hardware."""
+    subject.deactivate_shaker()
+
+    decoy.verify(mock_sync_module_hardware.deactivate_shaker(), times=1)
+
+
+def test_deactivate_heater(
+    decoy: Decoy,
+    mock_sync_module_hardware: SyncHeaterShakerHardware,
+    subject: LegacyHeaterShakerCore,
+) -> None:
+    """It should stop heating with the hardware."""
+    subject.deactivate_heater()
+
+    decoy.verify(mock_sync_module_hardware.deactivate_heater(), times=1)

@@ -212,31 +212,31 @@ class LegacyHeaterShakerCore(
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the labware plate's target temperature in °C."""
-        raise NotImplementedError("LegacyHeaterShakerCore.set_target_temperature")
+        self._sync_module_hardware.start_set_temperature(celsius)
 
     def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""
-        raise NotImplementedError("LegacyHeaterShakerCore.wait_for_target_temperature")
+        self._sync_module_hardware.await_temperature()
 
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set the shaker's target shake speed and wait for it to spin up."""
-        raise NotImplementedError("LegacyHeaterShakerCore.set_and_wait_for_shake_speed")
+        self._sync_module_hardware.set_speed(rpm=rpm)
 
     def open_labware_latch(self) -> None:
         """Open the labware latch."""
-        raise NotImplementedError("LegacyHeaterShakerCore.open_labware_latch")
+        self._sync_module_hardware.open_labware_latch()
 
     def close_labware_latch(self) -> None:
         """Close the labware latch."""
-        raise NotImplementedError("LegacyHeaterShakerCore.close_labware_latch")
+        self._sync_module_hardware.close_labware_latch()
 
     def deactivate_shaker(self) -> None:
         """Stop shaking."""
-        raise NotImplementedError("LegacyHeaterShakerCore.deactivate_shaker")
+        self._sync_module_hardware.deactivate_shaker()
 
     def deactivate_heater(self) -> None:
         """Stop heating."""
-        raise NotImplementedError("LegacyHeaterShakerCore.deactivate_heater")
+        self._sync_module_hardware.deactivate_heater()
 
     def get_current_temperature(self) -> float:
         """Get the labware plate's current temperature in °C."""
