@@ -32,6 +32,7 @@ import {
   mockMagneticModuleGen2,
   mockTemperatureModuleGen2,
   mockThermocycler,
+  mockThermocyclerGen2,
 } from '../../../redux/modules/__fixtures__'
 
 import type { Store } from 'redux'
@@ -526,7 +527,7 @@ describe('useModuleOverflowMenu', () => {
     expect(mockHandleClick).toHaveBeenCalled()
   })
 
-  it('should render TC module and create deactivate temp command', () => {
+  it('should render TC module and create open lid command', () => {
     const wrapper: React.FunctionComponent<{}> = ({ children }) => (
       <I18nextProvider i18n={i18n}>
         <Provider store={store}>{children}</Provider>
@@ -549,11 +550,12 @@ describe('useModuleOverflowMenu', () => {
     )
     const { menuOverflowItemsByModuleType } = result.current
     const tcMenu = menuOverflowItemsByModuleType.thermocyclerModuleType
-    act(() => tcMenu[1].onClick(false))
+    const openLidButton = tcMenu[1]
+    act(() => openLidButton.onClick(true))
 
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
-        commandType: 'thermocycler/deactivateBlock',
+        commandType: 'thermocycler/openLid',
         params: {
           moduleId: mockTCBlockHeating.id,
         },
@@ -584,13 +586,50 @@ describe('useModuleOverflowMenu', () => {
     )
     const { menuOverflowItemsByModuleType } = result.current
     const tcMenu = menuOverflowItemsByModuleType.thermocyclerModuleType
-    act(() => tcMenu[0].onClick(true))
+    const lidTempButton = tcMenu[0]
+    act(() => lidTempButton.onClick(true))
 
     expect(mockCreateLiveCommand).toHaveBeenCalledWith({
       command: {
         commandType: 'thermocycler/deactivateLid',
         params: {
           moduleId: mockTCLidHeating.id,
+        },
+      },
+    })
+  })
+
+  it('should render TC module gen 2 and create a close lid command', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <I18nextProvider i18n={i18n}>
+        <Provider store={store}>{children}</Provider>
+      </I18nextProvider>
+    )
+    const { result } = renderHook(
+      () =>
+        useModuleOverflowMenu(
+          mockThermocyclerGen2,
+          null,
+          jest.fn(),
+          jest.fn(),
+          jest.fn(),
+          jest.fn(),
+          false
+        ),
+      {
+        wrapper,
+      }
+    )
+    const { menuOverflowItemsByModuleType } = result.current
+    const tcMenu = menuOverflowItemsByModuleType.thermocyclerModuleType
+    const lidOpenButton = tcMenu[1]
+    act(() => lidOpenButton.onClick(true))
+
+    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+      command: {
+        commandType: 'thermocycler/closeLid',
+        params: {
+          moduleId: mockThermocyclerGen2.id,
         },
       },
     })

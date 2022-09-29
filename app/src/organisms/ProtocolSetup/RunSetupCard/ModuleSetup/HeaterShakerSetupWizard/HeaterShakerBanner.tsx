@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { COLORS } from '@opentrons/components'
 import { Divider } from '../../../../../atoms/structure/Divider'
+import { TertiaryButton } from '../../../../../atoms/buttons'
 import { HeaterShakerWizard } from '../../../../Devices/HeaterShakerWizard'
 import { ModuleRenderInfoForProtocol } from '../../../../Devices/hooks'
 import { Banner, BannerItem } from '../Banner/Banner'
@@ -39,8 +40,14 @@ export function HeaterShakerBanner(
               slotName: module.slotName,
             })}
             body={t('improperly_fastened_description')}
-            btnText={t('view_instructions')}
-            onClick={() => setWizardId(module.moduleId)}
+            button={
+              <TertiaryButton
+                data-testid="HeaterShakerBanner_Button"
+                onClick={() => setWizardId(module.moduleId)}
+              >
+                {t('view_instructions')}
+              </TertiaryButton>
+            }
           />
         </React.Fragment>
       ))}

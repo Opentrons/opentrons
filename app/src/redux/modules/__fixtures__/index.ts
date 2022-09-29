@@ -178,6 +178,7 @@ export const mockApiThermocyclerLegacy: ApiTypes.ApiThermocyclerModuleLegacy = {
   data: {
     lidStatus: 'open',
     lidTargetTemperature: null,
+    lidTemperatureStatus: 'idle',
     lidTemperature: null,
     currentTemperature: null,
     targetTemperature: null,
@@ -203,6 +204,7 @@ export const mockApiThermocycler: ApiTypes.ApiThermocyclerModule = {
   data: {
     lidStatus: 'open',
     lidTargetTemperature: null,
+    lidTemperatureStatus: 'idle',
     lidTemperature: null,
     currentTemperature: null,
     targetTemperature: null,
@@ -228,6 +230,7 @@ export const mockThermocycler: Types.ThermocyclerModule = {
   data: {
     lidStatus: 'open',
     lidTargetTemperature: null,
+    lidTemperatureStatus: 'idle',
     lidTemperature: null,
     currentTemperature: null,
     targetTemperature: null,
@@ -240,6 +243,32 @@ export const mockThermocycler: Types.ThermocyclerModule = {
     status: 'idle',
   },
   usbPort: { path: '/dev/ot_module_thermocycler0', port: 1, hub: null },
+}
+
+export const mockThermocyclerGen2: Types.ThermocyclerModule = {
+  id: 'thermocycler_id2',
+  moduleModel: 'thermocyclerModuleV2',
+  moduleType: 'thermocyclerModuleType',
+  serialNumber: 'ghi789',
+  hardwareRevision: 'thermocycler_v4.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    lidStatus: 'open',
+    lidTargetTemperature: null,
+    lidTemperatureStatus: 'idle',
+    lidTemperature: null,
+    currentTemperature: null,
+    targetTemperature: null,
+    holdTime: null,
+    rampRate: null,
+    currentCycleIndex: null,
+    totalCycleCount: null,
+    currentStepIndex: null,
+    totalStepCount: null,
+    status: 'idle',
+  },
+  usbPort: { path: '/dev/ot_module_thermocycler2', port: 1, hub: null },
 }
 
 export const mockApiHeaterShaker: ApiTypes.ApiHeaterShakerModule = {

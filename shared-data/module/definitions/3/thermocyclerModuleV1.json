@@ -34,7 +34,7 @@
     "minBlockVolume": 0,
     "maxBlockVolume": 100
   },
-  "displayName": "Thermocycler Module",
+  "displayName": "Thermocycler Module GEN1",
   "quirks": [],
   "slotTransforms": {},
   "compatibleWith": ["thermocyclerModuleV1"],
