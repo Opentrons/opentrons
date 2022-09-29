@@ -35,14 +35,10 @@ export const getPrimaryPipetteId = (
   const rightPipetteSpecs = getPipetteNameSpecs(rightPipette.name)
 
   if (leftPipetteSpecs == null) {
-    throw new Error(
-      `could not find pipette specs for ${leftPipette.name}`
-    )
+    throw new Error(`could not find pipette specs for ${leftPipette.name}`)
   }
   if (rightPipetteSpecs == null) {
-    throw new Error(
-      `could not find pipette specs for ${rightPipette.name}`
-    )
+    throw new Error(`could not find pipette specs for ${rightPipette.name}`)
   }
 
   // prefer pipettes with fewer channels

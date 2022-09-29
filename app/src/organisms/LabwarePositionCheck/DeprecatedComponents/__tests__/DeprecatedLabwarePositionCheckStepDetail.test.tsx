@@ -177,7 +177,7 @@ describe('DeprecatedLabwarePositionCheckStepDetail', () => {
           },
           pipettes: {
             [PRIMARY_PIPETTE_ID]: {
-              pipetteName: PRIMARY_PIPETTE_NAME,
+              name: PRIMARY_PIPETTE_NAME,
               mount: 'left',
             },
           },
@@ -257,7 +257,7 @@ describe('DeprecatedLabwarePositionCheckStepDetail', () => {
           },
           pipettes: {
             [PRIMARY_PIPETTE_ID]: {
-              pipetteName: PRIMARY_PIPETTE_NAME,
+              name: PRIMARY_PIPETTE_NAME,
               mount: 'left',
             },
           },

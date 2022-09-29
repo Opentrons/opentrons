@@ -208,9 +208,7 @@
   },
   "robot": { "model": "OT-2 Standard", "deckId": "ot2_standard" },
   "pipettes": {
-    "0b3f2210-75c7-11ea-b42f-4b64e50f43e5": {
-      "name": "p300_single_gen2"
-    }
+    "0b3f2210-75c7-11ea-b42f-4b64e50f43e5": { "name": "p300_single_gen2" }
   },
   "labware": {
     "fixedTrash": {
