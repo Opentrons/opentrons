@@ -138,7 +138,7 @@ class AbstractHeaterShakerCore(AbstractModuleCore[LabwareCoreType]):
         """Set the labware plate's target temperature in °C."""
 
     @abstractmethod
-    def wait_for_target_temeprature(self) -> None:
+    def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""
 
     @abstractmethod

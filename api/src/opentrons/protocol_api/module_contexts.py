@@ -829,7 +829,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
                         and the Heater-Shaker module has a temperature accuracy of ±0.5 °C.
         """
         validated_temp = validate_heater_shaker_temperature(celsius=celsius)
-        self._module.start_set_temperature(celsius=validated_temp)
+        self._core.set_target_temperature(celsius=validated_temp)
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_wait_for_temperature)
@@ -841,7 +841,8 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             raise NoTargetTemperatureSetError(
                 f"Heater-Shaker Module {self} does not have a target temperature set."
             )
-        self._module.await_temperature(awaiting_temperature=self.target_temperature)
+        # TODO should we pass the target temperature to the core (and then to await temperature?)
+        self._core.wait_for_target_temperature()
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_set_and_wait_for_shake_speed)
@@ -856,13 +857,10 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
 
         :param rpm: A value between 200 and 3000, representing the target shake speed in revolutions per minute.
         """
-        if (
-            self._module.labware_latch_status
-            == HeaterShakerLabwareLatchStatus.IDLE_CLOSED
-        ):
+        if self.labware_latch_status == HeaterShakerLabwareLatchStatus.IDLE_CLOSED:
             validated_speed = validate_heater_shaker_speed(rpm=rpm)
-            self._prepare_for_shake()
-            self._module.set_speed(rpm=validated_speed)
+            self._prepare_for_shake()  # TODO move this to core?
+            self._core.set_and_wait_for_shake_speed(rpm=validated_speed)
         else:
             # TODO: Figure out whether to issue close latch behind the scenes instead
             raise CannotPerformModuleAction(
@@ -886,13 +884,13 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             Before opening the latch, this command will retract the pipettes upward
             if they are parked adjacent to the left or right of the Heater-Shaker.
         """
-        if self._module.speed_status != module_types.SpeedStatus.IDLE:
+        if self.speed_status != module_types.SpeedStatus.IDLE:
             # TODO: What to do when speed status is ERROR?
             raise CannotPerformModuleAction(
                 """Cannot open labware latch while module is shaking."""
             )
-        self._prepare_for_latch_open()
-        self._module.open_labware_latch()
+        self._prepare_for_latch_open()  # TODO also move this to core?
+        self._core.open_labware_latch()
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_close_labware_latch)
@@ -902,7 +900,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         The labware latch needs to be closed using this method before sending a shake command,
         even if the latch was manually closed before starting the protocol.
         """
-        self._module.close_labware_latch()
+        self._core.close_labware_latch()
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_deactivate_shaker)
@@ -911,7 +909,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
 
         Decelerating to 0 rpm typically only takes a few seconds.
         """
-        self._module.deactivate_shaker()
+        self._core.deactivate_shaker()
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_deactivate_heater)
@@ -921,7 +919,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
         The module will passively cool to room temperature.
         The Heater-Shaker does not have active cooling.
         """
-        self._module.deactivate_heater()
+        self._core.deactivate_heater()
 
     def flag_unsafe_move(
         self,

@@ -214,9 +214,9 @@ class LegacyHeaterShakerCore(
         """Set the labware plate's target temperature in °C."""
         raise NotImplementedError("LegacyHeaterShakerCore.set_target_temperature")
 
-    def wait_for_target_temeprature(self) -> None:
+    def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""
-        raise NotImplementedError("LegacyHeaterShakerCore.wait_for_target_temeprature")
+        raise NotImplementedError("LegacyHeaterShakerCore.wait_for_target_temperature")
 
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set the shaker's target shake speed and wait for it to spin up."""
