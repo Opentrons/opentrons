@@ -66,7 +66,7 @@ describe('ensure bad protocol data fails validation', () => {
       missingName: { mount: 'left' },
       hasAdditionalProperties: {
         mount: 'left',
-        pipetteName: 'pipetteName',
+        name: 'pipetteName',
         blah: 'blah',
       },
     }

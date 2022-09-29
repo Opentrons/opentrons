@@ -198,10 +198,10 @@
         ".+": {
           "description": "Fields describing an individual pipette",
           "type": "object",
-          "required": ["pipetteName"],
+          "required": ["name"],
           "additionalProperties": false,
           "properties": {
-            "pipetteName": {
+            "name": {
               "$ref": "#/definitions/pipetteName"
             }
           }

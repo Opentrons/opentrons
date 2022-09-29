@@ -691,10 +691,10 @@
   },
   "pipettes": {
     "50d23e00-0042-11ec-8258-f7ffdf5ad45a": {
-      "pipetteName": "p300_single_gen2"
+      "name": "p300_single_gen2"
     },
     "c235a5a0-0042-11ec-8258-f7ffdf5ad45a": {
-      "pipetteName": "p300_multi"
+      "name": "p300_multi"
     }
   },
   "labware": {
