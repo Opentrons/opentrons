@@ -172,7 +172,7 @@ describe('LabwarePositionCheckStepDetail', () => {
           },
           pipettes: {
             [PRIMARY_PIPETTE_ID]: {
-              name: PRIMARY_PIPETTE_NAME,
+              pipetteName: PRIMARY_PIPETTE_NAME,
               mount: 'left',
             },
           },
@@ -252,7 +252,7 @@ describe('LabwarePositionCheckStepDetail', () => {
           },
           pipettes: {
             [PRIMARY_PIPETTE_ID]: {
-              name: PRIMARY_PIPETTE_NAME,
+              pipetteName: PRIMARY_PIPETTE_NAME,
               mount: 'left',
             },
           },
