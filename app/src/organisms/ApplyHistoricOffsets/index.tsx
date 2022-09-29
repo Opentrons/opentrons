@@ -18,6 +18,8 @@ import { LabwareOffsetTable } from './LabwareOffsetTable'
 import { CheckboxField } from '../../atoms/CheckboxField'
 import type { LabwareOffset } from '@opentrons/api-client'
 
+const HOW_OFFSETS_WORK_SUPPORT_URL =
+  'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
 export interface OffsetCandidate extends LabwareOffset {
   runCreatedAt: string
   labwareDisplayName: string
@@ -73,7 +75,11 @@ export function ApplyHistoricOffsets(
                   ? t('robot_has_offsets_from_previous_runs')
                   : t('robot_has_no_offsets_from_previous_runs')}
               </StyledText>
-              <Link css={TYPOGRAPHY.linkPSemiBold} marginTop={SPACING.spacing3}>
+              <Link
+                css={TYPOGRAPHY.linkPSemiBold}
+                marginTop={SPACING.spacing3}
+                href={HOW_OFFSETS_WORK_SUPPORT_URL}
+              >
                 {t('see_how_offsets_work')}
               </Link>
               {offsetCandidates.length > 0 ? (
