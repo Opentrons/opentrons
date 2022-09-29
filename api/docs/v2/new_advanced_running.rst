@@ -24,7 +24,7 @@ Protocol Structure
 
 Jupyter Notebook is structured around `cells`: discrete chunks of code that can be run individually. This is nearly the opposite of Opentrons protocols, which bundle all commands into a single ``run`` function. Therefore, to take full advantage of Jupyter Notebook, you have to restructure your protocol. 
 
-Rather than writing a  ``run`` function and embedding commands within it, start your notebook with ``import opentrons.execute`` and an instantiation of  :py:meth:`opentrons.execute.get_protocol_api`. This method also replaces the metadata block of a standalone protocol by taking the minimum :ref:`API version <v2-versioning>` as its argument. Then you can call :py:class:`~opentrons.protocol_api.contexts.ProtocolContext` methods in subsequent lines or cells:
+Rather than writing a  ``run`` function and embedding commands within it, start your notebook by importing ``opentrons.execute`` and calling :py:meth:`opentrons.execute.get_protocol_api`. This function also replaces the ``metadata`` block of a standalone protocol by taking the minimum :ref:`API version <v2-versioning>` as its argument. Then you can call :py:class:`~opentrons.protocol_api.contexts.ProtocolContext` methods in subsequent lines or cells:
 
 .. code-block:: python
     :substitutions:
