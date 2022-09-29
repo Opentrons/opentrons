@@ -28,7 +28,7 @@ export const schemaV6Adapter = (
       return {
         ...acc,
         [pipette.id]: {
-          name: pipette.pipetteName,
+          pipetteName: pipette.pipetteName,
         },
       }
     }, {})
