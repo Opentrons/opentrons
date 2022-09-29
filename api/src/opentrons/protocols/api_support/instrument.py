@@ -111,42 +111,25 @@ def determine_drop_target(
         return location.top(-z_height)
 
 
-def validate_can_aspirate(location: types.Location) -> None:
-    """Can one aspirate on the given `location` or not? This method is
-    pretty basic and will probably remain so (?) as the future holds neat
-    ambitions for how validation is implemented. And as robots become more
-    intelligent more rigorous testing will be possible
+def validate_takes_liquid(location: types.Location, reject_module: bool) -> None:
+    """Validate that a location is a valid liquid handling target.
 
     Args:
-        location: target for aspiration
+        location: target location.
 
     Raises:
-        RuntimeError:
+        ValueError: the given location is not a valid liquid handling target.
     """
-    if _is_tiprack(location):
-        raise RuntimeError("Cannot aspirate a tiprack")
+    labware = None
 
+    if location.labware.is_labware:
+        labware = location.labware.as_labware()
 
-def validate_can_dispense(location: types.Location) -> None:
-    """Can one dispense to the given `location` or not? This method is
-    pretty basic and will probably remain so (?) as the future holds neat
-    ambitions for how validation is implemented. And as robots become more
-    intelligent more rigorous testing will be possible
+    if location.labware.is_well:
+        labware = location.labware.as_well().parent
 
-    Args:
-        location: target for dispense
+    if location.labware.is_module and reject_module:
+        raise ValueError("Cannot aspirate/dispense directly to a module")
 
-    Raises:
-        RuntimeError:
-    """
-    if _is_tiprack(location):
-        raise RuntimeError("Cannot dispense to a tiprack")
-
-
-# TODO(mc, 2021-09-08): this `as_labware` looks wrong. I get the feeling
-# this is coincidentally working because `both `Well` and `Labware` have
-# a `parent` property. Also, it doesn't seem to handle the wide range of
-# things a `types.Location` can be (i.e. module, labware, well, etc.)
-def _is_tiprack(location: types.Location) -> bool:
-    labware = location.labware.as_labware()
-    return labware.parent and labware.parent.is_tiprack  # type: ignore[return-value, union-attr]
+    if labware is not None and labware.is_tiprack:
+        raise ValueError("Cannot aspirate/dispense to a tip rack")

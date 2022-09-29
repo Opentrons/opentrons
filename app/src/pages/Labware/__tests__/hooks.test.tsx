@@ -7,7 +7,7 @@ import { I18nextProvider } from 'react-i18next'
 import { getAllDefs } from '../helpers/getAllDefs'
 
 import {
-  getCustomLabware,
+  getValidCustomLabware,
   getAddLabwareFailure,
   getAddNewLabwareName,
 } from '../../../redux/custom-labware'
@@ -25,8 +25,8 @@ import { FailedLabwareFile } from '../../../redux/custom-labware/types'
 jest.mock('../../../redux/custom-labware')
 jest.mock('../helpers/getAllDefs')
 
-const mockGetCustomLabware = getCustomLabware as jest.MockedFunction<
-  typeof getCustomLabware
+const mockGetValidCustomLabware = getValidCustomLabware as jest.MockedFunction<
+  typeof getValidCustomLabware
 >
 const mockGetAllAllDefs = getAllDefs as jest.MockedFunction<typeof getAllDefs>
 const mockGetAddLabwareFailure = getAddLabwareFailure as jest.MockedFunction<
@@ -40,7 +40,7 @@ describe('useAllLabware hook', () => {
   const store: Store<State> = createStore(jest.fn(), {})
   beforeEach(() => {
     mockGetAllAllDefs.mockReturnValue([mockDefinition])
-    mockGetCustomLabware.mockReturnValue([mockValidLabware])
+    mockGetValidCustomLabware.mockReturnValue([mockValidLabware])
     store.dispatch = jest.fn()
   })
   afterEach(() => {

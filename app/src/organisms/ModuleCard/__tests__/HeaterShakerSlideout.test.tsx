@@ -34,6 +34,28 @@ const render = (props: React.ComponentProps<typeof HeaterShakerSlideout>) => {
   })[0]
 }
 
+const mockMovingHeaterShaker = {
+  id: 'heatershaker_id',
+  moduleModel: 'heaterShakerModuleV1',
+  moduleType: 'heaterShakerModuleType',
+  serialNumber: 'jkl123',
+  hardwareRevision: 'heatershaker_v4.0',
+  firmwareVersion: 'v2.0.0',
+  hasAvailableUpdate: true,
+  data: {
+    labwareLatchStatus: 'idle_closed',
+    speedStatus: 'speeding up',
+    temperatureStatus: 'idle',
+    currentSpeed: null,
+    currentTemperature: null,
+    targetSpeed: null,
+    targetTemp: null,
+    errorDetails: null,
+    status: 'idle',
+  },
+  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1 },
+} as any
+
 describe('HeaterShakerSlideout', () => {
   let props: React.ComponentProps<typeof HeaterShakerSlideout>
   let mockCreateLiveCommand = jest.fn()
@@ -159,5 +181,17 @@ describe('HeaterShakerSlideout', () => {
       },
     })
     expect(button).not.toBeEnabled()
+  })
+
+  it('input value is disabled when heater shaker is shaking', () => {
+    props = {
+      module: mockMovingHeaterShaker,
+      isExpanded: true,
+      onCloseClick: jest.fn(),
+      isLoadedInRun: false,
+    }
+    const { getByTestId } = render(props)
+    const input = getByTestId('heaterShakerModuleV1_setTemp')
+    expect(input).toBeDisabled()
   })
 })

@@ -15,12 +15,14 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../../redux/discovery/__fixtures__'
+import { getBuildrootSession } from '../../../../redux/buildroot'
 
 jest.mock('../../../../organisms/RobotSettingsCalibration')
 jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking')
 jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced')
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../redux/discovery/selectors')
+jest.mock('../../../../redux/buildroot')
 
 const mockRobotSettingsCalibration = RobotSettingsCalibration as jest.MockedFunction<
   typeof RobotSettingsCalibration
@@ -32,6 +34,10 @@ const mockRobotSettingsAdvanced = RobotSettingsAdvanced as jest.MockedFunction<
   typeof RobotSettingsAdvanced
 >
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
+
+const mockGetBuildrootSession = getBuildrootSession as jest.MockedFunction<
+  typeof getBuildrootSession
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -85,6 +91,22 @@ describe('RobotSettings', () => {
     when(mockUseRobot).calledWith('otie').mockReturnValue(null)
     const [{ getByText }] = render('/devices/otie/robot-settings/calibration')
     getByText('mock device details')
+  })
+
+  it('does NOT redirect to device details if robot is null but a buildroot session is active', () => {
+    when(mockUseRobot).calledWith('otie').mockReturnValue(null)
+    mockGetBuildrootSession.mockReturnValue({
+      robotName: 'some robot',
+      userFileInfo: null,
+      token: null,
+      pathPrefix: null,
+      step: null,
+      stage: null,
+      progress: null,
+      error: null,
+    })
+    const [{ getByText }] = render('/devices/otie/robot-settings/calibration')
+    getByText('Robot Settings')
   })
 
   it('redirects to device details if robot is reachable but server is down', () => {

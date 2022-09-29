@@ -62,6 +62,6 @@ describe('useHistoricRunDetails', () => {
     )
     const { result, waitFor } = renderHook(useHistoricRunDetails, { wrapper })
     await waitFor(() => result.current != null)
-    expect(result.current).toEqual([MOCK_RUN_EARLIER, MOCK_RUN_LATER])
+    expect(result.current).toEqual([MOCK_RUN_LATER, MOCK_RUN_EARLIER])
   })
 })
