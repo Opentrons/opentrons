@@ -473,7 +473,7 @@ async def test_compare_points(mock_user_flow):
 
 async def test_mark_bad_calibration(mock_user_flow_bad_vectors):
     uf = mock_user_flow_bad_vectors
-    storage_path = "opentrons.calibration_storage.ot2"
+    storage_path = "opentrons.calibration_storage.mark_bad_calibration"
     with patch(f"{storage_path}.mark_bad") as m, patch(
         f"{storage_path}.create_tip_length_data"
     ), patch(f"{storage_path}.save_tip_length_calibration"), patch(

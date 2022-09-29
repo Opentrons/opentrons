@@ -9,6 +9,7 @@ from opentrons.calibration_storage import (
     ot2_tip_length,
     ot2_pipette_offset,
     ot2_schemas,
+    mark_bad_calibration,
 )
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import (
@@ -673,8 +674,8 @@ class CheckCalibrationUserFlow:
         only_one_pipette = not self._is_checking_both_mounts()
         pipette_state = is_second_pipette or only_one_pipette
         if self.current_state == State.comparingTip:
-            calibration = modify.mark_bad(
-                self._tip_lengths[active_mount], SourceType.calibration_check
+            calibration = mark_bad_calibration.mark_bad(
+                self._tip_lengths[active_mount], cal_types.SourceType.calibration_check
             )
             tip_definition = self.active_tiprack._implementation.get_definition()
             tip_length_dict = ot2_tip_length.create_tip_length_data(
@@ -688,11 +689,12 @@ class CheckCalibrationUserFlow:
         elif self.current_state == State.comparingPointOne and pipette_state:
             # Here if we're on the second pipette, but the first slot we
             # should make sure we mark both pipette cal and deck cal as bad.
-            pip_calibration = modify.mark_bad(
-                self._pipette_calibrations[active_mount], SourceType.calibration_check
+            pip_calibration = mark_bad_calibration.mark_bad(
+                self._pipette_calibrations[active_mount],
+                cal_types.SourceType.calibration_check,
             )
-            deck_calibration = modify.mark_bad(
-                self._deck_calibration, SourceType.calibration_check
+            deck_calibration = mark_bad_calibration.mark_bad(
+                self._deck_calibration, cal_types.SourceType.calibration_check
             )
             pipette_id = self.hw_pipette.pipette_id
             assert pipette_id, "Cannot update pipette offset calibraion"
@@ -704,7 +706,7 @@ class CheckCalibrationUserFlow:
                 tiprack_uri=pip_calibration.uri,
                 cal_status=pip_calibration.status,
             )
-            ot2_pipette_offset.save_robot_deck_attitude(
+            ot2_deck_attitude.save_robot_deck_attitude(
                 transform=deck_calibration.attitude,
                 pip_id=deck_calibration.pipette_calibrated_with,
                 lw_hash=deck_calibration.tiprack,
@@ -712,8 +714,9 @@ class CheckCalibrationUserFlow:
                 cal_status=deck_calibration.status,
             )
         elif self.current_state in pipette_offset_states:
-            calibration = modify.mark_bad(
-                self._pipette_calibrations[active_mount], SourceType.calibration_check
+            calibration = mark_bad_calibration.mark_bad(
+                self._pipette_calibrations[active_mount],
+                cal_types.SourceType.calibration_check,
             )
             pipette_id = self.hw_pipette.pipette_id
             assert pipette_id, "Cannot update pipette offset calibraion"
@@ -726,8 +729,8 @@ class CheckCalibrationUserFlow:
                 cal_status=calibration.status,
             )
         elif self.current_state in deck_calibration_states and pipette_state:
-            calibration = modify.mark_bad(
-                self._deck_calibration, SourceType.calibration_check
+            calibration = mark_bad_calibration.mark_bad(
+                self._deck_calibration, cal_types.SourceType.calibration_check
             )
             ot2_deck_attitude.save_robot_deck_attitude(
                 transform=calibration.attitude,
@@ -842,7 +845,7 @@ class CheckCalibrationUserFlow:
                 cast(cal_types.PipetteId, pip_id),
                 self.active_tiprack._implementation.get_definition(),
             ).tipLength
-        except TipLengthCalNotFound:
+        except cal_types.TipLengthCalNotFound:
             tip_overlap = self.hw_pipette.config.tip_overlap.get(
                 self.active_tiprack.uri, self.hw_pipette.config.tip_overlap["default"]
             )

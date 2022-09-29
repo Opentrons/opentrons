@@ -1,7 +1,7 @@
 import os
 import json
 from pydantic import ValidationError
-from typing import Optional
+from typing import Optional, Union
 from dataclasses import asdict
 
 from opentrons import config
@@ -52,14 +52,18 @@ def save_robot_deck_attitude(
     pip_id: Optional[local_types.PipetteId],
     lw_hash: Optional[local_types.TiprackHash],
     source: Optional[local_types.SourceType] = None,
-    cal_status: Optional[local_types.CalibrationStatus] = None,
+    cal_status: Optional[
+        Union[local_types.CalibrationStatus, v1.CalibrationStatus]
+    ] = None,
 ) -> None:
     robot_dir = config.get_opentrons_path("robot_calibration_dir")
     robot_dir.mkdir(parents=True, exist_ok=True)
     gantry_path = robot_dir / "deck_calibration.json"
 
-    if cal_status:
+    if cal_status and isinstance(cal_status, local_types.CalibrationStatus):
         cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
+    elif cal_status and isinstance(cal_status, v1.CalibrationStatus):
+        cal_status_model = cal_status
     else:
         cal_status_model = v1.CalibrationStatus()
 

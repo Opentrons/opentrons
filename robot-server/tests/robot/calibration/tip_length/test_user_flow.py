@@ -289,7 +289,7 @@ async def test_get_reference_location(mock_user_flow_all_combos):
 
 async def test_save_offsets(mock_user_flow):
     with patch(
-        "opentrons.calibration_storage.ot2.modify.create_tip_length_data"
+        "opentrons.calibration_storage.ot2_tip_length.create_tip_length_data"
     ) as create_tip_length_data_patch:
         uf = mock_user_flow
         uf._current_state = "measuringNozzleOffset"

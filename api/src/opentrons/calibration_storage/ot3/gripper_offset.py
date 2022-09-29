@@ -1,7 +1,7 @@
 import os
 import json
 from pydantic import ValidationError
-from typing import Dict, cast, Optional
+from typing import Dict, cast, Optional, Union
 
 from opentrons import config, types
 from dataclasses import asdict
@@ -64,14 +64,18 @@ def clear_gripper_calibration_offsets() -> None:
 def save_gripper_calibration(
     offset: types.Point,
     gripper_id: local_types.GripperId,
-    cal_status: Optional[local_types.CalibrationStatus] = None,
+    cal_status: Optional[
+        Union[local_types.CalibrationStatus, v1.CalibrationStatus]
+    ] = None,
 ) -> None:
     gripper_dir = config.get_opentrons_path("gripper_calibration_dir")
     gripper_dir.mkdir(parents=True, exist_ok=True)
     gripper_path = gripper_dir / f"{gripper_id}.json"
 
-    if cal_status:
+    if cal_status and isinstance(cal_status, local_types.CalibrationStatus):
         cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
+    elif cal_status and isinstance(cal_status, v1.CalibrationStatus):
+        cal_status_model = cal_status
     else:
         cal_status_model = v1.CalibrationStatus()
 

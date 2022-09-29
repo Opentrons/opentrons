@@ -76,15 +76,18 @@ def save_pipette_calibration(
     mount: Mount,
     tiprack_hash: local_types.TiprackHash,
     tiprack_uri: str,
-    cal_status: typing.Optional[local_types.CalibrationStatus] = None,
+    cal_status: typing.Optional[
+        typing.Union[local_types.CalibrationStatus, v1.CalibrationStatus]
+    ] = None,
 ) -> None:
     pip_dir = config.get_opentrons_path("pipette_calibration_dir") / mount.name.lower()
     pip_dir.mkdir(parents=True, exist_ok=True)
 
     offset_path = pip_dir / f"{pip_id}.json"
-
-    if cal_status:
+    if cal_status and isinstance(cal_status, local_types.CalibrationStatus):
         cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
+    elif cal_status and isinstance(cal_status, v1.CalibrationStatus):
+        cal_status_model = cal_status
     else:
         cal_status_model = v1.CalibrationStatus()
 

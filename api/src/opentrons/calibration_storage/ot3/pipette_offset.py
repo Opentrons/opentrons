@@ -1,7 +1,7 @@
 import os
 import json
 from pydantic import ValidationError
-from typing import Dict, cast, Optional
+from typing import Dict, cast, Optional, Union
 from dataclasses import asdict
 
 from opentrons import config, types
@@ -75,15 +75,19 @@ def save_pipette_calibration(
     offset: types.Point,
     pip_id: local_types.PipetteId,
     mount: types.Mount,
-    cal_status: Optional[local_types.CalibrationStatus] = None,
+    cal_status: Optional[
+        Union[local_types.CalibrationStatus, v1.CalibrationStatus]
+    ] = None,
 ) -> None:
     pip_dir = config.get_opentrons_path("pipette_calibration_dir") / mount.name.lower()
     pip_dir.mkdir(parents=True, exist_ok=True)
 
     offset_path = pip_dir / f"{pip_id}.json"
 
-    if cal_status:
+    if cal_status and isinstance(cal_status, local_types.CalibrationStatus):
         cal_status_model = v1.CalibrationStatus(**asdict(cal_status))
+    elif cal_status and isinstance(cal_status, v1.CalibrationStatus):
+        cal_status_model = cal_status
     else:
         cal_status_model = v1.CalibrationStatus()
 

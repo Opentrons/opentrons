@@ -524,7 +524,7 @@ def test_no_pipette(hardware, mount):
 @pytest.fixture
 def mock_save_pipette():
     with patch(
-        "opentrons.calibration_storage.ot2.modify.save_pipette_calibration",
+        "opentrons.calibration_storage.ot2.ot2_pipette_offset.save_pipette_calibration",
         autospec=True,
     ) as mock_save:
         yield mock_save
@@ -533,7 +533,7 @@ def mock_save_pipette():
 @pytest.fixture
 def mock_delete_pipette():
     with patch(
-        "opentrons.calibration_storage.ot2.delete.delete_pipette_offset_file",
+        "opentrons.calibration_storage.ot2.ot2_pipette_offset.delete_pipette_offset_file",
         autospec=True,
     ) as mock_delete:
         yield mock_delete
