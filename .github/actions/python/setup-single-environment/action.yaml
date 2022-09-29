@@ -1,17 +1,17 @@
-name: "Setup a single Python environment"
+name: 'Setup a single Python environment'
 description: |
   "Set up an environment with a specific Python."
   "Cache pipenv virtual environments but still always run make setup which runs pipenv sync."
 inputs:
   python-version:
-    description: "Which Python version?"
+    description: 'Which Python version?'
     required: true
   environment:
     description: 'Which environment?'
     required: true
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - shell: bash
       run: |
@@ -27,7 +27,7 @@ runs:
     - uses: 'actions/setup-python@v4'
       with:
         python-version: ${{ inputs.python-version }}
-        cache: "pipenv"
+        cache: 'pipenv'
         cache-dependency-path: |
           **/setup.*
           **/Pipfile.*

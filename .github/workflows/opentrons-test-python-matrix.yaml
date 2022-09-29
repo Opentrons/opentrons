@@ -1,4 +1,4 @@
-# validate Python opentrons and opentrons_shared_data 
+# validate Python opentrons and opentrons_shared_data
 # test, build, and pip install on each backward supported version of Python and platform
 # additionally smoke test cli tools of the opentrons package
 # this will default run against edge because it is the default branch of the repository
@@ -10,10 +10,10 @@ name: 'opentrons backward test matrix'
 on:
   push:
     branches:
-      - "add-environment-specs" # remove me before merge
+      - 'add-environment-specs' # remove me before merge
   schedule:
     # 8:44 UTC each day
-    - cron:  '44 8 * * *'
+    - cron: '44 8 * * *'
   workflow_dispatch:
 
 defaults:
@@ -28,7 +28,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ['windows-2019', 'ubuntu-22.04', 'macos-latest']
-        python: ['3.7','3.8','3.9']
+        python: ['3.7', '3.8', '3.9']
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v3'

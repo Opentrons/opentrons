@@ -13,6 +13,7 @@ on:
       - '**/*.json'
       - '**/*.css'
       - '**/*.md'
+      - '**/*.y*ml'
   push:
     paths:
       - '**/*.js'
@@ -23,6 +24,7 @@ on:
       - '**/*.md'
       - '.github/workflows/js-check.yaml'
       - '**/*.css'
+      - '**/*.y*ml'
   workflow_dispatch:
 
 concurrency:
@@ -70,9 +72,9 @@ jobs:
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
           make setup-js
-      # Use the if to run all the lint checks even of some fail
+        # Use the if to run all the lint checks even of some fail
         shell: bash
-      - name: 'lint js'
+      - name: 'lint js markdown and yaml'
         if: always() && steps.setup-js.outcome == 'success'
         run: make lint-js
       - name: 'typechecks'

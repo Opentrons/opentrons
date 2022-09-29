@@ -45,7 +45,7 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: hardware-testing
-          python-version: "3.8"
+          python-version: '3.8'
 
       - name: Lint
         run: make -C hardware-testing lint

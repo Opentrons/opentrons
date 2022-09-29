@@ -1,12 +1,12 @@
-name: "Lint Tools"
-description: "Run all linting tools."
+name: 'Lint Tools'
+description: 'Run all linting tools.'
 inputs:
   setup-outcome:
-    description: "The outcome of the setup step."
+    description: 'The outcome of the setup step.'
     required: true
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - shell: bash
       name: black-check

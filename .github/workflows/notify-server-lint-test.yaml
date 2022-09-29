@@ -51,7 +51,7 @@ jobs:
         with:
           node-version: '14'
       - uses: './.github/actions/python/setup-all-environments'
-        id: "setup"
+        id: 'setup'
       - uses: './.github/actions/python/lint'
         with:
           setup-outcome: ${{ steps.setup.outcome }}

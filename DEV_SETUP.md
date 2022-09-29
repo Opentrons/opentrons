@@ -180,7 +180,13 @@ eval "$(pyenv init -)"
 # ...
 ```
 
-Before you can install python, you'll need to install its build dependencies explicitly. If you're getting errors during environment setup about SSH not working, it's because you built an interpreter without SSH support accidentally because openssh headers weren't installed and python's configuration detected this. Python's build dependencies are [here](https://devguide.python.org/getting-started/setup-building/#macos-and-os-x).
+##### Python installation with pyenv
+
+Before you can install python, you'll need to install its build dependencies explicitly. If you're getting errors during environment setup about SSH not working, it's because you built an interpreter without SSH support accidentally because openssh headers weren't installed and python's configuration detected this. Python's build dependencies are:
+
+- [here for Mac](https://devguide.python.org/getting-started/setup-building/#macos-and-os-x)
+
+- [here for Linux](https://devguide.python.org/getting-started/setup-building/#linux)
 
 Install `jpeg` if on ARM Mac (M1)
 
@@ -192,7 +198,7 @@ brew install jpeg
 
 Install the required versions of Python. Use the latest available version of `3.10.x` and `3.8.x`
 
-> At the time of writing this looks like the below
+> At the time of writing
 
 ```shell
 pyenv install 3.10.7
@@ -201,10 +207,9 @@ pyenv global 3.10.7 3.8.14
 pyenv versions
 ```
 
-Both Python 3.8 and 3.10 are available to you.
-Call then with `python3.8` and `python3.10` on the command line.
+Both Python 3.8 and 3.10 are available with this pyenv global configuration. Because 3.10.7 is first when you set the configuration, `python` will use that version. Pyenv provides `python3.8` and `python3.10` to call minor versions.
 
-With both versions of Python available through pyenv on your system, Makefiles will point to the right version for a given make target.
+With both versions of Python available through pyenv on your system, pipenv will point to the right version given a projects Pipfile.
 
 ### Windows
 
@@ -214,13 +219,18 @@ On Windows, we rely on:
 
 - [scoop][] to install general dependencies
 - [Node Version Switcher][nvs] to install and manage Node.js
-- [pyenv-win][pyenv-win] to install and manage python
+- For the Python side, native Windows development is not recommended
+  - [environments/app](/environments/app) is supported for Windows opentrons and shared-data package testing
+  - [environments/dev](/environments/dev) may work on Windows but is not guaranteed
+  - **Instead use Windows Subsystem for Linux (WSL)**
+    - [VS Code provides great tools!](https://code.visualstudio.com/docs/remote/wsl)
+      - Follow the instructions and then see the [Linux section](#linux)
 
 #### 0. Install `scoop` and general dependencies
 
 #### 1. Install `nvs` and Node.js
 
-#### 2. Install Python
+#### TODO any instructions for Node side development
 
 ### Linux
 
@@ -253,7 +263,7 @@ echo 'eval "$(pyenv init -)"' >> ~/.bashrc
 
 Also add the above to whatever combination of `~/.profile`, `~/.bash_profile`, etc you like best depending on your ssh workflows.
 
-Before you can install python, you'll need to install its build dependencies explicitly. If you're getting errors during environment setup about SSH not working, it's because you built an interpreter without SSH support accidentally because openssh headers weren't installed and python's configuration detected this. Python's build dependencies are [here](https://devguide.python.org/getting-started/setup-building/#linux).
+##### [Python installation with pyenv](#python-installation-with-pyenv)
 
 ## Repository Setup
 
@@ -267,18 +277,16 @@ cd ./opentrons
 Once you are inside the repository for the first time, you should do two things:
 
 1. Confirm that `nvs` selected the proper version of Node.js to use
-2. Tell `pyenv` to use Python 3.7
 
 ```shell
 # confirm Node v14
 node --version
 
-# set Python version, and confirm
-pyenv local 3.7.13
-python --version
+# confirm Pyenv has 3.8 and 3.10 with a star by them
+pyenv versions
 ```
 
-Once you've confirmed you're running the correct versions of Node.js and Python, you must install [yarn][] to manage JavaScript dependencies.
+Once you've confirmed you're running the correct versions of Node.js and have Python ready, you must install [yarn][] to manage JavaScript dependencies.
 
 ```shell
 npm install --global yarn@1
@@ -303,5 +311,3 @@ Once `make setup` completes, you're ready to start developing! Check out our gen
 [yarn]: https://classic.yarnpkg.com/
 [pipenv]: https://github.com/pypa/pipenv
 [contributing guide]: ./CONTRIBUTING.md
-
-## VSCode Dev container

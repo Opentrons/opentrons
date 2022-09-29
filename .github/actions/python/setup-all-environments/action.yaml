@@ -1,10 +1,10 @@
-name: "Setup All Environments"
+name: 'Setup All Environments'
 description: |
-    "Set up all the environments for python projects."
-    "Cache pipenv virtual environments but still always run make setup which runs pipenv sync."
+  "Set up all the environments for python projects."
+  "Cache pipenv virtual environments but still always run make setup which runs pipenv sync."
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - shell: bash
       run: |
@@ -21,7 +21,7 @@ runs:
     - uses: 'actions/setup-python@v4'
       with:
         python-version: '3.8'
-        cache: "pipenv"
+        cache: 'pipenv'
         cache-dependency-path: |
           **/setup.*
           **/Pipfile.*
@@ -35,7 +35,7 @@ runs:
     - uses: 'actions/setup-python@v4'
       with:
         python-version: '3.10'
-        cache: "pipenv"
+        cache: 'pipenv'
         cache-dependency-path: |
           **/setup.*
           **/Pipfile.*

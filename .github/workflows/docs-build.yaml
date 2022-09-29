@@ -7,7 +7,6 @@
 #   * The docs source themselves;
 #   * The CI/makefile tooling used to build the docs.
 
-
 name: 'API docs build'
 
 on:
