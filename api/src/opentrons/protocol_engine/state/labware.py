@@ -159,7 +159,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
         elif isinstance(command.result, MoveLabwareOffDeckResult):
             labware_id = command.params.labwareId
-            self._state.labware_by_id[labware_id].location = None
+            self._state.labware_by_id[labware_id].location = "off-deck"
             self._state.labware_by_id[labware_id].offsetId = None
 
     def _add_labware_offset(self, labware_offset: LabwareOffset) -> None:

@@ -239,5 +239,5 @@ def test_handles_move_labware_off_deck(
         labware_id="my-labware-id"
     )
     subject.handle_action(UpdateCommandAction(command=move_labware_off_deck_cmd))
-    assert subject.state.labware_by_id["my-labware-id"].location is None
+    assert subject.state.labware_by_id["my-labware-id"].location == "off-deck"
     assert subject.state.labware_by_id["my-labware-id"].offsetId is None

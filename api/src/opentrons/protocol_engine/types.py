@@ -51,8 +51,10 @@ class ModuleLocation(BaseModel):
     )
 
 
-LabwareLocation = Union[DeckSlotLocation, ModuleLocation]
-"""Union of all locations where it's legal to load a labware."""
+OffDeckLocationType = Literal["off-deck"]
+
+LabwareLocation = Union[DeckSlotLocation, ModuleLocation, OffDeckLocationType]
+"""Union of all locations where it's legal to keep a labware."""
 
 
 class WellOrigin(str, Enum):
