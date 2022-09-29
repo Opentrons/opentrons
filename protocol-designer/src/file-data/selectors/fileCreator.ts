@@ -156,7 +156,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         pipette: typeof initialRobotState.pipettes[keyof typeof initialRobotState.pipettes],
         pipetteId: string
       ) => ({
-        pipetteName: pipetteEntities[pipetteId].name,
+        name: pipetteEntities[pipetteId].name,
       })
     )
 

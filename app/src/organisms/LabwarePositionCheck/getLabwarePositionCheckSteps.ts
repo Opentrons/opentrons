@@ -25,7 +25,7 @@ export const getLabwarePositionCheckSteps = (
         )
     )
     const pipettes = values(pipettesById)
-    const pipetteNames = pipettes.map(({ pipetteName }) => pipetteName)
+    const pipetteNames = pipettes.map(({ name }) => name)
     const labware = omitBy(
       protocolData.labware,
       (labware, id) =>

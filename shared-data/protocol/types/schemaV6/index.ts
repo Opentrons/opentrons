@@ -28,7 +28,7 @@ export interface ProtocolFile<DesignerApplicationData = {}> {
     deckId: 'ot2_standard' | 'ot2_short_trash'
   }
   pipettes: {
-    [pipetteId: string]: { pipetteName: PipetteName }
+    [pipetteId: string]: { name: PipetteName }
   }
   labwareDefinitions: {
     [definitionId: string]: LabwareDefinition2

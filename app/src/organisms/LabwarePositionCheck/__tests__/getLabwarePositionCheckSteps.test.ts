@@ -53,7 +53,7 @@ describe('getLabwarePositionCheckSteps', () => {
 
     when(mockGetPipetteWorkflow)
       .calledWith({
-        pipetteNames: [mockPipette.pipetteName],
+        pipetteNames: [mockPipette.name],
         primaryPipetteId: 'pipetteId',
         labware: protocolWithOnePipette.labware,
         labwareDefinitions: protocolWithOnePipette.labwareDefinitions,
@@ -99,7 +99,7 @@ describe('getLabwarePositionCheckSteps', () => {
 
     when(mockGetPipetteWorkflow)
       .calledWith({
-        pipetteNames: [mockPipette.pipetteName],
+        pipetteNames: [mockPipette.name],
         primaryPipetteId: 'pipetteId',
         labware: protocolWithOnePipette.labware,
         labwareDefinitions: protocolWithOnePipette.labwareDefinitions,
@@ -147,7 +147,7 @@ describe('getLabwarePositionCheckSteps', () => {
 
     when(mockGetPipetteWorkflow)
       .calledWith({
-        pipetteNames: [rightPipette.pipetteName],
+        pipetteNames: [rightPipette.name],
         primaryPipetteId: rightPipetteId,
         labware: protocolWithTwoPipettesWithOnlyOneBeingUsed.labware,
         labwareDefinitions:
@@ -182,7 +182,7 @@ describe('getLabwarePositionCheckSteps', () => {
 
     when(mockGetPipetteWorkflow)
       .calledWith({
-        pipetteNames: [leftPipette.pipetteName, rightPipette.pipetteName],
+        pipetteNames: [leftPipette.name, rightPipette.name],
         primaryPipetteId: leftPipetteId,
         labware: protocolWithTwoPipettes.labware,
         labwareDefinitions: protocolWithTwoPipettes.labwareDefinitions,
