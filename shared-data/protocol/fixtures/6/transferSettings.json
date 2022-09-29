@@ -15,10 +15,10 @@
   },
   "pipettes": {
     "3dff4f90-3412-11eb-ad93-ed232a2337cf": {
-      "name": "p1000_single_gen2"
+      "pipetteName": "p1000_single_gen2"
     },
     "4da579b0-a9bf-11eb-bce6-9f1d5b9c1a1b": {
-      "name": "p20_multi_gen2"
+      "pipetteName": "p20_multi_gen2"
     }
   },
   "labware": {

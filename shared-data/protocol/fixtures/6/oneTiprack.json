@@ -14,7 +14,7 @@
   },
   "pipettes": {
     "pipetteId": {
-      "name": "p10_single"
+      "pipetteName": "p10_single"
     }
   },
   "modules": {},
