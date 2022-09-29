@@ -193,7 +193,7 @@ div.hs_submit input {
     height: 34px;
     justify-content: center;
     letter-spacing: 1px;
-    line-height: 1em !important;
+    line-height: 1em;
     min-width: 100px;
     padding: 1.125rem 1.75rem;
     text-transform: uppercase;
