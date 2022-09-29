@@ -2,9 +2,8 @@ import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { ApplyHistoricOffsets } from '../'
+import { ApplyHistoricOffsets } from '..'
 import type { OffsetCandidate } from '../hooks/useOffsetCandidatesForAnalysis'
-import { queryByRole, queryByText } from '@testing-library/react'
 
 const mockFirstCandidate: OffsetCandidate = {
   id: 'first_offset_id',
@@ -38,7 +37,7 @@ describe('ApplyHistoricOffsets', () => {
   let render: (
     props?: Partial<React.ComponentProps<typeof ApplyHistoricOffsets>>
   ) => ReturnType<typeof renderWithProviders>
-  let mockSetShouldApplyOffsets = jest.fn()
+  const mockSetShouldApplyOffsets = jest.fn()
 
   beforeEach(() => {
     render = props =>
@@ -62,13 +61,13 @@ describe('ApplyHistoricOffsets', () => {
   })
 
   it('renders correct copy when shouldApplyOffsets is true', () => {
-    const [{ getByText, getByRole }] = render()
+    const [{ getByText }] = render()
     getByText('Apply Labware Offset data')
     getByText('View data')
   })
 
   it('renders correct copy when shouldApplyOffsets is false', () => {
-    const [{ getByText, getByRole }] = render({ shouldApplyOffsets: false })
+    const [{ getByText }] = render({ shouldApplyOffsets: false })
     getByText('Apply Labware Offset data')
     getByText('View data')
   })

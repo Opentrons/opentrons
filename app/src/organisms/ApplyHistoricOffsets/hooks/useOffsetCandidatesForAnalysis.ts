@@ -20,8 +20,12 @@ export function useOffsetCandidatesForAnalysis(
     robotIp ? { hostname: robotIp } : null
   )
   if (allHistoricOffsets.length === 0 || analysisOutput == null) return []
-  const { commands, labware } = analysisOutput
-  const labwareLocationCombos = getLabwareLocationCombos(commands, labware)
+  const { commands, labware, modules } = analysisOutput
+  const labwareLocationCombos = getLabwareLocationCombos(
+    commands,
+    labware,
+    modules
+  )
   const defsByUri = getDefsByURI(commands)
 
   return labwareLocationCombos.reduce<OffsetCandidate[]>(

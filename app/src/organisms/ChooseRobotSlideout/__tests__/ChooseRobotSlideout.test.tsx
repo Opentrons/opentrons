@@ -133,7 +133,11 @@ describe('ChooseRobotSlideout', () => {
       displayName: 'A Protocol for Otie',
     } as ProtocolDetails)
     when(mockUseCreateRunFromProtocol)
-      .calledWith(expect.any(Object), { hostname: expect.any(String) }, expect.any(Array))
+      .calledWith(
+        expect.any(Object),
+        { hostname: expect.any(String) },
+        expect.any(Array)
+      )
       .mockReturnValue({
         createRunFromProtocolSource: mockCreateRunFromProtocolSource,
         reset: mockResetCreateRun,
@@ -145,9 +149,11 @@ describe('ChooseRobotSlideout', () => {
       .calledWith('enableManualDeckStateModification')
       .mockReturnValue(true)
     when(mockUseOffsetCandidatesForAnalysis)
-      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, expect.any(String))
+      .calledWith(
+        storedProtocolDataFixture.mostRecentAnalysis,
+        expect.any(String)
+      )
       .mockReturnValue([])
-
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -328,11 +334,13 @@ describe('ChooseRobotSlideout', () => {
     expect(mockUseCreateRunFromProtocol).toHaveBeenCalledWith(
       expect.any(Object),
       { hostname: '127.0.0.1' },
-      [{
-        vector: mockOffsetCandidate.vector,
-        location: mockOffsetCandidate.location,
-        definitionUri: mockOffsetCandidate.definitionUri,
-      }]
+      [
+        {
+          vector: mockOffsetCandidate.vector,
+          location: mockOffsetCandidate.location,
+          definitionUri: mockOffsetCandidate.definitionUri,
+        },
+      ]
     )
     expect(getByRole('checkbox')).toBeChecked()
     const proceedButton = getByRole('button', { name: 'Proceed to setup' })
@@ -374,21 +382,23 @@ describe('ChooseRobotSlideout', () => {
     expect(getByRole('checkbox')).toBeChecked()
     const proceedButton = getByRole('button', { name: 'Proceed to setup' })
     proceedButton.click()
-    expect(mockUseCreateRunFromProtocol).nthCalledWith(1,
+    expect(mockUseCreateRunFromProtocol).nthCalledWith(
+      1,
       expect.any(Object),
       { hostname: '127.0.0.1' },
-      [{
-        vector: mockOffsetCandidate.vector,
-        location: mockOffsetCandidate.location,
-        definitionUri: mockOffsetCandidate.definitionUri,
-      }]
+      [
+        {
+          vector: mockOffsetCandidate.vector,
+          location: mockOffsetCandidate.location,
+          definitionUri: mockOffsetCandidate.definitionUri,
+        },
+      ]
     )
-    expect(mockUseCreateRunFromProtocol).nthCalledWith(2,
+    expect(mockUseCreateRunFromProtocol).nthCalledWith(
+      2,
       expect.any(Object),
       { hostname: 'otherIp' },
       []
     )
   })
-
-
 })

@@ -408,7 +408,7 @@ export interface LoadedLabware {
 }
 export interface LoadedModule {
   id: string
-  model: string
+  model: ModuleModel
   location: {
     slotName: string
   }
