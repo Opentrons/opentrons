@@ -124,7 +124,7 @@ def reset_pipette_offset() -> None:
 def reset_tip_length_calibrations() -> None:
     if feature_flags.enable_ot3_hardware_controller():
         ot3_tip_length.clear_tip_length_calibration()
-        ot2_pipette_offset.clear_pipette_offset_calibrations()
+        ot3_pipette_offset.clear_pipette_offset_calibrations()
     else:
         ot2_tip_length.clear_tip_length_calibration()
         ot2_pipette_offset.clear_pipette_offset_calibrations()
