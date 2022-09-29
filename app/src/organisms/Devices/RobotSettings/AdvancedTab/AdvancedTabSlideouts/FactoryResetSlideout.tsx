@@ -195,6 +195,9 @@ export function FactoryResetSlideout({
               {t('download')}
             </Link>
           </Flex>
+          <StyledText as="p" marginBottom={SPACING.spacing3}>
+            {t('protocol_run_history_description')}
+          </StyledText>
           {runHistoryOption.map(opt => (
             <CheckboxField
               key={opt.id}

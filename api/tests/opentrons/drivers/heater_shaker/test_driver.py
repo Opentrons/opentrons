@@ -1,6 +1,8 @@
 import pytest
 from mock import AsyncMock
-from opentrons.drivers.asyncio.communication.serial_connection import SerialConnection
+from opentrons.drivers.asyncio.communication.serial_connection import (
+    AsyncResponseSerialConnection,
+)
 from opentrons.drivers.heater_shaker import driver
 from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
@@ -8,7 +10,7 @@ from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchSt
 
 @pytest.fixture
 def connection() -> AsyncMock:
-    return AsyncMock(spec=SerialConnection)
+    return AsyncMock(spec=AsyncResponseSerialConnection)
 
 
 @pytest.fixture
