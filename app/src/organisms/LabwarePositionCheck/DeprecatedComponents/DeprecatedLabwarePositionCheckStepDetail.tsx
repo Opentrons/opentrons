@@ -103,7 +103,7 @@ export const DeprecatedLabwarePositionCheckStepDetail = (
   const command = stepMovementCommands[0]
 
   const pipetteId = command.params.pipetteId
-  const pipetteName = protocolData.pipettes[pipetteId].name
+  const pipetteName = protocolData.pipettes[pipetteId].pipetteName
   let wellsToHighlight: string[] = []
   const pipetteChannels = getPipetteNameSpecs(pipetteName)?.channels
   if (pipetteChannels === 8) {

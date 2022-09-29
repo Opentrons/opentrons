@@ -6,7 +6,7 @@ describe('getPrimaryPipetteId', () => {
   it('should return the one and only pipette if there is only one pipette in the protocol', () => {
     const mockPipette: ProtocolFile<{}>['pipettes'] = {
       p10SingleId: {
-        name: 'p10_single',
+        pipetteName: 'p10_single',
       },
     }
     expect(getPrimaryPipetteId({ ...mockPipette }, [])).toBe('p10SingleId')
@@ -33,12 +33,12 @@ describe('getPrimaryPipetteId', () => {
 
     const p10Single: ProtocolFile<{}>['pipettes'] = {
       p10SingleId: {
-        name: 'p10_single',
+        pipetteName: 'p10_single',
       },
     }
     const p10Multi: ProtocolFile<{}>['pipettes'] = {
       p10MultiId: {
-        name: 'p10_multi',
+        pipetteName: 'p10_multi',
       },
     }
 
@@ -77,12 +77,12 @@ describe('getPrimaryPipetteId', () => {
     ] as any
     const p10Single: ProtocolFile<{}>['pipettes'] = {
       p10SingleId: {
-        name: 'p10_single',
+        pipetteName: 'p10_single',
       },
     }
     const p10Multi: ProtocolFile<{}>['pipettes'] = {
       p10MultiId: {
-        name: 'p10_multi',
+        pipetteName: 'p10_multi',
       },
     }
 
@@ -122,12 +122,12 @@ describe('getPrimaryPipetteId', () => {
 
     const p10Single: ProtocolFile<{}>['pipettes'] = {
       p10SingleId: {
-        name: 'p10_single',
+        pipetteName: 'p10_single',
       },
     }
     const p50Multi: ProtocolFile<{}>['pipettes'] = {
       p50MultiId: {
-        name: 'p50_single',
+        pipetteName: 'p50_single',
       },
     }
 
@@ -167,12 +167,12 @@ describe('getPrimaryPipetteId', () => {
 
     const p300Single: ProtocolFile<{}>['pipettes'] = {
       p300SingleId: {
-        name: 'p300_single',
+        pipetteName: 'p300_single',
       },
     }
     const p300SingleGen2: ProtocolFile<{}>['pipettes'] = {
       p300SingleGen2Id: {
-        name: 'p300_single_gen2',
+        pipetteName: 'p300_single_gen2',
       },
     }
 
@@ -213,12 +213,12 @@ describe('getPrimaryPipetteId', () => {
 
     const p300SingleLeft: ProtocolFile<{}>['pipettes'] = {
       p300SingleLeftId: {
-        name: 'p300_single',
+        pipetteName: 'p300_single',
       },
     }
     const p300SingleRight: ProtocolFile<{}>['pipettes'] = {
       p300SingleRightId: {
-        name: 'p300_single',
+        pipetteName: 'p300_single',
       },
     }
 
