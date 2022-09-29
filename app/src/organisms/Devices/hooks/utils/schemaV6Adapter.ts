@@ -11,6 +11,9 @@ import type {
   LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+
+// TODO(sh, 2022-09-29): The liquids logic should move into the shared-data/schemaV6Adapter once the liquids FF is removed
+
 // This adapter exists to resolve the interface mismatch between the PE analysis response
 // and the protocol schema v6 interface. Much of this logic should be deleted once we resolve
 // these discrepencies on the server side
