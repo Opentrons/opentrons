@@ -18,7 +18,7 @@ import {
   C_SELECTED_DARK,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import type { Section } from './types'
+import type { DeprecatedSection } from './types'
 interface Props {
   sections: Section[]
   currentSection?: Section

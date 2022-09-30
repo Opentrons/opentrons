@@ -4,7 +4,7 @@ import { getOnePipettePositionCheckSteps } from '../getOnePipettePositionCheckSt
 import { DEPRECATED_SECTIONS } from '../../constants'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
-import type { LabwarePositionCheckStep } from '../../types'
+import type { DeprecatedLabwarePositionCheckStep } from '../../types'
 
 const protocolMultipleTipracks = (_uncastedProtocolMultipleTipracks as unknown) as ProtocolAnalysisFile
 const protocolWithTC = (_uncastedProtocolWithTC as unknown) as ProtocolAnalysisFile

@@ -1,5 +1,5 @@
-import type { Section } from '../types'
-import { useSteps } from './useSteps'
+import type { DeprecatedSection } from '../types'
+import { useDeprecatedSteps } from './useDeprecatedSteps'
 import { useSections } from './useSections'
 
 type LabwareIdsBySection = {
@@ -8,7 +8,7 @@ type LabwareIdsBySection = {
 export function useLabwareIdsBySection(
   runId: string | null
 ): LabwareIdsBySection {
-  const steps = useSteps(runId)
+  const steps = useDeprecatedSteps(runId)
   const sections = useSections(runId)
   return sections.reduce<LabwareIdsBySection>(
     (labwareIdsBySection, section) => {

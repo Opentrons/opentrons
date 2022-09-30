@@ -12,7 +12,7 @@ import { DeprecatedDeckMap } from '../DeprecatedDeckMap'
 import { DeprecatedSummaryScreen } from '../DeprecatedSummaryScreen'
 import { DeprecatedLabwareOffsetsSummary } from '../DeprecatedLabwareOffsetsSummary'
 import { useIntroInfo, useLabwareOffsets } from '../../hooks'
-import { Section } from '../types'
+import { DeprecatedSection } from '../types'
 import { useLPCSuccessToast } from '../../../ProtocolSetup/hooks'
 
 jest.mock('../../../../redux/analytics')

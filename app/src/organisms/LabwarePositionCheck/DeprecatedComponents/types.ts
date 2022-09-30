@@ -11,7 +11,7 @@ import type {
   PickUpTipCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 
-export type Section = keyof typeof SECTIONS
+export type DeprecatedSection = keyof typeof SECTIONS
 
 export type LabwarePositionCheckCreateCommand =
   | MoveToWellCreateCommand
@@ -25,7 +25,7 @@ export type LabwarePositionCheckMovementCommand =
   | MoveToWellCreateCommand
   | PickUpTipCreateCommand
   | DropTipCreateCommand
-export interface LabwarePositionCheckStep {
+export interface DeprecatedLabwarePositionCheckStep {
   labwareId: string
   section: Section
   commands: LabwarePositionCheckCreateCommand[]

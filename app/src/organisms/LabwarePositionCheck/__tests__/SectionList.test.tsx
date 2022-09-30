@@ -2,7 +2,7 @@ import { renderWithProviders } from '@opentrons/components'
 import * as React from 'react'
 import { i18n } from '../../../i18n'
 import { SectionList } from '../SectionList'
-import { Section } from '../types'
+import { DeprecatedSection } from '../types'
 
 const MOCK_SECTIONS_1_PIPETTE_2_STEPS = [
   'PRIMARY_PIPETTE_TIPRACKS',

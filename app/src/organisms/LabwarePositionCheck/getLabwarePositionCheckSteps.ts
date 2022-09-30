@@ -7,25 +7,24 @@ import { getTwoPipettePositionCheckSteps } from './utils/getTwoPipettePositionCh
 import type {
   RunTimeCommand,
   ProtocolAnalysisFile,
+  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwarePositionCheckStep } from './types'
 
 export const getLabwarePositionCheckSteps = (
-  protocolData: ProtocolAnalysisFile
+  protocolData: ProtocolAnalysisOutput
 ): LabwarePositionCheckStep[] => {
   if (protocolData != null && 'pipettes' in protocolData) {
     // filter out any pipettes that are not being used in the protocol
-    const pipettesById: ProtocolAnalysisFile['pipettes'] = omitBy(
-      protocolData.pipettes,
-      (_pipette, id) =>
-        !protocolData.commands.some(
+    const pipettesUsedInProtocol: ProtocolAnalysisOutput['pipettes'] = 
+      protocolData.pipettes.filter(
+      ({id}) =>
+        protocolData.commands.some(
           command =>
             command.commandType === 'pickUpTip' &&
             command.params.pipetteId === id
         )
     )
-    const pipettes = values(pipettesById)
-    const pipetteNames = pipettes.map(({ name }) => name)
     const labware = omitBy(
       protocolData.labware,
       (labware, id) =>
@@ -42,7 +41,7 @@ export const getLabwarePositionCheckSteps = (
     const commands: RunTimeCommand[] = protocolData.commands
     const primaryPipetteId = getPrimaryPipetteId(pipettesById, commands)
     const pipetteWorkflow = getPipetteWorkflow({
-      pipetteNames,
+      pipetteNames: pipettesUsedInProtocol.map(({pipetteName}) => pipetteName),
       primaryPipetteId,
       labware,
       labwareDefinitions,

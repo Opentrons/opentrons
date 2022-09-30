@@ -13,7 +13,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { LabwarePositionCheckStepDetail } from './LabwarePositionCheckStepDetail'
 import { SectionList } from './SectionList'
-import { useIntroInfo, useLabwareIdsBySection, useSteps } from './hooks'
+import { useIntroInfo, useLabwareIdsBySection, useDeprecatedSteps } from './hooks'
 import { DeckMap } from './DeckMap'
 import type { Jog } from '../../molecules/DeprecatedJogControls'
 import type { LabwarePositionCheckStep, SavePositionCommandData } from './types'
@@ -32,7 +32,7 @@ export const GenericStepScreen = (
 ): JSX.Element | null => {
   const introInfo = useIntroInfo()
   const labwareIdsBySection = useLabwareIdsBySection(props.runId)
-  const allSteps = useSteps(props.runId)
+  const allSteps = useDeprecatedSteps(props.runId)
   if (introInfo == null) return null
   const { sections, primaryPipetteMount, secondaryPipetteMount } = introInfo
   const labwareIdsToHighlight = labwareIdsBySection[props.selectedStep.section]

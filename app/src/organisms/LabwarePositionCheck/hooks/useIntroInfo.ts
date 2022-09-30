@@ -2,10 +2,10 @@ import { getPipetteMount } from '../../Devices/ProtocolRun/utils/getPipetteMount
 import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
 import { useProtocolDetailsForRun } from '../../Devices/hooks/useProtocolDetailsForRun'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
-import { useSteps } from './useSteps'
+import { useDeprecatedSteps } from './useDeprecatedSteps'
 import { useSections } from './useSections'
 import type { PickUpTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
-import type { Section } from '../types'
+import type { DeprecatedSection } from '../types'
 
 interface IntroInfo {
   primaryPipetteMount: string
@@ -16,7 +16,7 @@ interface IntroInfo {
 export function useIntroInfo(): IntroInfo | null {
   const runId = useCurrentRunId()
   const { protocolData } = useProtocolDetailsForRun(runId)
-  const steps = useSteps(runId)
+  const steps = useDeprecatedSteps(runId)
   const sections = useSections(runId)
   if (
     protocolData == null ||

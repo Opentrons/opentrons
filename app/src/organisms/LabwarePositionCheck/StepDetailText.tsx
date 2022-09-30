@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LabwarePositionCheckStepDetailModal } from './LabwarePositionCheckStepDetailModal'
-import type { LabwarePositionCheckStep } from './types'
+import type { DeprecatedLabwarePositionCheckStep } from './types'
 import { useProtocolDetailsForRun } from '../Devices/hooks'
 
 interface StepDetailTextProps {

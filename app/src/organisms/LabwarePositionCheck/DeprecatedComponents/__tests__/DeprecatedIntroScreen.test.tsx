@@ -21,7 +21,7 @@ import { getLatestLabwareOffsetCount } from '../../utils/getLatestLabwareOffsetC
 import { DeprecatedSectionList } from '../DeprecatedSectionList'
 import { useIntroInfo, useLabwareIdsBySection } from '../../hooks'
 import { DeprecatedIntroScreen, INTERVAL_MS } from '../DeprecatedIntroScreen'
-import type { Section } from '../types'
+import type { DeprecatedSection } from '../types'
 import type { HostConfig, LabwareOffset } from '@opentrons/api-client'
 
 jest.mock('../../hooks')
@@ -147,7 +147,7 @@ describe('DeprecatedIntroScreen', () => {
       firstTiprackSlot: '2',
       sections: MOCK_DEPRECATED_SECTIONS,
     })
-    mockDeprecatedSectionList.mockReturnValue(<div>Mock Section List</div>)
+    mockDeprecatedSectionList.mockReturnValue(<div>Mock DeprecatedSection List</div>)
     when(mockUseCurrentRun)
       .calledWith()
       .mockReturnValue({
@@ -170,7 +170,7 @@ describe('DeprecatedIntroScreen', () => {
     getByText(
       'When you check a labware, the OT-2’s pipette nozzle or attached tip will stop at the center of the A1 well. If the pipette nozzle or tip is not centered, you can reveal the OT-2’s jog controls to make an adjustment. This Labware Offset will be applied to the entire labware. Offset data is measured to the nearest 1/10th mm and can be made in the X, Y and/or Z directions.'
     )
-    getByText('Mock Section List')
+    getByText('Mock DeprecatedSection List')
   })
   it('should call beginLPC when the CTA button is pressed', () => {
     const { getByRole } = render(props)

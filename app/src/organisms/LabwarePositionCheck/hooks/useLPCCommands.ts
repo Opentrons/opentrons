@@ -1,10 +1,10 @@
 import { LabwarePositionCheckCreateCommand } from '../types'
-import { useSteps } from './useSteps'
+import { useDeprecatedSteps } from './useDeprecatedSteps'
 
 export function useLPCCommands(
   runId: string
 ): LabwarePositionCheckCreateCommand[] {
-  return useSteps(runId).reduce<LabwarePositionCheckCreateCommand[]>(
+  return useDeprecatedSteps(runId).reduce<LabwarePositionCheckCreateCommand[]>(
     (steps, currentStep) => {
       return [...steps, ...currentStep.commands]
     },

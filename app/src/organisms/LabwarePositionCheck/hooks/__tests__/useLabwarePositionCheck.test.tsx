@@ -20,11 +20,11 @@ import {
 } from '../../../Devices/hooks'
 import { getLabwareLocation } from '../../../Devices/ProtocolRun/utils/getLabwareLocation'
 import { getModuleInitialLoadInfo } from '../../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
-import { useSteps } from '../useSteps'
+import { useDeprecatedSteps } from '../useDeprecatedSteps'
 import { useLabwarePositionCheck } from '../useLabwarePositionCheck'
 
 import type { HostConfig } from '@opentrons/api-client'
-import type { LabwarePositionCheckStep } from '../../types'
+import type { DeprecatedLabwarePositionCheckStep } from '../../types'
 import { LARGE_STEP_SIZE_MM } from '../../../../molecules/JogControls'
 
 jest.mock('@opentrons/react-api-client')
@@ -34,7 +34,7 @@ jest.mock('../../../Devices/hooks')
 jest.mock('../../../ProtocolUpload/hooks')
 jest.mock('../../../Devices/ProtocolRun/utils/getLabwareLocation')
 jest.mock('../../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo')
-jest.mock('../useSteps')
+jest.mock('../useDeprecatedSteps')
 
 const queryClient = new QueryClient()
 const store: Store<any> = createStore(jest.fn(), {})
@@ -51,7 +51,7 @@ const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
 const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
   typeof useCurrentRunId
 >
-const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
+const mockUseSteps = useDeprecatedSteps as jest.MockedFunction<typeof useDeprecatedSteps>
 const mockUseCreateCommandMutation = useCreateCommandMutation as jest.MockedFunction<
   typeof useCreateCommandMutation
 >

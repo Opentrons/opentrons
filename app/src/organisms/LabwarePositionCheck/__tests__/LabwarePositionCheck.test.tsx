@@ -11,9 +11,9 @@ import { DeprecatedSummaryScreen } from '../DeprecatedComponents/DeprecatedSumma
 import { DeprecatedRobotMotionLoadingModal } from '../DeprecatedComponents/DeprecatedRobotMotionLoadingModal'
 import { DeprecatedConfirmPickUpTipModal } from '../DeprecatedComponents/DeprecatedConfirmPickUpTipModal'
 import { DeprecatedExitPreventionModal } from '../DeprecatedComponents/DeprecatedExitPreventionModal'
-import { useSteps, useLabwarePositionCheck } from '../hooks'
+import { useDeprecatedSteps, useLabwarePositionCheck } from '../hooks'
 import { useRestartRun } from '../../ProtocolUpload/hooks'
-import type { LabwarePositionCheckStep } from '../types'
+import type { DeprecatedLabwarePositionCheckStep } from '../types'
 
 jest.mock('../../../redux/analytics')
 jest.mock('../DeprecatedComponents/DeprecatedGenericStepScreen')
@@ -43,7 +43,7 @@ const mockConfirmPickUpTipModal = DeprecatedConfirmPickUpTipModal as jest.Mocked
 const mockExitPreventionModal = DeprecatedExitPreventionModal as jest.MockedFunction<
   typeof DeprecatedExitPreventionModal
 >
-const mockUseSteps = useSteps as jest.MockedFunction<typeof useSteps>
+const mockUseSteps = useDeprecatedSteps as jest.MockedFunction<typeof useDeprecatedSteps>
 const mockUseRestartRun = useRestartRun as jest.MockedFunction<
   typeof useRestartRun
 >
