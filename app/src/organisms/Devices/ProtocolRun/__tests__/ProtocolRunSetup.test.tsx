@@ -244,7 +244,7 @@ describe('ProtocolRunSetup', () => {
         .mockReturnValue({
           protocolData: ({
             ...noModulesProtocol,
-            liquids: [{displayName: 'water', description: 'liquid H2O'}]
+            liquids: [{ displayName: 'water', description: 'liquid H2O' }],
           } as unknown) as ProtocolAnalysisFile,
           displayName: 'mock display name',
           protocolKey: 'fakeProtocolKey',
