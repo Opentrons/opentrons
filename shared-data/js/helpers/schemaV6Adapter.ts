@@ -116,7 +116,7 @@ export const schemaV6Adapter = (
     }, {})
     return {
       ...protocolAnalysis,
-      // @ts-expect-error this is a v6 like object that does not quite match the v6 spec at the moment
+      //  @ts-expect-error
       pipettes,
       labware,
       modules,
