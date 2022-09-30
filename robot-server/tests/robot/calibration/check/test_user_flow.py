@@ -473,13 +473,14 @@ async def test_compare_points(mock_user_flow):
 
 async def test_mark_bad_calibration(mock_user_flow_bad_vectors):
     uf = mock_user_flow_bad_vectors
-    storage_path = "opentrons.calibration_storage.mark_bad_calibration"
-    with patch(f"{storage_path}.mark_bad") as m, patch(
-        f"{storage_path}.create_tip_length_data"
-    ), patch(f"{storage_path}.save_tip_length_calibration"), patch(
-        f"{storage_path}.save_pipette_calibration"
+    cal_store = "opentrons.calibration_storage"
+
+    with patch(f"{cal_store}.mark_bad_calibration.mark_bad") as m, patch(
+        f"{cal_store}.ot2_tip_length.create_tip_length_data"
+    ), patch(f"{cal_store}.ot2_tip_length.save_tip_length_calibration"), patch(
+        f"{cal_store}.ot2_pipette_offset.save_pipette_calibration"
     ), patch(
-        f"{storage_path}.save_robot_deck_attitude"
+        f"{cal_store}.ot2_deck_attitude.save_robot_deck_attitude"
     ):
         uf._current_state = CalibrationCheckState.comparingTip
         await uf.update_comparison_map()
