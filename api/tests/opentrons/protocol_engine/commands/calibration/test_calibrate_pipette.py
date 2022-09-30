@@ -35,23 +35,19 @@ async def test_calibrate_pipette_implementation(
     decoy: Decoy, ot3_hardware_api: OT3API
 ) -> None:
     """Test Calibration command execution."""
-    # TODO (tz, 9-23-22) Figure out a better way to run this test with OT-3 api only.
-    if ot3_hardware_api:
-        subject = CalibratePipetteImplementation(hardware_api=ot3_hardware_api)
+    subject = CalibratePipetteImplementation(hardware_api=ot3_hardware_api)
 
-        params = CalibratePipetteParams(
-            mount=MountType.LEFT,
-        )
+    params = CalibratePipetteParams(
+        mount=MountType.LEFT,
+    )
 
-        decoy.when(
-            await calibration.calibrate_mount(
-                hcapi=ot3_hardware_api, mount=OT3Mount.LEFT
-            )
-        ).then_return(Point(x=3, y=4, z=6))
+    decoy.when(
+        await calibration.calibrate_mount(hcapi=ot3_hardware_api, mount=OT3Mount.LEFT)
+    ).then_return(Point(x=3, y=4, z=6))
 
-        result = await subject.execute(params)
+    result = await subject.execute(params)
 
-        assert result == CalibratePipetteResult(pipetteOffset=Point(x=3, y=4, z=6))
+    assert result == CalibratePipetteResult(pipetteOffset=Point(x=3, y=4, z=6))
 
 
 @pytest.mark.ot3_only
