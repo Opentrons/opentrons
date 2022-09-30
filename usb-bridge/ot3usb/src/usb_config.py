@@ -210,4 +210,7 @@ class SerialGadget:
     def get_handle(self) -> serial.Serial:
         """Open a handle to the serial port."""
         path = self._get_handle_path()
-        return serial.Serial(port=path)
+        ser = serial.Serial(port=path)
+        # To support select()
+        ser.nonblocking()
+        return ser
