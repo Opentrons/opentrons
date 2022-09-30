@@ -1,4 +1,4 @@
-import { SECTIONS } from '../constants'
+import { DEPRECATED_SECTIONS } from '../constants'
 import {
   getLabwareIdsInOrder, 
   getAllTipracksIdsThatPipetteUsesInOrder,
@@ -59,28 +59,28 @@ export const getOnePipettePositionCheckSteps = (args: {
   const moveToTiprackSteps = getMoveToTiprackSteps(
     orderedTiprackIds,
     primaryPipetteId,
-    SECTIONS.PRIMARY_PIPETTE_TIPRACKS
+    DEPRECATED_SECTIONS.PRIMARY_PIPETTE_TIPRACKS
   )
 
   const lastTiprackId = orderedTiprackIds[orderedTiprackIds.length - 1]
   const pickupTipFromLastTiprackStep = getPickupTipStep(
     lastTiprackId,
     primaryPipetteId,
-    SECTIONS.PRIMARY_PIPETTE_TIPRACKS
+    DEPRECATED_SECTIONS.PRIMARY_PIPETTE_TIPRACKS
   )
   const moveToRemainingLabwareSteps = getMoveToLabwareSteps(
     labware,
     modules,
     orderedLabwareIds,
     primaryPipetteId,
-    SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
+    DEPRECATED_SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
     commands
   )
 
   const dropTipInLastTiprackStep = getDropTipStep(
     lastTiprackId,
     primaryPipetteId,
-    SECTIONS.RETURN_TIP
+    DEPRECATED_SECTIONS.RETURN_TIP
   )
 
   return [

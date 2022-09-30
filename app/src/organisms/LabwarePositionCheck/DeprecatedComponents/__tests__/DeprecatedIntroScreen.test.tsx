@@ -74,7 +74,7 @@ const deckSlotsById = standardDeckDef.locations.orderedSlots.reduce(
   (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
   {}
 )
-const MOCK_SECTIONS = ['MOCK_PRIMARY_PIPETTE_TIPRACKS' as Section]
+const MOCK_DEPRECATED_SECTIONS = ['MOCK_PRIMARY_PIPETTE_TIPRACKS' as Section]
 const MOCK_300_UL_TIPRACK_COORDS = [30, 40, 0]
 const MOCK_ROBOT_NAME = 'otie'
 const HOST_CONFIG: HostConfig = {
@@ -145,7 +145,7 @@ describe('DeprecatedIntroScreen', () => {
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
       firstTiprackSlot: '2',
-      sections: MOCK_SECTIONS,
+      sections: MOCK_DEPRECATED_SECTIONS,
     })
     mockDeprecatedSectionList.mockReturnValue(<div>Mock Section List</div>)
     when(mockUseCurrentRun)

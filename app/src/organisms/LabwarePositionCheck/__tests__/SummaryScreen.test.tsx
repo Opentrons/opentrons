@@ -49,7 +49,7 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
 >
 
-const MOCK_SECTIONS = ['PRIMARY_PIPETTE_TIPRACKS' as Section]
+const MOCK_DEPRECATED_SECTIONS = ['PRIMARY_PIPETTE_TIPRACKS' as Section]
 const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
@@ -85,7 +85,7 @@ describe('SummaryScreen', () => {
       primaryPipetteMount: 'left',
       secondaryPipetteMount: '',
       firstTiprackSlot: '2',
-      sections: MOCK_SECTIONS,
+      sections: MOCK_DEPRECATED_SECTIONS,
     })
 
     when(mockUseProtocolDetailsForRun)

@@ -1,5 +1,5 @@
 import type { ProtocolFile, LabwareDefinition2 } from '@opentrons/shared-data'
-import { SECTIONS } from '../constants'
+import { DEPRECATED_SECTIONS } from '../constants'
 import {
   getLabwareIdsInOrder,
   getAllTipracksIdsThatPipetteUsesInOrder,
@@ -62,13 +62,13 @@ export const getTwoPipettePositionCheckSteps = (args: {
   const moveSecondaryPipetteToTiprackSteps = getMoveToTiprackSteps(
     orderedTiprackIdsThatOnlySecondaryPipetteUses,
     secondaryPipetteId,
-    SECTIONS.SECONDARY_PIPETTE_TIPRACKS
+    DEPRECATED_SECTIONS.SECONDARY_PIPETTE_TIPRACKS
   )
 
   const movePrimaryPipetteToTiprackSteps = getMoveToTiprackSteps(
     remainingTiprackIdsThatPrimaryPipetteUses,
     primaryPipetteId,
-    SECTIONS.PRIMARY_PIPETTE_TIPRACKS
+    DEPRECATED_SECTIONS.PRIMARY_PIPETTE_TIPRACKS
   )
 
   const lastTiprackId =
@@ -79,7 +79,7 @@ export const getTwoPipettePositionCheckSteps = (args: {
   const pickupTipFromLastTiprackStep = getPickupTipStep(
     lastTiprackId,
     primaryPipetteId,
-    SECTIONS.PRIMARY_PIPETTE_TIPRACKS
+    DEPRECATED_SECTIONS.PRIMARY_PIPETTE_TIPRACKS
   )
 
   const moveToRemainingLabwareSteps = getMoveToLabwareSteps(
@@ -87,14 +87,14 @@ export const getTwoPipettePositionCheckSteps = (args: {
     modules,
     orderedLabwareIds,
     primaryPipetteId,
-    SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
+    DEPRECATED_SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
     commands
   )
 
   const dropTipInLastTiprackStep = getDropTipStep(
     lastTiprackId,
     primaryPipetteId,
-    SECTIONS.RETURN_TIP
+    DEPRECATED_SECTIONS.RETURN_TIP
   )
 
   return [

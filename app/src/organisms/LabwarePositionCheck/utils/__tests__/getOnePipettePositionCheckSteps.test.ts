@@ -1,7 +1,7 @@
 import _uncastedProtocolMultipleTipracks from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracks.json'
 import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracksWithTC.json'
 import { getOnePipettePositionCheckSteps } from '../getOnePipettePositionCheckSteps'
-import { SECTIONS } from '../../constants'
+import { DEPRECATED_SECTIONS } from '../../constants'
 import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { LabwarePositionCheckStep } from '../../types'
@@ -79,27 +79,27 @@ describe('getOnePipettePositionCheckSteps', () => {
     const allSteps: LabwarePositionCheckStep[] = [
       {
         labwareId: tiprackInSlot1Id,
-        section: SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
+        section: DEPRECATED_SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
         commands: [moveToWellFirstTiprack],
       },
       {
         labwareId: tiprackInSlot2Id,
-        section: SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
+        section: DEPRECATED_SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
         commands: [moveToWellSecondTiprack],
       },
       {
         labwareId: tiprackInSlot2Id,
-        section: SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
+        section: DEPRECATED_SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
         commands: [pickupTipAtLastTiprack],
       },
       {
         labwareId: resevoirId,
-        section: SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
+        section: DEPRECATED_SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
         commands: [moveToWellFirstLabware],
       },
       {
         labwareId: tiprackInSlot2Id,
-        section: SECTIONS.RETURN_TIP,
+        section: DEPRECATED_SECTIONS.RETURN_TIP,
         commands: [dropTipIntoLastTiprack],
       },
     ]
@@ -205,32 +205,32 @@ describe('getOnePipettePositionCheckSteps', () => {
     const allSteps: LabwarePositionCheckStep[] = [
       {
         labwareId: tiprackInSlot1Id,
-        section: SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
+        section: DEPRECATED_SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
         commands: [moveToWellFirstTiprack],
       },
       {
         labwareId: tiprackInSlot2Id,
-        section: SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
+        section: DEPRECATED_SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
         commands: [moveToWellSecondTiprack],
       },
       {
         labwareId: tiprackInSlot2Id,
-        section: SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
+        section: DEPRECATED_SECTIONS.PRIMARY_PIPETTE_TIPRACKS,
         commands: [pickupTipAtLastTiprack],
       },
       {
         labwareId: resevoirId,
-        section: SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
+        section: DEPRECATED_SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
         commands: [moveToWellFirstLabware],
       },
       {
         labwareId: TCWellPlateId,
-        section: SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
+        section: DEPRECATED_SECTIONS.CHECK_REMAINING_LABWARE_WITH_PRIMARY_PIPETTE,
         commands: [openTCLid, moveToWellAfterOpeningTCLid],
       },
       {
         labwareId: tiprackInSlot2Id,
-        section: SECTIONS.RETURN_TIP,
+        section: DEPRECATED_SECTIONS.RETURN_TIP,
         commands: [dropTipIntoLastTiprack],
       },
     ]
