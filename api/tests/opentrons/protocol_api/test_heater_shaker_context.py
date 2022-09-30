@@ -196,7 +196,47 @@ def test_wait_for_temperature_no_target(
     )
 
 
-# TODO set and wait for target temperature??
+def test_set_and_wait_for_temperature(
+    decoy: Decoy,
+    mock_core: HeaterShakerCore,
+    mock_broker: Broker,
+    subject: HeaterShakerContext,
+) -> None:
+    """It should set and wait for the temperature via the core."""
+    decoy.when(mock_core.get_target_temperature()).then_return(42.0)
+
+    subject.set_and_wait_for_temperature(celsius=42.0)
+
+    decoy.verify(
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "before",
+                    "name": "command.HEATER_SHAKER_SET_TARGET_TEMPERATURE",
+                }
+            ),
+        ),
+        mock_core.set_target_temperature(celsius=42.0),
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching({"$": "after"}),
+        ),
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching(
+                {
+                    "$": "before",
+                    "name": "command.HEATER_SHAKER_WAIT_FOR_TEMPERATURE",
+                }
+            ),
+        ),
+        mock_core.wait_for_target_temperature(),
+        mock_broker.publish(
+            "command",
+            matchers.DictMatching({"$": "after"}),
+        ),
+    )
 
 
 def test_set_and_wait_for_shake_speed(
@@ -230,16 +270,25 @@ def test_set_and_wait_for_shake_speed(
     )
 
 
-def test_set_and_wait_for_shake_speed_latch_not_closed(
+@pytest.mark.parametrize(
+    "latch_status",
+    [
+        HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
+        HeaterShakerLabwareLatchStatus.UNKNOWN,
+        HeaterShakerLabwareLatchStatus.CLOSING,
+        HeaterShakerLabwareLatchStatus.IDLE_OPEN,
+        HeaterShakerLabwareLatchStatus.OPENING,
+    ],
+)
+def test_set_and_wait_for_shake_speed_raises(
     decoy: Decoy,
+    latch_status: HeaterShakerLabwareLatchStatus,
     mock_core: HeaterShakerCore,
     mock_broker: Broker,
     subject: HeaterShakerContext,
 ) -> None:
     """It should raise a CannotPerformModuleAction when latch is not closed."""
-    decoy.when(mock_core.get_labware_latch_status()).then_return(
-        HeaterShakerLabwareLatchStatus.IDLE_OPEN
-    )
+    decoy.when(mock_core.get_labware_latch_status()).then_return(latch_status)
 
     with pytest.raises(CannotPerformModuleAction) as exc_info:
         subject.set_and_wait_for_shake_speed(rpm=1337)
@@ -281,14 +330,24 @@ def test_open_labware_latch(
     )
 
 
-def test_open_labware_latch_not_idle(
+@pytest.mark.parametrize(
+    "speed_status",
+    [
+        SpeedStatus.DECELERATING,
+        SpeedStatus.ACCELERATING,
+        SpeedStatus.HOLDING,
+        SpeedStatus.ERROR,
+    ],
+)
+def test_open_labware_latch_raises(
     decoy: Decoy,
+    speed_status: SpeedStatus,
     mock_core: HeaterShakerCore,
     mock_broker: Broker,
     subject: HeaterShakerContext,
 ) -> None:
     """It should raise a CannotPerformModuleAction when heater-shaker is not idle."""
-    decoy.when(mock_core.get_speed_status()).then_return(SpeedStatus.ACCELERATING)
+    decoy.when(mock_core.get_speed_status()).then_return(speed_status)
 
     with pytest.raises(CannotPerformModuleAction) as exc_info:
         subject.open_labware_latch()

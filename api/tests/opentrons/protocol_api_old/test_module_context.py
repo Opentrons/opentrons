@@ -17,7 +17,6 @@ from opentrons.hardware_control.modules.types import (
 
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api.module_contexts import (
-    CannotPerformModuleAction,
     HeaterShakerContext,
 )
 
