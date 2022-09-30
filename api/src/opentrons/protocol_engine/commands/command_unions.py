@@ -7,6 +7,8 @@ from . import magnetic_module
 from . import temperature_module
 from . import thermocycler
 
+from . import calibration
+
 from .set_rail_lights import (
     SetRailLights,
     SetRailLightsCommandType,
@@ -217,6 +219,7 @@ Command = Union[
     thermocycler.OpenLid,
     thermocycler.CloseLid,
     thermocycler.RunProfile,
+    calibration.CalibratePipette,
 ]
 
 CommandParams = Union[
@@ -263,6 +266,7 @@ CommandParams = Union[
     thermocycler.CloseLidParams,
     thermocycler.RunProfileParams,
     thermocycler.RunProfileStepParams,
+    calibration.CalibratePipetteParams,
 ]
 
 CommandType = Union[
@@ -308,6 +312,7 @@ CommandType = Union[
     thermocycler.OpenLidCommandType,
     thermocycler.CloseLidCommandType,
     thermocycler.RunProfileCommandType,
+    calibration.CalibratePipetteCommandType,
 ]
 
 CommandCreate = Union[
@@ -352,6 +357,7 @@ CommandCreate = Union[
     thermocycler.OpenLidCreate,
     thermocycler.CloseLidCreate,
     thermocycler.RunProfileCreate,
+    calibration.CalibratePipetteCreate,
 ]
 
 CommandResult = Union[
@@ -397,4 +403,5 @@ CommandResult = Union[
     thermocycler.OpenLidResult,
     thermocycler.CloseLidResult,
     thermocycler.RunProfileResult,
+    calibration.CalibratePipetteResult,
 ]
