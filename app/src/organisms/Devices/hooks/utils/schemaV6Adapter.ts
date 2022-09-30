@@ -1,15 +1,19 @@
 import type {
-  LoadLabwareRunTimeCommand,
-  LoadModuleRunTimeCommand,
-} from '../../protocol/types/schemaV6/command/setup'
-import type { RunTimeCommand, ProtocolAnalysisFile } from '../../protocol'
-import type { PipetteName } from '../pipettes'
-import type {
-  PendingProtocolAnalysis,
   CompletedProtocolAnalysis,
   LabwareDefinition2,
   ModuleModel,
-} from '../types'
+  PendingProtocolAnalysis,
+  PipetteName,
+  ProtocolAnalysisFile,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
+import type {
+  LoadLabwareRunTimeCommand,
+  LoadModuleRunTimeCommand,
+} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+
+// TODO(sh, 2022-09-29): The liquids logic should move into the shared-data/schemaV6Adapter once the liquids FF is removed
+
 // This adapter exists to resolve the interface mismatch between the PE analysis response
 // and the protocol schema v6 interface. Much of this logic should be deleted once we resolve
 // these discrepencies on the server side
@@ -98,12 +102,30 @@ export const schemaV6Adapter = (
         }
       }, {})
 
+    const liquids: {
+      [liquidId: string]: {
+        displayName: string
+        description: string
+        displayColor?: string
+      }
+    } = (protocolAnalysis?.liquids ?? []).reduce((acc, liquid) => {
+      return {
+        ...acc,
+        [liquid.id]: {
+          displayName: liquid.displayName,
+          description: liquid.description,
+          displayColor: liquid.displayColor,
+        },
+      }
+    }, {})
+
     // @ts-expect-error this is a v6 like object that does not quite match the v6 spec at the moment
     return {
       ...protocolAnalysis,
       pipettes,
       labware,
       modules,
+      liquids,
       labwareDefinitions,
       commands: protocolAnalysis.commands,
     }

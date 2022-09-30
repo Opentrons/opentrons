@@ -21,7 +21,7 @@ import {
 import {
   getModuleDisplayName,
   HEATERSHAKER_MODULE_TYPE,
-  HS_TOO_HOT_TEMP,
+  TOO_HOT_TEMP,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -58,12 +58,8 @@ import { AboutModuleSlideout } from './AboutModuleSlideout'
 import { HeaterShakerModuleData } from './HeaterShakerModuleData'
 import { HeaterShakerSlideout } from './HeaterShakerSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
+import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
-
-import magneticModule from '../../assets/images/magnetic_module_gen_2_transparent.png'
-import temperatureModule from '../../assets/images/temp_deck_gen_2_transparent.png'
-import thermoModule from '../../assets/images/thermocycler_closed.png'
-import heaterShakerModule from '../../assets/images/heater_shaker_module_transparent.png'
 
 import type {
   AttachedModule,
@@ -139,16 +135,23 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const isOverflowBtnDisabled =
     runStatus === RUN_STATUS_RUNNING || runStatus === RUN_STATUS_FINISHING
 
-  const isTooHot =
+  const heaterShakerTooHot =
     module.moduleModel === 'heaterShakerModuleV1' &&
     module.data.currentTemperature != null &&
-    module.data.currentTemperature > HS_TOO_HOT_TEMP
+    module.data.currentTemperature > TOO_HOT_TEMP
 
-  let image = ''
+  const ThermoTooHot =
+    module.moduleType === THERMOCYCLER_MODULE_TYPE &&
+    ((module.data.currentTemperature != null &&
+      module.data.currentTemperature > TOO_HOT_TEMP) ||
+      (module.data.lidTemperature != null &&
+        module.data.lidTemperature > TOO_HOT_TEMP))
+
+  const isTooHot = heaterShakerTooHot || ThermoTooHot
+
   let moduleData: JSX.Element = <div></div>
   switch (module.moduleType) {
     case 'magneticModuleType': {
-      image = magneticModule
       moduleData = (
         <MagneticModuleData
           moduleStatus={module.data.status}
@@ -160,7 +163,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
 
     case 'temperatureModuleType': {
-      image = temperatureModule
       moduleData = (
         <TemperatureModuleData
           moduleStatus={module.data.status}
@@ -172,21 +174,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     }
 
     case 'thermocyclerModuleType': {
-      image = thermoModule
-      moduleData = (
-        <ThermocyclerModuleData
-          status={module.data.status}
-          currentTemp={module.data.currentTemperature}
-          targetTemp={module.data.targetTemperature}
-          lidTarget={module.data.lidTargetTemperature}
-          lidTemp={module.data.lidTemperature}
-        />
-      )
+      moduleData = <ThermocyclerModuleData data={module.data} />
       break
     }
 
     case 'heaterShakerModuleType': {
-      image = heaterShakerModule
       moduleData = (
         <HeaterShakerModuleData
           moduleData={module.data}
@@ -264,7 +256,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             <img
               width="60px"
               height="54px"
-              src={image}
+              src={getModuleCardImage(module)}
               alt={module.moduleModel}
             />
           </Flex>
