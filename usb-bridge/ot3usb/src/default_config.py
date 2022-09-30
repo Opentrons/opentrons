@@ -1,9 +1,9 @@
 """Provides default configuration options for the OT3 Serial Gadget."""
 from .usb_config import SerialGadgetConfig
 
-DEFAULT_NAME = "g1"
-DEFAULT_VID = "0x0483"
-DEFAULT_PID = "0x0483"
+DEFAULT_NAME = "ot3_usb"
+DEFAULT_VID = "0x1b67"
+DEFAULT_PID = "0x4037"
 DEFAULT_BCDEVICE = "0x0010"
 DEFAULT_SERIAL = "01121997"
 DEFAULT_MANUFACTURER = "Opentrons"
