@@ -123,6 +123,8 @@ def create_step(
     ordered_nodes = sorted(present_nodes, key=lambda node: node.value)
     step: MoveGroupStep = {}
     for axis_node in ordered_nodes:
+        if not distance.get(axis_node) or not velocity.get(axis_node):
+            continue
         step[axis_node] = MoveGroupSingleAxisStep(
             distance_mm=distance.get(axis_node, np.float64(0)),
             acceleration_mm_sec_sq=acceleration.get(axis_node, np.float64(0)),
