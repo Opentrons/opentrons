@@ -171,14 +171,15 @@ async def home_ot3(
         OT3Axis.P_L,
         OT3Axis.P_R,
     ]
+    default_home_speed = 10
     homing_speeds: Dict[OT3Axis, float] = {
-        ax: DEFAULT_MAX_SPEED_DISCONTINUITY[api.gantry_load][OT3Axis.to_kind(ax)]
+        ax: DEFAULT_MAX_SPEED_DISCONTINUITY[api.gantry_load].get(OT3Axis.to_kind(ax), default_home_speed)
         for ax in _all_axes
     }
     cached_discontinuities: Dict[OT3Axis, float] = {
-        ax: api.config.motion_settings.max_speed_discontinuity[api.gantry_load][
-            OT3Axis.to_kind(ax)
-        ]
+        ax: api.config.motion_settings.max_speed_discontinuity[api.gantry_load].get(
+            OT3Axis.to_kind(ax), default_home_speed
+        )
         for ax in _all_axes
     }
     for ax, val in homing_speeds.items():
