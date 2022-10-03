@@ -126,6 +126,7 @@ export const getLabwareIdsInOrder = (
   commands: RunTimeCommand[]
 ): string[] => {
   const labwareDefinitions = getLabwareDefinitionsFromCommands(commands)
+
   const unorderedLabware = labware.reduce<LabwareToOrder[]>(
     (acc, currentLabware) => {
       const labwareDef = labwareDefinitions.find(def => getLabwareDefURI(def) === currentLabware.definitionUri)
@@ -161,7 +162,7 @@ export const getLabwareIdsInOrder = (
   return orderedLabwareIds
 }
 
-function getLabwareDefinitionsFromCommands(commands: RunTimeCommand[]): LabwareDefinition2[] {
+export function getLabwareDefinitionsFromCommands(commands: RunTimeCommand[]): LabwareDefinition2[] {
   return commands.reduce<LabwareDefinition2[]>((acc, command) => {
     const isLoadingNewDef = command.commandType === 'loadLabware' && !acc.some(def => (
       getLabwareDefURI(def) === getLabwareDefURI(command.result.definition)

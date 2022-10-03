@@ -10,6 +10,7 @@ import type {
   DropTipCreateCommand,
   PickUpTipCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 export type DeprecatedSection = keyof typeof DEPRECATED_SECTIONS
 
@@ -50,21 +51,25 @@ export interface CheckTipRacksStep {
   section: typeof SECTIONS.CHECK_TIP_RACKS
   pipetteId: string
   labwareId: string
+  location: LabwareLocation
 }
 export interface PickUpTipStep {
   section: typeof SECTIONS.PICK_UP_TIP
   pipetteId: string
   labwareId: string
+  location: LabwareLocation
 }
 export interface CheckLabwareStep {
   section: typeof SECTIONS.CHECK_LABWARE
   pipetteId: string
   labwareId: string
+  location: LabwareLocation
 }
 export interface ReturnTipStep {
   section: typeof SECTIONS.RETURN_TIP
   pipetteId: string
   labwareId: string
+  location: LabwareLocation
 }
 export interface ResultsSummaryStep {
   section: typeof SECTIONS.RESULTS_SUMMARY
