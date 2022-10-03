@@ -369,7 +369,7 @@ class ProtocolContext(CommandPublisher):
         location: Optional[DeckLocation] = None,
         configuration: Optional[str] = None,
     ) -> ModuleTypes:
-        """Load a module onto the deck given its name.
+        """Load a module onto the deck, given its name or model.
 
         This is the function to call to use a module in your protocol, like
         :py:meth:`load_instrument` is the method to call to use an instrument
@@ -378,7 +378,7 @@ class ProtocolContext(CommandPublisher):
         module loaded.
 
         A map of deck positions to loaded modules can be accessed later
-        using :py:attr:`loaded_modules`.
+        by using :py:attr:`loaded_modules`.
 
         :param str module_name: The name or model of the module.
         :param location: The location of the module. This is usually the
@@ -386,26 +386,26 @@ class ProtocolContext(CommandPublisher):
                          will be placing the module. Some modules, like
                          the Thermocycler, are only valid in one deck
                          location. You do not have to specify a location
-                         when loading a Thermocycler - it will always be
+                         when loading a Thermocycler---it will always be
                          in Slot 7.
-        :param configuration: Used to specify the slot configuration of
-                              the Thermocycler. Only Valid in Python API
-                              Version 2.4 and later. If you wish to use
-                              the non-full plate configuration, you must
-                              pass in the key word value `semi`
+        :param configuration: Only valid in Python API version 2.4 and later.
+                              Used to specify the slot configuration of the
+                              Thermocycler. If you wish to use the non-full-plate
+                              configuration, you must pass the keyword
+                              value ``semi``.
         :type location: str or int or None
         :returns: The loaded and initialized module---a
-                  :py:class:`TemperatureModuleContext`, or
+                  :py:class:`TemperatureModuleContext`,
+                  :py:class:`MagneticModuleContext`,
                   :py:class:`ThermocyclerContext`, or
-                  :py:class:`MagneticModuleContext`
+                  :py:class:`HeaterShakerContext`,
                   depending on what you requested with ``module_name``.
         """
-        # TODO: add heater-shaker to the returns values in above docstring
 
         if self._api_version < APIVersion(2, 4) and configuration:
             raise APIVersionError(
                 f"You have specified API {self._api_version}, but you are"
-                "using thermocycler parameters only available in 2.4"
+                "using Thermocycler parameters only available in 2.4"
             )
 
         requested_model = validation.ensure_module_model(module_name)

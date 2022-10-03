@@ -60,6 +60,7 @@ import { HeaterShakerSlideout } from './HeaterShakerSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
 import { getModuleCardImage } from './utils'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
+import { ErrorInfo } from './ErrorInfo'
 
 import type {
   AttachedModule,
@@ -265,6 +266,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             flex="100%"
             paddingLeft={SPACING.spacing3}
           >
+            <ErrorInfo attachedModule={module} />
             {showSuccessToast && (
               <Toast
                 message={t('firmware_update_installation_successful')}

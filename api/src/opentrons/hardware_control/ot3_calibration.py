@@ -1,15 +1,19 @@
 """Functions and utilites for OT3 calibration."""
-from typing_extensions import Final, Literal
+from __future__ import annotations
+from typing_extensions import Final, Literal, TYPE_CHECKING
 from typing import Union, Tuple, List, Dict, Any, Optional
 import datetime
 import numpy as np
 from enum import Enum
 from math import copysign, floor
 from logging import getLogger
-from .ot3api import OT3API
+
 from .types import OT3Mount, OT3Axis
 from opentrons.types import Point
 import json
+
+if TYPE_CHECKING:
+    from .ot3api import OT3API
 
 LOG = getLogger(__name__)
 
