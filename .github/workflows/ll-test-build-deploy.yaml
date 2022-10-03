@@ -105,7 +105,7 @@ jobs:
   build-ll:
     name: 'build labware library artifact'
     needs: ['js-unit-test']
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'macos-latest'
     if: github.event_name != 'pull_request'
     steps:
       - uses: 'actions/checkout@v3'
