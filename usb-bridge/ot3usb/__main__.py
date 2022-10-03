@@ -42,9 +42,18 @@ async def main() -> NoReturn:
 
     ser = None
 
-    monitor = usb_monitor.USBConnectionMonitor("usbphynop1", "")
+    monitor = usb_monitor.USBConnectionMonitor(
+        phy_udev_name="usbphynop1", udc_folder=config.udc_folder()
+    )
+
+    # After the gadget starts up, need time to populate state
+    time.sleep(1)
 
     monitor.begin()
+
+    if monitor.host_connected():
+        LOG.info("USB connected on startup")
+        ser = config.get_handle()
 
     while True:
         rlist = [monitor]
@@ -52,6 +61,7 @@ async def main() -> NoReturn:
             rlist.append(ser)
         ready = select.select(rlist, [], [])[0]
         if monitor in ready:
+            LOG.info("Message from UDEV")
             # Read a new udev messages
             monitor.read_message()
             if ser:
@@ -61,9 +71,10 @@ async def main() -> NoReturn:
             elif monitor.host_connected():
                 LOG.info("New USB host connected")
                 ser = config.get_handle()
+                continue
         if ser and ser in ready:
             # Ready serial data
-            data = ser.read()
+            data = ser.read_all()
             LOG.debug(f"Received: {data}")
             ser.write(data)
 

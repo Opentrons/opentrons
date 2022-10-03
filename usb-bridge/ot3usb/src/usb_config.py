@@ -13,7 +13,6 @@ and a few kernel modules must be running before this program:
 
 - dwc3 (or another USB module)
 - libcomposite (to provide the configuration filesystem)
-- g_serial (to provide /dev/ttyGS0 after configuration)
 """
 
 from dataclasses import dataclass
@@ -107,6 +106,7 @@ class SerialGadget:
         """
         self._driver = driver
         self._config = config
+        self._udc_name: typing.Optional[str] = None
 
         self._basename = os.path.join(GADGET_BASE_PATH, config.name)
 
@@ -124,6 +124,12 @@ class SerialGadget:
         with open(os.path.join(self._basename, filename), mode="w") as f:
             written = f.write(contents)
         return written == len(contents)
+
+    def udc_folder(self) -> str:
+        """Get the folder where UDC configuration lives."""
+        if not self._udc_name:
+            raise Exception("Gadget is not configured")
+        return os.path.join(UDC_HANDLE_FOLDER, self._udc_name)
 
     def configure_and_activate(self) -> None:
         """Configure this gadget. Throws exceptions on errors."""
@@ -183,6 +189,7 @@ class SerialGadget:
             LOG.info("UDC was already uninitialized")
         try:
             self._write_file(udc_handles[0], "UDC")
+            self._udc_name = udc_handles[0]
         except Exception:
             raise Exception("UDC is occupied by another driver!")
         if not self._driver.exists(udc_path):
