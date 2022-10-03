@@ -41,6 +41,7 @@ describe('getProtocolModulesInfo', () => {
         nestedLabwareDef:
           _protocolWithMagTempTC.labwareDefinitions[
             _protocolWithMagTempTC.labware[MAG_LW_ID]
+              //  @ts-expect-error
               .definitionUri as keyof typeof _protocolWithMagTempTC.labwareDefinitions
           ],
         nestedLabwareId: MAG_LW_ID,
@@ -58,6 +59,7 @@ describe('getProtocolModulesInfo', () => {
         nestedLabwareDef:
           _protocolWithMagTempTC.labwareDefinitions[
             _protocolWithMagTempTC.labware[TEMP_LW_ID]
+              //  @ts-expect-error
               .definitionUri as keyof typeof _protocolWithMagTempTC.labwareDefinitions
           ],
         nestedLabwareId: TEMP_LW_ID,
@@ -75,6 +77,7 @@ describe('getProtocolModulesInfo', () => {
         nestedLabwareDef:
           _protocolWithMagTempTC.labwareDefinitions[
             _protocolWithMagTempTC.labware[TC_LW_ID]
+              //  @ts-expect-error
               .definitionUri as keyof typeof _protocolWithMagTempTC.labwareDefinitions
           ],
         nestedLabwareId: TC_LW_ID,
@@ -121,6 +124,7 @@ describe('getProtocolModulesInfo', () => {
         nestedLabwareDef:
           _protocolWithMultipleTemps.labwareDefinitions[
             _protocolWithMultipleTemps.labware[MAG_LW_ID]
+              //  @ts-expect-error
               .definitionUri as keyof typeof _protocolWithMultipleTemps.labwareDefinitions
           ],
         nestedLabwareId: MAG_LW_ID,
@@ -138,6 +142,7 @@ describe('getProtocolModulesInfo', () => {
         nestedLabwareDef:
           _protocolWithMultipleTemps.labwareDefinitions[
             _protocolWithMultipleTemps.labware[TEMP_ONE_LW_ID]
+              //  @ts-expect-error
               .definitionUri as keyof typeof _protocolWithMultipleTemps.labwareDefinitions
           ],
         nestedLabwareId: TEMP_ONE_LW_ID,
@@ -155,6 +160,7 @@ describe('getProtocolModulesInfo', () => {
         nestedLabwareDef:
           _protocolWithMultipleTemps.labwareDefinitions[
             _protocolWithMultipleTemps.labware[TEMP_TWO_LW_ID]
+              //  @ts-expect-error
               .definitionUri as keyof typeof _protocolWithMultipleTemps.labwareDefinitions
           ],
         nestedLabwareId: TEMP_TWO_LW_ID,
@@ -190,6 +196,7 @@ describe('getProtocolModulesInfo', () => {
         nestedLabwareDef:
           _protocolWithMagTempTC.labwareDefinitions[
             _protocolWithMagTempTC.labware[MAG_LW_ID]
+              //  @ts-expect-error
               .definitionUri as keyof typeof _protocolWithMagTempTC.labwareDefinitions
           ],
         nestedLabwareId: MAG_LW_ID,
