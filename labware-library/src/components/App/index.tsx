@@ -38,7 +38,7 @@ export function AppComponent(props: DefinitionRouteRenderProps): JSX.Element {
         detailPage={detailPage}
         sidebar={<Sidebar filters={filters} />}
         content={
-          definition ? (
+          definition && definition.metadata.displayCategory !== 'trash' ? (
             <LabwareDetails definition={definition} />
           ) : (
             <LabwareList filters={filters} />
