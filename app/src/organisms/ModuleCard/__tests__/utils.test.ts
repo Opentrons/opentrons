@@ -50,7 +50,7 @@ describe('getModuleCardImage', () => {
   })
   it('should render the correct image string when there is a thermocycler gen 1 attached with opened lid', () => {
     const result = getModuleCardImage(mockThermocycler)
-    expect(result).toEqual('thermocycler_open_transparent.svg')
+    expect(result).toEqual('thermocycler_open_transparent.png')
   })
   it('should render the correct image string when there is a thermocycler gen 1 attached with closed lid', () => {
     const result = getModuleCardImage(mockThermocyclerGen1ClosedLid)
