@@ -88,8 +88,6 @@ const mockJogControls = DeprecatedJogControls as jest.MockedFunction<
 const PICKUP_TIP_LABWARE_ID = 'PICKUP_TIP_LABWARE_ID'
 const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
-const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
-const TIPRACK_DEF_ID = 'tiprack_DEF_ID'
 const TIPRACK_DEF_URI = 'TIPRACK_DEF'
 const LABWARE_DEF_URI = 'LABWARE_DEF'
 const LABWARE_DEF = {
@@ -175,7 +173,7 @@ describe('DeprecatedLabwarePositionCheckStepDetail', () => {
             },
           },
           labwareDefinitions: {
-            [LABWARE_DEF_ID]: LABWARE_DEF,
+            [`${LABWARE_DEF_URI}_id`]: LABWARE_DEF,
           },
           pipettes: {
             [PRIMARY_PIPETTE_ID]: {
@@ -255,7 +253,7 @@ describe('DeprecatedLabwarePositionCheckStepDetail', () => {
             },
           },
           labwareDefinitions: {
-            [TIPRACK_DEF_ID]: LABWARE_DEF,
+            [`${TIPRACK_DEF_URI}_id`]: LABWARE_DEF,
           },
           pipettes: {
             [PRIMARY_PIPETTE_ID]: {

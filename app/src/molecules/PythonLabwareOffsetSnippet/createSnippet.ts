@@ -25,7 +25,8 @@ export function createSnippet(
         const loadedLabware = protocol.labware[command.result.labwareId]
         if (loadedLabware == null) return acc
         const { loadName } = protocol.labwareDefinitions[
-          loadedLabware.definitionId
+          //  @ts-expect-error
+          loadedLabware.definitionUri
         ].parameters
         if ('slotName' in command.params.location) {
           // load labware on deck
@@ -42,6 +43,7 @@ export function createSnippet(
           protocol.labware,
           protocol.labwareDefinitions
         )
+
         const offsetLocation = getLabwareOffsetLocation(
           command.result.labwareId,
           protocol.commands,
