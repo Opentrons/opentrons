@@ -9,9 +9,28 @@ from . import payloads
 from .. import utils
 
 
+class SingletonMessageIndexGenerator(object):
+    """ Singlton class that generates uinque index values """
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(SingletonMessageIndexGenerator, cls).__new__(cls)
+        return cls.instance
+
+    def get_next_index(self):
+        # increment before returning so we never return 0 as a value
+        self.__current_index += 1
+        return self.__current_index
+
+    __current_index = 0
+
+
 @dataclass
-class BaseMessage:
+class BaseMessage(object):
     """Base class of a message that has an empty payload."""
+
+    def __post_init__(self):
+        index_generator = SingletonMessageIndexGenerator()
+        self.message_index = index_generator.get_next_index()
 
     payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[payloads.EmptyPayload] = payloads.EmptyPayload
