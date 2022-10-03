@@ -20,7 +20,6 @@ def stop_server_ot3() -> None:
     """Stop opentrons-robot-server on the OT3."""
     run(["systemctl", "stop", "opentrons-robot-server"])
 
-
 def build_ot3_hardware_api(
     is_simulating: Optional[bool] = False, use_defaults: Optional[bool] = False
 ) -> ThreadManagedHardwareAPI:
@@ -192,6 +191,9 @@ async def home_ot3(
             api, ax, max_speed_discontinuity=val
         )
 
+async def home_pipette(api: ThreadManagedHardwareAPI, mount: OT3Mount):
+    """Home Plunger"""
+    await api.home_plunger(mount)
 
 def get_endstop_position_ot3(api: ThreadManagedHardwareAPI, mount: OT3Mount) -> Point:
     """Get the endstop's position per mount."""
