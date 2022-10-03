@@ -103,6 +103,8 @@ class MessageId(int, Enum):
     gripper_home_request = 0x43
     add_brushed_linear_move_request = 0x44
 
+    acknowledgement = 0x50
+
     read_presence_sensing_voltage_request = 0x600
     read_presence_sensing_voltage_response = 0x601
 
