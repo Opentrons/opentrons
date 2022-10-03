@@ -25,7 +25,8 @@ export const getLabwarePositionCheckSteps = (
         )
     )
     const pipettes = values(pipettesById)
-    const pipetteNames = pipettes.map(({ name }) => name)
+    //  @ts-expect-error: pipetteName should be name until we remove the schemaV6Adapter
+    const pipetteNames = pipettes.map(({ pipetteName }) => pipetteName)
     const labware = omitBy(
       protocolData.labware,
       (labware, id) =>

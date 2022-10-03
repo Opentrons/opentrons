@@ -1,4 +1,3 @@
-import pick from 'lodash/pick'
 import { when, resetAllWhenMocks } from 'jest-when'
 import _uncasted_v6ProtocolWithTwoPipettes from '@opentrons/shared-data/protocol/fixtures/6/multipleTipracks.json'
 import { getLabwarePositionCheckSteps } from '../getLabwarePositionCheckSteps'
@@ -10,12 +9,23 @@ import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 const protocolWithOnePipette = ({
   ..._uncasted_v6ProtocolWithTwoPipettes,
-  pipettes: pick(
-    _uncasted_v6ProtocolWithTwoPipettes.pipettes,
-    Object.keys(_uncasted_v6ProtocolWithTwoPipettes.pipettes)[0]
-  ),
+  pipettes: {
+    '50d23e00-0042-11ec-8258-f7ffdf5ad45a': {
+      pipetteName: 'p300_single_gen2',
+    },
+  },
 } as unknown) as ProtocolAnalysisFile
-const protocolWithTwoPipettes = (_uncasted_v6ProtocolWithTwoPipettes as unknown) as ProtocolAnalysisFile
+const protocolWithTwoPipettes = ({
+  ..._uncasted_v6ProtocolWithTwoPipettes,
+  pipettes: {
+    '50d23e00-0042-11ec-8258-f7ffdf5ad45a': {
+      pipetteName: 'p300_single_gen2',
+    },
+    'c235a5a0-0042-11ec-8258-f7ffdf5ad45a': {
+      pipetteName: 'p300_multi',
+    },
+  },
+} as unknown) as ProtocolAnalysisFile
 
 jest.mock('../utils/getPrimaryPipetteId')
 jest.mock('../utils/getPipetteWorkflow')
@@ -53,7 +63,8 @@ describe('getLabwarePositionCheckSteps', () => {
 
     when(mockGetPipetteWorkflow)
       .calledWith({
-        pipetteNames: [mockPipette.name],
+        //  @ts-expect-error
+        pipetteNames: [mockPipette.pipetteName],
         primaryPipetteId: 'pipetteId',
         labware: protocolWithOnePipette.labware,
         labwareDefinitions: protocolWithOnePipette.labwareDefinitions,
@@ -99,7 +110,9 @@ describe('getLabwarePositionCheckSteps', () => {
 
     when(mockGetPipetteWorkflow)
       .calledWith({
-        pipetteNames: [mockPipette.name],
+        //  @ts-expect-error
+
+        pipetteNames: [mockPipette.pipetteName],
         primaryPipetteId: 'pipetteId',
         labware: protocolWithOnePipette.labware,
         labwareDefinitions: protocolWithOnePipette.labwareDefinitions,
@@ -147,7 +160,8 @@ describe('getLabwarePositionCheckSteps', () => {
 
     when(mockGetPipetteWorkflow)
       .calledWith({
-        pipetteNames: [rightPipette.name],
+        //  @ts-expect-error
+        pipetteNames: [rightPipette.pipetteName],
         primaryPipetteId: rightPipetteId,
         labware: protocolWithTwoPipettesWithOnlyOneBeingUsed.labware,
         labwareDefinitions:
@@ -182,7 +196,8 @@ describe('getLabwarePositionCheckSteps', () => {
 
     when(mockGetPipetteWorkflow)
       .calledWith({
-        pipetteNames: [leftPipette.name, rightPipette.name],
+        //  @ts-expect-error
+        pipetteNames: [leftPipette.pipetteName, rightPipette.pipetteName],
         primaryPipetteId: leftPipetteId,
         labware: protocolWithTwoPipettes.labware,
         labwareDefinitions: protocolWithTwoPipettes.labwareDefinitions,
