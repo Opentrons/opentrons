@@ -12,6 +12,7 @@
 // so we will re-parse the HTML files and replace their URLs with relative ones.
 console.log('about to get react snap')
 const { run } = require('react-snap')
+console.log(run)
 console.log('got react snap')
 const path = require('path')
 console.log('got path')
