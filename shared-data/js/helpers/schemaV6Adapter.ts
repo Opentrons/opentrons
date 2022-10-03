@@ -23,7 +23,7 @@ export const schemaV6Adapter = (
 ): ProtocolAnalysisFile<{}> | null => {
   if (protocolAnalysis != null && protocolAnalysis.status === 'completed') {
     const pipettes: {
-      [pipetteId: string]: { name: PipetteName }
+      [pipetteId: string]: { pipetteName: PipetteName }
     } = protocolAnalysis.pipettes.reduce((acc, pipette) => {
       return {
         ...acc,
@@ -98,10 +98,27 @@ export const schemaV6Adapter = (
         }
       }, {})
 
-    // @ts-expect-error this is a v6 like object that does not quite match the v6 spec at the moment
+    const liquids: {
+      [liquidId: string]: {
+        displayName: string
+        description: string
+        displayColor?: string
+      }
+    } = protocolAnalysis.liquids?.reduce((acc, liquid) => {
+      return {
+        ...acc,
+        [liquid.id]: {
+          displayName: liquid.displayName,
+          description: liquid.description,
+          displayColor: liquid.displayColor,
+        },
+      }
+    }, {})
     return {
       ...protocolAnalysis,
+      //  @ts-expect-error
       pipettes,
+      liquids,
       labware,
       modules,
       labwareDefinitions,
