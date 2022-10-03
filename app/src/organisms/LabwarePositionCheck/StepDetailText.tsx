@@ -30,7 +30,8 @@ export const StepDetailText = (
     setLabwarePositionCheckStepDetailModal,
   ] = React.useState<boolean>(false)
   if (protocolData == null) return null
-  const labwareDefId = protocolData.labware[labwareId].definitionId
+  //   @ts-expect-error: when we remove schemav6Adapter, defintiionUri will be correct
+  const labwareDefId = protocolData.labware[labwareId].definitionUri
   const labwareDef = protocolData.labwareDefinitions[labwareDefId]
   const { displayName } = labwareDef.metadata
   const { isTiprack } = labwareDef.parameters

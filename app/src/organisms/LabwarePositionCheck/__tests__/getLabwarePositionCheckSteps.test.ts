@@ -9,6 +9,24 @@ import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 const protocolWithOnePipette = ({
   ..._uncasted_v6ProtocolWithTwoPipettes,
+  labware: {
+    fixedTrash: {
+      displayName: 'Trash',
+      definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+    },
+    '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1': {
+      displayName: 'Opentrons 96 Tip Rack 300 µL',
+      definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+    },
+    '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1': {
+      displayName: 'NEST 12 Well Reservoir 15 mL',
+      definitionUri: 'opentrons/nest_12_reservoir_15ml/1',
+    },
+    'e24818a0-0042-11ec-8258-f7ffdf5ad45a': {
+      displayName: 'Opentrons 96 Tip Rack 300 µL (1)',
+      definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+    },
+  },
   pipettes: {
     '50d23e00-0042-11ec-8258-f7ffdf5ad45a': {
       pipetteName: 'p300_single_gen2',
@@ -23,6 +41,24 @@ const protocolWithTwoPipettes = ({
     },
     'c235a5a0-0042-11ec-8258-f7ffdf5ad45a': {
       pipetteName: 'p300_multi',
+    },
+  },
+  labware: {
+    fixedTrash: {
+      displayName: 'Trash',
+      definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+    },
+    '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1': {
+      displayName: 'Opentrons 96 Tip Rack 300 µL',
+      definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
+    },
+    '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1': {
+      displayName: 'NEST 12 Well Reservoir 15 mL',
+      definitionUri: 'opentrons/nest_12_reservoir_15ml/1',
+    },
+    'e24818a0-0042-11ec-8258-f7ffdf5ad45a': {
+      displayName: 'Opentrons 96 Tip Rack 300 µL (1)',
+      definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
     },
   },
 } as unknown) as ProtocolAnalysisFile
@@ -99,7 +135,7 @@ describe('getLabwarePositionCheckSteps', () => {
       labware: {
         ...protocolWithOnePipette.labware,
         unusedTipRackId: {
-          definitionId: 'bogusDefinitionId',
+          definitionUri: 'bogusDefinitionUri',
         },
       },
       labwareDefinitions: {
@@ -120,6 +156,7 @@ describe('getLabwarePositionCheckSteps', () => {
       })
       .mockReturnValue(1)
 
+    //  @ts-expect-error
     getLabwarePositionCheckSteps(protocolWithUnusedTipRack)
 
     expect(mockGetOnePipettePositionCheckSteps).toHaveBeenCalledWith({

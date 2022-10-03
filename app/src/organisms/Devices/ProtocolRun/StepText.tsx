@@ -80,7 +80,8 @@ export function StepText(props: Props): JSX.Element | null {
             ? 'Opentrons Fixed Trash'
             : getLabwareDisplayName(
                 protocolData.labwareDefinitions[
-                  protocolData.labware[labwareId].definitionId
+                  //  @ts-expect-error
+                  `${protocolData.labware[labwareId].definitionUri}_id`
                 ]
               ),
         labware_location: labwareLocation.slotName,

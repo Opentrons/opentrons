@@ -80,7 +80,8 @@ function getLabwareDefinition(
   labware: ProtocolFile<{}>['labware'],
   labwareDefinitions: ProtocolFile<{}>['labwareDefinitions']
 ): ProtocolFile<{}>['labwareDefinitions'][string] {
-  const labwareDefinitionId = labware[labwareId].definitionId
+  //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
+  const labwareDefinitionId = labware[labwareId].definitionUri
   if (labwareDefinitionId == null) {
     throw new Error(
       'expected to be able to find labware definition id for labware, but could not'

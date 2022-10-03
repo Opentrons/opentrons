@@ -17,7 +17,8 @@ export const doesPipetteVisitAllTipracks = (
   const numberOfTipracks = reduce(
     labware,
     (numberOfTipracks, currentLabware) => {
-      const labwareDef = labwareDefinitions[currentLabware.definitionId]
+      //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
+      const labwareDef = labwareDefinitions[currentLabware.definitionUri]
       return getIsTiprack(labwareDef) ? numberOfTipracks + 1 : numberOfTipracks
     },
     0

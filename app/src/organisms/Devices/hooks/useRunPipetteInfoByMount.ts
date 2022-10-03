@@ -78,7 +78,8 @@ export function useRunPipetteInfoByMount(
         >((acc, command) => {
           if (pipetteId === command.params?.pipetteId) {
             const tipRack = labware[command.params?.labwareId]
-            const tipRackDefinition = labwareDefinitions[tipRack.definitionId]
+            //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
+            const tipRackDefinition = labwareDefinitions[tipRack.definitionUri]
 
             if (tipRackDefinition != null && !acc.includes(tipRackDefinition)) {
               return [...acc, tipRackDefinition]
@@ -147,7 +148,9 @@ function getRequestedPipetteMatch(
     attachedPipette?.modelSpecs?.backCompatNames.includes(requestedPipetteName)
   ) {
     return INEXACT_MATCH
-  } else if (requestedPipetteName === attachedPipette?.modelSpecs?.name) {
+  } else if (
+    requestedPipetteName === attachedPipette?.modelSpecs?.name
+  ) {
     return MATCH
   } else {
     return INCOMPATIBLE

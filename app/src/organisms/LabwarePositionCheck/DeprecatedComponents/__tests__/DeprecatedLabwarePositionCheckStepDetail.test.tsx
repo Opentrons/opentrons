@@ -90,6 +90,8 @@ const PRIMARY_PIPETTE_ID = 'PRIMARY_PIPETTE_ID'
 const PRIMARY_PIPETTE_NAME = 'PRIMARY_PIPETTE_NAME'
 const LABWARE_DEF_ID = 'LABWARE_DEF_ID'
 const TIPRACK_DEF_ID = 'tiprack_DEF_ID'
+const TIPRACK_DEF_URI = 'TIPRACK_DEF'
+const LABWARE_DEF_URI = 'LABWARE_DEF'
 const LABWARE_DEF = {
   ordering: [['A1', 'A2']],
 }
@@ -169,7 +171,7 @@ describe('DeprecatedLabwarePositionCheckStepDetail', () => {
             [mockLabwarePositionCheckStepTipRack.labwareId]: {
               slot: '1',
               displayName: 'someDislpayName',
-              definitionId: LABWARE_DEF_ID,
+              definitionUri: LABWARE_DEF_URI,
             },
           },
           labwareDefinitions: {
@@ -249,7 +251,7 @@ describe('DeprecatedLabwarePositionCheckStepDetail', () => {
             [mockLabwarePositionCheckStepTipRack.labwareId]: {
               slot: '1',
               displayName: 'someDislpayName',
-              definitionId: TIPRACK_DEF_ID,
+              definitionUri: TIPRACK_DEF_URI,
             },
           },
           labwareDefinitions: {

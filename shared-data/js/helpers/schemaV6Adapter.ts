@@ -35,7 +35,7 @@ export const schemaV6Adapter = (
 
     const labware: {
       [labwareId: string]: {
-        definitionId: string
+        definitionUri: string
         displayName?: string
       }
     } = protocolAnalysis.labware.reduce((acc, labware) => {
@@ -54,7 +54,7 @@ export const schemaV6Adapter = (
       return {
         ...acc,
         [labwareId]: {
-          definitionId: `${labware.definitionUri}_id`,
+          definitionUri: `${labware.definitionUri}`,
           displayName: displayName,
         },
       }
@@ -118,6 +118,7 @@ export const schemaV6Adapter = (
       ...protocolAnalysis,
       //  @ts-expect-error
       pipettes,
+      //  @ts-expect-error
       labware,
       modules,
       liquids,

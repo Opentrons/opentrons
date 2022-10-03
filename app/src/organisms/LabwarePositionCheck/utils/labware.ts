@@ -44,7 +44,8 @@ export const getTiprackIdsInOrder = (
   const unorderedTipracks = reduce<typeof labware, LabwareToOrder[]>(
     labware,
     (tipracks, currentLabware, labwareId) => {
-      const labwareDef = labwareDefinitions[currentLabware.definitionId]
+      //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
+      const labwareDef = labwareDefinitions[currentLabware.definitionUri]
       const isTiprack = getIsTiprack(labwareDef)
       if (isTiprack) {
         const labwareLocation = getLabwareLocation(labwareId, commands)
@@ -95,7 +96,8 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
 
   const orderedTiprackIds = tipracksVisited
     .map<LabwareToOrder>(tiprackId => {
-      const labwareDefId = labware[tiprackId].definitionId
+      //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
+      const labwareDefId = labware[tiprackId].definitionUri
       const definition = labwareDefinitions[labwareDefId]
       const tiprackLocation = getLabwareLocation(tiprackId, commands)
       if (!('slotName' in tiprackLocation)) {
@@ -122,7 +124,8 @@ export const getLabwareIdsInOrder = (
   const unorderedLabware = reduce<typeof labware, LabwareToOrder[]>(
     labware,
     (unorderedLabware, currentLabware, labwareId) => {
-      const labwareDef = labwareDefinitions[currentLabware.definitionId]
+      //  @ts-expect-error: will be an error until we remove the schemaV6Adapter
+      const labwareDef = labwareDefinitions[currentLabware.definitionUri]
       const isTiprack = getIsTiprack(labwareDef)
       const labwareLocation = getLabwareLocation(labwareId, commands)
       // skip any labware that is not a tiprack
