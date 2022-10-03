@@ -10,7 +10,7 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     GantryLoadSettings,
     set_gantry_load_per_axis_settings_ot3,
     home_ot3,
-    home_pipette
+    home_pipette,
     get_endstop_position_ot3,
 )
 
@@ -29,16 +29,16 @@ def _create_relative_point(axis: OT3Axis, distance: float) -> Point:
     raise ValueError(f"Unexpected axis: {axis}")
 
 
-async def _test_home_pipette(api: ThreadManagedHardwareAPI, mount: MountOT3) -> None:
-    await home_pipette(mount)
+async def _test_home_pipette(api: ThreadManagedHardwareAPI, mount: OT3Mount) -> None:
+    await api.home_plunger(mount)
 
 
 async def _test_move_plunger(
-    api: ThreadManagedHardwareAPI, mount: MountOT3, plunger_distance: float)-> None:
-    await api._backend.set_active_current({OT3Axis.from_axis(mount)})
+    api: ThreadManagedHardwareAPI, mount: OT3Mount, plunger_distance: float)-> None:
+    await api._backend.set_active_current({OT3Axis.of_main_tool_actuator(mount)})
     target_pos = target_position_from_plunger(OT3Mount.from_mount(mount),
                                               plunger_distance,
-                                              api.current_position)
+                                              api._current_position)
     await api._move(target_pos,
                     speed = PIPETTE_SPEED,
                     home_flagged_axes = False,
@@ -52,7 +52,7 @@ async def _test_encoder(
     enc_start = await api.encoder_current_position(mount=MOUNT, refresh=True)
     rel_pnt = _create_relative_point(axis, distance)
     input("ready?")
-    await api.move_rel(mount=MOUNT, delta=rel_pnt)
+    await _test_move_plunger(api, mount= MOUNT, plunger_distance= 10)
     pos_end = await api.current_position_ot3(mount=MOUNT, refresh=True)
     enc_end = await api.encoder_current_position(mount=MOUNT, refresh=True)
     print(f"Position:\n\tstart={pos_start}\n\tend={pos_end}")
@@ -85,13 +85,16 @@ async def _test_limit_switch(
 
 
 async def _main(api: ThreadManagedHardwareAPI) -> None:
+    await home_ot3(api, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+    switches = await api.get_limit_switches()
+    print(switches)
     await _test_home_pipette(api, MOUNT)
-    await _test_encoder(api, axis=OT3Axis.by_mount(MOUNT))
-    await api.disengage_axes([OT3Axis.by_mount(MOUNT)])
+    await _test_encoder(api, axis=OT3Axis.by_mount(MOUNT), distance = 10)
+    input("Enter to disengage the pipette")
+    await api.disengage_axes([OT3Axis.of_main_tool_actuator(MOUNT)])
     input("ENTER to re-engage")
-    await api.engage_axes([OT3Axis.by_mount(MOUNT)])
-    input("ENTER to home")
-    await _safe_home(api, mount)
+    await api.engage_axes([OT3Axis.of_main_tool_actuator(MOUNT)])
+    input("Check Motor if engaged")
 
 
 if __name__ == "__main__":
