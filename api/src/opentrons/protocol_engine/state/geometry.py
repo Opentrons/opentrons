@@ -13,7 +13,6 @@ from ..types import (
     WellOffset,
     DeckSlotLocation,
     ModuleLocation,
-    OffDeckLocationType,
 )
 from .labware import LabwareView
 from .modules import ModuleView
@@ -281,7 +280,14 @@ class GeometryView:
 
         if isinstance(labware.location, DeckSlotLocation):
             slot_name = labware.location.slotName
-        else:
+        elif isinstance(labware.location, ModuleLocation):
             module_id = labware.location.moduleId
             slot_name = self._modules.get_location(module_id).slotName
+        else:
+            # Labware is off-deck
+            raise errors.LabwareNotOnDeckError(
+                f"Labware {labware_id} does not have a slot associated with it"
+                f" since it is no longer on the deck."
+            )
+
         return slot_name

@@ -14,7 +14,6 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     DeckSlotLocation,
     ModuleLocation,
-    OffDeckLocationType,
     LoadedLabware,
     LoadedModule,
     WellLocation,

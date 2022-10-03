@@ -10,7 +10,6 @@ from .types import (
     LabwareParameters,
     Point,
     DeckSlotLocation,
-    ModuleLocation,
 )
 from .well import Well
 from ..protocols.models import LabwareDefinition
@@ -84,7 +83,6 @@ class Labware:  # noqa: D101
             return str(parent.slotName)
         else:
             raise NotImplementedError("Not yet implemented for labware on modules.")
-
 
     # TODO(mc, 2021-05-03): document removal of name setter
     @property

@@ -30,6 +30,7 @@ from ..state import StateStore, HardwareModule
 from ..types import (
     LabwareLocation,
     DeckSlotLocation,
+    ModuleLocation,
     LabwareOffsetLocation,
     ModuleModel,
     ModuleDefinition,
@@ -319,7 +320,7 @@ class EquipmentHandler:
         if isinstance(labware_location, DeckSlotLocation):
             slot_name = labware_location.slotName
             module_model = None
-        else:
+        elif isinstance(labware_location, ModuleLocation):
             module_id = labware_location.moduleId
             # Allow ModuleNotLoadedError to propagate.
             module_model = self._state_store.modules.get_model(module_id=module_id)
@@ -327,6 +328,10 @@ class EquipmentHandler:
                 module_id=module_id
             )
             slot_name = module_location.slotName
+        else:
+            # No offset for off-deck location. This would allow loading a labware with
+            # 'off-deck' as valid location.
+            return None
 
         offset = self._state_store.labware.find_applicable_labware_offset(
             definition_uri=labware_definition_uri,

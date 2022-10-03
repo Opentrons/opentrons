@@ -39,7 +39,6 @@ class Params(BaseModel):
     mount: Optional[str]
     moduleId: Optional[str]
     location: Optional[Location]
-    newLocation: Optional[Location]     # TODO: remove this before merging
     labwareId: Optional[str]
     displayName: Optional[str]
     liquidId: Optional[str]
