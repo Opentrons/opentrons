@@ -22,7 +22,9 @@ NAME_TAG = "OF_NAME"
 class USBConnectionMonitor:
     """Class to monitor host connections over the USB Serial line."""
 
-    def __init__(self, phy_udev_name: str, udc_folder: str) -> None:
+    def __init__(
+        self, phy_udev_name: str, udc_folder: str, monitor: pyudev.Monitor
+    ) -> None:
         """Initialize a USBConnectionMonitor.
 
         Args:
@@ -31,21 +33,17 @@ class USBConnectionMonitor:
 
             udc_folder: The full path to the folder with the hardware info for
             the UDC
+
+            monitor: A handle to a pyudev monitor to receive udev messages
         """
         self._phy_udev_name = phy_udev_name
         self._udc_folder = udc_folder
-
-        self._udev_ctx = pyudev.Context()
-
-        self._monitor = pyudev.Monitor.from_netlink(self._udev_ctx)
-        self._monitor.filter_by(subsystem="platform")
-
+        self._monitor = monitor
         self._host_connected = False
 
     def fileno(self) -> int:
         """Returns a selectable fileno for the udev message stream."""
         fn = self._monitor.fileno()
-        LOG.debug(f"fileno={fn}")
         return int(fn)
 
     def begin(self) -> None:
@@ -77,11 +75,28 @@ class USBConnectionMonitor:
             if name == self._phy_udev_name:
                 self._host_connected = self._read_state()
 
+    def update_state(self) -> None:
+        """Force a state update by polling."""
+        self._host_connected = self._read_state()
+
     def _read_state(self) -> bool:
         fp = os.path.join(self._udc_folder, "state")
         try:
             state = open(fp, mode="r").read()
             LOG.debug(f"state={state}")
-            return state.startswith("configured")
+            return state.startswith("configured")  # or state.startswith('suspended')
         except Exception:
             return False
+
+
+class USBConnectionMonitorFactory:
+    """Factory class to construct a USBConnectionMonitor."""
+
+    @staticmethod
+    def create(phy_udev_name: str, udc_folder: str) -> USBConnectionMonitor:
+        """Factory function to create the USBConnectionMonitor."""
+        context = pyudev.Context()
+        monitor = pyudev.Monitor.from_netlink(context)
+        monitor.filter_by(subsystem="platform")
+
+        return USBConnectionMonitor(phy_udev_name, udc_folder, monitor)

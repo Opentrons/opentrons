@@ -18,17 +18,33 @@ def update_ser_handle(
 
     Args:
         config: Serial gadget configuration
+
         ser: Handle for the serial port
+
         connected: Whether the monitor reports the serial handle as
         connected or not
     """
     if ser and not connected:
         LOG.info("USB host disconnected")
         ser = None
-    elif connected:
+    elif connected and not ser:
         LOG.info("New USB host connected")
         ser = config.get_handle()
     return ser
+
+
+def check_monitor(monitor: usb_monitor.USBConnectionMonitor, msg_ready: bool) -> None:
+    """Order the monitor to update its status.
+
+    If a message is ready then the update is performed based on the message,
+    otherwise it is polled by the state file (for cases where the messages do
+    not signal before configuration completes).
+    """
+    if msg_ready:
+        monitor.read_message()
+    else:
+        # Force a poll
+        monitor.update_state()
 
 
 def listen(
@@ -46,22 +62,31 @@ def listen(
 
     Args:
         monitor: The USB connection monitor
+
         config: Serial gadget configuration
+
         ser: Handle for the serial port
     """
     rlist = [monitor]
     if ser:
         rlist.append(ser)
-    ready = select.select(rlist, [], [])[0]
-    if monitor in ready:
+    ready = select.select(rlist, [], [], 1.0)[0]
+    if len(ready) == 0 or monitor in ready:
         # Read a new udev messages
-        monitor.read_message()
+        check_monitor(monitor, monitor in ready)
         ser = update_ser_handle(config, ser, monitor.host_connected())
+        # ALWAYS exit early if we had a change in udev messages
+        return ser
     if ser and ser in ready:
         # Ready serial data
-        data = ser.read_all()
-        LOG.debug(f"Received: {data}")
-        ser.write(data)
+        try:
+            data = ser.read_all()
+            LOG.debug(f"Received: {data}")
+            ser.write(data)
+        except OSError:
+            LOG.debug("Got an OSError when disconnecting")
+            monitor.update_state()
+            ser = update_ser_handle(config, ser, monitor.host_connected())
     return ser
 
 
@@ -98,7 +123,7 @@ async def main() -> NoReturn:
 
     ser = None
 
-    monitor = usb_monitor.USBConnectionMonitor(
+    monitor = usb_monitor.USBConnectionMonitorFactory.create(
         phy_udev_name="usbphynop1", udc_folder=config.udc_folder()
     )
 
