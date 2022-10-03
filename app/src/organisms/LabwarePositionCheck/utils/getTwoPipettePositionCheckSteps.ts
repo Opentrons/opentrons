@@ -3,7 +3,7 @@ import { DEPRECATED_SECTIONS } from '../constants'
 import {
   getLabwareIdsInOrder,
   getAllTipracksIdsThatPipetteUsesInOrder,
-} from './labware'
+} from './deprecatedLabware'
 import {
   getMoveToTiprackSteps,
   getPickupTipStep,

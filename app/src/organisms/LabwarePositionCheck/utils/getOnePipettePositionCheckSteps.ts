@@ -1,5 +1,5 @@
 import { DEPRECATED_SECTIONS } from '../constants'
-import { getLabwareIdsInOrder, getTiprackIdsInOrder } from './labware'
+import { getLabwareIdsInOrder, getTiprackIdsInOrder } from './deprecatedLabware'
 import {
   getMoveToTiprackSteps,
   getPickupTipStep,

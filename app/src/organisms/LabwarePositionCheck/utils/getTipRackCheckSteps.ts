@@ -3,14 +3,7 @@ import { SECTIONS } from '../constants'
 import {
   getLabwareIdsInOrder,
   getAllTipracksIdsThatPipetteUsesInOrder,
-  getTiprackIdsInOrder
 } from './labware'
-import {
-  getMoveToTiprackSteps,
-  getPickupTipStep,
-  getMoveToLabwareSteps,
-  getDropTipStep,
-} from './deprecatedStepCreators'
 import type {
   LabwareDefinition2,
   RunTimeCommand,
@@ -60,8 +53,6 @@ export const getLabwarePositionCheckSteps = (args: LPCArgs): LabwarePositionChec
     { section: SECTIONS.RESULTS_SUMMARY},
   ]
 }
-
-
 
 function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
   const { secondaryPipetteId, primaryPipetteId, commands, labware } = args
