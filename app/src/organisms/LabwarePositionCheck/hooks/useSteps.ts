@@ -8,22 +8,28 @@ import {
 import { getLabwarePositionCheckSteps } from '../getLabwarePositionCheckSteps'
 import type { LabwarePositionCheckStep } from '../types'
 
-export function useDeprecatedSteps(runId: string | null): LabwarePositionCheckStep[] {
+export function useSteps(runId: string | null): LabwarePositionCheckStep[] {
   const [LPCSteps, setLPCSteps] = React.useState<LabwarePositionCheckStep[]>([])
-
-  const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = {data: {data: {protocolId: '234'}}}//useRunQuery(runId, { staleTime: Infinity })
+  console.log('runRecord', runRecord)
   const protocolId = runRecord?.data?.protocolId ?? null
+  console.log('protocolId', protocolId)
 
-  const { data: protocolAnalyses } = useProtocolAnalysesQuery(
-    protocolId,
-    { staleTime: Infinity }
-  )
+  const { data: protocolAnalyses } ={data:[] }
+  // useProtocolAnalysesQuery(
+  //   protocolId,
+  //   { staleTime: Infinity }
+  // )
+  console.log('protocolAnalyses', protocolAnalyses)
 
   const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
 
+  console.log('mostRecentAnalysis', mostRecentAnalysis)
   if (mostRecentAnalysis == null) return [] // this state should never be reached
+
   if (LPCSteps.length === 0) {
     setLPCSteps(getLabwarePositionCheckSteps(mostRecentAnalysis))
   }
-  return LPCSteps
+  console.log('LPCSteps', LPCSteps)
+  return LPCSteps 
 }

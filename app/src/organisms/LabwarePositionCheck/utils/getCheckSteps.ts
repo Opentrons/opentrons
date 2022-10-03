@@ -16,7 +16,7 @@ import type { LabwareLocation, LoadModuleRunTimeCommand } from '@opentrons/share
 
 interface LPCArgs {
   primaryPipetteId: string
-  secondaryPipetteId: string
+  secondaryPipetteId: string | null
   labware: ProtocolAnalysisOutput['labware']
   modules: ProtocolAnalysisOutput['modules']
   commands: RunTimeCommand[]
@@ -26,7 +26,7 @@ const OT2_STANDARD_DECK_DEF = standardDeckDef as any
 
 const PICK_UP_TIP_LOCATION: LabwareLocation = { slotName: '2' }
 
-export const getLabwarePositionCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
+export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
   const checkTipRacksSectionSteps = getCheckTipRackSectionSteps(args)
   if (checkTipRacksSectionSteps.length < 1) return []
 
@@ -47,6 +47,8 @@ export const getLabwarePositionCheckSteps = (args: LPCArgs): LabwarePositionChec
     location: PICK_UP_TIP_LOCATION
   }
 
+  console.log('checkTipRacksSectionSteps', checkTipRacksSectionSteps)
+  console.log('checkLabwareSectionSteps', checkLabwareSectionSteps)
   return [
     { section: SECTIONS.BEFORE_BEGINNING },
     ...checkTipRacksSectionSteps,

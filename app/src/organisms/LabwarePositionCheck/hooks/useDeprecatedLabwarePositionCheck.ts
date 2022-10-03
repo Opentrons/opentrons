@@ -22,7 +22,7 @@ import {
 import { useProtocolDetailsForRun } from '../../Devices/hooks'
 import { getLabwareLocation } from '../../Devices/ProtocolRun/utils/getLabwareLocation'
 import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
-import { useSteps } from './useSteps'
+import { useDeprecatedSteps } from './useDeprecatedSteps'
 import type {
   HostConfig,
   RunCommandSummary,
@@ -235,7 +235,7 @@ const isLoadLabwareCommand = (
   command: RunTimeCommand
 ): command is LoadLabwareRunTimeCommand => command.commandType === 'loadLabware'
 
-export function useLabwarePositionCheck(
+export function useDeprecatedLabwarePositionCheck(
   addSavePositionCommandData: (commandId: string, labwareId: string) => void,
   savePositionCommandData: SavePositionCommandData
 ): LabwarePositionCheckUtils {
@@ -265,9 +265,7 @@ export function useLabwarePositionCheck(
   const { createCommand } = useCreateCommandMutation()
   const host = useHost()
   const trackEvent = useTrackEvent()
-  const LPCSteps = useSteps(currentRunId)
-
-  console.log('STEPS', LPCSteps)
+  const LPCSteps = useDeprecatedSteps(currentRunId)
 
   const LPCCommands = LPCSteps.reduce<LabwarePositionCheckCreateCommand[]>(
     (commands, currentStep) => {
