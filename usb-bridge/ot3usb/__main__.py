@@ -11,6 +11,26 @@ from .src import cli, usb_config, default_config, usb_monitor
 LOG = logging.getLogger(__name__)
 
 
+def update_ser_handle(
+    config: usb_config.SerialGadget, ser: Optional[serial.Serial], connected: bool
+) -> Optional[serial.Serial]:
+    """Updates the serial handle for connections and disconnections.
+
+    Args:
+        config: Serial gadget configuration
+        ser: Handle for the serial port
+        connected: Whether the monitor reports the serial handle as
+        connected or not
+    """
+    if ser and not connected:
+        LOG.info("USB host disconnected")
+        ser = None
+    elif connected:
+        LOG.info("New USB host connected")
+        ser = config.get_handle()
+    return ser
+
+
 def listen(
     monitor: usb_monitor.USBConnectionMonitor,
     config: usb_config.SerialGadget,
@@ -20,9 +40,14 @@ def listen(
 
     This function will check for input from any of the input sources to the
     USB bridge:
-    - The serial port, if it is available
-    - The UDEV message stream (usb_monitor)
-    - The TCP connection to the NGINX server, if a connection is open
+        - The serial port, if it is available
+        - The UDEV message stream (usb_monitor)
+        - The TCP connection to the NGINX server, if a connection is open
+
+    Args:
+        monitor: The USB connection monitor
+        config: Serial gadget configuration
+        ser: Handle for the serial port
     """
     rlist = [monitor]
     if ser:
@@ -31,13 +56,7 @@ def listen(
     if monitor in ready:
         # Read a new udev messages
         monitor.read_message()
-        if ser:
-            if not monitor.host_connected():
-                LOG.info("USB host disconnected")
-                ser = None
-        elif monitor.host_connected():
-            LOG.info("New USB host connected")
-            ser = config.get_handle()
+        ser = update_ser_handle(config, ser, monitor.host_connected())
     if ser and ser in ready:
         # Ready serial data
         data = ser.read_all()
