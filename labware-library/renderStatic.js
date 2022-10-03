@@ -10,15 +10,24 @@
 //
 // React-snap does not yet support this, see https://github.com/stereobooster/react-snap/issues/397
 // so we will re-parse the HTML files and replace their URLs with relative ones.
+console.log('about to get react snap')
 const { run } = require('react-snap')
+console.log('got react snap')
 const path = require('path')
+console.log('got path')
 const fs = require('fs-extra')
+console.log('got fs-extra')
 const globby = require('globby')
+console.log('got globby')
 const rehype = require('rehype')
+console.log('got rehype')
 const rehypeUrls = require('rehype-urls')
+console.log('got rehype-urls')
 
 const outputPath = 'dist'
 const outputPathAbs = path.join(__dirname, outputPath)
+
+console.log('about to call react snap run function')
 
 run({
   source: outputPath,
