@@ -4,6 +4,23 @@ When a usb serial gadget is configured, a tty handle is created by udev
 immediately and it remains in the filesystem indefinitely. This makes it
 impossible to distinguish the presence of a serial port directly; instead,
 this module hooks into the udev message stream on the system to check for
+messages pertaining to the connection status of the USB gadget.
+
+Unfortunately, no UDEV messages directly contain the configuration status
+of the USB gadget; however, when a new USB host connects to the PHY, there
+is a series of UDEV messages. By filtering for these, it is possible for the
+software to roughly monitor the connection status of the USB gadget by
+polling a file `/sys/class/udc/<UDC name>/state`.
+
+There are some caveats to this setup:
+- The UDEV messages to not strictly correlate with the connection status.
+Therefore, it's important to also periodically poll the connection if there
+haven't been any new messages. This is possibly only an issue for messages
+when a new host is connected.
+- Serial ports will sometimes signal readiness with the POSIX Select after
+they have been disconnected but before the UDEV messages start to appear.
+In that case, it is important to check for an OSError on the port while
+reading new data.
 
 """
 import pyudev  # type: ignore[import]
