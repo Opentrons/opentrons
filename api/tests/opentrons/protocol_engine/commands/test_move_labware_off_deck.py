@@ -13,12 +13,12 @@ from opentrons.protocol_engine.commands.move_labware_off_deck import (
 )
 
 
-async def test_load_labware_implementation(
+async def test_move_labware_off_deck_implementation(
     decoy: Decoy,
     run_control: RunControlHandler,
     state_view: StateView,
 ) -> None:
-    """It should delegate to the equipment handler."""
+    """It should pause the run."""
     subject = MoveLabwareOffDeckImplementation(
         state_view=state_view, run_control=run_control
     )
@@ -31,7 +31,7 @@ async def test_load_labware_implementation(
     assert result == MoveLabwareOffDeckResult()
 
 
-async def test_load_labware_implementation_raises(
+async def test_move_labware_off_deck_raises(
     decoy: Decoy,
     run_control: RunControlHandler,
     state_view: StateView,
