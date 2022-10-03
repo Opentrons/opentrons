@@ -113,7 +113,6 @@ export const schemaV6Adapter = (
         },
       }
     }, {})
-
     return {
       ...protocolAnalysis,
       //  @ts-expect-error
