@@ -7,8 +7,14 @@ import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
 import {
   FIXED_TRASH_ID,
+  GEN2,
+  GEN3,
+  getPipetteNameSpecs,
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
+  OT3_STANDARD_DECKID,
+  OT3_STANDARD_MODEL,
+  PipetteName,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getFileMetadata } from './fileFields'
@@ -23,6 +29,7 @@ import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
+import { swatchColors } from '../../components/swatchColors'
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
@@ -46,7 +53,6 @@ import type {
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import { swatchColors } from '../../components/swatchColors'
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
 if (isEmpty(process.env.OT_PD_VERSION))
@@ -283,6 +289,36 @@ export const createFile: Selector<ProtocolFile> = createSelector(
 
     const commands = [...loadCommands, ...nonLoadCommands]
 
+    interface RobotModel {
+      [pipetteId: string]: { name: PipetteName }
+    }
+
+    const getRobotModelFromPipettes = (
+      pipettes: RobotModel
+    ): {
+      model: typeof OT2_STANDARD_MODEL | typeof OT3_STANDARD_MODEL
+      deckId: typeof OT2_STANDARD_DECKID | typeof OT3_STANDARD_DECKID
+    } => {
+      const loadedPipettes = Object.values(pipettes)
+      const pipetteGEN = loadedPipettes.some(
+        pipette => getPipetteNameSpecs(pipette.name)?.displayCategory === GEN3
+      )
+        ? GEN3
+        : GEN2
+      switch (pipetteGEN) {
+        case GEN3:
+          return {
+            model: OT3_STANDARD_MODEL,
+            deckId: OT3_STANDARD_DECKID,
+          }
+        default:
+          return {
+            model: OT2_STANDARD_MODEL,
+            deckId: OT2_STANDARD_DECKID,
+          }
+      }
+    }
+
     const protocolFile = {
       metadata: {
         protocolName: name,
@@ -296,10 +332,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         tags: [],
       },
       designerApplication,
-      robot: {
-        model: OT2_STANDARD_MODEL,
-        deckId: OT2_STANDARD_DECKID,
-      },
+      robot: getRobotModelFromPipettes(pipettes),
       pipettes,
       labware,
       liquids,

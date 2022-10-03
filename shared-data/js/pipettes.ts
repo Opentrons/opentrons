@@ -62,5 +62,8 @@ function comparePipettes(sortBy: SortableProps[]) {
 }
 
 export function shouldLevel(specs: PipetteNameSpecs): boolean {
-  return specs.displayCategory === 'GEN2' && specs.channels === 8
+  return (
+    (specs.displayCategory === 'GEN2' || specs.displayCategory === 'GEN3') &&
+    specs.channels === 8
+  )
 }

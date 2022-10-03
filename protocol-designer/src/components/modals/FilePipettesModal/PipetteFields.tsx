@@ -6,15 +6,19 @@ import {
   PipetteSelect,
   OutlineButton,
   Mount,
+  SelectOption,
 } from '@opentrons/components'
 import {
+  getAllPipetteNames,
   getLabwareDefURI,
   getLabwareDisplayName,
+  getPipetteNameSpecs,
   OT3_PIPETTES,
 } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
 import { i18n } from '../../../localization'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { PipetteDiagram } from './PipetteDiagram'
@@ -24,6 +28,8 @@ import formStyles from '../../forms/forms.css'
 
 import { FormPipettesByMount } from '../../../step-forms'
 import { DropdownOption } from '../../../../../components/src/forms/DropdownField'
+
+import type { PipetteName } from '@opentrons/shared-data'
 
 export interface Props {
   initialTabIndex?: number
@@ -61,6 +67,12 @@ export interface Props {
 interface PipetteSelectProps {
   mount: Mount
   tabIndex: number
+  filteredOptions?: SelectOption[]
+}
+
+interface GEN3PipetteOptions {
+  value: PipetteName
+  label: string | undefined
 }
 
 export function PipetteFields(props: Props): JSX.Element {
@@ -78,12 +90,26 @@ export function PipetteFields(props: Props): JSX.Element {
 
   const allLabware = useSelector(getLabwareDefsByURI)
 
+  const enableOT3Support = useSelector(featureFlagSelectors.getEnabledOT3)
+
+  // TODO(sh, 2022-09-29): remove this list of OT-3 tip racks when the feature flag is removed
+  const OT_3_TIP_RACKS = [
+    'opentrons_ot3_96_tiprack_200ul',
+    'opentrons_ot3_96_tiprack_1000ul',
+    'opentrons_ot3_96_tiprack_50ul',
+  ]
+
   type Values<T> = T[keyof T]
 
   const tiprackOptions = reduce<typeof allLabware, DropdownOption[]>(
     allLabware,
     (acc, def: Values<typeof allLabware>) => {
-      if (def.metadata.displayCategory !== 'tipRack') return acc
+      if (
+        (!enableOT3Support &&
+          OT_3_TIP_RACKS.includes(def.parameters.loadName)) ||
+        def.metadata.displayCategory !== 'tipRack'
+      )
+        return acc
       return [
         ...acc,
         {
@@ -97,8 +123,23 @@ export function PipetteFields(props: Props): JSX.Element {
 
   const initialTabIndex = props.initialTabIndex || 1
 
+  const getGEN3PipetteOptions = (
+    pipettes: PipetteName[]
+  ): GEN3PipetteOptions[] => {
+    const getGEN3Pipettes = pipettes.filter(
+      pipette => getPipetteNameSpecs(pipette)?.displayCategory === 'GEN3'
+    )
+    const options = getGEN3Pipettes.map(pipette => {
+      return {
+        value: pipette,
+        label: getPipetteNameSpecs(pipette)?.displayName,
+      }
+    })
+    return options
+  }
+
   const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
-    const { tabIndex, mount } = props
+    const { tabIndex, mount, filteredOptions } = props
     const pipetteName = values[mount].pipetteName
 
     return (
@@ -115,8 +156,9 @@ export function PipetteFields(props: Props): JSX.Element {
           onSetFieldValue(targetToClear, null)
           onSetFieldTouched(targetToClear, false)
         }}
-        nameBlocklist={OT3_PIPETTES}
+        nameBlocklist={enableOT3Support ? [] : OT3_PIPETTES}
         id={`PipetteSelect_${mount}`}
+        filteredOptions={filteredOptions}
       />
     )
   }
@@ -133,6 +175,11 @@ export function PipetteFields(props: Props): JSX.Element {
             {renderPipetteSelect({
               mount: 'left',
               tabIndex: initialTabIndex + 1,
+              filteredOptions:
+                getPipetteNameSpecs(values.right.pipetteName as PipetteName)
+                  ?.displayCategory === 'GEN3'
+                  ? getGEN3PipetteOptions(getAllPipetteNames())
+                  : [],
             })}
           </FormGroup>
           <FormGroup
@@ -178,6 +225,11 @@ export function PipetteFields(props: Props): JSX.Element {
             {renderPipetteSelect({
               mount: 'right',
               tabIndex: initialTabIndex + 3,
+              filteredOptions:
+                getPipetteNameSpecs(values.left.pipetteName as PipetteName)
+                  ?.displayCategory === 'GEN3'
+                  ? getGEN3PipetteOptions(getAllPipetteNames())
+                  : [],
             })}
           </FormGroup>
           <FormGroup
