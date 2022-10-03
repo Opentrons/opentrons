@@ -28,7 +28,6 @@ interface LPCArgs {
   primaryPipetteId: string
   secondaryPipetteId: string
   labware: ProtocolAnalysisOutput['labware']
-  labwareDefinitions: Record<string, LabwareDefinition2>
   modules: ProtocolAnalysisOutput['modules']
   commands: RunTimeCommand[]
 }
@@ -65,19 +64,17 @@ export const getLabwarePositionCheckSteps = (args: LPCArgs): LabwarePositionChec
 
 
 function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
-  const { secondaryPipetteId, primaryPipetteId, commands, labware, labwareDefinitions } = args
+  const { secondaryPipetteId, primaryPipetteId, commands, labware } = args
   const orderedTiprackIdsThatSecondaryPipetteUses = getAllTipracksIdsThatPipetteUsesInOrder(
     secondaryPipetteId,
     commands,
     labware,
-    labwareDefinitions
   )
 
   const orderedTiprackIdsThatPrimaryPipetteUses = getAllTipracksIdsThatPipetteUsesInOrder(
     primaryPipetteId,
     commands,
     labware,
-    labwareDefinitions
   )
 
   const orderedTiprackIdsThatOnlySecondaryPipetteUses = orderedTiprackIdsThatSecondaryPipetteUses.filter(
@@ -104,8 +101,8 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
 }
 
 function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
-  const {labware, labwareDefinitions, modules, commands, primaryPipetteId} = args
-  const orderedLabwareIds = getLabwareIdsInOrder(labware, labwareDefinitions, modules, commands)
+  const {labware, commands, primaryPipetteId} = args
+  const orderedLabwareIds = getLabwareIdsInOrder(labware, commands)
 
   return orderedLabwareIds.map(labwareId => ({
     section: SECTIONS.CHECK_LABWARE,
