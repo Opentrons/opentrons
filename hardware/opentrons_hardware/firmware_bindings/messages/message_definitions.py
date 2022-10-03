@@ -1,6 +1,6 @@
 """Definition of CAN messages."""
 from dataclasses import dataclass
-from typing import Type
+from typing import Type, Any
 
 from typing_extensions import Literal
 
@@ -10,28 +10,34 @@ from .. import utils
 
 
 class SingletonMessageIndexGenerator(object):
-    """ Singlton class that generates uinque index values """
-    def __new__(cls):
-        if not hasattr(cls, 'instance'):
+    """Singlton class that generates uinque index values."""
+
+    def __new__(cls) -> Any:
+        """Either generate or return the singleton instance."""
+        if not hasattr(cls, "instance"):
             cls.instance = super(SingletonMessageIndexGenerator, cls).__new__(cls)
         return cls.instance
 
-    def get_next_index(self):
+    def get_next_index(self) -> int:
+        """Return the next index."""
         # increment before returning so we never return 0 as a value
         self.__current_index += 1
         return self.__current_index
 
     __current_index = 0
 
+
 @dataclass(eq=False)
 class BaseMessage(object):
     """Base class of a message that has an empty payload."""
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
+        """Update the message index from the singleton."""
         index_generator = SingletonMessageIndexGenerator()
-        self.message_index = index_generator.get_next_index()
+        self.message_index = utils.UInt32Field(index_generator.get_next_index())
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        """Override __eq__ to ignore message_index."""
         other_dict = vars(other)
         self_dict = vars(self)
         for key in self_dict:
@@ -40,14 +46,14 @@ class BaseMessage(object):
                     return False
         return True
 
-    payload: payloads.EmptyPayload = payloads.EmptyPayload()
-    payload_type: Type[payloads.EmptyPayload] = payloads.EmptyPayload
-    message_index: Literal[utils.UInt32Field] = 0
+    payload: utils.BinarySerializable = payloads.EmptyPayload()
+    payload_type: Type[utils.BinarySerializable] = payloads.EmptyPayload
+    message_index: utils.UInt32Field = utils.UInt32Field(0)
 
 
 @dataclass(eq=False)
-class Acknowledgement(BaseMessage): # noqa: D101
-    message_id: Literal[MessageId.acknowledgement] = MessageId.acknowledgement
+class Acknowledgement(BaseMessage):  # noqa: D101
+    message_id: MessageId = MessageId.acknowledgement
 
 
 @dataclass(eq=False)
