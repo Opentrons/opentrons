@@ -161,7 +161,6 @@ describe('getLabwarePositionCheckSteps', () => {
     when(mockGetPipetteWorkflow)
       .calledWith({
         //  @ts-expect-error
-
         pipetteNames: [rightPipette.pipetteName],
         primaryPipetteId: rightPipetteId,
         labware: protocolWithTwoPipettesWithOnlyOneBeingUsed.labware,
