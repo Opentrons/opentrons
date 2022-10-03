@@ -9,5 +9,5 @@ def test_unqiue_index() -> None:
     last_index = utils.UInt32Field(0)
     for i in range(1, 20):
         message = message_definitions.HeartbeatRequest()
-        assert message.message_index != last_index
-        last_index = message.message_index
+        assert message.payload.message_index != last_index
+        last_index = message.payload.message_index

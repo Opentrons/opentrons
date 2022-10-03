@@ -29,12 +29,12 @@ class SingletonMessageIndexGenerator(object):
 
 @dataclass(eq=False)
 class BaseMessage(object):
-    """Base class of a message that has an empty payload."""
+    """Base class of a message."""
 
     def __post_init__(self) -> None:
         """Update the message index from the singleton."""
         index_generator = SingletonMessageIndexGenerator()
-        self.message_index = utils.UInt32Field(index_generator.get_next_index())
+        self.payload.message_index = utils.UInt32Field(index_generator.get_next_index())
 
     def __eq__(self, other: object) -> bool:
         """Override __eq__ to ignore message_index."""
@@ -49,6 +49,7 @@ class BaseMessage(object):
 
 @dataclass(eq=False)
 class EmptyPayloadMessage(BaseMessage):  # noqa: D101
+    """Base class of a message that has an empty payload."""
     payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[payloads.EmptyPayload] = payloads.EmptyPayload
 

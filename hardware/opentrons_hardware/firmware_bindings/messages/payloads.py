@@ -27,12 +27,11 @@ from .. import utils
 @dataclass
 class EmptyPayload(utils.BinarySerializable):
     """An empty payload."""
-
-    pass
+    message_index = 0
 
 
 @dataclass
-class DeviceInfoResponsePayload(utils.BinarySerializable):
+class DeviceInfoResponsePayload(EmptyPayload):
     """Device info response."""
 
     version: utils.UInt32Field
@@ -41,7 +40,7 @@ class DeviceInfoResponsePayload(utils.BinarySerializable):
 
 
 @dataclass
-class TaskInfoResponsePayload(utils.BinarySerializable):
+class TaskInfoResponsePayload(EmptyPayload):
     """Task info response payload."""
 
     name: TaskNameDataField
@@ -52,7 +51,7 @@ class TaskInfoResponsePayload(utils.BinarySerializable):
 
 
 @dataclass
-class GetStatusResponsePayload(utils.BinarySerializable):
+class GetStatusResponsePayload(EmptyPayload):
     """Get status response."""
 
     status: utils.UInt8Field
@@ -60,21 +59,21 @@ class GetStatusResponsePayload(utils.BinarySerializable):
 
 
 @dataclass
-class MoveRequestPayload(utils.BinarySerializable):
+class MoveRequestPayload(EmptyPayload):
     """Move request."""
 
     steps: utils.UInt32Field
 
 
 @dataclass
-class GetSpeedResponsePayload(utils.BinarySerializable):
+class GetSpeedResponsePayload(EmptyPayload):
     """Get speed response."""
 
     mm_sec: utils.UInt32Field
 
 
 @dataclass
-class EEPromReadPayload(utils.BinarySerializable):
+class EEPromReadPayload(EmptyPayload):
     """Eeprom read request payload ."""
 
     address: utils.UInt16Field
@@ -89,14 +88,14 @@ class EEPromDataPayload(EEPromReadPayload):
 
 
 @dataclass
-class MoveGroupRequestPayload(utils.BinarySerializable):
+class MoveGroupRequestPayload(EmptyPayload):
     """A payload with a group id."""
 
     group_id: utils.UInt8Field
 
 
 @dataclass
-class MoveGroupResponsePayload(utils.BinarySerializable):
+class MoveGroupResponsePayload(EmptyPayload):
     """A response payload with a group id."""
 
     group_id: utils.UInt8Field
@@ -153,14 +152,14 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 
 
 @dataclass
-class EncoderPositionResponse(utils.BinarySerializable):
+class EncoderPositionResponse(EmptyPayload):
     """Read Encoder Position."""
 
     encoder_position: utils.Int32Field
 
 
 @dataclass
-class MotionConstraintsPayload(utils.BinarySerializable):
+class MotionConstraintsPayload(EmptyPayload):
     """The min and max velocity and acceleration of a motion system."""
 
     min_velocity: utils.Int32Field
@@ -170,7 +169,7 @@ class MotionConstraintsPayload(utils.BinarySerializable):
 
 
 @dataclass
-class MotorDriverRegisterPayload(utils.BinarySerializable):
+class MotorDriverRegisterPayload(EmptyPayload):
     """Read motor driver register request payload."""
 
     reg_addr: utils.UInt8Field
@@ -184,7 +183,7 @@ class MotorDriverRegisterDataPayload(MotorDriverRegisterPayload):
 
 
 @dataclass
-class ReadMotorDriverRegisterResponsePayload(utils.BinarySerializable):
+class ReadMotorDriverRegisterResponsePayload(EmptyPayload):
     """Read motor driver register response payload."""
 
     reg_addr: utils.UInt8Field
@@ -192,7 +191,7 @@ class ReadMotorDriverRegisterResponsePayload(utils.BinarySerializable):
 
 
 @dataclass
-class MotorCurrentPayload(utils.BinarySerializable):
+class MotorCurrentPayload(EmptyPayload):
     """Read motor current register payload."""
 
     # All values in milliAmps
@@ -201,7 +200,7 @@ class MotorCurrentPayload(utils.BinarySerializable):
 
 
 @dataclass
-class ReadPresenceSensingVoltageResponsePayload(utils.BinarySerializable):
+class ReadPresenceSensingVoltageResponsePayload(EmptyPayload):
     """Read head presence sensing voltage response payload."""
 
     # All values in millivolts
@@ -211,7 +210,7 @@ class ReadPresenceSensingVoltageResponsePayload(utils.BinarySerializable):
 
 
 @dataclass
-class ToolsDetectedNotificationPayload(utils.BinarySerializable):
+class ToolsDetectedNotificationPayload(EmptyPayload):
     """Tool detection notification."""
 
     # Tools are mapped to an enum
@@ -221,7 +220,7 @@ class ToolsDetectedNotificationPayload(utils.BinarySerializable):
 
 
 @dataclass
-class FirmwareUpdateWithAddress(utils.BinarySerializable):
+class FirmwareUpdateWithAddress(EmptyPayload):
     """A FW update payload with an address."""
 
     address: utils.UInt32Field
@@ -269,7 +268,7 @@ class FirmwareUpdateDataAcknowledge(FirmwareUpdateWithAddress):
 
 
 @dataclass
-class FirmwareUpdateComplete(utils.BinarySerializable):
+class FirmwareUpdateComplete(EmptyPayload):
     """All data messages have been transmitted."""
 
     num_messages: utils.UInt32Field
@@ -277,28 +276,28 @@ class FirmwareUpdateComplete(utils.BinarySerializable):
 
 
 @dataclass
-class FirmwareUpdateAcknowledge(utils.BinarySerializable):
+class FirmwareUpdateAcknowledge(EmptyPayload):
     """A response to a firmware update message with an error code."""
 
     error_code: ErrorCodeField
 
 
 @dataclass
-class FirmwareUpdateStatus(utils.BinarySerializable):
+class FirmwareUpdateStatus(EmptyPayload):
     """A response to the FirmwareUpdateStatusRequest message."""
 
     flags: utils.UInt32Field
 
 
 @dataclass
-class GetLimitSwitchResponse(utils.BinarySerializable):
+class GetLimitSwitchResponse(EmptyPayload):
     """A response to the Limit Switch Status request payload."""
 
     switch_status: utils.UInt8Field
 
 
 @dataclass
-class SensorPayload(utils.BinarySerializable):
+class SensorPayload(EmptyPayload):
     """Take a single reading from a sensor request payload."""
 
     sensor: SensorTypeField
@@ -380,7 +379,7 @@ class BindSensorOutputResponsePayload(SensorPayload):
 
 
 @dataclass
-class PipetteInfoResponsePayload(utils.BinarySerializable):
+class PipetteInfoResponsePayload(EmptyPayload):
     """A response carrying data about an attached pipette."""
 
     name: PipetteNameField
@@ -389,21 +388,21 @@ class PipetteInfoResponsePayload(utils.BinarySerializable):
 
 
 @dataclass
-class BrushedMotorVrefPayload(utils.BinarySerializable):
+class BrushedMotorVrefPayload(EmptyPayload):
     """A request to set the reference voltage of a brushed motor."""
 
     v_ref: utils.UInt32Field
 
 
 @dataclass
-class BrushedMotorPwmPayload(utils.BinarySerializable):
+class BrushedMotorPwmPayload(EmptyPayload):
     """A request to set the pwm of a brushed motor."""
 
     duty_cycle: utils.UInt32Field
 
 
 @dataclass
-class GripperInfoResponsePayload(utils.BinarySerializable):
+class GripperInfoResponsePayload(EmptyPayload):
     """A response carrying data about an attached gripper."""
 
     model: utils.UInt16Field
@@ -443,7 +442,7 @@ class PeripheralStatusResponsePayload(SensorPayload):
 
 
 @dataclass
-class SerialNumberPayload(utils.BinarySerializable):
+class SerialNumberPayload(EmptyPayload):
     """A payload with a serial number."""
 
     serial: SerialField
