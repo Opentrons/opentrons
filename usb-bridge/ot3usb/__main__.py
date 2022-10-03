@@ -3,10 +3,47 @@ import asyncio
 import logging
 import select
 import time
-from typing import NoReturn
+from typing import NoReturn, Optional
+import serial  # type: ignore[import]
+
 from .src import cli, usb_config, default_config, usb_monitor
 
 LOG = logging.getLogger(__name__)
+
+
+def listen(
+    monitor: usb_monitor.USBConnectionMonitor,
+    config: usb_config.SerialGadget,
+    ser: Optional[serial.Serial],
+) -> Optional[serial.Serial]:
+    """Process any available incoming data.
+
+    This function will check for input from any of the input sources to the
+    USB bridge:
+    - The serial port, if it is available
+    - The UDEV message stream (usb_monitor)
+    - The TCP connection to the NGINX server, if a connection is open
+    """
+    rlist = [monitor]
+    if ser:
+        rlist.append(ser)
+    ready = select.select(rlist, [], [])[0]
+    if monitor in ready:
+        # Read a new udev messages
+        monitor.read_message()
+        if ser:
+            if not monitor.host_connected():
+                LOG.info("USB host disconnected")
+                ser = None
+        elif monitor.host_connected():
+            LOG.info("New USB host connected")
+            ser = config.get_handle()
+    if ser and ser in ready:
+        # Ready serial data
+        data = ser.read_all()
+        LOG.debug(f"Received: {data}")
+        ser.write(data)
+    return ser
 
 
 async def main() -> NoReturn:
@@ -31,7 +68,7 @@ async def main() -> NoReturn:
         LOG.error(f"Exception: {format(err)}")
         exit(-1)
 
-    # Spin for at least a couple seconds
+    # Give the kernel a couple seconds to set up the handle
     timeout = time.time() + 2.0
     while time.time() < timeout and not config.handle_exists():
         time.sleep(0.1)
@@ -56,27 +93,7 @@ async def main() -> NoReturn:
         ser = config.get_handle()
 
     while True:
-        rlist = [monitor]
-        if ser:
-            rlist.append(ser)
-        ready = select.select(rlist, [], [])[0]
-        if monitor in ready:
-            LOG.info("Message from UDEV")
-            # Read a new udev messages
-            monitor.read_message()
-            if ser:
-                if not monitor.host_connected():
-                    LOG.info("USB host disconnected")
-                    ser = None
-            elif monitor.host_connected():
-                LOG.info("New USB host connected")
-                ser = config.get_handle()
-                continue
-        if ser and ser in ready:
-            # Ready serial data
-            data = ser.read_all()
-            LOG.debug(f"Received: {data}")
-            ser.write(data)
+        ser = listen(monitor, config, ser)
 
 
 if __name__ == "__main__":
