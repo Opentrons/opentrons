@@ -1,9 +1,12 @@
 """Legacy Protocol API module implementation logic."""
+from __future__ import annotations
+
 import logging
-from typing import Optional, cast
+from typing import Optional, cast, TYPE_CHECKING
 
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
+from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
@@ -12,7 +15,7 @@ from opentrons.hardware_control.modules.types import (
     SpeedStatus,
     MagneticModuleModel,
 )
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
+from opentrons.protocols.geometry.module_geometry import ModuleGeometry, HeaterShakerGeometry
 from opentrons.types import DeckSlotName
 
 from ..module import (
@@ -23,8 +26,15 @@ from ..module import (
 )
 from .labware import LabwareImplementation
 
+if TYPE_CHECKING:
+    from .protocol_context import ProtocolContextImplementation
+
 
 _log = logging.getLogger(__name__)
+
+
+class CannotPerformModuleAction(RuntimeError):
+    """An error raised when attempting to execute an invalid module action."""
 
 
 class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
@@ -35,10 +45,12 @@ class LegacyModuleCore(AbstractModuleCore[LabwareImplementation]):
         sync_module_hardware: SynchronousAdapter[hw_modules.AbstractModule],
         requested_model: ModuleModel,
         geometry: ModuleGeometry,
+        protocol_core: ProtocolContextImplementation,
     ) -> None:
         self._sync_module_hardware = sync_module_hardware
         self._requested_model = requested_model
         self._geometry = geometry
+        self._protocol_core = protocol_core
 
     @property
     def geometry(self) -> ModuleGeometry:
@@ -209,6 +221,7 @@ class LegacyHeaterShakerCore(
     """Core control interface for an attached Heater-Shaker Module."""
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker]
+    _geometry: HeaterShakerGeometry
 
     def set_target_temperature(self, celsius: float) -> None:
         """Set the labware plate's target temperature in °C."""
@@ -220,7 +233,14 @@ class LegacyHeaterShakerCore(
 
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set the shaker's target shake speed and wait for it to spin up."""
-        self._sync_module_hardware.set_speed(rpm=rpm)
+        if self.get_labware_latch_status() == HeaterShakerLabwareLatchStatus.IDLE_CLOSED:
+            self._prepare_for_shake()
+            self._sync_module_hardware.set_speed(rpm=rpm)
+        else:
+            # TODO: Figure out whether to issue close latch behind the scenes instead
+            raise CannotPerformModuleAction(
+                "Cannot start shaking unless labware latch is closed."
+            )
 
     def open_labware_latch(self) -> None:
         """Open the labware latch."""
@@ -266,11 +286,38 @@ class LegacyHeaterShakerCore(
         """Get the module's labware latch status."""
         return self._sync_module_hardware.labware_latch_status  # type: ignore[no-any-return]
 
+    def _prepare_for_shake(self) -> None:
+        """
+        Before shaking, retracts pipettes if they're parked over a slot
+        adjacent to the heater-shaker.
+        """
+        protocol_core = self._protocol_core
+        if self._geometry.is_pipette_blocking_shake_movement(
+            pipette_location=protocol_core.get_last_location()
+        ):
+            hardware = protocol_core.get_hardware()
+            hardware.home(axes=[axis for axis in Axis.mount_axes()])
+            protocol_core.set_last_location(None)
+
+    def _prepare_for_latch_open(self) -> None:
+        """
+        Before opening latch, retracts pipettes if they're parked over a slot
+        east/ west of the heater-shaker.
+        """
+        protocol_core = self._protocol_core
+        if self._geometry.is_pipette_blocking_latch_movement(
+            pipette_location=protocol_core.get_last_location()
+        ):
+            hardware = protocol_core.get_hardware()
+            hardware.home(axes=[axis for axis in Axis.mount_axes()])
+            protocol_core.set_last_location(None)
+
 
 def create_module_core(
     module_hardware_api: hw_modules.AbstractModule,
     requested_model: ModuleModel,
     geometry: ModuleGeometry,
+    protocol_core: ProtocolContextImplementation,
 ) -> LegacyModuleCore:
     core_cls = LegacyModuleCore
 
@@ -285,4 +332,5 @@ def create_module_core(
         sync_module_hardware=SynchronousAdapter(module_hardware_api),
         requested_model=requested_model,
         geometry=geometry,
+        protocol_core=protocol_core,
     )

@@ -246,10 +246,6 @@ def test_set_and_wait_for_shake_speed(
     subject: HeaterShakerContext,
 ) -> None:
     """It should set and wait for shake speed via the core."""
-    decoy.when(mock_core.get_labware_latch_status()).then_return(
-        HeaterShakerLabwareLatchStatus.IDLE_CLOSED
-    )
-
     subject.set_and_wait_for_shake_speed(rpm=1337)
 
     decoy.verify(
@@ -270,35 +266,35 @@ def test_set_and_wait_for_shake_speed(
     )
 
 
-@pytest.mark.parametrize(
-    "latch_status",
-    [
-        HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
-        HeaterShakerLabwareLatchStatus.UNKNOWN,
-        HeaterShakerLabwareLatchStatus.CLOSING,
-        HeaterShakerLabwareLatchStatus.IDLE_OPEN,
-        HeaterShakerLabwareLatchStatus.OPENING,
-    ],
-)
-def test_set_and_wait_for_shake_speed_raises(
-    decoy: Decoy,
-    latch_status: HeaterShakerLabwareLatchStatus,
-    mock_core: HeaterShakerCore,
-    mock_broker: Broker,
-    subject: HeaterShakerContext,
-) -> None:
-    """It should raise a CannotPerformModuleAction when latch is not closed."""
-    decoy.when(mock_core.get_labware_latch_status()).then_return(latch_status)
-
-    with pytest.raises(CannotPerformModuleAction) as exc_info:
-        subject.set_and_wait_for_shake_speed(rpm=1337)
-
-    decoy.verify(
-        mock_broker.publish(
-            "command",
-            matchers.DictMatching({"$": "after", "error": exc_info.value}),
-        ),
-    )
+# @pytest.mark.parametrize(
+#     "latch_status",
+#     [
+#         HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
+#         HeaterShakerLabwareLatchStatus.UNKNOWN,
+#         HeaterShakerLabwareLatchStatus.CLOSING,
+#         HeaterShakerLabwareLatchStatus.IDLE_OPEN,
+#         HeaterShakerLabwareLatchStatus.OPENING,
+#     ],
+# )
+# def test_set_and_wait_for_shake_speed_raises(
+#     decoy: Decoy,
+#     latch_status: HeaterShakerLabwareLatchStatus,
+#     mock_core: HeaterShakerCore,
+#     mock_broker: Broker,
+#     subject: HeaterShakerContext,
+# ) -> None:
+#     """It should raise a CannotPerformModuleAction when latch is not closed."""
+#     decoy.when(mock_core.get_labware_latch_status()).then_return(latch_status)
+#
+#     with pytest.raises(CannotPerformModuleAction) as exc_info:
+#         subject.set_and_wait_for_shake_speed(rpm=1337)
+#
+#     decoy.verify(
+#         mock_broker.publish(
+#             "command",
+#             matchers.DictMatching({"$": "after", "error": exc_info.value}),
+#         ),
+#     )
 
 
 def test_open_labware_latch(

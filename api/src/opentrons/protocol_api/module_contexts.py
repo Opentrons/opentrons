@@ -857,15 +857,17 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
 
         :param rpm: A value between 200 and 3000, representing the target shake speed in revolutions per minute.
         """
-        if self.labware_latch_status == HeaterShakerLabwareLatchStatus.IDLE_CLOSED:
-            validated_speed = validate_heater_shaker_speed(rpm=rpm)
-            self._prepare_for_shake()  # TODO move this to core?
-            self._core.set_and_wait_for_shake_speed(rpm=validated_speed)
-        else:
-            # TODO: Figure out whether to issue close latch behind the scenes instead
-            raise CannotPerformModuleAction(
-                "Cannot start shaking unless labware latch is closed."
-            )
+        validated_speed = validate_heater_shaker_speed(rpm=rpm)
+        self._core.set_and_wait_for_shake_speed(rpm=validated_speed)
+        # if self.labware_latch_status == HeaterShakerLabwareLatchStatus.IDLE_CLOSED:
+        #     validated_speed = validate_heater_shaker_speed(rpm=rpm)
+        #     #self._prepare_for_shake()  # TODO move this to core?
+        #     self._core.set_and_wait_for_shake_speed(rpm=validated_speed)
+        # else:
+        #     # TODO: Figure out whether to issue close latch behind the scenes instead
+        #     raise CannotPerformModuleAction(
+        #         "Cannot start shaking unless labware latch is closed."
+        #     )
 
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_open_labware_latch)
@@ -889,7 +891,7 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             raise CannotPerformModuleAction(
                 """Cannot open labware latch while module is shaking."""
             )
-        self._prepare_for_latch_open()  # TODO also move this to core?
+        #self._prepare_for_latch_open()  # TODO also move this to core?
         self._core.open_labware_latch()
 
     @requires_version(2, 13)
@@ -967,29 +969,3 @@ class HeaterShakerContext(ModuleContext[HeaterShakerGeometry]):
             is_plate_shaking=is_plate_shaking,
             is_labware_latch_closed=is_labware_latch_closed,
         )
-
-    def _prepare_for_shake(self) -> None:
-        """
-        Before shaking, retracts pipettes if they're parked over a slot
-        adjacent to the heater-shaker.
-        """
-        protocol_core = self._protocol_core
-        if self.geometry.is_pipette_blocking_shake_movement(
-            pipette_location=protocol_core.get_last_location()
-        ):
-            hardware = protocol_core.get_hardware()
-            hardware.home(axes=[axis for axis in Axis.mount_axes()])
-            protocol_core.set_last_location(None)
-
-    def _prepare_for_latch_open(self) -> None:
-        """
-        Before opening latch, retracts pipettes if they're parked over a slot
-        east/ west of the heater-shaker.
-        """
-        protocol_core = self._protocol_core
-        if self.geometry.is_pipette_blocking_latch_movement(
-            pipette_location=protocol_core.get_last_location()
-        ):
-            hardware = protocol_core.get_hardware()
-            hardware.home(axes=[axis for axis in Axis.mount_axes()])
-            protocol_core.set_last_location(None)

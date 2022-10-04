@@ -3,7 +3,8 @@ import pytest
 from decoy import Decoy
 
 from opentrons.drivers.types import HeaterShakerLabwareLatchStatus
-from opentrons.hardware_control import SynchronousAdapter
+from opentrons.hardware_control import SynchronousAdapter, SyncHardwareAPI
+from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.modules import HeaterShaker
 from opentrons.hardware_control.modules.types import (
     HeaterShakerModuleModel,
@@ -12,9 +13,13 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.protocols.geometry.module_geometry import HeaterShakerGeometry
 
+from opentrons.protocol_api.core.protocol_api.protocol_context import (
+    ProtocolContextImplementation,
+)
 from opentrons.protocol_api.core.protocol_api.legacy_module_core import (
     LegacyHeaterShakerCore,
     create_module_core,
+    CannotPerformModuleAction,
 )
 
 SyncHeaterShakerHardware = SynchronousAdapter[HeaterShaker]
@@ -33,21 +38,30 @@ def mock_sync_module_hardware(decoy: Decoy) -> SyncHeaterShakerHardware:
 
 
 @pytest.fixture
+def mock_protocol_core(decoy: Decoy) -> ProtocolContextImplementation:
+    """Get a mock protocol core."""
+    return decoy.mock(cls=ProtocolContextImplementation)
+
+
+@pytest.fixture
 def subject(
     mock_geometry: HeaterShakerGeometry,
     mock_sync_module_hardware: SyncHeaterShakerHardware,
+    mock_protocol_core: ProtocolContextImplementation,
 ) -> LegacyHeaterShakerCore:
     """Get a legacy module implementation core with mocked out dependencies."""
     return LegacyHeaterShakerCore(
         requested_model=HeaterShakerModuleModel.HEATER_SHAKER_V1,
         geometry=mock_geometry,
         sync_module_hardware=mock_sync_module_hardware,
+        protocol_core=mock_protocol_core,
     )
 
 
 def test_create(
     decoy: Decoy,
     mock_geometry: HeaterShakerGeometry,
+    mock_protocol_core: ProtocolContextImplementation,
 ) -> None:
     """It should be able to create a magnetic module core."""
     mock_module_hardware_api = decoy.mock(cls=HeaterShaker)
@@ -55,6 +69,7 @@ def test_create(
         geometry=mock_geometry,
         module_hardware_api=mock_module_hardware_api,
         requested_model=HeaterShakerModuleModel.HEATER_SHAKER_V1,
+        protocol_core=mock_protocol_core,
     )
 
     assert isinstance(result, LegacyHeaterShakerCore)
@@ -168,12 +183,47 @@ def test_wait_for_target_temperature(
 def test_set_and_wait_for_shake_speed(
     decoy: Decoy,
     mock_sync_module_hardware: SyncHeaterShakerHardware,
+    mock_geometry: HeaterShakerGeometry,
+    mock_protocol_core: ProtocolContextImplementation,
     subject: LegacyHeaterShakerCore,
 ) -> None:
     """It should set and wait for the target speed with the hardware."""
+    # TODO check all this mocking
+    mock_hardware = decoy.mock(cls=SyncHardwareAPI)
+    decoy.when(subject.get_labware_latch_status()).then_return(HeaterShakerLabwareLatchStatus.IDLE_CLOSED)
+    decoy.when(mock_geometry.is_pipette_blocking_shake_movement(None)).then_return(True)
+    decoy.when(mock_protocol_core.get_hardware()).then_return(mock_hardware)
+
     subject.set_and_wait_for_shake_speed(1337)
 
-    decoy.verify(mock_sync_module_hardware.set_speed(rpm=1337), times=1)
+    decoy.verify(
+        mock_hardware.home(axes=[Axis.Z, Axis.A]),
+        mock_protocol_core.set_last_location(None),
+        mock_sync_module_hardware.set_speed(rpm=1337),
+    )
+
+
+@pytest.mark.parametrize(
+    "latch_status",
+    [
+        HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN,
+        HeaterShakerLabwareLatchStatus.UNKNOWN,
+        HeaterShakerLabwareLatchStatus.CLOSING,
+        HeaterShakerLabwareLatchStatus.IDLE_OPEN,
+        HeaterShakerLabwareLatchStatus.OPENING,
+    ],
+)
+def test_set_and_wait_for_shake_speed_raises(
+    decoy: Decoy,
+    latch_status: HeaterShakerLabwareLatchStatus,
+    mock_sync_module_hardware: SyncHeaterShakerHardware,
+    subject: LegacyHeaterShakerCore,
+) -> None:
+    """It should raise a CannotPerformModuleAction when latch is not closed."""
+    decoy.when(subject.get_labware_latch_status()).then_return(latch_status)
+
+    with pytest.raises(CannotPerformModuleAction):
+        subject.set_and_wait_for_shake_speed(rpm=1337)
 
 
 def test_open_labware_latch(
