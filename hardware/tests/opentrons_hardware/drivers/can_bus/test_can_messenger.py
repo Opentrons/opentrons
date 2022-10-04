@@ -123,7 +123,7 @@ async def test_listen_messages(
                     originating_node_id=NodeId.gantry_x,
                 )
             ),
-            data=b"\1",
+            data=b"\x00\x00\x00\x01\1",
         )
     )
 

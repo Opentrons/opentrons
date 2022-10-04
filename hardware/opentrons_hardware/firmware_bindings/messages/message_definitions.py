@@ -33,12 +33,21 @@ class BaseMessage(object):
 
     def __post_init__(self) -> None:
         """Update the message index from the singleton."""
-        index_generator = SingletonMessageIndexGenerator()
-        self.payload.message_index = utils.UInt32Field(index_generator.get_next_index())
+        try:
+            index_generator = SingletonMessageIndexGenerator()
+            self.payload.message_index = utils.UInt32Field(
+                index_generator.get_next_index()
+            )
+        except AttributeError:
+            # we are probably constructing this instance from binary and it doesn't
+            # have a payload yet
+            pass
+
 
 @dataclass
 class EmptyPayloadMessage(BaseMessage):  # noqa: D101
     """Base class of a message that has an empty payload."""
+
     payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[payloads.EmptyPayload] = payloads.EmptyPayload
 
